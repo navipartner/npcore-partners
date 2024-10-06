@@ -116,8 +116,7 @@ table 6150788 "NPR Adyen Reconciliation Hdr"
         field(150; "Failed Lines Exist"; Boolean)
         {
             Caption = 'Failed Lines Exist';
-            FieldClass = FlowField;
-            CalcFormula = exist("NPR Adyen Recon. Line" where("Document No." = field("Document No."), Status = filter("Failed to Match" | "Failed to Post")));
+            DataClassification = CustomerContent;
         }
     }
     keys
@@ -127,6 +126,9 @@ table 6150788 "NPR Adyen Reconciliation Hdr"
             Clustered = true;
         }
         key(Key2; "Batch Number", "Merchant Account")
+        {
+        }
+        key(Key3; "Failed Lines Exist")
         {
         }
     }

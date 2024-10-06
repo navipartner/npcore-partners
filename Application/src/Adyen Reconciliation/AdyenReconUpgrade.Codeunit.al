@@ -1,4 +1,4 @@
-codeunit 6184908 "NPR Recon. EFT Magento Upgrade"
+codeunit 6184908 "NPR Adyen Recon. Upgrade"
 {
     Access = Internal;
     Subtype = Upgrade;
@@ -15,6 +15,7 @@ codeunit 6184908 "NPR Recon. EFT Magento Upgrade"
         UpdateAdyenSetupCompanyID();
         UpdateAdyenReconLinePostingAllowed();
         UpdateAdyenReconciliationStatus();
+        UpdateAdyenReconciliationDocumentProcessingStatus();
     end;
 
     local procedure UpdatePSPReferenceForEFTTrans()
@@ -24,9 +25,9 @@ codeunit 6184908 "NPR Recon. EFT Magento Upgrade"
         AdyenLocalIntegration: Codeunit "NPR EFT Adyen Local Integrat.";
     begin
         UpgradeStep := 'UpdatePSPReferenceForEFTTrans';
-        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Recon. EFT Magento Upgrade", UpgradeStep)) then
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep)) then
             exit;
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Recon. EFT Magento Upgrade', UpgradeStep);
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Adyen Recon. Upgrade', UpgradeStep);
 
         EFTTransactionRequest.Reset();
         EFTTransactionRequest.SetFilter("Integration Type", '%1|%2', AdyenCloudIntegration.IntegrationType(), AdyenLocalIntegration.IntegrationType());
@@ -38,7 +39,7 @@ codeunit 6184908 "NPR Recon. EFT Magento Upgrade"
                 end;
             until EFTTransactionRequest.Next() = 0;
 
-        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Recon. EFT Magento Upgrade", UpgradeStep));
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();
     end;
 
@@ -48,9 +49,9 @@ codeunit 6184908 "NPR Recon. EFT Magento Upgrade"
         AdyenSetupCompanyID: Record "NPR Adyen Setup";
     begin
         UpgradeStep := 'UpdateAdyenSetupCompanyID';
-        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Recon. EFT Magento Upgrade", UpgradeStep)) then
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep)) then
             exit;
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Recon. EFT Magento Upgrade', UpgradeStep);
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Adyen Recon. Upgrade', UpgradeStep);
 
         if not AdyenSetup.Get() then
             exit;
@@ -62,7 +63,7 @@ codeunit 6184908 "NPR Recon. EFT Magento Upgrade"
         AdyenSetup."Company ID" := AdyenSetupCompanyID."Company ID";
         AdyenSetup.Modify(false);
 
-        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Recon. EFT Magento Upgrade", UpgradeStep));
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();
     end;
 
@@ -72,9 +73,9 @@ codeunit 6184908 "NPR Recon. EFT Magento Upgrade"
         AdyenReconLine: Record "NPR Adyen Recon. Line";
     begin
         UpgradeStep := 'UpdateAdyenReconLinePostingAllowed';
-        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Recon. EFT Magento Upgrade", UpgradeStep)) then
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep)) then
             exit;
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Recon. EFT Magento Upgrade', UpgradeStep);
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Adyen Recon. Upgrade', UpgradeStep);
 
         if not AdyenSetup.Get() then
             exit;
@@ -85,7 +86,7 @@ codeunit 6184908 "NPR Recon. EFT Magento Upgrade"
             AdyenReconLine.SetFilter("Transaction Type", '<>%1&<>%2&<>%3', AdyenReconLine."Transaction Type"::Chargeback, AdyenReconLine."Transaction Type"::ChargebackExternallyWithInfo, AdyenReconLine."Transaction Type"::SecondChargeback);
         AdyenReconLine.ModifyAll("Posting allowed", true);
 
-        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Recon. EFT Magento Upgrade", UpgradeStep));
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();
     end;
 
@@ -96,9 +97,9 @@ codeunit 6184908 "NPR Recon. EFT Magento Upgrade"
         ReconLine: Record "NPR Adyen Recon. Line";
     begin
         UpgradeStep := 'UpdateAdyenReconciliationStatus';
-        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Recon. EFT Magento Upgrade", UpgradeStep)) then
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep)) then
             exit;
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Recon. EFT Magento Upgrade', UpgradeStep);
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Adyen Recon. Upgrade', UpgradeStep);
 
         if ReconHeader.FindSet() then
             repeat
@@ -118,7 +119,33 @@ codeunit 6184908 "NPR Recon. EFT Magento Upgrade"
                 end;
             until ReconHeader.Next() = 0;
 
-        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Recon. EFT Magento Upgrade", UpgradeStep));
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure UpdateAdyenReconciliationDocumentProcessingStatus()
+    var
+        ReconHeader: Record "NPR Adyen Reconciliation Hdr";
+        ReconHeader2: Record "NPR Adyen Reconciliation Hdr";
+        ReconLine: Record "NPR Adyen Recon. Line";
+    begin
+        UpgradeStep := 'UpdateAdyenReconciliationDocumentProcessingStatus';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep)) then
+            exit;
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Adyen Recon. Upgrade', UpgradeStep);
+
+        if ReconHeader.FindSet() then
+            repeat
+                ReconLine.SetRange("Document No.", ReconHeader2."Document No.");
+                ReconLine.SetFilter(Status, '%1|%2', ReconLine.Status::"Failed to Match", ReconLine.Status::"Failed to Post");
+                if not ReconLine.IsEmpty() then begin
+                    ReconHeader2 := ReconHeader;
+                    ReconHeader2."Failed Lines Exist" := true;
+                    ReconHeader2.Modify();
+                end;
+            until ReconHeader.Next() = 0;
+
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();
     end;
 }

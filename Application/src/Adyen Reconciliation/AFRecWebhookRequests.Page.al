@@ -38,6 +38,16 @@ page 6184519 "NPR AF Rec. Webhook Requests"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Report Name.';
                 }
+                field(Processed; Rec.Processed)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies if the Report line was processed.';
+                }
+                field("Processing Status"; Rec."Processing Status")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the Report line processing status.';
+                }
                 field(Live; Rec.Live)
                 {
                     ApplicationArea = NPRRetail;

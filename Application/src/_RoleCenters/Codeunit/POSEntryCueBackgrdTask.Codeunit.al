@@ -20,7 +20,7 @@
         POSEntryCue.CalcFields(
             "Unposted Item Trans.", "Unposted G/L Trans.", "Failed Item Transaction.", "Failed G/L Posting Trans.",
             "EFT Reconciliation Errors", "Unfinished EFT Requests", "EFT Req. with Unknown Result",
-            "Campaign Discount List", "Mix Discount List", "Coupon List", "Voucher List");
+            "Campaign Discount List", "Mix Discount List", "Coupon List", "Voucher List", "Reconc. Batches with Errors");
 
         Result.Add(Format(POSEntryCue.FieldNo("Unposted Item Trans.")), Format(POSEntryCue."Unposted Item Trans.", 0, 9));
         Result.Add(Format(POSEntryCue.FieldNo("Unposted G/L Trans.")), Format(POSEntryCue."Unposted G/L Trans.", 0, 9));
@@ -35,6 +35,7 @@
         Result.Add(Format(POSEntryCue.FieldNo("Voucher List")), Format(POSEntryCue."Voucher List", 0, 9));
         TransationAmountLCY := POSStatisticsMgt.CalculateTransactionAmount();
         Result.Add(Format(POSEntryCue.FieldNo("Transaction Amount (LCY)")), Format(TransationAmountLCY, 0, 9));
+        Result.Add(Format(POSEntryCue.FieldNo("Reconc. Batches with Errors")), Format(POSEntryCue."Reconc. Batches with Errors", 0, 9));
 
         Page.SetBackgroundTaskResult(Result);
     end;

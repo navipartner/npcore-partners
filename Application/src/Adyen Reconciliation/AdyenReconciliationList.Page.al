@@ -111,8 +111,6 @@ page 6184534 "NPR Adyen Reconciliation List"
 
     local procedure ChangeColorDocument(): Text[50]
     begin
-        Rec.CalcFields("Failed Lines Exist");
-
         if Rec."Failed Lines Exist" then
             exit('Unfavorable');
 

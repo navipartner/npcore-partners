@@ -96,14 +96,31 @@
             {
                 Caption = 'EFT Errors';
                 ShowCaption = true;
+                field(FailedReconcBatches; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Reconc. Batches with Errors"))))
+                {
+                    ApplicationArea = NPRRetail;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
+                    AutoFormatType = 11;
+                    Caption = 'Reconciliation Batches with Errors';
+                    ToolTip = 'Specifies the number of Reconciliation Batches that have Errors. By clicking, you can drill down to the list of failed NP Pay Batches.';
 
+                    trigger OnDrillDown()
+                    var
+                        AdyenReconHdr: Record "NPR Adyen Reconciliation Hdr";
+                        AdyenReconList: Page "NPR Adyen Reconciliation List";
+                    begin
+                        AdyenReconHdr.SetRange("Failed Lines Exist", true);
+                        AdyenReconList.SetTableView(AdyenReconHdr);
+                        AdyenReconList.RunModal();
+                    end;
+                }
                 field(EFTReconcErrors; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("EFT Reconciliation Errors"))))
                 {
                     ApplicationArea = NPRRetail;
                     AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
                     AutoFormatType = 11;
-                    Caption = 'EFT Reconciliation Errors';
-                    ToolTip = 'Specifies the number of Reconciliation EFT Errors in the last 30 days. By clicking, you can drill down to the list of Reconciliation EFT Errors in the last 30 days.';
+                    Caption = 'EFT Transaction Errors';
+                    ToolTip = 'Specifies the number of Transaction EFT Errors in the last 30 days. By clicking, you can drill down to the list of Transaction EFT Errors in the last 30 days.';
 
                     trigger OnDrillDown()
                     var

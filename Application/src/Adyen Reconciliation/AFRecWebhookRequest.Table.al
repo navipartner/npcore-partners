@@ -106,12 +106,20 @@ table 6150791 "NPR AF Rec. Webhook Request"
             Caption = 'NP Pay Webhook Entry No.';
             TableRelation = "NPR Adyen Webhook"."Entry No.";
         }
+        field(140; "Processing Status"; Enum "NPR Adyen Report Proc. Status")
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Processing Status';
+        }
     }
     keys
     {
         key(PK; ID)
         {
             Clustered = true;
+        }
+        key(Key2; Processed)
+        {
         }
     }
 }

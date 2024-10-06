@@ -192,10 +192,11 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POSMenu Actions v3", 'MM_MEMBERMGT-1'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POSMenu Actions v3", 'MM_MEMBERMGMT_WF2-1'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POSMenu Actions v3", 'UpgradeOSMenuButtonParameterActionCodes'));
-        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Recon. EFT Magento Upgrade", 'UpdatePSPReferenceForEFTTrans'));
-        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Recon. EFT Magento Upgrade", 'UpdateAdyenSetupCompanyID'));
-        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Recon. EFT Magento Upgrade", 'UpdateAdyenReconLinePostingAllowed'));
-        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Recon. EFT Magento Upgrade", 'UpdateAdyenReconciliationStatus'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", 'UpdatePSPReferenceForEFTTrans'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", 'UpdateAdyenSetupCompanyID'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", 'UpdateAdyenReconLinePostingAllowed'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", 'UpdateAdyenReconciliationStatus'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", 'UpdateAdyenReconciliationDocumentProcessingStatus'));
 #if not BC17
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'SetDataProcessingHandlerID'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'PhaseOutShopifyCCIntegration'));
@@ -747,7 +748,7 @@
                     'UpgradeArchivedPOSLayoutEncoding':
                         exit('NPR-UpgradeArchivedPOSLayoutEncoding-20240405');
                 end;
-            Codeunit::"NPR Recon. EFT Magento Upgrade":
+            Codeunit::"NPR Adyen Recon. Upgrade":
                 case UpgradeStep of
                     'UpdatePSPReferenceForEFTTrans':
                         exit('NPR-UpdatePSPReferenceForEFTTrans-20240603');
@@ -757,6 +758,8 @@
                         exit('NPR-UpdateAdyenReconLinePostingAllowed-20240626');
                     'UpdateAdyenReconciliationStatus':
                         exit('NPR-UpdateAdyenReconciliationStatus-20240828');
+                    'UpdateAdyenReconciliationDocumentProcessingStatus':
+                        exit('NPR-UpdateAdyenReconciliationDocumentProcessingStatus-20241004');
                 end;
 #if not BC17
             Codeunit::"NPR Spfy App Upgrade":
