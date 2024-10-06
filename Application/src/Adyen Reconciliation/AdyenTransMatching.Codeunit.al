@@ -14,23 +14,11 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         CurrentMerchantAccount: Text;
         CurrentBatchNumber: Integer;
         EntryAmount: Integer;
-        SetupDoesNotExist: Label 'G/L Setup or NP Pay Setup does not exist.';
-        GLSetupLCYCodeIsEmpty: Label 'LCY Code is not set in General Ledger Setup.';
     begin
-        if (not _GLSetup.Get()) or (not _AdyenSetup.Get()) then begin
-            _AdyenManagement.CreateReconciliationLog(_LogType::"Init Setup", false, SetupDoesNotExist, 0);
-            exit;
-        end;
-
-        if _GLSetup."LCY Code" = '' then begin
-            _AdyenManagement.CreateReconciliationLog(_LogType::"Init Setup", false, GLSetupLCYCodeIsEmpty, 0);
-            exit;
-        end;
-
-        if ReportWebhookRequest.ID = 0 then begin
-            _AdyenManagement.CreateReconciliationLog(_LogType::"Get Report", false, StrSubstNo(GetWebhookError, Format(ReportWebhookRequest.ID)), 0);
-            exit;
-        end;
+        ReportWebhookRequest.TestField(ID);
+        _GLSetup.Get();
+        _GLSetup.TestField("LCY Code");
+        _AdyenSetup.Get();
 
         if not GetReportData(ReportWebhookRequest, false) then
             exit;
@@ -452,6 +440,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         if not ReconciliationLine.FindSet(true) then begin
             _AdyenManagement.CreateReconciliationLog(_LogType::"Match Transactions", false, StrSubstNo(MatchTransactionsError02, ReconciliationHeader."Document No.", ReconciliationHeader."Merchant Account"), ReconciliationHeader."Webhook Request ID");
             ReconciliationHeader.Status := ReconciliationHeader.Status::Matched;
+            ReconciliationHeader."Failed Lines Exist" := false;
             ReconciliationHeader.Modify();
             exit(MatchedEntries);
         end;
@@ -511,15 +500,14 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         if GuiAllowed() then
             Window.Close();
 
-        if UnmatchedEntries > 0 then
+        ReconciliationHeader."Failed Lines Exist" := UnmatchedEntries > 0;
+        if ReconciliationHeader."Failed Lines Exist" then
             _AdyenManagement.CreateReconciliationLog(_LogType::"Match Transactions", false, StrSubstNo(MatchTransactionsError03, Format(UnmatchedEntries), ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID")
         else begin
             _AdyenManagement.CreateReconciliationLog(_LogType::"Match Transactions", true, StrSubstNo(MatchTransactionsSuccess01, ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID");
             ReconciliationHeader.Status := ReconciliationHeader.Status::Matched;
-            ReconciliationHeader.Modify();
         end;
-
-        exit(MatchedEntries);
+        ReconciliationHeader.Modify();
     end;
 
     local procedure TryMatchingPayment(var ReconciliationLine: Record "NPR Adyen Recon. Line"; var UnmatchedEntries: Integer; ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr") MatchedEntries: Integer
@@ -747,6 +735,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         if ReconciliationLine.IsEmpty() then begin
             _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", true, StrSubstNo(PostTransactionsSuccess01, ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID");
             ReconciliationHeader.Status := ReconciliationHeader.Status::Posted;
+            ReconciliationHeader."Failed Lines Exist" := false;
             ReconciliationHeader.Modify();
             exit(true);
         end;
@@ -813,14 +802,15 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         if GuiAllowed() then
             Window.Close();
 
-        if UnPostedEntries > 0 then begin
-            _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(PostTransactionsError03, Format(UnPostedEntries), ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID");
-            exit(false);
+        if UnPostedEntries > 0 then
+            _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(PostTransactionsError03, Format(UnPostedEntries), ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID")
+        else begin
+            _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", true, StrSubstNo(PostTransactionsSuccess01, ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID");
+            ReconciliationHeader.Status := ReconciliationHeader.Status::Posted;
         end;
-        _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", true, StrSubstNo(PostTransactionsSuccess01, ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID");
-        ReconciliationHeader.Status := ReconciliationHeader.Status::Posted;
+        ReconciliationHeader."Failed Lines Exist" := UnPostedEntries > 0;
         ReconciliationHeader.Modify();
-        exit(true);
+        exit(ReconciliationHeader."Failed Lines Exist");
     end;
 
     local procedure TryPostingPayment(var ReconciliationLine: Record "NPR Adyen Recon. Line"; ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr") UnPostedEntries: Integer
@@ -1031,28 +1021,19 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         SchemeColumnNumber: Integer;
         InvalidSchemeError: Label 'Validation Scheme Failed: Report did not meet validation criteria. Column ''%1'' does not exist. Please check report''s configuration.';
         ValidSchemeText: Label 'Validation Success: Report passed all validation criteria.';
-        NoSetupCreated: Label 'NP Pay Setup configuration does not exist.';
-        PostingNosEmpty: Label 'Posting Document Nos. is not specified in NP Pay Setup.';
+        ReportDataIsMissingOrCorruptedLbl: Label 'Report data is missing or could not be read.';
         Scheme: array[50] of Text[35];
         AdyenSetup: Record "NPR Adyen Setup";
     begin
-        if WebhookRequest.ID = 0 then begin
-            _AdyenManagement.CreateReconciliationLog(_LogType::"Get Report", false, StrSubstNo(GetWebhookError, Format(WebhookRequest.ID)), 0);
-            exit;
-        end;
-        if not AdyenSetup.Get() then begin
-            _AdyenManagement.CreateReconciliationLog(_LogType::"Init Setup", false, NoSetupCreated, WebhookRequest.ID);
-            exit;
-        end;
-        if AdyenSetup."Posting Document Nos." = '' then begin
-            _AdyenManagement.CreateReconciliationLog(_LogType::"Init Setup", false, PostingNosEmpty, WebhookRequest.ID);
-            exit;
-        end;
+        WebhookRequest.TestField(ID);
+        AdyenSetup.GetRecordOnce();
+        AdyenSetup.TestField("Posting Document Nos.");
+
         if not GetReportData(WebhookRequest, false) then
-            exit;
+            Error(ReportDataIsMissingOrCorruptedLbl);
 
         if WebhookRequest."Report Type" = WebhookRequest."Report Type"::Undefined then
-            exit;
+            WebhookRequest.FieldError("Report Type");
 
         _AdyenManagement.DefineReportScheme(WebhookRequest."Report Type", Scheme, SchemeColumnNumber);
 
@@ -1065,14 +1046,10 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             i += 1;
         end;
 
-        if not SchemeValid then begin
-            _AdyenManagement.CreateReconciliationLog(_LogType::"Validate Report Scheme", false, StrSubstNo(InvalidSchemeError, SchemeValidationField), WebhookRequest.ID);
-            exit;
-        end;
+        if not SchemeValid then
+            Error(InvalidSchemeError);
 
         _AdyenManagement.CreateReconciliationLog(_LogType::"Validate Report Scheme", true, ValidSchemeText, WebhookRequest.ID);
-        WebhookRequest.Processed := true;
-        WebhookRequest.Modify();
         exit(true);
     end;
 
@@ -1401,7 +1378,6 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
 #else
         _NoSeriesMgt: Codeunit NoSeriesManagement;
 #endif
-        GetWebhookError: Label 'Webhook request with ID %1 does not exist.';
         GetReportError02: Label 'Webhook request with ID %1 does not have a Report Download URL.\Please contact your System Administrator.';
         ImportLinesError01: Label 'Report ''%1'' has no entries. Report Data exist - %2';
         ImportLinesError02: Label 'Report ''%1'' has no transactions within Merchant Account ''%2''.';

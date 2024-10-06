@@ -50,17 +50,20 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         MagentoPaymentLine: Record "NPR Magento Payment Line";
-        POSPaymentMethod: Record "NPR POS Payment Method";
+        POSPaymentLine: Record "NPR POS Entry Payment Line";
         POSPostingSetup: Record "NPR POS Posting Setup";
+        POSPostEntries: Codeunit "NPR POS Post Entries";
+        CouldNotDeterminePOSPostingSetupLbl: Label 'The system was unable to locate the corresponding POS Posting Setup for the Sale: %1.';
     begin
         case _ReconciliationLine."Matching Table Name" of
             _ReconciliationLine."Matching Table Name"::"EFT Transaction":
                 begin
                     EFTTransactionRequest.GetBySystemId(_ReconciliationLine."Matching Entry System ID");
-                    POSPaymentMethod.Get(EFTTransactionRequest."Original POS Payment Type Code");
-                    POSPostingSetup.Reset();
-                    POSPostingSetup.SetRange("POS Payment Method Code", POSPaymentMethod.Code);
-                    POSPostingSetup.FindFirst();
+                    POSPaymentLine.GetBySystemId(EFTTransactionRequest."Sales Line ID");
+
+                    if not POSPostEntries.GetPostingSetup(POSPaymentLine."POS Store Code", EFTTransactionRequest."Original POS Payment Type Code", POSPaymentLine."POS Payment Bin Code", POSPostingSetup) then
+                        Error(CouldNotDeterminePOSPostingSetupLbl, EFTTransactionRequest."Sales Ticket No.");
+
                     case POSPostingSetup."Account Type" of
                         POSPostingSetup."Account Type"::"G/L Account":
                             _PaymentAccountType := _PaymentAccountType::"G/L Account";

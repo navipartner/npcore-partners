@@ -93,6 +93,12 @@
             Caption = 'Transaction Amount (LCY)';
             DataClassification = CustomerContent;
         }
+        field(40; "Reconc. Batches with Errors"; Integer)
+        {
+            Caption = 'Reconciliation Batches with Errors';
+            FieldClass = FlowField;
+            CalcFormula = count("NPR Adyen Reconciliation Hdr" where("Failed Lines Exist" = const(true)));
+        }
     }
     keys
     {

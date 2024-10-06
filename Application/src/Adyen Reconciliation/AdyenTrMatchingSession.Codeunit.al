@@ -4,17 +4,13 @@ codeunit 6184786 "NPR Adyen Tr. Matching Session"
 
     trigger OnRun()
     var
-        TransactionMatching: Codeunit "NPR Adyen Trans. Matching";
-        NewDocumentsList: JsonArray;
-        JsonToken: JsonToken;
-        MatchedEntries: Integer;
-        AdyenGenericSetup: Record "NPR Adyen Setup";
-        ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr";
         RecWebhookRequests: Record "NPR AF Rec. Webhook Request";
+        RecWebhookRequests2: Record "NPR AF Rec. Webhook Request";
         AdyenWebhook: Record "NPR Adyen Webhook";
         AdyenManagement: Codeunit "NPR Adyen Management";
         WebhookProcessing: Codeunit "NPR Adyen Webhook Processing";
-        LogType: Enum "NPR Adyen Webhook Log Type";
+        GeneralLogType: Enum "NPR Adyen Webhook Log Type";
+        ReconciliationLogType: Enum "NPR Adyen Rec. Log Type";
     begin
         AdyenWebhook.Reset();
         AdyenWebhook.SetRange("Event Code", AdyenWebhook."Event Code"::REPORT_AVAILABLE);
@@ -22,7 +18,7 @@ codeunit 6184786 "NPR Adyen Tr. Matching Session"
         if AdyenWebhook.FindSet() then
             repeat
                 if not WebhookProcessing.Run(AdyenWebhook) then begin
-                    AdyenManagement.CreateGeneralLog(LogType::Error, false, GetLastErrorText(), AdyenWebhook."Entry No.");
+                    AdyenManagement.CreateGeneralLog(GeneralLogType::Error, false, GetLastErrorText(), AdyenWebhook."Entry No.");
                     AdyenWebhook.Status := AdyenWebhook.Status::Error;
                     AdyenWebhook.Modify();
                     Commit();
@@ -32,24 +28,20 @@ codeunit 6184786 "NPR Adyen Tr. Matching Session"
         // Process all not processed Webhook Entries
         RecWebhookRequests.Reset();
         RecWebhookRequests.SetRange(Processed, false);
+
         if RecWebhookRequests.IsEmpty() then
             exit;
 
-        if RecWebhookRequests.FindSet(true) then
+        if RecWebhookRequests.FindSet() then
             repeat
-                Clear(TransactionMatching);
-                if TransactionMatching.ValidateReportScheme(RecWebhookRequests) then begin
-                    NewDocumentsList := TransactionMatching.CreateSettlementDocuments(RecWebhookRequests, false, '');
-                    if NewDocumentsList.Count() > 0 then begin
-                        foreach JsonToken in NewDocumentsList do begin
-                            if ReconciliationHeader.Get(CopyStr(JsonToken.AsValue().AsCode(), 1, MaxStrLen(ReconciliationHeader."Document No."))) then begin
-                                MatchedEntries := TransactionMatching.MatchEntries(ReconciliationHeader);
-                                if MatchedEntries > 0 then
-                                    if not AdyenGenericSetup.Get() or AdyenGenericSetup."Enable Automatic Posting" then
-                                        TransactionMatching.PostEntries(ReconciliationHeader);
-                            end;
-                        end;
-                    end;
+                RecWebhookRequests2 := RecWebhookRequests;
+                if not Codeunit.Run(Codeunit::"NPR Adyen Rec. Report Process", RecWebhookRequests2) then begin
+                    RecWebhookRequests2.Find();
+                    RecWebhookRequests2.Processed := true;
+                    RecWebhookRequests2."Processing Status" := RecWebhookRequests2."Processing Status"::Failed;
+                    RecWebhookRequests2.Modify();
+                    AdyenManagement.CreateReconciliationLog(ReconciliationLogType::"Background Session", false, GetLastErrorText(), RecWebhookRequests2.ID);
+                    Commit();
                 end;
             until RecWebhookRequests.Next() = 0;
     end;
