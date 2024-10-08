@@ -60,4 +60,8 @@ enumextension 6014402 "NPR Assisted Setup Group" extends "Assisted Setup Group"
     {
         Caption = 'NP SE CleanCash';
     }
+    value(6014415; NPRHUMultiSoftEInv)
+    {
+        Caption = 'NP HU MiltiSoft E-Invoice';
+    }
 }
