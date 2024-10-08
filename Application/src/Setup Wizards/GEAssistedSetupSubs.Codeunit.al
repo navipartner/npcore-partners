@@ -23,6 +23,7 @@
         AddDEFiscalizationSetupsWizard();
         AddIRLFiscalizationSetupsWizard();
         AddNOFiscalSetupsWizard();
+        AddSECCFiscalizationSetupsWizard(); 
     end;
 
     local procedure AddRetailSetupsWizard()
@@ -229,7 +230,7 @@
         AssistedSetup.Add(GetAppId(), Page::"NPR Setup IRL Fiscal", IRLFiscalizationSetupTxt, AssistedSetupGroup::NPRIRLFiscal);
     end;
 
-     local procedure AddNOFiscalSetupsWizard()
+    local procedure AddNOFiscalSetupsWizard()
     var
         AssistedSetup: Codeunit "Assisted Setup";
         AssistedSetupGroup: Enum "Assisted Setup Group";
@@ -238,6 +239,17 @@
     begin
         AssistedSetup.Add(GetAppId(), Page::"NPR Setup NO Fiscal", NOFiscalSetupTxt, AssistedSetupGroup::NPRNOFiscal);
         AssistedSetup.Add(GetAppId(), Page::"NPR Setup NO Audit Profile", NOPOSAuditProfileSetupTxt, AssistedSetupGroup::NPRNOFiscal);
+    end;
+
+    local procedure AddSECCFiscalizationSetupsWizard()
+    var
+        AssistedSetup: Codeunit "Assisted Setup";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        SECCFiscalSetupTxt: Label 'Welcome to SE CleanCash Fiscal Setup';
+        SECCSetupTxt: Label 'Welcome to SE CleanCash Setup';
+    begin
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup SE Fiscal", SECCFiscalSetupTxt, AssistedSetupGroup::NPRSECleanCash);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup SE CleanCash", SECCSetupTxt, AssistedSetupGroup::NPRSECleanCash);
     end;
 
     procedure GetAppId(): Guid
@@ -276,6 +288,7 @@
         DEFiscalizationSetups();
         IRLFiscalizationSetups();
         NOFiscalizationSetups();
+        SECCFiscalizationSetups();
 
 #if not BC18
         if Checklist.IsChecklistVisible() then
@@ -1460,7 +1473,7 @@
 
     #region Common Functions
     //This region contains common functions used by all Setup Wizards and Checklists
-    local procedure GetChecklistUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup,DEFiscalization,BEFiscalization,IRLFiscalization,NOFiscalization): Code[250]
+    local procedure GetChecklistUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup,DEFiscalization,BEFiscalization,IRLFiscalization,NOFiscalization,SECCFiscalization): Code[250]
     begin
         case Modul of
             Modul::Retail:
@@ -1475,7 +1488,7 @@
         end;
     end;
 
-    local procedure GetAssistedSetupUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup,DEFiscalization,BEFiscalization,IRLFiscalization,NOFiscalization): Code[250]
+    local procedure GetAssistedSetupUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup,DEFiscalization,BEFiscalization,IRLFiscalization,NOFiscalization,SECCFiscalization): Code[250]
     begin
         case Modul of
             Modul::Retail:
@@ -1520,6 +1533,9 @@
             Modul::NOFiscalization:
                 // For Any change, increase version
                 exit('NPR-AssistedSetup-NOFiscalization-v1.0');
+            Modul::SECCFiscalization:
+                // For Any change, increase version
+                exit('NPR-AssistedSetup-SECCFiscalization-v1.0');
         end;
     end;
 
@@ -2667,6 +2683,8 @@
                 GuidedExperience.ResetAssistedSetup(ObjectType::Page, Page::"NPR Setup IRL Fiscal");
             AssistedSetupGroup::NPRNOFiscal:
                 GuidedExperience.ResetAssistedSetup(ObjectType::Page, Page::"NPR Setup NO Fiscal");
+            AssistedSetupGroup::NPRSECleanCash:
+                GuidedExperience.ResetAssistedSetup(ObjectType::Page, Page::"NPR Setup SE Fiscal");
         end;
     end;
 
@@ -3465,6 +3483,156 @@
         GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup NO Audit Profile");
     end;
     #endregion
+    #region SE CleanCash Wizards
+    local procedure SECCFiscalizationSetups()
+    var
+        UpgradeTag: Codeunit "Upgrade Tag";
+    begin
+        if not (Session.CurrentClientType() in [ClientType::Web, ClientType::Windows, ClientType::Desktop]) then
+            exit;
+
+        if UpgradeTag.HasUpgradeTag(GetAssistedSetupUpgradeTag(ThisModul::SECCFiscalization)) then
+            exit;
+
+        RemoveSECCFiscalizationSetupGuidedExperience();
+
+        AddSECCFiscalizationSetupsWizard();
+
+        UpgradeTag.SetUpgradeTag(GetAssistedSetupUpgradeTag(ThisModul::SECCFiscalization));
+    end;
+
+    local procedure RemoveSECCFiscalizationSetupGuidedExperience()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup SE Fiscal");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup SE CleanCash");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup SE Audit Profile");
+    end;
+
+    local procedure AddSECCFiscalizationSetupsWizard()
+    begin
+        EnableSECCFiscalSetupWizard();
+        EnableSECCFiscalPaymMethWizard();
+        EnableSECCPOSAuditProfilehWizard();
+    end;
+
+    local procedure EnableSECCFiscalSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Enable Fiscalization', Locked = true;
+        SetupDescriptionTxt: Label 'Enable Fiscalization', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup SE Fiscal") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                3,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup SE Fiscal",
+                                                AssistedSetupGroup::NPRSECleanCash,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableSECCFiscalPaymMethWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup CleanCash', Locked = true;
+        SetupDescriptionTxt: Label 'Setup CleanCash', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup SE CleanCash") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                1,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup SE CleanCash",
+                                                AssistedSetupGroup::NPRSECleanCash,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableSECCPOSAuditProfilehWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup POS Audit Profile', Locked = true;
+        SetupDescriptionTxt: Label 'Setup POS Audit Profile', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup SE Audit Profile") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                1,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup SE Audit Profile",
+                                                AssistedSetupGroup::NPRSECleanCash,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup SE Fiscal", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupSECCFiscalWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateSetupSECCFiscalWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup SE CleanCash", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupSECleanCashWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateSetupSECleanCashWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup SE Audit Profile", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupSEPOSAuditProfileWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateSetupSEPOSAuditProfileWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR SE Fiscalization Setup.", 'OnAfterValidateEvent', 'Enable SE Fiscal', false, false)]
+    local procedure ResetSECCFiscalWizard_OnAfterValidateEnableSECCFiscal(var Rec: Record "NPR SE Fiscalization Setup."; var xRec: Record "NPR SE Fiscalization Setup.")
+    begin
+        if (Rec."Enable SE Fiscal" <> xRec."Enable SE Fiscal") and not Rec."Enable SE Fiscal" then
+            ResetSetupFiscalWizardStatus(Enum::"Assisted Setup Group"::NPRSECleanCash);
+    end;
+
+    local procedure UpdateSetupSECCFiscalWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup SE Fiscal");
+    end;
+
+    local procedure UpdateSetupSECleanCashWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup SE CleanCash");
+    end;
+
+    local procedure UpdateSetupSEPOSAuditProfileWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup SE Audit Profile");
+    end;
+    #endregion
 
 #if not (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22)
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Checklist Banner", 'OnBeforeUpdateBannerLabels', '', false, false)]
@@ -3491,6 +3659,6 @@
 
     var
         Checklist: Codeunit Checklist;
-        ThisModul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup,DEFiscalization,BEFiscalization,IRLFiscalization,NOFiscalization;
+        ThisModul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup,DEFiscalization,BEFiscalization,IRLFiscalization,NOFiscalization,SECCFiscalization;
 #endif
 }
