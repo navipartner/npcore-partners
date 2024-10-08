@@ -613,10 +613,15 @@
     end;
 
     local procedure GetServiceURL(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Text
+    var
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         case EFTTransactionRequest.Mode of
             EFTTransactionRequest.Mode::Production:
-                exit('https://api1.cloudconnect.nets.eu');
+                if FeatureFlagsManagement.IsEnabled('netscloudnewurl') then
+                    exit('https://connectcloud.aws.nets.eu')
+                else
+                    exit('https://api1.cloudconnect.nets.eu');
             EFTTransactionRequest.Mode::"TEST Remote":
                 exit('https://connectcloud-test.aws.nets.eu');
             EFTTransactionRequest.Mode::"TEST Local":
