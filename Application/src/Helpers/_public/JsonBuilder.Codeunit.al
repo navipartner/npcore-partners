@@ -89,23 +89,34 @@ codeunit 6184982 "NPR Json Builder"
     /// Create an empty JSON array. 
     /// JSON arrays can't be placed to the top-level of the JSON object, they must be included within another JSON object.
     /// </summary>
+    /// <example>StartArray().EndArray(); => "addresses": [ ] </example>
+    /// <example>StartArray().AddValue('Elm Street, USA').AddValue('Downing Street, UK').EndArray(); => "addressES": [ "Elm Street, USA", "Downing Street, UK" ] </example>
+    /// <returns>Json Builder Codeunit itself.</returns>
+    procedure StartArray(): Codeunit "NPR Json Builder"
+    begin
+        exit(StartArray(''))
+    end;
+
+    /// <summary>
+    /// Create an empty JSON array. 
+    /// JSON arrays can't be placed to the top-level of the JSON object, they must be included within another JSON object.
+    /// </summary>
     /// <param name="PropertyName">Name of the key/property the JSON array will belong.</param>
     /// <example>StartArray('addresses').EndArray(); => "addresses": [ ] </example>
     /// <example>StartArray('addresses').AddValue('Elm Street, USA').AddValue('Downing Street, UK').EndArray(); => "addressES": [ "Elm Street, USA", "Downing Street, UK" ] </example>
-    /// <returns></returns>
+    /// <returns>Json Builder Codeunit itself.</returns>
     procedure StartArray(PropertyName: Text): Codeunit "NPR Json Builder"
     var
         NewArray: JsonArray;
-        NewObject: JsonObject;
     begin
         InitcurrCodeunit();
         if not IsRootSet then begin
-            RootJsonToken := NewObject.AsToken();
+            RootJsonToken := NewArray.AsToken();
             CurrentJsonToken := RootJsonToken;
             IsRootSet := true;
-            TokenStack.Add(CurrentJsonToken);
+        end else begin
+            AddTokenToParent(PropertyName, NewArray.AsToken());
         end;
-        AddTokenToParent(PropertyName, NewArray.AsToken());
         TokenStack.Add(CurrentJsonToken);
         CurrentJsonToken := NewArray.AsToken();
         exit(currCodeunit);
@@ -235,6 +246,18 @@ codeunit 6184982 "NPR Json Builder"
 
         JsonObj := RootJsonToken.AsObject();
         exit(JsonObj);
+    end;
+
+    /// <summary>
+    /// Generate output as a JsonToken.
+    /// </summary>
+    /// <returns>JsonToken</returns>
+    procedure BuildAsJsonToken(): JsonToken
+    begin
+        if not IsRootSet then
+            StartObject('');
+
+        exit(RootJsonToken);
     end;
 
     local procedure AddTokenToParent(PropertyName: Text; NewToken: JsonToken)
