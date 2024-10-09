@@ -1,11 +1,12 @@
-page 6184827 "NPR NO Cert Upload Step"
+page 6184830 "NPR DK Cert Upload Step"
 {
-    Caption = 'NO Certificate Upload';
+    Caption = 'DK Certificate Upload';
     PageType = CardPart;
-    SourceTable = "NPR NO Fiscalization Setup";
+    SourceTable = "NPR DK Fiscalization Setup";
     SourceTableTemporary = true;
     Extensible = false;
     UsageCategory = None;
+
     layout
     {
         area(Content)
@@ -40,9 +41,9 @@ page 6184827 "NPR NO Cert Upload Step"
 
                 trigger OnAction()
                 var
-                    NOAuditMgt: Codeunit "NPR NO Audit Mgt.";
+                    DKAuditMgt: Codeunit "NPR DK Audit Mgt.";
                 begin
-                    NOAuditMgt.ImportCertificate();
+                    DKAuditMgt.ImportCertificate();
                 end;
             }
         }
@@ -58,39 +59,32 @@ page 6184827 "NPR NO Cert Upload Step"
 
     internal procedure CopyRealToTemp()
     begin
-        if not NOFiscalizationSetup.Get() then
+        if not DKFiscalizationSetup.Get() then
             exit;
-        Rec.TransferFields(NOFiscalizationSetup);
+        Rec.TransferFields(DKFiscalizationSetup);
         if not Rec.Insert() then
             Rec.Modify();
     end;
 
     internal procedure CreateCertificateData()
     begin
-        if not Rec.FindFirst() then
+        if not Rec.Get() then
             exit;
-        if not NOFiscalizationSetup.Get() then
-            NOFiscalizationSetup.Init();
+        if not DKFiscalizationSetup.Get() then
+            DKFiscalizationSetup.Init();
         if Rec."Signing Certificate Password" <> xRec."Signing Certificate Password" then
-            NOFiscalizationSetup."Signing Certificate Password" := Rec."Signing Certificate Password";
+            DKFiscalizationSetup."Signing Certificate Password" := Rec."Signing Certificate Password";
         if Rec."Signing Certificate Thumbprint" <> xRec."Signing Certificate Thumbprint" then
-            NOFiscalizationSetup."Signing Certificate Thumbprint" := Rec."Signing Certificate Thumbprint";
-        if not NOFiscalizationSetup.Insert() then
-            NOFiscalizationSetup.Modify();
+            DKFiscalizationSetup."Signing Certificate Thumbprint" := Rec."Signing Certificate Thumbprint";
+        if not DKFiscalizationSetup.Insert() then
+            DKFiscalizationSetup.Modify();
     end;
 
     local procedure CheckIsDataPopulated(): Boolean
     begin
-        if not Rec.FindSet() then
+        if not Rec.Get() then
             exit(false);
-
-        repeat
-            if (Format(Rec."Signing Certificate Password") <> '') or
-               (Format(Rec."Signing Certificate Thumbprint") <> '') then
-                exit(true);
-        until Rec.Next() = 0;
-
-        exit(false);
+        exit((Rec."Signing Certificate Password" <> '') and ((Rec."Signing Certificate Thumbprint") <> ''));
     end;
 
     internal procedure IsDataPopulated(): Boolean
@@ -99,5 +93,5 @@ page 6184827 "NPR NO Cert Upload Step"
     end;
 
     var
-        NOFiscalizationSetup: Record "NPR NO Fiscalization Setup";
+        DKFiscalizationSetup: Record "NPR DK Fiscalization Setup";
 }
