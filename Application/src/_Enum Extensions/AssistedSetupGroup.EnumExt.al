@@ -64,4 +64,8 @@ enumextension 6014402 "NPR Assisted Setup Group" extends "Assisted Setup Group"
     {
         Caption = 'NP HU MiltiSoft E-Invoice';
     }
+    value(6014416; NPRDKFiscal)
+    {
+        Caption = 'NP DK Fiscalization';
+    }
 }

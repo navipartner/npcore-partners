@@ -25,7 +25,7 @@
         AddNOFiscalSetupsWizard();
         AddSECCFiscalizationSetupsWizard(); 
         AddHUMSFiscalSetupsWizard();
-
+        AddDKFiscalizationSetupsWizard();
     end;
 
     local procedure AddRetailSetupsWizard()
@@ -267,6 +267,18 @@
         AssistedSetup.Add(GetAppId(), Page::"NPR Setup SE CleanCash", SECCSetupTxt, AssistedSetupGroup::NPRSECleanCash);
     end;
 
+    local procedure AddDKFiscalizationSetupsWizard()
+    var
+        AssistedSetup: Codeunit "Assisted Setup";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        DKFiscalSetupTxt: Label 'Welcome to DK Fiscal Setup';
+        DKPOSAuditProfileSetupTxt: Label 'Welcome to DK Audit Profile Setup';
+    begin
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup DK Fiscal", DKFiscalSetupTxt, AssistedSetupGroup::NPRDKFiscal);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup DK Audit Profile", DKPOSAuditProfileSetupTxt, AssistedSetupGroup::NPRDKFiscal);
+    end;
+
+
     procedure GetAppId(): Guid
     var
         EmptyGuid: Guid;
@@ -305,6 +317,7 @@
         NOFiscalizationSetups();
         HUMSFiscalizationSetups();
         SECCFiscalizationSetups();
+        DKFiscalizationSetups();
 #if not BC18
         if Checklist.IsChecklistVisible() then
             HideChecklistIfPOSEntryExist();
@@ -1488,7 +1501,7 @@
 
     #region Common Functions
     //This region contains common functions used by all Setup Wizards and Checklists
-    local procedure GetChecklistUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup,DEFiscalization,BEFiscalization,IRLFiscalization,NOFiscalization,HUMSFiscalization,SECCFiscalization): Code[250]
+    local procedure GetChecklistUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup,DEFiscalization,BEFiscalization,IRLFiscalization,NOFiscalization,HUMSFiscalization,SECCFiscalization,DKFiscalization): Code[250]
     begin
         case Modul of
             Modul::Retail:
@@ -1503,7 +1516,7 @@
         end;
     end;
 
-    local procedure GetAssistedSetupUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup,DEFiscalization,BEFiscalization,IRLFiscalization,NOFiscalization,HUMSFiscalization,SECCFiscalization): Code[250]
+    local procedure GetAssistedSetupUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup,DEFiscalization,BEFiscalization,IRLFiscalization,NOFiscalization,HUMSFiscalization,SECCFiscalization,DKFiscalization): Code[250]
     begin
         case Modul of
             Modul::Retail:
@@ -1554,9 +1567,12 @@
             Modul::HUMSFiscalization:
                 // For Any change, increase version
                 exit('NPR-AssistedSetup-HUFiscalization-v1.0');
+            Modul::DKFiscalization:
+                // For Any change, increase version
+                exit('NPR-AssistedSetup-DKFiscalization-v1.9');
         end;
     end;
-
+    
     local procedure AddRoleToList(var TempAllProfile: Record "All Profile" temporary; RoleCenterID: Integer)
     var
         AllProfile: Record "All Profile";
@@ -3804,6 +3820,117 @@
     end;
     #endregion
 
+    #region DK MultiSoft Wizards
+    local procedure DKFiscalizationSetups()
+    var
+        UpgradeTag: Codeunit "Upgrade Tag";
+    begin
+        if not (Session.CurrentClientType() in [ClientType::Web, ClientType::Windows, ClientType::Desktop]) then
+            exit;
+
+        if UpgradeTag.HasUpgradeTag(GetAssistedSetupUpgradeTag(ThisModul::DKFiscalization)) then
+            exit;
+
+        RemoveDKFiscalizationSetupGuidedExperience();
+
+        AddDKFiscalizationSetupsWizard();
+
+        UpgradeTag.SetUpgradeTag(GetAssistedSetupUpgradeTag(ThisModul::DKFiscalization));
+    end;
+
+    local procedure RemoveDKFiscalizationSetupGuidedExperience()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup DK Fiscal");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup DK Audit Profile");
+    end;
+
+    local procedure AddDKFiscalizationSetupsWizard()
+    begin
+        EnableDKFiscalSetupWizard();
+        EnableDKFiscalAuditProfileSetupWizard();
+    end;
+
+    local procedure EnableDKFiscalSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Enable Fiscalization', Locked = true;
+        SetupDescriptionTxt: Label 'Enable Fiscalization', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup DK Fiscal") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                3,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup DK Fiscal",
+                                                AssistedSetupGroup::NPRDKFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableDKFiscalAuditProfileSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup POS Audit Profile', Locked = true;
+        SetupDescriptionTxt: Label 'Setup POS Audit Profile', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup DK Audit Profile") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                2,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup DK Audit Profile",
+                                                AssistedSetupGroup::NPRDKFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup DK Fiscal", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupDKFiscalWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateSetupDKFiscalWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup DK Audit Profile", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupDKFiscalAuditProfileWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateSetupDKFiscalAuditProfileWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR DK Fiscalization Setup", 'OnAfterValidateEvent', 'Enable DK Fiscal', false, false)]
+    local procedure ResetDKFiscalWizard_OnAfterValidateEnableDKFiscal(var Rec: Record "NPR DK Fiscalization Setup"; var xRec: Record "NPR DK Fiscalization Setup")
+    begin
+        if (Rec."Enable DK Fiscal" <> xRec."Enable DK Fiscal") and not Rec."Enable DK Fiscal" then
+            ResetSetupFiscalWizardStatus(Enum::"Assisted Setup Group"::NPRDKFiscal);
+    end;
+
+    local procedure UpdateSetupDKFiscalWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup DK Fiscal");
+    end;
+
+    local procedure UpdateSetupDKFiscalAuditProfileWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup DK Audit Profile");
+    end;
+    #endregion
 
 #if not (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22)
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Checklist Banner", 'OnBeforeUpdateBannerLabels', '', false, false)]
@@ -3830,6 +3957,6 @@
 
     var
         Checklist: Codeunit Checklist;
-        ThisModul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup,DEFiscalization,BEFiscalization,IRLFiscalization,NOFiscalization,SECCFiscalization,HUMSFiscalizationSetup;
+        ThisModul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup,DEFiscalization,BEFiscalization,IRLFiscalization,NOFiscalization,SECCFiscalization,HUMSFiscalizationSetup,DKFiscalization;
 #endif
 }
