@@ -86,6 +86,30 @@ codeunit 6184982 "NPR Json Builder"
     end;
 
     /// <summary>
+    /// Allows JSON Array to be generated in a dedicated function returning back the builder.
+    /// The function works just as a bypass able to return the same instance of the Codeunit.
+    /// </summary>
+    /// <param name="JsonBuilder">Json Builder Codeunit</param>
+    /// <example>builder.AddArray(GenerateSalesOrders(builder)).Build()</example>
+    /// <returns>Json Builder Codeunit</returns>
+    procedure AddArray(JsonBuilder: Codeunit "NPR Json Builder"): Codeunit "NPR Json Builder"
+    begin
+        exit(JsonBuilder);
+    end;
+
+    /// <summary>
+    /// Allows JSON Object to be generated in a dedicated function returning back the builder.
+    /// The function works just as a bypass able to return the same instance of the Codeunit.
+    /// </summary>
+    /// <param name="JsonBuilder">Json Builder Codeunit</param>
+    /// <example>builder.AddObject(GenerateSalesOrderStrucuture(builder)).Build()</example>
+    /// <returns>Json Builder Codeunit</returns>
+    procedure AddObject(JsonBuilder: Codeunit "NPR Json Builder"): Codeunit "NPR Json Builder"
+    begin
+        exit(JsonBuilder);
+    end;
+
+    /// <summary>
     /// Create an empty JSON array. 
     /// JSON arrays can't be placed to the top-level of the JSON object, they must be included within another JSON object.
     /// </summary>
