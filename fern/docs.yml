@@ -50,17 +50,6 @@ navigation:
       path: docs/pages/crane.mdx
       hidden: true
 
-      # Companies API definition (specific as routed directly to a specific OData endpoint):
-    - api: API Companies
-      api-name: companies
-      #icon: fa-solid fa-code
-      #flattened: true
-      display-errors: false
-      layout:
-        - companies:
-            title: Companies
-            summary: ./docs/pages/companies/companies.mdx
-
     # General BC services API definition:
     - api: API Reference
       api-name: default
@@ -72,9 +61,14 @@ navigation:
          - Production
       layout:
         - section: System Services
+          summary: ./docs/pages/systemservices/systemservices.mdx
           contents:
+          - systemservices.companies:
+              title: Companies
+              summary: ./docs/pages/systemservices/companies.mdx
           - systemservices.helloworld:
               title: Hello World
+              summary: ./docs/pages/systemservices/helloworld.mdx
         - section: Ticketing
           summary: ./docs/pages/ticketing/overview.mdx
           contents:

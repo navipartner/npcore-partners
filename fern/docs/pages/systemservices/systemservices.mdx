@@ -1,0 +1,21 @@
+---
+title: System Services
+slug: systemservices
+description: Overview of essential system service endpoints.
+---
+
+Our API provides several essential endpoints designed to facilitate key system operations. 
+These endpoints serve critical functions for interacting with our Business Central backend, ensuring smooth communication and reliable access to foundational resources. 
+Currently, we offer the following system services:
+
+### Companies Endpoint
+
+The [companies](/systemservices/companies/get-companies) endpoint returns a list of companies available in your Business Central environment. 
+As Business Central operates on a multi-company model, this list is essential for all subsequent API calls, allowing clients to specify the company context 
+in which an operation should be performed.
+
+
+### Hello World Endpoint
+
+The [helloworld](/systemservices/helloworld/get-hello-world) endpoint serves as a diagnostic tool to verify that communication between the API client, middleware, and backend is functioning correctly. 
+This endpoint is data-agnostic and provides a simple response confirming that the entire API pipeline is operational.
