@@ -832,11 +832,14 @@ codeunit 6184534 "NPR EFT NETSCloud Protocol"
 
     local procedure GetServiceURL(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Text
     var
-        EFTAdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integ.";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         case EFTTransactionRequest.Mode of
             EFTTransactionRequest.Mode::Production:
-                exit('https://api1.cloudconnect.nets.eu');
+                if FeatureFlagsManagement.IsEnabled('netscloudnewurl') then
+                    exit('https://connectcloud.aws.nets.eu')
+                else
+                    exit('https://api1.cloudconnect.nets.eu');
             EFTTransactionRequest.Mode::"TEST Remote":
                 exit('https://testapi.cloudconnect.ml:8080');
             EFTTransactionRequest.Mode::"TEST Local":
