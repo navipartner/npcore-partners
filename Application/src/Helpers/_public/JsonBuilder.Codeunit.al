@@ -273,6 +273,18 @@ codeunit 6184982 "NPR Json Builder"
     end;
 
     /// <summary>
+    /// Generate output as a JsonArray.
+    /// </summary>
+    /// <returns>JsonArray</returns>
+    procedure BuildAsArray(): JsonArray
+    begin
+        if not IsRootSet then
+            StartObject('');
+
+        exit(RootJsonToken.AsArray());
+    end;
+
+    /// <summary>
     /// Generate output as a JsonToken.
     /// </summary>
     /// <returns>JsonToken</returns>

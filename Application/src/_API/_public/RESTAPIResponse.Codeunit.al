@@ -8,7 +8,7 @@ codeunit 6185021 "NPR REST API Response"
         _HascurrCodeunit: Boolean;
         _StatusCode: Integer;
         _Headers: Dictionary of [Text, Text];
-        _ResponseBody: JsonObject;
+        _ResponseBody: JsonToken;
         NPRVersionHeader: Label 'NPR-Version', Locked = true;
         UnsupportedHttpMethodErr: Label 'Http method %1 is not supported', Comment = '%1 = name of the Http method, do not translate';
         UnsupportedErrorStatusCodeErr: Label 'Status Code %1 is not a supported status code for error handling. This is not a user error; it is a development error.';
@@ -78,13 +78,34 @@ codeunit 6185021 "NPR REST API Response"
     begin
         InitcurrCodeunit();
         Clear(_ResponseBody);
+        _ResponseBody := JsonBody.AsToken();
+        exit(_CurrCodeunit);
+    end;
+
+    procedure SetJson(JsonBody: JsonArray): Codeunit "NPR REST API Response"
+    begin
+        InitcurrCodeunit();
+        Clear(_ResponseBody);
+        _ResponseBody := JsonBody.AsToken();
+        exit(_CurrCodeunit);
+    end;
+
+    procedure SetJson(JsonBody: JsonToken): Codeunit "NPR REST API Response"
+    begin
+        InitcurrCodeunit();
+        Clear(_ResponseBody);
         _ResponseBody := JsonBody;
         exit(_CurrCodeunit);
     end;
 
     procedure GetJson() JsonOut: JsonObject
     begin
-        JsonOut := _ResponseBody;
+        JsonOut := _ResponseBody.AsObject();
+    end;
+
+    procedure GetJsonArray() JsonArrayOut: JsonArray
+    begin
+        JsonArrayOut := _ResponseBody.AsArray();
     end;
 
     procedure GetResponseJson() ResponseJson: JsonObject
@@ -106,7 +127,7 @@ codeunit 6185021 "NPR REST API Response"
         ResponseJson.Add('body', EncodeJsonObjectToBase64(_ResponseBody));
     end;
 
-    local procedure EncodeJsonObjectToBase64(var JsonObject: JsonObject) Base64String: Text
+    local procedure EncodeJsonObjectToBase64(var JsonToken: JsonToken) Base64String: Text
     var
         TempBlob: Codeunit "Temp Blob";
         Base64Convert: Codeunit "Base64 Convert";
@@ -114,7 +135,7 @@ codeunit 6185021 "NPR REST API Response"
         InStream: InStream;
         JsonText: Text;
     begin
-        JsonObject.WriteTo(JsonText);
+        JsonToken.WriteTo(JsonText);
         TempBlob.CreateOutStream(OutStream, TextEncoding::UTF8);
         OutStream.WriteText(JsonText);
         TempBlob.CreateInStream(InStream);
@@ -141,12 +162,22 @@ codeunit 6185021 "NPR REST API Response"
         exit(CreateSuccessResponse("NPR REST API HTTP Status Code"::OK, Value));
     end;
 
+    procedure RespondOK(Value: JsonArray): Codeunit "NPR REST API Response"
+    begin
+        exit(CreateSuccessResponse("NPR REST API HTTP Status Code"::OK, Value));
+    end;
+
     procedure RespondCreated(Value: Text): Codeunit "NPR REST API Response"
     begin
         exit(CreateSuccessResponse("NPR REST API HTTP Status Code"::Created, CreateSimpleJsonResponse('value', Value)));
     end;
 
     procedure RespondCreated(Value: JsonObject): Codeunit "NPR REST API Response"
+    begin
+        exit(CreateSuccessResponse("NPR REST API HTTP Status Code"::Created, Value));
+    end;
+
+    procedure RespondCreated(Value: JsonArray): Codeunit "NPR REST API Response"
     begin
         exit(CreateSuccessResponse("NPR REST API HTTP Status Code"::Created, Value));
     end;
@@ -184,6 +215,16 @@ codeunit 6185021 "NPR REST API Response"
 
     #region Generic Response handling functions
     procedure CreateSuccessResponse(StatusCode: Enum "NPR REST API HTTP Status Code"; Value: JsonObject): Codeunit "NPR REST API Response"
+    begin
+        exit(CreateSuccessResponse(StatusCode, Value.AsToken()));
+    end;
+
+    procedure CreateSuccessResponse(StatusCode: Enum "NPR REST API HTTP Status Code"; Value: JsonArray): Codeunit "NPR REST API Response"
+    begin
+        exit(CreateSuccessResponse(StatusCode, Value.AsToken()));
+    end;
+
+    local procedure CreateSuccessResponse(StatusCode: Enum "NPR REST API HTTP Status Code"; Value: JsonToken): Codeunit "NPR REST API Response"
     begin
         InitcurrCodeunit();
         Init();
