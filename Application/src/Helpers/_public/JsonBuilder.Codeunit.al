@@ -111,10 +111,9 @@ codeunit 6184982 "NPR Json Builder"
 
     /// <summary>
     /// Create an empty JSON array. 
-    /// JSON arrays can't be placed to the top-level of the JSON object, they must be included within another JSON object.
     /// </summary>
-    /// <example>StartArray().EndArray(); => "addresses": [ ] </example>
-    /// <example>StartArray().AddValue('Elm Street, USA').AddValue('Downing Street, UK').EndArray(); => "addressES": [ "Elm Street, USA", "Downing Street, UK" ] </example>
+    /// <example>StartArray().EndArray(); => [ ] </example>
+    /// <example>StartArray().AddValue('Elm Street, USA').AddValue('Downing Street, UK').EndArray(); => [ "Elm Street, USA", "Downing Street, UK" ] </example>
     /// <returns>Json Builder Codeunit itself.</returns>
     procedure StartArray(): Codeunit "NPR Json Builder"
     begin
@@ -127,7 +126,7 @@ codeunit 6184982 "NPR Json Builder"
     /// </summary>
     /// <param name="PropertyName">Name of the key/property the JSON array will belong.</param>
     /// <example>StartArray('addresses').EndArray(); => "addresses": [ ] </example>
-    /// <example>StartArray('addresses').AddValue('Elm Street, USA').AddValue('Downing Street, UK').EndArray(); => "addressES": [ "Elm Street, USA", "Downing Street, UK" ] </example>
+    /// <example>StartArray('addresses').AddValue('Elm Street, USA').AddValue('Downing Street, UK').EndArray(); => "addresses": [ "Elm Street, USA", "Downing Street, UK" ] </example>
     /// <returns>Json Builder Codeunit itself.</returns>
     procedure StartArray(PropertyName: Text): Codeunit "NPR Json Builder"
     var
