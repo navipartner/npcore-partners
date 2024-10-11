@@ -61,6 +61,12 @@ table 6150842 "NPR TM CouponProfile"
             DataClassification = CustomerContent;
         }
 
+        field(50; ForceTicketAmount; Boolean)
+        {
+            Caption = 'Force Ticket Amount';
+            DataClassification = CustomerContent;
+        }
+
     }
 
     keys

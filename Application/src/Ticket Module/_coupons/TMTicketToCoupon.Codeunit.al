@@ -12,6 +12,7 @@ codeunit 6184871 "NPR TM TicketToCoupon"
         CouponProfile: Record "NPR TM CouponProfile";
         CouponValidFrom: Date;
         CouponValidUntil: Date;
+        CouponValue: Decimal;
 
         TicketNotFound: Label 'Ticket not found';
         TicketBlocked: Label 'Ticket is blocked';
@@ -93,7 +94,12 @@ codeunit 6184871 "NPR TM TicketToCoupon"
                     Error('Invalid ValidFromDate value in Coupon Profile, this is a programming error.');
             end;
 
-            IssueCoupon(CouponProfile."CouponType", TicketCoupons.CouponNo, TicketCoupons.CouponReferenceNo, CouponValidFrom, CouponValidUntil);
+            CouponValue := 0;
+            if (CouponProfile.ForceTicketAmount) then
+                CouponValue := Ticket.AmountInclVat;
+
+            IssueCoupon(CouponProfile."CouponType", TicketCoupons.CouponNo, TicketCoupons.CouponReferenceNo, CouponValidFrom, CouponValidUntil, CouponValue);
+
             TicketCoupons.TicketNo := Ticket."No.";
             TicketCoupons.CouponType := CouponProfile."CouponType";
             TicketCoupons.CouponAlias := CouponProfile.AliasCode;
@@ -107,7 +113,7 @@ codeunit 6184871 "NPR TM TicketToCoupon"
 
     end;
 
-    local procedure IssueCoupon(CouponTypeCode: Code[20]; var CouponNo: Code[20]; var CouponReferenceNo: Text[50]; ValidFrom: Date; ValidUntil: Date)
+    local procedure IssueCoupon(CouponTypeCode: Code[20]; var CouponNo: Code[20]; var CouponReferenceNo: Text[50]; ValidFrom: Date; ValidUntil: Date; ForceCouponAmount: Decimal)
     var
         CouponType: Record "NPR NpDc Coupon Type";
         Coupon: Record "NPR NpDc Coupon";
@@ -124,7 +130,15 @@ codeunit 6184871 "NPR TM TicketToCoupon"
             Coupon."Ending Date" := CreateDateTime(ValidUntil, 235959T);
         end;
         Coupon.Insert(true);
-        CouponMgt.PostIssueCoupon(Coupon);
+
+        if (ForceCouponAmount > 0) then begin
+            Coupon."Discount Type" := Coupon."Discount Type"::"Discount Amount";
+            Coupon."Discount Amount" := ForceCouponAmount;
+            Coupon.Modify();
+            CouponMgt.PostIssueCoupon2(Coupon, 1, ForceCouponAmount);
+        end else begin
+            CouponMgt.PostIssueCoupon(Coupon);
+        end;
 
         if (CouponType."Print on Issue") then
             CouponMgt.PrintCoupon(Coupon);
