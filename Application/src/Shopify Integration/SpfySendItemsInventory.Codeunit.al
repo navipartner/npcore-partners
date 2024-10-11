@@ -1008,13 +1008,19 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
 
         ShopifyItemID := GetShopifyItemID(SpfyStoreItemLink, WithDialog);
         if ShopifyItemID = '' then begin
-            if LinkExists and (SpfyStoreItemLink."Sync. to this Store" or SpfyStoreItemLink."Synchronization Is Enabled") then begin
-                DisableIntegrationForItem(SpfyStoreItemLink);
-                if CreateAtShopify then begin
-                    ModifySpfyStoreItemLink(SpfyStoreItemLink, true);
-                    SpfyStoreItemLink."Sync. to this Store" := true;
+            if not LinkExists and CreateAtShopify then begin
+                SpfyStoreLinkMgt.UpdateStoreItemLinks(Item);
+                LinkExists := SpfyStoreItemLink.Find();
+            end;
+            if LinkExists and (SpfyStoreItemLink."Sync. to this Store" or SpfyStoreItemLink."Synchronization Is Enabled" or CreateAtShopify) then begin
+                if SpfyStoreItemLink."Sync. to this Store" or SpfyStoreItemLink."Synchronization Is Enabled" then begin
+                    DisableIntegrationForItem(SpfyStoreItemLink);
+                    ModifySpfyStoreItemLink(SpfyStoreItemLink, DisableDataLog or CreateAtShopify);
                 end;
-                ModifySpfyStoreItemLink(SpfyStoreItemLink, DisableDataLog);
+                if CreateAtShopify then begin
+                    SpfyStoreItemLink."Sync. to this Store" := true;
+                    ModifySpfyStoreItemLink(SpfyStoreItemLink, false);
+                end;
             end;
             exit;
         end;
