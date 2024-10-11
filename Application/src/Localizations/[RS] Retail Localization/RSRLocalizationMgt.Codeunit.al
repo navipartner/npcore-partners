@@ -223,6 +223,39 @@ codeunit 6151490 "NPR RS R Localization Mgt."
         ValueEntry."Cost per Unit" := 0;
     end;
 
+    internal procedure CopyValueEntryAmounts(FromValueEntry: Record "Value Entry"; var ToValueEntry: Record "Value Entry")
+    begin
+        ToValueEntry."Cost Amount (Actual)" := FromValueEntry."Cost Amount (Actual)";
+        ToValueEntry."Cost Amount (Expected)" := FromValueEntry."Cost Amount (Expected)";
+        ToValueEntry."Cost Amount (Non-Invtbl.)" := FromValueEntry."Cost Amount (Non-Invtbl.)";
+        ToValueEntry."Cost Amount (Actual) (ACY)" := FromValueEntry."Cost Amount (Actual) (ACY)";
+        ToValueEntry."Cost Amount (Expected) (ACY)" := FromValueEntry."Cost Amount (Expected) (ACY)";
+        ToValueEntry."Cost Amount (Non-Invtbl.)(ACY)" := FromValueEntry."Cost Amount (Non-Invtbl.)(ACY)";
+        ToValueEntry."Sales Amount (Actual)" := FromValueEntry."Sales Amount (Actual)";
+        ToValueEntry."Sales Amount (Expected)" := FromValueEntry."Sales Amount (Expected)";
+        ToValueEntry."Valued Quantity" := FromValueEntry."Valued Quantity";
+        ToValueEntry."Invoiced Quantity" := FromValueEntry."Invoiced Quantity";
+        ToValueEntry."Item Ledger Entry Quantity" := FromValueEntry."Item Ledger Entry Quantity";
+        ToValueEntry."Cost Posted to G/L" := FromValueEntry."Cost Amount (Actual)";
+        ToValueEntry."Cost per Unit" := FromValueEntry."Cost per Unit";
+    end;
+
+    internal procedure ReverseSignOnValueEntry(var ValueEntry: Record "Value Entry")
+    begin
+        ValueEntry."Sales Amount (Actual)" := -ValueEntry."Sales Amount (Actual)";
+        ValueEntry."Sales Amount (Expected)" := -ValueEntry."Sales Amount (Expected)";
+        ValueEntry."Cost Amount (Actual)" := -ValueEntry."Cost Amount (Actual)";
+        ValueEntry."Cost Amount (Expected)" := -ValueEntry."Cost Amount (Expected)";
+        ValueEntry."Cost Amount (Actual) (ACY)" := -ValueEntry."Cost Amount (Actual) (ACY)";
+        ValueEntry."Cost Amount (Expected) (ACY)" := -ValueEntry."Cost Amount (Expected) (ACY)";
+        ValueEntry."Cost Amount (Non-Invtbl.)" := -ValueEntry."Cost Amount (Non-Invtbl.)";
+        ValueEntry."Cost Amount (Non-Invtbl.)(ACY)" := -ValueEntry."Cost Amount (Non-Invtbl.)(ACY)";
+        ValueEntry."Valued Quantity" := -ValueEntry."Valued Quantity";
+        ValueEntry."Invoiced Quantity" := -ValueEntry."Invoiced Quantity";
+        ValueEntry."Item Ledger Entry Quantity" := -ValueEntry."Item Ledger Entry Quantity";
+        ValueEntry."Cost Posted to G/L" := -ValueEntry."Cost Posted to G/L";
+    end;
+
     internal procedure RoundAmountToCurrencyRounding(Amount: Decimal; CurrencyCode: Code[10]): Decimal
     var
         Currency: Record Currency;
