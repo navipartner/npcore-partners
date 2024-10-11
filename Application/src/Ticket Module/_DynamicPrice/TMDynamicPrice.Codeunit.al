@@ -52,7 +52,8 @@ codeunit 6014559 "NPR TM Dynamic Price"
         TempSaleLinePOS."Allow Line Discount" := true;
         TempSaleLinePOS.Insert();
 
-        OriginalWorkDate := WorkDate(AdmCapacityPriceBuffer.ReferenceDate);
+        OriginalWorkDate := WorkDate();
+        WorkDate(AdmCapacityPriceBuffer.ReferenceDate);
         ValidErpPrice := M2PriceService.TryPosQuoteRequest(TempSalePOS, TempSaleLinePOS);
         if (ValidErpPrice) then begin
             AdmCapacityPriceBuffer.UnitPrice := TempSaleLinePOS."Unit Price";
@@ -115,10 +116,11 @@ codeunit 6014559 "NPR TM Dynamic Price"
 
     internal procedure SetTicketAdmissionDynamicUnitPrice(
         var ReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        AdmScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         OriginalUnitPrice: Decimal; DiscountPct: Decimal; PriceIncludesVAT: Boolean; VatPercentage: Decimal;
         ReferenceDate: Date; ReferenceTime: Time)
     var
-        AdmScheduleEntryResponse: Record "NPR TM Admis. Schedule Entry";
+
         PriceRule: Record "NPR TM Dynamic Price Rule";
         GeneralLedgerSetup: Record "General Ledger Setup";
         HavePriceRule: Boolean;
@@ -126,7 +128,7 @@ codeunit 6014559 "NPR TM Dynamic Price"
     begin
 
 
-        HavePriceRule := SelectPriceRule(AdmScheduleEntryResponse, ReferenceDate, ReferenceTime, PriceRule);
+        HavePriceRule := SelectPriceRule(AdmScheduleEntry, ReferenceDate, ReferenceTime, PriceRule);
         if (HavePriceRule) then
             EvaluatePriceRule(PriceRule, OriginalUnitPrice, PriceIncludesVAT, VatPercentage, false, BasePrice, AddonPrice);
 
@@ -470,11 +472,13 @@ codeunit 6014559 "NPR TM Dynamic Price"
     var
         DateHelper: date;
     begin
+        if (ReferenceDate = 0D) then
+            exit(false);
+
         // IMPORTANT: On the 15th D15 evaluates to the 15th next month. WD5 on a Friday is Friday 7 days from now
         // To get at "D15" rule to work, it needs to be entered as D15 - 1M
         // D28..D31 in January would return February 28. Thus with a relative booking date of "D31-1M" it would be valid on January 28.
         // Relative DF include WD1 == Monday, D15 == 15th every month, M5 == May 01, etc
-
         DateHelper := CalcDate(RelativeDateFormula, ReferenceDate);
 
         case (GetDateFormulaPriorityWeight(RelativeDateFormula)) of
