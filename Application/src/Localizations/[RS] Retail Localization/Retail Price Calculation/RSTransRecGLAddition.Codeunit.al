@@ -79,6 +79,7 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
     begin
         InitGenJournalLine(GenJournalLine, CalculationValueEntry, RSRetailCalculationType);
         GLSetup.Get();
+        AddCurrencyCode := GLSetup."Additional Reporting Currency";
         if (GenJournalLine."Document Date" = 0D) and (GLSetup."VAT Reporting Date" = GLSetup."VAT Reporting Date"::"Document Date") then
             GenJournalLine."VAT Reporting Date" := GenJournalLine."Posting Date"
         else
@@ -295,20 +296,28 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
             RSRetailCalculationType::"Margin with VAT":
                 GenJournalLine.Validate("Debit Amount", CalculationValueEntry."Cost Amount (Actual)");
             RSRetailCalculationType::VAT:
-                GenJournalLine.Validate("Credit Amount", CalculateRSGLVATAmount());
+                GenJournalLine.Validate("Credit Amount", CalculateRSGLVATAmount(CalculationValueEntry));
             RSRetailCalculationType::Margin:
-                GenJournalLine.Validate("Credit Amount", CalculationValueEntry."Cost Amount (Actual)" - CalculateRSGLVATAmount());
+                GenJournalLine.Validate("Credit Amount", CalculationValueEntry."Cost Amount (Actual)" - CalculateRSGLVATAmount(CalculationValueEntry));
         end;
     end;
 
-    local procedure CalculateRSGLVATAmount(): Decimal
+    local procedure CalculateRSGLVATAmount(CalculationValueEntry: Record "Value Entry"): Decimal
     begin
-        exit((PriceListLine."Unit Price" * TempTransferReceiptLine.Quantity) * CalculateVATBreakDown());
+        exit((PriceListLine."Unit Price" * GetItemLedgerQuantityFromCalcEntry(CalculationValueEntry)) * CalculateVATBreakDown());
     end;
 
     local procedure CalculateVATBreakDown(): Decimal
     begin
         exit(RSRLocalizationMgt.CalculateVATBreakDown(PriceListLine."VAT Bus. Posting Gr. (Price)", PriceListLine."VAT Prod. Posting Group"));
+    end;
+
+    local procedure GetItemLedgerQuantityFromCalcEntry(CalculationValueEntry: Record "Value Entry"): Decimal
+    var
+        ItemLedgerEntry: Record "Item Ledger Entry";
+    begin
+        ItemLedgerEntry.Get(CalculationValueEntry."Item Ledger Entry No.");
+        exit(ItemLedgerEntry."Invoiced Quantity");
     end;
 
     local procedure GetRSAccountNoFromSetup(RSRetailCalculationType: Enum "NPR RS Retail Calculation Type"): Code[20]
@@ -355,14 +364,41 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
             if (GenJnlLine."Source Currency Code" = AddCurrencyCode) and UseAddCurrAmount then
                 exit(AddCurrAmount);
 
-            exit(ExchangeAmtLCYToFCY2(Amount));
+            exit(ExchangeAmtLCYToFCY2(Amount, GenJnlLine));
         end;
         exit(OldAddCurrAmount);
     end;
 
-    local procedure ExchangeAmtLCYToFCY2(Amount: Decimal): Decimal
+    local procedure ExchangeAmtLCYToFCY2(Amount: Decimal; GenJnlLine: Record "Gen. Journal Line"): Decimal
+    var
+        NewCurrencyDate: Date;
+        CurrencyDate: Date;
+        UseCurrFactorOnly: Boolean;
     begin
-        exit(Round(CurrExchRate.ExchangeAmtLCYToFCYOnlyFactor(Amount, CurrencyFactor), AddCurrency."Amount Rounding Precision"));
+        AddCurrency.Get(AddCurrencyCode);
+
+        NewCurrencyDate := GenJnlLine."Posting Date";
+
+        if GenJnlLine."Reversing Entry" then
+            NewCurrencyDate := NewCurrencyDate - 1;
+
+        if (NewCurrencyDate <> CurrencyDate) then begin
+            UseCurrFactorOnly := false;
+            CurrencyDate := NewCurrencyDate;
+            CurrencyFactor := CurrExchRate.ExchangeRate(CurrencyDate, AddCurrencyCode);
+        end;
+
+        if (GenJnlLine."FA Add.-Currency Factor" <> 0) and (GenJnlLine."FA Add.-Currency Factor" <> CurrencyFactor)
+        then begin
+            UseCurrFactorOnly := true;
+            CurrencyDate := 0D;
+            CurrencyFactor := GenJnlLine."FA Add.-Currency Factor";
+        end;
+
+        if UseCurrFactorOnly then
+            exit(Round(CurrExchRate.ExchangeAmtLCYToFCYOnlyFactor(Amount, CurrencyFactor), AddCurrency."Amount Rounding Precision"));
+
+        exit(Round(CurrExchRate.ExchangeAmtLCYToFCY(CurrencyDate, AddCurrencyCode, Amount, CurrencyFactor), AddCurrency."Amount Rounding Precision"));
     end;
 
     local procedure PostJob(GenJnlLine: Record "Gen. Journal Line"; GLEntry: Record "G/L Entry")

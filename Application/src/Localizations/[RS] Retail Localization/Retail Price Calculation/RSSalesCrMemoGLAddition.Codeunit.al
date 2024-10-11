@@ -134,6 +134,7 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
     begin
         InitGenJournalLine(GenJournalLine, SalesCrMemoHeader, CalculationValueEntry, RSRetailCalculationType);
         GLSetup.Get();
+        AddCurrencyCode := GLSetup."Additional Reporting Currency";
         if (GenJournalLine."Document Date" = 0D) and (GLSetup."VAT Reporting Date" = GLSetup."VAT Reporting Date"::"Document Date") then
             GenJournalLine."VAT Reporting Date" := GenJournalLine."Posting Date"
         else
@@ -713,14 +714,41 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
             if (GenJnlLine."Source Currency Code" = AddCurrencyCode) and UseAddCurrAmount then
                 exit(AddCurrAmount);
 
-            exit(ExchangeAmtLCYToFCY2(Amount));
+            exit(ExchangeAmtLCYToFCY2(Amount, GenJnlLine));
         end;
         exit(OldAddCurrAmount);
     end;
 
-    local procedure ExchangeAmtLCYToFCY2(Amount: Decimal): Decimal
+    local procedure ExchangeAmtLCYToFCY2(Amount: Decimal; GenJnlLine: Record "Gen. Journal Line"): Decimal
+    var
+        NewCurrencyDate: Date;
+        CurrencyDate: Date;
+        UseCurrFactorOnly: Boolean;
     begin
-        exit(Round(CurrExchRate.ExchangeAmtLCYToFCYOnlyFactor(Amount, CurrencyFactor), AddCurrency."Amount Rounding Precision"));
+        AddCurrency.Get(AddCurrencyCode);
+
+        NewCurrencyDate := GenJnlLine."Posting Date";
+
+        if GenJnlLine."Reversing Entry" then
+            NewCurrencyDate := NewCurrencyDate - 1;
+
+        if (NewCurrencyDate <> CurrencyDate) then begin
+            UseCurrFactorOnly := false;
+            CurrencyDate := NewCurrencyDate;
+            CurrencyFactor := CurrExchRate.ExchangeRate(CurrencyDate, AddCurrencyCode);
+        end;
+
+        if (GenJnlLine."FA Add.-Currency Factor" <> 0) and (GenJnlLine."FA Add.-Currency Factor" <> CurrencyFactor)
+        then begin
+            UseCurrFactorOnly := true;
+            CurrencyDate := 0D;
+            CurrencyFactor := GenJnlLine."FA Add.-Currency Factor";
+        end;
+
+        if UseCurrFactorOnly then
+            exit(Round(CurrExchRate.ExchangeAmtLCYToFCYOnlyFactor(Amount, CurrencyFactor), AddCurrency."Amount Rounding Precision"));
+
+        exit(Round(CurrExchRate.ExchangeAmtLCYToFCY(CurrencyDate, AddCurrencyCode, Amount, CurrencyFactor), AddCurrency."Amount Rounding Precision"));
     end;
 
     local procedure PostJob(GenJnlLine: Record "Gen. Journal Line"; GLEntry: Record "G/L Entry")

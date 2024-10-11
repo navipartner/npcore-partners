@@ -54,7 +54,7 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
 
     #region GL Entry Posting
 
-    local procedure CreateAdditionalGLEntries(CalculationValueEntry: Record "Value Entry"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type")
+    local procedure CreateAdditionalGLEntries(CalculationValueEntry: Record "Value Entry"; StdTransitValueEntry: Record "Value Entry"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type")
     var
         GLEntry: Record "G/L Entry";
         GenJournalLine: Record "Gen. Journal Line";
@@ -63,12 +63,13 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
     begin
         InitGenJournalLine(GenJournalLine, CalculationValueEntry, RSRetailCalculationType);
         GLSetup.Get();
+        AddCurrencyCode := GLSetup."Additional Reporting Currency";
         if (GenJournalLine."Document Date" = 0D) and (GLSetup."VAT Reporting Date" = GLSetup."VAT Reporting Date"::"Document Date") then
             GenJournalLine."VAT Reporting Date" := GenJournalLine."Posting Date"
         else
             GenJournalLine."VAT Reporting Date" := GLSetup.GetVATDate(GenJournalLine."Posting Date", GenJournalLine."Document Date");
 
-        CalculateRSGLEntryAmounts(GenJournalLine, CalculationValueEntry, RSRetailCalculationType);
+        CalculateRSGLEntryAmounts(GenJournalLine, CalculationValueEntry, StdTransitValueEntry, RSRetailCalculationType);
 
         if GenJournalLine.Amount = 0 then
             exit;
@@ -85,7 +86,18 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
                     GenJournalLine."Bill-to/Pay-to No." := GenJournalLine."Bal. Account No.";
             end;
 
+        ValidateNegativeDebitCredit(GenJournalLine, RSRetailCalculationType);
+
         PostGLAcc(GenJournalLine, GLEntry);
+    end;
+
+    local procedure ValidateNegativeDebitCredit(var GenJournalLine: Record "Gen. Journal Line"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type")
+    begin
+        if RSRetailCalculationType in [RSRetailCalculationType::"Transit Adjustment"] then begin
+            GenJournalLine.Validate(Amount, -Abs(GenJournalLine.Amount));
+            GenJournalLine."Debit Amount" := -Abs(GenJournalLine.Amount);
+            GenJournalLine."Credit Amount" := 0;
+        end;
     end;
 
     local procedure InitAmounts(var GenJnlLine: Record "Gen. Journal Line")
@@ -230,34 +242,38 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         AppliedEntryCostPerUnit: Decimal;
     begin
         TransferFromItemLedgerEntry.SetRange("Document Type", TransferFromItemLedgerEntry."Document Type"::"Transfer Shipment");
-        TransferFromItemLedgerEntry.SetRange("Order No.", TransferHeader."No.");
+        TransferFromItemLedgerEntry.SetRange("Document No.", GetCurrentTransferShipmentNo());
         TransferFromItemLedgerEntry.SetRange("Location Code", TransferHeader."Transfer-from Code");
         TransferFromItemLedgerEntry.SetRange("Item No.", TempTransferLine."Item No.");
         if TransferFromItemLedgerEntry.IsEmpty() then
             exit;
 
-        TransitLocationItemLedgerEntries.SetLoadFields("Entry No.", "Invoiced Quantity", "Document No.");
+        TransitLocationItemLedgerEntries.SetLoadFields("Entry No.", "Invoiced Quantity", "Document No.", Quantity);
         TransitLocationItemLedgerEntries.SetRange("Document Type", TransitLocationItemLedgerEntries."Document Type"::"Transfer Shipment");
-        TransitLocationItemLedgerEntries.SetRange("Order No.", TransferHeader."No.");
+        TransitLocationItemLedgerEntries.SetRange("Document No.", GetCurrentTransferShipmentNo());
         TransitLocationItemLedgerEntries.SetRange("Location Code", TransferHeader."In-Transit Code");
         TransitLocationItemLedgerEntries.SetRange("Item No.", TempTransferLine."Item No.");
         if TransitLocationItemLedgerEntries.IsEmpty() then
             exit;
 
         TransferFromItemLedgerEntry.FindSet();
-        TransitLocationItemLedgerEntries.FindSet();
         repeat
             ShowAppliedEntries.FindAppliedEntries(TransferFromItemLedgerEntry, TempTransferFromILEAppliedItemLedgerEntries);
-            if TempTransferFromILEAppliedItemLedgerEntries.FindSet() then
-                repeat
-                    Clear(AppliedEntryCostPerUnit);
-                    Clear(TransitCostPerUnit);
-                    CalculateTransferFromAppliedItemLedgerEntriesCostPerUnit(AppliedEntryCostPerUnit, TempTransferFromILEAppliedItemLedgerEntries);
-                    CalculateTransitLocationItemLedgerEntryCostPerUnit(TransitCostPerUnit, TransitLocationItemLedgerEntries);
-                    if AppliedEntryCostPerUnit <> TransitCostPerUnit then
-                        InsertCorrectionalValueEntryForTransitLocation(TransitLocationItemLedgerEntries, AppliedEntryCostPerUnit, TransitCostPerUnit);
-                until (TempTransferFromILEAppliedItemLedgerEntries.Next() = 0) and (TransitLocationItemLedgerEntries.Next() = 0);
         until TransferFromItemLedgerEntry.Next() = 0;
+
+        if TempTransferFromILEAppliedItemLedgerEntries.IsEmpty() then
+            exit;
+
+        TempTransferFromILEAppliedItemLedgerEntries.FindSet();
+        TransitLocationItemLedgerEntries.FindSet();
+        repeat
+            Clear(AppliedEntryCostPerUnit);
+            Clear(TransitCostPerUnit);
+            CalculateTransferFromAppliedItemLedgerEntriesCostPerUnit(AppliedEntryCostPerUnit, TempTransferFromILEAppliedItemLedgerEntries);
+            CalculateTransitLocationItemLedgerEntryCostPerUnit(TransitCostPerUnit, TransitLocationItemLedgerEntries);
+            if AppliedEntryCostPerUnit <> TransitCostPerUnit then
+                InsertCorrectionalValueEntryForTransitLocation(TransitLocationItemLedgerEntries, AppliedEntryCostPerUnit, TransitCostPerUnit);
+        until (TransitLocationItemLedgerEntries.Next() = 0) and (TempTransferFromILEAppliedItemLedgerEntries.Next() = 0);
 
         DocumentNo := TempTransferFromILEAppliedItemLedgerEntries."Document No.";
     end;
@@ -291,9 +307,9 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
 
         RSRLocalizationMgt.InsertRetailCalculationValueEntryMappingEntry(CorrectionValueEntry);
 
-        CreateAdditionalGLEntries(CorrectionValueEntry, RSRetailCalculationType::Margin);
-        CreateAdditionalGLEntries(CorrectionValueEntry, RSRetailCalculationType::VAT);
-        CreateAdditionalGLEntries(CorrectionValueEntry, RSRetailCalculationType::"Transit Adjustment");
+        CreateAdditionalGLEntries(CorrectionValueEntry, StdTransitValueEntry, RSRetailCalculationType::Margin);
+        CreateAdditionalGLEntries(CorrectionValueEntry, StdTransitValueEntry, RSRetailCalculationType::VAT);
+        CreateAdditionalGLEntries(CorrectionValueEntry, StdTransitValueEntry, RSRetailCalculationType::"Transit Adjustment");
 
         RSRLocalizationMgt.InsertGLItemLedgerRelations(CorrectionValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::Margin));
         RSRLocalizationMgt.InsertGLItemLedgerRelations(CorrectionValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::VAT));
@@ -355,21 +371,26 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         end;
     end;
 
-    local procedure CalculateRSGLEntryAmounts(var GenJournalLine: Record "Gen. Journal Line"; CalculationValueEntry: Record "Value Entry"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type")
+    local procedure CalculateRSGLEntryAmounts(var GenJournalLine: Record "Gen. Journal Line"; CalculationValueEntry: Record "Value Entry"; StdTransitValueEntry: Record "Value Entry"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type")
     begin
         case RSRetailCalculationType of
             RSRetailCalculationType::VAT:
-                GenJournalLine.Validate("Credit Amount", -CalculateRSGLVATAmount());
+                GenJournalLine.Validate("Credit Amount", -CalculateRSGLVATAmount(StdTransitValueEntry));
             RSRetailCalculationType::Margin:
-                GenJournalLine.Validate("Credit Amount", PriceListLine."Unit Price" * Abs(CalculationValueEntry."Invoiced Quantity") - (Abs(CalculationValueEntry."Cost Amount (Actual)") + CalculateRSGLVATAmount()));
+                GenJournalLine.Validate("Credit Amount", CalculateRSGLMarginAmount(StdTransitValueEntry, CalculationValueEntry));
             RSRetailCalculationType::"Transit Adjustment":
-                GenJournalLine.Validate("Credit Amount", Abs(CalculationValueEntry."Cost Amount (Actual)"));
+                GenJournalLine.Validate("Debit Amount", -Abs(CalculationValueEntry."Cost Amount (Actual)"));
         end;
     end;
 
-    local procedure CalculateRSGLVATAmount(): Decimal
+    local procedure CalculateRSGLMarginAmount(StdTransitValueEntry: Record "Value Entry"; CalculationValueEntry: Record "Value Entry"): Decimal
     begin
-        exit((PriceListLine."Unit Price" * TempTransferLine.Quantity) * CalculateVATBreakDown());
+        exit(-(Abs(CalculationValueEntry."Cost Amount (Actual)") - CalculateRSGLVATAmount(StdTransitValueEntry)))
+    end;
+
+    local procedure CalculateRSGLVATAmount(StdTransitValueEntry: Record "Value Entry"): Decimal
+    begin
+        exit((PriceListLine."Unit Price" * StdTransitValueEntry."Invoiced Quantity") * CalculateVATBreakDown());
     end;
 
     local procedure CalculateVATBreakDown(): Decimal
@@ -400,14 +421,41 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
             if (GenJnlLine."Source Currency Code" = AddCurrencyCode) and UseAddCurrAmount then
                 exit(AddCurrAmount);
 
-            exit(ExchangeAmtLCYToFCY2(Amount));
+            exit(ExchangeAmtLCYToFCY2(Amount, GenJnlLine));
         end;
         exit(OldAddCurrAmount);
     end;
 
-    local procedure ExchangeAmtLCYToFCY2(Amount: Decimal): Decimal
+    local procedure ExchangeAmtLCYToFCY2(Amount: Decimal; GenJnlLine: Record "Gen. Journal Line"): Decimal
+    var
+        NewCurrencyDate: Date;
+        CurrencyDate: Date;
+        UseCurrFactorOnly: Boolean;
     begin
-        exit(Round(CurrExchRate.ExchangeAmtLCYToFCYOnlyFactor(Amount, CurrencyFactor), AddCurrency."Amount Rounding Precision"));
+        AddCurrency.Get(AddCurrencyCode);
+
+        NewCurrencyDate := GenJnlLine."Posting Date";
+
+        if GenJnlLine."Reversing Entry" then
+            NewCurrencyDate := NewCurrencyDate - 1;
+
+        if (NewCurrencyDate <> CurrencyDate) then begin
+            UseCurrFactorOnly := false;
+            CurrencyDate := NewCurrencyDate;
+            CurrencyFactor := CurrExchRate.ExchangeRate(CurrencyDate, AddCurrencyCode);
+        end;
+
+        if (GenJnlLine."FA Add.-Currency Factor" <> 0) and (GenJnlLine."FA Add.-Currency Factor" <> CurrencyFactor)
+        then begin
+            UseCurrFactorOnly := true;
+            CurrencyDate := 0D;
+            CurrencyFactor := GenJnlLine."FA Add.-Currency Factor";
+        end;
+
+        if UseCurrFactorOnly then
+            exit(Round(CurrExchRate.ExchangeAmtLCYToFCYOnlyFactor(Amount, CurrencyFactor), AddCurrency."Amount Rounding Precision"));
+
+        exit(Round(CurrExchRate.ExchangeAmtLCYToFCY(CurrencyDate, AddCurrencyCode, Amount, CurrencyFactor), AddCurrency."Amount Rounding Precision"));
     end;
 
     local procedure CheckGLAccDirectPosting(GenJnlLine: Record "Gen. Journal Line"; GLAcc: Record "G/L Account")
@@ -495,6 +543,27 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         PriceListLine.SetRange("Asset No.", TempTransferLine."Item No.");
         if not PriceListLine.FindFirst() then
             Error(PriceNotFoundErr, TempTransferLine."Item No.", PriceListHeader.Code, LocationCode);
+    end;
+
+    local procedure GetCurrentTransferShipmentNo(): Code[20]
+    var
+        InventorySetup: Record "Inventory Setup";
+#if (BC20 or BC21 or BC22 or BC23)
+        NoSeriesLine: Record "No. Series Line";
+        NoSeriesManagement: Codeunit NoSeriesManagement;
+#else
+        NoSeriesBatch: Codeunit "No. Series - Batch";
+#endif
+    begin
+        InventorySetup.Get();
+        InventorySetup.TestField("Posted Transfer Shpt. Nos.");
+#if (BC20 or BC21 or BC22 or BC23)
+        NoSeriesManagement.SetNoSeriesLineFilter(NoSeriesLine, InventorySetup."Posted Transfer Shpt. Nos.", Today());
+        NoSeriesLine.FindFirst();
+        exit(NoSeriesLine."Last No. Used");
+#else
+        exit(NoSeriesBatch.GetLastNoUsed(InventorySetup."Posted Transfer Shpt. Nos."));
+#endif
     end;
 
     #endregion
