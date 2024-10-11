@@ -9,7 +9,6 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         CROTaxCommunicationMgt: Codeunit "NPR CRO Tax Communication Mgt.";
         Enabled: Boolean;
         Initialized: Boolean;
-        RetailLocationExistsOnSalesLines: Boolean;
         CAPTION_CERT_SUCCESS: Label 'Certificate with thumbprint %1 was uploaded successfully';
         CAPTION_OVERWRITE_CERT: Label 'Are you sure you want to overwrite the existing certificate?';
         ERROR_MISSING_KEY: Label 'The selected certificate does not contain the private key';
@@ -130,8 +129,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
     begin
         if not IsCROFiscalActive() then
             exit;
-        if not RetailLocationExistsOnSalesLines then
-            exit;
+
         CROAuxSalesInvHeader.ReadCROAuxSalesInvHeaderFields(SalesInvHeader);
         CROAuxSalesHeader.ReadCROAuxSalesHeaderFields(SalesHeader);
         CROAuxSalesInvHeader.TransferFields(CROAuxSalesHeader, false);
@@ -146,8 +144,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
     begin
         if not IsCROFiscalActive() then
             exit;
-        if not RetailLocationExistsOnSalesLines then
-            exit;
+
         CROAuxSalesCrMemoHeader.ReadCROAuxSalesCrMemoHeaderFields(SalesCrMemoHeader);
         CROAuxSalesHeader.ReadCROAuxSalesHeaderFields(SalesHeader);
         CROAuxSalesCrMemoHeader.TransferFields(CROAuxSalesHeader, false);
@@ -163,8 +160,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
     begin
         if not IsCROFiscalActive() then
             exit;
-        if not RetailLocationExistsOnSalesLines then
-            exit;
+
         CROAuxSalesHeader.ReadCROAuxSalesHeaderFields(SalesHeader);
         CROAuxSalesInvHeader.ReadCROAuxSalesInvHeaderFields(SalesInvoiceHeader);
         CROAuxSalesHeader.TransferFields(CROAuxSalesInvHeader, false);
@@ -183,8 +179,6 @@ codeunit 6151547 "NPR CRO Audit Mgt."
     begin
         if not IsCROFiscalActive() then
             exit;
-        if not RetailLocationExistsOnSalesLines then
-            exit;
 
         if SalesInvHdrNo <> '' then
             FiscalizeSalesInvoice(SalesInvHdrNo);
@@ -199,8 +193,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
     begin
         if not IsCROFiscalActive() then
             exit;
-        if not RetailLocationExistsOnSalesLines then
-            exit;
+
         CROAuxSalesHeader.ReadCROAuxSalesHeaderFields(SalesHeader);
         CROAuxSalesHeader."NPR CRO POS Unit" := SalePOS."Register No.";
         CROAuxSalesHeader.SaveCROAuxSalesHeaderFields();
@@ -219,12 +212,11 @@ codeunit 6151547 "NPR CRO Audit Mgt."
             exit;
         if not RunTrigger then
             exit;
-        if not RetailLocationExistsOnSalesLines then
-            exit;
         if not IsCROFiscalActive() then
             exit;
-        CROAuxSalesInvHeader.ReadCROAuxSalesInvHeaderFields(Rec);
-        CROAuxSalesInvHeader.Delete();
+
+        if CROAuxSalesInvHeader.Get(Rec.SystemId) then
+            CROAuxSalesInvHeader.Delete();
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Cr.Memo Header", 'OnAfterDeleteEvent', '', false, false)]
@@ -236,12 +228,11 @@ codeunit 6151547 "NPR CRO Audit Mgt."
             exit;
         if not RunTrigger then
             exit;
-        if not RetailLocationExistsOnSalesLines then
-            exit;
         if not IsCROFiscalActive() then
             exit;
-        CROAuxSalesCrMemoHdr.ReadCROAuxSalesCrMemoHeaderFields(Rec);
-        CROAuxSalesCrMemoHdr.Delete();
+
+        if CROAuxSalesCrMemoHdr.Get(Rec.SystemId) then
+            CROAuxSalesCrMemoHdr.Delete();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterDeleteAfterPosting', '', false, false)]
@@ -249,12 +240,11 @@ codeunit 6151547 "NPR CRO Audit Mgt."
     var
         CROAuxSalesHeader: Record "NPR CRO Aux Sales Header";
     begin
-        if not RetailLocationExistsOnSalesLines then
-            exit;
         if not IsCROFiscalActive() then
             exit;
-        CROAuxSalesHeader.ReadCROAuxSalesHeaderFields(SalesHeader);
-        CROAuxSalesHeader.Delete();
+
+        if CROAuxSalesHeader.Get(SalesHeader.SystemId) then
+            CROAuxSalesHeader.Delete();
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Salesperson/Purchaser", 'OnAfterDeleteEvent', '', false, false)]
@@ -268,6 +258,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
             exit;
         if not IsCROFiscalActive() then
             exit;
+
         if CROAuxSalespPurch.Get(Rec.SystemId) then
             CROAuxSalespPurch.Delete();
     end;
@@ -283,6 +274,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
             exit;
         if not IsCROFiscalActive() then
             exit;
+
         if CROPOSPaymentMethod.Get(Rec."Code") then
             CROPOSPaymentMethod.Delete();
     end;
@@ -298,6 +290,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
             exit;
         if not IsCROFiscalActive() then
             exit;
+
         if CROPaymentMethod.Get(Rec."Code") then
             CROPaymentMethod.Delete();
     end;
@@ -380,7 +373,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         CROPOSAuditLogAuxInfo.Insert(true);
     end;
 
-    local procedure InsertCROPOSAuditLogAuxInfo(SalesInvoiceHeader: Record "Sales Invoice Header")
+    local procedure InsertCROPOSAuditLogAuxInfo(SalesInvoiceHeader: Record "Sales Invoice Header"): Boolean
     var
         CROAuxSalesInvHeader: Record "NPR CRO Aux Sales Inv. Header";
         CROAuxSalespPurch: Record "NPR CRO Aux Salesperson/Purch.";
@@ -390,9 +383,13 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         SalespersonPurchaser: Record "Salesperson/Purchaser";
     begin
         CROAuxSalesInvHeader.ReadCROAuxSalesInvHeaderFields(SalesInvoiceHeader);
+        if CROAuxSalesInvHeader."NPR CRO POS Unit" = '' then
+            exit(false);
+
         POSUnit.Get(CROAuxSalesInvHeader."NPR CRO POS Unit");
         if not IsCROAuditEnabled(POSUnit."POS Audit Profile") then
-            exit;
+            exit(false);
+
         CROPOSAuditLogAuxInfo.Init();
         CROPOSAuditLogAuxInfo."POS Unit No." := CROAuxSalesInvHeader."NPR CRO POS Unit";
         SalesInvoiceHeader.CalcFields("Amount Including VAT");
@@ -401,7 +398,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         CROPOSAuditLogAuxInfo."POS Store Code" := POSUnit."POS Store Code";
         CROPOSAuditLogAuxInfo."Source Document No." := SalesInvoiceHeader."No.";
         Evaluate(CROPOSAuditLogAuxInfo."Log Timestamp", Format(Time, 0, '<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>'));
-        CROPOSAuditLogAuxInfo."Total Amount" := SalesInvoiceHeader."Amount Including VAT" - CalculateAmountInclVATForNonRetailLocation(SalesInvoiceHeader);
+        CROPOSAuditLogAuxInfo."Total Amount" := SalesInvoiceHeader."Amount Including VAT";
 
         SalespersonPurchaser.Get(SalesInvoiceHeader."Salesperson Code");
         CROAuxSalespPurch.ReadCROAuxSalespersonFields(SalespersonPurchaser);
@@ -414,9 +411,10 @@ codeunit 6151547 "NPR CRO Audit Mgt."
 
         CROAuxSalesInvHeader."NPR CRO Audit Entry No." := CROPOSAuditLogAuxInfo."Audit Entry No.";
         CROAuxSalesInvHeader.SaveCROAuxSalesInvHeaderFields();
+        exit(true);
     end;
 
-    local procedure InsertCROPOSAuditLogAuxInfo(SalesCrMemoHeader: Record "Sales Cr.Memo Header")
+    local procedure InsertCROPOSAuditLogAuxInfo(SalesCrMemoHeader: Record "Sales Cr.Memo Header"): Boolean
     var
         CROAuxSalesCrMemoHeader: Record "NPR CRO Aux Sales Cr. Memo Hdr";
         CROAuxSalespPurch: Record "NPR CRO Aux Salesperson/Purch.";
@@ -426,9 +424,13 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         SalespersonPurchaser: Record "Salesperson/Purchaser";
     begin
         CROAuxSalesCrMemoHeader.ReadCROAuxSalesCrMemoHeaderFields(SalesCrMemoHeader);
+        if CROAuxSalesCrMemoHeader."NPR CRO POS Unit" = '' then
+            exit(false);
+
         POSUnit.Get(CROAuxSalesCrMemoHeader."NPR CRO POS Unit");
         if not IsCROAuditEnabled(POSUnit."POS Audit Profile") then
-            exit;
+            exit(false);
+
         SalesCrMemoHeader.CalcFields("Amount Including VAT");
         CROPOSAuditLogAuxInfo.Init();
         CROPOSAuditLogAuxInfo."Audit Entry Type" := CROPOSAuditLogAuxInfo."Audit Entry Type"::"Sales Credit Memo";
@@ -437,7 +439,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         CROPOSAuditLogAuxInfo."POS Store Code" := POSUnit."POS Store Code";
         CROPOSAuditLogAuxInfo."Source Document No." := SalesCrMemoHeader."No.";
         Evaluate(CROPOSAuditLogAuxInfo."Log Timestamp", Format(Time, 0, '<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>'));
-        CROPOSAuditLogAuxInfo."Total Amount" := SalesCrMemoHeader."Amount Including VAT" - CalculateAmountInclVATForNonRetailLocation(SalesCrMemoHeader);
+        CROPOSAuditLogAuxInfo."Total Amount" := SalesCrMemoHeader."Amount Including VAT";
 
         SalespersonPurchaser.Get(SalesCrMemoHeader."Salesperson Code");
         CROAuxSalespPurch.ReadCROAuxSalespersonFields(SalespersonPurchaser);
@@ -450,6 +452,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
 
         CROAuxSalesCrMemoHeader."NPR CRO Audit Entry No." := CROPOSAuditLogAuxInfo."Audit Entry No.";
         CROAuxSalesCrMemoHeader.SaveCROAuxSalesCrMemoHeaderFields();
+        exit(true);
     end;
 
     local procedure CheckAreDataSetAndAccordingToCompliance(FrontEnd: Codeunit "NPR POS Front End Management")
@@ -563,7 +566,8 @@ codeunit 6151547 "NPR CRO Audit Mgt."
     begin
         if not SalesInvoiceHeader.Get(SalesInvHdrNo) then
             exit;
-        InsertCROPOSAuditLogAuxInfo(SalesInvoiceHeader);
+        if not InsertCROPOSAuditLogAuxInfo(SalesInvoiceHeader) then
+            exit;
         if not CROPOSAuditLogAuxInfo.GetAuditFromSalesInvoice(SalesInvHdrNo) then
             exit;
         CalculateZKI(CROPOSAuditLogAuxInfo);
@@ -579,7 +583,8 @@ codeunit 6151547 "NPR CRO Audit Mgt."
     begin
         if not SalesCrMemoHeader.Get(SalesCrMemoHdrNo) then
             exit;
-        InsertCROPOSAuditLogAuxInfo(SalesCrMemoHeader);
+        if not InsertCROPOSAuditLogAuxInfo(SalesCrMemoHeader) then
+            exit;
         if not CROPOSAuditLogAuxInfo.GetAuditFromSalesCrMemo(SalesCrMemoHdrNo) then
             exit;
         CalculateZKI(CROPOSAuditLogAuxInfo);
@@ -652,87 +657,26 @@ codeunit 6151547 "NPR CRO Audit Mgt."
     begin
         if not IsCROFiscalActive() then
             exit;
-        if not CheckSalesLinesRetailLocation(SalesHeader) then
+        CROAuxSalesHeader.ReadCROAuxSalesHeaderFields(SalesHeader);
+
+        if CROAuxSalesHeader."NPR CRO POS Unit" = '' then
             exit;
+
+        POSUnit.Get(CROAuxSalesHeader."NPR CRO POS Unit");
+        if not IsCROAuditEnabled(POSUnit."POS Audit Profile") then
+            Error(NotCROAuditProfileErr, POSUnit."No.");
+
         SalesHeader.TestField("Payment Method Code");
         SalesHeader.TestField("Salesperson Code");
-        CROAuxSalesHeader.ReadCROAuxSalesHeaderFields(SalesHeader);
-        CROAuxSalesHeader.TestField("NPR CRO POS Unit");
         CROPaymentMethodMapping.Get(SalesHeader."Payment Method Code");
-        POSUnit.Get(CROAuxSalesHeader."NPR CRO POS Unit");
         SalespersonPurchaser.Get(SalesHeader."Salesperson Code");
         CROAuxSalespPurch.ReadCROAuxSalespersonFields(SalespersonPurchaser);
         CROAuxSalespPurch.TestField("NPR CRO Salesperson OIB");
-        if not IsCROAuditEnabled(POSUnit."POS Audit Profile") then
-            Error(NotCROAuditProfileErr, POSUnit."No.");
-    end;
-
-    local procedure CheckSalesLinesRetailLocation(SalesHeader: Record "Sales Header"): Boolean
-    var
-        Location: Record Location;
-        SalesLines: Record "Sales Line";
-    begin
-        RetailLocationExistsOnSalesLines := false;
-        SalesLines.SetCurrentKey("Document Type", "Document No.", "Location Code");
-        SalesLines.SetLoadFields("Location Code");
-        SalesLines.SetFilter(Type, '%1|%2', SalesLines.Type::Item, SalesLines.Type::"Charge (Item)");
-        SalesLines.SetRange("Document No.", SalesHeader."No.");
-        if not SalesLines.FindSet() then
-            exit(RetailLocationExistsOnSalesLines);
-
-        repeat
-            if Location.Get(SalesLines."Location Code") then
-                if Location."NPR Retail Location" then begin
-                    RetailLocationExistsOnSalesLines := true;
-                    exit(RetailLocationExistsOnSalesLines);
-                end;
-        until SalesLines.Next() = 0;
-        exit(RetailLocationExistsOnSalesLines);
     end;
 
     internal procedure FormatDecimal(DecimalValue: Decimal): Text
     begin
         exit(Format(DecimalValue, 0, '<Precision,2:2><Standard Format,2>'));
-    end;
-
-    local procedure CalculateAmountInclVATForNonRetailLocation(SalesInvoiceHeader: Record "Sales Invoice Header"): Decimal
-    var
-        Location: Record Location;
-        SalesInvoiceLines: Record "Sales Invoice Line";
-        AmountInclVAT: Decimal;
-    begin
-        SalesInvoiceLines.SetCurrentKey("Document No.", "Location Code");
-        SalesInvoiceLines.SetRange("Document No.", SalesInvoiceHeader."No.");
-        SalesInvoiceLines.SetRange(Type, SalesInvoiceLines.Type::Item, SalesInvoiceLines.Type::"Charge (Item)");
-        if not SalesInvoiceLines.FindSet() then
-            exit;
-        repeat
-            SalesInvoiceLines.TestField("Location Code");
-            Location.Get(SalesInvoiceLines."Location Code");
-            if Location."NPR Retail Location" then
-                AmountInclVAT += SalesInvoiceLines."Amount Including VAT";
-        until SalesInvoiceLines.Next() = 0;
-        exit(AmountInclVAT);
-    end;
-
-    local procedure CalculateAmountInclVATForNonRetailLocation(SalesCrMemoHeader: Record "Sales Cr.Memo Header"): Decimal
-    var
-        Location: Record Location;
-        SalesCrMemoLines: Record "Sales Cr.Memo Line";
-        AmountInclVAT: Decimal;
-    begin
-        SalesCrMemoLines.SetCurrentKey("Document No.", "Location Code");
-        SalesCrMemoLines.SetRange("Document No.", SalesCrMemoHeader."No.");
-        SalesCrMemoLines.SetRange(Type, SalesCrMemoLines.Type::Item, SalesCrMemoLines.Type::"Charge (Item)");
-        if not SalesCrMemoLines.FindSet() then
-            exit;
-        repeat
-            SalesCrMemoLines.TestField("Location Code");
-            Location.Get(SalesCrMemoLines."Location Code");
-            if Location."NPR Retail Location" then
-                AmountInclVAT += SalesCrMemoLines."Amount Including VAT";
-        until SalesCrMemoLines.Next() = 0;
-        exit(AmountInclVAT);
     end;
 
     #endregion

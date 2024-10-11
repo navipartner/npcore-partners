@@ -90,13 +90,11 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
 
         VATSection := XmlElement.Create('Pdv');
         repeat
-            if CheckForRetailLocation(SalesInvLines) then begin
-                VATElements := XmlElement.Create('Porez');
-                VATElements.Add(CreateXmlElement('Stopa', CROAuditMgt.FormatDecimal(SalesInvLines."VAT %")));
-                VATElements.Add(CreateXmlElement('Osnovica', CROAuditMgt.FormatDecimal(SalesInvLines."VAT Base Amount")));
-                VATElements.Add(CreateXmlElement('Iznos', CROAuditMgt.FormatDecimal(SalesInvLines."Amount Including VAT" - SalesInvLines."VAT Base Amount")));
-                VATSection.Add(VATElements);
-            end
+            VATElements := XmlElement.Create('Porez');
+            VATElements.Add(CreateXmlElement('Stopa', CROAuditMgt.FormatDecimal(SalesInvLines."VAT %")));
+            VATElements.Add(CreateXmlElement('Osnovica', CROAuditMgt.FormatDecimal(SalesInvLines."VAT Base Amount")));
+            VATElements.Add(CreateXmlElement('Iznos', CROAuditMgt.FormatDecimal(SalesInvLines."Amount Including VAT" - SalesInvLines."VAT Base Amount")));
+            VATSection.Add(VATElements);
         until SalesInvLines.Next() = 0;
 
         AddVoucherVATSection(CROPOSAuditLogAuxInfo, VATElements, VATSection);
@@ -138,13 +136,11 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
 
         VATSection := XmlElement.Create('Pdv');
         repeat
-            if CheckForRetailLocation(SalesCrMemoLines) then begin
-                VATElements := XmlElement.Create('Porez');
-                VATElements.Add(CreateXmlElement('Stopa', CROAuditMgt.FormatDecimal(-SalesCrMemoLines."VAT %")));
-                VATElements.Add(CreateXmlElement('Osnovica', CROAuditMgt.FormatDecimal(-SalesCrMemoLines."VAT Base Amount")));
-                VATElements.Add(CreateXmlElement('Iznos', CROAuditMgt.FormatDecimal(-(SalesCrMemoLines."Amount Including VAT" - SalesCrMemoLines."VAT Base Amount"))));
-                VATSection.Add(VATElements);
-            end
+            VATElements := XmlElement.Create('Porez');
+            VATElements.Add(CreateXmlElement('Stopa', CROAuditMgt.FormatDecimal(-SalesCrMemoLines."VAT %")));
+            VATElements.Add(CreateXmlElement('Osnovica', CROAuditMgt.FormatDecimal(-SalesCrMemoLines."VAT Base Amount")));
+            VATElements.Add(CreateXmlElement('Iznos', CROAuditMgt.FormatDecimal(-(SalesCrMemoLines."Amount Including VAT" - SalesCrMemoLines."VAT Base Amount"))));
+            VATSection.Add(VATElements);
         until SalesCrMemoLines.Next() = 0;
 
         AddVoucherVATSection(CROPOSAuditLogAuxInfo, VATElements, VATSection);
@@ -282,6 +278,7 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
 
         if not CROAuditMgt.SignXML(CROPOSAuditLogAuxInfo, BaseValue, SignedValue) then
             exit;
+
         if not SendToTA(CROPOSAuditLogAuxInfo, SignedValue, ResponseText) then
             exit;
 
@@ -398,24 +395,6 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
         BaseValue := BaseValue.Replace('<?xml version="1.0" encoding="utf-8"?>', '');
         BaseValue := BaseValue.Replace('xmlns=""', '');
         BaseValue := BaseValue.Replace('"', '\"');
-    end;
-
-    local procedure CheckForRetailLocation(SalesInvoiceLines: Record "Sales Invoice Line"): Boolean
-    var
-        Location: Record Location;
-    begin
-        if not Location.Get(SalesInvoiceLines."Location Code") then
-            exit(false);
-        exit(Location."NPR Retail Location");
-    end;
-
-    local procedure CheckForRetailLocation(SalesCrMemoLines: Record "Sales Cr.Memo Line"): Boolean
-    var
-        Location: Record Location;
-    begin
-        if not Location.Get(SalesCrMemoLines."Location Code") then
-            exit(false);
-        exit(Location."NPR Retail Location");
     end;
 
     #endregion
