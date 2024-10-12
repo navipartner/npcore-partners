@@ -407,36 +407,38 @@
             repeat
 
                 ReferenceDate := Today();
+
+                AdmScheduleEntry.SetCurrentKey("External Schedule Entry No.");
                 AdmScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', TicketReservationRequest."External Adm. Sch. Entry No.");
                 AdmScheduleEntry.SetFilter(Cancelled, '=%1', false);
-                if (AdmScheduleEntry.FindFirst()) then begin
+                if (AdmScheduleEntry.FindFirst()) then
                     ReferenceDate := AdmScheduleEntry."Admission Start Date";
 
-                    LocalDateTime := TimeHelper.GetLocalTimeAtAdmission(AdmScheduleEntry."Admission Code");
-                    LocalDate := DT2Date(LocalDateTime);
-                    LocalTime := DT2Time(LocalDateTime);
+                LocalDateTime := TimeHelper.GetLocalTimeAtAdmission(AdmScheduleEntry."Admission Code");
+                LocalDate := DT2Date(LocalDateTime);
+                LocalTime := DT2Time(LocalDateTime);
 
-                    if (TicketReservationRequest."Admission Inclusion" = TicketReservationRequest."Admission Inclusion"::REQUIRED) then begin
+                if (TicketReservationRequest."Admission Inclusion" = TicketReservationRequest."Admission Inclusion"::REQUIRED) then begin
+                    PriceCalculation.CalculateErpUnitPrice(
+                        TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest."Customer No.", ReferenceDate, TicketReservationRequest.Quantity,
+                        UnitPrice, DiscountPct, UnitPriceIncludesVat, UnitPriceVatPercentage);
+                    PriceCalculation.SetTicketAdmissionDynamicUnitPrice(TicketReservationRequest, AdmScheduleEntry, UnitPrice, DiscountPct, UnitPriceIncludesVat, UnitPriceVatPercentage, LocalDate, LocalTime);
+                    TicketReservationRequest.Modify();
+                end;
+
+                if (TicketReservationRequest."Admission Inclusion" <> TicketReservationRequest."Admission Inclusion"::REQUIRED) then begin
+                    if (Admission.Get(TicketReservationRequest."Admission Code")) then begin
                         PriceCalculation.CalculateErpUnitPrice(
-                            TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest."Customer No.", ReferenceDate, TicketReservationRequest.Quantity,
+                            Admission."Additional Experience Item No.", '', TicketReservationRequest."Customer No.", ReferenceDate, TicketReservationRequest.Quantity,
                             UnitPrice, DiscountPct, UnitPriceIncludesVat, UnitPriceVatPercentage);
                         PriceCalculation.SetTicketAdmissionDynamicUnitPrice(TicketReservationRequest, AdmScheduleEntry, UnitPrice, DiscountPct, UnitPriceIncludesVat, UnitPriceVatPercentage, LocalDate, LocalTime);
                         TicketReservationRequest.Modify();
                     end;
+                end;
 
-                    if (TicketReservationRequest."Admission Inclusion" <> TicketReservationRequest."Admission Inclusion"::REQUIRED) then begin
-                        if (Admission.Get(TicketReservationRequest."Admission Code")) then begin
-                            PriceCalculation.CalculateErpUnitPrice(
-                                Admission."Additional Experience Item No.", '', TicketReservationRequest."Customer No.", ReferenceDate, TicketReservationRequest.Quantity,
-                                UnitPrice, DiscountPct, UnitPriceIncludesVat, UnitPriceVatPercentage);
-                            PriceCalculation.SetTicketAdmissionDynamicUnitPrice(TicketReservationRequest, AdmScheduleEntry, UnitPrice, DiscountPct, UnitPriceIncludesVat, UnitPriceVatPercentage, LocalDate, LocalTime);
-                            TicketReservationRequest.Modify();
-                        end;
-                    end;
+                if (TicketReservationRequest."Admission Inclusion" <> TicketReservationRequest."Admission Inclusion"::NOT_SELECTED) then
+                    AggregateTicketPriceDetails(TicketReservationRequest, TicketPriceDict);
 
-                    if (TicketReservationRequest."Admission Inclusion" <> TicketReservationRequest."Admission Inclusion"::NOT_SELECTED) then
-                        AggregateTicketPriceDetails(TicketReservationRequest, TicketPriceDict);
-                end
             until (TicketReservationRequest.Next() = 0);
 
             TicketReservationRequest.Reset();
