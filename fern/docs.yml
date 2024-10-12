@@ -48,6 +48,7 @@ navigation:
     # Hidden pages (accessible only from specific areas):
     - page: Crane
       path: docs/pages/crane.mdx
+      icon: fa-brands fa-docker
       hidden: true
 
     # General BC services API definition:
@@ -56,6 +57,7 @@ navigation:
       #icon: fa-solid fa-code
       #flattened: true
       display-errors: false
+      summary: ./docs/pages/apiref.mdx
       playground:
         environments:
          - Production
