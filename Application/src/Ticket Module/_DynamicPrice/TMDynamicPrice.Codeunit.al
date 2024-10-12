@@ -127,8 +127,8 @@ codeunit 6014559 "NPR TM Dynamic Price"
         DynamicPrice, BasePrice, AddonPrice : Decimal;
     begin
 
-
-        HavePriceRule := SelectPriceRule(AdmScheduleEntry, ReferenceDate, ReferenceTime, PriceRule);
+        if (AdmScheduleEntry."Entry No." > 0) and (AdmScheduleEntry."External Schedule Entry No." > 0) then
+            HavePriceRule := SelectPriceRule(AdmScheduleEntry, ReferenceDate, ReferenceTime, PriceRule);
         if (HavePriceRule) then
             EvaluatePriceRule(PriceRule, OriginalUnitPrice, PriceIncludesVAT, VatPercentage, false, BasePrice, AddonPrice);
 
