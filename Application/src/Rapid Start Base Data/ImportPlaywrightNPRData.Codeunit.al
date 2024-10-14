@@ -29,6 +29,7 @@
         UserPosUnitMapping: Dictionary of [Code[50], Code[10]];
     begin
         // User to PosUnit mapping
+        UserPosUnitMapping.Add('OLDRESTUSER', '04');
         UserPosUnitMapping.Add('RESTUSER', '04');
         UserPosUnitMapping.Add('MPOSUSER', '03');
         UserPosUnitMapping.Add('E2EWORKER1', '01');
@@ -36,7 +37,6 @@
         UserPosUnitMapping.Add('E2EWORKER3', '05');
         UserPosUnitMapping.Add('E2EWORKER4', '');
         UserPosUnitMapping.Add('E2EWORKER5', '');
-        UserPosUnitMapping.Add('E2EWORKER6', '');
 
         // Run mapping
         AssignPosUnitsToUsers(UserPosUnitMapping, '01');

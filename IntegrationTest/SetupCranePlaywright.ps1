@@ -52,7 +52,7 @@ try {
         . "C:\Run\Prompt.ps1"
 
         $bcUsers = (Get-NAVServerUser -ServerInstance BC -Tenant default).UserName
-        $bcUsersArray = @("RESTUSER", "MPOSUSER", "E2EWORKER1", "E2EWORKER2", "E2EWORKER3", "E2EWORKER4", "E2EWORKER5", "E2EWORKER6")
+        $bcUsersArray = @("OLDRESTUSER", "RESTUSER", "MPOSUSER", "E2EWORKER1", "E2EWORKER2", "E2EWORKER3", "E2EWORKER4", "E2EWORKER5")
         foreach ($usr in $bcUsersArray) {
             if ($bcUsers.Contains($usr)) {
                 Write-Host "$usr already created"

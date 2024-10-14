@@ -4,29 +4,35 @@ export abstract class RestaurantLayout {
   constructor(public page: Page) {}
 
   async openEdit() {
-
-    await this.page
-    .frameLocator("iframe")
-    .locator("button.restaurant-navigation-menu__button svg.fa-house.restaurant-navigation-menu__button__icon")
-    .click();
-
     await expect(
       this.page
         .frameLocator("iframe")
-        .locator("div.restaurant-selection__item--active")
+        .locator("div.old-restaurant__selection__item.is-active")
     ).toHaveCount(1, { timeout: 60000 });
 
     await this.page
       .frameLocator("iframe")
-      .locator("button.restaurant-navigation-menu__button svg.fa-gear.restaurant-navigation-menu__button__icon")
+      .locator("div.button--simple--edit.float-left span")
+      .filter({ hasText: /^Edit$/ })
+      .nth(1)
+      .click();
+
+    await this.page
+      .frameLocator("iframe")
+      .locator("div.old-seating-setup-menu__burger")
       .click();
 
     await expect(
       this.page
         .frameLocator("iframe")
-        .locator("#popup-host")
-        .locator("span.restaurant-title__text.restaurant-title__text--edit-mode")
-        .filter({ hasText: /^Edit Mode$/ })
+        .locator("div.old-seating-setup-menu.is-active")
+    ).toBeVisible();
+
+    await expect(
+      this.page
+        .frameLocator("iframe")
+        .locator("div.old-seating-setup-menu__configuration-title")
+        .filter({ hasText: new RegExp(`^Configure.*`) })
     ).toBeVisible();
   }
 

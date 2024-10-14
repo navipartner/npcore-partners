@@ -8,68 +8,102 @@ class RestaurantLocation extends RestaurantLayout {
 
     await this.page
       .frameLocator("iframe")
-      .locator("div.seating-setup-menu-button span")
-      .filter({ hasText: /^New Location$/ })
+      .locator("#popup-host")
+      .locator("button.seating-setup-navigation-menu__button svg.fa-location-plus.seating-setup-navigation-menu__button__icon")
       .click();
 
     await expect(
       this.page
         .frameLocator("iframe")
+        .locator("#popup-host")
         .locator(".dialog__container.dialog__container--configuration")
     ).toBeVisible();
 
     await this.page
       .frameLocator("iframe")
+      .locator("#popup-host")
       .locator("#id")
       .getByRole("textbox")
       .click();
 
     await this.page
       .frameLocator("iframe")
+      .locator("#popup-host")
       .locator("#id")
       .getByRole("textbox")
       .fill(id);
-
+      
     await this.page
       .frameLocator("iframe")
+      .locator("#popup-host")
       .locator("#caption")
       .getByRole("textbox")
       .click();
-
+      
     await this.page
       .frameLocator("iframe")
+      .locator("#popup-host")
       .locator("#caption")
       .getByRole("textbox")
       .fill(name);
-
+      
     await this.page
       .frameLocator("iframe")
       .locator("#popup-host div")
       .filter({ hasText: /^OK$/ })
       .nth(3)
       .click();
-
+      
     await expect(
       this.page
         .frameLocator("iframe")
-        .locator(
-          `div.seating-setup-locations__location > span:has-text('${name}')`
-        )
+        .locator("#popup-host")
+        .locator("span.restaurant-title__small-text.restaurant-title__small-text--edit-mode")
+    ).toHaveText(new RegExp(`> ${name}$`));
+
+    await this.page
+      .frameLocator("iframe")
+      .locator("#popup-host")
+      .locator("button.seating-setup-navigation-menu__button svg.fa-location-dot.seating-setup-navigation-menu__button__icon")
+      .click();
+      
+    await expect(
+      this.page
+        .frameLocator("iframe")
+        .locator("#popup-host")
+        .locator("div.seating-setup-locations__item.seating-setup-locations__item--active")
+    ).toHaveCount(1, { timeout: 60000 });
+      
+    await expect(
+      this.page
+        .frameLocator("iframe")
+        .locator("#popup-host")
+        .locator("div.seating-setup-locations__item.seating-setup-locations__item--active span.seating-setup-locations__item__text")
+    ).toHaveText(`${name}`);
+      
+    await this.page
+      .frameLocator("iframe")
+      .locator("#popup-host")
+      .locator("#button-dialog-ok > div > span > span")
+      .first()
+      .click();
+      
+    await this.page
+      .frameLocator("iframe")
+      .locator("button.restaurant-navigation-menu__button svg.fa-location-dot.restaurant-navigation-menu__button__icon")
+      .click();
+      
+    await expect(
+      this.page
+        .frameLocator("iframe")
+        .locator("div.restaurant-locations__item span.restaurant-locations__item__text")
+        .filter({ hasText: new RegExp(`^${name}$`) })
     ).toBeVisible();
 
     await this.page
       .frameLocator("iframe")
-      .locator("#button-dialog-ok > div > span > span")
-      .first()
+      .locator("button.restaurant-navigation-menu__button svg.fa-location-dot.restaurant-navigation-menu__button__icon")
       .click();
-
-    await expect(
-      this.page
-        .frameLocator("iframe")
-        .locator("div.restaurant__location__selection__button span")
-        .filter({ hasText: new RegExp(`^${name}$`) })
-        .nth(1)
-    ).toBeVisible();
   }
 
   async rename(editedName: string, oldName: string) {
@@ -77,31 +111,42 @@ class RestaurantLocation extends RestaurantLayout {
 
     await this.page
       .frameLocator("iframe")
+      .locator("#popup-host")
+      .locator("button.seating-setup-navigation-menu__button svg.fa-location-dot.seating-setup-navigation-menu__button__icon")
+      .click();
+
+    await this.page
+      .frameLocator("iframe")
+      .locator("#popup-host")
       .locator(
-        `div.seating-setup-locations__location span:has-text('${oldName}') + div.seating-setup-locations__buttons > div:nth-child(2)`
+        `div.seating-setup-locations__item span:has-text('${oldName}') + div.seating-setup-locations__item__buttons > div.seating-setup-locations__item__buttons-icon-edit`
       )
       .click();
 
     await expect(
       this.page
         .frameLocator("iframe")
+        .locator("#popup-host")
         .locator(".dialog__container.dialog__container--configuration")
     ).toBeVisible();
 
     await this.page
       .frameLocator("iframe")
+      .locator("#popup-host")
       .locator("#caption div")
       .nth(3)
       .click();
 
     await this.page
       .frameLocator("iframe")
+      .locator("#popup-host")
       .locator("#caption")
       .getByRole("textbox")
       .click();
 
     await this.page
       .frameLocator("iframe")
+      .locator("#popup-host")
       .locator("#caption")
       .getByRole("textbox")
       .fill(editedName);
@@ -113,60 +158,121 @@ class RestaurantLocation extends RestaurantLayout {
       .nth(3)
       .click();
 
-    await expect(
-      this.page
-        .frameLocator("iframe")
-        .locator(
-          `div.seating-setup-locations__location span:has-text('${editedName}')`
-        )
-    ).toBeVisible();
-
     await this.page
       .frameLocator("iframe")
-      .locator("#button-dialog-ok > div > span > span")
-      .first()
+      .locator("#popup-host")
+      .locator("button.seating-setup-navigation-menu__button svg.fa-location-dot.seating-setup-navigation-menu__button__icon")
       .click();
 
     await expect(
       this.page
         .frameLocator("iframe")
-        .locator("div.restaurant__location__selection__button span")
-        .filter({ hasText: new RegExp(`^${editedName}$`) })
-        .nth(1)
+        .locator("#popup-host")
+        .locator(
+          `div.seating-setup-locations__item span:has-text('${editedName}')`
+        )
     ).toBeVisible();
+    
+    await this.page
+    .frameLocator("iframe")
+    .locator("#button-dialog-ok > div > span > span")
+    .first()
+    .click();
+
+    await this.page
+      .frameLocator("iframe")
+      .locator("button.restaurant-navigation-menu__button svg.fa-location-dot.restaurant-navigation-menu__button__icon")
+      .click();
+      
+    await expect(
+      this.page
+        .frameLocator("iframe")
+        .locator("div.restaurant-locations__item span.restaurant-locations__item__text")
+        .filter({ hasText: new RegExp(`^${editedName}$`) })
+    ).toBeVisible();
+
+    await this.page
+      .frameLocator("iframe")
+      .locator("button.restaurant-navigation-menu__button svg.fa-location-dot.restaurant-navigation-menu__button__icon")
+      .click();
   }
 
   async remove(id: string, name: string) {
+    const initialCountTableView = await this.page
+      .frameLocator("iframe")
+      .locator(
+        "div.restaurant-locations__item span.restaurant-locations__item__text"
+      )
+      .filter({ hasText: new RegExp(`^${name}$`) })
+      .count();
+
     await this.openEdit();
 
     await this.page
       .frameLocator("iframe")
+      .locator("#popup-host")
+      .locator("button.seating-setup-navigation-menu__button svg.fa-location-dot.seating-setup-navigation-menu__button__icon")
+      .click();
+      
+      await expect(
+        this.page
+        .frameLocator("iframe")
+        .locator("#popup-host")
+        .locator(
+          `div.seating-setup-locations__item span:has-text('${name}')`
+        )
+        .nth(0)
+      ).toBeVisible();
+      
+    const initialCountEditMode = await this.page
+      .frameLocator("iframe")
+      .locator("#popup-host")
       .locator(
-        `div.seating-setup-locations__location span:has-text('${name}') + div.seating-setup-locations__buttons > div:nth-child(1)`
+        `div.seating-setup-locations__item span:has-text('${name}')`
       )
+      .count();
+
+    await this.page
+      .frameLocator("iframe")
+      .locator("#popup-host")
+      .locator(
+        `div.seating-setup-locations__item span:has-text('${name}') + div.seating-setup-locations__item__buttons > div.seating-setup-locations__item__buttons-icon-delete`
+      )
+      .nth(0)
       .click();
 
     await expect(
       this.page
         .frameLocator("iframe")
+        .locator("#popup-host")
         .locator(
-          `div.seating-setup-locations__location span:has-text('${name}')`
+          `div.seating-setup-locations__item span:has-text('${name}')`
         )
-    ).not.toBeVisible();
+    ).toHaveCount(initialCountEditMode - 1);
 
     await this.page
       .frameLocator("iframe")
+      .locator("#popup-host")
       .locator("#button-dialog-ok > div > span > span")
       .first()
       .click();
 
+      await this.page
+      .frameLocator("iframe")
+      .locator("button.restaurant-navigation-menu__button svg.fa-location-dot.restaurant-navigation-menu__button__icon")
+      .click();
+      
     await expect(
       this.page
         .frameLocator("iframe")
-        .locator("div.restaurant__location__selection__button span")
+        .locator("div.restaurant-locations__item span.restaurant-locations__item__text")
         .filter({ hasText: new RegExp(`^${name}$`) })
-        .nth(1)
-    ).not.toBeVisible();
+    ).toHaveCount(initialCountTableView - 1);
+
+    await this.page
+      .frameLocator("iframe")
+      .locator("button.restaurant-navigation-menu__button svg.fa-location-dot.restaurant-navigation-menu__button__icon")
+      .click();
   }
 }
 

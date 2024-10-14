@@ -48,115 +48,60 @@ export class RestaurantElement extends RestaurantLayout {
 
     await this.page
       .frameLocator("iframe")
-      .locator("#popup-host")
-      .locator("button.seating-setup-navigation-menu__button svg.fa-location-dot.seating-setup-navigation-menu__button__icon")
-      .click();
-
-    await this.page
-      .frameLocator("iframe")
-      .locator("#popup-host")
-      .locator("div.seating-setup-locations__item span.seating-setup-locations__item__text")
-      .filter({ hasText: new RegExp(`^${locationName}$`) })
+      .locator(
+        `div.old-seating-setup-locations__location > span:has-text('${locationName}')`
+      )
       .click();
 
     await expect(
       this.page
         .frameLocator("iframe")
-        .locator("#popup-host")
-        .locator("div.seating-setup-locations__item.seating-setup-locations__item--active span.seating-setup-locations__item__text")
-    ).toHaveText(`${locationName}`);
-
-    await expect(
-      this.page
-        .frameLocator("iframe")
-        .locator("#popup-host")
-        .locator("span.restaurant-title__small-text.restaurant-title__small-text--edit-mode")
-    ).toHaveText(new RegExp(`> ${locationName}$`));
+        .locator("div.old-seating-setup-menu__configuration-title")
+        .filter({ hasText: new RegExp(`^Configure ${locationName}$`) })
+    ).toBeVisible();
 
     await this.page
       .frameLocator("iframe")
-      .locator("#popup-host")
-      .locator("button.seating-setup-navigation-menu__button svg.fa-square-plus.seating-setup-navigation-menu__button__icon")
-      .click();
-
-    await this.page
-      .frameLocator("iframe")
-      .locator("#popup-host")
-      .locator("div.seating-setup-new-elements__item span.seating-setup-new-elements__item__text")
-      .filter({ hasText: `Add ${this.elementName}` })
-      .click();
-
-    await this.page
-      .frameLocator("iframe")
-      .locator("#popup-host")
-      .locator("button.seating-setup-navigation-menu__button svg.fa-square-plus.seating-setup-navigation-menu__button__icon")
+      .locator(
+        "div.old-seating-setup-menu__buttons > div.old-seating-setup-menu-button"
+      )
+      .filter({ hasText: `New ${this.elementName}` })
       .click();
 
     switch (this.elementName) {
-      case ElementType.Room:
-        await expect(
-          this.page
-            .frameLocator("iframe")
-            .locator("#popup-host")
-            .locator(`div.seating-component--${this.elementName.toLowerCase()} div.${this.elementName.toLowerCase()}`)
-            .filter({ hasText: this.elementName })
-        ).toBeVisible();
-        break;
-      case ElementType.Table:
-        await expect(
-          this.page
-            .frameLocator("iframe")
-            .locator("#popup-host")
-            .locator(`div.seating-component--${this.elementName.toLowerCase()} span.circle-text__text`)
-            .filter({ hasText: this.elementName })
-        ).toBeVisible();
-        break;
       case ElementType.Wall:
         await expect(
           this.page
             .frameLocator("iframe")
-            .locator("#popup-host")
-            .locator(`div.seating-component--${this.elementName.toLowerCase()}`)
+            .locator(`div.old-seating--${this.elementName.toLowerCase()}`)
         ).toBeVisible();
         break;
-      case ElementType.Bar:
+      default:
         await expect(
           this.page
             .frameLocator("iframe")
-            .locator("#popup-host")
-            .locator(`div.seating-component--${this.elementName.toLowerCase()} span.${this.elementName.toLowerCase()}__text`)
+            .locator(`div.old-seating--${this.elementName.toLowerCase()}`)
             .filter({ hasText: this.elementName })
         ).toBeVisible();
-        break;
     }
 
     await this.page
       .frameLocator("iframe")
-      .locator("#popup-host")
       .locator("#button-dialog-ok > div > span > span")
       .first()
       .click();
 
     await this.page
       .frameLocator("iframe")
-      .locator("button.restaurant-navigation-menu__button svg.fa-location-dot.restaurant-navigation-menu__button__icon")
-      .click();
-
-    await this.page
-      .frameLocator("iframe")
-      .locator("div.restaurant-locations__item span.restaurant-locations__item__text")
+      .locator("div.old-restaurant__location__selection__button span")
       .filter({ hasText: new RegExp(`^${locationName}$`) })
-      .click();
-
-    await this.page
-      .frameLocator("iframe")
-      .locator("button.restaurant-navigation-menu__button svg.fa-location-dot.restaurant-navigation-menu__button__icon")
+      .nth(1)
       .click();
 
     await expect(
       this.page
         .frameLocator("iframe")
-        .locator(`div.floor-render-element-${this.elementName.toLowerCase()}`)
+        .locator(`div.old-${this.elementName.toLowerCase()}`)
     ).toBeVisible();
   }
 
@@ -169,84 +114,58 @@ export class RestaurantElement extends RestaurantLayout {
 
       await this.page
         .frameLocator("iframe")
-        .locator("#popup-host")
-        .locator("button.seating-setup-navigation-menu__button svg.fa-location-dot.seating-setup-navigation-menu__button__icon")
-        .click();
-    
-      await this.page
-        .frameLocator("iframe")
-        .locator("#popup-host")
-        .locator("div.seating-setup-locations__item span.seating-setup-locations__item__text")
-        .filter({ hasText: new RegExp(`^${locationName}$`) })
+        .locator(
+          `div.old-seating-setup-locations__location > span:has-text('${locationName}')`
+        )
         .click();
 
       await expect(
         this.page
           .frameLocator("iframe")
-          .locator("#popup-host")
-          .locator("div.seating-setup-locations__item.seating-setup-locations__item--active span.seating-setup-locations__item__text")
-      ).toHaveText(`${locationName}`);
-
-      await expect(
-        this.page
-          .frameLocator("iframe")
-          .locator("#popup-host")
-          .locator("span.restaurant-title__small-text.restaurant-title__small-text--edit-mode")
-      ).toHaveText(new RegExp(`> ${locationName}$`));
+          .locator("div.old-seating-setup-menu__configuration-title")
+          .filter({ hasText: new RegExp(`^Configure ${locationName}$`) })
+      ).toBeVisible();
 
       await this.page
         .frameLocator("iframe")
-        .locator("#popup-host")
-        .locator("button.seating-setup-navigation-menu__button svg.fa-location-dot.seating-setup-navigation-menu__button__icon")
-        .click();
-
-      await this.page
-        .frameLocator("iframe")
-        .locator("#popup-host")
-        .locator(`div.${this.elementName.toLowerCase()}`)
+        .locator(`div.old-${this.elementName.toLowerCase()}`)
         .first()
         .click();
 
       await this.page
         .frameLocator("iframe")
-        .locator("#popup-host")
         .locator(
-          "div.seating-setup-context-menu__item > span.seating-setup-context-menu__text"
+          "div.old-seating-setup-context-menu > div.old-seating-setup-menu-button > span"
         )
         .filter({ hasText: /^Rename$/ })
         .click();
 
       await this.page
         .frameLocator("iframe")
-        .locator("#popup-host")
         .locator("div#user_friendly_id div.input__erase")
         .nth(1)
         .click();
 
       await this.page
         .frameLocator("iframe")
-        .locator("#popup-host")
         .locator("div#user_friendly_id")
         .getByTestId("search-input")
         .click();
 
       await this.page
         .frameLocator("iframe")
-        .locator("#popup-host")
         .locator("div#user_friendly_id")
         .getByTestId("search-input")
         .fill(number);
 
       await this.page
         .frameLocator("iframe")
-        .locator("#popup-host")
         .locator("div#caption div.input__erase")
         .nth(1)
         .click();
 
       await this.page
         .frameLocator("iframe")
-        .locator("#popup-host")
         .locator("div#caption")
         .getByTestId("search-input")
         .fill(caption);
@@ -260,20 +179,17 @@ export class RestaurantElement extends RestaurantLayout {
 
       const byCaptionPromise = this.page
         .frameLocator("iframe")
-        .locator("#popup-host")
-        .locator(`div.seating-floor div.${this.elementName.toLowerCase()}`)
+        .locator(`div.old-seating-floor .old-${this.elementName.toLowerCase()}`)
         .filter({ hasText: caption });
 
       const byNumberPromise = this.page
         .frameLocator("iframe")
-        .locator("#popup-host")
-        .locator(`div.seating-floor div.${this.elementName.toLowerCase()}`)
+        .locator(`div.old-seating-floor .old-${this.elementName.toLowerCase()}`)
         .filter({ hasText: number });
 
       const byClassPromise = this.page
         .frameLocator("iframe")
-        .locator("#popup-host")
-        .locator(`div.seating-floor div.${this.elementName.toLowerCase()}`);
+        .locator(`div.old-seating-floor .old-${this.elementName.toLowerCase()}`);
 
       switch (this.elementName) {
         case ElementType.Table:
@@ -288,31 +204,21 @@ export class RestaurantElement extends RestaurantLayout {
 
       await this.page
         .frameLocator("iframe")
-        .locator("#popup-host")
         .locator("#button-dialog-ok > div > span > span")
         .first()
         .click();
 
       await this.page
         .frameLocator("iframe")
-        .locator("button.restaurant-navigation-menu__button svg.fa-location-dot.restaurant-navigation-menu__button__icon")
-        .click();
-  
-      await this.page
-        .frameLocator("iframe")
-        .locator("div.restaurant-locations__item span.restaurant-locations__item__text")
+        .locator("div.old-restaurant__location__selection__button span")
         .filter({ hasText: new RegExp(`^${locationName}$`) })
-        .click();
-  
-      await this.page
-        .frameLocator("iframe")
-        .locator("button.restaurant-navigation-menu__button svg.fa-location-dot.restaurant-navigation-menu__button__icon")
+        .nth(1)
         .click();
 
       await expect(
         this.page
           .frameLocator("iframe")
-          .locator(`div.${this.elementName.toLowerCase()}`)
+          .locator(`div.old-${this.elementName.toLowerCase()}`)
       ).toBeVisible();
 
       // checking
@@ -320,55 +226,35 @@ export class RestaurantElement extends RestaurantLayout {
 
       await this.page
         .frameLocator("iframe")
-        .locator("#popup-host")
-        .locator("button.seating-setup-navigation-menu__button svg.fa-location-dot.seating-setup-navigation-menu__button__icon")
-        .click();
-
-      await this.page
-        .frameLocator("iframe")
-        .locator("#popup-host")
-        .locator("div.seating-setup-locations__item span.seating-setup-locations__item__text")
-        .filter({ hasText: new RegExp(`^${locationName}$`) })
+        .locator(
+          `div.old-seating-setup-locations__location > span:has-text('${locationName}')`
+        )
         .click();
 
       await expect(
         this.page
           .frameLocator("iframe")
-          .locator("#popup-host")
-          .locator("div.seating-setup-locations__item.seating-setup-locations__item--active span.seating-setup-locations__item__text")
-      ).toHaveText(`${locationName}`);
-
-      await expect(
-        this.page
-          .frameLocator("iframe")
-          .locator("#popup-host")
-          .locator("span.restaurant-title__small-text.restaurant-title__small-text--edit-mode")
-      ).toHaveText(new RegExp(`> ${locationName}$`));
-
-      await this.page
-        .frameLocator("iframe")
-        .locator("#popup-host")
-        .locator("button.seating-setup-navigation-menu__button svg.fa-location-dot.seating-setup-navigation-menu__button__icon")
-        .click();
+          .locator("div.old-seating-setup-menu__configuration-title")
+          .filter({
+            hasText: new RegExp(`^Configure ${locationName}$`),
+          })
+      ).toBeVisible();
 
       const byCaptionPromise1 = this.page
         .frameLocator("iframe")
-        .locator("#popup-host")
-        .locator(`div.seating-floor div.${this.elementName.toLowerCase()}`)
+        .locator(`div.old-seating-floor .old-${this.elementName.toLowerCase()}`)
         .filter({ hasText: caption })
         .first();
 
       const byNumberPromise1 = this.page
         .frameLocator("iframe")
-        .locator("#popup-host")
-        .locator(`div.seating-floor div.${this.elementName.toLowerCase()}`)
+        .locator(`div.old-seating-floor .old-${this.elementName.toLowerCase()}`)
         .filter({ hasText: number })
         .first();
 
       const byClassPromise1 = this.page
         .frameLocator("iframe")
-        .locator("#popup-host")
-        .locator(`div.seating-floor div.${this.elementName.toLowerCase()}`)
+        .locator(`div.old-seating-floor .old-${this.elementName.toLowerCase()}`)
         .first();
 
       switch (this.elementName) {
@@ -384,9 +270,8 @@ export class RestaurantElement extends RestaurantLayout {
 
       await this.page
         .frameLocator("iframe")
-        .locator("#popup-host")
         .locator(
-          "div.seating-setup-context-menu__item > span.seating-setup-context-menu__text"
+          "div.old-seating-setup-context-menu > div.old-seating-setup-menu-button > span"
         )
         .filter({ hasText: /^Rename$/ })
         .click();
@@ -394,7 +279,6 @@ export class RestaurantElement extends RestaurantLayout {
       await expect(
         this.page
           .frameLocator("iframe")
-          .locator("#popup-host")
           .locator("div#user_friendly_id")
           .getByTestId("search-input")
       ).toHaveValue(number);
@@ -402,7 +286,6 @@ export class RestaurantElement extends RestaurantLayout {
       await expect(
         this.page
           .frameLocator("iframe")
-          .locator("#popup-host")
           .locator("div#caption")
           .getByTestId("search-input")
       ).toHaveValue(caption);
@@ -416,7 +299,6 @@ export class RestaurantElement extends RestaurantLayout {
 
       await this.page
         .frameLocator("iframe")
-        .locator("#popup-host")
         .locator("#button-dialog-ok > div > span > span")
         .first()
         .click();
@@ -431,93 +313,54 @@ export class RestaurantElement extends RestaurantLayout {
     await this.openEdit();
 
     await this.page
-    .frameLocator("iframe")
-    .locator("#popup-host")
-    .locator("button.seating-setup-navigation-menu__button svg.fa-location-dot.seating-setup-navigation-menu__button__icon")
-    .click();
-
-    await this.page
       .frameLocator("iframe")
-      .locator("#popup-host")
-      .locator("div.seating-setup-locations__item span.seating-setup-locations__item__text")
-      .filter({ hasText: new RegExp(`^${locationName}$`) })
+      .locator(
+        `div.old-seating-setup-locations__location > span:has-text('${locationName}')`
+      )
       .click();
 
     await expect(
       this.page
         .frameLocator("iframe")
-        .locator("#popup-host")
-        .locator("div.seating-setup-locations__item.seating-setup-locations__item--active span.seating-setup-locations__item__text")
-    ).toHaveText(`${locationName}`);
-
-    await expect(
-      this.page
-        .frameLocator("iframe")
-        .locator("#popup-host")
-        .locator("span.restaurant-title__small-text.restaurant-title__small-text--edit-mode")
-    ).toHaveText(new RegExp(`> ${locationName}$`));
+        .locator("div.old-seating-setup-menu__configuration-title")
+        .filter({ hasText: new RegExp(`^Configure ${locationName}$`) })
+    ).toBeVisible();
 
     await this.page
       .frameLocator("iframe")
-      .locator("#popup-host")
-      .locator("button.seating-setup-navigation-menu__button svg.fa-location-dot.seating-setup-navigation-menu__button__icon")
-      .click();
-
-    await this.page
-      .frameLocator("iframe")
-      .locator("#popup-host")
-      .locator(`div.${this.elementName.toLowerCase()}`)
+      .locator(`div.old-${this.elementName.toLowerCase()}`)
       .first()
       .click();
 
     await this.page
       .frameLocator("iframe")
-      .locator("#popup-host")
       .locator(
-        "div.seating-setup-context-menu__item > span.seating-setup-context-menu__text"
+        "div.old-seating-setup-context-menu > div.old-seating-setup-menu-button > span"
       )
       .filter({ hasText: /^Duplicate$/ })
       .click();
 
     const byElementNamePromise = this.page
       .frameLocator("iframe")
-      .locator("#popup-host")
-      .locator(`div.seating-floor div.${this.elementName.toLowerCase()}`);
+      .locator(`div.old-seating-floor .old-${this.elementName.toLowerCase()}`);
 
     const byNumberPromise = this.page
       .frameLocator("iframe")
-      .locator("#popup-host")
-      .locator(`div.seating-floor div.${this.elementName.toLowerCase()}`);
+      .locator(`div.old-seating-floor .old-${this.elementName.toLowerCase()}`);
 
     const byClassPromise = this.page
       .frameLocator("iframe")
-      .locator("#popup-host")
-      .locator(`div.seating-floor div.${this.elementName.toLowerCase()}`);
+      .locator(`div.old-seating-floor .old-${this.elementName.toLowerCase()}`);
 
     switch (this.elementName) {
-      case ElementType.Room:
-        await expect(byElementNamePromise).toHaveCount(2);
-        await expect(
-          byElementNamePromise.filter({ hasText: this.elementName }).nth(0)
-        ).toHaveText(caption);
-        await expect(
-          byElementNamePromise.filter({ hasText: this.elementName }).nth(1)
-        ).toHaveText(new RegExp(`^${this.elementName}\\s*\\d+$`));
-        break;
       case ElementType.Table:
         await expect(byNumberPromise).toHaveCount(2);
         if (number) {
           await expect(
-            byNumberPromise
-              .locator(`span.circle-text__text`)
-              .filter({ hasText: number })
-              .nth(0)
+            byNumberPromise.filter({ hasText: number }).nth(0)
           ).toHaveText(number);
           await expect(
-            byNumberPromise
-              .locator(`span.circle-text__text`)
-              .filter({ hasText: number })
-              .nth(1)
+            byNumberPromise.filter({ hasText: number }).nth(1)
           ).toHaveText(number);
         }
         break;
@@ -526,48 +369,32 @@ export class RestaurantElement extends RestaurantLayout {
         await expect(byClassPromise.nth(0)).toHaveText("");
         await expect(byClassPromise.nth(1)).toHaveText("");
         break;
-      case ElementType.Bar:
+      default:
         await expect(byElementNamePromise).toHaveCount(2);
         await expect(
-          byElementNamePromise
-            .locator(`span.${this.elementName.toLowerCase()}__text`)
-            .filter({ hasText: this.elementName })
-            .nth(0)
+          byElementNamePromise.filter({ hasText: this.elementName }).nth(0)
         ).toHaveText(caption);
         await expect(
-          byElementNamePromise
-            .locator(`span.${this.elementName.toLowerCase()}__text`)
-            .filter({ hasText: this.elementName })
-            .nth(1)
+          byElementNamePromise.filter({ hasText: this.elementName }).nth(1)
         ).toHaveText(new RegExp(`^${this.elementName}\\s*\\d+$`));
     }
 
     await this.page
       .frameLocator("iframe")
-      .locator("#popup-host")
       .locator("#button-dialog-ok > div > span > span")
       .first()
       .click();
 
     await this.page
       .frameLocator("iframe")
-      .locator("button.restaurant-navigation-menu__button svg.fa-location-dot.restaurant-navigation-menu__button__icon")
-      .click();
-
-    await this.page
-      .frameLocator("iframe")
-      .locator("div.restaurant-locations__item span.restaurant-locations__item__text")
+      .locator("div.old-restaurant__location__selection__button span")
       .filter({ hasText: new RegExp(`^${locationName}$`) })
-      .click();
-
-    await this.page
-      .frameLocator("iframe")
-      .locator("button.restaurant-navigation-menu__button svg.fa-location-dot.restaurant-navigation-menu__button__icon")
+      .nth(1)
       .click();
 
     const elementsLayout = this.page
       .frameLocator("iframe")
-      .locator(`div.${this.elementName.toLowerCase()}`);
+      .locator(`div.old-${this.elementName.toLowerCase()}`);
 
     await expect(elementsLayout).toHaveCount(2);
   }
@@ -575,7 +402,7 @@ export class RestaurantElement extends RestaurantLayout {
   async remove(locationName: string): Promise<void> {
     const elementsLayout = this.page
       .frameLocator("iframe")
-      .locator(`div.${this.elementName.toLowerCase()}`);
+      .locator(`div.old-${this.elementName.toLowerCase()}`);
 
     expect(await elementsLayout.count()).toBeGreaterThan(0);
 
@@ -583,41 +410,21 @@ export class RestaurantElement extends RestaurantLayout {
 
     await this.page
       .frameLocator("iframe")
-      .locator("#popup-host")
-      .locator("button.seating-setup-navigation-menu__button svg.fa-location-dot.seating-setup-navigation-menu__button__icon")
-      .click();
-
-    await this.page
-      .frameLocator("iframe")
-      .locator("#popup-host")
-      .locator("div.seating-setup-locations__item span.seating-setup-locations__item__text")
-      .filter({ hasText: new RegExp(`^${locationName}$`) })
+      .locator(
+        `div.old-seating-setup-locations__location > span:has-text('${locationName}')`
+      )
       .click();
 
     await expect(
       this.page
         .frameLocator("iframe")
-        .locator("#popup-host")
-        .locator("div.seating-setup-locations__item.seating-setup-locations__item--active span.seating-setup-locations__item__text")
-    ).toHaveText(`${locationName}`);
-
-    await expect(
-      this.page
-        .frameLocator("iframe")
-        .locator("#popup-host")
-        .locator("span.restaurant-title__small-text.restaurant-title__small-text--edit-mode")
-    ).toHaveText(new RegExp(`> ${locationName}$`));
-
-    await this.page
-      .frameLocator("iframe")
-      .locator("#popup-host")
-      .locator("button.seating-setup-navigation-menu__button svg.fa-location-dot.seating-setup-navigation-menu__button__icon")
-      .click();
+        .locator("div.old-seating-setup-menu__configuration-title")
+        .filter({ hasText: new RegExp(`^Configure ${locationName}$`) })
+    ).toBeVisible();
 
     const elementsEdit = await this.page
       .frameLocator("iframe")
-      .locator("#popup-host")
-      .locator(`div.seating-floor div.${this.elementName.toLowerCase()}`)
+      .locator(`div.old-seating-floor .old-${this.elementName.toLowerCase()}`)
       .all();
 
     for (const element of elementsEdit.reverse()) {
@@ -625,9 +432,8 @@ export class RestaurantElement extends RestaurantLayout {
 
       await this.page
         .frameLocator("iframe")
-        .locator("#popup-host")
         .locator(
-          "div.seating-setup-context-menu__item > span.seating-setup-context-menu__text"
+          "div.old-seating-setup-context-menu > div.old-seating-setup-menu-button > span"
         )
         .filter({ hasText: /^Remove$/ })
         .click();
@@ -637,30 +443,20 @@ export class RestaurantElement extends RestaurantLayout {
 
     await this.page
       .frameLocator("iframe")
-      .locator("#popup-host")
       .locator("#button-dialog-ok > div > span > span")
       .first()
       .click();
 
     await this.page
       .frameLocator("iframe")
-      .locator("button.restaurant-navigation-menu__button svg.fa-location-dot.restaurant-navigation-menu__button__icon")
-      .click();
-
-    await this.page
-      .frameLocator("iframe")
-      .locator("div.restaurant-locations__item span.restaurant-locations__item__text")
+      .locator("div.old-restaurant__location__selection__button span")
       .filter({ hasText: new RegExp(`^${locationName}$`) })
-      .click();
-
-    await this.page
-      .frameLocator("iframe")
-      .locator("button.restaurant-navigation-menu__button svg.fa-location-dot.restaurant-navigation-menu__button__icon")
+      .nth(1)
       .click();
 
     const elements = this.page
       .frameLocator("iframe")
-      .locator(`div.${this.elementName.toLowerCase()}`);
+      .locator(`div.old-${this.elementName.toLowerCase()}`);
 
     await expect(elements).toHaveCount(0);
   }
@@ -680,49 +476,28 @@ export class RestaurantConfigElement extends RestaurantElement {
 
     await this.page
       .frameLocator("iframe")
-      .locator("#popup-host")
-      .locator("button.seating-setup-navigation-menu__button svg.fa-location-dot.seating-setup-navigation-menu__button__icon")
-      .click();
-
-    await this.page
-      .frameLocator("iframe")
-      .locator("#popup-host")
-      .locator("div.seating-setup-locations__item span.seating-setup-locations__item__text")
-      .filter({ hasText: new RegExp(`^${locationName}$`) })
+      .locator(
+        `div.old-seating-setup-locations__location > span:has-text('${locationName}')`
+      )
       .click();
 
     await expect(
       this.page
         .frameLocator("iframe")
-        .locator("#popup-host")
-        .locator("div.seating-setup-locations__item.seating-setup-locations__item--active span.seating-setup-locations__item__text")
-    ).toHaveText(`${locationName}`);
-
-    await expect(
-      this.page
-        .frameLocator("iframe")
-        .locator("#popup-host")
-        .locator("span.restaurant-title__small-text.restaurant-title__small-text--edit-mode")
-    ).toHaveText(new RegExp(`> ${locationName}$`));
+        .locator("div.old-seating-setup-menu__configuration-title")
+        .filter({ hasText: new RegExp(`^Configure ${locationName}$`) })
+    ).toBeVisible();
 
     await this.page
       .frameLocator("iframe")
-      .locator("#popup-host")
-      .locator("button.seating-setup-navigation-menu__button svg.fa-location-dot.seating-setup-navigation-menu__button__icon")
-      .click();
-
-    await this.page
-      .frameLocator("iframe")
-      .locator("#popup-host")
-      .locator(`div.${this.elementName.toLowerCase()}`)
+      .locator(`div.old-${this.elementName.toLowerCase()}`)
       .first()
       .click();
 
     await this.page
       .frameLocator("iframe")
-      .locator("#popup-host")
       .locator(
-        "div.seating-setup-context-menu__item > span.seating-setup-context-menu__text"
+        "div.old-seating-setup-context-menu > div.old-seating-setup-menu-button > span"
       )
       .filter({ hasText: /^Configure$/ })
       .click();
@@ -732,7 +507,6 @@ export class RestaurantConfigElement extends RestaurantElement {
         if (count) {
           await this.page
             .frameLocator("iframe")
-            .locator("#popup-host")
             .locator(
               "div.plus-minus-editor__caption:has-text('Count') + div.plus-minus-editor__buttons > div.add"
             )
@@ -741,7 +515,6 @@ export class RestaurantConfigElement extends RestaurantElement {
         if (minimum) {
           await this.page
             .frameLocator("iframe")
-            .locator("#popup-host")
             .locator(
               "div.plus-minus-editor__caption:has-text('Minimum') + div.plus-minus-editor__buttons > div.add"
             )
@@ -750,7 +523,6 @@ export class RestaurantConfigElement extends RestaurantElement {
         if (maximum) {
           await this.page
             .frameLocator("iframe")
-            .locator("#popup-host")
             .locator(
               "div.plus-minus-editor__caption:has-text('Maximum') + div.plus-minus-editor__buttons > div.add"
             )
@@ -759,14 +531,12 @@ export class RestaurantConfigElement extends RestaurantElement {
         if (roundBoolean) {
           await this.page
             .frameLocator("iframe")
-            .locator("#popup-host")
             .locator("input#switch-round + span.switch__pointer")
             .click();
         }
         if (width && parseInt(width) >= 1) {
           await this.page
             .frameLocator("iframe")
-            .locator("#popup-host")
             .locator(
               "div.plus-minus-editor__caption:has-text('Width') + div.plus-minus-editor__buttons > div.add"
             )
@@ -775,7 +545,6 @@ export class RestaurantConfigElement extends RestaurantElement {
         if (height && parseInt(height) >= 1) {
           await this.page
             .frameLocator("iframe")
-            .locator("#popup-host")
             .locator(
               "div.plus-minus-editor__caption:has-text('Height') + div.plus-minus-editor__buttons > div.add"
             )
@@ -786,7 +555,6 @@ export class RestaurantConfigElement extends RestaurantElement {
         if (width && parseInt(width) >= 1) {
           await this.page
             .frameLocator("iframe")
-            .locator("#popup-host")
             .locator(
               "div.plus-minus-editor__caption:has-text('Width') + div.plus-minus-editor__buttons > div.add"
             )
@@ -795,7 +563,6 @@ export class RestaurantConfigElement extends RestaurantElement {
         if (length && parseInt(length) >= 1) {
           await this.page
             .frameLocator("iframe")
-            .locator("#popup-host")
             .locator(
               "div.plus-minus-editor__caption:has-text('Length') + div.plus-minus-editor__buttons > div.add"
             )
@@ -807,7 +574,6 @@ export class RestaurantConfigElement extends RestaurantElement {
     if (rotation) {
       await this.page
         .frameLocator("iframe")
-        .locator("#popup-host")
         .locator(
           "div.plus-minus-editor__caption:has-text('Rotation (degrees)') + div.plus-minus-editor__buttons > div.value"
         )
@@ -815,7 +581,6 @@ export class RestaurantConfigElement extends RestaurantElement {
       for (const digit of rotation.split("")) {
         await this.page
           .frameLocator("iframe")
-          .locator("#popup-host")
           .locator("div.dialog__container--numpad")
           .getByTitle(digit, { exact: true })
           .click();
@@ -824,49 +589,45 @@ export class RestaurantConfigElement extends RestaurantElement {
 
     await this.page
       .frameLocator("iframe")
-      .locator("#popup-host")
       .locator("#button-dialog-ok > div > span > span")
       .nth(2)
       .click();
 
     await this.page
       .frameLocator("iframe")
-      .locator("#popup-host")
       .locator("#button-dialog-ok > div > span > span")
       .nth(1)
       .click();
 
     const byCaptionPromise = this.page
       .frameLocator("iframe")
-      .locator("#popup-host")
-      .locator(`div.seating-floor div.${this.elementName.toLowerCase()}`)
+      .locator(`div.old-seating-floor .old-${this.elementName.toLowerCase()}`)
       .filter({ hasText: caption });
 
     const byNumberPromise = this.page
       .frameLocator("iframe")
-      .locator("#popup-host")
-      .locator(`div.seating-floor div.${this.elementName.toLowerCase()}`)
+      .locator(`div.old-seating-floor .old-${this.elementName.toLowerCase()}`)
       .filter({ hasText: number });
 
-    const chairs = byNumberPromise.locator("div.table__chairs > span");
+    const chairs = byNumberPromise.locator("div.old-table__chairs > span");
 
     const byClassPromise = this.page
       .frameLocator("iframe")
-      .locator("#popup-host")
-      .locator(`div.seating-floor div.${this.elementName.toLowerCase()}`);
+      .locator(`div.old-seating-floor .old-${this.elementName.toLowerCase()}`);
 
     switch (this.elementName) {
       case ElementType.Table:
         await expect(byNumberPromise).toBeVisible();
         await expect(byNumberPromise).toHaveClass(
-          new RegExp(`.*chairs-${count}.*`)
+          new RegExp(`.*old-chairs-${count}.*`)
         );
         if (count && parseInt(count) >= 0) {
           await expect(chairs).toHaveCount(parseInt(count));
         }
+
         if (roundBoolean) {
           await expect(byNumberPromise).toHaveClass(
-            new RegExp(`.*${this.elementName.toLowerCase()}--round.*`)
+            new RegExp(`.*old-${this.elementName.toLowerCase()}--round.*`)
           );
         }
         if (width) {
@@ -927,54 +688,46 @@ export class RestaurantConfigElement extends RestaurantElement {
 
     await this.page
       .frameLocator("iframe")
-      .locator("button.restaurant-navigation-menu__button svg.fa-location-dot.restaurant-navigation-menu__button__icon")
-      .click();
-  
-    await this.page
-      .frameLocator("iframe")
-      .locator("div.restaurant-locations__item span.restaurant-locations__item__text")
+      .locator("div.old-restaurant__location__selection__button span")
       .filter({ hasText: new RegExp(`^${locationName}$`) })
-      .click();
-  
-    await this.page
-      .frameLocator("iframe")
-      .locator("button.restaurant-navigation-menu__button svg.fa-location-dot.restaurant-navigation-menu__button__icon")
+      .nth(1)
       .click();
 
     await expect(
       this.page
         .frameLocator("iframe")
-        .locator(`div.${this.elementName.toLowerCase()}`)
+        .locator(`div.old-${this.elementName.toLowerCase()}`)
     ).toBeVisible();
 
     const byCaptionPromise1 = this.page
       .frameLocator("iframe")
-      .locator(`div.restaurant-container div.${this.elementName.toLowerCase()}`)
+      .locator(`div.old-restaurant__container .old-${this.elementName.toLowerCase()}`)
       .filter({ hasText: caption });
 
     const byNumberPromise1 = this.page
       .frameLocator("iframe")
-      .locator(`div.restaurant-container div.${this.elementName.toLowerCase()}`)
+      .locator(`div.old-restaurant__container .old-${this.elementName.toLowerCase()}`)
       .filter({ hasText: number });
 
-    const chairs1 = byNumberPromise1.locator("div.table__chairs > span");
+    const chairs1 = byNumberPromise1.locator("div.old-table__chairs > span");
 
     const byClassPromise1 = this.page
       .frameLocator("iframe")
-      .locator(`div.restaurant-container div.${this.elementName.toLowerCase()}`);
+      .locator(`div.old-restaurant__container .old-${this.elementName.toLowerCase()}`);
 
     switch (this.elementName) {
       case ElementType.Table:
         await expect(byNumberPromise1).toBeVisible();
         await expect(byNumberPromise1).toHaveClass(
-          new RegExp(`.*chairs-${count}.*`)
+          new RegExp(`.*old-chairs-${count}.*`)
         );
         if (count && parseInt(count) >= 0) {
           await expect(chairs1).toHaveCount(parseInt(count));
         }
+
         if (roundBoolean) {
           await expect(byNumberPromise1).toHaveClass(
-            new RegExp(`.*${this.elementName.toLowerCase()}--round.*`)
+            new RegExp(`.*old-${this.elementName.toLowerCase()}--round.*`)
           );
         }
         if (width) {
@@ -1032,55 +785,35 @@ export class RestaurantConfigElement extends RestaurantElement {
 
     await this.page
       .frameLocator("iframe")
-      .locator("#popup-host")
-      .locator("button.seating-setup-navigation-menu__button svg.fa-location-dot.seating-setup-navigation-menu__button__icon")
-      .click();
-
-    await this.page
-      .frameLocator("iframe")
-      .locator("#popup-host")
-      .locator("div.seating-setup-locations__item span.seating-setup-locations__item__text")
-      .filter({ hasText: new RegExp(`^${locationName}$`) })
+      .locator(
+        `div.old-seating-setup-locations__location > span:has-text('${locationName}')`
+      )
       .click();
 
     await expect(
       this.page
         .frameLocator("iframe")
-        .locator("#popup-host")
-        .locator("div.seating-setup-locations__item.seating-setup-locations__item--active span.seating-setup-locations__item__text")
-    ).toHaveText(`${locationName}`);
-
-    await expect(
-      this.page
-        .frameLocator("iframe")
-        .locator("#popup-host")
-        .locator("span.restaurant-title__small-text.restaurant-title__small-text--edit-mode")
-    ).toHaveText(new RegExp(`> ${locationName}$`));
-
-    await this.page
-      .frameLocator("iframe")
-      .locator("#popup-host")
-      .locator("button.seating-setup-navigation-menu__button svg.fa-location-dot.seating-setup-navigation-menu__button__icon")
-      .click();
+        .locator("div.old-seating-setup-menu__configuration-title")
+        .filter({
+          hasText: new RegExp(`^Configure ${locationName}$`),
+        })
+    ).toBeVisible();
 
     const byCaptionPromise2 = this.page
       .frameLocator("iframe")
-      .locator("#popup-host")
-      .locator(`div.seating-floor div.${this.elementName.toLowerCase()}`)
+      .locator(`div.old-seating-floor .old-${this.elementName.toLowerCase()}`)
       .filter({ hasText: caption })
       .first();
 
     const byNumberPromise2 = this.page
       .frameLocator("iframe")
-      .locator("#popup-host")
-      .locator(`div.seating-floor div.${this.elementName.toLowerCase()}`)
+      .locator(`div.old-seating-floor .old-${this.elementName.toLowerCase()}`)
       .filter({ hasText: number })
       .first();
 
     const byClassPromise2 = this.page
       .frameLocator("iframe")
-      .locator("#popup-host")
-      .locator(`div.seating-floor div.${this.elementName.toLowerCase()}`)
+      .locator(`div.old-seating-floor .old-${this.elementName.toLowerCase()}`)
       .first();
 
     switch (this.elementName) {
@@ -1096,9 +829,8 @@ export class RestaurantConfigElement extends RestaurantElement {
 
     await this.page
       .frameLocator("iframe")
-      .locator("#popup-host")
       .locator(
-        "div.seating-setup-context-menu__item > span.seating-setup-context-menu__text"
+        "div.old-seating-setup-context-menu > div.old-seating-setup-menu-button > span"
       )
       .filter({ hasText: /^Configure$/ })
       .click();
@@ -1109,7 +841,6 @@ export class RestaurantConfigElement extends RestaurantElement {
           await expect(
             this.page
               .frameLocator("iframe")
-              .locator("#popup-host")
               .locator(
                 "div.plus-minus-editor__caption:has-text('Count') + div.plus-minus-editor__buttons > div.value > span"
               )
@@ -1119,7 +850,6 @@ export class RestaurantConfigElement extends RestaurantElement {
           await expect(
             this.page
               .frameLocator("iframe")
-              .locator("#popup-host")
               .locator(
                 "div.plus-minus-editor__caption:has-text('Minimum') + div.plus-minus-editor__buttons > div.value > span"
               )
@@ -1129,7 +859,6 @@ export class RestaurantConfigElement extends RestaurantElement {
           await expect(
             this.page
               .frameLocator("iframe")
-              .locator("#popup-host")
               .locator(
                 "div.plus-minus-editor__caption:has-text('Maximum') + div.plus-minus-editor__buttons > div.value > span"
               )
@@ -1140,14 +869,12 @@ export class RestaurantConfigElement extends RestaurantElement {
             expect(
               this.page
                 .frameLocator("iframe")
-                .locator("#popup-host")
                 .locator("input#switch-round + span.switch__pointer")
             ).toBeChecked();
           } else {
             expect(
               this.page
                 .frameLocator("iframe")
-                .locator("#popup-host")
                 .locator("input#switch-round + span.switch__pointer")
             ).not.toBeChecked();
           }
@@ -1156,7 +883,6 @@ export class RestaurantConfigElement extends RestaurantElement {
           await expect(
             this.page
               .frameLocator("iframe")
-              .locator("#popup-host")
               .locator(
                 "div.plus-minus-editor__caption:has-text('Width') + div.plus-minus-editor__buttons > div.value > span"
               )
@@ -1166,7 +892,6 @@ export class RestaurantConfigElement extends RestaurantElement {
           await expect(
             this.page
               .frameLocator("iframe")
-              .locator("#popup-host")
               .locator(
                 "div.plus-minus-editor__caption:has-text('Height') + div.plus-minus-editor__buttons > div.value > span"
               )
@@ -1178,7 +903,6 @@ export class RestaurantConfigElement extends RestaurantElement {
           await expect(
             this.page
               .frameLocator("iframe")
-              .locator("#popup-host")
               .locator(
                 "div.plus-minus-editor__caption:has-text('Width') + div.plus-minus-editor__buttons > div.value > span"
               )
@@ -1188,7 +912,6 @@ export class RestaurantConfigElement extends RestaurantElement {
           await expect(
             this.page
               .frameLocator("iframe")
-              .locator("#popup-host")
               .locator(
                 "div.plus-minus-editor__caption:has-text('Length') + div.plus-minus-editor__buttons > div.value > span"
               )
@@ -1201,7 +924,6 @@ export class RestaurantConfigElement extends RestaurantElement {
       await expect(
         this.page
           .frameLocator("iframe")
-          .locator("#popup-host")
           .locator(
             "div.plus-minus-editor__caption:has-text('Rotation (degrees)') + div.plus-minus-editor__buttons > div.value > span"
           )
@@ -1210,14 +932,12 @@ export class RestaurantConfigElement extends RestaurantElement {
 
     await this.page
       .frameLocator("iframe")
-      .locator("#popup-host")
       .locator("#button-dialog-ok > div > span > span")
       .nth(1)
       .click();
 
     await this.page
       .frameLocator("iframe")
-      .locator("#popup-host")
       .locator("#button-dialog-ok > div > span > span")
       .first()
       .click();
