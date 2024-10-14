@@ -31,19 +31,17 @@
     var
         Request: JsonObject;
         InS: InStream;
-        SSHKey: Text;
-        Buffer: Text;
+        SSHKeyB64: Text;
+        Base64Convert: Codeunit "Base64 Convert";
     begin
         Request.Add(_JsonUrl, SftpConnection."Server Host");
         Request.Add(_JsonPort, SftpConnection."Server Port");
         Request.Add(_JsonUser, SftpConnection.Username);
         Request.Add(_JsonPass, SftpConnection.Password);
+        SftpConnection.CalcFields("Server SSH Key");
         SftpConnection."Server SSH Key".CreateInStream(InS);
-        while not InS.EOS() do begin
-            InS.ReadText(Buffer);
-            SSHKey := SSHKey + Buffer;
-        end;
-        Request.Add(_JsonKey, SSHKey);
+        SSHKeyB64 := Base64Convert.ToBase64(InS);
+        Request.Add(_JsonKey, SSHKeyB64);
         Request.Add(_JsonForce, SftpConnection."Force Behavior");
         exit(Request);
     end;
@@ -61,12 +59,13 @@
     internal procedure GetFileServerJsonRequest(Server: Text; Port: Integer; Username: text; Password: Text; SSHKey: Text; ForceBehavior: Boolean): JsonObject
     var
         Request: JsonObject;
+        Base64Convert: Codeunit "Base64 Convert";
     begin
         Request.Add(_JsonUrl, Server);
         Request.Add(_JsonPort, Port);
         Request.Add(_JsonUser, Username);
         Request.Add(_JsonPass, Password);
-        Request.Add(_JsonKey, SSHKey);
+        Request.Add(_JsonKey, Base64Convert.ToBase64(SSHKey));
         Request.Add(_JsonForce, ForceBehavior);
         exit(Request);
     end;
