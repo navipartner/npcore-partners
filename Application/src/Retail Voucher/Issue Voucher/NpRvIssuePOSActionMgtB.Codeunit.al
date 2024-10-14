@@ -37,6 +37,7 @@ codeunit 6059981 "NPR NpRv Issue POSAction Mgt-B"
         NpRvSalesLine.Type := NpRvSalesLine.Type::"New Voucher";
         NpRvSalesLine."Voucher Type" := VoucherType.Code;
         NpRvSalesLine.Description := VoucherType.Description;
+        NpRvSalesLine."Voucher Message" := VoucherType."Voucher Message";
         NpRvSalesLine."Starting Date" := CurrentDateTime;
         POSSale.GetCurrentSale(SalePOS);
         NpRvSalesLine.Validate("Customer No.", SalePOS."Customer No.");

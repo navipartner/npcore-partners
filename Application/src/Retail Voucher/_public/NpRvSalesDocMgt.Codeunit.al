@@ -884,6 +884,7 @@
         NpRvSalesLine."Voucher Type" := TempNpRvVoucher."Voucher Type";
         NpRvSalesLine."Voucher No." := TempNpRvVoucher."No.";
         NpRvSalesLine."Reference No." := TempNpRvVoucher."Reference No.";
+        NpRvSalesLine."Voucher Message" := TempNpRvVoucher."Voucher Message";
         NpRvSalesLine.Description := TempNpRvVoucher.Description;
         NpRvSalesLine.Validate("Customer No.", SalesHeader."Sell-to Customer No.");
         if (not NpRvSalesLine."Send via Print") and (not NpRvSalesLine."Send via SMS") and (NpRvSalesLine."E-mail" <> '') then
