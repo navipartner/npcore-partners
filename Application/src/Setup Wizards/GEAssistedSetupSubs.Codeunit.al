@@ -22,10 +22,11 @@
         AddRSEInvoiceSetupsWizard();
         AddDEFiscalizationSetupsWizard();
         AddIRLFiscalizationSetupsWizard();
-        AddNOFiscalSetupsWizard();
-        AddSECCFiscalizationSetupsWizard(); 
-        AddHUMSFiscalSetupsWizard();
+        AddNOFiscalizationSetupsWizard();
+        AddSECCFiscalizationSetupsWizard();
+        AddHUMSFiscalizationSetupsWizard();
         AddDKFiscalizationSetupsWizard();
+        AddFRFiscalizationSetupsWizard();
     end;
 
     local procedure AddRetailSetupsWizard()
@@ -199,7 +200,7 @@
         AssistedSetup.Add(GetAppId(), Page::"NPR Setup RS EI UOM Mapping", RSEIUOMMappingSetupTxt, AssistedSetupGroup::NPRRSEInvoice);
     end;
 
-    local procedure AddHUMSFiscalSetupsWizard()
+    local procedure AddHUMSFiscalizationSetupsWizard()
     var
         AssistedSetup: Codeunit "Assisted Setup";
         AssistedSetupGroup: Enum "Assisted Setup Group";
@@ -245,7 +246,7 @@
         AssistedSetup.Add(GetAppId(), Page::"NPR Setup IRL Fiscal", IRLFiscalizationSetupTxt, AssistedSetupGroup::NPRIRLFiscal);
     end;
 
-    local procedure AddNOFiscalSetupsWizard()
+    local procedure AddNOFiscalizationSetupsWizard()
     var
         AssistedSetup: Codeunit "Assisted Setup";
         AssistedSetupGroup: Enum "Assisted Setup Group";
@@ -277,7 +278,22 @@
         AssistedSetup.Add(GetAppId(), Page::"NPR Setup DK Fiscal", DKFiscalSetupTxt, AssistedSetupGroup::NPRDKFiscal);
         AssistedSetup.Add(GetAppId(), Page::"NPR Setup DK Audit Profile", DKPOSAuditProfileSetupTxt, AssistedSetupGroup::NPRDKFiscal);
     end;
-
+      local procedure AddFRFiscalizationSetupsWizard()
+    var
+        AssistedSetup: Codeunit "Assisted Setup";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        FRAuditNoSeriesTxt: Label 'Welcome to FR Audit No Series Setup';
+        FRAuditTxt: Label 'Welcome to FR Audit Setup';
+        FRPOSAuditProfileTxt: Label 'Welcome to FR POS Audit Profile Setup';
+        FREoDProfileTxt: Label 'Welcome to FR End of Day Profile Setup';
+        FRCompanyInfoTxt: Label 'Welcome to FR Company Information Setup';
+    begin
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup FR Audit No Series", FRAuditNoSeriesTxt, AssistedSetupGroup::NPRFRFiscal);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup FR Audit", FRAuditTxt, AssistedSetupGroup::NPRFRFiscal);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup FR POS Audit Prof", FRPOSAuditProfileTxt, AssistedSetupGroup::NPRFRFiscal);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup FR EoD Profile", FREoDProfileTxt, AssistedSetupGroup::NPRFRFiscal);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup FR Company Info", FRCompanyInfoTxt, AssistedSetupGroup::NPRFRFiscal);
+    end;
 
     procedure GetAppId(): Guid
     var
@@ -318,6 +334,7 @@
         HUMSFiscalizationSetups();
         SECCFiscalizationSetups();
         DKFiscalizationSetups();
+        FRFiscalizationSetups();
 #if not BC18
         if Checklist.IsChecklistVisible() then
             HideChecklistIfPOSEntryExist();
@@ -388,7 +405,6 @@
                                                 '',
                                                 VideoCategory::ReadyForBusiness,
                                                 '');
-
     end;
 
     local procedure DownloadAndImportDataWizard()
@@ -426,7 +442,6 @@
     begin
         GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Download&Import Data");
     end;
-
 
     local procedure CreatePOSstoresAndUnitsWizard()
     var
@@ -647,7 +662,6 @@
         if UpgradeTag.HasUpgradeTag(GetAssistedSetupUpgradeTag(ThisModul::Restaurant)) then
             exit;
 
-
         WelcomeVideoRestaurantExperience();
         DownloadAndImportRestDataWizard();
         CreateFlowStatusesWizard();
@@ -695,7 +709,6 @@
                                                 '',
                                                 VideoCategory::ReadyForBusiness,
                                                 '');
-
     end;
 
     local procedure DownloadAndImportRestDataWizard()
@@ -754,7 +767,6 @@
                                                 '',
                                                 VideoCategory::ReadyForBusiness,
                                                 '');
-
     end;
 
     [EventSubscriber(ObjectType::Page, Page::"NPR Modify Flow Statuses", 'OnAfterFinishStep', '', false, false)]
@@ -791,7 +803,6 @@
                                                 '',
                                                 VideoCategory::ReadyForBusiness,
                                                 '');
-
     end;
 
     [EventSubscriber(ObjectType::Page, Page::"NPR Modify Print/Prod Category", 'OnAfterFinishStep', '', false, false)]
@@ -828,7 +839,6 @@
                                                 '',
                                                 VideoCategory::ReadyForBusiness,
                                                 '');
-
     end;
 
     [EventSubscriber(ObjectType::Page, Page::"NPR Modify Item Rtng. Profiles", 'OnAfterFinishStep', '', false, false)]
@@ -865,7 +875,6 @@
                                                 '',
                                                 VideoCategory::ReadyForBusiness,
                                                 '');
-
     end;
 
     [EventSubscriber(ObjectType::Page, Page::"NPR Create Rest. Serv. Flow", 'OnAfterFinishStep', '', false, false)]
@@ -902,7 +911,6 @@
                                                 '',
                                                 VideoCategory::ReadyForBusiness,
                                                 '');
-
     end;
 
     [EventSubscriber(ObjectType::Page, Page::"NPR Create Restaurant Layout", 'OnAfterFinishStep', '', false, false)]
@@ -939,7 +947,6 @@
                                                 '',
                                                 VideoCategory::ReadyForBusiness,
                                                 '');
-
     end;
 
     [EventSubscriber(ObjectType::Page, Page::"NPR Create Kitchen Layout", 'OnAfterFinishStep', '', false, false)]
@@ -1079,7 +1086,6 @@
                                                 '',
                                                 VideoCategory::ReadyForBusiness,
                                                 '');
-
     end;
 
     local procedure ImportTicketingDataWizard()
@@ -1501,7 +1507,7 @@
 
     #region Common Functions
     //This region contains common functions used by all Setup Wizards and Checklists
-    local procedure GetChecklistUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup,DEFiscalization,BEFiscalization,IRLFiscalization,NOFiscalization,HUMSFiscalization,SECCFiscalization,DKFiscalization): Code[250]
+    local procedure GetChecklistUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup,DEFiscalization,BEFiscalization,IRLFiscalization,NOFiscalization,HUMSFiscalization,SECCFiscalization,DKFiscalization,FRFiscalization): Code[250]
     begin
         case Modul of
             Modul::Retail:
@@ -1516,7 +1522,7 @@
         end;
     end;
 
-    local procedure GetAssistedSetupUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup,DEFiscalization,BEFiscalization,IRLFiscalization,NOFiscalization,HUMSFiscalization,SECCFiscalization,DKFiscalization): Code[250]
+    local procedure GetAssistedSetupUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup,DEFiscalization,BEFiscalization,IRLFiscalization,NOFiscalization,HUMSFiscalization,SECCFiscalization,DKFiscalization,FRFiscalization): Code[250]
     begin
         case Modul of
             Modul::Retail:
@@ -1551,7 +1557,7 @@
                 exit('NPR-AssistedSetup-RSEInvoice-v1.0');
             Modul::DEFiscalization:
                 // For Any change, increase version
-                exit('NPR-AssistedSetup-DEFiscalization-v1.3');
+                exit('NPR-AssistedSetup-DEFiscalization-v1.0');
             Modul::BEFiscalization:
                 // For Any change, increase version
                 exit('NPR-AssistedSetup-BEFiscalization-v1.0');
@@ -1569,10 +1575,13 @@
                 exit('NPR-AssistedSetup-HUFiscalization-v1.0');
             Modul::DKFiscalization:
                 // For Any change, increase version
-                exit('NPR-AssistedSetup-DKFiscalization-v1.9');
+                exit('NPR-AssistedSetup-DKFiscalization-v1.0');
+            Modul::FRFiscalization:
+                // For Any change, increase version
+                exit('NPR-AssistedSetup-FRFiscalization-v1.0');
         end;
     end;
-    
+
     local procedure AddRoleToList(var TempAllProfile: Record "All Profile" temporary; RoleCenterID: Integer)
     var
         AllProfile: Record "All Profile";
@@ -2633,7 +2642,6 @@
             UpdateSetupATAuditProfileWizardStatus();
     end;
 
-
     [EventSubscriber(ObjectType::Page, Page::"NPR Setup AT VAT Posting Setup", 'OnAfterFinishStep', '', false, false)]
     local procedure SetupATVATPostingSetupWizard_OnAfterFinishStep(DataPopulated: Boolean)
     begin
@@ -3619,7 +3627,6 @@
                                                 '');
     end;
 
-
     [EventSubscriber(ObjectType::Page, Page::"NPR Setup SE Fiscal", 'OnAfterFinishStep', '', false, false)]
     local procedure SetupSECCFiscalWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
     begin
@@ -3932,6 +3939,225 @@
     end;
     #endregion
 
+    #region FR Fiscalization Wizards
+    local procedure FRFiscalizationSetups()
+    var
+        UpgradeTag: Codeunit "Upgrade Tag";
+    begin
+        if not (Session.CurrentClientType() in [ClientType::Web, ClientType::Windows, ClientType::Desktop]) then
+            exit;
+
+        if UpgradeTag.HasUpgradeTag(GetAssistedSetupUpgradeTag(ThisModul::FRFiscalizationSetup)) then
+            exit;
+
+        RemoveFRFiscalizationSetupGuidedExperience();
+
+        AddFRFiscalizationSetupsWizard();
+
+        UpgradeTag.SetUpgradeTag(GetAssistedSetupUpgradeTag(ThisModul::FRFiscalizationSetup));
+    end;
+
+    local procedure RemoveFRFiscalizationSetupGuidedExperience()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup FR Audit No Series");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup FR Audit");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup FR POS Audit Prof");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup FR Company Info");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup FR EoD Profile");
+    end;
+
+    local procedure AddFRFiscalizationSetupsWizard()
+    begin
+        EnableFRAuditNoSeriesSetupWizard();
+        EnableFRAuditWizard();
+        EnableFRPOSAuditProfileWizard();
+        EnableFRCompanyInfoWizard();
+        EnableFREoDProfileWizard();
+    end;
+
+    local procedure EnableFRAuditNoSeriesSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup Audit No Series', Locked = true;
+        SetupDescriptionTxt: Label 'Setup Audit No Series', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup FR Audit No Series") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                3,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup FR Audit No Series",
+                                                AssistedSetupGroup::NPRFRFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableFRAuditWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup FR Audit', Locked = true;
+        SetupDescriptionTxt: Label 'Setup FR Audit', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup FR Audit") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                1,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup FR Audit",
+                                                AssistedSetupGroup::NPRFRFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableFRPOSAuditProfileWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup POS Audit Profile', Locked = true;
+        SetupDescriptionTxt: Label 'Setup POS Audit Profile', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup FR POS Audit Prof") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                2,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup FR POS Audit Prof",
+                                                AssistedSetupGroup::NPRFRFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableFRCompanyInfoWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup Company Information', Locked = true;
+        SetupDescriptionTxt: Label 'Setup Company Information', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup FR Company Info") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                2,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup FR Company Info",
+                                                AssistedSetupGroup::NPRFRFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableFREoDProfileWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup FR End of Day Profile', Locked = true;
+        SetupDescriptionTxt: Label 'Setup FR End of Day Profile', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup FR EoD Profile") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                2,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup FR EoD Profile",
+                                                AssistedSetupGroup::NPRFRFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup FR Audit No Series", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupFRAuditNoSeriesWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateSetupFRAuditNoSeriesWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup FR Audit", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupFRAuditWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateSetupFRAuditWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup FR POS Audit Prof", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupFRPOSAuditProfileWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateSetupFRPOSAuditProfileWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup FR Company Info", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupFRCompanyInfoWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateSetupFRCompanyInfoWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup FR EoD Profile", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupFREoDProfileWizard_OnAfterFinishStep(AnyDataToCreate: Boolean)
+    begin
+        if AnyDataToCreate then
+            UpdateSetupFREoDProfileWizardStatus();
+    end;
+
+    local procedure UpdateSetupFRAuditNoSeriesWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup FR Audit No Series");
+    end;
+
+    local procedure UpdateSetupFRAuditWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup FR Audit");
+    end;
+
+    local procedure UpdateSetupFRPOSAuditProfileWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup FR POS Audit Prof");
+    end;
+
+    local procedure UpdateSetupFRCompanyInfoWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup FR Company Info");
+    end;
+
+    local procedure UpdateSetupFREoDProfileWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup FR EoD Profile");
+    end;
+    #endregion
+
 #if not (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22)
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Checklist Banner", 'OnBeforeUpdateBannerLabels', '', false, false)]
     local procedure ChecklistBannerOnBeforeUpdateBannerLabels(var IsHandled: Boolean; var DescriptionTxt: Text; var TitleTxt: Text; var HeaderTxt: Text)
@@ -3957,6 +4183,6 @@
 
     var
         Checklist: Codeunit Checklist;
-        ThisModul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup,DEFiscalization,BEFiscalization,IRLFiscalization,NOFiscalization,SECCFiscalization,HUMSFiscalizationSetup,DKFiscalization;
+        ThisModul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup,DEFiscalization,BEFiscalization,IRLFiscalization,NOFiscalization,SECCFiscalization,HUMSFiscalizationSetup,DKFiscalization,FRFiscalizationSetup;
 #endif
 }
