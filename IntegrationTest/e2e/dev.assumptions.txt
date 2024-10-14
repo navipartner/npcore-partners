@@ -14,7 +14,11 @@ E2E_USER_1_PASSWORD=Test-user-1
 E2E_USER_2_USERNAME=TEST-USER-2
 E2E_USER_2_PASSWORD=Test-user-2
 
-For restaurant tests we need default user that has restaurant POS unit, with restaurant default view: 
+For old restaurant tests we need default user that has restaurant POS unit, with restaurant default view and restaurant view layout set to "Classic": 
+E2E_OLD_RESTAURANT_USERNAME=username
+E2E_OLD_RESTAURANT_PASSWORD=password
+
+For restaurant tests we need default user that has restaurant POS unit, with restaurant default view and restaurant view layout set to "Modern": 
 E2E_RESTAURANT_USERNAME=username
 E2E_RESTAURANT_PASSWORD=password
 

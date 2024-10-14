@@ -1,59 +1,21 @@
-import { expect } from "@playwright/test";
-import { test } from "../fixtures/restaurant";
+import { test } from "../fixtures/restaurantOld";
 import { restaurantLogin } from "../fixtures/restaurantLogin";
-import { restaurantSelectLayoutType } from "../fixtures/restaurantSelectLayoutType";
 import * as data from "./util/data/restaurant-test-data.json";
-
-let restaurantViewLayoutDropdownExists: boolean;
+import { restaurantSelectLayoutType } from "../fixtures/restaurantSelectLayoutType";
 
 test.beforeEach(async ({ page }) => {
-  restaurantViewLayoutDropdownExists = await restaurantSelectLayoutType(page, true);
-  if(restaurantViewLayoutDropdownExists){
-    await restaurantLogin(page, true);
-  }
+  await restaurantSelectLayoutType(page, false);
+  await restaurantLogin(page, false);
 });
 
-test.describe("Restaurant layout", () => {
+test.describe("Restaurant old layout", () => {
   test("user should be able to create new location, room, table, wall and bar, and then edit, and remove", async ({
-    page,
     location,
     room,
     table,
     wall,
     bar,
   }) => {
-    test.skip(!restaurantViewLayoutDropdownExists,"'Restaurant View Layout' dropdown not found. Feature flag 'modernRestaurantLayout' is not enabled.");
-
-    await expect(
-      page
-        .frameLocator("iframe")
-        .locator("span.restaurant-title__small-text")
-    ).toHaveCount(1, { timeout: 60000 });
-
-    await page.waitForTimeout(2000);
-
-    await page
-      .frameLocator("iframe")
-      .locator("button.restaurant-navigation-menu__button svg.fa-location-dot.restaurant-navigation-menu__button__icon")
-      .click();
-    
-    const newLocationCount = await page
-      .frameLocator("iframe")
-      .locator("div.restaurant-locations__item span.restaurant-locations__item__text")
-      .filter({ hasText: new RegExp(`^${data.location.new.name}$`) }).count();
-
-    const editedLocationCount = await page
-      .frameLocator("iframe")
-      .locator("div.restaurant-locations__item span.restaurant-locations__item__text")
-      .filter({ hasText: new RegExp(`^${data.location.edited.name}$`) }).count();
-
-    for (let i = 0; i < newLocationCount; i++) {
-      await location.remove(data.location.new.id, data.location.new.name);
-    }
-    for (let i = 0; i < editedLocationCount; i++) {
-      await location.remove(data.location.edited.id, data.location.edited.name);
-    }
-
     // user should be able to create new location and edit location name
     await location.add(data.location.new.id, data.location.new.name);
     await location.rename(data.location.edited.name, data.location.new.name);
@@ -116,6 +78,6 @@ test.describe("Restaurant layout", () => {
     await bar.duplicate(data.location.edited.name, data.element.bar.caption);
     await bar.remove(data.location.edited.name);
     // user should be able to delete location
-    await location.remove(data.location.edited.id, data.location.edited.name);
+    await location.remove(data.location.new.id, data.location.edited.name);
   });
 });

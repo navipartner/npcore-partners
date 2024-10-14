@@ -684,6 +684,13 @@
         RestaurantMenusEditorAdminButtonsLbl: Label 'Admin Buttons';
         RestaurantMenusEditorWaiterPadMenuLbl: Label 'Waiter Pad Menu';
         RestaurantMenusEditorTablesMenuLbl: Label 'Tables Menu';
+        RestaurantTitleTableViewLbl: Label 'Table View';
+        RestaurantTitleEditModeLbl: Label 'Edit Mode';
+        RestaurantNumberOfGuestsNumpadCaptionLbl: Label 'Enter the number of guests for waiter pad';
+        RestaurantEditModeNewElementAddRoomLbl: Label 'Add Room';
+        RestaurantEditModeNewElementAddTableLbl: Label 'Add Table';
+        RestaurantEditModeNewElementAddWallLbl: Label 'Add Wall';
+        RestaurantEditModeNewElementAddBarLbl: Label 'Add Bar';
         BinTransferNotCompletedConfirmationLbl: Label 'You have not reviewed and confirmed the counting. Are you sure you want to cancel bin transfer?';
         BinTransferCashCountFinalizedLbl: Label 'finalized';
         BinTransferCashCountTransferAmountTooMuchLbl: Label 'The amount you are attempting to transfer is higher than the counted amount. Please correct this before proceeding.';
@@ -999,7 +1006,7 @@
         Captions.Add('Captions_Editor_DrawerCaptionPopupText', CaptionsEditorDrawerCaptionPopupTextLbl);
         Captions.Add('Icons_Editor_SwipeIconPopupText', IconsEditorSwipeIconPopupTextLbl);
         Captions.Add('Icons_Editor_DrawerIconPopupText', IconsEditorDrawerIconPopupTextLbl);
-        Captions.Add('Icons_Editor_DrawerMenuButtonsCantChangecolors',IconsEditorDrawerMenuButtonsCantChangecolorsLbl);
+        Captions.Add('Icons_Editor_DrawerMenuButtonsCantChangecolors', IconsEditorDrawerMenuButtonsCantChangecolorsLbl);
         Captions.Add('Icons_Editor_MobileTooltipPopupText', IconsEditorMobileTooltipPopupTextLbl);
         Captions.Add('Icons_Editor_HavingImgIconPopupText', IconsEditorHavingImgIconPopupTextLbl);
         Captions.Add('Icons_Editor_PleaseProvideLink', IconsEditorPleaseProvideLinkLbl);
@@ -1171,6 +1178,13 @@
         Captions.Add('Restaurant_Menus_Editor_AdminButtons', RestaurantMenusEditorAdminButtonsLbl);
         Captions.Add('Restaurant_Menus_Editor_WaiterPadMenu', RestaurantMenusEditorWaiterPadMenuLbl);
         Captions.Add('Restaurant_Menus_Editor_TablesMenu', RestaurantMenusEditorTablesMenuLbl);
+        Captions.Add('Restaurant_Title_TableView', RestaurantTitleTableViewLbl);
+        Captions.Add('Restaurant_Title_EditMode', RestaurantTitleEditModeLbl);
+        Captions.Add('Restaurant_NumberOfGuests_NumpadCaption', RestaurantNumberOfGuestsNumpadCaptionLbl);
+        Captions.Add('Restaurant_EditMode_NewElement_AddRoom', RestaurantEditModeNewElementAddRoomLbl);
+        Captions.Add('Restaurant_EditMode_NewElement_AddTable', RestaurantEditModeNewElementAddTableLbl);
+        Captions.Add('Restaurant_EditMode_NewElement_AddWall', RestaurantEditModeNewElementAddWallLbl);
+        Captions.Add('Restaurant_EditMode_NewElement_AddBar', RestaurantEditModeNewElementAddBarLbl);
         Captions.Add('BinTransfer_NotCompletedConfirmation', BinTransferNotCompletedConfirmationLbl);
         Captions.Add('BinTransfer_CashCountFinalized', BinTransferCashCountFinalizedLbl);
         Captions.Add('BinTransfer_CashCountTransferAmountTooMuch', BinTransferCashCountTransferAmountTooMuchLbl);
