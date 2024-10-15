@@ -244,6 +244,7 @@
         }
         key(Key2; "External Member No.") { }
         key(Key3; "E-Mail Address") { }
+        key(Key4; "Phone No.") { }
     }
 
     fieldgroups

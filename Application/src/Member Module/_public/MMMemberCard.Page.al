@@ -58,19 +58,24 @@
                 }
                 field("E-Mail Address"; Rec."E-Mail Address")
                 {
-
                     ToolTip = 'Specifies the value of the E-Mail Address field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    trigger OnValidate()
+                    begin
+                        ValidateMemberEmail(Rec);
+                    end;
                 }
                 field("Phone No."; Rec."Phone No.")
                 {
-
                     ToolTip = 'Specifies the value of the Phone No. field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    trigger OnValidate()
+                    begin
+                        ValidateMemberPhoneNumber(Rec);
+                    end;
                 }
                 field("Social Security No."; Rec."Social Security No.")
                 {
-
                     ToolTip = 'Specifies the value of the Social Security No. field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
@@ -1023,5 +1028,20 @@
     begin
         NPRAttrManagement.OnPageLookUp(GetAttributeTableId(), AttributeNumber, Format(Rec."Entry No.", 0, '<integer>'), NPRAttrTextArray[AttributeNumber]);
     end;
+
+    local procedure ValidateMemberPhoneNumber(Member: Record "NPR MM Member")
+    var
+        MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+        MemberManagement.ValidateMemberPhoneNumber(Member);
+    end;
+
+    local procedure ValidateMemberEmail(Member: Record "NPR MM Member")
+    var
+        MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+        MemberManagement.ValidateMemberEmail(Member)
+    end;
+
 }
 
