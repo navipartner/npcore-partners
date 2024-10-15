@@ -143,26 +143,6 @@ codeunit 6151548 "NPR NO Audit Mgt."
         POSAuditLogMgt.CreateEntryExtended(SaleLinePOS.RecordId, POSAuditLog."Action Type"::PRICE_CHANGE, 0, '', SalePOS."Register No.", AuditLogDesc, AdditionalInfo);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnBeforeInsertPOSSalesLine', '', false, false)]
-    local procedure NPRPOSCreateEntry_OnBeforeInsertPOSSalesLine(POSEntry: Record "NPR POS Entry"; SaleLinePOS: Record "NPR POS Sale Line")
-    var
-        POSUnit: Record "NPR POS Unit";
-    begin
-        if POSEntry."Entry Type" <> POSEntry."Entry Type"::"Direct Sale" then
-            exit;
-
-        if SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::Item then
-            exit;
-
-        if not POSUnit.Get(POSEntry."POS Unit No.") then
-            exit;
-
-        if not IsNOAuditEnabled(POSUnit."POS Audit Profile") then
-            exit;
-
-        UpdatePriceChangedLine(SaleLinePOS, Format(POSEntry."Entry Type"));
-    end;
-
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR End Of Day Worker", 'OnAfterCleanupPOSSavedSalesBeforeBalancing', '', false, false)]
     local procedure CheckOnAfterCleanupPOSSavedSalesBeforeBalancing(SalePOS: Record "NPR POS Sale")
     var
