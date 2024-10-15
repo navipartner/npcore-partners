@@ -54,11 +54,19 @@
                 {
                     ToolTip = 'Specifies the value of the Phone No. field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    trigger OnValidate()
+                    begin
+                        ValidateMemberPhoneNumber(Rec);
+                    end;
                 }
                 field("E-Mail Address"; Rec."E-Mail Address")
                 {
                     ToolTip = 'Specifies the value of the E-Mail Address field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    trigger OnValidate()
+                    begin
+                        ValidateMemberEmail(Rec);
+                    end;
                 }
                 field("GDPR Approval"; MembershipRoleDisplay."GDPR Approval")
                 {
@@ -684,6 +692,20 @@
             Error(NO_QUESTIONNAIR);
 
         ProfileManagement.ShowContactQuestionnaireCard(Contact, '', 0);
+    end;
+
+    local procedure ValidateMemberPhoneNumber(Member: Record "NPR MM Member")
+    var
+        MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+        MemberManagement.ValidateMemberPhoneNumber(Member);
+    end;
+
+    local procedure ValidateMemberEmail(Member: Record "NPR MM Member")
+    var
+        MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+        MemberManagement.ValidateMemberEmail(Member)
     end;
 
 }

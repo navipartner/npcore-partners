@@ -958,6 +958,48 @@
         exit(CardEntryNo <> 0);
     end;
 
+    internal procedure ValidateMemberPhoneNumber(Member: Record "NPR MM Member")
+    var
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+        Community: Record "NPR MM Member Community";
+        CommunityCode: Code[20];
+    begin
+        if (not GetMemberCommunityCode(Member."Entry No.", CommunityCode)) then
+            exit;
+
+        Community.Get(CommunityCode);
+        if (not (Community."Member Unique Identity" in [Community."Member Unique Identity"::PHONENO, Community."Member Unique Identity"::EMAIL_AND_PHONE, Community."Member Unique Identity"::EMAIL_OR_PHONE])) then
+            exit;
+
+        MemberInfoCapture.Init();
+        MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::NEW;
+        MemberInfoCapture."Member Entry No" := Member."Entry No.";
+        MemberInfoCapture."Phone No." := Member."Phone No.";
+        MemberInfoCapture."E-Mail Address" := Member."E-Mail Address";
+        CheckMemberUniqueId(CommunityCode, MemberInfoCapture);
+    end;
+
+    internal procedure ValidateMemberEmail(Member: Record "NPR MM Member")
+    var
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+        Community: Record "NPR MM Member Community";
+        CommunityCode: Code[20];
+    begin
+        if (not GetMemberCommunityCode(Member."Entry No.", CommunityCode)) then
+            exit;
+
+        Community.Get(CommunityCode);
+        if (not (Community."Member Unique Identity" in [Community."Member Unique Identity"::EMAIL, Community."Member Unique Identity"::EMAIL_AND_PHONE, Community."Member Unique Identity"::EMAIL_OR_PHONE])) then
+            exit;
+
+        MemberInfoCapture.Init();
+        MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::NEW;
+        MemberInfoCapture."Member Entry No" := Member."Entry No.";
+        MemberInfoCapture."Phone No." := Member."Phone No.";
+        MemberInfoCapture."E-Mail Address" := Member."E-Mail Address";
+        CheckMemberUniqueId(CommunityCode, MemberInfoCapture);
+    end;
+
     internal procedure CheckMemberUniqueId(CommunityCode: Code[20]; var MemberInfoCapture: Record "NPR MM Member Info Capture") MemberEntryNo: Integer
     var
         Community: Record "NPR MM Member Community";
@@ -965,7 +1007,6 @@
         RequireField: Label '%1 is required.';
         RequireFieldOrField: Label 'Either %1 or %2 is required.';
         RequireFieldAndField: Label 'Both %1 and %2 are required.';
-        MemberFound: Boolean;
         MEMBER_REUSE: Label 'Member with unique ID [%1] with name: %2 is already in use.\Do you want to create duplicate member?';
     begin
 
@@ -981,6 +1022,8 @@
 
         Member.FilterGroup(240);
         Member.SetFilter(Blocked, '=%1', false);
+        if (MemberInfoCapture."Member Entry No" <> 0) then
+            Member.SetFilter("Entry No.", '<>%1', MemberInfoCapture."Member Entry No");
         Member.FilterGroup(0);
 
         case Community."Member Unique Identity" of
@@ -989,19 +1032,19 @@
             Community."Member Unique Identity"::EMAIL:
                 begin
                     if (MemberInfoCapture."E-Mail Address" = '') then
-                        Error(RequireField, MemberInfoCapture."E-Mail Address");
+                        Error(RequireField, MemberInfoCapture.FieldCaption("E-Mail Address"));
                     Member.SetFilter("E-Mail Address", '=%1', MemberInfoCapture."E-Mail Address");
                 end;
             Community."Member Unique Identity"::PHONENO:
                 begin
                     if (MemberInfoCapture."Phone No." = '') then
-                        Error(RequireField, MemberInfoCapture."Phone No.");
+                        Error(RequireField, MemberInfoCapture.FieldCaption("Phone No."));
                     Member.SetFilter("Phone No.", '=%1', MemberInfoCapture."Phone No.");
                 end;
             Community."Member Unique Identity"::SSN:
                 begin
                     if (MemberInfoCapture."Social Security No." = '') then
-                        Error(RequireField, MemberInfoCapture."Social Security No.");
+                        Error(RequireField, MemberInfoCapture.FieldCaption("Social Security No."));
                     Member.SetFilter("Social Security No.", '=%1', MemberInfoCapture."Social Security No.");
                 end;
             Community."Member Unique Identity"::EMAIL_AND_PHONE:
@@ -1033,10 +1076,7 @@
                 Error(CASE_MISSING, Community.FieldName("Member Unique Identity"), Community."Member Unique Identity");
         end;
 
-        MemberFound := Member.FindFirst();
-
-        if (MemberFound) then begin
-
+        if (Member.FindFirst()) then begin
             if ((MemberInfoCapture."Guardian External Member No." <> '') and
                 (MemberInfoCapture."Guardian External Member No." = Member."External Member No.")) then
                 exit(0);
@@ -2785,6 +2825,29 @@
         end;
 
         exit(not TmpMembershipEntry.IsEmpty());
+    end;
+
+    internal procedure GetMemberCommunityCode(MemberEntryNo: Integer; var CommunityCode: Code[20]): Boolean
+    var
+        MembershipRole: Record "NPR MM Membership Role";
+        Membership: Record "NPR MM Membership";
+        Community: Record "NPR MM Member Community";
+    begin
+        CommunityCode := '';
+
+        MembershipRole.SetFilter("Member Entry No.", '=%1', MemberEntryNo);
+        MembershipRole.SetFilter(Blocked, '=%1', false);
+        if (not MembershipRole.FindFirst()) then
+            exit(false);
+
+        if (not Membership.Get(MembershipRole."Membership Entry No.")) then
+            exit(false);
+
+        if (not Community.Get(Membership."Community Code")) then
+            exit(false);
+
+        CommunityCode := Community.Code;
+        exit(true);
     end;
 
     internal procedure GetMemberCount(MembershipEntryno: Integer; var AdminMemberCount: Integer; var MemberMemberCount: Integer; var AnonymousMemberCount: Integer)
