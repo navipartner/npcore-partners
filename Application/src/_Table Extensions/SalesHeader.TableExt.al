@@ -59,7 +59,7 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
             OptionCaption = 'Print,E-mail,OIO,Print and E-Mail';
             OptionMembers = Print,Email,OIO,PrintAndEmail;
         }
-        field(6014420; "NPR Delivery Location"; Code[10])
+        field(6014420; "NPR Delivery Location"; Code[50])
         {
             Caption = 'Delivery Location';
             DataClassification = CustomerContent;

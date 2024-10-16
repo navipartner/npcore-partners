@@ -314,7 +314,7 @@
             SalesHeader.Validate("Shipping Agent Code", ShipmentMapping."Shipping Agent Code");
             SalesHeader.Validate("Shipping Agent Service Code", ShipmentMapping."Shipping Agent Service Code");
             RecRef.GetTable(SalesHeader);
-            SetFieldText(RecRef, 6014420, NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'shipment_service', 10, false));
+            SetFieldText(RecRef, 6014420, NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'shipment_service', 50, false));
             RecRef.SetTable(SalesHeader);
         end;
 
