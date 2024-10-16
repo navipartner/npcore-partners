@@ -3,23 +3,9 @@ let main = async ({ workflow, hwc, popup, context, captions }) => {
     await workflow.respond("SetValuesToContext");
     
     if (context.showSpinner) {
-        _dialogRef = await popup.simplePayment({
-            showStatus: true,
-            title: captions.workflowTitle,
-            amount: " ",
-            onAbort: async () => {
-                if (await popup.confirm(captions.confirmAbort)) {
-                    _dialogRef.updateStatus(captions.statusAborting);
-                    await hwc.invoke(
-                        context.hwcRequest.HwcName,
-                        {
-                            CardAction: "RequestCancel"
-                        },
-                        _contextId,
-                    );
-                }
-            },
-            abortValue: { completed: "Aborted" },
+        _dialogRef = await popup.spinner({
+            caption: captions.workflowTitle,
+            abortEnabled: false
     });
 }
 
@@ -29,7 +15,7 @@ let main = async ({ workflow, hwc, popup, context, captions }) => {
                     try {
                         console.log("[Cash Drawer HWC] ", hwcResponse);
 
-                        if (_dialogRef) _dialogRef.updateStatus(captions.statusProcessing);
+                        if (_dialogRef) _dialogRef.updateCaption(captions.statusProcessing);
 
                         _bcResponse = await workflow.respond("Process", { hwcResponse: hwcResponse });
                         
@@ -49,8 +35,7 @@ let main = async ({ workflow, hwc, popup, context, captions }) => {
             }
         });
 
-        if (_dialogRef) _dialogRef.updateStatus(captions.statusExecuting);
-        if (_dialogRef) _dialogRef.enableAbort(true);
+        if (_dialogRef) _dialogRef.updateCaption(captions.statusExecuting);
 
         await hwc.invoke(
             context.hwcRequest.HwcName,
