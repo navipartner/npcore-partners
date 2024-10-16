@@ -294,7 +294,7 @@ table 6059884 "NPR Pacsoft Shipment Document"
             Caption = 'Send Link To Print';
             DataClassification = CustomerContent;
         }
-        field(700; "Delivery Location"; Code[10])
+        field(700; "Delivery Location"; Code[50])
         {
             Caption = 'Delivery Location';
             DataClassification = CustomerContent;

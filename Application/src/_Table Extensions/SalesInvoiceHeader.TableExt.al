@@ -31,7 +31,7 @@ tableextension 6014405 "NPR Sales Invoice Header" extends "Sales Invoice Header"
             OptionMembers = Print,Email,OIO,PrintAndEmail;
             DataClassification = CustomerContent;
         }
-        field(6014420; "NPR Delivery Location"; Code[10])
+        field(6014420; "NPR Delivery Location"; Code[50])
         {
             Caption = 'Delivery Location';
             Description = 'PS1.00';

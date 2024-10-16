@@ -289,7 +289,7 @@ xmlport 6151401 "NPR Magento Sales Order Import"
                         MaxOccurs = Once;
                         MinOccurs = Zero;
                     }
-                    fieldelement(delivery_location; TempSalesLine4."Location Code")
+                    fieldelement(delivery_location; TempSalesLine4."Unit of Measure")
                     {
                         MaxOccurs = Once;
                         MinOccurs = Zero;

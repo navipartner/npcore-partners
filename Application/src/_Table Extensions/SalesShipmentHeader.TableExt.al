@@ -28,7 +28,7 @@ tableextension 6014403 "NPR Sales Shipment Header" extends "Sales Shipment Heade
             OptionMembers = Print,Email,OIO,PrintAndEmail;
             DataClassification = CustomerContent;
         }
-        field(6014420; "NPR Delivery Location"; Code[10])
+        field(6014420; "NPR Delivery Location"; Code[50])
         {
             Caption = 'Delivery Location';
             Description = 'PS1.01';
