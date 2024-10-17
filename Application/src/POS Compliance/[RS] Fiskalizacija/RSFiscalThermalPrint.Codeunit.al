@@ -293,12 +293,12 @@ codeunit 6150981 "NPR RS Fiscal Thermal Print"
 
     local procedure PrintInvoiceNumberBarcode(var Printer: Codeunit "NPR RP Line Print Mgt."; RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info")
     begin
-        PrintThermalLine(Printer, StrSubstNo(ShortInvoiceNumberFormatLbl, RSPOSAuditLogAuxInfo."Signed By", RSPOSAuditLogAuxInfo."Transaction Type Counter"), 'CODE128', false, 'CENTER', true, false);
+        PrintThermalLine(Printer, StrSubstNo(ShortInvoiceNumberFormatLbl, RSPOSAuditLogAuxInfo."Signed By", RSPOSAuditLogAuxInfo."Total Counter"), 'CODE128', false, 'CENTER', true, false);
     end;
 
     local procedure PrintInvoiceNumberBarcode(var Printer: Codeunit "NPR RP Line Print Mgt."; RSPOSAuditLogAuxInfoCopy: Record "NPR RS POS Audit Log Aux. Copy")
     begin
-        PrintThermalLine(Printer, StrSubstNo(ShortInvoiceNumberFormatLbl, RSPOSAuditLogAuxInfoCopy."Signed By", RSPOSAuditLogAuxInfoCopy."Transaction Type Counter"), 'CODE128', false, 'CENTER', true, false);
+        PrintThermalLine(Printer, StrSubstNo(ShortInvoiceNumberFormatLbl, RSPOSAuditLogAuxInfoCopy."Signed By", RSPOSAuditLogAuxInfoCopy."Total Counter"), 'CODE128', false, 'CENTER', true, false);
     end;
 
     #endregion
