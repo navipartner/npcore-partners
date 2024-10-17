@@ -8,10 +8,17 @@ codeunit 6184815 "NPR Spfy Post Order" implements "NPR Nc Import List IProcess"
 
     procedure RunProcessImportEntry(ImportEntry: Record "NPR Nc Import Entry")
     var
+        SpfyDeleteOrder: Codeunit "NPR Spfy Delete Order";
         Order: JsonToken;
+        AnonymizedCustomerOrderErr: Label 'The order is for an anonymous customer. If the order has not yet been posted, the system has deleted it. Further processing has been skipped.';
     begin
+        ImportEntry.Find();
         ImportEntry.TestField("Store Code");
         OrderMgt.LoadOrder(ImportEntry, Order);
+        if OrderMgt.IsAnonymizedCustomerOrder(ImportEntry, Order, AnonymizedCustomerOrderErr) then begin
+            SpfyDeleteOrder.DeleteOrder(ImportEntry."Store Code", Order);
+            exit;
+        end;
         PostOrder(ImportEntry."Store Code", Order);
         ClearLastError();  //Do not save error text in Import List, if order processing completed successfully
     end;

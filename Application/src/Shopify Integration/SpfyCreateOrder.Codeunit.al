@@ -9,9 +9,13 @@ codeunit 6184808 "NPR Spfy Create Order" implements "NPR Nc Import List IProcess
     procedure RunProcessImportEntry(ImportEntry: Record "NPR Nc Import Entry")
     var
         Order: JsonToken;
+        AnonymizedCustomerOrderErr: Label 'The order is for an anonymous customer and has therefore been skipped.';
     begin
+        ImportEntry.Find();
         ImportEntry.TestField("Store Code");
         OrderMgt.LoadOrder(ImportEntry, Order);
+        if OrderMgt.IsAnonymizedCustomerOrder(ImportEntry, Order, AnonymizedCustomerOrderErr) then
+            exit;
         ImportOrder(ImportEntry."Store Code", Order);
         ClearLastError();  //Do not save error text in Import List, if order processing completed successfully
     end;

@@ -15,8 +15,7 @@ codeunit 6184809 "NPR Spfy Delete Order" implements "NPR Nc Import List IProcess
         DeleteOrder(ImportEntry."Store Code", Order);
     end;
 
-
-    local procedure DeleteOrder(ShopifyStoreCode: Code[20]; Order: JsonToken)
+    internal procedure DeleteOrder(ShopifyStoreCode: Code[20]; Order: JsonToken)
     var
         SalesHeader: Record "Sales Header";
         ReleaseSalesDoc: Codeunit "Release Sales Document";

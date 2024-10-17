@@ -276,13 +276,29 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         InStr: InStream;
         InvalidDocSourceErr: Label 'Invalid Document Source';
     begin
-        if not ImportEntry."Document Source".HasValue then
-            error(InvalidDocSourceErr);
+        if not ImportEntry."Document Source".HasValue() then
+            Error(InvalidDocSourceErr);
         ImportEntry.CalcFields("Document Source");
 
         ImportEntry."Document Source".CreateInStream(InStr, TextEncoding::UTF8);
         if not Order.ReadFrom(InStr) then
-            error(InvalidDocSourceErr);
+            Error(InvalidDocSourceErr);
+    end;
+
+    procedure IsAnonymizedCustomerOrder(var ImportEntry: Record "NPR Nc Import Entry"; Order: JsonToken; AnonymizedCustomerMsg: Text): Boolean
+    var
+        OutStr: OutStream;
+    begin
+        if JsonHelper.GetJText(Order, 'customer.first_name', false) <> 'Anonymous' then
+            exit(false);
+        if JsonHelper.GetJText(Order, 'customer.last_name', false) <> 'Customer' then
+            exit(false);
+
+        ImportEntry."Error Message" := CopyStr(AnonymizedCustomerMsg, 1, MaxStrLen(ImportEntry."Error Message"));
+        ImportEntry."Last Error Message".CreateOutStream(OutStr, TextEncoding::UTF8);
+        OutStr.WriteText(AnonymizedCustomerMsg);
+        ImportEntry.Modify(true);
+        exit(true);
     end;
 
     procedure OrderExists(ShopifyStoreCode: Code[20]; Order: JsonToken): Boolean
