@@ -133,7 +133,14 @@ codeunit 6184689 "NPR TM ImportTicketControl"
         TicketOrder, Ticket, TicketHolder : JsonObject;
         TicketOrderToken, TicketToken : JsonToken;
         TicketOrders, Tickets : JsonArray;
+        TMTicketSetup: Record "NPR TM Ticket Setup";
+        TMTicketManagement: Codeunit "NPR TM Ticket Management";
+        TMTicket: Record "NPR TM Ticket";
+        GenerateNumberCount: Integer;
+        ErrUnableToGenerateUniqueNumber: Label 'Unable to generate an unique number after 10 attempts.';
+        ErrEmptyExtTicketPattern: Label 'cannot be empty when PreAssignedTicketNumber is blank upon Ticket Import.';
     begin
+        TMTicketSetup.Get();
         Clear(TempTicketImport);
         Clear(TempTicketImportLine);
         TicketJson.Get('ticketBatch', JToken);
@@ -161,7 +168,24 @@ codeunit 6184689 "NPR TM ImportTicketControl"
                 TempTicketImportLine.Init();
                 TempTicketImportLine.OrderId := TempTicketImport.OrderId;
                 TempTicketImportLine.JobId := JobId;
-                TempTicketImportLine.PreAssignedTicketNumber := Format(GetAsText(Ticket, 'preAssignedTicketNumber', MaxStrLen(TempTicketImportLine.PreAssignedTicketNumber), true));
+                TempTicketImportLine.PreAssignedTicketNumber := Format(GetAsText(Ticket, 'preAssignedTicketNumber', MaxStrLen(TempTicketImportLine.PreAssignedTicketNumber), false));
+
+                if TempTicketImportLine.PreAssignedTicketNumber = '' then begin
+                    if TMTicketSetup."Imp. Def. Ext. Ticket Pattern" = '' then
+                        TMTicketSetup.FieldError("Imp. Def. Ext. Ticket Pattern", ErrEmptyExtTicketPattern);
+
+                    TempTicketImportLine.PreAssignedTicketNumber := TMTicketManagement.GenerateNumberPattern(TMTicketSetup."Imp. Def. Ext. Ticket Pattern", '');
+                    if (not TMTicket.CheckIsUnique(TempTicketImportLine.PreAssignedTicketNumber)) then begin
+                        repeat
+                            TempTicketImportLine.PreAssignedTicketNumber := TMTicketManagement.GenerateNumberPattern(TMTicketSetup."Imp. Def. Ext. Ticket Pattern", '');
+                            GenerateNumberCount += 1;
+                        until ((TMTicket.CheckIsUnique(TempTicketImportLine.PreAssignedTicketNumber)) or (GenerateNumberCount >= 10));
+
+                        if GenerateNumberCount > 10 then
+                            Error(ErrUnableToGenerateUniqueNumber);
+                    end;
+                end;
+
                 TempTicketImportLine.ItemReferenceNumber := Format(GetAsText(Ticket, 'itemReferenceNumber', MaxStrLen(TempTicketImportLine.ItemReferenceNumber), true));
                 TempTicketImportLine.Description := Format(GetAsText(Ticket, 'description', MaxStrLen(TempTicketImportLine.Description), false));
                 TempTicketImportLine.ExpectedVisitDate := GetAsDate(Ticket, 'expectedVisitDate', true);

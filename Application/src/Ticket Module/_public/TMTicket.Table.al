@@ -247,7 +247,7 @@
         _TicketType.Get(Rec."Ticket Type Code");
     end;
 
-    local procedure CheckIsUnique(ExternalTicketNumber: Code[30]): Boolean
+    internal procedure CheckIsUnique(ExternalTicketNumber: Code[30]): Boolean
     var
         Ticket: Record "NPR TM Ticket";
     begin

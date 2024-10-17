@@ -11,6 +11,19 @@
             Caption = 'Code';
             DataClassification = CustomerContent;
         }
+        field(31; "Imp. Def. Ext. Ticket Pattern"; Code[30])
+        {
+            Caption = 'Import Default External Ticket Pattern';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                ErrInvalidPattern: Label '%1 cannot contain following pattern: %2', Comment = '%1 = Current Field Caption, %2 = Pattern.';
+            begin
+                if (StrPos(Rec."Imp. Def. Ext. Ticket Pattern", '[S]') > 0) then
+                    Error(ErrInvalidPattern, Rec.FieldCaption("Imp. Def. Ext. Ticket Pattern"), '[S]');
+            end;
+        }
         field(70; "Store Code"; Code[32])
         {
             Caption = 'Store Code';
