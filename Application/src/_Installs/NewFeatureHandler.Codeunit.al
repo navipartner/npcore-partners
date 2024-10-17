@@ -40,6 +40,25 @@ codeunit 6150632 "NPR New Feature Handler"
         LogMessageStopwatch.LogFinish();
     end;
 
+    internal procedure HandlePOSStatisticsDashboardFeature()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagsDef: Codeunit "NPR Upgrade Tag Definitions";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR New Feature Handler', 'POSStatisticsDashboardFeatureHandle');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'POSStatisticsDashboardFeatureHandle')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        POSStatisticsDashboardFeatureHandle();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'POSStatisticsDashboardFeatureHandle'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
     local procedure POSEditorFeatureHandle()
     var
         Feature: Record "NPR Feature";
@@ -59,6 +78,19 @@ codeunit 6150632 "NPR New Feature Handler"
         ScenarioObsoletedFeature: Codeunit "NPR Scenario Obsoleted Feature";
     begin
         if not Feature.Get(ScenarioObsoletedFeature.GetFeatureId()) then
+            exit;
+        if Feature.Enabled then
+            exit;
+        Feature.Enabled := true;
+        Feature.Modify();
+    end;
+
+    local procedure POSStatisticsDashboardFeatureHandle()
+    var
+        Feature: Record "NPR Feature";
+        POSStatisticsDashboardFeature: Codeunit "NPR POS Stat Dashboard Feature";
+    begin
+        if not Feature.Get(POSStatisticsDashboardFeature.GetFeatureId()) then
             exit;
         if Feature.Enabled then
             exit;
