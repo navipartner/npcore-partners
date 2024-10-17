@@ -12,11 +12,12 @@
     procedure CheckVouchers(var vouchers: XMLport "NPR NpRv Ext. Vouchers")
     var
         TempNpRvExtVoucherBuffer: Record "NPR NpRv Ext. Voucher Buffer" temporary;
+        TempNPRNpRvExtVoucherItemBuffer: Record "NPR NpRv ExtVoucherItem Buffer" temporary;
     begin
         SetGlobalLanguage(UserId);
 
         vouchers.Import();
-        vouchers.GetSourceTable(TempNpRvExtVoucherBuffer);
+        vouchers.GetSourceTable(TempNpRvExtVoucherBuffer, TempNPRNpRvExtVoucherItemBuffer);
         if TempNpRvExtVoucherBuffer.IsEmpty then
             exit;
 
@@ -434,6 +435,4 @@
         if UserPersonalization."Language ID" > 0 then
             GlobalLanguage(UserPersonalization."Language ID");
     end;
-
 }
-

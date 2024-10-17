@@ -1,44 +1,69 @@
-let main = async ({ workflow, parameters, popup, captions }) => {
-    debugger;
-    let amountInput;
-    await workflow.respond('validateRequest');
+const main = async ({ context, workflow, parameters, popup, captions }) => {
+  let amountInput;
+  await workflow.respond("validateRequest");
 
-    if (parameters.VoucherTypeCode) {
-        workflow.context.voucherType = parameters.VoucherTypeCode
-    } else {
-        workflow.context.voucherType = await workflow.respond("setVoucherType");
-    }
-    if (workflow.context.voucherType == null || workflow.context.voucherType == "") return;
+  const response = {
+    returnVoucherAmt: 0,
+  };
 
-    if (!workflow.context.IsUnattendedPOS) {
-        amountInput = await popup.numpad({ title: captions.IssueReturnVoucherTitle, caption: captions.Amount, value: workflow.context.voucher_amount, notBlank: true });
-        if (amountInput === 0 || amountInput === null) return;
-    } else { amountInput = workflow.context.voucher_amount };
+  if (parameters.VoucherTypeCode) {
+    context.voucherType = parameters.VoucherTypeCode;
+  } else {
+    context.voucherType = await workflow.respond("setVoucherType");
+  }
+  if (context.voucherType == null || context.voucherType == "") return response;
 
-    let ReturnVoucherAmount = await workflow.respond('validateAmount', { amountInput: amountInput });
-    if (ReturnVoucherAmount == 0) return;
+  if (!context.IsUnattendedPOS && !context.issueReturnVoucherSilent) {
+    amountInput = await popup.numpad({
+      title: captions.IssueReturnVoucherTitle,
+      caption: captions.Amount,
+      value: context.voucher_amount,
+    });
+    if (amountInput === 0 || amountInput === null) return response;
+  } else {
+    amountInput = context.voucher_amount;
+  }
 
-    let send = await workflow.respond("select_send_method");
-    if (send.SendMethodEmail) {
-        send.SendToEmail = await popup.input({ title: captions.SendViaEmail, caption: captions.Email, value: send.SendToEmail, notBlank: true });
-    }
-    if (send.SendMethodSMS) {
-        send.SendToPhoneNo = await popup.input({ title: captions.SendViaSMS, caption: captions.Phone, value: send.SendToPhoneNo, notBlank: true });
-    }
+  const ReturnVoucherAmount = await workflow.respond("validateAmount", {
+    amountInput: amountInput,
+  });
+  if (ReturnVoucherAmount == 0) return response;
 
-    workflow.context = Object.assign(workflow.context, send);
+  const send = await workflow.respond("select_send_method");
+  if (send.SendMethodEmail) {
+    send.SendToEmail = await popup.input({
+      title: captions.SendViaEmail,
+      caption: captions.Email,
+    });
+  }
+  if (send.SendMethodSMS) {
+    send.SendToPhoneNo = await popup.input({
+      title: captions.SendViaSMS,
+      caption: captions.Phone,
+    });
+  }
 
-    const { paymentNo } = await workflow.respond("issueReturnVoucher", { ReturnVoucherAmount: ReturnVoucherAmount });
+  context = Object.assign(context, send);
 
-    if (parameters.ContactInfo) {
-        await workflow.respond("contactInfo");
-    }
-    if (parameters.ScanReferenceNos) {
-        await workflow.respond("scanReference");
-    }
-    if (parameters.EndSale) {
-        await workflow.run('END_SALE', { parameters: { calledFromWorkflow: 'ISSUE_RETURN_VCHR_2', paymentNo: paymentNo } });
-    }
-    return;
-}
+  const { paymentNo } = await workflow.respond("issueReturnVoucher", {
+    ReturnVoucherAmount: ReturnVoucherAmount,
+  });
 
+  response.returnVoucherAmt = ReturnVoucherAmount;
+
+  if (parameters.ContactInfo) {
+    await workflow.respond("contactInfo");
+  }
+  if (parameters.ScanReferenceNos) {
+    await workflow.respond("scanReference");
+  }
+  if (parameters.EndSale) {
+    await workflow.run("END_SALE", {
+      parameters: {
+        calledFromWorkflow: "ISSUE_RETURN_VCHR_2",
+        paymentNo: paymentNo,
+      },
+    });
+  }
+  return response;
+};

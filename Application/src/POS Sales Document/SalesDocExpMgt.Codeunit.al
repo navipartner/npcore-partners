@@ -603,9 +603,10 @@
         if SaleLinePOS.FindSet() then
             repeat
                 TestSaleLinePOS(SaleLinePOS);
-                if SaleLinePOS."Amount Including VAT" > 0 then
+                if SaleLinePOS."Amount Including VAT" <> 0 then
                     POSActionEFTDocPayRsrvB.ProcessPOSPayment(SaleLinePOS, SalesHeader);
             until SaleLinePOS.Next() = 0;
+        SaleLinePOS.SetRange("Line Type");
 #IF NOT (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
         UnbindSubscription(ManulBoundEventSubMgt);
 #ENDIF

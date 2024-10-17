@@ -208,6 +208,12 @@
             DataClassification = EndUserIdentifiableInformation;
             Editable = false;
         }
+        field(2020; "Voucher Has Item Limitations"; Boolean)
+        {
+            Caption = 'Voucher Has Item Limitations';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
     }
 
     keys

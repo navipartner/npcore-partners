@@ -145,11 +145,41 @@ xmlport 6151011 "NPR NpRv Ext. Vouchers"
                 {
                     MinOccurs = Zero;
                 }
+                textelement(voucheritems)
+                {
+                    MinOccurs = Zero;
+                    MaxOccurs = Once;
+                    tableelement(voucheritem; "NPR NpRv ExtVoucherItem Buffer")
+                    {
+                        UseTemporary = true;
+                        MinOccurs = Zero;
+                        LinkTable = nprvextvoucherbuffer;
+                        LinkFields = "Voucher Reference No." = field("Reference No.");
+                        fieldattribute(voucheritem_no; voucheritem."No.")
+                        {
+                        }
+                        trigger OnBeforeInsertRecord()
+                        begin
+                            EntryNo += 1;
+                            voucheritem."Entry No." := EntryNo;
+                            voucheritem."Voucher Reference No." := NpRvExtVoucherBuffer."Reference No.";
+                            if (not CheckItemCanBeUsedWithVoucher(voucheritem."No.", NpRvExtVoucherBuffer."Reference No.")) or (not NpRvExtVoucherBuffer."Voucher Has Item Limitations") then
+                                currXMLport.Skip();
+                        end;
+                    }
+                    trigger OnBeforePassVariable()
+                    begin
+                        if not NpRvExtVoucherBuffer."Voucher Has Item Limitations" then
+                            currXMLport.Skip();
+                    end;
+                }
 
                 trigger OnBeforeInsertRecord()
                 begin
                     LineNo += 1000;
                     NpRvExtVoucherBuffer."Line No." := LineNo;
+                    if CheckIfPaymentMethodItemsExistVoucher(NpRvExtVoucherBuffer."Reference No.") then
+                        NpRvExtVoucherBuffer."Voucher Has Item Limitations" := true;
                 end;
             }
         }
@@ -157,6 +187,13 @@ xmlport 6151011 "NPR NpRv Ext. Vouchers"
 
     var
         LineNo: Integer;
+        EntryNo: Integer;
+
+    internal procedure GetSourceTable(var NpRvExtVoucherBuffer2: Record "NPR NpRv Ext. Voucher Buffer" temporary; var TempNPRNpRvExtVoucherItemBuffer: Record "NPR NpRv ExtVoucherItem Buffer" temporary)
+    begin
+        GetSourceTable(NpRvExtVoucherBuffer2);
+        TempNPRNpRvExtVoucherItemBuffer.Copy(voucheritem, true);
+    end;
 
     internal procedure GetSourceTable(var NpRvExtVoucherBuffer2: Record "NPR NpRv Ext. Voucher Buffer" temporary)
     begin
@@ -167,5 +204,32 @@ xmlport 6151011 "NPR NpRv Ext. Vouchers"
     begin
         NpRvExtVoucherBuffer.Copy(NpRvExtVoucherBuffer2, true);
     end;
-}
 
+    local procedure CheckItemCanBeUsedWithVoucher(ItemNo: Code[20]; ReferenceNo: Text[50]): Boolean
+    var
+        Item: Record Item;
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        POSPaymentMethodCode: Code[10];
+    begin
+        if not Item.Get(ItemNo) then
+            exit(false);
+        POSPaymentMethodCode := NpRvVoucherMgt.GetVoucherPaymentMethod(ReferenceNo);
+        if POSPaymentMethodCode = '' then
+            exit(false);
+        if NpRvVoucherMgt.CheckVoucherCanBeUsedWithItem(POSPaymentMethodCode, Item."No.", Item."Item Category Code") then
+            exit(true);
+    end;
+
+    local procedure CheckIfPaymentMethodItemsExistVoucher(ReferenceNo: Text[50]) HasItemFilter: Boolean
+    var
+        POSPmtMethodItemMgt: Codeunit "NPR POS Pmt. Method Item Mgt.";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        PaymentMethodCode: Code[10];
+    begin
+        PaymentMethodCode := NpRvVoucherMgt.GetVoucherPaymentMethod(ReferenceNo);
+        if PaymentMethodCode = '' then
+            exit;
+
+        HasItemFilter := POSPmtMethodItemMgt.HasPOSPaymentMethodItemFilter(PaymentMethodCode);
+    end;
+}

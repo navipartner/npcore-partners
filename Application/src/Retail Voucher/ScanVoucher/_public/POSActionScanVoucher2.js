@@ -5,6 +5,7 @@ const main = async ({ workflow, parameters, popup, context, captions }) => {
     legacy: false,
     success: false,
     remainingAmount: 0,
+    remainingSalesBalanceAmount: 0,
   };
 
   if (parameters.VoucherTypeCode) {
@@ -27,11 +28,13 @@ const main = async ({ workflow, parameters, popup, context, captions }) => {
 
   const {
     selectedVoucherReferenceNo,
+    selectedVoucherNo,
     askForAmount,
     suggestedAmount,
     paymentDescription,
     amountPrompt,
     voucherType,
+    voucherHasItemLimitation,
   } = await workflow.respond("calculateVoucherInformation", {
     VoucherRefNo: voucher_input,
   });
@@ -42,6 +45,12 @@ const main = async ({ workflow, parameters, popup, context, captions }) => {
   if (!voucher_input) return response;
 
   let selectedAmount = suggestedAmount;
+
+  if (selectedAmount === 0 && voucherHasItemLimitation) {
+    await popup.error(captions.voucherCannotBeUsedError);
+    return response;
+  }
+
   if (askForAmount) {
     let validateSuggestedAmount = true;
     while (validateSuggestedAmount) {
@@ -66,7 +75,7 @@ const main = async ({ workflow, parameters, popup, context, captions }) => {
       }
     }
   }
-
+  let returnVoucherResponse, workflowResponse;
   const result = await workflow.respond("prepareRequest", {
     VoucherRefNo: voucher_input,
     selectedAmount: selectedAmount,
@@ -87,13 +96,24 @@ const main = async ({ workflow, parameters, popup, context, captions }) => {
       });
     } else {
       if (result.workflowName) {
-        await workflow.run(result.workflowName, {
+        workflowResponse = await workflow.run(result.workflowName, {
           parameters: result.parameters,
+          context: {
+            issueReturnVoucherSilent: voucherHasItemLimitation,
+            voucherSalesLineParentId: result.voucherSalesLineParentId,
+          },
         });
+        if (result.workflowName === "ISSUE_RETURN_VCHR_2")
+          returnVoucherResponse = workflowResponse;
       }
     }
   }
   response.success = true;
   response.remainingAmount = result.remainingAmount;
+  response.remainingSalesBalanceAmount = result.remainingSalesBalanceAmount;
+  if (returnVoucherResponse && returnVoucherResponse.returnVoucherAmt !== 0) {
+    response.remainingSalesBalanceAmount +=
+      returnVoucherResponse.returnVoucherAmt;
+  }
   return response;
 };
