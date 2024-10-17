@@ -73,4 +73,9 @@ enum 6014577 "NPR Feature" implements "NPR Feature Management"
         Caption = 'New POS Editor', Locked = true, MaxLength = 50;
         Implementation = "NPR Feature Management" = "NPR New POS Editor Feature";
     }
+    value(120; "POS Statistics Dashboard")
+    {
+        Caption = 'POS Statistics Dashboard', Locked = true, MaxLength = 50;
+        Implementation = "NPR Feature Management" = "NPR POS Stat Dashboard Feature";
+    }
 }

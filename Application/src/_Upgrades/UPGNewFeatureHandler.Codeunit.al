@@ -7,9 +7,11 @@ codeunit 6150638 "NPR UPG New Feature Handler"
     var
         POSEditorFeatureHandleUpgradeStepLbl: Label 'POSEditorFeatureHandle', Locked = true;
         ScenarioObsoletedFeatureUpgradeStepLbl: Label 'ScenarioObsoletedFeatureHandle', Locked = true;
+        POSStatisticsDashboardFeatureHandleUpgradeStepLbl: Label 'POSStatisticsDashboardFeatureHandle', Locked = true;
     begin
         AddUpgradeTagIfNotExist(CurrCodeunitId(), POSEditorFeatureHandleUpgradeStepLbl);
         AddUpgradeTagIfNotExist(CurrCodeunitId(), ScenarioObsoletedFeatureUpgradeStepLbl);
+        AddUpgradeTagIfNotExist(CurrCodeunitId(), POSStatisticsDashboardFeatureHandleUpgradeStepLbl);
     end;
 
     local procedure AddUpgradeTagIfNotExist(UpgradeCodeunitId: Integer; UpgradeStep: Text)
