@@ -277,11 +277,11 @@
         NaviConnectTask."Last Processing Completed at" := CurrentDateTime;
         NaviConnectTask."Last Processing Duration" := (NaviConnectTask."Last Processing Completed at" - NaviConnectTask."Last Processing Started at") / 1000;
 
-        ErrorText := GetLastErrorText;
+        ErrorText := GetLastErrorText();
 
         if ErrorText <> '' then begin
-            NaviConnectTask.Response.CreateOutStream(OutStream);
-            OutStream.Write(ErrorText);
+            NaviConnectTask.Response.CreateOutStream(OutStream, TextEncoding::UTF8);
+            OutStream.WriteText(ErrorText);
             OnBeforeClearLastErrorInTaskError(SkipErrorClearing);
             if not SkipErrorClearing then
                 ClearLastError();

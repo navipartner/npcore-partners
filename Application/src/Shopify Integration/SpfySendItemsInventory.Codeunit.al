@@ -56,7 +56,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         Commit();
 
         if not Success then
-            Error(GetLastErrorText);
+            Error(GetLastErrorText());
 
         UpdateItemWithDataFromShopify(NcTask, ShopifyResponse, false);
     end;
@@ -416,7 +416,11 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         ShopifyVariantID := SpfyAssignedIDMgt.GetAssignedShopifyID(ItemVariant.RecordId(), "NPR Spfy ID Type"::"Entry ID");
         if ShopifyVariantID = '' then
             ShopifyVariantID := GetShopifyVariantID(SpfyStoreItemVariantLink, false);
-        if (ShopifyVariantID = '') and not ProcessNewVariants then
+#if (BC18 or BC19 or BC20 or BC21 or BC22)
+        if (ShopifyVariantID = '') and (not ProcessNewVariants or ItemVariant."NPR Blocked") then
+#else
+        if (ShopifyVariantID = '') and (not ProcessNewVariants or ItemVariant.Blocked) then
+#endif
             exit(false);
 
         SpfyItemMgt.CheckVarieties(Item, ItemVariant);
