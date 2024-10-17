@@ -7,6 +7,7 @@ codeunit 85090 "NPR Library SI Fiscal"
         SIAuxSalespersonPurchaser: Record "NPR SI Aux Salesperson/Purch.";
         SIFiscalizationSetup: Record "NPR SI Fiscalization Setup";
         SIPOSStoreMapping: Record "NPR SI POS Store Mapping";
+        LibrarySIFiscal: Codeunit "NPR Library SI Fiscal";
         OStream: OutStream;
     begin
         POSAuditProfile.Init();
@@ -60,7 +61,9 @@ codeunit 85090 "NPR Library SI Fiscal"
         NoSeriesLine.Modify();
         SIFiscalizationSetup.Insert();
 
+        BindSubscription(LibrarySIFiscal);
         RegisterPOSStore(SIPOSStoreMapping);
+        UnbindSubscription(LibrarySIFiscal);
     end;
 
     procedure CreateNumberSeries(): Text
