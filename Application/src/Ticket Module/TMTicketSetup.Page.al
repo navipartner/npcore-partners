@@ -20,6 +20,11 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Authorization Code Scheme field';
                 }
+                field("Import Default Ext. Ticket Pattern"; Rec."Imp. Def. Ext. Ticket Pattern")
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the Import Default External Ticket Pattern. The pattern can include fixed text, the original ticket number and random characters. Any characters not within the [ and ] will be treated as fixed text. [N] – Random number, [N*4] – 4 random numbers, [A] – Random character, [A*4] – 4 random characters An example could be: TK-[N*4] which would result in TK-<four random numbers>';
+                }
                 field("Retire Used Tickets After"; Rec."Retire Used Tickets After")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
