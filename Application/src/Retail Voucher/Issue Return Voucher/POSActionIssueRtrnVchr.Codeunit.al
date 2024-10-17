@@ -32,8 +32,8 @@ codeunit 6150623 "NPR POSAction: Issue Rtrn Vchr" implements "NPR IPOS Workflow"
     local procedure GetActionScript(): Text
     begin
         exit(
-//###NPR_INJECT_FROM_FILE:POSActionIssueRetVoucher.js###
-'let main=async({workflow:e,parameters:a,popup:i,captions:n})=>{debugger;let u;if(await e.respond("validateRequest"),a.VoucherTypeCode?e.context.voucherType=a.VoucherTypeCode:e.context.voucherType=await e.respond("setVoucherType"),e.context.voucherType==null||e.context.voucherType=="")return;if(e.context.IsUnattendedPOS)u=e.context.voucher_amount;else if(u=await i.numpad({title:n.IssueReturnVoucherTitle,caption:n.Amount,value:e.context.voucher_amount,notBlank:!0}),u===0||u===null)return;let c=await e.respond("validateAmount",{amountInput:u});if(c==0)return;let t=await e.respond("select_send_method");t.SendMethodEmail&&(t.SendToEmail=await i.input({title:n.SendViaEmail,caption:n.Email,value:t.SendToEmail,notBlank:!0})),t.SendMethodSMS&&(t.SendToPhoneNo=await i.input({title:n.SendViaSMS,caption:n.Phone,value:t.SendToPhoneNo,notBlank:!0})),e.context=Object.assign(e.context,t);const{paymentNo:d}=await e.respond("issueReturnVoucher",{ReturnVoucherAmount:c});a.ContactInfo&&await e.respond("contactInfo"),a.ScanReferenceNos&&await e.respond("scanReference"),a.EndSale&&await e.run("END_SALE",{parameters:{calledFromWorkflow:"ISSUE_RETURN_VCHR_2",paymentNo:d}})};'
+//###NPR_INJECT_FROM_FILE:POSActionIssueRtrnVchr.js###
+'const main=async({context:e,workflow:n,parameters:t,popup:o,captions:u})=>{let a;await n.respond("validateRequest");const i={returnVoucherAmt:0};if(t.VoucherTypeCode?e.voucherType=t.VoucherTypeCode:e.voucherType=await n.respond("setVoucherType"),e.voucherType==null||e.voucherType=="")return i;if(!e.IsUnattendedPOS&&!e.issueReturnVoucherSilent){if(a=await o.numpad({title:u.IssueReturnVoucherTitle,caption:u.Amount,value:e.voucher_amount}),a===0||a===null)return i}else a=e.voucher_amount;const d=await n.respond("validateAmount",{amountInput:a});if(d==0)return i;const r=await n.respond("select_send_method");r.SendMethodEmail&&(r.SendToEmail=await o.input({title:u.SendViaEmail,caption:u.Email})),r.SendMethodSMS&&(r.SendToPhoneNo=await o.input({title:u.SendViaSMS,caption:u.Phone})),e=Object.assign(e,r);const{paymentNo:s}=await n.respond("issueReturnVoucher",{ReturnVoucherAmount:d});return i.returnVoucherAmt=d,t.ContactInfo&&await n.respond("contactInfo"),t.ScanReferenceNos&&await n.respond("scanReference"),t.EndSale&&await n.run("END_SALE",{parameters:{calledFromWorkflow:"ISSUE_RETURN_VCHR_2",paymentNo:s}}),i};'
         );
     end;
 
@@ -41,7 +41,7 @@ codeunit 6150623 "NPR POSAction: Issue Rtrn Vchr" implements "NPR IPOS Workflow"
     begin
         case Step of
             'validateRequest':
-                ValidateRequest(Context, PaymentLine, Setup);
+                ValidateRequest(Context, PaymentLine, Setup, Sale);
             'setVoucherType':
                 FrontEnd.WorkflowResponse(VoucherTypeInput());
             'validateAmount':
@@ -86,6 +86,8 @@ codeunit 6150623 "NPR POSAction: Issue Rtrn Vchr" implements "NPR IPOS Workflow"
         Amount: Decimal;
         Email: Text[80];
         PhoneNo: Text[30];
+        VoucherSalesLineParentIdText: Text;
+        VoucherSalesLineParentId: Guid;
         SendMethodPrint: Boolean;
         SendMethodEmail: Boolean;
         SendMethodSMS: Boolean;
@@ -105,29 +107,40 @@ codeunit 6150623 "NPR POSAction: Issue Rtrn Vchr" implements "NPR IPOS Workflow"
         if SendMethodSMS then
             PhoneNo := CopyStr(Context.GetString('SendToPhoneNo'), 1, MaxStrLen(NpRvSalesLine."Phone No."));
 
-        NpRvVoucherMgt.IssueReturnVoucher(POSSession, VoucherTypeCode, Amount, Email, PhoneNo, SendMethodPrint, SendMethodEmail, SendMethodSMS);
+#pragma warning disable AA0139
+
+        if not Context.GetString('voucherSalesLineParentId', VoucherSalesLineParentIdText) then
+            Clear(VoucherSalesLineParentIdText);
+
+        if not Evaluate(VoucherSalesLineParentId, VoucherSalesLineParentIdText) then
+            Clear(VoucherSalesLineParentId);
+
+        NpRvVoucherMgt.IssueReturnVoucher(POSSession, VoucherTypeCode, Amount, Email, PhoneNo, SendMethodPrint, SendMethodEmail, SendMethodSMS, VoucherSalesLineParentId);
+#pragma warning restore AA0139
 
         Response.Add('paymentNo', VoucherType."Payment Type");
         exit(Response);
     end;
 
-    local procedure ValidateRequest(Context: Codeunit "NPR POS JSON Helper"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
+    local procedure ValidateRequest(Context: Codeunit "NPR POS JSON Helper"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup"; Sale: Codeunit "NPR POS Sale")
     var
         POSUnit: Record "NPR POS Unit";
+        POSSale: Record "NPR POS Sale";
         VoucherType: Text;
         VoucherTypeCode: Code[20];
         ReturnAmountToCapture: Decimal;
         POSActIssueReturnVchrB: Codeunit "NPR POS Act.Issue Return VchrB";
     begin
         Context.SetScopeParameters();
+        Setup.GetPOSUnit(POSUnit);
         if Context.GetString('VoucherTypeCode', VoucherType) then begin
             Evaluate(VoucherTypeCode, VoucherType);
 
-            POSActIssueReturnVchrB.ValidateAmount(VoucherTypeCode, ReturnAmountToCapture, PaymentLine);
+            Sale.GetCurrentSale(POSSale);
+            POSActIssueReturnVchrB.ValidateAmount(VoucherTypeCode, ReturnAmountToCapture, PaymentLine, POSUnit."No.", POSSale."Sales Ticket No.");
 
             Context.SetContext('voucher_amount', -ReturnAmountToCapture);
         end;
-        Setup.GetPOSUnit(POSUnit);
         Context.SetContext('IsUnattendedPOS', POSUnit."POS Type" = POSUnit."POS Type"::UNATTENDED);
     end;
 

@@ -66,8 +66,8 @@ const main = async ({ workflow, parameters, captions }) => {
             },
           });
           if (scanVoucherResponse.success) {
-            scanVoucher = scanVoucherResponse.remainingAmount !== 0;
-            remainingAmount = scanVoucherResponse.remainingAmount;
+            scanVoucher = scanVoucherResponse.remainingSalesBalanceAmount !== 0;
+            remainingAmount = scanVoucherResponse.remainingSalesBalanceAmount;
           }
         }
       }

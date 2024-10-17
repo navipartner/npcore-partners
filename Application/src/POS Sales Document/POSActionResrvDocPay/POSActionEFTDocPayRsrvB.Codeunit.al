@@ -173,7 +173,7 @@
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
         SaleLinePOS.SetRange("Line Type", SaleLinePOS."Line Type"::"POS Payment");
-        SaleLinePOS.SetFilter("Amount Including VAT", '>%1', 0);
+        SaleLinePOS.SetFilter("Amount Including VAT", '<>%1', 0);
         if not SaleLinePOS.FindSet() then
             exit;
 
@@ -260,13 +260,13 @@
             exit;
 
         VoucherSaleLinePOS.Reset();
-        VoucherSaleLinePOS.SetCurrentKey("Retail ID");
+        VoucherSaleLinePOS.SetCurrentKey("Retail ID", "Document Source", Type);
         VoucherSaleLinePOS.SetRange("Retail ID", SaleLinePOS.SystemId);
-        VoucherSaleLinePOS.SetRange(Type, VoucherSaleLinePOS.Type::Payment);
+        VoucherSaleLinePOS.SetFilter(Type, '%1|%2', VoucherSaleLinePOS.Type::Payment, VoucherSaleLinePOS.Type::"New Voucher");
         if not VoucherSaleLinePOS.FindFirst() then
             exit;
 
-        NPRNpRvSalesDocMgt.RedeemVoucher(SalesHeader, VoucherSaleLinePOS, SaleLinePOS."Amount Including VAT");
+        NPRNpRvSalesDocMgt.CreateMagentoPaymentLines(SalesHeader, VoucherSaleLinePOS, SaleLinePOS."Amount Including VAT");
     end;
 
     internal procedure ProcessPOSPayment(SaleLinePOS: Record "NPR POS Sale Line"; SalesHeader: Record "Sales Header")

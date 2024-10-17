@@ -107,4 +107,42 @@ codeunit 6150631 "NPR POS Action Scan Voucher2B"
         RemainingAmount := PaymentLine.CalculateRemainingPaymentSuggestion(SalesAmount, PaidAmount, POSPaymentMethodOut, ReturnPOSPaymentMethod, true);
     end;
 
+    internal procedure CalculateRemainingSalesBalanceAmount(PaymentLine: Codeunit "NPR POS Payment Line") RemainingSalesBalanceAmount: Decimal
+    var
+        SalesAmount: Decimal;
+        PaidAmount: Decimal;
+        ReturnAmount: Decimal;
+        SubTotal: Decimal;
+    begin
+        PaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
+        RemainingSalesBalanceAmount := SubTotal;
+    end;
+
+    internal procedure VoucherHasItemFilterLimitation(NPRNpRvVoucher: Record "NPR NpRv Voucher") HasItemFilterLimitation: boolean
+    var
+        POSPmtMethodItemMgt: Codeunit "NPR POS Pmt. Method Item Mgt.";
+        VoucherType: Record "NPR NpRv Voucher Type";
+    begin
+        if not VoucherType.Get(NPRNpRvVoucher."Voucher Type") then
+            exit;
+
+        if VoucherType."Payment Type" = '' then
+            exit;
+
+        HasItemFilterLimitation := POSPmtMethodItemMgt.HasPOSPaymentMethodItemFilter(VoucherType."Payment Type");
+    end;
+
+    internal procedure GetVoucherSalesLineId(PaymentLinePOS: Record "NPR POS Sale Line") ParentId: Guid
+    var
+        VoucherSaleLine: Record "NPR NpRv Sales Line";
+    begin
+        VoucherSaleLine.Reset();
+        VoucherSaleLine.SetCurrentKey("Retail ID", "Document Source", Type);
+        VoucherSaleLine.SetRange("Retail ID", PaymentLinePOS.SystemId);
+        VoucherSaleLine.SetLoadFields("Retail ID", Id);
+        if not VoucherSaleLine.FindFirst() then
+            exit;
+
+        ParentId := VoucherSaleLine.Id;
+    end;
 }

@@ -76,9 +76,17 @@
         POSPaymentMethod: Record "NPR POS Payment Method";
         TempNpRvVoucher: Record "NPR NpRv Voucher" temporary;
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        PmtMethodItemMgt: Codeunit "NPR POS Pmt. Method Item Mgt.";
+        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
         ReturnAmount: Decimal;
+        SalesAmount: Decimal;
+        PaidAmount: Decimal;
+        TotalReturnAmount: Decimal;
+        TotalSalesAmount: Decimal;
+        TotalPaidAmount: Decimal;
         LineNo: Integer;
         ReturnLineExists: Boolean;
+        HasPOSPaymentMethodItemFilter: Boolean;
     begin
         NpRvSalesLine.Get(NpRvSalesLine.Id);
         NpRvSalesLine.TestField("Document Source", NpRvSalesLine."Document Source"::"Payment Line");
@@ -91,12 +99,25 @@
             MagentoPaymentLine.Modify(true);
         end;
 
+        SalesHeader.CalcFields("NPR Magento Payment Amount");
+        TotalSalesAmount := GetTotalAmtInclVat(SalesHeader);
+        TotalPaidAmount := SalesHeader."NPR Magento Payment Amount";
+        TotalReturnAmount := TotalPaidAmount - TotalSalesAmount;
+
+        HasPOSPaymentMethodItemFilter := PmtMethodItemMgt.HasPOSPaymentMethodItemFilter(NpRvVoucherType."Payment Type");
+        if HasPOSPaymentMethodItemFilter then begin
+            SalesAmount := NpRvSalesDocMgt.CalcSalesOrderPaymentMethodItemSalesAmount(SalesHeader, NpRvVoucherType."Payment Type");
+            PaidAmount := NpRvSalesDocMgt.CalcSalesOrderPaymentMethodItemPaymentAmount(SalesHeader, NpRvVoucherType.Code, NpRvVoucherType."Payment Type");
+            ReturnAmount := PaidAmount - SalesAmount;
+            if ReturnAmount < TotalReturnAmount then
+                ReturnAmount := TotalReturnAmount;
+        end else
+            ReturnAmount := TotalReturnAmount;
+
         NpRvReturnVoucherType.Get(NpRvVoucherType.Code);
         NpRvReturnVoucherType.TestField("Return Voucher Type");
         NpRvVoucherTypeNew.Get(NpRvReturnVoucherType."Return Voucher Type");
 
-        SalesHeader.CalcFields("NPR Magento Payment Amount");
-        ReturnAmount := SalesHeader."NPR Magento Payment Amount" - GetTotalAmtInclVat(SalesHeader);
         NpRvSalesLineNew.SetRange("Parent Id", NpRvSalesLine.Id);
         NpRvSalesLineNew.SetRange("Document Source", NpRvSalesLine."Document Source"::"Payment Line");
         NpRvSalesLineNew.SetRange(Type, NpRvSalesLine.Type::"New Voucher");
@@ -310,6 +331,7 @@
     procedure ApplyPayment(POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line"; EndSale: Boolean; var ActionContext: JsonObject)
     var
         ReturnVoucherType: Record "NPR NpRv Ret. Vouch. Type";
+        CurrentPOSPaymentMethod: Record "NPR POS Payment Method";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         POSActIssueReturnVchr: Codeunit "NPR POSAction: Issue Rtrn Vchr";
         PaidAmount: Decimal;
@@ -321,7 +343,9 @@
         ActionVersion: Integer;
     begin
         POSSession.GetPaymentLine(POSPaymentLine);
-        POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, Subtotal);
+        CurrentPOSPaymentMethod.Get(VoucherType."Payment Type");
+        POSPaymentLine.CalculateBalance(CurrentPOSPaymentMethod, SaleAmount, PaidAmount, ReturnAmount, SubTotal);
+
         if Subtotal >= 0 then begin
             if EndSale then
                 ActionContext.Add('stopEndSaleExecution', not DoEndSale(POSSession, VoucherType));

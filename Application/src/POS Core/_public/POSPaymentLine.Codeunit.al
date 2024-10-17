@@ -97,14 +97,12 @@
 
     procedure CalculateBalance(POSPaymentMethod: Record "NPR POS Payment Method"; var SaleAmount: Decimal; var PaidAmount: Decimal; var ReturnAmount: Decimal; var Subtotal: Decimal)
     var
-        POSPaymentMethodItem: Record "NPR POS Payment Method Item";
+        POSPmtMethodItemMgt: Codeunit "NPR POS Pmt. Method Item Mgt.";
     begin
         if not Initialized then
             exit;
 
-        POSPaymentMethodItem.SetCurrentKey("POS Payment Method Code", Type, "No.");
-        POSPaymentMethodItem.SetRange("POS Payment Method Code", POSPaymentMethod.Code);
-        if POSPaymentMethodItem.IsEmpty() then
+        if not POSPmtMethodItemMgt.HasPOSPaymentMethodItemFilter(POSPaymentMethod.Code) then
             CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, Subtotal)
         else
             CalculateBalanceV2(POSPaymentMethod.Code, SaleAmount, PaidAmount, ReturnAmount, Subtotal);
@@ -178,7 +176,7 @@
             ReturnAmount := Round(ReturnAmount, Setup.AmountRoundingPrecision(), Setup.AmountRoundingDirection());
     end;
 
-    local procedure CalculateBalanceV2(POSPaymentMethodCode: Code[20]; var SaleAmount: Decimal; var PaidAmount: Decimal; var ReturnAmount: Decimal; var Subtotal: Decimal)
+    local procedure CalculateBalanceV2(POSPaymentMethodCode: Code[10]; var SaleAmount: Decimal; var PaidAmount: Decimal; var ReturnAmount: Decimal; var Subtotal: Decimal)
     var
         POSSaleLine: Record "NPR POS Sale Line";
         TempSalePOSSaleLine, TempOtherPaymentPOSSaleLine : Record "NPR POS Sale Line" temporary;
@@ -191,11 +189,11 @@
 
         InitCalculateBalance(SaleAmount, PaidAmount, ReturnAmount, Subtotal);
 
+        PaidAmount := CalculateAlreadyPaidAmountWithThisPOSPaymentMethodV2(POSPaymentMethodCode, RegisterNo, SalesTicketNo);
+        FindOtherPaymentPOSSaleLinesV2(SalesTicketNo, RegisterNo, TempOtherPaymentPOSSaleLine, POSPaymentMethodCode);
+
         POSSaleLine.SetRange("Register No.", RegisterNo);
         POSSaleLine.SetRange("Sales Ticket No.", SalesTicketNo);
-        PaidAmount := CalculateAlreadyPaidAmountWithThisPOSPaymentMethod(POSSaleLine, POSPaymentMethodCode);
-
-        FindOtherPaymentPOSSaleLines(POSSaleLine, TempOtherPaymentPOSSaleLine, POSPaymentMethodCode);
         FindSalePOSSalesLines(POSSaleLine, TempSalePOSSaleLine);
 
         DecreaseOnlySalesPOSSaleLinesThatCanOnlyBePaidWithOtherPOSPaymentMethods(TempSalePOSSaleLine, TempOtherPaymentPOSSaleLine, POSPaymentMethodCode);
@@ -226,12 +224,88 @@
         Subtotal := 0;
     end;
 
+    [Obsolete('Replaced by CalculateAlreadyPaidAmountWithThisPOSPaymentMethodV2.', '2024-10-13')]
     local procedure CalculateAlreadyPaidAmountWithThisPOSPaymentMethod(var POSSaleLine: Record "NPR POS Sale Line"; POSPaymentMethodCode: Code[20]): Decimal
     begin
         POSSaleLine.SetRange("Line Type", POSSaleLine."Line Type"::"POS Payment");
         POSSaleLine.SetRange("No.", POSPaymentMethodCode);
         POSSaleLine.CalcSums("Amount Including VAT");
         exit(POSSaleLine."Amount Including VAT");
+    end;
+
+    local procedure CalculateAlreadyPaidAmountWithThisPOSPaymentMethodV2(POSPaymentMethodCode: Code[10]; CurrRegisterNo: Code[20]; CurrSalesTicketNo: Code[20]) PaidAmount: Decimal
+    var
+        CurrSaleLinePOS: Record "NPR POS Sale Line";
+        CurrVoucherSalesLine: Record "NPR NpRv Sales Line";
+        RelatedVoucherSalesLine: Record "NPR NpRv Sales Line";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        TempRelatedPOSSaleLineProcessed: Record "NPR POS Sale Line" temporary;
+        NPRPOSPmtMethodItemMgt: Codeunit "NPR POS Pmt. Method Item Mgt.";
+    begin
+        POSPaymentMethod.Get(POSPaymentMethodCode);
+        if (POSPaymentMethod."Processing Type" <> POSPaymentMethod."Processing Type"::VOUCHER) or
+           (not NPRPOSPmtMethodItemMgt.HasPOSPaymentMethodItemFilter(POSPaymentMethodCode))
+        then begin
+            CurrSaleLinePOS.Reset();
+            CurrSaleLinePOS.SetRange("Register No.", CurrRegisterNo);
+            CurrSaleLinePOS.SetRange("Sales Ticket No.", SalesTicketNo);
+            CurrSaleLinePOS.SetRange("Line Type", CurrSaleLinePOS."Line Type"::"POS Payment");
+            CurrSaleLinePOS.SetRange("No.", POSPaymentMethodCode);
+            CurrSaleLinePOS.CalcSums("Amount Including VAT");
+            PaidAmount := CurrSaleLinePOS."Amount Including VAT";
+            exit;
+        end;
+
+        CurrSaleLinePOS.Reset();
+        CurrSaleLinePOS.SetRange("Register No.", CurrRegisterNo);
+        CurrSaleLinePOS.SetRange("Sales Ticket No.", CurrSalesTicketNo);
+        CurrSaleLinePOS.SetRange("Line Type", CurrSaleLinePOS."Line Type"::"POS Payment");
+        CurrSaleLinePOS.SetRange("No.", POSPaymentMethodCode);
+        CurrSaleLinePOS.SetLoadFields("Register No.", "Sales Ticket No.", "Line Type", "No.", SystemId, "Amount Including VAT");
+        if not CurrSaleLinePOS.FindSet() then
+            exit;
+
+        repeat
+            if not TempRelatedPOSSaleLineProcessed.Get(CurrSaleLinePOS.RecordId) then begin
+                PaidAmount += CurrSaleLinePOS."Amount Including VAT";
+                CurrVoucherSalesLine.Reset();
+                CurrVoucherSalesLine.SetCurrentKey("Retail ID", "Document Source", Type);
+                CurrVoucherSalesLine.SetRange("Retail ID", CurrSaleLinePOS.SystemId);
+                CurrVoucherSalesLine.SetLoadFields("Id", "Retail ID", "Parent Id");
+                if CurrVoucherSalesLine.FindFirst() then begin
+                    RelatedVoucherSalesLine.SetLoadFields(Id, "Retail ID");
+                    if RelatedVoucherSalesLine.Get(CurrVoucherSalesLine."Parent Id") then
+                        ProcessRelatedVoucherSalesLineWhenCalculatingAlreadyPaidAmounts(RelatedVoucherSalesLine, PaidAmount, TempRelatedPOSSaleLineProcessed);
+
+                    RelatedVoucherSalesLine.Reset();
+                    RelatedVoucherSalesLine.SetLoadFields("Parent Id", "Retail ID");
+                    RelatedVoucherSalesLine.SetRange("Parent Id", CurrVoucherSalesLine.Id);
+                    if RelatedVoucherSalesLine.FindFirst() then
+                        ProcessRelatedVoucherSalesLineWhenCalculatingAlreadyPaidAmounts(RelatedVoucherSalesLine, PaidAmount, TempRelatedPOSSaleLineProcessed);
+                end;
+            end;
+        until CurrSaleLinePOS.Next() = 0;
+
+    end;
+
+    local procedure ProcessRelatedVoucherSalesLineWhenCalculatingAlreadyPaidAmounts(RelatedVoucherSalesLine: Record "NPR NpRv Sales Line"; var PaidAmount: Decimal; var TempRelatedPOSSaleLineProcessed: Record "NPR POS Sale Line" temporary)
+    var
+        RelatedSaleLinePOS: Record "NPR POS Sale Line";
+        TempRelatedPOSSaleLineProcessedErrorLbl: Label 'Parameter TempRelatedPOSSaleLineProcessed must be temporary. This is a programming bug';
+    begin
+        if not TempRelatedPOSSaleLineProcessed.IsTemporary then
+            Error(TempRelatedPOSSaleLineProcessedErrorLbl);
+
+        RelatedSaleLinePOS.SetLoadFields("Amount Including VAT");
+        if not RelatedSaleLinePOS.GetBySystemId(RelatedVoucherSalesLine."Retail ID") then
+            exit;
+        PaidAmount += RelatedSaleLinePOS."Amount Including VAT";
+        if TempRelatedPOSSaleLineProcessed.Get(RelatedSaleLinePOS.RecordId) then
+            exit;
+
+        TempRelatedPOSSaleLineProcessed.Init();
+        TempRelatedPOSSaleLineProcessed := RelatedSaleLinePOS;
+        TempRelatedPOSSaleLineProcessed.Insert();
     end;
 
     local procedure CalcTotalPaidAmount(CurrRegisterNo: Code[20]; CurrSalesTicketNo: Code[20]) TotalPaidAmount: Decimal;
@@ -258,6 +332,7 @@
         TotalPaidAmount := POSSaleLine."Amount Including VAT";
     end;
 
+    [Obsolete('Not used. Use function FindOtherPaymentPOSSaleLinesV2 instead', '2024-10-13')]
     local procedure FindOtherPaymentPOSSaleLines(var POSSaleLine: Record "NPR POS Sale Line"; var TempOtherPaymentPOSSaleLine: Record "NPR POS Sale Line" temporary; POSPaymentMethodCode: Code[20])
     begin
         POSSaleLine.SetFilter("No.", '<>%1', POSPaymentMethodCode);
@@ -266,6 +341,82 @@
                 TempOtherPaymentPOSSaleLine := POSSaleLine;
                 TempOtherPaymentPOSSaleLine.Insert();
             until POSSaleLine.Next() = 0;
+    end;
+
+    local procedure FindOtherPaymentPOSSaleLinesV2(CurrSalesTicketNo: Code[20]; CurrRegisterNo: Code[20]; var TempOtherPaymentPOSSaleLine: Record "NPR POS Sale Line" temporary; POSPaymentMethodCode: Code[10])
+    var
+        CurrSaleLinePOS: Record "NPR POS Sale Line";
+        TempCurrSaleLinePOS: Record "NPR POS Sale Line" temporary;
+        CurrVoucherSalesLine: Record "NPR NpRv Sales Line";
+        RelatedVoucherSalesLine: Record "NPR NpRv Sales Line";
+        TempRelatedProcessedSalesLinePOS: Record "NPR POS Sale Line" temporary;
+        SkipLine: Boolean;
+        TempOtherPaymentPOSSaleLineErrorLbl: Label 'Parameter TempOtherPaymentPOSSaleLine must be temporary. This is a programming error.';
+    begin
+        if not TempOtherPaymentPOSSaleLine.IsTemporary then
+            Error(TempOtherPaymentPOSSaleLineErrorLbl);
+
+        TempOtherPaymentPOSSaleLine.Reset();
+        if not TempOtherPaymentPOSSaleLine.IsEmpty then
+            TempOtherPaymentPOSSaleLine.DeleteAll();
+
+        CurrSaleLinePOS.Reset();
+        CurrSaleLinePOS.SetRange("Sales Ticket No.", CurrSalesTicketNo);
+        CurrSaleLinePOS.SetRange("Register No.", CurrRegisterNo);
+        CurrSaleLinePOS.SetFilter("No.", '<>%1', POSPaymentMethodCode);
+        CurrSaleLinePOS.SetRange("Line Type", CurrSaleLinePOS."Line Type"::"POS Payment");
+        if not CurrSaleLinePOS.FindSet() then
+            exit;
+
+        repeat
+            if not TempRelatedProcessedSalesLinePOS.Get(CurrSaleLinePOS.RecordId) then begin
+                SkipLine := false;
+                TempCurrSaleLinePOS := CurrSaleLinePOS;
+
+                CurrVoucherSalesLine.Reset();
+                CurrVoucherSalesLine.SetCurrentKey("Retail ID", "Document Source", Type);
+                CurrVoucherSalesLine.SetRange("Retail ID", TempCurrSaleLinePOS.SystemId);
+                if CurrVoucherSalesLine.FindFirst() then begin
+                    if RelatedVoucherSalesLine.Get(CurrVoucherSalesLine."Parent Id") then
+                        ProcessRelatedSalesLinePOSWhenFindingOtherPaymentMethods(TempCurrSaleLinePOS, RelatedVoucherSalesLine, POSPaymentMethodCode, SkipLine, TempRelatedProcessedSalesLinePOS);
+
+                    RelatedVoucherSalesLine.Reset();
+                    RelatedVoucherSalesLine.SetRange("Parent Id", CurrVoucherSalesLine.Id);
+                    RelatedVoucherSalesLine.SetLoadFields("Retail ID");
+                    if RelatedVoucherSalesLine.FindFirst() then
+                        ProcessRelatedSalesLinePOSWhenFindingOtherPaymentMethods(TempCurrSaleLinePOS, RelatedVoucherSalesLine, POSPaymentMethodCode, SkipLine, TempRelatedProcessedSalesLinePOS);
+
+                end;
+                if not SkipLine then begin
+                    TempOtherPaymentPOSSaleLine := TempCurrSaleLinePOS;
+                    TempOtherPaymentPOSSaleLine.Insert();
+                end;
+            end;
+        until CurrSaleLinePOS.Next() = 0;
+    end;
+
+    local procedure ProcessRelatedSalesLinePOSWhenFindingOtherPaymentMethods(var CurrentSalesLinePOS: Record "NPR POS Sale Line"; RelatedVoucherSalesLine: Record "NPR NpRv Sales Line"; POSPaymentMethodCode: Code[10]; var SkipLine: boolean; var TempRelatedProcessedSalesLinePOS: Record "NPR POS Sale Line" temporary)
+    var
+        TempRelatedProcessedSalesLinePOSErrorLbl: Label 'Parameter TempRelatedProcessedSalesLinePOS must be temporary. This is a programming error.';
+        RelatedSaleLinePOS: Record "NPR POS Sale Line";
+    begin
+        if not TempRelatedProcessedSalesLinePOS.IsTemporary then
+            Error(TempRelatedProcessedSalesLinePOSErrorLbl);
+
+        RelatedSaleLinePOS.SetLoadFields("No.");
+        if not RelatedSaleLinePOS.GetBySystemId(RelatedVoucherSalesLine."Retail ID") then
+            exit;
+
+        SkipLine := SkipLine or (RelatedSaleLinePOS."No." = POSPaymentMethodCode);
+        if SkipLine then
+            exit;
+
+        CurrentSalesLinePOS."Amount Including VAT" += RelatedSaleLinePOS."Amount Including VAT";
+        if TempRelatedProcessedSalesLinePOS.Get(RelatedSaleLinePOS.RecordId) then
+            exit;
+
+        TempRelatedProcessedSalesLinePOS := RelatedSaleLinePOS;
+        TempRelatedProcessedSalesLinePOS.Insert()
     end;
 
     local procedure FindSalePOSSalesLines(var POSSaleLine: Record "NPR POS Sale Line"; var TempSalePOSSaleLine: Record "NPR POS Sale Line" temporary)
@@ -525,7 +676,6 @@
     begin
         exit(POSPaymentMethod.Get(PaymentTypeCode));
     end;
-
 
     procedure CalculateForeignAmount(POSPaymentMethod: Record "NPR POS Payment Method"; AmountLCY: Decimal) Amount: Decimal
     var

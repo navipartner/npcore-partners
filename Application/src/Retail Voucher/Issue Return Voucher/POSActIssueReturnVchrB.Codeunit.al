@@ -1,11 +1,13 @@
 ﻿codeunit 6150624 "NPR POS Act.Issue Return VchrB"
 {
     Access = Internal;
-    internal procedure ValidateAmount(VoucherTypeCodeIn: code[20]; var ReturnAmount: Decimal; PaymentLine: Codeunit "NPR POS Payment Line")
+    internal procedure ValidateAmount(VoucherTypeCodeIn: code[20]; var ReturnAmount: Decimal; PaymentLine: Codeunit "NPR POS Payment Line"; RegisterNo: Code[10]; SalesTicketNo: Code[20])
     var
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         POSPaymentMethod: Record "NPR POS Payment Method";
+        CurrentPOSPaymentMethod: Record "NPR POS Payment Method";
         ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
+        PaymentLinePOS: Record "NPR POS Sale Line";
         SaleAmount: Decimal;
         PaidAmount: Decimal;
         SubTotal: Decimal;
@@ -15,8 +17,11 @@
         NpRvVoucherType.Get(VoucherTypeCodeIn);
         POSPaymentMethod.Get(NpRvVoucherType."Payment Type");
         ReturnPOSPaymentMethod.Get(POSPaymentMethod."Return Payment Method Code");
+        PaymentLine.GetCurrentPaymentLine(PaymentLinePOS);
 
-        PaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, SubTotal);
+        CurrentPOSPaymentMethod.Get(PaymentLinePOS."No.");
+        PaymentLine.CalculateBalance(CurrentPOSPaymentMethod, SaleAmount, PaidAmount, ReturnAmount, SubTotal);
+
         ReturnAmount := SaleAmount - PaidAmount;
 
         if POSPaymentMethod."Rounding Precision" > 0 then

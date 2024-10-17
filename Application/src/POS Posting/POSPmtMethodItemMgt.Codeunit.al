@@ -12,6 +12,16 @@ codeunit 6059932 "NPR POS Pmt. Method Item Mgt."
             CheckIsDeletingPOSSaleLineAllowed(SaleLinePOS);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Payment Line", 'OnBeforeDeleteLine', '', true, true)]
+    local procedure CheckOnBeforeDeletePOSPaymentLine(SaleLinePOS: Record "NPR POS Sale Line")
+    begin
+        if SaleLinePOS.IsTemporary() then
+            exit;
+
+        CheckIsDeletingPOSPaymentLineVoucherAllowed(SaleLinePOS);
+    end;
+
+
     local procedure CheckIsDeletingPOSSaleLineAllowed(POSSaleLine: Record "NPR POS Sale Line")
     var
         PaymentPOSSaleLine: Record "NPR POS Sale Line";
@@ -30,7 +40,74 @@ codeunit 6059932 "NPR POS Pmt. Method Item Mgt."
         until PaymentPOSSaleLine.Next() = 0;
     end;
 
+    local procedure CheckIsDeletingPOSPaymentLineVoucherAllowed(POSSaleLine: Record "NPR POS Sale Line")
+    var
+        OriginalPOSPaymentMethodItem: Record "NPR POS Payment Method Item";
+        OriginalVoucherType: Record "NPR NpRv Voucher Type";
+        OriginalVoucherSalesLine: Record "NPR NpRv Sales Line";
+        ReturnVoucherSalesLine: Record "NPR NpRv Sales Line";
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        Dummyguid: Guid;
+        CannotDeleteErr: Label '%1 for voucher type %2 reference no. %3 cannot be deleted since it has been issued from voucher type %4 reference no. %5 which has an item filter. Please delete voucher type %6 reference no. %7 from the POS Sale and try again.', Comment = '%1 - POS Sale Line table caption, %2 - voucher value, %3 - POS Sale Line Description value, %4 - POS Payment Method Code value';
+    begin
+        if POSSaleLine."Line Type" <> POSSaleLine."Line Type"::"POS Payment" then
+            exit;
+
+        POSPaymentMethod.SetLoadFields(Code, "Processing Type");
+        if not POSPaymentMethod.Get(POSSaleLine."No.") then
+            exit;
+
+        if POSPaymentMethod."Processing Type" <> POSPaymentMethod."Processing Type"::VOUCHER then
+            exit;
+
+        ReturnVoucherSalesLine.Reset();
+        ReturnVoucherSalesLine.SetCurrentKey("Retail ID", "Document Source", Type);
+        ReturnVoucherSalesLine.SetRange("Retail ID", POSSaleLine.SystemId);
+        ReturnVoucherSalesLine.SetLoadFields(SystemId, "Voucher Type", "Reference No.", "Parent Id");
+        if not ReturnVoucherSalesLine.FindFirst() then
+            exit;
+
+        if ReturnVoucherSalesLine."Parent Id" = Dummyguid then
+            exit;
+
+        OriginalVoucherSalesLine.SetLoadFields("Voucher Type", "Voucher No.", "Reference No.");
+        if not OriginalVoucherSalesLine.Get(ReturnVoucherSalesLine."Parent Id") then
+            exit;
+
+        OriginalVoucherType.SetLoadFields(Code, "Payment Type");
+        if not OriginalVoucherType.Get(OriginalVoucherSalesLine."Voucher Type") then
+            exit;
+
+        if OriginalVoucherType."Payment Type" = '' then
+            exit;
+
+        OriginalPOSPaymentMethodItem.Reset();
+        OriginalPOSPaymentMethodItem.SetRange("POS Payment Method Code", OriginalVoucherType."Payment Type");
+        if OriginalPOSPaymentMethodItem.IsEmpty then
+            exit;
+
+
+        Error(CannotDeleteErr,
+              POSSaleLine.TableCaption,
+              ReturnVoucherSalesLine."Voucher Type",
+              ReturnVoucherSalesLine."Reference No.",
+              OriginalVoucherSalesLine."Voucher Type",
+              OriginalVoucherSalesLine."Reference No.",
+              OriginalVoucherSalesLine."Voucher Type",
+              OriginalVoucherSalesLine."Reference No.");
+    end;
+
     internal procedure IsThisPOSPaymentMethodItem(POSPaymentMethodCode: Code[20]; POSSaleLine: Record "NPR POS Sale Line"): Boolean
+    begin
+        exit(IsThisPOSPaymentMethodItem(POSPaymentMethodCode, POSSaleLine."Item Category Code", POSSaleLine."No."))
+    end;
+
+    internal procedure IsThisPOSPaymentMethodItem(POSPaymentMethodCode: Code[20]; SalesLine: Record "Sales Line"): Boolean
+    begin
+        exit(IsThisPOSPaymentMethodItem(POSPaymentMethodCode, SalesLine."Item Category Code", SalesLine."No."))
+    end;
+
+    internal procedure IsThisPOSPaymentMethodItem(POSPaymentMethodCode: Code[20]; ItemCategoryCode: Code[20]; ItemNo: Code[20]): Boolean
     var
         POSPaymentMethodItem: Record "NPR POS Payment Method Item";
     begin
@@ -40,15 +117,25 @@ codeunit 6059932 "NPR POS Pmt. Method Item Mgt."
             exit(false);
 
         POSPaymentMethodItem.SetRange(Type, POSPaymentMethodItem.Type::"Item Categories");
-        POSPaymentMethodItem.SetRange("No.", POSSaleLine."Item Category Code");
+        POSPaymentMethodItem.SetRange("No.", ItemCategoryCode);
         if not POSPaymentMethodItem.IsEmpty() then
             exit(true);
 
         POSPaymentMethodItem.SetRange(Type, POSPaymentMethodItem.Type::Item);
-        POSPaymentMethodItem.SetRange("No.", POSSaleLine."No.");
+        POSPaymentMethodItem.SetRange("No.", ItemNo);
         if not POSPaymentMethodItem.IsEmpty() then
             exit(true);
 
         exit(false);
+    end;
+
+    internal procedure HasPOSPaymentMethodItemFilter(POSPaymentMethodCode: Code[10]) HasItemFilter: Boolean
+    var
+        POSPaymentMethodItem: Record "NPR POS Payment Method Item";
+    begin
+        POSPaymentMethodItem.Reset();
+        POSPaymentMethodItem.SetRange("POS Payment Method Code", POSPaymentMethodCode);
+        POSPaymentMethodItem.SetCurrentKey("POS Payment Method Code", Type, "No.");
+        HasItemFilter := not POSPaymentMethodItem.IsEmpty;
     end;
 }

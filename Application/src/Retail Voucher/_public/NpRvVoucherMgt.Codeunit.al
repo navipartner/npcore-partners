@@ -1561,15 +1561,17 @@
             Error(MaxCountErr, VoucherType.FieldCaption("Max Voucher Count"), VoucherType.TableCaption, VoucherType.Code);
     end;
 
-    internal procedure IssueReturnVoucher(var POSSession: Codeunit "NPR POS Session"; VoucherTypeCode: Text; Amount: Decimal; Email: Text[80]; PhoneNo: Text[30]; SendMethodPrint: Boolean; SendMethodEmail: Boolean; SendMethodSMS: Boolean)
+    internal procedure IssueReturnVoucher(var POSSession: Codeunit "NPR POS Session"; VoucherTypeCode: Text; Amount: Decimal; Email: Text[80]; PhoneNo: Text[30]; SendMethodPrint: Boolean; SendMethodEmail: Boolean; SendMethodSMS: Boolean; VoucherSalesLineParentID: Guid)
     var
         VoucherType: Record "NPR NpRv Voucher Type";
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
+        PaymentLinePOS: Record "NPR POS Sale Line";
         NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         POSPaymentMethod: Record "NPR POS Payment Method";
         TempVoucher: Record "NPR NpRv Voucher" temporary;
+        CurrentPOSPaymentMethod: Record "NPR POS Payment Method";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
@@ -1580,7 +1582,10 @@
         MaximumReturnAmountErr: Label 'Maximum Return Amount is: %1', Comment = '%1=ReturnAmount';
     begin
         POSSession.GetPaymentLine(POSPaymentLine);
-        POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, SubTotal);
+        POSPaymentLine.GetCurrentPaymentLine(PaymentLinePOS);
+        CurrentPOSPaymentMethod.Get(PaymentLinePOS."No.");
+        POSPaymentLine.CalculateBalance(CurrentPOSPaymentMethod, SaleAmount, PaidAmount, ReturnAmount, SubTotal);
+
         VoucherType.Get(VoucherTypeCode);
 
         ReturnAmount := PaidAmount - SaleAmount;
@@ -1628,6 +1633,7 @@
         NpRvSalesLine.Type := NpRvSalesLine.Type::"New Voucher";
         NpRvSalesLine."Voucher Type" := VoucherType.Code;
         NpRvSalesLine."Starting Date" := CurrentDateTime;
+        NpRvSalesLine."Parent Id" := VoucherSalesLineParentID;
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         NpRvSalesLine.Validate("Customer No.", SalePOS."Customer No.");
@@ -1649,6 +1655,13 @@
             SaleLinePOS.Description := TempVoucher.Description;
             SaleLinePOS.Modify();
         end;
+    end;
+
+    internal procedure IssueReturnVoucher(var POSSession: Codeunit "NPR POS Session"; VoucherTypeCode: Text; Amount: Decimal; Email: Text[80]; PhoneNo: Text[30]; SendMethodPrint: Boolean; SendMethodEmail: Boolean; SendMethodSMS: Boolean)
+    var
+        DummyGuid: Guid;
+    begin
+        IssueReturnVoucher(POSSession, VoucherTypeCode, Amount, Email, PhoneNo, SendMethodPrint, SendMethodEmail, SendMethodSMS, DummyGuid);
     end;
 
     internal procedure TopUpVoucher(var POSSession: Codeunit "NPR POS Session"; VoucherNo: Text; DiscountType: Text; AmtInput: Decimal; DiscountAmount: Decimal; DiscountPct: Decimal)
@@ -1909,7 +1922,66 @@
         NpRvVoucher."Ending Date" := CreateDateTime(CalcDate(NpRvVoucherType."Valid Period", DT2Date(CurrentDateTime())), DT2Time(CurrentDateTime()));
         NpRvVoucher.Modify();
     end;
+
+    internal procedure GetVoucherPaymentMethod(ReferenceNo: Text[50]) PaymentMethodCode: Code[10]
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvVoucherType: Record "NPR NpRv Voucher Type";
+    begin
+        NpRvVoucher.SetLoadFields("Voucher Type");
+        NpRvVoucher.SetRange("Reference No.", ReferenceNo);
+        if not NpRvVoucher.FindFirst() then
+            exit;
+        NpRvVoucherType.SetLoadFields("Payment Type");
+        if not NpRvVoucherType.Get(NpRvVoucher."Voucher Type") then
+            exit;
+        PaymentMethodCode := NpRvVoucherType."Payment Type";
+    end;
+
+    internal procedure CheckVoucherCanBeUsedWithItem(PaymentMethodCode: Code[10]; ItemNo: Code[20]; ItemCategoryCode: Code[20]): Boolean
+    var
+        POSPaymentMethodItem: Record "NPR POS Payment Method Item";
+    begin
+        POSPaymentMethodItem.SetRange("POS Payment Method Code", PaymentMethodCode);
+        if POSPaymentMethodItem.IsEmpty() then
+            exit(true);
+        POSPaymentMethodItem.SetRange("No.", ItemNo);
+        POSPaymentMethodItem.SetRange(Type, POSPaymentMethodItem.Type::Item);
+        if not POSPaymentMethodItem.IsEmpty() then
+            exit(true);
+        POSPaymentMethodItem.SetRange("No.", ItemCategoryCode);
+        POSPaymentMethodItem.SetRange(Type, POSPaymentMethodItem.Type::"Item Categories");
+        if not POSPaymentMethodItem.IsEmpty() then
+            exit(true);
+    end;
     #endregion
+
+    [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnBeforeDeleteEvent', '', true, true)]
+    local procedure SalesLineOnBeforeDelete(var Rec: Record "Sales Line")
+    var
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+        POSPmtMethodItemMgt: Codeunit "NPR POS Pmt. Method Item Mgt.";
+        PaymentMethodCode: Code[10];
+        CannotDeleteErr: Label '%1 for item %2 %3 cannot be deleted since it is restricted to payment type No: %4, that has already been used.', Comment = '%1 - Sale Line table caption, %2 - Item No. value, %3 - POS Sale Line Description value, %4 - Payment Line No. value';
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        if Rec.Type <> Rec.Type::Item then
+            exit;
+
+        MagentoPaymentLine.SetLoadFields("No.");
+        MagentoPaymentLine.SetRange("Document Table No.", Database::"Sales Header");
+        MagentoPaymentLine.SetRange("Document Type", MagentoPaymentLine."Document Type"::Order);
+        MagentoPaymentLine.SetRange("Document No.", Rec."Document No.");
+        MagentoPaymentLine.SetRange("Payment Type", MagentoPaymentLine."Payment Type"::Voucher);
+        MagentoPaymentLine.SetFilter(Amount, '>%1', 0);
+        if MagentoPaymentLine.FindSet() then
+            repeat
+                PaymentMethodCode := GetVoucherPaymentMethod(MagentoPaymentLine."No.");
+                if POSPmtMethodItemMgt.IsThisPOSPaymentMethodItem(PaymentMethodCode, Rec) then
+                    Error(CannotDeleteErr, Rec.TableCaption, Rec."No.", Rec.Description, MagentoPaymentLine."No.");
+            until MagentoPaymentLine.Next() = 0;
+    end;
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertIssuedVoucher(var Voucher: Record "NPR NpRv Voucher"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line")
