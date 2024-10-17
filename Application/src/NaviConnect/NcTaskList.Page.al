@@ -267,7 +267,6 @@
             action(Output)
             {
                 Caption = 'Output';
-                Visible = false;
                 Image = List;
                 Promoted = true;
                 PromotedOnly = true;
@@ -335,19 +334,15 @@
 
     local procedure UpdateResponseText()
     var
+        TypeHelper: Codeunit "Type Helper";
         InStr: InStream;
-        BufferText: Text;
     begin
         ResponseText := '';
         if not Rec.Response.HasValue() then
             exit;
         Rec.CalcFields(Response);
         Rec.Response.CreateInStream(InStr, TextEncoding::UTF8);
-        BufferText := '';
-        while not InStr.EOS do begin
-            InStr.ReadText(BufferText);
-            ResponseText += BufferText;
-        end;
+        ResponseText := TypeHelper.ReadAsTextWithSeparator(InStr, TypeHelper.LFSeparator());
     end;
 
     local procedure ImportNewTasks()
