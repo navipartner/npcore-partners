@@ -64,6 +64,11 @@
                     ToolTip = 'Specifies if popup will be enabled only for selected POS Units.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Dimension Mandatory on POS"; Rec."Dimension Mandatory on POS")
+                {
+                    ToolTip = 'Specifies the value of the Dimension Mandatory on POS field.';
+                    ApplicationArea = NPRRetail;
+                }
             }
             group(FilterGr)
             {

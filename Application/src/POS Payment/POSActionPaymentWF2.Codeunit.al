@@ -125,6 +125,7 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         ActionParameters.Add('DimensionCode', POSPmtViewEventSetup."Dimension Code");
         ActionParameters.Add('CreateDimValue', POSPmtViewEventSetup."Create New Dimension Values");
         ActionParameters.Add('HeadlineTxt', StrSubstNo(HeadlineTextLbl, Dimension.GetMLCodeCaption(GlobalLanguage())));
+        ActionParameters.Add('DimensionMandatory', POSPmtViewEventSetup."Dimension Mandatory on POS");
 
         PreWorkflows.Add('SALE_DIMENSION', ActionParameters);
     end;
