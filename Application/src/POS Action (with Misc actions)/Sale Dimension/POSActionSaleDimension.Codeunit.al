@@ -37,6 +37,8 @@ codeunit 6150826 "NPR POS Action: Sale Dimension" implements "NPR IPOS Workflow"
         DimTitle: Label 'Dimension and Statistics';
         ParamHeadlineTxt_CptLbl: Label 'Headline text';
         ParamHealineTxt_DescLbl: Label 'Specifies popup Headline text';
+        ParmDimensionMandatory_CptLbl: Label 'Dimension Mandatory';
+        ParmDimensionMandatory_DescLbl: Label 'Specifies if it is necessary to insert a dimension.';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
@@ -76,6 +78,7 @@ codeunit 6150826 "NPR POS Action: Sale Dimension" implements "NPR IPOS Workflow"
         WorkflowConfig.AddBooleanParameter('ShowConfirmMessage', false, ParamShowConfirmMessage_CptLbl, ParamShowConfirmMessage_DescLbl);
         WorkflowConfig.AddBooleanParameter('CreateDimValue', false, ParamCreateDimValue_CptLbl, ParamCreateDimValue_DescLbl);
         WorkflowConfig.AddTextParameter('HeadlineTxt', DimTitle, ParamHeadlineTxt_CptLbl, ParamHealineTxt_DescLbl);
+        WorkflowConfig.AddBooleanParameter('DimensionMandatory', false, ParmDimensionMandatory_CptLbl, ParmDimensionMandatory_DescLbl);
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
@@ -118,7 +121,9 @@ codeunit 6150826 "NPR POS Action: Sale Dimension" implements "NPR IPOS Workflow"
         ValueSelection: Integer;
         ShowMessage: Boolean;
         WithCreate: Boolean;
+        DimensionMandatory: Boolean;
         MissingParameterErr: Label 'POS action parameter ''%1'' must be specified.', Comment = '%1 - parameter name';
+        DimensionMandatoryErr: Label 'Dimension must be inserted.';
         POSSession: Codeunit "NPR POS Session";
         POActSaleDimB: Codeunit "NPR POS Action: Sale Dim. B";
     begin
@@ -144,18 +149,30 @@ codeunit 6150826 "NPR POS Action: Sale Dimension" implements "NPR IPOS Workflow"
 
         ShowMessage := Context.GetBooleanParameter('ShowConfirmMessage');
         WithCreate := Context.GetBooleanParameter('CreateDimValue');
+        DimensionMandatory := Context.GetBooleanParameter('DimensionMandatory');
 
         case ValueSelection of
             ValueSelectionOptions::PROMPT_N:
-                DimValueCode := CopyStr(Context.GetString('DimCode'), 1, MaxStrLen(DimValueCode));
+                begin
+                    DimValueCode := CopyStr(Context.GetString('DimCode'), 1, MaxStrLen(DimValueCode));
+                    if DimensionMandatory and (DimValueCode = '') then
+                        Error(DimensionMandatoryErr);
+                end;
             ValueSelectionOptions::PROMPT_A:
-                DimValueCode := CopyStr(Context.GetString('DimCode'), 1, MaxStrLen(DimValueCode));
+                begin
+                    DimValueCode := CopyStr(Context.GetString('DimCode'), 1, MaxStrLen(DimValueCode));
+                    if DimensionMandatory and (DimValueCode = '') then
+                        Error(DimensionMandatoryErr);
+                end;
             ValueSelectionOptions::"FIXED":
                 DimValueCode := CopyStr(Context.GetStringParameter('DimensionValue'), 1, MaxStrLen(DimValueCode));
             ValueSelectionOptions::"LIST":
                 if DimCode <> '' then
                     if not LookupDimensionValue(DimCode, DimValueCode) then
-                        Error('');
+                        if DimensionMandatory then
+                            Error(DimensionMandatoryErr)
+                        else
+                            Error('');
         end;
 
         if ApplyDimTo = ApplyDimTo::Sale then
@@ -490,7 +507,7 @@ codeunit 6150826 "NPR POS Action: Sale Dimension" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionSaleDimension.js###
-'let main=async({parameters:t})=>{const{HeadlineTxt:n,DimCaption:a}=await workflow.respond("GetCaptions");if(t.ValueSelection==2){var i=await popup.numpad({title:n,caption:a});if(i===null)return" "}if(t.ValueSelection==3){var i=await popup.input({title:n,caption:a});if(i===null)return" "}await workflow.respond("InsertDim",{DimCode:i})};'
+'const main=async({parameters:n})=>{const{HeadlineTxt:o,DimCaption:t}=await workflow.respond("GetCaptions");if(n.ValueSelection==2){var i=await popup.numpad({title:o,caption:t});if(i===null)if(n.DimensionMandatory)i="";else return" "}if(n.ValueSelection==3){var i=await popup.input({title:o,caption:t});if(i===null)if(n.DimensionMandatory)i="";else return" "}await workflow.respond("InsertDim",{DimCode:i})};'
         );
     end;
 }

@@ -70,6 +70,11 @@
             Caption = 'Show Only for Selected POS Units';
             DataClassification = CustomerContent;
         }
+        field(100; "Dimension Mandatory on POS"; Boolean)
+        {
+            Caption = 'Dimension Mandatory on POS';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
