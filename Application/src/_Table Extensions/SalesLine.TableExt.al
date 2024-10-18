@@ -217,4 +217,17 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
             end;
         }
     }
+
+    var
+        _SkipPOSPaymentMethodItemCheck: Boolean;
+
+    internal procedure SetSkipPOSPaymentMethodItemCheck(SkipPOSPaymentMethodItemCheck: Boolean)
+    begin
+        _SkipPOSPaymentMethodItemCheck := SkipPOSPaymentMethodItemCheck;
+    end;
+
+    internal procedure GetSkipPOSPaymentMethodItemCheck() SkipPOSPaymentMethodItemCheck: Boolean
+    begin
+        SkipPOSPaymentMethodItemCheck := _SkipPOSPaymentMethodItemCheck;
+    end;
 }

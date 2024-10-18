@@ -20,6 +20,46 @@ codeunit 6059932 "NPR POS Pmt. Method Item Mgt."
 
         CheckIsDeletingPOSPaymentLineVoucherAllowed(SaleLinePOS);
     end;
+#IF NOT (BC17 or BC18)
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnDeleteSalesLinesOnBeforeDeleteLine', '', false, false)]
+    local procedure SalesHeaderOnDeleteSalesLinesOnBeforeDeleteLine(var SalesLine: Record "Sales Line")
+    begin
+        SalesLine.SetSkipPOSPaymentMethodItemCheck(true);
+    end;
+#ENDIF
+    [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnBeforeDeleteEvent', '', true, true)]
+    local procedure SalesLineOnBeforeDelete(var Rec: Record "Sales Line")
+    var
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        SkipPOSPaymentMethodItemCheck: Boolean;
+        PaymentMethodCode: Code[10];
+        CannotDeleteErr: Label '%1 for item %2 %3 cannot be deleted since it is restricted to payment type No: %4, that has already been used.', Comment = '%1 - Sale Line table caption, %2 - Item No. value, %3 - POS Sale Line Description value, %4 - Payment Line No. value';
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        if Rec.Type <> Rec.Type::Item then
+            exit;
+#IF NOT (BC17 or BC18)
+        SkipPOSPaymentMethodItemCheck := Rec.GetSkipPOSPaymentMethodItemCheck();
+#ELSE
+        SkipPOSPaymentMethodItemCheck := Rec.GetSuspendedStatusCheck();
+#ENDIF
+        if not SkipPOSPaymentMethodItemCheck then begin
+            MagentoPaymentLine.SetLoadFields("No.");
+            MagentoPaymentLine.SetRange("Document Table No.", Database::"Sales Header");
+            MagentoPaymentLine.SetRange("Document Type", MagentoPaymentLine."Document Type"::Order);
+            MagentoPaymentLine.SetRange("Document No.", Rec."Document No.");
+            MagentoPaymentLine.SetRange("Payment Type", MagentoPaymentLine."Payment Type"::Voucher);
+            MagentoPaymentLine.SetFilter(Amount, '>%1', 0);
+            if MagentoPaymentLine.FindSet() then
+                repeat
+                    PaymentMethodCode := NpRvVoucherMgt.GetVoucherPaymentMethod(MagentoPaymentLine."No.");
+                    if IsThisPOSPaymentMethodItem(PaymentMethodCode, Rec) then
+                        Error(CannotDeleteErr, Rec.TableCaption, Rec."No.", Rec.Description, MagentoPaymentLine."No.");
+                until MagentoPaymentLine.Next() = 0;
+        end;
+    end;
 
 
     local procedure CheckIsDeletingPOSSaleLineAllowed(POSSaleLine: Record "NPR POS Sale Line")
