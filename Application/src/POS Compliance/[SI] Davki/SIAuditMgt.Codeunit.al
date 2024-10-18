@@ -355,12 +355,13 @@ codeunit 6151546 "NPR SI Audit Mgt."
 
     internal procedure SignAndSendXML(MethodType: Text; BaseValue: Text; var ResponseText: Text): Boolean
     var
+        KeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         Content: HttpContent;
         Headers: HttpHeaders;
         RequestMessage: HttpRequestMessage;
         InStr: InStream;
         RequestMessageLbl: Label '{"certificateBase64": "%1","certificatePass": "%2","methodType": "%3", "URLToSend": "%4", "contentToSign": "%5"}', Locked = true;
-        SignAndSendXMLAzureFunctionURLLbl: Label 'https://slocompilance.azurewebsites.net/api/SignAndSend?code=75lf3yGMPXq7962epcp5E90V-N6EXp1mWN9qnArngVilAzFuCNEAtQ==', Locked = true;
+        SignAndSendXMLAzureFunctionURLLbl: Label 'https://slocompilance.azurewebsites.net/api/SignAndSend?code=', Locked = true;
         CertBase64: Text;
         Url: Text;
         XMLDocText: Text;
@@ -377,7 +378,7 @@ codeunit 6151546 "NPR SI Audit Mgt."
         Content.WriteFrom(XMLDocText);
         Content.GetHeaders(Headers);
         SetHeader(Headers, 'Content-Type', 'application/json');
-        Url := SignAndSendXMLAzureFunctionURLLbl;
+        Url := SignAndSendXMLAzureFunctionURLLbl + KeyVaultMgt.GetAzureKeyVaultSecret('CompilanceSISignAndSend');
 
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('POST');
@@ -389,12 +390,13 @@ codeunit 6151546 "NPR SI Audit Mgt."
 
     internal procedure SignZOICode(BaseValue: Text; var ResponseText: Text): Boolean
     var
+        KeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         Content: HttpContent;
         Headers: HttpHeaders;
         RequestMessage: HttpRequestMessage;
         InStr: InStream;
         RequestMessageLbl: Label '{"certificateBase64": "%1","certificatePass": "%2","baseValue": "%3"}', Locked = true;
-        SignZOIAzureFunctionURLLbl: Label 'https://slocompilance.azurewebsites.net/api/GenerateZOI?code=Ba73k6IpW1PvLrPj7M2-6Mz69NmvuQizlg3wVS-3UXf-AzFu5xuXGQ==', Locked = true;
+        SignZOIAzureFunctionURLLbl: Label 'https://slocompilance.azurewebsites.net/api/GenerateZOI?code=', Locked = true;
         CertBase64: Text;
         Url: Text;
         XMLDocText: Text;
@@ -412,15 +414,16 @@ codeunit 6151546 "NPR SI Audit Mgt."
         Content.WriteFrom(XMLDocText);
         Content.GetHeaders(Headers);
         SetHeader(Headers, 'Content-Type', 'application/json');
-        Url := SignZOIAzureFunctionURLLbl;
 
+        OnBeforeSendHttpRequestForSignZOICode(ResponseText, IsHandled);
+        if IsHandled then
+            exit(true);
+
+        Url := SignZOIAzureFunctionURLLbl + KeyVaultMgt.GetAzureKeyVaultSecret('CompilanceSIGenerateZOI');
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('POST');
         RequestMessage.Content(Content);
         RequestMessage.GetHeaders(Headers);
-        OnBeforeSendHttpRequestForSignZOICode(ResponseText, IsHandled);
-        if IsHandled then
-            exit(true);
         if SendHttpRequest(RequestMessage, ResponseText, false) then
             exit(true)
     end;
