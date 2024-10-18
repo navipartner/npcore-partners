@@ -317,7 +317,7 @@ report 6014546 "NPR RS Retail Sales Statistics"
         ValueEntry.CalcSums("Sales Amount (Actual)", "Invoiced Quantity");
 
         SalesAmountLCY := ValueEntry."Sales Amount (Actual)" - SalesAmountToSubtract;
-        SalesQty := Abs(ValueEntry."Invoiced Quantity") - SalesQtyToSubtract;
+        SalesQty := ValueEntry."Invoiced Quantity" - SalesQtyToSubtract;
     end;
 
     local procedure CalculateRetailValueEntrySalesAmount(var RetailValueEntryAmount: Decimal; var RetailValueEntryQty: Decimal; Item: Record Item)
@@ -352,8 +352,8 @@ report 6014546 "NPR RS Retail Sales Statistics"
     begin
         ItemLedgerEntry.SetRange("Item No.", Item."No.");
 
-        if _StartDate <> 0D then
-            ItemLedgerEntry.SetFilter("Posting Date", StrSubstNo(_DateFilterLbl, _StartDate, _EndDate));
+        if _EndDate <> 0D then
+            ItemLedgerEntry.SetFilter("Posting Date", StrSubstNo(_DateFilterLbl, 0D, _EndDate));
 
         if _LocationCode <> '' then
             ItemLedgerEntry.SetRange("Location Code", _LocationCode);
