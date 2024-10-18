@@ -684,6 +684,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
     #region CRO Fiscal - XML Signing
     internal procedure SignXML(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; SigningContent: Text; var ResponseText: Text): Boolean
     var
+        KeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         IsHandled: Boolean;
         Content: HttpContent;
         Headers: HttpHeaders;
@@ -707,21 +708,23 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         Content.WriteFrom(XMLDocText);
         Content.GetHeaders(Headers);
         SetHeader(Headers, 'Content-Type', 'application/json');
-        Url := 'https://crocompilance.azurewebsites.net/api/SignReceipt?code=jpUlN6UoCnZQeyRxptQVYODyoZmPKzurZmCxrqkGCQJrAzFupY4LAQ==';
 
+        OnBeforeSendHttpRequestForXMLSigning(ResponseText, CROPOSAuditLogAuxInfo, IsHandled);
+        if IsHandled then
+            exit(true);
+
+        Url := 'https://crocompilance.azurewebsites.net/api/SignReceipt?code=' + KeyVaultMgt.GetAzureKeyVaultSecret('CompilanceCROSignReceipt');
         RequestMessage.SetRequestUri(Url);
         RequestMessage.Method('POST');
         RequestMessage.Content(Content);
         RequestMessage.GetHeaders(Headers);
-        OnBeforeSendHttpRequestForXMLSigning(ResponseText, CROPOSAuditLogAuxInfo, IsHandled);
-        if IsHandled then
-            exit(true);
         if SendHttpRequest(RequestMessage, ResponseText, false) then
             exit(true)
     end;
 
     internal procedure SignZKICode(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; BaseValue: Text; var ResponseText: Text): Boolean
     var
+        KeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         Content: HttpContent;
         Headers: HttpHeaders;
         RequestMessage: HttpRequestMessage;
@@ -744,16 +747,16 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         Content.WriteFrom(XMLDocText);
         Content.GetHeaders(Headers);
         SetHeader(Headers, 'Content-Type', 'application/json');
-        Url := 'https://crocompilance.azurewebsites.net/api/GenerateZKI?code=l1zbJdCxbBRcj1Y_38pQH_uIEVufktVWK5TVSEYFre-9AzFuRIXdBg==';
-
-        RequestMessage.SetRequestUri(Url);
-        RequestMessage.Method('POST');
-        RequestMessage.Content(Content);
-        RequestMessage.GetHeaders(Headers);
 
         OnBeforeSendHttpRequestForSignZKICode(ResponseText, IsHandled);
         if IsHandled then
             exit(true);
+
+        Url := 'https://crocompilance.azurewebsites.net/api/GenerateZKI?code=' + KeyVaultMgt.GetAzureKeyVaultSecret('CompilanceCROGenerateZKI');
+        RequestMessage.SetRequestUri(Url);
+        RequestMessage.Method('POST');
+        RequestMessage.Content(Content);
+        RequestMessage.GetHeaders(Headers);
         if SendHttpRequest(RequestMessage, ResponseText, false) then
             exit(true)
     end;
