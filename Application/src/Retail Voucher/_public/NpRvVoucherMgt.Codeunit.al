@@ -1956,32 +1956,6 @@
     end;
     #endregion
 
-    [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnBeforeDeleteEvent', '', true, true)]
-    local procedure SalesLineOnBeforeDelete(var Rec: Record "Sales Line")
-    var
-        MagentoPaymentLine: Record "NPR Magento Payment Line";
-        POSPmtMethodItemMgt: Codeunit "NPR POS Pmt. Method Item Mgt.";
-        PaymentMethodCode: Code[10];
-        CannotDeleteErr: Label '%1 for item %2 %3 cannot be deleted since it is restricted to payment type No: %4, that has already been used.', Comment = '%1 - Sale Line table caption, %2 - Item No. value, %3 - POS Sale Line Description value, %4 - Payment Line No. value';
-    begin
-        if Rec.IsTemporary() then
-            exit;
-        if Rec.Type <> Rec.Type::Item then
-            exit;
-
-        MagentoPaymentLine.SetLoadFields("No.");
-        MagentoPaymentLine.SetRange("Document Table No.", Database::"Sales Header");
-        MagentoPaymentLine.SetRange("Document Type", MagentoPaymentLine."Document Type"::Order);
-        MagentoPaymentLine.SetRange("Document No.", Rec."Document No.");
-        MagentoPaymentLine.SetRange("Payment Type", MagentoPaymentLine."Payment Type"::Voucher);
-        MagentoPaymentLine.SetFilter(Amount, '>%1', 0);
-        if MagentoPaymentLine.FindSet() then
-            repeat
-                PaymentMethodCode := GetVoucherPaymentMethod(MagentoPaymentLine."No.");
-                if POSPmtMethodItemMgt.IsThisPOSPaymentMethodItem(PaymentMethodCode, Rec) then
-                    Error(CannotDeleteErr, Rec.TableCaption, Rec."No.", Rec.Description, MagentoPaymentLine."No.");
-            until MagentoPaymentLine.Next() = 0;
-    end;
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertIssuedVoucher(var Voucher: Record "NPR NpRv Voucher"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line")
