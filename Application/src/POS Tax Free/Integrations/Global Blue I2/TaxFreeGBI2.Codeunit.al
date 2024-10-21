@@ -1701,10 +1701,12 @@
         GetBlockedCountriesJob: Codeunit "NPR TaxFree GBI2 GetBCountries";
         GetIINBlacklistJob: Codeunit "NPR TaxFree GBI2 GetBlockedIIN";
     begin
-        If Silent then begin
-            GlobalTaxFreeProfile.Get(TaxFreeRequest."Tax Free Profile");
-        end else begin
+        If Silent or (TaxFreeRequest."Tax Free Profile" <> '') then
+            GlobalTaxFreeProfile.Get(TaxFreeRequest."Tax Free Profile")
+        else begin
+            TaxFreeRequest.TestField("POS Unit No.");
             POSUnit.Get(TaxFreeRequest."POS Unit No.");
+            POSUnit.TestField("POS Tax Free Prof.");
             GlobalTaxFreeProfile.Get(POSUnit."POS Tax Free Prof.");
         end;
 
@@ -1725,8 +1727,14 @@
     var
         POSUnit: Record "NPR POS Unit";
     begin
-        POSUnit.Get(TaxFreeRequest."POS Unit No.");
-        GlobalTaxFreeProfile.Get(POSUnit."POS Tax Free Prof.");
+        if TaxFreeRequest."Tax Free Profile" <> '' then
+            GlobalTaxFreeProfile.Get(TaxFreeRequest."Tax Free Profile")
+        else begin
+            TaxFreeRequest.TestField("POS Unit No.");
+            POSUnit.Get(TaxFreeRequest."POS Unit No.");
+            POSUnit.TestField("POS Tax Free Prof.");
+            GlobalTaxFreeProfile.Get(POSUnit."POS Tax Free Prof.");
+        end;
         GlobalBlueParameters.Get(GlobalTaxFreeProfile."Tax Free Profile");
         DownloadDeskConfiguration(TaxFreeRequest);
     end;
