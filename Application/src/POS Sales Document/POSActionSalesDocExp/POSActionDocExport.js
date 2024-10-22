@@ -66,13 +66,13 @@ const main = async ({ workflow, parameters, captions }) => {
             },
           });
           if (scanVoucherResponse.success) {
-            scanVoucher = scanVoucherResponse.remainingSalesBalanceAmount !== 0;
+            scanVoucher = scanVoucherResponse.remainingSalesBalanceAmount > 0;
             remainingAmount = scanVoucherResponse.remainingSalesBalanceAmount;
           }
         }
       }
     }
-    if (remainingAmount !== 0) {
+    if (remainingAmount > 0) {
       const paymentResponse = await workflow.run("PAYMENT_2", {
         parameters: {
           paymentNo: parameters.POSPaymentMethodCode,
