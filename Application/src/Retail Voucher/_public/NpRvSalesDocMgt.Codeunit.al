@@ -785,7 +785,7 @@
         SalesAmount := CalculateSaleAmountWithThisPOSPaymentMethod(TempSalesLine, POSPaymentMethodCode);
     end;
 
-    local procedure DecreaseOnlySalesLineThatCanOnlyBePaidWithOtherVouchersPaymentTypes(var TempSalesLine: Record "Sales Line" temporary; var TempOtherPaymentVoucherLine: Record "NPR Magento Payment Line" temporary; POSPaymentMethodCode: Code[20])
+    internal procedure DecreaseOnlySalesLineThatCanOnlyBePaidWithOtherVouchersPaymentTypes(var TempSalesLine: Record "Sales Line" temporary; var TempOtherPaymentVoucherLine: Record "NPR Magento Payment Line" temporary; POSPaymentMethodCode: Code[20])
     var
         POSPmtMethodItemMgt: Codeunit "NPR POS Pmt. Method Item Mgt.";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
@@ -836,7 +836,7 @@
         TempOtherPaymentVoucherLine.DeleteAll();
     end;
 
-    local procedure DecreaseSalesLinesThatCanBePaidWithOtherVouchersPaymentTypes(var TempSalesLine: Record "Sales Line" temporary; var TempOtherPaymentVoucherLine: Record "NPR Magento Payment Line" temporary)
+    internal procedure DecreaseSalesLinesThatCanBePaidWithOtherVouchersPaymentTypes(var TempSalesLine: Record "Sales Line" temporary; var TempOtherPaymentVoucherLine: Record "NPR Magento Payment Line" temporary)
     var
         POSPmtMethodItemMgt: Codeunit "NPR POS Pmt. Method Item Mgt.";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
@@ -880,7 +880,7 @@
         until TempOtherPaymentVoucherLine.Next() = 0;
     end;
 
-    local procedure CalculateSaleAmountWithThisPOSPaymentMethod(var TempSaleSaleLine: Record "Sales Line" temporary; POSPaymentMethodCode: Code[20]) SaleAmount: Decimal
+    internal procedure CalculateSaleAmountWithThisPOSPaymentMethod(var TempSaleSaleLine: Record "Sales Line" temporary; POSPaymentMethodCode: Code[20]) SaleAmount: Decimal
     var
         POSPmtMethodItemMgt: Codeunit "NPR POS Pmt. Method Item Mgt.";
     begin
@@ -958,7 +958,81 @@
 
     end;
 
-    local procedure FindSalesLines(SalesHeader: Record "Sales Header"; var TempSalesLine: Record "Sales Line" temporary)
+    internal procedure CalcSalesOrderPaymentMethodItemPaymentAmountFromBuffers(SalesHeader: Record "Sales Header";
+                                                                               var TempVoucherSalesLine: Record "NPR NpRv Sales Line" temporary;
+                                                                               var TempDocumentMagentoPaymentLines: Record "NPR Magento Payment Line" temporary;
+                                                                               POSPaymentMethodCode: Code[10]) PaidAmount: Decimal;
+    var
+        TempRelatedVoucherSalesLine: Record "NPR NpRv Sales Line" temporary;
+        TempRelatedDocumentMagentoPaymentLines: Record "NPR Magento Payment Line" temporary;
+        TempRelatedMagentoPaymentLineProcessed: Record "NPR Magento Payment Line" temporary;
+        VoucherType: Record "NPR NpRv Voucher Type";
+        POSPmtMethodItemMgt: Codeunit "NPR POS Pmt. Method Item Mgt.";
+    begin
+        if SalesHeader."Document Type" <> SalesHeader."Document Type"::Order then
+            exit;
+
+        if not POSPmtMethodItemMgt.HasPOSPaymentMethodItemFilter(POSPaymentMethodCode) then
+            exit;
+        CopyVoucherSalesLineBuffer(TempVoucherSalesLine, TempRelatedVoucherSalesLine);
+        CopyMagentoPaymentLineBuffer(TempDocumentMagentoPaymentLines, TempRelatedDocumentMagentoPaymentLines);
+
+        TempVoucherSalesLine.Reset();
+        if not TempVoucherSalesLine.FindSet() then
+            exit;
+
+        repeat
+            VoucherType.Reset();
+            VoucherType.SetRange("Payment Type", POSPaymentMethodCode);
+            VoucherType.SetRange(Code, TempVoucherSalesLine."Voucher Type");
+            if not VoucherType.IsEmpty then begin
+                if not TempRelatedMagentoPaymentLineProcessed.Get(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", TempVoucherSalesLine."Document Line No.") then begin
+                    if TempDocumentMagentoPaymentLines.Get(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", TempVoucherSalesLine."Document Line No.") then
+                        PaidAmount += TempDocumentMagentoPaymentLines.Amount;
+
+                    if TempRelatedVoucherSalesLine.Get(TempVoucherSalesLine."Parent Id") then
+                        ProcessRelatedVoucherSalesLineWhenCalcSalesOrderPaymentMethodItemPaymentAmountFromBuffers(TempRelatedVoucherSalesLine,
+                                                                                                                  TempRelatedDocumentMagentoPaymentLines,
+                                                                                                                  PaidAmount,
+                                                                                                                  TempRelatedMagentoPaymentLineProcessed);
+
+                    TempRelatedVoucherSalesLine.Reset();
+                    TempRelatedVoucherSalesLine.SetRange("Parent Id", TempVoucherSalesLine.Id);
+                    TempRelatedVoucherSalesLine.SetLoadFields("Parent Id", "Document Line No.");
+                    if TempRelatedVoucherSalesLine.FindFirst() then
+                        ProcessRelatedVoucherSalesLineWhenCalcSalesOrderPaymentMethodItemPaymentAmountFromBuffers(TempRelatedVoucherSalesLine,
+                                                                                                                  TempRelatedDocumentMagentoPaymentLines,
+                                                                                                                  PaidAmount,
+                                                                                                                  TempRelatedMagentoPaymentLineProcessed);
+                end;
+            end;
+        until TempVoucherSalesLine.Next() = 0;
+    end;
+
+    local procedure ProcessRelatedVoucherSalesLineWhenCalcSalesOrderPaymentMethodItemPaymentAmountFromBuffers(RelatedVoucherSalesLine: Record "NPR NpRv Sales Line";
+                                                                                                              var TempRelatedMagentoPaymentLine: Record "NPR Magento Payment Line" temporary;
+                                                                                                              var PaidAmount: Decimal;
+                                                                                                              var TempRelatedMagentoPaymentLineProcessed: Record "NPR Magento Payment Line" temporary)
+    var
+        TempRelatedMagentoPaymentLineProcessedErrorLbl: Label 'Parameter TempRelatedMagentoPaymentLineProcessed must be temporary. This is a programming error.';
+    begin
+        if not TempRelatedMagentoPaymentLineProcessed.IsTemporary then
+            Error(TempRelatedMagentoPaymentLineProcessedErrorLbl);
+
+        if not TempRelatedMagentoPaymentLine.Get(Database::"Sales Header", RelatedVoucherSalesLine."Document Type", RelatedVoucherSalesLine."Document No.", RelatedVoucherSalesLine."Document Line No.") then
+            exit;
+
+        PaidAmount += TempRelatedMagentoPaymentLine.Amount;
+        if TempRelatedMagentoPaymentLineProcessed.Get(TempRelatedMagentoPaymentLine.RecordId) then
+            exit;
+
+        TempRelatedMagentoPaymentLineProcessed.Init();
+        TempRelatedMagentoPaymentLineProcessed := TempRelatedMagentoPaymentLine;
+        TempRelatedMagentoPaymentLineProcessed.Insert();
+
+    end;
+
+    internal procedure FindSalesLines(SalesHeader: Record "Sales Header"; var TempSalesLine: Record "Sales Line" temporary)
     var
         SalesLine: Record "Sales Line";
         TempSalesLineNotTemporaryErrorLbl: Label 'Parameter TempSalesLine must be temporary. This is a programming error.';
@@ -997,10 +1071,10 @@
         RelatedVoucherType: Record "NPR NpRv Voucher Type";
         TempMagentoPaymentLineProccessed: Record "NPR Magento Payment Line" temporary;
         SkipLine: Boolean;
-        TempOtherVoucherPaymentLineTemporaryErrorLbl: Label 'The parameter TempOtherVoucherPaymentLine must be temporary. This is a programming error.';
+        TempOtherVoucherPaymentLineTemporaryError: Label 'The parameter TempOtherVoucherPaymentLine must be temporary. This is a programming error.';
     begin
         if not TempOtherVoucherPaymentLine.IsTemporary then
-            Error(TempOtherVoucherPaymentLineTemporaryErrorLbl);
+            Error(TempOtherVoucherPaymentLineTemporaryError);
 
         TempOtherVoucherPaymentLine.Reset();
         if not TempOtherVoucherPaymentLine.IsEmpty then
@@ -1064,10 +1138,10 @@
     var
         RelatedVoucherType: Record "NPR NpRv Voucher Type";
         RelatedMagentoPaymentLine: Record "NPR Magento Payment Line";
-        TempRelatedProcessedSalesLinePOSErrorLbl: Label 'Parameter TempRelatedProcessedMagentoPaymentLine must be temporary. This is a programming error.';
+        TempRelatedProcessedSalesLinePOSError: Label 'Parameter TempRelatedProcessedMagentoPaymentLine must be temporary. This is a programming error.';
     begin
         if not TempRelatedProcessedMagentoPaymentLine.IsTemporary then
-            Error(TempRelatedProcessedSalesLinePOSErrorLbl);
+            Error(TempRelatedProcessedSalesLinePOSError);
 
         RelatedVoucherType.SetLoadFields("Payment Type");
         if not RelatedVoucherType.Get(RelatedVoucherSalesLine."Voucher Type") then
@@ -1159,10 +1233,9 @@
         ApplyPayment(SalesHeader, NpRvSalesLine);
     end;
 
-    internal procedure CreateMagentoPaymentLines(SalesHeader: Record "Sales Header"; var CurrVoucherSalesLine: Record "NPR NpRv Sales Line"; Amount: Decimal)
+    internal procedure CreateMagentoPaymentLines(SalesHeader: Record "Sales Header"; var CurrVoucherSalesLine: Record "NPR NpRv Sales Line"; Amount: Decimal; var MagentoPaymentLine: Record "NPR Magento Payment Line")
     var
         VoucherType: Record "NPR NpRv Voucher Type";
-        MagentoPaymentLine: Record "NPR Magento Payment Line";
         RelatedVoucherSalesLine: Record "NPR NpRv Sales Line";
         RelatedSaleLinePOS: Record "NPR POS Sale Line";
         LineNo: Decimal;
@@ -1379,6 +1452,285 @@
             end;
             Commit();
         end;
+    end;
+
+    internal procedure FindOtherVoucherPaymentLinesFromBuffers(var TempOtherVoucherPaymentLine: Record "NPR Magento Payment Line" temporary;
+                                                               var TempDocumentMagentoPaymentLine: Record "NPR Magento Payment Line" temporary;
+                                                               var TempCurrVoucherSalesLine: Record "NPR NpRv Sales Line" temporary;
+                                                               POSPaymentMethodCode: Code[10])
+    var
+
+        TempCurrMagentoPaymentLine: Record "NPR Magento Payment Line" temporary;
+        TempRelatedDocumentMagentoPaymentLine: Record "NPR Magento Payment Line" temporary;
+        TempRelatedVoucherSalesLine: Record "NPR NpRv Sales Line" temporary;
+        Voucher: Record "NPR NpRv Voucher";
+        VoucherType: Record "NPR NpRv Voucher Type";
+        RelatedVoucherType: Record "NPR NpRv Voucher Type";
+        TempMagentoPaymentLineProccessed: Record "NPR Magento Payment Line" temporary;
+        SkipLine: Boolean;
+        TempOtherVoucherPaymentLineTemporaryErrorLbl: Label 'The parameter TempOtherVoucherPaymentLine must be temporary. This is a programming error.';
+    begin
+        if not TempOtherVoucherPaymentLine.IsTemporary then
+            Error(TempOtherVoucherPaymentLineTemporaryErrorLbl);
+
+        TempOtherVoucherPaymentLine.Reset();
+        if not TempOtherVoucherPaymentLine.IsEmpty then
+            TempOtherVoucherPaymentLine.DeleteAll();
+
+        CopyVoucherSalesLineBuffer(TempCurrVoucherSalesLine, TempRelatedVoucherSalesLine);
+        CopyMagentoPaymentLineBuffer(TempDocumentMagentoPaymentLine, TempRelatedDocumentMagentoPaymentLine);
+
+        TempDocumentMagentoPaymentLine.Reset();
+        TempDocumentMagentoPaymentLine.SetRange("Payment Type", TempDocumentMagentoPaymentLine."Payment Type"::Voucher);
+        if not TempDocumentMagentoPaymentLine.FindSet() then begin
+            TempDocumentMagentoPaymentLine.Reset();
+            exit;
+        end;
+
+        repeat
+            if not TempMagentoPaymentLineProccessed.get(TempDocumentMagentoPaymentLine.RecordId) then begin
+                TempCurrMagentoPaymentLine := TempDocumentMagentoPaymentLine;
+
+                Voucher.SetCurrentKey("Reference No.");
+                Voucher.SetRange("Reference No.", TempCurrMagentoPaymentLine."No.");
+                Voucher.SetLoadFields("Reference No.", "Voucher Type");
+                if Voucher.FindFirst() then begin
+                    VoucherType.SetLoadFields(Code, "Payment Type");
+                    if VoucherType.Get(Voucher."Voucher Type") then
+                        if VoucherType."Payment Type" <> POSPaymentMethodCode then begin
+                            SkipLine := false;
+
+                            TempCurrVoucherSalesLine.Reset();
+                            TempCurrVoucherSalesLine.SetRange("Document Type", TempCurrVoucherSalesLine."Document Type"::Order);
+                            TempCurrVoucherSalesLine.SetRange("Document Source", TempCurrVoucherSalesLine."Document Source"::"Payment Line");
+                            TempCurrVoucherSalesLine.SetRange("Document No.", TempCurrMagentoPaymentLine."Document No.");
+                            TempCurrVoucherSalesLine.SetRange("Document Line No.", TempCurrMagentoPaymentLine."Line No.");
+                            if TempCurrVoucherSalesLine.FindFirst() then begin
+                                if TempRelatedVoucherSalesLine.Get(TempCurrVoucherSalesLine."Parent Id") then begin
+                                    RelatedVoucherType.SetLoadFields("Payment Type");
+                                    if RelatedVoucherType.Get(TempRelatedVoucherSalesLine."Voucher Type") then
+                                        ProcessRelatedVoucherSalesLineWhenFindingOtherPaymentLines(TempCurrMagentoPaymentLine,
+                                                                                                    TempRelatedVoucherSalesLine,
+                                                                                                    SkipLine,
+                                                                                                    POSPaymentMethodCode,
+                                                                                                    TempRelatedDocumentMagentoPaymentLine,
+                                                                                                    TempMagentoPaymentLineProccessed);
+                                end;
+
+                                TempRelatedVoucherSalesLine.Reset();
+                                TempRelatedVoucherSalesLine.SetRange("Parent Id", TempCurrVoucherSalesLine.Id);
+                                if TempRelatedVoucherSalesLine.FindFirst() then
+                                    ProcessRelatedVoucherSalesLineWhenFindingOtherPaymentLines(TempCurrMagentoPaymentLine,
+                                                                                               TempRelatedVoucherSalesLine,
+                                                                                               SkipLine,
+                                                                                               POSPaymentMethodCode,
+                                                                                               TempRelatedDocumentMagentoPaymentLine,
+                                                                                               TempMagentoPaymentLineProccessed);
+                            end;
+
+                            if not SkipLine then begin
+                                TempOtherVoucherPaymentLine.Init();
+                                TempOtherVoucherPaymentLine := TempCurrMagentoPaymentLine;
+                                TempOtherVoucherPaymentLine.Insert();
+                            end;
+                        end
+                end;
+            end;
+        until TempDocumentMagentoPaymentLine.Next() = 0;
+    end;
+
+    local procedure ProcessRelatedVoucherSalesLineWhenFindingOtherPaymentLines(var CurrMagentoPaymentLine: Record "NPR Magento Payment Line" temporary;
+                                                                                RelatedVoucherSalesLine: Record "NPR NpRv Sales Line";
+                                                                                var SkipLine: Boolean;
+                                                                                POSPaymentMethodCode: Code[10];
+                                                                                var TempRelatedVoucherSalesLine: Record "NPR Magento Payment Line" temporary;
+                                                                                var TempRelatedProcessedMagentoPaymentLine: Record "NPR Magento Payment Line" temporary)
+    var
+        RelatedVoucherType: Record "NPR NpRv Voucher Type";
+        TempRelatedProcessedSalesLinePOSErrorLbl: Label 'Parameter TempRelatedProcessedMagentoPaymentLine must be temporary. This is a programming error.';
+    begin
+        if not TempRelatedProcessedMagentoPaymentLine.IsTemporary then
+            Error(TempRelatedProcessedSalesLinePOSErrorLbl);
+
+        RelatedVoucherType.SetLoadFields("Payment Type");
+        if not RelatedVoucherType.Get(RelatedVoucherSalesLine."Voucher Type") then
+            exit;
+
+        SkipLine := SkipLine or (RelatedVoucherType."Payment Type" = POSPaymentMethodCode);
+        if SkipLine then
+            exit;
+
+        if not TempRelatedVoucherSalesLine.Get(Database::"Sales Header", RelatedVoucherSalesLine."Document Type", RelatedVoucherSalesLine."Document No.", RelatedVoucherSalesLine."Document Line No.") then
+            exit;
+
+        CurrMagentoPaymentLine."Amount" += TempRelatedVoucherSalesLine."Amount";
+        if TempRelatedProcessedMagentoPaymentLine.Get(TempRelatedVoucherSalesLine.RecordId) then
+            exit;
+
+        TempRelatedProcessedMagentoPaymentLine := TempRelatedVoucherSalesLine;
+        TempRelatedProcessedMagentoPaymentLine.Insert();
+    end;
+
+    local procedure CopyMagentoPaymentLineBuffer(var TempFromMagentoPaymentLineBuffer: Record "NPR Magento Payment Line" temporary; var TempToMagentoPaymentLineBuffer: Record "NPR Magento Payment Line" temporary)
+    var
+        TempFromMagentoPaymentLineBufferErrorLbl: Label 'Parameter TempFromMagentoPaymentLineBuffer must be temporary. This is a programming error.';
+        TempToMagentoPaymentLineBufferErrorLbl: Label 'Parameter TempToMagentoPaymentLineBuffer must be temporary. This is a programming error.';
+    begin
+        if not TempFromMagentoPaymentLineBuffer.IsTemporary then
+            Error(TempFromMagentoPaymentLineBufferErrorLbl);
+
+        if not TempToMagentoPaymentLineBuffer.IsTemporary then
+            Error(TempToMagentoPaymentLineBufferErrorLbl);
+
+        TempToMagentoPaymentLineBuffer.Reset();
+        if not TempToMagentoPaymentLineBuffer.IsEmpty then
+            TempToMagentoPaymentLineBuffer.DeleteAll();
+
+        if not TempFromMagentoPaymentLineBuffer.FindSet() then
+            exit;
+
+        repeat
+            TempToMagentoPaymentLineBuffer.Init();
+            TempToMagentoPaymentLineBuffer := TempFromMagentoPaymentLineBuffer;
+            TempToMagentoPaymentLineBuffer.Insert();
+        until TempFromMagentoPaymentLineBuffer.Next() = 0;
+    end;
+
+    local procedure CopyVoucherSalesLineBuffer(var TempFromVoucherSalesLine: Record "NPR NpRv Sales Line" temporary; var TempToVoucherSalesLine: Record "NPR NpRv Sales Line" temporary)
+    var
+        TempFromVoucherSalesLineErrorLbl: Label 'Parameter TempFromVoucherSalesLine must be temporary. This is a programming error.';
+        TempToVoucherSalesLineErrorLbl: Label 'Parameter TempToVoucherSalesLine must be temporary. This is a programming error.';
+    begin
+        if not TempFromVoucherSalesLine.IsTemporary then
+            Error(TempFromVoucherSalesLineErrorLbl);
+
+        if not TempToVoucherSalesLine.IsTemporary then
+            Error(TempToVoucherSalesLineErrorLbl);
+
+        TempToVoucherSalesLine.Reset();
+        if not TempToVoucherSalesLine.IsEmpty then
+            TempToVoucherSalesLine.DeleteAll();
+
+        if not TempFromVoucherSalesLine.FindSet() then
+            exit;
+
+        repeat
+            TempToVoucherSalesLine.Init();
+            TempToVoucherSalesLine := TempFromVoucherSalesLine;
+            TempToVoucherSalesLine.Insert();
+        until TempFromVoucherSalesLine.Next() = 0;
+
+    end;
+
+    internal procedure GetVoucherSalesLinesPOSBuffer(SalesTicketNo: Code[20]; RegisterNo: Code[20]; var TempVoucherSalesLine: Record "NPR NpRv Sales Line" temporary)
+    var
+        CurrVoucherSalesLine: Record "NPR NpRv Sales Line";
+        TempVoucherSalesLineErrorLbl: Label 'TempVoucherSalesLine must be temporary. This is a programming error.';
+    begin
+        if not TempVoucherSalesLine.IsTemporary then
+            Error(TempVoucherSalesLineErrorLbl);
+
+        TempVoucherSalesLine.Reset();
+        if not TempVoucherSalesLine.IsEmpty then
+            TempVoucherSalesLine.DeleteAll();
+
+        CurrVoucherSalesLine.Reset();
+        CurrVoucherSalesLine.SetRange("Sales Ticket No.", SalesTicketNo);
+        CurrVoucherSalesLine.SetRange("Register No.", RegisterNo);
+        if not CurrVoucherSalesLine.FindSet() then
+            exit;
+
+        repeat
+            TempVoucherSalesLine.Init();
+            TempVoucherSalesLine := CurrVoucherSalesLine;
+            TempVoucherSalesLine.Insert();
+        until CurrVoucherSalesLine.Next() = 0;
+    end;
+
+    internal procedure GetSalesPOSVoucherLinesAsSalesDocumentMagentoPaymentLines(SalesHeader: Record "Sales Header"; var TempVoucherSalesLine: Record "NPR NpRv Sales Line" temporary; var TempSalesLinePOS: Record "NPR POS Sale Line" temporary; var TempMagentoPaymentLine: Record "NPR Magento Payment Line" temporary)
+    var
+        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
+        TempVoucherSalesLineErrorLbl: Label 'Parameter TempVoucherSalesLine must be temporary. This is a programming error.';
+        TempSalesLinePOSErrorLbl: Label 'Parameter TempSalesLinePOS must be temporary. This is a programming error.';
+        TempMagentoPaymentLineErrorLbl: Label 'Parameter TempMagentoPaymentLine must be temporary. This is a programming error.';
+    begin
+        if not TempVoucherSalesLine.IsTemporary then
+            Error(TempVoucherSalesLineErrorLbl);
+
+        if not TempSalesLinePOS.IsTemporary then
+            Error(TempSalesLinePOSErrorLbl);
+
+        if not TempMagentoPaymentLine.IsTemporary then
+            Error(TempMagentoPaymentLineErrorLbl);
+
+        TempVoucherSalesLine.Reset();
+        if not TempVoucherSalesLine.FindSet() then
+            exit;
+
+        repeat
+            if TempSalesLinePOS.GetBySystemId(TempVoucherSalesLine."Retail ID") then
+                NpRvSalesDocMgt.CreateMagentoPaymentLines(SalesHeader, TempVoucherSalesLine, TempSalesLinePOS."Amount Including VAT", TempMagentoPaymentLine);
+        until TempVoucherSalesLine.Next() = 0;
+    end;
+
+
+    internal procedure GetSalesDocumentVoucherLines(SalesHeader: Record "Sales Header"; var TempVoucherSalesLine: Record "NPR NpRv Sales Line" temporary)
+    var
+        VoucherSalesLine: Record "NPR NpRv Sales Line";
+        TempVoucherSalesLineErrorLbl: Label 'Parameter TempVoucherSalesLine must be temporary. This is a programming error.';
+    begin
+        if not TempVoucherSalesLine.IsTemporary then
+            Error(TempVoucherSalesLineErrorLbl);
+
+        TempVoucherSalesLine.Reset();
+        if not TempVoucherSalesLine.IsEmpty then
+            TempVoucherSalesLine.DeleteAll();
+
+        VoucherSalesLine.Reset();
+        VoucherSalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        VoucherSalesLine.SetRange("Document No.", SalesHeader."No.");
+        VoucherSalesLine.SetRange("Document Source", VoucherSalesLine."Document Source"::"Payment Line");
+        if not VoucherSalesLine.FindSet() then
+            exit;
+
+        repeat
+            TempVoucherSalesLine.Init();
+            TempVoucherSalesLine := VoucherSalesLine;
+            TempVoucherSalesLine.Insert();
+        until VoucherSalesLine.Next() = 0;
+
+    end;
+
+    internal procedure GetSalesDocumentMagentoPaymentLines(SalesHeader: Record "Sales Header"; var TempSalesDocumentMagentoPaymentLines: Record "NPR Magento Payment Line" temporary)
+    var
+        TempSalesDocumentMagentoPaymentLinesErrorLbl: Label 'Parameter TempSalesDocumentMagentoPaymentLines must be temporary. This is a programming error.';
+        SalesDocumentMagentoPaymentLine: Record "NPR Magento Payment Line";
+    begin
+        if not TempSalesDocumentMagentoPaymentLines.IsTemporary then
+            Error(TempSalesDocumentMagentoPaymentLinesErrorLbl);
+
+        if not TempSalesDocumentMagentoPaymentLines.IsEmpty then
+            TempSalesDocumentMagentoPaymentLines.DeleteAll();
+
+        SalesDocumentMagentoPaymentLine.Reset();
+        SalesDocumentMagentoPaymentLine.SetRange("Document Table No.", Database::"Sales Header");
+        SalesDocumentMagentoPaymentLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesDocumentMagentoPaymentLine.SetRange("Document No.", SalesHeader."No.");
+        if not SalesDocumentMagentoPaymentLine.FindSet() then
+            exit;
+
+        repeat
+            TempSalesDocumentMagentoPaymentLines.Init();
+            TempSalesDocumentMagentoPaymentLines := SalesDocumentMagentoPaymentLine;
+            TempSalesDocumentMagentoPaymentLines.Insert()
+        until SalesDocumentMagentoPaymentLine.Next() = 0;
+    end;
+
+    internal procedure CalcPaidAmountFromMagentoPaymentLineBuffer(var TempMagentoPaymentLine: Record "NPR Magento Payment Line" temporary) PaidAmount: Decimal;
+    begin
+        TempMagentoPaymentLine.Reset();
+        TempMagentoPaymentLine.CalcSums(Amount);
+        PaidAmount := TempMagentoPaymentLine.Amount;
     end;
 
     [IntegrationEvent(false, false)]

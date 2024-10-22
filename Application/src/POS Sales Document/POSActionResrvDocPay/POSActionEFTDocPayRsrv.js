@@ -23,13 +23,13 @@ async function main({ workflow, parameters, captions }) {
           },
         });
         if (scanVoucherResponse.success) {
-          scanVoucher = scanVoucherResponse.remainingAmount !== 0;
-          remainingAmount = scanVoucherResponse.remainingAmount;
+          scanVoucher = scanVoucherResponse.remainingSalesBalanceAmount > 0;
+          remainingAmount = scanVoucherResponse.remainingSalesBalanceAmount;
         }
       }
     }
   }
-  if (remainingAmount !== 0) {
+  if (remainingAmount > 0) {
     const paymentWorkflowResponse = await workflow.run("PAYMENT_2", {
       parameters: {
         HideAmountDialog: true,

@@ -105,7 +105,10 @@
         if not POSPmtMethodItemMgt.HasPOSPaymentMethodItemFilter(POSPaymentMethod.Code) then
             CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, Subtotal)
         else
-            CalculateBalanceV2(POSPaymentMethod.Code, SaleAmount, PaidAmount, ReturnAmount, Subtotal);
+            if IsDocumentPaymentReservation() then
+                CalculateBalanceFromCombinedEntries(POSPaymentMethod.Code, SaleAmount, PaidAmount, ReturnAmount, Subtotal)
+            else
+                CalculateBalanceV2(POSPaymentMethod.Code, SaleAmount, PaidAmount, ReturnAmount, Subtotal);
 
     end;
 
@@ -809,6 +812,125 @@
         if not POSPaymentMethodItem.IsEmpty() then
             if AmountToCapture > DefaultAmountToCapture then
                 Error(AmountIncreasedErr, POSPaymentMethod.Description);
+    end;
+
+    internal procedure CalculateBalanceFromCombinedEntries(POSPaymentMethodCode: Code[10]; var SaleAmount: Decimal; var PaidAmount: Decimal; var ReturnAmount: Decimal; var Subtotal: Decimal)
+    var
+        SalesHeader: Record "Sales Header";
+        TempVoucherSalesLine: Record "NPR NpRv Sales Line" temporary;
+        TempDocumentVoucherSalesLine: Record "NPR NpRv Sales Line" temporary;
+        TempDocumentMagentoPaymentLines: Record "NPR Magento Payment Line" temporary;
+        TempSalesLinePOS: Record "NPR POS Sale Line" temporary;
+        TempSalesLine: Record "Sales Line" temporary;
+        TempOtherVoucherPaymentLines: Record "NPR Magento Payment Line" temporary;
+        NPRNpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
+        TotalPaidAmount: Decimal;
+        TotalSalesAmount: Decimal;
+        TotalSubtotal: Decimal;
+    begin
+        GetSalesLinesPOSAsBuffer(SalesTicketNo, RegisterNo, TempSalesLinePOS);
+
+        TempSalesLinePOS.Reset();
+        TempSalesLinePOS.SetFilter("Sales Document No.", '<>%1', '');
+        if TempSalesLinePOS.FindFirst() then
+            if not SalesHeader.Get(TempSalesLinePOS."Sales Document Type", TempSalesLinePOS."Sales Document No.") then
+                Clear(SalesHeader);
+
+        TempSalesLinePOS.Reset();
+        NPRNpRvSalesDocMgt.GetSalesDocumentMagentoPaymentLines(SalesHeader, TempDocumentMagentoPaymentLines);
+        NPRNpRvSalesDocMgt.GetVoucherSalesLinesPOSBuffer(SalesTicketNo, RegisterNo, TempVoucherSalesLine);
+
+        NPRNpRvSalesDocMgt.GetSalesPOSVoucherLinesAsSalesDocumentMagentoPaymentLines(SalesHeader, TempVoucherSalesLine, TempSalesLinePOS, TempDocumentMagentoPaymentLines);
+        NPRNpRvSalesDocMgt.GetSalesDocumentVoucherLines(SalesHeader, TempDocumentVoucherSalesLine);
+        CopyVoucherSalesLines(TempDocumentVoucherSalesLine, TempVoucherSalesLine);
+        NPRNpRvSalesDocMgt.FindSalesLines(SalesHeader, TempSalesLine);
+
+        TotalPaidAmount := NPRNpRvSalesDocMgt.CalcPaidAmountFromMagentoPaymentLineBuffer(TempDocumentMagentoPaymentLines);
+        TotalSalesAmount := CalcSalesAmountFromBuffer(TempSalesLine);
+        TotalSubtotal := TotalSalesAmount - TotalPaidAmount;
+
+        NPRNpRvSalesDocMgt.FindOtherVoucherPaymentLinesFromBuffers(TempOtherVoucherPaymentLines, TempDocumentMagentoPaymentLines, TempVoucherSalesLine, POSPaymentMethodCode);
+        NPRNpRvSalesDocMgt.DecreaseOnlySalesLineThatCanOnlyBePaidWithOtherVouchersPaymentTypes(TempSalesLine, TempOtherVoucherPaymentLines, POSPaymentMethodCode);
+        NPRNpRvSalesDocMgt.DecreaseSalesLinesThatCanBePaidWithOtherVouchersPaymentTypes(TempSalesLine, TempOtherVoucherPaymentLines);
+        SaleAmount := NPRNpRvSalesDocMgt.CalculateSaleAmountWithThisPOSPaymentMethod(TempSalesLine, POSPaymentMethodCode);
+        PaidAmount := NPRNpRvSalesDocMgt.CalcSalesOrderPaymentMethodItemPaymentAmountFromBuffers(SalesHeader, TempVoucherSalesLine, TempDocumentMagentoPaymentLines, POSPaymentMethodCode);
+
+        Subtotal := SaleAmount - PaidAmount;
+        if Subtotal > TotalSubtotal then begin
+            Subtotal := TotalSubtotal;
+            SaleAmount := TotalSalesAmount;
+            PaidAmount := TotalPaidAmount;
+        end;
+
+        ReturnAmount := SaleAmount - PaidAmount;
+    end;
+
+    local procedure IsDocumentPaymentReservation() DocumentPaymentReservation: Boolean;
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+    begin
+        SaleLinePOS.Reset();
+        SaleLinePOS.SetRange("Sales Ticket No.", SalesTicketNo);
+        SaleLinePOS.SetRange("Register No.", RegisterNo);
+        SaleLinePOS.SetRange("Document Payment Reservation", true);
+        DocumentPaymentReservation := not SaleLinePOS.IsEmpty;
+    end;
+
+    local procedure GetSalesLinesPOSAsBuffer(CurrSalesTicketNo: Code[20]; CurrRegisterNo: Code[20]; var TempSalesLinePOS: Record "NPR POS Sale Line" temporary)
+    var
+        SalesLinePOS: Record "NPR POS Sale Line";
+        TempVoucherSalesLineErrorLbl: Label 'TempSalesLinePOS must be temporary. This is a programming error.';
+    begin
+        if not TempSalesLinePOS.IsTemporary then
+            Error(TempVoucherSalesLineErrorLbl);
+
+        TempSalesLinePOS.Reset();
+        if not TempSalesLinePOS.IsEmpty then
+            TempSalesLinePOS.DeleteAll();
+
+        SalesLinePOS.Reset();
+        SalesLinePOS.SetRange("Sales Ticket No.", CurrSalesTicketNo);
+        SalesLinePOS.SetRange("Register No.", CurrRegisterNo);
+        if not SalesLinePOS.FindSet() then
+            exit;
+
+        repeat
+            TempSalesLinePOS.Init();
+            TempSalesLinePOS := SalesLinePOS;
+            TempSalesLinePOS.Insert();
+        until SalesLinePOS.Next() = 0;
+    end;
+
+    local procedure CopyVoucherSalesLines(var FromVoucherSalesLines: Record "NPR NpRv Sales Line"; var ToVoucherSalesLines: Record "NPR NpRv Sales Line")
+    begin
+        if not FromVoucherSalesLines.FindSet() then
+            exit;
+
+        repeat
+            if not ToVoucherSalesLines.Get(FromVoucherSalesLines.RecordId) then begin
+                ToVoucherSalesLines.Init();
+                ToVoucherSalesLines := FromVoucherSalesLines;
+                ToVoucherSalesLines.Insert();
+            end
+        until FromVoucherSalesLines.Next() = 0;
+    end;
+
+    local procedure CalcSalesAmountFromBuffer(var TempSalesLine: Record "Sales Line" temporary) SalesAmount: Decimal;
+    var
+        TempCurrSalesLine: Record "Sales Line" temporary;
+    begin
+        TempCurrSalesLine := TempSalesLine;
+        TempCurrSalesLine.CopyFilters(TempSalesLine);
+
+        TempSalesLine.Reset();
+        TempSalesLine.SetRange(Type, TempSalesLine.Type::Item);
+        TempSalesLine.CalcSums("Amount Including VAT");
+
+        SalesAmount := TempSalesLine."Amount Including VAT";
+
+        TempSalesLine := TempCurrSalesLine;
+        TempSalesLine.Reset();
+        TempSalesLine.CopyFilters(TempCurrSalesLine);
     end;
 
     [IntegrationEvent(false, false)]
