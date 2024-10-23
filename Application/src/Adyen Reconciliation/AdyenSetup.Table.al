@@ -25,19 +25,19 @@ table 6150801 "NPR Adyen Setup"
 
             trigger OnValidate()
             var
-                WebService: Record "Web Service Aggregate";
-                WebServiceManagement: Codeunit "Web Service Management";
-                AdyenManagement: Codeunit "NPR Adyen Management";
-                ProcessReconciliationWebhookLbl: Label 'Process Reconciliation Webhooks';
-                WebhookSetup: Record "NPR Adyen Webhook Setup";
                 MerchantAccount: Record "NPR Adyen Merchant Account";
-                AdyenWebhookType: Enum "NPR Adyen Webhook Type";
+                WebhookSetup: Record "NPR Adyen Webhook Setup";
+                WebService: Record "Web Service Aggregate";
+                AdyenManagement: Codeunit "NPR Adyen Management";
+                AdyenTrMatchingSession: Codeunit "NPR Adyen Tr. Matching Session";
+                WebServiceManagement: Codeunit "Web Service Management";
                 ReportReadyEventFilter: Label 'REPORT_AVAILABLE', Locked = true;
+                AdyenWebhookType: Enum "NPR Adyen Webhook Type";
             begin
                 TestField("Management API Key");
+                AdyenTrMatchingSession.SetupReconciliationTaskProcessingJobQueue("Enable Reconciliation");
                 if "Enable Reconciliation" then begin
                     WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, Codeunit::"NPR AF Rec. API Request", 'AdyenWebhook', true);
-                    AdyenManagement.CreateAdyenJob(Codeunit::"NPR Adyen Tr. Matching Session", ProcessReconciliationWebhookLbl, 1440);
                     AdyenManagement.UpdateMerchantList(0);
                     if MerchantAccount.FindSet() then
                         repeat
@@ -46,11 +46,8 @@ table 6150801 "NPR Adyen Setup"
                         until MerchantAccount.Next() = 0;
                     "Enable Automatic Posting" := true;
                     Modify();
-                end else begin
+                end else
                     WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, Codeunit::"NPR AF Rec. API Request", 'AdyenWebhook', false);
-                    AdyenManagement.CancelAdyenJob(Codeunit::"NPR Adyen Tr. Matching Session");
-
-                end;
             end;
         }
         field(30; "Management Base URL"; Text[2048])

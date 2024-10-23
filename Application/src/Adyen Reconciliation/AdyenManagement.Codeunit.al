@@ -381,33 +381,51 @@ codeunit 6184796 "NPR Adyen Management"
         end;
     end;
 
-    internal procedure CreateAdyenJob(CodeunitID: Integer; JobDescription: Text; NoOfMinutesBetweenRuns: Integer)
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-        JobQueueMgt: Codeunit "NPR Job Queue Management";
-    begin
-        if JobQueueMgt.InitRecurringJobQueueEntry(
-                JobQueueEntry."Object Type to Run"::Codeunit, CodeunitID,
-                '', JobDescription,
-                CreateDateTime(Today(), 070000T), NoOfMinutesBetweenRuns,
-                '', JobQueueEntry)
-            then
-            JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
-    end;
-
     internal procedure CreateAutoRescheduleAdyenJob(CodeunitID: Integer; JobDescription: Text; NoOfMinutesBetweenRuns: Integer; AutoRescheduleDelaySec: Integer)
     var
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueMgt: Codeunit "NPR Job Queue Management";
     begin
         JobQueueMgt.SetJobTimeout(4, 0);  // 4 hours
-        JobQueueMgt.SetAutoRescheduleAndNotifyOnError(true, AutoRescheduleDelaySec, '');
+        if AutoRescheduleDelaySec > 0 then
+            JobQueueMgt.SetAutoRescheduleAndNotifyOnError(true, AutoRescheduleDelaySec, '');
         if JobQueueMgt.InitRecurringJobQueueEntry(
-                JobQueueEntry."Object Type to Run"::Codeunit, CodeunitID,
-                '', JobDescription,
-                CreateDateTime(Today(), 070000T), NoOfMinutesBetweenRuns,
-                '', JobQueueEntry)
+                JobQueueEntry."Object Type to Run"::Codeunit,
+                CodeunitID,
+                '',
+                JobDescription,
+                CreateDateTime(Today(), 070000T),
+                NoOfMinutesBetweenRuns,
+                '',
+                JobQueueEntry)
             then
+            JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
+    end;
+
+    internal procedure CreateAutoRescheduleAdyenJob(CodeunitID: Integer; JobDescription: Text; AutoRescheduleDelaySec: Integer)
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
+        NotBeforeDateTime: DateTime;
+        NextRunDateFormula: DateFormula;
+    begin
+        NotBeforeDateTime := CreateDateTime(Today, 070000T);
+        Evaluate(NextRunDateFormula, '<1D>');
+        JobQueueMgt.SetJobTimeout(4, 0);  // 4 hours
+        if AutoRescheduleDelaySec > 0 then
+            JobQueueMgt.SetAutoRescheduleAndNotifyOnError(true, AutoRescheduleDelaySec, '');
+        if JobQueueMgt.InitRecurringJobQueueEntry(
+            JobQueueEntry."Object Type to Run"::Codeunit,
+            CodeunitID,
+            '',
+            JobDescription,
+            NotBeforeDateTime,
+            DT2Time(NotBeforeDateTime),
+            080000T,
+            NextRunDateFormula,
+            '',
+            JobQueueEntry)
+        then
             JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
     end;
 
@@ -696,14 +714,15 @@ codeunit 6184796 "NPR Adyen Management"
 
     internal procedure SetReconciledEFTMagentoUpgrade()
     var
-        ConfirmLabel01: Label 'This action will set status ''Reconciled'' to ''True'' for all EFT Transaction Request and Magento Payment Line Entries that were created before ''Reconciliation Integration Starting Date'' (%1).\Are you sure to continue?';
-        ConfirmLabel02: Label 'Warning.\\This will lock both EFT Transaction Requests and Magento Payment Lines.\Don''t close this window until the process is done.';
+        ConfirmLabel01: Label 'This will mark all payment entries created before the ''Reconciliation Integration Starting Date'' (%1) as ''Reconciled''. These entries will not be included in any future NP Pay Reconciliation Matching.\Please note that running this function can take a considerable amount of time.\\Are you sure you want to continue?';
         UpdatingEFTLbl: Label 'Updating EFT Transaction Request entries...\\Updating #1 Entry out of #2.';
         UpdatingMagentoLbl: Label 'Updating Magento Payment Line entries...\\Updating #1 Entry out of #2.';
         EFTUpdateDoneLbl: Label 'Successfully updated %1 EFT Transaction Requests.';
         EFTUpdateNullLbl: Label 'No EFT Transaction Requests were updated.';
+        EmptyStartingDateLbl: Label 'Please specify the Reconciliation Integration Starting Date first.';
         MagentoUpdateDoneLbl: Label 'Successfully updated %1 Magento Payment Lines.';
         MagentoUpdateNullLbl: Label 'No Magento Payment Lines were updated.';
+        AdyenSetup: Record "NPR Adyen Setup";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         PaymentGateway: Record "NPR Magento Payment Gateway";
@@ -715,17 +734,15 @@ codeunit 6184796 "NPR Adyen Management"
         Window: Dialog;
         FilterPGCodes: Text;
     begin
-        if not InitiateAdyenManagement() then
+        if not AdyenSetup.Get() then
             exit;
-        if _AdyenSetup."Recon. Integr. Starting Date" = 0DT then
-            exit;
-        if not Confirm(ConfirmLabel01, false, Format(_AdyenSetup."Recon. Integr. Starting Date")) then
-            exit;
-        if not Confirm(ConfirmLabel02) then
+        if AdyenSetup."Recon. Integr. Starting Date" = 0DT then
+            Error(EmptyStartingDateLbl);
+        if not Confirm(ConfirmLabel01, false, Format(AdyenSetup."Recon. Integr. Starting Date")) then
             exit;
 
         Clear(ProcessedEntries);
-        EFTTransactionRequest.SetFilter(Finished, '<%1', _AdyenSetup."Recon. Integr. Starting Date");
+        EFTTransactionRequest.SetFilter(Finished, '<%1', AdyenSetup."Recon. Integr. Starting Date");
         EFTTransactionRequest.SetRange(Reconciled, false);
         EFTTransactionRequest.SetRange("Financial Impact", true);
         EFTTransactionRequest.SetFilter("Integration Type", '%1|%2', AdyenCloudIntegration.IntegrationType(), AdyenLocalIntegration.IntegrationType());
@@ -749,7 +766,7 @@ codeunit 6184796 "NPR Adyen Management"
             Message(EFTUpdateNullLbl);
 
         Clear(ProcessedEntries);
-        MagentoPaymentLine.SetFilter("Date Captured", '<%1', DT2Date(_AdyenSetup."Recon. Integr. Starting Date"));
+        MagentoPaymentLine.SetFilter("Date Captured", '<%1', DT2Date(AdyenSetup."Recon. Integr. Starting Date"));
         MagentoPaymentLine.SetRange(Reconciled, false);
 
         PaymentGateway.Reset();

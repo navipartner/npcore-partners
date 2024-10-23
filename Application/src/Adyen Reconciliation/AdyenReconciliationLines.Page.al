@@ -275,18 +275,24 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                         case Rec."Matching Table Name" of
                             Rec."Matching Table Name"::"EFT Transaction":
                                 begin
-                                    if EFTTransaction.GetBySystemId(Rec."Matching Entry System ID") then
-                                        Page.RunModal(Page::"NPR EFT Transaction Requests", EFTTransaction);
+                                    EFTTransaction.FilterGroup(2);
+                                    EFTTransaction.SetRange(SystemId, Rec."Matching Entry System ID");
+                                    EFTTransaction.FilterGroup(0);
+                                    Page.Run(Page::"NPR EFT Transaction Requests", EFTTransaction);
                                 end;
                             Rec."Matching Table Name"::"G/L Entry":
                                 begin
-                                    if GLEntry.GetBySystemId(Rec."Matching Entry System ID") then
-                                        Page.RunModal(Page::"General Ledger Entries", GLEntry);
+                                    GLEntry.FilterGroup(2);
+                                    GLEntry.SetRange(SystemId, Rec."Matching Entry System ID");
+                                    GLEntry.FilterGroup(0);
+                                    Page.Run(Page::"General Ledger Entries", GLEntry);
                                 end;
                             Rec."Matching Table Name"::"Magento Payment Line":
                                 begin
-                                    if MagentoPaymentLine.GetBySystemId(Rec."Matching Entry System ID") then
-                                        Page.RunModal(Page::"NPR Magento Payment Line List", MagentoPaymentLine);
+                                    MagentoPaymentLine.FilterGroup(2);
+                                    MagentoPaymentLine.SetRange(SystemId, Rec."Matching Entry System ID");
+                                    MagentoPaymentLine.FilterGroup(0);
+                                    Page.Run(Page::"NPR Magento Payment Line List", MagentoPaymentLine);
                                 end;
                         end;
                     end;
