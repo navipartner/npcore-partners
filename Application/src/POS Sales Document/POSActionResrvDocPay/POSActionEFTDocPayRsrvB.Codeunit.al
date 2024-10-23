@@ -80,7 +80,7 @@
         if ReservationAmount = 0 then
             Error(NothingToReserverErrorLbl, SalesHeader."Document Type", SalesHeader."No.", SalesHeader."Amount Including VAT");
 
-        RetailSalesDocImpMgt.SalesDocumentAmountToPOS(POSSession, SalesHeader, false, false, false, SalesHeader."Print Posted Documents", false, false, Enum::"NPR POS Sales Document Post"::No, ReservationAmount);
+        RetailSalesDocImpMgt.SalesDocumentAmountToPOS(POSSession, SalesHeader, false, false, false, SalesHeader."Print Posted Documents", false, false, true, Enum::"NPR POS Sales Document Post"::No, ReservationAmount);
     end;
 
     internal procedure GetSalesHeaderFromPOSSale(SalePOs: Record "NPR POS Sale"; var SalesHeader: Record "Sales Header") Found: Boolean
@@ -248,6 +248,7 @@
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
         VoucherSaleLinePOS: Record "NPR NpRv Sales Line";
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
         NPRNpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
     begin
         if SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::"POS Payment" then
@@ -266,7 +267,7 @@
         if not VoucherSaleLinePOS.FindFirst() then
             exit;
 
-        NPRNpRvSalesDocMgt.CreateMagentoPaymentLines(SalesHeader, VoucherSaleLinePOS, SaleLinePOS."Amount Including VAT");
+        NPRNpRvSalesDocMgt.CreateMagentoPaymentLines(SalesHeader, VoucherSaleLinePOS, SaleLinePOS."Amount Including VAT", MagentoPaymentLine);
     end;
 
     internal procedure ProcessPOSPayment(SaleLinePOS: Record "NPR POS Sale Line"; SalesHeader: Record "Sales Header")
@@ -284,6 +285,7 @@
         POSPaymentLine: Codeunit "NPR POS Payment Line";
     begin
         POSSession.GetPaymentLine(POSPaymentLine);
+        POSPaymentLine.SetFirst();
         while not POSPaymentLine.IsEmpty() do
             DeletePOSLineB.DeletePaymentLine(POSPaymentLine);
     end;

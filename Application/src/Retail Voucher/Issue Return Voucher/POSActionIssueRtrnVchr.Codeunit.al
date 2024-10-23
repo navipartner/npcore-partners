@@ -127,17 +127,25 @@ codeunit 6150623 "NPR POSAction: Issue Rtrn Vchr" implements "NPR IPOS Workflow"
         POSUnit: Record "NPR POS Unit";
         POSSale: Record "NPR POS Sale";
         VoucherType: Text;
+        VoucherSalesLineParentIdText: Text;
         VoucherTypeCode: Code[20];
         ReturnAmountToCapture: Decimal;
         POSActIssueReturnVchrB: Codeunit "NPR POS Act.Issue Return VchrB";
+        VoucherSalesLineParentId: Guid;
     begin
+        if not Context.GetString('voucherSalesLineParentId', VoucherSalesLineParentIdText) then
+            Clear(VoucherSalesLineParentIdText);
+
+        if not Evaluate(VoucherSalesLineParentId, VoucherSalesLineParentIdText) then
+            Clear(VoucherSalesLineParentId);
+
         Context.SetScopeParameters();
         Setup.GetPOSUnit(POSUnit);
         if Context.GetString('VoucherTypeCode', VoucherType) then begin
             Evaluate(VoucherTypeCode, VoucherType);
 
             Sale.GetCurrentSale(POSSale);
-            POSActIssueReturnVchrB.ValidateAmount(VoucherTypeCode, ReturnAmountToCapture, PaymentLine, POSUnit."No.", POSSale."Sales Ticket No.");
+            POSActIssueReturnVchrB.ValidateAmount(VoucherTypeCode, ReturnAmountToCapture, PaymentLine, POSUnit."No.", POSSale."Sales Ticket No.", VoucherSalesLineParentId);
 
             Context.SetContext('voucher_amount', -ReturnAmountToCapture);
         end;
