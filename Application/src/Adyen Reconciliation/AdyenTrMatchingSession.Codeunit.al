@@ -45,4 +45,64 @@ codeunit 6184786 "NPR Adyen Tr. Matching Session"
                 end;
             until RecWebhookRequests.Next() = 0;
     end;
+
+#if BC17 or BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnRefreshNPRJobQueueList, '', false, false)]
+#endif
+    local procedure RefreshReconciliationJob()
+    begin
+        SetupReconciliationTaskProcessingJobQueue();
+    end;
+
+#if BC17 or BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnCheckIfIsNPRecurringJob, '', false, false)]
+#endif
+    local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
+    begin
+        if Handled then
+            exit;
+        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
+           (JobQueueEntry."Object ID to Run" = CurrCodeunitId())
+        then begin
+            IsNpJob := true;
+            Handled := true;
+        end;
+    end;
+
+    procedure SetupReconciliationTaskProcessingJobQueue()
+    var
+        AdyenSetup: Record "NPR Adyen Setup";
+    begin
+        Clear(AdyenSetup);
+        AdyenSetup.GetRecordOnce();
+        SetupReconciliationTaskProcessingJobQueue(AdyenSetup."Enable Reconciliation");
+    end;
+
+    procedure SetupReconciliationTaskProcessingJobQueue(Enable: Boolean)
+    var
+        ProccessPostPaymentLine: Label 'Process Reconciliation Documents.';
+        JobQueueEntry: Record "Job Queue Entry";
+        AdyenManagement: Codeunit "NPR Adyen Management";
+    begin
+        if Enable then
+            AdyenManagement.CreateAutoRescheduleAdyenJob(Codeunit::"NPR Adyen Tr. Matching Session", ProccessPostPaymentLine, 300)
+        else begin
+            JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+            JobQueueEntry.SetRange("Object ID to Run", CurrCodeunitID());
+            if JobQueueEntry.FindSet() then
+                repeat
+                    JobQueueEntry.Cancel();
+                    Commit();
+                until JobQueueEntry.Next() = 0;
+        end;
+    end;
+
+    local procedure CurrCodeunitID(): Integer
+    begin
+        exit(Codeunit::"NPR Adyen Tr. Matching Session");
+    end;
 }
