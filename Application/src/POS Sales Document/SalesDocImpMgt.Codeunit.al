@@ -196,14 +196,19 @@
     end;
 
     procedure SalesDocumentAmountToPOS(var POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Invoice: Boolean; Ship: Boolean; Receive: Boolean; Print: Boolean; Pdf2Nav: Boolean; Send: Boolean; SalePostingIn: Enum "NPR POS Sales Document Post")
+    begin
+        SalesDocumentAmountToPOS(POSSession, SalesHeader, Invoice, Ship, Receive, Print, Pdf2Nav, Send, false, SalePostingIn);
+    end;
+
+    procedure SalesDocumentAmountToPOS(var POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Invoice: Boolean; Ship: Boolean; Receive: Boolean; Print: Boolean; Pdf2Nav: Boolean; Send: Boolean; DocumentPaymentReservation: Boolean; SalePostingIn: Enum "NPR POS Sales Document Post")
     var
         PaymentAmount: Decimal;
     begin
         PaymentAmount := GetTotalAmountToBeInvoiced(SalesHeader);
-        SalesDocumentAmountToPOS(POSSession, SalesHeader, Invoice, Ship, Receive, Print, Pdf2Nav, Send, SalePostingIn, PaymentAmount);
+        SalesDocumentAmountToPOS(POSSession, SalesHeader, Invoice, Ship, Receive, Print, Pdf2Nav, Send, DocumentPaymentReservation, SalePostingIn, PaymentAmount);
     end;
 
-    procedure SalesDocumentAmountToPOS(var POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Invoice: Boolean; Ship: Boolean; Receive: Boolean; Print: Boolean; Pdf2Nav: Boolean; Send: Boolean; SalePostingIn: Enum "NPR POS Sales Document Post"; PaymentAmount: Decimal)
+    procedure SalesDocumentAmountToPOS(var POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; Invoice: Boolean; Ship: Boolean; Receive: Boolean; Print: Boolean; Pdf2Nav: Boolean; Send: Boolean; DocumentPaymentReservation: Boolean; SalePostingIn: Enum "NPR POS Sales Document Post"; PaymentAmount: Decimal)
     var
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
@@ -233,12 +238,12 @@
         SalesHeader.Ship := Ship;
         SalesHeader."Print Posted Documents" := Print;
         SalesHeader.Receive := Receive;
-        SalesDocumentPaymentAmountToPOSSaleLine(PaymentAmount, SaleLinePOS, SalesHeader, Pdf2Nav, Send, SalePostingIn);
+        SalesDocumentPaymentAmountToPOSSaleLine(PaymentAmount, SaleLinePOS, SalesHeader, Pdf2Nav, Send, DocumentPaymentReservation, SalePostingIn);
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
         POSSaleLine.InsertLineRaw(SaleLinePOS, false);
     end;
 
-    procedure SalesDocumentPaymentAmountToPOSSaleLine(PaymentAmount: Decimal; var SaleLinePOS: Record "NPR POS Sale Line"; var SalesHeader: Record "Sales Header"; Pdf2Nav: Boolean; Send: Boolean; SalePostingIn: Enum "NPR POS Sales Document Post")
+    procedure SalesDocumentPaymentAmountToPOSSaleLine(PaymentAmount: Decimal; var SaleLinePOS: Record "NPR POS Sale Line"; var SalesHeader: Record "Sales Header"; Pdf2Nav: Boolean; Send: Boolean; DocumentPaymentReservation: Boolean; SalePostingIn: Enum "NPR POS Sales Document Post")
     begin
         SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::"Customer Deposit";
         SaleLinePOS.Validate(Quantity, 1);
@@ -252,6 +257,7 @@
         SaleLinePOS."Sales Document Post" := SalePostingIn;
         SaleLinePOS."Sales Document Send" := Send;
         SaleLinePOS."Sales Document Pdf2Nav" := Pdf2Nav;
+        SaleLinePOS."Document Payment Reservation" := DocumentPaymentReservation;
         if SalesHeader."Document Type" in [SalesHeader."Document Type"::"Return Order", SalesHeader."Document Type"::"Credit Memo"] then
             SaleLinePOS.Validate("Unit Price", -PaymentAmount)
         else
@@ -264,6 +270,11 @@
             SaleLinePOS.Description += ', ' + DocumentReceivedLbl;
         if SalesHeader.Ship then
             SaleLinePOS.Description += ', ' + DocumentShippedLbl;
+    end;
+
+    procedure SalesDocumentPaymentAmountToPOSSaleLine(PaymentAmount: Decimal; var SaleLinePOS: Record "NPR POS Sale Line"; var SalesHeader: Record "Sales Header"; Pdf2Nav: Boolean; Send: Boolean; SalePostingIn: Enum "NPR POS Sales Document Post")
+    begin
+        SalesDocumentPaymentAmountToPOSSaleLine(PaymentAmount, SaleLinePOS, SalesHeader, Pdf2Nav, Send, false, SalePostingIn);
     end;
 
     procedure SalesDocumentPaymentAmountToPOSSaleLine(PaymentAmount: Decimal; var SaleLinePOS: Record "NPR POS Sale Line"; var SalesInvoiceHeader: Record "Sales Invoice Header"; Pdf2Nav: Boolean; Send: Boolean; SyncPost: Boolean)

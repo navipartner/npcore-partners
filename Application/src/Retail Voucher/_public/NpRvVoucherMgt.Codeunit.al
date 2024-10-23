@@ -1583,7 +1583,10 @@
     begin
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.GetCurrentPaymentLine(PaymentLinePOS);
-        CurrentPOSPaymentMethod.Get(PaymentLinePOS."No.");
+        VoucherType.Get(VoucherTypeCode);
+#pragma warning disable AA0139
+        GetCurrPOSPaymentMethod(VoucherTypeCode, VoucherSalesLineParentID, CurrentPOSPaymentMethod);
+#pragma warning restore AA0139
         POSPaymentLine.CalculateBalance(CurrentPOSPaymentMethod, SaleAmount, PaidAmount, ReturnAmount, SubTotal);
 
         VoucherType.Get(VoucherTypeCode);
@@ -1953,6 +1956,31 @@
         POSPaymentMethodItem.SetRange(Type, POSPaymentMethodItem.Type::"Item Categories");
         if not POSPaymentMethodItem.IsEmpty() then
             exit(true);
+    end;
+
+    internal procedure GetCurrPOSPaymentMethod(VoucherTypeCode: Code[20]; voucherSalesLineParentId: Guid; var CurrPOSPaymentMethod: Record "NPR POS Payment Method") Found: Boolean;
+    var
+        ParentVoucherSaleLine: Record "NPR NpRv Sales Line";
+        CurrVoucherType: Record "NPR NpRv Voucher Type";
+        CurrVoucherTypeCode: Code[20];
+    begin
+        ParentVoucherSaleLine.SetLoadFields("Voucher Type");
+        if not ParentVoucherSaleLine.Get(VoucherSalesLineParentID) then
+            Clear(ParentVoucherSaleLine);
+
+        CurrVoucherTypeCode := ParentVoucherSaleLine."Voucher Type";
+        if CurrVoucherTypeCode = '' then
+            CurrVoucherTypeCode := VoucherTypeCode;
+
+        CurrVoucherType.SetLoadFields("Payment Type");
+        if not CurrVoucherType.Get(CurrVoucherTypeCode) then
+            exit;
+
+        if not CurrPOSPaymentMethod.Get(CurrVoucherType."Payment Type") then begin
+            Clear(CurrPOSPaymentMethod);
+            exit;
+        end;
+        Found := true;
     end;
     #endregion
 

@@ -1611,6 +1611,11 @@
             DataClassification = CustomerContent;
             MinValue = 0;
         }
+        field(6130; "Document Payment Reservation"; Boolean)
+        {
+            Caption = 'Document Payment Reservation';
+            DataClassification = CustomerContent;
+        }
         field(7014; "Item Disc. Group"; Code[20])
         {
             Caption = 'Item Disc. Group';
