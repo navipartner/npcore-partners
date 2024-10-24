@@ -451,7 +451,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             Clear(ProcessedEntries);
             TotalEntries := ReconciliationLine.Count();
             Window.Open(MatchingEntriesLbl);
-            Window.Update(1, TotalEntries);
+            Window.Update(2, TotalEntries);
         end;
 
         repeat
@@ -492,7 +492,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
 
             if GuiAllowed() then begin
                 ProcessedEntries += 1;
-                Window.Update(2, ProcessedEntries);
+                Window.Update(1, ProcessedEntries);
             end;
 
         until ReconciliationLine.Next() = 0;
@@ -752,7 +752,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             Clear(ProcessedEntries);
             TotalEntries := ReconciliationLine.Count();
             Window.Open(PostingEntriesLbl);
-            Window.Update(1, TotalEntries);
+            Window.Update(2, TotalEntries);
         end;
 
         repeat
@@ -795,7 +795,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
 
             if GuiAllowed() then begin
                 ProcessedEntries += 1;
-                Window.Update(2, ProcessedEntries);
+                Window.Update(1, ProcessedEntries);
             end;
         until ReconciliationLine.Next() = 0;
 
@@ -810,7 +810,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         end;
         ReconciliationHeader."Failed Lines Exist" := UnPostedEntries > 0;
         ReconciliationHeader.Modify();
-        exit(ReconciliationHeader."Failed Lines Exist");
+        exit(not ReconciliationHeader."Failed Lines Exist");
     end;
 
     local procedure TryPostingPayment(var ReconciliationLine: Record "NPR Adyen Recon. Line"; ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr") UnPostedEntries: Integer

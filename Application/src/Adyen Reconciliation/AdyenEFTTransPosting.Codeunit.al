@@ -60,8 +60,7 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
                 begin
                     EFTTransactionRequest.GetBySystemId(_ReconciliationLine."Matching Entry System ID");
                     POSPaymentLine.GetBySystemId(EFTTransactionRequest."Sales Line ID");
-
-                    if not POSPostEntries.GetPostingSetup(POSPaymentLine."POS Store Code", EFTTransactionRequest."Original POS Payment Type Code", POSPaymentLine."POS Payment Bin Code", POSPostingSetup) then
+                    if not POSPostEntries.GetPostingSetup(POSPaymentLine."POS Store Code", POSPaymentLine."POS Payment Method Code", POSPaymentLine."POS Payment Bin Code", POSPostingSetup) then
                         Error(CouldNotDeterminePOSPostingSetupLbl, EFTTransactionRequest."Sales Ticket No.");
 
                     case POSPostingSetup."Account Type" of

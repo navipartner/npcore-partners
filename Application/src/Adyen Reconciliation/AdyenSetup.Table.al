@@ -44,8 +44,6 @@ table 6150801 "NPR Adyen Setup"
                             AdyenManagement.InitWebhookSetup(WebhookSetup, ReportReadyEventFilter, MerchantAccount.Name, AdyenWebhookType::standard);
                             AdyenManagement.CreateWebhook(WebhookSetup);
                         until MerchantAccount.Next() = 0;
-                    "Enable Automatic Posting" := true;
-                    Modify();
                 end else
                     WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, Codeunit::"NPR AF Rec. API Request", 'AdyenWebhook', false);
             end;
@@ -83,7 +81,6 @@ table 6150801 "NPR Adyen Setup"
         {
             DataClassification = CustomerContent;
             Caption = 'Enable Posting Automation';
-            InitValue = true;
         }
         field(80; "Post POS Entries Immediately"; Boolean)
         {
