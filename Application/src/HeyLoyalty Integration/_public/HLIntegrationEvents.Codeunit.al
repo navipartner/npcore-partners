@@ -96,4 +96,24 @@ codeunit 6059992 "NPR HL Integration Events"
     internal procedure OnAddFieldsToHeybookingDBPayload(TicketNotifEntry: Record "NPR TM Ticket Notif. Entry"; var FieldNameValueList: Dictionary of [Text, Text])
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAddTicketAdmissionDataToHeybookingDBPayload(var AdmissionDataFieldNames: Dictionary of [Text, Text])
+    begin
+    end;
+
+    procedure "HeyBookingDBFieldKey.ActualAdmissionDateTime"(): Text
+    begin
+        exit('ActualAdmissionDateTime');
+    end;
+
+    procedure "HeyBookingDBFieldKey.ScheduledAdmissionDateTime"(): Text
+    begin
+        exit('ScheduledAdmissionDateTime');
+    end;
+
+    procedure "HeyBookingDBFieldKey.TicketScanned"(): Text
+    begin
+        exit('TicketScanned');
+    end;
 }

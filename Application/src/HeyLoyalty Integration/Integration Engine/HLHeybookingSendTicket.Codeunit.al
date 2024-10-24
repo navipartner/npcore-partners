@@ -10,6 +10,7 @@ codeunit 6151489 "NPR HL Heybooking Send Ticket"
 
     var
         TempTouchedTicketNotifEntry: Record "NPR TM Ticket Notif. Entry" temporary;
+        HLIntegrationEvents: Codeunit "NPR HL Integration Events";
         NotReprocessibleErr: Label 'The task %1 cannot be (re)processed manually. It is generated and processed automatically by the ticket notification handler.', Comment = '%1 - Task ID (Entry No.)';
 
     procedure Touch(TicketNotificationEntryIn: Record "NPR TM Ticket Notif. Entry")
@@ -119,7 +120,6 @@ codeunit 6151489 "NPR HL Heybooking Send Ticket"
         Ticket: Record "NPR TM Ticket";
         TempTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary;
         TicketType: Record "NPR TM Ticket Type";
-        HLIntegrationEvents: Codeunit "NPR HL Integration Events";
         FieldNameValueList: Dictionary of [Text, Text];
         FieldName: Text;
         INVALID: Label 'Invalid %1';
@@ -154,6 +154,7 @@ codeunit 6151489 "NPR HL Heybooking Send Ticket"
         FieldNameValueList.Add('category_name', TicketType.Description);
         FieldNameValueList.Add('booking_date', Format(Ticket."Document Date", 0, 9));
         FieldNameValueList.Add('price', Format(Item."Unit Price", 0, 9));
+        AddTicketAdmissionData(TempTouchedTicketNotifEntry, FieldNameValueList);
         HLIntegrationEvents.OnAddFieldsToHeybookingDBPayload(TempTouchedTicketNotifEntry, FieldNameValueList);
 
         foreach FieldName in FieldNameValueList.Keys() do
@@ -189,6 +190,64 @@ codeunit 6151489 "NPR HL Heybooking Send Ticket"
                 TicketReservationRequestOut := TicketReservationRequest;
                 if TicketReservationRequestOut.Insert() then;
             until (TicketReservationRequest.Next() = 0);
+    end;
+
+    local procedure AddTicketAdmissionData(TicketNotifEntry: Record "NPR TM Ticket Notif. Entry"; var FieldNameValueList: Dictionary of [Text, Text])
+    var
+        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        AdmissionDataFieldNames: Dictionary of [Text, Text];
+        FieldName: Text;
+        FieldValue: Text;
+        TicketScanned: Boolean;
+    begin
+        HLIntegrationEvents.OnAddTicketAdmissionDataToHeybookingDBPayload(AdmissionDataFieldNames);
+        if AdmissionDataFieldNames.Count() = 0 then
+            exit;
+
+        TicketAccessEntry.SetRange("Ticket No.", TicketNotifEntry."Ticket No.");
+        TicketAccessEntry.SetRange("Admission Code", TicketNotifEntry."Admission Code");
+        if AdmissionDataFieldNames.ContainsKey(HLIntegrationEvents."HeyBookingDBFieldKey.ScheduledAdmissionDateTime"()) then begin
+            FieldName := AdmissionDataFieldNames.Get(HLIntegrationEvents."HeyBookingDBFieldKey.ScheduledAdmissionDateTime"());
+            if FieldName <> '' then begin
+                FieldValue := '';
+                if TicketAccessEntry.FindFirst() then begin
+                    DetTicketAccessEntry.SetRange("Ticket Access Entry No.", TicketAccessEntry."Entry No.");
+                    DetTicketAccessEntry.SetFilter("External Adm. Sch. Entry No.", '<>%1', 0);
+                    DetTicketAccessEntry.SetFilter(Type, '%1|%2|%3', DetTicketAccessEntry.Type::INITIAL_ENTRY, DetTicketAccessEntry.Type::RESERVATION, DetTicketAccessEntry.Type::ADMITTED);
+                    if DetTicketAccessEntry.FindLast() then begin
+                        AdmissionScheduleEntry.SetRange("External Schedule Entry No.", DetTicketAccessEntry."External Adm. Sch. Entry No.");
+                        AdmissionScheduleEntry.SetRange(Cancelled, false);
+                        if AdmissionScheduleEntry.FindFirst() then
+                            FieldValue := StrSubstNo('%1 %2', Format(AdmissionScheduleEntry."Admission Start Date", 0, 9), CopyStr(Format(AdmissionScheduleEntry."Admission Start Time", 0, 9), 1, 5));
+                    end;
+                end;
+                FieldNameValueList.Add(FieldName, FieldValue);
+            end;
+        end;
+
+        if AdmissionDataFieldNames.ContainsKey(HLIntegrationEvents."HeyBookingDBFieldKey.TicketScanned"()) or
+           AdmissionDataFieldNames.ContainsKey(HLIntegrationEvents."HeyBookingDBFieldKey.ActualAdmissionDateTime"())
+        then begin
+            TicketAccessEntry.SetFilter("Access Date", '<>%1', 0D);
+            TicketScanned := TicketAccessEntry.FindFirst();
+            if AdmissionDataFieldNames.ContainsKey(HLIntegrationEvents."HeyBookingDBFieldKey.TicketScanned"()) then begin
+                FieldName := AdmissionDataFieldNames.Get(HLIntegrationEvents."HeyBookingDBFieldKey.TicketScanned"());
+                if FieldName <> '' then
+                    FieldNameValueList.Add(FieldName, Format(TicketScanned, 0, 9));
+            end;
+            if AdmissionDataFieldNames.ContainsKey(HLIntegrationEvents."HeyBookingDBFieldKey.ActualAdmissionDateTime"()) then begin
+                FieldName := AdmissionDataFieldNames.Get(HLIntegrationEvents."HeyBookingDBFieldKey.ActualAdmissionDateTime"());
+                if FieldName <> '' then begin
+                    if TicketScanned then
+                        FieldValue := StrSubstNo('%1 %2', Format(TicketAccessEntry."Access Date", 0, 9), CopyStr(Format(TicketAccessEntry."Access Time", 0, 9), 1, 5))
+                    else
+                        FieldValue := '';
+                    FieldNameValueList.Add(FieldName, FieldValue);
+                end;
+            end;
+        end;
     end;
 
     local procedure AddFieldToCSVBuffer(var CSVBuffer: Record "CSV Buffer"; LineNo: Integer; FieldName: Text; FieldValue: Text; var CSVFieldList: List of [Text])
