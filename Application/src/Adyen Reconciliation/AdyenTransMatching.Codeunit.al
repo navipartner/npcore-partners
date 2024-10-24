@@ -484,7 +484,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                     ReconciliationLine2."Transaction Type"::RefundedInstallmentExternallyWithInfo,
                     ReconciliationLine2."Transaction Type"::SettledInstallmentExternallyWithInfo:
                         begin
-                            MatchedEntries += TryMatchingAdjustments(ReconciliationLine2, UnmatchedEntries, ReconciliationHeader);
+                            MatchedEntries += TryMatchingAdjustments(ReconciliationLine2, ReconciliationHeader);
                         end;
                 end;
                 ReconciliationLine2.Modify();
@@ -675,7 +675,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         exit(true);
     end;
 
-    local procedure TryMatchingAdjustments(var ReconciliationLine: Record "NPR Adyen Recon. Line"; var UnmatchedEntries: Integer; ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr") MatchedEntries: Integer
+    local procedure TryMatchingAdjustments(var ReconciliationLine: Record "NPR Adyen Recon. Line"; ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr") MatchedEntries: Integer
     var
         FeeCreatePost: Codeunit "NPR Adyen Fee Posting";
         RecordPrepared: Boolean;
@@ -701,18 +701,13 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             ReconciliationLine."Transaction Type"::SettledInstallmentExternallyWithInfo:
                 RecordPrepared := FeeCreatePost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Settled External Commission G/L Account");
         end;
-        if RecordPrepared then begin
-            ReconciliationLine.Status := ReconciliationLine.Status::Matched;
+        ReconciliationLine.Status := ReconciliationLine.Status::Matched;
+        if RecordPrepared then
             if FeeCreatePost.FeePosted(ReconciliationLine) then begin
                 ReconciliationLine."Matching Entry System ID" := FeeCreatePost.GetGlEntrySystemID();
                 ReconciliationLine.Status := ReconciliationLine.Status::Posted;
             end;
-            MatchedEntries += 1;
-        end else begin
-            _AdyenManagement.CreateReconciliationLog(_LogType::"Match Transactions", false, GetLastErrorText(), ReconciliationHeader."Webhook Request ID");
-            ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Match";
-            UnmatchedEntries += 1;
-        end;
+        MatchedEntries += 1;
     end;
     #endregion
 
