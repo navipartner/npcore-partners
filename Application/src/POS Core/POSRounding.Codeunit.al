@@ -6,13 +6,11 @@
         GLAccount: Record "G/L Account";
         POSUnit: Record "NPR POS Unit";
         POSSetup: Codeunit "NPR POS Setup";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         if RoundAmount = 0 then
             exit(0);
 
-        if FeatureFlagsManagement.IsEnabled('doubleRoundingLineFix') then
-            DeleteExistingRoundingLines(SalePOS);
+        DeleteExistingRoundingLines(SalePOS);
 
         RoundAmount *= -1; //Is out payment line
 
