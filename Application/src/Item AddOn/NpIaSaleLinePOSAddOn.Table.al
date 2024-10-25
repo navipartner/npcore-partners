@@ -78,6 +78,16 @@
             Caption = 'Copy Serial No.';
             DataClassification = CustomerContent;
         }
+        field(160; AddToWallet; Boolean)
+        {
+            Caption = 'Add to Wallet';
+            DataClassification = CustomerContent;
+        }
+        field(165; AddOnItemNo; Code[20])
+        {
+            Caption = 'AddOn Item No.';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

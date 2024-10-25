@@ -166,6 +166,21 @@
                     TestField(Quantity);
             end;
         }
+        field(140; IncludeFromDate; Date)
+        {
+            Caption = 'Include From Date';
+            DataClassification = CustomerContent;
+        }
+        field(150; IncludeUntilDate; Date)
+        {
+            Caption = 'Include Until Date';
+            DataClassification = CustomerContent;
+        }
+        field(160; AddToWallet; Boolean)
+        {
+            Caption = 'Add To Wallet';
+            DataClassification = CustomerContent;
+        }
         field(200; "Before Insert Codeunit ID"; Integer)
         {
             BlankZero = true;

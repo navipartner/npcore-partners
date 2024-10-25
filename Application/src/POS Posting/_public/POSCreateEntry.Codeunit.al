@@ -31,6 +31,9 @@
             InsertPOSEntry(POSPeriodRegister, Rec, POSEntry, POSEntry."Entry Type"::"Direct Sale");
         end;
 
+        if (not SaleCancelled) then
+            CreateWalletAssets(POSEntry, Rec);
+
         CreateLines(POSEntry, Rec);
 
         UpdatePostSaleDocumentStatus(POSEntry, SaleCancelled);
@@ -2277,6 +2280,21 @@
             exit;
         ContBusRel.FindFirst();
         POSEntry."Customer No." := ContBusRel."No.";
+    end;
+
+    local procedure CreateWalletAssets(POSEntry: Record "NPR POS Entry"; POSSale: Record "NPR POS Sale")
+    var
+        WalletAssetMgt: Codeunit "NPR AttractionWallet";
+        POSSaleLine: Record "NPR POS Sale Line";
+    begin
+        POSSaleLine.SetCurrentKey("Register No.", "Sales Ticket No.");
+        POSSaleLine.SetFilter("Register No.", '=%1', POSSale."Register No.");
+        POSSaleLine.SetFilter("Sales Ticket No.", '=%1', POSSale."Sales Ticket No.");
+        if (POSSaleLine.FindSet()) then begin
+            repeat
+                WalletAssetMgt.CreateAssetsFromPosSaleLine(POSEntry, POSSaleLine);
+            until (POSSaleLine.Next() = 0);
+        end;
     end;
     #endregion
 }
