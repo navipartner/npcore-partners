@@ -148,6 +148,8 @@
         PlaceHolder3Lbl: Label '%1 %3 %2', Locked = true;
     begin
         ItemAddOnLine.SetRange("AddOn No.", ItemAddOn."No.");
+        ItemAddOnLine.SetFilter(IncludeFromDate, '<=%1', Today());
+        ItemAddOnLine.SetFilter(IncludeUntilDate, '=%1|>=%2', 0D, Today());
         if ItemAddOnLine.FindSet() then
             repeat
                 ItemAddOnLineOption.SetRange("AddOn No.", ItemAddOnLine."AddOn No.");
@@ -315,6 +317,9 @@
         ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
     begin
         ItemAddOnLine.SetRange("AddOn No.", ItemAddOn."No.");
+        ItemAddOnLine.SetFilter(IncludeFromDate, '<=%1', Today());
+        ItemAddOnLine.SetFilter(IncludeUntilDate, '=%1|>=%2', 0D, Today());
+
         ItemAddOnLine.FilterGroup(-1);
         ItemAddOnLine.SetRange(Mandatory, false);
         ItemAddOnLine.SetRange("Comment Enabled", true);
@@ -326,6 +331,8 @@
             exit(true);
         ItemAddOnLine.Reset();
         ItemAddOnLine.SetRange("AddOn No.", ItemAddOn."No.");
+        ItemAddOnLine.SetFilter(IncludeFromDate, '<=%1', Today());
+        ItemAddOnLine.SetFilter(IncludeUntilDate, '=%1|>=%2', 0D, Today());
         if ItemAddOnLine.Count() > 1 then
             exit(true);
         ItemAddOnLine.FindFirst();
@@ -365,6 +372,8 @@
         ItemAddOnLine.SetRange("AddOn No.", ItemAddOn."No.");
         ItemAddOnLine.SetRange(Mandatory, true);
         ItemAddOnLine.SetRange(Type, ItemAddOnLine.Type::Quantity);
+        ItemAddOnLine.SetFilter(IncludeFromDate, '<=%1', Today());
+        ItemAddOnLine.SetFilter(IncludeUntilDate, '=%1|>=%2', 0D, Today());
 
         ItemAddOnUnit.FilterItemAddOnLine(ItemAddOnLine, ItemAddOn, POSSession, AppliesToLineNo, CompulsoryAddOn);
 
@@ -433,6 +442,8 @@
         if NotRequiringComments then
             ItemAddOnLine.SetRange("Comment Enabled", false);
         ItemAddOnLine.SetRange(Type, ItemAddOnLine.Type::Quantity);
+        ItemAddOnLine.SetFilter(IncludeFromDate, '<=%1', Today());
+        ItemAddOnLine.SetFilter(IncludeUntilDate, '=%1|>=%2', 0D, Today());
 
         ItemAddOnUnit.FilterItemAddOnLine(ItemAddOnLine, ItemAddOn, POSSession, AppliesToLineNo, CompulsoryAddOn);
 
@@ -560,6 +571,8 @@
             SaleLinePOSAddOn."Per Unit" := ItemAddOnLine."Per Unit";
             SaleLinePOSAddOn.Mandatory := ItemAddOnLine.Mandatory;
             SaleLinePOSAddOn."Copy Serial No." := ItemAddOnLine."Copy Serial No.";
+            SaleLinePOSAddOn.AddToWallet := ItemAddOnLine.AddToWallet;
+            SaleLinePOSAddOn.AddOnItemNo := ItemAddOnLine."Item No.";
             SaleLinePOSAddOn.Insert(true);
             exit(true);
         end;
@@ -899,6 +912,8 @@
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
         SaleLinePOS2: Record "NPR POS Sale Line";
         xSaleLinePOS: Record "NPR POS Sale Line";
+        Item: Record Item;
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
     begin
         Sender.GetxRec(xSaleLinePOS);
         if xSaleLinePOS."Quantity (Base)" = 0 then
@@ -917,6 +932,12 @@
                 then begin
                     SaleLinePOS2.Validate(Quantity, Round(SaleLinePOS2.Quantity * SaleLinePOS."Quantity (Base)" / xSaleLinePOS."Quantity (Base)", 0.00001));
                     SaleLinePOS2.Modify();
+
+                    // Ticket Item needs to be updated with the new quantity, normally this is triggered by OnBeforeSetQuantity - but this is not triggered for dependent addon lines
+                    if (Item.Get(SaleLinePOS2."No.")) then
+                        if (Item."NPR Ticket Type" <> '') then
+                            TicketRequestManager.POS_OnModifyQuantity(SaleLinePOS2);
+
                 end;
             until SaleLinePOSAddOn.Next() = 0;
     end;

@@ -29,6 +29,11 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Info" where("Once per Transaction" = const(false), Type = const("Request Data"), "Input Type" = const(Text));
         }
+        field(20; WalletTemplate; Boolean)
+        {
+            Caption = 'Wallet Template';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
