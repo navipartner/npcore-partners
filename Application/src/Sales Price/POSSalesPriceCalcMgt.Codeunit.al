@@ -224,7 +224,6 @@
     local procedure CalcBestUnitPrice(var PriceListLine: Record "Price List Line")
     var
         BestPriceListLine: Record "Price List Line";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         BestSalesPriceFound: Boolean;
         CurrentBestPriceLineAmount: Decimal;
         CurrentPriceLineAmount: Decimal;
@@ -239,23 +238,15 @@
                     ConvertPriceToUoM(PriceListLine."Unit of Measure Code", PriceListLine."Unit Price");
                     ConvertPriceLCYToFCY(PriceListLine."Currency Code", PriceListLine."Unit Price");
 
-                    if FeatureFlagsManagement.IsEnabled('bestPriceCalculationAdjustments') then begin
-                        CurrentBestPriceLineAmount := CalcLineAmount(BestPriceListLine);
-                        CurrentPriceLineAmount := CalcLineAmount(PriceListLine);
-                        if (BestPriceListLine."Unit Price" = 0) or
-                           (CurrentBestPriceLineAmount > CurrentPriceLineAmount) or
-                           ((CurrentBestPriceLineAmount = CurrentPriceLineAmount) and (BestPriceListLine."Unit Price" > PriceListLine."Unit Price"))
-                        then begin
-                            BestPriceListLine := PriceListLine;
-                            BestSalesPriceFound := true;
-                        end;
-                    end else
-                        if (BestPriceListLine."Unit Price" = 0) or
-                           (CalcLineAmount(BestPriceListLine) > CalcLineAmount(PriceListLine))
-                        then begin
-                            BestPriceListLine := PriceListLine;
-                            BestSalesPriceFound := true;
-                        end;
+                    CurrentBestPriceLineAmount := CalcLineAmount(BestPriceListLine);
+                    CurrentPriceLineAmount := CalcLineAmount(PriceListLine);
+                    if (BestPriceListLine."Unit Price" = 0) or
+                       (CurrentBestPriceLineAmount > CurrentPriceLineAmount) or
+                       ((CurrentBestPriceLineAmount = CurrentPriceLineAmount) and (BestPriceListLine."Unit Price" > PriceListLine."Unit Price"))
+                    then begin
+                        BestPriceListLine := PriceListLine;
+                        BestSalesPriceFound := true;
+                    end;
                 end;
             until PriceListLine.Next() = 0;
 

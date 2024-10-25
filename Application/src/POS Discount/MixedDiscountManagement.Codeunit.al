@@ -795,7 +795,6 @@
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         InvQtyDict: Dictionary of [Guid, Decimal];
         BatchQty: Decimal;
         LastLineNo: Integer;
@@ -808,17 +807,15 @@
         AdjustBatchQty(BatchQty, TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOSApply, InvQtyDict);
         AdjustDiscQty(BatchQty, TempMixedDiscount, TempMixedDiscountLine, TempSaleLinePOSApply, InvQtyDict);
         Clear(TempSaleLinePOS);
-        if TempSaleLinePOS.FindLast() then
-            if FeatureFlagsManagement.IsEnabled('bestPriceCalculationAdjustments') then begin
-                SaleLinePOS.Reset();
-                SaleLinePOS.SetRange("Register No.", TempSaleLinePOS."Register No.");
-                SaleLinePOS.SetRange("Sales Ticket No.", TempSaleLinePOS."Sales Ticket No.");
-                SaleLinePOS.SetRange(Date, TempSaleLinePOS.Date);
-                SaleLinePOS.SetLoadFields("Register No.", "Sales Ticket No.", Date, "Line No.");
-                if SaleLinePOS.FindLast() then
-                    LastLineNo := SaleLinePOS."Line No.";
-            end else
-                LastLineNo := TempSaleLinePOS."Line No.";
+        if TempSaleLinePOS.FindLast() then begin
+            SaleLinePOS.Reset();
+            SaleLinePOS.SetRange("Register No.", TempSaleLinePOS."Register No.");
+            SaleLinePOS.SetRange("Sales Ticket No.", TempSaleLinePOS."Sales Ticket No.");
+            SaleLinePOS.SetRange(Date, TempSaleLinePOS.Date);
+            SaleLinePOS.SetLoadFields("Register No.", "Sales Ticket No.", Date, "Line No.");
+            if SaleLinePOS.FindLast() then
+                LastLineNo := SaleLinePOS."Line No.";
+        end;
         if TempMixedDiscount."Discount Type" = TempMixedDiscount."Discount Type"::"Multiple Discount Levels" then
             TotalDiscAmount := ApplylMultiLevelMixDiscountOnLines(TempSaleLinePOSApply, TempMixedDiscount, TempMixedDiscountLine, LastLineNo, InvQtyDict)
         else
@@ -1832,8 +1829,6 @@
     end;
 
     local procedure UpdateSalesLinePOS(var FromSalesLinePOS: Record "NPR POS Sale Line"; var ToSalesLinePOS: Record "NPR POS Sale Line")
-    var
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         FromSalesLinePOS.Reset();
         if not FromSalesLinePOS.FindSet(false) then
@@ -1841,10 +1836,7 @@
 
         repeat
             if ToSalesLinePOS.Get(FromSalesLinePOS.RecordId) then begin
-                if FeatureFlagsManagement.IsEnabled('bestPriceCalculationAdjustments') then
-                    ToSalesLinePOS.TransferFields(FromSalesLinePOS, false)
-                else
-                    ToSalesLinePOS := FromSalesLinePOS;
+                ToSalesLinePOS.TransferFields(FromSalesLinePOS, false);
                 ToSalesLinePOS.Modify()
             end else begin
                 ToSalesLinePOS := FromSalesLinePOS;
