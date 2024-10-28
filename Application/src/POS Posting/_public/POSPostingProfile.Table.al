@@ -272,11 +272,18 @@
         {
             Caption = 'Enable POS Entry Cust. Ledg. Entry Posting';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2024-11-03';
+            ObsoleteReason = 'Moved Customer Ledger Posting Setup to Fiscalization Setup Tables';
         }
         field(191; "Customer Posting Group Filter"; Text[2048])
         {
             Caption = 'Customer Posting Group Filter';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2024-11-03';
+            ObsoleteReason = 'Moved Customer Ledger Posting Setup to Fiscalization Setup Tables';
+
             trigger OnLookup()
             var
                 CustomerPostingGroup: Record "Customer Posting Group";
@@ -300,20 +307,28 @@
         {
             Caption = 'Enable Legal Entities Cust. Ledg. Entry Posting';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2024-11-03';
+            ObsoleteReason = 'Moved Customer Ledger Posting Setup to Fiscalization Setup Tables';
         }
         field(193; "General Journal Template Name"; Code[10])
         {
             Caption = 'General Journal Template Name';
             DataClassification = CustomerContent;
             TableRelation = "Gen. Journal Template";
+            ObsoleteState = Pending;
+            ObsoleteTag = '2024-11-03';
+            ObsoleteReason = 'Moved Customer Ledger Posting Setup to Fiscalization Setup Tables';
         }
         field(194; "General Journal Batch Name"; Code[10])
         {
             Caption = 'General Journal Batch Name';
             DataClassification = CustomerContent;
             TableRelation = "Gen. Journal Batch".Name where("Journal Template Name" = field("General Journal Template Name"));
+            ObsoleteState = Pending;
+            ObsoleteTag = '2024-11-03';
+            ObsoleteReason = 'Moved Customer Ledger Posting Setup to Fiscalization Setup Tables';
         }
-
     }
 
     keys

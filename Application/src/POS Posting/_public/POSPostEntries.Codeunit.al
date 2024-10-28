@@ -625,6 +625,8 @@
     var
         POSPostCustLedgEntry: Codeunit "NPR POS Post Cust. Ledg. Entry";
     begin
+        if POSEntry."Customer No." = '' then
+            exit;
         POSPostCustLedgEntry.InsertGenJournalLinesForCustLedgEntryPosting(GenJournalLine, _LineNumber, POSEntry);
     end;
 
