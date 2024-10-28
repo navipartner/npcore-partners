@@ -482,7 +482,7 @@ codeunit 85016 "NPR MM API Smoke Test"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure MemberRegisterArrival()
+    procedure MemberRegisterArrival_ItemRef()
     var
         MembershipSetup: Record "NPR MM Membership Setup";
         Item: Record Item;
@@ -502,6 +502,7 @@ codeunit 85016 "NPR MM API Smoke Test"
         ItemNo := TicketLibrary.CreateScenario_SmokeTest();
         Item.Get(ItemNo);
         MembershipSetup.Get(_LastMembership."Membership Code");
+        MembershipSetup."Ticket Item Type" := MembershipSetup."Ticket Item Type"::REFERENCE;
         MembershipSetup.Validate("Ticket Item Barcode", StrSubstNo('IXRF-%1', ItemNo)); // Ticket smoketest scenario creates item cross reference by prefixing item no.
         MembershipSetup.Modify();
 
@@ -516,7 +517,44 @@ codeunit 85016 "NPR MM API Smoke Test"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
-    procedure MemberCardRegisterArrival()
+    procedure MemberRegisterArrival_Item()
+    var
+        MembershipSetup: Record "NPR MM Membership Setup";
+        Item: Record Item;
+        MemberApiLibrary: Codeunit "NPR Library - Member XML API";
+        TicketLibrary: Codeunit "NPR Library - Ticket Module";
+        Assert: Codeunit Assert;
+        ItemNo: Code[20];
+        AdmissionCode: Code[20];
+        ScannerStation: Code[10];
+        ResponseMessage: Text;
+        ApiStatus: Boolean;
+    begin
+        Initialize();
+        CreateMembership();
+        AddMembershipMemberWorker();
+
+        ItemNo := TicketLibrary.CreateScenario_SmokeTest();
+        Item.Get(ItemNo);
+        MembershipSetup.Get(_LastMembership."Membership Code");
+        MembershipSetup."Ticket Item Type" := MembershipSetup."Ticket Item Type"::ITEM;
+        MembershipSetup.Validate("Ticket Item Barcode", ItemNo);
+        MembershipSetup.Modify();
+
+        // [TEST 1]
+        ApiStatus := MemberApiLibrary.MemberRegisterArrivalAPI(_LastMember."External Member No.", AdmissionCode, ScannerStation, ResponseMessage);
+        Assert.IsTrue(ApiStatus, StrSubstNo('Member arrival failed: %1', ResponseMessage));
+
+        // [TEST 2]
+        asserterror ApiStatus := MemberApiLibrary.MemberRegisterArrivalAPI('FOOBAR MEMBER NO', AdmissionCode, ScannerStation, ResponseMessage);
+
+    end;
+
+
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure MemberCardRegisterArrival_ItemRef()
     var
         MembershipSetup: Record "NPR MM Membership Setup";
         MemberApiLibrary: Codeunit "NPR Library - Member XML API";
@@ -534,6 +572,7 @@ codeunit 85016 "NPR MM API Smoke Test"
 
         ItemNo := TicketLibrary.CreateScenario_SmokeTest();
         MembershipSetup.Get(_LastMembership."Membership Code");
+        MembershipSetup."Ticket Item Type" := MembershipSetup."Ticket Item Type"::REFERENCE;
         MembershipSetup.Validate("Ticket Item Barcode", StrSubstNo('IXRF-%1', ItemNo)); // Ticket smoketest scenario creates item cross reference by prefixing item no.
         MembershipSetup.Modify();
         Commit();
@@ -547,6 +586,39 @@ codeunit 85016 "NPR MM API Smoke Test"
         Assert.Isfalse(ApiStatus, StrSubstNo('Member arrival must fail when providing invalid card number: %1', ResponseMessage));
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure MemberCardRegisterArrival_Item()
+    var
+        MembershipSetup: Record "NPR MM Membership Setup";
+        MemberApiLibrary: Codeunit "NPR Library - Member XML API";
+        TicketLibrary: Codeunit "NPR Library - Ticket Module";
+        Assert: Codeunit Assert;
+        ItemNo: Code[20];
+        AdmissionCode: Code[20];
+        ScannerStation: Code[10];
+        ResponseMessage: Text;
+        ApiStatus: Boolean;
+    begin
+        Initialize();
+        CreateMembership();
+        AddMembershipMemberWorker();
+
+        ItemNo := TicketLibrary.CreateScenario_SmokeTest();
+        MembershipSetup.Get(_LastMembership."Membership Code");
+        MembershipSetup."Ticket Item Type" := MembershipSetup."Ticket Item Type"::ITEM;
+        MembershipSetup.Validate("Ticket Item Barcode", ItemNo);
+        MembershipSetup.Modify();
+        Commit();
+
+        // [TEST 1]
+        ApiStatus := MemberApiLibrary.MemberCardRegisterArrivalAPI(_LastMemberCard."External Card No.", AdmissionCode, ScannerStation, ResponseMessage);
+        Assert.IsTrue(ApiStatus, StrSubstNo('Member arrival failed: %1', ResponseMessage));
+
+        // [TEST 2]
+        ApiStatus := MemberApiLibrary.MemberCardRegisterArrivalAPI('FOOBAR MEMBER NO', AdmissionCode, ScannerStation, ResponseMessage);
+        Assert.Isfalse(ApiStatus, StrSubstNo('Member arrival must fail when providing invalid card number: %1', ResponseMessage));
+    end;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]

@@ -184,9 +184,12 @@
         }
         field(40; "Ticket Item Barcode"; Code[50])
         {
-            Caption = 'Ticket Item Barcode';
+            Caption = 'Ticket Item';
             DataClassification = CustomerContent;
-            TableRelation = "Item Reference"."Reference No." WHERE("Reference Type" = CONST("Bar Code"));
+            // TableRelation = "Item Reference"."Reference No." WHERE("Reference Type" = CONST("Bar Code"));
+            TableRelation = if ("Ticket ITem Type" = CONST(REFERENCE)) "Item Reference"."Reference No." WHERE("Reference Type" = CONST("Bar Code"))
+            ELSE
+            Item."No." WHERE("NPR Ticket Type" = FILTER(<> ''));
         }
         field(41; "Ticket Print Model"; Option)
         {
@@ -215,6 +218,13 @@
             Caption = 'Ticket Print Template Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR RP Template Header";
+        }
+        field(45; "Ticket Item Type"; Option)
+        {
+            Caption = 'Ticket Item Type';
+            DataClassification = CustomerContent;
+            OptionCaption = 'Item,Reference';
+            OptionMembers = ITEM,REFERENCE;
         }
         field(50; "Account Print Object Type"; Option)
         {

@@ -333,12 +333,18 @@
             }
             group("On Membercard Swipe")
             {
+                field("Ticket Item Type"; Rec."Ticket Item Type")
+                {
+                    ToolTip = 'Specifies the value of the Ticket Item Type field';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Visible = false;
+                }
                 field("Ticket Item Barcode"; Rec."Ticket Item Barcode")
                 {
-
                     ToolTip = 'Specifies the value of the Ticket Item Barcode field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+
             }
             group(GDPR)
             {

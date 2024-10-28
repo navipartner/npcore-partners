@@ -124,6 +124,7 @@ page 6151294 "NPR TM Ticket Card"
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    Visible = false;
                 }
                 field("External Member Card No."; Rec."External Member Card No.")
                 {

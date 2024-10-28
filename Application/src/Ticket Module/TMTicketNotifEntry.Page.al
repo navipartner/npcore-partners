@@ -279,6 +279,7 @@
                 {
                     ToolTip = 'Specifies the value of the Ticket Variant Code field';
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Visible = false;
                 }
                 field("Ticket External Item No."; Rec."Ticket External Item No.")
                 {

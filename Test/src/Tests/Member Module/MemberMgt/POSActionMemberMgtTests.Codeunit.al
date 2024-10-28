@@ -184,7 +184,8 @@ codeunit 85082 "NPR POS Action MemberMgt Tests"
         MembershipSetup.Blocked := false;
         ItemNo := TicketLibrary.CreateScenario_SmokeTest();
         Item.Get(ItemNo);
-        MembershipSetup.Validate("Ticket Item Barcode", StrSubstNo('IXRF-%1', ItemNo)); // Ticket smoketest scenario creates item cross reference by prefixing item no.
+        MembershipSetup."Ticket Item Type" := MembershipSetup."Ticket Item Type"::ITEM;
+        MembershipSetup.Validate("Ticket Item Barcode", ItemNo);
         MembershipSetup.Modify();
         LibraryPOSMaster.CreatePostingSetupForSaleItem(Item, POSUnit, POSStore);
         MemberApiLibrary.CreateMembership(MemberItem."No.", MembershipEntryNo, ResponseMessage);

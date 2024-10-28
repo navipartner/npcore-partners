@@ -69,6 +69,7 @@
                     ApplicationArea = NPRTicketAdvanced;
                     Editable = false;
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    Visible = false;
                 }
                 field(Status; Rec.Status)
                 {

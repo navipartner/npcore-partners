@@ -22,6 +22,7 @@ page 6059885 "NPR TM Ticket BOM Part"
                 {
                     ToolTip = 'Specifies the code that is added to the value in the Item No. column to determine the ticket type (e.g., tickets for children/adults/seniors). Microsoft only supports one dimension of variants.';
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Visible = false;
                 }
                 field(Description; Rec.Description)
                 {
