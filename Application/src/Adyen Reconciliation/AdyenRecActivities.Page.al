@@ -8,6 +8,10 @@ page 6184535 "NPR Adyen Rec. Activities"
     ShowFilter = false;
     Editable = false;
     UsageCategory = None;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2024-10-25';
+    ObsoleteReason = 'Replaced with NPR POS Entry Cue. "Reconc. Batches with Errors"';
+
     layout
     {
         area(content)
@@ -43,45 +47,13 @@ page 6184535 "NPR Adyen Rec. Activities"
         }
     }
 
-    trigger OnOpenPage()
-    var
-        AdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integrat.";
-        AdyenLocalIntegration: Codeunit "NPR EFT Adyen Local Integrat.";
-        PaymentGateway: Record "NPR Magento Payment Gateway";
-        FilterPGCodes: Text;
-    begin
-        Rec.Reset();
-        if not Rec.Get() then begin
-            Rec.Init();
-            Rec.Insert();
-            Commit();
-        end;
-        Rec.SetFilter("EFT Tr. Date Filter", '<=%1', CreateDateTime(CalcDate('<-4D>', Today()), DT2Time(CurrentDateTime())));
-        Rec.SetFilter("EC Payment Date Filter", '<=%1', (CalcDate('<-4D>', Today())));
-        Rec.SetFilter("EFT Tr. Integr. Type Filter", '%1|%2', AdyenCloudIntegration.IntegrationType(), AdyenLocalIntegration.IntegrationType());
-
-        PaymentGateway.Reset();
-        PaymentGateway.SetRange("Integration Type", Enum::"NPR PG Integrations"::Adyen);
-        if PaymentGateway.FindSet() then begin
-            repeat
-                FilterPGCodes += PaymentGateway.Code + '|';
-            until PaymentGateway.Next() = 0;
-            if StrLen(FilterPGCodes) > 0 then
-                FilterPGCodes := FilterPGCodes.TrimEnd('|');
-            Rec.SetFilter("EC PG Filter", FilterPGCodes);
-            CalculateOutstandingECPaymentLines();
-        end;
-
-        CalculateCueFieldValues();
-    end;
-
+    [Obsolete('Cue replaced with NPR POS Entry Cue. "Reconc. Batches with Errors"', '2024-10-25')]
     procedure CalculateCueFieldValues()
     begin
-        Rec.CalcFields("Unposted Documents", "Outstanding EFT Tr. Requests");
     end;
 
+    [Obsolete('Cue replaced with NPR POS Entry Cue. "Reconc. Batches with Errors"', '2024-10-25')]
     procedure CalculateOutstandingECPaymentLines()
     begin
-        Rec.CalcFields("Outstanding EC Payment Lines");
     end;
 }

@@ -8,6 +8,7 @@ pageextension 6014517 "NPR Adyen Reconciliation Cue" extends "Business Manager R
         {
             part("NPR Adyen Reconciliation Activities"; "NPR Adyen Rec. Activities")
             {
+                Enabled = false;
                 Visible = false;
                 ApplicationArea = NPRRetail;
             }
