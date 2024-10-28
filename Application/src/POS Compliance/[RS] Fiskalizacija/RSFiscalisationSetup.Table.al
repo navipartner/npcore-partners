@@ -158,6 +158,39 @@ table 6059861 "NPR RS Fiscalisation Setup"
             Caption = 'Receipt Cut Per Section';
             DataClassification = CustomerContent;
         }
+        field(90; "Enable POS Entry CLE Posting"; Boolean)
+        {
+            Caption = 'Enable POS Entry Cust. Ledg. Entry Posting';
+            DataClassification = CustomerContent;
+        }
+        field(91; "Enable Legal Ent. CLE Posting"; Boolean)
+        {
+            Caption = 'Enable Legal Entities Cust. Ledg. Entry Posting';
+            DataClassification = CustomerContent;
+        }
+        field(92; "Customer Posting Group Filter"; Text[2048])
+        {
+            Caption = 'Customer Posting Group Filter';
+            DataClassification = CustomerContent;
+            trigger OnLookup()
+            var
+                CustomerPostingGroup: Record "Customer Posting Group";
+                SelectionFilterManagement: Codeunit SelectionFilterManagement;
+                CustomerPostingGroups: Page "Customer Posting Groups";
+                RecRef: RecordRef;
+            begin
+                if CustomerPostingGroup.IsEmpty() then
+                    exit;
+                CustomerPostingGroups.SetTableView(CustomerPostingGroup);
+                CustomerPostingGroups.Editable(false);
+                CustomerPostingGroups.LookupMode(true);
+                if CustomerPostingGroups.RunModal() = Action::LookupOK then begin
+                    CustomerPostingGroups.SetSelectionFilter(CustomerPostingGroup);
+                    RecRef.GetTable(CustomerPostingGroup);
+                    "Customer Posting Group Filter" := CopyStr(SelectionFilterManagement.GetSelectionFilter(RecRef, CustomerPostingGroup.FieldNo(Code)), 1, MaxStrLen("Customer Posting Group Filter"));
+                end;
+            end;
+        }
     }
 
     keys

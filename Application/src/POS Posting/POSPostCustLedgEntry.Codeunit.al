@@ -3,66 +3,51 @@ codeunit 6184983 "NPR POS Post Cust. Ledg. Entry"
     Access = Internal;
 
 #if not (BC17 or BC18 or BC19)
+
+    #region General Journal Line Insert
     internal procedure InsertGenJournalLinesForCustLedgEntryPosting(var GenJournalLine: Record "Gen. Journal Line"; var LineNumber: Integer; POSEntry: Record "NPR POS Entry")
     var
-        POSPostingProfile: Record "NPR POS Posting Profile";
-        Customer: Record Customer;
+        CustLedgerEntryPostingEnabled: Boolean;
+        LegalEntityPostingEnabled: Boolean;
+        CustomerPostingGroupFilter: Text;
     begin
-        if POSEntry."Customer No." = '' then
+        OnBeforeInsertGenJournalLinesForCustLedgEntryPosting(CustLedgerEntryPostingEnabled, LegalEntityPostingEnabled, CustomerPostingGroupFilter);
+
+        if not CustLedgerEntryPostingEnabled then
             exit;
 
-        if not GetPOSPostingProfile(POSPostingProfile, POSEntry) then
+        if not CheckCustomerAndAllowPosting(POSEntry."Customer No.", LegalEntityPostingEnabled, CustomerPostingGroupFilter) then
             exit;
 
-        if not POSPostingProfile."Enable POS Entry CLE Posting" then
-            exit;
-
-        Customer.Get(POSEntry."Customer No.");
-        if (Customer."VAT Registration No." <> '') and (not POSPostingProfile."Enable Legal Ent. CLE Posting") then
-            exit;
-
-        ProcessPOSEntry(GenJournalLine, LineNumber, POSEntry, POSPostingProfile."General Journal Batch Name", POSPostingProfile."Journal Template Name");
+        ProcessPOSEntry(GenJournalLine, LineNumber, POSEntry);
     end;
 
-    local procedure GetPOSPostingProfile(var POSPostingProfile: Record "NPR POS Posting Profile"; POSEntry: Record "NPR POS Entry"): Boolean
-    var
-        POSStore: Record "NPR POS Store";
-    begin
-        POSStore.Get(POSEntry."POS Store Code");
-        if POSStore."POS Posting Profile" = '' then
-            exit(false);
-        exit(POSPostingProfile.Get(POSStore."POS Posting Profile"));
-    end;
-
-    local procedure ProcessPOSEntry(var GenJournalLine: Record "Gen. Journal Line"; var LineNumber: Integer; POSEntry: Record "NPR POS Entry"; BatchName: Code[10]; TemplateName: Code[10])
+    local procedure ProcessPOSEntry(var GenJournalLine: Record "Gen. Journal Line"; var LineNumber: Integer; POSEntry: Record "NPR POS Entry")
     begin
         POSEntry.CalcFields("Payment Amount");
         if POSEntry."Payment Amount" > 0 then
-            ProcessPositivePOSSale(GenJournalLine, LineNumber, POSEntry, BatchName, TemplateName)
+            ProcessPositivePOSSale(GenJournalLine, LineNumber, POSEntry)
         else
-            ProcessNegativePOSSale(GenJournalLine, LineNumber, POSEntry, BatchName, TemplateName);
+            ProcessNegativePOSSale(GenJournalLine, LineNumber, POSEntry);
     end;
 
-    local procedure ProcessPositivePOSSale(var GenJournalLine: Record "Gen. Journal Line"; var LineNumber: Integer; POSEntry: Record "NPR POS Entry"; BatchName: Code[10]; TemplateName: Code[10])
+    local procedure ProcessPositivePOSSale(var GenJournalLine: Record "Gen. Journal Line"; var LineNumber: Integer; POSEntry: Record "NPR POS Entry")
     begin
-        CreateGenJournalLine(GenJournalLine, LineNumber, POSEntry, GenJournalLine."Document Type"::Payment, BatchName, TemplateName);
-        CreateGenJournalLine(GenJournalLine, LineNumber, POSEntry, GenJournalLine."Document Type"::Invoice, BatchName, TemplateName);
+        CreateGenJournalLine(GenJournalLine, LineNumber, POSEntry, GenJournalLine."Document Type"::Payment);
+        CreateGenJournalLine(GenJournalLine, LineNumber, POSEntry, GenJournalLine."Document Type"::Invoice);
     end;
 
-    local procedure ProcessNegativePOSSale(var GenJournalLine: Record "Gen. Journal Line"; var LineNumber: Integer; POSEntry: Record "NPR POS Entry"; BatchName: Code[10]; TemplateName: Code[10])
+    local procedure ProcessNegativePOSSale(var GenJournalLine: Record "Gen. Journal Line"; var LineNumber: Integer; POSEntry: Record "NPR POS Entry")
     begin
-        CreateGenJournalLine(GenJournalLine, LineNumber, POSEntry, GenJournalLine."Document Type"::Refund, BatchName, TemplateName);
-        CreateGenJournalLine(GenJournalLine, LineNumber, POSEntry, GenJournalLine."Document Type"::"Credit Memo", BatchName, TemplateName);
+        CreateGenJournalLine(GenJournalLine, LineNumber, POSEntry, GenJournalLine."Document Type"::Refund);
+        CreateGenJournalLine(GenJournalLine, LineNumber, POSEntry, GenJournalLine."Document Type"::"Credit Memo");
     end;
 
-    local procedure CreateGenJournalLine(var GenJournalLine: Record "Gen. Journal Line"; var LineNumber: Integer; POSEntry: Record "NPR POS Entry"; GenJournalDocumentType: Enum "Gen. Journal Document Type";
-                                            BatchName: Code[10]; TemplateName: Code[10])
+    local procedure CreateGenJournalLine(var GenJournalLine: Record "Gen. Journal Line"; var LineNumber: Integer; POSEntry: Record "NPR POS Entry"; GenJournalDocumentType: Enum "Gen. Journal Document Type")
     begin
         LineNumber += 10000;
         GenJournalLine.Init();
         GenJournalLine."Line No." := LineNumber;
-        GenJournalLine."Journal Template Name" := TemplateName;
-        GenJournalLine."Journal Batch Name" := BatchName;
         GenJournalLine."Document Type" := GenJournalDocumentType;
         GenJournalLine."Document No." := POSEntry."Document No.";
         GenJournalLine."Account Type" := GenJournalLine."Account Type"::Customer;
@@ -81,31 +66,30 @@ codeunit 6184983 "NPR POS Post Cust. Ledg. Entry"
         GenJournalLine.Insert();
     end;
 
+    #endregion General Journal Line Insert
+
+    #region Closing Customer Ledger Entries
+
     internal procedure CloseCustLedgerEntries(var POSEntry: Record "NPR POS Entry"; StopOnErrorVar: Boolean)
     var
-        POSPostingProfile: Record "NPR POS Posting Profile";
+        CustLedgerEntryPostingEnabled: Boolean;
+        LegalEntityPostingEnabled: Boolean;
+        CustomerPostingGroupFilter: Text;
     begin
-        if not GetPOSPostingProfile(POSPostingProfile, POSEntry) then
-            exit;
+        OnBeforeCloseCustLedgerEntries(CustLedgerEntryPostingEnabled, LegalEntityPostingEnabled, CustomerPostingGroupFilter);
 
-        if not POSPostingProfile."Enable POS Entry CLE Posting" then
+        if not CustLedgerEntryPostingEnabled then
             exit;
 
         POSEntry.FindSet();
         repeat
-            if POSEntry."Customer No." <> '' then
-                CloseEntries(POSEntry, POSPostingProfile."Enable Legal Ent. CLE Posting", StopOnErrorVar)
+            if CheckCustomerAndAllowPosting(POSEntry."Customer No.", LegalEntityPostingEnabled, CustomerPostingGroupFilter) then
+                CloseEntries(POSEntry, StopOnErrorVar);
         until POSEntry.Next() = 0;
     end;
 
-    local procedure CloseEntries(POSEntry: Record "NPR POS Entry"; LegalEntityPostingEnabled: Boolean; StopOnErrorVar: Boolean)
-    var
-        Customer: Record Customer;
+    local procedure CloseEntries(POSEntry: Record "NPR POS Entry"; StopOnErrorVar: Boolean)
     begin
-        Customer.Get(POSEntry."Customer No.");
-        if (Customer."VAT Registration No." <> '') and (not LegalEntityPostingEnabled) then
-            exit;
-
         POSEntry.CalcFields("Payment Amount");
         if POSEntry."Payment Amount" > 0 then
             CloseEntriesForDocumentType(POSEntry, "Gen. Journal Document Type"::Payment, "Gen. Journal Document Type"::Invoice, StopOnErrorVar)
@@ -167,6 +151,31 @@ codeunit 6184983 "NPR POS Post Cust. Ledg. Entry"
         if CustLedgerEntry.IsEmpty() then
             exit;
         CustLedgerEntry.ModifyAll("Applies-to ID", '');
+    end;
+
+    #endregion Closing Customer Ledger Entries
+
+    local procedure CheckCustomerAndAllowPosting(CustomerNo: Code[20]; LegalEntityPostingEnabled: Boolean; CustomerPostingGroupFilter: Text): Boolean
+    var
+        Customer: Record Customer;
+    begin
+        Customer.SetRange("No.", CustomerNo);
+        if CustomerPostingGroupFilter <> '' then
+            Customer.SetFilter("Customer Posting Group", CustomerPostingGroupFilter);
+        if LegalEntityPostingEnabled then
+            Customer.SetFilter("VAT Registration No.", '<>%1', '');
+
+        exit(not Customer.IsEmpty());
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeInsertGenJournalLinesForCustLedgEntryPosting(var CustLedgerEntryPostingEnabled: Boolean; var LegalEntityPostingEnabled: Boolean; var CustomerPostingGroupFilter: Text)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCloseCustLedgerEntries(var CustLedgerEntryPostingEnabled: Boolean; var LegalEntityPostingEnabled: Boolean; var CustomerPostingGroupFilter: Text)
+    begin
     end;
 
     var

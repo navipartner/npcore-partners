@@ -27,6 +27,9 @@ page 6150854 "NPR RS Fiscalisation Setup"
                     begin
                         if xRec."Enable RS Fiscal" <> Rec."Enable RS Fiscal" then
                             EnabledValueChanged := true;
+
+                        if EnabledValueChanged and (not Rec."Enable RS Fiscal") then
+                            DisableCustLedgerEntryPosting();
                     end;
                 }
                 field("Fiscal Proforma on Sales Doc."; Rec."Fiscal Proforma on Sales Doc.")
@@ -161,6 +164,31 @@ page 6150854 "NPR RS Fiscalisation Setup"
                     }
                 }
             }
+            group("Customer Ledger Entry Posting Setup")
+            {
+                Caption = 'Customer Ledger Entry Posting Setup';
+
+                field("Enable POS Entry CLE Posting"; Rec."Enable POS Entry CLE Posting")
+                {
+                    Caption = 'Enable Posting';
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Enable posting Customer Ledger Entries from POS Entry when customer is selected on POS.';
+                    Enabled = Rec."Enable RS Fiscal";
+                }
+                field("Customer Posting Group Filter"; Rec."Customer Posting Group Filter")
+                {
+                    ToolTip = 'Set the Customer Posting Group for which Customer Ledger Entries Filter will be posted.';
+                    ApplicationArea = NPRRetail;
+                    Enabled = Rec."Enable POS Entry CLE Posting";
+                }
+                field("Enable Legal Ent. CLE Posting"; Rec."Enable Legal Ent. CLE Posting")
+                {
+                    Caption = 'Post Only for Legal Entites';
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Enable posting Customer Ledger Entries for customers that are Legal Entities - have VAT Registration No. set on their Customer Card.';
+                    Enabled = Rec."Enable POS Entry CLE Posting";
+                }
+            }
             group(CertificationDetails)
             {
                 Caption = 'Certification Details';
@@ -265,6 +293,13 @@ page 6150854 "NPR RS Fiscalisation Setup"
     begin
         if EnabledValueChanged then
             ApplicationAreaMgmtFacade.RefreshExperienceTierCurrentCompany(); // refresh of experience tier has to be done in order to trigger OnGetEssentialExperienceAppAreas publisher
+    end;
+
+    local procedure DisableCustLedgerEntryPosting()
+    begin
+        Clear(Rec."Enable POS Entry CLE Posting");
+        Clear(Rec."Enable Legal Ent. CLE Posting");
+        Clear(Rec."Customer Posting Group Filter");
     end;
 
     var
