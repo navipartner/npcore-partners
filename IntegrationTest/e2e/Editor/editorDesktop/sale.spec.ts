@@ -110,6 +110,7 @@ test.describe("Sale test", () => {
       await page.frameLocator('iframe').getByRole('button', { name: 'BELLING COOKER HOOD 100CM' }).click();
       await page.frameLocator('iframe').getByRole('button', { name: 'Discounts' }).click();
       await page.frameLocator('iframe').getByRole('button', { name: 'Line Amount' }).click();
+      await page.waitForTimeout(1000)
       await page.frameLocator('iframe').locator('span').filter({ hasText: '5' }).first().click();
       await page.frameLocator('iframe').locator('span').filter({ hasText: ',' }).first().click();
       await page.frameLocator('iframe').locator('span').filter({ hasText: '5' }).first().click();
@@ -120,6 +121,7 @@ test.describe("Sale test", () => {
       const input = page.frameLocator('iframe').getByTestId('search-input');
       await expect(input).toHaveValue('5,5')
       await page.frameLocator('iframe').locator('span').filter({ hasText: 'OK' }).first().click();
+      await removeLayout(page, key);
     })
   });
   
