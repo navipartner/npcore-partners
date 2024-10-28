@@ -14,7 +14,13 @@ export const switchUserRegion = async (
   // BC19 ~ BC24 - open "My Settings" page 9204
   await page.goto("/BC/?page=9204&tenant=default");
   await page.waitForLoadState("networkidle");
-  await page.waitForSelector(".spinner", { state: "hidden" });
+  try {
+    await page.waitForSelector(".spinner", { state: "hidden", timeout: 30000 });
+  } catch (error) {
+    console.warn("Spinner did not disappear within 60 seconds, reloading the page...");
+    await page.goto("/BC/?page=9204&tenant=default");
+    await page.waitForSelector(".spinner", { state: "hidden", timeout: 30000 });
+  }
   const shouldAuthenticate = await page.getByRole("button", { name: "Sign In" }).count();
   if (shouldAuthenticate > 0) {
     await page.getByLabel("User name:").fill(username ?? "");
@@ -63,6 +69,7 @@ export const switchUserRegion = async (
     }
   }
 
+  await page.waitForTimeout(1000);
   await page.frameLocator('iframe').getByPlaceholder('Search').fill(regionInput);
   await page.waitForTimeout(1000);
 

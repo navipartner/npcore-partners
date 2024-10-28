@@ -32,6 +32,7 @@ export const login = async (
     await page.frameLocator('iframe').getByRole('button', { name: 'Copy Existing Layout' }).click();
     await page.frameLocator('iframe').locator('.new-layout-modal__content-inner > .select > .css-b62m3t-container > .react-select__control > .react-select__indicators').click();
     await page.frameLocator('iframe').getByText('E2E Base layout', { exact: true }).click();
+    await page.waitForTimeout(2000)
     await page.frameLocator('iframe').getByRole('textbox').nth(3).fill(`E2E Testing ${uniqueLayoutKey}`);
   await page
     .frameLocator("iframe")
@@ -72,6 +73,13 @@ export const login = async (
   if (await unfinishedSaleText.isVisible()) {
     await page.waitForTimeout(1000);
     await page.getByRole("button", { name: "No" }).click();
+  }
+  const paymentBinText = page.getByText(
+    "Payment bin has never been balanced"
+  );
+  if (await paymentBinText.isVisible()) {
+    await page.waitForTimeout(1000);
+    await page.getByRole("button", { name: "Yes" }).click();
   }
   const unfinishedBalancingText = page.getByText(
     "Do you want to continue with balancing now?"
