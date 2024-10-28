@@ -26,6 +26,7 @@ page 6151496 "NPR TM DeferRevenueReqDetail"
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Variant Code field.';
+                    Visible = false;
                 }
                 field(AdmissionCode; Rec.AdmissionCode)
                 {

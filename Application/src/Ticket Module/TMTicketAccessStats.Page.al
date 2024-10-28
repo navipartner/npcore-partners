@@ -30,6 +30,7 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    Visible = false;
                 }
                 field("Ticket Type"; Rec."Ticket Type")
                 {

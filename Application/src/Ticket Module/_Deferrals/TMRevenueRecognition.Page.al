@@ -39,6 +39,7 @@ page 6151476 "NPR TM RevenueRecognition"
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Variant Code field.';
                     Editable = false;
+                    Visible = false;
                 }
                 field(TicketValidUntil; Rec.TicketValidUntil)
                 {

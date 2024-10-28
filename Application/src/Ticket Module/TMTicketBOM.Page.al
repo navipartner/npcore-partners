@@ -26,6 +26,7 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the variant code that can be added to the Item No. This is optional, and only used if the Item is configured with variants';
+                    Visible = false;
                 }
                 field("Admission Code"; Rec."Admission Code")
                 {

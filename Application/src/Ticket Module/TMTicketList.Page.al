@@ -188,6 +188,7 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    Visible = false;
                 }
                 field("Last Date Modified"; Rec."Last Date Modified")
                 {

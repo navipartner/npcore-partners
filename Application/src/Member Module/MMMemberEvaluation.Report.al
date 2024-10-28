@@ -310,6 +310,7 @@
         ItemReference: Record "Item Reference";
         POSEntry: Record "NPR POS Entry";
         SalesInvoiceHeader: Record "Sales Invoice Header";
+        Item: Record Item;
     begin
 
         if (not Member.Get(TmpAgrBuffer."Line No.")) then
@@ -331,8 +332,11 @@
         if (MembershipSetup."Ticket Item Barcode" <> '') then begin
             ItemReference.SetFilter("Reference Type", '=%1', ItemReference."Reference Type"::"Bar Code");
             ItemReference.SetFilter("Reference No.", '=%1', MembershipSetup."Ticket Item Barcode");
-            if (not ItemReference.FindFirst()) then
+            if (not ItemReference.FindFirst()) then begin
                 ItemReference.Init();
+                if (Item.Get(CopyStr(MembershipSetup."Ticket Item Barcode", 1, MaxStrLen(ItemReference."Item No.")))) then // Item No. is used as EAN Number
+                    ItemReference."Item No." := Item."No.";
+            end;
 
             IssuedTicket.SetFilter("External Member Card No.", '=%1', Member."External Member No.");
             IssuedTicket.SetFilter(Blocked, '=%1', false);

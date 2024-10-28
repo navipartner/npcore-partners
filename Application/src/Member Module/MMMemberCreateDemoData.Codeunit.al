@@ -118,6 +118,7 @@
         TicketDemo.CreateTicketBOM('320100-3', '', 'MM-CASTLE', '', 1, true, '', 0, "NPR TM ActivationMethod_Bom"::SCAN, TicketBom."Admission Entry Validation"::SINGLE, 0);
 
         MembershipSetup.Get('GOLD');
+        MembershipSetup."Ticket Item Type" := MembershipSetup."Ticket Item Type"::REFERENCE;
         MembershipSetup."Ticket Item Barcode" := 'IXRF-320100-0';
         MembershipSetup.Modify();
 

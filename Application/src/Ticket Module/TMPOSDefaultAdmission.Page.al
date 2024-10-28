@@ -23,6 +23,7 @@
                 {
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Variant Code field';
+                    Visible = false;
                 }
                 field("Admission Code"; Rec."Admission Code")
                 {
