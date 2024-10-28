@@ -615,6 +615,7 @@
         GlobalSettingsModalEditorTabButtonLbl: Label 'Editor';
         GlobalSettingsModalEditorMaintenanceTabLbl: Label 'Maintenance';
         GlobalSettingsModalMobilePosTabLbl: Label 'Mobile Pos';
+        GlobalSettingsShortcutsTabLbl: Label 'Shortcuts';
         GlobalSettingsModalRestaurantTabButtonLbl: Label 'Restaurant';
         GlobalSettingsAuthorizationLbl: Label 'Authorization';
         GlobalSettingsDecimalNumberDigitsLbl: Label 'Decimal Number Digits';
@@ -635,6 +636,13 @@
         GlobalSettingsStartStopPerfRecordingLbl: Label 'Opens built-in BC page for starting/stopping performance recordings : ';
         GlobalSettingsMaintenanceErrorHandlingLbl: Label 'Error Handling';
         GlobalSettingsMaintenanceShowLastStackTraceLbl: Label 'Show last error stacktrace : ';
+        GlobalShortcutsErrorShortcutAlreadyExistsLbl: Label 'Shortcut already exists';
+        GlobalShortcutsErrorShortcutIsPredefinedLbl: Label 'Shortcut is predefined';
+        GlobalShortcutsWarningMessageLbl: Label 'Be aware, entering only numbers, only one letter, or just special key like shift, ctrl, space, enter, backspace, delete, insert, F keys, meta  or alt, may activate your shortcut in the middle of typing or scanning items. Consider using combination of special keys, numbers/letters like ctrl+t, ctrl+1, ctrl+shift+p etc.';
+        GlobalShortcutsClickToAddShortcutLbl: Label 'Click to add a shortcut';
+        GlobalShortcutsClickToAddActionLbl: Label 'Click to add an action';
+        GlobalShortcutsEditParametersLbl: Label 'Edit parameters';
+        GlobalShortcutsAddShortcutLbl: Label 'Add shortcut';
         GlobalSettingsPleaseEnterNameForThisActionLbl: Label 'Please enter name for this action';
         GlobalSettingsNoEditableVariablesLbl: Label 'No Editable Variables';
         GlobalSettingsAddNewLbl: Label 'Add New';
@@ -762,6 +770,14 @@
         VariablesDialogDataTypeTextLbl: Label 'Text';
         VariablesDialogDataTypeBooleanLbl: Label 'Boolean';
         VariablesDialogDataTypeOptionLbl: Label 'Option';
+        StatisticsTotalSalesTitleLbl: Label 'Total Sales Statistics';
+        StatisticsSalesPerCustomerTitleLbl: Label 'Sales Per Customer Statistics';
+        StatisticsSalesPerProductQuantityTitleLbl: Label 'Sales Per Product Quantity';
+        StatisticsTotalSalesLbl: Label 'Total Sales';
+        StatisticsSalesPerCustomerLbl: Label 'Sales Per Customer';
+        StatisticsSalesPerProductLbl: Label 'Sales Per Product';
+        StatisticsOneDayLbl: Label '1 Day';
+        StatisticsSevenDaysLbl: Label '7 Days';
     begin
         Captions.Add('Sale_ReceiptNo', CaptionLabelReceiptNo);
         Captions.Add('Sale_EANHeader', CaptionLabelEANHeader);
@@ -1110,6 +1126,7 @@
         Captions.Add('Global_Settings_Modal_EditorTabButton', GlobalSettingsModalEditorTabButtonLbl);
         Captions.Add('Global_Settings_Modal_MaintenanceTab', GlobalSettingsModalEditorMaintenanceTabLbl);
         Captions.Add('Global_Settings_Modal_MobilePosTab', GlobalSettingsModalMobilePosTabLbl);
+        Captions.Add('Global_Settings_ShortcutsTab',GlobalSettingsShortcutsTabLbl);
         Captions.Add('Global_Settings_DecimalNumberDigits', GlobalSettingsDecimalNumberDigitsLbl);
         Captions.Add('Global_Settings_DecimalNumberDigitsInfo', GlobalSettingsDecimalNumberDigitsInfoLbl);
         Captions.Add('Global_Settings_NamedActions', GlobalSettingsNamedActionsLbl);
@@ -1142,6 +1159,13 @@
         Captions.Add('Global_Settings_Maintenance_StartStopPerfRecording', GlobalSettingsStartStopPerfRecordingLbl);
         Captions.Add('Global_Settings_Maintenance_ErrorHandling', GlobalSettingsMaintenanceErrorHandlingLbl);
         Captions.Add('Global_Settings_Maintenance_ShowLastStackTrace', GlobalSettingsMaintenanceShowLastStackTraceLbl);
+        Captions.Add('Global_Shortcuts_Error_ShortcutAlreadyExists', GlobalShortcutsErrorShortcutAlreadyExistsLbl);
+        Captions.Add('Global_Shortcuts_Error_ShortcutIsPredefined',GlobalShortcutsErrorShortcutIsPredefinedLbl);
+        Captions.Add('Global_Shortcuts_WarningMessage',GlobalShortcutsWarningMessageLbl);
+        Captions.Add('Global_Shortcuts_ClickToAddShortcut',GlobalShortcutsClickToAddShortcutLbl);
+        Captions.Add('Global_Shortcuts_ClickToAddAction', GlobalShortcutsClickToAddActionLbl);
+        Captions.Add('Global_Shortcuts_EditParameters', GlobalShortcutsEditParametersLbl);
+        Captions.Add('Global_Shortcuts_AddShortcut',GlobalShortcutsAddShortcutLbl);
         Captions.Add('Color_Settings_SelectPrimaryColor', ColorSettingsSelectPrimaryColorLbl);
         Captions.Add('Color_Settings_ChangeColor', ColorSettingsChangeColorLbl);
         Captions.Add('Color_Settings_SelectSecondaryColor', ColorSettingsSelectSecondaryColorLbl);
@@ -1256,6 +1280,14 @@
         Captions.Add('VariablesDialog_DataTypeText', VariablesDialogDataTypeTextLbl);
         Captions.Add('VariablesDialog_DataTypeBoolean', VariablesDialogDataTypeBooleanLbl);
         Captions.Add('VariablesDialog_DataTypeOption', VariablesDialogDataTypeOptionLbl);
+        Captions.Add('Statistics_TotalSalesTitle', StatisticsTotalSalesTitleLbl);
+        Captions.Add('Statistics_SalesPerCustomerTitle', StatisticsSalesPerCustomerTitleLbl);
+        Captions.Add('Statistics_SalesPerProductQuantityTitle', StatisticsSalesPerProductQuantityTitleLbl);
+        Captions.Add('Statistics_TotalSales',StatisticsTotalSalesLbl);
+        Captions.Add('Statistics_SalesPerCustomer', StatisticsSalesPerCustomerLbl);
+        Captions.Add('Statistics_SalesPerProduct',StatisticsSalesPerProductLbl);
+        Captions.Add('Statistics_OneDay', StatisticsOneDayLbl);
+        Captions.Add('Statistics_SevenDays', StatisticsSevenDaysLbl);
 
         RecRef.Open(DATABASE::"NPR POS Sale Line");
         for i := 1 to RecRef.FieldCount do begin
