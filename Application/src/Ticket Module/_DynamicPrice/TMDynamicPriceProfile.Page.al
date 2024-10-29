@@ -57,5 +57,27 @@ page 6059868 "NPR TM Dynamic Price Profile"
                 end;
             }
         }
+        area(Navigation)
+        {
+            action(WhereUsed)
+            {
+                ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
+                Caption = 'Where Used';
+                ToolTip = 'Show where this price profile is used.';
+                Image = Navigate;
+                Promoted = true;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+
+                trigger OnAction()
+                var
+                    ItemProfileList: Page "NPR TM DynamicPriceItemList";
+                begin
+                    ItemProfileList.SetPriceViewProfileCode(Rec.ProfileCode);
+                    ItemProfileList.Run();
+                end;
+            }
+        }
     }
 }

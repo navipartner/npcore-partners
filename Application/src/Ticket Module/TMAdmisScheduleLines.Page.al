@@ -228,6 +228,22 @@
                               "Schedule Code" = FIELD("Schedule Code");
 
             }
+            Action(DetailedPrices)
+            {
+                Caption = 'Prices Profiles';
+                ToolTip = 'Navigate to Dynamic Prices';
+                ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
+                Scope = Repeater;
+                Image = Price;
+
+                trigger OnAction()
+                var
+                    ItemProfileList: Page "NPR TM DynamicPriceItemList";
+                begin
+                    ItemProfileList.SetPriceViewAdmissionSchedule(Rec."Admission Code", Rec."Schedule Code");
+                    ItemProfileList.Run();
+                end;
+            }
         }
         area(Processing)
         {

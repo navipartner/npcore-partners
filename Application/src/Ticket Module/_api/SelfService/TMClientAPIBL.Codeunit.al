@@ -820,7 +820,7 @@ codeunit 6151543 "NPR TM Client API BL"
                 BlockSaleReason := BlockSaleReason::RemainingCapacityZeroOrLess;
             end;
 
-            HavePriceRule := TicketPrice.SelectPriceRule(AdmissionScheduleEntry, Today(), Time(), PriceRule);
+            HavePriceRule := TicketPrice.SelectPriceRule(AdmissionScheduleEntry, AdmCapacityPriceBufferResponse.ItemNumber, AdmCapacityPriceBufferResponse.VariantCode, Today(), Time(), PriceRule);
             if (HavePriceRule) then
                 TicketPrice.EvaluatePriceRule(PriceRule, AdmCapacityPriceBufferResponse.UnitPrice, AdmCapacityPriceBufferResponse.UnitPriceIncludesVat, AdmCapacityPriceBufferResponse.UnitPriceVatPercentage, false, BasePrice, AddonPrice);
 

@@ -94,6 +94,7 @@ page 6059885 "NPR TM Ticket BOM Part"
                 Scope = Repeater;
                 Caption = 'Admission';
                 Image = WorkCenter;
+
                 RunObject = Page "NPR TM Admission Card";
                 RunPageLink = "Admission Code" = field("Admission Code");
             }
@@ -104,6 +105,7 @@ page 6059885 "NPR TM Ticket BOM Part"
                 Scope = Repeater;
                 Caption = 'Admission Schedules';
                 Image = CalendarWorkcenter;
+
                 RunObject = Page "NPR TM Admis. Schedule Lines";
                 RunPageLink = "Admission Code" = field("Admission Code");
             }
@@ -114,8 +116,25 @@ page 6059885 "NPR TM Ticket BOM Part"
                 Scope = Repeater;
                 Caption = 'Schedule Entries';
                 Image = WorkCenterLoad;
+
                 RunObject = Page "NPR TM Admis. Schedule Entry";
                 RunPageLink = "Admission Code" = field("Admission Code");
+            }
+            Action(DetailedPrices)
+            {
+                Caption = 'Prices Profiles';
+                ToolTip = 'Navigate to Dynamic Prices Profiles';
+                ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
+                Scope = Repeater;
+                Image = Price;
+
+                trigger OnAction()
+                var
+                    ItemProfileList: Page "NPR TM DynamicPriceItemList";
+                begin
+                    ItemProfileList.SetPriceViewItemAdmission(Rec."Item No.", Rec."Variant Code", Rec."Admission Code");
+                    ItemProfileList.Run();
+                end;
             }
         }
     }
