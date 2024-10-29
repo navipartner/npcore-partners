@@ -270,7 +270,7 @@ xmlport 6060113 "NPR TM Admis. Capacity Check"
                         Amount := '';
                         Percentage := '';
                         IncludesVAT := '';
-                        if (TicketPrice.SelectPriceRule(TmpAdmScheduleEntryResponse, LocalDate, LocalTime, PriceRule)) then begin
+                        if (TicketPrice.SelectPriceRule(TmpAdmScheduleEntryResponse, ItemNumber, VariantCode, LocalDate, LocalTime, PriceRule)) then begin
                             case (PriceRule.PricingOption) of
                                 PriceRule.PricingOption::NA:
                                     PriceOption := '';

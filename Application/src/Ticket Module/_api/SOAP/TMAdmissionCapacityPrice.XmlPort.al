@@ -277,7 +277,7 @@ xmlport 6014411 "NPR TM AdmissionCapacityPrice"
                             LocalDate := DT2Date(LocalDateTime);
                             LocalTime := DT2Time(LocalDateTime);
 
-                            HavePriceRule := TicketPrice.SelectPriceRule(TmpAdmScheduleEntryResponse, LocalDate, LocalTime, PriceRule);
+                            HavePriceRule := TicketPrice.SelectPriceRule(TmpAdmScheduleEntryResponse, xAdmCapacityPriceBufferResponse.ItemNumber, xAdmCapacityPriceBufferResponse.VariantCode, LocalDate, LocalTime, PriceRule);
                             if (HavePriceRule) then
                                 TicketPrice.EvaluatePriceRule(PriceRule, xAdmCapacityPriceBufferResponse.UnitPrice, xAdmCapacityPriceBufferResponse.UnitPriceIncludesVat, xAdmCapacityPriceBufferResponse.UnitPriceVatPercentage, false, BasePrice, AddonPrice);
 

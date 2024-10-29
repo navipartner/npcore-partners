@@ -128,7 +128,7 @@ codeunit 6014559 "NPR TM Dynamic Price"
     begin
 
         if (AdmScheduleEntry."Entry No." > 0) and (AdmScheduleEntry."External Schedule Entry No." > 0) then
-            HavePriceRule := SelectPriceRule(AdmScheduleEntry, ReferenceDate, ReferenceTime, PriceRule);
+            HavePriceRule := SelectPriceRule(AdmScheduleEntry, ReservationRequest."Item No.", ReservationRequest."Variant Code", ReferenceDate, ReferenceTime, PriceRule);
         if (HavePriceRule) then
             EvaluatePriceRule(PriceRule, OriginalUnitPrice, PriceIncludesVAT, VatPercentage, false, BasePrice, AddonPrice);
 
@@ -309,7 +309,7 @@ codeunit 6014559 "NPR TM Dynamic Price"
         AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', ExternalScheduleEntryNo);
         AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
         if (AdmissionScheduleEntry.FindLast()) then begin
-            HavePriceRule := SelectPriceRule(AdmissionScheduleEntry, BookingDateDate, BookingTime, PriceRule);
+            HavePriceRule := SelectPriceRule(AdmissionScheduleEntry, TicketItemNo, TicketVariantCode, BookingDateDate, BookingTime, PriceRule);
             if (HavePriceRule) then
                 EvaluatePriceRule(PriceRule, OriginalUnitPrice, UnitPriceIncludesVAT, UnitPriceVatPercentage, IncludeBasePrice, BasePrice, AddonPrice);
         end;
@@ -409,12 +409,20 @@ codeunit 6014559 "NPR TM Dynamic Price"
     end;
 
 #pragma warning disable AA0137
-    internal procedure SelectPriceRule(AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; BookingDate: Date; BookingTime: Time; var SelectedPriceRule: Record "NPR TM Dynamic Price Rule"): Boolean
+    internal procedure SelectPriceRule(AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"; ItemNo: Code[20]; VariantCode: Code[10]; BookingDate: Date; BookingTime: Time; var SelectedPriceRule: Record "NPR TM Dynamic Price Rule"): Boolean
     var
         DynamicPriceRule: Record "NPR TM Dynamic Price Rule";
+        ItemProfileList: Record "NPR TM DynamicPriceItemList";
+        PriceProfileCode: Code[10];
     begin
 
-        DynamicPriceRule.SetFilter(ProfileCode, '=%1', AdmissionScheduleEntry."Dynamic Price Profile Code");
+        PriceProfileCode := AdmissionScheduleEntry."Dynamic Price Profile Code";
+
+        if (ItemProfileList.Get(ItemNo, VariantCode, AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code")) then
+            if (ItemProfileList.ItemPriceCode <> '') then
+                PriceProfileCode := ItemProfileList.ItemPriceCode;
+
+        DynamicPriceRule.SetFilter(ProfileCode, '=%1', PriceProfileCode);
         DynamicPriceRule.SetFilter(Blocked, '=%1', false);
         if (not DynamicPriceRule.FindFirst()) then begin
             SelectedPriceRule.Init();
