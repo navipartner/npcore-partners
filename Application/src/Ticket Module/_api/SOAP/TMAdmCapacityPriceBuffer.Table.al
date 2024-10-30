@@ -67,6 +67,13 @@ table 6060016 "NPR TM AdmCapacityPriceBuffer"
         {
             DataClassification = CustomerContent;
         }
+        field(225; CapacityControl; Option)
+        {
+            Caption = 'Capacity Control';
+            DataClassification = CustomerContent;
+            OptionCaption = 'None,Sales,Admitted,Admitted & Departed,Seating';
+            OptionMembers = "NONE",SALES,ADMITTED,FULL,SEATING;
+        }
         field(230; DefaultAdmission; Boolean)
         {
             DataClassification = CustomerContent;

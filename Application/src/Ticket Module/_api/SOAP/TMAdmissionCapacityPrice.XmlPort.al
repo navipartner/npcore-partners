@@ -123,6 +123,14 @@ xmlport 6014411 "NPR TM AdmissionCapacityPrice"
                     {
                         XmlName = 'vat_pct';
                     }
+                    textattribute(xCapacityControlBy)
+                    {
+                        XmlName = 'capacity_control';
+                        trigger OnBeforePassVariable()
+                        begin
+                            xCapacityControlBy := GetCapacityControlDescription(xAdmCapacityPriceBufferResponse.CapacityControl);
+                        end;
+                    }
 
                     tableelement(TmpAdmScheduleEntryResponse; "NPR TM Admis. Schedule Entry")
                     {
@@ -234,7 +242,6 @@ xmlport 6014411 "NPR TM AdmissionCapacityPrice"
                         {
                             XmlName = 'customer_price';
                         }
-
 
                         trigger OnPreXmlItem()
                         begin
@@ -430,6 +437,8 @@ xmlport 6014411 "NPR TM AdmissionCapacityPrice"
 
         BomIndex := 0;
         repeat
+            Admission.Get(TicketBom."Admission Code");
+
             xAdmCapacityPriceBufferResponse.TransferFields(AdmCapacityPriceBuffer, false);
             xAdmCapacityPriceBufferResponse.EntryNo := AdmCapacityPriceBuffer.EntryNo + BomIndex;
             xAdmCapacityPriceBufferResponse.AdmissionCode := TicketBom."Admission Code";
@@ -437,13 +446,13 @@ xmlport 6014411 "NPR TM AdmissionCapacityPrice"
             xAdmCapacityPriceBufferResponse.AdmissionInclusion := TicketBom."Admission Inclusion";
             xAdmCapacityPriceBufferResponse.ItemNumber := xAdmCapacityPriceBufferResponse.RequestItemNumber;
             xAdmCapacityPriceBufferResponse.VariantCode := xAdmCapacityPriceBufferResponse.RequestVariantCode;
+            xAdmCapacityPriceBufferResponse.CapacityControl := Admission."Capacity Control";
 
             if (TicketBom."Admission Inclusion" = TicketBom."Admission Inclusion"::REQUIRED) then
                 if (TicketBom.Default) then
                     CalculateErpPrice(xAdmCapacityPriceBufferResponse);
 
             if (TicketBom."Admission Inclusion" <> TicketBom."Admission Inclusion"::REQUIRED) then begin
-                Admission.Get(TicketBom."Admission Code");
                 xAdmCapacityPriceBufferResponse.ItemNumber := Admission."Additional Experience Item No.";
                 xAdmCapacityPriceBufferResponse.VariantCode := '';
                 if (xAdmCapacityPriceBufferResponse.ItemNumber <> '') then
@@ -466,6 +475,23 @@ xmlport 6014411 "NPR TM AdmissionCapacityPrice"
         until (TicketBom.Next() = 0);
 
     end;
+
+    local procedure GetCapacityControlDescription(CapacityControl: Option) Description: Text
+    var
+        Admission: Record "NPR TM Admission";
+    begin
+        case CapacityControl of
+            Admission."Capacity Control"::SALES:
+                Description := 'sales';
+            Admission."Capacity Control"::ADMITTED:
+                Description := 'admitted';
+            Admission."Capacity Control"::FULL:
+                Description := 'admitted_and_departed';
+            Admission."Capacity Control"::NONE:
+                Description := 'none';
+        end;
+    end;
+
 
     local procedure SetResponseMessageText(ReasonCode: Enum "NPR TM Sch. Block Sales Reason"): Text
     begin

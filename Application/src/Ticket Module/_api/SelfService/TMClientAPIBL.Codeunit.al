@@ -725,6 +725,7 @@ codeunit 6151543 "NPR TM Client API BL"
 
         BomIndex := 1;
         repeat
+            Admission.Get(TicketBom."Admission Code");
 
             AdmCapacityPriceBuffer.EntryNo := BomIndex;
             AdmCapacityPriceBuffer.AdmissionCode := TicketBom."Admission Code";
@@ -736,7 +737,6 @@ codeunit 6151543 "NPR TM Client API BL"
                     TicketPrice.CalculateErpPrice(AdmCapacityPriceBuffer);
 
             if (TicketBom."Admission Inclusion" <> TicketBom."Admission Inclusion"::REQUIRED) then begin
-                Admission.Get(TicketBom."Admission Code");
                 AdmCapacityPriceBuffer.ItemNumber := Admission."Additional Experience Item No.";
                 AdmCapacityPriceBuffer.VariantCode := '';
                 if (AdmCapacityPriceBuffer.ItemNumber <> '') then
@@ -752,6 +752,11 @@ codeunit 6151543 "NPR TM Client API BL"
             JBuilder.WriteStartObject('included');
             JBuilder.WriteRawProperty('option', TicketBom."Admission Inclusion");
             JBuilder.WriteStringProperty('description', GetInclusionDescription(TicketBom."Admission Inclusion"));
+            JBuilder.WriteEndObject();
+
+            JBuilder.WriteStartObject('capacity-control');
+            JBuilder.WriteRawProperty('option', Admission."Capacity Control");
+            JBuilder.WriteStringProperty('description', GetCapacityControlDescription(Admission."Capacity Control"));
             JBuilder.WriteEndObject();
 
             JBuilder.WriteStringProperty('customerNumber', CustomerNumber);
@@ -1051,6 +1056,22 @@ codeunit 6151543 "NPR TM Client API BL"
                 Description := 'selected';
             TicketBom."Admission Inclusion"::NOT_SELECTED:
                 Description := 'not_selected';
+        end;
+    end;
+
+    local procedure GetCapacityControlDescription(CapacityControl: Option) Description: Text
+    var
+        Admission: Record "NPR TM Admission";
+    begin
+        case CapacityControl of
+            Admission."Capacity Control"::SALES:
+                Description := 'sales';
+            Admission."Capacity Control"::ADMITTED:
+                Description := 'admitted';
+            Admission."Capacity Control"::FULL:
+                Description := 'admitted_and_departed';
+            Admission."Capacity Control"::NONE:
+                Description := 'none';
         end;
     end;
 
