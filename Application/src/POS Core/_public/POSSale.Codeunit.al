@@ -1004,6 +1004,7 @@
         TMTicketPrintError: Label 'The error occurred during the printing Ticket: %1';
         NpCsDeliverCollectDocError: Label 'The error occurred during the delivering Collect Document: %1';
         MMMemberNotifError: label 'The error occurred during sending Membership Notification: %1';
+        WalletPrintError: Label 'The error occurred during the printing of Attraction Wallet: %1';
         IsHandled: Boolean;
     begin
         // Clear existing data in the temporary table
@@ -1024,6 +1025,7 @@
         InsertExecutionOrder(TempExecutionOrderOnSale, Codeunit::"NPR MM Member Print On Sale", 60, MMMemberPrintReceiptError);
         InsertExecutionOrder(TempExecutionOrderOnSale, Codeunit::"NPR MM Member Notif. On Sale", 70, MMMemberNotifError);
         InsertExecutionOrder(TempExecutionOrderOnSale, Codeunit::"NPR TM Ticket Print On Sale", 80, TMTicketPrintError);
+        InsertExecutionOrder(TempExecutionOrderOnSale, Codeunit::"NPR AttractionWalletPrint", 85, WalletPrintError);
         InsertExecutionOrder(TempExecutionOrderOnSale, Codeunit::"NPR NpCs Del.CollectDoc OnSale", 90, NpCsDeliverCollectDocError);
         InsertExecutionOrder(TempExecutionOrderOnSale, Codeunit::"NPR E-mail Receipt On Sale", 100, SendEmailReceiptError);
 

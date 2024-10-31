@@ -162,6 +162,30 @@
     begin
     end;
 
+    procedure PrintTicketFromEndOfSale(SalesTicketNo: Code[20])
+    var
+        Ticket: Record "NPR TM Ticket";
+        Wallet: Codeunit "NPR AttractionWallet";
+        WalletPrintEnabled: Boolean;
+    begin
+        Ticket.SetCurrentKey("Sales Receipt No.");
+        Ticket.SetRange("Sales Receipt No.", SalesTicketNo);
+        Ticket.SetFilter(Blocked, '=%1', false);
+        if (Ticket.FindSet()) then begin
+
+            WalletPrintEnabled := Wallet.IsEndOfSalePrintEnabled();
+
+            repeat
+                if (WalletPrintEnabled) then begin
+                    if (not Wallet.IsTicketInWallet(Ticket)) then
+                        DoTicketPrint(Ticket);
+                end else begin
+                    DoTicketPrint(Ticket);
+                end;
+            until (Ticket.Next() = 0);
+        end
+    end;
+
     procedure PrintTicketFromSalesTicketNo(SalesTicketNo: Code[20])
     var
         Ticket: Record "NPR TM Ticket";
@@ -211,13 +235,7 @@
 
     procedure PrintTicketBatch(var TicketFilter: Record "NPR TM Ticket")
     var
-        Ticket, Ticket2 : Record "NPR TM Ticket";
-        TicketSetup: Record "NPR TM Ticket Setup";
-        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        TicketDIYTicketPrint: Codeunit "NPR TM Ticket DIY Ticket Print";
-        ResponseMessage: Text;
-        PrintTicket: Boolean;
-        PublishError: Boolean;
+        Ticket: Record "NPR TM Ticket";
     begin
         Ticket.CopyFilters(TicketFilter);
         Ticket.SetFilter(Blocked, '=%1', false);
@@ -225,48 +243,61 @@
             exit;
 
         repeat
-
-            PrintTicket := true;
-
-            if (TicketRequestManager.IsETicket(Ticket."No.")) then begin
-                TicketSetup.Get();
-
-                if (TicketRequestManager.CreateAndSendETicket(Ticket."No.", ResponseMessage)) then begin
-                    PrintTicket := not TicketSetup."Suppress Print When eTicket";
-                end else begin
-                    if (TicketSetup."Show Send Fail Message In POS") then
-                        Message(ResponseMessage);
-                end;
-            end;
-
-            if (TicketDIYTicketPrint.CheckPublishTicketUrl(Ticket."No.")) then begin
-                TicketSetup.Get();
-
-                PublishError := not TicketDIYTicketPrint.PublishTicketUrl(Ticket."No.", ResponseMessage);
-
-                if (not PublishError) and (TicketDIYTicketPrint.CheckSendTicketUrl(Ticket."No.")) then
-                    PublishError := not TicketDIYTicketPrint.SendTicketUrl(Ticket."No.", ResponseMessage);
-
-                if (PublishError) then begin
-                    if (TicketSetup."Show Send Fail Message In POS") then
-                        Message(ResponseMessage);
-                end else begin
-                    PrintTicket := not TicketSetup."Suppress Print When eTicket";
-                end;
-            end;
-
-            if (PrintTicket) then begin
-                Ticket2.SetFilter("No.", '=%1', Ticket."No.");
-                Ticket2.Get(Ticket."No.");
-                if (PrintSingleTicket(Ticket2)) then begin
-                    Ticket2.Get(Ticket."No.");
-                    Ticket2."Printed Date" := Today();
-                    Ticket2.Modify();
-                    Commit();
-                end
-            end;
-
+            DoTicketPrint(Ticket);
         until (Ticket.Next() = 0);
+    end;
+
+    internal procedure DoTicketPrint(var Ticket: Record "NPR TM Ticket")
+    var
+        Ticket2: Record "NPR TM Ticket";
+        TicketSetup: Record "NPR TM Ticket Setup";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketDIYTicketPrint: Codeunit "NPR TM Ticket DIY Ticket Print";
+        ResponseMessage: Text;
+        PrintTicket: Boolean;
+        PublishError: Boolean;
+    begin
+
+        PrintTicket := true;
+
+        if (TicketRequestManager.IsETicket(Ticket."No.")) then begin
+            TicketSetup.Get();
+
+            if (TicketRequestManager.CreateAndSendETicket(Ticket."No.", ResponseMessage)) then begin
+                PrintTicket := not TicketSetup."Suppress Print When eTicket";
+            end else begin
+                if (TicketSetup."Show Send Fail Message In POS") then
+                    Message(ResponseMessage);
+            end;
+        end;
+
+        if (TicketDIYTicketPrint.CheckPublishTicketUrl(Ticket."No.")) then begin
+            TicketSetup.Get();
+
+            PublishError := not TicketDIYTicketPrint.PublishTicketUrl(Ticket."No.", ResponseMessage);
+
+            if (not PublishError) and (TicketDIYTicketPrint.CheckSendTicketUrl(Ticket."No.")) then
+                PublishError := not TicketDIYTicketPrint.SendTicketUrl(Ticket."No.", ResponseMessage);
+
+            if (PublishError) then begin
+                if (TicketSetup."Show Send Fail Message In POS") then
+                    Message(ResponseMessage);
+            end else begin
+                PrintTicket := not TicketSetup."Suppress Print When eTicket";
+            end;
+        end;
+
+        if (PrintTicket) then begin
+            Ticket2.SetFilter("No.", '=%1', Ticket."No.");
+            Ticket2.Get(Ticket."No.");
+            if (PrintSingleTicket(Ticket2)) then begin
+                Ticket2.Get(Ticket."No.");
+                Ticket2."Printed Date" := Today();
+                Ticket2.Modify();
+                Commit();
+            end
+        end;
+
     end;
 
     local procedure PrintTicketUsingFormatter(var Ticket: Record "NPR TM Ticket"; PrintObjectType: Option; PrintObjectId: Integer; PrintTemplateCode: Code[20]): Boolean
