@@ -385,7 +385,7 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
 
     local procedure CalculateRSGLMarginAmount(StdTransitValueEntry: Record "Value Entry"; CalculationValueEntry: Record "Value Entry"): Decimal
     begin
-        exit(-(Abs(CalculationValueEntry."Cost Amount (Actual)") - CalculateRSGLVATAmount(StdTransitValueEntry)))
+        exit(-(Abs(CalculationValueEntry."Cost Amount (Actual)") - Abs(CalculateRSGLVATAmount(StdTransitValueEntry))))
     end;
 
     local procedure CalculateRSGLVATAmount(StdTransitValueEntry: Record "Value Entry"): Decimal
