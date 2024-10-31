@@ -16,7 +16,8 @@ codeunit 6184658 "NPR TM Ticket Print On Sale"
 
         if not POSTicketProfile."Print Ticket On Sale" then
             exit;
-        TMTicketManagement.PrintTicketFromSalesTicketNo(Rec."Sales Ticket No.");
+
+        TMTicketManagement.PrintTicketFromEndOfSale(Rec."Sales Ticket No.");
     end;
 
 }

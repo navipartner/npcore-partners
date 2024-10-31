@@ -122,6 +122,22 @@ page 6184846 "NPR AttractionWallet"
 
                 end;
             }
+            action(PrintWallet)
+            {
+                ApplicationArea = NPRRetail;
+                ToolTip = 'Print Wallet';
+                Caption = 'Print';
+                Image = Print;
+                Promoted = true;
+                PromotedOnly = true;
+                Scope = Repeater;
+                trigger OnAction()
+                var
+                    WalletMgr: Codeunit "NPR AttractionWallet";
+                begin
+                    WalletMgr.PrintWallet(Rec.EntryNo, Enum::"NPR WalletPrintType"::WALLET);
+                end;
+            }
         }
         area(Navigation)
         {
