@@ -136,6 +136,10 @@ page 6059925 "NPR APIV1 PBIGLEntry"
                 {
                     Caption = 'Last Modified Date Filter', Locked = true;
                 }
+                field(priorYearEntry; Rec."Prior-Year Entry")
+                {
+                    Caption = 'Prior-Year Entry', Locked = true;
+                }
             }
         }
     }
