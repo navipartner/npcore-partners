@@ -535,6 +535,7 @@
         NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
         Voucher: Record "NPR NpRv Voucher";
         VoucherEntry: Record "NPR NpRv Voucher Entry";
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
     begin
         if not ToSalesHeader.IsCreditDocType() then
             exit;
@@ -547,9 +548,16 @@
         VoucherEntry.SetRange("Document Type", VoucherEntry."Document Type"::Invoice);
         VoucherEntry.SetRange("Document No.", FromSalesInvLine."Document No.");
         VoucherEntry.SetRange("Document Line No.", FromSalesInvLine."Line No.");
-        if VoucherEntry.FindFirst() then
+        if VoucherEntry.FindFirst() then begin
+            MagentoPaymentLine.Reset();
+            MagentoPaymentLine.SetRange("Document Table No.", Database::"Sales Invoice Header");
+            MagentoPaymentLine.SetRange("Document No.", VoucherEntry."Document No.");
+            MagentoPaymentLine.SetRange("Line No.", VoucherEntry."Document Line No.");
+            if not MagentoPaymentLine.IsEmpty then
+                exit;
+
             Voucher.Get(VoucherEntry."Voucher No.")
-        else begin
+        end else begin
             ArchVoucherEntry.SetCurrentKey("Entry Type", "Document Type", "Document No.", "Document Line No.");
             ArchVoucherEntry.SetFilter("Entry Type", '%1|%2|%3',
                 ArchVoucherEntry."Entry Type"::"Issue Voucher",
