@@ -28,7 +28,7 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         if not RSRLocalizationMgt.IsRSLocalizationActive() then
             exit;
 
-        if not CheckRetailLocation(TransferHeader) then
+        if (not RSRLocalizationMgt.IsRetailLocation(TransferHeader."Transfer-from Code")) or RSRLocalizationMgt.IsRetailLocation(TransferHeader."Transfer-to Code") then
             exit;
 
         TempTransferLine.Reset();
@@ -488,20 +488,8 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
             exit(true);
     end;
 
-    local procedure CheckRetailLocation(TransferHeader: Record "Transfer Header"): Boolean
-    var
-        Location: Record Location;
-        Location2: Record Location;
-    begin
-        Location.Get(TransferHeader."Transfer-from Code");
-        Location2.Get(TransferHeader."Transfer-to Code");
-
-        exit((Location."NPR Retail Location") and (not Location2."NPR Retail Location"))
-    end;
-
     local procedure FillRetailTransferLines(TransferHeader: Record "Transfer Header")
     var
-        Location: Record Location;
         TransferLine: Record "Transfer Line";
     begin
         TransferLine.SetRange("Document No.", TransferHeader."No.");
@@ -509,12 +497,9 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
             exit;
         TransferLine.FindSet();
         repeat
-            if Location.Get(TransferHeader."Transfer-from Code") then
-                if Location."NPR Retail Location" then begin
-                    TempTransferLine.Init();
-                    TempTransferLine.Copy(TransferLine);
-                    TempTransferLine.Insert();
-                end;
+            TempTransferLine.Init();
+            TempTransferLine.Copy(TransferLine);
+            TempTransferLine.Insert();
         until TransferLine.Next() = 0;
     end;
 

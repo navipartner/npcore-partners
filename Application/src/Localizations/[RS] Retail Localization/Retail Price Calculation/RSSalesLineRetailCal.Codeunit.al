@@ -9,12 +9,14 @@ codeunit 6184754 "NPR RS Sales Line Retail Cal."
     internal procedure GetPriceFromSalesPriceList(var SalesLine: Record "Sales Line")
     var
         SalesHeader: Record "Sales Header";
-        Location: Record Location;
+        RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
     begin
-        if not Location.Get(SalesLine."Location Code") then
+        if not RSRLocalizationMgt.IsRetailLocation(SalesLine."Location Code") then
             exit;
-        if not Location."NPR Retail Location" then
-            exit;
+
+        if SalesLine.Type in [SalesLine.Type::Item] then
+            if RSRLocalizationMgt.IsServiceItem(SalesLine."No.") then
+                exit;
 
         SalesHeader.Get("Sales Document Type"::Order, SalesLine."Document No.");
         FilterPriceListHeader(SalesHeader, SalesLine);

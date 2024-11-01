@@ -445,7 +445,6 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
 
     local procedure FillRetailPurchaseLines(PurchInvHeader: Record "Purch. Inv. Header")
     var
-        Location: Record Location;
         PurchInvLine: Record "Purch. Inv. Line";
     begin
         PurchInvLine.SetRange(Type, "Purchase Line Type"::Item);
@@ -454,8 +453,8 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
             exit;
         PurchInvLine.FindSet();
         repeat
-            if Location.Get(PurchInvLine."Location Code") then
-                if Location."NPR Retail Location" then begin
+            if RSRLocalizationMgt.IsRetailLocation(PurchInvLine."Location Code") then
+                if not (RSRLocalizationMgt.IsServiceItem(PurchInvLine."No.")) then begin
                     TempPurchInvLine.Init();
                     TempPurchInvLine.Copy(PurchInvLine);
                     TempPurchInvLine.Insert();
@@ -484,7 +483,6 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
         ItemChargeAssignment: Record "Item Charge Assignment (Purch)";
         AssignedPurchInvLine: Record "Purch. Inv. Line";
         AssignedPurcRcptLine: Record "Purch. Rcpt. Line";
-        Location: Record Location;
     begin
         ItemChargeAssignment.SetRange("Document No.", TempPurchInvLine."Document No.");
         ItemChargeAssignment.SetRange("Document Line No.", TempPurchInvLine."Line No.");
@@ -498,22 +496,20 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
                 "Purchase Applies-to Document Type"::Order:
                     begin
                         AssignedPurchInvLine.Get(ItemChargeAssignment."Applies-to Doc. Type", ItemChargeAssignment."Applies-to Doc. No.", ItemChargeAssignment."Line No.");
-                        if Location.Get(AssignedPurchInvLine."Location Code") then
-                            if Location."NPR Retail Location" then begin
-                                TempItemChargeAssignment.Init();
-                                TempItemChargeAssignment.Copy(ItemChargeAssignment);
-                                TempItemChargeAssignment.Insert();
-                            end;
+                        if RSRLocalizationMgt.IsRetailLocation(AssignedPurchInvLine."Location Code") then begin
+                            TempItemChargeAssignment.Init();
+                            TempItemChargeAssignment.Copy(ItemChargeAssignment);
+                            TempItemChargeAssignment.Insert();
+                        end;
                     end;
                 "Purchase Applies-to Document Type"::Receipt:
                     begin
                         AssignedPurcRcptLine.Get(ItemChargeAssignment."Applies-to Doc. No.", ItemChargeAssignment."Line No.");
-                        if Location.Get(AssignedPurcRcptLine."Location Code") then
-                            if Location."NPR Retail Location" then begin
-                                TempItemChargeAssignment.Init();
-                                TempItemChargeAssignment.Copy(ItemChargeAssignment);
-                                TempItemChargeAssignment.Insert();
-                            end;
+                        if RSRLocalizationMgt.IsRetailLocation(AssignedPurcRcptLine."Location Code") then begin
+                            TempItemChargeAssignment.Init();
+                            TempItemChargeAssignment.Copy(ItemChargeAssignment);
+                            TempItemChargeAssignment.Insert();
+                        end;
                     end;
             end;
         until ItemChargeAssignment.Next() = 0;

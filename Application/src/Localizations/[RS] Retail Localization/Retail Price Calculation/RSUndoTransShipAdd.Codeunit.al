@@ -13,7 +13,7 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Undo Transfer Shipment", 'OnBeforeModifyTransShptLine', '', false, false)]
     local procedure OnBeforeModifyTransShptLine(TransferShipmentLine: Record "Transfer Shipment Line")
     begin
-        if not CheckRetailLocation(TransferShipmentLine) then
+        if (not RSRLocalizationMgt.IsRetailLocation(TransferShipmentLine."Transfer-from Code")) or RSRLocalizationMgt.IsRetailLocation(TransferShipmentLine."Transfer-to Code") then
             exit;
 
         PostRetailCalculationEntries(TransferShipmentLine);
@@ -446,17 +446,6 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
     #endregion RS Undo Shipment - G/L Posting Procedures
 
     #region RS Undo Shipment - Helper Procedures
-
-    local procedure CheckRetailLocation(TransferShipmentLine: Record "Transfer Shipment Line"): Boolean
-    var
-        Location: Record Location;
-        Location2: Record Location;
-    begin
-        Location.Get(TransferShipmentLine."Transfer-from Code");
-        Location2.Get(TransferShipmentLine."Transfer-to Code");
-
-        exit((Location."NPR Retail Location") and (not Location2."NPR Retail Location"))
-    end;
 
     local procedure GetRetailStandardItemLedgerEntry(var StdItemLedgerEntry: Record "Item Ledger Entry"; TransferShipmentLine: Record "Transfer Shipment Line"; LoadPartial: Boolean; ShouldFindSet: Boolean): Boolean
     begin

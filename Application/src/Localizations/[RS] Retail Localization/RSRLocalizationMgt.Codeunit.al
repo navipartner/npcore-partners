@@ -18,26 +18,21 @@ codeunit 6151490 "NPR RS R Localization Mgt."
     internal procedure CheckForRetailLocationLines(PostedPurchInvHdr: Record "Purch. Inv. Header") RetailLocationCodeExists: Boolean
     var
         PurchInvLines: Record "Purch. Inv. Line";
-        Location: Record Location;
     begin
         if not IsRSLocalizationActive() then
             exit;
         PurchInvLines.SetLoadFields("Document No.", "Location Code");
         PurchInvLines.SetRange("Document No.", PostedPurchInvHdr."No.");
+        PurchInvLines.SetFilter("Location Code", '<>%1', '');
         if PurchInvLines.IsEmpty() then
             exit;
 
         PurchInvLines.FindSet();
         repeat
-            case true of
-                PurchInvLines."Location Code" <> '':
-                    begin
-                        if Location.Get(PurchInvLines."Location Code") then
-                            RetailLocationCodeExists := Location."NPR Retail Location";
-                        if RetailLocationCodeExists then
-                            exit;
-                    end;
-            end;
+            if IsRetailLocation(PurchInvLines."Location Code") then begin
+                RetailLocationCodeExists := true;
+                exit;
+            end
         until PurchInvLines.Next() = 0;
     end;
     #endregion
@@ -305,6 +300,23 @@ codeunit 6151490 "NPR RS R Localization Mgt."
         GLRegister."To Entry No." := ToEntryNo;
         GLRegister."User ID" := CopyStr(UserId(), 1, MaxStrLen(GLRegister."User ID"));
         GLRegister.Insert();
+    end;
+
+    internal procedure IsServiceItem(ItemNo: Code[20]): Boolean
+    var
+        Item: Record Item;
+    begin
+        Item.Get(ItemNo);
+        exit(Item.Type in [Item.Type::Service]);
+    end;
+
+    internal procedure IsRetailLocation(LocationCode: Code[20]): Boolean
+    var
+        Location: Record Location;
+    begin
+        if not Location.Get(LocationCode) then
+            exit(false);
+        exit(Location."NPR Retail Location");
     end;
     #endregion RS Retail Localization Helper Procedures
 }

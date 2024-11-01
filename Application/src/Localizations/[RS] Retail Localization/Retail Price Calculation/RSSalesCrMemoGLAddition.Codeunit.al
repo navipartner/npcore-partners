@@ -793,7 +793,6 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
 
     local procedure FillRetailSalesLines(SalesCrMemoHeader: Record "Sales Cr.Memo Header")
     var
-        Location: Record Location;
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
     begin
         SalesCrMemoLine.SetRange("Document No.", SalesCrMemoHeader."No.");
@@ -802,13 +801,24 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
             exit;
         SalesCrMemoLine.FindSet();
         repeat
-            if Location.Get(SalesCrMemoLine."Location Code") then
-                if Location."NPR Retail Location" then begin
-                    TempSalesCrMemoLine.Init();
-                    TempSalesCrMemoLine.Copy(SalesCrMemoLine);
-                    TempSalesCrMemoLine.Insert();
+            if RSRLocalizationMgt.IsRetailLocation(SalesCrMemoLine."Location Code") then
+                case SalesCrMemoLine.Type of
+                    SalesCrMemoLine.Type::Item:
+                        begin
+                            if not (RSRLocalizationMgt.IsServiceItem(SalesCrMemoLine."No.")) then
+                                InsertRetailSalesLine(SalesCrMemoLine);
+                        end;
+                    SalesCrMemoLine.Type::"Charge (Item)":
+                        InsertRetailSalesLine(SalesCrMemoLine);
                 end;
         until SalesCrMemoLine.Next() = 0;
+    end;
+
+    local procedure InsertRetailSalesLine(SalesCrMemoLine: Record "Sales Cr.Memo Line")
+    begin
+        TempSalesCrMemoLine.Init();
+        TempSalesCrMemoLine.Copy(SalesCrMemoLine);
+        TempSalesCrMemoLine.Insert();
     end;
 
     local procedure FilterPriceListHeader(SalesCrMemoHeader: Record "Sales Cr.Memo Header")

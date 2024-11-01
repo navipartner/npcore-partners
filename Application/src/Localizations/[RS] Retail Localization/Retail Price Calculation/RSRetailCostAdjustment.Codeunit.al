@@ -53,15 +53,13 @@ codeunit 6184751 "NPR RS Retail Cost Adjustment"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Batch", 'OnPostLinesOnAfterPostLine', '', false, false)]
     local procedure OnPostLinesOnAfterPostLine(var ItemJournalLine: Record "Item Journal Line")
     var
-        Location: Record Location;
         ValueEntry: Record "Value Entry";
         RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
     begin
         if not RSRLocalizationMgt.IsRSLocalizationActive() then
             exit;
 
-        Location.Get(ItemJournalLine."Location Code");
-        if not (Location."NPR Retail Location") then
+        if not RSRLocalizationMgt.IsRetailLocation(ItemJournalLine."Location Code") then
             exit;
 
         ValueEntry.SetRange("Document No.", ItemJournalLine."Document No.");

@@ -182,11 +182,10 @@ report 6014483 "NPR RS Ret. Purch. Price Calc."
 
     local procedure CheckForRetailLocation()
     var
-        Location: Record Location;
+        RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
     begin
-        if Location.Get("Purch. Inv. Line"."Location Code") then
-            if not Location."NPR Retail Location" then
-                CurrReport.Skip();
+        if not RSRLocalizationMgt.IsRetailLocation("Purch. Inv. Line"."Location Code") then
+            CurrReport.Skip();
     end;
 
     local procedure CalculateItemCharge(var LineItemChargeAmount: Decimal)
