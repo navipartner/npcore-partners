@@ -279,13 +279,8 @@
     end;
 
     procedure CopyMix2RetailJnlLines(var MixedDiscountLine: Record "NPR Mixed Discount Line"; RetailJnlCode: Code[40])
-    var
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
-        if FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            CopyMix2RetailJnlLinesV2(MixedDiscountLine, RetailJnlCode)
-        else
-            CopyMix2RetailJnlLinesV1(MixedDiscountLine, RetailJnlCode);
+        CopyMix2RetailJnlLinesV2(MixedDiscountLine, RetailJnlCode)
     end;
 
     [Obsolete('Not used anymore. Use function CopyMix2RetailJnlLinesV2 instead', '2024-07-28')]

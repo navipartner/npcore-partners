@@ -276,7 +276,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Customer, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Pct." = LineDiscPct, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Price Incl. Vat" = LineAmtInclTax, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. Vat", LineAmtInclTax, 0.1, 'Discount not calculated according to scenario');
     end;
 
     [Test]
@@ -351,14 +351,10 @@ codeunit 85137 "NPR Retail Journal Tests"
         VATPostingSetup: Record "VAT Posting Setup";
         POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         Assert: Codeunit Assert;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailJournalNo: Text;
         TotalAmount: Decimal;
     begin
         // [SCENARIO] Check prices when having item on retail journal which has mix discount total amount per min qty. Item price includes vat = false + item without VAT
-
-        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            exit;
 
         Initialize();
 
@@ -389,7 +385,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine.FindFirst();
 
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", TotalAmount, 0.1, 'Discount not calculated according to scenario');
@@ -407,16 +403,12 @@ codeunit 85137 "NPR Retail Journal Tests"
         POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit Assert;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailJournalNo: Text;
         TotalAmount: Decimal;
         UnitPriceInclTax: Decimal;
         DiscountPriceExclTax: Decimal;
     begin
         // [SCENARIO] Check prices when having item on retail journal which has mix discount total amount per min qty. Item price includes vat = false + item with VAT
-
-        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            exit;
 
         Initialize();
 
@@ -450,7 +442,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         DiscountPriceExclTax := POSSaleTaxCalc.CalcAmountWithoutVAT(TotalAmount, VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
 
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = UnitPriceInclTax, 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", UnitPriceInclTax, 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
@@ -466,14 +458,10 @@ codeunit 85137 "NPR Retail Journal Tests"
         VATPostingSetup: Record "VAT Posting Setup";
         POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         Assert: Codeunit Assert;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailJournalNo: Text;
         TotalAmount: Decimal;
     begin
         // [SCENARIO] Check prices when having item on retail journal which has mix discount total amount per min qty. Item price includes vat = true + item without VAT
-
-        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            exit;
 
         Initialize();
 
@@ -504,7 +492,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine.FindFirst();
 
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", TotalAmount, 0.1, 'Discount not calculated according to scenario');
@@ -522,15 +510,11 @@ codeunit 85137 "NPR Retail Journal Tests"
         POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit Assert;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailJournalNo: Text;
         TotalAmount: Decimal;
         DiscountPriceExclTax: Decimal;
     begin
         // [SCENARIO] Check prices when having item on retail journal which has mix discount total amount per min qty. Item price includes vat = true + item with VAT
-
-        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            exit;
 
         Initialize();
 
@@ -563,7 +547,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         DiscountPriceExclTax := POSSaleTaxCalc.CalcAmountWithoutVAT(TotalAmount, VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
 
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
@@ -579,14 +563,10 @@ codeunit 85137 "NPR Retail Journal Tests"
         VATPostingSetup: Record "VAT Posting Setup";
         POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         Assert: Codeunit Assert;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailJournalNo: Text;
         DiscountAmount: Decimal;
     begin
         // [SCENARIO] Check prices when having item on retail journal which has mix discount total discount amount per min qty. Item price includes vat = false + item without VAT
-
-        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            exit;
 
         Initialize();
 
@@ -617,7 +597,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine.FindFirst();
 
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" - DiscountAmount, 0.1, 'Discount not calculated according to scenario');
@@ -635,16 +615,12 @@ codeunit 85137 "NPR Retail Journal Tests"
         POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit Assert;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailJournalNo: Text;
         DiscountAmount: Decimal;
         UnitPriceInclTax: Decimal;
         DiscountAmountExclTax: Decimal;
     begin
         // [SCENARIO] Check prices when having item on retail journal which has mix discount total discount amount per min qty. Item price includes vat = false + item with VAT
-
-        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            exit;
 
         Initialize();
 
@@ -678,7 +654,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         DiscountAmountExclTax := POSSaleTaxCalc.CalcAmountWithoutVAT(UnitPriceInclTax - DiscountAmount, VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
 
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = UnitPriceInclTax, 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", UnitPriceInclTax, 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountAmountExclTax, 0.1, 'Discount not calculated according to scenario');
@@ -694,14 +670,10 @@ codeunit 85137 "NPR Retail Journal Tests"
         VATPostingSetup: Record "VAT Posting Setup";
         POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         Assert: Codeunit Assert;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailJournalNo: Text;
         DiscountAmount: Decimal;
     begin
         // [SCENARIO] Check prices when having item on retail journal which has mix discount total discount amount per min qty. Item price includes vat = true + item without VAT
-
-        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            exit;
 
         Initialize();
 
@@ -732,7 +704,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine.FindFirst();
 
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" - DiscountAmount, 0.1, 'Discount not calculated according to scenario');
@@ -750,15 +722,11 @@ codeunit 85137 "NPR Retail Journal Tests"
         POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit Assert;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailJournalNo: Text;
         DiscountAmount: Decimal;
         DiscountPriceExclTax: Decimal;
     begin
         // [SCENARIO] Check prices when having item on retail journal which has mix discount total discount amount per min qty. Item price includes vat = true + item with VAT
-
-        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            exit;
 
         Initialize();
 
@@ -791,7 +759,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         DiscountPriceExclTax := POSSaleTaxCalc.CalcAmountWithoutVAT(Item."Unit Price" - DiscountAmount, VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
 
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
@@ -807,14 +775,10 @@ codeunit 85137 "NPR Retail Journal Tests"
         VATPostingSetup: Record "VAT Posting Setup";
         POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         Assert: Codeunit Assert;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailJournalNo: Text;
         DiscountPct: Decimal;
     begin
         // [SCENARIO] Check prices when having item on retail journal which has mix discount total discount %. Item price includes vat = false + item without VAT
-
-        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            exit;
 
         Initialize();
 
@@ -845,7 +809,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine.FindFirst();
 
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Pct." = DiscountPct, 'Discount not calculated according to scenario');
@@ -864,15 +828,11 @@ codeunit 85137 "NPR Retail Journal Tests"
         POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit Assert;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailJournalNo: Text;
         DiscountPct: Decimal;
         UnitPriceInclTax: Decimal;
     begin
         // [SCENARIO] Check prices when having item on retail journal which has mix discount total discount %. Item price includes vat = false + item with VAT
-
-        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            exit;
 
         Initialize();
 
@@ -905,7 +865,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         UnitPriceInclTax := POSSaleTaxCalc.CalcAmountWithVAT(Item."Unit Price", VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
 
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = UnitPriceInclTax, 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", UnitPriceInclTax, 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Pct." = DiscountPct, 'Discount not calculated according to scenario');
@@ -922,14 +882,10 @@ codeunit 85137 "NPR Retail Journal Tests"
         VATPostingSetup: Record "VAT Posting Setup";
         POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         Assert: Codeunit Assert;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailJournalNo: Text;
         DiscountPct: Decimal;
     begin
         // [SCENARIO] Check prices when having item on retail journal which has mix discount total discount %. Item price includes vat = true + item without VAT
-
-        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            exit;
 
         Initialize();
 
@@ -960,7 +916,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine.FindFirst();
 
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Pct." = DiscountPct, 'Discount not calculated according to scenario');
@@ -979,15 +935,11 @@ codeunit 85137 "NPR Retail Journal Tests"
         POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit Assert;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailJournalNo: Text;
         DiscountPct: Decimal;
         DiscountPriceExclTax: Decimal;
     begin
         // [SCENARIO] Check prices when having item on retail journal which has mix discount total discount %. Item price includes vat = true + item with VAT
-
-        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            exit;
 
         Initialize();
 
@@ -1020,7 +972,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         DiscountPriceExclTax := POSSaleTaxCalc.CalcAmountWithoutVAT(Item."Unit Price" * (1 - DiscountPct / 100), VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
 
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Pct." = DiscountPct, 'Discount not calculated according to scenario');
@@ -1037,7 +989,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         VATPostingSetup: Record "VAT Posting Setup";
         POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         Assert: Codeunit Assert;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailJournalNo: Text;
         DiscountCode: Code[20];
         FirstLevelQty: Integer;
@@ -1046,9 +997,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         SecondLevelAmount: Decimal;
     begin
         // [SCENARIO] Check prices when having item on retail journal which has mix discount multiple discount levels. Item price includes vat = false + item without VAT
-
-        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            exit;
 
         Initialize();
 
@@ -1084,16 +1032,16 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine.FindFirst();
         RetailJournalLine.Validate("Quantity for Discount Calc", FirstLevelQty);
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Code" = DiscountCode, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Price Excl. VAT" = Item."Unit Price" * FirstLevelQty - FirstLevelAmount, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Price Incl. VAT" = Item."Unit Price" * FirstLevelQty - FirstLevelAmount, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" * FirstLevelQty - FirstLevelAmount, 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" * FirstLevelQty - FirstLevelAmount, 0.1, 'Discount not calculated according to scenario');
 
         // [GIVEN] Second level discount quantity on retail journal line
         RetailJournalLine.Validate("Quantity for Discount Calc", SecondLevelQty);
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Code" = DiscountCode, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" * SecondLevelQty - SecondLevelAmount, 0.1, 'Discount not calculated according to scenario');
@@ -1111,7 +1059,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit Assert;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailJournalNo: Text;
         DiscountCode: Code[20];
         FirstLevelQty: Integer;
@@ -1123,9 +1070,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         SecondDiscountPriceExclTax: Decimal;
     begin
         // [SCENARIO] Check prices when having item on retail journal which has mix discount multiple discount levels. Item price includes vat = false + item with VAT
-
-        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            exit;
 
         Initialize();
 
@@ -1165,16 +1109,16 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine.FindFirst();
         RetailJournalLine.Validate("Quantity for Discount Calc", FirstLevelQty);
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = UnitPriceInclTax, 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", UnitPriceInclTax, 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Code" = DiscountCode, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Price Excl. VAT" = FirstDiscountPriceExclTax, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Price Incl. VAT" = UnitPriceInclTax * FirstLevelQty - FirstLevelAmount, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", FirstDiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", UnitPriceInclTax * FirstLevelQty - FirstLevelAmount, 0.1, 'Discount not calculated according to scenario');
 
         // [GIVEN] Second level discount quantity on retail journal line
         RetailJournalLine.Validate("Quantity for Discount Calc", SecondLevelQty);
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = UnitPriceInclTax, 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", UnitPriceInclTax, 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Code" = DiscountCode, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", SecondDiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
@@ -1190,7 +1134,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         VATPostingSetup: Record "VAT Posting Setup";
         POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         Assert: Codeunit Assert;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailJournalNo: Text;
         DiscountCode: Code[20];
         FirstLevelQty: Integer;
@@ -1199,9 +1142,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         SecondLevelAmount: Decimal;
     begin
         // [SCENARIO] Check prices when having item on retail journal which has mix discount multiple discount levels. Item price includes vat = true + item without VAT
-
-        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            exit;
 
         Initialize();
 
@@ -1237,16 +1177,16 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine.FindFirst();
         RetailJournalLine.Validate("Quantity for Discount Calc", FirstLevelQty);
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Code" = DiscountCode, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Price Excl. VAT" = Item."Unit Price" * FirstLevelQty - FirstLevelAmount, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Price Incl. VAT" = Item."Unit Price" * FirstLevelQty - FirstLevelAmount, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" * FirstLevelQty - FirstLevelAmount, 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" * FirstLevelQty - FirstLevelAmount, 0.1, 'Discount not calculated according to scenario');
 
         // [GIVEN] Second level discount quantity on retail journal line
         RetailJournalLine.Validate("Quantity for Discount Calc", SecondLevelQty);
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Code" = DiscountCode, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" * SecondLevelQty - SecondLevelAmount, 0.1, 'Discount not calculated according to scenario');
@@ -1264,7 +1204,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit Assert;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailJournalNo: Text;
         DiscountCode: Code[20];
         FirstLevelQty: Integer;
@@ -1275,9 +1214,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         SecondDiscountPriceExclTax: Decimal;
     begin
         // [SCENARIO] Check prices when having item on retail journal which has mix discount multiple discount levels. Item price includes vat = true + item with VAT
-
-        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            exit;
 
         Initialize();
 
@@ -1319,16 +1255,16 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine.FindFirst();
         RetailJournalLine.Validate("Quantity for Discount Calc", FirstLevelQty);
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Code" = DiscountCode, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Price Excl. VAT" = FirstDiscountPriceExclTax, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Price Incl. VAT" = Item."Unit Price" * FirstLevelQty - FirstLevelAmount, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", FirstDiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" * FirstLevelQty - FirstLevelAmount, 0.1, 'Discount not calculated according to scenario');
 
         // [GIVEN] Second level discount quantity on retail journal line
         RetailJournalLine.Validate("Quantity for Discount Calc", SecondLevelQty);
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Code" = DiscountCode, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", SecondDiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
@@ -1345,13 +1281,9 @@ codeunit 85137 "NPR Retail Journal Tests"
         PeriodDiscountLine: Record "NPR Period Discount Line";
         POSPeriodDiscandTax: Codeunit "NPR POS Period Disc. and Tax";
         Assert: Codeunit Assert;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailJournalNo: Text;
     begin
         // [SCENARIO] Check prices when having item on retail journal which has period discount. Item price includes vat = false + item without VAT
-
-        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            exit;
 
         Initialize();
 
@@ -1382,7 +1314,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine.FindFirst();
 
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Campaign, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Code" = PeriodDiscountLine.Code, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" - PeriodDiscountLine."Discount Amount", 0.1, 'Discount not calculated according to scenario');
@@ -1401,14 +1333,10 @@ codeunit 85137 "NPR Retail Journal Tests"
         POSPeriodDiscandTax: Codeunit "NPR POS Period Disc. and Tax";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit Assert;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailJournalNo: Text;
         UnitPriceInclTax: Decimal;
     begin
         // [SCENARIO] Check prices when having item on retail journal which has period discount. Item price includes vat = false + item with VAT
-
-        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            exit;
 
         Initialize();
 
@@ -1441,7 +1369,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         UnitPriceInclTax := POSSaleTaxCalc.CalcAmountWithVAT(Item."Unit Price", VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
 
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = UnitPriceInclTax, 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", UnitPriceInclTax, 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Campaign, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Code" = PeriodDiscountLine.Code, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" - PeriodDiscountLine."Discount Amount", 0.1, 'Discount not calculated according to scenario');
@@ -1458,13 +1386,9 @@ codeunit 85137 "NPR Retail Journal Tests"
         PeriodDiscountLine: Record "NPR Period Discount Line";
         POSPeriodDiscandTax: Codeunit "NPR POS Period Disc. and Tax";
         Assert: Codeunit Assert;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailJournalNo: Text;
     begin
         // [SCENARIO] Check prices when having item on retail journal which has period discount. Item price includes vat = true + item without VAT
-
-        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            exit;
 
         Initialize();
 
@@ -1495,7 +1419,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine.FindFirst();
 
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Campaign, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Code" = PeriodDiscountLine.Code, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" - PeriodDiscountLine."Discount Amount", 0.1, 'Discount not calculated according to scenario');
@@ -1514,14 +1438,10 @@ codeunit 85137 "NPR Retail Journal Tests"
         POSPeriodDiscandTax: Codeunit "NPR POS Period Disc. and Tax";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit Assert;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailJournalNo: Text;
         DiscountPriceExclTax: Decimal;
     begin
         // [SCENARIO] Check prices when having item on retail journal which has period discount. Item price includes vat = true + item with VAT
-
-        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            exit;
 
         Initialize();
 
@@ -1554,7 +1474,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         DiscountPriceExclTax := POSSaleTaxCalc.CalcAmountWithoutVAT(Item."Unit Price" - PeriodDiscountLine."Discount Amount", VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
 
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Campaign, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Code" = PeriodDiscountLine.Code, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
@@ -1571,7 +1491,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         QuantityDiscountLine: Record "NPR Quantity Discount Line";
         POSQtyDiscandTax: Codeunit "NPR POS Qty. Disc. and Tax";
         Assert: Codeunit Assert;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailJournalNo: Text;
         QtyForDiscCalc: Integer;
         LineDiscPct: Decimal;
@@ -1579,9 +1498,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         DiscountPriceExclTax: Decimal;
     begin
         // [SCENARIO] Check prices above when having item on retail journal which has quantity discount. Item price includes vat = false + item without VAT
-
-        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            exit;
 
         Initialize();
 
@@ -1617,7 +1533,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         DiscountPriceExclTax := QtyForDiscCalc * Item."Unit Price" - LineDiscAmt;
 
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Quantity, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Code" = QuantityDiscountLine."Main no.", 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
@@ -1636,7 +1552,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         POSQtyDiscandTax: Codeunit "NPR POS Qty. Disc. and Tax";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit Assert;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailJournalNo: Text;
         QtyForDiscCalc: Integer;
         UnitPriceInclTax: Decimal;
@@ -1646,9 +1561,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         LineDiscAmt: Decimal;
     begin
         // [SCENARIO] Check prices when having item on retail journal which has quantity discount. Item price includes vat = false + item with VAT
-
-        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            exit;
 
         Initialize();
 
@@ -1687,7 +1599,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         DiscountPriceInclTax := POSSaleTaxCalc.CalcAmountWithVAT(DiscountPriceExclTax, VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
 
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = UnitPriceInclTax, 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", UnitPriceInclTax, 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Quantity, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Code" = QuantityDiscountLine."Main no.", 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
@@ -1704,7 +1616,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         QuantityDiscountLine: Record "NPR Quantity Discount Line";
         POSQtyDiscandTax: Codeunit "NPR POS Qty. Disc. and Tax";
         Assert: Codeunit Assert;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailJournalNo: Text;
         QtyForDiscCalc: Integer;
         LineDiscPct: Decimal;
@@ -1712,9 +1623,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         DiscountPriceInclTax: Decimal;
     begin
         // [SCENARIO] Check prices when having item on retail journal which has quantity discount. Item price includes vat = true + item without VAT
-
-        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            exit;
 
         Initialize();
 
@@ -1750,7 +1658,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         DiscountPriceInclTax := QtyForDiscCalc * Item."Unit Price" - LineDiscAmt;
 
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Quantity, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Code" = QuantityDiscountLine."Main no.", 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceInclTax, 0.1, 'Discount not calculated according to scenario');
@@ -1769,7 +1677,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         POSQtyDiscandTax: Codeunit "NPR POS Qty. Disc. and Tax";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit Assert;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailJournalNo: Text;
         QtyForDiscCalc: Integer;
         LineDiscPct: Decimal;
@@ -1778,9 +1685,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         DiscountPriceInclTax: Decimal;
     begin
         // [SCENARIO] Check prices when having item on retail journal which has quantity discount. Item price includes vat = true + item with VAT
-
-        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            exit;
 
         Initialize();
 
@@ -1818,7 +1722,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         DiscountPriceExclTax := POSSaleTaxCalc.CalcAmountWithoutVAT(DiscountPriceInclTax, VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
 
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Quantity, 'Discount not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Code" = QuantityDiscountLine."Main no.", 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
@@ -1834,16 +1738,12 @@ codeunit 85137 "NPR Retail Journal Tests"
         VATPostingSetup: Record "VAT Posting Setup";
         POSCustoDiscandTax: Codeunit "NPR POS Cust. Disc. and Tax";
         Assert: Codeunit Assert;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailJournalNo: Text;
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
         DiscountPriceInclTax: Decimal;
     begin
         // [SCENARIO] Check prices when having item on retail journal which has price list line discount. Item price includes vat = false + item without VAT
-
-        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            exit;
 
         Initialize();
 
@@ -1876,7 +1776,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         DiscountPriceInclTax := Item."Unit Price" - LineDiscAmt;
 
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Customer, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceInclTax, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", DiscountPriceInclTax, 0.1, 'Discount not calculated according to scenario');
@@ -1893,7 +1793,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         POSCustoDiscandTax: Codeunit "NPR POS Cust. Disc. and Tax";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit Assert;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailJournalNo: Text;
         UnitPriceInclTax: Decimal;
         LineDiscPct: Decimal;
@@ -1902,9 +1801,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         DiscountPriceInclTax: Decimal;
     begin
         // [SCENARIO] Check prices when having item on retail journal which has price list line discount. Item price includes vat = false + item with VAT
-
-        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            exit;
 
         Initialize();
 
@@ -1940,7 +1836,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         DiscountPriceInclTax := POSSaleTaxCalc.CalcAmountWithVAT(DiscountPriceExclTax, VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
 
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = UnitPriceInclTax, 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", UnitPriceInclTax, 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Customer, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", DiscountPriceInclTax, 0.1, 'Discount not calculated according to scenario');
@@ -1955,16 +1851,12 @@ codeunit 85137 "NPR Retail Journal Tests"
         VATPostingSetup: Record "VAT Posting Setup";
         POSCustoDiscandTax: Codeunit "NPR POS Cust. Disc. and Tax";
         Assert: Codeunit Assert;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailJournalNo: Text;
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
         DiscountPriceInclTax: Decimal;
     begin
         // [SCENARIO] Check prices when having item on retail journal which has price list line discount. Item price includes vat = true + item without VAT
-
-        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            exit;
 
         Initialize();
 
@@ -1997,7 +1889,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         DiscountPriceInclTax := Item."Unit Price" - LineDiscAmt;
 
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Customer, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceInclTax, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", DiscountPriceInclTax, 0.1, 'Discount not calculated according to scenario');
@@ -2014,7 +1906,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         POSCustoDiscandTax: Codeunit "NPR POS Cust. Disc. and Tax";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit Assert;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RetailJournalNo: Text;
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
@@ -2022,9 +1913,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         DiscountPriceInclTax: Decimal;
     begin
         // [SCENARIO] Check prices when having item on retail journal which has price list line discount. Item price includes vat = true + item with VAT
-
-        if not FeatureFlagsManagement.IsEnabled('newRetailJournalDiscountCalculation') then
-            exit;
 
         Initialize();
 
@@ -2059,7 +1947,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         DiscountPriceExclTax := POSSaleTaxCalc.CalcAmountWithoutVAT(DiscountPriceInclTax, VATPostingSetup."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
 
         // [THEN] Check if discount and prices are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
         Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Customer, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", DiscountPriceInclTax, 0.1, 'Discount not calculated according to scenario');
@@ -2068,6 +1956,7 @@ codeunit 85137 "NPR Retail Journal Tests"
     local procedure Initialize()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryERM: Codeunit "Library - ERM";
         POSPostingProfile: Record "NPR POS Posting Profile";
     begin
         //Clean any previous mock session
@@ -2075,6 +1964,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         Clear(POSSession);
 
         if not Initialized then begin
+            LibraryERM.CreateVATBusinessPostingGroup(VATBusinessPostingGroup);
             NPRLibraryPOSMasterData.CreatePOSSetup(POSSetup);
             NPRLibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
             NPRLibraryPOSMasterData.CreatePOSStore(POSStore, POSPostingProfile.Code);

@@ -41,6 +41,9 @@
         TempSaleLinePOS."VAT %" := VATPostingSetup."VAT %";
         TempSaleLinePOS."VAT Calculation Type" := TempSaleLinePOS."VAT Calculation Type"::"Normal VAT";
         TempSaleLinePOS."VAT Bus. Posting Group" := Item."VAT Bus. Posting Gr. (Price)";
+#IF BC19
+        TempSaleLinePOS."VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
+#ENDIF
     end;
 
     procedure FindItemPrice(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
