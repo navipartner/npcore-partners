@@ -1144,6 +1144,14 @@
                             else
                                 PostingDescription := CopyStr(StrSubstNo(TextPaymentDescription, POSPaymentMethod.Code, POSEntry."Posting Date"), 1, MaxStrLen(POSPostingBuffer.Description));
                         end;
+                    end else
+                        Clear(POSPaymentMethod);
+                    if (POSPaymentMethod."Processing Type" in [POSPaymentMethod."Processing Type"::VOUCHER, POSPaymentMethod."Processing Type"::"FOREIGN VOUCHER"]) or
+                       (POSPaymentLineToBeCompressed."VAT Amount (LCY)" <> 0)
+                    then begin
+                        POSPostingBuffer."VAT Prod. Posting Group" := POSPaymentLineToBeCompressed."VAT Prod. Posting Group";
+                        POSPostingBuffer."VAT Bus. Posting Group" := POSPaymentLineToBeCompressed."VAT Bus. Posting Group";
+                        POSPostingBuffer."VAT Calculation Type" := POSPaymentLineToBeCompressed."VAT Calculation Type";
                     end;
 
                     case Compressionmethod of
