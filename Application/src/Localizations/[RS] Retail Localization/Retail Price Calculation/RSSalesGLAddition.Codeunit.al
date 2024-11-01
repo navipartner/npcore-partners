@@ -765,7 +765,6 @@ codeunit 6151094 "NPR RS Sales GL Addition"
 
     local procedure FillRetailSalesLines(SalesInvoiceHeader: Record "Sales Invoice Header")
     var
-        Location: Record Location;
         SalesInvoiceLine: Record "Sales Invoice Line";
     begin
         SalesInvoiceLine.SetRange("Document No.", SalesInvoiceHeader."No.");
@@ -774,13 +773,22 @@ codeunit 6151094 "NPR RS Sales GL Addition"
             exit;
         SalesInvoiceLine.FindSet();
         repeat
-            if Location.Get(SalesInvoiceLine."Location Code") then
-                if Location."NPR Retail Location" then begin
-                    TempSalesInvoiceLine.Init();
-                    TempSalesInvoiceLine.Copy(SalesInvoiceLine);
-                    TempSalesInvoiceLine.Insert();
+            if RSRLocalizationMgt.IsRetailLocation(SalesInvoiceLine."Location Code") then
+                case SalesInvoiceLine.Type of
+                    SalesInvoiceLine.Type::Item:
+                        if not (RSRLocalizationMgt.IsServiceItem(SalesInvoiceLine."No.")) then
+                            InsertRetailSalesLine(SalesInvoiceLine);
+                    SalesInvoiceLine.Type::"Charge (Item)":
+                        InsertRetailSalesLine(SalesInvoiceLine);
                 end;
         until SalesInvoiceLine.Next() = 0;
+    end;
+
+    local procedure InsertRetailSalesLine(SalesInvoiceLine: Record "Sales Invoice Line")
+    begin
+        TempSalesInvoiceLine.Init();
+        TempSalesInvoiceLine.Copy(SalesInvoiceLine);
+        TempSalesInvoiceLine.Insert();
     end;
 
     local procedure FindPriceListLine(LocationCode: Code[20]; ItemNo: Code[20])

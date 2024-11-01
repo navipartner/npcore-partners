@@ -182,11 +182,10 @@ report 6014484 "NPR RS Ret. Trans. Rec. Calc."
 
     local procedure CheckForRetailLocation()
     var
-        Location: Record Location;
+        RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
     begin
-        if Location.Get(TransRecHdr."Transfer-to Code") then
-            if not Location."NPR Retail Location" then
-                CurrReport.Skip();
+        if not RSRLocalizationMgt.IsRetailLocation(TransRecHdr."Transfer-to Code") then
+            CurrReport.Skip();
     end;
 
     local procedure SetupReportPrintOrderNo()

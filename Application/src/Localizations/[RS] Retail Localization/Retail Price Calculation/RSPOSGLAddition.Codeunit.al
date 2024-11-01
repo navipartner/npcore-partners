@@ -913,7 +913,6 @@ codeunit 6151363 "NPR RS POS GL Addition"
 
     local procedure FillRetailPOSEntryLines(POSEntry: Record "NPR POS Entry")
     var
-        Location: Record Location;
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
     begin
         POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
@@ -923,8 +922,8 @@ codeunit 6151363 "NPR RS POS GL Addition"
             exit;
         POSEntrySalesLine.FindSet();
         repeat
-            if Location.Get(POSEntrySalesLine."Location Code") then
-                if Location."NPR Retail Location" then begin
+            if RSRLocalizationMgt.IsRetailLocation(POSEntrySalesLine."Location Code") then
+                if not (RSRLocalizationMgt.IsServiceItem(POSEntrySalesLine."No.")) then begin
                     TempPOSEntrySalesLines.Init();
                     TempPOSEntrySalesLines.Copy(POSEntrySalesLine);
                     TempPOSEntrySalesLines.Insert();

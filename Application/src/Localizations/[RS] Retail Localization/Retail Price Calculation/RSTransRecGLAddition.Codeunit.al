@@ -29,7 +29,7 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
         if not RSRLocalizationMgt.IsRSLocalizationActive() then
             exit;
 
-        if IsRetailLocation(TransferReceiptHeader."Transfer-from Code") or not IsRetailLocation(TransferReceiptHeader."Transfer-to Code") then
+        if RSRLocalizationMgt.IsRetailLocation(TransferReceiptHeader."Transfer-from Code") or (not RSRLocalizationMgt.IsRetailLocation(TransferReceiptHeader."Transfer-to Code")) then
             exit;
 
         TempTransferReceiptLine.Reset();
@@ -439,14 +439,6 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
                 ((GLAccNo = GenJnlLine."Bal. Account No.") and
                  (GenJnlLine."Bal. Account Type" = GenJnlLine."Bal. Account Type"::"G/L Account")) then
             exit(true);
-    end;
-
-    local procedure IsRetailLocation(LocationCode: Code[20]): Boolean
-    var
-        Location: Record Location;
-    begin
-        Location.Get(LocationCode);
-        exit(Location."NPR Retail Location");
     end;
 
     local procedure FillTempTransferReceiptLines(TransferReceiptHeader: Record "Transfer Receipt Header")
