@@ -17,6 +17,8 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                 SendItemCost(Rec);
             Database::"NPR Spfy Inventory Level":
                 SendShopifyInventoryUpdate(Rec);
+            Database::"NPR Spfy Item Price":
+                SendShopifyItemPrices(Rec);
         end;
     end;
 
@@ -158,6 +160,152 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         Commit();
         if not Success then
             Error(GetLastErrorText);
+    end;
+
+    local procedure SendShopifyItemPrices(var NcTask: Record "NPR Nc Task")
+    var
+        TempNcTask: Record "NPR Nc Task" temporary;
+        productVariantsBulkUpdateRequestString: Text;
+    begin
+        while PrepareItemPriceUpdateRequest(NcTask, TempNcTask) do begin
+            if SetNcTaskPostponed(TempNcTask, productVariantsBulkUpdateRequestString) then begin
+                UpdateNCTasksWithDataFromShopify(TempNcTask, productVariantsBulkUpdateRequestString);
+            end;
+        end;
+    end;
+
+    local procedure UpdateNCTasksWithDataFromShopify(var NcTaskIn: Record "NPR Nc Task"; productVariantsBulkUpdateRequestString: Text)
+    var
+        NcTaskParam: Record "NPR Nc Task";
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+        ShopifyResponse: JsonToken;
+        ResponseDictionary: Dictionary of [Text[30], Dictionary of [Text[30], Text]];
+        Found: Boolean;
+        Success: Boolean;
+        NcTaskErrorText: Text;
+    begin
+        if not NcTaskIn.FindFirst() then
+            exit;
+
+        CreateNcTaskParam(NcTaskIn, NcTaskParam, productVariantsBulkUpdateRequestString);
+
+        ClearLastError();
+        Clear(ShopifyResponse);
+
+        if (NcTaskParam."Store Code" <> '') and (NcTaskParam."Data Output".HasValue()) then
+            Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTaskParam, true, ShopifyResponse);
+
+        if Success then
+            Success := PopulateResponseDictionary(ShopifyResponse, ResponseDictionary);
+        if not Success then
+            NcTaskErrorText := GetLastErrorText();
+
+        NcTaskIn.FindSet();
+        repeat
+            if Success then
+                Found := FindNcTaskInDictionary(NcTaskIn, ResponseDictionary, NcTaskErrorText);
+            MarkNcTaskAsCompleted(NcTaskIn."Entry No.", ShopifyResponse, Success and Found, NcTaskErrorText);
+        until NcTaskIn.Next() = 0;
+    end;
+
+    [TryFunction]
+    local procedure PopulateResponseDictionary(ShopifyResponse: JsonToken; var ResponseDictionary: Dictionary of [Text[30], Dictionary of [Text[30], Text]])
+    var
+        DataJToken: JsonToken;
+        ErrorsJToken: JsonToken;
+        ErrorText: Text;
+        ResponseNcTaskID: Text;
+        ProductVariantIDJToken: JsonToken;
+        ProductVariantsJToken: JsonToken;
+        UserErrorsJToken: JsonToken;
+        NcTaskResult: Dictionary of [Text[30], Text];
+        UserErrorsDeserialized: Text;
+        NoResponseLbl: Label 'No response received from Shopify and Shopify provided no reason.';
+    begin
+        if not ShopifyResponse.IsObject() then
+            Error(NoResponseLbl);
+
+        Clear(ResponseDictionary);
+
+        if not ShopifyResponse.AsObject().Get('data', DataJToken) or not DataJToken.IsObject() then begin
+            if ShopifyResponse.AsObject().Get('errors', ErrorsJToken) then begin
+                ErrorsJToken.WriteTo(ErrorText);
+                Error(ErrorText);
+            end;
+            Error(NoResponseLbl);
+        end;
+
+        foreach ResponseNcTaskID in DataJToken.AsObject().Keys() do begin
+            Clear(NcTaskResult);
+            DataJToken.AsObject().SelectToken(StrSubstNo('%1.productVariants', ResponseNcTaskID), ProductVariantsJToken);
+            if ProductVariantsJToken.IsArray() then begin
+                ProductVariantsJToken.AsArray().Get(0, ProductVariantIDJToken);
+                ProductVariantIDJToken.AsObject().Get('id', ProductVariantIDJToken);
+                NcTaskResult.Add('VariantID', CopyStr(RemoveUntil(ProductVariantIDJToken.AsValue().AsText(), '/'), 1, 30));
+            end else begin
+                DataJToken.SelectToken(StrSubstNo('%1.userErrors', ResponseNcTaskID), UserErrorsJToken);
+                UserErrorsJToken.AsArray().Get(0, UserErrorsJToken);
+                UserErrorsJToken.WriteTo(UserErrorsDeserialized);
+                NcTaskResult.Add('Error', UserErrorsDeserialized);
+            end;
+            ResponseDictionary.Add(CopyStr(ResponseNcTaskID, 1, 30), NcTaskResult);
+        end;
+    end;
+
+    local procedure MarkNcTaskAsCompleted(NcTaskInEntryNo: BigInteger; ShopifyResponse: JsonToken; Success: Boolean; ErrorText: Text)
+    var
+        NcTask: Record "NPR Nc Task";
+        OStream: OutStream;
+        ShopifyResponseText: Text;
+    begin
+#if not (BC18 or BC19 or BC20 or BC21)
+        NcTask.ReadIsolation := IsolationLevel::UpdLock;
+#else
+        NcTask.LockTable();
+#endif
+
+        if not NcTask.Get(NcTaskInEntryNo) then
+            exit;
+        if NcTask.Processed then
+            exit;
+
+        NcTask."Last Processing Completed at" := CurrentDateTime();
+        NcTask."Last Processing Duration" := (NcTask."Last Processing Completed at" - NcTask."Last Processing Started at") / 1000;
+        NcTask.Postponed := false;
+        NcTask.Response.CreateOutStream(OStream);
+        if ErrorText = '' then begin
+            ShopifyResponse.WriteTo(ShopifyResponseText);
+            OStream.WriteText(ShopifyResponseText);
+        end else
+            OStream.WriteText(ErrorText);
+
+        if Success then begin
+            NcTask.Processed := true;
+            NcTask."Process Error" := false;
+            NcTask."Postponed At" := 0DT;
+        end else
+            NcTask."Process Error" := true;
+
+        NcTask.Modify(true);
+        Commit();
+    end;
+
+    local procedure ValidateProductVariantId(var NcTaskIn: Record "NPR Nc Task"; ShopifyVariantID: Text[30]): Boolean
+    var
+        ItemPrice: Record "NPR Spfy Item Price";
+        RecRef: RecordRef;
+        ShopifyVariantIDComparison: Text[30];
+    begin
+        if not RecRef.Get(NcTaskIn."Record ID") then
+            exit;
+        RecRef.SetTable(ItemPrice);
+
+        GetProductVariantForItemPrice(ItemPrice, ShopifyVariantIDComparison);
+        if ShopifyVariantIDComparison = '' then
+            exit;
+        if ShopifyVariantID <> ShopifyVariantIDComparison then
+            exit;
+        exit(true);
     end;
 
     [TryFunction]
@@ -320,6 +468,66 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         RequestJObject.WriteTo(OStream);
     end;
 
+    [TryFunction]
+    local procedure PrepareItemPriceUpdateRequest(var NcTaskIn: Record "NPR Nc Task"; var NcTaskOut: Record "NPR Nc Task")
+    var
+        ItemPrice: Record "NPR Spfy Item Price";
+        SpfyStore: Record "NPR Spfy Store";
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        RecRef: RecordRef;
+        OStream: OutStream;
+        MaxItemPricesPerRequest: Integer;
+        IncludedNcTasks: Integer;
+        ShopifyItemID: Text[30];
+        ShopifyVariantID: Text[30];
+        ShopifyProductIDIsMissingLbl: Label 'Item %1 does not have a Shopify Product ID assigned.';
+        ShopifyVariantIDIsMissingLbl: Label 'Variant %1 of Item %2 does not have a Shopify Variant ID assigned.';
+        UpdateProductVariantsMutationLabel: Label '%1: productVariantsBulkUpdate(productId: "gid://shopify/Product/%2", variants: [ { id: "gid://shopify/ProductVariant/%3", price: %4, compareAtPrice: %5 } ]) { productVariants { id price compareAtPrice } userErrors { field message } }', Locked = true, Comment = '%1 = NcTask ID, %2 = Shopify Product ID, %3 = Shopify Product Variant ID, %4 = Unit Price, %5 = Compare At Price';
+    begin
+        if not (NcTaskIn.IsTemporary() and NcTaskOut.IsTemporary()) then
+            FunctionCallOnNonTempVarErr('PrepareItemPriceUpdateRequest');
+
+        NcTaskOut.DeleteAll();
+        NcTaskIn.FindSet();
+
+        SpfyStore.Get(NcTaskIn."Store Code");
+        MaxItemPricesPerRequest := SpfyStore.NoOfPriceUpdatesPerRequest();
+        IncludedNcTasks := 0;
+
+        repeat
+            if RecRef.Get(NcTaskIn."Record ID") then begin
+                RecRef.SetTable(ItemPrice);
+                if ItemPrice."Starting Date" <= Today() + 1 then begin
+                    GetStoreItemLink(ItemPrice."Item No.", ItemPrice."Shopify Store Code", SpfyStoreItemLink);  //Check integration is enabled for the item
+                    ShopifyItemID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+                    if ShopifyItemID = '' then
+                        ShopifyItemID := GetShopifyItemID(SpfyStoreItemLink, false);
+
+                    GetProductVariantForItemPrice(ItemPrice, ShopifyVariantID);
+                    IncludedNcTasks += 1;
+                    NcTaskOut := NcTaskIn;
+                    NcTaskOut."Last Processing Started at" := CurrentDateTime();
+                    NcTaskOut."Process Error" := (ShopifyItemID = '') or (ShopifyVariantID = '');
+                    if NcTaskOut."Process Error" then begin
+                        NcTaskOut.Response.CreateOutStream(OStream, TextEncoding::UTF8);
+                        case true of
+                            ShopifyItemID = '':
+                                OStream.WriteText(StrSubstNo(ShopifyProductIDIsMissingLbl, ItemPrice."Item No."));
+                            ShopifyVariantID = '':
+                                OStream.WriteText(StrSubstNo(ShopifyVariantIDIsMissingLbl, ItemPrice."Variant Code", ItemPrice."Item No."));
+                        end;
+                    end else begin
+                        NcTaskOut."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
+                        OStream.WriteText(StrSubstNo(UpdateProductVariantsMutationLabel, 'NCTask' + Format(NcTaskIn."Entry No."), ShopifyItemID, ShopifyVariantID, Format(ItemPrice."Unit Price", 0, 9), Format(ItemPrice."Compare at Price", 0, 9)));
+                    end;
+                    NcTaskOut.Insert();
+                end;
+            end;
+            NcTaskIn.Delete();
+        until (NcTaskIn.Next() = 0) or (IncludedNcTasks >= MaxItemPricesPerRequest);
+    end;
+
     local procedure AddItemInfo(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; Item: Record Item; NcTaskType: Integer; ShopifyItemID: Text[30]; var ProductJObject: JsonObject)
     var
         NcTask: Record "NPR Nc Task";
@@ -428,8 +636,8 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         if ShopifyVariantID <> '' then
             VariantJObject.Add('id', ShopifyVariantID);
         VariantJObject.Add('sku', SpfyItemMgt.GetProductVariantSku(ItemVariant."Item No.", ItemVariant.Code));
-        if _SpfyIntegrationMgt.IsSendSalesPrices(ShopifyStoreCode) then
-            VariantJObject.Add('price', Item."Unit Price");
+        // if _SpfyIntegrationMgt.IsSendSalesPrices(ShopifyStoreCode) then
+        //     VariantJObject.Add('price', Item."Unit Price");
         VariantJObject.Add('inventory_management', 'shopify');
         Barcode := GetItemReference(ItemVariant);
         if Barcode <> '' then
@@ -1126,6 +1334,125 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
     local procedure CurrCodeunitID(): Integer
     begin
         exit(Codeunit::"NPR Spfy Send Items&Inventory");
+    end;
+
+    local procedure SetNcTaskPostponed(var NcTaskIn: Record "NPR Nc Task"; var RequestString: Text) Success: Boolean
+    var
+        NcTask: Record "NPR Nc Task";
+        MutationQueryRequestLabel: Label 'mutation UpdateProductVariants { %1 }', Locked = true, Comment = '%1 = Update Product Variants Array';
+        IStream: InStream;
+        productVariantsBulkUpdateRequestStringPart: Text;
+        productVariantsBulkUpdateRequestStringTextBuilder: TextBuilder;
+    begin
+        if not NcTaskIn.IsTemporary() then
+            FunctionCallOnNonTempVarErr('SetNcTaskPostponed');
+        if not NcTaskIn.FindSet() then
+            exit;
+
+#if not (BC18 or BC19 or BC20 or BC21)
+        NcTask.ReadIsolation := IsolationLevel::UpdLock;
+#else
+        NcTask.LockTable();
+#endif
+
+        productVariantsBulkUpdateRequestStringTextBuilder.Clear();
+        repeat
+            if NcTask.Get(NcTaskIn."Entry No.") and (not NcTaskIn.Processed and not NcTaskIn.Postponed) then begin
+                if NcTaskIn."Process Error" then begin
+                    NcTaskIn.CalcFields(Response);
+                    NcTask.Response := NcTaskIn.Response;
+                    NcTask."Process Error" := true;
+                    NcTask."Last Processing Completed at" := CurrentDateTime();
+                    NcTaskIn.Delete();
+                end else begin
+                    NcTask.Postponed := true;
+                    NcTask."Postponed At" := CurrentDateTime();
+                    NcTask."Last Processing Completed at" := 0DT;
+                    NcTaskIn.CalcFields("Data Output");
+                    NcTask."Data Output" := NcTaskIn."Data Output";
+                    NcTask."Data Output".CreateInStream(IStream, TextEncoding::UTF8);
+                    IStream.ReadText(productVariantsBulkUpdateRequestStringPart);
+                    productVariantsBulkUpdateRequestStringTextBuilder.Append(productVariantsBulkUpdateRequestStringPart);
+                    Success := true;
+                end;
+                NcTask."Last Processing Started at" := NcTaskIn."Last Processing Started at";
+                NcTask."Last Processing Duration" := 0;
+
+                NcTask.Modify();
+            end else
+                NcTaskIn.Delete();
+        until NcTaskIn.Next() = 0;
+        Commit();
+        RequestString := StrSubstNo(MutationQueryRequestLabel, productVariantsBulkUpdateRequestStringTextBuilder.ToText());
+    end;
+
+    local procedure CreateNcTaskParam(var NcTaskIn: Record "NPR Nc Task"; var NcTaskParam: Record "NPR Nc Task"; productVariantsBulkUpdateRequest: Text)
+    var
+        OStream: OutStream;
+        RequestJObject: JsonObject;
+    begin
+        Clear(NcTaskParam);
+        if not NcTaskIn.FindFirst() then
+            exit;
+        if productVariantsBulkUpdateRequest = '' then
+            exit;
+
+        NcTaskParam."Entry No." := 0;
+        NcTaskParam."Task Processor Code" := NcTaskIn."Task Processor Code";
+        NcTaskParam.Type := NcTaskIn.Type;
+        NcTaskParam."Company Name" := NcTaskIn."Company Name";
+        NcTaskParam."Table No." := NcTaskIn."Table No.";
+        NcTaskParam."Table Name" := NcTaskIn."Table Name";
+        NcTaskParam."Store Code" := NcTaskIn."Store Code";
+        NcTaskParam."Not Before Date-Time" := NcTaskIn."Not Before Date-Time";
+        RequestJObject.Add('query', productVariantsBulkUpdateRequest);
+        NcTaskParam."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
+        RequestJObject.WriteTo(OStream);
+    end;
+
+    local procedure GetProductVariantForItemPrice(var ItemPrice: Record "NPR Spfy Item Price"; var ShopifyVariantID: Text[30])
+    var
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+    begin
+        SpfyStoreItemLink.Type := SpfyStoreItemLink.Type::"Variant";
+        SpfyStoreItemLink."Item No." := ItemPrice."Item No.";
+        SpfyStoreItemLink."Variant Code" := ItemPrice."Variant Code";
+        SpfyStoreItemLink."Shopify Store Code" := ItemPrice."Shopify Store Code";
+
+        ShopifyVariantID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+        if ShopifyVariantID = '' then
+            ShopifyVariantID := GetShopifyVariantID(SpfyStoreItemLink, false);
+    end;
+
+    local procedure FindNcTaskInDictionary(var NcTaskIn: Record "NPR Nc Task"; ResponseDictionary: Dictionary of [Text[30], Dictionary of [Text[30], Text]]; var NcTaskErrorText: Text): Boolean
+    var
+        NcTaskNotFoundLbl: Label 'Nc Task %1 was not found in the Shopify response.';
+        InvalidProductVariantIDLbl: Label 'Product Variant ID %1 could not be validated.';
+        NcTaskResultDictionary: Dictionary of [Text[30], Text];
+    begin
+        Clear(NcTaskErrorText);
+        if not ResponseDictionary.ContainsKey(StrSubstNo('NCTask%1', Format(NcTaskIn."Entry No."))) then begin
+            NcTaskErrorText := StrSubstNo(NcTaskNotFoundLbl, Format(NcTaskIn."Entry No."));
+            exit;
+        end;
+
+        NcTaskResultDictionary := ResponseDictionary.Get(StrSubstNo('NCTask%1', Format(NcTaskIn."Entry No.")));
+        case true of
+            NcTaskResultDictionary.ContainsKey('VariantID'):
+                begin
+                    if not ValidateProductVariantId(NcTaskIn, CopyStr(NcTaskResultDictionary.Get('VariantID'), 1, 30)) then begin
+                        NcTaskErrorText := StrSubstNo(InvalidProductVariantIDLbl, NcTaskResultDictionary.Get('VariantID'));
+                        exit;
+                    end;
+                    exit(true);
+                end;
+            NcTaskResultDictionary.ContainsKey('Error'):
+                begin
+                    NcTaskErrorText := NcTaskResultDictionary.Get('Error');
+                    exit;
+                end;
+        end;
     end;
 }
 #endif

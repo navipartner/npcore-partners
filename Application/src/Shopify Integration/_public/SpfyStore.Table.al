@@ -37,6 +37,7 @@ table 6150810 "NPR Spfy Store"
                 ShopifyStore.Get("Code");
                 ShopifyStore.SetRecFilter();
                 SpfyScheduleSend.SetupTaskProcessingJobQueues(ShopifyStore);
+                Validate("Do Not Sync. Sales Prices");
             end;
         }
         field(20; "Shopify Url"; Text[250])
@@ -99,6 +100,16 @@ table 6150810 "NPR Spfy Store"
         {
             Caption = 'Do Not Sync. Sales Prices';
             DataClassification = CustomerContent;
+            InitValue = true;
+
+            trigger OnValidate()
+            var
+                SpfyScheduleSendTasks: Codeunit "NPR Spfy Schedule Send Tasks";
+            begin
+                if not "Do Not Sync. Sales Prices" then
+                    _SpfyDataLogSubscrMgt.CreateDataLogSetup("NPR Spfy Integration Area"::"Item Prices");
+                SpfyScheduleSendTasks.ToggleSpfyItemPriceSyncJobQueue(Enabled and not "Do Not Sync. Sales Prices");
+            end;
         }
         field(62; "Set Shopify Name/Descr. in BC"; Boolean)
         {
@@ -286,6 +297,17 @@ table 6150810 "NPR Spfy Store"
             CalcFormula = exist("NPR Spfy Webhook Subscription" where("Store Code" = field(Code), Topic = const("products/update")));
             Editable = false;
         }
+        field(600; "Customer No. (Price)"; Code[20])
+        {
+            Caption = 'Customer No. (Price)';
+            DataClassification = CustomerContent;
+            TableRelation = Customer."No.";
+        }
+        field(610; "No. of Prices per Request"; Integer)
+        {
+            Caption = 'No. of Prices per Request';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {
@@ -304,6 +326,13 @@ table 6150810 "NPR Spfy Store"
         RecordCannotBeRenamedErr: Label '%1 record cannot be renamed.';
     begin
         Error(RecordCannotBeRenamedErr, Rec.TableCaption());
+    end;
+
+    internal procedure NoOfPriceUpdatesPerRequest(): Integer
+    begin
+        if "No. of Prices per Request" > 0 then
+            exit("No. of Prices per Request");
+        exit(100);
     end;
 }
 #endif

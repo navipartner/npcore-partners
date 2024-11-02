@@ -40,6 +40,11 @@ codeunit 6184799 "NPR Spfy DLog Subscr.Mgt.Impl."
                         AddDataLogSetupEntity(
                             IntegrationArea, Database::"Transfer Line", DataLogSetup."Log Insertion"::Simple, DataLogSetup."Log Modification"::Changes, DataLogSetup."Log Deletion"::Detailed, JobQueueMgt.DaysToDuration(7));
                 end;
+            "NPR Spfy Integration Area"::"Item Prices":
+                begin
+                    AddDataLogSetupEntity(
+                        IntegrationArea, Database::"NPR Spfy Item Price", DataLogSetup."Log Insertion"::Simple, DataLogSetup."Log Modification"::Changes, DataLogSetup."Log Deletion"::Detailed, JobQueueMgt.DaysToDuration(7));
+                end;
             "NPR Spfy Integration Area"::"Retail Vouchers":
                 begin
                     AddDataLogSetupEntity(
@@ -91,6 +96,7 @@ codeunit 6184799 "NPR Spfy DLog Subscr.Mgt.Impl."
                 Database::"Item Reference",
                 Database::"NPR Spfy Store-Item Link",
                 Database::"NPR Spfy Inventory Level",
+                Database::"NPR Spfy Item Price",
                 Database::"Sales Line",
                 Database::"Transfer Line",
                 Database::"Item Ledger Entry",

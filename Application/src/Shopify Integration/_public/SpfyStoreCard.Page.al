@@ -61,6 +61,18 @@ page 6184704 "NPR Spfy Store Card"
                     ApplicationArea = NPRShopify;
                     Enabled = _ItemListIntegrationIsEnabled;
                 }
+                field("Customer No. (Price)"; Rec."Customer No. (Price)")
+                {
+                    ToolTip = 'Specifies the customer that will be used to calculate the prices of Shopify synchronisable items.';
+                    ApplicationArea = NPRShopify;
+                    Enabled = _ItemListIntegrationIsEnabled;
+                }
+                field("No. of Prices per Request"; Rec."No. of Prices per Request")
+                {
+                    ToolTip = 'Specifies the number of item prices that can be sent to Shopify in a single batch price update request. The default value is 100, which will be used by the system if you set the field value to zero.';
+                    ApplicationArea = NPRRetail;
+                    Enabled = _ItemListIntegrationIsEnabled;
+                }
                 group(ItemWebhooks)
                 {
                     Caption = 'Item Webhooks';
