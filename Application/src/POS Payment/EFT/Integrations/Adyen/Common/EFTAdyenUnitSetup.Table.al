@@ -32,6 +32,11 @@ table 6150913 "NPR EFT Adyen Unit Setup"
             DataClassification = CustomerContent;
             Caption = 'Poi Id';
         }
+        field(4; "In Person Store Id"; Text[250])
+        {
+            Caption = 'Store Id';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {

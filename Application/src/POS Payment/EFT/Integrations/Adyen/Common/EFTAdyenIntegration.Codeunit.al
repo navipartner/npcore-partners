@@ -196,6 +196,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         end;
         EFTAdyenPaymTypeSetup.Get(EftTransactionRequest."POS Payment Type Code");
         Request.Add('IsLiveEnvironment', EFTAdyenPaymTypeSetup.Environment = EFTAdyenPaymTypeSetup.Environment::PRODUCTION);
+        Request.Add('PosUnitNumber', EftTransactionRequest."Register No.");
         case EftTransactionRequest."Integration Type" of
             CloudIntegrationType():
                 Workflow := Format(Enum::"NPR POS Workflow"::EFT_ADYEN_CLOUD);

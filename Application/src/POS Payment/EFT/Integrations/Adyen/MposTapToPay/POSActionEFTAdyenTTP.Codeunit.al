@@ -56,12 +56,14 @@ codeunit 6184885 "NPR POS Action EFT Adyen TTP" implements "NPR IPOS Workflow"
     local procedure GetBoardingToken(Context: codeunit "NPR POS JSON Helper")
     var
         EFTAdyenPaymTypeSetup: Record "NPR EFT Adyen Paym. Type Setup";
+        EFTAdyenUnitSetup: Record "NPR EFT Adyen Unit Setup";
         EFTAdyneBoardingToken: Codeunit "NPR EFT Adyen Boarding Token";
         BoardingTokenB64: Text;
     begin
         _TrxStatus.Set(Context.GetInteger('EntryNo'), Enum::"NPR Adyen TTP Status"::"Fetching BoardingToken".AsInteger());
         EFTAdyenPaymTypeSetup.Get(Context.GetString('PaymentSetupCode'));
-        EFTAdyneBoardingToken.RequestBoardingToken(EFTAdyenPaymTypeSetup, Context.GetString('BoardingRequestToken'), BoardingTokenB64);
+        EFTAdyenUnitSetup.Get(Context.GetString('PosUnitNumber'));
+        EFTAdyneBoardingToken.RequestBoardingToken(EFTAdyenPaymTypeSetup, EFTAdyenUnitSetup."In Person Store Id", Context.GetString('BoardingRequestToken'), BoardingTokenB64);
         Context.SetContext('boardingTokenBase64', BoardingTokenB64);
     end;
 

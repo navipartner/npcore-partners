@@ -107,8 +107,12 @@
             Caption = 'Manual Capture';
             DataClassification = CustomerContent;
         }
+
         field(18; "In Person Store Id"; Text[250])
         {
+            ObsoleteState = Pending;
+            ObsoleteTag = '2023-11-04';
+            ObsoleteReason = 'Moved to Adyen Unit Parameter Setup';
             Caption = 'Store Id';
             DataClassification = CustomerContent;
         }

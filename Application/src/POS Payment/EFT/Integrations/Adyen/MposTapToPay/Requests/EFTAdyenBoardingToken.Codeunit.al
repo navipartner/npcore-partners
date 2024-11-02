@@ -2,7 +2,7 @@ codeunit 6184995 "NPR EFT Adyen Boarding Token"
 {
     Access = Internal;
     [TryFunction]
-    procedure RequestBoardingToken(EFTAdyenPaymTypeSetup: Record "NPR EFT Adyen Paym. Type Setup"; BoardingRequestToken: Text; var BoardingTokenB64: Text)
+    procedure RequestBoardingToken(EFTAdyenPaymTypeSetup: Record "NPR EFT Adyen Paym. Type Setup"; StoreId: Text; BoardingRequestToken: Text; var BoardingTokenB64: Text)
     var
         Url: Text;
         Request: Text;
@@ -15,10 +15,10 @@ codeunit 6184995 "NPR EFT Adyen Boarding Token"
         Base64Convert: Codeunit "Base64 Convert";
     begin
         if (EFTAdyenPaymTypeSetup."Merchant Account" = '') then Error('Merchant Account was not specified!');
-        if (EFTAdyenPaymTypeSetup."In Person Store Id" = '') then Error('Store was not specified!');
+        if (StoreId = '') then Error('Store was not specified!');
         if (EFTAdyenPaymTypeSetup."API Key" = '') then Error('API Key was not specified!');
         if (BoardingRequestToken = '') then Error('Boarding Request Token was not empty!');
-        Url := GetBoardingUrl(EFTAdyenPaymTypeSetup.Environment = EFTAdyenPaymTypeSetup.Environment::TEST, EFTAdyenPaymTypeSetup."Merchant Account", EFTAdyenPaymTypeSetup."In Person Store Id");//
+        Url := GetBoardingUrl(EFTAdyenPaymTypeSetup.Environment = EFTAdyenPaymTypeSetup.Environment::TEST, EFTAdyenPaymTypeSetup."Merchant Account", StoreId);
         JsonTextReaderWriter.WriteStartObject('');
         JsonTextReaderWriter.WriteStringProperty('boardingRequestToken', BoardingRequestToken);
         JsonTextReaderWriter.WriteEndObject();//Root

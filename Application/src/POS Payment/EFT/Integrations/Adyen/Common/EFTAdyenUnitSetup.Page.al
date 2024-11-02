@@ -24,6 +24,74 @@ page 6150838 "NPR EFT Adyen Unit Setup"
                     ToolTip = 'The POS Unit for this configuration';
                 }
             }
+
+            group("Tap To Pay Setup")
+            {
+                Visible = _IsTapToPay;
+
+                field(TapToPayStoreId; Rec."In Person Store Id")
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Store Id';
+                    ToolTip = 'Specify the unique identifier of the store';
+
+                    trigger OnLookup(var Text: Text): Boolean
+                    var
+                        AdyenStoreAPI: Codeunit "NPR Adyen Store API";
+                        EFTSetup: Record "NPR EFT Setup";
+                        EFTAdyenPaymTypeSetup: Record "NPR EFT Adyen Paym. Type Setup";
+                        EFTAdyenTTPInteg: Codeunit "NPR EFT Adyen TTP Integ.";
+                        TempRetailList: Record "NPR Retail List" temporary;
+                        Stores: Dictionary of [Text, Text];
+                        StoreId: Text;
+                        StoreDecription: Text;
+                        EftSetupNotFoundLbl: Label 'Could not find a matching EFT setup, ensure you have a record with the relevant POS Unit No. and Integration type.';
+                        PayParameterNotFoundLbl: Label 'The payment parameter was not found.';
+                        StoreLookupErrLbl: Label 'Could not fetch stores: %1';
+                        NeedApiKeyLbl: Label 'The field ''API Key'' needs to be filled out in payment parameters.';
+                        NeedMerchantAccountLbl: Label 'The field ''Merchant Account'' needs to be filled out in payment parameters..';
+                    begin
+                        EFTSetup.SetFilter("POS Unit No.", Rec."POS Unit No.");
+                        EFTSetup.SetFilter("EFT Integration Type", EFTAdyenTTPInteg.IntegrationType());
+                        if (not EFTSetup.FindFirst()) then begin
+                            Message(EftSetupNotFoundLbl);
+                            exit(false);
+                        end;
+                        if (not EFTAdyenPaymTypeSetup.Get(EFTSetup."Payment Type POS")) then begin
+                            Message(PayParameterNotFoundLbl);
+                            exit(false);
+                        end;
+                        if (EFTAdyenPaymTypeSetup."API Key" = '') then begin
+                            Message(NeedApiKeyLbl);
+                            exit(false);
+                        end;
+                        if (EFTAdyenPaymTypeSetup."Merchant Account" = '') then begin
+                            Message(NeedMerchantAccountLbl);
+                            exit(false);
+                        end;
+                        if not (AdyenStoreAPI.GetMerchantStoresIdAndNames(
+                            EFTAdyenPaymTypeSetup.Environment = EFTAdyenPaymTypeSetup.Environment::TEST,
+                            EFTAdyenPaymTypeSetup."Merchant Account",
+                            EFTAdyenPaymTypeSetup."API Key",
+                            Stores)) then begin
+                            Message(StrSubstNo(StoreLookupErrLbl, GetLastErrorText()));
+                            exit(false);
+                        end;
+                        foreach StoreId in Stores.Keys() do begin
+                            StoreDecription := Stores.Get(StoreId);
+                            TempRetailList.Number += 1;
+                            TempRetailList.Value := CopyStr(StoreId, 1, MaxStrLen(TempRetailList.Value));
+                            TempRetailList.Choice := CopyStr(StoreDecription, 1, MaxStrLen(TempRetailList.Choice));
+                            TempRetailList."Package Description" := CopyStr(StoreId, 1, MaxStrLen(TempRetailList."Package Description"));
+                            TempRetailList.Insert();
+                        end;
+                        if Page.Runmodal(Page::"NPR Retail List", TempRetailList) <> Action::LookupOK then
+                            exit(false);
+                        Text := TempRetailList.Value;
+                        exit(true);
+                    end;
+                }
+            }
             group("Cloud Unit Setup")
             {
                 Visible = _IsCloud;
@@ -36,7 +104,7 @@ page 6150838 "NPR EFT Adyen Unit Setup"
             }
             group("LAN Unit Setup")
             {
-                Visible = not _IsCloud;
+                Visible = _IsLan;
 
                 field(LANPOITID; Rec.POIID)
                 {
@@ -59,14 +127,27 @@ page 6150838 "NPR EFT Adyen Unit Setup"
     procedure SetCloud()
     begin
         _IsCloud := True;
+        _IsTapToPay := false;
+        _IsLan := false;
     end;
 
     procedure SetLan()
     begin
-        _IsCloud := False;
+        _IsCloud := false;
+        _IsTapToPay := false;
+        _IsLan := True;
+    end;
+
+    procedure SetTapToPay()
+    begin
+        _IsCloud := false;
+        _IsTapToPay := true;
+        _IsLan := false;
     end;
 
 
     var
         _IsCloud: Boolean;
+        _IsTapToPay: Boolean;
+        _IsLan: Boolean;
 }
