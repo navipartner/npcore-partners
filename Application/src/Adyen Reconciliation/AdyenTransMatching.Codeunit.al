@@ -1042,7 +1042,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         end;
 
         if not SchemeValid then
-            Error(InvalidSchemeError);
+            Error(InvalidSchemeError, SchemeValidationField);
 
         _AdyenManagement.CreateReconciliationLog(_LogType::"Validate Report Scheme", true, ValidSchemeText, WebhookRequest.ID);
         exit(true);
