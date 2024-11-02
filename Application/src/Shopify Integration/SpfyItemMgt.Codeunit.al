@@ -43,6 +43,13 @@ codeunit 6184812 "NPR Spfy Item Mgt."
                     TaskCreated := UpdateShopifyInventory(DataLogEntry);
                 end;
 
+            Database::"NPR Spfy Item Price":
+                begin
+                    if not SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Item Prices") then
+                        exit;
+                    TaskCreated := UpdateShopifyItemPrice(DataLogEntry);
+                end;
+
             Database::"Item Reference":
                 begin
                     if not SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::Items) then
@@ -332,6 +339,25 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         exit(SpfyScheduleSend.InitNcTask(InventoryLevel."Shopify Store Code", RecRef, VariantSku, NcTask.Type::Modify, InventoryLevel."Last Updated at", NcTask));
     end;
 
+    local procedure UpdateShopifyItemPrice(DataLogEntry: Record "NPR Data Log Record"): Boolean
+    var
+        ItemPrice: Record "NPR Spfy Item Price";
+        NcTask: Record "NPR Nc Task";
+        SpfyScheduleSend: Codeunit "NPR Spfy Schedule Send Tasks";
+        RecRef: RecordRef;
+        VariantSku: Text;
+    begin
+        if not FindItemPrice(DataLogEntry, ItemPrice) then
+            exit;
+        if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Item Prices", ItemPrice."Shopify Store Code") then
+            exit;
+
+        VariantSku := GetProductVariantSku(ItemPrice."Item No.", ItemPrice."Variant Code");
+
+        RecRef.GetTable(ItemPrice);
+        exit(SpfyScheduleSend.InitNcTask(ItemPrice."Shopify Store Code", RecRef, VariantSku, NcTask.Type::Modify, ItemPrice.SystemModifiedAt, CreateDateTime(ItemPrice."Starting Date", 0T), NcTask));
+    end;
+
     local procedure ScheduleCostSync(ShopifyStoreCode: Code[20]; Item: Record Item): Boolean
     var
         InventoryBuffer: Record "Inventory Buffer";
@@ -444,6 +470,31 @@ codeunit 6184812 "NPR Spfy Item Mgt."
             exit(false);
 
         Item.SetRange("NPR Spfy Store Filter", InventoryLevel."Shopify Store Code");
+        exit(TestRequiredInvFields(Item));
+    end;
+
+    local procedure FindItemPrice(DataLogEntry: Record "NPR Data Log Record"; var ItemPrice: Record "NPR Spfy Item Price"): Boolean
+    var
+        Item: Record Item;
+        RecRef: RecordRef;
+    begin
+        Clear(ItemPrice);
+        case DataLogEntry."Table ID" of
+            Database::"NPR Spfy Item Price":
+                begin
+                    RecRef := DataLogEntry."Record ID".GetRecord();
+                    RecRef.SetTable(ItemPrice);
+                    if not ItemPrice.Find() then
+                        exit(false);
+                end;
+            else
+                exit(false);
+        end;
+
+        if not Item.Get(ItemPrice."Item No.") then
+            exit(false);
+
+        Item.SetRange("NPR Spfy Store Filter", ItemPrice."Shopify Store Code");
         exit(TestRequiredInvFields(Item));
     end;
 

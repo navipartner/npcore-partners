@@ -89,6 +89,11 @@
                     ToolTip = 'Specifies the value of the Processed field';
                     ApplicationArea = NPRNaviConnect;
                 }
+                field(Postponed; Rec.Postponed)
+                {
+                    ToolTip = 'Specifies if the NC Task is Postponed';
+                    ApplicationArea = NPRNaviConnect;
+                }
                 field("Process Error"; Rec."Process Error")
                 {
                     Editable = false;
@@ -140,6 +145,12 @@
                 {
                     Editable = false;
                     ToolTip = 'Specifies the value of the Log Date field';
+                    ApplicationArea = NPRNaviConnect;
+                }
+                field("Not Before Date-Time"; Rec."Not Before Date-Time")
+                {
+                    Editable = false;
+                    ToolTip = 'Specifies the date time ';
                     ApplicationArea = NPRNaviConnect;
                 }
                 field("Last Checked1"; Rec."Last Processing Started at")
@@ -206,6 +217,20 @@
                     ProcessManually();
                 end;
             }
+
+            action(UnPostpone)
+            {
+                Caption = 'Set as Not Postponed';
+                Image = ChangeStatus;
+                ToolTip = 'Sets selected tasks as not postponed. The system may mark tasks as "Postponed" to defer processing when it needs to process certain types of tasks together in a batch, rather than individually. The Postponed field should be cleared automatically once the system has finished processing. However, if the process was interrupted abruptly, the tasks may remain deferred. In this case, you can use this function to return the task to it''s original state.';
+                ApplicationArea = NPRNaviConnect;
+
+                trigger OnAction()
+                begin
+                    MarkAsNotPostponed();
+                end;
+            }
+
             action("Reschedule For Processing")
             {
                 Caption = 'Reschedule for Processing';
@@ -366,18 +391,34 @@
         Task2: Record "NPR Nc Task";
         Counter: Integer;
         Window: Dialog;
+        ExecutePostponedTasksLbl: Label 'You have selected one or more tasks that should be executed later.\Are you sure you want to execute them now?';
     begin
         CurrPage.SetSelectionFilter(Task);
+        Task.FilterGroup(10);
+        Task.SetFilter("Not Before Date-Time", '>%1', CurrentDateTime());
+        if not Task.IsEmpty() then
+            if not Confirm(ExecutePostponedTasksLbl) then
+                Error('');
+        Task.SetRange("Not Before Date-Time");
+        Task.FilterGroup(0);
         Window.Open(OpenWindowTxt);
         Window.Update(2, Task.Count());
+        Clear(SyncMgt);
         if Task.FindSet() then
             repeat
                 Counter += 1;
                 Window.Update(1, Counter);
-                Task2 := Task;
-                SyncMgt.ProcessTask(Task2);
+                if SyncMgt.IsBatchProcessing(Task) then
+                    SyncMgt.Postpone(Task)
+                else begin
+                    Task2 := Task;
+                    SyncMgt.ProcessTask(Task2);
+                end;
             until Task.Next() = 0;
         Window.Close();
+
+        SyncMgt.ProcessPostponedTasks(false);
+
         CurrPage.Update(false);
     end;
 
@@ -430,5 +471,36 @@
         NcTaskMgt: Codeunit "NPR Nc Task Mgt.";
     begin
         NcTaskMgt.RunSourceCard(Rec);
+    end;
+
+    local procedure MarkAsNotPostponed()
+    var
+        Task: Record "NPR Nc Task";
+        Counter: Integer;
+        Window: Dialog;
+        NoPostponedTasksWhereSelectedLbl: Label 'No Postponed tasks where selected.';
+        UnmarkPostponedTasksLbl: Label 'You have selected multiple tasks. Only tasks marked as "Postponed" will be updated. You will not be able to manually revert this action.\Are you sure you want to continue?';
+    begin
+        CurrPage.SetSelectionFilter(Task);
+        Task.SetRange(Postponed, true);
+        if not Task.IsEmpty() then begin
+            if not Confirm(UnmarkPostponedTasksLbl) then
+                Error('');
+        end else
+            Error(NoPostponedTasksWhereSelectedLbl);
+        Window.Open(OpenWindowTxt);
+        Window.Update(2, Task.Count());
+        if Task.FindSet(true) then
+            repeat
+                Counter += 1;
+                Window.Update(1, Counter);
+                if Task.Postponed then begin
+                    Task.Postponed := false;
+                    Task.Modify();
+                end;
+            until Task.Next() = 0;
+        Window.Close();
+
+        CurrPage.Update(false);
     end;
 }

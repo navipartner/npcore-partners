@@ -131,6 +131,22 @@
             TableRelation = "NPR Spfy Store".Code;
 #endif
         }
+        field(220; "Not Before Date-Time"; DateTime)
+        {
+            Caption = 'Not Before Date-Time';
+            DataClassification = CustomerContent;
+        }
+        field(230; Postponed; Boolean)
+        {
+            Editable = false;
+            Caption = 'Postponed';
+            DataClassification = CustomerContent;
+        }
+        field(240; "Postponed At"; DateTime)
+        {
+            Caption = 'Postponed At';
+            DataClassification = CustomerContent;
+        }
         field(6059906; "Task Processor Code"; Code[20])
         {
             Caption = 'Task Processor Code';
@@ -155,7 +171,7 @@
         key(Key4; "Record Value")
         {
         }
-        key(Key5; "Task Processor Code", Processed) { }
+        key(Key5; "Task Processor Code", Processed, Postponed, "Store Code", "Not Before Date-Time") { }
     }
 
     trigger OnDelete()

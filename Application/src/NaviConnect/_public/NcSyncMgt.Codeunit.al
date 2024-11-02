@@ -5,6 +5,7 @@
         FileIsNotValidErr: Label 'File %1 is not valid', Comment = '%1=FileName';
         SyncEndTime: DateTime;
         AuthorizationFailedErrorText: Label 'Authorization failed. Wrong FTP username/password.';
+        TempTask: Record "NPR Nc Task" temporary;
         FTPClient: Codeunit "NPR AF FTP Client";
         SFTPClient: Codeunit "NPR AF Sftp Client";
 
@@ -223,6 +224,24 @@
         exit(true);
     end;
 
+    procedure ProcessTaskBatch(var Task: Record "NPR Nc Task"): Boolean
+    var
+        TaskSetup: Record "NPR Nc Task Setup";
+    begin
+        OnBeforeProcessTaskBatch(Task);
+
+        TaskSetup.SetCurrentKey("Task Processor Code", "Table No.", "Codeunit ID");
+        TaskSetup.SetRange("Task Processor Code", Task."Task Processor Code");
+        TaskSetup.SetRange("Table No.", Task."Table No.");
+        if TaskSetup.FindSet() then
+            repeat
+                Commit();
+                SelectLatestVersion();
+                if Codeunit.Run(TaskSetup."Codeunit ID", Task) then;
+            until TaskSetup.Next() = 0;
+        exit(true);
+    end;
+
     internal procedure ProcessTasks(TaskProcessor: Record "NPR Nc Task Processor"; StoreCode: Code[20]; MaxRetry: Integer)
     var
         Task: Record "NPR Nc Task";
@@ -233,19 +252,28 @@
             MaxRetry := 1;
         SyncEndTime := CurrentDateTime() + GetMaxSyncDuration();
 
-        Task.SetCurrentKey("Task Processor Code", Processed);
+        TempTask.DeleteAll();
+        Task.SetCurrentKey("Task Processor Code", Processed, Postponed, "Store Code", "Not Before Date-Time");
         Task.SetRange("Task Processor Code", TaskProcessor.Code);
         if StoreCode <> '' then
             Task.SetRange("Store Code", StoreCode);
         Task.SetRange(Processed, false);
+        Task.SetRange(Postponed, false);
+        Task.SetFilter("Not Before Date-Time", '%1|..%2', 0DT, CurrentDateTime());
         Task.SetFilter("Process Count", '<%1', MaxRetry);
         if Task.FindSet() then
             repeat
-                Task2 := Task;
-                ProcessTask(Task2);
-                if (CurrentDateTime > SyncEndTime) and (SyncEndTime <> 0DT) then
-                    exit;
+                if IsBatchProcessing(Task) then
+                    Postpone(Task)
+                else begin
+                    Task2 := Task;
+                    ProcessTask(Task2);
+                    if (CurrentDateTime > SyncEndTime) and (SyncEndTime <> 0DT) then
+                        exit;
+                end;
             until Task.Next() = 0;
+
+        ProcessPostponedTasks(true);
     end;
     #endregion "Process Import"
 
@@ -622,11 +650,67 @@
     begin
         exit(120000T - 113000T);
     end;
+
+    procedure IsBatchProcessing(Task: Record "NPR Nc Task") BatchProcessing: Boolean
+    var
+        Handled: Boolean;
+    begin
+        OnCheckIfIsBatchProcessing(Task, BatchProcessing, Handled);
+        if Handled then
+            exit;
+#if not BC17
+        BatchProcessing := Task."Table No." = Database::"NPR Spfy Item Price";
+#endif
+    end;
+
+    procedure Postpone(var Task: Record "NPR Nc Task")
+    begin
+        TempTask := Task;
+        TempTask.Insert();
+    end;
+
+    procedure ProcessPostponedTasks(Silent: Boolean)
+    var
+        Counter: Integer;
+        Window: Dialog;
+        OpenWindowTxt: Label 'Updating Postponed: #1#############\Total: #2###############';
+    begin
+        if not TempTask.FindSet() then
+            exit;
+        if not Silent and GuiAllowed() then begin
+            Window.Open(OpenWindowTxt);
+            Window.Update(2, TempTask.Count());
+        end;
+        repeat
+            TempTask.SetRange("Task Processor Code", TempTask."Task Processor Code");
+            TempTask.SetRange("Table No.", TempTask."Table No.");
+            TempTask.SetRange("Store Code", TempTask."Store Code");
+            ProcessTaskBatch(TempTask);
+            if not Silent and GuiAllowed() then begin
+                Counter += TempTask.Count();
+                Window.Update(1, Counter);
+            end;
+            TempTask.DeleteAll();
+            if not Silent and GuiAllowed() then
+                if (CurrentDateTime > SyncEndTime) and (SyncEndTime <> 0DT) then
+                    exit;
+            TempTask.SetRange("Task Processor Code");
+            TempTask.SetRange("Table No.");
+            TempTask.SetRange("Store Code");
+        until TempTask.Next() = 0;
+        if not Silent and GuiAllowed() then
+            Window.Close();
+    end;
     #endregion UI
 
     #region events
     [IntegrationEvent(false, false)]
     local procedure OnBeforeProcessTask(var Task: Record "NPR Nc Task")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeProcessTaskBatch(var Task: Record "NPR Nc Task")
     begin
     end;
 
@@ -637,6 +721,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeDownloadDirectory(ImportType: Record "NPR Nc Import Type"; var ListOfDirectory: List of [Text])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCheckIfIsBatchProcessing(Task: Record "NPR Nc Task"; var BatchProcessing: Boolean; var Handled: Boolean)
     begin
     end;
     #endregion events

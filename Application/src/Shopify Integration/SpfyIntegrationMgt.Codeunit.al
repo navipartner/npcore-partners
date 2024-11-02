@@ -65,6 +65,8 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
                 exit(ShopifyStore."Item List Integration");
             IntegrationArea::"Inventory Levels":
                 exit(ShopifyStore."Send Inventory Updates");
+            IntegrationArea::"Item Prices":
+                exit(not ShopifyStore."Do Not Sync. Sales Prices");
             IntegrationArea::"Sales Orders":
                 exit(ShopifyStore."Sales Order Integration");
             IntegrationArea::"Order Fulfillments":
@@ -112,7 +114,12 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
     procedure IsSendSalesPrices(ShopifyStoreCode: Code[20]): Boolean
     begin
         GetStore(ShopifyStoreCode);
-        exit(not _ShopifyStore."Do Not Sync. Sales Prices");
+        exit(IsSendSalesPrices(_ShopifyStore));
+    end;
+
+    procedure IsSendSalesPrices(ShopifyStoreIn: Record "NPR Spfy Store"): Boolean
+    begin
+        exit(not ShopifyStoreIn."Do Not Sync. Sales Prices");
     end;
 
     procedure IsSendShopifyNameAndDescription(ShopifyStoreCode: Code[20]): Boolean

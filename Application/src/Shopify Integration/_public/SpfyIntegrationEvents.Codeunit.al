@@ -87,5 +87,15 @@ codeunit 6184824 "NPR Spfy Integration Events"
     internal procedure LocationCardOnCheckIfShopifyIntegrationIsEnabled(Rec: Record Location; var IsEnabled: Boolean)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterCalculateUnitPrice(Item: Record Item; VariantCode: Code[20]; UnitOfMeasure: Code[20]; ShopifyStoreCode: Code[20]; CurrencyCode: Code[10]; var Price: Decimal; var ComparePrice: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeCalculateUnitPrice(Item: Record Item; VariantCode: Code[20]; UnitOfMeasure: Code[20]; ShopifyStoreCode: Code[20]; CurrencyCode: Code[10]; var Price: Decimal; var ComparePrice: Decimal; var Handled: Boolean)
+    begin
+    end;
 }
 #endif

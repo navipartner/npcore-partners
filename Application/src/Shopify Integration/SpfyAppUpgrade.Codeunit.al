@@ -17,6 +17,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         PhaseOutShopifyCCIntegration();
         StoreSpecificIntegrationSetups();
         UpdateShopifyPaymentModule();
+        UpdateShopifyStoreDoNotSyncSalesPrices();
     end;
 
     internal procedure UpdateShopifySetup()
@@ -149,6 +150,25 @@ codeunit 6184802 "NPR Spfy App Upgrade"
                 VoucherType.Modify();
             until VoucherType.Next() = 0;
         end;
+
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", UpgradeStep));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    internal procedure UpdateShopifyStoreDoNotSyncSalesPrices()
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+    begin
+        UpgradeStep := 'UpdateShopifyStoreDoNotSyncSalesPrices';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", UpgradeStep)) then
+            exit;
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Spfy App Upgrade', UpgradeStep);
+
+        if ShopifyStore.FindSet() then
+            repeat
+                if not ShopifyStore."Do Not Sync. Sales Prices" then
+                    ShopifyStore.Validate("Do Not Sync. Sales Prices");
+            until ShopifyStore.Next() = 0;
 
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();

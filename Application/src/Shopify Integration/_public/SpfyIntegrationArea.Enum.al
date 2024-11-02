@@ -12,6 +12,10 @@ enum 6014656 "NPR Spfy Integration Area"
     {
         Caption = 'Inventory';
     }
+    value(12; "Item Prices")
+    {
+        Caption = 'Item Prices';
+    }
     value(20; "Sales Orders")
     {
         Caption = 'Sales Orders';
