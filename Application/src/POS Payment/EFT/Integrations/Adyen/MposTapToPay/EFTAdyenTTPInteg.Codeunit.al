@@ -18,6 +18,26 @@ codeunit 6184884 "NPR EFT Adyen TTP Integ."
         tmpEFTIntegrationType.Insert();
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnConfigureIntegrationUnitSetup', '', false, false)]
+    local procedure OnConfigureIntegrationUnitSetup(EFTSetup: Record "NPR EFT Setup")
+    var
+        EFTAdyenUnitSetup: Record "NPR EFT Adyen Unit Setup";
+        EFTAdyenUnitSetupPage: Page "NPR EFT Adyen Unit Setup";
+    begin
+        if EFTSetup."EFT Integration Type" <> IntegrationType() then
+            exit;
+
+        if (not EFTAdyenUnitSetup.Get(EFTSetup."POS Unit No.")) then begin
+            EFTAdyenUnitSetup.Init();
+            EFTAdyenUnitSetup."POS Unit No." := EFTSetup."POS Unit No.";
+            EFTAdyenUnitSetup.Insert();
+        end;
+        Commit();
+        EFTAdyenUnitSetupPage.SetTapToPay();
+        EFTAdyenUnitSetupPage.SetRecord(EFTAdyenUnitSetup);
+        EFTAdyenUnitSetupPage.RunModal();
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnConfigureIntegrationPaymentSetup', '', false, false)]
     local procedure OnConfigureIntegrationPaymentSetup(EFTSetup: Record "NPR EFT Setup")
     var

@@ -106,52 +106,7 @@
                     ToolTip = 'Specifies the value of the API Key field';
                     ApplicationArea = NPRRetail;
                 }
-                field("In Person Store Id"; Rec."In Person Store Id")
-                {
-                    ToolTip = 'Specifies the store Id';
-                    ApplicationArea = NPRRetail;
 
-                    trigger OnLookup(var Text: Text): Boolean
-                    var
-                        AdyenStoreAPI: Codeunit "NPR Adyen Store API";
-                        TempRetailList: Record "NPR Retail List" temporary;
-                        Stores: Dictionary of [Text, Text];
-                        StoreId: Text;
-                        StoreDecription: Text;
-                        StoreLookupErrLbl: Label 'Could not fetch stores: %1';
-                        NeedApiKeyLbl: Label 'The field ''API Key'' needs to be filled out.';
-                        NeedMerchantAccountLbl: Label 'The field ''Merchant Account'' needs to be filled out.';
-                    begin
-                        if (Rec."API Key" = '') then begin
-                            Message(NeedApiKeyLbl);
-                            exit(false);
-                        end;
-                        if (Rec."Merchant Account" = '') then begin
-                            Message(NeedMerchantAccountLbl);
-                            exit(false);
-                        end;
-                        if not (AdyenStoreAPI.GetMerchantStoresIdAndNames(
-                            Rec.Environment = Rec.Environment::TEST,
-                            Rec."Merchant Account",
-                            Rec."API Key",
-                            Stores)) then begin
-                            Message(StrSubstNo(StoreLookupErrLbl, GetLastErrorText()));
-                            exit(false);
-                        end;
-                        foreach StoreId in Stores.Keys() do begin
-                            StoreDecription := Stores.Get(StoreId);
-                            TempRetailList.Number += 1;
-                            TempRetailList.Value := CopyStr(StoreId, 1, MaxStrLen(TempRetailList.Value));
-                            TempRetailList.Choice := CopyStr(StoreDecription, 1, MaxStrLen(TempRetailList.Choice));
-                            TempRetailList."Package Description" := CopyStr(StoreId, 1, MaxStrLen(TempRetailList."Package Description"));
-                            TempRetailList.Insert();
-                        end;
-                        if Page.Runmodal(Page::"NPR Retail List", TempRetailList) <> Action::LookupOK then
-                            exit(false);
-                        Text := TempRetailList.Value;
-                        exit(true);
-                    end;
-                }
                 field("TTP: EncKey Id"; Rec."Local Key Identifier")
                 {
                     Caption = 'TTP Key Identifier';
