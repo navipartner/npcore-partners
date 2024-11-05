@@ -57,20 +57,6 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
             TempPurchInvLine.DeleteAll();
         end;
 
-        FilterItemChargeLines(PurchInvHeader);
-        if TempPurchInvLine.IsEmpty() then
-            exit;
-
-        TempPurchInvLine.FindSet();
-        repeat
-            FilterRetailItemChargeAssignment();
-            if TempItemChargeAssignment.FindSet() then
-                repeat
-                    CreateAdditionalGLEntries(RetailValueEntry, RSRetailCalculationType::"Item Charge Margin With VAT");
-                    CreateAdditionalGLEntries(RetailValueEntry, RSRetailCalculationType::"Item Charge Margin");
-                until TempItemChargeAssignment.Next() = 0;
-        until TempPurchInvLine.Next() = 0;
-
         SourceCodeSetup.Get();
         RSRLocalizationMgt.AddGLEntriesToGLRegister(PurchInvHeader."No.", SourceCodeSetup.Purchases);
     end;
@@ -94,12 +80,7 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
         else
             GenJournalLine."VAT Reporting Date" := GLSetup.GetVATDate(GenJournalLine."Posting Date", GenJournalLine."Document Date");
 
-        case TempPurchInvLine.Type of
-            "Purchase Line Type"::Item:
-                CalculatePurchLineItemTypeAmounts(GenJournalLine, CalculationValueEntry, RSRetailCalculationType);
-            "Purchase Line Type"::"Charge (Item)":
-                CalculatePurchLineItemChTypeAmounts(GenJournalLine, RSRetailCalculationType);
-        end;
+        CalculatePurchLineItemTypeAmounts(GenJournalLine, CalculationValueEntry, RSRetailCalculationType);
 
         if GenJournalLine.Amount = 0 then
             exit;
@@ -257,10 +238,10 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
             exit;
 
         RSRLocalizationMgt.InsertCOGSCorrectionValueEntryMappingEntry(StdValueEntry);
-        InsertRetailValueEntry(RetailValueEntry, StdValueEntry, PurchInvHeader);
+        InsertRetailValueEntry(RetailValueEntry, StdValueEntry);
     end;
 
-    local procedure InsertRetailValueEntry(var RetailValueEntry: Record "Value Entry"; StdValueEntry: Record "Value Entry"; PurchInvHeader: Record "Purch. Inv. Header")
+    local procedure InsertRetailValueEntry(var RetailValueEntry: Record "Value Entry"; StdValueEntry: Record "Value Entry")
     var
         CalculationValueEntryDescLbl: Label 'Calculation';
     begin
@@ -269,10 +250,9 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
         RetailValueEntry.Copy(StdValueEntry);
         RetailValueEntry."Entry No." := StdValueEntry.GetLastEntryNo() + 1;
         RSRLocalizationMgt.ResetValueEntryAmounts(RetailValueEntry);
-        RetailValueEntry."Cost Amount (Actual)" := PriceListLine."Unit Price" * TempPurchInvLine.Quantity - StdValueEntry."Cost Amount (Actual)";
-        RetailValueEntry."Cost Amount (Actual)" := RSRLocalizationMgt.RoundAmountToCurrencyRounding(RetailValueEntry."Cost Amount (Actual)", PurchInvHeader."Currency Code");
+        RetailValueEntry."Cost per Unit" := PriceListLine."Unit Price" - CalculateStandardCostPerUnit(StdValueEntry);
+        RetailValueEntry."Cost Amount (Actual)" := RetailValueEntry."Cost per Unit" * TempPurchInvLine.Quantity;
         RetailValueEntry."Cost Posted to G/L" := RetailValueEntry."Cost Amount (Actual)";
-        RetailValueEntry."Cost per Unit" := RSRLocalizationMgt.RoundAmountToCurrencyRounding(PriceListLine."Unit Price" - StdValueEntry."Cost per Unit", PurchInvHeader."Currency Code");
         RetailValueEntry.Description := CalculationValueEntryDescLbl;
 
         if (RetailValueEntry."Cost Amount (Actual)" = 0) then
@@ -281,6 +261,16 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
         RetailValueEntry.Insert();
 
         RSRLocalizationMgt.InsertRetailCalculationValueEntryMappingEntry(RetailValueEntry);
+    end;
+
+    local procedure CalculateStandardCostPerUnit(StdValueEntry: Record "Value Entry"): Decimal
+    var
+        ValueEntry: Record "Value Entry";
+    begin
+        ValueEntry.SetLoadFields("Cost per Unit");
+        ValueEntry.SetRange("Item Ledger Entry No.", StdValueEntry."Item Ledger Entry No.");
+        ValueEntry.CalcSums("Cost per Unit");
+        exit(ValueEntry."Cost per Unit");
     end;
 
     #endregion
@@ -299,22 +289,6 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
         end;
     end;
 
-    local procedure CalculatePurchLineItemChTypeAmounts(var GenJournalLine: Record "Gen. Journal Line"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type")
-    begin
-        case RSRetailCalculationType of
-            RSRetailCalculationType::"Item Charge Margin With VAT":
-                begin
-                    GenJournalLine.Validate("Debit Amount", -Abs(TempItemChargeAssignment."Amount to Assign"));
-                    GenJournalLine.Validate(Amount, -Abs(GenJournalLine.Amount));
-                end;
-            RSRetailCalculationType::"Item Charge Margin":
-                begin
-                    GenJournalLine.Validate("Credit Amount", -Abs(TempItemChargeAssignment."Amount to Assign"));
-                    GenJournalLine.Validate(Amount, Abs(GenJournalLine.Amount));
-                end;
-        end;
-    end;
-
     local procedure GetRSAccountNoFromSetup(RSRetailCalculationType: Enum "NPR RS Retail Calculation Type"): Code[20]
     var
         LocalizationSetup: Record "NPR RS R Localization Setup";
@@ -326,9 +300,9 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
                     LocalizationSetup.TestField("RS Calc. VAT GL Account");
                     exit(LocalizationSetup."RS Calc. VAT GL Account");
                 end;
-            RSRetailCalculationType::"Margin with VAT", RSRetailCalculationType::"Item Charge Margin With VAT":
+            RSRetailCalculationType::"Margin with VAT":
                 exit(GetInventoryAccountFromInvPostingSetup(TempPurchInvLine."Location Code"));
-            RSRetailCalculationType::Margin, RSRetailCalculationType::"Item Charge Margin":
+            RSRetailCalculationType::Margin:
                 begin
                     LocalizationSetup.TestField("RS Calc. Margin GL Account");
                     exit(LocalizationSetup."RS Calc. Margin GL Account");
@@ -462,59 +436,6 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
         until PurchInvLine.Next() = 0;
     end;
 
-    local procedure FilterItemChargeLines(PurchInvHeader: Record "Purch. Inv. Header")
-    var
-        PurchInvLine: Record "Purch. Inv. Line";
-    begin
-        PurchInvLine.SetRange(Type, "Purchase Line Type"::"Charge (Item)");
-        PurchInvLine.SetRange("Document No.", PurchInvHeader."No.");
-        if PurchInvLine.IsEmpty() then
-            exit;
-        PurchInvLine.FindSet();
-        repeat
-            TempPurchInvLine.Init();
-            TempPurchInvLine.Copy(PurchInvLine);
-            TempPurchInvLine.Insert();
-        until PurchInvLine.Next() = 0;
-    end;
-
-    local procedure FilterRetailItemChargeAssignment()
-    var
-        ItemChargeAssignment: Record "Item Charge Assignment (Purch)";
-        AssignedPurchInvLine: Record "Purch. Inv. Line";
-        AssignedPurcRcptLine: Record "Purch. Rcpt. Line";
-    begin
-        ItemChargeAssignment.SetRange("Document No.", TempPurchInvLine."Document No.");
-        ItemChargeAssignment.SetRange("Document Line No.", TempPurchInvLine."Line No.");
-        ItemChargeAssignment.SetRange("Item Charge No.", TempPurchInvLine."No.");
-        if ItemChargeAssignment.IsEmpty() then
-            exit;
-
-        ItemChargeAssignment.FindSet();
-        repeat
-            case ItemChargeAssignment."Applies-to Doc. Type" of
-                "Purchase Applies-to Document Type"::Order:
-                    begin
-                        AssignedPurchInvLine.Get(ItemChargeAssignment."Applies-to Doc. Type", ItemChargeAssignment."Applies-to Doc. No.", ItemChargeAssignment."Line No.");
-                        if RSRLocalizationMgt.IsRetailLocation(AssignedPurchInvLine."Location Code") then begin
-                            TempItemChargeAssignment.Init();
-                            TempItemChargeAssignment.Copy(ItemChargeAssignment);
-                            TempItemChargeAssignment.Insert();
-                        end;
-                    end;
-                "Purchase Applies-to Document Type"::Receipt:
-                    begin
-                        AssignedPurcRcptLine.Get(ItemChargeAssignment."Applies-to Doc. No.", ItemChargeAssignment."Line No.");
-                        if RSRLocalizationMgt.IsRetailLocation(AssignedPurcRcptLine."Location Code") then begin
-                            TempItemChargeAssignment.Init();
-                            TempItemChargeAssignment.Copy(ItemChargeAssignment);
-                            TempItemChargeAssignment.Insert();
-                        end;
-                    end;
-            end;
-        until ItemChargeAssignment.Next() = 0;
-    end;
-
     local procedure FilterPriceListHeader(PurchInvHeader: Record "Purch. Inv. Header")
     var
         EndingDateFilter: Label '>=%1|''''', Comment = '%1 = Ending Date', Locked = true;
@@ -549,41 +470,13 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
     local procedure GetInventoryAccountFromInvPostingSetup(LocationCode: Code[10]): Code[20]
     var
         InventoryPostingSetup: Record "Inventory Posting Setup";
-        AssignedPurchInvLine: Record "Purch. Inv. Line";
-        AssignedPurchRcptLine: Record "Purch. Rcpt. Line";
         Item: Record Item;
         InvPostingSetupNotFoundErr: Label '%1 for %2 : %3 and %4 : %5 not found.', Comment = '%1 = Inventory Posting Setup Table Caption, %2 = Location Code Field Caption %3 = Location Code, %4 = Invt. Posting Group Code Field Caption, %5 = Inventory Posting Group';
     begin
-        case TempPurchInvLine.Type of
-            "Purchase Line Type"::Item:
-                begin
-                    Item.Get(TempPurchInvLine."No.");
-
-                    if not InventoryPostingSetup.Get(LocationCode, Item."Inventory Posting Group") then
-                        Error(InvPostingSetupNotFoundErr, InventoryPostingSetup.TableCaption(), InventoryPostingSetup.FieldCaption("Location Code"), LocationCode,
-                                InventoryPostingSetup.FieldCaption("Invt. Posting Group Code"), Item."Inventory Posting Group");
-                end;
-            "Purchase Line Type"::"Charge (Item)":
-                begin
-                    Item.Get(TempItemChargeAssignment."Item No.");
-                    case TempItemChargeAssignment."Applies-to Doc. Type" of
-                        "Purchase Applies-to Document Type"::Order:
-                            begin
-                                AssignedPurchInvLine.Get(TempItemChargeAssignment."Applies-to Doc. Type", TempItemChargeAssignment."Applies-to Doc. No.", TempItemChargeAssignment."Line No.");
-                                if not InventoryPostingSetup.Get(LocationCode, Item."Inventory Posting Group") then
-                                    Error(InvPostingSetupNotFoundErr, InventoryPostingSetup.TableCaption(), InventoryPostingSetup.FieldCaption("Location Code"), LocationCode,
-                                            InventoryPostingSetup.FieldCaption("Invt. Posting Group Code"), Item."Inventory Posting Group");
-                            end;
-                        "Purchase Applies-to Document Type"::Receipt:
-                            begin
-                                AssignedPurchRcptLine.Get(TempItemChargeAssignment."Applies-to Doc. No.", TempItemChargeAssignment."Line No.");
-                                if not InventoryPostingSetup.Get(LocationCode, Item."Inventory Posting Group") then
-                                    Error(InvPostingSetupNotFoundErr, InventoryPostingSetup.TableCaption(), InventoryPostingSetup.FieldCaption("Location Code"), LocationCode,
-                                            InventoryPostingSetup.FieldCaption("Invt. Posting Group Code"), Item."Inventory Posting Group");
-                            end;
-                    end;
-                end;
-        end;
+        Item.Get(TempPurchInvLine."No.");
+        if not InventoryPostingSetup.Get(LocationCode, Item."Inventory Posting Group") then
+            Error(InvPostingSetupNotFoundErr, InventoryPostingSetup.TableCaption(), InventoryPostingSetup.FieldCaption("Location Code"), LocationCode,
+                    InventoryPostingSetup.FieldCaption("Invt. Posting Group Code"), Item."Inventory Posting Group");
         InventoryPostingSetup.TestField("Inventory Account");
         exit(InventoryPostingSetup."Inventory Account");
     end;
@@ -595,7 +488,6 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
         PriceListHeader: Record "Price List Header";
         PriceListLine: Record "Price List Line";
         TempPurchInvLine: Record "Purch. Inv. Line" temporary;
-        TempItemChargeAssignment: Record "Item Charge Assignment (Purch)" temporary;
         RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
         GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
         JobLine: Boolean;

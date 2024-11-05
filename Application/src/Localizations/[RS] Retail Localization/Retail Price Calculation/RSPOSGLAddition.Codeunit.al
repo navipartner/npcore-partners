@@ -565,16 +565,31 @@ codeunit 6151363 "NPR RS POS GL Addition"
         case true of
             (QtyTakenFromEntry < QtyNeeded) or (QtyTakenFromEntry = QtyNeeded):
                 begin
-                    InsertCOGSCorrectionValueEntry(SumOfCOGSCostPerUnit, SumOfCOGSCostAmtAct, StdValueEntry, ApplValueEntry."Cost per Unit", QtyTakenFromEntry, false);
+                    InsertCOGSCorrectionValueEntry(SumOfCOGSCostPerUnit, SumOfCOGSCostAmtAct, StdValueEntry, CalculateAppliedCostPerUnit(ApplValueEntry), QtyTakenFromEntry, false);
                     RSRLocalizationMgt.SubRetValueEntryMappingRemainingQty(RSRetValueEntryMapp, QtyTakenFromEntry);
                 end;
             QtyTakenFromEntry > QtyNeeded:
                 begin
-                    InsertCOGSCorrectionValueEntry(SumOfCOGSCostPerUnit, SumOfCOGSCostAmtAct, StdValueEntry, ApplValueEntry."Cost per Unit", QtyNeeded, false);
+                    InsertCOGSCorrectionValueEntry(SumOfCOGSCostPerUnit, SumOfCOGSCostAmtAct, StdValueEntry, CalculateAppliedCostPerUnit(ApplValueEntry), QtyNeeded, false);
                     RSRLocalizationMgt.SubRetValueEntryMappingRemainingQty(RSRetValueEntryMapp, QtyNeeded);
                 end;
         end;
         QtyNeeded := QtyNeeded - QtyTakenFromEntry;
+    end;
+
+    local procedure CalculateAppliedCostPerUnit(ApplValueEntry: Record "Value Entry") AppliedCostPerUnit: Decimal
+    var
+        ItemChargeValueEntries: Record "Value Entry";
+    begin
+        ItemChargeValueEntries.SetLoadFields("Cost per Unit");
+        ItemChargeValueEntries.SetRange("Item Ledger Entry No.", ApplValueEntry."Item Ledger Entry No.");
+        ItemChargeValueEntries.SetFilter("Item Charge No.", '<>%1', '');
+        if ItemChargeValueEntries.IsEmpty() then
+            AppliedCostPerUnit := ApplValueEntry."Cost per Unit"
+        else begin
+            ItemChargeValueEntries.CalcSums("Cost per Unit");
+            AppliedCostPerUnit := ApplValueEntry."Cost per Unit" + ItemChargeValueEntries."Cost per Unit";
+        end;
     end;
 
     local procedure HandleReturnApplicationValueEntry(ApplValueEntry: Record "Value Entry"; StdValueEntry: Record "Value Entry"; var SumOfCOGSCostPerUnit: Decimal; var SumOfCOGSCostAmtAct: Decimal; var QtyNeeded: Decimal; QtyTakenFromEntry: Decimal)
