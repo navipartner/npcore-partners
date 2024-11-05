@@ -78,11 +78,12 @@ report 6014528 "NPR Spfy Upd. Item Sync Status"
 
     local procedure SelectExcelWorksheet(var SheetName: Text[250]; var ExcelFileStream: InStream)
     var
+        FileManagement: Codeunit "File Management";
         ServerFileName: Text;
         ExcelFileExtensionTok: Label '.xlsx', Locked = true;
         ImportFromExcelLbl: Label 'Select Excel File';
     begin
-        if not UploadIntoStream(ImportFromExcelLbl, '', ExcelFileExtensionTok, ServerFileName, ExcelFileStream) or (ServerFileName = '') then
+        if not UploadIntoStream(ImportFromExcelLbl, '', FileManagement.GetToFilterText('', ExcelFileExtensionTok), ServerFileName, ExcelFileStream) or (ServerFileName = '') then
             Error('');
         if SheetName = '' then
             SheetName := TempExcelBuffer.SelectSheetsNameStream(ExcelFileStream);
