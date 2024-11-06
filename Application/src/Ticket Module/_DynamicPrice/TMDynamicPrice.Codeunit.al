@@ -1,6 +1,7 @@
 codeunit 6014559 "NPR TM Dynamic Price"
 {
     Access = Internal;
+    [TryFunction]
     internal procedure CalculateErpUnitPrice(
         ItemNo: Code[20];
         VariantCode: Code[10];
@@ -252,6 +253,37 @@ codeunit 6014559 "NPR TM Dynamic Price"
                         );
     end;
 
+    procedure CalculateScheduleEntryErpPrice(TicketItemNo: Code[20]; TicketVariantCode: Code[10]; AdmissionCode: Code[20]; ExternalScheduleEntryNo: Integer; BookingDateDate: Date; BookingTime: Time; var BasePrice: Decimal; var AddonPrice: Decimal) HavePriceRule: Boolean
+    var
+        Item: Record "Item";
+        SelectedPriceRule: Record "NPR TM Dynamic Price Rule";
+        UnitPrice: Decimal;
+        DiscountPct: Decimal;
+        UnitPriceIncludesVat: Boolean;
+        UnitPriceVatPercentage: Decimal;
+    begin
+        if (not Item.Get(TicketItemNo)) then
+            exit;
+
+        CalculateErpUnitPrice(TicketItemNo, TicketVariantCode, '', BookingDateDate, 1, UnitPrice, DiscountPct, UnitPriceIncludesVat, UnitPriceVatPercentage);
+
+        HavePriceRule := CalculateScheduleEntryPrice(
+                            TicketItemNo,
+                            TicketVariantCode,
+                            AdmissionCode,
+                            ExternalScheduleEntryNo,
+                            UnitPrice,
+                            UnitPriceIncludesVat,
+                            UnitPriceVatPercentage,
+                            BookingDateDate,
+                            BookingTime,
+                            BasePrice,
+                            AddonPrice,
+                            SelectedPriceRule
+                        );
+    end;
+
+
     procedure CalculateScheduleEntryPrice(TicketItemNo: Code[20]; TicketVariantCode: Code[10]; AdmissionCode: Code[20]; ExternalScheduleEntryNo: Integer; OriginalUnitPrice: Decimal; UnitPriceIncludesVAT: Boolean; UnitPriceVatPercentage: Decimal; BookingDateDate: Date; BookingTime: Time; var BasePrice: Decimal; var AddonPrice: Decimal) HavePriceRule: Boolean
     var
         SelectedPriceRule: Record "NPR TM Dynamic Price Rule";
@@ -322,7 +354,7 @@ codeunit 6014559 "NPR TM Dynamic Price"
         exit(HavePriceRule);
     end;
 
-    local procedure GetItemDefaultVat(ItemNo: Code[20]): Decimal
+    internal procedure GetItemDefaultVat(ItemNo: Code[20]): Decimal
     var
         VATPostingSetup: Record "VAT Posting Setup";
         Item: Record Item;

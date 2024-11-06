@@ -262,7 +262,7 @@
                         CalcVisualQueueUnfavorable(Rec);
                     end;
                 }
-                field(UnitPrice; _UnitPrice)
+                field(UnitPrice; _UnitPriceDisplay)
                 {
                     ApplicationArea = NPRTicketAdvanced, NPRTicketDynamicPrice;
                     ToolTip = 'Specifies the value for the Unit Price field.';
@@ -378,9 +378,28 @@
         }
     }
 
-    trigger OnAfterGetRecord()
+    trigger OnOpenPage()
     var
         TicketPrice: Codeunit "NPR TM Dynamic Price";
+        Item: Record Item;
+    begin
+        _UnitPrice := 0;
+        _DiscountPct := 0;
+        _UnitPriceIncludesVat := false;
+        _UnitPriceVatPercentage := 0;
+
+        if (gTicketItemNo <> '') then begin
+            if (not TicketPrice.CalculateErpUnitPrice(gTicketItemNo, gTicketVariantCode, '', Today(), 1, _UnitPrice, _DiscountPct, _UnitPriceIncludesVat, _UnitPriceVatPercentage)) then begin
+                Item.Get(gTicketItemNo);
+                _UnitPrice := Item."Unit Price";
+                _UnitPriceIncludesVat := Item."Price Includes VAT";
+                _UnitPriceVatPercentage := TicketPrice.GetItemDefaultVat(gTicketItemNo);
+            end;
+        end;
+    end;
+
+    trigger OnAfterGetRecord()
+    var
         BasePrice, AddonPrice : Decimal;
         FormatLabel: Label '<Sign><Integer><Decimals>', Locked = true;
     begin
@@ -396,10 +415,10 @@
 
         gDisallowReschedule := not IsRescheduleAllowed(Rec."External Adm. Sch. Entry No.");
 
-        TicketPrice.CalculateScheduleEntryPrice(Rec."Item No.", Rec."Variant Code", Rec."Admission Code", Rec."External Adm. Sch. Entry No.", Today, Time, BasePrice, AddonPrice);
-        _UnitPrice := StrSubstNo('%1', Format(BasePrice, 0, FormatLabel));
+        GetAdmissionPrice(Rec."Admission Code", Rec."External Adm. Sch. Entry No.", BasePrice, AddonPrice);
+        _UnitPriceDisplay := StrSubstNo('%1', Format(BasePrice, 0, FormatLabel));
         if (BasePrice <> 0) or (AddonPrice <> 0) then
-            _UnitPrice := StrSubstNo('%1 [%2 / %3]', Format(BasePrice + AddonPrice, 0, FormatLabel), Format(BasePrice, 0, FormatLabel), Format(AddonPrice, 0, FormatLabel));
+            _UnitPriceDisplay := StrSubstNo('%1 [%2 / %3]', Format(BasePrice + AddonPrice, 0, FormatLabel), Format(BasePrice, 0, FormatLabel), Format(AddonPrice, 0, FormatLabel));
 
     end;
 
@@ -459,7 +478,11 @@
         gConfirmStatusText: Text;
         gDeliverTicketTo: Text[100];
         gTicketHolderName: Text[100];
-        _UnitPrice: Text;
+        _UnitPriceDisplay: Text;
+        _UnitPrice: Decimal;
+        _DiscountPct: Decimal;
+        _UnitPriceIncludesVat: Boolean;
+        _UnitPriceVatPercentage: Decimal;
 
     local procedure ChangeQuantity(NewQuantity: Integer)
     var
@@ -1083,5 +1106,26 @@
         DetTicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
         DetTicketAccessEntry.SetFilter(Type, '=%1|=%2|=%3', DetTicketAccessEntry.Type::PAYMENT, DetTicketAccessEntry.Type::POSTPAID, DetTicketAccessEntry.Type::PREPAID);
         exit(DetTicketAccessEntry.IsEmpty());
+    end;
+
+    local procedure GetAdmissionPrice(AdmissionCode: Code[20]; ExternalScheduleEntryNo: Integer; var BasePrice: Decimal; var AddonPrice: Decimal) HavePriceRule: Boolean
+    var
+        TicketPrice: Codeunit "NPR TM Dynamic Price";
+        SelectedPriceRule: Record "NPR TM Dynamic Price Rule";
+    begin
+        HavePriceRule := TicketPrice.CalculateScheduleEntryPrice(
+                    gTicketItemNo,
+                    gTicketVariantCode,
+                    AdmissionCode,
+                    ExternalScheduleEntryNo,
+                    _UnitPrice,
+                    _UnitPriceIncludesVat,
+                    _UnitPriceVatPercentage,
+                    Today(),
+                    Time(),
+                    BasePrice,
+                    AddonPrice,
+                    SelectedPriceRule
+                );
     end;
 }

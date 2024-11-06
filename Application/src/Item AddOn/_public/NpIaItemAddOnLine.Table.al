@@ -105,6 +105,12 @@
             MaxValue = 100;
             MinValue = 0;
         }
+        field(58; DiscountAmount; Decimal)
+        {
+            Caption = 'Discount Amount';
+            DataClassification = CustomerContent;
+            BlankZero = true;
+        }
         field(60; "Comment Enabled"; Boolean)
         {
             Caption = 'Comment Enabled';

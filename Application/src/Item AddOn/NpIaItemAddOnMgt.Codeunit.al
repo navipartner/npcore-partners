@@ -542,17 +542,14 @@
                 SaleLinePOS.Validate("Unit Price", ItemAddOnLine."Unit Price");
             end;
             SaleLinePOS.Validate(Quantity, ItemAddOnLine.Quantity);
-            SaleLinePOS.Validate("Discount %", ItemAddOnLine."Discount %");
+            if (ItemAddOnLine."Discount %" <> 0) and (ItemAddOnLine.DiscountAmount = 0) then
+                SaleLinePOS.Validate("Discount %", ItemAddOnLine."Discount %");
+            if (ItemAddOnLine."Discount %" = 0) and (ItemAddOnLine.DiscountAmount <> 0) then
+                SaleLinePOS.Validate("Discount Amount", ItemAddOnLine.DiscountAmount);
+
             SaleLinePOS."Serial No." := ItemAddOnLine."Serial No.";
             SaleLinePOS."Lot No." := ItemAddOnLine."Lot No.";
             SaleLinePOS.Indentation := BaseLineIndent + 1;
-
-            POSSaleLine.SetUsePresetLineNo(true);
-            POSSaleLine.InsertLine(SaleLinePOS);
-            POSSaleLine.SetUsePresetLineNo(false);
-            if not IsAutoSplitKeyRecord then
-                IsAutoSplitKeyRecord := POSSaleLine.InsertedWithAutoSplitKey();
-            POSSaleLine.ForceInsertWithAutoSplitKey(false);
 
             FilterSaleLinePOS2ItemAddOnPOSLine(SaleLinePOS, SaleLinePOSAddOn);
             if not SaleLinePOSAddOn.FindLast() then
@@ -573,7 +570,18 @@
             SaleLinePOSAddOn."Copy Serial No." := ItemAddOnLine."Copy Serial No.";
             SaleLinePOSAddOn.AddToWallet := ItemAddOnLine.AddToWallet;
             SaleLinePOSAddOn.AddOnItemNo := ItemAddOnLine."Item No.";
+            SaleLinePOSAddOn.DiscountPercent := ItemAddOnLine."Discount %";
+            SaleLinePOSAddOn.DiscountAmount := ItemAddOnLine.DiscountAmount;
             SaleLinePOSAddOn.Insert(true);
+
+            POSSaleLine.SetUsePresetLineNo(true);
+            POSSaleLine.InsertLine(SaleLinePOS);
+            POSSaleLine.SetUsePresetLineNo(false);
+
+            if not IsAutoSplitKeyRecord then
+                IsAutoSplitKeyRecord := POSSaleLine.InsertedWithAutoSplitKey();
+            POSSaleLine.ForceInsertWithAutoSplitKey(false);
+
             exit(true);
         end;
 
@@ -595,7 +603,11 @@
             SaleLinePOS.Validate("Unit Price", ItemAddOnLine."Unit Price");
         end;
         SaleLinePOS.Validate(Quantity, ItemAddOnLine.Quantity);
-        SaleLinePOS.Validate("Discount %", ItemAddOnLine."Discount %");
+        if (ItemAddOnLine."Discount %" <> 0) and (ItemAddOnLine.DiscountAmount = 0) then
+            SaleLinePOS.Validate("Discount %", ItemAddOnLine."Discount %");
+        if (ItemAddOnLine."Discount %" = 0) and (ItemAddOnLine.DiscountAmount <> 0) then
+            SaleLinePOS.Validate("Discount Amount", ItemAddOnLine.DiscountAmount);
+
         SaleLinePOS.Validate("Serial No.", ItemAddOnLine."Serial No.");
         if PrevRec <> Format(SaleLinePOS) then begin
             SaleLinePOS.Modify(true);
