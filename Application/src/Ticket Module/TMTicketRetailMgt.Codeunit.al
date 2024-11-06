@@ -172,7 +172,7 @@
         exit(true);
     end;
 
-    local procedure AdjustPriceOnSalesLine(var SaleLinePOS: Record "NPR POS Sale Line"; NewQuantity: Integer)
+    internal procedure AdjustPriceOnSalesLine(var SaleLinePOS: Record "NPR POS Sale Line"; NewQuantity: Integer)
     var
         Token: Text[100];
         TokenLineNumber: Integer;
@@ -183,7 +183,7 @@
         AdjustPriceOnSalesLine(SaleLinePOS, NewQuantity, Token, TokenLineNumber);
     end;
 
-    local procedure AdjustPriceOnSalesLine(var SaleLinePOS: Record "NPR POS Sale Line"; NewQuantity: Integer; Token: Text[100]; TokenLineNumber: Integer)
+    internal procedure AdjustPriceOnSalesLine(var SaleLinePOS: Record "NPR POS Sale Line"; NewQuantity: Integer; Token: Text[100]; TokenLineNumber: Integer)
     var
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
         TicketPrice: Codeunit "NPR TM Dynamic Price";

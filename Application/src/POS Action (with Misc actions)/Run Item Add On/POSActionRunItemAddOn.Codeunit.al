@@ -36,7 +36,7 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn" implements "NPR IPOS Workflow"
             'GetSalesLineAddonConfigJson':
                 FrontEnd.WorkflowResponse(GenerateItemAddonConfig(Context, Sale, SaleLine));
             'SetItemAddons':
-                OnActionRunAddOns(Context);
+                FrontEnd.WorkflowResponse(OnActionRunAddOns(Context));
         end;
     end;
 
@@ -181,7 +181,7 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn" implements "NPR IPOS Workflow"
         exit(SaleLinePOSAddOn.FindFirst());
     end;
 
-    local procedure OnActionRunAddOns(Context: Codeunit "NPR POS JSON Helper")
+    local procedure OnActionRunAddOns(Context: Codeunit "NPR POS JSON Helper"): JsonObject
     var
         POSActRunItemAddOnB: Codeunit "NPR POS Action: RunItemAddOn B";
         POSSession: Codeunit "NPR POS Session";
@@ -203,6 +203,54 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn" implements "NPR IPOS Workflow"
 
         if POSActRunItemAddOnB.RunItemAddOns(GetBaseLineNoFromContext(Context, true), ApplyItemAddOnNo, CompulsoryAddOn, SkipItemAvailabilityCheck, UserSelectionRequired, UserSelectionJToken) then
             POSSession.RequestFullRefresh();
+
+        exit(GetTicketTokens(Context));
+    end;
+
+    local procedure GetTicketTokens(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
+    var
+        POSSession: Codeunit "NPR POS Session";
+        Sale: Codeunit "NPR POS Sale";
+        POSSale: Record "NPR POS Sale";
+        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketRetailManager: Codeunit "NPR TM Ticket Retail Mgt.";
+        Token: Text[100];
+        TicketTokens: JsonArray;
+        RequiredAdmissionHasTimeSlots, AllAdmissionsRequired : Boolean;
+    begin
+        if (not TicketRetailManager.UseFrontEndScheduleUX()) then
+            exit;
+
+        POSSession.GetSale(Sale);
+        Sale.GetCurrentSale(POSSale);
+        SaleLinePOSAddOn.SetCurrentKey("Register No.", "Sales Ticket No.", "Sale Type", "Sale Date", "Sale Line No.", "Line No.");
+        SaleLinePOSAddOn.SetFilter("Register No.", '=%1', POSSale."Register No.");
+        SaleLinePOSAddOn.SetFilter("Sales Ticket No.", '=%1', POSSale."Sales Ticket No.");
+        SaleLinePOSAddOn.SetFilter("Sale Date", '=%1', POSSale.Date);
+        SaleLinePOSAddOn.SetFilter("Applies-to Line No.", '=%1', GetBaseLineNoFromContext(Context, true));
+        if (SaleLinePOSAddOn.FindSet()) then begin
+            repeat
+                if (TicketRequestManager.GetTokenFromReceipt(SaleLinePOSAddOn."Sales Ticket No.", SaleLinePOSAddOn."Sale Line No.", Token)) then begin
+                    TicketReservationRequest.Reset();
+                    TicketReservationRequest.SetCurrentKey("Session Token ID");
+                    TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+                    TicketReservationRequest.SetFilter("External Adm. Sch. Entry No.", '<=%1', 0);
+                    TicketReservationRequest.SetRange("Admission Inclusion", TicketReservationRequest."Admission Inclusion"::REQUIRED);
+                    RequiredAdmissionHasTimeSlots := TicketReservationRequest.IsEmpty();
+
+                    TicketReservationRequest.SetRange("External Adm. Sch. Entry No.");
+                    TicketReservationRequest.SetFilter("Admission Inclusion", '<>%1', TicketReservationRequest."Admission Inclusion"::REQUIRED);
+                    AllAdmissionsRequired := TicketReservationRequest.IsEmpty();
+
+                    if not (RequiredAdmissionHasTimeSlots and AllAdmissionsRequired) then
+                        TicketTokens.Add(Token);
+                end;
+            until (SaleLinePOSAddOn.Next() = 0);
+        end;
+
+        Response.Add('TicketTokens', TicketTokens);
     end;
 
     local procedure GetBaseLineNoFromContext(Context: Codeunit "NPR POS JSON Helper"; Mandatory: Boolean) Result: Integer
@@ -295,7 +343,7 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionRunItemAddOn.js###
-'let main=async({workflow:e,popup:t,context:s,captions:l})=>{let{AskForApplyToLine:r,ApplyToDialogOptions:A}=await e.respond("DefineBaseLineNo");if(r){let n=await t.optionsMenu({title:l.SelectLine,oneTouch:!0,options:A});if(!n)return;s.BaseLineNo=n.id}let{ApplyItemAddOnNo:o,CompulsoryAddOn:i,UserSelectionRequired:d,ItemAddonConfigAsString:a}=await e.respond("GetSalesLineAddonConfigJson");if(d){let n=JSON.parse(a);UserSelectedAddons=await t.configuration(n),await e.respond("SetItemAddons",{ApplyItemAddOnNo:o,CompulsoryAddOn:i,UserSelectionRequired:d,UserSelectedAddons})}else await e.respond("SetItemAddons",{ApplyItemAddOnNo:o,CompulsoryAddOn:i,UserSelectionRequired:d})};'
+'const main=async({workflow:n,popup:i,context:a,captions:c})=>{const{AskForApplyToLine:r,ApplyToDialogOptions:A}=await n.respond("DefineBaseLineNo");if(r){const e=await i.optionsMenu({title:c.SelectLine,oneTouch:!0,options:A});if(!e)return;a.BaseLineNo=e.id}const{ApplyItemAddOnNo:s,CompulsoryAddOn:d,UserSelectionRequired:o,ItemAddonConfigAsString:l}=await n.respond("GetSalesLineAddonConfigJson");let t={};if(o){const e=JSON.parse(l),p=await i.configuration(e);t=await n.respond("SetItemAddons",{ApplyItemAddOnNo:s,CompulsoryAddOn:d,UserSelectionRequired:o,UserSelectedAddons:p})}else t=await n.respond("SetItemAddons",{ApplyItemAddOnNo:s,CompulsoryAddOn:d,UserSelectionRequired:o});if(t.TicketTokens&&t.TicketTokens.length>0)for(const e of t.TicketTokens)await n.run("TM_SCHEDULE_SELECT",{context:{TicketToken:e,EditSchedule:!0}})};'
         );
     end;
 }
