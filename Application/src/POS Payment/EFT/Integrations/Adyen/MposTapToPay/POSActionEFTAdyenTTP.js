@@ -9,6 +9,7 @@ const main = async ({ workflow, context, popup, captions }) => {
   context.EntryNo = context.request.EntryNo;
   context.PaymentSetupCode = context.request.PaymentSetupCode;
   context.IsLiveEnvironment = context.request.IsLiveEnvironment;
+  context.PosUnitNumber = context.request.PosUnitNumber;
   try {
     await workflow.respond("PrepareRequest");
     if (context.IsLookup) {
