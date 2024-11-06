@@ -82,7 +82,7 @@
                     Visible = false;
                     ToolTip = 'Specifies the value of the Calendar Exception field';
                 }
-                field(UnitPrice; _UnitPrice)
+                field(UnitPrice; _UnitPriceDisplay)
                 {
                     ApplicationArea = NPRTicketAdvanced, NPRTicketDynamicPrice;
                     Caption = 'Unit Price';
@@ -112,7 +112,6 @@
 
     trigger OnAfterGetRecord()
     var
-        TicketPrice: Codeunit "NPR TM Dynamic Price";
         NonWorking: Boolean;
         DateTimeLbl: Label '%1 %2', Locked = true;
         RemainingLbl: Label '%1', Locked = true;
@@ -124,7 +123,7 @@
 
         LocalDateTimeText := StrSubstNo(DateTimeLbl, Format(Today()), Format(Time()));
 
-        TicketManagement.ValidateAdmSchEntryForSales(Rec, gTicketItemNo, gTicketVariantCode, Today, Time, ReasonCode, Remaining);
+        TicketManagement.ValidateAdmSchEntryForSales(Rec, _TicketItemNo, _TicketVariantCode, Today, Time, ReasonCode, Remaining);
         RemainingText := Format(Remaining);
         if (Rec."Allocation By" = Rec."Allocation By"::WAITINGLIST) then begin
             Rec.CalcFields("Waiting List Queue");
@@ -133,17 +132,17 @@
                 RemainingText := StrSubstNo(Remaining2Lbl, WAITING_LIST, Rec."Waiting List Queue");
         end;
 
-        TicketManagement.CheckTicketBaseCalendar(Rec."Admission Code", gTicketItemNo, gTicketVariantCode, Rec."Admission Start Date", NonWorking, CalendarExceptionText);
+        TicketManagement.CheckTicketBaseCalendar(Rec."Admission Code", _TicketItemNo, _TicketVariantCode, Rec."Admission Start Date", NonWorking, CalendarExceptionText);
         if (CalendarExceptionText <> '') then
             RemainingText := Format(Remaining) + ' - ' + CalendarExceptionText;
 
         if (NonWorking) then
             RemainingText := CalendarExceptionText;
 
-        TicketPrice.CalculateScheduleEntryPrice(gTicketItemNo, gTicketVariantCode, Rec."Admission Code", Rec."External Schedule Entry No.", Today, Time, BasePrice, AddonPrice);
-        _UnitPrice := StrSubstNo('%1', Format(BasePrice, 0, FormatLabel));
+        GetAdmissionPrice(Rec."Admission Code", Rec."External Schedule Entry No.", Today(), Time(), BasePrice, AddonPrice);
+        _UnitPriceDisplay := StrSubstNo('%1', Format(BasePrice, 0, FormatLabel));
         if (BasePrice <> 0) or (AddonPrice <> 0) then
-            _UnitPrice := StrSubstNo('%1 [%2 / %3]', Format(BasePrice + AddonPrice, 0, FormatLabel), Format(BasePrice, 0, FormatLabel), Format(AddonPrice, 0, FormatLabel));
+            _UnitPriceDisplay := StrSubstNo('%1 [%2 / %3]', Format(BasePrice + AddonPrice, 0, FormatLabel), Format(BasePrice, 0, FormatLabel), Format(AddonPrice, 0, FormatLabel));
 
     end;
 
@@ -155,11 +154,27 @@
     end;
 
     trigger OnOpenPage()
+    var
+        TicketPrice: Codeunit "NPR TM Dynamic Price";
+        Item: Record Item;
     begin
 
         if (not Rec.FindFirst()) then
             Error(NO_TIMESLOTS);
 
+        _UnitPrice := 0;
+        _DiscountPct := 0;
+        _UnitPriceIncludesVat := false;
+        _UnitPriceVatPercentage := 0;
+
+        if (_TicketItemNo <> '') then begin
+            if (not TicketPrice.CalculateErpUnitPrice(_TicketItemNo, _TicketVariantCode, '', Today(), 1, _UnitPrice, _DiscountPct, _UnitPriceIncludesVat, _UnitPriceVatPercentage)) then begin
+                Item.Get(_TicketItemNo);
+                _UnitPrice := Item."Unit Price";
+                _UnitPriceIncludesVat := Item."Price Includes VAT";
+                _UnitPriceVatPercentage := TicketPrice.GetItemDefaultVat(_TicketItemNo);
+            end;
+        end;
     end;
 
     var
@@ -169,12 +184,16 @@
         Remaining: Integer;
         TicketManagement: Codeunit "NPR TM Ticket Management";
         CalendarExceptionText: Text;
-        gTicketItemNo: Code[20];
-        gTicketVariantCode: Code[10];
+        _TicketItemNo: Code[20];
+        _TicketVariantCode: Code[10];
         LocalDateTimeText: Text;
         NO_TIMESLOTS: Label 'There are no timeslots available for sales at this time for this event.';
         WAITING_LIST: Label 'Waiting List';
-        _UnitPrice: Text;
+        _UnitPriceDisplay: Text;
+        _UnitPrice: Decimal;
+        _DiscountPct: Decimal;
+        _UnitPriceIncludesVat: Boolean;
+        _UnitPriceVatPercentage: Decimal;
 
 
     internal procedure FillPage(var AdmissionScheduleEntryFilter: Record "NPR TM Admis. Schedule Entry"; TicketQty: Decimal; TicketItemNo: Code[20]; TicketVariantCode: Code[10]): Boolean
@@ -192,8 +211,8 @@
             until (AdmissionScheduleEntry.Next() = 0);
         end;
 
-        gTicketItemNo := TicketItemNo;
-        gTicketVariantCode := TicketVariantCode;
+        _TicketItemNo := TicketItemNo;
+        _TicketVariantCode := TicketVariantCode;
 
         exit(true);
     end;
@@ -208,6 +227,27 @@
             Rec.TransferFields(AdmissionScheduleEntry, true);
             if (Rec.Insert()) then;
         end;
+    end;
+
+    local procedure GetAdmissionPrice(AdmissionCode: Code[20]; ExternalScheduleEntryNo: Integer; BookingDateDate: Date; BookingTime: Time; var BasePrice: Decimal; var AddonPrice: Decimal) HavePriceRule: Boolean
+    var
+        TicketPrice: Codeunit "NPR TM Dynamic Price";
+        SelectedPriceRule: Record "NPR TM Dynamic Price Rule";
+    begin
+        HavePriceRule := TicketPrice.CalculateScheduleEntryPrice(
+                    _TicketItemNo,
+                    _TicketVariantCode,
+                    AdmissionCode,
+                    ExternalScheduleEntryNo,
+                    _UnitPrice,
+                    _UnitPriceIncludesVat,
+                    _UnitPriceVatPercentage,
+                    BookingDateDate,
+                    BookingTime,
+                    BasePrice,
+                    AddonPrice,
+                    SelectedPriceRule
+                );
     end;
 }
 

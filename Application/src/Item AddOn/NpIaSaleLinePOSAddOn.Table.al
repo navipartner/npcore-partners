@@ -68,6 +68,21 @@
             Caption = 'Per unit';
             DataClassification = CustomerContent;
         }
+        field(55; DiscountPercent; Decimal)
+        {
+            BlankZero = true;
+            Caption = 'Discount %';
+            DataClassification = CustomerContent;
+            DecimalPlaces = 0 : 1;
+            MaxValue = 100;
+            MinValue = 0;
+        }
+        field(58; DiscountAmount; Decimal)
+        {
+            Caption = 'Discount Amount';
+            DataClassification = CustomerContent;
+            BlankZero = true;
+        }
         field(60; Mandatory; Boolean)
         {
             Caption = 'Mandatory';

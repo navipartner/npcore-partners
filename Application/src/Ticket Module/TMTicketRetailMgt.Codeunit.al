@@ -66,6 +66,7 @@
     var
         PageAction: Action;
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+
         DisplayTicketReservationRequest: Page "NPR TM Ticket Make Reserv.";
         DisplayTicketReservationRequestPhone: Page "NPR TM TicketMakeReservePhone";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
@@ -162,15 +163,72 @@
         end;
 
         if (HaveSalesLine) then begin
-            SaleLinePOS."Unit Price" := SaleLinePOS.FindItemSalesPrice();
+            AdjustPriceOnSalesLine(SaleLinePOS, NewQuantity);
             SaleLinePOS."Description 2" := TimeSlotDescription;
-            SaleLinePOS.Validate(Quantity, NewQuantity);
             SaleLinePOS.Modify();
             Commit();
         end;
 
         exit(true);
     end;
+
+    local procedure AdjustPriceOnSalesLine(var SaleLinePOS: Record "NPR POS Sale Line"; NewQuantity: Integer)
+    var
+        Token: Text[100];
+        TokenLineNumber: Integer;
+    begin
+        if (not GetRequestToken(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token, TokenLineNumber)) then
+            exit;
+
+        AdjustPriceOnSalesLine(SaleLinePOS, NewQuantity, Token, TokenLineNumber);
+    end;
+
+    local procedure AdjustPriceOnSalesLine(var SaleLinePOS: Record "NPR POS Sale Line"; NewQuantity: Integer; Token: Text[100]; TokenLineNumber: Integer)
+    var
+        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+        TicketPrice: Codeunit "NPR TM Dynamic Price";
+        TicketUnitPrice: Decimal;
+        DiscountAmount: Decimal;
+        DiscountPercent: Decimal;
+    begin
+        DiscountAmount := 0;
+        DiscountPercent := 0;
+
+        if (SaleLinePOS.Quantity <> NewQuantity) then
+            SaleLinePOS.Validate(Quantity, NewQuantity);
+
+        if (SaleLinePOS."Discount %" <> 0) then begin
+            SaleLinePOSAddOn.SetCurrentKey("Register No.", "Sales Ticket No.", "Sale Type", "Sale Date", "Sale Line No.", "Line No.");
+            SaleLinePOSAddOn.SetFilter("Register No.", '=%1', SaleLinePOS."Register No.");
+            SaleLinePOSAddOn.SetFilter("Sales Ticket No.", '=%1', SaleLinePOS."Sales Ticket No.");
+            SaleLinePOSAddOn.SetFilter("Sale Type", '=%1', SaleLinePOSAddOn."Sale Type"::Sale);
+            SaleLinePOSAddOn.SetFilter("Sale Date", '=%1', SaleLinePOS.Date);
+            SaleLinePOSAddOn.SetFilter("Sale Line No.", '=%1', SaleLinePOS."Line No.");
+            SaleLinePOSAddOn.SetFilter(AddToWallet, '=%1', true);
+            if (SaleLinePOSAddOn.FindFirst()) then begin
+                if (SaleLinePOSAddOn.DiscountAmount <> 0) then
+                    DiscountAmount := SaleLinePOS."Discount Amount";
+                if (SaleLinePOSAddOn.DiscountPercent <> 0) then
+                    DiscountPercent := saleLinePOS."Discount %";
+            end
+        end;
+
+        SaleLinePOS."Unit Price" := SaleLinePOS.FindItemSalesPrice(); // --> OnAfterFindSalesLinePrice() will not do GetTicketUnitPrice() when "Eksp. Salgspris" or "Custom Price" is set   
+
+        if ((SaleLinePOS."Eksp. Salgspris") or (SaleLinePOS."Custom Price")) then
+            if (TicketPrice.GetTicketUnitPrice(Token, TokenLineNumber, SaleLinePOS."Unit Price", SaleLinePOS."Price Includes VAT", SaleLinePOS."VAT %", TicketUnitPrice)) then
+                SaleLinePOS."Unit Price" := TicketUnitPrice;
+
+        if (DiscountAmount <> 0) then
+            SaleLinePOS.Validate("Discount Amount", DiscountAmount); // Discount % is recalculated relative to new price
+        if (DiscountPercent <> 0) then
+            SaleLinePOS.Validate("Discount %", DiscountPercent);
+
+        SaleLinePOS.UpdateAmounts(SaleLinePOS);
+        SaleLinePOS."Eksp. Salgspris" := false;
+        SaleLinePOS."Custom Price" := false;
+    end;
+
 
     procedure AcquireTicketParticipant(Token: Text[100]; ExternalMemberNo: Code[20]): Boolean
     begin
@@ -606,16 +664,18 @@
         Token: Text[100];
         TokenLineNumber: Integer;
     begin
-        if (not IsTicketSalesLine(SaleLinePOS)) then
+        if ((SaleLinePOS."Eksp. Salgspris") or (SaleLinePOS."Custom Price")) then
             exit;
 
-        if ((SaleLinePOS."Eksp. Salgspris") or (SaleLinePOS."Custom Price")) then
+        if (not IsTicketSalesLine(SaleLinePOS)) then
             exit;
 
         if (GetRequestToken(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token, TokenLineNumber)) then begin
 
             if (TicketPrice.GetTicketUnitPrice(Token, TokenLineNumber, SaleLinePOS."Unit Price", SaleLinePOS."Price Includes VAT", SaleLinePOS."VAT %", TicketUnitPrice)) then
-                SaleLinePOS."Unit Price" := TicketUnitPrice;
+                if (SaleLinePOS."Unit Price" <> TicketUnitPrice) then
+                    SaleLinePOS."Unit Price" := TicketUnitPrice;
+
         end;
     end;
 
@@ -667,11 +727,9 @@
         Token: Text[100];
         TokenLineNumber: Integer;
         ExternalMemberNo: Code[20];
-        TicketUnitPrice: Decimal;
         POSSession: Codeunit "NPR POS Session";
         FrontEnd: Codeunit "NPR POS Front End Management";
         SeatingUI: Codeunit "NPR TM Seating UI";
-        TicketPrice: Codeunit "NPR TM Dynamic Price";
         RequiredAdmissionHasTimeSlots, AllAdmissionsRequired : Boolean;
     begin
         if (not GuiAllowed()) then
@@ -709,12 +767,7 @@
                 if (not TicketRetailManager.UseFrontEndScheduleUX()) then
                     AcquireTicketParticipant(Token, ExternalMemberNo, false);
 
-                if (TicketPrice.GetTicketUnitPrice(Token, TokenLineNumber, SaleLinePOS."Unit Price", SaleLinePOS."Price Includes VAT", SaleLinePOS."VAT %", TicketUnitPrice)) then begin
-                    SaleLinePOS.Validate("Unit Price", TicketUnitPrice);
-                    SaleLinePOS.UpdateAmounts(SaleLinePOS);
-                    SaleLinePOS."Eksp. Salgspris" := false;
-                    SaleLinePOS."Custom Price" := false;
-                end;
+                AdjustPriceOnSalesLine(SaleLinePOS, SaleLinePOS.Quantity, Token, TokenLineNumber);
 
                 TicketReservationRequest.Reset();
                 TicketReservationRequest.SetCurrentKey("Session Token ID");

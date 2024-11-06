@@ -77,7 +77,24 @@ page 6184855 "NPR WalletTemplateLines"
                 {
                     ToolTip = 'Specifies the discount percentage that is granted for the item on the line.';
                     ApplicationArea = NPRRetail;
+
+                    trigger OnValidate()
+                    begin
+                        if (Rec."Discount %" <> 0) then
+                            Rec.DiscountAmount := 0;
+                    end;
                 }
+                field(DiscountAmount; Rec.DiscountAmount)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Discount Amount field.', Comment = '%';
+                    trigger OnValidate()
+                    begin
+                        if (Rec.DiscountAmount <> 0) then
+                            Rec."Discount %" := 0;
+                    end;
+                }
+
                 field(IncludeFromDate; Rec.IncludeFromDate)
                 {
                     ToolTip = 'Specifies the date from which the template line is included in the sale.';

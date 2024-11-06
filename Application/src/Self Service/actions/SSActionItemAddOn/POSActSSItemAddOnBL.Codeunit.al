@@ -223,14 +223,22 @@ codeunit 6060027 "NPR POSAct. SS Item AddOn-BL"
             end;
 
             SaleLinePOS.Validate(Quantity, DecVal);
-            SaleLinePOS.Validate("Discount %", ItemAddOnLine."Discount %");
+            if (ItemAddOnLine."Discount %" <> 0) and (ItemAddOnLine.DiscountAmount = 0) then
+                SaleLinePOS.Validate("Discount %", ItemAddOnLine."Discount %");
+            if (ItemAddOnLine."Discount %" = 0) and (ItemAddOnLine.DiscountAmount <> 0) then
+                SaleLinePOS.Validate("Discount Amount", ItemAddOnLine.DiscountAmount);
+
             POSSaleLine.InsertLine(SaleLinePOS);
 
             InsertAddOn(SaleLinePOS, ItemAddOnLine, MasterLineNumber);
         end;
 
         SaleLinePOS.Validate(Quantity, DecVal);
-        SaleLinePOS.Validate("Discount %", ItemAddOnLine."Discount %");
+        if (ItemAddOnLine."Discount %" <> 0) and (ItemAddOnLine.DiscountAmount = 0) then
+            SaleLinePOS.Validate("Discount %", ItemAddOnLine."Discount %");
+        if (ItemAddOnLine."Discount %" = 0) and (ItemAddOnLine.DiscountAmount <> 0) then
+            SaleLinePOS.Validate("Discount Amount", ItemAddOnLine.DiscountAmount);
+
         SaleLinePOS.Modify(true);
     end;
 
@@ -398,6 +406,8 @@ codeunit 6060027 "NPR POSAct. SS Item AddOn-BL"
         SaleLinePOSAddOn."Fixed Quantity" := NpIaItemAddOnLine."Fixed Quantity";
         SaleLinePOSAddOn."Per Unit" := NpIaItemAddOnLine."Per Unit";
         SaleLinePOSAddOn.Mandatory := NpIaItemAddOnLine.Mandatory;
+        SaleLinePOSAddOn.AddToWallet := NpIaItemAddOnLine.AddToWallet;
+        SaleLinePOSAddOn.AddOnItemNo := NpIaItemAddOnLine."Item No.";
         SaleLinePOSAddOn.Insert(true);
     end;
 
