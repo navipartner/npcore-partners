@@ -224,12 +224,6 @@
         SalePOS.TestField("Customer No.");
         CreateSalesHeader(SalePOS, SalesHeader);
 
-        if CustomerCreditCheck then
-            DoCustomerCreditCheck(SalesHeader);
-
-        if WarningCustomerCreditCheck then
-            DoCustomerWarningCreditCheck(SalesHeader);
-
         SaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
         SaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
 
@@ -241,6 +235,12 @@
         if AutoReserveSalesLines then begin
             ReserveSalesLines(SalesHeader, true);
         end;
+
+        if CustomerCreditCheck then
+            DoCustomerCreditCheck(SalesHeader);
+
+        if WarningCustomerCreditCheck then
+            DoCustomerWarningCreditCheck(SalesHeader);
 
         Commit();
 
