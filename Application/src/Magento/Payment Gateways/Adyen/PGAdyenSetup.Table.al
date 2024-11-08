@@ -111,7 +111,8 @@ table 6151466 "NPR PG Adyen Setup"
                 exit('https://checkout-test.adyen.com/v71/paymentLinks');
             Rec.Environment::Production:
                 begin
-                    exit('https://checkout.adyen.com/v71/paymentLinks');
+                    Rec.TestField("API URL Prefix");
+                    exit(StrSubstNo('https://%1-checkout-live.adyenpayments.com/checkout/v71/paymentLinks', Rec."API URL Prefix"));
                 end;
             else
                 Error(UnsupportedEnvironmentErr, Format(Rec.Environment));
