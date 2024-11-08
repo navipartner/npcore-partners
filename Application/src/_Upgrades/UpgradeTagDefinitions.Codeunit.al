@@ -215,6 +215,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pay By Link Setup", 'UpdatePayByLinkSetup'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS EFT Pay Res. Setup", 'UpdatePOSEFTPayResSetup'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Update Wizards", 'UpdateWizardFiscalization'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Pay View Dimension", 'SetDimensionMandatoryTrueForListOption'));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -818,6 +819,11 @@
                 case UpgradeStep of
                     'UpdateWizardFiscalization':
                         exit('NPR-UpdateWizardFiscalization-20240926');
+                end;
+            Codeunit::"NPR UPG POS Pay View Dimension":
+                case UpgradeStep of
+                    'SetDimensionMandatoryTrueForListOption':
+                        exit('NPR-SetDimensionMandatoryTrueForListOption-20241105');
                 end;
         end;
     end;

@@ -169,10 +169,10 @@ codeunit 6150826 "NPR POS Action: Sale Dimension" implements "NPR IPOS Workflow"
             ValueSelectionOptions::"LIST":
                 if DimCode <> '' then
                     if not LookupDimensionValue(DimCode, DimValueCode) then
-                        if DimensionMandatory then
-                            Error(DimensionMandatoryErr)
+                        if not DimensionMandatory then
+                            exit
                         else
-                            Error('');
+                            Error(DimensionMandatoryErr)
         end;
 
         if ApplyDimTo = ApplyDimTo::Sale then
@@ -215,7 +215,7 @@ codeunit 6150826 "NPR POS Action: Sale Dimension" implements "NPR IPOS Workflow"
             if DimensionValue.Find('=><') then;
         end;
 
-        if Page.RunModal(0, DimensionValue) <> ACTION::LookupOK then
+        if Page.RunModal(Page::"NPR Dimension Value List", DimensionValue) <> ACTION::LookupOK then
             exit(false);
 
         DimValueCode := DimensionValue.Code;
