@@ -25,6 +25,8 @@ codeunit 6184799 "NPR Spfy DLog Subscr.Mgt.Impl."
                         IntegrationArea, Database::"Item Reference", DataLogSetup."Log Insertion"::Simple, DataLogSetup."Log Modification"::Changes, DataLogSetup."Log Deletion"::Detailed, JobQueueMgt.DaysToDuration(7));
                     AddDataLogSetupEntity(
                         IntegrationArea, Database::"NPR Spfy Store-Item Link", DataLogSetup."Log Insertion"::Simple, DataLogSetup."Log Modification"::Changes, DataLogSetup."Log Deletion"::Detailed, JobQueueMgt.DaysToDuration(7));
+                    AddDataLogSetupEntity(
+                        IntegrationArea, Database::"NPR Spfy Entity Metafield", DataLogSetup."Log Insertion"::Simple, DataLogSetup."Log Modification"::Simple, DataLogSetup."Log Deletion"::" ", JobQueueMgt.DaysToDuration(7));
                 end;
             "NPR Spfy Integration Area"::"Inventory Levels":
                 begin
@@ -95,6 +97,7 @@ codeunit 6184799 "NPR Spfy DLog Subscr.Mgt.Impl."
                 Database::"Item Variant",
                 Database::"Item Reference",
                 Database::"NPR Spfy Store-Item Link",
+                Database::"NPR Spfy Entity Metafield",
                 Database::"NPR Spfy Inventory Level",
                 Database::"NPR Spfy Item Price",
                 Database::"Sales Line",

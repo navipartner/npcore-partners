@@ -203,6 +203,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'StoreSpecificIntegrationSetups'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'UpdateShopifyPaymentModule'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'UpdateShopifyStoreDoNotSyncSalesPrices'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'EnableMetafieldDataLogSubscriber'));
 #endif
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Dig. Rcpt. Enable", 'UpgradeDigitalReceiptSetupEnable'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Dig. Rcpt. Enable", 'UpdateDigitalReceiptSetupTable'));
@@ -778,6 +779,8 @@
                         exit('NPR-Spfy-UpdateShopifyPaymentModule-20240919');
                     'UpdateShopifyStoreDoNotSyncSalesPrices':
                         exit('NPR-Spfy-UpdateShopifyStoreDoNotSyncSalesPrices-20241031');
+                    'EnableMetafieldDataLogSubscriber':
+                        exit('NPR-Spfy-EnableMetafieldDataLogSubscriber-20241112');
                 end;
 #endif
             Codeunit::"NPR UPG Dig. Rcpt. Enable":

@@ -5,10 +5,10 @@ codeunit 6184802 "NPR Spfy App Upgrade"
     Subtype = Upgrade;
 
     var
-        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
-        UpgradeTag: Codeunit "Upgrade Tag";
-        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
-        UpgradeStep: Text;
+        _LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+        _UpgradeTag: Codeunit "Upgrade Tag";
+        _UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
+        _UpgradeStep: Text;
 
     trigger OnUpgradePerCompany()
     begin
@@ -18,6 +18,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         StoreSpecificIntegrationSetups();
         UpdateShopifyPaymentModule();
         UpdateShopifyStoreDoNotSyncSalesPrices();
+        EnableMetafieldDataLogSubscriber();
     end;
 
     internal procedure UpdateShopifySetup()
@@ -40,10 +41,10 @@ codeunit 6184802 "NPR Spfy App Upgrade"
     var
         ShopifySetup: Record "NPR Spfy Integration Setup";
     begin
-        UpgradeStep := 'SetDataProcessingHandlerID';
-        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", UpgradeStep)) then
+        _UpgradeStep := 'SetDataProcessingHandlerID';
+        if HasUpgradeTag() then
             exit;
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Spfy App Upgrade', UpgradeStep);
+        LogStart();
 
         if ShopifySetup.Get() then
             if ShopifySetup."Data Processing Handler ID" = '' then begin
@@ -51,8 +52,8 @@ codeunit 6184802 "NPR Spfy App Upgrade"
                 ShopifySetup.Modify();
             end;
 
-        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", UpgradeStep));
-        LogMessageStopwatch.LogFinish();
+        SetUpgradeTag();
+        LogFinish();
     end;
 
     internal procedure PhaseOutShopifyCCIntegration()
@@ -62,10 +63,10 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         RetenPolAllowedTables: Codeunit "Reten. Pol. Allowed Tables";
         WebServiceManagement: Codeunit "Web Service Management";
     begin
-        UpgradeStep := 'PhaseOutShopifyCCIntegration';
-        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", UpgradeStep)) then
+        _UpgradeStep := 'PhaseOutShopifyCCIntegration';
+        if HasUpgradeTag() then
             exit;
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Spfy App Upgrade', UpgradeStep);
+        LogStart();
 
         if ShopifySetup.Get() then begin
             ShopifySetup."C&C Order Integration" := false;
@@ -83,8 +84,8 @@ codeunit 6184802 "NPR Spfy App Upgrade"
 #else
             WebServiceManagement.DeleteWebService(WebServiceAggregate);
 #endif
-        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", UpgradeStep));
-        LogMessageStopwatch.LogFinish();
+        SetUpgradeTag();
+        LogFinish();
     end;
 
 #if BC18 or BC19
@@ -102,10 +103,10 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         ShopifySetup: Record "NPR Spfy Integration Setup";
         ShopifyStore: Record "NPR Spfy Store";
     begin
-        UpgradeStep := 'StoreSpecificIntegrationSetups';
-        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", UpgradeStep)) then
+        _UpgradeStep := 'StoreSpecificIntegrationSetups';
+        if HasUpgradeTag() then
             exit;
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Spfy App Upgrade', UpgradeStep);
+        LogStart();
 
         if ShopifySetup.Get() then
             if ShopifyStore.FindSet(true) then
@@ -128,8 +129,8 @@ codeunit 6184802 "NPR Spfy App Upgrade"
                     ShopifyStore.Modify();
                 until ShopifyStore.Next() = 0;
 
-        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", UpgradeStep));
-        LogMessageStopwatch.LogFinish();
+        SetUpgradeTag();
+        LogFinish();
     end;
 
     internal procedure UpdateShopifyPaymentModule()
@@ -137,10 +138,10 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         VoucherType: Record "NPR NpRv Voucher Type";
         PaymentModuleShopify: Codeunit "NPR NpRv Module Pay. - Shopify";
     begin
-        UpgradeStep := 'UpdateShopifyPaymentModule';
-        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", UpgradeStep)) then
+        _UpgradeStep := 'UpdateShopifyPaymentModule';
+        if HasUpgradeTag() then
             exit;
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Spfy App Upgrade', UpgradeStep);
+        LogStart();
 
         VoucherType.SetRange("Integrate with Shopify", true);
         if VoucherType.FindSet(true) then begin
@@ -151,18 +152,18 @@ codeunit 6184802 "NPR Spfy App Upgrade"
             until VoucherType.Next() = 0;
         end;
 
-        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", UpgradeStep));
-        LogMessageStopwatch.LogFinish();
+        SetUpgradeTag();
+        LogFinish();
     end;
 
     internal procedure UpdateShopifyStoreDoNotSyncSalesPrices()
     var
         ShopifyStore: Record "NPR Spfy Store";
     begin
-        UpgradeStep := 'UpdateShopifyStoreDoNotSyncSalesPrices';
-        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", UpgradeStep)) then
+        _UpgradeStep := 'UpdateShopifyStoreDoNotSyncSalesPrices';
+        if HasUpgradeTag() then
             exit;
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Spfy App Upgrade', UpgradeStep);
+        LogStart();
 
         if ShopifyStore.FindSet() then
             repeat
@@ -170,8 +171,48 @@ codeunit 6184802 "NPR Spfy App Upgrade"
                     ShopifyStore.Validate("Do Not Sync. Sales Prices");
             until ShopifyStore.Next() = 0;
 
-        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", UpgradeStep));
-        LogMessageStopwatch.LogFinish();
+        SetUpgradeTag();
+        LogFinish();
+    end;
+
+    internal procedure EnableMetafieldDataLogSubscriber()
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+    begin
+        _UpgradeStep := 'EnableMetafieldDataLogSubscriber';
+        if HasUpgradeTag() then
+            exit;
+        LogStart();
+
+        if ShopifyStore.FindSet() then
+            repeat
+                ShopifyStore.Validate("Item List Integration");
+            until ShopifyStore.Next() = 0;
+
+        SetUpgradeTag();
+        LogFinish();
+    end;
+
+    local procedure HasUpgradeTag(): Boolean
+    begin
+        exit(_UpgradeTag.HasUpgradeTag(_UpgTagDef.GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", _UpgradeStep)));
+    end;
+
+    local procedure SetUpgradeTag()
+    begin
+        if HasUpgradeTag() then
+            exit;
+        _UpgradeTag.SetUpgradeTag(_UpgTagDef.GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", _UpgradeStep));
+    end;
+
+    local procedure LogStart()
+    begin
+        _LogMessageStopwatch.LogStart(CompanyName(), 'NPR Spfy App Upgrade', _UpgradeStep);
+    end;
+
+    local procedure LogFinish()
+    begin
+        _LogMessageStopwatch.LogFinish();
     end;
 }
 #endif

@@ -5,6 +5,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
     SingleInstance = true;
 
     var
+        SpfyIntegrationEvents: Codeunit "NPR Spfy Integration Events";
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
 
     [TryFunction]
@@ -358,6 +359,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         RequestMsg: HttpRequestMessage;
         ResponseMsg: HttpResponseMessage;
         Links: array[1] of Text;
+        ErrorTxt: Text;
         MaxRetries: Integer;
         RetryCounter: Integer;
         Retry: Boolean;
@@ -394,9 +396,13 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         if ResponseText = '' then
             ResponseText := '{}';
 
+        if Success then
+            if TreatAsError(NcTask, ResponseMsg, ResponseText, ErrorTxt) then
+                Error(ErrorTxt);
+
         if not Success then
-            if not TreatAsSuccess(NcTask, ResponseMsg) then
-                Error('%1: %2\%3', ResponseMsg.HttpStatusCode(), ResponseMsg.ReasonPhrase, ResponseText);
+            if not TreatAsSuccess(NcTask, ResponseMsg, ResponseText, ErrorTxt) then
+                Error(ErrorTxt);
 
         if ResponseMsg.Headers().GetValues('Link', Links) then
             NextLink := ParseNextLink(Links[1]);
@@ -501,26 +507,54 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         exit(true);
     end;
 
-    local procedure TreatAsSuccess(NcTask: Record "NPR Nc Task"; ResponseMsg: HttpResponseMessage): Boolean
+    local procedure TreatAsError(NcTask: Record "NPR Nc Task"; ResponseMsg: HttpResponseMessage; ResponseText: Text; var ErrorTxt: Text): Boolean
     var
-        ResponseJToken: JsonToken;
         ErrorJToken: JsonToken;
-        ResponseText: Text;
+        ResponseJToken: JsonToken;
+        Handled: Boolean;
+        IsError: Boolean;
+        UnknownErrorTxt: Label 'An error has occurred while processing the request. The system did not provide any details of the error.';
+    begin
+        if not ResponseJToken.ReadFrom(ResponseText) then
+            exit(false);
+        SpfyIntegrationEvents.OnTreatSuccessfulResponseAsError(NcTask, ResponseMsg, ResponseJToken, ErrorTxt, IsError, Handled);
+        if not Handled then begin
+            IsError := ResponseJToken.SelectToken('errors', ErrorJToken);
+            if IsError then begin
+                ResponseJToken.SelectToken('errors[0].message', ErrorJToken);
+                ErrorTxt := ErrorJToken.AsValue().AsText();
+            end;
+        end;
+        if IsError and (ErrorTxt = '') then
+            ErrorTxt := UnknownErrorTxt;
+        exit(IsError);
+    end;
+
+    local procedure TreatAsSuccess(NcTask: Record "NPR Nc Task"; ResponseMsg: HttpResponseMessage; ResponseText: Text; var ErrorTxt: Text): Boolean
+    var
+        ErrorJToken: JsonToken;
+        ResponseJToken: JsonToken;
+        Handled: Boolean;
+        IsSuccess: Boolean;
         AlreadyCapturedTok: Label 'The authorized transaction has already been captured', Locked = true;
         AlreadyDisabledTok: Label 'Gift card is disabled', Locked = true;
     begin
-        if not (ResponseMsg.Content.ReadAs(ResponseText) and ResponseJToken.ReadFrom(ResponseText)) then
+        if not ResponseJToken.ReadFrom(ResponseText) then
             exit(false);
-        case true of
-            (NcTask."Table No." = Database::"NPR Magento Payment Line") and (ResponseMsg.HttpStatusCode() = 422):
-                if ResponseJToken.SelectToken('errors.base[0]', ErrorJToken) then
-                    exit(ErrorJToken.AsValue().AsText() = AlreadyCapturedTok);
+        SpfyIntegrationEvents.OnTreatErroneousResponseAsSuccess(NcTask, ResponseMsg, ResponseJToken, ErrorTxt, IsSuccess, Handled);
+        if not Handled then
+            case true of
+                (NcTask."Table No." = Database::"NPR Magento Payment Line") and (ResponseMsg.HttpStatusCode() = 422):
+                    if ResponseJToken.SelectToken('errors.base[0]', ErrorJToken) then
+                        IsSuccess := ErrorJToken.AsValue().AsText() = AlreadyCapturedTok;
 
-            (NcTask."Table No." = Database::"NPR NpRv Voucher Entry") and (ResponseMsg.HttpStatusCode() = 422):
-                if ResponseJToken.SelectToken('errors.base[0]', ErrorJToken) then
-                    exit(ErrorJToken.AsValue().AsText() = AlreadyDisabledTok);
-        end;
-        exit(false);
+                (NcTask."Table No." = Database::"NPR NpRv Voucher Entry") and (ResponseMsg.HttpStatusCode() = 422):
+                    if ResponseJToken.SelectToken('errors.base[0]', ErrorJToken) then
+                        IsSuccess := ErrorJToken.AsValue().AsText() = AlreadyDisabledTok;
+            end;
+        if not IsSuccess and (ErrorTxt = '') then
+            ErrorTxt := StrSubstNo('%1: %2\%3', ResponseMsg.HttpStatusCode(), ResponseMsg.ReasonPhrase, ResponseText);
+        exit(IsSuccess);
     end;
 
     local procedure ParseNextLink(Link: Text) NextLink: Text

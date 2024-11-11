@@ -123,10 +123,23 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
                         CurrPage.Update(false);
                     end;
                 }
+                field("Product Metafields"; SpfyMetafieldMgt.SyncedEntityMetafieldCount(SpfyStoreItemLink.RecordId(), "NPR Spfy Metafield Owner Type"::PRODUCT))
+                {
+                    Caption = 'Product Metafields';
+                    ToolTip = 'Specifies the number of product metafields synced with Shopify.';
+                    ApplicationArea = NPRShopify;
+                    Editable = false;
+                    AssistEdit = true;
+
+                    trigger OnAssistEdit()
+                    begin
+                        SpfyMetafieldMgt.ShowEntitySyncedMetafields(SpfyStoreItemLink.RecordId(), "NPR Spfy Metafield Owner Type"::PRODUCT);
+                    end;
+                }
                 field("Shopify Variant ID"; SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy ID Type"::"Entry ID"))
                 {
                     Caption = 'Shopify Variant ID';
-                    ToolTip = 'Specifies a Shopify Variant ID assigned to the item. Is applicable only for items not having any variants.';
+                    ToolTip = 'Specifies a Shopify Variant ID assigned to the item. Only applies to items that have no variants.';
                     ApplicationArea = NPRShopify;
                     Editable = false;
                     AssistEdit = true;
@@ -149,6 +162,19 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
                         ChangeShopifyID.RunModal();
 
                         CurrPage.Update(false);
+                    end;
+                }
+                field("Variant Metafields"; SpfyMetafieldMgt.SyncedEntityMetafieldCount(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy Metafield Owner Type"::PRODUCTVARIANT))
+                {
+                    Caption = 'Variant Metafields';
+                    ToolTip = 'Specifies the number of product variant metafields that are synced with Shopify. Only applies to items that have no variants.';
+                    ApplicationArea = NPRShopify;
+                    Editable = false;
+                    AssistEdit = true;
+
+                    trigger OnAssistEdit()
+                    begin
+                        SpfyMetafieldMgt.ShowEntitySyncedMetafields(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy Metafield Owner Type"::PRODUCTVARIANT);
                     end;
                 }
                 field("Shopify Inventory Item ID"; SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy ID Type"::"Inventory Item ID"))
@@ -251,6 +277,7 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         SpfyStoreItemVariantLink: Record "NPR Spfy Store-Item Link";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
         ItemListIntegrationIsEnabled: Boolean;
 
     trigger OnOpenPage()

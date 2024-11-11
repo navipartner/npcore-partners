@@ -23,17 +23,18 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
     var
         TempCalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Entry" temporary;
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+        SendToShopify: Boolean;
         Success: Boolean;
     begin
         Clear(NcTask."Data Output");
         Clear(NcTask.Response);
         ClearLastError();
         TempCalculatedFulfillmentLines.DeleteAll();
-        Success := false;
 
-        if PrepareFulfillment(NcTask, TempCalculatedFulfillmentLines) then
+        Success := PrepareFulfillment(NcTask, TempCalculatedFulfillmentLines, SendToShopify);
+        if SendToShopify then
             Success := SpfyCommunicationHandler.SendFulfillmentRequest(NcTask);
-        if Success then
+        if SendToShopify and Success then
             SaveFulfillmentEntries(TempCalculatedFulfillmentLines);
 
         NcTask.Modify();
@@ -43,7 +44,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
     end;
 
     [TryFunction]
-    local procedure PrepareFulfillment(var NcTask: Record "NPR Nc Task"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Entry" temporary)
+    local procedure PrepareFulfillment(var NcTask: Record "NPR Nc Task"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Entry" temporary; var SendToShopify: Boolean)
     var
         TempAvailableFulfillmentLines: Record "NPR Spfy Fulfillment Entry" temporary;
         JsonHelper: Codeunit "NPR Json Helper";
@@ -87,7 +88,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
             end;
 
         CalculateFulfillmentLines(NcTask, TempAvailableFulfillmentLines, CalculatedFulfillmentLines);
-        GenerateFulfillmentPayloadJson(NcTask, CalculatedFulfillmentLines);
+        GenerateFulfillmentPayloadJson(NcTask, CalculatedFulfillmentLines, SendToShopify);
     end;
 
     local procedure CalculateFulfillmentLines(NcTask: Record "NPR Nc Task"; var AvailableFulfillmentLines: Record "NPR Spfy Fulfillment Entry" temporary; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Entry" temporary)
@@ -206,7 +207,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
             until CalculatedFulfillmentLines.Next() = 0;
     end;
 
-    local procedure GenerateFulfillmentPayloadJson(var NcTask: Record "NPR Nc Task"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Entry" temporary)
+    local procedure GenerateFulfillmentPayloadJson(var NcTask: Record "NPR Nc Task"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Entry" temporary; var SendToShopify: Boolean)
     var
         ItemsByFulfillmentOrder: JsonArray;
         OrderLines: JsonArray;
@@ -216,8 +217,12 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         NoFulfillmentAvailableErr: Label 'No Shopify fulfillment order lines are available to process';
         ShipmentPostedMsg: Label 'BC: the packages has been successfully shipped';
     begin
-        if CalculatedFulfillmentLines.IsEmpty() then
-            Error(NoFulfillmentAvailableErr);
+        SendToShopify := false;
+        if CalculatedFulfillmentLines.IsEmpty() then begin
+            NcTask."Data Output".CreateOutStream(OutStr);
+            OutStr.WriteText(NoFulfillmentAvailableErr);
+            exit;
+        end;
 
         CalculatedFulfillmentLines.SetCurrentKey("Fulfillment Order ID", "Fulfillment Order Line ID");
         if CalculatedFulfillmentLines.FindSet() then
@@ -246,6 +251,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         JObject.Add('fulfillment', ChildJObject);
         NcTask."Data Output".CreateOutStream(OutStr);
         JObject.WriteTo(OutStr);
+        SendToShopify := true;
     end;
 
 #if BC18 or BC19 or BC20 or BC21

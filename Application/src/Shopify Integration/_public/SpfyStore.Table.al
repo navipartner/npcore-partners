@@ -246,6 +246,12 @@ table 6150810 "NPR Spfy Store"
             Caption = 'Shopify Plus Subscription';
             DataClassification = CustomerContent;
         }
+        field(160; "Language Code"; Code[10])
+        {
+            Caption = 'Language Code';
+            TableRelation = Language.Code;
+            DataClassification = CustomerContent;
+        }
         field(500; "Auto Set as Shopify Item"; Boolean)
         {
             Caption = 'Auto Set as Shopify Item';

@@ -360,6 +360,8 @@ codeunit 6184816 "NPR Spfy Retail Voucher Mgt."
         SpfyIntegrationMgt.CheckIsEnabled("NPR Spfy Integration Area"::"Retail Vouchers", ShopifyStore.Code);
 
         if WithDialog then
+            WithDialog := GuiAllowed();
+        if WithDialog then
             if not Confirm(ConfirmQst + '\' + SpfyIntegrationMgt.LongRunningProcessConfirmQst(), true, ShopifyStore.Code) then
                 exit;
 
