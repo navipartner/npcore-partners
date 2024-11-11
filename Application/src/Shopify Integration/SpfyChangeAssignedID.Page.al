@@ -84,7 +84,6 @@ page 6184563 "NPR Spfy Change Assigned ID"
         SpfyStoreLocationLink: Record "NPR Spfy Store-Location Link";
         SendItemAndInventory: Codeunit "NPR Spfy Send Items&Inventory";
         RecRef: RecordRef;
-        SelectedValueTxt: Text;
     begin
         case BCRecID.TableNo of
             Database::"NPR Spfy Store-Item Link":
@@ -105,8 +104,7 @@ page 6184563 "NPR Spfy Change Assigned ID"
                     RecRef.Get(BCRecID);
                     RecRef.SetTable(SpfyStoreLocationLink);
                     SpfyStoreLocationLink.TestField("Shopify Store Code");
-                    SendItemAndInventory.SelectShopifyLocation(SpfyStoreLocationLink."Shopify Store Code", SelectedValueTxt);
-                    NewShopifyID := CopyStr(SelectedValueTxt, 1, MaxStrLen(NewShopifyID));
+                    SendItemAndInventory.SelectShopifyLocation(SpfyStoreLocationLink."Shopify Store Code", NewShopifyID);
                 end;
         end;
     end;

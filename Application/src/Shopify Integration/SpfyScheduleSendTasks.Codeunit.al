@@ -86,6 +86,7 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
             Database::"Item Variant",
             Database::"Item Reference",
             Database::"Inventory Buffer",
+            Database::"NPR Spfy Entity Metafield",
             Database::"NPR Spfy Item Price",
             Database::"NPR Spfy Inventory Level":
                 NcTaskSetup."Codeunit ID" := Codeunit::"NPR Spfy Send Items&Inventory";
@@ -108,15 +109,15 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
 
     procedure InitNcTask(ShopifyStoreCode: Code[20]; RecRef: RecordRef; TaskRecordValue: Text; TaskType: Option; var NcTask: Record "NPR Nc Task"): Boolean
     begin
-        exit(InitNcTask(ShopifyStoreCode, RecRef, TaskRecordValue, TaskType, CurrentDateTime, NcTask));
+        exit(InitNcTask(ShopifyStoreCode, RecRef, TaskRecordValue, TaskType, CurrentDateTime(), NcTask));
     end;
 
     procedure InitNcTask(ShopifyStoreCode: Code[20]; RecRef: RecordRef; TaskRecordValue: Text; TaskType: Option; LogDateTime: DateTime; var NcTask: Record "NPR Nc Task"): Boolean
     begin
-        exit(InitNcTask(ShopifyStoreCode, RecRef, TaskRecordValue, TaskType, LogDateTime, 0DT, NcTask));
+        exit(InitNcTask(ShopifyStoreCode, RecRef, RecRef.RecordId(), TaskRecordValue, TaskType, LogDateTime, 0DT, NcTask));
     end;
 
-    procedure InitNcTask(ShopifyStoreCode: Code[20]; RecRef: RecordRef; TaskRecordValue: Text; TaskType: Option; LogDateTime: DateTime; NotBeforeDateTime: DateTime; var NcTask: Record "NPR Nc Task"): Boolean
+    procedure InitNcTask(ShopifyStoreCode: Code[20]; RecRef: RecordRef; RecID: RecordId; TaskRecordValue: Text; TaskType: Option; LogDateTime: DateTime; NotBeforeDateTime: DateTime; var NcTask: Record "NPR Nc Task"): Boolean
     var
         NcTask2: Record "NPR Nc Task";
     begin
@@ -128,7 +129,7 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
         NcTask."Table No." := RecRef.Number();
         NcTask."Table Name" := CopyStr(RecRef.Name(), 1, MaxStrLen(NcTask."Table Name"));
         NcTask."Record Position" := CopyStr(RecRef.GetPosition(false), 1, MaxStrLen(NcTask."Record Position"));
-        NcTask."Record ID" := RecRef.RecordId();
+        NcTask."Record ID" := RecID;
         NcTask."Record Value" := CopyStr(TaskRecordValue, 1, MaxStrLen(NcTask."Record Value"));
         NcTask."Store Code" := ShopifyStoreCode;
         NcTask."Not Before Date-Time" := NotBeforeDateTime;
@@ -136,7 +137,6 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
         NcTask2.SetCurrentKey(Type, "Table No.", "Record Position");
         NcTask2.SetRange(Type, NcTask.Type);
         NcTask2.SetRange("Table No.", NcTask."Table No.");
-        NcTask2.SetRange("Record Position", NcTask."Record Position");
         NcTask2.SetRange(Processed, false);
         NcTask2.SetRange("Task Processor Code", NcTask."Task Processor Code");
         NcTask2.SetRange("Company Name", NcTask."Company Name");
@@ -144,7 +144,7 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
         NcTask2.SetRange("Record Value", NcTask."Record Value");
         NcTask2.SetRange("Store Code", NcTask."Store Code");
         NcTask2.SetRange("Not Before Date-Time", NcTask."Not Before Date-Time");
-        NcTask2.SetFilter("Log Date", '%1..', CreateDateTime(Today - 1, 0T));
+        NcTask2.SetFilter("Log Date", '%1..', CreateDateTime(Today() - 1, 0T));
         if NcTask2.FindLast() then begin
             NcTask := NcTask2;
             exit(false);
@@ -153,7 +153,7 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
         if LogDateTime <> 0DT then
             NcTask."Log Date" := LogDateTime
         else
-            NcTask."Log Date" := CurrentDateTime;
+            NcTask."Log Date" := CurrentDateTime();
         NcTask.Insert(true);
         exit(true);
     end;
@@ -161,7 +161,7 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
     procedure ToggleSpfyItemPriceSyncJobQueue(Enabled: Boolean)
     var
         SpfyItemPriceMgt: Codeunit "NPR Spfy Item Price Mgt.";
-        JobDescription: Label 'Synchronize Shopify Item Prices', MaxLength = 250;
+        JobDescription: Label 'Calculate Shopify Item Prices', MaxLength = 250;
     begin
         if Enabled then
             SpfyItemPriceMgt.CreateSpfyItemPriceSyncJob(JobDescription)
@@ -181,6 +181,7 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
             Database::"Stockkeeping Unit",
             Database::"Item Reference",
             Database::"NPR Spfy Store-Item Link",
+            Database::"NPR Spfy Entity Metafield",
             Database::"NPR Spfy Item Price",
             Database::"NPR Spfy Inventory Level":
                 NewTasksInserted := SpfyItemMgt.ProcessDataLogRecord(DataLogRecord);
@@ -211,6 +212,7 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
             CreateTaskSetupEntry(Task."Task Processor Code", Database::"Item Variant");
             CreateTaskSetupEntry(Task."Task Processor Code", Database::"Item Reference");
             CreateTaskSetupEntry(Task."Task Processor Code", Database::"Inventory Buffer");
+            CreateTaskSetupEntry(Task."Task Processor Code", Database::"NPR Spfy Entity Metafield");
         end;
         if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels", Task."Store Code") then begin
             CreateTaskSetupEntry(Task."Task Processor Code", Database::"NPR Spfy Inventory Level");
@@ -262,7 +264,8 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
                         IsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Inventory Levels");
                 end;
             Database::"Item Variant",
-            Database::"Item Reference":
+            Database::"Item Reference",
+            Database::"NPR Spfy Entity Metafield":
                 IsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::Items);
             Database::"Stockkeeping Unit",
             Database::"NPR Spfy Inventory Level",

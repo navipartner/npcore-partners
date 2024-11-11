@@ -167,6 +167,12 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         exit(not ShopifyStore.IsEmpty());
     end;
 
+    procedure GetLanguageCode(ShopifyStoreCode: Code[20]): Code[10]
+    begin
+        GetStore(ShopifyStoreCode);
+        exit(_ShopifyStore."Language Code");
+    end;
+
     procedure DataProcessingHandlerID(AutoCreate: Boolean): Code[20]
     begin
         if not AutoCreate then
@@ -258,6 +264,29 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         RetrievedFieldValue := JsonHelper.GetJText(ShopifyResponse, 'id', false);
         if RetrievedFieldValue <> '' then
             ShopifyStoreID := CopyStr(CopyStr(RetrievedFieldValue, RetrievedFieldValue.LastIndexOf('/') + 1, StrLen(RetrievedFieldValue)), 1, MaxStrLen(ShopifyStoreID));
+    end;
+
+    internal procedure RemoveUntil(Input: Text; UntilChr: Char) Output: Text
+    var
+        Position: Integer;
+    begin
+        Position := LastIndexOf(Input, UntilChr);
+        if Position <= 0 then
+            exit(Input);
+
+        Output := DelStr(Input, 1, Position);
+        exit(Output);
+    end;
+
+    local procedure LastIndexOf(Input: Text; UntilChr: Char): Integer
+    var
+        Position: Integer;
+    begin
+        Position := StrPos(Input, UntilChr);
+        if Position <= 0 then
+            exit(0)
+        else
+            exit(Position + LastIndexOf(CopyStr(Input, Position + 1), UntilChr));
     end;
 
     procedure UnsupportedIntegrationTable(NcTask: Record "NPR Nc Task"; CallerFunction: Text)

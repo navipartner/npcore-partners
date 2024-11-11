@@ -97,5 +97,15 @@ codeunit 6184824 "NPR Spfy Integration Events"
     internal procedure OnBeforeCalculateUnitPrice(Item: Record Item; VariantCode: Code[20]; UnitOfMeasure: Code[20]; ShopifyStoreCode: Code[20]; CurrencyCode: Code[10]; var Price: Decimal; var ComparePrice: Decimal; var Handled: Boolean)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnTreatSuccessfulResponseAsError(NcTask: Record "NPR Nc Task"; ResponseMsg: HttpResponseMessage; ResponseJToken: JsonToken; var ErrorTxt: Text; var IsError: Boolean; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnTreatErroneousResponseAsSuccess(NcTask: Record "NPR Nc Task"; ResponseMsg: HttpResponseMessage; ResponseJToken: JsonToken; var ErrorTxt: Text; var IsSuccess: Boolean; var Handled: Boolean)
+    begin
+    end;
 }
 #endif

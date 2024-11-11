@@ -26,6 +26,11 @@ page 6184704 "NPR Spfy Store Card"
                     ToolTip = 'Specifies the description of the Shopify store.';
                     ApplicationArea = NPRShopify;
                 }
+                field("Language Code"; Rec."Language Code")
+                {
+                    ToolTip = 'Specifies the language code of the Shopify store. The system will use this to select appropriate master data translations, if available.';
+                    ApplicationArea = NPRShopify;
+                }
                 field(Enabled; Rec.Enabled)
                 {
                     ToolTip = 'Specifies whether the integration with this Shopify store is enabled.';
