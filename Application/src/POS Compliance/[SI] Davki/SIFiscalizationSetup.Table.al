@@ -60,6 +60,11 @@ table 6059835 "NPR SI Fiscalization Setup"
             Caption = 'Certificate Subject Identification';
             DataClassification = CustomerContent;
         }
+        field(20; "Print Receipt On Sales Doc."; Boolean)
+        {
+            Caption = 'Auto Print Receipt On Sales Document';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

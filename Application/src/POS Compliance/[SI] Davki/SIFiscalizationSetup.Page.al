@@ -71,6 +71,15 @@ page 6150767 "NPR SI Fiscalization Setup"
                     ToolTip = 'Specifies the Fiscal Bill No. Series.';
                 }
             }
+            group(Additional)
+            {
+                Caption = 'Additional Setup';
+                field("Print Receipt On Sales Doc."; Rec."Print Receipt On Sales Doc.")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies if the receipt should be automatically printed after sales document posting.';
+                }
+            }
         }
     }
 

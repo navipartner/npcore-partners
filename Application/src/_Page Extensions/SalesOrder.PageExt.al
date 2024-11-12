@@ -219,6 +219,18 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                     CROAuxSalesHeader.SaveCROAuxSalesHeaderFields();
                 end;
             }
+            field("NPR SI POS Unit"; SIAuxSalesHeader."NPR SI POS Unit")
+            {
+                Caption = 'SI POS Unit';
+                ApplicationArea = NPRSIFiscal;
+                ToolTip = 'Specifies the value of the SI POS Unit field.';
+                TableRelation = "NPR POS Unit";
+                trigger OnValidate()
+                begin
+                    SIAuxSalesHeader.Validate("NPR SI POS Unit");
+                    SIAuxSalesHeader.SaveSIAuxSalesHeaderFields();
+                end;
+            }
         }
         addlast("Invoice Details")
         {
@@ -737,6 +749,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
     var
         RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
         CROAuxSalesHeader: Record "NPR CRO Aux Sales Header";
+        SIAuxSalesHeader: Record "NPR SI Aux Sales Header";
         RSSalesHeader: Record "NPR RS Sales Header";
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         RSEIAuxSalesHeader: Record "NPR RS EI Aux Sales Header";
@@ -757,8 +770,9 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
     trigger OnAfterGetCurrRecord()
     begin
         RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(Rec);
-        RSSalesHeader.Read(Rec.SystemId);
         CROAuxSalesHeader.ReadCROAuxSalesHeaderFields(Rec);
+        SIAuxSalesHeader.ReadSIAuxSalesHeaderFields(Rec);
+        RSSalesHeader.Read(Rec.SystemId);
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         RSEIAuxSalesHeader.ReadRSEIAuxSalesHeaderFields(Rec);
         IsDocForSendingToSEF := RSEInvoiceMgt.CheckIsDocumentSetForSendingToSEF(RSEIAuxSalesHeader);
