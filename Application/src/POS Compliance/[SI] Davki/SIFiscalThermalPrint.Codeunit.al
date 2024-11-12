@@ -20,9 +20,14 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
 
         PrintHeader(SIPOSAuditLogAuxInfo);
 
-        PrintContent(SIPOSAuditLogAuxInfo);
-
-        PrintVATSection(SIPOSAuditLogAuxInfo);
+        case SIPOSAuditLogAuxInfo."Audit Entry Type" of
+            SIPOSAuditLogAuxInfo."Audit Entry Type"::"POS Entry":
+                PrintPOSEntryContent(SIPOSAuditLogAuxInfo);
+            SIPOSAuditLogAuxInfo."Audit Entry Type"::"Sales Invoice Header":
+                PrintSalesInvoiceContent(SIPOSAuditLogAuxInfo);
+            SIPOSAuditLogAuxInfo."Audit Entry Type"::"Sales Cr. Memo Header":
+                PrintSalesCreditMemoContent(SIPOSAuditLogAuxInfo);
+        end;
 
         PrintFooter(SIPOSAuditLogAuxInfo);
 
@@ -72,14 +77,19 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
         PrintTextLine(StrSubstNo(ReceiptNoLbl, SIPOSAuditLogAuxInfo."POS Store Code", SIPOSAuditLogAuxInfo."POS Unit No.", SIPOSAuditLogAuxInfo."Receipt No."), true);
     end;
 
-    local procedure PrintContent(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info")
+    local procedure PrintPOSEntryContent(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info")
     var
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        POSEntryTaxLine: Record "NPR POS Entry Tax Line";
         FinalBillLbl: Label 'SKUPAJ EUR', Locked = true;
         ItemDescLbl: Label 'Postavka', Locked = true;
         ItemPriceLbl: Label 'Skupaj €', Locked = true;
         QtyLbl: Label 'Kol', Locked = true;
         UnitPriceLbl: Label 'Cena', Locked = true;
+        AmountInclVATLbl: Label 'Vrednost', Locked = true;
+        VATAmountLbl: Label 'DDV', Locked = true;
+        VATBaseLbl: Label 'Osnova', Locked = true;
+        VATPercLbl: Label 'Stopnja', Locked = true;
         SalesLineType: Option Comment,"G/L Account",Item,Customer,Voucher,Payout,Rounding;
     begin
         PrintDottedLine();
@@ -98,16 +108,7 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
 
         PrintTwoColumnText(FinalBillLbl, FormatDecimal(SIPOSAuditLogAuxInfo."Total Amount"), true);
         PrintTextLine('', false);
-    end;
 
-    local procedure PrintVATSection(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info")
-    var
-        POSEntryTaxLine: Record "NPR POS Entry Tax Line";
-        AmountInclVATLbl: Label 'Vrednost', Locked = true;
-        VATAmountLbl: Label 'DDV', Locked = true;
-        VATBaseLbl: Label 'Osnova', Locked = true;
-        VATPercLbl: Label 'Stopnja', Locked = true;
-    begin
         PrintDottedLine();
         PrintFourColumnText(VATPercLbl, VATBaseLbl, VATAmountLbl, AmountInclVATLbl, true);
         PrintDottedLine();
@@ -120,6 +121,104 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
         until POSEntryTaxLine.Next() = 0;
     end;
 
+    local procedure PrintSalesInvoiceContent(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info")
+    var
+        SalesInvoiceLine: Record "Sales Invoice Line";
+        FinalBillLbl: Label 'SKUPAJ EUR', Locked = true;
+        ItemDescLbl: Label 'Postavka', Locked = true;
+        ItemPriceLbl: Label 'Skupaj €', Locked = true;
+        QtyLbl: Label 'Kol', Locked = true;
+        UnitPriceLbl: Label 'Cena', Locked = true;
+        AmountInclVATLbl: Label 'Vrednost', Locked = true;
+        VATAmountLbl: Label 'DDV', Locked = true;
+        VATBaseLbl: Label 'Osnova', Locked = true;
+        VATPercLbl: Label 'Stopnja', Locked = true;
+        TaxableAmountDict: Dictionary of [Decimal, Decimal];
+        TaxAmountDict: Dictionary of [Decimal, Decimal];
+        AmountInclTaxDict: Dictionary of [Decimal, Decimal];
+        DictKeysList: List of [Decimal];
+        DictKey: Decimal;
+    begin
+        PrintDottedLine();
+        PrintFourColumnText(ItemDescLbl, QtyLbl, UnitPriceLbl, ItemPriceLbl, true);
+        PrintDottedLine();
+
+        SalesInvoiceLine.SetLoadFields(Description, Quantity, "Unit Price", "VAT Base Amount", "VAT %", "Amount Including VAT");
+        SalesInvoiceLine.SetRange("Document No.", SIPOSAuditLogAuxInfo."Source Document No.");
+        SalesInvoiceLine.SetRange(Type, SalesInvoiceLine.Type::Item);
+        SalesInvoiceLine.FindSet();
+        repeat
+            PrintTextLine(SalesInvoiceLine.Description, false);
+            PrintFourColumnText(Format(SalesInvoiceLine.Quantity).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(SalesInvoiceLine."Unit Price"), FormatDecimal(SalesInvoiceLine."Amount Including VAT"), false);
+
+            AddAmountToDecimalDict(TaxableAmountDict, SalesInvoiceLine."VAT %", SalesInvoiceLine."VAT Base Amount");
+            AddAmountToDecimalDict(TaxAmountDict, SalesInvoiceLine."VAT %", SalesInvoiceLine."Amount Including VAT" - SalesInvoiceLine."VAT Base Amount");
+            AddAmountToDecimalDict(TaxAmountDict, SalesInvoiceLine."VAT %", SalesInvoiceLine."Amount Including VAT");
+        until SalesInvoiceLine.Next() = 0;
+        PrintFullLine();
+
+        PrintTwoColumnText(FinalBillLbl, FormatDecimal(SIPOSAuditLogAuxInfo."Total Amount"), true);
+        PrintTextLine('', false);
+
+        PrintDottedLine();
+        PrintFourColumnText(VATPercLbl, VATBaseLbl, VATAmountLbl, AmountInclVATLbl, true);
+        PrintDottedLine();
+
+        DictKeysList := TaxableAmountDict.Keys();
+        foreach DictKey in DictKeysList do begin
+            PrintFourColumnText(StrSubstNo(TwoValueFormatLbl, Format(Round(DictKey, 0.1)), '%'), FormatDecimal(TaxableAmountDict.Get(DictKey)), FormatDecimal(TaxAmountDict.Get(DictKey)), FormatDecimal(AmountInclTaxDict.Get(DictKey)), false);
+        end;
+    end;
+
+    local procedure PrintSalesCreditMemoContent(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info")
+    var
+        SalesCrMemoLine: Record "Sales Cr.Memo Line";
+        FinalBillLbl: Label 'SKUPAJ EUR', Locked = true;
+        ItemDescLbl: Label 'Postavka', Locked = true;
+        ItemPriceLbl: Label 'Skupaj €', Locked = true;
+        QtyLbl: Label 'Kol', Locked = true;
+        UnitPriceLbl: Label 'Cena', Locked = true;
+        AmountInclVATLbl: Label 'Vrednost', Locked = true;
+        VATAmountLbl: Label 'DDV', Locked = true;
+        VATBaseLbl: Label 'Osnova', Locked = true;
+        VATPercLbl: Label 'Stopnja', Locked = true;
+        TaxableAmountDict: Dictionary of [Decimal, Decimal];
+        TaxAmountDict: Dictionary of [Decimal, Decimal];
+        AmountInclTaxDict: Dictionary of [Decimal, Decimal];
+        DictKeysList: List of [Decimal];
+        DictKey: Decimal;
+    begin
+        PrintDottedLine();
+        PrintFourColumnText(ItemDescLbl, QtyLbl, UnitPriceLbl, ItemPriceLbl, true);
+        PrintDottedLine();
+
+        SalesCrMemoLine.SetLoadFields(Description, Quantity, "Unit Price", "VAT Base Amount", "VAT %", "Amount Including VAT");
+        SalesCrMemoLine.SetAutoCalcFields("Amount Including VAT");
+        SalesCrMemoLine.SetRange("Document No.", SIPOSAuditLogAuxInfo."Source Document No.");
+        SalesCrMemoLine.SetRange(Type, SalesCrMemoLine.Type::Item);
+        SalesCrMemoLine.FindSet();
+        repeat
+            PrintTextLine(SalesCrMemoLine.Description, false);
+            PrintFourColumnText(Format(SalesCrMemoLine.Quantity).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(SalesCrMemoLine."Unit Price"), FormatDecimal(SalesCrMemoLine."Amount Including VAT"), false);
+
+            AddAmountToDecimalDict(TaxableAmountDict, SalesCrMemoLine."VAT %", SalesCrMemoLine."VAT Base Amount");
+            AddAmountToDecimalDict(TaxAmountDict, SalesCrMemoLine."VAT %", SalesCrMemoLine."Amount Including VAT" - SalesCrMemoLine."VAT Base Amount");
+            AddAmountToDecimalDict(TaxAmountDict, SalesCrMemoLine."VAT %", SalesCrMemoLine."Amount Including VAT");
+        until SalesCrMemoLine.Next() = 0;
+        PrintFullLine();
+
+        PrintTwoColumnText(FinalBillLbl, FormatDecimal(SIPOSAuditLogAuxInfo."Total Amount"), true);
+        PrintTextLine('', false);
+
+        PrintDottedLine();
+        PrintFourColumnText(VATPercLbl, VATBaseLbl, VATAmountLbl, AmountInclVATLbl, true);
+        PrintDottedLine();
+
+        DictKeysList := TaxableAmountDict.Keys();
+        foreach DictKey in DictKeysList do begin
+            PrintFourColumnText(StrSubstNo(TwoValueFormatLbl, Format(Round(DictKey, 0.1)), '%'), FormatDecimal(TaxableAmountDict.Get(DictKey)), FormatDecimal(TaxAmountDict.Get(DictKey)), FormatDecimal(AmountInclTaxDict.Get(DictKey)), false);
+        end;
+    end;
 
     local procedure PrintFooter(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info")
     var
@@ -219,6 +318,20 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
     local procedure FormatDecimal(Value: Decimal): Text
     begin
         exit(Format(Value, 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,.>'));
+    end;
+
+    #endregion
+
+    #region SI Fiscal Thermal Print - Helper Procedures
+
+    local procedure AddAmountToDecimalDict(var DecimalDict: Dictionary of [Decimal, Decimal]; DictKey: Decimal; DictValue: Decimal)
+    var
+        BaseAmount: Decimal;
+    begin
+        if DecimalDict.Add(DictKey, DictValue) then
+            exit;
+        BaseAmount := DecimalDict.Get(DictKey) + DictValue;
+        DecimalDict.Set(DictKey, BaseAmount);
     end;
 
     #endregion

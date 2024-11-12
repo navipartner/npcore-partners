@@ -45,9 +45,32 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
             }
             field("NPR CRO Document Fiscalized"; CROAuxSalesInvHeader."NPR CRO Document Fiscalized")
             {
-                Caption = 'Document Fiscalized';
+                Caption = 'CRO Document Fiscalized';
                 ApplicationArea = NPRCROFiscal;
                 ToolTip = 'Specifies the value of the CRO Document Fiscalized field.';
+                Editable = false;
+            }
+            field("NPR CRO Audit Entry No."; CROAuxSalesInvHeader."NPR CRO Audit Entry No.")
+            {
+                Caption = 'CRO Audit Entry No.';
+                ApplicationArea = NPRCROFiscal;
+                ToolTip = 'Specifies the value of the CRO Audit Entry No. field.';
+                TableRelation = "NPR CRO POS Aud. Log Aux. Info"."Audit Entry No.";
+                Editable = false;
+            }
+            field("NPR Document Fiscalized"; SIAuxSalesInvHeader."NPR SI Document Fiscalized")
+            {
+                Caption = 'SI Document Fiscalized';
+                ApplicationArea = NPRSIFiscal;
+                ToolTip = 'Specifies the value of the SI Document Fiscalized field.';
+                Editable = false;
+            }
+            field("NPR SI Audit Entry No."; SIAuxSalesInvHeader."NPR SI Audit Entry No.")
+            {
+                Caption = 'SI Audit Entry No.';
+                ApplicationArea = NPRSIFiscal;
+                ToolTip = 'Specifies the value of the SI Audit Entry No. field.';
+                TableRelation = "NPR SI POS Audit Log Aux. Info"."Audit Entry No.";
                 Editable = false;
             }
         }
@@ -364,6 +387,7 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
     var
         RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header";
         CROAuxSalesInvHeader: Record "NPR CRO Aux Sales Inv. Header";
+        SIAuxSalesInvHeader: Record "NPR SI Aux Sales Inv. Header";
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         RSEIAuxSalesInvHdr: Record "NPR RS EI Aux Sales Inv. Hdr.";
 #endif
@@ -401,6 +425,7 @@ pageextension 6014405 "NPR Posted Sales Invoice" extends "Posted Sales Invoice"
     begin
         RSAuxSalesInvHeader.ReadRSAuxSalesInvHeaderFields(Rec);
         CROAuxSalesInvHeader.ReadCROAuxSalesInvHeaderFields(Rec);
+        SIAuxSalesInvHeader.ReadSIAuxSalesInvHeaderFields(Rec);
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         RSEIAuxSalesInvHdr.ReadRSEIAuxSalesInvHdrFields(Rec);
         IsRSEInvoiceSent := RSEInvoiceMgt.CheckIsRSEInvoiceSent(Rec."No.");

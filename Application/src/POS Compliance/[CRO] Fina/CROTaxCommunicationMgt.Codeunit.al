@@ -314,6 +314,7 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
             exit;
         CROAuxSalesInvHeader.ReadCROAuxSalesInvHeaderFields(SalesInvoiceHeader);
         CROAuxSalesInvHeader."NPR CRO Document Fiscalized" := true;
+        CROAuxSalesInvHeader."NPR CRO Audit Entry No." := CROPOSAuditLogAuxInfo."Audit Entry No.";
         CROAuxSalesInvHeader.SaveCROAuxSalesInvHeaderFields();
     end;
 
@@ -326,6 +327,7 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
             exit;
         CROAuxSalesCrMemoHeader.ReadCROAuxSalesCrMemoHeaderFields(SalesCrMemoHeader);
         CROAuxSalesCrMemoHeader."NPR CRO Document Fiscalized" := true;
+        CROAuxSalesCrMemoHeader."NPR CRO Audit Entry No." := CROPOSAuditLogAuxInfo."Audit Entry No.";
         CROAuxSalesCrMemoHeader.SaveCROAuxSalesCrMemoHeaderFields();
     end;
 

@@ -14,13 +14,13 @@ table 6150696 "NPR CRO Aux Sales Inv. Header"
         }
         field(2; "NPR CRO POS Unit"; Code[10])
         {
-            Caption = 'POS Unit No.';
+            Caption = 'CRO POS Unit';
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Unit";
         }
         field(3; "NPR CRO Document Fiscalized"; Boolean)
         {
-            Caption = 'Document Fiscalized';
+            Caption = 'CRO Document Fiscalized';
             DataClassification = CustomerContent;
             Editable = false;
         }

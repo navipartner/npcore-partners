@@ -23,10 +23,69 @@ pageextension 6014428 "NPR Posted Sales Credit Memo" extends "Posted Sales Credi
         {
             field("NPR Document Fiscalized"; CROAuxSalesCrMemoHdr."NPR CRO Document Fiscalized")
             {
-                Caption = 'Document Fiscalized';
+                Caption = 'CRO Document Fiscalized';
                 ApplicationArea = NPRCROFiscal;
                 ToolTip = 'Specifies the value of the Document Fiscalized field.';
                 Editable = false;
+            }
+            field("NPR CRO Audit Entry No."; CROAuxSalesCrMemoHdr."NPR CRO Audit Entry No.")
+            {
+                Caption = 'CRO Audit Entry No.';
+                ApplicationArea = NPRCROFiscal;
+                ToolTip = 'Specifies the value of the CRO Audit Entry No. field.';
+                TableRelation = "NPR CRO POS Aud. Log Aux. Info"."Audit Entry No.";
+                Editable = false;
+            }
+            field("NPR SI Document Fiscalized"; SIAuxSalesCrMemoHeader."NPR SI Document Fiscalized")
+            {
+                Caption = 'SI Document Fiscalized';
+                ApplicationArea = NPRSIFiscal;
+                ToolTip = 'Specifies the value of the Document Fiscalized field.';
+                Editable = false;
+            }
+            field("NPR SI Audit Entry No."; SIAuxSalesCrMemoHeader."NPR SI Audit Entry No.")
+            {
+                Caption = 'SI Audit Entry No.';
+                ApplicationArea = NPRSIFiscal;
+                ToolTip = 'Specifies the value of the SI Audit Entry No. field.';
+                TableRelation = "NPR SI POS Audit Log Aux. Info"."Audit Entry No.";
+                Editable = false;
+            }
+        }
+        addafter("Applies-to Doc. No.")
+        {
+            group("NPR SIReturnInfo")
+            {
+                Caption = 'SI Return Receipt Info';
+
+                field("NPR SI Return Receipt No."; SIAuxSalesCrMemoHeader."NPR SI Return Receipt No.")
+                {
+                    Caption = 'SI Return Receipt No.';
+                    ApplicationArea = NPRSIFiscal;
+                    ToolTip = 'Specifies the value of the Return Receipt No. field.';
+                    Editable = false;
+                }
+                field("NPR SI Return Bus. Premise ID"; SIAuxSalesCrMemoHeader."NPR SI Return Bus. Premise ID")
+                {
+                    Caption = 'SI Return Business Premise ID';
+                    ApplicationArea = NPRSIFiscal;
+                    ToolTip = 'Specifies the value of the Return Business Premise ID field.';
+                    Editable = false;
+                }
+                field("NPR SI Return Cash Register ID"; SIAuxSalesCrMemoHeader."NPR SI Return Cash Register ID")
+                {
+                    Caption = 'SI Return Cash Register ID';
+                    ApplicationArea = NPRSIFiscal;
+                    ToolTip = 'Specifies the value of the Return Cash Register ID field.';
+                    Editable = false;
+                }
+                field("NPR SI Return Receipt DateTime"; SIAuxSalesCrMemoHeader."NPR SI Return Receipt DateTime")
+                {
+                    Caption = 'SI Return Receipt Date/Time';
+                    ApplicationArea = NPRSIFiscal;
+                    ToolTip = 'Specifies the value of the Return Receipt Date/Time field.';
+                    Editable = false;
+                }
             }
         }
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
@@ -245,6 +304,7 @@ pageextension 6014428 "NPR Posted Sales Credit Memo" extends "Posted Sales Credi
 
     var
         CROAuxSalesCrMemoHdr: Record "NPR CRO Aux Sales Cr. Memo Hdr";
+        SIAuxSalesCrMemoHeader: Record "NPR SI Aux Sales CrMemo Header";
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         RSEIAuxSalesCrMemoHdr: Record "NPR RSEI Aux Sales Cr.Memo Hdr";
         IsRSEInvoiceSent: Boolean;
@@ -267,6 +327,7 @@ pageextension 6014428 "NPR Posted Sales Credit Memo" extends "Posted Sales Credi
 #endif
     begin
         CROAuxSalesCrMemoHdr.ReadCROAuxSalesCrMemoHeaderFields(Rec);
+        SIAuxSalesCrMemoHeader.ReadSIAuxSalesCrMemoHeaderFields(Rec);
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         RSEIAuxSalesCrMemoHdr.ReadRSEIAuxSalesCrMemoHdrFields(Rec);
         IsRSEInvoiceSent := RSEInvoiceMgt.CheckIsRSEInvoiceSent(Rec."No.");

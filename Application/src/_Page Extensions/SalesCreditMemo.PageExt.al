@@ -150,6 +150,71 @@ pageextension 6014412 "NPR Sales Credit Memo" extends "Sales Credit Memo"
                     CROAuxSalesHeader.SaveCROAuxSalesHeaderFields();
                 end;
             }
+            field("NPR SI POS Unit"; SIAuxSalesHeader."NPR SI POS Unit")
+            {
+                Caption = 'SI POS Unit';
+                ApplicationArea = NPRSIFiscal;
+                ToolTip = 'Specifies the value of the SI POS Unit field.';
+                TableRelation = "NPR POS Unit";
+                trigger OnValidate()
+                begin
+                    SIAuxSalesHeader.Validate("NPR SI POS Unit");
+                    SIAuxSalesHeader.SaveSIAuxSalesHeaderFields();
+                end;
+            }
+        }
+
+        addafter("Applies-to ID")
+        {
+            group("NPR SIReturnInfo")
+            {
+                Caption = 'SI Return Receipt Info';
+
+                field("NPR SI Return Receipt No."; SIAuxSalesHeader."NPR SI Return Receipt No.")
+                {
+                    Caption = 'SI Return Receipt No.';
+                    ApplicationArea = NPRSIFiscal;
+                    ToolTip = 'Specifies the value of the Return Receipt No. field.';
+                    trigger OnValidate()
+                    begin
+                        SIAuxSalesHeader.Validate("NPR SI Return Receipt No.");
+                        SIAuxSalesHeader.SaveSIAuxSalesHeaderFields();
+                    end;
+                }
+                field("NPR SI Return Bus. Premise ID"; SIAuxSalesHeader."NPR SI Return Bus. Premise ID")
+                {
+                    Caption = 'SI Return Business Premise ID';
+                    ApplicationArea = NPRSIFiscal;
+                    ToolTip = 'Specifies the value of the Return Business Premise ID field.';
+                    trigger OnValidate()
+                    begin
+                        SIAuxSalesHeader.Validate("NPR SI Return Bus. Premise ID");
+                        SIAuxSalesHeader.SaveSIAuxSalesHeaderFields();
+                    end;
+                }
+                field("NPR SI Return Cash Register ID"; SIAuxSalesHeader."NPR SI Return Cash Register ID")
+                {
+                    Caption = 'SI Return Cash Register ID';
+                    ApplicationArea = NPRSIFiscal;
+                    ToolTip = 'Specifies the value of the Return Cash Register ID field.';
+                    trigger OnValidate()
+                    begin
+                        SIAuxSalesHeader.Validate("NPR SI Return Cash Register ID");
+                        SIAuxSalesHeader.SaveSIAuxSalesHeaderFields();
+                    end;
+                }
+                field("NPR SI Return Receipt DateTime"; SIAuxSalesHeader."NPR SI Return Receipt DateTime")
+                {
+                    Caption = 'SI Return Receipt Date/Time';
+                    ApplicationArea = NPRSIFiscal;
+                    ToolTip = 'Specifies the value of the Return Receipt Date/Time field.';
+                    trigger OnValidate()
+                    begin
+                        SIAuxSalesHeader.Validate("NPR SI Return Receipt DateTime");
+                        SIAuxSalesHeader.SaveSIAuxSalesHeaderFields();
+                    end;
+                }
+            }
         }
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         addlast(content)
@@ -266,6 +331,7 @@ pageextension 6014412 "NPR Sales Credit Memo" extends "Sales Credit Memo"
     var
         RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
         CROAuxSalesHeader: Record "NPR CRO Aux Sales Header";
+        SIAuxSalesHeader: Record "NPR SI Aux Sales Header";
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         RSEIAuxSalesHeader: Record "NPR RS EI Aux Sales Header";
         RSEInvoiceMgt: Codeunit "NPR RS E-Invoice Mgt.";
@@ -278,6 +344,7 @@ pageextension 6014412 "NPR Sales Credit Memo" extends "Sales Credit Memo"
     begin
         RSAuxSalesHeader.ReadRSAuxSalesHeaderFields(Rec);
         CROAuxSalesHeader.ReadCROAuxSalesHeaderFields(Rec);
+        SIAuxSalesHeader.ReadSIAuxSalesHeaderFields(Rec);
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         RSEIAuxSalesHeader.ReadRSEIAuxSalesHeaderFields(Rec);
         RSEIAuxSalesHeader.SetDefaultTaxLiabilityForSalesCrMemo(Rec);

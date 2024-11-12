@@ -9,6 +9,7 @@ codeunit 6151546 "NPR SI Audit Mgt."
         CAPTION_CERT_SUCCESS: Label 'Certificate with thumbprint %1 was uploaded successfully';
         CAPTION_OVERWRITE_CERT: Label 'Are you sure you want to overwrite the existing certificate?';
         ERROR_MISSING_KEY: Label 'The selected certificate does not contain the private key';
+        RecordInTableForFieldNotFoundErr: Label 'Record not found in table %1 for %2 : %3', Comment = '%1 = Table Caption, %2 = Field Caption, %3 = Field Value';
 
     #region SI Fiscal - POS Handling Subscribers
 
@@ -73,9 +74,9 @@ codeunit 6151546 "NPR SI Audit Mgt."
         InsertPreNumberedInvoiceBookToAudit(SalePOS, SIPOSAuditLogAuxInfo);
 
         if SIPOSAuditLogAuxInfo."Return Receipt No." = '' then
-            SITaxCommunicationMgt.CreateNormalSale(SIPOSAuditLogAuxInfo, false, false)
+            SITaxCommunicationMgt.CreateNormalSale(SIPOSAuditLogAuxInfo, false)
         else
-            SITaxCommunicationMgt.CreateNormalSale(SIPOSAuditLogAuxInfo, true, false);
+            SITaxCommunicationMgt.CreateNormalSale(SIPOSAuditLogAuxInfo, false);
 
         Commit();
         OnBeforePrintFiscalReceipt(IsHandled);
@@ -103,6 +104,69 @@ codeunit 6151546 "NPR SI Audit Mgt."
         if not POSEntry.FindFirst() then
             exit;
         SalesTicketNo := POSEntry."Document No.";
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostSalesDoc', '', false, false)]
+    local procedure OnBeforePostSalesDoc(var SalesHeader: Record "Sales Header");
+    begin
+        VerifyIsDataSetOnSalesDocuments(SalesHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterPostSalesDoc', '', false, false)]
+    local procedure OnAfterPostSalesDoc(SalesInvHdrNo: Code[20]; SalesCrMemoHdrNo: Code[20]);
+    begin
+        if SalesInvHdrNo <> '' then
+            CreateSalesInvoiceSale(SalesInvHdrNo);
+
+        if SalesCrMemoHdrNo <> '' then
+            CreateSalesCreditMemoSale(SalesCrMemoHdrNo);
+    end;
+
+#if not BC17
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Correct Posted Sales Invoice", 'OnAfterCreateCopyDocument', '', false, false)]
+    local procedure OnAfterCreateCopyDocument(var SalesHeader: Record "Sales Header"; var SalesInvoiceHeader: Record "Sales Invoice Header")
+    var
+        SIAuxSalesHeader: Record "NPR SI Aux Sales Header";
+        SIAuxSalesInvHeader: Record "NPR SI Aux Sales Inv. Header";
+    begin
+        if not IsSIFiscalActive() then
+            exit;
+
+        SIAuxSalesHeader.ReadSIAuxSalesHeaderFields(SalesHeader);
+        SIAuxSalesInvHeader.ReadSIAuxSalesInvHeaderFields(SalesInvoiceHeader);
+        SIAuxSalesHeader.TransferFields(SIAuxSalesInvHeader, false);
+        SIAuxSalesHeader.SaveSIAuxSalesHeaderFields();
+    end;
+#endif
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterSalesInvHeaderInsert', '', false, false)]
+    local procedure OnAfterSalesInvHeaderInsert(var SalesInvHeader: Record "Sales Invoice Header"; SalesHeader: Record "Sales Header");
+    var
+        SIAuxSalesHeader: Record "NPR SI Aux Sales Header";
+        SIAuxSalesInvHeader: Record "NPR SI Aux Sales Inv. Header";
+    begin
+        if not IsSIFiscalActive() then
+            exit;
+
+        SIAuxSalesInvHeader.ReadSIAuxSalesInvHeaderFields(SalesInvHeader);
+        SIAuxSalesHeader.ReadSIAuxSalesHeaderFields(SalesHeader);
+        SIAuxSalesInvHeader.TransferFields(SIAuxSalesHeader, false);
+        SIAuxSalesInvHeader.SaveSIAuxSalesInvHeaderFields();
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterSalesCrMemoHeaderInsert', '', false, false)]
+    local procedure OnAfterSalesCrMemoHeaderInsert(var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; SalesHeader: Record "Sales Header");
+    var
+        SIAuxSalesCrMemoHeader: Record "NPR SI Aux Sales CrMemo Header";
+        SIAuxSalesHeader: Record "NPR SI Aux Sales Header";
+    begin
+        if not IsSIFiscalActive() then
+            exit;
+
+        SIAuxSalesCrMemoHeader.ReadSIAuxSalesCrMemoHeaderFields(SalesCrMemoHeader);
+        SIAuxSalesHeader.ReadSIAuxSalesHeaderFields(SalesHeader);
+        SIAuxSalesCrMemoHeader.TransferFields(SIAuxSalesHeader, false);
+        SIAuxSalesCrMemoHeader.SaveSIAuxSalesCrMemoHeaderFields();
     end;
 
     #endregion
@@ -137,6 +201,66 @@ codeunit 6151546 "NPR SI Audit Mgt."
             exit;
         if SIPOSStoreMapping.Get(Rec.Code) then
             SIPOSStoreMapping.Delete();
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure SalesHeader_OnAfterDeleteEvent(var Rec: Record "Sales Header"; RunTrigger: Boolean)
+    var
+        SIAuxSalesHeader: Record "NPR SI Aux Sales Header";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        if not RunTrigger then
+            exit;
+        if not IsSIFiscalActive() then
+            exit;
+
+        if SIAuxSalesHeader.Get(Rec.SystemId) then
+            SIAuxSalesHeader.Delete();
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterDeleteAfterPosting', '', false, false)]
+    local procedure OnAfterDeleteAfterPosting(SalesHeader: Record "Sales Header"; SalesInvoiceHeader: Record "Sales Invoice Header"; SalesCrMemoHeader: Record "Sales Cr.Memo Header"; CommitIsSuppressed: Boolean);
+    var
+        SIAuxSalesHeader: Record "NPR SI Aux Sales Header";
+    begin
+        if not IsSIFiscalActive() then
+            exit;
+
+        SIAuxSalesHeader.ReadSIAuxSalesHeaderFields(SalesHeader);
+        SIAuxSalesHeader.Delete();
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Sales Invoice Header", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure SalesInvoiceHeader_OnAfterDeleteEvent(var Rec: Record "Sales Invoice Header"; RunTrigger: Boolean)
+    var
+        SIAuxSalesInvHeader: Record "NPR SI Aux Sales Inv. Header";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        if not RunTrigger then
+            exit;
+        if not IsSIFiscalActive() then
+            exit;
+
+        if SIAuxSalesInvHeader.Get(Rec.SystemId) then
+            SIAuxSalesInvHeader.Delete();
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Sales Cr.Memo Header", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure SalesCrMemoHeader_OnAfterDeleteEvent(var Rec: Record "Sales Cr.Memo Header"; RunTrigger: Boolean)
+    var
+        SIAuxSalesCrMemoHeader: Record "NPR SI Aux Sales CrMemo Header";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        if not RunTrigger then
+            exit;
+        if not IsSIFiscalActive() then
+            exit;
+
+        if SIAuxSalesCrMemoHeader.Get(Rec.SystemId) then
+            SIAuxSalesCrMemoHeader.Delete();
     end;
 
     #endregion
@@ -212,7 +336,6 @@ codeunit 6151546 "NPR SI Audit Mgt."
         SIPOSAuditLogAuxInfo."Log Timestamp" := POSEntry."Ending Time";
         SIPOSAuditLogAuxInfo."Total Amount" := POSEntry."Amount Incl. Tax";
         SIPOSAuditLogAuxInfo."Payment Amount" := POSEntry."Payment Amount";
-        SIPOSAuditLogAuxInfo."Returns Amount" := POSEntry."Item Returns (LCY)";
 
         case POSEntry."Return Sales Quantity" of
             0:
@@ -229,6 +352,79 @@ codeunit 6151546 "NPR SI Audit Mgt."
         SIAuxSalespPurch.ReadSIAuxSalespersonFields(SalespersonPurchaser);
         SIAuxSalespPurch.TestField("NPR SI Salesperson Tax Number");
         SIPOSAuditLogAuxInfo."Cashier ID" := SIAuxSalespPurch."NPR SI Salesperson Tax Number";
+        SIPOSAuditLogAuxInfo."Customer VAT Number" := GetCustomerVATRegistrationNo(POSEntry."Customer No.");
+
+        SIPOSAuditLogAuxInfo.Insert(true);
+        CalculateAndSignZOI(SIPOSAuditLogAuxInfo);
+    end;
+
+    local procedure InsertSIPOSAuditLogAuxInfo(SalesInvoiceHeader: Record "Sales Invoice Header")
+    var
+        SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
+        SIAuxSalesInvHeader: Record "NPR SI Aux Sales Inv. Header";
+        SalespersonPurchaser: Record "Salesperson/Purchaser";
+        SIAuxSalespPurch: Record "NPR SI Aux Salesperson/Purch.";
+        POSUnit: Record "NPR POS Unit";
+    begin
+        SIPOSAuditLogAuxInfo.Init();
+        SIPOSAuditLogAuxInfo."Audit Entry Type" := SIPOSAuditLogAuxInfo."Audit Entry Type"::"Sales Invoice Header";
+        SIPOSAuditLogAuxInfo."Entry Date" := SalesInvoiceHeader."Posting Date";
+        SIPOSAuditLogAuxInfo."Source Document No." := SalesInvoiceHeader."No.";
+        SIPOSAuditLogAuxInfo."Log Timestamp" := DT2Time(SalesInvoiceHeader.SystemCreatedAt);
+        SalesInvoiceHeader.CalcFields("Amount Including VAT");
+        SIPOSAuditLogAuxInfo."Total Amount" := SalesInvoiceHeader."Amount Including VAT";
+        SIPOSAuditLogAuxInfo."Payment Amount" := SalesInvoiceHeader."Amount Including VAT";
+        SIPOSAuditLogAuxInfo."Transaction Type" := "NPR SI Transaction Type"::Sale;
+
+        SIAuxSalesInvHeader.ReadSIAuxSalesInvHeaderFields(SalesInvoiceHeader);
+        POSUnit.Get(SIAuxSalesInvHeader."NPR SI POS Unit");
+        SIPOSAuditLogAuxInfo."POS Unit No." := POSUnit."No.";
+        SIPOSAuditLogAuxInfo."POS Store Code" := POSUnit."POS Store Code";
+
+        SalespersonPurchaser.Get(SalesInvoiceHeader."Salesperson Code");
+        SIAuxSalespPurch.ReadSIAuxSalespersonFields(SalespersonPurchaser);
+        SIAuxSalespPurch.TestField("NPR SI Salesperson Tax Number");
+        SIPOSAuditLogAuxInfo."Cashier ID" := SIAuxSalespPurch."NPR SI Salesperson Tax Number";
+        SIPOSAuditLogAuxInfo."Customer VAT Number" := GetCustomerVATRegistrationNo(SalesInvoiceHeader."Sell-to Customer No.");
+
+        SIPOSAuditLogAuxInfo.Insert(true);
+        CalculateAndSignZOI(SIPOSAuditLogAuxInfo);
+    end;
+
+    local procedure InsertSIPOSAuditLogAuxInfo(SalesCrMemoHeader: Record "Sales Cr.Memo Header")
+    var
+        SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
+        SIAuxSalesCrMemoHeader: Record "NPR SI Aux Sales CrMemo Header";
+        SalespersonPurchaser: Record "Salesperson/Purchaser";
+        SIAuxSalespPurch: Record "NPR SI Aux Salesperson/Purch.";
+        POSUnit: Record "NPR POS Unit";
+    begin
+        SIPOSAuditLogAuxInfo.Init();
+        SIPOSAuditLogAuxInfo."Audit Entry Type" := SIPOSAuditLogAuxInfo."Audit Entry Type"::"Sales Cr. Memo Header";
+        SIPOSAuditLogAuxInfo."Entry Date" := SalesCrMemoHeader."Posting Date";
+        SIPOSAuditLogAuxInfo."Source Document No." := SalesCrMemoHeader."No.";
+        SIPOSAuditLogAuxInfo."Log Timestamp" := DT2Time(SalesCrMemoHeader.SystemCreatedAt);
+        SalesCrMemoHeader.CalcFields("Amount Including VAT");
+        SIPOSAuditLogAuxInfo."Total Amount" := -SalesCrMemoHeader."Amount Including VAT";
+        SIPOSAuditLogAuxInfo."Payment Amount" := -SalesCrMemoHeader."Amount Including VAT";
+        SIPOSAuditLogAuxInfo."Transaction Type" := "NPR SI Transaction Type"::Return;
+
+        SIAuxSalesCrMemoHeader.ReadSIAuxSalesCrMemoHeaderFields(SalesCrMemoHeader);
+
+        if SIAuxSalesCrMemoHeader."NPR SI Return Receipt No." <> '' then
+            SIPOSAuditLogAuxInfo."Return Receipt No." := SIAuxSalesCrMemoHeader."NPR SI Return Receipt No."
+        else
+            SIPOSAuditLogAuxInfo."Return Receipt No." := SalesCrMemoHeader."Applies-to Doc. No.";
+
+        POSUnit.Get(SIAuxSalesCrMemoHeader."NPR SI POS Unit");
+        SIPOSAuditLogAuxInfo."POS Unit No." := POSUnit."No.";
+        SIPOSAuditLogAuxInfo."POS Store Code" := POSUnit."POS Store Code";
+
+        SalespersonPurchaser.Get(SalesCrMemoHeader."Salesperson Code");
+        SIAuxSalespPurch.ReadSIAuxSalespersonFields(SalespersonPurchaser);
+        SIAuxSalespPurch.TestField("NPR SI Salesperson Tax Number");
+        SIPOSAuditLogAuxInfo."Cashier ID" := SIAuxSalespPurch."NPR SI Salesperson Tax Number";
+        SIPOSAuditLogAuxInfo."Customer VAT Number" := GetCustomerVATRegistrationNo(SalesCrMemoHeader."Sell-to Customer No.");
 
         SIPOSAuditLogAuxInfo.Insert(true);
         CalculateAndSignZOI(SIPOSAuditLogAuxInfo);
@@ -248,7 +444,105 @@ codeunit 6151546 "NPR SI Audit Mgt."
 
     #endregion
 
+    #region SI Fiscal - Sales Order Fiscalization
+
+    local procedure VerifyIsDataSetOnSalesDocuments(SalesHeader: Record "Sales Header")
+    var
+        SalespersonPurchaser: Record "Salesperson/Purchaser";
+        SIAuxSalespersonPurch: Record "NPR SI Aux Salesperson/Purch.";
+        SIAuxSalesHeader: Record "NPR SI Aux Sales Header";
+    begin
+        if not IsSIFiscalActive() then
+            exit;
+
+        SalesHeader.TestField("Salesperson Code");
+        SalespersonPurchaser.Get(SalesHeader."Salesperson Code");
+        SIAuxSalespersonPurch.ReadSIAuxSalespersonFields(SalespersonPurchaser);
+        SIAuxSalespersonPurch.TestField("NPR SI Salesperson Tax Number");
+
+        SIAuxSalesHeader.ReadSIAuxSalesHeaderFields(SalesHeader);
+        SIAuxSalesHeader.TestField("NPR SI POS Unit");
+
+        if SalesHeader."Document Type" in [SalesHeader."Document Type"::"Credit Memo"] then begin
+            if SIAuxSalesHeader."NPR SI Return Receipt No." <> '' then begin
+                SIAuxSalesHeader.TestField("NPR SI Return Bus. Premise ID");
+                SIAuxSalesHeader.TestField("NPR SI Return Cash Register ID");
+                SIAuxSalesHeader.TestField("NPR SI Return Receipt DateTime");
+            end else
+                SalesHeader.TestField("Applies-to Doc. No.");
+        end;
+    end;
+
+    local procedure CreateSalesInvoiceSale(SalesInvHeaderNo: Code[20])
+    var
+        SIFiscalizationSetup: Record "NPR SI Fiscalization Setup";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
+        SITaxCommunicationMgt: Codeunit "NPR SI Tax Communication Mgt.";
+        SIFiscalThermalPrint: Codeunit "NPR SI Fiscal Thermal Print";
+    begin
+        if not IsSIFiscalActive() then
+            exit;
+
+        SalesInvoiceHeader.Get(SalesInvHeaderNo);
+        InsertSIPOSAuditLogAuxInfo(SalesInvoiceHeader);
+
+        if not SIPOSAuditLogAuxInfo.GetAuditFromSalesInvHeader(SalesInvHeaderNo) then
+            Error(RecordInTableForFieldNotFoundErr, SIPOSAuditLogAuxInfo.TableCaption(), SIPOSAuditLogAuxInfo.FieldCaption("Source Document No."), SalesInvHeaderNo);
+
+        SITaxCommunicationMgt.CreateNormalSale(SIPOSAuditLogAuxInfo, false);
+        Commit();
+
+        SIFiscalizationSetup.Get();
+        if SIFiscalizationSetup."Print Receipt On Sales Doc." then
+            SIFiscalThermalPrint.PrintReceipt(SIPOSAuditLogAuxInfo);
+    end;
+
+    local procedure CreateSalesCreditMemoSale(SalesCrMemoHeaderNo: Code[20])
+    var
+        SIFiscalizationSetup: Record "NPR SI Fiscalization Setup";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
+        SITaxCommunicationMgt: Codeunit "NPR SI Tax Communication Mgt.";
+        SIFiscalThermalPrint: Codeunit "NPR SI Fiscal Thermal Print";
+        AppliesToDocumentNotFiscalizedErr: Label 'Sales Credit Memo %1 cannot be fiscalized, because Sales Document %2 to which it applies to was not fiscalized.', Comment = '%1 = Sales Credit Memo No., %2 = Applies-to Document No.';
+    begin
+        if not IsSIFiscalActive() then
+            exit;
+
+        SalesCrMemoHeader.Get(SalesCrMemoHeaderNo);
+
+        if not IsAppliesToDocumentFiscalized(SalesCrMemoHeader."Applies-to Doc. No.") then
+            Error(AppliesToDocumentNotFiscalizedErr, SalesCrMemoHeader."No.", SalesCrMemoHeader."Applies-to Doc. No.");
+
+        InsertSIPOSAuditLogAuxInfo(SalesCrMemoHeader);
+
+        if not SIPOSAuditLogAuxInfo.GetAuditFromSalesCrMemoHeader(SalesCrMemoHeaderNo) then
+            Error(RecordInTableForFieldNotFoundErr, SIPOSAuditLogAuxInfo.TableCaption(), SIPOSAuditLogAuxInfo.FieldCaption("Source Document No."), SalesCrMemoHeaderNo);
+
+        SITaxCommunicationMgt.CreateNormalSale(SIPOSAuditLogAuxInfo, false);
+        Commit();
+
+        SIFiscalizationSetup.Get();
+        if SIFiscalizationSetup."Print Receipt On Sales Doc." then
+            SIFiscalThermalPrint.PrintReceipt(SIPOSAuditLogAuxInfo);
+    end;
+
+    local procedure IsAppliesToDocumentFiscalized(AppliesToDocNo: Code[20]): Boolean
+    var
+        SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
+    begin
+        if AppliesToDocNo = '' then
+            exit(true);
+        SIPOSAuditLogAuxInfo.SetRange("Audit Entry Type", SIPOSAuditLogAuxInfo."Audit Entry Type"::"Sales Invoice Header");
+        SIPOSAuditLogAuxInfo.SetRange("Source Document No.", AppliesToDocNo);
+        exit(not SIPOSAuditLogAuxInfo.IsEmpty());
+    end;
+
+    #endregion
+
     #region SI Fiscal - Procedures/Helper Functions
+
     internal procedure IsSIFiscalActive(): Boolean
     begin
         if not SIFiscalSetup.Get() then begin
@@ -347,6 +641,17 @@ codeunit 6151546 "NPR SI Audit Mgt."
         CertificateSubject := CopyStr(CertificateSubject, StartPosition, 11);
         CertificateSubject := DelChr(CertificateSubject, '=', 'OU=');
         exit(CertificateSubject);
+    end;
+
+    local procedure GetCustomerVATRegistrationNo(CustomerNo: Code[20]): Text[20]
+    var
+        Customer: Record Customer;
+    begin
+        if CustomerNo = '' then
+            exit('');
+        if not Customer.Get(CustomerNo) then
+            exit('');
+        exit(Customer."VAT Registration No.");
     end;
 
     #endregion

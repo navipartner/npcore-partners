@@ -5,7 +5,7 @@ page 6150768 "NPR SI POS Audit Log Aux. Info"
     Editable = false;
     Extensible = false;
     PageType = List;
-    PromotedActionCategories = 'New,Process,Report,Process Receipt,Receipt Print,Related';
+    PromotedActionCategories = 'New,Process,Report,Process Receipt,Receipt Print,Download,Related';
     SourceTable = "NPR SI POS Audit Log Aux. Info";
     SourceTableView = sorting("Audit Entry No.") order(descending);
     UsageCategory = History;
@@ -116,13 +116,9 @@ page 6150768 "NPR SI POS Audit Log Aux. Info"
                     if Rec."EOR Code" <> '' then
                         Error(BillAlreadyFiscalizedErr);
 
-                    if Rec."Return Receipt No." = '' then begin
-                        SITaxCommunicationMgt.CreateNormalSale(Rec, false, true);
-                        Rec."Subsequent Submit" := true;
-                        Rec.Modify();
-                    end
-                    else
-                        SITaxCommunicationMgt.CreateNormalSale(Rec, true, true);
+                    SITaxCommunicationMgt.CreateNormalSale(Rec, true);
+                    Rec."Subsequent Submit" := true;
+                    Rec.Modify();
                 end;
             }
             action(Print)
@@ -148,20 +144,20 @@ page 6150768 "NPR SI POS Audit Log Aux. Info"
                 Caption = 'Download Request Message';
                 Image = ExportElectronicDocument;
                 Promoted = true;
-                PromotedCategory = Category5;
+                PromotedCategory = Category6;
                 PromotedOnly = true;
                 ToolTip = 'The message sent to TA will be downloaded in the XML form.';
                 trigger OnAction()
                 var
                     FileMgt: Codeunit "File Management";
                     TempBlob: Codeunit "Temp Blob";
-                    FileNameLbl: Label '%1.xml', Locked = true;
+                    FileNameLbl: Label '%1-request.xml', Locked = true;
                     OStream: OutStream;
                 begin
                     TempBlob.CreateOutStream(OStream, TextEncoding::UTF8);
                     if Rec."Receipt Content".HasValue then begin
                         Rec."Receipt Content".ExportStream(OStream);
-                        FileMgt.BLOBExport(TempBlob, StrSubstNo(FileNameLbl, Rec."ZOI Code"), true);
+                        FileMgt.BLOBExport(TempBlob, StrSubstNo(FileNameLbl, Rec."Source Document No."), true);
                     end;
                 end;
             }
@@ -171,42 +167,56 @@ page 6150768 "NPR SI POS Audit Log Aux. Info"
                 Caption = 'Download Response Message';
                 Image = ExportElectronicDocument;
                 Promoted = true;
-                PromotedCategory = Category5;
+                PromotedCategory = Category6;
                 PromotedOnly = true;
                 ToolTip = 'The message recived from TA will be downloaded in the XML form.';
                 trigger OnAction()
                 var
                     FileMgt: Codeunit "File Management";
                     TempBlob: Codeunit "Temp Blob";
-                    FileNameLbl: Label '%1.xml', Locked = true;
+                    FileNameLbl: Label '%1-response.xml', Locked = true;
                     OStream: OutStream;
                 begin
                     TempBlob.CreateOutStream(OStream, TextEncoding::UTF8);
                     if Rec."Response Content".HasValue then begin
                         Rec."Response Content".ExportStream(OStream);
-                        FileMgt.BLOBExport(TempBlob, StrSubstNo(FileNameLbl, Rec."EOR Code"), true);
+                        FileMgt.BLOBExport(TempBlob, StrSubstNo(FileNameLbl, Rec."Source Document No."), true);
                     end;
                 end;
             }
 
-            action(ShowSalesLines)
+            action(OpenRelatedDocument)
             {
                 ApplicationArea = NPRSIFiscal;
-                Caption = 'Show Related POS Sale Lines';
+                Caption = 'Open Related Document';
                 Image = ShowList;
                 Promoted = true;
-                PromotedCategory = Category6;
+                PromotedCategory = Category7;
                 PromotedOnly = true;
-                ToolTip = 'Opens the sale lines related to the selected transaction record.';
+                ToolTip = 'Opens the document related to the selected transaction record.';
                 trigger OnAction()
                 var
-                    POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+                    POSEntry: Record "NPR POS Entry";
+                    SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+                    SalesInvoiceHeader: Record "Sales Invoice Header";
                 begin
-                    POSEntrySalesLine.FilterGroup(10);
-                    POSEntrySalesLine.SetRange("POS Entry No.", Rec."POS Entry No.");
-                    POSEntrySalesLine.FilterGroup(0);
-
-                    Page.RunModal(Page::"NPR POS Entry Sales Line List", POSEntrySalesLine);
+                    case Rec."Audit Entry Type" of
+                        "NPR SI Audit Entry Type"::"POS Entry":
+                            begin
+                                POSEntry.Get(Rec."POS Entry No.");
+                                Page.RunModal(Page::"NPR POS Entry Card", POSEntry);
+                            end;
+                        "NPR SI Audit Entry Type"::"Sales Invoice Header":
+                            begin
+                                SalesInvoiceHeader.Get(Rec."Source Document No.");
+                                Page.RunModal(Page::"Posted Sales Invoice", SalesInvoiceHeader);
+                            end;
+                        "NPR SI Audit Entry Type"::"Sales Cr. Memo Header":
+                            begin
+                                SalesCrMemoHeader.Get(Rec."Source Document No.");
+                                Page.RunModal(Page::"Posted Sales Credit Memo", SalesCrMemoHeader);
+                            end;
+                    end;
                 end;
             }
         }

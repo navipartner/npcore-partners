@@ -5,7 +5,7 @@ page 6151213 "NPR CRO POS Aud. Log Aux. Info"
     Editable = false;
     Extensible = false;
     PageType = List;
-    PromotedActionCategories = 'New,Process,Report,Process Receipt,Receipt Print,Related';
+    PromotedActionCategories = 'New,Process,Report,Process Receipt,Receipt Print,Download,Related';
     SourceTable = "NPR CRO POS Aud. Log Aux. Info";
     SourceTableView = sorting("Audit Entry No.") order(descending);
     UsageCategory = History;
@@ -94,42 +94,6 @@ page 6151213 "NPR CRO POS Aud. Log Aux. Info"
     {
         area(Processing)
         {
-            action("Open Related Document")
-            {
-                ApplicationArea = NPRCROFiscal;
-                Caption = 'Open Related Document';
-                Image = Open;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
-                Scope = Repeater;
-                ToolTip = 'Openes the Document related to the selected transaction.';
-
-                trigger OnAction()
-                var
-                    POSEntry: Record "NPR POS Entry";
-                    SalesCrMemoHeader: Record "Sales Cr.Memo Header";
-                    SalesInvoiceHeader: Record "Sales Invoice Header";
-                begin
-                    case Rec."Audit Entry Type" of
-                        "NPR CRO Audit Entry Type"::"POS Entry":
-                            begin
-                                POSEntry.Get(Rec."POS Entry No.");
-                                Page.RunModal(Page::"NPR POS Entry Card", POSEntry);
-                            end;
-                        Rec."Audit Entry Type"::"Sales Invoice":
-                            begin
-                                SalesInvoiceHeader.Get(Rec."Source Document No.");
-                                Page.RunModal(Page::"Posted Sales Invoice", SalesInvoiceHeader);
-                            end;
-                        Rec."Audit Entry Type"::"Sales Credit Memo":
-                            begin
-                                SalesCrMemoHeader.Get(Rec."Source Document No.");
-                                Page.RunModal(Page::"Posted Sales Credit Memo", SalesCrMemoHeader);
-                            end;
-                    end;
-                end;
-            }
             action(SendToTA)
             {
                 ApplicationArea = NPRCROFiscal;
@@ -175,82 +139,67 @@ page 6151213 "NPR CRO POS Aud. Log Aux. Info"
                     end;
                 }
             }
-            group(Download)
-            {
-                Caption = 'Download';
-                Image = Download;
 
-                action(DownloadRequest)
-                {
-                    ApplicationArea = NPRCROFiscal;
-                    Caption = 'Download Request Message';
-                    Image = ExportElectronicDocument;
-                    Promoted = true;
-                    PromotedCategory = Category5;
-                    PromotedIsBig = true;
-                    PromotedOnly = true;
-                    ToolTip = 'The message sent to TA will be downloaded in the XML form.';
-                    trigger OnAction()
-                    var
-                        FileMgt: Codeunit "File Management";
-                        TempBlob: Codeunit "Temp Blob";
-                        FileNameLbl: Label '%1.xml', Locked = true;
-                        OStream: OutStream;
-                    begin
-                        TempBlob.CreateOutStream(OStream, TextEncoding::UTF8);
-                        if Rec."Receipt Content".HasValue() then begin
-                            Rec."Receipt Content".ExportStream(OStream);
-                            FileMgt.BLOBExport(TempBlob, StrSubstNo(FileNameLbl, Rec."ZKI Code"), true);
-                        end;
+            action(DownloadRequest)
+            {
+                ApplicationArea = NPRCROFiscal;
+                Caption = 'Download Request Message';
+                Image = ExportElectronicDocument;
+                Promoted = true;
+                PromotedCategory = Category6;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+                ToolTip = 'The message sent to TA will be downloaded in the XML form.';
+                trigger OnAction()
+                var
+                    FileMgt: Codeunit "File Management";
+                    TempBlob: Codeunit "Temp Blob";
+                    FileNameLbl: Label '%1.xml', Locked = true;
+                    OStream: OutStream;
+                begin
+                    TempBlob.CreateOutStream(OStream, TextEncoding::UTF8);
+                    if Rec."Receipt Content".HasValue() then begin
+                        Rec."Receipt Content".ExportStream(OStream);
+                        FileMgt.BLOBExport(TempBlob, StrSubstNo(FileNameLbl, Rec."ZKI Code"), true);
                     end;
-                }
+                end;
             }
 
-            group(Related)
+            action("Open Related Document")
             {
-                Caption = 'Related';
+                ApplicationArea = NPRCROFiscal;
+                Caption = 'Open Related Document';
+                Image = Open;
+                Promoted = true;
+                PromotedCategory = Category7;
+                PromotedOnly = true;
+                Scope = Repeater;
+                ToolTip = 'Opens the Document related to the selected transaction.';
 
-                action(ShowSalesLines)
-                {
-                    ApplicationArea = NPRCROFiscal;
-                    Caption = 'Show Related Sale Lines';
-                    Image = ShowList;
-                    Promoted = true;
-                    PromotedCategory = Category6;
-                    PromotedIsBig = true;
-                    PromotedOnly = true;
-                    ToolTip = 'Opens the sale lines related to the selected transaction record.';
-                    trigger OnAction()
-                    var
-                        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
-                        SalesCrMemoLine: Record "Sales Cr.Memo Line";
-                        SalesInvoiceLine: Record "Sales Invoice Line";
-                    begin
-                        case Rec."Audit Entry Type" of
-                            "NPR CRO Audit Entry Type"::"POS Entry":
-                                begin
-                                    POSEntrySalesLine.FilterGroup(10);
-                                    POSEntrySalesLine.SetRange("POS Entry No.", Rec."POS Entry No.");
-                                    POSEntrySalesLine.FilterGroup(0);
-                                    Page.RunModal(Page::"NPR POS Entry Sales Line List", POSEntrySalesLine);
-                                end;
-                            "NPR CRO Audit Entry Type"::"Sales Invoice":
-                                begin
-                                    SalesInvoiceLine.FilterGroup(10);
-                                    SalesInvoiceLine.SetRange("Document No.", Rec."Source Document No.");
-                                    SalesInvoiceLine.FilterGroup(0);
-                                    Page.RunModal(Page::"Posted Sales Invoice Lines", SalesInvoiceLine);
-                                end;
-                            "NPR CRO Audit Entry Type"::"Sales Credit Memo":
-                                begin
-                                    SalesCrMemoLine.FilterGroup(10);
-                                    SalesCrMemoLine.SetRange("Document No.", Rec."Source Document No.");
-                                    SalesCrMemoLine.FilterGroup(0);
-                                    Page.RunModal(Page::"Posted Sales Credit Memo Lines", SalesCrMemoLine);
-                                end;
-                        end;
+                trigger OnAction()
+                var
+                    POSEntry: Record "NPR POS Entry";
+                    SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+                    SalesInvoiceHeader: Record "Sales Invoice Header";
+                begin
+                    case Rec."Audit Entry Type" of
+                        "NPR CRO Audit Entry Type"::"POS Entry":
+                            begin
+                                POSEntry.Get(Rec."POS Entry No.");
+                                Page.RunModal(Page::"NPR POS Entry Card", POSEntry);
+                            end;
+                        Rec."Audit Entry Type"::"Sales Invoice":
+                            begin
+                                SalesInvoiceHeader.Get(Rec."Source Document No.");
+                                Page.RunModal(Page::"Posted Sales Invoice", SalesInvoiceHeader);
+                            end;
+                        Rec."Audit Entry Type"::"Sales Credit Memo":
+                            begin
+                                SalesCrMemoHeader.Get(Rec."Source Document No.");
+                                Page.RunModal(Page::"Posted Sales Credit Memo", SalesCrMemoHeader);
+                            end;
                     end;
-                }
+                end;
             }
         }
     }
