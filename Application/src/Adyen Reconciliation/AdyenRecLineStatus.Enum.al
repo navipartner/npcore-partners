@@ -37,4 +37,8 @@ enum 6014661 "NPR Adyen Rec. Line Status"
     {
         Caption = 'Not to be Posted';
     }
+    value(70; "Not to be Matched")
+    {
+        Caption = 'Not to be Matched';
+    }
 }

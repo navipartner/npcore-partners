@@ -762,7 +762,7 @@
                     'UpdateAdyenReconLinePostingAllowed':
                         exit('NPR-UpdateAdyenReconLinePostingAllowed-20240626');
                     'UpdateAdyenReconciliationStatus':
-                        exit('NPR-UpdateAdyenReconciliationStatus-20240828');
+                        exit('NPR-UpdateAdyenReconciliationStatus-20241112');
                     'UpdateAdyenReconciliationDocumentProcessingStatus':
                         exit('NPR-UpdateAdyenReconciliationDocumentProcessingStatus-20241004');
                 end;

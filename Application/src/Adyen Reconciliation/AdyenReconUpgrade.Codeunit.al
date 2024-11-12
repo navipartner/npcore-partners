@@ -106,7 +106,7 @@ codeunit 6184908 "NPR Adyen Recon. Upgrade"
                 ReconHeader2 := ReconHeader;
                 ReconLine.Reset();
                 ReconLine.SetRange("Document No.", ReconHeader2."Document No.");
-                ReconLine.SetFilter(Status, '<>%1&<>%2', ReconLine.Status::Matched, ReconLine.Status::"Matched Manually");
+                ReconLine.SetFilter(Status, '<>%1&<>%2&<>%3', ReconLine.Status::Matched, ReconLine.Status::"Matched Manually", ReconLine.Status::"Not to be Matched");
                 if ReconLine.IsEmpty() then begin
                     ReconHeader2.Status := ReconHeader2.Status::Matched;
                     ReconHeader2.Modify();
