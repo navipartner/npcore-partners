@@ -701,7 +701,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             ReconciliationLine."Transaction Type"::SettledInstallmentExternallyWithInfo:
                 RecordPrepared := FeeCreatePost.PrepareRecords(ReconciliationLine, ReconciliationHeader, GLAccountType::"Settled External Commission G/L Account");
         end;
-        ReconciliationLine.Status := ReconciliationLine.Status::Matched;
+        ReconciliationLine.Status := ReconciliationLine.Status::"Not to be Matched";
         if RecordPrepared then
             if FeeCreatePost.FeePosted(ReconciliationLine) then begin
                 ReconciliationLine."Matching Entry System ID" := FeeCreatePost.GetGlEntrySystemID();
@@ -735,7 +735,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             exit(true);
         end;
 
-        ReconciliationLine.SetFilter(Status, '%1|%2', ReconciliationLine."Status"::Matched, ReconciliationLine.Status::"Failed to Post");
+        ReconciliationLine.SetFilter(Status, '%1|%2|%3|%4', ReconciliationLine.Status::Matched, ReconciliationLine.Status::"Not to be Matched", ReconciliationLine.Status::"Matched Manually", ReconciliationLine.Status::"Failed to Post");
         if ReconciliationLine.IsEmpty() then begin
             _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(PostTransactionsError01, ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID");
             exit(false);
@@ -834,7 +834,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         end;
 
 
-        if not (ReconciliationLine.Status in [ReconciliationLine.Status::Matched, ReconciliationLine.Status::"Matched Manually", ReconciliationLine.Status::"Failed to Post"]) then begin
+        if not (ReconciliationLine.Status in [ReconciliationLine.Status::Matched, ReconciliationLine.Status::"Not to be Matched", ReconciliationLine.Status::"Matched Manually", ReconciliationLine.Status::"Failed to Post"]) then begin
             _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(PostTransactionsError04, Format(ReconciliationLine."PSP Reference")), ReconciliationHeader."Webhook Request ID");
             UnPostedEntries += 1;
             exit(UnPostedEntries);
