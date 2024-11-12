@@ -95,6 +95,11 @@ xmlport 6151144 "NPR M2 Get Extended Account"
                             {
                                 XmlName = 'TotalSalesFiscalYear';
                             }
+                            fieldelement(responsibilityCenter; TmpSellToCustomer."Responsibility Center")
+                            {
+                                XmlName = 'ResponsibilityCenter';
+                                MinOccurs = Zero;
+                            }
                         }
                     }
                     tableelement(tmpbilltocustomer; Customer)
