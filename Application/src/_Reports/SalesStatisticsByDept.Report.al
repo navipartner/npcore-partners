@@ -12,13 +12,13 @@
 
     dataset
     {
-        dataitem("Dimension Value"; "Dimension Value")
+        dataitem(Buffer; "NPR Sales Stat Buffer Table")
         {
-            DataItemTableView = sorting(Code, "Global Dimension No.") where("Global Dimension No." = const(1));
-            column(COMPANYNAME; CompanyName) { }
+            UseTemporary = true;
+            column(COMPANYNAME; CompanyName()) { }
             column(FilterList; FilterList) { }
-            column(Code_DimensionValue; "Dimension Value".Code) { }
-            column(Name_DimensionValue; "Dimension Value".Name) { }
+            column(Code_DimensionValue; Buffer.Code) { }
+            column(Name_DimensionValue; Buffer.Description) { }
             column(VELocQty_DimensionValue; VELocQty) { }
             column(VELocCost; VELocCost) { }
             column(VELocSales; VELocSales) { }
@@ -36,186 +36,47 @@
             column(LastYear; LastYear) { }
             column(CurrentYearShow; CurrentYearShow) { }
             column(LastYearShow; LastYearShow) { }
-            column(SalesPerson; SalespersonCode) { }
+            column(SalesPerson; SalespersonFilter) { }
 
             trigger OnAfterGetRecord()
-            var
-                TempValueEntry: Record "Value Entry" temporary;
-                CostAmount: Decimal;
-                SalesAmount: Decimal;
             begin
-                VELocLastYearTotalCost := 0;
-
-                if not IsGroupedByLocation then
-                    if not firstDimValue then
-                        CurrReport.Skip()
-                    else
-                        firstDimValue := false;
-
                 CurrentYearShow := true;
-                LastYearShow := true;
 
-                Clear(ValueEntry);
-                ValueEntry.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
-                ValueEntry.SetRange(Filter_Dim_1_Code, Code);
-
-                if DateFilter <> '' then
-                    ValueEntry.SetFilter(Filter_DateTime, DateFilter);
-                if Dim1Filter <> '' then
-                    ValueEntry.SetFilter(Filter_Dim_1_Code, Dim1Filter);
-                if Dim2Filter <> '' then
-                    ValueEntry.SetFilter(Filter_Dim_2_Code, Dim2Filter);
-                if VendorFilter <> '' then
-                    ValueEntry.SetFilter(Filter_Vendor_No, VendorFilter);
-                if SalespersonCode <> '' then
-                    ValueEntry.SetFilter(Filter_Salespers_Purch_Code, SalespersonCode);
-                ValueEntry.Open();
-                while ValueEntry.Read() do begin
-                    SalesAmount += ValueEntry.Sum_Sales_Amount_Actual;
-                    CostAmount += ValueEntry.Sum_Cost_Amount_Actual;
-                end;
-
-                Clear(ILEByDeptQuery);
-                Clear(ILEByPersonQuery);
-                VELocQty := 0;
-                case SalespersonCode <> '' of
-                    true:
-                        begin
-                            ILEByPersonQuery.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
-                            ILEByPersonQuery.SetRange(Filter_Global_Dimension_1_Code, Code);
-
-                            if DateFilter <> '' then
-                                ILEByPersonQuery.SetFilter(Filter_Posting_Date, DateFilter);
-                            if Dim1Filter <> '' then
-                                ILEByPersonQuery.SetFilter(Filter_Global_Dimension_1_Code, Dim1Filter);
-                            if Dim2Filter <> '' then
-                                ILEByPersonQuery.SetFilter(Filter_Global_Dimension_2_Code, Dim2Filter);
-                            if VendorFilter <> '' then
-                                ILEByPersonQuery.SetFilter(Filter_Vendor_No_, VendorFilter);
-                            ILEByPersonQuery.SetFilter(Filter_SalesPers_Purch_Code, SalespersonCode);
-                            ILEByPersonQuery.Open();
-                            while ILEByPersonQuery.Read() do
-                                VELocQty += -ILEByPersonQuery.Quantity;
-                            ILEByPersonQuery.Close();
-                        end;
-                    false:
-                        begin
-                            ILEByDeptQuery.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
-                            ILEByDeptQuery.SetRange(Filter_Global_Dimension_1_Code, Code);
-
-                            if DateFilter <> '' then
-                                ILEByDeptQuery.SetFilter(Filter_Posting_Date, DateFilter);
-                            if Dim1Filter <> '' then
-                                ILEByDeptQuery.SetFilter(Filter_Global_Dimension_1_Code, Dim1Filter);
-                            if Dim2Filter <> '' then
-                                ILEByDeptQuery.SetFilter(Filter_Global_Dimension_2_Code, Dim2Filter);
-                            if VendorFilter <> '' then
-                                ILEByDeptQuery.SetFilter(Filter_Vendor_No, VendorFilter);
-                            ILEByDeptQuery.Open();
-                            while ILEByDeptQuery.Read() do
-                                VELocQty += -ILEByDeptQuery.Quantity;
-                            ILEByDeptQuery.Close();
-                        end;
-                end;
-                VELocCost := -CostAmount;
-                VELocSales := SalesAmount;
+                VELocSales := Buffer."Decimal Field 1";
+                VELocCost := -Buffer."Decimal Field 2";
+                VELocQty := -Buffer."Decimal Field 3";
 
                 VETotalProfit := VELocSales - VELocCost;
                 VETotalGlobalProfit += VETotalProfit;
-                CurrentYearShow := true;
+                if VELocQty = 0 then
+                    CurrentYearShow := false;
 
                 if ((Dim1Filter <> '') and (Dim1Filter <> Code)) or (VELocQty = 0) then
                     CurrentYearShow := false;
 
-                Clear(ValueEntryLastYear);
-                ValueEntryLastYear.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
-                ValueEntryLastYear.SetRange(Filter_Dim_1_Code, Code);
 
-                if Dim1Filter <> '' then
-                    ValueEntryLastYear.SetFilter(Filter_Dim_1_Code, Dim1Filter);
-                if Dim2Filter <> '' then
-                    ValueEntryLastYear.SetFilter(Filter_Dim_2_Code, Dim2Filter);
-                if VendorFilter <> '' then
-                    ValueEntryLastYear.SetFilter(Filter_Vendor_No, VendorFilter);
-                if SalespersonCode <> '' then
-                    ValueEntryLastYear.SetFilter(Filter_Salespers_Purch_Code, SalespersonCode);
-
-                if DateFilter <> '' then begin
-                    TempValueEntry.SetFilter("Posting Date", DateFilter);
-                    ValueEntryLastYear.SetRange(Filter_DateTime,
-                    CalcDate('<-1Y>', TempValueEntry.GetRangeMin("Posting Date")),
-                    CalcDate('<-1Y>', TempValueEntry.GetRangeMax("Posting Date")));
-                end;
-                Clear(CostAmount);
-                Clear(SalesAmount);
-                ValueEntryLastYear.Open();
-                while ValueEntryLastYear.Read() do begin
-                    SalesAmount += ValueEntryLastYear.Sum_Sales_Amount_Actual;
-                    CostAmount += ValueEntryLastYear.Sum_Cost_Amount_Actual;
-                end;
-
-                Clear(ILEByDeptLastYearQuery);
-                Clear(ILEByPersonLastYearQuery);
+                VELocLastYearTotalCost := 0;
                 VELocLastYearTotalQty := 0;
-                case SalespersonCode <> '' of
-                    true:
-                        begin
-                            ILEByPersonLastYearQuery.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
-                            ILEByPersonLastYearQuery.SetRange(Filter_Global_Dimension_1_Code, Code);
+                VELocLastYearTotalSales := 0;
+                LastYearShow := true;
+                if LastYear then begin
+                    VELocLastYearTotalSales := Buffer."Decimal Field 4";
+                    VELocLastYearTotalCost := -Buffer."Decimal Field 5";
+                    VELocLastYearTotalQty := -Buffer."Decimal Field 6";
+                    VELocLastYearTotalProfit := VELocLastYearTotalSales - VELocLastYearTotalCost;
+                    VELastYearTotalGlobalProfit += VELocLastYearTotalProfit;
 
-                            if DateFilter <> '' then
-                                ILEByPersonLastYearQuery.SetFilter(Filter_Posting_Date, DateFilter);
-                            if Dim1Filter <> '' then
-                                ILEByPersonLastYearQuery.SetFilter(Filter_Global_Dimension_1_Code, Dim1Filter);
-                            if Dim2Filter <> '' then
-                                ILEByPersonLastYearQuery.SetFilter(Filter_Global_Dimension_2_Code, Dim2Filter);
-                            if VendorFilter <> '' then
-                                ILEByPersonLastYearQuery.SetFilter(Filter_Vendor_No_, VendorFilter);
-                            if SalespersonCode <> '' then
-                                ILEByPersonLastYearQuery.SetFilter(Filter_SalesPers_Purch_Code, SalespersonCode);
-
-                            if DateFilter <> '' then
-                                ILEByPersonLastYearQuery.SetRange(Filter_Posting_Date,
-                                CalcDate('<-1Y>', MinDate),
-                                CalcDate('<-1Y>', MaxDate));
-                            ILEByPersonLastYearQuery.Open();
-                            while ILEByPersonLastYearQuery.Read() do
-                                VELocLastYearTotalQty += -ILEByPersonLastYearQuery.Quantity;
-                            ILEByPersonLastYearQuery.Close();
-                        end;
-                    false:
-                        begin
-                            ILEByDeptLastYearQuery.SetRange(Filter_Entry_Type, Enum::"Item Ledger Entry Type"::Sale);
-                            ILEByDeptLastYearQuery.SetRange(Filter_Global_Dimension_1_Code, Code);
-
-                            if DateFilter <> '' then
-                                ILEByDeptLastYearQuery.SetFilter(Filter_Posting_Date, DateFilter);
-                            if Dim1Filter <> '' then
-                                ILEByDeptLastYearQuery.SetFilter(Filter_Global_Dimension_1_Code, Dim1Filter);
-                            if Dim2Filter <> '' then
-                                ILEByDeptLastYearQuery.SetFilter(Filter_Global_Dimension_2_Code, Dim2Filter);
-                            if VendorFilter <> '' then
-                                ILEByDeptLastYearQuery.SetFilter(Filter_Vendor_No, VendorFilter);
-                            if DateFilter <> '' then
-                                ILEByDeptLastYearQuery.SetRange(Filter_Posting_Date,
-                                CalcDate('<-1Y>', MinDate),
-                                CalcDate('<-1Y>', MaxDate));
-                            ILEByDeptLastYearQuery.Open();
-                            while ILEByDeptLastYearQuery.Read() do
-                                VELocLastYearTotalQty += -ILEByDeptLastYearQuery.Quantity;
-                            ILEByDeptLastYearQuery.Close();
-                        end;
+                    if ((Dim1Filter <> '') and (Dim1Filter <> Code)) or (VELocLastYearTotalQty = 0) then
+                        LastYearShow := false;
                 end;
-                VELocLastYearTotalCost := -CostAmount;
-                VELocLastYearTotalSales := SalesAmount;
-                VELocLastYearTotalProfit := VELocLastYearTotalSales - VELocLastYearTotalCost;
-                VELastYearTotalGlobalProfit += VELocLastYearTotalProfit;
+            end;
 
-                LastYearShow := (LastYear and (DateFilter <> ''));
-                if ((Dim1Filter <> '') and (Dim1Filter <> Code)) or (VELocLastYearTotalQty = 0) then
-                    LastYearShow := false;
+            trigger OnPostDataItem()
+            begin
+                LastYearShow := LastYear;
             end;
         }
+
 
         dataitem("Item Category"; "Item Category")
         {
@@ -233,40 +94,12 @@
                 group(Control6150614)
                 {
                     ShowCaption = false;
-                    field("antal niveauer"; LevelsToShow)
-                    {
-                        ApplicationArea = NPRRetail;
-                        Caption = 'Levels To Show';
-                        ToolTip = 'Specifies the value of the Show No. Of Levels field';
-                    }
-                    field("kunmed salg"; SalesOnly)
-                    {
-                        ApplicationArea = NPRRetail;
-                        Caption = 'Sales Only';
-                        ToolTip = 'Specifies the value of the Only with Sales field';
-                    }
+
                     field("last Year"; LastYear)
                     {
                         ApplicationArea = NPRRetail;
                         Caption = 'Show Last Year';
                         ToolTip = 'Specifies the value of the Print Last Years Numbers field';
-                    }
-                    field("is Grouped By Location"; IsGroupedByLocation)
-                    {
-                        ApplicationArea = NPRRetail;
-                        Caption = 'Group By';
-                        CaptionClass = Dim1LabelTxt;
-
-                        ToolTip = 'Specifies the value of the Group By field';
-                    }
-                    field("Sales Person"; SalespersonCode)
-                    {
-                        ApplicationArea = NPRRetail;
-                        Caption = 'Salesperson';
-                        TableRelation = "Salesperson/Purchaser".Code;
-
-                        ToolTip = 'Specifies the value of the Sales Person field';
-                        Visible = false;
                     }
                 }
             }
@@ -274,7 +107,6 @@
 
         trigger OnOpenPage()
         begin
-            LevelsToShow := 2;
         end;
     }
 
@@ -300,8 +132,6 @@
         CompanyInformation.Get();
         CompanyInformation.CalcFields(Picture);
 
-        IsGroupedByLocation := true;
-
         CaptionClassDim1 := '1,1,1';
         Dim1Txt := CaptionClassTranslate(CaptionClassDim1);
 
@@ -312,11 +142,8 @@
 
     trigger OnPreReport()
     begin
-        if SalespersonCode = '' then
-            FilterList := "Item Category".GetFilters()
-        else
-            FilterList := "Item Category".GetFilters() + ' SalesPerson: ' + SalespersonCode;
-        SalespersonCode := "Item Category"."NPR Salesperson/Purch. Filter";
+        FilterList := "Item Category".GetFilters();
+        SalespersonFilter := "Item Category"."NPR Salesperson/Purch. Filter";
         DateFilter := "Item Category".GetFilter("NPR Date Filter");
         MinDate := "Item Category".GetRangeMin("NPR Date Filter");
         MaxDate := "Item Category".GetRangeMax("NPR Date Filter");
@@ -324,23 +151,106 @@
         Dim2Filter := "Item Category".GetFilter("NPR Global Dimension 2 Filter");
         VendorFilter := "Item Category".GetFilter("NPR Vendor Filter");
 
-        firstDimValue := true;
+        InitBuffer();
+        GetPeriodData();
+        if LastYear then
+            GetPreviousYearData();
+    end;
+
+
+    local procedure InitBuffer()
+    var
+        DimensionValue: Record "Dimension Value";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+    begin
+        GeneralLedgerSetup.Get();
+        DimensionValue.SetRange("Dimension Code", GeneralLedgerSetup."Global Dimension 1 Code");
+        if Dim1Filter <> '' then
+            DimensionValue.SetFilter(Code, Dim1Filter);
+        if DimensionValue.FindSet() then
+            repeat
+                Buffer.Init();
+                Buffer.Code := DimensionValue.Code;
+                Buffer.Description := DimensionValue.Name;
+                Buffer.Insert();
+            until DimensionValue.Next() = 0;
+    end;
+
+    local procedure GetPeriodData()
+    var
+        SalesStatisticsbyDepar: Query "NPR Sales Statistics by Depar";
+    begin
+        SalesStatisticsbyDepar.SetFilter(Posting_Date_Filter, DateFilter);
+
+        if Dim1Filter <> '' then
+            SalesStatisticsbyDepar.SetFilter(Global_Dimension_1_Filter, Dim1Filter);
+        if Dim2Filter <> '' then
+            SalesStatisticsbyDepar.SetFilter(Global_Dimension_2_Filter, Dim2Filter);
+        if SalespersonFilter <> '' then
+            SalesStatisticsbyDepar.SetFilter(Salespers__Purch__Filter, SalespersonFilter);
+        if VendorFilter <> '' then
+            SalesStatisticsbyDepar.SetFilter(Vendor_No_Filter, VendorFilter);
+
+        SalesStatisticsbyDepar.Open();
+        while SalesStatisticsbyDepar.Read() do begin
+            PopulateBuffer(SalesStatisticsbyDepar);
+        end;
+        SalesStatisticsbyDepar.Close();
+    end;
+
+    local procedure PopulateBuffer(SalesStatisticsbyDepar: Query "NPR Sales Statistics by Depar")
+    begin
+        if not Buffer.Get(SalesStatisticsbyDepar.Dimension_1_Code) then begin
+            Buffer.Init();
+            Buffer.Code := SalesStatisticsbyDepar.Dimension_1_Code;
+            Buffer.Insert();
+        end;
+        Buffer."Decimal Field 1" := SalesStatisticsbyDepar.Sales_Amount__Actual;
+        Buffer."Decimal Field 2" := SalesStatisticsbyDepar.Cost_Amount__Actual;
+        Buffer."Decimal Field 3" := SalesStatisticsbyDepar.Item_Ledger_Entry_Quantity;
+        Buffer.Modify();
+    end;
+
+    local procedure GetPreviousYearData()
+    var
+        SalesStatisticsbyDepar: Query "NPR Sales Statistics by Depar";
+    begin
+        SalesStatisticsbyDepar.SetRange(Posting_Date_Filter, CalcDate('<-1Y>', MinDate), CalcDate('<-1Y>', MaxDate));
+        if Dim1Filter <> '' then
+            SalesStatisticsbyDepar.SetFilter(Global_Dimension_1_Filter, Dim1Filter);
+        if Dim2Filter <> '' then
+            SalesStatisticsbyDepar.SetFilter(Global_Dimension_2_Filter, Dim2Filter);
+        if SalespersonFilter <> '' then
+            SalesStatisticsbyDepar.SetFilter(Salespers__Purch__Filter, SalespersonFilter);
+        if VendorFilter <> '' then
+            SalesStatisticsbyDepar.SetFilter(Vendor_No_Filter, VendorFilter);
+
+        SalesStatisticsbyDepar.Open();
+        while SalesStatisticsbyDepar.Read() do begin
+            PopulateBufferPrevious(SalesStatisticsbyDepar);
+        end;
+        SalesStatisticsbyDepar.Close();
+    end;
+
+    local procedure PopulateBufferPrevious(SalesStatisticsbyDepar: Query "NPR Sales Statistics by Depar")
+    begin
+        if not Buffer.Get(SalesStatisticsbyDepar.Dimension_1_Code) then begin
+            Buffer.Init();
+            Buffer.Code := SalesStatisticsbyDepar.Dimension_1_Code;
+            Buffer.Insert();
+        end;
+        Buffer."Decimal Field 4" := SalesStatisticsbyDepar.Sales_Amount__Actual;
+        Buffer."Decimal Field 5" := SalesStatisticsbyDepar.Cost_Amount__Actual;
+        Buffer."Decimal Field 6" := SalesStatisticsbyDepar.Item_Ledger_Entry_Quantity;
+        Buffer.Modify();
     end;
 
     var
         CompanyInformation: Record "Company Information";
-        ILEByDeptLastYearQuery: Query "NPR Sales Statistics By Dept";
-        ILEByDeptQuery: Query "NPR Sales Statistics By Dept";
-        ILEByPersonLastYearQuery: Query "NPR Sales Statistics By Person";
-        ILEByPersonQuery: Query "NPR Sales Statistics By Person";
-        ValueEntry: Query "NPR Value Entry With Vendor";
-        ValueEntryLastYear: Query "NPR Value Entry With Vendor";
         CurrentYearShow: Boolean;
-        firstDimValue: Boolean;
-        IsGroupedByLocation: Boolean;
+
         LastYear: Boolean;
         LastYearShow: Boolean;
-        SalesOnly: Boolean;
         MaxDate: Date;
         MinDate: Date;
         VELastYearTotalGlobalProfit: Decimal;
@@ -354,13 +264,12 @@
         VELocSales: Decimal;
         VETotalGlobalProfit: Decimal;
         VETotalProfit: Decimal;
-        LevelsToShow: Integer;
         DateFilter: Text;
         Dim1Filter: Text;
         Dim1Txt: Text;
         Dim2Filter: Text;
         FilterList: Text;
-        SalespersonCode: Text;
+        SalespersonFilter: Text;
         VendorFilter: Text;
         CaptionClassDim1: Text[30];
         Dim1LabelTxt: Text[100];
