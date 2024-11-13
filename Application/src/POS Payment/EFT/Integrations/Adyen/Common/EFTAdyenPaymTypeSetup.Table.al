@@ -116,6 +116,11 @@
             Caption = 'Store Id';
             DataClassification = CustomerContent;
         }
+        field(20; "Enable Tipping"; Boolean)
+        {
+            Caption = 'Enable Tipping';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
