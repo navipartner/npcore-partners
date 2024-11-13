@@ -14,6 +14,10 @@ codeunit 6151443 "NPR POSAction SS CreateAndPay" implements "NPR IPOS Workflow"
         SaleCOntentDesc: Label 'The contents of the sale to be created';
         PaymentTypeTitle: Label 'Payment Type';
         PaymentTypeDesc: Label 'The payment type to pay with';
+        CouponTitle: Label 'Coupons';
+        CouponDesc: Label 'Coupons to apply to the sale';
+        VoucherTitle: Label 'Vouchers';
+        VoucherDesc: Label 'Vouchers to apply to the sale';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
@@ -21,6 +25,8 @@ codeunit 6151443 "NPR POSAction SS CreateAndPay" implements "NPR IPOS Workflow"
         WorkflowConfig.AddTextParameter('saleSystemId', '', ParamSaleIdentifierTitle, ParamSaleIdentifierDesc);
         WorkflowConfig.AddTextParameter('saleContents', '', SaleContentTitle, SaleContentDesc);
         WorkflowConfig.AddTextParameter('paymentType', '', PaymentTypeTitle, PaymentTypeDesc);
+        WorkflowConfig.AddTextParameter('coupons', '', CouponTitle, CouponDesc);
+        WorkflowConfig.AddTextParameter('vouchers', '', VoucherTitle, VoucherDesc);
     end;
 
     procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
@@ -28,11 +34,11 @@ codeunit 6151443 "NPR POSAction SS CreateAndPay" implements "NPR IPOS Workflow"
     begin
         case Step of
             'createAndPreparePayment':
-                FrontEnd.WorkflowResponse(CreateAndPreparePayment(Context));
+                FrontEnd.WorkflowResponse(CreateAndPreparePayment(Context, Sale, SaleLine, PaymentLine));
         end;
     end;
 
-    procedure CreateAndPreparePayment(Context: codeunit "NPR POS JSON Helper"): JsonObject
+    procedure CreateAndPreparePayment(Context: codeunit "NPR POS JSON Helper"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"): JsonObject
     var
         SaleContents: JsonObject;
         SaleSystemId: Guid;
@@ -43,6 +49,8 @@ codeunit 6151443 "NPR POSAction SS CreateAndPay" implements "NPR IPOS Workflow"
         POSSale: Codeunit "NPR POS Sale";
         TMTicketRetailMgt: Codeunit "NPR TM Ticket Retail Mgt.";
         POSSaleRec: Record "NPR POS Sale";
+        Coupons: JsonArray;
+        Vouchers: JsonArray;
     begin
 
         if (not Evaluate(SaleSystemId, Context.GetStringParameter('saleSystemId'))) then
@@ -51,6 +59,14 @@ codeunit 6151443 "NPR POSAction SS CreateAndPay" implements "NPR IPOS Workflow"
         if (SaleContents.ReadFrom(Context.GetStringParameter('saleContents'))) then begin
             SaleContents.Get('ticketToken', JToken);
             TicketToken := JToken.AsValue().AsText();
+
+            if (SaleContents.Get('coupons', JToken)) then
+                if (JToken.IsArray()) then
+                    Coupons := JToken.AsArray();
+
+            if (SaleContents.Get('vouchers', JToken)) then
+                if (JToken.IsArray()) then
+                    Vouchers := JToken.AsArray();
         end;
 
         ExistingSale := CheckForExistingSale(SaleSystemId, TicketToken);
@@ -78,8 +94,92 @@ codeunit 6151443 "NPR POSAction SS CreateAndPay" implements "NPR IPOS Workflow"
         POSSale.GetCurrentSale(POSSaleRec);
         TMTicketRetailMgt.CreatePOSLinesForReservationRequest(TicketToken, POSSaleRec);
 
+        ApplySelfServiceCoupons(POSSale, SaleLine, Coupons);
+        ApplySelfServiceVouchers(POSSale, SaleLine, PaymentLine, Vouchers);
+
         exit(GetPaymentWorkflow(Context));
     end;
+
+    local procedure ApplySelfServiceCoupons(Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; Coupons: JsonArray)
+    var
+        CouponHandler: Codeunit "NPR POS Action: Scan Coupon B";
+        RequireSerialNo: Boolean;
+        ReferenceNo: Text[50];
+        CouponToken, CouponsToken : JsonToken;
+        ReservedCoupon: Record "NPR NpDc Ext. Coupon Reserv.";
+    begin
+        foreach CouponsToken in Coupons do begin
+            ReferenceNo := '';
+            if (CouponsToken.IsObject()) then
+                if (CouponsToken.AsObject().Get('referenceNo', CouponToken)) then
+                    ReferenceNo := CopyStr(CouponToken.AsValue().AsText(), 1, MaxStrLen(ReferenceNo));
+
+            if (CouponsToken.IsValue()) then
+                ReferenceNo := CopyStr(CouponsToken.AsValue().AsText(), 1, MaxStrLen(ReferenceNo));
+
+            if (ReferenceNo <> '') then begin
+                ReservedCoupon.SetFilter("Reference No.", '=%1', ReferenceNo);
+                if (ReservedCoupon.FindFirst()) then
+                    ReservedCoupon.Delete();
+
+                CouponHandler.ScanCoupon(ReferenceNo, Sale, SaleLine, RequireSerialNo);
+            end;
+        end;
+    end;
+
+    local procedure ApplySelfServiceVouchers(Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Vouchers: JsonArray)
+    var
+        VoucherToken, VouchersToken : JsonToken;
+        VoucherHandler2: Codeunit "NPR POS Action Scan Voucher2B";
+        Voucher: Record "NPR NpRv Voucher";
+        VoucherReservation: Record "NPR NpRv Sales Line";
+        ReferenceNo: Text[50];
+        ActionContext: JsonObject;
+        SaleAmount: Decimal;
+        PaidAmount: Decimal;
+        ReturnAmount: Decimal;
+        AmountToRedeem: Decimal;
+    begin
+        foreach VouchersToken in Vouchers do begin
+            ReferenceNo := '';
+            if (VouchersToken.IsObject()) then
+                if (VouchersToken.AsObject().Get('referenceNo', VoucherToken)) then
+                    ReferenceNo := CopyStr(VoucherToken.AsValue().AsText(), 1, MaxStrLen(ReferenceNo));
+
+            if (VouchersToken.IsValue()) then
+                ReferenceNo := CopyStr(VouchersToken.AsValue().AsText(), 1, MaxStrLen(ReferenceNo));
+
+            if (ReferenceNo <> '') then begin
+                Voucher.SetAutoCalcFields(Amount);
+                Voucher.SetFilter("Reference No.", '=%1', ReferenceNo);
+                Voucher.FindFirst(); // Blow up if voucher does not exist
+
+                VoucherReservation.SetFilter("Reference No.", '=%1', ReferenceNo);
+                VoucherReservation.SetFilter(Type, '=%1', VoucherReservation.Type::Payment);
+                if (VoucherReservation.FindSet()) then begin
+                    repeat
+                        VoucherReservation.Delete();
+                    until (VoucherReservation.Next() = 0);
+                end;
+
+                // Redeem amount selection is greedy, it will redeem as much as possible
+                PaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, AmountToRedeem);
+                if (AmountToRedeem > Voucher.Amount) then
+                    AmountToRedeem := Voucher.Amount;
+
+                VoucherHandler2.ProcessPayment(
+                        Voucher."Voucher Type",
+                        ReferenceNo,
+                        AmountToRedeem,
+                        Sale,
+                        PaymentLine,
+                        SaleLine,
+                        false,
+                        ActionContext);
+            end;
+        end;
+    end;
+
 
     local procedure CheckForExistingSale(SaleSystemId: Guid; TicketToken: Text): Integer
     var
