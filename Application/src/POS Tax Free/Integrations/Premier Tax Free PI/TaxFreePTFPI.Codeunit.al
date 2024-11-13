@@ -198,7 +198,7 @@
     begin
         XMLNodeList := XMLDoc.GetDescendantElements(CDATATagName);
         XMLNodeList.Get(1, XMLNode);
-        XMLMessage := XMLNode.AsXmlElement().InnerText;
+        XMLMessage := XMLNode.AsXmlElement().InnerXml();
         XmlDocument.ReadFrom(TypeHelper.HtmlDecode(XMLMessage), XMLDoc);
     end;
 
@@ -472,10 +472,9 @@
 
     local procedure ReplaceSpecialChars(Text: Text): Text
     var
-        TypeHelper: Codeunit "Type Helper";
+        XMLDOMManagement: Codeunit "XML DOM Management";
     begin
-        TypeHelper.HtmlEncode(Text);
-        exit(Text);
+        exit(XMLDOMManagement.XMLEscape(Text));
     end;
 
     local procedure IsStoredSaleEligible(SalesTicketNo: Text): Boolean
