@@ -285,6 +285,14 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         exit(EFTAdyenPaymentTypeSetup."Manual Capture");
     end;
 
+    procedure GetEnableTipping(EFTSetupIn: Record "NPR EFT Setup"): Boolean
+    var
+        EFTAdyenPaymentTypeSetup: Record "NPR EFT Adyen Paym. Type Setup";
+    begin
+        GetPaymentTypeParameters(EFTSetupIn, EFTAdyenPaymentTypeSetup);
+        exit(EFTAdyenPaymentTypeSetup."Enable Tipping");
+    end;
+
     local procedure GetCashbackAllowed(EFTSetupIn: Record "NPR EFT Setup"): Boolean
     var
         EFTAdyenPaymentTypeSetup: Record "NPR EFT Adyen Paym. Type Setup";

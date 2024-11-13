@@ -47,6 +47,11 @@
                     ToolTip = 'Specifies the value of the Cashback Allowed field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Enable Tipping"; Rec."Enable Tipping")
+                {
+                    ToolTip = 'Specifies if the terminal should ask about tipping per the configuration in Adyen''s portal';
+                    ApplicationArea = NPRRetail;
+                }
             }
 
             group(Cloud)

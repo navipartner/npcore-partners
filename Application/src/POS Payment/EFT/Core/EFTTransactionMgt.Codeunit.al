@@ -482,10 +482,10 @@
 
             case OriginalProcessingType of
                 EFTTransactionRequest."Processing Type"::PAYMENT:
-                    EFTTransactionRequest."Fee Line ID" := InsertAccountLine(POSSession, POSPaymentMethod."EFT Tip Account No.", EFTTransactionRequest."Fee Amount", '');
+                    EFTTransactionRequest."Tip Line ID" := InsertAccountLine(POSSession, POSPaymentMethod."EFT Tip Account No.", EFTTransactionRequest."Tip Amount", '');
                 EFTTransactionRequest."Processing Type"::REFUND,
                 EFTTransactionRequest."Processing Type"::VOID:
-                    EFTTransactionRequest."Fee Line ID" := InsertAccountLine(POSSession, POSPaymentMethod."EFT Tip Account No.", EFTTransactionRequest."Fee Amount" * -1, ' - ' + Format(EFTTransactionRequest."Processing Type"));
+                    EFTTransactionRequest."Tip Line ID" := InsertAccountLine(POSSession, POSPaymentMethod."EFT Tip Account No.", EFTTransactionRequest."Tip Amount" * -1, ' - ' + Format(EFTTransactionRequest."Processing Type"));
             end;
         end else begin
             POSPaymentMethod.Get(EFTTransactionRequest."POS Payment Type Code");

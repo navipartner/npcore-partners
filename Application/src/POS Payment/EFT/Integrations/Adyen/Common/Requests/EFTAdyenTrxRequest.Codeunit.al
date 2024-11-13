@@ -82,6 +82,12 @@ codeunit 6184589 "NPR EFT Adyen Trx Request"
         if (EFTTransactionRequest."Processing Type" in [EFTTransactionRequest."Processing Type"::PAYMENT, EFTTransactionRequest."Processing Type"::REFUND]) then begin
             Value := 'tenderOption=ReceiptHandler&tenderOption=GetAdditionalData';
 
+            if (
+                (EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::PAYMENT) and
+                (EFTAdyenIntegration.GetEnableTipping(EFTSetup))
+            ) then
+                Value += '&tenderOption=AskGratuity';
+
             case EFTAdyenIntegration.GetCreateRecurringContract(EFTSetup) of
                 EFTAdyenPaymentTypeSetup."Create Recurring Contract"::NO:
                     ;
