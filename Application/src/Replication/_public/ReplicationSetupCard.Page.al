@@ -195,6 +195,18 @@
                 Caption = 'Endpoints';
                 SubPageLink = "Service Code" = field("API Version");
             }
+
+            group(Options)
+            {
+                Caption = 'Options';
+                field("Add Tenant To MediaReadLinks"; Rec."Add Tenant To MediaReadLinks")
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Add Tenant To MediaReadLinks';
+                    ToolTip = 'Specifies if the system should add the tenant to the URLs used to retrieve Media, Mediaset or Blob fields.';
+                }
+
+            }
         }
 
     }

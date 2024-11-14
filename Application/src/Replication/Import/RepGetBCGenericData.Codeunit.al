@@ -258,6 +258,9 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
         StatusCode: Integer;
     begin
         ServiceSetup.Get(ReplicationEndPoint."Service Code");
+        if ServiceSetup."Add Tenant To MediaReadLinks" then
+            ServiceSetup.AddTenantToURL(BlobURL);
+
         ReplicationAPI.GetBCAPIResponseImage(ServiceSetup, ReplicationEndPoint, Client, Response, StatusCode, BlobURL);
 
         if ReplicationAPI.FoundErrorInResponse(Response, StatusCode) then
@@ -377,13 +380,16 @@ codeunit 6014605 "NPR Rep. Get BC Generic Data" implements "NPR Replication IEnd
         if NewImageURL = '' then
             Exit(false);
 
+        ServiceSetup.Get(ReplicationEndPoint."Service Code");
+        if ServiceSetup."Add Tenant To MediaReadLinks" then
+            ServiceSetup.AddTenantToURL(NewImageURL);
+
         if EValuate(ImageWidth, ReplicationAPI.SelectJsonToken(PictureJToken.AsObject(), '$.width')) then;
         if Evaluate(ImageHeight, ReplicationAPI.SelectJsonToken(PictureJToken.AsObject(), '$.height')) then;
         MimeType := COPYSTR(ReplicationAPI.SelectJsonToken(PictureJToken.AsObject(), '$.contentType'), 1, 100);
         FRef := RecRef.Field(FieldNo);
 
         if (ImageWidth > 0) AND (ImageHeight > 0) and (MimeType <> '') then begin
-            ServiceSetup.Get(ReplicationEndPoint."Service Code");
             ReplicationAPI.GetBCAPIResponseImage(ServiceSetup, ReplicationEndPoint, Client, Response, StatusCode, NewImageURL);
 
             if ReplicationAPI.FoundErrorInResponse(Response, StatusCode) then begin
