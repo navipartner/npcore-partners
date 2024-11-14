@@ -237,6 +237,11 @@
             Caption = 'Error Notification Email Address';
             DataClassification = CustomerContent;
         }
+        field(70; "Add Tenant To MediaReadLinks"; Boolean)
+        {
+            Caption = 'Add Tenant To MediaReadLinks';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {
