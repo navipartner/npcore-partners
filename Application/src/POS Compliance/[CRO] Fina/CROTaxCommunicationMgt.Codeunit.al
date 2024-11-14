@@ -194,7 +194,7 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
             Content.Add(CreateXmlElement('USustPdv', 'false'));
 
         Content.Add(CreateXmlElement('DatVrijeme', StrSubstNo(TimeStampLbl, Format(CROPOSAuditLogAuxInfo."Entry Date", 10, '<Day,2>.<Month,2>.<Year4>'), Format(CROPOSAuditLogAuxInfo."Log Timestamp", 8, '<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>'))));
-        Content.Add(CreateXmlElement('OznSlijed', 'N'));
+        Content.Add(CreateXmlElement('OznSlijed', 'P'));
 
         BillNoSection := XmlElement.Create('BrRac');
         BillNoSection.Add(CreateXmlElement('BrOznRac', CROPOSAuditLogAuxInfo."Bill No."));
