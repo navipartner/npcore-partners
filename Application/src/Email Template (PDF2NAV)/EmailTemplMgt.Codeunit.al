@@ -207,6 +207,32 @@
         Path := ExportHtmlTemplate(EmailTemplateHeader, false);
         Hyperlink(Path);
     end;
+
+    procedure UploadAttachment(var EmailAttachment: Record "NPR E-mail Attachment")
+    var
+        FileMgt: Codeunit "File Management";
+        TempBlob: Codeunit "Temp Blob";
+        FileName: Text;
+        RecRef: RecordRef;
+        Text001Lbl: Label 'Replace the existing file?';
+    begin
+        EmailAttachment.CalcFields("Attached File");
+        if EmailAttachment."Attached File".HasValue() then
+            if not Confirm(Text001Lbl, false) then
+                exit;
+
+        FileName := CopyStr(FileMgt.BLOBImport(TempBlob, '*.*'), 1, MaxStrLen(FileName));
+        if FileName = '' then
+            exit;
+        RecRef.GetTable(EmailAttachment);
+        TempBlob.ToRecordRef(RecRef, EmailAttachment.FieldNo("Attached File"));
+        RecRef.SetTable(EmailAttachment);
+
+        while StrPos(FileName, '\') <> 0 do
+            FileName := CopyStr(CopyStr(FileName, StrPos(FileName, '\') + 1, StrLen(FileName) - StrPos(FileName, '\')), 1, MaxStrLen(FileName));
+        EmailAttachment.Description := CopyStr(FileName, 1, MaxStrLen(EmailAttachment.Description));
+    end;
+
     #endregion
 }
 

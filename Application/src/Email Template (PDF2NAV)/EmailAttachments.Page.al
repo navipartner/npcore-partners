@@ -35,5 +35,25 @@
             }
         }
     }
+
+    actions
+    {
+        area(Processing)
+        {
+            action(UploadFile)
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Upload File';
+                ToolTip = 'Uploads file to the email attachment';
+                Image = Insert;
+                trigger OnAction()
+                var
+                    EmailTemplMgt: Codeunit "NPR E-mail Templ. Mgt.";
+                begin
+                    EmailTemplMgt.UploadAttachment(Rec);
+                end;
+            }
+        }
+    }
 }
 
