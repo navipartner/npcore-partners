@@ -227,8 +227,8 @@ codeunit 6151546 "NPR SI Audit Mgt."
         if not IsSIFiscalActive() then
             exit;
 
-        SIAuxSalesHeader.ReadSIAuxSalesHeaderFields(SalesHeader);
-        SIAuxSalesHeader.Delete();
+        if SIAuxSalesHeader.Get(SalesHeader.SystemId) then
+            SIAuxSalesHeader.Delete();
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Invoice Header", 'OnAfterDeleteEvent', '', false, false)]
@@ -455,13 +455,14 @@ codeunit 6151546 "NPR SI Audit Mgt."
         if not IsSIFiscalActive() then
             exit;
 
+        SIAuxSalesHeader.ReadSIAuxSalesHeaderFields(SalesHeader);
+        if SIAuxSalesHeader."NPR SI POS Unit" = '' then
+            exit;
+
         SalesHeader.TestField("Salesperson Code");
         SalespersonPurchaser.Get(SalesHeader."Salesperson Code");
         SIAuxSalespersonPurch.ReadSIAuxSalespersonFields(SalespersonPurchaser);
         SIAuxSalespersonPurch.TestField("NPR SI Salesperson Tax Number");
-
-        SIAuxSalesHeader.ReadSIAuxSalesHeaderFields(SalesHeader);
-        SIAuxSalesHeader.TestField("NPR SI POS Unit");
 
         if SalesHeader."Document Type" in [SalesHeader."Document Type"::"Credit Memo"] then begin
             if SIAuxSalesHeader."NPR SI Return Receipt No." <> '' then begin
@@ -477,6 +478,7 @@ codeunit 6151546 "NPR SI Audit Mgt."
     var
         SIFiscalizationSetup: Record "NPR SI Fiscalization Setup";
         SalesInvoiceHeader: Record "Sales Invoice Header";
+        SIAuxSalesInvHeader: Record "NPR SI Aux Sales Inv. Header";
         SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
         SITaxCommunicationMgt: Codeunit "NPR SI Tax Communication Mgt.";
         SIFiscalThermalPrint: Codeunit "NPR SI Fiscal Thermal Print";
@@ -485,6 +487,10 @@ codeunit 6151546 "NPR SI Audit Mgt."
             exit;
 
         SalesInvoiceHeader.Get(SalesInvHeaderNo);
+        SIAuxSalesInvHeader.ReadSIAuxSalesInvHeaderFields(SalesInvoiceHeader);
+        if SIAuxSalesInvHeader."NPR SI POS Unit" = '' then
+            exit;
+
         InsertSIPOSAuditLogAuxInfo(SalesInvoiceHeader);
 
         if not SIPOSAuditLogAuxInfo.GetAuditFromSalesInvHeader(SalesInvHeaderNo) then
@@ -502,6 +508,7 @@ codeunit 6151546 "NPR SI Audit Mgt."
     var
         SIFiscalizationSetup: Record "NPR SI Fiscalization Setup";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        SIAuxSalesCrMemoHeader: Record "NPR SI Aux Sales CrMemo Header";
         SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
         SITaxCommunicationMgt: Codeunit "NPR SI Tax Communication Mgt.";
         SIFiscalThermalPrint: Codeunit "NPR SI Fiscal Thermal Print";
@@ -511,6 +518,9 @@ codeunit 6151546 "NPR SI Audit Mgt."
             exit;
 
         SalesCrMemoHeader.Get(SalesCrMemoHeaderNo);
+        SIAuxSalesCrMemoHeader.ReadSIAuxSalesCrMemoHeaderFields(SalesCrMemoHeader);
+        if SIAuxSalesCrMemoHeader."NPR SI POS Unit" = '' then
+            exit;
 
         if not IsAppliesToDocumentFiscalized(SalesCrMemoHeader."Applies-to Doc. No.") then
             Error(AppliesToDocumentNotFiscalizedErr, SalesCrMemoHeader."No.", SalesCrMemoHeader."Applies-to Doc. No.");
