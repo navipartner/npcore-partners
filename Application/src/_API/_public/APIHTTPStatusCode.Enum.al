@@ -1,4 +1,4 @@
-enum 6059796 "NPR REST API HTTP Status Code"
+enum 6059813 "NPR API HTTP Status Code"
 {
     Extensible = false;
 

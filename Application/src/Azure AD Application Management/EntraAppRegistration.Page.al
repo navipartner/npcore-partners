@@ -25,13 +25,6 @@ page 6184803 "NPR Entra App Registration"
                             EntraAppSecretDisplayName := EntraAppDisplayName + ' - ' + Format(Today, 0, 9);
                     end;
                 }
-                field(EntraAppSecretDisplayName; EntraAppSecretDisplayName)
-                {
-                    Caption = 'Secret Name';
-                    ToolTip = 'Specifies the display name of the secret for the Entra Application.';
-                    ApplicationArea = NPRRetail;
-                    ShowMandatory = true;
-                }
             }
             part(PermissionSetsSubpage; "NPR Entra App Permissions")
             {

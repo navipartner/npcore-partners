@@ -2,6 +2,9 @@
 codeunit 6185021 "NPR REST API Response"
 {
     EventSubscriberInstance = Manual;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2024-10-13';
+    ObsoleteReason = 'Removed REST from object name';
 
     var
         _CurrCodeunit: Variant;

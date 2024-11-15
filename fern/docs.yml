@@ -4,9 +4,6 @@ instances:
 
 title: NaviPartner | NP Retail API Documentation
 
-announcement:
-    message: "🚀 The site is under construction currently ... We are going live during the next days! 🚀"
-
 layout:
   searchbar-placement: sidebar  # header, header-tabs, sidebar
   page-width: full
@@ -55,7 +52,7 @@ navigation:
     - api: API Reference
       api-name: default
       #icon: fa-solid fa-code
-      #flattened: true
+      flattened: true
       display-errors: false
       summary: ./docs/pages/apiref.mdx
       playground:
@@ -170,6 +167,13 @@ navigation:
                 summary: ./docs/pages/memberships/misc-introduction.mdx
                 contents:
                   - endpoint: memberships.service-misc.resolveIdentifier
+
+        - section: POS
+          summary: ./docs/pages/pos/overview.mdx
+          contents:
+          - pos.possale:
+              title: POS Sale
+              summary: ./docs/pages/pos/possale.mdx
 
 
 navbar-links:

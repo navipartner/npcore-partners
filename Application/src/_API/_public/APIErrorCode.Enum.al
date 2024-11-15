@@ -1,10 +1,10 @@
-enum 6059797 "NPR REST API Error Code"
+enum 6059810 "NPR API Error Code"
 {
     Extensible = true;
 
     value(0; generic_error)
     {
-        Caption = 'Unspecified error occurred.', Locked = true;
+        Caption = 'An error occurred. See HTTP status code.', Locked = true;
     }
 
     value(10; unsupported_http_method)
