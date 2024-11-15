@@ -708,6 +708,7 @@
                     '<redeem_partner_code>' + '<![CDATA[' + CopyStr(CompanyName(), 1, 20) + ']]>' + '</redeem_partner_code>' +
                     '<issue_posstore_code>' + VoucherEntry."POS Store Code" + '</issue_posstore_code>' +
                     '<company>' + '<![CDATA[' + VoucherEntry.Company + ']]>' + '</company>' +
+                    '<global_redeem_checked>true</global_redeem_checked>' +
                   '</voucher>' +
                 '</vouchers>' +
               '</RedeemVouchers>' +

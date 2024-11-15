@@ -318,6 +318,10 @@
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         InUseQty: Integer;
     begin
+        if NpRvVoucherBuffer."Global Redeem Checked" then
+            if GlobalRedeemChecked(NpRvVoucherBuffer."Reference No.") then
+                exit;
+
         if not FindVoucher(NpRvVoucherBuffer."Voucher Type", NpRvVoucherBuffer."Reference No.", NpRvVoucher) then
             Error(Text000, NpRvVoucherBuffer."Reference No.");
         NpRvVoucher.CalcFields(Open, Amount);
@@ -594,6 +598,15 @@
             Voucher.SetFilter("Voucher Type", UpperCase(VoucherTypeFilter));
         Voucher.SetRange("Reference No.", ReferenceNo);
         exit(Voucher.FindLast());
+    end;
+
+    local procedure GlobalRedeemChecked(ReferenceNo: Text[50]): Boolean
+    var
+        NpRvArchVoucher: Record "NPR NpRv Arch. Voucher";
+    begin
+        NpRvArchVoucher.SetRange("Reference No.", ReferenceNo);
+        if not NpRvArchVoucher.IsEmpty() then
+            exit(true);
     end;
 
     local procedure GetServiceName(NpRvIssuer: Record "NPR NpRv Partner") ServiceName: Text

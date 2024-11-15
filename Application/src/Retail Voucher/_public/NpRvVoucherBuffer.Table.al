@@ -189,6 +189,11 @@
             Caption = 'Company';
             DataClassification = CustomerContent;
         }
+        field(2027; "Global Redeem Checked"; Boolean)
+        {
+            Caption = 'Global Redeem Checked';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

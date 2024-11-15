@@ -135,6 +135,10 @@ xmlport 6151010 "NPR NpRv Global Vouchers"
                 {
                     MinOccurs = Zero;
                 }
+                fieldelement(global_redeem_checked; NpRvVoucherBuffer."Global Redeem Checked")
+                {
+                    MinOccurs = Zero;
+                }
             }
         }
     }
