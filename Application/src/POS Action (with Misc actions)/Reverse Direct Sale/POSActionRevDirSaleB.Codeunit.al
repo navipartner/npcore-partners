@@ -299,6 +299,7 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
             repeat
                 InsertPaymentLine(SalePOS, CopyLineDimensions, POSEntryPaymentLines);
             until POSEntryPaymentLines.Next() = 0;
+        CalculateAndAddChangeAmount(SalePOS, SalesTicketNo);
     end;
 
     local procedure GetPaymentLineNo(SalePOS: Record "NPR POS Sale"): Integer
@@ -338,9 +339,9 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
         PaymentLine."No." := POSEntryPaymentLines."POS Payment Method Code";
         PaymentLine."Currency Code" := POSPaymentMethod."Currency Code";
         if POSEntryPaymentLines."Currency Code" <> '' then
-            PaymentLine."Amount Including VAT" := -POSEntryPaymentLines."Amount (LCY)" - GetChangeAmt(POSEntryPaymentLines, POSPaymentMethod)
+            PaymentLine."Amount Including VAT" := -POSEntryPaymentLines."Amount (LCY)"
         else
-            PaymentLine."Amount Including VAT" := -POSEntryPaymentLines.Amount - GetChangeAmt(POSEntryPaymentLines, POSPaymentMethod);
+            PaymentLine."Amount Including VAT" := -POSEntryPaymentLines.Amount;
         PaymentLine."Currency Amount" := PaymentLine."Amount Including VAT";
         PaymentLine."EFT Approved" := POSEntryPaymentLines.EFT;
         if CopyLineDimensions then begin
@@ -359,18 +360,35 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
         PaymentLine.Insert(false, true);
     end;
 
-    local procedure GetChangeAmt(POSEntryPaymentLines: Record "NPR POS Entry Payment Line"; POSPaymentMethod: Record "NPR POS Payment Method") ChangeAmount: Decimal
+    local procedure CalculateAndAddChangeAmount(SalePOS: Record "NPR POS Sale"; SalesTicketNo: Code[20])
     var
+        ReversedPaymentLine: Record "NPR POS Sale Line";
+        TempReferentReversedPaymentLine: Record "NPR POS Sale Line" temporary;
         POSEntryChangePaymentLine: Record "NPR POS Entry Payment Line";
+        POSPaymentMethod: Record "NPR POS Payment Method";
     begin
-        POSEntryChangePaymentLine.SetRange("Document No.", POSEntryPaymentLines."Document No.");
-        POSEntryChangePaymentLine.SetRange("POS Payment Method Code", POSPaymentMethod."Return Payment Method Code");
+        POSEntryChangePaymentLine.SetLoadFields(Amount, "POS Payment Method Code");
+        POSEntryChangePaymentLine.SetRange("Document No.", SalesTicketNo);
         POSEntryChangePaymentLine.SetFilter(Amount, '<%1', 0);
-        if POSEntryChangePaymentLine.FindSet() then begin
-            POSEntryChangePaymentLine.CalcSums(Amount);
-            ChangeAmount := POSEntryChangePaymentLine.Amount;
-        end;
-
+        if not POSEntryChangePaymentLine.FindFirst() then
+            exit;
+        ReversedPaymentLine.SetRange("Register No.", SalePOS."Register No.");
+        ReversedPaymentLine.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        ReversedPaymentLine.SetRange("Line Type", ReversedPaymentLine."Line Type"::"POS Payment");
+        ReversedPaymentLine.SetFilter("Amount Including VAT", '<%1', POSEntryChangePaymentLine.Amount);
+        if not ReversedPaymentLine.FindSet() then
+            exit;
+        repeat
+            POSPaymentMethod.Reset();
+            if POSPaymentMethod.Get(ReversedPaymentLine."No.") and (POSPaymentMethod."Return Payment Method Code" = POSEntryChangePaymentLine."POS Payment Method Code") then
+                TempReferentReversedPaymentLine := ReversedPaymentLine;
+        until ReversedPaymentLine.Next() = 0;
+        if not ReversedPaymentLine.GetBySystemId(TempReferentReversedPaymentLine.SystemId) then
+            exit;
+        ReversedPaymentLine."Amount Including VAT" += -POSEntryChangePaymentLine.Amount;
+        ReversedPaymentLine."Currency Amount" := ReversedPaymentLine."Amount Including VAT";
+        ReversedPaymentLine."VAT Base Amount" := ReversedPaymentLine."Amount Including VAT";
+        ReversedPaymentLine.Modify();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnBeforeSetQuantity', '', true, true)]
