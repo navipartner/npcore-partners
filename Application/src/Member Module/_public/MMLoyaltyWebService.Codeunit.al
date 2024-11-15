@@ -41,12 +41,12 @@
             GetLoyaltyPoints.AddErrorResponse(ImportEntry."Error Message");
         end;
 
+        MemberInfoCapture.DeleteAll();
         ImportEntry."Document Source".CreateOutStream(OutStr);
         GetLoyaltyPoints.SetDestination(OutStr);
         GetLoyaltyPoints.Export();
         ImportEntry.Modify(true);
 
-        MemberInfoCapture.DeleteAll();
     end;
 #pragma warning restore
 
@@ -83,12 +83,11 @@
             GetLoyaltyStatement.AddErrorResponse(ImportEntry."Error Message");
         end;
 
+        MemberInfoCapture.DeleteAll();
         ImportEntry."Document Source".CreateOutStream(OutStr);
         GetLoyaltyStatement.SetDestination(OutStr);
         GetLoyaltyStatement.Export();
         ImportEntry.Modify(true);
-
-        MemberInfoCapture.DeleteAll();
     end;
 
     procedure GetMembershipReceiptList(var GetLoyaltyReceiptList: XMLport "NPR MM Get Loyalty Rcpt. List")
@@ -125,14 +124,12 @@
             GetLoyaltyReceiptList.AddErrorResponse(ImportEntry."Error Message");
 
         end;
+        MemberInfoCapture.DeleteAll();
 
         ImportEntry."Document Source".CreateOutStream(OutStr);
         GetLoyaltyReceiptList.SetDestination(OutStr);
         GetLoyaltyReceiptList.Export();
         ImportEntry.Modify(true);
-
-        MemberInfoCapture.DeleteAll();
-
     end;
 
     procedure GetMembershipReceiptPdf(ExternalMembershipNumber: Code[20]; ReceiptEntryNo: Integer) PdfDoc: Text
