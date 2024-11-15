@@ -1,5 +1,5 @@
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
-codeunit 6184997 "NPR REST API Request Processor"
+codeunit 6185052 "NPR API Request Processor"
 {
     var
         EmptyPathErr: Label 'The path is empty.';
@@ -19,11 +19,11 @@ codeunit 6184997 "NPR REST API Request Processor"
 
     local procedure ProcessRequest(requestJson: JsonObject): JsonObject
     var
-        apiModuleResolver: Interface "NPR REST API Module Resolver";
-        apiModule: Enum "NPR REST API Module";
+        apiModuleResolver: Interface "NPR API Module Resolver";
+        apiModule: Enum "NPR API Module";
         apiModuleName: Text;
-        requestCodeunit: Codeunit "NPR REST API Request";
-        requestResolver: Interface "NPR REST API Request Handler";
+        requestCodeunit: Codeunit "NPR API Request";
+        requestResolver: Interface "NPR API Request Handler";
         requestHttpMethod: Enum "Http Method";
         requestHttpMethodStr: Text;
         requestPath: Text;
@@ -34,8 +34,11 @@ codeunit 6184997 "NPR REST API Request Processor"
         requestQueryParams: Dictionary of [Text, Text];
         requestBodyJson: JsonToken;
         requestBodyStr: Text;
-        responseCodeunit: Codeunit "NPR REST API Response";
+        responseCodeunit: Codeunit "NPR API Response";
         jsonParser: Codeunit "NPR JSON Parser";
+        UserPermissions: Codeunit "User Permissions";
+        AccessControl: Record "Access Control";
+        CurrentModuleInfo: ModuleInfo;
     begin
         jsonParser.Load(requestJson);
         jsonParser
@@ -65,7 +68,15 @@ codeunit 6184997 "NPR REST API Request Processor"
 
         requestCodeunit.Init(requestHttpMethod, requestPath, requestRelativePathSegments, requestQueryParams, requestHeaders, requestBodyJson);
 
+        NavApp.GetCurrentModuleInfo(CurrentModuleInfo);
         apiModuleResolver := apiModule;
+# pragma warning disable AA0139
+        if not UserPermissions.HasUserPermissionSetAssigned(UserSecurityId(), CompanyName(), apiModuleResolver.GetRequiredPermissionSet(), AccessControl.Scope::System, CurrentModuleInfo.Id) then begin
+# pragma warning restore AA0139
+            // For the API module, we require explicit permission sets declared on the entra app for each module to avoid "BC365 FULL ACCESS + NPR RETAIL" as go-to everywhere in prod.
+            exit(responseCodeunit.RespondForbidden(StrSubstNo('Missing permissions: %1', apiModuleResolver.GetRequiredPermissionSet())).GetResponseJson());
+        end;
+
         requestResolver := apiModuleResolver.Resolve(requestCodeunit);
 
         case requestHttpMethod of
@@ -76,6 +87,10 @@ codeunit 6184997 "NPR REST API Request Processor"
             else begin
                 exit(responseCodeunit.RespondBadRequestUnsupportedHttpMethod(requestHttpMethod).GetResponseJson());
             end;
+        end;
+
+        if (not responseCodeunit.IsInitialized()) then begin
+            exit(responseCodeunit.RespondResourceNotFound().GetResponseJson());
         end;
 
         exit(responseCodeunit.GetResponseJson());
@@ -92,7 +107,7 @@ codeunit 6184997 "NPR REST API Request Processor"
         end;
 
         //CurrCodeunit := this;
-        CurrCodeunit := Codeunit::"NPR REST API Request Processor";
+        CurrCodeunit := Codeunit::"NPR API Request Processor";
         WebServiceMgt.CreateTenantWebService(WebService."Object Type"::Codeunit, CurrCodeunit, 'npr_rest_api', true);
     end;
 }

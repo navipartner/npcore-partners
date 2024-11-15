@@ -1,5 +1,5 @@
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
-codeunit 6185006 "NPR REST API Request"
+codeunit 6185051 "NPR API Request"
 {
     var
         _HttpMethod: Enum "Http Method";
@@ -35,12 +35,12 @@ codeunit 6185006 "NPR REST API Request"
         exit(_ModuleName);
     end;
 
-    procedure Path(): Text
+    procedure FullPath(): Text
     begin
         exit(_Path);
     end;
 
-    procedure RelativePathSegments(): List of [Text]
+    procedure Paths(): List of [Text]
     begin
         exit(_RelativePathSegments);
     end;
@@ -59,6 +59,41 @@ codeunit 6185006 "NPR REST API Request"
     begin
         exit(_BodyJson);
     end;
+
+    procedure ApiVersion(): Date
+    var
+        _apiVersion: Date;
+    begin
+        if not _Headers.ContainsKey('x-api-version') then
+            exit(Today());
+
+        Evaluate(_apiVersion, _Headers.Get('x-api-version'), 9);
+        exit(_apiVersion);
+    end;
+
+    procedure Match(Method: Text; _fullPath: Text): Boolean
+    var
+        _Paths: List of [Text];
+        i: Integer;
+    begin
+        if (Format(_HttpMethod) <> Method) then
+            exit(false);
+
+        _Paths := _fullPath.Split('/');
+        _Paths.Remove('');
+        if (_Paths.Count() <> _RelativePathSegments.Count()) then
+            exit(false);
+
+        for i := 1 to _Paths.Count() do begin
+            if (not _Paths.Get(i).StartsWith(':')) then begin
+                if (_Paths.Get(i) <> _RelativePathSegments.Get(i)) then
+                    exit(false);
+            end;
+        end;
+
+        exit(true);
+    end;
+
     #endregion
 }
 #endif

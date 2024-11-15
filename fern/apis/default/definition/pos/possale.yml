@@ -1,0 +1,150 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+
+types:
+  saleId: 
+    type: uuid
+    docs: The id of an active POS sale. This value can also be used to find the sale later when it's either parked or completed as a POS Entry.
+  
+  POSUnitFilter:
+    type: string
+    docs: A filter for POS Unit. It should be formatted according to Business Central filter syntax.
+
+  POSSaleLineType:
+    enum:
+      - name: ITEM
+        value: 'Item'
+      - name: ITEM_CATEGORY
+        value: 'Item Category'
+      - name: BOM_LIST
+        value: 'BOM List'
+      - name: CUSTOMER_DEPOSIT
+        value: 'Customer Deposit'
+      - name: COMMENT
+        value: 'Comment'
+      - name: ROUNDING
+        value: 'Rounding'
+      - name: GL_PAYMENT
+        value: 'G/L Payment'
+      - name: ISSUE_VOUCHER
+        value: 'Issue Voucher'
+
+  POSSaleLine:
+    docs: A sale line in an active POS sale
+    properties:
+      sortKey: integer
+      type: POSSaleLineType
+      code: string
+      variantCode: string
+      description: string
+      quantity: double
+      unitPrice: double
+      discountPct: double
+      discountAmount: double
+      vatPercent: double
+      amountInclVat: double
+      amount: double
+    examples:
+      - name: ExampleSaleLine
+        value:
+          sortKey: 10000
+          type: "Item"
+          code: "M12345"
+          variantCode: "SKU-12345"
+          description: "Item Description"
+          quantity: 2
+          unitPrice: 100
+          discountPct: 50
+          discountAmount: 100
+          vatPercent: 25
+          amountInclVat: 100
+          amount: 80
+  
+  POSPaymentLine:
+    docs: A payment line in an active POS sale
+    properties:
+      sortKey: integer
+      code: string
+      description: string
+      amountInclVat: double
+    examples:
+      - name: ExamplePaymentLine
+        value:
+          sortKey: 20000
+          code: "CASH"
+          description: "Cash"
+          amountInclVat: 50
+
+  POSSale:
+    docs: An active POS sale
+    properties:
+      saleId: saleId
+      receiptNo: string
+      posUnit: string
+      startTime: datetime
+      customerNo: string
+      saleLines: optional<list<POSSaleLine>>
+      paymentLines: optional<list<POSPaymentLine>>    
+    examples:
+      - name: ExamplePOSSale
+        value: 
+          saleId: 0d200aa6-aacd-4b78-b673-c4fb7461f5ea
+          receiptNo: "12345678"
+          posUnit: "POS-031"
+          startTime: "2024-01-01T17:00:00Z"
+          customerNo: "C12345"
+          saleLines: 
+            - $POSSaleLine.ExampleSaleLine
+          paymentLines: 
+            - $POSPaymentLine.ExamplePaymentLine
+
+service:
+  auth: true
+  base-path: /pos
+  endpoints: 
+    searchPOSSale:
+      display-name: Search POS Sale
+      docs: Find any active POS sales connected to specific POS units. This can be used to poll for real time updates as lines are scanned in the active POS sale.
+      method: GET
+      path: "/sale/search"
+      request:
+        name: searchPOSSaleRequest
+        query-parameters:
+          posunit: POSUnitFilter
+          withLines: boolean
+      response: POSSale
+      examples:
+        - path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          response:
+            body: $POSSale.ExamplePOSSale
+          query-parameters:
+            posunit: "POS-031"
+            withLines: true
+
+    getPOSSale:
+      display-name: POS Sale
+      docs: Get a POS Sale by saleId
+      method: GET
+      path: "/sale/{saleId}"
+      path-parameters:
+        saleId: saleId
+      request:
+        name: getPOSSaleRequest
+        query-parameters:
+          withLines: boolean
+      response: POSSale
+      examples:
+        - path-parameters:
+            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            saleId: 0d200aa6-aacd-4b78-b673-c4fb7461f5ea
+          response:
+            body: $POSSale.ExamplePOSSale
+          query-parameters:
+            withLines: true

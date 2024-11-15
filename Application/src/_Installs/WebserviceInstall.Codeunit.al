@@ -91,7 +91,7 @@ codeunit 6014471 "NPR Webservice Install"
     local procedure InitModernApiWSCodeunits()
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
     var
-        restApi: Codeunit "NPR REST API Request Processor";
+        restApi: Codeunit "NPR API Request Processor";
 #endif
     begin
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22

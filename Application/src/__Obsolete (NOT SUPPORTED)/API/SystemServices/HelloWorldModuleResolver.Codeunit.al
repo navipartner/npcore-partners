@@ -2,12 +2,12 @@
 codeunit 6185005 "NPR HelloWorld Module Resolver" implements "NPR REST API Module Resolver"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2024-10-13';
+    ObsoleteReason = 'Removed REST from object name';
 
     procedure Resolve(var Request: Codeunit "NPR REST API Request"): Interface "NPR REST API Request Handler"
-    var
-        HelloWorld: Codeunit "NPR HelloWorld API";
     begin
-        exit(HelloWorld);
     end;
 }
 #endif
