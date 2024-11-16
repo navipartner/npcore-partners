@@ -90,6 +90,14 @@ page 6150768 "NPR SI POS Audit Log Aux. Info"
                 {
                     ApplicationArea = NPRSIFiscal;
                     ToolTip = 'Specifies the value of the Validation Code.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '2024-11-17';
+                    ObsoleteReason = 'Not necessary on page.';
+                }
+                field("Receipt Fiscalized"; Rec."Receipt Fiscalized")
+                {
+                    ApplicationArea = NPRSIFiscal;
+                    ToolTip = 'Specifies the value of the Receipt Fiscalized field.';
                 }
             }
         }
