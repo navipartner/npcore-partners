@@ -10,6 +10,8 @@ codeunit 6151546 "NPR SI Audit Mgt."
         CAPTION_OVERWRITE_CERT: Label 'Are you sure you want to overwrite the existing certificate?';
         ERROR_MISSING_KEY: Label 'The selected certificate does not contain the private key';
         RecordInTableForFieldNotFoundErr: Label 'Record not found in table %1 for %2 : %3', Comment = '%1 = Table Caption, %2 = Field Caption, %3 = Field Value';
+        DateTimeFormatLbl: Label '%1T%2', Locked = true, Comment = '%1 = Date, %2 = Time';
+        ReturnAdditionalInfoFormatLbl: Label '%1;%2;%3', Locked = true, Comment = '%1 = Return Business Premise ID, %2 = Return Cash Register ID, %3 = Return Receipt Date/Time';
 
     #region SI Fiscal - POS Handling Subscribers
 
@@ -73,16 +75,19 @@ codeunit 6151546 "NPR SI Audit Mgt."
 
         InsertPreNumberedInvoiceBookToAudit(SalePOS, SIPOSAuditLogAuxInfo);
 
-        if SIPOSAuditLogAuxInfo."Return Receipt No." = '' then
-            SITaxCommunicationMgt.CreateNormalSale(SIPOSAuditLogAuxInfo, false)
-        else
-            SITaxCommunicationMgt.CreateNormalSale(SIPOSAuditLogAuxInfo, false);
+        SITaxCommunicationMgt.CreateNormalSale(SIPOSAuditLogAuxInfo, false);
 
         Commit();
         OnBeforePrintFiscalReceipt(IsHandled);
         if IsHandled then
             exit;
         SIFiscalThermalPrint.PrintReceipt(SIPOSAuditLogAuxInfo);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSEntry', '', false, false)]
+    local procedure OnAfterInsertPOSEntry(var SalePOS: Record "NPR POS Sale"; var POSEntry: Record "NPR POS Entry");
+    begin
+        HandlePOSSaleAdditionalFieldsAfterPOSEntryInsert(SalePOS, POSEntry);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: Rev. Dir. Sale", 'OnBeforeHendleReverse', '', false, false)]
@@ -165,7 +170,11 @@ codeunit 6151546 "NPR SI Audit Mgt."
 
         SIAuxSalesCrMemoHeader.ReadSIAuxSalesCrMemoHeaderFields(SalesCrMemoHeader);
         SIAuxSalesHeader.ReadSIAuxSalesHeaderFields(SalesHeader);
-        SIAuxSalesCrMemoHeader.TransferFields(SIAuxSalesHeader, false);
+        SIAuxSalesCrMemoHeader."NPR SI POS Unit" := SIAuxSalesHeader."NPR SI POS Unit";
+        SIAuxSalesCrMemoHeader."NPR SI Return Receipt No." := SIAuxSalesHeader."NPR SI Return Receipt No.";
+        SIAuxSalesCrMemoHeader."NPR SI Return Bus. Premise ID" := SIAuxSalesHeader."NPR SI Return Bus. Premise ID";
+        SIAuxSalesCrMemoHeader."NPR SI Return Cash Register ID" := SIAuxSalesHeader."NPR SI Return Cash Register ID";
+        SIAuxSalesCrMemoHeader."NPR SI Return Receipt DateTime" := SIAuxSalesHeader."NPR SI Return Receipt DateTime";
         SIAuxSalesCrMemoHeader.SaveSIAuxSalesCrMemoHeaderFields();
     end;
 
@@ -323,6 +332,7 @@ codeunit 6151546 "NPR SI Audit Mgt."
         POSRMALine: Record "NPR POS RMA Line";
         SIAuxSalespPurch: Record "NPR SI Aux Salesperson/Purch.";
         SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
+        ReturnSIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
     begin
         POSEntry.CalcFields("Payment Amount");
@@ -342,15 +352,17 @@ codeunit 6151546 "NPR SI Audit Mgt."
                 SIPOSAuditLogAuxInfo."Transaction Type" := "NPR SI Transaction Type"::Sale;
             else begin
                 POSRMALine.SetRange("POS Entry No.", POSEntry."Entry No.");
-                if POSRMALine.FindSet() then
-                    SIPOSAuditLogAuxInfo."Return Receipt No." := POSRMALine."Sales Ticket No.";
+                if POSRMALine.FindFirst() then
+                    if ReturnSIPOSAuditLogAuxInfo.GetAuditFromSourceDocument(POSRMALine."Sales Ticket No.") then begin
+                        SIPOSAuditLogAuxInfo."Return Receipt No." := ReturnSIPOSAuditLogAuxInfo."Receipt No.";
+                        SIPOSAuditLogAuxInfo."Return Additional Info" := StrSubstNo(ReturnAdditionalInfoFormatLbl, ReturnSIPOSAuditLogAuxInfo."POS Store Code", ReturnSIPOSAuditLogAuxInfo."POS Unit No.", StrSubstNo(DateTimeFormatLbl, Format(ReturnSIPOSAuditLogAuxInfo."Entry Date", 10, '<Year4>-<Month,2>-<Day,2>'), Format(ReturnSIPOSAuditLogAuxInfo."Log Timestamp", 8, '<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>')));
+                    end;
                 SIPOSAuditLogAuxInfo."Transaction Type" := "NPR SI Transaction Type"::Return;
             end;
         end;
 
         SalespersonPurchaser.Get(POSEntry."Salesperson Code");
         SIAuxSalespPurch.ReadSIAuxSalespersonFields(SalespersonPurchaser);
-        SIAuxSalespPurch.TestField("NPR SI Salesperson Tax Number");
         SIPOSAuditLogAuxInfo."Cashier ID" := SIAuxSalespPurch."NPR SI Salesperson Tax Number";
         SIPOSAuditLogAuxInfo."Customer VAT Number" := GetCustomerVATRegistrationNo(POSEntry."Customer No.");
 
@@ -383,7 +395,6 @@ codeunit 6151546 "NPR SI Audit Mgt."
 
         SalespersonPurchaser.Get(SalesInvoiceHeader."Salesperson Code");
         SIAuxSalespPurch.ReadSIAuxSalespersonFields(SalespersonPurchaser);
-        SIAuxSalespPurch.TestField("NPR SI Salesperson Tax Number");
         SIPOSAuditLogAuxInfo."Cashier ID" := SIAuxSalespPurch."NPR SI Salesperson Tax Number";
         SIPOSAuditLogAuxInfo."Customer VAT Number" := GetCustomerVATRegistrationNo(SalesInvoiceHeader."Sell-to Customer No.");
 
@@ -398,6 +409,7 @@ codeunit 6151546 "NPR SI Audit Mgt."
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         SIAuxSalespPurch: Record "NPR SI Aux Salesperson/Purch.";
         POSUnit: Record "NPR POS Unit";
+        ReturnSIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
     begin
         SIPOSAuditLogAuxInfo.Init();
         SIPOSAuditLogAuxInfo."Audit Entry Type" := SIPOSAuditLogAuxInfo."Audit Entry Type"::"Sales Cr. Memo Header";
@@ -411,10 +423,14 @@ codeunit 6151546 "NPR SI Audit Mgt."
 
         SIAuxSalesCrMemoHeader.ReadSIAuxSalesCrMemoHeaderFields(SalesCrMemoHeader);
 
-        if SIAuxSalesCrMemoHeader."NPR SI Return Receipt No." <> '' then
-            SIPOSAuditLogAuxInfo."Return Receipt No." := SIAuxSalesCrMemoHeader."NPR SI Return Receipt No."
-        else
-            SIPOSAuditLogAuxInfo."Return Receipt No." := SalesCrMemoHeader."Applies-to Doc. No.";
+        if SIAuxSalesCrMemoHeader."NPR SI Return Receipt No." <> '' then begin
+            SIPOSAuditLogAuxInfo."Return Receipt No." := SIAuxSalesCrMemoHeader."NPR SI Return Receipt No.";
+            SIPOSAuditLogAuxInfo."Return Additional Info" := StrSubstNo(ReturnAdditionalInfoFormatLbl, SIAuxSalesCrMemoHeader."NPR SI Return Bus. Premise ID", SIAuxSalesCrMemoHeader."NPR SI Return Cash Register ID", Format(SIAuxSalesCrMemoHeader."NPR SI Return Receipt DateTime", 0, '<Year4>-<Month,2>-<Day,2>T<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>'));
+        end else
+            if ReturnSIPOSAuditLogAuxInfo.GetAuditFromSourceDocument(SalesCrMemoHeader."Applies-to Doc. No.") then begin
+                SIPOSAuditLogAuxInfo."Return Receipt No." := ReturnSIPOSAuditLogAuxInfo."Receipt No.";
+                SIPOSAuditLogAuxInfo."Return Additional Info" := StrSubstNo(ReturnAdditionalInfoFormatLbl, ReturnSIPOSAuditLogAuxInfo."POS Store Code", ReturnSIPOSAuditLogAuxInfo."POS Unit No.", StrSubstNo(DateTimeFormatLbl, Format(ReturnSIPOSAuditLogAuxInfo."Entry Date", 10, '<Year4>-<Month,2>-<Day,2>'), Format(ReturnSIPOSAuditLogAuxInfo."Log Timestamp", 8, '<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>')));
+            end;
 
         POSUnit.Get(SIAuxSalesCrMemoHeader."NPR SI POS Unit");
         SIPOSAuditLogAuxInfo."POS Unit No." := POSUnit."No.";
@@ -422,7 +438,6 @@ codeunit 6151546 "NPR SI Audit Mgt."
 
         SalespersonPurchaser.Get(SalesCrMemoHeader."Salesperson Code");
         SIAuxSalespPurch.ReadSIAuxSalespersonFields(SalespersonPurchaser);
-        SIAuxSalespPurch.TestField("NPR SI Salesperson Tax Number");
         SIPOSAuditLogAuxInfo."Cashier ID" := SIAuxSalespPurch."NPR SI Salesperson Tax Number";
         SIPOSAuditLogAuxInfo."Customer VAT Number" := GetCustomerVATRegistrationNo(SalesCrMemoHeader."Sell-to Customer No.");
 
@@ -615,6 +630,25 @@ codeunit 6151546 "NPR SI Audit Mgt."
         SIPOSAuditLogAuxInfo.SetRange("POS Unit No.", OldPOSUnit."No.");
         if not SIPOSAuditLogAuxInfo.IsEmpty() then
             Error(CannotRenameErr, OldPOSUnit.TableCaption(), OldPOSUnit."No.", SIPOSAuditLogAuxInfo.TableCaption());
+    end;
+
+    local procedure HandlePOSSaleAdditionalFieldsAfterPOSEntryInsert(var SalePOS: Record "NPR POS Sale"; var POSEntry: Record "NPR POS Entry")
+    var
+        SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
+        SIPOSSale: Record "NPR SI POS Sale";
+    begin
+        if not IsSIFiscalActive() then
+            exit;
+        if not SIPOSAuditLogAuxInfo.GetAuditFromPOSEntry(POSEntry."Entry No.") then
+            exit;
+        if not SIPOSSale.Get(SalePOS.SystemId) then
+            exit;
+
+        if SIPOSSale."SI Return Receipt No." <> '' then begin
+            SIPOSAuditLogAuxInfo."Return Receipt No." := SIPOSSale."SI Return Receipt No.";
+            SIPOSAuditLogAuxInfo."Return Additional Info" := StrSubstNo(ReturnAdditionalInfoFormatLbl, SIPOSSale."SI Return Bus. Premise ID", SIPOSSale."SI Return Cash Register ID", SIPOSSale."SI Return Receipt DateTime");
+            SIPOSAuditLogAuxInfo.Modify();
+        end;
     end;
 
     local procedure CalculateAndSignZOI(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info")

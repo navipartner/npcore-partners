@@ -163,6 +163,11 @@ table 6059838 "NPR SI POS Audit Log Aux. Info"
             Caption = 'Customer VAT Number';
             DataClassification = CustomerContent;
         }
+        field(35; "Return Additional Info"; Text[250])
+        {
+            Caption = 'Return Additional Info';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -206,6 +211,14 @@ table 6059838 "NPR SI POS Audit Log Aux. Info"
         Rec.Reset();
         Rec.SetRange("Audit Entry Type", Rec."Audit Entry Type"::"Sales Cr. Memo Header");
         Rec.SetRange("Source Document No.", SalesCrMemoHeaderNo);
+        exit(Rec.FindFirst());
+    end;
+
+    procedure GetAuditFromSourceDocument(SourceDocumentNo: Code[20]): Boolean
+    begin
+        Rec.Reset();
+        Rec.SetLoadFields("Receipt No.", "POS Store Code", "POS Unit No.", "Entry Date", "Log Timestamp");
+        Rec.SetRange("Source Document No.", SourceDocumentNo);
         exit(Rec.FindFirst());
     end;
 

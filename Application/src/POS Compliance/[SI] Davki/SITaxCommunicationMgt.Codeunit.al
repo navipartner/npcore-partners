@@ -9,6 +9,8 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
         SoapEnvNamespaceUriLbl: Label 'http://schemas.xmlsoap.org/soap/envelope/', Locked = true;
         XmlDsigNamespaceUriLbl: Label 'http://www.w3.org/2000/09/xmldsig#', Locked = true;
         XmlSchemaNamespaceUriLbl: Label 'http://www.w3.org/2001/XMLSchema-instance', Locked = true;
+        XPathExcludeNamespacePatternLbl: Label '//*[local-name()=''%1'']', Locked = true;
+        DateTimeFormatLbl: Label '%1T%2', Locked = true, Comment = '%1 = Entry Date, %2 = Time Stamp';
 
     internal procedure CreateNormalSale(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"; isSubsequent: Boolean)
     var
@@ -23,10 +25,9 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
     end;
 
     #region SI Fiscalization - XML Document Creation
-    local procedure CreateSaleDocument(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"; var Document: XmlDocument; isSubsequent: Boolean)
+    local procedure CreateSaleDocument(SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"; var Document: XmlDocument; isSubsequent: Boolean)
     var
         CompanyInformation: Record "Company Information";
-        TimeStampLbl: Label '%1T%2', Locked = true, Comment = '%1 = Entry Date, %2 = Time Stamp';
         FormattedDateTime: Text;
         IdPoruke: Text;
         Body: XmlElement;
@@ -64,7 +65,7 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
         Invoice := XmlElement.Create('Invoice', FuNamespaceUriLbl);
 
         Invoice.Add(CreateXmlElement('TaxNumber', FuNamespaceUriLbl, SIFiscalSetup."Certificate Subject Ident."));
-        Invoice.Add(CreateXmlElement('IssueDateTime', FuNamespaceUriLbl, StrSubstNo(TimeStampLbl, Format(SIPOSAuditLogAuxInfo."Entry Date", 10, '<Year4>-<Month,2>-<Day,2>'), Format(SIPOSAuditLogAuxInfo."Log Timestamp", 0, '<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>'))));
+        Invoice.Add(CreateXmlElement('IssueDateTime', FuNamespaceUriLbl, StrSubstNo(DateTimeFormatLbl, Format(SIPOSAuditLogAuxInfo."Entry Date", 10, '<Year4>-<Month,2>-<Day,2>'), Format(SIPOSAuditLogAuxInfo."Log Timestamp", 0, '<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>'))));
         Invoice.Add(CreateXmlElement('NumberingStructure', FuNamespaceUriLbl, 'C'));
 
         InvoiceIdent := XmlElement.Create('InvoiceIdentifier', FuNamespaceUriLbl);
@@ -100,11 +101,10 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
             AddReturnInfoSection(SIPOSAuditLogAuxInfo, Document);
     end;
 
-    local procedure CreatePreNumberedBookSaleDocument(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"; var Document: XmlDocument; isSubsequent: Boolean)
+    local procedure CreatePreNumberedBookSaleDocument(SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"; var Document: XmlDocument; isSubsequent: Boolean)
     var
         CompanyInformation: Record "Company Information";
         POSEntryTaxLines: Record "NPR POS Entry Tax Line";
-        TimeStampLbl: Label '%1T%2', Locked = true, Comment = '%1 = Entry Date, %2 = Time Stamp';
         FormattedDateTime: Text;
         IdPoruke: Text;
         Body: XmlElement;
@@ -144,7 +144,7 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
         Invoice := XmlElement.Create('SalesBookInvoice', FuNamespaceUriLbl);
 
         Invoice.Add(CreateXmlElement('TaxNumber', FuNamespaceUriLbl, SIFiscalSetup."Certificate Subject Ident."));
-        Invoice.Add(CreateXmlElement('IssueDateTime', FuNamespaceUriLbl, StrSubstNo(TimeStampLbl, Format(SIPOSAuditLogAuxInfo."Entry Date", 10, '<Year4>-<Month,2>-<Day,2>'), Format(SIPOSAuditLogAuxInfo."Log Timestamp", 0, '<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>'))));
+        Invoice.Add(CreateXmlElement('IssueDateTime', FuNamespaceUriLbl, StrSubstNo(DateTimeFormatLbl, Format(SIPOSAuditLogAuxInfo."Entry Date", 10, '<Year4>-<Month,2>-<Day,2>'), Format(SIPOSAuditLogAuxInfo."Log Timestamp", 0, '<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>'))));
 
         InvoiceIdent := XmlElement.Create('SalesBookIdentifier', FuNamespaceUriLbl);
         InvoiceIdent.Add(CreateXmlElement('InvoiceNumber', FuNamespaceUriLbl, SIPOSAuditLogAuxInfo."Receipt No."));
@@ -295,90 +295,30 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
 
     local procedure AddReturnInfoSection(SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"; var BaseDocument: XmlDocument)
     var
-    begin
-        case SIPOSAuditLogAuxInfo."Audit Entry Type" of
-            SIPOSAuditLogAuxInfo."Audit Entry Type"::"POS Entry":
-                AddPOSEntryReturnInfo(SIPOSAuditLogAuxInfo, BaseDocument);
-            SIPOSAuditLogAuxInfo."Audit Entry Type"::"Sales Cr. Memo Header":
-                AddSalesCreditMemoReturnInfo(SIPOSAuditLogAuxInfo, BaseDocument);
-        end;
-    end;
-
-    local procedure AddPOSEntryReturnInfo(SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"; var BaseDocument: XmlDocument)
-    var
-        ReturnSIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
-        TimeStampLbl: Label '%1T%2', Locked = true, Comment = '%1 = Entry Date, %2 = Time Stamp';
-        XPathExcludeNamespacePattern: Label '//*[local-name()=''%1'']', Locked = true;
         ReferenceInvoice: XmlElement;
         ReferenceInvoiceID: XmlElement;
         DocumentRoot: XmlElement;
         DocumentNode: XmlNode;
         DocumentNode2: XmlNode;
-        ReturnPOSAuditLogRecordNotFoundErr: Label 'Could not find a record in %1 table for %2: %3', Comment = '%1 = Table Caption, %2 = Field Caption, %3 = Return Receipt No.';
+        ReturnAdditionalInfoList: List of [Text];
+        ReturnPOSAuditLogRecordNotFoundErr: Label 'Could not find necessary return receipt information.';
     begin
         BaseDocument.GetRoot(DocumentRoot);
         DocumentRoot.GetDescendantElements().Get(3, DocumentNode);
-        DocumentNode.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePattern, 'SubsequentSubmit'), DocumentNode2);
+        DocumentNode.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePatternLbl, 'SubsequentSubmit'), DocumentNode2);
 
-        ReturnSIPOSAuditLogAuxInfo.SetRange("Source Document No.", SIPOSAuditLogAuxInfo."Return Receipt No.");
-        if not ReturnSIPOSAuditLogAuxInfo.FindFirst() then
-            Error(ReturnPOSAuditLogRecordNotFoundErr, ReturnSIPOSAuditLogAuxInfo.TableCaption(), ReturnSIPOSAuditLogAuxInfo.FieldCaption("Return Receipt No."), SIPOSAuditLogAuxInfo."Return Receipt No.");
+        if SIPOSAuditLogAuxInfo."Return Additional Info" = '' then
+            Error(ReturnPOSAuditLogRecordNotFoundErr);
 
+        ReturnAdditionalInfoList := SIPOSAuditLogAuxInfo."Return Additional Info".Split(';');
         ReferenceInvoice := XmlElement.Create('ReferenceInvoice', FuNamespaceUriLbl);
         ReferenceInvoiceID := XmlElement.Create('ReferenceInvoiceIdentifier', FuNamespaceUriLbl);
-        ReferenceInvoiceID.Add(CreateXmlElement('BusinessPremiseID', FuNamespaceUriLbl, ReturnSIPOSAuditLogAuxInfo."POS Store Code"));
-        ReferenceInvoiceID.Add(CreateXmlElement('ElectronicDeviceID', FuNamespaceUriLbl, ReturnSIPOSAuditLogAuxInfo."POS Unit No."));
-        ReferenceInvoiceID.Add(CreateXmlElement('InvoiceNumber', FuNamespaceUriLbl, Format(ReturnSIPOSAuditLogAuxInfo."Receipt No.")));
+        ReferenceInvoiceID.Add(CreateXmlElement('BusinessPremiseID', FuNamespaceUriLbl, ReturnAdditionalInfoList.Get(1)));
+        ReferenceInvoiceID.Add(CreateXmlElement('ElectronicDeviceID', FuNamespaceUriLbl, ReturnAdditionalInfoList.Get(2)));
+        ReferenceInvoiceID.Add(CreateXmlElement('InvoiceNumber', FuNamespaceUriLbl, Format(SIPOSAuditLogAuxInfo."Return Receipt No.")));
 
         ReferenceInvoice.Add(ReferenceInvoiceID);
-        ReferenceInvoice.Add(CreateXmlElement('ReferenceInvoiceIssueDateTime', FuNamespaceUriLbl, StrSubstNo(TimeStampLbl, Format(ReturnSIPOSAuditLogAuxInfo."Entry Date", 10, '<Year4>-<Month,2>-<Day,2>'), Format(ReturnSIPOSAuditLogAuxInfo."Log Timestamp", 8, '<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>'))));
-
-        DocumentNode2.AddAfterSelf(ReferenceInvoice);
-    end;
-
-    local procedure AddSalesCreditMemoReturnInfo(SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"; var BaseDocument: XmlDocument)
-    var
-        ReturnSIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
-        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
-        SIAuxSalesCrMemoHeader: Record "NPR SI Aux Sales CrMemo Header";
-        TimeStampLbl: Label '%1T%2', Locked = true, Comment = '%1 = Entry Date, %2 = Time Stamp';
-        XPathExcludeNamespacePattern: Label '//*[local-name()=''%1'']', Locked = true;
-        ReferenceInvoice: XmlElement;
-        ReferenceInvoiceID: XmlElement;
-        DocumentRoot: XmlElement;
-        DocumentNode: XmlNode;
-        DocumentNode2: XmlNode;
-        ReturnPOSAuditLogRecordNotFoundErr: Label 'Could not find a record in %1 table for %2: %3', Comment = '%1 = Table Caption, %2 = Field Caption, %3 = Return Receipt No.';
-    begin
-        BaseDocument.GetRoot(DocumentRoot);
-        DocumentRoot.GetDescendantElements().Get(3, DocumentNode);
-        DocumentNode.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePattern, 'SubsequentSubmit'), DocumentNode2);
-
-        SalesCrMemoHeader.Get(SIPOSAuditLogAuxInfo."Source Document No.");
-
-        if SalesCrMemoHeader."Applies-to Doc. No." <> '' then begin
-            ReturnSIPOSAuditLogAuxInfo.SetRange("Source Document No.", SIPOSAuditLogAuxInfo."Return Receipt No.");
-            if not ReturnSIPOSAuditLogAuxInfo.FindFirst() then
-                Error(ReturnPOSAuditLogRecordNotFoundErr, ReturnSIPOSAuditLogAuxInfo.TableCaption(), ReturnSIPOSAuditLogAuxInfo.FieldCaption("Return Receipt No."), SIPOSAuditLogAuxInfo."Return Receipt No.");
-            ReferenceInvoice := XmlElement.Create('ReferenceInvoice', FuNamespaceUriLbl);
-            ReferenceInvoiceID := XmlElement.Create('ReferenceInvoiceIdentifier', FuNamespaceUriLbl);
-            ReferenceInvoiceID.Add(CreateXmlElement('BusinessPremiseID', FuNamespaceUriLbl, ReturnSIPOSAuditLogAuxInfo."POS Store Code"));
-            ReferenceInvoiceID.Add(CreateXmlElement('ElectronicDeviceID', FuNamespaceUriLbl, ReturnSIPOSAuditLogAuxInfo."POS Unit No."));
-            ReferenceInvoiceID.Add(CreateXmlElement('InvoiceNumber', FuNamespaceUriLbl, Format(ReturnSIPOSAuditLogAuxInfo."Receipt No.")));
-
-            ReferenceInvoice.Add(ReferenceInvoiceID);
-            ReferenceInvoice.Add(CreateXmlElement('ReferenceInvoiceIssueDateTime', FuNamespaceUriLbl, StrSubstNo(TimeStampLbl, Format(ReturnSIPOSAuditLogAuxInfo."Entry Date", 10, '<Year4>-<Month,2>-<Day,2>'), Format(ReturnSIPOSAuditLogAuxInfo."Log Timestamp", 8, '<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>'))));
-        end else begin
-            SIAuxSalesCrMemoHeader.ReadSIAuxSalesCrMemoHeaderFields(SalesCrMemoHeader);
-            ReferenceInvoice := XmlElement.Create('ReferenceInvoice', FuNamespaceUriLbl);
-            ReferenceInvoiceID := XmlElement.Create('ReferenceInvoiceIdentifier', FuNamespaceUriLbl);
-            ReferenceInvoiceID.Add(CreateXmlElement('BusinessPremiseID', FuNamespaceUriLbl, SIAuxSalesCrMemoHeader."NPR SI Return Bus. Premise ID"));
-            ReferenceInvoiceID.Add(CreateXmlElement('ElectronicDeviceID', FuNamespaceUriLbl, SIAuxSalesCrMemoHeader."NPR SI Return Cash Register ID"));
-            ReferenceInvoiceID.Add(CreateXmlElement('InvoiceNumber', FuNamespaceUriLbl, Format(SIAuxSalesCrMemoHeader."NPR SI Return Receipt No.")));
-
-            ReferenceInvoice.Add(ReferenceInvoiceID);
-            ReferenceInvoice.Add(CreateXmlElement('ReferenceInvoiceIssueDateTime', FuNamespaceUriLbl, Format(SIAuxSalesCrMemoHeader."NPR SI Return Receipt DateTime", 0, '<Year4>-<Month,2>-<Day,2>T<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>')));
-        end;
+        ReferenceInvoice.Add(CreateXmlElement('ReferenceInvoiceIssueDateTime', FuNamespaceUriLbl, ReturnAdditionalInfoList.Get(3)));
 
         DocumentNode2.AddAfterSelf(ReferenceInvoice);
     end;
@@ -545,7 +485,6 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
 
     internal procedure GetEORCodeFromResponse(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"; ResponseText: Text)
     var
-        XPathExcludeNamespacePatternLbl: Label '//*[local-name()=''%1'']', Locked = true;
         Document: XmlDocument;
         ChildNode: XmlNode;
         Node: XmlNode;
