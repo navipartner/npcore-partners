@@ -31,7 +31,7 @@ codeunit 6150843 "NPR POS Action: Item Prompt" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionItemPrompt.js###
-'let main=async({workflow:t,captions:e,parameters:n})=>{let a=await popup.numpad({title:e.title,caption:e.caption});if(a===null)return" ";const{workflowName:i}=await t.respond("createitem");await t.run(i,{parameters:{itemNo:a.toString(),itemQuantity:1,itemIdentifierType:0}})};'
+'let main=async({workflow:t,captions:e,parameters:n})=>{let a=await popup.stringpad({title:e.title,caption:e.caption});if(a===null)return" ";const{workflowName:i}=await t.respond("createitem");await t.run(i,{parameters:{itemNo:a.toString(),itemQuantity:1,itemIdentifierType:0}})};'
         )
     end;
 }
