@@ -76,7 +76,7 @@ codeunit 6185050 "NPR Spfy Product Price Calc."
         TempSalesHeader."Customer Posting Group" := Customer."Customer Posting Group";
         TempSalesHeader."Prices Including VAT" := Customer."Prices Including VAT";
         TempSalesHeader.Validate("Document Date", ItemPriceDate);
-        TempSalesHeader.Validate("Order Date", ItemPriceDate);
+        TempSalesHeader."Order Date" := ItemPriceDate;
         TempSalesHeader."Currency Code" := ShopifyStore."Currency Code";
         TempSalesHeader.UpdateCurrencyFactor();
         TempSalesHeader.Insert(false);

@@ -85,7 +85,7 @@ report 6014527 "NPR Spfy Item Re-sycn Options"
                     Caption = 'Options';
                     field(CreateShopifyProducts; CreateAtShopify)
                     {
-                        Caption = 'Create products in Shopify';
+                        Caption = 'Create Products in Shopify';
                         ToolTip = 'Specifies if you want to create products in Shopify.';
                         ApplicationArea = NPRShopify;
 
