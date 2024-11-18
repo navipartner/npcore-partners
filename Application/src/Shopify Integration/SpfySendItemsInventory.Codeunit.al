@@ -1368,12 +1368,12 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             repeat
                 SpfyStoreItemVariantLink."Variant Code" := ItemVariant.Code;
                 ShopifyVariantID := GetShopifyVariantID(SpfyStoreItemVariantLink, false);
-                SpfyAssignedIDMgt.AssignShopifyID(ItemVariant.RecordId(), "NPR Spfy ID Type"::"Entry ID", ShopifyVariantID, false);
+                SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy ID Type"::"Entry ID", ShopifyVariantID, false);
                 if ShopifyVariantID <> '' then
                     SpfyMetafieldMgt.RequestMetafieldValuesFromShopifyAndUpdateBCData(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy Metafield Owner Type"::PRODUCTVARIANT, ShopifyVariantID, SpfyStoreItemVariantLink."Shopify Store Code");
 
                 ShopifyInventoryItemID := GetShopifyInventoryItemID(SpfyStoreItemVariantLink, false);
-                SpfyAssignedIDMgt.AssignShopifyID(ItemVariant.RecordId(), "NPR Spfy ID Type"::"Inventory Item ID", ShopifyInventoryItemID, false);
+                SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy ID Type"::"Inventory Item ID", ShopifyInventoryItemID, false);
             until ItemVariant.Next() = 0;
 
         SpfyStoreItemLink."Sync. to this Store" := true;
