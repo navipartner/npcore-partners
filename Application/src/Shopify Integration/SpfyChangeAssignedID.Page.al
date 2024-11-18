@@ -88,13 +88,20 @@ page 6184563 "NPR Spfy Change Assigned ID"
         case BCRecID.TableNo of
             Database::"NPR Spfy Store-Item Link":
                 begin
-                    RecRef.Get(BCRecID);
+                    RecRef := BCRecID.GetRecord();
                     RecRef.SetTable(SpfyStoreItemLink);
                     SpfyStoreItemLink.TestField("Item No.");
                     SpfyStoreItemLink.TestField("Shopify Store Code");
                     case IDType of
                         "NPR Spfy ID Type"::"Entry ID":
-                            NewShopifyID := SendItemAndInventory.GetShopifyVariantID(SpfyStoreItemLink, true);
+                            begin
+                                case SpfyStoreItemLink.Type of
+                                    SpfyStoreItemLink.Type::Item:
+                                        NewShopifyID := SendItemAndInventory.GetShopifyItemID(SpfyStoreItemLink, true);
+                                    SpfyStoreItemLink.Type::Variant:
+                                        NewShopifyID := SendItemAndInventory.GetShopifyVariantID(SpfyStoreItemLink, true);
+                                end;
+                            end;
                         "NPR Spfy ID Type"::"Inventory Item ID":
                             NewShopifyID := SendItemAndInventory.GetShopifyInventoryItemID(SpfyStoreItemLink, true);
                     end;
