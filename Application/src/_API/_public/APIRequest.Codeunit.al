@@ -86,7 +86,7 @@ codeunit 6185051 "NPR API Request"
 
         for i := 1 to _Paths.Count() do begin
             if (not _Paths.Get(i).StartsWith(':')) then begin
-                if (_Paths.Get(i) <> _RelativePathSegments.Get(i)) then
+                if (_Paths.Get(i).ToLower() <> _RelativePathSegments.Get(i).ToLower()) then
                     exit(false);
             end;
         end;
