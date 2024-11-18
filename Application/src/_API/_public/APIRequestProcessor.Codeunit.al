@@ -3,6 +3,7 @@ codeunit 6185052 "NPR API Request Processor"
 {
     var
         EmptyPathErr: Label 'The path is empty.';
+        SentryTracerHeaderNameTok: Label 'x-sentry-trace-header', Locked = true;
 
     [ServiceEnabled]
     procedure httpmethod(message: Text): Text
@@ -39,6 +40,8 @@ codeunit 6185052 "NPR API Request Processor"
         UserPermissions: Codeunit "User Permissions";
         AccessControl: Record "Access Control";
         CurrentModuleInfo: ModuleInfo;
+        SentryTraceHeader: Text;
+        SentryTraceHeaderValues: List of [Text];
     begin
         jsonParser.Load(requestJson);
         jsonParser
@@ -56,6 +59,14 @@ codeunit 6185052 "NPR API Request Processor"
         requestRelativePathSegments.Remove('');
         if (requestRelativePathSegments.Count = 0) then begin
             Error(EmptyPathErr);
+        end;
+
+        if (requestHeaders.ContainsKey(SentryTracerHeaderNameTok)) then begin
+            Evaluate(SentryTraceHeader, requestHeaders.Get(SentryTracerHeaderNameTok));
+            SentryTraceHeaderValues := SentryTraceHeader.Split('-');
+        end else begin
+            Clear(SentryTraceHeader);
+            Clear(SentryTraceHeaderValues);
         end;
 
         apiModuleName := requestRelativePathSegments.Get(1);
