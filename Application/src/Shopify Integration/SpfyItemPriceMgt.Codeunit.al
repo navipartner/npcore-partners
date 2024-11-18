@@ -243,7 +243,7 @@ codeunit 6185048 "NPR Spfy Item Price Mgt."
         Item.SetRange("Variant Filter", ItemPriceParam."Variant Code");
 
         ShopifyStore.Get(ItemPriceParam."Shopify Store Code");
-        SpfyProductPriceCalc.CalcPrice(Item, ItemVariant.Code, Item."Sales Unit of Measure", CurrentPrice, CurrentComparePrice);
+        SpfyProductPriceCalc.CalcPrice(Item, ItemPriceParam."Variant Code", Item."Sales Unit of Measure", CurrentPrice, CurrentComparePrice);
 
         ItemPrice.LockTable();
         ItemPrice := ItemPriceParam;
