@@ -29,6 +29,11 @@ const createBalancingButtonAndDoASale = async (page) => {
       .getByRole("textbox")
       .nth(2)
       .fill("balancing");
+      await page
+      .frameLocator("iframe")
+      .getByRole("textbox")
+      .nth(2)
+      .click()
     await page
       .frameLocator("iframe")
       .getByRole("heading", { name: "Variables" })
