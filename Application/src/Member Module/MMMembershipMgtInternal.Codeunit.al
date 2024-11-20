@@ -2561,6 +2561,7 @@
         MemberInfoCapture."Membership Code" := Membership."Membership Code";
 
         MemberInfoCapture."External Card No." := ExternalMemberCardNo;
+        MemberInfoCapture."Card Entry No." := GetCardEntryNoFromExtCardNo(ExternalMemberCardNo);
         MemberInfoCapture."Item No." := MembershipSalesItemNo;
     end;
 
@@ -5345,16 +5346,20 @@
     internal procedure GetCardEntryNoFromExtCardNo(ExternalCardNo: Text[100]) CardEntryNo: Integer
     var
         MemberCard: Record "NPR MM Member Card";
+        FoundMemberCard: Boolean;
         PrefixedCardNo: Text;
         ForeignMembershipSetup: Record "NPR MM Foreign Members. Setup";
         PlaceHolderLbl: Label '%1%2', Locked = true;
     begin
 
         MemberCard.SetCurrentKey("External Card No.");
+        MemberCard.SetLoadFields("Entry No.", "External Card No.");
         MemberCard.SetFilter("External Card No.", '=%1|=%2', ExternalCardNo, EncodeSHA1(ExternalCardNo));
         MemberCard.SetFilter(Blocked, '=%1', false);
 
-        if (MemberCard.IsEmpty()) then begin
+        FoundMemberCard := MemberCard.FindFirst();
+
+        if (not FoundMemberCard) then begin
             ForeignMembershipSetup.SetCurrentKey("Invokation Priority");
             ForeignMembershipSetup.SetFilter(Disabled, '=%1', false);
             ForeignMembershipSetup.SetFilter("Community Code", '<>%1', '');
@@ -5373,7 +5378,7 @@
             end;
         end;
 
-        if (not MemberCard.FindFirst()) then
+        if (not FoundMemberCard) then
             exit(0);
 
         exit(MemberCard."Entry No.");
