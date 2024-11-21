@@ -3715,7 +3715,7 @@
         MembershipEvents.OnAfterInsertMembershipEntry(MembershipEntry);
 
         AddMembershipRenewalNotification(MembershipEntry);
-        Commit();
+
     end;
 
     internal procedure MembershipNeedsActivation(MembershipEntryNo: Integer): Boolean

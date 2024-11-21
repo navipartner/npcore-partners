@@ -196,6 +196,7 @@
 
         if (MustActivate) and (ActivateMembership) then begin
             MemberManagement.ActivateMembershipLedgerEntry(MembershipEntryNo, Today);
+            Commit();
         end;
 
         exit(true);
