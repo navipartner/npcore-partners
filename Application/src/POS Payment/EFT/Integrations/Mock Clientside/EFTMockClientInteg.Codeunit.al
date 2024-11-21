@@ -7,9 +7,9 @@
     end;
 
     var
-        Description: Label 'Mock client-side via Stargate';
-        BalanceDescription: Label 'Gift card balance enquiry';
-        ReprintLastDescription: Label 'Reprint last terminal receipt';
+        Description: Label 'Mock client-side via Stargate', MaxLength = 50;
+        BalanceDescription: Label 'Gift card balance enquiry', MaxLength = 50;
+        ReprintLastDescription: Label 'Reprint last terminal receipt', MaxLength = 50;
         CompBlobCaption1: Label 'Blob Caption 1';
         CompBlobCaption2: Label 'Blob Caption 2';
         CompBlobDesc1: Label 'Blob Description 1 ';
@@ -38,7 +38,7 @@
     begin
         tmpEFTIntegrationType.Init();
         tmpEFTIntegrationType.Code := IntegrationType();
-        tmpEFTIntegrationType.Description := Description;
+        tmpEFTIntegrationType.Description := CopyStr(Description, 1, MaxStrLen(tmpEFTIntegrationType.Description));
         tmpEFTIntegrationType."Codeunit ID" := CODEUNIT::"NPR EFT Mock Client Integ.";
         tmpEFTIntegrationType."Version 2" := true;
         tmpEFTIntegrationType.Insert();
@@ -52,13 +52,13 @@
         tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 1;
-        tmpEFTAuxOperation.Description := BalanceDescription;
+        tmpEFTAuxOperation.Description := CopyStr(BalanceDescription, 1, MaxStrLen(tmpEFTAuxOperation.Description));
         tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 2;
-        tmpEFTAuxOperation.Description := ReprintLastDescription;
+        tmpEFTAuxOperation.Description := CopyStr(ReprintLastDescription, 1, MaxStrlen(tmpEFTAuxOperation.Description));
         tmpEFTAuxOperation.Insert();
     end;
 

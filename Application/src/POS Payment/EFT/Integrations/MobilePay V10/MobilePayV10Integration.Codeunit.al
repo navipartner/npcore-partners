@@ -15,7 +15,7 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
 
     var
         Tok_INTEGRATIONTYPE: Label 'MOBILEPAY_V10', Locked = true, MaxLength = 20;
-        Lbl_DESCRIPTION: Label 'MobilePay V10 Integration';
+        Lbl_DESCRIPTION: Label 'MobilePay V10 Integration', MaxLength = 50;
         Lbl_NO_CASHBACK: Label 'Cashback is not supported for MobilePay';
         Lbl_POS_CREATION_SUCCESS: Label 'Created POS in MobilePay backend successfully';
         Lbl_POS_DELETE_SUCCESS: Label 'Deleted POS in MobilePay backend successfully';
@@ -26,7 +26,7 @@ codeunit 6014518 "NPR MobilePayV10 Integration"
     begin
         tmpEFTIntegrationType.Init();
         tmpEFTIntegrationType.Code := Tok_INTEGRATIONTYPE;
-        tmpEFTIntegrationType.Description := Lbl_DESCRIPTION;
+        tmpEFTIntegrationType.Description := CopyStr(Lbl_DESCRIPTION, 1, MaxStrLen(tmpEFTIntegrationType.Description));
         tmpEFTIntegrationType."Codeunit ID" := Codeunit::"NPR MobilePayV10 Integration";
         tmpEFTIntegrationType."Version 2" := true;
         tmpEFTIntegrationType.Insert();
