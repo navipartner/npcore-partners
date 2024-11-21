@@ -3,13 +3,13 @@
     Access = Internal;
 
     var
-        Description: Label 'Adyen Cloud Terminal API';
-        ABORT_TRX: Label 'Abort Transaction';
-        ACQUIRE_CARD: Label 'Acquire Card';
-        ABORT_ACQUIRED: Label 'Abort Acquired Card';
-        DETECT_SHOPPER: Label 'Detect Shopper from Card';
-        CLEAR_SHOPPER: Label 'Clear Shopper from Card';
-        DISABLE_CONTRACT: Label 'Disable Shopper Recurring Contract';
+        Description: Label 'Adyen Cloud Terminal API', MaxLength = 50;
+        ABORT_TRX: Label 'Abort Transaction', MaxLength = 50;
+        ACQUIRE_CARD: Label 'Acquire Card', MaxLength = 50;
+        ABORT_ACQUIRED: Label 'Abort Acquired Card', MaxLength = 50;
+        DETECT_SHOPPER: Label 'Detect Shopper from Card', MaxLength = 50;
+        CLEAR_SHOPPER: Label 'Clear Shopper from Card', MaxLength = 50;
+        DISABLE_CONTRACT: Label 'Disable Shopper Recurring Contract', MaxLength = 50;
 
     procedure IntegrationType(): Code[20]
     begin
@@ -21,7 +21,7 @@
     begin
         tmpEFTIntegrationType.Init();
         tmpEFTIntegrationType.Code := IntegrationType();
-        tmpEFTIntegrationType.Description := Description;
+        tmpEFTIntegrationType.Description := CopyStr(Description, 1, MaxStrLen(tmpEFTIntegrationType.Description));
         tmpEFTIntegrationType."Codeunit ID" := CODEUNIT::"NPR EFT Adyen Local Integrat.";
         tmpEFTIntegrationType."Version 2" := true;
         tmpEFTIntegrationType.Insert();
@@ -35,37 +35,37 @@
         tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 1;
-        tmpEFTAuxOperation.Description := ABORT_TRX;
+        tmpEFTAuxOperation.Description := CopyStr(ABORT_TRX, 1, MaxStrLen(tmpEFTAuxOperation.Description));
         tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 2;
-        tmpEFTAuxOperation.Description := ACQUIRE_CARD;
+        tmpEFTAuxOperation.Description := CopyStr(ACQUIRE_CARD, 1, MaxStrLen(tmpEFTAuxOperation.Description));
         tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 3;
-        tmpEFTAuxOperation.Description := ABORT_ACQUIRED;
+        tmpEFTAuxOperation.Description := CopyStr(ABORT_ACQUIRED, 1, MaxStrLen(tmpEFTAuxOperation.Description));
         tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 4;
-        tmpEFTAuxOperation.Description := DETECT_SHOPPER;
+        tmpEFTAuxOperation.Description := CopyStr(DETECT_SHOPPER, 1, MaxStrLen(tmpEFTAuxOperation.Description));
         tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 5;
-        tmpEFTAuxOperation.Description := CLEAR_SHOPPER;
+        tmpEFTAuxOperation.Description := CopyStr(CLEAR_SHOPPER, 1, MaxStrLen(tmpEFTAuxOperation.Description));
         tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 6;
-        tmpEFTAuxOperation.Description := DISABLE_CONTRACT;
+        tmpEFTAuxOperation.Description := CopyStr(DISABLE_CONTRACT, 1, MaxStrLen(tmpEFTAuxOperation.Description));
         tmpEFTAuxOperation.Insert();
     end;
 

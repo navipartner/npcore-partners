@@ -14,11 +14,11 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnDiscoverIntegrations', '', false, false)]
     local procedure OnDiscoverIntegrations(var tmpEFTIntegrationType: Record "NPR EFT Integration Type" temporary)
     var
-        DescriptionLbl: Label 'NETS Cloud Terminal API';
+        DescriptionLbl: Label 'NETS Cloud Terminal API', MaxLength = 50;
     begin
         tmpEFTIntegrationType.Init();
         tmpEFTIntegrationType.Code := IntegrationType();
-        tmpEFTIntegrationType.Description := DescriptionLbl;
+        tmpEFTIntegrationType.Description := CopyStr(DescriptionLbl, 1, MaxStrLen(tmpEFTIntegrationType.Description));
         tmpEFTIntegrationType."Codeunit ID" := CODEUNIT::"NPR EFT NETSCloud Integrat.";
         tmpEFTIntegrationType."Version 2" := true;
         tmpEFTIntegrationType.Insert();
@@ -27,26 +27,26 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnDiscoverAuxiliaryOperations', '', false, false)]
     local procedure OnDiscoverAuxiliaryOperations(var tmpEFTAuxOperation: Record "NPR EFT Aux Operation" temporary)
     var
-        BalanceEnquiryLbl: Label 'Balance Enquiry';
-        DownloadDatasetLbl: Label 'Download Dataset';
-        DownloadSoftwareLbl: Label 'Download Software';
+        BalanceEnquiryLbl: Label 'Balance Enquiry', MaxLength = 50;
+        DownloadDatasetLbl: Label 'Download Dataset', MaxLength = 50;
+        DownloadSoftwareLbl: Label 'Download Software', MaxLength = 50;
     begin
         tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 2;
-        tmpEFTAuxOperation.Description := BalanceEnquiryLbl;
+        tmpEFTAuxOperation.Description := CopyStr(BalanceEnquiryLbl, 1, MaxStrLen(tmpEFTAuxOperation.Description));
         tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 3;
-        tmpEFTAuxOperation.Description := DownloadDatasetLbl;
+        tmpEFTAuxOperation.Description := CopyStr(DownloadDatasetLbl, 1, MaxStrLen(tmpEFTAuxOperation.Description));
         tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 4;
-        tmpEFTAuxOperation.Description := DownloadSoftwareLbl;
+        tmpEFTAuxOperation.Description := CopyStr(DownloadSoftwareLbl, 1, MaxStrLen(tmpEFTAuxOperation.Description));
         tmpEFTAuxOperation.Insert();
     end;
 
