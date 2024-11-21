@@ -3,10 +3,10 @@
     Access = Internal;
 
     var
-        Description: Label 'NETS BAXI .NET';
-        BALANCE_ENQUIRY: Label 'Balance Enquiry';
-        DOWNLOAD_DATASET: Label 'Download Dataset';
-        DOWNLOAD_SOFTWARE: Label 'Download Software';
+        Description: Label 'NETS BAXI .NET', MaxLength = 50;
+        BALANCE_ENQUIRY: Label 'Balance Enquiry', MaxLength = 50;
+        DOWNLOAD_DATASET: Label 'Download Dataset', MaxLength = 50;
+        DOWNLOAD_SOFTWARE: Label 'Download Software', MaxLength = 50;
         TRX_ERROR: Label '%1 %2 failed\%3\%4';
         VOID_SUCCESS: Label 'Transaction %1 voided successfully';
         CARD: Label 'Card: %1';
@@ -14,7 +14,7 @@
         ERROR_ONLY_LAST: Label 'Can only perform %1 on last transaction on terminal %2';
         OPERATION_SUCCESS: Label '%1 %2 Success';
         RECONCILE_SUCCESS: Label 'NETS Terminal Reconciliation Success';
-        RECONCILIATION: Label 'Reconciliation';
+        RECONCILIATION: Label 'Reconciliation', MaxLength = 50;
 
     procedure IntegrationType(): Code[20]
     begin
@@ -26,7 +26,7 @@
     begin
         tmpEFTIntegrationType.Init();
         tmpEFTIntegrationType.Code := IntegrationType();
-        tmpEFTIntegrationType.Description := Description;
+        tmpEFTIntegrationType.Description := CopyStr(Description, 1, MaxStrLen(tmpEFTIntegrationType.Description));
         tmpEFTIntegrationType."Codeunit ID" := CODEUNIT::"NPR EFT NETS BAXI Integration";
         tmpEFTIntegrationType."Version 2" := true;
         tmpEFTIntegrationType.Insert();
@@ -38,25 +38,25 @@
         tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 1;
-        tmpEFTAuxOperation.Description := BALANCE_ENQUIRY;
+        tmpEFTAuxOperation.Description := CopyStr(BALANCE_ENQUIRY, 1, MaxStrLen(tmpEFTAuxOperation.Description));
         tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 2;
-        tmpEFTAuxOperation.Description := DOWNLOAD_DATASET;
+        tmpEFTAuxOperation.Description := CopyStr(DOWNLOAD_DATASET, 1, MaxStrLen(tmpEFTAuxOperation.Description));
         tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 3;
-        tmpEFTAuxOperation.Description := DOWNLOAD_SOFTWARE;
+        tmpEFTAuxOperation.Description := CopyStr(DOWNLOAD_SOFTWARE, 1, MaxStrLen(tmpEFTAuxOperation.Description));
         tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 4;
-        tmpEFTAuxOperation.Description := RECONCILIATION;
+        tmpEFTAuxOperation.Description := CopyStr(RECONCILIATION, 1, MaxStrLen(tmpEFTAuxOperation.Description));
         tmpEFTAuxOperation.Insert();
     end;
 
