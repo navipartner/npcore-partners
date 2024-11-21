@@ -564,17 +564,33 @@
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnBeforeDeletePOSSaleLine', '', true, true)]
     local procedure OnBeforeDeletePOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line")
+    begin
+        OnDeletePOSSaleLineWorker(SaleLinePOS);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale Line", 'OnBeforeDeleteEvent', '', true, false)]
+    local procedure OnBeforeDeleteRecordPOSSaleLine(var Rec: Record "NPR POS Sale Line"; RunTrigger: Boolean)
+    begin
+        OnDeletePOSSaleLineWorker(Rec);
+    end;
+
+    local procedure OnDeletePOSSaleLineWorker(var SaleLinePOS: Record "NPR POS Sale Line")
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         Token: Text[100];
         TokenLineNumber: Integer;
     begin
+        if (SaleLinePOS.IsTemporary()) then
+            exit;
+
         if (not IsTicketSalesLine(SaleLinePOS)) then
             exit;
 
         // This is a ticket event
         if (GetRequestToken(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token, TokenLineNumber)) then begin
             if (TicketRequestManager.IsRequestStatusReservation(Token)) then
+                exit;
+            if (TicketRequestManager.IsRequestStatusConfirmed(Token)) then
                 exit;
 
             TicketRequestManager.DeleteReservationRequest(Token, true);
