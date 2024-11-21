@@ -1843,6 +1843,18 @@
         exit(false);
     end;
 
+    procedure IsRequestStatusConfirmed(Token: Text[100]): Boolean
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+        TicketReservationRequest.SetCurrentKey("Session Token ID");
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        if (TicketReservationRequest.FindFirst()) then
+            exit(TicketReservationRequest."Request Status" = TicketReservationRequest."Request Status"::CONFIRMED);
+
+        exit(false);
+    end;
+
     procedure RequestRequiresAttention(Token: Text[100]): boolean
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
