@@ -558,7 +558,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                 if NcTaskOut."Process Error" then
                     SetResponse(NcTaskOut, FuturePriceErr)
                 else begin
-                    NcTaskOut."Process Error" := GetStoreItemLink(ItemPrice."Item No.", ItemPrice."Shopify Store Code", false, SpfyStoreItemLink);  //Check integration is enabled for the item
+                    NcTaskOut."Process Error" := not GetStoreItemLink(ItemPrice."Item No.", ItemPrice."Shopify Store Code", false, SpfyStoreItemLink);  //Check integration is enabled for the item
                     if NcTaskOut."Process Error" then
                         SetResponse(NcTaskOut, ItemIntegrNotEnabledErr)
                     else begin
