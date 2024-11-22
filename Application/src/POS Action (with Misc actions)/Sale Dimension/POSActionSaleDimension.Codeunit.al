@@ -204,6 +204,7 @@ codeunit 6150826 "NPR POS Action: Sale Dimension" implements "NPR IPOS Workflow"
     local procedure LookupDimensionValue(DimCode: Code[20]; var DimValueCode: Code[20]): Boolean
     var
         DimensionValue: Record "Dimension Value";
+        SalesDimensionEvents: Codeunit "NPR Sales Dimension Events";
     begin
         DimensionValue.FilterGroup(2);
         DimensionValue.SetRange("Dimension Code", DimCode);
@@ -215,6 +216,7 @@ codeunit 6150826 "NPR POS Action: Sale Dimension" implements "NPR IPOS Workflow"
             if DimensionValue.Find('=><') then;
         end;
 
+        SalesDimensionEvents.OnBeforeRunDimensionValueListModal(DimensionValue);
         if Page.RunModal(Page::"NPR Dimension Value List", DimensionValue) <> ACTION::LookupOK then
             exit(false);
 
