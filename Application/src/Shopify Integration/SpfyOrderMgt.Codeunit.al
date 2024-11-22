@@ -784,9 +784,12 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         SalesHeader.Validate("Sell-to Customer No.", Customer."No.");
 
         if Order.SelectToken('billing_address', BillingAddress) then begin
-            SellToName := JsonHelper.GetJText(BillingAddress, 'first_name', true);
-            if JsonHelper.GetJText(BillingAddress, 'last_name', true) <> '' then
-                SellToName += ' ' + JsonHelper.GetJText(BillingAddress, 'last_name', true);
+            SellToName := JsonHelper.GetJText(BillingAddress, 'first_name', false);
+            if JsonHelper.GetJText(BillingAddress, 'last_name', false) <> '' then begin
+                if SellToName <> '' then
+                    SellToName += ' ';
+                SellToName += JsonHelper.GetJText(BillingAddress, 'last_name', false);
+            end;
             Company := JsonHelper.GetJText(BillingAddress, 'company', false);
             if Company = '' then begin
                 SalesHeader."Sell-to Customer Name" := CopyStr(SellToName, 1, MaxStrLen(SalesHeader."Sell-to Customer Name"));
@@ -797,10 +800,10 @@ codeunit 6184814 "NPR Spfy Order Mgt."
                 SalesHeader."Sell-to Contact" := CopyStr(SellToName, 1, MaxStrLen(SalesHeader."Sell-to Contact"));
             end;
 #pragma warning disable AA0139
-            SalesHeader."Sell-to Address" := JsonHelper.GetJText(BillingAddress, 'address1', MaxStrLen(SalesHeader."Sell-to Address"), true);
+            SalesHeader."Sell-to Address" := JsonHelper.GetJText(BillingAddress, 'address1', MaxStrLen(SalesHeader."Sell-to Address"), false);
             SalesHeader."Sell-to Address 2" := JsonHelper.GetJText(BillingAddress, 'address2', MaxStrLen(SalesHeader."Sell-to Address 2"), false);
-            SalesHeader."Sell-to Post Code" := JsonHelper.GetJCode(BillingAddress, 'zip', MaxStrLen(SalesHeader."Sell-to Post Code"), true);
-            SalesHeader."Sell-to City" := JsonHelper.GetJText(BillingAddress, 'city', MaxStrLen(SalesHeader."Sell-to City"), true);
+            SalesHeader."Sell-to Post Code" := JsonHelper.GetJCode(BillingAddress, 'zip', MaxStrLen(SalesHeader."Sell-to Post Code"), false);
+            SalesHeader."Sell-to City" := JsonHelper.GetJText(BillingAddress, 'city', MaxStrLen(SalesHeader."Sell-to City"), false);
 #pragma warning restore AA0139
             SalesHeader.Validate("Sell-to Country/Region Code", GetCountryCode(NpEcStore, BillingAddress, 'country_code', false));
         end;
@@ -839,9 +842,12 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         if not Order.SelectToken('shipping_address', ShippingAddress) or not ShippingAddress.IsObject() then
             exit;
 
-        ShipToName := JsonHelper.GetJText(ShippingAddress, 'first_name', true);
-        if JsonHelper.GetJText(ShippingAddress, 'last_name', true) <> '' then
-            ShipToName += ' ' + JsonHelper.GetJText(ShippingAddress, 'last_name', true);
+        ShipToName := JsonHelper.GetJText(ShippingAddress, 'first_name', false);
+        if JsonHelper.GetJText(ShippingAddress, 'last_name', false) <> '' then begin
+            if ShipToName <> '' then
+                ShipToName += ' ';
+            ShipToName += JsonHelper.GetJText(ShippingAddress, 'last_name', false);
+        end;
         Company := JsonHelper.GetJText(ShippingAddress, 'company', false);
         if Company = '' then begin
             SalesHeader."Ship-to Name" := CopyStr(ShipToName, 1, MaxStrLen(SalesHeader."Ship-to Name"));
