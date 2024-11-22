@@ -78,6 +78,16 @@ page 6151214 "NPR CRO Fiscalization Setup"
                 }
             }
 
+            group(FiscalPrinting)
+            {
+                Caption = 'Fiscal Receipt Printing Setup';
+                field("Print Receipt On Sales Doc."; Rec."Print Receipt On Sales Doc.")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies if the receipt should be automatically printed after sales document posting.';
+                }
+            }
+
             group("Customer Ledger Entry Posting Setup")
             {
                 Caption = 'Customer Ledger Entry Posting Setup';

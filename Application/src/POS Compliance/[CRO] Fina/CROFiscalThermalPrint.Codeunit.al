@@ -76,8 +76,6 @@ codeunit 6151584 "NPR CRO Fiscal Thermal Print"
 
         PrintSalesInvContentSection(CROPOSAuditLogAuxInfo, SalesInvoiceHdr);
 
-        PrintSalesInvVATSection(CROPOSAuditLogAuxInfo, SalesInvoiceHdr);
-
         PrintFooter(CROPOSAuditLogAuxInfo);
 
         PrintThermalLine('PAPERCUT', 'COMMAND', false, 'CENTER', true, false);
@@ -107,8 +105,6 @@ codeunit 6151584 "NPR CRO Fiscal Thermal Print"
         PrintHeaderSection(CROPOSAuditLogAuxInfo);
 
         PrintSalesCrMemoContentSection(CROPOSAuditLogAuxInfo, SalesCrMemoHdr);
-
-        PrintSalesCrMemoVATSection(CROPOSAuditLogAuxInfo, SalesCrMemoHdr);
 
         PrintFooter(CROPOSAuditLogAuxInfo);
 
@@ -141,7 +137,7 @@ codeunit 6151584 "NPR CRO Fiscal Thermal Print"
         if POSEntrySalesLine.FindSet() then
             repeat
                 PrintTextLine(POSEntrySalesLine.Description, false);
-                PrintFourColumnText(Format(POSEntrySalesLine.Quantity).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(POSEntrySalesLine."Unit Price"), FormatDecimal(Round(POSEntrySalesLine."Amount Incl. VAT")), false);
+                PrintFourColumnText(Format(POSEntrySalesLine.Quantity).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(Abs(POSEntrySalesLine."Unit Price")), FormatDecimal(POSEntrySalesLine."Amount Incl. VAT"), false);
             until POSEntrySalesLine.Next() = 0;
         PrintFullLine();
 
@@ -160,7 +156,7 @@ codeunit 6151584 "NPR CRO Fiscal Thermal Print"
         POSEntryTaxLine.SetRange("POS Entry No.", CROPOSAuditLogAuxInfo."POS Entry No.");
         if POSEntryTaxLine.FindSet() then
             repeat
-                PrintFourColumnText(StrSubstNo(TwoValueFormatLbl, Format(Round(POSEntryTaxLine."Tax %", 0.1)), '%'), FormatDecimal(POSEntryTaxLine."Tax Base Amount"), FormatDecimal(POSEntryTaxLine."Tax Amount"), FormatDecimal(POSEntryTaxLine."Amount Including Tax"), false);
+                PrintFourColumnText(StrSubstNo(TwoValueFormatLbl, Format(Round(Abs(POSEntryTaxLine."Tax %"), 0.1)), '%'), FormatDecimal(Abs(POSEntryTaxLine."Tax Base Amount")), FormatDecimal(Abs(POSEntryTaxLine."Tax Amount")), FormatDecimal(Abs(POSEntryTaxLine."Amount Including Tax")), false);
             until POSEntryTaxLine.Next() = 0;
 
         PrintFullLine();
@@ -176,6 +172,11 @@ codeunit 6151584 "NPR CRO Fiscal Thermal Print"
     local procedure PrintSalesInvContentSection(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; SalesInvoiceHdr: Record "Sales Invoice Header")
     var
         SalesInvoiceLine: Record "Sales Invoice Line";
+        TaxableAmountDict: Dictionary of [Decimal, Decimal];
+        TaxAmountDict: Dictionary of [Decimal, Decimal];
+        AmountInclTaxDict: Dictionary of [Decimal, Decimal];
+        DictKeysList: List of [Decimal];
+        DictKey: Decimal;
     begin
         PrintFourColumnText(ItemDescLbl, QtyLbl, PriceLbl, LineAmountLbl, true);
         PrintDottedLine();
@@ -185,28 +186,24 @@ codeunit 6151584 "NPR CRO Fiscal Thermal Print"
         if SalesInvoiceLine.FindSet() then
             repeat
                 PrintTextLine(SalesInvoiceLine.Description, false);
-                PrintFourColumnText(Format(SalesInvoiceLine.Quantity).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(SalesInvoiceLine."Unit Price"), FormatDecimal(Round(SalesInvoiceLine."Amount Including VAT")), false);
+                PrintFourColumnText(Format(SalesInvoiceLine.Quantity).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(GetUnitPriceInclVAT(SalesInvoiceHdr."Prices Including VAT", SalesInvoiceLine."Unit Price", SalesInvoiceLine."VAT %", SalesInvoiceHdr."Currency Code")), FormatDecimal(SalesInvoiceLine."Amount Including VAT"), false);
+
+                AddAmountToDecimalDict(TaxableAmountDict, SalesInvoiceLine."VAT %", SalesInvoiceLine."VAT Base Amount");
+                AddAmountToDecimalDict(TaxAmountDict, SalesInvoiceLine."VAT %", SalesInvoiceLine."Amount Including VAT" - SalesInvoiceLine."VAT Base Amount");
+                AddAmountToDecimalDict(AmountInclTaxDict, SalesInvoiceLine."VAT %", SalesInvoiceLine."Amount Including VAT");
             until SalesInvoiceLine.Next() = 0;
         PrintFullLine();
 
         PrintTwoColumnText(FinalBillLbl, FormatDecimal(SalesInvoiceHdr."Amount Including VAT"), true);
         PrintTextLine('', false);
-    end;
 
-    local procedure PrintSalesInvVATSection(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; SalesInvoiceHdr: Record "Sales Invoice Header")
-    var
-        SalesInvoiceLine: Record "Sales Invoice Line";
-    begin
         PrintDottedLine();
         PrintFourColumnText(VATPercLbl, VATBaseLbl, VATAmountLbl, VATTotalLbl, true);
         PrintDottedLine();
 
-        SalesInvoiceLine.SetRange("Document No.", CROPOSAuditLogAuxInfo."Source Document No.");
-        SalesInvoiceLine.SetRange(Type, "Sales Line Type"::Item);
-        if SalesInvoiceLine.FindSet() then
-            repeat
-                PrintFourColumnText(StrSubstNo(TwoValueFormatLbl, Format(Round(SalesInvoiceLine."VAT %", 0.1)), '%'), FormatDecimal(SalesInvoiceLine."VAT Base Amount"), FormatDecimal(SalesInvoiceLine."Amount Including VAT" - SalesInvoiceLine."VAT Base Amount"), FormatDecimal(SalesInvoiceLine."Amount Including VAT"), false);
-            until SalesInvoiceLine.Next() = 0;
+        DictKeysList := TaxableAmountDict.Keys();
+        foreach DictKey in DictKeysList do
+            PrintFourColumnText(StrSubstNo(TwoValueFormatLbl, Format(Round(DictKey, 0.1)), '%'), FormatDecimal(TaxableAmountDict.Get(DictKey)), FormatDecimal(TaxAmountDict.Get(DictKey)), FormatDecimal(AmountInclTaxDict.Get(DictKey)), false);
 
         PrintFullLine();
 
@@ -220,6 +217,11 @@ codeunit 6151584 "NPR CRO Fiscal Thermal Print"
     local procedure PrintSalesCrMemoContentSection(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; SalesCrMemoHdr: Record "Sales Cr.Memo Header")
     var
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
+        TaxableAmountDict: Dictionary of [Decimal, Decimal];
+        TaxAmountDict: Dictionary of [Decimal, Decimal];
+        AmountInclTaxDict: Dictionary of [Decimal, Decimal];
+        DictKeysList: List of [Decimal];
+        DictKey: Decimal;
     begin
         PrintFourColumnText(ItemDescLbl, QtyLbl, PriceLbl, LineAmountLbl, true);
         PrintDottedLine();
@@ -229,28 +231,25 @@ codeunit 6151584 "NPR CRO Fiscal Thermal Print"
         if SalesCrMemoLine.FindSet() then
             repeat
                 PrintTextLine(SalesCrMemoLine.Description, false);
-                PrintFourColumnText(Format(-SalesCrMemoLine.Quantity).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(-Round(SalesCrMemoLine."Unit Price")), FormatDecimal(-Round(SalesCrMemoLine."Amount Including VAT")), false);
+                PrintFourColumnText(Format(-Abs(SalesCrMemoLine.Quantity)).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(Abs(GetUnitPriceInclVAT(SalesCrMemoHdr."Prices Including VAT", SalesCrMemoLine."Unit Price", SalesCrMemoLine."VAT %", SalesCrMemoHdr."Currency Code"))), FormatDecimal(-Abs(SalesCrMemoLine."Amount Including VAT")), false);
+
+                AddAmountToDecimalDict(TaxableAmountDict, SalesCrMemoLine."VAT %", SalesCrMemoLine."VAT Base Amount");
+                AddAmountToDecimalDict(TaxAmountDict, SalesCrMemoLine."VAT %", SalesCrMemoLine."Amount Including VAT" - SalesCrMemoLine."VAT Base Amount");
+                AddAmountToDecimalDict(AmountInclTaxDict, SalesCrMemoLine."VAT %", SalesCrMemoLine."Amount Including VAT");
             until SalesCrMemoLine.Next() = 0;
         PrintFullLine();
 
         PrintTwoColumnText(FinalBillLbl, FormatDecimal(SalesCrMemoHdr."Amount Including VAT"), true);
         PrintTextLine('', false);
-    end;
 
-    local procedure PrintSalesCrMemoVATSection(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; SalesCrMemoHdr: Record "Sales Cr.Memo Header")
-    var
-        SalesCrMemoLine: Record "Sales Cr.Memo Line";
-    begin
         PrintDottedLine();
         PrintFourColumnText(VATPercLbl, VATBaseLbl, VATAmountLbl, VATTotalLbl, true);
         PrintDottedLine();
 
-        SalesCrMemoLine.SetRange("Document No.", CROPOSAuditLogAuxInfo."Source Document No.");
-        SalesCrMemoLine.SetRange(Type, "Sales Line Type"::Item);
-        if SalesCrMemoLine.FindSet() then
-            repeat
-                PrintFourColumnText(StrSubstNo(TwoValueFormatLbl, Format(-Round(SalesCrMemoLine."VAT %", 0.1)), '%'), FormatDecimal(-SalesCrMemoLine."VAT Base Amount"), FormatDecimal(-(SalesCrMemoLine."Amount Including VAT" - SalesCrMemoLine."VAT Base Amount")), FormatDecimal(-SalesCrMemoLine."Amount Including VAT"), false);
-            until SalesCrMemoLine.Next() = 0;
+
+        DictKeysList := TaxableAmountDict.Keys();
+        foreach DictKey in DictKeysList do
+            PrintFourColumnText(StrSubstNo(TwoValueFormatLbl, Format(Round(DictKey, 0.1)), '%'), FormatDecimal(TaxableAmountDict.Get(DictKey)), FormatDecimal(TaxAmountDict.Get(DictKey)), FormatDecimal(AmountInclTaxDict.Get(DictKey)), false);
 
         PrintFullLine();
 
@@ -258,6 +257,7 @@ codeunit 6151584 "NPR CRO Fiscal Thermal Print"
 
         PrintTextLine('', false);
     end;
+
     #endregion
 
     #region CRO Fiscal Thermal Print - Base Section Printing
@@ -398,6 +398,35 @@ codeunit 6151584 "NPR CRO Fiscal Thermal Print"
     local procedure FormatDecimal(Value: Decimal): Text
     begin
         exit(Format(Value, 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,.>'));
+    end;
+
+    #endregion
+
+    #region CRO Fiscal Thermal Print - Helper Procedures
+
+    local procedure AddAmountToDecimalDict(var DecimalDict: Dictionary of [Decimal, Decimal]; DictKey: Decimal; DictValue: Decimal)
+    var
+        BaseAmount: Decimal;
+    begin
+        if DecimalDict.Add(DictKey, DictValue) then
+            exit;
+        BaseAmount := DecimalDict.Get(DictKey) + DictValue;
+        DecimalDict.Set(DictKey, BaseAmount);
+    end;
+
+    local procedure GetUnitPriceInclVAT(PricesInclVAT: Boolean; UnitPrice: Decimal; VATPercentage: Decimal; CurrencyCode: Code[20]): Decimal
+    var
+        Currency: Record Currency;
+    begin
+        if PricesInclVAT then
+            exit(UnitPrice);
+
+        if CurrencyCode = '' then
+            Currency.InitRoundingPrecision()
+        else
+            if not Currency.Get(CurrencyCode) then
+                Currency.InitRoundingPrecision();
+        exit(Round(UnitPrice * (1 + VATPercentage / 100), Currency."Amount Rounding Precision"));
     end;
 
     #endregion
