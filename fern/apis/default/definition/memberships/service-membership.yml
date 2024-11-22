@@ -26,8 +26,8 @@ service:
         - name: ExampleMembership1
           docs: Example response for the createMembership endpoint
           path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
           request: $CreateMembershipRequest.ExampleCreateMembership
           response:
@@ -48,8 +48,8 @@ service:
       examples:
         - name: ExampleGetMembershipId
           path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             membershipId: $simpleTypes.MembershipId.ExampleMembershipId
           response:
@@ -70,8 +70,8 @@ service:
       examples:
         - name: ExampleGetMembershipNumber
           path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
           response:
@@ -91,8 +91,8 @@ service:
       examples:
         - name: ExampleBlockMembership
           path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             membershipId: $simpleTypes.MembershipId.ExampleMembershipId
           response:
@@ -113,8 +113,8 @@ service:
       examples:
         - name: ExampleUnblockMembership
           path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             membershipId: $simpleTypes.MembershipId.ExampleMembershipId
           response:
@@ -135,8 +135,8 @@ service:
       examples:
         - name: GetMembershipMembers
           path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             membershipId: $simpleTypes.MembershipId.ExampleMembershipId
           response: 

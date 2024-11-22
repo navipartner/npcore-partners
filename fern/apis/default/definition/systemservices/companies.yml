@@ -22,17 +22,17 @@ service:
     getCompanies:
       display-name: Get all companies
       docs: Get list of all companies in the selected environment. More information how to work with companies can be found [here](/api-reference/system-services/companies).
-      base-path: /{saasguid}/{saasenv}
+      base-path: /{tenant}/{environment}
       path: "/companies"
       path-parameters:
-        saasguid: string
-        saasenv: string
+        tenant: string
+        environment: string
       method: GET
       response: Companies
       examples:
         - path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
           response:
             body:
               value:

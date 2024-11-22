@@ -30,8 +30,8 @@ service:
       examples:
         - name: ExampleAddMember
           path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             membershipId: $simpleTypes.MembershipId.ExampleMembershipId
           request: $AddMemberRequest.ExampleAddMember
@@ -52,8 +52,8 @@ service:
       examples:
         - name: ExampleGetMember
           path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             memberId: $simpleTypes.MemberId.ExampleMemberId
           response: 
@@ -73,8 +73,8 @@ service:
       examples:
         - name: ExampleGetMemberNumber
           path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             memberNumber: $simpleTypes.MemberNumber.ExampleMemberNumber
           response: 
@@ -98,8 +98,8 @@ service:
       examples:
         - name: ExampleBlockMember
           path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             memberId: $simpleTypes.MemberId.ExampleMemberId
           response: 
@@ -120,8 +120,8 @@ service:
       examples:
         - name: ExampleUnblockMember
           path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             memberId: $simpleTypes.MemberId.ExampleMemberId
           response: 
@@ -143,8 +143,8 @@ service:
       examples:
         - name: ExampleUpdateMember
           path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             memberId: $simpleTypes.MemberId.ExampleMemberId
           request: $UpdateMemberRequest.ExampleUpdateMember
@@ -165,8 +165,8 @@ service:
       examples:
         - name: ExampleGetMemberImage
           path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             memberId: $simpleTypes.MemberId.ExampleMemberId
           response:
@@ -188,8 +188,8 @@ service:
       examples:
         - name: ExampleSetMemberImage
           path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             memberId: $simpleTypes.MemberId.ExampleMemberId
           request: $SetMemberImageRequest.ExampleSetMemberImage
@@ -219,8 +219,8 @@ service:
       examples:
         - name: ExampleFindMembers
           path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
           query-parameters:
             memberNumber: $simpleTypes.MemberNumber.ExampleMemberNumber

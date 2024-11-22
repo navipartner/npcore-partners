@@ -9,22 +9,22 @@ types:
       - name: ExampleApiVersionDate
         value: "2024-10-11"
 
-  SaasGuid: 
+  tenant: 
     type: string
     docs: 
-      A unique identifier (GUID) for the Business Central tenant in the Software as a Service (SaaS) environment. [More details.](/url-paths#1-saasguid-saas-guid)
+      A unique identifier (GUID) for the Business Central tenant in the Software as a Service (SaaS) environment. [More details.](/url-paths#1-tenant-saas-guid)
     examples:
-      - name: ExampleSaasGuid
+      - name: Exampletenant
         value: "01234567-89ab-cdef-0123-456789abcdef"
 
-  SaasEnv:
+  environment:
     type: string
     docs: 
-      Specifies which environment of the Business Central tenant you want to access. [More details.](/url-paths#2-saasenv-saas-environment)
+      Specifies which environment of the Business Central tenant you want to access. [More details.](/url-paths#2-environment-saas-environment)
     examples: 
-      - name: ExampleSaasEnvSandBox
+      - name: ExampleenvironmentSandBox
         value: sandbox
-      - name: ExampleSaasEnvProduction
+      - name: ExampleenvironmentProduction
         value: production
 
   Company:

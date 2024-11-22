@@ -3,12 +3,24 @@ title: "Errors"
 slug: errors
 ---
 
-For a comprehensive list of codes and a brief explanation on how to resolve them you should read [this article on error codes](/home/error-codes).
+We indicate the type of API error that occured in two ways:
+- HTTP status codes.
+- Unique Error Codes. If a situation occurs that you are expected to be able to react to with more precision than HTTP status codes would allow, we will return a unique error code in the response body as well.
 
-## Table of HTTP Error Codes
-The following HTTP status error codes are commonly used in the NaviPartner REST API:
+## Example Error Body
 
-| Code | Description                              |
+Our error responses always have the following JSON structure:
+```json
+{
+  "code": "generic_error",
+  "message": "Http method OPTIONS is not supported."
+}
+```
+
+## HTTP Error Status Codes
+The following HTTP status error codes are used in our API:
+
+| Status Code | Description                              |
 |------|------------------------------------------|
 | 400  | Bad Request: The request could not be understood by the server. |
 | 401  | Unauthorized: Authentication is required and has failed or has not yet been provided. |
@@ -21,6 +33,7 @@ The following HTTP status error codes are commonly used in the NaviPartner REST 
 | 413  | Payload Too Large: The request is larger than the server is willing or able to process. |
 | 415  | Unsupported Media Type: The request entity has a media type which the server or resource does not support. |
 | 416  | Range Not Satisfiable: The server cannot provide the requested range of data. |
+| 422  | Unprocessable Entity: The server understands the request, but could not succeed in processing it. |
 | 429  | Too Many Requests: Too many requests hit the API too quickly. We recommend an exponential backoff of your requests. |
 | 500  | Internal Server Error: The server encountered an unexpected condition that prevented it from fulfilling the request. |
 | 501  | Not Implemented: The server does not support the functionality required to fulfill the request. |
@@ -29,11 +42,18 @@ The following HTTP status error codes are commonly used in the NaviPartner REST 
 | 504  | Gateway Timeout: The server, while acting as a gateway or proxy, did not receive a timely response from the upstream server. |
 | 505  | HTTP Version Not Supported: The server does not support the HTTP protocol version that was used in the request. |
 
-## Example Error Body
-Here's an example of a JSON response body:
 
-```json
-{
-  "code": "generic_error",
-  "message": "Http method OPTIONS is not supported."
-}
+## Unique Error Codes
+The following unique error codes are used in our API:
+
+| Error Code | Description                              |
+|------|------------------------------------------|
+| **`generic_error`** | An unspecified error has occurred. This is the default error code if nothing more specific applies, check the HTTP status code and the message. |
+| **`saas_tenant_not_found**` | Provided tenant GUID (parameter `tenant`) is not a valid tenant ID. |
+| **`saas_environment_not_found`** | Provided tenant environment name (parameter `environment`) is not a valid environment name for the selected tenant. |
+| **`saas_company_not_found`** | Provided company name (parameter `company`) is not a valid company name for the selected tenant and environment. |
+| **`server_timeout`** | Server timeout. |
+| **`admission_not_allowed_ticket_is_revoked`** | Admission is not allowed because the ticket has been revoked. |
+| **`admission_not_allowed_to_many_admissions`** | Admission is not allowed because there have been too many admissions. |
+| **`admission_not_allowed_wrong_date_or_time`** | Admission is not allowed due to an incorrect date or time. | 
+| **`ticket_not_found`** | The requested ticket could not be found. |

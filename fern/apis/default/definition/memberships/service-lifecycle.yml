@@ -28,8 +28,8 @@ service:
       examples:
         - name: ExampleGetMembershipHistory
           path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             membershipId: $simpleTypes.MembershipId.ExampleMembershipId
           response:
@@ -50,8 +50,8 @@ service:
       examples:
         - name: ExampleActivateMembership
           path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             membershipId: $simpleTypes.MembershipId.ExampleMembershipId
           response:
@@ -73,8 +73,8 @@ service:
       examples:
         - name: ExampleCancelMembership
           path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             membershipId: $simpleTypes.MembershipId.ExampleMembershipId
           request: $CancelMembershipRequest.Example
@@ -99,8 +99,8 @@ service:
       examples:
         - name: ExampleGetRenewOptions
           path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             membershipId: $simpleTypes.MembershipId.ExampleMembershipId
           response:
@@ -124,8 +124,8 @@ service:
       examples:
         - name: ExampleRenewMembership
           path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             membershipId: $simpleTypes.MembershipId.ExampleMembershipId
           request: $RenewMembershipRequest.Example
@@ -149,8 +149,8 @@ service:
       examples:
       - name: ExampleGetUpgradeOptions
         path-parameters:
-          saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-          saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+          tenant: $globalApiTypes.tenant.Exampletenant
+          environment: $globalApiTypes.environment.ExampleenvironmentProduction
           company: $globalApiTypes.Company.ExampleCompanyCronus
           membershipId: $simpleTypes.MembershipId.ExampleMembershipId
         response:
@@ -174,8 +174,8 @@ service:
       examples:
       - name: ExampleUpgradeMembership
         path-parameters:
-          saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-          saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+          tenant: $globalApiTypes.tenant.Exampletenant
+          environment: $globalApiTypes.environment.ExampleenvironmentProduction
           company: $globalApiTypes.Company.ExampleCompanyCronus
           membershipId: $simpleTypes.MembershipId.ExampleMembershipId
         request: $UpgradeMembershipRequest.Example
@@ -199,8 +199,8 @@ service:
       examples:
       - name: ExampleGetExtendOptions
         path-parameters:
-          saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-          saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+          tenant: $globalApiTypes.tenant.Exampletenant
+          environment: $globalApiTypes.environment.ExampleenvironmentProduction
           company: $globalApiTypes.Company.ExampleCompanyCronus
           membershipId: $simpleTypes.MembershipId.ExampleMembershipId
         response:
@@ -225,8 +225,8 @@ service:
       examples:
       - name: ExampleExtendMembership
         path-parameters:
-          saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-          saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+          tenant: $globalApiTypes.tenant.Exampletenant
+          environment: $globalApiTypes.environment.ExampleenvironmentProduction
           company: $globalApiTypes.Company.ExampleCompanyCronus
           membershipId: $simpleTypes.MembershipId.ExampleMembershipId
         request: $ExtendMembershipRequest.Example
