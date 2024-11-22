@@ -43,6 +43,11 @@ table 6150931 "NPR WalletAssetLine"
             Caption = 'Line Type Reference';
             DataClassification = CustomerContent;
         }
+        field(50; DocumentNumber; Code[20])
+        {
+            Caption = 'Document Number';
+            DataClassification = CustomerContent;
+        }
 
         field(100; TransferControlledBy; Enum "NPR WalletRole")
         {

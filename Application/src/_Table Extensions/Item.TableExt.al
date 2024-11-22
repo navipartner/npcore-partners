@@ -256,6 +256,12 @@ tableextension 6014427 "NPR Item" extends Item
                     Rec."NPR Visibility" := Rec."NPR Visibility"::Hidden;
             end;
         }
+        field(6150937; "NPR CreateAttractionWallet"; Boolean)
+        {
+            Caption = 'Create Attraction Wallet';
+            DataClassification = CustomerContent;
+        }
+
         field(6059970; "NPR Variety 1"; Code[10])
         {
             Caption = 'Variety 1';

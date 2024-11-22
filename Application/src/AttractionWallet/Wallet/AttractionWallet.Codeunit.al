@@ -23,32 +23,24 @@ codeunit 6185062 "NPR AttractionWallet"
 
     // Wallets Created per quantity when source is a Wallet Template Addon
     [CommitBehavior(CommitBehavior::Error)]
-    internal procedure CreateAssetsFromPosSaleLine(POSSale: Record "NPR POS Sale"; POSSaleLine: Record "NPR POS Sale Line")
+    internal procedure CreateAssetsFromPosSaleLine(POSSale: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line")
     var
-        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
-        AddOnSaleLine: Record "NPR POS Sale Line";
+        IntermediaryWalletLine: Record "NPR AttractionWalletSaleLine";
         WalletEntryNoList: List of [Integer];
     begin
         if (not IsWalletEnabled()) then
             exit;
 
-        SaleLinePOSAddOn.SetCurrentKey("Register No.", "Sales Ticket No.", "Sale Type", "Sale Date", "Sale Line No.", "Line No.");
-        SaleLinePOSAddOn.SetFilter("Register No.", '=%1', POSSaleLine."Register No.");
-        SaleLinePOSAddOn.SetFilter("Sales Ticket No.", '=%1', POSSaleLine."Sales Ticket No.");
-        SaleLinePOSAddOn.SetFilter("Sale Type", '=%1', SaleLinePOSAddOn."Sale Type"::Sale);
-        SaleLinePOSAddOn.SetFilter("Sale Date", '=%1', POSSaleLine.Date);
-        SaleLinePOSAddOn.SetFilter("Applies-to Line No.", '=%1', POSSaleLine."Line No.");
-        SaleLinePOSAddOn.SetFilter(AddToWallet, '=%1', true);
+        IntermediaryWalletLine.SetCurrentKey(SaleHeaderSystemId, LineNumber);
+        IntermediaryWalletLine.SetFilter(SaleHeaderSystemId, '=%1', POSSale.SystemId);
+        IntermediaryWalletLine.SetFilter(LineNumber, '=%1', SaleLinePOS."Line No.");
+        if (IntermediaryWalletLine.IsEmpty()) then
+            exit;
 
-        if (SaleLinePOSAddOn.FindSet()) then begin
-            CreateWallets(POSSaleLine.Quantity, WalletEntryNoList);
-            repeat
-                AddOnSaleLine.Get(SaleLinePOSAddOn."Register No.", SaleLinePOSAddOn."Sales Ticket No.", SaleLinePOSAddOn."Sale Date", SaleLinePOSAddOn."Sale Type", SaleLinePOSAddOn."Sale Line No.");
-                CreateAssets(WalletEntryNoList, SaleLinePOSAddOn."Sales Ticket No.", SaleLinePOSAddOn."Sale Line No.", SaleLinePOSAddOn.AddOnItemNo, AddOnSaleLine.Quantity);
-            until (SaleLinePOSAddOn.Next() = 0);
+        CreateWallets(POSSale.SystemId, SaleLinePOS."Line No.", SaleLinePOS.Quantity, WalletEntryNoList);
+        CreateAssets(WalletEntryNoList, POSSale."Sales Ticket No.", SaleLinePOS."Line No.", SaleLinePOS."No.", SaleLinePOS.Quantity);
+        AddReferencesToWalletFromPosSale(POSSale, WalletEntryNoList);
 
-            AddReferencesToWalletFromPosSale(POSSale, WalletEntryNoList);
-        end;
     end;
 
     [CommitBehavior(CommitBehavior::Error)]
@@ -100,7 +92,8 @@ codeunit 6185062 "NPR AttractionWallet"
                     repeat
                         Wallet.Reset();
                         Wallet.GetBySystemId(AssetLine.LineTypeSystemId);
-                        WalletEntryNoList.Add(Wallet.EntryNo);
+                        if (not WalletEntryNoList.Contains(Wallet.EntryNo)) then
+                            WalletEntryNoList.Add(Wallet.EntryNo);
 
                     until (AssetLine.Next() = 0);
             until (WalletAssetHeaderRef.Next() = 0);
@@ -183,6 +176,9 @@ codeunit 6185062 "NPR AttractionWallet"
         Quantity: Integer;
     begin
 
+        if (WalletEntryNoList.Count() = 0) then
+            exit;
+
         if (not Item.Get(SalesItemNo)) then
             exit;
 
@@ -198,7 +194,7 @@ codeunit 6185062 "NPR AttractionWallet"
 
         WalletCoupon.SetFilter(TriggerOnItemNo, '=%1', SalesItemNo);
         if (WalletCoupon.FindFirst()) then
-            AddCouponAssets(WalletEntryNoList, WalletCoupon."Coupon Type", SalesItemNo, Item.Description, Quantity);
+            AddCouponAssets(WalletEntryNoList, WalletCoupon."Coupon Type", SalesItemNo, Item.Description, Quantity, SalesTicketNo);
 
         MembershipSalesSetup.SetFilter("No.", '=%1', SalesItemNo);
         MembershipSalesSetup.SetFilter("Business Flow Type", '=%1', MembershipSalesSetup."Business Flow Type"::MEMBERSHIP);
@@ -268,6 +264,7 @@ codeunit 6185062 "NPR AttractionWallet"
                     WalletAssetLine.Description := Description;
                     WalletAssetLine.TransferControlledBy := ENUM::"NPR WalletRole"::Holder;
                     WalletAssetLine.Type := ENUM::"NPR WalletLineType"::Ticket;
+                    WalletAssetLine.DocumentNumber := TIcket."Sales Receipt No.";
 
                     WalletAssetLine.EntryNo := 0;
                     WalletAssetLine.LineTypeSystemId := Ticket.SystemId;
@@ -280,7 +277,7 @@ codeunit 6185062 "NPR AttractionWallet"
         until (ReservationRequest.Next() = 0);
     end;
 
-    local procedure AddCouponAssets(WalletEntryNoList: List of [Integer]; CouponType: Code[20]; ItemNo: Code[20]; Description: Text[100]; SalesQuantity: Decimal)
+    local procedure AddCouponAssets(WalletEntryNoList: List of [Integer]; CouponType: Code[20]; ItemNo: Code[20]; Description: Text[100]; SalesQuantity: Decimal; DocumentNumber: Code[20])
     var
         WalletAssetLine: Record "NPR WalletAssetLine";
         TempCoupon: Record "NPR NpDc Coupon" temporary;
@@ -304,6 +301,7 @@ codeunit 6185062 "NPR AttractionWallet"
             WalletAssetLine.Description := Description;
             WalletAssetLine.TransferControlledBy := ENUM::"NPR WalletRole"::Holder;
             WalletAssetLine.Type := ENUM::"NPR WalletLineType"::Coupon;
+            WalletAssetLine.DocumentNumber := DocumentNumber;
 
             WalletAssetLine.EntryNo := 0;
             WalletAssetLine.LineTypeSystemId := TempCoupon.SystemId;
@@ -341,6 +339,7 @@ codeunit 6185062 "NPR AttractionWallet"
                 WalletAssetLine.Description := Description;
                 WalletAssetLine.TransferControlledBy := ENUM::"NPR WalletRole"::Holder;
                 WalletAssetLine.Type := ENUM::"NPR WalletLineType"::MEMBERSHIP;
+                WalletAssetLine.DocumentNumber := InfoCapture."Receipt No.";
 
                 WalletAssetLine.EntryNo := 0;
                 WalletAssetLine.LineTypeSystemId := MembershipCard.SystemId;
@@ -412,7 +411,7 @@ codeunit 6185062 "NPR AttractionWallet"
         Wallet: Record "NPR AttractionWallet";
         WalletAssetHeaderRef: Record "NPR WalletAssetHeaderReference";
     begin
-        CreateWallet(CreateGuid(), Wallet);
+        CreateWallet(CreateGuid(), '', Wallet);
 
         WalletAssetHeaderRef.Init();
         WalletAssetHeaderRef.WalletHeaderEntryNo := WalletAssetHeader.EntryNo;
@@ -432,21 +431,39 @@ codeunit 6185062 "NPR AttractionWallet"
         WalletEntryNo := CreateOwnerWallet(WalletAssetHeader);
     end;
 
-    local procedure CreateWallets(Quantity: Integer; var WalletEntryNoList: List of [Integer])
+    local procedure CreateWallets(SaleId: Guid; SaleLineNumber: Integer; Quantity: Integer; var WalletEntryNoList: List of [Integer])
     var
-        i: Integer;
         Wallet: Record "NPR AttractionWallet";
+        IntermediaryWallet: Record "NPR AttractionWalletSaleHdr";
+        IntermediaryWalletLine: Record "NPR AttractionWalletSaleLine";
     begin
-        for i := 1 to Quantity do
-            WalletEntryNoList.Add(CreateWallet(CreateGuid(), Wallet));
+        if (Quantity <= 0) then
+            exit;
+
+        IntermediaryWalletLine.SetCurrentKey(SaleHeaderSystemId, LineNumber);
+        IntermediaryWalletLine.SetFilter(SaleHeaderSystemId, '=%1', SaleId);
+        IntermediaryWalletLine.SetFilter(LineNumber, '=%1', SaleLineNumber);
+        if (IntermediaryWalletLine.FindSet()) then begin
+            repeat
+                IntermediaryWallet.Get(IntermediaryWalletLine.SaleHeaderSystemId, IntermediaryWalletLine.WalletNumber);
+                if (Wallet.Get(IntermediaryWallet.WalletEntryNo)) then begin
+                    WalletEntryNoList.Add(Wallet.EntryNo)
+                end else begin
+                    WalletEntryNoList.Add(CreateWallet(CreateGuid(), IntermediaryWallet.Name, Wallet));
+                    IntermediaryWallet.WalletEntryNo := Wallet.EntryNo;
+                    IntermediaryWallet.Modify();
+                end;
+            until (IntermediaryWalletLine.Next() = 0);
+        end;
     end;
 
-    local procedure CreateWallet(WalletSystemId: Guid; var Wallet: Record "NPR AttractionWallet"): Integer
+    local procedure CreateWallet(WalletSystemId: Guid; Description: Text[100]; var Wallet: Record "NPR AttractionWallet"): Integer
     var
         WalletSequenceNumber: Text[30];
     begin
         Wallet.Init();
         Wallet.EntryNo := 0;
+        Wallet.Description := Description;
         Wallet.SystemId := WalletSystemId;
         if (not Wallet.Insert()) then
             error(GetLastErrorText());
@@ -552,17 +569,24 @@ codeunit 6185062 "NPR AttractionWallet"
         Handled: Boolean;
     begin
         WalletFacade.OnPrint(WalletEntryNoList, PrintContext, Handled);
-
-        if (not Handled) then
-            PrintWalletsWorker(WalletEntryNoList, PrintContext);
+        PrintWalletsWorker(WalletEntryNoList, Handled, PrintContext);
     end;
 
-    local procedure PrintWalletsWorker(WalletEntryNoList: List of [Integer]; PrintContext: Enum "NPR WalletPrintType")
+    local procedure PrintWalletsWorker(WalletEntryNoList: List of [Integer]; PrintHandled: Boolean; PrintContext: Enum "NPR WalletPrintType")
     var
-        WalletId: Integer;
+        EntryNo: Integer;
+        Wallet: Record "NPR AttractionWallet";
     begin
-        foreach WalletId in WalletEntryNoList do
-            PrintWalletWorker(WalletId, PrintContext);
+        foreach EntryNo in WalletEntryNoList do begin
+            if (not PrintHandled) then
+                PrintWalletWorker(EntryNo, PrintContext);
+
+            if (Wallet.Get(EntryNo)) then begin
+                Wallet.PrintCount += 1;
+                Wallet.LastPrintAt := CurrentDateTime;
+                Wallet.Modify();
+            end;
+        end;
     end;
 
     local procedure PrintWalletWorker(WalletEntryNo: Integer; PrintContext: Enum "NPR WalletPrintType")
@@ -576,7 +600,8 @@ codeunit 6185062 "NPR AttractionWallet"
 
         case PrintContext of
             ENUM::"NPR WalletPrintType"::END_OF_SALE:
-                Codeunit.Run(Codeunit::"NPR WalletPrintEndOfSale", Wallet);
+                if (Wallet.PrintCount = 0) then
+                    Codeunit.Run(Codeunit::"NPR WalletPrintEndOfSale", Wallet);
 
             ENUM::"NPR WalletPrintType"::WALLET:
                 Codeunit.Run(Codeunit::"NPR WalletPrintEndOfSale", Wallet);

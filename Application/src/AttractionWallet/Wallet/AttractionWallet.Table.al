@@ -11,7 +11,7 @@ table 6150937 "NPR AttractionWallet"
             Caption = 'Entry No.';
         }
 
-        field(10; ReferenceNumber; Code[30])
+        field(10; ReferenceNumber; Code[50])
         {
             DataClassification = CustomerContent;
             Caption = 'Reference Number';
@@ -27,6 +27,18 @@ table 6150937 "NPR AttractionWallet"
         {
             DataClassification = CustomerContent;
             Caption = 'Expiration Date';
+        }
+
+        field(40; PrintCount; Integer)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Print Count';
+        }
+
+        field(45; LastPrintAt; DateTime)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Last Print Date';
         }
     }
 
