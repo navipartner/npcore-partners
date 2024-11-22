@@ -21,11 +21,28 @@ page 6184847 "NPR AttractionWalletAssets"
                     ToolTip = 'Specifies the value of the Asset Type field.', Comment = '%';
                     Editable = false;
                 }
+
+                field(Description; Rec.Description)
+                {
+                    Caption = 'Description';
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Description field.', Comment = '%';
+                    Editable = false;
+                }
+
                 field(LineTypeReference; Rec.LineTypeReference)
                 {
                     Caption = 'Asset Reference Number';
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Asset Reference field.', Comment = '%';
+                    Editable = false;
+                }
+
+                field(DocumentNumber; Rec.DocumentNumber)
+                {
+                    Caption = 'Document Number';
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Document Number field.', Comment = '%';
                     Editable = false;
                 }
 
@@ -42,7 +59,7 @@ page 6184847 "NPR AttractionWalletAssets"
                     begin
                         // Validate reference is a wallet in our list of valid wallets
                         TempWallet.SetCurrentKey(ReferenceNumber);
-                        TempWallet.SetFilter(ReferenceNumber, '=%1', _WalletHolder);
+                        TempWallet.SetFilter(ReferenceNumber, '=%1', CopyStr(_WalletHolder, 1, MaxStrLen(TempWallet.ReferenceNumber)));
                         TempWallet.FindFirst(); // Hard fail on invalid wallet
 
                         // Get the existing link between wallet and asset

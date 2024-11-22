@@ -677,6 +677,7 @@
         POSProxyDisplay: Codeunit "NPR POS Proxy - Display";
         TicketRetailMgt: Codeunit "NPR TM Ticket Retail Mgt.";
         POSActMemberMgt: codeunit "NPR POS Action Member Mgt WF3";
+        WalletCreate: Codeunit "NPR AttractionWalletCreate";
     begin
         Rec := Line;
 
@@ -701,6 +702,7 @@
         POSIssueOnSale.AddNewSaleCoupons(Rec);
         HTMLDisplay.UpdateHTMLDisplay();
         POSProxyDisplay.UpdateDisplay(Rec);
+        WalletCreate.CreateIntermediateWallet(Rec);
         TicketRetailMgt.UpdateTicketOnSaleLineInsert(Rec);
         POSActMemberMgt.UpdateMembershipOnSaleLineInsert(Rec);
         InvokeOnAfterInsertSaleLineWorkflow(Rec);

@@ -214,10 +214,10 @@ page 6184846 "NPR AttractionWallet"
     end;
 
     var
-        _WalletReference: Code[30];
+        _WalletReference: Code[50];
         TempSelectedWallets: Record "NPR AttractionWallet" temporary;
 
-    internal procedure SetSearch(WalletReference: Code[30]);
+    internal procedure SetSearch(WalletReference: Code[50]);
     begin
         _WalletReference := WalletReference;
     end;
@@ -241,7 +241,7 @@ page 6184846 "NPR AttractionWallet"
         CurrPage.Update(false);
     end;
 
-    local procedure FindWalletAssets(WalletReference: Code[30])
+    local procedure FindWalletAssets(WalletReference: Code[50])
     var
         Wallet: Record "NPR AttractionWallet";
         WalletAssetHeaderRef: Record "NPR WalletAssetHeaderReference";

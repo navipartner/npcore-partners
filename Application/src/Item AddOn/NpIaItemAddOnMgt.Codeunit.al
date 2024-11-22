@@ -926,6 +926,7 @@
         xSaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        WalletManager: Codeunit "NPR AttractionWalletCreate";
     begin
         Sender.GetxRec(xSaleLinePOS);
         if xSaleLinePOS."Quantity (Base)" = 0 then
@@ -946,9 +947,13 @@
                     SaleLinePOS2.Modify();
 
                     // Ticket Item needs to be updated with the new quantity, normally this is triggered by OnBeforeSetQuantity - but this is not triggered for dependent addon lines
-                    if (Item.Get(SaleLinePOS2."No.")) then
+                    if (Item.Get(SaleLinePOS2."No.")) then begin
                         if (Item."NPR Ticket Type" <> '') then
                             TicketRequestManager.POS_OnModifyQuantity(SaleLinePOS2);
+
+                        if (Item."NPR CreateAttractionWallet") or (SaleLinePOSAddOn.AddToWallet) then
+                            WalletManager.OnAfterSetQuantityPOSSaleLine(SaleLinePOS2, SaleLinePOS2.Quantity);
+                    end;
 
                 end;
             until SaleLinePOSAddOn.Next() = 0;

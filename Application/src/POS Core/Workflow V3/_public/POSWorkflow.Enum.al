@@ -1156,4 +1156,9 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'TM_SCHEDULE_SELECT', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POSAction TMScheduleSelect";
     }
+    value(6185105; WALLET_ASSIGNMENT)
+    {
+        Caption = 'WALLET_ASSIGNMENT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction WalletAssign";
+    }
 }

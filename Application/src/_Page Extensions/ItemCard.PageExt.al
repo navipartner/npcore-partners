@@ -321,6 +321,11 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 group("NPR Group1")
                 {
                     ShowCaption = false;
+                    field("NPR CreateAttractionWallet"; Rec."NPR CreateAttractionWallet")
+                    {
+                        ToolTip = 'Specifies if the item will be used to create an Attraction Wallet.';
+                        ApplicationArea = NPRRetail;
+                    }
 
                     field("NPR Item AddOn No."; Rec."NPR Item AddOn No.")
                     {

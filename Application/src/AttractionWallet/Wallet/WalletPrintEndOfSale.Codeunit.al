@@ -25,6 +25,9 @@ codeunit 6185079 "NPR WalletPrintEndOfSale"
     local procedure PrintOne(Wallet: Record "NPR AttractionWallet")
     var
     begin
+        if (Wallet.Description = '') then
+            Wallet.Description := 'Wallet';
+
         Printer.SetFont('COMMAND');
         Printer.AddLine('STOREDLOGO_1', 0);
         Printer.SetFont('A11');
@@ -34,7 +37,7 @@ codeunit 6185079 "NPR WalletPrintEndOfSale"
 
         Printer.SetBold(true);
         Printer.SetFont('A11');
-        Printer.AddLine('Wallet', 0);
+        Printer.AddLine(Wallet.Description, 0);
 
         Printer.AddBarcode('QR', Wallet.ReferenceNumber, 6, false, 0);
         Printer.AddLine(' ', 0);
