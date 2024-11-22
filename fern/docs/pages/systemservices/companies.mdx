@@ -4,61 +4,15 @@ description: Explanation of what companies mean in Business Central and how to w
 ---
 
 ## Companies in Business Central
+Companies in Business Central are data containers that keep business data isolated within the same database. Each company has its own set of data tables.
 
-In Business Central, **Companies** serve as data envelopes, encapsulating all the data and business logic execution relevant to a specific organizational unit. 
-Each company operates as a separate environment within Business Central, with its own set of data tables. 
-This structure allows multiple companies to coexist within a single Business Central database (environment), while keeping their data isolated and secure.
+## API Usage
+All API calls must specify the company except for the Companies endpoint.
 
-### How Companies Work in API Calls
-
-When interacting with Business Central via REST API calls, it's crucial to [specify the company](./../paths.mdx#url-structure) in which the request should be executed. 
-The company is typically identified by a path segment in the API call, ensuring that the operation is performed within the correct data context. 
-For example, if you want to retrieve customers from a specific company, the API call must include the appropriate company identifier in the path.
-
-### REST API Feature: `Companies` Endpoint
-
-Our REST API provides a convenient endpoint called `Companies` that allows clients to retrieve a list of all available companies within the Business Central database. 
-This feature is particularly useful for all applications that need to be aware of the companies they can interact with.
-
-#### GET /companies
-
-The [companies](/api-reference/system-services/companies/get-companies) endpoint responds to `GET` requests with a list of companies. Here's what the request looks like:
+## Companies Endpoint
+Get a list of available companies:
 
 ```http
-GET https://api.navipartner.app/tenant-id/environment-name/companies
+GET https://api.npretail.app/tenant/environment/companies
 ```
-
 <Warning>This endpoint is an exception in terms of routing, as it does not use the global path segment named `company`.</Warning>
-
-
-### Response
-
-The response from the Companies endpoint will look like this:
-
-```
-{
-  "value": [
-    {
-      "id": "17ff1351-d07d-4b85-8957-b4b585f47aad",
-      "systemVersion": "24.0.16410.18056",
-      "name": "CRONUS International Ltd.",
-      "displayName": ""
-    },
-    {
-      "id": "872336d7-5183-4c0b-9b47-755f3d6d77e7",
-      "systemVersion": "24.0.16410.18056",
-      "name": "TestCompany",
-      "displayName": "TestCompany"
-    }
-  ]
-}
-```
-
- - `name`: The system name of the company. This holds the value that is relevant for all API calls.
- - `displayName`: The display name of the company (if different from the internal name, can be eventually empty).
-
-
-### Using the Company Information
-
-Once the client application retrieves the list of companies, it can use one of the returned company names to make subsequent API calls. 
-This ensures that all operations are correctly targeted at the appropriate company, maintaining data integrity and ensuring that the application's business logic operates in the correct context.

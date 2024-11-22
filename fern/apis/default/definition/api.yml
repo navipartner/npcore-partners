@@ -8,10 +8,10 @@ imports:
   errors: ./errors.yml
   globalApiTypes: ./global-api-types.yml
 
-base-path: /{saasguid}/{saasenv}/{company}
+base-path: /{tenant}/{environment}/{company}
 path-parameters:
-  saasguid: globalApiTypes.SaasGuid
-  saasenv: globalApiTypes.SaasEnv
+  tenant: globalApiTypes.tenant
+  environment: globalApiTypes.environment
   company: globalApiTypes.Company
 
 headers:

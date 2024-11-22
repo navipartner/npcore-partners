@@ -28,8 +28,8 @@ service:
         - name: ExampleCatalog1
           docs: Example response for the getCatalog endpoint
           path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             storeCode: $simpleTypes.StoreCode.ExampleStoreCode
           response:

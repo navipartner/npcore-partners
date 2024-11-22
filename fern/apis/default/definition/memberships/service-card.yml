@@ -31,8 +31,8 @@ service:
       examples:
         - name: ExampleAddCard
           path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             membershipId: $simpleTypes.MembershipId.ExampleMembershipId
             memberId: $simpleTypes.MemberId.ExampleMemberId
@@ -59,8 +59,8 @@ service:
       examples:
         - name: ExampleReplaceCard
           path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             membershipId: $simpleTypes.MembershipId.ExampleMembershipId
             memberId: $simpleTypes.MemberId.ExampleMemberId
@@ -85,8 +85,8 @@ service:
       examples:
         - name: ExampleGetCard
           path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             cardId: $simpleTypes.CardId.ExampleCardId
           response: 
@@ -108,8 +108,8 @@ service:
       examples:
         - name: ExampleGetCard
           path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
           response: 
@@ -132,8 +132,8 @@ service:
       examples:
         - name: ExampleRegisterArrival
           path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
           request: $RegisterArrivalRequest.ExampleRegisterArrival
@@ -154,8 +154,8 @@ service:
       response: WalletSentResponse
       examples:
         - path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
           request:

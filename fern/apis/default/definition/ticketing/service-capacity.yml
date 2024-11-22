@@ -9,12 +9,9 @@ imports:
 
 service:
   display-name: Capacity
-  auth: false
+  auth: true
   base-path: /ticketing
-  headers:
-    x-api-version: optional<globalApiTypes.ApiVersionDate>
   endpoints:
-
     getCapacity:
       docs: Retrieve the capacity and availability for a ticket item number. 
       path: /capacity/search
@@ -32,8 +29,8 @@ service:
         ### Success
         - name: ExampleCapacity1
           path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
           query-parameters:
             itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber

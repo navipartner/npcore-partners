@@ -1,13 +1,32 @@
 ---
-title: Authentication
-slug: authenticate
-description: Here you'll find information to authenticate against NaviPartner NP Retail API.
+title: API Key
+slug: auth
 ---
 
-[Authentication](./auth.mdx) is a critical aspect of our API. When you authenticate:
+You'll need two things to authorize against our APIs:
+- An Entra App for your integration with the proper permissions defined.
+- An Authorization library for your language of choice:  
+https://learn.microsoft.com/en-us/entra/identity-platform/msal-overview 
 
-1. Your credentials are securely passed through to the Business Central instance.
-2. Business Central validates your credentials and permissions.
-3. Upon successful authentication, you're granted access to the API resources you're authorized to use.
+## Create Entra App with permissions via our wizard
+<Warning>This wizard can only be used by a user that is an Entra ID Global Administrator. The wizard will create a single-tenant Entra app on your behalf and ask for the required admin consent</Warning>
 
-This ensures that all security protocols and access controls configured in Business Central are respected and enforced.
+1. Search for page "Microsoft Entra Applications" in Business Central and open it.
+2. Click "Actions" -> "Entra App Management" -> "Create Entra App"
+3. Fill in "Application Name" based on the purpose and/or vendor that will be using the integration. 
+4. Select the permissions below that the API Key should have. You will typically find 1 permission per API group in our portal i.e. "POS", "Memberships", etc.
+5. Click on action "Create Microsoft Entra Application" 
+6. Approve the consent request.
+7. Write down the client_id and client_secret as you will not be able to retrieve the client_secret again afterwards.
+8. Develop your integration :)
+
+## OAuth config:
+When acquiring a token with Entra ID, you'll need a few parameters, along with your client_id and client_secret:
+- Scope should be "https://api.businesscentral.dynamics.com/.default" 
+- The URL to acquire a token is "https://login.microsoftonline.com/:tenantId/oauth2/v2.0/token"
+
+If you need to test in Postman, you can do so using their OAuth 2.0 authentication feature with the following parameters:
+- Authorization to OAuth 2.0
+- Grant type to "Client Credentials"
+- Scope to "https://api.businesscentral.dynamics.com/.default" 
+- Token URL to "https://login.microsoftonline.com/:tenantId/oauth2/v2.0/token"

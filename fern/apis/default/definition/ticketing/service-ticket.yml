@@ -27,8 +27,8 @@ service:
       response: compositeTypes.TicketDetails
       examples:
           - path-parameters:
-              saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-              saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+              tenant: $globalApiTypes.tenant.Exampletenant
+              environment: $globalApiTypes.environment.ExampleenvironmentProduction
               company: $globalApiTypes.Company.ExampleCompanyCronus
               ticketNumber: $simpleTypes.TicketId.ExampleTicket1
             response:
@@ -48,8 +48,8 @@ service:
       response: RevokedResponse
       examples:
          - path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             ticketNumber: $simpleTypes.TicketId.ExampleTicket1
            response:
@@ -72,8 +72,8 @@ service:
       response: optional<AdmittedResponse>
       examples:
         - path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             ticketNumber: $simpleTypes.TicketId.ExampleTicket1
           request:
@@ -99,8 +99,8 @@ service:
       response: DepartedResponse
       examples:
         - path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             ticketNumber: $simpleTypes.TicketId.ExampleTicket1
           request:
@@ -126,8 +126,8 @@ service:
       response: list<compositeTypes.TicketDetails>
       examples:
         - path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             memberNumber: $simpleTypes.MemberNumber.ExampleMemberNumber
           request:
@@ -157,8 +157,8 @@ service:
       response: TicketSentResponse
       examples:
         - path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             ticketNumber: $simpleTypes.TicketId.ExampleTicket1
           request:
@@ -184,8 +184,8 @@ service:
       response: TicketCouponResponse
       examples:
           - path-parameters:
-              saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-              saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+              tenant: $globalApiTypes.tenant.Exampletenant
+              environment: $globalApiTypes.environment.ExampleenvironmentProduction
               company: $globalApiTypes.Company.ExampleCompanyCronus
               ticketNumber: $simpleTypes.TicketId.ExampleTicket1
             request:

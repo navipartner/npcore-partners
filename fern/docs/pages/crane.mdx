@@ -12,7 +12,7 @@ When working with NaviPartner's Crane container environment, specific adjustment
 
 In the standard REST API configuration, the URL is structured as follows:
 ```
-https://api.navipartner.app/{saasguid}/{saasenv}/{company}/[endpoint]
+https://api.navipartner.app/{tenant}/{environment}/{company}/[endpoint]
 ```
 
 When routing requests to the Crane container environment, the URL must be adjusted to the following format:
@@ -20,8 +20,8 @@ When routing requests to the Crane container environment, the URL must be adjust
 https://api.navipartner.app/{container-name}/{nst-instance}/{company}/[endpoint]
 ```
 
-- `{container-name}`: Replace `{saasguid}` with the name of the specific Crane container you are targeting.
-- `{nst-instance}`: Replace `{saasenv}` with the NST (Navision Service Tier) instance name within the Crane environment. Currently we use only `BC` value.
+- `{container-name}`: Replace `{tenant}` with the name of the specific Crane container you are targeting.
+- `{nst-instance}`: Replace `{environment}` with the NST (Navision Service Tier) instance name within the Crane environment. Currently we use only `BC` value.
 - `{company}`: This remains the same as in the original configuration, representing the target company within Business Central.
 
 ### Additional Header Requirement
@@ -39,12 +39,12 @@ Below is an example of how an API request would look after applying the necessar
 
 #### Original Request
 ```
-GET https://api.navipartner.app/c35fabce-d6b1-4e2f-b539-dabc68f0e7bb/production/MyCompany/v1.0/customers
+GET https://api.npretail.app/c35fabce-d6b1-4e2f-b539-dabc68f0e7bb/production/MyCompany/customers
 ```
 
 #### Modified Request for Crane
 ```
-GET https://api.navipartner.app/XY123456/BC/MyCompany/v1.0/customers
+GET https://api.npretail.app/XY123456/BC/MyCompany/customers
 ```
 
 ### Summary

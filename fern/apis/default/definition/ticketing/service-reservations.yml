@@ -31,8 +31,8 @@ service:
         # Success response
           - name: ExampleCreateReservation1
             path-parameters:
-              saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-              saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+              tenant: $globalApiTypes.tenant.Exampletenant
+              environment: $globalApiTypes.environment.ExampleenvironmentProduction
               company: $globalApiTypes.Company.ExampleCompanyCronus
             request:
                reserve:
@@ -68,8 +68,8 @@ service:
       response: GetReservationDetails
       examples:
         - path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             token: $simpleTypes.Token.ExampleToken
           request:
@@ -106,8 +106,8 @@ service:
       examples:
         # Success response
         - path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             token: $simpleTypes.Token.ExampleToken
           response:
@@ -130,8 +130,8 @@ service:
       examples:
         # Success response
         - path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             token: $simpleTypes.Token.ExampleToken
           response:
@@ -156,8 +156,8 @@ service:
         # Success response
         - name: ExampleConfirmReservation1
           path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             token: $simpleTypes.Token.ExampleToken
           request:
@@ -189,8 +189,8 @@ service:
       examples:
         # Success response
         - path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             token: $simpleTypes.Token.ExampleToken
           response:
@@ -205,8 +205,8 @@ service:
                   content:
                     - admissionDetails: $compositeTypes.AdmissionDetails.ExampleAdmissionCastle
         - path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             token: $simpleTypes.Token.ExampleToken
           response:
@@ -235,8 +235,8 @@ service:
       response: list<compositeTypes.TicketDetails>
       examples:
         - path-parameters:
-            saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
-            saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             token: $simpleTypes.Token.ExampleToken
           response:
