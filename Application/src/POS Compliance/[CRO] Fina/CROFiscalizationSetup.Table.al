@@ -50,6 +50,11 @@ table 6060058 "NPR CRO Fiscalization Setup"
             Caption = 'Certificate Subject OIB';
             DataClassification = CustomerContent;
         }
+        field(21; "Print Receipt On Sales Doc."; Boolean)
+        {
+            Caption = 'Auto Print Receipt On Sales Document';
+            DataClassification = CustomerContent;
+        }
         field(30; "Enable POS Entry CLE Posting"; Boolean)
         {
             Caption = 'Enable POS Entry Cust. Ledg. Entry Posting';

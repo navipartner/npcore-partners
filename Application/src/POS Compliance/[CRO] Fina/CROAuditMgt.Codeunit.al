@@ -147,7 +147,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
 
         CROAuxSalesCrMemoHeader.ReadCROAuxSalesCrMemoHeaderFields(SalesCrMemoHeader);
         CROAuxSalesHeader.ReadCROAuxSalesHeaderFields(SalesHeader);
-        CROAuxSalesCrMemoHeader.TransferFields(CROAuxSalesHeader, false);
+        CROAuxSalesCrMemoHeader."NPR CRO POS Unit" := CROAuxSalesHeader."NPR CRO POS Unit";
         CROAuxSalesCrMemoHeader.SaveCROAuxSalesCrMemoHeaderFields();
     end;
 
@@ -561,6 +561,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
 
     local procedure FiscalizeSalesInvoice(SalesInvHdrNo: Code[20])
     var
+        CROFiscalizationSetup: Record "NPR CRO Fiscalization Setup";
         CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info";
         SalesInvoiceHeader: Record "Sales Invoice Header";
     begin
@@ -572,12 +573,16 @@ codeunit 6151547 "NPR CRO Audit Mgt."
             exit;
         CalculateZKI(CROPOSAuditLogAuxInfo);
         CROTaxCommunicationMgt.CreateNormalSale(CROPOSAuditLogAuxInfo, true);
-        CROFiscalThermalPrint.PrintReceipt(CROPOSAuditLogAuxInfo);
         Commit();
+
+        CROFiscalizationSetup.Get();
+        if CROFiscalizationSetup."Print Receipt On Sales Doc." then
+            CROFiscalThermalPrint.PrintReceipt(CROPOSAuditLogAuxInfo);
     end;
 
     local procedure FiscalizeSalesCrMemo(SalesCrMemoHdrNo: Code[20])
     var
+        CROFiscalizationSetup: Record "NPR CRO Fiscalization Setup";
         CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
     begin
@@ -589,8 +594,11 @@ codeunit 6151547 "NPR CRO Audit Mgt."
             exit;
         CalculateZKI(CROPOSAuditLogAuxInfo);
         CROTaxCommunicationMgt.CreateNormalSale(CROPOSAuditLogAuxInfo, true);
-        CROFiscalThermalPrint.PrintReceipt(CROPOSAuditLogAuxInfo);
         Commit();
+
+        CROFiscalizationSetup.Get();
+        if CROFiscalizationSetup."Print Receipt On Sales Doc." then
+            CROFiscalThermalPrint.PrintReceipt(CROPOSAuditLogAuxInfo);
     end;
 
     #endregion

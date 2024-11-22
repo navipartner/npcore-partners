@@ -81,6 +81,7 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
         XmlWriteOpts: XmlWriteOptions;
     begin
         SalesInvLines.SetRange("Document No.", CROPOSAuditLogAuxInfo."Source Document No.");
+        SalesInvLines.SetFilter(Type, '<>%1', SalesInvLines.Type::" ");
         if not SalesInvLines.FindSet() then
             exit;
 
@@ -127,6 +128,7 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
         XmlWriteOpts: XmlWriteOptions;
     begin
         SalesCrMemoLines.SetRange("Document No.", CROPOSAuditLogAuxInfo."Source Document No.");
+        SalesCrMemoLines.SetFilter(Type, '<>%1', SalesCrMemoLines.Type::" ");
         if not SalesCrMemoLines.FindSet() then
             exit;
 
