@@ -123,6 +123,7 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
 
     local procedure PrintSalesInvoiceContent(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info")
     var
+        SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesInvoiceLine: Record "Sales Invoice Line";
         FinalBillLbl: Label 'SKUPAJ EUR', Locked = true;
         ItemDescLbl: Label 'Postavka', Locked = true;
@@ -143,17 +144,19 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
         PrintFourColumnText(ItemDescLbl, QtyLbl, UnitPriceLbl, ItemPriceLbl, true);
         PrintDottedLine();
 
+        SalesInvoiceHeader.Get(SIPOSAuditLogAuxInfo."Source Document No.");
+
         SalesInvoiceLine.SetLoadFields(Description, Quantity, "Unit Price", "VAT Base Amount", "VAT %", "Amount Including VAT");
         SalesInvoiceLine.SetRange("Document No.", SIPOSAuditLogAuxInfo."Source Document No.");
         SalesInvoiceLine.SetRange(Type, SalesInvoiceLine.Type::Item);
         SalesInvoiceLine.FindSet();
         repeat
             PrintTextLine(SalesInvoiceLine.Description, false);
-            PrintFourColumnText(Format(SalesInvoiceLine.Quantity).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(SalesInvoiceLine."Unit Price"), FormatDecimal(SalesInvoiceLine."Amount Including VAT"), false);
+            PrintFourColumnText(Format(SalesInvoiceLine.Quantity).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(GetUnitPriceInclVAT(SalesInvoiceHeader."Prices Including VAT", SalesInvoiceLine."Unit Price", SalesInvoiceLine."VAT %", SalesInvoiceHeader."Currency Code")), FormatDecimal(SalesInvoiceLine."Amount Including VAT"), false);
 
             AddAmountToDecimalDict(TaxableAmountDict, SalesInvoiceLine."VAT %", SalesInvoiceLine."VAT Base Amount");
             AddAmountToDecimalDict(TaxAmountDict, SalesInvoiceLine."VAT %", SalesInvoiceLine."Amount Including VAT" - SalesInvoiceLine."VAT Base Amount");
-            AddAmountToDecimalDict(TaxAmountDict, SalesInvoiceLine."VAT %", SalesInvoiceLine."Amount Including VAT");
+            AddAmountToDecimalDict(AmountInclTaxDict, SalesInvoiceLine."VAT %", SalesInvoiceLine."Amount Including VAT");
         until SalesInvoiceLine.Next() = 0;
         PrintFullLine();
 
@@ -173,6 +176,8 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
     local procedure PrintSalesCreditMemoContent(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info")
     var
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        Currency: Record Currency;
         FinalBillLbl: Label 'SKUPAJ EUR', Locked = true;
         ItemDescLbl: Label 'Postavka', Locked = true;
         ItemPriceLbl: Label 'Skupaj €', Locked = true;
@@ -192,6 +197,8 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
         PrintFourColumnText(ItemDescLbl, QtyLbl, UnitPriceLbl, ItemPriceLbl, true);
         PrintDottedLine();
 
+        SalesCrMemoHeader.Get(SIPOSAuditLogAuxInfo."Source Document No.");
+
         SalesCrMemoLine.SetLoadFields(Description, Quantity, "Unit Price", "VAT Base Amount", "VAT %", "Amount Including VAT");
         SalesCrMemoLine.SetAutoCalcFields("Amount Including VAT");
         SalesCrMemoLine.SetRange("Document No.", SIPOSAuditLogAuxInfo."Source Document No.");
@@ -199,11 +206,11 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
         SalesCrMemoLine.FindSet();
         repeat
             PrintTextLine(SalesCrMemoLine.Description, false);
-            PrintFourColumnText(Format(SalesCrMemoLine.Quantity).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(SalesCrMemoLine."Unit Price"), FormatDecimal(SalesCrMemoLine."Amount Including VAT"), false);
+            PrintFourColumnText(Format(-Abs(SalesCrMemoLine.Quantity)).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(GetUnitPriceInclVAT(SalesCrMemoHeader."Prices Including VAT", SalesCrMemoLine."Unit Price", SalesCrMemoLine."VAT %", SalesCrMemoHeader."Currency Code")), FormatDecimal(Round(-Abs(SalesCrMemoLine."Amount Including VAT"), Currency."Amount Rounding Precision")), false);
 
             AddAmountToDecimalDict(TaxableAmountDict, SalesCrMemoLine."VAT %", SalesCrMemoLine."VAT Base Amount");
             AddAmountToDecimalDict(TaxAmountDict, SalesCrMemoLine."VAT %", SalesCrMemoLine."Amount Including VAT" - SalesCrMemoLine."VAT Base Amount");
-            AddAmountToDecimalDict(TaxAmountDict, SalesCrMemoLine."VAT %", SalesCrMemoLine."Amount Including VAT");
+            AddAmountToDecimalDict(AmountInclTaxDict, SalesCrMemoLine."VAT %", SalesCrMemoLine."Amount Including VAT");
         until SalesCrMemoLine.Next() = 0;
         PrintFullLine();
 
@@ -332,6 +339,21 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
             exit;
         BaseAmount := DecimalDict.Get(DictKey) + DictValue;
         DecimalDict.Set(DictKey, BaseAmount);
+    end;
+
+    local procedure GetUnitPriceInclVAT(PricesInclVAT: Boolean; UnitPrice: Decimal; VATPercentage: Decimal; CurrencyCode: Code[20]): Decimal
+    var
+        Currency: Record Currency;
+    begin
+        if PricesInclVAT then
+            exit(UnitPrice);
+
+        if CurrencyCode = '' then
+            Currency.InitRoundingPrecision()
+        else
+            if not Currency.Get(CurrencyCode) then
+                Currency.InitRoundingPrecision();
+        exit(Round(UnitPrice * (1 + VATPercentage / 100), Currency."Amount Rounding Precision"));
     end;
 
     #endregion
