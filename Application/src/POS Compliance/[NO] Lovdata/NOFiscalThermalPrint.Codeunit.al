@@ -38,7 +38,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         PrintItemCategoryPart(Printer, POSWorkshiftCheckpoint);
         PrintSalespersonPart(Printer, POSWorkshiftCheckpoint);
         PrintGeneralInfoPart(Printer, POSWorkshiftCheckpoint);
-        PrintTotalsPart(Printer, POSWorkshiftCheckpoint);
+        PrintTotalsPart(Printer);
         PrintMoreInfoPart(Printer, POSWorkshiftCheckpoint);
 
         PrintThermalLine(Printer, 'PAPERCUT', 'COMMAND', false, 'CENTER', true, false);
@@ -81,6 +81,7 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
 
         PrintThermalLine(Printer, CompanyInfo.Name, 'A11', false, 'CENTER', true, false);
         PrintThermalLine(Printer, StrSubstNo(POSStoreAddressInfoLbl, POSStore.Address, POSStore.City, POSStore."Post Code"), 'A11', false, 'CENTER', true, false);
+        PrintThermalLine(Printer, Format(ZReportPOSEntry."Fiscal No."), 'A11', false, 'CENTER', true, false);
         PrintThermalLine(Printer, '', 'A11', true, 'CENTER', true, false);
 
         if NOReportStatisticsMgt.FindPreviousZReport(PreviousZReport, POSWorkshiftCheckpoint."POS Unit No.", POSWorkshiftCheckpoint."Entry No.") then
@@ -473,12 +474,15 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         PrintThermalLine(Printer, CaptionValueFormat(AppVersionCaptionLbl, AppVerTxt), 'A11', false, 'LEFT', true, false);
     end;
 
-    local procedure PrintTotalsPart(var Printer: Codeunit "NPR RP Line Print"; POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint")
+    local procedure PrintTotalsPart(var Printer: Codeunit "NPR RP Line Print")
+    var
+        NOAuditMgt: Codeunit "NPR NO Audit Mgt.";
+        TotalPOSReturnSale, TotalPOSSale : Decimal;
     begin
-        POSWorkshiftCheckpoint.CalcFields("FF Total Dir. Item Return(LCY)", "FF Total Dir. Item Sales (LCY)");
-        PrintThermalLine(Printer, CaptionValueFormat(TotalSalesAmountCaptionLbl, FormatNumber(POSWorkshiftCheckpoint."FF Total Dir. Item Sales (LCY)")), 'A11', false, 'LEFT', true, false);
-        PrintThermalLine(Printer, CaptionValueFormat(TotalReturnAmountCaptionLbl, FormatNumber(POSWorkshiftCheckpoint."FF Total Dir. Item Return(LCY)")), 'A11', false, 'LEFT', true, false);
-        PrintThermalLine(Printer, CaptionValueFormat(TotalSalesNetoCaptionLbl, FormatNumber(POSWorkshiftCheckpoint."FF Total Dir. Item Sales (LCY)" - Abs(POSWorkshiftCheckpoint."FF Total Dir. Item Return(LCY)"))), 'A11', false, 'LEFT', true, false);
+        NOAuditMgt.GetPOSSaleLineTotalSaleAndReturn(TotalPOSSale, TotalPOSReturnSale);
+        PrintThermalLine(Printer, CaptionValueFormat(TotalSalesAmountCaptionLbl, FormatNumber(TotalPOSSale)), 'A11', false, 'LEFT', true, false);
+        PrintThermalLine(Printer, CaptionValueFormat(TotalReturnAmountCaptionLbl, FormatNumber(-TotalPOSReturnSale)), 'A11', false, 'LEFT', true, false);
+        PrintThermalLine(Printer, CaptionValueFormat(TotalSalesNetoCaptionLbl, FormatNumber(TotalPOSSale - TotalPOSReturnSale)), 'A11', false, 'LEFT', true, false);
 
         PrintThermalLine(Printer, ThermalPrintLineLbl, 'A11', true, 'LEFT', true, false);
     end;
@@ -693,12 +697,12 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
         Quantity: Decimal;
         Quantity2: Decimal;
         Quantity3: Decimal;
-        ReceiptCopyCounter: Integer;
-        ReceiptPrintCounter: Integer;
         ReturnAmount: Decimal;
         CountCards, CountOther : Integer;
         CountReturned: Integer;
         FromEntryNo: Integer;
+        ReceiptCopyCounter: Integer;
+        ReceiptPrintCounter: Integer;
     begin
         PrintThermalLine(Printer, '', 'A11', true, 'CENTER', true, false);
         PrintThermalLine(Printer, GeneralInfoCaptionLbl, 'A11', true, 'CENTER', true, false);

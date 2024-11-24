@@ -726,7 +726,6 @@ codeunit 6151548 "NPR NO Audit Mgt."
         if not POSSavedSaleEntry.IsEmpty() then
             Error(POSSavedSalesErr, SalePOS.FieldCaption("Register No."), SalePOS."Register No.");
     end;
-    #endregion
 
     local procedure UpdatePriceChangedLine(POSSaleLine: Record "NPR POS Sale Line"; EntryType: Text)
     var
@@ -744,4 +743,26 @@ codeunit 6151548 "NPR NO Audit Mgt."
         POSAuditLog."Additional Information" += ':' + EntryType;
         POSAuditLog.Modify();
     end;
+
+    procedure GetPOSSaleLineTotalSaleAndReturn(var TotalPOSSale: Decimal; var TotalPOSReturnSale: Decimal)
+    var
+        NOPOSSale: Query "NPR NO POS Sale Line Sum";
+        EntryType: Option Comment,"Direct Sale",Other,"Credit Sale",Balancing,"Cancelled Sale";
+    begin
+        NOPOSSale.SetFilter(POS_Entry_Type, Format(EntryType::"Direct Sale"));
+        NOPOSSale.SetFilter(QuantityFilter, '>%1', 0);
+        if NOPOSSale.Open() then begin
+            NOPOSSale.Read();
+            TotalPOSSale := NOPOSSale.Total_Amt_Incl_Vat;
+            NOPOSSale.Close();
+        end;
+        NOPOSSale.SetFilter(POS_Entry_Type, Format(EntryType::"Direct Sale"));
+        NOPOSSale.SetFilter(QuantityFilter, '<=%1', 0);
+        if NOPOSSale.Open() then begin
+            NOPOSSale.Read();
+            TotalPOSReturnSale := NOPOSSale.Total_Amt_Incl_Vat;
+            NOPOSSale.Close();
+        end;
+    end;
+    #endregion
 }
