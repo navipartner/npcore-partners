@@ -15,7 +15,6 @@ report 6014468 "NPR NO Balacing A4 POS"
         dataitem("POS Workshift Checkpoint"; "NPR POS Workshift Checkpoint")
         {
             RequestFilterFields = "Entry No.";
-            CalcFields = "FF Total Dir. Item Return(LCY)", "FF Total Dir. Item Sales (LCY)";
 
             column(CompInfoPicture_; CompanyInfo.Picture) { }
             column(CompanyAddress; StrSubstNo(CompanyAddressInfoLbl, CompanyInfo.Address, CompanyInfo.City, CompanyInfo."Post Code")) { }
@@ -160,9 +159,9 @@ report 6014468 "NPR NO Balacing A4 POS"
             column(Total_WithItemCategoryAmount; WithItemCategoryAmount) { }
             column(Total_WithoutItemCategoryQuantity; WithoutItemCategoryQuantity) { }
             column(Total_WithoutItemCategoryAmount; WithoutItemCategoryAmount) { }
-            column(Total_ReturnSales; "FF Total Dir. Item Return(LCY)") { }
-            column(Total_BrutoSales; "FF Total Dir. Item Sales (LCY)") { }
-            column(Total_NetoSales; "FF Total Dir. Item Sales (LCY)" - Abs("FF Total Dir. Item Return(LCY)")) { }
+            column(Total_ReturnSales; -Abs(TotalPOSReturnSale)) { }
+            column(Total_BrutoSales; TotalPOSSale) { }
+            column(Total_NetoSales; TotalPOSSale - TotalPOSReturnSale) { }
             column(Total_PriceLookupQuantity; TotalPriceLookupQuantity) { }
             column(AppVersionText; AppVersionTxt) { }
             column(FirstSaleDatetimeTxt; FirstSaleDatetimeTxt) { }
@@ -420,6 +419,7 @@ report 6014468 "NPR NO Balacing A4 POS"
             var
                 POSUnit: Record "NPR POS Unit";
                 PreviousZReport: Record "NPR POS Workshift Checkpoint";
+                NOAuditMgt: Codeunit "NPR NO Audit Mgt.";
             begin
                 VarMain := 1;
                 Clear(FromPOSEntryNo);
@@ -459,6 +459,7 @@ report 6014468 "NPR NO Balacing A4 POS"
                     LastSaleDatetimeTxt := Format(POSEntry.SystemCreatedAt);
 
                 GetFirstLoginTimeAndPOSOpenedBy("POS Workshift Checkpoint", POSOpenedByTxt, FirstLoginDatetimeTxt);
+                NOAuditMgt.GetPOSSaleLineTotalSaleAndReturn(TotalPOSSale, TotalPOSReturnSale);
             end;
         }
     }
@@ -771,12 +772,12 @@ report 6014468 "NPR NO Balacing A4 POS"
 
     local procedure SetSalespersonStatistics(POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint"; SalespersonPurchaser: Record "Salesperson/Purchaser")
     var
-        CashBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
         POSAuditLog: Record "NPR POS Audit Log";
+        POSEntry2: Record "NPR POS Entry";
+        CashBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
         POSUnit: Record "NPR POS Unit";
         PreviousZReport: Record "NPR POS Workshift Checkpoint";
         PreviousZReportDateTime: DateTime;
-        POSEntry2: Record "NPR POS Entry";
     begin
         POSUnit.Get(POSWorkshiftCheckpoint."POS Unit No.");
         NOReportStatisticsMgt.SetFilterOnPOSEntry(POSEntry2, POSUnit, FromPOSEntryNo, POSWorkshiftCheckpoint."POS Entry No.", SalespersonPurchaser.Code);
@@ -824,8 +825,8 @@ report 6014468 "NPR NO Balacing A4 POS"
         CompanyInfo: Record "Company Information";
         POSEntry: Record "NPR POS Entry";
         Salesperson: Record "Salesperson/Purchaser";
-        TempSalespersonBuffer: Record "Vendor Amount" temporary;
         User: Record User;
+        TempSalespersonBuffer: Record "Vendor Amount" temporary;
         NOReportStatisticsMgt: Codeunit "NPR NO Report Statistics Mgt.";
         ifBankDenominExists: Boolean;
         ifCountingDenominExists: Boolean;
@@ -851,29 +852,30 @@ report 6014468 "NPR NO Balacing A4 POS"
         BrutoAmount: Decimal;
         CancelledReceiptsAmount: Decimal;
         DiscountAmount: Decimal;
+        DiscountQuantity: Decimal;
         InitialFloatAmount: Decimal;
         NetoAmount: Decimal;
         ReceiptCopyAmount: Decimal;
         ReturnAmount: Decimal;
+        ReturnedProductsQuantity: Decimal;
         ReturnTax25Amount: Decimal;
         ReturnTaxAmount: Decimal;
+        SoldProductsQuantity: Decimal;
         Tax25Amount: Decimal;
         TaxAmount: Decimal;
         TotalCards: Decimal;
         TotalOther: Decimal;
-        WithItemCategoryAmount, WithoutItemCategoryAmount, WithItemCategoryQuantity, WithoutItemCategoryQuantity : Decimal;
+        TotalPOSReturnSale, TotalPOSSale : Decimal;
+        WithItemCategoryAmount, WithItemCategoryQuantity, WithoutItemCategoryAmount, WithoutItemCategoryQuantity : Decimal;
         CancelledReceiptsQuantity: Integer;
         CashDrawerOpenQuantity: Integer;
-        DiscountQuantity: Decimal;
         FromPOSEntryNo: Integer;
         PriceLookupQuantity: Integer;
         QuantityCards: Integer;
         QuantityOther: Integer;
         ReceiptCopyCounter: Integer;
         ReceiptPrintCounter: Integer;
-        ReturnedProductsQuantity: Decimal;
         ReturnedRecieptsQuantity: Integer;
-        SoldProductsQuantity: Decimal;
         TotalPriceLookupQuantity: Integer;
         VarAttachedBin: Integer;
         VarBin: Integer;
@@ -881,16 +883,6 @@ report 6014468 "NPR NO Balacing A4 POS"
         VarMain: Integer;
         VarTax: Integer;
         ZeroLinesQuantity: Integer;
-        AppVersionTxt: Text;
-        ClosingDatetimeTxt: Text;
-        FirstLoginDatetimeTxt: Text;
-        FirstSaleDatetimeTxt: Text;
-        LastSaleDatetimeTxt: Text;
-        POSClosedByTxt: Text;
-        POSOpenedByTxt: Text;
-        PreviousZReportDateTimeTxt: Text;
-        VarBalancedBy: Text;
-        VarReportTitle: Text;
         AttachedPaymentBinslbl: Label 'Vedlagte betalingsbinger', Locked = true;
         BalancedByLbl: Label 'Registrer balansert etter', Locked = true;
         ClosingDatelbl: Label 'Dato', Locked = true;
@@ -926,4 +918,14 @@ report 6014468 "NPR NO Balacing A4 POS"
         Voucherslbl: Label 'Bilag', Locked = true;
         WithLbl: Label 'Med', Locked = true;
         Workshiftlbl: Label 'Z-rapport SerieNummer', Locked = true;
+        AppVersionTxt: Text;
+        ClosingDatetimeTxt: Text;
+        FirstLoginDatetimeTxt: Text;
+        FirstSaleDatetimeTxt: Text;
+        LastSaleDatetimeTxt: Text;
+        POSClosedByTxt: Text;
+        POSOpenedByTxt: Text;
+        PreviousZReportDateTimeTxt: Text;
+        VarBalancedBy: Text;
+        VarReportTitle: Text;
 }
