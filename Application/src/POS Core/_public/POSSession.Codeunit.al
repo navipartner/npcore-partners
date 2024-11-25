@@ -809,7 +809,7 @@
         GetFrontEnd(POSFrontEndOut, true);
     end;
 
-    internal procedure GetPOSBackgroundTaskAPI(var POSBackgroundTaskAPIOut: Codeunit "NPR POS Background Task API")
+    procedure GetPOSBackgroundTaskAPI(var POSBackgroundTaskAPIOut: Codeunit "NPR POS Background Task API")
     begin
         ErrorIfNotInitialized();
         POSBackgroundTaskAPIOut := _POSBackgroundTaskAPI;
