@@ -147,6 +147,16 @@ navigation:
                   - endpoint: memberships.service-card.registerArrival
                   - endpoint: memberships.service-card.sendToWallet
 
+            - memberships.service-paymentmethod:
+                title: Payment Method
+                summary: ./docs/pages/memberships/paymentmethod-introduction.mdx
+                contents:
+                  - endpoint: memberships.service-paymentmethod.getPaymentMethods
+                  - endpoint: memberships.service-paymentmethod.getPaymentMethod
+                  - endpoint: memberships.service-paymentmethod.addPaymentMethod
+                  - endpoint: memberships.service-paymentmethod.updatePaymentMethod
+                  - endpoint: memberships.service-paymentmethod.deletePaymentMethod
+
             - memberships.service-lifecycle:
                 title: Lifecycle
                 summary: ./docs/pages/memberships/lifecycle-introduction.mdx

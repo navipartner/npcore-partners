@@ -193,6 +193,149 @@ types:
           cards: 
             - $MemberCardEntity.ExampleMemberCard
 
+  ## Membership Payment Methods
+  PaymentMethodDTO:
+    docs:
+      This is a composite type representing a membership payment method. 
+    properties:
+      PSP: optional<simpleTypes.PaymentMethodPSP>
+      status: optional<simpleTypes.PaymentMethodStatus>
+      paymentInstrument: optional<simpleTypes.PaymentInstrument>
+      paymentBrand: optional<simpleTypes.PaymentBrand>
+      PANLastDigits: optional<simpleTypes.PaymentMethodPANLastDigits>
+      expiryDate: optional<simpleTypes.ExpiryDate>
+      default: optional<simpleTypes.Default>
+      alias: optional<simpleTypes.PaymentMethodAlias>
+    examples:
+      - name : ExamplePaymentMethod
+        value:
+          PSP: $simpleTypes.PaymentMethodPSP.ExamplePaymentMethodPSPAdyen
+          status: $simpleTypes.PaymentMethodStatus.ExamplePaymentMethodStatusActive
+          paymentInstrument: $simpleTypes.PaymentInstrument.ExamplePaymentInstrument
+          paymentBrand: $simpleTypes.PaymentBrand.ExamplePaymentBrand
+          PANLastDigits: $simpleTypes.PaymentMethodPANLastDigits.ExamplePaymentMethodPANLastDigits
+          expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDateEOM
+          default: $simpleTypes.Default.ExampleDefaultTrue
+          alias: $simpleTypes.PaymentMethodAlias.ExamplePaymentMethodAliasMain
+
+  PaymentMethodRetrieveDTO:
+    docs:
+      The PaymentMethodRetrieveDTO extends the PaymentMethodDTO and includes additional property - the payment method ID.
+      This DTO is used when retrieving infromation about existing payment methods.
+    extends: 
+      PaymentMethodDTO
+    properties:
+      id: simpleTypes.PaymentMethodId
+    examples:
+      - name : ExamplePaymentMethodRetrieve
+        value:
+          id: $simpleTypes.PaymentMethodId.ExamplePaymentMethodId
+          PSP: $simpleTypes.PaymentMethodPSP.ExamplePaymentMethodPSPAdyen
+          status: $simpleTypes.PaymentMethodStatus.ExamplePaymentMethodStatusActive
+          paymentInstrument: $simpleTypes.PaymentInstrument.ExamplePaymentInstrument
+          paymentBrand: $simpleTypes.PaymentBrand.ExamplePaymentBrand
+          PANLastDigits: $simpleTypes.PaymentMethodPANLastDigits.ExamplePaymentMethodPANLastDigits
+          expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDateEOM
+          default: $simpleTypes.Default.ExampleDefaultTrue
+          alias: $simpleTypes.PaymentMethodAlias.ExamplePaymentMethodAliasMain
+      - name : ExamplePaymentMethodRetrieveVipss
+        value:
+          id: $simpleTypes.PaymentMethodId.ExamplePaymentMethodId2
+          PSP: $simpleTypes.PaymentMethodPSP.ExamplePaymentMethodPSPVipps
+          status: $simpleTypes.PaymentMethodStatus.ExamplePaymentMethodStatusActive
+          paymentInstrument: $simpleTypes.PaymentInstrument.ExamplePaymentInstrument
+          paymentBrand: $simpleTypes.PaymentBrand.ExamplePaymentBrand
+          PANLastDigits: $simpleTypes.PaymentMethodPANLastDigits.ExamplePaymentMethodPANLastDigits2
+          expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDateEOM
+          default: $simpleTypes.Default.ExampleDefault
+          alias: $simpleTypes.PaymentMethodAlias.ExamplePaymentMethodAliasBackup
+      - name : ExamplePaymentMethodRetrieveArchived
+        value:
+          id: $simpleTypes.PaymentMethodId.ExamplePaymentMethodId3
+          PSP: $simpleTypes.PaymentMethodPSP.ExamplePaymentMethodPSPAdyen
+          status: $simpleTypes.PaymentMethodStatus.ExamplePaymentMethodStatusArchived
+          paymentInstrument: $simpleTypes.PaymentInstrument.ExamplePaymentInstrument
+          paymentBrand: $simpleTypes.PaymentBrand.ExamplePaymentBrand
+          PANLastDigits: $simpleTypes.PaymentMethodPANLastDigits.ExamplePaymentMethodPANLastDigits
+          expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDateExpired
+          default: $simpleTypes.Default.ExampleDefault
+          alias: $simpleTypes.PaymentMethodAlias.ExamplePaymentMethodAliasEmpty
+
+  PaymentMethodCreateRequestDTO:
+    docs:
+      The PaymentMethodCreateRequestDTO extends the PaymentMethodDTO and includes additional properties such as 
+      the paymentToken and shopperReference. This DTO is used when creating a new payment method.
+    extends: 
+      PaymentMethodDTO
+    properties:
+      shopperReference: optional<simpleTypes.ShopperReference>
+      paymentToken: optional<simpleTypes.PaymentToken>
+    examples:
+      - name : ExamplePaymentMethodCreateRequest
+        value:
+          PSP: $simpleTypes.PaymentMethodPSP.ExamplePaymentMethodPSPAdyen
+          status: $simpleTypes.PaymentMethodStatus.ExamplePaymentMethodStatusActive
+          paymentInstrument: $simpleTypes.PaymentInstrument.ExamplePaymentInstrument
+          paymentBrand: $simpleTypes.PaymentBrand.ExamplePaymentBrand
+          PANLastDigits: $simpleTypes.PaymentMethodPANLastDigits.ExamplePaymentMethodPANLastDigits
+          expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDateEOM
+          default: $simpleTypes.Default.ExampleDefault
+          alias: $simpleTypes.PaymentMethodAlias.ExamplePaymentMethodAliasEmpty
+          shopperReference: $simpleTypes.ShopperReference.ExampleShopperReference
+          paymentToken: $simpleTypes.PaymentToken.ExamplePaymentToken
+
+  PaymentMethodCreateResponseDTO:
+    docs:
+      The PaymentMethodCreateResponseDTO extends the PaymentMethodCreateRequestDTO and includes additional property - the payment method ID.
+      This DTO is used when returning results for the payment method create request.
+    extends: 
+      PaymentMethodCreateRequestDTO
+    properties:
+      id: simpleTypes.PaymentMethodId
+    examples:
+      - name : ExamplePaymentMethodCreateResponse
+        value:
+          id: $simpleTypes.PaymentMethodId.ExamplePaymentMethodId
+          PSP: $simpleTypes.PaymentMethodPSP.ExamplePaymentMethodPSPAdyen
+          status: $simpleTypes.PaymentMethodStatus.ExamplePaymentMethodStatusActive
+          paymentInstrument: $simpleTypes.PaymentInstrument.ExamplePaymentInstrument
+          paymentBrand: $simpleTypes.PaymentBrand.ExamplePaymentBrand
+          PANLastDigits: $simpleTypes.PaymentMethodPANLastDigits.ExamplePaymentMethodPANLastDigits
+          expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDateEOM
+          default: $simpleTypes.Default.ExampleDefault
+          alias: $simpleTypes.PaymentMethodAlias.ExamplePaymentMethodAliasEmpty
+          shopperReference: $simpleTypes.ShopperReference.ExampleShopperReference
+          paymentToken: $simpleTypes.PaymentToken.ExamplePaymentToken
+      - name : ExamplePaymentMethodCreateResponseDefault
+        value:
+          id: $simpleTypes.PaymentMethodId.ExamplePaymentMethodId
+          PSP: $simpleTypes.PaymentMethodPSP.ExamplePaymentMethodPSPAdyen
+          status: $simpleTypes.PaymentMethodStatus.ExamplePaymentMethodStatusActive
+          paymentInstrument: $simpleTypes.PaymentInstrument.ExamplePaymentInstrument
+          paymentBrand: $simpleTypes.PaymentBrand.ExamplePaymentBrand
+          PANLastDigits: $simpleTypes.PaymentMethodPANLastDigits.ExamplePaymentMethodPANLastDigits
+          expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDateEOM
+          default: $simpleTypes.Default.ExampleDefaultTrue
+          alias: $simpleTypes.PaymentMethodAlias.ExamplePaymentMethodAliasEmpty
+          shopperReference: $simpleTypes.ShopperReference.ExampleShopperReference
+          paymentToken: $simpleTypes.PaymentToken.ExamplePaymentToken
+
+  PaymentMethodUpdateRequestDTO:
+    docs:
+      This DTO is used when updating an existing payment method.
+    properties:
+      status: optional<simpleTypes.PaymentMethodStatus>
+      expiryDate: optional<simpleTypes.ExpiryDate>
+      default: optional<simpleTypes.Default>
+      alias: optional<simpleTypes.PaymentMethodAlias>
+    examples:
+      - name : ExamplePaymentMethodUpdateRequest
+        value:
+          status: $simpleTypes.PaymentMethodStatus.ExamplePaymentMethodStatusActive
+          expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDateEOM
+          default: $simpleTypes.Default.ExampleDefaultTrue
+          alias: $simpleTypes.PaymentMethodAlias.ExamplePaymentMethodAliasMain
+
   ### Entities
   MembershipEntity:
     docs:

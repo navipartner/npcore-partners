@@ -53,11 +53,11 @@ types:
 
   ## Membership related types
   MembershipId:
-    type: integer
+    type: uuid
     docs: Unique identifier for a membership.
     examples:
       - name: ExampleMembershipId
-        value: 1224
+        value: cdef7890-abcd-0123-1234-567890abcdef
 
   MembershipNumber:
     type: string
@@ -379,6 +379,10 @@ types:
     examples:
       - name: ExampleExpiryDate
         value: "2029-09-17"
+      - name: ExampleExpiryDateEOM
+        value: "2029-09-30"
+      - name: ExampleExpiryDateExpired
+        value: "2024-10-31"
 
   TemporaryCard:
       type: boolean
@@ -402,6 +406,104 @@ types:
       - name: ExampleRoleAdmin
         value: membership_admin
 
+  ## Payment Method Related Types
+  PaymentMethodId:
+    type: uuid
+    docs: Unique identifier for a payment method.
+    examples:
+      - name: ExamplePaymentMethodId
+        value: a7b41af8-d187-48d9-89e0-a57c47039004
+      - name: ExamplePaymentMethodId2
+        value: 5f705a42-0bb8-439f-8914-6f80cfde1414
+      - name: ExamplePaymentMethodId3
+        value: eadda754-7ae0-475a-813c-445da84a6801
+
+  PaymentMethodPSPEnum:
+    enum:
+      - Adyen
+      - Vipps
+
+  PaymentMethodPSP:
+    type: PaymentMethodPSPEnum
+    docs: The payment service provider of the payment method.
+    examples:
+      - name: ExamplePaymentMethodPSPAdyen
+        value: Adyen
+      - name: ExamplePaymentMethodPSPVipps
+        value: Vipps
+
+  PaymentMethodStatusEnum:
+    enum:
+      - Active
+      - Archived
+
+  PaymentMethodStatus:
+    type: PaymentMethodStatusEnum
+    docs: The status of the payment method.
+    examples:
+      - name: ExamplePaymentMethodStatusActive
+        value: Active
+      - name: ExamplePaymentMethodStatusArchived
+        value: Archived
+
+  PaymentInstrument:
+    type: string
+    docs: The payment method type.
+    examples:
+      - name: ExamplePaymentInstrument
+        value: "Card"
+
+  PaymentBrand:
+    type: string
+    docs: The payment method brand.
+    examples:
+      - name: ExamplePaymentBrand
+        value: "visa"
+
+  PaymentMethodPANLastDigits:
+    type: string
+    docs: The last 4 digits of the payment card number.
+    examples:
+      - name: ExamplePaymentMethodPANLastDigits
+        value: "1234"
+      - name: ExamplePaymentMethodPANLastDigits2
+        value: "5678"
+
+  PaymentMethodAlias:
+    type: string
+    docs: A short description that can be assigned to each payment method by the end user.
+    examples:
+      - name: ExamplePaymentMethodAliasMain
+        value: "my main card"
+      - name: ExamplePaymentMethodAliasBackup
+        value: "my backup card"
+      - name: ExamplePaymentMethodAliasEmpty
+        value: ""
+
+  Default:
+      type: boolean
+      docs: Indicates whether the payment method should be set up as default.
+      examples:
+        - name: ExampleDefault
+          value: false
+        - name: ExampleDefaultTrue
+          value: true
+
+  ShopperReference:
+    type: string
+    docs: The shopper reference of the payment method.
+    examples:
+      - name: ExampleShopperReference
+        value: "3AE8115C-D7A4-B9FC-4FCA-B09BFD311895"
+
+  PaymentToken:
+    type: string
+    docs: The shopper reference of the payment method.
+    examples:
+      - name: ExamplePaymentToken
+        value: "FMF7KDR3WL9S2DK5"
+      - name: ExamplePaymentToken2
+        value: "ABCDEFGHIJ1234KL567"
 
   #######################
   DocumentId:
