@@ -3,6 +3,7 @@ enum 6014505 "NPR POS Background Task" implements "NPR POS Background Task"
 #if not BC17
     UnknownValueImplementation = "NPR POS Background Task" = "NPR Unknown POS Bgnd. Task";
 #endif
+    Extensible = true;
 
     value(0; Example)
     {
