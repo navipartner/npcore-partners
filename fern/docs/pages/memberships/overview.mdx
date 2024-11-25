@@ -20,6 +20,9 @@ A card is a physical or virtual representation of a member’s access to their m
 
 A card is linked to a specific member and a specific membership, providing a bridge between the person and their ability to interact with the membership benefits. Cards can be added, replaced, or removed as needed, and in cases where a card is lost or damaged, it can be replaced with a new one while blocking the old one. Not all members may have cards (for example, in cases where physical access is not required), but the option to assign cards provides flexibility in how memberships are managed.
 
+## Payment Method ##
+A payment method is information about a means of payment (debit/credit card) that can be used by the system to renew the membership. The system doesn't store the actual credit card numbers, only the tokens provided by a supported Payment Service Provider (PSP). The token is then used with the PSP to request the renewal payment. Therefore, if you want to register a new payment method, you'll first need to tokenize the payment card details with a supported PSP.
+
 ## Time Periods and Membership Lifecycle Actions ##
 A membership must have a valid time period that defines when it is active. This period ensures that members are only able to use their membership benefits during specific times. Various actions can manipulate these time periods:
 

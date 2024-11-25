@@ -1,0 +1,200 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+  simpleTypes: ./types/types-simple.yml
+  compositeTypes: ./types/types-composite.yml
+
+types:
+  # Get Payment Methods Service
+  GetPaymentMethodsResponse:
+    docs: Response to retrieving payment methods
+    properties:
+      paymentMethods: list<compositeTypes.PaymentMethodRetrieveDTO>
+    examples:
+      - name: ExampleGetPaymentMethods
+        value:
+          paymentMethods:
+            - $compositeTypes.PaymentMethodRetrieveDTO.ExamplePaymentMethodRetrieve
+            - $compositeTypes.PaymentMethodRetrieveDTO.ExamplePaymentMethodRetrieveVipss
+            - $compositeTypes.PaymentMethodRetrieveDTO.ExamplePaymentMethodRetrieveArchived
+
+  # Get One Payment Method Service
+  GetPaymentMethodResponse:
+    docs: Response to retrieving a payment method
+    properties:
+      paymentMethod: compositeTypes.PaymentMethodRetrieveDTO
+    examples:
+      - name: ExampleGetPaymentMethod
+        value:
+          paymentMethod: $compositeTypes.PaymentMethodRetrieveDTO.ExamplePaymentMethodRetrieve
+
+  # Add Payment Method Service
+  AddPaymentMethodRequest: 
+    docs: Request to add a new payment method for a membership
+    properties:
+      paymentMethod: compositeTypes.PaymentMethodCreateRequestDTO
+    examples:
+      - name: ExampleAddPaymentMethod
+        value:
+          paymentMethod: $compositeTypes.PaymentMethodCreateRequestDTO.ExamplePaymentMethodCreateRequest
+
+  AddPaymentMethodResponse:
+    docs: Response to adding a new payment method for a membership
+    properties:
+      paymentMethod: compositeTypes.PaymentMethodCreateResponseDTO
+    examples:
+      - name: ExampleAddPaymentMethod
+        value:
+          paymentMethod: $compositeTypes.PaymentMethodCreateResponseDTO.ExamplePaymentMethodCreateResponse
+
+  # Update Payment Method Service
+  UpdatePaymentMethodRequest: 
+    docs: Request to update an existing payment method
+    properties:
+      paymentMethod: compositeTypes.PaymentMethodUpdateRequestDTO
+    examples:
+      - name: ExampleUpdatePaymentMethod
+        value:
+          paymentMethod: $compositeTypes.PaymentMethodUpdateRequestDTO.ExamplePaymentMethodUpdateRequest
+
+  UpdatePaymentMethodResponse:
+    docs: Response to updating an existing payment method
+    properties:
+      paymentMethod: compositeTypes.PaymentMethodRetrieveDTO
+    examples:
+      - name: ExampleUpdatePaymentMethod
+        value:
+          paymentMethod: $compositeTypes.PaymentMethodRetrieveDTO.ExamplePaymentMethodRetrieve
+
+  # Delete Payment Method Service
+  DeletePaymentMethodResponse:
+    docs: Response to deleting a payment method
+    properties:
+      paymentMethod: compositeTypes.PaymentMethodRetrieveDTO
+    examples:
+      - name: ExampleDeletePaymentMethod
+        value:
+          paymentMethod: $compositeTypes.PaymentMethodRetrieveDTO.ExamplePaymentMethodRetrieve
+
+service:
+  display-name: Payment method
+  auth: false
+  base-path: /memberships
+  headers:
+    x-api-version: optional<globalApiTypes.ApiVersionDate>
+  endpoints:
+
+    ## GET payment methods
+    getPaymentMethods:
+      docs: 
+        Retrieve membership payment methods. 
+      display-name: Retrieve membership payment methods
+      method: GET 
+      path: /{membershipId}/paymentmethods
+      path-parameters:
+        membershipId: simpleTypes.MembershipId
+      request:
+        name: getPaymentMethods
+      response: GetPaymentMethodsResponse
+      examples:
+        - name: ExampleGetPaymentMethods
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          response: 
+            body: $GetPaymentMethodsResponse.ExampleGetPaymentMethods
+
+    ## GET a single payment method
+    getPaymentMethod:
+      docs: 
+        Retrieve a payment method by its ID.
+      display-name: Get payment method using Id
+      method: GET 
+      path: /paymentmethods/{paymentMethodId}
+      path-parameters:
+        paymentMethodId: simpleTypes.PaymentMethodId
+      request:
+        name: getPaymentMethod
+      response: GetPaymentMethodResponse
+      examples:
+        - name: ExampleGetPaymentMethod
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            paymentMethodId: $simpleTypes.PaymentMethodId.ExamplePaymentMethodId
+          response:
+            body: $GetPaymentMethodResponse.ExampleGetPaymentMethod
+
+    ## POST Add a payment method
+    addPaymentMethod:
+      docs: 
+        Add a new payment method for a membership.
+      display-name: Add payment method
+      method: POST
+      path: /{membershipId}/paymentmethods
+      path-parameters:
+        membershipId: simpleTypes.MembershipId
+      request:
+        name: addPaymentMethod
+        body: AddPaymentMethodRequest
+      response: AddPaymentMethodResponse
+      examples:
+        - name: ExamplePaymentMethod
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          request: $AddPaymentMethodRequest.ExampleAddPaymentMethod
+          response:
+            body: $AddPaymentMethodResponse.ExampleAddPaymentMethod
+
+    ## POST Update a payment method
+    updatePaymentMethod:
+      docs: 
+        Update an existing payment method using the payment method ID.
+      display-name: Update payment method
+      method: PATCH
+      path: /paymentmethods/{paymentMethodId}
+      path-parameters:
+        paymentMethodId: simpleTypes.PaymentMethodId
+      request:
+        name: updatePaymentMethod
+        body: UpdatePaymentMethodRequest
+      response: UpdatePaymentMethodResponse
+      examples:
+        - name: ExamplePaymentMethod
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            paymentMethodId: $simpleTypes.PaymentMethodId.ExamplePaymentMethodId
+          request: $UpdatePaymentMethodRequest.ExampleUpdatePaymentMethod
+          response:
+            body: $UpdatePaymentMethodResponse.ExampleUpdatePaymentMethod
+
+    ## DELETE delete a payment method
+    deletePaymentMethod:
+      docs: 
+        Delete an existing payment method using the payment method ID.
+      display-name: Delete payment method
+      method: DELETE
+      path: /paymentmethods/{paymentMethodId}
+      path-parameters:
+        paymentMethodId: simpleTypes.PaymentMethodId
+      request:
+        name: deletePaymentMethod
+      response: DeletePaymentMethodResponse
+      examples:
+        - name: ExamplePaymentMethod
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            paymentMethodId: $simpleTypes.PaymentMethodId.ExamplePaymentMethodId
+          response:
+            body: $DeletePaymentMethodResponse.ExampleDeletePaymentMethod
