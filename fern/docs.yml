@@ -37,8 +37,11 @@ navigation:
       icon: fa-solid fa-key
       path: docs/pages/auth.mdx
     - page: Errors
-      icon: fa-solid fa-bug
+      icon: fa-solid fa-exclamation-circle
       path: docs/pages/errors.mdx
+    - page: Versioning
+      icon: fa-solid fa-code-branch
+      path: docs/pages/versioning.mdx
     # Hidden pages (accessible only from specific areas):
     - page: Crane
       path: docs/pages/crane.mdx
@@ -177,11 +180,8 @@ navbar-links:
     text: Support
     url: https://www.navipartner.com/support/
   - type: secondary
-    text: NP Retail Documentation
+    text: Product Documentation
     url: https://docs.navipartner.com/docs/retail/gettingstarted/intro/
-  - type: primary
-    text: Get a demo
-    url: https://www.navipartner.com/get-trial/
 
 colors:
   accentPrimary: 
@@ -195,6 +195,6 @@ logo:
   dark: ./docs/assets/NaviPartner_rgb.png
   light: ./docs/assets/NaviPartner_rgb.png
   height: 20
-  href: https://navipartner.com
+  href: https://api.navipartner.com
 
 favicon: ./docs/assets/favicon.ico

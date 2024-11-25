@@ -1,0 +1,12 @@
+---
+title: "Versioning"
+slug: versioning
+---
+
+All our endpoints use header **`x-api-version`** to specify which version of the API a client wants to interact with.  
+
+When you develop your integration you should set this header to be the current date. This ensures that future versions with potential breaking changes will not impact you.  
+If you omit the header, you will always get the latest version.
+
+## Header Format
+The format of the header should be `YYYY-MM-DD`.
