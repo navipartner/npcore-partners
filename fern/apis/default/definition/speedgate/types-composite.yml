@@ -1,0 +1,119 @@
+imports:
+  simpleTypes: ./types-simple.yml
+
+types:
+
+  MemberGuestOptions:
+    docs:
+      When admitting a member that is allowed to bring guests, 
+      the number of guests and the corresponding token should be specified to the admit endpoint.
+    properties:
+      description: simpleTypes.Description
+      token: simpleTypes.Token
+      maxNumberOfGuests: optional<simpleTypes.MaxNumberOfGuests>
+
+  TicketOptions:
+    docs:
+      When admitting a customer with referencing a wallet, the tickets available in the wallet are returned.  
+    properties:
+      referenceNumber: simpleTypes.ReferenceNumber
+      admissions: list<AdmissionDetails>
+
+  AdmissionDetails:
+    docs:
+      Details of the admission for a specific ticket
+    properties:
+      admissionCode: simpleTypes.AdmissionCode
+      scanCount: optional<simpleTypes.ScanCount>
+      lastScanAt: optional<simpleTypes.LastScanAt>
+
+  AdmissionInfo:
+    docs:
+      Details of the admission for a specific ticket
+    properties:
+      code: simpleTypes.AdmissionCode
+      description: optional<simpleTypes.Description>
+      default: optional<simpleTypes.DefaultAdmission>
+
+  MemberDetails:
+    properties:
+      memberId: simpleTypes.MemberId
+      memberNumber: simpleTypes.MemberNumber
+      firstName: simpleTypes.FirstName
+      lastName: simpleTypes.LastName
+      membershipId: simpleTypes.MembershipId
+      membershipNumber: simpleTypes.MembershipNumber
+      communityCode: simpleTypes.CommunityCode
+      membershipCode: simpleTypes.MembershipCode
+      issueDate: simpleTypes.IssueDate
+      validFromDate: simpleTypes.ValidFromDate
+      validUntilDate: simpleTypes.ValidUntilDate
+    examples:
+      - name: ExampleMemberDetails
+        value:
+          memberId: $simpleTypes.MemberId.ExampleMemberId
+          memberNumber: $simpleTypes.MemberNumber.ExampleMemberNumber
+          firstName: $simpleTypes.FirstName.ExampleFirstName
+          lastName: $simpleTypes.LastName.ExampleLastName
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
+          communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
+          membershipCode: $simpleTypes.MembershipCode.GOLD
+          issueDate: $simpleTypes.IssueDate.ExampleIssueDate
+          validFromDate: $simpleTypes.ValidFromDate.ExampleValidFromDate
+          validUntilDate: $simpleTypes.ValidUntilDate.ExampleValidUntilDate
+
+  TryAdmitRequest:
+    docs: 
+      Request to try to admit a customer with a reference number.
+    properties:
+      referenceNumber: simpleTypes.ReferenceNumber
+      gateId: optional<simpleTypes.Gate>
+      admissionCode: optional<simpleTypes.AdmissionCode>
+
+  TryAdmitResponse:
+    docs: 
+      Response to try to admit a customer with a reference number.
+    properties:
+      token: simpleTypes.Token
+      referenceNumberType: simpleTypes.ReferenceNumberType
+      # In case of a member card
+      member: optional<MemberDetails>
+      guests: optional<list<MemberGuestOptions>>
+      # In case of a wallet
+      tickets: optional<list<TicketOptions>>
+
+      
+  TokenToAdmit:
+    docs: 
+      The token to admit a guest to the park. In case the token is a member guest token, a quantity for number of guests may be specified
+    properties:
+      token: simpleTypes.Token
+      quantity: optional<simpleTypes.Quantity>
+  
+  AdmitRequest:
+    docs: 
+      Request to admit a customer with a token.
+    properties:
+      tokens: list<TokenToAdmit>
+
+  AdmitResponse:
+    docs: 
+      Response to admit a customer with a token.
+    properties:
+      message: optional<string>
+
+  GateSetupResponse:
+    docs: 
+      Response to setup a gate.
+    properties:
+      gateId: simpleTypes.Gate
+      name: simpleTypes.Description
+      location: optional<simpleTypes.Description>
+      readyImage: optional<simpleTypes.Base64Image>
+      successImage: optional<simpleTypes.Base64Image>
+      failureImage: optional<simpleTypes.Base64Image>
+      admissions: list<AdmissionInfo>
+      acceptsTickets: optional<boolean>
+      acceptsMemberCards: optional<boolean>
+      acceptsWallets: optional<boolean>

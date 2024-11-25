@@ -9,8 +9,6 @@ service:
   display-name: Tickets
   auth: false
   base-path: /ticketing
-  headers:
-    x-api-version: optional<globalApiTypes.ApiVersionDate>
   endpoints:
 
     getTicket:
@@ -22,40 +20,81 @@ service:
       path: /ticket/{ticketNumber}
       request: 
         name: getTicket
+        query-parameters:
+          storeCode: optional<simpleTypes.StoreCode>
       path-parameters:
         ticketNumber: simpleTypes.TicketId
       response: compositeTypes.TicketDetails
       examples:
-          - path-parameters:
+          - name: ExampleGetTicket
+            path-parameters:
               tenant: $globalApiTypes.tenant.Exampletenant
               environment: $globalApiTypes.environment.ExampleenvironmentProduction
               company: $globalApiTypes.Company.ExampleCompanyCronus
               ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+            query-parameters:
+              storeCode: $simpleTypes.StoreCode.ExampleStoreCode
             response:
               body: $compositeTypes.TicketDetails.ExampleTicket1
 
-    revokeTicket:
+    requestRevokeTicket:
       docs: 
-        Revokes a ticket identified by its ticketNumber, effectively canceling it after it has been confirmed. 
-        This action makes the ticket invalid for entry or use and releases any held resources. 
-        Useful for handling refunds or cancellations initiated by the customer or the system.
+        Initiates a revoke request for a ticket identified by its ticket number. 
+        This first step validates that the ticket is eligible for revocation and provides a revokeId to be used in the subsequent confirmation step. 
+        It also returns the possible refund amount based on the ticket's conditions. 
+        This pre-validation is useful for assessing revocation eligibility and potential refunds before the final confirmation.
       method: POST
-      path: /ticket/{ticketNumber}/revoke
+      path: /ticket/{ticketNumber}/requestRevoke
       path-parameters:
         ticketNumber: simpleTypes.TicketId
       request: 
         name: revokeTicket
-      response: RevokedResponse
+        body: RevokeTicketRequest
+      response: RevokeTicketResponse
       examples:
          - path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             ticketNumber: $simpleTypes.TicketId.ExampleTicket1
-           response:
-             body:
-               ticketNumber: $simpleTypes.TicketId.ExampleTicket1
-               revoked: true
+           request:
+            pinCode: $simpleTypes.PinCode.ExamplePinCode
+           response: 
+            body:
+              revokeId: $simpleTypes.Token.ExampleRevokeId
+              quantityToRevoke: 1
+              unitAmount: 10.00
+            
+    confirmRevokeTicket:
+      docs: 
+        Confirms and executes the revocation of a ticket using the revokeId obtained from Request Revoke Ticket. 
+        This step finalizes the cancellation, making the ticket invalid for entry or use and releasing any associated resources. 
+        It may include additional customer details such as the ticketHolder name, notificationAddress for sending tickets or notifications, 
+        and a paymentReference to link the reservation to a payment transaction.
+      method: POST
+      path: /ticket/{ticketNumber}/confirmRevoke
+      path-parameters:
+        ticketNumber: simpleTypes.TicketId
+      request:
+        name: confirmRevoke
+        body: ConfirmRevokeTicketRequest
+      response: ConfirmRevokeTicketResponse
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+          request:
+            revokeId: $simpleTypes.Token.ExampleRevokeId
+            ticketHolder: $simpleTypes.TicketHolder.ExampleTicketHolder
+            notificationAddress: $simpleTypes.NotificationAddress.ExampleEmail
+            paymentReference: "R-1234"
+          response:
+            body:
+              revokeId: $simpleTypes.Token.ExampleRevokeId
+              status: "revoked"
+            
 
     validateArrival:
       docs: 
@@ -111,35 +150,38 @@ service:
               ticketNumber: $simpleTypes.TicketId.ExampleTicket1
               departed: true
 
-    validateMemberArrival:
-      docs: 
-        Validates the arrival of a member using their member card number, possibly creating a reservation on-the-fly if necessary. 
-        This endpoint is used when members, such as season pass holders or VIPs, arrive at an admission point without a prior reservation. 
-        It ensures that their access is recorded and any tickets are generated accordingly.
-      method: POST
-      path: /ticket/{memberNumber}/validateMemberArrival
-      path-parameters:
-        memberNumber: simpleTypes.MemberNumber
-      request:
-        name: validateMemberArrival 
-        body: CreateMemberReservationRequest
-      response: list<compositeTypes.TicketDetails>
-      examples:
-        - path-parameters:
-            tenant: $globalApiTypes.tenant.Exampletenant
-            environment: $globalApiTypes.environment.ExampleenvironmentProduction
-            company: $globalApiTypes.Company.ExampleCompanyCronus
-            memberNumber: $simpleTypes.MemberNumber.ExampleMemberNumber
-          request:
-            reserve:
-              - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
-                quantity: 1
-                #content:
-                #  - admissionCode: $AdmissionCode.ExampleAdmissionCastle
-                #    scheduleId: $ScheduleId.ExampleMorningId
-          response:
-            body: 
-              - $compositeTypes.TicketDetails.ExampleTicketMember
+    #
+    # This endpoint is intended to be used for creating a simple ticket reservation for a member guest and register arrival in one step.
+    # 
+    # validateMemberGuestArrival:
+    #   docs: 
+    #     Validates the arrival of a member using their member card number, possibly creating a reservation on-the-fly if necessary. 
+    #     This endpoint is used when members, such as season pass holders or VIPs, arrive at an admission point without a prior reservation. 
+    #     It ensures that their access is recorded and any tickets are generated accordingly.
+    #   method: POST
+    #   path: /ticket/{memberCardNumber}/validateMemberArrival
+    #   path-parameters:
+    #     memberNumber: simpleTypes.MemberNumber
+    #   request:
+    #     name: validateMemberArrival 
+    #     body: CreateMemberReservationRequest
+    #   response: list<compositeTypes.TicketDetails>
+    #   examples:
+    #     - path-parameters:
+    #         saasguid: $globalApiTypes.SaasGuid.ExampleSaasGuid
+    #         saasenv: $globalApiTypes.SaasEnv.ExampleSaasEnvProduction
+    #         company: $globalApiTypes.Company.ExampleCompanyCronus
+    #         memberNumber: $simpleTypes.MemberNumber.ExampleMemberNumber
+    #       request:
+    #         reserve:
+    #           - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
+    #             quantity: 1
+    #             #content:
+    #             #  - admissionCode: $AdmissionCode.ExampleAdmissionCastle
+    #             #    scheduleId: $ScheduleId.ExampleMorningId
+    #       response:
+    #         body: 
+    #           - $compositeTypes.TicketDetails.ExampleTicketMember
 
     sendToWallet:
       display-name: Send to Wallet
@@ -189,7 +231,6 @@ service:
               company: $globalApiTypes.Company.ExampleCompanyCronus
               ticketNumber: $simpleTypes.TicketId.ExampleTicket1
             request:
-              ticketNumber: $simpleTypes.TicketId.ExampleTicket1
               couponCode: "DISCOUNT10"
             response:
               body:
@@ -207,6 +248,38 @@ types:
     docs: Request to get ticket details
     properties:
       ticketNumber: simpleTypes.TicketId
+
+  RevokeTicketRequest:
+    docs: Request to revoke a ticket
+    properties:
+      pinCode: simpleTypes.PinCode
+    examples:
+      - name: ExampleRevokeTicket
+        value:
+          pinCode: $simpleTypes.PinCode.ExamplePinCode
+
+  RevokeTicketResponse:
+    properties:
+      revokeId: simpleTypes.Token
+      quantityToRevoke: simpleTypes.NumberOfTickets
+      unitAmount: simpleTypes.UnitPrice
+
+  ConfirmRevokeTicketRequest:
+    docs: 
+      Submitted when confirming a ticket revocation, finalizing the cancellation
+      May include customer details such as ticketHolder name, 
+      notificationAddress for sending tickets or notifications, 
+      and a paymentReference to link the reservation to a payment transaction.
+    properties:
+      revokeId: simpleTypes.Token
+      ticketHolder: optional<simpleTypes.TicketHolder>
+      notificationAddress: optional<simpleTypes.NotificationAddress>
+      paymentReference: optional<simpleTypes.PaymentReference>
+
+  ConfirmRevokeTicketResponse:
+    properties:
+      revokeId: simpleTypes.Token
+      status: string
 
   ValidateTicketsRequest:
     docs: Request to validate a ticket
@@ -236,7 +309,6 @@ types:
   GetTicketCouponRequest:
     docs: Request to exchange a ticket for a coupon
     properties:
-      ticketNumber: simpleTypes.TicketId
       couponCode: optional<simpleTypes.CouponCode>
 
   ## Complex Type Definitions
@@ -262,7 +334,7 @@ types:
       type: string
       docs: A message that describes the result of the action 
 
-  RevokedResponse:
+  RevokedRequestResponse:
     properties:
       ticketNumber: simpleTypes.TicketId
       revoked: ActionResponseSuccess

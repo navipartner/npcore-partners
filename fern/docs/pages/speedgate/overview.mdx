@@ -1,0 +1,17 @@
+---
+title: "Introduction to Speedgate"
+
+---
+
+The Speedgate endpoints offer a streamlined approach to admitting guests by accepting a variety of reference types—whether it’s a ticket number, wallet ID, or member card number. This flexibility means that users don’t need to worry about the specific reference type, as the endpoint identifies and handles each type automatically.
+
+When a reference number is valid and unambiguous, the process concludes with a set of tokens to finalize the guest’s admission and, if applicable, any accompanying guests.
+
+Upon receiving a reference number, the system resolves it into one of three categories:
+
+* Ticket Number: Returns a single admission token that allows entry for the ticket holder.
+* Member Card Number: Provides tokens not only for the cardholder but also for any associated guests, including details on the type of guest and the maximum allowable count.
+* Wallet ID: Retrieves a collection of tickets tied to the wallet, each with its own admission parameters, which can then be individually processed.
+
+Each successful tryAdmit call provides these tokens as authorization for the admitToken endpoint, allowing for flexible and controlled admission. 
+

@@ -2360,29 +2360,33 @@
     end;
 
     procedure CreateAndSendETicket(TicketNo: Code[20]; var ReasonText: Text): Boolean
+    begin
+        exit(CreateAndSendETicket(TicketNo, '', false, ReasonText));
+    end;
+
+    procedure CreateAndSendETicket(TicketNo: Code[20]; SendTo: Text[100]; ForceCreateNew: Boolean; var ReasonText: Text): Boolean
     var
         Ticket: Record "NPR TM Ticket";
         TempTicketNotificationEntry: Record "NPR TM Ticket Notif. Entry" temporary;
     begin
 
         Ticket.Get(TicketNo);
-        if (not CreateETicketNotificationEntry(Ticket, TempTicketNotificationEntry, false, ReasonText)) then
+        if (not CreateETicketNotificationEntry(Ticket, TempTicketNotificationEntry, SendTo, false, ForceCreateNew, ReasonText)) then
             exit(false);
 
         TempTicketNotificationEntry.Reset();
         TempTicketNotificationEntry.FindSet();
         repeat
-
             if (not SendETicketNotification(TempTicketNotificationEntry."Entry No.", false, ReasonText)) then
                 exit(false);
-
         until (TempTicketNotificationEntry.Next() = 0);
 
         ReasonText := '';
         exit(true);
     end;
 
-    procedure CreateETicketNotificationEntry(Ticket: Record "NPR TM Ticket"; var TmpNotificationsCreated: Record "NPR TM Ticket Notif. Entry" temporary; NotifyWithExternalModule: Boolean; var ReasonText: Text): Boolean
+
+    procedure CreateETicketNotificationEntry(Ticket: Record "NPR TM Ticket"; var TmpNotificationsCreated: Record "NPR TM Ticket Notif. Entry" temporary; SendTo: Text[100]; NotifyWithExternalModule: Boolean; ForceCreateNew: Boolean; var ReasonText: Text): Boolean
     var
         TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry";
         TicketNotificationEntry2: Record "NPR TM Ticket Notif. Entry";
@@ -2414,16 +2418,18 @@
                     TicketNotificationEntry2."Entry No." := 0;
                     TicketNotificationEntry2."Notification Group Id" += 1;
                     TicketNotificationEntry2."Notification Trigger" := TicketNotificationEntry."Notification Trigger"::ETICKET_UPDATE;
+                    if (ForceCreateNew) then
+                        TicketNotificationEntry2."Notification Trigger" := TicketNotificationEntry."Notification Trigger"::ETICKET_CREATE;
 
                     TicketNotificationEntry2."Notification Send Status" := TicketNotificationEntry."Notification Send Status"::PENDING;
 
-                    case TicketReservationRequest."Notification Method" of
-                        TicketReservationRequest."Notification Method"::SMS:
-                            TicketNotificationEntry2."Notification Method" := TicketNotificationEntry."Notification Method"::SMS;
-                        TicketReservationRequest."Notification Method"::EMAIL:
-                            TicketNotificationEntry2."Notification Method" := TicketNotificationEntry."Notification Method"::EMAIL;
-                    end;
                     TicketNotificationEntry2."Notification Address" := TicketReservationRequest."Notification Address";
+                    if (SendTo <> '') then
+                        TicketNotificationEntry2."Notification Address" := SendTo;
+
+                    TicketNotificationEntry2."Notification Method" := TicketNotificationEntry."Notification Method"::SMS;
+                    if (StrPos(TicketNotificationEntry2."Notification Address", '@') > 0) then
+                        TicketNotificationEntry2."Notification Method" := TicketNotificationEntry."Notification Method"::EMAIL;
 
                     if (NotifyWithExternalModule) then begin
                         TicketNotificationEntry2."Notification Method" := TicketNotificationEntry2."Notification Method"::NA;
@@ -2438,12 +2444,13 @@
             end;
         end;
 
-        if (TicketReservationRequest."Notification Method" = TicketReservationRequest."Notification Method"::NA) then begin
-            if (not NotifyWithExternalModule) then begin
-                ReasonText := StrSubstNo(MISSING_RECIPIENT, TicketReservationRequest.FieldCaption("Notification Method"));
-                exit(false);
+        if (not ((ForceCreateNew) and (SendTo <> ''))) then
+            if (TicketReservationRequest."Notification Method" = TicketReservationRequest."Notification Method"::NA) then begin
+                if (not NotifyWithExternalModule) then begin
+                    ReasonText := StrSubstNo(MISSING_RECIPIENT, TicketReservationRequest.FieldCaption("Notification Method"));
+                    exit(false);
+                end;
             end;
-        end;
 
         TicketAdmissionBOM.SetFilter("Item No.", '=%1', Ticket."Item No.");
         TicketAdmissionBOM.SetFilter("Variant Code", '=%1', Ticket."Variant Code");
@@ -2468,13 +2475,14 @@
             TicketNotificationEntry."Ticket Token" := TicketReservationRequest."Session Token ID";
             TicketNotificationEntry."eTicket Pass Id" := GetNewToken();
             TicketNotificationEntry."Notification Send Status" := TicketNotificationEntry."Notification Send Status"::PENDING;
-            case TicketReservationRequest."Notification Method" of
-                TicketReservationRequest."Notification Method"::SMS:
-                    TicketNotificationEntry."Notification Method" := TicketNotificationEntry."Notification Method"::SMS;
-                TicketReservationRequest."Notification Method"::EMAIL:
-                    TicketNotificationEntry."Notification Method" := TicketNotificationEntry."Notification Method"::EMAIL;
-            end;
+
             TicketNotificationEntry."Notification Address" := TicketReservationRequest."Notification Address";
+            if (SendTo <> '') then
+                TicketNotificationEntry."Notification Address" := SendTo;
+
+            TicketNotificationEntry."Notification Method" := TicketNotificationEntry."Notification Method"::SMS;
+            if (StrPos(TicketNotificationEntry."Notification Address", '@') > 0) then
+                TicketNotificationEntry."Notification Method" := TicketNotificationEntry."Notification Method"::EMAIL;
 
             if (NotifyWithExternalModule) then begin
                 TicketNotificationEntry."Notification Method" := TicketNotificationEntry."Notification Method"::NA;
@@ -2484,7 +2492,7 @@
 
             TicketNotificationEntry2.SetFilter("Ticket No.", '=%1', Ticket."No.");
             TicketNotificationEntry2.SetFilter("Notification Send Status", '=%1', TicketNotificationEntry2."Notification Send Status"::SENT);
-            if (TicketNotificationEntry2.IsEmpty()) then
+            if ((TicketNotificationEntry2.IsEmpty()) or (ForceCreateNew)) then
                 TicketNotificationEntry."Notification Trigger" := TicketNotificationEntry."Notification Trigger"::ETICKET_CREATE;
 
             TicketNotificationEntry."Ticket Type Code" := TicketType.Code;
@@ -2545,6 +2553,7 @@
                         TicketNotificationEntry."Entry No." := 0;
                         TicketNotificationEntry.Insert();
                         TmpNotificationsCreated.TransferFields(TicketNotificationEntry, true);
+                        TmpNotificationsCreated.SystemId := TicketNotificationEntry.SystemId;
                         TmpNotificationsCreated.Insert();
                     until (SeatingReservationEntry.Next() = 0);
                 end;
@@ -2555,6 +2564,7 @@
                 TicketNotificationEntry."Entry No." := 0;
                 TicketNotificationEntry.Insert();
                 TmpNotificationsCreated.TransferFields(TicketNotificationEntry, true);
+                TmpNotificationsCreated.SystemId := TicketNotificationEntry.SystemId;
                 TmpNotificationsCreated.Insert();
             end;
 
@@ -2614,11 +2624,6 @@
                 ResponseMessage := 'Missing notification address.';
                 exit(false);
             end;
-
-            if (TicketNotificationEntry."Notification Method" <> TicketNotificationEntry."Notification Method"::SMS) then begin
-                ResponseMessage := 'Only SMS is supported.';
-                exit(false);
-            end;
         end;
 
         if (not CreateETicket(TicketNotificationEntry, ResponseMessage)) then begin
@@ -2632,12 +2637,24 @@
         if (not NotifyWithExternalModule) then begin
             if (TicketNotificationEntry."Notification Trigger" = TicketNotificationEntry."Notification Trigger"::ETICKET_CREATE) then begin
                 Commit();
-                if (not TicketNotifyParticipant.SendSmsNotificationEntry(TicketNotificationEntry, ResponseMessage)) then begin
-                    TicketNotificationEntry."Failed With Message" := CopyStr(ResponseMessage, 1, MaxStrLen(TicketNotificationEntry."Failed With Message"));
-                    TicketNotificationEntry."Notification Send Status" := TicketNotificationEntry."Notification Send Status"::FAILED;
-                    TicketNotificationEntry.Modify();
-                    Commit();
-                    exit(false);
+                if (TicketNotificationEntry."Notification Method" = TicketNotificationEntry."Notification Method"::SMS) then begin
+                    if (not TicketNotifyParticipant.SendSmsNotificationEntry(TicketNotificationEntry, ResponseMessage)) then begin
+                        TicketNotificationEntry."Failed With Message" := CopyStr(ResponseMessage, 1, MaxStrLen(TicketNotificationEntry."Failed With Message"));
+                        TicketNotificationEntry."Notification Send Status" := TicketNotificationEntry."Notification Send Status"::FAILED;
+                        TicketNotificationEntry.Modify();
+                        Commit();
+                        exit(false);
+                    end;
+                end;
+
+                if (TicketNotificationEntry."Notification Method" = TicketNotificationEntry."Notification Method"::EMAIL) then begin
+                    if (not TicketNotifyParticipant.SendMailNotificationEntry(TicketNotificationEntry, ResponseMessage)) then begin
+                        TicketNotificationEntry."Failed With Message" := CopyStr(ResponseMessage, 1, MaxStrLen(TicketNotificationEntry."Failed With Message"));
+                        TicketNotificationEntry."Notification Send Status" := TicketNotificationEntry."Notification Send Status"::FAILED;
+                        TicketNotificationEntry.Modify();
+                        Commit();
+                        exit(false);
+                    end;
                 end;
             end;
         end;

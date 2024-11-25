@@ -146,7 +146,7 @@
         exit(ResponseMessage = '');
     end;
 
-    local procedure SendMailNotificationEntry(TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry"; var ResponseMessage: Text): Boolean
+    internal procedure SendMailNotificationEntry(TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry"; var ResponseMessage: Text): Boolean
     var
         RecordRef: RecordRef;
         EMailMgt: Codeunit "NPR E-mail Management";

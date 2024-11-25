@@ -9,8 +9,6 @@ service:
   display-name: Reservations
   auth: false
   base-path: /ticketing
-  headers:
-    x-api-version: optional<globalApiTypes.ApiVersionDate>
   endpoints:
 
     createReservation:
@@ -188,7 +186,8 @@ service:
       response: GetReservationDetails
       examples:
         # Success response
-        - path-parameters:
+        - name: "Status Registered"
+          path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
@@ -204,7 +203,8 @@ service:
                   ticket: $ReservationTicketDetails.ExampleTicketUnconfirmed
                   content:
                     - admissionDetails: $compositeTypes.AdmissionDetails.ExampleAdmissionCastle
-        - path-parameters:
+        - name: "Status Confirmed"
+          path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
@@ -212,7 +212,6 @@ service:
           response:
             body:
               token: $simpleTypes.Token.ExampleToken
-              expiresAt: $simpleTypes.ExpiresAt.ExampleExpiresAt
               reservationStatus: confirmed
               reservations:
                 - itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
@@ -232,6 +231,8 @@ service:
         token: simpleTypes.Token
       request: 
         name: getTickets
+        query-parameters:
+          storeCode: optional<simpleTypes.StoreCode>
       response: list<compositeTypes.TicketDetails>
       examples:
         - path-parameters:
@@ -239,6 +240,8 @@ service:
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             token: $simpleTypes.Token.ExampleToken
+          query-parameters:
+            storeCode: $simpleTypes.StoreCode.ExampleStoreCode
           response:
             body: 
             - $compositeTypes.TicketDetails.ExampleTicket1
@@ -332,7 +335,7 @@ types:
       pricing details, and optional customer information like pinCode and ticketHolder name. 
       Used to inform customers about their tickets and any actions they can perform.
     properties:
-      ticketNumbers: optional<list<simpleTypes.TicketId>>
+      ticketNumbers: optional<list<compositeTypes.TicketNumbers>>
       validFrom: datetime
       validUntil: datetime
       pinCode: optional<simpleTypes.PinCode>
@@ -343,7 +346,9 @@ types:
     examples: 
       - name: ExampleTicketConfirmed
         value:
-          ticketNumbers: [TICKET123, TICKET124]
+          ticketNumbers: 
+            - ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+            - ticketNumber: $simpleTypes.TicketId.ExampleTicket2
           validFrom: 2024-10-15T00:00:00Z
           validUntil: 2024-10-15T23:59:59Z
           pinCode: 12-34
