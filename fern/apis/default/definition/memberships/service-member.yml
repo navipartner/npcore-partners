@@ -43,7 +43,7 @@ service:
         Retrieve details of a specific member using their unique member ID. 
       display-name: Get using Id
       method: GET 
-      path: /member/id/{memberId}
+      path: /member/{memberId}
       path-parameters:
         memberId: simpleTypes.MemberId
       request:
@@ -56,27 +56,6 @@ service:
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             memberId: $simpleTypes.MemberId.ExampleMemberId
-          response: 
-            body: $GetMemberResponse.ExampleGetMember
-
-    getMemberNumber:
-      docs: 
-        Use this endpoint to retrieve details of a member based on their member number. This is helpful when the member number is available but the member ID is not known.
-      display-name: Get using Number
-      method: GET 
-      path: /member/number/{memberNumber}
-      path-parameters:
-        memberNumber: simpleTypes.MemberNumber
-      request:
-        name: getMemberNumber
-      response: GetMemberResponse 
-      examples:
-        - name: ExampleGetMemberNumber
-          path-parameters:
-            tenant: $globalApiTypes.tenant.Exampletenant
-            environment: $globalApiTypes.environment.ExampleenvironmentProduction
-            company: $globalApiTypes.Company.ExampleCompanyCronus
-            memberNumber: $simpleTypes.MemberNumber.ExampleMemberNumber
           response: 
             body: $GetMemberResponse.ExampleGetMember
 

@@ -393,6 +393,9 @@ End Function
         <Field Name="MemberType">
           <DataField>MemberType</DataField>
         </Field>
+        <Field Name="CompNameMember">
+          <DataField>CompNameMember</DataField>
+        </Field>
         <Field Name="CardType">
           <DataField>CardType</DataField>
         </Field>

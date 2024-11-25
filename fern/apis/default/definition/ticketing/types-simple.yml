@@ -7,6 +7,9 @@ types:
     examples:
       - name: ExampleToken
         value: ABC123456DEF789GHI
+      - name: ExampleRevokeId
+        value: R123456BAR789BAZ00
+
 
   ItemNumber:
     type: string
@@ -45,6 +48,9 @@ types:
   TicketHolder:
     type: string
     docs: The name of the person holding the ticket(s)
+    examples:
+      - name: ExampleTicketHolder
+        value: "John Doe"
 
   NotificationAddress:
     type: string
@@ -86,6 +92,9 @@ types:
   PinCode:
     type: string
     docs: A pin code for the ticket, used for validation when rescheduling or revoking a confirmed ticket
+    examples:
+      - name: ExamplePinCode
+        value: "1234"
 
   UnitPrice:
     type: double
@@ -108,6 +117,7 @@ types:
     docs: 
       A unique identifier for a store - a logical grouping defining a subset of ticket items. 
       This is used to filter the list of ticket items returned by the API.
+      When left empty, the API will use the default store code. 
     examples:
       - name: ExampleStoreCode
         value: "EN"
@@ -175,6 +185,7 @@ types:
       - noScheduleSelection
       - currentSchedule
       - nextAvailableSchedule
+      - userSelectedSchedule
       
   ScheduleSelection:
     type: ScheduleSelectionEnum

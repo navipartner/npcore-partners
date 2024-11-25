@@ -205,19 +205,19 @@ types:
         value: 10
 
   ## Member related types
-  MemberId:
-    type: integer
-    docs: Unique identifier for a member.
-    examples:
-      - name: ExampleMemberId
-        value: 4331
-    
   ContactNumber:
     type: string
     docs: The contact number for the member.
     examples:
       - name: ExampleContactNumber
         value: "C1234567890"
+  
+  MemberId:
+    type: integer
+    docs: Unique identifier for a member.
+    examples:
+      - name: ExampleMemberId
+        value: 4331
 
   MemberNumber:
     type: string

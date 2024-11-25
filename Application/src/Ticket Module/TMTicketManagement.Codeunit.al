@@ -1261,8 +1261,8 @@
             if (AdmissionCode = '') then
                 AdmissionCode := GetDefaultAdmissionCode(Ticket."Item No.", Ticket."Variant Code");
 
-            ValidateTicketForArrival(Ticket, AdmissionCode, AdmissionScheduleEntryNo, TimeHelper.GetLocalTimeAtAdmission(AdmissionCode));
         end;
+        ValidateTicketForArrival(Ticket, AdmissionCode, AdmissionScheduleEntryNo, TimeHelper.GetLocalTimeAtAdmission(AdmissionCode));
 
         if (WithPrint) then
             if (PrintSingleTicket(Ticket)) then begin

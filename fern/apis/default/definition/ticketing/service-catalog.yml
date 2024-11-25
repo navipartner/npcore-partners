@@ -9,9 +9,7 @@ service:
   display-name: Catalog
   auth: false
   base-path: /ticketing
-  headers:
-    x-api-version: optional<globalApiTypes.ApiVersionDate>
-
+  
   endpoints:
     getCatalog:
       docs: Get the list of ticket items and their descriptions
@@ -19,7 +17,7 @@ service:
       method: GET
       path: /catalog/{storeCode}
       path-parameters:
-        storeCode: simpleTypes.StoreCode
+        storeCode: optional<simpleTypes.StoreCode>
       request:
         name: getCatalog
       response: 
@@ -105,7 +103,6 @@ types:
       Details the admissions included with a ticket item, specifying access rights like entry to events or exhibits. Informs customers about what experiences are included with their purchase.
     extends: compositeTypes.AdmissionBase
     properties:
-      capacityControl: simpleTypes.CapacityControl
       maxCapacity: optional<integer>
       scheduleSelection: simpleTypes.ScheduleSelection
     examples:
@@ -114,8 +111,8 @@ types:
           code: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
           description: $compositeTypes.Descriptions.ExampleAdmissionCastle
           default: true
-          included: "mandatory"
-          capacityControl: "sales"
-          scheduleSelection: "noScheduleSelection"
+          included: mandatory
+          capacityControl: sales
+          scheduleSelection: noScheduleSelection
           maxCapacity: 175
 

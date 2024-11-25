@@ -1,0 +1,171 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  simpleTypes: ./types-simple.yml
+  compositeTypes: ./types-composite.yml
+  globalApiTypes: ./../global-api-types.yml
+
+service:
+  display-name: Speedgate
+  auth: false
+  base-path: /speedgate
+
+  endpoints:
+
+    getSetup:
+      docs: 
+        This endpoint retrieves the setup details for a specific gate, such as the gate's name, location, and the admission codes it supports.  
+      path: /setup/{gateId}
+      path-parameters:
+        gateId: simpleTypes.Gate
+      method: GET
+      request: 
+        name: getSetup
+      response:
+        docs: Returns the setup details for the specified gate.
+        type: compositeTypes.GateSetupResponse
+      examples:
+        - name: "Speedgate Setup"
+          docs: Example of a successful retrieval of a speedgate setup.
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            gateId: $simpleTypes.Gate.ExampleSpeedgate
+          response:
+            body:
+              gateId: $simpleTypes.Gate.ExampleSpeedgate
+              name: "Speedgate 1"
+              location: "Main Entrance"
+              admissions:
+                - code: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+                  description: "Castle Admission"
+                  default: true
+                - code: $simpleTypes.AdmissionCode.ExampleAdmissionTreasure
+                  description: "Treasure Tour Admission"
+                - code: $simpleTypes.AdmissionCode.ExampleAdmissionDungeon
+                  description: "Dungeon Tour Admission"
+              acceptsTickets: true
+              acceptsMemberCards: true
+              acceptsWallets: true
+
+    tryAdmit:
+      docs: 
+        This endpoint attempts to validate a customer's reference number and identifies it as either a ticket, member card, or wallet. Each type provides different responses.
+        <br><br><b>Ticket Reference</b> Returns a single token that you can use with the admitToken endpoint.
+        <br><b>Member Card</b> Reference Returns a primary token for the member and additional tokens for any guests, with details such as guest type and max number of guests.
+        <br><b>Wallet Reference</b> Returns a list of tickets, each with relevant admission details, which can be individually used in subsequent calls to tryAdmit.
+      path: /try
+      method: POST
+      request: 
+        name: tryAdmit
+        body: compositeTypes.TryAdmitRequest
+      response:
+        docs: Returns the result of the try to admit a customer.
+        type: compositeTypes.TryAdmitResponse
+      examples:
+        - name: "Ticket Reference"
+          docs: Example of a successful identification of a ticket.
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          request:
+            referenceNumber: $simpleTypes.ReferenceNumber.ExampleTicketNumber
+            gateId: $simpleTypes.Gate.ExampleSpeedgate
+            admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+          response:
+            body:
+              token: $simpleTypes.Token.ExampleToken
+              referenceNumberType: ticket
+        - name: "Member Card Reference"
+          docs: Example of a successful identification of a member card with guests.
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          request:
+            referenceNumber: $simpleTypes.ReferenceNumber.ExampleMemberCard
+            gateId: $simpleTypes.Gate.ExampleSpeedgate
+            admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+          response:
+            body:
+              token: $simpleTypes.Token.ExampleToken
+              referenceNumberType: membership
+              member: $compositeTypes.MemberDetails.ExampleMemberDetails
+              guests:
+                - description: Adult
+                  token: $simpleTypes.Token.ExampleGuestToken1
+                  maxNumberOfGuests: 2
+                - description: Child
+                  token: $simpleTypes.Token.ExampleGuestToken2
+                  maxNumberOfGuests: 3
+        - name: "Wallet Reference"
+          docs: Example of a successful identification of a wallet reference.
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          request:
+            referenceNumber: $simpleTypes.ReferenceNumber.ExampleWalletId
+            gateId: $simpleTypes.Gate.ExampleSpeedgate
+            admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+          response:
+            body:
+              token: $simpleTypes.Token.ExampleToken
+              referenceNumberType: wallet
+              tickets: 
+                - referenceNumber: $simpleTypes.ReferenceNumber.ExampleTicketNumber
+                  admissions:
+                    - admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+                      scanCount: 1
+                      lastScanAt: "2024-10-11T12:13:00Z"
+                - referenceNumber: $simpleTypes.ReferenceNumber.ExampleTicketNumber2
+                  admissions:
+                    - admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+
+      
+    admitToken:
+      docs: 
+        This endpoint processes tokens received from tryAdmit to grant admission. Each token in the request specifies a quantity for admission (useful for guests).
+        <br><br><b>Single Token Admission</b> Admit a single ticket by providing its token.
+        <br><b>Multiple Token Admission</b> Use multiple tokens to admit a member and their guests, specifying quantities for each guest token (default is 1).
+        <br><br>The request payload must include tokens and relevant quantity to admit (default is 1). If admission fails, an error message is returned.
+      path: /admit
+      method: POST
+      request: 
+        name: admitToken
+        body: compositeTypes.AdmitRequest
+      response:
+        docs: Returns the result of the admit of a customer.
+        type: compositeTypes.AdmitResponse
+      examples:
+        - name: "Admit Ticket"
+          docs: Example of a successful admission of a ticket.
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          request:
+            tokens:
+              - token: $simpleTypes.Token.ExampleToken
+          response:
+            body:
+              message: "Admitted"
+        - name: "Admit Member with Guests"
+          docs: Example of a successful admission of a ticket.
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          request:
+            tokens:
+              - token: $simpleTypes.Token.ExampleToken
+              - token: $simpleTypes.Token.ExampleGuestToken1  
+                quantity: 2
+              - token: $simpleTypes.Token.ExampleGuestToken2
+                quantity: 2
+          response:
+            body:
+              message: "Admitted"
+  

@@ -1,7 +1,5 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
 
-docs: I am testing new feature...
-
 imports:
   simpleTypes: ./types-simple.yml
   compositeTypes: ./types-composite.yml
@@ -11,9 +9,12 @@ service:
   display-name: Capacity
   auth: true
   base-path: /ticketing
+
   endpoints:
     getCapacity:
-      docs: Retrieve the capacity and availability for a ticket item number. 
+      docs: 
+        Retrieve the capacity and availability for a ticket item number. 
+        Note that an item may have multiple admissions with different schedules and pricing.
       path: /capacity/search
       method: GET
       request: 
@@ -24,7 +25,9 @@ service:
           quantity: optional<simpleTypes.NumberOfTickets>
           admissionCode: optional<simpleTypes.AdmissionCode>
           customerNumber: optional<simpleTypes.CustomerNumber>
-      response: list<AdmissionCapacity>
+      response: 
+        docs: Returns a list of available capacities for the specified ticket item number.
+        type: list<AdmissionCapacity>
       examples:
         ### Success
         - name: ExampleCapacity1
@@ -41,7 +44,8 @@ service:
               - code: "CASTLE"
                 #description: $compositeTypes.Descriptions.ExampleAdmissionCastle
                 default: true
-                included: "mandatory"
+                included: mandatory
+                capacityControl: sales
                 referenceDate: $simpleTypes.ReferenceDate.ExampleCheckCapacityDate
                 quantity: 2
                 unitPrice: 100.00
@@ -50,14 +54,14 @@ service:
                 vatPct: 25.00
                 schedules:
                   - allocatable: true
-                    allocationModel: "capacity"
+                    allocationModel: capacity
                     remainingCapacity: 10
                     explanation: "Schedule is allocatable"
                     schedule: $compositeTypes.ScheduleDetails.ExampleMorning
                     price: $SchedulePrice.ExampleFixedPrice
                     sales: $ScheduleSales.ExampleSalesPeriod
                   - allocatable: true
-                    allocationModel: "capacity"
+                    allocationModel: capacity
                     remainingCapacity: 12
                     explanation: "Schedule is allocatable"
                     schedule: $compositeTypes.ScheduleDetails.ExampleEvening

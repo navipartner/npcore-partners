@@ -39,7 +39,7 @@ service:
         It’s useful for checking the status, validity, and other details of an existing membership.
       display-name: Get using Id
       method: GET
-      path: /membership/id/{membershipId}
+      path: /membership/{membershipId}
       path-parameters:
         membershipId: simpleTypes.MembershipId
       request:
@@ -61,11 +61,11 @@ service:
         This is helpful when the ID isn't available but the membership number is known.
       display-name: Get using Number
       method: GET
-      path: /membership/number/{membershipNumber}
-      path-parameters:
-        membershipNumber: simpleTypes.MembershipNumber
+      path: /membership
       request:
         name: getMembershipNumber
+        query-parameters:
+          membershipNumber: simpleTypes.MembershipNumber
       response: GetMembershipResponse
       examples:
         - name: ExampleGetMembershipNumber
@@ -73,6 +73,7 @@ service:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
             membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
           response:
             body: $GetMembershipResponse.ExampleGetMembership

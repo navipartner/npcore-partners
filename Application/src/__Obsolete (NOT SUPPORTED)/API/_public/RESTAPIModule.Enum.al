@@ -10,5 +10,6 @@ enum 6059791 "NPR REST API Module" implements "NPR REST API Module Resolver"
     {
         Implementation = "NPR REST API Module Resolver" = "NPR HelloWorld Module Resolver";
     }
+
 }
 #endif

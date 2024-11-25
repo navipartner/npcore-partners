@@ -1,0 +1,188 @@
+types:
+
+  ## Simple types
+  Token:
+    type: string
+    docs: A unique token that identifies a specific admission request
+    examples:
+      - name: ExampleToken
+        value: ABC123456DEF789GHI
+      - name: ExampleGuestToken1
+        value: JKL987654MNO321PQR
+      - name: ExampleGuestToken2
+        value: STU654321VWX987YZA
+
+  Quantity: 
+    type: integer
+    docs: The number of tickets
+    examples:
+      - name: ExampleQuantity
+        value: 1
+
+  MaxNumberOfGuests: 
+    type: integer
+    docs: The maximum number of guests allowed for this category.
+    examples:
+      - name: ExampleQuantity
+        value: 1
+
+  ScanCount:
+    type: integer
+    docs: The number of times the ticket has been scanned
+    examples:
+      - name: ExampleScanCount
+        value: 1
+
+  LastScanAt:
+    type: datetime
+    docs: The date and time when the ticket was last scanned
+    examples:
+      - name: ExampleLastScanAt
+        value: "2024-10-11T12:13:00Z"
+
+  Description:
+    type: string
+    docs: A textual description or name
+    examples:
+      - name: ExampleDescription
+        value: "This is a description"
+
+  AdmissionCode:
+    type: string
+    docs: A unique code that identifies a specific admission.
+    examples:
+      - name: ExampleAdmissionCastle
+        value: CASTLE
+      - name: ExampleAdmissionTreasure
+        value: TREASURE
+      - name: ExampleAdmissionDungeon
+        value: DUNGEON
+  
+  DefaultAdmission:
+    type: boolean
+    docs: Indicates if this is the default admission for the ticket.
+    examples:
+      - name: ExampleDefaultAdmission
+        value: true
+
+  Gate:
+    type: string
+    docs: A unique code that identifies a specific speedgate.
+    examples:
+      - name: ExampleSpeedgate
+        value: GATE1
+
+  ReferenceNumber:
+    type: string
+    docs: The number sent to speedgate to open the gate
+    examples:
+      - name: ExampleTicketNumber
+        value: TIC123456
+      - name: ExampleTicketNumber2
+        value: TIC789012
+      - name: ExampleMemberCard
+        value: MEM789012
+      - name: ExampleWalletId
+        value: WAL345678
+
+  ReferenceNumberTypeEnum:
+    enum:
+      - ticket
+      - wallet
+      - membership
+
+  ReferenceNumberType:
+    type: ReferenceNumberTypeEnum
+    docs: The type of reference number that was identified.
+
+  # Member Related Types
+
+  CommunityCode:
+    type: string
+    docs: Code representing the community associated with the membership.
+    examples:
+      - name: ExampleCommunityCode
+        value: "RIVERLAND"
+
+  MembershipCode:
+    type: string
+    docs: Code representing the type of membership.
+    examples:
+      - name: SILVER
+        value: "SILVER"
+      - name: GOLD
+        value: "GOLD"
+      - name: PLATINUM
+        value: "PLATINUM"
+
+  MembershipId:
+    type: integer
+    docs: Unique identifier for a membership.
+    examples:
+      - name: ExampleMembershipId
+        value: 1224
+
+  MembershipNumber:
+    type: string
+    docs: Unique membership number.
+    examples:
+      - name: ExampleMembershipNumber
+        value: "MS-DEMO-00152"
+
+  IssueDate:
+    type: date
+    docs: The date the membership was issued.
+    examples:
+      - name: ExampleIssueDate
+        value: "2024-09-17"
+
+  ValidFromDate:
+    type: date
+    docs: The date the membership starts being valid.
+    examples:
+      - name: ExampleValidFromDate
+        value: "2024-09-17"
+
+  ValidUntilDate:
+    type: date
+    docs: The date the membership expires.
+    examples:
+      - name: ExampleValidUntilDate
+        value: "2025-09-16"
+
+  MemberId:
+    type: integer
+    docs: Unique identifier for a member.
+    examples:
+      - name: ExampleMemberId
+        value: 4331
+
+  MemberNumber:
+    type: string
+    docs: Unique number identifying the member.
+    examples:
+      - name: ExampleMemberNumber
+        value: "M123456789"
+
+  FirstName:
+    type: string
+    docs: The first name of the member.
+    examples:
+      - name: ExampleFirstName
+        value: "John"
+
+  LastName:
+    type: string
+    docs: The last name of the member.
+    examples:
+      - name: ExampleLastName
+        value: "Doe"
+
+
+  # Gate setup
+  Base64Image:
+    type: base64
+    docs: Base64 encoded image of the member.
+    examples:
+      - name: ExampleBase64Image
+        value: SGVsbG8gV29ybGQ=

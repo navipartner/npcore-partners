@@ -141,7 +141,7 @@ xmlport 6060124 "NPR TM Send eTicket"
                 exit(false);
             end;
 
-            if (not TicketRequestManager.CreateETicketNotificationEntry(Ticket, TempTicketNotificationEntry, (tmpTicketReservationRequest."Notification Address" = ''), ReasonText)) then begin
+            if (not TicketRequestManager.CreateETicketNotificationEntry(Ticket, TempTicketNotificationEntry, '', (tmpTicketReservationRequest."Notification Address" = ''), false, ReasonText)) then begin
                 CreateErrorResponse(ReasonText);
                 exit(false);
             end;

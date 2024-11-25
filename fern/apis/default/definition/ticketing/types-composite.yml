@@ -16,6 +16,7 @@ types:
       description: optional<Descriptions>
       default: simpleTypes.DefaultAdmission
       included: simpleTypes.AdmissionIsIncluded
+      capacityControl: simpleTypes.CapacityControl
 
   AdmissionDetails:
     docs: Details of the admission for a specific reservation
@@ -27,7 +28,8 @@ types:
         value:
           code: CASTLE
           default: true
-          included: "mandatory"
+          included: mandatory
+          capacityControl: sales
           description: $Descriptions.ExampleAdmissionCastle
           scheduleDetails: $ScheduleDetails.ExampleMorning
 
@@ -102,6 +104,12 @@ types:
           fullDescription: 
             "<p>Experience the grandeur of the castle's architecture and marvel at its intricate details. 
             Walk through beautifully decorated rooms and admire the stunning artwork and furniture on display.</p>"
+
+  TicketNumbers:
+    docs: 
+      A list of ticket numbers.
+    properties:
+      ticketNumber: simpleTypes.TicketId
 
   TicketDetails:
     docs: Details of the ticket 

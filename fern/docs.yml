@@ -87,10 +87,11 @@ navigation:
                 summary: ./docs/pages/ticketing/tickets-summary.mdx
                 contents:
                   - endpoint: ticketing.service-ticket.getTicket
-                  - endpoint: ticketing.service-ticket.revokeTicket
+                  - endpoint: ticketing.service-ticket.requestRevokeTicket
+                  - endpoint: ticketing.service-ticket.confirmRevokeTicket
                   - endpoint: ticketing.service-ticket.validateArrival
                   - endpoint: ticketing.service-ticket.validateDeparture
-                  - endpoint: ticketing.service-ticket.validateMemberArrival
+                  # - endpoint: ticketing.service-ticket.validateMemberGuestArrival # Intended to register member guests arrival in one go, might move to memberships API
                   - endpoint: ticketing.service-ticket.sendToWallet
                   - endpoint: ticketing.service-ticket.exchangeForCoupon
             - ticketing.service-reservations:
@@ -128,7 +129,6 @@ navigation:
                 summary: ./docs/pages/memberships/member-introduction.mdx
                 contents:
                   - endpoint: memberships.service-member.getMemberId
-                  - endpoint: memberships.service-member.getMemberNumber
                   - endpoint: memberships.service-member.addMember
                   - endpoint: memberships.service-member.updateMember
                   - endpoint: memberships.service-member.getMemberImage
@@ -166,6 +166,16 @@ navigation:
                 summary: ./docs/pages/memberships/misc-introduction.mdx
                 contents:
                   - endpoint: memberships.service-misc.resolveIdentifier
+
+        - section: Speedgate
+          summary: ./docs/pages/speedgate/overview.mdx
+          contents:
+            - speedgate.service-speedgate:
+                title: Speedgate
+                contents:
+                  - endpoint: speedgate.service-speedgate.getSetup
+                  - endpoint: speedgate.service-speedgate.tryAdmit
+                  - endpoint: speedgate.service-speedgate.admitToken
 
         - section: POS
           summary: ./docs/pages/pos/overview.mdx
