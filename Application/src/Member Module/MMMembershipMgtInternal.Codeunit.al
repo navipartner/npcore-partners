@@ -5373,8 +5373,9 @@
                         PrefixedCardNo := StrSubstNo(PlaceHolderLbl, ForeignMembershipSetup."Append Local Prefix", ExternalCardNo);
 
                     MemberCard.SetFilter("External Card No.", '=%1|=%2', PrefixedCardNo, EncodeSHA1(PrefixedCardNo));
+                    FoundMemberCard := MemberCard.FindFirst();
 
-                until ((ForeignMembershipSetup.Next() = 0) or (not MemberCard.IsEmpty()));
+                until ((ForeignMembershipSetup.Next() = 0) or (FoundMemberCard));
             end;
         end;
 
