@@ -8,7 +8,7 @@ imports:
 service:
   display-name: Tickets
   auth: false
-  base-path: /ticketing
+  base-path: /ticket
   endpoints:
 
     getTicket:
@@ -17,7 +17,7 @@ service:
         Clients use this endpoint to obtain ticket details such as validity periods, admissions, and any associated information after a reservation has been confirmed.
       display-name: Get Ticket
       method: GET
-      path: /ticket/{ticketNumber}
+      path: /{ticketNumber}
       request: 
         name: getTicket
         query-parameters:
@@ -44,7 +44,7 @@ service:
         It also returns the possible refund amount based on the ticket's conditions. 
         This pre-validation is useful for assessing revocation eligibility and potential refunds before the final confirmation.
       method: POST
-      path: /ticket/{ticketNumber}/requestRevoke
+      path: /{ticketNumber}/requestRevoke
       path-parameters:
         ticketNumber: simpleTypes.TicketId
       request: 
@@ -72,7 +72,7 @@ service:
         It may include additional customer details such as the ticketHolder name, notificationAddress for sending tickets or notifications, 
         and a paymentReference to link the reservation to a payment transaction.
       method: POST
-      path: /ticket/{ticketNumber}/confirmRevoke
+      path: /{ticketNumber}/confirmRevoke
       path-parameters:
         ticketNumber: simpleTypes.TicketId
       request:
@@ -102,7 +102,7 @@ service:
         This endpoint is typically used at entry points (e.g., gates or doors) to verify the ticket's validity and record the customer's arrival. 
         Optional parameters like admissionCode and scannerStation provide context for the validation.
       method: POST
-      path: /ticket/{ticketNumber}/validateArrival
+      path: /{ticketNumber}/validateArrival
       path-parameters:
         ticketNumber: simpleTypes.TicketId
       request:
@@ -129,7 +129,7 @@ service:
         Used when tracking both entry and exit of customers, this endpoint helps manage capacities and ensures that the ticket is correctly processed upon leaving. 
         Similar to arrival validation, it can include admissionCode and scannerStation.
       method: POST
-      path: /ticket/{ticketNumber}/validateDeparture
+      path: /{ticketNumber}/validateDeparture
       path-parameters:
         ticketNumber: simpleTypes.TicketId
       request:
@@ -190,7 +190,7 @@ service:
         This endpoint facilitates electronic delivery of tickets, allowing customers to receive and present their tickets digitally. 
         Useful for post-purchase communications and ensuring customers have access to their tickets.
       method: POST
-      path: /ticket/{ticketNumber}/sendToWallet
+      path: /{ticketNumber}/sendToWallet
       path-parameters:
         ticketNumber: simpleTypes.TicketId
       request:
@@ -217,7 +217,7 @@ service:
         This endpoint is used when a customer opts to convert their ticket into a coupon, providing multiple value retention options.
         The ticket is validated, and a coupon is issued, providing value retention for the customer.
       method: POST
-      path: /ticket/{ticketNumber}/exchangeForCoupon
+      path: /{ticketNumber}/exchangeForCoupon
       path-parameters:
         ticketNumber: simpleTypes.TicketId
       request:

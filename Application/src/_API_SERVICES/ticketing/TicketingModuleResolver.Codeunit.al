@@ -11,7 +11,7 @@ codeunit 6185039 "NPR TicketingModuleResolver" implements "NPR API Module Resolv
 
     procedure GetRequiredPermissionSet(): Text
     begin
-        exit('NPR Ticketing API');
+        exit('NPR API Ticketing');
     end;
 }
 #endif

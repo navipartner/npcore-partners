@@ -8,7 +8,7 @@ imports:
 service:
   display-name: Capacity
   auth: true
-  base-path: /ticketing
+  base-path: /ticket
 
   endpoints:
     getCapacity:

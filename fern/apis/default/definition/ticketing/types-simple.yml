@@ -69,7 +69,7 @@ types:
     enum:
       - registered
       - confirmed
-      - cancelled
+      - canceled
       - expired
 
   ReservationStatus:
