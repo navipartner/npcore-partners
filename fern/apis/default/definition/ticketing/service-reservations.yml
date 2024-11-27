@@ -8,7 +8,7 @@ imports:
 service:
   display-name: Reservations
   auth: false
-  base-path: /ticketing
+  base-path: /ticket
   endpoints:
 
     createReservation:
@@ -110,7 +110,8 @@ service:
             token: $simpleTypes.Token.ExampleToken
           response:
             body:
-              reservationStatus: cancelled
+              token: $simpleTypes.Token.ExampleToken
+              reservationStatus: canceled
 
     preConfirmReservation:
       docs: 
@@ -134,6 +135,7 @@ service:
             token: $simpleTypes.Token.ExampleToken
           response:
             body:
+              token: $simpleTypes.Token.ExampleToken
               expiresAt: $simpleTypes.ExpiresAt.ExampleExpiresAt
               reservationStatus: registered
 
@@ -298,6 +300,7 @@ types:
       Provides a simplified response after performing actions like canceling or pre-confirming a reservation. 
       Includes the updated reservationStatus and optionally the new expiresAt time if the reservation's lifespan was extended.
     properties:
+      token: simpleTypes.Token
       expiresAt: optional<simpleTypes.ExpiresAt>
       reservationStatus: simpleTypes.ReservationStatus
 

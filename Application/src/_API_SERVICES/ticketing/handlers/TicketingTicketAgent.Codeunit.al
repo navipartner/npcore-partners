@@ -9,8 +9,8 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         StoreCode: Code[32];
         Ticket: Record "NPR TM Ticket";
     begin
-        TicketId := Request.Paths().Get(3);
-        Ticket.SetFilter("External Ticket No.", '=%1', CopyStr(TicketId, 1, MaxStrLen(Ticket."External Ticket No.")));
+        TicketId := CopyStr(Request.Paths().Get(2), 1, MaxStrLen(TicketId));
+        Ticket.SetFilter("External Ticket No.", '=%1', TicketId);
         if (not Ticket.FindFirst()) then
             exit(Response.RespondResourceNotFound('Invalid Ticket - Ticket not found'));
 
@@ -32,8 +32,8 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         PinCodeToken: JsonToken;
     begin
 
-        TicketId := Request.Paths().Get(3);
-        Ticket.SetFilter("External Ticket No.", '=%1', CopyStr(TicketId, 1, MaxStrLen(Ticket."External Ticket No.")));
+        TicketId := CopyStr(Request.Paths().Get(2), 1, MaxStrLen(TicketId));
+        Ticket.SetFilter("External Ticket No.", '=%1', TicketId);
         if (not Ticket.FindFirst()) then
             exit(Response.RespondResourceNotFound('Invalid Ticket - Ticket not found'));
 
@@ -85,7 +85,7 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         ScannerStation: Code[10];
     begin
 
-        TicketId := CopyStr(Request.Paths().Get(3), 1, MaxStrLen(TicketId));
+        TicketId := CopyStr(Request.Paths().Get(2), 1, MaxStrLen(TicketId));
         if (TicketId = '') then
             exit(Response.RespondBadRequest('Invalid Ticket - Ticket ID not found'));
 
@@ -108,7 +108,7 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         ScannerStation: Code[10];
     begin
 
-        TicketId := CopyStr(Request.Paths().Get(3), 1, MaxStrLen(TicketId));
+        TicketId := CopyStr(Request.Paths().Get(2), 1, MaxStrLen(TicketId));
         if (TicketId = '') then
             exit(Response.RespondBadRequest('Invalid Ticket - Ticket ID not found'));
 
@@ -135,7 +135,7 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         SendTo: Text[100];
     begin
 
-        TicketId := CopyStr(Request.Paths().Get(3), 1, MaxStrLen(TicketId));
+        TicketId := CopyStr(Request.Paths().Get(2), 1, MaxStrLen(TicketId));
         if (TicketId = '') then
             exit(Response.RespondBadRequest('Invalid Ticket - Ticket ID not found'));
 
@@ -153,7 +153,7 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         TicketId: Text[30];
         CouponCodeAlias: Text[20];
     begin
-        TicketId := CopyStr(Request.Paths().Get(3), 1, MaxStrLen(TicketId));
+        TicketId := CopyStr(Request.Paths().Get(2), 1, MaxStrLen(TicketId));
         if (TicketId = '') then
             exit(Response.RespondBadRequest('Invalid Ticket - Ticket ID not found'));
 
