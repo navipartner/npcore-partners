@@ -3838,8 +3838,8 @@
         SaleLinePOS.Quantity := 1;
 
         POSSession.GetSaleLine(SaleLine);
-        TicketPrice.CalculateScheduleEntryPrice(ItemNo, SaleLinePOS."Variant Code", NewAdmissionScheduleEntry."Admission Code", NewAdmissionScheduleEntry."External Schedule Entry No.", SaleLinePOS."Unit Price", SaleLinePOS."Price Includes VAT", SaleLinePOS."VAT %", Today(), Time(), BasePrice, AddonPrice);
         SaleLine.InsertLine(SaleLinePOS, false);
+        TicketPrice.CalculateScheduleEntryPrice(ItemNo, SaleLinePOS."Variant Code", NewAdmissionScheduleEntry."Admission Code", NewAdmissionScheduleEntry."External Schedule Entry No.", SaleLinePOS."Unit Price", SaleLinePOS."Price Includes VAT", SaleLinePOS."VAT %", Today(), Time(), BasePrice, AddonPrice);
         SaleLinePOS.Validate("Unit Price", BasePrice + AddonPrice);
         SaleLinePOS.Modify();
 
