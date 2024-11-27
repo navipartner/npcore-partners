@@ -15,11 +15,11 @@ export const switchUserRegion = async (
   await page.goto("/BC/?page=9204&tenant=default");
   await page.waitForLoadState("networkidle");
   try {
-    await page.waitForSelector(".spinner", { state: "hidden", timeout: 10000 });
+    await page.waitForSelector(".spinner", { state: "hidden", timeout: 20000 });
   } catch (error) {
     console.warn("Spinner did not disappear within 20 seconds, reloading the page...");
     await page.goto("/BC/?page=9204&tenant=default");
-    await page.waitForSelector(".spinner", { state: "hidden", timeout: 10000 });
+    await page.waitForSelector(".spinner", { state: "hidden", timeout: 20000 });
   }
   const shouldAuthenticate = await page.getByRole("button", { name: "Sign In" }).count();
   if (shouldAuthenticate > 0) {
@@ -37,11 +37,11 @@ export const switchUserRegion = async (
     await page.goto("/BC/?page=9176&tenant=default");
     await page.waitForLoadState("networkidle");
     try {
-      await page.waitForSelector(".spinner", { state: "hidden", timeout: 10000 });
+      await page.waitForSelector(".spinner", { state: "hidden", timeout: 20000 });
     } catch (error) {
       console.warn("Spinner did not disappear within 20 seconds, reloading the page...");
       await page.goto("/BC/?page=9176&tenant=default");
-      await page.waitForSelector(".spinner", { state: "hidden", timeout: 10000 });
+      await page.waitForSelector(".spinner", { state: "hidden", timeout: 20000 });
     }
   }
 
