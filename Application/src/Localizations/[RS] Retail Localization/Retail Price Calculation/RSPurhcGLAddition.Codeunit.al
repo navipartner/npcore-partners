@@ -268,6 +268,7 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
         ValueEntry: Record "Value Entry";
     begin
         ValueEntry.SetLoadFields("Cost per Unit");
+        ValueEntry.SetRange("Document No.", StdValueEntry."Document No.");
         ValueEntry.SetRange("Item Ledger Entry No.", StdValueEntry."Item Ledger Entry No.");
         ValueEntry.CalcSums("Cost per Unit");
         exit(ValueEntry."Cost per Unit");
