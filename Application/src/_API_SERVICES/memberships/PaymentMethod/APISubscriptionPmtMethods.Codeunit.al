@@ -6,15 +6,15 @@ codeunit 6185107 "NPR API SubscriptionPmtMethods"
     procedure Handle(var Request: Codeunit "NPR API Request"): Codeunit "NPR API Response"
     begin
         case true of
-            Request.Match('GET', '/memberships/:membershipId/paymentmethods'):  //Get membership payment methods
+            Request.Match('GET', '/membership/:membershipId/paymentmethods'):  //Get membership payment methods
                 exit(GetPaymentMethods(Request));
-            Request.Match('POST', '/memberships/:membershipId/paymentmethods'):  //Create a new payment method
+            Request.Match('POST', '/membership/:membershipId/paymentmethods'):  //Create a new payment method
                 exit(CreatePaymentMethod(Request));
-            Request.Match('GET', '/memberships/paymentmethods/:paymentMethodId'):  //Get individual payment method
+            Request.Match('GET', '/membership/paymentmethods/:paymentMethodId'):  //Get individual payment method
                 exit(GetPaymentMethod(Request));
-            Request.Match('PATCH', '/memberships/paymentmethods/:paymentMethodId'):  //Update a payment method
+            Request.Match('PATCH', '/membership/paymentmethods/:paymentMethodId'):  //Update a payment method
                 exit(UpdatePaymentMethod(Request));
-            Request.Match('DELETE', '/memberships/paymentmethods/:paymentMethodId'):  //Delete a payment method
+            Request.Match('DELETE', '/membership/paymentmethods/:paymentMethodId'):  //Delete a payment method
                 exit(DeletePaymentMethod(Request));
         end;
     end;

@@ -8,16 +8,15 @@ imports:
 service:
   display-name: Memberships
   auth: false
-  base-path: /memberships
-  headers:
-    x-api-version: optional<globalApiTypes.ApiVersionDate>
+  base-path: /membership
+
   endpoints:
 
     createMembership:
       docs: Use this endpoint to create a new membership. 
       display-name: Create Membership
       method: POST
-      path: /membership
+      path: ''
       request:
         name: createMembership
         body: CreateMembershipRequest
@@ -39,7 +38,7 @@ service:
         It’s useful for checking the status, validity, and other details of an existing membership.
       display-name: Get using Id
       method: GET
-      path: /membership/{membershipId}
+      path: /{membershipId}
       path-parameters:
         membershipId: simpleTypes.MembershipId
       request:
@@ -61,7 +60,7 @@ service:
         This is helpful when the ID isn't available but the membership number is known.
       display-name: Get using Number
       method: GET
-      path: /membership
+      path: ''
       request:
         name: getMembershipNumber
         query-parameters:
@@ -83,7 +82,7 @@ service:
         Use this endpoint to block a membership, preventing any further activity on it. 
       display-name: Block Membership
       method: POST
-      path: /membership/{membershipId}/block
+      path: /{membershipId}/block
       path-parameters:
         membershipId: simpleTypes.MembershipId
       request:
@@ -105,7 +104,7 @@ service:
         It reactivates the membership, allowing members to resume activity after a block period.
       display-name: Unblock Membership
       method: POST
-      path: /membership/{membershipId}/unblock
+      path: /{membershipId}/unblock
       path-parameters:
         membershipId: simpleTypes.MembershipId
       request:
@@ -127,7 +126,7 @@ service:
         It is useful you need to see a list of all participants or account holders under a single membership.
       display-name: Get Members
       method: GET
-      path: /membership/{membershipId}/members
+      path: /{membershipId}/members
       path-parameters:
         membershipId: simpleTypes.MembershipId
       request:
