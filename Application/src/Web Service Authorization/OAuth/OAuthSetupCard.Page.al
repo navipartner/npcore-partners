@@ -39,7 +39,7 @@
                     ApplicationArea = NPRRetail;
                     Caption = 'Client Id';
                     Tooltip = 'Specifies the CLient Id.';
-                    ExtendedDatatype = Masked;
+
                     trigger OnValidate()
                     begin
                         if ClientIdGlobal <> '' Then
