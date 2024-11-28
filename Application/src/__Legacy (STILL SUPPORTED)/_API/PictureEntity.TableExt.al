@@ -1,6 +1,6 @@
 tableextension 6014473 "NPR Picture Entity" extends "Picture Entity"
 {
-    internal procedure NPRLoadDataWithParentType(IdFilter: Text; ParentType: Enum "Picture Entity Parent Type")
+    procedure NPRLoadDataWithParentType(IdFilter: Text; ParentType: Enum "Picture Entity Parent Type")
     var
         MediaID: Guid;
     begin
