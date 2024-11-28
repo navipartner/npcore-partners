@@ -80,9 +80,7 @@ types:
 service:
   display-name: Payment method
   auth: false
-  base-path: /memberships
-  headers:
-    x-api-version: optional<globalApiTypes.ApiVersionDate>
+  base-path: /membership
   endpoints:
 
     ## GET payment methods

@@ -28,6 +28,13 @@ enum 6059812 "NPR API Module" implements "NPR API Module Resolver"
     value(6185106; memberships)
     {
         Implementation = "NPR API Module Resolver" = "NPR MembershipsModuleResolver";
+        ObsoleteState = Pending;
+        ObsoleteTag = '2024-11-27';
+        ObsoleteReason = 'Segment path changed from /memberships to /membership';
+    }
+    value(6185107; membership)
+    {
+        Implementation = "NPR API Module Resolver" = "NPR MembershipsModuleResolver";
     }
 }
 #endif

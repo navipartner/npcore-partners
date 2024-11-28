@@ -12,7 +12,7 @@ codeunit 6185106 "NPR MembershipsModuleResolver" implements "NPR API Module Reso
 
     procedure GetRequiredPermissionSet(): Text
     begin
-        exit('NPR Memberships API');
+        exit('NPR API Membership');
     end;
 }
 #endif
