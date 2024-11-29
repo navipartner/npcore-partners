@@ -51,6 +51,11 @@ page 6150768 "NPR SI POS Audit Log Aux. Info"
                     ApplicationArea = NPRSIFiscal;
                     ToolTip = 'Specifies the POS Unit No. related to this record.';
                 }
+                field("Salesperson Code"; Rec."Salesperson Code")
+                {
+                    ApplicationArea = NPRSIFiscal;
+                    ToolTip = 'Specifies the value of the Salesperson Code field.';
+                }
                 field("Source Document No."; Rec."Source Document No.")
                 {
                     ApplicationArea = NPRSIFiscal;

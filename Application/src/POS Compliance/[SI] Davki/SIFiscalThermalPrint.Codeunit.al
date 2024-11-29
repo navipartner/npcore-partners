@@ -49,11 +49,12 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
     var
         CompanyInfo: Record "Company Information";
         POSStore: Record "NPR POS Store";
-        CompanyAddressFormatLbl: Label '%1, %2 %3', Locked = true, Comment = '%1 = Address, %2 = Post Code, %3 = City';
-        DateFormatLbl: Label 'Dne: %1, %2', Locked = true, Comment = '%1 = Entry Date, %2 = Time Stamp';
-        IDStLbl: Label 'ID. ŠT.: %1', Locked = true, Comment = '%1 = Company Registration Number';
+        DateLbl: Label 'Dne: ';
+        DateFormatLbl: Label '%1, %2', Locked = true, Comment = '%1 = Entry Date, %2 = Time Stamp';
+        VATRegNoLbl: Label 'DŠ: %1', Locked = true, Comment = '%1 = VAT Registration No.';
         ReceiptCopyLbl: Label 'THIS IS A COPY %1 OF A RECEIPT', Comment = '%1 = Receipt Copy No.';
-        ReceiptNoLbl: Label 'Št. računa: %1-%2-%3', Locked = true, Comment = '%1 = POS Store Code, %2 = POS Unit No., %3 = Receipt No.';
+        ReceiptNoLbl: Label 'Št. računa: ';
+        ReceiptNoFormatLbl: Label '%1-%2-%3', Locked = true, Comment = '%1 = POS Store Code, %2 = POS Unit No., %3 = Receipt No.';
     begin
         CompanyInfo.Get();
         POSStore.Get(SIPOSAuditLogAuxInfo."POS Store Code");
@@ -63,18 +64,18 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
         if SIPOSAuditLogAuxInfo."Receipt Printed" then begin
             SIPOSAuditLogAuxInfo."Copies Printed" += 1;
             PrintDottedLine();
-            PrintTextLine(StrSubstNo(ReceiptCopyLbl, SIPOSAuditLogAuxInfo."Copies Printed"), true);
+            PrintTextLine(StrSubstNo(ReceiptCopyLbl, SIPOSAuditLogAuxInfo."Copies Printed"), 'CENTER', true);
             PrintDottedLine();
         end;
 
-        PrintTextLine(CompanyInfo.Name, true);
-        PrintTextLine(POSStore.Name, true);
-        PrintTextLine(StrSubstNo(CompanyAddressFormatLbl, POSStore.Address, POSStore."Post Code", POSStore.City), true);
-        PrintTextLine(StrSubstNo(IDStLbl, CompanyInfo."Registration No."), true);
+        PrintTextLine(CompanyInfo.Name, 'CENTER', true);
+        PrintTextLine(POSStore.Name, 'CENTER', true);
+        PrintTextLine(FormatAddressLine(POSStore.Address, POSStore."Post Code", POSStore.City), 'CENTER', true);
+        PrintTextLine(StrSubstNo(VATRegNoLbl, POSStore."VAT Registration No."), 'CENTER', true);
         PrintFullLine();
 
-        PrintTextLine(StrSubstNo(DateFormatLbl, Format(SIPOSAuditLogAuxInfo."Entry Date", 10, '<Day,2>.<Month,2>.<Year4>'), Format(SIPOSAuditLogAuxInfo."Log Timestamp", 8, '<Hours24>:<Minutes,2>:<Seconds,2>')), true);
-        PrintTextLine(StrSubstNo(ReceiptNoLbl, SIPOSAuditLogAuxInfo."POS Store Code", SIPOSAuditLogAuxInfo."POS Unit No.", SIPOSAuditLogAuxInfo."Receipt No."), true);
+        PrintTwoColumnText(DateLbl, StrSubstNo(DateFormatLbl, Format(SIPOSAuditLogAuxInfo."Entry Date", 10, '<Day,2>.<Month,2>.<Year4>'), Format(SIPOSAuditLogAuxInfo."Log Timestamp", 8, '<Hours24>:<Minutes,2>:<Seconds,2>')), 'CENTER', true);
+        PrintTwoColumnText(ReceiptNoLbl, StrSubstNo(ReceiptNoFormatLbl, SIPOSAuditLogAuxInfo."POS Store Code", SIPOSAuditLogAuxInfo."POS Unit No.", SIPOSAuditLogAuxInfo."Receipt No."), 'CENTER', true);
     end;
 
     local procedure PrintPOSEntryContent(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info")
@@ -93,7 +94,7 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
         SalesLineType: Option Comment,"G/L Account",Item,Customer,Voucher,Payout,Rounding;
     begin
         PrintDottedLine();
-        PrintFourColumnText(ItemDescLbl, QtyLbl, UnitPriceLbl, ItemPriceLbl, true);
+        PrintFourColumnText(ItemDescLbl, QtyLbl, UnitPriceLbl, ItemPriceLbl, 'CENTER', true);
         PrintDottedLine();
 
         POSEntrySalesLine.SetRange("POS Entry No.", SIPOSAuditLogAuxInfo."POS Entry No.");
@@ -101,23 +102,23 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
         if not POSEntrySalesLine.FindSet() then
             exit;
         repeat
-            PrintTextLine(POSEntrySalesLine.Description, false);
-            PrintFourColumnText(Format(POSEntrySalesLine.Quantity).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(POSEntrySalesLine."Unit Price"), FormatDecimal(POSEntrySalesLine."Amount Incl. VAT"), false);
+            PrintTextLine(POSEntrySalesLine.Description, 'CENTER', false);
+            PrintFourColumnText(Format(POSEntrySalesLine.Quantity).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(POSEntrySalesLine."Unit Price"), FormatDecimal(POSEntrySalesLine."Amount Incl. VAT"), 'CENTER', false);
         until POSEntrySalesLine.Next() = 0;
         PrintFullLine();
 
-        PrintTwoColumnText(FinalBillLbl, FormatDecimal(SIPOSAuditLogAuxInfo."Total Amount"), true);
-        PrintTextLine('', false);
+        PrintTwoColumnText(FinalBillLbl, FormatDecimal(SIPOSAuditLogAuxInfo."Total Amount"), 'CENTER', true);
+        PrintEmptyLine();
 
         PrintDottedLine();
-        PrintFourColumnText(VATPercLbl, VATBaseLbl, VATAmountLbl, AmountInclVATLbl, true);
+        PrintFourColumnText(VATPercLbl, VATBaseLbl, VATAmountLbl, AmountInclVATLbl, 'CENTER', true);
         PrintDottedLine();
 
         POSEntryTaxLine.SetRange("POS Entry No.", SIPOSAuditLogAuxInfo."POS Entry No.");
         if not POSEntryTaxLine.FindSet() then
             exit;
         repeat
-            PrintFourColumnText(StrSubstNo(TwoValueFormatLbl, Format(Round(POSEntryTaxLine."Tax %", 0.1)), '%'), FormatDecimal(POSEntryTaxLine."Tax Base Amount"), FormatDecimal(POSEntryTaxLine."Tax Amount"), FormatDecimal(POSEntryTaxLine."Amount Including Tax"), false);
+            PrintFourColumnText(StrSubstNo(TwoValueFormatLbl, Format(Round(POSEntryTaxLine."Tax %", 0.1)), '%'), FormatDecimal(Abs(POSEntryTaxLine."Tax Base Amount")), FormatDecimal(Abs(POSEntryTaxLine."Tax Amount")), FormatDecimal(POSEntryTaxLine."Amount Including Tax"), 'CENTER', false);
         until POSEntryTaxLine.Next() = 0;
     end;
 
@@ -141,7 +142,7 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
         DictKey: Decimal;
     begin
         PrintDottedLine();
-        PrintFourColumnText(ItemDescLbl, QtyLbl, UnitPriceLbl, ItemPriceLbl, true);
+        PrintFourColumnText(ItemDescLbl, QtyLbl, UnitPriceLbl, ItemPriceLbl, 'CENTER', true);
         PrintDottedLine();
 
         SalesInvoiceHeader.Get(SIPOSAuditLogAuxInfo."Source Document No.");
@@ -151,8 +152,8 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
         SalesInvoiceLine.SetRange(Type, SalesInvoiceLine.Type::Item);
         SalesInvoiceLine.FindSet();
         repeat
-            PrintTextLine(SalesInvoiceLine.Description, false);
-            PrintFourColumnText(Format(SalesInvoiceLine.Quantity).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(GetUnitPriceInclVAT(SalesInvoiceHeader."Prices Including VAT", SalesInvoiceLine."Unit Price", SalesInvoiceLine."VAT %", SalesInvoiceHeader."Currency Code")), FormatDecimal(SalesInvoiceLine."Amount Including VAT"), false);
+            PrintTextLine(SalesInvoiceLine.Description, 'CENTER', false);
+            PrintFourColumnText(Format(SalesInvoiceLine.Quantity).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(GetUnitPriceInclVAT(SalesInvoiceHeader."Prices Including VAT", SalesInvoiceLine."Unit Price", SalesInvoiceLine."VAT %", SalesInvoiceHeader."Currency Code")), FormatDecimal(SalesInvoiceLine."Amount Including VAT"), 'CENTER', false);
 
             AddAmountToDecimalDict(TaxableAmountDict, SalesInvoiceLine."VAT %", SalesInvoiceLine."VAT Base Amount");
             AddAmountToDecimalDict(TaxAmountDict, SalesInvoiceLine."VAT %", SalesInvoiceLine."Amount Including VAT" - SalesInvoiceLine."VAT Base Amount");
@@ -160,16 +161,16 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
         until SalesInvoiceLine.Next() = 0;
         PrintFullLine();
 
-        PrintTwoColumnText(FinalBillLbl, FormatDecimal(SIPOSAuditLogAuxInfo."Total Amount"), true);
-        PrintTextLine('', false);
+        PrintTwoColumnText(FinalBillLbl, FormatDecimal(SIPOSAuditLogAuxInfo."Total Amount"), 'CENTER', true);
+        PrintEmptyLine();
 
         PrintDottedLine();
-        PrintFourColumnText(VATPercLbl, VATBaseLbl, VATAmountLbl, AmountInclVATLbl, true);
+        PrintFourColumnText(VATPercLbl, VATBaseLbl, VATAmountLbl, AmountInclVATLbl, 'CENTER', true);
         PrintDottedLine();
 
         DictKeysList := TaxableAmountDict.Keys();
         foreach DictKey in DictKeysList do begin
-            PrintFourColumnText(StrSubstNo(TwoValueFormatLbl, Format(Round(DictKey, 0.1)), '%'), FormatDecimal(TaxableAmountDict.Get(DictKey)), FormatDecimal(TaxAmountDict.Get(DictKey)), FormatDecimal(AmountInclTaxDict.Get(DictKey)), false);
+            PrintFourColumnText(StrSubstNo(TwoValueFormatLbl, Format(Round(DictKey, 0.1)), '%'), FormatDecimal(TaxableAmountDict.Get(DictKey)), FormatDecimal(TaxAmountDict.Get(DictKey)), FormatDecimal(AmountInclTaxDict.Get(DictKey)), 'CENTER', false);
         end;
     end;
 
@@ -194,19 +195,18 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
         DictKey: Decimal;
     begin
         PrintDottedLine();
-        PrintFourColumnText(ItemDescLbl, QtyLbl, UnitPriceLbl, ItemPriceLbl, true);
+        PrintFourColumnText(ItemDescLbl, QtyLbl, UnitPriceLbl, ItemPriceLbl, 'CENTER', true);
         PrintDottedLine();
 
         SalesCrMemoHeader.Get(SIPOSAuditLogAuxInfo."Source Document No.");
 
         SalesCrMemoLine.SetLoadFields(Description, Quantity, "Unit Price", "VAT Base Amount", "VAT %", "Amount Including VAT");
-        SalesCrMemoLine.SetAutoCalcFields("Amount Including VAT");
         SalesCrMemoLine.SetRange("Document No.", SIPOSAuditLogAuxInfo."Source Document No.");
         SalesCrMemoLine.SetRange(Type, SalesCrMemoLine.Type::Item);
         SalesCrMemoLine.FindSet();
         repeat
-            PrintTextLine(SalesCrMemoLine.Description, false);
-            PrintFourColumnText(Format(-Abs(SalesCrMemoLine.Quantity)).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(GetUnitPriceInclVAT(SalesCrMemoHeader."Prices Including VAT", SalesCrMemoLine."Unit Price", SalesCrMemoLine."VAT %", SalesCrMemoHeader."Currency Code")), FormatDecimal(Round(-Abs(SalesCrMemoLine."Amount Including VAT"), Currency."Amount Rounding Precision")), false);
+            PrintTextLine(SalesCrMemoLine.Description, 'CENTER', false);
+            PrintFourColumnText(Format(-Abs(SalesCrMemoLine.Quantity)).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(GetUnitPriceInclVAT(SalesCrMemoHeader."Prices Including VAT", SalesCrMemoLine."Unit Price", SalesCrMemoLine."VAT %", SalesCrMemoHeader."Currency Code")), FormatDecimal(Round(-Abs(SalesCrMemoLine."Amount Including VAT"), Currency."Amount Rounding Precision")), 'CENTER', false);
 
             AddAmountToDecimalDict(TaxableAmountDict, SalesCrMemoLine."VAT %", SalesCrMemoLine."VAT Base Amount");
             AddAmountToDecimalDict(TaxAmountDict, SalesCrMemoLine."VAT %", SalesCrMemoLine."Amount Including VAT" - SalesCrMemoLine."VAT Base Amount");
@@ -214,29 +214,31 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
         until SalesCrMemoLine.Next() = 0;
         PrintFullLine();
 
-        PrintTwoColumnText(FinalBillLbl, FormatDecimal(SIPOSAuditLogAuxInfo."Total Amount"), true);
-        PrintTextLine('', false);
+        PrintTwoColumnText(FinalBillLbl, FormatDecimal(SIPOSAuditLogAuxInfo."Total Amount"), 'CENTER', true);
+        PrintEmptyLine();
 
         PrintDottedLine();
-        PrintFourColumnText(VATPercLbl, VATBaseLbl, VATAmountLbl, AmountInclVATLbl, true);
+        PrintFourColumnText(VATPercLbl, VATBaseLbl, VATAmountLbl, AmountInclVATLbl, 'CENTER', true);
         PrintDottedLine();
 
         DictKeysList := TaxableAmountDict.Keys();
         foreach DictKey in DictKeysList do begin
-            PrintFourColumnText(StrSubstNo(TwoValueFormatLbl, Format(Round(DictKey, 0.1)), '%'), FormatDecimal(TaxableAmountDict.Get(DictKey)), FormatDecimal(TaxAmountDict.Get(DictKey)), FormatDecimal(AmountInclTaxDict.Get(DictKey)), false);
+            PrintFourColumnText(StrSubstNo(TwoValueFormatLbl, Format(Round(DictKey, 0.1)), '%'), FormatDecimal(TaxableAmountDict.Get(DictKey)), FormatDecimal(TaxAmountDict.Get(DictKey)), FormatDecimal(-AmountInclTaxDict.Get(DictKey)), 'CENTER', false);
         end;
     end;
 
     local procedure PrintFooter(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info")
     var
-        CashierIDLbl: Label 'Račun izdal: %1', Locked = true, Comment = '%1 = Cashier ID';
+        CashierIDLbl: Label 'Račun izdal: ', Locked = true;
+        ZOICodeLbl: Label 'ZOI: ', Locked = true;
+        EORCodeLbl: Label 'EOR: ', Locked = true;
     begin
         PrintFullLine();
-        PrintTextLine(StrSubstNo(CashierIDLbl, SIPOSAuditLogAuxInfo."Cashier ID"), true);
-        PrintTextLine('', false);
-        PrintTextLine(StrSubstNo(TwoValueFormatLbl, 'ZOI:', SIPOSAuditLogAuxInfo."ZOI Code"), true);
-        PrintTextLine(StrSubstNo(TwoValueFormatLbl, 'EOR:', SIPOSAuditLogAuxInfo."EOR Code"), true);
-        PrintTextLine('', false);
+        PrintTwoColumnText(CashierIDLbl, Format(SIPOSAuditLogAuxInfo."Salesperson Code"), 'CENTER', true);
+        PrintEmptyLine();
+        PrintTwoColumnText(ZOICodeLbl, SIPOSAuditLogAuxInfo."ZOI Code", 'CENTER', true);
+        PrintTwoColumnText(EORCodeLbl, SIPOSAuditLogAuxInfo."EOR Code", 'CENTER', true);
+        PrintEmptyLine();
 
         PrintQRCode(SIPOSAuditLogAuxInfo."Validation Code");
     end;
@@ -280,23 +282,27 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
             Printer.NewLine();
     end;
 
-    local procedure PrintTextLine(TextToPrint: Text; Bold: Boolean)
+    local procedure PrintTextLine(TextToPrint: Text; Alignment: Text; Bold: Boolean)
     begin
-        PrintThermalLine(TextToPrint.PadRight(40, ' '), 'A11', Bold, 'CENTER', true, false);
+        PrintThermalLine(TextToPrint.PadRight(ReceiptWidth(), ' '), 'A11', Bold, Alignment, true, false);
     end;
 
-    local procedure PrintTwoColumnText(FirstColumnText: Text; SecondColumnText: Text; Bold: Boolean)
-    var
-        TwoColumnValuesLbl: Label '%1%2', Locked = true, Comment = '%1 = First Value, %2 = Second Value';
+    local procedure PrintTwoColumnText(FirstColumnText: Text; SecondColumnText: Text; Alignment: Text; Bold: Boolean)
     begin
-        PrintThermalLine(StrSubstNo(TwoColumnValuesLbl, FirstColumnText.PadRight(20, ' '), SecondColumnText.PadLeft(20, ' ')), 'A11', Bold, 'CENTER', true, false);
+        if SecondColumnText <> '' then
+            PrintThermalLine(FormatTwoColumnText(FirstColumnText, SecondColumnText), 'A11', Bold, Alignment, true, false);
     end;
 
-    local procedure PrintFourColumnText(FirstColumnText: Text; SecondColumnText: Text; ThirdColumnText: Text; FourthColumnText: Text; Bold: Boolean)
+    local procedure PrintFourColumnText(FirstColumnText: Text; SecondColumnText: Text; ThirdColumnText: Text; FourthColumnText: Text; Alignment: Text; Bold: Boolean)
     var
         FourColumnValuesLbl: Label '%1%2%3%4', Locked = true, Comment = '%1 = First Value, %2 = Second Value, %3 = Third Value, %4 = Fourth Value';
     begin
-        PrintThermalLine(StrSubstNo(FourColumnValuesLbl, FirstColumnText.PadRight(10, ' '), SecondColumnText.PadRight(10, ' '), ThirdColumnText.PadLeft(10, ' '), FourthColumnText.PadLeft(10, ' ')), 'A11', Bold, 'CENTER', true, false);
+        PrintThermalLine(StrSubstNo(FourColumnValuesLbl, FirstColumnText.PadRight(11, ' '), SecondColumnText.PadRight(10, ' '), ThirdColumnText.PadLeft(10, ' '), FourthColumnText.PadLeft(11, ' ')), 'A11', Bold, Alignment, true, false);
+    end;
+
+    local procedure PrintEmptyLine()
+    begin
+        PrintThermalLine('', 'A11', false, 'CENTER', true, false);
     end;
 
     local procedure PrintQRCode(QRCodeValue: Text)
@@ -306,17 +312,20 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
 
     local procedure PrintDottedLine()
     var
-        DottedLineLbl: Label '---------------------------------------------', Locked = true;
+        Dots: Text;
     begin
-        PrintThermalLine(DottedLineLbl, 'A11', true, 'CENTER', true, false);
+        Dots := '-';
+        PrintThermalLine(Dots.PadRight(ReceiptWidth(), '-'), 'A11', true, 'CENTER', true, false);
     end;
 
     local procedure PrintFullLine()
     var
-        ThermalPrintLineLbl: Label '_____________________________________________', Locked = true;
+        Line: Text;
     begin
-        PrintThermalLine(ThermalPrintLineLbl, 'A11', true, 'CENTER', true, false);
+        Line := '_';
+        PrintThermalLine(Line.PadRight(ReceiptWidth(), '_'), 'A11', true, 'CENTER', true, false);
     end;
+
 
     #endregion
 
@@ -325,6 +334,37 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
     local procedure FormatDecimal(Value: Decimal): Text
     begin
         exit(Format(Value, 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,.>'));
+    end;
+
+    local procedure FormatAddressLine(Address: Text[50]; PostCode: Code[20]; City: Text[30]) AddressLine: Text
+    begin
+        if Address <> '' then
+            AddressLine += Address + ', ';
+        if PostCode <> '' then
+            AddressLine += PostCode + ', ';
+        if City <> '' then
+            AddressLine += City;
+        if AddressLine = '' then
+            exit;
+
+        AddressLine := AddressLine.TrimEnd(', ');
+    end;
+
+    local procedure FormatTwoColumnText(CaptionLbl: Text; Value: Text) Result: Text
+    var
+        TotalTxtLen: Integer;
+    begin
+        TotalTxtLen := StrLen(CaptionLbl) + StrLen(Value);
+
+        if TotalTxtLen < ReceiptWidth() then
+            Result := PadStr(CaptionLbl, ReceiptWidth() - StrLen(Value), ' ') + Value
+        else
+            Result := CaptionLbl + Value;
+    end;
+
+    local procedure ReceiptWidth(): Integer
+    begin
+        exit(42);
     end;
 
     #endregion
