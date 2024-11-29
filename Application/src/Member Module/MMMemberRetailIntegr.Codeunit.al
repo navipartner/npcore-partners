@@ -794,6 +794,7 @@
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         CreateMembership: Codeunit "NPR Membership Attempt Create";
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
     begin
         MemberInfoCapture.LockTable(true);
         MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
@@ -802,13 +803,22 @@
         if (not MemberInfoCapture.FindSet()) then
             exit;
 
+        if (not MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MemberInfoCapture."Item No.")) then
+            MembershipSalesSetup.Init();
+
         repeat
             MemberInfoCapture."Unit Price" := UnitPrice;
             MemberInfoCapture.Amount := Amount_LCY;
             MemberInfoCapture."Amount Incl VAT" := AmountInclVat_LCY;
             MemberInfoCapture.Description := CopyStr(Description, 1, MaxStrLen(MemberInfoCapture.Description));
             MemberInfoCapture.Quantity := Quantity;
-            MemberInfoCapture."Document Date" := SalesDate;
+
+            if (MemberInfoCapture."Document Date" = 0D) then
+                MemberInfoCapture."Document Date" := SalesDate;
+
+            if (MembershipSalesSetup."Valid From Base" <> MembershipSalesSetup."Valid From Base"::PROMPT) then
+                MemberInfoCapture."Document Date" := SalesDate;
+
             MemberInfoCapture.Modify();
         until (MemberInfoCapture.Next() = 0);
 
