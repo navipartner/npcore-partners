@@ -139,6 +139,7 @@ pageextension 6014442 "NPR Sales Invoice" extends "Sales Invoice"
             }
         }
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
+
         addlast(content)
         {
             group("NPR RS E-Invoicing")

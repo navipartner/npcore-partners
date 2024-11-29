@@ -38,17 +38,15 @@ codeunit 6184883 "NPR RS EI In Purch. Inv. Mgt."
 
         case TempRSEInvoiceDocument."Invoice Type Code" of
             TempRSEInvoiceDocument."Invoice Type Code"::"381":
-                TempRSEInvoiceDocument."Document Type" := TempRSEInvoiceDocument."Document Type"::"Purchase Cr. Memo";
+                SetPurchaseCrMemoDocumentType(TempRSEInvoiceDocument, InvoiceElement, NamespaceManager);
             TempRSEInvoiceDocument."Invoice Type Code"::"386":
-                TempRSEInvoiceDocument."Document Type" := TempRSEInvoiceDocument."Document Type"::"Purchase Invoice";
+                SetPrepaymentPurchaseInvDocumentType(TempRSEInvoiceDocument);
         end;
 
         if RSEInvoiceMgt.GetTextValue(HelperText, InvoiceElement, 'cac:AccountingSupplierParty/cac:Party/cac:PartyName/cbc:Name', NamespaceManager) then
             TempRSEInvoiceDocument."Supplier Name" := CopyStr(HelperText, 1, MaxStrLen(TempRSEInvoiceDocument."Supplier Name"));
 
         TempRSEInvoiceDocument."Customer Name" := CopyStr(CompanyName(), 1, MaxStrLen(TempRSEInvoiceDocument."Customer Name"));
-        TempRSEInvoiceDocument."Created" := false;
-        TempRSEInvoiceDocument."Posted" := false;
 
         RSEInvoiceMgt.GetDecimalValue(TempRSEInvoiceDocument.Amount, InvoiceElement, 'cac:LegalMonetaryTotal/cbc:TaxInclusiveAmount', NamespaceManager);
 
@@ -74,8 +72,9 @@ codeunit 6184883 "NPR RS EI In Purch. Inv. Mgt."
 
         PurchaseHeader.Init();
 
-        if not CheckIfLocalizationEnabledAndImportPrepaymentDocument(TempRSEInvoiceDocument, PurchaseHeader, InvoiceElement, NamespaceManager) then
-            exit;
+        if TempRSEInvoiceDocument.Prepayment then
+            if not ValidatePrepaymentDocumentData(TempRSEInvoiceDocument, PurchaseHeader, InvoiceElement, NamespaceManager) then
+                exit;
 
         case TempRSEInvoiceDocument."Document Type" of
             TempRSEInvoiceDocument."Document Type"::"Purchase Invoice":
@@ -379,35 +378,73 @@ codeunit 6184883 "NPR RS EI In Purch. Inv. Mgt."
         ReferenceNo := CopyStr(FullText, 1, MaxStrLen(ReferenceNo));
     end;
 
-    local procedure CheckIfLocalizationEnabledAndImportPrepaymentDocument(var TempRSEInvoiceDocument: Record "NPR RS E-Invoice Document" temporary; var PurchaseHeader: Record "Purchase Header"; InvoiceElement: XmlElement; NamespaceManager: XmlNamespaceManager): Boolean
+    local procedure ValidatePrepaymentDocumentData(var TempRSEInvoiceDocument: Record "NPR RS E-Invoice Document" temporary; var PurchaseHeader: Record "Purchase Header"; InvoiceElement: XmlElement; NamespaceManager: XmlNamespaceManager): Boolean
     begin
-        if not (TempRSEInvoiceDocument."Invoice Type Code" in [TempRSEInvoiceDocument."Invoice Type Code"::"381", TempRSEInvoiceDocument."Invoice Type Code"::"386"]) then
-            exit(true);
+        if not CheckRSLocalizationForPrepayment(TempRSEInvoiceDocument."Invoice Document No.") then
+            exit(false);
         case TempRSEInvoiceDocument."Invoice Type Code" of
             TempRSEInvoiceDocument."Invoice Type Code"::"386":
-                exit(CheckIfPrepaymentInvoiceCanBeImported(TempRSEInvoiceDocument, PurchaseHeader));
+                exit(ValidatePrepaymentInvoiceData(PurchaseHeader));
             TempRSEInvoiceDocument."Invoice Type Code"::"381":
-                exit(CheckIfPrepaymentCrMemoCanBeImported(TempRSEInvoiceDocument, PurchaseHeader, InvoiceElement, NamespaceManager));
+                exit(ValidatePrepaymentCrMemoData(TempRSEInvoiceDocument, PurchaseHeader, InvoiceElement, NamespaceManager));
+            else
+                exit(true);
         end;
     end;
 
-    local procedure CheckIfPrepaymentInvoiceCanBeImported(var TempRSEInvoiceDocument: Record "NPR RS E-Invoice Document" temporary; PurchaseHeader: Record "Purchase Header"): Boolean
+    local procedure CheckRSLocalizationForPrepayment(InvoiceDocumentNo: Code[35]): Boolean
     var
         RSLocalizationNotEnabledMsg: Label 'RS Localization is not enabled and Prepayment Invoice %1 cannot be imported.', Comment = '%1 = Document No.';
     begin
-        if not RSEInvoiceMgt.IsRSLocalizationEnabled() then begin
-            Message(RSLocalizationNotEnabledMsg);
-            exit(false);
-        end;
-        RSEInvoiceMgt.SetPrepaymentPurchaseHeader(PurchaseHeader);
+        if RSEInvoiceMgt.IsRSLocalizationEnabled() then
+            exit(true);
+
+        Message(RSLocalizationNotEnabledMsg, InvoiceDocumentNo);
+    end;
+
+    local procedure SetPurchaseCrMemoDocumentType(var TempRSEInvoiceDocument: Record "NPR RS E-Invoice Document" temporary; InvoiceElement: XmlElement; NamespaceManager: XmlNamespaceManager)
+    begin
+        TempRSEInvoiceDocument."Document Type" := TempRSEInvoiceDocument."Document Type"::"Purchase Cr. Memo";
+        CheckIsPrepaymentCreditMemo(TempRSEInvoiceDocument, InvoiceElement, NamespaceManager);
+    end;
+
+    local procedure SetPrepaymentPurchaseInvDocumentType(var TempRSEInvoiceDocument: Record "NPR RS E-Invoice Document" temporary)
+    begin
+        TempRSEInvoiceDocument."Document Type" := TempRSEInvoiceDocument."Document Type"::"Purchase Invoice";
         TempRSEInvoiceDocument.Prepayment := true;
-        TempRSEInvoiceDocument.Modify();
+    end;
+
+    local procedure ValidatePrepaymentInvoiceData(var PurchaseHeader: Record "Purchase Header"): Boolean
+    var
+        PurchasesPayablesSetup: Record "Purchases & Payables Setup";
+    begin
+        RSEInvoiceMgt.SetLocalizationPrepaymentPurchaseHeader(PurchaseHeader);
+        PurchasesPayablesSetup.Get();
+        PurchaseHeader."Prepayment No. Series" := PurchasesPayablesSetup."Posted Prepmt. Inv. Nos.";
         exit(true);
     end;
 
-    local procedure CheckIfPrepaymentCrMemoCanBeImported(var TempRSEInvoiceDocument: Record "NPR RS E-Invoice Document" temporary; var PurchaseHeader: Record "Purchase Header"; InvoiceElement: XmlElement; NamespaceManager: XmlNamespaceManager): Boolean
+    local procedure ValidatePrepaymentCrMemoData(var TempRSEInvoiceDocument: Record "NPR RS E-Invoice Document" temporary; var PurchaseHeader: Record "Purchase Header"; InvoiceElement: XmlElement; NamespaceManager: XmlNamespaceManager): Boolean
     var
         RSEInvoiceDocument: Record "NPR RS E-Invoice Document";
+        PurchasesPayablesSetup: Record "Purchases & Payables Setup";
+        HelperText: Text;
+    begin
+        if not GetReferencedEInvoiceDocument(RSEInvoiceDocument, TempRSEInvoiceDocument, InvoiceElement, NamespaceManager) then
+            exit(false);
+
+        RSEInvoiceMgt.SetLocalizationPrepaymentPurchaseHeader(PurchaseHeader);
+
+        RSEInvoiceMgt.GetTextValue(HelperText, InvoiceElement, 'cac:BillingReference/cac:InvoiceDocumentReference/cbc:ID', NamespaceManager);
+        PurchaseHeader."Applies-to Doc. Type" := PurchaseHeader."Applies-to Doc. Type"::Invoice;
+        PurchaseHeader."Applies-to Doc. No." := RSEInvoiceDocument."Document No.";
+        PurchasesPayablesSetup.Get();
+        PurchaseHeader."Prepmt. Cr. Memo No. Series" := PurchasesPayablesSetup."Posted Prepmt. Cr. Memo Nos.";
+        exit(true);
+    end;
+
+    local procedure GetReferencedEInvoiceDocument(var RSEInvoiceDocument: Record "NPR RS E-Invoice Document"; TempRSEInvoiceDocument: Record "NPR RS E-Invoice Document" temporary; InvoiceElement: XmlElement; NamespaceManager: XmlNamespaceManager): Boolean
+    var
         HelperText: Text;
         CannotImportCrMemoDocumentIfOriginalNotImportedMsg: Label 'You cannot import Purchase Credit Memo: %1, if the related document %2 was not imported.', Comment = '%1 = Purch. Cr. Memo Document No, %2 = Referenced Document No.';
         CannotImportCrMemoDocumentIfOriginalNotPostedMsg: Label 'You cannot import Purchase Credit Memo: %1, if the related document %2 was not posted.', Comment = '%1 = Purch. Cr. Memo Document No, %2 = Referenced Document No.';
@@ -422,14 +459,18 @@ codeunit 6184883 "NPR RS EI In Purch. Inv. Mgt."
             Message(CannotImportCrMemoDocumentIfOriginalNotPostedMsg, TempRSEInvoiceDocument."Invoice Document No.", HelperText);
             exit(false);
         end;
-        if RSEInvoiceDocument.Prepayment then begin
-            RSEInvoiceMgt.SetPrepaymentPurchaseHeader(PurchaseHeader);
-            TempRSEInvoiceDocument.Prepayment := true;
-            TempRSEInvoiceDocument.Modify();
-        end;
-        PurchaseHeader."Applies-to Doc. Type" := PurchaseHeader."Applies-to Doc. Type"::Invoice;
-        PurchaseHeader."Applies-to Doc. No." := RSEInvoiceDocument."Document No.";
         exit(true);
+    end;
+
+    local procedure CheckIsPrepaymentCreditMemo(var TempRSEInvoiceDocument: Record "NPR RS E-Invoice Document" temporary; InvoiceElement: XmlElement; NamespaceManager: XmlNamespaceManager)
+    var
+        RSEInvoiceDocument: Record "NPR RS E-Invoice Document";
+        HelperText: Text;
+    begin
+        RSEInvoiceMgt.GetTextValue(HelperText, InvoiceElement, 'cac:BillingReference/cac:InvoiceDocumentReference/cbc:ID', NamespaceManager);
+        RSEInvoiceDocument.SetRange("Invoice Document No.", HelperText);
+        RSEInvoiceDocument.FindFirst();
+        TempRSEInvoiceDocument.Prepayment := RSEInvoiceDocument.Prepayment;
     end;
 
     #endregion RS E-Invoice Helper Procedures

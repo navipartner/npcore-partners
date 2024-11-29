@@ -317,13 +317,6 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
         }
 
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
-        modify("Sell-to Customer No.")
-        {
-            trigger OnAfterValidate()
-            begin
-                RSEInvoiceMgt.SetSalesHeaderFieldsFromCustomer(Rec);
-            end;
-        }
 
         addlast(content)
         {
@@ -776,7 +769,6 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         RSEIAuxSalesHeader.ReadRSEIAuxSalesHeaderFields(Rec);
         IsDocForSendingToSEF := RSEInvoiceMgt.CheckIsDocumentSetForSendingToSEF(RSEIAuxSalesHeader);
-        IsModelFilled := false;
 #endif
     end;
 

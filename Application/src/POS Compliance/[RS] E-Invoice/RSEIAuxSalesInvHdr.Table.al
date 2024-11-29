@@ -120,5 +120,11 @@ table 6150834 "NPR RS EI Aux Sales Inv. Hdr."
         "NPR RS EI Invoice Status" := RSEInvoiceStatus;
         SaveRSEIAuxSalesInvHdrFields();
     end;
+
+    internal procedure SetRSEIAuxSalesInvHdrSendToSEF(SendToSEF: Boolean)
+    begin
+        "NPR RS EI Send To SEF" := SendToSEF;
+        SaveRSEIAuxSalesInvHdrFields();
+    end;
 #endif
 }
