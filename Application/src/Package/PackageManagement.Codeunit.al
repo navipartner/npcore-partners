@@ -268,7 +268,7 @@ codeunit 6059947 "NPR Package Management"
         if ShipmentDocument."Shipment Date" < TODAY then
             ShipmentDocument."Shipment Date" := TODAY;
 
-        ShipmondoEvents.AddEntryOnBeforeShipmentDocumentModify(ShipmentDocument);
+        ShipmondoEvents.AddEntryOnBeforeShipmentDocumentModify(ShipmentDocument, RecRef);
         ShipmentDocument.MODIFY(true);
 
         COMMIT();
