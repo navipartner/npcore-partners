@@ -35,7 +35,6 @@
 
             trigger OnValidate()
             begin
-
                 if RecField.Get("Table No.", "Field Number") then begin
                     "Field Name" := RecField.FieldName;
                     "Field Caption" := RecField."Field Caption";
@@ -44,6 +43,10 @@
                     "Field Name" := '';
                     "Field Caption" := '';
                 end;
+
+                if GuiAllowed then
+                    if FieldObsoleted(Rec."Table No.", Rec."Field Number") then
+                        Message(StrSubstNo(ObsoletedFieldWarningLbl, Rec."Field Number", Rec."Field Caption"));
             end;
         }
         field(20; "Table Name"; Text[30])
@@ -118,6 +121,10 @@
                     "Target Field Name Create" := '';
                     "Target Field Caption Create" := '';
                 end;
+
+                if GuiAllowed then
+                    if FieldObsoleted(Rec."Target Table No. Create", Rec."Target Field Number Create") then
+                        Message(StrSubstNo(ObsoletedFieldWarningLbl, Rec."Target Field Number Create", Rec."Target Field Caption Create"));
             end;
         }
         field(45; "Target Field Name Create"; Text[30])
@@ -182,6 +189,10 @@
                     "Target Field Name Update" := '';
                     "Target Field Caption Update" := '';
                 end;
+
+                if GuiAllowed then
+                    if FieldObsoleted(Rec."Target Table No. Update", Rec."Target Field Number Update") then
+                        Message(StrSubstNo(ObsoletedFieldWarningLbl, Rec."Target Field Number Update", Rec."Target Field Caption Update"));
             end;
         }
         field(55; "Target Field Name Update"; Text[30])
@@ -269,6 +280,7 @@
     var
         RecField: Record "Field";
         ItemWorksheetManagement: Codeunit "NPR Item Worksheet Mgt.";
+        ObsoletedFieldWarningLbl: Label 'Field %1 %2 is obsoleted. You should use another field.', Comment = '%1 = "Field No.", %2 = "Field Caption"';
 
     local procedure LookupField(OptType: Option Source,TargetCreate,TargetUpdate)
     var
@@ -323,6 +335,14 @@
             OptType::TargetUpdate:
                 Validate("Target Field Number Update", RecField."No.");
         end;
+    end;
+
+    local procedure FieldObsoleted(TableNo: Integer; FieldNo: Integer): Boolean
+    var
+        Field: Record "Field";
+    begin
+        if Field.Get(TableNo, FieldNo) then
+            exit(Field.ObsoleteState = Field.ObsoleteState::Removed);
     end;
 }
 
