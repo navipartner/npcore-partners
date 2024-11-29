@@ -647,6 +647,14 @@
         exit(false);
     end;
 
+    local procedure FieldObsoleted(TableNo: Integer; FieldNo: Integer): Boolean
+    var
+        Field: Record "Field";
+    begin
+        if Field.Get(TableNo, FieldNo) then
+            exit(Field.ObsoleteState = Field.ObsoleteState::Removed);
+    end;
+
     internal procedure CreateLookupFilter(TableNumber: Integer) FilterText: Text
     var
         FieldRec: Record "Field";
@@ -678,13 +686,15 @@
         ItemWorksheetFieldSetup.SetFilter("Worksheet Name", '=%1', '');
         if ItemWorksheetFieldSetup.FindSet() then
             repeat
-                NewItemWorksheetFieldSetup := ItemWorksheetFieldSetup;
-                NewItemWorksheetFieldSetup."Worksheet Template Name" := ItemWorksheetLine."Worksheet Template Name";
-                if SetLevel = SetLevel::Worksheet then
-                    NewItemWorksheetFieldSetup."Worksheet Name" := ItemWorksheetLine."Worksheet Name"
-                else
-                    NewItemWorksheetFieldSetup."Worksheet Name" := '';
-                NewItemWorksheetFieldSetup.Insert(true);
+                if not FieldObsoleted(ItemWorksheetFieldSetup."Table No.", ItemWorksheetFieldSetup."Field Number") then begin
+                    NewItemWorksheetFieldSetup := ItemWorksheetFieldSetup;
+                    NewItemWorksheetFieldSetup."Worksheet Template Name" := ItemWorksheetLine."Worksheet Template Name";
+                    if SetLevel = SetLevel::Worksheet then
+                        NewItemWorksheetFieldSetup."Worksheet Name" := ItemWorksheetLine."Worksheet Name"
+                    else
+                        NewItemWorksheetFieldSetup."Worksheet Name" := '';
+                    NewItemWorksheetFieldSetup.Insert(true);
+                end;
             until ItemWorksheetFieldSetup.Next() = 0;
     end;
 
