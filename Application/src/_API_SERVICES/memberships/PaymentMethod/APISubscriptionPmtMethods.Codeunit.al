@@ -3,23 +3,7 @@ codeunit 6185107 "NPR API SubscriptionPmtMethods"
 {
     Access = Internal;
 
-    procedure Handle(var Request: Codeunit "NPR API Request"): Codeunit "NPR API Response"
-    begin
-        case true of
-            Request.Match('GET', '/membership/:membershipId/paymentmethods'):  //Get membership payment methods
-                exit(GetPaymentMethods(Request));
-            Request.Match('POST', '/membership/:membershipId/paymentmethods'):  //Create a new payment method
-                exit(CreatePaymentMethod(Request));
-            Request.Match('GET', '/membership/paymentmethods/:paymentMethodId'):  //Get individual payment method
-                exit(GetPaymentMethod(Request));
-            Request.Match('PATCH', '/membership/paymentmethods/:paymentMethodId'):  //Update a payment method
-                exit(UpdatePaymentMethod(Request));
-            Request.Match('DELETE', '/membership/paymentmethods/:paymentMethodId'):  //Delete a payment method
-                exit(DeletePaymentMethod(Request));
-        end;
-    end;
-
-    local procedure GetPaymentMethods(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    internal procedure GetPaymentMethods(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         MemberPaymentMethod: Record "NPR MM Member Payment Method";
         Membership: Record "NPR MM Membership";
@@ -50,7 +34,7 @@ codeunit 6185107 "NPR API SubscriptionPmtMethods"
         exit(Response.RespondOK(Json));
     end;
 
-    local procedure GetPaymentMethod(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    internal procedure GetPaymentMethod(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         MemberPaymentMethod: Record "NPR MM Member Payment Method";
         Json: Codeunit "NPR Json Builder";
@@ -71,7 +55,7 @@ codeunit 6185107 "NPR API SubscriptionPmtMethods"
         exit(Response.RespondOK(Json));
     end;
 
-    local procedure CreatePaymentMethod(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    internal procedure CreatePaymentMethod(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         MemberPaymentMethod: Record "NPR MM Member Payment Method";
         Membership: Record "NPR MM Membership";
@@ -119,7 +103,7 @@ codeunit 6185107 "NPR API SubscriptionPmtMethods"
         exit(Response.RespondOK(Json));
     end;
 
-    local procedure UpdatePaymentMethod(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    internal procedure UpdatePaymentMethod(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         MemberPaymentMethod: Record "NPR MM Member Payment Method";
         Json: Codeunit "NPR Json Builder";
@@ -162,7 +146,7 @@ codeunit 6185107 "NPR API SubscriptionPmtMethods"
         exit(Response.RespondOK(Json));
     end;
 
-    local procedure DeletePaymentMethod(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    internal procedure DeletePaymentMethod(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         MemberPaymentMethod: Record "NPR MM Member Payment Method";
         Json: Codeunit "NPR Json Builder";
