@@ -2626,7 +2626,7 @@
             MembershipSalesSetup."Valid From Base"::SALESDATE:
                 ValidFromDate := SalesDate;
 
-            MembershipSalesSetup."Valid From Base"::DateFormula:
+            MembershipSalesSetup."Valid From Base"::"DATEFORMULA":
                 begin
                     ValidFromDate := SalesDate;
                     if (SalesDate = WorkDate()) then begin

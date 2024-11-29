@@ -581,6 +581,10 @@
                                     if (CalcDate(MembershipSalesSetup."Duration Formula", Rec."Document Date") < WorkDate()) then
                                         Error(INVALID_ACTIVATION_DATE, Rec."Document Date");
 
+                                    if (MembershipSalesSetup."Valid From Base" = MembershipSalesSetup."Valid From Base"::PROMPT) then
+                                        if (Rec."Document Date" > CalcDate(MembershipSalesSetup."Duration Formula", WorkDate())) then
+                                            Error(INVALID_ACTIVATION_DATE_2, Rec."Document Date");
+
                                     case MembershipSetup."Card Expire Date Calculation" of
                                         MembershipSetup."Card Expire Date Calculation"::DATEFORMULA:
                                             Rec."Valid Until" := CalcDate(MembershipSetup."Card Number Valid Until", Rec."Document Date");
@@ -980,6 +984,7 @@
         ActivationDateEditable: Boolean;
         ActivationDateMandatory: Boolean;
         INVALID_ACTIVATION_DATE: Label 'The activation date %1 is not valid. The resulting membership must have remaining time when applying the membership duration formula to activation date.';
+        INVALID_ACTIVATION_DATE_2: Label 'The activation date %1 is not valid. The membership activation date must not exceed the membership duration applied to work date.';
         ActivationDate: Date;
         ExternalMembershipNo: Code[20];
         _ShowNewMemberSection: Boolean;
