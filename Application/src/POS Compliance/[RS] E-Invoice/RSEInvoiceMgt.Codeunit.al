@@ -97,8 +97,10 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
         RSEIAuxPurchInvHdr.TransferFields(RSEIAuxPurchHeader, false);
         RSEIAuxPurchInvHdr.SaveRSEIAuxPurchInvHdrFields();
 
-        if RSEIAuxPurchHeader."NPR RS E-Invoice Type Code" in [RSEIAuxPurchHeader."NPR RS E-Invoice Type Code"::"383"] then
+        if RSEIAuxPurchHeader."NPR RS EI Prepayment" then begin
             PurchInvHeader."Prepayment Invoice" := true;
+            PurchInvHeader.Modify();
+        end;
 
         SetEInvoiceDocumentToPosted(PurchHeader."Vendor Invoice No.", PurchInvHeader."No.");
     end;
@@ -119,6 +121,11 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
         RSEIAuxPurchHeader.ReadRSEIAuxPurchHeaderFields(PurchHeader);
         RSEIAuxPurchCrMemHdr.TransferFields(RSEIAuxPurchHeader, false);
         RSEIAuxPurchCrMemHdr.SaveRSEIAuxPurchCrMemoHdrFields();
+
+        if RSEIAuxPurchHeader."NPR RS EI Prepayment" then begin
+            PurchCrMemoHdr."Prepayment Credit Memo" := true;
+            PurchCrMemoHdr.Modify();
+        end;
 
         SetEInvoiceDocumentToPosted(PurchCrMemoHdr."Vendor Cr. Memo No.", PurchCrMemoHdr."No.");
     end;
@@ -397,6 +404,33 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
         RSEInvoiceDocument.SetRange("Document No.", xRec."No.");
         if not RSEInvoiceDocument.IsEmpty() then
             RSEInvoiceDocument.ModifyAll("Document No.", Rec."No.");
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostSalesDoc', '', false, false)]
+    local procedure SalesPost_OnBeforePostSalesDoc(var SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
+    var
+        Customer: Record Customer;
+        RSEIAuxSalesHeader: Record "NPR RS EI Aux Sales Header";
+        RSEIAuxCustomer: Record "NPR RS EI Aux Customer";
+        ConfirmManagement: Codeunit "Confirm Management";
+        EInvoiceCustomerNotSendingToSEFQst: Label 'The Customer %1 is an E-Invoice customer. The document %2 will not be sent to SEF. Are you sure you want to proceed?', Comment = '%1 = Cusotmer No., %2 = Document No.';
+    begin
+        if not IsRSEInvoiceEnabled() then
+            exit;
+        if SalesHeader."Sell-to Customer No." = '' then
+            exit;
+        RSEIAuxSalesHeader.ReadRSEIAuxSalesHeaderFields(SalesHeader);
+        Customer.Get(SalesHeader."Sell-to Customer No.");
+        RSEIAuxCustomer.ReadRSEIAuxCustomerFields(Customer);
+
+        if not RSEIAuxCustomer."NPR RS E-Invoice Customer" then
+            exit;
+
+        if RSEIAuxSalesHeader."NPR RS EI Send To SEF" then
+            exit;
+
+        if not (ConfirmManagement.GetResponseOrDefault(StrSubstNo(EInvoiceCustomerNotSendingToSEFQst, SalesHeader."Sell-to Customer Name", SalesHeader."No."), false)) then
+            IsHandled := true;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnRunOnBeforeFinalizePosting', '', false, false)]
@@ -739,6 +773,41 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
             RSEIAuxSalesHeader.SetRSEIAuxSalesHeaderInvoiceStatus(RSEInvoiceDocument."Document Type", RSEInvoiceDocument."Document No.", RSEInvoiceDocument."Invoice Status");
     end;
 
+    internal procedure IsRSEInvoiceCustomer(CustomerNo: Code[20]): Boolean
+    var
+        Customer: Record Customer;
+        RSEIAuxCustomer: Record "NPR RS EI Aux Customer";
+    begin
+        if not Customer.Get(CustomerNo) then
+            exit(false);
+
+        RSEIAuxCustomer.ReadRSEIAuxCustomerFields(Customer);
+        exit(RSEIAuxCustomer."NPR RS E-Invoice Customer");
+    end;
+
+    internal procedure CheckIfDocumentShouldBeSent(CustomerNo: Code[20]; DocumentNo: Code[20]; SendToSEFChecked: Boolean): Boolean
+    var
+        ConfirmManagement: Codeunit "Confirm Management";
+        NotAnEInvoiceCustomerQst: Label 'Customer %1 is not an E-Invoice customer. Are you sure document %2 should be sent to SEF?', Comment = '%1 = Customer No., %2 = Document No.';
+    begin
+        if IsRSEInvoiceCustomer(CustomerNo) then
+            exit(CheckIfDocumentShouldBeSentForEInvoiceCustomer(CustomerNo, DocumentNo, SendToSEFChecked))
+        else
+            exit(ConfirmManagement.GetResponseOrDefault(StrSubstNo(NotAnEInvoiceCustomerQst, CustomerNo, DocumentNo), false));
+    end;
+
+    local procedure CheckIfDocumentShouldBeSentForEInvoiceCustomer(CustomerNo: Code[20]; DocumentNo: Code[20]; SendToSEFChecked: Boolean): Boolean
+    var
+        ConfirmManagement: Codeunit "Confirm Management";
+        ShouldSendDocumentToSEFQst: Label 'Are you sure document %1 should be sent to SEF?', Comment = '%1 = Document No.';
+        CustomerEInvoiceDocumentNotSentToSEFQst: Label 'Customer %1 is an E-Invoice customer. Document %2 is not selected for sending to SEF. Do you want to continue?', Comment = '%1 - Customer No., %2 - Document No.';
+    begin
+        if SendToSEFChecked then
+            exit(ConfirmManagement.GetResponseOrDefault(StrSubstNo(ShouldSendDocumentToSEFQst, DocumentNo), true))
+        else
+            exit(not (ConfirmManagement.GetResponseOrDefault(StrSubstNo(CustomerEInvoiceDocumentNotSentToSEFQst, CustomerNo, DocumentNo), false)));
+    end;
+
     #endregion RS E-Invoice Sales Mgt. Helper Procedures
 
     #region RS E-Invoice Purchase Mgt. Helper Procedures
@@ -883,7 +952,7 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
         exit(RSLocalisationMgt.GetLocalisationSetupEnabled());
     end;
 
-    internal procedure SetPrepaymentPurchaseHeader(PurchaseHeader: Record "Purchase Header")
+    internal procedure SetLocalizationPrepaymentPurchaseHeader(PurchaseHeader: Record "Purchase Header")
     var
         RSPurchaseHeader: Record "NPR RS Purchase Header";
     begin

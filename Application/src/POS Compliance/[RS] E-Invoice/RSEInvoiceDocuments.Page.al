@@ -5,6 +5,7 @@ page 6184547 "NPR RS E-Invoice Documents"
     UsageCategory = Documents;
     PageType = List;
     SourceTable = "NPR RS E-Invoice Document";
+    SourceTableView = sorting("Entry No.") order(descending);
     DelayedInsert = true;
     Extensible = false;
     Editable = false;

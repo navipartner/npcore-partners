@@ -143,12 +143,12 @@ codeunit 85200 "NPR Library RS E-Invoice"
     #region Library RS E-Invoice Documents
 
     internal procedure CreateSalesHeaderWLines(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; DocumentType: Enum "Sales Document Type"; LineType: Enum "Sales Line Type";
-                                            Customer: Record Customer; GeneralPostingSetup: Record "General Posting Setup"; VATPostingSetup: Record "VAT Posting Setup")
+                                            Customer: Record Customer; GeneralPostingSetup: Record "General Posting Setup"; VATPostingSetup: Record "VAT Posting Setup"; NoSeriesPrefix: Text)
     var
         LineTypeNo: Code[20];
         GenPostingType: Enum "General Posting Type";
     begin
-        CreateSalesHeaderForRSEInvoicing(SalesHeader, DocumentType, Customer, GeneralPostingSetup, VATPostingSetup);
+        CreateSalesHeaderForRSEInvoicing(SalesHeader, DocumentType, Customer, GeneralPostingSetup, VATPostingSetup, NoSeriesPrefix);
 
         case LineType of
             LineType::Item:
@@ -159,7 +159,8 @@ codeunit 85200 "NPR Library RS E-Invoice"
         _LibrarySales.CreateSalesLine(SalesLine, SalesHeader, LineType, LineTypeNo, _LibraryRandom.RandDec(10, 2));
     end;
 
-    local procedure CreateSalesHeaderForRSEInvoicing(var SalesHeader: Record "Sales Header"; DocumentType: Enum "Sales Document Type"; Customer: Record Customer; GeneralPostingSetup: Record "General Posting Setup"; VATPostingSetup: Record "VAT Posting Setup"): Code[20]
+    local procedure CreateSalesHeaderForRSEInvoicing(var SalesHeader: Record "Sales Header"; DocumentType: Enum "Sales Document Type"; Customer: Record Customer; GeneralPostingSetup: Record "General Posting Setup";
+                                                    VATPostingSetup: Record "VAT Posting Setup"; NoSeriesPrefix: Text): Code[20]
     var
         PaymentMethod: Record "Payment Method";
     begin
@@ -169,6 +170,7 @@ codeunit 85200 "NPR Library RS E-Invoice"
             _LibrarySales.CreateSalesHeader(SalesHeader, DocumentType, Customer."No.");
         CreatePaymentMethod(PaymentMethod, GeneralPostingSetup, VATPostingSetup);
         SalesHeader."Payment Method Code" := PaymentMethod.Code;
+        SalesHeader."Posting No. Series" := CreateNumberSeries(NoSeriesPrefix);
         SalesHeader.Modify();
         CreateSalesHeaderAux(SalesHeader);
         exit(SalesHeader."No.");
@@ -184,8 +186,8 @@ codeunit 85200 "NPR Library RS E-Invoice"
         RSEIAuxSalesHeader.SaveRSEIAuxSalesHeaderFields();
     end;
 
-    internal procedure CreateAndPostPrepaymentSalesHeader(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; Customer: Record Customer;
-                                                        GenPostingSetup: Record "General Posting Setup"; VATPostingSetup: Record "VAT Posting Setup") PostedDocumentNo: Code[20]
+    internal procedure CreatePrepaymentSalesHeader(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; Customer: Record Customer;
+                                                        GenPostingSetup: Record "General Posting Setup"; VATPostingSetup: Record "VAT Posting Setup")
     var
         VATPostingSetup2: Record "VAT Posting Setup";
         BankAccountLedgerEntry: Record "Bank Account Ledger Entry";
@@ -193,10 +195,8 @@ codeunit 85200 "NPR Library RS E-Invoice"
         PrepmtNoSeries: Code[20];
         GenPostingType: Enum "General Posting Type";
     begin
-        PrepmtNoSeries := CreateNumberSeries();
-        SalesHeader."Prepayment No. Series" := PrepmtNoSeries;
-        PrepmtNoSeries := CreateNumberSeries();
-        SalesHeader."Prepmt. Cr. Memo No. Series" := PrepmtNoSeries;
+        SalesHeader."Prepayment No. Series" := CreateNumberSeries('PREP');
+        SalesHeader."Prepmt. Cr. Memo No. Series" := CreateNumberSeries('PREPCR');
 
         SalesLine.SetLoadFields("Gen. Bus. Posting Group", "Gen. Prod. Posting Group", "VAT Bus. Posting Group");
         SalesLine.SetRange("Document No.", SalesHeader."No.");
@@ -209,13 +209,10 @@ codeunit 85200 "NPR Library RS E-Invoice"
 
         CreateBankAccountLedgerEntry(BankAccountLedgerEntry, Customer);
         CreateRSSalesHeaderAuxData(SalesHeader, BankAccountLedgerEntry."Entry No.");
-
-        PostedDocumentNo := _LibrarySales.PostSalesPrepaymentInvoice(SalesHeader);
     end;
 
-    internal procedure CreateAndPostSalesCreditMemo(var SalesLine: Record "Sales Line"; GeneralPostingSetup: Record "General Posting Setup"; VATPostingSetup: Record "VAT Posting Setup"; DocumentNo: Code[20]): Code[20]
+    internal procedure CreateSalesCreditMemo(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; GeneralPostingSetup: Record "General Posting Setup"; VATPostingSetup: Record "VAT Posting Setup"; DocumentNo: Code[20]; NoSeriesPrefix: Text)
     var
-        SalesHeader: Record "Sales Header";
         SalesLine2: Record "Sales Line";
         PaymentMethod: Record "Payment Method";
     begin
@@ -224,6 +221,7 @@ codeunit 85200 "NPR Library RS E-Invoice"
         SalesHeader."Payment Method Code" := PaymentMethod.Code;
         SalesHeader."Applies-to Doc. Type" := SalesHeader."Applies-to Doc. Type"::Invoice;
         SalesHeader."Applies-to Doc. No." := DocumentNo;
+        SalesHeader."Posting No. Series" := CreateNumberSeries(NoSeriesPrefix);
         SalesHeader.Modify();
 
         SalesLine2.Init();
@@ -241,7 +239,6 @@ codeunit 85200 "NPR Library RS E-Invoice"
         SalesLine2.Validate("Unit Price", -SalesLine."Unit Price");
         SalesLine2.Insert();
         CreateSalesHeaderAux(SalesHeader);
-        exit(_LibrarySales.PostSalesDocument(SalesHeader, true, true));
     end;
 
     local procedure SalesCreditMemoCopyDocument(var SalesHeader: Record "Sales Header"; CustomerNo: Code[20]; DocumentNo: Code[20])
@@ -331,6 +328,13 @@ codeunit 85200 "NPR Library RS E-Invoice"
         RSEIAuxPurchHeader.ReadRSEIAuxPurchHeaderFields(PurchaseHeader);
         LineAmount := RSEIAuxPurchHeader."NPR RS EI Total Amount";
     end;
+
+    internal procedure PeekNextPostingNo(NoSeriesCode: Code[20]): Code[20]
+    var
+        NoSeries: Codeunit "No. Series";
+    begin
+        exit(NoSeries.PeekNextNo(NoSeriesCode));
+    end;
     #endregion Library RS E-Invoice Misc
 
     #region Library RS E-Invoice Initial Data
@@ -394,14 +398,16 @@ codeunit 85200 "NPR Library RS E-Invoice"
         end;
     end;
 
-    internal procedure CreateNumberSeries(): Text
+    internal procedure CreateNumberSeries(Prefix: Text): Text
     var
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";
         LibraryUtility: Codeunit "Library - Utility";
+        StartingNoLbl: Label '%1_1', Locked = true, Comment = '%1 = Prefix';
+        EndingNoLbl: Label '%1_99999999', Locked = true, Comment = '%1 = Prefix';
     begin
         LibraryUtility.CreateNoSeries(NoSeries, true, false, false);
-        LibraryUtility.CreateNoSeriesLine(NoSeriesLine, NoSeries.Code, 'TEST_1', 'TEST_99999999');
+        LibraryUtility.CreateNoSeriesLine(NoSeriesLine, NoSeries.Code, StrSubstNo(StartingNoLbl, Prefix), StrSubstNo(EndingNoLbl, Prefix));
         exit(NoSeries.Code);
     end;
 

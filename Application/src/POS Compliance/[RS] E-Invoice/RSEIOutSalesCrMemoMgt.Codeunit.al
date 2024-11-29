@@ -15,24 +15,15 @@ codeunit 6184888 "NPR RSEI Out SalesCr.Memo Mgt."
 
     internal procedure CreateRequestAndSendSalesCrMemo(SalesCrMemoHeader: Record "Sales Cr.Memo Header")
     var
-        Customer: Record Customer;
-        RSEIAuxCustomer: Record "NPR RS EI Aux Customer";
         RSEInvoiceDocument: Record "NPR RS E-Invoice Document";
         RSEIAuxSalesCrMemoHdr: Record "NPR RSEI Aux Sales Cr.Memo Hdr";
         RSEICommunicationMgt: Codeunit "NPR RS EI Communication Mgt.";
-        ConfirmManagement: Codeunit "Confirm Management";
         RequestText: Text;
-        ShouldSendDocumentToSEFQst: Label 'Are you sure this document should be sent to SEF?';
     begin
-        Customer.Get(SalesCrMemoHeader."Sell-to Customer No.");
-        RSEIAuxCustomer.ReadRSEIAuxCustomerFields(Customer);
         RSEIAuxSalesCrMemoHdr.ReadRSEIAuxSalesCrMemoHdrFields(SalesCrMemoHeader);
-        if not ((RSEIAuxCustomer."NPR RS E-Invoice Customer") and (RSEIAuxSalesCrMemoHdr."NPR RS EI Send To SEF")) then
-            exit;
 
-        if not (ConfirmManagement.GetResponseOrDefault(ShouldSendDocumentToSEFQst, false)) then begin
-            RSEIAuxSalesCrMemoHdr."NPR RS EI Send To SEF" := false;
-            RSEIAuxSalesCrMemoHdr.SaveRSEIAuxSalesCrMemoHdrFields();
+        if not RSEInvoiceMgt.CheckIfDocumentShouldBeSent(SalesCrMemoHeader."Sell-to Customer No.", SalesCrMemoHeader."No.", RSEIAuxSalesCrMemoHdr."NPR RS EI Send To SEF") then begin
+            RSEIAuxSalesCrMemoHdr.SetRSEIAuxSalesCrMemoHdrSendToSEF(false);
             exit;
         end;
 
@@ -45,7 +36,7 @@ codeunit 6184888 "NPR RSEI Out SalesCr.Memo Mgt."
         CheckIfAppliedDocumentIsApproved(SalesCrMemoHeader);
 
         SalesCrMemoHeader.CalcFields(Amount, "Amount Including VAT", "Invoice Discount Amount");
-        CreateInvoiceXMLDocument(RequestText, SalesCrMemoHeader, Customer, RSEIAuxCustomer, RSEIAuxSalesCrMemoHdr);
+        CreateInvoiceXMLDocument(RequestText, SalesCrMemoHeader, RSEIAuxSalesCrMemoHdr);
         InsertInvoiceDocumentRec(RSEInvoiceDocument, SalesCrMemoHeader, RSEIAuxSalesCrMemoHdr, RequestText);
         RSEICommunicationMgt.SendSalesDocument(RSEInvoiceDocument);
         InsertDataToSalesCrMemoAuxTable(RSEIAuxSalesCrMemoHdr, RSEInvoiceDocument);
@@ -89,15 +80,20 @@ codeunit 6184888 "NPR RSEI Out SalesCr.Memo Mgt."
         RSEIAuxSalesCrMemoHdr.SaveRSEIAuxSalesCrMemoHdrFields();
     end;
 
-    local procedure CreateInvoiceXMLDocument(var DocumentText: Text; SalesCrMemoHeader: Record "Sales Cr.Memo Header"; Customer: Record Customer; RSEIAuxCustomer: Record "NPR RS EI Aux Customer"; RSEIAuxSalesCrMemoHdr: Record "NPR RSEI Aux Sales Cr.Memo Hdr")
+    local procedure CreateInvoiceXMLDocument(var DocumentText: Text; SalesCrMemoHeader: Record "Sales Cr.Memo Header"; RSEIAuxSalesCrMemoHdr: Record "NPR RSEI Aux Sales Cr.Memo Hdr")
     var
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
+        Customer: Record Customer;
+        RSEIAuxCustomer: Record "NPR RS EI Aux Customer";
         Document: XmlDocument;
         CreditNoteElement: XmlElement;
     begin
         SalesCrMemoLine.SetRange("Document No.", SalesCrMemoHeader."No.");
         if not SalesCrMemoLine.FindSet() then
             exit;
+
+        Customer.Get(SalesCrMemoHeader."Sell-to Customer No.");
+        RSEIAuxCustomer.ReadRSEIAuxCustomerFields(Customer);
 
         CreateXmlDocument(Document);
 

@@ -157,6 +157,17 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
             TableRelation = "NPR MM Loyalty Sales Channel".Code;
         }
 
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        modify("Sell-to Customer No.")
+        {
+            trigger OnAfterValidate()
+            var
+                RSEInvoiceMgt: Codeunit "NPR RS E-Invoice Mgt.";
+            begin
+                RSEInvoiceMgt.SetSalesHeaderFieldsFromCustomer(Rec);
+            end;
+        }
+#endif
     }
 
     internal procedure OpenMagentPaymentLines() LookUpOk: Boolean

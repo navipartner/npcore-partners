@@ -15,25 +15,15 @@ codeunit 6184793 "NPR RS EI Out Sales Inv. Mgt."
 
     internal procedure CreateRequestAndSendSalesInvoice(SalesInvoiceHeader: Record "Sales Invoice Header")
     var
-        Customer: Record Customer;
         RSEInvoiceDocument: Record "NPR RS E-Invoice Document";
         RSEIAuxSalesInvHdr: Record "NPR RS EI Aux Sales Inv. Hdr.";
-        RSEIAuxCustomer: Record "NPR RS EI Aux Customer";
         RSEICommunicationMgt: Codeunit "NPR RS EI Communication Mgt.";
-        ConfirmManagement: Codeunit "Confirm Management";
         RequestText: Text;
-        ShouldSendDocumentToSEFQst: Label 'Are you sure this document should be sent to SEF?';
     begin
-        Customer.Get(SalesInvoiceHeader."Sell-to Customer No.");
-        RSEIAuxCustomer.ReadRSEIAuxCustomerFields(Customer);
         RSEIAuxSalesInvHdr.ReadRSEIAuxSalesInvHdrFields(SalesInvoiceHeader);
 
-        if not ((RSEIAuxCustomer."NPR RS E-Invoice Customer") and (RSEIAuxSalesInvHdr."NPR RS EI Send To SEF")) then
-            exit;
-
-        if not (ConfirmManagement.GetResponseOrDefault(ShouldSendDocumentToSEFQst, false)) then begin
-            RSEIAuxSalesInvHdr."NPR RS EI Send To SEF" := false;
-            RSEIAuxSalesInvHdr.SaveRSEIAuxSalesInvHdrFields();
+        if not RSEInvoiceMgt.CheckIfDocumentShouldBeSent(SalesInvoiceHeader."Sell-to Customer No.", SalesInvoiceHeader."No.", RSEIAuxSalesInvHdr."NPR RS EI Send To SEF") then begin
+            RSEIAuxSalesInvHdr.SetRSEIAuxSalesInvHdrSendToSEF(false);
             exit;
         end;
 
@@ -43,7 +33,7 @@ codeunit 6184793 "NPR RS EI Out Sales Inv. Mgt."
         if not RSEInvoiceDocument.IsEmpty() then
             exit;
         SalesInvoiceHeader.CalcFields(Amount, "Amount Including VAT", "Invoice Discount Amount");
-        CreateInvoiceXMLDocument(RequestText, SalesInvoiceHeader, Customer, RSEIAuxCustomer, RSEIAuxSalesInvHdr);
+        CreateInvoiceXMLDocument(RequestText, SalesInvoiceHeader, RSEIAuxSalesInvHdr);
         InsertInvoiceDocumentRec(RSEInvoiceDocument, SalesInvoiceHeader, RSEIAuxSalesInvHdr, RequestText);
         RSEICommunicationMgt.SendSalesDocument(RSEInvoiceDocument);
         InsertDataToSalesInvAuxTable(RSEIAuxSalesInvHdr, RSEInvoiceDocument);
@@ -91,8 +81,10 @@ codeunit 6184793 "NPR RS EI Out Sales Inv. Mgt."
         RSEIAuxSalesInvHdr.SaveRSEIAuxSalesInvHdrFields();
     end;
 
-    local procedure CreateInvoiceXMLDocument(var DocumentText: Text; SalesInvoiceHeader: Record "Sales Invoice Header"; Customer: Record Customer; RSEIAuxCustomer: Record "NPR RS EI Aux Customer"; RSEIAuxSalesInvHdr: Record "NPR RS EI Aux Sales Inv. Hdr.")
+    local procedure CreateInvoiceXMLDocument(var DocumentText: Text; SalesInvoiceHeader: Record "Sales Invoice Header"; RSEIAuxSalesInvHdr: Record "NPR RS EI Aux Sales Inv. Hdr.")
     var
+        Customer: Record Customer;
+        RSEIAuxCustomer: Record "NPR RS EI Aux Customer";
         SalesInvoiceLine: Record "Sales Invoice Line";
         Document: XmlDocument;
         InvoiceElement: XmlElement;
@@ -101,6 +93,9 @@ codeunit 6184793 "NPR RS EI Out Sales Inv. Mgt."
         SalesInvoiceLine.SetRange("Document No.", SalesInvoiceHeader."No.");
         if SalesInvoiceLine.IsEmpty() then
             exit;
+
+        Customer.Get(SalesInvoiceHeader."Sell-to Customer No.");
+        RSEIAuxCustomer.ReadRSEIAuxCustomerFields(Customer);
 
         CreateXmlDocument(Document);
 

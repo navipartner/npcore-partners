@@ -10,6 +10,8 @@ codeunit 85199 "NPR RS EI Sales Tests"
         _Assert: Codeunit Assert;
         _LibrarySales: Codeunit "Library - Sales";
         _Initialized: Boolean;
+        _PostedDocumentNo: Code[20];
+        _PostedDocumentCrMemoNo: Code[20];
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
@@ -29,13 +31,14 @@ codeunit 85199 "NPR RS EI Sales Tests"
         InitializeData();
 
         // [When] Creating Sales Document and Posting it
-        LibraryRSEInvoice.CreateSalesHeaderWLines(SalesHeader, SalesLine, SalesHeader."Document Type"::Order, SalesLine.Type::Item, _Customer, _GeneralPostingSetup, _VATPostingSetup);
+        LibraryRSEInvoice.CreateSalesHeaderWLines(SalesHeader, SalesLine, SalesHeader."Document Type"::Order, SalesLine.Type::Item, _Customer, _GeneralPostingSetup, _VATPostingSetup, 'EISO');
+        _PostedDocumentNo := LibraryRSEInvoice.PeekNextPostingNo(SalesHeader."Posting No. Series");
         PostedDocumentNo := _LibrarySales.PostSalesDocument(SalesHeader, true, true);
 
         // [Then] For Normal Sale RS E-Invoice Document is created and filled
         LibraryRSEInvoice.VerifySalesDocumentIsSentToSEFAndCleanup(SalesHeader."Document Type", PostedDocumentNo);
 
-        // [Cleanup] Unbind Event Subscriptions in Test Library Codeunit and Cleanup Records
+        // [Cleanup] Unbind Event Subscriptions in Test Library Codeunit
         UnbindSubscription(LibraryRSEInvoice);
     end;
 
@@ -58,15 +61,22 @@ codeunit 85199 "NPR RS EI Sales Tests"
         InitializeData();
 
         // [When] Creating Sales Document and Posting it
-        LibraryRSEInvoice.CreateSalesHeaderWLines(SalesHeader, SalesLine, SalesHeader."Document Type"::Order, SalesLine.Type::Item, _Customer, _GeneralPostingSetup, _VATPostingSetup);
-        PrepaymentDocNo := LibraryRSEInvoice.CreateAndPostPrepaymentSalesHeader(SalesHeader, SalesLine, _Customer, _GeneralPostingSetup, _VATPostingSetup);
+        LibraryRSEInvoice.CreateSalesHeaderWLines(SalesHeader, SalesLine, SalesHeader."Document Type"::Order, SalesLine.Type::Item, _Customer, _GeneralPostingSetup, _VATPostingSetup, 'EISPREP');
+
+        LibraryRSEInvoice.CreatePrepaymentSalesHeader(SalesHeader, SalesLine, _Customer, _GeneralPostingSetup, _VATPostingSetup);
+
+        _PostedDocumentNo := LibraryRSEInvoice.PeekNextPostingNo(SalesHeader."Prepayment No. Series");
+        PrepaymentDocNo := _LibrarySales.PostSalesPrepaymentInvoice(SalesHeader);
+
+        _PostedDocumentCrMemoNo := LibraryRSEInvoice.PeekNextPostingNo(SalesHeader."Prepmt. Cr. Memo No. Series");
+        _PostedDocumentNo := LibraryRSEInvoice.PeekNextPostingNo(SalesHeader."Posting No. Series");
         PostedDocumentNo := _LibrarySales.PostSalesDocument(SalesHeader, true, true);
 
         // [Then] For Normal Sale RS E-Invoice Document is created and filled
         LibraryRSEInvoice.VerifySalesDocumentIsSentToSEFAndCleanup(SalesHeader."Document Type", PrepaymentDocNo);
         LibraryRSEInvoice.VerifySalesDocumentIsSentToSEFAndCleanup(SalesHeader."Document Type", PostedDocumentNo);
 
-        // [Cleanup] Unbind Event Subscriptions in Test Library Codeunit and Cleanup Records
+        // [Cleanup] Unbind Event Subscriptions in Test Library Codeunit
         UnbindSubscription(LibraryRSEInvoice);
     end;
 
@@ -76,6 +86,7 @@ codeunit 85199 "NPR RS EI Sales Tests"
     procedure EInvoiceSalesCrMemo()
     var
         SalesHeader: Record "Sales Header";
+        SalesHeader2: Record "Sales Header";
         SalesLine: Record "Sales Line";
         LibraryRSEInvoice: Codeunit "NPR Library RS E-Invoice";
         PostedCreditMemoNo: Code[20];
@@ -90,15 +101,19 @@ codeunit 85199 "NPR RS EI Sales Tests"
         InitializeData();
 
         // [When] Creating Sales Document and Posting it
-        LibraryRSEInvoice.CreateSalesHeaderWLines(SalesHeader, SalesLine, SalesHeader."Document Type"::Order, SalesLine.Type::Item, _Customer, _GeneralPostingSetup, _VATPostingSetup);
+        LibraryRSEInvoice.CreateSalesHeaderWLines(SalesHeader, SalesLine, SalesHeader."Document Type"::Order, SalesLine.Type::Item, _Customer, _GeneralPostingSetup, _VATPostingSetup, 'EISCRM');
+        _PostedDocumentNo := LibraryRSEInvoice.PeekNextPostingNo(SalesHeader."Posting No. Series");
         PostedDocumentNo := _LibrarySales.PostSalesDocument(SalesHeader, true, true);
-        PostedCreditMemoNo := LibraryRSEInvoice.CreateAndPostSalesCreditMemo(SalesLine, _GeneralPostingSetup, _VATPostingSetup, PostedDocumentNo);
+
+        LibraryRSEInvoice.CreateSalesCreditMemo(SalesHeader2, SalesLine, _GeneralPostingSetup, _VATPostingSetup, PostedDocumentNo, 'EISCRM2');
+        _PostedDocumentCrMemoNo := LibraryRSEInvoice.PeekNextPostingNo(SalesHeader2."Posting No. Series");
+        PostedCreditMemoNo := _LibrarySales.PostSalesDocument(SalesHeader2, true, true);
 
         // [Then] For Normal Sale RS E-Invoice Document is created and filled
         LibraryRSEInvoice.VerifySalesDocumentIsSentToSEFAndCleanup(SalesHeader."Document Type", PostedDocumentNo);
         LibraryRSEInvoice.VerifySalesDocumentIsSentToSEFAndCleanup(SalesDocumentType::"Credit Memo", PostedCreditMemoNo);
 
-        // [Cleanup] Unbind Event Subscriptions in Test Library Codeunit and Cleanup Records
+        // [Cleanup] Unbind Event Subscriptions in Test Library Codeunit
         UnbindSubscription(LibraryRSEInvoice);
     end;
 
@@ -127,8 +142,16 @@ codeunit 85199 "NPR RS EI Sales Tests"
     [ConfirmHandler]
     procedure ShouldSendDocumentToSEFConfirmHandler(Question: Text[1024]; var Reply: Boolean)
     begin
-        _Assert.ExpectedMessage('Are you sure this document should be sent to SEF?', Question);
-        Reply := true;
+        if _PostedDocumentCrMemoNo <> '' then begin
+            _Assert.ExpectedMessage(StrSubstNo('Are you sure document %1 should be sent to SEF?', _PostedDocumentCrMemoNo), Question);
+            Reply := true;
+            Clear(_PostedDocumentCrMemoNo);
+        end else
+            if _PostedDocumentNo <> '' then begin
+                _Assert.ExpectedMessage(StrSubstNo('Are you sure document %1 should be sent to SEF?', _PostedDocumentNo), Question);
+                Reply := true;
+                Clear(_PostedDocumentNo);
+            end
     end;
 
     [MessageHandler]
