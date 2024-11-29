@@ -3,7 +3,7 @@ codeunit 6184795 "NPR Shipmondo Events"
     Access = Public;
 
     [IntegrationEvent(false, false)]
-    internal procedure AddEntryOnBeforeShipmentDocumentModify(var ShipmentDocument: Record "NPR Shipping Provider Document")
+    internal procedure AddEntryOnBeforeShipmentDocumentModify(var ShipmentDocument: Record "NPR Shipping Provider Document"; RecRef: RecordRef)
     begin
 
     end;
