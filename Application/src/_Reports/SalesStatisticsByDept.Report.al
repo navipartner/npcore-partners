@@ -24,6 +24,8 @@
             column(VELocSales; VELocSales) { }
             column(VELocPrevYearPerc; VELocPrevYearPerc) { }
             column(VETotalProfit; VETotalProfit) { }
+            column(VELocProfitPct; VELocProfitPct) { }
+            column(VELastYearProfitPct; VELastYearProfitPct) { }
             column(txtDim1; Dim1Txt) { }
             column(VELocLastYearTotalQty; VELocLastYearTotalQty) { }
             column(VELocLastYearTotalCost; VELocLastYearTotalCost) { }
@@ -46,34 +48,34 @@
                 VELocCost := -Buffer."Decimal Field 2";
                 VELocQty := -Buffer."Decimal Field 3";
 
+                if VELocSales = 0 then
+                    VELocProfitPct := 0
+                else
+                    VELocProfitPct := Round((VELocSales - VELocCost) / VELocSales, 0.01);
+
                 VETotalProfit := VELocSales - VELocCost;
                 VETotalGlobalProfit += VETotalProfit;
-                if VELocQty = 0 then
-                    CurrentYearShow := false;
-
-                if ((Dim1Filter <> '') and (Dim1Filter <> Code)) or (VELocQty = 0) then
-                    CurrentYearShow := false;
-
 
                 VELocLastYearTotalCost := 0;
                 VELocLastYearTotalQty := 0;
                 VELocLastYearTotalSales := 0;
-                LastYearShow := true;
+
                 if LastYear then begin
+                    LastYearShow := true;
                     VELocLastYearTotalSales := Buffer."Decimal Field 4";
                     VELocLastYearTotalCost := -Buffer."Decimal Field 5";
                     VELocLastYearTotalQty := -Buffer."Decimal Field 6";
                     VELocLastYearTotalProfit := VELocLastYearTotalSales - VELocLastYearTotalCost;
                     VELastYearTotalGlobalProfit += VELocLastYearTotalProfit;
-
-                    if ((Dim1Filter <> '') and (Dim1Filter <> Code)) or (VELocLastYearTotalQty = 0) then
-                        LastYearShow := false;
+                    if VELocLastYearTotalSales = 0 then
+                        VELastYearProfitPct := 0
+                    else
+                        VELastYearProfitPct := Round((VELocLastYearTotalSales - VELocLastYearTotalCost) / VELocLastYearTotalSales, 0.01)
                 end;
             end;
 
             trigger OnPostDataItem()
             begin
-                LastYearShow := LastYear;
             end;
         }
 
@@ -264,6 +266,8 @@
         VELocSales: Decimal;
         VETotalGlobalProfit: Decimal;
         VETotalProfit: Decimal;
+        VELocProfitPct: Decimal;
+        VELastYearProfitPct: Decimal;
         DateFilter: Text;
         Dim1Filter: Text;
         Dim1Txt: Text;
