@@ -584,7 +584,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=(Fields!VELocSales.Value - Fields!VELocCost.Value)/Fields!VELocSales.Value</Value>
+                                  <Value>=Fields!VELocProfitPct.Value</Value>
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <Format>0%</Format>
@@ -834,7 +834,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=(Fields!VELocLastYearTotalSales.Value-Fields!VELocLastYearTotalCost.Value)/Fields!VELocLastYearTotalSales.Value</Value>
+                                  <Value>=Fields!VELastYearProfitPct.Value</Value>
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <Format>0%</Format>
@@ -2062,6 +2062,18 @@ End Function
         </Field>
         <Field Name="VETotalProfitFormat">
           <DataField>VETotalProfitFormat</DataField>
+        </Field>
+        <Field Name="VELocProfitPct">
+          <DataField>VELocProfitPct</DataField>
+        </Field>
+        <Field Name="VELocProfitPctFormat">
+          <DataField>VELocProfitPctFormat</DataField>
+        </Field>
+        <Field Name="VELastYearProfitPct">
+          <DataField>VELastYearProfitPct</DataField>
+        </Field>
+        <Field Name="VELastYearProfitPctFormat">
+          <DataField>VELastYearProfitPctFormat</DataField>
         </Field>
         <Field Name="txtDim1">
           <DataField>txtDim1</DataField>
