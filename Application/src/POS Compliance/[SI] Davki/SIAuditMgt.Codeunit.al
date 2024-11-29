@@ -364,6 +364,7 @@ codeunit 6151546 "NPR SI Audit Mgt."
         SalespersonPurchaser.Get(POSEntry."Salesperson Code");
         SIAuxSalespPurch.ReadSIAuxSalespersonFields(SalespersonPurchaser);
         SIPOSAuditLogAuxInfo."Cashier ID" := SIAuxSalespPurch."NPR SI Salesperson Tax Number";
+        SIPOSAuditLogAuxInfo."Salesperson Code" := POSEntry."Salesperson Code";
         SIPOSAuditLogAuxInfo."Customer VAT Number" := GetCustomerVATRegistrationNo(POSEntry."Customer No.");
 
         SIPOSAuditLogAuxInfo.Insert(true);
@@ -396,6 +397,7 @@ codeunit 6151546 "NPR SI Audit Mgt."
         SalespersonPurchaser.Get(SalesInvoiceHeader."Salesperson Code");
         SIAuxSalespPurch.ReadSIAuxSalespersonFields(SalespersonPurchaser);
         SIPOSAuditLogAuxInfo."Cashier ID" := SIAuxSalespPurch."NPR SI Salesperson Tax Number";
+        SIPOSAuditLogAuxInfo."Salesperson Code" := SalesInvoiceHeader."Salesperson Code";
         SIPOSAuditLogAuxInfo."Customer VAT Number" := GetCustomerVATRegistrationNo(SalesInvoiceHeader."Sell-to Customer No.");
 
         SIPOSAuditLogAuxInfo.Insert(true);
@@ -439,6 +441,7 @@ codeunit 6151546 "NPR SI Audit Mgt."
         SalespersonPurchaser.Get(SalesCrMemoHeader."Salesperson Code");
         SIAuxSalespPurch.ReadSIAuxSalespersonFields(SalespersonPurchaser);
         SIPOSAuditLogAuxInfo."Cashier ID" := SIAuxSalespPurch."NPR SI Salesperson Tax Number";
+        SIPOSAuditLogAuxInfo."Salesperson Code" := SalesCrMemoHeader."Salesperson Code";
         SIPOSAuditLogAuxInfo."Customer VAT Number" := GetCustomerVATRegistrationNo(SalesCrMemoHeader."Sell-to Customer No.");
 
         SIPOSAuditLogAuxInfo.Insert(true);

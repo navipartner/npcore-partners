@@ -163,6 +163,11 @@ table 6059838 "NPR SI POS Audit Log Aux. Info"
             Caption = 'Customer VAT Number';
             DataClassification = CustomerContent;
         }
+        field(31; "Salesperson Code"; Code[20])
+        {
+            Caption = 'Salesperson Code';
+            DataClassification = CustomerContent;
+        }
         field(35; "Return Additional Info"; Text[250])
         {
             Caption = 'Return Additional Info';
