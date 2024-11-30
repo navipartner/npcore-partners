@@ -3,7 +3,7 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
     Access = Internal;
 
     var
-        SIFiscalSetup: Record "NPR SI Fiscalization Setup";
+        SIFiscalizationSetup: Record "NPR SI Fiscalization Setup";
         SIAuditMgt: Codeunit "NPR SI Audit Mgt.";
         FuNamespaceUriLbl: Label 'http://www.fu.gov.si/', Locked = true;
         SoapEnvNamespaceUriLbl: Label 'http://schemas.xmlsoap.org/soap/envelope/', Locked = true;
@@ -38,7 +38,7 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
         InvRequest: XmlElement;
     begin
         CompanyInformation.Get();
-        SIFiscalSetup.Get();
+        SIFiscalizationSetup.Get();
         Document := XmlDocument.Create('', '');
         Document.SetDeclaration(XmlDeclaration.Create('1.0', 'UTF-8', 'yes'));
 
@@ -64,7 +64,7 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
 
         Invoice := XmlElement.Create('Invoice', FuNamespaceUriLbl);
 
-        Invoice.Add(CreateXmlElement('TaxNumber', FuNamespaceUriLbl, SIFiscalSetup."Certificate Subject Ident."));
+        Invoice.Add(CreateXmlElement('TaxNumber', FuNamespaceUriLbl, SIFiscalizationSetup."Certificate Subject Ident."));
         Invoice.Add(CreateXmlElement('IssueDateTime', FuNamespaceUriLbl, StrSubstNo(DateTimeFormatLbl, Format(SIPOSAuditLogAuxInfo."Entry Date", 10, '<Year4>-<Month,2>-<Day,2>'), Format(SIPOSAuditLogAuxInfo."Log Timestamp", 0, '<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>'))));
         Invoice.Add(CreateXmlElement('NumberingStructure', FuNamespaceUriLbl, 'C'));
 
@@ -117,7 +117,7 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
         TaxesSection: XmlElement;
     begin
         CompanyInformation.Get();
-        SIFiscalSetup.Get();
+        SIFiscalizationSetup.Get();
         Document := XmlDocument.Create('', '');
         Document.SetDeclaration(XmlDeclaration.Create('1.0', 'UTF-8', 'yes'));
 
@@ -143,7 +143,7 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
 
         Invoice := XmlElement.Create('SalesBookInvoice', FuNamespaceUriLbl);
 
-        Invoice.Add(CreateXmlElement('TaxNumber', FuNamespaceUriLbl, SIFiscalSetup."Certificate Subject Ident."));
+        Invoice.Add(CreateXmlElement('TaxNumber', FuNamespaceUriLbl, SIFiscalizationSetup."Certificate Subject Ident."));
         Invoice.Add(CreateXmlElement('IssueDateTime', FuNamespaceUriLbl, StrSubstNo(DateTimeFormatLbl, Format(SIPOSAuditLogAuxInfo."Entry Date", 10, '<Year4>-<Month,2>-<Day,2>'), Format(SIPOSAuditLogAuxInfo."Log Timestamp", 0, '<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>'))));
 
         InvoiceIdent := XmlElement.Create('SalesBookIdentifier', FuNamespaceUriLbl);
@@ -327,6 +327,7 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
     var
         POSStore: Record "NPR POS Store";
         TimeStampLbl: Label '%1T%2Z', Locked = true, Comment = '%1 = Entry Date, %2 = Time Stamp';
+        SoftwareSupplierLbl: Label 'Navi Partner København ApS, Titangade 16 DK-2200 København N', Locked = true;
         FormattedDateTime: Text;
         HouseNumberAdditional: Text;
         IdPoruke: Text;
@@ -342,7 +343,7 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
         RealEstateBP: XmlElement;
         SoftwareSupplier: XmlElement;
     begin
-        SIFiscalSetup.Get();
+        SIFiscalizationSetup.Get();
         POSStore.SetRange(Code, SIPOSStoreMapping."POS Store Code");
         POSStore.FindFirst();
 
@@ -367,7 +368,7 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
         BPremiseRequest.Add(Header);
 
         BPremise := XmlElement.Create('BusinessPremise', FuNamespaceUriLbl);
-        BPremise.Add(CreateXmlElement('TaxNumber', FuNamespaceUriLbl, SIFiscalSetup."Certificate Subject Ident."));
+        BPremise.Add(CreateXmlElement('TaxNumber', FuNamespaceUriLbl, SIFiscalizationSetup."Certificate Subject Ident."));
         BPremise.Add(CreateXmlElement('BusinessPremiseID', FuNamespaceUriLbl, POSStore.Code));
 
         BPIdentifier := XmlElement.Create('BPIdentifier', FuNamespaceUriLbl);
@@ -399,7 +400,7 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
         BPremise.Add(CreateXmlElement('ValidityDate', FuNamespaceUriLbl, Format(SIPOSStoreMapping."Validity Date", 10, '<Year4>-<Month,2>-<Day,2>')));
 
         SoftwareSupplier := XmlElement.Create('SoftwareSupplier', FuNamespaceUriLbl);
-        SoftwareSupplier.Add(CreateXmlElement('TaxNumber', FuNamespaceUriLbl, '21382191'));
+        SoftwareSupplier.Add(CreateXmlElement('NameForeign', FuNamespaceUriLbl, SoftwareSupplierLbl));
         BPremise.Add(SoftwareSupplier);
         BPremiseRequest.Add(BPremise);
 
@@ -553,7 +554,8 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
         BaseZoiValue := HexadecimalConvert.BigHexToText(SIPOSAuditLogAuxInfo."ZOI Code".ToUpper());
         if StrLen(BaseZoiValue) < 39 then
             BaseZoiValue := BaseZoiValue.PadLeft(39, '0');
-        NewValue := BaseZoiValue + Format(SIPOSAuditLogAuxInfo."Cashier ID") + Format(SIPOSAuditLogAuxInfo."Entry Date", 6, '<Year,2><Month,2><Day,2>') + Format(SIPOSAuditLogAuxInfo."Log Timestamp", 6, '<Hours24,2><Filler Character,0><Minutes,2><Seconds,2>');
+
+        NewValue := BaseZoiValue + Format(SIFiscalizationSetup."Certificate Subject Ident.") + Format(SIPOSAuditLogAuxInfo."Entry Date", 6, '<Year,2><Month,2><Day,2>') + Format(SIPOSAuditLogAuxInfo."Log Timestamp", 6, '<Hours24,2><Filler Character,0><Minutes,2><Seconds,2>');
 
         NewValue := DelChr(NewValue, '=', ' :.');
         for i := 1 to StrLen(NewValue) do begin
