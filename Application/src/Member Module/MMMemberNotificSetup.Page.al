@@ -188,7 +188,7 @@
 
             action(RenewNotificationsList)
             {
-                Caption = 'View Renewal Notifications';
+                Caption = 'View For Renewal Notifications';
                 ToolTip = 'Navigate to the Notification List Page';
                 Ellipsis = true;
                 Image = Interaction;
@@ -299,7 +299,7 @@
 
                 action(RefreshRenewNotification)
                 {
-                    Caption = 'Recreate All Renew Notifications';
+                    Caption = 'Recreate All For Renewal Notifications';
                     Image = Recalculate;
                     ToolTip = 'Executes the Refresh Renew Notification action';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;

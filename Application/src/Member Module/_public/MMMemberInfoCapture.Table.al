@@ -333,6 +333,12 @@
             TableRelation = "NPR NpCs Store";
             ValidateTableRelation = false;
         }
+        field(600; "Member Payment Method"; Integer)
+        {
+            Caption = 'Member Payment Method';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM Member Payment Method"."Entry No.";
+        }
         field(1000; "Receipt No."; Code[20])
         {
             Caption = 'Receipt No.';

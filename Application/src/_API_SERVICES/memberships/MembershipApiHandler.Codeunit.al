@@ -37,6 +37,9 @@ codeunit 6185122 "NPR MembershipApiHandler"
             _ApiFunction::GET_MEMBERSHIP_USING_NUMBER:
                 _Response := MembershipApiAgent.GetMembershipByNumber(_Request);
 
+            _ApiFunction::GET_MEMBERSHIP_RENEWAL_INFO:
+                _Response := MembershipApiAgent.GetMembershipRenewalInfo(_Request);
+
             _ApiFunction::GET_ALL_PAYMENT_METHODS:
                 _Response := PaymentMethodApiAgent.GetPaymentMethods(_Request);
 

@@ -401,7 +401,6 @@
                         _PreSelectedCustomerContact := (Rec."Customer No." <> '');
                     end;
                 }
-
             }
             group(CRM)
             {

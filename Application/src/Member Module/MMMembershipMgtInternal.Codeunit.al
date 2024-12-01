@@ -193,11 +193,13 @@
         MemberArrivalLogEntry: Record "NPR MM Member Arr. Log Entry";
         MemberCommunication: Record "NPR MM Member Communication";
         RequestMemberFieldUpdate: Record "NPR MM Request Member Update";
+        Subscription: Record "NPR MM Subscription";
         GdprManagement: Codeunit "NPR NP GDPR Management";
         GdprAnonymizeRequestWS: Codeunit "NPR GDPR Anon. Req. WS";
         OriginalCustomerNo: Code[20];
         MembershipTimeFrameEntries: Boolean;
         AnonymizeResponseCode: Integer;
+        MMMemberPaymentMethod: Record "NPR MM Member Payment Method";
     begin
 
         if (MembershipEntryNo = 0) then
@@ -259,6 +261,11 @@
                 if (GdprAnonymizeRequestWS.CanCustomerBeAnonymized(OriginalCustomerNo, '', AnonymizeResponseCode)) then
                     GdprManagement.AnonymizeCustomer(OriginalCustomerNo);
 
+            MMMemberPaymentMethod.SetRange("Table No.", Database::"NPR MM Membership");
+            MMMemberPaymentMethod.SetRange("BC Record ID", Membership.RecordId);
+            if not MMMemberPaymentMethod.IsEmpty() then
+                MMMemberPaymentMethod.DeleteAll(true);
+
         end;
 
         TempMembershipRole.Reset();
@@ -299,6 +306,10 @@
 
             until (TempMembershipRole.Next() = 0);
         end;
+
+        Subscription.SetRange("Membership Entry No.", Membership."Entry No.");
+        if not Subscription.IsEmpty() then
+            Subscription.DeleteAll(true);
 
         if (DeleteMembershipRecord) then
             Membership.Delete();
@@ -1750,6 +1761,13 @@
                     Membership.Modify();
                 end;
 
+            if MemberInfoCapture."Enable Auto-Renew" then begin
+                Membership."Auto-Renew" := Membership."Auto-Renew"::YES_INTERNAL;
+                Membership."Auto-Renew Payment Method Code" := MemberInfoCapture."Auto-Renew Payment Method Code";
+                Membership.Modify();
+            end;
+
+
             MemberInfoCapture."Membership Code" := Membership."Membership Code";
 
             if (not CheckExtendMemberCards(true, MemberInfoCapture."Membership Entry No.", MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."External Card No.", MemberInfoCapture."Card Entry No.", ReasonText)) then
@@ -2228,12 +2246,9 @@
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         Membership: Record "NPR MM Membership";
         MembershipEntry: Record "NPR MM Membership Entry";
-        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
         MembershipStartDate: Date;
         MembershipUntilDate: Date;
-        HaveAutoRenewItem: Boolean;
-        PlaceHolderLbl: Label '%1 for %2', Locked = true;
         PlaceHolder2Lbl: Label '%1 with %2', Locked = true;
     begin
 
@@ -2251,51 +2266,9 @@
             exit(0);
         end;
 
-        HaveAutoRenewItem := (RenewWithItemNo <> '');
-        if (not HaveAutoRenewItem) then begin
-            case MembershipEntry.Context of
-                MembershipEntry.Context::NEW:
-                    begin
-                        HaveAutoRenewItem := MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MembershipEntry."Item No.");
-                        RenewWithItemNo := MembershipSalesSetup."Auto-Renew To";
-                    end;
-                MembershipEntry.Context::RENEW:
-                    begin
-                        HaveAutoRenewItem := MembershipAlterationSetup.Get(MembershipAlterationSetup."Alteration Type"::RENEW, Membership."Membership Code", MembershipEntry."Item No.");
-                        RenewWithItemNo := MembershipAlterationSetup."Auto-Renew To";
-                    end;
-                MembershipEntry.Context::EXTEND:
-                    begin
-                        HaveAutoRenewItem := MembershipAlterationSetup.Get(MembershipAlterationSetup."Alteration Type"::EXTEND, Membership."Membership Code", MembershipEntry."Item No.");
-                        RenewWithItemNo := MembershipAlterationSetup."Auto-Renew To";
-                    end;
-                MembershipEntry.Context::UPGRADE:
-                    begin
-                        HaveAutoRenewItem := MembershipAlterationSetup.Get(MembershipAlterationSetup."Alteration Type"::UPGRADE, Membership."Membership Code", MembershipEntry."Item No.");
-                        RenewWithItemNo := MembershipAlterationSetup."Auto-Renew To";
-                    end;
-                MembershipEntry.Context::AUTORENEW:
-                    begin
-                        HaveAutoRenewItem := MembershipAlterationSetup.Get(MembershipAlterationSetup."Alteration Type"::AUTORENEW, Membership."Membership Code", MembershipEntry."Item No.");
-                        RenewWithItemNo := MembershipAlterationSetup."Auto-Renew To";
-                    end;
-            end;
-        end;
-
-        if (not HaveAutoRenewItem) then begin
-            HaveAutoRenewItem := MembershipAlterationSetup.Get(MembershipAlterationSetup."Alteration Type"::AUTORENEW, Membership."Membership Code", MembershipEntry."Item No.");
-            RenewWithItemNo := MembershipAlterationSetup."Auto-Renew To";
-        end;
-
-        if (not HaveAutoRenewItem) then begin
-            ReasonText := StrSubstNo(NOT_FOUND, 'Auto-Renew rule', StrSubstNo(PlaceHolderLbl, MembershipEntry.Context, MembershipEntry."Item No."));
+        MembershipEntry."Membership Code" := Membership."Membership Code";
+        if not GetAutoRenewItemNo(MembershipEntry, RenewWithItemNo, ReasonText) then
             exit(0);
-        end;
-
-        if (RenewWithItemNo = '') then begin
-            ReasonText := StrSubstNo(NOT_FOUND, 'Auto-Renew rule item', StrSubstNo(PlaceHolderLbl, MembershipEntry.Context, MembershipEntry."Item No."));
-            exit(0);
-        end;
 
         if (not MembershipAlterationSetup.Get(MembershipAlterationSetup."Alteration Type"::AUTORENEW, Membership."Membership Code", RenewWithItemNo)) then begin
             ReasonText := StrSubstNo(NOT_FOUND, 'Auto-Renew item', StrSubstNo(PlaceHolder2Lbl, MembershipEntry.Context::AUTORENEW, RenewWithItemNo));
@@ -2312,7 +2285,7 @@
         MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::AUTORENEW;
         MemberInfoCapture."Document Date" := Today(); // Active
 
-        if (not AutoRenewMembershipWorker(MemberInfoCapture, false, MembershipStartDate, MembershipUntilDate, MemberInfoCapture."Unit Price", ReasonText)) then
+        if (not AutoRenewMembershipWorker(MemberInfoCapture, false, Today(), MembershipStartDate, MembershipUntilDate, MemberInfoCapture."Unit Price", ReasonText)) then
             exit(0);
 
         MemberInfoCapture."Valid Until" := MembershipStartDate;
@@ -2322,17 +2295,76 @@
         exit(MemberInfoCapture."Entry No.");
     end;
 
+    internal procedure GetAutoRenewItemNo(MembershipEntry: Record "NPR MM Membership Entry"; var RenewWithItemNo: Code[20]; var ReasonText: Text): Boolean
+    var
+        MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        HaveAutoRenewItem: Boolean;
+        PlaceHolderLbl: Label '%1 for %2', Locked = true;
+    begin
+        HaveAutoRenewItem := (RenewWithItemNo <> '');
+        if (not HaveAutoRenewItem) then begin
+            case MembershipEntry.Context of
+                MembershipEntry.Context::NEW:
+                    begin
+                        HaveAutoRenewItem := MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MembershipEntry."Item No.");
+                        RenewWithItemNo := MembershipSalesSetup."Auto-Renew To";
+                    end;
+                MembershipEntry.Context::RENEW:
+                    begin
+                        HaveAutoRenewItem := MembershipAlterationSetup.Get(MembershipAlterationSetup."Alteration Type"::RENEW, MembershipEntry."Membership Code", MembershipEntry."Item No.");
+                        RenewWithItemNo := MembershipAlterationSetup."Auto-Renew To";
+                    end;
+                MembershipEntry.Context::EXTEND:
+                    begin
+                        HaveAutoRenewItem := MembershipAlterationSetup.Get(MembershipAlterationSetup."Alteration Type"::EXTEND, MembershipEntry."Membership Code", MembershipEntry."Item No.");
+                        RenewWithItemNo := MembershipAlterationSetup."Auto-Renew To";
+                    end;
+                MembershipEntry.Context::UPGRADE:
+                    begin
+                        HaveAutoRenewItem := MembershipAlterationSetup.Get(MembershipAlterationSetup."Alteration Type"::UPGRADE, MembershipEntry."Membership Code", MembershipEntry."Item No.");
+                        RenewWithItemNo := MembershipAlterationSetup."Auto-Renew To";
+                    end;
+                MembershipEntry.Context::AUTORENEW:
+                    begin
+                        HaveAutoRenewItem := MembershipAlterationSetup.Get(MembershipAlterationSetup."Alteration Type"::AUTORENEW, MembershipEntry."Membership Code", MembershipEntry."Item No.");
+                        RenewWithItemNo := MembershipAlterationSetup."Auto-Renew To";
+                    end;
+            end;
+        end;
+
+        if (not HaveAutoRenewItem) then begin
+            HaveAutoRenewItem := MembershipAlterationSetup.Get(MembershipAlterationSetup."Alteration Type"::AUTORENEW, MembershipEntry."Membership Code", MembershipEntry."Item No.");
+            RenewWithItemNo := MembershipAlterationSetup."Auto-Renew To";
+        end;
+
+        if (not HaveAutoRenewItem) then begin
+            ReasonText := StrSubstNo(NOT_FOUND, 'Auto-Renew rule', StrSubstNo(PlaceHolderLbl, MembershipEntry.Context, MembershipEntry."Item No."));
+            exit(false);
+        end;
+
+        if (RenewWithItemNo = '') then begin
+            ReasonText := StrSubstNo(NOT_FOUND, 'Auto-Renew rule item', StrSubstNo(PlaceHolderLbl, MembershipEntry.Context, MembershipEntry."Item No."));
+            exit(false);
+        end;
+
+        exit(true);
+    end;
+
     internal procedure AutoRenewMembership(var MemberInfoCapture: Record "NPR MM Member Info Capture"; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal): Boolean
     var
         ReasonText: Text;
     begin
-
-        exit(AutoRenewMembershipWorker(MemberInfoCapture, WithUpdate, OutStartDate, OutUntilDate, SuggestedUnitPrice, ReasonText));
+        exit(AutoRenewMembership(MemberInfoCapture, WithUpdate, Today(), OutStartDate, OutUntilDate, SuggestedUnitPrice, ReasonText));
     end;
 
-    local procedure AutoRenewMembershipWorker(var MemberInfoCapture: Record "NPR MM Member Info Capture"; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal; var ReasonText: Text): Boolean
+    internal procedure AutoRenewMembership(var MemberInfoCapture: Record "NPR MM Member Info Capture"; WithUpdate: Boolean; RenewalDate: Date; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal; var ReasonText: Text): Boolean
+    begin
+        exit(AutoRenewMembershipWorker(MemberInfoCapture, WithUpdate, RenewalDate, OutStartDate, OutUntilDate, SuggestedUnitPrice, ReasonText));
+    end;
+
+    local procedure AutoRenewMembershipWorker(var MemberInfoCapture: Record "NPR MM Member Info Capture"; WithUpdate: Boolean; RenewalDate: Date; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal; var ReasonText: Text): Boolean
     var
-        MembershipAutoRenew: Codeunit "NPR MM Membership Auto Renew";
         Membership: Record "NPR MM Membership";
         MembershipEntry: Record "NPR MM Membership Entry";
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
@@ -2341,9 +2373,10 @@
         EndDateNew: Date;
         EntryNo: Integer;
     begin
-
+        if RenewalDate = 0D then
+            RenewalDate := Today();
         if (MemberInfoCapture."Document Date" = 0D) then
-            MemberInfoCapture."Document Date" := Today();
+            MemberInfoCapture."Document Date" := RenewalDate;
 
         Membership.Get(MemberInfoCapture."Membership Entry No.");
 
@@ -2365,8 +2398,8 @@
 
         Item.Get(MemberInfoCapture."Item No.");
 
-        if (MembershipEntry."Valid Until Date" < Today) then
-            MembershipEntry."Valid Until Date" := CalcDate('<-1D>', Today);
+        if (MembershipEntry."Valid Until Date" < RenewalDate) then
+            MembershipEntry."Valid Until Date" := CalcDate('<-1D>', RenewalDate);
 
         case MembershipAlterationSetup."Alteration Activate From" of
             MembershipAlterationSetup."Alteration Activate From"::ASAP:
@@ -2382,8 +2415,8 @@
 
         end;
 
-        if (StartDateNew < Today) then
-            StartDateNew := Today();
+        if (StartDateNew < RenewalDate) then
+            StartDateNew := RenewalDate;
 
         EndDateNew := CalcDate(MembershipAlterationSetup."Membership Duration", StartDateNew);
 
@@ -2391,9 +2424,9 @@
             exit(ExitFalseOrWithError(false, StrSubstNo(CONFLICTING_ENTRY, StartDateNew, EndDateNew)));
 
         if (not MembershipAlterationSetup."Stacking Allowed") then
-            if (GetLedgerEntryForDate(Membership."Entry No.", Today, EntryNo)) then
+            if (GetLedgerEntryForDate(Membership."Entry No.", RenewalDate, EntryNo)) then
                 if (EntryNo <> MembershipEntry."Entry No.") then
-                    exit(ExitFalseOrWithError(false, StrSubstNo(STACKING_NOT_ALLOWED, Membership."Entry No.", Today)));
+                    exit(ExitFalseOrWithError(false, StrSubstNo(STACKING_NOT_ALLOWED, Membership."Entry No.", RenewalDate)));
 
         SuggestedUnitPrice := Item."Unit Price";
         SuggestedUnitPrice += MembershipAlterationSetup."Member Unit Price" * GetMembershipMemberCountForAlteration(Membership."Entry No.", MembershipAlterationSetup);
@@ -2402,23 +2435,41 @@
             exit(false);
 
         if (WithUpdate) then begin
-            MemberInfoCapture."Duration Formula" := MembershipAlterationSetup."Membership Duration";
             MemberInfoCapture."Membership Code" := Membership."Membership Code";
-
-            if (not MembershipAutoRenew.CreateInvoice(MemberInfoCapture, StartDateNew, EndDateNew)) then
+            if not CarryOutMembershipRenewal(MemberInfoCapture, MembershipAlterationSetup, StartDateNew, EndDateNew, EntryNo, ReasonText) then
                 exit(false);
-
-            if (not CheckExtendMemberCards(true, MemberInfoCapture."Membership Entry No.", MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."External Card No.", MemberInfoCapture."Card Entry No.", ReasonText)) then
-                exit(false);
-
-            EntryNo := AddMembershipLedgerEntry(MemberInfoCapture."Membership Entry No.", MemberInfoCapture, StartDateNew, EndDateNew);
-
-            OnMembershipChangeEvent(MembershipEntry."Membership Entry No.");
         end;
 
         ReasonText := 'Ok';
         OutStartDate := StartDateNew;
         OutUntilDate := EndDateNew;
+        exit(true);
+    end;
+
+    internal procedure CarryOutMembershipRenewal(var MemberInfoCapture: Record "NPR MM Member Info Capture"; MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; StartDateNew: Date; EndDateNew: Date; var EntryNo: Integer; var ReasonText: Text): Boolean
+    var
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+    begin
+        SubscriptionRequest."New Valid From Date" := StartDateNew;
+        SubscriptionRequest."New Valid Until Date" := EndDateNew;
+
+        exit(CarryOutMembershipRenewal(SubscriptionRequest, MemberInfoCapture, MembershipAlterationSetup, EntryNo, ReasonText));
+    end;
+
+    [CommitBehavior(CommitBehavior::Error)]
+    internal procedure CarryOutMembershipRenewal(var SubscriptionRequest: Record "NPR MM Subscr. Request"; var MemberInfoCapture: Record "NPR MM Member Info Capture"; MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; var EntryNo: Integer; var ReasonText: Text): Boolean
+    var
+        MembershipAutoRenew: Codeunit "NPR MM Membership Auto Renew";
+    begin
+        MemberInfoCapture."Duration Formula" := MembershipAlterationSetup."Membership Duration";
+
+        if (not MembershipAutoRenew.CreateInvoice(SubscriptionRequest, MemberInfoCapture)) then
+            exit(false);
+        if (not CheckExtendMemberCards(true, MemberInfoCapture."Membership Entry No.", MembershipAlterationSetup."Card Expired Action", SubscriptionRequest."New Valid Until Date", MemberInfoCapture."External Card No.", MemberInfoCapture."Card Entry No.", ReasonText)) then
+            exit(false);
+        EntryNo := AddMembershipLedgerEntry(MemberInfoCapture."Membership Entry No.", MemberInfoCapture, SubscriptionRequest."New Valid From Date", SubscriptionRequest."New Valid Until Date");
+
+        OnMembershipChangeEvent(MemberInfoCapture."Membership Entry No.");
         exit(true);
     end;
 
@@ -3034,6 +3085,21 @@
         exit(GetCommunicationMethodWorker(MemberEntryNo, MembershipEntryNo, MemberCommunication."Message Type"::COUPONS, Method, Address, Engine));
     end;
 
+    internal procedure GetCommunicationMethod_RenewalSuccess(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
+    var
+        MemberCommunication: Record "NPR MM Member Communication";
+    begin
+
+        exit(GetCommunicationMethodWorker(MemberEntryNo, MembershipEntryNo, MemberCommunication."Message Type"::RENEWAL_SUCCESS, Method, Address, Engine));
+    end;
+
+    internal procedure GetCommunicationMethod_RenewalFailure(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
+    var
+        MemberCommunication: Record "NPR MM Member Communication";
+    begin
+
+        exit(GetCommunicationMethodWorker(MemberEntryNo, MembershipEntryNo, MemberCommunication."Message Type"::RENEWAL_FAILURE, Method, Address, Engine));
+    end;
 
     local procedure GetCommunicationMethodWorker(MemberEntryNo: Integer; MembershipEntryNo: Integer; MessageType: Option; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
     var
@@ -3163,6 +3229,14 @@
     begin
 
         MemberNotification.AddMembershipRenewalNotification(MembershipLedgerEntry);
+    end;
+
+    local procedure AddMembershipRenewalSuccessNotification(MembershipLedgerEntry: Record "NPR MM Membership Entry")
+    var
+        MemberNotification: Codeunit "NPR MM Member Notification";
+    begin
+
+        MemberNotification.AddMembershipRenewalSuccessNotification(MembershipLedgerEntry);
     end;
 
     local procedure AddMemberCreateNotification(MembershipEntryNo: Integer; MembershipSetup: Record "NPR MM Membership Setup"; Member: Record "NPR MM Member"; MemberInfoCapture: Record "NPR MM Member Info Capture")
@@ -3566,6 +3640,7 @@
         ConfigTemplateMgt: Codeunit "Config. Template Management";
         RecRef: RecordRef;
         MemberNotification: Codeunit "NPR MM Member Notification";
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
         Item: Record Item;
     begin
 
@@ -3645,8 +3720,11 @@
 
         MembershipEvents.OnAfterInsertMembershipEntry(MembershipLedgerEntry);
 
-        if (not MembershipLedgerEntry."Activate On First Use") then
+        if (not MembershipLedgerEntry."Activate On First Use") then begin
             AddMembershipRenewalNotification(MembershipLedgerEntry);
+            if MembershipLedgerEntry.Context <> MembershipLedgerEntry.Context::REGRET then
+                SubscriptionMgtImpl.UpdateMembershipSubscriptionDetails(MembershipLedgerEntry);
+        end;
 
         if ((MembershipSetup."Enable NP Pass Integration") and
             (MemberInfoCapture."Information Context" <> MemberInfoCapture."Information Context"::FOREIGN)) then begin
@@ -3681,6 +3759,9 @@
             end;
         end;
 
+        if MemberInfoCapture."Information Context" = MemberInfoCapture."Information Context"::AUTORENEW then
+            AddMembershipRenewalSuccessNotification(MembershipLedgerEntry);
+
         exit(MembershipLedgerEntry."Entry No.");
     end;
 
@@ -3690,6 +3771,7 @@
         Membership: Record "NPR MM Membership";
         MemberCard: Record "NPR MM Member Card";
         MembershipSetup: Record "NPR MM Membership Setup";
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
     begin
 
         Membership.Get(MembershipEntryNo);
@@ -3715,6 +3797,7 @@
         MembershipEvents.OnAfterInsertMembershipEntry(MembershipEntry);
 
         AddMembershipRenewalNotification(MembershipEntry);
+        SubscriptionMgtImpl.UpdateMembershipSubscriptionDetails(Membership, MembershipEntry);
 
     end;
 
@@ -3782,7 +3865,9 @@
         MembershipSetup: Record "NPR MM Membership Setup";
         Community: Record "NPR MM Member Community";
         Membership: Record "NPR MM Membership";
+        MMPaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
         MembershipCreated: Boolean;
+        MissingCustomerNoErr: Label 'Each membership must have a link to a customer in order for the system to store the payment token.';
     begin
 
         MembershipSetup.Get(MembershipCode);
@@ -3808,6 +3893,9 @@
             Membership."Modified At" := CurrentDateTime();
             if (MemberInfoCapture."Information Context" = MemberInfoCapture."Information Context"::FOREIGN) then
                 Membership."Replicated At" := CurrentDateTime();
+            if (MemberInfoCapture."Enable Auto-Renew") then
+                Membership."Auto-Renew" := Membership."Auto-Renew"::YES_INTERNAL;
+            Membership."Auto-Renew Payment Method Code" := MemberInfoCapture."Auto-Renew Payment Method Code";
 
             Membership.Insert(true);
             MembershipCreated := true;
@@ -3839,6 +3927,11 @@
                 Membership."Modified At" := CurrentDateTime();
                 Membership.Modify();
             end;
+        end;
+        if MemberInfoCapture."Member Payment Method" <> 0 then begin
+            if Membership."Customer No." = '' then
+                Error(MissingCustomerNoErr);
+            MMPaymentMethodMgt.AddMemberPaymentMethod(Membership.RecordId(), MemberInfoCapture."Member Payment Method");
         end;
 
         TransferInfoCaptureAttributes(MemberInfoCapture."Entry No.", Database::"NPR MM Membership", Membership."Entry No.");
@@ -5586,5 +5679,41 @@
         MemberInfoCapture."External Membership No." := Membership."External Membership No.";
         MemberInfoCapture."Membership Code" := Membership."Membership Code";
         MemberInfoCapture.Modify();
+    end;
+
+    internal procedure GetMembershipEntryNoFromCustomer(CustomerNo: Code[20]) MembershipEntryNo: Integer
+    var
+        Membership: Record "NPR MM Membership";
+    begin
+        Membership.Reset();
+        Membership.SetCurrentKey("Customer No.");
+        Membership.SetRange("Customer No.", CustomerNo);
+        Membership.SetLoadFields("Entry No.");
+        Membership.FindFirst();
+
+        MembershipEntryNo := Membership."Entry No.";
+    end;
+
+    internal procedure GetMembershipFromCustomerNo(CustomerNo: Code[20]; var Membership: Record "NPR MM Membership") Found: Boolean;
+    begin
+        Membership.Reset();
+        Membership.SetCurrentKey("Customer No.");
+        Membership.SetRange("Customer No.", CustomerNo);
+        Found := Membership.FindFirst();
+    end;
+
+    [TryFunction]
+    internal procedure TryGetMembershipEntryNoFromCustomer(CustomerNo: Code[20]; var MembershipEntryNo: Integer)
+    begin
+        MembershipEntryNo := GetMembershipEntryNoFromCustomer(CustomerNo);
+    end;
+
+    internal procedure GetCustomerNoFromMembershipEntryNo(MembershipEntryNo: Integer) CustomerNo: Code[20]
+    var
+        Membership: Record "NPR MM Membership";
+    begin
+        Membership.SetLoadFields("Customer No.");
+        Membership.Get(MembershipEntryNo);
+        CustomerNo := Membership."Customer No.";
     end;
 }

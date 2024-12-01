@@ -25,8 +25,8 @@
         {
             Caption = 'Message Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Welcome,Renew,Newsletter,Member Card,Tickets,Coupons';
-            OptionMembers = WELCOME,RENEW,NEWSLETTER,MEMBERCARD,TICKETS,COUPONS;
+            OptionCaption = 'Welcome,For Renewal,Newsletter,Member Card,Tickets,Coupons,Renewal Success,Renewal Failure';
+            OptionMembers = WELCOME,RENEW,NEWSLETTER,MEMBERCARD,TICKETS,COUPONS,RENEWAL_SUCCESS,RENEWAL_FAILURE;
         }
         field(20; "Preferred Method"; Option)
         {

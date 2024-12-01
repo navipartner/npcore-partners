@@ -519,7 +519,9 @@
         SalesHeader: Record "Sales Header";
         EFTShopperRecognition: Record "NPR EFT Shopper Recognition";
         EFTAdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integrat.";
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
         PrevRec: Text;
+        MembershipEntryNo: Integer;
     begin
         if not IsAdyenPaymentLine(PaymentLine) then
             exit;
@@ -532,19 +534,22 @@
         if SalesHeader."Sell-to Customer No." = '' then
             exit;
 
+        if not MembershipMgtInternal.TryGetMembershipEntryNoFromCustomer(SalesHeader."Sell-to Customer No.", MembershipEntryNo) then
+            exit;
+
         if not EFTShopperRecognition.Get(EFTAdyenCloudIntegration.IntegrationType(), PaymentLine."Payment Gateway Shopper Ref.") then begin
             EFTShopperRecognition.Init();
             EFTShopperRecognition."Integration Type" := CopyStr(EFTAdyenCloudIntegration.IntegrationType(), 1, MaxStrLen(EFTShopperRecognition."Integration Type"));
             EFTShopperRecognition."Shopper Reference" := PaymentLine."Payment Gateway Shopper Ref.";
-            EFTShopperRecognition."Entity Type" := EFTShopperRecognition."Entity Type"::Customer;
-            EFTShopperRecognition."Entity Key" := SalesHeader."Sell-to Customer No.";
+            EFTShopperRecognition."Entity Type" := EFTShopperRecognition."Entity Type"::Membership;
+            EFTShopperRecognition."Entity Key" := Format(MembershipEntryNo);
             EFTShopperRecognition.Insert(true);
         end;
 
         PrevRec := Format(EFTShopperRecognition);
 
-        EFTShopperRecognition."Entity Type" := EFTShopperRecognition."Entity Type"::Customer;
-        EFTShopperRecognition."Entity Key" := SalesHeader."Sell-to Customer No.";
+        EFTShopperRecognition."Entity Type" := EFTShopperRecognition."Entity Type"::Membership;
+        EFTShopperRecognition."Entity Key" := Format(MembershipEntryNo);
 
         if PrevRec <> Format(EFTShopperRecognition) then
             EFTShopperRecognition.Modify(true);

@@ -217,6 +217,15 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pay By Link Setup", 'UpdatePayByLinkSetup'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS EFT Pay Res. Setup", 'UpdatePOSEFTPayResSetup'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Update Wizards", 'UpdateWizardFiscalization'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Subscriptions", 'CreateSubscriptions'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Subscriptions", 'ScheduleSubscriptionRequestCreationJobQueue'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Subscriptions", 'ScheduleSubscriptionPaymentRequestProcessingJobQueue'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Subscriptions", 'ScheduleSubscriptionRequestProcessingJobQueue'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Subscriptions", 'SetMaxRecurringPaymentProcessingTryCount'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Subscriptions", 'SetMaxSubscriptionRequestProcessingTryCount'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Subscriptions Install", 'ScheduleSubscriptionRequestCreationJobQueue'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Subscriptions Install", 'ScheduleSubscriptionPaymentRequestProcessingJobQueue'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Subscriptions Install", 'ScheduleSubscriptionRequestProcessingJobQueue'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Pay View Dimension", 'SetDimensionMandatoryTrueForListOption'));
     end;
 
@@ -825,6 +834,32 @@
                 case UpgradeStep of
                     'UpdateWizardFiscalization':
                         exit('NPR-UpdateWizardFiscalization-20240926');
+                end;
+            Codeunit::"NPR Subscriptions Install":
+                case UpgradeStep of
+                    'CreateSubscriptions':
+                        exit('NPR-CreateSubscriptions-20241015');
+                    'ScheduleSubscriptionRequestCreationJobQueue':
+                        exit('NPR-ScheduleSubscriptionRequestCreationJobQueue-20241015');
+                    'ScheduleSubscriptionPaymentRequestProcessingJobQueue':
+                        exit('NPR-ScheduleSubscriptionPaymentRequestProcessingJobQueue-20241015');
+                    'ScheduleSubscriptionRequestProcessingJobQueue':
+                        exit('NPR-ScheduleSubscriptionRequestProcessingJobQueue-20241015');
+                end;
+            Codeunit::"NPR UPG Subscriptions":
+                case UpgradeStep of
+                    'CreateSubscriptions':
+                        exit('NPR-CreateSubscriptions-20241015');
+                    'ScheduleSubscriptionRequestCreationJobQueue':
+                        exit('NPR-ScheduleSubscriptionRequestCreationJobQueue-20241015');
+                    'ScheduleSubscriptionPaymentRequestProcessingJobQueue':
+                        exit('NPR-ScheduleSubscriptionPaymentRequestProcessingJobQueue-20241015');
+                    'ScheduleSubscriptionRequestProcessingJobQueue':
+                        exit('NPR-ScheduleSubscriptionRequestProcessingJobQueue-20241015');
+                    'SetMaxRecurringPaymentProcessingTryCount':
+                        exit('NPR-SetMaxRecurringPaymentProcessingTryCount-20241015');
+                    'SetMaxSubscriptionRequestProcessingTryCount':
+                        exit('NPR-SetMaxSubscriptionRequestProcessingTryCount-20241015');
                 end;
             Codeunit::"NPR UPG POS Pay View Dimension":
                 case UpgradeStep of

@@ -1,0 +1,246 @@
+codeunit 6185102 "NPR MM Subscr. Request Utils"
+{
+    Access = Internal;
+
+    internal procedure ProcessSubscriptionRequestWithConfirmation(var SubscrRequest: Record "NPR MM Subscr. Request"; SkipTryCountUpdate: Boolean)
+    var
+        ConfirmManagement: Codeunit "Confirm Management";
+        ConfirmLbl: Label 'Are you sure you want to process entry no. %1?', Comment = '%1 Entry No.';
+    begin
+        if not ConfirmManagement.GetResponseOrDefault(StrSubstNo(ConfirmLbl, SubscrRequest."Entry No."), true) then
+            exit;
+
+        ProcessSubscriptionRequest(SubscrRequest, SkipTryCountUpdate);
+    end;
+
+    local procedure ProcessSubscriptionRequest(var SubscrRequest: Record "NPR MM Subscr. Request"; SkipTryCountUpdate: Boolean)
+    var
+        SubscrRenewProcess: Codeunit "NPR MM Subscr. Renew: Process";
+    begin
+        if not SubscrRenewProcess.ProcessSubscriptionRequest(SubscrRequest, SkipTryCountUpdate, true) then
+            Error(GetLastErrorText());
+
+        //Refresh Record
+        if not SubscrRequest.Get(SubscrRequest.RecordId) then
+            exit;
+    end;
+
+    local procedure SetSubscriptionRequestStatus(var SubscrRequest: Record "NPR MM Subscr. Request"; NewStatus: Enum "NPR MM Subscr. Request Status")
+    var
+        SubsReqLogEntry: Record "NPR MM Subs Req Log Entry";
+        SubsReqLogUtils: Codeunit "NPR MM Subs Req Log Utils";
+    begin
+        if SubscrRequest.Status = NewStatus then
+            exit;
+
+        SubscrRequest.Validate(Status, NewStatus);
+        SubscrRequest.Validate("Processing Status", SubscrRequest."Processing Status"::Success);
+        SubscrRequest.Modify(true);
+
+        SubsReqLogUtils.LogEntry(SubscrRequest, true, SubsReqLogEntry);
+    end;
+
+    local procedure SetSubscriptionRequestStatusCancelled(var SubscrRequest: Record "NPR MM Subscr. Request")
+    begin
+        CheckSuccessfulPaymentRequestsExistAndGiveError(SubscrRequest);
+        SetSubscriptionRequestStatus(SubscrRequest, Enum::"NPR MM Subscr. Request Status"::Cancelled);
+    end;
+
+    internal procedure SetSubscriptionRequestStatusCancelledWithConfirmation(var SubscrRequest: Record "NPR MM Subscr. Request")
+    var
+        ConfirmManagement: Codeunit "Confirm Management";
+        NewStatusConfirmLbl: Label 'Are you sure you want to set the status of entry no. %1 to %2?', Comment = '%1 - entry no., %2 - Status';
+    begin
+        if not ConfirmManagement.GetResponseOrDefault(StrSubstNo(NewStatusConfirmLbl, SubscrRequest."Entry No.", Enum::"NPR MM Subscr. Request Status"::Cancelled), true) then
+            exit;
+
+        SetSubscriptionRequestStatusCancelled(SubscrRequest);
+    end;
+
+    local procedure CheckSuccessfulPaymentRequestsExist(SubscrRequest: Record "NPR MM Subscr. Request"; var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request") Found: Boolean
+    begin
+        SubscrPaymentRequest.Reset();
+        SubscrPaymentRequest.SetCurrentKey("Subscr. Request Entry No.", Status);
+        SubscrPaymentRequest.SetRange("Subscr. Request Entry No.", SubscrRequest."Entry No.");
+        SubscrPaymentRequest.SetFilter(Status, '%1|%2', SubscrPaymentRequest.Status::Authorized, SubscrPaymentRequest.Status::Captured);
+        SubscrPaymentRequest.SetLoadFields("Entry No.", Status);
+
+        Found := SubscrPaymentRequest.FindFirst();
+    end;
+
+    internal procedure CheckSuccessfulPaymentRequestsExistAndGiveError(SubscrRequest: Record "NPR MM Subscr. Request")
+    var
+        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+        CancelErrorLbl: Label 'Subscription payment request no. %1 must not be with status %2.', Comment = '%1 - subscription payment entry, %2 - Status';
+    begin
+        if not CheckSuccessfulPaymentRequestsExist(SubscrRequest, SubscrPaymentRequest) then
+            exit;
+
+        Error(CancelErrorLbl, SubscrPaymentRequest."Entry No.", SubscrPaymentRequest.Status);
+    end;
+
+    internal procedure UpdateUnprocessableStatusInSubscriptionPaymentRequestStatus(SubscrRequest: Record "NPR MM Subscr. Request")
+    var
+        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+        IsModified: Boolean;
+    begin
+        if not (SubscrRequest.Status in [SubscrRequest.Status::Rejected, SubscrRequest.Status::Cancelled]) then
+            exit;
+
+        SubscrPaymentRequest.SetCurrentKey("Subscr. Request Entry No.", Status);
+        SubscrPaymentRequest.SetRange("Subscr. Request Entry No.", SubscrRequest."Entry No.");
+        if not SubscrPaymentRequest.FindSet() then
+            exit;
+        repeat
+            IsModified := false;
+            case SubscrRequest.Status of
+                SubscrRequest.Status::Rejected:
+                    begin
+                        CheckSuccessfulPaymentRequestsExistAndGiveError(SubscrRequest);
+                        if SubscrPaymentRequest.Status <> SubscrPaymentRequest.Status::Rejected then begin
+                            SubscrPaymentRequest.Status := SubscrPaymentRequest.Status::Rejected;
+                            IsModified := true;
+                        end;
+                    end;
+                SubscrRequest.Status::Cancelled:
+                    begin
+                        CheckSuccessfulPaymentRequestsExistAndGiveError(SubscrRequest);
+                        if SubscrPaymentRequest.Status <> SubscrPaymentRequest.Status::Cancelled then begin
+                            SubscrPaymentRequest.Status := SubscrPaymentRequest.Status::Cancelled;
+                            IsModified := true;
+                        end;
+                    end;
+            end;
+
+            if IsModified then
+                SubscrPaymentRequest.Modify();
+        until SubscrPaymentRequest.Next() = 0;
+    end;
+
+    local procedure CreateSubscriptionRequestCreationJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry") Created: Boolean;
+    var
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
+        NPRJobQueueManagement: Codeunit "NPR Job Queue Management";
+        SubscriptionsJobQueueCategoryCode: Code[10];
+        DescriptionLbl: Label 'Creates subscription requests for expiring memberships';
+        StartDateTime: DateTime;
+    begin
+        StartDateTime := CreateDateTime(Today, 060000T);
+        if CurrentDateTime > StartDateTime then
+            StartDateTime := CreateDateTime(CalcDate('<+1D>', Today), 060000T);
+
+        SubscriptionsJobQueueCategoryCode := SubscriptionMgtImpl.GetSubscriptionsJobQueueCategoryCode();
+        if not NPRJobQueueManagement.InitRecurringJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR MM Subscr. Renew Req. JQ", '', DescriptionLbl, StartDateTime, 1440, SubscriptionsJobQueueCategoryCode, JobQueueEntry) then
+            exit;
+
+        JobQueueEntry."Maximum No. of Attempts to Run" := 999999999;
+        JobQueueEntry."Rerun Delay (sec.)" := 10;
+        JobQueueEntry."NPR Auto-Resched. after Error" := true;
+        JobQueueEntry."NPR Auto-Resched. Delay (sec.)" := 20;
+        JobQueueEntry.Modify(true);
+
+        Created := true;
+    end;
+
+    local procedure CheckIfSubscriptionRequestCreationJobQueueEntryScheduled() GetFeatureFlagsScheduled: Boolean;
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        JobQueueEntry.Reset();
+        JobQueueEntry.SetRange(Status, JobQueueEntry.Status::Ready);
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR MM Subscr. Renew Req. JQ");
+        GetFeatureFlagsScheduled := not JobQueueEntry.IsEmpty;
+    end;
+
+    internal procedure ScheduleSubscriptionRequestCreationJobQueueEntry()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        JobQueueManagement: Codeunit "NPR Job Queue Management";
+    begin
+        if CheckIfSubscriptionRequestCreationJobQueueEntryScheduled() then
+            exit;
+
+        if not CreateSubscriptionRequestCreationJobQueueEntry(JobQueueEntry) then
+            exit;
+
+        JobQueueManagement.StartJobQueueEntry(JobQueueEntry);
+    end;
+
+    local procedure CreateSubscriptionRequestProcessingJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry") Created: Boolean;
+    var
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
+        NPRJobQueueManagement: Codeunit "NPR Job Queue Management";
+        SubscriptionsJobQueueCategoryCode: Code[10];
+        DescriptionLbl: Label 'Process subscription requests for expiring memberships';
+        StartDateTime: DateTime;
+    begin
+        StartDateTime := CreateDateTime(Today, 230000T);
+        if CurrentDateTime > StartDateTime then
+            StartDateTime := CreateDateTime(CalcDate('<+1D>', Today), 230000T);
+
+        SubscriptionsJobQueueCategoryCode := SubscriptionMgtImpl.GetSubscriptionsJobQueueCategoryCode();
+        if not NPRJobQueueManagement.InitRecurringJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR MM Subscr. Renew Proc. JQ", '', DescriptionLbl, StartDateTime, 1440, SubscriptionsJobQueueCategoryCode, JobQueueEntry) then
+            exit;
+
+        JobQueueEntry."Maximum No. of Attempts to Run" := 999999999;
+        JobQueueEntry."Rerun Delay (sec.)" := 10;
+        JobQueueEntry."NPR Auto-Resched. after Error" := true;
+        JobQueueEntry."NPR Auto-Resched. Delay (sec.)" := 20;
+        JobQueueEntry.Modify(true);
+
+        Created := true;
+    end;
+
+    local procedure CheckIfSubscriptionRequestProcessingJobQueueEntryScheduled() GetFeatureFlagsScheduled: Boolean;
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        JobQueueEntry.Reset();
+        JobQueueEntry.SetRange(Status, JobQueueEntry.Status::Ready);
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR MM Subscr. Renew Proc. JQ");
+        GetFeatureFlagsScheduled := not JobQueueEntry.IsEmpty;
+    end;
+
+    internal procedure ScheduleSubscriptionRequestProcessingJobQueueEntry()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        JobQueueManagement: Codeunit "NPR Job Queue Management";
+    begin
+        if CheckIfSubscriptionRequestProcessingJobQueueEntryScheduled() then
+            exit;
+
+        if not CreateSubscriptionRequestProcessingJobQueueEntry(JobQueueEntry) then
+            exit;
+
+        JobQueueManagement.StartJobQueueEntry(JobQueueEntry);
+    end;
+
+    internal procedure OpenLogEntries(SubscrRequest: Record "NPR MM Subscr. Request")
+    var
+        SubsReqLogEntry: Record "NPR MM Subs Req Log Entry";
+    begin
+        SubsReqLogEntry.SetRange("Request Entry No.", SubscrRequest."Entry No.");
+        Page.Run(0, SubsReqLogEntry);
+    end;
+
+    local procedure ResetProcessTryCount(var SubscrRequest: Record "NPR MM Subscr. Request")
+    begin
+        SubscrRequest."Process Try Count" := 0;
+        SubscrRequest.Modify(true)
+    end;
+
+    internal procedure ResetProcessTryCountWithConfirmation(var SubscrRequest: Record "NPR MM Subscr. Request")
+    var
+        ConfirmManagement: Codeunit "Confirm Management";
+        ResetTryCountConfirmationLbl: Label 'Are you sure you want to reset the process try count of entry no. %1?', Comment = '%1 - subscription request entry no.';
+    begin
+        if not ConfirmManagement.GetResponseOrDefault(StrSubstNo(ResetTryCountConfirmationLbl, SubscrRequest."Entry No."), true) then
+            exit;
+
+        ResetProcessTryCount(SubscrRequest);
+    end;
+
+
+}

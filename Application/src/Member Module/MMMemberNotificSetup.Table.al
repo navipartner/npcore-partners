@@ -23,8 +23,8 @@
         {
             Caption = 'Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Welcome,Membership Renewal,Wallet Update,Wallet Create,Coupon,Achievement';
-            OptionMembers = WELCOME,RENEWAL,WALLET_UPDATE,WALLET_CREATE,COUPON,ACHIEVEMENT;
+            OptionCaption = 'Welcome,For Renewal,Wallet Update,Wallet Create,Coupon,Achievement,Renewal Success,Renewal Failure';
+            OptionMembers = WELCOME,RENEWAL,WALLET_UPDATE,WALLET_CREATE,COUPON,ACHIEVEMENT,RENEWAL_SUCCESS,RENEWAL_FAILURE;
         }
         field(30; "Days Before"; Integer)
         {

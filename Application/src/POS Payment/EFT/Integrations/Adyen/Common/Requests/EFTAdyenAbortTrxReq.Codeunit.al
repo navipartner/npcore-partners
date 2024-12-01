@@ -41,7 +41,12 @@ codeunit 6184595 "NPR EFT Adyen AbortTrx Req"
             ProcessedEFTTransactionRequest."Processing Type"::REFUND:
                 exit('Payment');
             else
-                exit('CardAcquisition');
+                case ProcessedEFTTransactionRequest."Auxiliary Operation ID" of
+                    8:
+                        exit('Input');
+                    else
+                        exit('CardAcquisition');
+                end;
         end;
     end;
 }

@@ -108,6 +108,16 @@
                     ToolTip = 'Specifies the value of the Create Renewal Notifications field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field("Create Renewal Success Notif"; Rec."Create Renewal Success Notif")
+                {
+                    ToolTip = 'Specifies the value of the Create Renewal Success Notifications field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field("Create Renewal Failure Notif"; Rec."Create Renewal Failure Notif")
+                {
+                    ToolTip = 'Specifies the value of the Create Renewal Failure Notifications field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
                 field("Membership Member Cardinality"; Rec."Membership Member Cardinality")
                 {
                     ToolTip = 'Specifies the value of the Membership Member Cardinality field';

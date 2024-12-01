@@ -243,7 +243,7 @@
         }
         field(60; "Create Renewal Notifications"; Boolean)
         {
-            Caption = 'Create Renewal Notifications';
+            Caption = 'Create For Renewal Notifications';
             DataClassification = CustomerContent;
         }
         field(70; "Membership Customer No."; Code[20])
@@ -383,6 +383,16 @@
                 GDPRManagement.OnMembershipGDPRAgreementChangeWorker(Code, xRec."GDPR Agreement No.", Rec."GDPR Agreement No.");
 
             end;
+        }
+        field(600; "Create Renewal Success Notif"; Boolean)
+        {
+            Caption = 'Create Renewal Success Notifications';
+            DataClassification = CustomerContent;
+        }
+        field(610; "Create Renewal Failure Notif"; Boolean)
+        {
+            Caption = 'Create Renewal Failure Notifications';
+            DataClassification = CustomerContent;
         }
         field(800; "HeyLoyalty Name"; Text[50])
         {

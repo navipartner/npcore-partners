@@ -431,9 +431,29 @@
             Caption = 'External Customer ID Provider';
             DataClassification = CustomerContent;
         }
+        field(632; "Recurring Detail Reference"; Text[50])
+        {
+            Caption = 'Recurring Detail Reference';
+            DataClassification = CustomerContent;
+        }
+        field(633; "Card Expiry Month"; Text[2])
+        {
+            Caption = 'Card Expiry Month';
+            DataClassification = CustomerContent;
+        }
+        field(634; "Card Expiry Year"; Text[4])
+        {
+            Caption = 'Card Expiry Year';
+            DataClassification = CustomerContent;
+        }
         field(635; "External Payment Token"; Text[50])
         {
             Caption = 'External Payment Token';
+            DataClassification = CustomerContent;
+        }
+        field(636; "Payment Brand"; Text[30])
+        {
+            Caption = 'Payment Brand';
             DataClassification = CustomerContent;
         }
         field(650; "Additional Info"; BLOB)
@@ -529,6 +549,11 @@
         field(860; "Manual Capture"; Boolean)
         {
             Caption = 'Manual Capture';
+            DataClassification = CustomerContent;
+        }
+        field(870; "Confirmed Flag"; Boolean)
+        {
+            Caption = 'Confirmed Flag';
             DataClassification = CustomerContent;
         }
         field(10000; "FF Moved to POS Entry"; Boolean)

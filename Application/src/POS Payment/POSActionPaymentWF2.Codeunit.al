@@ -14,6 +14,7 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         SwitchToPaymentViewDesc: Label 'Automatically switch to Payment view, when the POS action is run from Sale view';
         EndSaleName: Label 'Try End Sale';
         EndSaleNameDesc: Label 'Try to end the sale after the payment is processed.';
+        MMPaymentMethodAssignedCaption: Label 'A payment method has already been assigned to the membership. Do you want to change it?';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
@@ -22,6 +23,7 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         WorkflowConfig.AddBooleanParameter('SwitchToPaymentView', false, SwitchToPaymentViewName, SwitchToPaymentViewDesc);
         WorkflowConfig.AddBooleanParameter('tryEndSale', true, EndSaleName, EndSaleNameDesc);
         WorkflowConfig.AddTextParameter('paymentNo', '', PaymentMethodCodeName, PaymentMethodCodeName);
+        WorkflowConfig.AddLabel('paymentMethodAssignedCaption', MMPaymentMethodAssignedCaption);
     end;
 
     procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
@@ -30,7 +32,7 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
             'preparePreWorkflows':
                 Frontend.WorkflowResponse(PreparePreWorkflows(Context));
             'preparePaymentWorkflow':
-                Frontend.WorkflowResponse(PreparePayment(PaymentLine, Context));
+                Frontend.WorkflowResponse(PreparePayment(Sale, PaymentLine, Context));
             'tryEndSale':
                 Frontend.WorkflowResponse(AttemptEndSale(Context));
             'doLegacyPaymentWorkflow':
@@ -38,8 +40,9 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         end;
     end;
 
-    local procedure PreparePayment(PaymentLine: Codeunit "NPR POS Payment Line"; Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
+    local procedure PreparePayment(Sale: codeunit "NPR POS Sale"; PaymentLine: Codeunit "NPR POS Payment Line"; Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
     var
+        SalePOS: Record "NPR POS Sale";
         Payments: Codeunit "NPR POS Action: Payment WF2 BL";
         PaymentProcessingEvents: Codeunit "NPR Payment Processing Events";
         PaymentMethodCode: Code[10];
@@ -48,13 +51,15 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         RemainingAmount: Decimal;
         TextAmountPrompt: Text;
         TextAmountLabel: Label 'Enter Amount';
+        ForceAmount: Boolean;
     begin
         SwitchToPaymentView(Context);
 #pragma warning disable AA0139
         PaymentMethodCode := Context.GetStringParameter('paymentNo');
 #pragma warning restore AA0139
 
-        Payments.PrepareForPayment(PaymentLine, PaymentMethodCode, WorkflowName, POSPaymentMethod, RemainingAmount);
+        Sale.GetCurrentSale(SalePOS);
+        Payments.PrepareForPayment(PaymentLine, PaymentMethodCode, WorkflowName, POSPaymentMethod, RemainingAmount, ForceAmount);
 
         Response.ReadFrom('{}');
         Response.Add('dispatchToWorkflow', WorkflowName);
@@ -64,6 +69,8 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         TextAmountPrompt := TextAmountLabel;
         PaymentProcessingEvents.OnBeforeAddAmountPromptLblToResponse(POSPaymentMethod, TextAmountPrompt);
         Response.Add('amountPrompt', TextAmountPrompt);
+        Response.Add('forceAmount', ForceAmount);
+        Response.Add('mmPaymentMethodAssigned', Payments.CheckMMPaymentMethodAssigned(PaymentMethodCode, SalePOS));
         exit(Response);
     end;
 
@@ -130,6 +137,7 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         PreWorkflows.Add('SALE_DIMENSION', ActionParameters);
     end;
 
+
     [Obsolete('Use the new END_SALE workflow instead', '2023-11-28')]
     local procedure AttemptEndSale(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
     var
@@ -166,7 +174,7 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionPaymentWF2.Codeunit.js###
-'const main=async({workflow:e,popup:s,parameters:n,context:m})=>{const{HideAmountDialog:p,HideZeroAmountDialog:u}=n,{preWorkflows:r}=await e.respond("preparePreWorkflows");if(r)for(const d of Object.entries(r)){const[i,A]=d;i&&await e.run(i,{parameters:A})}const{dispatchToWorkflow:c,paymentType:l,remainingAmount:t,paymentDescription:y,amountPrompt:f}=await e.respond("preparePaymentWorkflow");let a=t;if(!p&&(!u||t>0)){if(a=await s.numpad({title:y,caption:f,value:t}),a===null)return{};if(a==0&&t>0)return{}}if(a==0&&t==0)return await e.run("END_SALE",{parameters:{calledFromWorkflow:"PAYMENT_2",paymentNo:n.paymentNo}}),{};const o=await e.run(c,{context:{paymentType:l,suggestedAmount:a,remainingAmount:t}});return o.legacy?(m.fallbackAmount=a,await e.respond("doLegacyPaymentWorkflow")):o.tryEndSale&&n.tryEndSale&&await e.run("END_SALE",{parameters:{calledFromWorkflow:"PAYMENT_2",paymentNo:n.paymentNo}}),{success:o.success}};'
+'const main=async({workflow:e,popup:r,parameters:a,context:s,captions:p})=>{const{HideAmountDialog:u,HideZeroAmountDialog:c}=a,{preWorkflows:i}=await e.respond("preparePreWorkflows");if(i)for(const W of Object.entries(i)){const[m,N]=W;m&&await e.run(m,{parameters:N})}const{dispatchToWorkflow:l,paymentType:f,remainingAmount:t,paymentDescription:y,amountPrompt:d,forceAmount:A,mmPaymentMethodAssigned:g}=await e.respond("preparePaymentWorkflow");if(g&&!await r.confirm(p.paymentMethodAssignedCaption))return{};let n=t;if(!u&&(!c||t>0)){if(n=await r.numpad({title:y,caption:d,value:t}),n===null)return{};if(n===0&&t>0)return{}}if(n===0&&t===0&&!A)return await e.run("END_SALE",{parameters:{calledFromWorkflow:"PAYMENT_2",paymentNo:a.paymentNo}}),{};const o=await e.run(l,{context:{paymentType:f,suggestedAmount:n,remainingAmount:t}});return o.legacy?(s.fallbackAmount=n,await e.respond("doLegacyPaymentWorkflow")):o.tryEndSale&&a.tryEndSale&&await e.run("END_SALE",{parameters:{calledFromWorkflow:"PAYMENT_2",paymentNo:a.paymentNo}}),{success:o.success}};'
         );
     end;
 }

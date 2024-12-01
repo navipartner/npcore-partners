@@ -233,6 +233,24 @@ table 6150801 "NPR Adyen Setup"
             ELSE
             IF ("EFT Res. Account Type" = CONST("Bank Account")) "Bank Account";
         }
+        field(260; "Active Subs. Payment Gateways"; Integer)
+        {
+            Caption = 'Active Subs. Payment Gateways';
+            FieldClass = FlowField;
+            Editable = false;
+            CalcFormula = count("NPR MM Subs. Payment Gateway" where(Status = const(Enabled)));
+        }
+        field(270; "Max Sub Req Process Try Count"; Integer)
+        {
+            Caption = 'Max. Subscription Request Processing Try Count';
+            DataClassification = CustomerContent;
+            InitValue = 2;
+        }
+        field(280; "Auto Process Subs Req Errors"; boolean)
+        {
+            Caption = 'Auto Process Subscription Request Errors';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {

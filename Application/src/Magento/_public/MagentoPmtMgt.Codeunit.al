@@ -699,6 +699,7 @@
 
         SalesInvoiceHeader.CalcFields("Amount Including VAT");
         PostPaymentLines(SalesHeader, SalesInvoiceHeader."No.");
+        CreateMembershipPaymentMethods(SalesInvoiceHeader);
 
         OnAfterPostMagentoPayment(SalesInvoiceHeader);
     end;
@@ -1200,6 +1201,109 @@
             exit;
 
         PaymentsAndRefundsExist := true;
+    end;
+
+    local procedure CreateMembershipPaymentMethods(SalesInvoiceHeader: Record "Sales Invoice Header")
+    var
+        TempMembership: Record "NPR MM Membership" temporary;
+        TempPaymentLine: Record "NPR Magento Payment Line" temporary;
+    begin
+        if not GetPaymentTokenInforamtionBuffer(SalesInvoiceHeader."No.", TempPaymentLine) then
+            exit;
+
+        if not GetRelatedMembershipsBuffer(SalesInvoiceHeader, TempMembership) then
+            exit;
+
+        CreatePaymentMethodsFromSalesDocumentBuffers(TempPaymentLine, TempMembership);
+    end;
+
+    local procedure GetRelatedMembershipsBuffer(SalesInvoiceHeader: Record "Sales Invoice Header"; var TempMemebrship: Record "NPR MM Membership" temporary) Found: Boolean
+    var
+        MembershipEntry: Record "NPR MM Membership Entry";
+        TempMemebrshipTempErrorLbl: Label 'TempMemebrship must be a temporary table. This is a programming error.';
+    begin
+        if not TempMemebrship.IsTemporary then
+            Error(TempMemebrshipTempErrorLbl);
+
+        TempMemebrship.Reset();
+        if not TempMemebrship.IsEmpty then
+            TempMemebrship.DeleteAll();
+
+        MembershipEntry.Reset();
+        MembershipEntry.SetRange("Source Type", MembershipEntry."Source Type"::SALESHEADER);
+        MembershipEntry.SetRange("Document Type", Enum::"Sales Document Type"::Order);
+        MembershipEntry.SetRange("Document No.", SalesInvoiceHeader."External Document No.");
+        MembershipEntry.SetLoadFields("Membership Entry No.");
+        if not MembershipEntry.FindSet() then
+            exit;
+
+        repeat
+            if not TempMemebrship.Get(MembershipEntry."Membership Entry No.") then begin
+                TempMemebrship.Init();
+                TempMemebrship."Entry No." := MembershipEntry."Membership Entry No.";
+                TempMemebrship.Insert();
+            end
+        until MembershipEntry.Next() = 0;
+
+        Found := true;
+    end;
+
+    local procedure GetPaymentTokenInforamtionBuffer(DocumentNo: Code[20]; var TempPaymentLine: Record "NPR Magento Payment Line" temporary) Found: Boolean;
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+        TempPaymentLineErrorLbl: Label 'TempPaymentLine must be a temporary table. This is a programming error.';
+    begin
+        if not TempPaymentLine.IsTemporary then
+            Error(TempPaymentLineErrorLbl);
+
+        TempPaymentLine.Reset();
+        if not TempPaymentLine.IsEmpty then
+            TempPaymentLine.DeleteAll();
+
+        PaymentLine.Reset();
+        PaymentLine.SetRange("Document Table No.", Database::"Sales Invoice Header");
+        PaymentLine.SetRange("Document Type", 0);
+        PaymentLine.SetRange("Document No.", DocumentNo);
+        PaymentLine.SetFilter("Date Captured", '<>%1', 0D);
+        PaymentLine.SetFilter("Payment Token", '<>%1', '');
+        PaymentLine.SetFilter("Payment Gateway Shopper Ref.", '<>%1', '');
+        PaymentLine.SetLoadFields("Payment Token", "Payment Gateway Shopper Ref.", "Source No.", "Payment Gateway Code");
+        if not PaymentLine.FindSet() then
+            exit;
+
+        repeat
+            TempPaymentLine.Reset();
+            TempPaymentLine.SetRange("Payment Token", PaymentLine."Payment Token");
+            TempPaymentLine.SetRange("Payment Gateway Shopper Ref.", PaymentLine."Payment Gateway Shopper Ref.");
+            if TempPaymentLine.IsEmpty then begin
+                TempPaymentLine.Init();
+                TempPaymentLine := PaymentLine;
+                TempPaymentLine.SystemId := PaymentLine.SystemId;
+                TempPaymentLine.Insert();
+            end;
+        until TempPaymentLine.Next() = 0;
+
+        Found := true;
+    end;
+
+    local procedure CreatePaymentMethodsFromSalesDocumentBuffers(var TempPaymentLine: Record "NPR Magento Payment Line" temporary; var TempMembership: Record "NPR MM Membership" temporary)
+    var
+        MemberPaymentMethod: Record "NPR MM Member Payment Method";
+        PaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
+    begin
+        TempMembership.Reset();
+        if not TempMembership.FindSet() then
+            exit;
+        repeat
+            TempPaymentLine.Reset();
+            if TempPaymentLine.FindSet() then
+                repeat
+                    if not PaymentMethodMgt.FindMemberPaymentMethod(TempPaymentLine, TempMembership, MemberPaymentMethod) then
+                        PaymentMethodMgt.AddMemberPaymentMethod(TempPaymentLine, true, MemberPaymentMethod, TempMembership);
+
+                    PaymentMethodMgt.SetMembePaymentMethodAsDefault(TempPaymentLine, MemberPaymentMethod);
+                until TempPaymentLine.Next() = 0;
+        until TempMembership.Next() = 0;
     end;
 
     [IntegrationEvent(false, false)]

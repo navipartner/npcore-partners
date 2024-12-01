@@ -90,10 +90,13 @@ codeunit 85004 "NPR EFT Tests"
         EFTTestMockIntegration: Codeunit "NPR EFT Test Mock Integrat.";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTTransactionMgt: Codeunit "NPR EFT Transaction Mgt.";
+        NPRLibraryEFT: Codeunit "NPR Library - EFT";
+        EFTSetup: Record "NPR EFT Setup";
     begin
         // [Scenario] Add payment to an existing sales, can be used from by external test functions to add a successful EFT payment to sales
         // [Given] POS, EFT & Payment setup
         InitializeData(InitSession);
+        NPRLibraryEFT.CreateMockEFTSetup(EFTSetup, SalePOS."Register No.", _POSPaymentMethod.Code);
 
         // [Given] EFT mock integration set to simulate external approval
         BindSubscription(EFTTestMockIntegration);
@@ -103,7 +106,7 @@ codeunit 85004 "NPR EFT Tests"
 
         // [When] Requesting to pay 
         SetSessionActionStateBeforePayment();
-        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(_EFTSetup, PaymentAmount, '', SalePOS);
+        _LastTrxEntryNo := EFTTransactionMgt.StartPayment(EFTSetup, PaymentAmount, '', SalePOS);
         EFTTransactionRequest.Get(_LastTrxEntryNo);
 
         // [Then] PaymentAmount LCY is the trx result and a payment line for the result was created.
@@ -2470,10 +2473,10 @@ codeunit 85004 "NPR EFT Tests"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         NPRLibraryEFT: Codeunit "NPR Library - EFT";
     begin
-        if InitSession then begin
-        //Clean any previous mock session
-        _POSSession.ClearAll();
-        Clear(_POSSession);
+    if InitSession then begin
+            //Clean any previous mock session
+            _POSSession.ClearAll();
+            Clear(_POSSession);
         end;
 
         if not _Initialized then begin

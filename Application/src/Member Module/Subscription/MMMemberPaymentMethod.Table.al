@@ -3,6 +3,8 @@ table 6150920 "NPR MM Member Payment Method"
     Access = Internal;
     Caption = 'Member Payment Method';
     DataClassification = CustomerContent;
+    DrillDownPageId = "NPR MM Member Payment Methods";
+    LookupPageId = "NPR MM Member Payment Methods";
 
     fields
     {
@@ -33,9 +35,19 @@ table 6150920 "NPR MM Member Payment Method"
             DataClassification = CustomerContent;
 
             trigger OnValidate()
+            var
+                MemberPaymentMethod: Record "NPR MM Member Payment Method";
             begin
                 if (Status = Status::Archived) and Default then
                     Default := false;
+                if Default then begin
+                    MemberPaymentMethod.SetRange("Table No.", "Table No.");
+                    MemberPaymentMethod.SetRange("BC Record ID", "BC Record ID");
+                    MemberPaymentMethod.SetRange(Status, MemberPaymentMethod.Status::Active);
+                    MemberPaymentMethod.SetFilter("Entry No.", '<>%1', "Entry No.");
+                    if not MemberPaymentMethod.IsEmpty() then
+                        MemberPaymentMethod.ModifyAll(Status, MemberPaymentMethod.Status::Archived);
+                end;
             end;
         }
         field(30; "Payment Instrument Type"; Text[30])
@@ -105,5 +117,8 @@ table 6150920 "NPR MM Member Payment Method"
         {
             Clustered = true;
         }
+        key(RelationFromBCTables; "Table No.", "BC Record ID", Status, Default) { }
+        key(Key2; "Created from System Id") { }
+        key(Key3; "Table No.", "BC Record ID", PSP, "Payment Token", "Shopper Reference") { }
     }
 }

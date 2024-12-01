@@ -99,7 +99,17 @@
         }
         field(60; "Create Renewal Notifications"; Boolean)
         {
-            Caption = 'Create Renewal Notifications';
+            Caption = 'Create For Renewal Notifications';
+            DataClassification = CustomerContent;
+        }
+        field(70; "Create Renewal Success Notif"; Boolean)
+        {
+            Caption = 'Create Renewal Success Notifications';
+            DataClassification = CustomerContent;
+        }
+        field(80; "Create Renewal Failure Notif"; Boolean)
+        {
+            Caption = 'Create Renewal Failure Notifications';
             DataClassification = CustomerContent;
         }
     }

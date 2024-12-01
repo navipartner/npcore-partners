@@ -318,6 +318,53 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         exit(EFTAdyenPaymentTypeSetup."Recurring API URL Prefix");
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Framework Mgt.", 'OnAfterEftIntegrationResponseReceived', '', false, false)]
+    local procedure InsertEFTAdditionalData(EftTransactionRequest: Record "NPR EFT Transaction Request")
+    var
+        MemberPaymentMethod: Record "NPR MM Member Payment Method";
+        EFTAdyenPaymentTypeSetup: Record "NPR EFT Adyen Paym. Type Setup";
+        EFTSetup: Record "NPR EFT Setup";
+        EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
+        MMMemberInfoCapture: Record "NPR MM Member Info Capture";
+    begin
+        EFTSetup.FindSetup(EftTransactionRequest."Register No.", EftTransactionRequest."Original POS Payment Type Code");
+        if EFTAdyenIntegration.GetCreateRecurringContract(EFTSetup) = EFTAdyenPaymentTypeSetup."Create Recurring Contract"::NO then
+            exit;
+
+        if EFTTransactionRequest."Recurring Detail Reference" = '' then
+            exit;
+        if not (EftTransactionRequest."Integration Type" in [CloudIntegrationType(), LocalIntegrationType()]) then
+            exit;
+        if EftTransactionRequest."Processing Type" <> EftTransactionRequest."Processing Type"::PAYMENT then
+            exit;
+
+        MMMemberInfoCapture.SetRange("Receipt No.", EftTransactionRequest."Sales Ticket No.");
+        if not MMMemberInfoCapture.FindSet() then begin
+            DeleteMemberPaymentMethods(EftTransactionRequest);
+            AddPaymentMethodToExistingMembership(EftTransactionRequest, MemberPaymentMethod);
+            exit;
+        end;
+
+        repeat
+            NewMemberSubscription(EftTransactionRequest, MMMemberInfoCapture);
+        until MMMemberInfoCapture.Next() = 0;
+
+    end;
+
+    local procedure GetLastDayOfMonth(ParamYear: Text[4]; ParamMonth: Text[2]): Date
+    var
+        FirstDayOfMonth: Date;
+        Year: integer;
+        Month: integer;
+    begin
+        Evaluate(Year, ParamYear);
+        Evaluate(Month, ParamMonth);
+
+        FirstDayOfMonth := DMY2Date(1, Month, Year);
+
+        exit(CalcDate('<1M>', FirstDayOfMonth) - 1);
+    end;
+
     #endregion
 
     #region Aux
@@ -404,15 +451,51 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         exit(true);
     end;
 
+    procedure RequestShopperSubscriptionConfirmation(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var TerminalConfirmationEntryNo: Integer): Boolean
+    var
+        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
+        ShopperSubscriptionConfirmationEFTTransactionRequest: Record "NPR EFT Transaction Request";
+        EFTSetup: Record "NPR EFT Setup";
+        POSSession: Codeunit "NPR POS Session";
+        POSSale: Codeunit "NPR POS Sale";
+        SalePOS: Record "NPR POS Sale";
+    begin
+        if not (EFTTransactionRequest."Processing Type" in [EFTTransactionRequest."Processing Type"::PAYMENT, EFTTransactionRequest."Processing Type"::REFUND]) then
+            exit(false);
 
+        EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
+
+        if GetCreateRecurringContract(EFTSetup) = 0 then
+            exit(false);
+
+        if not POSSession.IsInitialized() then
+            exit(false);
+
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+
+        EFTFrameworkMgt.CreateAuxRequest(ShopperSubscriptionConfirmationEFTTransactionRequest, EFTSetup, 8, EFTTransactionRequest."Register No.", EFTTransactionRequest."Sales Ticket No.");
+        ShopperSubscriptionConfirmationEFTTransactionRequest."Initiated from Entry No." := EFTTransactionRequest."Entry No.";
+        ShopperSubscriptionConfirmationEFTTransactionRequest.Modify();
+        EFTTransactionRequest.Recoverable := false;
+        EFTTransactionRequest.Modify();
+        Commit();
+
+        TerminalConfirmationEntryNo := ShopperSubscriptionConfirmationEFTTransactionRequest."Entry No.";
+        exit(true);
+    end;
 
     local procedure RecurringContractCheckPreTransaction(var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         POSSession: Codeunit "NPR POS Session";
         POSSale: Codeunit "NPR POS Sale";
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
         SalePOS: Record "NPR POS Sale";
         EFTShopperRecognition: Record "NPR EFT Shopper Recognition";
         EFTSetup: Record "NPR EFT Setup";
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+        EntityType: Option Customer,Contact,Membership;
+        MembershipEntryNo: Integer;
     begin
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
         if GetCreateRecurringContract(EFTSetup) = 0 then
@@ -421,22 +504,35 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         POSSession.ErrorIfNotInitialized();
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
-        SalePOS.TestField("Customer No."); //Customer is required to issue recurring contract
 
+        MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
+        MemberInfoCapture.SetRange("Receipt No.", SalePOS."Sales Ticket No.");
+        if not MemberInfoCapture.FindSet() then begin
+            MembershipEntryNo := MembershipMgtInternal.GetMembershipEntryNoFromCustomer(SalePOS."Customer No.");
+            GetCreateEFTShopperRecognition(Format(MembershipEntryNo), EntityType::Membership, EFTTransactionRequest."Integration Type", EFTShopperRecognition);
+        end else
+            repeat
+                GetCreateEFTShopperRecognition(Format(MemberInfoCapture."Membership Entry No."), EntityType::Membership, EFTTransactionRequest."Integration Type", EFTShopperRecognition);
+            until MemberInfoCapture.Next() = 0;
+
+        EFTTransactionRequest."Internal Customer ID" := EFTShopperRecognition."Shopper Reference";
+    end;
+
+    local procedure GetCreateEFTShopperRecognition(EntityKey: Code[20]; EntityType: Option Customer,Contact,Membership; IntegrationType: Code[20]; var EFTShopperRecognition: Record "NPR EFT Shopper Recognition")
+    begin
+        EFTShopperRecognition.Reset();
         EFTShopperRecognition.SetFilter("Integration Type", '%1|%2', CloudIntegrationType(), LocalIntegrationType());
-        EFTShopperRecognition.SetRange("Entity Key", SalePOS."Customer No.");
-        EFTShopperRecognition.SetRange("Entity Type", EFTShopperRecognition."Entity Type"::Customer);
+        EFTShopperRecognition.SetRange("Entity Key", EntityKey);
+        EFTShopperRecognition.SetRange("Entity Type", EntityType);
 
         if not EFTShopperRecognition.FindFirst() then begin
             EFTShopperRecognition.Init();
-            EFTShopperRecognition."Integration Type" := EFTTransactionRequest."Integration Type";
+            EFTShopperRecognition."Integration Type" := IntegrationType;
             EFTShopperRecognition."Shopper Reference" := CopyStr(Format(CreateGuid()), 2, 36);
-            EFTShopperRecognition."Entity Key" := SalePOS."Customer No.";
-            EFTShopperRecognition."Entity Type" := EFTShopperRecognition."Entity Type"::Customer;
+            EFTShopperRecognition."Entity Key" := EntityKey;
+            EFTShopperRecognition."Entity Type" := EntityType;
             EFTShopperRecognition.Insert();
         end;
-
-        EFTTransactionRequest."Internal Customer ID" := EFTShopperRecognition."Shopper Reference";
     end;
 
     procedure ContinueAfterAcquireCard(TransactionEntryNo: Integer; var ContinueOnTransactionEntryNo: Integer): Boolean
@@ -469,6 +565,26 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         end;
     end;
 
+    procedure ContinueAfterSubscriptionConfirmation(TransactionEntryNo: Integer; var ContinueOnTransactionEntryNo: Integer): Boolean
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+    begin
+        if not EFTTransactionRequest.Get(TransactionEntryNo) then
+            exit(false);
+
+        if EFTTransactionRequest."Processing Type" <> EFTTransactionRequest."Processing Type"::AUXILIARY then
+            exit(false);
+
+        case EFTTransactionRequest."Auxiliary Operation ID" of
+            8:
+                begin
+                    exit(ShouldProceedToAquireCard(EFTTransactionRequest, ContinueOnTransactionEntryNo));
+                end;
+            else
+                EFTTransactionRequest.FieldError("Auxiliary Operation ID");
+        end;
+    end;
+
     local procedure ShouldProceedToPurchaseTransaction(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var ContinueOnTransactionEntryNo: Integer): Boolean
     var
         EFTPaymentTransactionRequest: Record "NPR EFT Transaction Request";
@@ -481,6 +597,25 @@ codeunit 6184639 "NPR EFT Adyen Integration"
 
         if CancelContractCreation(EFTTransactionRequest) then
             exit(false);
+
+        EFTPaymentTransactionRequest.Get(EFTTransactionRequest."Initiated from Entry No.");
+        EFTPaymentTransactionRequest.Recoverable := true;
+        EFTPaymentTransactionRequest.Modify();
+        Commit();
+        ContinueOnTransactionEntryNo := EFTPaymentTransactionRequest."Entry No.";
+        exit(true);
+    end;
+
+    local procedure ShouldProceedToAquireCard(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var ContinueOnTransactionEntryNo: Integer): Boolean
+    var
+        EFTPaymentTransactionRequest: Record "NPR EFT Transaction Request";
+    begin
+        if not EFTTransactionRequest.Successful then
+            exit(false);
+
+        if not EFTTransactionRequest."Confirmed Flag" then
+            exit(false);
+
 
         EFTPaymentTransactionRequest.Get(EFTTransactionRequest."Initiated from Entry No.");
         EFTPaymentTransactionRequest.Recoverable := true;
@@ -702,6 +837,127 @@ codeunit 6184639 "NPR EFT Adyen Integration"
     begin
         GetPaymentTypeParameters(EFTSetupIn, EFTAdyenPaymentTypeSetup);
         exit(EFTAdyenPaymentTypeSetup."Log Level");
+    end;
+
+    local procedure NewMemberSubscription(EftTransactionRequest: Record "NPR EFT Transaction Request"; var MMMemberInfoCapture: Record "NPR MM Member Info Capture")
+    var
+        MemberPaymentMethod: Record "NPR MM Member Payment Method";
+        Membership: Record "NPR MM Membership";
+        MMPaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
+    begin
+        if not Membership.Get(MMMemberInfoCapture."Membership Entry No.") then
+            exit;
+
+        if MemberPaymentMethod.Get(MMMemberInfoCapture."Member Payment Method") then
+            MemberPaymentMethod.Delete();
+
+        AddMemberPaymentMethod(EftTransactionRequest, true, MemberPaymentMethod, Membership);
+
+        MMMemberInfoCapture."Enable Auto-Renew" := true;
+        MMMemberInfoCapture."Auto-Renew Payment Method Code" := EftTransactionRequest."POS Payment Type Code";
+        MMMemberInfoCapture."Member Payment Method" := MemberPaymentMethod."Entry No.";
+        MMMemberInfoCapture.Modify();
+
+        MMPaymentMethodMgt.UpdateMembership(EftTransactionRequest, Membership);
+    end;
+
+    local procedure AddPaymentMethodToExistingMembership(EftTransactionRequest: Record "NPR EFT Transaction Request"; var MemberPaymentMethod: Record "NPR MM Member Payment Method")
+    var
+        POSSale: Codeunit "NPR POS Sale";
+        SalePOS: Record "NPR POS Sale";
+        POSSession: Codeunit "NPR POS Session";
+        MMPaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
+        Membership: Record "NPR MM Membership";
+    begin
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        if SalePOS."Customer No." = '' then
+            exit;
+
+        Membership.SetCurrentKey("Customer No.");
+        Membership.SetRange("Customer No.", SalePOS."Customer No.");
+        Membership.SetLoadFields("Entry No.");
+        if not Membership.FindFirst() then
+            exit;
+
+        if not MMPaymentMethodMgt.FindMemberPaymentMethod(EftTransactionRequest, Membership, MemberPaymentMethod) then
+            AddMemberPaymentMethod(EftTransactionRequest, false, MemberPaymentMethod, Membership);
+    end;
+
+    local procedure AddMemberPaymentMethod(EftTransactionRequest: Record "NPR EFT Transaction Request"; Default: boolean; var MemberPaymentMethod: Record "NPR MM Member Payment Method"; Membership: Record "NPR MM Membership")
+    begin
+        Clear(MemberPaymentMethod);
+        MemberPaymentMethod.Init();
+        MemberPaymentMethod."BC Record ID" := Membership.RecordId;
+        MemberPaymentMethod."Table No." := Database::"NPR MM Membership";
+        MemberPaymentMethod.Insert(true);
+        MemberPaymentMethod."Payment Token" := EFTTransactionRequest."Recurring Detail Reference";
+        MemberPaymentMethod."Shopper Reference" := EFTTransactionRequest."Internal Customer ID";
+        MemberPaymentMethod."PAN Last 4 Digits" := CopyStr(DELSTR(EFTTransactionRequest."Card Number", 1, STRLEN(EFTTransactionRequest."Card Number") - 4), 1, MaxStrLen(MemberPaymentMethod."PAN Last 4 Digits"));
+        MemberPaymentMethod."Expiry Date" := GetLastDayOfMonth(EFTTransactionRequest."Card Expiry Year", EFTTransactionRequest."Card Expiry Month");
+        MemberPaymentMethod.PSP := MemberPaymentMethod.PSP::Adyen;
+        MemberPaymentMethod.Validate(Status, MemberPaymentMethod.Status::Active);
+        MemberPaymentMethod.Validate(Default, Default);
+        MemberPaymentMethod."Payment Instrument Type" := EFTTransactionRequest."Payment Instrument Type";
+        MemberPaymentMethod."Payment Brand" := EFTTransactionRequest."Payment Brand";
+        MemberPaymentMethod."Created from System Id" := EFTTransactionRequest.SystemId;
+        MemberPaymentMethod.Modify(true);
+    end;
+
+    local procedure DeleteMemberPaymentMethods(CurrEftTransactionRequest: Record "NPR EFT Transaction Request")
+    var
+        EftTransactionRequest: Record "NPR EFT Transaction Request";
+        MMPaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
+    begin
+        EftTransactionRequest.SetCurrentKey("Sales Ticket No.", "Sales Line No.");
+        EftTransactionRequest.SetRange("Sales Ticket No.", CurrEftTransactionRequest."Sales Ticket No.");
+        EftTransactionRequest.SetFilter("Sales Line No.", '<>%1', CurrEftTransactionRequest."Sales Line No.");
+        EFTTransactionRequest.SetRange(Successful, true);
+        EFTTransactionRequest.SetFilter("Recurring Detail Reference", '<>%1', '');
+        EFTTransactionRequest.SetRange("Processing Type", EFTTransactionRequest."Processing Type"::PAYMENT);
+        EftTransactionRequest.SetLoadFields("Sales Ticket No.", "Sales Line No.", SystemId, Successful, "Recurring Detail Reference", "Processing Type");
+        if not EftTransactionRequest.FindSet() then
+            exit;
+
+        repeat
+            MMPaymentMethodMgt.DeleteMemberPaymentMethod(EftTransactionRequest);
+        until EftTransactionRequest.Next() = 0;
+    end;
+
+    internal procedure CheckMMPaymentMethodAssignedToPOSSale(EFTSetup: Record "NPR EFT Setup"; SalesTicketNo: Code[20]) PaymentMethodAssigned: Boolean;
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        EFTPaymentParamSetup: Record "NPR EFT Adyen Paym. Type Setup";
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+        MemberPaymentMethod: Record "NPR MM Member Payment Method";
+    begin
+        EFTPaymentParamSetup.SetLoadFields("Create Recurring Contract");
+        EFTPaymentParamSetup.Get(EFTSetup."Payment Type POS");
+        if EFTPaymentParamSetup."Create Recurring Contract" = EFTPaymentParamSetup."Create Recurring Contract"::NO then
+            exit;
+
+        MemberInfoCapture.SetRange("Receipt No.", SalesTicketNo);
+        MemberInfoCapture.SetFilter("Member Payment Method", '<>0');
+        PaymentMethodAssigned := not MemberInfoCapture.IsEmpty;
+        if PaymentMethodAssigned then
+            exit;
+
+        EFTTransactionRequest.SetCurrentKey("Sales Ticket No.", "Sales Line No.");
+        EFTTransactionRequest.SetRange("Sales Ticket No.", SalesTicketNo);
+        EFTTransactionRequest.SetFilter("Sales Line No.", '<>%1', 0);
+        EFTTransactionRequest.SetRange(Successful, true);
+        EFTTransactionRequest.SetFilter("Recurring Detail Reference", '<>%1', '');
+        EFTTransactionRequest.SetRange("Processing Type", EFTTransactionRequest."Processing Type"::PAYMENT);
+        EFTTransactionRequest.SetLoadFields("Sales Ticket No.", SystemId, "Sales Line No.", Successful, "Recurring Detail Reference", "Processing Type");
+        if not EFTTransactionRequest.FindSet() then
+            exit;
+
+        repeat
+            MemberPaymentMethod.Reset();
+            MemberPaymentMethod.SetCurrentKey("Created from System Id");
+            MemberPaymentMethod.SetRange("Created from System Id", EFTTransactionRequest.SystemId);
+            PaymentMethodAssigned := not MemberPaymentMethod.IsEmpty;
+        until (EFTTransactionRequest.Next() = 0) or PaymentMethodAssigned;
     end;
 
     internal procedure RewriteAmountFromStringToNumberWithoutRounding(Json: Text; Element: Text): Text

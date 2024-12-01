@@ -1,7 +1,7 @@
 /*
     POSActionPaymentWF2.Codeunit.js
 */
-const main = async ({ workflow, popup, parameters, context }) => {
+const main = async ({ workflow, popup, parameters, context, captions }) => {
   const { HideAmountDialog, HideZeroAmountDialog } = parameters;
   const { preWorkflows } = await workflow.respond("preparePreWorkflows");
 
@@ -22,8 +22,14 @@ const main = async ({ workflow, popup, parameters, context }) => {
     remainingAmount,
     paymentDescription,
     amountPrompt,
+    forceAmount,
+    mmPaymentMethodAssigned,
   } = await workflow.respond("preparePaymentWorkflow");
 
+  if (mmPaymentMethodAssigned) {
+    if (!(await popup.confirm(captions.paymentMethodAssignedCaption)))
+      return {};
+  }
   let suggestedAmount = remainingAmount;
   if (!HideAmountDialog && (!HideZeroAmountDialog || remainingAmount > 0)) {
     suggestedAmount = await popup.numpad({
@@ -32,10 +38,10 @@ const main = async ({ workflow, popup, parameters, context }) => {
       value: remainingAmount,
     });
     if (suggestedAmount === null) return {}; // user cancelled dialog
-    if (suggestedAmount == 0 && remainingAmount > 0) return {}; // user paid 0 with remaining amount
+    if (suggestedAmount === 0 && remainingAmount > 0) return {}; // user paid 0 with remaining amount
   }
 
-  if (suggestedAmount == 0 && remainingAmount == 0) {
+  if (suggestedAmount === 0 && remainingAmount === 0 && !forceAmount) {
     await workflow.run("END_SALE", {
       parameters: {
         calledFromWorkflow: "PAYMENT_2",

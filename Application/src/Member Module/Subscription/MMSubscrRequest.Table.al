@@ -1,0 +1,138 @@
+table 6150923 "NPR MM Subscr. Request"
+{
+    Access = Internal;
+    Caption = 'Subscription Request';
+    DataClassification = CustomerContent;
+    DrillDownPageId = "NPR MM Subscr. Requests";
+    LookupPageId = "NPR MM Subscr. Requests";
+
+    fields
+    {
+        field(1; "Entry No."; BigInteger)
+        {
+            Caption = 'Entry No.';
+            DataClassification = CustomerContent;
+            AutoIncrement = true;
+        }
+        field(10; Type; Enum "NPR MM Subscr. Request Type")
+        {
+            Caption = 'Type';
+            DataClassification = CustomerContent;
+        }
+        field(20; Status; Enum "NPR MM Subscr. Request Status")
+        {
+            Caption = 'Status';
+            DataClassification = CustomerContent;
+            trigger OnValidate()
+            begin
+                if Rec.Status <> xRec.Status then
+                    Rec."Processing Status" := Rec."Processing Status"::Pending;
+
+                UpdateSubscriptionPaymentRequestStatus();
+            end;
+        }
+        field(30; "Processing Status"; ENUM "NPR MM Subs Req Proc Status")
+        {
+            Caption = 'Processing Status';
+            DataClassification = CustomerContent;
+        }
+        field(40; "Subscription Entry No."; Integer)
+        {
+            Caption = 'Subscription Entry No.';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM Subscription"."Entry No.";
+        }
+        field(50; Description; Text[100])
+        {
+            Caption = 'Description';
+            DataClassification = CustomerContent;
+        }
+        field(60; "New Valid From Date"; Date)
+        {
+            Caption = 'New Valid From Date';
+            DataClassification = CustomerContent;
+        }
+        field(70; "New Valid Until Date"; Date)
+        {
+            Caption = 'New Valid Until Date';
+            DataClassification = CustomerContent;
+        }
+        field(80; Amount; Decimal)
+        {
+            Caption = 'Amount';
+            DataClassification = CustomerContent;
+            AutoFormatType = 1;
+            AutoFormatExpression = "Currency Code";
+        }
+        field(90; "Currency Code"; Code[10])
+        {
+            Caption = 'Currency Code';
+            DataClassification = CustomerContent;
+        }
+        field(100; "Item No."; Code[20])
+        {
+            Caption = 'Item No.';
+            DataClassification = CustomerContent;
+            TableRelation = Item."No.";
+        }
+        field(110; Posted; Boolean)
+        {
+            Caption = 'Posted';
+            DataClassification = CustomerContent;
+        }
+        field(120; "G/L Entry No."; Integer)
+        {
+            Caption = 'G/L Entry No.';
+            DataClassification = CustomerContent;
+            TableRelation = "G/L Entry"."Entry No.";
+        }
+        field(130; "Posting Document No."; Code[20])
+        {
+            Caption = 'Posting Document No.';
+            DataClassification = CustomerContent;
+        }
+        field(140; "Posting Date"; Date)
+        {
+            Caption = 'Posting Date';
+            DataClassification = CustomerContent;
+        }
+        field(150; "Process Try Count"; Integer)
+        {
+            Caption = 'Process Try Count';
+            DataClassification = CustomerContent;
+        }
+    }
+
+    keys
+    {
+        key(PK; "Entry No.")
+        {
+            Clustered = true;
+        }
+        key(Key2; "Subscription Entry No.") { }
+        key(Key3; "Processing Status", Type, Status) { }
+        key(Key4; "Subscription Entry No.", "Processing Status") { }
+    }
+
+    trigger OnDelete()
+    var
+        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+        UnfinishedPmtReqestsErr: Label 'The %1 %2 cannot be deleted because it has an unfinished payment request assigned to it. Please wait until a response is received from the PSP and the response is properly processed.', Comment = '%1 - "Subscription Request" table caption, %2 - entry number';
+    begin
+        SubscrPaymentRequest.SetRange("Subscr. Request Entry No.", "Entry No.");
+        if not SubscrPaymentRequest.IsEmpty() then begin
+            SubscrPaymentRequest.SetRange(Status, SubscrPaymentRequest.Status::Requested);
+            if not SubscrPaymentRequest.IsEmpty() then
+                Error(UnfinishedPmtReqestsErr);
+            SubscrPaymentRequest.SetRange(Status);
+            SubscrPaymentRequest.DeleteAll(true);
+        end;
+    end;
+
+    local procedure UpdateSubscriptionPaymentRequestStatus()
+    var
+        SubscrRequestUtils: Codeunit "NPR MM Subscr. Request Utils";
+    begin
+        SubscrRequestUtils.UpdateUnprocessableStatusInSubscriptionPaymentRequestStatus(Rec);
+    end;
+}

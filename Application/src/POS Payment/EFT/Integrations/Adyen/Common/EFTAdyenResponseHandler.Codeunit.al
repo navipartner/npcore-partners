@@ -36,13 +36,15 @@ codeunit 6184611 "NPR EFT Adyen Response Handler"
                             EndAcquireCard(EFTTransactionRequest, Response);
                         6:
                             EndClearShopperContract(EFTTransactionRequest, Response);
-
+                        8:
+                            EndSubscriptionConfirmation(EFTTransactionRequest, Response);
                     end;
             end;
         end else begin
             EFTTransactionRequest."NST Error" := CopyStr(ErrorText, 1, MaxStrLen(EFTTransactionRequest."NST Error"));
             EFTTransactionRequest."External Result Known" := not Started;
             ProcessOriginalTrxAfterAcquireCardFailure(EFTTransactionRequest);
+            ProcessOriginalTrxAfterSubscriptionConfirmationFailure(EFTTransactionRequest);
             HandleProtocolResponse(EFTTransactionRequest);
         end;
     end;
@@ -221,6 +223,34 @@ codeunit 6184611 "NPR EFT Adyen Response Handler"
         end;
     end;
 
+    local procedure EndSubscriptionConfirmation(var EftTransactionRequest: Record "NPR EFT Transaction Request"; Response: Text)
+    var
+        EFTAdyenResponseParser: Codeunit "NPR EFT Adyen Response Parser";
+        ParseError: Text;
+        ParseSuccess: Boolean;
+    begin
+        EFTAdyenResponseParser.SetResponseData(Enum::"NPR EFT Adyen Response Type"::SubscriptionConfirmation, Response, EftTransactionRequest."Entry No.");
+        ParseSuccess := EFTAdyenResponseParser.Run();
+
+        if not ParseSuccess then begin
+            ParseError := GetLastErrorText;
+            EFTAdyenResponseParser.SetResponseData(Enum::"NPR EFT Adyen Response Type"::RejectNotification, Response, EftTransactionRequest."Entry No.");
+            ParseSuccess := EFTAdyenResponseParser.Run();
+        end;
+
+        EftTransactionRequest.Get(EftTransactionRequest."Entry No.");
+
+        if not ParseSuccess then begin
+            HandleError(EftTransactionRequest, ParseError);
+            EftTransactionRequest.Modify();
+        end;
+
+        HandleProtocolResponse(EftTransactionRequest);
+        if (not EftTransactionRequest.Successful) then begin
+            ProcessOriginalTrxAfterSubscriptionConfirmationFailure(EftTransactionRequest);
+        end;
+    end;
+
     local procedure EndClearShopperContract(var EftTransactionRequest: Record "NPR EFT Transaction Request"; Response: Text)
     var
         EFTAdyenResponseParser: Codeunit "NPR EFT Adyen Response Parser";
@@ -253,6 +283,28 @@ codeunit 6184611 "NPR EFT Adyen Response Handler"
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
         if not (EFTTransactionRequest."Auxiliary Operation ID" in [2, 3]) then
+            exit;
+        if (EFTTransactionRequest."Initiated from Entry No." = 0) then
+            exit;
+        if (EFTTransactionRequest."Processing Type" <> EFTTransactionRequest."Processing Type"::AUXILIARY) then
+            exit;
+
+        OriginalEFTTransactionRequest.Get(EFTTransactionRequest."Initiated from Entry No.");
+        OriginalEFTTransactionRequest."External Result Known" := true; //We know the primary transaction "failed correctly" since we never started it in the first place.
+        OriginalEFTTransactionRequest.Recoverable := false; //Not recoverable since we never started it in the first place.
+        OriginalEFTTransactionRequest."NST Error" := EFTTransactionRequest."NST Error";
+        OriginalEFTTransactionRequest."Result Description" := EFTTransactionRequest."Result Description";
+        OriginalEFTTransactionRequest."Result Display Text" := EFTTransactionRequest."Result Display Text";
+        OriginalEFTTransactionRequest.Modify();
+        HandleProtocolResponse(OriginalEFTTransactionRequest);
+    end;
+
+
+    procedure ProcessOriginalTrxAfterSubscriptionConfirmationFailure(EFTTransactionRequest: Record "NPR EFT Transaction Request")
+    var
+        OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
+    begin
+        if not (EFTTransactionRequest."Auxiliary Operation ID" in [8]) then
             exit;
         if (EFTTransactionRequest."Initiated from Entry No." = 0) then
             exit;
@@ -314,7 +366,7 @@ codeunit 6184611 "NPR EFT Adyen Response Handler"
                     Message := StrSubstNo(TRX_ERROR, Format(EFTTransactionRequest."Processing Type"), EFTTransactionRequest."Result Description", EFTTransactionRequest."Result Display Text", EFTTransactionRequest."NST Error");
                 EFTTransactionRequest."Processing Type"::AUXILIARY:
                     case EFTTransactionRequest."Auxiliary Operation ID" of
-                        2, 4, 5, 6:
+                        2, 4, 5, 6, 8:
                             Message := StrSubstNo(TRX_ERROR, Format(EftTransactionRequest."Auxiliary Operation Desc."), EftTransactionRequest."Result Description", EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
                     end;
             end;
