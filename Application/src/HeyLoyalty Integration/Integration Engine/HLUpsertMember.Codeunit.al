@@ -162,6 +162,7 @@ codeunit 6060000 "NPR HL Upsert Member"
         MembershipSetup: Record "NPR MM Membership Setup";
         MemberNotification: Codeunit "NPR MM Member Notification";
         MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
         MembershipEntryNo: Integer;
     begin
         clear(MembershipEntry);
@@ -178,10 +179,12 @@ codeunit 6060000 "NPR HL Upsert Member"
             MembershipNotification.ModifyAll("Notification Status", MembershipNotification."Notification Status"::CANCELED);
 
             MembershipEntry.SetRange("Membership Entry No.", MembershipEntryNo);
-            if MembershipEntry.FindFirst() then begin
+            MembershipEntry.SetFilter(Context, '<>%1', MembershipEntry.Context::REGRET);
+            if MembershipEntry.FindLast() then begin
                 MembershipEntry."Activate On First Use" := false;
                 MembershipEntry.Modify();
                 MemberNotification.AddMembershipRenewalNotification(MembershipEntry);
+                SubscriptionMgtImpl.UpdateMembershipSubscriptionDetails(MembershipEntry);
             end;
         end;
     end;

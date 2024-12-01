@@ -170,6 +170,27 @@ page 6184531 "NPR Adyen Setup"
                     ToolTip = 'Specifies the value of the EFT Res. Account No. field.';
                 }
             }
+
+            group(Subscriptions)
+            {
+                Caption = 'Subscriptions';
+                field("Active Subs. Payment Gateways"; Rec."Active Subs. Payment Gateways")
+                {
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ToolTip = 'The number of the active subscription payment gateways';
+                }
+                field("Max Sub Req Process Try Count"; Rec."Max Sub Req Process Try Count")
+                {
+                    BlankZero = true;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ToolTip = 'Specifies the value of the Max. Subscription Request Processing Try Count field.';
+                }
+                field("Auto Process Subs Req Errors"; Rec."Auto Process Subs Req Errors")
+                {
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ToolTip = 'Specifies the value of the Auto Process Subscription Request Errors field.';
+                }
+            }
         }
     }
 
@@ -196,6 +217,14 @@ page 6184531 "NPR Adyen Setup"
                     Image = Setup;
                     ToolTip = 'Running this action will open Merchant Account Setup.';
                     RunObject = Page "NPR Adyen Merchant Setup";
+                }
+                action("Open Subscription Payment Gateways")
+                {
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Caption = 'Open Subscription Payment Gateways';
+                    Image = Setup;
+                    ToolTip = 'Running this action will open the Subscription Payment Gateways.';
+                    RunObject = Page "NPR MM Subs. Payment Gateways";
                 }
             }
             group(Configurations)

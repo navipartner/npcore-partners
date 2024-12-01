@@ -438,6 +438,11 @@
                     ToolTip = 'Specifies the value of the Manual Capture field.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Confirmed Flag"; Rec."Confirmed Flag")
+                {
+                    ToolTip = 'Specifies the value of the Confirmed Flag field.';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
         area(factboxes)

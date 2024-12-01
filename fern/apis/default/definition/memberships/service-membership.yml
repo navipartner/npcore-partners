@@ -142,6 +142,26 @@ service:
           response: 
             body: $GetMembersResponse.ExampleGetMembers
 
+    getMembershipRenewalInfo:
+      docs: 
+        This endpoint retrieves information about renewing a membership (pricing and term).
+      display-name: Get Membership Renewal Info
+      method: GET
+      path: /{membershipId}/renewal
+      path-parameters:
+        membershipId: simpleTypes.MembershipId
+      request:
+        name: getMembershipRenewalInfo
+      response: GetMembershipRenewalInfoResponse
+      examples:
+        - name: GetMembershipRenewalInfo
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          response: 
+            body: $GetMembershipRenewalInfoResponse.ExampleGetMembershipRenewalInfo
 
 ###################################################
 types:
@@ -216,4 +236,13 @@ types:
         value:
           #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
           membership: $compositeTypes.MembershipDTO.ExampleMembershipDTO
-
+  
+  # Get Membership Renewal Info Service
+  GetMembershipRenewalInfoResponse:
+    properties:
+      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
+      membership: compositeTypes.MembershipRenewalInfoDTO
+    examples:
+      - name: ExampleGetMembershipRenewalInfo
+        value:
+          membership: $compositeTypes.MembershipRenewalInfoDTO.ExampleMembershipRenewalInfo

@@ -215,6 +215,31 @@
             Caption = 'Try Posting Count';
             DataClassification = CustomerContent;
         }
+        field(390; "Payment Token"; Text[64])
+        {
+            Caption = 'Payment Token';
+            DataClassification = CustomerContent;
+        }
+        field(400; "Payment Instrument Type"; Text[30])
+        {
+            Caption = 'Payment Instrument Type';
+            DataClassification = CustomerContent;
+        }
+        field(410; "Card Summary"; Text[4])
+        {
+            Caption = 'Card Summary';
+            DataClassification = CustomerContent;
+        }
+        field(420; Brand; Text[30])
+        {
+            Caption = 'Brand';
+            DataClassification = CustomerContent;
+        }
+        field(430; "Expiry Date Text"; Text[50])
+        {
+            Caption = 'Expiry Date Text';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

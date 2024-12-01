@@ -37,6 +37,7 @@
             var
                 MembershipRole: Record "NPR MM Membership Role";
                 Contact: Record Contact;
+                Subscription: Record "NPR MM Subscription";
             begin
                 Rec."Blocked At" := CreateDateTime(0D, 0T);
                 Rec."Blocked By" := '';
@@ -60,6 +61,14 @@
                     until (MembershipRole.Next() = 0);
                 end;
 
+                Subscription.SetRange("Membership Entry No.", "Entry No.");
+                if Subscription.FindSet() then
+                    repeat
+                        if Subscription.Blocked <> Blocked then begin
+                            Subscription.Validate(Blocked, Blocked);
+                            Subscription.Modify(true);
+                        end;
+                    until Subscription.Next() = 0;
             end;
         }
         field(16; "Blocked At"; DateTime)

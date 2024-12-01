@@ -1,0 +1,11 @@
+enum 6059805 "NPR MM Subscr. Request Type"
+{
+#if not BC17
+    Access = Internal;
+#endif
+    Extensible = false;
+    Caption = 'Subscription Request Type';
+
+    value(0; " ") { Caption = ''; }
+    value(10; "Renew") { Caption = 'Renew'; }
+}

@@ -1,15 +1,21 @@
 ﻿table 6060093 "NPR MM Recur. Paym. Setup"
 {
     Access = Internal;
-
     Caption = 'Recurring Payment Setup';
     DataClassification = CustomerContent;
+    LookupPageId = "NPR MM Recurring Payments";
+    DrillDownPageId = "NPR MM Recurring Payments";
 
     fields
     {
         field(1; "Code"; Code[10])
         {
             Caption = 'Code';
+            DataClassification = CustomerContent;
+        }
+        field(2; Description; Text[100])
+        {
+            Caption = 'Description';
             DataClassification = CustomerContent;
         }
         field(10; "Payment Service Provider Code"; Code[20])
@@ -52,6 +58,22 @@
             Caption = 'Period Size';
             DataClassification = CustomerContent;
         }
+        field(110; "Subscr. Auto-Renewal On"; Enum "NPR MM Subscr. Auto-Renewal")
+        {
+            Caption = 'Subscr. Auto-Renewal On';
+            DataClassification = CustomerContent;
+        }
+        field(115; "First Attempt Offset (Days)"; Integer)
+        {
+            Caption = 'First Attempt Offset (Days)';
+            DataClassification = CustomerContent;
+        }
+        field(120; "Source Code"; Code[10])
+        {
+            Caption = 'Source Code';
+            DataClassification = CustomerContent;
+            TableRelation = "Source Code".Code;
+        }
         field(200; "Gen. Journal Template Name"; Code[10])
         {
             Caption = 'Gen. Journal Template Name';
@@ -65,6 +87,12 @@
             DataClassification = CustomerContent;
             TableRelation = "Gen. Journal Batch".Name WHERE("Journal Template Name" = FIELD("Gen. Journal Template Name"));
         }
+        field(6; "Max. Pay. Process Try Count"; Integer)
+        {
+            Caption = 'Max. Payment Process Try Count';
+            DataClassification = CustomerContent;
+            InitValue = 5;
+        }
     }
 
     keys
@@ -73,9 +101,4 @@
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-

@@ -92,11 +92,11 @@ codeunit 6184589 "NPR EFT Adyen Trx Request"
                 EFTAdyenPaymentTypeSetup."Create Recurring Contract"::NO:
                     ;
                 EFTAdyenPaymentTypeSetup."Create Recurring Contract"::ONECLICK:
-                    Value += '&recurringContract=ONECLICK&shopperReference=' + EFTTransactionRequest."Internal Customer ID";
+                    Value += '&recurringProcessingModel=CardOnFile&shopperReference=' + EFTTransactionRequest."Internal Customer ID";
                 EFTAdyenPaymentTypeSetup."Create Recurring Contract"::RECURRING:
-                    Value += '&recurringContract=RECURRING&shopperReference=' + EFTTransactionRequest."Internal Customer ID";
+                    Value += '&recurringProcessingModel=Subscription&shopperReference=' + EFTTransactionRequest."Internal Customer ID";
                 EFTAdyenPaymentTypeSetup."Create Recurring Contract"::RECURRING_ONECLICK:
-                    Value += '&recurringContract=ONECLICK,RECURRING&shopperReference=' + EFTTransactionRequest."Internal Customer ID";
+                    Value += '&recurringProcessingModel=UnscheduledCardOnFile,RECURRING&shopperReference=' + EFTTransactionRequest."Internal Customer ID";
             end;
 
             if not EFTTransactionRequest."Manual Capture" then begin

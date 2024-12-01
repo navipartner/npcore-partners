@@ -446,12 +446,14 @@
         SentryEndSaleSpan: Codeunit "NPR Sentry Span";
         SentryPreEndSaleSpan: Codeunit "NPR Sentry Span";
         SentryPostEndSaleSpan: Codeunit "NPR Sentry Span";
+        MMPaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
     begin
         SentryScope.TryGetActiveSpan(SentryActiveSpan);
         SentryActiveSpan.StartChildSpan('bc.end_sale.pre_processing', 'bc.end_sale.pre_processing', SentryPreEndSaleSpan);
 
         CheckItemAvailability();
         _PaymentLine.CalculateBalance(SalesAmount, PaidAmount, ReturnAmount, SubTotal);
+        MMPaymentMethodMgt.SetMemberPaymentMethodDefaultBeforeEndSale(_Rec);
         RetailSalesDocMgt.HandleLinkedDocuments(POSSession);
 
         OnBeforeEndSale(_Rec);

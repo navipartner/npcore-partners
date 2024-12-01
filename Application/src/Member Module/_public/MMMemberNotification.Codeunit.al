@@ -130,6 +130,25 @@
 
                     exit(_NOTIFICATION_ACTION::CANCEL); // Cancel welcome notification
                 end;
+            MembershipNotification."Notification Trigger"::RENEWAL_SUCCESS:
+                begin
+                    // Notification Date is offset from subscription starts
+                    StartDate := MembershipNotification."Date To Notify";
+                    if (StartDate < Today) then
+                        StartDate := Today();
+
+                    if (MembershipManagement.GetMembershipValidDate(MembershipNotification."Membership Entry No.", StartDate, FromDate, UntilDate)) then
+                        exit(_NOTIFICATION_ACTION::SEND); // valid, send notification
+                end;
+            MembershipNotification."Notification Trigger"::RENEWAL_FAILURE:
+                begin
+                    // Notification Date is offset from subscription starts
+                    StartDate := MembershipNotification."Date To Notify";
+                    if (StartDate < Today) then
+                        StartDate := Today();
+
+                    exit(_NOTIFICATION_ACTION::SEND); // valid, send notification
+                end;
             MembershipNotification."Notification Trigger"::WALLET_CREATE,
             MembershipNotification."Notification Trigger"::WALLET_UPDATE:
                 begin
@@ -439,6 +458,10 @@
                 FoundAddress := MembershipManagement.GetCommunicationMethod_Coupon(MemberEntryNo, MembershipEntryNo, Method, NotificationAddress, NotificationEngine);
             MembershipNotification."Notification Trigger"::ACHIEVEMENT:
                 FoundAddress := MembershipManagement.GetCommunicationMethod_Coupon(MemberEntryNo, MembershipEntryNo, Method, NotificationAddress, NotificationEngine);
+            MembershipNotification."Notification Trigger"::RENEWAL_SUCCESS:
+                FoundAddress := MembershipManagement.GetCommunicationMethod_RenewalSuccess(MemberEntryNo, MembershipEntryNo, Method, NotificationAddress, NotificationEngine);
+            MembershipNotification."Notification Trigger"::RENEWAL_FAILURE:
+                FoundAddress := MembershipManagement.GetCommunicationMethod_RenewalFailure(MemberEntryNo, MembershipEntryNo, Method, NotificationAddress, NotificationEngine);
         end;
 
         case Method of
@@ -870,6 +893,133 @@
         MembershipNotification."Template Filter Value" := NotificationSetup."Template Filter Value";
         MembershipNotification."Target Member Role" := NotificationSetup."Target Member Role";
 
+        MembershipNotification.Insert();
+    end;
+
+    procedure AddMembershipRenewalSuccessNotification(MembershipLedgerEntry: Record "NPR MM Membership Entry")
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        CommunitySetup: Record "NPR MM Member Community";
+    begin
+
+        Membership.Get(MembershipLedgerEntry."Membership Entry No.");
+        MembershipSetup.Get(Membership."Membership Code");
+        CommunitySetup.Get(MembershipSetup."Community Code");
+
+        AddMembershipRenewalSuccessNotificationWorker(MembershipLedgerEntry, MembershipSetup, CommunitySetup);
+    end;
+
+    local procedure AddMembershipRenewalSuccessNotificationWorker(MembershipLedgerEntry: Record "NPR MM Membership Entry"; MembershipSetup: Record "NPR MM Membership Setup"; CommunitySetup: Record "NPR MM Member Community")
+    var
+        Membership: Record "NPR MM Membership";
+        NotificationSetup: Record "NPR MM Member Notific. Setup";
+        MembershipNotification: Record "NPR MM Membership Notific.";
+    begin
+
+        Membership.Get(MembershipLedgerEntry."Membership Entry No.");
+
+        MembershipNotification.SetCurrentKey("Membership Entry No.");
+        MembershipNotification.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
+        MembershipNotification.SetFilter("Notification Trigger", '=%1', MembershipNotification."Notification Trigger"::RENEWAL_SUCCESS);
+        MembershipNotification.SetFilter("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);
+        if (MembershipNotification.FindSet(true)) then begin
+            repeat
+                MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::CANCELED;
+                MembershipNotification."Notification Processed At" := CurrentDateTime();
+                MembershipNotification."Notification Processed By User" := CopyStr(UserId, 1, MaxStrLen(MembershipNotification."Notification Processed By User"));
+                MembershipNotification.Modify();
+            until (MembershipNotification.Next() = 0);
+        end;
+
+        if (not ((MembershipSetup."Create Renewal Success Notif") or (CommunitySetup."Create Renewal Success Notif"))) then
+            exit;
+
+        NotificationSetup.SetCurrentKey(Type, "Community Code", "Membership Code", "Days Before");
+        NotificationSetup.SetFilter(Type, '=%1', NotificationSetup.Type::RENEWAL_SUCCESS);
+        NotificationSetup.SetFilter("Community Code", '=%1', Membership."Community Code");
+        NotificationSetup.SetFilter("Membership Code", '=%1', Membership."Membership Code");
+        if (not NotificationSetup.FindLast()) then begin
+            NotificationSetup.SetFilter("Membership Code", '=%1', '');
+            if (not NotificationSetup.FindLast()) then begin
+                NotificationSetup.SetFilter("Community Code", '=%1', '');
+                if (not NotificationSetup.FindLast()) then
+                    exit;
+            end;
+        end;
+
+        MembershipNotification.Reset();
+        MembershipNotification.Init();
+        MembershipNotification."Entry No." := 0;
+        MembershipNotification."Membership Entry No." := MembershipLedgerEntry."Membership Entry No.";
+        MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::PENDING;
+        MembershipNotification."Notification Code" := NotificationSetup.Code;
+        MembershipNotification."Date To Notify" := Today;
+        MembershipNotification."Notification Trigger" := MembershipNotification."Notification Trigger"::RENEWAL_SUCCESS;
+        MembershipNotification."Template Filter Value" := NotificationSetup."Template Filter Value";
+        MembershipNotification."Target Member Role" := NotificationSetup."Target Member Role";
+        MembershipNotification."Processing Method" := NotificationSetup."Processing Method";
+        MembershipNotification.Insert();
+    end;
+
+    procedure AddMembershipRenewalFailureNotification(MembershipEntryNo: Integer; MembershipCode: Code[20]; RejectedReasonCode: Text[50]; RejectedReasonDescription: Text[250])
+    var
+        MembershipSetup: Record "NPR MM Membership Setup";
+        CommunitySetup: Record "NPR MM Member Community";
+    begin
+        MembershipSetup.Get(MembershipCode);
+        CommunitySetup.Get(MembershipSetup."Community Code");
+
+        AddMembershipRenewalFailureNotificationWorker(MembershipEntryNo, RejectedReasonCode, RejectedReasonDescription, MembershipSetup, CommunitySetup);
+    end;
+
+    local procedure AddMembershipRenewalFailureNotificationWorker(MembershipEntryNo: Integer; RejectedReasonCode: Text[50]; RejectedReasonDescription: Text[250]; MembershipSetup: Record "NPR MM Membership Setup"; CommunitySetup: Record "NPR MM Member Community")
+    var
+        NotificationSetup: Record "NPR MM Member Notific. Setup";
+        MembershipNotification: Record "NPR MM Membership Notific.";
+    begin
+        MembershipNotification.SetCurrentKey("Membership Entry No.");
+        MembershipNotification.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
+        MembershipNotification.SetFilter("Notification Trigger", '=%1', MembershipNotification."Notification Trigger"::RENEWAL_FAILURE);
+        MembershipNotification.SetFilter("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);
+        if (MembershipNotification.FindSet(true)) then begin
+            repeat
+                MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::CANCELED;
+                MembershipNotification."Notification Processed At" := CurrentDateTime();
+                MembershipNotification."Notification Processed By User" := CopyStr(UserId, 1, MaxStrLen(MembershipNotification."Notification Processed By User"));
+                MembershipNotification.Modify();
+            until (MembershipNotification.Next() = 0);
+        end;
+
+        if (not ((MembershipSetup."Create Renewal Failure Notif") or (CommunitySetup."Create Renewal Failure Notif"))) then
+            exit;
+
+        NotificationSetup.SetCurrentKey(Type, "Community Code", "Membership Code", "Days Before");
+        NotificationSetup.SetFilter(Type, '=%1', NotificationSetup.Type::RENEWAL_FAILURE);
+        NotificationSetup.SetFilter("Community Code", '=%1', CommunitySetup.Code);
+        NotificationSetup.SetFilter("Membership Code", '=%1', MembershipSetup.Code);
+        if (not NotificationSetup.FindLast()) then begin
+            NotificationSetup.SetFilter("Membership Code", '=%1', '');
+            if (not NotificationSetup.FindLast()) then begin
+                NotificationSetup.SetFilter("Community Code", '=%1', '');
+                if (not NotificationSetup.FindLast()) then
+                    exit;
+            end;
+        end;
+
+        MembershipNotification.Reset();
+        MembershipNotification.Init();
+        MembershipNotification."Entry No." := 0;
+        MembershipNotification."Membership Entry No." := MembershipEntryNo;
+        MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::PENDING;
+        MembershipNotification."Notification Code" := NotificationSetup.Code;
+        MembershipNotification."Date To Notify" := Today;
+        MembershipNotification."Notification Trigger" := MembershipNotification."Notification Trigger"::RENEWAL_FAILURE;
+        MembershipNotification."Template Filter Value" := NotificationSetup."Template Filter Value";
+        MembershipNotification."Target Member Role" := NotificationSetup."Target Member Role";
+        MembershipNotification."Processing Method" := NotificationSetup."Processing Method";
+        MembershipNotification."Rejected Reason Code" := RejectedReasonCode;
+        MembershipNotification."Rejected Reason Description" := RejectedReasonDescription;
         MembershipNotification.Insert();
     end;
 

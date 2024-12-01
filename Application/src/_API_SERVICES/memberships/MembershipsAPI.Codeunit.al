@@ -12,6 +12,8 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
         if (Request.Match('GET', '/membership')) then
             exit(Handle(_ApiFunction::GET_MEMBERSHIP_USING_NUMBER, Request));
 
+        if (Request.Match('GET', '/membership/:membershipId/renewal')) then
+            exit(Handle(_ApiFunction::GET_MEMBERSHIP_RENEWAL_INFO, Request));
 
         if (Request.Match('GET', '/membership/:membershipId/paymentmethods')) then
             exit(Handle(_ApiFunction::GET_ALL_PAYMENT_METHODS, Request));

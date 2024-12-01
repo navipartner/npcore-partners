@@ -23,4 +23,10 @@ enum 6014607 "NPR EFT Adyen Task Status"
     value(5; LookupInitiated)
     {
     }
+    value(6; SubscriptionConfirmationResponseInitiated)
+    {
+    }
+    value(7; SubscriptionConfirmationResponseReceived)
+    {
+    }
 }

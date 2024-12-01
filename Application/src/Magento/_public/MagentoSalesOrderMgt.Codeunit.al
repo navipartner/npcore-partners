@@ -341,12 +341,24 @@
         TransactionId: Text;
         PaymentAmount: Decimal;
         ShopperReference: Text;
+        PaymentToken: Text;
+        Brand: Text;
+        CardSummary: Text;
+        PaymentInstrumentType: Text;
+        ExpiryDateText: Text;
+        CardPaymentInstrumentTypeLbl: Label 'Card';
     begin
         TransactionId := NpXmlDomMgt.GetXmlText(XmlElement, 'transaction_id', MaxStrLen(PaymentLine."Transaction ID"), false);
         Evaluate(PaymentAmount, NpXmlDomMgt.GetXmlText(XmlElement, 'payment_amount', 0, true), 9);
         if PaymentAmount = 0 then
             exit;
         ShopperReference := NpXmlDomMgt.GetXmlText(XmlElement, 'shopper_reference', MaxStrLen(PaymentLine."No."), false);
+        PaymentToken := NpXmlDomMgt.GetXmlText(XmlElement, 'token', MaxStrLen(PaymentLine."Payment Token"), false);
+        ExpiryDateText := NpXmlDomMgt.GetXmlText(XmlElement, 'expiry_date', MaxStrLen(PaymentLine."Payment Token"), false);
+        Brand := NpXmlDomMgt.GetXmlText(XmlElement, 'brand', MaxStrLen(PaymentLine.Brand), false);
+        CardSummary := NpXmlDomMgt.GetXmlText(XmlElement, 'card_summary', MaxStrLen(PaymentLine."Card Summary"), false);
+        if PaymentToken <> '' then
+            PaymentInstrumentType := CardPaymentInstrumentTypeLbl;
 
         PaymentMapping.SetRange("External Payment Method Code", CopyStr(NpXmlDomMgt.GetXmlAttributeText(XmlElement, 'code', true), 1, MaxStrLen(PaymentMapping."External Payment Method Code")));
 
@@ -376,6 +388,11 @@
         PaymentLine."Allow Adjust Amount" := PaymentMapping."Allow Adjust Payment Amount";
         PaymentLine."Payment Gateway Code" := PaymentMapping."Payment Gateway Code";
         PaymentLine."Payment Gateway Shopper Ref." := CopyStr(ShopperReference, 1, MaxStrLen(PaymentLine."Payment Gateway Shopper Ref."));
+        PaymentLine."Payment Token" := CopyStr(PaymentToken, 1, MaxStrLen(PaymentLine."Payment Token"));
+        PaymentLine."Expiry Date Text" := Copystr(ExpiryDateText, 1, MaxStrLen(PaymentLine."Expiry Date Text"));
+        PaymentLine.Brand := CopyStr(Brand, 1, MaxStrLen(PaymentLine."Payment Instrument Type"));
+        PaymentLine."Payment Instrument Type" := CopyStr(CardPaymentInstrumentTypeLbl, 1, MaxStrLen(PaymentLine."Payment Instrument Type"));
+        PaymentLine."Card Summary" := CopyStr(CardSummary, 1, MaxStrLen(PaymentLine."Card Summary"));
 
         if PaymentMapping."Captured Externally" then
             PaymentLine."Date Captured" := GetDate(SalesHeader."Order Date", SalesHeader."Posting Date");

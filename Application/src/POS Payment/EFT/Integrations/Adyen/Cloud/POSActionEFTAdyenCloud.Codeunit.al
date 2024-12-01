@@ -50,6 +50,10 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
                 begin
                     exit(ProcessAcquireCardResponse(EntryNo));
                 end;
+            TrxStatus::SubscriptionConfirmationResponseReceived:
+                begin
+                    exit(ProccessSubscriptionConfirmationResponseReceived(EntryNo));
+                end;
             TrxStatus::ResultReceived:
                 begin
                     exit(ProcessResult(EntryNo));
@@ -77,17 +81,28 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
         TaskId: Integer;
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
         AcquireCardEntryNo: Integer;
+        ShopperSubscriptionConfirmation: Integer;
     begin
         ClearGlobalState();
         POSSession.GetPOSBackgroundTaskAPI(POSBackgroundTaskAPI);
         EftTransactionRequest.Get(EntryNo);
         EftSetup.FindSetup(EftTransactionRequest."Register No.", EftTransactionRequest."Original POS Payment Type Code");
 
-        if EFTAdyenIntegration.AcquireCardBeforeTransaction(EftTransactionRequest, AcquireCardEntryNo) then begin
-            //We start by acquiring the card in background task, then later continue to purchase request once done.
-            Response.Add('newEntryNo', AcquireCardEntryNo);
-            EftTransactionRequest.Get(AcquireCardEntryNo);
-            _trxStatus.Set(EntryNo, Enum::"NPR EFT Adyen Task Status"::Initiated.AsInteger());
+        case true of
+            EFTAdyenIntegration.RequestShopperSubscriptionConfirmation(EftTransactionRequest, ShopperSubscriptionConfirmation):
+                begin
+                    //Ask for subscription confirmation if necessary before acquire card
+                    Response.Add('newEntryNo', ShopperSubscriptionConfirmation);
+                    EftTransactionRequest.Get(ShopperSubscriptionConfirmation);
+                    _trxStatus.Set(EntryNo, Enum::"NPR EFT Adyen Task Status"::Initiated.AsInteger());
+                end;
+            EFTAdyenIntegration.AcquireCardBeforeTransaction(EftTransactionRequest, AcquireCardEntryNo):
+                begin
+                    //We start by acquiring the card in background task, then later continue to purchase request once done.
+                    Response.Add('newEntryNo', AcquireCardEntryNo);
+                    EftTransactionRequest.Get(AcquireCardEntryNo);
+                    _trxStatus.Set(EntryNo, Enum::"NPR EFT Adyen Task Status"::Initiated.AsInteger());
+                end;
         end;
 
         Parameters.Add('EntryNo', Format(EftTransactionRequest."Entry No."));
@@ -116,6 +131,11 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
                         begin
                             _trxStatus.Set(EftTransactionRequest."Entry No.", Enum::"NPR EFT Adyen Task Status"::AcquireCardInitiated.AsInteger());
                             POSBackgroundTaskAPI.EnqueuePOSBackgroundTask(TaskId, Enum::"NPR POS Background Task"::EFT_ADYEN_CLOUD_ACQ_CARD, Parameters, 1000 * 60 * 5);
+                        end;
+                    8:
+                        begin
+                            _trxStatus.Set(EftTransactionRequest."Entry No.", Enum::"NPR EFT Adyen Task Status"::SubscriptionConfirmationResponseInitiated.AsInteger());
+                            POSBackgroundTaskAPI.EnqueuePOSBackgroundTask(TaskId, Enum::"NPR POS Background Task"::EFT_SUBSCRIPTION_CONFIRM, Parameters, 1000 * 60 * 5);
                         end;
                     else
                         Error('Unsupported operation. This is programming bug, not a user error.');
@@ -172,6 +192,58 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
 
             // Fire off cancel of the acquire card operation in the background so terminal goes back to idle again.
             CancelAcquisition(EntryNo);
+            _trxStatus.Set(EntryNo, Enum::"NPR EFT Adyen Task Status"::ResultReceived.AsInteger());
+
+            Response.Add('done', true);
+            Response.Add('success', false);
+        end;
+
+        exit(Response);
+    end;
+
+    local procedure ProccessSubscriptionConfirmationResponseReceived(EntryNo: Integer): JsonObject
+    var
+        EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
+        ContinueOnEntryNo: Integer;
+        Response: JsonObject;
+        Parameters: Dictionary of [Text, Text];
+        POSSession: Codeunit "NPR POS Session";
+        POSBackgroundTaskAPI: Codeunit "NPR POS Background Task API";
+        TaskId: Integer;
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        EFTAdyenResponseHandler: Codeunit "NPR EFT Adyen Response Handler";
+        ResultMessageOut: Text;
+    begin
+        if not ProcessResponse(EntryNo) then
+            exit;
+
+        EFTTransactionRequest.Get(EntryNo);
+        if EFTTransactionRequest."Result Code" = -10 then begin
+            // Previous Trx is still in progress on terminal. Fire off abort in background to help it back to idle while processing this failure.
+            TryAbortMostRecentTrx(EFTTransactionRequest);
+        end;
+
+        if EFTAdyenIntegration.ContinueAfterSubscriptionConfirmation(EntryNo, ContinueOnEntryNo) then begin
+            EftTransactionRequest.Get(ContinueOnEntryNo);
+            if EFTAdyenIntegration.AcquireCardBeforeTransaction(EftTransactionRequest, ContinueOnEntryNo) then begin
+                EftTransactionRequest.Get(ContinueOnEntryNo);
+                _trxStatus.Set(ContinueOnEntryNo, Enum::"NPR EFT Adyen Task Status"::Initiated.AsInteger());
+
+                Parameters.Add('EntryNo', Format(EftTransactionRequest."Entry No."));
+                POSSession.GetPOSBackgroundTaskAPI(POSBackgroundTaskAPI);
+                POSBackgroundTaskAPI.EnqueuePOSBackgroundTask(TaskId, Enum::"NPR POS Background Task"::EFT_ADYEN_CLOUD_ACQ_CARD, Parameters, 1000 * 60 * 5);
+            end;
+
+            Response.Add('taskId', TaskId);
+            Response.Add('done', false);
+            Response.Add('newEntryNo', ContinueOnEntryNo);
+        end else begin
+            if (not EFTTransactionRequest."Self Service") then begin
+                if EFTAdyenResponseHandler.GetResultMessage(EFTTransactionRequest, ResultMessageOut) then begin
+                    Message(ResultMessageOut);
+                end;
+            end;
+
             _trxStatus.Set(EntryNo, Enum::"NPR EFT Adyen Task Status"::ResultReceived.AsInteger());
 
             Response.Add('done', true);

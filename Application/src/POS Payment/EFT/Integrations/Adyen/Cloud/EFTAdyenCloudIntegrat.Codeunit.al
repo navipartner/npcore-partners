@@ -10,6 +10,7 @@
         DETECT_SHOPPER: Label 'Detect Shopper from Card', MaxLength = 50;
         CLEAR_SHOPPER: Label 'Clear Shopper from Card', MaxLength = 50;
         DISABLE_CONTRACT: Label 'Disable Shopper Recurring Contract', MaxLength = 50;
+        SUBSCRIPTION_CONFIRM: Label 'Subscription Confirmation', MaxLength = 50;
 
     procedure IntegrationType(): Code[20]
     begin
@@ -66,6 +67,12 @@
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
         tmpEFTAuxOperation."Auxiliary ID" := 6;
         tmpEFTAuxOperation.Description := CopyStr(DISABLE_CONTRACT, 1, MaxStrLen(tmpEFTAuxOperation.Description));
+        tmpEFTAuxOperation.Insert();
+
+        tmpEFTAuxOperation.Init();
+        tmpEFTAuxOperation."Integration Type" := IntegrationType();
+        tmpEFTAuxOperation."Auxiliary ID" := 8;
+        tmpEFTAuxOperation.Description := SUBSCRIPTION_CONFIRM;
         tmpEFTAuxOperation.Insert();
     end;
 

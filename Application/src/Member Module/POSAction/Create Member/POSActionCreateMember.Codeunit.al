@@ -34,8 +34,8 @@ codeunit 6014660 "NPR POS Action Create Member" implements "NPR IPOS Workflow"
     local procedure GetActionScript(): Text
     begin
         exit(
-        //###NPR_INJECT_FROM_FILE:POSActionCreateMembership.js###
-'let main=async({workflow:e})=>{await e.respond("CreateMember")};'
+        //###NPR_INJECT_FROM_FILE:POSActionCreateMember.js###
+'const main=async({workflow:n})=>{await n.respond("CreateMember"),await n.respond("TermsAndConditions")};'
         );
     end;
 }

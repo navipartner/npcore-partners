@@ -89,6 +89,17 @@
                     ToolTip = 'Specifies the value of the Create Renewal Notifications field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field("Create Renewal Success Notif"; Rec."Create Renewal Success Notif")
+                {
+                    ToolTip = 'Specifies the value of the Create Renewal Success Notifications field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field("Create Renewal Failure Notif"; Rec."Create Renewal Failure Notif")
+                {
+                    ToolTip = 'Specifies the value of the Create Renewal Failure Notifications field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                }
                 field("Activate Loyalty Program"; Rec."Activate Loyalty Program")
                 {
 

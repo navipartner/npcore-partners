@@ -229,11 +229,12 @@
         exit(Posted);
     end;
 
-    procedure CreateInvoice(var MemberInfoCapture: Record "NPR MM Member Info Capture"; ValidFromDate: Date; ValidUntilDate: Date): Boolean
+    procedure CreateInvoice(var SubscriptionRequest: Record "NPR MM Subscr. Request"; var MemberInfoCapture: Record "NPR MM Member Info Capture"): Boolean
     var
         Membership: Record "NPR MM Membership";
         MembershipAutoRenew: Record "NPR MM Membership Auto Renew";
         MembershipSetup: Record "NPR MM Membership Setup";
+        SubscrRenewPost: Codeunit "NPR MM Subscr. Renew: Post";
     begin
 
         if (not Membership.Get(MemberInfoCapture."Membership Entry No.")) then
@@ -254,17 +255,24 @@
 
                     if (not MembershipAutoRenew.Get(MemberInfoCapture."Auto-Renew Entry No.")) then
                         MembershipAutoRenew.Init();
-                    exit(CreateDocument(MemberInfoCapture, ValidFromDate, ValidUntilDate, Membership, MembershipAutoRenew));
+                    exit(CreateDocument(MemberInfoCapture, SubscriptionRequest."New Valid From Date", SubscriptionRequest."New Valid Until Date", Membership, MembershipAutoRenew));
                 end;
             MembershipSetup."Auto-Renew Model"::CUSTOMER_BALANCE:
                 begin
                     if (Membership."Customer No." = '') then
                         exit(false);
 
-                    exit(CreateAndPostJournal(MemberInfoCapture, ValidFromDate, ValidUntilDate, Membership));
+                    exit(CreateAndPostJournal(MemberInfoCapture, SubscriptionRequest."New Valid From Date", SubscriptionRequest."New Valid Until Date", Membership, MembershipSetup));
                 end;
             MembershipSetup."Auto-Renew Model"::RECURRING_PAYMENT:
-                ; // Nothing to be done here
+                begin
+                    if SubscrRenewPost.PostInvoiceToGL(SubscriptionRequest, Membership, MembershipSetup) then
+                        if SubscriptionRequest."Posting Document No." <> '' then
+                            MemberInfoCapture."Document No." := SubscriptionRequest."Posting Document No.";
+                    if SubscriptionRequest.Posted then
+                        SubscrRenewPost.PostPaymentsToGL(SubscriptionRequest);
+                    exit(SubscriptionRequest.Posted);
+                end;
         end;
     end;
 
@@ -330,19 +338,17 @@
         exit(true);
     end;
 
-    local procedure CreateAndPostJournal(var MemberInfoCapture: Record "NPR MM Member Info Capture"; ValidFromDate: Date; ValidUntilDate: Date; Membership: Record "NPR MM Membership"): Boolean
+    local procedure CreateAndPostJournal(var MemberInfoCapture: Record "NPR MM Member Info Capture"; ValidFromDate: Date; ValidUntilDate: Date; Membership: Record "NPR MM Membership"; MembershipSetup: Record "NPR MM Membership Setup"): Boolean
     var
         TempGenJournalLine: Record "Gen. Journal Line" temporary;
         GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23
         NoSeriesManagement: Codeunit NoSeriesManagement;
-        MembershipSetup: Record "NPR MM Membership Setup";
+#else
+        NoSeries: Codeunit "No. Series";
+#endif
         RecurringPaymentSetup: Record "NPR MM Recur. Paym. Setup";
     begin
-
-        if (not Membership.Get(MemberInfoCapture."Membership Entry No.")) then
-            exit(false);
-
-        MembershipSetup.Get(Membership."Membership Code");
         MembershipSetup.TestField("Recurring Payment Code");
         RecurringPaymentSetup.Get(MembershipSetup."Recurring Payment Code");
 
@@ -362,7 +368,11 @@
         TempGenJournalLine.Validate("Document Type", TempGenJournalLine."Document Type"::Invoice);
         if (RecurringPaymentSetup."Document No. Series" <> '') then
             TempGenJournalLine."Posting No. Series" := RecurringPaymentSetup."Document No. Series";
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23
         TempGenJournalLine."Document No." := NoSeriesManagement.GetNextNo(TempGenJournalLine."Posting No. Series", TempGenJournalLine."Posting Date", true);
+#else
+        TempGenJournalLine."Document No." := NoSeries.GetNextNo(TempGenJournalLine."Posting No. Series", TempGenJournalLine."Posting Date");
+#endif
 
         TempGenJournalLine."Account Type" := TempGenJournalLine."Account Type"::Customer;
         TempGenJournalLine.Validate("Account No.", Membership."Customer No.");

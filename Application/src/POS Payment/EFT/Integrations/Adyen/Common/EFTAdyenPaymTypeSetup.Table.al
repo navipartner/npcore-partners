@@ -34,9 +34,9 @@
         }
         field(5; "Create Recurring Contract"; Option)
         {
-            Caption = 'Create Recurring Contract';
+            Caption = 'Recurring Processing Model';
             DataClassification = CustomerContent;
-            OptionCaption = 'No,Recurring,One Click,Recurring & One Click';
+            OptionCaption = 'No,Subscription,CardOnFile,UnscheduledCardOnFile';
             OptionMembers = NO,RECURRING,ONECLICK,RECURRING_ONECLICK;
         }
         field(6; "Acquire Card First"; Boolean)

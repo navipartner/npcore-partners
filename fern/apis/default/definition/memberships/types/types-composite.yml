@@ -45,6 +45,27 @@ types:
           contactNumber: $simpleTypes.ContactNumber.ExampleContactNumber
           member: $MemberWithCardDTOResponse.ExampleMember
 
+  MembershipRenewalInfoDTO:
+    docs:
+      # Use this DTO to retrieve membership renewal information. 
+      This is a composite type representing renewal information about a membership.
+    properties:
+      membershipId: simpleTypes.MembershipId
+      membershipNumber: simpleTypes.MembershipNumber
+      expiryDate: optional<simpleTypes.ValidUntilDate>
+      newValidFromDate: optional<simpleTypes.NewValidFromDate>
+      newValidUntilDate: optional<simpleTypes.NewValidUntilDate>
+      amountInclVat: simpleTypes.AmountInclVat
+    examples:
+      - name: ExampleMembershipRenewalInfo
+        value:
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
+          expiryDate: $simpleTypes.ValidUntilDate.ExampleValidUntilDate
+          newValidFromDate: $simpleTypes.NewValidFromDate.ExampleNewValidFromDate
+          newValidUntilDate: $simpleTypes.NewValidUntilDate.ExampleNewValidUntilDate
+          amountInclVat: $simpleTypes.AmountInclVat.ExampleAmountInclVat
+
   ##
   MemberDTO:
     docs:

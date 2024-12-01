@@ -257,6 +257,26 @@ xmlport 6151401 "NPR Magento Sales Order Import"
                             MaxOccurs = Once;
                             MinOccurs = Zero;
                         }
+                        fieldelement(token; TempPaymentLine."Payment Token")
+                        {
+                            MaxOccurs = Once;
+                            MinOccurs = Zero;
+                        }
+                        fieldelement(brand; TempPaymentLine.Brand)
+                        {
+                            MaxOccurs = Once;
+                            MinOccurs = Zero;
+                        }
+                        fieldelement(card_summary; TempPaymentLine."Card Summary")
+                        {
+                            MaxOccurs = Once;
+                            MinOccurs = Zero;
+                        }
+                        fieldelement(expiry_date; TempPaymentLine."Expiry Date Text")
+                        {
+                            MaxOccurs = Once;
+                            MinOccurs = Zero;
+                        }
                         trigger OnBeforeInsertRecord()
                         begin
                             LineNo += 1;

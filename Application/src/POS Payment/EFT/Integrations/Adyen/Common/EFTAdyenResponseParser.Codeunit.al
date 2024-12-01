@@ -44,6 +44,8 @@
                 ParseDisableContract(_Data, EFTTransactionRequest);
             Enum::"NPR EFT Adyen Response Type"::CacheRecoveredResponse:
                 ParsePaymentTransactionAsLookup(_Data, EFTTransactionRequest);
+            Enum::"NPR EFT Adyen Response Type"::SubscriptionConfirmation:
+                ParseSubscriptionConfirmation(_Data, EFTTransactionRequest);
             else
                 Error(ERROR_RESPONSE_TYPE, _ResponseType);
         end;
@@ -211,6 +213,25 @@
         TrySelectToken(JObject, 'CardAcquisitionResponse', JToken, true);
         JObject := JToken.AsObject();
         ParseCardAcquisitionResponse(JObject, EFTTransactionRequest);
+
+        EFTTransactionRequest."External Result Known" := true;
+    end;
+
+    local procedure ParseSubscriptionConfirmation(Response: Text; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
+    var
+        JObject: JsonObject;
+        JToken: JsonToken;
+    begin
+        JObject.ReadFrom(Response);
+        TrySelectToken(JObject, 'SaleToPOIResponse', JToken, true);
+        JObject := JToken.AsObject();
+
+        TrySelectToken(JObject, 'MessageHeader', JToken, true);
+        ValidateHeader(JToken.AsObject(), EFTTransactionRequest);
+
+        TrySelectToken(JObject, 'InputResponse.InputResult', JToken, true);
+        JObject := JToken.AsObject();
+        ParseInputResponse(JObject, EFTTransactionRequest);
 
         EFTTransactionRequest."External Result Known" := true;
     end;
@@ -446,6 +467,20 @@
             ParsePaymentInstrumentData(JToken.AsObject(), EFTTransactionRequest);
     end;
 
+    local procedure ParseInputResponse(JObject: JsonObject; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
+    var
+        JToken: JsonToken;
+    begin
+        TrySelectToken(JObject, 'Response', JToken, true);
+        ParseResponse(JToken.AsObject(), EFTTransactionRequest);
+
+        if not EFTTransactionRequest.Successful then
+            exit;
+
+        if TrySelectToken(JObject, 'Input.ConfirmedFlag', JToken, false) then
+            EFTTransactionRequest."Confirmed Flag" := JToken.AsValue().AsBoolean();
+    end;
+
     local procedure ParseResponse(JObject: JsonObject; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         JToken: JsonToken;
@@ -623,6 +658,14 @@
                     EFTTransactionRequest."External Customer ID" := NameValueCollection.Get(Key);
                 'message':
                     EFTTransactionRequest."Result Display Text" := CopyStr(NameValueCollection.Get(Key), 1, MaxStrLen(EFTTransactionRequest."Result Display Text"));
+                'recurring.recurringdetailreference':
+                    EFTTransactionRequest."Recurring Detail Reference" := CopyStr(NameValueCollection.Get(Key), 1, MaxStrLen(EFTTransactionRequest."Recurring Detail Reference"));
+                'expiryyear':
+                    EFTTransactionRequest."Card Expiry Year" := NameValueCollection.Get(Key);
+                'expirymonth':
+                    EFTTransactionRequest."Card Expiry Month" := NameValueCollection.Get(Key);
+                'cardtype':
+                    EFTTransactionRequest."Payment Brand" := NameValueCollection.Get(Key);
             end;
         end;
     end;
@@ -719,6 +762,8 @@
                         ExpectedMessageCategory := 'CardAcquisition';
                     3:
                         ExpectedMessageCategory := 'EnableService';
+                    8:
+                        ExpectedMessageCategory := 'Input';
                 end;
         end;
         TrySelectToken(JObject, 'MessageCategory', JToken, true);

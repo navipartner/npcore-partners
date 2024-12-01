@@ -80,8 +80,8 @@
         {
             Caption = 'Notification Trigger';
             DataClassification = CustomerContent;
-            OptionCaption = 'Welcome,Membership Renewal,Wallet Update,Wallet Create,Coupon,Achievement';
-            OptionMembers = WELCOME,RENEWAL,WALLET_UPDATE,WALLET_CREATE,COUPON,ACHIEVEMENT;
+            OptionCaption = 'Welcome,For Renewal,Wallet Update,Wallet Create,Coupon,Achievement,Renewal Success,Renewal Failure';
+            OptionMembers = WELCOME,RENEWAL,WALLET_UPDATE,WALLET_CREATE,COUPON,ACHIEVEMENT,RENEWAL_SUCCESS,RENEWAL_FAILURE;
         }
         field(51; "Template Filter Value"; Code[20])
         {
@@ -381,6 +381,16 @@
         field(520; DataSubjectId; Text[64])
         {
             Caption = 'Member Identifier';
+            DataClassification = CustomerContent;
+        }
+        field(530; "Rejected Reason Code"; Text[50])
+        {
+            Caption = 'Rejected Reason Code';
+            DataClassification = CustomerContent;
+        }
+        field(540; "Rejected Reason Description"; Text[250])
+        {
+            Caption = 'Rejected Reason Description';
             DataClassification = CustomerContent;
         }
     }

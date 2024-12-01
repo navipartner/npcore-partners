@@ -731,6 +731,40 @@
                     MemberGoals.Run();
                 end;
             }
+            action(PaymentMethods)
+            {
+                Caption = 'Payment Methods';
+                ToolTip = 'Displays PSP tokenized customer payment methods associated with the membership.';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Image = PaymentHistory;
+                Scope = Repeater;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                trigger OnAction()
+                var
+                    MemberPaymentMethod: Record "NPR MM Member Payment Method";
+                begin
+                    MemberPaymentMethod.FilterGroup(2);
+                    MemberPaymentMethod.SetRange("Table No.", Database::"NPR MM Membership");
+                    MemberPaymentMethod.SetRange("BC Record ID", Rec.RecordId());
+                    MemberPaymentMethod.FilterGroup(0);
+                    Page.Run(0, MemberPaymentMethod);
+                end;
+            }
+            action(Subscription)
+            {
+                Caption = 'Subscription';
+                ToolTip = 'Opens membership subscription details.';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Image = DueDate;
+                Scope = Repeater;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                RunObject = page "NPR MM Subscription Details";
+                RunPageLink = "Membership Entry No." = field("Entry No.");
+            }
             group(History)
             {
                 Caption = 'History';

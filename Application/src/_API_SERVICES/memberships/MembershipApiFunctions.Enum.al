@@ -12,7 +12,10 @@ enum 6059827 "NPR MembershipApiFunctions"
     {
         Caption = 'Get membership using query parameters';
     }
-
+    value(150; GET_MEMBERSHIP_RENEWAL_INFO)
+    {
+        Caption = 'Get membership renewal info';
+    }
     value(200; GET_ALL_PAYMENT_METHODS)
     {
         Caption = 'Get payment methods for a membership';
@@ -29,11 +32,9 @@ enum 6059827 "NPR MembershipApiFunctions"
     {
         Caption = 'Update a payment method';
     }
-
     value(204; DELETE_PAYMENT_METHOD)
     {
         Caption = 'Delete a payment method';
     }
-
 }
 #endif
