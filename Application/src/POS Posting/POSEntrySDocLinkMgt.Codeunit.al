@@ -69,6 +69,26 @@
         POSEntrySalesDocLink.Insert();
     end;
 
+    procedure POSSalesLineSalesDocReferenceExists(POSEntrySalesLine: Record "NPR POS Entry Sales Line"; SalesDocumentType: Enum "NPR POS Sales Document Type"; SalesDocumentNo: Code[20]): Boolean
+    var
+        POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
+    begin
+        exit(POSEntrySalesDocLink.Get(POSEntrySalesLine."POS Entry No.", POSEntrySalesDocLink."POS Entry Reference Type"::SALESLINE, POSEntrySalesLine."Line No.", SalesDocumentType, SalesDocumentNo));
+    end;
+
+    procedure InsertPOSSalesLineSalesDocReference(POSEntrySalesLine: Record "NPR POS Entry Sales Line"; SalesDocumentType: Enum "NPR POS Sales Document Type"; SalesDocumentNo: Code[20])
+    var
+        POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
+    begin
+        POSEntrySalesDocLink.Init();
+        POSEntrySalesDocLink."POS Entry No." := POSEntrySalesLine."POS Entry No.";
+        POSEntrySalesDocLink."POS Entry Reference Type" := POSEntrySalesDocLink."POS Entry Reference Type"::SALESLINE;
+        POSEntrySalesDocLink."POS Entry Reference Line No." := POSEntrySalesLine."Line No.";
+        POSEntrySalesDocLink."Sales Document Type" := SalesDocumentType;
+        POSEntrySalesDocLink."Sales Document No" := SalesDocumentNo;
+        POSEntrySalesDocLink.Insert();
+    end;
+
     procedure InsertPOSSalesLineSalesDocReferenceAsyncPost(POSSalesLine: Record "NPR POS Entry Sales Line"; SalesDocType: Enum "NPR POS Sales Document Type"; SalesDocNo: Code[20]; InvoiceType: Enum "NPR Post Sales Posting Type"; Print: Boolean; Send: Boolean; Pdf2Nav: Boolean; IsPrepayPerc: Boolean; DeleteAfter: Boolean)
     var
         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
@@ -90,4 +110,3 @@
         POSEntrySalesDocLink.Insert();
     end;
 }
-

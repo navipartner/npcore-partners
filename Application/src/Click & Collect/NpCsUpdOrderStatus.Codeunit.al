@@ -1,6 +1,7 @@
 ﻿codeunit 6151198 "NPR NpCs Upd. Order Status"
 {
     Access = Internal;
+
     var
         Text000: Label 'Collect in Store Document is first Processed by Store and then Delivered';
         Text001: Label 'Update Order Status';
