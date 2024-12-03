@@ -1267,6 +1267,8 @@
 
         SaleLinePOS2 := SaleLinePOS;
 
+        GetLastLineFromBufferAndStoreFilters(SaleLinePOS, SaleLinePOS2."Sales Ticket No.", SaleLinePOS2."Register No.", SaleLinePOS2.Date, LastLineNo);
+
         SaleLinePOS.Init();
         SaleLinePOS := FromSaleLinePOS;
         SaleLinePOS."Sales Document Type" := SaleLinePOS2."Sales Document Type";
@@ -1287,6 +1289,20 @@
         SaleLinePOS.Modify();
 
         LastLineNo := SaleLinePOS."Line No.";
+    end;
+
+    local procedure GetLastLineFromBufferAndStoreFilters(var SaleLinePOS: Record "NPR POS Sale Line"; SalesTicketNo: Code[20]; RegisterNo: Code[10]; DateFilter: Date; var LastLineNo: Integer)
+    var
+        SaleLinePOSFilterStore: Record "NPR POS Sale Line";
+    begin
+        SaleLinePOSFilterStore.CopyFilters(SaleLinePOS);
+        SaleLinePOS.Reset();
+        SaleLinePOS.SetRange("Register No.", RegisterNo);
+        SaleLinePOS.SetRange("Sales Ticket No.", SalesTicketNo);
+        SaleLinePOS.SetRange(Date, DateFilter);
+        if SaleLinePOS.FindLast() then
+            LastLineNo := SaleLinePOS."Line No.";
+        SaleLinePOS.CopyFilters(SaleLinePOSFilterStore);
     end;
 
     local procedure AmountExclVat(MixedDiscount: Record "NPR Mixed Discount"): Boolean

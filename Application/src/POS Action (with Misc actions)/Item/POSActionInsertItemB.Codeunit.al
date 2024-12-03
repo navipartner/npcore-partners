@@ -249,6 +249,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         MainSaleLinePOS: Record "NPR POS Sale Line";
         AccessorySaleLinePOS: Record "NPR POS Sale Line";
         AccessorySparePart: Record "NPR Accessory/Spare Part";
+        DerivedPOSSaleLine: Record "NPR POS Sale Line";
     begin
         AccessorySparePart.SetRange(Type, AccessorySparePart.Type::Accessory);
         AccessorySparePart.SetRange(Code, Item."No.");
@@ -284,28 +285,46 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
                 AccessorySaleLinePOS."Unit Price" := 0;  //Allow for default price retrieval routine to kick in
 
             POSSaleLine.InsertLine(AccessorySaleLinePOS);
+            AccessorySaleLinePOS.Get(AccessorySaleLinePOS.RecordId());
 
-            if AccessorySparePart."Use Alt. Price" and AccessorySparePart."Show Discount" then begin
-                POSSaleLine.ConvertPriceToVAT(
-                  Item."Price Includes VAT", Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group",
-                  AccessorySaleLinePOS, AccessorySparePart."Alt. Price");
-                if not AccessorySaleLinePOS."Price Includes VAT" then
-                    AccessorySparePart."Alt. Price" := AccessorySparePart."Alt. Price" * (1 + (AccessorySaleLinePOS."VAT %" / 100));
-                AccessorySaleLinePOS.Validate("Amount Including VAT", AccessorySparePart."Alt. Price" * AccessorySaleLinePOS.Quantity);
-            end;
+            DerivedPOSSaleLine.SetRange("Derived from Line", AccessorySaleLinePOS.SystemId);
+            if DerivedPOSSaleLine.FindSet() then
+                repeat
+                    ConvertPriceAndAssignNecessaryFields(AccessorySparePart, DerivedPOSSaleLine, POSSaleLine, MainSaleLinePOS."Line No.", Item, GroupAccessory);
+                until DerivedPOSSaleLine.Next() = 0;
 
-            AccessorySaleLinePOS."Item group accessory" := GroupAccessory;
-            if (GroupAccessory) then
-                AccessorySaleLinePOS."Accessories Item Group No." := Item."Item Category Code";
-
-            AccessorySaleLinePOS.Accessory := true;
-            AccessorySaleLinePOS."Main Item No." := Item."No.";
-            AccessorySaleLinePOS."Main Line No." := MainSaleLinePOS."Line No.";
-
-            AccessorySaleLinePOS.Modify();
+            ConvertPriceAndAssignNecessaryFields(AccessorySparePart, AccessorySaleLinePOS, POSSaleLine, MainSaleLinePOS."Line No.", Item, GroupAccessory);
             POSSaleLine.RefreshCurrent();
         until (AccessorySparePart.Next() = 0);
 
+    end;
+
+    local procedure ConvertPriceAndAssignNecessaryFields(var AccessorySparePart: Record "NPR Accessory/Spare Part";
+                                                        var SaleLinePOS: Record "NPR POS Sale Line";
+                                                        POSSaleLine: Codeunit "NPR POS Sale Line";
+                                                        MainSaleLinePOSLineNo: Integer;
+                                                        Item: Record Item;
+                                                        GroupAccessory: Boolean)
+    var
+    begin
+        if AccessorySparePart."Use Alt. Price" and AccessorySparePart."Show Discount" then begin
+            POSSaleLine.ConvertPriceToVAT(
+              Item."Price Includes VAT", Item."VAT Bus. Posting Gr. (Price)", Item."VAT Prod. Posting Group",
+              SaleLinePOS, AccessorySparePart."Alt. Price");
+            if not SaleLinePOS."Price Includes VAT" then
+                AccessorySparePart."Alt. Price" := AccessorySparePart."Alt. Price" * (1 + (SaleLinePOS."VAT %" / 100));
+            SaleLinePOS.Validate("Amount Including VAT", AccessorySparePart."Alt. Price" * SaleLinePOS.Quantity);
+        end;
+
+        SaleLinePOS."Item group accessory" := GroupAccessory;
+        if (GroupAccessory) then
+            SaleLinePOS."Accessories Item Group No." := Item."Item Category Code";
+
+        SaleLinePOS.Accessory := true;
+        SaleLinePOS."Main Item No." := Item."No.";
+        SaleLinePOS."Main Line No." := MainSaleLinePOSLineNo;
+
+        SaleLinePOS.Modify();
     end;
 
     [Obsolete('Replaced by function ItemRequiresSerialNo in codeunit NPR POS Tracking Utils', '2023-06-28')]
