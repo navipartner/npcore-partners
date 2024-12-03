@@ -3,10 +3,10 @@
     UsageCategory = None;
     Caption = 'Collect in Store Order Card';
     SourceTable = "NPR NpCs Document";
-    SourceTableView = WHERE(Type = CONST("Collect in Store"));
+    SourceTableView = where(Type = const("Collect in Store"));
     layout
     {
-        area(content)
+        area(Content)
         {
             group(General)
             {
@@ -133,8 +133,6 @@
                     ShowCaption = false;
                     field("Delivery Status"; Rec."Delivery Status")
                     {
-
-                        Editable = false;
                         Importance = Promoted;
                         ToolTip = 'Specifies the value of the Delivery Status field';
                         ApplicationArea = NPRRetail;
@@ -221,7 +219,7 @@
                     {
 
                         Style = Unfavorable;
-                        StyleExpr = TRUE;
+                        StyleExpr = true;
                         ToolTip = 'Specifies the value of the Store Stock field';
                         ApplicationArea = NPRRetail;
                     }
@@ -252,13 +250,13 @@
                     group(Control6014447)
                     {
                         ShowCaption = false;
-                        Visible = NOT Rec."Store Stock";
+                        Visible = not Rec."Store Stock";
                         field(WarningText; UpperCase(WarningLbl))
                         {
 
                             ShowCaption = false;
                             Style = Unfavorable;
-                            StyleExpr = TRUE;
+                            StyleExpr = true;
                             ToolTip = 'Specifies the value of the warning text field';
                             ApplicationArea = NPRRetail;
                         }
@@ -418,25 +416,24 @@
             }
             part(Control6014423; "NPR NpCs Coll. StoreOrderLines")
             {
-                SubPageLink = "Document Type" = FIELD("Document Type"),
-                              "Document No." = FIELD("Document No.");
+                SubPageLink = "Document Type" = field("Document Type"),
+                              "Document No." = field("Document No.");
                 Visible = Rec."Document Type" = Rec."Document Type"::Order;
                 ApplicationArea = NPRRetail;
 
             }
             part(Control6014464; "NPR NpCs Coll. Store Inv.Lines")
             {
-                SubPageLink = "Document No." = FIELD("Document No.");
+                SubPageLink = "Document No." = field("Document No.");
                 Visible = Rec."Document Type" = Rec."Document Type"::"Posted Invoice";
                 ApplicationArea = NPRRetail;
-
             }
         }
     }
 
     actions
     {
-        area(processing)
+        area(Processing)
         {
             group("&Print")
             {
@@ -451,7 +448,6 @@
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = Rec."Processing Print Template" <> '';
-
                     ToolTip = 'Executes the Print Order action';
                     ApplicationArea = NPRRetail;
 
@@ -472,7 +468,6 @@
                     PromotedCategory = Process;
                     PromotedIsBig = true;
                     Visible = Rec."Document Type" = Rec."Document Type"::Order;
-
                     ToolTip = 'Executes the Print Confirmation action';
                     ApplicationArea = NPRRetail;
 
@@ -494,8 +489,7 @@
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    Visible = (Rec."Delivery Status" = Rec."Delivery Status"::Delivered) AND (((Rec."Bill via" = Rec."Bill via"::POS) AND (Rec."Delivery Print Template (POS)" <> '')) OR ((Rec."Bill via" = Rec."Bill via"::"Sales Document") AND (Rec."Delivery Print Template (S.)" <> '')));
-
+                    Visible = (Rec."Delivery Status" = Rec."Delivery Status"::Delivered) and (((Rec."Bill via" = Rec."Bill via"::POS) and (Rec."Delivery Print Template (POS)" <> '')) or ((Rec."Bill via" = Rec."Bill via"::"Sales Document") and (Rec."Delivery Print Template (S.)" <> '')));
                     ToolTip = 'Executes the Print Delivery action';
                     ApplicationArea = NPRRetail;
 
@@ -518,7 +512,7 @@
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    Visible = ((Rec."Processing Status" = 0) OR (Rec."Processing Status" = 1)) AND (Rec."Delivery Status" = 0);
+                    Visible = ((Rec."Processing Status" = Rec."Processing Status"::" ") or (Rec."Processing Status" = Rec."Processing Status"::Pending)) and (Rec."Delivery Status" = Rec."Delivery Status"::" ");
 
                     ToolTip = 'Executes the Confirm Order action';
                     ApplicationArea = NPRRetail;
@@ -541,7 +535,7 @@
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    Visible = ((Rec."Processing Status" = 0) OR (Rec."Processing Status" = 1)) AND (Rec."Delivery Status" = 0) and (Rec."Processing Print Template" <> '');
+                    Visible = ((Rec."Processing Status" = Rec."Processing Status"::" ") or (Rec."Processing Status" = Rec."Processing Status"::Pending)) and (Rec."Delivery Status" = Rec."Delivery Status"::" ") and (Rec."Processing Print Template" <> '');
                     ToolTip = 'Executes the Confirm and Print Order action';
                     ApplicationArea = NPRRetail;
 
@@ -568,8 +562,7 @@
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     PromotedIsBig = true;
-                    Visible = ((Rec."Processing Status" = 0) OR (Rec."Processing Status" = 1)) AND (Rec."Delivery Status" = 0) AND (Rec."Store Stock");
-
+                    Visible = ((Rec."Processing Status" = Rec."Processing Status"::" ") or (Rec."Processing Status" = Rec."Processing Status"::Pending)) and (Rec."Delivery Status" = Rec."Delivery Status"::" ") and (Rec."Store Stock");
                     ToolTip = 'Executes the Reject Order action';
                     ApplicationArea = NPRRetail;
 
@@ -605,7 +598,7 @@
                 }
             }
         }
-        area(navigation)
+        area(Navigation)
         {
             action(Document)
             {
@@ -615,8 +608,7 @@
                 PromotedOnly = true;
                 PromotedIsBig = true;
                 PromotedCategory = Process;
-                ShortCutKey = 'Shift+F7';
-
+                ShortcutKey = 'Shift+F7';
                 ToolTip = 'Executes the Document action';
                 ApplicationArea = NPRRetail;
 
@@ -635,8 +627,7 @@
                 PromotedOnly = true;
                 PromotedIsBig = true;
                 PromotedCategory = Process;
-                ShortCutKey = 'Ctrl+F7';
-
+                ShortcutKey = 'Ctrl+F7';
                 ToolTip = 'Executes the Log Entries action';
                 ApplicationArea = NPRRetail;
 

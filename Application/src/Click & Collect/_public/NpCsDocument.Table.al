@@ -28,6 +28,7 @@
 
             trigger OnValidate()
             begin
+                CheckDeliveryStatus();
                 UpdateDocumentInfo();
             end;
         }
@@ -44,6 +45,7 @@
 
             trigger OnValidate()
             begin
+                CheckDeliveryStatus();
                 UpdateDocumentInfo();
                 if "Reference No." = '' then
                     "Reference No." := "Document No.";
@@ -53,6 +55,11 @@
         {
             Caption = 'Reference No.';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                CheckDeliveryStatus();
+            end;
         }
         field(13; "Inserted at"; DateTime)
         {
@@ -71,6 +78,7 @@
                 NpCsWorkflow: Record "NPR NpCs Workflow";
                 NpCsStoreWorkflowRelation: Record "NPR NpCs Store Workflow Rel.";
             begin
+                CheckDeliveryStatus();
                 if "Workflow Code" = '' then
                     exit;
 
@@ -113,6 +121,11 @@
             DataClassification = CustomerContent;
             OptionCaption = 'Send Order,Order Status,Post Processing';
             OptionMembers = "Send Order","Order Status","Post Processing";
+
+            trigger OnValidate()
+            begin
+                CheckDeliveryStatus();
+            end;
         }
         field(25; "From Document Type"; Option)
         {
@@ -120,16 +133,31 @@
             DataClassification = CustomerContent;
             OptionCaption = 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order';
             OptionMembers = Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order";
+
+            trigger OnValidate()
+            begin
+                CheckDeliveryStatus();
+            end;
         }
         field(27; "From Document No."; Code[20])
         {
             Caption = 'From Document No.';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                CheckDeliveryStatus();
+            end;
         }
         field(30; "From Store Code"; Code[20])
         {
             Caption = 'From Store Code';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                CheckDeliveryStatus();
+            end;
         }
         field(35; "Callback Data"; BLOB)
         {
@@ -142,11 +170,21 @@
             DataClassification = CustomerContent;
             OptionCaption = 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order';
             OptionMembers = Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order";
+
+            trigger OnValidate()
+            begin
+                CheckDeliveryStatus();
+            end;
         }
         field(57; "To Document No."; Code[20])
         {
             Caption = 'To Document No.';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                CheckDeliveryStatus();
+            end;
         }
         field(60; "To Store Code"; Code[20])
         {
@@ -159,6 +197,7 @@
             var
                 NpCsStore: Record "NPR NpCs Store";
             begin
+                CheckDeliveryStatus();
                 NpCsStore.Get("To Store Code");
                 "Prepayment Account No." := NpCsStore."Prepayment Account No.";
                 "Opening Hour Set" := NpCsStore."Opening Hour Set";
@@ -170,11 +209,21 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.51';
             TableRelation = "NPR NpCs Open. Hour Set";
+
+            trigger OnValidate()
+            begin
+                CheckDeliveryStatus();
+            end;
         }
         field(95; "Processing Expiry Duration"; Duration)
         {
             Caption = 'Processing Expiry Duration';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                CheckDeliveryStatus();
+            end;
         }
         field(100; "Processing Status"; Option)
         {
@@ -185,6 +234,7 @@
 
             trigger OnValidate()
             begin
+                CheckDeliveryStatus();
                 "Processing updated at" := CurrentDateTime;
                 "Processing updated by" := CopyStr(UserId, 1, MaxStrLen("Processing updated by"));
             end;
@@ -203,6 +253,11 @@
         {
             Caption = 'Processing expires at';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                CheckDeliveryStatus();
+            end;
         }
         field(114; "Customer No."; Code[20])
         {
@@ -289,11 +344,17 @@
             Caption = 'Delivery Expiry Days (Qty.)';
             DataClassification = CustomerContent;
             MinValue = 0;
+
+            trigger OnValidate()
+            begin
+                CheckDeliveryStatus();
+            end;
         }
         field(200; "Delivery Status"; Option)
         {
             Caption = 'Delivery Status';
             DataClassification = CustomerContent;
+            Editable = false;
             OptionCaption = ' ,Ready,Delivered,Expired';
             OptionMembers = " ",Ready,Delivered,Expired;
 
@@ -317,11 +378,21 @@
         {
             Caption = 'Delivery expires at';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                CheckDeliveryStatus();
+            end;
         }
         field(215; "Prepaid Amount"; Decimal)
         {
             Caption = 'Prepaid Amount';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                CheckDeliveryStatus();
+            end;
         }
         field(220; "Prepayment Account No."; Code[20])
         {
@@ -330,6 +401,11 @@
             TableRelation = "G/L Account" WHERE("Direct Posting" = CONST(true));
 
             ValidateTableRelation = false;
+
+            trigger OnValidate()
+            begin
+                CheckDeliveryStatus();
+            end;
         }
         field(225; "Delivery Document Type"; Option)
         {
@@ -337,6 +413,11 @@
             DataClassification = CustomerContent;
             OptionCaption = ' ,Sales Shipment,Sales Invoice,Sales Return Receipt,Sales Credit Memo,POS Entry';
             OptionMembers = " ","Sales Shipment","Sales Invoice","Sales Return Receipt","Sales Credit Memo","POS Entry";
+
+            trigger OnValidate()
+            begin
+                CheckDeliveryStatus();
+            end;
         }
         field(230; "Delivery Document No."; Code[20])
         {
@@ -354,6 +435,7 @@
 
             trigger OnValidate()
             begin
+                CheckDeliveryStatus();
                 if "Reference No." = '' then
                     "Reference No." := "Document No.";
             end;
@@ -362,6 +444,11 @@
         {
             Caption = 'Archive on Delivery';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                CheckDeliveryStatus();
+            end;
         }
         field(240; "Store Stock"; Boolean)
         {
@@ -369,6 +456,11 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.51';
             InitValue = true;
+
+            trigger OnValidate()
+            begin
+                CheckDeliveryStatus();
+            end;
         }
         field(250; "Post on"; Option)
         {
@@ -377,12 +469,22 @@
             Description = 'NPR5.51';
             OptionCaption = 'Delivery,Processing';
             OptionMembers = Delivery,Processing;
+
+            trigger OnValidate()
+            begin
+                CheckDeliveryStatus();
+            end;
         }
         field(260; "Allow Partial Delivery"; Boolean)
         {
             Caption = 'Allow Partial Delivery';
             DataClassification = CustomerContent;
             Description = 'NPR5.55';
+
+            trigger OnValidate()
+            begin
+                CheckDeliveryStatus();
+            end;
         }
         field(290; "Processing Print Template"; Code[20])
         {
@@ -397,6 +499,12 @@
             DataClassification = CustomerContent;
             OptionCaption = 'POS,Sales Document';
             OptionMembers = POS,"Sales Document";
+
+            trigger OnValidate()
+            begin
+                if ("Bill via" <> xRec."Bill via") then
+                    CheckDeliveryStatus();
+            end;
         }
         field(305; "Delivery Print Template (POS)"; Code[20])
         {
@@ -416,6 +524,11 @@
             DataClassification = CustomerContent;
             Description = 'NPR5.51';
             TableRelation = "Salesperson/Purchaser";
+
+            trigger OnValidate()
+            begin
+                CheckDeliveryStatus();
+            end;
         }
         field(400; "Notify Store via E-mail"; Boolean)
         {
@@ -483,12 +596,22 @@
             Caption = 'Sell-to Customer Name';
             DataClassification = CustomerContent;
             Description = 'NPR5.51';
+
+            trigger OnValidate()
+            begin
+                CheckDeliveryStatus();
+            end;
         }
         field(2005; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
             DataClassification = CustomerContent;
             Description = 'NPR5.51';
+
+            trigger OnValidate()
+            begin
+                CheckDeliveryStatus();
+            end;
         }
         field(2010; "To Store Contact Name"; Text[100])
         {
@@ -557,6 +680,11 @@
         {
             Caption = 'Ship-to Contact';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                CheckDeliveryStatus();
+            end;
         }
     }
 
@@ -582,26 +710,30 @@
         }
     }
 
+    trigger OnInsert()
+    begin
+        "Inserted at" := CurrentDateTime;
+    end;
+
     trigger OnDelete()
     var
         SalesHeader: Record "Sales Header";
         NpCsDocumentLogEntry: Record "NPR NpCs Document Log Entry";
     begin
+        CheckDeliveryStatus();
+
         if (Type = Type::"Collect in Store") and
           ("Document Type" in ["Document Type"::Quote, "Document Type"::Order, "Document Type"::Invoice, "Document Type"::"Credit Memo", "Document Type"::"Blanket Order", "Document Type"::"Return Order"])
-        then begin
+        then
             if SalesHeader.Get("Document Type", "Document No.") then
                 SalesHeader.Delete(true);
-        end;
 
         NpCsDocumentLogEntry.SetRange("Document Entry No.", "Entry No.");
         NpCsDocumentLogEntry.DeleteAll();
     end;
 
-    trigger OnInsert()
-    begin
-        "Inserted at" := CurrentDateTime;
-    end;
+    var
+        DeliveryStatusCheckSuspended: Boolean;
 
     internal procedure GetLastLogMessage(): Text
     var
@@ -630,6 +762,48 @@
             "Ship-to Contact" := SalesHeader."Ship-to Contact";
             "Location Code" := SalesHeader."Location Code";
         end;
+    end;
+
+    procedure SuspendDeliveryStatusCheck(Suspend: Boolean)
+    begin
+        DeliveryStatusCheckSuspended := Suspend;
+    end;
+
+    procedure GetDeliveryStatusCheckSuspended(): Boolean
+    begin
+        exit(DeliveryStatusCheckSuspended);
+    end;
+
+    local procedure CheckDeliveryStatus()
+    var
+        FeatureFlagManagement: Codeunit "NPR Feature Flags Management";
+        Handled: Boolean;
+        CannotChangeErr: Label 'You cannot change this %1 when its %2 is %3, because it can cause data discrepancy.', Comment = '%1 - NpCs Document table caption, %2 - Delivery Status field caption, %3 - Deliver Status field value';
+    begin
+        if not FeatureFlagManagement.IsEnabled('checkCollectDocumentDeliveryStatus') then
+            exit;
+
+        OnBeforeCheckDeliveryStatus(Rec, Handled, DeliveryStatusCheckSuspended, CurrFieldNo);
+        if Handled then
+            exit;
+
+        if DeliveryStatusCheckSuspended then
+            exit;
+
+        if Type <> Type::"Collect in Store" then
+            exit;
+
+        if not (CurrFieldNo in [FieldNo("Document Type"), FieldNo("Document No."), FieldNo("Reference No."), FieldNo("Bill via")]) then
+            if ("Bill via" = "Bill via"::POS) then
+                exit;
+
+        if "Delivery Status" = "Delivery Status"::Delivered then
+            Error(CannotChangeErr, TableCaption(), FieldCaption("Delivery Status"), "Delivery Status");
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckDeliveryStatus(var NpCsDocument: Record "NPR NpCs Document"; var Handled: Boolean; var DeliveryStatusCheckSuspended: Boolean; CallingFieldNo: Integer)
+    begin
     end;
 }
 

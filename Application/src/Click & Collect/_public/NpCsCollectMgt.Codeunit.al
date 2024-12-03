@@ -479,10 +479,536 @@
                     exit(PAGE::"NPR NpCs Coll. Store Orders");
                 end;
         end;
-    end;   
+    end;
 
     [IntegrationEvent(false, false)]
     procedure OnBeforeCreateTenantWebservice(ObjectType: Option; ObjectId: Integer; ServiceName: Text; var Handled: Boolean)
     begin
     end;
+
+    #region Document Change Management
+    [EventSubscriber(ObjectType::Page, Page::"Sales Quote", 'OnModifyRecordEvent', '', false, false)]
+    local procedure OnModifySalesQuote(var Rec: Record "Sales Header"; var xRec: Record "Sales Header"; var AllowModify: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+    begin
+        if not FindCollectInStoreDocument(NpCsDocument, Rec) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, Rec);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Sales Quote", 'OnDeleteRecordEvent', '', false, false)]
+    local procedure OnDeleteSalesQuote(var Rec: Record "Sales Header"; var AllowDelete: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+    begin
+        if not FindCollectInStoreDocument(NpCsDocument, Rec) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, Rec);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Sales Quote Subform", 'OnInsertRecordEvent', '', true, true)]
+    local procedure OnInsertSalesQuoteLine(var Rec: Record "Sales Line"; BelowxRec: Boolean; var xRec: Record "Sales Line"; var AllowInsert: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+        SalesHeader: Record "Sales Header";
+    begin
+        if not SalesHeader.Get(Rec."Document Type", Rec."Document No.") then
+            exit;
+
+        if not FindCollectInStoreDocument(NpCsDocument, SalesHeader) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, SalesHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Sales Quote Subform", 'OnModifyRecordEvent', '', true, true)]
+    local procedure OnModifySalesQuoteLine(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; var AllowModify: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+        SalesHeader: Record "Sales Header";
+    begin
+        if not SalesHeader.Get(Rec."Document Type", Rec."Document No.") then
+            exit;
+
+        if not FindCollectInStoreDocument(NpCsDocument, SalesHeader) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, SalesHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Sales Quote Subform", 'OnDeleteRecordEvent', '', true, true)]
+    local procedure OnDeleteSalesQuoteLine(var Rec: Record "Sales Line"; var AllowDelete: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+        SalesHeader: Record "Sales Header";
+    begin
+        if not SalesHeader.Get(Rec."Document Type", Rec."Document No.") then
+            exit;
+
+        if not FindCollectInStoreDocument(NpCsDocument, SalesHeader) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, SalesHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Sales Order", 'OnModifyRecordEvent', '', false, false)]
+    local procedure OnModifySalesOrder(var Rec: Record "Sales Header"; var xRec: Record "Sales Header"; var AllowModify: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+    begin
+        if not FindCollectInStoreDocument(NpCsDocument, Rec) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, Rec);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Sales Order", 'OnDeleteRecordEvent', '', false, false)]
+    local procedure OnDeleteSalesOrder(var Rec: Record "Sales Header"; var AllowDelete: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+    begin
+        if not FindCollectInStoreDocument(NpCsDocument, Rec) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, Rec);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Sales Order Subform", 'OnInsertRecordEvent', '', true, true)]
+    local procedure OnInsertSalesOrderLine(var Rec: Record "Sales Line"; BelowxRec: Boolean; var xRec: Record "Sales Line"; var AllowInsert: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+        SalesHeader: Record "Sales Header";
+    begin
+        if not SalesHeader.Get(Rec."Document Type", Rec."Document No.") then
+            exit;
+
+        if not FindCollectInStoreDocument(NpCsDocument, SalesHeader) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, SalesHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Sales Order Subform", 'OnModifyRecordEvent', '', true, true)]
+    local procedure OnModifySalesOrderLine(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; var AllowModify: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+        SalesHeader: Record "Sales Header";
+    begin
+        if not SalesHeader.Get(Rec."Document Type", Rec."Document No.") then
+            exit;
+
+        if not FindCollectInStoreDocument(NpCsDocument, SalesHeader) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, SalesHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Sales Order Subform", 'OnDeleteRecordEvent', '', true, true)]
+    local procedure OnDeleteSalesOrderLine(var Rec: Record "Sales Line"; var AllowDelete: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+        SalesHeader: Record "Sales Header";
+    begin
+        if not SalesHeader.Get(Rec."Document Type", Rec."Document No.") then
+            exit;
+
+        if not FindCollectInStoreDocument(NpCsDocument, SalesHeader) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, SalesHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Sales Invoice", 'OnModifyRecordEvent', '', false, false)]
+    local procedure OnModifySalesInvoice(var Rec: Record "Sales Header"; var xRec: Record "Sales Header"; var AllowModify: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+    begin
+        if not FindCollectInStoreDocument(NpCsDocument, Rec) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, Rec);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Sales Invoice", 'OnDeleteRecordEvent', '', false, false)]
+    local procedure OnDeleteSalesInvoice(var Rec: Record "Sales Header"; var AllowDelete: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+    begin
+        if not FindCollectInStoreDocument(NpCsDocument, Rec) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, Rec);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Sales Invoice Subform", 'OnInsertRecordEvent', '', true, true)]
+    local procedure OnInsertSalesInvoiceLine(var Rec: Record "Sales Line"; BelowxRec: Boolean; var xRec: Record "Sales Line"; var AllowInsert: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+        SalesHeader: Record "Sales Header";
+    begin
+        if not SalesHeader.Get(Rec."Document Type", Rec."Document No.") then
+            exit;
+
+        if not FindCollectInStoreDocument(NpCsDocument, SalesHeader) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, SalesHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Sales Invoice Subform", 'OnModifyRecordEvent', '', true, true)]
+    local procedure OnModifySalesInvoiceLine(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; var AllowModify: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+        SalesHeader: Record "Sales Header";
+    begin
+        if not SalesHeader.Get(Rec."Document Type", Rec."Document No.") then
+            exit;
+
+        if not FindCollectInStoreDocument(NpCsDocument, SalesHeader) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, SalesHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Sales Invoice Subform", 'OnDeleteRecordEvent', '', true, true)]
+    local procedure OnDeleteSalesInvoiceLine(var Rec: Record "Sales Line"; var AllowDelete: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+        SalesHeader: Record "Sales Header";
+    begin
+        if not SalesHeader.Get(Rec."Document Type", Rec."Document No.") then
+            exit;
+
+        if not FindCollectInStoreDocument(NpCsDocument, SalesHeader) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, SalesHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Sales Credit Memo", 'OnModifyRecordEvent', '', false, false)]
+    local procedure OnModifySalesCreditMemo(var Rec: Record "Sales Header"; var xRec: Record "Sales Header"; var AllowModify: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+    begin
+        if not FindCollectInStoreDocument(NpCsDocument, Rec) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, Rec);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Sales Credit Memo", 'OnDeleteRecordEvent', '', false, false)]
+    local procedure OnDeleteSalesCreditMemo(var Rec: Record "Sales Header"; var AllowDelete: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+    begin
+        if not FindCollectInStoreDocument(NpCsDocument, Rec) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, Rec);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Sales Cr. Memo Subform", 'OnInsertRecordEvent', '', true, true)]
+    local procedure OnInsertSalesCrMemoLine(var Rec: Record "Sales Line"; BelowxRec: Boolean; var xRec: Record "Sales Line"; var AllowInsert: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+        SalesHeader: Record "Sales Header";
+    begin
+        if not SalesHeader.Get(Rec."Document Type", Rec."Document No.") then
+            exit;
+
+        if not FindCollectInStoreDocument(NpCsDocument, SalesHeader) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, SalesHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Sales Cr. Memo Subform", 'OnModifyRecordEvent', '', true, true)]
+    local procedure OnModifySalesCrMemoLine(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; var AllowModify: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+        SalesHeader: Record "Sales Header";
+    begin
+        if not SalesHeader.Get(Rec."Document Type", Rec."Document No.") then
+            exit;
+
+        if not FindCollectInStoreDocument(NpCsDocument, SalesHeader) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, SalesHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Sales Cr. Memo Subform", 'OnDeleteRecordEvent', '', true, true)]
+    local procedure OnDeleteSalesCrMemoLine(var Rec: Record "Sales Line"; var AllowDelete: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+        SalesHeader: Record "Sales Header";
+    begin
+        if not SalesHeader.Get(Rec."Document Type", Rec."Document No.") then
+            exit;
+
+        if not FindCollectInStoreDocument(NpCsDocument, SalesHeader) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, SalesHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Blanket Sales Order", 'OnModifyRecordEvent', '', false, false)]
+    local procedure OnModifyBlanketSalesOrder(var Rec: Record "Sales Header"; var xRec: Record "Sales Header"; var AllowModify: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+    begin
+        if not FindCollectInStoreDocument(NpCsDocument, Rec) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, Rec);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Blanket Sales Order", 'OnDeleteRecordEvent', '', false, false)]
+    local procedure OnDeleteBlanketSalesOrder(var Rec: Record "Sales Header"; var AllowDelete: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+    begin
+        if not FindCollectInStoreDocument(NpCsDocument, Rec) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, Rec);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Blanket Sales Order Subform", 'OnInsertRecordEvent', '', true, true)]
+    local procedure OnInsertBlanketSalesOrderLine(var Rec: Record "Sales Line"; BelowxRec: Boolean; var xRec: Record "Sales Line"; var AllowInsert: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+        SalesHeader: Record "Sales Header";
+    begin
+        if not SalesHeader.Get(Rec."Document Type", Rec."Document No.") then
+            exit;
+
+        if not FindCollectInStoreDocument(NpCsDocument, SalesHeader) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, SalesHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Blanket Sales Order Subform", 'OnModifyRecordEvent', '', true, true)]
+    local procedure OnModifyBlanketSalesOrderLine(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; var AllowModify: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+        SalesHeader: Record "Sales Header";
+    begin
+        if not SalesHeader.Get(Rec."Document Type", Rec."Document No.") then
+            exit;
+
+        if not FindCollectInStoreDocument(NpCsDocument, SalesHeader) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, SalesHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Blanket Sales Order Subform", 'OnDeleteRecordEvent', '', true, true)]
+    local procedure OnDeleteBlanketSalesOrderLine(var Rec: Record "Sales Line"; var AllowDelete: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+        SalesHeader: Record "Sales Header";
+    begin
+        if not SalesHeader.Get(Rec."Document Type", Rec."Document No.") then
+            exit;
+
+        if not FindCollectInStoreDocument(NpCsDocument, SalesHeader) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, SalesHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Sales Return Order", 'OnModifyRecordEvent', '', false, false)]
+    local procedure OnModifySalesReturnOrder(var Rec: Record "Sales Header"; var xRec: Record "Sales Header"; var AllowModify: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+    begin
+        if not FindCollectInStoreDocument(NpCsDocument, Rec) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, Rec);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Sales Return Order", 'OnDeleteRecordEvent', '', false, false)]
+    local procedure OnDeleteSalesReturnOrder(var Rec: Record "Sales Header"; var AllowDelete: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+    begin
+        if not FindCollectInStoreDocument(NpCsDocument, Rec) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, Rec);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Sales Return Order Subform", 'OnInsertRecordEvent', '', true, true)]
+    local procedure OnInsertSalesReturnOrderLine(var Rec: Record "Sales Line"; BelowxRec: Boolean; var xRec: Record "Sales Line"; var AllowInsert: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+        SalesHeader: Record "Sales Header";
+    begin
+        if not SalesHeader.Get(Rec."Document Type", Rec."Document No.") then
+            exit;
+
+        if not FindCollectInStoreDocument(NpCsDocument, SalesHeader) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, SalesHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Sales Return Order Subform", 'OnModifyRecordEvent', '', true, true)]
+    local procedure OnModifySalesReturnOrderLine(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; var AllowModify: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+        SalesHeader: Record "Sales Header";
+    begin
+        if not SalesHeader.Get(Rec."Document Type", Rec."Document No.") then
+            exit;
+
+        if not FindCollectInStoreDocument(NpCsDocument, SalesHeader) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, SalesHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Sales Return Order Subform", 'OnDeleteRecordEvent', '', true, true)]
+    local procedure OnDeleteSalesReturnOrderLine(var Rec: Record "Sales Line"; var AllowDelete: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+        SalesHeader: Record "Sales Header";
+    begin
+        if not SalesHeader.Get(Rec."Document Type", Rec."Document No.") then
+            exit;
+
+        if not FindCollectInStoreDocument(NpCsDocument, SalesHeader) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, SalesHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Sales Order Pick", 'OnModifyRecordEvent', '', false, false)]
+    local procedure OnModifySalesOrderPick(var Rec: Record "Sales Header"; var xRec: Record "Sales Header"; var AllowModify: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+    begin
+        if not FindCollectInStoreDocument(NpCsDocument, Rec) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, Rec);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Sales Order Pick", 'OnDeleteRecordEvent', '', false, false)]
+    local procedure OnDeleteSalesOrderPick(var Rec: Record "Sales Header"; var AllowDelete: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+    begin
+        if not FindCollectInStoreDocument(NpCsDocument, Rec) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, Rec);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Sales Order Pick Subform", 'OnInsertRecordEvent', '', true, true)]
+    local procedure OnInsertSalesOrderPickLine(var Rec: Record "Sales Line"; BelowxRec: Boolean; var xRec: Record "Sales Line"; var AllowInsert: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+        SalesHeader: Record "Sales Header";
+    begin
+        if not SalesHeader.Get(Rec."Document Type", Rec."Document No.") then
+            exit;
+
+        if not FindCollectInStoreDocument(NpCsDocument, SalesHeader) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, SalesHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Sales Order Pick Subform", 'OnModifyRecordEvent', '', true, true)]
+    local procedure OnModifySalesOrderPickLine(var Rec: Record "Sales Line"; var xRec: Record "Sales Line"; var AllowModify: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+        SalesHeader: Record "Sales Header";
+    begin
+        if not SalesHeader.Get(Rec."Document Type", Rec."Document No.") then
+            exit;
+
+        if not FindCollectInStoreDocument(NpCsDocument, SalesHeader) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, SalesHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Sales Order Pick Subform", 'OnDeleteRecordEvent', '', true, true)]
+    local procedure OnDeleteSalesOrderPickLine(var Rec: Record "Sales Line"; var AllowDelete: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+        SalesHeader: Record "Sales Header";
+    begin
+        if not SalesHeader.Get(Rec."Document Type", Rec."Document No.") then
+            exit;
+
+        if not FindCollectInStoreDocument(NpCsDocument, SalesHeader) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, SalesHeader);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Debit sale info", 'OnModifyRecordEvent', '', false, false)]
+    local procedure OnModifyDebitSaleInfo(var Rec: Record "Sales Header"; var xRec: Record "Sales Header"; var AllowModify: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+    begin
+        if not FindCollectInStoreDocument(NpCsDocument, Rec) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, Rec);
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Debit sale info", 'OnDeleteRecordEvent', '', false, false)]
+    local procedure OnDeleteDebitSaleInfo(var Rec: Record "Sales Header"; var AllowDelete: Boolean)
+    var
+        NpCsDocument: Record "NPR NpCs Document";
+    begin
+        if not FindCollectInStoreDocument(NpCsDocument, Rec) then
+            exit;
+
+        CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, Rec);
+    end;
+
+    local procedure FindCollectInStoreDocument(var NpCsDocument: Record "NPR NpCs Document"; SalesHeader: Record "Sales Header"): Boolean
+    begin
+        NpCsDocument.SetRange(Type, NpCsDocument.Type::"Collect in Store");
+        NpCsDocument.SetRange("Document Type", SalesHeader."Document Type");
+        NpCsDocument.SetRange("Document No.", SalesHeader."No.");
+        exit(NpCsDocument.FindFirst());
+    end;
+
+    local procedure CheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument: Record "NPR NpCs Document"; SalesHeader: Record "Sales Header")
+    var
+        FeatureFlagManagement: Codeunit "NPR Feature Flags Management";
+        Handled: Boolean;
+        CannotChangeErr: Label 'You cannot change Sales %1 %2 when its related %3 has %4 %5, because it can cause data discrepancy.', Comment = '%1 Document Type field value - %2 - Document Number field value, %3 - NpCs Document table caption, %4 - Delivery Status field caption, %5 - Deliver Status field value';
+    begin
+        if not FeatureFlagManagement.IsEnabled('checkCollectDocumentDeliveryStatus') then
+            exit;
+
+        OnBeforeCheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument, SalesHeader, Handled);
+        if Handled then
+            exit;
+
+        if NpCsDocument."Bill via" = NpCsDocument."Bill via"::POS then
+            exit;
+
+        if NpCsDocument."Delivery Status" = NpCsDocument."Delivery Status"::Delivered then
+            Error(CannotChangeErr, SalesHeader."Document Type", SalesHeader."No.", NpCsDocument.TableCaption(), NpCsDocument.FieldCaption("Delivery Status"), NpCsDocument."Delivery Status");
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckDeliveryStatusOnChangeRelatedSalesDocument(NpCsDocument: Record "NPR NpCs Document"; SalesHeader: Record "Sales Header"; var Handled: Boolean)
+    begin
+    end;
+    #endregion
 }

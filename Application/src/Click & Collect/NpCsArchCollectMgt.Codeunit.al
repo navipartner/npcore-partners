@@ -38,6 +38,7 @@
                 NpCsDocumentLogEntry.Delete();
             until NpCsDocumentLogEntry.Next() = 0;
 
+        NpCsDocument.SuspendDeliveryStatusCheck(true);
         NpCsDocument.Delete(true);
         NpCsDocument := PrevNpCsDocument;
         exit(true);

@@ -19,12 +19,11 @@
         case NpCsDocument."Bill via" of
             NpCsDocument."Bill via"::POS:
                 SalesHeader.Delete(true);
-
             NpCsDocument."Bill via"::"Sales Document":
                 begin
                     if (NpCsDocument."Delivery Status" = NpCsDocument."Delivery Status"::Delivered) and NpCsDocument."Store Stock" then
-                        Error(MustBePostedLbl,
-                            NpCsDocument."Document Type", NpCsDocument."Document No.", NpCsDocument.FieldCaption("Bill via"), NpCsDocument."Bill via");
+                        Error(MustBePostedLbl, NpCsDocument."Document Type", NpCsDocument."Document No.", NpCsDocument.FieldCaption("Bill via"), NpCsDocument."Bill via");
+
                     SalesHeader.Delete(true);
                 end;
         end;
