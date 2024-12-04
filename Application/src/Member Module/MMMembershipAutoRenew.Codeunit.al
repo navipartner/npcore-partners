@@ -266,6 +266,8 @@
                 end;
             MembershipSetup."Auto-Renew Model"::RECURRING_PAYMENT:
                 begin
+                    if SubscriptionRequest."Entry No." = 0 then
+                        exit;
                     if SubscrRenewPost.PostInvoiceToGL(SubscriptionRequest, Membership, MembershipSetup) then
                         if SubscriptionRequest."Posting Document No." <> '' then
                             MemberInfoCapture."Document No." := SubscriptionRequest."Posting Document No.";
