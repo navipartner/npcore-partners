@@ -697,18 +697,19 @@ codeunit 6184796 "NPR Adyen Management"
             ReconciliationLine.DeleteAll(true);
     end;
 
-    internal procedure CreateGLEntryReconciliationLineRelation(GLEntryNo: Integer; DocumentNo: Code[20]; LineNo: Integer; AmountType: Enum "NPR Adyen Recon. Amount Type"; Amount: Decimal; PostingDate: Date; PostingDocumentNo: Code[20])
+    internal procedure CreateGLEntryReconciliationLineRelation(GLEntryNo: Integer; DocumentNo: Code[20]; LineNo: Integer; AmountType: Enum "NPR Adyen Recon. Amount Type"; Amount: Decimal; PostingDate: Date; PostingNo: Code[20])
     var
-        ReconLineRelation: Record "NPR Adyen Recon. Line Relation";
+        ReconLineRelation: Record "NPR Adyen Recons.Line Relation";
     begin
         ReconLineRelation.Init();
+        ReconLineRelation."Entry No." := 0;
         ReconLineRelation."GL Entry No." := GLEntryNo;
         ReconLineRelation."Document No." := DocumentNo;
         ReconLineRelation."Document Line No." := LineNo;
         ReconLineRelation."Amount Type" := AmountType;
         ReconLineRelation.Amount := Amount;
         ReconLineRelation."Posting Date" := PostingDate;
-        ReconLineRelation."Posting Document No." := PostingDocumentNo;
+        ReconLineRelation."Posting Document No." := PostingNo;
         ReconLineRelation.Insert();
     end;
 

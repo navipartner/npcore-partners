@@ -102,29 +102,31 @@ codeunit 6184827 "NPR Adyen Fee Posting"
 
     internal procedure FeePosted(RecLine: Record "NPR Adyen Recon. Line"): Boolean
     var
-        ReconRelation: Record "NPR Adyen Recon. Line Relation";
+        ReconRelation: Record "NPR Adyen Recons.Line Relation";
         AmountType: Enum "NPR Adyen Recon. Amount Type";
-        TransactionFound: Boolean;
     begin
+        ReconRelation.SetRange("Document No.", RecLine."Document No.");
+        ReconRelation.SetRange("Document Line No.", RecLine."Line No.");
+        ReconRelation.SetRange(Reversed, false);
         case _GLAccountType of
             _GLAccountType::"Fee G/L Account":
-                TransactionFound := ReconRelation.Get(RecLine."Document No.", RecLine."Line No.", AmountType::Fee);
+                ReconRelation.SetRange("Amount Type", AmountType::Fee);
             _GLAccountType::"Invoice Deduction G/L Account":
-                TransactionFound := ReconRelation.Get(RecLine."Document No.", RecLine."Line No.", AmountType::"Invoice Deduction");
+                ReconRelation.SetRange("Amount Type", AmountType::"Invoice Deduction");
             _GLAccountType::"Chargeback Fees G/L Account":
-                TransactionFound := ReconRelation.Get(RecLine."Document No.", RecLine."Line No.", AmountType::"Chargeback Fees");
+                ReconRelation.SetRange("Amount Type", AmountType::"Chargeback Fees");
             _GLAccountType::"Merchant Payout Account":
-                TransactionFound := ReconRelation.Get(RecLine."Document No.", RecLine."Line No.", AmountType::"Merchant Payout");
+                ReconRelation.SetRange("Amount Type", AmountType::"Merchant Payout");
             _GLAccountType::"Acquirer Payout Account":
-                TransactionFound := ReconRelation.Get(RecLine."Document No.", RecLine."Line No.", AmountType::"Acquirer Payout");
+                ReconRelation.SetRange("Amount Type", AmountType::"Acquirer Payout");
             _GLAccountType::"Advancement External Commission G/L Account":
-                TransactionFound := ReconRelation.Get(RecLine."Document No.", RecLine."Line No.", AmountType::"Advancement External Commission");
+                ReconRelation.SetRange("Amount Type", AmountType::"Advancement External Commission");
             _GLAccountType::"Refunded External Commission G/L Account":
-                TransactionFound := ReconRelation.Get(RecLine."Document No.", RecLine."Line No.", AmountType::"Refunded External Commission");
+                ReconRelation.SetRange("Amount Type", AmountType::"Refunded External Commission");
             _GLAccountType::"Settled External Commission G/L Account":
-                TransactionFound := ReconRelation.Get(RecLine."Document No.", RecLine."Line No.", AmountType::"Settled External Commission");
+                ReconRelation.SetRange("Amount Type", AmountType::"Settled External Commission");
         end;
-        if TransactionFound then begin
+        if ReconRelation.FindFirst() then begin
             _GLEntryNo := ReconRelation."GL Entry No.";
             exit(true);
         end;

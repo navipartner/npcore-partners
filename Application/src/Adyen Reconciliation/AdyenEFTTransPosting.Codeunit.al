@@ -15,17 +15,6 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         end;
     end;
 
-    internal procedure LineIsPosted(Line: Record "NPR Adyen Recon. Line"): Boolean
-    begin
-        _TransactionPosted := _ReconRelation.Get(Line."Document No.", Line."Line No.", _AmountType::Transaction);
-        _MarkupPosted := _ReconRelation.Get(Line."Document No.", Line."Line No.", _AmountType::Markup);
-        _CommissionsPosted := _ReconRelation.Get(Line."Document No.", Line."Line No.", _AmountType::"Other commissions");
-        _RealizedGainsOrLossesPosted := _ReconRelation.Get(Line."Document No.", Line."Line No.", _AmountType::"Realized Gains") or _ReconRelation.Get(Line."Document No.", Line."Line No.", _AmountType::"Realized Losses");
-
-        if (_TransactionPosted and _MarkupPosted and _CommissionsPosted and _RealizedGainsOrLossesPosted) then
-            exit(true);
-    end;
-
     [TryFunction]
     internal procedure PrepareRecords(RecLine: Record "NPR Adyen Recon. Line"; RecHeader: Record "NPR Adyen Reconciliation Hdr")
     begin
@@ -151,8 +140,9 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         ReverseEFTTransactionRequest: Record "NPR EFT Transaction Request";
         POSPaymentLine: Record "NPR POS Entry Payment Line";
-        ReversePOSPaymentLine: Record "NPR POS Entry Payment Line";
+        EFTReversed: Boolean;
     begin
+        EFTTransactionRequest.GetBySystemId(_ReconciliationLine."Matching Entry System ID");
         case _ReconciliationLine."Transaction Type" of
             _ReconciliationLine."Transaction Type"::Chargeback,
             _ReconciliationLine."Transaction Type"::SecondChargeback,
@@ -160,71 +150,17 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
             _ReconciliationLine."Transaction Type"::ChargebackReversed,
             _ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo:
                 begin
-                    EFTTransactionRequest.GetBySystemId(_ReconciliationLine."Matching Entry System ID");
                     POSPaymentLine.GetBySystemId(EFTTransactionRequest."Sales Line ID");
-
-                    ReversePOSPaymentLine := POSPaymentLine;
-                    POSPaymentLine.SetRange("POS Entry No.", POSPaymentLine."POS Entry No.");
-                    POSPaymentLine.FindLast();
-
-                    ReversePOSPaymentLine."Line No." := POSPaymentLine."Line No." + 10000;
-                    if _AdyenSetup."Post with Transaction Date" then
-                        ReversePOSPaymentLine."Entry Date" := DT2Date(_ReconciliationLine."Transaction Date")
-                    else
-                        ReversePOSPaymentLine."Entry Date" := _ReconciliationHeader."Posting Date";
-
-                    ReversePOSPaymentLine.Amount *= -1;
-                    ReversePOSPaymentLine."Amount (LCY)" *= -1;
-                    ReversePOSPaymentLine."Payment Amount" *= -1;
-                    ReversePOSPaymentLine."Amount (Sales Currency)" *= -1;
-                    ReversePOSPaymentLine."VAT Base Amount (LCY)" *= -1;
-                    case _ReconciliationLine."Transaction Type" of
-                        _ReconciliationLine."Transaction Type"::Chargeback:
-                            ReversePOSPaymentLine.Description := ChargebackPaymentLineDescription;
-                        _ReconciliationLine."Transaction Type"::SecondChargeback:
-                            ReversePOSPaymentLine.Description := SecondChargebackPaymentLineDescription;
-                        _ReconciliationLine."Transaction Type"::RefundedReversed:
-                            ReversePOSPaymentLine.Description := ReverseRefundPaymentLineDescription;
-                        _ReconciliationLine."Transaction Type"::ChargebackReversed:
-                            ReversePOSPaymentLine.Description := ReverseChargebackPaymentLineDescription;
-                        _ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo:
-                            ReversePOSPaymentLine.Description := ReversedExternalChargebackPaymentLineDescription;
-                    end;
-                    ReversePOSPaymentLine."Created by Reconciliation" := true;
-                    ReversePOSPaymentLine."Created by Recon. Posting No." := _ReconciliationLine."Posting No.";
-                    ReversePOSPaymentLine.Insert();
+                    CreateReverseEFTTransactionRequest(EFTTransactionRequest, ReverseEFTTransactionRequest, EFTReversed);
 
                     //TODO PostReversePOSPaymentLine
 
-                    ReverseEFTTransactionRequest := EFTTransactionRequest;
-                    ReverseEFTTransactionRequest."Entry No." := 0;
-                    ReverseEFTTransactionRequest."Result Amount" *= -1;
-                    ReverseEFTTransactionRequest."Amount Input" *= -1;
-                    ReverseEFTTransactionRequest."Amount Output" *= -1;
-                    ReverseEFTTransactionRequest."Transaction Date" := DT2Date(_ReconciliationLine."Transaction Date");
-                    if _AdyenSetup."Post with Transaction Date" then
-                        ReverseEFTTransactionRequest."Reconciliation Date" := DT2Date(_ReconciliationLine."Transaction Date")
-                    else
-                        ReverseEFTTransactionRequest."Reconciliation Date" := _ReconciliationHeader."Posting Date";
-                    case _ReconciliationLine."Transaction Type" of
-                        _ReconciliationLine."Transaction Type"::Chargeback:
-                            ReverseEFTTransactionRequest."Auxiliary Operation Desc." := ChargebackPaymentLineDescription;
-                        _ReconciliationLine."Transaction Type"::SecondChargeback:
-                            ReverseEFTTransactionRequest."Auxiliary Operation Desc." := SecondChargebackPaymentLineDescription;
-                        _ReconciliationLine."Transaction Type"::RefundedReversed:
-                            ReverseEFTTransactionRequest."Auxiliary Operation Desc." := ReverseRefundPaymentLineDescription;
-                        _ReconciliationLine."Transaction Type"::ChargebackReversed:
-                            ReverseEFTTransactionRequest."Auxiliary Operation Desc." := ReverseChargebackPaymentLineDescription;
-                        _ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo:
-                            ReverseEFTTransactionRequest."Auxiliary Operation Desc." := ReversedExternalChargebackPaymentLineDescription;
+                    if EFTReversed then begin
+                        EFTTransactionRequest."Reversed by Entry No." := ReverseEFTTransactionRequest."Entry No.";
+                        EFTTransactionRequest.Reversed := true;
+                        EFTTransactionRequest.Modify();
+                        CreateReversePOSPaymentLine(POSPaymentLine);
                     end;
-                    ReverseEFTTransactionRequest."Created by Reconciliation" := true;
-                    ReverseEFTTransactionRequest."Created by Recon. Posting No." := _ReconciliationLine."Posting No.";
-                    ReverseEFTTransactionRequest.Insert();
-
-                    EFTTransactionRequest."Reversed by Entry No." := ReverseEFTTransactionRequest."Entry No.";
-                    EFTTransactionRequest.Reversed := true;
-                    EFTTransactionRequest.Modify();
 
                     _NewReversedSystemId := ReverseEFTTransactionRequest.SystemId;
                 end;
@@ -253,7 +189,9 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         DimensionSetID: Integer;
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         ReverseMagentoPaymentLine: Record "NPR Magento Payment Line";
+        MagentoReversed: Boolean;
     begin
+        MagentoPaymentLine.GetBySystemId(_ReconciliationLine."Matching Entry System ID");
         case _ReconciliationLine."Transaction Type" of
             _ReconciliationLine."Transaction Type"::Chargeback,
             _ReconciliationLine."Transaction Type"::SecondChargeback,
@@ -261,62 +199,26 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
             _ReconciliationLine."Transaction Type"::ChargebackReversed,
             _ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo:
                 begin
-                    MagentoPaymentLine.GetBySystemId(_ReconciliationLine."Matching Entry System ID");
-
-                    ReverseMagentoPaymentLine := MagentoPaymentLine;
-                    MagentoPaymentLine.SetRange("Document Table No.", ReverseMagentoPaymentLine."Document Table No.");
-                    MagentoPaymentLine.SetRange("Document No.", ReverseMagentoPaymentLine."Document No.");
-                    MagentoPaymentLine.SetRange("Document Type", ReverseMagentoPaymentLine."Document Type");
-                    MagentoPaymentLine.FindLast();
-
-                    ReverseMagentoPaymentLine."Line No." := MagentoPaymentLine."Line No." + 10000;
-
-                    ReverseMagentoPaymentLine.Amount *= -1;
-                    ReverseMagentoPaymentLine."Last Amount" *= -1;
-
-                    ReverseMagentoPaymentLine."Date Captured" := DT2Date(_ReconciliationLine."Transaction Date");
-
-                    if _AdyenSetup."Post with Transaction Date" then
-                        ReverseMagentoPaymentLine."Reconciliation Date" := DT2Date(_ReconciliationLine."Transaction Date")
-                    else
-                        ReverseMagentoPaymentLine."Reconciliation Date" := _ReconciliationHeader."Posting Date";
-
-                    ReverseMagentoPaymentLine."Posting Date" := ReverseMagentoPaymentLine."Reconciliation Date";
-
-                    ReverseMagentoPaymentLine."Created by Reconciliation" := true;
-                    ReverseMagentoPaymentLine."Created by Recon. Posting No." := _ReconciliationLine."Posting No.";
-                    case _ReconciliationLine."Transaction Type" of
-                        _ReconciliationLine."Transaction Type"::Chargeback:
-                            ReverseMagentoPaymentLine.Description := ChargebackPaymentLineDescription;
-                        _ReconciliationLine."Transaction Type"::RefundedReversed:
-                            ReverseMagentoPaymentLine.Description := ReverseRefundPaymentLineDescription;
-                        _ReconciliationLine."Transaction Type"::ChargebackReversed:
-                            ReverseMagentoPaymentLine.Description := ReverseChargebackPaymentLineDescription;
-                        _ReconciliationLine."Transaction Type"::SecondChargeback:
-                            ReverseMagentoPaymentLine.Description := SecondChargebackPaymentLineDescription;
-                        _ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo:
-                            ReverseMagentoPaymentLine.Description := ReversedExternalChargebackPaymentLineDescription;
-                    end;
-                    ReverseMagentoPaymentLine.Insert();
+                    CreateReverseMagento(MagentoPaymentLine, ReverseMagentoPaymentLine, MagentoReversed);
 
                     //TODO PostReverseMagentoPaymentLine
-
-                    MagentoPaymentLine.GetBySystemId(_ReconciliationLine."Matching Entry System ID");
-                    MagentoPaymentLine."Reversed by Entry System ID" := ReverseMagentoPaymentLine.SystemId;
-                    MagentoPaymentLine.Reversed := true;
-                    MagentoPaymentLine.Modify();
+                    if MagentoReversed then begin
+                        MagentoPaymentLine."Reversed by Entry System ID" := ReverseMagentoPaymentLine.SystemId;
+                        MagentoPaymentLine.Reversed := true;
+                        MagentoPaymentLine.Modify();
+                    end;
 
                     _NewReversedSystemId := ReverseMagentoPaymentLine.SystemId;
                 end;
         end;
 
         SalesHeader.Reset();
-        SalesHeader.SetRange("No.", ReverseMagentoPaymentLine."Document No.");
-        SalesHeader.SetRange("Document Type", ReverseMagentoPaymentLine."Document Type");
+        SalesHeader.SetRange("No.", MagentoPaymentLine."Document No.");
+        SalesHeader.SetRange("Document Type", MagentoPaymentLine."Document Type");
         if not SalesHeader.FindFirst() then begin
-            if not SalesInvHeader.Get(ReverseMagentoPaymentLine."Document No.") then begin
-                if not SalesCrMemoHeader.Get(ReverseMagentoPaymentLine."Document No.") then
-                    Error(NoOriginalSalesDocumentFound, ReverseMagentoPaymentLine."Document No.")
+            if not SalesInvHeader.Get(MagentoPaymentLine."Document No.") then begin
+                if not SalesCrMemoHeader.Get(MagentoPaymentLine."Document No.") then
+                    Error(NoOriginalSalesDocumentFound, MagentoPaymentLine."Document No.")
                 else
                     SetDimensions(SalesCrMemoHeader, DimensionSetID);
             end else
@@ -332,19 +234,19 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         AdyenManagement: Codeunit "NPR Adyen Management";
         GLEntryNo: Integer;
     begin
-        if (_ReconciliationLine."Amount (TCY)" <> 0) and (not _TransactionPosted) then begin
+        if (_ReconciliationLine."Amount (TCY)" <> 0) and (not _ReconciliationLine."Transaction Posted") then begin
             GLEntryNo := CreatePostGL(_ReconciliationLine."Amount (TCY)", _AdyenMerchantSetup."Reconciled Payment Acc. Type", _AdyenMerchantSetup."Reconciled Payment Acc. No.", _PaymentAccountType, _PaymentAccountNo, DimensionSetID, _ReconciliationLine."Transaction Currency Code", StrSubstNo(AdyenTransactionLabel, _ReconciliationLine."PSP Reference"), true);
             AdyenManagement.CreateGLEntryReconciliationLineRelation(GLEntryNo, _ReconciliationLine."Document No.", _ReconciliationLine."Line No.", _AmountType::Transaction, _ReconciliationLine."Amount(AAC)", _ReconciliationLine."Posting Date", _ReconciliationLine."Posting No.");
         end;
-        if (_ReconciliationLine."Markup (LCY)" <> 0) and (not _MarkupPosted) then begin
+        if (_ReconciliationLine."Markup (LCY)" <> 0) and (not _ReconciliationLine."Markup Posted") then begin
             GLEntryNo := CreatePostGL(_ReconciliationLine."Markup (LCY)", _PaymentAccountType::"G/L Account", _AdyenMerchantSetup."Markup G/L Account", _AdyenMerchantSetup."Reconciled Payment Acc. Type", _AdyenMerchantSetup."Reconciled Payment Acc. No.", DimensionSetID, '', AdyenMarkupLabel, false);
             AdyenManagement.CreateGLEntryReconciliationLineRelation(GLEntryNo, _ReconciliationLine."Document No.", _ReconciliationLine."Line No.", _AmountType::Markup, _ReconciliationLine."Markup (LCY)", _ReconciliationLine."Posting Date", _ReconciliationLine."Posting No.");
         end;
-        if (_ReconciliationLine."Other Commissions (LCY)" <> 0) and (not _CommissionsPosted) then begin
+        if (_ReconciliationLine."Other Commissions (LCY)" <> 0) and (not _ReconciliationLine."Commissions Posted") then begin
             GLEntryNo := CreatePostGL(_ReconciliationLine."Other Commissions (LCY)", _PaymentAccountType::"G/L Account", _AdyenMerchantSetup."Other commissions G/L Account", _AdyenMerchantSetup."Reconciled Payment Acc. Type", _AdyenMerchantSetup."Reconciled Payment Acc. No.", DimensionSetID, '', AdyenOtherCommissionsLabel, false);
             AdyenManagement.CreateGLEntryReconciliationLineRelation(GLEntryNo, _ReconciliationLine."Document No.", _ReconciliationLine."Line No.", _AmountType::"Other commissions", _ReconciliationLine."Other Commissions (LCY)", _ReconciliationLine."Posting Date", _ReconciliationLine."Posting No.");
         end;
-        if (_ReconciliationLine."Realized Gains or Losses" <> 0) and (not _RealizedGainsOrLossesPosted) then begin
+        if (_ReconciliationLine."Realized Gains or Losses" <> 0) and (not (_ReconciliationLine."Realized Gains Posted" or _ReconciliationLine."Realized Losses Posted")) then begin
             if _ReconciliationLine."Realized Gains or Losses" < 0 then begin
                 GLEntryNo := CreatePostGL(_ReconciliationLine."Realized Gains or Losses", _PaymentAccountType::"G/L Account", _Currency."Realized Gains Acc.", _AdyenMerchantSetup."Reconciled Payment Acc. Type", _AdyenMerchantSetup."Reconciled Payment Acc. No.", DimensionSetID, '', AdyenRealizedGainsLabel, false);
                 AdyenManagement.CreateGLEntryReconciliationLineRelation(GLEntryNo, _ReconciliationLine."Document No.", _ReconciliationLine."Line No.", _AmountType::"Realized Gains", _ReconciliationLine."Realized Gains or Losses", _ReconciliationLine."Posting Date", _ReconciliationLine."Posting No.");
@@ -375,6 +277,137 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         DimensionSetID := SalesCreditMemo."Dimension Set ID";
     end;
 
+    local procedure CreateReverseEFTTransactionRequest(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var ReverseEFTTransactionRequest: Record "NPR EFT Transaction Request"; var EFTReversed: Boolean)
+    var
+        ExistingReversedEFT: Record "NPR EFT Transaction Request";
+    begin
+        EFTReversed := false;
+        ExistingReversedEFT.Reset();
+        ExistingReversedEFT.SetRange("PSP Reference", EFTTransactionRequest."PSP Reference");
+        ExistingReversedEFT.SetRange(Reversed, false);
+        ExistingReversedEFT.SetRange(Reconciled, false);
+        ExistingReversedEFT.SetRange("Result Amount", EFTTransactionRequest."Result Amount");
+        if ExistingReversedEFT.FindFirst() then begin
+            ReverseEFTTransactionRequest := ExistingReversedEFT;
+            exit;
+        end;
+
+        ReverseEFTTransactionRequest := EFTTransactionRequest;
+        ReverseEFTTransactionRequest."Entry No." := 0;
+        ReverseEFTTransactionRequest."Result Amount" *= -1;
+        ReverseEFTTransactionRequest."Amount Input" *= -1;
+        ReverseEFTTransactionRequest."Amount Output" *= -1;
+        ReverseEFTTransactionRequest."Transaction Date" := DT2Date(_ReconciliationLine."Transaction Date");
+        if _AdyenSetup."Post with Transaction Date" then
+            ReverseEFTTransactionRequest."Reconciliation Date" := DT2Date(_ReconciliationLine."Transaction Date")
+        else
+            ReverseEFTTransactionRequest."Reconciliation Date" := _ReconciliationHeader."Posting Date";
+        case _ReconciliationLine."Transaction Type" of
+            _ReconciliationLine."Transaction Type"::Chargeback:
+                ReverseEFTTransactionRequest."Auxiliary Operation Desc." := ChargebackPaymentLineDescription;
+            _ReconciliationLine."Transaction Type"::SecondChargeback:
+                ReverseEFTTransactionRequest."Auxiliary Operation Desc." := SecondChargebackPaymentLineDescription;
+            _ReconciliationLine."Transaction Type"::RefundedReversed:
+                ReverseEFTTransactionRequest."Auxiliary Operation Desc." := ReverseRefundPaymentLineDescription;
+            _ReconciliationLine."Transaction Type"::ChargebackReversed:
+                ReverseEFTTransactionRequest."Auxiliary Operation Desc." := ReverseChargebackPaymentLineDescription;
+            _ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo:
+                ReverseEFTTransactionRequest."Auxiliary Operation Desc." := ReversedExternalChargebackPaymentLineDescription;
+        end;
+        ReverseEFTTransactionRequest."Created by Reconciliation" := true;
+        ReverseEFTTransactionRequest."Created by Recon. Posting No." := _ReconciliationLine."Posting No.";
+        ReverseEFTTransactionRequest.Insert();
+        EFTReversed := true;
+    end;
+
+    local procedure CreateReversePOSPaymentLine(POSPaymentLine: Record "NPR POS Entry Payment Line")
+    var
+        ReversePOSPaymentLine: Record "NPR POS Entry Payment Line";
+    begin
+        ReversePOSPaymentLine := POSPaymentLine;
+        POSPaymentLine.SetRange("POS Entry No.", POSPaymentLine."POS Entry No.");
+        POSPaymentLine.FindLast();
+
+        ReversePOSPaymentLine."Line No." := POSPaymentLine."Line No." + 10000;
+        if _AdyenSetup."Post with Transaction Date" then
+            ReversePOSPaymentLine."Entry Date" := DT2Date(_ReconciliationLine."Transaction Date")
+        else
+            ReversePOSPaymentLine."Entry Date" := _ReconciliationHeader."Posting Date";
+
+        ReversePOSPaymentLine.Amount *= -1;
+        ReversePOSPaymentLine."Amount (LCY)" *= -1;
+        ReversePOSPaymentLine."Payment Amount" *= -1;
+        ReversePOSPaymentLine."Amount (Sales Currency)" *= -1;
+        ReversePOSPaymentLine."VAT Base Amount (LCY)" *= -1;
+        case _ReconciliationLine."Transaction Type" of
+            _ReconciliationLine."Transaction Type"::Chargeback:
+                ReversePOSPaymentLine.Description := ChargebackPaymentLineDescription;
+            _ReconciliationLine."Transaction Type"::SecondChargeback:
+                ReversePOSPaymentLine.Description := SecondChargebackPaymentLineDescription;
+            _ReconciliationLine."Transaction Type"::RefundedReversed:
+                ReversePOSPaymentLine.Description := ReverseRefundPaymentLineDescription;
+            _ReconciliationLine."Transaction Type"::ChargebackReversed:
+                ReversePOSPaymentLine.Description := ReverseChargebackPaymentLineDescription;
+            _ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo:
+                ReversePOSPaymentLine.Description := ReversedExternalChargebackPaymentLineDescription;
+        end;
+        ReversePOSPaymentLine."Created by Reconciliation" := true;
+        ReversePOSPaymentLine."Created by Recon. Posting No." := _ReconciliationLine."Posting No.";
+        ReversePOSPaymentLine.Insert();
+    end;
+
+    local procedure CreateReverseMagento(MagentoPaymentLine: Record "NPR Magento Payment Line"; var ReverseMagentoPaymentLine: Record "NPR Magento Payment Line"; var MagentoReversed: Boolean)
+    var
+        ExistingReverseMagento: Record "NPR Magento Payment Line";
+    begin
+        MagentoReversed := false;
+        ReverseMagentoPaymentLine := MagentoPaymentLine;
+        ExistingReverseMagento.SetRange("Transaction ID", MagentoPaymentLine."Transaction ID");
+        ExistingReverseMagento.SetRange(Reversed, false);
+        ExistingReverseMagento.SetRange(Reconciled, false);
+        ExistingReverseMagento.SetRange(Amount, MagentoPaymentLine.Amount);
+        if ExistingReverseMagento.FindFirst() then begin
+            ReverseMagentoPaymentLine := ExistingReverseMagento;
+            exit;
+        end;
+
+        MagentoPaymentLine.SetRange("Document Table No.", ReverseMagentoPaymentLine."Document Table No.");
+        MagentoPaymentLine.SetRange("Document No.", ReverseMagentoPaymentLine."Document No.");
+        MagentoPaymentLine.SetRange("Document Type", ReverseMagentoPaymentLine."Document Type");
+        MagentoPaymentLine.FindLast();
+
+        ReverseMagentoPaymentLine."Line No." := MagentoPaymentLine."Line No." + 10000;
+
+        ReverseMagentoPaymentLine.Amount *= -1;
+        ReverseMagentoPaymentLine."Last Amount" *= -1;
+
+        ReverseMagentoPaymentLine."Date Captured" := DT2Date(_ReconciliationLine."Transaction Date");
+
+        if _AdyenSetup."Post with Transaction Date" then
+            ReverseMagentoPaymentLine."Reconciliation Date" := DT2Date(_ReconciliationLine."Transaction Date")
+        else
+            ReverseMagentoPaymentLine."Reconciliation Date" := _ReconciliationHeader."Posting Date";
+
+        ReverseMagentoPaymentLine."Posting Date" := ReverseMagentoPaymentLine."Reconciliation Date";
+
+        ReverseMagentoPaymentLine."Created by Reconciliation" := true;
+        ReverseMagentoPaymentLine."Created by Recon. Posting No." := _ReconciliationLine."Posting No.";
+        case _ReconciliationLine."Transaction Type" of
+            _ReconciliationLine."Transaction Type"::Chargeback:
+                ReverseMagentoPaymentLine.Description := ChargebackPaymentLineDescription;
+            _ReconciliationLine."Transaction Type"::RefundedReversed:
+                ReverseMagentoPaymentLine.Description := ReverseRefundPaymentLineDescription;
+            _ReconciliationLine."Transaction Type"::ChargebackReversed:
+                ReverseMagentoPaymentLine.Description := ReverseChargebackPaymentLineDescription;
+            _ReconciliationLine."Transaction Type"::SecondChargeback:
+                ReverseMagentoPaymentLine.Description := SecondChargebackPaymentLineDescription;
+            _ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo:
+                ReverseMagentoPaymentLine.Description := ReversedExternalChargebackPaymentLineDescription;
+        end;
+        ReverseMagentoPaymentLine.Insert();
+        MagentoReversed := true;
+    end;
+
     var
         _AdyenSetup: Record "NPR Adyen Setup";
         _GLSetup: Record "General Ledger Setup";
@@ -382,14 +415,9 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         _ReconciliationLine: Record "NPR Adyen Recon. Line";
         _ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr";
         _Currency: Record Currency;
-        _ReconRelation: Record "NPR Adyen Recon. Line Relation";
         _PaymentAccountType: Enum "Gen. Journal Account Type";
         _AmountType: Enum "NPR Adyen Recon. Amount Type";
         _PaymentAccountNo: Code[20];
-        _TransactionPosted: Boolean;
-        _MarkupPosted: Boolean;
-        _CommissionsPosted: Boolean;
-        _RealizedGainsOrLossesPosted: Boolean;
         _NewReversedSystemId: Guid;
         NoOriginalDocumentFound: Label 'No POS Entry was found with No. %1.';
         NoOriginalSalesDocumentFound: Label 'No Sales Document was found with No. %1.';

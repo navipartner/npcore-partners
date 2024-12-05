@@ -526,6 +526,51 @@ table 6150874 "NPR Adyen Recon. Line"
             Caption = 'Submerchant Identifier';
             DataClassification = CustomerContent;
         }
+        field(880; "Transaction Posted"; Boolean)
+        {
+            Caption = 'Transaction Posted';
+            FieldClass = FlowField;
+            CalcFormula = exist("NPR Adyen Recons.Line Relation" where("Document No." = field("Document No."),
+                                                                    "Document Line No." = field("Line No."),
+                                                                    Reversed = const(false),
+                                                                    "Amount Type" = const(Transaction)));
+        }
+        field(890; "Markup Posted"; Boolean)
+        {
+            Caption = 'Markup Posted';
+            FieldClass = FlowField;
+            CalcFormula = exist("NPR Adyen Recons.Line Relation" where("Document No." = field("Document No."),
+                                                                    "Document Line No." = field("Line No."),
+                                                                    Reversed = const(false),
+                                                                    "Amount Type" = const(Markup)));
+        }
+        field(900; "Commissions Posted"; Boolean)
+        {
+            Caption = 'Commissions Posted';
+            FieldClass = FlowField;
+            CalcFormula = exist("NPR Adyen Recons.Line Relation" where("Document No." = field("Document No."),
+                                                                    "Document Line No." = field("Line No."),
+                                                                    Reversed = const(false),
+                                                                    "Amount Type" = const("Other commissions")));
+        }
+        field(910; "Realized Gains Posted"; Boolean)
+        {
+            Caption = 'Realized Gains Posted';
+            FieldClass = FlowField;
+            CalcFormula = exist("NPR Adyen Recons.Line Relation" where("Document No." = field("Document No."),
+                                                                    "Document Line No." = field("Line No."),
+                                                                    Reversed = const(false),
+                                                                    "Amount Type" = const("Realized Gains")));
+        }
+        field(920; "Realized Losses Posted"; Boolean)
+        {
+            Caption = 'Realized Losses Posted';
+            FieldClass = FlowField;
+            CalcFormula = exist("NPR Adyen Recons.Line Relation" where("Document No." = field("Document No."),
+                                                                    "Document Line No." = field("Line No."),
+                                                                    Reversed = const(false),
+                                                                    "Amount Type" = const("Realized Losses")));
+        }
     }
     keys
     {
@@ -541,5 +586,12 @@ table 6150874 "NPR Adyen Recon. Line"
     begin
         if ("Amount(AAC)" = 0) and ("Transaction Currency Code" = "Adyen Acc. Currency Code") then
             "Amount(AAC)" := "Amount (TCY)";
+    end;
+
+    internal procedure IsPosted(RecalcFlowFields: Boolean): Boolean
+    begin
+        if RecalcFlowFields then
+            CalcFields("Transaction Posted", "Markup Posted", "Commissions Posted", "Realized Gains Posted");
+        exit("Transaction Posted" and "Markup Posted" and "Commissions Posted");
     end;
 }

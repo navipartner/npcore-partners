@@ -4,7 +4,7 @@ page 6184657 "NPR Adyen Recon. Line Relation"
     ApplicationArea = NPRRetail;
     Caption = 'NP Pay Recon. Line Relation';
     PageType = List;
-    SourceTable = "NPR Adyen Recon. Line Relation";
+    SourceTable = "NPR Adyen Recons.Line Relation";
     Editable = false;
     Extensible = false;
 
@@ -18,6 +18,11 @@ page 6184657 "NPR Adyen Recon. Line Relation"
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the corresponding Entry''s Amount Type';
+                }
+                field(Reversed; Rec.Reversed)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies if the transactions are reversed.';
                 }
                 field(Amount; Rec.Amount)
                 {

@@ -16,6 +16,7 @@ codeunit 6184908 "NPR Adyen Recon. Upgrade"
         UpdateAdyenReconLinePostingAllowed();
         UpdateAdyenReconciliationStatus();
         UpdateAdyenReconciliationDocumentProcessingStatus();
+        UpdateAdyenReconciliationRelation();
     end;
 
     local procedure UpdatePSPReferenceForEFTTrans()
@@ -144,6 +145,37 @@ codeunit 6184908 "NPR Adyen Recon. Upgrade"
                     ReconHeader2.Modify();
                 end;
             until ReconHeader.Next() = 0;
+
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure UpdateAdyenReconciliationRelation()
+    var
+        OldReconRelation: Record "NPR Adyen Recon. Line Relation";
+        NewReconRelation: Record "NPR Adyen Recons.Line Relation";
+    begin
+        UpgradeStep := 'UpdateAdyenReconciliationRelation';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep)) then
+            exit;
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Adyen Recon. Upgrade', UpgradeStep);
+
+        if OldReconRelation.FindSet() then begin
+            repeat
+                NewReconRelation.Init();
+                NewReconRelation."Entry No." := 0;
+                NewReconRelation."GL Entry No." := OldReconRelation."GL Entry No.";
+                NewReconRelation."Document No." := OldReconRelation."Document No.";
+                NewReconRelation."Document Line No." := OldReconRelation."Document Line No.";
+                NewReconRelation."Amount Type" := OldReconRelation."Amount Type";
+                NewReconRelation.Amount := OldReconRelation.Amount;
+                NewReconRelation."Posting Date" := OldReconRelation."Posting Date";
+                NewReconRelation."Posting Document No." := OldReconRelation."Posting Document No.";
+                NewReconRelation.Insert();
+            until OldReconRelation.Next() = 0;
+            OldReconRelation.DeleteAll();
+        end;
+
 
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();

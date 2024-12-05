@@ -534,7 +534,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         PaymentLine: Record "NPR POS Entry Payment Line";
         AdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integrat.";
         AdyenLocalIntegration: Codeunit "NPR EFT Adyen Local Integrat.";
-        EFTAmountFactor: Integer;
+        MatchValidationPassed: Boolean;
     begin
         EFTTransactionRequest.Reset();
         EFTTransactionRequest.SetRange("PSP Reference", ReconciliationLine."PSP Reference");
@@ -572,15 +572,20 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             end;
         end;
 
-        EFTAmountFactor := 1;
         if ReconciliationLine."Transaction Type" in
-            [ReconciliationLine."Transaction Type"::RefundedReversed,
+            [ReconciliationLine."Transaction Type"::Chargeback,
+            ReconciliationLine."Transaction Type"::SecondChargeback,
+            ReconciliationLine."Transaction Type"::RefundedReversed,
             ReconciliationLine."Transaction Type"::ChargebackReversed,
             ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo]
         then
-            EFTAmountFactor := 1;
+            MatchValidationPassed := Abs(EFTTransactionRequest."Result Amount") = Abs(ReconciliationLine."Amount (TCY)")
+        else
+            MatchValidationPassed := EFTTransactionRequest."Result Amount" = ReconciliationLine."Amount (TCY)";
 
-        if ((EFTTransactionRequest."Result Amount" * EFTAmountFactor) = (ReconciliationLine."Amount (TCY)")) and EFTTransactionRequest."Financial Impact" then begin
+        MatchValidationPassed := MatchValidationPassed and EFTTransactionRequest."Financial Impact";
+
+        if MatchValidationPassed then begin
             ReconciliationLine.Status := ReconciliationLine.Status::Matched;
             MatchedEntries += 1;
             if PaymentLine.GetBySystemId(EFTTransactionRequest."Sales Line ID") and
@@ -616,7 +621,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         PaymentGateway: Record "NPR Magento Payment Gateway";
         FilterPGCodes: Text;
         GLSetup: Record "General Ledger Setup";
-        MagentoAmountFactor: Integer;
+        MatchValidationPassed: Boolean;
     begin
         PaymentGateway.Reset();
         PaymentGateway.SetRange("Integration Type", Enum::"NPR PG Integrations"::Adyen);
@@ -648,16 +653,21 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         ReconciliationLine."Matching Table Name" := ReconciliationLine."Matching Table Name"::"Magento Payment Line";
         ReconciliationLine."Matching Entry System ID" := MagentoPaymentLine.SystemId;
 
-        MagentoAmountFactor := 1;
 
         if ReconciliationLine."Transaction Type" in
-            [ReconciliationLine."Transaction Type"::RefundedReversed,
+            [ReconciliationLine."Transaction Type"::Chargeback,
+            ReconciliationLine."Transaction Type"::SecondChargeback,
+            ReconciliationLine."Transaction Type"::RefundedReversed,
             ReconciliationLine."Transaction Type"::ChargebackReversed,
             ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo]
         then
-            MagentoAmountFactor := -1;
+            MatchValidationPassed := Abs(MagentoPaymentLine.Amount) = Abs(ReconciliationLine."Amount (TCY)")
+        else
+            MatchValidationPassed := MagentoPaymentLine.Amount = ReconciliationLine."Amount (TCY)";
 
-        if GLSetup.Get() and (GLSetup."LCY Code" = ReconciliationLine."Transaction Currency Code") and ((MagentoPaymentLine.Amount * MagentoAmountFactor) = (ReconciliationLine."Amount (TCY)")) then begin
+        MatchValidationPassed := MatchValidationPassed and GLSetup.Get() and (GLSetup."LCY Code" = ReconciliationLine."Transaction Currency Code");
+
+        if MatchValidationPassed then begin
             ReconciliationLine.Status := ReconciliationLine.Status::Matched;
             MatchedEntries += 1;
             // TODO Calculate Realized Gains or Losses
@@ -716,11 +726,10 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
     var
         ReconciliationLine: Record "NPR Adyen Recon. Line";
         UnPostedEntries: Integer;
-        Handled: Boolean;
         Window: Dialog;
         TotalEntries: Integer;
         ProcessedEntries: Integer;
-        PostingEntriesLbl: Label 'Attempting to Post Reconciliation Line entries...\\Posting #1 Entry out of #2';
+        PostingEntriesLbl: Label 'Attempting to Post Reconciliation Line entries...\\Processing entry #1 of #2.';
         PostingDateIsNotAllowedLbl: Label 'The transaction date of line %1 cannot be earlier than the specified ''%2'' in the NP Pay Setup.', Comment = '%1 - Reconciliation line number, %2 - "Reconciliation Posting Starting Date" from the NP Pay Setup page';
         PostAllowed: Boolean;
     begin
@@ -740,8 +749,6 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(PostTransactionsError01, ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID");
             exit(false);
         end;
-        ReconciliationLine.SetFilter(Status, '<>%1', ReconciliationLine.Status::Posted);
-        ReconciliationLine.FindSet();
 
         if GuiAllowed() then begin
             Clear(ProcessedEntries);
@@ -750,43 +757,42 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             Window.Update(2, TotalEntries);
         end;
 
+        _AdyenSetup.GetRecordOnce();
+        ReconciliationLine.SetFilter(Status, '<>%1', ReconciliationLine.Status::Posted);
+        ReconciliationLine.SetAutoCalcFields("Transaction Posted", "Markup Posted", "Commissions Posted", "Realized Gains Posted", "Realized Losses Posted");
+        ReconciliationLine.FindSet();
         repeat
-            Handled := false;
-            if not Handled then begin
-                PostAllowed := true;
+            PostAllowed := true;
+            if ReconciliationLine."Matching Table Name" in [ReconciliationLine."Matching Table Name"::"EFT Transaction", ReconciliationLine."Matching Table Name"::"Magento Payment Line"] then
+                PostAllowed := PostingAllowed(ReconciliationLine);
+            if _AdyenSetup."Recon. Posting Starting Date" > 0DT then
+                if ReconciliationLine."Transaction Date" < _AdyenSetup."Recon. Posting Starting Date" then begin
+                    _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(PostingDateIsNotAllowedLbl, Format(ReconciliationLine."Line No."), _AdyenSetup.FieldCaption("Recon. Posting Starting Date")), ReconciliationHeader."Webhook Request ID");
+                    PostAllowed := false;
+                end;
 
-                if ReconciliationLine."Matching Table Name" in [ReconciliationLine."Matching Table Name"::"EFT Transaction", ReconciliationLine."Matching Table Name"::"Magento Payment Line"] then
-                    PostAllowed := PostingAllowed(ReconciliationLine);
-                _AdyenSetup.GetRecordOnce();
-                if _AdyenSetup."Recon. Posting Starting Date" > 0DT then
-                    if ReconciliationLine."Transaction Date" < _AdyenSetup."Recon. Posting Starting Date" then begin
-                        _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(PostingDateIsNotAllowedLbl, Format(ReconciliationLine."Line No."), _AdyenSetup.FieldCaption("Recon. Posting Starting Date")), ReconciliationHeader."Webhook Request ID");
-                        PostAllowed := false;
-                    end;
+            if PostAllowed then begin
+                AssignPostingDateAndNo(ReconciliationLine, ReconciliationHeader);
+                case ReconciliationLine."Matching Table Name" of
+                    ReconciliationLine."Matching Table Name"::"EFT Transaction",
+                    ReconciliationLine."Matching Table Name"::"Magento Payment Line":
+                        begin
+                            UnPostedEntries += TryPostingPayment(ReconciliationLine, ReconciliationHeader);
+                        end;
+                    ReconciliationLine."Matching Table Name"::"G/L Entry":
+                        begin
+                            UnPostedEntries += TryPostingAdjustments(ReconciliationLine, ReconciliationHeader);
+                        end;
+                    ReconciliationLine."Matching Table Name"::"To Be Determined":
+                        begin
+                            UnPostedEntries += 1;
+                        end;
+                end;
+            end else
+                UnPostedEntries += 1;
 
-                if PostAllowed then begin
-                    AssignPostingDateAndNo(ReconciliationLine, ReconciliationHeader);
-                    Commit();
-                    case ReconciliationLine."Matching Table Name" of
-                        ReconciliationLine."Matching Table Name"::"EFT Transaction",
-                        ReconciliationLine."Matching Table Name"::"Magento Payment Line":
-                            begin
-                                UnPostedEntries += TryPostingPayment(ReconciliationLine, ReconciliationHeader);
-                            end;
-                        ReconciliationLine."Matching Table Name"::"G/L Entry":
-                            begin
-                                UnPostedEntries += TryPostingAdjustments(ReconciliationLine, ReconciliationHeader);
-                            end;
-                        ReconciliationLine."Matching Table Name"::"To Be Determined":
-                            begin
-                                UnPostedEntries += 1;
-                            end;
-                    end;
-                end else
-                    UnPostedEntries += 1;
-
-                ReconciliationLine.Modify();
-            end;
+            ReconciliationLine.Modify();
+            Commit();
 
             if GuiAllowed() then begin
                 ProcessedEntries += 1;
@@ -816,71 +822,66 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
     begin
         case ReconciliationLine."Matching Table Name" of
             ReconciliationLine."Matching Table Name"::"EFT Transaction":
-                begin
-                    if not EFTTransactionRequest.GetBySystemId(ReconciliationLine."Matching Entry System ID") then begin
-                        _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(PostTransactionsEFTError01, ReconciliationLine."Matching Entry System ID"), ReconciliationHeader."Webhook Request ID");
-                        UnPostedEntries += 1;
-                        exit(UnPostedEntries);
-                    end;
+                if not EFTTransactionRequest.GetBySystemId(ReconciliationLine."Matching Entry System ID") then begin
+                    _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(PostTransactionsEFTError01, ReconciliationLine."Matching Entry System ID"), ReconciliationHeader."Webhook Request ID");
+                    UnPostedEntries += 1;
+                    exit;
                 end;
             ReconciliationLine."Matching Table Name"::"Magento Payment Line":
-                begin
-                    if not MagentoPaymentLine.GetBySystemId(ReconciliationLine."Matching Entry System ID") then begin
-                        _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(PostTransactionsMagentoError01, ReconciliationLine."Matching Entry System ID"), ReconciliationHeader."Webhook Request ID");
-                        UnPostedEntries += 1;
-                        exit(UnPostedEntries);
-                    end;
+                if not MagentoPaymentLine.GetBySystemId(ReconciliationLine."Matching Entry System ID") then begin
+                    _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(PostTransactionsMagentoError01, ReconciliationLine."Matching Entry System ID"), ReconciliationHeader."Webhook Request ID");
+                    UnPostedEntries += 1;
+                    exit;
                 end;
         end;
-
 
         if not (ReconciliationLine.Status in [ReconciliationLine.Status::Matched, ReconciliationLine.Status::"Not to be Matched", ReconciliationLine.Status::"Matched Manually", ReconciliationLine.Status::"Failed to Post"]) then begin
             _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(PostTransactionsError04, Format(ReconciliationLine."PSP Reference")), ReconciliationHeader."Webhook Request ID");
             UnPostedEntries += 1;
-            exit(UnPostedEntries);
+            exit;
         end;
 
-        if PostEFTTransaction.PrepareRecords(ReconciliationLine, ReconciliationHeader) then begin
-            if not PostEFTTransaction.LineIsPosted(ReconciliationLine) then begin
+        if not ReconciliationLine.IsPosted(false) then begin
+            if PostEFTTransaction.PrepareRecords(ReconciliationLine, ReconciliationHeader) then begin
                 if not PostEFTTransaction.Run() then begin
                     _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, GetLastErrorText(), ReconciliationHeader."Webhook Request ID");
                     UnPostedEntries += 1;
-                    exit(UnPostedEntries);
+                    exit;
                 end;
-                if ((not IsNullGuid(PostEFTTransaction.GetNewReversedSystemId()))) and (ReconciliationLine."Transaction Type" in
-                    [ReconciliationLine."Transaction Type"::Chargeback,
-                    ReconciliationLine."Transaction Type"::SecondChargeback,
-                    ReconciliationLine."Transaction Type"::RefundedReversed,
-                    ReconciliationLine."Transaction Type"::ChargebackReversed,
-                    ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo])
-                then begin
+                if (not IsNullGuid(PostEFTTransaction.GetNewReversedSystemId())) and
+                   (ReconciliationLine."Transaction Type" in
+                     [ReconciliationLine."Transaction Type"::Chargeback,
+                      ReconciliationLine."Transaction Type"::SecondChargeback,
+                      ReconciliationLine."Transaction Type"::RefundedReversed,
+                      ReconciliationLine."Transaction Type"::ChargebackReversed,
+                      ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo])
+                then
                     ReconciliationLine."Matching Entry System ID" := PostEFTTransaction.GetNewReversedSystemId();
-                    ReconciliationLine.Modify();
-                end;
+            end else begin
+                _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, GetLastErrorText(), ReconciliationHeader."Webhook Request ID");
+                UnPostedEntries += 1;
+                exit;
             end;
-            ReconciliationLine.Status := ReconciliationLine.Status::Posted;
-            case ReconciliationLine."Matching Table Name" of
-                ReconciliationLine."Matching Table Name"::"EFT Transaction":
-                    begin
-                        if EFTTransactionRequest.GetBySystemId(ReconciliationLine."Matching Entry System ID") then begin
-                            EFTTransactionRequest.Reconciled := true;
-                            EFTTransactionRequest."Reconciliation Date" := Today();
-                            EFTTransactionRequest.Modify();
-                        end;
-                    end;
-                ReconciliationLine."Matching Table Name"::"Magento Payment Line":
-                    begin
-                        if MagentoPaymentLine.GetBySystemId(ReconciliationLine."Matching Entry System ID") then begin
-                            MagentoPaymentLine.Reconciled := true;
-                            MagentoPaymentLine."Reconciliation Date" := Today();
-                            MagentoPaymentLine.Modify();
-                        end;
-                    end;
-            end;
+        end;
 
-        end else begin
-            _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, GetLastErrorText(), ReconciliationHeader."Webhook Request ID");
-            UnPostedEntries += 1;
+        ReconciliationLine.Status := ReconciliationLine.Status::Posted;
+        case ReconciliationLine."Matching Table Name" of
+            ReconciliationLine."Matching Table Name"::"EFT Transaction":
+                begin
+                    if EFTTransactionRequest.GetBySystemId(ReconciliationLine."Matching Entry System ID") then begin
+                        EFTTransactionRequest.Reconciled := true;
+                        EFTTransactionRequest."Reconciliation Date" := Today();
+                        EFTTransactionRequest.Modify();
+                    end;
+                end;
+            ReconciliationLine."Matching Table Name"::"Magento Payment Line":
+                begin
+                    if MagentoPaymentLine.GetBySystemId(ReconciliationLine."Matching Entry System ID") then begin
+                        MagentoPaymentLine.Reconciled := true;
+                        MagentoPaymentLine."Reconciliation Date" := Today();
+                        MagentoPaymentLine.Modify();
+                    end;
+                end;
         end;
     end;
 
@@ -929,16 +930,23 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         ReconciliationLine.Status := ReconciliationLine.Status::Posted;
     end;
 
-    internal procedure AssignPostingDateAndNo(var RecLine: Record "NPR Adyen Recon. Line"; var RecHeader: Record "NPR Adyen Reconciliation Hdr")
+    local procedure AssignPostingDateAndNo(var ReconLine: Record "NPR Adyen Recon. Line"; ReconHeader: Record "NPR Adyen Reconciliation Hdr")
+    var
+        xReconLine: Record "NPR Adyen Recon. Line";
     begin
-        if _AdyenSetup.Get() and (_AdyenSetup."Posting Document Nos." <> '') then begin
-            RecLine."Posting No." := _NoSeriesMgt.GetNextNo(_AdyenSetup."Posting Document Nos.", Today(), true);
-            if _AdyenSetup."Post with Transaction Date" then
-                RecLine."Posting Date" := DT2Date(RecLine."Transaction Date")
-            else
-                RecLine."Posting Date" := RecHeader."Posting Date";
-            RecLine.Modify();
+        xReconLine := ReconLine;
+        if ReconLine."Posting No." = '' then begin
+            _AdyenSetup.TestField("Posting Document Nos.");
+            ReconLine."Posting No." := _NoSeriesMgt.GetNextNo(_AdyenSetup."Posting Document Nos.", Today(), true);
         end;
+        if _AdyenSetup."Post with Transaction Date" then
+            ReconLine."Posting Date" := DT2Date(ReconLine."Transaction Date")
+        else
+            ReconLine."Posting Date" := ReconHeader."Posting Date";
+        if (xReconLine."Posting No." = ReconLine."Document No.") and (xReconLine."Posting Date" = ReconLine."Posting Date") then
+            exit;
+        ReconLine.Modify();
+        Commit();
     end;
 
     local procedure PostingAllowed(var ReconciliationLine: Record "NPR Adyen Recon. Line"): Boolean
@@ -1005,6 +1013,36 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         end;
         exit(true);
     end;
+
+    procedure ReversePostings(var ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr")
+    var
+        ReconciliationLine: Record "NPR Adyen Recon. Line";
+        ReversedPostings: Integer;
+        Window: Dialog;
+        ReverseProcessingLbl: Label 'Reversing postings of the Reconciliation Line(s)...\Processing entry #1 of #2.';
+        UnPostedSuccessResultLbl: Label 'The postings for this document have been successfully reversed.';
+        NothingToReverseLbl: Label 'Nothing to Reverse.';
+    begin
+        ReversedPostings := 0;
+        ReconciliationLine.SetRange("Document No.", ReconciliationHeader."Document No.");
+        ReconciliationLine.SetRange(Status, ReconciliationLine.Status::Posted);
+        if ReconciliationLine.FindSet() then begin
+            Window.Open(ReverseProcessingLbl);
+            Window.Update(2, Format(ReconciliationLine.Count()));
+            repeat
+                if ReverseRecLinePosting(ReconciliationLine) then
+                    ReversedPostings += 1;
+                Window.Update(1, Format(ReversedPostings));
+            until ReconciliationLine.Next() = 0;
+            Window.Close();
+            ReconciliationHeader.Status := ReconciliationHeader.Status::Matched;
+            ReconciliationHeader."Posting Date" := 0D;
+            ReconciliationHeader."Total Posted Amount" := 0;
+            ReconciliationHeader.Modify();
+            Message(UnPostedSuccessResultLbl);
+        end else
+            Message(NothingToReverseLbl);
+    end;
     #endregion
 
     #region Miscellaneous
@@ -1068,37 +1106,53 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         exit(true);
     end;
 
-    internal procedure PostUnmatchedEntries(var Lines: Record "NPR Adyen Recon. Line"; var RecHeader: Record "NPR Adyen Reconciliation Hdr") PostedEntries: Integer
+    internal procedure PostUnmatchedEntries(var ReconLine: Record "NPR Adyen Recon. Line") PostedEntries: Integer
     var
+        RecHeader: Record "NPR Adyen Reconciliation Hdr";
+        PostMissingTransaction: Codeunit "NPR Adyen Missing Trans. Post";
         Window: Dialog;
         EntryPosting: Integer;
-        PostMissingTransaction: Codeunit "NPR Adyen Missing Trans. Post";
-        ProcessingLbl: Label 'Posting the Reconciliation Line/s...\\Posting #1 entry out of #2.';
+        TouchedHeader: Code[20];
+        TouchedHeaders: List of [Code[20]];
+        ProcessingLbl: Label 'Posting the Reconciliation Line(s)...\Processing entry #1 of #2.';
     begin
         Window.Open(ProcessingLbl);
-        Window.Update(2, Lines.Count());
+        Window.Update(2, Format(ReconLine.Count()));
+        _AdyenSetup.GetRecordOnce();
         EntryPosting := 0;
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        ReconLine.ReadIsolation := IsolationLevel::UpdLock;
+#else
+        ReconLine.LockTable();
+#endif
+        ReconLine.FindSet();
         repeat
             EntryPosting += 1;
             Window.Update(1, Format(EntryPosting));
-            if RecHeader.Get(Lines."Document No.") then begin
-                Lines.LockTable();
-                AssignPostingDateAndNo(Lines, RecHeader);
+            if RecHeader."Document No." <> ReconLine."Document No." then begin
+                RecHeader.Get(ReconLine."Document No.");
+                if not TouchedHeaders.Contains(RecHeader."Document No.") then
+                    TouchedHeaders.Add(RecHeader."Document No.");
             end;
-            Lines.LockTable();
-            Commit();
+
+            AssignPostingDateAndNo(ReconLine, RecHeader);
+
             Clear(PostMissingTransaction);
-            if PostMissingTransaction.Run(Lines) then begin
-                Lines."Matching Table Name" := Lines."Matching Table Name"::"G/L Entry";
-                Lines."Matching Entry System ID" := PostMissingTransaction.GetGLSystemID();
-                Lines.Status := Lines.Status::Posted;
-                Lines.Modify();
+            if PostMissingTransaction.Run(ReconLine) then begin
+                ReconLine."Matching Table Name" := ReconLine."Matching Table Name"::"G/L Entry";
+                ReconLine."Matching Entry System ID" := PostMissingTransaction.GetGLSystemID();
+                ReconLine.Status := ReconLine.Status::Posted;
+                ReconLine.Modify();
                 PostedEntries += 1;
             end;
-        until Lines.Next() = 0;
+        until ReconLine.Next() = 0;
         Window.Close();
 
-        MarkAsPostedIfPossible(RecHeader);
+        foreach TouchedHeader in TouchedHeaders do begin
+            if RecHeader."Document No." <> TouchedHeader then
+                RecHeader.Get(TouchedHeader);
+            MarkAsPostedIfPossible(RecHeader);
+        end;
     end;
 
     local procedure GetValueAtCell(RowNo: Integer; ColNo: Integer): Text
@@ -1334,6 +1388,80 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         if Temp_ExcelBuffer.IsEmpty() then
             exit;
         exit(true);
+    end;
+
+    local procedure ReverseRecLinePosting(ReconciliationLine: Record "NPR Adyen Recon. Line") Reversed: Boolean
+    var
+        GLEntry: Record "G/L Entry";
+        ReconRelation: Record "NPR Adyen Recons.Line Relation";
+        ReconRelation2: Record "NPR Adyen Recons.Line Relation";
+        ReversalEntry: Record "Reversal Entry";
+        SkipPostCheck: Codeunit "NPR Adyen Skip Post Check";
+    begin
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        ReconciliationLine.ReadIsolation := IsolationLevel::UpdLock;
+        ReconRelation.ReadIsolation := IsolationLevel::UpdLock;
+#else
+        ReconciliationLine.LockTable();
+        ReconRelation.LockTable();
+#endif
+        ReconciliationLine.Find();
+        if ReconciliationLine.Status = ReconciliationLine.Status::Posted then begin
+            ReconRelation.SetRange("Document No.", ReconciliationLine."Document No.");
+            ReconRelation.SetRange("Document Line No.", ReconciliationLine."Line No.");
+            ReconRelation.SetRange(Reversed, false);
+            if ReconRelation.FindSet() then
+                Repeat
+                    GLEntry.SetRange("Entry No.", ReconRelation."GL Entry No.");
+                    GLEntry.SetRange(Reversed, false);
+                    if GLEntry.FindFirst() then begin
+                        Clear(ReversalEntry);
+                        GLEntry.TestField("Transaction No.");
+                        ReversalEntry.SetHideWarningDialogs();
+                        BindSubscription(SkipPostCheck);
+                        ReversalEntry.ReverseTransaction(GLEntry."Transaction No.");
+                        UnBindSubscription(SkipPostCheck);
+                    end;
+
+                    ReconRelation2 := ReconRelation;
+                    ReconRelation2.Reversed := true;
+                    ReconRelation2.Modify();
+                until ReconRelation.Next() = 0;
+
+            ReconciliationLine."Posting No." := '';
+            ReconciliationLine."Posting Date" := 0D;
+            ReconciliationLine.Status := ReconciliationLine.Status::Matched;
+            ReconciliationLine.Modify();
+            if ReconciliationLine."Matching Table Name" in [ReconciliationLine."Matching Table Name"::"EFT Transaction", ReconciliationLine."Matching Table Name"::"Magento Payment Line"] then
+                RevertPaymentReconciliation(ReconciliationLine, ReconciliationLine."Matching Table Name");
+            Reversed := true;
+        end;
+        Commit();
+    end;
+
+    local procedure RevertPaymentReconciliation(ReconciliationLine: Record "NPR Adyen Recon. Line"; MatchingTable: Enum "NPR Adyen Trans. Rec. Table")
+    var
+        EFTTransRequest: Record "NPR EFT Transaction Request";
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+    begin
+        case MatchingTable of
+            MatchingTable::"EFT Transaction":
+                begin
+                    if EFTTransRequest.GetBySystemId(ReconciliationLine."Matching Entry System ID") then begin
+                        EFTTransRequest.Reconciled := false;
+                        EFTTransRequest."Reconciliation Date" := 0D;
+                        EFTTransRequest.Modify();
+                    end;
+                end;
+            MatchingTable::"Magento Payment Line":
+                begin
+                    if MagentoPaymentLine.GetBySystemId(ReconciliationLine."Matching Entry System ID") then begin
+                        MagentoPaymentLine.Reconciled := false;
+                        MagentoPaymentLine."Reconciliation Date" := 0D;
+                        MagentoPaymentLine.Modify();
+                    end;
+                end;
+        end;
     end;
 
     internal procedure CalculateAmsterdamToUTCOffset(ParsedDateTime: DateTime): Integer

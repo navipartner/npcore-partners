@@ -197,6 +197,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", 'UpdateAdyenReconLinePostingAllowed'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", 'UpdateAdyenReconciliationStatus'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", 'UpdateAdyenReconciliationDocumentProcessingStatus'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", 'UpdateAdyenReconciliationRelation'));
 #if not BC17
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'SetDataProcessingHandlerID'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'PhaseOutShopifyCCIntegration'));
@@ -775,6 +776,8 @@
                         exit('NPR-UpdateAdyenReconciliationStatus-20241112');
                     'UpdateAdyenReconciliationDocumentProcessingStatus':
                         exit('NPR-UpdateAdyenReconciliationDocumentProcessingStatus-20241004');
+                    'UpdateAdyenReconciliationRelation':
+                        exit('NPR-UpdateAdyenReconciliationRelation-20241204');
                 end;
 #if not BC17
             Codeunit::"NPR Spfy App Upgrade":
