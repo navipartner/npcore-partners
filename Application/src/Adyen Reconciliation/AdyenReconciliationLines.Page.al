@@ -343,7 +343,6 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                 var
                     AdyenTransMatching: Codeunit "NPR Adyen Trans. Matching";
                     Line: Record "NPR Adyen Recon. Line";
-                    Header: Record "NPR Adyen Reconciliation Hdr";
                     PostedEntries: Integer;
                     ConfirmPostingLbl: Label 'Do you wish to proceed with posting selected transaction/s skipping the matching process?';
                     SuccessfullyPostedLbl: Label 'Successfully posted %1 entries bypassing the Matching process.';
@@ -357,15 +356,11 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                         Message(NothingToPostLbl);
                         exit;
                     end;
-
-                    Line.FindSet();
-                    if not Header.Get(Line."Document No.") then
-                        exit;
                     if not Confirm(ConfirmPostingLbl) then
                         exit;
 
                     Clear(AdyenTransMatching);
-                    PostedEntries := AdyenTransMatching.PostUnmatchedEntries(Line, Header);
+                    PostedEntries := AdyenTransMatching.PostUnmatchedEntries(Line);
 
                     if PostedEntries > 0 then begin
                         Message(SuccessfullyPostedLbl, Format(PostedEntries));

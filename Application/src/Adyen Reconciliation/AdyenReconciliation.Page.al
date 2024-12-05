@@ -247,6 +247,25 @@ page 6184502 "NPR Adyen Reconciliation"
                         CurrPage.Update(false);
                     end;
                 }
+                action("Reverse Postings")
+                {
+                    Caption = 'Reverse Postings...';
+                    Image = ReverseRegister;
+                    Enabled = _HasPostedLines;
+                    ToolTip = 'Running this action will revert the posting process for all lines.';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnAction()
+                    var
+                        UnPostingConfirmationLbl: Label 'Are you sure you want to reverse the posting for this Reconciliation Document?';
+                    begin
+                        if not Confirm(UnPostingConfirmationLbl) then
+                            exit;
+
+                        _TransactionMatching.ReversePostings(Rec);
+                        CurrPage.Update(false);
+                    end;
+                }
             }
         }
         area(Navigation)
@@ -292,6 +311,7 @@ page 6184502 "NPR Adyen Reconciliation"
     trigger OnAfterGetRecord()
     begin
         _DocumentPosted := Rec.Status = Rec.Status::Posted;
+        _HasPostedLines := Rec."Total Posted Amount" > 0;
         _AdyenSetup.GetRecordOnce();
         _PostWithTransactionDate := _AdyenSetup."Post with Transaction Date";
 
@@ -304,6 +324,7 @@ page 6184502 "NPR Adyen Reconciliation"
     var
         _AdyenSetup: Record "NPR Adyen Setup";
         _TransactionMatching: Codeunit "NPR Adyen Trans. Matching";
+        _HasPostedLines: Boolean;
         _IsExternalReport: Boolean;
         _DocumentPosted: Boolean;
         _PostWithTransactionDate: Boolean;
