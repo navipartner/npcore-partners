@@ -5,6 +5,7 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
     var
         Printer: Codeunit "NPR RP Line Print";
         TwoValueFormatLbl: Label '%1 %2', Locked = true, Comment = '%1 = First Value, %2 = Second Value';
+        VATRegNoLbl: Label 'DŠ: %1', Locked = true, Comment = '%1 = VAT Registration No.';
 
     internal procedure PrintReceipt(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info")
     begin
@@ -51,7 +52,6 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
         POSStore: Record "NPR POS Store";
         DateLbl: Label 'Dne: ';
         DateFormatLbl: Label '%1, %2', Locked = true, Comment = '%1 = Entry Date, %2 = Time Stamp';
-        VATRegNoLbl: Label 'DŠ: %1', Locked = true, Comment = '%1 = VAT Registration No.';
         ReceiptCopyLbl: Label 'THIS IS A COPY %1 OF A RECEIPT', Comment = '%1 = Receipt Copy No.';
         ReceiptNoLbl: Label 'Št. računa: ';
         ReceiptNoFormatLbl: Label '%1-%2-%3', Locked = true, Comment = '%1 = POS Store Code, %2 = POS Unit No., %3 = Receipt No.';
@@ -66,12 +66,16 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
             PrintDottedLine();
             PrintTextLine(StrSubstNo(ReceiptCopyLbl, SIPOSAuditLogAuxInfo."Copies Printed"), 'CENTER', true);
             PrintDottedLine();
+            SIPOSAuditLogAuxInfo.Modify();
         end;
 
         PrintTextLine(CompanyInfo.Name, 'CENTER', true);
         PrintTextLine(POSStore.Name, 'CENTER', true);
         PrintTextLine(FormatAddressLine(POSStore.Address, POSStore."Post Code", POSStore.City), 'CENTER', true);
         PrintTextLine(StrSubstNo(VATRegNoLbl, POSStore."VAT Registration No."), 'CENTER', true);
+        PrintFullLine();
+
+        PrintCustomerAdditionalInfo(SIPOSAuditLogAuxInfo);
         PrintFullLine();
 
         PrintTwoColumnText(DateLbl, StrSubstNo(DateFormatLbl, Format(SIPOSAuditLogAuxInfo."Entry Date", 10, '<Day,2>.<Month,2>.<Year4>'), Format(SIPOSAuditLogAuxInfo."Log Timestamp", 8, '<Hours24>:<Minutes,2>:<Seconds,2>')), 'CENTER', true);
@@ -243,6 +247,51 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
         PrintQRCode(SIPOSAuditLogAuxInfo."Validation Code");
     end;
 
+    local procedure PrintCustomerAdditionalInfo(SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info")
+    var
+        POSEntry: Record "NPR POS Entry";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+    begin
+        if SIPOSAuditLogAuxInfo."Customer VAT Number" = '' then
+            exit;
+
+        case SIPOSAuditLogAuxInfo."Audit Entry Type" of
+            SIPOSAuditLogAuxInfo."Audit Entry Type"::"POS Entry":
+                begin
+                    POSEntry.Get(SIPOSAuditLogAuxInfo."POS Entry No.");
+                    PrintCustomerAdditionalInfo(POSEntry."Customer No.");
+                end;
+            SIPOSAuditLogAuxInfo."Audit Entry Type"::"Sales Invoice Header":
+                begin
+                    SalesInvoiceHeader.Get(SIPOSAuditLogAuxInfo."Source Document No.");
+                    PrintCustomerAdditionalInfo(SalesInvoiceHeader."Sell-to Customer No.");
+                end;
+            SIPOSAuditLogAuxInfo."Audit Entry Type"::"Sales Cr. Memo Header":
+                begin
+                    SalesCrMemoHeader.Get(SIPOSAuditLogAuxInfo."Source Document No.");
+                    PrintCustomerAdditionalInfo(SalesCrMemoHeader."Sell-to Customer No.");
+                end;
+        end;
+    end;
+
+    local procedure PrintCustomerAdditionalInfo(CustomerNo: Code[20])
+    var
+        Customer: Record Customer;
+    begin
+        if CustomerNo = '' then
+            exit;
+
+        if not Customer.Get(CustomerNo) then
+            exit;
+
+        if Customer.Name <> '' then
+            PrintTextLine(Customer.Name, 'CENTER', false);
+
+        PrintTextLine(FormatAddressLine(Customer.Address, Customer."Post Code", Customer.City), 'CENTER', false);
+        PrintTextLine(StrSubstNo(VATRegNoLbl, Customer."VAT Registration No."), 'CENTER', true);
+    end;
+
     #endregion
 
     #region SI Fiscal Thermal Print - Printing Procedures
@@ -326,7 +375,6 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
         PrintThermalLine(Line.PadRight(ReceiptWidth(), '_'), 'A11', true, 'CENTER', true, false);
     end;
 
-
     #endregion
 
     #region SI Fiscal Thermal Print - Formatting
@@ -336,7 +384,7 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
         exit(Format(Value, 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,.>'));
     end;
 
-    local procedure FormatAddressLine(Address: Text[50]; PostCode: Code[20]; City: Text[30]) AddressLine: Text
+    local procedure FormatAddressLine(Address: Text[100]; PostCode: Code[20]; City: Text[30]) AddressLine: Text
     begin
         if Address <> '' then
             AddressLine += Address + ', ';
