@@ -58,12 +58,15 @@ codeunit 6185107 "NPR API SubscriptionPmtMethods"
     internal procedure CreatePaymentMethod(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         MemberPaymentMethod: Record "NPR MM Member Payment Method";
+        ExistingMemberPaymentMethod: Record "NPR MM Member Payment Method";
         Membership: Record "NPR MM Membership";
         Json: Codeunit "NPR Json Builder";
         JsonHelper: Codeunit "NPR Json Helper";
+        PaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
         RequestBody: JsonToken;
         MembershipID: Text;
         PSPAsString: Text;
+        IsModified: Boolean;
     begin
         MembershipID := Request.Paths().Get(2);
         if MembershipID = '' then
@@ -94,7 +97,22 @@ codeunit 6185107 "NPR API SubscriptionPmtMethods"
         MemberPaymentMethod."Payment Method Alias" := CopyStr(JsonHelper.GetJText(RequestBody, 'paymentMethod.alias', false), 1, MaxStrLen(MemberPaymentMethod."Payment Method Alias"));
         MemberPaymentMethod."Shopper Reference" := CopyStr(JsonHelper.GetJText(RequestBody, 'paymentMethod.shopperReference', false), 1, MaxStrLen(MemberPaymentMethod."Shopper Reference"));
         MemberPaymentMethod."Payment Token" := CopyStr(JsonHelper.GetJText(RequestBody, 'paymentMethod.paymentToken', false), 1, MaxStrLen(MemberPaymentMethod."Payment Token"));
-        MemberPaymentMethod.Insert(true);
+
+        Clear(ExistingMemberPaymentMethod);
+        if PaymentMethodMgt.FindMemberPaymentMethod(MemberPaymentMethod."Payment Token", MemberPaymentMethod."Shopper Reference", MemberPaymentMethod.PSP, Membership, ExistingMemberPaymentMethod) then begin
+            IsModified :=
+                (MemberPaymentMethod."Payment Brand" <> ExistingMemberPaymentMethod."Payment Brand") or
+                (MemberPaymentMethod."Payment Instrument Type" <> ExistingMemberPaymentMethod."Payment Instrument Type") or
+                (MemberPaymentMethod."Expiry Date" <> ExistingMemberPaymentMethod."Expiry Date") or
+                (MemberPaymentMethod.Default <> ExistingMemberPaymentMethod.Default) or
+                (MemberPaymentMethod."Payment Method Alias" <> ExistingMemberPaymentMethod."Payment Method Alias");
+            if IsModified then
+                MemberPaymentMethod.Modify(true);
+        end else
+            MemberPaymentMethod.Insert(true);
+
+        if MemberPaymentMethod.Default then
+            PaymentMethodMgt.UpdateMembershipWithDefaultAutoRenewPaymentMethod(Membership);
 
         Json.StartObject('');
         PaymentMethodAsJson(MemberPaymentMethod, 'paymentMethod', true, Json);

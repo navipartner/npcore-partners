@@ -190,6 +190,11 @@ page 6184531 "NPR Adyen Setup"
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     ToolTip = 'Specifies the value of the Auto Process Subscription Request Errors field.';
                 }
+                field("Def. Subsc. Pay. Method Code"; Rec."Def Auto Renew Pay Method Code")
+                {
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ToolTip = 'The default auto-payment method code which is going to be used for subscription.';
+                }
             }
         }
     }

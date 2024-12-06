@@ -581,9 +581,21 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
 
     local procedure GetReference(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request") Reference: Text
     var
-        ReferenceLbl: Label 'Subscription payment request no. %1', Comment = '%1 - subscription payment request no.', Locked = true;
+        Membership: Record "NPR MM Membership";
+        Subscription: Record "NPR MM Subscription";
+        SubscrRequest: Record "NPR MM Subscr. Request";
+        ReferenceLbl: Label 'Membership no. %1 subs. pay. request no. %2', Comment = '%1 - Membership external no %2 - subscription payment request no.', Locked = true;
     begin
-        Reference := StrSubstNo(ReferenceLbl, SubscrPaymentRequest."Entry No.");
+        SubscrRequest.SetLoadFields("Subscription Entry No.");
+        SubscrRequest.Get(SubscrPaymentRequest."Subscr. Request Entry No.");
+
+        Subscription.SetLoadFields("Membership Entry No.");
+        Subscription.Get(SubscrRequest."Subscription Entry No.");
+
+        Membership.SetLoadFields("External Membership No.");
+        Membership.Get(Subscription."Membership Entry No.");
+
+        Reference := StrSubstNo(ReferenceLbl, Membership."External Membership No.", SubscrPaymentRequest."Entry No.");
     end;
 
     [TryFunction]

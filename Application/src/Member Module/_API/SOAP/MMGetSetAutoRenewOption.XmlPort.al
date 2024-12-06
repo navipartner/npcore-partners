@@ -132,10 +132,20 @@ xmlport 6060146 "NPR MM GetSet AutoRenew Option"
                     Membership."Auto-Renew External Data" := tmpMembershipRequest."Auto-Renew External Data";
                     Membership.Modify(true);
                 end;
-            else begin
-                    setError('Incorrect auto-renew state.');
-                    exit;
+            'OFF_INTERNAL':
+                begin
+                    Membership."Auto-Renew" := Membership."Auto-Renew"::NO;
+                    Membership.Modify(true);
                 end;
+            'ON_INTERNAL':
+                begin
+                    Membership."Auto-Renew" := Membership."Auto-Renew"::YES_INTERNAL;
+                    Membership.Modify(true);
+                end;
+            else begin
+                setError('Incorrect auto-renew state.');
+                exit;
+            end;
         end;
 
         tmpMembershipResponse.TransferFields(Membership, true);
