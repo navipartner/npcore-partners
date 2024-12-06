@@ -251,6 +251,12 @@ table 6150801 "NPR Adyen Setup"
             Caption = 'Auto Process Subscription Request Errors';
             DataClassification = CustomerContent;
         }
+        field(290; "Def Auto Renew Pay Method Code"; Code[10])
+        {
+            Caption = 'Default Auto-Renew Payment Method Code';
+            DataClassification = CustomerContent;
+            TableRelation = "Payment Method".Code;
+        }
     }
     keys
     {
