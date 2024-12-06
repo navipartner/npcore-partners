@@ -294,9 +294,16 @@
                     ShowMandatory = _PhoneNoMandatory;
                     ToolTip = 'Specifies the value of the Phone No. field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
                     trigger OnValidate()
                     begin
                         CheckPhone();
+                    end;
+
+                    trigger OnAssistEdit()
+                    begin
+                        MakeAddInfoRequest();
+                        CurrPage.Update();
                     end;
                 }
                 field("Social Security No."; Rec."Social Security No.")
@@ -1916,6 +1923,35 @@
     local procedure OnAttributeLookup(AttributeNumber: Integer)
     begin
         NPRAttrManagement.OnPageLookUp(GetAttributeTableId(), AttributeNumber, Format(Rec."Entry No.", 0, '<integer>'), NPRAttrTextArray[AttributeNumber]);
+    end;
+
+    local procedure MakeAddInfoRequest()
+    var
+        MemberCaptIntSetup: Record "NPR MM Member Info. Int. Setup";
+        TempAddInfoResponse: Record "NPR MM Add. Info. Response" temporary;
+        AddInfoReqMgt: Codeunit "NPR MM Add. Info. Req. Mgt.";
+        CustomerRecordRef: RecordRef;
+        LoginHint: Text[100];
+    begin
+        if not MemberCaptIntSetup.Get() then begin
+            MemberCaptIntSetup.Init();
+            MemberCaptIntSetup.Insert();
+            Commit();
+        end;
+
+        case MemberCaptIntSetup."MembCapt PhoneNo. OnAssistEdit" of  // Leaving as case statement for further integrations
+            Enum::"NPR MM Add. Info. Request"::"Vipps MobilePay":
+                begin
+                    Rec.TestField("Phone No.");
+                    LoginHint := AddInfoReqMgt.NormalizePhoneNo(Rec."Phone No.");
+                    if LoginHint.Substring(1, 1) <> '+' then
+                        LoginHint := CopyStr(MemberCaptIntSetup."Implicit Phone No. Prefix" + LoginHint, 1, MaxStrLen(LoginHint));
+                    LoginHint := CopyStr(LoginHint, 2, MaxStrLen(LoginHint));
+                end;
+        end;
+        CustomerRecordRef.GetTable(Rec);
+        AddInfoReqMgt.MakeAddInfoRequest(MemberCaptIntSetup."MembCapt PhoneNo. OnAssistEdit", LoginHint, CustomerRecordRef, TempAddInfoResponse);
+        AddInfoReqMgt.SetMemberAdditionalInfo(Rec, TempAddInfoResponse)
     end;
 
     procedure SetPOSUnit(PosUnitNoIn: Code[10])

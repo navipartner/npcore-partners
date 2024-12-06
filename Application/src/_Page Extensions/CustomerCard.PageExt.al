@@ -322,6 +322,28 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 end;
             }
         }
+        #region Membership Module Integrations
+        addlast("F&unctions")
+        {
+            action("NPR MM Request Customer Information")
+            {
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Caption = 'Request Customer Information';
+                Image = ContactReference;
+                ToolTip = 'Requests additional information from the customer using selected integration.';
+                Visible = AddInfoRequestVisible;
+                Promoted = true;
+                PromotedCategory = Category9;
+
+                trigger OnAction()
+                begin
+                    MakeAddInfoRequest();
+                    Rec.Modify();
+                    CurrPage.Update();
+                end;
+            }
+        }
+        #endregion Membership Module Integrations
     }
 
     var
@@ -340,6 +362,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         ShopifyIntegrationIsEnabled: Boolean;
 #endif
+        AddInfoRequestVisible: Boolean;
 
     trigger OnAfterGetCurrRecord()
     var
@@ -359,16 +382,21 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
     end;
 
     trigger OnOpenPage()
-#if not BC17
     var
+#if not BC17
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
 #endif
+        MemberCaptIntSetup: Record "NPR MM Member Info. Int. Setup";
     begin
 #if not BC17
         ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Orders");
 #endif
         SetMagentoVersion();
         ToAnonymizeEditable := UserSetup.Get(UserId) and UserSetup."NPR Anonymize Customers";
+
+        if MemberCaptIntSetup.Get() then
+            if MemberCaptIntSetup."CustCard RequestCustInfo Act." <> MemberCaptIntSetup."CustCard RequestCustInfo Act."::" " then
+                AddInfoRequestVisible := true;
     end;
 
     local procedure SetMagentoVersion()
@@ -385,4 +413,31 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 MagentoVersion := 2;
         end;
     end;
+
+    #region Membership Module Integrations
+    local procedure MakeAddInfoRequest()
+    var
+        MemberCaptIntSetup: Record "NPR MM Member Info. Int. Setup";
+        TempAddInfoResponse: Record "NPR MM Add. Info. Response" temporary;
+        AddInfoReqMgt: Codeunit "NPR MM Add. Info. Req. Mgt.";
+        CustomerRecordRef: RecordRef;
+        LoginHint: Text[100];
+    begin
+        MemberCaptIntSetup.Get();
+
+        case MemberCaptIntSetup."CustCard RequestCustInfo Act." of  // Leaving as case statement for further integrations
+            Enum::"NPR MM Add. Info. Request"::"Vipps MobilePay":
+                begin
+                    Rec.TestField("Phone No.");
+                    LoginHint := AddInfoReqMgt.NormalizePhoneNo(Rec."Phone No.");
+                    if LoginHint.Substring(1, 1) <> '+' then
+                        LoginHint := CopyStr(MemberCaptIntSetup."Implicit Phone No. Prefix" + LoginHint, 1, MaxStrLen(LoginHint));
+                    LoginHint := CopyStr(LoginHint, 2, MaxStrLen(LoginHint));
+                end;
+        end;
+        CustomerRecordRef.GetTable(Rec);
+        AddInfoReqMgt.MakeAddInfoRequest(MemberCaptIntSetup."CustCard RequestCustInfo Act.", LoginHint, CustomerRecordRef, TempAddInfoResponse);
+        AddInfoReqMgt.SetCustAdditionalInfo(Rec, TempAddInfoResponse);
+    end;
+    #endregion Membership Module Integrations
 }
