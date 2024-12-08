@@ -101,7 +101,7 @@
         FinalizeTicketReservation(Token, Lines);
     end;
 
-    internal procedure FinalizeTicketReservation(Token: Text[100]; Lines: List of [Integer])
+    internal procedure FinalizeTicketReservation(Token: Text[100]; Lines: List of [Integer]): Boolean
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketWaitingListMgr: Codeunit "NPR TM Ticket WaitingList Mgr.";
@@ -149,6 +149,8 @@
 
         if (not TicketCreated) then
             TicketRequestManager.DeleteReservationRequest(Token, false);
+
+        exit(TicketCreated);
     end;
 
     local procedure ImportTicketReservation(Element: XmlElement; Token: Text[100]; var Lines: List of [Integer]): Boolean

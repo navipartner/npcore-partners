@@ -237,7 +237,7 @@ types:
       - name: ExampleAdmissionCastle
         value: CASTLE
   
-  TicketId:
+  TicketExternalNumber:
     type: string
     docs: The unique identifier of a ticket
     examples:
@@ -257,12 +257,12 @@ types:
     docs: Response to registering a member's arrival
     properties:
       cardNumber: simpleTypes.CardNumber
-      ticketNumber: TicketId
+      ticketNumber: TicketExternalNumber
     examples:
       - name: ExampleRegisterArrival
         value:
           cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
-          ticketNumber: $TicketId.ExampleTicket
+          ticketNumber: $TicketExternalNumber.ExampleTicket
 
   # Send to Wallet Service
   SendWalletRequest:

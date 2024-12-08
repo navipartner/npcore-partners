@@ -16,4 +16,9 @@ enum 6059810 "NPR API Error Code"
     {
         Caption = 'The selected resource does not exist.', Locked = true;
     }
+
+    value(6060000; capacity_exceeded)
+    {
+        Caption = 'The reservation capacity has been exceeded.', Locked = true;
+    }
 }

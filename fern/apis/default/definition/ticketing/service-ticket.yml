@@ -13,17 +13,17 @@ service:
 
     getTicket:
       docs: 
-        Retrieves detailed information about a specific ticket using its unique ticketNumber. 
+        Retrieves detailed information about a specific ticket using its unique ticket id. 
         Clients use this endpoint to obtain ticket details such as validity periods, admissions, and any associated information after a reservation has been confirmed.
       display-name: Get Ticket
       method: GET
-      path: /{ticketNumber}
+      path: /{ticketId}
       request: 
         name: getTicket
         query-parameters:
           storeCode: optional<simpleTypes.StoreCode>
       path-parameters:
-        ticketNumber: simpleTypes.TicketId
+        ticketId: simpleTypes.TicketId
       response: compositeTypes.TicketDetails
       examples:
           - name: ExampleGetTicket
@@ -31,22 +31,45 @@ service:
               tenant: $globalApiTypes.tenant.Exampletenant
               environment: $globalApiTypes.environment.ExampleenvironmentProduction
               company: $globalApiTypes.Company.ExampleCompanyCronus
-              ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+              ticketId: $simpleTypes.TicketId.ExampleTicket1
             query-parameters:
               storeCode: $simpleTypes.StoreCode.ExampleStoreCode
             response:
               body: $compositeTypes.TicketDetails.ExampleTicket1
 
+    findTicket:
+      docs: 
+        Retrieves ticket id about a specific ticket using its unique external ticket number for further processing.
+      display-name: Find Ticket
+      method: GET
+      path: ''
+      request: 
+        name: findTicket
+        query-parameters:
+          externalNumber: optional<simpleTypes.TicketExternalNumber>
+      response: list<FindTicketResponse>
+      examples:
+          - name: ExampleFindTicket
+            path-parameters:
+              tenant: $globalApiTypes.tenant.Exampletenant
+              environment: $globalApiTypes.environment.ExampleenvironmentProduction
+              company: $globalApiTypes.Company.ExampleCompanyCronus
+            query-parameters:
+              externalNumber: $simpleTypes.TicketExternalNumber.ExampleTicket1
+            response:
+              body: 
+                - ticketId: $simpleTypes.TicketId.ExampleTicket1
+              
     requestRevokeTicket:
       docs: 
-        Initiates a revoke request for a ticket identified by its ticket number. 
+        Initiates a revoke request for a ticket identified by its ticket id. 
         This first step validates that the ticket is eligible for revocation and provides a revokeId to be used in the subsequent confirmation step. 
         It also returns the possible refund amount based on the ticket's conditions. 
         This pre-validation is useful for assessing revocation eligibility and potential refunds before the final confirmation.
       method: POST
-      path: /{ticketNumber}/requestRevoke
+      path: /{ticketId}/requestRevoke
       path-parameters:
-        ticketNumber: simpleTypes.TicketId
+        ticketId: simpleTypes.TicketId
       request: 
         name: revokeTicket
         body: RevokeTicketRequest
@@ -56,7 +79,7 @@ service:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
-            ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+            ticketId: $simpleTypes.TicketId.ExampleTicket1
            request:
             pinCode: $simpleTypes.PinCode.ExamplePinCode
            response: 
@@ -72,9 +95,9 @@ service:
         It may include additional customer details such as the ticketHolder name, notificationAddress for sending tickets or notifications, 
         and a paymentReference to link the reservation to a payment transaction.
       method: POST
-      path: /{ticketNumber}/confirmRevoke
+      path: /{ticketId}/confirmRevoke
       path-parameters:
-        ticketNumber: simpleTypes.TicketId
+        ticketId: simpleTypes.TicketId
       request:
         name: confirmRevoke
         body: ConfirmRevokeTicketRequest
@@ -84,7 +107,7 @@ service:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
-            ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+            ticketId: $simpleTypes.TicketId.ExampleTicket1
           request:
             revokeId: $simpleTypes.Token.ExampleRevokeId
             ticketHolder: $simpleTypes.TicketHolder.ExampleTicketHolder
@@ -102,9 +125,9 @@ service:
         This endpoint is typically used at entry points (e.g., gates or doors) to verify the ticket's validity and record the customer's arrival. 
         Optional parameters like admissionCode and scannerStation provide context for the validation.
       method: POST
-      path: /{ticketNumber}/validateArrival
+      path: /{ticketId}/validateArrival
       path-parameters:
-        ticketNumber: simpleTypes.TicketId
+        ticketId: simpleTypes.TicketId
       request:
         name: validateArrival
         body: optional<ValidateTicketsRequest> 
@@ -114,13 +137,14 @@ service:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
-            ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+            ticketId: $simpleTypes.TicketId.ExampleTicket1
           request:
             admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
             scannerStation: $simpleTypes.ScannerStation.ExampleScannerStationEntrance
           response:
             body:
-              ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+              ticketId: $simpleTypes.TicketId.ExampleTicket1
+              ticketNumber: $simpleTypes.TicketExternalNumber.ExampleTicket1
               admitted: true
 
     validateDeparture:
@@ -129,9 +153,9 @@ service:
         Used when tracking both entry and exit of customers, this endpoint helps manage capacities and ensures that the ticket is correctly processed upon leaving. 
         Similar to arrival validation, it can include admissionCode and scannerStation.
       method: POST
-      path: /{ticketNumber}/validateDeparture
+      path: /{ticketId}/validateDeparture
       path-parameters:
-        ticketNumber: simpleTypes.TicketId
+        ticketId: simpleTypes.TicketId
       request:
         name: validateDeparture  
         body: optional<ValidateTicketsRequest>
@@ -141,13 +165,14 @@ service:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
-            ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+            ticketId: $simpleTypes.TicketId.ExampleTicket1
           request:
             admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
             scannerStation: $simpleTypes.ScannerStation.ExampleScannerStationExit
           response:
             body:
-              ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+              ticketId: $simpleTypes.TicketId.ExampleTicket1
+              ticketNumber: $simpleTypes.TicketExternalNumber.ExampleTicket1
               departed: true
 
     #
@@ -190,9 +215,9 @@ service:
         This endpoint facilitates electronic delivery of tickets, allowing customers to receive and present their tickets digitally. 
         Useful for post-purchase communications and ensuring customers have access to their tickets.
       method: POST
-      path: /{ticketNumber}/sendToWallet
+      path: /{ticketId}/sendToWallet
       path-parameters:
-        ticketNumber: simpleTypes.TicketId
+        ticketId: simpleTypes.TicketId
       request:
         name: sendToWallet 
         body: SendTicketRequest
@@ -202,12 +227,13 @@ service:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
-            ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+            ticketId: $simpleTypes.TicketId.ExampleTicket1
           request:
             notificationAddress: $simpleTypes.NotificationAddress.ExampleEmail
           response:
             body:
-              ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+              ticketId: $simpleTypes.TicketId.ExampleTicket1
+              ticketNumber: $simpleTypes.TicketExternalNumber.ExampleTicket1
               ticketSent: true
 
     exchangeForCoupon:
@@ -217,9 +243,9 @@ service:
         This endpoint is used when a customer opts to convert their ticket into a coupon, providing multiple value retention options.
         The ticket is validated, and a coupon is issued, providing value retention for the customer.
       method: POST
-      path: /{ticketNumber}/exchangeForCoupon
+      path: /{ticketId}/exchangeForCoupon
       path-parameters:
-        ticketNumber: simpleTypes.TicketId
+        ticketId: simpleTypes.TicketId
       request:
         name: exchangeForCoupon 
         body: GetTicketCouponRequest
@@ -229,12 +255,13 @@ service:
               tenant: $globalApiTypes.tenant.Exampletenant
               environment: $globalApiTypes.environment.ExampleenvironmentProduction
               company: $globalApiTypes.Company.ExampleCompanyCronus
-              ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+              ticketId: $simpleTypes.TicketId.ExampleTicket1
             request:
-              couponCode: "DISCOUNT10"
+              couponType : "DISCOUNT10"
             response:
               body:
-                couponId: "COUPON123"
+                couponId: $simpleTypes.CouponId.ExampleCouponId
+                couponNumber: $simpleTypes.CouponNumber.ExampleCouponNumber
 
       ## TODO for version 2
       # GetTicketChangeRequest
@@ -247,7 +274,12 @@ types:
   GetTicketsRequest:
     docs: Request to get ticket details
     properties:
-      ticketNumber: simpleTypes.TicketId
+      ticketNumber: simpleTypes.TicketExternalNumber
+
+  FindTicketResponse:
+    docs: Response to a find ticket request
+    properties:
+      ticketId: simpleTypes.TicketId
 
   RevokeTicketRequest:
     docs: Request to revoke a ticket
@@ -309,12 +341,14 @@ types:
   GetTicketCouponRequest:
     docs: Request to exchange a ticket for a coupon
     properties:
-      couponCode: optional<simpleTypes.CouponCode>
+      couponType: optional<simpleTypes.CouponType>
 
   ## Complex Type Definitions
   TicketCouponResponse:
     properties:
       couponId: simpleTypes.CouponId
+      couponNumber: simpleTypes.CouponNumber
+      couponType: optional<simpleTypes.CouponType>
 
   CreateMemberReservationItemRequest:
     properties:
@@ -336,39 +370,44 @@ types:
 
   RevokedRequestResponse:
     properties:
-      ticketNumber: simpleTypes.TicketId
+      ticketNumber: simpleTypes.TicketExternalNumber
       revoked: ActionResponseSuccess
       code: optional<ActionResponseCode>
       message: optional<ActionResponseMessage>
 
   AdmittedResponse:
     properties:
-      ticketNumber: simpleTypes.TicketId
+      ticketId: simpleTypes.TicketId
+      ticketNumber: simpleTypes.TicketExternalNumber
       admitted: simpleTypes.Admitted
       code: optional<ActionResponseCode>
       message: optional<ActionResponseMessage>
 
   DepartedResponse:
     properties:
-      ticketNumber: simpleTypes.TicketId
+      ticketId: simpleTypes.TicketId
+      ticketNumber: simpleTypes.TicketExternalNumber
       departed: simpleTypes.Departed
       code: optional<ActionResponseCode>
       message: optional<ActionResponseMessage>
 
   TicketSentResponse:
     properties:
-      ticketNumber: simpleTypes.TicketId
+      ticketId: simpleTypes.TicketId
+      ticketNumber: simpleTypes.TicketExternalNumber
       ticketSent: simpleTypes.TicketSent
       code: optional<ActionResponseCode>
       message: optional<ActionResponseMessage>
     examples:
       - name: ExampleTicketSent
         value:
-          ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+          ticketId: $simpleTypes.TicketId.ExampleTicket1
+          ticketNumber: $simpleTypes.TicketExternalNumber.ExampleTicket1
           ticketSent: true
       - name: ExampleTicketNotSent  
         value:
-          ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+          ticketId: $simpleTypes.TicketId.ExampleTicket1
+          ticketNumber: $simpleTypes.TicketExternalNumber.ExampleTicket1
           ticketSent: false
           code: "ticket_not_sent"
           message: "Ticket could not be sent as e-ticket."

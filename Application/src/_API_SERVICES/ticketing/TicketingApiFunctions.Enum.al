@@ -22,6 +22,10 @@ enum 6059815 "NPR TicketingApiFunctions"
     {
         Caption = 'Get ticket';
     }
+    value(301; FIND_TICKETS)
+    {
+        Caption = 'Get ticket by filter';
+    }
 
     value(302; VALIDATE_ARRIVAL)
     {

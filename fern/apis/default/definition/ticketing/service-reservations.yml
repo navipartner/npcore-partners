@@ -38,7 +38,7 @@ service:
                   quantity: 2
                   content:
                     - admissionCode: CASTLE
-                      scheduleId: 452
+                      ScheduleNumber: 452
             response:
               body:
                 token: $simpleTypes.Token.ExampleToken
@@ -76,7 +76,7 @@ service:
                  quantity: 3
                  content:
                  - admissionCode: CASTLE
-                   scheduleId: 452
+                   ScheduleNumber: 452
           response:
             body:
               token: $simpleTypes.Token.ExampleToken
@@ -350,8 +350,10 @@ types:
       - name: ExampleTicketConfirmed
         value:
           ticketNumbers: 
-            - ticketNumber: $simpleTypes.TicketId.ExampleTicket1
-            - ticketNumber: $simpleTypes.TicketId.ExampleTicket2
+            - ticketId: $simpleTypes.TicketId.ExampleTicket1
+              ticketNumber: $simpleTypes.TicketExternalNumber.ExampleTicket1
+            - ticketId: $simpleTypes.TicketId.ExampleTicket2
+              ticketNumber: $simpleTypes.TicketExternalNumber.ExampleTicket2
           validFrom: 2024-10-15T00:00:00Z
           validUntil: 2024-10-15T23:59:59Z
           pinCode: 12-34

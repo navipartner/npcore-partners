@@ -5,37 +5,40 @@ codeunit 6185080 "NPR TicketingTicketAgent"
 
     internal procedure GetTicket(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
-        TicketId: Text;
         StoreCode: Code[32];
         Ticket: Record "NPR TM Ticket";
     begin
-        TicketId := CopyStr(Request.Paths().Get(2), 1, MaxStrLen(TicketId));
-        Ticket.SetFilter("External Ticket No.", '=%1', TicketId);
-        if (not Ticket.FindFirst()) then
-            exit(Response.RespondResourceNotFound('Invalid Ticket - Ticket not found'));
+        if (not GetTicketById(Request, 2, Ticket, Response)) then
+            exit(Response);
 
         if (Request.QueryParams().ContainsKey('storeCode')) then
             StoreCode := CopyStr(UpperCase(Request.QueryParams().Get('storeCode')), 1, MaxStrLen(StoreCode));
 
-        exit(SingleTicket(Ticket."No.", StoreCode));
+        exit(SingleTicket(Ticket, StoreCode));
 
+    end;
+
+    internal procedure FindTickets(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        ExternalNumber: Text[30];
+    begin
+        if (Request.QueryParams().ContainsKey('externalNumber')) then
+            ExternalNumber := CopyStr(UpperCase(Request.QueryParams().Get('externalNumber')), 1, MaxStrLen(ExternalNumber));
+
+        exit(FindTicketByExternalNumber(ExternalNumber));
     end;
 
     internal procedure RequestRevokeTicket(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         Ticket: Record "NPR TM Ticket";
         Item: Record Item;
-        TicketId: Text;
-
         Amount: Decimal;
         PinCode: Code[10];
         PinCodeToken: JsonToken;
     begin
 
-        TicketId := CopyStr(Request.Paths().Get(2), 1, MaxStrLen(TicketId));
-        Ticket.SetFilter("External Ticket No.", '=%1', TicketId);
-        if (not Ticket.FindFirst()) then
-            exit(Response.RespondResourceNotFound('Invalid Ticket - Ticket not found'));
+        if (not GetTicketById(Request, 2, Ticket, Response)) then
+            exit(Response);
 
         // Request body should contain required parameter pinCode
         Request.BodyJson().AsObject().Get('pinCode', PinCodeToken);
@@ -47,18 +50,23 @@ codeunit 6185080 "NPR TicketingTicketAgent"
             Amount := Item."Unit Price";
         end;
 
-        exit(RequestRevokeTicket(Ticket."No.", PinCode, Amount));
+        exit(RequestRevokeTicket(Ticket, PinCode, Amount));
     end;
 
     internal procedure ConfirmRevokeTicket(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         Body: JsonObject;
+        Ticket: Record "NPR TM Ticket";
         RevokeId: Text[100];
         NotificationAddress: Text[100];
         PaymentReference: Code[20];
         TicketHolder: Text[100];
         Token: JsonToken;
     begin
+
+        if (not GetTicketById(Request, 2, Ticket, Response)) then
+            exit(Response);
+
         Body := Request.BodyJson().AsObject();
 
         Body.Get('revokeId', Token);
@@ -78,16 +86,15 @@ codeunit 6185080 "NPR TicketingTicketAgent"
 
     internal procedure ValidateArrival(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
+        Ticket: Record "NPR TM Ticket";
         Body: JsonObject;
         Token: JsonToken;
-        TicketId: Text[50];
         AdmissionCode: Code[20];
         ScannerStation: Code[10];
     begin
 
-        TicketId := CopyStr(Request.Paths().Get(2), 1, MaxStrLen(TicketId));
-        if (TicketId = '') then
-            exit(Response.RespondBadRequest('Invalid Ticket - Ticket ID not found'));
+        if (not GetTicketById(Request, 2, Ticket, Response)) then
+            exit(Response);
 
         Body := Request.BodyJson().AsObject();
         if (Body.Get('admissionCode', Token)) then
@@ -96,21 +103,20 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         if (Body.Get('scannerStation', Token)) then
             ScannerStation := CopyStr(Token.AsValue().AsText(), 1, MaxStrLen(ScannerStation));
 
-        exit(ValidateArrival(TicketId, AdmissionCode, ScannerStation));
+        exit(ValidateArrival(Ticket, AdmissionCode, ScannerStation));
     end;
 
     internal procedure ValidateDeparture(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
+        Ticket: Record "NPR TM Ticket";
         Body: JsonObject;
         Token: JsonToken;
-        TicketId: Text[50];
         AdmissionCode: Code[20];
         ScannerStation: Code[10];
     begin
 
-        TicketId := CopyStr(Request.Paths().Get(2), 1, MaxStrLen(TicketId));
-        if (TicketId = '') then
-            exit(Response.RespondBadRequest('Invalid Ticket - Ticket ID not found'));
+        if (not GetTicketById(Request, 2, Ticket, Response)) then
+            exit(Response);
 
         Body := Request.BodyJson().AsObject();
         if (Body.Get('admissionCode', Token)) then
@@ -119,7 +125,7 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         if (Body.Get('scannerStation', Token)) then
             ScannerStation := CopyStr(Token.AsValue().AsText(), 1, MaxStrLen(ScannerStation));
 
-        exit(ValidateDeparture(TicketId, AdmissionCode, ScannerStation));
+        exit(ValidateDeparture(Ticket, AdmissionCode, ScannerStation));
     end;
 
     internal procedure ValidateMemberArrival(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
@@ -129,44 +135,41 @@ codeunit 6185080 "NPR TicketingTicketAgent"
 
     internal procedure SendToWallet(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
+        Ticket: Record "NPR TM Ticket";
         Body: JsonObject;
         Token: JsonToken;
-        TicketId: Text[50];
         SendTo: Text[100];
     begin
-
-        TicketId := CopyStr(Request.Paths().Get(2), 1, MaxStrLen(TicketId));
-        if (TicketId = '') then
-            exit(Response.RespondBadRequest('Invalid Ticket - Ticket ID not found'));
+        if (not GetTicketById(Request, 2, Ticket, Response)) then
+            exit(Response);
 
         Body := Request.BodyJson().AsObject();
         if (Body.Get('notificationAddress', Token)) then
             SendTo := CopyStr(Token.AsValue().AsText(), 1, MaxStrLen(SendTo));
 
-        exit(SendToWallet(TicketId, SendTo));
+        exit(SendToWallet(Ticket, SendTo));
     end;
 
     internal procedure ExchangeTicketForCoupon(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
+        Ticket: Record "NPR TM Ticket";
         Body: JsonObject;
         Token: JsonToken;
-        TicketId: Text[30];
         CouponCodeAlias: Text[20];
     begin
-        TicketId := CopyStr(Request.Paths().Get(2), 1, MaxStrLen(TicketId));
-        if (TicketId = '') then
-            exit(Response.RespondBadRequest('Invalid Ticket - Ticket ID not found'));
+        if (not GetTicketById(Request, 2, Ticket, Response)) then
+            exit(Response);
 
         Body := Request.BodyJson().AsObject();
         if (Body.Get('couponCode', Token)) then
             CouponCodeAlias := CopyStr(Token.AsValue().AsText(), 1, MaxStrLen(CouponCodeAlias));
 
-        exit(ExchangeTicketForCoupon(TicketId, CouponCodeAlias));
+        exit(ExchangeTicketForCoupon(Ticket, CouponCodeAlias));
 
     end;
 
     // ****************************
-    internal procedure RequestRevokeTicket(TicketNo: Code[20]; PinCode: Code[10]; Amount: Decimal) Response: Codeunit "NPR API Response"
+    internal procedure RequestRevokeTicket(Ticket: Record "NPR TM Ticket"; PinCode: Code[10]; Amount: Decimal) Response: Codeunit "NPR API Response"
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         ResponseJson: Codeunit "NPR JSON Builder";
@@ -174,7 +177,7 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         RevokeQty: Integer;
     begin
         RevokeId := CreateDocumentId();
-        TicketRequestManager.WS_CreateRevokeRequest(RevokeId, TicketNo, PinCode, Amount, RevokeQty);
+        TicketRequestManager.WS_CreateRevokeRequest(RevokeId, Ticket."No.", PinCode, Amount, RevokeQty);
 
         ResponseJson.StartObject()
             .AddProperty('revokeId', RevokeId)
@@ -205,35 +208,21 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         exit(Response.RespondOk(ResponseJson.Build()));
     end;
 
-    internal procedure ValidateArrival(ExternalTicketNo: Text[50]; AdmissionCode: Code[20]; ScannerStationId: Code[10]) Response: Codeunit "NPR API Response"
+    internal procedure ValidateArrival(Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; ScannerStationId: Code[10]) Response: Codeunit "NPR API Response"
     var
         AttemptTicket: Codeunit "NPR Ticket Attempt Create";
         ArrivalSuccess: Boolean;
-        Ticket: Record "NPR TM Ticket";
-        TicketNumberRequired: Label '[-2001] Ticket number. is required.';
         MessageText: Text;
         ResponseJson: Codeunit "NPR JSON Builder";
     begin
-
-        if (ExternalTicketNo = '') then
-            exit(Response.RespondBadRequest(TicketNumberRequired));
-
-        // We don't want to reveal if the ticket was found as the order reference or ticket number
-        // so we first check if the ticket exists by external ticket number and if not found, try validate by external order reference
-        Ticket.SetFilter("External Ticket No.", '=%1', CopyStr(ExternalTicketNo, 1, MaxStrLen(Ticket."External Ticket No.")));
-        if (Ticket.IsEmpty()) then
-            ArrivalSuccess := AttemptTicket.AttemptValidateTicketForArrival("NPR TM TicketIdentifierType"::EXTERNAL_ORDER_REF, ExternalTicketNo, AdmissionCode, -1, '', ScannerStationId, MessageText);
-
-        // if not yet successful, try validate by external ticket number
-        if (not ArrivalSuccess) then
-            ArrivalSuccess := AttemptTicket.AttemptValidateTicketForArrival("NPR TM TicketIdentifierType"::EXTERNAL_TICKET_NO, ExternalTicketNo, AdmissionCode, -1, '', ScannerStationId, MessageText);
+        ArrivalSuccess := AttemptTicket.AttemptValidateTicketForArrival("NPR TM TicketIdentifierType"::EXTERNAL_TICKET_NO, Ticket."External Ticket No.", AdmissionCode, -1, '', ScannerStationId, MessageText);
 
         if (not ArrivalSuccess) then
             exit(Response.RespondBadRequest(MessageText));
 
         if (ArrivalSuccess) then begin
             ResponseJson.StartObject()
-                .AddProperty('ticketNumber', ExternalTicketNo)
+                .AddProperty('ticketNumber', Ticket."External Ticket No.")
                 .AddProperty('admissionCode', AdmissionCode)
                 .AddProperty('scannerStation', ScannerStationId)
                 .AddProperty('admitted', 'true')
@@ -244,20 +233,15 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         end;
     end;
 
-    internal procedure ValidateDeparture(ExternalTicketNo: Text[50]; AdmissionCode: Code[20]; ScannerStationId: Code[20]) Response: Codeunit "NPR API Response"
+    internal procedure ValidateDeparture(Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; ScannerStationId: Code[20]) Response: Codeunit "NPR API Response"
     var
         TicketManagement: Codeunit "NPR TM Ticket Management";
         ResponseJson: Codeunit "NPR JSON Builder";
-        TicketNumberRequired: Label '[-2001] Ticket number. is required.';
     begin
-
-        if (ExternalTicketNo = '') then
-            exit(Response.RespondBadRequest(TicketNumberRequired));
-
-        TicketManagement.ValidateTicketForDeparture("NPR TM TicketIdentifierType"::EXTERNAL_TICKET_NO, ExternalTicketNo, AdmissionCode);
+        TicketManagement.ValidateTicketForDeparture("NPR TM TicketIdentifierType"::EXTERNAL_TICKET_NO, Ticket."External Ticket No.", AdmissionCode);
 
         ResponseJson.StartObject()
-            .AddProperty('ticketNumber', ExternalTicketNo)
+            .AddProperty('ticketNumber', Ticket."External Ticket No.")
             .AddProperty('admissionCode', AdmissionCode)
             .AddProperty('scannerStation', ScannerStationId)
             .AddProperty('departed', 'true')
@@ -265,23 +249,18 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         Response.RespondOk(ResponseJson.Build());
     end;
 
-    local procedure SendToWallet(TicketId: Text; SendTo: Text[100]) Response: Codeunit "NPR API Response"
+    local procedure SendToWallet(Ticket: Record "NPR TM Ticket"; SendTo: Text[100]) Response: Codeunit "NPR API Response"
     var
-        Ticket: Record "NPR TM Ticket";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         ResponseJson: Codeunit "NPR JSON Builder";
         ResponseText: Text;
     begin
 
-        Ticket.SetFilter("External Ticket No.", '=%1', CopyStr(TicketId, 1, MaxStrLen(Ticket."External Ticket No.")));
-        if (not Ticket.FindFirst()) then
-            exit(Response.RespondResourceNotFound('Invalid Ticket - Ticket not found'));
-
         if (not TicketRequestManager.CreateAndSendETicket(Ticket."No.", SendTo, true, ResponseText)) then
             exit(Response.RespondBadRequest(ResponseText));
 
         ResponseJson.StartObject()
-            .AddProperty('ticketNumber', TicketId)
+            .AddProperty('ticketNumber', Ticket."External Ticket No.")
             .AddProperty('sentTo', SendTo)
             .AddProperty('ticketSent', 'true')
             .EndObject();
@@ -289,7 +268,7 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         exit(Response.RespondOk(ResponseJson.Build()));
     end;
 
-    local procedure ExchangeTicketForCoupon(TicketId: Text[30]; CouponCodeAlias: Text[20]) Response: Codeunit "NPR API Response"
+    local procedure ExchangeTicketForCoupon(Ticket: Record "NPR TM Ticket"; CouponCodeAlias: Text[20]) Response: Codeunit "NPR API Response"
     var
         CouponReferenceNo: Text[50];
         ReasonText: Text;
@@ -297,11 +276,11 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         ResponseJson: Codeunit "NPR JSON Builder";
         ReasonNumber: Integer;
     begin
-        if (not TicketToCoupon.ExchangeTicketForCoupon(TicketId, CouponCodeAlias, CouponReferenceNo, ReasonNumber, ReasonText)) then
+        if (not TicketToCoupon.ExchangeTicketForCoupon(Ticket."External Ticket No.", CouponCodeAlias, CouponReferenceNo, ReasonNumber, ReasonText)) then
             exit(Response.RespondBadRequest(ReasonText));
 
         ResponseJson.StartObject()
-            .AddProperty('ticketNumber', TicketId)
+            .AddProperty('ticketNumber', Ticket."External Ticket No.")
             .AddProperty('couponId', CouponReferenceNo)
             .EndObject();
 
@@ -310,19 +289,67 @@ codeunit 6185080 "NPR TicketingTicketAgent"
 
 
     // ****************************
-    internal procedure SingleTicket(TicketNo: Code[20]; StoreCode: Code[32]) Response: Codeunit "NPR API Response"
+    local procedure GetTicketById(var Request: Codeunit "NPR API Request"; PathPosition: Integer; var Ticket: Record "NPR TM Ticket"; var Response: Codeunit "NPR API Response"): Boolean
+    var
+        TicketIdText: Text[50];
+        TicketId: Guid;
+    begin
+        TicketIdText := CopyStr(Request.Paths().Get(PathPosition), 1, MaxStrLen(TicketIdText));
+        if (TicketIdText = '') then begin
+            Response.RespondBadRequest('Invalid Ticket - Ticket Id not valid');
+            exit(false);
+        end;
+
+        if (not Evaluate(TicketId, TicketIdText)) then begin
+            Response.RespondBadRequest('Invalid Ticket - Ticket Id not valid');
+            exit(false);
+        end;
+
+        if (not Ticket.GetBySystemId(TicketId)) then begin
+            Response.RespondResourceNotFound('Invalid Ticket - Ticket not found');
+            exit(false);
+        end;
+
+        exit(true);
+    end;
+
+    local procedure FindTicketByExternalNumber(ExternalNumber: Text[30]) Response: Codeunit "NPR API Response"
     var
         Ticket: Record "NPR TM Ticket";
+        ResponseJson: Codeunit "NPR JSON Builder";
+    begin
+        Ticket.SetFilter("External Ticket No.", '=%1', ExternalNumber);
+        if (not Ticket.FindFirst()) then
+            exit(Response.RespondResourceNotFound('Invalid Ticket - Ticket not found'));
+
+        ResponseJson.StartArray().AddArray(TicketIdDTO(ResponseJson, Ticket)).EndArray();
+
+        exit(Response.RespondOk(ResponseJson.BuildAsArray()));
+    end;
+
+    local procedure TicketIdDTO(var ResponseJson: Codeunit "NPR JSON Builder"; Ticket: Record "NPR TM Ticket"): Codeunit "NPR JSON Builder";
+    begin
+
+        ResponseJson.StartObject()
+            .AddProperty('ticketId', Format(Ticket.SystemId, 0, 4))
+            .AddProperty('ticketNumber', Ticket."External Ticket No.")
+            .AddProperty('validFrom', Format(Ticket."Valid From Date", 0, 9))
+            .AddProperty('validUntil', Format(Ticket."Valid To Date", 0, 9))
+            .AddProperty('unitPrice', Ticket.AmountExclVat)
+            .AddProperty('unitPriceInclVat', Ticket.AmountInclVat)
+        .EndObject();
+
+        exit(ResponseJson);
+    end;
+
+    internal procedure SingleTicket(Ticket: Record "NPR TM Ticket"; StoreCode: Code[32]) Response: Codeunit "NPR API Response"
+    var
         TicketingCatalog: Codeunit "NPR TicketingCatalogAgent";
         ResponseJson: Codeunit "NPR JSON Builder";
         ReservationRequest: Record "NPR TM Ticket Reservation Req.";
         GeneralLedgerSetup: Record "General Ledger Setup";
         TicketDescriptionBuffer: Record "NPR TM TempTicketDescription";
     begin
-        Ticket.Get(TicketNo);
-        if (not ReservationRequest.Get(Ticket."Ticket Reservation Entry No.")) then
-            exit(Response.RespondBadRequest('Invalid Ticket - Reservation not found'));
-
         GeneralLedgerSetup.Get();
         TicketingCatalog.GetCatalogItemDescription(StoreCode, Ticket."Item No.", TicketDescriptionBuffer);
 
@@ -339,6 +366,7 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         ReservationRequest: Record "NPR TM Ticket Reservation Req."): Codeunit "NPR JSON Builder";
     begin
         ResponseJson.StartObject()
+            .AddProperty('ticketId', Format(Ticket.SystemId, 0, 4))
             .AddProperty('ticketNumber', Ticket."External Ticket No.")
             .AddProperty('reservationToken', ReservationRequest."Session Token ID")
             .AddProperty('validFrom', Format(Ticket."Valid From Date", 0, 9))

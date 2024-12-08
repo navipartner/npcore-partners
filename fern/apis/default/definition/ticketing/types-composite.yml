@@ -6,7 +6,7 @@ types:
   TicketContentRequest:
     properties:
       admissionCode: simpleTypes.AdmissionCode
-      scheduleId: optional<simpleTypes.ScheduleId>
+      ScheduleNumber: optional<simpleTypes.ScheduleNumber>
 
   AdmissionBase: 
     docs: 
@@ -36,7 +36,7 @@ types:
   ScheduleDetails: 
     docs: Details of the schedule for a specific time slot.
     properties:
-      id: simpleTypes.ScheduleId
+      externalNumber: simpleTypes.ScheduleNumber
       code: string
       description: optional<string>
       startDate: date
@@ -49,7 +49,7 @@ types:
     examples:
       - name: ExampleMorning
         value:
-          id: $simpleTypes.ScheduleId.ExampleMorningId
+          externalNumber: $simpleTypes.ScheduleNumber.ExampleMorningId
           code: "MORNING"
           description: "Morning schedule"
           startDate: $simpleTypes.ReferenceDate.ExampleCheckCapacityDate
@@ -61,7 +61,7 @@ types:
           arrivalUntilTime: "10:00"
       - name: ExampleEvening
         value:
-          id: $simpleTypes.ScheduleId.ExampleEveningId
+          externalNumber: $simpleTypes.ScheduleNumber.ExampleEveningId
           code: "EVENING"
           description: "Evening schedule"
           startDate: $simpleTypes.ReferenceDate.ExampleCheckCapacityDate
@@ -109,12 +109,14 @@ types:
     docs: 
       A list of ticket numbers.
     properties:
-      ticketNumber: simpleTypes.TicketId
+      ticketId: simpleTypes.TicketId
+      ticketNumber: simpleTypes.TicketExternalNumber
 
   TicketDetails:
     docs: Details of the ticket 
     properties:
-      ticketNumber: simpleTypes.TicketId
+      id: simpleTypes.TicketId
+      ticketNumber: simpleTypes.TicketExternalNumber
       reservationToken: simpleTypes.Token
       validFrom: datetime
       validUntil: datetime
@@ -128,7 +130,8 @@ types:
     examples:
       - name: ExampleTicket1
         value:
-          ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+          id: $simpleTypes.TicketId.ExampleTicket1
+          ticketNumber: $simpleTypes.TicketExternalNumber.ExampleTicket1
           reservationToken : $simpleTypes.Token.ExampleToken
           validFrom: $simpleTypes.ReferenceDateTime.ExampleValidFrom
           validUntil: $simpleTypes.ReferenceDateTime.ExampleValidUntil
@@ -142,7 +145,8 @@ types:
           description: $Descriptions.ExampleTicket31001
       - name: ExampleTicketMember
         value:
-          ticketNumber: $simpleTypes.TicketId.ExampleTicket1
+          id: $simpleTypes.TicketId.ExampleTicket1
+          ticketNumber: $simpleTypes.TicketExternalNumber.ExampleTicket1
           reservationToken : $simpleTypes.Token.ExampleToken
           validFrom: $simpleTypes.ReferenceDateTime.ExampleValidFrom
           validUntil: $simpleTypes.ReferenceDateTime.ExampleValidUntil

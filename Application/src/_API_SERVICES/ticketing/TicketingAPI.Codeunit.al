@@ -12,6 +12,8 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
         if (Request.Paths().Get(1) = 'ticketing') then // Obsolete
             exit(Response.RespondBadRequest('Segment path changed from ticketing to ticket, check the API documentation for the correct path.'));
 
+        if (Request.Match('GET', '/ticket/catalog')) then
+            exit(Handle(_ApiFunction::CATALOG, Request));
 
         if (Request.Match('GET', '/ticket/catalog/:storCode')) then
             exit(Handle(_ApiFunction::CATALOG, Request));
@@ -20,6 +22,9 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
         if (Request.Match('GET', '/ticket/capacity/search')) then
             exit(Handle(_ApiFunction::CAPACITY_SEARCH, Request));
 
+
+        if (Request.Match('GET', '/ticket')) then
+            exit(Handle(_ApiFunction::FIND_TICKETS, Request));
 
         if (Request.Match('GET', '/ticket/:ticketId')) then
             exit(Handle(_ApiFunction::GET_TICKET, Request));
@@ -78,8 +83,7 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
         if (TicketingApiHandler.Run()) then
             exit(TicketingApiHandler.GetResponse());
 
-        Response.CreateErrorResponse(Enum::"NPR API Error Code"::generic_error, StrSubstNo('An error occurred while processing the request: %1', GetLastErrorText()));
-        Commit();
+        Response.CreateErrorResponse(Enum::"NPR API Error Code"::generic_error, GetLastErrorText());
     end;
 }
 #endif

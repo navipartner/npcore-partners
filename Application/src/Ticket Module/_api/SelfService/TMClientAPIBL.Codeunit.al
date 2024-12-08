@@ -3,7 +3,7 @@ codeunit 6151543 "NPR TM Client API BL"
     Access = Internal;
 
     var
-        _CapacityStatusCodeOption: Option ,OK,CAPACITY_EXCEEDED,NON_WORKING,CALENDAR_WARNING;
+        _CapacityStatusCodeOption: Option ,OK,CAPACITY_EXCEEDED,NON_WORKING,CALENDAR_WARNING,CLOSED;
 
     internal procedure GetReservationAction(ReservationRequest: JsonArray) ResponseText: Text
     var
@@ -793,6 +793,10 @@ codeunit 6151543 "NPR TM Client API BL"
         DynamicPriceOptionId: Integer;
         DynamicCustomerPrice: Decimal;
         CustomerPriceOut: Decimal;
+        TimeHelper: Codeunit "NPR TM TimeHelper";
+        LocalDateTime: DateTime;
+        LocalDate: Date;
+        LocalTime: Time;
     begin
 
         AdmissionScheduleEntry.SetCurrentKey("Admission Start Date", "Admission Start Time");
@@ -805,6 +809,10 @@ codeunit 6151543 "NPR TM Client API BL"
         if (not AdmissionScheduleEntry.FindSet()) then
             exit;
 
+        LocalDateTime := TimeHelper.GetLocalTimeAtAdmission(AdmCapacityPriceBufferResponse.AdmissionCode);
+        LocalDate := DT2Date(LocalDateTime);
+        LocalTime := DT2Time(LocalDateTime);
+
         AdmissionScheduleEntry.FindSet();
         repeat
             CapacityStatusCode := _CapacityStatusCodeOption::OK;
@@ -812,7 +820,7 @@ codeunit 6151543 "NPR TM Client API BL"
             if (not TicketManagement.ValidateAdmSchEntryForSales(AdmissionScheduleEntry,
                         AdmCapacityPriceBufferResponse.RequestItemNumber,
                         AdmCapacityPriceBufferResponse.RequestVariantCode,
-                        Today(), Time(),
+                        LocalDate, LocalTime,
                         BlockSaleReason, RemainingCapacity)) then begin
                 CapacityStatusCode := _CapacityStatusCodeOption::CAPACITY_EXCEEDED;
                 if (BlockSaleReason = BlockSaleReason::ScheduleExceedTicketDuration) then
@@ -840,6 +848,15 @@ codeunit 6151543 "NPR TM Client API BL"
 
             if ((CapacityStatusCode = _CapacityStatusCodeOption::OK) and (CalendarExceptionText <> '')) then
                 CapacityStatusCode := _CapacityStatusCodeOption::CALENDAR_WARNING;
+
+            if (CapacityStatusCode = _CapacityStatusCodeOption::OK) then begin
+                if (AdmissionScheduleEntry."Admission Is" = AdmissionScheduleEntry."Admission Is"::CLOSED) then
+                    CapacityStatusCode := _CapacityStatusCodeOption::CLOSED;
+                if (AdmissionScheduleEntry."Admission End Date" < LocalDate) then
+                    CapacityStatusCode := _CapacityStatusCodeOption::CLOSED;
+                if ((AdmissionScheduleEntry."Admission End Date" = LocalDate) and (AdmissionScheduleEntry."Admission End Time" < LocalTime)) then
+                    CapacityStatusCode := _CapacityStatusCodeOption::CLOSED;
+            end;
 
             DynamicCustomerPrice := AdmCapacityPriceBufferResponse.UnitPrice;
             if (HavePriceRule) then begin
@@ -1017,6 +1034,7 @@ codeunit 6151543 "NPR TM Client API BL"
         ResponseLbl: Label 'Capacity Status Code %1 does not have a dedicated message.';
         OK: Label 'Ok.';
         CAPACITY_EXCEEDED: Label 'Capacity Exceeded (code %1).';
+        CLOSED: Label 'Closed.';
     begin
         case CapacityStatusCode of
             _CapacityStatusCodeOption::OK:
@@ -1027,6 +1045,8 @@ codeunit 6151543 "NPR TM Client API BL"
                 exit(StrSubstNo(CAPACITY_EXCEEDED, BlockSalesReason));
             _CapacityStatusCodeOption::CALENDAR_WARNING:
                 exit(ReasonText);
+            _CapacityStatusCodeOption::CLOSED:
+                exit(CLOSED);
             else
                 exit(StrSubstNo(ResponseLbl, CapacityStatusCode));
         end;
