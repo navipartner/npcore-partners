@@ -120,7 +120,10 @@
                 TempSaleLinePOS."Discount Type" := TempSaleLinePOS."Discount Type"::Campaign;
                 TempSaleLinePOS."Discount Code" := PeriodDiscountLine.Code;
                 PeriodDiscount.Get(PeriodDiscountLine.Code);
-                TempSaleLinePOS."Custom Disc Blocked" := PeriodDiscount."Block Custom Disc.";
+                if Item."NPR Custom Discount Blocked" then
+                    TempSaleLinePOS."Custom Disc Blocked" := Item."NPR Custom Discount Blocked"
+                else
+                    TempSaleLinePOS."Custom Disc Blocked" := PeriodDiscount."Block Custom Disc.";
             end;
 
             //Apply unit cost for the period if specified

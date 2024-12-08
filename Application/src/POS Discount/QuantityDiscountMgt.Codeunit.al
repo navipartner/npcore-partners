@@ -9,6 +9,7 @@
     var
         TempQuantityDiscountLine: Record "NPR Quantity Discount Line" temporary;
         TempQuantityDiscountHeader: Record "NPR Quantity Discount Header" temporary;
+        Item: Record Item;
         ItemQuantity: Decimal;
         DiscountPercent: Decimal;
     begin
@@ -65,6 +66,10 @@
                         TempSaleLinePOS."Discount Type" := TempSaleLinePOS."Discount Type"::Quantity;
                         TempSaleLinePOS."Discount Code" := TempQuantityDiscountLine."Main no.";
                         TempSaleLinePOS."FP Anvendt" := true;
+                        if Item.Get(TempSaleLinePOS."No.") and Item."NPR Custom Discount Blocked" then
+                            TempSaleLinePOS."Custom Disc Blocked" := Item."NPR Custom Discount Blocked"
+                        else
+                            TempSaleLinePOS."Custom Disc Blocked" := TempQuantityDiscountHeader."Block Custom Discount";
 
                         if (DiscountPercent >= 0) then
                             TempSaleLinePOS.Modify();

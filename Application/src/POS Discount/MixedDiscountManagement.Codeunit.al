@@ -838,6 +838,7 @@
     local procedure ApplyMixDiscountOnLines(BatchQty: Decimal; var TempMixedDiscount: Record "NPR Mixed Discount" temporary; var TempMixedDiscountLine: Record "NPR Mixed Discount Line" temporary; var TempSaleLinePOSApply: Record "NPR POS Sale Line" temporary; InvQtyDict: Dictionary of [Guid, Decimal]): Decimal
     var
         TempPriorityBuffer: Record "NPR Mixed Disc. Prio. Buffer" temporary;
+        Item: Record Item;
         AppliedDiscAmountRaw: Decimal;
         AppliedDiscAmountTaxAdjusted: Decimal;
         LineDiscAmount: Decimal;
@@ -860,7 +861,10 @@
         repeat
             TempSaleLinePOSApply."Discount Type" := TempSaleLinePOSApply."Discount Type"::Mix;
             TempSaleLinePOSApply."Discount Code" := TempMixedDiscount.Code;
-            TempSaleLinePOSApply."Custom Disc Blocked" := TempMixedDiscount."Block Custom Discount";
+            if Item.Get(TempSaleLinePOSApply."No.") and Item."NPR Custom Discount Blocked" then
+                TempSaleLinePOSApply."Custom Disc Blocked" := Item."NPR Custom Discount Blocked"
+            else
+                TempSaleLinePOSApply."Custom Disc Blocked" := TempMixedDiscount."Block Custom Discount";
             LineDiscAmount := CalcLineDiscAmount(TempMixedDiscount, TempMixedDiscountLine, BatchQty, TotalQty, TotalVATAmount, TotalAmountInclVAT, TempSaleLinePOSApply, InvQtyDict);
             if LineDiscAmount <> 0 then
                 LineDiscAmount := LineDiscAmount + RemainderAmt;
