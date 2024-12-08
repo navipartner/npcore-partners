@@ -210,8 +210,12 @@ codeunit 6185083 "NPR TicketingReservationAgent"
             end;
         end;
 
-        if (not CreateReservation(Lines, Token, '', 0, Success, ResponseMessage)) then
+        if (not CreateReservation(Lines, Token, '', 0, Success, ResponseMessage)) then begin
+            if (ResponseMessage.StartsWith('[-1015]')) then
+                exit(Response.CreateErrorResponse(Enum::"NPR API Error Code"::capacity_exceeded, ResponseMessage));
+
             exit(Response.RespondBadRequest(ResponseMessage));
+        end;
 
         exit(GetReservation(Token));
     end;
@@ -233,6 +237,7 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         ResolvingTable: Integer;
         INVALID_ITEM_REFERENCE: Label 'Reference %1 does not resolve to neither an item reference nor an item number.';
     begin
+        TicketRequestManager.ExpireReservationRequests();
 
         if (Token <> '') then
             TicketRequestManager.DeleteReservationRequest(Token, true);
@@ -279,13 +284,16 @@ codeunit 6185083 "NPR TicketingReservationAgent"
                 ExternalId.Add(TicketRequest."Ext. Line Reference No.");
         end;
 
-        TicketWebRequestManager.FinalizeTicketReservation(Token, ExternalId);
+        Success := TicketWebRequestManager.FinalizeTicketReservation(Token, ExternalId);
+        if (not Success) then begin
+            ResponseMessage := GetLastErrorText();
+            exit(false);
+        end;
 
         Ticket.Reset();
         TicketRequest.SetCurrentKey("Session Token ID");
         TicketRequest.SetFilter("Session Token ID", '=%1', Token);
         TicketRequest.FindSet();
-
         repeat
             if (TicketRequest."Admission Created") then begin
                 TicketResponse.SetFilter("Session Token ID", '=%1', Token);
@@ -459,6 +467,7 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         Ticket.FindSet();
         repeat
             ResponseJson.StartObject()
+                .AddProperty('ticketId', Format(Ticket.SystemId, 0, 4))
                 .AddProperty('ticketNumber', Ticket."External Ticket No.")
                 .EndObject();
         until (Ticket.Next() = 0);

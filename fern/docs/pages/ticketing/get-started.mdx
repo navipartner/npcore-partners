@@ -9,48 +9,51 @@ There are 5 steps to selling a ticket. This step by step guide below with exampl
 <AccordionGroup>
     
     <Accordion title="1 - Decide which ticket">
-        First, query the available tickets catalog to find a product that fits the needs. This is done using the `/ticketing/catalog/` endpoint.
-        <EndpointRequestSnippet endpoint="GET /:saasguid/:saasenv/:company/ticketing/catalog/:storeCode" example="ExampleCatalog1" /> 
+        First, query the available tickets catalog to find a product that fits the needs. This is done using the `/ticket/catalog/` endpoint.
+        <EndpointRequestSnippet endpoint="GET /:tenant/:environment/:company/ticket/catalog/:storeCode" example="ExampleCatalog1" /> 
         
         Use the `itemNumber` to specify your chosen ticket in later steps.
-        <EndpointResponseSnippet endpoint="GET /:saasguid/:saasenv/:company/ticketing/catalog/:storeCode" example="ExampleCatalog1"/> 
+        <EndpointResponseSnippet endpoint="GET /:tenant/:environment/:company/ticket/catalog/:storeCode" example="ExampleCatalog1"/> 
     </Accordion>
 
     <Accordion title="2 - Find and select a time slot">
         Next we need to find time slots for the admission codes that are included with the selected product. 
-        For that purpose we will use the `/ticketing/capacity/search` endpoint.
+        For that purpose we will use the `/ticket/capacity/search` endpoint.
 
-        <EndpointRequestSnippet endpoint="GET /:saasguid/:saasenv/:company/ticketing/capacity/search" example="ExampleCapacity1"/> 
+        <EndpointRequestSnippet endpoint="GET /:tenant/:environment/:company/ticket/capacity/search" example="ExampleCapacity1"/> 
 
         From the response, user must select a suitable time slot. We need the `code` ("CASTLE") and `schedule.id` (452)
         values to be able to create the reservation in the next step.  
-        <EndpointResponseSnippet endpoint="GET /:saasguid/:saasenv/:company/ticketing/capacity/search" example="ExampleCapacity1"/> 
+        <EndpointResponseSnippet endpoint="GET /:tenant/:environment/:company/ticket/capacity/search" example="ExampleCapacity1"/> 
     </Accordion>
 
     <Accordion title="3 - Create the reservation">
         To make a reservation we need to know the `itemNumber` (from step 1), `admissionCode` and `scheduleId` from step 2
-        <EndpointRequestSnippet endpoint="POST /:saasguid/:saasenv/:company/ticketing/reservation" example="ExampleCreateReservation1"/> 
+        <EndpointRequestSnippet endpoint="POST /:tenant/:environment/:company/ticket/reservation" example="ExampleCreateReservation1"/> 
 
         If the reservation is successful, we will get a reservation token in return. As long as the reservation is valid, our tickets are guaranteed.
         For subsequent references to this reservation we need the reservation `token`.
-        <EndpointResponseSnippet endpoint="POST /:saasguid/:saasenv/:company/ticketing/reservation" example="ExampleCreateReservation1"/> 
+        <EndpointResponseSnippet endpoint="POST /:tenant/:environment/:company/ticket/reservation" example="ExampleCreateReservation1"/> 
     </Accordion>
 
     <Accordion title="4 - Confirm the reservation">
-        Tickets are reserved but not valid until the reservation has been confirmed. To confirm a reservation we use the `/ticketing/reservation/:token/confirm` endpoint.
-        <EndpointRequestSnippet endpoint="POST /:saasguid/:saasenv/:company/ticketing/reservation/:token/confirm" example="ExampleConfirmReservation1"/>
+        Tickets are reserved but not valid until the reservation has been confirmed. To confirm a reservation we use the `/ticket/reservation/:token/confirm` endpoint.
+        <EndpointRequestSnippet endpoint="POST /:tenant/:environment/:company/ticket/reservation/:token/confirm" example="ExampleConfirmReservation1"/>
 
         The response object contains the ticket numbers that are created and valid for admission.
-        <EndpointResponseSnippet endpoint="POST /:saasguid/:saasenv/:company/ticketing/reservation/:token/confirm" example="ExampleConfirmReservation1"/> 
+        <EndpointResponseSnippet endpoint="POST /:tenant/:environment/:company/ticket/reservation/:token/confirm" example="ExampleConfirmReservation1"/> 
     </Accordion>
 
 
     <Accordion title="5 - Ticket information">
-        Finally, the full ticket information can be accessed.
-        <EndpointRequestSnippet endpoint="GET /:saasguid/:saasenv/:company/ticketing/ticket/:ticketNumber"/>
+        To get access to the ticket endpoint services, you need to know the ticketId - a unique id for each ticket. You can look-up the this id if you have printed barcode of the ticket with the `Find Ticket` service.
+        <EndpointRequestSnippet endpoint="GET /:tenant/:environment/:company/ticket"/>
+
+        When the ticketId is know, use the `Get Ticket` endpoint to retrieve all ticket information.
+        <EndpointRequestSnippet endpoint="GET /:tenant/:environment/:company/ticket/:ticketId"/>
 
         The response contain all relevant ticket details:
-        <EndpointResponseSnippet endpoint="GET /:saasguid/:saasenv/:company/ticketing/ticket/:ticketNumber" example="ExampleGetTicket"/> 
+        <EndpointResponseSnippet endpoint="GET /:tenant/:environment/:company/ticket/:ticketId" example="ExampleGetTicket"/> 
 
     </Accordion>
 

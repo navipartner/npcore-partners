@@ -87,6 +87,7 @@ navigation:
                 summary: ./docs/pages/ticketing/tickets-summary.mdx
                 contents:
                   - endpoint: ticketing.service-ticket.getTicket
+                  - endpoint: ticketing.service-ticket.findTicket
                   - endpoint: ticketing.service-ticket.requestRevokeTicket
                   - endpoint: ticketing.service-ticket.confirmRevokeTicket
                   - endpoint: ticketing.service-ticket.validateArrival

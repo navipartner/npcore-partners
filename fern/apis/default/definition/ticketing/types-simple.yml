@@ -26,6 +26,15 @@ types:
         value: CASTLE
 
   ScheduleId:
+    type: uuid
+    docs: The unique identifier of a schedule
+    examples:
+      - name: ExampleMorningId
+        value: 12345678-1234-1234-1234-123456789012
+      - name: ExampleEveningId
+        value: 12345678-1234-1234-1234-123456789013
+
+  ScheduleNumber:
     type: integer
     docs: The ID of a specific time slot for a specific admission
     examples:
@@ -77,6 +86,17 @@ types:
     docs: The status of the reservation
 
   TicketId:
+    type: uuid
+    docs: The unique identifier of a ticket
+    examples:
+      - name: ExampleTicket1
+        value: 12345678-1234-1234-1234-123456789012
+      - name: ExampleTicket2
+        value: ABCDEFAB-1234-1234-1234-123456789013
+      - name: ExampleTicket3
+        value: FABCDEFA-1234-1234-1234-123456789014
+
+  TicketExternalNumber:
     type: string
     docs: The unique identifier of a ticket
     examples:
@@ -276,16 +296,26 @@ types:
       - name: ExampleScannerStationExit
         value: Exit
 
-  CouponCode:
+  CouponType:
     type: string
-    docs: The alias of the coupon type. This is used to identify the coupon type in the system. 
+    docs: The type of coupon
+    examples:
+      - name: ExampleCouponType
+        value: DISCOUNT
+
+  CouponNumber:
+    type: string
+    docs: The external reference number of the coupon. 
+    examples:
+      - name: ExampleCouponNumber
+        value: COUPON123
   
   CouponId:
-    type: string
+    type: uuid
     docs: The unique identifier of a coupon
     examples:
       - name: ExampleCouponId
-        value: COUPON123
+        value: 12345678-1234-1234-1234-123456789012
 
   Admitted:
       type: boolean

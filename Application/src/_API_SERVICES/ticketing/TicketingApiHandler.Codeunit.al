@@ -45,6 +45,8 @@ codeunit 6185082 "NPR TicketingApiHandler"
             // Ticketing
             _ApiFunction::GET_TICKET:
                 _Response := Ticket.GetTicket(_Request);
+            _ApiFunction::FIND_TICKETS:
+                _Response := Ticket.FindTickets(_Request);
             _ApiFunction::REQUEST_REVOKE_TICKET:
                 _Response := Ticket.RequestRevokeTicket(_Request);
             _ApiFunction::CONFIRM_REVOKE_TICKET:
