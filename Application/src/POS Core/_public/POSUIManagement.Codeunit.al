@@ -338,6 +338,8 @@
         CaptionsGlobalPreviewModeLbl: Label 'PREVIEW MODE';
         WorkflowsDisabledPreviewModeLbl: Label 'Running workflows in preview mode is not enabled';
         BalancingCashMovementsLbl: Label 'Cash Movements';
+        BalancingCashCountNotFinalizedLbl: Label 'You have not finalized Cash Count yet. Still need to finalize:';
+        BalancingPleaseGoBackToCashCountLbl: Label 'Please go back to Cash Count and finalize the above.';
         BalancingBalancingLbl: Label 'Balancing';
         BalancingCreatedAtLbl: Label 'Created At';
         BalancingDirectSalesCountLbl: Label 'Direct Sales Count';
@@ -855,6 +857,8 @@
         Captions.Add('Global_PreviewMode', CaptionsGlobalPreviewModeLbl);
         Captions.Add('Global_WorkflowsDisabledPreviewMode', WorkflowsDisabledPreviewModeLbl);
         Captions.Add('Balancing_CashMovements', BalancingCashMovementsLbl);
+        Captions.Add('Balancing_CashCountNotFinalized', BalancingCashCountNotFinalizedLbl);
+        Captions.Add('Balancing_PleaseGoBackToCashCount', BalancingPleaseGoBackToCashCountLbl);
         Captions.Add('Balancing_Balancing', BalancingBalancingLbl);
         Captions.Add('Balancing_CreatedAt', BalancingCreatedAtLbl);
         Captions.Add('Balancing_DirectSalesCount', BalancingDirectSalesCountLbl);
@@ -1126,7 +1130,7 @@
         Captions.Add('Global_Settings_Modal_EditorTabButton', GlobalSettingsModalEditorTabButtonLbl);
         Captions.Add('Global_Settings_Modal_MaintenanceTab', GlobalSettingsModalEditorMaintenanceTabLbl);
         Captions.Add('Global_Settings_Modal_MobilePosTab', GlobalSettingsModalMobilePosTabLbl);
-        Captions.Add('Global_Settings_ShortcutsTab',GlobalSettingsShortcutsTabLbl);
+        Captions.Add('Global_Settings_ShortcutsTab', GlobalSettingsShortcutsTabLbl);
         Captions.Add('Global_Settings_DecimalNumberDigits', GlobalSettingsDecimalNumberDigitsLbl);
         Captions.Add('Global_Settings_DecimalNumberDigitsInfo', GlobalSettingsDecimalNumberDigitsInfoLbl);
         Captions.Add('Global_Settings_NamedActions', GlobalSettingsNamedActionsLbl);
@@ -1160,12 +1164,12 @@
         Captions.Add('Global_Settings_Maintenance_ErrorHandling', GlobalSettingsMaintenanceErrorHandlingLbl);
         Captions.Add('Global_Settings_Maintenance_ShowLastStackTrace', GlobalSettingsMaintenanceShowLastStackTraceLbl);
         Captions.Add('Global_Shortcuts_Error_ShortcutAlreadyExists', GlobalShortcutsErrorShortcutAlreadyExistsLbl);
-        Captions.Add('Global_Shortcuts_Error_ShortcutIsPredefined',GlobalShortcutsErrorShortcutIsPredefinedLbl);
-        Captions.Add('Global_Shortcuts_WarningMessage',GlobalShortcutsWarningMessageLbl);
-        Captions.Add('Global_Shortcuts_ClickToAddShortcut',GlobalShortcutsClickToAddShortcutLbl);
+        Captions.Add('Global_Shortcuts_Error_ShortcutIsPredefined', GlobalShortcutsErrorShortcutIsPredefinedLbl);
+        Captions.Add('Global_Shortcuts_WarningMessage', GlobalShortcutsWarningMessageLbl);
+        Captions.Add('Global_Shortcuts_ClickToAddShortcut', GlobalShortcutsClickToAddShortcutLbl);
         Captions.Add('Global_Shortcuts_ClickToAddAction', GlobalShortcutsClickToAddActionLbl);
         Captions.Add('Global_Shortcuts_EditParameters', GlobalShortcutsEditParametersLbl);
-        Captions.Add('Global_Shortcuts_AddShortcut',GlobalShortcutsAddShortcutLbl);
+        Captions.Add('Global_Shortcuts_AddShortcut', GlobalShortcutsAddShortcutLbl);
         Captions.Add('Color_Settings_SelectPrimaryColor', ColorSettingsSelectPrimaryColorLbl);
         Captions.Add('Color_Settings_ChangeColor', ColorSettingsChangeColorLbl);
         Captions.Add('Color_Settings_SelectSecondaryColor', ColorSettingsSelectSecondaryColorLbl);
@@ -1283,9 +1287,9 @@
         Captions.Add('Statistics_TotalSalesTitle', StatisticsTotalSalesTitleLbl);
         Captions.Add('Statistics_SalesPerCustomerTitle', StatisticsSalesPerCustomerTitleLbl);
         Captions.Add('Statistics_SalesPerProductQuantityTitle', StatisticsSalesPerProductQuantityTitleLbl);
-        Captions.Add('Statistics_TotalSales',StatisticsTotalSalesLbl);
+        Captions.Add('Statistics_TotalSales', StatisticsTotalSalesLbl);
         Captions.Add('Statistics_SalesPerCustomer', StatisticsSalesPerCustomerLbl);
-        Captions.Add('Statistics_SalesPerProduct',StatisticsSalesPerProductLbl);
+        Captions.Add('Statistics_SalesPerProduct', StatisticsSalesPerProductLbl);
         Captions.Add('Statistics_OneDay', StatisticsOneDayLbl);
         Captions.Add('Statistics_SevenDays', StatisticsSevenDaysLbl);
 
