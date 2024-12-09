@@ -65,8 +65,10 @@
                     SaleLinePOSAddOn."Sale Date",
                     SaleLinePOSAddOn."Sale Type",
                     SaleLinePOSAddOn."Sale Line No.")
-                then
+                then begin
+                    DeleteAccessories(SaleLinePOS);
                     SaleLinePOS.Delete(true);
+                end;
             until SaleLinePOSAddOn.Next() = 0;
 
             SaleLinePOSAddOn.DeleteAll();
@@ -504,6 +506,8 @@
     local procedure InsertPOSAddOnLine(ItemAddOnLine: Record "NPR NpIa Item AddOn Line"; SalePOS: Record "NPR POS Sale"; POSSaleLine: Codeunit "NPR POS Sale Line"; AppliesToLineNo: Integer; var SaleLinePOS: Record "NPR POS Sale Line"): Boolean
     var
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+        Item: Record Item;
+        POSActionInsertItemB: Codeunit "NPR POS Action: Insert Item B";
         ItemAddOn: Codeunit "NPR NpIa Item AddOn";
         LineNo: Integer;
         PrevRec: Text;
@@ -577,6 +581,9 @@
             POSSaleLine.SetUsePresetLineNo(true);
             POSSaleLine.InsertLine(SaleLinePOS);
             POSSaleLine.SetUsePresetLineNo(false);
+
+            if Item.Get(SaleLinePOS."No.") then
+                POSActionInsertItemB.AddAccessories(Item, POSSaleLine);
 
             if not IsAutoSplitKeyRecord then
                 IsAutoSplitKeyRecord := POSSaleLine.InsertedWithAutoSplitKey();
@@ -1136,6 +1143,15 @@
                     if not ToItemAddOnLine.Find() then
                         ToItemAddOnLine.Insert();
             until FromItemAddOnLine.Next() = 0;
+    end;
+
+    local procedure DeleteAccessories(SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSActDeletePOSLineB: Codeunit "NPR POSAct:Delete POS Line-B";
+    begin
+        POSSaleLine.SetPosition(SaleLinePOS.GetPosition());
+        POSActDeletePOSLineB.DeleteAccessories(POSSaleLine);
     end;
 
     local procedure JObjectToText(JObject: JsonObject) Text: Text

@@ -227,7 +227,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         SaleLinePOS.ExplodeBOM(SaleLinePOS."No.", 0, 0, Level, 0, 0);
     end;
 
-    local procedure AddAccessories(Item: Record Item; POSSaleLine: Codeunit "NPR POS Sale Line")
+    internal procedure AddAccessories(Item: Record Item; POSSaleLine: Codeunit "NPR POS Sale Line")
     var
         AccessorySparePart: Record "NPR Accessory/Spare Part";
     begin
@@ -290,10 +290,10 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
             DerivedPOSSaleLine.SetRange("Derived from Line", AccessorySaleLinePOS.SystemId);
             if DerivedPOSSaleLine.FindSet() then
                 repeat
-                    ConvertPriceAndAssignNecessaryFields(AccessorySparePart, DerivedPOSSaleLine, POSSaleLine, MainSaleLinePOS."Line No.", Item, GroupAccessory);
+                    ConvertPriceAndAssignNecessaryFields(AccessorySparePart, DerivedPOSSaleLine, POSSaleLine, MainSaleLinePOS."Line No.", MainSaleLinePOS.Indentation, Item, GroupAccessory);
                 until DerivedPOSSaleLine.Next() = 0;
 
-            ConvertPriceAndAssignNecessaryFields(AccessorySparePart, AccessorySaleLinePOS, POSSaleLine, MainSaleLinePOS."Line No.", Item, GroupAccessory);
+            ConvertPriceAndAssignNecessaryFields(AccessorySparePart, AccessorySaleLinePOS, POSSaleLine, MainSaleLinePOS."Line No.", MainSaleLinePOS.Indentation, Item, GroupAccessory);
             POSSaleLine.RefreshCurrent();
         until (AccessorySparePart.Next() = 0);
 
@@ -303,6 +303,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
                                                         var SaleLinePOS: Record "NPR POS Sale Line";
                                                         POSSaleLine: Codeunit "NPR POS Sale Line";
                                                         MainSaleLinePOSLineNo: Integer;
+                                                        MainSaleLinePOSIndentation: Integer;
                                                         Item: Record Item;
                                                         GroupAccessory: Boolean)
     var
@@ -323,6 +324,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         SaleLinePOS.Accessory := true;
         SaleLinePOS."Main Item No." := Item."No.";
         SaleLinePOS."Main Line No." := MainSaleLinePOSLineNo;
+        SaleLinePOS.Indentation := MainSaleLinePOSIndentation;
 
         SaleLinePOS.Modify();
     end;
