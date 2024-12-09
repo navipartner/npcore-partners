@@ -150,6 +150,23 @@ page 6150768 "NPR SI POS Audit Log Aux. Info"
                     SIFiscalThermalPrint.PrintReceipt(Rec);
                 end;
             }
+            action(PrintA4Report)
+            {
+                ApplicationArea = NPRSIFiscal;
+                Caption = 'Print A4 Fiscal';
+                Image = PrintVoucher;
+                Promoted = true;
+                PromotedCategory = Category5;
+                PromotedOnly = true;
+                ToolTip = 'Executing this action will print either the original or a copy of the receipt in A4 format.';
+                trigger OnAction()
+                var
+                    SIFiscalBillA4: Report "NPR SI Fiscal Bill A4";
+                begin
+                    SIFiscalBillA4.SetFilters(Rec."Audit Entry Type", Rec."Audit Entry No.", Rec."Source Document No.");
+                    SIFiscalBillA4.RunModal();
+                end;
+            }
 
             action(DownloadRequest)
             {
