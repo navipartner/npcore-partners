@@ -36,6 +36,8 @@ codeunit 6059880 "NPR POS Action: Change View-B"
 
                         POSSession.GetSale(POSSale);
                         POSSale.GetCurrentSale(SalePOS);
+                        if CheckIfPOSSaleEmpty(SalePOS."Register No.", SalePOS."Sales Ticket No.") then
+                            SalePOS."Empty Sale On Login/Logout" := true;
                         POSTryCancelSale.DoCancelSale(SalePOS, POSSession);
                     end;
 
@@ -55,5 +57,15 @@ codeunit 6059880 "NPR POS Action: Change View-B"
                     POSSession.ChangeViewLocked();
                 end;
         end;
+    end;
+
+    local procedure CheckIfPOSSaleEmpty(RegisterNo: Code[10]; SalesTicketNo: Code[20]): Boolean
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+    begin
+        POSSaleLine.SetRange("Register No.", RegisterNo);
+        POSSaleLine.SetRange("Sales Ticket No.", SalesTicketNo);
+        if POSSaleLine.IsEmpty() then
+            exit(true);
     end;
 }

@@ -794,6 +794,12 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR MM Loyalty Sales Channel".Code;
         }
+        field(6020; "Empty Sale On Login/Logout"; Boolean)
+        {
+            Caption = 'Empty Sale On Login/Logout';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
     }
 
     keys

@@ -48,7 +48,8 @@
 
         if POSAuditProfile.Get(POSUnit."POS Audit Profile") then
             if ((POSEntry."Entry Type" <> POSEntry."Entry Type"::"Cancelled Sale") and POSAuditProfile."Do Not Print Receipt on Sale") or
-               ((POSEntry."Entry Type" = POSEntry."Entry Type"::"Cancelled Sale") and not POSAuditProfile."Print Receipt On Sale Cancel")
+               ((POSEntry."Entry Type" = POSEntry."Entry Type"::"Cancelled Sale") and not POSAuditProfile."Print Receipt On Sale Cancel") or
+               ((POSEntry."Entry Type" = POSEntry."Entry Type"::"Cancelled Sale") and POSAuditProfile."Print Receipt On Sale Cancel" and SalePOS."Empty Sale On Login/Logout")
             then
                 exit;
 
