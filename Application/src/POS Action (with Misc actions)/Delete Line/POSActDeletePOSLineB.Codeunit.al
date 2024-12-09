@@ -54,7 +54,7 @@ codeunit 6060097 "NPR POSAct:Delete POS Line-B"
 
     end;
 
-    local procedure DeleteAccessories(POSSaleLine: Codeunit "NPR POS Sale Line")
+    internal procedure DeleteAccessories(POSSaleLine: Codeunit "NPR POS Sale Line")
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         SaleLinePOS2: Record "NPR POS Sale Line";
