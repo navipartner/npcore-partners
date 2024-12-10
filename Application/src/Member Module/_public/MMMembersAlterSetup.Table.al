@@ -215,6 +215,11 @@
             OptionCaption = 'Ignore,Prevent,Update Existing,Issue New';
             OptionMembers = IGNORE,PREVENT,UPDATE,NEW;
         }
+        field(140; PrintCardOnAlteration; Boolean)
+        {
+            Caption = 'Print Card On Alteration';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
