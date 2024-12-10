@@ -200,6 +200,12 @@
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     ToolTip = 'Specifies the value of the Age Constraint Applies To field.';
                 }
+                field(PrintCardOnAlteration; Rec.PrintCardOnAlteration)
+                {
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ToolTip = 'Specifies the value of the Print Card On Alteration field.', Comment = '%';
+                }
+
             }
         }
     }

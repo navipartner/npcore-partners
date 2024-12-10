@@ -272,7 +272,7 @@
                         begin
                             PrintMembershipSalesReceiptWorker(Membership, MembershipSetup);
 
-                            if (ForceCardPrint or (CheckSalesSetupForCardPrint(MembershipEntry."Item No."))) then begin
+                            if (ForceCardPrint or (CheckSalesSetupForCardPrint(MembershipEntry))) then begin
                                 if (MembershipEntry."Member Card Entry No." <> 0) then begin
                                     MemberCard2.SetFilter("Entry No.", '%1..', MembershipEntry."Member Card Entry No.");
                                     MemberCard2.SetFilter("Membership Entry No.", '=%1', MembershipEntry."Membership Entry No.");
@@ -291,7 +291,7 @@
                         begin
                             MembershipManagement.PrintOffline(MemberInfoCapture."Information Context"::PRINT_MEMBERSHIP, MembershipEntry."Membership Entry No.");
 
-                            if (ForceCardPrint or (CheckSalesSetupForCardPrint(MembershipEntry."Item No."))) then begin
+                            if (ForceCardPrint or (CheckSalesSetupForCardPrint(MembershipEntry))) then begin
                                 if (MembershipEntry."Member Card Entry No." <> 0) then begin
                                     MemberCard.SetFilter("Entry No.", '%1..', MembershipEntry."Member Card Entry No.");
                                     MemberCard.SetFilter("Membership Entry No.", '=%1', MembershipEntry."Membership Entry No.");
@@ -444,17 +444,56 @@
         end;
     end;
 
-    local procedure CheckSalesSetupForCardPrint(ItemNo: Code[20]): Boolean
+    local procedure CheckSalesSetupForCardPrint(MembershipEntry: Record "NPR MM Membership Entry"): Boolean
     var
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
+        PreviousMembershipEntry: Record "NPR MM Membership Entry";
+        HavePhysicalCard: Boolean;
     begin
+        HavePhysicalCard := false;
 
-        MembershipSalesSetup.SetFilter(Type, '=%1', MembershipSalesSetup.Type::ITEM);
-        MembershipSalesSetup.SetFilter("No.", '=%1', ItemNo);
-        if (not MembershipSalesSetup.FindFirst()) then
-            exit(true); // the setup was deleted - assume true
+        if (MembershipEntry.Context = MembershipEntry.Context::NEW) then begin
+            MembershipSalesSetup.SetFilter(Type, '=%1', MembershipSalesSetup.Type::ITEM);
+            MembershipSalesSetup.SetFilter("No.", '=%1', MembershipEntry."Item No.");
+            if (not MembershipSalesSetup.FindFirst()) then
+                exit(true); // the setup was not found - assume print for new memberships
 
-        exit(MembershipSalesSetup."Member Card Type" in [MembershipSalesSetup."Member Card Type"::CARD, MembershipSalesSetup."Member Card Type"::CARD_PASSSERVER]);
+            HavePhysicalCard := MembershipSalesSetup."Member Card Type" in [MembershipSalesSetup."Member Card Type"::CARD, MembershipSalesSetup."Member Card Type"::CARD_PASSSERVER];
+        end;
+
+        if (MembershipEntry.Context in [MembershipEntry.Context::RENEW, MembershipEntry.Context::UPGRADE, MembershipEntry.Context::EXTEND]) then begin
+            PreviousMembershipEntry.SetCurrentKey("Membership Entry No.");
+            PreviousMembershipEntry.SetFilter("Membership Entry No.", '=%1', MembershipEntry."Membership Entry No.");
+            PreviousMembershipEntry.SetFilter(Context, '=%1', MembershipEntry.Context::NEW);
+            if (PreviousMembershipEntry.FindFirst()) then begin
+                // Figure out the card setup for the membership that is being renewed, upgraded or extended
+                if (MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, PreviousMembershipEntry."Item No.")) then
+                    HavePhysicalCard := MembershipSalesSetup."Member Card Type" in [MembershipSalesSetup."Member Card Type"::CARD, MembershipSalesSetup."Member Card Type"::CARD_PASSSERVER];
+            end;
+
+            PreviousMembershipEntry.SetFilter("Entry No.", '<%1', MembershipEntry."Entry No.");
+            PreviousMembershipEntry.SetFilter(Blocked, '=%1', false);
+            PreviousMembershipEntry.SetFilter(Context, '<>%1', MembershipEntry.Context::REGRET);
+            if (not PreviousMembershipEntry.FindLast()) then
+                PreviousMembershipEntry := MembershipEntry; // There should be a previous membership entry when doing renew, upgrade or extend
+
+            case MembershipEntry.Context of
+                MembershipEntry.Context::RENEW:
+                    if (not MembershipAlterationSetup.Get(MembershipAlterationSetup."Alteration Type"::RENEW, PreviousMembershipEntry."Membership Code", MembershipEntry."Item No.")) then
+                        exit(false); // the setup was not found - assume no print
+                MembershipEntry.Context::UPGRADE:
+                    if (not MembershipAlterationSetup.Get(MembershipAlterationSetup."Alteration Type"::UPGRADE, PreviousMembershipEntry."Membership Code", MembershipEntry."Item No.")) then
+                        exit(false); // the setup was not found - assume no print
+                MembershipEntry.Context::EXTEND:
+                    if (not MembershipAlterationSetup.Get(MembershipAlterationSetup."Alteration Type"::EXTEND, PreviousMembershipEntry."Membership Code", MembershipEntry."Item No.")) then
+                        exit(false); // the setup was not found - assume no print
+            end;
+
+            HavePhysicalCard := (HavePhysicalCard and MembershipAlterationSetup.PrintCardOnAlteration);
+        end;
+
+        exit(HavePhysicalCard);
     end;
 
     procedure IssueTicketFromMemberScan(Member: Record "NPR MM Member"; ItemCrossReference: Code[50]; var TicketNo: Code[20]; var ResponseMessage: Text): Integer
