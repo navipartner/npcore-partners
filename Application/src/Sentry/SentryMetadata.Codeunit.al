@@ -15,8 +15,8 @@ codeunit 6150966 "NPR Sentry Metadata"
         Handled := true;
 
         Json.WriteStartObject('');
-        Json.WriteStringProperty('sentryKey', AzureKeyVaultMgt.GetAzureKeyVaultSecret('SentryIODragonglass'));
-        Json.WriteStringProperty('sessionRecordAll', SessionRecordingEnabled());
+        Json.WriteStringProperty('sentryKey', AzureKeyVaultMgt.GetAzureKeyVaultSecret('SentryIODragonglassEU'));
+        Json.WriteStringProperty('sessionRecordAll', true);
         WriteMetadataJson(Json);
         Json.WriteEndObject();
         Response.ReadFrom(Json.GetJSonAsText());
@@ -47,10 +47,10 @@ codeunit 6150966 "NPR Sentry Metadata"
         Json.WriteStringProperty('POSStore', POSUnit."POS Store Code");
         Json.WriteStringProperty('VATNumber', CompanyInformation."VAT Registration No.");
         if InstalledApp.Get('992c2309-cca4-43cb-9e41-911f482ec088') then begin
-            Json.WriteStringProperty('retailAppVersion', StrSubstNo('%1.%2.%3.%4', InstalledApp."Version Major", InstalledApp."Version Minor", InstalledApp."Version Revision", InstalledApp."Version Build"));
+            Json.WriteStringProperty('retailAppVersion', StrSubstNo('%1.%2.%3.%4', InstalledApp."Version Major", InstalledApp."Version Minor", InstalledApp."Version Build", InstalledApp."Version Revision"));
         end;
         if InstalledApp.Get('437dbf0e-84ff-417a-965d-ed2bb9650972') then begin
-            Json.WriteStringProperty('baseAppVersion', StrSubstNo('%1.%2.%3.%4', InstalledApp."Version Major", InstalledApp."Version Minor", InstalledApp."Version Revision", InstalledApp."Version Build"));
+            Json.WriteStringProperty('baseAppVersion', StrSubstNo('%1.%2.%3.%4', InstalledApp."Version Major", InstalledApp."Version Minor", InstalledApp."Version Build", InstalledApp."Version Revision"));
         end;
         Json.WriteStringProperty('companyName', CompanyName());
         case true of
@@ -68,40 +68,6 @@ codeunit 6150966 "NPR Sentry Metadata"
             Json.WriteStringProperty('sessionUniqueId', Format(ActiveSession."Session Unique ID", 0, 4).ToLower());
             Json.WriteStringProperty('serverInstanceName', ActiveSession."Server Instance Name");
         end;
-        Json.WriteStringProperty('POSType', Format(POSUnit."POS Type"));
-    end;
-
-    local procedure SessionRecordingEnabled(): Boolean
-    var
-        EnvironmentInformation: Codeunit "Environment Information";
-        NavipartnerManaged: Boolean;
-    begin
-        if EnvironmentInformation.IsSaaS() then begin
-            if CheckIfNavipartnerManagedSaaSTenant(NavipartnerManaged) then begin
-                exit(NavipartnerManaged);
-            end else begin
-                exit(false);
-            end;
-        end;
-
-        exit(true); //onprem
-    end;
-
-    [TryFunction]
-    local procedure CheckIfNavipartnerManagedSaaSTenant(var IsNaviPartnerManaged: Boolean)
-    var
-        AzureADTenant: Codeunit "Azure AD Tenant";
-        Http: HttpClient;
-        HttpResponse: HttpResponseMessage;
-        Response: Text;
-        JSON: JsonObject;
-        JToken: JsonToken;
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
-    begin
-        Http.Get('https://api.navipartner.dk/customer-mgt/v1/get?subscription-key=' + AzureKeyVaultMgt.GetAzureKeyVaultSecret('CustomerMgtAzureAPI') + '&tenantId=' + AzureADTenant.GetAadTenantId(), HttpResponse);
-        HttpResponse.Content.ReadAs(Response);
-        JSON.ReadFrom(Response);
-        JSON.Get('isNpCustomer', JToken);
-        IsNaviPartnerManaged := JToken.AsValue().AsBoolean();
+        Json.WriteStringProperty('POSType', Format(POSUnit."POS Type", 0, 9));
     end;
 }
