@@ -76,7 +76,7 @@
                 if SalesLCY <> 0 then
                     DgTotal += (Db / SalesLCY) * 100;
 
-                if DiscountAmount <> 0 then
+                if (SalesLCY + DiscountAmount) <> 0 then
                     DiscountPctTotal += DiscountAmount / (SalesLCY + DiscountAmount) * 100;
             end;
 
