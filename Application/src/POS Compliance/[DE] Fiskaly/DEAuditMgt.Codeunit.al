@@ -8,6 +8,16 @@
         exit('DE_FISKALY');
     end;
 
+    internal procedure IsDEFiscalizationEnabled(): Boolean
+    var
+        DEFiscalizationSetup: Record "NPR DE Fiscalization Setup";
+    begin
+        if not DEFiscalizationSetup.Get() then
+            exit(false);
+
+        exit(DEFiscalizationSetup."Enable DE Fiscal");
+    end;
+
     local procedure IsEnabled(POSAuditProfileCode: Code[20]): Boolean
     var
         POSAuditProfile: Record "NPR POS Audit Profile";
@@ -500,6 +510,38 @@
         Clear(DSFINVKClosing."Closing ID");
         DSFINVKClosing.Modify();
     end;
+
+    #region DE Fiscal - Aux and Mapping Tables Cleanup
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Payment Method", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure PaymentMethod_OnAfterDeleteEvent(var Rec: Record "NPR POS Payment Method"; RunTrigger: Boolean)
+    var
+        DEPaymentMethodMapping: Record "NPR Payment Method Mapper";
+    begin
+        if not RunTrigger then
+            exit;
+        if Rec.IsTemporary() then
+            exit;
+        if not IsDEFiscalizationEnabled() then
+            exit;
+        if DEPaymentMethodMapping.Get(Rec.Code) then
+            DEPaymentMethodMapping.Delete(true);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"VAT Posting Setup", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure VATPostingSetup_OnAfterDeleteEvent(var Rec: Record "VAT Posting Setup"; RunTrigger: Boolean)
+    var
+        VATPostGroupMapper: Record "NPR VAT Post. Group Mapper";
+    begin
+        if not RunTrigger then
+            exit;
+        if Rec.IsTemporary() then
+            exit;
+        if not IsDEFiscalizationEnabled() then
+            exit;
+        if VATPostGroupMapper.Get(Rec."VAT Prod. Posting Group", Rec."VAT Bus. Posting Group") then
+            VATPostGroupMapper.Delete(true);
+    end;
+    #endregion
 
     [IntegrationEvent(false, false)]
     local procedure OnHandleDEAuditAuxLogBeforeInsert(var DEPOSAuditAuxLog: Record "NPR DE POS Audit Log Aux. Info")
