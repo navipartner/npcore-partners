@@ -387,7 +387,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
             RSAuxSalesHeader.SaveRSAuxSalesHeaderFields();
         end;
     end;
-
+    #region RS Fiscal - Aux and Mapping Tables Cleanup 
     [EventSubscriber(ObjectType::Table, Database::"Sales Invoice Header", 'OnAfterDeleteEvent', '', false, false)]
     local procedure SalesInvoiceHeader_OnAfterDeleteEvent(var Rec: Record "Sales Invoice Header"; RunTrigger: Boolean)
     var
@@ -401,6 +401,35 @@ codeunit 6059942 "NPR RS Audit Mgt."
         if RSAuxSalesInvHeader.Get(Rec."No.") then
             RSAuxSalesInvHeader.Delete();
     end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Sales Cr.Memo Header", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure SalesCrMemoHeader_OnAfterDeleteEvent(var Rec: Record "Sales Cr.Memo Header"; RunTrigger: Boolean)
+    var
+        RSAuxSalesCrMemoHeader: Record "NPR RS Aux Sales CrMemo Header";
+    begin
+        if not RunTrigger then
+            exit;
+        if not IsRSFiscalActive() then
+            exit;
+
+        if RSAuxSalesCrMemoHeader.Get(Rec."No.") then
+            RSAuxSalesCrMemoHeader.Delete(true);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Payment Method", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure PaymentMethod_OnAfterDeleteEvent(var Rec: Record "NPR POS Payment Method"; RunTrigger: Boolean)
+    var
+        RSPaymentMethodMapping: Record "NPR RS POS Paym. Meth. Mapping";
+    begin
+        if not RunTrigger then
+            exit;
+        if not IsRSFiscalActive() then
+            exit;
+
+        if RSPaymentMethodMapping.Get(Rec.Code) then
+            RSPaymentMethodMapping.Delete(true);
+    end;
+    #endregion
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterSalesInvHeaderInsert', '', false, false)]
     local procedure OnAfterSalesInvHeaderInsert(var SalesInvHeader: Record "Sales Invoice Header"; SalesHeader: Record "Sales Header");

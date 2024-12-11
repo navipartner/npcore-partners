@@ -548,4 +548,52 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
         end;
     end;
     #endregion
+    #region BG SIS Fiscal - Aux and Mapping Tables Cleanup
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Payment Method", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure PaymentMethod_OnAfterDeleteEvent(var Rec: Record "NPR POS Payment Method"; RunTrigger: Boolean)
+    var
+        BGSISPaymentMethodMapping: Record "NPR BG SIS POS Paym. Meth. Map";
+    begin
+        if not RunTrigger then
+            exit;
+        if Rec.IsTemporary() then
+            exit;
+        if not IsBGSISFiscalEnabled() then
+            exit;
+        if BGSISPaymentMethodMapping.Get(Rec.Code) then
+            BGSISPaymentMethodMapping.Delete(true);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Unit", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure POSUnit_OnAfterDeleteEvent(var Rec: Record "NPR POS Unit"; RunTrigger: Boolean)
+    var
+        BGSISPOSUnitMapping: Record "NPR BG SIS POS Unit Mapping";
+    begin
+        if not RunTrigger then
+            exit;
+        if Rec.IsTemporary() then
+            exit;
+        if not IsBGSISFiscalEnabled() then
+            exit;
+        if BGSISPOSUnitMapping.Get(Rec."No.") then
+            BGSISPOSUnitMapping.Delete(true);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"VAT Posting Setup", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure VATPostingSetup_OnAfterDeleteEvent(var Rec: Record "VAT Posting Setup"; RunTrigger: Boolean)
+    var
+        VATPostGroupMapper: Record "NPR BG SIS VAT Post. Setup Map";
+    begin
+        if not RunTrigger then
+            exit;
+        if Rec.IsTemporary() then
+            exit;
+        if not IsBGSISFiscalEnabled() then
+            exit;
+        if VATPostGroupMapper.Get(Rec."VAT Bus. Posting Group", Rec."VAT Prod. Posting Group") then
+            VATPostGroupMapper.Delete(true);
+    end;
+
+    #endregion
 }

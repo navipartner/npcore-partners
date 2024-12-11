@@ -185,4 +185,21 @@ codeunit 6184708 "NPR HU MS Audit Mgt."
         until POSEntryPaymentLine.Next() = 0;
         exit(true);
     end;
+    #region HUMS Fiscal - Aux and Mapping Tables Cleanup
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Payment Method", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure PaymentMethod_OnAfterDeleteEvent(var Rec: Record "NPR POS Payment Method"; RunTrigger: Boolean)
+    var
+        HUMSPaymentMethodMapping: Record "NPR HU MS Payment Method Map.";
+    begin
+        if not RunTrigger then
+            exit;
+        if Rec.IsTemporary() then
+            exit;
+        if not IsHUFiscalActive() then
+            exit;
+        if HUMSPaymentMethodMapping.Get(Rec.Code) then
+            HUMSPaymentMethodMapping.Delete(true);
+    end;
+    #endregion
 }

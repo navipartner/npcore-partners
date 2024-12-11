@@ -636,4 +636,52 @@ codeunit 6184848 "NPR AT Audit Mgt."
     begin
     end;
     #endregion
+
+    #region AT Fiscal - Aux and Mapping Tables Cleanup
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Payment Method", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure PaymentMethod_OnAfterDeleteEvent(var Rec: Record "NPR POS Payment Method"; RunTrigger: Boolean)
+    var
+        ATPaymentMethodMapping: Record "NPR AT POS Payment Method Map";
+    begin
+        if not RunTrigger then
+            exit;
+        if Rec.IsTemporary() then
+            exit;
+        if not IsATFiscalizationEnabled() then
+            exit;
+        if ATPaymentMethodMapping.Get(Rec.Code) then
+            ATPaymentMethodMapping.Delete(true);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"VAT Posting Setup", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure VATPostingSetup_OnAfterDeleteEvent(var Rec: Record "VAT Posting Setup"; RunTrigger: Boolean)
+    var
+        VATPostGroupMapper: Record "NPR AT VAT Posting Setup Map";
+    begin
+        if not RunTrigger then
+            exit;
+        if Rec.IsTemporary() then
+            exit;
+        if not IsATFiscalizationEnabled() then
+            exit;
+        if VATPostGroupMapper.Get(Rec."VAT Bus. Posting Group", Rec."VAT Prod. Posting Group") then
+            VATPostGroupMapper.Delete(true);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Unit", 'OnAfterDeleteEvent', '', false, false)]
+    local procedure POSUnit_OnAfterDeleteEvent(var Rec: Record "NPR POS Unit"; RunTrigger: Boolean)
+    var
+        CashRegister: Record "NPR AT Cash Register";
+    begin
+        if not RunTrigger then
+            exit;
+        if Rec.IsTemporary() then
+            exit;
+        if not IsATFiscalizationEnabled() then
+            exit;
+        if CashRegister.Get(Rec."No.") then
+            CashRegister.Delete(true);
+    end;
+    #endregion
 }

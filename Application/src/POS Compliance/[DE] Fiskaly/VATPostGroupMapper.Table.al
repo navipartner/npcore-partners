@@ -10,6 +10,7 @@
         {
             Caption = 'VAT Product Posting Group';
             DataClassification = CustomerContent;
+            TableRelation = "VAT Product Posting Group";
 
             trigger OnLookup()
             var
@@ -30,6 +31,7 @@
         {
             Caption = 'VAT Bus. Posting Group';
             DataClassification = CustomerContent;
+            TableRelation = "VAT Business Posting Group";
         }
         field(3; "VAT Identifier"; Code[20])
         {

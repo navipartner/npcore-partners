@@ -8,9 +8,9 @@ table 6059827 "NPR RS Aux Sales CrMemo Header"
     {
         field(1; "Sales Cr.Memo Header No."; Code[20])
         {
-            Caption = 'Sales Cr. Memo Header SystemId';
+            Caption = 'Sales Cr. Memo Header No.';
             DataClassification = CustomerContent;
-            TableRelation = "Sales Cr.Memo Header".SystemId;
+            TableRelation = "Sales Cr.Memo Header"."No.";
         }
         field(10; "NPR RS POS Unit"; Code[10])
         {
