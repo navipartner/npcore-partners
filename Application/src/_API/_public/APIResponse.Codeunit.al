@@ -170,86 +170,170 @@ codeunit 6185053 "NPR API Response"
     #endregion
 
     #region Standard Responses
+    /// <summary>
+    /// Responds with an HTTP 200 OK status and a simple JSON response containing a single value.
+    /// </summary>
+    /// <param name="Value">The text value to be included in the response.</param>
+    /// <returns>An API response with OK (200) status and a JSON object with the given value.</returns>
     procedure RespondOK(Value: Text): Codeunit "NPR API Response"
     begin
         exit(CreateSuccessResponse("NPR API HTTP Status Code"::OK, CreateSimpleJsonResponse('value', Value)));
     end;
 
+    /// <summary>
+    /// Responds with an HTTP 200 OK status and the provided JSON object.
+    /// </summary>
+    /// <param name="Value">The JSON object to be returned in the response.</param>
+    /// <returns>An API response with OK (200) status and the given JSON object.</returns>
     procedure RespondOK(Value: JsonObject): Codeunit "NPR API Response"
     begin
         exit(CreateSuccessResponse("NPR API HTTP Status Code"::OK, Value));
     end;
 
+    /// <summary>
+    /// Responds with an HTTP 200 OK status and the provided JSON array.
+    /// </summary>
+    /// <param name="Value">The JSON array to be returned in the response.</param>
+    /// <returns>An API response with OK (200) status and the given JSON array.</returns>
     procedure RespondOK(Value: JsonArray): Codeunit "NPR API Response"
     begin
         exit(CreateSuccessResponse("NPR API HTTP Status Code"::OK, Value));
     end;
 
+    /// <summary>
+    /// Responds with an HTTP 200 OK status and the provided JSON stream.
+    /// </summary>
+    /// <param name="JsonStream">The JSON input stream to be returned in the response.</param>
+    /// <returns>An API response with OK (200) status and the given JSON stream.</returns>
     procedure RespondOK(JsonStream: InStream): Codeunit "NPR API Response"
     begin
         exit(CreateSuccessResponse("NPR API HTTP Status Code"::OK, JsonStream));
     end;
 
+    /// <summary>
+    /// Responds with an HTTP 200 OK status using a JSON builder.
+    /// </summary>
+    /// <param name="JsonBuilder">The JSON builder used to construct the response payload.</param>
+    /// <returns>An API response with OK (200) status and the built JSON object.</returns>
     procedure RespondOK(JsonBuilder: Codeunit "NPR JSON Builder"): Codeunit "NPR API Response"
     begin
         exit(CreateSuccessResponse("NPR API HTTP Status Code"::OK, JsonBuilder.Build()));
     end;
 
+    /// <summary>
+    /// Responds with an HTTP 201 Created status and a simple JSON response containing a single value.
+    /// </summary>
+    /// <param name="Value">The text value to be included in the response.</param>
+    /// <returns>An API response with Created (201) status and a JSON object with the given value.</returns>
     procedure RespondCreated(Value: Text): Codeunit "NPR API Response"
     begin
         exit(CreateSuccessResponse("NPR API HTTP Status Code"::Created, CreateSimpleJsonResponse('value', Value)));
     end;
 
+    /// <summary>
+    /// Responds with an HTTP 201 Created status and the provided JSON object.
+    /// </summary>
+    /// <param name="Value">The JSON object to be returned in the response.</param>
+    /// <returns>An API response with Created (201) status and the given JSON object.</returns>
     procedure RespondCreated(Value: JsonObject): Codeunit "NPR API Response"
     begin
         exit(CreateSuccessResponse("NPR API HTTP Status Code"::Created, Value));
     end;
 
+    /// <summary>
+    /// Responds with an HTTP 201 Created status and the provided JSON array.
+    /// </summary>
+    /// <param name="Value">The JSON array to be returned in the response.</param>
+    /// <returns>An API response with Created (201) status and the given JSON array.</returns>
     procedure RespondCreated(Value: JsonArray): Codeunit "NPR API Response"
     begin
         exit(CreateSuccessResponse("NPR API HTTP Status Code"::Created, Value));
     end;
 
+    /// <summary>
+    /// Responds with an HTTP 204 No Content status.
+    /// </summary>
+    /// <returns>An API response with No Content (204) status.</returns>
     procedure RespondNoContent(): Codeunit "NPR API Response"
     begin
         exit(CreateSuccessResponse("NPR API HTTP Status Code"::"No Content", CreateEmptyJsonObject()));
     end;
 
+    /// <summary>
+    /// Responds with an HTTP 400 Bad Request status using a generic error code.
+    /// </summary>
+    /// <returns>An API response with Bad Request (400) status and a generic error.</returns>
     procedure RespondBadRequest(): Codeunit "NPR API Response"
     begin
         exit(CreateErrorResponse("NPR API Error Code"::generic_error));
     end;
 
+    /// <summary>
+    /// Responds with an HTTP 400 Bad Request status using a specific error code.
+    /// </summary>
+    /// <param name="ErrorCode">The specific error code to be used in the response.</param>
+    /// <returns>An API response with Bad Request (400) status and the specified error code.</returns>
     procedure RespondBadRequest(ErrorCode: Enum "NPR API Error Code"): Codeunit "NPR API Response"
     begin
         exit(CreateErrorResponse(ErrorCode));
     end;
 
+
+    /// <summary>
+    /// Responds with an HTTP 400 Bad Request status using a specific error code and message.
+    /// </summary>
+    /// <param name="ErrorCode">The specific error code to be used in the response.</param>
+    /// <param name="ErrorMessage">A descriptive error message to provide additional context.</param>
+    /// <returns>An API response with Bad Request (400) status, specified error code, and message.</returns>
     procedure RespondBadRequest(ErrorCode: Enum "NPR API Error Code"; ErrorMessage: Text): Codeunit "NPR API Response"
     begin
         exit(CreateErrorResponse(ErrorCode, ErrorMessage));
     end;
 
+    /// <summary>
+    /// Responds with an HTTP 400 Bad Request status using a generic error code and custom message.
+    /// </summary>
+    /// <param name="ErrorMessage">A descriptive error message to provide additional context.</param>
+    /// <returns>An API response with Bad Request (400) status, generic error code, and custom message.</returns>
     procedure RespondBadRequest(ErrorMessage: Text): Codeunit "NPR API Response"
     begin
         exit(CreateErrorResponse("NPR API Error Code"::generic_error, ErrorMessage));
     end;
 
+    /// <summary>
+    /// Responds with an HTTP 400 Bad Request status for an unsupported HTTP method.
+    /// </summary>
+    /// <param name="UnsupportedHttpMethod">The HTTP method that is not supported.</param>
+    /// <returns>An API response with Bad Request (400) status and an unsupported method error.</returns>
     procedure RespondBadRequestUnsupportedHttpMethod(UnsupportedHttpMethod: Enum "Http Method"): Codeunit "NPR API Response"
     begin
         exit(RespondBadRequest("NPR API Error Code"::unsupported_http_method, StrSubstNo(UnsupportedHttpMethodErr, UnsupportedHttpMethod)));
     end;
 
+    /// <summary>
+    /// Responds with an HTTP 404 Not Found status using a generic resource not found error code.
+    /// </summary>
+    /// <returns>An API response with Not Found (404) status and a resource not found error.</returns>
     procedure RespondResourceNotFound(): Codeunit "NPR API Response"
     begin
         exit(CreateErrorResponse("NPR API Error Code"::resource_not_found, "NPR API HTTP Status Code"::"Not Found"));
     end;
 
+    /// <summary>
+    /// Responds with an HTTP 404 Not Found status for a specific HTTP resource.
+    /// </summary>
+    /// <param name="HttpResource">The name or identifier of the resource that was not found.</param>
+    /// <returns>An API response with Not Found (404) status and a specific resource not found error.</returns>
     procedure RespondResourceNotFound(HttpResource: Text): Codeunit "NPR API Response"
     begin
         exit(CreateErrorResponse("NPR API Error Code"::resource_not_found, StrSubstNo(ResourceNotFoundErr, HttpResource), "NPR API HTTP Status Code"::"Not Found"));
     end;
 
+    /// <summary>
+    /// Responds with an HTTP 403 Forbidden status and a custom error message.
+    /// </summary>
+    /// <param name="Message">A descriptive message explaining the reason for forbidden access.</param>
+    /// <returns>An API response with Forbidden (403) status and the provided error message.</returns>
     procedure RespondForbidden(Message: Text): Codeunit "NPR API Response"
     begin
         exit(CreateErrorResponse("NPR API Error Code"::generic_error, Message, "NPR API HTTP Status Code"::Forbidden));
