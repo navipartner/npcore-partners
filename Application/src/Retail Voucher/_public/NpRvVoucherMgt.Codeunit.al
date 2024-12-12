@@ -1545,6 +1545,9 @@
         if VoucherNumber = '' then
             exit;
 
+        if Voucher.IsEmpty then
+            exit;
+
         Found := Page.RunModal(0, Voucher) = Action::LookupOK;
     end;
 
