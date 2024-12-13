@@ -827,6 +827,18 @@
         OnLookupVarietyMatrixTotal(CurrentCellVarietyBuffer, TempVarietyBufferInRange, VrtFieldSetup, ItemFilters);
     end;
 
+    internal procedure ClearMatrixData()
+    var
+        RecRef: RecordRef;
+    begin
+        if TempVRTBuffer_.FindSet(true) then
+            repeat
+                if RecRef.Get(TempVRTBuffer_."Record ID (TMP)") then begin
+                    Clear(TempVRTBuffer_."Record ID (TMP)");
+                    TempVRTBuffer_.Modify();
+                end;
+            until TempVRTBuffer_.Next() = 0;
+    end;
 
     [IntegrationEvent(false, false)]
     local procedure OnDrillDownVarietyMatrix(TMPVrtBuffer: Record "NPR Variety Buffer" temporary; VrtFieldSetup: Record "NPR Variety Field Setup"; var FieldValue: Text[1024]; CalledFrom: Option OnDrillDown,OnLookup; var ItemFilters: Record Item)

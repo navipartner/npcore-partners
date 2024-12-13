@@ -197,6 +197,11 @@
                     ToolTip = 'Specifies whether you want variety value names to be used as column names in the Variant Matrix by default. If disabled, variety value codes will be used as column names in the matrix.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Allow Clear Matrix"; Rec."Allow Clear Matrix")
+                {
+                    ToolTip = 'Specifies if the action Clear Matrix is visible in the Variety Matrix.';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }

@@ -1056,6 +1056,25 @@
                     UpdateMatrix(false);
                 end;
             }
+
+            action("Clear Matrix")
+            {
+                Caption = 'Clear Matrix';
+                Image = Delete;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                ToolTip = 'Clear Matrix';
+                Visible = ShowClearMatrix;
+                ApplicationArea = NPRRetail;
+                trigger OnAction()
+                var
+                begin
+                    VRTMatrixMgt.ClearMatrixData();
+                    CurrPage.Update(false);
+                end;
+            }
         }
     }
 
@@ -1092,6 +1111,7 @@
         ShowVariety2: Boolean;
         ShowVariety3: Boolean;
         ShowVariety4: Boolean;
+        ShowClearMatrix: Boolean;
         MATRIX_MatrixRecords: array[30] of Record "NPR Variety Buffer" temporary;
         MATRIX_CodeSet: array[30] of Text[1024];
         MATRIX_CaptionSet: array[30] of Text[1024];
@@ -1116,6 +1136,7 @@
 
         HideInactive := VarietySetup."Hide Inactive Values";
         ShowColumnNames := VarietySetup."Show Column Names";
+        ShowClearMatrix := VarietySetup."Allow Clear Matrix";
         Initialized := true;
     end;
 
