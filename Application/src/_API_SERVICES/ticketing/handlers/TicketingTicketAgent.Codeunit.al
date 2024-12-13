@@ -331,10 +331,10 @@ codeunit 6185080 "NPR TicketingTicketAgent"
     begin
 
         ResponseJson.StartObject()
-            .AddProperty('ticketId', Format(Ticket.SystemId, 0, 4))
+            .AddProperty('ticketId', Format(Ticket.SystemId, 0, 4).ToLower())
             .AddProperty('ticketNumber', Ticket."External Ticket No.")
-            .AddProperty('validFrom', Format(Ticket."Valid From Date", 0, 9))
-            .AddProperty('validUntil', Format(Ticket."Valid To Date", 0, 9))
+            .AddProperty('validFrom', Ticket."Valid From Date")
+            .AddProperty('validUntil', Ticket."Valid To Date")
             .AddProperty('unitPrice', Ticket.AmountExclVat)
             .AddProperty('unitPriceInclVat', Ticket.AmountInclVat)
         .EndObject();
@@ -366,11 +366,11 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         ReservationRequest: Record "NPR TM Ticket Reservation Req."): Codeunit "NPR JSON Builder";
     begin
         ResponseJson.StartObject()
-            .AddProperty('ticketId', Format(Ticket.SystemId, 0, 4))
+            .AddProperty('ticketId', Format(Ticket.SystemId, 0, 4).ToLower())
             .AddProperty('ticketNumber', Ticket."External Ticket No.")
             .AddProperty('reservationToken', ReservationRequest."Session Token ID")
-            .AddProperty('validFrom', Format(Ticket."Valid From Date", 0, 9))
-            .AddProperty('validUntil', Format(Ticket."Valid To Date", 0, 9))
+            .AddProperty('validFrom', Ticket."Valid From Date")
+            .AddProperty('validUntil', Ticket."Valid To Date")
             .AddArray(AdmissionDetailsDTO(ResponseJson, 'admissionDetails', Ticket, TicketDescriptionBuffer))
             .StartObject('description')
                 .AddProperty('title', TicketDescriptionBuffer.Title)
@@ -423,8 +423,6 @@ codeunit 6185080 "NPR TicketingTicketAgent"
             .AddProperty('default', TicketBom.Default)
             .AddProperty('included', EnumEncoder.EncodeInclusion(TicketBom."Admission Inclusion"))
             .AddProperty('capacityControl', EnumEncoder.EncodeCapacity(Admission."Capacity Control"))
-            .AddProperty('scheduleSelection', EnumEncoder.EncodeScheduleSelection(TicketBom."Ticket Schedule Selection", Admission."Default Schedule"))
-            .AddProperty('maxCapacity', Format(Admission."Max Capacity Per Sch. Entry", 0, 9))
             .StartObject('description')
                 .AddProperty('title', TicketDescriptionBuffer.Title)
                 .AddProperty('subtitle', TicketDescriptionBuffer.Subtitle)
@@ -462,19 +460,19 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         if (ScheduleEntry.FindFirst()) then begin
             Schedule.Get(ScheduleEntry."Schedule Code");
             ResponseJson
-                .AddProperty('id', ScheduleEntry."External Schedule Entry No.")
+                .AddProperty('externalNumber', ScheduleEntry."External Schedule Entry No.")
                 .AddProperty('code', ScheduleEntry."Schedule Code")
-                .AddProperty('startDate', Format(ScheduleEntry."Admission Start Date", 0, 9))
-                .AddProperty('startTime', Format(ScheduleEntry."Admission Start Time", 0, 9))
-                .AddProperty('endDate', Format(ScheduleEntry."Admission End Date", 0, 9))
-                .AddProperty('endTime', Format(ScheduleEntry."Admission End Time", 0, 9))
-                .AddProperty('duration', Format((ScheduleEntry."Admission End Time" - ScheduleEntry."Admission Start Time") / 1000, 0, 9))
+                .AddProperty('startDate', ScheduleEntry."Admission Start Date")
+                .AddProperty('startTime', ScheduleEntry."Admission Start Time")
+                .AddProperty('endDate', ScheduleEntry."Admission End Date")
+                .AddProperty('endTime', ScheduleEntry."Admission End Time")
+                .AddProperty('duration', (ScheduleEntry."Admission End Time" - ScheduleEntry."Admission Start Time") / 1000)
                 .AddProperty('description', Schedule.Description)
-                .AddProperty('arrivalFromTime', Format(ScheduleEntry."Event Arrival From Time", 0, 9))
-                .AddProperty('arrivalUntilTime', Format(ScheduleEntry."Event Arrival Until Time", 0, 9));
+                .AddProperty('arrivalFromTime', ScheduleEntry."Event Arrival From Time")
+                .AddProperty('arrivalUntilTime', ScheduleEntry."Event Arrival Until Time");
         end else begin
             ResponseJson
-                .AddProperty('id', -1)
+                .AddProperty('externalNumber', -1)
                 .AddProperty('code', '')
                 .AddProperty('description', 'No reservation required');
         end;

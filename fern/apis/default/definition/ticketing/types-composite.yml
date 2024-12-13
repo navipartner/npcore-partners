@@ -43,7 +43,7 @@ types:
       startTime: string
       endDate: date
       endTime: string 
-      duration: string
+      duration: integer
       arrivalFromTime: optional<simpleTypes.ArrivalFromTime>
       arrivalUntilTime: optional<simpleTypes.ArrivalUntilTime>
     examples:
@@ -56,7 +56,7 @@ types:
           startTime: "09:00"
           endDate: $simpleTypes.ReferenceDate.ExampleCheckCapacityDate
           endTime: "12:00"
-          duration: "3 hours"
+          duration: 10800
           arrivalFromTime: "08:30"
           arrivalUntilTime: "10:00"
       - name: ExampleEvening
@@ -68,7 +68,7 @@ types:
           startTime: "17:00"  
           endDate: $simpleTypes.ReferenceDate.ExampleCheckCapacityDate
           endTime: "20:00"
-          duration: "3 hours"
+          duration: 10800
           arrivalFromTime: "16:30"
           arrivalUntilTime: "18:00"
 

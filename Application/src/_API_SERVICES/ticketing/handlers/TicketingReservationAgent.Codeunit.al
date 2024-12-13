@@ -467,7 +467,7 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         Ticket.FindSet();
         repeat
             ResponseJson.StartObject()
-                .AddProperty('ticketId', Format(Ticket.SystemId, 0, 4))
+                .AddProperty('ticketId', Format(Ticket.SystemId, 0, 4).ToLower())
                 .AddProperty('ticketNumber', Ticket."External Ticket No.")
                 .EndObject();
         until (Ticket.Next() = 0);

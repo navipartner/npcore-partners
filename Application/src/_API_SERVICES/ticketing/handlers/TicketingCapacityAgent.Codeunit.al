@@ -96,12 +96,12 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
                 .AddProperty('default', AdmCapacityPriceBuffer.DefaultAdmissionCode)
                 .AddProperty('included', EnumEncoder.EncodeInclusion(TicketBom."Admission Inclusion"))
                 .AddProperty('capacityControl', EnumEncoder.EncodeCapacity(Admission."Capacity Control"))
-                .AddProperty('referenceDate', Format(AdmCapacityPriceBuffer.ReferenceDate, 0, 9))
-                .AddProperty('quantity', Format(AdmCapacityPriceBuffer.Quantity, 0, 9))
-                .AddProperty('unitPrice', Format(AdmCapacityPriceBuffer.UnitPrice, 0, 9))
-                .AddProperty('discountPct', Format(AdmCapacityPriceBuffer.DiscountPct, 0, 9))
+                .AddProperty('referenceDate', AdmCapacityPriceBuffer.ReferenceDate)
+                .AddProperty('quantity', AdmCapacityPriceBuffer.Quantity)
+                .AddProperty('unitPrice', AdmCapacityPriceBuffer.UnitPrice)
+                .AddProperty('discountPct', AdmCapacityPriceBuffer.DiscountPct)
                 .AddProperty('unitPriceIncludesVat', AdmCapacityPriceBuffer.UnitPriceIncludesVat)
-                .AddProperty('vatPct', Format(AdmCapacityPriceBuffer.UnitPriceVatPercentage, 0, 9))
+                .AddProperty('vatPct', AdmCapacityPriceBuffer.UnitPriceVatPercentage)
                 .AddArray(ScheduleEntryDTO(AdmCapacityPriceBuffer, ResponseJson, LocalDate, LocalTime, (Admission."Capacity Control" = Admission."Capacity Control"::"NONE")))
             .EndObject();
 
@@ -181,7 +181,7 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
                 ResponseJson.StartObject()
                     .AddProperty('allocatable', CapacityStatusCode in [_CapacityStatusCodeOption::OK, _CapacityStatusCodeOption::CALENDAR_WARNING, _CapacityStatusCodeOption::UNLIMITED_CAPACITY])
                     .AddProperty('allocationModel', EnumEncoder.EncodeAllocationBy(AdmissionScheduleEntry."Allocation By"))
-                    .AddProperty('remainingCapacity', Format(RemainingCapacity, 0, 9))
+                    .AddProperty('remainingCapacity', RemainingCapacity)
                     .AddProperty('explanation', GetMessageText(CapacityStatusCode, CalendarExceptionText, BlockSaleReason.AsInteger()))
                     .AddObject(ScheduleDTO(ResponseJson, AdmissionScheduleEntry))
                     .AddObject(PriceDTO(AdmCapacityPriceBuffer, ResponseJson, AdmissionScheduleEntry, LocalDate, LocalTime))
@@ -199,10 +199,10 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
     local procedure SalesDTO(var ResponseJson: Codeunit "NPR JSON Builder"; AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"): Codeunit "NPR JSON Builder"
     begin
         ResponseJson.StartObject('sales')
-            .AddProperty('salesFromDate', Format(AdmissionScheduleEntry."Sales From Date", 0, 9))
-            .AddProperty('salesFromTime', Format(AdmissionScheduleEntry."Sales From Time", 0, 9))
-            .AddProperty('salesUntilDate', Format(AdmissionScheduleEntry."Sales Until Date", 0, 9))
-            .AddProperty('salesUntilTime', Format(AdmissionScheduleEntry."Sales Until Time", 0, 9))
+            .AddProperty('salesFromDate', AdmissionScheduleEntry."Sales From Date")
+            .AddProperty('salesFromTime', AdmissionScheduleEntry."Sales From Time")
+            .AddProperty('salesUntilDate', AdmissionScheduleEntry."Sales Until Date")
+            .AddProperty('salesUntilTime', AdmissionScheduleEntry."Sales Until Time")
         .EndObject();
 
         exit(ResponseJson);
@@ -216,16 +216,16 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
             Schedule.Init();
 
         ResponseJson.StartObject('schedule')
-            .AddProperty('id', Format(AdmissionScheduleEntry."External Schedule Entry No.", 0, 9))
+            .AddProperty('externalNumber', AdmissionScheduleEntry."External Schedule Entry No.")
             .AddProperty('code', AdmissionScheduleEntry."Schedule Code")
             .AddProperty('description', Schedule.Description)
-            .AddProperty('startDate', Format(AdmissionScheduleEntry."Admission Start Date", 0, 9))
-            .AddProperty('startTime', Format(AdmissionScheduleEntry."Admission Start Time", 0, 9))
-            .AddProperty('endDate', Format(AdmissionScheduleEntry."Admission End Date", 0, 9))
-            .AddProperty('endTime', Format(AdmissionScheduleEntry."Admission End Time", 0, 9))
-            .AddProperty('duration', Format((AdmissionScheduleEntry."Admission End Time" - AdmissionScheduleEntry."Admission Start Time") / 1000, 0, 9))
-            .AddProperty('arrivalFromTime', Format(AdmissionScheduleEntry."Event Arrival From Time", 0, 9))
-            .AddProperty('arrivalUntilTime', Format(AdmissionScheduleEntry."Event Arrival Until Time", 0, 9))
+            .AddProperty('startDate', AdmissionScheduleEntry."Admission Start Date")
+            .AddProperty('startTime', AdmissionScheduleEntry."Admission Start Time")
+            .AddProperty('endDate', AdmissionScheduleEntry."Admission End Date")
+            .AddProperty('endTime', AdmissionScheduleEntry."Admission End Time")
+            .AddProperty('duration', (AdmissionScheduleEntry."Admission End Time" - AdmissionScheduleEntry."Admission Start Time") / 1000)
+            .AddProperty('arrivalFromTime', AdmissionScheduleEntry."Event Arrival From Time")
+            .AddProperty('arrivalUntilTime', AdmissionScheduleEntry."Event Arrival Until Time")
         .EndObject();
 
         exit(ResponseJson);
@@ -240,9 +240,7 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
         AddonPrice: Decimal;
 
         PriceOptionName: Text;
-        AdjustmentAmount: Text;
-        AdjustmentPct: Text;
-        AdjustedTotalPrice: Text;
+        AdjustedTotalPrice: Decimal;
         CustomerPriceOut: Decimal;
         AdjustedUnitPrice: Decimal;
     begin
@@ -276,20 +274,18 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
                     AdjustedUnitPrice := AdmCapacityPriceBuffer.UnitPrice + AddonPrice;
                 end;
         end;
-        AdjustmentAmount := Format(PriceRule.Amount, 0, 9);
-        AdjustmentPct := Format(PriceRule.Percentage, 0, 9);
 
         if (AdjustedUnitPrice < 0) then
             AdjustedUnitPrice := 0;
 
         CustomerPriceOut := AdmCapacityPriceBuffer.Quantity * AdjustedUnitPrice - AdmCapacityPriceBuffer.Quantity * AdjustedUnitPrice * AdmCapacityPriceBuffer.DiscountPct / 100;
-        AdjustedTotalPrice := Format(TicketPrice.RoundAmount(CustomerPriceOut, PriceRule.RoundingPrecision, PriceRule.RoundingDirection), 0, 9);
+        AdjustedTotalPrice := TicketPrice.RoundAmount(CustomerPriceOut, PriceRule.RoundingPrecision, PriceRule.RoundingDirection);
 
         ResponseJson.StartObject('price')
             .AddProperty('pricingOption', PriceOptionName)
-            .AddProperty('adjustmentAmount', AdjustmentAmount)
-            .AddProperty('adjustmentPct', AdjustmentPct)
-            .AddProperty('adjustedUnitPrice', Format(AdjustedUnitPrice, 0, 9))
+            .AddProperty('adjustmentAmount', PriceRule.Amount)
+            .AddProperty('adjustmentPct', PriceRule.Percentage)
+            .AddProperty('adjustedUnitPrice', AdjustedUnitPrice)
             .AddProperty('adjustedTotalPrice', AdjustedTotalPrice)
         .EndObject();
 
