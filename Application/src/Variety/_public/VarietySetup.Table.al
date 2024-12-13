@@ -259,6 +259,12 @@
             Caption = 'Activate Inventory in Variety Lookup on POS';
             DataClassification = CustomerContent;
         }
+
+        field(105; "Allow Clear Matrix"; Boolean)
+        {
+            Caption = 'Allow Clear Matrix';
+            DataClassification = CustomerContent;
+        }
         field(750; "Variant No. Series"; Code[20])
         {
             Caption = 'Variant Std. No. Serie';
