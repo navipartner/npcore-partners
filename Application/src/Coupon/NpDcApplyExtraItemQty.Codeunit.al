@@ -134,7 +134,8 @@
         SaleLinePOSCouponApply."Discount Amount" := DiscountAmount;
         SaleLinePOSCouponApply."Discount Amount Including VAT" := DiscountAmountIncludingVAT;
         SaleLinePOSCouponApply."Discount Amount Excluding VAT" := DiscountAmountExcludingVAT;
-        SaleLinePOSCouponApply.Insert();
+        if not SaleLinePOSCouponApply.Insert() then
+            exit;
     end;
 
     procedure CalcDiscountAmount(SaleLinePOS: Record "NPR POS Sale Line"; SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; ExtraItemQty: Decimal) DiscountAmount: Decimal
