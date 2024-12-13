@@ -16,11 +16,13 @@
 
 
     procedure SalesDocumentToPOS(var POSSession: Codeunit "NPR POS Session"; var SalesHeader: Record "Sales Header")
+    var
+        TempNpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon" temporary;
     begin
-        SalesDocumentToPOSCustom(POSSession, SalesHeader, true, true);
+        SalesDocumentToPOSCustom(POSSession, SalesHeader, TempNpDcSaleLinePOSCoupon, true, true);
     end;
 
-    procedure SalesDocumentToPOSCustom(var POSSession: Codeunit "NPR POS Session"; var SalesHeader: Record "Sales Header"; DeleteDocument: Boolean; ShowSuccessMessage: Boolean)
+    procedure SalesDocumentToPOSCustom(var POSSession: Codeunit "NPR POS Session"; var SalesHeader: Record "Sales Header"; var TempNpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon" temporary; DeleteDocument: Boolean; ShowSuccessMessage: Boolean)
     var
         SalesLine: Record "Sales Line";
         POSSale: Codeunit "NPR POS Sale";
@@ -49,7 +51,7 @@
         SalesLine.SetRange(Type);
         if not SalesLine.FindSet() then
             exit;
-
+        InsertAllSalePOSCouponLines(TempNpDcSaleLinePOSCoupon);
         repeat
             case SalesLine.Type of
                 SalesLine.Type::Item:
@@ -77,6 +79,18 @@
             else
                 Message(StrSubstNo(DOCUMENT_IMPORTED, SalesHeader."Document Type", SalesHeader."No."));
         end;
+    end;
+
+    local procedure InsertAllSalePOSCouponLines(var TempNpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon" temporary)
+    var
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+    begin
+        if TempNpDcSaleLinePOSCoupon.FindSet() then
+            repeat
+                NpDcSaleLinePOSCoupon.Init();
+                NpDcSaleLinePOSCoupon.TransferFields(TempNpDcSaleLinePOSCoupon);
+                NpDcSaleLinePOSCoupon.Insert();
+            until TempNpDcSaleLinePOSCoupon.Next() = 0;
     end;
 
     local procedure SpecificItemTrackingExist(Item: Record Item): Boolean
@@ -381,6 +395,7 @@
     procedure SynchronizePOSSaleWithDocument(SalePOS: Record "NPR POS Sale")
     var
         SalesHeader: Record "Sales Header";
+        TempNpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon" temporary;
         POSSession: Codeunit "NPR POS Session";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
@@ -391,6 +406,7 @@
         POSSession.GetSale(POSSale);
         POSSession.GetSaleLine(POSSaleLine);
 
+        SavePOSCouponLines(SalePOS, TempNpDcSaleLinePOSCoupon);
         POSSaleLine.DeleteAll(true);
 
         POSSale.RefreshCurrent();
@@ -402,7 +418,22 @@
         SalePOS.Modify();
         POSSale.RefreshCurrent();
 
-        SalesDocumentToPOSCustom(POSSession, SalesHeader, false, false);
+        SalesDocumentToPOSCustom(POSSession, SalesHeader, TempNpDcSaleLinePOSCoupon, false, false);
+    end;
+
+    local procedure SavePOSCouponLines(SalePOS: Record "NPR POS Sale"; var TempNpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon" temporary)
+    var
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+    begin
+        NpDcSaleLinePOSCoupon.SetRange("Register No.", SalePOS."Register No.");
+        NpDcSaleLinePOSCoupon.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        NpDcSaleLinePOSCoupon.SetRange("Sale Date", SalePOS.Date);
+        if NpDcSaleLinePOSCoupon.FindSet() then
+            repeat
+                TempNpDcSaleLinePOSCoupon.Init();
+                TempNpDcSaleLinePOSCoupon.TransferFields(NpDcSaleLinePOSCoupon);
+                TempNpDcSaleLinePOSCoupon.Insert();
+            until NpDcSaleLinePOSCoupon.Next() = 0;
     end;
 
     procedure DocumentIsSetToFullPosting(SalesHeader: Record "Sales Header"): Boolean
