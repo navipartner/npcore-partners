@@ -56,7 +56,7 @@ report 6014445 "NPR RS Fiscal Bill A4 V2"
                     Error(RSAuditNotFiscalisedErrLbl, "NPR RS POS Audit Log Aux. Info"."Audit Entry No.");
                 ParseJournalTextToFields("NPR RS POS Audit Log Aux. Info".GetTextFromJournal());
 #if not BC17
-                QRCode := GenerateQRCode("NPR RS POS Audit Log Aux. Info"."Verification URL");
+                QRCode := GenerateQRCode("NPR RS POS Audit Log Aux. Info");
 #endif
                 NewLine := PrintNewLine();
                 if ("Discount Amount" <> 0) then
@@ -182,11 +182,14 @@ report 6014445 "NPR RS Fiscal Bill A4 V2"
     end;
 
 #if not BC17  
-    local procedure GenerateQRCode(VerificationURL: Text): Text
+    local procedure GenerateQRCode(RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info"): Text
     var
         BarcodeFontProviderMgt: Codeunit "NPR Barcode Font Provider Mgt.";
     begin
-        exit(BarcodeFontProviderMgt.GenerateQRCodeAZ(VerificationURL, 'M', 'UTF8', true, true, 2));
+        if RSPOSAuditLogAuxInfo."Verification QR Code".HasValue() then
+            exit(BarcodeFontProviderMgt.GenerateQRCodeAZ(RSPOSAuditLogAuxInfo."Verification URL", 'M', 'UTF8', true, true, 2))
+        else
+            exit(RSPOSAuditLogAuxInfo.GetQRFromJournal());
     end;
 #endif
 

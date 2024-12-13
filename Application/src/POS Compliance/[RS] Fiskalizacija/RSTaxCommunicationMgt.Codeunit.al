@@ -568,7 +568,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             CreateJsonForVoucherBasedOnReferenceDocument(RSPOSAuditLogAuxInfo, NpRvArchVoucherEntry, RSPOSPaymMethMapping, JObjectHeader)
         else begin
             Clear(JObjectLines);
-            JObjectLines.Add('omitQRCodeGen', 1);
+            JObjectLines.Add('omitQRCodeGen', 0);
             JObjectLines.Add('omitTextualRepresentation', 0);
             JObjectHeader.Add('options', JObjectLines);
             POSEntrySalesLine.SetRange("POS Entry No.", RSPOSAuditLogAuxInfo."POS Entry No.");
@@ -681,7 +681,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             JObjectHeader.Add('referentDocumentDT', Format(RSPOSAuditLogAuxInfo."SDC DateTime"));
         end;
         Clear(JObjectLines);
-        JObjectLines.Add('omitQRCodeGen', 1);
+        JObjectLines.Add('omitQRCodeGen', 0);
         JObjectLines.Add('omitTextualRepresentation', 0);
         JObjectHeader.Add('options', JObjectLines);
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
@@ -789,7 +789,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             end;
         end;
         Clear(JObjectLines);
-        JObjectLines.Add('omitQRCodeGen', 1);
+        JObjectLines.Add('omitQRCodeGen', 0);
         JObjectLines.Add('omitTextualRepresentation', 0);
         JObjectHeader.Add('options', JObjectLines);
         SalesInvoiceLine.SetRange("Document No.", SalesInvoiceHeader."No.");
@@ -901,7 +901,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             end;
         end;
         Clear(JObjectLines);
-        JObjectLines.Add('omitQRCodeGen', 1);
+        JObjectLines.Add('omitQRCodeGen', 0);
         JObjectLines.Add('omitTextualRepresentation', 0);
         JObjectHeader.Add('options', JObjectLines);
         SalesInvoiceLine.SetRange("Document No.", RSPOSAuditLogAuxInfoReferent."Source Document No.");
@@ -1011,7 +1011,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             end;
         end;
         Clear(JObjectLines);
-        JObjectLines.Add('omitQRCodeGen', 1);
+        JObjectLines.Add('omitQRCodeGen', 0);
         JObjectLines.Add('omitTextualRepresentation', 0);
         JObjectHeader.Add('options', JObjectLines);
         SalesInvoiceLine.SetRange("Document No.", SalesInvoiceHeader."No.");
@@ -1119,7 +1119,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
                 JObjectHeader.Add('referentDocumentDT', RSPOSAuditLogAuxInfoReferent."SDC DateTime");
             end;
             Clear(JObjectLines);
-            JObjectLines.Add('omitQRCodeGen', 1);
+            JObjectLines.Add('omitQRCodeGen', 0);
             JObjectLines.Add('omitTextualRepresentation', 0);
             JObjectHeader.Add('options', JObjectLines);
             POSEntrySalesLine.Reset();
@@ -1222,7 +1222,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         JObjectHeader.Add('referentDocumentNumber', RSPOSAuditLogAuxInfoReferent."Invoice Number");
         JObjectHeader.Add('referentDocumentDT', RSPOSAuditLogAuxInfoReferent."SDC DateTime");
         Clear(JObjectLines);
-        JObjectLines.Add('omitQRCodeGen', 1);
+        JObjectLines.Add('omitQRCodeGen', 0);
         JObjectLines.Add('omitTextualRepresentation', 0);
         JObjectHeader.Add('options', JObjectLines);
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
@@ -1320,7 +1320,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         end;
 
         Clear(JObjectLines);
-        JObjectLines.Add('omitQRCodeGen', 1);
+        JObjectLines.Add('omitQRCodeGen', 0);
         JObjectLines.Add('omitTextualRepresentation', 0);
         JObjectHeader.Add('options', JObjectLines);
         SalesCrMemoLine.SetRange("Document No.", SalesCrMemoHeader."No.");
@@ -1387,7 +1387,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             JObjectHeader.Add('referentDocumentNumber', RSPOSAuditLogAuxInfoReferent."Invoice Number");
             JObjectHeader.Add('referentDocumentDT', RSPOSAuditLogAuxInfoReferent."SDC DateTime");
             Clear(JObjectLines);
-            JObjectLines.Add('omitQRCodeGen', 1);
+            JObjectLines.Add('omitQRCodeGen', 0);
             JObjectLines.Add('omitTextualRepresentation', 0);
             JObjectHeader.Add('options', JObjectLines);
             POSEntrySalesLine.Reset();
@@ -1471,6 +1471,10 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         JsonHeader.Get('verificationUrl', JsonTok);
         JsonTok.WriteTo(TempResult);
         RSPOSAuditLogAuxInfo."Verification URL" := DelChr(TempResult, '=', '"');
+
+        JsonHeader.Get('verificationQRCode', JsonTok);
+        JsonTok.WriteTo(TempResult);
+        RSPOSAuditLogAuxInfo.SetQRToJournal(DelChr(TempResult, '=', '"'));
 
         JsonHeader.Get('journal', JsonTok);
         JsonTok.WriteTo(TempResult);
@@ -1611,6 +1615,10 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         JsonHeader.Get('verificationUrl', JsonTok);
         JsonTok.WriteTo(TempResult);
         RSPOSAuditLogAuxInfo."Verification URL" := DelChr(TempResult, '=', '"');
+
+        JsonHeader.Get('verificationQRCode', JsonTok);
+        JsonTok.WriteTo(TempResult);
+        RSPOSAuditLogAuxInfo.SetQRToJournal(DelChr(TempResult, '=', '"'));
 
         JsonHeader.Get('journal', JsonTok);
         JsonTok.WriteTo(TempResult);
@@ -1768,6 +1776,10 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         JsonTok.WriteTo(TempResult);
         RSPOSAuditLogAuxInfo."Verification URL" := DelChr(TempResult, '=', '"');
 
+        JsonHeader.Get('verificationQRCode', JsonTok);
+        JsonTok.WriteTo(TempResult);
+        RSPOSAuditLogAuxInfo.SetQRToJournal(DelChr(TempResult, '=', '"'));
+
         JsonHeader.Get('journal', JsonTok);
         JsonTok.WriteTo(TempResult);
         RSPOSAuditLogAuxInfo.SetTextToJournal(DelChr(TempResult, '=', '"'));
@@ -1912,6 +1924,10 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         JsonTok.WriteTo(TempResult);
         RSPOSAuditLogAuxInfo."Verification URL" := DelChr(TempResult, '=', '"');
 
+        JsonHeader.Get('verificationQRCode', JsonTok);
+        JsonTok.WriteTo(TempResult);
+        RSPOSAuditLogAuxInfo.SetQRToJournal(DelChr(TempResult, '=', '"'));
+
         JsonHeader.Get('journal', JsonTok);
         JsonTok.WriteTo(TempResult);
         RSPOSAuditLogAuxInfo.SetTextToJournal(DelChr(TempResult, '=', '"'));
@@ -2052,6 +2068,10 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         JsonHeader.Get('verificationUrl', JsonTok);
         JsonTok.WriteTo(TempResult);
         RSPOSAuditLogAuxCopy."Verification URL" := DelChr(TempResult, '=', '"');
+
+        JsonHeader.Get('verificationQRCode', JsonTok);
+        JsonTok.WriteTo(TempResult);
+        RSPOSAuditLogAuxCopy.SetQRToJournal(DelChr(TempResult, '=', '"'));
 
         JsonHeader.Get('journal', JsonTok);
         JsonTok.WriteTo(TempResult);

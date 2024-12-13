@@ -17,7 +17,7 @@ codeunit 6059930 "NPR RS Fiscal Preview Mgt."
     #endregion
 
     #region HTML Fiscal Generator
-    local procedure SetParametersFromRecord(AuditEntryNo: Integer; AuditEntryType: Enum "NPR RS Audit Entry Type"; Copy: Boolean; var JournalText: Text; var QRVerifyURL: Text; var RSInvoiceType: Enum "NPR RS Invoice Type"; var RSTransactionType: Enum "NPR RS Transaction Type"; var DiscountAmount: Decimal; var POSEntryNo: Integer; var SourceDocumentNo: Code[20])
+    local procedure SetParametersFromRecord(AuditEntryNo: Integer; AuditEntryType: Enum "NPR RS Audit Entry Type"; Copy: Boolean; var JournalText: Text; var QRVerifyURL: Text; var QRCode: Text; var RSInvoiceType: Enum "NPR RS Invoice Type"; var RSTransactionType: Enum "NPR RS Transaction Type"; var DiscountAmount: Decimal; var POSEntryNo: Integer; var SourceDocumentNo: Code[20])
     var
         RSPOSAuditLogAuxCopy: Record "NPR RS POS Audit Log Aux. Copy";
         RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info";
@@ -30,6 +30,8 @@ codeunit 6059930 "NPR RS Fiscal Preview Mgt."
                     RSPOSAuditLogAuxCopy.FindLast();
                     JournalText := RSPOSAuditLogAuxCopy.GetTextFromJournal();
                     QRVerifyURL := RSPOSAuditLogAuxCopy."Verification URL";
+                    if RSPOSAuditLogAuxCopy."Verification QR Code".HasValue() then
+                        QRCode := RSPOSAuditLogAuxCopy.GetQRFromJournal();
                     RSInvoiceType := RSPOSAuditLogAuxCopy."RS Invoice Type";
                     RSTransactionType := RSPOSAuditLogAuxCopy."RS Transaction Type";
                     DiscountAmount := RSPOSAuditLogAuxCopy."Discount Amount";
@@ -43,6 +45,8 @@ codeunit 6059930 "NPR RS Fiscal Preview Mgt."
                     RSPOSAuditLogAuxInfo.FindLast();
                     JournalText := RSPOSAuditLogAuxInfo.GetTextFromJournal();
                     QRVerifyURL := RSPOSAuditLogAuxInfo."Verification URL";
+                    if RSPOSAuditLogAuxInfo."Verification QR Code".HasValue() then
+                        QRCode := RSPOSAuditLogAuxInfo.GetQRFromJournal();
                     RSInvoiceType := RSPOSAuditLogAuxInfo."RS Invoice Type";
                     RSTransactionType := RSPOSAuditLogAuxInfo."RS Transaction Type";
                     DiscountAmount := RSPOSAuditLogAuxInfo."Discount Amount";
@@ -75,7 +79,10 @@ codeunit 6059930 "NPR RS Fiscal Preview Mgt."
         IsHandled := false;
         OnBeforeGEnerateQRCodeAZOnAddHtmlReceiptCopyIfExists(Base64QRCodeImage, IsHandled);
         if not IsHandled then
-            Base64QRCodeImage := BarcodeFontProviderMgt.GenerateQRCodeAZ(RSPOSAuditLogAuxCopy."Verification URL", 'M', 'UTF8', true, true, 2);
+            if RSPOSAuditLogAuxCopy."Verification QR Code".HasValue() then
+                Base64QRCodeImage := RSPOSAuditLogAuxCopy.GetQRFromJournal()
+            else
+                Base64QRCodeImage := BarcodeFontProviderMgt.GenerateQRCodeAZ(RSPOSAuditLogAuxCopy."Verification URL", 'M', 'UTF8', true, true, 2);
 
         TempHtmlContent += DoubleNewLineHtml + NewLineHtml + RSPOSAuditLogAuxCopy.GetTextFromJournal().Replace(EndingLineHtmlTags, NewLineHtml).Replace(NonFiscalText + NewLineHtml, '');
         if TempHtmlContent.Substring(StrLen(TempHtmlContent) - 100).Contains(NotFiscalBillVersion1Lbl) then
@@ -121,7 +128,10 @@ codeunit 6059930 "NPR RS Fiscal Preview Mgt."
         IsHandled := false;
         OnBeforeGEnerateQRCodeAZOnAddHtmlReceiptOriginal(Base64QRCodeImage, IsHandled);
         if not IsHandled then
-            Base64QRCodeImage := BarcodeFontProviderMgt.GenerateQRCodeAZ(RSPOSAuditLogAuxInfo."Verification URL", 'M', 'UTF8', true, true, 2);
+            if RSPOSAuditLogAuxInfo."Verification QR Code".HasValue() then
+                Base64QRCodeImage := RSPOSAuditLogAuxInfo.GetQRFromJournal()
+            else
+                Base64QRCodeImage := BarcodeFontProviderMgt.GenerateQRCodeAZ(RSPOSAuditLogAuxInfo."Verification URL", 'M', 'UTF8', true, true, 2);
         HtmlContent += DoubleNewLineHtml + NewLineHtml + RSPOSAuditLogAuxInfo.GetTextFromJournal().Replace(EndingLineHtmlTags, NewLineHtml).Replace(EndOfFiscalText + NewLineHtml, '') +
                         PreBase64ImageTag + Base64QRCodeImage + AfterBase64ImageTag + NewLineHtml;
 #else
@@ -148,9 +158,9 @@ codeunit 6059930 "NPR RS Fiscal Preview Mgt."
         POSEntryNo: Integer;
         FiscalBillNotSentLbl: Label 'Fiscal Bill has not been sent to Tax authority.';
         JournalText: Text;
-        QRVerifyURL: Text;
+        QRVerifyURL, QRCode : Text;
     begin
-        SetParametersFromRecord(AuditEntryNo, AuditEntryType, Copy, JournalText, QRVerifyURL, RSInvoiceType, RSTransactionType, DiscountAmount, POSEntryNo, SourceDocumentNo);
+        SetParametersFromRecord(AuditEntryNo, AuditEntryType, Copy, JournalText, QRVerifyURL, QRCode, RSInvoiceType, RSTransactionType, DiscountAmount, POSEntryNo, SourceDocumentNo);
         HtmlContent := OpeningHtmlTagForFiscal;
         if JournalText = '' then begin
             HtmlContent := FiscalBillNotSentLbl;
@@ -161,7 +171,10 @@ codeunit 6059930 "NPR RS Fiscal Preview Mgt."
         IsHandled := false;
         OnBeforeGEnerateQRCodeAZOnAddCurrentReceipt(Base64QRCodeImage, IsHandled);
         if not IsHandled then
-            Base64QRCodeImage := BarcodeFontProviderMgt.GenerateQRCodeAZ(QRVerifyURL, 'M', 'UTF8', true, true, 2);
+            if (StrLen(QRCode) = 0) then
+                Base64QRCodeImage := BarcodeFontProviderMgt.GenerateQRCodeAZ(QRVerifyURL, 'M', 'UTF8', true, true, 2)
+            else
+                Base64QRCodeImage := QRCode;
 #endif
         case RSInvoiceType in [RSInvoiceType::COPY] of
             true:

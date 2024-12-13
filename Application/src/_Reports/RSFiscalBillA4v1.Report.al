@@ -123,7 +123,7 @@ report 6014453 "NPR RS Fiscal Bill A4 v1"
                     Error(RSAuditNotFiscalisedErrLbl, "NPR RS POS Audit Log Aux. Info"."Audit Entry No.");
                 ParseJournalTextToFields("NPR RS POS Audit Log Aux. Info".GetTextFromJournal());
 #if not BC17
-                QRCode := GenerateQRCode("NPR RS POS Audit Log Aux. Info"."Verification URL");
+                QRCode := GenerateQRCode("NPR RS POS Audit Log Aux. Info");
 #endif
                 if "NPR RS POS Audit Log Aux. Info"."Audit Entry Type" in ["NPR RS POS Audit Log Aux. Info"."Audit Entry Type"::"POS Entry"] then
                     Barcode := GenerateBarcode(Format("NPR RS POS Audit Log Aux. Info"."POS Entry No."))
@@ -411,11 +411,14 @@ report 6014453 "NPR RS Fiscal Bill A4 v1"
     end;
 
 #if not BC17  
-    local procedure GenerateQRCode(VerificationURL: Text): Text
+    local procedure GenerateQRCode(RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info"): Text
     var
         BarcodeFontProviderMgt: Codeunit "NPR Barcode Font Provider Mgt.";
     begin
-        exit(BarcodeFontProviderMgt.GenerateQRCodeAZ(VerificationURL, 'M', 'UTF8', true, true, 2));
+        if RSPOSAuditLogAuxInfo."Verification QR Code".HasValue() then
+            exit(BarcodeFontProviderMgt.GenerateQRCodeAZ(RSPOSAuditLogAuxInfo."Verification URL", 'M', 'UTF8', true, true, 2))
+        else
+            exit(RSPOSAuditLogAuxInfo.GetQRFromJournal());
     end;
 #endif
 

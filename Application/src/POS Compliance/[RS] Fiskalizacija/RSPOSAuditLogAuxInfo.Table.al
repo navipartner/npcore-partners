@@ -233,6 +233,11 @@
             Caption = 'Return Reference Date/Time';
             DataClassification = CustomerContent;
         }
+        field(150; "Verification QR Code"; Media)
+        {
+            Caption = 'Fiscal QR Code';
+            DataClassification = CustomerContent;
+        }
         field(200; "Fiscal Processing Time"; Duration)
         {
             Caption = 'Fiscal Processing Time';
@@ -278,5 +283,29 @@
         OutStream.WriteText(JournalText);
         TempBlob.CreateInStream(InStream, TextEncoding::UTF8);
         Rec."Receipt Content".ImportStream(InStream, Rec.FieldCaption("Receipt Content"));
+    end;
+
+    procedure GetQRFromJournal() JournalText: Text;
+    var
+        TempBlob: Codeunit "Temp Blob";
+        OutStream: OutStream;
+        InStream: InStream;
+    begin
+        TempBlob.CreateOutStream(OutStream, TextEncoding::UTF8);
+        Rec."Verification QR Code".ExportStream(OutStream);
+        TempBlob.CreateInStream(InStream, TextEncoding::UTF8);
+        InStream.ReadText(JournalText);
+    end;
+
+    procedure SetQRToJournal(JournalText: Text)
+    var
+        TempBlob: Codeunit "Temp Blob";
+        OutStream: OutStream;
+        InStream: InStream;
+    begin
+        TempBlob.CreateOutStream(OutStream, TextEncoding::UTF8);
+        OutStream.WriteText(JournalText);
+        TempBlob.CreateInStream(InStream, TextEncoding::UTF8);
+        Rec."Verification QR Code".ImportStream(InStream, Rec.FieldCaption("Verification QR Code"));
     end;
 }
