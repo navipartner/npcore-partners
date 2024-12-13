@@ -10,8 +10,8 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         Action_Description: Label 'This action handles member management functions for workflow 3.0.';
         ParamFunction_CptLbl: Label 'Function';
         ParamFunction_DescLbl: Label 'Specifies the Function used.';
-        ParamFunction_OptLbl: Label 'Member Arrival,Select Membership,View Membership Entry,Regret Membership Entry,Renew Membership,Extend Membership,Upgrade Membership,Cancel Membership,Edit Membership,Show Member,Edit Current Membership', Locked = true;
-        ParamFunction_OptCptLbl: Label 'Member Arrival,Select Membership,View Membership Entry,Regret Membership Entry,Renew Membership,Extend Membership,Upgrade Membership,Cancel Membership,Edit Membership,Show Member,Edit Current Membership';
+        ParamFunction_OptLbl: Label 'Member Arrival,Select Membership,View Membership Entry,Regret Membership Entry,Renew Membership,Extend Membership,Upgrade Membership,Cancel Membership,Edit Membership,Show Member,Edit Current Membership,Cancel Auto-Renew', Locked = true;
+        ParamFunction_OptCptLbl: Label 'Member Arrival,Select Membership,View Membership Entry,Regret Membership Entry,Renew Membership,Extend Membership,Upgrade Membership,Cancel Membership,Edit Membership,Show Member,Edit Current Membership,Cancel Auto-Renew';
         ParamDialogPrompt_CptLbl: Label 'Dialog Prompt';
         ParamDialogPrompt_DescLbl: Label 'Specifies the type of Dialog Prompt';
         ParamDialogPrompt_OptLbl: Label 'Member Card Number,Facial Recognition,No Dialog', Locked = true;
@@ -116,6 +116,8 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
                 POSActionMemberMgtWF3B.ShowMember(FrontEndInputMethod, ExternalMemberCardNo, ForeignCommunityCode);
             10:
                 POSActionMemberMgtWF3B.EditActiveMembership();
+            11:
+                POSActionMemberMgtWF3B.CancelAutoRenew(ExternalMemberCardNo);
         end;
         exit(Response);
     end;

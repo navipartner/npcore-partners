@@ -38,14 +38,15 @@ codeunit 6185033 "NPR MM Subscr. Renew Req. JQ"
         Subscription.SetRange("Valid Until Date", 0D, Today() + RecurPaymentSetup."First Attempt Offset (Days)");
         Subscription.SetRange("Postpone Renewal Attempt Until", 0D, Today());
         Subscription.SetRange("Subscr. Request Type Filter", Subscription."Subscr. Request Type Filter"::Renew);
+        Subscription.SetRange("Outst. Subscr. Requests Exist", false);
+        Subscription.SetRange("Auto-Renew", Subscription."Auto-Renew"::YES_INTERNAL);
         Subscription.SetAutoCalcFields("Outst. Subscr. Requests Exist");
         if Subscription.FindSet() then
             repeat
-                if not Subscription."Outst. Subscr. Requests Exist" then
-                    if not RequestSubscrRenewal.Run(Subscription) then begin
-                        Subscription.Find();
-                        //TODO: log error
-                    end;
+                if not RequestSubscrRenewal.Run(Subscription) then begin
+                    Subscription.Find();
+                    //TODO: log error
+                end;
             until Subscription.Next() = 0;
     end;
 

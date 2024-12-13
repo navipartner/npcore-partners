@@ -534,6 +534,20 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
 
     end;
 
+    internal procedure CancelAutoRenew(ExternalMemberCardNo: Text[100])
+    var
+        Membership: Record "NPR MM Membership";
+        MemberCard: Record "NPR MM Member Card";
+        InputMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+
+    begin
+        if (ExternalMemberCardNo = '') then
+            GetMembershipFromCardNumberWithUI(InputMethod::NO_PROMPT, ExternalMemberCardNo, Membership, MemberCard, false);
+
+        MembershipMgtInternal.CancelAutoRenew(ExternalMemberCardNo);
+    end;
+
     var
 
     var

@@ -17,6 +17,7 @@ codeunit 6185060 "NPR UPG Subscriptions"
         ScheduleSubscriptionRequestCreationJobQueue();
         ScheduleSubscriptionPaymentRequestProcessingJobQueue();
         ScheduleSubscriptionRequestProcessingJobQueue();
+        UpdateSubscriptionAutoRenewStatus();
     end;
 
     internal procedure CreateSubscriptions()
@@ -104,14 +105,34 @@ codeunit 6185060 "NPR UPG Subscriptions"
         if HasUpgradeTag() then
             exit;
 
-        if not NPPaySetup.Get() then
+        if NPPaySetup.Get() then
+            if NPPaySetup."Max Sub Req Process Try Count" = 0 then begin
+                NPPaySetup."Max Sub Req Process Try Count" := 2;
+                NPPaySetup.Modify();
+            end;
+
+        SetUpgradeTag();
+    end;
+
+    local procedure UpdateSubscriptionAutoRenewStatus()
+    var
+        Subscription: Record "NPR MM Subscription";
+        Membership: Record "NPR MM Membership";
+    begin
+        UpgradeStep := 'UpdateSubscriptionAutoRenewStatus';
+        if HasUpgradeTag() then
             exit;
 
-        if NPPaySetup."Max Sub Req Process Try Count" <> 0 then
-            exit;
-
-        NPPaySetup."Max Sub Req Process Try Count" := 2;
-        NPPaySetup.Modify();
+        Subscription.Reset();
+        if Subscription.FindSet() then
+            repeat
+                Membership.SetLoadFields("Auto-Renew");
+                if Membership.Get(Subscription."Membership Entry No.") then
+                    if Subscription."Auto-Renew" <> Membership."Auto-Renew" then begin
+                        Subscription."Auto-Renew" := Membership."Auto-Renew";
+                        Subscription.Modify(true);
+                    end;
+            until Subscription.Next() = 0;
 
         SetUpgradeTag();
     end;

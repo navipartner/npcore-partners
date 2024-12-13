@@ -224,6 +224,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Subscriptions", 'ScheduleSubscriptionRequestProcessingJobQueue'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Subscriptions", 'SetMaxRecurringPaymentProcessingTryCount'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Subscriptions", 'SetMaxSubscriptionRequestProcessingTryCount'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Subscriptions", 'UpdateSubscriptionAutoRenewStatus'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Subscriptions Install", 'ScheduleSubscriptionRequestCreationJobQueue'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Subscriptions Install", 'ScheduleSubscriptionPaymentRequestProcessingJobQueue'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Subscriptions Install", 'ScheduleSubscriptionRequestProcessingJobQueue'));
@@ -863,6 +864,8 @@
                         exit('NPR-SetMaxRecurringPaymentProcessingTryCount-20241015');
                     'SetMaxSubscriptionRequestProcessingTryCount':
                         exit('NPR-SetMaxSubscriptionRequestProcessingTryCount-20241015');
+                    'UpdateSubscriptionAutoRenewStatus':
+                        exit('NPR-UpdateSubscriptionAutoRenewStatus-20241112');
                 end;
             Codeunit::"NPR UPG POS Pay View Dimension":
                 case UpgradeStep of
