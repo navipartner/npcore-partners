@@ -42,13 +42,15 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
 
     local procedure ProcessRejectedStatus(var SubscriptionRequest: Record "NPR MM Subscr. Request")
     var
+        Membership: Record "NPR MM Membership";
         Subscription: Record "NPR MM Subscription";
         SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
         MemberNotification: Codeunit "NPR MM Member Notification";
     begin
         Subscription.Get(SubscriptionRequest."Subscription Entry No.");
-        Subscription.Blocked := true;
-        Subscription.Modify(true);
+        Membership.Get(Subscription."Membership Entry No.");
+        Membership."Auto-Renew" := Membership."Auto-Renew"::NO;
+        Membership.Modify(true);
 
         SubscrPaymentRequest.Reset();
         SubscrPaymentRequest.SetCurrentKey("Subscr. Request Entry No.", Status);

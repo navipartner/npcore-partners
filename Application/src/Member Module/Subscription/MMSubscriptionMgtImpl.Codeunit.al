@@ -14,6 +14,10 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
     internal procedure UpdateMembershipSubscriptionDetails(Membership: Record "NPR MM Membership"; MembershipLedger: Record "NPR MM Membership Entry")
     var
         Subscription: Record "NPR MM Subscription";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+        ValidFromDate: Date;
+        ValidUntilDate: Date;
+        MaxValidUntilDate: Date;
     begin
         MembershipLedger.TestField("Membership Entry No.");
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
@@ -21,6 +25,11 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
 #else
         Subscription.LockTable();
 #endif
+        MembershipManagement.GetMembershipValidDate(Membership."Entry No.", Today, ValidFromDate, ValidUntilDate);
+        MembershipManagement.GetMembershipMaxValidUntilDate(Membership."Entry No.", MaxValidUntilDate);
+        if MaxValidUntilDate > ValidUntilDate then
+            ValidUntilDate := MaxValidUntilDate;
+
         Subscription.SetRange("Membership Entry No.", Membership."Entry No.");
         if not Subscription.FindFirst() then begin
             Subscription.Init();
@@ -31,8 +40,8 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
         Subscription."Membership Ledger Entry No." := MembershipLedger."Entry No.";
         Subscription."Membership Code" := MembershipLedger."Membership Code";
         Subscription.Blocked := Membership.Blocked;
-        Subscription."Valid From Date" := MembershipLedger."Valid From Date";
-        Subscription."Valid Until Date" := MembershipLedger."Valid Until Date";
+        Subscription."Valid From Date" := ValidFromDate;
+        Subscription."Valid Until Date" := ValidUntilDate;
         Subscription."Postpone Renewal Attempt Until" := 0D;
         Subscription.Modify(true);
     end;
@@ -157,5 +166,87 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
             IsNpJob := true;
             Handled := true;
         end;
+    end;
+
+#if BC17 or BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Table, Database::"NPR MM Membership", 'OnAfterModifyEvent', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::"NPR MM Membership", OnAfterModifyEvent, '', false, false)]
+#endif
+    local procedure OnAfterModifyMembership(var Rec: Record "NPR MM Membership"; var xRec: Record "NPR MM Membership")
+    begin
+        if Rec.IsTemporary then
+            exit;
+
+        UpdateSubscriptionAutoRenewStatus(Rec);
+    end;
+
+    internal procedure UpdateSubscriptionPeriodFromMembership(MembershipEntryNo: Integer)
+    var
+        Subscription: Record "NPR MM Subscription";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+        ValidFromDate: Date;
+        ValidUntilDate: Date;
+        MaxValidUntilDate: Date;
+        IsModified: Boolean;
+    begin
+        Subscription.Reset();
+        Subscription.SetCurrentKey("Membership Entry No.");
+        Subscription.SetRange("Membership Entry No.", MembershipEntryNo);
+        if not Subscription.FindFirst() then
+            exit;
+
+        MembershipManagement.GetMembershipValidDate(MembershipEntryNo, Today, ValidFromDate, ValidUntilDate);
+        MembershipManagement.GetMembershipMaxValidUntilDate(MembershipEntryNo, MaxValidUntilDate);
+
+        if MaxValidUntilDate > ValidUntilDate then
+            ValidUntilDate := MaxValidUntilDate;
+
+        if Subscription."Valid From Date" <> ValidFromDate then begin
+            Subscription."Valid From Date" := ValidFromDate;
+            IsModified := true;
+        end;
+
+        if Subscription."Valid Until Date" <> ValidUntilDate then begin
+            Subscription."Valid Until Date" := ValidUntilDate;
+            IsModified := true;
+        end;
+
+        if IsModified then
+            Subscription.Modify(true);
+    end;
+
+    internal procedure UpdateSubscriptionValidUntilDateFromMembershipEntry(MembershipEntry: Record "NPR MM Membership Entry")
+    var
+        Subscription: Record "NPR MM Subscription";
+    begin
+        Subscription.Reset();
+        Subscription.SetCurrentKey("Membership Entry No.");
+        Subscription.SetRange("Membership Entry No.", MembershipEntry."Membership Entry No.");
+        if not Subscription.FindFirst() then
+            exit;
+
+        if Subscription."Valid Until Date" = MembershipEntry."Valid Until Date" then
+            exit;
+
+        Subscription."Valid Until Date" := MembershipEntry."Valid Until Date";
+
+        Subscription.Modify(true);
+    end;
+
+    local procedure UpdateSubscriptionAutoRenewStatus(Membership: Record "NPR MM Membership")
+    var
+        Subscription: Record "NPR MM Subscription";
+    begin
+        Subscription.SetCurrentKey("Membership Entry No.");
+        Subscription.SetRange("Membership Entry No.", Membership."Entry No.");
+        if not Subscription.FindFirst() then
+            exit;
+
+        if Subscription."Auto-Renew" = Membership."Auto-Renew" then
+            exit;
+
+        Subscription."Auto-Renew" := Membership."Auto-Renew";
+        Subscription.Modify(true);
     end;
 }

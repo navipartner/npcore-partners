@@ -237,6 +237,7 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
         SubscriptionValidErrorLbl: Label 'Subscription no. %1 is valid until %2.', Comment = '%1 - subscription no., %2 - valid until';
         PostponedRenewalErrorLbl: Label 'Renewal of subscription no. %1 is postponed until %2.', Comment = '%1 - subscription no., %2 - postponed until date';
         SubscriptionRequestExistsErrorLbl: Label 'Subscription request for subscription no. %1 already exists.', Comment = '%1 - subscription no.';
+        MemberhsipNotSetForAutoRenewErrorLbl: Label 'Membership %1 for subscription %2 is not set to auto renew.', Comment = '% - membership no., %2 - subscription no.';
     begin
         if _SkipProcessSubscriptionCheck then
             exit;
@@ -254,5 +255,8 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
         Subscription.CalcFields("Outst. Subscr. Requests Exist");
         if Subscription."Outst. Subscr. Requests Exist" then
             Error(SubscriptionRequestExistsErrorLbl, Subscription."Entry No.");
+
+        if Subscription."Auto-Renew" <> Subscription."Auto-Renew"::YES_INTERNAL then
+            Error(MemberhsipNotSetForAutoRenewErrorLbl, Subscription."Membership Entry No.", Subscription."Entry No.");
     end;
 }

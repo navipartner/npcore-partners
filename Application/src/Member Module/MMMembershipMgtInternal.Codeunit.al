@@ -1399,6 +1399,8 @@
     end;
 
     local procedure DoReverseRegretTimeFrame(var MembershipEntry: Record "NPR MM Membership Entry")
+    var
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
     begin
 
         if (not ((MembershipEntry.Context = MembershipEntry.Context::REGRET) and (MembershipEntry."Original Context" = MembershipEntry."Original Context"::NEW))) then
@@ -1407,6 +1409,8 @@
         MembershipEntry.Context := MembershipEntry."Original Context";
         MembershipEntry.Validate(Blocked, false);
         MembershipEntry.Modify();
+
+        SubscriptionMgtImpl.UpdateMembershipSubscriptionDetails(MembershipEntry);
 
         MembershipEvents.OnAfterInsertMembershipEntry(MembershipEntry);
 
@@ -1417,6 +1421,7 @@
     var
         Membership: Record "NPR MM Membership";
         MembershipAutoRenew: Codeunit "NPR MM Membership Auto Renew";
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
     begin
 
         // Note - also invoked from MM Member WebService Mgr
@@ -1427,6 +1432,14 @@
         MembershipEntry.Context := MembershipEntry.Context::REGRET;
         MembershipEntry.Validate(Blocked, true);
         MembershipEntry.Modify();
+
+        if MembershipEntry."Original Context" in [MembershipEntry."Original Context"::NEW, MembershipEntry."Original Context"::RENEW, MembershipEntry."Original Context"::AUTORENEW, MembershipEntry."Original Context"::EXTEND] then begin
+            Membership.Get(MembershipEntry."Membership Entry No.");
+            if Membership."Auto-Renew" <> Membership."Auto-Renew"::NO then begin
+                Membership."Auto-Renew" := Membership."Auto-Renew"::NO;
+                Membership.Modify(true);
+            end;
+        end;
 
         MembershipEvents.OnAfterInsertMembershipEntry(MembershipEntry);
 
@@ -1447,7 +1460,7 @@
                 Membership.Modify();
             end;
         end;
-
+        SubscriptionMgtImpl.UpdateMembershipSubscriptionDetails(MembershipEntry);
         OnMembershipChangeEvent(MembershipEntry."Membership Entry No.");
 
     end;
@@ -1509,6 +1522,7 @@
         Membership: Record "NPR MM Membership";
         MembershipEntry: Record "NPR MM Membership Entry";
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
         Item: Record Item;
         EndDateNew: Date;
         CancelledFraction: Decimal;
@@ -1590,6 +1604,13 @@
         if (WithUpdate) then begin
             MembershipEntry."Valid Until Date" := EndDateNew;
             MembershipEntry.Modify();
+
+            if Membership."Auto-Renew" <> Membership."Auto-Renew"::NO then begin
+                Membership."Auto-Renew" := Membership."Auto-Renew"::NO;
+                Membership.Modify(true);
+            end;
+
+            SubscriptionMgtImpl.UpdateSubscriptionValidUntilDateFromMembershipEntry(MembershipEntry);
 
             MembershipEvents.OnAfterInsertMembershipEntry(MembershipEntry);
 
@@ -1842,6 +1863,7 @@
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
         Item: Record Item;
         OldItem: Record Item;
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
         StartDateNew: Date;
         EndDateNew: Date;
         EndDateCurrent: Date;
@@ -1975,6 +1997,7 @@
                 end;
                 MembershipEntry."Closed By Entry No." := EntryNo;
                 MembershipEntry.Modify();
+                SubscriptionMgtImpl.UpdateSubscriptionPeriodFromMembership(MembershipEntry."Entry No.");
             end;
 
             OnMembershipChangeEvent(MembershipEntry."Membership Entry No.");
@@ -2048,6 +2071,7 @@
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
         Item: Record Item;
         OldItem: Record Item;
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
         StartDateNew: Date;
         EndDateCurrent: Date;
         EndDateNew: Date;
@@ -2171,6 +2195,8 @@
             MembershipEntry."Closed By Entry No." := EntryNo;
 
             MembershipEntry.Modify();
+
+            SubscriptionMgtImpl.UpdateSubscriptionPeriodFromMembership(MembershipEntry."Membership Entry No.");
 
             OnMembershipChangeEvent(MembershipEntry."Membership Entry No.");
         end;
@@ -5715,5 +5741,20 @@
         Membership.SetLoadFields("Customer No.");
         Membership.Get(MembershipEntryNo);
         CustomerNo := Membership."Customer No.";
+    end;
+
+    internal procedure CancelAutoRenew(ExternalMemberCardNo: Text[100])
+    var
+        Membership: Record "NPR MM Membership";
+        NotFoundReasonText: Text;
+    begin
+        if (not (Membership.Get(GetMembershipFromExtCardNo(ExternalMemberCardNo, Today, NotFoundReasonText)))) then
+            Error(NotFoundReasonText);
+
+        if Membership."Auto-Renew" = Membership."Auto-Renew"::NO then
+            exit;
+
+        Membership."Auto-Renew" := Membership."Auto-Renew"::NO;
+        Membership.Modify(true);
     end;
 }

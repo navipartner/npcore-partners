@@ -47,6 +47,11 @@ page 6184834 "NPR MM Subscription Details"
                     ToolTip = 'Specifies the value of the Valid Until Date field.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field("Auto-Renew"; Rec."Auto-Renew")
+                {
+                    ToolTip = 'Specifies the value of the Auto-Renew field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
                 field("Postpone Renewal Attempt Until"; Rec."Postpone Renewal Attempt Until")
                 {
                     ToolTip = 'Specifies the value of the Postpone Renewal Attempt Until field.';
