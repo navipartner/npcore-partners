@@ -791,9 +791,12 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
         NotAnEInvoiceCustomerQst: Label 'Customer %1 is not an E-Invoice customer. Are you sure document %2 should be sent to SEF?', Comment = '%1 = Customer No., %2 = Document No.';
     begin
         if IsRSEInvoiceCustomer(CustomerNo) then
-            exit(CheckIfDocumentShouldBeSentForEInvoiceCustomer(CustomerNo, DocumentNo, SendToSEFChecked))
-        else
+            exit(CheckIfDocumentShouldBeSentForEInvoiceCustomer(CustomerNo, DocumentNo, SendToSEFChecked));
+
+        if SendToSEFChecked then
             exit(ConfirmManagement.GetResponseOrDefault(StrSubstNo(NotAnEInvoiceCustomerQst, CustomerNo, DocumentNo), false));
+
+        exit(false);
     end;
 
     local procedure CheckIfDocumentShouldBeSentForEInvoiceCustomer(CustomerNo: Code[20]; DocumentNo: Code[20]; SendToSEFChecked: Boolean): Boolean
