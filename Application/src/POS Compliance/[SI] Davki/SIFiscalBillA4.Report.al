@@ -41,7 +41,6 @@ report 6014556 "NPR SI Fiscal Bill A4"
                 column(DiscountPerc; "Line Discount %") { }
                 column(DiscountAmount; "Line Discount Amount Incl. VAT") { }
                 column(AmountIncludingVAT; "Amount Incl. VAT") { }
-                column(ItemNo; "No.") { }
 
                 trigger OnPreDataItem()
                 begin
@@ -138,7 +137,6 @@ report 6014556 "NPR SI Fiscal Bill A4"
     labels
     {
         ItemNameLbl = 'NAZIV', Locked = true;
-        ItemCodeLbl = 'OZNAKA', Locked = true;
         BarcodeLbl = 'ČRTNA KODA', Locked = true;
         PriceLbl = 'CENA', Locked = true;
         DiscountLbl = 'POPUST', Locked = true;
@@ -205,14 +203,13 @@ report 6014556 "NPR SI Fiscal Bill A4"
         until POSEntryPaymentLine.Next() = 0;
 
         POSEntrySalesLine.SetRange("POS Entry No.", SIPOSAuditLogAuxInfo."POS Entry No.");
-        POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Item);
+        POSEntrySalesLine.SetFilter(Type, '%1|%2', POSEntrySalesLine.Type::Item, POSEntrySalesLine.Type::Voucher);
         if not POSEntrySalesLine.FindSet() then
             exit;
         NextLineNo := 10000;
         repeat
             POSEntryLines.Init();
             POSEntryLines.TransferFields(POSEntrySalesLine);
-            POSEntryLines.Type := POSEntryLines.Type::Item;
             POSEntryLines."POS Entry No." := SIPOSAuditLogAuxInfo."POS Entry No.";
             POSEntryLines."Line No." := NextLineNo;
             NextLineNo += 10000;
@@ -323,6 +320,8 @@ report 6014556 "NPR SI Fiscal Bill A4"
         repeat
             POSEntryLines.Init();
             POSEntryLines.TransferFields(SalesInvoicesLine);
+            POSEntryLines."No." := SalesInvoicesLine."No.";
+            POSEntryLines.Description := SalesInvoicesLine.Description;
             POSEntryLines.Type := POSEntryLines.Type::Item;
             POSEntryLines."POS Entry No." := SIPOSAuditLogAuxInfo."POS Entry No.";
             POSEntryLines."Line No." := NextLineNo;
@@ -432,6 +431,12 @@ report 6014556 "NPR SI Fiscal Bill A4"
                 FormattedAddrArray[1] += ' - ' + CompanyInfo."Post Code"
             else
                 FormattedAddrArray[1] := CompanyInfo."Post Code";
+
+        if CompanyInfo.Address <> '' then
+            if FormattedAddrArray[1] <> '' then
+                FormattedAddrArray[1] += ', ' + CompanyInfo.Address
+            else
+                FormattedAddrArray[1] := CompanyInfo.Address;
 
         if CompanyInfo."VAT Registration No." <> '' then
             FormattedAddrArray[2] := DSLbl + CompanyInfo."VAT Registration No.";
