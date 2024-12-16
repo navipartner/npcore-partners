@@ -135,7 +135,7 @@ codeunit 85167 "NPR POS Act SI Aud Look Tests"
             NPRLibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
             POSPostingProfile."POS Period Register No. Series" := '';
             POSPostingProfile.Modify();
-            NPRLibraryPOSMasterData.CreatePOSStore(_POSStore, POSPostingProfile.Code);
+            LibrarySIFiscal.CreatePOSStore(_POSStore, POSPostingProfile);
             NPRLibraryPOSMasterData.CreatePOSUnit(GetTestPOSUnitNo(), _POSUnit, _POSStore.Code, POSPostingProfile.Code);
             NPRLibraryPOSMasterData.CreatePOSPaymentMethod(_POSPaymentMethod, _POSPaymentMethod."Processing Type"::CASH, '', false);
             NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(_Item, _POSUnit, _POSStore);
