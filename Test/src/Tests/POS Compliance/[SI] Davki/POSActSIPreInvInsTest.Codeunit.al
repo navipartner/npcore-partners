@@ -72,7 +72,7 @@ codeunit 85168 "NPR POS Act SI PreInv Ins Test"
             NPRLibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
             POSPostingProfile."POS Period Register No. Series" := '';
             POSPostingProfile.Modify();
-            NPRLibraryPOSMasterData.CreatePOSStore(_POSStore, POSPostingProfile.Code);
+            LibrarySIFiscal.CreatePOSStore(_POSStore, POSPostingProfile);
             NPRLibraryPOSMasterData.CreatePOSUnit(GetTestPOSUnitNo(), _POSUnit, _POSStore.Code, POSPostingProfile.Code);
             NPRLibraryPOSMasterData.CreatePOSPaymentMethod(POSPaymentMethod, POSPaymentMethod."Processing Type"::CASH, '', false);
             NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);

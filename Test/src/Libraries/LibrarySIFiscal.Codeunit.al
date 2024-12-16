@@ -35,6 +35,7 @@ codeunit 85090 "NPR Library SI Fiscal"
         SIPOSStoreMapping."Building Number" := GetTestBuildingNumber();
         SIPOSStoreMapping."Building Section Number" := GetTestBuildingSectNumber();
         SIPOSStoreMapping."Cadastral Number" := GetTestCadastralNumber();
+        SIPOSStoreMapping."Validity Date" := CalcDate('<1D>', Today());
         SIPOSStoreMapping.Insert();
 
         SIAuxSalespersonPurchaser.Init();
@@ -75,6 +76,17 @@ codeunit 85090 "NPR Library SI Fiscal"
         LibraryUtility.CreateNoSeries(NoSeries, true, false, false);
         LibraryUtility.CreateNoSeriesLine(NoSeriesLine, NoSeries.Code, 'TEST_1', 'TEST_99999999');
         exit(NoSeries.Code);
+    end;
+
+    procedure CreatePOSStore(var POSStore: Record "NPR POS Store"; POSPostingProfile: Record "NPR POS Posting Profile")
+    var
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+    begin
+        NPRLibraryPOSMasterData.CreatePOSStore(POSStore, POSPostingProfile.Code);
+        POSStore.Address := GetTestAddress();
+        POSStore.City := GetTestCity();
+        POSStore."Post Code" := GetTestPostCode();
+        POSStore.Modify();
     end;
 
     procedure HandlerCode(): Text
@@ -124,6 +136,21 @@ codeunit 85090 "NPR Library SI Fiscal"
     local procedure GetTestCadastralNumber(): Integer
     begin
         exit(4567);
+    end;
+
+    local procedure GetTestAddress(): Text[50]
+    begin
+        exit('Test Address 12b');
+    end;
+
+    local procedure GetTestCity(): Text[30]
+    begin
+        exit('Ljubljana');
+    end;
+
+    local procedure GetTestPostCode(): Code[20]
+    begin
+        exit('1100');
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR SI Tax Communication Mgt.", 'OnBeforeSendHttpRequest', '', false, false)]

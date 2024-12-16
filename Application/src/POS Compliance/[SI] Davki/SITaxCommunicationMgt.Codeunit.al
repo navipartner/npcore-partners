@@ -329,9 +329,10 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
         TimeStampLbl: Label '%1T%2Z', Locked = true, Comment = '%1 = Entry Date, %2 = Time Stamp';
         SoftwareSupplierLbl: Label 'Navi Partner København ApS, Titangade 16 DK-2200 København N', Locked = true;
         FormattedDateTime: Text;
-        HouseNumberAdditional: Text;
+        ParsedAddress: Text;
+        ParsedHouseNumber: Text;
+        ParsedHouseNumberAdditional: Text;
         IdPoruke: Text;
-        POSStoreAddress: Text;
         Address: XmlElement;
         Body: XmlElement;
         BPIdentifier: XmlElement;
@@ -343,9 +344,14 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
         RealEstateBP: XmlElement;
         SoftwareSupplier: XmlElement;
     begin
+        SIPOSStoreMapping.TestField("Validity Date");
+
         SIFiscalizationSetup.Get();
-        POSStore.SetRange(Code, SIPOSStoreMapping."POS Store Code");
-        POSStore.FindFirst();
+        POSStore.Get(SIPOSStoreMapping."POS Store Code");
+
+        POSStore.TestField(Address);
+        POSStore.TestField(City);
+        POSStore.TestField("Post Code");
 
         Document := XmlDocument.Create('', '');
         Document.SetDeclaration(XmlDeclaration.Create('1.0', 'UTF-8', 'yes'));
@@ -379,15 +385,13 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
         PropertyID.Add(CreateXmlElement('BuildingSectionNumber', FuNamespaceUriLbl, Format(SIPOSStoreMapping."Building Section Number")));
         RealEstateBP.Add(PropertyID);
 
-        POSStoreAddress := POSStore.Address;
-
-        FormatAddress(HouseNumberAdditional, POSStoreAddress);
+        FormatAddress(ParsedAddress, ParsedHouseNumber, ParsedHouseNumberAdditional, POSStore.Address);
 
         Address := XmlElement.Create('Address', FuNamespaceUriLbl);
-        Address.Add(CreateXmlElement('Street', FuNamespaceUriLbl, DelChr(POSStoreAddress, '=', '1234567890').Trim()));
-        Address.Add(CreateXmlElement('HouseNumber', FuNamespaceUriLbl, DelChr(POSStoreAddress, '=', DelChr(POSStoreAddress, '=', '1234567890').Trim())));
-        if HouseNumberAdditional <> '' then
-            Address.Add(CreateXmlElement('HouseNumberAdditional', FuNamespaceUriLbl, HouseNumberAdditional));
+        Address.Add(CreateXmlElement('Street', FuNamespaceUriLbl, ParsedAddress));
+        Address.Add(CreateXmlElement('HouseNumber', FuNamespaceUriLbl, ParsedHouseNumber));
+        if ParsedHouseNumberAdditional <> '' then
+            Address.Add(CreateXmlElement('HouseNumberAdditional', FuNamespaceUriLbl, ParsedHouseNumberAdditional));
         Address.Add(CreateXmlElement('Community', FuNamespaceUriLbl, POSStore.City));
         Address.Add(CreateXmlElement('City', FuNamespaceUriLbl, POSStore.City));
         Address.Add(CreateXmlElement('PostalCode', FuNamespaceUriLbl, DelChr(POSStore."Post Code", '=', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ-')));
@@ -411,7 +415,7 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
 
     #endregion
 
-    #region CRO Tax Communication - HTTP Request
+    #region SI Tax Communication - HTTP Request
     local procedure SignBillAndSendToTA(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"; var ReceiptDocument: XmlDocument)
     var
         TempBlob: Codeunit "Temp Blob";
@@ -566,24 +570,24 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
         exit(CopyStr(NewValue + Format(ResultMod), 1, 60));
     end;
 
-    local procedure FormatAddress(var HouseNumberAdditional: Text; var POSStoreAddress: Text)
+    local procedure FormatAddress(var ParsedAddress: Text; var ParsedHouseNumber: Text; var ParsedHouseNumberAdditional: Text; POSStoreAddress: Text)
     var
         i: Integer;
         Words: List of [Text];
         CheckWord: Text;
         Word: Text;
     begin
+        ParsedHouseNumber := DelChr(POSStoreAddress, '=', DelChr(POSStoreAddress, '=', '1234567890').Trim());
         Words := POSStoreAddress.Split(' ');
         Words.Get(Words.Count(), Word);
         CheckWord := DelChr(Word, '=', '1234567890');
         if CheckWord = '' then
             exit;
-        HouseNumberAdditional := Word;
-        Clear(POSStoreAddress);
+        ParsedHouseNumberAdditional := DelChr(Word, '=', '1234567890');
         for i := 1 to Words.Count() - 1 do
             if Words.Get(i, Word) then
-                POSStoreAddress += Word + ' ';
-        POSStoreAddress := POSStoreAddress.Trim();
+                ParsedAddress += Word + ' ';
+        ParsedAddress := ParsedAddress.Trim();
     end;
 
     local procedure AddAmountToDecimalDict(var DecimalDict: Dictionary of [Decimal, Decimal]; DictKey: Decimal; DictValue: Decimal)
@@ -598,24 +602,45 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
 
     internal procedure RegisterPOSStore(var SIPOSStoreMapping: Record "NPR SI POS Store Mapping")
     var
+        ConfirmManagement: Codeunit "Confirm Management";
         IsHandled: Boolean;
         POSStoreRegisteredSuccessfulyMsg: Label 'POS Store %1 registered successfully.', Comment = '%1 = POS Store Code';
+        POSStoreAlreadyRegisteredQst: Label 'POS Store %1 is already registered. Are you sure you want to continue with registration?', Comment = '%1 = POS Store Code';
         BaseValue: Text;
         ResponseText: Text;
         Document: XmlDocument;
     begin
         if SIPOSStoreMapping.Registered then
-            exit;
+            if not ConfirmManagement.GetResponseOrDefault(StrSubstNo(POSStoreAlreadyRegisteredQst, SIPOSStoreMapping."POS Store Code"), false) then
+                exit;
+
         CreatePOSStoreRegistrationDocument(SIPOSStoreMapping, Document);
         FillRequestBaseValue(Document, BaseValue);
+
         OnBeforeRegisterPOSStore(SIPOSStoreMapping, ResponseText, IsHandled);
         if IsHandled then
             exit;
+
         if not SIAuditMgt.SignAndSendXML('PP', BaseValue, ResponseText) then
             exit;
+
+        if not CheckIfBPRegisterResponseSuccess(ResponseText) then
+            Error(ResponseText);
+
         Message(StrSubstNo(POSStoreRegisteredSuccessfulyMsg, SIPOSStoreMapping."POS Store Code"));
         SIPOSStoreMapping.Registered := true;
         SIPOSStoreMapping.Modify();
+    end;
+
+    local procedure CheckIfBPRegisterResponseSuccess(ResponseText: Text): Boolean
+    var
+        Document: XmlDocument;
+        ChildNode: XmlNode;
+        ErrorNode: XmlNode;
+    begin
+        XmlDocument.ReadFrom(ResponseText, Document);
+        Document.GetChildElements().Get(1, ChildNode);
+        exit(not ChildNode.SelectSingleNode(StrSubstNo(XPathExcludeNamespacePatternLbl, 'Error'), ErrorNode));
     end;
 
     #endregion

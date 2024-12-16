@@ -132,7 +132,7 @@ codeunit 85091 "NPR SI Compliance Tests"
             NPRLibraryPOSMasterData.CreateDefaultPostingSetup(_POSPostingProfile);
             _POSPostingProfile."POS Period Register No. Series" := '';
             _POSPostingProfile.Modify();
-            NPRLibraryPOSMasterData.CreatePOSStore(_POSStore, _POSPostingProfile.Code);
+            LibrarySIFiscal.CreatePOSStore(_POSStore, _POSPostingProfile);
             NPRLibraryPOSMasterData.CreatePOSUnit(GetTestPOSUnitNo(), _POSUnit, _POSStore.Code, _POSPostingProfile.Code);
             NPRLibraryPOSMasterData.CreatePOSPaymentMethod(_POSPaymentMethod, _POSPaymentMethod."Processing Type"::CASH, '', false);
             NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(_Item, _POSUnit, _POSStore);
