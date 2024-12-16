@@ -61,7 +61,7 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
     internal procedure GetSubscriptionsJobQueueCategoryCode() JobQueueCategoryCode: Code[10]
     var
         JobQueueCategory: Record "Job Queue Category";
-        SubscriptionsJobQueueCategoryCodeLbl: Label 'NPR-SUBS';
+        SubscriptionsJobQueueCategoryCodeLbl: Label 'NPR-SUBS', Locked = true, MaxLength = 10;
         SubscriptionsJobQueueCategoryDescriptionLbl: Label 'NPR Subscriptions';
     begin
         JobQueueCategory.InsertRec(SubscriptionsJobQueueCategoryCodeLbl, SubscriptionsJobQueueCategoryDescriptionLbl);
