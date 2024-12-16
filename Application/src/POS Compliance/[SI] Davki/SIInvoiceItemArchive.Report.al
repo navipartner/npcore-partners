@@ -24,12 +24,14 @@ report 6014501 "NPR SI Invoice Item Archive"
                         Caption = 'Start Date';
                         ApplicationArea = NPRSIFiscal;
                         ToolTip = 'Specifies the value of the Start Date field.';
+                        ShowMandatory = true;
                     }
                     field(EndDateFilter; EndDate)
                     {
                         Caption = 'End Date';
                         ApplicationArea = NPRSIFiscal;
                         ToolTip = 'Specifies the value of the End Date field.';
+                        ShowMandatory = true;
                     }
                 }
             }
