@@ -25,4 +25,11 @@ codeunit 6060127 "NPR MM Membership Mgt."
             MembershipManagement.DeleteMembership(MembershipEntryNo, Force);
         end;
     end;
+
+    procedure GetMembershipMaxValidUntilDate(MembershipEntryNo: Integer; var MaxValidUntilDate: Date)
+    var
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+        MembershipManagement.GetMembershipMaxValidUntilDate(MembershipEntryNo, MaxValidUntilDate);
+    end;
 }
