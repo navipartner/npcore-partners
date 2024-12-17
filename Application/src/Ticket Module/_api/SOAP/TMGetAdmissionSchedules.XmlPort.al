@@ -112,6 +112,20 @@ xmlport 6060106 "NPR TM Get Admission Schedules"
                     fieldattribute(sales_until_time; TmpAdmScheduleEntryResponse."Sales Until Time")
                     {
                     }
+                    textattribute(admission_is)
+                    {
+                        trigger OnBeforePassVariable()
+                        begin
+                            case TmpAdmScheduleEntryResponse."Admission Is" of
+                                TmpAdmScheduleEntryResponse."Admission Is"::CLOSED:
+                                    admission_is := 'closed';
+                                TmpAdmScheduleEntryResponse."Admission Is"::OPEN:
+                                    admission_is := 'open';
+                                else
+                                    admission_is := '';
+                            end;
+                        end;
+                    }
                 }
             }
         }
