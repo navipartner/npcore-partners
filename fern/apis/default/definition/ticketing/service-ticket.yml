@@ -131,7 +131,7 @@ service:
       request:
         name: validateArrival
         body: optional<ValidateTicketsRequest> 
-      response: optional<AdmittedResponse>
+      response: AdmittedResponse
       examples:
         - path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant

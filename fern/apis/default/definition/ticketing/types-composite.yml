@@ -6,14 +6,23 @@ types:
   TicketContentRequest:
     properties:
       admissionCode: simpleTypes.AdmissionCode
-      ScheduleNumber: optional<simpleTypes.ScheduleNumber>
+      scheduleNumber: optional<simpleTypes.ScheduleNumber>
 
   AdmissionBase: 
     docs: 
       An admission component for a specific item number. 
     properties:
       code: simpleTypes.AdmissionCode
-      description: optional<Descriptions>
+      description: Descriptions
+      default: simpleTypes.DefaultAdmission
+      included: simpleTypes.AdmissionIsIncluded
+      capacityControl: simpleTypes.CapacityControl
+
+  AdmissionCapacityBase: 
+    docs: 
+      An admission component for a specific item number. 
+    properties:
+      code: simpleTypes.AdmissionCode
       default: simpleTypes.DefaultAdmission
       included: simpleTypes.AdmissionIsIncluded
       capacityControl: simpleTypes.CapacityControl
@@ -31,7 +40,6 @@ types:
           included: mandatory
           capacityControl: sales
           description: $Descriptions.ExampleAdmissionCastle
-          scheduleDetails: $ScheduleDetails.ExampleMorning
 
   ScheduleDetails: 
     docs: Details of the schedule for a specific time slot.
@@ -115,7 +123,7 @@ types:
   TicketDetails:
     docs: Details of the ticket 
     properties:
-      id: simpleTypes.TicketId
+      ticketId: simpleTypes.TicketId
       ticketNumber: simpleTypes.TicketExternalNumber
       reservationToken: simpleTypes.Token
       validFrom: datetime
@@ -125,12 +133,12 @@ types:
       unitPriceInclVat: optional<double>
       currencyCode: optional<string>
       ticketHolder: optional<string>
-      admissionDetails: list<AdmissionDetails>
+      content: list<TicketContent>
       description: Descriptions
     examples:
       - name: ExampleTicket1
         value:
-          id: $simpleTypes.TicketId.ExampleTicket1
+          ticketId: $simpleTypes.TicketId.ExampleTicket1
           ticketNumber: $simpleTypes.TicketExternalNumber.ExampleTicket1
           reservationToken : $simpleTypes.Token.ExampleToken
           validFrom: $simpleTypes.ReferenceDateTime.ExampleValidFrom
@@ -140,18 +148,33 @@ types:
           unitPriceInclVat: 100.00
           currencyCode: DKK
           ticketHolder: John Doe
-          admissionDetails: 
-            - $AdmissionDetails.ExampleAdmissionCastle
+          content: 
+            - $TicketContent.ExampleTicketContent1
           description: $Descriptions.ExampleTicket31001
       - name: ExampleTicketMember
         value:
-          id: $simpleTypes.TicketId.ExampleTicket1
+          ticketId: $simpleTypes.TicketId.ExampleTicket1
           ticketNumber: $simpleTypes.TicketExternalNumber.ExampleTicket1
           reservationToken : $simpleTypes.Token.ExampleToken
           validFrom: $simpleTypes.ReferenceDateTime.ExampleValidFrom
           validUntil: $simpleTypes.ReferenceDateTime.ExampleValidUntil
           pinCode: 12-34
           ticketHolder: John Doe
-          admissionDetails: 
-            - $AdmissionDetails.ExampleAdmissionCastle
+          content: 
+            - $TicketContent.ExampleTicketContent2
           description: $Descriptions.ExampleTicket31001
+  
+  TicketContent:
+    docs: Details of the ticket content
+    properties:
+      admissionDetails: AdmissionDetails
+      scheduleDetails: ScheduleDetails
+    examples:
+      - name: ExampleTicketContent1
+        value:
+          admissionDetails: $AdmissionDetails.ExampleAdmissionCastle
+          scheduleDetails: $ScheduleDetails.ExampleMorning
+      - name: ExampleTicketContent2
+        value:
+          admissionDetails: $AdmissionDetails.ExampleAdmissionCastle
+          scheduleDetails: $ScheduleDetails.ExampleEvening

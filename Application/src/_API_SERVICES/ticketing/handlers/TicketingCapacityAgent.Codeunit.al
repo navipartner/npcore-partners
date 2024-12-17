@@ -199,10 +199,10 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
     local procedure SalesDTO(var ResponseJson: Codeunit "NPR JSON Builder"; AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"): Codeunit "NPR JSON Builder"
     begin
         ResponseJson.StartObject('sales')
-            .AddProperty('salesFromDate', AdmissionScheduleEntry."Sales From Date")
-            .AddProperty('salesFromTime', AdmissionScheduleEntry."Sales From Time")
-            .AddProperty('salesUntilDate', AdmissionScheduleEntry."Sales Until Date")
-            .AddProperty('salesUntilTime', AdmissionScheduleEntry."Sales Until Time")
+            .AddObject(AddPropertyNotNull(ResponseJson, 'salesFromDate', AdmissionScheduleEntry."Sales From Date"))
+            .AddObject(AddPropertyNotNull(ResponseJson, 'salesFromTime', AdmissionScheduleEntry."Sales From Time"))
+            .AddObject(AddPropertyNotNull(ResponseJson, 'salesUntilDate', AdmissionScheduleEntry."Sales Until Date"))
+            .AddObject(AddPropertyNotNull(ResponseJson, 'salesUntilTime', AdmissionScheduleEntry."Sales Until Time"))
         .EndObject();
 
         exit(ResponseJson);
@@ -224,10 +224,24 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
             .AddProperty('endDate', AdmissionScheduleEntry."Admission End Date")
             .AddProperty('endTime', AdmissionScheduleEntry."Admission End Time")
             .AddProperty('duration', (AdmissionScheduleEntry."Admission End Time" - AdmissionScheduleEntry."Admission Start Time") / 1000)
-            .AddProperty('arrivalFromTime', AdmissionScheduleEntry."Event Arrival From Time")
-            .AddProperty('arrivalUntilTime', AdmissionScheduleEntry."Event Arrival Until Time")
+            .AddObject(AddPropertyNotNull(ResponseJson, 'arrivalFromTime', AdmissionScheduleEntry."Event Arrival From Time"))
+            .AddObject(AddPropertyNotNull(ResponseJson, 'arrivalUntilTime', AdmissionScheduleEntry."Event Arrival Until Time"))
         .EndObject();
 
+        exit(ResponseJson);
+    end;
+
+    local procedure AddPropertyNotNull(var ResponseJson: Codeunit "NPR JSON Builder"; PropertyName: Text; PropertyValue: Time): Codeunit "NPR JSON Builder"
+    begin
+        if (PropertyValue <> 0T) then
+            ResponseJson.AddProperty(PropertyName, PropertyValue);
+        exit(ResponseJson);
+    end;
+
+    local procedure AddPropertyNotNull(var ResponseJson: Codeunit "NPR JSON Builder"; PropertyName: Text; PropertyValue: Date): Codeunit "NPR JSON Builder"
+    begin
+        if (PropertyValue <> 0D) then
+            ResponseJson.AddProperty(PropertyName, PropertyValue);
         exit(ResponseJson);
     end;
 
@@ -255,22 +269,22 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
         case (PriceRule.PricingOption) of
             PriceRule.PricingOption::NA:
                 begin
-                    PriceOptionName := 'standard';
+                    PriceOptionName := 'fixed';
                     AdjustedUnitPrice := AdmCapacityPriceBuffer.UnitPrice;
                 end;
             PriceRule.PricingOption::FIXED:
                 begin
-                    PriceOptionName := 'fixed_amount';
+                    PriceOptionName := 'dynamic_fixed_amount';
                     AdjustedUnitPrice := BasePrice;
                 end;
             PriceRule.PricingOption::RELATIVE:
                 begin
-                    PriceOptionName := 'relative_amount';
+                    PriceOptionName := 'dynamic_relative_amount';
                     AdjustedUnitPrice := AdmCapacityPriceBuffer.UnitPrice + AddonPrice;
                 end;
             PriceRule.PricingOption::PERCENT:
                 begin
-                    PriceOptionName := 'percentage';
+                    PriceOptionName := 'dynamic_percentage';
                     AdjustedUnitPrice := AdmCapacityPriceBuffer.UnitPrice + AddonPrice;
                 end;
         end;

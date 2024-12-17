@@ -38,7 +38,7 @@ service:
                   quantity: 2
                   content:
                     - admissionCode: CASTLE
-                      ScheduleNumber: 452
+                      scheduleNumber: 452
             response:
               body:
                 token: $simpleTypes.Token.ExampleToken
@@ -50,6 +50,7 @@ service:
                     ticket: $ReservationTicketDetails.ExampleTicketUnconfirmed
                     content:
                       - admissionDetails: $compositeTypes.AdmissionDetails.ExampleAdmissionCastle
+                        scheduleDetails: $compositeTypes.ScheduleDetails.ExampleMorning
 
     updateReservation:
       docs: 
@@ -76,7 +77,7 @@ service:
                  quantity: 3
                  content:
                  - admissionCode: CASTLE
-                   ScheduleNumber: 452
+                   scheduleNumber: 452
           response:
             body:
               token: $simpleTypes.Token.ExampleToken
@@ -88,6 +89,7 @@ service:
                   ticket: $ReservationTicketDetails.ExampleTicketUnconfirmed
                   content:
                   - admissionDetails: $compositeTypes.AdmissionDetails.ExampleAdmissionCastle
+                    scheduleDetails: $compositeTypes.ScheduleDetails.ExampleMorning
 
     cancelReservation:
       docs: 
@@ -174,6 +176,7 @@ service:
                   ticket: $ReservationTicketDetails.ExampleTicketConfirmed
                   content:
                   - admissionDetails: $compositeTypes.AdmissionDetails.ExampleAdmissionCastle
+                    scheduleDetails: $compositeTypes.ScheduleDetails.ExampleMorning
 
     getReservation:
       docs: 
@@ -205,6 +208,7 @@ service:
                   ticket: $ReservationTicketDetails.ExampleTicketUnconfirmed
                   content:
                     - admissionDetails: $compositeTypes.AdmissionDetails.ExampleAdmissionCastle
+                      scheduleDetails: $compositeTypes.ScheduleDetails.ExampleMorning
         - name: "Status Confirmed"
           path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
@@ -221,6 +225,7 @@ service:
                   ticket: $ReservationTicketDetails.ExampleTicketConfirmed
                   content:
                     - admissionDetails: $compositeTypes.AdmissionDetails.ExampleAdmissionCastle
+                      scheduleDetails: $compositeTypes.ScheduleDetails.ExampleMorning
 
     getTickets:
       docs: 
@@ -293,7 +298,7 @@ types:
       token: simpleTypes.Token
       expiresAt: optional<simpleTypes.ExpiresAt>
       reservationStatus: simpleTypes.ReservationStatus
-      reservations: list<ReservationItemDetails>
+      reservations: optional<list<ReservationItemDetails>>
   
   ReservationActionResponse:
     docs:
@@ -322,6 +327,7 @@ types:
       and any relevant information for each component of the ticket.
     properties:
       admissionDetails: compositeTypes.AdmissionDetails
+      scheduleDetails: compositeTypes.ScheduleDetails
     
   AdmissionDetailsFull:
     docs:

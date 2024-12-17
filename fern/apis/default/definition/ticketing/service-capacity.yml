@@ -74,7 +74,7 @@ types:
     docs: 
       Provides detailed capacity and availability information for a specific admission associated with a ticket item. 
       Includes pricing, quantity, and schedule details to help determine if the desired number of tickets can be reserved on a particular date.
-    extends: compositeTypes.AdmissionBase
+    extends: compositeTypes.AdmissionCapacityBase
     properties:
       customerNumber: optional<simpleTypes.CustomerNumber>
       referenceDate: simpleTypes.ReferenceDate
@@ -134,10 +134,10 @@ types:
       Specifies the sales period for a schedule, indicating when ticket sales start and end for that schedule. 
       Informs clients about the booking window, enabling them to display availability and enforce booking rules accordingly.
     properties:
-      salesFromDate: date
-      salesFromTime: string
-      salesUntilDate: date
-      salesUntilTime: string
+      salesFromDate: optional<date>
+      salesFromTime: optional<string>
+      salesUntilDate: optional<date>
+      salesUntilTime: optional<string>
     examples:
       - name: ExampleSalesPeriod
         value:
