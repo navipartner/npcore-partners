@@ -299,7 +299,7 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
     procedure PrintBarcode(POSPrintBuffer: Record "NPR RP Print Buffer")
     var
         Code128: Text;
-        TypeHelper: Codeunit "Type Helper";
+        Math: Codeunit Math;
         PLow: Integer;
         PHigh: Integer;
         TextLength: Integer;
@@ -376,8 +376,8 @@ codeunit 6014543 "NPR RP Epson TM Device Lib." implements "NPR ILine Printer"
 
                     // Store QR
                     TextLength := StrLen(POSPrintBuffer.Text) + 3;
-                    PLow := TypeHelper.BitwiseAnd(TextLength, 255);
-                    PHigh := (TextLength - PLow) / 256;
+                    PLow := TextLength MOD 256;
+                    PHigh := Math.Floor(TextLength / 256);
                     QRStoreData(PLow, PHigh, 49, 80, 48, POSPrintBuffer.Text);
 
                     // Print QR
