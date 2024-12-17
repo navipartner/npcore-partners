@@ -82,11 +82,11 @@ codeunit 6185041 "NPR TicketingCatalogAgent"
                     .AddProperty('category', TicketType.Category)
                 .EndObject()
                 .StartObject('description')
-                    .AddProperty('title', TicketDescriptionBuffer.Title)
-                    .AddProperty('subtitle', TicketDescriptionBuffer.Subtitle)
-                    .AddProperty('name', TicketDescriptionBuffer.Name)
-                    .AddProperty('description', TicketDescriptionBuffer.Description)
-                    .AddProperty('fullDescription', TicketDescriptionBuffer.FullDescription)
+                    .AddObject(AddPropertyNotNull(ResponseJson, 'title', TicketDescriptionBuffer.Title))
+                    .AddObject(AddPropertyNotNull(ResponseJson, 'subtitle', TicketDescriptionBuffer.Subtitle))
+                    .AddObject(AddPropertyNotNull(ResponseJson, 'name', TicketDescriptionBuffer.Name))
+                    .AddObject(AddPropertyNotNull(ResponseJson, 'description', TicketDescriptionBuffer.Description))
+                    .AddObject(AddPropertyNotNull(ResponseJson, 'fullDescription', TicketDescriptionBuffer.FullDescription))
                 .EndObject()
                 .AddArray(AdmissionDetailsDTO(ResponseJson, 'contents', TempCatalogItems."Item No.", TempCatalogItems.Code, TicketDescriptionBuffer))
             .EndObject();
@@ -120,17 +120,24 @@ codeunit 6185041 "NPR TicketingCatalogAgent"
                 .AddProperty('scheduleSelection', EnumEncoder.EncodeScheduleSelection(TicketBom."Ticket Schedule Selection", Admission."Default Schedule"))
                 .AddProperty('maxCapacity', Admission."Max Capacity Per Sch. Entry")
                 .StartObject('description')
-                    .AddProperty('title', TicketDescriptionBuffer.Title)
-                    .AddProperty('subtitle', TicketDescriptionBuffer.Subtitle)
-                    .AddProperty('name', TicketDescriptionBuffer.Name)
-                    .AddProperty('description', TicketDescriptionBuffer.Description)
-                    .AddProperty('fullDescription', TicketDescriptionBuffer.FullDescription)
+                    .AddObject(AddPropertyNotNull(ResponseJson, 'title', TicketDescriptionBuffer.Title))
+                    .AddObject(AddPropertyNotNull(ResponseJson, 'subtitle', TicketDescriptionBuffer.Subtitle))
+                    .AddObject(AddPropertyNotNull(ResponseJson, 'name', TicketDescriptionBuffer.Name))
+                    .AddObject(AddPropertyNotNull(ResponseJson, 'description', TicketDescriptionBuffer.Description))
+                    .AddObject(AddPropertyNotNull(ResponseJson, 'fullDescription', TicketDescriptionBuffer.FullDescription))
                 .EndObject()
             .EndObject();
 
         until (TicketBom.Next() = 0);
 
         ResponseJson.EndArray();
+        exit(ResponseJson);
+    end;
+
+    local procedure AddPropertyNotNull(var ResponseJson: Codeunit "NPR JSON Builder"; PropertyName: Text; PropertyValue: Text): Codeunit "NPR JSON Builder"
+    begin
+        if (PropertyValue <> '') then
+            ResponseJson.AddProperty(PropertyName, PropertyValue);
         exit(ResponseJson);
     end;
 

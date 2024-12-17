@@ -222,10 +222,11 @@ codeunit 6185080 "NPR TicketingTicketAgent"
 
         if (ArrivalSuccess) then begin
             ResponseJson.StartObject()
+                .AddProperty('ticketId', format(Ticket.SystemId, 0, 4).ToLower())
                 .AddProperty('ticketNumber', Ticket."External Ticket No.")
                 .AddProperty('admissionCode', AdmissionCode)
                 .AddProperty('scannerStation', ScannerStationId)
-                .AddProperty('admitted', 'true')
+                .AddProperty('admitted', true)
                 .EndObject();
             Response.RespondOk(ResponseJson.Build());
         end else begin
@@ -241,10 +242,11 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         TicketManagement.ValidateTicketForDeparture("NPR TM TicketIdentifierType"::EXTERNAL_TICKET_NO, Ticket."External Ticket No.", AdmissionCode);
 
         ResponseJson.StartObject()
+            .AddProperty('ticketId', format(Ticket.SystemId, 0, 4).ToLower())
             .AddProperty('ticketNumber', Ticket."External Ticket No.")
             .AddProperty('admissionCode', AdmissionCode)
             .AddProperty('scannerStation', ScannerStationId)
-            .AddProperty('departed', 'true')
+            .AddProperty('departed', true)
             .EndObject();
         Response.RespondOk(ResponseJson.Build());
     end;
@@ -352,6 +354,8 @@ codeunit 6185080 "NPR TicketingTicketAgent"
     begin
         GeneralLedgerSetup.Get();
         TicketingCatalog.GetCatalogItemDescription(StoreCode, Ticket."Item No.", TicketDescriptionBuffer);
+        if (not ReservationRequest.Get(Ticket."Ticket Reservation Entry No.")) then
+            ReservationRequest.Init();
 
         ResponseJson.Initialize()
             .AddObject(SingleTicketDTO(ResponseJson, Ticket, GeneralLedgerSetup."LCY Code", TicketDescriptionBuffer, ReservationRequest));
@@ -369,15 +373,15 @@ codeunit 6185080 "NPR TicketingTicketAgent"
             .AddProperty('ticketId', Format(Ticket.SystemId, 0, 4).ToLower())
             .AddProperty('ticketNumber', Ticket."External Ticket No.")
             .AddProperty('reservationToken', ReservationRequest."Session Token ID")
-            .AddProperty('validFrom', Ticket."Valid From Date")
-            .AddProperty('validUntil', Ticket."Valid To Date")
-            .AddArray(AdmissionDetailsDTO(ResponseJson, 'admissionDetails', Ticket, TicketDescriptionBuffer))
+            .AddProperty('validFrom', CreateDateTime(Ticket."Valid From Date", Ticket."Valid From Time"))
+            .AddProperty('validUntil', CreateDateTime(Ticket."Valid To Date", Ticket."Valid To Time"))
+            .AddArray(AdmissionDetailsDTO(ResponseJson, 'content', Ticket, TicketDescriptionBuffer))
             .StartObject('description')
-                .AddProperty('title', TicketDescriptionBuffer.Title)
-                .AddProperty('subtitle', TicketDescriptionBuffer.Subtitle)
-                .AddProperty('name', TicketDescriptionBuffer.Name)
-                .AddProperty('description', TicketDescriptionBuffer.Description)
-                .AddProperty('fullDescription', TicketDescriptionBuffer.FullDescription)
+                .AddObject(AddPropertyNotNull(ResponseJson, 'title', TicketDescriptionBuffer.Title))
+                .AddObject(AddPropertyNotNull(ResponseJson, 'subtitle', TicketDescriptionBuffer.Subtitle))
+                .AddObject(AddPropertyNotNull(ResponseJson, 'name', TicketDescriptionBuffer.Name))
+                .AddObject(AddPropertyNotNull(ResponseJson, 'description', TicketDescriptionBuffer.Description))
+                .AddObject(AddPropertyNotNull(ResponseJson, 'fullDescription', TicketDescriptionBuffer.FullDescription))
             .EndObject()
             .AddProperty('pinCode', ReservationRequest."Authorization Code")
             .AddProperty('unitPrice', Ticket.AmountExclVat)
@@ -386,6 +390,13 @@ codeunit 6185080 "NPR TicketingTicketAgent"
             .AddProperty('ticketHolder', ReservationRequest.TicketHolderName)
         .EndObject();
 
+        exit(ResponseJson);
+    end;
+
+    local procedure AddPropertyNotNull(var ResponseJson: Codeunit "NPR JSON Builder"; PropertyName: Text; PropertyValue: Text): Codeunit "NPR JSON Builder"
+    begin
+        if (PropertyValue <> '') then
+            ResponseJson.AddProperty(PropertyName, PropertyValue);
         exit(ResponseJson);
     end;
 
@@ -398,9 +409,10 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
         if (TicketAccessEntry.FindSet()) then begin
             repeat
-                ResponseJson.AddObject(AdmissionDTO(ResponseJson, Ticket."Item No.", Ticket."Variant Code", TicketAccessEntry."Admission Code", TicketDescriptionBuffer))
+                ResponseJson.StartObject()
+                    .AddObject(AdmissionDTO(ResponseJson, 'admissionDetails', Ticket."Item No.", Ticket."Variant Code", TicketAccessEntry."Admission Code", TicketDescriptionBuffer))
                     .AddObject(ScheduleDetailsDTO(ResponseJson, 'scheduleDetails', TicketAccessEntry."Entry No."))
-                    .EndObject();
+                .EndObject();
             until (TicketAccessEntry.Next() = 0);
         end;
 
@@ -408,7 +420,7 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         exit(ResponseJson);
     end;
 
-    internal procedure AdmissionDTO(var ResponseJson: Codeunit "NPR JSON Builder"; ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; var TicketDescriptionBuffer: Record "NPR TM TempTicketDescription"): Codeunit "NPR JSON Builder"
+    internal procedure AdmissionDTO(var ResponseJson: Codeunit "NPR JSON Builder"; ObjectName: Text; ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; var TicketDescriptionBuffer: Record "NPR TM TempTicketDescription"): Codeunit "NPR JSON Builder"
     var
         Admission: Record "NPR TM Admission";
         TicketBom: Record "NPR TM Ticket Admission Bom";
@@ -418,7 +430,7 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         TicketBom.Get(ItemNo, VariantCode, AdmissionCode);
         TicketDescriptionBuffer.Get(ItemNo, VariantCode, AdmissionCode);
 
-        ResponseJson.StartObject()
+        ResponseJson.StartObject(ObjectName)
             .AddProperty('code', TicketBom."Admission Code")
             .AddProperty('default', TicketBom.Default)
             .AddProperty('included', EnumEncoder.EncodeInclusion(TicketBom."Admission Inclusion"))
@@ -429,8 +441,8 @@ codeunit 6185080 "NPR TicketingTicketAgent"
                 .AddProperty('name', TicketDescriptionBuffer.Name)
                 .AddProperty('description', TicketDescriptionBuffer.Description)
                 .AddProperty('fullDescription', TicketDescriptionBuffer.FullDescription)
-            .EndObject();
-
+            .EndObject()
+        .EndObject();
         exit(ResponseJson);
     end;
 
@@ -441,8 +453,11 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         DetailAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', EntryNo);
         DetailAccessEntry.SetFilter(Type, '=%1', DetailAccessEntry.Type::RESERVATION);
         DetailAccessEntry.SetFilter(Quantity, '>%1', 0);
-        if (not DetailAccessEntry.FindLast()) then
-            DetailAccessEntry.Init();
+        if (not DetailAccessEntry.FindLast()) then begin
+            DetailAccessEntry.SetFilter(Type, '=%1', DetailAccessEntry.Type::INITIAL_ENTRY);
+            if (not DetailAccessEntry.FindLast()) then
+                DetailAccessEntry.Init();
+        end;
 
         exit(ScheduleDTO(ResponseJson, ObjectName, DetailAccessEntry."External Adm. Sch. Entry No."));
 

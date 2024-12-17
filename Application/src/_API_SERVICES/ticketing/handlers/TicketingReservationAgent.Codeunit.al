@@ -100,11 +100,18 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         ResponseJson.StartObject()
             .AddProperty('token', Token)
             .AddProperty('reservationStatus', _Translation.EncodeRequestStatus(TicketReservationRequest."Request Status"))
-            .AddProperty('expiresAt', GetExpiryDateTimeValue(TicketReservationRequest))
             .AddArray(ReservationDTO(ResponseJson, 'reservations', Token))
+            .AddObject(AddPropertyNotNull(ResponseJson, 'expiresAt', GetExpiryDateTimeValue(TicketReservationRequest)))
             .EndObject();
 
         exit(Response.RespondOK(ResponseJson.Build()));
+    end;
+
+    local procedure AddPropertyNotNull(var ResponseJson: Codeunit "NPR JSON Builder"; PropertyName: Text; PropertyValue: DateTime): Codeunit "NPR JSON Builder"
+    begin
+        if (PropertyValue <> CreateDateTime(0D, 0T)) then
+            ResponseJson.AddProperty(PropertyName, PropertyValue);
+        exit(ResponseJson);
     end;
 
     internal procedure CancelReservation(Token: Code[100]) Response: Codeunit "NPR API Response"
@@ -371,12 +378,12 @@ codeunit 6185083 "NPR TicketingReservationAgent"
     // ******************************
     // local functions
 
-    local procedure GetExpiryDateTimeValue(TicketReservationRequest: Record "NPR TM Ticket Reservation Req."): Text
+    local procedure GetExpiryDateTimeValue(TicketReservationRequest: Record "NPR TM Ticket Reservation Req."): DateTime
     var
     begin
         if (TicketReservationRequest."Request Status" = TicketReservationRequest."Request Status"::Confirmed) then
-            exit('');
-        exit(Format(TicketReservationRequest."Expires Date Time", 0, 9));
+            exit(CreateDateTime(0D, 0T));
+        exit(TicketReservationRequest."Expires Date Time");
     end;
 
 
@@ -416,10 +423,11 @@ codeunit 6185083 "NPR TicketingReservationAgent"
             .AddProperty('itemNumber', TicketReservationRequest."Item No.")
             .AddProperty('quantity', TicketReservationRequest."Quantity")
             .AddObject(CompactTicketDetailsDTO(ResponseJson, PrimaryEntryNo))
-            .StartArray('admissions');
+            .StartArray('content');
         repeat
             ResponseJson
-                .AddObject(TicketAgent.AdmissionDTO(ResponseJson, TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest."Admission Code", TicketDescriptionBuffer))
+                .StartObject()
+                .AddObject(TicketAgent.AdmissionDTO(ResponseJson, 'admissionDetails', TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest."Admission Code", TicketDescriptionBuffer))
                 .AddObject(TicketAgent.ScheduleDTO(ResponseJson, 'scheduleDetails', TicketReservationRequest."External Adm. Sch. Entry No."))
                 .EndObject()
         until (TicketReservationRequest.Next() = 0);
@@ -441,8 +449,8 @@ codeunit 6185083 "NPR TicketingReservationAgent"
             exit(ResponseJson);
 
         ResponseJson.StartObject('ticket')
-            .AddProperty('validFrom', Ticket."Valid From Date")
-            .AddProperty('validUntil', Ticket."Valid To Date")
+            .AddProperty('validFrom', CreateDateTime(Ticket."Valid From Date", Ticket."Valid From Time"))
+            .AddProperty('validUntil', CreateDateTime(Ticket."Valid To Date", Ticket."Valid To Time"))
             .AddProperty('unitPrice', Ticket.AmountExclVat)
             .AddProperty('unitPriceInclVat', Ticket.AmountInclVat)
             .AddProperty('currencyCode', GeneralLedgerSetup."LCY Code")
