@@ -89,6 +89,19 @@ page 6184831 "NPR Spfy Item Prices"
                     SpfyCalculateItemPricesParams.RunModal();
                 end;
             }
+            action("Show Logs")
+            {
+                Caption = 'Show Logs';
+                ToolTip = 'Show Log entries of the last recalculation process.';
+                ApplicationArea = NPRShopify;
+                Image = Log;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+                RunObject = Page "NPR Spfy Logs";
+                RunPageView = where("Log Source" = const("Item Price"));
+            }
         }
     }
 }

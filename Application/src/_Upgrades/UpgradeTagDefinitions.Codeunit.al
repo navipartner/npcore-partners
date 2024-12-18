@@ -47,6 +47,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'HeyLoyaltyWebhookRequests'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NPRE'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NcTask'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'ShopifyLog'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddJobQueues'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateJobQueues1'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddTaskCountResetJQ'));
@@ -334,6 +335,8 @@
                         exit('NcTask-20231017');
                     'SalesPriceMaintenance':
                         exit('SalesPriceMaintenance-20240523');
+                    'ShopifyLog':
+                        exit('ShopifyLog-20241218')
                 end;
             Codeunit::"NPR Job Queue Install":
                 Case UpgradeStep of

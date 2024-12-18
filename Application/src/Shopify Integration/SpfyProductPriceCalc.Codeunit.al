@@ -16,6 +16,7 @@ codeunit 6185050 "NPR Spfy Product Price Calc."
         _SpfyStoreCode: Code[20];
         _SpfyIntegrationEvents: Codeunit "NPR Spfy Integration Events";
 
+    [TryFunction]
     internal procedure CalcPrice(Item: Record Item; VariantCode: Code[20]; UnitOfMeasureCode: Code[20]; var Price: Decimal; var ComparePrice: Decimal)
     var
         ItemUnitofMeasure: Record "Item Unit of Measure";
@@ -82,6 +83,7 @@ codeunit 6185050 "NPR Spfy Product Price Calc."
         TempSalesHeader.Insert(false);
     end;
 
+    [TryFunction]
     internal procedure Initialize(ShopifyStoreCode: Code[20]; ItemPriceDate: Date)
     var
         ShopifyStore: Record "NPR Spfy Store";

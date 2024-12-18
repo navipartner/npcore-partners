@@ -20,15 +20,20 @@ codeunit 6185048 "NPR Spfy Item Price Mgt."
         TempItemPrice: Record "NPR Spfy Item Price" temporary;
         ItemVariant: Record "Item Variant";
         Window: Dialog;
+        CalculatedPrices: Integer;
         RecNo: Integer;
         TotalRecNo: Integer;
         ShopifyStoreCode: Code[20];
         ShopifyStores: List of [Code[20]];
         FullRecalculation: Boolean;
+        ItemPriceUpdated: Boolean;
         DialogTextLbl1: Label 'Initializing Item Prices...\\';
         DialogTextLbl2: Label 'Prepare   @1@@@@@@@@@@@@@@@@@@@@\';
         DialogTextLbl3: Label 'Calculate @2@@@@@@@@@@@@@@@@@@@@';
+        FinishedItemPriceCalcInfLbl: Label 'Finished item price calculation. %1 Item Price entries were updated/created.';
+        SalesHeaderInitializationWrnLbl: Label 'Sales Header initialization error: %1';
         NothingToDoErr: Label 'There is nothing to do. Please make sure you have marked all relevant items as Shopify items.';
+        StartingItemPriceCalcInfLbl: Label 'Starting item price calculation... \Filters: \Item Prices Calculation Date: "%1", \Shopify Store filters: "%2", \Item filters: "%3"';
     begin
         if not Initialize() then
             exit;
@@ -50,6 +55,8 @@ codeunit 6185048 "NPR Spfy Item Price Mgt."
                 exit;
             Error(NothingToDoErr);
         end;
+
+        LogMessage(StrSubstNo(StartingItemPriceCalcInfLbl, ItemPricesCalculationDate, ShopifyStore.GetFilters(), Item.GetFilters()), Enum::"NPR Spfy Message Type"::Info);
 
         if not Silent then begin
             Window.Open(
@@ -102,7 +109,7 @@ codeunit 6185048 "NPR Spfy Item Price Mgt."
             RecNo := 0;
             TotalRecNo := TempItemPrice.Count();
         end;
-
+        CalculatedPrices := 0;
 #if not (BC18 or BC19 or BC20 or BC21)
         ItemPrice.ReadIsolation := IsolationLevel::UpdLock;
 #else
@@ -113,43 +120,54 @@ codeunit 6185048 "NPR Spfy Item Price Mgt."
             repeat
                 ItemPrice.Reset();
                 TempItemPrice.SetRange("Shopify Store Code", TempItemPrice."Shopify Store Code");
-                SpfyProductPriceCalc.Initialize(TempItemPrice."Shopify Store Code", ItemPricesCalculationDate);
+                if SpfyProductPriceCalc.Initialize(TempItemPrice."Shopify Store Code", ItemPricesCalculationDate) then begin
 
-                if FullRecalculation then
-                    MarkObsoleteItemPrices(TempItemPrice."Shopify Store Code", ItemPrice);
-                repeat
-                    TempItemPrice.SetRange("Item No.", TempItemPrice."Item No.");
 
-                    if not FullRecalculation then begin
-                        if (Item.GetFilter("Variant Filter") = '') then
-                            MarkObsoleteItemPrices(TempItemPrice, true, ItemPrice);
-
-                        if TempItemPrice."Variant Code" <> '' then begin
-                            ItemPrice := TempItemPrice;
-                            ItemPrice."Variant Code" := '';
-                            MarkObsoleteItemPrices(ItemPrice, Item.GetFilter("Variant Filter") = '', ItemPrice);
-                        end;
-                    end;
-
+                    if FullRecalculation then
+                        MarkObsoleteItemPrices(TempItemPrice."Shopify Store Code", ItemPrice);
                     repeat
-                        if not FullRecalculation then
-                            MarkObsoleteItemPrices(TempItemPrice, false, ItemPrice);
-                        if RecalcItemPrice(TempItemPrice, ItemPrice, ItemPricesCalculationDate) then
-                            ItemPrice.Mark(false);
-                        if not Silent then begin
-                            RecNo += 1;
-                            Window.Update(2, Round(RecNo / TotalRecNo * 10000, 1));
+                        TempItemPrice.SetRange("Item No.", TempItemPrice."Item No.");
+
+                        if not FullRecalculation then begin
+                            if (Item.GetFilter("Variant Filter") = '') then
+                                MarkObsoleteItemPrices(TempItemPrice, true, ItemPrice);
+
+                            if TempItemPrice."Variant Code" <> '' then begin
+                                ItemPrice := TempItemPrice;
+                                ItemPrice."Variant Code" := '';
+                                MarkObsoleteItemPrices(ItemPrice, Item.GetFilter("Variant Filter") = '', ItemPrice);
+                            end;
                         end;
-                    until TempItemPrice.Next() = 0; //by Variant
-                    TempItemPrice.SetRange("Item No.");
-                until TempItemPrice.Next() = 0;  //by Item
 
-                ItemPrice.MarkedOnly(true);
-                ItemPrice.DeleteAll();
-                TempItemPrice.SetRange("Shopify Store Code");
+                        repeat
+                            if not FullRecalculation then
+                                MarkObsoleteItemPrices(TempItemPrice, false, ItemPrice);
+                            ItemPriceUpdated := false;
+                            if RecalcItemPrice(TempItemPrice, ItemPrice, ItemPricesCalculationDate, ItemPriceUpdated) then begin
+                                if ItemPriceUpdated then
+                                    CalculatedPrices += 1;
+                                ItemPrice.Mark(false);
+                            end;
+                            if not Silent then begin
+                                RecNo += 1;
+                                Window.Update(2, Round(RecNo / TotalRecNo * 10000, 1));
+                            end;
+                        until TempItemPrice.Next() = 0; //by Variant
+                        TempItemPrice.SetRange("Item No.");
+                    until TempItemPrice.Next() = 0;  //by Item
+
+                    ItemPrice.MarkedOnly(true);
+                    ItemPrice.DeleteAll();
+                    TempItemPrice.SetRange("Shopify Store Code");
+                end else
+                    LogMessage(StrSubstNo(SalesHeaderInitializationWrnLbl, GetLastErrorText()), Enum::"NPR Spfy Message Type"::Error);
             until TempItemPrice.Next() = 0;  //by Shopify Store
-    end;
 
+        if not Silent then
+            Window.Close();
+
+        LogMessage(StrSubstNo(FinishedItemPriceCalcInfLbl, Format(CalculatedPrices)), Enum::"NPR Spfy Message Type"::Info);
+    end;
 
     internal procedure CreateSpfyItemPriceSyncJob(JobDescription: Text)
     var
@@ -186,6 +204,33 @@ codeunit 6185048 "NPR Spfy Item Price Mgt."
             JobQueueEntry.Cancel();
     end;
 
+    internal procedure EnableShopifyLogRetentionPolicy()
+    var
+        RetentionPolicySetup: Record "Retention Policy Setup";
+    begin
+        if not RetentionPolicySetup.WritePermission() then
+            exit;
+        if not RetentionPolicySetup.Get(Database::"NPR Spfy Log") or RetentionPolicySetup.Enabled then
+            exit;
+        RetentionPolicySetup.Validate(Enabled, true);
+        RetentionPolicySetup.Modify(true);
+    end;
+
+    local procedure LogMessage(Message: Text; MessageType: Enum "NPR Spfy Message Type")
+    var
+        SpfyItemPriceLog: Record "NPR Spfy Log";
+        OutS: OutStream;
+    begin
+        SpfyItemPriceLog.Init();
+        SpfyItemPriceLog."Entry No." := 0;
+        SpfyItemPriceLog."Log Source" := SpfyItemPriceLog."Log Source"::"Item Price";
+        SpfyItemPriceLog."Message Type" := MessageType;
+        SpfyItemPriceLog."Message Text" := CopyStr(DelChr(Message, '=', '\'), 1, MaxStrLen(SpfyItemPriceLog."Message Text"));
+        SpfyItemPriceLog."Message Blob".CreateOutStream(OutS, TextEncoding::UTF8);
+        OutS.WriteText(Message);
+        SpfyItemPriceLog.Insert();
+    end;
+
     local procedure ValidateStore(SpfyStore: Record "NPR Spfy Store"): Boolean
     begin
         if not SpfyStore.Enabled then
@@ -215,7 +260,7 @@ codeunit 6185048 "NPR Spfy Item Price Mgt."
         ItemPrice.SetRange("Variant Code");
     end;
 
-    local procedure RecalcItemPrice(ItemPriceParam: Record "NPR Spfy Item Price"; var ItemPriceOut: Record "NPR Spfy Item Price"; ItemPricesCalculationDate: Date): Boolean
+    local procedure RecalcItemPrice(ItemPriceParam: Record "NPR Spfy Item Price"; var ItemPriceOut: Record "NPR Spfy Item Price"; ItemPricesCalculationDate: Date; var ItemPriceUpdated: Boolean): Boolean
     var
         Item: Record Item;
         ItemPrice: Record "NPR Spfy Item Price";
@@ -243,26 +288,27 @@ codeunit 6185048 "NPR Spfy Item Price Mgt."
         Item.SetRange("Variant Filter", ItemPriceParam."Variant Code");
 
         ShopifyStore.Get(ItemPriceParam."Shopify Store Code");
-        SpfyProductPriceCalc.CalcPrice(Item, ItemPriceParam."Variant Code", Item."Sales Unit of Measure", CurrentPrice, CurrentComparePrice);
-
-        ItemPrice.LockTable();
-        ItemPrice := ItemPriceParam;
-        if not ItemPrice.Find() then begin
-            ItemPrice."Unit Price" := CurrentPrice;
-            ItemPrice."Compare at Price" := CurrentComparePrice;
-            ItemPrice."Currency Code" := ShopifyStore."Currency Code";
-            ItemPrice."Starting Date" := ItemPriceParam."Starting Date";
-            ItemPrice.Insert(true);
-        end else
-            if (ItemPrice."Unit Price" <> CurrentPrice) or (ItemPrice."Compare at Price" <> CurrentComparePrice) or (ItemPrice."Currency Code" <> ShopifyStore."Currency Code") then begin
+        ClearLastError();
+        if SpfyProductPriceCalc.CalcPrice(Item, ItemPriceParam."Variant Code", Item."Sales Unit of Measure", CurrentPrice, CurrentComparePrice) then begin
+            ItemPrice := ItemPriceParam;
+            if not ItemPrice.Find() then begin
                 ItemPrice."Unit Price" := CurrentPrice;
                 ItemPrice."Compare at Price" := CurrentComparePrice;
                 ItemPrice."Currency Code" := ShopifyStore."Currency Code";
                 ItemPrice."Starting Date" := ItemPriceParam."Starting Date";
-                ItemPrice.Modify(true);
-            end;
-        ItemPriceOut := ItemPrice;
-        exit(true);
+                ItemPriceUpdated := ItemPrice.Insert(true);
+            end else
+                if (ItemPrice."Unit Price" <> CurrentPrice) or (ItemPrice."Compare at Price" <> CurrentComparePrice) or (ItemPrice."Currency Code" <> ShopifyStore."Currency Code") then begin
+                    ItemPrice."Unit Price" := CurrentPrice;
+                    ItemPrice."Compare at Price" := CurrentComparePrice;
+                    ItemPrice."Currency Code" := ShopifyStore."Currency Code";
+                    ItemPrice."Starting Date" := ItemPriceParam."Starting Date";
+                    ItemPriceUpdated := ItemPrice.Modify(true);
+                end;
+            ItemPriceOut := ItemPrice;
+            exit(true);
+        end else
+            LogMessage(GetLastErrorText(), Enum::"NPR Spfy Message Type"::Error);
     end;
 }
 #endif

@@ -104,10 +104,13 @@ table 6150810 "NPR Spfy Store"
 
             trigger OnValidate()
             var
+                SpfyItemPriceMgt: Codeunit "NPR Spfy Item Price Mgt.";
                 SpfyScheduleSendTasks: Codeunit "NPR Spfy Schedule Send Tasks";
             begin
-                if not "Do Not Sync. Sales Prices" then
+                if not "Do Not Sync. Sales Prices" then begin
+                    SpfyItemPriceMgt.EnableShopifyLogRetentionPolicy();
                     _SpfyDataLogSubscrMgt.CreateDataLogSetup("NPR Spfy Integration Area"::"Item Prices");
+                end;
                 SpfyScheduleSendTasks.ToggleSpfyItemPriceSyncJobQueue(Enabled and not "Do Not Sync. Sales Prices");
             end;
         }
