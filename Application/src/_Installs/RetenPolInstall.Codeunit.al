@@ -48,6 +48,10 @@
 
         AddSalesPriceMaintRetentionPolicy(IsUpgrade);
 
+#if not BC17
+        AddShopifyLogRetentionPolicy(IsUpgrade);
+#endif
+
         if IsUpgrade then
             LogMessageStopwatch.LogFinish();
     end;
@@ -192,6 +196,20 @@
         if IsUpgrade then
             SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NPRE');
     end;
+
+#if not BC17
+    local procedure AddShopifyLogRetentionPolicy(IsUpgrade: Boolean)
+    begin
+        if IsUpgrade then
+            if HasUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'ShopifyLog') then
+                exit;
+
+        AddAllowedTable(Database::"NPR Spfy Log", Enum::"Retention Period Enum"::"1 Month", Enum::"Reten. Pol. Deleting"::Default);
+
+        if IsUpgrade then
+            SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'ShopifyLog');
+    end;
+#endif
 
     local procedure AddSalesPriceMaintRetentionPolicy(IsUpgrade: Boolean)
     var
