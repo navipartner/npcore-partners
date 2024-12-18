@@ -188,7 +188,9 @@ codeunit 6185083 "NPR TicketingReservationAgent"
 
                     ContentLine := ContentLineToken.AsObject();
                     AdmissionCode := CopyStr(GetAsText(ContentLine, 'admissionCode', ''), 1, MaxStrLen(AdmissionCode));
-                    ScheduleId := GetAsInteger(ContentLine, 'scheduleId', -1);
+                    ScheduleId := GetAsInteger(ContentLine, 'scheduleNumber', -1);
+                    if (ScheduleId = -1) then
+                        ScheduleId := GetAsInteger(ContentLine, 'scheduleId', -1);
 
                     Clear(Line);
                     Line.Add('itemReference', ItemNo);
