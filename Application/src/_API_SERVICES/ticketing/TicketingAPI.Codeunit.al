@@ -77,13 +77,73 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
     local procedure Handle(ApiFunction: Enum "NPR TicketingApiFunctions"; var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         TicketingApiHandler: Codeunit "NPR TicketingApiHandler";
+        StartTime: Time;
+        ResponseMessage: Text;
+        ApiError: Enum "NPR API Error Code";
     begin
+        StartTime := Time();
+
         Commit();
         TicketingApiHandler.SetRequest(ApiFunction, Request);
-        if (TicketingApiHandler.Run()) then
-            exit(TicketingApiHandler.GetResponse());
+        if (TicketingApiHandler.Run()) then begin
+            Response := TicketingApiHandler.GetResponse();
+            LogMessage(ApiFunction, (Time() - StartTime), Response.GetStatusCode(), Response);
+            exit(Response);
+        end;
 
-        Response.CreateErrorResponse(Enum::"NPR API Error Code"::generic_error, GetLastErrorText());
+        // When the code throws an error, the response is not set by the handler
+        ResponseMessage := GetLastErrorText();
+        ApiError := ErrorToEnum();
+
+        Response.CreateErrorResponse(ApiError, ResponseMessage);
+        LogMessage(ApiFunction, (Time() - StartTime), Response.GetStatusCode(), Response);
+        exit(Response);
     end;
+
+    local procedure ErrorToEnum(): Enum "NPR API Error Code"
+    begin
+        exit(Enum::"NPR API Error Code"::generic_error);
+    end;
+
+    local procedure LogMessage(Function: Enum "NPR TicketingApiFunctions"; DurationMs: Decimal; HttpStatusCode: Integer; Response: Codeunit "NPR API Response")
+    var
+        CustomDimensions: Dictionary of [Text, Text];
+        ActiveSession: Record "Active Session";
+        JsonObj: JsonObject;
+        JToken: JsonToken;
+        ResponseMessage: Text;
+    begin
+        if (not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId())) then
+            ActiveSession.Init();
+
+        CustomDimensions.Add('NPR_FunctionName', Function.Names.Get(Function.Ordinals.IndexOf(Function.AsInteger())));
+        CustomDimensions.Add('NPR_DurationMs', Format(DurationMs, 0, 9));
+
+        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
+        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
+        CustomDimensions.Add('NPR_TenantId', Database.TenantId());
+        CustomDimensions.Add('NPR_CompanyName', CompanyName());
+        CustomDimensions.Add('NPR_UserID', ActiveSession."User ID");
+        CustomDimensions.Add('NPR_SessionId', Format(Database.SessionId(), 0, 9));
+        CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
+
+        if (HttpStatusCode in [200 .. 299]) then begin
+            ResponseMessage := StrSubstNo('Success - HTTP %1', HttpStatusCode);
+            CustomDimensions.Add('NPR_ErrorText', '');
+            CustomDimensions.Add('NPR_ErrorCodeName', '');
+
+            Session.LogMessage('NPR_API_Ticketing', ResponseMessage, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
+        end else begin
+            JsonObj := Response.GetJson(); // Note: This will throw an error if the response is not JSON Object which might be true for some success responses
+            ResponseMessage := StrSubstNo('Failure - HTTP %1', HttpStatusCode);
+            if (JsonObj.Get('message', JToken)) then
+                CustomDimensions.Add('NPR_ErrorText', JToken.AsValue().AsText());
+            if (JsonObj.Get('code', JToken)) then
+                CustomDimensions.Add('NPR_ErrorCodeName', JToken.AsValue().AsText());
+
+            Session.LogMessage('NPR_API_Ticketing', ResponseMessage, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
+        end;
+    end;
+
 }
 #endif
