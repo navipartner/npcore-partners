@@ -104,6 +104,24 @@ page 6150768 "NPR SI POS Audit Log Aux. Info"
                     ApplicationArea = NPRSIFiscal;
                     ToolTip = 'Specifies the value of the Receipt Fiscalized field.';
                 }
+                field("Fiscal Bill E-Mails"; Rec."Fiscal Bill E-Mails")
+                {
+                    ApplicationArea = NPRSIFiscal;
+                    ToolTip = 'Specifies if the Fiscal Bill was E-mailed to the recipient.';
+                    trigger OnDrillDown()
+                    var
+                        SIFiscalEMailLog: Record "NPR SI Fiscal E-Mail Log";
+                        SIFiscalEMailLogs: Page "NPR SI Fiscal E-Mail Logs";
+                    begin
+                        SIFiscalEMailLogs.Editable(false);
+                        SIFiscalEMailLog.SetRange("Audit Entry Type", Rec."Audit Entry Type");
+                        SIFiscalEMailLog.SetRange("Audit Entry No.", Rec."Audit Entry No.");
+                        if SIFiscalEMailLog.IsEmpty() then
+                            exit;
+                        SIFiscalEMailLogs.SetTableView(SIFiscalEMailLog);
+                        SIFiscalEMailLogs.RunModal();
+                    end;
+                }
             }
         }
     }
@@ -167,7 +185,52 @@ page 6150768 "NPR SI POS Audit Log Aux. Info"
                     SIFiscalBillA4.RunModal();
                 end;
             }
+            action("Send To Document E-mail")
+            {
+                ApplicationArea = NPRSIFiscal;
+                Caption = 'Send To Document E-mail';
+                Image = SendElectronicDocument;
+                Promoted = true;
+                PromotedCategory = Category5;
+                PromotedOnly = true;
+                ToolTip = 'Executes the Send With Document E-mail action.';
 
+                trigger OnAction()
+                var
+                    FiscalEMailMgt: Codeunit "NPR SI Fiscal E-Mail Mgt.";
+                begin
+                    FiscalEMailMgt.Run(Rec);
+                end;
+            }
+            action("Send To Custom E-mail")
+            {
+                ApplicationArea = NPRSIFiscal;
+                Caption = 'Send To Custom E-mail';
+                Image = SendElectronicDocument;
+                Promoted = true;
+                PromotedCategory = Category5;
+                PromotedOnly = true;
+                ToolTip = 'Executes the Send To Custom E-mail action.';
+
+                trigger OnAction()
+                var
+                    MailManagement: Codeunit "Mail Management";
+                    FiscalEMailMgt: Codeunit "NPR SI Fiscal E-Mail Mgt.";
+                    EmailUserSpecifiedAddress: Page "Email User-Specified Address";
+                    EmailRecipient: Text;
+                    EmailAddressNotValidErrLbl: Label 'E-Mail address is not in the valid format.';
+                begin
+                    if EmailUserSpecifiedAddress.RunModal() <> Action::OK then
+                        exit;
+
+                    EmailRecipient := EmailUserSpecifiedAddress.GetEmailAddress();
+
+                    if not MailManagement.CheckValidEmailAddress(EmailRecipient) then
+                        Error(EmailAddressNotValidErrLbl);
+
+                    FiscalEMailMgt.SendFiscalBillViaEmail(Rec, EmailRecipient);
+                end;
+            }
             action(DownloadRequest)
             {
                 ApplicationArea = NPRSIFiscal;

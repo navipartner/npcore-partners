@@ -365,7 +365,7 @@ codeunit 6151546 "NPR SI Audit Mgt."
         SIAuxSalespPurch.ReadSIAuxSalespersonFields(SalespersonPurchaser);
         SIPOSAuditLogAuxInfo."Cashier ID" := SIAuxSalespPurch."NPR SI Salesperson Tax Number";
         SIPOSAuditLogAuxInfo."Salesperson Code" := POSEntry."Salesperson Code";
-        SIPOSAuditLogAuxInfo."Customer VAT Number" := GetCustomerVATRegistrationNo(POSEntry."Customer No.");
+        SaveCustomerDataToAuditLog(SIPOSAuditLogAuxInfo, POSEntry."Customer No.");
 
         SIPOSAuditLogAuxInfo.Insert(true);
         CalculateAndSignZOI(SIPOSAuditLogAuxInfo);
@@ -398,7 +398,7 @@ codeunit 6151546 "NPR SI Audit Mgt."
         SIAuxSalespPurch.ReadSIAuxSalespersonFields(SalespersonPurchaser);
         SIPOSAuditLogAuxInfo."Cashier ID" := SIAuxSalespPurch."NPR SI Salesperson Tax Number";
         SIPOSAuditLogAuxInfo."Salesperson Code" := SalesInvoiceHeader."Salesperson Code";
-        SIPOSAuditLogAuxInfo."Customer VAT Number" := GetCustomerVATRegistrationNo(SalesInvoiceHeader."Sell-to Customer No.");
+        SaveCustomerDataToAuditLog(SIPOSAuditLogAuxInfo, SalesInvoiceHeader."Sell-to Customer No.");
 
         SIPOSAuditLogAuxInfo.Insert(true);
         CalculateAndSignZOI(SIPOSAuditLogAuxInfo);
@@ -442,7 +442,7 @@ codeunit 6151546 "NPR SI Audit Mgt."
         SIAuxSalespPurch.ReadSIAuxSalespersonFields(SalespersonPurchaser);
         SIPOSAuditLogAuxInfo."Cashier ID" := SIAuxSalespPurch."NPR SI Salesperson Tax Number";
         SIPOSAuditLogAuxInfo."Salesperson Code" := SalesCrMemoHeader."Salesperson Code";
-        SIPOSAuditLogAuxInfo."Customer VAT Number" := GetCustomerVATRegistrationNo(SalesCrMemoHeader."Sell-to Customer No.");
+        SaveCustomerDataToAuditLog(SIPOSAuditLogAuxInfo, SalesCrMemoHeader."Sell-to Customer No.");
 
         SIPOSAuditLogAuxInfo.Insert(true);
         CalculateAndSignZOI(SIPOSAuditLogAuxInfo);
@@ -690,15 +690,16 @@ codeunit 6151546 "NPR SI Audit Mgt."
         exit(CertificateSubject);
     end;
 
-    local procedure GetCustomerVATRegistrationNo(CustomerNo: Code[20]): Text[20]
+    local procedure SaveCustomerDataToAuditLog(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"; CustomerNo: Code[20])
     var
         Customer: Record Customer;
     begin
         if CustomerNo = '' then
-            exit('');
+            exit;
         if not Customer.Get(CustomerNo) then
-            exit('');
-        exit(Customer."VAT Registration No.");
+            exit;
+        SIPOSAuditLogAuxInfo."Customer VAT Number" := Customer."VAT Registration No.";
+        SIPOSAuditLogAuxInfo."Email-To" := Customer."E-Mail";
     end;
 
     #endregion

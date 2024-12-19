@@ -65,6 +65,11 @@ table 6059835 "NPR SI Fiscalization Setup"
             Caption = 'Auto Print Receipt On Sales Document';
             DataClassification = CustomerContent;
         }
+        field(30; "E-Mail Subject"; Text[250])
+        {
+            Caption = 'E-Mail Subject';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

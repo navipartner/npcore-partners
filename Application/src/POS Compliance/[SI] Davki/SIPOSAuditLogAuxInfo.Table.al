@@ -168,6 +168,18 @@ table 6059838 "NPR SI POS Audit Log Aux. Info"
             Caption = 'Salesperson Code';
             DataClassification = CustomerContent;
         }
+        field(32; "Email-To"; Text[250])
+        {
+            Caption = 'Email-To';
+            DataClassification = CustomerContent;
+        }
+        field(33; "Fiscal Bill E-Mails"; Boolean)
+        {
+            CalcFormula = exist("NPR SI Fiscal E-Mail Log" where("Audit Entry Type" = field("Audit Entry Type"), "Audit Entry No." = field("Audit Entry No."), Successful = const(true)));
+            Caption = 'Fiscal Bill E-Mails';
+            Editable = false;
+            FieldClass = FlowField;
+        }
         field(35; "Return Additional Info"; Text[250])
         {
             Caption = 'Return Additional Info';

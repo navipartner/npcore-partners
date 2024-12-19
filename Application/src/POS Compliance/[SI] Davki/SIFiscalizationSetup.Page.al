@@ -74,10 +74,21 @@ page 6150767 "NPR SI Fiscalization Setup"
             group(Additional)
             {
                 Caption = 'Additional Setup';
+
                 field("Print Receipt On Sales Doc."; Rec."Print Receipt On Sales Doc.")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies if the receipt should be automatically printed after sales document posting.';
+                }
+            }
+            group(Mailing)
+            {
+                Caption = 'E-Mailing Setup';
+
+                field("E-Mail Subject"; Rec."E-Mail Subject")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the E-mail subject that will be sent with fiscal bill e-mails.';
                 }
             }
         }
