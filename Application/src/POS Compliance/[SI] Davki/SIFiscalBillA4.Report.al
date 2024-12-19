@@ -18,7 +18,7 @@ report 6014556 "NPR SI Fiscal Bill A4"
             column(CompanyWebsite; CompanyWebsite) { }
             column(CompanyCity; CompanyCity) { }
             column(LogTimeStamp; Format("Log Timestamp", 8, '<Hours24>:<Minutes,2>:<Seconds,2>')) { }
-            column(EntryDate; SystemCreatedAt) { }
+            column(EntryDate; Format("Entry Date", 0, '<Day,2>/<Month,2>/<Year4>')) { }
             column(EORCode; "EOR Code") { }
             column(Bill; StrSubstNo(BillLbl, "POS Store Code", "POS Unit No.", "Receipt No.")) { }
             column(ZOICode; "ZOI Code") { }
@@ -67,7 +67,15 @@ report 6014556 "NPR SI Fiscal Bill A4"
                 DataItemLink = "Code" = field("POS Store Code");
 
                 column(StoreDetailsLine; StoreDetailsLine) { }
+                column(POSStoreName; Name) { }
+                column(POSStoreAddress; Address) { }
+                column(POSStorePostCode; "Post Code") { }
+                column(POSStoreCity; City) { }
                 column(POSStore; Code) { }
+                trigger OnAfterGetRecord()
+                begin
+                    CreatePOSStoreInfo();
+                end;
             }
             trigger OnPreDataItem()
             begin
@@ -90,8 +98,6 @@ report 6014556 "NPR SI Fiscal Bill A4"
                     CompanyName := CompanyInfo.Name;
                     CompanyCity := CompanyInfo.City;
                 end;
-
-                CreatePOSStoreInfoArray();
 
                 IsPrintedCopy();
             end;
@@ -175,12 +181,10 @@ report 6014556 "NPR SI Fiscal Bill A4"
         POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
-        TaxKey: Decimal;
         AmountInclTaxDict: Dictionary of [Decimal, Decimal];
         TaxableAmountDict: Dictionary of [Decimal, Decimal];
         TaxAmountDict: Dictionary of [Decimal, Decimal];
         NextLineNo: Integer;
-        DictKeyList: List of [Decimal];
     begin
         POSEntry.SetLoadFields("Customer No.", "Salesperson Code");
         POSEntry.Get(SIPOSAuditLogAuxInfo."POS Entry No.");
@@ -213,30 +217,25 @@ report 6014556 "NPR SI Fiscal Bill A4"
             POSEntryLines."POS Entry No." := SIPOSAuditLogAuxInfo."POS Entry No.";
             POSEntryLines."Line No." := NextLineNo;
             NextLineNo += 10000;
-            TaxKey := POSEntrySalesLine."VAT %";
-            AddAmountToDecimalDictionary(TaxableAmountDict, TaxKey, POSEntrySalesLine."VAT Base Amount");
-            AddAmountToDecimalDictionary(TaxAmountDict, TaxKey, POSEntrySalesLine."Amount Incl. VAT" - POSEntrySalesLine."Amount Excl. VAT");
-            AddAmountToDecimalDictionary(AmountInclTaxDict, TaxKey, POSEntrySalesLine."Amount Incl. VAT");
+            AddAmountToDecimalDictionary(TaxableAmountDict, POSEntrySalesLine."VAT %", POSEntrySalesLine."VAT Base Amount");
+            AddAmountToDecimalDictionary(TaxAmountDict, POSEntrySalesLine."VAT %", POSEntrySalesLine."Amount Incl. VAT" - POSEntrySalesLine."Amount Excl. VAT");
+            AddAmountToDecimalDictionary(AmountInclTaxDict, POSEntrySalesLine."VAT %", POSEntrySalesLine."Amount Incl. VAT");
             POSEntryLines.Insert();
         until POSEntrySalesLine.Next() = 0;
 
-        DictKeyList := TaxableAmountDict.Keys();
-        FillTaxField(POSEntryTaxLines, AmountInclTaxDict, DictKeyList, TaxableAmountDict, TaxAmountDict, TaxKey);
+        FillTaxField(POSEntryTaxLines, AmountInclTaxDict, TaxableAmountDict, TaxAmountDict);
     end;
 
     local procedure FillSalesCrMemoRecords(SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"; var POSEntryLines: Record "NPR POS Entry Sales Line" temporary;
     var POSEntryTaxLines: Record "NPR POS Entry Tax Line" temporary; var POSEntryPaymentLines: Record "NPR POS Entry Payment Line" temporary)
-
     var
         SalesCreditMemo: Record "Sales Cr.Memo Header";
         SalesCreditMemoLine: Record "Sales Cr.Memo Line";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
-        TaxKey: Decimal;
         AmountInclTaxDict: Dictionary of [Decimal, Decimal];
         TaxableAmountDict: Dictionary of [Decimal, Decimal];
         TaxAmountDict: Dictionary of [Decimal, Decimal];
         NextLineNo: Integer;
-        DictKeyList: List of [Decimal];
     begin
         if not SalesCreditMemo.Get(SIPOSAuditLogAuxInfo."Source Document No.") then
             exit;
@@ -273,14 +272,13 @@ report 6014556 "NPR SI Fiscal Bill A4"
             POSEntryLines."Line Discount %" := SalesCreditMemoLine."Line Discount %";
             POSEntryLines."Line Discount Amount Incl. VAT" := -SalesCreditMemoLine."Line Discount Amount";
             POSEntryLines."No." := SalesCreditMemoLine."No.";
-            TaxKey := SalesCreditMemoLine."VAT %";
-            AddAmountToDecimalDictionary(TaxableAmountDict, TaxKey, -SalesCreditMemoLine."VAT Base Amount");
-            AddAmountToDecimalDictionary(TaxAmountDict, TaxKey, -(SalesCreditMemoLine."Amount Including VAT" - SalesCreditMemoLine.Amount));
-            AddAmountToDecimalDictionary(AmountInclTaxDict, TaxKey, -SalesCreditMemoLine."Amount Including VAT");
+            AddAmountToDecimalDictionary(TaxableAmountDict, SalesCreditMemoLine."VAT %", -SalesCreditMemoLine."VAT Base Amount");
+            AddAmountToDecimalDictionary(TaxAmountDict, SalesCreditMemoLine."VAT %", -(SalesCreditMemoLine."Amount Including VAT" - SalesCreditMemoLine.Amount));
+            AddAmountToDecimalDictionary(AmountInclTaxDict, SalesCreditMemoLine."VAT %", -SalesCreditMemoLine."Amount Including VAT");
             POSEntryLines.Insert();
         until SalesCreditMemoLine.Next() = 0;
 
-        FillTaxField(POSEntryTaxLines, AmountInclTaxDict, DictKeyList, TaxableAmountDict, TaxAmountDict, TaxKey);
+        FillTaxField(POSEntryTaxLines, AmountInclTaxDict, TaxableAmountDict, TaxAmountDict);
     end;
 
     local procedure FillSalesInvoiceRecords(SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"; var POSEntryLines: Record "NPR POS Entry Sales Line" temporary;
@@ -289,12 +287,10 @@ report 6014556 "NPR SI Fiscal Bill A4"
         SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesInvoicesLine: Record "Sales Invoice Line";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
-        TaxKey: Decimal;
         AmountInclTaxDict: Dictionary of [Decimal, Decimal];
         TaxableAmountDict: Dictionary of [Decimal, Decimal];
         TaxAmountDict: Dictionary of [Decimal, Decimal];
         NextLineNo: Integer;
-        DictKeyList: List of [Decimal];
     begin
         if not SalesInvoiceHeader.Get(SIPOSAuditLogAuxInfo."Source Document No.") then
             exit;
@@ -326,15 +322,13 @@ report 6014556 "NPR SI Fiscal Bill A4"
             POSEntryLines."POS Entry No." := SIPOSAuditLogAuxInfo."POS Entry No.";
             POSEntryLines."Line No." := NextLineNo;
             NextLineNo += 10000;
-            TaxKey := SalesInvoicesLine."VAT %";
-            AddAmountToDecimalDictionary(TaxableAmountDict, TaxKey, SalesInvoicesLine."VAT Base Amount");
-            AddAmountToDecimalDictionary(TaxAmountDict, TaxKey, (SalesInvoicesLine."Amount Including VAT" - SalesInvoicesLine.Amount));
-            AddAmountToDecimalDictionary(AmountInclTaxDict, TaxKey, SalesInvoicesLine."Amount Including VAT");
+            AddAmountToDecimalDictionary(TaxableAmountDict, SalesInvoicesLine."VAT %", SalesInvoicesLine."VAT Base Amount");
+            AddAmountToDecimalDictionary(TaxAmountDict, SalesInvoicesLine."VAT %", (SalesInvoicesLine."Amount Including VAT" - SalesInvoicesLine.Amount));
+            AddAmountToDecimalDictionary(AmountInclTaxDict, SalesInvoicesLine."VAT %", SalesInvoicesLine."Amount Including VAT");
             POSEntryLines.Insert();
         until SalesInvoicesLine.Next() = 0;
 
-        DictKeyList := TaxableAmountDict.Keys();
-        FillTaxField(POSEntryTaxLines, AmountInclTaxDict, DictKeyList, TaxableAmountDict, TaxAmountDict, TaxKey);
+        FillTaxField(POSEntryTaxLines, AmountInclTaxDict, TaxableAmountDict, TaxAmountDict);
     end;
 #IF NOT (BC17 or BC18)
     local procedure GenerateQRCode()
@@ -366,19 +360,22 @@ report 6014556 "NPR SI Fiscal Bill A4"
     begin
         if CurrReport.Preview() then
             exit;
-        if not "SI POS Audit Log Aux Info"."Receipt Printed" then
-            "SI POS Audit Log Aux Info"."Receipt Printed" := true;
 
         if "SI POS Audit Log Aux Info"."Receipt Printed" then begin
             "SI POS Audit Log Aux Info"."Copies Printed" += 1;
             CopyText := StrSubstNo(MessageLbl, "SI POS Audit Log Aux Info"."Copies Printed");
+        end
+        else begin
+            "SI POS Audit Log Aux Info"."Receipt Printed" := true;
+            "SI POS Audit Log Aux Info".Modify(true);
         end;
-        "SI POS Audit Log Aux Info".Modify(true);
     end;
 
-    local procedure FillTaxField(var POSEntryTaxLines: Record "NPR POS Entry Tax Line" temporary; var AmountInclTaxDict: Dictionary of [Decimal, Decimal]; var DictKeyList: List of [Decimal]; var TaxableAmountDict: Dictionary of [Decimal, Decimal]; var TaxAmountDict: Dictionary of [Decimal, Decimal]; TaxKey: Decimal)
+    local procedure FillTaxField(var POSEntryTaxLines: Record "NPR POS Entry Tax Line" temporary; AmountInclTaxDict: Dictionary of [Decimal, Decimal]; TaxableAmountDict: Dictionary of [Decimal, Decimal]; TaxAmountDict: Dictionary of [Decimal, Decimal])
+    var
+        TaxKey: Decimal;
     begin
-        foreach TaxKey in DictKeyList do begin
+        foreach TaxKey in TaxableAmountDict.Keys() do begin
             POSEntryTaxLines.Init();
             POSEntryTaxLines."Tax %" := TaxKey;
             POSEntryTaxLines."Tax Base Amount" := TaxableAmountDict.Get(TaxKey);
@@ -388,31 +385,27 @@ report 6014556 "NPR SI Fiscal Bill A4"
         end;
     end;
 
-    local procedure CreatePOSStoreInfoArray()
-    var
-        POSStore: Record "NPR POS Store";
+    local procedure CreatePOSStoreInfo()
     begin
-        if not POSStore.Get("SI POS Audit Log Aux Info"."POS Store Code") then
-            exit;
-        if POSStore.Name <> '' then
-            StoreDetailsLine := POSStore.Name;
+        if "POS Store".Name <> '' then
+            StoreDetailsLine := "POS Store".Name;
 
-        if POSStore.Address <> '' then begin
+        if "POS Store".Address <> '' then begin
             if StoreDetailsLine <> '' then
                 StoreDetailsLine += ', ';
-            StoreDetailsLine += POSStore.Address;
+            StoreDetailsLine += "POS Store".Address;
         end;
 
-        if POSStore."Post Code" <> '' then begin
+        if "POS Store"."Post Code" <> '' then begin
             if StoreDetailsLine <> '' then
                 StoreDetailsLine += ', ';
-            StoreDetailsLine += POSStore."Post Code";
+            StoreDetailsLine += "POS Store"."Post Code";
         end;
 
-        if POSStore.City <> '' then begin
+        if "POS Store".City <> '' then begin
             if StoreDetailsLine <> '' then
                 StoreDetailsLine += ' ';
-            StoreDetailsLine += POSStore.City;
+            StoreDetailsLine += "POS Store".City;
         end;
     end;
 
