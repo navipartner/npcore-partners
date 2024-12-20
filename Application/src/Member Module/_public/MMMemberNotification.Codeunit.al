@@ -149,6 +149,24 @@
 
                     exit(_NOTIFICATION_ACTION::SEND); // valid, send notification
                 end;
+            MembershipNotification."Notification Trigger"::AUTORENEWAL_ENABLED:
+                begin
+                    // Notification Date is offset from subscription starts
+                    StartDate := MembershipNotification."Date To Notify";
+                    if (StartDate < Today) then
+                        StartDate := Today();
+
+                    exit(_NOTIFICATION_ACTION::SEND); // valid, send notification
+                end;
+            MembershipNotification."Notification Trigger"::AUTORENEWAL_DISABLED:
+                begin
+                    // Notification Date is offset from subscription starts
+                    StartDate := MembershipNotification."Date To Notify";
+                    if (StartDate < Today) then
+                        StartDate := Today();
+
+                    exit(_NOTIFICATION_ACTION::SEND); // valid, send notification
+                end;
             MembershipNotification."Notification Trigger"::WALLET_CREATE,
             MembershipNotification."Notification Trigger"::WALLET_UPDATE:
                 begin
@@ -462,6 +480,10 @@
                 FoundAddress := MembershipManagement.GetCommunicationMethod_RenewalSuccess(MemberEntryNo, MembershipEntryNo, Method, NotificationAddress, NotificationEngine);
             MembershipNotification."Notification Trigger"::RENEWAL_FAILURE:
                 FoundAddress := MembershipManagement.GetCommunicationMethod_RenewalFailure(MemberEntryNo, MembershipEntryNo, Method, NotificationAddress, NotificationEngine);
+            MembershipNotification."Notification Trigger"::AUTORENEWAL_ENABLED:
+                FoundAddress := MembershipManagement.GetCommunicationMethod_AutoRenewalEnabled(MemberEntryNo, MembershipEntryNo, Method, NotificationAddress, NotificationEngine);
+            MembershipNotification."Notification Trigger"::AUTORENEWAL_DISABLED:
+                FoundAddress := MembershipManagement.GetCommunicationMethod_AutoRenewalDisabled(MemberEntryNo, MembershipEntryNo, Method, NotificationAddress, NotificationEngine);
         end;
 
         case Method of
@@ -1020,6 +1042,142 @@
         MembershipNotification."Processing Method" := NotificationSetup."Processing Method";
         MembershipNotification."Rejected Reason Code" := RejectedReasonCode;
         MembershipNotification."Rejected Reason Description" := RejectedReasonDescription;
+        MembershipNotification.Insert();
+    end;
+
+    procedure AddMembershipAutoRenewalEnableNotification(MembershipEntryNo: Integer; MembershipCode: Code[20])
+    var
+        MembershipSetup: Record "NPR MM Membership Setup";
+        CommunitySetup: Record "NPR MM Member Community";
+    begin
+        MembershipSetup.Get(MembershipCode);
+        CommunitySetup.Get(MembershipSetup."Community Code");
+
+        AddMembershipAutoRenewalEnabledNotificationWorker(MembershipEntryNo, MembershipSetup, CommunitySetup);
+    end;
+
+    local procedure AddMembershipAutoRenewalEnabledNotificationWorker(MembershipEntryNo: Integer; MembershipSetup: Record "NPR MM Membership Setup"; CommunitySetup: Record "NPR MM Member Community")
+    var
+        NotificationSetup: Record "NPR MM Member Notific. Setup";
+        MembershipNotification: Record "NPR MM Membership Notific.";
+    begin
+        MembershipNotification.SetCurrentKey("Membership Entry No.");
+        MembershipNotification.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
+        MembershipNotification.SetFilter("Notification Trigger", '=%1|%2', MembershipNotification."Notification Trigger"::AUTORENEWAL_ENABLED, MembershipNotification."Notification Trigger"::AUTORENEWAL_DISABLED);
+        MembershipNotification.SetFilter("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);
+        if (MembershipNotification.FindSet(true)) then begin
+            repeat
+                MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::CANCELED;
+                MembershipNotification."Notification Processed At" := CurrentDateTime();
+                MembershipNotification."Notification Processed By User" := CopyStr(UserId, 1, MaxStrLen(MembershipNotification."Notification Processed By User"));
+                MembershipNotification.Modify();
+            until (MembershipNotification.Next() = 0);
+        end;
+
+        if (not ((MembershipSetup."Create AutoRenewal Enabl Notif") or (CommunitySetup."Create AutoRenewal Enabl Notif"))) then
+            exit;
+
+        NotificationSetup.SetCurrentKey(Type, "Community Code", "Membership Code", "Days Before");
+        NotificationSetup.SetFilter(Type, '=%1', NotificationSetup.Type::AUTORENEWAL_ENABLED);
+        NotificationSetup.SetFilter("Community Code", '=%1', CommunitySetup.Code);
+        NotificationSetup.SetFilter("Membership Code", '=%1', MembershipSetup.Code);
+        if (not NotificationSetup.FindLast()) then begin
+            NotificationSetup.SetFilter("Membership Code", '=%1', '');
+            if (not NotificationSetup.FindLast()) then begin
+                NotificationSetup.SetFilter("Community Code", '=%1', '');
+                if (not NotificationSetup.FindLast()) then
+                    exit;
+            end;
+        end;
+
+        //Skip notificaiton if there is an unprocessed welcome notificaiton
+        MembershipNotification.Reset();
+        MembershipNotification.SetCurrentKey("Membership Entry No.");
+        MembershipNotification.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
+        MembershipNotification.SetFilter("Notification Trigger", '%1', MembershipNotification."Notification Trigger"::WELCOME);
+        MembershipNotification.SetFilter("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);
+        if not MembershipNotification.IsEmpty then
+            exit;
+
+        MembershipNotification.Reset();
+        MembershipNotification.Init();
+        MembershipNotification."Entry No." := 0;
+        MembershipNotification."Membership Entry No." := MembershipEntryNo;
+        MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::PENDING;
+        MembershipNotification."Notification Code" := NotificationSetup.Code;
+        MembershipNotification."Date To Notify" := Today;
+        MembershipNotification."Notification Trigger" := MembershipNotification."Notification Trigger"::AUTORENEWAL_ENABLED;
+        MembershipNotification."Template Filter Value" := NotificationSetup."Template Filter Value";
+        MembershipNotification."Target Member Role" := NotificationSetup."Target Member Role";
+        MembershipNotification."Processing Method" := NotificationSetup."Processing Method";
+        MembershipNotification.Insert();
+    end;
+
+    procedure AddMembershipAutoRenewalDisabledNotification(MembershipEntryNo: Integer; MembershipCode: Code[20])
+    var
+        MembershipSetup: Record "NPR MM Membership Setup";
+        CommunitySetup: Record "NPR MM Member Community";
+    begin
+        MembershipSetup.Get(MembershipCode);
+        CommunitySetup.Get(MembershipSetup."Community Code");
+
+        AddMembershipAutoRenewalDisabledNotificationWorker(MembershipEntryNo, MembershipSetup, CommunitySetup);
+    end;
+
+    local procedure AddMembershipAutoRenewalDisabledNotificationWorker(MembershipEntryNo: Integer; MembershipSetup: Record "NPR MM Membership Setup"; CommunitySetup: Record "NPR MM Member Community")
+    var
+        NotificationSetup: Record "NPR MM Member Notific. Setup";
+        MembershipNotification: Record "NPR MM Membership Notific.";
+    begin
+        MembershipNotification.SetCurrentKey("Membership Entry No.");
+        MembershipNotification.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
+        MembershipNotification.SetFilter("Notification Trigger", '=%1|%2', MembershipNotification."Notification Trigger"::AUTORENEWAL_DISABLED, MembershipNotification."Notification Trigger"::AUTORENEWAL_ENABLED);
+        MembershipNotification.SetFilter("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);
+        if (MembershipNotification.FindSet(true)) then begin
+            repeat
+                MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::CANCELED;
+                MembershipNotification."Notification Processed At" := CurrentDateTime();
+                MembershipNotification."Notification Processed By User" := CopyStr(UserId, 1, MaxStrLen(MembershipNotification."Notification Processed By User"));
+                MembershipNotification.Modify();
+            until (MembershipNotification.Next() = 0);
+        end;
+
+        if (not ((MembershipSetup."Create AutoRenewal Enabl Notif") or (CommunitySetup."Create AutoRenewal Enabl Notif"))) then
+            exit;
+
+        NotificationSetup.SetCurrentKey(Type, "Community Code", "Membership Code", "Days Before");
+        NotificationSetup.SetFilter(Type, '=%1', NotificationSetup.Type::AUTORENEWAL_DISABLED);
+        NotificationSetup.SetFilter("Community Code", '=%1', CommunitySetup.Code);
+        NotificationSetup.SetFilter("Membership Code", '=%1', MembershipSetup.Code);
+        if (not NotificationSetup.FindLast()) then begin
+            NotificationSetup.SetFilter("Membership Code", '=%1', '');
+            if (not NotificationSetup.FindLast()) then begin
+                NotificationSetup.SetFilter("Community Code", '=%1', '');
+                if (not NotificationSetup.FindLast()) then
+                    exit;
+            end;
+        end;
+
+        //Skip notificaiton if there is an unprocessed welcome notificaiton
+        MembershipNotification.Reset();
+        MembershipNotification.SetCurrentKey("Membership Entry No.");
+        MembershipNotification.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
+        MembershipNotification.SetFilter("Notification Trigger", '%1', MembershipNotification."Notification Trigger"::RENEWAL_FAILURE);
+        MembershipNotification.SetFilter("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);
+        if not MembershipNotification.IsEmpty then
+            exit;
+
+        MembershipNotification.Reset();
+        MembershipNotification.Init();
+        MembershipNotification."Entry No." := 0;
+        MembershipNotification."Membership Entry No." := MembershipEntryNo;
+        MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::PENDING;
+        MembershipNotification."Notification Code" := NotificationSetup.Code;
+        MembershipNotification."Date To Notify" := Today;
+        MembershipNotification."Notification Trigger" := MembershipNotification."Notification Trigger"::AUTORENEWAL_DISABLED;
+        MembershipNotification."Template Filter Value" := NotificationSetup."Template Filter Value";
+        MembershipNotification."Target Member Role" := NotificationSetup."Target Member Role";
+        MembershipNotification."Processing Method" := NotificationSetup."Processing Method";
         MembershipNotification.Insert();
     end;
 

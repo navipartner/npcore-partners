@@ -118,6 +118,16 @@
                     ToolTip = 'Specifies the value of the Create Renewal Failure Notifications field.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field("Create AutoRenewal Enabl Notif"; Rec."Create AutoRenewal Enabl Notif")
+                {
+                    ToolTip = 'Specifies the value of the Create Auto-Renewal Enabled Notifications field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field("Create AutoRenewal Disbl Notif"; Rec."Create AutoRenewal Disbl Notif")
+                {
+                    ToolTip = 'Specifies the value of the Create Auto-Renewal Disabled Notifications field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
                 field("Membership Member Cardinality"; Rec."Membership Member Cardinality")
                 {
                     ToolTip = 'Specifies the value of the Membership Member Cardinality field';

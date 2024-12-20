@@ -102,8 +102,17 @@
                 field(Control6014412; Rec."Auto-Renew")
                 {
 
+                    Editable = false;
                     ToolTip = 'Specifies the value of the Auto-Renew field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    AssistEdit = true;
+                    trigger OnAssistEdit()
+                    var
+                        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+                    begin
+                        MembershipMgtInternal.SetAutoRenewStatusWithConfirmPage(Rec);
+                        CurrPage.Update(true);
+                    end;
                 }
                 field("Auto-Renew Payment Method Code"; Rec."Auto-Renew Payment Method Code")
                 {
@@ -634,7 +643,25 @@
                         MembershipMgt.DeleteMembership(Rec."Entry No.", (not MembershipSetup.Get(Rec."Membership Code")));
                 end;
             }
+            action("Set Auto-Renew Status")
+            {
+                Caption = 'Set Auto-Renew Status';
+                Image = ReOpen;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
 
+                ToolTip = 'This action will set the auto-renew status of the membership';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                trigger OnAction()
+                var
+                    MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+                begin
+                    MembershipMgtInternal.SetAutoRenewStatusWithConfirmPage(Rec);
+                    CurrPage.Update(true);
+                end;
+            }
         }
         area(navigation)
         {

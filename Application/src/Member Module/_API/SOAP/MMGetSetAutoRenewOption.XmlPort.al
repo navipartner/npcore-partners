@@ -90,6 +90,7 @@ xmlport 6060146 "NPR MM GetSet AutoRenew Option"
     internal procedure createResponse()
     var
         Membership: Record "NPR MM Membership";
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
     begin
 
         if (not tmpMembershipRequest.FindFirst()) then begin
@@ -133,15 +134,9 @@ xmlport 6060146 "NPR MM GetSet AutoRenew Option"
                     Membership.Modify(true);
                 end;
             'OFF_INTERNAL':
-                begin
-                    Membership."Auto-Renew" := Membership."Auto-Renew"::NO;
-                    Membership.Modify(true);
-                end;
+                MembershipMgtInternal.DisableMembershipAutoRenewal(Membership, true, false);
             'ON_INTERNAL':
-                begin
-                    Membership."Auto-Renew" := Membership."Auto-Renew"::YES_INTERNAL;
-                    Membership.Modify(true);
-                end;
+                MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, true, false);
             else begin
                 setError('Incorrect auto-renew state.');
                 exit;

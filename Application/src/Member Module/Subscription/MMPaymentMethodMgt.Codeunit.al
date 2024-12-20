@@ -181,36 +181,29 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
 
     internal procedure UpdateMembership(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Membership: Record "NPR MM Membership")
     var
-        Modi: Boolean;
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
     begin
-        if Membership."Auto-Renew" <> Membership."Auto-Renew"::YES_INTERNAL then begin
-            Membership."Auto-Renew" := Membership."Auto-Renew"::YES_INTERNAL;
-            Modi := true;
-        end;
-        if Membership."Auto-Renew Payment Method Code" <> EftTransactionRequest."POS Payment Type Code" then begin
-            Membership."Auto-Renew Payment Method Code" := EftTransactionRequest."POS Payment Type Code";
-            Modi := true;
-        end;
-        if Modi then
-            Membership.Modify();
+        MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, true, false);
+
+        if Membership."Auto-Renew Payment Method Code" = EftTransactionRequest."POS Payment Type Code" then
+            exit;
+        Membership."Auto-Renew Payment Method Code" := EftTransactionRequest."POS Payment Type Code";
+        Membership.Modify();
+
     end;
 
     internal procedure UpdateMembership(PaymentLine: Record "NPR Magento Payment Line"; var Membership: Record "NPR MM Membership")
     var
-        Modi: Boolean;
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
     begin
-        if Membership."Auto-Renew" <> Membership."Auto-Renew"::YES_INTERNAL then begin
-            Membership."Auto-Renew" := Membership."Auto-Renew"::YES_INTERNAL;
-            Modi := true;
-        end;
-        if Membership."Auto-Renew Payment Method Code" <> PaymentLine."Source No." then begin
+        MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, true, false);
+        if Membership."Auto-Renew Payment Method Code" = PaymentLine."Source No." then
+            exit;
+
 #pragma warning disable AA0139
-            Membership."Auto-Renew Payment Method Code" := PaymentLine."Source No.";
+        Membership."Auto-Renew Payment Method Code" := PaymentLine."Source No.";
 #pragma warning restore AA0139
-            Modi := true;
-        end;
-        if Modi then
-            Membership.Modify();
+        Membership.Modify();
     end;
 
 

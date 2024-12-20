@@ -112,6 +112,16 @@
             Caption = 'Create Renewal Failure Notifications';
             DataClassification = CustomerContent;
         }
+        field(90; "Create AutoRenewal Enabl Notif"; Boolean)
+        {
+            Caption = 'Create Auto-Renewal Enabled Notifications';
+            DataClassification = CustomerContent;
+        }
+        field(100; "Create AutoRenewal Disbl Notif"; Boolean)
+        {
+            Caption = 'Create Auto-Renewal Disabled Notifications';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

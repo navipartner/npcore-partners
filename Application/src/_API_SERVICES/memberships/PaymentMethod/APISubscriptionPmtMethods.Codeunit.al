@@ -58,7 +58,7 @@ codeunit 6185107 "NPR API SubscriptionPmtMethods"
     internal procedure CreatePaymentMethod(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         MemberPaymentMethod: Record "NPR MM Member Payment Method";
-        ExistingMemberPaymentMethod: Record "NPR MM Member Payment Method";
+        TempMemberPaymentMethod: Record "NPR MM Member Payment Method" temporary;
         Membership: Record "NPR MM Membership";
         Json: Codeunit "NPR Json Builder";
         JsonHelper: Codeunit "NPR Json Helper";
@@ -83,33 +83,62 @@ codeunit 6185107 "NPR API SubscriptionPmtMethods"
         if not Membership.GetBySystemId(MembershipID) then
             exit(Response.RespondResourceNotFound(StrSubstNo('Membership %1', MembershipID)));
 
-        MemberPaymentMethod.Init();
-        MemberPaymentMethod."Entry No." := 0;
-        MemberPaymentMethod."Table No." := Membership.RecordId().TableNo();
-        MemberPaymentMethod."BC Record ID" := Membership.RecordId();
         if PSPAsString <> '' then
-            MemberPaymentMethod.PSP := Enum::"NPR MM Subscription PSP".FromInteger(Enum::"NPR MM Subscription PSP".Ordinals().Get(Enum::"NPR MM Subscription PSP".Names().IndexOf(PSPAsString)));
-        MemberPaymentMethod."Payment Brand" := CopyStr(JsonHelper.GetJText(RequestBody, 'paymentMethod.paymentBrand', false), 1, MaxStrLen(MemberPaymentMethod."Payment Brand"));
-        MemberPaymentMethod."Payment Instrument Type" := CopyStr(JsonHelper.GetJText(RequestBody, 'paymentMethod.paymentInstrument', false), 1, MaxStrLen(MemberPaymentMethod."Payment Instrument Type"));
-        MemberPaymentMethod."PAN Last 4 Digits" := CopyStr(JsonHelper.GetJText(RequestBody, 'paymentMethod.PANLastDigits', false), 1, MaxStrLen(MemberPaymentMethod."PAN Last 4 Digits"));
-        MemberPaymentMethod."Expiry Date" := JsonHelper.GetJDate(RequestBody, 'paymentMethod.expiryDate', false);
-        MemberPaymentMethod.Validate(Default, JsonHelper.GetJBoolean(RequestBody, 'paymentMethod.default', false));
-        MemberPaymentMethod."Payment Method Alias" := CopyStr(JsonHelper.GetJText(RequestBody, 'paymentMethod.alias', false), 1, MaxStrLen(MemberPaymentMethod."Payment Method Alias"));
-        MemberPaymentMethod."Shopper Reference" := CopyStr(JsonHelper.GetJText(RequestBody, 'paymentMethod.shopperReference', false), 1, MaxStrLen(MemberPaymentMethod."Shopper Reference"));
-        MemberPaymentMethod."Payment Token" := CopyStr(JsonHelper.GetJText(RequestBody, 'paymentMethod.paymentToken', false), 1, MaxStrLen(MemberPaymentMethod."Payment Token"));
+            TempMemberPaymentMethod.PSP := Enum::"NPR MM Subscription PSP".FromInteger(Enum::"NPR MM Subscription PSP".Ordinals().Get(Enum::"NPR MM Subscription PSP".Names().IndexOf(PSPAsString)));
+        TempMemberPaymentMethod."Payment Brand" := CopyStr(JsonHelper.GetJText(RequestBody, 'paymentMethod.paymentBrand', false), 1, MaxStrLen(TempMemberPaymentMethod."Payment Brand"));
+        TempMemberPaymentMethod."Payment Instrument Type" := CopyStr(JsonHelper.GetJText(RequestBody, 'paymentMethod.paymentInstrument', false), 1, MaxStrLen(TempMemberPaymentMethod."Payment Instrument Type"));
+        TempMemberPaymentMethod."PAN Last 4 Digits" := CopyStr(JsonHelper.GetJText(RequestBody, 'paymentMethod.PANLastDigits', false), 1, MaxStrLen(TempMemberPaymentMethod."PAN Last 4 Digits"));
+        TempMemberPaymentMethod."Expiry Date" := JsonHelper.GetJDate(RequestBody, 'paymentMethod.expiryDate', false);
+        TempMemberPaymentMethod.Default := JsonHelper.GetJBoolean(RequestBody, 'paymentMethod.default', false);
+        TempMemberPaymentMethod."Payment Method Alias" := CopyStr(JsonHelper.GetJText(RequestBody, 'paymentMethod.alias', false), 1, MaxStrLen(TempMemberPaymentMethod."Payment Method Alias"));
+        TempMemberPaymentMethod."Shopper Reference" := CopyStr(JsonHelper.GetJText(RequestBody, 'paymentMethod.shopperReference', false), 1, MaxStrLen(TempMemberPaymentMethod."Shopper Reference"));
+        TempMemberPaymentMethod."Payment Token" := CopyStr(JsonHelper.GetJText(RequestBody, 'paymentMethod.paymentToken', false), 1, MaxStrLen(TempMemberPaymentMethod."Payment Token"));
 
-        Clear(ExistingMemberPaymentMethod);
-        if PaymentMethodMgt.FindMemberPaymentMethod(MemberPaymentMethod."Payment Token", MemberPaymentMethod."Shopper Reference", MemberPaymentMethod.PSP, Membership, ExistingMemberPaymentMethod) then begin
-            IsModified :=
-                (MemberPaymentMethod."Payment Brand" <> ExistingMemberPaymentMethod."Payment Brand") or
-                (MemberPaymentMethod."Payment Instrument Type" <> ExistingMemberPaymentMethod."Payment Instrument Type") or
-                (MemberPaymentMethod."Expiry Date" <> ExistingMemberPaymentMethod."Expiry Date") or
-                (MemberPaymentMethod.Default <> ExistingMemberPaymentMethod.Default) or
-                (MemberPaymentMethod."Payment Method Alias" <> ExistingMemberPaymentMethod."Payment Method Alias");
+        if PaymentMethodMgt.FindMemberPaymentMethod(TempMemberPaymentMethod."Payment Token", TempMemberPaymentMethod."Shopper Reference", TempMemberPaymentMethod.PSP, Membership, MemberPaymentMethod) then begin
+            if MemberPaymentMethod."Payment Brand" <> TempMemberPaymentMethod."Payment Brand" then begin
+                MemberPaymentMethod."Payment Brand" := TempMemberPaymentMethod."Payment Brand";
+                IsModified := true;
+            end;
+
+            if MemberPaymentMethod."Payment Instrument Type" <> TempMemberPaymentMethod."Payment Instrument Type" then begin
+                MemberPaymentMethod."Payment Instrument Type" := TempMemberPaymentMethod."Payment Instrument Type";
+                IsModified := true;
+            end;
+
+            if (MemberPaymentMethod."Expiry Date" <> TempMemberPaymentMethod."Expiry Date") then begin
+                MemberPaymentMethod."Expiry Date" := TempMemberPaymentMethod."Expiry Date";
+                IsModified := true;
+            end;
+
+            if MemberPaymentMethod.Default <> TempMemberPaymentMethod.Default then begin
+                MemberPaymentMethod.Validate(Default, TempMemberPaymentMethod.Default);
+                IsModified := true;
+            end;
+
+            if MemberPaymentMethod."Payment Method Alias" <> TempMemberPaymentMethod."Payment Method Alias" then begin
+                MemberPaymentMethod."Payment Method Alias" := TempMemberPaymentMethod."Payment Method Alias";
+                IsModified := true;
+            end;
+
             if IsModified then
                 MemberPaymentMethod.Modify(true);
-        end else
+        end else begin
+            Clear(MemberPaymentMethod);
+            MemberPaymentMethod.Init();
+            MemberPaymentMethod."Entry No." := 0;
+            MemberPaymentMethod."Table No." := Membership.RecordId().TableNo();
+            MemberPaymentMethod."BC Record ID" := Membership.RecordId();
+            MemberPaymentMethod.PSP := TempMemberPaymentMethod.PSP;
+            MemberPaymentMethod."Payment Brand" := TempMemberPaymentMethod."Payment Brand";
+            MemberPaymentMethod."Payment Instrument Type" := TempMemberPaymentMethod."Payment Instrument Type";
+            MemberPaymentMethod."PAN Last 4 Digits" := TempMemberPaymentMethod."PAN Last 4 Digits";
+            MemberPaymentMethod."Expiry Date" := TempMemberPaymentMethod."Expiry Date";
+            MemberPaymentMethod.Validate(Default, TempMemberPaymentMethod.Default);
+            MemberPaymentMethod."Payment Method Alias" := TempMemberPaymentMethod."Payment Method Alias";
+            MemberPaymentMethod."Shopper Reference" := TempMemberPaymentMethod."Shopper Reference";
+            MemberPaymentMethod."Payment Token" := TempMemberPaymentMethod."Payment Token";
             MemberPaymentMethod.Insert(true);
+        end;
 
         if MemberPaymentMethod.Default then
             PaymentMethodMgt.UpdateMembershipWithDefaultAutoRenewPaymentMethod(Membership);
