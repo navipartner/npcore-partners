@@ -19,6 +19,12 @@ table 6150921 "NPR MM Subscr. Payment Request"
             Caption = 'Batch No.';
             DataClassification = CustomerContent;
         }
+        field(5; Type; Enum "NPR MM Payment Request Type")
+        {
+            Caption = 'Type';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
         field(10; Status; Enum "NPR MM Payment Request Status")
         {
             Caption = 'Status';
@@ -87,6 +93,13 @@ table 6150921 "NPR MM Subscr. Payment Request"
             Caption = 'Reversed by Entry No.';
             DataClassification = CustomerContent;
             TableRelation = "NPR MM Subscr. Payment Request"."Entry No.";
+
+            trigger OnValidate()
+            begin
+                if "Reversed by Entry No." <> 0 then
+                    if "Reversed by Entry No." = "Entry No." then
+                        FieldError("Reversed by Entry No.");
+            end;
         }
         field(220; "Process Try Count"; Integer)
         {
@@ -119,6 +132,12 @@ table 6150921 "NPR MM Subscr. Payment Request"
             DataClassification = CustomerContent;
             TableRelation = "G/L Entry"."Entry No.";
         }
+        field(275; "Posting Document Type"; Enum "Gen. Journal Document Type")
+        {
+            Caption = 'Posting Document Type';
+            DataClassification = CustomerContent;
+            ValuesAllowed = " ", Payment, Refund;
+        }
         field(280; "Posting Document No."; Code[20])
         {
             Caption = 'Posting Document No.';
@@ -129,6 +148,12 @@ table 6150921 "NPR MM Subscr. Payment Request"
             Caption = 'Posting Date';
             DataClassification = CustomerContent;
         }
+        field(300; "Cust. Ledger Entry No."; Integer)
+        {
+            Caption = 'Cust. Ledger Entry No.';
+            DataClassification = CustomerContent;
+            TableRelation = "Cust. Ledger Entry"."Entry No.";
+        }
     }
 
     keys
@@ -137,10 +162,13 @@ table 6150921 "NPR MM Subscr. Payment Request"
         {
             Clustered = true;
         }
+        key(Parent; "Subscr. Request Entry No.") { }
         key(Key2; "Subscr. Request Entry No.", Status) { }
         key(Key3; "Batch No.") { }
         key(Key4; PSP, "Batch No.") { }
+        key(Key5; "Reversed by Entry No.") { }
     }
+
     internal procedure CheckSubscrPaymentRequestStatusCanBeChanged()
     var
         StatusErrorLbl: Label 'Subscription payment request no. %1 must not be with status %2.', Comment = '%1 - entry no., %2 - status';
@@ -150,5 +178,20 @@ table 6150921 "NPR MM Subscr. Payment Request"
 
         if xRec.Status in [xRec.Status::Authorized, xRec.Status::Captured] then
             Error(StatusErrorLbl, xRec."Entry No.", xRec.Status);
+    end;
+
+    internal procedure MarkReversed(var SubscrPaymentRequest_Marked: Record "NPR MM Subscr. Payment Request")
+    var
+        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+    begin
+        if not (Reversed and ("Reversed by Entry No." <> 0)) then
+            exit;
+        SubscrPaymentRequest.SetLoadFields("Entry No.", Reversed, "Reversed by Entry No.");
+        SubscrPaymentRequest.Get("Reversed by Entry No.");
+        SubscrPaymentRequest_Marked := SubscrPaymentRequest;
+        if SubscrPaymentRequest_Marked.Mark() then
+            exit;
+        SubscrPaymentRequest_Marked.Mark(true);
+        SubscrPaymentRequest.MarkReversed(SubscrPaymentRequest_Marked);
     end;
 }

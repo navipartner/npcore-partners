@@ -18,24 +18,39 @@ codeunit 6185103 "NPR MM Subs Pay Request Utils"
         SubscrPaymentRequest.Get(SubscrPaymentRequest.RecordId);
     end;
 
-    local procedure SetSubscrPaymentRequestStatus(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; NewStatus: Enum "NPR MM Payment Request Status")
+    local procedure SetSubscrPaymentRequestStatusWithConfirmation(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; NewStatus: Enum "NPR MM Payment Request Status")
     var
-        SubsPayReqLogEntry: Record "NPR MM Subs Pay Req Log Entry";
-        SubsPayReqLogUtils: Codeunit "NPR MM Subs Pay Req Log Utils";
         ConfirmManagement: Codeunit "Confirm Management";
         NewStatusConfirmLbl: Label 'Are you sure you want to set the status of entry no. %1 to %2?', Comment = '%1 - entry no., %2 - Status';
     begin
         if not ConfirmManagement.GetResponseOrDefault(StrSubstNo(NewStatusConfirmLbl, SubscrPaymentRequest."Entry No.", NewStatus), true) then
             exit;
+        SetSubscrPaymentRequestStatus(SubscrPaymentRequest, NewStatus);
+    end;
+
+    internal procedure SetSubscrPaymentRequestStatus(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; NewStatus: Enum "NPR MM Payment Request Status")
+    var
+        SubsPayReqLogEntry: Record "NPR MM Subs Pay Req Log Entry";
+        SubsPayReqLogUtils: Codeunit "NPR MM Subs Pay Req Log Utils";
+        SubscrReversalMgt: Codeunit "NPR MM Subscr. Reversal Mgt.";
+    begin
+        if SubscrPaymentRequest.Status = NewStatus then
+            exit;
         SubscrPaymentRequest.Validate(Status, NewStatus);
         SubscrPaymentRequest.Modify(true);
+        if NewStatus = NewStatus::Cancelled then
+            SubscrReversalMgt.CancelReversal(SubscrPaymentRequest);
 
         SubsPayReqLogUtils.LogEntry(SubscrPaymentRequest, '', '', true, SubsPayReqLogEntry);
     end;
 
     internal procedure SetSubscrPaymentRequestStatusCancelled(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request")
+    var
+        CannotCancelCapturedErr: Label 'Captured subscription payment requests cannot be cancelled. Please request a refund instead.';
     begin
-        SetSubscrPaymentRequestStatus(SubscrPaymentRequest, Enum::"NPR MM Payment Request Status"::Cancelled);
+        if SubscrPaymentRequest.Status = SubscrPaymentRequest.Status::Captured then
+            Error(CannotCancelCapturedErr);
+        SetSubscrPaymentRequestStatusWithConfirmation(SubscrPaymentRequest, Enum::"NPR MM Payment Request Status"::Cancelled);
     end;
 
     local procedure CreateSubscriptionPaymentRequestProcessingJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry") Created: Boolean;

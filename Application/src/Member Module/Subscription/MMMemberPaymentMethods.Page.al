@@ -55,7 +55,7 @@ page 6184835 "NPR MM Member Payment Methods"
                 }
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ToolTip = 'Specifies the value of the Entry No. field.';
+                    ToolTip = 'Specifies a unique entry number, assigned by the system to this record according to an automatically maintained number series.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }

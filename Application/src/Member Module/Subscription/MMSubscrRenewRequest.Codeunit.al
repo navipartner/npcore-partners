@@ -45,6 +45,7 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
             end;
 
         SubscriptionRequest."Subscription Entry No." := Subscription."Entry No.";
+        SubscriptionRequest."Membership Code" := Subscription."Membership Code";
         SubscriptionRequest.Type := SubscriptionRequest.Type::Renew;
         SubscriptionRequest."Item No." := RenewWithItemNo;
         SubscriptionRequest.Status := SubscriptionRequest.Status::New;
@@ -97,6 +98,7 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
         SubscrPaymentRequest."Entry No." := 0;
         SubscrPaymentRequest."Batch No." := GetBatchNo();
         SubscrPaymentRequest."Subscr. Request Entry No." := SubscriptionRequest."Entry No.";
+        SubscrPaymentRequest.Type := SubscrPaymentRequest.Type::Payment;
         SubscrPaymentRequest.Status := SubscrPaymentRequest.Status::New;
         SubscrPaymentRequest.PSP := MemberPaymentMethod.PSP;
         SubscrPaymentRequest."Payment Token" := MemberPaymentMethod."Payment Token";
@@ -192,6 +194,8 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
     var
         SubscriptionRequest: Record "NPR MM Subscr. Request";
         xSubscriptionRequest: Record "NPR MM Subscr. Request";
+        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+        SubscrReversalMgt: Codeunit "NPR MM Subscr. Reversal Mgt.";
         ProcessingStatusErrorLbl: Label 'Subscription request %1 has already been processed.', Comment = '%1 - subscription request no.';
     begin
         if Rec.IsTemporary() then
@@ -224,9 +228,21 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
                 SubscriptionRequest.Status := SubscriptionRequest.Status::"Request Error";
         end;
         if SubscriptionRequest.Status <> xSubscriptionRequest.Status then begin
-            SubscriptionRequest."Processing Status" := SubscriptionRequest."Processing Status"::Pending;
+            if (SubscriptionRequest.Status = SubscriptionRequest.Status::Cancelled) and (Rec.Status = Rec.Status::Cancelled) then begin
+                SubscrPaymentRequest.SetRange("Subscr. Request Entry No.", SubscriptionRequest."Entry No.");
+                SubscrPaymentRequest.SetFilter(Status, '<>%1', SubscrPaymentRequest.Status::Cancelled);
+                SubscrPaymentRequest.SetFilter("Entry No.", '<>%1', Rec."Entry No.");
+                if SubscrPaymentRequest.IsEmpty() then
+                    SubscriptionRequest."Processing Status" := SubscriptionRequest."Processing Status"::Success
+                else
+                    SubscriptionRequest."Processing Status" := SubscriptionRequest."Processing Status"::Pending;
+            end else
+                SubscriptionRequest."Processing Status" := SubscriptionRequest."Processing Status"::Pending;
             SubscriptionRequest."Process Try Count" := 0;
             SubscriptionRequest.Modify(true);
+
+            if SubscriptionRequest.Status = SubscriptionRequest.Status::Cancelled then
+                SubscrReversalMgt.CancelReversal(SubscriptionRequest);
         end;
     end;
 
@@ -249,7 +265,7 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
         if Subscription."Valid Until Date" > ValidUntilDate then
             Error(SubscriptionValidErrorLbl, Subscription."Entry No.", Subscription."Valid Until Date");
 
-        if Subscription."Postpone Renewal Attempt Until" > Today then
+        if Subscription."Postpone Renewal Attempt Until" > Today() then
             Error(PostponedRenewalErrorLbl, Subscription."Entry No.", Subscription."Postpone Renewal Attempt Until");
 
         Subscription.CalcFields("Outst. Subscr. Requests Exist");

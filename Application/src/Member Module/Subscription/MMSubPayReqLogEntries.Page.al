@@ -18,7 +18,7 @@ page 6184871 "NPR MM Sub Pay Req Log Entries"
                 field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-                    ToolTip = 'Specifies the value of the Entry No. field.';
+                    ToolTip = 'Specifies a unique entry number, assigned by the system to this record according to an automatically maintained number series.';
                 }
                 field(Status; Rec.Status)
                 {

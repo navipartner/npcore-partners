@@ -28,6 +28,7 @@ table 6150923 "NPR MM Subscr. Request"
                 if Rec.Status <> xRec.Status then
                     Rec."Processing Status" := Rec."Processing Status"::Pending;
 
+                Modify();
                 UpdateSubscriptionPaymentRequestStatus();
             end;
         }
@@ -46,6 +47,12 @@ table 6150923 "NPR MM Subscr. Request"
         {
             Caption = 'Description';
             DataClassification = CustomerContent;
+        }
+        field(55; "Membership Code"; Code[20])
+        {
+            Caption = 'Membership Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM Membership Setup".Code;
         }
         field(60; "New Valid From Date"; Date)
         {
@@ -80,11 +87,23 @@ table 6150923 "NPR MM Subscr. Request"
             Caption = 'Posted';
             DataClassification = CustomerContent;
         }
+        field(115; "Posted M/ship Ledg. Entry No."; Integer)
+        {
+            Caption = 'Posted M/ship Ledg. Entry No.';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM Membership Entry"."Entry No.";
+        }
         field(120; "G/L Entry No."; Integer)
         {
             Caption = 'G/L Entry No.';
             DataClassification = CustomerContent;
             TableRelation = "G/L Entry"."Entry No.";
+        }
+        field(125; "Posting Document Type"; Enum "Gen. Journal Document Type")
+        {
+            Caption = 'Posting Document Type';
+            DataClassification = CustomerContent;
+            ValuesAllowed = " ", Invoice, "Credit Memo";
         }
         field(130; "Posting Document No."; Code[20])
         {
@@ -96,10 +115,34 @@ table 6150923 "NPR MM Subscr. Request"
             Caption = 'Posting Date';
             DataClassification = CustomerContent;
         }
+        field(145; "Cust. Ledger Entry No."; Integer)
+        {
+            Caption = 'Cust. Ledger Entry No.';
+            DataClassification = CustomerContent;
+            TableRelation = "Cust. Ledger Entry"."Entry No.";
+        }
         field(150; "Process Try Count"; Integer)
         {
             Caption = 'Process Try Count';
             DataClassification = CustomerContent;
+        }
+        field(200; Reversed; Boolean)
+        {
+            Caption = 'Reversed';
+            DataClassification = CustomerContent;
+        }
+        field(210; "Reversed by Entry No."; BigInteger)
+        {
+            Caption = 'Reversed by Entry No.';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM Subscr. Request"."Entry No.";
+
+            trigger OnValidate()
+            begin
+                if "Reversed by Entry No." <> 0 then
+                    if "Reversed by Entry No." = "Entry No." then
+                        FieldError("Reversed by Entry No.");
+            end;
         }
     }
 
@@ -112,6 +155,7 @@ table 6150923 "NPR MM Subscr. Request"
         key(Key2; "Subscription Entry No.") { }
         key(Key3; "Processing Status", Type, Status) { }
         key(Key4; "Subscription Entry No.", "Processing Status") { }
+        key(Key5; "Reversed by Entry No.") { }
     }
 
     trigger OnDelete()

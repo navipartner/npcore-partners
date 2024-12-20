@@ -4,9 +4,10 @@ page 6184832 "NPR MM Subscr.Payment Requests"
     Caption = 'Subscr. Payment Requests';
     PageType = List;
     SourceTable = "NPR MM Subscr. Payment Request";
-    UsageCategory = None;
+    UsageCategory = Tasks;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
     Editable = false;
-    SourceTableView = sorting("Entry No.") order(descending);
+
     layout
     {
         area(Content)
@@ -15,7 +16,7 @@ page 6184832 "NPR MM Subscr.Payment Requests"
             {
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ToolTip = 'Specifies the value of the Entry No. field.';
+                    ToolTip = 'Specifies a unique entry number, assigned by the system to this record according to an automatically maintained number series.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Batch No."; Rec."Batch No.")
@@ -26,6 +27,11 @@ page 6184832 "NPR MM Subscr.Payment Requests"
                 field(PSP; Rec.PSP)
                 {
                     ToolTip = 'Specifies the value of the PSP field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field(Type; Rec.Type)
+                {
+                    ToolTip = 'Specifies the type of requested transaction.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Status; Rec.Status)
@@ -96,6 +102,11 @@ page 6184832 "NPR MM Subscr.Payment Requests"
                 field("G/L Entry No."; Rec."G/L Entry No.")
                 {
                     ToolTip = 'Specifies the entry number created in the general ledger by the posting process for the subscription payment request.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field("Cust. Ledger Entry No."; Rec."Cust. Ledger Entry No.")
+                {
+                    ToolTip = 'Specifies the entry number created in the customer ledger by the posting process for the subscription payment request.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Reversed; Rec.Reversed)
@@ -175,6 +186,23 @@ page 6184832 "NPR MM Subscr.Payment Requests"
                     SetStatusCancelled();
                 end;
             }
+            action(Refund)
+            {
+                Caption = 'Refund';
+                ToolTip = 'Requests a refund for the current subscription payment. In order to request a refund, the status of the payment must be "Captured".';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Image = VendorPayment;
+#if BC17 or BC18 or BC19 or BC20
+                Promoted = true;
+                PromotedIsBig = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+#endif
+                trigger OnAction()
+                begin
+                    RequestRefund();
+                end;
+            }
             action(ResetTryCount)
             {
                 Caption = 'Reset Process Try Count';
@@ -241,6 +269,7 @@ page 6184832 "NPR MM Subscr.Payment Requests"
             actionref(Process_Promoted; Process) { }
             actionref(ProcessWithoutTryCountUpdate_Promoted; ProcessWithoutTryCountUpdate) { }
             actionref(Cancel_Promoted; Cancel) { }
+            actionref(Refund_Promoted; Refund) { }
             actionref(ResetTryCount_Promoted; ResetTryCount) { }
         }
 #endif
@@ -259,7 +288,6 @@ page 6184832 "NPR MM Subscr.Payment Requests"
     begin
         SubsPayReqLogUtils.OpenLogEntries(Rec);
     end;
-
 
     local procedure SetStatusCancelled()
     var
@@ -283,4 +311,18 @@ page 6184832 "NPR MM Subscr.Payment Requests"
         SubsPayRequestUtils.ResetProcessTryCountWithConfirmation(Rec);
     end;
 
+    local procedure RequestRefund()
+    var
+        SubscrPmtReversalRequest: Record "NPR MM Subscr. Payment Request";
+        SubscrReversalMgt: Codeunit "NPR MM Subscr. Reversal Mgt.";
+        RefundReqestedMsg: Label 'Refund of selected subscription payment has been successfully requested.';
+    begin
+        SubscrReversalMgt.RequestRefundWithConfirmation(Rec, SubscrPmtReversalRequest);
+        if SubscrPmtReversalRequest."Entry No." <> 0 then begin
+            Rec := SubscrPmtReversalRequest;
+            Rec.Mark(true);
+            CurrPage.Update(false);
+            Message(RefundReqestedMsg);
+        end;
+    end;
 }

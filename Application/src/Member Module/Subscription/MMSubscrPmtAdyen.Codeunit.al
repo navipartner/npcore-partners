@@ -85,6 +85,25 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                                     SubsPayReqLogEntry);
 
         ClearLastError();
+        if not RequestTypeIsSupported(SubscrPaymentRequest) then begin
+            ErrorMessage := GetLastErrorText();
+            ProcessResponse(SubscrPaymentRequest,
+                            SubsPayReqLogEntry,
+                            '',
+                            '',
+                            ErrorMessage,
+                            SubscrPaymentRequest.Status::Error,
+                            SubsPayReqLogEntry."Processing Status"::Error,
+                            1,
+                            '',
+                            '',
+                            '',
+                            '',
+                            SkipTryCountUpdate,
+                            '');
+            exit;
+        end;
+
         if not TryGetRecurringPaymentSetup(SubscrPaymentRequest, RecurPaymSetup) then begin
             ErrorMessage := GetLastErrorText();
             ProcessResponse(SubscrPaymentRequest,
@@ -799,6 +818,20 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         Clear(RejectedReasonDescription);
         if JsonObject.Get('refusalReason', JsonToken) then
             RejectedReasonDescription := Copystr(JsonToken.AsValue().AsText(), 1, MaxStrLen(RejectedReasonDescription));
+    end;
+
+    [TryFunction]
+    local procedure RequestTypeIsSupported(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request")
+    var
+        CannotBeProcessedErr: Label 'Requests of type %1 must be initiated directly at the PSP and can only be created in BC by the reconciliation routine.', Comment = '%1 - request type (Enum "NPR MM Payment Request Type")';
+        NotSupportedErr: Label 'Requests of type %1 are not yet supported. Please confirm with your system vendor on when the support for this request type is planned.', Comment = '%1 - request type (Enum "NPR MM Payment Request Type")';
+    begin
+        if not (SubscrPaymentRequest.Type In [SubscrPaymentRequest.Type::Payment, SubscrPaymentRequest.Type::Refund]) then
+            Error(CannotBeProcessedErr, SubscrPaymentRequest.Type);
+
+        //TODO: implement refund processing
+        if SubscrPaymentRequest.Type = SubscrPaymentRequest.Type::Refund then
+            Error(NotSupportedErr, SubscrPaymentRequest.Type);
     end;
 
     local procedure ProcessResponse(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
