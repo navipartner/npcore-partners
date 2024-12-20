@@ -19,12 +19,18 @@
             Commit();
             ClearNstCache(XmlDoc);
 
+            FunctionName := GetWebServiceFunction(ImportEntry."Import Type");
+            case FunctionName of
+                'GetSetAutoRenewOption', 'GetSetMemberComOption', 'SearchMembers':
+                    exit; // Do nothing, handled by xmlport
+
+            end;
+
             if (not MemberInfoCapture.IsEmpty()) then begin
                 MemberInfoCapture.LockTable(true);
                 MemberInfoCapture.FindLast();
             end;
 
-            FunctionName := GetWebServiceFunction(ImportEntry."Import Type");
             case FunctionName of
                 'CreateMembership':
                     ImportCreateMemberships(XmlDoc, ImportEntry."Document ID");
@@ -71,14 +77,6 @@
 
                 'CreateWalletMemberPass':
                     CreateWallet(XmlDoc, ImportEntry."Document ID");
-
-                'GetSetAutoRenewOption':
-                    ; // Do nothing, handled by xmlport
-                'GetSetMemberComOption':
-                    ; // Do nothing, handled by xmlport */
-
-                'SearchMembers':
-                    ; // Do nothing, handled by xmlport */
                 else
                     Error(MISSING_CASE, ImportEntry."Import Type", FunctionName);
             end;
