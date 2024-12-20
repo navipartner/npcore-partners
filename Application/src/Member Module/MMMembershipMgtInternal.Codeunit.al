@@ -1435,10 +1435,7 @@
 
         if MembershipEntry."Original Context" in [MembershipEntry."Original Context"::NEW, MembershipEntry."Original Context"::RENEW, MembershipEntry."Original Context"::AUTORENEW, MembershipEntry."Original Context"::EXTEND] then begin
             Membership.Get(MembershipEntry."Membership Entry No.");
-            if Membership."Auto-Renew" <> Membership."Auto-Renew"::NO then begin
-                Membership."Auto-Renew" := Membership."Auto-Renew"::NO;
-                Membership.Modify(true);
-            end;
+            DisableMembershipAutoRenewal(Membership, true, false);
         end;
 
         MembershipEvents.OnAfterInsertMembershipEntry(MembershipEntry);
@@ -1605,11 +1602,7 @@
             MembershipEntry."Valid Until Date" := EndDateNew;
             MembershipEntry.Modify();
 
-            if Membership."Auto-Renew" <> Membership."Auto-Renew"::NO then begin
-                Membership."Auto-Renew" := Membership."Auto-Renew"::NO;
-                Membership.Modify(true);
-            end;
-
+            DisableMembershipAutoRenewal(Membership, true, false);
             SubscriptionMgtImpl.UpdateSubscriptionValidUntilDateFromMembershipEntry(MembershipEntry);
 
             MembershipEvents.OnAfterInsertMembershipEntry(MembershipEntry);
@@ -1782,11 +1775,8 @@
                     Membership.Modify();
                 end;
 
-            if MemberInfoCapture."Enable Auto-Renew" then begin
-                Membership."Auto-Renew" := Membership."Auto-Renew"::YES_INTERNAL;
-                Membership."Auto-Renew Payment Method Code" := MemberInfoCapture."Auto-Renew Payment Method Code";
-                Membership.Modify();
-            end;
+            if MemberInfoCapture."Enable Auto-Renew" then
+                EnableMembershipInternalAutoRenewal(Membership, true, false);
 
 
             MemberInfoCapture."Membership Code" := Membership."Membership Code";
@@ -3127,6 +3117,22 @@
         exit(GetCommunicationMethodWorker(MemberEntryNo, MembershipEntryNo, MemberCommunication."Message Type"::RENEWAL_FAILURE, Method, Address, Engine));
     end;
 
+    internal procedure GetCommunicationMethod_AutoRenewalEnabled(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
+    var
+        MemberCommunication: Record "NPR MM Member Communication";
+    begin
+
+        exit(GetCommunicationMethodWorker(MemberEntryNo, MembershipEntryNo, MemberCommunication."Message Type"::AUTORENEWAL_ENABLED, Method, Address, Engine));
+    end;
+
+    internal procedure GetCommunicationMethod_AutoRenewalDisabled(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
+    var
+        MemberCommunication: Record "NPR MM Member Communication";
+    begin
+
+        exit(GetCommunicationMethodWorker(MemberEntryNo, MembershipEntryNo, MemberCommunication."Message Type"::AUTORENEWAL_DISABLED, Method, Address, Engine));
+    end;
+
     local procedure GetCommunicationMethodWorker(MemberEntryNo: Integer; MembershipEntryNo: Integer; MessageType: Option; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
     var
         MemberCommunication: Record "NPR MM Member Communication";
@@ -3785,8 +3791,11 @@
             end;
         end;
 
-        if MemberInfoCapture."Information Context" = MemberInfoCapture."Information Context"::AUTORENEW then
+        if MemberInfoCapture."Information Context" in [MemberInfoCapture."Information Context"::AUTORENEW, MemberInfoCapture."Information Context"::RENEW] then
             AddMembershipRenewalSuccessNotification(MembershipLedgerEntry);
+
+        if MemberInfoCapture."Enable Auto-Renew" then
+            MemberNotification.AddMembershipAutoRenewalEnableNotification(MembershipLedgerEntry."Membership Entry No.", MembershipLedgerEntry."Membership Code");
 
         exit(MembershipLedgerEntry."Entry No.");
     end;
@@ -5751,10 +5760,81 @@
         if (not (Membership.Get(GetMembershipFromExtCardNo(ExternalMemberCardNo, Today, NotFoundReasonText)))) then
             Error(NotFoundReasonText);
 
-        if Membership."Auto-Renew" = Membership."Auto-Renew"::NO then
+        DisableMembershipAutoRenewal(Membership, true, false);
+    end;
+
+    internal procedure EnableMembershipInternalAutoRenewal(var Membership: Record "NPR MM Membership"; CreateMemberNotification: Boolean; ForceMemberNotification: Boolean)
+    var
+        MemberNotification: Codeunit "NPR MM Member Notification";
+        EligibleForNotification: Boolean;
+    begin
+        if Membership."Auto-Renew" <> Membership."Auto-Renew"::YES_INTERNAL then begin
+            Membership."Auto-Renew" := Membership."Auto-Renew"::YES_INTERNAL;
+            Membership.Modify(true);
+
+            EligibleForNotification := true;
+        end;
+
+        if not CreateMemberNotification then
             exit;
 
-        Membership."Auto-Renew" := Membership."Auto-Renew"::NO;
-        Membership.Modify(true);
+        EligibleForNotification := EligibleForNotification or ForceMemberNotification;
+        if not EligibleForNotification then
+            exit;
+
+        MemberNotification.AddMembershipAutoRenewalEnableNotification(Membership."Entry No.", Membership."Membership Code");
+    end;
+
+    internal procedure EnableMembershipExternalAutoRenewal(var Membership: Record "NPR MM Membership"; CreateMemberNotification: Boolean; ForceMemberNotification: Boolean)
+    var
+        MemberNotification: Codeunit "NPR MM Member Notification";
+        EligibleForNotification: Boolean;
+    begin
+        if Membership."Auto-Renew" <> Membership."Auto-Renew"::YES_EXTERNAL then begin
+            Membership."Auto-Renew" := Membership."Auto-Renew"::YES_EXTERNAL;
+            Membership.Modify(true);
+
+            EligibleForNotification := true;
+        end;
+
+        if not CreateMemberNotification then
+            exit;
+
+        EligibleForNotification := EligibleForNotification or ForceMemberNotification;
+        if not EligibleForNotification then
+            exit;
+
+        MemberNotification.AddMembershipAutoRenewalEnableNotification(Membership."Entry No.", Membership."Membership Code");
+    end;
+
+    internal procedure DisableMembershipAutoRenewal(var Membership: Record "NPR MM Membership"; CreateMemberNotification: Boolean; ForceMemberNotification: Boolean)
+    var
+        MemberNotification: Codeunit "NPR MM Member Notification";
+        EligibleForNotification: Boolean;
+    begin
+        if Membership."Auto-Renew" <> Membership."Auto-Renew"::NO then begin
+            Membership."Auto-Renew" := Membership."Auto-Renew"::NO;
+            Membership.Modify(true);
+
+            EligibleForNotification := true;
+        end;
+
+        if not CreateMemberNotification then
+            exit;
+
+        EligibleForNotification := EligibleForNotification or ForceMemberNotification;
+        if not EligibleForNotification then
+            exit;
+
+        MemberNotification.AddMembershipAutoRenewalDisabledNotification(Membership."Entry No.", Membership."Membership Code");
+    end;
+
+    internal procedure SetAutoRenewStatusWithConfirmPage(var Membership: Record "NPR MM Membership")
+    var
+        SetAutoRenewStatus: Page "NPR MM Set Auto-Renew Status";
+    begin
+        Clear(SetAutoRenewStatus);
+        SetAutoRenewStatus.SetMembership(Membership);
+        SetAutoRenewStatus.RunModal();
     end;
 }

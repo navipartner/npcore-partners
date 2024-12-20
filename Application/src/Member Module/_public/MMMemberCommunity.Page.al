@@ -100,6 +100,16 @@
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                 }
+                field("Create AutoRenewal Enabl Notif"; Rec."Create AutoRenewal Enabl Notif")
+                {
+                    ToolTip = 'Specifies the value of the Create Auto-Renewal Enabled Notifications field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field("Create AutoRenewal Disbl Notif"; Rec."Create AutoRenewal Disbl Notif")
+                {
+                    ToolTip = 'Specifies the value of the Create Auto-Renewal Disabled Notifications field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
                 field("Activate Loyalty Program"; Rec."Activate Loyalty Program")
                 {
 

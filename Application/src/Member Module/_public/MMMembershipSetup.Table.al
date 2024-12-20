@@ -394,6 +394,16 @@
             Caption = 'Create Renewal Failure Notifications';
             DataClassification = CustomerContent;
         }
+        field(620; "Create AutoRenewal Enabl Notif"; Boolean)
+        {
+            Caption = 'Create Auto-Renewal Enabled Notifications';
+            DataClassification = CustomerContent;
+        }
+        field(630; "Create AutoRenewal Disbl Notif"; Boolean)
+        {
+            Caption = 'Create Auto-Renewal Disabled Notifications';
+            DataClassification = CustomerContent;
+        }
         field(800; "HeyLoyalty Name"; Text[50])
         {
             Caption = 'HeyLoyalty Name';
