@@ -1,7 +1,7 @@
 codeunit 6060078 "NPR POS Dragonglass API"
 {
-    //This codeunit can be exposed as an unbound odata v4 codeunit to allow dragonglass to consume the same methods 
-    //as the control addin exposes on the dragonglass page, but via HTTP from outside of BC instead of inside a BC iframe.                
+    //This codeunit can be exposed as an unbound odata v4 codeunit to allow dragonglass to consume the same methods
+    //as the control addin exposes on the dragonglass page, but via HTTP from outside of BC instead of inside a BC iframe.
     //
     //Advantages:
     //- No risk of exposing BC UI/standard ERP pages (relevant for some products such as selfservice POS)
@@ -13,7 +13,7 @@ codeunit 6060078 "NPR POS Dragonglass API"
     //- Cannot open BC pages, messages, strmenus
     //- Cannot use page background task to make async AL http requests in backend.
     //- Single instance codeunits are cleared between each HTTP request, so any POS action or functionality used must serialize to DB or
-    //  return relevant data to client so the client can remember the state instead.    
+    //  return relevant data to client so the client can remember the state instead.
 
     procedure InvokeMethod(method: Text; parameters: Text; lastServerId: Text) JsonResponse: Text
     var
@@ -82,5 +82,13 @@ codeunit 6060078 "NPR POS Dragonglass API"
             SalesTicketNoOut := TempPOSSale."Sales Ticket No.";
             exit;
         end;
+    end;
+
+    internal procedure InitPOSDragonglassService()
+    var
+        WebService: Record "Web Service Aggregate";
+        WebServiceManagement: Codeunit "Web Service Management";
+    begin
+        WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, Codeunit::"NPR POS Dragonglass API", 'dragonglass', true);
     end;
 }

@@ -230,6 +230,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Subscriptions Install", 'ScheduleSubscriptionPaymentRequestProcessingJobQueue'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Subscriptions Install", 'ScheduleSubscriptionRequestProcessingJobQueue'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Pay View Dimension", 'SetDimensionMandatoryTrueForListOption'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Dragonglass Service", 'PublishDragonglassWebService'));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -298,10 +299,10 @@
                 exit('NPRNewPriceTableUpgrade-20210920');
             Codeunit::"NPR MCS Data Upgrade":
                 exit('NPR_MCS_Data_Upgrade');
-#if BC17 or BC18                
+#if BC17 or BC18
             Codeunit::"NPR Enable Item Ref. Upgr.":
                 exit('AutoEnableItemReference-20210324');
-#endif                
+#endif
             Codeunit::"NPR NP Retail Setup Upgrade":
                 case UpgradeStep of
                     'RemoveSourceCode':
@@ -874,6 +875,11 @@
                 case UpgradeStep of
                     'SetDimensionMandatoryTrueForListOption':
                         exit('NPR-SetDimensionMandatoryTrueForListOption-20241105');
+                end;
+            Codeunit::"NPR UPG Dragonglass Service":
+                case UpgradeStep of
+                    'PublishDragonglassWebService':
+                        exit('NPR-PublishDragonglassWebService-20241218')
                 end;
         end;
     end;
