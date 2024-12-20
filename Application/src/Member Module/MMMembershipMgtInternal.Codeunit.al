@@ -1382,20 +1382,22 @@
 
         ReasonText := StrSubstNo(PlaceHolderLbl, MemberInfoCapture."Information Context", MembershipEntry.Context, MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date");
 
-        if (WithUpdate) then begin
-
-            if (MembershipEntry.Context = MembershipEntry.Context::REGRET) then begin
-                DoReverseRegretTimeFrame(MembershipEntry);
-            end else begin
-                DoRegretTimeframe(MembershipEntry);
-            end;
-
-        end;
+        if (WithUpdate) then
+            CarryOutMembershipRegret(MembershipEntry);
 
         OutStartDate := MembershipEntry."Valid From Date";
         OutUntilDate := MembershipEntry."Valid Until Date";
 
         exit(true);
+    end;
+
+    internal procedure CarryOutMembershipRegret(var MembershipEntry: Record "NPR MM Membership Entry")
+    begin
+        if (MembershipEntry.Context = MembershipEntry.Context::REGRET) then begin
+            DoReverseRegretTimeFrame(MembershipEntry);
+        end else begin
+            DoRegretTimeframe(MembershipEntry);
+        end;
     end;
 
     local procedure DoReverseRegretTimeFrame(var MembershipEntry: Record "NPR MM Membership Entry")

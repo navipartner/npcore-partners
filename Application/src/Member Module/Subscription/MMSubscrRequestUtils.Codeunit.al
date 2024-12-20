@@ -29,6 +29,7 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
     var
         SubsReqLogEntry: Record "NPR MM Subs Req Log Entry";
         SubsReqLogUtils: Codeunit "NPR MM Subs Req Log Utils";
+        SubscrReversalMgt: Codeunit "NPR MM Subscr. Reversal Mgt.";
     begin
         if SubscrRequest.Status = NewStatus then
             exit;
@@ -36,6 +37,8 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
         SubscrRequest.Validate(Status, NewStatus);
         SubscrRequest.Validate("Processing Status", SubscrRequest."Processing Status"::Success);
         SubscrRequest.Modify(true);
+        if NewStatus = NewStatus::Cancelled then
+            SubscrReversalMgt.CancelReversal(SubscrRequest);
 
         SubsReqLogUtils.LogEntry(SubscrRequest, true, SubsReqLogEntry);
     end;
@@ -82,38 +85,26 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
     internal procedure UpdateUnprocessableStatusInSubscriptionPaymentRequestStatus(SubscrRequest: Record "NPR MM Subscr. Request")
     var
         SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
-        IsModified: Boolean;
+        SubsPayRequestUtils: Codeunit "NPR MM Subs Pay Request Utils";
+        NewPmtRequestStatus: Enum "NPR MM Payment Request Status";
     begin
         if not (SubscrRequest.Status in [SubscrRequest.Status::Rejected, SubscrRequest.Status::Cancelled]) then
             exit;
 
+        case SubscrRequest.Status of
+            SubscrRequest.Status::Rejected:
+                NewPmtRequestStatus := NewPmtRequestStatus::Rejected;
+            SubscrRequest.Status::Cancelled:
+                NewPmtRequestStatus := NewPmtRequestStatus::Cancelled;
+        end;
         SubscrPaymentRequest.SetCurrentKey("Subscr. Request Entry No.", Status);
         SubscrPaymentRequest.SetRange("Subscr. Request Entry No.", SubscrRequest."Entry No.");
+        SubscrPaymentRequest.SetFilter(Status, '<>%1', NewPmtRequestStatus);
         if not SubscrPaymentRequest.FindSet() then
             exit;
+        CheckSuccessfulPaymentRequestsExistAndGiveError(SubscrRequest);
         repeat
-            IsModified := false;
-            case SubscrRequest.Status of
-                SubscrRequest.Status::Rejected:
-                    begin
-                        CheckSuccessfulPaymentRequestsExistAndGiveError(SubscrRequest);
-                        if SubscrPaymentRequest.Status <> SubscrPaymentRequest.Status::Rejected then begin
-                            SubscrPaymentRequest.Status := SubscrPaymentRequest.Status::Rejected;
-                            IsModified := true;
-                        end;
-                    end;
-                SubscrRequest.Status::Cancelled:
-                    begin
-                        CheckSuccessfulPaymentRequestsExistAndGiveError(SubscrRequest);
-                        if SubscrPaymentRequest.Status <> SubscrPaymentRequest.Status::Cancelled then begin
-                            SubscrPaymentRequest.Status := SubscrPaymentRequest.Status::Cancelled;
-                            IsModified := true;
-                        end;
-                    end;
-            end;
-
-            if IsModified then
-                SubscrPaymentRequest.Modify();
+            SubsPayRequestUtils.SetSubscrPaymentRequestStatus(SubscrPaymentRequest, NewPmtRequestStatus);
         until SubscrPaymentRequest.Next() = 0;
     end;
 

@@ -10,10 +10,13 @@ codeunit 6185121 "NPR MM Subscr. Renew: Post"
     var
         GenJnlLine: Record "Gen. Journal Line";
         RecurringPaymentSetup: Record "NPR MM Recur. Paym. Setup";
+        AppliesToDocType: Enum "Gen. Journal Document Type";
+        AppliesToDocNo: Code[20];
         PostingDescription: Text;
     begin
         if SubscriptionRequest.Posted then
             exit(true);
+        SubscriptionRequest.TestField(Type);
 
         Membership.TestField("Customer No.");
         MembershipSetup.TestField("Recurring Payment Code");
@@ -24,30 +27,40 @@ codeunit 6185121 "NPR MM Subscr. Renew: Post"
         if SubscriptionRequest."Posting Document No." = '' then
             SubscriptionRequest."Posting Document No." := GetPostingDocumentNo(RecurringPaymentSetup);
         PostingDescription := StrSubstNo(AUTORENEW_TEXT, Membership."External Membership No.", SubscriptionRequest."New Valid From Date", SubscriptionRequest."New Valid Until Date");
+        if SubscriptionRequest.Type = SubscriptionRequest.Type::Renew then
+            SubscriptionRequest."Posting Document Type" := SubscriptionRequest."Posting Document Type"::Invoice
+        else
+            SubscriptionRequest."Posting Document Type" := SubscriptionRequest."Posting Document Type"::"Credit Memo";
+        SubscriptionRequest."Posting Date" := Today();
+        SetAppliesToDoc(SubscriptionRequest, AppliesToDocType, AppliesToDocNo);
 
         //Revenue account
         InitGenJnlLine(GenJnlLine,
-            GenJnlLine."Document Type"::Invoice, SubscriptionRequest."Posting Document No.",
+            SubscriptionRequest."Posting Document Type", SubscriptionRequest."Posting Document No.", SubscriptionRequest."Posting Date",
             GenJnlLine."Account Type"::"G/L Account", RecurringPaymentSetup."Revenue Account",
             -SubscriptionRequest.Amount, SubscriptionRequest."Currency Code", true,
             0, RecurringPaymentSetup."Source Code", PostingDescription);
         SubscriptionRequest."G/L Entry No." := GenJnlPostLine.RunWithCheck(GenJnlLine);
-        SubscriptionRequest."Posting Date" := GenJnlLine."Posting Date";
         SubscriptionRequest.Posted := SubscriptionRequest."G/L Entry No." <> 0;
 
         //Customer account
         InitGenJnlLine(GenJnlLine,
-            GenJnlLine."Document Type"::Invoice, SubscriptionRequest."Posting Document No.",
+            SubscriptionRequest."Posting Document Type", SubscriptionRequest."Posting Document No.", SubscriptionRequest."Posting Date",
             GenJnlLine."Account Type"::Customer, Membership."Customer No.",
             SubscriptionRequest.Amount, SubscriptionRequest."Currency Code", false,
             0, RecurringPaymentSetup."Source Code", PostingDescription);
+        if AppliesToDocNo <> '' then begin
+            GenJnlLine."Applies-to Doc. Type" := AppliesToDocType;
+            GenJnlLine."Applies-to Doc. No." := AppliesToDocNo;
+        end;
         GenJnlPostLine.RunWithCheck(GenJnlLine);
+        SubscriptionRequest."Cust. Ledger Entry No." := GetLastPostedGLEntryNo();
 
         exit(SubscriptionRequest.Posted);
     end;
 
     [CommitBehavior(CommitBehavior::Error)]
-    internal procedure PostPaymentsToGL(SubscriptionRequest: Record "NPR MM Subscr. Request")
+    internal procedure PostPaymentsToGL(SubscriptionRequest: Record "NPR MM Subscr. Request"; PostingDocumentNo: Code[20])
     var
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
@@ -61,7 +74,10 @@ codeunit 6185121 "NPR MM Subscr. Renew: Post"
         if SubscrPaymentRequest.IsEmpty() then
             exit;
 
-        SubscriptionRequest.TestField("Posting Document No.");
+        if PostingDocumentNo = '' then begin
+            SubscriptionRequest.TestField("Posting Document No.");
+            PostingDocumentNo := SubscriptionRequest."Posting Document No.";
+        end;
 
         Subscription.Get(SubscriptionRequest."Subscription Entry No.");
         Membership.Get(Subscription."Membership Entry No.");
@@ -78,47 +94,55 @@ codeunit 6185121 "NPR MM Subscr. Renew: Post"
 #endif
         if SubscrPaymentRequest.FindSet() then
             repeat
-                PostPayment(SubscriptionRequest, SubscrPaymentRequest, Membership, RecurringPaymentSetup);
+                PostPayment(SubscriptionRequest, SubscrPaymentRequest, Membership, RecurringPaymentSetup, PostingDocumentNo);
             until SubscrPaymentRequest.Next() = 0;
     end;
 
-    local procedure PostPayment(SubscriptionRequest: Record "NPR MM Subscr. Request"; SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; Membership: Record "NPR MM Membership"; RecurringPaymentSetup: Record "NPR MM Recur. Paym. Setup")
+    local procedure PostPayment(SubscriptionRequest: Record "NPR MM Subscr. Request"; SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; Membership: Record "NPR MM Membership"; RecurringPaymentSetup: Record "NPR MM Recur. Paym. Setup"; PostingDocumentNo: Code[20])
     var
         GenJnlLine: Record "Gen. Journal Line";
         SubscrPaymentIHandler: Interface "NPR MM Subscr.Payment IHandler";
+        AppliesToDocType: Enum "Gen. Journal Document Type";
         PaymentAccountType: Enum "Gen. Journal Account Type";
+        AppliesToDocNo: Code[20];
         PaymentAccountNo: Code[20];
         PostingDescription: Text;
     begin
         if SubscrPaymentRequest.Posted then
             exit;
         PostingDescription := StrSubstNo(AUTORENEW_TEXT, Membership."External Membership No.", SubscriptionRequest."New Valid From Date", SubscriptionRequest."New Valid Until Date");
+        if SubscrPaymentRequest.Type = SubscrPaymentRequest.Type::Payment then
+            SubscrPaymentRequest."Posting Document Type" := SubscrPaymentRequest."Posting Document Type"::Payment
+        else
+            SubscrPaymentRequest."Posting Document Type" := SubscrPaymentRequest."Posting Document Type"::Refund;
+        SubscrPaymentRequest."Posting Document No." := PostingDocumentNo;
+        SubscrPaymentRequest."Posting Date" := Today();
+        SetAppliesToDoc(SubscriptionRequest, SubscrPaymentRequest, AppliesToDocType, AppliesToDocNo);
 
         //Payment account
         SubscrPaymentIHandler := SubscrPaymentRequest.PSP;
         SubscrPaymentIHandler.GetPaymentPostingAccount(PaymentAccountType, PaymentAccountNo);
         InitGenJnlLine(GenJnlLine,
-            GenJnlLine."Document Type"::Payment, SubscriptionRequest."Posting Document No.",
+            SubscrPaymentRequest."Posting Document Type", SubscrPaymentRequest."Posting Document No.", SubscrPaymentRequest."Posting Date",
             PaymentAccountType, PaymentAccountNo,
             SubscrPaymentRequest.Amount, SubscrPaymentRequest."Currency Code", false,
             0, RecurringPaymentSetup."Source Code", PostingDescription);
         SubscrPaymentRequest."G/L Entry No." := GenJnlPostLine.RunWithCheck(GenJnlLine);
-        SubscrPaymentRequest."Posting Document No." := SubscriptionRequest."Posting Document No.";
         SubscrPaymentRequest.Posted := SubscrPaymentRequest."G/L Entry No." <> 0;
-        SubscrPaymentRequest."Posting Date" := GenJnlLine."Posting Date";
-        SubscrPaymentRequest.Modify();
 
         //Customer account
         GenJnlLine."Account Type" := GenJnlLine."Account Type"::Customer;
         GenJnlLine.Validate("Account No.", Membership."Customer No.");
         GenJnlLine.Validate(Amount, -GenJnlLine.Amount);
-        GenJnlLine."Applies-to Doc. Type" := GenJnlLine."Applies-to Doc. Type"::Invoice;
-        GenJnlLine."Applies-to Doc. No." := SubscriptionRequest."Posting Document No.";
+        GenJnlLine."Applies-to Doc. Type" := AppliesToDocType;
+        GenJnlLine."Applies-to Doc. No." := AppliesToDocNo;
         GenJnlPostLine.RunWithCheck(GenJnlLine);
+        SubscrPaymentRequest."Cust. Ledger Entry No." := GetLastPostedGLEntryNo();
+        SubscrPaymentRequest.Modify();
     end;
 
     local procedure InitGenJnlLine(var GenJnlLine: Record "Gen. Journal Line";
-                                   DocumentType: Enum "Gen. Journal Document Type"; DocumentNo: Code[20];
+                                   DocumentType: Enum "Gen. Journal Document Type"; DocumentNo: Code[20]; PostingDate: Date;
                                    AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20];
                                    Amount: Decimal; CurrencyCode: Code[20]; UseVAT: Boolean;
                                    DimensionSetID: Integer; SourceCode: Code[10]; Description: Text)
@@ -127,8 +151,8 @@ codeunit 6185121 "NPR MM Subscr. Renew: Post"
     begin
         GenJnlLine.Init();
         GenJnlLine.SetSuppressCommit(true);
-        GenJnlLine."Posting Date" := Today();
-        GenJnlLine."Document Date" := Today();
+        GenJnlLine."Posting Date" := PostingDate;
+        GenJnlLine."Document Date" := PostingDate;
         GenJnlLine."Document Type" := DocumentType;
         GenJnlLine."Document No." := DocumentNo;
         GenJnlLine."Account Type" := AccountType;
@@ -145,7 +169,7 @@ codeunit 6185121 "NPR MM Subscr. Renew: Post"
         GenJnlLine."Source Code" := SourceCode;
     end;
 
-    local procedure GetPostingDocumentNo(RecurringPaymentSetup: Record "NPR MM Recur. Paym. Setup"): Code[20]
+    internal procedure GetPostingDocumentNo(RecurringPaymentSetup: Record "NPR MM Recur. Paym. Setup"): Code[20]
     var
 #if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23
         NoSeriesManagement: Codeunit NoSeriesManagement;
@@ -159,5 +183,72 @@ codeunit 6185121 "NPR MM Subscr. Renew: Post"
 #else
         exit(NoSeries.GetNextNo(RecurringPaymentSetup."Document No. Series", Today()));
 #endif
+    end;
+
+    local procedure SetAppliesToDoc(SubscriptionRequest: Record "NPR MM Subscr. Request"; var AppliesToDocType: Enum "Gen. Journal Document Type"; var AppliesToDocNo: Code[20])
+    begin
+        if SubscriptionRequest."Posting Document Type" = SubscriptionRequest."Posting Document Type"::"Credit Memo" then begin
+            SubscriptionRequest.SetRange("Reversed by Entry No.", SubscriptionRequest."Entry No.");
+            SubscriptionRequest.SetFilter("Entry No.", '<>%1', SubscriptionRequest."Entry No.");
+            if SubscriptionRequest.FindLast() and (SubscriptionRequest."Cust. Ledger Entry No." <> 0) then
+                if UnapplyCustomerLedgerEntry(SubscriptionRequest."Cust. Ledger Entry No.", SubscriptionRequest."Posting Document No.", SubscriptionRequest."Posting Date") then begin
+                    AppliesToDocType := SubscriptionRequest."Posting Document Type";
+                    AppliesToDocNo := SubscriptionRequest."Posting Document No.";
+                end;
+        end;
+    end;
+
+    local procedure SetAppliesToDoc(SubscriptionRequest: Record "NPR MM Subscr. Request"; SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var AppliesToDocType: Enum "Gen. Journal Document Type"; var AppliesToDocNo: Code[20])
+    begin
+        if SubscrPaymentRequest."Posting Document Type" = SubscrPaymentRequest."Posting Document Type"::Refund then begin
+            SubscrPaymentRequest.SetRange("Reversed by Entry No.", SubscrPaymentRequest."Entry No.");
+            SubscrPaymentRequest.SetFilter("Entry No.", '<>%1', SubscrPaymentRequest."Entry No.");
+            if SubscrPaymentRequest.FindLast() and (SubscrPaymentRequest."Cust. Ledger Entry No." <> 0) then
+                if UnapplyCustomerLedgerEntry(SubscrPaymentRequest."Cust. Ledger Entry No.", SubscrPaymentRequest."Posting Document No.", SubscrPaymentRequest."Posting Date") then begin
+                    AppliesToDocType := SubscrPaymentRequest."Posting Document Type";
+                    AppliesToDocNo := SubscrPaymentRequest."Posting Document No.";
+                    exit;
+                end;
+        end;
+        AppliesToDocType := SubscriptionRequest."Posting Document Type";
+        AppliesToDocNo := SubscriptionRequest."Posting Document No.";
+    end;
+
+    local procedure UnapplyCustomerLedgerEntry(CustLedgEntryNo: Integer; PostingDocNo: Code[20]; PostingDate: Date): Boolean
+    var
+#if not (BC17 or BC18 or BC19)
+        ApplyUnapplyParameters: Record "Apply Unapply Parameters";
+#endif
+        CustLedgEntry: Record "Cust. Ledger Entry";
+        DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
+        CustEntryApplyPostedEntries: Codeunit "CustEntry-Apply Posted Entries";
+        CustEntryUnapplyModifier: Codeunit "NPR CustEntry-Unapply Modifier";
+        ApplicationEntryNo: Integer;
+    begin
+        CustLedgEntry.Get(CustLedgEntryNo);
+        if CustLedgEntry.Reversed then
+            exit(false);
+        ApplicationEntryNo := CustEntryApplyPostedEntries.FindLastApplEntry(CustLedgEntryNo);
+        if ApplicationEntryNo = 0 then
+            exit(true);
+        DetailedCustLedgEntry.Get(ApplicationEntryNo);
+        BindSubscription(CustEntryUnapplyModifier);
+#if not (BC17 or BC18 or BC19)        
+        ApplyUnapplyParameters."Document No." := PostingDocNo;
+        ApplyUnapplyParameters."Posting Date" := PostingDate;
+        CustEntryApplyPostedEntries.PostUnApplyCustomerCommit(DetailedCustLedgEntry, ApplyUnapplyParameters, false);
+#else
+        CustEntryApplyPostedEntries.PostUnApplyCustomerCommit(DetailedCustLedgEntry, PostingDocNo, PostingDate, false);
+#endif
+        UnbindSubscription(CustEntryUnapplyModifier);
+        exit(true);
+    end;
+
+    local procedure GetLastPostedGLEntryNo(): Integer
+    var
+        GLReg: Record "G/L Register";
+    begin
+        GenJnlPostLine.GetGLReg(GLReg);
+        exit(GLReg."To Entry No.");
     end;
 }

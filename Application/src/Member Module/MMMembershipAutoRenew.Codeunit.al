@@ -272,7 +272,7 @@
                         if SubscriptionRequest."Posting Document No." <> '' then
                             MemberInfoCapture."Document No." := SubscriptionRequest."Posting Document No.";
                     if SubscriptionRequest.Posted then
-                        SubscrRenewPost.PostPaymentsToGL(SubscriptionRequest);
+                        SubscrRenewPost.PostPaymentsToGL(SubscriptionRequest, '');
                     exit(SubscriptionRequest.Posted);
                 end;
         end;

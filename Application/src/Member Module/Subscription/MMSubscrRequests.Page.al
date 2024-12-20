@@ -7,7 +7,7 @@ page 6184833 "NPR MM Subscr. Requests"
     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
     UsageCategory = Tasks;
     Editable = false;
-    SourceTableView = sorting("Entry No.") order(descending);
+    SourceTableView = sorting("Subscription Entry No.", "Entry No.");
 
     layout
     {
@@ -17,7 +17,7 @@ page 6184833 "NPR MM Subscr. Requests"
             {
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ToolTip = 'Specifies the value of the Entry No. field.';
+                    ToolTip = 'Specifies a unique entry number, assigned by the system to this record according to an automatically maintained number series.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Type; Rec."Type")
@@ -70,6 +70,11 @@ page 6184833 "NPR MM Subscr. Requests"
                     ToolTip = 'Specifies whether the subscription request has been posted to the general ledger.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field("Posted M/ship Ledg. Entry No."; Rec."Posted M/ship Ledg. Entry No.")
+                {
+                    ToolTip = 'Specifies the membership ledger entry number created by the subscription request posting process.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
                 field("Posting Document No."; Rec."Posting Document No.")
                 {
                     ToolTip = 'Specifies the document number used by the posting process for the subscription request.';
@@ -83,6 +88,21 @@ page 6184833 "NPR MM Subscr. Requests"
                 field("G/L Entry No."; Rec."G/L Entry No.")
                 {
                     ToolTip = 'Specifies the entry number created in the general ledger by the posting process for the subscription request.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field("Cust. Ledger Entry No."; Rec."Cust. Ledger Entry No.")
+                {
+                    ToolTip = 'Specifies the entry number created in the customer ledger by the posting process for the subscription request.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field(Reversed; Rec.Reversed)
+                {
+                    ToolTip = 'Specifies the value of the Reversed field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field("Reversed by Entry No."; Rec."Reversed by Entry No.")
+                {
+                    ToolTip = 'Specifies the value of the Reversed by Entry No. field.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Subscription Entry No."; Rec."Subscription Entry No.")
@@ -120,8 +140,25 @@ page 6184833 "NPR MM Subscr. Requests"
                 PromotedCategory = Process;
                 PromotedOnly = true;
 #endif
-                RunObject = page "NPR MM Subscr.Payment Requests";
-                RunPageLink = "Subscr. Request Entry No." = field("Entry No.");
+
+                trigger OnAction()
+                var
+                    SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+                    SubscrPaymentRequest_Marked: Record "NPR MM Subscr. Payment Request";
+                begin
+                    SubscrPaymentRequest.SetCurrentKey("Subscr. Request Entry No.");
+                    SubscrPaymentRequest.SetLoadFields("Subscr. Request Entry No.", Reversed, "Reversed by Entry No.");
+                    SubscrPaymentRequest.SetRange("Subscr. Request Entry No.", Rec."Entry No.");
+                    if SubscrPaymentRequest.FindSet() then
+                        repeat
+                            SubscrPaymentRequest_Marked := SubscrPaymentRequest;
+                            SubscrPaymentRequest_Marked.Mark(true);
+                            SubscrPaymentRequest.MarkReversed(SubscrPaymentRequest_Marked);
+                        until SubscrPaymentRequest.Next() = 0;
+
+                    SubscrPaymentRequest_Marked.MarkedOnly(true);
+                    Page.Run(Page::"NPR MM Subscr.Payment Requests", SubscrPaymentRequest_Marked);
+                end;
             }
             action(LogEntries)
             {
@@ -215,6 +252,23 @@ page 6184833 "NPR MM Subscr. Requests"
                     SetStatusCancelled();
                 end;
             }
+            action(Regret)
+            {
+                Caption = 'Regret';
+                ToolTip = 'Creates a new entry of type "Regret" for the current subscription request entry and requests a refund of the associated payment. The status of the payment must be "Captured".';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Image = VendorPayment;
+#if BC17 or BC18 or BC19 or BC20
+                Promoted = true;
+                PromotedIsBig = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+#endif
+                trigger OnAction()
+                begin
+                    RegretSubscriptionRequest();
+                end;
+            }
             action(ResetTryCount)
             {
                 Caption = 'Reset Process Try Count';
@@ -244,6 +298,7 @@ page 6184833 "NPR MM Subscr. Requests"
             actionref(Process_Promoted; Process) { }
             actionref(ProcessWithoutTryCountUpdate_Promoted; ProcessWithoutTryCountUpdate) { }
             actionref(Cancel_Promoted; Cancel) { }
+            actionref(Regret_Promoted; Regret) { }
             actionref(ResetTryCount_Promoted; ResetTryCount) { }
         }
 #endif
@@ -283,5 +338,27 @@ page 6184833 "NPR MM Subscr. Requests"
         SubscrRequestUtils: Codeunit "NPR MM Subscr. Request Utils";
     begin
         SubscrRequestUtils.ResetProcessTryCountWithConfirmation(Rec);
+    end;
+
+    local procedure RegretSubscriptionRequest()
+    var
+        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+        SubscrPmtReversalRequest: Record "NPR MM Subscr. Payment Request";
+        SubscrReversalMgt: Codeunit "NPR MM Subscr. Reversal Mgt.";
+        RefundReqestedMsg: Label 'A new entry of type "Regret" for the current subscription request entry has been successfully created.';
+    begin
+        Rec.TestField(Type, Rec.Type::Renew);
+        Rec.TestField(Status, Rec.Status::Confirmed);
+        SubscrPaymentRequest.SetRange("Subscr. Request Entry No.", Rec."Entry No.");
+        SubscrPaymentRequest.FindLast();
+        SubscrPaymentRequest.TestField(Status, SubscrPaymentRequest.Status::Captured);
+
+        SubscrReversalMgt.RequestRefundWithConfirmation(SubscrPaymentRequest, SubscrPmtReversalRequest);
+        if SubscrPmtReversalRequest."Entry No." <> 0 then begin
+            Rec."Entry No." := SubscrPmtReversalRequest."Subscr. Request Entry No.";
+            if Rec.Find() then;
+            CurrPage.Update(false);
+            Message(RefundReqestedMsg);
+        end;
     end;
 }

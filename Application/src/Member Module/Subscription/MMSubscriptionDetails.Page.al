@@ -5,9 +5,7 @@ page 6184834 "NPR MM Subscription Details"
     PageType = List;
     SourceTable = "NPR MM Subscription";
     UsageCategory = None;
-#if not DEBUG
     Editable = false;
-#endif
     SourceTableView = sorting("Entry No.") order(descending);
 
 
@@ -64,7 +62,7 @@ page 6184834 "NPR MM Subscription Details"
                 }
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ToolTip = 'Specifies the value of the Entry No. field.';
+                    ToolTip = 'Specifies a unique entry number, assigned by the system to this record according to an automatically maintained number series.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
             }
