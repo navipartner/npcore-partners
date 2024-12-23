@@ -17,4 +17,9 @@ enum 6014598 "NPR POS DS Extension Module" implements "NPR POS DS Exten. Field S
         Caption = 'Click & Collect';
         Implementation = "NPR POS DS Exten. Field Setup" = "NPR NpCs Data Source Extension";
     }
+    value(3; TransferOrder)
+    {
+        Caption = 'Transfer Order';
+        Implementation = "NPR POS DS Exten. Field Setup" = "NPR Transf.Ord. DataSource Ext";
+    }
 }

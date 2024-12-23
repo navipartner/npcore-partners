@@ -3,6 +3,7 @@ codeunit 6059967 "NPR POS Action: Transf. Order" implements "NPR IPOS Workflow"
     Access = Internal;
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
+        POSDataMgt: Codeunit "NPR POS Data Management";
         ActionDescription: Label 'This is a built-in action for handling Transfer Orders';
         DefaultTransferToCode_CaptionLbl: Label 'Default Transfer-To Code';
         DefaultTransferToCode_DescLbl: Label 'Specifies Default Transfer-to location code for newly created transfer orders';
@@ -19,6 +20,7 @@ codeunit 6059967 "NPR POS Action: Transf. Order" implements "NPR IPOS Workflow"
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
+        WorkflowConfig.SetDataSourceBinding(POSDataMgt.POSDataSource_BuiltInSale());
         WorkflowConfig.AddTextParameter('DefaultTransferToCode', '', DefaultTransferToCode_CaptionLbl, DefaultTransferToCode_DescLbl);
         WorkflowConfig.AddBooleanParameter('NewRecord', false, NewRecord_CaptionLbl, StrSubstNo(NewRecord_DescLbl, TransferHeader.TableCaption));
         WorkflowConfig.AddOptionParameter('RegisterLocation',
