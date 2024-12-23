@@ -133,12 +133,15 @@ page 6151279 "NPR POS DS Exten. Field Setup"
         PageCaption: Text;
         CollectPageCaptionLbl: Label 'Collect Data Source Exten. Field Location Setup';
         DocImportPageCaptionLbl: Label 'Doc.Import Data Source Exten. Field Location Setup';
+        TransferOrderPageCaptionLbl: Label 'Transfer Order Source Exten. Field Location Setup';
     begin
         case Rec.GetExtensionModuleFromFilter() of
             Enum::"NPR POS DS Extension Module"::DocImport:
                 PageCaption := DocImportPageCaptionLbl;
             Enum::"NPR POS DS Extension Module"::ClickCollect:
                 PageCaption := CollectPageCaptionLbl;
+            Enum::"NPR POS DS Extension Module"::TransferOrder:
+                PageCaption := TransferOrderPageCaptionLbl;
             else
                 PageCaption := '';
         end;
