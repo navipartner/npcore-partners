@@ -472,7 +472,26 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         if SendHttpRequest(RequestMessage, ResponseText, true) then
             FillSUFConfigurationSetup(ResponseText)
         else
-            ClearSUFConfigurationSetup();
+            UploadSUFConfigurationFile();
+    end;
+
+    internal procedure UploadSUFConfigurationFile()
+    var
+        FileEmptyLbl: Label 'Uploaded file is empty.';
+        UploadCancelledLbl: Label 'File upload cancelled.';
+        ConfigurationFileLbl: Label 'Upload Configuration File';
+        ResponseText: Text;
+        FileName: Text;
+        InStream: InStream;
+    begin
+        if UploadIntoStream(ConfigurationFileLbl, '', '', FileName, InStream) then begin
+            InStream.ReadText(ResponseText);
+            if StrLen(ResponseText) > 0 then
+                FillSUFConfigurationSetup(ResponseText)
+            else
+                Message(FileEmptyLbl);
+        end else
+            Message(UploadCancelledLbl);
     end;
 
     internal procedure PullAndFillAllowedTaxRates(): Text
@@ -2306,27 +2325,6 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
                 RSVATPostSetupMapping.Modify();
             end;
         until RSVATPostSetupMapping.Next() = 0;
-    end;
-
-    local procedure ClearSUFConfigurationSetup()
-    var
-        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
-        APIPullError: Label 'Error pulling configuration from SandBox API. Check URL or availability of API.';
-    begin
-        RSFiscalizationSetup.Get();
-        Clear(RSFiscalizationSetup."Organization Name");
-        Clear(RSFiscalizationSetup."Server Time Zone");
-        Clear(RSFiscalizationSetup.Street);
-        Clear(RSFiscalizationSetup.City);
-        Clear(RSFiscalizationSetup.Country);
-        Clear(RSFiscalizationSetup."Environment Name");
-        Clear(RSFiscalizationSetup."NPT Server URL");
-        Clear(RSFiscalizationSetup."TaxPayer Admin Portal URL");
-        Clear(RSFiscalizationSetup."TaxCore API URL");
-        Clear(RSFiscalizationSetup."VSDC URL");
-        Clear(RSFiscalizationSetup."Root URL");
-        RSFiscalizationSetup.Modify();
-        Message(APIPullError);
     end;
 
     local procedure ClearAllowedTaxRates()
