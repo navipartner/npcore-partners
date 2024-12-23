@@ -520,7 +520,26 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
         if SendHttpRequest(RequestMessage, ResponseText, true) then
             FillAllowedTaxRates(ResponseText, false)
         else
-            ClearAllowedTaxRates();
+            UploadTaxRatesFile();
+    end;
+
+    local procedure UploadTaxRatesFile()
+    var
+        FileEmptyLbl: Label 'Uploaded file is empty.';
+        CancelledLbl: Label 'File upload cancelled.';
+        UploadFileLbl: Label 'Upload Tax Rates File';
+        ResponseText: Text;
+        FileName: Text;
+        InStream: InStream;
+    begin
+        if UploadIntoStream(UploadFileLbl, '', '', FileName, InStream) then begin
+            InStream.ReadText(ResponseText);
+            if StrLen(ResponseText) > 0 then
+                FillAllowedTaxRates(ResponseText, false)
+            else
+                Message(FileEmptyLbl); 
+        end else
+            Message(CancelledLbl);
     end;
     #endregion
 
@@ -2325,15 +2344,6 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
                 RSVATPostSetupMapping.Modify();
             end;
         until RSVATPostSetupMapping.Next() = 0;
-    end;
-
-    local procedure ClearAllowedTaxRates()
-    var
-        RSAllowedTaxRates: Record "NPR RS Allowed Tax Rates";
-        APIPullError: Label 'Error pulling configuration from SandBox API. Check URL or availability of API.';
-    begin
-        RSAllowedTaxRates.DeleteAll();
-        Message(APIPullError);
     end;
 
     local procedure GetSumAmountOfPrepaymentSales(SalesInvoiceLine: Record "Sales Invoice Line") Amount: Decimal
