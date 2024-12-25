@@ -14,13 +14,19 @@ table 6060164 "NPR SI POS Sale"
         }
         field(2; "SI Set Number"; Code[20])
         {
-            Caption = 'Set Number';
+            Caption = 'SI Salesbook Set Number';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2024-12-29';
+            ObsoleteReason = 'Field replaced by SI SB Set Number, field length decreased.';
         }
         field(3; "SI Serial Number"; Text[40])
         {
-            Caption = 'Serial Number';
+            Caption = 'SI Salesbook Serial Number';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2024-12-29';
+            ObsoleteReason = 'Field replaced by SI SB Serial Number, field length decreased.';
         }
         field(4; "SI Return Receipt No."; Code[20])
         {
@@ -40,6 +46,26 @@ table 6060164 "NPR SI POS Sale"
         field(7; "SI Return Receipt DateTime"; Text[33])
         {
             Caption = 'SI Return Receipt Date/Time';
+            DataClassification = CustomerContent;
+        }
+        field(8; "SI SB Set Number"; Text[2])
+        {
+            Caption = 'SI Salesbook Set Number';
+            DataClassification = CustomerContent;
+        }
+        field(9; "SI SB Serial Number"; Text[12])
+        {
+            Caption = 'SI Salesbook Serial Number';
+            DataClassification = CustomerContent;
+        }
+        field(10; "SI SB Receipt No."; Code[20])
+        {
+            Caption = 'SI Salesbook Receipt No.';
+            DataClassification = CustomerContent;
+        }
+        field(11; "SI SB Receipt Issue Date"; Date)
+        {
+            Caption = 'SI Salesbook Receipt Issue Date';
             DataClassification = CustomerContent;
         }
     }

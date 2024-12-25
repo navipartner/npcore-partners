@@ -73,8 +73,6 @@ codeunit 6151546 "NPR SI Audit Mgt."
         if not SIPOSAuditLogAuxInfo.GetAuditFromPOSEntry(POSEntry."Entry No.") then
             exit;
 
-        InsertPreNumberedInvoiceBookToAudit(SalePOS, SIPOSAuditLogAuxInfo);
-
         SITaxCommunicationMgt.CreateNormalSale(SIPOSAuditLogAuxInfo, false);
 
         Commit();
@@ -303,7 +301,7 @@ codeunit 6151546 "NPR SI Audit Mgt."
 
         POSEntry.Get(POSAuditLog."Record ID");
         if not (POSEntry."Post Item Entry Status" in [POSEntry."Post Item Entry Status"::"Not To Be Posted"]) then
-            InsertSIPOSAuditLogAuxInfo(POSEntry, POSStore, POSUnit);
+            InsertSIPOSAuditLogAuxInfo(POSEntry, POSStore, POSUnit, POSAuditLog);
     end;
 
     local procedure CheckAreDataSetAndAccordingToCompliance(FrontEnd: Codeunit "NPR POS Front End Management")
@@ -327,7 +325,7 @@ codeunit 6151546 "NPR SI Audit Mgt."
             Error(MissingTaxNumberErr);
     end;
 
-    local procedure InsertSIPOSAuditLogAuxInfo(POSEntry: Record "NPR POS Entry"; POSStore: Record "NPR POS Store"; POSUnit: Record "NPR POS Unit")
+    local procedure InsertSIPOSAuditLogAuxInfo(POSEntry: Record "NPR POS Entry"; POSStore: Record "NPR POS Store"; POSUnit: Record "NPR POS Unit"; POSAuditLog: Record "NPR POS Audit Log")
     var
         POSRMALine: Record "NPR POS RMA Line";
         SIAuxSalespPurch: Record "NPR SI Aux Salesperson/Purch.";
@@ -367,8 +365,12 @@ codeunit 6151546 "NPR SI Audit Mgt."
         SIPOSAuditLogAuxInfo."Salesperson Code" := POSEntry."Salesperson Code";
         SaveCustomerDataToAuditLog(SIPOSAuditLogAuxInfo, POSEntry."Customer No.");
 
-        SIPOSAuditLogAuxInfo.Insert(true);
-        CalculateAndSignZOI(SIPOSAuditLogAuxInfo);
+        if SaveSalesbookReceiptInfo(POSAuditLog, SIPOSAuditLogAuxInfo) then begin
+            SIPOSAuditLogAuxInfo.Insert();
+        end else begin
+            SIPOSAuditLogAuxInfo.Insert(true);
+            CalculateAndSignZOI(SIPOSAuditLogAuxInfo);
+        end;
     end;
 
     local procedure InsertSIPOSAuditLogAuxInfo(SalesInvoiceHeader: Record "Sales Invoice Header")
@@ -448,16 +450,32 @@ codeunit 6151546 "NPR SI Audit Mgt."
         CalculateAndSignZOI(SIPOSAuditLogAuxInfo);
     end;
 
-    local procedure InsertPreNumberedInvoiceBookToAudit(SalePOS: Record "NPR POS Sale"; var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info")
+    local procedure SaveSalesbookReceiptInfo(POSAuditLog: Record "NPR POS Audit Log"; var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"): Boolean
     var
+        SalePOS: Record "NPR POS Sale";
         SIPOSSale: Record "NPR SI POS Sale";
+        SISalesbookReceipt: Record "NPR SI Salesbook Receipt";
     begin
-        if not SIPOSSale.Get(SalePOS.SystemId) then
-            exit;
+        SalePOS.GetBySystemId(POSAuditLog."Active POS Sale SystemId");
 
-        SIPOSAuditLogAuxInfo."Sales Book Invoice No." := SIPOSSale."SI Set Number";
-        SIPOSAuditLogAuxInfo."Sales Book Serial No." := SIPOSSale."SI Serial Number";
-        SIPOSAuditLogAuxInfo.Modify();
+        if not SIPOSSale.Get(SalePOS.SystemId) then
+            exit(false);
+
+        if SIPOSSale."SI SB Receipt No." = '' then
+            exit(false);
+
+        SISalesbookReceipt.Init();
+        SISalesbookReceipt."Entry No." := SISalesbookReceipt.GetLastEntryNo() + 1;
+        SISalesbookReceipt."Set Number" := SIPOSSale."SI SB Set Number";
+        SISalesbookReceipt."Serial Number" := SIPOSSale."SI SB Serial Number";
+        SISalesbookReceipt."Receipt No." := SIPOSSale."SI SB Receipt No.";
+        SISalesbookReceipt."Receipt Issue Date" := SIPOSSale."SI SB Receipt Issue Date";
+        SISalesbookReceipt.Insert();
+
+        SIPOSAuditLogAuxInfo."Salesbook Entry No." := SISalesbookReceipt."Entry No.";
+        SIPOSAuditLogAuxInfo."Sales Book Invoice No." := SISalesbookReceipt."Receipt No.";
+        SIPOSAuditLogAuxInfo."Sales Book Serial No." := SISalesbookReceipt."Serial Number";
+        exit(true);
     end;
 
     #endregion

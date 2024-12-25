@@ -16,26 +16,25 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
     var
         BaseDocument: XmlDocument;
     begin
-        if (SIPOSAuditLogAuxInfo."Sales Book Invoice No." <> '') and (SIPOSAuditLogAuxInfo."Sales Book Serial No." <> '') then
-            CreatePreNumberedBookSaleDocument(SIPOSAuditLogAuxInfo, BaseDocument, isSubsequent)
-        else
+        if SIPOSAuditLogAuxInfo."Salesbook Entry No." <> 0 then begin
+            CreatePreNumberedBookSaleDocument(SIPOSAuditLogAuxInfo, BaseDocument);
+            SignBillAndSendToTA(SIPOSAuditLogAuxInfo, 'VKR', BaseDocument);
+        end else begin
             CreateSaleDocument(SIPOSAuditLogAuxInfo, BaseDocument, isSubsequent);
-
-        SignBillAndSendToTA(SIPOSAuditLogAuxInfo, BaseDocument);
+            SignBillAndSendToTA(SIPOSAuditLogAuxInfo, 'INVOICE', BaseDocument);
+        end;
     end;
 
     #region SI Fiscalization - XML Document Creation
     local procedure CreateSaleDocument(SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"; var Document: XmlDocument; isSubsequent: Boolean)
     var
         CompanyInformation: Record "Company Information";
-        FormattedDateTime: Text;
-        IdPoruke: Text;
         Body: XmlElement;
         Envelope: XmlElement;
         Header: XmlElement;
-        Invoice: XmlElement;
-        InvoiceIdent: XmlElement;
-        InvRequest: XmlElement;
+        InvoiceElement: XmlElement;
+        InvoiceIdentifierElement: XmlElement;
+        InvoiceRequestElement: XmlElement;
     begin
         CompanyInformation.Get();
         SIFiscalizationSetup.Get();
@@ -52,48 +51,46 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
 
         Body := XmlElement.Create('Body', SoapEnvNamespaceUriLbl);
 
-        InvRequest := XmlElement.Create('InvoiceRequest', FuNamespaceUriLbl);
-        InvRequest.Add(XmlAttribute.Create('Id', 'data'));
+        InvoiceRequestElement := XmlElement.Create('InvoiceRequest', FuNamespaceUriLbl);
+        InvoiceRequestElement.Add(XmlAttribute.Create('Id', 'data'));
 
         Header := XmlElement.Create('Header', FuNamespaceUriLbl);
-        IdPoruke := DelChr(Format(CreateGuid()), '=', '{}').ToLower();
-        Header.Add(CreateXmlElement('MessageID', FuNamespaceUriLbl, IdPoruke));
-        FormattedDateTime := Format(CurrentDateTime(), 0, '<Year4>-<Month,2>-<Day,2>T<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>');
-        Header.Add(CreateXmlElement('DateTime', FuNamespaceUriLbl, FormattedDateTime));
-        InvRequest.Add(Header);
+        Header.Add(CreateXmlElement('MessageID', FuNamespaceUriLbl, DelChr(Format(CreateGuid()), '=', '{}').ToLower()));
+        Header.Add(CreateXmlElement('DateTime', FuNamespaceUriLbl, Format(CurrentDateTime(), 0, '<Year4>-<Month,2>-<Day,2>T<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>')));
+        InvoiceRequestElement.Add(Header);
 
-        Invoice := XmlElement.Create('Invoice', FuNamespaceUriLbl);
+        InvoiceElement := XmlElement.Create('Invoice', FuNamespaceUriLbl);
 
-        Invoice.Add(CreateXmlElement('TaxNumber', FuNamespaceUriLbl, SIFiscalizationSetup."Certificate Subject Ident."));
-        Invoice.Add(CreateXmlElement('IssueDateTime', FuNamespaceUriLbl, StrSubstNo(DateTimeFormatLbl, Format(SIPOSAuditLogAuxInfo."Entry Date", 10, '<Year4>-<Month,2>-<Day,2>'), Format(SIPOSAuditLogAuxInfo."Log Timestamp", 0, '<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>'))));
-        Invoice.Add(CreateXmlElement('NumberingStructure', FuNamespaceUriLbl, 'C'));
+        InvoiceElement.Add(CreateXmlElement('TaxNumber', FuNamespaceUriLbl, SIFiscalizationSetup."Certificate Subject Ident."));
+        InvoiceElement.Add(CreateXmlElement('IssueDateTime', FuNamespaceUriLbl, StrSubstNo(DateTimeFormatLbl, Format(SIPOSAuditLogAuxInfo."Entry Date", 10, '<Year4>-<Month,2>-<Day,2>'), Format(SIPOSAuditLogAuxInfo."Log Timestamp", 0, '<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>'))));
+        InvoiceElement.Add(CreateXmlElement('NumberingStructure', FuNamespaceUriLbl, 'C'));
 
-        InvoiceIdent := XmlElement.Create('InvoiceIdentifier', FuNamespaceUriLbl);
-        InvoiceIdent.Add(CreateXmlElement('BusinessPremiseID', FuNamespaceUriLbl, SIPOSAuditLogAuxInfo."POS Store Code"));
-        InvoiceIdent.Add(CreateXmlElement('ElectronicDeviceID', FuNamespaceUriLbl, SIPOSAuditLogAuxInfo."POS Unit No."));
-        InvoiceIdent.Add(CreateXmlElement('InvoiceNumber', FuNamespaceUriLbl, SIPOSAuditLogAuxInfo."Receipt No."));
-        Invoice.Add(InvoiceIdent);
+        InvoiceIdentifierElement := XmlElement.Create('InvoiceIdentifier', FuNamespaceUriLbl);
+        InvoiceIdentifierElement.Add(CreateXmlElement('BusinessPremiseID', FuNamespaceUriLbl, SIPOSAuditLogAuxInfo."POS Store Code"));
+        InvoiceIdentifierElement.Add(CreateXmlElement('ElectronicDeviceID', FuNamespaceUriLbl, SIPOSAuditLogAuxInfo."POS Unit No."));
+        InvoiceIdentifierElement.Add(CreateXmlElement('InvoiceNumber', FuNamespaceUriLbl, SIPOSAuditLogAuxInfo."Receipt No."));
+        InvoiceElement.Add(InvoiceIdentifierElement);
 
         if SIPOSAuditLogAuxInfo."Customer VAT Number" <> '' then
-            Invoice.Add(CreateXmlElement('CustomerVATNumber', FuNamespaceUriLbl, SIPOSAuditLogAuxInfo."Customer VAT Number"));
+            InvoiceElement.Add(CreateXmlElement('CustomerVATNumber', FuNamespaceUriLbl, SIPOSAuditLogAuxInfo."Customer VAT Number"));
 
-        Invoice.Add(CreateXmlElement('InvoiceAmount', FuNamespaceUriLbl, FormatDecimalField(SIPOSAuditLogAuxInfo."Total Amount")));
+        InvoiceElement.Add(CreateXmlElement('InvoiceAmount', FuNamespaceUriLbl, FormatDecimalField(SIPOSAuditLogAuxInfo."Total Amount")));
         if SIPOSAuditLogAuxInfo."Returns Amount" <> 0 then
-            Invoice.Add(CreateXmlElement('ReturnsAmount', FuNamespaceUriLbl, FormatDecimalField(SIPOSAuditLogAuxInfo."Returns Amount")));
-        Invoice.Add(CreateXmlElement('PaymentAmount', FuNamespaceUriLbl, FormatDecimalField(SIPOSAuditLogAuxInfo."Payment Amount")));
+            InvoiceElement.Add(CreateXmlElement('ReturnsAmount', FuNamespaceUriLbl, FormatDecimalField(SIPOSAuditLogAuxInfo."Returns Amount")));
+        InvoiceElement.Add(CreateXmlElement('PaymentAmount', FuNamespaceUriLbl, FormatDecimalField(SIPOSAuditLogAuxInfo."Payment Amount")));
 
-        AddTaxSection(Invoice, SIPOSAuditLogAuxInfo);
+        AddTaxSection(InvoiceElement, SIPOSAuditLogAuxInfo);
 
-        Invoice.Add(CreateXmlElement('OperatorTaxNumber', FuNamespaceUriLbl, Format(SIPOSAuditLogAuxInfo."Cashier ID")));
-        Invoice.Add(CreateXmlElement('ProtectedID', FuNamespaceUriLbl, SIPOSAuditLogAuxInfo."ZOI Code"));
+        InvoiceElement.Add(CreateXmlElement('OperatorTaxNumber', FuNamespaceUriLbl, Format(SIPOSAuditLogAuxInfo."Cashier ID")));
+        InvoiceElement.Add(CreateXmlElement('ProtectedID', FuNamespaceUriLbl, SIPOSAuditLogAuxInfo."ZOI Code"));
 
         if isSubsequent then
-            Invoice.Add(CreateXmlElement('SubsequentSubmit', FuNamespaceUriLbl, 'true'))
+            InvoiceElement.Add(CreateXmlElement('SubsequentSubmit', FuNamespaceUriLbl, 'true'))
         else
-            Invoice.Add(CreateXmlElement('SubsequentSubmit', FuNamespaceUriLbl, 'false'));
+            InvoiceElement.Add(CreateXmlElement('SubsequentSubmit', FuNamespaceUriLbl, 'false'));
 
-        InvRequest.Add(Invoice);
-        Body.Add(InvRequest);
+        InvoiceRequestElement.Add(InvoiceElement);
+        Body.Add(InvoiceRequestElement);
         Envelope.Add(Body);
         Document.Add(Envelope);
 
@@ -101,20 +98,16 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
             AddReturnInfoSection(SIPOSAuditLogAuxInfo, Document);
     end;
 
-    local procedure CreatePreNumberedBookSaleDocument(SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"; var Document: XmlDocument; isSubsequent: Boolean)
+    local procedure CreatePreNumberedBookSaleDocument(SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"; var Document: XmlDocument)
     var
         CompanyInformation: Record "Company Information";
-        POSEntryTaxLines: Record "NPR POS Entry Tax Line";
-        FormattedDateTime: Text;
-        IdPoruke: Text;
+        SISalesbookReceipt: Record "NPR SI Salesbook Receipt";
         Body: XmlElement;
         Envelope: XmlElement;
         Header: XmlElement;
-        Invoice: XmlElement;
-        InvoiceIdent: XmlElement;
-        InvRequest: XmlElement;
-        TaxAmounts: XmlElement;
-        TaxesSection: XmlElement;
+        SalesBookInvoiceElement: XmlElement;
+        SalesBookIdentifierElement: XmlElement;
+        InvoiceRequestElement: XmlElement;
     begin
         CompanyInformation.Get();
         SIFiscalizationSetup.Get();
@@ -131,68 +124,43 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
 
         Body := XmlElement.Create('Body', SoapEnvNamespaceUriLbl);
 
-        InvRequest := XmlElement.Create('InvoiceRequest', FuNamespaceUriLbl);
-        InvRequest.Add(XmlAttribute.Create('Id', 'data'));
+        InvoiceRequestElement := XmlElement.Create('InvoiceRequest', FuNamespaceUriLbl);
+        InvoiceRequestElement.Add(XmlAttribute.Create('Id', 'data'));
 
         Header := XmlElement.Create('Header', FuNamespaceUriLbl);
-        IdPoruke := DelChr(Format(CreateGuid()), '=', '{}').ToLower();
-        Header.Add(CreateXmlElement('MessageID', FuNamespaceUriLbl, IdPoruke));
-        FormattedDateTime := Format(CurrentDateTime(), 0, '<Year4>-<Month,2>-<Day,2>T<Hours24,2>:<Minutes,2>:<Seconds,2>');
-        Header.Add(CreateXmlElement('DateTime', FuNamespaceUriLbl, FormattedDateTime));
-        InvRequest.Add(Header);
+        Header.Add(CreateXmlElement('MessageID', FuNamespaceUriLbl, DelChr(Format(CreateGuid()), '=', '{}').ToLower()));
+        Header.Add(CreateXmlElement('DateTime', FuNamespaceUriLbl, Format(CurrentDateTime(), 0, '<Year4>-<Month,2>-<Day,2>T<Hours24,2>:<Minutes,2>:<Seconds,2>')));
+        InvoiceRequestElement.Add(Header);
 
-        Invoice := XmlElement.Create('SalesBookInvoice', FuNamespaceUriLbl);
+        SalesBookInvoiceElement := XmlElement.Create('SalesBookInvoice', FuNamespaceUriLbl);
 
-        Invoice.Add(CreateXmlElement('TaxNumber', FuNamespaceUriLbl, SIFiscalizationSetup."Certificate Subject Ident."));
-        Invoice.Add(CreateXmlElement('IssueDateTime', FuNamespaceUriLbl, StrSubstNo(DateTimeFormatLbl, Format(SIPOSAuditLogAuxInfo."Entry Date", 10, '<Year4>-<Month,2>-<Day,2>'), Format(SIPOSAuditLogAuxInfo."Log Timestamp", 0, '<Hours24,2><Filler Character,0>:<Minutes,2>:<Seconds,2>'))));
+        SalesBookInvoiceElement.Add(CreateXmlElement('TaxNumber', FuNamespaceUriLbl, SIFiscalizationSetup."Certificate Subject Ident."));
 
-        InvoiceIdent := XmlElement.Create('SalesBookIdentifier', FuNamespaceUriLbl);
-        InvoiceIdent.Add(CreateXmlElement('InvoiceNumber', FuNamespaceUriLbl, SIPOSAuditLogAuxInfo."Receipt No."));
-        InvoiceIdent.Add(CreateXmlElement('SetNumber', FuNamespaceUriLbl, SIPOSAuditLogAuxInfo."Sales Book Invoice No."));
-        InvoiceIdent.Add(CreateXmlElement('SerialNumber', FuNamespaceUriLbl, SIPOSAuditLogAuxInfo."Sales Book Serial No."));
-        Invoice.Add(InvoiceIdent);
+        SISalesbookReceipt.Get(SIPOSAuditLogAuxInfo."Salesbook Entry No.");
+        SalesBookInvoiceElement.Add(CreateXmlElement('IssueDate', FuNamespaceUriLbl, Format(SISalesbookReceipt."Receipt Issue Date", 10, '<Year4>-<Month,2>-<Day,2>')));
+        SalesBookIdentifierElement := XmlElement.Create('SalesBookIdentifier', FuNamespaceUriLbl);
+        SalesBookIdentifierElement.Add(CreateXmlElement('InvoiceNumber', FuNamespaceUriLbl, SISalesbookReceipt."Receipt No."));
+        SalesBookIdentifierElement.Add(CreateXmlElement('SetNumber', FuNamespaceUriLbl, SISalesbookReceipt."Set Number"));
+        SalesBookIdentifierElement.Add(CreateXmlElement('SerialNumber', FuNamespaceUriLbl, SISalesbookReceipt."Serial Number"));
+        SalesBookInvoiceElement.Add(SalesBookIdentifierElement);
 
         if SIPOSAuditLogAuxInfo."Customer VAT Number" <> '' then
-            Invoice.Add(CreateXmlElement('CustomerVATNumber', FuNamespaceUriLbl, SIPOSAuditLogAuxInfo."Customer VAT Number"));
+            SalesBookInvoiceElement.Add(CreateXmlElement('CustomerVATNumber', FuNamespaceUriLbl, SIPOSAuditLogAuxInfo."Customer VAT Number"));
 
-        Invoice.Add(CreateXmlElement('BusinessPremiseID', FuNamespaceUriLbl, SIPOSAuditLogAuxInfo."POS Store Code"));
-        Invoice.Add(CreateXmlElement('ElectronicDeviceID', FuNamespaceUriLbl, SIPOSAuditLogAuxInfo."POS Unit No."));
-        Invoice.Add(CreateXmlElement('InvoiceAmount', FuNamespaceUriLbl, FormatDecimalField(SIPOSAuditLogAuxInfo."Total Amount")));
+        SalesBookInvoiceElement.Add(CreateXmlElement('BusinessPremiseID', FuNamespaceUriLbl, SIPOSAuditLogAuxInfo."POS Store Code"));
+        SalesBookInvoiceElement.Add(CreateXmlElement('InvoiceAmount', FuNamespaceUriLbl, FormatDecimalField(SIPOSAuditLogAuxInfo."Total Amount")));
         if SIPOSAuditLogAuxInfo."Returns Amount" <> 0 then
-            Invoice.Add(CreateXmlElement('ReturnsAmount', FuNamespaceUriLbl, FormatDecimalField(SIPOSAuditLogAuxInfo."Returns Amount")));
-        Invoice.Add(CreateXmlElement('PaymentAmount', FuNamespaceUriLbl, FormatDecimalField(SIPOSAuditLogAuxInfo."Payment Amount")));
+            SalesBookInvoiceElement.Add(CreateXmlElement('ReturnsAmount', FuNamespaceUriLbl, FormatDecimalField(SIPOSAuditLogAuxInfo."Returns Amount")));
+        SalesBookInvoiceElement.Add(CreateXmlElement('PaymentAmount', FuNamespaceUriLbl, FormatDecimalField(SIPOSAuditLogAuxInfo."Payment Amount")));
 
-        TaxesSection := XmlElement.Create('TaxesPerSeller', FuNamespaceUriLbl);
+        AddTaxSection(SalesBookInvoiceElement, SIPOSAuditLogAuxInfo);
 
-        POSEntryTaxLines.SetRange("POS Entry No.", SIPOSAuditLogAuxInfo."POS Entry No.");
-        if POSEntryTaxLines.FindSet() then
-            repeat
-                TaxAmounts := XmlElement.Create('VAT', FuNamespaceUriLbl);
-                TaxAmounts.Add(CreateXmlElement('TaxRate', FuNamespaceUriLbl, FormatDecimalField(POSEntryTaxLines."Tax %")));
-                TaxAmounts.Add(CreateXmlElement('TaxableAmount', FuNamespaceUriLbl, FormatDecimalField(POSEntryTaxLines."Tax Base Amount")));
-                TaxAmounts.Add(CreateXmlElement('TaxAmount', FuNamespaceUriLbl, FormatDecimalField(POSEntryTaxLines."Tax Amount")));
-                TaxesSection.Add(TaxAmounts);
-            until POSEntryTaxLines.Next() = 0;
+        InvoiceRequestElement.Add(SalesBookInvoiceElement);
 
-        Invoice.Add(TaxesSection);
-
-        Invoice.Add(CreateXmlElement('OperatorTaxNumber', FuNamespaceUriLbl, Format(SIPOSAuditLogAuxInfo."Cashier ID")));
-        Invoice.Add(CreateXmlElement('ProtectedID', FuNamespaceUriLbl, SIPOSAuditLogAuxInfo."ZOI Code"));
-        if isSubsequent then
-            Invoice.Add(CreateXmlElement('SubsequentSubmit', FuNamespaceUriLbl, 'true'))
-        else
-            Invoice.Add(CreateXmlElement('SubsequentSubmit', FuNamespaceUriLbl, 'false'));
-
-        InvRequest.Add(Invoice);
-
-        Body.Add(InvRequest);
+        Body.Add(InvoiceRequestElement);
         Envelope.Add(Body);
         Document.Add(Envelope);
-
-        if SIPOSAuditLogAuxInfo."Transaction Type" in [SIPOSAuditLogAuxInfo."Transaction Type"::Return] then
-            AddReturnInfoSection(SIPOSAuditLogAuxInfo, Document);
     end;
-
 
     local procedure AddTaxSection(var InvoiceElement: XmlElement; SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info")
     begin
@@ -214,6 +182,7 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
     begin
         TaxesSection := XmlElement.Create('TaxesPerSeller', FuNamespaceUriLbl);
 
+        POSEntryTaxLines.SetLoadFields("Tax %", "Tax Base Amount", "Tax Amount");
         POSEntryTaxLines.SetRange("POS Entry No.", SIPOSAuditLogAuxInfo."POS Entry No.");
         if POSEntryTaxLines.FindSet() then
             repeat
@@ -416,7 +385,7 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
     #endregion
 
     #region SI Tax Communication - HTTP Request
-    local procedure SignBillAndSendToTA(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"; var ReceiptDocument: XmlDocument)
+    local procedure SignBillAndSendToTA(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"; MethodType: Text; var ReceiptDocument: XmlDocument)
     var
         TempBlob: Codeunit "Temp Blob";
         IStream: InStream;
@@ -429,7 +398,7 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
         OnBeforeSendHttpRequest(SIPOSAuditLogAuxInfo, ResponseText, IsHandled);
         if IsHandled then
             exit;
-        if not SIAuditMgt.SignAndSendXML('INVOICE', BaseValue, ResponseText) then
+        if not SIAuditMgt.SignAndSendXML(MethodType, BaseValue, ResponseText) then
             exit;
         GetEORCodeFromResponse(SIPOSAuditLogAuxInfo, ResponseText);
         SaveResponseToAuditLog(SIPOSAuditLogAuxInfo, ResponseText);
@@ -502,7 +471,10 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
         SIPOSAuditLogAuxInfo."Receipt Fiscalized" := true;
         SIPOSAuditLogAuxInfo."EOR Code" := CopyStr(Node.AsXmlElement().InnerText(), 1, MaxStrLen(SIPOSAuditLogAuxInfo."EOR Code"));
         SIPOSAuditLogAuxInfo."EOR Code" := CopyStr(Node.AsXmlElement().InnerText(), 1, MaxStrLen(SIPOSAuditLogAuxInfo."EOR Code"));
-        SIPOSAuditLogAuxInfo."Validation Code" := CalculateValidationCode(SIPOSAuditLogAuxInfo);
+
+        if SIPOSAuditLogAuxInfo."Salesbook Entry No." = 0 then
+            SIPOSAuditLogAuxInfo."Validation Code" := CalculateValidationCode(SIPOSAuditLogAuxInfo);
+
         SIPOSAuditLogAuxInfo.Modify();
     end;
 

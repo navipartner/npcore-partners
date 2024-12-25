@@ -14,12 +14,13 @@ codeunit 85168 "NPR POS Act SI PreInv Ins Test"
     [TestPermissions(TestPermissions::Disabled)]
     procedure InsertSetSerialNumber()
     var
-        SalePOS: Record "NPR POS Sale";
+        POSSaleRec: Record "NPR POS Sale";
         SIPOSSale: Record "NPR SI POS Sale";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
-        NewDesc: Text;
-        NewDesc2: Text;
+        SBSetNo: Text;
+        SBSerialNo: Text;
+        SBReceiptNo: Text;
     begin
         // [Scenario] Activate POS Session and add Set and Serial Numbers to it
         // [Given] POS & Payment setup
@@ -31,12 +32,15 @@ codeunit 85168 "NPR POS Act SI PreInv Ins Test"
         LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, _Salesperson, POSSale);
 
         // [When] Add Additional Paragon Number
-        AddPrenumberedBookNumbers(SalePOS, POSSale, NewDesc, NewDesc2);
+        SBSetNo := GetTestSetNo();
+        SBSerialNo := GetTestSerialNo();
+        SBReceiptNo := GetTestReceiptNo();
+        POSSale.GetCurrentSale(POSSaleRec);
+        AddPrenumberedBookNumbers(POSSaleRec, SBSetNo, SBSerialNo, SBReceiptNo);
 
         // [Then] Set and Serial Numbers is added to POS Sale
-        POSSale.GetCurrentSale(SalePOS);
-        SIPOSSale.Get(SalePOS.SystemId);
-        _Assert.IsTrue((SIPOSSale."SI Set Number" = NewDesc) and (SIPOSSale."SI Serial Number" = NewDesc2), 'Set and Serial Numbers are not inserted.');
+        SIPOSSale.Get(POSSaleRec.SystemId);
+        _Assert.IsTrue((SIPOSSale."SI SB Set Number" = SBSetNo) and (SIPOSSale."SI SB Serial Number" = SBSerialNo) and (SIPOSSale."SI SB Receipt No." = SBReceiptNo), 'Salesbook Info has not been inserted.');
 
         // [Cleanup] Unbind Event Subscriptions in Test Library Codeunit 
         UnbindSubscription(LibrarySIFiscal);
@@ -105,17 +109,15 @@ codeunit 85168 "NPR POS Act SI PreInv Ins Test"
         Commit();
     end;
 
-    local procedure AddPrenumberedBookNumbers(var SalePOS: Record "NPR POS Sale"; var POSSale: Codeunit "NPR POS Sale"; var NewDesc: Text; var NewDesc2: Text)
+    local procedure AddPrenumberedBookNumbers(POSSaleRec: Record "NPR POS Sale"; SBSetNo: Text; SBSerialNo: Text; SBReceiptNo: Text)
     var
         SIPOSSale: Record "NPR SI POS Sale";
         LibraryRandom: Codeunit "Library - Random";
     begin
-        POSSale.GetCurrentSale(SalePOS);
-        NewDesc := Format(LibraryRandom.RandIntInRange(111111111, 999999999));
-        NewDesc2 := Format(LibraryRandom.RandIntInRange(111111111, 999999999));
-        SIPOSSale."POS Sale SystemId" := SalePOS.SystemId;
-        SIPOSSale."SI Set Number" := NewDesc;
-        SIPOSSale."SI Serial Number" := NewDesc2;
+        SIPOSSale."POS Sale SystemId" := POSSaleRec.SystemId;
+        SIPOSSale."SI SB Set Number" := CopyStr(SBSetNo, 1, MaxStrLen(SIPOSSale."SI SB Set Number"));
+        SIPOSSale."SI SB Serial Number" := CopyStr(SBSerialNo, 1, MaxStrLen(SIPOSSale."SI SB Serial Number"));
+        SIPOSSale."SI SB Receipt No." := CopyStr(SBReceiptNo, 1, MaxStrLen(SIPOSSale."SI SB Receipt No."));
         if not SIPOSSale.Insert() then
             SIPOSSale.Modify();
     end;
@@ -123,5 +125,20 @@ codeunit 85168 "NPR POS Act SI PreInv Ins Test"
     local procedure GetTestPOSUnitNo(): Code[10]
     begin
         exit('077');
+    end;
+
+    local procedure GetTestSetNo(): Text
+    begin
+        exit('12');
+    end;
+
+    local procedure GetTestSerialNo(): Text
+    begin
+        exit('5001-00152');
+    end;
+
+    local procedure GetTestReceiptNo(): Text
+    begin
+        exit('30');
     end;
 }
