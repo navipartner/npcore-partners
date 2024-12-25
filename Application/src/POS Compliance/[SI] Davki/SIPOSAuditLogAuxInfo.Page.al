@@ -68,6 +68,7 @@ page 6150768 "NPR SI POS Audit Log Aux. Info"
                 }
                 field("Sales Book Invoice No."; Rec."Sales Book Invoice No.")
                 {
+                    Caption = 'Sales Book Receipt No.';
                     ApplicationArea = NPRSIFiscal;
                     ToolTip = 'Specifies the of the Sales Book Invoice Number of the related record. Sales Book Invoice is used when POS is out of order.';
                 }
@@ -310,6 +311,25 @@ page 6150768 "NPR SI POS Audit Log Aux. Info"
                                 Page.RunModal(Page::"Posted Sales Credit Memo", SalesCrMemoHeader);
                             end;
                     end;
+                end;
+            }
+            action(OpenRelatedSalesBook)
+            {
+                ApplicationArea = NPRSIFiscal;
+                Caption = 'Open Related Salesbook Receipt';
+                Image = ShowList;
+                Promoted = true;
+                PromotedCategory = Category7;
+                PromotedOnly = true;
+                ToolTip = 'Opens the salesbook receipt related to the selected transaction record.';
+                trigger OnAction()
+                var
+                    SISalesbookReceipt: Record "NPR SI Salesbook Receipt";
+                begin
+                    if Rec."Salesbook Entry No." = 0 then
+                        exit;
+                    SISalesbookReceipt.Get(Rec."Salesbook Entry No.");
+                    Page.RunModal(Page::"NPR SI Salesbook Receipt", SISalesbookReceipt);
                 end;
             }
         }

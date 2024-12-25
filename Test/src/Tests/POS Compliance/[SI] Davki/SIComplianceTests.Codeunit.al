@@ -101,6 +101,7 @@ codeunit 85091 "NPR SI Compliance Tests"
         SIPOSAuditLogAuxInfo.SetRange("Audit Entry Type", SIPOSAuditLogAuxInfo."Audit Entry Type"::"POS Entry");
         SIPOSAuditLogAuxInfo.SetRange("POS Entry No.", EntryNumber);
         SIPOSAuditLogAuxInfo.FindFirst();
+        _Assert.IsTrue(SIPOSAuditLogAuxInfo."Salesbook Entry No." <> 0, 'Salesbook Sale has to have a Salesbook Entry No.');
         _Assert.IsTrue(SIPOSAuditLogAuxInfo."EOR Code" <> '', 'Fiscal Bill must be signed by the Tax Authority.');
 
         // [Cleanup] Unbind Event Subscriptions in Test Library Codeunit 
@@ -194,7 +195,7 @@ codeunit 85091 "NPR SI Compliance Tests"
     begin
         NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, _Salesperson, POSSaleWrapper);
         POSSaleWrapper.GetCurrentSale(POSSaleRecord);
-        POSActionPreInvIns.InputAuditPreInvoiceNumbersTest(GetTestSetNo(), GetTestSerialNo(), POSSaleRecord);
+        POSActionPreInvIns.InputAuditPreInvoiceNumbersTest(GetTestSetNo(), GetTestSerialNo(), GetTestReceiptNo(), Today(), POSSaleRecord);
         NPRLibraryPOSMock.CreateItemLine(_POSSession, _Item."No.", 1);
         if not (NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethod.Code, _Item."Unit Price", '')) then
             Error('Sale did not end as expected');
@@ -237,11 +238,16 @@ codeunit 85091 "NPR SI Compliance Tests"
 
     local procedure GetTestSetNo(): Text
     begin
-        exit('123');
+        exit('12');
     end;
 
     local procedure GetTestSerialNo(): Text
     begin
-        exit('777');
+        exit('5001-00152');
+    end;
+
+    local procedure GetTestReceiptNo(): Text
+    begin
+        exit('30');
     end;
 }

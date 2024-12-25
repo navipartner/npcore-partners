@@ -185,6 +185,12 @@ table 6059838 "NPR SI POS Audit Log Aux. Info"
             Caption = 'Return Additional Info';
             DataClassification = CustomerContent;
         }
+        field(40; "Salesbook Entry No."; Integer)
+        {
+            Caption = 'Salesbook Entry No.';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR SI Salesbook Receipt";
+        }
     }
 
     keys

@@ -54,7 +54,6 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
         DateFormatLbl: Label '%1, %2', Locked = true, Comment = '%1 = Entry Date, %2 = Time Stamp';
         ReceiptCopyLbl: Label 'THIS IS A COPY %1 OF A RECEIPT', Comment = '%1 = Receipt Copy No.';
         ReceiptNoLbl: Label 'Št. računa: ';
-        ReceiptNoFormatLbl: Label '%1-%2-%3', Locked = true, Comment = '%1 = POS Store Code, %2 = POS Unit No., %3 = Receipt No.';
     begin
         CompanyInfo.Get();
         POSStore.Get(SIPOSAuditLogAuxInfo."POS Store Code");
@@ -79,7 +78,8 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
         PrintFullLine();
 
         PrintTwoColumnText(DateLbl, StrSubstNo(DateFormatLbl, Format(SIPOSAuditLogAuxInfo."Entry Date", 10, '<Day,2>.<Month,2>.<Year4>'), Format(SIPOSAuditLogAuxInfo."Log Timestamp", 8, '<Hours24>:<Minutes,2>:<Seconds,2>')), 'CENTER', true);
-        PrintTwoColumnText(ReceiptNoLbl, StrSubstNo(ReceiptNoFormatLbl, SIPOSAuditLogAuxInfo."POS Store Code", SIPOSAuditLogAuxInfo."POS Unit No.", SIPOSAuditLogAuxInfo."Receipt No."), 'CENTER', true);
+
+        PrintTwoColumnText(ReceiptNoLbl, FormatReceiptNo(SIPOSAuditLogAuxInfo), 'CENTER', true);
     end;
 
     local procedure PrintPOSEntryContent(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info")
@@ -95,14 +95,13 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
         VATAmountLbl: Label 'DDV', Locked = true;
         VATBaseLbl: Label 'Osnova', Locked = true;
         VATPercLbl: Label 'Stopnja', Locked = true;
-        SalesLineType: Option Comment,"G/L Account",Item,Customer,Voucher,Payout,Rounding;
     begin
         PrintDottedLine();
         PrintFourColumnText(ItemDescLbl, QtyLbl, UnitPriceLbl, ItemPriceLbl, 'CENTER', true);
         PrintDottedLine();
 
         POSEntrySalesLine.SetRange("POS Entry No.", SIPOSAuditLogAuxInfo."POS Entry No.");
-        POSEntrySalesLine.SetFilter(Type, '%1|%2', SalesLineType::Item, SalesLineType::Voucher);
+        POSEntrySalesLine.SetFilter(Type, '%1|%2', POSEntrySalesLine.Type::Item, POSEntrySalesLine.Type::Voucher);
         if not POSEntrySalesLine.FindSet() then
             exit;
         repeat
@@ -240,11 +239,15 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
         PrintFullLine();
         PrintTwoColumnText(CashierIDLbl, Format(SIPOSAuditLogAuxInfo."Salesperson Code"), 'CENTER', true);
         PrintEmptyLine();
-        PrintTwoColumnText(ZOICodeLbl, SIPOSAuditLogAuxInfo."ZOI Code", 'CENTER', true);
+
+        if SIPOSAuditLogAuxInfo."ZOI Code" <> '' then
+            PrintTwoColumnText(ZOICodeLbl, SIPOSAuditLogAuxInfo."ZOI Code", 'CENTER', true);
+
         PrintTwoColumnText(EORCodeLbl, SIPOSAuditLogAuxInfo."EOR Code", 'CENTER', true);
         PrintEmptyLine();
 
-        PrintQRCode(SIPOSAuditLogAuxInfo."Validation Code");
+        if SIPOSAuditLogAuxInfo."Validation Code" <> '' then
+            PrintQRCode(SIPOSAuditLogAuxInfo."Validation Code");
     end;
 
     local procedure PrintCustomerAdditionalInfo(SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info")
@@ -396,6 +399,16 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
             exit;
 
         AddressLine := AddressLine.TrimEnd(', ');
+    end;
+
+    local procedure FormatReceiptNo(SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"): Text
+    var
+        ReceiptNoFormatLbl: Label '%1-%2-%3', Locked = true, Comment = '%1 = POS Store Code, %2 = POS Unit No., %3 = Receipt No.';
+    begin
+        if SIPOSAuditLogAuxInfo."Receipt No." <> '' then
+            exit(StrSubstNo(ReceiptNoFormatLbl, SIPOSAuditLogAuxInfo."POS Store Code", SIPOSAuditLogAuxInfo."POS Unit No.", SIPOSAuditLogAuxInfo."Receipt No."))
+        else
+            exit(StrSubstNo(ReceiptNoFormatLbl, SIPOSAuditLogAuxInfo."POS Store Code", SIPOSAuditLogAuxInfo."POS Unit No.", SIPOSAuditLogAuxInfo."Sales Book Invoice No."));
     end;
 
     local procedure FormatTwoColumnText(CaptionLbl: Text; Value: Text) Result: Text
