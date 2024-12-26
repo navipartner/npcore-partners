@@ -46,7 +46,7 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
 
         TempSalesCrMemoLine.FindSet();
         repeat
-            FindPriceListLine();
+            FindPriceListLine(TempSalesCrMemoLine."Location Code", TempSalesCrMemoLine."No.");
 
             InsertRetailValueEntries(RetailValueEntry, SalesCrMemoHeader);
 
@@ -92,7 +92,7 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
             NivelationLines."Line No." := LineNo;
             NivelationLines."Document No." := NivelationHeader."No.";
             NivelationLines."Location Code" := TempNivSalesCrMemoLines."Location Code";
-            FindPriceListLine();
+            FindPriceListLine(TempNivSalesCrMemoLines."Location Code", TempNivSalesCrMemoLines."No.");
             NivelationLines."Price Valid Date" := PriceListLine."Starting Date";
             NivelationLines."Posting Date" := SalesCrMemoHeader."Posting Date";
             NivelationLines."VAT Bus. Posting Gr. (Price)" := PriceListLine."VAT Bus. Posting Gr. (Price)";
@@ -848,22 +848,22 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
         PriceListHeader.SetFilter("Ending Date", StrSubstNo(EndingDateFilter, SalesCrMemoHeader."Posting Date"));
     end;
 
-    local procedure FindPriceListLine()
+    local procedure FindPriceListLine(LocationCode: Code[10]; ItemNo: Code[20])
     var
         PriceListNotFoundErr: Label 'Price for the Location %2 has not been found.', Comment = '%1 - Location Code';
         PriceNotFoundErr: Label 'Price for the Item %1 has not been found in Price List: %2 for Location %3', Comment = '%1 - Item No, %2 - Price List Code, %3 - Location Code';
     begin
-        PriceListHeader.SetRange("NPR Location Code", TempSalesCrMemoLine."Location Code");
+        PriceListHeader.SetRange("NPR Location Code", LocationCode);
         if not PriceListHeader.FindFirst() then
             PriceListHeader.SetRange("Assign-to No.", '');
         if not PriceListHeader.FindFirst() then
-            Error(PriceListNotFoundErr, TempSalesCrMemoLine."Location Code");
+            Error(PriceListNotFoundErr, LocationCode);
 
         PriceListLine.SetLoadFields("Price List Code", "Asset No.", "Unit Price", "Starting Date", "VAT Bus. Posting Gr. (Price)");
         PriceListLine.SetRange("Price List Code", PriceListHeader.Code);
-        PriceListLine.SetRange("Asset No.", TempSalesCrMemoLine."No.");
+        PriceListLine.SetRange("Asset No.", ItemNo);
         if not PriceListLine.FindFirst() then
-            Error(PriceNotFoundErr, TempSalesCrMemoLine."No.", PriceListHeader.Code, TempSalesCrMemoLine."Location Code");
+            Error(PriceNotFoundErr, ItemNo, PriceListHeader.Code, LocationCode);
     end;
 
     local procedure GetCOGSAccountFromGenPostingSetup(SalesCrMemoHeader: Record "Sales Cr.Memo Header"): Code[20]
