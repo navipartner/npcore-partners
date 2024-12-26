@@ -333,6 +333,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                     begin
                         RSEIAuxSalesHeader.SaveRSEIAuxSalesHeaderFields();
                         IsDocForSendingToSEF := RSEIAuxSalesHeader."NPR RS EI Send To SEF";
+                        RSEIAuxSalesHeader.SetReferenceNumberFromSalesHeader(Rec);
                     end;
                 }
                 field("NPR RS EI Send To CIR"; RSEIAuxSalesHeader."NPR RS EI Send To CIR")
@@ -767,7 +768,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
         SIAuxSalesHeader.ReadSIAuxSalesHeaderFields(Rec);
         RSSalesHeader.Read(Rec.SystemId);
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
-        RSEIAuxSalesHeader.ReadRSEIAuxSalesHeaderFields(Rec);
+        RSEIAuxSalesHeader.SetReferenceNumberFromSalesHeader(Rec);
         IsDocForSendingToSEF := RSEInvoiceMgt.CheckIsDocumentSetForSendingToSEF(RSEIAuxSalesHeader);
 #endif
     end;

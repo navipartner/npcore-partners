@@ -93,7 +93,6 @@ table 6150833 "NPR RS EI Aux Sales Header"
         if not Rec.Get(SalesHeader.SystemId) then begin
             Rec.Init();
             Rec."Sales Header SystemId" := SalesHeader.SystemId;
-            SetReferenceNumberFromSalesHeader(SalesHeader);
         end;
     end;
 
@@ -134,11 +133,23 @@ table 6150833 "NPR RS EI Aux Sales Header"
     end;
 
 #if BC24
-    local procedure SetReferenceNumberFromSalesHeader(SalesHeader: Record "Sales Header")
+    internal procedure SetReferenceNumberFromSalesHeader(SalesHeader: Record "Sales Header")
     var
         SalesReceivablesSetup: Record "Sales & Receivables Setup";
         NoSeries: Codeunit "No. Series";
+        RSEInvoiceMgt: Codeunit "NPR RS E-Invoice Mgt.";
     begin
+        if not RSEInvoiceMgt.IsRSEInvoiceEnabled() then
+            exit;
+
+        ReadRSEIAuxSalesHeaderFields(SalesHeader);
+
+        if not "NPR RS EI Send To SEF" then begin
+            "NPR RS EI Reference Number" := '';
+            SaveRSEIAuxSalesHeaderFields();
+            exit;
+        end;
+
         SalesReceivablesSetup.Get();
 
         case SalesHeader."Document Type" of
@@ -147,13 +158,27 @@ table 6150833 "NPR RS EI Aux Sales Header"
             SalesHeader."Document Type"::"Credit Memo":
                 "NPR RS EI Reference Number" := NoSeries.PeekNextNo(SalesReceivablesSetup."Posted Credit Memo Nos.");
         end;
+
+        SaveRSEIAuxSalesHeaderFields();
     end;
 #else
-    local procedure SetReferenceNumberFromSalesHeader(SalesHeader: Record "Sales Header")
+    internal procedure SetReferenceNumberFromSalesHeader(SalesHeader: Record "Sales Header")
     var
         SalesReceivablesSetup: Record "Sales & Receivables Setup";
         NoSeriesMgt: Codeunit NoSeriesManagement;
+        RSEInvoiceMgt: Codeunit "NPR RS E-Invoice Mgt.";
     begin
+        if not RSEInvoiceMgt.IsRSEInvoiceEnabled() then
+            exit;
+
+        ReadRSEIAuxSalesHeaderFields(SalesHeader);
+
+        if not "NPR RS EI Send To SEF" then begin
+            "NPR RS EI Reference Number" := '';
+            SaveRSEIAuxSalesHeaderFields();
+            exit;
+        end;
+
         SalesReceivablesSetup.Get();
 
         case SalesHeader."Document Type" of
@@ -162,6 +187,8 @@ table 6150833 "NPR RS EI Aux Sales Header"
             SalesHeader."Document Type"::"Credit Memo":
                 "NPR RS EI Reference Number" := NoSeriesMgt.GetNextNo(SalesReceivablesSetup."Posted Credit Memo Nos.", Today(), false)
         end;
+
+        SaveRSEIAuxSalesHeaderFields();
     end;
 #endif
 #endif
