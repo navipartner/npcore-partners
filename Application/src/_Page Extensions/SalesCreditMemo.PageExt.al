@@ -233,6 +233,7 @@ pageextension 6014412 "NPR Sales Credit Memo" extends "Sales Credit Memo"
                     begin
                         RSEIAuxSalesHeader.SaveRSEIAuxSalesHeaderFields();
                         IsDocForSendingToSEF := RSEIAuxSalesHeader."NPR RS EI Send To SEF";
+                        RSEIAuxSalesHeader.SetReferenceNumberFromSalesHeader(Rec);
                     end;
                 }
                 field("NPR RS EI Send To CIR"; RSEIAuxSalesHeader."NPR RS EI Send To CIR")
@@ -347,7 +348,7 @@ pageextension 6014412 "NPR Sales Credit Memo" extends "Sales Credit Memo"
         CROAuxSalesHeader.ReadCROAuxSalesHeaderFields(Rec);
         SIAuxSalesHeader.ReadSIAuxSalesHeaderFields(Rec);
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
-        RSEIAuxSalesHeader.ReadRSEIAuxSalesHeaderFields(Rec);
+        RSEIAuxSalesHeader.SetReferenceNumberFromSalesHeader(Rec);
         RSEIAuxSalesHeader.SetDefaultTaxLiabilityForSalesCrMemo(Rec);
         IsDocForSendingToSEF := RSEInvoiceMgt.CheckIsDocumentSetForSendingToSEF(RSEIAuxSalesHeader);
         IsModelFilled := false;
