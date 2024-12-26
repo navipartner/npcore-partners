@@ -66,6 +66,8 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
         if not TempNivSalesCrMemoLines.IsEmpty() and not PreviewMode then
             CreateAndPostNivelationDocument(SalesCrMemoHeader);
 
+        RSRLocalizationMgt.ValidateGLEntriesBalanced(SalesCrMemoHeader."No.");
+
         SourceCodeSetup.Get();
         RSRLocalizationMgt.AddGLEntriesToGLRegister(SalesCrMemoHeader."No.", SourceCodeSetup.Sales);
     end;

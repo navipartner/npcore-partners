@@ -26,6 +26,8 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
     begin
         InsertTransitLocationCorrectionalValueEntries(TransferShipmentLine);
         InsertRetailLocationCorrectionalValueEntries(TransferShipmentLine);
+
+        RSRLocalizationMgt.ValidateGLEntriesBalanced(TransferShipmentLine."Document No.");
     end;
 
     local procedure InsertRetailLocationCorrectionalValueEntries(TransferShipmentLine: Record "Transfer Shipment Line")

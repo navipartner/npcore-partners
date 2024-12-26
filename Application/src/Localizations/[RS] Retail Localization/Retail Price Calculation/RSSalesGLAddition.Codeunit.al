@@ -64,6 +64,8 @@ codeunit 6151094 "NPR RS Sales GL Addition"
         if not TempNivSalesInvLines.IsEmpty() and not PreviewMode then
             CreateAndPostNivelationDocument(SalesInvoiceHeader);
 
+        RSRLocalizationMgt.ValidateGLEntriesBalanced(SalesInvoiceHeader."No.");
+
         SourceCodeSetup.Get();
         RSRLocalizationMgt.AddGLEntriesToGLRegister(SalesInvoiceHeader."No.", SourceCodeSetup.Sales);
     end;

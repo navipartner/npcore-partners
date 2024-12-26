@@ -46,6 +46,8 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
             PostTransitValueEntry(TransferHeader, DocumentNo);
         until TempTransferLine.Next() = 0;
 
+        RSRLocalizationMgt.ValidateGLEntriesBalanced(GetCurrentTransferShipmentNo());
+
         SourceCodeSetup.Get();
         RSRLocalizationMgt.AddGLEntriesToGLRegister(DocumentNo, SourceCodeSetup.Transfer);
     end;
