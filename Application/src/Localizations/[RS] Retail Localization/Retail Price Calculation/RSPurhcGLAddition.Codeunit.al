@@ -57,6 +57,7 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
             TempPurchInvLine.DeleteAll();
         end;
 
+        RSRLocalizationMgt.ValidateGLEntriesBalanced(PurchInvHeader."No.");
         SourceCodeSetup.Get();
         RSRLocalizationMgt.AddGLEntriesToGLRegister(PurchInvHeader."No.", SourceCodeSetup.Purchases);
     end;

@@ -318,5 +318,16 @@ codeunit 6151490 "NPR RS R Localization Mgt."
             exit(false);
         exit(Location."NPR Retail Location");
     end;
+
+    internal procedure ValidateGLEntriesBalanced(DocumentNo: Code[20])
+    var
+        GLEntry: Record "G/L Entry";
+        GenLedgerNotBalancedErr: Label 'You cannot post document %1 right now. If you proceed, the General Ledger will become imbalanced. Current sum of amounts in General Ledger is %2. This is an issue with RS Retail Localization, please contact your administrator for further guidance.', Comment = '%1 = Document No., %2 = Amount';
+    begin
+        GLEntry.SetRange("Document No.", DocumentNo);
+        GLEntry.CalcSums(Amount);
+        if GLEntry.Amount <> 0 then
+            Error(GenLedgerNotBalancedErr, DocumentNo, GLEntry.Amount);
+    end;
     #endregion RS Retail Localization Helper Procedures
 }

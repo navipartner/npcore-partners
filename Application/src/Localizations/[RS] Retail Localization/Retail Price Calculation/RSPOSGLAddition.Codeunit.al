@@ -69,6 +69,8 @@ codeunit 6151363 "NPR RS POS GL Addition"
         if not TempNivelationSalesLines.IsEmpty() then
             CreateAndPostNivelationDocument(POSEntry, ShowNivelationPostingMessage);
 
+        RSRLocalizationMgt.ValidateGLEntriesBalanced(POSEntry."Document No.");
+
         if not POSStore.Get(POSEntry."POS Store Code") then
             exit;
         if not POSPostingProfile.Get(POSStore."POS Posting Profile") then
