@@ -121,7 +121,7 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
         if not POSEntryTaxLine.FindSet() then
             exit;
         repeat
-            PrintFourColumnText(StrSubstNo(TwoValueFormatLbl, Format(Round(POSEntryTaxLine."Tax %", 0.1)), '%'), FormatDecimal(Abs(POSEntryTaxLine."Tax Base Amount")), FormatDecimal(Abs(POSEntryTaxLine."Tax Amount")), FormatDecimal(POSEntryTaxLine."Amount Including Tax"), 'CENTER', false);
+            PrintFourColumnText(StrSubstNo(TwoValueFormatLbl, Format(Round(POSEntryTaxLine."Tax %", 0.1)), '%'), FormatDecimal(POSEntryTaxLine."Tax Base Amount"), FormatDecimal(POSEntryTaxLine."Tax Amount"), FormatDecimal(POSEntryTaxLine."Amount Including Tax"), 'CENTER', false);
         until POSEntryTaxLine.Next() = 0;
     end;
 
@@ -226,7 +226,7 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
 
         DictKeysList := TaxableAmountDict.Keys();
         foreach DictKey in DictKeysList do begin
-            PrintFourColumnText(StrSubstNo(TwoValueFormatLbl, Format(Round(DictKey, 0.1)), '%'), FormatDecimal(TaxableAmountDict.Get(DictKey)), FormatDecimal(TaxAmountDict.Get(DictKey)), FormatDecimal(-AmountInclTaxDict.Get(DictKey)), 'CENTER', false);
+            PrintFourColumnText(StrSubstNo(TwoValueFormatLbl, Format(Round(DictKey, 0.1)), '%'), FormatDecimal(-TaxableAmountDict.Get(DictKey)), FormatDecimal(-TaxAmountDict.Get(DictKey)), FormatDecimal(-AmountInclTaxDict.Get(DictKey)), 'CENTER', false);
         end;
     end;
 
