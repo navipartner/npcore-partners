@@ -227,6 +227,7 @@ table 6150874 "NPR Adyen Recon. Line"
             TableRelation =
                 if ("Matching Table Name" = const("EFT Transaction")) "NPR EFT Transaction Request".SystemId else
             if ("Matching Table Name" = const("Magento Payment Line")) "NPR Magento Payment Line".SystemId else
+            if ("Matching Table Name" = const("Subscription Payment")) "NPR MM Subscr. Payment Request".SystemId else
             if ("Matching Table Name" = const("G/L Entry")) "G/L Entry".SystemId;
         }
         field(290; Status; Enum "NPR Adyen Rec. Line Status")
@@ -570,6 +571,11 @@ table 6150874 "NPR Adyen Recon. Line"
                                                                     "Document Line No." = field("Line No."),
                                                                     Reversed = const(false),
                                                                     "Amount Type" = const("Realized Losses")));
+        }
+        field(930; "Matched Manually"; Boolean)
+        {
+            Caption = 'Matched Manually';
+            DataClassification = CustomerContent;
         }
     }
     keys

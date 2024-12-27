@@ -524,8 +524,43 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             exit;
         if TryMatchingPaymentWithMagento(ReconciliationLine, MatchedEntries, ReconciliationHeader) then
             exit;
+        if TryMatchingPaymentWithSubscr(ReconciliationLine, MatchedEntries, ReconciliationHeader) then
+            exit;
         ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Match";
         UnmatchedEntries += 1;
+    end;
+
+    local procedure TryMatchingPaymentWithSubscr(var ReconciliationLine: Record "NPR Adyen Recon. Line"; var MatchedEntries: Integer; ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"): Boolean
+    var
+        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+    begin
+        SubscrPaymentRequest.Reset();
+        SubscrPaymentRequest.SetRange("PSP Reference", ReconciliationLine."PSP Reference");
+        SubscrPaymentRequest.SetRange(PSP, Enum::"NPR MM Subscription PSP"::Adyen);
+        if not (ReconciliationLine."Transaction Type" in
+            [ReconciliationLine."Transaction Type"::Chargeback,
+            ReconciliationLine."Transaction Type"::SecondChargeback,
+            ReconciliationLine."Transaction Type"::RefundedReversed,
+            ReconciliationLine."Transaction Type"::ChargebackReversed,
+            ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo])
+        then
+            SubscrPaymentRequest.SetRange(Reconciled, false)
+        else
+            SubscrPaymentRequest.SetRange(Reversed, false);
+        if not SubscrPaymentRequest.FindFirst() then
+            exit;
+
+        ReconciliationLine."Matching Table Name" := ReconciliationLine."Matching Table Name"::"Subscription Payment";
+        ReconciliationLine."Matching Entry System ID" := SubscrPaymentRequest.SystemId;
+
+        if SubscriptionMatchingAllowed(SubscrPaymentRequest, ReconciliationLine, ReconciliationHeader, false) then begin
+            ReconciliationLine.Status := ReconciliationLine.Status::Matched;
+            // TODO Calculate Realized Gains or Losses
+            MatchedEntries += 1;
+        end else
+            ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Match";
+
+        exit(true);
     end;
 
     local procedure TryMatchingPaymentWithEFT(var ReconciliationLine: Record "NPR Adyen Recon. Line"; var MatchedEntries: Integer; ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"): Boolean
@@ -534,7 +569,6 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         PaymentLine: Record "NPR POS Entry Payment Line";
         AdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integrat.";
         AdyenLocalIntegration: Codeunit "NPR EFT Adyen Local Integrat.";
-        MatchValidationPassed: Boolean;
     begin
         EFTTransactionRequest.Reset();
         EFTTransactionRequest.SetRange("PSP Reference", ReconciliationLine."PSP Reference");
@@ -546,7 +580,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             ReconciliationLine."Transaction Type"::ChargebackReversed,
             ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo])
         then
-            EFTTransactionRequest.SetRange(EFTTransactionRequest.Reconciled, false)
+            EFTTransactionRequest.SetRange(Reconciled, false)
         else
             EFTTransactionRequest.SetRange(Reversed, false);
 
@@ -556,38 +590,8 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         ReconciliationLine."Matching Table Name" := ReconciliationLine."Matching Table Name"::"EFT Transaction";
         ReconciliationLine."Matching Entry System ID" := EFTTransactionRequest.SystemId;
 
-        if ReconciliationLine."Transaction Type" in
-            [ReconciliationLine."Transaction Type"::Chargeback,
-            ReconciliationLine."Transaction Type"::SecondChargeback,
-            ReconciliationLine."Transaction Type"::RefundedReversed,
-            ReconciliationLine."Transaction Type"::ChargebackReversed,
-            ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo]
-        then begin
-            if not PaymentLine.GetBySystemId(EFTTransactionRequest."Sales Line ID") then begin
-                ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Match";
-                _AdyenManagement.CreateReconciliationLog(_LogType::"Match Transactions", false,
-                    MatchTransactionsError05,
-                    ReconciliationHeader."Webhook Request ID");
-                exit(true);
-            end;
-        end;
-
-        if ReconciliationLine."Transaction Type" in
-            [ReconciliationLine."Transaction Type"::Chargeback,
-            ReconciliationLine."Transaction Type"::SecondChargeback,
-            ReconciliationLine."Transaction Type"::RefundedReversed,
-            ReconciliationLine."Transaction Type"::ChargebackReversed,
-            ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo]
-        then
-            MatchValidationPassed := Abs(EFTTransactionRequest."Result Amount") = Abs(ReconciliationLine."Amount (TCY)")
-        else
-            MatchValidationPassed := EFTTransactionRequest."Result Amount" = ReconciliationLine."Amount (TCY)";
-
-        MatchValidationPassed := MatchValidationPassed and EFTTransactionRequest."Financial Impact";
-
-        if MatchValidationPassed then begin
+        if EFTMatchingAllowed(EFTTransactionRequest, ReconciliationLine, ReconciliationHeader, true) then begin
             ReconciliationLine.Status := ReconciliationLine.Status::Matched;
-            MatchedEntries += 1;
             if PaymentLine.GetBySystemId(EFTTransactionRequest."Sales Line ID") and
                 (ReconciliationLine."Adyen Acc. Currency Code" <> ReconciliationLine."Transaction Currency Code") and
                 (ReconciliationLine."Transaction Type" in
@@ -598,20 +602,12 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                     ReconciliationLine."Transaction Type"::SettledExternallyWithInfo,
                     ReconciliationLine."Transaction Type"::RefundedExternallyWithInfo,
                     ReconciliationLine."Transaction Type"::ChargebackExternallyWithInfo])
-            then begin
+            then
                 ReconciliationLine."Realized Gains or Losses" := CalculateRealizedGL(ReconciliationLine, PaymentLine);
-            end;
-        end else begin
+            MatchedEntries += 1;
+        end else
             ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Match";
-            _AdyenManagement.CreateReconciliationLog(_LogType::"Match Transactions", false,
-                StrSubstNo(MatchTransactionsError01, Format(EFTTransactionRequest."Entry No."),
-                Format(EFTTransactionRequest."Result Amount" = ReconciliationLine."Amount (TCY)"),
-                Format(EFTTransactionRequest."Result Amount"),
-                Format(ReconciliationLine."Amount (TCY)"),
-                Format(EFTTransactionRequest."Financial Impact")),
-                ReconciliationHeader."Webhook Request ID");
-            exit;
-        end;
+
         exit(true);
     end;
 
@@ -620,8 +616,6 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         PaymentGateway: Record "NPR Magento Payment Gateway";
         FilterPGCodes: Text;
-        GLSetup: Record "General Ledger Setup";
-        MatchValidationPassed: Boolean;
     begin
         PaymentGateway.Reset();
         PaymentGateway.SetRange("Integration Type", Enum::"NPR PG Integrations"::Adyen);
@@ -653,35 +647,13 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         ReconciliationLine."Matching Table Name" := ReconciliationLine."Matching Table Name"::"Magento Payment Line";
         ReconciliationLine."Matching Entry System ID" := MagentoPaymentLine.SystemId;
 
-
-        if ReconciliationLine."Transaction Type" in
-            [ReconciliationLine."Transaction Type"::Chargeback,
-            ReconciliationLine."Transaction Type"::SecondChargeback,
-            ReconciliationLine."Transaction Type"::RefundedReversed,
-            ReconciliationLine."Transaction Type"::ChargebackReversed,
-            ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo]
-        then
-            MatchValidationPassed := Abs(MagentoPaymentLine.Amount) = Abs(ReconciliationLine."Amount (TCY)")
-        else
-            MatchValidationPassed := MagentoPaymentLine.Amount = ReconciliationLine."Amount (TCY)";
-
-        MatchValidationPassed := MatchValidationPassed and GLSetup.Get() and (GLSetup."LCY Code" = ReconciliationLine."Transaction Currency Code");
-
-        if MatchValidationPassed then begin
+        if MagentoMatchingAllowed(MagentoPaymentLine, ReconciliationLine, ReconciliationHeader, true) then begin
             ReconciliationLine.Status := ReconciliationLine.Status::Matched;
-            MatchedEntries += 1;
             // TODO Calculate Realized Gains or Losses
-        end else begin
+            MatchedEntries += 1;
+        end else
             ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Match";
-            _AdyenManagement.CreateReconciliationLog(_LogType::"Match Transactions", false,
-                StrSubstNo(MatchTransactionsError04,
-                    Format(MagentoPaymentLine."Document Type"),
-                    Format(MagentoPaymentLine."Document No."),
-                    Format(MagentoPaymentLine."Line No."),
-                    Format(MagentoPaymentLine.Amount),
-                    Format(ReconciliationLine."Amount (TCY)")),
-                ReconciliationHeader."Webhook Request ID");
-        end;
+
         exit(true);
     end;
 
@@ -744,7 +716,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             exit(true);
         end;
 
-        ReconciliationLine.SetFilter(Status, '%1|%2|%3|%4', ReconciliationLine.Status::Matched, ReconciliationLine.Status::"Not to be Matched", ReconciliationLine.Status::"Matched Manually", ReconciliationLine.Status::"Failed to Post");
+        ReconciliationLine.SetFilter(Status, '%1|%2|%3', ReconciliationLine.Status::Matched, ReconciliationLine.Status::"Not to be Matched", ReconciliationLine.Status::"Failed to Post");
         if ReconciliationLine.IsEmpty() then begin
             _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(PostTransactionsError01, ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID");
             exit(false);
@@ -763,7 +735,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         ReconciliationLine.FindSet();
         repeat
             PostAllowed := true;
-            if ReconciliationLine."Matching Table Name" in [ReconciliationLine."Matching Table Name"::"EFT Transaction", ReconciliationLine."Matching Table Name"::"Magento Payment Line"] then
+            if ReconciliationLine."Matching Table Name" in [ReconciliationLine."Matching Table Name"::"EFT Transaction", ReconciliationLine."Matching Table Name"::"Magento Payment Line", ReconciliationLine."Matching Table Name"::"Subscription Payment"] then
                 PostAllowed := PostingAllowed(ReconciliationLine);
             if _AdyenSetup."Recon. Posting Starting Date" > 0DT then
                 if ReconciliationLine."Transaction Date" < _AdyenSetup."Recon. Posting Starting Date" then begin
@@ -775,7 +747,8 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                 AssignPostingDateAndNo(ReconciliationLine, ReconciliationHeader);
                 case ReconciliationLine."Matching Table Name" of
                     ReconciliationLine."Matching Table Name"::"EFT Transaction",
-                    ReconciliationLine."Matching Table Name"::"Magento Payment Line":
+                    ReconciliationLine."Matching Table Name"::"Magento Payment Line",
+                    ReconciliationLine."Matching Table Name"::"Subscription Payment":
                         begin
                             UnPostedEntries += TryPostingPayment(ReconciliationLine, ReconciliationHeader);
                         end;
@@ -818,6 +791,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         MagentoPaymentLine: Record "NPR Magento Payment Line";
+        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
         PostEFTTransaction: Codeunit "NPR Adyen EFT Trans. Posting";
     begin
         case ReconciliationLine."Matching Table Name" of
@@ -833,9 +807,15 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                     UnPostedEntries += 1;
                     exit;
                 end;
+            ReconciliationLine."Matching Table Name"::"Subscription Payment":
+                if not SubscrPaymentRequest.GetBySystemId(ReconciliationLine."Matching Entry System ID") then begin
+                    _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(PostTransactionsSubscriptionError01, ReconciliationLine."Matching Entry System ID"), ReconciliationHeader."Webhook Request ID");
+                    UnPostedEntries += 1;
+                    exit;
+                end;
         end;
 
-        if not (ReconciliationLine.Status in [ReconciliationLine.Status::Matched, ReconciliationLine.Status::"Not to be Matched", ReconciliationLine.Status::"Matched Manually", ReconciliationLine.Status::"Failed to Post"]) then begin
+        if not (ReconciliationLine.Status in [ReconciliationLine.Status::Matched, ReconciliationLine.Status::"Not to be Matched", ReconciliationLine.Status::"Failed to Post"]) then begin
             _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(PostTransactionsError04, Format(ReconciliationLine."PSP Reference")), ReconciliationHeader."Webhook Request ID");
             UnPostedEntries += 1;
             exit;
@@ -880,6 +860,14 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                         MagentoPaymentLine.Reconciled := true;
                         MagentoPaymentLine."Reconciliation Date" := Today();
                         MagentoPaymentLine.Modify();
+                    end;
+                end;
+            ReconciliationLine."Matching Table Name"::"Subscription Payment":
+                begin
+                    if SubscrPaymentRequest.GetBySystemId(ReconciliationLine."Matching Entry System ID") then begin
+                        SubscrPaymentRequest.Reconciled := true;
+                        SubscrPaymentRequest."Reconciliation Date" := Today();
+                        SubscrPaymentRequest.Modify();
                     end;
                 end;
         end;
@@ -953,15 +941,17 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         MagentoPaymentLine: Record "NPR Magento Payment Line";
+        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
         ChargebackNeedsConfirmationLbl: Label 'It is not allowed to post %1 entry. Chargeback transactions require your confirmation first.';
         PostingNotAllowedLbl: Label 'It is not allowed to post %1 entry.';
         ParkedSaleLbl: Label 'The sale %1 is parked. Please finish the sale and try again.';
         SaleNotFinishedLbl: Label 'The sale %1 has not yet been finished. Please finish the sale and try again.';
         EFTTransactionRequestDoesNotExistLbl: Label 'EFT Transaction Request %1 does not exist anymore.';
         MagentoPaymentLineDoesNotExistLbl: Label 'Magento Payment Line %1 does not exist anymore.', Comment = '%1 - Magento Payment Line entry''s System ID (GUID).';
+        SubscrPaymentRequestDoesNotExistLbl: Label 'Subscription Payment Request %1 does not exist anymore.', Comment = '%1 - Subscription Payment Request entry''s System ID (GUID).';
         SavedPOSSale: Record "NPR POS Saved Sale Entry";
     begin
-        if ReconciliationLine."Matching Table Name" in [ReconciliationLine."Matching Table Name"::"EFT Transaction", ReconciliationLine."Matching Table Name"::"Magento Payment Line"] then begin
+        if ReconciliationLine."Matching Table Name" in [ReconciliationLine."Matching Table Name"::"EFT Transaction", ReconciliationLine."Matching Table Name"::"Magento Payment Line", ReconciliationLine."Matching Table Name"::"Subscription Payment"] then begin
             if not ReconciliationLine."Posting allowed" then begin
                 if ReconciliationLine."Transaction Type" in [ReconciliationLine."Transaction Type"::Chargeback, ReconciliationLine."Transaction Type"::ChargebackExternallyWithInfo, ReconciliationLine."Transaction Type"::SecondChargeback] then
                     _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(ChargebackNeedsConfirmationLbl, ReconciliationLine."Line No."), ReconciliationLine."Webhook Request ID")
@@ -1006,6 +996,14 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                 begin
                     if not MagentoPaymentLine.GetBySystemId(ReconciliationLine."Matching Entry System ID") then begin
                         _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(MagentoPaymentLineDoesNotExistLbl, ReconciliationLine."Matching Entry System ID"), ReconciliationLine."Webhook Request ID");
+                        ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Post";
+                        exit(false);
+                    end;
+                end;
+            ReconciliationLine."Matching Table Name"::"Subscription Payment":
+                begin
+                    if not SubscrPaymentRequest.GetBySystemId(ReconciliationLine."Matching Entry System ID") then begin
+                        _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(SubscrPaymentRequestDoesNotExistLbl, ReconciliationLine."Matching Entry System ID"), ReconciliationLine."Webhook Request ID");
                         ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Post";
                         exit(false);
                     end;
@@ -1432,7 +1430,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             ReconciliationLine."Posting Date" := 0D;
             ReconciliationLine.Status := ReconciliationLine.Status::Matched;
             ReconciliationLine.Modify();
-            if ReconciliationLine."Matching Table Name" in [ReconciliationLine."Matching Table Name"::"EFT Transaction", ReconciliationLine."Matching Table Name"::"Magento Payment Line"] then
+            if ReconciliationLine."Matching Table Name" in [ReconciliationLine."Matching Table Name"::"EFT Transaction", ReconciliationLine."Matching Table Name"::"Magento Payment Line", ReconciliationLine."Matching Table Name"::"Subscription Payment"] then
                 RevertPaymentReconciliation(ReconciliationLine, ReconciliationLine."Matching Table Name");
             Reversed := true;
         end;
@@ -1443,6 +1441,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
     var
         EFTTransRequest: Record "NPR EFT Transaction Request";
         MagentoPaymentLine: Record "NPR Magento Payment Line";
+        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
     begin
         case MatchingTable of
             MatchingTable::"EFT Transaction":
@@ -1461,6 +1460,143 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                         MagentoPaymentLine.Modify();
                     end;
                 end;
+            MatchingTable::"Subscription Payment":
+                begin
+                    if SubscrPaymentRequest.GetBySystemId(ReconciliationLine."Matching Entry System ID") then begin
+                        SubscrPaymentRequest.Reconciled := false;
+                        SubscrPaymentRequest."Reconciliation Date" := 0D;
+                        SubscrPaymentRequest.Modify();
+                    end;
+                end;
+        end;
+    end;
+
+    internal procedure SubscriptionMatchingAllowed(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; ReconciliationLine: Record "NPR Adyen Recon. Line"; Silent: Boolean) Success: Boolean
+    var
+        ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr";
+    begin
+        Success := SubscriptionMatchingAllowed(SubscrPaymentRequest, ReconciliationLine, ReconciliationHeader, Silent);
+    end;
+
+    local procedure SubscriptionMatchingAllowed(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; ReconciliationLine: Record "NPR Adyen Recon. Line"; ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"; Silent: Boolean) Success: Boolean
+    var
+        MatchValidationPassed: Boolean;
+        ManualMatchTransactionError01: Label 'Failed to match with Subscription Payment Request No. %1 because amounts aren''t equal or Subscription Payment Request status is either Canceled or Rejected.';
+    begin
+        if ReconciliationLine."Transaction Type" in
+            [ReconciliationLine."Transaction Type"::Chargeback,
+            ReconciliationLine."Transaction Type"::SecondChargeback,
+            ReconciliationLine."Transaction Type"::RefundedReversed,
+            ReconciliationLine."Transaction Type"::ChargebackReversed,
+            ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo]
+        then
+            MatchValidationPassed := Abs(SubscrPaymentRequest."Amount") = Abs(ReconciliationLine."Amount (TCY)")
+        else
+            MatchValidationPassed := SubscrPaymentRequest."Amount" = ReconciliationLine."Amount (TCY)";
+
+        MatchValidationPassed := MatchValidationPassed and not (SubscrPaymentRequest.Status in [SubscrPaymentRequest.Status::Cancelled, SubscrPaymentRequest.Status::Rejected]);
+
+        if MatchValidationPassed then begin
+            Success := true;
+        end else begin
+            if not Silent and GuiAllowed() then
+                Error(ManualMatchTransactionError01, Format(SubscrPaymentRequest."Entry No."))
+            else
+                _AdyenManagement.CreateReconciliationLog(_LogType::"Match Transactions", false, StrSubstNo(MatchTransactionsError08, Format(SubscrPaymentRequest."Entry No.")), ReconciliationHeader."Webhook Request ID");
+        end;
+    end;
+
+    internal procedure MagentoMatchingAllowed(MagentoPaymentLine: Record "NPR Magento Payment Line"; ReconciliationLine: Record "NPR Adyen Recon. Line"; Silent: Boolean) Success: Boolean
+    var
+        ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr";
+    begin
+        Success := MagentoMatchingAllowed(MagentoPaymentLine, ReconciliationLine, ReconciliationHeader, Silent);
+    end;
+
+    local procedure MagentoMatchingAllowed(MagentoPaymentLine: Record "NPR Magento Payment Line"; ReconciliationLine: Record "NPR Adyen Recon. Line"; ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"; Silent: Boolean) Success: Boolean
+    var
+        GLSetup: Record "General Ledger Setup";
+        MatchValidationPassed: Boolean;
+        ManualMatchTransactionError02: Label 'Failed to match with Magento Payment Line (Document Type: %1, Document No.: %2, Document Line No.: %3) because Amounts aren''t equal.';
+    begin
+        if ReconciliationLine."Transaction Type" in
+            [ReconciliationLine."Transaction Type"::Chargeback,
+            ReconciliationLine."Transaction Type"::SecondChargeback,
+            ReconciliationLine."Transaction Type"::RefundedReversed,
+            ReconciliationLine."Transaction Type"::ChargebackReversed,
+            ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo]
+        then
+            MatchValidationPassed := Abs(MagentoPaymentLine.Amount) = Abs(ReconciliationLine."Amount (TCY)")
+        else
+            MatchValidationPassed := MagentoPaymentLine.Amount = ReconciliationLine."Amount (TCY)";
+
+        MatchValidationPassed := MatchValidationPassed and GLSetup.Get() and (GLSetup."LCY Code" = ReconciliationLine."Transaction Currency Code");
+
+        if MatchValidationPassed then
+            Success := true
+        else begin
+            if not Silent and GuiAllowed() then
+                Error(ManualMatchTransactionError02, Format(MagentoPaymentLine."Document Type"), Format(MagentoPaymentLine."Document No."), Format(MagentoPaymentLine."Line No."))
+            else
+                _AdyenManagement.CreateReconciliationLog(_LogType::"Match Transactions", false,
+                    StrSubstNo(MatchTransactionsError04,
+                        Format(MagentoPaymentLine."Document Type"),
+                        Format(MagentoPaymentLine."Document No."),
+                        Format(MagentoPaymentLine."Line No.")),
+                    ReconciliationHeader."Webhook Request ID");
+        end;
+    end;
+
+    internal procedure EFTMatchingAllowed(EFTTransactionRequest: Record "NPR EFT Transaction Request"; ReconciliationLine: Record "NPR Adyen Recon. Line"; Silent: Boolean) Success: Boolean
+    var
+        RecHeader: Record "NPR Adyen Reconciliation Hdr";
+    begin
+        Success := EFTMatchingAllowed(EFTTransactionRequest, ReconciliationLine, RecHeader, Silent);
+    end;
+
+    local procedure EFTMatchingAllowed(EFTTransactionRequest: Record "NPR EFT Transaction Request"; ReconciliationLine: Record "NPR Adyen Recon. Line"; ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"; Silent: Boolean) Success: Boolean
+    var
+        PaymentLine: Record "NPR POS Entry Payment Line";
+        MatchValidationPassed: Boolean;
+        ManualMatchTransactionError03: Label 'POS Entry Payment Line does not exist. Please check if the Sale is posted.';
+        ManualMatchTransactionError04: Label 'Failed to match with EFT Transaction Request No. %1 because Amounts aren''t equal or EFT Transaction Request has no Financial Impact.';
+    begin
+        if ReconciliationLine."Transaction Type" in
+            [ReconciliationLine."Transaction Type"::Chargeback,
+            ReconciliationLine."Transaction Type"::SecondChargeback,
+            ReconciliationLine."Transaction Type"::RefundedReversed,
+            ReconciliationLine."Transaction Type"::ChargebackReversed,
+            ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo]
+        then begin
+            if not PaymentLine.GetBySystemId(EFTTransactionRequest."Sales Line ID") then begin
+                if not Silent and GuiAllowed() then
+                    Error(ManualMatchTransactionError03)
+                else
+                    _AdyenManagement.CreateReconciliationLog(_LogType::"Match Transactions", false, MatchTransactionsError05, ReconciliationHeader."Webhook Request ID");
+                exit;
+            end;
+        end;
+
+        if ReconciliationLine."Transaction Type" in
+            [ReconciliationLine."Transaction Type"::Chargeback,
+            ReconciliationLine."Transaction Type"::SecondChargeback,
+            ReconciliationLine."Transaction Type"::RefundedReversed,
+            ReconciliationLine."Transaction Type"::ChargebackReversed,
+            ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo]
+        then
+            MatchValidationPassed := Abs(EFTTransactionRequest."Result Amount") = Abs(ReconciliationLine."Amount (TCY)")
+        else
+            MatchValidationPassed := EFTTransactionRequest."Result Amount" = ReconciliationLine."Amount (TCY)";
+
+        MatchValidationPassed := MatchValidationPassed and EFTTransactionRequest."Financial Impact";
+
+        if MatchValidationPassed then
+            Success := true
+        else begin
+            if not Silent and GuiAllowed() then
+                Error(ManualMatchTransactionError04, Format(EFTTransactionRequest."Entry No."))
+            else
+                _AdyenManagement.CreateReconciliationLog(_LogType::"Match Transactions", false, StrSubstNo(MatchTransactionsError01, Format(EFTTransactionRequest."Entry No.")), ReconciliationHeader."Webhook Request ID");
         end;
     end;
 
@@ -1506,16 +1642,18 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         ImportLinesError02: Label 'Report ''%1'' has no transactions within Merchant Account ''%2''.';
         ImportLinesError03: Label 'Unsupported Journal Type: %1.\Entry was skipped.';
         ImportLinesSuccess01: Label 'NP Pay Reconciliation Document %1 was successfully created with %2 transaction entries.';
-        MatchTransactionsError01: Label 'Failed to match with EFT Transaction Request No. %1 because of one of the conditions:\\    Amounts are equal: %2\EFT Transaction Amount:%3, Reconciliation Line Transaction Amount:%4\\Financial Impact: %5';
+        MatchTransactionsError01: Label 'Failed to match with EFT Transaction Request No. %1 because one of the conditions failed:\\ -Amounts aren''t equal.\\ -EFT Transaction Request has no Financial Impact.';
         MatchTransactionsError02: Label 'NP Pay Reconciliation Document %1 does not contain any transactions within Marchant Account ''%2''.';
         MatchTransactionsError03: Label 'Couldn''t match %1 entries in NP Pay Reconciliation Document %2.';
-        MatchTransactionsError04: Label 'Failed to match with Magento Payment Line (Document Type: %1, Document No.: %2, Document Line No.: %3).\\    Amounts are not equal:\Magento Payment Line Amount:%4, Reconciliation Line Transaction Amount:%5';
+        MatchTransactionsError04: Label 'Failed to match with Magento Payment Line (Document Type: %1, Document No.: %2, Document Line No.: %3) because one of the conditions failed:\\ -Amounts aren''t equal.';
         MatchTransactionsError05: Label 'EFT Transaction Request was found, however the POS Entry Payment Line does not exist. Please check if the Sale is posted.';
         MatchTransactionsError06: Label 'PSP Reference is empty.';
+        MatchTransactionsError08: Label 'Failed to match with Subscription Payment Request No. %1 because one of the conditions failed:\\ -Amounts aren''t equal.\\ -Subscription Payment Request status is either Canceled or Rejected.';
         MatchTransactionsSuccess01: Label 'Successfully matched entries in NP Pay Reconciliation Document %1.';
         PostTransactionsError01: Label 'Couldn''t find any matched transactions to post in NP Pay Reconciliation Document %1.';
         PostTransactionsEFTError01: Label 'EFT Transaction Request %1 does not exist.';
         PostTransactionsMagentoError01: Label 'Magento Payment Line %1 does not exist.';
+        PostTransactionsSubscriptionError01: Label 'Subscription Payment Request %1 does not exist.';
         PostTransactionsError03: Label 'Couldn''t post %1 entries in NP Pay Reconciliation Document %2.';
         PostTransactionsError04: Label 'Transaction %1 is not matched yet.';
         PostTransactionsSuccess01: Label 'Successfully posted entries in NP Pay Reconciliation Document %1.';

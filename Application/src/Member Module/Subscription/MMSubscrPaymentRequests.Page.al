@@ -124,6 +124,16 @@ page 6184832 "NPR MM Subscr.Payment Requests"
                     ToolTip = 'Specifies the value of the Subscription Request Entry No. field.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field(Reconciled; Rec.Reconciled)
+                {
+                    ToolTip = 'Specifies whether the subscription payment request has been reconciled.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced, NPRRetail;
+                }
+                field("Reconciliation Date"; Rec."Reconciliation Date")
+                {
+                    ToolTip = 'Specifies the date when the subscription payment request has been reconciled.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced, NPRRetail;
+                }
             }
         }
     }

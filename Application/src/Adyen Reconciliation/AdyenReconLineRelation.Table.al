@@ -4,9 +4,9 @@ table 6150876 "NPR Adyen Recon. Line Relation"
     Caption = 'NP Pay Reconciliation Line Relation';
     DataClassification = CustomerContent;
 
-    ObsoleteState = Pending;
+    ObsoleteState = Removed;
     ObsoleteTag = '2024-12-03';
-    ObsoleteReason = 'Replaced with AdyenRecLineRelation';
+    ObsoleteReason = 'Replaced with NPR Adyen Recons.Line Relation';
 
 
     fields

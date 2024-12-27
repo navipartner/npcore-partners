@@ -5,13 +5,11 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
     begin
         case _ReconciliationLine."Matching Table Name" of
             _ReconciliationLine."Matching Table Name"::"EFT Transaction":
-                begin
-                    PostEFT();
-                end;
+                PostEFT();
             _ReconciliationLine."Matching Table Name"::"Magento Payment Line":
-                begin
-                    PostMagento();
-                end;
+                PostMagento();
+            _ReconciliationLine."Matching Table Name"::"Subscription Payment":
+                PostSubscription();
         end;
     end;
 
@@ -41,7 +39,9 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         POSPaymentLine: Record "NPR POS Entry Payment Line";
         POSPostingSetup: Record "NPR POS Posting Setup";
+        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
         POSPostEntries: Codeunit "NPR POS Post Entries";
+        SubscrPaymentIHandler: Interface "NPR MM Subscr.Payment IHandler";
         CouldNotDeterminePOSPostingSetupLbl: Label 'The system was unable to locate the corresponding POS Posting Setup for the Sale: %1.';
     begin
         case _ReconciliationLine."Matching Table Name" of
@@ -72,6 +72,12 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
                             _PaymentAccountType := _PaymentAccountType::"Bank Account";
                     end;
                     _PaymentAccountNo := MagentoPaymentLine."Account No.";
+                end;
+            _ReconciliationLine."Matching Table Name"::"Subscription Payment":
+                begin
+                    SubscrPaymentRequest.GetBySystemId(_ReconciliationLine."Matching Entry System ID");
+                    SubscrPaymentIHandler := SubscrPaymentRequest.PSP;
+                    SubscrPaymentIHandler.GetPaymentPostingAccount(_PaymentAccountType, _PaymentAccountNo);
                 end;
         end;
     end;
@@ -106,10 +112,10 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
 
         GenJnlLine.Validate(Amount, Amount);
         GenJnlLine.Description := Description;
-        GenJnlLine."Dimension Set ID" := DimensionSetID;
-        DimensionManagement.UpdateGlobalDimFromDimSetID(
-          GenJnlLine."Dimension Set ID", GenJnlLine."Shortcut Dimension 1 Code", GenJnlLine."Shortcut Dimension 2 Code");
-
+        if DimensionSetID > 0 then begin
+            GenJnlLine."Dimension Set ID" := DimensionSetID;
+            DimensionManagement.UpdateGlobalDimFromDimSetID(GenJnlLine."Dimension Set ID", GenJnlLine."Shortcut Dimension 1 Code", GenJnlLine."Shortcut Dimension 2 Code");
+        end;
 
         GenJnlLine."Source Code" := _AdyenMerchantSetup."Posting Source Code";
         GLEntryNo := PostGenJnlLine(GenJnlLine, GenJournalPostLine);
@@ -202,6 +208,7 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
                     CreateReverseMagento(MagentoPaymentLine, ReverseMagentoPaymentLine, MagentoReversed);
 
                     //TODO PostReverseMagentoPaymentLine
+
                     if MagentoReversed then begin
                         MagentoPaymentLine."Reversed by Entry System ID" := ReverseMagentoPaymentLine.SystemId;
                         MagentoPaymentLine.Reversed := true;
@@ -227,6 +234,26 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
             SetDimensions(SalesHeader, DimensionSetID);
 
         PostEntryToGL(DimensionSetID);
+    end;
+
+    local procedure PostSubscription()
+    var
+        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+        ReverseSubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+    begin
+        case _ReconciliationLine."Transaction Type" of
+            _ReconciliationLine."Transaction Type"::Chargeback,
+            _ReconciliationLine."Transaction Type"::SecondChargeback,
+            _ReconciliationLine."Transaction Type"::RefundedReversed,
+            _ReconciliationLine."Transaction Type"::ChargebackReversed,
+            _ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo:
+                begin
+                    SubscrPaymentRequest.GetBySystemId(_ReconciliationLine."Matching Entry System ID");
+                    CreateReverseSubscrPaymentRequest(SubscrPaymentRequest, ReverseSubscrPaymentRequest, _ReconciliationLine."Transaction Type");
+                    _NewReversedSystemId := ReverseSubscrPaymentRequest.SystemId;
+                end;
+        end;
+        PostEntryToGL(0);
     end;
 
     local procedure PostEntryToGL(DimensionSetID: Integer)
@@ -406,6 +433,51 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         end;
         ReverseMagentoPaymentLine.Insert();
         MagentoReversed := true;
+    end;
+
+    local procedure CreateReverseSubscrPaymentRequest(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var ReverseSubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; ReconciliationTransactionType: Enum "NPR Adyen Rec. Trans. Type")
+    var
+        ExistingReversedSubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+        SubscrReversalRequest: Record "NPR MM Subscr. Request";
+        SubscrReversalMgt: Codeunit "NPR MM Subscr. Reversal Mgt.";
+
+        PaymentRequestType: Enum "NPR MM Payment Request Type";
+    begin
+        ExistingReversedSubscrPaymentRequest.Reset();
+        ExistingReversedSubscrPaymentRequest.SetRange("PSP Reference", SubscrPaymentRequest."PSP Reference");
+        ExistingReversedSubscrPaymentRequest.SetRange(Reversed, false);
+        ExistingReversedSubscrPaymentRequest.SetRange(Reconciled, false);
+        ExistingReversedSubscrPaymentRequest.SetRange("Amount", SubscrPaymentRequest."Amount");
+        if ExistingReversedSubscrPaymentRequest.FindFirst() then begin
+            ReverseSubscrPaymentRequest := ExistingReversedSubscrPaymentRequest;
+            exit;
+        end;
+
+        SubscrPaymentRequest.TestField("Subscr. Request Entry No.");
+
+        case ReconciliationTransactionType of
+            ReconciliationTransactionType::RefundedReversed:
+                PaymentRequestType := PaymentRequestType::RefundRefersed;
+            ReconciliationTransactionType::Chargeback,
+            ReconciliationTransactionType::SecondChargeback:
+                PaymentRequestType := PaymentRequestType::Chargeback;
+            ReconciliationTransactionType::ChargebackReversed,
+            ReconciliationTransactionType::ChargebackReversedExternallyWithInfo:
+                PaymentRequestType := PaymentRequestType::ChargebackReversed;
+        end;
+
+        SubscriptionRequest.Get(SubscrPaymentRequest."Subscr. Request Entry No.");
+
+        SubscrReversalMgt.InitReversalRequest(SubscriptionRequest, SubscrPaymentRequest, PaymentRequestType, SubscrReversalRequest, ReverseSubscrPaymentRequest);
+        ReverseSubscrPaymentRequest.Status := ReverseSubscrPaymentRequest.Status::Captured;
+        ReverseSubscrPaymentRequest.PSP := SubscrPaymentRequest.PSP;
+        ReverseSubscrPaymentRequest."PSP Reference" := SubscrPaymentRequest."PSP Reference";
+        ReverseSubscrPaymentRequest."External Transaction ID" := SubscrPaymentRequest."External Transaction ID";
+        SubscrReversalMgt.InsertReversalRequest(SubscriptionRequest, SubscrPaymentRequest, SubscrReversalRequest, ReverseSubscrPaymentRequest);
+        SubscrReversalRequest.Status := SubscrReversalRequest.Status::Confirmed;
+        SubscrReversalRequest.Modify();
     end;
 
     var

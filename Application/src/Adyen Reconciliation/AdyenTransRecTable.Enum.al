@@ -21,4 +21,8 @@ enum 6014671 "NPR Adyen Trans. Rec. Table"
     {
         Caption = 'G/L Entry';
     }
+    value(40; "Subscription Payment")
+    {
+        Caption = 'Subscription Payment';
+    }
 }
