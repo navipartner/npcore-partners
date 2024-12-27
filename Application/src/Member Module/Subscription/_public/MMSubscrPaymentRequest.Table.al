@@ -154,6 +154,16 @@ table 6150921 "NPR MM Subscr. Payment Request"
             DataClassification = CustomerContent;
             TableRelation = "Cust. Ledger Entry"."Entry No.";
         }
+        field(310; Reconciled; Boolean)
+        {
+            Caption = 'Reconciled';
+            DataClassification = CustomerContent;
+        }
+        field(320; "Reconciliation Date"; Date)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Reconciliation Date';
+        }
     }
 
     keys
@@ -167,6 +177,7 @@ table 6150921 "NPR MM Subscr. Payment Request"
         key(Key3; "Batch No.") { }
         key(Key4; PSP, "Batch No.") { }
         key(Key5; "Reversed by Entry No.") { }
+        key(Key6; "PSP Reference", PSP, Reconciled, Reversed) { }
     }
 
     internal procedure CheckSubscrPaymentRequestStatusCanBeChanged()

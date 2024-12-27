@@ -17,6 +17,7 @@ codeunit 6184908 "NPR Adyen Recon. Upgrade"
         UpdateAdyenReconciliationStatus();
         UpdateAdyenReconciliationDocumentProcessingStatus();
         UpdateAdyenReconciliationRelation();
+        UpdateManuallyMatchedLines();
     end;
 
     local procedure UpdatePSPReferenceForEFTTrans()
@@ -176,6 +177,27 @@ codeunit 6184908 "NPR Adyen Recon. Upgrade"
             OldReconRelation.DeleteAll();
         end;
 
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure UpdateManuallyMatchedLines()
+    var
+        RecLine: Record "NPR Adyen Recon. Line";
+    begin
+        UpgradeStep := 'UpdateManuallyMatchedLines';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep)) then
+            exit;
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Adyen Recon. Upgrade', UpgradeStep);
+
+        if RecLine.FindSet(true) then
+            repeat
+                if RecLine.Status = RecLine.Status::"Matched Manually" then begin
+                    RecLine.Status := RecLine.Status::Matched;
+                    RecLine."Matched Manually" := true;
+                    RecLine.Modify();
+                end;
+            until RecLine.Next() = 0;
 
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();

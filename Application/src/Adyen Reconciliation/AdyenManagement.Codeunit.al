@@ -1067,6 +1067,17 @@ codeunit 6184796 "NPR Adyen Management"
         exit(AdyenWebhook.Success);
     end;
 
+    internal procedure ManualMatchingAllowed(RecLine: Record "NPR Adyen Recon. Line"): Boolean
+    begin
+        case RecLine.Status of
+            RecLine.Status::"Failed to Match":
+                exit(true);
+            RecLine.Status::Matched,
+            RecLine.Status::"Failed to Post":
+                exit(RecLine."Matched Manually");
+        end;
+    end;
+
     [TryFunction]
     local procedure RecordWebhookData(JsonRequest: JsonObject; var AdyenWebhook: Record "NPR Adyen Webhook")
     var

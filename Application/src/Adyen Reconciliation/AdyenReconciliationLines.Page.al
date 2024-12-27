@@ -5,7 +5,6 @@ page 6184503 "NPR Adyen Reconciliation Lines"
     UsageCategory = None;
     Caption = 'NP Pay Reconciliation Lines';
     SourceTable = "NPR Adyen Recon. Line";
-    SourceTableView = sorting(Status) order(ascending);
     AutoSplitKey = true;
     DelayedInsert = true;
     LinksAllowed = false;
@@ -82,14 +81,16 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Transaction Matching Table.';
                     StyleExpr = _StyleExprTxt;
-                    Editable = (Rec.Status = Rec.Status::"Failed to Match") or (Rec.Status = Rec.Status::"Matched Manually");
+                    Editable = (Rec.Status = Rec.Status::"Failed to Match") or
+                        (((Rec.Status = Rec.Status::Matched) or (Rec.Status = Rec.Status::"Failed to Post")) and Rec."Matched Manually");
                 }
                 field("Matching Entry No."; Rec."Matching Entry System ID")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Transaction Entry System ID';
                     StyleExpr = _StyleExprTxt;
-                    Editable = (Rec.Status = Rec.Status::"Failed to Match") or (Rec.Status = Rec.Status::"Matched Manually");
+                    Editable = (Rec.Status = Rec.Status::"Failed to Match") or
+                        (((Rec.Status = Rec.Status::Matched) or (Rec.Status = Rec.Status::"Failed to Post")) and Rec."Matched Manually");
                     AssistEdit = true;
                     Lookup = false;
 
@@ -99,63 +100,125 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                         EFTTransaction: Record "NPR EFT Transaction Request";
                         MagentoPaymentLine: Record "NPR Magento Payment Line";
                         MagentoPaymentLines: Page "NPR Magento Payment Line List";
-                        GLEntry: Record "G/L Entry";
-                        GLEntries: Page "General Ledger Entries";
+                        SubscrPaymentRequests: Page "NPR MM Subscr.Payment Requests";
+                        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+                        PaymentGateway: Record "NPR Magento Payment Gateway";
+                        AdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integrat.";
+                        AdyenLocalIntegration: Codeunit "NPR EFT Adyen Local Integrat.";
+                        AdyenTransMatching: Codeunit "NPR Adyen Trans. Matching";
+                        FilterPGCodes: Text;
                     begin
                         case Rec."Matching Table Name" of
                             Rec."Matching Table Name"::"EFT Transaction":
                                 begin
-                                    EFTTransaction.FilterGroup(2);
-                                    EFTTransaction.SetRange(Reconciled, false);
-                                    EFTTransaction.FilterGroup(0);
-                                    EFTTransactions.SetTableView(EFTTransaction);
-                                    EFTTransactions.SetRecord(EFTTransaction);
-                                    if (Rec.Status = Rec.Status::"Failed to Match") or (Rec.Status = Rec.Status::"Matched Manually") then begin
+                                    if _AdyenManagement.ManualMatchingAllowed(Rec) then begin
+                                        EFTTransaction.FilterGroup(2);
+                                        EFTTransaction.SetFilter("Integration Type", '%1|%2', AdyenCloudIntegration.IntegrationType(), AdyenLocalIntegration.IntegrationType());
+                                        if not (Rec."Transaction Type" in
+                                            [Rec."Transaction Type"::Chargeback,
+                                            Rec."Transaction Type"::SecondChargeback,
+                                            Rec."Transaction Type"::RefundedReversed,
+                                            Rec."Transaction Type"::ChargebackReversed,
+                                            Rec."Transaction Type"::ChargebackReversedExternallyWithInfo])
+                                        then
+                                            EFTTransaction.SetRange(Reconciled, false)
+                                        else
+                                            EFTTransaction.SetRange(Reversed, false);
+                                        EFTTransaction.FilterGroup(0);
+                                        EFTTransactions.SetTableView(EFTTransaction);
+                                        if not IsNullGuid(Rec."Matching Entry System ID") then
+                                            if EFTTransaction.GetBySystemId(Rec."Matching Entry System ID") then
+                                                if EFTTransaction.Find('=><') then
+                                                    EFTTransactions.SetRecord(EFTTransaction);
                                         EFTTransactions.LookupMode := true;
                                         if EFTTransactions.RunModal() = Action::LookupOK then begin
-                                            Rec.Status := Rec.Status::"Matched Manually";
-                                            EFTTransactions.SetSelectionFilter(EFTTransaction);
-                                            if EFTTransaction.FindFirst() then
+                                            EFTTransactions.GetRecord(EFTTransaction);
+                                            if AdyenTransMatching.EFTMatchingAllowed(EFTTransaction, Rec, false) then begin
                                                 Rec."Matching Entry System ID" := EFTTransaction.SystemId;
-                                            Rec.Modify();
+                                                Rec.Status := Rec.Status::Matched;
+                                                Rec."Matched Manually" := true;
+                                                Rec.Modify();
+                                            end;
                                         end;
                                     end else
                                         EFTTransactions.RunModal();
-
                                 end;
                             Rec."Matching Table Name"::"Magento Payment Line":
                                 begin
-                                    MagentoPaymentLine.FilterGroup(2);
-                                    MagentoPaymentLine.SetRange(Reconciled, false);
-                                    MagentoPaymentLine.FilterGroup(0);
-                                    MagentoPaymentLines.SetTableView(MagentoPaymentLine);
-                                    MagentoPaymentLines.SetRecord(MagentoPaymentLine);
-                                    if (Rec.Status = Rec.Status::"Failed to Match") or (Rec.Status = Rec.Status::"Matched Manually") then begin
+                                    if _AdyenManagement.ManualMatchingAllowed(Rec) then begin
+                                        PaymentGateway.Reset();
+                                        PaymentGateway.SetRange("Integration Type", Enum::"NPR PG Integrations"::Adyen);
+                                        PaymentGateway.FindSet();
+                                        repeat
+                                            FilterPGCodes += PaymentGateway.Code + '|';
+                                        until PaymentGateway.Next() = 0;
+                                        if StrLen(FilterPGCodes) > 0 then
+                                            FilterPGCodes := FilterPGCodes.TrimEnd('|');
+
+                                        MagentoPaymentLine.FilterGroup(2);
+                                        MagentoPaymentLine.SetFilter("Payment Gateway Code", FilterPGCodes);
+                                        if not (Rec."Transaction Type" in
+                                            [Rec."Transaction Type"::Chargeback,
+                                            Rec."Transaction Type"::SecondChargeback,
+                                            Rec."Transaction Type"::RefundedReversed,
+                                            Rec."Transaction Type"::ChargebackReversed,
+                                            Rec."Transaction Type"::ChargebackReversedExternallyWithInfo])
+                                        then
+                                            MagentoPaymentLine.SetRange(Reconciled, false)
+                                        else
+                                            MagentoPaymentLine.SetRange(Reversed, false);
+                                        MagentoPaymentLine.FilterGroup(0);
+                                        MagentoPaymentLines.SetTableView(MagentoPaymentLine);
+                                        if not IsNullGuid(Rec."Matching Entry System ID") then
+                                            if MagentoPaymentLine.GetBySystemId(Rec."Matching Entry System ID") then
+                                                if MagentoPaymentLine.Find('=><') then
+                                                    MagentoPaymentLines.SetRecord(MagentoPaymentLine);
                                         MagentoPaymentLines.LookupMode := true;
                                         if MagentoPaymentLines.RunModal() = Action::LookupOK then begin
-                                            Rec.Status := Rec.Status::"Matched Manually";
-                                            MagentoPaymentLine.Reset();
-                                            MagentoPaymentLines.SetSelectionFilter(MagentoPaymentLine);
-                                            if MagentoPaymentLine.FindFirst() then
+                                            MagentoPaymentLines.GetRecord(MagentoPaymentLine);
+                                            if AdyenTransMatching.MagentoMatchingAllowed(MagentoPaymentLine, Rec, false) then begin
                                                 Rec."Matching Entry System ID" := MagentoPaymentLine.SystemId;
-                                            Rec.Modify();
+                                                Rec.Status := Rec.Status::Matched;
+                                                Rec."Matched Manually" := true;
+                                                Rec.Modify();
+                                            end;
                                         end;
                                     end else
                                         MagentoPaymentLines.RunModal();
                                 end;
-                            Rec."Matching Table Name"::"G/L Entry":
+                            Rec."Matching Table Name"::"Subscription Payment":
                                 begin
-                                    if (Rec.Status = Rec.Status::"Failed to Match") or (Rec.Status = Rec.Status::"Matched Manually") then begin
-                                        GLEntries.LookupMode := true;
-                                        if GLEntries.RunModal() = Action::LookupOK then begin
-                                            Rec.Status := Rec.Status::"Matched Manually";
-                                            GLEntries.SetSelectionFilter(GLEntry);
-                                            if GLEntry.FindFirst() then
-                                                Rec."Matching Entry System ID" := GLEntry.SystemId;
-                                            Rec.Modify();
+                                    if _AdyenManagement.ManualMatchingAllowed(Rec) then begin
+                                        SubscrPaymentRequest.FilterGroup(2);
+                                        SubscrPaymentRequest.SetRange(PSP, Enum::"NPR MM Subscription PSP"::Adyen);
+                                        if not (Rec."Transaction Type" in
+                                            [Rec."Transaction Type"::Chargeback,
+                                            Rec."Transaction Type"::SecondChargeback,
+                                            Rec."Transaction Type"::RefundedReversed,
+                                            Rec."Transaction Type"::ChargebackReversed,
+                                            Rec."Transaction Type"::ChargebackReversedExternallyWithInfo])
+                                        then
+                                            SubscrPaymentRequest.SetRange(Reconciled, false)
+                                        else
+                                            SubscrPaymentRequest.SetRange(Reversed, false);
+                                        SubscrPaymentRequest.FilterGroup(0);
+                                        SubscrPaymentRequests.SetTableView(SubscrPaymentRequest);
+                                        if not IsNullGuid(Rec."Matching Entry System ID") then
+                                            if SubscrPaymentRequest.GetBySystemId(Rec."Matching Entry System ID") then
+                                                if SubscrPaymentRequest.Find('=><') then
+                                                    SubscrPaymentRequests.SetRecord(SubscrPaymentRequest);
+                                        SubscrPaymentRequests.LookupMode := true;
+                                        if SubscrPaymentRequests.RunModal() = Action::LookupOK then begin
+                                            SubscrPaymentRequests.GetRecord(SubscrPaymentRequest);
+                                            if AdyenTransMatching.SubscriptionMatchingAllowed(SubscrPaymentRequest, Rec, false) then begin
+                                                Rec."Matching Entry System ID" := SubscrPaymentRequest.SystemId;
+                                                Rec.Status := Rec.Status::Matched;
+                                                Rec."Matched Manually" := true;
+                                                Rec.Modify();
+                                            end;
                                         end;
                                     end else
-                                        GLEntries.RunModal();
+                                        SubscrPaymentRequests.RunModal();
                                 end;
                         end;
                     end;
@@ -268,6 +331,7 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                 trigger OnAction()
                 var
                     EFTTransaction: Record "NPR EFT Transaction Request";
+                    SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
                     MagentoPaymentLine: Record "NPR Magento Payment Line";
                     GLEntry: Record "G/L Entry";
                 begin
@@ -293,6 +357,13 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                                     MagentoPaymentLine.SetRange(SystemId, Rec."Matching Entry System ID");
                                     MagentoPaymentLine.FilterGroup(0);
                                     Page.Run(Page::"NPR Magento Payment Line List", MagentoPaymentLine);
+                                end;
+                            Rec."Matching Table Name"::"Subscription Payment":
+                                begin
+                                    SubscrPaymentRequest.FilterGroup(2);
+                                    SubscrPaymentRequest.SetRange(SystemId, Rec."Matching Entry System ID");
+                                    SubscrPaymentRequest.FilterGroup(0);
+                                    Page.Run(Page::"NPR MM Subscr.Payment Requests", SubscrPaymentRequest);
                                 end;
                         end;
                     end;
