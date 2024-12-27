@@ -201,6 +201,23 @@ page 6151213 "NPR CRO POS Aud. Log Aux. Info"
                     end;
                 end;
             }
+            action(PrintA4Report)
+            {
+                ApplicationArea = NPRCROFiscal;
+                Caption = 'Print A4 Fiscal';
+                Image = PrintVoucher;
+                Promoted = true;
+                PromotedCategory = Category5;
+                PromotedOnly = true;
+                ToolTip = 'Executing this action the receipt will be printed in A4 format';
+                trigger OnAction()
+                var
+                    CROFiscalBillA4: Report "NPR CRO Fiscal Bill A4";
+                begin
+                    CROFiscalBillA4.SetFilters(Rec."Audit Entry Type", Rec."Audit Entry No.", Rec."Source Document No.");
+                    CROFiscalBillA4.RunModal();
+                end;
+            }
         }
     }
 }
