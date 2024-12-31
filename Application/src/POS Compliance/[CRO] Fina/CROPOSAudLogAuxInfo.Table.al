@@ -144,6 +144,18 @@ table 6060059 "NPR CRO POS Aud. Log Aux. Info"
             Caption = 'Payment Method';
             DataClassification = CustomerContent;
         }
+        field(23; "Email-To"; Text[250])
+        {
+            Caption = 'Email-To';
+            DataClassification = CustomerContent;
+        }
+        field(24; "Fiscal Bill E-Mails"; Boolean)
+        {
+            CalcFormula = exist("NPR CRO Fiscal E-Mail Log" where("Audit Entry Type" = field("Audit Entry Type"), "Audit Entry No." = field("Audit Entry No."), Successful = const(true)));
+            Caption = 'Fiscal Bill E-Mails';
+            Editable = false;
+            FieldClass = FlowField;
+        }
     }
 
     keys

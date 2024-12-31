@@ -88,6 +88,17 @@ page 6151214 "NPR CRO Fiscalization Setup"
                 }
             }
 
+            group(Mailing)
+            {
+                Caption = 'E-Mailing Setup';
+
+                field("E-Mail Subject"; Rec."E-Mail Subject")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the E-mail subject that will be sent with fiscal bill e-mails.';
+                }
+            }
+
             group("Customer Ledger Entry Posting Setup")
             {
                 Caption = 'Customer Ledger Entry Posting Setup';
