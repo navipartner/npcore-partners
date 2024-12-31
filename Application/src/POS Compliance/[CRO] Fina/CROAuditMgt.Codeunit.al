@@ -368,6 +368,8 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         CROAuxSalespPurch.TestField("NPR CRO Salesperson OIB");
         CROPOSAuditLogAuxInfo."Cashier ID" := CROAuxSalespPurch."NPR CRO Salesperson OIB";
 
+        SaveCustomerDataToAuditLog(CROPOSAuditLogAuxInfo, POSEntry."Customer No.");
+
         CheckPaymentMethod(POSEntry, CROPOSAuditLogAuxInfo);
 
         CROPOSAuditLogAuxInfo.Insert(true);
@@ -403,6 +405,8 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         SalespersonPurchaser.Get(SalesInvoiceHeader."Salesperson Code");
         CROAuxSalespPurch.ReadCROAuxSalespersonFields(SalespersonPurchaser);
         CROPOSAuditLogAuxInfo."Cashier ID" := CROAuxSalespPurch."NPR CRO Salesperson OIB";
+
+        SaveCustomerDataToAuditLog(CROPOSAuditLogAuxInfo, SalesInvoiceHeader."Sell-to Customer No.");
 
         CROPaymentMethodMapping.Get(SalesInvoiceHeader."Payment Method Code");
         CROPOSAuditLogAuxInfo.Validate("Payment Method Code", CROPaymentMethodMapping."Payment Method Code");
@@ -444,6 +448,8 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         SalespersonPurchaser.Get(SalesCrMemoHeader."Salesperson Code");
         CROAuxSalespPurch.ReadCROAuxSalespersonFields(SalespersonPurchaser);
         CROPOSAuditLogAuxInfo."Cashier ID" := CROAuxSalespPurch."NPR CRO Salesperson OIB";
+
+        SaveCustomerDataToAuditLog(CROPOSAuditLogAuxInfo, SalesCrMemoHeader."Sell-to Customer No.");
 
         CROPaymentMethodMapping.Get(SalesCrMemoHeader."Payment Method Code");
         CROPOSAuditLogAuxInfo.Validate("Payment Method Code", CROPaymentMethodMapping."Payment Method Code");
@@ -557,6 +563,17 @@ codeunit 6151547 "NPR CRO Audit Mgt."
 
         CROPOSAuditLogAuxInfo."Paragon Number" := CROPOSSale."CRO Paragon Number";
         CROPOSAuditLogAuxInfo.Modify();
+    end;
+
+    local procedure SaveCustomerDataToAuditLog(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; CustomerNo: Code[20])
+    var
+        Customer: Record Customer;
+    begin
+        if CustomerNo = '' then
+            exit;
+        if not Customer.Get(CustomerNo) then
+            exit;
+        CROPOSAuditLogAuxInfo."Email-To" := Customer."E-Mail";
     end;
 
     local procedure FiscalizeSalesInvoice(SalesInvHdrNo: Code[20])

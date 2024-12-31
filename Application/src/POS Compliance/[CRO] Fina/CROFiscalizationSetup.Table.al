@@ -55,6 +55,11 @@ table 6060058 "NPR CRO Fiscalization Setup"
             Caption = 'Auto Print Receipt On Sales Document';
             DataClassification = CustomerContent;
         }
+        field(22; "E-Mail Subject"; Text[250])
+        {
+            Caption = 'E-Mail Subject';
+            DataClassification = CustomerContent;
+        }
         field(30; "Enable POS Entry CLE Posting"; Boolean)
         {
             Caption = 'Enable POS Entry Cust. Ledg. Entry Posting';

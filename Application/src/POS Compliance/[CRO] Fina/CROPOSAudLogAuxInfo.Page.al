@@ -218,6 +218,52 @@ page 6151213 "NPR CRO POS Aud. Log Aux. Info"
                     CROFiscalBillA4.RunModal();
                 end;
             }
+            action("Send To Document E-mail")
+            {
+                ApplicationArea = NPRCROFiscal;
+                Caption = 'Send To Document E-mail';
+                Image = SendElectronicDocument;
+                Promoted = true;
+                PromotedCategory = Category5;
+                PromotedOnly = true;
+                ToolTip = 'Executes the Send With Document E-mail action.';
+
+                trigger OnAction()
+                var
+                    FiscalEMailMgt: Codeunit "NPR CRO Fiscal E-Mail Mgt.";
+                begin
+                    FiscalEMailMgt.Run(Rec);
+                end;
+            }
+            action("Send To Custom E-mail")
+            {
+                ApplicationArea = NPRCROFiscal;
+                Caption = 'Send To Custom E-mail';
+                Image = SendElectronicDocument;
+                Promoted = true;
+                PromotedCategory = Category5;
+                PromotedOnly = true;
+                ToolTip = 'Executes the Send To Custom E-mail action.';
+
+                trigger OnAction()
+                var
+                    MailManagement: Codeunit "Mail Management";
+                    FiscalEMailMgt: Codeunit "NPR CRO Fiscal E-Mail Mgt.";
+                    EmailUserSpecifiedAddress: Page "Email User-Specified Address";
+                    EmailRecipient: Text;
+                    EmailAddressNotValidErrLbl: Label 'E-Mail address is not in the valid format.';
+                begin
+                    if EmailUserSpecifiedAddress.RunModal() <> Action::OK then
+                        exit;
+
+                    EmailRecipient := EmailUserSpecifiedAddress.GetEmailAddress();
+
+                    if not MailManagement.CheckValidEmailAddress(EmailRecipient) then
+                        Error(EmailAddressNotValidErrLbl);
+
+                    FiscalEMailMgt.SendFiscalBillViaEmail(Rec, EmailRecipient);
+                end;
+            }
         }
     }
 }
