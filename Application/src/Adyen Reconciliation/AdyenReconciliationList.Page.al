@@ -115,7 +115,7 @@ page 6184534 "NPR Adyen Reconciliation List"
             exit('Unfavorable');
 
         if (Rec.Status = Rec.Status::Posted) or
-           (not _AdyenSetup."Enable Automatic Posting" and ((Rec.Status = Rec.Status::Matched)))
+           (not _AdyenSetup."Enable Automatic Posting" and ((Rec.Status = Rec.Status::Reconciled)))
         then
             exit('Favorable');
 

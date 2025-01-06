@@ -136,17 +136,27 @@ table 6150788 "NPR Adyen Reconciliation Hdr"
     trigger OnDelete()
     var
         AdyenManagement: Codeunit "NPR Adyen Management";
-        DocumentIsPostedLbl: Label 'The document %1 cannot be deleted because it is already posted.';
+        DocumentIsPostedLbl: Label 'Document %1 cannot be deleted because it has already been posted.';
+        DocumentIsReconciledLbl: Label 'Document %1 cannot be deleted because it has already been reconciled.';
         DocumentIsPartiallyPostedLbl: Label 'The document %1 cannot be deleted because it is partially posted.\\You can try to "Recreate" the current document. The posted lines will remain intact.';
+        DocumentIsPartiallyReconciledLbl: Label 'The document %1 cannot be deleted because it is partially reconciled.\\You can try to "Recreate" the current document. The posted lines will remain intact.';
         RecLine: Record "NPR Adyen Recon. Line";
     begin
-        if Rec.Status = Rec.Status::Posted then
-            Error(DocumentIsPostedLbl, Rec."Document No.");
+        case Rec.Status of
+            Rec.Status::Posted:
+                Error(DocumentIsPostedLbl, Rec."Document No.");
+            Rec.Status::Reconciled:
+                Error(DocumentIsReconciledLbl, Rec."Document No.");
+        end;
+
         RecLine.Reset();
         RecLine.SetRange("Document No.", Rec."Document No.");
         RecLine.SetRange(Status, RecLine.Status::Posted);
         if not RecLine.IsEmpty() then
             Error(DocumentIsPartiallyPostedLbl, Rec."Document No.");
+        RecLine.SetRange(Status, RecLine.Status::Reconciled);
+        if not RecLine.IsEmpty() then
+            Error(DocumentIsPartiallyReconciledLbl, Rec."Document No.");
 
         AdyenManagement.DeleteReconciliationLines("Document No.");
     end;

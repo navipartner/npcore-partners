@@ -41,4 +41,12 @@ enum 6014661 "NPR Adyen Rec. Line Status"
     {
         Caption = 'Not to be Matched';
     }
+    value(80; "Not to be Reconciled")
+    {
+        Caption = 'Not to be Reconciled';
+    }
+    value(90; "Failed to Reconcile")
+    {
+        Caption = 'Failed to Reconcile';
+    }
 }

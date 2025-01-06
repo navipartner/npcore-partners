@@ -693,6 +693,134 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
     end;
     #endregion
 
+    #region Reconciling
+    internal procedure ReconcileEntries(var ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"): Boolean;
+    var
+        ReconciliationLine: Record "NPR Adyen Recon. Line";
+        Window: Dialog;
+        ProcessedEntries: Integer;
+        TotalEntries: Integer;
+        UnReconciledEntries: Integer;
+        ReconcileAllowed: Boolean;
+        ReconcilingEntriesLbl: Label 'Attempting to Reconcile Entries...\\Reconciling entry #1 of #2.';
+        ReconcilingIsNotPossibleLbl: Label 'Reconciling is not possible while Posting is enabled. Please either proceed with Posting or disable it in NP Pay Setup.';
+    begin
+        if CheckPostedOrReconciled(ReconciliationLine, ReconciliationHeader, Enum::"NPR Adyen Rec. Line Status"::Reconciled) then
+            exit(true);
+
+        if not LinesToProcessExist(ReconciliationLine, ReconciliationHeader, Enum::"NPR Adyen Rec. Line Status"::Reconciled) then
+            exit;
+
+        _AdyenSetup.GetRecordOnce();
+        if _AdyenSetup."Enable Automatic Posting" then begin
+            _AdyenManagement.CreateReconciliationLog(_LogType::"Reconcile Transactions", false, ReconcilingIsNotPossibleLbl, ReconciliationHeader."Webhook Request ID");
+            exit;
+        end;
+
+        if GuiAllowed() then begin
+            Clear(ProcessedEntries);
+            TotalEntries := ReconciliationLine.Count();
+            Window.Open(ReconcilingEntriesLbl);
+            Window.Update(2, TotalEntries);
+        end;
+
+        ReconciliationLine.SetFilter(Status, '<>%1&<>%2&<>%3&<>%4', ReconciliationLine.Status::Reconciled, ReconciliationLine.Status::"Not to be Reconciled", ReconciliationLine.Status::Posted, ReconciliationLine.Status::"Not to be Posted");
+        ReconciliationLine.FindSet();
+        repeat
+            ReconcileAllowed := true;
+            if ReconciliationLine."Matching Table Name" in [ReconciliationLine."Matching Table Name"::"EFT Transaction", ReconciliationLine."Matching Table Name"::"Magento Payment Line", ReconciliationLine."Matching Table Name"::"Subscription Payment"] then
+                ReconcileAllowed := PostingOrReconcilingAllowed(ReconciliationLine, Enum::"NPR Adyen Rec. Line Status"::Reconciled);
+
+            if ReconcileAllowed then begin
+                case ReconciliationLine."Matching Table Name" of
+                    ReconciliationLine."Matching Table Name"::"EFT Transaction",
+                    ReconciliationLine."Matching Table Name"::"Magento Payment Line",
+                    ReconciliationLine."Matching Table Name"::"Subscription Payment":
+                        UnReconciledEntries += TryReconcilingPayment(ReconciliationLine, ReconciliationHeader);
+                    ReconciliationLine."Matching Table Name"::"G/L Entry":
+                        ReconcileAdjustments(ReconciliationLine);
+                    ReconciliationLine."Matching Table Name"::"To Be Determined":
+                        UnReconciledEntries += 1;
+                end;
+            end else
+                UnReconciledEntries += 1;
+
+            ReconciliationLine.Modify();
+            Commit();
+
+            if GuiAllowed() then begin
+                ProcessedEntries += 1;
+                Window.Update(1, ProcessedEntries);
+            end;
+        until ReconciliationLine.Next() = 0;
+
+        if GuiAllowed() then
+            Window.Close();
+
+        if UnReconciledEntries > 0 then
+            _AdyenManagement.CreateReconciliationLog(_LogType::"Reconcile Transactions", false, StrSubstNo(ReconcileTransactionsError02, Format(UnReconciledEntries), ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID")
+        else begin
+            _AdyenManagement.CreateReconciliationLog(_LogType::"Reconcile Transactions", true, StrSubstNo(ReconcileTransactionsSuccess01, ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID");
+            ReconciliationHeader.Status := ReconciliationHeader.Status::Reconciled;
+        end;
+        ReconciliationHeader."Failed Lines Exist" := UnReconciledEntries > 0;
+        ReconciliationHeader.Modify();
+        exit(not ReconciliationHeader."Failed Lines Exist");
+    end;
+
+    local procedure TryReconcilingPayment(var ReconciliationLine: Record "NPR Adyen Recon. Line"; ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr") UnReconciledEntries: Integer
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+    begin
+        if not (ReconciliationLine.Status in [ReconciliationLine.Status::Matched, ReconciliationLine.Status::"Not to be Matched", ReconciliationLine.Status::"Failed to Reconcile", ReconciliationLine.Status::"Failed to Post"]) then begin
+            _AdyenManagement.CreateReconciliationLog(_LogType::"Reconcile Transactions", false, StrSubstNo(TransactionNotMatchedLbl, Format(ReconciliationLine."PSP Reference")), ReconciliationHeader."Webhook Request ID");
+            UnReconciledEntries += 1;
+            exit;
+        end;
+
+        case ReconciliationLine."Matching Table Name" of
+            ReconciliationLine."Matching Table Name"::"EFT Transaction":
+                begin
+                    if EFTTransactionRequest.GetBySystemId(ReconciliationLine."Matching Entry System ID") then begin
+                        EFTTransactionRequest.Reconciled := true;
+                        EFTTransactionRequest."Reconciliation Date" := Today();
+                        EFTTransactionRequest.Modify();
+                        ReconciliationLine.Status := ReconciliationLine.Status::Reconciled;
+                        exit;
+                    end;
+                end;
+            ReconciliationLine."Matching Table Name"::"Magento Payment Line":
+                begin
+                    if MagentoPaymentLine.GetBySystemId(ReconciliationLine."Matching Entry System ID") then begin
+                        MagentoPaymentLine.Reconciled := true;
+                        MagentoPaymentLine."Reconciliation Date" := Today();
+                        MagentoPaymentLine.Modify();
+                        ReconciliationLine.Status := ReconciliationLine.Status::Reconciled;
+                        exit;
+                    end;
+                end;
+            ReconciliationLine."Matching Table Name"::"Subscription Payment":
+                begin
+                    if SubscrPaymentRequest.GetBySystemId(ReconciliationLine."Matching Entry System ID") then begin
+                        SubscrPaymentRequest.Reconciled := true;
+                        SubscrPaymentRequest."Reconciliation Date" := Today();
+                        SubscrPaymentRequest.Modify();
+                        ReconciliationLine.Status := ReconciliationLine.Status::Reconciled;
+                        exit;
+                    end;
+                end;
+        end;
+        UnReconciledEntries += 1;
+    end;
+
+    local procedure ReconcileAdjustments(var ReconciliationLine: Record "NPR Adyen Recon. Line")
+    begin
+        ReconciliationLine.Status := ReconciliationLine.Status::"Not to be Reconciled";
+    end;
+    #endregion
+
     #region Posting
     internal procedure PostEntries(var ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr") Success: Boolean;
     var
@@ -705,22 +833,11 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         PostingDateIsNotAllowedLbl: Label 'The transaction date of line %1 cannot be earlier than the specified ''%2'' in the NP Pay Setup.', Comment = '%1 - Reconciliation line number, %2 - "Reconciliation Posting Starting Date" from the NP Pay Setup page';
         PostAllowed: Boolean;
     begin
-        ReconciliationLine.Reset();
-        ReconciliationLine.SetRange("Document No.", ReconciliationHeader."Document No.");
-        ReconciliationLine.SetFilter(Status, '<>%1', ReconciliationLine."Status"::Posted);
-        if ReconciliationLine.IsEmpty() then begin
-            _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", true, StrSubstNo(PostTransactionsSuccess01, ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID");
-            ReconciliationHeader.Status := ReconciliationHeader.Status::Posted;
-            ReconciliationHeader."Failed Lines Exist" := false;
-            ReconciliationHeader.Modify();
+        if CheckPostedOrReconciled(ReconciliationLine, ReconciliationHeader, Enum::"NPR Adyen Rec. Line Status"::Posted) then
             exit(true);
-        end;
 
-        ReconciliationLine.SetFilter(Status, '%1|%2|%3', ReconciliationLine.Status::Matched, ReconciliationLine.Status::"Not to be Matched", ReconciliationLine.Status::"Failed to Post");
-        if ReconciliationLine.IsEmpty() then begin
-            _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(PostTransactionsError01, ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID");
-            exit(false);
-        end;
+        if not LinesToProcessExist(ReconciliationLine, ReconciliationHeader, Enum::"NPR Adyen Rec. Line Status"::Posted) then
+            exit;
 
         if GuiAllowed() then begin
             Clear(ProcessedEntries);
@@ -730,13 +847,13 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         end;
 
         _AdyenSetup.GetRecordOnce();
-        ReconciliationLine.SetFilter(Status, '<>%1', ReconciliationLine.Status::Posted);
+        ReconciliationLine.SetFilter(Status, '<>%1&<>%2', ReconciliationLine.Status::Posted, ReconciliationLine.Status::"Not to be Posted");
         ReconciliationLine.SetAutoCalcFields("Transaction Posted", "Markup Posted", "Commissions Posted", "Realized Gains Posted", "Realized Losses Posted");
         ReconciliationLine.FindSet();
         repeat
             PostAllowed := true;
             if ReconciliationLine."Matching Table Name" in [ReconciliationLine."Matching Table Name"::"EFT Transaction", ReconciliationLine."Matching Table Name"::"Magento Payment Line", ReconciliationLine."Matching Table Name"::"Subscription Payment"] then
-                PostAllowed := PostingAllowed(ReconciliationLine);
+                PostAllowed := PostingOrReconcilingAllowed(ReconciliationLine, Enum::"NPR Adyen Rec. Line Status"::Posted);
             if _AdyenSetup."Recon. Posting Starting Date" > 0DT then
                 if ReconciliationLine."Transaction Date" < _AdyenSetup."Recon. Posting Starting Date" then begin
                     _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(PostingDateIsNotAllowedLbl, Format(ReconciliationLine."Line No."), _AdyenSetup.FieldCaption("Recon. Posting Starting Date")), ReconciliationHeader."Webhook Request ID");
@@ -815,8 +932,8 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                 end;
         end;
 
-        if not (ReconciliationLine.Status in [ReconciliationLine.Status::Matched, ReconciliationLine.Status::"Not to be Matched", ReconciliationLine.Status::"Failed to Post"]) then begin
-            _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(PostTransactionsError04, Format(ReconciliationLine."PSP Reference")), ReconciliationHeader."Webhook Request ID");
+        if not (ReconciliationLine.Status in [ReconciliationLine.Status::Matched, ReconciliationLine.Status::"Not to be Matched", ReconciliationLine.Status::Reconciled, ReconciliationLine.Status::"Not to be Reconciled", ReconciliationLine.Status::"Failed to Post"]) then begin
+            _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(TransactionNotMatchedLbl, Format(ReconciliationLine."PSP Reference")), ReconciliationHeader."Webhook Request ID");
             UnPostedEntries += 1;
             exit;
         end;
@@ -879,10 +996,6 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         GLAccountType: Enum "NPR Adyen Posting GL Accounts";
         RecordsOK: Boolean;
     begin
-        if not IsNullGuid(ReconciliationLine."Matching Entry System ID") then begin
-            ReconciliationLine.Status := ReconciliationLine.Status::Posted;
-            exit(UnPostedEntries);
-        end;
         RecordsOK := false;
         case ReconciliationLine."Transaction Type" of
             ReconciliationLine."Transaction Type"::Fee:
@@ -937,7 +1050,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         Commit();
     end;
 
-    local procedure PostingAllowed(var ReconciliationLine: Record "NPR Adyen Recon. Line"): Boolean
+    local procedure PostingOrReconcilingAllowed(var ReconciliationLine: Record "NPR Adyen Recon. Line"; AdyenRecLineStatus: Enum "NPR Adyen Rec. Line Status"): Boolean
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         MagentoPaymentLine: Record "NPR Magento Payment Line";
@@ -959,7 +1072,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                     _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(PostingNotAllowedLbl, ReconciliationLine."Line No."), ReconciliationLine."Webhook Request ID");
 
                 ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Post";
-                exit(false);
+                exit;
             end;
         end;
 
@@ -967,45 +1080,91 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             ReconciliationLine."Matching Table Name"::"EFT Transaction":
                 begin
                     if not EFTTransactionRequest.GetBySystemId(ReconciliationLine."Matching Entry System ID") then begin
-                        _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(EFTTransactionRequestDoesNotExistLbl, ReconciliationLine."Matching Entry System ID"), ReconciliationLine."Webhook Request ID");
-                        ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Post";
-                        exit(false);
+                        case AdyenRecLineStatus of
+                            AdyenRecLineStatus::Posted:
+                                begin
+                                    _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(EFTTransactionRequestDoesNotExistLbl, ReconciliationLine."Matching Entry System ID"), ReconciliationLine."Webhook Request ID");
+                                    ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Post";
+                                end;
+                            AdyenRecLineStatus::Reconciled:
+                                begin
+                                    _AdyenManagement.CreateReconciliationLog(_LogType::"Reconcile Transactions", false, StrSubstNo(EFTTransactionRequestDoesNotExistLbl, ReconciliationLine."Matching Entry System ID"), ReconciliationLine."Webhook Request ID");
+                                    ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Reconcile";
+                                end;
+                        end;
+                        exit;
                     end;
 
                     /* Unknown use  //TODO (confirm with Tim)
                     if ((EFTTransactionRequest.Finished = 0DT) or (not EFTTransactionRequest."External Result Known")) and (EFTTransactionRequest."Amount Input" <> 0) then begin
                         _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(SaleNotFinishedLbl, EFTTransactionRequest."Sales Ticket No."), ReconciliationLine."Webhook Request ID");
                         ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Post";
-                        exit(false);
+                        exit;
                     end;
                     */
 
                     if EFTTransactionRequest."Result Amount" <> 0 then begin
                         EFTTransactionRequest.CalcFields("FF Moved to POS Entry");
                         if not EFTTransactionRequest."FF Moved to POS Entry" then begin
-                            if SavedPOSSale.GetBySystemId(EFTTransactionRequest."Sales ID") then
-                                _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(ParkedSaleLbl, Format(EFTTransactionRequest."Sales Ticket No.")), ReconciliationLine."Webhook Request ID")
-                            else
-                                _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(SaleNotFinishedLbl, Format(EFTTransactionRequest."Sales Ticket No.")), ReconciliationLine."Webhook Request ID");
-                            ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Post";
-                            exit(false);
+                            if SavedPOSSale.GetBySystemId(EFTTransactionRequest."Sales ID") then begin
+                                case AdyenRecLineStatus of
+                                    AdyenRecLineStatus::Posted:
+                                        _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(ParkedSaleLbl, Format(EFTTransactionRequest."Sales Ticket No.")), ReconciliationLine."Webhook Request ID");
+                                    AdyenRecLineStatus::Reconciled:
+                                        _AdyenManagement.CreateReconciliationLog(_LogType::"Reconcile Transactions", false, StrSubstNo(ParkedSaleLbl, Format(EFTTransactionRequest."Sales Ticket No.")), ReconciliationLine."Webhook Request ID");
+                                end;
+                            end else begin
+                                case AdyenRecLineStatus of
+                                    AdyenRecLineStatus::Posted:
+                                        _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(SaleNotFinishedLbl, Format(EFTTransactionRequest."Sales Ticket No.")), ReconciliationLine."Webhook Request ID");
+                                    AdyenRecLineStatus::Reconciled:
+                                        _AdyenManagement.CreateReconciliationLog(_LogType::"Reconcile Transactions", false, StrSubstNo(SaleNotFinishedLbl, Format(EFTTransactionRequest."Sales Ticket No.")), ReconciliationLine."Webhook Request ID");
+                                end;
+                            end;
+                            case AdyenRecLineStatus of
+                                AdyenRecLineStatus::Posted:
+                                    ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Post";
+                                AdyenRecLineStatus::Reconciled:
+                                    ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Reconcile";
+                            end;
+                            exit;
                         end;
                     end;
                 end;
             ReconciliationLine."Matching Table Name"::"Magento Payment Line":
                 begin
                     if not MagentoPaymentLine.GetBySystemId(ReconciliationLine."Matching Entry System ID") then begin
-                        _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(MagentoPaymentLineDoesNotExistLbl, ReconciliationLine."Matching Entry System ID"), ReconciliationLine."Webhook Request ID");
-                        ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Post";
-                        exit(false);
+                        case AdyenRecLineStatus of
+                            AdyenRecLineStatus::Posted:
+                                begin
+                                    _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(MagentoPaymentLineDoesNotExistLbl, ReconciliationLine."Matching Entry System ID"), ReconciliationLine."Webhook Request ID");
+                                    ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Post";
+                                end;
+                            AdyenRecLineStatus::Reconciled:
+                                begin
+                                    _AdyenManagement.CreateReconciliationLog(_LogType::"Reconcile Transactions", false, StrSubstNo(MagentoPaymentLineDoesNotExistLbl, ReconciliationLine."Matching Entry System ID"), ReconciliationLine."Webhook Request ID");
+                                    ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Reconcile";
+                                end;
+                        end;
+                        exit;
                     end;
                 end;
             ReconciliationLine."Matching Table Name"::"Subscription Payment":
                 begin
                     if not SubscrPaymentRequest.GetBySystemId(ReconciliationLine."Matching Entry System ID") then begin
-                        _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(SubscrPaymentRequestDoesNotExistLbl, ReconciliationLine."Matching Entry System ID"), ReconciliationLine."Webhook Request ID");
-                        ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Post";
-                        exit(false);
+                        case AdyenRecLineStatus of
+                            AdyenRecLineStatus::Posted:
+                                begin
+                                    _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(SubscrPaymentRequestDoesNotExistLbl, ReconciliationLine."Matching Entry System ID"), ReconciliationLine."Webhook Request ID");
+                                    ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Post";
+                                end;
+                            AdyenRecLineStatus::Reconciled:
+                                begin
+                                    _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(SubscrPaymentRequestDoesNotExistLbl, ReconciliationLine."Matching Entry System ID"), ReconciliationLine."Webhook Request ID");
+                                    ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Reconcile";
+                                end;
+                        end;
+                        exit;
                     end;
                 end;
         end;
@@ -1600,6 +1759,58 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         end;
     end;
 
+    local procedure CheckPostedOrReconciled(var ReconciliationLine: Record "NPR Adyen Recon. Line"; var ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"; AdyenRecLineStatus: Enum "NPR Adyen Rec. Line Status"): Boolean
+    begin
+        ReconciliationLine.Reset();
+        ReconciliationLine.SetRange("Document No.", ReconciliationHeader."Document No.");
+        case AdyenRecLineStatus of
+            AdyenRecLineStatus::Posted:
+                begin
+                    ReconciliationLine.SetFilter(Status, '<>%1&<>%2', ReconciliationLine.Status::Posted, ReconciliationLine.Status::"Not to be Posted");
+                    if ReconciliationLine.IsEmpty() then begin
+                        _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", true, StrSubstNo(PostTransactionsSuccess01, ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID");
+                        ReconciliationHeader.Status := ReconciliationHeader.Status::Posted;
+                        ReconciliationHeader."Failed Lines Exist" := false;
+                        ReconciliationHeader.Modify();
+                        exit(true);
+                    end;
+                end;
+            AdyenRecLineStatus::Reconciled:
+                begin
+                    ReconciliationLine.SetFilter(Status, '<>%1&<>%2', ReconciliationLine.Status::Reconciled, ReconciliationLine.Status::"Not to be Reconciled");
+                    if ReconciliationLine.IsEmpty() then begin
+                        _AdyenManagement.CreateReconciliationLog(_LogType::"Reconcile Transactions", true, StrSubstNo(ReconcileTransactionsSuccess01, ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID");
+                        ReconciliationHeader.Status := ReconciliationHeader.Status::Reconciled;
+                        ReconciliationHeader."Failed Lines Exist" := false;
+                        ReconciliationHeader.Modify();
+                        exit(true);
+                    end;
+                end;
+        end;
+    end;
+
+    local procedure LinesToProcessExist(var ReconciliationLine: Record "NPR Adyen Recon. Line"; var ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"; AdyenRecLineStatus: Enum "NPR Adyen Rec. Line Status"): Boolean
+    begin
+        ReconciliationLine.Reset();
+        ReconciliationLine.SetRange("Document No.", ReconciliationHeader."Document No.");
+        case AdyenRecLineStatus of
+            AdyenRecLineStatus::Reconciled:
+                begin
+                    ReconciliationLine.SetFilter(Status, '%1|%2|%3', ReconciliationLine.Status::Matched, ReconciliationLine.Status::"Not to be Matched", ReconciliationLine.Status::"Failed to Reconcile");
+                    if not ReconciliationLine.IsEmpty() then
+                        exit(true);
+                    _AdyenManagement.CreateReconciliationLog(_LogType::"Reconcile Transactions", false, StrSubstNo(ReconcileTransactionsError01, ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID");
+                end;
+            AdyenRecLineStatus::Posted:
+                begin
+                    ReconciliationLine.SetFilter(Status, '%1|%2|%3|%4|%5|%6', ReconciliationLine.Status::Matched, ReconciliationLine.Status::"Not to be Matched", ReconciliationLine.Status::Reconciled, ReconciliationLine.Status::"Not to be Reconciled", ReconciliationLine.Status::"Failed to Reconcile", ReconciliationLine.Status::"Failed to Post");
+                    if not ReconciliationLine.IsEmpty() then
+                        exit(true);
+                    _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, StrSubstNo(PostTransactionsError01, ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID");
+                end;
+        end;
+    end;
+
     internal procedure CalculateAmsterdamToUTCOffset(ParsedDateTime: DateTime): Integer
     var
         StandardOffset: Integer;
@@ -1651,12 +1862,15 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         MatchTransactionsError08: Label 'Failed to match with Subscription Payment Request No. %1 because one of the conditions failed:\\ -Amounts aren''t equal.\\ -Subscription Payment Request status is either Canceled or Rejected.';
         MatchTransactionsSuccess01: Label 'Successfully matched entries in NP Pay Reconciliation Document %1.';
         PostTransactionsError01: Label 'Couldn''t find any matched transactions to post in NP Pay Reconciliation Document %1.';
+        ReconcileTransactionsError01: Label 'Couldn''t find any matched transactions to reconcile in NP Pay Reconciliation Document %1.';
         PostTransactionsEFTError01: Label 'EFT Transaction Request %1 does not exist.';
         PostTransactionsMagentoError01: Label 'Magento Payment Line %1 does not exist.';
         PostTransactionsSubscriptionError01: Label 'Subscription Payment Request %1 does not exist.';
         PostTransactionsError03: Label 'Couldn''t post %1 entries in NP Pay Reconciliation Document %2.';
-        PostTransactionsError04: Label 'Transaction %1 is not matched yet.';
+        ReconcileTransactionsError02: Label 'Couldn''t reconcile %1 entries in NP Pay Reconciliation Document %2.';
         PostTransactionsSuccess01: Label 'Successfully posted entries in NP Pay Reconciliation Document %1.';
+        ReconcileTransactionsSuccess01: Label 'Successfully reconciled entries in NP Pay Reconciliation Document %1.';
         NoSeriesError01: Label 'No. Series in NP Pay Setup is not specified.';
         NoSeriesError02: Label 'Numbers are configured incorrectly for No. Series %1.';
+        TransactionNotMatchedLbl: Label 'Transaction %1 is not matched yet.';
 }
