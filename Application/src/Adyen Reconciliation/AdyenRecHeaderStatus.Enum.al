@@ -13,6 +13,10 @@ enum 6059795 "NPR Adyen Rec. Header Status"
     {
         Caption = 'Matched';
     }
+    value(20; Reconciled)
+    {
+        Caption = 'Reconciled';
+    }
     value(30; Posted)
     {
         Caption = 'Posted';

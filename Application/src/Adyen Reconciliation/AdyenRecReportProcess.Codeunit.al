@@ -20,6 +20,7 @@ codeunit 6185038 "NPR Adyen Rec. Report Process"
 #else
         AdyenWebhookRequest.LockTable();
 #endif
+        AdyenGenericSetup.Get();
         AdyenWebhookRequest.Get(Rec.ID);
         if AdyenWebhookRequest.Processed then
             exit;
@@ -35,8 +36,10 @@ codeunit 6185038 "NPR Adyen Rec. Report Process"
             ReconciliationHeader.Get(CopyStr(JsonToken.AsValue().AsCode(), 1, MaxStrLen(ReconciliationHeader."Document No.")));
             MatchedEntries := TransactionMatching.MatchEntries(ReconciliationHeader);
             if MatchedEntries > 0 then
-                if AdyenGenericSetup.Get() and AdyenGenericSetup."Enable Automatic Posting" then
-                    TransactionMatching.PostEntries(ReconciliationHeader);
+                if AdyenGenericSetup."Enable Automatic Posting" then
+                    TransactionMatching.PostEntries(ReconciliationHeader)
+                else
+                    TransactionMatching.ReconcileEntries(ReconciliationHeader);
         end;
         AdyenWebhookRequest.Processed := true;
         AdyenWebhookRequest."Processing Status" := AdyenWebhookRequest."Processing Status"::Success;

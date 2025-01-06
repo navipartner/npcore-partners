@@ -168,6 +168,9 @@ page 6184502 "NPR Adyen Reconciliation"
                 actionref(Post_Promoted; "Post Entries")
                 {
                 }
+                actionref(Reconcile_Promoted; "Set as Reconciled")
+                {
+                }
             }
         }
 #ENDIF
@@ -227,7 +230,7 @@ page 6184502 "NPR Adyen Reconciliation"
                 {
                     Caption = 'Post Entries';
                     Image = PostingEntries;
-                    Enabled = not _DocumentPosted;
+                    Enabled = _PostingAllowed and not _DocumentPosted;
                     ToolTip = 'Running this action will post transactions.';
                     ApplicationArea = NPRRetail;
 
@@ -244,6 +247,30 @@ page 6184502 "NPR Adyen Reconciliation"
                             Message(PostedSuccessResult)
                         else
                             Message(PostedFailedResult);
+                        CurrPage.Update(false);
+                    end;
+                }
+                action("Set as Reconciled")
+                {
+                    Caption = 'Set as Reconciled';
+                    Image = PostingEntries;
+                    Enabled = not _PostingAllowed and not _DocumentReconciled and not _DocumentPosted;
+                    ToolTip = 'Running this action will set transactions as Reconciled.';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnAction()
+                    var
+                        ReconcilingSuccessResult: Label 'The reconciliation document lines have been successfully set as reconciled.';
+                        ReconcilingFailedResult: Label 'Some entries could not be set as reconciled.';
+                        ReconcilingConfirmationLbl: Label 'This will set the reconciliation lines as reconciled. This action is irreversible and once you''ve completed it, you won''t be able to change the transaction matching. Are you sure you want to proceed?';
+                    begin
+                        if not Confirm(ReconcilingConfirmationLbl) then
+                            exit;
+
+                        if _TransactionMatching.ReconcileEntries(Rec) then
+                            Message(ReconcilingSuccessResult)
+                        else
+                            Message(ReconcilingFailedResult);
                         CurrPage.Update(false);
                     end;
                 }
@@ -311,14 +338,19 @@ page 6184502 "NPR Adyen Reconciliation"
     trigger OnAfterGetRecord()
     begin
         _DocumentPosted := Rec.Status = Rec.Status::Posted;
+        _DocumentReconciled := Rec.Status = Rec.Status::Reconciled;
         _HasPostedLines := Rec."Total Posted Amount" > 0;
-        _AdyenSetup.GetRecordOnce();
-        _PostWithTransactionDate := _AdyenSetup."Post with Transaction Date";
-
         _IsExternalReport := Rec."Document Type" = Rec."Document Type"::"External Settlement detail (C)";
         _OpeningBalanceNull := Rec."Opening Balance" = 0;
         _ClosingBalanceNull := Rec."Closing Balance" = 0;
         _MerchantPayoutNull := Rec."Merchant Payout" = 0;
+    end;
+
+    trigger OnOpenPage()
+    begin
+        _AdyenSetup.GetRecordOnce();
+        _PostWithTransactionDate := _AdyenSetup."Post with Transaction Date";
+        _PostingAllowed := _AdyenSetup."Enable Automatic Posting";
     end;
 
     var
@@ -327,6 +359,8 @@ page 6184502 "NPR Adyen Reconciliation"
         _HasPostedLines: Boolean;
         _IsExternalReport: Boolean;
         _DocumentPosted: Boolean;
+        _DocumentReconciled: Boolean;
+        _PostingAllowed: Boolean;
         _PostWithTransactionDate: Boolean;
         _OpeningBalanceNull: Boolean;
         _ClosingBalanceNull: Boolean;
