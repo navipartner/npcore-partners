@@ -180,7 +180,7 @@ codeunit 6060140 "NPR POS Action: MM Member Arr." implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionMMMemberArr.js###
-'let main=async({workflow:i,popup:t,captions:m,parameters:e})=>{let a;debugger;if(e.DefaultInputValue.length==0&&e.DialogPrompt==1){let r=await t.input({caption:m.MemberCardPrompt,title:m.MembershipTitle,value:e.DefaultInputValue});if(r===null)return" ";a=await i.respond("MemberArrival",{membercard_number:r})}else a=await i.respond("MemberArrival");const n=e.ToastMessageTimer!==null&&e.ToastMessageTimer!==void 0&&e.ToastMessageTimer!==0?e.ToastMessageTimer:15;a.MemberScanned&&n>0&&toast.memberScanned({memberImg:a.MemberScanned.ImageDataUrl,memberName:a.MemberScanned.Name,validForAdmission:a.MemberScanned.Valid,hideAfter:n,memberExpiry:a.MemberScanned.ExpiryDate})};'
+'const main=async({workflow:n,popup:t,captions:i,parameters:e})=>{let a;debugger;if(e.DefaultInputValue.length==0&&e.DialogPrompt==1){const r=await t.input({caption:i.MemberCardPrompt,title:i.MembershipTitle,value:e.DefaultInputValue});if(r===null)return" ";a=await n.respond("MemberArrival",{membercard_number:r})}else a=await n.respond("MemberArrival");const m=e.ToastMessageTimer!==null&&e.ToastMessageTimer!==void 0&&e.ToastMessageTimer!==0?e.ToastMessageTimer:15;a.MemberScanned&&m>0&&toast.memberScanned({memberImg:a.MemberScanned.ImageDataUrl,memberName:a.MemberScanned.Name,validForAdmission:a.MemberScanned.Valid,hideAfter:m,memberExpiry:a.MemberScanned.ExpiryDate})};'
         );
     end;
 }
