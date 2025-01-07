@@ -315,6 +315,66 @@
         end;
     end;
 
+    internal procedure AttemptMemberFastCheckIn(MembershipEntryNo: Integer; MemberEntryNo: Integer; AdmissionCode: Code[20]; PosUnitNo: Code[10]; Qty: Integer; TicketTokenToIgnore: Text[100]; var ExternalTicketNo: Text[30]; var ErrorReason: Text; var ErrorCode: Integer): Boolean
+    var
+        MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
+        AttemptTicket: Codeunit "NPR Ticket Attempt Create";
+        TicketToPrint: Record "NPR TM Ticket";
+        Member: Record "NPR MM Member";
+        Membership: Record "NPR MM Membership";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        MemberTicketNotSetup: Label 'No ticket reservation found for member %1 that is valid for today, with admission code [%2] or an admission code selected from POS unit [%3].';
+        TicketNo: Code[20];
+        ItemNo: Code[20];
+        VariantCode: Code[10];
+        ResolvingTable: Integer;
+        TicketIsReused: Boolean;
+        ExternalItemNo: Code[50];
+    // WELCOME: Label 'Welcome %1.';
+    begin
+
+        Membership.Get(MembershipEntryNo);
+        Member.Get(MemberEntryNo);
+        ExternalItemNo := MemberRetailIntegration.POS_GetExternalTicketItemForMembership(MembershipEntryNo, false);
+
+        TicketIsReused := SelectReusableTicket(Member."Entry No.", '', AdmissionCode, PosUnitNo, Qty, TicketTokenToIgnore, TicketToPrint);
+        if ((not TicketIsReused) and (ExternalItemNo = '')) then begin
+            ErrorCode := -10;
+            ErrorReason := StrSubstNo(MemberTicketNotSetup, Member."External Member No.", AdmissionCode, PosUnitNo);
+            exit(false);
+        end;
+
+        // Create new ticket - only possible when ExternalItemNo <> ''
+        if (not TicketIsReused) then begin
+            if (not (MemberRetailIntegration.TranslateBarcodeToItemVariant(ExternalItemNo, ItemNo, VariantCode, ResolvingTable))) then begin
+                ErrorCode := -11;
+                ErrorReason := StrSubstNo(MISSING_CROSSREF, ExternalItemNo);
+                exit(false);
+            end;
+
+            ErrorCode := MemberRetailIntegration.IssueTicketFromMemberScan(false, ItemNo, VariantCode, Member, TicketNo, ErrorReason);
+            if (ErrorCode <> 0) then
+                exit(false);
+
+            if (not AttemptTicket.AttemptValidateTicketForArrival("NPR TM TicketIdentifierType"::INTERNAL_TICKET_NO, TicketNo, AdmissionCode, -1, PosUnitNo, '', ErrorReason)) then begin
+                ErrorCode := -12;
+                exit(false);
+            end;
+
+            TicketToPrint.Get(TicketNo);
+            TicketToPrint.SetRecFilter();
+        end;
+
+        if (TicketToPrint.GetFilters() <> '') then begin
+            MembershipSetup.Get(Membership."Membership Code");
+            PrintTicket(MembershipSetup, TicketToPrint);
+            if (TicketToPrint.find()) then
+                ExternalTicketNo := TicketToPrint."External Ticket No.";
+        end;
+
+        exit(true);
+    end;
+
     internal procedure MemberFastCheckIn(MembershipEntryNo: Integer; MemberEntryNo: Integer; AdmissionCode: Code[20]; PosUnitNo: Code[10]; Qty: Integer; TicketTokenToIgnore: Text[100]; var ExternalTicketNo: Text[30])
     var
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";

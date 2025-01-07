@@ -28,8 +28,8 @@ codeunit 6150815 "NPR POS Action: MM Member ArrB"
         Token: Text[100];
         POSWorkflowMethod: Option POS,Automatic,GuestCheckIn;
         PosUnitNo: Code[10];
+        CheckInOK: Boolean;
     begin
-
         if (POSWorkflowType = POSWorkflowMethod::POS) then begin
             MemberCardEntryNo := POSActionMemberManagement.POSMemberArrival(InputMethod, ExternalMemberCardNo, ForeignCommunityCode);
             exit;
@@ -39,11 +39,6 @@ codeunit 6150815 "NPR POS Action: MM Member ArrB"
         PosUnitNo := POSSetup.GetPOSUnitNo();
 
         POSActionMemberManagement.GetMembershipFromCardNumberWithUI(InputMethod, ExternalMemberCardNo, MembershipOut, MemberCardOut, true, ForeignCommunityCode);
-        LogEntryNo := MemberLimitationMgr.POS_CheckLimitMemberCardArrival(ExternalMemberCardNo, AdmissionCode, 'POS', LogEntryNo, ResponseMessage, ResponseCode);
-        Commit();
-
-        if (ResponseCode <> 0) then
-            Error(ResponseMessage);
 
         MemberCardEntryNo := MemberCardOut."Entry No.";
         MembershipOut.Get(MemberCardOut."Membership Entry No.");
@@ -51,16 +46,31 @@ codeunit 6150815 "NPR POS Action: MM Member ArrB"
 
         MembershipEvents.OnBeforePOSMemberArrival(ThisShouldBeEmpty_SaleLinePOS, MembershipSetup."Community Code", MembershipSetup.Code, MemberCardOut."Membership Entry No.", MemberCardOut."Member Entry No.", MemberCardOut."Entry No.", ExternalMemberCardNo);
 
+        LogEntryNo := MemberLimitationMgr.POS_CheckLimitMemberCardArrival(ExternalMemberCardNo, AdmissionCode, 'POS', LogEntryNo, ResponseMessage, ResponseCode);
+        Commit();
+
+        if (ResponseCode <> 0) then
+            Error(ResponseMessage);
+
+
         if (POSWorkflowType = POSWorkflowMethod::Automatic) then
-            MemberTicketManager.MemberFastCheckIn(MemberCardOut."Membership Entry No.", MemberCardOut."Member Entry No.", AdmissionCode, PosUnitNo, 1, '', ExternalTicketNo);
+            MemberTicketManager.AttemptMemberFastCheckIn(MemberCardOut."Membership Entry No.", MemberCardOut."Member Entry No.", AdmissionCode, PosUnitNo, 1, '', ExternalTicketNo, ResponseMessage, ResponseCode);
 
         if (POSWorkflowType = POSWorkflowMethod::GuestCheckIn) then begin
             MemberTicketManager.PromptForMemberGuestArrival(MemberCardOut."Membership Entry No.", MemberCardOut."Member Entry No.", AdmissionCode, PosUnitNo, Token);
-            MemberTicketManager.MemberFastCheckIn(MemberCardOut."Membership Entry No.", MemberCardOut."Member Entry No.", AdmissionCode, PosUnitNo, 1, Token, ExternalTicketNo);
+            MemberTicketManager.AttemptMemberFastCheckIn(MemberCardOut."Membership Entry No.", MemberCardOut."Member Entry No.", AdmissionCode, PosUnitNo, 1, Token, ExternalTicketNo, ResponseMessage, ResponseCode);
         end;
 
-        MemberLimitationMgr.UpdateLogEntry(LogEntryNo, 0, ExternalTicketNo);
+        if (not CheckInOK) then
+            MemberLimitationMgr.UpdateLogEntry(LogEntryNo, ResponseCode, ResponseMessage);
+
+        if (CheckInOK) then
+            MemberLimitationMgr.UpdateLogEntry(LogEntryNo, 0, ExternalTicketNo);
+
         Commit();
+
+        if (not CheckInOK) then
+            Error(ResponseMessage);
     end;
 
     internal procedure AddToastMemberScannedData(MembershipEntryNo: Integer; MemberEntryNo: Integer; Context: Option ARRIVAL,LOYALTY; var Response: JsonObject)
