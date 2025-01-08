@@ -173,7 +173,6 @@
         JObject := JToken.AsObject();
         ParseStatusResponse(JObject, EFTTransactionRequest);
 
-        EFTTransactionRequest."Result Amount" := EFTTransactionRequest."Amount Output";
         EFTTransactionRequest."External Result Known" := true;
     end;
 
@@ -387,6 +386,7 @@
     local procedure ParseStatusResponse(JObject: JsonObject; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
+        OriginalEFTTransactionRequestToVoid: Record "NPR EFT Transaction Request";
         StatusResponse: JsonObject;
         JToken: JsonToken;
     begin
@@ -408,8 +408,13 @@
                         begin
                             TrySelectToken(JObject, 'RepeatedResponseMessageBody.PaymentResponse', JToken, true);
                             ParsePaymentResponse(JToken.AsObject(), EFTTransactionRequest);
+                            if (EFTTransactionRequest.Successful) then begin
+                                if (OriginalEFTTransactionRequest."Processing Type" = OriginalEFTTransactionRequest."Processing Type"::REFUND) then
+                                    EFTTransactionRequest."Result Amount" := EFTTransactionRequest."Amount Output" * -1
+                                else
+                                    EFTTransactionRequest."Result Amount" := EFTTransactionRequest."Amount Output";
+                            end;
                         end;
-
 
                     OriginalEFTTransactionRequest."Processing Type"::VOID:
                         begin
@@ -418,6 +423,11 @@
                             if EFTTransactionRequest.Successful then begin
                                 EFTTransactionRequest."Amount Output" := OriginalEFTTransactionRequest."Amount Input";
                                 EFTTransactionRequest."Currency Code" := OriginalEFTTransactionRequest."Currency Code";
+                                EFTTransactionRequest."Result Amount" := EFTTransactionRequest."Amount Output";
+                                OriginalEFTTransactionRequestToVoid.Get(OriginalEFTTransactionRequest."Processed Entry No.");
+                                if (OriginalEFTTransactionRequestToVoid."Processing Type" = OriginalEFTTransactionRequestToVoid."Processing Type"::PAYMENT) then begin
+                                    EFTTransactionRequest."Result Amount" := EFTTransactionRequest."Amount Output" * -1
+                                end
                             end;
                         end;
                 end;
