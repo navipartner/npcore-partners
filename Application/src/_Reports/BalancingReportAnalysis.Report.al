@@ -1,7 +1,7 @@
 ﻿report 6014460 "NPR Balancing Report Analysis"
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = False;
 #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/Balancing Report-Analysis.rdlc';
@@ -510,14 +510,15 @@
                     }
                     field(CompareDay_; CompareDay)
                     {
-                        Caption = 'Compare To Day';
-                        ToolTip = 'Specifies the value of the Compare To Day field';
+                        Caption = 'Compare to same weekday last year';
+                        ToolTip = 'Specifies if values should be compared to same weekday and week no. last year. If not checked, values will be compared to same date last year.';
                         ApplicationArea = NPRRetail;
                     }
                     field(compareNearestDate_; CompareNearestDate)
                     {
                         Caption = 'Compare Nearest Date';
-                        ToolTip = 'Specifies the value of the Compare Nearest Date field';
+                        ToolTip = 'Specifies if the report should compare to the nearest weekday in the previous year.';
+                        Enabled = CompareDay;
                         ApplicationArea = NPRRetail;
                     }
                     field("Print Discount"; PrintDiscount)
@@ -577,21 +578,6 @@
                 }
             }
         }
-
-        trigger OnOpenPage()
-        begin
-            PrintTurnOver := true;
-            PrintDiscount := true;
-            PrintVAT := true;
-            PrintEFT := true;
-            PrintVouchers := true;
-            PrintCounting := true;
-            PrintCountedAmtInclFloat := true;
-            PrintClosing := true;
-            PrintAttachedBins := true;
-            CompareDay := true;
-            CompareNearestDate := true;
-        end;
     }
 
     labels
@@ -600,6 +586,21 @@
         BankDepositAmountDetailsCaptionLbl = 'Bank Deposit Amount Details';
         MoveToBinAmountDetailsCaptionLbl = 'Move to Bin Amount Details';
     }
+
+    trigger OnInitReport()
+    begin
+        PrintTurnOver := true;
+        PrintDiscount := true;
+        PrintVAT := true;
+        PrintEFT := true;
+        PrintVouchers := true;
+        PrintCounting := true;
+        PrintCountedAmtInclFloat := true;
+        PrintClosing := true;
+        PrintAttachedBins := true;
+        CompareDay := true;
+        CompareNearestDate := true;
+    end;
 
     trigger OnPreReport()
     begin
@@ -659,7 +660,6 @@
         POSEntry2: Record "NPR POS Entry";
         POSWorkshiftCheckpointUnit: codeunit "NPR POS Workshift Checkpoint";
         StartDate, EndDate : Date;
-        WeekDay, Week, Year : Integer;
     begin
         if not CompareDay then begin
             StartDate := CalcDate('<-1Y>', POSEntry."Entry Date");
@@ -671,18 +671,8 @@
         end else begin
             StartDate := POSEntry."Entry Date";
             EndDate := POSEntry."Entry Date";
-            WeekDay := Date2DWY(StartDate, 1);
-            Week := Date2DWY(StartDate, 2);
-            Year := Date2DWY(StartDate, 3) - 1;
-            if CompareNearestDate then
-                Week += 1;
-            StartDate := DWY2Date(WeekDay, Week, Year);
-            WeekDay := Date2DWY(EndDate, 1);
-            Week := Date2DWY(EndDate, 2);
-            Year := Date2DWY(EndDate, 3) - 1;
-            if CompareNearestDate then
-                Week += 1;
-            EndDate := DWY2Date(WeekDay, Week, Year);
+            StartDate := SameWeekdayLastYear(StartDate, CompareNearestDate);
+            EndDate := SameWeekdayLastYear(EndDate, CompareNearestDate);
             PreviousPeriod := CompareToDayLbl;
             if StartDate <> EndDate then
                 PreviousPeriod := StrSubStNo(CompareToDayLbl, Format(StartDate) + '..' + Format(EndDate))
@@ -731,6 +721,33 @@
 
             WorkshiftCheckpointPrevious.Copy(TempWorkshiftCheckpoint, true);
         end;
+    end;
+
+    local procedure SameWeekdayLastYear(DateThisYear: Date; NearestDate: Boolean): Date
+    var
+        DateLastYear: Date;
+        WeekDay, WeekNo, Year : Integer;
+    begin
+        WeekDay := Date2DWY(DateThisYear, 1);
+        WeekNo := Date2DWY(DateThisYear, 2);
+        Year := Date2DWY(DateThisYear, 3);
+        Year := Year - 1;
+        if WeekNo = 53 then
+            if not TryDWY2Date(WeekDay, WeekNo, Year, DateLastYear) then begin
+                WeekNo := 1;
+                Year := Year + 1;
+            end;
+        DateLastYear := DWY2Date(WeekDay, WeekNo, Year);
+        if NearestDate then
+            if (CalcDate('<-1Y>', DateThisYear) - DateLastYear) > 3 then
+                DateLastYear := CalcDate('<1W>', DateLastYear);
+        exit(DateLastYear);
+    end;
+
+    [TryFunction]
+    local procedure TryDWY2Date(WeekDay: Integer; WeekNo: Integer; Year: Integer; var Date: Date)
+    begin
+        Date := DWY2Date(WeekDay, WeekNo, Year);
     end;
 }
 
