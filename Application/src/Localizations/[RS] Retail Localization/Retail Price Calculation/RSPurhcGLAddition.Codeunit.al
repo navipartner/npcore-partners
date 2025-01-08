@@ -36,26 +36,26 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
 
         FillRetailPurchaseLines(PurchInvHeader);
 
-        if TempPurchInvLine.FindSet() then begin
-            FilterPriceListHeader(PurchInvHeader);
+        if not TempPurchInvLine.FindSet() then
+            exit;
 
-            repeat
-                FindPriceListLine();
-                InsertRetailValueEntries(RetailValueEntry, PurchInvHeader);
+        repeat
+            RSRLocalizationMgt.GetPriceListLine(PriceListLine, TempPurchInvLine."No.", TempPurchInvLine."Location Code", PurchInvHeader."Posting Date");
 
-                if RetailValueEntry."Entry No." <> 0 then begin
-                    CreateAdditionalGLEntries(RetailValueEntry, RSRetailCalculationType::"Margin with VAT");
-                    CreateAdditionalGLEntries(RetailValueEntry, RSRetailCalculationType::VAT);
-                    CreateAdditionalGLEntries(RetailValueEntry, RSRetailCalculationType::Margin);
+            InsertRetailValueEntries(RetailValueEntry, PurchInvHeader);
 
-                    RSRLocalizationMgt.InsertGLItemLedgerRelations(RetailValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::VAT));
-                    RSRLocalizationMgt.InsertGLItemLedgerRelations(RetailValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::"Margin with VAT"));
-                    RSRLocalizationMgt.InsertGLItemLedgerRelations(RetailValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::Margin));
-                end
-            until TempPurchInvLine.Next() = 0;
+            if RetailValueEntry."Entry No." <> 0 then begin
+                CreateAdditionalGLEntries(RetailValueEntry, RSRetailCalculationType::"Margin with VAT");
+                CreateAdditionalGLEntries(RetailValueEntry, RSRetailCalculationType::VAT);
+                CreateAdditionalGLEntries(RetailValueEntry, RSRetailCalculationType::Margin);
 
-            TempPurchInvLine.DeleteAll();
-        end;
+                RSRLocalizationMgt.InsertGLItemLedgerRelations(RetailValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::VAT));
+                RSRLocalizationMgt.InsertGLItemLedgerRelations(RetailValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::"Margin with VAT"));
+                RSRLocalizationMgt.InsertGLItemLedgerRelations(RetailValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::Margin));
+            end
+        until TempPurchInvLine.Next() = 0;
+
+        TempPurchInvLine.DeleteAll();
 
         RSRLocalizationMgt.ValidateGLEntriesBalanced(PurchInvHeader."No.");
         SourceCodeSetup.Get();
@@ -438,37 +438,6 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
         until PurchInvLine.Next() = 0;
     end;
 
-    local procedure FilterPriceListHeader(PurchInvHeader: Record "Purch. Inv. Header")
-    var
-        EndingDateFilter: Label '>=%1|''''', Comment = '%1 = Ending Date', Locked = true;
-        StartingDateFilter: Label '<=%1', Comment = '%1 = Starting Date', Locked = true;
-    begin
-        PriceListHeader.SetLoadFields(Code);
-        PriceListHeader.SetRange(Status, "Price Status"::Active);
-        PriceListHeader.SetRange("Assign-to No.", PurchInvHeader."Sell-to Customer No.");
-
-        PriceListHeader.SetFilter("Starting Date", StrSubstNo(StartingDateFilter, PurchInvHeader."Posting Date"));
-        PriceListHeader.SetFilter("Ending Date", StrSubstNo(EndingDateFilter, PurchInvHeader."Posting Date"));
-    end;
-
-    local procedure FindPriceListLine()
-    var
-        PriceListNotFoundErr: Label 'Price for the Location %2 has not been found.', Comment = '%1 - Location Code';
-        PriceNotFoundErr: Label 'Price for the Item %1 has not been found in Price List: %2 for Location %3', Comment = '%1 - Item No, %2 - Price List Code, %3 - Location Code';
-    begin
-        PriceListHeader.SetRange("NPR Location Code", TempPurchInvLine."Location Code");
-        if not PriceListHeader.FindFirst() then
-            PriceListHeader.SetRange("Assign-to No.", '');
-        if not PriceListHeader.FindFirst() then
-            Error(PriceListNotFoundErr, TempPurchInvLine."Location Code");
-
-        PriceListLine.SetLoadFields("Unit Price", "VAT Bus. Posting Gr. (Price)");
-        PriceListLine.SetRange("Price List Code", PriceListHeader.Code);
-        PriceListLine.SetRange("Asset No.", TempPurchInvLine."No.");
-        if not PriceListLine.FindFirst() then
-            Error(PriceNotFoundErr, TempPurchInvLine."No.", PriceListHeader.Code, TempPurchInvLine."Location Code");
-    end;
-
     local procedure GetInventoryAccountFromInvPostingSetup(LocationCode: Code[10]): Code[20]
     var
         InventoryPostingSetup: Record "Inventory Posting Setup";
@@ -487,7 +456,6 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
 
     var
         CurrExchRate: Record "Currency Exchange Rate";
-        PriceListHeader: Record "Price List Header";
         PriceListLine: Record "Price List Line";
         TempPurchInvLine: Record "Purch. Inv. Line" temporary;
         RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";

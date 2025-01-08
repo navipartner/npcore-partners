@@ -42,11 +42,9 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
         if TempSalesCrMemoLine.IsEmpty() then
             exit;
 
-        FilterPriceListHeader(SalesCrMemoHeader);
-
         TempSalesCrMemoLine.FindSet();
         repeat
-            FindPriceListLine(TempSalesCrMemoLine."Location Code", TempSalesCrMemoLine."No.");
+            RSRLocalizationMgt.GetPriceListLine(PriceListLine, TempSalesCrMemoLine."No.", TempSalesCrMemoLine."Location Code", TempSalesCrMemoLine."Posting Date");
 
             InsertRetailValueEntries(RetailValueEntry, SalesCrMemoHeader);
 
@@ -94,7 +92,7 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
             NivelationLines."Line No." := LineNo;
             NivelationLines."Document No." := NivelationHeader."No.";
             NivelationLines."Location Code" := TempNivSalesCrMemoLines."Location Code";
-            FindPriceListLine(TempNivSalesCrMemoLines."Location Code", TempNivSalesCrMemoLines."No.");
+            RSRLocalizationMgt.GetPriceListLine(PriceListLine, TempNivSalesCrMemoLines."No.", TempNivSalesCrMemoLines."Location Code", TempNivSalesCrMemoLines."Posting Date");
             NivelationLines."Price Valid Date" := PriceListLine."Starting Date";
             NivelationLines."Posting Date" := SalesCrMemoHeader."Posting Date";
             NivelationLines."VAT Bus. Posting Gr. (Price)" := PriceListLine."VAT Bus. Posting Gr. (Price)";
@@ -823,51 +821,6 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
         TempSalesCrMemoLine.Insert();
     end;
 
-    local procedure FilterPriceListHeader(SalesCrMemoHeader: Record "Sales Cr.Memo Header")
-    var
-        PriceListFilter: Text;
-        StartingDateFilter: Label '<=%1', Comment = '%1 = Starting Date', Locked = true;
-        EndingDateFilter: Label '>=%1|''''', Comment = '%1 = Ending Date', Locked = true;
-    begin
-        PriceListHeader.SetLoadFields(Code);
-        PriceListHeader.SetRange(Status, "Price Status"::Active);
-        PriceListFilter := SalesCrMemoHeader."Sell-to Customer No.";
-        if (SalesCrMemoHeader."Customer Disc. Group" <> '') and (PriceListFilter <> '') then
-            PriceListFilter += '|' + SalesCrMemoHeader."Customer Disc. Group"
-        else
-            PriceListFilter += SalesCrMemoHeader."Customer Disc. Group";
-        if (SalesCrMemoHeader."Customer Price Group" <> '') and (PriceListFilter <> '') then
-            PriceListFilter += '|' + SalesCrMemoHeader."Customer Price Group"
-        else
-            PriceListFilter += SalesCrMemoHeader."Customer Price Group";
-        if (SalesCrMemoHeader."Campaign No." <> '') and (PriceListFilter <> '') then
-            PriceListFilter += '|' + SalesCrMemoHeader."Campaign No."
-        else
-            PriceListFilter += SalesCrMemoHeader."Campaign No.";
-
-        PriceListHeader.SetFilter("Assign-to No.", PriceListFilter);
-        PriceListHeader.SetFilter("Starting Date", StrSubstNo(StartingDateFilter, SalesCrMemoHeader."Posting Date"));
-        PriceListHeader.SetFilter("Ending Date", StrSubstNo(EndingDateFilter, SalesCrMemoHeader."Posting Date"));
-    end;
-
-    local procedure FindPriceListLine(LocationCode: Code[10]; ItemNo: Code[20])
-    var
-        PriceListNotFoundErr: Label 'Price for the Location %2 has not been found.', Comment = '%1 - Location Code';
-        PriceNotFoundErr: Label 'Price for the Item %1 has not been found in Price List: %2 for Location %3', Comment = '%1 - Item No, %2 - Price List Code, %3 - Location Code';
-    begin
-        PriceListHeader.SetRange("NPR Location Code", LocationCode);
-        if not PriceListHeader.FindFirst() then
-            PriceListHeader.SetRange("Assign-to No.", '');
-        if not PriceListHeader.FindFirst() then
-            Error(PriceListNotFoundErr, LocationCode);
-
-        PriceListLine.SetLoadFields("Price List Code", "Asset No.", "Unit Price", "Starting Date", "VAT Bus. Posting Gr. (Price)");
-        PriceListLine.SetRange("Price List Code", PriceListHeader.Code);
-        PriceListLine.SetRange("Asset No.", ItemNo);
-        if not PriceListLine.FindFirst() then
-            Error(PriceNotFoundErr, ItemNo, PriceListHeader.Code, LocationCode);
-    end;
-
     local procedure GetCOGSAccountFromGenPostingSetup(SalesCrMemoHeader: Record "Sales Cr.Memo Header"): Code[20]
     var
         GenPostingSetup: Record "General Posting Setup";
@@ -891,7 +844,6 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
         AddCurrency: Record Currency;
         LCYCurrency: Record Currency;
         CurrExchRate: Record "Currency Exchange Rate";
-        PriceListHeader: Record "Price List Header";
         PriceListLine: Record "Price List Line";
         TempNivSalesCrMemoLines: Record "Sales Cr.Memo Line" temporary;
         TempSalesCrMemoLine: Record "Sales Cr.Memo Line" temporary;

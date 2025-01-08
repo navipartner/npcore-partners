@@ -64,11 +64,41 @@ codeunit 6151490 "NPR RS R Localization Mgt."
     #region RS Retail Lcl. Mgt. - Sales Line Retail Price Mgt.
     internal procedure GetPriceFromSalesPriceList(var SalesLine: Record "Sales Line")
     var
-        RSSalesLineRetailCalc: Codeunit "NPR RS Sales Line Retail Cal.";
+        SalesHeader: Record "Sales Header";
+        PriceListHeader: Record "Price List Header";
+        PriceListLine: Record "Price List Line";
     begin
         if not IsRSLocalizationActive() then
             exit;
-        RSSalesLineRetailCalc.GetPriceFromSalesPriceList(SalesLine);
+
+        if SalesLine.Type = SalesLine.Type::Item then
+            if IsServiceItem(SalesLine."No.") then
+                exit;
+
+        SalesHeader.Get("Sales Document Type"::Order, SalesLine."Document No.");
+
+        GetPriceListLine(PriceListLine, SalesLine."No.", SalesLine."Location Code", SalesHeader."Posting Date");
+        PriceListHeader.Get(PriceListLine."Price List Code");
+
+        case true of
+            PriceListHeader."Price Includes VAT" and SalesHeader."Prices Including VAT":
+                SalesLine.Validate("Unit Price", PriceListLine."Unit Price");
+            PriceListHeader."Price Includes VAT" and not SalesHeader."Prices Including VAT":
+                SalesLine.Validate("Unit Price", PriceListLine."Unit Price" - (PriceListLine."Unit Price" * CalculateSalesLineVATBreakDown(SalesLine)));
+            not PriceListHeader."Price Includes VAT" and SalesHeader."Prices Including VAT":
+                SalesLine.Validate("Unit Price", PriceListLine."Unit Price" + (PriceListLine."Unit Price" * CalculateSalesLineVATBreakDown(SalesLine)));
+            not PriceListHeader."Price Includes VAT" and not SalesHeader."Prices Including VAT":
+                SalesLine.Validate("Unit Price", PriceListLine."Unit Price");
+        end;
+
+        if SalesLine.Quantity = 0 then
+            exit;
+        SalesLine.Validate("Line Amount");
+    end;
+
+    local procedure CalculateSalesLineVATBreakDown(SalesLine: Record "Sales Line"): Decimal
+    begin
+        exit((100 * SalesLine."VAT %") / (100 + SalesLine."VAT %") / 100);
     end;
     #endregion
 
@@ -307,7 +337,7 @@ codeunit 6151490 "NPR RS R Localization Mgt."
         Item: Record Item;
     begin
         Item.Get(ItemNo);
-        exit(Item.Type in [Item.Type::Service]);
+        exit(Item.Type = Item.Type::Service);
     end;
 
     internal procedure IsRetailLocation(LocationCode: Code[20]): Boolean
@@ -328,6 +358,33 @@ codeunit 6151490 "NPR RS R Localization Mgt."
         GLEntry.CalcSums(Amount);
         if GLEntry.Amount <> 0 then
             Error(GenLedgerNotBalancedErr, DocumentNo, GLEntry.Amount);
+    end;
+
+    internal procedure GetPriceListLine(var PriceListLine: Record "Price List Line"; ItemNo: Code[20]; LocationCode: Code[10]; PostingDate: Date)
+    var
+        PriceListHeader: Record "Price List Header";
+        StartingDateFilter: Label '<=%1', Comment = '%1 = Starting Date', Locked = true;
+        EndingDateFilter: Label '>=%1|''''', Comment = '%1 = Ending Date', Locked = true;
+        PriceListNotFoundErr: Label 'Price List has not been found for the Location %1.', Comment = '%1 - Location Code';
+        PriceNotFoundErr: Label 'Price for the Item %1 has not been found in any Price Lists for Location %2', Comment = '%1 - Item No, %2 - Location Code';
+    begin
+        PriceListHeader.SetLoadFields(Code);
+        PriceListHeader.SetRange(Status, "Price Status"::Active);
+        PriceListHeader.SetFilter("Starting Date", StrSubstNo(StartingDateFilter, PostingDate));
+        PriceListHeader.SetFilter("Ending Date", StrSubstNo(EndingDateFilter, PostingDate));
+        PriceListHeader.SetRange("NPR Location Code", LocationCode);
+        if not PriceListHeader.FindSet() then
+            Error(PriceListNotFoundErr, LocationCode);
+
+        PriceListLine.SetLoadFields("Unit Price", "VAT Bus. Posting Gr. (Price)");
+        PriceListLine.SetRange("Asset No.", ItemNo);
+        repeat
+            PriceListLine.SetRange("Price List Code", PriceListHeader.Code);
+            if PriceListLine.FindFirst() then
+                exit;
+        until PriceListHeader.Next() = 0;
+
+        Error(PriceNotFoundErr, ItemNo, LocationCode);
     end;
     #endregion RS Retail Localization Helper Procedures
 }
