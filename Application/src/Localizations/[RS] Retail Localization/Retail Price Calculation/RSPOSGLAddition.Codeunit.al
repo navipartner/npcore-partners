@@ -41,13 +41,11 @@ codeunit 6151363 "NPR RS POS GL Addition"
         if TempPOSEntrySalesLines.IsEmpty() then
             exit;
 
-        FilterPriceListHeader(POSEntry);
-
         TempPOSEntrySalesLines.FindSet();
         repeat
             Clear(ReturnDocumentNo);
 
-            FindPriceListLine(TempPOSEntrySalesLines."Location Code", TempPOSEntrySalesLines."No.");
+            RSRLocalizationMgt.GetPriceListLine(PriceListLine, TempPOSEntrySalesLines."No.", TempPOSEntrySalesLines."Location Code", POSEntry."Posting Date");
 
             if TempPOSEntrySalesLines.Quantity < 0 then
                 GetReturnPOSEntryDocumentNo(ReturnDocumentNo, POSEntry);
@@ -106,7 +104,7 @@ codeunit 6151363 "NPR RS POS GL Addition"
             NivelationLines."VAT Bus. Posting Gr. (Price)" := PriceListLine."VAT Bus. Posting Gr. (Price)";
             NivelationLines.Validate("Item No.", TempNivelationSalesLines."No.");
             NivelationLines.Quantity := TempNivelationSalesLines.Quantity;
-            FindPriceListLine(TempNivelationSalesLines."Location Code", TempNivelationSalesLines."No.");
+            RSRLocalizationMgt.GetPriceListLine(PriceListLine, TempNivelationSalesLines."No.", TempNivelationSalesLines."Location Code", POSEntry."Posting Date");
             NivelationLines."Old Price" := PriceListLine."Unit Price";
             NivelationLines."Posting Date" := POSEntry."Posting Date";
             NivelationLines.Validate("New Price", RSRLocalizationMgt.RoundAmountToCurrencyRounding((TempNivelationSalesLines."Amount Incl. VAT" / TempNivelationSalesLines.Quantity), TempNivelationSalesLines."Currency Code"));
@@ -948,34 +946,6 @@ codeunit 6151363 "NPR RS POS GL Addition"
         until POSEntrySalesLine.Next() = 0;
     end;
 
-    local procedure FindPriceListLine(LocationCode: Code[20]; ItemNo: Code[20])
-    var
-        PriceListNotFoundErr: Label 'Price for the Location %1 has not been found.', Comment = '%1 - Location Code';
-        PriceNotFoundErr: Label 'Price for the Item %1 has not been found in Price List: %2 for Location %3', Comment = '%1 - Item No, %2 - Price List Code, %3 - Location Code';
-    begin
-        PriceListHeader.SetRange("NPR Location Code", LocationCode);
-        if not PriceListHeader.FindFirst() then
-            PriceListHeader.SetRange("Assign-to No.", '');
-        if not PriceListHeader.FindFirst() then
-            Error(PriceListNotFoundErr, LocationCode);
-
-        PriceListLine.SetLoadFields("Unit Price", "VAT Bus. Posting Gr. (Price)");
-        PriceListLine.SetRange("Price List Code", PriceListHeader.Code);
-        PriceListLine.SetRange("Asset No.", ItemNo);
-        if not PriceListLine.FindFirst() then
-            Error(PriceNotFoundErr, ItemNo, PriceListHeader.Code, LocationCode);
-    end;
-
-    local procedure FilterPriceListHeader(POSEntry: Record "NPR POS Entry")
-    begin
-        PriceListHeader.SetLoadFields(Code);
-        PriceListHeader.SetRange(Status, "Price Status"::Active);
-        PriceListHeader.SetRange("Assign-to No.", POSEntry."Customer No.");
-
-        PriceListHeader.SetFilter("Starting Date", StrSubstNo(StartingDateFilter, POSEntry."Posting Date"));
-        PriceListHeader.SetFilter("Ending Date", StrSubstNo(EndingDateFilter, POSEntry."Posting Date"));
-    end;
-
     local procedure GetCOGSAccountFromGenPostingSetup(): Code[20]
     var
         GenPostingSetup: Record "General Posting Setup";
@@ -1006,7 +976,6 @@ codeunit 6151363 "NPR RS POS GL Addition"
         CurrExchRate: Record "Currency Exchange Rate";
         TempNivelationSalesLines: Record "NPR POS Entry Sales Line" temporary;
         TempPOSEntrySalesLines: Record "NPR POS Entry Sales Line" temporary;
-        PriceListHeader: Record "Price List Header";
         PriceListLine: Record "Price List Line";
         GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
         RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
@@ -1016,8 +985,6 @@ codeunit 6151363 "NPR RS POS GL Addition"
         CurrencyFactor: Decimal;
         NextEntryNo: Integer;
         NextTransactionNo: Integer;
-        EndingDateFilter: Label '>=%1|''''', Comment = '%1 = Ending Date', Locked = true;
         NeedsRoundingErr: Label '%1 needs to be rounded', Comment = '%1 - amount';
-        StartingDateFilter: Label '<=%1', Comment = '%1 = Starting Date', Locked = true;
 #endif
 }

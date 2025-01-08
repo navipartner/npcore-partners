@@ -41,11 +41,9 @@ codeunit 6151094 "NPR RS Sales GL Addition"
         if TempSalesInvoiceLine.IsEmpty() then
             exit;
 
-        FilterPriceListHeader(SalesInvoiceHeader);
-
         TempSalesInvoiceLine.FindSet();
         repeat
-            FindPriceListLine(TempSalesInvoiceLine."Location Code", TempSalesInvoiceLine."No.");
+            RSRLocalizationMgt.GetPriceListLine(PriceListLine, TempSalesInvoiceLine."No.", TempSalesInvoiceLine."Location Code", TempSalesInvoiceLine."Posting Date");
 
             InsertRetailValueEntries(RetailValueEntry, SalesInvoiceHeader);
 
@@ -93,7 +91,7 @@ codeunit 6151094 "NPR RS Sales GL Addition"
             NivelationLines."Line No." := LineNo;
             NivelationLines."Document No." := NivelationHeader."No.";
             NivelationLines."Location Code" := TempNivSalesInvLines."Location Code";
-            FindPriceListLine(TempNivSalesInvLines."Location Code", TempNivSalesInvLines."No.");
+            RSRLocalizationMgt.GetPriceListLine(PriceListLine, TempNivSalesInvLines."No.", TempNivSalesInvLines."Location Code", TempNivSalesInvLines."Posting Date");
             NivelationLines."Price Valid Date" := PriceListLine."Starting Date";
             NivelationLines."Posting Date" := SalesInvoiceHeader."Posting Date";
             NivelationLines."VAT Bus. Posting Gr. (Price)" := PriceListLine."VAT Bus. Posting Gr. (Price)";
@@ -807,51 +805,6 @@ codeunit 6151094 "NPR RS Sales GL Addition"
         TempSalesInvoiceLine.Insert();
     end;
 
-    local procedure FindPriceListLine(LocationCode: Code[20]; ItemNo: Code[20])
-    var
-        PriceListNotFoundErr: Label 'Price for the Location %2 has not been found.', Comment = '%1 - Location Code';
-        PriceNotFoundErr: Label 'Price for the Item %1 has not been found in Price List: %2 for Location %3', Comment = '%1 - Item No, %2 - Price List Code, %3 - Location Code';
-    begin
-        PriceListHeader.SetRange("NPR Location Code", LocationCode);
-        if not PriceListHeader.FindFirst() then
-            PriceListHeader.SetRange("Assign-to No.", '');
-        if not PriceListHeader.FindFirst() then
-            Error(PriceListNotFoundErr, LocationCode);
-
-        PriceListLine.SetLoadFields("Unit Price", "VAT Bus. Posting Gr. (Price)", "Price Includes VAT");
-        PriceListLine.SetRange("Price List Code", PriceListHeader.Code);
-        PriceListLine.SetRange("Asset No.", ItemNo);
-        if not PriceListLine.FindFirst() then
-            Error(PriceNotFoundErr, ItemNo, PriceListHeader.Code, LocationCode);
-    end;
-
-    local procedure FilterPriceListHeader(SalesInvoiceHeader: Record "Sales Invoice Header")
-    var
-        PriceListFilter: Text;
-        EndingDateFilter: Label '>=%1|''''', Comment = '%1 = Ending Date', Locked = true;
-        StartingDateFilter: Label '<=%1', Comment = '%1 = Starting Date', Locked = true;
-    begin
-        PriceListHeader.SetLoadFields(Code);
-        PriceListHeader.SetRange(Status, "Price Status"::Active);
-        PriceListFilter := SalesInvoiceHeader."Sell-to Customer No.";
-        if (SalesInvoiceHeader."Customer Disc. Group" <> '') and (PriceListFilter <> '') then
-            PriceListFilter += '|' + SalesInvoiceHeader."Customer Disc. Group"
-        else
-            PriceListFilter += SalesInvoiceHeader."Customer Disc. Group";
-        if (SalesInvoiceHeader."Customer Price Group" <> '') and (PriceListFilter <> '') then
-            PriceListFilter += '|' + SalesInvoiceHeader."Customer Price Group"
-        else
-            PriceListFilter += SalesInvoiceHeader."Customer Price Group";
-        if (SalesInvoiceHeader."Campaign No." <> '') and (PriceListFilter <> '') then
-            PriceListFilter += '|' + SalesInvoiceHeader."Campaign No."
-        else
-            PriceListFilter += SalesInvoiceHeader."Campaign No.";
-
-        PriceListHeader.SetFilter("Assign-to No.", PriceListFilter);
-        PriceListHeader.SetFilter("Starting Date", StrSubstNo(StartingDateFilter, SalesInvoiceHeader."Posting Date"));
-        PriceListHeader.SetFilter("Ending Date", StrSubstNo(EndingDateFilter, SalesInvoiceHeader."Posting Date"));
-    end;
-
     local procedure GetCOGSAccountFromGenPostingSetup(SalesInvoiceHeader: Record "Sales Invoice Header"): Code[20]
     var
         GenPostingSetup: Record "General Posting Setup";
@@ -866,7 +819,6 @@ codeunit 6151094 "NPR RS Sales GL Addition"
         AddCurrency: Record Currency;
         LCYCurrency: Record Currency;
         CurrExchRate: Record "Currency Exchange Rate";
-        PriceListHeader: Record "Price List Header";
         PriceListLine: Record "Price List Line";
         TempNivSalesInvLines: Record "Sales Invoice Line" temporary;
         TempSalesInvoiceLine: Record "Sales Invoice Line" temporary;

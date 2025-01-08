@@ -32,14 +32,15 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
 
     local procedure InsertRetailLocationCorrectionalValueEntries(TransferShipmentLine: Record "Transfer Shipment Line")
     var
+        TransferShipmentHeader: Record "Transfer Shipment Header";
         StdRetailItemLedgEntry: Record "Item Ledger Entry";
         StdValueEntry: Record "Value Entry";
     begin
         if not GetRetailStandardItemLedgerEntry(StdRetailItemLedgEntry, TransferShipmentLine, false, false) then
             exit;
 
-        FilterPriceListHeader(TransferShipmentLine, TransferShipmentLine."Transfer-from Code");
-        FindPriceListLine(TransferShipmentLine, TransferShipmentLine."Transfer-from Code");
+        TransferShipmentHeader.Get(TransferShipmentLine."Document No.");
+        RSRLocalizationMgt.GetPriceListLine(PriceListLine, TransferShipmentLine."Item No.", TransferShipmentHeader."Transfer-from Code", TransferShipmentHeader."Posting Date");
 
         StdValueEntry.FindFirstValueEntryByItemLedgerEntryNo(StdRetailItemLedgEntry."Entry No.");
         InsertStdCorrectionEntryToRetail(StdRetailItemLedgEntry, StdValueEntry);
@@ -476,35 +477,6 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
         ItemLedgerEntry.Modify();
     end;
 
-    local procedure FilterPriceListHeader(TransferShipmentLine: Record "Transfer Shipment Line"; LocationCode: Code[20])
-    var
-        TransferShipmentHeader: Record "Transfer Shipment Header";
-        StartingDateFilter: Label '<=%1', Comment = '%1 = Starting Date', Locked = true;
-        EndingDateFilter: Label '>=%1|''''', Comment = '%1 = Ending Date', Locked = true;
-        PriceListNotFoundErr: Label 'Price for the Location %1 has not been found.', Comment = '%1 - Location Code';
-    begin
-        PriceListHeader.SetLoadFields(Code);
-        PriceListHeader.SetRange(Status, "Price Status"::Active);
-
-        TransferShipmentHeader.Get(TransferShipmentLine."Document No.");
-        PriceListHeader.SetFilter("Starting Date", StrSubstNo(StartingDateFilter, TransferShipmentHeader."Posting Date"));
-        PriceListHeader.SetFilter("Ending Date", StrSubstNo(EndingDateFilter, TransferShipmentHeader."Posting Date"));
-        PriceListHeader.SetRange("NPR Location Code", LocationCode);
-        if not PriceListHeader.FindFirst() then
-            Error(PriceListNotFoundErr, LocationCode);
-    end;
-
-    local procedure FindPriceListLine(TransferShipmentLine: Record "Transfer Shipment Line"; LocationCode: Code[20])
-    var
-        PriceNotFoundErr: Label 'Price for the Item %1 has not been found in Price List: %2 for Location %3', Comment = '%1 - Item No, %2 - Price List Code, %3 - Location Code';
-    begin
-        PriceListLine.SetLoadFields("Unit Price", "VAT Bus. Posting Gr. (Price)");
-        PriceListLine.SetRange("Price List Code", PriceListHeader.Code);
-        PriceListLine.SetRange("Asset No.", TransferShipmentLine."Item No.");
-        if not PriceListLine.FindFirst() then
-            Error(PriceNotFoundErr, TransferShipmentLine."Item No.", PriceListHeader.Code, LocationCode);
-    end;
-
     local procedure InitNextEntryNo()
     var
         GLEntry: Record "G/L Entry";
@@ -646,7 +618,6 @@ codeunit 6184772 "NPR RS Undo Trans. Ship. Add."
     #endregion RS Undo Shipment - Helper Procedures
 
     var
-        PriceListHeader: Record "Price List Header";
         PriceListLine: Record "Price List Line";
         CurrExchRate: Record "Currency Exchange Rate";
         RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";

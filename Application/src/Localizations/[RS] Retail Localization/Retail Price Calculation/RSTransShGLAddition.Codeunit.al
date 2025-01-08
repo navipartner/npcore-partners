@@ -38,11 +38,9 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         if TempTransferLine.IsEmpty() then
             exit;
 
-        FilterPriceListHeader(TransferHeader, TransferHeader."Transfer-from Code");
-
         TempTransferLine.FindSet();
         repeat
-            FindPriceListLine(TransferHeader."Transfer-from Code");
+            RSRLocalizationMgt.GetPriceListLine(PriceListLine, TempTransferLine."Item No.", TransferHeader."Transfer-from Code", TransferHeader."Posting Date");
             PostTransitValueEntry(TransferHeader, DocumentNo);
         until TempTransferLine.Next() = 0;
 
@@ -495,6 +493,7 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         TransferLine: Record "Transfer Line";
     begin
         TransferLine.SetRange("Document No.", TransferHeader."No.");
+        TransferLine.SetFilter("Qty. to Ship", '<>%1', 0);
         if TransferLine.IsEmpty() then
             exit;
         TransferLine.FindSet();
@@ -503,33 +502,6 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
             TempTransferLine.Copy(TransferLine);
             TempTransferLine.Insert();
         until TransferLine.Next() = 0;
-    end;
-
-    local procedure FilterPriceListHeader(TransferHeader: Record "Transfer Header"; LocationCode: Code[20])
-    var
-        StartingDateFilter: Label '<=%1', Comment = '%1 = Starting Date', Locked = true;
-        EndingDateFilter: Label '>=%1|''''', Comment = '%1 = Ending Date', Locked = true;
-        PriceListNotFoundErr: Label 'Price for the Location %1 has not been found.', Comment = '%1 - Location Code';
-    begin
-        PriceListHeader.SetLoadFields(Code);
-        PriceListHeader.SetRange(Status, "Price Status"::Active);
-
-        PriceListHeader.SetFilter("Starting Date", StrSubstNo(StartingDateFilter, TransferHeader."Posting Date"));
-        PriceListHeader.SetFilter("Ending Date", StrSubstNo(EndingDateFilter, TransferHeader."Posting Date"));
-        PriceListHeader.SetRange("NPR Location Code", LocationCode);
-        if not PriceListHeader.FindFirst() then
-            Error(PriceListNotFoundErr, LocationCode);
-    end;
-
-    local procedure FindPriceListLine(LocationCode: Code[20])
-    var
-        PriceNotFoundErr: Label 'Price for the Item %1 has not been found in Price List: %2 for Location %3', Comment = '%1 - Item No, %2 - Price List Code, %3 - Location Code';
-    begin
-        PriceListLine.SetLoadFields("Unit Price", "VAT Bus. Posting Gr. (Price)");
-        PriceListLine.SetRange("Price List Code", PriceListHeader.Code);
-        PriceListLine.SetRange("Asset No.", TempTransferLine."Item No.");
-        if not PriceListLine.FindFirst() then
-            Error(PriceNotFoundErr, TempTransferLine."Item No.", PriceListHeader.Code, LocationCode);
     end;
 
     local procedure GetCurrentTransferShipmentNo(): Code[20]
@@ -558,7 +530,6 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
     var
         AddCurrency: Record Currency;
         CurrExchRate: Record "Currency Exchange Rate";
-        PriceListHeader: Record "Price List Header";
         PriceListLine: Record "Price List Line";
         TempTransferLine: Record "Transfer Line" temporary;
         GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
