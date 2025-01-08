@@ -68,6 +68,16 @@
             Caption = 'Printed Date';
             DataClassification = CustomerContent;
         }
+        field(41; PrintedDateTime; DateTime)
+        {
+            Caption = 'Printed Date Time';
+            DataClassification = CustomerContent;
+        }
+        field(42; PrintCount; Integer)
+        {
+            Caption = 'Print Count';
+            DataClassification = CustomerContent;
+        }
         field(50; "Salesperson Code"; Code[20])
         {
             Caption = 'Salesperson Code';

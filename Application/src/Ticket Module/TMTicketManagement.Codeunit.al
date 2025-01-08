@@ -293,6 +293,8 @@
             if (PrintSingleTicket(Ticket2)) then begin
                 Ticket2.Get(Ticket."No.");
                 Ticket2."Printed Date" := Today();
+                Ticket2.PrintCount += 1;
+                Ticket2.PrintedDateTime := CurrentDateTime();
                 Ticket2.Modify();
                 Commit();
             end
@@ -1595,6 +1597,8 @@
         AdmissionEndTime: DateTime;
         DurationUntilTime: DateTime;
         AdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
+        TimeHelper: Codeunit "NPR TM TimeHelper";
+        LocalTime: DateTime;
     begin
 
         // Requirements, should be checked elsewhere
@@ -1619,7 +1623,10 @@
             ReservationSchEntry.SetFilter(Cancelled, '=%1', false);
             ReservationSchEntry.SetFilter("Admission Is", '=%1', ReservationSchEntry."Admission Is"::Open);
             ReservationSchEntry.SetFilter("External Schedule Entry No.", '=%1', ReservationAccessEntry."External Adm. Sch. Entry No.");
-            ReservationSchEntry.FindFirst();
+            if (not ReservationSchEntry.FindFirst()) then begin
+                LocalTime := TimeHelper.GetLocalTimeAtAdmission(AdmissionCode);
+                RaiseError(StrSubstNo(ADM_NOT_OPEN, AdmissionCode, LocalTime), ADM_NOT_OPEN_NO);
+            end;
 
             // find the todays/now entry
             if (AdmissionScheduleEntryNo < 0) then begin
@@ -1643,7 +1650,8 @@
                     AdmissionEndTime := DurationUntilTime;
 
                 if (not ((ReferenceTime >= AdmissionStartTime) and (ReferenceTime <= AdmissionEndTime))) then begin
-                    ReasonText := StrSubstNo(RESERVATION_NOT_FOR_NOW, DT2Time(AdmissionStartTime), DT2Time(AdmissionEndTime), DT2Date(AdmissionStartTime), AdmissionCode, Time);
+                    LocalTime := TimeHelper.GetLocalTimeAtAdmission(AdmissionCode);
+                    ReasonText := StrSubstNo(RESERVATION_NOT_FOR_NOW, DT2Time(AdmissionStartTime), DT2Time(AdmissionEndTime), DT2Date(AdmissionStartTime), AdmissionCode, LocalTime);
                     ReasonCode := RESERVATION_NOT_FOR_NOW_NO;
                     exit(false);
                 end;

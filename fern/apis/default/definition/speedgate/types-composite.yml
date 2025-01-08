@@ -3,29 +3,121 @@ imports:
 
 types:
 
+  TryAdmitRequest:
+    docs: 
+      Request to try to admit a customer with a reference number.
+    properties:
+      referenceNumber: simpleTypes.ReferenceNumber
+      scannerId: optional<simpleTypes.ScannerId>
+      admissionCode: optional<simpleTypes.AdmissionCode>
+
+  TryAdmitResponse:
+    docs: 
+      Response to try to admit a customer with a reference number.
+    properties:
+      token: simpleTypes.Token
+      referenceNumberType: simpleTypes.ReferenceNumberType
+      
+      # In case of a member card
+      memberCard: optional<MemberCardDetails>
+
+      # In case of a ticket
+      ticket: optional<TicketDetail>
+
+      # In case of a wallet
+      wallet: optional<WalletDetails>
+
+
+  TicketDetail:
+    docs:
+      When attempting to admit a ticket, some ticket details should be provided.
+    properties:
+        ticketId: simpleTypes.TicketId
+        itemNo: simpleTypes.ItemNo
+        admissionCode: simpleTypes.AdmissionCode
+        admitCount: simpleTypes.AdmitCount
+        admittedAt: optional<simpleTypes.AdmittedAt>
+        printedAt: optional<simpleTypes.PrintedAt>
+        printCount: optional<simpleTypes.PrintCount>
+    examples:
+      - name: ExampleTicketDetail
+        value:
+          ticketId: $simpleTypes.TicketId.ExampleTicketId
+          itemNo: $simpleTypes.ItemNo.ExampleItemNo
+          admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+          admitCount: 0
+          printedAt: $simpleTypes.PrintedAt.ExamplePrintedAt
+          printCount: 1
+
+
+  MemberCardDetails:
+    docs:
+      Details of a member card and its guests
+    properties:
+      memberCardId: simpleTypes.MemberCardId
+      membershipId: simpleTypes.MembershipId
+      member: MemberDetails
+      previousScan: PreviousScan
+      guests: list<MemberGuestOptions>
+    examples:
+      - name: ExampleMemberCardDetails
+        value:
+          memberCardId: $simpleTypes.MemberCardId.ExampleMemberCardId
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          member: $MemberDetails.ExampleMemberDetails
+          previousScan: $PreviousScan.ExamplePreviousScan
+          guests:
+            - token: $simpleTypes.Token.ExampleToken
+              description: "Guest 1"
+              admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+              maxNumberOfGuests: 1
+
+  MemberDetails:
+    properties:
+      memberId: simpleTypes.MemberId
+      firstName: simpleTypes.FirstName
+      lastName: simpleTypes.LastName
+      hasPicture: simpleTypes.HasPicture
+    examples:
+      - name: ExampleMemberDetails
+        value:
+          memberId: $simpleTypes.MemberId.ExampleMemberId
+          firstName: $simpleTypes.FirstName.ExampleFirstName
+          lastName: $simpleTypes.LastName.ExampleLastName
+          hasPicture: $simpleTypes.HasPicture.ExampleHasPicture
+
+  PreviousScan:
+    properties:
+      datetime: simpleTypes.LastScanAt
+      scannerId: simpleTypes.ScannerId
+      admissionCode: simpleTypes.AdmissionCode
+      status: simpleTypes.AdmittedStatus
+    examples:
+      - name: ExamplePreviousScan
+        value:
+          datetime: $simpleTypes.LastScanAt.ExampleLastScanAt
+          scannerId: $simpleTypes.ScannerId.ExampleSpeedgate
+          admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+          status: admitted
+
   MemberGuestOptions:
     docs:
       When admitting a member that is allowed to bring guests, 
       the number of guests and the corresponding token should be specified to the admit endpoint.
     properties:
-      description: simpleTypes.Description
       token: simpleTypes.Token
-      maxNumberOfGuests: optional<simpleTypes.MaxNumberOfGuests>
-
-  TicketOptions:
-    docs:
-      When admitting a customer with referencing a wallet, the tickets available in the wallet are returned.  
-    properties:
-      referenceNumber: simpleTypes.ReferenceNumber
-      admissions: list<AdmissionDetails>
-
-  AdmissionDetails:
-    docs:
-      Details of the admission for a specific ticket
-    properties:
+      description: simpleTypes.Description
       admissionCode: simpleTypes.AdmissionCode
-      scanCount: optional<simpleTypes.ScanCount>
-      lastScanAt: optional<simpleTypes.LastScanAt>
+      maxNumberOfGuests: simpleTypes.MaxNumberOfGuests
+
+  WalletDetails:
+    docs:
+      Details of a wallet and its tickets
+    properties:
+      walletId: simpleTypes.WalletId
+      tickets: list<TicketDetail>
+
+############################
 
   AdmissionInfo:
     docs:
@@ -35,79 +127,72 @@ types:
       description: optional<simpleTypes.Description>
       default: optional<simpleTypes.DefaultAdmission>
 
-  MemberDetails:
-    properties:
-      memberId: simpleTypes.MemberId
-      memberNumber: simpleTypes.MemberNumber
-      firstName: simpleTypes.FirstName
-      lastName: simpleTypes.LastName
-      membershipId: simpleTypes.MembershipId
-      membershipNumber: simpleTypes.MembershipNumber
-      communityCode: simpleTypes.CommunityCode
-      membershipCode: simpleTypes.MembershipCode
-      issueDate: simpleTypes.IssueDate
-      validFromDate: simpleTypes.ValidFromDate
-      validUntilDate: simpleTypes.ValidUntilDate
-    examples:
-      - name: ExampleMemberDetails
-        value:
-          memberId: $simpleTypes.MemberId.ExampleMemberId
-          memberNumber: $simpleTypes.MemberNumber.ExampleMemberNumber
-          firstName: $simpleTypes.FirstName.ExampleFirstName
-          lastName: $simpleTypes.LastName.ExampleLastName
-          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
-          membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
-          communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
-          membershipCode: $simpleTypes.MembershipCode.GOLD
-          issueDate: $simpleTypes.IssueDate.ExampleIssueDate
-          validFromDate: $simpleTypes.ValidFromDate.ExampleValidFromDate
-          validUntilDate: $simpleTypes.ValidUntilDate.ExampleValidUntilDate
+############################
 
-  TryAdmitRequest:
+  AdmitRequest:
     docs: 
-      Request to try to admit a customer with a reference number.
+      Request to admit a customer with a token.
     properties:
-      referenceNumber: simpleTypes.ReferenceNumber
-      gateId: optional<simpleTypes.Gate>
-      admissionCode: optional<simpleTypes.AdmissionCode>
-
-  TryAdmitResponse:
-    docs: 
-      Response to try to admit a customer with a reference number.
-    properties:
-      token: simpleTypes.Token
-      referenceNumberType: simpleTypes.ReferenceNumberType
-      # In case of a member card
-      member: optional<MemberDetails>
-      guests: optional<list<MemberGuestOptions>>
-      # In case of a wallet
-      tickets: optional<list<TicketOptions>>
-
-      
+      tokens: list<TokenToAdmit>
+  
   TokenToAdmit:
     docs: 
       The token to admit a guest to the park. In case the token is a member guest token, a quantity for number of guests may be specified
     properties:
       token: simpleTypes.Token
       quantity: optional<simpleTypes.Quantity>
-  
-  AdmitRequest:
-    docs: 
-      Request to admit a customer with a token.
-    properties:
-      tokens: list<TokenToAdmit>
+
 
   AdmitResponse:
     docs: 
       Response to admit a customer with a token.
     properties:
-      message: optional<string>
+      token: simpleTypes.Token
+      referenceNumberType: simpleTypes.ReferenceNumberType
+      referenceNumber: simpleTypes.ReferenceNumber
+      ticketId: simpleTypes.TicketId
+      status:	simpleTypes.AdmittedStatus
+      itemNo: simpleTypes.ItemNo
+      admissionCode: simpleTypes.AdmissionCode
+      printedAt: simpleTypes.PrintedAt
+      printCount: simpleTypes.PrintCount
+      memberCardId: optional<simpleTypes.MemberCardId>
+      externalTicketNo: optional<simpleTypes.ReferenceNumber>
+      
+    examples:
+      - name: ExampleAdmitTicketResponse
+        value:
+          token: $simpleTypes.Token.ExampleAdmitToken
+          referenceNumberType: ticket
+          referenceNumber: $simpleTypes.ReferenceNumber.ExampleTicketNumber
+          ticketId: $simpleTypes.TicketId.ExampleTicketId
+          status: admitted
+          itemNo: $simpleTypes.ItemNo.ExampleItemNo
+          admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+          printedAt: $simpleTypes.PrintedAt.ExamplePrintedAt
+          printCount: 1
+      - name: ExampleAdmitMemberCardResponse
+        value:
+          token: $simpleTypes.Token.ExampleAdmitToken
+          referenceNumberType: memberCard
+          referenceNumber: $simpleTypes.ReferenceNumber.ExampleMemberCard
+          ticketId: $simpleTypes.TicketId.ExampleTicketId
+          status: admitted
+          itemNo: $simpleTypes.ItemNo.ExampleItemNo
+          admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+          printedAt: $simpleTypes.PrintedAt.ExamplePrintedAt
+          printCount: 1
+          memberCardId: $simpleTypes.MemberCardId.ExampleMemberCardId
+          externalTicketNo: $simpleTypes.ReferenceNumber.ExampleTicketNumber
+          
 
-  GateSetupResponse:
+############################
+
+  ScannerIdSetupResponse:
     docs: 
       Response to setup a gate.
     properties:
-      gateId: simpleTypes.Gate
+      scannerId: simpleTypes.ScannerId
       name: simpleTypes.Description
       location: optional<simpleTypes.Description>
       readyImage: optional<simpleTypes.Base64Image>
