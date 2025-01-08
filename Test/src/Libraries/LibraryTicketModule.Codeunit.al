@@ -287,7 +287,7 @@ codeunit 85011 "NPR Library - Ticket Module"
         exit(ItemNo)
     end;
 
-    local procedure CreateBaseCalendar(CalendarCode: Code[10]): Code[10]
+    internal procedure CreateBaseCalendar(CalendarCode: Code[10]): Code[10]
     var
         BaseCalendar: Record "Base Calendar";
     begin
@@ -301,6 +301,27 @@ codeunit 85011 "NPR Library - Ticket Module"
         end;
 
         exit(BaseCalendar.Code);
+    end;
+
+    internal procedure SetNonWorking(Code: Code[10]; Description: Text[30]; RecurringPattern: Integer; Date: Date; Day: Integer)
+    var
+        BaseCalendarChange: Record "Base Calendar Change";
+    begin
+        BaseCalendarChange."Base Calendar Code" := Code;
+        BaseCalendarChange.Description := Description;
+        BaseCalendarChange.Nonworking := true;
+
+        BaseCalendarChange."Recurring System" := RecurringPattern;
+        case BaseCalendarChange."Recurring System" OF
+            BaseCalendarChange."Recurring System"::" ":
+                BaseCalendarChange.Date := Date;
+            BaseCalendarChange."Recurring System"::"Annual Recurring":
+                BaseCalendarChange.Date := Date;
+            BaseCalendarChange."Recurring System"::"Weekly Recurring":
+                BaseCalendarChange.Day := Day;
+        end;
+
+        if (BaseCalendarChange.Insert()) then;
     end;
 
     procedure CreateItem(VariantCode: Code[10]; TicketTypeCode: Code[10]; UnitPrice: Decimal) ItemNo: Code[20]

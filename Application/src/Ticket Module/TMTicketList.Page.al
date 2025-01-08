@@ -334,6 +334,33 @@
                         DisplayTicketRequest(Rec."Ticket Reservation Entry No.");
                     end;
                 }
+                Action(SpeedGateEntryLog)
+                {
+                    ToolTip = 'Navigate to Speed Gate Entry Log.';
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Speed Gate Entry Log';
+                    Image = Navigate;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category4;
+                    Scope = Repeater;
+
+                    trigger OnAction()
+                    var
+                        EntryLog: Record "NPR SGEntryLog";
+                        TempEntryLog: Record "NPR SGEntryLog" temporary;
+                    begin
+                        EntryLog.SetCurrentKey(ReferenceNo);
+                        EntryLog.SetFilter(ReferenceNo, '=%1', Rec."External Ticket No.");
+                        if (EntryLog.FindSet()) then
+                            repeat
+                                TempEntryLog.TransferFields(EntryLog, true);
+                                if (not TempEntryLog.Insert()) then;
+                            until (EntryLog.Next() = 0);
+                        Page.Run(Page::"NPR SG EntryLogList", TempEntryLog);
+                    end;
+
+                }
                 Action("View Online Ticket")
                 {
                     ToolTip = 'Display the ticket as created on ticket server.';

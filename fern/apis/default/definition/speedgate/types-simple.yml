@@ -2,15 +2,47 @@ types:
 
   ## Simple types
   Token:
-    type: string
+    type: uuid
     docs: A unique token that identifies a specific admission request
     examples:
       - name: ExampleToken
-        value: ABC123456DEF789GHI
+        value: "123e4567-e89b-12d3-a456-426614174000"
+      - name: ExampleMemberToken
+        value: "123e4567-ccdd-ddcc-a456-426614174001"
       - name: ExampleGuestToken1
-        value: JKL987654MNO321PQR
+        value: "aaaaaaaa-e89b-12d3-a456-426614174000"
       - name: ExampleGuestToken2
-        value: STU654321VWX987YZA
+        value: "bbbbbbbb-e89b-12d3-a456-426614174000"
+      - name: ExampleAdmitToken
+        value: "aaaaaaaa-aaaa-aaaa-aaaa-426614174000"
+
+  PrintedAt:
+    type: datetime
+    docs: The date and time when the ticket was printed
+    examples:
+      - name: ExamplePrintedAt
+        value: "2024-10-11T12:13:00Z"
+
+  PrintCount:
+    type: integer
+    docs: The number of times the ticket has been printed
+    examples:
+      - name: ExamplePrintCount
+        value: 1
+    
+  TicketId:
+    type: uuid
+    docs: Unique identifier for a ticket
+    examples:
+      - name: ExampleTicketId
+        value: "cccccccc-e89b-12d3-a456-426614174000"
+
+  ItemNo:
+    type: string
+    docs: The item number of the ticket
+    examples:
+      - name: ExampleItemNo
+        value: "31001"
 
   Quantity: 
     type: integer
@@ -58,6 +90,20 @@ types:
       - name: ExampleAdmissionDungeon
         value: DUNGEON
   
+  AdmitCount:
+    type: integer
+    docs: The number of times the ticket has been admitted.
+    examples:
+      - name: ExampleAdmitCount
+        value: 1
+
+  AdmittedAt:
+    type: datetime
+    docs: The date and time when the ticket was admitted.
+    examples:
+      - name: ExampleAdmittedAt
+        value: "2024-10-11T12:13:00Z"
+
   DefaultAdmission:
     type: boolean
     docs: Indicates if this is the default admission for the ticket.
@@ -65,7 +111,7 @@ types:
       - name: ExampleDefaultAdmission
         value: true
 
-  Gate:
+  ScannerId:
     type: string
     docs: A unique code that identifies a specific speedgate.
     examples:
@@ -89,11 +135,29 @@ types:
     enum:
       - ticket
       - wallet
-      - membership
+      - memberCard
 
   ReferenceNumberType:
     type: ReferenceNumberTypeEnum
     docs: The type of reference number that was identified.
+
+
+  AdmittedStatusEnum:
+    enum:
+      - admitted
+      - denied
+
+  AdmittedStatus:
+    type: AdmittedStatusEnum
+    docs: The status of the admission request.
+
+  # Wallet Related Types
+  WalletId:
+    type: uuid
+    docs: Unique identifier for a wallet.
+    examples:
+      - name: ExampleWalletId
+        value: "12345678-aaaa-12d3-aabb-426614174000" 
 
   # Member Related Types
 
@@ -116,11 +180,11 @@ types:
         value: "PLATINUM"
 
   MembershipId:
-    type: integer
+    type: uuid
     docs: Unique identifier for a membership.
     examples:
       - name: ExampleMembershipId
-        value: 1224
+        value: "12345678-aaaa-12d3-a456-426614174000"
 
   MembershipNumber:
     type: string
@@ -151,11 +215,11 @@ types:
         value: "2025-09-16"
 
   MemberId:
-    type: integer
+    type: uuid
     docs: Unique identifier for a member.
     examples:
       - name: ExampleMemberId
-        value: 4331
+        value: "12341234-bbbb-12d3-a456-426614174000"
 
   MemberNumber:
     type: string
@@ -178,8 +242,22 @@ types:
       - name: ExampleLastName
         value: "Doe"
 
+  HasPicture:
+    type: boolean
+    docs: Indicates if the member has a picture.
+    examples:
+      - name: ExampleHasPicture
+        value: true
 
-  # Gate setup
+  MemberCardId: 
+    type: uuid
+    docs: Unique identifier for a member card.
+    examples:
+      - name: ExampleMemberCardId
+        value: "12121212-aaaa-aaaa-a456-426614174000"
+
+
+  # ScannerId setup
   Base64Image:
     type: base64
     docs: Base64 encoded image of the member.

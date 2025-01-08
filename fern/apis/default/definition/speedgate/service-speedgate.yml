@@ -15,15 +15,15 @@ service:
     getSetup:
       docs: 
         This endpoint retrieves the setup details for a specific gate, such as the gate's name, location, and the admission codes it supports.  
-      path: /setup/{gateId}
+      path: /setup/{scannerId}
       path-parameters:
-        gateId: simpleTypes.Gate
+        scannerId: simpleTypes.ScannerId
       method: GET
       request: 
         name: getSetup
       response:
         docs: Returns the setup details for the specified gate.
-        type: compositeTypes.GateSetupResponse
+        type: compositeTypes.ScannerIdSetupResponse
       examples:
         - name: "Speedgate Setup"
           docs: Example of a successful retrieval of a speedgate setup.
@@ -31,10 +31,10 @@ service:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
-            gateId: $simpleTypes.Gate.ExampleSpeedgate
+            scannerId: $simpleTypes.ScannerId.ExampleSpeedgate
           response:
             body:
-              gateId: $simpleTypes.Gate.ExampleSpeedgate
+              scannerId: $simpleTypes.ScannerId.ExampleSpeedgate
               name: "Speedgate 1"
               location: "Main Entrance"
               admissions:
@@ -63,6 +63,7 @@ service:
       response:
         docs: Returns the result of the try to admit a customer.
         type: compositeTypes.TryAdmitResponse
+
       examples:
         - name: "Ticket Reference"
           docs: Example of a successful identification of a ticket.
@@ -72,12 +73,14 @@ service:
             company: $globalApiTypes.Company.ExampleCompanyCronus
           request:
             referenceNumber: $simpleTypes.ReferenceNumber.ExampleTicketNumber
-            gateId: $simpleTypes.Gate.ExampleSpeedgate
+            scannerId: $simpleTypes.ScannerId.ExampleSpeedgate
             admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
           response:
             body:
-              token: $simpleTypes.Token.ExampleToken
+              token: $simpleTypes.Token.ExampleAdmitToken
               referenceNumberType: ticket
+              ticket: $compositeTypes.TicketDetail.ExampleTicketDetail
+
         - name: "Member Card Reference"
           docs: Example of a successful identification of a member card with guests.
           path-parameters:
@@ -86,20 +89,14 @@ service:
             company: $globalApiTypes.Company.ExampleCompanyCronus
           request:
             referenceNumber: $simpleTypes.ReferenceNumber.ExampleMemberCard
-            gateId: $simpleTypes.Gate.ExampleSpeedgate
+            scannerId: $simpleTypes.ScannerId.ExampleSpeedgate
             admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
           response:
             body:
-              token: $simpleTypes.Token.ExampleToken
-              referenceNumberType: membership
-              member: $compositeTypes.MemberDetails.ExampleMemberDetails
-              guests:
-                - description: Adult
-                  token: $simpleTypes.Token.ExampleGuestToken1
-                  maxNumberOfGuests: 2
-                - description: Child
-                  token: $simpleTypes.Token.ExampleGuestToken2
-                  maxNumberOfGuests: 3
+              token: $simpleTypes.Token.ExampleAdmitToken
+              referenceNumberType: memberCard
+              memberCard: $compositeTypes.MemberCardDetails.ExampleMemberCardDetails
+
         - name: "Wallet Reference"
           docs: Example of a successful identification of a wallet reference.
           path-parameters:
@@ -108,23 +105,17 @@ service:
             company: $globalApiTypes.Company.ExampleCompanyCronus
           request:
             referenceNumber: $simpleTypes.ReferenceNumber.ExampleWalletId
-            gateId: $simpleTypes.Gate.ExampleSpeedgate
+            scannerId: $simpleTypes.ScannerId.ExampleSpeedgate
             admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
           response:
             body:
-              token: $simpleTypes.Token.ExampleToken
+              token: $simpleTypes.Token.ExampleAdmitToken
               referenceNumberType: wallet
-              tickets: 
-                - referenceNumber: $simpleTypes.ReferenceNumber.ExampleTicketNumber
-                  admissions:
-                    - admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
-                      scanCount: 1
-                      lastScanAt: "2024-10-11T12:13:00Z"
-                - referenceNumber: $simpleTypes.ReferenceNumber.ExampleTicketNumber2
-                  admissions:
-                    - admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+              wallet: 
+                walletId: $simpleTypes.WalletId.ExampleWalletId
+                tickets:
+                  - $compositeTypes.TicketDetail.ExampleTicketDetail
 
-      
     admitToken:
       docs: 
         This endpoint processes tokens received from tryAdmit to grant admission. Each token in the request specifies a quantity for admission (useful for guests).
@@ -148,24 +139,28 @@ service:
             company: $globalApiTypes.Company.ExampleCompanyCronus
           request:
             tokens:
-              - token: $simpleTypes.Token.ExampleToken
+               - token: $simpleTypes.Token.ExampleAdmitToken
           response:
             body:
-              message: "Admitted"
-        - name: "Admit Member with Guests"
-          docs: Example of a successful admission of a ticket.
+              $compositeTypes.AdmitResponse.ExampleAdmitTicketResponse
+
+        - name: "Admit MemberCard"
+          docs: Example of a successful admission of a Member Card.
           path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
           request:
             tokens:
-              - token: $simpleTypes.Token.ExampleToken
-              - token: $simpleTypes.Token.ExampleGuestToken1  
-                quantity: 2
-              - token: $simpleTypes.Token.ExampleGuestToken2
-                quantity: 2
+              - token: $simpleTypes.Token.ExampleAdmitToken
           response:
             body:
-              message: "Admitted"
+              $compositeTypes.AdmitResponse.ExampleAdmitMemberCardResponse
   
+types:
+  DummyType:
+    type: string
+    docs: A dummy type for testing purposes.
+    examples:
+      - name: ExampleDummytype
+        value: "DummyValue"
