@@ -377,15 +377,15 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
             RSRetailCalculationType::VAT:
                 GenJournalLine.Validate("Credit Amount", -CalculateRSGLVATAmount(StdTransitValueEntry));
             RSRetailCalculationType::Margin:
-                GenJournalLine.Validate("Credit Amount", CalculateRSGLMarginAmount(StdTransitValueEntry, CalculationValueEntry));
+                GenJournalLine.Validate("Credit Amount", CalculateRSGLMarginAmount(StdTransitValueEntry, CalculationValueEntry, GenJournalLine));
             RSRetailCalculationType::"Transit Adjustment":
                 GenJournalLine.Validate("Debit Amount", -Abs(CalculationValueEntry."Cost Amount (Actual)"));
         end;
     end;
 
-    local procedure CalculateRSGLMarginAmount(StdTransitValueEntry: Record "Value Entry"; CalculationValueEntry: Record "Value Entry"): Decimal
+    local procedure CalculateRSGLMarginAmount(StdTransitValueEntry: Record "Value Entry"; CalculationValueEntry: Record "Value Entry"; GenJournalLine: Record "Gen. Journal Line"): Decimal
     begin
-        exit(-(Abs(CalculationValueEntry."Cost Amount (Actual)") - Abs(CalculateRSGLVATAmount(StdTransitValueEntry))))
+        exit(-(Abs(CalculationValueEntry."Cost Amount (Actual)") - Abs(RSRLocalizationMgt.RoundAmountToCurrencyRounding(CalculateRSGLVATAmount(StdTransitValueEntry), GenJournalLine."Currency Code"))))
     end;
 
     local procedure CalculateRSGLVATAmount(StdTransitValueEntry: Record "Value Entry"): Decimal
