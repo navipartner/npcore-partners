@@ -143,6 +143,12 @@
             group("Customer Ledger Entry Posting Setup")
             {
                 Caption = 'Customer Ledger Entry Posting Setup';
+                ObsoleteState = Pending;
+                ObsoleteTag = '2025-01-12';
+                ObsoleteReason = 'Moved Customer Ledger Posting Setup to Fiscalization Setup Tables';
+                Visible = false;
+                Enabled = false;
+
                 field("Enable POS Entry CLE Posting"; Rec."Enable POS Entry CLE Posting")
                 {
                     Caption = 'Enable Posting';
