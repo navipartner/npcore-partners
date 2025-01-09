@@ -299,7 +299,7 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
             RSRetailCalculationType::VAT:
                 GenJournalLine.Validate("Credit Amount", CalculateRSGLVATAmount(CalculationValueEntry));
             RSRetailCalculationType::Margin:
-                GenJournalLine.Validate("Credit Amount", CalculationValueEntry."Cost Amount (Actual)" - CalculateRSGLVATAmount(CalculationValueEntry));
+                GenJournalLine.Validate("Credit Amount", CalculationValueEntry."Cost Amount (Actual)" - RSRLocalizationMgt.RoundAmountToCurrencyRounding(CalculateRSGLVATAmount(CalculationValueEntry), GenJournalLine."Currency Code"));
         end;
     end;
 
