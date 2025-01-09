@@ -287,6 +287,18 @@
             end;
         end;
 
+        if (TicketDIYTicketPrint.CheckCreateTicketDesignerNotification(Ticket."No.")) then begin
+            TicketSetup.Get();
+            PublishError := not TicketDIYTicketPrint.SendTicketUrl(Ticket."No.", ResponseMessage);
+
+            if (PublishError) then begin
+                if (TicketSetup."Show Send Fail Message In POS") then
+                    Message(ResponseMessage);
+            end else begin
+                PrintTicket := not TicketSetup."Suppress Print When eTicket";
+            end;
+        end;
+
         if (PrintTicket) then begin
             Ticket2.SetFilter("No.", '=%1', Ticket."No.");
             Ticket2.Get(Ticket."No.");

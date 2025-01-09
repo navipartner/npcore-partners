@@ -197,7 +197,6 @@
                         "eTicket Type Code" := Admission."eTicket Type Code";
 
                     TestField("eTicket Type Code");
-
                 end;
             end;
         }
@@ -227,6 +226,32 @@
                 end;
             end;
         }
+        field(97; NPDesignerTemplateId; Text[40])
+        {
+            Caption = 'Design Layout Id';
+            DataClassification = CustomerContent;
+        }
+        field(98; NPDesignerTemplateLabel; Text[80])
+        {
+            Caption = 'Design Layout Label';
+            DataClassification = CustomerContent;
+            trigger OnLookup()
+            var
+                Designer: Codeunit "NPR NPDesigner";
+            begin
+                Rec.TestField(Default, true);
+                Designer.LookupDesignLayouts(Rec);
+            end;
+
+            trigger OnValidate()
+            var
+                Designer: Codeunit "NPR NPDesigner";
+            begin
+                Rec.TestField(Default, true);
+                Designer.ValidateDesignLayouts(Rec);
+            end;
+        }
+
         field(100; "Admission Description"; Text[50])
         {
             Caption = 'Admission Description';

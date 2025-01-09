@@ -703,6 +703,13 @@
         TicketBOM.SetFilter("Notification Profile Code", '<>%1', '');
         if (not gShowDeliverTo) then
             gShowDeliverTo := TicketBOM.FindFirst();
+
+        TicketBOM.Reset();
+        TicketBOM.SetFilter("Item No.", '=%1', ItemNo);
+        TicketBOM.SetFilter("Variant Code", '=%1', VariantCode);
+        TicketBOM.SetFilter(NPDesignerTemplateId, '<>%1', '');
+        if (not gShowDeliverTo) then
+            gShowDeliverTo := TicketBOM.FindFirst();
     end;
 
     internal procedure AllowQuantityChange(IsQuantityChangeAllowed: Boolean)

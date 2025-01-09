@@ -435,9 +435,9 @@
             }
             Action("Print Selected Tickets")
             {
-                ToolTip = 'Print selected tickets.';
+                ToolTip = 'This action does a print only of the selected tickets.';
                 ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                Caption = 'Print Selected Tickets';
+                Caption = 'Print';
                 Image = Print;
                 Promoted = true;
                 PromotedOnly = true;
@@ -455,10 +455,39 @@
                         Ticket2.Get(Ticket."No.");
                         Ticket2.SetRecFilter();
                         if (TicketManagement.PrintSingleTicket(Ticket2)) then begin
+                            Ticket2.Get(Ticket."No.");
                             Ticket2."Printed Date" := Today();
+                            Ticket2.PrintedDateTime := CurrentDateTime();
+                            Ticket2.PrintCount += 1;
                             Ticket2.Modify();
                             Commit();
                         end
+                    until (Ticket.Next() = 0);
+                end;
+            }
+
+            Action("Print_Notification")
+            {
+                ToolTip = 'This actions prints selected tickets via the notification subsystem, creating digital tickets .';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                Caption = 'Print (incl. digital)';
+                Image = Print;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                Scope = Repeater;
+
+                trigger OnAction()
+                var
+                    Ticket: Record "NPR TM Ticket";
+                    Ticket2: Record "NPR TM Ticket";
+                begin
+                    CurrPage.SetSelectionFilter(Ticket);
+                    Ticket.FindSet();
+                    repeat
+                        Ticket2.Get(Ticket."No.");
+                        Ticket2.SetRecFilter();
+                        TicketManagement.PrintTicketBatch(Ticket2);
                     until (Ticket.Next() = 0);
                 end;
             }

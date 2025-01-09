@@ -67,6 +67,22 @@
 
     end;
 
+    procedure CheckCreateTicketDesignerNotification(TicketNo: Code[20]): Boolean
+    var
+        Ticket: Record "NPR TM Ticket";
+        TicketBOM: Record "NPR TM Ticket Admission BOM";
+    begin
+
+        if (not Ticket.Get(TicketNo)) then
+            exit(false);
+
+        TicketBOM.SetFilter("Item No.", '=%1', Ticket."Item No.");
+        TicketBOM.SetFilter(NPDesignerTemplateId, '<>%1', '');
+        exit(not TicketBOM.IsEmpty());
+    end;
+
+
+
     procedure SendTicketUrl(TicketNo: Code[20]; var ResponseMessage: Text): Boolean
     var
         TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry";
