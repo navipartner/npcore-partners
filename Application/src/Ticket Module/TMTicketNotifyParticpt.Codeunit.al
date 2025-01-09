@@ -252,6 +252,12 @@
                         RequireParticipantInformation := RequireParticipantInformation::OPTIONAL;
                 end;
 
+                if (TicketAdmissionBOM.NPDesignerTemplateId <> '') then begin
+                    AdmissionCode := TicketAdmissionBOM."Admission Code";
+                    SuggestNotificationMethod := SuggestNotificationMethod::EMAIL;
+                    if (SuggestNotificationAddress = '') then
+                        RequireParticipantInformation := RequireParticipantInformation::OPTIONAL;
+                end;
             end;
 
         until (TicketReservationRequest.Next() = 0);
@@ -542,6 +548,7 @@
         TicketBom: Record "NPR TM Ticket Admission BOM";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         UrlLbl: Label '%1%2', Locked = true;
+        NPDesignerSetup: Record "NPR NPDesignerSetup";
     begin
 
         if (not TicketSetup.Get()) then
@@ -586,7 +593,9 @@
 
         NotificationEntry."Det. Ticket Access Entry No." := DetTicketAccessEntry."Entry No.";
         NotificationEntry."Admission Schedule Entry No." := AdmissionScheduleEntry."Entry No.";
-        NotificationEntry."Published Ticket URL" := StrSubstNo(UrlLbl, TicketSetup."Print Server Order URL", TicketReservationRequest."Session Token ID");
+
+        if (TicketBom."Publish Ticket URL" <> TicketBom."Publish Ticket URL"::DISABLE) then
+            NotificationEntry."Published Ticket URL" := StrSubstNo(UrlLbl, TicketSetup."Print Server Order URL", TicketReservationRequest."Session Token ID");
 
         NotificationEntry."Ticket Type Code" := Ticket."Ticket Type Code";
         NotificationEntry."Ticket No." := Ticket."No.";
@@ -601,6 +610,16 @@
 
         NotificationEntry."Ticket BOM Description" := TicketBom.Description;
         NotificationEntry."Ticket BOM Adm. Description" := TicketBom."Admission Description";
+
+        NotificationEntry.NPDesignerTemplateId := TicketBom.NPDesignerTemplateId;
+        if (NotificationEntry.NPDesignerTemplateId <> '') then begin
+            NotificationEntry."Notification Trigger" := NotificationEntry."Notification Trigger"::NP_DESIGNER;
+            if (NPDesignerSetup.Get('')) then
+                if (NPDesignerSetup.PublicTicketURL <> '') then
+                    // https://tickets.npretail.app?reservation=%1&design=%2
+                    NotificationEntry."Published Ticket URL" := StrSubstNo(NPDesignerSetup.PublicTicketURL, TicketReservationRequest."Session Token ID", NotificationEntry.NPDesignerTemplateId);
+        end;
+
         NotificationEntry."Adm. Location Description" := Admission.Description;
         NotificationEntry."Adm. Event Description" := Admission.Description;
         NotificationEntry."Admission Code" := Admission."Admission Code";
@@ -1227,6 +1246,7 @@
         Entry.Add('eTicketPassId', Notification."eTicket Pass Id");
         Entry.Add('eTicketPassLandingURL', Notification."eTicket Pass Landing URL");
         Entry.Add('eTicketTypeCode', Notification."eTicket Type Code");
+        Entry.Add('NPDesignerTemplateId', Notification.NPDesignerTemplateId);
     end;
 
 

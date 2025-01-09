@@ -306,6 +306,11 @@
             Caption = 'Published Ticket URL';
             DataClassification = CustomerContent;
         }
+        field(450; NPDesignerTemplateId; Text[40])
+        {
+            Caption = 'NPDesigner Template Id';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

@@ -1858,12 +1858,22 @@
     procedure RequestRequiresAttention(Token: Text[100]): boolean
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        NotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
+        RequireParticipantInformation: Option NOT_REQUIRED,OPTIONAL,REQUIRED;
+        AdmissionCode: Code[20];
+        SuggestNotificationMethod: Option NA,EMAIL,SMS;
+        SuggestNotificationAddress: Text[100];
+        SuggestTicketHolderName: Text[100];
     begin
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         TicketReservationRequest.SetFilter("Admission Inclusion", '=%1|=%2', TicketReservationRequest."Admission Inclusion"::SELECTED, TicketReservationRequest."Admission Inclusion"::NOT_SELECTED);
         if (not TicketReservationRequest.IsEmpty()) then
             exit(true); // dynamic contents requires attention
+
+        RequireParticipantInformation := NotifyParticipant.RequireParticipantInfo(Token, AdmissionCode, SuggestNotificationMethod, SuggestNotificationAddress, SuggestTicketHolderName);
+        if (RequireParticipantInformation <> RequireParticipantInformation::NOT_REQUIRED) then
+            exit(true); // notifying participant requires attention
 
         TicketReservationRequest.Reset();
         TicketReservationRequest.SetCurrentKey("Session Token ID");
@@ -2400,6 +2410,7 @@
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         SeatingReservationEntry: Record "NPR TM Seating Reserv. Entry";
         SeatingTemplate: Record "NPR TM Seating Template";
+        NPDesignerSetup: Record "NPR NPDesignerSetup";
     begin
 
         TicketNotificationEntry.Init();
@@ -2500,6 +2511,13 @@
 
             TicketNotificationEntry."Ticket BOM Adm. Description" := TicketAdmissionBOM."Admission Description";
             TicketNotificationEntry."Ticket BOM Description" := TicketAdmissionBOM.Description;
+            TicketNotificationEntry.NPDesignerTemplateId := TicketAdmissionBOM.NPDesignerTemplateId;
+            if (TicketNotificationEntry.NPDesignerTemplateId <> '') then begin
+                // https://tickets.npretail.app?reservation=%1&design=%2
+                if (NPDesignerSetup.Get('')) then
+                    if (NPDesignerSetup.PublicTicketURL <> '') then
+                        TicketNotificationEntry."Published Ticket URL" := StrSubstNo(NPDesignerSetup.PublicTicketURL, TicketReservationRequest."Session Token ID", TicketNotificationEntry.NPDesignerTemplateId);
+            end;
 
             // Ticket Level data
             TicketNotificationEntry."Ticket No." := Ticket."No.";

@@ -1,8 +1,8 @@
 ﻿enum 6014477 "NPR TM Not. Trigger"
 {
-    #IF NOT BC17  
-    Access = Internal;       
-    #ENDIF
+#IF NOT BC17
+    Access = Internal;
+#ENDIF
     Extensible = true;
 
     value(0; NA)
@@ -32,5 +32,9 @@
     value(6; REMINDER)
     {
         Caption = 'Reminder';
+    }
+    value(7; NP_DESIGNER)
+    {
+        Caption = 'NPDesigner';
     }
 }

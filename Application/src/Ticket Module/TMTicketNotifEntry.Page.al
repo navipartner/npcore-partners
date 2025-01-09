@@ -220,6 +220,11 @@
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the eTicket Type Code field';
                 }
+                field(NPDesignerTemplateId; Rec.NPDesignerTemplateId)
+                {
+                    ApplicationArea = NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the NPDesignerTemplateId field';
+                }
                 field("eTicket Pass Id"; Rec."eTicket Pass Id")
                 {
                     ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
