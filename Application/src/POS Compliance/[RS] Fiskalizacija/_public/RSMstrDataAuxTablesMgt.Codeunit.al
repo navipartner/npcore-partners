@@ -3,7 +3,6 @@ codeunit 6185003 "NPR RS MstrData Aux Tables Mgt"
     SingleInstance = true;
 
     var
-        RSAuxSalesHeaderInitialized: Boolean;
         RSAuxSalesHeader: Record "NPR RS Aux Sales Header";
 
     procedure GetRSAuxSalesHeaderPosUnit(SalesHeaderSystemID: Guid; var RSPOSUnitValue: Code[10]): Boolean
@@ -33,17 +32,11 @@ codeunit 6185003 "NPR RS MstrData Aux Tables Mgt"
 
     local procedure InitializeRSAuxSalesHeader(SalesHeaderSystemID: Guid)
     begin
-        if RSAuxSalesHeaderInitialized then
+        if RSAuxSalesHeader.Get(SalesHeaderSystemID) then
             exit;
-
-        if RSAuxSalesHeader.Get(SalesHeaderSystemID) then begin
-            RSAuxSalesHeaderInitialized := true;
-            exit;
-        end;
 
         RSAuxSalesHeader.Init();
         RSAuxSalesHeader."Sales Header SystemId" := SalesHeaderSystemID;
         RSAuxSalesHeader.Insert();
-        RSAuxSalesHeaderInitialized := true;
     end;
 }
