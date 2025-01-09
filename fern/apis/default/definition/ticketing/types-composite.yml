@@ -133,6 +133,8 @@ types:
       unitPriceInclVat: optional<double>
       currencyCode: optional<string>
       ticketHolder: optional<string>
+      printCount: optional<integer>
+      printedAt: optional<datetime>
       content: list<TicketContent>
       description: Descriptions
     examples:
@@ -148,6 +150,8 @@ types:
           unitPriceInclVat: 100.00
           currencyCode: DKK
           ticketHolder: John Doe
+          printCount: 1
+          printedAt: $simpleTypes.ReferenceDateTime.ExamplePrintedAt
           content: 
             - $TicketContent.ExampleTicketContent1
           description: $Descriptions.ExampleTicket31001

@@ -16,10 +16,10 @@ Authorization: Basic {{username}} {{password}}
 
 @ticketToken = 3A3800F28C884BF795895C80BE7EB04D
 @scheduleId=0
-@itemNumber = 31001
-@referenceDate = 2024-10-30
+@itemNumber = 31005
+@referenceDate = 2025-01-09
 @quantity = 1
-@admissionCode = CASTLE
+@admissionCode = DUNGEON
 ###
 
 POST {{baseUrl}}/{{serviceName}}_{{functionName}}?tenant={{tenant}}

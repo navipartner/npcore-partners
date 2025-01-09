@@ -385,6 +385,7 @@ codeunit 6151543 "NPR TM Client API BL"
         TicketRequest: Record "NPR TM Ticket Reservation Req.";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         HaveScheduleEntry: Boolean;
+        DurationAsInt: Integer;
     begin
         TicketRequest.SetCurrentKey("Session Token ID");
         TicketRequest.SetFilter("Session Token ID", '=%1', Token);
@@ -417,6 +418,8 @@ codeunit 6151543 "NPR TM Client API BL"
                 HaveScheduleEntry := false;
             end;
 
+            DurationAsInt := Round((AdmissionScheduleEntry."Admission End Time" - AdmissionScheduleEntry."Admission Start Time") / 1000, 1);
+
             JBuilder.WriteStartObject('');
             JBuilder.WriteRawProperty('id', TicketRequest."Entry No.");
             JBuilder.WriteStringProperty('itemReference', TicketRequest."External Item Code");
@@ -433,7 +436,7 @@ codeunit 6151543 "NPR TM Client API BL"
                 JBuilder.WriteStringProperty('startTime', Format(AdmissionScheduleEntry."Admission Start Time", 0, 9));
                 JBuilder.WriteStringProperty('endDate', Format(AdmissionScheduleEntry."Admission End Date", 0, 9));
                 JBuilder.WriteStringProperty('endTime', Format(AdmissionScheduleEntry."Admission End Time", 0, 9));
-                JBuilder.WriteStringProperty('duration', Format(AdmissionScheduleEntry."Event Duration", 0, 9));
+                JBuilder.WriteStringProperty('duration', Format(DurationAsInt, 0, 9));
             end else begin
                 JBuilder.WriteStringProperty('description', '');
             end;

@@ -61,6 +61,10 @@ codeunit 6185082 "NPR TicketingApiHandler"
                 _Response := Ticket.SendToWallet(_Request);
             _ApiFunction::EXCHANGE_TICKET_FOR_COUPON:
                 _Response := Ticket.ExchangeTicketForCoupon(_Request);
+            _ApiFunction::CONFIRM_PRINT_TICKET:
+                _Response := Ticket.ConfirmPrintTicket(_Request);
+            _ApiFunction::CLEAR_CONFIRM_PRINT_TICKET:
+                _Response := Ticket.ClearConfirmPrintTicket(_Request);
 
             // Reservation
             _ApiFunction::CREATE_RESERVATION:
