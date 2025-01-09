@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+types:
+  POSSaleLineType:
+    enum:
+      - name: ITEM
+        value: 'Item'
+      - name: ITEM_CATEGORY
+        value: 'Item Category'
+      - name: BOM_LIST
+        value: 'BOM List'
+      - name: CUSTOMER_DEPOSIT
+        value: 'Customer Deposit'
+      - name: COMMENT
+        value: 'Comment'
+      - name: ROUNDING
+        value: 'Rounding'
+      - name: GL_PAYMENT
+        value: 'G/L Payment'
+      - name: ISSUE_VOUCHER
+        value: 'Issue Voucher'

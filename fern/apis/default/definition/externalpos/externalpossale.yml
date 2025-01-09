@@ -1,0 +1,269 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+  posApiTypes: ./../pos/pos-api-types.yml
+
+types:
+  saleId:
+    type: uuid
+
+  lineId:
+    type: uuid
+
+  discountType:
+    enum:
+      - name: CAMPAIGN
+        value: 'Campaign'
+      - name: MIX
+        value: 'Mix'
+      - name: QUANTITY
+        value: 'Quantity'
+      - name: MANUAL
+        value: 'Manual'
+      - name: BOM_LIST
+        value: 'BOM List'
+      - name: ROUNDING
+        value: 'Rounding'
+      - name: COMBINATION
+        value: 'Combination'
+      - name: Customer
+        value: 'Customer'
+
+  ExternalPOSSale:
+    properties:
+      saleId: saleId
+      startedAt: datetime
+      posStore: string
+      posUnit: string
+      receiptNo:
+        type: optional<string>
+        docs: Determines the receipt number that is known by the customer. If omitted the system will generate one for you.
+      salespersonCode:
+        type: optional<string>
+        docs: Determines the code of the salesperson performing the external sale. If omitted the system will attempt to use the one assigned to the API user.
+      customerId: optional<string>
+      pricesIncludeVAT: boolean
+      externalDocumentNo:
+        type: optional<string>
+        docs: Determines the external document number of the sale. This could for example be a web order ID that the external sale was converted into.
+      convertedToPOSEntry: boolean
+      posEntryId: 
+        type: optional<uuid>
+        docs: Determines the POS Entry Id that the external sale was converted to. Not included if the sale is not yet converted.
+      saleLines: list<ExternalPOSSaleLine>
+      paymentLines: list<ExternalPOSPaymentLine>
+    examples:
+      - name: ExampleSale
+        value:
+          saleId: 4ca28ccc-e84b-4788-973c-c8ce5a59383b
+          startedAt: "2024-01-01T10:00:00Z"
+          posStore: "01"
+          posUnit: "0101"
+          receiptNo: "123ABCD"
+          salespersonCode: "1234"
+          pricesIncludeVAT: true
+          convertedToPOSEntry: true
+          posEntryId: "e3ddb678-30e8-45e3-9e88-96d7cf703ac1"
+          saleLines: 
+            - $ExternalPOSSaleLine.ExampleSaleLine
+          paymentLines: 
+            - $ExternalPOSPaymentLine.ExamplePaymentLine
+  
+  ExternalPOSSaleLine:
+    properties:
+      lineId: lineId
+      type: posApiTypes.POSSaleLineType
+      code:
+        type: string
+        docs: The identifier for the sales line being added. This can for example be an item number or an item reference.
+      variantCode: optional<string>
+      qty: double
+      unitPrice: double
+      vatPercent: double
+      amount: double
+      amountIncludingVAT: double
+      discountType: optional<discountType>
+      discountAmount: double
+      unitOfMeasureCode: optional<string>
+      description: string
+      description2: optional<string>
+      returnReasonCode: optional<string>
+    examples:
+      - name: ExampleSaleLine
+        value:
+          lineId: 43aef219-60d9-4827-9e3e-4cc63b420548
+          type: "Item"
+          code: "ITEM-01"
+          qty: 1
+          unitPrice: 100
+          vatPercent: 25
+          amount: 80
+          amountIncludingVAT: 100
+          discountAmount: 0
+          description: "Super awesome item"
+
+  ExternalPOSPaymentLine:
+    properties:
+      lineId: lineId
+      paymentMethodCode: string
+      currencyAmount:
+        type: optional<double>
+        docs: If the payment is done in a different currency than the one of the sale, then the amount paid in the foreign currency should be provided in this field.
+      description: string
+      amountIncludingVAT: double
+    examples:
+      - name: ExamplePaymentLine
+        value:
+          lineId: "f77b05de-cf16-461a-b330-15188b34b6fd"
+          paymentMethodCode: "CASH"
+          description: "Cash payment"
+          amountIncludingVAT: 100
+
+  CreateExternalPOSSale:
+    properties:
+      startedAt: datetime
+      posStore: string
+      posUnit: string
+      receiptNo:
+        type: optional<string>
+        docs: Determines the receipt number that is known by the customer. If omitted the system will generate one for you.
+      salespersonCode:
+        type: optional<string>
+        docs: Determines the code of the salesperson performing the external sale. If omitted the system will attempt to use the one assigned to the API user.
+      customerId: optional<string>
+      pricesIncludeVAT: boolean
+      externalDocumentNo:
+        type: optional<string>
+        docs: Determines the external document number of the sale. This could for example be a web order ID that the external sale was converted into.
+      saleLines: list<CreateExternalPOSSaleLine>
+      paymentLines: list<CreateExternalPOSPaymentLine>
+    examples:
+      - name: ExampleSaleRequest
+        value:
+          startedAt: "2024-01-01T10:00:00Z"
+          posStore: "01"
+          posUnit: "0101"
+          receiptNo: "123ABCD"
+          salespersonCode: "1234"
+          pricesIncludeVAT: true
+          saleLines: 
+            - $CreateExternalPOSSaleLine.ExampleSaleLineRequest
+          paymentLines: 
+            - $CreateExternalPOSPaymentLine.ExamplePaymentLineRequest
+
+  CreateExternalPOSSaleLine:
+    properties:
+      type: posApiTypes.POSSaleLineType
+      code:
+        type: string
+        docs: The identifier for the sales line being added. This can for example be an item number or an item reference.
+      variantCode: optional<string>
+      qty: double
+      unitPrice: double
+      vatPercent: optional<double>
+      amount: optional<double>
+      amountIncludingVAT: double
+      discountType: optional<discountType>
+      discountAmount: double
+      unitOfMeasureCode: optional<string>
+      description: string
+      description2: optional<string>
+      returnReasonCode: optional<string>
+    examples:
+      - name: ExampleSaleLineRequest
+        value:
+          type: "Item"
+          code: "ITEM-01"
+          qty: 1
+          unitPrice: 100
+          vatPercent: 25
+          amount: 80
+          amountIncludingVAT: 100
+          discountAmount: 0
+          description: "Super awesome item"
+
+  CreateExternalPOSPaymentLine:
+    docs: A payment line in the representation of the external system.
+    properties:
+      paymentMethodCode: string
+      currencyAmount:
+        type: optional<double>
+        docs: If the payment is done in a different currency than the one of the sale, then the amount paid in the foreign currency should be provided in this field.
+      description: string
+      amountIncludingVAT: double
+      additionalEftData:
+        type: optional<AdditionalEftData>
+        docs: Additional data about the payment, if it's an EFT transaction, can be provided here. The data format will be specific to the individual EFT type.
+    examples:
+      - name: ExamplePaymentLineRequest
+        value:
+          paymentMethodCode: "CASH"
+          description: "Cash payment"
+          amountIncludingVAT: 100
+          additionalEftData: $AdditionalEftData.ExampleAdditionalEftData
+
+  AdditionalEftData:
+    properties:
+      eftType: string
+      eftData: string
+    examples:
+      - name: ExampleAdditionalEftData
+        value:
+          eftType: adyen
+          eftData: Base64EncodedResponse
+
+service:
+  auth: true
+  base-path: /externalpos
+  endpoints:
+    # Until pagination helpers are in place, we will leave this out
+    #
+    # listExternalPOSSales:
+    #   display-name: List External POS Sales
+    #   method: GET
+    #   path: "/sales"
+    #   response: list<ExternalPOSSale>
+    #   examples:
+    #     - name: ExampleExternalPOSSales
+    #       path-parameters:
+    #         tenant: $globalApiTypes.tenant.Exampletenant
+    #         environment: $globalApiTypes.environment.ExampleenvironmentProduction
+    #         company: $globalApiTypes.Company.ExampleCompanyCronus
+    #       response:
+    #         body:
+    #           - $ExternalPOSSale.ExampleSale
+
+    getExternalPOSSale:
+      display-name: Get External POS Sale
+      method: GET
+      path: "/sales/{saleId}"
+      path-parameters:
+        saleId: saleId
+      response: ExternalPOSSale
+      examples:
+        - name: ExampleExternalPOSSales
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            saleId: "971c0b28-d649-4ae3-a1e7-2a3ea336ef87"
+          response:
+            body: $ExternalPOSSale.ExampleSale
+
+    createExternalPOSSale:
+      display-name: Create External POS Sale
+      method: POST
+      path: "/sales"
+      request: CreateExternalPOSSale
+      response: ExternalPOSSale
+      examples:
+        - name: ExampleExternalPOSSaleRequest
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          response:
+            body: $ExternalPOSSale.ExampleSale
+          request: $CreateExternalPOSSale.ExampleSaleRequest
+

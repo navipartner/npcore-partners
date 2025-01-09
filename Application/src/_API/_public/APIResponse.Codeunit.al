@@ -221,6 +221,16 @@ codeunit 6185053 "NPR API Response"
     end;
 
     /// <summary>
+    /// Responds with an HTTP 201 Created status using a JSON builder.
+    /// </summary>
+    /// <param name="Value">The text value to be included in the response.</param>
+    /// <returns>An API response with Created (201) status and a JSON object with the given value.</returns>
+    procedure RespondCreated(JsonBuilder: Codeunit "NPR Json Builder"): Codeunit "NPR API Response"
+    begin
+        exit(CreateSuccessResponse("NPR API HTTP Status Code"::Created, JsonBuilder.Build()));
+    end;
+
+    /// <summary>
     /// Responds with an HTTP 201 Created status and a simple JSON response containing a single value.
     /// </summary>
     /// <param name="Value">The text value to be included in the response.</param>

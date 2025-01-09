@@ -2,6 +2,7 @@
 
 imports:
   globalApiTypes: ./../global-api-types.yml
+  posApiTypes: ./pos-api-types.yml
 
 types:
   saleId: 
@@ -12,30 +13,11 @@ types:
     type: string
     docs: A filter for POS Unit. It should be formatted according to Business Central filter syntax.
 
-  POSSaleLineType:
-    enum:
-      - name: ITEM
-        value: 'Item'
-      - name: ITEM_CATEGORY
-        value: 'Item Category'
-      - name: BOM_LIST
-        value: 'BOM List'
-      - name: CUSTOMER_DEPOSIT
-        value: 'Customer Deposit'
-      - name: COMMENT
-        value: 'Comment'
-      - name: ROUNDING
-        value: 'Rounding'
-      - name: GL_PAYMENT
-        value: 'G/L Payment'
-      - name: ISSUE_VOUCHER
-        value: 'Issue Voucher'
-
   POSSaleLine:
     docs: A sale line in an active POS sale
     properties:
       sortKey: integer
-      type: POSSaleLineType
+      type: posApiTypes.POSSaleLineType
       code: string
       variantCode: string
       description: string
