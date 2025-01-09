@@ -2491,13 +2491,21 @@
 
     internal procedure CreateDimFromDefaultDim(FieldNo: Integer)
     var
+#IF NOT (BC17 or BC18 or BC19 or BC20 or BC2100 or BC2101 or BC2102 or BC2103)
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        CreateDimensions: Boolean;
+#ENDIF
         DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
     begin
         GetPOSHeader();
         InitDefaultDimensionSources(DefaultDimSource, FieldNo);
 #ENDIF
 #IF NOT (BC17 or BC18 or BC19 or BC20 or BC2100 or BC2101 or BC2102 or BC2103)
-        if DimMgt.IsDefaultDimDefinedForTable(GetTableValuePair(FieldNo)) then  //First appears in BC21.4
+        if FeatureFlagsManagement.IsEnabled('forcePosSalelineDimensions') then
+            CreateDimensions := true
+        else
+            CreateDimensions := DimMgt.IsDefaultDimDefinedForTable(GetTableValuePair(FieldNo));  //First appears in BC21.4
+        if CreateDimensions then
 #ENDIF
 #IF NOT (BC17 or BC18 or BC19)
         CreateDim(DefaultDimSource);
