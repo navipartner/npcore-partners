@@ -747,17 +747,29 @@
         if ("Line Type" = "Line Type"::"GL Payment") then
             TestField("Gen. Posting Type");
 
-        if "Gen. Posting Type" = "Gen. Posting Type"::" " then begin
-            "VAT Calculation Type" := "VAT Calculation Type"::"Normal VAT";
-            "VAT %" := 0;
-            "Gen. Bus. Posting Group" := '';
-            "Gen. Prod. Posting Group" := '';
-            "VAT Bus. Posting Group" := '';
-            "VAT Prod. Posting Group" := '';
-        end else begin
-            VATPostingSetup.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group");
-            "VAT Identifier" := VATPostingSetup."VAT Identifier";
-            "VAT Calculation Type" := VATPostingSetup."VAT Calculation Type";
+        case true of
+            "Line Type" in ["Line Type"::Rounding, "Line Type"::"GL Payment", "Line Type"::"Issue Voucher"]:
+                begin
+                    if Rec."Gen. Posting Type" = Rec."Gen. Posting Type"::" " then begin
+                        "VAT Calculation Type" := "VAT Calculation Type"::"Normal VAT";
+                        "VAT %" := 0;
+                        "Gen. Bus. Posting Group" := '';
+                        "Gen. Prod. Posting Group" := '';
+                        "VAT Bus. Posting Group" := '';
+                        "VAT Prod. Posting Group" := '';
+                    end else begin
+                        VATPostingSetup.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group");
+                        "VAT Identifier" := VATPostingSetup."VAT Identifier";
+                        "VAT Calculation Type" := VATPostingSetup."VAT Calculation Type";
+                    end;
+                end;
+            "Line Type" in ["Line Type"::Item, "Line Type"::"Item Category", "Line Type"::"BOM List"]:
+                begin
+                    VATPostingSetup.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group");
+                    "VAT %" := VATPostingSetup."VAT %";
+                    "VAT Identifier" := VATPostingSetup."VAT Identifier";
+                    "VAT Calculation Type" := VATPostingSetup."VAT Calculation Type";
+                end;
         end;
     end;
 
@@ -896,6 +908,7 @@
         "Register No." := ExtSalePOS."Register No.";
         "Sales Ticket No." := ExtSalePOS."Sales Ticket No.";
         Rec.Date := ExtSalePOS.Date;
+        Rec."Price Includes VAT" := ExtSalePOS."Prices Including VAT";
         "Location Code" := ExtSalePOS."Location Code";
         "Gen. Bus. Posting Group" := ExtSalePOS."Gen. Bus. Posting Group";
         "VAT Bus. Posting Group" := ExtSalePOS."VAT Bus. Posting Group";
@@ -1107,5 +1120,106 @@
     procedure GetCurrency(var CurrencyOut: Record Currency)
     begin
         CurrencyOut := Currency;
+    end;
+
+    procedure UpdateVAT()
+    var
+        VATPostingSetup: Record "VAT Posting Setup";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        TempPOSSaleLine: Record "NPR POS Sale Line" temporary;
+        TempPOSSale: Record "NPR POS Sale" temporary;
+    begin
+        if (Rec."Line Type" <> Enum::"NPR POS Sale Line Type"::"Item") then
+            exit;
+
+        GetItem();
+
+        Rec."Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
+        Rec."VAT Bus. Posting Group" := Item."VAT Bus. Posting Gr. (Price)";
+        Rec."VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
+        VATPostingSetup.Get(Rec."VAT Bus. Posting Group", Rec."VAT Prod. Posting Group");
+        Rec."VAT %" := VATPostingSetup."VAT %";
+        Rec."VAT Identifier" := VATPostingSetup."VAT Identifier";
+        Rec."VAT Calculation Type" := VATPostingSetup."VAT Calculation Type";
+        TempPOSSaleLine.Init();
+        CopyToPosSaleLine(TempPOSSaleLine);
+        TempPOSSaleLine.Insert();
+        POSSaleTaxCalc.CalculateTax(TempPOSSaleLine, TempPOSSale, 0);
+        CopyFromPosSaleLine(TempPOSSaleLine);
+    end;
+
+    procedure CopyToPosSaleLine(var POSSaleLine: Record "NPR POS Sale Line")
+    begin
+        POSSaleLine.SystemId := Rec.SystemId;
+        POSSaleLine.Amount := Rec.Amount;
+        POSSaleLine."Amount Including VAT" := Rec."Amount Including VAT";
+        POSSaleLine."Currency Amount" := Rec."Currency Amount";
+        POSSaleLine."Currency Code" := Rec."Currency Code";
+        POSSaleline."Discount %" := Rec."Discount %";
+        POSSaleline."Discount Amount" := Rec."Discount Amount";
+        POSSaleline."Gen. Bus. Posting Group" := Rec."Gen. Bus. Posting Group";
+        POSSaleline."Gen. Posting Type" := Rec."Gen. Posting Type";
+        POSSaleline."Gen. Prod. Posting Group" := Rec."Gen. Prod. Posting Group";
+        POSSaleline."Line Amount" := Rec."Line Amount";
+        POSSaleline."Line No." := Rec."Line No.";
+        POSSaleline."Line Type" := Rec."Line Type";
+        POSSaleline."Location Code" := Rec."Location Code";
+        POSSaleline."No." := Rec."No.";
+        POSSaleline."Posting Group" := Rec."Posting Group";
+        POSSaleline."Price Includes VAT" := Rec."Price Includes VAT";
+        POSSaleline."Qty. per Unit of Measure" := Rec."Qty. per Unit of Measure";
+        POSSaleline.Quantity := Rec.Quantity;
+        POSSaleline."Quantity (Base)" := Rec."Quantity (Base)";
+        POSSaleline."Tax Area Code" := Rec."Tax Area Code";
+        POSSaleline."Tax Group Code" := Rec."Tax Group Code";
+        POSSaleline."Tax Liable" := Rec."Tax Liable";
+        POSSaleline."Unit Cost" := Rec."Unit Cost";
+        POSSaleline."Unit Cost (LCY)" := Rec."Unit Cost (LCY)";
+        POSSaleline."Unit of Measure Code" := Rec."Unit of Measure Code";
+        POSSaleline."Unit Price" := Rec."Unit Price";
+        POSSaleline."Variant Code" := Rec."Variant Code";
+        POSSaleline."VAT %" := Rec."VAT %";
+        POSSaleline."VAT Bus. Posting Group" := Rec."VAT Bus. Posting Group";
+        POSSaleline."VAT Identifier" := Rec."VAT Identifier";
+        POSSaleline."VAT Prod. Posting Group" := Rec."VAT Prod. Posting Group";
+        POSSaleline."VAT Base Amount" := Rec."VAT Base Amount";
+        POSSaleline."VAT Calculation Type" := Rec."VAT Calculation Type";
+    end;
+
+    procedure CopyFromPosSaleLine(var POSSaleLine: Record "NPR POS Sale Line")
+    begin
+        Rec.Amount := POSSaleLine.Amount;
+        Rec."Amount Including VAT" := POSSaleLine."Amount Including VAT";
+        Rec."Currency Amount" := POSSaleLine."Currency Amount";
+        Rec."Currency Code" := POSSaleLine."Currency Code";
+        Rec."Discount %" := POSSaleLine."Discount %";
+        Rec."Discount Amount" := POSSaleLine."Discount Amount";
+        Rec."Gen. Bus. Posting Group" := POSSaleLine."Gen. Bus. Posting Group";
+        Rec."Gen. Posting Type" := POSSaleLine."Gen. Posting Type";
+        Rec."Gen. Prod. Posting Group" := POSSaleLine."Gen. Prod. Posting Group";
+        Rec."Line Amount" := POSSaleLine."Line Amount";
+        Rec."Line No." := POSSaleLine."Line No.";
+        Rec."Line Type" := POSSaleLine."Line Type";
+        Rec."Location Code" := POSSaleLine."Location Code";
+        Rec."No." := POSSaleLine."No.";
+        Rec."Posting Group" := POSSaleLine."Posting Group";
+        Rec."Price Includes VAT" := POSSaleLine."Price Includes VAT";
+        Rec."Qty. per Unit of Measure" := POSSaleLine."Qty. per Unit of Measure";
+        Rec.Quantity := POSSaleLine.Quantity;
+        Rec."Quantity (Base)" := POSSaleLine."Quantity (Base)";
+        Rec."Tax Area Code" := POSSaleLine."Tax Area Code";
+        Rec."Tax Group Code" := POSSaleLine."Tax Group Code";
+        Rec."Tax Liable" := POSSaleLine."Tax Liable";
+        Rec."Unit Cost" := POSSaleLine."Unit Cost";
+        Rec."Unit Cost (LCY)" := POSSaleLine."Unit Cost (LCY)";
+        Rec."Unit of Measure Code" := POSSaleLine."Unit of Measure Code";
+        Rec."Unit Price" := POSSaleLine."Unit Price";
+        Rec."Variant Code" := POSSaleLine."Variant Code";
+        Rec."VAT %" := POSSaleLine."VAT %";
+        Rec."VAT Bus. Posting Group" := POSSaleLine."VAT Bus. Posting Group";
+        Rec."VAT Identifier" := POSSaleLine."VAT Identifier";
+        Rec."VAT Prod. Posting Group" := POSSaleLine."VAT Prod. Posting Group";
+        Rec."VAT Base Amount" := POSSaleLine."VAT Base Amount";
+        Rec."VAT Calculation Type" := POSSaleLine."VAT Calculation Type";
     end;
 }

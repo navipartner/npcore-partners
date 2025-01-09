@@ -195,6 +195,13 @@ navigation:
               title: POS Sale
               summary: ./docs/pages/pos/possale.mdx
 
+        - section: External POS
+          summary: ./docs/pages/externalpos/overview.mdx
+          contents:
+          - externalpos.externalpossale:
+              title: External POS Sale
+              summary: ./docs/pages/externalpos/externalpossale.mdx
+
 
 navbar-links:
   - type: secondary
