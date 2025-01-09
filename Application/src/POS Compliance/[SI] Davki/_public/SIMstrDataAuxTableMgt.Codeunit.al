@@ -3,7 +3,6 @@ codeunit 6248181 "NPR SI MstrData Aux Table Mgt"
     SingleInstance = true;
 
     var
-        SIAuxSalesHeaderInitialized: Boolean;
         SIAuxSalesHeader: Record "NPR SI Aux Sales Header";
 
     procedure GetSIAuxSalesHeaderPosUnit(SalesHeaderSystemID: Guid; var SIPOSUnitValue: Code[10]): Boolean
@@ -33,17 +32,11 @@ codeunit 6248181 "NPR SI MstrData Aux Table Mgt"
 
     local procedure InitializeSIAuxSalesHeader(SalesHeaderSystemID: Guid)
     begin
-        if SIAuxSalesHeaderInitialized then
+        if SIAuxSalesHeader.Get(SalesHeaderSystemID) then
             exit;
-
-        if SIAuxSalesHeader.Get(SalesHeaderSystemID) then begin
-            SIAuxSalesHeaderInitialized := true;
-            exit;
-        end;
 
         SIAuxSalesHeader.Init();
         SIAuxSalesHeader."Sales Header SystemId" := SalesHeaderSystemID;
         SIAuxSalesHeader.Insert();
-        SIAuxSalesHeaderInitialized := true;
     end;
 }

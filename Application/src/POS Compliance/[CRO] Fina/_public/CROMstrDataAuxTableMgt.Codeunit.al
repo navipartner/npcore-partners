@@ -3,7 +3,6 @@ codeunit 6185089 "NPR CRO MstrData Aux Table Mgt"
     SingleInstance = true;
 
     var
-        CROAuxSalesHeaderInitialized: Boolean;
         CROAuxSalesHeader: Record "NPR CRO Aux Sales Header";
 
     procedure GetCROAuxSalesHeaderPosUnit(SalesHeaderSystemID: Guid; var CROPOSUnitValue: Code[10]): Boolean
@@ -33,17 +32,11 @@ codeunit 6185089 "NPR CRO MstrData Aux Table Mgt"
 
     local procedure InitializeCROAuxSalesHeader(SalesHeaderSystemID: Guid)
     begin
-        if CROAuxSalesHeaderInitialized then
+        if CROAuxSalesHeader.Get(SalesHeaderSystemID) then
             exit;
-
-        if CROAuxSalesHeader.Get(SalesHeaderSystemID) then begin
-            CROAuxSalesHeaderInitialized := true;
-            exit;
-        end;
 
         CROAuxSalesHeader.Init();
         CROAuxSalesHeader."Sales Header SystemId" := SalesHeaderSystemID;
         CROAuxSalesHeader.Insert();
-        CROAuxSalesHeaderInitialized := true;
     end;
 }
