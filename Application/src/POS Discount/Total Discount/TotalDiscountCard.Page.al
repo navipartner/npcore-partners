@@ -6,7 +6,7 @@ page 6150909 "NPR Total Discount Card"
     PageType = Card;
     SourceTable = "NPR Total Discount Header";
     UsageCategory = None;
-    
+
     layout
     {
         area(content)
@@ -173,6 +173,7 @@ page 6150909 "NPR Total Discount Card"
                 ShortCutKey = 'Shift+Ctrl+D';
                 ToolTip = 'Open the Default Dimensions List';
                 ApplicationArea = NPRRetail;
+                Visible = false;
             }
         }
         area(processing)
