@@ -95,6 +95,8 @@ navigation:
                   # - endpoint: ticketing.service-ticket.validateMemberGuestArrival # Intended to register member guests arrival in one go, might move to memberships API
                   - endpoint: ticketing.service-ticket.sendToWallet
                   - endpoint: ticketing.service-ticket.exchangeForCoupon
+                  - endpoint: ticketing.service-ticket.confirmPrint
+                  - endpoint: ticketing.service-ticket.clearConfirmPrint
             - ticketing.service-reservations:
                 title: Reservations
                 summary: ./docs/pages/ticketing/reservation-summary.mdx              

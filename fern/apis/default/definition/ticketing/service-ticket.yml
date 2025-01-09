@@ -117,7 +117,50 @@ service:
             body:
               revokeId: $simpleTypes.Token.ExampleRevokeId
               status: "revoked"
-            
+
+    confirmPrint:
+      docs: 
+        Confirms the printing of a ticket using the ticketId. Increases the print count and sets the printedAt field to the current time.
+      method: POST
+      path: /{ticketId}/confirmPrint
+      path-parameters:
+        ticketId: simpleTypes.TicketId
+      request:
+        name: confirmPrint
+        body: ConfirmPrintRequest
+      response: ConfirmPrintResponse
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            ticketId: $simpleTypes.TicketId.ExampleTicket1
+          request:
+            printCount: $simpleTypes.PrintCount.ExamplePrintCount
+          response:
+            body:
+              printCount: $simpleTypes.PrintCountResponse.ExamplePrintCount
+              printedAt: $simpleTypes.PrintedAt.ExamplePrintedAt
+
+    clearConfirmPrint:
+      docs: 
+        Clears the printedAt field of a ticket using the ticketId.
+      method: POST
+      path: /{ticketId}/unConfirmPrint
+      path-parameters:
+        ticketId: simpleTypes.TicketId
+      request:
+        name: clearConfirmPrint
+      response: ClearConfirmPrintResponse
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            ticketId: $simpleTypes.TicketId.ExampleTicket1
+          response:
+            body:
+              printCount: $simpleTypes.PrintCountResponse.ExamplePrintCount
 
     validateArrival:
       docs: 
@@ -374,6 +417,33 @@ types:
       revoked: ActionResponseSuccess
       code: optional<ActionResponseCode>
       message: optional<ActionResponseMessage>
+
+
+  ConfirmPrintRequest:
+    properties:
+      printCount: simpleTypes.PrintCount
+    examples:
+      - name: ExampleConfirmPrint
+        value:
+          printCount: $simpleTypes.PrintCount.ExamplePrintCount
+
+  ConfirmPrintResponse:
+    properties:
+      printCount: simpleTypes.PrintCountResponse
+      printedAt: simpleTypes.PrintedAt
+    examples:
+      - name: ExampleConfirmPrint
+        value:
+          printCount: $simpleTypes.PrintCountResponse.ExamplePrintCount
+          printedAt: $simpleTypes.PrintedAt.ExamplePrintedAt
+
+  ClearConfirmPrintResponse:
+    properties:
+      printCount: simpleTypes.PrintCountResponse
+    examples:
+      - name: ExampleClearConfirmPrint
+        value:
+          printCount: $simpleTypes.PrintCountResponse.ExamplePrintCount
 
   AdmittedResponse:
     properties:

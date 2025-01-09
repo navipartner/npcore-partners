@@ -55,7 +55,14 @@ enum 6059815 "NPR TicketingApiFunctions"
     {
         Caption = 'Exchange ticket for coupon';
     }
-
+    value(309; CONFIRM_PRINT_TICKET)
+    {
+        Caption = 'Confirm print ticket';
+    }
+    value(310; CLEAR_CONFIRM_PRINT_TICKET)
+    {
+        Caption = 'Clear confirm print ticket';
+    }
 
     value(400; CREATE_RESERVATION)
     {

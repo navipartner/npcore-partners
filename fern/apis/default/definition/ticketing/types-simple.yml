@@ -165,6 +165,8 @@ types:
         value: 2024-10-15T00:00:00Z
       - name: ExampleValidUntil
         value: 2024-10-15T23:59:59Z
+      - name: ExamplePrintedAt
+        value: 2024-10-15T12:00:00Z
 
   DefaultAdmission:
     type: boolean
@@ -328,3 +330,24 @@ types:
   TicketSent:
       type: boolean
       docs: Indicates whether the ticket has been sent as an e-ticket
+
+  PrintCount:
+      type: integer
+      docs: The number of times the ticket has been printed. This value needs to correspond to the current value or confirmation will fail. Specifying -1 will ignore the print count check. The print count is increased by the confirmPrint operation.
+      examples:
+        - name: ExamplePrintCount
+          value: 0
+
+  PrintCountResponse:
+      type: integer
+      docs: The number of times the ticket has been printed. The print count is increased by the confirmPrint operation.
+      examples:
+        - name: ExamplePrintCount
+          value: 1
+
+  PrintedAt:
+      type: datetime
+      docs: The date and time when the ticket was printed
+      examples:
+        - name: ExamplePrintedAt
+          value: "2024-10-11T12:13:00Z"

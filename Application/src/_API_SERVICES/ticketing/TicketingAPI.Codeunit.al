@@ -35,6 +35,12 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
         if (Request.Match('POST', '/ticket/:ticketId/confirmRevoke')) then
             exit(Handle(_ApiFunction::CONFIRM_REVOKE_TICKET, Request));
 
+        if (Request.Match('POST', '/ticket/:ticketId/confirmPrint')) then
+            exit(Handle(_ApiFunction::CONFIRM_PRINT_TICKET, Request));
+
+        if (Request.Match('POST', '/ticket/:ticketId/clearConfirmPrint')) then
+            exit(Handle(_ApiFunction::CLEAR_CONFIRM_PRINT_TICKET, Request));
+
         if (Request.Match('POST', '/ticket/:ticketId/validateArrival')) then
             exit(Handle(_ApiFunction::VALIDATE_ARRIVAL, Request));
 

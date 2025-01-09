@@ -211,9 +211,12 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
     local procedure ScheduleDTO(var ResponseJson: Codeunit "NPR JSON Builder"; AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry"): Codeunit "NPR JSON Builder"
     var
         Schedule: Record "NPR TM Admis. Schedule";
+        DurationAsInt: Integer;
     begin
         if (not Schedule.Get(AdmissionScheduleEntry."Schedule Code")) then
             Schedule.Init();
+
+        DurationAsInt := Round((AdmissionScheduleEntry."Admission End Time" - AdmissionScheduleEntry."Admission Start Time") / 1000, 1);
 
         ResponseJson.StartObject('schedule')
             .AddProperty('externalNumber', AdmissionScheduleEntry."External Schedule Entry No.")
@@ -223,7 +226,7 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
             .AddProperty('startTime', AdmissionScheduleEntry."Admission Start Time")
             .AddProperty('endDate', AdmissionScheduleEntry."Admission End Date")
             .AddProperty('endTime', AdmissionScheduleEntry."Admission End Time")
-            .AddProperty('duration', (AdmissionScheduleEntry."Admission End Time" - AdmissionScheduleEntry."Admission Start Time") / 1000)
+            .AddProperty('duration', DurationAsInt)
             .AddObject(AddPropertyNotNull(ResponseJson, 'arrivalFromTime', AdmissionScheduleEntry."Event Arrival From Time"))
             .AddObject(AddPropertyNotNull(ResponseJson, 'arrivalUntilTime', AdmissionScheduleEntry."Event Arrival Until Time"))
         .EndObject();

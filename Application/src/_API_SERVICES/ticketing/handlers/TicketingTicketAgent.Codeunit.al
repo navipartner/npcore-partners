@@ -168,6 +168,36 @@ codeunit 6185080 "NPR TicketingTicketAgent"
 
     end;
 
+    internal procedure ConfirmPrintTicket(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        Ticket: Record "NPR TM Ticket";
+        Body: JsonObject;
+        Token: JsonToken;
+        printCount: Integer;
+    begin
+        if (not GetTicketById(Request, 2, Ticket, Response)) then
+            exit(Response);
+
+        Body := Request.BodyJson().AsObject();
+        if (not Body.Get('printCount', Token)) then
+            exit(Response.RespondBadRequest('Missing printCount in request'));
+
+        printCount := Token.AsValue().AsInteger();
+
+        exit(ConfirmPrintTicket(Ticket, printCount));
+    end;
+
+    internal procedure ClearConfirmPrintTicket(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        Ticket: Record "NPR TM Ticket";
+    begin
+        if (not GetTicketById(Request, 2, Ticket, Response)) then
+            exit(Response);
+
+        exit(ClearConfirmPrintTicket(Ticket));
+    end;
+
+
     // ****************************
     internal procedure RequestRevokeTicket(Ticket: Record "NPR TM Ticket"; PinCode: Code[10]; Amount: Decimal) Response: Codeunit "NPR API Response"
     var
@@ -290,6 +320,45 @@ codeunit 6185080 "NPR TicketingTicketAgent"
     end;
 
 
+    local procedure ConfirmPrintTicket(Ticket: Record "NPR TM Ticket"; PrintCount: Integer) Response: Codeunit "NPR API Response"
+    var
+        ResponseJson: Codeunit "NPR JSON Builder";
+    begin
+        if (PrintCount < -1) then
+            exit(Response.RespondBadRequest('Invalid print count'));
+
+        if (PrintCount >= 0) then
+            if (not (PrintCount = Ticket.PrintCount)) then
+                exit(Response.RespondBadRequest('Invalid print count'));
+
+        Ticket.PrintCount += 1;
+        Ticket.PrintedDateTime := CurrentDateTime();
+        Ticket."Printed Date" := Today(); // slight issue with timezone, but we can live with that
+        Ticket.Modify();
+
+        ResponseJson.StartObject()
+            .AddProperty('printCount', Ticket.PrintCount)
+            .AddProperty('printedAt', Ticket.PrintedDateTime)
+            .EndObject();
+
+        exit(Response.RespondOk(ResponseJson.Build()));
+    end;
+
+    local procedure ClearConfirmPrintTicket(Ticket: Record "NPR TM Ticket") Response: Codeunit "NPR API Response"
+    var
+        ResponseJson: Codeunit "NPR JSON Builder";
+    begin
+        Ticket.PrintedDateTime := CreateDateTime(0D, 0T);
+        Ticket."Printed Date" := 0D;
+        Ticket.Modify();
+
+        ResponseJson.StartObject()
+            .AddProperty('printCount', Ticket.PrintCount)
+            .EndObject();
+
+        exit(Response.RespondOk(ResponseJson.Build()));
+    end;
+
     // ****************************
     local procedure GetTicketById(var Request: Codeunit "NPR API Request"; PathPosition: Integer; var Ticket: Record "NPR TM Ticket"; var Response: Codeunit "NPR API Response"): Boolean
     var
@@ -388,6 +457,8 @@ codeunit 6185080 "NPR TicketingTicketAgent"
             .AddProperty('unitPriceInclVat', Ticket.AmountInclVat)
             .AddProperty('currencyCode', CurrencyCode)
             .AddProperty('ticketHolder', ReservationRequest.TicketHolderName)
+            .AddProperty('printCount', Ticket.PrintCount)
+            .AddProperty('printedAt', Ticket.PrintedDateTime)
         .EndObject();
 
         exit(ResponseJson);
@@ -467,6 +538,7 @@ codeunit 6185080 "NPR TicketingTicketAgent"
     var
         ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         Schedule: Record "NPR TM Admis. Schedule";
+        DurationAsInt: Integer;
     begin
         ResponseJson.StartObject(ObjectName);
 
@@ -474,6 +546,9 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         ScheduleEntry.SetFilter(Cancelled, '=%1', false);
         if (ScheduleEntry.FindFirst()) then begin
             Schedule.Get(ScheduleEntry."Schedule Code");
+
+            DurationAsInt := Round((ScheduleEntry."Admission End Time" - ScheduleEntry."Admission Start Time") / 1000, 1);
+
             ResponseJson
                 .AddProperty('externalNumber', ScheduleEntry."External Schedule Entry No.")
                 .AddProperty('code', ScheduleEntry."Schedule Code")
@@ -481,7 +556,7 @@ codeunit 6185080 "NPR TicketingTicketAgent"
                 .AddProperty('startTime', ScheduleEntry."Admission Start Time")
                 .AddProperty('endDate', ScheduleEntry."Admission End Date")
                 .AddProperty('endTime', ScheduleEntry."Admission End Time")
-                .AddProperty('duration', (ScheduleEntry."Admission End Time" - ScheduleEntry."Admission Start Time") / 1000)
+                .AddProperty('duration', DurationAsInt)
                 .AddProperty('description', Schedule.Description)
                 .AddProperty('arrivalFromTime', ScheduleEntry."Event Arrival From Time")
                 .AddProperty('arrivalUntilTime', ScheduleEntry."Event Arrival Until Time");
