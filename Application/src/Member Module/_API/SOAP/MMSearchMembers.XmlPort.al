@@ -313,7 +313,7 @@ xmlport 6151186 "NPR MM Search Members"
             Member.SetFilter("E-Mail Address", '%1', LowerCase(TempMemberInfoRequest."E-Mail Address"));
 
         if (TempMemberInfoRequest."Phone No." <> '') then
-            Member.SetFilter("Phone No.", '%1', StrSubstNo('@%1', TempMemberInfoRequest."Phone No."));
+            Member.SetFilter("Phone No.", '%1', TempMemberInfoRequest."Phone No.");
 
         if (Member.FindSet()) then begin
             repeat
