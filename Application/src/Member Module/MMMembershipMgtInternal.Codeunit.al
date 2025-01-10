@@ -2696,13 +2696,7 @@
                 ValidFromDate := SalesDate;
 
             MembershipSalesSetup."Valid From Base"::"DATEFORMULA":
-                begin
-                    ValidFromDate := SalesDate;
-                    if (SalesDate = WorkDate()) then begin
-                        MembershipSalesSetup.TestField("Valid From Date Calculation");
-                        ValidFromDate := CalcDate(MembershipSalesSetup."Valid From Date Calculation", SalesDate);
-                    end;
-                end;
+                ValidFromDate := SalesDate;
 
             MembershipSalesSetup."Valid From Base"::FIRST_USE:
                 begin
