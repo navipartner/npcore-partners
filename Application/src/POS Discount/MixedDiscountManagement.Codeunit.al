@@ -1207,6 +1207,8 @@
                 TempSaleLinePOSApply."Sales Document No." := TempMixedDiscountLine."No.";
                 TempSaleLinePOSApply."Variant Code" := TempMixedDiscountLine."Variant Code";
                 TempSaleLinePOSApply."Quantity (Base)" := TempMixedDiscountLine.Quantity;
+                if IsNullGuid(TempSaleLinePOSApply.SystemId) then
+                    TempSaleLinePOSApply.SystemId := CreateGuid();
                 TempSaleLinePOSApply.Insert();
 
                 TempSaleLinePOSApply."MR Anvendt antal" := TempSaleLinePOSApply.Quantity;
