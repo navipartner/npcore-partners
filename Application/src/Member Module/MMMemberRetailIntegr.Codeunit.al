@@ -855,7 +855,8 @@
             if (MemberInfoCapture."Document Date" = 0D) then
                 MemberInfoCapture."Document Date" := SalesDate;
 
-            if (MembershipSalesSetup."Valid From Base" <> MembershipSalesSetup."Valid From Base"::PROMPT) then
+            if ((MembershipSalesSetup."Valid From Base" <> MembershipSalesSetup."Valid From Base"::PROMPT) and
+                (MembershipSalesSetup."Valid From Base" <> MembershipSalesSetup."Valid From Base"::DATEFORMULA)) then
                 MemberInfoCapture."Document Date" := SalesDate;
 
             MemberInfoCapture.Modify();
