@@ -30,6 +30,7 @@
         POSSalesPriceCalcMgt: Codeunit "NPR POS Sales Price Calc. Mgt.";
         Item: Record Item;
         POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
+        POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         CurrencyDiscCalcNotSupported: Label 'Discount module "%1" does not support discount calculations when exchange rates apply (%2 -> %3).';
     begin
         // Prepare Lines for VAT
@@ -110,8 +111,11 @@
         if (TempSaleLinePOS2.FindSet()) then begin
             repeat
                 TmpSaleLinePOS.Get(TempSaleLinePOS2."Register No.", TempSaleLinePOS2."Sales Ticket No.", TempSaleLinePOS2.Date, TempSaleLinePOS2."Sale Type", TempSaleLinePOS2."Line No.");
-
                 TmpSaleLinePOS.TransferFields(TempSaleLinePOS2, false);
+                if (TmpSaleLinePOS."Discount Type" = TmpSaleLinePOS."Discount Type"::Mix) and (TmpSaleLinePOS."Price Includes VAT") then begin
+                    TmpSaleLinePOS."Unit Price" := POSSaleTaxCalc.CalcAmountWithVAT(TmpSaleLinePOS."Unit Price", TmpSaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+                    TmpSaleLinePOS.Amount := POSSaleTaxCalc.CalcAmountWithVAT(TmpSaleLinePOS.Amount, TempSaleLinePOS2."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+                end;
                 TmpSaleLinePOS.UpdateAmounts(TmpSaleLinePOS);
                 TmpSaleLinePOS.Modify();
             until (TempSaleLinePOS2.Next() = 0);
