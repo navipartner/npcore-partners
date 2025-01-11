@@ -45,11 +45,11 @@
 
             trigger OnValidate()
             var
-                POSUnitAuxPar: Record "NPR DE POS Unit Aux. Info";
+                DETSSClient: Record "NPR DE POS Unit Aux. Info";
             begin
-                if not POSUnitAuxPar.GetBySystemId("Client ID") then
-                    Clear(POSUnitAuxPar);
-                "Serial Number" := POSUnitAuxPar."Serial Number";
+                if not DETSSClient.GetBySystemId("Client ID") then
+                    Clear(DETSSClient);
+                "Serial Number" := DETSSClient."Serial Number";
             end;
         }
         field(50; "Serial Number"; Text[250])
@@ -159,7 +159,7 @@
         {
         }
     }
-      trigger OnInsert()
+    trigger OnInsert()
     begin
         SystemId := CreateGuid();
     end;

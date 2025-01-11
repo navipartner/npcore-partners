@@ -92,7 +92,7 @@
                         Success := DSFINVKMng.CreateDSFINVKDocument(DSFINVKJson, Rec);
                     if Success then begin
                         Rec."Closing ID" := CreateGuid(); //Fiskaly does not allow update of Cash Point Closings 
-                        Success := DEFiskalyCommunication.SendRequest_DSFinV_K(DSFINVKJson, DSFINVKResponseJson, ConnectionParameters, 'PUT', StrSubstNo('/cash_point_closings/%1', Format(Rec."Closing ID", 0, 4)));
+                        Success := DEFiskalyCommunication.SendRequest_DSFinV_K(DSFINVKJson, DSFINVKResponseJson, ConnectionParameters, Enum::"Http Request Type"::PUT, StrSubstNo('/cash_point_closings/%1', Format(Rec."Closing ID", 0, 4)));
                     end;
 
                     if not Success then

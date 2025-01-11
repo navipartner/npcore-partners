@@ -4,15 +4,15 @@
     [TryFunction]
     procedure CreateDSFINVKDocument(var DSFINVKJson: JsonObject; DSFINVKClosing: Record "NPR DSFINVK Closing")
     var
-        DePosUnit: Record "NPR DE POS Unit Aux. Info";
+        DETSSClient: Record "NPR DE POS Unit Aux. Info";
         FirstFiscalNo: Text;
         LastFiscalNo: Text;
     begin
-        DePosUnit.Get(DSFINVKClosing."POS Unit No.");
+        DETSSClient.Get(DSFINVKClosing."POS Unit No.");
         FillTransactionData(DSFINVKClosing."Closing Date", FirstFiscalNo, LastFiscalNo);
 
         DSFINVKJson.Add('head', GetHeader(FirstFiscalNo, LastFiscalNo));
-        DSFINVKJson.Add('client_id', Format(DePosUnit.SystemId, 0, 4));
+        DSFINVKJson.Add('client_id', Format(DETSSClient.SystemId, 0, 4));
         DSFINVKJson.Add('cash_point_closing_export_id', DSFINVKClosing."DSFINVK Closing No.");
         DSFINVKJson.Add('cash_statement', CreateCashStatement());
         DSFINVKJson.Add('transactions', CreateTransactions(DSFINVKClosing."Closing Date"));

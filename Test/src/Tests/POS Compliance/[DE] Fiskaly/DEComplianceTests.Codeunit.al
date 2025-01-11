@@ -19,12 +19,13 @@ codeunit 85214 "NPR DE Compliance Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure CreateTSSandClientData()
     var
-        DEAuditSetup: Record "NPR DE Audit Setup";
+        ConnectionParameterSet: Record "NPR DE Audit Setup";
         DETSS: Record "NPR DE TSS";
         POSUnit: Record "NPR POS Unit";
         POSStore: Record "NPR POS Store";
         POSPostingProfile: Record "NPR POS Posting Profile";
-        DEPOSUnitAuxInfo: Record "NPR DE POS Unit Aux. Info";
+        DETSSClient: Record "NPR DE POS Unit Aux. Info";
+        DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
         LibraryDEFiscal: Codeunit "NPR Library DE Fiscal";
     begin
         // [Scenario] Check that TSS and Client are successfully created.
@@ -32,21 +33,23 @@ codeunit 85214 "NPR DE Compliance Tests"
         BindSubscription(LibraryDEFiscal);
 
         // [When] Creating TSS and Client setup
-        LibraryDEFiscal.CreateDEConnectionParamSet(DEAuditSetup);
-        LibraryDEFiscal.CreateTSSClient(DETSS, DEAuditSetup);
+        LibraryDEFiscal.CreateTestConnectionParameterSet(ConnectionParameterSet);
+        LibraryDEFiscal.CreateTSS(DETSS, ConnectionParameterSet);
+        DEFiskalyCommunication.CreateTSS(DETSS, ConnectionParameterSet);
         LibraryDEFiscal.CreatePOSUnit(POSUnit, POSStore, POSPostingProfile);
-        LibraryDEFiscal.CreateDEPOSUnitAuxInfo(DEPOSUnitAuxInfo, POSUnit, DETSS, DEAuditSetup);
+        LibraryDEFiscal.CreateTSSClient(DETSSClient, POSUnit, DETSS);
+        DEFiskalyCommunication.CreateClient(DETSSClient);
 
         // [Then] Setup records are filled with information received from Fiskaly
         _Assert.IsTrue(DETSS."Fiskaly TSS Created at" <> 0DT, 'Fiskaly TSS Created at must be initialized.');
         _Assert.IsTrue(DETSS."Fiskaly TSS State" in [DETSS."Fiskaly TSS State"::CREATED, DETSS."Fiskaly TSS State"::INITIALIZED], 'Fiskaly TSS State must be CREATED or INITIALIZED.');
-        _Assert.IsTrue(DEPOSUnitAuxInfo."Fiskaly Client Created at" <> 0DT, 'Fiskaly Client Created at must be initialized.');
-        _Assert.IsTrue(DEPOSUnitAuxInfo."Fiskaly Client State" in [DEPOSUnitAuxInfo."Fiskaly Client State"::REGISTERED], 'Fiskaly Client state must be REGISTERED.');
+        _Assert.IsTrue(DETSSClient."Fiskaly Client Created at" <> 0DT, 'Fiskaly Client Created at must be initialized.');
+        _Assert.IsTrue(DETSSClient."Fiskaly Client State" in [DETSSClient."Fiskaly Client State"::REGISTERED], 'Fiskaly Client state must be REGISTERED.');
 
         // [Cleanup] Cleanum and Unbind Event Subscriptions in Test Library Codeunit
-        DEAuditSetup.DeleteAll();
+        ConnectionParameterSet.DeleteAll();
         DETSS.DeleteAll();
-        DEPOSUnitAuxInfo.DeleteAll();
+        DETSSClient.DeleteAll();
         UnbindSubscription(LibraryDEFiscal);
     end;
 
@@ -54,9 +57,9 @@ codeunit 85214 "NPR DE Compliance Tests"
     [TestPermissions(TestPermissions::Disabled)]
     procedure GetTSSClientList()
     var
-        DEAuditSetup: Record "NPR DE Audit Setup";
+        ConnectionParameterSet: Record "NPR DE Audit Setup";
         DETSS: Record "NPR DE TSS";
-        DEPOSUnitAuxInfo: Record "NPR DE POS Unit Aux. Info";
+        DETSSClient: Record "NPR DE POS Unit Aux. Info";
         LibraryDEFiscal: Codeunit "NPR Library DE Fiscal";
         DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
     begin
@@ -65,17 +68,17 @@ codeunit 85214 "NPR DE Compliance Tests"
         BindSubscription(LibraryDEFiscal);
 
         // [When] Creating TSS and Client setup
-        LibraryDEFiscal.CreateDEConnectionParamSet(DEAuditSetup);
-        LibraryDEFiscal.CreateTSSClient(DETSS, DEAuditSetup);
-        DEFiskalyCommunication.GetTSSClientList(DETSS, DEPOSUnitAuxInfo);
+        LibraryDEFiscal.CreateTestConnectionParameterSet(ConnectionParameterSet);
+        LibraryDEFiscal.CreateTSS(DETSS, ConnectionParameterSet);
+        DEFiskalyCommunication.GetTSSClientList(DETSS, DETSSClient);
 
         // [Then] Setup records are filled with information received from Fiskaly
-        _Assert.IsTrue(DEPOSUnitAuxInfo.FindFirst(), 'Client List has not been imported correctly');
+        _Assert.IsTrue(DETSSClient.FindFirst(), 'Client List has not been imported correctly');
 
         // [Cleanup] Cleanum and Unbind Event Subscriptions in Test Library Codeunit
-        DEAuditSetup.DeleteAll();
+        ConnectionParameterSet.DeleteAll();
         DETSS.DeleteAll();
-        DEPOSUnitAuxInfo.DeleteAll();
+        DETSSClient.DeleteAll();
         UnbindSubscription(LibraryDEFiscal);
     end;
 
@@ -147,38 +150,6 @@ codeunit 85214 "NPR DE Compliance Tests"
         UnbindSubscription(LibraryDEFiscal);
     end;
 
-    local procedure InitializeData()
-    var
-        POSAuditProfile: Record "NPR POS Audit Profile";
-        POSAuditLog: Record "NPR POS Audit Log";
-        POSStore: Record "NPR POS Store";
-        POSPostingProfile: Record "NPR POS Posting Profile";
-        LibraryDEFiscal: Codeunit "NPR Library DE Fiscal";
-        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
-        LibraryERM: Codeunit "Library - ERM";
-    begin
-        if _Initialized then begin
-            // Clean any previous mock session
-            _POSSession.ClearAll();
-            Clear(_POSSession);
-        end else begin
-            LibraryDEFiscal.CreatePOSUnit(_POSUnit, POSStore, POSPostingProfile);
-            LibraryPOSMasterData.CreateItemForPOSSaleUsage(_Item, _POSUnit, POSStore);
-            LibraryPOSMasterData.CreateSalespersonForPOSUsage(_Salesperson);
-            _Item."Unit Price" := 10;
-            _Item.Modify();
-            LibraryERM.CreateReturnReasonCode(_ReturnReason);
-            LibraryDEFiscal.CreateVATPostingSetup(POSPostingProfile."VAT Bus. Posting Group", _Item."VAT Prod. Posting Group");
-            LibraryDEFiscal.CreatePOSPaymentMethod(_POSPaymentMethod, Enum::"NPR Payment Processing Type"::CASH);
-            LibraryDEFiscal.CreateAuditProfileSetup(POSAuditProfile, _POSUnit);
-
-            _Initialized := true;
-        end;
-
-        POSAuditLog.DeleteAll(true); // Clean between tests
-        Commit();
-    end;
-
     local procedure DoItemSale(): Integer
     var
         POSEntry: Record "NPR POS Entry";
@@ -223,5 +194,37 @@ codeunit 85214 "NPR DE Compliance Tests"
         _POSSession.ClearAll();
         Clear(_POSSession);
         exit(POSEntry."Entry No.");
+    end;
+
+    local procedure InitializeData()
+    var
+        POSAuditProfile: Record "NPR POS Audit Profile";
+        POSAuditLog: Record "NPR POS Audit Log";
+        POSStore: Record "NPR POS Store";
+        POSPostingProfile: Record "NPR POS Posting Profile";
+        LibraryDEFiscal: Codeunit "NPR Library DE Fiscal";
+        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryERM: Codeunit "Library - ERM";
+    begin
+        if _Initialized then begin
+            // Clean any previous mock session
+            _POSSession.ClearAll();
+            Clear(_POSSession);
+        end else begin
+            LibraryDEFiscal.CreatePOSUnit(_POSUnit, POSStore, POSPostingProfile);
+            LibraryPOSMasterData.CreateItemForPOSSaleUsage(_Item, _POSUnit, POSStore);
+            LibraryPOSMasterData.CreateSalespersonForPOSUsage(_Salesperson);
+            _Item."Unit Price" := 10;
+            _Item.Modify();
+            LibraryERM.CreateReturnReasonCode(_ReturnReason);
+            LibraryDEFiscal.CreateVATPostingSetup(POSPostingProfile."VAT Bus. Posting Group", _Item."VAT Prod. Posting Group");
+            LibraryDEFiscal.CreatePOSPaymentMethod(_POSPaymentMethod, Enum::"NPR Payment Processing Type"::CASH);
+            LibraryDEFiscal.CreateAuditProfileSetup(POSAuditProfile, _POSUnit);
+
+            _Initialized := true;
+        end;
+
+        POSAuditLog.DeleteAll(true); // Clean between tests
+        Commit();
     end;
 }

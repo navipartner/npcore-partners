@@ -8,7 +8,21 @@
         exit('DE_FISKALY');
     end;
 
-    internal procedure IsDEFiscalizationEnabled(): Boolean
+    local procedure IsAuditEnabled(POSAuditProfileCode: Code[20]): Boolean
+    var
+        POSAuditProfile: Record "NPR POS Audit Profile";
+    begin
+        if not POSAuditProfile.Get(POSAuditProfileCode) then
+            exit(false);
+        exit(IsAuditEnabled(POSAuditProfile));
+    end;
+
+    local procedure IsAuditEnabled(POSAuditProfile: Record "NPR POS Audit Profile"): Boolean
+    begin
+        exit(POSAuditProfile."Audit Handler" = HandlerCode());
+    end;
+
+    internal procedure IsFiscalizationEnabled(): Boolean
     var
         DEFiscalizationSetup: Record "NPR DE Fiscalization Setup";
     begin
@@ -18,29 +32,15 @@
         exit(DEFiscalizationSetup."Enable DE Fiscal");
     end;
 
-    local procedure IsEnabled(POSAuditProfileCode: Code[20]): Boolean
-    var
-        POSAuditProfile: Record "NPR POS Audit Profile";
-    begin
-        if not POSAuditProfile.Get(POSAuditProfileCode) then
-            exit(false);
-        exit(IsEnabled(POSAuditProfile));
-    end;
-
-    local procedure IsEnabled(POSAuditProfile: Record "NPR POS Audit Profile"): Boolean
-    begin
-        exit(POSAuditProfile."Audit Handler" = HandlerCode());
-    end;
-
     procedure ShouldDisplayNotification(POSAuditProfile: Record "NPR POS Audit Profile"; xPOSAuditProfile: Record "NPR POS Audit Profile"): Boolean
     var
-        DEPosUnitSetup: Record "NPR DE POS Unit Aux. Info";
+        DETSSClient: Record "NPR DE POS Unit Aux. Info";
     begin
-        if not IsEnabled(POSAuditProfile) then
+        if not IsAuditEnabled(POSAuditProfile) then
             exit(false);
         if POSAuditProfile."Audit Handler" = xPOSAuditProfile."Audit Handler" then
             exit(false);
-        exit(DEPosUnitSetup.IsEmpty());
+        exit(DETSSClient.IsEmpty());
     end;
 
     procedure OnActionShowSetup()
@@ -58,7 +58,7 @@
     [EventSubscriber(ObjectType::Page, Page::"NPR POS Audit Profiles", 'OnHandlePOSAuditProfileAdditionalSetup', '', true, true)]
     local procedure OnHandlePOSAuditProfileAdditionalSetup(POSAuditProfile: Record "NPR POS Audit Profile")
     begin
-        if not IsEnabled(POSAuditProfile) then
+        if not IsAuditEnabled(POSAuditProfile) then
             exit;
         OnActionShowSetup();
     end;
@@ -75,30 +75,30 @@
     local procedure OnHandleAuditLogBeforeInsert(var POSAuditLog: Record "NPR POS Audit Log")
     var
         DeAuditAux: Record "NPR DE POS Audit Log Aux. Info";
-        POSUnitAux: Record "NPR DE POS Unit Aux. Info";
+        DETSSClient: Record "NPR DE POS Unit Aux. Info";
         POSUnit: Record "NPR POS Unit";
         DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
     begin
         if (POSAuditLog."Active POS Unit No." = '') then
             POSAuditLog."Active POS Unit No." := POSAuditLog."Acted on POS Unit No.";
-        if not POSUnitAux.Get(POSAuditLog."Active POS Unit No.") then
+        if not DETSSClient.Get(POSAuditLog."Active POS Unit No.") then
             exit;
         if not POSUnit.Get(POSAuditLog."Active POS Unit No.") then
             exit;
-        if not IsEnabled(POSUnit."POS Audit Profile") then
+        if not IsAuditEnabled(POSUnit."POS Audit Profile") then
             exit;
 
         case POSAuditLog."Action Type" of
             POSAuditLog."Action Type"::DIRECT_SALE_END:
                 begin
-                    InitDeAuxInfo(DeAuditAux, POSUnitAux, POSAuditLog, Enum::"NPR DE Fiskaly Receipt Type"::RECEIPT);
+                    InitDeAuxInfo(DeAuditAux, DETSSClient, POSAuditLog, Enum::"NPR DE Fiskaly Receipt Type"::RECEIPT);
                     OnHandleDEAuditAuxLogBeforeInsert(DeAuditAux);
                     DeAuditAux.Insert(true);
                     DEFiskalyCommunication.SendDocument(DeAuditAux);
                 end;
             POSAuditLog."Action Type"::CANCEL_SALE_END:
                 begin
-                    InitDeAuxInfo(DeAuditAux, POSUnitAux, POSAuditLog, Enum::"NPR DE Fiskaly Receipt Type"::CANCELLATION);
+                    InitDeAuxInfo(DeAuditAux, DETSSClient, POSAuditLog, Enum::"NPR DE Fiskaly Receipt Type"::CANCELLATION);
                     OnHandleDEAuditAuxLogBeforeInsert(DeAuditAux);
                     DeAuditAux.Insert(true);
                     DEFiskalyCommunication.SendDocument(DeAuditAux);
@@ -118,7 +118,7 @@
             exit;
         if not PosUnit.GetProfile(PosAuditProfile) then
             exit;
-        if not IsEnabled(PosAuditProfile) then
+        if not IsAuditEnabled(PosAuditProfile) then
             exit;
 
         PosEntry.SetCurrentKey("Document No.");
@@ -192,16 +192,16 @@
             until PaymentLine.Next() = 0;
     end;
 
-    local procedure InitDeAuxInfo(var DeAuditAux: Record "NPR DE POS Audit Log Aux. Info"; POSUnitAuxPar: Record "NPR DE POS Unit Aux. Info"; POSAuditLog: Record "NPR POS Audit Log"; FiskalyTransactionType: Enum "NPR DE Fiskaly Receipt Type")
+    local procedure InitDeAuxInfo(var DeAuditAux: Record "NPR DE POS Audit Log Aux. Info"; DETSSClient: Record "NPR DE POS Unit Aux. Info"; POSAuditLog: Record "NPR POS Audit Log"; FiskalyTransactionType: Enum "NPR DE Fiskaly Receipt Type")
     var
         Licenseinformation: Codeunit "NPR License Information";
     begin
         DeAuditAux.Init();
         DeAuditAux."POS Entry No." := POSAuditLog."Acted on POS Entry No.";
         DeAuditAux."NPR Version" := CopyStr(Licenseinformation.GetRetailVersion(), 1, MaxStrLen(DeAuditAux."NPR Version"));
-        DeAuditAux.Validate("TSS Code", POSUnitAuxPar."TSS Code");
-        DeAuditAux."Client ID" := POSUnitAuxPar.SystemId;
-        DeAuditAux."Serial Number" := POSUnitAuxPar."Serial Number";
+        DeAuditAux.Validate("TSS Code", DETSSClient."TSS Code");
+        DeAuditAux."Client ID" := DETSSClient.SystemId;
+        DeAuditAux."Serial Number" := DETSSClient."Serial Number";
         DeAuditAux."Fiskaly Transaction Type" := FiskalyTransactionType;
         DeAuditAux."Transaction ID" := POSAuditLog."Active POS Sale SystemId";
         if IsNullGuid(DeAuditAux."Transaction ID") then
@@ -290,7 +290,8 @@
     local procedure OnBeforeLogin(SaleHeader: Record "NPR POS Sale"; FrontEnd: Codeunit "NPR POS Front End Management")
     var
         CompanyInformation: Record "Company Information";
-        POSUnitAudit: Record "NPR DE POS Unit Aux. Info";
+        ConnectionParameterSet: Record "NPR DE Audit Setup";
+        DETSSClient: Record "NPR DE POS Unit Aux. Info";
         DETSS: Record "NPR DE TSS";
         POSAuditProfile: Record "NPR POS Audit Profile";
         POSEndofDayProfile: Record "NPR POS End of Day Profile";
@@ -307,26 +308,26 @@
         FrontEnd.GetSession(POSSession);
         POSSession.GetSetup(POSSetup);
         POSSetup.GetPOSUnit(POSUnit);
-        if not IsEnabled(POSUnit."POS Audit Profile") then
+        if not IsAuditEnabled(POSUnit."POS Audit Profile") then
             exit;
 
-        POSUnitAudit.Get(POSUnit."No.");
-        POSUnitAudit.TestField(SystemId);
-        POSUnitAudit.TestField("Serial Number");
-        POSUnitAudit.TestField("TSS Code");
-        POSUnitAudit.TestField("Fiskaly Client Created at");
+        DETSSClient.Get(POSUnit."No.");
+        DETSSClient.TestField(SystemId);
+        DETSSClient.TestField("Serial Number");
+        DETSSClient.TestField("TSS Code");
+        DETSSClient.TestField("Fiskaly Client Created at");
 
-        DETSS.Get(POSUnitAudit."TSS Code");
+        DETSS.Get(DETSSClient."TSS Code");
         DETSS.TestField(SystemId);
         DETSS.TestField("Fiskaly TSS Created at");
         DETSS.TestField("Connection Parameter Set Code");
 
-        DEConnectionParameterSet.Get(DETSS."Connection Parameter Set Code");
-        DEConnectionParameterSet.TestField("Api URL");
-        if not DESecretMgt.HasSecretKey(DEConnectionParameterSet.ApiKeyLbl()) then
-            Error(MissingConnectionParameterErr, SelectStr(1, ParameterFieldCaptionsLbl), DEConnectionParameterSet.TableCaption(), DEConnectionParameterSet.FieldCaption("Primary Key"), DEConnectionParameterSet."Primary Key");
-        if not DESecretMgt.HasSecretKey(DEConnectionParameterSet.ApiSecretLbl()) then
-            Error(MissingConnectionParameterErr, SelectStr(2, ParameterFieldCaptionsLbl), DEConnectionParameterSet.TableCaption(), DEConnectionParameterSet.FieldCaption("Primary Key"), DEConnectionParameterSet."Primary Key");
+        ConnectionParameterSet.Get(DETSS."Connection Parameter Set Code");
+        ConnectionParameterSet.TestField("Api URL");
+        if not DESecretMgt.HasSecretKey(ConnectionParameterSet.ApiKeyLbl()) then
+            Error(MissingConnectionParameterErr, SelectStr(1, ParameterFieldCaptionsLbl), ConnectionParameterSet.TableCaption(), ConnectionParameterSet.FieldCaption("Primary Key"), ConnectionParameterSet."Primary Key");
+        if not DESecretMgt.HasSecretKey(ConnectionParameterSet.ApiSecretLbl()) then
+            Error(MissingConnectionParameterErr, SelectStr(2, ParameterFieldCaptionsLbl), ConnectionParameterSet.TableCaption(), ConnectionParameterSet.FieldCaption("Primary Key"), ConnectionParameterSet."Primary Key");
 
         POSAuditProfile.Get(POSUnit."POS Audit Profile");
         POSAuditProfile.TestField("Sale Fiscal No. Series");
@@ -365,8 +366,8 @@
     var
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueMgt: Codeunit "NPR Job Queue Management";
-        JobDescLbl: Label 'Auto-created for sending Fiskaly', Locked = true;
         IsHandled: Boolean;
+        JobDescLbl: Label 'Auto-created for sending Fiskaly', Locked = true;
     begin
         OnBeforeCheckTssJobQueue(IsHandled);
         if IsHandled then
@@ -394,8 +395,8 @@
     var
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueMgt: Codeunit "NPR Job Queue Management";
-        JobDescLbl: Label 'Auto-created for sending DSFINVK', Locked = true;
         IsHandled: Boolean;
+        JobDescLbl: Label 'Auto-created for sending DSFINVK', Locked = true;
     begin
         OnBeforeCheckDSFINVKJobQueue(IsHandled);
         if IsHandled then
@@ -437,7 +438,7 @@
         if not POSUnit.Get(UnitNo) then
             exit;
 
-        if not IsEnabled(POSUnit."POS Audit Profile") then
+        if not IsAuditEnabled(POSUnit."POS Audit Profile") then
             exit;
 
         POSWorkshifCheckpoint.Reset();
@@ -481,7 +482,7 @@
         end;
 
         DSFINVKClosing."Closing ID" := CreateGuid(); //Fiskaly does not allow update of Cash Point Closings
-        if not DEFiskalyCommunication.SendRequest_DSFinV_K(DSFINVKJson, DSFINVKResponseJson, ConnectionParameters, 'PUT', '/cash_point_closings/' + Format(DSFINVKClosing."Closing ID", 0, 4)) then begin
+        if not DEFiskalyCommunication.SendRequest_DSFinV_K(DSFINVKJson, DSFINVKResponseJson, ConnectionParameters, Enum::"Http Request Type"::PUT, '/cash_point_closings/' + Format(DSFINVKClosing."Closing ID", 0, 4)) then begin
             SetDSFINVKErrorMsg(DSFINVKClosing);
             exit;
         end;
@@ -511,6 +512,46 @@
         DSFINVKClosing.Modify();
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Store", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure OnBeforeRenamePOSStore(var Rec: Record "NPR POS Store"; var xRec: Record "NPR POS Store"; RunTrigger: Boolean)
+    begin
+        ErrorOnRenameOfPOSStoreIfAlreadyUsed(xRec);
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR POS Unit", 'OnBeforeRenameEvent', '', false, false)]
+    local procedure OnBeforeRenamePOSUnit(var Rec: Record "NPR POS Unit"; var xRec: Record "NPR POS Unit"; RunTrigger: Boolean)
+    begin
+        ErrorOnRenameOfPOSUnitIfAlreadyUsed(xRec);
+    end;
+
+    local procedure ErrorOnRenameOfPOSStoreIfAlreadyUsed(OldPOSStore: Record "NPR POS Store")
+    var
+        DEEstablishment: Record "NPR DE Establishment";
+        CannotRenameErr: Label 'You cannot rename %1 %2 since there is related %3 record and it can cause data discrepancy since it is being used for fiscalization.', Comment = '%1 - POS Store table caption, %2 - POS Store Code value, %3 - DE Establishment table caption';
+    begin
+        if not IsFiscalizationEnabled() then
+            exit;
+
+        DEEstablishment.SetRange("POS Store Code", OldPOSStore.Code);
+        DEEstablishment.SetRange(Created, true);
+        if not DEEstablishment.IsEmpty() then
+            Error(CannotRenameErr, OldPOSStore.TableCaption(), OldPOSStore.Code, DEEstablishment.TableCaption());
+    end;
+
+    local procedure ErrorOnRenameOfPOSUnitIfAlreadyUsed(OldPOSUnit: Record "NPR POS Unit")
+    var
+        DETSSClient: Record "NPR DE POS Unit Aux. Info";
+        CannotRenameErr: Label 'You cannot rename %1 %2 since there is related %3 record and it can cause data discrepancy since it is being used for fiscalization.', Comment = '%1 - POS Unit table caption, %2 - POS Unit No. value, %3 - DE POS Unit Aux. Info table caption';
+    begin
+        if not IsAuditEnabled(OldPOSUnit."POS Audit Profile") then
+            exit;
+
+        DETSSClient.SetRange("POS Unit No.", OldPOSUnit."No.");
+        DETSSClient.SetFilter("Fiskaly Client State", '<>%1', DETSSClient."Fiskaly Client State"::Unknown);
+        if not DETSSClient.IsEmpty() then
+            Error(CannotRenameErr, OldPOSUnit.TableCaption(), OldPOSUnit."No.", DETSSClient.TableCaption());
+    end;
+
     #region DE Fiscal - Aux and Mapping Tables Cleanup
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Payment Method", 'OnAfterDeleteEvent', '', false, false)]
     local procedure PaymentMethod_OnAfterDeleteEvent(var Rec: Record "NPR POS Payment Method"; RunTrigger: Boolean)
@@ -521,7 +562,7 @@
             exit;
         if Rec.IsTemporary() then
             exit;
-        if not IsDEFiscalizationEnabled() then
+        if not IsFiscalizationEnabled() then
             exit;
         if DEPaymentMethodMapping.Get(Rec.Code) then
             DEPaymentMethodMapping.Delete(true);
@@ -536,7 +577,7 @@
             exit;
         if Rec.IsTemporary() then
             exit;
-        if not IsDEFiscalizationEnabled() then
+        if not IsFiscalizationEnabled() then
             exit;
         if VATPostGroupMapper.Get(Rec."VAT Prod. Posting Group", Rec."VAT Bus. Posting Group") then
             VATPostGroupMapper.Delete(true);
@@ -562,7 +603,4 @@
     local procedure OnBeforeCheckDSFINVKJobQueue(var IsHandled: Boolean)
     begin
     end;
-
-    var
-        DEConnectionParameterSet: Record "NPR DE Audit Setup";
 }
