@@ -75,7 +75,7 @@
         end;
 
         DSFINVKClosing."Closing ID" := CreateGuid(); //Fiskaly does not allow update of Cash Point Closings
-        if not DEFiskalyCommunication.SendRequest_DSFinV_K(DSFINVKJson, DSFINVKResponseJson, ConnectionParameters, 'PUT', StrSubstNo('/cash_point_closings/%1', Format(DSFINVKClosing."Closing ID", 0, 4))) then begin
+        if not DEFiskalyCommunication.SendRequest_DSFinV_K(DSFINVKJson, DSFINVKResponseJson, ConnectionParameters, Enum::"Http Request Type"::PUT, StrSubstNo('/cash_point_closings/%1', Format(DSFINVKClosing."Closing ID", 0, 4))) then begin
             DEAuditMgt.SetDSFINVKErrorMsg(DSFINVKClosing);
             exit;
         end;
@@ -108,7 +108,7 @@
                     DSFINVKJson.Add('start_date', DSFINVKMng.GetUnixTime(CreateDateTime(DSFINVKClosing2."Closing Date", 0T)));
                     DSFINVKJson.Add('end_date', DSFINVKMng.GetUnixTime(CreateDateTime(DSFINVKClosing2."Closing Date", 235959T)));
                     DSFINVKClosing2."Export ID" := CreateGuid();
-                    Success := DEFiskalyCommunication.SendRequest_DSFinV_K(DSFINVKJson, DSFINVKResponseJson, ConnectionParameters, 'PUT', StrSubstNo('/exports/%1', Format(DSFINVKClosing2."Export ID", 0, 4)));
+                    Success := DEFiskalyCommunication.SendRequest_DSFinV_K(DSFINVKJson, DSFINVKResponseJson, ConnectionParameters, Enum::"Http Request Type"::PUT, StrSubstNo('/exports/%1', Format(DSFINVKClosing2."Export ID", 0, 4)));
                 end;
 
                 if not Success then
@@ -141,7 +141,7 @@
 
                 Success := ConnectionParameters.GetSetup(DSFINVKClosing2);
                 if Success then
-                    Success := DEFiskalyCommunication.SendRequest_DSFinV_K(DSFINVKJson, DSFINVKResponseJson, ConnectionParameters, 'GET', StrSubstNo('/cash_point_closings/%1', Format(DSFINVKClosing2."Closing ID", 0, 4)));
+                    Success := DEFiskalyCommunication.SendRequest_DSFinV_K(DSFINVKJson, DSFINVKResponseJson, ConnectionParameters, Enum::"Http Request Type"::GET, StrSubstNo('/cash_point_closings/%1', Format(DSFINVKClosing2."Closing ID", 0, 4)));
 
                 if not Success then
                     DEAuditMgt.SetDSFINVKErrorMsg(DSFINVKClosing2)
@@ -170,7 +170,7 @@
             Success := DSFINVKMng.CreateDSFINVKDocument(DSFINVKJson, DSFINVKClosing2);
         if Success then begin
             DSFINVKClosing2."Closing ID" := CreateGuid(); //Fiskaly does not allow update of Cash Point Closings
-            Success := DEFiskalyCommunication.SendRequest_DSFinV_K(DSFINVKJson, DSFINVKResponseJson, ConnectionParameters, 'PUT', StrSubstNo('/cash_point_closings/%1', Format(DSFINVKClosing2."Closing ID", 0, 4)));
+            Success := DEFiskalyCommunication.SendRequest_DSFinV_K(DSFINVKJson, DSFINVKResponseJson, ConnectionParameters, Enum::"Http Request Type"::PUT, StrSubstNo('/cash_point_closings/%1', Format(DSFINVKClosing2."Closing ID", 0, 4)));
         end;
 
         if not Success then

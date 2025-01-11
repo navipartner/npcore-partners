@@ -50,17 +50,9 @@ page 6184745 "NPR DE POS Unit Step"
 
                 trigger OnAction()
                 var
-                    DETSS: Record "NPR DE TSS";
                     DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
-                    TSSNotSyncedQst: Label 'It looks that assigned TSS hasn''t been created at Fiskaly yet. If you continue, it will be created automatically.\Are you sure you want to continue?';
                 begin
-                    Rec.TestField("Serial Number");
-                    Rec.TestField("TSS Code");
-                    DETSS.Get(Rec."TSS Code");
-                    if DETSS."Fiskaly TSS Created at" = 0DT then
-                        if not Confirm(TSSNotSyncedQst, false) then
-                            exit;
-
+                    CurrPage.SaveRecord();
                     DEFiskalyCommunication.CreateClient(Rec);
                     CurrPage.Update(false);
                 end;
@@ -69,28 +61,28 @@ page 6184745 "NPR DE POS Unit Step"
     }
     trigger OnDeleteRecord(): Boolean
     begin
-        if not DEPOSUnitMapping.Get(Rec."POS Unit No.") then
+        if not DETSSClient.Get(Rec."POS Unit No.") then
             exit;
-        DEPOSUnitMapping.Delete();
+        DETSSClient.Delete();
     end;
 
     trigger OnModifyRecord(): Boolean
     begin
-        if not DEPOSUnitMapping.Get(Rec."POS Unit No.") then
+        if not DETSSClient.Get(Rec."POS Unit No.") then
             exit;
-        DEPOSUnitMapping.TransferFields(Rec);
-        DEPOSUnitMapping.Modify();
+        DETSSClient.TransferFields(Rec);
+        DETSSClient.Modify();
     end;
 
     internal procedure CopyRealToTemp()
     begin
-        if not DEPOSUnitMapping.FindSet() then
+        if not DETSSClient.FindSet() then
             exit;
         repeat
-            Rec.TransferFields(DEPOSUnitMapping);
+            Rec.TransferFields(DETSSClient);
             if not Rec.Insert() then
                 Rec.Modify();
-        until DEPOSUnitMapping.Next() = 0;
+        until DETSSClient.Next() = 0;
     end;
 
     internal procedure DEPOSUnitMappingDataToCreate(): Boolean
@@ -108,9 +100,9 @@ page 6184745 "NPR DE POS Unit Step"
         if not Rec.FindSet() then
             exit;
         repeat
-            DEPOSUnitMapping.TransferFields(Rec);
-            if not DEPOSUnitMapping.Insert() then
-                DEPOSUnitMapping.Modify();
+            DETSSClient.TransferFields(Rec);
+            if not DETSSClient.Insert() then
+                DETSSClient.Modify();
         until Rec.Next() = 0;
     end;
 
@@ -143,5 +135,5 @@ page 6184745 "NPR DE POS Unit Step"
     end;
 
     var
-        DEPOSUnitMapping: Record "NPR DE POS Unit Aux. Info";
+        DETSSClient: Record "NPR DE POS Unit Aux. Info";
 }

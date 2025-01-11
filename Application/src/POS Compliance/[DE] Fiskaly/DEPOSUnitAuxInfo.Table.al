@@ -1,7 +1,7 @@
 ﻿table 6014532 "NPR DE POS Unit Aux. Info"
 {
     Access = Internal;
-    Caption = 'DE Fiskaly POS Unit Setup';
+    Caption = 'DE Fiskaly TSS Client';
     DataClassification = CustomerContent;
 
     fields
@@ -10,18 +10,16 @@
         {
             Caption = 'POS Unit No.';
             DataClassification = CustomerContent;
-            TableRelation = "NPR POS Unit"."No.";
+            TableRelation = "NPR POS Unit";
         }
-        field(2; "Cash Register Brand"; Text[50])
+        field(2; "Cash Register Brand"; Text[250])
         {
-            Caption = 'Cash Register Brand';
-            Description = 'Cash Register Brand for DE Fiskaly DSFINKV';
+            Caption = 'Cash Register Brand (Manufacturer)';
             DataClassification = CustomerContent;
         }
-        field(3; "Cash Register Model"; Text[50])
+        field(3; "Cash Register Model"; Text[250])
         {
             Caption = 'Cash Register Model';
-            Description = 'Cash Register Model for DE Fiskaly DSFINKV';
             DataClassification = CustomerContent;
         }
         field(10; "Client ID"; Guid)
@@ -76,6 +74,7 @@
             Caption = 'Cash Register Created';
             Description = 'Is Cash Register Created for DE Fiskaly DSFINVK';
             DataClassification = CustomerContent;
+            Editable = false;
         }
         field(50; "Fiskaly Client Created at"; DateTime)
         {
@@ -89,6 +88,107 @@
             DataClassification = CustomerContent;
             Editable = false;
         }
+        field(100; "Additional Data Created"; Boolean)
+        {
+            Caption = 'Additional Data Created';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
+        field(105; "Additional Data Decommissioned"; Boolean)
+        {
+            Caption = 'Additional Data Decommissioned';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
+        field(110; "Acquisition Date"; Date)
+        {
+            Caption = 'Acquisition Date';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if "Acquisition Date" <> xRec."Acquisition Date" then
+                    TestField("Additional Data Created", false);
+            end;
+        }
+        field(115; "Commissioning Date"; Date)
+        {
+            Caption = 'Commissioning Date';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if "Commissioning Date" <> xRec."Commissioning Date" then
+                    TestField("Additional Data Created", false);
+            end;
+        }
+        field(120; "Decommissioning Date"; Date)
+        {
+            Caption = 'Decommissioning Date';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if "Decommissioning Date" <> xRec."Decommissioning Date" then
+                    TestField("Additional Data Decommissioned", false);
+            end;
+        }
+        field(125; "Decommissioning Reason"; Text[1000])
+        {
+            Caption = 'Decommissioning Reason';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if ("Decommissioning Reason" <> xRec."Decommissioning Reason") and ("Decommissioning Reason" <> '') then
+                    TestField("Decommissioning Date");
+            end;
+        }
+        field(130; "POS Store Code"; Code[10])
+        {
+            Caption = 'POS Store Code (Establishment)';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR DE Establishment";
+
+            trigger OnValidate()
+            begin
+                if "POS Store Code" <> xRec."POS Store Code" then
+                    TestField("Additional Data Created", false);
+            end;
+        }
+        field(135; "Establishment Id"; Guid)
+        {
+            Caption = 'Establishment Id';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
+        field(140; Remarks; Text[1000])
+        {
+            Caption = 'Remarks';
+            DataClassification = CustomerContent;
+        }
+        field(145; Software; Text[250])
+        {
+            Caption = 'Software';
+            DataClassification = CustomerContent;
+        }
+        field(150; "Software Version"; Text[250])
+        {
+            Caption = 'Software Version';
+            DataClassification = CustomerContent;
+        }
+        field(155; "Client Type"; Enum "NPR DE Client Type")
+        {
+            Caption = 'Client Type';
+            DataClassification = CustomerContent;
+            InitValue = 1;
+
+            trigger OnValidate()
+            begin
+                if "Client Type" <> xRec."Client Type" then
+                    TestField("Additional Data Created", false);
+            end;
+        }
     }
 
     keys
@@ -98,8 +198,23 @@
             Clustered = true;
         }
     }
+
     trigger OnInsert()
     begin
         SystemId := CreateGuid();
+    end;
+
+    internal procedure GetWithCheck(POSUnitNo: Code[10])
+    begin
+        Get(POSUnitNo);
+        TestField("Additional Data Created");
+    end;
+
+    internal procedure CheckIsClientTypePopulated()
+    var
+        NotPopulatedErr: Label '%1 must be populated for %2 %3.', Comment = '%1 - Client Type field caption, %2 - POS Unit Number field value, %3 - DE POS Unit Aux. Info table caption';
+    begin
+        if "Client Type" = "Client Type"::" " then
+            Error(NotPopulatedErr, FieldCaption("Client Type"), "POS Unit No.", TableCaption());
     end;
 }

@@ -25,6 +25,11 @@ page 6059891 "NPR DE Connection Param. Sets"
                     ToolTip = 'Specifies a text that describes the set of DE Fiskaly connection parameters.';
                     ApplicationArea = NPRDEFiscal;
                 }
+                field("Taxpayer Created"; Rec."Taxpayer Created")
+                {
+                    ApplicationArea = NPRDEFiscal;
+                    ToolTip = 'Specifies whether the taxpayer is created at Fiskaly.';
+                }
             }
         }
         area(factboxes)
@@ -38,6 +43,24 @@ page 6059891 "NPR DE Connection Param. Sets"
             {
                 ApplicationArea = NPRDEFiscal;
                 Visible = false;
+            }
+        }
+    }
+
+    actions
+    {
+        area(Navigation)
+        {
+            action(DEEstablishments)
+            {
+                ApplicationArea = NPRDEFiscal;
+                Caption = 'DE Establishments';
+                Image = Home;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                RunObject = page "NPR DE Establishments";
+                ToolTip = 'Opens DE Establishments page.';
             }
         }
     }

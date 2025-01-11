@@ -1,13 +1,15 @@
 ﻿page 6150756 "NPR DE Fiskaly TSS Clients"
 {
-    Extensible = False;
     Caption = 'DE Fiskaly TSS Clients';
     ContextSensitiveHelpPage = 'docs/fiscalization/germany/how-to/setup/';
+    Editable = false;
+    Extensible = False;
+    ObsoleteReason = 'Page NPR DE POS Unit Aux. Info List should be used instead.';
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-01-12';
     PageType = List;
     SourceTable = "NPR DE POS Unit Aux. Info";
-    UsageCategory = Administration;
-    Editable = false;
-    ApplicationArea = NPRDEFiscal;
+    UsageCategory = None;
 
     layout
     {
@@ -17,13 +19,13 @@
             {
                 field("POS Unit No."; Rec."POS Unit No.")
                 {
-                    ToolTip = 'Specifies the POS Unit this Fiskaly client is created for.';
                     ApplicationArea = NPRDEFiscal;
+                    ToolTip = 'Specifies the POS Unit this Fiskaly client is created for.';
                 }
                 field("Cash Register Brand"; Rec."Cash Register Brand")
                 {
                     ApplicationArea = NPRDEFiscal;
-                    ToolTip = 'Specifies the POS unit cash register brand.';
+                    ToolTip = 'Specifies the POS unit cash register brand (manufacturer).';
                 }
                 field("Cash Register Model"; Rec."Cash Register Model")
                 {
@@ -32,28 +34,28 @@
                 }
                 field("Serial Number"; Rec."Serial Number")
                 {
-                    ToolTip = 'Specifies the POS unit cash register serial number.';
                     ApplicationArea = NPRDEFiscal;
+                    ToolTip = 'Specifies the POS unit cash register serial number.';
                 }
                 field("TSS Code"; Rec."TSS Code")
                 {
-                    ToolTip = 'Specifies the Technical Security System (TSS) the Fiskaly client is linked to.';
                     ApplicationArea = NPRDEFiscal;
+                    ToolTip = 'Specifies the Technical Security System (TSS) the Fiskaly client is linked to.';
                 }
                 field("Client ID"; Rec.SystemId)
                 {
-                    ToolTip = 'Specifies the Fiskaly client ID.';
                     ApplicationArea = NPRDEFiscal;
+                    ToolTip = 'Specifies the Fiskaly client ID.';
                 }
                 field("Fiskaly Client Created at"; Rec."Fiskaly Client Created at")
                 {
-                    ToolTip = 'Specifies the date/time the client was created at Fiskaly.';
                     ApplicationArea = NPRDEFiscal;
+                    ToolTip = 'Specifies the date/time the client was created at Fiskaly.';
                 }
                 field("Fiskaly Client State"; Rec."Fiskaly Client State")
                 {
-                    ToolTip = 'Specifies last known state of the Fiskaly client.';
                     ApplicationArea = NPRDEFiscal;
+                    ToolTip = 'Specifies last known state of the Fiskaly client.';
                 }
             }
         }
@@ -65,14 +67,14 @@
         {
             action(DeregisterClient)
             {
+                ApplicationArea = NPRRetail;
                 Caption = 'Deregister Fiskaly Client';
                 Image = VoidCheck;
                 Promoted = true;
-                PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                PromotedOnly = true;
                 ToolTip = 'Deregisters previously created client at Fiskaly.';
-                ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
