@@ -112,6 +112,11 @@
         {
             Caption = 'Quantity';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                Return := Quantity < 0;
+            end;
         }
         field(305; "Unit of Measure Code"; Code[10])
         {
@@ -132,6 +137,11 @@
         field(315; "Quantity (Base)"; Decimal)
         {
             Caption = 'Quantity (Base)';
+            DataClassification = CustomerContent;
+        }
+        field(320; Return; Boolean)
+        {
+            Caption = 'Return';
             DataClassification = CustomerContent;
         }
         field(400; "Unit Price"; Decimal)
@@ -224,10 +234,8 @@
             ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Use systemID instead';
         }
-    }
-
-    fieldgroups
-    {
+        key(Key4; "Global Reference", Return, Type, "No.", "Variant Code")
+        {
+        }
     }
 }
-
