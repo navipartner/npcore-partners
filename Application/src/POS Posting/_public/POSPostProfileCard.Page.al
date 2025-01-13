@@ -157,6 +157,7 @@
                     ObsoleteState = Pending;
                     ObsoleteTag = '2024-11-03';
                     ObsoleteReason = 'Moved Customer Ledger Posting Setup to Fiscalization Setup Tables';
+                    Enabled = false;
                 }
                 field("Customer Posting Group Filter"; Rec."Customer Posting Group Filter")
                 {
@@ -165,6 +166,7 @@
                     ObsoleteState = Pending;
                     ObsoleteTag = '2024-11-03';
                     ObsoleteReason = 'Moved Customer Ledger Posting Setup to Fiscalization Setup Tables';
+                    Enabled = false;
                 }
                 field("Enable Legal Ent. CLE Posting"; Rec."Enable Legal Ent. CLE Posting")
                 {
@@ -174,6 +176,7 @@
                     ObsoleteState = Pending;
                     ObsoleteTag = '2024-11-03';
                     ObsoleteReason = 'Moved Customer Ledger Posting Setup to Fiscalization Setup Tables';
+                    Enabled = false;
                 }
                 field("General Journal Template Name"; Rec."General Journal Template Name")
                 {
@@ -182,6 +185,7 @@
                     ObsoleteState = Pending;
                     ObsoleteTag = '2024-11-03';
                     ObsoleteReason = 'Moved Customer Ledger Posting Setup to Fiscalization Setup Tables';
+                    Enabled = false;
                 }
                 field("General Journal Batch Name"; Rec."General Journal Batch Name")
                 {
@@ -190,6 +194,7 @@
                     ObsoleteState = Pending;
                     ObsoleteTag = '2024-11-03';
                     ObsoleteReason = 'Moved Customer Ledger Posting Setup to Fiscalization Setup Tables';
+                    Enabled = false;
                 }
             }
         }
