@@ -197,6 +197,7 @@ xmlport 6151167 "NPR NpGp POS Entries"
                         trigger OnBeforeInsertRecord()
                         begin
                             TempNpGpPOSSalesLine."POS Entry No." := TempNpGpPOSSalesEntry."Entry No.";
+                            TempNpGpPOSSalesLine.Return := TempNpGpPOSSalesLine.Quantity < 0;
                         end;
                     }
                 }

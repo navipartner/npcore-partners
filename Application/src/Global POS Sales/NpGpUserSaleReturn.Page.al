@@ -112,7 +112,7 @@
                         if QuantityToReturn > OriginalQuantity - QuantityReturned then
                             QuantityToReturn := OriginalQuantity - QuantityReturned;
 
-                        Rec.Quantity := -QuantityToReturn;
+                        Rec.Validate(Quantity, -QuantityToReturn);
                     end;
                 }
                 field("Currency Code"; Rec."Currency Code")
@@ -172,7 +172,7 @@
         end;
 
         QuantityToReturn := Abs(Rec.Quantity);
-        Rec.Quantity := -Abs(Rec.Quantity);
+        Rec.Validate(Quantity, -Abs(Rec.Quantity));
         Rec.Modify();
     end;
 
