@@ -54,11 +54,11 @@ codeunit 6150815 "NPR POS Action: MM Member ArrB"
 
 
         if (POSWorkflowType = POSWorkflowMethod::Automatic) then
-            MemberTicketManager.AttemptMemberFastCheckIn(MemberCardOut."Membership Entry No.", MemberCardOut."Member Entry No.", AdmissionCode, PosUnitNo, 1, '', ExternalTicketNo, ResponseMessage, ResponseCode);
+            CheckInOK := MemberTicketManager.AttemptMemberFastCheckIn(MemberCardOut."Membership Entry No.", MemberCardOut."Member Entry No.", AdmissionCode, PosUnitNo, 1, '', ExternalTicketNo, ResponseMessage, ResponseCode);
 
         if (POSWorkflowType = POSWorkflowMethod::GuestCheckIn) then begin
             MemberTicketManager.PromptForMemberGuestArrival(MemberCardOut."Membership Entry No.", MemberCardOut."Member Entry No.", AdmissionCode, PosUnitNo, Token);
-            MemberTicketManager.AttemptMemberFastCheckIn(MemberCardOut."Membership Entry No.", MemberCardOut."Member Entry No.", AdmissionCode, PosUnitNo, 1, Token, ExternalTicketNo, ResponseMessage, ResponseCode);
+            CheckInOK := MemberTicketManager.AttemptMemberFastCheckIn(MemberCardOut."Membership Entry No.", MemberCardOut."Member Entry No.", AdmissionCode, PosUnitNo, 1, Token, ExternalTicketNo, ResponseMessage, ResponseCode);
         end;
 
         if (not CheckInOK) then
