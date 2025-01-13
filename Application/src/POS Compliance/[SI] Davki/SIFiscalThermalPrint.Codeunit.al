@@ -51,7 +51,7 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
         CompanyInfo: Record "Company Information";
         POSStore: Record "NPR POS Store";
         DateLbl: Label 'Dne: ';
-        DateFormatLbl: Label '%1, %2', Locked = true, Comment = '%1 = Entry Date, %2 = Time Stamp';
+        DateFormatLbl: Label '%1 %2', Locked = true, Comment = '%1 = Entry Date, %2 = Time Stamp';
         ReceiptCopyLbl: Label 'THIS IS A COPY %1 OF A RECEIPT', Comment = '%1 = Receipt Copy No.';
         ReceiptNoLbl: Label 'Št. računa: ';
     begin
@@ -77,7 +77,7 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
         PrintCustomerAdditionalInfo(SIPOSAuditLogAuxInfo);
         PrintFullLine();
 
-        PrintTwoColumnText(DateLbl, StrSubstNo(DateFormatLbl, Format(SIPOSAuditLogAuxInfo."Entry Date", 10, '<Day,2>.<Month,2>.<Year4>'), Format(SIPOSAuditLogAuxInfo."Log Timestamp", 8, '<Hours24>:<Minutes,2>:<Seconds,2>')), 'CENTER', true);
+        PrintTwoColumnText(DateLbl, StrSubstNo(DateFormatLbl, Format(SIPOSAuditLogAuxInfo."Entry Date", 11, '<Day,2>.<Month,2>.<Year4>.'), Format(SIPOSAuditLogAuxInfo."Log Timestamp", 8, '<Hours24>:<Minutes,2>:<Seconds,2>')), 'CENTER', true);
 
         PrintTwoColumnText(ReceiptNoLbl, FormatReceiptNo(SIPOSAuditLogAuxInfo), 'CENTER', true);
     end;
@@ -106,8 +106,18 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
             exit;
         repeat
             PrintTextLine(POSEntrySalesLine.Description, 'CENTER', false);
+
             PrintFourColumnText(Format(POSEntrySalesLine.Quantity).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(POSEntrySalesLine."Unit Price"), FormatDecimal(POSEntrySalesLine."Amount Incl. VAT"), 'CENTER', false);
         until POSEntrySalesLine.Next() = 0;
+
+        POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Comment);
+        if POSEntrySalesLine.FindSet() then begin
+            PrintEmptyLine();
+            repeat
+                PrintTextLine(POSEntrySalesLine.Description, 'CENTER', false);
+            until POSEntrySalesLine.Next() = 0;
+        end;
+
         PrintFullLine();
 
         PrintTwoColumnText(FinalBillLbl, FormatDecimal(SIPOSAuditLogAuxInfo."Total Amount"), 'CENTER', true);
@@ -157,11 +167,18 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
         repeat
             PrintTextLine(SalesInvoiceLine.Description, 'CENTER', false);
             PrintFourColumnText(Format(SalesInvoiceLine.Quantity).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(GetUnitPriceInclVAT(SalesInvoiceHeader."Prices Including VAT", SalesInvoiceLine."Unit Price", SalesInvoiceLine."VAT %", SalesInvoiceHeader."Currency Code")), FormatDecimal(SalesInvoiceLine."Amount Including VAT"), 'CENTER', false);
-
             AddAmountToDecimalDict(TaxableAmountDict, SalesInvoiceLine."VAT %", SalesInvoiceLine."VAT Base Amount");
             AddAmountToDecimalDict(TaxAmountDict, SalesInvoiceLine."VAT %", SalesInvoiceLine."Amount Including VAT" - SalesInvoiceLine."VAT Base Amount");
             AddAmountToDecimalDict(AmountInclTaxDict, SalesInvoiceLine."VAT %", SalesInvoiceLine."Amount Including VAT");
         until SalesInvoiceLine.Next() = 0;
+
+        SalesInvoiceLine.SetRange(Type, SalesInvoiceLine.Type::" ");
+        if SalesInvoiceLine.FindSet() then begin
+            PrintEmptyLine();
+            repeat
+                PrintTextLine(SalesInvoiceLine.Description, 'CENTER', false);
+            until SalesInvoiceLine.Next() = 0;
+        end;
         PrintFullLine();
 
         PrintTwoColumnText(FinalBillLbl, FormatDecimal(SIPOSAuditLogAuxInfo."Total Amount"), 'CENTER', true);
@@ -203,18 +220,28 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
 
         SalesCrMemoHeader.Get(SIPOSAuditLogAuxInfo."Source Document No.");
 
-        SalesCrMemoLine.SetLoadFields(Description, Quantity, "Unit Price", "VAT Base Amount", "VAT %", "Amount Including VAT");
+        SalesCrMemoLine.SetLoadFields(Description, Type, Quantity, "Unit Price", "VAT Base Amount", "VAT %", "Amount Including VAT");
         SalesCrMemoLine.SetRange("Document No.", SIPOSAuditLogAuxInfo."Source Document No.");
         SalesCrMemoLine.SetRange(Type, SalesCrMemoLine.Type::Item);
         SalesCrMemoLine.FindSet();
         repeat
             PrintTextLine(SalesCrMemoLine.Description, 'CENTER', false);
+
             PrintFourColumnText(Format(-Abs(SalesCrMemoLine.Quantity)).PadLeft(StrLen(Format(ItemDescLbl).PadRight(10, ' ')), ' '), 'x', FormatDecimal(GetUnitPriceInclVAT(SalesCrMemoHeader."Prices Including VAT", SalesCrMemoLine."Unit Price", SalesCrMemoLine."VAT %", SalesCrMemoHeader."Currency Code")), FormatDecimal(Round(-Abs(SalesCrMemoLine."Amount Including VAT"), Currency."Amount Rounding Precision")), 'CENTER', false);
 
             AddAmountToDecimalDict(TaxableAmountDict, SalesCrMemoLine."VAT %", SalesCrMemoLine."VAT Base Amount");
             AddAmountToDecimalDict(TaxAmountDict, SalesCrMemoLine."VAT %", SalesCrMemoLine."Amount Including VAT" - SalesCrMemoLine."VAT Base Amount");
             AddAmountToDecimalDict(AmountInclTaxDict, SalesCrMemoLine."VAT %", SalesCrMemoLine."Amount Including VAT");
         until SalesCrMemoLine.Next() = 0;
+
+        SalesCrMemoLine.SetRange(Type, SalesCrMemoLine.Type::" ");
+        if SalesCrMemoLine.FindSet() then begin
+            PrintEmptyLine();
+            repeat
+                PrintTextLine(SalesCrMemoLine.Description, 'CENTER', false);
+            until SalesCrMemoLine.Next() = 0;
+        end;
+
         PrintFullLine();
 
         PrintTwoColumnText(FinalBillLbl, FormatDecimal(SIPOSAuditLogAuxInfo."Total Amount"), 'CENTER', true);
