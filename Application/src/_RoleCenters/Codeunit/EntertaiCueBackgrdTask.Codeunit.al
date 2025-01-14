@@ -13,8 +13,10 @@
     begin
 
         RetailEntertainmentCue.SetAutoCalcFields("Issued Tickets", "Ticket Requests", "Ticket Schedules", "Ticket Admissions", Items, Contacts, Customers,
-                                    Members, Memberships, Membercards, "Ticket Types", "Ticket Admission BOM", TicketItems);
+                                    Members, Memberships, Membercards, "Ticket Types", "Ticket Admission BOM", TicketItems, "No. of Sub Pay Req Error", "No. of Sub Req Error",
+                                    "No. of Sub Pay Req New", "No. of Sub Pay Req Captured", "No. of Sub Pay Req Rejected", "No. of Sub Req Pending", "No. of Sub Req Confirmed", "No. of Sub Req Rejected");
 
+        RetailEntertainmentCue.SetRange("Subs. Date Filter", Today);
         if not RetailEntertainmentCue.Get() then
             exit;
 
@@ -31,6 +33,14 @@
         Result.Add(Format(RetailEntertainmentCue.FieldNo("Ticket Types")), Format(RetailEntertainmentCue."Ticket Types", 0, 9));
         Result.Add(Format(RetailEntertainmentCue.FieldNo("Ticket Admission BOM")), Format(RetailEntertainmentCue."Ticket Admission BOM", 0, 9));
         Result.Add(Format(RetailEntertainmentCue.FieldNo(TicketItems)), Format(RetailEntertainmentCue.TicketItems, 0, 9));
+        Result.Add(Format(RetailEntertainmentCue.FieldNo("No. of Sub Pay Req Error")), Format(RetailEntertainmentCue."No. of Sub Pay Req Error", 0, 9));
+        Result.Add(Format(RetailEntertainmentCue.FieldNo("No. of Sub Req Error")), Format(RetailEntertainmentCue."No. of Sub Req Error", 0, 9));
+        Result.Add(Format(RetailEntertainmentCue.FieldNo("No. of Sub Pay Req New")), Format(RetailEntertainmentCue."No. of Sub Pay Req New", 0, 9));
+        Result.Add(Format(RetailEntertainmentCue.FieldNo("No. of Sub Pay Req Captured")), Format(RetailEntertainmentCue."No. of Sub Pay Req Captured", 0, 9));
+        Result.Add(Format(RetailEntertainmentCue.FieldNo("No. of Sub Pay Req Rejected")), Format(RetailEntertainmentCue."No. of Sub Pay Req Rejected", 0, 9));
+        Result.Add(Format(RetailEntertainmentCue.FieldNo("No. of Sub Req Pending")), Format(RetailEntertainmentCue."No. of Sub Req Pending", 0, 9));
+        Result.Add(Format(RetailEntertainmentCue.FieldNo("No. of Sub Req Confirmed")), Format(RetailEntertainmentCue."No. of Sub Req Confirmed", 0, 9));
+        Result.Add(Format(RetailEntertainmentCue.FieldNo("No. of Sub Req Rejected")), Format(RetailEntertainmentCue."No. of Sub Req Rejected", 0, 9));
         Page.SetBackgroundTaskResult(Result);
     end;
 }

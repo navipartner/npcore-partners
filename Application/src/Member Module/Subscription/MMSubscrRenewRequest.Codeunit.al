@@ -233,11 +233,11 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
                 SubscrPaymentRequest.SetFilter(Status, '<>%1', SubscrPaymentRequest.Status::Cancelled);
                 SubscrPaymentRequest.SetFilter("Entry No.", '<>%1', Rec."Entry No.");
                 if SubscrPaymentRequest.IsEmpty() then
-                    SubscriptionRequest."Processing Status" := SubscriptionRequest."Processing Status"::Success
+                    SubscriptionRequest.Validate("Processing Status", SubscriptionRequest."Processing Status"::Success)
                 else
-                    SubscriptionRequest."Processing Status" := SubscriptionRequest."Processing Status"::Pending;
+                    SubscriptionRequest.Validate("Processing Status", SubscriptionRequest."Processing Status"::Pending);
             end else
-                SubscriptionRequest."Processing Status" := SubscriptionRequest."Processing Status"::Pending;
+                SubscriptionRequest.Validate("Processing Status", SubscriptionRequest."Processing Status"::Pending);
             SubscriptionRequest."Process Try Count" := 0;
             SubscriptionRequest.Modify(true);
 

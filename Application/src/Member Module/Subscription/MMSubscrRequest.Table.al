@@ -26,7 +26,7 @@ table 6150923 "NPR MM Subscr. Request"
             trigger OnValidate()
             begin
                 if Rec.Status <> xRec.Status then
-                    Rec."Processing Status" := Rec."Processing Status"::Pending;
+                    Rec.Validate("Processing Status", Rec."Processing Status"::Pending);
 
                 Modify();
                 UpdateSubscriptionPaymentRequestStatus();
@@ -36,6 +36,12 @@ table 6150923 "NPR MM Subscr. Request"
         {
             Caption = 'Processing Status';
             DataClassification = CustomerContent;
+            trigger OnValidate()
+            begin
+                if Rec."Processing Status" <> xRec."Processing Status" then
+                    "Processing Status Change Date" := Today;
+
+            end;
         }
         field(40; "Subscription Entry No."; Integer)
         {
@@ -143,6 +149,11 @@ table 6150923 "NPR MM Subscr. Request"
                     if "Reversed by Entry No." = "Entry No." then
                         FieldError("Reversed by Entry No.");
             end;
+        }
+        field(220; "Processing Status Change Date"; Date)
+        {
+            Caption = 'Processing Status Change Date';
+            DataClassification = CustomerContent;
         }
     }
 
