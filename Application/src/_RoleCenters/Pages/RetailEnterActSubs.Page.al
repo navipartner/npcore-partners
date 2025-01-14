@@ -38,7 +38,7 @@ page 6184931 "NPR Retail Enter. Act: Subs"
                         DrillDownNoOfSubReqConfirmed();
                     end;
                 }
-                field("No. of Sub Req Rejected"; Rec."No. of Sub Req Rejected")
+                field("No. of Sub Req Rejected"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("No. of Sub Req Rejected"))))
                 {
                     Caption = 'Rejected (Today)';
                     ToolTip = 'The number of subscription requests that were rejected today';
@@ -129,6 +129,7 @@ page 6184931 "NPR Retail Enter. Act: Subs"
             Rec.Init();
             Rec.Insert();
         end;
+        Rec.SetRange("Subs. Date Filter", Today);
     end;
 
     trigger OnAfterGetCurrRecord()
