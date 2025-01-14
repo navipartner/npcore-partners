@@ -27,7 +27,7 @@ page 6184531 "NPR Adyen Setup"
                 field("Enable Adyen Automation"; Rec."Enable Reconciliation")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Creates/Enables Processing Job Queue and an NP Pay Automation Web Service which allows receiving NP Pay Webhooks.';
+                    ToolTip = 'Creates/Enables NP Pay Automation Web Service which allows receiving NP Pay Webhooks.';
                 }
             }
             group(Management)
@@ -48,6 +48,16 @@ page 6184531 "NPR Adyen Setup"
             group(Reconciliation)
             {
                 Caption = 'Reconciliation';
+                field("Enable Reconcil. Automation"; Rec."Enable Reconcil. Automation")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Creates/Enables NP Pay Reconciliation Automation, also setting up a processing job queue to handle reconciliation tasks automatically.';
+                }
+                field("Enable Automatic Posting"; Rec."Enable Automatic Posting")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies whether the System should post Reconciliation document lines during the automatic Reconciliation process. If not enabled, the automatic Reconciliation process ends after the matching stage.';
+                }
                 field("Recon. Integr. Starting Date"; Rec."Recon. Integr. Starting Date")
                 {
                     ApplicationArea = NPRRetail;
@@ -63,11 +73,6 @@ page 6184531 "NPR Adyen Setup"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Download Report API Key.';
                     ExtendedDatatype = Masked;
-                }
-                field("Enable Automatic Posting"; Rec."Enable Automatic Posting")
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies whether the System should post Reconciliation document lines during the automatic Reconciliation process. If not enabled, the automatic Reconciliation process ends after the matching stage.';
                 }
                 field("Post Chargebacks Automatically"; Rec."Post Chargebacks Automatically")
                 {
@@ -287,6 +292,9 @@ page 6184531 "NPR Adyen Setup"
         _AdyenGenericSetup := Rec;
         Rec.CalcFields("Active Webhooks");
         _IsSaaS := not EnvironmentInformation.IsOnPrem();
+
+        if Rec."Management API Key" <> '' then
+            _AdyenManagement.TestApiKey(Rec."Management API Key", Rec."Environment Type");
     end;
 
     var

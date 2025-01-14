@@ -79,7 +79,7 @@ codeunit 6184786 "NPR Adyen Tr. Matching Session"
     begin
         Clear(AdyenSetup);
         AdyenSetup.GetRecordOnce();
-        SetupReconciliationTaskProcessingJobQueue(AdyenSetup."Enable Reconciliation");
+        SetupReconciliationTaskProcessingJobQueue(AdyenSetup."Enable Reconcil. Automation");
     end;
 
     procedure SetupReconciliationTaskProcessingJobQueue(Enable: Boolean)
