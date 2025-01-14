@@ -93,8 +93,10 @@ table 6150811 "NPR Spfy Store-Item Link"
 
     trigger OnDelete()
     var
+        SpfyEntityMetafield: Record "NPR Spfy Entity Metafield";
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
     begin
         SpfyAssignedIDMgt.RemoveAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID");
         SpfyAssignedIDMgt.RemoveAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Inventory Item ID");
@@ -104,6 +106,10 @@ table 6150811 "NPR Spfy Store-Item Link"
             SpfyAssignedIDMgt.RemoveAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
             SpfyAssignedIDMgt.RemoveAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Inventory Item ID");
         end;
+        SpfyMetafieldMgt.FilterSpfyEntityMetafields(RecordId(), "NPR Spfy Metafield Owner Type"::PRODUCT, SpfyEntityMetafield);
+        SpfyEntityMetafield.SetRange("Owner Type", SpfyEntityMetafield."Owner Type"::PRODUCT, SpfyEntityMetafield."Owner Type"::PRODUCTVARIANT);
+        if not SpfyEntityMetafield.IsEmpty() then
+            SpfyEntityMetafield.DeleteAll();
     end;
 
     trigger OnRename()

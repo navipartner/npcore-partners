@@ -29,7 +29,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         else
             Url := Link;
 
-        ResponseText := SendShopifyRequest(NcTask, 'GET', Url, NextLink);
+        ResponseText := SendShopifyRequest(NcTask, Enum::"Http Request Type"::GET, Url, NextLink);
 
         Result.ReadFrom(ResponseText);
         Result.SelectToken('orders', Token);
@@ -47,7 +47,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         CheckRequestContent(NcTask);
 
         Url := GetShopifyUrl(NcTask."Store Code") + 'fulfillments.json';
-        SendShopifyRequest(NcTask, 'POST', Url);
+        SendShopifyRequest(NcTask, Enum::"Http Request Type"::POST, Url);
     end;
 
     procedure GetShopifyOrderFulfillmentOrders(ShopifyStoreCode: Code[20]; ShopifyOrderID: Text[30]; var ShopifyResponse: JsonToken)
@@ -56,7 +56,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         Url: Text;
     begin
         Url := GetShopifyUrl(ShopifyStoreCode) + StrSubstNo('orders/%1/fulfillment_orders.json', ShopifyOrderID);
-        ResponseText := SendShopifyRequest(ShopifyStoreCode, 'GET', Url);
+        ResponseText := SendShopifyRequest(ShopifyStoreCode, Enum::"Http Request Type"::GET, Url);
         ShopifyResponse.ReadFrom(ResponseText);
     end;
 
@@ -83,7 +83,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
     begin
         NcTask."Store Code" := ShopifyStoreCode;
         Url := GetShopifyUrl(NcTask."Store Code") + 'locations.json';
-        ResponseText := SendShopifyRequest(NcTask, 'GET', Url);
+        ResponseText := SendShopifyRequest(NcTask, Enum::"Http Request Type"::GET, Url);
         ShopifyResponse.ReadFrom(ResponseText);
     end;
 
@@ -95,7 +95,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         CheckRequestContent(NcTask);
 
         Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('orders/%1/transactions.json', NcTask."Record Value");
-        SendShopifyRequest(NcTask, 'POST', Url);
+        SendShopifyRequest(NcTask, Enum::"Http Request Type"::POST, Url);
     end;
 
     [TryFunction]
@@ -110,7 +110,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         Url: Text;
     begin
         Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('orders/%1/transactions.json', NcTask."Record Value");
-        ResponseText := SendShopifyRequest(NcTask, 'GET', Url);
+        ResponseText := SendShopifyRequest(NcTask, Enum::"Http Request Type"::GET, Url);
         SpfyOrderTransactions.ReadFrom(ResponseText);
     end;
 
@@ -121,7 +121,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         Url: Text;
     begin
         Url := GetShopifyUrl(NcTask."Store Code", CheckIntegrationIsEnabled) + 'graphql.json';
-        ResponseText := SendShopifyRequest(NcTask, 'POST', Url);
+        ResponseText := SendShopifyRequest(NcTask, Enum::"Http Request Type"::POST, Url);
         ShopifyResponse.ReadFrom(ResponseText);
     end;
 
@@ -134,7 +134,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         CheckRequestContent(NcTask);
 
         Url := GetShopifyUrl(NcTask."Store Code") + 'products.json';
-        ResponseText := SendShopifyRequest(NcTask, 'POST', Url);
+        ResponseText := SendShopifyRequest(NcTask, Enum::"Http Request Type"::POST, Url);
         ShopifyResponse.ReadFrom(ResponseText);
     end;
 
@@ -147,7 +147,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         CheckRequestContent(NcTask);
 
         Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('products/%1.json', ShopifyItemID);
-        ResponseText := SendShopifyRequest(NcTask, 'PUT', Url);
+        ResponseText := SendShopifyRequest(NcTask, Enum::"Http Request Type"::PUT, Url);
         ShopifyResponse.ReadFrom(ResponseText);
     end;
 
@@ -157,7 +157,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         Url: Text;
     begin
         Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('products/%1.json', ShopifyItemID);
-        SendShopifyRequest(NcTask, 'DELETE', Url);
+        SendShopifyRequest(NcTask, Enum::"Http Request Type"::DELETE, Url);
     end;
 
     [TryFunction]
@@ -169,7 +169,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         CheckRequestContent(NcTask);
 
         Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('products/%1/variants.json', ShopifyItemID);
-        ResponseText := SendShopifyRequest(NcTask, 'POST', Url);
+        ResponseText := SendShopifyRequest(NcTask, Enum::"Http Request Type"::POST, Url);
         ShopifyResponse.ReadFrom(ResponseText);
     end;
 
@@ -182,7 +182,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         CheckRequestContent(NcTask);
 
         Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('variants/%1.json', ShopifyVariantID);
-        ResponseText := SendShopifyRequest(NcTask, 'PUT', Url);
+        ResponseText := SendShopifyRequest(NcTask, Enum::"Http Request Type"::PUT, Url);
         ShopifyResponse.ReadFrom(ResponseText);
     end;
 
@@ -192,7 +192,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         Url: Text;
     begin
         Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('products/%1/variants/%2.json', ShopifyItemID, ShopifyVariantID);
-        SendShopifyRequest(NcTask, 'DELETE', Url);
+        SendShopifyRequest(NcTask, Enum::"Http Request Type"::DELETE, Url);
     end;
 
     [TryFunction]
@@ -203,7 +203,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         CheckRequestContent(NcTask);
 
         Url := GetShopifyUrl(NcTask."Store Code") + 'inventory_levels/set.json';
-        SendShopifyRequest(NcTask, 'POST', Url);
+        SendShopifyRequest(NcTask, Enum::"Http Request Type"::POST, Url);
     end;
 
     [TryFunction]
@@ -214,7 +214,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         CheckRequestContent(NcTask);
 
         Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('inventory_items/%1.json', ShopifyInventoryItemID);
-        SendShopifyRequest(NcTask, 'PUT', Url);
+        SendShopifyRequest(NcTask, Enum::"Http Request Type"::PUT, Url);
     end;
 
     [TryFunction]
@@ -223,7 +223,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         Url: Text;
     begin
         Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('orders/%1/close.json', NcTask."Record Value");
-        SendShopifyRequest(NcTask, 'POST', Url);
+        SendShopifyRequest(NcTask, Enum::"Http Request Type"::POST, Url);
     end;
 
     [TryFunction]
@@ -235,7 +235,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
     begin
         NcTask."Store Code" := ShopifyStoreCode;
         Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('gift_cards/%1.json', ShopifyGiftCardID);
-        ResponseText := SendShopifyRequest(NcTask, 'GET', Url);
+        ResponseText := SendShopifyRequest(NcTask, Enum::"Http Request Type"::GET, Url);
         ShopifyResponse.ReadFrom(ResponseText);
     end;
 
@@ -248,7 +248,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         CheckRequestContent(NcTask);
 
         Url := GetShopifyUrl(NcTask."Store Code") + 'gift_cards.json';
-        ResponseText := SendShopifyRequest(NcTask, 'POST', Url);
+        ResponseText := SendShopifyRequest(NcTask, Enum::"Http Request Type"::POST, Url);
         ShopifyResponse.ReadFrom(ResponseText);
     end;
 
@@ -261,7 +261,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         CheckRequestContent(NcTask);
 
         Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('gift_cards/%1.json', ShopifyGiftCardID);
-        ResponseText := SendShopifyRequest(NcTask, 'PUT', Url);
+        ResponseText := SendShopifyRequest(NcTask, Enum::"Http Request Type"::PUT, Url);
         ShopifyResponse.ReadFrom(ResponseText);
     end;
 
@@ -272,7 +272,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         Url: Text;
     begin
         Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('gift_cards/%1/disable.json', ShopifyGiftCardID);
-        ResponseText := SendShopifyRequest(NcTask, 'POST', Url);
+        ResponseText := SendShopifyRequest(NcTask, Enum::"Http Request Type"::POST, Url);
         ShopifyResponse.ReadFrom(ResponseText);
     end;
 
@@ -284,7 +284,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         CheckRequestContent(NcTask);
 
         Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('gift_cards/%1/adjustments.json', ShopifyGiftCardID);
-        SendShopifyRequest(NcTask, 'POST', Url);
+        SendShopifyRequest(NcTask, Enum::"Http Request Type"::POST, Url);
     end;
 
     [TryFunction]
@@ -295,7 +295,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
     begin
         NcTask."Store Code" := SpfyStoreCode;
         Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('webhooks.json?topic=%1', Topic);
-        ShopifyResponse.ReadFrom(SendShopifyRequest(NcTask, 'GET', Url));
+        ShopifyResponse.ReadFrom(SendShopifyRequest(NcTask, Enum::"Http Request Type"::GET, Url));
     end;
 
     [TryFunction]
@@ -306,7 +306,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
     begin
         NcTask."Store Code" := SpfyStoreCode;
         Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('webhooks/%1.json', SpfyWebhookId);
-        SendShopifyRequest(NcTask, 'DELETE', Url);
+        SendShopifyRequest(NcTask, Enum::"Http Request Type"::DELETE, Url);
     end;
 
     procedure RegisterWebhook(var NcTask: Record "NPR Nc Task") ShopifyResponse: JsonToken
@@ -316,7 +316,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         CheckRequestContent(NcTask);
 
         Url := GetShopifyUrl(NcTask."Store Code") + 'webhooks.json';
-        ShopifyResponse.ReadFrom(SendShopifyRequest(NcTask, 'POST', Url));
+        ShopifyResponse.ReadFrom(SendShopifyRequest(NcTask, Enum::"Http Request Type"::POST, Url));
     end;
 
     local procedure CheckRequestContent(var NcTask: Record "NPR Nc Task")
@@ -329,7 +329,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
             Error(NoRequestBodyErr);
     end;
 
-    local procedure SendShopifyRequest(ShopifyStoreCode: Code[20]; RestMethod: text; Url: Text) ResponseText: Text
+    local procedure SendShopifyRequest(ShopifyStoreCode: Code[20]; RestMethod: Enum "Http Request Type"; Url: Text) ResponseText: Text
     var
         NcTask: Record "NPR Nc Task";
         NextLink: Text;
@@ -339,21 +339,21 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         ResponseText := SendShopifyRequest(NcTask, RestMethod, Url, NextLink);
     end;
 
-    local procedure SendShopifyRequest(var NcTask: Record "NPR Nc Task"; RestMethod: text; Url: Text) ResponseText: Text
+    local procedure SendShopifyRequest(var NcTask: Record "NPR Nc Task"; RestMethod: Enum "Http Request Type"; Url: Text) ResponseText: Text
     var
         NextLink: Text;
     begin
         ResponseText := SendShopifyRequest(NcTask, RestMethod, Url, NextLink);
     end;
 
-    local procedure SendShopifyRequest(var NcTask: Record "NPR Nc Task"; RestMethod: text; Url: Text; var NextLink: Text) ResponseText: Text
+    local procedure SendShopifyRequest(var NcTask: Record "NPR Nc Task"; RestMethod: Enum "Http Request Type"; Url: Text; var NextLink: Text) ResponseText: Text
     begin
         if not TrySendShopifyRequest(NcTask, RestMethod, Url, NextLink, ResponseText) then
             Error(GetLastErrorText());
     end;
 
     [TryFunction]
-    local procedure TrySendShopifyRequest(var NcTask: Record "NPR Nc Task"; RestMethod: text; Url: Text; var NextLink: Text; var ResponseText: Text)
+    local procedure TrySendShopifyRequest(var NcTask: Record "NPR Nc Task"; RestMethod: Enum "Http Request Type"; Url: Text; var NextLink: Text; var ResponseText: Text)
     var
         Client: HttpClient;
         RequestMsg: HttpRequestMessage;
@@ -408,7 +408,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
             NextLink := ParseNextLink(Links[1]);
     end;
 
-    local procedure CreateRequestMsg(var NcTask: Record "NPR Nc Task"; RestMethod: text; Url: Text; var RequestMsg: HttpRequestMessage)
+    local procedure CreateRequestMsg(var NcTask: Record "NPR Nc Task"; RestMethod: Enum "Http Request Type"; Url: Text; var RequestMsg: HttpRequestMessage)
     var
         Content: HttpContent;
         Headers: HttpHeaders;
@@ -427,7 +427,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         end;
 
         RequestMsg.SetRequestUri(Url);
-        RequestMsg.Method(RestMethod);
+        RequestMsg.Method(Format(RestMethod));
         RequestMsg.GetHeaders(Headers);
         Headers.Add('X-Shopify-Access-Token', GetShopifyAccessToken(NcTask."Store Code"));
         Headers.Add('Accept', 'application/json');

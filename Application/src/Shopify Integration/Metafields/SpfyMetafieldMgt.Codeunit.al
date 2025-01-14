@@ -36,6 +36,62 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
         Page.Run(0, SpfyEntityMetafield);
     end;
 
+    internal procedure ProcessMetafieldMappingChange(var SpfyMetafieldMapping: Record "NPR Spfy Metafield Mapping"; xMetafieldID: Text[30]; Removed: Boolean; Silent: Boolean)
+    var
+        ItemAttribute: Record "Item Attribute";
+        ItemAttributeValueMapping: Record "Item Attribute Value Mapping";
+        SpfyEntityMetafield: Record "NPR Spfy Entity Metafield";
+        LinkRegenerationCnf: Label 'The item attribute has already been mapped to one or more items. Changing the Shopify metafield ID may require recreating the links between BC item attributes and Shopify product metafields. This can take a significant amount of time. Are you sure you want to continue?';
+    begin
+        if (SpfyMetafieldMapping."Metafield ID" = '') and (xMetafieldID = '') then
+            exit;
+        if (SpfyMetafieldMapping."Metafield ID" = xMetafieldID) and not Removed then
+            exit;
+        if SpfyMetafieldMapping."BC Record ID".TableNo() <> Database::"Item Attribute" then
+            exit;  // only item attribute based metafields are currently supported
+        if (SpfyMetafieldMapping."Metafield ID" = '') and not Removed then
+            Removed := true;
+
+        SpfyEntityMetafield.SetRange("Owner Type", SpfyMetafieldMapping."Owner Type");
+        SpfyEntityMetafield.SetRange("Metafield ID", xMetafieldID);
+        SpfyEntityMetafield.SetRange("Table No.", Database::"NPR Spfy Store-Item Link");
+        if Removed then begin
+            if xMetafieldID <> '' then
+                if not SpfyEntityMetafield.IsEmpty() then
+                    SpfyEntityMetafield.DeleteAll();
+            exit;
+        end;
+
+        ItemAttribute.Get(SpfyMetafieldMapping."BC Record ID");
+        ItemAttributeValueMapping.SetRange("Table ID", Database::Item);
+        ItemAttributeValueMapping.SetRange("Item Attribute ID", ItemAttribute.ID);
+        if ItemAttributeValueMapping.IsEmpty() then begin
+            if xMetafieldID <> '' then
+                if not SpfyEntityMetafield.IsEmpty() then
+                    SpfyEntityMetafield.DeleteAll();
+            exit;
+        end;
+
+        if not Silent then
+            if not Confirm(LinkRegenerationCnf, true) then
+                Error('');
+
+        SpfyMetafieldMapping.Modify(true);
+
+        if xMetafieldID <> '' then begin
+            if not SpfyEntityMetafield.IsEmpty() then begin
+                SpfyEntityMetafield.ModifyAll("Metafield Key", '');
+                SpfyEntityMetafield.ModifyAll("Metafield Value Version ID", '');
+                SpfyEntityMetafield.ModifyAll("Metafield ID", SpfyMetafieldMapping."Metafield ID");
+            end;
+        end;
+
+        ItemAttributeValueMapping.FindSet();
+        repeat
+            ProcessItemAttributeMappingChange(ItemAttributeValueMapping, Removed);
+        until ItemAttributeValueMapping.Next() = 0;
+    end;
+
     internal procedure ShopifyEntityMetafieldValueUpdateQuery(EntityRecID: RecordId; ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type"; ShopifyOwnerID: Text[30]; ShopifyStoreCode: Code[20]; var QueryStream: OutStream) SendToShopify: Boolean
     var
         MetafieldsSet: JsonObject;
@@ -448,7 +504,7 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
         SpfyMetafieldMapping.SetFilter("Metafield ID", '<>%1', '');
     end;
 
-    local procedure FilterSpfyEntityMetafields(EntityRecID: RecordId; ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type"; var SpfyEntityMetafield: Record "NPR Spfy Entity Metafield")
+    internal procedure FilterSpfyEntityMetafields(EntityRecID: RecordId; ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type"; var SpfyEntityMetafield: Record "NPR Spfy Entity Metafield")
     begin
         SpfyEntityMetafield.Reset();
         SpfyEntityMetafield.SetRange("Table No.", EntityRecID.TableNo());
