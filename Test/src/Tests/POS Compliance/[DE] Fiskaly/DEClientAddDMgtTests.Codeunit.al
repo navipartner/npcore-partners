@@ -107,7 +107,7 @@ codeunit 85220 "NPR DE Client Add D Mgt Tests"
         DEFiscalLibrary: Codeunit "NPR Library DE Fiscal";
         ClientAdditionalDataNotRetrievedErr: Label 'Client additional data is not retrieved.', Locked = true;
     begin
-        // [SCENARIO] Checks creation/update of Establishment with successful response from Fiskaly
+        // [SCENARIO] Checks retrieving of Establishment with successful response from Fiskaly
         // [GIVEN] POS and DE audit setup are set
         InitializeData();
 
