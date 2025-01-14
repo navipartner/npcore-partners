@@ -45,6 +45,7 @@ codeunit 6184942 "NPR Spfy Webhook Mgt."
     var
         SpfyWebhookSubscription: Record "NPR Spfy Webhook Subscription";
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+        WebhookDeleteRequestFailedErr: Label 'The system was unable to delete the webhook from Shopify. Shopify returned the following error: "%1".\You may want to take this up with Shopify directly. Shopify Webhook ID: %2', Comment = '%1 - Shopify request error message, %2 - Shopify webhook ID';
     begin
         FilterWebhookSubscription(ShopifyStoreCode, Topic, SpfyWebhookSubscription);
         if SpfyWebhookSubscription.IsEmpty() then
@@ -56,7 +57,8 @@ codeunit 6184942 "NPR Spfy Webhook Mgt."
 #endif
         SpfyWebhookSubscription.FindFirst();
         if SpfyWebhookSubscription."Webhook ID" <> '' then
-            SpfyCommunicationHandler.DeleteRegisteredWebhook(ShopifyStoreCode, SpfyWebhookSubscription."Webhook ID");
+            if not SpfyCommunicationHandler.DeleteRegisteredWebhook(ShopifyStoreCode, SpfyWebhookSubscription."Webhook ID") then
+                Message(WebhookDeleteRequestFailedErr, GetLastErrorText(), SpfyWebhookSubscription."Webhook ID");
         SpfyWebhookSubscription.Delete();
     end;
 

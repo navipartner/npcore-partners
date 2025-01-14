@@ -54,10 +54,15 @@ page 6184854 "NPR Spfy Metafield Mappings"
                     trigger OnAssistEdit()
                     var
                         SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
+                        SelectedMetafieldID: Text[30];
                     begin
                         Rec.TestField("Shopify Store Code");
-                        if not SpfyMetafieldMgt.SelectShopifyMetafield(Rec."Shopify Store Code", Rec."Owner Type", Rec."Metafield ID") then
-                            Rec."Metafield ID" := xRec."Metafield ID";
+                        Rec.TestField("Owner Type");
+                        SelectedMetafieldID := Rec."Metafield ID";
+                        if SpfyMetafieldMgt.SelectShopifyMetafield(Rec."Shopify Store Code", Rec."Owner Type", SelectedMetafieldID) then begin
+                            Rec.Validate("Metafield ID", SelectedMetafieldID);
+                            CurrPage.Update(true);
+                        end;
                     end;
                 }
             }

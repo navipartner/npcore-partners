@@ -149,6 +149,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
         MetafieldsSet: JsonToken;
+        MetafieldsSetErrors: JsonToken;
         ShopifyResponse: JsonToken;
         ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type";
         SendToShopify: Boolean;
@@ -169,8 +170,13 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
 
         NcTask.Modify();
         Commit();
+
         if not Success then
             Error(GetLastErrorText());
+        if ShopifyResponse.SelectToken('data.metafieldsSet.userErrors', MetafieldsSetErrors) then
+            if MetafieldsSetErrors.IsArray() then
+                if MetafieldsSetErrors.AsArray().Count() > 0 then
+                    Error('');
     end;
 
     local procedure SendShopifyInventoryUpdate(var NcTask: Record "NPR Nc Task")

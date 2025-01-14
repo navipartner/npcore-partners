@@ -62,6 +62,7 @@ table 6150939 "NPR Spfy Metafield Mapping"
             trigger OnValidate()
             var
                 SpfyMetafieldMapping: Record "NPR Spfy Metafield Mapping";
+                SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
                 DuplicateMappingErr: Label 'The same Shopify Metafield ID has already been mapped to a different entity (%1). Mapping to multiple entities is not allowed.';
             begin
                 if "Metafield ID" <> '' then begin
@@ -77,6 +78,7 @@ table 6150939 "NPR Spfy Metafield Mapping"
                         else
                             Error(DuplicateMappingErr, Format("BC Record ID"));
                 end;
+                SpfyMetafieldMgt.ProcessMetafieldMappingChange(Rec, xRec."Metafield ID", "Metafield ID" = '', false);
             end;
         }
     }
@@ -89,5 +91,12 @@ table 6150939 "NPR Spfy Metafield Mapping"
         key(Key2; "Table No.", "Field No.", "BC Record ID", "Shopify Store Code", "Owner Type", "Metafield ID") { }
         key(Key3; "Shopify Store Code", "Owner Type", "Metafield ID") { }
     }
+
+    trigger OnDelete()
+    var
+        SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
+    begin
+        SpfyMetafieldMgt.ProcessMetafieldMappingChange(Rec, "Metafield ID", true, false);
+    end;
 }
 #endif
