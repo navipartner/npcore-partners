@@ -824,6 +824,97 @@ codeunit 85213 "NPR Library DE Fiscal"
         IsHandled := true;
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR DE Fiskaly Communication", 'OnBeforeSendHttpRequestForCreateSubmission', '', false, false)]
+    local procedure HandleOnBeforeSendHttpRequestForCreateSubmission(sender: Codeunit "NPR DE Fiskaly Communication"; var DESubmission: Record "NPR DE Submission"; var ResponseJsonOut: JsonToken; var IsHandled: Boolean)
+    var
+        ResponseText: Text;
+    begin
+        ResponseText :=
+            '{' +
+            '   "establishment_id": "' + Format(DESubmission."Establishment Id", 0, 4).ToLower() + '",' +
+            '   "state": "' + Enum::"NPR DE Submission State".Names().Get(Enum::"NPR DE Submission State".Ordinals().IndexOf(Enum::"NPR DE Submission State"::CREATED.AsInteger())) + '",' +
+            '   "time_created": "' + Format(CurrentDateTime(), 0, 9) + '",' +
+            '   "metadata": {' +
+            '       "bc_company_name": "' + CompanyName() + '",' +
+            '       "bc_entry_no": "' + Format(DESubmission."Entry No.") + '",' +
+            '       "bc_pos_store_code": "' + DESubmission."POS Store Code" + '"' +
+            '   }' +
+            '}';
+
+        ResponseJsonOut.ReadFrom(ResponseText);
+        sender.PopulateSubmission(DESubmission, ResponseJsonOut);
+        IsHandled := true;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR DE Fiskaly Communication", 'OnBeforeSendHttpRequestForRetrieveSubmission', '', false, false)]
+    local procedure HandleOnBeforeSendHttpRequestForRetrieveSubmission(sender: Codeunit "NPR DE Fiskaly Communication"; var DESubmission: Record "NPR DE Submission"; var ResponseJsonOut: JsonToken; var IsHandled: Boolean)
+    var
+        ResponseText: Text;
+    begin
+        ResponseText :=
+            '{' +
+            '   "establishment_id": "' + Format(DESubmission."Establishment Id", 0, 4).ToLower() + '",' +
+            '   "state": "' + Enum::"NPR DE Submission State".Names().Get(Enum::"NPR DE Submission State".Ordinals().IndexOf(Enum::"NPR DE Submission State"::VALIDATION_TRIGGERED.AsInteger())) + '",' +
+            '   "time_created": "' + Format(CurrentDateTime(), 0, 9) + '",' +
+            '   "time_generated": "' + Format(CurrentDateTime(), 0, 9) + '",' +
+            '   "metadata": {' +
+            '       "bc_company_name": "' + CompanyName() + '",' +
+            '       "bc_entry_no": "' + Format(DESubmission."Entry No.") + '",' +
+            '       "bc_pos_store_code": "' + DESubmission."POS Store Code" + '"' +
+            '   }' +
+            '}';
+
+        ResponseJsonOut.ReadFrom(ResponseText);
+        sender.PopulateSubmission(DESubmission, ResponseJsonOut);
+        IsHandled := true;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR DE Fiskaly Communication", 'OnBeforeSendHttpRequestForTriggerSubmissionTransmission', '', false, false)]
+    local procedure HandleOnBeforeSendHttpRequestForTriggerSubmissionTransmission(sender: Codeunit "NPR DE Fiskaly Communication"; var DESubmission: Record "NPR DE Submission"; var ResponseJsonOut: JsonToken; var IsHandled: Boolean)
+    var
+        ResponseText: Text;
+    begin
+        ResponseText :=
+            '{' +
+            '   "establishment_id": "' + Format(DESubmission."Establishment Id", 0, 4).ToLower() + '",' +
+            '   "state": "' + Enum::"NPR DE Submission State".Names().Get(Enum::"NPR DE Submission State".Ordinals().IndexOf(Enum::"NPR DE Submission State"::TRANSMISSION_PENDING.AsInteger())) + '",' +
+            '   "time_created": "' + Format(CurrentDateTime(), 0, 9) + '",' +
+            '   "time_generated": "' + Format(CurrentDateTime(), 0, 9) + '",' +
+            '   "metadata": {' +
+            '       "bc_company_name": "' + CompanyName() + '",' +
+            '       "bc_entry_no": "' + Format(DESubmission."Entry No.") + '",' +
+            '       "bc_pos_store_code": "' + DESubmission."POS Store Code" + '"' +
+            '   }' +
+            '}';
+
+        ResponseJsonOut.ReadFrom(ResponseText);
+        sender.PopulateSubmission(DESubmission, ResponseJsonOut);
+        IsHandled := true;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR DE Fiskaly Communication", 'OnBeforeSendHttpRequestForCancelSubmissionTransmission', '', false, false)]
+    local procedure HandleOnBeforeSendHttpRequestForCancelSubmissionTransmission(sender: Codeunit "NPR DE Fiskaly Communication"; var DESubmission: Record "NPR DE Submission"; var ResponseJsonOut: JsonToken; var IsHandled: Boolean)
+    var
+        ResponseText: Text;
+    begin
+        ResponseText :=
+            '{' +
+            '   "establishment_id": "' + Format(DESubmission."Establishment Id", 0, 4).ToLower() + '",' +
+            '   "state": "' + Enum::"NPR DE Submission State".Names().Get(Enum::"NPR DE Submission State".Ordinals().IndexOf(Enum::"NPR DE Submission State"::TRANSMISSION_CANCELLED.AsInteger())) + '",' +
+            '   "time_created": "' + Format(CurrentDateTime(), 0, 9) + '",' +
+            '   "time_generated": "' + Format(CurrentDateTime(), 0, 9) + '",' +
+            '   "metadata": {' +
+            '       "bc_company_name": "' + CompanyName() + '",' +
+            '       "bc_entry_no": "' + Format(DESubmission."Entry No.") + '",' +
+            '       "bc_pos_store_code": "' + DESubmission."POS Store Code" + '"' +
+            '   }' +
+            '}';
+
+        ResponseJsonOut.ReadFrom(ResponseText);
+        sender.PopulateSubmission(DESubmission, ResponseJsonOut);
+        IsHandled := true;
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR DE Audit Mgt.", 'OnBeforeCheckTssJobQueue', '', false, false)]
     local procedure OnBeforeCheckTssJobQueue(var IsHandled: Boolean)
     begin
