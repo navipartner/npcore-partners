@@ -61,7 +61,7 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
 
         MemberNotification.AddMembershipRenewalFailureNotification(Subscription."Membership Entry No.", Subscription."Membership Code", SubscrPaymentRequest."Rejected Reason Code", SubscrPaymentRequest."Rejected Reason Description");
 
-        SubscriptionRequest."Processing Status" := SubscriptionRequest."Processing Status"::Success;
+        SubscriptionRequest.Validate("Processing Status", SubscriptionRequest."Processing Status"::Success);
         SubscriptionRequest.Modify(true);
     end;
 
@@ -102,7 +102,7 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
             Error(ReasonText);
 
         SubscriptionRequest."Posted M/ship Ledg. Entry No." := NewMembershipLedgerEntryNo;
-        SubscriptionRequest."Processing Status" := SubscriptionRequest."Processing Status"::Success;
+        SubscriptionRequest.Validate("Processing Status", SubscriptionRequest."Processing Status"::Success);
         SubscriptionRequest.Modify(true);
     end;
 
@@ -145,7 +145,7 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
         if SubscrReversalRequest.Posted then
             SubscrRenewPost.PostPaymentsToGL(SubscrReversalRequest, '');
 
-        SubscrReversalRequest."Processing Status" := SubscrReversalRequest."Processing Status"::Success;
+        SubscrReversalRequest.Validate("Processing Status", SubscrReversalRequest."Processing Status"::Success);
         SubscrReversalRequest.Modify(true);
     end;
 
@@ -174,7 +174,7 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
 
     local procedure ProcessCancelStatus(var SubscriptionRequest: Record "NPR MM Subscr. Request")
     begin
-        SubscriptionRequest."Processing Status" := SubscriptionRequest."Processing Status"::Success;
+        SubscriptionRequest.Validate("Processing Status", SubscriptionRequest."Processing Status"::Success);
         SubscriptionRequest.Modify(true);
     end;
 
@@ -231,7 +231,7 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
 
         SubscrRenewPost.PostPaymentsToGL(SubscriptionRequest, PostingDocumentNo);
 
-        SubscriptionRequest."Processing Status" := SubscriptionRequest."Processing Status"::Success;
+        SubscriptionRequest.Validate("Processing Status", SubscriptionRequest."Processing Status"::Success);
         SubscriptionRequest.Modify(true);
     end;
 

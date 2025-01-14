@@ -88,6 +88,59 @@
             FieldClass = FlowField;
             CalcFormula = count("Item" where("NPR Ticket Type" = filter(<> '')));
         }
+        field(15; "No. of Sub Req Error"; integer)
+        {
+            Caption = 'No. of Subscription Requests with With Error';
+            FieldClass = FlowField;
+            CalcFormula = count("NPR MM Subscr. Request" where("Processing Status" = filter('Error')));
+        }
+        field(16; "No. of Sub Req Pending"; integer)
+        {
+            Caption = 'No. of Pending Subscription Requests';
+            FieldClass = FlowField;
+            CalcFormula = count("NPR MM Subscr. Request" where("Processing Status" = filter('Pending')));
+        }
+        field(17; "No. of Sub Req Confirmed"; integer)
+        {
+            Caption = 'No. of Confirmed Subscription Requests';
+            FieldClass = FlowField;
+            CalcFormula = count("NPR MM Subscr. Request" where("Processing Status" = filter('Success'), "Processing Status Change Date" = field("Subs. Date Filter"), "Status" = filter('Confirmed')));
+        }
+        field(18; "No. of Sub Req Rejected"; integer)
+        {
+            Caption = 'No. of Rejected Subscription Requests';
+            FieldClass = FlowField;
+            CalcFormula = count("NPR MM Subscr. Request" where("Processing Status" = filter('Success'), "Processing Status Change Date" = field("Subs. Date Filter"), "Status" = filter('Rejected')));
+        }
+        field(19; "No. of Sub Pay Req Error"; integer)
+        {
+            Caption = 'No. of Subscription Payment Requests with Error';
+            FieldClass = FlowField;
+            CalcFormula = count("NPR MM Subscr. Payment Request" where("Status" = filter('Error')));
+        }
+        field(20; "No. of Sub Pay Req New"; integer)
+        {
+            Caption = 'No. of New Subscription Payment Requests';
+            FieldClass = FlowField;
+            CalcFormula = count("NPR MM Subscr. Payment Request" where("Status" = filter('New')));
+        }
+        field(21; "No. of Sub Pay Req Captured"; integer)
+        {
+            Caption = 'No. of Captured Subscription Payment Requests';
+            FieldClass = FlowField;
+            CalcFormula = count("NPR MM Subscr. Payment Request" where("Status" = filter('Captured'), "Status Change Date" = field("Subs. Date Filter")));
+        }
+        field(22; "No. of Sub Pay Req Rejected"; integer)
+        {
+            Caption = 'No. of Rejected Subscription Payment Requests';
+            FieldClass = FlowField;
+            CalcFormula = count("NPR MM Subscr. Payment Request" where("Status" = filter('Rejected'), "Status Change Date" = field("Subs. Date Filter")));
+        }
+        field(1000; "Subs. Date Filter"; Date)
+        {
+            Caption = 'Subscriptions Date Filter';
+            FieldClass = Flowfilter;
+        }
     }
 
     keys

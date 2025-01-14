@@ -472,6 +472,7 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
 
         SubscrReversalMgt.InitReversalRequest(SubscriptionRequest, SubscrPaymentRequest, PaymentRequestType, SubscrReversalRequest, ReverseSubscrPaymentRequest);
         ReverseSubscrPaymentRequest.Status := ReverseSubscrPaymentRequest.Status::Captured;
+        ReverseSubscrPaymentRequest."Status Change Date" := Today;
         ReverseSubscrPaymentRequest.PSP := SubscrPaymentRequest.PSP;
         ReverseSubscrPaymentRequest."PSP Reference" := SubscrPaymentRequest."PSP Reference";
         ReverseSubscrPaymentRequest."External Transaction ID" := SubscrPaymentRequest."External Transaction ID";

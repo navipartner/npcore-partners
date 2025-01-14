@@ -32,6 +32,7 @@ table 6150921 "NPR MM Subscr. Payment Request"
             trigger OnValidate()
             begin
                 CheckSubscrPaymentRequestStatusCanBeChanged();
+                "Status Change Date" := Today;
             end;
         }
         field(30; "Subscr. Request Entry No."; BigInteger)
@@ -163,6 +164,11 @@ table 6150921 "NPR MM Subscr. Payment Request"
         {
             DataClassification = CustomerContent;
             Caption = 'Reconciliation Date';
+        }
+        field(330; "Status Change Date"; Date)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Status Change Date';
         }
     }
 

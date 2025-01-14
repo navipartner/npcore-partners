@@ -34,6 +34,10 @@
             {
                 ApplicationArea = NPRRetail;
             }
+            part(Subscriptions; "NPR Retail Enter. Act: Subs")
+            {
+                ApplicationArea = NPRRetail;
+            }
             part(RCMembershipBurndownChart; "NPR RC Members. Burndown Chart")
             {
                 ApplicationArea = NPRRetail;
