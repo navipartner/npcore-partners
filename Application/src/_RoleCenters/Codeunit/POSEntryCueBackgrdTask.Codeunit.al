@@ -36,7 +36,7 @@
         Result.Add(Format(POSEntryCue.FieldNo("Voucher List")), Format(POSEntryCue."Voucher List", 0, 9));
         TransationAmountLCY := POSStatisticsMgt.CalculateTransactionAmount();
         Result.Add(Format(POSEntryCue.FieldNo("Transaction Amount (LCY)")), Format(TransationAmountLCY, 0, 9));
-        if AdyenSetup.Get() and AdyenSetup."Enable Reconciliation" then begin
+        if AdyenSetup.Get() and AdyenSetup."Enable Reconcil. Automation" then begin
             POSEntryCue.CalcFields("Reconc. Batches with Errors");
             Result.Add(Format(POSEntryCue.FieldNo("Reconc. Batches with Errors")), Format(POSEntryCue."Reconc. Batches with Errors", 0, 9));
         end;

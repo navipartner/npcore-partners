@@ -4,6 +4,8 @@ table 6150805 "NPR Adyen Webhook Setup"
 
     Caption = 'NP Pay Webhook Setup';
     DataClassification = CustomerContent;
+    LookupPageId = "NPR Adyen Webhook Setup List";
+    DrillDownPageId = "NPR Adyen Webhook Setup List";
 
     fields
     {

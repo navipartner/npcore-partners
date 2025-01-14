@@ -684,6 +684,35 @@ codeunit 6184796 "NPR Adyen Management"
         if not Logs.IsEmpty() then
             Page.Run(Page::"NPR Adyen Reconciliation Logs", Logs);
     end;
+
+    internal procedure TestApiKey(ManagementAPIKey: Text[2048]; EnvironmentType: Enum "NPR Adyen Environment Type")
+    var
+        RequestURL: Text;
+        GetCompaniesEndpoint: Label '/companies', Locked = true;
+        HttpClient: HttpClient;
+        HttpContent: HttpContent;
+        HttpHeaders: HttpHeaders;
+        HttpRequestMessage: HttpRequestMessage;
+        HttpResponseMessage: HttpResponseMessage;
+        ManagementKeyIsNotValidLbl: Label 'Management API key is not valid. Please update the Management API key.';
+    begin
+        RequestURL := GetManagementAPIURL(EnvironmentType) + GetCompaniesEndpoint;
+
+        Clear(HttpRequestMessage);
+        HttpContent.GetHeaders(HttpHeaders);
+        HttpHeaders.Clear();
+        HttpHeaders.Add('Content-Type', 'text/json; charset="utf-8"');
+        HttpHeaders.Add('x-api-key', ManagementAPIKey);
+
+        HttpRequestMessage.Content := HttpContent;
+        HttpRequestMessage.SetRequestUri(RequestUrl);
+        HttpRequestMessage.Method := 'GET';
+
+        HttpClient.Send(HttpRequestMessage, HttpResponseMessage);
+
+        if not HttpResponseMessage.IsSuccessStatusCode() then
+            Error(ManagementKeyIsNotValidLbl);
+    end;
     #endregion
 
     #region Reconciliation

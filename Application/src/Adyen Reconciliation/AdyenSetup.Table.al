@@ -25,27 +25,40 @@ table 6150801 "NPR Adyen Setup"
 
             trigger OnValidate()
             var
-                MerchantAccount: Record "NPR Adyen Merchant Account";
-                WebhookSetup: Record "NPR Adyen Webhook Setup";
                 WebService: Record "Web Service Aggregate";
                 AdyenManagement: Codeunit "NPR Adyen Management";
-                AdyenTrMatchingSession: Codeunit "NPR Adyen Tr. Matching Session";
                 WebServiceManagement: Codeunit "Web Service Management";
+            begin
+                WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, Codeunit::"NPR AF Rec. API Request", 'AdyenWebhook', "Enable Reconciliation");
+                TestField("Management API Key");
+                AdyenManagement.UpdateMerchantList(0);
+            end;
+        }
+        field(21; "Enable Reconcil. Automation"; Boolean)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Enable Reconciliation';
+
+            trigger OnValidate()
+            var
+                MerchantAccount: Record "NPR Adyen Merchant Account";
+                WebhookSetup: Record "NPR Adyen Webhook Setup";
+                AdyenManagement: Codeunit "NPR Adyen Management";
+                AdyenTrMatchingSession: Codeunit "NPR Adyen Tr. Matching Session";
                 ReportReadyEventFilter: Label 'REPORT_AVAILABLE', Locked = true;
                 AdyenWebhookType: Enum "NPR Adyen Webhook Type";
             begin
-                TestField("Management API Key");
-                AdyenTrMatchingSession.SetupReconciliationTaskProcessingJobQueue("Enable Reconciliation");
-                if "Enable Reconciliation" then begin
-                    WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, Codeunit::"NPR AF Rec. API Request", 'AdyenWebhook', true);
+                AdyenTrMatchingSession.SetupReconciliationTaskProcessingJobQueue("Enable Reconcil. Automation");
+                if "Enable Reconcil. Automation" then begin
+                    TestField("Management API Key");
                     AdyenManagement.UpdateMerchantList(0);
-                    if MerchantAccount.FindSet() then
+
+                    if MerchantAccount.FindSet() and WebhookSetup.IsEmpty() then
                         repeat
                             AdyenManagement.InitWebhookSetup(WebhookSetup, ReportReadyEventFilter, MerchantAccount.Name, AdyenWebhookType::standard);
                             AdyenManagement.CreateWebhook(WebhookSetup);
                         until MerchantAccount.Next() = 0;
-                end else
-                    WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, Codeunit::"NPR AF Rec. API Request", 'AdyenWebhook', false);
+                end;
             end;
         }
         field(30; "Management Base URL"; Text[2048])
@@ -65,6 +78,14 @@ table 6150801 "NPR Adyen Setup"
         {
             DataClassification = CustomerContent;
             Caption = 'Management API Key';
+
+            trigger OnValidate()
+            var
+                AdyenManagement: Codeunit "NPR Adyen Management";
+            begin
+                if "Management API Key" <> '' then
+                    AdyenManagement.TestApiKey("Management API Key", "Environment Type");
+            end;
         }
         field(50; "Download Report API Key"; Text[2048])
         {
