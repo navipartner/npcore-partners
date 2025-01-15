@@ -638,6 +638,10 @@
         GlobalSettingsStartStopPerfRecordingLbl: Label 'Opens built-in BC page for starting/stopping performance recordings : ';
         GlobalSettingsMaintenanceErrorHandlingLbl: Label 'Error Handling';
         GlobalSettingsMaintenanceShowLastStackTraceLbl: Label 'Show last error stacktrace : ';
+        GlobalSettingsFirstDayOfTheWeekDatePickerLbl: Label 'First day of the week';
+        GlobalSettingsDatePickerSettingsTitleLbl: Label 'Date Picker Settings';
+        GlobalSettingsDialogTabLbl: Label 'Dialog';
+        GlobalSettingsHIDSettingsLabelLbl: Label 'HID Settings';
         GlobalShortcutsErrorShortcutAlreadyExistsLbl: Label 'Shortcut already exists';
         GlobalShortcutsErrorShortcutIsPredefinedLbl: Label 'Shortcut is predefined';
         GlobalShortcutsWarningMessageLbl: Label 'Be aware, entering only numbers, only one letter, or just special key like shift, ctrl, space, enter, backspace, delete, insert, F keys, meta  or alt, may activate your shortcut in the middle of typing or scanning items. Consider using combination of special keys, numbers/letters like ctrl+t, ctrl+1, ctrl+shift+p etc.';
@@ -645,6 +649,7 @@
         GlobalShortcutsClickToAddActionLbl: Label 'Click to add an action';
         GlobalShortcutsEditParametersLbl: Label 'Edit parameters';
         GlobalShortcutsAddShortcutLbl: Label 'Add shortcut';
+        GlobalShortcutsEnableShortcutsLbl: Label 'Enable shortcuts';
         GlobalSettingsPleaseEnterNameForThisActionLbl: Label 'Please enter name for this action';
         GlobalSettingsNoEditableVariablesLbl: Label 'No Editable Variables';
         GlobalSettingsAddNewLbl: Label 'Add New';
@@ -690,6 +695,8 @@
         ScheduleDialogTimeSlotsTableRemainingCapacityLbl: Label 'Remaining Capacity';
         ScheduleDialogTimeSlotsTablePriceLbl: Label 'Price';
         ScheduleDialogDialogScheduleRequestErrorLbl: Label 'Something went wrong when creating your ticket, please check the selected times and try again.';
+        ScheduleDialogAdmissionsTableEnterEditModeDescriptionLbl: Label 'Enter edit mode to edit layout.';
+        ScheduleDialogAdmissionsTableExitEditModeDescriptionLbl: Label 'Exit edit mode.';
         RestaurantMenusEditorPleaseIgnoreLbl: Label 'Please ignore this if you are not using restaurant';
         RestaurantMenusEditorAdminButtonsLbl: Label 'Admin Buttons';
         RestaurantMenusEditorWaiterPadMenuLbl: Label 'Waiter Pad Menu';
@@ -778,8 +785,11 @@
         StatisticsTotalSalesLbl: Label 'Total Sales';
         StatisticsSalesPerCustomerLbl: Label 'Sales Per Customer';
         StatisticsSalesPerProductLbl: Label 'Sales Per Product';
-        StatisticsOneDayLbl: Label '1 Day';
-        StatisticsSevenDaysLbl: Label '7 Days';
+        StatisticsDayModeLbl: Label 'Day';
+        StatisticsWeekModeLbl: Label 'Week';
+        StatisticsShowDetailsLbl: Label 'Show Details';
+        StatisticsHideDetailsLbl: Label 'Hide Details';
+        LastSaleDateLbl: Label 'Last Sale date';
     begin
         Captions.Add('Sale_ReceiptNo', CaptionLabelReceiptNo);
         Captions.Add('Sale_EANHeader', CaptionLabelEANHeader);
@@ -1163,6 +1173,10 @@
         Captions.Add('Global_Settings_Maintenance_StartStopPerfRecording', GlobalSettingsStartStopPerfRecordingLbl);
         Captions.Add('Global_Settings_Maintenance_ErrorHandling', GlobalSettingsMaintenanceErrorHandlingLbl);
         Captions.Add('Global_Settings_Maintenance_ShowLastStackTrace', GlobalSettingsMaintenanceShowLastStackTraceLbl);
+        Captions.Add('Global_Settings_FirstDayOfTheWeekDatePickerLabel', GlobalSettingsFirstDayOfTheWeekDatePickerLbl);
+        Captions.Add('Global_Settings_DatePickerSettingsTitle', GlobalSettingsDatePickerSettingsTitleLbl);
+        Captions.Add('Global_Settings_DialogTab', GlobalSettingsDialogTabLbl);
+        Captions.Add('Global_Settings_HID_SettingsLabel', GlobalSettingsHIDSettingsLabelLbl);
         Captions.Add('Global_Shortcuts_Error_ShortcutAlreadyExists', GlobalShortcutsErrorShortcutAlreadyExistsLbl);
         Captions.Add('Global_Shortcuts_Error_ShortcutIsPredefined', GlobalShortcutsErrorShortcutIsPredefinedLbl);
         Captions.Add('Global_Shortcuts_WarningMessage', GlobalShortcutsWarningMessageLbl);
@@ -1170,6 +1184,7 @@
         Captions.Add('Global_Shortcuts_ClickToAddAction', GlobalShortcutsClickToAddActionLbl);
         Captions.Add('Global_Shortcuts_EditParameters', GlobalShortcutsEditParametersLbl);
         Captions.Add('Global_Shortcuts_AddShortcut', GlobalShortcutsAddShortcutLbl);
+        Captions.Add('Global_Shortcuts_EnableShortcuts', GlobalShortcutsEnableShortcutsLbl);
         Captions.Add('Color_Settings_SelectPrimaryColor', ColorSettingsSelectPrimaryColorLbl);
         Captions.Add('Color_Settings_ChangeColor', ColorSettingsChangeColorLbl);
         Captions.Add('Color_Settings_SelectSecondaryColor', ColorSettingsSelectSecondaryColorLbl);
@@ -1202,6 +1217,8 @@
         Captions.Add('ScheduleDialog_TimeSlots_Table_RemainingCapacity', ScheduleDialogTimeSlotsTableRemainingCapacityLbl);
         Captions.Add('ScheduleDialog_TimeSlots_Table_Price', ScheduleDialogTimeSlotsTablePriceLbl);
         Captions.Add('ScheduleDialog_Dialog_Schedule_RequestError', ScheduleDialogDialogScheduleRequestErrorLbl);
+        Captions.Add('ScheduleDialog_Admissions_Table_EnterEditModeDescription', ScheduleDialogAdmissionsTableEnterEditModeDescriptionLbl);
+        Captions.Add('ScheduleDialog_Admissions_Table_ExitEditModeDescription', ScheduleDialogAdmissionsTableExitEditModeDescriptionLbl);
         Captions.Add('Restaurant_Menus_Editor_PleaseIgnore', RestaurantMenusEditorPleaseIgnoreLbl);
         Captions.Add('Restaurant_Menus_Editor_AdminButtons', RestaurantMenusEditorAdminButtonsLbl);
         Captions.Add('Restaurant_Menus_Editor_WaiterPadMenu', RestaurantMenusEditorWaiterPadMenuLbl);
@@ -1290,8 +1307,11 @@
         Captions.Add('Statistics_TotalSales', StatisticsTotalSalesLbl);
         Captions.Add('Statistics_SalesPerCustomer', StatisticsSalesPerCustomerLbl);
         Captions.Add('Statistics_SalesPerProduct', StatisticsSalesPerProductLbl);
-        Captions.Add('Statistics_OneDay', StatisticsOneDayLbl);
-        Captions.Add('Statistics_SevenDays', StatisticsSevenDaysLbl);
+        Captions.Add('Statistics_DayMode', StatisticsDayModeLbl);
+        Captions.Add('Statistics_WeekMode', StatisticsWeekModeLbl);
+        Captions.Add('Statistics_ShowDetails', StatisticsShowDetailsLbl);
+        Captions.Add('Statistics_HideDetails', StatisticsHideDetailsLbl);
+        Captions.Add('LastSale_Date', LastSaleDateLbl);
 
         RecRef.Open(DATABASE::"NPR POS Sale Line");
         for i := 1 to RecRef.FieldCount do begin
