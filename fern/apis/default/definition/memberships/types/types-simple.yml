@@ -21,7 +21,7 @@ types:
 
   Description:
     type: string
-    docs: Description of the membership item.
+    docs: Description of the entity.
     examples:
       - name: ExampleItem
         value: "Membership Item"
@@ -29,6 +29,8 @@ types:
         value: "Short Description including HTML styling"
       - name: ExampleFull
         value: "Full Description including HTML styling"
+      - name: ExampleTimeEntry
+        value: "A description of the time entry"
 
 
   CacheInstanceId:
@@ -50,6 +52,8 @@ types:
         value: "UPGRADE-12346"
       - name: ExampleExtendWithItem
         value: "EXTEND-12346"
+      - name: ExampleCancelWithItem
+        value: "CANCEL-12346"
 
   ## Membership related types
   MembershipId:
@@ -129,12 +133,37 @@ types:
       - name: ExampleNewValidUntilDate
         value: "2026-09-16"
   
+  LifecycleOptionId:
+    type: uuid
+    docs: Unique identifier for a membership alteration option.
+    examples:
+      - name: ExampleLifecycleOptionId
+        value: 01111111-abcd-1234-5678-1234567890ab
+      - name: ExampleLifecycleOptionIdRenew
+        value: 11111111-abcd-1234-5678-1234567890ab
+      - name: ExampleLifecycleOptionIdUpgrade
+        value: 21111111-abcd-1234-5678-1234567890ac
+      - name: ExampleLifecycleOptionIdExtend
+        value: 31111111-abcd-1234-5678-1234567890ac
+      - name: ExampleLifecycleOptionIdCancel
+        value: 41111111-abcd-1234-5678-1234567890ac
+
   TimeEntryId:
-    type: integer
+    type: uuid
     docs: Unique identifier for a time entry.
     examples:
       - name: ExampleTimeEntryId
-        value: 1234
+        value: 12349999-aaaa-bbbb-cccc-1234567890ab
+      - name: Activate
+        value: 22349999-bbbb-cccc-dddd-2234567890bc
+      - name: Renew
+        value: 32349999-cccc-dddd-eeee-3234567890cd
+      - name: Upgrade
+        value: 42349999-dddd-eeee-ffff-4234567890de
+      - name: Extend
+        value: 52349999-eeee-ffff-aaaa-5234567890ef
+      - name: Cancel
+        value: 62349999-ffff-aaaa-bbbb-6234567890ff
  
   LifecycleActionEnum:
     enum:
@@ -142,7 +171,8 @@ types:
       - renew
       - upgrade
       - extend
-      - auto_renew
+      - cancel
+      - autoRenew
 
   LifecycleAction:
     type: LifecycleActionEnum
@@ -157,7 +187,9 @@ types:
       - name: ExampleExtend
         value: extend
       - name: ExampleAutoRenew
-        value: auto_renew
+        value: autoRenew
+      - name: ExampleCancel
+        value: cancel
 
   LifecycleDate:
     type: date
@@ -188,19 +220,26 @@ types:
     type: date
     docs: "The end date for the option."
 
+  UnitPrice:
+    type: double
+    docs: "The list price for the option."
+    examples:
+      - name: ExampleUnitPrice
+        value: 100.0
+
   Amount:
     type: double
     docs: The amount associated with the membership.
     examples:
       - name: ExampleAmount
-        value: 80 
+        value: 80.0 
   
   AmountInclVat:
     type: double
     docs: The amount including VAT associated with the membership.
     examples:
       - name: ExampleAmountInclVat
-        value: 100
+        value: 100.0
 
   ReceiptNumber:
     type: string
@@ -227,11 +266,11 @@ types:
         value: "C1234567890"
   
   MemberId:
-    type: integer
+    type: uuid
     docs: Unique identifier for a member.
     examples:
       - name: ExampleMemberId
-        value: 4331
+        value: 12345678-abcd-1234-5678-1234567890ab
 
   MemberNumber:
     type: string
@@ -298,7 +337,7 @@ types:
 
   GenderEnum:
     enum:
-      - not_specified
+      - notSpecified
       - female
       - male
       - other
@@ -330,6 +369,13 @@ types:
     examples:
       - name: ExampleEmail
         value: "john.doe@acme.com"
+  
+  HasPicture:
+    type: boolean
+    docs: Indicates if the member has a picture.
+    examples:
+      - name: ExampleHasPicture
+        value: true
 
   Base64Image:
     type: base64
@@ -338,19 +384,19 @@ types:
       - name: ExampleBase64Image
         value: SGVsbG8gV29ybGQ=
 
-  GDPRApprovalEnum:
+  GDPRConsentEnum:
     enum:
       - pending
       - accepted
       - rejected
       - delegated
 
-  GDPRApproval:
-    type: boolean
+  GDPRConsent:
+    type: GDPRConsentEnum
     docs: Indicates if the member has given GDPR approval.
     examples:
       - name: ExampleGDPRApproval
-        value: true
+        value: accepted
 
   NotificationMethod:
     type: string
@@ -368,15 +414,30 @@ types:
       - name: ExamplePhone
         value: "+46701234567"
 
+
+  PreferredLanguage:
+    type: string
+    docs: The preferred language of the member.
+    examples:
+      - name: ExamplePreferredLanguage
+        value: "EN"
+
+  PreassignedContactNumber:
+    type: string
+    docs: A preassigned contact number for the member. When there is no contact number, the system will generate one.
+    examples:
+      - name: ExamplePreassignedContactNumber
+        value: "C000188"
+        
   ## Card Related Types
   CardId:
-    type: integer
+    type: uuid
     docs: Unique identifier for a card.
     examples:
       - name: ExampleCardId
-        value: 123434
+        value: 12345678-abcd-1234-5678-1234567890ab
       - name: ExampleCardIdBlocked
-        value: 598
+        value: 66666666-6666-6666-6666-666666666666
 
   CardNumber:
     type: string
@@ -408,17 +469,18 @@ types:
   ## Role Related Types
   RoleEnum:
     enum:
-      - membership_admin
+      - membershipAdmin
       - member
       - guardian
       - dependant
+      - anonymous
 
   Role:
     type: RoleEnum
     docs: The role of the member.
     examples:
       - name: ExampleRoleAdmin
-        value: membership_admin
+        value: membershipAdmin
 
   ## Payment Method Related Types
   PaymentMethodId:
@@ -526,6 +588,17 @@ types:
     examples:
       - name: ExampleDocumentId
         value: "EA3AD944335C49DB962E4C854937990A"
+      - name: ExampleDocumentId2
+        value: "FFFFF944335C49DB962E4C854937990A"
+
+  DocumentNo:
+    type: string
+    docs: External identifier for the sales document.
+    examples:
+      - name: ExampleDocumentNo
+        value: "DOC123456"
+      - name: ExampleDocumentNo2
+        value: "DOC654321"
 
   MediaId:
     type: uuid
@@ -685,14 +758,15 @@ types:
 
   ItemMemberTypeEnum:
     enum:
-      - new_membership
-      - add_member
-      - add_card
-      - replace_card
+      - newMembership
+      - addMember
+      - addAnonymousMember
+      - addCard
+      - replaceCard
 
   ItemMemberType:
-    type: string
+    type: ItemMemberTypeEnum
     docs: Type of membership item.
     examples:
       - name: ExampleNewMembership
-        value: new_membership
+        value: newMembership

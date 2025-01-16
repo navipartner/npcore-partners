@@ -31,14 +31,119 @@ codeunit 6185122 "NPR MembershipApiHandler"
     internal procedure HandleFunction()
     var
         MembershipApiAgent: Codeunit "NPR MembershipApiAgent";
+        MemberApiAgent: Codeunit "NPR MemberApiAgent";
+        MemberCardApiAgent: Codeunit "NPR MemberCardApiAgent";
+        MembershipCatalogAgent: Codeunit "NPR MembershipCatalogAgent";
+        MembershipPhasesApiAgent: Codeunit "NPR MembershipPhasesApiAgent";
+        MembershipMiscApiAgent: Codeunit "NPR MembershipMiscApiAgent";
         PaymentMethodApiAgent: Codeunit "NPR API SubscriptionPmtMethods";
     begin
         case _ApiFunction of
+
+            _ApiFunction::GET_CATALOG:
+                _Response := MembershipCatalogAgent.GetMembershipCatalog(_Request);
+
+
+
             _ApiFunction::GET_MEMBERSHIP_USING_NUMBER:
                 _Response := MembershipApiAgent.GetMembershipByNumber(_Request);
 
+            _ApiFunction::GET_MEMBERSHIP_USING_ID:
+                _Response := MembershipApiAgent.GetMembershipById(_Request);
+
+            _ApiFunction::GET_MEMBERSHIP_MEMBERS:
+                _Response := MembershipApiAgent.GetMembershipMembers(_Request);
+
+            _ApiFunction::CREATE_MEMBERSHIP:
+                _Response := MembershipApiAgent.CreateMembership(_Request);
+
+            _ApiFunction::BLOCK_MEMBERSHIP:
+                _Response := MembershipApiAgent.BlockMembership(_Request);
+
+            _ApiFunction::UNBLOCK_MEMBERSHIP:
+                _Response := MembershipApiAgent.UnblockMembership(_Request);
+
             _ApiFunction::GET_MEMBERSHIP_RENEWAL_INFO:
                 _Response := MembershipApiAgent.GetMembershipRenewalInfo(_Request);
+
+
+
+            _ApiFunction::FIND_MEMBER:
+                _Response := MemberApiAgent.FindMember(_Request);
+
+            _ApiFunction::GET_MEMBER_USING_ID:
+                _Response := MemberApiAgent.GetMemberById(_Request);
+
+            _ApiFunction::BLOCK_MEMBER:
+                _Response := MemberApiAgent.BlockMember(_Request);
+
+            _ApiFunction::UNBLOCK_MEMBER:
+                _Response := MemberApiAgent.UnblockMember(_Request);
+
+            _ApiFunction::GET_MEMBER_IMAGE:
+                _Response := MemberApiAgent.GetMemberImage(_Request);
+
+            _ApiFunction::SET_MEMBER_IMAGE:
+                _Response := MemberApiAgent.SetMemberImage(_Request);
+
+            _ApiFunction::ADD_MEMBER:
+                _Response := MemberApiAgent.AddMember(_Request);
+
+            _ApiFunction::UPDATE_MEMBER:
+                _Response := MemberApiAgent.UpdateMember(_Request);
+
+
+            _ApiFunction::GET_CARD_USING_ID:
+                _Response := MemberCardApiAgent.GetMemberCardById(_Request);
+
+            _ApiFunction::FIND_MEMBER_CARD:
+                _Response := MemberCardApiAgent.GetMemberCardByNumber(_Request);
+
+            _ApiFunction::BLOCK_CARD:
+                _Response := MemberCardApiAgent.BlockMemberCard(_Request);
+
+            _ApiFunction::UNBLOCK_CARD:
+                _Response := MemberCardApiAgent.UnblockMemberCard(_Request);
+
+            _ApiFunction::ADD_CARD:
+                _Response := MemberCardApiAgent.AddMemberCard(_Request);
+
+            _ApiFunction::REPLACE_CARD:
+                _Response := MemberCardApiAgent.ReplaceMemberCard(_Request);
+
+            _ApiFunction::SEND_TO_WALLET:
+                _Response := MemberCardApiAgent.SendToWallet(_Request);
+
+
+            _ApiFunction::GET_RENEWAL_OPTIONS:
+                _Response := MembershipPhasesApiAgent.GetRenewalOptions(_Request);
+            _ApiFunction::RENEW_MEMBERSHIP:
+                _Response := MembershipPhasesApiAgent.RenewMembership(_Request);
+
+            _ApiFunction::GET_EXTEND_OPTIONS:
+                _Response := MembershipPhasesApiAgent.GetExtendOptions(_Request);
+            _ApiFunction::EXTEND_MEMBERSHIP:
+                _Response := MembershipPhasesApiAgent.ExtendMembership(_Request);
+
+            _ApiFunction::GET_UPGRADE_OPTIONS:
+                _Response := MembershipPhasesApiAgent.GetUpgradeOptions(_Request);
+            _ApiFunction::UPGRADE_MEMBERSHIP:
+                _Response := MembershipPhasesApiAgent.UpgradeMembership(_Request);
+
+            _ApiFunction::GET_CANCEL_OPTIONS:
+                _Response := MembershipPhasesApiAgent.GetCancelOptions(_Request);
+            _ApiFunction::CANCEL_MEMBERSHIP:
+                _Response := MembershipPhasesApiAgent.CancelMembership(_Request);
+
+            _ApiFunction::REGRET_MEMBERSHIP:
+                _Response := MembershipPhasesApiAgent.RegretMembership(_Request);
+
+            _ApiFunction::GET_MEMBERSHIP_TIME_ENTRIES:
+                _Response := MembershipPhasesApiAgent.GetMembershipTimeEntries(_Request);
+
+            _ApiFunction::ACTIVATE_MEMBERSHIP:
+                _Response := MembershipPhasesApiAgent.ActivateMembership(_Request);
+
 
             _ApiFunction::GET_ALL_PAYMENT_METHODS:
                 _Response := PaymentMethodApiAgent.GetPaymentMethods(_Request);
@@ -54,6 +159,10 @@ codeunit 6185122 "NPR MembershipApiHandler"
 
             _ApiFunction::DELETE_PAYMENT_METHOD:
                 _Response := PaymentMethodApiAgent.DeletePaymentMethod(_Request);
+
+
+            _ApiFunction::RESOLVE_IDENTIFIER:
+                _Response := MembershipMiscApiAgent.ResolveIdentifier(_Request);
 
         end;
     end;
