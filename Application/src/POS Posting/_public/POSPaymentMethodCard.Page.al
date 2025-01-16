@@ -245,7 +245,7 @@
             group(Vouchers)
             {
                 Caption = 'Vouchers';
-                Visible = Rec."Processing Type" = Rec."Processing Type"::VOUCHER;
+                Visible = (Rec."Processing Type" = Rec."Processing Type"::VOUCHER) or (Rec."Processing Type" = Rec."Processing Type"::"FOREIGN VOUCHER");
                 field("Reverse Unrealized VAT"; Rec."Reverse Unrealized VAT")
                 {
                     ApplicationArea = NPRRetail;
