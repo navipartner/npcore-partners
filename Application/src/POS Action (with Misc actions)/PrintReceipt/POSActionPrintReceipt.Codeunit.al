@@ -138,23 +138,20 @@ codeunit 6150787 "NPR POS Action: Print Receipt" implements "NPR IPOS Workflow"
             exit;
 
         Setup.GetPOSUnit(POSUnit);
-        SalesTicketNo := BusinessLogicRun.GetSalesTicketNo(Setup,
+        SalesTicketNo := BusinessLogicRun.GetSalesTicketNoAndPrintReceipt(Setup,
                                                            POSUnit,
                                                            SettingOption,
                                                            ReceiptListFilterOption,
                                                            PresetTableView,
                                                            SelectionDialogType,
                                                            ManualReceiptNo,
-                                                           ObfuscationMethod);
-        if PrintPhysicalReceipts then
-            BusinessLogicRun.PrintReceipt(Setup,
-                                          POSUnit,
-                                          SalesTicketNo,
-                                          PrintTickets,
-                                          PrintMemberships,
-                                          PrintRetailVoucher,
-                                          PrintTerminalReceipt,
-                                          PrintTaxFreeVoucher);
+                                                           ObfuscationMethod,
+                                                           PrintPhysicalReceipts,
+                                                           PrintTickets,
+                                                           PrintMemberships,
+                                                           PrintRetailVoucher,
+                                                           PrintTerminalReceipt,
+                                                           PrintTaxFreeVoucher);
 
         FrontEnd.WorkflowResponse(PrepareDigitalReceiptWorkflow(IssueDigitalReceipts, SalesTicketNo));
     end;
