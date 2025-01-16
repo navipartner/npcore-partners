@@ -419,7 +419,7 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
 
 
 
-    internal procedure ExecuteMembershipAlteration(POSSaleLine: Codeunit "NPR POS Sale Line"; AlterationType: Option; ExternalMemberCardNo: Text[100]; ItemNo: Code[20])
+    internal procedure ExecuteMembershipAlteration(POSSaleLine: Codeunit "NPR POS Sale Line"; AlterationType: Option; ExternalMemberCardNo: Text[100]; ItemNo: Code[20]; AutoAdmitMember: Option DECIDED_BY_BACKEND,NO,YES,PROMPT)
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
@@ -449,13 +449,18 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
 
         MemberInfoCapture.Get(MemberInfoEntryNo);
         MembershipAlterationSetup.Get(AlterationType, MemberInfoCapture."Membership Code", MemberInfoCapture."Item No.");
+        if AutoAdmitMember = AutoAdmitMember::DECIDED_BY_BACKEND then begin
+            if (MembershipAlterationSetup."Auto-Admit Member On Sale" = MembershipAlterationSetup."Auto-Admit Member On Sale"::ASK) then
+                MemberInfoCapture."Auto-Admit Member" := Confirm(ADMIT_MEMBERS, true);
 
-        if (MembershipAlterationSetup."Auto-Admit Member On Sale" = MembershipAlterationSetup."Auto-Admit Member On Sale"::ASK) then
-            MemberInfoCapture."Auto-Admit Member" := Confirm(ADMIT_MEMBERS, true);
-
-        if (MembershipAlterationSetup."Auto-Admit Member On Sale" = MembershipAlterationSetup."Auto-Admit Member On Sale"::YES) then
-            MemberInfoCapture."Auto-Admit Member" := true;
-
+            if (MembershipAlterationSetup."Auto-Admit Member On Sale" = MembershipAlterationSetup."Auto-Admit Member On Sale"::YES) then
+                MemberInfoCapture."Auto-Admit Member" := true;
+        end else begin
+            if AutoAdmitMember = AutoAdmitMember::PROMPT then
+                MemberInfoCapture."Auto-Admit Member" := Confirm(ADMIT_MEMBERS, true);
+            if AutoAdmitMember = AutoAdmitMember::YES then
+                MemberInfoCapture."Auto-Admit Member" := true;
+        end;
         MemberInfoCapture.Modify();
 
         AddItemToPOS(POSSaleLine, MemberInfoEntryNo, ItemNo, MembershipAlterationSetup.Description, CopyStr(ExternalMemberCardNo, 1, 80), 1, MemberInfoCapture."Unit Price", SaleLinePOS);

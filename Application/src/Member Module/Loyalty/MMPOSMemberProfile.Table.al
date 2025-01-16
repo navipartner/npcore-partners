@@ -28,6 +28,12 @@ table 6150851 "NPR MM POS Member Profile"
             Caption = 'Send Notification On Sale';
             DataClassification = CustomerContent;
         }
+        field(6; "Alteration Group"; Code[10])
+        {
+            Caption = 'Alteration Group';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM Members. Alter. Group";
+        }
     }
 
     keys

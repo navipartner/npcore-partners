@@ -2819,7 +2819,7 @@
         end;
     end;
 
-    internal procedure GetMembershipChangeOptions(MembershipEntryNo: Integer; var MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; var TmpMembershipEntry: Record "NPR MM Membership Entry" temporary): Boolean
+    internal procedure GetMembershipChangeOptions(MembershipEntryNo: Integer; AlterationGroup: Code[10]; var MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; var TmpMembershipEntry: Record "NPR MM Membership Entry" temporary): Boolean
     var
         TempMemberInfoCapture: Record "NPR MM Member Info Capture" temporary;
         Item: Record Item;
@@ -2840,19 +2840,19 @@
                 if (Item.Get(TempMemberInfoCapture."Item No.")) then;
 
                 IsValidOption := false;
-                case MembershipAlterationSetup."Alteration Type" of
-                    MembershipAlterationSetup."Alteration Type"::RENEW:
-                        IsValidOption := RenewMembership(TempMemberInfoCapture, false, false, StartDate, EndDate, UnitPrice);
-                    MembershipAlterationSetup."Alteration Type"::EXTEND:
-                        IsValidOption := ExtendMembership(TempMemberInfoCapture, false, false, StartDate, EndDate, UnitPrice);
-                    MembershipAlterationSetup."Alteration Type"::UPGRADE:
-                        IsValidOption := UpgradeMembership(TempMemberInfoCapture, false, false, StartDate, EndDate, UnitPrice);
-                    MembershipAlterationSetup."Alteration Type"::REGRET:
-                        IsValidOption := RegretMembership(TempMemberInfoCapture, false, false, StartDate, EndDate, UnitPrice);
-                    MembershipAlterationSetup."Alteration Type"::CANCEL:
-                        IsValidOption := CancelMembership(TempMemberInfoCapture, false, false, StartDate, EndDate, UnitPrice);
-                end;
-
+                if AlterationSetupInGroup(MembershipAlterationSetup, AlterationGroup) then
+                    case MembershipAlterationSetup."Alteration Type" of
+                        MembershipAlterationSetup."Alteration Type"::RENEW:
+                            IsValidOption := RenewMembership(TempMemberInfoCapture, false, false, StartDate, EndDate, UnitPrice);
+                        MembershipAlterationSetup."Alteration Type"::EXTEND:
+                            IsValidOption := ExtendMembership(TempMemberInfoCapture, false, false, StartDate, EndDate, UnitPrice);
+                        MembershipAlterationSetup."Alteration Type"::UPGRADE:
+                            IsValidOption := UpgradeMembership(TempMemberInfoCapture, false, false, StartDate, EndDate, UnitPrice);
+                        MembershipAlterationSetup."Alteration Type"::REGRET:
+                            IsValidOption := RegretMembership(TempMemberInfoCapture, false, false, StartDate, EndDate, UnitPrice);
+                        MembershipAlterationSetup."Alteration Type"::CANCEL:
+                            IsValidOption := CancelMembership(TempMemberInfoCapture, false, false, StartDate, EndDate, UnitPrice);
+                    end;
                 if (IsValidOption) then begin
                     TmpMembershipEntry.Init();
 
@@ -5832,5 +5832,14 @@
         Clear(SetAutoRenewStatus);
         SetAutoRenewStatus.SetMembership(Membership);
         SetAutoRenewStatus.RunModal();
+    end;
+
+    local procedure AlterationSetupInGroup(MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; AlterationGroup: Code[10]): boolean
+    var
+        MMMembersAlterLine: Record "NPR MM Members. Alter. Line";
+    begin
+        if AlterationGroup = '' then
+            exit(true);
+        exit(MMMembersAlterLine.Get(AlterationGroup, MembershipAlterationSetup.SystemId));
     end;
 }
