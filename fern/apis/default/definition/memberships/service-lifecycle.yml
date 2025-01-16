@@ -56,6 +56,31 @@ service:
           response:
             body: $ConfirmMembershipActivateResponse.Example
 
+    getCancelOptions:
+      docs: 
+        Retrieve a list of available cancel options for a membership. 
+        Each option is represented by an `itemNumber`, which includes predefined configurations such as price, 
+        duration, and other relevant details. 
+        The `optionId` returned from this endpoint can be used as a parameter in the `cancelMembership` endpoint 
+        to proceed with the cancel.
+      display-name: Get Cancel Options
+      method: GET
+      path: /{membershipId}/cancelOptions
+      path-parameters:
+        membershipId: simpleTypes.MembershipId
+      request:
+        name: getCancelOptions
+      response: GetCancelOptionsResponse
+      examples:
+        - name: ExampleGetCancelOptions
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          response:
+            body: $GetCancelOptionsResponse.Example
+
     cancelMembership:
       docs: 
         Cancel an active membership using this endpoint. 
@@ -85,11 +110,11 @@ service:
         Retrieve a list of available renewal options for a membership. 
         Each option is represented by an `itemNumber`, which includes predefined configurations such as price, 
         duration, and other relevant details. 
-        The `itemNumber` returned from this endpoint can be used as a parameter in the `renewMembership` endpoint 
+        The `optionId` returned from this endpoint can be used as a parameter in the `renewMembership` endpoint 
         to proceed with the renewal.
       display-name: Get Renewal Options
       method: GET
-      path: /membership/{membershipId}/renew/options
+      path: /{membershipId}/renewalOptions
       path-parameters:
         membershipId: simpleTypes.MembershipId
       request:
@@ -109,7 +134,7 @@ service:
       docs: 
         Use this endpoint to renew an existing membership. 
         The renewal will **add a new period** after the current membership period expires. 
-        To renew, you must provide the `itemNumber` from the `getRenewalOptions` endpoint, 
+        To renew, you must provide the `optionId` from the `getRenewalOptions` endpoint, 
         which specifies the predefined renewal configuration such as price and duration.
       display-name: Renew Membership
       method: POST  
@@ -135,7 +160,7 @@ service:
       docs: 
          Retrieve a list of available upgrade options for a membership. Each upgrade option is represented by an 
          `itemNumber`, which includes predefined details such as the upgraded benefits and any 
-         pricing adjustments. The `itemNumber` returned from this endpoint can be used as a parameter in 
+         pricing adjustments. The `optionId` returned from this endpoint can be used as a parameter in 
          the `upgradeMembership` endpoint to execute the upgrade.
       display-name: Get Upgrade Options
       method: GET
@@ -185,7 +210,7 @@ service:
       docs: 
         Retrieve a list of available extension options for a membership. Each option is represented by an 
         `itemNumber`, which includes predefined configurations such as new duration and pricing. 
-        The `itemNumber` returned from this endpoint can be used as a parameter in the `extendMembership` 
+        The `optionId` returned from this endpoint can be used as a parameter in the `extendMembership` 
         endpoint to apply the extension.
       display-name: Get Extend Options
       method: GET
@@ -233,139 +258,180 @@ service:
           body: $ConfirmMembershipExtendResponse.Example
 
 
+
+    getMembershipRecurringPaymentInfo:
+      docs: 
+        This endpoint retrieves information about renewing a membership (pricing and term).
+      display-name: Get Membership Recurring Subscription Payment Information
+      method: GET
+      path: /{membershipId}/renewal
+      path-parameters:
+        membershipId: simpleTypes.MembershipId
+      request:
+        name: getMembershipRenewalInfo
+      response: GetMembershipRenewalInfoResponse
+      examples:
+        - name: GetMembershipRenewalInfo
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          response: 
+            body: $GetMembershipRenewalInfoResponse.ExampleGetMembershipRenewalInfo
+
 ###################################################
 types:
 
   # Get Membership History Service
   GetMembershipHistoryResponse:
     properties:
-      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
-      membership: compositeTypes.MembershipLifecycleDTO
+      membership: compositeTypes.MembershipLifecycleEntriesDTO
     examples:
       - name: Example
         value:
-          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
-          membership: $compositeTypes.MembershipLifecycleDTO.ExampleActivate
+          membership: $compositeTypes.MembershipLifecycleEntriesDTO.ExampleActivate
+
+
 
   # Confirm Membership Activate Service
   ConfirmMembershipActivateResponse:
     properties:
-      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
-      membership: compositeTypes.MembershipLifecycleDTO
+      membership: compositeTypes.MembershipLifecycleEntriesDTO
     examples:
       - name: Example
         value:
-          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
-          membership: $compositeTypes.MembershipLifecycleDTO.ExampleActivate
+          membership: $compositeTypes.MembershipLifecycleEntriesDTO.ExampleActivate
+
+
+
 
   # Confirm Membership Cancel Service
   CancelMembershipRequest:
     properties:
-      cancelDate: simpleTypes.LifecycleDate
+      optionId: simpleTypes.LifecycleOptionId
+      documentNo: optional<simpleTypes.DocumentNo>
     examples:
       - name: Example
         value:
-          cancelDate: $simpleTypes.LifecycleDate.CancelDate
+          optionId: $simpleTypes.LifecycleOptionId.ExampleLifecycleOptionIdCancel
+          documentNo: $simpleTypes.DocumentNo.ExampleDocumentNo2
 
   ConfirmMembershipCancelResponse:
     properties:
-      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
-      membership: compositeTypes.MembershipLifecycleDTO
+      membership: compositeTypes.MembershipLifecycleEntriesDTO
     examples:
       - name: Example
         value:
-          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
-          membership: $compositeTypes.MembershipLifecycleDTO.ExampleCancel
-          
+          membership: $compositeTypes.MembershipLifecycleEntriesDTO.ExampleCancel
+
+  # Get Cancel Options Service
+  GetCancelOptionsResponse:
+    properties:
+      membership: compositeTypes.MembershipLifecycleOptionsDTO
+    examples:
+      - name: Example
+        value:
+          membership: $compositeTypes.MembershipLifecycleOptionsDTO.ExampleCancel
+
+
   # Confirm Membership Renew Service
   RenewMembershipRequest:
     properties:
-      renewWithItem: simpleTypes.ItemNumber
+      optionId: simpleTypes.LifecycleOptionId
+      documentNo: optional<simpleTypes.DocumentNo>
     examples:
       - name: Example
         value:
-          renewWithItem: $simpleTypes.ItemNumber.ExampleRenewWithItem
+          optionId: $simpleTypes.LifecycleOptionId.ExampleLifecycleOptionIdRenew
+          documentNo: $simpleTypes.DocumentNo.ExampleDocumentNo2
 
   ConfirmMembershipRenewResponse:
     properties:
-      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
-      membership: compositeTypes.MembershipLifecycleDTO
+      membership: compositeTypes.MembershipLifecycleEntriesDTO
     examples:
       - name: Example
         value:
-          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
-          membership: $compositeTypes.MembershipLifecycleDTO.ExampleRenew
+          membership: $compositeTypes.MembershipLifecycleEntriesDTO.ExampleRenew
           
   # Get Renew Options Service
   GetRenewOptionsResponse:
     properties:
-      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
-      renewalOptions: list<compositeTypes.LifecycleOptionDTO>
+      membership: compositeTypes.MembershipLifecycleOptionsDTO
     examples:
       - name: Example
         value:
-          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
-          renewalOptions: 
-            - $compositeTypes.LifecycleOptionDTO.ExampleRenewWithItem
+          membership: $compositeTypes.MembershipLifecycleOptionsDTO.ExampleRenew
+
+
+
+
 
   # Confirm Membership Upgrade Service
   UpgradeMembershipRequest:
     properties:
-      renewWithItem: simpleTypes.ItemNumber
+      optionId: simpleTypes.LifecycleOptionId
+      documentNo: optional<simpleTypes.DocumentNo>
     examples:
       - name: Example
         value:
-          renewWithItem: $simpleTypes.ItemNumber.ExampleUpgradeWithItem
+          optionId: $simpleTypes.LifecycleOptionId.ExampleLifecycleOptionIdUpgrade
+          documentNo: $simpleTypes.DocumentNo.ExampleDocumentNo2
 
   ConfirmMembershipUpgradeResponse:
     properties:
-      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
-      membership: compositeTypes.MembershipLifecycleDTO
+      membership: compositeTypes.MembershipLifecycleEntriesDTO
     examples:
       - name: Example
         value:
-          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
-          membership: $compositeTypes.MembershipLifecycleDTO.ExampleUpgrade
+          membership: $compositeTypes.MembershipLifecycleEntriesDTO.ExampleUpgrade
           
   # Get Upgrade Options Service
   GetUpgradeOptionsResponse:
     properties:
-      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
-      renewalOptions: list<compositeTypes.LifecycleOptionDTO>
+      membership: compositeTypes.MembershipLifecycleOptionsDTO
     examples:
       - name: Example
         value:
-          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
-          renewalOptions: 
-            - $compositeTypes.LifecycleOptionDTO.ExampleUpgradeWithItem
+          membership: $compositeTypes.MembershipLifecycleOptionsDTO.ExampleUpgrade
+
+
 
   # Confirm Membership Extend Service
   ExtendMembershipRequest:
     properties:
-      extendWithItem: simpleTypes.ItemNumber
+      optionId: simpleTypes.LifecycleOptionId
+      documentNo: optional<simpleTypes.DocumentNo>
     examples:
       - name: Example
         value:
-          extendWithItem: $simpleTypes.ItemNumber.ExampleExtendWithItem
-
+          optionId: $simpleTypes.LifecycleOptionId.ExampleLifecycleOptionIdExtend
+          documentNo: $simpleTypes.DocumentNo.ExampleDocumentNo2
+          
   ConfirmMembershipExtendResponse:
     properties:
-      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
-      membership: compositeTypes.MembershipLifecycleDTO
+      membership: compositeTypes.MembershipLifecycleEntriesDTO
     examples:
       - name: Example
         value:
-          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
-          membership: $compositeTypes.MembershipLifecycleDTO.ExampleExtend
+          membership: $compositeTypes.MembershipLifecycleEntriesDTO.ExampleExtend
           
   # Get Extend Options Service
   GetExtendOptionsResponse:
     properties:
-      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
-      extendOptions: list<compositeTypes.LifecycleOptionDTO>
+      membership: compositeTypes.MembershipLifecycleOptionsDTO
     examples:
       - name: Example
         value:
-          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
-          extendOptions: 
-            - $compositeTypes.LifecycleOptionDTO.ExampleExtendWithItem
+          membership: $compositeTypes.MembershipLifecycleOptionsDTO.ExampleExtend
+
+
+
+  # Get Membership Renewal Info Service
+  GetMembershipRenewalInfoResponse:
+    properties:
+      membership: compositeTypes.MembershipRenewalInfoDTO
+    examples:
+      - name: ExampleGetMembershipRenewalInfo
+        value:
+          membership: $compositeTypes.MembershipRenewalInfoDTO.ExampleMembershipRenewalInfo

@@ -2856,6 +2856,7 @@
                 if (IsValidOption) then begin
                     TmpMembershipEntry.Init();
 
+                    TmpMembershipEntry.SystemId := MembershipAlterationSetup.SystemId;
                     TmpMembershipEntry."Entry No." := EntryNo;
                     TmpMembershipEntry."Valid From Date" := StartDate;
                     TmpMembershipEntry."Valid Until Date" := EndDate;

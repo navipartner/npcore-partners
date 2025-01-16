@@ -94,6 +94,7 @@ types:
           phoneNo: $simpleTypes.PhoneNo.ExamplePhoneNo
           email: $simpleTypes.Email.ExampleEmail
           blocked: $simpleTypes.Blocked.ExampleBlocked
+
           memberships:
             - $MembershipDTOWithinMember.ExampleMembershipDTOWithinMember
 
@@ -141,7 +142,7 @@ types:
     extends: 
       MemberEntityRequest
     properties:
-      cards: optional<list<MemberCardEntity>>
+      card: optional<MemberCardEntity>
     examples:
       - name: ExampleMember
         value:
@@ -157,8 +158,8 @@ types:
           newsletter: $simpleTypes.Newsletter.ExampleNewsletter
           phoneNo: $simpleTypes.PhoneNo.ExamplePhoneNo
           email: $simpleTypes.Email.ExampleEmail
-          cards: 
-            - $MemberCardEntity.ExampleMemberCardCreate
+          card: 
+            $MemberCardEntity.ExampleMemberCardCreate
 
   MemberWithCardDTOResponse:
     docs:
@@ -414,6 +415,10 @@ types:
       newsletter: optional<simpleTypes.Newsletter>
       phoneNo: optional<simpleTypes.PhoneNo>
       email: optional<simpleTypes.Email>
+      preferredLanguage: optional<simpleTypes.PreferredLanguage>
+      gdprConsent: optional<simpleTypes.GDPRConsent>
+      preassignedContactNumber: optional<simpleTypes.PreassignedContactNumber>
+      storeCode: optional<simpleTypes.StoreCode>
     examples:
       - name : ExampleMember
         value:
@@ -440,6 +445,7 @@ types:
       memberId: simpleTypes.MemberId
       memberNumber: simpleTypes.MemberNumber
       blocked: simpleTypes.Blocked
+      hasPicture: optional<simpleTypes.HasPicture>
     examples:
       - name : ExampleMember
         value:
@@ -458,6 +464,7 @@ types:
           phoneNo: $simpleTypes.PhoneNo.ExamplePhoneNo
           email: $simpleTypes.Email.ExampleEmail
           blocked: $simpleTypes.Blocked.ExampleBlocked
+          hasPicture: $simpleTypes.HasPicture.ExampleHasPicture
       - name : ExampleMemberBlocked
         value:
           memberId: $simpleTypes.MemberId.ExampleMemberId
@@ -475,6 +482,7 @@ types:
           phoneNo: $simpleTypes.PhoneNo.ExamplePhoneNo
           email: $simpleTypes.Email.ExampleEmail
           blocked: $simpleTypes.Blocked.ExampleBlockedTrue
+          hasPicture: $simpleTypes.HasPicture.ExampleHasPicture
 
   MemberCardEntity:
     docs:
@@ -506,10 +514,10 @@ types:
           expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDate
           temporary: false
 
-  MembershipLifecycleDTO:
+  MembershipLifecycleEntriesDTO:
     docs: 
       # Use this DTO to retrieve the timeline of a membership including activation, renewal, upgrade, and extension details.
-      The MembershipLifecycleDTO is a composite type representing the timeline of a membership.
+      The MembershipLifecycleEntriesDTO is a composite type representing the timeline of a membership.
       It includes details when the membership was activated, renewed, upgraded, or extended.
     extends: 
       MembershipEntity
@@ -590,21 +598,26 @@ types:
       The MembershipTimeEntryEntity describes the attributes of a time entry linked to a Membership. 
       It is used within other composite DTOs to represent the validity associated with a membership.
     properties:
-      timeEntryId: simpleTypes.TimeEntryId
+      entryId: simpleTypes.TimeEntryId
+      itemNumber: simpleTypes.ItemNumber
+      lifecycleAction: simpleTypes.LifecycleAction
+      blocked: simpleTypes.Blocked
+      membershipCode: simpleTypes.MembershipCode
+      description: simpleTypes.Description
       validFromDate: simpleTypes.ValidFromDate
       validUntilDate: simpleTypes.ValidUntilDate
+      createdAt: simpleTypes.CreatedAt
       activateOnFirstUse: simpleTypes.ActivateOnFirstUse
-      lifecycleAction: simpleTypes.LifecycleAction
-      itemNumber: simpleTypes.ItemNumber
+      documentNumber: simpleTypes.DocumentNo
+      documentId: simpleTypes.DocumentId
+      unitPrice: simpleTypes.UnitPrice
       amount: simpleTypes.Amount
       amountInclVat: simpleTypes.AmountInclVat
-      receiptNumber: simpleTypes.ReceiptNumber
-      receiptLine: simpleTypes.ReceiptLine
-      membershipCode: simpleTypes.MembershipCode
+     
     examples:
       - name: ExampleActivateEntry
         value:
-          timeEntryId: 1223
+          entryId: $simpleTypes.TimeEntryId.Activate
           validFromDate: $simpleTypes.LifecycleDate.ValidFromDate
           validUntilDate: $simpleTypes.LifecycleDate.ValidUntilDate
           activateOnFirstUse: $simpleTypes.ActivateOnFirstUse.ExampleActivateOnFirstUse
@@ -612,12 +625,17 @@ types:
           itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
           amount: $simpleTypes.Amount.ExampleAmount
           amountInclVat: $simpleTypes.AmountInclVat.ExampleAmountInclVat
-          receiptNumber: $simpleTypes.ReceiptNumber.ExampleReceiptNumber
-          receiptLine: $simpleTypes.ReceiptLine.ExampleReceiptLine
           membershipCode: $simpleTypes.MembershipCode.GOLD
+          blocked: $simpleTypes.Blocked.ExampleBlocked
+          createdAt: $simpleTypes.CreatedAt.ExampleCreatedAt
+          documentNumber: $simpleTypes.DocumentNo.ExampleDocumentNo
+          documentId: $simpleTypes.DocumentId.ExampleDocumentId
+          unitPrice: $simpleTypes.UnitPrice.ExampleUnitPrice
+          description: $simpleTypes.Description.ExampleTimeEntry
+
       - name: ExampleCancelEntry
         value:
-          timeEntryId: 2332
+          entryId: $simpleTypes.TimeEntryId.Cancel
           validFromDate: $simpleTypes.LifecycleDate.ValidFromDate
           validUntilDate: $simpleTypes.LifecycleDate.CancelDate
           activateOnFirstUse: $simpleTypes.ActivateOnFirstUse.ExampleActivateOnFirstUse
@@ -625,12 +643,16 @@ types:
           itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
           amount: $simpleTypes.Amount.ExampleAmount
           amountInclVat: $simpleTypes.AmountInclVat.ExampleAmountInclVat
-          receiptNumber: $simpleTypes.ReceiptNumber.ExampleReceiptNumber
-          receiptLine: $simpleTypes.ReceiptLine.ExampleReceiptLine
           membershipCode: $simpleTypes.MembershipCode.GOLD
+          blocked: $simpleTypes.Blocked.ExampleBlocked
+          createdAt: $simpleTypes.CreatedAt.ExampleCreatedAt
+          documentNumber: $simpleTypes.DocumentNo.ExampleDocumentNo
+          documentId: $simpleTypes.DocumentId.ExampleDocumentId
+          unitPrice: $simpleTypes.UnitPrice.ExampleUnitPrice
+          description: $simpleTypes.Description.ExampleTimeEntry
       - name: ExampleRenewEntry
         value:
-          timeEntryId: 3443
+          entryId: $simpleTypes.TimeEntryId.Renew
           validFromDate: $simpleTypes.LifecycleDate.RenewFromDate
           validUntilDate: $simpleTypes.LifecycleDate.RenewUntilDate
           activateOnFirstUse: $simpleTypes.ActivateOnFirstUse.ExampleActivateOnFirstUse
@@ -638,12 +660,16 @@ types:
           itemNumber: $simpleTypes.ItemNumber.ExampleRenewWithItem
           amount: $simpleTypes.Amount.ExampleAmount
           amountInclVat: $simpleTypes.AmountInclVat.ExampleAmountInclVat
-          receiptNumber: $simpleTypes.ReceiptNumber.ExampleReceiptNumber2
-          receiptLine: $simpleTypes.ReceiptLine.ExampleReceiptLine
           membershipCode: $simpleTypes.MembershipCode.GOLD
+          blocked: $simpleTypes.Blocked.ExampleBlocked
+          createdAt: $simpleTypes.CreatedAt.ExampleCreatedAt
+          documentNumber: $simpleTypes.DocumentNo.ExampleDocumentNo2
+          documentId: $simpleTypes.DocumentId.ExampleDocumentId2
+          unitPrice: $simpleTypes.UnitPrice.ExampleUnitPrice
+          description: $simpleTypes.Description.ExampleTimeEntry
       - name: ExampleUpgradeEntry
         value:
-          timeEntryId: 4554
+          entryId: $simpleTypes.TimeEntryId.Upgrade
           validFromDate: $simpleTypes.LifecycleDate.UpgradeFromDate
           validUntilDate: $simpleTypes.LifecycleDate.ValidUntilDate
           activateOnFirstUse: $simpleTypes.ActivateOnFirstUse.ExampleActivateOnFirstUse
@@ -651,13 +677,16 @@ types:
           itemNumber: $simpleTypes.ItemNumber.ExampleUpgradeWithItem
           amount: $simpleTypes.Amount.ExampleAmount
           amountInclVat: $simpleTypes.AmountInclVat.ExampleAmountInclVat
-          receiptNumber: $simpleTypes.ReceiptNumber.ExampleReceiptNumber2
-          receiptLine: $simpleTypes.ReceiptLine.ExampleReceiptLine
           membershipCode: $simpleTypes.MembershipCode.PLATINUM
-
+          blocked: $simpleTypes.Blocked.ExampleBlocked
+          createdAt: $simpleTypes.CreatedAt.ExampleCreatedAt
+          documentNumber: $simpleTypes.DocumentNo.ExampleDocumentNo2
+          documentId: $simpleTypes.DocumentId.ExampleDocumentId2
+          unitPrice: $simpleTypes.UnitPrice.ExampleUnitPrice
+          description: $simpleTypes.Description.ExampleTimeEntry
       - name: ExampleExtendEntry
         value:
-          timeEntryId: 4554
+          entryId: $simpleTypes.TimeEntryId.Extend
           validFromDate: $simpleTypes.LifecycleDate.ExtendFromDate
           validUntilDate: $simpleTypes.LifecycleDate.ExtendUntilDate
           activateOnFirstUse: $simpleTypes.ActivateOnFirstUse.ExampleActivateOnFirstUse
@@ -665,15 +694,85 @@ types:
           itemNumber: $simpleTypes.ItemNumber.ExampleExtendWithItem
           amount: $simpleTypes.Amount.ExampleAmount
           amountInclVat: $simpleTypes.AmountInclVat.ExampleAmountInclVat
-          receiptNumber: $simpleTypes.ReceiptNumber.ExampleReceiptNumber2
-          receiptLine: $simpleTypes.ReceiptLine.ExampleReceiptLine
           membershipCode: $simpleTypes.MembershipCode.GOLD
+          blocked: $simpleTypes.Blocked.ExampleBlocked
+          createdAt: $simpleTypes.CreatedAt.ExampleCreatedAt
+          documentNumber: $simpleTypes.DocumentNo.ExampleDocumentNo2
+          documentId: $simpleTypes.DocumentId.ExampleDocumentId2
+          unitPrice: $simpleTypes.UnitPrice.ExampleUnitPrice
+          description: $simpleTypes.Description.ExampleTimeEntry
+
+
+
+  MembershipLifecycleOptionsDTO:
+    docs: 
+      # Use this DTO to retrieve the timeline of a membership including activation, renewal, upgrade, and extension details.
+      The MembershipLifecycleEntriesDTO is a composite type representing the timeline of a membership.
+      It includes details when the membership was activated, renewed, upgraded, or extended.
+    extends: 
+      MembershipEntity
+    properties:
+      options: list<LifecycleOptionDTO>
+    examples:
+      - name: ExampleRenew
+        value:
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
+          communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
+          membershipCode: $simpleTypes.MembershipCode.GOLD
+          issueDate: $simpleTypes.IssueDate.ExampleIssueDate
+          validFromDate: $simpleTypes.LifecycleDate.RenewFromDate
+          validUntilDate: $simpleTypes.LifecycleDate.RenewUntilDate
+          customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
+          blocked: $simpleTypes.Blocked.ExampleBlocked
+          options:
+              - $LifecycleOptionDTO.ExampleRenew
+      - name: ExampleUpgrade
+        value:
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
+          communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
+          membershipCode: $simpleTypes.MembershipCode.GOLD
+          issueDate: $simpleTypes.IssueDate.ExampleIssueDate
+          validFromDate: $simpleTypes.LifecycleDate.ValidFromDate
+          validUntilDate: $simpleTypes.LifecycleDate.ValidUntilDate
+          customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
+          blocked: $simpleTypes.Blocked.ExampleBlocked
+          options:
+              - $LifecycleOptionDTO.ExampleUpgrade
+      - name: ExampleExtend
+        value:
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
+          communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
+          membershipCode: $simpleTypes.MembershipCode.GOLD
+          issueDate: $simpleTypes.IssueDate.ExampleIssueDate
+          validFromDate: $simpleTypes.LifecycleDate.ValidFromDate
+          validUntilDate: $simpleTypes.LifecycleDate.ExtendUntilDate
+          customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
+          blocked: $simpleTypes.Blocked.ExampleBlocked
+          options:
+              - $LifecycleOptionDTO.ExampleExtend
+      - name: ExampleCancel
+        value:
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
+          communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
+          membershipCode: $simpleTypes.MembershipCode.GOLD
+          issueDate: $simpleTypes.IssueDate.ExampleIssueDate
+          validFromDate: $simpleTypes.LifecycleDate.ValidFromDate
+          validUntilDate: $simpleTypes.LifecycleDate.ValidUntilDate
+          customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
+          blocked: $simpleTypes.Blocked.ExampleBlocked
+          options:
+              - $LifecycleOptionDTO.ExampleCancel
 
   LifecycleOptionDTO:
     docs:
       # Use this DTO to retrieve the available lifecycle options for a membership.
       This composite type represents an item used to facilitate the renewal of a membership. It includes details such as the item number, renewal period, and pricing.
     properties:
+      optionId: simpleTypes.LifecycleOptionId
       itemNumber: simpleTypes.ItemNumber
       lifecycleAction: simpleTypes.LifecycleAction
       description: string
@@ -685,8 +784,9 @@ types:
       memberCardinality: integer
       presentationOrder: integer
     examples:
-      - name: ExampleRenewWithItem
+      - name: ExampleRenew
         value:
+          optionId: $simpleTypes.LifecycleOptionId.ExampleLifecycleOptionIdRenew
           itemNumber: $simpleTypes.ItemNumber.ExampleRenewWithItem
           lifecycleAction: $simpleTypes.LifecycleAction.ExampleRenew
           description: "Renew GOLD Membership for 1 year"
@@ -697,8 +797,9 @@ types:
           amountInclVat: $simpleTypes.AmountInclVat.ExampleAmountInclVat
           memberCardinality: 2
           presentationOrder: 0
-      - name: ExampleUpgradeWithItem
+      - name: ExampleUpgrade
         value:
+          optionId: $simpleTypes.LifecycleOptionId.ExampleLifecycleOptionIdUpgrade
           itemNumber: $simpleTypes.ItemNumber.ExampleUpgradeWithItem
           lifecycleAction: $simpleTypes.LifecycleAction.ExampleUpgrade
           description: "Upgrade to PLATINUM Membership for the remaining period"
@@ -709,8 +810,9 @@ types:
           amountInclVat: $simpleTypes.AmountInclVat.ExampleAmountInclVat
           memberCardinality: 2
           presentationOrder: 0
-      - name: ExampleExtendWithItem
+      - name: ExampleExtend
         value:
+          optionId: $simpleTypes.LifecycleOptionId.ExampleLifecycleOptionIdExtend
           itemNumber: $simpleTypes.ItemNumber.ExampleExtendWithItem
           lifecycleAction: $simpleTypes.LifecycleAction.ExampleExtend
           description: "Extend GOLD Membership with 1 year from today"
@@ -721,7 +823,19 @@ types:
           amountInclVat: $simpleTypes.AmountInclVat.ExampleAmountInclVat
           memberCardinality: 2
           presentationOrder: 0
-
+      - name: ExampleCancel
+        value:
+          optionId: $simpleTypes.LifecycleOptionId.ExampleLifecycleOptionIdCancel
+          itemNumber: $simpleTypes.ItemNumber.ExampleCancelWithItem
+          lifecycleAction: $simpleTypes.LifecycleAction.ExampleCancel
+          description: "Cancel GOLD Membership"
+          targetMembershipCode: $simpleTypes.MembershipCode.GOLD
+          periodStart: $simpleTypes.LifecycleDate.ValidFromDate
+          periodEnd: $simpleTypes.LifecycleDate.CancelDate
+          amount: $simpleTypes.Amount.ExampleAmount
+          amountInclVat: $simpleTypes.AmountInclVat.ExampleAmountInclVat
+          memberCardinality: 2
+          presentationOrder: 0
 
   MembershipItemCatalogDTO:
     docs: 

@@ -142,107 +142,66 @@ service:
           response: 
             body: $GetMembersResponse.ExampleGetMembers
 
-    getMembershipRenewalInfo:
-      docs: 
-        This endpoint retrieves information about renewing a membership (pricing and term).
-      display-name: Get Membership Renewal Info
-      method: GET
-      path: /{membershipId}/renewal
-      path-parameters:
-        membershipId: simpleTypes.MembershipId
-      request:
-        name: getMembershipRenewalInfo
-      response: GetMembershipRenewalInfoResponse
-      examples:
-        - name: GetMembershipRenewalInfo
-          path-parameters:
-            tenant: $globalApiTypes.tenant.Exampletenant
-            environment: $globalApiTypes.environment.ExampleenvironmentProduction
-            company: $globalApiTypes.Company.ExampleCompanyCronus
-            membershipId: $simpleTypes.MembershipId.ExampleMembershipId
-          response: 
-            body: $GetMembershipRenewalInfoResponse.ExampleGetMembershipRenewalInfo
 
 ###################################################
 types:
   # Create Membership Service
   CreateMembershipRequest:
     properties:
-      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
       itemNumber: simpleTypes.ItemNumber
       activationDate: optional<simpleTypes.ActivationDate>
       companyName: optional<simpleTypes.CompanyName>
       preassignedCustomerNumber: optional<simpleTypes.PreassignedCustomerNumber>
+      documentNo: optional<simpleTypes.DocumentNo>
     examples:
       - name: ExampleCreateMembership
         value:
-          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
           itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
-          #activationDate: $simpleTypes.ActivationDate.ExampleActivationDate
+          activationDate: $simpleTypes.ActivationDate.ExampleActivationDate
           #companyName: $simpleTypes.CompanyName.ExampleCompanyName
           #preassignedCustomerNumber: $simpleTypes.PreassignedCustomerNumber.ExamplePreassignedCustomerNumber
 
   CreateMembershipResponse:
     properties:
-      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
       membership: compositeTypes.MembershipEntity
     examples:
       - name: ExampleCreateMembership
         value:
-          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
           membership: $compositeTypes.MembershipEntity.ExampleMembership
-
 
   # Get Membership Service
   GetMembershipResponse:
     properties:
-      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
       membership: compositeTypes.MembershipEntity
     examples:
       - name: ExampleGetMembership
         value:
-          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
           membership: $compositeTypes.MembershipEntity.ExampleMembership
 
   # Block Membership Service
   BlockMembershipResponse:
     properties:
-      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
       membership: compositeTypes.MembershipEntity
     examples:
       - name: ExampleBlockMembership
         value:
-          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
           membership: $compositeTypes.MembershipEntity.ExampleMembershipBlocked
 
   # Unblock Membership Service
   UnblockMembershipResponse:
     properties:
-      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
       membership: compositeTypes.MembershipEntity
     examples:
       - name: ExampleUnblockMembership
         value:
-          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
           membership: $compositeTypes.MembershipEntity.ExampleMembership
   
   # Get Members Service
   GetMembersResponse:
     properties:
-      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
       membership: compositeTypes.MembershipDTO
     examples:
       - name: ExampleGetMembers
         value:
-          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
           membership: $compositeTypes.MembershipDTO.ExampleMembershipDTO
   
-  # Get Membership Renewal Info Service
-  GetMembershipRenewalInfoResponse:
-    properties:
-      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
-      membership: compositeTypes.MembershipRenewalInfoDTO
-    examples:
-      - name: ExampleGetMembershipRenewalInfo
-        value:
-          membership: $compositeTypes.MembershipRenewalInfoDTO.ExampleMembershipRenewalInfo

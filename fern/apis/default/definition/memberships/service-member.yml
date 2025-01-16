@@ -19,7 +19,7 @@ service:
         either at the time of membership creation or later. 
       display-name: Add Member
       method: POST
-      path: /member/{membershipId}/add
+      path: /{membershipId}/addMember
       path-parameters:
         membershipId: simpleTypes.MembershipId
       request:
@@ -110,7 +110,7 @@ service:
         Update the details of an existing member. 
         This endpoint is used when a member's information needs to be changed, such as updating their contact details, name, or personal information.
       display-name: Update Member
-      method: PUT
+      method: PATCH
       path: /member/{memberId}
       path-parameters:
         memberId: simpleTypes.MemberId
@@ -190,10 +190,9 @@ service:
           birthDate: optional<simpleTypes.Birthday>
           email: optional<simpleTypes.Email>
           phone: optional<simpleTypes.PhoneNo>
-          cardNumber: optional<simpleTypes.CardNumber>
           limit: optional<simpleTypes.Limit>
           offset: optional<simpleTypes.Offset>
-      response: GetMemberListResponse
+      response: GetMemberListResponse 
       examples:
         - name: ExampleFindMembers
           path-parameters:
@@ -207,7 +206,6 @@ service:
             birthDate: $simpleTypes.Birthday.ExampleBirthday
             email: $simpleTypes.Email.ExampleEmail
             phone: $simpleTypes.PhoneNo.ExamplePhoneNo
-            cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
             #limit: $simpleTypes.Limit.ExampleLimit
             #offset: $simpleTypes.Offset.ExampleOffset
           response: 
@@ -219,48 +217,40 @@ types:
   AddMemberRequest: 
     docs: Request to add a member to a membership
     properties:
-      membershipId: simpleTypes.MembershipId
       member: compositeTypes.MemberWithCardDTORequest
     examples:
       - name: ExampleAddMember
         value:
-          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
           member: $compositeTypes.MemberWithCardDTORequest.ExampleMember
 
   AddMemberResponse:
     docs: Response to adding a member to a membership
     properties:
-      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
       member: compositeTypes.MemberDTO
     examples:
       - name: ExampleAddMember
         value:
-          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
           member: $compositeTypes.MemberDTO.ExampleMembershipDTO
 
   # Get Member Service
   GetMemberResponse:
     docs: Response to retrieving a member
     properties:
-      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
       member: compositeTypes.MemberDTO
     examples:
       - name: ExampleGetMember
         value:
-          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
           member: $compositeTypes.MemberDTO.ExampleMembershipDTO
 
   GetMemberListResponse:
     docs: Response to retrieving a member
     properties:
-      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
-      members: list<compositeTypes.MemberDTO>
+      members: list<compositeTypes.MemberEntityResponse>
     examples:
       - name: ExampleGetMember
         value:
-          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
           members: 
-            - $compositeTypes.MemberDTO.ExampleMembershipDTO
+            - $compositeTypes.MemberEntityResponse.ExampleMember
 
   # Get Member Image Service
   GetMemberImageResponse:
@@ -294,23 +284,19 @@ types:
   # Block Membership Service
   BlockMemberResponse:
     properties:
-      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
       member: compositeTypes.MemberEntityResponse
     examples:
       - name: ExampleBlockMember
         value:
-          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
           member: $compositeTypes.MemberEntityResponse.ExampleMemberBlocked
 
   # Unblock Membership Service
   UnblockMemberResponse:
     properties:
-      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
       member: compositeTypes.MemberEntityResponse
     examples:
       - name: ExampleUnblockMember
         value:
-          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
           member: $compositeTypes.MemberEntityResponse.ExampleMember
 
   # Update Member Service
@@ -326,10 +312,8 @@ types:
   UpdateMemberResponse:
     docs: Response to updating a member
     properties:
-      cacheInstanceId: optional<simpleTypes.CacheInstanceId>
       member: compositeTypes.MemberEntityResponse
     examples:
       - name: ExampleUpdateMember
         value:
-          #cacheInstanceId: $simpleTypes.CacheInstanceId.ExampleCacheInstanceId
           member: $compositeTypes.MemberEntityResponse.ExampleMember

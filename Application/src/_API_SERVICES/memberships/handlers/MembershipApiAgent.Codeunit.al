@@ -16,21 +16,96 @@ codeunit 6185123 "NPR MembershipApiAgent"
         exit(GetMembershipByNumber(MembershipNo));
     end;
 
-    // ************
-    internal procedure GetMembershipByNumber(MembershipNumber: Code[20]) Response: Codeunit "NPR API Response"
+    internal procedure GetMembershipById(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         Membership: Record "NPR MM Membership";
         ResponseJson: Codeunit "NPR JSON Builder";
     begin
-        Membership.SetCurrentKey("External Membership No.");
-        Membership.SetFilter("External Membership No.", '=%1', MembershipNumber);
-        if (not Membership.FindFirst()) then
-            exit(Response.RespondResourceNotFound('Membership not found.'));
+        if (not GetMembershipById(Request, 2, Membership)) then
+            exit(Response.RespondBadRequest('Invalid Membership - Membership Id not valid.'));
 
         ResponseJson.StartObject()
-            .AddObject(MembershipDTO(ResponseJson, Membership))
-        .EndObject();
+            .AddObject(StartMembershipDTO(ResponseJson, Membership, false))
+            .EndObject();
 
+        exit(Response.RespondOK(ResponseJson.Build()));
+
+    end;
+
+    internal procedure CreateMembership(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+        Membership: Record "NPR MM Membership";
+        ResponseJson: Codeunit "NPR JSON Builder";
+    begin
+        MemberInfoCapture.Init();
+        MemberInfoCapture."Entry No." := 0;
+        DeserializeCreateMembershipRequest(Request, MemberInfoCapture);
+        // TransferAttributes(CreateMembershipRequest, MemberInfoCapture);
+        MemberInfoCapture.Insert();
+
+        if (CreateMembershipWorker(MemberInfoCapture)) then begin
+            Membership.Get(MemberInfoCapture."Membership Entry No.");
+            ResponseJson.StartObject()
+                .AddObject(StartMembershipDTO(ResponseJson, Membership, false))
+                .EndObject();
+            exit(Response.RespondCreated(ResponseJson.Build()));
+        end;
+
+        exit(Response.RespondBadRequest('Membership creation failed.'));
+    end;
+
+    internal procedure BlockMembership(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        Membership: Record "NPR MM Membership";
+        ResponseJson: Codeunit "NPR JSON Builder";
+        MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+        if (not GetMembershipById(Request, 2, Membership)) then
+            exit(Response.RespondBadRequest('Invalid Membership - Membership Id not valid.'));
+
+        MembershipMgt.BlockMembership(Membership."Entry No.", true);
+
+        Membership.Get(Membership."Entry No.");
+        ResponseJson.StartObject()
+            .AddObject(StartMembershipDTO(ResponseJson, Membership, false))
+            .EndObject();
+
+        exit(Response.RespondOK(ResponseJson.Build()));
+
+    end;
+
+    internal procedure UnblockMembership(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        Membership: Record "NPR MM Membership";
+        ResponseJson: Codeunit "NPR JSON Builder";
+        MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+        if (not GetMembershipById(Request, 2, Membership)) then
+            exit(Response.RespondBadRequest('Invalid Membership - Membership Id not valid.'));
+
+        MembershipMgt.BlockMembership(Membership."Entry No.", false);
+
+        Membership.Get(Membership."Entry No.");
+        ResponseJson.StartObject()
+            .AddObject(StartMembershipDTO(ResponseJson, Membership, false))
+            .EndObject();
+
+        exit(Response.RespondOK(ResponseJson.Build()));
+
+    end;
+
+    internal procedure GetMembershipMembers(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        Membership: Record "NPR MM Membership";
+        ResponseJson: Codeunit "NPR JSON Builder";
+    begin
+        if (not GetMembershipById(Request, 2, Membership)) then
+            exit(Response.RespondBadRequest('Invalid Membership - Membership Id not valid.'));
+
+        ResponseJson.StartObject()
+            .AddObject(StartMembershipDTO(ResponseJson, Membership, true))
+            .EndObject();
         exit(Response.RespondOK(ResponseJson.Build()));
     end;
 
@@ -98,15 +173,42 @@ codeunit 6185123 "NPR MembershipApiAgent"
         exit(Response.RespondOK(ResponseJson));
     end;
 
-    local procedure MembershipDTO(ResponseJson: Codeunit "NPR JSON Builder"; Membership: Record "NPR MM Membership"): Codeunit "NPR JSON Builder"
+    // ************
+    local procedure GetMembershipByNumber(MembershipNumber: Code[20]) Response: Codeunit "NPR API Response"
+    var
+        Membership: Record "NPR MM Membership";
+        ResponseJson: Codeunit "NPR JSON Builder";
+    begin
+        Membership.SetCurrentKey("External Membership No.");
+        Membership.SetFilter("External Membership No.", '=%1', MembershipNumber);
+        if (not Membership.FindFirst()) then
+            exit(Response.RespondResourceNotFound('Membership not found.'));
+
+        ResponseJson.StartObject()
+            .AddObject(StartMembershipDTO(ResponseJson, Membership, false))
+        .EndObject();
+
+        exit(Response.RespondOK(ResponseJson.Build()));
+    end;
+
+    local procedure StartMembershipDTO(ResponseJson: Codeunit "NPR JSON Builder"; Membership: Record "NPR MM Membership"; IncludeMembers: Boolean): Codeunit "NPR JSON Builder"
+    begin
+        ResponseJson.StartObject('membership')
+            .AddObject(MembershipDTO(ResponseJson, Membership))
+            .AddArray(MembershipToMembersDTO(ResponseJson, Membership, IncludeMembers))
+        .EndObject();
+
+        exit(ResponseJson);
+    end;
+
+    internal procedure MembershipDTO(ResponseJson: Codeunit "NPR JSON Builder"; Membership: Record "NPR MM Membership"): Codeunit "NPR JSON Builder"
     var
         MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
         ValidFrom, ValidUntil : Date;
     begin
-
         MembershipMgt.GetConsecutiveTimeFrame(Membership."Entry No.", Today(), ValidFrom, ValidUntil);
 
-        ResponseJson.StartObject('membership')
+        ResponseJson
             .AddProperty('membershipId', Format(Membership.SystemId, 0, 4).ToLower())
             .AddProperty('membershipNumber', Membership."External Membership No.")
             .AddProperty('communityCode', Membership."Community Code")
@@ -115,10 +217,177 @@ codeunit 6185123 "NPR MembershipApiAgent"
             .AddProperty('blocked', Membership.Blocked)
             .AddProperty('validFromDate', ValidFrom)
             .AddProperty('validUntilDate', ValidUntil)
-            .AddProperty('customerNumber', Membership."Customer No.")
-        .EndObject();
+            .AddProperty('customerNumber', Membership."Customer No.");
 
         exit(ResponseJson);
     end;
+
+    local procedure MembershipToMembersDTO(ResponseJson: Codeunit "NPR JSON Builder"; Membership: Record "NPR MM Membership"; IncludeMembers: Boolean): Codeunit "NPR JSON Builder"
+    var
+        MembershipRole: Record "NPR MM Membership Role";
+        Member: Record "NPR MM Member";
+        Encode: Codeunit "NPR MembershipApiTranslation";
+    begin
+        if (not IncludeMembers) then
+            exit(ResponseJson);
+
+        ResponseJson.StartArray('members');
+
+        MembershipRole.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
+        if (MembershipRole.FindSet()) then begin
+            repeat
+                Member.Get(MembershipRole."Member Entry No.");
+                ResponseJson.StartObject()
+                    .AddProperty('role', Encode.MemberRoleToText(MembershipRole."Member Role"))
+                    .AddProperty('contactNumber', MembershipRole."Contact No.")
+                    .AddObject(StartMemberDTO(ResponseJson, Membership."Entry No.", Member, true))
+                    .EndObject();
+            until (MembershipRole.Next() = 0);
+
+            ResponseJson.EndArray();
+            exit(ResponseJson);
+        end;
+    end;
+
+    local procedure StartMemberDTO(ResponseJson: Codeunit "NPR JSON Builder"; MembershipEntryNo: Integer; Member: Record "NPR MM Member"; IncludeCards: Boolean): Codeunit "NPR JSON Builder"
+    var
+        MemberAgent: Codeunit "NPR MemberApiAgent";
+    begin
+        ResponseJson.StartObject('member')
+            .AddObject(MemberAgent.MemberDTO(ResponseJson, Member))
+            .AddArray(MemberCardsDTO(ResponseJson, MembershipEntryNo, Member."Entry No.", IncludeCards))
+            .EndObject();
+    end;
+
+    local procedure MemberCardsDTO(ResponseJson: Codeunit "NPR JSON Builder"; MembershipEntryNo: Integer; MemberEntryNo: Integer; IncludeCards: Boolean): Codeunit "NPR JSON Builder"
+    var
+        MemberCard: Record "NPR MM Member Card";
+    begin
+        if (not IncludeCards) then
+            exit(ResponseJson);
+
+        ResponseJson.StartArray('cards');
+        MemberCard.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
+        MemberCard.SetFilter("Member Entry No.", '=%1', MemberEntryNo);
+        if (MemberCard.FindSet()) then begin
+            repeat
+                ResponseJson.StartObject()
+                    .AddProperty('cardId', Format(MemberCard.SystemId, 0, 4).ToLower())
+                    .AddProperty('cardNumber', MemberCard."External Card No.")
+                    .AddProperty('expiryDate', MemberCard."Valid Until")
+                    .AddProperty('temporary', MemberCard.IsTemporary)
+                    .AddProperty('blocked', MemberCard.Blocked)
+                    .EndObject();
+            until (MemberCard.Next() = 0);
+        end;
+
+        ResponseJson.EndArray();
+        exit(ResponseJson);
+    end;
+
+    internal procedure GetMembershipById(var Request: Codeunit "NPR API Request"; PathPosition: Integer; var Membership: Record "NPR MM Membership"): Boolean
+    var
+        MembershipIdText: Text[50];
+        MembershipId: Guid;
+    begin
+        MembershipIdText := CopyStr(Request.Paths().Get(PathPosition), 1, MaxStrLen(MembershipIdText));
+        if (MembershipIdText = '') then
+            exit(false);
+
+        if (not Evaluate(MembershipId, MembershipIdText)) then
+            exit(false);
+
+        if (not Membership.GetBySystemId(MembershipId)) then
+            exit(false);
+
+        exit(true);
+    end;
+
+    local procedure CreateMembershipWorker(var MemberInfoCapture: Record "NPR MM Member Info Capture"): Boolean
+    var
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        Item: Record Item;
+        VATPostingSetup: Record "VAT Posting Setup";
+        Membership: Record "NPR MM Membership";
+
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+
+        MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MemberInfoCapture."Item No.");
+        MembershipSalesSetup.TestField(Blocked, false);
+
+        if (MemberInfoCapture.Amount = 0) then begin
+            Item.Get(MemberInfoCapture."Item No.");
+            MemberInfoCapture."Unit Price" := Item."Unit Price";
+
+            VATPostingSetup.SetFilter("VAT Bus. Posting Group", '=%1', Item."VAT Bus. Posting Gr. (Price)");
+            VATPostingSetup.SetFilter("VAT Prod. Posting Group", '=%1', Item."VAT Prod. Posting Group");
+            if (not VATPostingSetup.FindFirst()) then
+                VATPostingSetup.Init();
+
+            if (Item."Price Includes VAT") then begin
+                MemberInfoCapture."Amount Incl VAT" := Item."Unit Price";
+                MemberInfoCapture.Amount := Round(MemberInfoCapture."Amount Incl VAT" / ((100 + VATPostingSetup."VAT %") / 100.0), 0.01);
+            end else begin
+                MemberInfoCapture.Amount := Item."Unit Price";
+                MemberInfoCapture."Amount Incl VAT" := Round(MemberInfoCapture.Amount * ((100 + VATPostingSetup."VAT %") / 100.0), 0.01);
+            end;
+        end;
+
+        MemberInfoCapture."Membership Entry No." := MembershipManagement.CreateMembership(MembershipSalesSetup, MemberInfoCapture, true);
+
+        Membership.Get(MemberInfoCapture."Membership Entry No.");
+        Membership."Document ID" := MemberInfoCapture."Import Entry Document ID";
+        Membership.Modify();
+
+        MemberInfoCapture."External Membership No." := Membership."External Membership No.";
+        MemberInfoCapture.Modify();
+
+        /*
+        MembershipSetup.Get(Membership."Membership Code");
+        case MembershipSetup."Web Service Print Action" of
+            MembershipSetup."Web Service Print Action"::DIRECT:
+                MemberRetailIntegration.PrintMembershipSalesReceiptWorker(Membership, MembershipSetup);
+            MembershipSetup."Web Service Print Action"::OFFLINE:
+                MembershipManagement.PrintOffline(MemberInfoCapture."Information Context"::PRINT_MEMBERSHIP, MemberInfoCapture."Membership Entry No.");
+        end;
+        */
+
+        exit(true);
+    end;
+
+# pragma warning disable AA0139
+    local procedure CreateDocumentId(): Text[50]
+    begin
+        exit(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')));
+    end;
+
+    local procedure DeserializeCreateMembershipRequest(var Request: Codeunit "NPR API Request"; var MemberInfoCapture: Record "NPR MM Member Info Capture")
+    var
+        Body: JsonObject;
+        JToken: JsonToken;
+    begin
+        Body := Request.BodyJson().AsObject();
+
+        if (Body.Get('itemNumber', JToken)) then
+            MemberInfoCapture."Item No." := JToken.AsValue().AsText();
+
+        if (Body.Get('activationDate', JToken)) then
+            MemberInfoCapture."Document Date" := JToken.AsValue().AsDate();
+
+        if (Body.Get('companyName', JToken)) then
+            MemberInfoCapture."Company Name" := JToken.AsValue().AsText();
+
+        if (Body.Get('preassignedCustomerNumber', JToken)) then
+            MemberInfoCapture."Customer No." := JToken.AsValue().AsText();
+
+        if (Body.Get('documentNo', JToken)) then
+            MemberInfoCapture."Document No." := JToken.AsValue().AsText();
+
+        MemberInfoCapture."Import Entry Document ID" := CreateDocumentId();
+        MemberInfoCapture.TestField("Item No.");
+
+    end;
+# pragma warning restore AA0139
 }
 #endif

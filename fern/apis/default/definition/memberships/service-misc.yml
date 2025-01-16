@@ -17,21 +17,40 @@ service:
       docs: Resolves number as a specific membership, member, or card
       display-name: Resolve Member Identifier
       method: GET
-      path: /misc/{identifier}/resolve
-      path-parameters:
-        identifier: string
+      path: /resolveIdentifier
       request:
         name: resolveMemberIdentifier
+        query-parameters:
+          identifier: string
       response: ResolveMemberIdentifierResponse
       examples:
-        - name: ExampleResolveIdentifier
+        - name: Card Number
           path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
-            identifier: "MS-DEMO-00152"  # Member Card Number
+          query-parameters:
+            identifier: $simpleTypes.CardNumber.ExampleCardNumber
           response:
-            body: $ResolveMemberIdentifierResponse.ExampleResolveMemberIdentifier
+            body: $ResolveMemberIdentifierResponse.ExampleCardNumber
+        - name: Member Number
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            identifier: $simpleTypes.MemberNumber.ExampleMemberNumber
+          response:
+            body: $ResolveMemberIdentifierResponse.ExampleMemberNumber
+        - name: Membership Number
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            identifier: $simpleTypes.MembershipNumber.ExampleMembershipNumber
+          response:
+            body: $ResolveMemberIdentifierResponse.ExampleMembershipNumber
 
     # generateNotificationToken:
     #   docs: Generate a notification token for a member
@@ -101,22 +120,34 @@ service:
 
 
 types:
+
+  IdentifierTypeEnum:
+    enum:
+      - membership
+      - member
+      - card
+  IdentifierType:
+    type: IdentifierTypeEnum
+    docs: The type of the identifier that was resolved
+
   ResolveMemberIdentifierResponse:
     properties:
       type: simpleTypes.IdentifierType
-      membershipId: simpleTypes.MembershipId
-      memberId: simpleTypes.MemberId
-      cardId: simpleTypes.CardId
-      membershipNumber: simpleTypes.MembershipNumber
-      memberNumber: simpleTypes.MemberNumber
-      cardNumber: simpleTypes.CardNumber
+      membershipId: optional<simpleTypes.MembershipId>
+      memberId: optional<simpleTypes.MemberId>
+      cardId: optional<simpleTypes.CardId>
     examples:
-      - name: ExampleResolveMemberIdentifier
+      - name: ExampleCardNumber
         value:
-          type: $simpleTypes.IdentifierType.ExampleIdentifierType
+          type: card
+          cardId: $simpleTypes.CardId.ExampleCardId
           membershipId: $simpleTypes.MembershipId.ExampleMembershipId
           memberId: $simpleTypes.MemberId.ExampleMemberId
-          cardId: $simpleTypes.CardId.ExampleCardId
-          membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
-          memberNumber: $simpleTypes.MemberNumber.ExampleMemberNumber
-          cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
+      - name: ExampleMemberNumber
+        value:
+          type: member
+          memberId: $simpleTypes.MemberId.ExampleMemberId
+      - name: ExampleMembershipNumber
+        value:
+          type: membership
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId

@@ -147,7 +147,7 @@ navigation:
                   - endpoint: memberships.service-card.getCardNumber
                   - endpoint: memberships.service-card.addCard
                   - endpoint: memberships.service-card.replaceCard
-                  - endpoint: memberships.service-card.registerArrival
+                  #- endpoint: memberships.service-card.registerArrival
                   - endpoint: memberships.service-card.sendToWallet
 
             - memberships.service-paymentmethod:
@@ -166,6 +166,7 @@ navigation:
                 contents:
                   - endpoint: memberships.service-lifecycle.getMembershipHistory
                   - endpoint: memberships.service-lifecycle.activateMembership
+                  - endpoint: memberships.service-lifecycle.getCancelOptions
                   - endpoint: memberships.service-lifecycle.cancelMembership
                   - endpoint: memberships.service-lifecycle.getRenewalOptions
                   - endpoint: memberships.service-lifecycle.renewMembership
@@ -173,6 +174,8 @@ navigation:
                   - endpoint: memberships.service-lifecycle.upgradeMembership
                   - endpoint: memberships.service-lifecycle.getExtendOptions
                   - endpoint: memberships.service-lifecycle.extendMembership
+
+                  - endpoint: memberships.service-lifecycle.getMembershipRecurringPaymentInfo
 
             - memberships.service-misc:
                 title: Miscellaneous

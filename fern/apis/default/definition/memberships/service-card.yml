@@ -19,7 +19,7 @@ service:
         are allowed for the same member (e.g., secondary or replacement cards).
       display-name: Add Card
       method: POST
-      path: /{membershipId}/member/{memberId}/card
+      path: /{membershipId}/member/{memberId}/addCard
       path-parameters:
         membershipId: simpleTypes.MembershipId
         memberId: simpleTypes.MemberId
@@ -46,10 +46,8 @@ service:
         This is typically used when a card is lost, damaged, or needs to be reissued.
       display-name: Replace Card
       method: POST
-      path: /{membershipId}/member/{memberId}/card/{cardId}/replace
+      path: /card/{cardId}/replaceCard
       path-parameters:
-        membershipId: simpleTypes.MembershipId
-        memberId: simpleTypes.MemberId
         cardId: simpleTypes.CardId
       request:
         name: replaceCard
@@ -61,8 +59,6 @@ service:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
-            membershipId: $simpleTypes.MembershipId.ExampleMembershipId
-            memberId: $simpleTypes.MemberId.ExampleMemberId
             cardId: $simpleTypes.CardId.ExampleCardIdBlocked
           request: $ReplaceCardRequest.ExampleReplaceCard
           response: 
@@ -75,7 +71,7 @@ service:
         such as the member it belongs to, its status, and its validity.
       display-name: Get using Id
       method: GET
-      path: /card/id/{cardId}
+      path: /card/{cardId}
       path-parameters:
         cardId: simpleTypes.CardId
       request:
@@ -98,11 +94,11 @@ service:
         providing key details such as the card's status and associated member.
       display-name: Get using Number
       method: GET
-      path: /card/number/{cardNumber}
-      path-parameters:
-        cardNumber: simpleTypes.CardNumber
+      path: /card
       request:
         name: getCardNumber
+        query-parameters:
+          cardNumber: simpleTypes.CardNumber
       response: GetCardResponse
       examples:
         - name: ExampleGetCard
@@ -110,59 +106,57 @@ service:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
             cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
           response: 
             body: $GetCardResponse.ExampleGetCard
 
-    registerArrival:
-      docs: 
-        This endpoint registers the member's arrival at a facility using their card. 
-        The card number is used to log the arrival and generate a ticket for the member.
-        Use Ticketing API to retrieve ticket details using the ticket number.
-      display-name: Register Arrival
-      method: POST
-      path: /card/{cardNumber}/register-arrival
-      path-parameters:
-        cardNumber: simpleTypes.CardNumber
-      request:
-        name: registerMemberArrival
-        body: RegisterArrivalRequest
-      response: RegisterArrivalResponse
-      examples:
-        - name: ExampleRegisterArrival
-          path-parameters:
-            tenant: $globalApiTypes.tenant.Exampletenant
-            environment: $globalApiTypes.environment.ExampleenvironmentProduction
-            company: $globalApiTypes.Company.ExampleCompanyCronus
-            cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
-          request: $RegisterArrivalRequest.ExampleRegisterArrival
-          response: 
-            body: $RegisterArrivalResponse.ExampleRegisterArrival
+
+    # registerArrival:
+    #   docs: 
+    #     This endpoint registers the member's arrival at a facility using their card. 
+    #     The card number is used to log the arrival and generate a ticket for the member.
+    #     Use Ticketing API to retrieve ticket details using the ticket number.
+    #   display-name: Register Arrival
+    #   method: POST
+    #   path: /card/{cardNumber}/register-arrival
+    #   path-parameters:
+    #     cardNumber: simpleTypes.CardNumber
+    #   request:
+    #     name: registerMemberArrival
+    #     body: RegisterArrivalRequest
+    #   response: RegisterArrivalResponse
+    #   examples:
+    #     - name: ExampleRegisterArrival
+    #       path-parameters:
+    #         tenant: $globalApiTypes.tenant.Exampletenant
+    #         environment: $globalApiTypes.environment.ExampleenvironmentProduction
+    #         company: $globalApiTypes.Company.ExampleCompanyCronus
+    #         cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
+    #       request: $RegisterArrivalRequest.ExampleRegisterArrival
+    #       response: 
+    #         body: $RegisterArrivalResponse.ExampleRegisterArrival
 
     sendToWallet:
       display-name: Send to Wallet
       docs: 
         Sends the card to the apple wallet via email or phone number specified in the request. 
       method: POST
-      path: /card/{cardNumber}/sendToWallet
+      path: /card/{cardId}/sendToWallet
       path-parameters:
-        cardNumber: simpleTypes.CardNumber
+        cardId: simpleTypes.CardId
       request:
         name: sendToWallet 
-        body: SendWalletRequest
       response: WalletSentResponse
       examples:
         - path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
-            cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
-          request:
-            notificationAddress: $simpleTypes.NotificationAddress.ExamplePhone
+            cardId: $simpleTypes.CardId.ExampleCardId
           response:
-            body:
-              cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
-              cardSent: true
+            body: $WalletSentResponse.ExampleSendToWallet
+
 
     # printMemberCard:
     #   docs: Print a member's card
@@ -211,13 +205,11 @@ types:
   ReplaceCardResponse:
     docs: Response to adding an additional member card
     properties:
-      card: list<compositeTypes.MemberCardEntity>
+      card: compositeTypes.MemberCardEntity
     examples:
       - name: ExampleReplaceCard
         value:
-          card: 
-            - $compositeTypes.MemberCardEntity.ExampleMemberCardBlocked
-            - $compositeTypes.MemberCardEntity.ExampleMemberCard
+          card: $compositeTypes.MemberCardEntity.ExampleMemberCard
   
   # Get Card Services
   GetCardResponse:
@@ -273,13 +265,24 @@ types:
       - name: ExampleSendToWallet
         value:
           notificationAddress: $simpleTypes.NotificationAddress.ExamplePhone
+  
   WalletSentResponse:
     docs: Response to sending a card to the wallet
     properties:
-      cardNumber: simpleTypes.CardNumber
-      cardSent: boolean
+      cardId: simpleTypes.CardId
+      notificationSent: boolean
+      email: optional<simpleTypes.NotificationAddress>
+      phoneNo: optional<simpleTypes.NotificationAddress>
+      landingUrl: optional<string>
+      androidUrl: optional<string>
+      iosUrl: optional<string>
     examples:
       - name: ExampleSendToWallet
         value:
-          cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
-          cardSent: true
+          cardId: $simpleTypes.CardId.ExampleCardId
+          notificationSent: false
+          email: $simpleTypes.NotificationAddress.ExampleEmail
+          phoneNo: $simpleTypes.NotificationAddress.ExamplePhone
+          landingUrl: "https://example.com"
+          androidUrl: "https://example.com/android"
+          iosUrl: "https://example.com/ios"

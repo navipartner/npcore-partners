@@ -9,8 +9,6 @@ service:
   display-name: Catalog
   auth: false
   base-path: /membership
-  headers:
-    x-api-version: optional<globalApiTypes.ApiVersionDate>
 
   endpoints:
     getCatalog:
@@ -19,9 +17,11 @@ service:
       method: GET
       path: /catalog/{storeCode}
       path-parameters:
-        storeCode: simpleTypes.StoreCode
+        storeCode: optional<simpleTypes.StoreCode>
       request: 
         name: getCatalog
+        query-parameters:
+          itemNumber: optional<simpleTypes.ItemNumber>
       response:
         type: StoreCatalogResponse
       examples:
@@ -32,6 +32,8 @@ service:
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             storeCode: $simpleTypes.StoreCode.ExampleStoreCode
+          query-parameters:
+            itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
           response:
             body:
               storeCode: $simpleTypes.StoreCode.ExampleStoreCode
