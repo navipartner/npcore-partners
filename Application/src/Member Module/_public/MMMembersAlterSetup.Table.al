@@ -246,6 +246,14 @@
         ValidateRec();
     end;
 
+    trigger OnDelete()
+    var
+        MMMembersAlterLine: Record "NPR MM Members. Alter. Line";
+    begin
+        MMMembersAlterLine.SetRange("Alteration Id", Rec.SystemId);
+        MMMembersAlterLine.DeleteAll(true);
+    end;
+
     trigger OnRename()
     begin
         ValidateRec();

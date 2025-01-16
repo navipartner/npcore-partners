@@ -16,6 +16,10 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         ParamDialogPrompt_DescLbl: Label 'Specifies the type of Dialog Prompt';
         ParamDialogPrompt_OptLbl: Label 'Member Card Number,Facial Recognition,No Dialog', Locked = true;
         ParamDialogPrompt_OptCptLbl: Label 'Member Card Number,Facial Recognition,No Dialog';
+        ParamAutoAdmit_CptLbl: Label 'Auto-Admit on Alteration';
+        ParamAutoAdmit_DescLbl: Label 'Specifies if the member should be admitted after the alteration. Decided by Backend (default) will use the setting from the Alteration Setup.';
+        ParamAutoAdmit_OptLbl: Label 'Decided by Backend,No,Yes,Prompt', Locked = true;
+        ParamAutoAdmit_OptCptLbl: Label 'Decided by Backend,No,Yes,Prompt';
         MemberCardPromptLbl: Label 'Enter Member Card Number';
         MemberNumberPromptLbl: Label 'Enter Member Number';
         MembershipNumberPromptLbl: Label 'Enter Membership Number';
@@ -52,6 +56,14 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         WorkflowConfig.AddLabel('MemberNumberPrompt', MemberNumberPromptLbl);
         WorkflowConfig.AddLabel('MembershipNumberPrompt', MembershipNumberPromptLbl);
         WorkflowConfig.AddLabel('DialogTitle', DialogTitleLbl);
+        WorkflowConfig.AddOptionParameter('AutoAdmitMember',
+                                        ParamAutoAdmit_OptLbl,
+#pragma warning disable AA0139
+                                        SelectStr(1, ParamAutoAdmit_OptLbl),
+#pragma warning restore 
+                                        ParamAutoAdmit_CptLbl,
+                                        ParamAutoAdmit_DescLbl,
+                                        ParamAutoAdmit_OptCptLbl);
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
@@ -156,10 +168,13 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         POSSession: Codeunit "NPR POS Session";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         ItemNo: Code[20];
+        AutoAdmitMember: Integer;
     begin
         POSSession.GetSaleLine(POSSaleLine);
         ItemNo := CopyStr(Context.GetString('itemNumber'), 1, MaxStrLen(ItemNo));
-        POSActionMemberMgtWF3B.ExecuteMembershipAlteration(POSSaleLine, AlterationType, ExternalMemberCardNo, ItemNo);
+        if not Context.GetIntegerParameter('AutoAdmitMember', AutoAdmitMember) then
+            AutoAdmitMember := 0;
+        POSActionMemberMgtWF3B.ExecuteMembershipAlteration(POSSaleLine, AlterationType, ExternalMemberCardNo, ItemNo, AutoAdmitMember);
     end;
 
     procedure GetMembershipAlterationLookupChoices(Context: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management") LookupProperties: JsonObject
@@ -229,12 +244,12 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
 
         end;
         LookupProperties.Add('cardnumber', ExternalMemberCardNo);
-        LookupProperties.Add('data', CreateAlterMembershipOptions(Membership."Entry No.", MembershipAlterationSetup));
+        LookupProperties.Add('data', CreateAlterMembershipOptions(Membership."Entry No.", GetAlterationGroup(POSSession), MembershipAlterationSetup));
         LookupProperties.Add('layout', GetAlterMembershipLayout());
 
     end;
 
-    local procedure CreateAlterMembershipOptions(MembershipEntryNo: Integer; var MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup") OptionsArray: JsonArray
+    local procedure CreateAlterMembershipOptions(MembershipEntryNo: Integer; AlterationGroup: Code[10]; var MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup") OptionsArray: JsonArray
     var
         TempMembershipEntry: Record "NPR MM Membership Entry" temporary;
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
@@ -243,7 +258,7 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         if (not MembershipAlterationSetup.FindFirst()) then
             exit;
 
-        if (not MembershipManagement.GetMembershipChangeOptions(MembershipEntryNo, MembershipAlterationSetup, TempMembershipEntry)) then
+        if (not MembershipManagement.GetMembershipChangeOptions(MembershipEntryNo, AlterationGroup, MembershipAlterationSetup, TempMembershipEntry)) then
             exit;
 
         TempMembershipEntry.Reset();
@@ -397,6 +412,24 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
 
             Context.RestoreScope(PrevScopeID);
         end;
+    end;
+
+    local procedure GetAlterationGroup(POSSession: Codeunit "NPR POS Session"): Code[10]
+    var
+        SalePOS: Record "NPR POS Sale";
+        POSUnit: Record "NPR POS Unit";
+        POSMemberProfile: Record "NPR MM POS Member Profile";
+        POSSale: Codeunit "NPR POS Sale";
+    begin
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        if not POSUnit.Get(SalePOS."Register No.") then
+            exit('');
+
+        if not POSUnit.GetProfile(POSMemberProfile) then
+            exit('');
+
+        exit(POSMemberProfile."Alteration Group");
     end;
 }
 

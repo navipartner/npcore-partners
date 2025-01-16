@@ -217,7 +217,7 @@ xmlport 6060135 "NPR MM Get Members. Chg. Items"
 
         MembershipAlterationSetup.SetFilter("Not Available Via Web Service", '=%1', false);
 
-        MembershipManagement.GetMembershipChangeOptions(MembershipEntryNo, MembershipAlterationSetup, TmpMembershipEntry);
+        MembershipManagement.GetMembershipChangeOptions(MembershipEntryNo, '', MembershipAlterationSetup, TmpMembershipEntry);
     end;
 
     internal procedure AddErrorResponse(ErrorMessage: Text)

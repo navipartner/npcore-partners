@@ -28,6 +28,11 @@ page 6184630 "NPR MM POS Member Profile"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies if member notifications are going to be send after the end of the pos sale.';
                 }
+                field("Alteration Group"; Rec."Alteration Group")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies a Alteration Group code for limiting the alterations shown on the POS.';
+                }
             }
             group(Print)
             {

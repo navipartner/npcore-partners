@@ -212,6 +212,36 @@
 
     actions
     {
+        area(Processing)
+        {
+            action(AddAlterationToGroups)
+            {
+                Caption = 'Add Alteration to Groups';
+                ToolTip = 'Let you select one or more Groups to add the Alteration to';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Image = Add;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                trigger OnAction()
+                var
+                    MMMembersAlterGroup: Record "NPR MM Members. Alter. Group";
+                begin
+                    MMMembersAlterGroup.AddAlterationToGroups(Rec.SystemId);
+                end;
+            }
+        }
+        area(Navigation)
+        {
+            action(AlterationGroups)
+            {
+                Caption = 'Alteration Groups';
+                ToolTip = 'Shows the list of Alteration Groups';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Image = Group;
+                RunObject = Page "NPR MM Members. Alter. Groups";
+            }
+        }
     }
 }
 
