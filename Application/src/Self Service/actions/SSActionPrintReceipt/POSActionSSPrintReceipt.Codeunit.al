@@ -19,7 +19,6 @@ codeunit 6184580 "NPR POSAction SS PrintReceipt" implements "NPR IPOS Workflow"
         SelectionDialogType: Option TextField,List;
         PresetTableView: Text;
         ManualReceiptNo: Code[20];
-        SalesTicketNo: Code[20];
         ObfuscationMethod: Option None,MI;
         PrintTickets: Boolean;
         PrintMemberships: Boolean;
@@ -42,22 +41,20 @@ codeunit 6184580 "NPR POSAction SS PrintReceipt" implements "NPR IPOS Workflow"
         PrintTaxFreeVoucher := false;
 
         Setup.GetPOSUnit(POSUnit);
-        SalesTicketNo := BusinessLogicRun.GetSalesTicketNo(Setup,
+        BusinessLogicRun.GetSalesTicketNoAndPrintReceipt(Setup,
                                                            POSUnit,
                                                            SettingOption,
                                                            ReceiptListFilterOption,
                                                            PresetTableView,
                                                            SelectionDialogType,
                                                            ManualReceiptNo,
-                                                           ObfuscationMethod);
-        BusinessLogicRun.PrintReceipt(Setup,
-                                      POSUnit,
-                                      SalesTicketNo,
-                                      PrintTickets,
-                                      PrintMemberships,
-                                      PrintRetailVoucher,
-                                      PrintTerminalReceipt,
-                                      PrintTaxFreeVoucher);
+                                                           ObfuscationMethod,
+                                                           true,
+                                                           PrintTickets,
+                                                           PrintMemberships,
+                                                           PrintRetailVoucher,
+                                                           PrintTerminalReceipt,
+                                                           PrintTaxFreeVoucher);
     end;
 
 
