@@ -23,5 +23,12 @@ codeunit 6184805 "NPR Spfy Integration Public"
     begin
         exit(SpfyItemMgt.ParseItem(ShopifyJToken, SkuKeyPath, ItemVariant, Sku));
     end;
+
+    procedure GetShopifyPictureUrl(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"): Text
+    var
+        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
+    begin
+        exit(SpfyItemMgt.GetShopifyPictureUrl(SpfyStoreItemLink));
+    end;
 }
 #endif
