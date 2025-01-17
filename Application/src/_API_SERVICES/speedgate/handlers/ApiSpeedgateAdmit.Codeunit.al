@@ -161,6 +161,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
     var
         MemberTicketManager: Codeunit "NPR MM Member Ticket Manager";
         MemberLimitationMgr: Codeunit "NPR MM Member Lim. Mgr.";
+        MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
         MemberCard: Record "NPR MM Member Card";
         ExternalTicketNo: Text[30];
         ResponseMessage: Text;
@@ -172,6 +173,9 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
 
         if (not MemberCard.GetBySystemId(ValidationRequest.EntityId)) then
             Error(ResponseMessage);
+
+        if (MemberManagement.MembershipNeedsActivation(MemberCard."Membership Entry No.")) then
+            MemberManagement.ActivateMembershipLedgerEntry(MemberCard."Membership Entry No.", Today());
 
         ValidationRequest.MemberCardLogEntryNo := MemberLimitationMgr.WS_CheckLimitMemberCardArrival(MemberCard."External Card No.", ValidationRequest.AdmissionCode, ValidationRequest.ScannerId, LogEntryNo, ResponseMessage, ResponseCode);
         ValidationRequest.Modify();

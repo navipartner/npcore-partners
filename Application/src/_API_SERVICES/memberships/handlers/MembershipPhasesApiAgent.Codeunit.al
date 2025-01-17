@@ -150,7 +150,7 @@ codeunit 6248225 "NPR MembershipPhasesApiAgent"
         Evaluate(OptionId, JToken.AsValue().AsText());
         MembershipAlterationSetup.GetBySystemId(OptionId);
 
-        if (Body.Get('externalDocumentNumber', JToken)) then
+        if (Body.Get('documentNo', JToken)) then
             MemberInfoCapture."Document No." := JToken.AsValue().AsText();
 
         MemberInfoCapture."Import Entry Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
