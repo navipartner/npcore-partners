@@ -77,6 +77,9 @@ codeunit 6185104 "NPR MM Add. Info. Req. Mgt."
 
         if AddInfoResponse."Post Code" <> '' then
             MemberInfoCapture."Post Code Code" := AddInfoResponse."Post Code";
+
+        if AddInfoResponse."Phone No." <> '' then
+            MemberInfoCapture.Validate("Phone No.", CopyStr('+' + AddInfoResponse."Phone No.", 1, MaxStrLen(MemberInfoCapture."Phone No.")));
     end;
 
     internal procedure UpperCaseUrlEncode(var TextToEncode: Text);

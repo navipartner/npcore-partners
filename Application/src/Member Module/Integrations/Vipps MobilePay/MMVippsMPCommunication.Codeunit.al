@@ -5,14 +5,27 @@ codeunit 6185092 "NPR MM VippsMP Communication"
     trigger OnRun()
     var
         TaskParameters: Dictionary of [Text, Text];
+        PhoneNoHint: Text;
         PhoneNo: Text[30];
         Scope: Text[70];
         Environment: Enum "NPR MM Add. Info. Req. Config.";
+        IsPhoneNoHintURL: Boolean;
     begin
         TaskParameters := Page.GetBackgroundParameters();
-        PhoneNo := CopyStr(TaskParameters.Get('RequestPhoneNo'), 1, MaxStrLen(PhoneNo));
+        PhoneNoHint := TaskParameters.Get('RequestPhoneNo');
         Scope := CopyStr(TaskParameters.Get('RequestScope'), 1, MaxStrLen(Scope));
         Evaluate(Environment, TaskParameters.Get('RequestEnvironment'));
+
+        if Strlen(PhoneNoHint) >= 4 then
+            if PhoneNoHint.Substring(1, 4) = 'http' then
+                IsPhoneNoHintURL := true;
+
+        if IsPhoneNoHintURL then begin
+            PhoneNo := CopyStr(PersonalQRCodeExchange(PhoneNoHint, Environment), 1, MaxStrLen(PhoneNo));
+            TaskParameters.Add('ExchangePhoneNo', PhoneNo);
+        end else
+            PhoneNo := CopyStr(PhoneNoHint, 1, MaxStrLen(PhoneNo));
+
         GetUserInformationVippsMP(PhoneNo, TaskParameters, Environment, Scope);
         Page.SetBackgroundTaskResult(TaskParameters);
     end;
@@ -355,6 +368,128 @@ codeunit 6185092 "NPR MM VippsMP Communication"
             'personal':
                 ResponseDict.Add('ConsentCustomizedOffers', 'true');
         end;
+    end;
+
+    [NonDebuggable]
+    local procedure PersonalQRCodeExchange(QRCodePhoneNoHint: Text; Environment: Enum "NPR MM Add. Info. Req. Config."): Text
+    var
+        VippsMpUtil: Codeunit "NPR Vipps Mp Util";
+        JWTAuthenticationEndpoint: Label 'https://api.vipps.no/accesstoken/get', Locked = true;
+        UserDataExchangeEndpoint: Label 'https://api.vipps.no/qr/v1/exchange', Locked = true;
+        JWTAuthenticationTESTEndpoint: Label 'https://apitest.vipps.no/accesstoken/get', Locked = true; // Testing purposes
+        UserDataExchangeTESTEndpoint: Label 'https://apitest.vipps.no/qr/v1/exchange', Locked = true; // Testing purposes
+        ClientSubscriptionKey: Text;
+        JWTAccessToken: Text;
+    begin
+        ClientSubscriptionKey := VippsMpUtil.VippsPartnerSubkey();
+
+        if Environment = Environment::Testing then begin
+            JWTAccessToken := FetchJWTAccessToken(JWTAuthenticationTESTEndpoint, ClientSubscriptionKey);
+            exit(ExchangeQrCodeForMSIDN(UserDataExchangeTESTEndpoint, QRCodePhoneNoHint, JWTAccessToken, ClientSubscriptionKey));
+        end;
+
+        JWTAccessToken := FetchJWTAccessToken(JWTAuthenticationEndpoint, ClientSubscriptionKey);
+        exit(ExchangeQrCodeForMSIDN(UserDataExchangeEndpoint, QRCodePhoneNoHint, JWTAccessToken, ClientSubscriptionKey));
+    end;
+
+    [NonDebuggable]
+    local procedure FetchJWTAccessToken(JWTAccessTokenUrl: Text; ClientSubscriptionKey: Text): Text
+    var
+        ResponseMessageText: Text;
+    begin
+        RequestJWTAccessToken(JWTAccessTokenUrl, ResponseMessageText, ClientSubscriptionKey);
+        exit(ParseJWTAccessToken(ResponseMessageText));
+    end;
+
+    [NonDebuggable]
+    local procedure RequestJWTAccessToken(JWTAccessTokenEndpoint: Text; var ResponseMessageText: Text; ClientSubscriptionKey: Text)
+    var
+        VippsMpUtil: Codeunit "NPR Vipps Mp Util";
+        PartnerClientId: Text;
+        PartnerClientSecret: Text;
+        HttpClient: HttpClient;
+        HttpHeaders: HttpHeaders;
+        HttpContent: HttpContent;
+        ResponseMessage: HttpResponseMessage;
+        RequestResult: Boolean;
+    begin
+        PartnerClientId := VippsMPUtil.VippsPartnerClientId();
+        PartnerClientSecret := VippsMPUtil.VippsPartnerClientSecret();
+
+        HttpHeaders := HttpClient.DefaultRequestHeaders();
+        HttpHeaders.Clear();
+        HttpHeaders.Add('accept', 'application/json');
+        HttpHeaders.Add('client_id', PartnerClientId);
+        HttpHeaders.Add('client_secret', PartnerClientSecret);
+        HttpHeaders.Add('ocp-apim-subscription-key', ClientSubscriptionKey);
+
+        RequestResult := HttpClient.Post(JWTAccessTokenEndpoint, HttpContent, ResponseMessage);
+
+        if (not RequestResult) or (not ResponseMessage.IsSuccessStatusCode()) then
+            HandleCommunicationError(RequestResult, ResponseMessage);
+
+        ResponseMessage.Content.ReadAs(ResponseMessageText);
+    end;
+
+    [NonDebuggable]
+    local procedure ParseJWTAccessToken(ResponseMessageText: Text): Text
+    var
+        JsonObject: JsonObject;
+        JsonValueToken: JsonToken;
+    begin
+        JsonObject.ReadFrom(ResponseMessageText);
+        JsonObject.Get('access_token', JsonValueToken);
+        exit(JsonValueToken.AsValue().AsText());
+    end;
+
+    [NonDebuggable]
+    local procedure ExchangeQrCodeForMSIDN(UserDataExchangeURL: Text; QRCode: Text; JWTAccessToken: Text; ClientSubscriptionKey: Text): Text
+    var
+        ResponseMessageText: Text;
+    begin
+        RequestUserMSIDN(UserDataExchangeURL, QRCode, JWTAccessToken, ClientSubscriptionKey, ResponseMessageText);
+        exit(ParseUserMSIDN(ResponseMessageText));
+    end;
+
+    [NonDebuggable]
+    local procedure RequestUserMSIDN(UserDataExchangeURL: Text; QRCode: Text; JWTAccessToken: Text; ClientSubscriptionKey: Text; var ResponseMessageText: Text): Text[30]
+    var
+        HttpClient: HttpClient;
+        HttpHeaders: HttpHeaders;
+        HttpContent: HttpContent;
+        ContentHeaders: HttpHeaders;
+        RequestBody: Label '{"qrCode":"%1"}', Comment = '%1 = QR Code', Locked = true;
+        ResponseMessage: HttpResponseMessage;
+        RequestResult: Boolean;
+    begin
+        HttpHeaders := HttpClient.DefaultRequestHeaders();
+        HttpHeaders.Clear();
+        HttpHeaders.Add('accept', 'application/json');
+        HttpHeaders.Add('authorization', 'Bearer ' + JWTAccessToken);
+        HttpHeaders.Add('ocp-apim-subscription-key', ClientSubscriptionKey);
+
+        HttpContent.WriteFrom(StrSubstNo(RequestBody, QRCode));
+        HttpContent.GetHeaders(ContentHeaders);
+        ContentHeaders.Clear();
+        ContentHeaders.Add('content-type', 'application/json');
+
+        RequestResult := HttpClient.Post(UserDataExchangeURL, HttpContent, ResponseMessage);
+
+        if (not RequestResult) or (not ResponseMessage.IsSuccessStatusCode()) then
+            HandleCommunicationError(RequestResult, ResponseMessage);
+
+        ResponseMessage.Content.ReadAs(ResponseMessageText);
+    end;
+
+    [NonDebuggable]
+    local procedure ParseUserMSIDN(ResponseMessageText: Text): Text
+    var
+        JsonObject: JsonObject;
+        JsonValueToken: JsonToken;
+    begin
+        JsonObject.ReadFrom(ResponseMessageText);
+        JsonObject.Get('msisdn', JsonValueToken);
+        exit(JsonValueToken.AsValue().AsText());
     end;
 
     [NonDebuggable]
