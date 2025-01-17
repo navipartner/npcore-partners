@@ -71,6 +71,9 @@ codeunit 6151490 "NPR RS R Localization Mgt."
         if not IsRSLocalizationActive() then
             exit;
 
+        if not IsRetailLocation(SalesLine."Location Code") then
+            exit;
+
         if SalesLine.Type = SalesLine.Type::Item then
             if IsServiceItem(SalesLine."No.") then
                 exit;
