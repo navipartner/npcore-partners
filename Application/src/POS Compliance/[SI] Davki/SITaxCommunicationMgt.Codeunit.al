@@ -179,11 +179,13 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
         POSEntryTaxLines: Record "NPR POS Entry Tax Line";
         TaxesSection: XmlElement;
         TaxAmounts: XmlElement;
+        ExemptedFromTaxAmount: Decimal;
     begin
         TaxesSection := XmlElement.Create('TaxesPerSeller', FuNamespaceUriLbl);
 
         POSEntryTaxLines.SetLoadFields("Tax %", "Tax Base Amount", "Tax Amount");
         POSEntryTaxLines.SetRange("POS Entry No.", SIPOSAuditLogAuxInfo."POS Entry No.");
+        POSEntryTaxLines.SetFilter("Tax %", '<>%1', 0);
         if POSEntryTaxLines.FindSet() then
             repeat
                 TaxAmounts := XmlElement.Create('VAT', FuNamespaceUriLbl);
@@ -192,6 +194,13 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
                 TaxAmounts.Add(CreateXmlElement('TaxAmount', FuNamespaceUriLbl, FormatDecimalField(POSEntryTaxLines."Tax Amount")));
                 TaxesSection.Add(TaxAmounts);
             until POSEntryTaxLines.Next() = 0;
+
+        POSEntryTaxLines.SetFilter("Tax %", '=%1', 0);
+        POSEntryTaxLines.CalcSums("Tax Base Amount");
+        ExemptedFromTaxAmount := POSEntryTaxLines."Tax Base Amount";
+
+        if ExemptedFromTaxAmount <> 0 then
+            TaxesSection.Add(CreateXmlElement('ExemptVATTaxableAmount', FuNamespaceUriLbl, FormatDecimalField(ExemptedFromTaxAmount)));
 
         InvoiceElement.Add(TaxesSection);
     end;
@@ -205,12 +214,12 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
         DictKey: Decimal;
         TaxesSection: XmlElement;
         TaxAmounts: XmlElement;
+        ExemptedFromTaxAmount: Decimal;
     begin
         SalesInvoiceLine.SetLoadFields("VAT %", "VAT Base Amount", "Amount Including VAT");
         SalesInvoiceLine.SetRange(Type, SalesInvoiceLine.Type::Item);
         SalesInvoiceLine.SetRange("Document No.", SIPOSAuditLogAuxInfo."Source Document No.");
         SalesInvoiceLine.FindSet();
-
         repeat
             AddAmountToDecimalDict(TaxableAmountDict, SalesInvoiceLine."VAT %", SalesInvoiceLine."VAT Base Amount");
             AddAmountToDecimalDict(TaxAmountDict, SalesInvoiceLine."VAT %", SalesInvoiceLine."Amount Including VAT" - SalesInvoiceLine."VAT Base Amount");
@@ -219,12 +228,19 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
         TaxesSection := XmlElement.Create('TaxesPerSeller', FuNamespaceUriLbl);
         DictKeysList := TaxableAmountDict.Keys();
         foreach DictKey in DictKeysList do begin
-            TaxAmounts := XmlElement.Create('VAT', FuNamespaceUriLbl);
-            TaxAmounts.Add(CreateXmlElement('TaxRate', FuNamespaceUriLbl, FormatDecimalField(DictKey)));
-            TaxAmounts.Add(CreateXmlElement('TaxableAmount', FuNamespaceUriLbl, FormatDecimalField(TaxableAmountDict.Get(DictKey))));
-            TaxAmounts.Add(CreateXmlElement('TaxAmount', FuNamespaceUriLbl, FormatDecimalField(TaxAmountDict.Get(DictKey))));
-            TaxesSection.Add(TaxAmounts);
+            if DictKey = 0 then
+                ExemptedFromTaxAmount += TaxableAmountDict.Get(DictKey)
+            else begin
+                TaxAmounts := XmlElement.Create('VAT', FuNamespaceUriLbl);
+                TaxAmounts.Add(CreateXmlElement('TaxRate', FuNamespaceUriLbl, FormatDecimalField(DictKey)));
+                TaxAmounts.Add(CreateXmlElement('TaxableAmount', FuNamespaceUriLbl, FormatDecimalField(TaxableAmountDict.Get(DictKey))));
+                TaxAmounts.Add(CreateXmlElement('TaxAmount', FuNamespaceUriLbl, FormatDecimalField(TaxAmountDict.Get(DictKey))));
+                TaxesSection.Add(TaxAmounts);
+            end;
         end;
+
+        if ExemptedFromTaxAmount <> 0 then
+            TaxesSection.Add(CreateXmlElement('ExemptVATTaxableAmount', FuNamespaceUriLbl, FormatDecimalField(ExemptedFromTaxAmount)));
 
         InvoiceElement.Add(TaxesSection);
     end;
@@ -238,12 +254,12 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
         DictKey: Decimal;
         TaxesSection: XmlElement;
         TaxAmounts: XmlElement;
+        ExemptedFromTaxAmount: Decimal;
     begin
         SalesCrMemoLine.SetLoadFields("VAT %", "VAT Base Amount", "Amount Including VAT");
         SalesCrMemoLine.SetRange(Type, SalesCrMemoLine.Type::Item);
         SalesCrMemoLine.SetRange("Document No.", SIPOSAuditLogAuxInfo."Source Document No.");
         SalesCrMemoLine.FindSet();
-
         repeat
             AddAmountToDecimalDict(TaxableAmountDict, SalesCrMemoLine."VAT %", SalesCrMemoLine."VAT Base Amount");
             AddAmountToDecimalDict(TaxAmountDict, SalesCrMemoLine."VAT %", SalesCrMemoLine."Amount Including VAT" - SalesCrMemoLine."VAT Base Amount");
@@ -252,12 +268,19 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
         TaxesSection := XmlElement.Create('TaxesPerSeller', FuNamespaceUriLbl);
         DictKeysList := TaxableAmountDict.Keys();
         foreach DictKey in DictKeysList do begin
-            TaxAmounts := XmlElement.Create('VAT', FuNamespaceUriLbl);
-            TaxAmounts.Add(CreateXmlElement('TaxRate', FuNamespaceUriLbl, FormatDecimalField(DictKey)));
-            TaxAmounts.Add(CreateXmlElement('TaxableAmount', FuNamespaceUriLbl, FormatDecimalField(-TaxableAmountDict.Get(DictKey))));
-            TaxAmounts.Add(CreateXmlElement('TaxAmount', FuNamespaceUriLbl, FormatDecimalField(-TaxAmountDict.Get(DictKey))));
-            TaxesSection.Add(TaxAmounts);
+            if DictKey = 0 then
+                ExemptedFromTaxAmount += TaxableAmountDict.Get(DictKey)
+            else begin
+                TaxAmounts := XmlElement.Create('VAT', FuNamespaceUriLbl);
+                TaxAmounts.Add(CreateXmlElement('TaxRate', FuNamespaceUriLbl, FormatDecimalField(DictKey)));
+                TaxAmounts.Add(CreateXmlElement('TaxableAmount', FuNamespaceUriLbl, FormatDecimalField(-TaxableAmountDict.Get(DictKey))));
+                TaxAmounts.Add(CreateXmlElement('TaxAmount', FuNamespaceUriLbl, FormatDecimalField(-TaxAmountDict.Get(DictKey))));
+                TaxesSection.Add(TaxAmounts);
+            end;
         end;
+
+        if ExemptedFromTaxAmount <> 0 then
+            TaxesSection.Add(CreateXmlElement('ExemptVATTaxableAmount', FuNamespaceUriLbl, FormatDecimalField(ExemptedFromTaxAmount)));
 
         InvoiceElement.Add(TaxesSection);
     end;
