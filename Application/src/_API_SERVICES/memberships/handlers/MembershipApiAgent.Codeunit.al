@@ -257,6 +257,8 @@ codeunit 6185123 "NPR MembershipApiAgent"
             .AddObject(MemberAgent.MemberDTO(ResponseJson, Member))
             .AddArray(MemberCardsDTO(ResponseJson, MembershipEntryNo, Member."Entry No.", IncludeCards))
             .EndObject();
+
+        exit(ResponseJson);
     end;
 
     local procedure MemberCardsDTO(ResponseJson: Codeunit "NPR JSON Builder"; MembershipEntryNo: Integer; MemberEntryNo: Integer; IncludeCards: Boolean): Codeunit "NPR JSON Builder"
