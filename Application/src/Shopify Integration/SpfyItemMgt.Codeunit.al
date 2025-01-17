@@ -684,6 +684,38 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         Found := not SpfyStoreItemLink.IsEmpty();
     end;
 
+    internal procedure GetShopifyPictureUrl(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"): Text
+    var
+        TempNcTask: Record "NPR Nc Task" temporary;
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt.";
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+        JsonHelper: Codeunit "NPR Json Helper";
+        RequestJson: JsonObject;
+        VariablesJson: JsonObject;
+        ShopifyResponse: JsonToken;
+        OStream: OutStream;
+        Success: Boolean;
+        ProductId: Text[30];
+        ProductMediaQLQueryTok: Label 'query ProductImageList($productId: ID!) { product(id: $productId) { media(first: 1, query: "media_type:IMAGE", sortKey: POSITION) { nodes { id alt ... on MediaImage { createdAt image { width height url } } } } } }', Locked = true;
+    begin
+        ProductId := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+        if ProductId = '' then
+            exit;
+        Clear(RequestJson);
+        RequestJson.Add('query', ProductMediaQLQueryTok);
+        VariablesJson.Add('productId', 'gid://shopify/Product/' + ProductId);
+        RequestJson.Add('variables', variablesJson.AsToken().AsObject());
+        Clear(TempNcTask);
+        TempNcTask."Store Code" := SpfyStoreItemLink."Shopify Store Code";
+        TempNcTask."Data Output".CreateOutStream(OStream);
+        RequestJson.WriteTo(OStream);
+
+        ClearLastError();
+        Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(TempNcTask, true, ShopifyResponse);
+        if Success then
+            exit(JsonHelper.GetJText(ShopifyResponse, '$[''data''].[''product''].[''media''].[''nodes''][0].[''image''].[''url'']', false));
+    end;
+
     local procedure UpdateInventoryLevels(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link")
     begin
         Codeunit.Run(Codeunit::"NPR Spfy Item Recalc.Invt.Lev.", SpfyStoreItemLink);
