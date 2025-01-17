@@ -80,6 +80,9 @@ codeunit 6185091 "NPR MM VippsMP Add. Info. Req." implements "NPR MM IAdd. Info.
 
         if Parameters.ContainsKey('ConsentCustomizedOffers') then
             AddInfoResponse."Consent Customized Offers" := true;
+
+        if Parameters.ContainsKey('ExchangePhoneNo') then
+            AddInfoResponse."Phone No." := CopyStr(Parameters.Get('ExchangePhoneNo'), 1, MaxStrLen(AddInfoResponse."Phone No."));
     end;
 
     local procedure TransferAddressToResponse(var AddInfoResponse: Record "NPR MM Add. Info. Response" temporary;

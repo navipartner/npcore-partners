@@ -290,6 +290,7 @@
                 }
                 field("Phone No."; Rec."Phone No.")
                 {
+                    Visible = false;
                     Editable = not _PreSelectedCustomerContact;
                     ShowMandatory = _PhoneNoMandatory;
                     ToolTip = 'Specifies the value of the Phone No. field';
@@ -298,6 +299,37 @@
                     trigger OnValidate()
                     begin
                         CheckPhone();
+                    end;
+                }
+                field("Auxiliary Phone No."; AuxiliaryPhoneNoField)
+                {
+                    Caption = 'Phone No.';
+                    Editable = not _PreSelectedCustomerContact;
+                    ShowMandatory = _PhoneNoMandatory;
+                    ToolTip = 'Specifies the value of the Phone No. field';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                    trigger OnValidate()
+                    var
+                        FieldLengthErr: Label 'The length of the Phone No. field cannot exceed 30 characters.';
+                    begin
+                        case true of
+#pragma warning disable AA0139
+                            StrLen(AuxiliaryPhoneNoField) < 4:
+                                begin
+                                    Rec.Validate("Phone No.", AuxiliaryPhoneNoField);
+                                    CheckPhone();
+                                end;
+                            StrLen(AuxiliaryPhoneNoField) > 30:
+                                if AuxiliaryPhoneNoField.Substring(1, 4) <> 'http' then
+                                    Error(FieldLengthErr);
+                            else // 4 >= AuxiliaryPhoneNoField < 30
+                                if AuxiliaryPhoneNoField.Substring(1, 4) <> 'http' then begin
+                                    Rec.Validate("Phone No.", AuxiliaryPhoneNoField);
+                                    CheckPhone();
+                                end;
+#pragma warning restore AA0139
+                        end;
                     end;
 
                     trigger OnAssistEdit()
@@ -950,7 +982,7 @@
         NPRAttrVisible09 := NPRAttrVisibleArray[9];
         NPRAttrVisible10 := NPRAttrVisibleArray[10];
         NPRAttrEditable := CurrPage.Editable();
-
+        AuxiliaryPhoneNoField := Rec."Phone No.";
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -1029,6 +1061,7 @@
         _PosUnitNo: Code[10];
         _MembershipValidUntilDate: Date;
         _BlockDetails: Text;
+        AuxiliaryPhoneNoField: Text[100];
 
     local procedure CheckPhone()
     var
@@ -1930,8 +1963,10 @@
         MemberCaptIntSetup: Record "NPR MM Member Info. Int. Setup";
         TempAddInfoResponse: Record "NPR MM Add. Info. Response" temporary;
         AddInfoReqMgt: Codeunit "NPR MM Add. Info. Req. Mgt.";
-        CustomerRecordRef: RecordRef;
+        MemberInfoCaptRecordRef: RecordRef;
         LoginHint: Text[100];
+        IsLoginHintURL: Boolean;
+        PhoneNoUnfilledErr: Label '%1 must have a value. It cannot be empty.', Comment = '%1 = Phone No.';
     begin
         if not MemberCaptIntSetup.Get() then begin
             MemberCaptIntSetup.Init();
@@ -1942,16 +1977,29 @@
         case MemberCaptIntSetup."MembCapt PhoneNo. OnAssistEdit" of  // Leaving as case statement for further integrations
             Enum::"NPR MM Add. Info. Request"::"Vipps MobilePay":
                 begin
-                    Rec.TestField("Phone No.");
-                    LoginHint := AddInfoReqMgt.NormalizePhoneNo(Rec."Phone No.");
-                    if LoginHint.Substring(1, 1) <> '+' then
-                        LoginHint := CopyStr(MemberCaptIntSetup."Implicit Phone No. Prefix" + LoginHint, 1, MaxStrLen(LoginHint));
-                    LoginHint := CopyStr(LoginHint, 2, MaxStrLen(LoginHint));
+                    if AuxiliaryPhoneNoField = '' then
+                        Error(PhoneNoUnfilledErr, Rec.FieldCaption("Phone No."));
+
+                    if Strlen(AuxiliaryPhoneNoField) >= 4 then
+                        if AuxiliaryPhoneNoField.Substring(1, 4) = 'http' then
+                            IsLoginHintURL := true;
+
+                    if IsLoginHintURL then
+                        LoginHint := AuxiliaryPhoneNoField
+                    else begin
+                        LoginHint := AddInfoReqMgt.NormalizePhoneNo(Rec."Phone No.");
+                        if LoginHint.Substring(1, 1) <> '+' then
+                            LoginHint := CopyStr(MemberCaptIntSetup."Implicit Phone No. Prefix" + LoginHint, 1, MaxStrLen(LoginHint));
+                        LoginHint := CopyStr(LoginHint, 2, MaxStrLen(LoginHint));
+                    end;
                 end;
         end;
-        CustomerRecordRef.GetTable(Rec);
-        AddInfoReqMgt.MakeAddInfoRequest(MemberCaptIntSetup."MembCapt PhoneNo. OnAssistEdit", LoginHint, CustomerRecordRef, TempAddInfoResponse);
-        AddInfoReqMgt.SetMemberAdditionalInfo(Rec, TempAddInfoResponse)
+        MemberInfoCaptRecordRef.GetTable(Rec);
+        AddInfoReqMgt.MakeAddInfoRequest(MemberCaptIntSetup."MembCapt PhoneNo. OnAssistEdit", LoginHint, MemberInfoCaptRecordRef, TempAddInfoResponse);
+        AddInfoReqMgt.SetMemberAdditionalInfo(Rec, TempAddInfoResponse);
+        if TempAddInfoResponse."Phone No." <> '' then // Phone No. has been updated
+            CheckPhone();
+        AuxiliaryPhoneNoField := Rec."Phone No.";
     end;
 
     procedure SetPOSUnit(PosUnitNoIn: Code[10])
