@@ -114,8 +114,8 @@
         NpRvVoucher: Record "NPR NpRv Voucher";
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
-        NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
         TempNpRvVoucher: Record "NPR NpRv Voucher" temporary;
+        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
     begin
         NpRvSalesLine.SetRange("External Document No.", NpRvExtVoucherBuffer."Document No.");
@@ -168,12 +168,7 @@
         NpRvSalesLine.Description := TempNpRvVoucher.Description;
         NpRvSalesLine.Insert(true);
 
-        NpRvSalesLineReference.Init();
-        NpRvSalesLineReference.Id := CreateGuid();
-        NpRvSalesLineReference."Voucher No." := TempNpRvVoucher."No.";
-        NpRvSalesLineReference."Reference No." := TempNpRvVoucher."Reference No.";
-        NpRvSalesLineReference."Sales Line Id" := NpRvSalesLine.Id;
-        NpRvSalesLineReference.Insert(true);
+        NpRvSalesDocMgt.InsertNpRVSalesLineReference(NpRvSalesLine, TempNpRvVoucher);
 
         VoucherSalesLine2Buffer(NpRvSalesLine, NpRvExtVoucherBuffer);
     end;

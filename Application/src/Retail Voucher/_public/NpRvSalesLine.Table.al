@@ -285,6 +285,13 @@
             Caption = 'Posting No.';
             DataClassification = CustomerContent;
         }
+#if not BC17
+        field(450; "Spfy Initiated in Shopify"; Boolean)
+        {
+            Caption = 'Initiated in Shopify';
+            DataClassification = CustomerContent;
+        }
+#endif
         field(1000; Id; Guid)
         {
             Caption = 'Id';
@@ -329,7 +336,7 @@
         NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
     begin
         NpRvSalesLineReference.SetRange("Sales Line Id", Id);
-        if NpRvSalesLineReference.FindFirst() then
+        if not NpRvSalesLineReference.IsEmpty() then
             NpRvSalesLineReference.DeleteAll();
     end;
 

@@ -3,7 +3,10 @@ table 6150815 "NPR Spfy Fulfillment Entry"
 {
     Access = Internal;
     Caption = 'Shopify Fulfillment Entry';
-    DataClassification = ToBeClassified;
+    DataClassification = CustomerContent;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2024-12-20';
+    ObsoleteReason = 'Table type will be changed to temporary';
 
     fields
     {
@@ -49,6 +52,11 @@ table 6150815 "NPR Spfy Fulfillment Entry"
             DataClassification = CustomerContent;
             Caption = 'Fulfilled Quantity';
             DecimalPlaces = 0 : 5;
+        }
+        field(30; "Gift Card"; Boolean)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Gift Card';
         }
     }
     keys

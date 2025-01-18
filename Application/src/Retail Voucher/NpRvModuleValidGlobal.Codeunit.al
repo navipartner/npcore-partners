@@ -420,6 +420,7 @@
     var
         NpRvGlobalVoucherSetup: Record "NPR NpRv Global Vouch. Setup";
         VoucherEntry: Record "NPR NpRv Voucher Entry";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
         XmlDomManagement: codeunit "XML DOM Management";
         Client: HttpClient;
@@ -489,11 +490,7 @@
         Voucher.SetRange("Reference No.", ReferenceNo);
         Voucher.SetRange("Voucher Type", NpRvVoucherType.Code);
         if not Voucher.FindLast() then begin
-            Voucher.Init();
-            Voucher."No." := '';
-            Voucher."Reference No." := ReferenceNo;
-            Voucher.Validate("Voucher Type", NpRvVoucherType.Code);
-            Voucher.Insert(true);
+            NpRvVoucherMgt.InitVoucher(NpRvVoucherType, '', ReferenceNo, 0DT, true, Voucher);
 
             VoucherEntry.Init();
             VoucherEntry."Entry No." := 0;
@@ -624,11 +621,7 @@
         Voucher.SetRange("Reference No.", ReferenceNo);
         Voucher.SetRange("Voucher Type", VoucherType.Code);
         if not Voucher.FindLast() then begin
-            Voucher.Init();
-            Voucher."No." := '';
-            Voucher."Reference No." := ReferenceNo;
-            Voucher.Validate("Voucher Type", VoucherType.Code);
-            Voucher.Insert(true);
+            NpRvVoucherMgt.InitVoucher(VoucherType, '', ReferenceNo, 0DT, true, Voucher);
 
             VoucherEntry.Init();
             VoucherEntry."Entry No." := 0;

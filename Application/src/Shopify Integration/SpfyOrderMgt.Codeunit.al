@@ -434,16 +434,6 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         exit(Found);
     end;
 
-    /*
-    local procedure FindPaymentMapping(Order: JsonToken; ShopifyStoreCode: Code[20]; var PaymentMapping: Record "NPR Magento Payment Mapping")
-    var
-        PayMethodId: Text;
-    begin
-        PayMethodId := JsonHelper.GetJText(Order, 'payment_gateway_names[0]', MaxStrLen(PaymentMapping."External Payment Type"), true);
-        GetPaymentMapping(PayMethodId, ShopifyStoreCode, PaymentMapping);
-    end;
-    */
-
     procedure GetPaymentMapping(PayMethodId: Text; ShopifyStoreCode: Code[20]; var PaymentMapping: Record "NPR Magento Payment Mapping")
     var
         ExternalPmtTypeFormatTok: Label '%1_%2', Locked = true;
@@ -905,37 +895,41 @@ codeunit 6184814 "NPR Spfy Order Mgt."
             SalesLine.DeleteAll(true);
     end;
 
-    procedure InsertSalesLines(Order: JsonToken; SalesHeader: Record "Sales Header"; ForPosting: Boolean)
+    procedure InsertSalesLines(ShopifyStoreCode: Code[20]; Order: JsonToken; SalesHeader: Record "Sales Header"; ForPosting: Boolean)
     var
         TempFulfillmentLineBuffer: Record "NPR Spfy Fulfillment Entry" temporary;
+        TempFulfillmEntryDetailBuffer: Record "NPR Spfy Fulfillm.Entry Detail" temporary;
         OrderLines: JsonToken;
         OrderLine: JsonToken;
         LastLineNo: Integer;
     begin
-        CalculateFulfillments(Order, TempFulfillmentLineBuffer);
+        CalculateFulfillments(Order, TempFulfillmentLineBuffer, TempFulfillmEntryDetailBuffer);
         if Order.SelectToken('line_items', OrderLines) and OrderLines.IsArray() then
             foreach OrderLine in OrderLines.AsArray() do
                 if not SkipLine(OrderLine) then
-                    InsertSalesLine(OrderLine, TempFulfillmentLineBuffer, SalesHeader, ForPosting, LastLineNo);
+                    InsertSalesLine(ShopifyStoreCode, OrderLine, TempFulfillmentLineBuffer, TempFulfillmEntryDetailBuffer, SalesHeader, ForPosting, LastLineNo);
 
         if Order.SelectToken('shipping_lines', OrderLines) and OrderLines.IsArray() then
             foreach OrderLine in OrderLines.AsArray() do
                 InsertSalesLineShipmentFee(OrderLine, SalesHeader, LastLineNo);
     end;
 
-    local procedure CalculateFulfillments(Order: JsonToken; var FulfillmentLineBuffer: Record "NPR Spfy Fulfillment Entry")
+    local procedure CalculateFulfillments(Order: JsonToken; var FulfillmentLineBuffer: Record "NPR Spfy Fulfillment Entry"; var FulfillmEntryDetailBuffer: Record "NPR Spfy Fulfillm.Entry Detail")
     var
         Fulfillment: JsonToken;
         FulfillmentLine: JsonToken;
         FulfillmentLines: JsonToken;
         Fulfillments: JsonToken;
+        GiftCard: JsonToken;
+        GiftCards: JsonToken;
         OrderLineID: Text[30];
         FulfilledQty: Decimal;
         LastEntryNo: Integer;
+        LastDetEntryNo: Integer;
     begin
         if Order.SelectToken('fulfillments', Fulfillments) and Fulfillments.IsArray() then
             foreach Fulfillment in Fulfillments.AsArray() do
-                if JsonHelper.GetJText(Fulfillment, 'status', true) = 'success' then
+                if JsonHelper.GetJText(Fulfillment, 'status', true) = 'success' then begin
                     if Fulfillment.SelectToken('line_items', FulfillmentLines) and FulfillmentLines.IsArray() then
                         foreach FulfillmentLine in FulfillmentLines.AsArray() do
                             if JsonHelper.GetJText(FulfillmentLine, 'fulfillment_status', true) = 'fulfilled' then begin
@@ -956,25 +950,61 @@ codeunit 6184814 "NPR Spfy Order Mgt."
                                     FulfillmentLineBuffer.Modify();
                                 end;
                             end;
+
+                    if Fulfillment.SelectToken('receipt.gift_cards', GiftCards) and GiftCards.IsArray() then
+                        foreach GiftCard in GiftCards.AsArray() do begin
+#pragma warning disable AA0139
+                            OrderLineID := JsonHelper.GetJText(GiftCard, 'line_item_id', MaxStrLen(OrderLineID), true);
+#pragma warning restore AA0139
+                            FulfillmentLineBuffer.SetRange("Order Line ID", OrderLineID);
+                            FulfillmentLineBuffer.FindFirst();
+                            FulfillmentLineBuffer."Gift Card" := true;
+                            FulfillmentLineBuffer.Modify();
+                            FulfillmentLineBuffer.SetRange("Order Line ID");
+
+                            LastDetEntryNo += 1;
+                            FulfillmEntryDetailBuffer.Init();
+                            FulfillmEntryDetailBuffer."Entry No." := LastDetEntryNo;
+                            FulfillmEntryDetailBuffer."Parent Entry No." := fulFillmentLineBuffer."Entry No.";
+#pragma warning disable AA0139
+                            FulfillmEntryDetailBuffer."Gift Card ID" := JsonHelper.GetJText(GiftCard, 'id', MaxStrLen(FulfillmEntryDetailBuffer."Gift Card ID"), true);
+                            FulfillmEntryDetailBuffer."Gift Card Reference No." := JsonHelper.GetJText(GiftCard, 'masked_code', MaxStrLen(FulfillmEntryDetailBuffer."Gift Card Reference No."), true);
+                            if StrLen(FulfillmEntryDetailBuffer."Gift Card Reference No.") > 4 then
+                                FulfillmEntryDetailBuffer."Gift Card Reference No." := CopyStr(FulfillmEntryDetailBuffer."Gift Card Reference No.", StrLen(FulfillmEntryDetailBuffer."Gift Card Reference No.") - 3);
+                            FulfillmEntryDetailBuffer."Gift Card Reference No." := StrSubstNo('%1/%2', FulfillmEntryDetailBuffer."Gift Card ID", FulfillmEntryDetailBuffer."Gift Card Reference No.");
+#pragma warning restore AA0139
+                            FulfillmEntryDetailBuffer.Insert();
+                        end;
+                end;
     end;
 
-    local procedure InsertSalesLine(OrderLine: JsonToken; var FulfillmentLineBuffer: Record "NPR Spfy Fulfillment Entry"; SalesHeader: Record "Sales Header"; ForPosting: Boolean; var LastLineNo: Integer)
+    local procedure InsertSalesLine(ShopifyStoreCode: Code[20]; OrderLine: JsonToken; var FulfillmentLineBuffer: Record "NPR Spfy Fulfillment Entry"; var FulfillmEntryDetailBuffer: Record "NPR Spfy Fulfillm.Entry Detail"; SalesHeader: Record "Sales Header"; ForPosting: Boolean; var LastLineNo: Integer)
     var
         ItemVariant: Record "Item Variant";
         NpEcDocument: Record "NPR NpEc Document";
         NpEcStore: Record "NPR NpEc Store";
         SalesLine: Record "Sales Line";
+        ShopifyStore: Record "NPR Spfy Store";
+        VoucherType: Record "NPR NpRv Voucher Type";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
         UnitPrice: Decimal;
         OrderLineID: Text[30];
         Sku: Text;
         Handled: Boolean;
+        IsGiftCard: Boolean;
         UnknownIdErr: Label 'Unknown %1: %2%3';
     begin
         OrderLineID := GetOrderID(OrderLine);
-        if not SpfyItemMgt.ParseItem(OrderLine, ItemVariant, Sku) then
-            Error(UnknownIdErr, 'sku', Sku, StrSubstNo(' (line ID: %1, name: %2)', OrderLineID, JsonHelper.GetJText(OrderLine, 'name', false)));
+        IsGiftCard := JsonHelper.GetJBoolean(OrderLine, 'gift_card', false);
+        if IsGiftCard then begin
+            ShopifyStore.Get(ShopifyStoreCode);
+            ShopifyStore.TestField("Voucher Type (Sold at Shopify)");
+            VoucherType.Get(ShopifyStore."Voucher Type (Sold at Shopify)");
+            VoucherType.TestField("Account No.");
+        end else
+            if not SpfyItemMgt.ParseItem(OrderLine, ItemVariant, Sku) then
+                Error(UnknownIdErr, 'sku', Sku, StrSubstNo(' (line ID: %1, name: %2)', OrderLineID, JsonHelper.GetJText(OrderLine, 'name', false)));
 
         UnitPrice := JsonHelper.GetJDecimal(OrderLine, 'price', true);
 
@@ -1000,10 +1030,22 @@ codeunit 6184814 "NPR Spfy Order Mgt."
 
         SpfyIntegrationEvents.OnBeforeFillInSalesLine(OrderLine, FulfillmentLineBuffer."Fulfilled Quantity", ForPosting, ItemVariant, SalesHeader, SalesLine, Handled);
         if not Handled then begin
-            SalesLine.Validate(Type, SalesLine.Type::Item);
-            SalesLine.Validate("No.", ItemVariant."Item No.");
-            if ItemVariant.Code <> '' then
-                SalesLine.Validate("Variant Code", ItemVariant.Code);
+            if IsGiftCard then begin
+                SalesLine.Validate(Type, SalesLine.Type::"G/L Account");
+                SalesLine.Validate("No.", VoucherType."Account No.");
+#pragma warning disable AA0139
+                SalesLine.Description := JsonHelper.GetJText(OrderLine, 'name', MaxStrLen(SalesLine.Description), false);
+#pragma warning restore AA0139
+            end else begin
+                SalesLine.Validate(Type, SalesLine.Type::Item);
+                SalesLine.Validate("No.", ItemVariant."Item No.");
+                if ItemVariant.Code <> '' then
+                    SalesLine.Validate("Variant Code", ItemVariant.Code);
+#pragma warning disable AA0139
+                SalesLine.Description := JsonHelper.GetJText(OrderLine, 'title', MaxStrLen(SalesLine.Description), true);
+                SalesLine."Description 2" := JsonHelper.GetJText(OrderLine, 'variant_title', MaxStrLen(SalesLine."Description 2"), false);
+#pragma warning restore AA0139
+            end;
             SalesLine.Validate(Quantity, JsonHelper.GetJDecimal(OrderLine, 'fulfillable_quantity', true) + FulfillmentLineBuffer."Fulfilled Quantity");
             if ForPosting then
                 if SalesLine."Qty. to Ship" <> FulfillmentLineBuffer."Fulfilled Quantity" then
@@ -1011,14 +1053,61 @@ codeunit 6184814 "NPR Spfy Order Mgt."
             SalesLine.Validate("Unit Price", UnitPrice);
             if SalesLine."Unit Price" <> 0 then
                 SalesLine.Validate("Line Discount Amount", CalcLineDiscountAmount(OrderLine, SalesLine));
-#pragma warning disable AA0139
-            SalesLine.Description := JsonHelper.GetJText(OrderLine, 'title', MaxStrLen(SalesLine.Description), true);
-            SalesLine."Description 2" := JsonHelper.GetJText(OrderLine, 'variant_title', MaxStrLen(SalesLine."Description 2"), false);
-#pragma warning restore AA0139
+            if IsGiftCard then begin
+                SetRetailVoucher(SalesHeader, SalesLine, VoucherType, FulfillmentLineBuffer, FulfillmEntryDetailBuffer);
+                FulfillmEntryDetailBuffer.Reset();
+            end;
         end;
         SalesLine.Modify(true);
-
         SpfyIntegrationEvents.OnAfterInsertSalesLine(SalesHeader, SalesLine, LastLineNo);
+    end;
+
+    local procedure SetRetailVoucher(SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; VoucherType: Record "NPR NpRv Voucher Type"; FulfillmentLineBuffer: Record "NPR Spfy Fulfillment Entry"; var FulfillmEntryDetailBuffer: Record "NPR Spfy Fulfillm.Entry Detail")
+    var
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        Voucher: Record "NPR NpRv Voucher";
+        ShopifyAssignedID: Record "NPR Spfy Assigned ID";
+        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        VoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+    begin
+        NpRvSalesLine.SetRange("Document Type", SalesLine."Document Type");
+        NpRvSalesLine.SetRange("Document No.", SalesLine."Document No.");
+        NpRvSalesLine.SetRange("Document Line No.", SalesLine."Line No.");
+        if not NpRvSalesLine.IsEmpty() then
+            NpRvSalesLine.DeleteAll(true);
+
+        if not FulfillmentLineBuffer."Gift Card" then
+            exit;
+        FulfillmEntryDetailBuffer.SetRange("Parent Entry No.", FulfillmentLineBuffer."Entry No.");
+        FulfillmEntryDetailBuffer.SetFilter("Gift Card ID", '<>%1', '');
+        if not FulfillmEntryDetailBuffer.FindSet() then
+            exit;
+
+        NpRvSalesLine.Init();
+        NpRvSalesLine.Id := CreateGuid();
+        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
+        NpRvSalesLine."Document Type" := SalesLine."Document Type";
+        NpRvSalesLine."Document No." := SalesLine."Document No.";
+        NpRvSalesLine."Document Line No." := SalesLine."Line No.";
+        NpRvSalesLine."External Document No." := SalesHeader."NPR External Order No.";
+        NpRvSalesLine."Voucher Type" := VoucherType.Code;
+        NpRvSalesLine.Type := NpRvSalesLine.Type::"Top-up";
+        NpRvSalesLine.Description := CopyStr(SalesLine.Description, 1, MaxStrLen(NpRvSalesLine.Description));
+        NpRvSalesLine."Spfy Initiated in Shopify" := true;
+        NpRvSalesLine.Insert(true);
+
+        repeat
+            SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"NPR NpRv Voucher", "NPR Spfy ID Type"::"Entry ID", FulfillmEntryDetailBuffer."Gift Card ID", ShopifyAssignedID);
+            if ShopifyAssignedID.FindLast() then
+                Voucher.Get(ShopifyAssignedID."BC Record ID")
+            else begin
+                VoucherMgt.InitVoucher(VoucherType, '', FulfillmEntryDetailBuffer."Gift Card Reference No.", 0DT, true, Voucher);
+                SpfyAssignedIDMgt.AssignShopifyID(Voucher.RecordId(), "NPR Spfy ID Type"::"Entry ID", FulfillmEntryDetailBuffer."Gift Card ID", false);
+            end;
+
+            NpRvSalesDocMgt.InsertNpRVSalesLineReference(NpRvSalesLine, Voucher);
+        until FulfillmEntryDetailBuffer.Next() = 0;
     end;
 
     local procedure InsertSalesLineShipmentFee(ShippingLine: JsonToken; SalesHeader: Record "Sales Header"; var LastLineNo: Integer)

@@ -99,6 +99,14 @@
                     ToolTip = 'Specifies the value of the Partner Code field';
                     ApplicationArea = NPRRetail;
                 }
+#if not BC17
+                field("Initiated in Shopify"; Rec."Spfy Initiated in Shopify")
+                {
+                    ToolTip = 'Specifies if the transaction was initiated in Shopify and then imported into BC.';
+                    ApplicationArea = NPRShopify;
+                    Visible = ShopifyIntegrationIsEnabled;
+                }
+#endif
                 field("Entry No."; Rec."Entry No.")
                 {
 
@@ -153,5 +161,16 @@
             }
         }
     }
-}
 
+#if not BC17
+    trigger OnOpenPage()
+    var
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+    begin
+        ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Retail Vouchers");
+    end;
+
+    var
+        ShopifyIntegrationIsEnabled: Boolean;
+#endif
+}

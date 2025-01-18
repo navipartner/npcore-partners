@@ -143,6 +143,13 @@
             TableRelation = Company;
             ValidateTableRelation = false;
         }
+#if not BC17
+        field(110; "Spfy Initiated in Shopify"; Boolean)
+        {
+            Caption = 'Initiated in Shopify';
+            DataClassification = CustomerContent;
+        }
+#endif
     }
 
     keys

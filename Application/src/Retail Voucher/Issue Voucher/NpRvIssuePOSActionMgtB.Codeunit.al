@@ -48,16 +48,11 @@ codeunit 6059981 "NPR NpRv Issue POSAction Mgt-B"
     var
         NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
     begin
         NpRvVoucherMgt.SetSalesLineReferenceFilter(NpRvSalesLine, NpRvSalesLineReference);
-        if NpRvSalesLineReference.IsEmpty then begin
-            NpRvSalesLineReference.Init();
-            NpRvSalesLineReference.Id := CreateGuid();
-            NpRvSalesLineReference."Voucher No." := TempVoucher."No.";
-            NpRvSalesLineReference."Reference No." := TempVoucher."Reference No.";
-            NpRvSalesLineReference."Sales Line Id" := NpRvSalesLine.Id;
-            NpRvSalesLineReference.Insert(true);
-        end;
+        if NpRvSalesLineReference.IsEmpty() then
+            NpRvSalesDocMgt.InsertNpRVSalesLineReference(NpRvSalesLine, TempVoucher);
     end;
 
     procedure IssueVoucherCreate(var POSSaleLine: Codeunit "NPR POS Sale Line"; var TempVoucher: Record "NPR NpRv Voucher" temporary; VoucherType: Record "NPR NpRv Voucher Type"; DiscountType: Text; Quantity: Integer; Amount: Decimal; Discount: Decimal; CustomRefereceNo: Text[50])

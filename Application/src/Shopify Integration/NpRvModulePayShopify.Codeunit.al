@@ -81,9 +81,12 @@ codeunit 6185022 "NPR NpRv Module Pay. - Shopify"
         PartialApplicationAllowed := IsShopifyPlusSubscription(VoucherType.GetStoreCode());
         if not PartialApplicationAllowed then begin
             NpRvSalesLine.Get(NpRvSalesLine.Id);
-            NpRvSalesLine.TestField("Document Source", NpRvSalesLine."Document Source"::"Payment Line");
-            PaymentLine.Get(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", NpRvSalesLine."Document Line No.");
-            PartialApplicationAllowed := SpfyAssignedIDMgt.GetAssignedShopifyID(PaymentLine.RecordId(), "NPR Spfy ID Type"::"Entry ID") <> '';
+            PartialApplicationAllowed := NpRvSalesLine."Spfy Initiated in Shopify";
+            if not PartialApplicationAllowed then begin
+                NpRvSalesLine.TestField("Document Source", NpRvSalesLine."Document Source"::"Payment Line");
+                PaymentLine.Get(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", NpRvSalesLine."Document Line No.");
+                PartialApplicationAllowed := SpfyAssignedIDMgt.GetAssignedShopifyID(PaymentLine.RecordId(), "NPR Spfy ID Type"::"Entry ID") <> '';
+            end;
         end;
 
         if PartialApplicationAllowed then

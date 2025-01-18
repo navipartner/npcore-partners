@@ -30,7 +30,7 @@ codeunit 6184808 "NPR Spfy Create Order" implements "NPR Nc Import List IProcess
 
         OrderMgt.LockTables();
         OrderMgt.InsertSalesHeader(ShopifyStoreCode, Order, SalesHeader);
-        OrderMgt.InsertSalesLines(Order, SalesHeader, false);
+        OrderMgt.InsertSalesLines(ShopifyStoreCode, Order, SalesHeader, false);
         OrderMgt.InsertPaymentLines(ShopifyStoreCode, Order, SalesHeader);
     end;
 }

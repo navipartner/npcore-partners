@@ -7,7 +7,6 @@
     DelayedInsert = true;
     PageType = List;
     UsageCategory = Administration;
-
     SourceTable = "NPR NpRv Sales Line Ref.";
     SourceTableView = SORTING("Sales Line Id", "Voucher No.", "Reference No.");
     ApplicationArea = NPRRetail;
@@ -18,9 +17,13 @@
         {
             repeater(Group)
             {
+                field("Voucher No."; Rec."Voucher No.")
+                {
+                    ToolTip = 'Specifies the value of the Voucher No. field';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Reference No."; Rec."Reference No.")
                 {
-
                     ToolTip = 'Specifies the value of the Reference No. field';
                     ApplicationArea = NPRRetail;
                 }
@@ -77,4 +80,3 @@
         if VoucherType.Get(NpRvSalesLine."Voucher Type") then;
     end;
 }
-

@@ -42,7 +42,7 @@
     var
         NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
     begin
-        if Rec.IsTemporary then
+        if Rec.IsTemporary() then
             exit;
 
         SetSalesLineReferenceFilter(Rec, NpRvSalesLineReference);
@@ -110,6 +110,69 @@
     local procedure OnAfterDebitSalePostEvent(var Sender: Codeunit "NPR Sales Doc. Exp. Mgt."; SalePOS: Record "NPR POS Sale"; SalesHeader: Record "Sales Header"; Posted: Boolean)
     begin
         SendVoucher(SalePOS);
+    end;
+
+#if BC17 or BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Page, Page::Navigate, 'OnAfterNavigateFindRecords', '', true, true)]
+#else
+    [EventSubscriber(ObjectType::Page, Page::Navigate, OnAfterFindLedgerEntries, '', true, true)]
+#endif
+    local procedure Navigate_FindRetailVoucherEntries(var DocumentEntry: Record "Document Entry" temporary; DocNoFilter: Text; PostingDateFilter: Text)
+    var
+        ArchVoucherEntry: Record "NPR NpRv Arch. Voucher Entry";
+        VoucherEntry: Record "NPR NpRv Voucher Entry";
+        Navigate: Page Navigate;
+    begin
+        if (DocNoFilter = '') and (PostingDateFilter = '') then
+            exit;
+        if VoucherEntry.ReadPermission() then begin
+            VoucherEntry.SetFilter("Document No.", DocNoFilter);
+            VoucherEntry.SetFilter("Posting Date", PostingDateFilter);
+#if BC17
+            Navigate.InsertIntoDocEntry(DocumentEntry, Database::"NPR NpRv Voucher Entry", DocumentEntry."Document Type"::" ", VoucherEntry.TableCaption(), VoucherEntry.Count());
+#else
+            Navigate.InsertIntoDocEntry(DocumentEntry, Database::"NPR NpRv Voucher Entry", VoucherEntry.TableCaption(), VoucherEntry.Count());
+#endif
+        end;
+        if ArchVoucherEntry.ReadPermission() then begin
+            ArchVoucherEntry.SetFilter("Document No.", DocNoFilter);
+            ArchVoucherEntry.SetFilter("Posting Date", PostingDateFilter);
+#if BC17
+            Navigate.InsertIntoDocEntry(DocumentEntry, Database::"NPR NpRv Arch. Voucher Entry", DocumentEntry."Document Type"::" ", ArchVoucherEntry.TableCaption(), ArchVoucherEntry.Count());
+#else
+            Navigate.InsertIntoDocEntry(DocumentEntry, Database::"NPR NpRv Arch. Voucher Entry", ArchVoucherEntry.TableCaption(), ArchVoucherEntry.Count());
+#endif
+        end;
+    end;
+
+#if BC17 or BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Page, Page::Navigate, 'OnAfterNavigateShowRecords', '', true, true)]
+#else
+    [EventSubscriber(ObjectType::Page, Page::Navigate, OnAfterNavigateShowRecords, '', true, true)]
+#endif
+    local procedure Navigate_ShowRetailVoucherEntries(TableID: Integer; DocNoFilter: Text; PostingDateFilter: Text)
+    var
+        ArchVoucherEntry: Record "NPR NpRv Arch. Voucher Entry";
+        VoucherEntry: Record "NPR NpRv Voucher Entry";
+    begin
+        if (DocNoFilter = '') and (PostingDateFilter = '') then
+            exit;
+        case TableID of
+            Database::"NPR NpRv Voucher Entry":
+                begin
+                    if VoucherEntry.SetCurrentKey("Document No.", "Posting Date") then;
+                    VoucherEntry.SetFilter("Document No.", DocNoFilter);
+                    VoucherEntry.SetFilter("Posting Date", PostingDateFilter);
+                    Page.Run(0, VoucherEntry);
+                end;
+            Database::"NPR NpRv Arch. Voucher Entry":
+                begin
+                    if ArchVoucherEntry.SetCurrentKey("Document No.", "Posting Date") then;
+                    ArchVoucherEntry.SetFilter("Document No.", DocNoFilter);
+                    ArchVoucherEntry.SetFilter("Posting Date", PostingDateFilter);
+                    Page.Run(0, ArchVoucherEntry);
+                end;
+        end;
     end;
 
     local procedure SendVoucher(SalePOS: Record "NPR POS Sale")
@@ -216,75 +279,114 @@
     local procedure IssueVoucher(var NpRvSalesLine: Record "NPR NpRv Sales Line"; VoucherType: Record "NPR NpRv Voucher Type"; SignFactor: Integer; VoucherAmount: Decimal; VoucherQty: Decimal)
     var
         NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
-        i: Integer;
+        Voucher: Record "NPR NpRv Voucher";
+        IssuedVoucherQty: Integer;
     begin
         if VoucherAmount <= 0 then
             exit;
         if VoucherQty <= 0 then
             exit;
 
-        for i := 1 to VoucherQty do begin
-            Clear(NpRvSalesLineReference);
-            NpRvSalesLineReference.SetRange("Sales Line Id", NpRvSalesLine.Id);
-            if NpRvSalesLineReference.FindFirst() then;
+        IssuedVoucherQty := 0;
+        NpRvSalesLineReference.SetRange("Sales Line Id", NpRvSalesLine.Id);
+        NpRvSalesLineReference.SetRange(Posted, false);
+        if NpRvSalesLineReference.FindSet() then
+            repeat
+                IssueVoucher(VoucherType, VoucherAmount * SignFactor, NpRvSalesLine, NpRvSalesLineReference);
+                IssuedVoucherQty += 1;
+            until (NpRvSalesLineReference.Next() = 0) or (IssuedVoucherQty = VoucherQty);
 
-            IssueVoucher(VoucherType, VoucherAmount * SignFactor, NpRvSalesLine, NpRvSalesLineReference);
+        if IssuedVoucherQty < VoucherQty then begin
+            Clear(NpRvSalesLineReference.Id);
+            NpRvSalesLineReference."Sales Line Id" := NpRvSalesLine.Id;
+            NpRvSalesLineReference."Voucher No." := NpRvSalesLine."Voucher No.";
+            NpRvSalesLineReference."Reference No." := NpRvSalesLine."Reference No.";
+            NpRvSalesLineReference.Posted := false;
+            while IssuedVoucherQty < VoucherQty do begin
+                if (NpRvSalesLine.Type = NpRvSalesLine.Type::"New Voucher") and (NpRvSalesLineReference."Voucher No." <> '') then
+                    if Voucher.Get(NpRvSalesLineReference."Voucher No.") then begin
+                        NpRvSalesLineReference."Voucher No." := '';
+                        NpRvSalesLineReference."Reference No." := '';
+                    end;
+                IssueVoucher(VoucherType, VoucherAmount * SignFactor, NpRvSalesLine, NpRvSalesLineReference);
+                IssuedVoucherQty += 1;
+            end;
         end;
+
+        if NpRvSalesLineReference.IsEmpty() and (IssuedVoucherQty > 0) then
+            MarkRetailVoucherSalesLineAsPosted(NpRvSalesLine.Id);
     end;
 
     local procedure IssueVoucher(VoucherType: Record "NPR NpRv Voucher Type"; VoucherAmount: Decimal; var NpRvSalesLine: Record "NPR NpRv Sales Line"; var NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.")
     var
         Voucher: Record "NPR NpRv Voucher";
-        PrevVoucher: Text;
     begin
         case true of
             (NpRvSalesLine."Document Source" = NpRvSalesLine."Document Source"::"Sales Document") and NpRvSalesLine.IsCreditDocType(),
             NpRvSalesLine.Type = NpRvSalesLine.Type::"Top-up":
-                Voucher.Get(NpRvSalesLine."Voucher No.");
+                Voucher.Get(NpRvSalesLineReference."Voucher No.");
 
             NpRvSalesLine.Type = NpRvSalesLine.Type::"New Voucher":
-                begin
-                    if NpRvSalesLineReference."Reference No." = '' then
-                        VoucherType.TestField("Reference No. Pattern");
-
-                    Voucher.Init();
-                    if NpRvSalesLine."Starting Date" > CurrentDateTime then
-                        Voucher."Starting Date" := NpRvSalesLine."Starting Date";
-                    Voucher.Validate("Voucher Type", VoucherType.Code);
-                    Voucher."No." := NpRvSalesLineReference."Voucher No.";
-                    Voucher."Reference No." := NpRvSalesLineReference."Reference No.";
-                    OnBeforeInsertIssuedVoucher(Voucher, NpRvSalesLine);
-                    Voucher.Insert(true);
-
-                    PrevVoucher := Format(Voucher);
-                    Voucher.Description := CopyStr(Voucher."Reference No." + ' ' + VoucherType.Description, 1, MaxStrLen(Voucher.Description));
-                    Voucher."Customer No." := NpRvSalesLine."Customer No.";
-                    Voucher."Contact No." := NpRvSalesLine."Contact No.";
-                    Voucher.Name := NpRvSalesLine.Name;
-                    Voucher."Name 2" := NpRvSalesLine."Name 2";
-                    Voucher.Address := NpRvSalesLine.Address;
-                    Voucher."Address 2" := NpRvSalesLine."Address 2";
-                    Voucher."Post Code" := NpRvSalesLine."Post Code";
-                    Voucher.City := NpRvSalesLine.City;
-                    Voucher.County := NpRvSalesLine.County;
-                    Voucher."Country/Region Code" := NpRvSalesLine."Country/Region Code";
-                    Voucher."E-mail" := NpRvSalesLine."E-mail";
-                    Voucher."Phone No." := NpRvSalesLine."Phone No.";
-                    Voucher."Send via Print" := NpRvSalesLine."Send via Print";
-                    Voucher."Send via E-mail" := NpRvSalesLine."Send via E-mail";
-                    Voucher."Send via SMS" := NpRvSalesLine."Send via SMS";
-                    Voucher."Voucher Message" := NpRvSalesLine."Voucher Message";
-                    OnBeforeModifyIssuedVoucher(Voucher, NpRvSalesLine, VoucherType);
-                    if PrevVoucher <> Format(Voucher) then
-                        Voucher.Modify(true);
+                if (NpRvSalesLineReference."Voucher No." = '') or not Voucher.Get(NpRvSalesLineReference."Voucher No.") then begin
+                    InsertIssuedVoucher(VoucherType, NpRvSalesLine, NpRvSalesLineReference."Voucher No.", NpRvSalesLineReference."Reference No.", Voucher);
                 end;
         end;
 
-        if NpRvSalesLineReference.Find() then
-            NpRvSalesLineReference.Delete();
-
         PostIssueVoucher(Voucher, VoucherType, VoucherAmount, NpRvSalesLine);
-        MarkRetailVoucherSalesLineAsPosted(NpRvSalesLine.Id);
+
+        if NpRvSalesLineReference.Find() then begin
+            NpRvSalesLineReference.Posted := true;
+            NpRvSalesLineReference.Modify();
+        end;
+    end;
+
+    local procedure InsertIssuedVoucher(VoucherType: Record "NPR NpRv Voucher Type"; NpRvSalesLine: Record "NPR NpRv Sales Line"; VoucherNo: Code[20]; ReferenceNo: Text[50]; var Voucher: Record "NPR NpRv Voucher")
+    begin
+        InitVoucher(VoucherType, VoucherNo, ReferenceNo, NpRvSalesLine."Starting Date", false, Voucher);
+        OnBeforeInsertIssuedVoucher(Voucher, NpRvSalesLine);
+        Voucher.Insert(true);
+
+        UpdateVoucherFromRvSalesLine(NpRvSalesLine, false, Voucher);
+        OnBeforeModifyIssuedVoucher(Voucher, NpRvSalesLine, VoucherType);
+        Voucher.Modify(true);
+    end;
+
+    internal procedure InitVoucher(VoucherType: Record "NPR NpRv Voucher Type"; VoucherNo: Code[20]; ReferenceNo: Text[50]; StartDateTime: DateTime; InsertVoucherRec: Boolean; var Voucher: Record "NPR NpRv Voucher")
+    begin
+        Clear(Voucher);
+        if StartDateTime > CurrentDateTime() then
+            Voucher."Starting Date" := StartDateTime;
+        Voucher.Validate("Voucher Type", VoucherType.Code);
+        Voucher."No." := VoucherNo;
+        Voucher.TestVoucherNo();
+        Voucher."Reference No." := ReferenceNo;
+        Voucher.TestReferenceNo();
+        Voucher.Description := CopyStr(Voucher."Reference No." + ' ' + VoucherType.Description, 1, MaxStrLen(Voucher.Description));
+
+        if InsertVoucherRec then
+            Voucher.Insert(true);
+    end;
+
+    internal procedure UpdateVoucherFromRvSalesLine(NpRvSalesLine: Record "NPR NpRv Sales Line"; ModifyVoucherRec: Boolean; var Voucher: Record "NPR NpRv Voucher")
+    begin
+        Voucher."Customer No." := NpRvSalesLine."Customer No.";
+        Voucher."Contact No." := NpRvSalesLine."Contact No.";
+        Voucher.Name := NpRvSalesLine.Name;
+        Voucher."Name 2" := NpRvSalesLine."Name 2";
+        Voucher.Address := NpRvSalesLine.Address;
+        Voucher."Address 2" := NpRvSalesLine."Address 2";
+        Voucher."Post Code" := NpRvSalesLine."Post Code";
+        Voucher.City := NpRvSalesLine.City;
+        Voucher.County := NpRvSalesLine.County;
+        Voucher."Country/Region Code" := NpRvSalesLine."Country/Region Code";
+        Voucher."E-mail" := NpRvSalesLine."E-mail";
+        Voucher."Phone No." := NpRvSalesLine."Phone No.";
+        Voucher."Send via Print" := NpRvSalesLine."Send via Print";
+        Voucher."Send via E-mail" := NpRvSalesLine."Send via E-mail";
+        Voucher."Send via SMS" := NpRvSalesLine."Send via SMS";
+        Voucher."Voucher Message" := NpRvSalesLine."Voucher Message";
+        if ModifyVoucherRec then
+            Voucher.Modify(true);
     end;
 
     local procedure FindMagentoPaymentLine(NpRvSalesLine: Record "NPR NpRv Sales Line"; var MagentoPaymentLine: Record "NPR Magento Payment Line"): Boolean
@@ -361,7 +463,12 @@
                     VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::"Issue Voucher";
                 end;
             NpRvSalesLine.Type::"Top-up":
-                VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::"Top-up";
+                begin
+                    if not InitialEntryExists(Voucher) then
+                        VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::"Issue Voucher"
+                    else
+                        VoucherEntry."Entry Type" := VoucherEntry."Entry Type"::"Top-up";
+                end;
             NpRvSalesLine.Type::"Partner Issue Voucher":
                 begin
                     if not VoucherEntry.Correction then
@@ -375,7 +482,9 @@
         VoucherEntry.Amount := VoucherAmount;
         VoucherEntry."Remaining Amount" := VoucherEntry.Amount;
         VoucherEntry.Positive := VoucherEntry.Amount > 0;
-        VoucherEntry."Posting Date" := Workdate();
+        if NpRvSalesLine."Sale Date" = 0D then
+            NpRvSalesLine."Sale Date" := WorkDate();
+        VoucherEntry."Posting Date" := NpRvSalesLine."Sale Date";
         VoucherEntry.Open := VoucherEntry.Amount <> 0;
         VoucherEntry."Register No." := NpRvSalesLine."Register No.";
         if POSUnit.Get(VoucherEntry."Register No.") then
@@ -400,6 +509,9 @@
                     VoucherEntry."External Document No." := NpRvSalesLine."External Document No.";
                 end;
         end;
+#if not BC17
+        VoucherEntry."Spfy Initiated in Shopify" := NpRvSalesLine."Spfy Initiated in Shopify";
+#endif
         VoucherEntry."Partner Code" := VoucherType."Partner Code";
         VoucherEntry."User ID" := CopyStr(UserId, 1, MaxStrLen(VoucherEntry."User ID"));
         VoucherEntry."Closed by Entry No." := 0;
@@ -418,7 +530,6 @@
             ExtendVoucherEndingDate(VoucherEntry."Posting Date", Voucher);
     end;
 
-
     local procedure PostIssueForeignVoucher(Voucher: Record "NPR NpRv Voucher"; VoucherType: Record "NPR NpRv Voucher Type"; VoucherAmount: Decimal; var NpRvSalesLine: Record "NPR NpRv Sales Line")
     var
         VoucherEntry: Record "NPR NpRv Voucher Entry";
@@ -434,7 +545,9 @@
         VoucherEntry.Amount := VoucherAmount;
         VoucherEntry."Remaining Amount" := VoucherEntry.Amount;
         VoucherEntry.Positive := VoucherEntry.Amount > 0;
-        VoucherEntry."Posting Date" := WorkDate();
+        if NpRvSalesLine."Sale Date" = 0D then
+            NpRvSalesLine."Sale Date" := WorkDate();
+        VoucherEntry."Posting Date" := NpRvSalesLine."Sale Date";
         VoucherEntry.Open := VoucherEntry.Amount <> 0;
         VoucherEntry."Register No." := NpRvSalesLine."Register No.";
         if POSUnit.Get(VoucherEntry."Register No.") then
@@ -812,6 +925,9 @@
         ArchVoucherEntry."Partner Clearing" := VoucherEntry."Partner Clearing";
         ArchVoucherEntry.Correction := VoucherEntry.Correction;
         ArchVoucherEntry."Closed by Entry No." := VoucherEntry."Closed by Entry No.";
+#if not BC17
+        ArchVoucherEntry."Spfy Initiated in Shopify" := VoucherEntry."Spfy Initiated in Shopify";
+#endif
         OnBeforeInsertArchiveEntry(ArchVoucherEntry, VoucherEntry);
         ArchVoucherEntry.Insert();
     end;
@@ -1084,35 +1200,15 @@
         NpRvSalesLineReference.SetRange("Sales Line Id", NpRvSalesLine.Id);
     end;
 
-    procedure GenerateTempVoucher(VoucherType: Record "NPR NpRv Voucher Type"; var TempVoucher: Record "NPR NpRv Voucher" temporary)
+    procedure GenerateTempVoucher(VoucherType: Record "NPR NpRv Voucher Type"; var TempVoucher: Record "NPR NpRv Voucher")
     begin
         GenerateTempVoucher(VoucherType, TempVoucher, '');
     end;
 
-    internal procedure GenerateTempVoucher(VoucherType: Record "NPR NpRv Voucher Type"; var TempVoucher: Record "NPR NpRv Voucher" temporary; CustomRefereceNo: Text[50])
-    var
-        NoSeriesMgt: Codeunit NoSeriesManagement;
-        ReferenceNo: Text;
-        ReferenceErr: Label 'Generated reference no. %1 is too long. Max length is %2.';
+    internal procedure GenerateTempVoucher(VoucherType: Record "NPR NpRv Voucher Type"; var TempVoucher: Record "NPR NpRv Voucher"; CustomRefereceNo: Text[50])
     begin
-        CheckVoucherTypeQty(VoucherType.Code);
-
-        TempVoucher.Init();
-        TempVoucher."No." := '';
-        TempVoucher.Validate("Voucher Type", VoucherType.Code);
-        if VoucherType."No. Series" <> '' then
-            NoSeriesMgt.InitSeries(TempVoucher."No. Series", '', 0D, TempVoucher."No.", TempVoucher."No. Series");
-
-        if CustomRefereceNo <> '' then
-            ReferenceNo := CustomRefereceNo
-        else
-            ReferenceNo := GenerateReferenceNo(TempVoucher);
-
-        if StrLen(ReferenceNo) > MaxStrLen(TempVoucher."Reference No.") then
-            Error(ReferenceErr, ReferenceNo, MaxStrLen(TempVoucher."Reference No."))
-        else
-            TempVoucher."Reference No." := CopyStr(ReferenceNo, 1, MaxStrLen(TempVoucher."Reference No."));
-        TempVoucher.Description := CopyStr(TempVoucher."Reference No." + ' ' + VoucherType.Description, 1, MaxStrLen(TempVoucher.Description));
+        CheckVoucherTypeQty(VoucherType);
+        InitVoucher(VoucherType, '', CustomRefereceNo, 0DT, false, TempVoucher);
         OnAfterGenerateTempVoucher(VoucherType, TempVoucher);
     end;
 
@@ -1125,12 +1221,12 @@
         case VoucherType."Reference No. Type" of
             VoucherType."Reference No. Type"::Pattern:
                 begin
-                    ReferenceNo := GenerateReferenceNoPattern(Voucher);
+                    ReferenceNo := GenerateReferenceNoPattern(Voucher, VoucherType);
                     exit(ReferenceNo);
                 end;
             VoucherType."Reference No. Type"::EAN13:
                 begin
-                    ReferenceNo := GenerateReferenceNoEAN13(Voucher);
+                    ReferenceNo := GenerateReferenceNoEAN13(Voucher, VoucherType);
                     exit(ReferenceNo);
                 end;
         end;
@@ -1138,14 +1234,13 @@
         exit('');
     end;
 
-    local procedure GenerateReferenceNoPattern(Voucher: Record "NPR NpRv Voucher") ReferenceNo: Text
+    local procedure GenerateReferenceNoPattern(Voucher: Record "NPR NpRv Voucher"; VoucherType: Record "NPR NpRv Voucher Type") ReferenceNo: Text
     var
-        VoucherType: Record "NPR NpRv Voucher Type";
         i: Integer;
     begin
-        VoucherType.Get(Voucher."Voucher Type");
         if VoucherType."Reference No. Type" <> VoucherType."Reference No. Type"::Pattern then
             exit('');
+        VoucherType.TestField("Reference No. Pattern");
 
         for i := 1 to 100 do begin
             ReferenceNo := GenerateReferenceNo(VoucherType."Reference No. Pattern", Voucher."No.", MaxStrLen(Voucher."Reference No."));
@@ -1155,16 +1250,15 @@
         Error(DuplicateRefNoErr, Voucher."No.", VoucherType.Code, VoucherType."Reference No. Pattern");
     end;
 
-    local procedure GenerateReferenceNoEAN13(Voucher: Record "NPR NpRv Voucher") ReferenceNo: Text
+    local procedure GenerateReferenceNoEAN13(Voucher: Record "NPR NpRv Voucher"; VoucherType: Record "NPR NpRv Voucher Type") ReferenceNo: Text
     var
-        VoucherType: Record "NPR NpRv Voucher Type";
         i: Integer;
         CheckSum: Integer;
         InvalidReferenceNoLength: Label 'Invalid EAN13: %1. Reference No. length cannot exceed more than 12 characters.', Comment = '%1=ReferenceNo';
     begin
-        VoucherType.Get(Voucher."Voucher Type");
         if VoucherType."Reference No. Type" <> VoucherType."Reference No. Type"::EAN13 then
             exit('');
+        VoucherType.TestField("Reference No. Pattern");
 
         for i := 1 to 100 do begin
             ReferenceNo := GenerateReferenceNo(VoucherType."Reference No. Pattern", Voucher."No.", MaxStrLen(Voucher."Reference No."));
@@ -1426,20 +1520,11 @@
 
     local procedure InsertForeignVoucher(var Voucher: Record "NPR NpRv Voucher"; VoucherType: Record "NPR NpRv Voucher Type"; VoucherNumber: Text)
     var
-        NoSeriesMgt: Codeunit NoSeriesManagement;
         TooLongErr: Label 'Voucher %1 is too long. Max length is %2';
     begin
-        Voucher.Init();
-        Voucher."No." := '';
-        Voucher.Validate("Voucher Type", VoucherType.Code);
-        if VoucherType."No. Series" <> '' then
-            NoSeriesMgt.InitSeries(Voucher."No. Series", '', 0D, Voucher."No.", Voucher."No. Series");
         if StrLen(VoucherNumber) > MaxStrLen(Voucher."Reference No.") then
             Error(TooLongErr, VoucherNumber, MaxStrLen(Voucher."Reference No."));
-        Voucher."Reference No." := CopyStr(VoucherNumber, 1, MaxStrLen(Voucher."Reference No."));
-        Voucher.Description := CopyStr(Voucher."Reference No." + ' ' + VoucherType.Description, 1, MaxStrLen(Voucher.Description));
-
-        Voucher.Insert();
+        InitVoucher(VoucherType, '', CopyStr(VoucherNumber, 1, MaxStrLen(Voucher."Reference No.")), 0DT, true, Voucher);
     end;
 
     local procedure DeleteExternalVoucher(POSSaleLine: Record "NPR POS Sale Line"; var NpRvSalesLine: Record "NPR NpRv Sales Line")
@@ -1554,9 +1639,15 @@
     procedure CheckVoucherTypeQty(VoucherTypeCode: Code[20])
     var
         VoucherType: Record "NPR NpRv Voucher Type";
-        MaxCountErr: Label '%1 for %2 %3 is exceeded.';
     begin
         VoucherType.Get(VoucherTypeCode);
+        CheckVoucherTypeQty(VoucherType);
+    end;
+
+    procedure CheckVoucherTypeQty(VoucherType: Record "NPR NpRv Voucher Type")
+    var
+        MaxCountErr: Label '%1 for %2 %3 is exceeded.';
+    begin
         if VoucherType."Max Voucher Count" = 0 then
             exit;
         VoucherType.CalcFields("Voucher Qty. (Open)", "Voucher Qty. (Closed)", "Arch. Voucher Qty.");
@@ -1575,6 +1666,7 @@
         POSPaymentMethod: Record "NPR POS Payment Method";
         TempVoucher: Record "NPR NpRv Voucher" temporary;
         CurrentPOSPaymentMethod: Record "NPR POS Payment Method";
+        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
@@ -1650,13 +1742,8 @@
         NpRvSalesLine.Insert();
 
         SetSalesLineReferenceFilter(NpRvSalesLine, NpRvSalesLineReference);
-        if NpRvSalesLineReference.IsEmpty then begin
-            NpRvSalesLineReference.Init();
-            NpRvSalesLineReference.Id := CreateGuid();
-            NpRvSalesLineReference."Voucher No." := TempVoucher."No.";
-            NpRvSalesLineReference."Reference No." := TempVoucher."Reference No.";
-            NpRvSalesLineReference."Sales Line Id" := NpRvSalesLine.Id;
-            NpRvSalesLineReference.Insert();
+        if NpRvSalesLineReference.IsEmpty() then begin
+            NpRvSalesDocMgt.InsertNpRVSalesLineReference(NpRvSalesLine, TempVoucher);
 
             SaleLinePOS.Description := TempVoucher.Description;
             SaleLinePOS.Modify();
@@ -1779,35 +1866,13 @@
         VoucherTypeCode := CopyStr(VoucherType, 1, MaxStrLen(VoucherTypeCode));
     end;
 
-    local procedure GenerateVoucherWithReference(VoucherType: Record "NPR NpRv Voucher Type"; var Voucher: Record "NPR NpRv Voucher"; ReferenceNo: Text[50])
-    var
-        NoSeriesMgt: Codeunit NoSeriesManagement;
-        DuplicateReferenceNoErr: Label 'System could not generate a unique reference number for voucher %1 (voucher type %2).', Comment = '%1 - voucher number, %2 - voucher type';
-    begin
-        Voucher.Init();
-        Voucher."No." := '';
-        Voucher.Validate("Voucher Type", VoucherType.Code);
-        if VoucherType."No. Series" <> '' then
-            NoSeriesMgt.InitSeries(Voucher."No. Series", '', 0D, Voucher."No.", Voucher."No. Series");
-
-        if not CheckReferenceNoHasNotBeenUsedBefore(Voucher."No.", ReferenceNo) then
-            Error(DuplicateReferenceNoErr, Voucher."No.", VoucherType.Code);
-
-        Voucher."Reference No." := ReferenceNo;
-        Voucher.Description := CopyStr(Voucher."Reference No." + ' ' + VoucherType.Description, 1, MaxStrLen(Voucher.Description));
-        Voucher.Insert();
-    end;
-
     procedure IssueVoucher(VoucherTypeCode: Code[20]; ReferenceNo: Text[50]; VoucherAmount: Decimal)
     var
         Voucher: Record "NPR NpRv Voucher";
         VoucherType: Record "NPR NpRv Voucher Type";
     begin
         VoucherType.Get(VoucherTypeCode);
-        CheckVoucherTypeQty(VoucherType.Code);
-
-        GenerateVoucherWithReference(VoucherType, Voucher, ReferenceNo);
-
+        InitVoucher(VoucherType, '', ReferenceNo, 0DT, true, Voucher);
         PostIssueVoucherEntry(Voucher, VoucherAmount, VoucherType);
     end;
 
@@ -1986,7 +2051,6 @@
         Found := true;
     end;
     #endregion
-
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertIssuedVoucher(var Voucher: Record "NPR NpRv Voucher"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line")
