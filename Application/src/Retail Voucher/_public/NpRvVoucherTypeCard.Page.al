@@ -367,6 +367,7 @@
                             ShopifyStore.Find('=><');
                             ShopifyStoreCode := ShopifyStore.Code;
                         end;
+                        Rec.CheckVoucherTypeIsNotInUse(ShopifyStoreCode);
                         SpfyAssignedIDMgt.AssignShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Store Code", ShopifyStoreCode, false);
                     end;
                 }

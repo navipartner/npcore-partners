@@ -293,6 +293,24 @@ pageextension 6014412 "NPR Sales Credit Memo" extends "Sales Credit Memo"
     {
         addlast(navigation)
         {
+            group("NPR Retail")
+            {
+                Caption = 'Retail';
+                action("NPR Retail Vouchers")
+                {
+                    Caption = 'Retail Vouchers';
+                    Image = Certificate;
+                    ToolTip = 'View retail vouchers for this document.';
+                    ApplicationArea = NPRRetail;
+
+                    trigger OnAction()
+                    var
+                        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
+                    begin
+                        NpRvSalesDocMgt.ShowRelatedVouchersAction(Rec);
+                    end;
+                }
+            }
             group("NPR PayByLink")
             {
                 Caption = 'Payments';

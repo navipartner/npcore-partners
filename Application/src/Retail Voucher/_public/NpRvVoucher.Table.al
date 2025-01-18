@@ -458,19 +458,11 @@
 
     trigger OnInsert()
     var
-        VoucherType: Record "NPR NpRv Voucher Type";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
     begin
         TestField("Voucher Type");
         NpRvVoucherMgt.CheckVoucherTypeQty("Voucher Type");
-
-        if "No." = '' then begin
-            VoucherType.Get("Voucher Type");
-            VoucherType.TestField("No. Series");
-            NoSeriesMgt.InitSeries(VoucherType."No. Series", xRec."No. Series", 0D, "No.", "No. Series");
-        end;
-        TestField("No.");
+        TestVoucherNo();
         TestReferenceNo();
     end;
 
@@ -478,6 +470,42 @@
     begin
         TestField("Voucher Type");
         TestReferenceNo();
+    end;
+
+    local procedure AssignVoucherNo()
+    var
+        VoucherType: Record "NPR NpRv Voucher Type";
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23)
+        Voucher2: Record "NPR NpRv Voucher";
+        NoSeries: Codeunit "No. Series";
+#else
+        NoSeriesMgt: Codeunit NoSeriesManagement;
+#endif
+    begin
+        if "No." <> '' then
+            exit;
+        if "No. Series" = '' then begin
+            VoucherType.Get("Voucher Type");
+            VoucherType.TestField("No. Series");
+            "No. Series" := VoucherType."No. Series";
+        end;
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23)
+        if NoSeries.AreRelated("No. Series", xRec."No. Series") then
+            "No. Series" := xRec."No. Series";
+        "No." := NoSeries.GetNextNo("No. Series");
+        Voucher2.ReadIsolation := IsolationLevel::ReadUncommitted;
+        Voucher2.SetLoadFields("No.");
+        while Voucher2.Get("No.") do
+            "No." := NoSeries.GetNextNo("No. Series");
+#else
+        NoSeriesMgt.InitSeries("No. Series", xRec."No. Series", 0D, "No.", "No. Series");
+#endif
+    end;
+
+    internal procedure TestVoucherNo()
+    begin
+        AssignVoucherNo();
+        TestField("No.");
     end;
 
     local procedure InitReferenceNo()
@@ -488,13 +516,13 @@
     begin
         ReferenceNo := VoucherMgt.GenerateReferenceNo(Rec);
         if StrLen(ReferenceNo) > MaxStrLen("Reference No.") then
-            Error(ReferenceNoErr, Rec."Voucher Type") else
-            "Reference No." := CopyStr(ReferenceNo, 1, MaxStrLen("Reference No."));
+            Error(ReferenceNoErr, Rec."Voucher Type");
+        "Reference No." := CopyStr(ReferenceNo, 1, MaxStrLen("Reference No."));
     end;
 
-    local procedure TestReferenceNo()
+    internal procedure TestReferenceNo()
     var
-        Voucher: Record "NPR NpRv Voucher";
+        VoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         ReferenceAlreadyUsedErr: Label 'Reference No. %1 is already used.', Comment = '%1 = Reference no.';
     begin
         if "Reference No." = '' then
@@ -502,11 +530,7 @@
 
         TestField("Reference No.");
 
-
-        Voucher.SetCurrentKey("Reference No.");
-        Voucher.SetRange("Reference No.", "Reference No.");
-        Voucher.SetFilter("No.", '<>%1', "No.");
-        if not Voucher.IsEmpty() then
+        if not VoucherMgt.CheckReferenceNoHasNotBeenUsedBefore("No.", "Reference No.") then
             Error(ReferenceAlreadyUsedErr, "Reference No.");
     end;
 
@@ -555,9 +579,11 @@
         VoucherType.Get("Voucher Type");
         Description := VoucherType.Description;
 
-        "Starting Date" := VoucherType."Starting Date";
-        if "Starting Date" = 0DT then
-            "Starting Date" := CreateDateTime(Today, 0T);
+        if "Starting Date" = 0DT then begin
+            "Starting Date" := VoucherType."Starting Date";
+            if "Starting Date" = 0DT then
+                "Starting Date" := CreateDateTime(Today, 0T);
+        end;
 
         "Ending Date" := VoucherType."Ending Date";
         if ((Format(VoucherType."Valid Period") <> '') and ("Ending Date" = 0DT)) then

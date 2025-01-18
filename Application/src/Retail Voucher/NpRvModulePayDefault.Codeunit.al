@@ -71,7 +71,6 @@
         NpRvVoucher: Record "NPR NpRv Voucher";
         NpRvVoucherTypeNew: Record "NPR NpRv Voucher Type";
         NpRvSalesLineNew: Record "NPR NpRv Sales Line";
-        NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
         NpRvReturnVoucherType: Record "NPR NpRv Ret. Vouch. Type";
         POSPaymentMethod: Record "NPR POS Payment Method";
         TempNpRvVoucher: Record "NPR NpRv Voucher" temporary;
@@ -199,12 +198,7 @@
             NpRvSalesLineNew."Send via E-mail" := true;
         NpRvSalesLineNew.Insert(true);
 
-        NpRvSalesLineReference.Init();
-        NpRvSalesLineReference.Id := CreateGuid();
-        NpRvSalesLineReference."Voucher No." := TempNpRvVoucher."No.";
-        NpRvSalesLineReference."Reference No." := TempNpRvVoucher."Reference No.";
-        NpRvSalesLineReference."Sales Line Id" := NpRvSalesLineNew.Id;
-        NpRvSalesLineReference.Insert(true);
+        NpRvSalesDocMgt.InsertNpRVSalesLineReference(NpRvSalesLineNew, TempNpRvVoucher);
     end;
 
     local procedure RemoveReturnVoucher(NpRvSalesLineParent: Record "NPR NpRv Sales Line")
@@ -232,10 +226,10 @@
         MagentoPaymentLineNew: Record "NPR Magento Payment Line";
         NpRvReturnVoucherType: Record "NPR NpRv Ret. Vouch. Type";
         NpRvSalesLineNew: Record "NPR NpRv Sales Line";
-        NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
         NpRvVoucherTypeNew: Record "NPR NpRv Voucher Type";
         POSPaymentMethod: Record "NPR POS Payment Method";
         TempNpRvVoucher: Record "NPR NpRv Voucher" temporary;
+        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         ReturnAmount: Decimal;
         LineNo: Integer;
@@ -319,12 +313,7 @@
             NpRvSalesLineNew."Send via E-mail" := true;
         NpRvSalesLineNew.Insert(true);
 
-        NpRvSalesLineReference.Init();
-        NpRvSalesLineReference.Id := CreateGuid();
-        NpRvSalesLineReference."Voucher No." := TempNpRvVoucher."No.";
-        NpRvSalesLineReference."Reference No." := TempNpRvVoucher."Reference No.";
-        NpRvSalesLineReference."Sales Line Id" := NpRvSalesLineNew.Id;
-        NpRvSalesLineReference.Insert(true);
+        NpRvSalesDocMgt.InsertNpRVSalesLineReference(NpRvSalesLineNew, TempNpRvVoucher);
     end;
 
     #region V3

@@ -158,6 +158,8 @@ codeunit 6184816 "NPR Spfy Retail Voucher Mgt."
                             Database::"NPR Nc Task":
                                 VoucherEntry."Voucher No." := CopyStr(NcTask."Record Value", 1, MaxStrLen(VoucherEntry."Voucher No."));
                         end;
+                    if VoucherEntry."Spfy Initiated in Shopify" and (VoucherEntry."Entry Type" in [VoucherEntry."Entry Type"::"Issue Voucher", VoucherEntry."Entry Type"::"Top-up"]) then
+                        exit(false);  //The entry was originally created in Shopify. No need to sync the changes from BC back to Shopify
                     Voucher."No." := VoucherEntry."Voucher No.";
                     if Voucher.Find() then
                         VoucherRecRef.GetTable(Voucher);

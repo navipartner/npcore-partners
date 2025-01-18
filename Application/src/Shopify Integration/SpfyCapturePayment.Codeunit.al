@@ -312,6 +312,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
             NpRvSalesLine."Voucher No." := NpRvVoucher."No.";
             NpRvSalesLine."Reference No." := NpRvVoucher."Reference No.";
             NpRvSalesLine.Description := NpRvVoucher.Description;
+            NpRvSalesLine."Spfy Initiated in Shopify" := true;
             NpRvSalesLine.Insert(true);
         end;
 

@@ -31,6 +31,11 @@
                 TestReferenceNo();
             end;
         }
+        field(40; Posted; Boolean)
+        {
+            Caption = 'Posted';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -38,9 +43,8 @@
         key(Key1; Id)
         {
         }
-        key(Key2; "Sales Line Id", "Voucher No.", "Reference No.")
-        {
-        }
+        key(Key2; "Sales Line Id", "Voucher No.", "Reference No.") { }
+        key(Key3; "Sales Line Id", Posted) { }
     }
 
     trigger OnInsert()

@@ -162,6 +162,16 @@ page 6184704 "NPR Spfy Store Card"
                     ToolTip = 'Specifies whether retail voucher integration is enabled. Retail vouchers are created as Shopify gift cards.';
                     ApplicationArea = NPRShopify;
                 }
+                field("Voucher Type (Sold at Shopify)"; Rec."Voucher Type (Sold at Shopify)")
+                {
+                    ToolTip = 'Specifies the voucher type to create retail vouchers in BC for gift cards sold directly on Shopify.';
+                    ApplicationArea = NPRShopify;
+
+                    trigger OnLookup(var Text: Text): Boolean
+                    begin
+                        exit(Rec.LookupVoucherType(Text));
+                    end;
+                }
             }
             group(SalesOrderIntegrationArea)
             {

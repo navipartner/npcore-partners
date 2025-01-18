@@ -289,7 +289,7 @@
         PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
         PaymentLine.SetRange("Document No.", SalesHeader."No.");
         PaymentLine.SetRange("Allow Adjust Amount", true);
-        exit(PaymentLine.FindFirst());
+        exit(not PaymentLine.IsEmpty());
     end;
 
     local procedure HasMagentoPayment(DocTableNo: Integer; DocType: Enum "Sales Document Type"; DocNo: Code[20]): Boolean
@@ -300,7 +300,7 @@
         PaymentLine.SetRange("Document Table No.", DocTableNo);
         PaymentLine.SetRange("Document Type", DocType);
         PaymentLine.SetRange("Document No.", DocNo);
-        exit(PaymentLine.FindFirst());
+        exit(not PaymentLine.IsEmpty());
     end;
 
     local procedure HasOpenEntry(PaymentLine: Record "NPR Magento Payment Line"): Boolean
@@ -318,7 +318,7 @@
         CustLedgerEntry.SetRange(Open, true);
         CustLedgerEntry.SetRange(Positive, PaymentLine.Amount >= 0);
         CustLedgerEntry.SetRange("Document No.", SalesInvHeader."No.");
-        exit(CustLedgerEntry.FindFirst());
+        exit(not CustLedgerEntry.IsEmpty());
     end;
 
     local procedure LastPostingDocExists(PaymentLine: Record "NPR Magento Payment Line"): Boolean

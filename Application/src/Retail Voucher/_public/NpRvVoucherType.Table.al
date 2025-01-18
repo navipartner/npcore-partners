@@ -309,12 +309,24 @@
         exit(CopyStr(SpfyAssignedIDMgt.GetAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Store Code"), 1, 20));
     end;
 
-    internal procedure CheckStoreIsAssigned(): Boolean
+    internal procedure CheckStoreIsAssigned()
     var
         StoreCodeMissingErr: Label 'You must assign a Shopify store to %1 %2.', Comment = '%1 - Table Caption, %2 - Code';
     begin
         if GetStoreCode() = '' then
             Error(StoreCodeMissingErr, TableCaption(), Code);
+    end;
+
+    internal procedure CheckVoucherTypeIsNotInUse(NewStoreCode: Code[20])
+    var
+        StoreCodeMissingErr: Label 'The voucher type has already been assigned to Shopify Store %1 as the type for vouchers sold directly on Shopify. Please remove this association before changing the store.', Comment = '%1 - Shopify store code';
+        SpfyStore: Record "NPR Spfy Store";
+    begin
+        SpfyStore.SetRange("Voucher Type (Sold at Shopify)", Code);
+        SpfyStore.SetFilter(Code, '<>%1', NewStoreCode);
+        SpfyStore.SetLoadFields(Code);
+        if SpfyStore.FindFirst() then
+            Error(StoreCodeMissingErr, SpfyStore.Code);
     end;
 
     local procedure CheckShopifySubscription(ShopifyStoreCode: Code[20])

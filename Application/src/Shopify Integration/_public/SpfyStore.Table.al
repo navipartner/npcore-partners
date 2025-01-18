@@ -239,6 +239,25 @@ table 6150810 "NPR Spfy Store"
                     _SpfyDataLogSubscrMgt.CreateDataLogSetup("NPR Spfy Integration Area"::"Retail Vouchers");
             end;
         }
+        field(131; "Voucher Type (Sold at Shopify)"; Code[20])
+        {
+            Caption = 'Voucher Type (Sold at Shopify)';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NpRv Voucher Type";
+
+            trigger OnValidate()
+            var
+                VoucherType: Record "NPR NpRv Voucher Type";
+                IncorrectVoucherStoreErr: Label 'You will need to assign the value "%1" as the Shopify Store Code for Retail Voucher Type "%2" before you can select it as the type of vouchers sold on Shopify for the store.', Comment = '%1 - Shopify store code, %2 - Retail voucher type code';
+            begin
+                if "Voucher Type (Sold at Shopify)" <> '' then begin
+                    VoucherType.Get("Voucher Type (Sold at Shopify)");
+                    VoucherType.TestField("Integrate with Shopify", true);
+                    if VoucherType.GetStoreCode() <> Code then
+                        Error(IncorrectVoucherStoreErr, Code, "Voucher Type (Sold at Shopify)");
+                end;
+            end;
+        }
         field(140; "Plan Display Name"; Text[50])
         {
             Caption = 'Shopify Plan';
@@ -342,6 +361,30 @@ table 6150810 "NPR Spfy Store"
         if "No. of Prices per Request" > 0 then
             exit("No. of Prices per Request");
         exit(100);
+    end;
+
+    internal procedure LookupVoucherType(var Text: Text): Boolean
+    var
+        VoucherType: Record "NPR NpRv Voucher Type";
+    begin
+        VoucherType.SetRange("Integrate with Shopify", true);
+        if VoucherType.FindSet() then
+            repeat
+                if VoucherType.GetStoreCode() = Code then
+                    VoucherType.Mark(true);
+            until VoucherType.Next() = 0;
+        VoucherType.MarkedOnly(true);
+
+        if not VoucherType.IsEmpty() and (Text <> '') then begin
+            VoucherType.Code := CopyStr(Text, 1, MaxStrLen(VoucherType.Code));
+            if VoucherType.Find('=><') then;
+        end;
+
+        if Page.RunModal(0, VoucherType) = Action::LookupOK then begin
+            Text := VoucherType.Code;
+            exit(true);
+        end;
+        exit(false);
     end;
 }
 #endif
