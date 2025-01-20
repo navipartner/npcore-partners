@@ -302,17 +302,20 @@ codeunit 6248223 "NPR MemberCardApiAgent"
 
 # pragma warning disable AA0139
         if (Body.Get('cardNumber', JToken)) then begin
-            MemberInfoCapture."External Card No." := JToken.AsValue().AsText();
+            if (not JToken.AsValue().IsNull()) then
+                MemberInfoCapture."External Card No." := JToken.AsValue().AsText();
             MemberInfoCapture.TestField("External Card No.");
         end;
 # pragma warning restore AA0139
 
         if (Body.Get('temporary', JToken)) then
-            MemberInfoCapture."Temporary Member Card" := JToken.AsValue().AsBoolean();
+            if (not JToken.AsValue().IsNull()) then
+                MemberInfoCapture."Temporary Member Card" := JToken.AsValue().AsBoolean();
 
         MemberInfoCapture."Valid Until" := CalcDate('<+10D>');
         if (Body.Get('expiryDate', JToken)) then
-            Evaluate(MemberInfoCapture."Valid Until", JToken.AsValue().AsText());
+            if (not JToken.AsValue().IsNull()) then
+                MemberInfoCapture."Valid Until" := JToken.AsValue().AsDate();
 
         if (StrLen(MemberInfoCapture."External Card No.") >= 4) then
             MemberInfoCapture."External Card No. Last 4" := CopyStr(CopyStr(MemberInfoCapture."External Card No.", StrLen(MemberInfoCapture."External Card No.") - 3), 1, 4);

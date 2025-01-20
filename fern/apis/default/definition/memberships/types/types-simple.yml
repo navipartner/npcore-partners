@@ -349,12 +349,18 @@ types:
       - name: ExampleGender
         value: male
 
+  NewsletterEnum:
+    enum:
+      - unknown
+      - yes
+      - no
+
   Newsletter:
-    type: boolean
+    type: NewsletterEnum
     docs: Indicates whether the member is subscribed to the newsletter.
     examples:
       - name: ExampleNewsletter
-        value: true
+        value: yes
 
   PhoneNo:
     type: string

@@ -47,9 +47,9 @@ codeunit 6248221 "NPR MembershipApiTranslation"
     begin
         case NewsLetter of
             Member."E-Mail News Letter"::YES:
-                exit('true');
+                exit('yes');
             Member."E-Mail News Letter"::NO:
-                exit('false');
+                exit('no');
             else
                 exit('unknown');
         end;
