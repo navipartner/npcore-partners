@@ -25,7 +25,9 @@ service:
       request:
         name: addMember
         body: AddMemberRequest
-      response: AddMemberResponse
+      response: 
+        type: AddMemberResponse
+        status-code: 201
       examples:
         - name: ExampleAddMember
           path-parameters:

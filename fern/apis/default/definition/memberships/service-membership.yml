@@ -20,9 +20,11 @@ service:
       request:
         name: createMembership
         body: CreateMembershipRequest
-      response: CreateMembershipResponse
+      response: 
+        type: CreateMembershipResponse
+        status-code: 201
       examples:
-        - name: ExampleMembership1
+        - name: Example Create Membership
           docs: Example response for the createMembership endpoint
           path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
@@ -205,3 +207,6 @@ types:
         value:
           membership: $compositeTypes.MembershipDTO.ExampleMembershipDTO
   
+errors:
+  UserNotFoundError:
+    status-code: 404
