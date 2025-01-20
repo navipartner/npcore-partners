@@ -194,6 +194,30 @@ codeunit 6184982 "NPR Json Builder"
         exit(AddPropertyInternal(PropertyName, PropertyValue));
     end;
 
+    /// <summary>
+    /// Add a property with a JSON value.
+    /// </summary>
+    /// <param name="PropertyName">Name of the key/property the JSON array will belong.</param>
+    /// <param name="PropertyValue">JSON value to be assigned to the property.</param>
+    /// <returns>Json Builder Codeunit itself.</returns>
+    procedure AddProperty(PropertyName: Text; PropertyValue: JsonValue): Codeunit "NPR Json Builder"
+    begin
+        exit(AddPropertyInternal(PropertyName, PropertyValue));
+    end;
+
+    /// <summary>
+    /// Add a property with a null value.
+    /// </summary>
+    /// <param name="PropertyName">Name of the key/property the JSON array will belong.</param>
+    /// <returns>Json Builder Codeunit itself.</returns>
+    procedure AddProperty(PropertyName: Text): Codeunit "NPR Json Builder"
+    var
+        JsonValue: JsonValue;
+    begin
+        JsonValue.SetValueToNull();
+        exit(AddPropertyInternal(PropertyName, JsonValue));
+    end;
+
     local procedure AddPropertyInternal(PropertyName: Text; PropertyValue: Variant): Codeunit "NPR Json Builder"
     var
         JValue: JsonValue;
@@ -244,6 +268,27 @@ codeunit 6184982 "NPR Json Builder"
     procedure AddValue(Value: DateTime): Codeunit "NPR Json Builder"
     begin
         exit(AddValueInternal(Value));
+    end;
+
+    /// <summary>
+    /// Add a value with a JSON value.
+    /// </summary>
+    /// <returns>Json Builder Codeunit itself.</returns>
+    procedure AddValue(Value: JsonValue): Codeunit "NPR Json Builder"
+    begin
+        exit(AddValueInternal(Value));
+    end;
+
+    /// <summary>
+    /// Add a value with a null value.
+    /// </summary>
+    /// <returns>Json Builder Codeunit itself.</returns>
+    procedure AddValue(): Codeunit "NPR Json Builder"
+    var
+        JsonValue: JsonValue;
+    begin
+        JsonValue.SetValueToNull();
+        exit(AddValueInternal(JsonValue));
     end;
 
     local procedure AddValueInternal(Value: Variant): Codeunit "NPR Json Builder"
@@ -363,6 +408,10 @@ codeunit 6184982 "NPR Json Builder"
                 begin
                     TextValue := Value;
                     JValue.SetValue(TextValue);
+                end;
+            Value.IsJsonValue:
+                begin
+                    JValue := Value;
                 end;
             else begin
                 TextValue := Format(Value);
