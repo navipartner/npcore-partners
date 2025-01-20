@@ -121,6 +121,9 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt." implements "NPR IPOS Workflow"
             Context.SetScopeRoot();
             Discount := Context.GetDecimal('discount_input');
         end;
+
+        NpRvModuleMgt.OnBeforeIssueVoucher(VoucherType, Quantity, Amount, DiscountType, Discount);
+
 #pragma warning disable AA0139
         IssueVoucherMgtB.IssueVoucherCreate(POSSaleLine, TempVoucher, VoucherType, DiscountType, Quantity, Amount, Discount, CustomReferenceNo);
 #pragma warning restore AA0139

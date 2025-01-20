@@ -112,5 +112,10 @@
     internal procedure OnBeforeIssueVoucherCheckCustomReferenceNo(var CustomReferenceNo: Text)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeIssueVoucher(VoucherType: Record "NPR NpRv Voucher Type"; var Quantity: Integer; var Amount: Decimal; var DiscountType: Text; var Discount: Decimal)
+    begin
+    end;
     #endregion
 }
