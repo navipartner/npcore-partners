@@ -146,7 +146,7 @@ service:
       docs: 
         Clears the printedAt field of a ticket using the ticketId.
       method: POST
-      path: /{ticketId}/unConfirmPrint
+      path: /{ticketId}/clearConfirmPrint
       path-parameters:
         ticketId: simpleTypes.TicketId
       request:
