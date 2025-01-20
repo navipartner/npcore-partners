@@ -1,3 +1,4 @@
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
 codeunit 6150977 "NPR UPG ItemRef. Disc Barcodes"
 {
     Access = Internal;
@@ -39,3 +40,4 @@ codeunit 6150977 "NPR UPG ItemRef. Disc Barcodes"
             until ItemReference.Next() = 0;
     end;
 }
+#endif

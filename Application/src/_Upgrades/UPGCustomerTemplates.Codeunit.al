@@ -1,4 +1,5 @@
-﻿codeunit 6150922 "NPR UPG Customer Templates"
+﻿#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
+codeunit 6150922 "NPR UPG Customer Templates"
 {
     Access = Internal;
     Subtype = Upgrade;
@@ -63,3 +64,4 @@
         CustomerTemplate.DeleteAll();
     end;
 }
+#endif
