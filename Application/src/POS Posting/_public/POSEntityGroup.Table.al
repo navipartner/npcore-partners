@@ -3,6 +3,9 @@
     Caption = 'POS Entity Group';
     DataClassification = CustomerContent;
     LookupPageID = "NPR POS Entity Groups";
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-01-21';
+    ObsoleteReason = 'Using POS Store Group instead.';
 
     fields
     {
