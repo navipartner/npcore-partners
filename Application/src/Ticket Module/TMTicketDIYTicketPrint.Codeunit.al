@@ -175,27 +175,45 @@
         Ticket: Record "NPR TM Ticket";
         TicketSetup: Record "NPR TM Ticket Setup";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        NpDesigner: Record "NPR NPDesignerSetup";
         FailReason: Text;
-        HpyperLinkLbl: Label '%1%2', Locked = true;
-        HpyperLink2Lbl: Label '%1%2-%3', Locked = true;
+        HyperLinkLbl: Label '%1%2', Locked = true;
+        HyperLink2Lbl: Label '%1%2-%3', Locked = true;
+        OnlineTicketNotAvailableErr: Label 'Online ticket not available';
     begin
 
-        Ticket.Get(TicketNo);
-
         TicketSetup.Get();
-        TicketSetup.TestField("Print Server Ticket URL");
-
-        if (not GenerateTicketPrint(Ticket."Ticket Reservation Entry No.", true, FailReason)) then
-            Error(FailReason);
-
-        HyperLink(StrSubstNo(HpyperLinkLbl, TicketSetup."Print Server Ticket URL", Ticket."External Ticket No."));
+        Ticket.Get(TicketNo);
         TicketReservationRequest.GET(Ticket."Ticket Reservation Entry No.");
-        case TicketReservationRequest."Entry Type" of
-            TicketReservationRequest."Entry Type"::PRIMARY:
-                HYPERLINK(STRSUBSTNO(HpyperLinkLbl, TicketSetup."Print Server Ticket URL", Ticket."External Ticket No."));
-            TicketReservationRequest."Entry Type"::CHANGE:
-                HYPERLINK(STRSUBSTNO(HpyperLink2Lbl, TicketSetup."Print Server Ticket URL", Ticket."External Ticket No.", Ticket."Ticket Reservation Entry No."));
+
+        if (NpDesigner.Get()) then begin
+            if (NpDesigner.PublicTicketURL <> '') then begin
+                TicketBom.SetFilter("Item No.", '=%1', Ticket."Item No.");
+                TicketBom.SetFilter(Default, '=%1', true);
+                TicketBom.SetFilter(NPDesignerTemplateId, '<>%1', '');
+                if (TicketBom.FindFirst()) then begin
+                    HyperLink(StrSubstNo(NpDesigner.PublicTicketURL, TicketReservationRequest."Session Token ID", TicketBom.NPDesignerTemplateId));
+                    exit;
+                end;
+            end;
         end;
+
+        if (TicketSetup."Print Server Ticket URL" <> '') then begin
+            if (not GenerateTicketPrint(Ticket."Ticket Reservation Entry No.", true, FailReason)) then
+                Error(FailReason);
+
+            HyperLink(StrSubstNo(HyperLinkLbl, TicketSetup."Print Server Ticket URL", Ticket."External Ticket No."));
+            case TicketReservationRequest."Entry Type" of
+                TicketReservationRequest."Entry Type"::PRIMARY:
+                    HYPERLINK(STRSUBSTNO(HyperLinkLbl, TicketSetup."Print Server Ticket URL", Ticket."External Ticket No."));
+                TicketReservationRequest."Entry Type"::CHANGE:
+                    HYPERLINK(STRSUBSTNO(HyperLink2Lbl, TicketSetup."Print Server Ticket URL", Ticket."External Ticket No.", Ticket."Ticket Reservation Entry No."));
+            end;
+            exit;
+        end;
+
+        Error(OnlineTicketNotAvailableErr);
     end;
 
     procedure ValidateSetup(): Boolean
