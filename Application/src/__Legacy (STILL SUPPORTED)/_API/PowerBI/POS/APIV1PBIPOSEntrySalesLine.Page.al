@@ -28,7 +28,10 @@ page 6060002 "NPR APIV1 PBIPOSEntrySalesLine"
                 {
                     Caption = 'POS Entry No.', Locked = true;
                 }
-
+                field(lineNo; Rec."Line No.")
+                {
+                    Caption = 'Line No.', Locked = true;
+                }
                 field(posStoreCode; Rec."POS Store Code")
                 {
                     Caption = 'POS Store Code', Locked = true;
@@ -85,6 +88,10 @@ page 6060002 "NPR APIV1 PBIPOSEntrySalesLine"
                 field(itemEntryNo; Rec."Item Entry No.")
                 {
                     Caption = 'Item Entry No.', Locked = true;
+                }
+                field(dimensionSetId; Rec."Dimension Set ID")
+                {
+                    Caption = 'Dimension Set ID', Locked = true;
                 }
                 field(shortcutDimension1Code; Rec."Shortcut Dimension 1 Code")
                 {
