@@ -504,6 +504,7 @@
         NpRvVoucherEntry: Record "NPR NpRv Voucher Entry";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesInvHeader: Record "Sales Invoice Header";
+        NpDcCouponModuleMgt: Codeunit "NPR NpDc Coupon Module Mgt.";
     begin
         if not SalesHeader.Invoice then
             exit;
@@ -526,6 +527,7 @@
             NpRvVoucherEntry."Entry Type"::"Issue Voucher", NpRvVoucherEntry."Entry Type"::Payment, NpRvVoucherEntry."Entry Type"::"Top-up");
         NpRvVoucherEntry.SetRange("Document Type", NpRvVoucherEntry."Document Type");
         NpRvVoucherEntry.SetRange("Document No.", NpRvVoucherEntry."Document No.");
+        NpDcCouponModuleMgt.OnAfterSendSalesDocVoucherSelection(NpRvVoucherEntry, SalesHeader, SalesInvHdrNo, SalesCrMemoHdrNo);
         if not NpRvVoucherEntry.FindSet() then
             exit;
 
