@@ -48,8 +48,6 @@
         {
             Caption = 'Member Unique Identity';
             DataClassification = CustomerContent;
-            //OptionCaption = ' ,E-Mail,Phone No.,Social Security No.';
-            //OptionMembers = "NONE",EMAIL,PHONENO,SSN;
         }
         field(21; "Create Member UI Violation"; Option)
         {

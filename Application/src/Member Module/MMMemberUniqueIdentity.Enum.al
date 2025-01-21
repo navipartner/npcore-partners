@@ -1,8 +1,8 @@
 ﻿enum 6014482 "NPR MM Member Unique Identity"
 {
-    #IF NOT BC17  
-    Access = Internal;       
-    #ENDIF
+#IF NOT BC17
+    Access = Internal;
+#ENDIF
     Extensible = false;
 
     value(0; NONE)
@@ -33,5 +33,10 @@
     value(5; EMAIL_OR_PHONE)
     {
         Caption = 'E-Mail or Phone No. (Individually)';
+    }
+
+    value(6; EMAIL_AND_FIRST_NAME)
+    {
+        Caption = 'E-Mail and First Name (Combination)';
     }
 }
