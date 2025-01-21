@@ -212,8 +212,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             .AddProperty('status', 'admitted')
             .AddProperty('itemNo', Ticket."Item No.")
             .AddProperty('admissionCode', ValidationRequest.AdmissionCode)
-            .AddProperty('printedAt', Ticket.PrintedDateTime)
-            .AddProperty('printCount', Ticket.PrintCount)
+            .AddObject(AddPrintedTicketDetails(ResponseJson, Ticket))
             .AddProperty('memberCardId', Format(ValidationRequest.EntityId, 0, 4).ToLower())
             .AddProperty('externalTicketNo', ExternalTicketNo)
             .EndObject();
@@ -349,9 +348,22 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             .AddProperty('admissionCode', ValidationRequest.AdmissionCode)
             .AddProperty('admitCount', AdmitCount)
             .AddProperty('admittedAt', DetAccessEntry.SystemCreatedAt)
-            .AddProperty('printedAt', Ticket.PrintedDateTime)
-            .AddProperty('printCount', Ticket.PrintCount)
+            .AddObject(AddPrintedTicketDetails(ResponseJson, Ticket))
             .EndObject()
+    end;
+
+    local procedure AddPrintedTicketDetails(var ResponseJson: Codeunit "NPR JSON Builder"; Ticket: Record "NPR TM Ticket"): Codeunit "NPR JSON Builder"
+    begin
+        if (Ticket.PrintedDateTime > 0DT) then
+            ResponseJson
+                .AddProperty('printedAt', Ticket.PrintedDateTime)
+                .AddProperty('printCount', Ticket.PrintCount)
+        else
+            ResponseJson
+                .AddProperty('printedAt')
+                .AddProperty('printCount', Ticket.PrintCount);
+
+        exit(ResponseJson);
     end;
 
     local procedure SingleMembershipDTO(var ResponseJson: Codeunit "NPR JSON Builder"; ValidationRequest: Record "NPR SGEntryLog"): Codeunit "NPR JSON Builder"

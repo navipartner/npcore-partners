@@ -260,6 +260,7 @@ codeunit 6248225 "NPR MembershipPhasesApiAgent"
                     .AddProperty('periodEnd', TempMembershipEntry."Valid Until Date")
                     .AddProperty('unitPrice', TempMembershipEntry."Unit Price")
                     .AddProperty('amount', TempMembershipEntry."Amount Incl VAT")
+                    .AddProperty('amountInclVat', TempMembershipEntry."Amount Incl VAT")
                     .AddProperty('memberCardinality', TargetMembershipSetup."Membership Member Cardinality")
                     .AddProperty('presentationOrder', TempMembershipEntry."Line No.")
                     .StartArray('translations');
@@ -301,8 +302,8 @@ codeunit 6248225 "NPR MembershipPhasesApiAgent"
                     .AddProperty('blocked', MembershipEntry."Blocked")
                     .AddProperty('membershipCode', MembershipEntry."Membership Code")
                     .AddProperty('description', MembershipEntry.Description)
-                    .AddProperty('periodStart', MembershipEntry."Valid From Date")
-                    .AddProperty('periodEnd', MembershipEntry."Valid Until Date")
+                    .AddProperty('validFromDate', MembershipEntry."Valid From Date")
+                    .AddProperty('validUntilDate', MembershipEntry."Valid Until Date")
                     .AddProperty('createdAt', MembershipEntry."Created At")
 
                     .AddProperty('documentNumber', MembershipEntry."Document No.")
