@@ -297,6 +297,38 @@ codeunit 6151547 "NPR CRO Audit Mgt."
 
     #endregion
 
+    #region CRO Fiscal - Custom Localization Fields
+
+#if not (BC17 or BC18 or BC19)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Post Entries", 'OnBeforeCheckAndPostGenJournal', '', false, false)]
+    local procedure UpdateDSXVATDateFieldOnGenJournalLine(var GenJournalLine: Record "Gen. Journal Line"; var POSEntry: Record "NPR POS Entry")
+    var
+        RecordRef: RecordRef;
+        FieldRef: FieldRef;
+        GLSetup: Record "General Ledger Setup";
+    begin
+        if not IsCROFiscalActive() then
+            exit;
+
+        RecordRef.GetTable(GenJournalLine);
+        if not RecordRef.FieldExist(38024001) then
+            exit;
+
+        if not RecordRef.FindSet() then
+            exit;
+        repeat
+            FieldRef := RecordRef.Field(38024001);
+            if GenJournalLine."VAT Reporting Date" = 0D then
+                FieldRef.Value(GLSetup.GetVATDate(GenJournalLine."Posting Date", GenJournalLine."Document Date"))
+            else
+                FieldRef.Value(GenJournalLine."VAT Reporting Date");
+            RecordRef.Modify();
+        until RecordRef.Next() = 0;
+    end;
+#endif
+
+    #endregion
+
     #region CRO Fiscal - Audit Profile Mgt
     local procedure AddCROAuditHandler(var tmpRetailList: Record "NPR Retail List")
     begin
