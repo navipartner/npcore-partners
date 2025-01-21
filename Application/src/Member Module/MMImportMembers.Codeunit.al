@@ -333,6 +333,15 @@
                 end else begin
                     exit(false);
                 end;
+
+            Community."Member Unique Identity"::EMAIL_AND_FIRST_NAME:
+                if ((FldEmail <> '') and (FldFirstName <> '')) then begin
+                    Member.SetCurrentKey("E-Mail Address");
+                    Member.SetFilter("E-Mail Address", '=%1', LowerCase(FldEmail));
+                    Member.SetFilter("First Name", '=%1', FldFirstName);
+                end else begin
+                    exit(false);
+                end;
             else
                 Error(NOT_IMPLEMENTED, Community.FieldCaption("Member Unique Identity"), Community."Member Unique Identity");
         end;

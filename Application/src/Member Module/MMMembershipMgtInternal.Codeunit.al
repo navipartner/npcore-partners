@@ -969,6 +969,27 @@
         exit(CardEntryNo <> 0);
     end;
 
+    internal procedure ValidateMemberFirstName(Member: Record "NPR MM Member")
+    var
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+        Community: Record "NPR MM Member Community";
+        CommunityCode: Code[20];
+    begin
+        if (not GetMemberCommunityCode(Member."Entry No.", CommunityCode)) then
+            exit;
+
+        Community.Get(CommunityCode);
+        if (not (Community."Member Unique Identity" in [Community."Member Unique Identity"::EMAIL_AND_FIRST_NAME])) then
+            exit;
+
+        MemberInfoCapture.Init();
+        MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::NEW;
+        MemberInfoCapture."Member Entry No" := Member."Entry No.";
+        MemberInfoCapture."First Name" := Member."First Name";
+        MemberInfoCapture."E-Mail Address" := Member."E-Mail Address";
+        CheckMemberUniqueId(CommunityCode, MemberInfoCapture);
+    end;
+
     internal procedure ValidateMemberPhoneNumber(Member: Record "NPR MM Member")
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
@@ -979,7 +1000,9 @@
             exit;
 
         Community.Get(CommunityCode);
-        if (not (Community."Member Unique Identity" in [Community."Member Unique Identity"::PHONENO, Community."Member Unique Identity"::EMAIL_AND_PHONE, Community."Member Unique Identity"::EMAIL_OR_PHONE])) then
+        if (not (Community."Member Unique Identity" in [Community."Member Unique Identity"::PHONENO,
+                                                        Community."Member Unique Identity"::EMAIL_AND_PHONE,
+                                                        Community."Member Unique Identity"::EMAIL_OR_PHONE])) then
             exit;
 
         MemberInfoCapture.Init();
@@ -1000,13 +1023,17 @@
             exit;
 
         Community.Get(CommunityCode);
-        if (not (Community."Member Unique Identity" in [Community."Member Unique Identity"::EMAIL, Community."Member Unique Identity"::EMAIL_AND_PHONE, Community."Member Unique Identity"::EMAIL_OR_PHONE])) then
+        if (not (Community."Member Unique Identity" in [Community."Member Unique Identity"::EMAIL,
+                                                        Community."Member Unique Identity"::EMAIL_AND_PHONE,
+                                                        Community."Member Unique Identity"::EMAIL_OR_PHONE,
+                                                        Community."Member Unique Identity"::EMAIL_AND_FIRST_NAME])) then
             exit;
 
         MemberInfoCapture.Init();
         MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::NEW;
         MemberInfoCapture."Member Entry No" := Member."Entry No.";
         MemberInfoCapture."Phone No." := Member."Phone No.";
+        MemberInfoCapture."First Name" := Member."First Name";
         MemberInfoCapture."E-Mail Address" := Member."E-Mail Address";
         CheckMemberUniqueId(CommunityCode, MemberInfoCapture);
     end;
@@ -1062,6 +1089,7 @@
                 begin
                     if ((MemberInfoCapture."E-Mail Address" = '') or (MemberInfoCapture."Phone No." = '')) then
                         Error(RequireFieldAndField, MemberInfoCapture.FieldCaption("E-Mail Address"), MemberInfoCapture.FieldCaption("Phone No."));
+                    Member.SetCurrentKey("E-Mail Address");
                     Member.SetFilter("E-Mail Address", '=%1', MemberInfoCapture."E-Mail Address");
                     Member.SetFilter("Phone No.", '=%1', MemberInfoCapture."Phone No.");
                 end;
@@ -1081,7 +1109,14 @@
                         Member.SetFilter("E-Mail Address", '=%1', MemberInfoCapture."E-Mail Address");
                         Member.SetFilter("Phone No.", '=%1', MemberInfoCapture."Phone No.");
                     end;
-
+                end;
+            Community."Member Unique Identity"::EMAIL_AND_FIRST_NAME:
+                begin
+                    if ((MemberInfoCapture."E-Mail Address" = '') or (MemberInfoCapture."First Name" = '')) then
+                        Error(RequireFieldAndField, MemberInfoCapture.FieldCaption("E-Mail Address"), MemberInfoCapture.FieldCaption("First Name"));
+                    Member.SetCurrentKey("E-Mail Address");
+                    Member.SetFilter("E-Mail Address", '=%1', MemberInfoCapture."E-Mail Address");
+                    Member.SetFilter("First Name", '%1', '@' + MemberInfoCapture."First Name");
                 end;
             else
                 Error(CASE_MISSING, Community.FieldName("Member Unique Identity"), Community."Member Unique Identity");
@@ -4466,6 +4501,8 @@
                 UniqIdSet := (Member."E-Mail Address" <> '') AND (Member."Phone No." <> '');
             Community."Member Unique Identity"::EMAIL_OR_PHONE:
                 UniqIdSet := (Member."E-Mail Address" <> '') OR (Member."Phone No." <> '');
+            Community."Member Unique Identity"::EMAIL_AND_FIRST_NAME:
+                UniqIdSet := (Member."E-Mail Address" <> '') AND (Member."First Name" <> '');
             else
                 Error(CASE_MISSING, Community.FieldName("Member Unique Identity"), Community."Member Unique Identity");
         end;
@@ -5105,6 +5142,8 @@
                     Community."Member Unique Identity"::EMAIL_AND_PHONE:
                         MemberLogonId := Member."E-Mail Address";
                     Community."Member Unique Identity"::EMAIL_OR_PHONE:
+                        MemberLogonId := Member."E-Mail Address";
+                    Community."Member Unique Identity"::EMAIL_AND_FIRST_NAME:
                         MemberLogonId := Member."E-Mail Address";
                     else
                         Error(CASE_MISSING, Community.FieldName("Member Unique Identity"), Community."Member Unique Identity");

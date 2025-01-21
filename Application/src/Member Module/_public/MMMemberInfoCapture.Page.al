@@ -275,6 +275,12 @@
                     Editable = not _PreSelectedCustomerContact;
                     ToolTip = 'Specifies the value of the First Name field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ShowMandatory = _FirstNameMandatory;
+
+                    trigger OnValidate()
+                    begin
+                        CheckFirstName();
+                    end;
                 }
                 field("Middle Name"; Rec."Middle Name")
                 {
@@ -1013,6 +1019,7 @@
         EMAIL_INVALID_CONFIRM: Label 'The %1 seems invalid, do you want to correct it?';
         _EmailMandatory: Boolean;
         _PhoneNoMandatory: Boolean;
+        _FirstNameMandatory: Boolean;
         _SSNMandatory: Boolean;
         INVALID_VALUE: Label 'The %1 is invalid.';
         _BirthDateMandatory: Boolean;
@@ -1062,6 +1069,35 @@
         _MembershipValidUntilDate: Date;
         _BlockDetails: Text;
         AuxiliaryPhoneNoField: Text[100];
+
+
+    local procedure CheckFirstName()
+    var
+        MembershipSetup: Record "NPR MM Membership Setup";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        MemberCommunity: Record "NPR MM Member Community";
+
+    begin
+        if (xRec.AcceptDuplicate and Rec.AcceptDuplicate) then
+            Rec.AcceptDuplicate := false;
+
+        if (Rec."First Name" = '') then
+            exit;
+
+        if (Rec."Item No." <> '') then begin
+            MembershipSalesSetup.SetFilter(Type, '=%1', MembershipSalesSetup.Type::ITEM);
+            MembershipSalesSetup.SetFilter("No.", '=%1', Rec."Item No.");
+            if (MembershipSalesSetup.FindFirst()) then begin
+                MembershipSetup.Get(MembershipSalesSetup."Membership Code");
+                MemberCommunity.Get(MembershipSetup."Community Code");
+
+                if (MemberCommunity."Member Unique Identity" = MemberCommunity."Member Unique Identity"::EMAIL_AND_FIRST_NAME) then
+                    if (Rec."E-Mail Address" <> '') then
+                        MembershipManagement.CheckMemberUniqueId(MemberCommunity.Code, Rec);
+            end;
+        end;
+    end;
 
     local procedure CheckPhone()
     var
@@ -1130,6 +1166,10 @@
 
                 if (MemberCommunity."Member Unique Identity" in [MemberCommunity."Member Unique Identity"::EMAIL_AND_PHONE]) then
                     if (Rec."Phone No." <> '') then
+                        MembershipManagement.CheckMemberUniqueId(MemberCommunity.Code, Rec);
+
+                if (MemberCommunity."Member Unique Identity" = MemberCommunity."Member Unique Identity"::EMAIL_AND_FIRST_NAME) then
+                    if (Rec."First Name" <> '') then
                         MembershipManagement.CheckMemberUniqueId(MemberCommunity.Code, Rec);
 
                 if (MemberCommunity."Member Unique Identity" = MemberCommunity."Member Unique Identity"::EMAIL_OR_PHONE) then
@@ -1342,6 +1382,11 @@
                         begin
                             _EmailMandatory := true;
                             _PhoneNoMandatory := true;
+                        end;
+                    MemberCommunity."Member Unique Identity"::EMAIL_AND_FIRST_NAME:
+                        begin
+                            _EmailMandatory := true;
+                            _FirstNameMandatory := true;
                         end;
                 end;
 
@@ -1997,8 +2042,11 @@
         MemberInfoCaptRecordRef.GetTable(Rec);
         AddInfoReqMgt.MakeAddInfoRequest(MemberCaptIntSetup."MembCapt PhoneNo. OnAssistEdit", LoginHint, MemberInfoCaptRecordRef, TempAddInfoResponse);
         AddInfoReqMgt.SetMemberAdditionalInfo(Rec, TempAddInfoResponse);
-        if TempAddInfoResponse."Phone No." <> '' then // Phone No. has been updated
-            CheckPhone();
+
+        CheckPhone();
+        CheckEmail();
+        CheckFirstName();
+
         AuxiliaryPhoneNoField := Rec."Phone No.";
     end;
 
