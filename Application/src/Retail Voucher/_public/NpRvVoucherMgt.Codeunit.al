@@ -505,7 +505,8 @@
                     else
                         VoucherEntry."Document Type" := VoucherEntry."Document Type"::Invoice;
                     VoucherEntry."Document No." := NpRvSalesLine."Posting No.";
-                    VoucherEntry."Document Line No." := NpRvSalesLine."Document Line No.";
+                    if NpRvSalesLine."Document Source" = NpRvSalesLine."Document Source"::"Sales Document" then
+                        VoucherEntry."Document Line No." := NpRvSalesLine."Document Line No.";
                     VoucherEntry."External Document No." := NpRvSalesLine."External Document No.";
                 end;
         end;
