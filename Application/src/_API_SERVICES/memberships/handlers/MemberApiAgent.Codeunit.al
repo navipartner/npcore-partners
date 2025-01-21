@@ -162,7 +162,7 @@ codeunit 6248220 "NPR MemberApiAgent"
 
         Member.Get(Member."Entry No.");
         ResponseJson.StartObject()
-            .AddProperty('mediaId', Format(Member.Image, 0, 9).ToLower())
+            .AddProperty('mediaId', Format(Member.Image.MediaId(), 0, 4).ToLower())
             .EndObject();
 
         exit(Response.RespondOK(ResponseJson.Build()));

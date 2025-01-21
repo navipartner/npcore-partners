@@ -337,8 +337,7 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         Ticket.Modify();
 
         ResponseJson.StartObject()
-            .AddProperty('printCount', Ticket.PrintCount)
-            .AddProperty('printedAt', Ticket.PrintedDateTime)
+            .AddObject(AddPrintedTicketDetails(ResponseJson, Ticket))
             .EndObject();
 
         exit(Response.RespondOk(ResponseJson.Build()));
@@ -353,7 +352,7 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         Ticket.Modify();
 
         ResponseJson.StartObject()
-            .AddProperty('printCount', Ticket.PrintCount)
+            .AddObject(AddPrintedTicketDetails(ResponseJson, Ticket))
             .EndObject();
 
         exit(Response.RespondOk(ResponseJson.Build()));
@@ -457,9 +456,22 @@ codeunit 6185080 "NPR TicketingTicketAgent"
             .AddProperty('unitPriceInclVat', Ticket.AmountInclVat)
             .AddProperty('currencyCode', CurrencyCode)
             .AddProperty('ticketHolder', ReservationRequest.TicketHolderName)
-            .AddProperty('printCount', Ticket.PrintCount)
-            .AddProperty('printedAt', Ticket.PrintedDateTime)
+            .AddObject(AddPrintedTicketDetails(ResponseJson, Ticket))
         .EndObject();
+
+        exit(ResponseJson);
+    end;
+
+    local procedure AddPrintedTicketDetails(var ResponseJson: Codeunit "NPR JSON Builder"; Ticket: Record "NPR TM Ticket"): Codeunit "NPR JSON Builder"
+    begin
+        if (Ticket.PrintedDateTime > 0DT) then
+            ResponseJson
+                .AddProperty('printedAt', Ticket.PrintedDateTime)
+                .AddProperty('printCount', Ticket.PrintCount)
+        else
+            ResponseJson
+                .AddProperty('printedAt')
+                .AddProperty('printCount', Ticket.PrintCount);
 
         exit(ResponseJson);
     end;

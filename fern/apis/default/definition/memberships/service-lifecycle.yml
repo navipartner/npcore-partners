@@ -18,7 +18,7 @@ service:
         It provides a chronological log of events, including creation, renewals, upgrades, and cancellations.
       display-name: Get Membership History
       method: GET 
-      path: /membership/{membershipId}/history
+      path: /{membershipId}/history
       path-parameters:
         membershipId: simpleTypes.MembershipId
       request:
@@ -40,7 +40,7 @@ service:
         This is commonly used when a membership is set up ahead of time and needs to be activated for use.
       display-name: Activate Membership
       method: POST
-      path: /membership/{membershipId}/activate
+      path: /{membershipId}/activate
       path-parameters:
         membershipId: simpleTypes.MembershipId
       request:
@@ -87,7 +87,7 @@ service:
         You can provide a cancellation date, allowing the membership to run until that date, or cancel it immediately.
       display-name: Cancel Membership
       method: POST  
-      path: /membership/{membershipId}/cancel
+      path: /{membershipId}/cancel
       path-parameters:
         membershipId: simpleTypes.MembershipId
       request:
@@ -138,7 +138,7 @@ service:
         which specifies the predefined renewal configuration such as price and duration.
       display-name: Renew Membership
       method: POST  
-      path: /membership/{membershipId}/renew
+      path: /{membershipId}/renew
       path-parameters:
         membershipId: simpleTypes.MembershipId
       request:
@@ -164,7 +164,7 @@ service:
          the `upgradeMembership` endpoint to execute the upgrade.
       display-name: Get Upgrade Options
       method: GET
-      path: /membership/{membershipId}/upgrade/options
+      path: /{membershipId}/upgrade/options
       path-parameters:
         membershipId: simpleTypes.MembershipId
       request:
@@ -188,7 +188,7 @@ service:
         the `getUpgradeOptions` endpoint, which includes the predefined details for the upgrade.
       display-name: Upgrade Membership
       method: POST  
-      path: /membership/{membershipId}/upgrade
+      path: /{membershipId}/upgrade
       path-parameters:
         membershipId: simpleTypes.MembershipId
       request:
@@ -214,7 +214,7 @@ service:
         endpoint to apply the extension.
       display-name: Get Extend Options
       method: GET
-      path: /membership/{membershipId}/extend/options
+      path: /{membershipId}/extend/options
       path-parameters:
         membershipId: simpleTypes.MembershipId
       request:
@@ -239,7 +239,7 @@ service:
         You must provide the `itemNumber` from the `getExtendOptions` endpoint to apply the extension.
       display-name: Extend Membership
       method: POST  
-      path: /membership/{membershipId}/extend
+      path: /{membershipId}/extend
       path-parameters:
         membershipId: simpleTypes.MembershipId
       request:
