@@ -558,8 +558,10 @@
         if VoucherEntry.FindSet() then begin
             InitNpRvSalesLine(ToSalesLine, ToSalesHeader, NpRvSalesLine);
             repeat
-                Voucher.Get(VoucherEntry."Voucher No.");
-                InsertNpRVSalesLineReference(NpRvSalesLine, Voucher);
+                if not IsVoucherRedeemRealatedEntry(VoucherEntry) then begin
+                    Voucher.Get(VoucherEntry."Voucher No.");
+                    InsertNpRVSalesLineReference(NpRvSalesLine, Voucher);
+                end;
             until VoucherEntry.Next() = 0;
         end else begin
             ArchVoucherEntry.SetCurrentKey("Entry Type", "Document Type", "Document No.", "Document Line No.");
@@ -576,12 +578,14 @@
             InitNpRvSalesLine(ToSalesLine, ToSalesHeader, NpRvSalesLine);
             repeat
                 VoucherEntry.TransferFields(ArchVoucherEntry);
-                ArchVoucher.Get(ArchVoucherEntry."Arch. Voucher No.");
-                Voucher.TransferFields(ArchVoucher);
-                Voucher."No." := ArchVoucher."Arch. No.";
-                if Voucher."No." = '' then
-                    Voucher."No." := ArchVoucher."No.";
-                InsertNpRVSalesLineReference(NpRvSalesLine, Voucher);
+                if not IsVoucherRedeemRealatedEntry(VoucherEntry) then begin
+                    ArchVoucher.Get(ArchVoucherEntry."Arch. Voucher No.");
+                    Voucher.TransferFields(ArchVoucher);
+                    Voucher."No." := ArchVoucher."Arch. No.";
+                    if Voucher."No." = '' then
+                        Voucher."No." := ArchVoucher."No.";
+                    InsertNpRVSalesLineReference(NpRvSalesLine, Voucher);
+                end;
             until ArchVoucherEntry.Next() = 0;
         end;
 
@@ -594,12 +598,29 @@
                 NpRvSalesLine.Type := NpRvSalesLine.Type::"Top-up";
         end;
         NpRvSalesLine."Voucher Type" := Voucher."Voucher Type";
-        if CountNpRVSalesLineReferences(NpRvSalesLine) = 1 then begin
-            NpRvSalesLine."Voucher No." := Voucher."No.";
-            NpRvSalesLine."Reference No." := Voucher."Reference No.";
-            NpRvSalesLine.Description := Voucher.Description;
+        case CountNpRVSalesLineReferences(NpRvSalesLine) of
+            0:
+                exit;
+            1:
+                begin
+                    NpRvSalesLine."Voucher No." := Voucher."No.";
+                    NpRvSalesLine."Reference No." := Voucher."Reference No.";
+                    NpRvSalesLine.Description := Voucher.Description;
+                end;
         end;
         NpRvSalesLine.Insert(true);
+    end;
+
+    local procedure IsVoucherRedeemRealatedEntry(VoucherEntry: Record "NPR NpRv Voucher Entry"): Boolean
+    var
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+    begin
+        MagentoPaymentLine.SetRange("Document Table No.", Database::"Sales Invoice Header");
+        MagentoPaymentLine.SetRange("Document No.", VoucherEntry."Document No.");
+        MagentoPaymentLine.SetRange("Line No.", VoucherEntry."Document Line No.");
+        MagentoPaymentLine.SetRange("Payment Type", MagentoPaymentLine."Payment Type"::Voucher);
+        MagentoPaymentLine.SetRange("Source No.", VoucherEntry."Voucher No.");
+        exit(not MagentoPaymentLine.IsEmpty());
     end;
 
     local procedure InitNpRvSalesLine(ToSalesLine: Record "Sales Line"; ToSalesHeader: Record "Sales Header"; var NpRvSalesLine: Record "NPR NpRv Sales Line")
