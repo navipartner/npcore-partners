@@ -178,16 +178,28 @@
                 {
                     ToolTip = 'Specifies the code of store groups. This is a useful field for reporting.';
                     ApplicationArea = NPRRetail;
+                    Visible = false;
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '2025-01-21';
+                    ObsoleteReason = 'Using POS Store Group instead.';
                 }
                 field("Store Category Code"; Rec."Store Category Code")
                 {
                     ToolTip = 'Specifies the code of store categories. This is a useful field for reporting.';
                     ApplicationArea = NPRRetail;
+                    Visible = false;
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '2025-01-21';
+                    ObsoleteReason = 'Using POS Store Group instead.';
                 }
                 field("Store Locality Code"; Rec."Store Locality Code")
                 {
                     ToolTip = 'Specifies the locality code of stores. This is a useful field for reporting.';
                     ApplicationArea = NPRRetail;
+                    Visible = false;
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '2025-01-21';
+                    ObsoleteReason = 'Using POS Store Group instead.';
                 }
                 field("Store Size"; Rec."Store Size")
                 {

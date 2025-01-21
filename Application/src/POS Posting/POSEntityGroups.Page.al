@@ -6,6 +6,10 @@
     PageType = List;
     UsageCategory = Administration;
 
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-01-21';
+    ObsoleteReason = 'Using POS Store Groups instead.';
+
     SourceTable = "NPR POS Entity Group";
     ApplicationArea = NPRRetail;
 

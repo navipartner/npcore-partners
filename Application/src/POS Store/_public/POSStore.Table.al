@@ -294,6 +294,9 @@
             Description = 'NPR5.31';
             TableRelation = "NPR POS Entity Group".Code WHERE("Table ID" = CONST(6150614),
                                                            "Field No." = CONST(812));
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-01-21';
+            ObsoleteReason = 'Use POS Store Group instead.';
         }
         field(813; "Store Category Code"; Code[20])
         {
@@ -302,6 +305,9 @@
             Description = 'NPR5.31';
             TableRelation = "NPR POS Entity Group".Code WHERE("Table ID" = CONST(6150614),
                                                            "Field No." = CONST(813));
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-01-21';
+            ObsoleteReason = 'Use POS Store Group instead.';
         }
         field(814; "Store Locality Code"; Code[20])
         {
@@ -310,6 +316,9 @@
             Description = 'NPR5.31';
             TableRelation = "NPR POS Entity Group".Code WHERE("Table ID" = CONST(6150614),
                                                            "Field No." = CONST(814));
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-01-21';
+            ObsoleteReason = 'Use POS Store Group instead.';
         }
         field(850; "VAT Customer No."; Code[20])
         {

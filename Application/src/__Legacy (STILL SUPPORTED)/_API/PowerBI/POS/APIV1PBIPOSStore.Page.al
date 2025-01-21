@@ -72,6 +72,10 @@ page 6059936 "NPR APIV1 PBIPOSStore"
                 {
                     Caption = 'Global Dimension 2 Code', Locked = true;
                 }
+                part(posStoreGroupLines; "NPR APIV1 PBI POSStoreGrpLines")
+                {
+                    SubPageLink = "POS Store" = field(Code);
+                }
             }
         }
     }
