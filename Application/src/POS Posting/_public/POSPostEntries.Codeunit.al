@@ -745,6 +745,7 @@
     var
         UnknownErrorTxt: Label 'An error has occurred while checking general journal lines for document No. %1. The system did not provide any details of the error.', Comment = '%1 - document number';
     begin
+        OnBeforeCheckAndPostGenJournal(GenJournalLine, POSEntry);
         GenJournalLine.Reset();
         GenJournalLine.SetCurrentKey("Journal Template Name", "Journal Batch Name", "Posting Date", "Document No.");
         if (not GenJournalLine.FindSet()) then
@@ -1843,6 +1844,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterModifyPOSEntryOnMarkPOSEntries(OptStatus: Option Posted,Error; var POSEntry: Record "NPR POS Entry"; var POSEntryWithError: Record "NPR POS Entry"; ShowProgressDialog: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckAndPostGenJournal(var GenJournalLine: Record "Gen. Journal Line"; var POSEntry: Record "NPR POS Entry")
     begin
     end;
 
