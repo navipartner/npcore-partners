@@ -264,7 +264,7 @@ codeunit 6248216 "NPR API External POS Sale" implements "NPR API Request Handler
             .AddProperty('startedAt', CreateDateTime(ExternalPOSSale.Date, ExternalPOSSale."Start Time"))
             .AddProperty('posStore', ExternalPOSSale."POS Store Code")
             .AddProperty('posUnit', ExternalPOSSale."Register No.")
-            .AddProperty('receiptNumber', ExternalPOSSale."Sales Ticket No.")
+            .AddProperty('receiptNo', ExternalPOSSale."Sales Ticket No.")
             .AddProperty('salespersonCode', ExternalPOSSale."Salesperson Code");
         if (ExternalPOSSale."Customer No." <> '') then
             Json.AddProperty('customerId', ExternalPOSSale."Customer No.");
