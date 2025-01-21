@@ -69,5 +69,10 @@
     procedure OnAfterSendVoucherSelection(var VoucherEntry: Record "NPR NpRv Voucher Entry"; SalePOS: Record "NPR POS Sale")
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnAfterSendSalesDocVoucherSelection(var VoucherEntry: Record "NPR NpRv Voucher Entry"; var SalesHeader: Record "Sales Header"; SalesInvHdrNo: Code[20]; SalesCrMemoNo: Code[20])
+    begin
+    end;
 }
 
