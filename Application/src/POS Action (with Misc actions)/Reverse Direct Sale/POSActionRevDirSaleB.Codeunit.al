@@ -124,6 +124,7 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
         SaleLinePOS.SetSkipUpdateDependantQuantity(true);
         SaleLinePOS.Validate("No.", POSSalesLine."No.");
         SaleLinePOS.Description := POSSalesLine.Description;
+        SaleLinePOS."Description 2" := POSSalesLine."Description 2";
 
         if not (SaleLinePOS."Line Type" in [SaleLinePOS."Line Type"::"POS Payment", SaleLinePOS."Line Type"::"GL Payment", SaleLinePOS."Line Type"::Comment]) then
             SaleLinePOS.Validate(Quantity, -POSSalesLine.Quantity);
