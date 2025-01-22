@@ -267,7 +267,7 @@ codeunit 6059993 "NPR HL Integration Mgt."
         if Enable then
             Codeunit.Run(Codeunit::"NPR HL Schedule Send Tasks", DummyNcTask)
         else begin
-            ParameterFilterTxt := StrSubstNo(FilterPlaceholderTok, NcTaskListProcessing.ParamProcessor(), HLScheduleSend.GetHeyLoyaltyTaskProcessorCode(true));
+            ParameterFilterTxt := StrSubstNo(FilterPlaceholderTok, NcTaskListProcessing.ParamProcessor(), HLScheduleSend.GetHeyLoyaltyTaskProcessorCode(false));
             JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
             JobQueueEntry.SetRange("Object ID to Run", NcSetupMgt.TaskListProcessingCodeunit());
             JobQueueEntry.SetFilter("Parameter String", ParameterFilterTxt);
