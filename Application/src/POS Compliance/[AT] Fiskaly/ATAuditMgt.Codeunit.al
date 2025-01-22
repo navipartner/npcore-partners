@@ -40,6 +40,78 @@ codeunit 6184848 "NPR AT Audit Mgt."
     begin
         ErrorOnRenameOfPOSUnitIfAlreadyUsed(xRec);
     end;
+
+#if not (BC17 or BC18 or BC19)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Environment Cleanup", 'OnClearCompanyConfig', '', false, false)]
+    local procedure OnClearCompanyConfig(CompanyName: Text; SourceEnv: Enum "Environment Type"; DestinationEnv: Enum "Environment Type")
+    var
+        ATFiscalizationSetup: Record "NPR AT Fiscalization Setup";
+        ATOrganization: Record "NPR AT Organization";
+        ATSCU: Record "NPR AT SCU";
+        ATCashRegister: Record "NPR AT Cash Register";
+        ATSecretMgt: Codeunit "NPR AT Secret Mgt.";
+    begin
+        if DestinationEnv <> DestinationEnv::Sandbox then
+            exit;
+
+        ATFiscalizationSetup.ChangeCompany(CompanyName);
+        if ATFiscalizationSetup.Get() then begin
+            if ATSecretMgt.HasSecretKey(ATFiscalizationSetup.GetFONParticipantId()) then
+                ATSecretMgt.RemoveSecretKey(ATFiscalizationSetup.GetFONParticipantId());
+
+            if ATSecretMgt.HasSecretKey(ATFiscalizationSetup.GetFONUserId()) then
+                ATSecretMgt.RemoveSecretKey(ATFiscalizationSetup.GetFONUserId());
+
+            if ATSecretMgt.HasSecretKey(ATFiscalizationSetup.GetFONUserPIN()) then
+                ATSecretMgt.RemoveSecretKey(ATFiscalizationSetup.GetFONUserPIN());
+
+            ATFiscalizationSetup.Delete();
+        end else
+            exit;
+
+        ATOrganization.ChangeCompany(CompanyName);
+        if ATOrganization.FindSet(true) then
+            repeat
+                Clear(ATOrganization."FON Authentication Status");
+                Clear(ATOrganization."FON Authenticated At");
+                ATOrganization.Modify();
+
+                if ATSecretMgt.HasSecretKey(ATOrganization.GetAPISecretName()) then
+                    ATSecretMgt.RemoveSecretKey(ATOrganization.GetAPISecretName());
+
+                if ATSecretMgt.HasSecretKey(ATOrganization.GetAPIKeyName()) then
+                    ATSecretMgt.RemoveSecretKey(ATOrganization.GetAPIKeyName());
+            until ATOrganization.Next() = 0;
+
+        ATSCU.ChangeCompany(CompanyName);
+        if ATSCU.FindSet(true) then
+            repeat
+                Clear(ATSCU.State);
+                Clear(ATSCU."Certificate Serial Number");
+                Clear(ATSCU."Pending At");
+                Clear(ATSCU."Created At");
+                Clear(ATSCU."Initialized At");
+                Clear(ATSCU."Decommissioned At");
+                ATSCU.Modify();
+            until ATSCU.Next() = 0;
+
+        ATCashRegister.ChangeCompany(CompanyName);
+        if ATCashRegister.FindSet(true) then
+            repeat
+                Clear(ATCashRegister.State);
+                Clear(ATCashRegister."Serial Number");
+                Clear(ATCashRegister."Created At");
+                Clear(ATCashRegister."Registered At");
+                Clear(ATCashRegister."Initialized At");
+                Clear(ATCashRegister."Decommissioned At");
+                Clear(ATCashRegister."Outage At");
+                Clear(ATCashRegister."Defect At");
+                Clear(ATCashRegister."Initialization Receipt Id");
+                Clear(ATCashRegister."Decommission Receipt Id");
+                ATCashRegister.Modify();
+            until ATCashRegister.Next() = 0;
+    end;
+#endif
     #endregion
 
     #region AT Fiscal - Audit Profile Mgt

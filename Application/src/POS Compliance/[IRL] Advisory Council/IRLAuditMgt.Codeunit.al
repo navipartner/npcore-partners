@@ -2,6 +2,25 @@ codeunit 6185015 "NPR IRL Audit Mgt."
 {
     Access = Internal;
 
+    #region IRL Fiscal - Sandbox Env. Cleanup
+
+#if not (BC17 or BC18 or BC19)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Environment Cleanup", 'OnClearCompanyConfig', '', false, false)]
+    local procedure OnClearCompanyConfig(CompanyName: Text; SourceEnv: Enum "Environment Type"; DestinationEnv: Enum "Environment Type")
+    var
+        IRLFiscalizationSetup: Record "NPR IRL Fiscalization Setup";
+    begin
+        if DestinationEnv <> DestinationEnv::Sandbox then
+            exit;
+
+        IRLFiscalizationSetup.ChangeCompany(CompanyName);
+        if IRLFiscalizationSetup.Get() then
+            IRLFiscalizationSetup.Delete();
+    end;
+#endif
+
+    #endregion
+
     #region Retention Policy by Law 6 Years insted of NPR 5 Years
     procedure UpdateRetentionPolicyTo6Years()
     begin

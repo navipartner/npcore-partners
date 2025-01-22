@@ -41,6 +41,33 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
     end;
     #endregion
 
+    #region BG SIS Fiscal - Sandbox Env. Cleanup
+
+#if not (BC17 or BC18 or BC19)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Environment Cleanup", 'OnClearCompanyConfig', '', false, false)]
+    local procedure OnClearCompanyConfig(CompanyName: Text; SourceEnv: Enum "Environment Type"; DestinationEnv: Enum "Environment Type")
+    var
+        BGFiscalizationSetup: Record "NPR BG Fiscalization Setup";
+        BGSISPOSUnitMapping: Record "NPR BG SIS POS Unit Mapping";
+    begin
+        if DestinationEnv <> DestinationEnv::Sandbox then
+            exit;
+
+        BGFiscalizationSetup.ChangeCompany(CompanyName);
+        if BGFiscalizationSetup.Get() then begin
+            BGFiscalizationSetup."BG SIS Fiscal Enabled" := false;
+            BGFiscalizationSetup.Modify();
+        end else
+            exit;
+
+        BGSISPOSUnitMapping.ChangeCompany(CompanyName);
+        BGSISPOSUnitMapping.SetFilter("Fiscal Printer IP Address", '<>''');
+        BGSISPOSUnitMapping.ModifyAll("Fiscal Printer IP Address", '');
+    end;
+#endif
+
+    #endregion
+
     #region BG SIS Fiscal - Audit Profile Mgt
     local procedure AddBGSISAuditHandler(var tmpRetailList: Record "NPR Retail List")
     begin

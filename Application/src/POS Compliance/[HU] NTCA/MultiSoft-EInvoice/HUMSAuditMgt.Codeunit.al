@@ -3,6 +3,24 @@ codeunit 6184708 "NPR HU MS Audit Mgt."
     Access = Internal;
     SingleInstance = true;
 
+    #region HUMS Fiscal - Sandbox Env. Cleanup
+
+#if not (BC17 or BC18 or BC19)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Environment Cleanup", 'OnClearCompanyConfig', '', false, false)]
+    local procedure OnClearCompanyConfig(CompanyName: Text; SourceEnv: Enum "Environment Type"; DestinationEnv: Enum "Environment Type")
+    var
+        HUMSFiscalizationSetup: Record "NPR HU MS Fiscalization Setup";
+    begin
+        if DestinationEnv <> DestinationEnv::Sandbox then
+            exit;
+
+        HUMSFiscalizationSetup.ChangeCompany(CompanyName);
+        if HUMSFiscalizationSetup.Get() then
+            HUMSFiscalizationSetup.Delete();
+    end;
+#endif
+    #endregion
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnBeforeFinishSale', '', false, false)]
     local procedure OnAfterEndSale(SalePOS: Record "NPR POS Sale");
     var

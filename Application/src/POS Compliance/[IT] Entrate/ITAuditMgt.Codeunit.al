@@ -193,6 +193,34 @@ codeunit 6184647 "NPR IT Audit Mgt."
 
     #endregion
 
+    #region IT Fiscal - Sandbox Env. Cleanup
+
+#if not (BC17 or BC18 or BC19)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Environment Cleanup", 'OnClearCompanyConfig', '', false, false)]
+    local procedure OnClearCompanyConfig(CompanyName: Text; SourceEnv: Enum "Environment Type"; DestinationEnv: Enum "Environment Type")
+    var
+        ITFiscalizationSetup: Record "NPR IT Fiscalization Setup";
+        ITPOSUnitMapping: Record "NPR IT POS Unit Mapping";
+    begin
+        if DestinationEnv <> DestinationEnv::Sandbox then
+            exit;
+
+        ITFiscalizationSetup.ChangeCompany(CompanyName);
+        if ITFiscalizationSetup.Get() then
+            ITFiscalizationSetup.Delete()
+        else
+            exit;
+
+        ITPOSUnitMapping.ChangeCompany(CompanyName);
+        ITPOSUnitMapping.SetFilter("Fiscal Printer IP Address", '<>''');
+        ITPOSUnitMapping.ModifyAll("Fiscal Printer IP Address", '');
+        ITPOSUnitMapping.ModifyAll("Fiscal Printer Password", '');
+        ITPOSUnitMapping.ModifyAll("Fiscal Printer Serial No.", '');
+        ITPOSUnitMapping.ModifyAll("Fiscal Printer RT Type", '');
+    end;
+#endif
+    #endregion
+
     #region IT Fiscal - Audit Profile Mgt
     local procedure AddITAuditHandler(var tmpRetailList: Record "NPR Retail List")
     begin

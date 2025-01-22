@@ -26,6 +26,29 @@ codeunit 6184850 "NPR FR Audit Mgt."
         CAPTION_CERT_SUCCESS: Label 'Certificate with thumbprint %1 was uploaded successfully';
         CAPTION_SIGNATURES_VALID: Label 'Chained signatures of %1 entries verified successfully';
 
+    #region FR Fiscal - Sandbox Env. Cleanup
+
+#if not (BC17 or BC18 or BC19)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Environment Cleanup", 'OnClearCompanyConfig', '', false, false)]
+    local procedure OnClearCompanyConfig(CompanyName: Text; SourceEnv: Enum "Environment Type"; DestinationEnv: Enum "Environment Type")
+    var
+        FRAuditSetup: Record "NPR FR Audit Setup";
+    begin
+        if DestinationEnv <> DestinationEnv::Sandbox then
+            exit;
+
+        FRAuditSetup.ChangeCompany(CompanyName);
+        if FRAuditSetup.Get() then begin
+            Clear(FRAuditSetup."Signing Certificate");
+            Clear(FRAuditSetup."Signing Certificate Password");
+            Clear(FRAuditSetup."Signing Certificate Thumbprint");
+            FRAuditSetup.Modify();
+        end;
+    end;
+#endif
+
+    #endregion
+
     procedure HandlerCode(): Text[8]
     begin
         exit('FR_NF525');

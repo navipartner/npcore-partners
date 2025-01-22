@@ -387,6 +387,41 @@ codeunit 6059942 "NPR RS Audit Mgt."
             RSAuxSalesHeader.SaveRSAuxSalesHeaderFields();
         end;
     end;
+
+    #region RS Fiscal - Sandbox Env. Cleanup
+
+#if not (BC17 or BC18 or BC19)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Environment Cleanup", 'OnClearCompanyConfig', '', false, false)]
+    local procedure OnClearCompanyConfig(CompanyName: Text; SourceEnv: Enum "Environment Type"; DestinationEnv: Enum "Environment Type")
+    var
+        RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
+        RSPOSUnitMapping: Record "NPR RS POS Unit Mapping";
+    begin
+        if DestinationEnv <> DestinationEnv::Sandbox then
+            exit;
+
+        RSFiscalizationSetup.ChangeCompany(CompanyName);
+        if RSFiscalizationSetup.Get() then begin
+            Clear(RSFiscalizationSetup."Sandbox URL");
+            Clear(RSFiscalizationSetup."Configuration URL");
+            Clear(RSFiscalizationSetup."TaxPayer Admin Portal URL");
+            Clear(RSFiscalizationSetup."TaxCore API URL");
+            Clear(RSFiscalizationSetup."VSDC URL");
+            Clear(RSFiscalizationSetup."Root URL");
+            Clear(RSFiscalizationSetup."NPT Server URL");
+            RSFiscalizationSetup.Modify();
+        end else
+            exit;
+
+        RSPOSUnitMapping.ChangeCompany(CompanyName);
+        RSPOSUnitMapping.ModifyAll("RS Sandbox PIN", 0);
+        RSPOSUnitMapping.ModifyAll("RS Sandbox JID", '');
+        RSPOSUnitMapping.ModifyAll("RS Sandbox Token", '');
+    end;
+#endif
+
+    #endregion
+
     #region RS Fiscal - Aux and Mapping Tables Cleanup 
     [EventSubscriber(ObjectType::Table, Database::"Sales Invoice Header", 'OnAfterDeleteEvent', '', false, false)]
     local procedure SalesInvoiceHeader_OnAfterDeleteEvent(var Rec: Record "Sales Invoice Header"; RunTrigger: Boolean)
