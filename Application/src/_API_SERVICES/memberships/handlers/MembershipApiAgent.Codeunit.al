@@ -215,11 +215,19 @@ codeunit 6185123 "NPR MembershipApiAgent"
             .AddProperty('membershipCode', Membership."Membership Code")
             .AddProperty('issueDate', Membership."Issued Date")
             .AddProperty('blocked', Membership.Blocked)
-            .AddProperty('validFromDate', ValidFrom)
-            .AddProperty('validUntilDate', ValidUntil)
+            .AddObject(AddRequiredProperty(ResponseJson, 'validFromDate', ValidFrom))
+            .AddObject(AddRequiredProperty(ResponseJson, 'validUntilDate', ValidUntil))
             .AddProperty('customerNumber', Membership."Customer No.");
 
         exit(ResponseJson);
+    end;
+
+    local procedure AddRequiredProperty(var ResponseJson: Codeunit "NPR JSON Builder"; PropertyName: Text; PropertyValue: Date): Codeunit "NPR JSON Builder"
+    begin
+        if (PropertyValue = 0D) then
+            exit(ResponseJson.AddProperty(PropertyName));
+
+        exit(ResponseJson.AddProperty(PropertyName, PropertyValue));
     end;
 
     local procedure MembershipToMembersDTO(ResponseJson: Codeunit "NPR JSON Builder"; Membership: Record "NPR MM Membership"; IncludeMembers: Boolean): Codeunit "NPR JSON Builder"

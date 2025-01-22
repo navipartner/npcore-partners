@@ -65,7 +65,7 @@ types:
       - name: ExampleScanCount
         value: 1
 
-  LastScanAt:
+  ScannedAt:
     type: datetime
     docs: The date and time when the ticket was last scanned
     examples:
@@ -146,6 +146,8 @@ types:
     enum:
       - admitted
       - denied
+      - unknown
+      - validationFailure
 
   AdmittedStatus:
     type: AdmittedStatusEnum
