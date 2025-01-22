@@ -3,6 +3,7 @@ codeunit 6184903 "NPR AT Fiscal Thermal Print"
     Access = Internal;
 
     var
+        PrinterDeviceSettingsForISO88591Encoding, PrinterDeviceSettingsForWindows1251Encoding : Record "NPR Printer Device Settings";
         Printer: Codeunit "NPR RP Line Print";
         TwoValuesClosePlaceholderLbl: Label '%1%2', Locked = true, Comment = '%1 - placeholder 1, %2 - placeholder 2';
 
@@ -24,11 +25,9 @@ codeunit 6184903 "NPR AT Fiscal Thermal Print"
     end;
 
     local procedure PrintThermalReceipt(var ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info")
-    var
-        PrinterDeviceSettings: Record "NPR Printer Device Settings";
     begin
-        Printer.SetThreeColumnDistribution(0.35, 0.465, 0.235);
-        Printer.SetAutoLineBreak(false);
+        InsertPrinterDeviceSettings();
+        ResetPrinterSettings();
 
         PrintHeader(ATPOSAuditLogAuxInfo);
         PrintContent(ATPOSAuditLogAuxInfo);
@@ -36,17 +35,14 @@ codeunit 6184903 "NPR AT Fiscal Thermal Print"
         PrintFooter(ATPOSAuditLogAuxInfo);
         PrintThermalLine('PAPERCUT', 'COMMAND', false, 'CENTER', true, false);
 
-        InsertPrinterDeviceSettings(PrinterDeviceSettings);
-        Printer.ProcessBuffer(Codeunit::"NPR AT Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
+        Printer.ProcessBuffer(Codeunit::"NPR AT Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettingsForWindows1251Encoding);
         SetReceiptPrintedOnATPOSAuditLogAuxInfo(ATPOSAuditLogAuxInfo);
     end;
 
     local procedure PrintThermalControlReceipt(var ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info")
-    var
-        PrinterDeviceSettings: Record "NPR Printer Device Settings";
     begin
-        Printer.SetThreeColumnDistribution(0.35, 0.465, 0.235);
-        Printer.SetAutoLineBreak(false);
+        InsertPrinterDeviceSettings();
+        ResetPrinterSettings();
 
         PrintHeader(ATPOSAuditLogAuxInfo);
         PrintControlContent();
@@ -54,17 +50,37 @@ codeunit 6184903 "NPR AT Fiscal Thermal Print"
         PrintFooter(ATPOSAuditLogAuxInfo);
         PrintThermalLine('PAPERCUT', 'COMMAND', false, 'CENTER', true, false);
 
-        InsertPrinterDeviceSettings(PrinterDeviceSettings);
-        Printer.ProcessBuffer(Codeunit::"NPR AT Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
+        Printer.ProcessBuffer(Codeunit::"NPR AT Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettingsForWindows1251Encoding);
         SetReceiptPrintedOnATPOSAuditLogAuxInfo(ATPOSAuditLogAuxInfo);
     end;
 
-    local procedure InsertPrinterDeviceSettings(var PrinterDeviceSettings: Record "NPR Printer Device Settings")
+    local procedure InsertPrinterDeviceSettings()
     begin
-        PrinterDeviceSettings.Init();
-        PrinterDeviceSettings.Name := 'ENCODING';
-        PrinterDeviceSettings.Value := 'Windows-1251';
-        PrinterDeviceSettings.Insert();
+        InsertPrinterDeviceSettingsForWindows1251Encoding();
+        InsertPrinterDeviceSettingsForISO88591Encoding();
+    end;
+
+    local procedure InsertPrinterDeviceSettingsForWindows1251Encoding()
+    begin
+        PrinterDeviceSettingsForWindows1251Encoding.Init();
+        PrinterDeviceSettingsForWindows1251Encoding.Name := 'ENCODING';
+        PrinterDeviceSettingsForWindows1251Encoding.Value := 'Windows-1251';
+        PrinterDeviceSettingsForWindows1251Encoding.Insert();
+    end;
+
+    local procedure InsertPrinterDeviceSettingsForISO88591Encoding()
+    begin
+        PrinterDeviceSettingsForISO88591Encoding.Init();
+        PrinterDeviceSettingsForISO88591Encoding.Name := 'ENCODING';
+        PrinterDeviceSettingsForISO88591Encoding.Value := 'ISO-8859-1';
+        PrinterDeviceSettingsForISO88591Encoding.Insert();
+    end;
+
+    local procedure ResetPrinterSettings()
+    begin
+        Clear(Printer);
+        Printer.SetThreeColumnDistribution(0.35, 0.465, 0.235);
+        Printer.SetAutoLineBreak(false);
     end;
 
     local procedure SetReceiptPrintedOnATPOSAuditLogAuxInfo(var ATPOSAuditLogAuxInfo: Record "NPR AT POS Audit Log Aux. Info")
@@ -230,7 +246,11 @@ codeunit 6184903 "NPR AT Fiscal Thermal Print"
         ReceiptNumberLbl: Label 'Rechnungs Nr.: %1', Locked = true, Comment = '%1 - Receipt Number value';
     begin
         PrintTextOnCenter('', false);
+        Printer.ProcessBuffer(Codeunit::"NPR AT Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettingsForWindows1251Encoding);
+        ResetPrinterSettings();
         PrintQRCode(ATPOSAuditLogAuxInfo.GetQRCode());
+        Printer.ProcessBuffer(Codeunit::"NPR AT Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettingsForISO88591Encoding);
+        ResetPrinterSettings();
         PrintTextOnCenter('', false);
         PrintTextOnCenter(StrSubstNo(ReceiptNumberLbl, ATPOSAuditLogAuxInfo."Receipt Number"), true);
         PrintTextOnCenter(StrSubstNo(POSUnitNoLbl, ATPOSAuditLogAuxInfo."POS Unit No."), true);
