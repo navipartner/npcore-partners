@@ -1,4 +1,4 @@
-codeunit 6184933 "NPR Adyen PayByLink Status JQ"
+codeunit 6248227 "NPR Adyen Refund Status JQ"
 {
     Access = Internal;
     trigger OnRun()
@@ -7,16 +7,9 @@ codeunit 6184933 "NPR Adyen PayByLink Status JQ"
         AdyenManagement: Codeunit "NPR Adyen Management";
         AdyenWebhookLogType: Enum "NPR Adyen Webhook Log Type";
         WebhookProcessing: Codeunit "NPR Adyen Webhook Processing";
-        AdyenSetup: Record "NPR Adyen Setup";
     begin
-        if not AdyenSetup.Get() then
-            exit;
 
-        if not AdyenSetup."Enable Pay by Link" then
-            exit;
-
-        AdyenWebhook.SetRange("Event Code", AdyenWebhook."Event Code"::AUTHORISATION);
-        AdyenWebhook.SetRange("Webhook Type", AdyenWebhook."Webhook Type"::"Pay by Link");
+        AdyenWebhook.SetRange("Event Code", AdyenWebhook."Event Code"::REFUND);
         AdyenWebhook.SetFilter(Status, '%1|%2', AdyenWebhook.Status::New, AdyenWebhook.Status::Error);
         if AdyenWebhook.FindSet() then
             repeat
@@ -48,6 +41,6 @@ codeunit 6184933 "NPR Adyen PayByLink Status JQ"
 
     local procedure CurrCodeunitID(): Integer
     begin
-        exit(Codeunit::"NPR Adyen PayByLink Status JQ");
+        exit(Codeunit::"NPR Adyen Refund Status JQ");
     end;
 }

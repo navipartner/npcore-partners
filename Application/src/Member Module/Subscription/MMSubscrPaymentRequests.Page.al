@@ -64,6 +64,11 @@ page 6184832 "NPR MM Subscr.Payment Requests"
                     ToolTip = 'Specifies the value of the PSP Reference field.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field("Payment PSP Reference"; Rec."Payment PSP Reference")
+                {
+                    ToolTip = 'Specifies the value of the Payment PSP Reference field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
                 field("Result Code"; Rec."Result Code")
                 {
                     ToolTip = 'Specifies the value of the Refuse Reason Code field.';

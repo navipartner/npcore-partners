@@ -469,6 +469,21 @@ codeunit 6184796 "NPR Adyen Management"
         AdyenManagement.CreateAutoRescheduleAdyenJob(Codeunit::"NPR Adyen PayByLink Status JQ", ProcessPayByLinkWebhook, 1, 600) //Reschedule to run again in 10 minutes on error
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
+    local procedure RefreshAdyenRefundJob()
+    var
+        ProcessRefundWebhook: Label 'Process Refund Webhook Requests';
+        AdyenManagement: Codeunit "NPR Adyen Management";
+        SubsPaymentGateway: Record "NPR MM Subs. Payment Gateway";
+    begin
+        SubsPaymentGateway.SetRange("Integration Type", SubsPaymentGateway."Integration Type"::Adyen);
+        SubsPaymentGateway.SetRange(Status, SubsPaymentGateway.Status::Enabled);
+        if SubsPaymentGateway.IsEmpty then
+            exit;
+
+        AdyenManagement.CreateAutoRescheduleAdyenJob(Codeunit::"NPR Adyen Refund Status JQ", ProcessRefundWebhook, 1, 600) //Reschedule to run again in 10 minutes on error
+    end;
+
     internal procedure CancelAdyenJob(CodeunitID: Integer)
     var
         JobQueueEntry: Record "Job Queue Entry";
