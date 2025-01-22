@@ -615,9 +615,9 @@
         if (NotificationEntry.NPDesignerTemplateId <> '') then begin
             NotificationEntry."Notification Trigger" := NotificationEntry."Notification Trigger"::NP_DESIGNER;
             if (NPDesignerSetup.Get('')) then
-                if (NPDesignerSetup.PublicTicketURL <> '') then
+                if (NPDesignerSetup.PublicOrderURL <> '') then
                     // https://tickets.npretail.app?reservation=%1&design=%2
-                    NotificationEntry."Published Ticket URL" := StrSubstNo(NPDesignerSetup.PublicTicketURL, TicketReservationRequest."Session Token ID", NotificationEntry.NPDesignerTemplateId);
+                    NotificationEntry."Published Ticket URL" := StrSubstNo(NPDesignerSetup.PublicOrderURL, TicketReservationRequest."Session Token ID", NotificationEntry.NPDesignerTemplateId);
         end;
 
         NotificationEntry."Adm. Location Description" := Admission.Description;

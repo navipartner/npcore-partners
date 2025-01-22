@@ -27,7 +27,13 @@ table 6151022 "NPR NPDesignerSetup"
         field(30; PublicTicketURL; Text[100])
         {
             DataClassification = CustomerContent;
-            Caption = 'Public URL';
+            Caption = 'Public Ticket URL';
+        }
+
+        field(40; PublicOrderURL; Text[100])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Public Order URL';
         }
     }
 

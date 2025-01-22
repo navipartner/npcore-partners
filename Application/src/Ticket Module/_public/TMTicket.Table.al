@@ -237,6 +237,9 @@
                 Error(NotUnique, Rec."No.", Rec."External Ticket No.");
         end;
 
+        if (not Rec.IsTemporary()) then
+            Rec.SystemId := CreateGuid();
+
     end;
 
     trigger OnModify()
