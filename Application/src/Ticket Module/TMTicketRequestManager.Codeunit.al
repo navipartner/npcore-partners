@@ -2515,8 +2515,8 @@
             if (TicketNotificationEntry.NPDesignerTemplateId <> '') then begin
                 // https://tickets.npretail.app?reservation=%1&design=%2
                 if (NPDesignerSetup.Get('')) then
-                    if (NPDesignerSetup.PublicTicketURL <> '') then
-                        TicketNotificationEntry."Published Ticket URL" := StrSubstNo(NPDesignerSetup.PublicTicketURL, TicketReservationRequest."Session Token ID", TicketNotificationEntry.NPDesignerTemplateId);
+                    if (NPDesignerSetup.PublicOrderURL <> '') then
+                        TicketNotificationEntry."Published Ticket URL" := StrSubstNo(NPDesignerSetup.PublicOrderURL, TicketReservationRequest."Session Token ID", TicketNotificationEntry.NPDesignerTemplateId);
             end;
 
             // Ticket Level data

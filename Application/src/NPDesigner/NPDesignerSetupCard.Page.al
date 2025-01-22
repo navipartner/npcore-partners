@@ -25,7 +25,12 @@ page 6184929 "NPR NPDesignerSetupCard"
                 }
                 field(PublicTicketURL; Rec.PublicTicketURL)
                 {
-                    ToolTip = 'Specifies the value of the Public URL field. Will fill in %1 with the token and %2 with designer id. Example: reservation=%1&design=%2', Comment = '%';
+                    ToolTip = 'Specifies the value of the Public Ticket URL field. Will fill in %1 with the ticket id and %2 with designer id. Example: ticket=%1&design=%2', Comment = '%';
+                    ApplicationArea = NPRRetail;
+                }
+                field(PublicOrderURL; Rec.PublicOrderURL)
+                {
+                    ToolTip = 'Specifies the value of the Public Order URL field. Will fill in %1 with the token and %2 with designer id. Example: reservation=%1&design=%2', Comment = '%';
                     ApplicationArea = NPRRetail;
                 }
             }
@@ -37,7 +42,8 @@ page 6184929 "NPR NPDesignerSetupCard"
         Setup: Record "NPR NPDesignerSetup";
     begin
         if (not Setup.Get('')) then begin
-            Setup.PublicTicketURL := 'https://tickets.npretail.app?reservation=%1&design=%2';
+            Setup.PublicTicketURL := 'https://tickets.npretail.app?ticket=%1&design=%2';
+            Setup.PublicOrderURL := 'https://tickets.npretail.app?reservation=%1&design=%2';
             Setup.Insert();
         end;
     end;
