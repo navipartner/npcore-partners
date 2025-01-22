@@ -129,9 +129,9 @@ service:
         body: compositeTypes.AdmitRequest
       response:
         docs: Returns the result of the admit of a customer.
-        type: compositeTypes.AdmitResponse
+        type: AdmittedTokensResponse
       examples:
-        - name: "Admit Ticket"
+        - name: Admit Ticket
           docs: Example of a successful admission of a ticket.
           path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
@@ -142,9 +142,9 @@ service:
                - token: $simpleTypes.Token.ExampleAdmitToken
           response:
             body:
-              $compositeTypes.AdmitResponse.ExampleAdmitTicketResponse
-
-        - name: "Admit MemberCard"
+              admittedTokens:
+                - $compositeTypes.AdmitResponse.ExampleAdmitTicketResponse
+        - name: Admit MemberCard
           docs: Example of a successful admission of a Member Card.
           path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
@@ -155,12 +155,11 @@ service:
               - token: $simpleTypes.Token.ExampleAdmitToken
           response:
             body:
-              $compositeTypes.AdmitResponse.ExampleAdmitMemberCardResponse
+              admittedTokens:
+                - $compositeTypes.AdmitResponse.ExampleAdmitMemberCardResponse
   
 types:
-  DummyType:
-    type: string
-    docs: A dummy type for testing purposes.
-    examples:
-      - name: ExampleDummytype
-        value: "DummyValue"
+  AdmittedTokensResponse:
+    properties:
+      admittedTokens: list<compositeTypes.AdmitResponse>
+

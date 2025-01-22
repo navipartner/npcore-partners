@@ -152,8 +152,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             .AddProperty('status', 'admitted')
             .AddProperty('itemNo', Ticket."Item No.")
             .AddProperty('admissionCode', ValidationRequest.AdmissionCode)
-            .AddProperty('printedAt', Ticket.PrintedDateTime)
-            .AddProperty('printCount', Ticket.PrintCount)
+            .AddObject(AddPrintedTicketDetails(ResponseJson, Ticket))
             .EndObject();
     end;
 
@@ -347,23 +346,26 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             .AddProperty('itemNo', Ticket."Item No.")
             .AddProperty('admissionCode', ValidationRequest.AdmissionCode)
             .AddProperty('admitCount', AdmitCount)
-            .AddProperty('admittedAt', DetAccessEntry.SystemCreatedAt)
+            .AddObject(AddRequiredProperty(ResponseJson, 'admittedAt', DetAccessEntry.SystemCreatedAt))
             .AddObject(AddPrintedTicketDetails(ResponseJson, Ticket))
             .EndObject()
     end;
 
     local procedure AddPrintedTicketDetails(var ResponseJson: Codeunit "NPR JSON Builder"; Ticket: Record "NPR TM Ticket"): Codeunit "NPR JSON Builder"
     begin
-        if (Ticket.PrintedDateTime > 0DT) then
-            ResponseJson
-                .AddProperty('printedAt', Ticket.PrintedDateTime)
-                .AddProperty('printCount', Ticket.PrintCount)
-        else
-            ResponseJson
-                .AddProperty('printedAt')
-                .AddProperty('printCount', Ticket.PrintCount);
+        ResponseJson
+            .AddObject(AddRequiredProperty(ResponseJson, 'printedAt', Ticket.PrintedDateTime))
+            .AddProperty('printCount', Ticket.PrintCount);
 
         exit(ResponseJson);
+    end;
+
+    local procedure AddRequiredProperty(var ResponseJson: Codeunit "NPR JSON Builder"; PropertyName: Text; PropertyValue: DateTime): Codeunit "NPR JSON Builder"
+    begin
+        if (PropertyValue = 0DT) then
+            exit(ResponseJson.AddProperty(PropertyName)); // Empty property with null value (not "")
+
+        exit(ResponseJson.AddProperty(PropertyName, PropertyValue));
     end;
 
     local procedure SingleMembershipDTO(var ResponseJson: Codeunit "NPR JSON Builder"; ValidationRequest: Record "NPR SGEntryLog"): Codeunit "NPR JSON Builder"
@@ -395,7 +397,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             .AddProperty('memberCardId', Format(MemberCard.SystemId, 0, 4).ToLower())
             .AddProperty('membershipId', Format(Membership.SystemId, 0, 4).ToLower())
             .StartObject('previousScan')
-                .AddProperty('datetime', MemberCardSwipe.SystemCreatedAt)
+                .AddObject(AddRequiredProperty(ResponseJson, 'scannedAt', MemberCardSwipe."Created At"))
                 .AddProperty('scannerId', MemberCardSwipe."Scanner Station Id")
                 .AddProperty('admissionCode', MemberCardSwipe."Admission Code")
                 .AddProperty('status', ResponseTypeToText(MemberCardSwipe."Response Type"))

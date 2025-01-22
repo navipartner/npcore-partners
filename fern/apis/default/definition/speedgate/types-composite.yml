@@ -88,14 +88,14 @@ types:
 
   PreviousScan:
     properties:
-      datetime: simpleTypes.LastScanAt
-      scannerId: simpleTypes.ScannerId
-      admissionCode: simpleTypes.AdmissionCode
-      status: simpleTypes.AdmittedStatus
+      scannedAt: optional<simpleTypes.ScannedAt>
+      scannerId: optional<simpleTypes.ScannerId>
+      admissionCode: optional<simpleTypes.AdmissionCode>
+      status: optional<simpleTypes.AdmittedStatus>
     examples:
       - name: ExamplePreviousScan
         value:
-          datetime: $simpleTypes.LastScanAt.ExampleLastScanAt
+          scannedAt: $simpleTypes.ScannedAt.ExampleLastScanAt
           scannerId: $simpleTypes.ScannerId.ExampleSpeedgate
           admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
           status: admitted
@@ -154,7 +154,7 @@ types:
       status:	simpleTypes.AdmittedStatus
       itemNo: simpleTypes.ItemNo
       admissionCode: simpleTypes.AdmissionCode
-      printedAt: simpleTypes.PrintedAt
+      printedAt: optional<simpleTypes.PrintedAt>
       printCount: simpleTypes.PrintCount
       memberCardId: optional<simpleTypes.MemberCardId>
       externalTicketNo: optional<simpleTypes.ReferenceNumber>

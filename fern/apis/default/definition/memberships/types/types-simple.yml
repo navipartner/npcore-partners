@@ -636,13 +636,6 @@ types:
       - name: ExampleBlockedTrue
         value: true
 
-  Active:
-    type: boolean
-    docs: Indicates whether the membership period is active.
-    examples:
-      - name: ExampleActive
-        value: true
-
   ActivateOnFirstUse:
     type: boolean
     docs: Specifies if the membership will activate upon first use.

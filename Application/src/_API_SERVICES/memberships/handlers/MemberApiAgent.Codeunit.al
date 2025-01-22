@@ -560,8 +560,17 @@ codeunit 6248220 "NPR MemberApiAgent"
             .AddProperty('newsletter', Encode.NewsLetterAsText(Member."E-Mail News Letter"))
             .AddProperty('email', Member."E-Mail Address")
             .AddProperty('phoneNo', Member."Phone No.")
-            .AddProperty('birthday', Member.Birthday)
+            .AddObject(AddRequiredProperty(ResponseJson, 'birthday', Member.Birthday))
             .AddProperty('hasPicture', Member.Image.HasValue());
+        exit(ResponseJson);
+    end;
+
+    local procedure AddRequiredProperty(var ResponseJson: Codeunit "NPR JSON Builder"; PropertyName: Text; PropertyValue: Date): Codeunit "NPR JSON Builder"
+    begin
+        if (PropertyValue <> 0D) then
+            ResponseJson.AddProperty(PropertyName, PropertyValue)
+        else
+            ResponseJson.AddProperty(PropertyName);
 
         exit(ResponseJson);
     end;

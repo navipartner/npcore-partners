@@ -373,7 +373,6 @@ types:
       customerNumber: optional<simpleTypes.CustomerNumber>
       documentId: optional<simpleTypes.DocumentId>
       blocked: simpleTypes.Blocked
-      active: optional<simpleTypes.Active>
     examples:
       - name: ExampleMembership
         value:
