@@ -277,7 +277,6 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
         POSSaleLine.InsertLine(Line);
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
-        SaleLinePOS.Validate("Unit Price", Abs(UnitPrice));
         SaleLinePOS."Description 2" := CopyStr(Description2, 1, MaxStrLen(SaleLinePOS."Description 2"));
         SaleLinePOS.Modify();
     end;
