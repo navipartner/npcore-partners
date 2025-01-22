@@ -42,7 +42,7 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
             JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
             JobQueueEntry.SetRange("Object ID to Run", NcSetupMgt.TaskListProcessingCodeunit());
             JobQueueEntry.SetFilter("Parameter String", '%1&%2',
-                StrSubstNo(FilterPlaceholderTok, NcTaskListProcessing.ParamProcessor(), GetShopifyTaskProcessorCode(true)),
+                StrSubstNo(FilterPlaceholderTok, NcTaskListProcessing.ParamProcessor(), GetShopifyTaskProcessorCode(false)),
                 StrSubstNo(FilterPlaceholderTok, NcTaskListProcessing.ParamStoreCode(), ShopifyStoreCode));
             if JobQueueEntry.FindSet() then
                 repeat
