@@ -10,7 +10,7 @@ codeunit 6185034 "NPR MM Subscr. Renew Proc. JQ"
         SubscrRenewProcess: Codeunit "NPR MM Subscr. Renew: Process";
     begin
         NpPaySetup.Get();
-        SubscriptionRequest.SetRange(Type, SubscriptionRequest.Type::Renew);
+        SubscriptionRequest.SetFilter(Type, '%1|%2', SubscriptionRequest.Type::Renew, SubscriptionRequest.Type::Regret);
         if NpPaySetup."Auto Process Subs Req Errors" then begin
             SubscriptionRequest.SetFilter("Processing Status", '%1|%2', SubscriptionRequest."Processing Status"::Pending, SubscriptionRequest."Processing Status"::Error);
             SubscriptionRequest.SetFilter(Status, '%1|%2|%3', SubscriptionRequest.Status::Confirmed, SubscriptionRequest.Status::Rejected, SubscriptionRequest.Status::"Request Error");

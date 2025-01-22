@@ -77,6 +77,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         PaymentToken: Text;
         ShopperReference: Text[50];
         PSPReference: Text[16];
+        OriginalPSPReference: Text[16];
+        PaymentPSPReference: Text[16];
     begin
         SubsPayReqLogUtils.LogEntry(SubscrPaymentRequest,
                                     '',
@@ -85,6 +87,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                                     SubsPayReqLogEntry);
 
         ClearLastError();
+
         if not RequestTypeIsSupported(SubscrPaymentRequest) then begin
             ErrorMessage := GetLastErrorText();
             ProcessResponse(SubscrPaymentRequest,
@@ -100,6 +103,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             '',
                             '',
                             SkipTryCountUpdate,
+                            '',
                             '');
             exit;
         end;
@@ -119,6 +123,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             '',
                             '',
                             SkipTryCountUpdate,
+                            '',
                             '');
             exit;
         end;
@@ -138,6 +143,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             '',
                             '',
                             SkipTryCountUpdate,
+                            '',
                             '');
             exit;
         end;
@@ -157,6 +163,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             '',
                             SubsAdyenPGSetup.Code,
                             SkipTryCountUpdate,
+                            '',
                             '');
             exit;
         end;
@@ -176,28 +183,80 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             '',
                             SubsAdyenPGSetup.Code,
                             SkipTryCountUpdate,
+                            '',
                             '');
             exit;
         end;
 
-        if not TryGetPaymentRequestJsonText(SubscrPaymentRequest, ShopperReference, PaymentToken, Request) then begin
-            ErrorMessage := GetLastErrorText();
-            ProcessResponse(SubscrPaymentRequest,
-                            SubsPayReqLogEntry,
-                            '',
-                            '',
-                            ErrorMessage,
-                            Enum::"NPR MM Payment Request Status"::Error,
-                            SubsPayReqLogEntry."Processing Status"::Error,
-                            RecurPaymSetup."Max. Pay. Process Try Count",
-                            '',
-                            '',
-                            '',
-                            SubsAdyenPGSetup.Code,
-                            SkipTryCountUpdate,
-                            '');
-            exit;
+        case SubscrPaymentRequest.Type of
+            SubscrPaymentRequest.Type::Refund:
+                begin
+                    if not TryGetOriginalPSPReference(SubscrPaymentRequest, OriginalPSPReference) then begin
+                        ErrorMessage := GetLastErrorText();
+                        ProcessResponse(SubscrPaymentRequest,
+                                        SubsPayReqLogEntry,
+                                        '',
+                                        '',
+                                        ErrorMessage,
+                                        Enum::"NPR MM Payment Request Status"::Error,
+                                        SubsPayReqLogEntry."Processing Status"::Error,
+                                        RecurPaymSetup."Max. Pay. Process Try Count",
+                                        '',
+                                        '',
+                                        '',
+                                        SubsAdyenPGSetup.Code,
+                                        SkipTryCountUpdate,
+                                        '',
+                                        '');
+                        exit;
+                    end;
+
+                    URL := URL + '/' + OriginalPSPReference + '/refunds';
+                    if not TryGetPmtRefundRequestJsonText(SubscrPaymentRequest, Request) then begin
+                        ErrorMessage := GetLastErrorText();
+                        ProcessResponse(SubscrPaymentRequest,
+                                        SubsPayReqLogEntry,
+                                        '',
+                                        '',
+                                        ErrorMessage,
+                                        Enum::"NPR MM Payment Request Status"::Error,
+                                        SubsPayReqLogEntry."Processing Status"::Error,
+                                        RecurPaymSetup."Max. Pay. Process Try Count",
+                                        '',
+                                        '',
+                                        '',
+                                        SubsAdyenPGSetup.Code,
+                                        SkipTryCountUpdate,
+                                        '',
+                                        '');
+                        exit;
+                    end;
+                end;
+
+            SubscrPaymentRequest.Type::Payment:
+                begin
+                    if not TryGetPaymentRequestJsonText(SubscrPaymentRequest, ShopperReference, PaymentToken, Request) then begin
+                        ErrorMessage := GetLastErrorText();
+                        ProcessResponse(SubscrPaymentRequest,
+                                        SubsPayReqLogEntry,
+                                        '',
+                                        '',
+                                        ErrorMessage,
+                                        Enum::"NPR MM Payment Request Status"::Error,
+                                        SubsPayReqLogEntry."Processing Status"::Error,
+                                        RecurPaymSetup."Max. Pay. Process Try Count",
+                                        '',
+                                        '',
+                                        '',
+                                        SubsAdyenPGSetup.Code,
+                                        SkipTryCountUpdate,
+                                        '',
+                                        '');
+                        exit;
+                    end;
+                end;
         end;
+
 
         if not InvokeAPI(Request, SubsAdyenPGSetup.GetApiKey(), URL, 1000 * 60 * 5, Response, StatusCode) then begin
             ErrorMessage := GetErrorMessageFromResponse(Response);
@@ -220,7 +279,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             '',
                             SubsAdyenPGSetup.Code,
                             SkipTryCountUpdate,
-                            PSPReference);
+                            PSPReference,
+                            '');
             exit;
         end;
 
@@ -236,40 +296,69 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         if not TryGetPSPReferenceFromResponse(Response, PSPReference) then
             Clear(PSPReference);
 
-        if not TryProcessResultCode(ResultCode, RejectedReasonCode, RejectedReasonDescription) then begin
-            ErrorMessage := GetLastErrorText();
-            ProcessResponse(SubscrPaymentRequest,
-                            SubsPayReqLogEntry,
-                            Request,
-                            Response,
-                            ErrorMessage,
-                            Enum::"NPR MM Payment Request Status"::Rejected,
-                            SubsPayReqLogEntry."Processing Status"::Rejected,
-                            RecurPaymSetup."Max. Pay. Process Try Count",
-                            RejectedReasonCode,
-                            RejectedReasonDescription,
-                            ResultCode,
-                            SubsAdyenPGSetup.Code,
-                            SkipTryCountUpdate,
-                            PSPReference);
-            exit;
-        end;
+        if not TryGetPaymentPSPFromRespondse(Response, PaymentPSPReference) then
+            Clear(PaymentPSPReference);
 
-        ErrorMessage := '';
-        ProcessResponse(SubscrPaymentRequest,
-                        SubsPayReqLogEntry,
-                        Request,
-                        Response,
-                        ErrorMessage,
-                        Enum::"NPR MM Payment Request Status"::Captured,
-                        SubsPayReqLogEntry."Processing Status"::Success,
-                        RecurPaymSetup."Max. Pay. Process Try Count",
-                        RejectedReasonCode,
-                        RejectedReasonDescription,
-                        ResultCode,
-                        SubsAdyenPGSetup.Code,
-                        SkipTryCountUpdate,
-                        PSPReference);
+        case SubscrPaymentRequest.Type of
+            SubscrPaymentRequest.Type::Payment:
+                begin
+                    if not TryProcessResultCode(ResultCode, RejectedReasonCode, RejectedReasonDescription) then begin
+                        ErrorMessage := GetLastErrorText();
+                        ProcessResponse(SubscrPaymentRequest,
+                                        SubsPayReqLogEntry,
+                                        Request,
+                                        Response,
+                                        ErrorMessage,
+                                        Enum::"NPR MM Payment Request Status"::Rejected,
+                                        SubsPayReqLogEntry."Processing Status"::Rejected,
+                                        RecurPaymSetup."Max. Pay. Process Try Count",
+                                        RejectedReasonCode,
+                                        RejectedReasonDescription,
+                                        ResultCode,
+                                        SubsAdyenPGSetup.Code,
+                                        SkipTryCountUpdate,
+                                        PSPReference,
+                                        '');
+                        exit;
+                    end;
+
+                    ErrorMessage := '';
+                    ProcessResponse(SubscrPaymentRequest,
+                                SubsPayReqLogEntry,
+                                Request,
+                                Response,
+                                ErrorMessage,
+                                Enum::"NPR MM Payment Request Status"::Captured,
+                                SubsPayReqLogEntry."Processing Status"::Success,
+                                RecurPaymSetup."Max. Pay. Process Try Count",
+                                RejectedReasonCode,
+                                RejectedReasonDescription,
+                                ResultCode,
+                                SubsAdyenPGSetup.Code,
+                                SkipTryCountUpdate,
+                                PSPReference,
+                                '');
+                end;
+            SubscrPaymentRequest.Type::Refund:
+                begin
+                    ErrorMessage := '';
+                    ProcessResponse(SubscrPaymentRequest,
+                                SubsPayReqLogEntry,
+                                Request,
+                                Response,
+                                ErrorMessage,
+                                Enum::"NPR MM Payment Request Status"::Authorized,
+                                SubsPayReqLogEntry."Processing Status"::Success,
+                                RecurPaymSetup."Max. Pay. Process Try Count",
+                                RejectedReasonCode,
+                                RejectedReasonDescription,
+                                ResultCode,
+                                SubsAdyenPGSetup.Code,
+                                SkipTryCountUpdate,
+                                PSPReference,
+                                PaymentPSPReference);
+                end;
+        end;
         Success := true;
     end;
 
@@ -329,7 +418,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                         SubscrPaymentRequest."Result Code",
                         '',
                         SkipTryCountUpdate,
-                        SubscrPaymentRequest."PSP Reference");
+                        SubscrPaymentRequest."PSP Reference",
+                        '');
     end;
 
     [TryFunction]
@@ -370,7 +460,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                         SubscrPaymentRequest."Result Code",
                         '',
                         SkipTryCountUpdate,
-                        SubscrPaymentRequest."PSP Reference");
+                        SubscrPaymentRequest."PSP Reference",
+                        '');
     end;
 
     [TryFunction]
@@ -411,7 +502,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                         SubscrPaymentRequest."Result Code",
                         '',
                         SkipTryCountUpdate,
-                        SubscrPaymentRequest."PSP Reference");
+                        SubscrPaymentRequest."PSP Reference",
+                        '');
 
     end;
 
@@ -453,7 +545,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                         SubscrPaymentRequest."Result Code",
                         '',
                         SkipTryCountUpdate,
-                        SubscrPaymentRequest."PSP Reference");
+                        SubscrPaymentRequest."PSP Reference",
+                        SubscrPaymentRequest."Payment PSP Reference");
     end;
 
     [TryFunction]
@@ -493,7 +586,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                         SubscrPaymentRequest."Result Code",
                         '',
                         SkipTryCountUpdate,
-                        SubscrPaymentRequest."PSP Reference");
+                        SubscrPaymentRequest."PSP Reference",
+                        SubscrPaymentRequest."Payment PSP Reference");
     end;
 
     [TryFunction]
@@ -506,7 +600,6 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
     begin
         if SubscrPaymentRequest.PSP <> SubscrPaymentRequest.PSP::Adyen then
             exit;
-
 
         CurrencyCode := GetCurrencyCode(SubscrPaymentRequest);
         Reference := GetReference(SubscrPaymentRequest);
@@ -540,6 +633,41 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         //root
         RequestJsonText := Json.GetJSonAsText();
     end;
+
+    [TryFunction]
+    local procedure TryGetPmtRefundRequestJsonText(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var RequestJsonText: Text)
+    var
+        Json: Codeunit "Json Text Reader/Writer";
+        CurrencyCode: Code[10];
+        Reference: Text;
+        MerchantName: Text[50];
+    begin
+        if SubscrPaymentRequest.PSP <> SubscrPaymentRequest.PSP::Adyen then
+            exit;
+
+        CurrencyCode := GetCurrencyCode(SubscrPaymentRequest);
+        Reference := GetReference(SubscrPaymentRequest);
+        MerchantName := GetMerchantName();
+        //root
+        Json.WriteStartObject('');
+
+        //amount
+        Json.WriteStartObject('amount');
+        Json.WriteStringProperty('value', ConvertToAdyenPayAmount(-SubscrPaymentRequest.Amount));
+        Json.WriteStringProperty('currency', CurrencyCode);
+        Json.WriteEndObject();
+        // amount
+
+        Json.WriteStringProperty('merchantAccount', MerchantName);
+        Json.WriteStringProperty('reference', Reference);
+
+        Json.WriteEndObject();
+
+        //root
+        RequestJsonText := Json.GetJSonAsText();
+    end;
+
+
 
     local procedure GetCurrencyCode(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request") CurrencyCode: Code[10]
     var
@@ -684,12 +812,13 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
 
     local procedure UpdateSubscriptionPaymentRequestStatus(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
                                                            Status: Enum "NPR MM Payment Request Status";
-                                                           PSPReference: Text[16];
-                                                           MaxProcessTryCount: Integer;
-                                                           RejectedReasonCode: Text[50];
-                                                           RejectedReasonDescription: Text[250];
-                                                           ResultCode: Text[50];
-                                                           SkipTryCountUpdate: Boolean)
+                                                                       PSPReference: Text[16];
+                                                                       MaxProcessTryCount: Integer;
+                                                                       RejectedReasonCode: Text[50];
+                                                                       RejectedReasonDescription: Text[250];
+                                                                       ResultCode: Text[50];
+                                                                       SkipTryCountUpdate: Boolean;
+                                                                       PaymentPSPReference: Text[16])
     var
         UpdatedStatus: Enum "NPR MM Payment Request Status";
         IsModified: Boolean;
@@ -726,6 +855,11 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
 
         if SubscrPaymentRequest."Result Code" <> ResultCode then begin
             SubscrPaymentRequest."Result Code" := ResultCode;
+            IsModified := true;
+        end;
+
+        if SubscrPaymentRequest."Payment PSP Reference" <> PaymentPSPReference then begin
+            SubscrPaymentRequest."Payment PSP Reference" := PaymentPSPReference;
             IsModified := true;
         end;
 
@@ -824,14 +958,9 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
     local procedure RequestTypeIsSupported(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request")
     var
         CannotBeProcessedErr: Label 'Requests of type %1 must be initiated directly at the PSP and can only be created in BC by the reconciliation routine.', Comment = '%1 - request type (Enum "NPR MM Payment Request Type")';
-        NotSupportedErr: Label 'Requests of type %1 are not yet supported. Please confirm with your system vendor on when the support for this request type is planned.', Comment = '%1 - request type (Enum "NPR MM Payment Request Type")';
     begin
         if not (SubscrPaymentRequest.Type In [SubscrPaymentRequest.Type::Payment, SubscrPaymentRequest.Type::Refund]) then
             Error(CannotBeProcessedErr, SubscrPaymentRequest.Type);
-
-        //TODO: implement refund processing
-        if SubscrPaymentRequest.Type = SubscrPaymentRequest.Type::Refund then
-            Error(NotSupportedErr, SubscrPaymentRequest.Type);
     end;
 
     local procedure ProcessResponse(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
@@ -840,14 +969,16 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                                     Response: Text;
                                     ErrorMessage: Text;
                                     Status: Enum "NPR MM Payment Request Status";
-                                    ProcessingStatus: Enum "NPR MM SubsPayReqLogProcStatus";
-                                    MaxProcessTryCount: Integer;
-                                    RejectedReasonCode: Text[50];
-                                    RejectedReasonDescription: Text[250];
-                                    ResultCode: Code[50];
-                                    SubscriptionsPaymentGatewayCode: Code[10];
-                                    SkipTryCountUpdate: Boolean;
-                                    PSPReference: Text[16])
+                                                ProcessingStatus: Enum "NPR MM SubsPayReqLogProcStatus";
+                                                MaxProcessTryCount: Integer;
+                                                RejectedReasonCode: Text[50];
+                                                RejectedReasonDescription: Text[250];
+                                                ResultCode: Code[50];
+                                                SubscriptionsPaymentGatewayCode: Code[10];
+                                                SkipTryCountUpdate: Boolean;
+                                                PSPReference: Text[16];
+                                                PaymentPSPReference: Text[16]
+                                                )
     var
         SubsPayReqLogUtils: Codeunit "NPR MM Subs Pay Req Log Utils";
 
@@ -859,7 +990,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                                                RejectedReasonCode,
                                                RejectedReasonDescription,
                                                ResultCode,
-                                               SkipTryCountUpdate);
+                                               SkipTryCountUpdate,
+                                               PaymentPSPReference);
 
         case ProcessingStatus of
             ProcessingStatus::Success:
@@ -879,4 +1011,33 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                                                SubscriptionsPaymentGatewayCode);
         end;
     end;
+
+    [TryFunction]
+    local procedure TryGetOriginalPSPReference(var SubscrPmtRefundRequest: Record "NPR MM Subscr. Payment Request"; var PSPReference: Text[16])
+    var
+        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+    begin
+        SubscrPaymentRequest.SetRange("Reversed by Entry No.", SubscrPmtRefundRequest."Entry No.");
+        SubscrPaymentRequest.FindFirst();
+        PSPReference := SubscrPaymentRequest."PSP Reference";
+    end;
+
+    [TryFunction]
+    local procedure TryGetPaymentPSPFromRespondse(ResponseText: Text; var PaymentPSPReference: Text[16])
+    var
+        JsonObject: JsonObject;
+        JsonToken: JsonToken;
+    begin
+        if ResponseText = '' then
+            exit;
+
+        if not JsonObject.ReadFrom(ResponseText) then
+            exit;
+
+        if not JsonObject.Get('paymentPspReference', JsonToken) then
+            exit;
+
+        PaymentPSPReference := Copystr(JsonToken.AsValue().AsText(), 1, MaxStrLen(PaymentPSPReference));
+    end;
+
 }

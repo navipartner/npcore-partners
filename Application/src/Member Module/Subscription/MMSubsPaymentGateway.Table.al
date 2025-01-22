@@ -36,6 +36,14 @@ table 6150961 "NPR MM Subs. Payment Gateway"
             begin
                 if xRec.Status <> Rec.Status then
                     CheckStatus();
+
+                if Rec."Integration Type" = Rec."Integration Type"::Adyen then begin
+                    if Rec.Status = Rec.Status::Enabled then begin
+                        CheckAdyenSetup();
+                        CreateRefundWebhook();
+                    end;
+                    CreateRefundWebhookJob();
+                end;
             end;
         }
     }
@@ -80,5 +88,57 @@ table 6150961 "NPR MM Subs. Payment Gateway"
     begin
         ISubscrPaymentIHandler := Rec."Integration Type";
         ISubscrPaymentIHandler.DeleteSetupCard(Rec.Code);
+    end;
+
+    local procedure CheckAdyenSetup()
+    var
+        NPPaySetup: Record "NPR Adyen Setup";
+    begin
+        if not NPPaySetup.Get() then begin
+            NPPaySetup.Init();
+            NPPaySetup.Insert();
+        end;
+
+        if not NPPaySetup."Enable Reconciliation" then begin
+            NPPaySetup.Validate("Enable Reconciliation", true);
+            NPPaySetup.Modify();
+        end;
+    end;
+
+    local procedure CreateRefundWebhook()
+    var
+        AdyenManagement: Codeunit "NPR Adyen Management";
+        WebhookSetup: Record "NPR Adyen Webhook Setup";
+        RefundEventFilter: Label 'REFUND', Locked = true;
+        AdyenWebhookType: Enum "NPR Adyen Webhook Type";
+        MMSubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup";
+    begin
+        if MMSubsAdyenPGSetup.Get(Rec.Code) then
+            If not WebhookExist(MMSubsAdyenPGSetup."Merchant Name", RefundEventFilter) then begin
+                AdyenManagement.InitWebhookSetup(WebhookSetup, RefundEventFilter, MMSubsAdyenPGSetup."Merchant Name", AdyenWebhookType::standard);
+                AdyenManagement.CreateWebhook(WebhookSetup);
+            end;
+    end;
+
+    local procedure WebhookExist(MerchantName: Text[50]; RefundEventFilter: Text) WebhookExist: Boolean
+    var
+        AdyenWebhookSetup: Record "NPR Adyen Webhook Setup";
+        LikeFilterLbl: Label '*%1*', Locked = true;
+    begin
+        AdyenWebhookSetup.SetRange(Active, true);
+        AdyenWebhookSetup.SetRange("Merchant Account", MerchantName);
+        AdyenWebhookSetup.SetRange(Type, AdyenWebhookSetup.Type::standard);
+        AdyenWebhookSetup.SetFilter("Include Events Filter", '%1', StrSubstNo(LikeFilterLbl, RefundEventFilter));
+        WebhookExist := not AdyenWebhookSetup.IsEmpty;
+    end;
+
+    local procedure CreateRefundWebhookJob()
+    var
+        AdyenManagement: Codeunit "NPR Adyen Management";
+        ProccessRefundStatus: Label 'Process Refund Status for Adyen';
+    begin
+        If Rec.Status = Rec.Status::Enabled then
+            AdyenManagement.CreateAutoRescheduleAdyenJob(Codeunit::"NPR Adyen Refund Status JQ", ProccessRefundStatus, 1, 30) //Reschedule to run again in 30 seconds on error
+
     end;
 }

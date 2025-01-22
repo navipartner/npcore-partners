@@ -8,6 +8,7 @@ codeunit 6184931 "NPR Adyen Webhook Processing"
         ReportReady: Codeunit "NPR Adyen Process Report Ready";
         AdyenPayByLinkStatus: Codeunit "NPR Adyen PayByLink Status";
         AdyenWebhook: Record "NPR Adyen Webhook";
+        AdyenRefundStatus: Codeunit "NPR Adyen Refund Status";
     begin
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         AdyenWebhook.ReadIsolation := IsolationLevel::UpdLock;
@@ -25,6 +26,10 @@ codeunit 6184931 "NPR Adyen Webhook Processing"
             "NPR Adyen Webhook Event Code"::AUTHORISATION:
                 begin
                     AdyenPayByLinkStatus.Run(AdyenWebhook);
+                end;
+            "NPR Adyen Webhook Event Code"::REFUND:
+                begin
+                    AdyenRefundStatus.Run(AdyenWebhook);
                 end;
         end;
     end;
