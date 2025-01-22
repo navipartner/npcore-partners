@@ -71,6 +71,70 @@
         tmpRetailList.Insert();
     end;
 
+#if not (BC17 or BC18 or BC19)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Environment Cleanup", 'OnClearCompanyConfig', '', false, false)]
+    local procedure OnClearCompanyConfig(CompanyName: Text; SourceEnv: Enum "Environment Type"; DestinationEnv: Enum "Environment Type")
+    var
+        DEFiscalizationSetup: Record "NPR DE Fiscalization Setup";
+        DEPOSUnitAuxInfo: Record "NPR DE POS Unit Aux. Info";
+        DEAuditSetup: Record "NPR DE Audit Setup";
+        DEEstablishment: Record "NPR DE Establishment";
+        DETSS: Record "NPR DE TSS";
+        DESecretMgt: Codeunit "NPR DE Secret Mgt.";
+    begin
+        if DestinationEnv <> DestinationEnv::Sandbox then
+            exit;
+
+        DEFiscalizationSetup.ChangeCompany(CompanyName);
+        if DEFiscalizationSetup.Get() then
+            DEFiscalizationSetup.Delete()
+        else
+            exit;
+
+        DEAuditSetup.ChangeCompany(CompanyName);
+        if DEAuditSetup.FindSet(true) then begin
+            if DESecretMgt.HasSecretKey(DEAuditSetup.ApiSecretLbl()) then
+                DESecretMgt.RemoveSecretKey(DEAuditSetup.ApiSecretLbl());
+
+            if DESecretMgt.HasSecretKey(DEAuditSetup.ApiKeyLbl()) then
+                DESecretMgt.RemoveSecretKey(DEAuditSetup.ApiKeyLbl());
+
+            Clear(DEAuditSetup."Taxpayer Created");
+            DEAuditSetup.Modify();
+        end;
+
+        DETSS.ChangeCompany(CompanyName);
+        if DETSS.FindSet(true) then begin
+            if DESecretMgt.HasSecretKey(DETSS.AdminPINSecretLbl()) then
+                DESecretMgt.RemoveSecretKey(DETSS.AdminPINSecretLbl());
+
+            if DESecretMgt.HasSecretKey(DETSS.AdminPUKSecretLbl()) then
+                DESecretMgt.RemoveSecretKey(DETSS.AdminPUKSecretLbl());
+
+            Clear(DETSS."Fiskaly TSS Created at");
+            Clear(DETSS."Fiskaly TSS State");
+            DETSS.Modify();
+        end;
+
+        DEPOSUnitAuxInfo.ChangeCompany(CompanyName);
+        if DEPOSUnitAuxInfo.FindSet(true) then
+            repeat
+                Clear(DEPOSUnitAuxInfo."Additional Data Created");
+                Clear(DEPOSUnitAuxInfo."Additional Data Decommissioned");
+                Clear(DEPOSUnitAuxInfo."Fiskaly Client Created at");
+                DEPOSUnitAuxInfo.Modify();
+            until DEPOSUnitAuxInfo.Next() = 0;
+
+        DEEstablishment.ChangeCompany(CompanyName);
+        if DEEstablishment.FindSet(true) then
+            repeat
+                Clear(DEEstablishment.Created);
+                Clear(DEEstablishment.Decommissioned);
+                DEEstablishment.Modify();
+            until DEEstablishment.Next() = 0;
+    end;
+#endif
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Audit Log Mgt.", 'OnHandleAuditLogBeforeInsert', '', true, true)]
     local procedure OnHandleAuditLogBeforeInsert(var POSAuditLog: Record "NPR POS Audit Log")
     var

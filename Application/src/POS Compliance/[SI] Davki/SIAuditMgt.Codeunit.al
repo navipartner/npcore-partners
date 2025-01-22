@@ -272,6 +272,33 @@ codeunit 6151546 "NPR SI Audit Mgt."
 
     #endregion
 
+    #region SI Fiscal - Sandbox Env. Cleanup
+
+#if not (BC17 or BC18 or BC19)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Environment Cleanup", 'OnClearCompanyConfig', '', false, false)]
+    local procedure OnClearCompanyConfig(CompanyName: Text; SourceEnv: Enum "Environment Type"; DestinationEnv: Enum "Environment Type")
+    var
+        SIFiscalizationSetup: Record "NPR SI Fiscalization Setup";
+    begin
+        if DestinationEnv <> DestinationEnv::Sandbox then
+            exit;
+
+        SIFiscalizationSetup.ChangeCompany(CompanyName);
+        if SIFiscalizationSetup.Get() then begin
+            Clear(SIFiscalizationSetup."Environment URL");
+            Clear(SIFiscalizationSetup."Signing Certificate");
+            Clear(SIFiscalizationSetup."Signing Certificate Password");
+            Clear(SIFiscalizationSetup."Signing Certificate Thumbprint");
+            Clear(SIFiscalizationSetup."Certificate Serial No.");
+            Clear(SIFiscalizationSetup."Certificate Private Key");
+            Clear(SIFiscalizationSetup."Certificate Subject Ident.");
+            SIFiscalizationSetup.Modify();
+        end;
+    end;
+#endif
+
+    #endregion
+
     #region SI Fiscal - Audit Profile Mgt
     local procedure AddSIAuditHandler(var tmpRetailList: Record "NPR Retail List")
     begin

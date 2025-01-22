@@ -37,6 +37,21 @@ codeunit 6059817 "NPR BE Audit Mgt."
         ErrorOnRenameOfPOSUnitIfAlreadyUsed(xRec);
     end;
 
+#if not (BC17 or BC18 or BC19)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Environment Cleanup", 'OnClearCompanyConfig', '', false, false)]
+    local procedure OnClearCompanyConfig(CompanyName: Text; SourceEnv: Enum "Environment Type"; DestinationEnv: Enum "Environment Type")
+    var
+        BEFiscalizationSetup: Record "NPR BE Fiscalisation Setup";
+    begin
+        if DestinationEnv <> DestinationEnv::Sandbox then
+            exit;
+
+        BEFiscalizationSetup.ChangeCompany(CompanyName);
+        if BEFiscalizationSetup.Get() then
+            BEFiscalizationSetup.Delete();
+    end;
+#endif
+
     local procedure AddBEAuditHandler(var tmpRetailList: Record "NPR Retail List")
     begin
         tmpRetailList.Number += 1;

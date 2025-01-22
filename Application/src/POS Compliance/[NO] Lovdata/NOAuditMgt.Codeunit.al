@@ -68,6 +68,29 @@ codeunit 6151548 "NPR NO Audit Mgt."
     end;
     #endregion
 
+    #region NO Fiscal - Sandbox Env. Cleanup
+
+#if not (BC17 or BC18 or BC19)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Environment Cleanup", 'OnClearCompanyConfig', '', false, false)]
+    local procedure OnClearCompanyConfig(CompanyName: Text; SourceEnv: Enum "Environment Type"; DestinationEnv: Enum "Environment Type")
+    var
+        NOFiscalizationSetup: Record "NPR NO Fiscalization Setup";
+    begin
+        if DestinationEnv <> DestinationEnv::Sandbox then
+            exit;
+
+        NOFiscalizationSetup.ChangeCompany(CompanyName);
+        if NOFiscalizationSetup.Get() then begin
+            Clear(NOFiscalizationSetup."Signing Certificate");
+            Clear(NOFiscalizationSetup."Signing Certificate Password");
+            Clear(NOFiscalizationSetup."Signing Certificate Thumbprint");
+            NOFiscalizationSetup.Modify();
+        end;
+    end;
+#endif
+
+    #endregion
+
     #region Subscribers - POS Audit Logging
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POSAction: Delete POS Line", 'OnBeforeDeleteSaleLinePOS', '', false, false)]
     local procedure NPRPOSActionDeletePOSLine_OnBeforeDeleteSaleLinePOS(POSSaleLine: Codeunit "NPR POS Sale Line");

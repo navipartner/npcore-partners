@@ -189,5 +189,33 @@
 
         Page.Run(Page::"NPR CleanCash Setup List");
     end;
+
+    #region SE Fiscal Clean Cash - Sandbox Env. Cleanup
+
+#if not (BC17 or BC18 or BC19)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Environment Cleanup", 'OnClearCompanyConfig', '', false, false)]
+    local procedure OnClearCompanyConfig(CompanyName: Text; SourceEnv: Enum "Environment Type"; DestinationEnv: Enum "Environment Type")
+    var
+        SEFiscalizationSetup: Record "NPR SE Fiscalization Setup.";
+        CleanCashSetup: Record "NPR CleanCash Setup";
+    begin
+        if DestinationEnv <> DestinationEnv::Sandbox then
+            exit;
+
+        SEFiscalizationSetup.ChangeCompany(CompanyName);
+        if SEFiscalizationSetup.Get() then
+            SEFiscalizationSetup.Delete()
+        else
+            exit;
+
+        CleanCashSetup.ChangeCompany(CompanyName);
+        CleanCashSetup.ModifyAll("Organization ID", '');
+        CleanCashSetup.ModifyAll("CleanCash Register No.", '');
+        CleanCashSetup.ModifyAll("CleanCash No. Series", '');
+        CleanCashSetup.ModifyAll("Connection String", '');
+    end;
+#endif
+
+    #endregion
 }
 

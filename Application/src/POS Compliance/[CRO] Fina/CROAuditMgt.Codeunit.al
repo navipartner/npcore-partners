@@ -48,6 +48,27 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         ErrorOnRenameOfPOSUnitIfAlreadyUsed(xRec);
     end;
 
+#if not (BC17 or BC18 or BC19)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Environment Cleanup", 'OnClearCompanyConfig', '', false, false)]
+    local procedure OnClearCompanyConfig(CompanyName: Text; SourceEnv: Enum "Environment Type"; DestinationEnv: Enum "Environment Type")
+    var
+        CROFiscalizationSetup: Record "NPR CRO Fiscalization Setup";
+    begin
+        if DestinationEnv <> DestinationEnv::Sandbox then
+            exit;
+
+        CROFiscalizationSetup.ChangeCompany(CompanyName);
+        if CROFiscalizationSetup.Get() then begin
+            Clear(CROFiscalizationSetup."Signing Certificate");
+            Clear(CROFiscalizationSetup."Signing Certificate Password");
+            Clear(CROFiscalizationSetup."Signing Certificate Thumbprint");
+            Clear(CROFiscalizationSetup."Certificate Subject OIB");
+            Clear(CROFiscalizationSetup."Environment URL");
+            CROFiscalizationSetup.Modify();
+        end;
+    end;
+#endif
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale", 'OnBeforeInitSale', '', false, false)]
     local procedure OnBeforeInitSale(SaleHeader: Record "NPR POS Sale"; FrontEnd: Codeunit "NPR POS Front End Management")
     begin

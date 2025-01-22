@@ -173,6 +173,25 @@ codeunit 6184669 "NPR DK Audit Mgt."
 
     #endregion
 
+    #region DK Fiscal - Sandbox Env. Cleanup
+
+#if not (BC17 or BC18 or BC19)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Environment Cleanup", 'OnClearCompanyConfig', '', false, false)]
+    local procedure OnClearCompanyConfig(CompanyName: Text; SourceEnv: Enum "Environment Type"; DestinationEnv: Enum "Environment Type")
+    var
+        DKFiscalizationSetup: Record "NPR DK Fiscalization Setup";
+    begin
+        if DestinationEnv <> DestinationEnv::Sandbox then
+            exit;
+
+        DKFiscalizationSetup.ChangeCompany(CompanyName);
+        if DKFiscalizationSetup.Get() then
+            DKFiscalizationSetup.Delete();
+    end;
+#endif
+
+    #endregion
+
     #region DK Fiscal - Audit Profile Mgt
     local procedure AddDKAuditHandler(var tmpRetailList: Record "NPR Retail List")
     begin

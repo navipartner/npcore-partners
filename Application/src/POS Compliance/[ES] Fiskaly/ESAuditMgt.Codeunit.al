@@ -23,6 +23,25 @@ codeunit 6184866 "NPR ES Audit Mgt."
     end;
     #endregion
 
+    #region ES Fiscal - Sandbox Env. Cleanup
+
+#if not (BC17 or BC18 or BC19)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Environment Cleanup", 'OnClearCompanyConfig', '', false, false)]
+    local procedure OnClearCompanyConfig(CompanyName: Text; SourceEnv: Enum "Environment Type"; DestinationEnv: Enum "Environment Type")
+    var
+        ESFiscalizationSetup: Record "NPR ES Fiscalization Setup";
+    begin
+        if DestinationEnv <> DestinationEnv::Sandbox then
+            exit;
+
+        ESFiscalizationSetup.ChangeCompany(CompanyName);
+        if ESFiscalizationSetup.Get() then
+            ESFiscalizationSetup.Delete();
+    end;
+#endif
+
+    #endregion
+
     #region ES Fiscal - Audit Profile Mgt
     local procedure HandleOnHandleAuditLogBeforeInsert(var POSAuditLog: Record "NPR POS Audit Log")
     var

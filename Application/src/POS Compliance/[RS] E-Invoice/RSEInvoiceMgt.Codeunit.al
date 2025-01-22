@@ -2,6 +2,28 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
 {
     Access = Internal;
 
+    #region RS E-Invoice - Sandbox Env. Cleanup
+
+#if not (BC17 or BC18 or BC19)
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Environment Cleanup", 'OnClearCompanyConfig', '', false, false)]
+    local procedure OnClearCompanyConfig(CompanyName: Text; SourceEnv: Enum "Environment Type"; DestinationEnv: Enum "Environment Type")
+    var
+        RSEInvoiceSetup: Record "NPR RS E-Invoice Setup";
+    begin
+        if DestinationEnv <> DestinationEnv::Sandbox then
+            exit;
+
+        RSEInvoiceSetup.ChangeCompany(CompanyName);
+        if RSEInvoiceSetup.Get() then begin
+            Clear(RSEInvoiceSetup."API Key");
+            Clear(RSEInvoiceSetup."API URL");
+            RSEInvoiceSetup.Modify();
+        end
+    end;
+#endif
+
+    #endregion
+
     #region RS E-Invoice Mgt. Procedures
 
     procedure IsRSEInvoiceEnabled(): Boolean
