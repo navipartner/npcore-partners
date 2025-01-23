@@ -256,7 +256,9 @@ service:
       method: POST
       path: "/sales"
       request: CreateExternalPOSSale
-      response: ExternalPOSSale
+      response:
+        type: ExternalPOSSale
+        status-code: 201
       examples:
         - name: ExampleExternalPOSSaleRequest
           path-parameters:
