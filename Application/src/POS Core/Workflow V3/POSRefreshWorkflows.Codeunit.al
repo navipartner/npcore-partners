@@ -23,11 +23,17 @@ codeunit 6059798 "NPR POS Refresh Workflows"
         ActionCode: Text;
         Workflow: Interface "NPR IPOS Workflow";
         MissingDescriptionLbl: Label 'Action %1 is missing a description caption';
+        POSWorkflowEvents: Codeunit "NPR POS Workflow Events";
+        POSActionParamBuf: Codeunit "NPR POS Action Param Buf.";
     begin
         Workflow := Enum::"NPR POS Workflow".FromInteger(WorkflowOrdinal);
         ActionCode := Enum::"NPR POS Workflow".Names().Get(Enum::"NPR POS Workflow".Ordinals().IndexOf(WorkflowOrdinal));
         WorkflowConfig.SetActionCode(ActionCode);
         Workflow.Register(WorkflowConfig); //Workflow registers all config
+
+        POSActionParamBuf.SetParameters("NPR POS Workflow".FromInteger(WorkflowOrdinal), WorkflowConfig);
+        POSWorkflowEvents.OnRefreshActionOnAfterRegister(POSActionParamBuf);
+
         if (WorkflowConfig.GetWorkflowDescription() = '') then
             Error(MissingDescriptionLbl, ActionCode);
 
