@@ -157,17 +157,35 @@
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         FailReason: Text;
         TicketOrderLbl: Label '%1%2', Locked = true;
+        NpDesigner: Record "NPR NPDesignerSetup";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        OnlineTicketNotAvailableErr: Label 'Online ticket not available';
     begin
 
         TicketReservationRequest.Get(RequestEntryNo);
-
         TicketSetup.Get();
-        TicketSetup.TestField("Print Server Order URL");
 
-        if (not GenerateTicketPrint(RequestEntryNo, true, FailReason)) then
-            Error(FailReason);
+        if (NpDesigner.Get()) then begin
+            if (NpDesigner.PublicOrderURL <> '') then begin
+                TicketBom.SetFilter("Item No.", '=%1', TicketReservationRequest."Item No.");
+                TicketBom.SetFilter(Default, '=%1', true);
+                TicketBom.SetFilter(NPDesignerTemplateId, '<>%1', '');
+                if (TicketBom.FindFirst()) then begin
+                    HyperLink(StrSubstNo(NpDesigner.PublicOrderURL, TicketReservationRequest."Session Token ID", TicketBom.NPDesignerTemplateId));
+                    exit;
+                end;
+            end;
+        end;
 
-        HyperLink(StrSubstNo(TicketOrderLbl, TicketSetup."Print Server Order URL", TicketReservationRequest."Session Token ID"));
+        if (TicketSetup."Print Server Ticket URL" <> '') then begin
+            if (not GenerateTicketPrint(RequestEntryNo, true, FailReason)) then
+                Error(FailReason);
+
+            HyperLink(StrSubstNo(TicketOrderLbl, TicketSetup."Print Server Order URL", TicketReservationRequest."Session Token ID"));
+            exit;
+        end;
+
+        Error(OnlineTicketNotAvailableErr);
     end;
 
     procedure ViewOnlineSingleTicket(TicketNo: Code[20])
@@ -193,7 +211,7 @@
                 TicketBom.SetFilter(Default, '=%1', true);
                 TicketBom.SetFilter(NPDesignerTemplateId, '<>%1', '');
                 if (TicketBom.FindFirst()) then begin
-                    HyperLink(StrSubstNo(NpDesigner.PublicTicketURL, TicketReservationRequest."Session Token ID", TicketBom.NPDesignerTemplateId));
+                    HyperLink(StrSubstNo(NpDesigner.PublicTicketURL, Format(Ticket.SystemId, 0, 4).ToLower(), TicketBom.NPDesignerTemplateId));
                     exit;
                 end;
             end;
