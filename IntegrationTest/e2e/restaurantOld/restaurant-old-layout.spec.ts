@@ -10,12 +10,18 @@ test.beforeEach(async ({ page }) => {
 
 test.describe("Restaurant old layout", () => {
   test("user should be able to create new location, room, table, wall and bar, and then edit, and remove", async ({
+    page,
     location,
     room,
     table,
     wall,
     bar,
   }) => {
+    // check if location that should be created already exists and remove it
+    const existingLocation = page.frameLocator('iframe[title="Framework"]').locator('div').filter({ hasText: /^Edited Location$/ }).nth(2);
+    if(await existingLocation.isVisible()) {
+      await location.remove(data.location.new.id, data.location.edited.name);
+    }
     // user should be able to create new location and edit location name
     await location.add(data.location.new.id, data.location.new.name);
     await location.rename(data.location.edited.name, data.location.new.name);
