@@ -52,7 +52,7 @@ codeunit 6151584 "NPR CRO Fiscal Thermal Print"
 
         PrinterDeviceSettings.Init();
         PrinterDeviceSettings.Name := 'ENCODING';
-        PrinterDeviceSettings.Value := 'Windows-1251';
+        PrinterDeviceSettings.Value := 'PC852';
         PrinterDeviceSettings.Insert();
 
         Printer.ProcessBuffer(Codeunit::"NPR CRO Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
