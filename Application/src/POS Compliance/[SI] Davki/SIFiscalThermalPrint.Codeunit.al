@@ -36,7 +36,7 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
 
         PrinterDeviceSettings.Init();
         PrinterDeviceSettings.Name := 'ENCODING';
-        PrinterDeviceSettings.Value := 'Windows-1251';
+        PrinterDeviceSettings.Value := 'PC852';
         PrinterDeviceSettings.Insert();
 
         Printer.ProcessBuffer(Codeunit::"NPR SI Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
