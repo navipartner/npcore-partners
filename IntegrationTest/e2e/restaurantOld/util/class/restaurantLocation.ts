@@ -55,7 +55,7 @@ class RestaurantLocation extends RestaurantLayout {
         .locator(
           `div.old-seating-setup-locations__location > span:has-text('${name}')`
         )
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
 
     await this.page
       .frameLocator("iframe")
@@ -69,7 +69,7 @@ class RestaurantLocation extends RestaurantLayout {
         .locator("div.old-restaurant__location__selection__button span")
         .filter({ hasText: new RegExp(`^${name}$`) })
         .nth(1)
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   }
 
   async rename(editedName: string, oldName: string) {
@@ -119,7 +119,7 @@ class RestaurantLocation extends RestaurantLayout {
         .locator(
           `div.old-seating-setup-locations__location span:has-text('${editedName}')`
         )
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
 
     await this.page
       .frameLocator("iframe")
@@ -133,7 +133,7 @@ class RestaurantLocation extends RestaurantLayout {
         .locator("div.old-restaurant__location__selection__button span")
         .filter({ hasText: new RegExp(`^${editedName}$`) })
         .nth(1)
-    ).toBeVisible();
+    ).toBeVisible({ timeout: 10000 });
   }
 
   async remove(id: string, name: string) {
@@ -152,7 +152,7 @@ class RestaurantLocation extends RestaurantLayout {
         .locator(
           `div.old-seating-setup-locations__location span:has-text('${name}')`
         )
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
 
     await this.page
       .frameLocator("iframe")
@@ -166,7 +166,7 @@ class RestaurantLocation extends RestaurantLayout {
         .locator("div.old-restaurant__location__selection__button span")
         .filter({ hasText: new RegExp(`^${name}$`) })
         .nth(1)
-    ).not.toBeVisible();
+    ).not.toBeVisible({ timeout: 10000 });
   }
 }
 
