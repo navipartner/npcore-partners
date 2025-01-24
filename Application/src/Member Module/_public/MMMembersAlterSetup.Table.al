@@ -220,6 +220,11 @@
             Caption = 'Print Card On Alteration';
             DataClassification = CustomerContent;
         }
+        field(150; "Description 2"; Text[100])
+        {
+            Caption = 'Description 2';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

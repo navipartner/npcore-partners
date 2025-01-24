@@ -34,6 +34,12 @@ page 6151381 "NPR Members. Alter. Setup Step"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Description field.';
                 }
+                field("Description 2"; Rec."Description 2")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Description 2 field.';
+                    Visible = false;
+                }
                 field("To Membership Code"; Rec."To Membership Code")
                 {
                     ApplicationArea = NPRRetail;
