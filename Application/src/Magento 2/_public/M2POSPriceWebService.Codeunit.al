@@ -30,6 +30,7 @@
         POSSalesPriceCalcMgt: Codeunit "NPR POS Sales Price Calc. Mgt.";
         Item: Record Item;
         POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
+        TotalDiscountManagement: Codeunit "NPR Total Discount Management";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         CurrencyDiscCalcNotSupported: Label 'Discount module "%1" does not support discount calculations when exchange rates apply (%2 -> %3).';
     begin
@@ -120,6 +121,20 @@
                 TmpSaleLinePOS.Modify();
             until (TempSaleLinePOS2.Next() = 0);
         end;
+
+        TotalDiscountManagement.ApplyTotalDiscount(TmpSalePOS, TmpSaleLinePOS, Today());
+        TmpSaleLinePOS.Reset();
+        if (TmpSaleLinePOS.FindSet()) then
+            repeat
+                if TmpSaleLinePOS."Total Discount Code" <> '' then begin
+                    if not TmpSaleLinePOS."Price Includes VAT" then begin
+                        if TmpSaleLinePOS."Total Discount Amount" <> 0 then begin
+                            TmpSaleLinePOS."Discount Amount" := POSSaleTaxCalc.CalcAmountWithoutVAT(TmpSaleLinePOS."Discount Amount", TmpSaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+                            TmpSaleLinePOS.Modify();
+                        end
+                    end;
+                end;
+            until (TmpSaleLinePOS.Next() = 0);
     end;
 
     procedure ItemPrice(var ItemPriceRequest: XMLport "NPR M2 Item Price Request")
