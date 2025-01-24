@@ -66,6 +66,12 @@ page 6059888 "NPR TM Ticket Item List"
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Visible = false;
                 }
+                field(Description_2; Rec."Description 2")
+                {
+                    ToolTip = 'Specifies the value of the Description 2 field.';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Visible = false;
+                }
             }
         }
     }
@@ -261,6 +267,7 @@ page 6059888 "NPR TM Ticket Item List"
                 Clear(Rec);
                 Rec."Item No." := Item."No.";
                 Rec.Description := Item.Description;
+                Rec."Description 2" := Item."Description 2";
                 Rec.Insert();
             end;
         until (Item.Next() = 0);
