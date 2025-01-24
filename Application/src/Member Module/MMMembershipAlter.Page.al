@@ -35,9 +35,14 @@
                 }
                 field(Description; Rec.Description)
                 {
-
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field("Description 2"; Rec."Description 2")
+                {
+                    ToolTip = 'Specifies the value of the Description 2 field';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Visible = false;
                 }
                 field("To Membership Code"; Rec."To Membership Code")
                 {

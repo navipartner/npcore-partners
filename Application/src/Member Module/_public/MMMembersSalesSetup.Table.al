@@ -171,6 +171,11 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR MM AzureMemberRegSetup";
         }
+        field(120; Description; Text[100])
+        {
+            Caption = 'Description';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

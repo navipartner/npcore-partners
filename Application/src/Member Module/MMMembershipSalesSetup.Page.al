@@ -25,6 +25,11 @@
                     ToolTip = 'Specifies the value of the No. field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field(Description; Rec.Description)
+                {
+                    ToolTip = 'Specifies the value of the Description field';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
                 field("Business Flow Type"; Rec."Business Flow Type")
                 {
                     ToolTip = 'Specifies the value of the Business Flow Type field';
