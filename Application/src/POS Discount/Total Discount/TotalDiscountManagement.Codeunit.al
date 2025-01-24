@@ -468,7 +468,7 @@ codeunit 6151077 "NPR Total Discount Management"
             ToTempSaleLinePOS.DeleteAll();
     end;
 
-    local procedure ApplyTotalDiscount(SalePOS: Record "NPR POS Sale";
+    internal procedure ApplyTotalDiscount(SalePOS: Record "NPR POS Sale";
                                        var TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
                                        CalculationDate: Date)
 
