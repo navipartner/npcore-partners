@@ -770,7 +770,7 @@ codeunit 6151543 "NPR TM Client API BL"
             JBuilder.WriteNumberProperty('vatPct', AdmCapacityPriceBuffer.UnitPriceVatPercentage);
 
             JBuilder.WriteStartArray('schedule');
-            GenerateAdmissionScheduleEntries(JBuilder, AdmCapacityPriceBuffer, ScheduleId);
+            GenerateAdmissionScheduleEntries(JBuilder, AdmCapacityPriceBuffer, Admission, ScheduleId);
             JBuilder.WriteEndArray();
             JBuilder.WriteEndObject();
 
@@ -779,7 +779,7 @@ codeunit 6151543 "NPR TM Client API BL"
         until (TicketBom.Next() = 0)
     end;
 
-    local procedure GenerateAdmissionScheduleEntries(var JBuilder: Codeunit "Json Text Reader/Writer"; AdmCapacityPriceBufferResponse: Record "NPR TM AdmCapacityPriceBuffer"; ScheduleId: Integer)
+    local procedure GenerateAdmissionScheduleEntries(var JBuilder: Codeunit "Json Text Reader/Writer"; AdmCapacityPriceBufferResponse: Record "NPR TM AdmCapacityPriceBuffer"; Admission: Record "NPR TM Admission"; ScheduleId: Integer)
     var
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         PriceRule: Record "NPR TM Dynamic Price Rule";
@@ -830,7 +830,7 @@ codeunit 6151543 "NPR TM Client API BL"
                     exit;
             end;
 
-            if (RemainingCapacity < 1) then begin
+            if (RemainingCapacity < 1) and (Admission."Capacity Control" <> Admission."Capacity Control"::NONE) then begin
                 CapacityStatusCode := _CapacityStatusCodeOption::CAPACITY_EXCEEDED;
                 BlockSaleReason := BlockSaleReason::RemainingCapacityZeroOrLess;
             end;
@@ -895,6 +895,9 @@ codeunit 6151543 "NPR TM Client API BL"
                 DynamicCustomerPrice := 0;
 
             CustomerPriceOut := (AdmCapacityPriceBufferResponse.Quantity * DynamicCustomerPrice - AdmCapacityPriceBufferResponse.Quantity * DynamicCustomerPrice * AdmCapacityPriceBufferResponse.DiscountPct / 100);
+
+            if (RemainingCapacity < 0) then
+                RemainingCapacity := 0;
 
             JBuilder.WriteStartObject('');
             JBuilder.WriteRawProperty('id', AdmissionScheduleEntry."External Schedule Entry No.");

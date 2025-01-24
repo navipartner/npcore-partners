@@ -17,7 +17,7 @@ Authorization: Basic {{username}} {{password}}
 @ticketToken = 3A3800F28C884BF795895C80BE7EB04D
 @scheduleId=0
 @itemNumber = 31005
-@referenceDate = 2025-01-09
+@referenceDate = 2025-01-24
 @quantity = 1
 @admissionCode = DUNGEON
 ###

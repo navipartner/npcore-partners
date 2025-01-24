@@ -357,11 +357,14 @@ xmlport 6014411 "NPR TM AdmissionCapacityPrice"
                             if (NonWorking) then
                                 _CapacityStatusCode := -6;
 
-                            if (_RemainingCapacity < 1) then begin
+                            if (_RemainingCapacity < 1) and (xAdmCapacityPriceBufferResponse.CapacityControl <> xAdmCapacityPriceBufferResponse.CapacityControl::NONE) then begin
                                 _RemainingCapacity := 0;
                                 _CapacityStatusCode := -1;
                                 ReasonCode := ReasonCode::RemainingCapacityZeroOrLess;
                             end;
+
+                            if (_RemainingCapacity < 0) then
+                                _RemainingCapacity := 0;
 
                             xResponseMessageOut := SetResponseMessageText(ReasonCode);
                         end;
