@@ -178,6 +178,9 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
                         CapacityStatusCode := _CapacityStatusCodeOption::CLOSED;
                 end;
 
+                if (RemainingCapacity < 0) then
+                    RemainingCapacity := 0;
+
                 ResponseJson.StartObject()
                     .AddProperty('allocatable', CapacityStatusCode in [_CapacityStatusCodeOption::OK, _CapacityStatusCodeOption::CALENDAR_WARNING, _CapacityStatusCodeOption::UNLIMITED_CAPACITY])
                     .AddProperty('allocationModel', EnumEncoder.EncodeAllocationBy(AdmissionScheduleEntry."Allocation By"))
