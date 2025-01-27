@@ -50,7 +50,7 @@ codeunit 6059995 "NPR HL Member Mgt. Impl."
         Commit();
     end;
 
-    local procedure ProcessMember(Member: Record "NPR MM Member"; MembershipRole: Record "NPR MM Membership Role"; MemberDeleted: Boolean; Enqueue: Boolean): Boolean
+    internal procedure ProcessMember(Member: Record "NPR MM Member"; MembershipRole: Record "NPR MM Membership Role"; MemberDeleted: Boolean; Enqueue: Boolean): Boolean
     var
         HLMember: Record "NPR HL HeyLoyalty Member";
     begin
@@ -98,6 +98,7 @@ codeunit 6059995 "NPR HL Member Mgt. Impl."
         MembershipRole: Record "NPR MM Membership Role";
         DataLogSubscriberMgt: Codeunit "NPR Data Log Sub. Mgt.";
         RecRef: RecordRef;
+        MemberDeletionRequest: Boolean;
         ProcessRec: Boolean;
     begin
         RecRef := DataLogEntry."Record ID".GetRecord();
@@ -106,7 +107,8 @@ codeunit 6059995 "NPR HL Member Mgt. Impl."
                 begin
                     RecRef.SetTable(Member);
                     ProcessRec := Member.Find();
-                    if DataLogEntry."Type of Change" = DataLogEntry."Type of Change"::Delete then
+                    MemberDeletionRequest := DataLogEntry."Type of Change" = DataLogEntry."Type of Change"::Delete;
+                    if MemberDeletionRequest then
                         if ProcessRec then
                             exit(false)  //the member record hasn't been actually deleted
                         else
@@ -129,7 +131,8 @@ codeunit 6059995 "NPR HL Member Mgt. Impl."
         if not FindMembershipRole(Member, MembershipRole) then
             Clear(MembershipRole);
         if ProcessRec then
-            ProcessRec := TestRequiredFields(Member, MembershipRole, false);
+            if not MemberDeletionRequest then
+                ProcessRec := TestRequiredFields(Member, MembershipRole, false);
 
         MemberOut := Member;
         MembershipRoleOut := MembershipRole;
@@ -320,12 +323,11 @@ codeunit 6059995 "NPR HL Member Mgt. Impl."
             exit(true);
         end;
 
-        Disqualified :=
-            (HLIntegrationMgt.UnsubscribeIfBlocked() and (Member.Blocked or Membership.Blocked or MembershipRole.Blocked))
-            or
-            ((HLIntegrationMgt.RequireNewsletterSubscr() or (HLMember."Unsubscribed at" <> 0DT)) and (Member."E-Mail News Letter" <> Member."E-Mail News Letter"::YES))
-            or
-            (HLIntegrationMgt.RequireGDPRApproval() and (MembershipRole."GDPR Approval" <> MembershipRole."GDPR Approval"::ACCEPTED));
+        Disqualified := HLIntegrationMgt.UnsubscribeIfBlocked() and (Member.Blocked or Membership.Blocked or MembershipRole.Blocked);
+        if not Disqualified then
+            Disqualified := (HLIntegrationMgt.RequireNewsletterSubscr() or (HLMember."Unsubscribed at" <> 0DT)) and (Member."E-Mail News Letter" <> Member."E-Mail News Letter"::YES);
+        if not Disqualified then
+            Disqualified := HLIntegrationMgt.RequireGDPRApproval() and (MembershipRole."GDPR Approval" <> MembershipRole."GDPR Approval"::ACCEPTED);
 
         exit(not Disqualified);
     end;
