@@ -15,6 +15,7 @@ codeunit 6060000 "NPR HL Upsert Member"
         MembershipRole: Record "NPR MM Membership Role";
         HLWSMgt: Codeunit "NPR HL Member Webhook Handler";
         MemberMgt: Codeunit "NPR HL Member Mgt. Impl.";
+        NewMember: Boolean;
     begin
         if not HLMember.Find() or HLMember.Deleted then
             exit;
@@ -27,14 +28,25 @@ codeunit 6060000 "NPR HL Upsert Member"
                 HLMember.Modify();
             end;
 
-        if HLMember."Member Entry No." <> 0 then
-            Member.Get(HLMember."Member Entry No.")
-        else
-            CreateNewMemberFromHL(HLMember, Member);
+        if HLMember."Member Entry No." <> 0 then begin
+            if not Member.Get(HLMember."Member Entry No.") then begin
+                HLMember.Deleted := true;
+                HLMember.Modify();
+                exit;
+            end;
+        end else
+            NewMember := CreateNewMemberFromHL(HLMember, Member);
         UpdateMemberFromHL(HLMember, Member);
+
+        if not NewMember then
+            exit;
+        // Schedule update back to HeyLoyalty with new member data
+        if not MemberMgt.FindMembershipRole(Member, MembershipRole) then
+            Clear(MembershipRole);
+        MemberMgt.ProcessMember(Member, MembershipRole, false, false);
     end;
 
-    local procedure CreateNewMemberFromHL(var HLMember: Record "NPR HL HeyLoyalty Member"; var Member: Record "NPR MM Member")
+    local procedure CreateNewMemberFromHL(var HLMember: Record "NPR HL HeyLoyalty Member"; var Member: Record "NPR MM Member"): Boolean
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipEntry: Record "NPR MM Membership Entry";
@@ -103,6 +115,7 @@ codeunit 6060000 "NPR HL Upsert Member"
         HLMember.Validate("Membership Code", MembershipEntry."Membership Code");
         HLMember.Modify();
         DataLogMgt.DisableDataLog(false);
+        exit(true);
     end;
 
     local procedure FindReusableCustomerNo(MemberInfoCapture: Record "NPR MM Member Info Capture"): Code[20]
