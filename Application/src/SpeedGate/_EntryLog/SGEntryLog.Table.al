@@ -47,6 +47,11 @@ table 6150987 "NPR SGEntryLog"
             DataClassification = CustomerContent;
             Caption = 'Admitted At';
         }
+        field(55; AdmittedReferenceNo; Text[100])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Admitted Reference No';
+        }
         field(100; ReferenceNumberType; Option)
         {
             DataClassification = CustomerContent;
