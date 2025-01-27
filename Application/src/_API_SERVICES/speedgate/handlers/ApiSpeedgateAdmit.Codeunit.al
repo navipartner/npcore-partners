@@ -73,7 +73,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
                     exit(Response.RespondBadRequest('Invalid quantity provided'));
             end;
 
-            if (not SpeedGateMgr.ValidateAdmitToken(Token)) then
+            if (not SpeedGateMgr.AdmitTokenIsValid(Token)) then
                 exit(Response.RespondBadRequest('Invalid token provided'));
         end;
 
@@ -120,34 +120,42 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
                 if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::MEMBER_CARD) then
                     AdmitMemberCard(ValidationRequest, ResponseJson);
 
+                if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::WALLET) then
+                    AdmitWallet(ValidationRequest, ResponseJson);
+
             until (ValidationRequest.Next() = 0);
         end;
 
         exit(ResponseJson);
     end;
 
+    local procedure AdmitWallet(ValidationRequest: Record "NPR SGEntryLog"; ResponseJson: Codeunit "NPR JSON Builder")
+    begin
+        if (ValidationRequest.ExtraEntityTableId = 0) then
+            Error('The tryAdmit request was not able to preselect a product for admission.');
+
+        if (not (ValidationRequest.ExtraEntityTableId in [Database::"NPR TM Ticket", Database::"NPR MM Member Card"])) then
+            Error('The admit request contains an unhandled Entity: %1', ValidationRequest.ExtraEntityTableId);
+
+        if (ValidationRequest.ExtraEntityTableId = Database::"NPR TM Ticket") then
+            AdmitTicket(ValidationRequest, ResponseJson);
+
+        if (ValidationRequest.ExtraEntityTableId = Database::"NPR MM Member Card") then
+            AdmitMemberCard(ValidationRequest, ResponseJson);
+    end;
+
     local procedure AdmitTicket(ValidationRequest: Record "NPR SGEntryLog"; ResponseJson: Codeunit "NPR JSON Builder")
     var
-        TicketManagement: Codeunit "NPR TM Ticket Management";
+        SpeedGateMgr: Codeunit "NPR SG SpeedGate";
         Ticket: Record "NPR TM Ticket";
     begin
-        TicketManagement.RegisterArrivalScanTicket("NPR TM TicketIdentifierType"::EXTERNAL_TICKET_NO,
-            CopyStr(ValidationRequest.ReferenceNo, 1, 30),
-            ValidationRequest.AdmissionCode,
-            -1, '', // PosUnitNo, 
-            ValidationRequest.ScannerId, false);
-
-        ValidationRequest.EntryStatus := ValidationRequest.EntryStatus::ADMITTED;
-        ValidationRequest.AdmittedAt := CurrentDateTime;
-        ValidationRequest.Modify();
-
-        Ticket.GetBySystemId(ValidationRequest.EntityId);
+        Ticket.GetBySystemId(SpeedGateMgr.ValidateAdmitTicket(ValidationRequest));
 
         ResponseJson
             .StartObject()
             .AddProperty('token', Format(ValidationRequest.Token, 0, 4).ToLower())
             .AddProperty('referenceNumberType', 'ticket')
-            .AddProperty('referenceNumber', ValidationRequest.ReferenceNo)
+            .AddProperty('referenceNumber', Ticket."External Ticket No.")
             .AddProperty('ticketId', Format(ValidationRequest.EntityId, 0, 4).ToLower())
             .AddProperty('status', 'admitted')
             .AddProperty('itemNo', Ticket."Item No.")
@@ -158,49 +166,10 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
 
     local procedure AdmitMemberCard(ValidationRequest: Record "NPR SGEntryLog"; ResponseJson: Codeunit "NPR JSON Builder")
     var
-        MemberTicketManager: Codeunit "NPR MM Member Ticket Manager";
-        MemberLimitationMgr: Codeunit "NPR MM Member Lim. Mgr.";
-        MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
-        MemberCard: Record "NPR MM Member Card";
-        ExternalTicketNo: Text[30];
-        ResponseMessage: Text;
-        ResponseCode: Integer;
+        SpeedGateMgr: Codeunit "NPR SG SpeedGate";
         Ticket: Record "NPR TM Ticket";
-        LogEntryNo: Integer;
     begin
-        ResponseMessage := 'Invalid Validation Request';
-
-        if (not MemberCard.GetBySystemId(ValidationRequest.EntityId)) then
-            Error(ResponseMessage);
-
-        if (MemberManagement.MembershipNeedsActivation(MemberCard."Membership Entry No.")) then
-            MemberManagement.ActivateMembershipLedgerEntry(MemberCard."Membership Entry No.", Today());
-
-        ValidationRequest.MemberCardLogEntryNo := MemberLimitationMgr.WS_CheckLimitMemberCardArrival(MemberCard."External Card No.", ValidationRequest.AdmissionCode, ValidationRequest.ScannerId, LogEntryNo, ResponseMessage, ResponseCode);
-        ValidationRequest.Modify();
-        if (ResponseCode <> 0) then begin
-            Commit();
-            ResponseMessage := Strsubstno('[-3149] %1', ResponseMessage);
-            Error(ResponseMessage);
-        end;
-
-        case ValidationRequest.ExtraEntityTableId of
-            0: // Member Card
-               // Has a commit inside
-                MemberTicketManager.MemberFastCheckInNoPrint(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", ValidationRequest.AdmissionCode, '', 1, '', ExternalTicketNo);
-            Database::"NPR MM Members. Admis. Setup": // Guest
-                Error('Guest check-in not implemented');
-            else
-                Error('Unknown MemberCard ExtraEntityTableId');
-        end;
-
-        ValidationRequest.EntryStatus := ValidationRequest.EntryStatus::ADMITTED;
-        ValidationRequest.AdmittedAt := CurrentDateTime;
-        ValidationRequest.Modify();
-
-        Ticket.SetFilter("External Ticket No.", '=%1', ExternalTicketNo);
-        if (not Ticket.FindFirst()) then
-            Ticket.Init();
+        Ticket.GetBySystemId(SpeedGateMgr.ValidateAdmitMemberCard(ValidationRequest));
 
         ResponseJson
             .StartObject()
@@ -213,11 +182,9 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             .AddProperty('admissionCode', ValidationRequest.AdmissionCode)
             .AddObject(AddPrintedTicketDetails(ResponseJson, Ticket))
             .AddProperty('memberCardId', Format(ValidationRequest.EntityId, 0, 4).ToLower())
-            .AddProperty('externalTicketNo', ExternalTicketNo)
+            .AddProperty('ticketNumber', ValidationRequest.AdmittedReferenceNo)
             .EndObject();
-
     end;
-
 
     internal procedure MarkAsDenied(var Request: Codeunit "NPR API Request"; ErrorCode: Enum "NPR API Error Code"; ErrorMessage: Text) Response: Codeunit "NPR API Response"
     var
@@ -305,11 +272,11 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
 
         case ValidationRequest.ReferenceNumberType of
             ValidationRequest.ReferenceNumberType::TICKET:
-                exit(SingleTicketDTO(ResponseJson, ValidationRequest));
+                exit(StartSingleTicketDTO(ResponseJson, ValidationRequest));
             ValidationRequest.ReferenceNumberType::MEMBER_CARD:
                 exit(SingleMembershipDTO(ResponseJson, ValidationRequest));
             ValidationRequest.ReferenceNumberType::WALLET:
-                exit(ResponseJson.AddProperty('wallet', ValidationRequest.EntityId));
+                exit(SingleWalletDTO(ResponseJson, ValidationRequest));
             ValidationRequest.ReferenceNumberType::DOC_LX_CITY_CARD:
                 exit(ResponseJson.AddProperty('docLxCityCard', ValidationRequest.ReferenceNo));
             else
@@ -317,39 +284,100 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         end;
     end;
 
-    local procedure SingleTicketDTO(var ResponseJson: Codeunit "NPR JSON Builder"; ValidationRequest: Record "NPR SGEntryLog"): Codeunit "NPR JSON Builder"
+    local procedure SingleWalletDTO(var ResponseJson: Codeunit "NPR JSON Builder"; ValidationRequest: Record "NPR SGEntryLog"): Codeunit "NPR JSON Builder"
+    var
+        Wallet: Record "NPR AttractionWallet";
+        WalletAssetLine: Record "NPR WalletAssetLine";
+        WalletAgent: Codeunit "NPR AttractionWallet";
+    begin
+
+        Wallet.GetBySystemId(ValidationRequest.EntityId);
+
+        ResponseJson
+            .StartObject('wallet')
+            .AddProperty('walletId', Format(ValidationRequest.EntityId, 0, 4).ToLower())
+            .AddProperty('referenceNumber', ValidationRequest.ReferenceNo)
+            .AddProperty('validToAdmit', ValidationRequest.ExtraEntityTableId in [Database::"NPR TM Ticket", Database::"NPR MM Member Card"]);
+
+        ResponseJson.StartArray('tickets');
+        WalletAssetLine.SetCurrentKey(TransactionId, Type);
+        WalletAssetLine.SetFilter(TransactionId, '=%1', WalletAgent.GetWalletTransactionId(Wallet.EntryNo));
+        WalletAssetLine.SetFilter(Type, '=%1', ENUM::"NPR WalletLineType"::Ticket);
+        if (WalletAssetLine.FindSet()) then begin
+            repeat
+                StartSingleTicketAnonymousDTO(ResponseJson, WalletAssetLine.LineTypeSystemId, ValidationRequest.AdmissionCode);
+            until (WalletAssetLine.Next() = 0);
+        end;
+        ResponseJson.EndArray();
+
+        ResponseJson.StartArray('memberships');
+        WalletAssetLine.SetFilter(Type, '=%1', ENUM::"NPR WalletLineType"::Membership);
+        if (WalletAssetLine.FindSet()) then begin
+            repeat
+                SingleMembershipAnonymousDTO(ResponseJson, WalletAssetLine.LineTypeSystemId);
+            until (WalletAssetLine.Next() = 0);
+        end;
+        ResponseJson.EndArray();
+
+        ResponseJson.EndObject();
+        exit(ResponseJson);
+    end;
+
+    local procedure StartSingleTicketDTO(var ResponseJson: Codeunit "NPR JSON Builder"; ValidationRequest: Record "NPR SGEntryLog"): Codeunit "NPR JSON Builder"
+    begin
+        ResponseJson
+            .StartObject('ticket')
+            .AddObject(SingleTicketDTO(ResponseJson, ValidationRequest.EntityId, ValidationRequest.AdmissionCode))
+            .EndObject();
+        exit(ResponseJson);
+    end;
+
+    local procedure StartSingleTicketAnonymousDTO(var ResponseJson: Codeunit "NPR JSON Builder"; TicketId: Guid; AdmissionCode: Code[20]): Codeunit "NPR JSON Builder"
+    begin
+        ResponseJson
+            .StartObject()
+            .AddObject(SingleTicketDTO(ResponseJson, TicketId, AdmissionCode))
+            .EndObject();
+        exit(ResponseJson);
+    end;
+
+
+    local procedure SingleTicketDTO(var ResponseJson: Codeunit "NPR JSON Builder"; TicketId: Guid; AdmissionCode: Code[20]): Codeunit "NPR JSON Builder"
     var
         Ticket: Record "NPR TM Ticket";
         AccessEntry: Record "NPR TM Ticket Access Entry";
         DetAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         AdmitCount: Integer;
     begin
-        if (not Ticket.GetBySystemId(ValidationRequest.EntityId)) then
+        if (not Ticket.GetBySystemId(TicketId)) then
             exit(ResponseJson.AddProperty('ticket', 'not found'));
 
         AccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
-        AccessEntry.SetFilter("Admission Code", '=%1', ValidationRequest.AdmissionCode);
+        AccessEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
         if (not AccessEntry.FindFirst()) then
             exit(ResponseJson.AddProperty('ticket', 'not found'));
 
         if (AccessEntry."Access Date" > 0D) then begin
             DetAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', AccessEntry."Entry No.");
             DetAccessEntry.SetFilter(Type, '=%1', DetAccessEntry.Type::ADMITTED);
+            DetAccessEntry.SetFilter(Quantity, '>%1', 0);
             AdmitCount := DetAccessEntry.Count;
             if (AdmitCount > 0) then
                 DetAccessEntry.FindLast();
         end;
 
         ResponseJson
-            .StartObject('ticket')
-            .AddProperty('ticketId', Format(ValidationRequest.EntityId, 0, 4).ToLower())
+            .AddProperty('ticketId', Format(TicketId, 0, 4).ToLower())
+            .AddProperty('ticketNumber', Ticket."External Ticket No.")
             .AddProperty('itemNo', Ticket."Item No.")
-            .AddProperty('admissionCode', ValidationRequest.AdmissionCode)
+            .AddProperty('admissionCode', AdmissionCode)
             .AddProperty('admitCount', AdmitCount)
             .AddObject(AddRequiredProperty(ResponseJson, 'admittedAt', DetAccessEntry.SystemCreatedAt))
-            .AddObject(AddPrintedTicketDetails(ResponseJson, Ticket))
-            .EndObject()
+            .AddObject(AddPrintedTicketDetails(ResponseJson, Ticket));
+
+        exit(ResponseJson);
     end;
+
 
     local procedure AddPrintedTicketDetails(var ResponseJson: Codeunit "NPR JSON Builder"; Ticket: Record "NPR TM Ticket"): Codeunit "NPR JSON Builder"
     begin
@@ -410,6 +438,53 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             .EndObject()
             .AddArray(AddMembershipGuestDetails(ResponseJson, Membership."Membership Code", ValidationRequest))
             .EndObject();
+
+        exit(ResponseJson);
+    end;
+
+    local procedure SingleMembershipAnonymousDTO(var ResponseJson: Codeunit "NPR JSON Builder"; MemberCardId: Guid): Codeunit "NPR JSON Builder"
+    var
+        MemberCard: Record "NPR MM Member Card";
+        Membership: Record "NPR MM Membership";
+        Member: Record "NPR MM Member";
+        MemberCardSwipe: Record "NPR MM Member Arr. Log Entry";
+    begin
+        if (not MemberCard.GetBySystemId(MemberCardId)) then
+            exit(ResponseJson.AddProperty('memberCard', 'not found'));
+
+        if (not Membership.Get(MemberCard."Membership Entry No.")) then
+            exit(ResponseJson.AddProperty('membership', 'not found'));
+
+        if (not Member.Get(MemberCard."Member Entry No.")) then
+            exit(ResponseJson.AddProperty('member', 'not found'));
+
+        MemberCardSwipe.SetCurrentKey("External Membership No.", "External Member No.");
+        MemberCardSwipe.SetFilter("External Membership No.", '=%1', Membership."External Membership No.");
+        MemberCardSwipe.SetFilter("External Member No.", '=%1', Member."External Member No.");
+        if (not MemberCardSwipe.FindLast()) then begin
+            MemberCardSwipe.Init();
+            MemberCardSwipe."Response Type" := 99; // Unknown 
+        end;
+
+        ResponseJson
+            .StartObject()
+            .AddProperty('memberCardId', Format(MemberCard.SystemId, 0, 4).ToLower())
+            .AddProperty('membershipId', Format(Membership.SystemId, 0, 4).ToLower())
+            .StartObject('previousScan')
+                .AddObject(AddRequiredProperty(ResponseJson, 'scannedAt', MemberCardSwipe."Created At"))
+                .AddProperty('scannerId', MemberCardSwipe."Scanner Station Id")
+                .AddProperty('admissionCode', MemberCardSwipe."Admission Code")
+                .AddProperty('status', ResponseTypeToText(MemberCardSwipe."Response Type"))
+            .EndObject()
+            .StartObject('member')
+                .AddProperty('memberId', Format(Member.SystemId, 0, 4).ToLower())
+                .AddProperty('firstName', Member."First Name")
+                .AddProperty('lastName', Member."Last Name")
+                .AddProperty('hasPicture', Member.Image.HasValue())
+            .EndObject()
+            .EndObject();
+
+        exit(ResponseJson);
     end;
 
     local procedure AddMembershipGuestDetails(var ResponseJson: Codeunit "NPR JSON Builder"; MembershipCode: Code[20]; SourceValidationRequest: Record "NPR SGEntryLog"): Codeunit "NPR JSON Builder"

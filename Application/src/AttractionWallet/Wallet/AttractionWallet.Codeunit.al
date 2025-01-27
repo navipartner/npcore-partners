@@ -498,7 +498,7 @@ codeunit 6185062 "NPR AttractionWallet"
         exit(WalletAssetLine.EntryNo);
     end;
 
-    local procedure GetWalletTransactionId(WalletEntryNo: Integer): Guid
+    internal procedure GetWalletTransactionId(WalletEntryNo: Integer): Guid
     var
         Wallet: Record "NPR AttractionWallet";
         WalletAssetHeaderRef: Record "NPR WalletAssetHeaderReference";

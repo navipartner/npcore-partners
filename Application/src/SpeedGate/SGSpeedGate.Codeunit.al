@@ -19,6 +19,118 @@ codeunit 6185130 "NPR SG SpeedGate"
         exit(EntryLog.EntryNo);
     end;
 
+    internal procedure ValidateAdmitWallet(var ValidationRequest: Record "NPR SGEntryLog"): Guid
+    begin
+        if (ValidationRequest.ExtraEntityTableId = 0) then
+            Error('The tryAdmit request was not able to preselect a product for admission.');
+
+        if (not (ValidationRequest.ExtraEntityTableId in [Database::"NPR TM Ticket", Database::"NPR MM Member Card"])) then
+            Error('The admit request contains an unhandled Entity: %1', ValidationRequest.ExtraEntityTableId);
+
+        if (ValidationRequest.ExtraEntityTableId = Database::"NPR TM Ticket") then
+            exit(ValidateAdmitTicket(ValidationRequest));
+
+        if (ValidationRequest.ExtraEntityTableId = Database::"NPR MM Member Card") then
+            exit(ValidateAdmitMemberCard(ValidationRequest));
+
+    end;
+
+    internal procedure ValidateAdmitTicket(var ValidationRequest: Record "NPR SGEntryLog"): Guid
+    var
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+        Ticket: Record "NPR TM Ticket";
+        ResponseMessage: Text;
+    begin
+        ResponseMessage := 'Invalid Validation Request';
+        if (not (ValidationRequest.ReferenceNumberType in [ValidationRequest.ReferenceNumberType::TICKET, ValidationRequest.ReferenceNumberType::WALLET])) then
+            Error('The admit request contains an unhandled Type: %1', ValidationRequest.ReferenceNumberType);
+
+        if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::TICKET) then
+            if (not Ticket.GetBySystemId(ValidationRequest.EntityId)) then
+                Error(ResponseMessage);
+
+        if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::WALLET) then
+            if (not Ticket.GetBySystemId(ValidationRequest.ExtraEntityId)) then
+                Error(ResponseMessage);
+
+        ValidationRequest.AdmittedReferenceNo := Ticket."External Ticket No.";
+        TicketManagement.RegisterArrivalScanTicket("NPR TM TicketIdentifierType"::EXTERNAL_TICKET_NO,
+            CopyStr(ValidationRequest.AdmittedReferenceNo, 1, 30),
+            ValidationRequest.AdmissionCode,
+            -1, '', // PosUnitNo, 
+            ValidationRequest.ScannerId, false);
+
+        ValidationRequest.EntryStatus := ValidationRequest.EntryStatus::ADMITTED;
+        ValidationRequest.AdmittedAt := CurrentDateTime();
+        ValidationRequest.Modify();
+
+        exit(Ticket.SystemId);
+    end;
+
+    internal procedure ValidateAdmitMemberCard(var ValidationRequest: Record "NPR SGEntryLog"): Guid
+    var
+        MemberTicketManager: Codeunit "NPR MM Member Ticket Manager";
+        MemberLimitationMgr: Codeunit "NPR MM Member Lim. Mgr.";
+        MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
+        MemberCard: Record "NPR MM Member Card";
+        ExternalTicketNo: Text[30];
+        ResponseMessage: Text;
+        ResponseCode: Integer;
+        Ticket: Record "NPR TM Ticket";
+        LogEntryNo: Integer;
+    begin
+        ResponseMessage := 'Invalid Validation Request';
+        if (not (ValidationRequest.ReferenceNumberType in [ValidationRequest.ReferenceNumberType::MEMBER_CARD, ValidationRequest.ReferenceNumberType::WALLET])) then
+            Error('The admit request contains an unhandled Type: %1', ValidationRequest.ReferenceNumberType);
+
+        if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::MEMBER_CARD) then begin
+            if (not MemberCard.GetBySystemId(ValidationRequest.EntityId)) then
+                Error(ResponseMessage);
+        end;
+
+        if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::WALLET) then begin
+            if (not MemberCard.GetBySystemId(ValidationRequest.ExtraEntityId)) then
+                Error(ResponseMessage);
+        end;
+
+        if (MemberManagement.MembershipNeedsActivation(MemberCard."Membership Entry No.")) then
+            MemberManagement.ActivateMembershipLedgerEntry(MemberCard."Membership Entry No.", Today());
+
+        ValidationRequest.MemberCardLogEntryNo := MemberLimitationMgr.WS_CheckLimitMemberCardArrival(MemberCard."External Card No.", ValidationRequest.AdmissionCode, ValidationRequest.ScannerId, LogEntryNo, ResponseMessage, ResponseCode);
+        ValidationRequest.Modify();
+        if (ResponseCode <> 0) then begin
+            Commit();
+            ResponseMessage := Strsubstno('[-3149] %1', ResponseMessage);
+            Error(ResponseMessage);
+        end;
+
+        case ValidationRequest.ExtraEntityTableId of
+            0: // Originates from a Member Card scan
+               // Has a commit inside
+                MemberTicketManager.MemberFastCheckInNoPrint(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", ValidationRequest.AdmissionCode, '', 1, '', ExternalTicketNo);
+
+            Database::"NPR MM Member Card": // Originates from Wallet number    
+                MemberTicketManager.MemberFastCheckInNoPrint(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", ValidationRequest.AdmissionCode, '', 1, '', ExternalTicketNo);
+
+            Database::"NPR MM Members. Admis. Setup": // Guest
+                Error('Guest check-in not implemented');
+            else
+                Error('Unknown MemberCard ExtraEntityTableId');
+        end;
+
+        ValidationRequest.EntryStatus := ValidationRequest.EntryStatus::ADMITTED;
+        ValidationRequest.AdmittedAt := CurrentDateTime;
+        ValidationRequest.AdmittedReferenceNo := ExternalTicketNo;
+        ValidationRequest.Modify();
+
+        Ticket.SetFilter("External Ticket No.", '=%1', ExternalTicketNo);
+        if (not Ticket.FindFirst()) then
+            Ticket.Init();
+
+        exit(Ticket.SystemId);
+    end;
+
+    [CommitBehavior(CommitBehavior::Error)]
     internal procedure CheckNumberAtGate(LogEntryNo: Integer)
     var
         ValidationRequest: Record "NPR SGEntryLog";
@@ -63,12 +175,15 @@ codeunit 6185130 "NPR SG SpeedGate"
                 _NumberType::TICKET:
                     if (PermitTickets) then
                         NumberPermitted := CheckForTicket(TicketProfileCode, ValidationRequest.ReferenceNo, ValidationRequest.AdmissionCode, EntityId, AdmitToAdmissionCodes);
+
                 _NumberType::MEMBER_CARD:
                     if (PermitMemberships) then
                         NumberPermitted := CheckForMemberCard(MemberCardProfileCode, ValidationRequest.ReferenceNo, ValidationRequest.AdmissionCode, EntityId, AdmitToAdmissionCodes);
+
                 _NumberType::WALLET:
                     if (PermitWallets) then
-                        NumberPermitted := false; // not yet implemented
+                        NumberPermitted := CheckForWallet(WalletProfileCode, TicketProfileCode, ValidationRequest, EntityId, AdmitToAdmissionCodes);
+
                 _NumberType::DOC_LX_CITY_CARD:
                     if (PermitCityCard) then
                         NumberPermitted := true; // not yet implemented;
@@ -107,7 +222,7 @@ codeunit 6185130 "NPR SG SpeedGate"
         end;
 
         if (PermitWallets and not NumberPermitted) then begin
-            NumberPermitted := false; // not yet implemented
+            NumberPermitted := CheckForWallet(WalletProfileCode, TicketProfileCode, ValidationRequest, EntityId, AdmitToAdmissionCodes);
             if (NumberPermitted) then
                 DetectedNumberType := _NumberType::WALLET;
         end;
@@ -152,7 +267,7 @@ codeunit 6185130 "NPR SG SpeedGate"
         end;
     end;
 
-    internal procedure ValidateAdmitToken(Token: Guid): Boolean
+    internal procedure AdmitTokenIsValid(Token: Guid): Boolean
     var
         ValidationRequest: Record "NPR SGEntryLog";
     begin
@@ -217,6 +332,89 @@ codeunit 6185130 "NPR SG SpeedGate"
 
         until ((NumberWhiteListLine.Next() = 0) or (NumberType = _NumberType::REJECTED));
 
+    end;
+
+    local procedure CheckForWallet(TicketProfileCode: Code[10]; MemberCardProfileCode: Code[10]; var ValidationRequest: Record "NPR SGEntryLog"; var EntityId: Guid; var AdmitToCodes: List of [Code[20]]): Boolean
+    var
+        Number: Text[100];
+        SuggestedAdmissionCode: Code[20];
+        Wallet: Record "NPR AttractionWallet";
+        TicketIds, MemberCardIds : List of [Guid];
+        MemberCardId, TicketId : Guid;
+        MemberCard: Record "NPR MM Member Card";
+        Ticket: Record "NPR TM Ticket";
+    begin
+        Number := ValidationRequest.ReferenceNo;
+        SuggestedAdmissionCode := ValidationRequest.AdmissionCode;
+
+        Wallet.SetCurrentKey(ReferenceNumber);
+        Wallet.SetFilter(ReferenceNumber, '=%1', CopyStr(UpperCase(Number), 1, MaxStrLen(Wallet.ReferenceNumber)));
+        Wallet.SetFilter(ExpirationDate, '=%1|<=%2', 0DT, CurrentDateTime());
+        if (not Wallet.FindFirst()) then
+            exit(false);
+
+        GetWalletTickets(Wallet.EntryNo, TicketProfileCode, SuggestedAdmissionCode, TicketIds);
+        GetWalletMemberCards(Wallet.EntryNo, MemberCardProfileCode, SuggestedAdmissionCode, MemberCardIds);
+
+        if (TicketIds.Count() = 1) and (MemberCardIds.Count() = 0) then begin
+            Ticket.GetBySystemId(TicketIds.Get(1));
+            ValidationRequest.ExtraEntityId := TicketIds.Get(1);
+            ValidationRequest.ExtraEntityTableId := Database::"NPR TM Ticket";
+            CheckForTicket(TicketProfileCode, Ticket."External Ticket No.", SuggestedAdmissionCode, TicketId, AdmitToCodes);
+        end;
+
+        if (TicketIds.Count() = 0) and (MemberCardIds.Count() = 1) then begin
+            MemberCard.GetBySystemId(MemberCardIds.Get(1));
+            ValidationRequest.ExtraEntityId := MemberCardIds.Get(1);
+            ValidationRequest.ExtraEntityTableId := Database::"NPR MM Member Card";
+            CheckForMemberCard(MemberCardProfileCode, MemberCard."External Card No.", SuggestedAdmissionCode, MemberCardId, AdmitToCodes);
+        end;
+
+        EntityId := Wallet.SystemId;
+        exit(true);
+    end;
+
+
+    local procedure GetWalletTickets(WalletEntryNo: Integer; TicketProfileCode: Code[10]; SuggestedAdmissionCode: Code[20]; var TicketIds: List of [Guid]): Boolean
+    var
+        WalletAssetLine: Record "NPR WalletAssetLine";
+        WalletAgent: Codeunit "NPR AttractionWallet";
+        AdmitToCodes: List of [Code[20]];
+        TicketId: Guid;
+    begin
+        WalletAssetLine.SetCurrentKey(TransactionId, Type);
+        WalletAssetLine.SetFilter(TransactionId, '=%1', WalletAgent.GetWalletTransactionId(WalletEntryNo));
+        WalletAssetLine.SetFilter(Type, '=%1', ENUM::"NPR WalletLineType"::Ticket);
+        if (not WalletAssetLine.FindSet()) then
+            exit(false);
+
+        repeat
+            if (CheckForTicket(TicketProfileCode, WalletAssetLine.LineTypeReference, SuggestedAdmissionCode, TicketId, AdmitToCodes)) then
+                TicketIds.Add(WalletAssetLine.LineTypeSystemId);
+        until (WalletAssetLine.Next() = 0);
+
+        exit(true);
+    end;
+
+    local procedure GetWalletMemberCards(WalletEntryNo: Integer; MemberCardProfileCode: Code[10]; SuggestedAdmissionCode: Code[20]; var MemberCardIds: List of [Guid]): Boolean
+    var
+        WalletAssetLine: Record "NPR WalletAssetLine";
+        WalletAgent: Codeunit "NPR AttractionWallet";
+        AdmitToCodes: List of [Code[20]];
+        MemberCardId: Guid;
+    begin
+        WalletAssetLine.SetCurrentKey(TransactionId, Type);
+        WalletAssetLine.SetFilter(TransactionId, '=%1', WalletAgent.GetWalletTransactionId(WalletEntryNo));
+        WalletAssetLine.SetFilter(Type, '=%1', ENUM::"NPR WalletLineType"::MEMBERSHIP);
+        if (not WalletAssetLine.FindSet()) then
+            exit(false);
+
+        repeat
+            if (CheckForMemberCard(MemberCardProfileCode, WalletAssetLine.LineTypeReference, SuggestedAdmissionCode, MemberCardId, AdmitToCodes)) then
+                MemberCardIds.Add(WalletAssetLine.LineTypeSystemId);
+        until (WalletAssetLine.Next() = 0);
+
+        exit(true);
     end;
 
     local procedure CheckForTicket(TicketProfileCode: Code[10]; Number: Text[100]; SuggestedAdmissionCode: Code[20]; var TicketId: Guid; var AdmitToCodes: List of [Code[20]]): Boolean
@@ -501,7 +699,7 @@ codeunit 6185130 "NPR SG SpeedGate"
         WhiteListProfileCode := SpeedGate.AllowedNumbersList;
         TicketProfileCode := SpeedGate.TicketProfileCode;
         MemberCardProfileCode := SpeedGate.MemberCardProfileCode;
-        //WalletProfile := SpeedGate.WalletProfileCode;
+        WalletProfileCode := '';
         CityCardProfileId := SpeedGate.DocLxCityCardProfileId;
 
         AllowTickets := SpeedGate.PermitTickets;

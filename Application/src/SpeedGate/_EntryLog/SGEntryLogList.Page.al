@@ -35,6 +35,12 @@ page 6184906 "NPR SG EntryLogList"
                     ToolTip = 'Specifies the value of the Reference No field.', Comment = '%';
                     ApplicationArea = NPRRetail;
                 }
+
+                field(ReferenceNumberType; Rec.ReferenceNumberType)
+                {
+                    ToolTip = 'Specifies the value of the Entry Type field.', Comment = '%';
+                    ApplicationArea = NPRRetail;
+                }
                 field(EntryStatus; Rec.EntryStatus)
                 {
                     ToolTip = 'Specifies the value of the Entry Status field.', Comment = '%';
@@ -51,10 +57,9 @@ page 6184906 "NPR SG EntryLogList"
                     ToolTip = 'Specifies the value of the Admitted At field.', Comment = '%';
                     ApplicationArea = NPRRetail;
                 }
-
-                field(ReferenceNumberType; Rec.ReferenceNumberType)
+                field(AdmittedReferenceNo; Rec.AdmittedReferenceNo)
                 {
-                    ToolTip = 'Specifies the value of the Entry Type field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Admitted Reference No field.', Comment = '%';
                     ApplicationArea = NPRRetail;
                 }
                 field(ScannerId; Rec.ScannerId)

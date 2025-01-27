@@ -33,6 +33,7 @@ types:
       When attempting to admit a ticket, some ticket details should be provided.
     properties:
         ticketId: simpleTypes.TicketId
+        ticketNumber: simpleTypes.TicketNumber
         itemNo: simpleTypes.ItemNo
         admissionCode: simpleTypes.AdmissionCode
         admitCount: simpleTypes.AdmitCount
@@ -43,6 +44,7 @@ types:
       - name: ExampleTicketDetail
         value:
           ticketId: $simpleTypes.TicketId.ExampleTicketId
+          ticketNumber: $simpleTypes.TicketNumber.ExampleTicketNumber
           itemNo: $simpleTypes.ItemNo.ExampleItemNo
           admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
           admitCount: 0
@@ -157,7 +159,7 @@ types:
       printedAt: optional<simpleTypes.PrintedAt>
       printCount: simpleTypes.PrintCount
       memberCardId: optional<simpleTypes.MemberCardId>
-      externalTicketNo: optional<simpleTypes.ReferenceNumber>
+      ticketNumber: optional<simpleTypes.ReferenceNumber>
       
     examples:
       - name: ExampleAdmitTicketResponse
@@ -183,7 +185,7 @@ types:
           printedAt: $simpleTypes.PrintedAt.ExamplePrintedAt
           printCount: 1
           memberCardId: $simpleTypes.MemberCardId.ExampleMemberCardId
-          externalTicketNo: $simpleTypes.ReferenceNumber.ExampleTicketNumber
+          ticketNumber: $simpleTypes.ReferenceNumber.ExampleTicketNumber
           
 
 ############################

@@ -131,6 +131,13 @@ types:
       - name: ExampleWalletId
         value: WAL345678
 
+  TicketNumber:
+    type: string
+    docs: The number of the ticket.
+    examples:
+      - name: ExampleTicketNumber
+        value: "TIC123456"
+
   ReferenceNumberTypeEnum:
     enum:
       - ticket
