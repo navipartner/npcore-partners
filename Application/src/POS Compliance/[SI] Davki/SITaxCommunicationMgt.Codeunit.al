@@ -319,7 +319,6 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
     var
         POSStore: Record "NPR POS Store";
         TimeStampLbl: Label '%1T%2Z', Locked = true, Comment = '%1 = Entry Date, %2 = Time Stamp';
-        SoftwareSupplierLbl: Label 'Navi Partner København ApS, Titangade 16 DK-2200 København N', Locked = true;
         FormattedDateTime: Text;
         ParsedAddress: Text;
         ParsedHouseNumber: Text;
@@ -396,7 +395,7 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
         BPremise.Add(CreateXmlElement('ValidityDate', FuNamespaceUriLbl, Format(SIPOSStoreMapping."Validity Date", 10, '<Year4>-<Month,2>-<Day,2>')));
 
         SoftwareSupplier := XmlElement.Create('SoftwareSupplier', FuNamespaceUriLbl);
-        SoftwareSupplier.Add(CreateXmlElement('NameForeign', FuNamespaceUriLbl, SoftwareSupplierLbl));
+        SoftwareSupplier.Add(CreateXmlElement('NameForeign', FuNamespaceUriLbl, SIFiscalizationSetup.GetSoftwareSupplierInfo()));
         BPremise.Add(SoftwareSupplier);
         BPremiseRequest.Add(BPremise);
 
