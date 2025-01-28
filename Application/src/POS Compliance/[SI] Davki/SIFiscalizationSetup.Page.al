@@ -91,6 +91,31 @@ page 6150767 "NPR SI Fiscalization Setup"
                     ToolTip = 'Specifies the E-mail subject that will be sent with fiscal bill e-mails.';
                 }
             }
+            group(SoftwareSupplier)
+            {
+                Caption = 'Software Supplier';
+                field("Software Supplier Name"; SoftwareSupplierName)
+                {
+                    ApplicationArea = NPRRetail;
+                    Editable = false;
+                    ToolTip = 'Specifies the name of the software supplier.';
+                    Caption = 'Name';
+                }
+                field("Software Supplier Address"; SoftwareSupplierAddress)
+                {
+                    ApplicationArea = NPRRetail;
+                    Editable = false;
+                    ToolTip = 'Specifies the address of the software supplier.';
+                    Caption = 'Address';
+                }
+                field("Software Supplier City"; SoftwareSupplierCity)
+                {
+                    ApplicationArea = NPRRetail;
+                    Editable = false;
+                    ToolTip = 'Specifies the city of the software supplier.';
+                    Caption = 'City';
+                }
+            }
         }
     }
 
@@ -125,6 +150,11 @@ page 6150767 "NPR SI Fiscalization Setup"
         end;
     end;
 
+    trigger OnAfterGetCurrRecord()
+    begin
+        Rec.InitSoftwareSupplierInfo(SoftwareSupplierName, SoftwareSupplierAddress, SoftwareSupplierCity);
+    end;
+
     trigger OnClosePage()
     var
         ApplicationAreaMgmtFacade: Codeunit "Application Area Mgmt. Facade";
@@ -135,4 +165,7 @@ page 6150767 "NPR SI Fiscalization Setup"
 
     var
         EnabledValueChanged: Boolean;
+        SoftwareSupplierName: Text;
+        SoftwareSupplierAddress: Text;
+        SoftwareSupplierCity: Text;
 }

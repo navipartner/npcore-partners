@@ -79,4 +79,23 @@ table 6059835 "NPR SI Fiscalization Setup"
             Clustered = true;
         }
     }
+
+    internal procedure InitSoftwareSupplierInfo(var SoftwareSupplierName: Text; var SoftwareSupplierAddress: Text; var SoftwareSupplierCity: Text)
+    begin
+        SoftwareSupplierName := SoftwareSupplierNameLbl;
+        SoftwareSupplierAddress := SoftwareSupplierAddressLbl;
+        SoftwareSupplierCity := SoftwareSupplierCityLbl;
+    end;
+
+    internal procedure GetSoftwareSupplierInfo(): Text
+    var
+        SoftwareSupplierFormatLbl: Label '%1, %2 %3', Locked = true, Comment = '%1 = Name, %2 = Address, %3 = City';
+    begin
+        exit(StrSubstNo(SoftwareSupplierFormatLbl, SoftwareSupplierNameLbl, SoftwareSupplierAddressLbl, SoftwareSupplierCityLbl));
+    end;
+
+    var
+        SoftwareSupplierNameLbl: Label 'Navi Partner København ApS', Locked = true;
+        SoftwareSupplierAddressLbl: Label 'Hillerødgade 30', Locked = true;
+        SoftwareSupplierCityLbl: Label '2200 Frederiksberg, Denmark', Locked = true;
 }
