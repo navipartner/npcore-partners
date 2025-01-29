@@ -6,11 +6,48 @@ codeunit 6185130 "NPR SG SpeedGate"
         _NumberType: Option REJECTED,NOT_WHITELISTED,TICKET,MEMBER_CARD,WALLET,DOC_LX_CITY_CARD;
         _ApiErrors: Enum "NPR API Error Code";
 
+    internal procedure CreateAdmitToken(ReferenceNumber: Text[100]; AdmissionCode: Code[20]; ScannerId: Code[10]) AdmitToken: Guid
+    var
+        EntryNo: Integer;
+        ValidationRequest: Record "NPR SGEntryLog";
+    begin
+        EntryNo := CreateInitialEntry(ReferenceNumber, AdmissionCode, ScannerId);
+        CheckNumberAtGate(EntryNo);
+        ValidationRequest.Get(EntryNo);
+
+        AdmitToken := ValidationRequest.Token; // Note, multiple records can be created in CheckNumberAtGate having the same Token
+    end;
+
+    internal procedure Admit(Token: Guid; Quantity: Integer)
+    var
+        ValidationRequest: Record "NPR SGEntryLog";
+    begin
+        ValidationRequest.SetCurrentKey(Token);
+        ValidationRequest.SetFilter(Token, '=%1', Token);
+        ValidationRequest.SetFilter(EntryStatus, '=%1', ValidationRequest.EntryStatus::PERMITTED_BY_GATE);
+        if (not ValidationRequest.FindSet()) then
+            Error('The admit token is not valid');
+
+        repeat
+            if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::TICKET) then
+                ValidateAdmitTicket(ValidationRequest);
+
+            if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::MEMBER_CARD) then
+                ValidateAdmitMemberCard(ValidationRequest);
+
+            if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::WALLET) then
+                ValidateAdmitWallet(ValidationRequest);
+
+        until (ValidationRequest.Next() = 0);
+
+    end;
+
     internal procedure CreateInitialEntry(ReferenceNumber: Text[100]; AdmissionCode: Code[20]; ScannerId: Code[10]) EntryNo: Integer
     var
         EntryLog: Record "NPR SGEntryLog";
     begin
         EntryLog.Init();
+        EntryLog.Token := Format(CreateGuid(), 0, 4);
         EntryLog.EntryStatus := EntryLog.EntryStatus::INITIALIZED;
         EntryLog.ReferenceNo := ReferenceNumber;
         EntryLog.AdmissionCode := AdmissionCode;
@@ -246,7 +283,6 @@ codeunit 6185130 "NPR SG SpeedGate"
         end;
 
         // Happy path
-        ValidationRequest.Token := Format(CreateGuid(), 0, 4);
         ValidationRequest.EntryStatus := ValidationRequest.EntryStatus::PERMITTED_BY_GATE;
         ValidationRequest.EntityId := EntityId;
         ValidationRequest.Modify();
