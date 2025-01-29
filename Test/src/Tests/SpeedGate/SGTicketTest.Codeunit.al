@@ -8,13 +8,10 @@ codeunit 85217 "NPR SG TicketTest"
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
     begin
         SpeedGateLibrary.NoSpeedGateSetup();
-        LogEntryNo := SpeedGate.CreateInitialEntry(GetOneTicket(), '', '');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidatePermitted(LogEntryNo);
+
+        ValidatePermitted(SpeedGate.CreateAdmitToken(GetOneTicket(), '', ''));
     end;
 
     [Test]
@@ -23,13 +20,10 @@ codeunit 85217 "NPR SG TicketTest"
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
     begin
         SpeedGateLibrary.NoSpeedGateSetup();
-        LogEntryNo := SpeedGate.CreateInitialEntry('FOOBAR-ASDFGHJKL', '', '');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidateDeniedUnknown(LogEntryNo);
+
+        ValidateDeniedUnknown(SpeedGate.CreateAdmitToken('FOOBAR-ASDFGHJKL', '', ''));
     end;
 
     [Test]
@@ -38,13 +32,10 @@ codeunit 85217 "NPR SG TicketTest"
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
     begin
         SpeedGateLibrary.DefaultSetup(false, false, '', '');
-        LogEntryNo := SpeedGate.CreateInitialEntry(GetOneTicket(), '', '');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidateDeniedUnknown(LogEntryNo);
+
+        ValidateDeniedUnknown(SpeedGate.CreateAdmitToken(GetOneTicket(), '', ''));
     end;
 
     [Test]
@@ -53,13 +44,10 @@ codeunit 85217 "NPR SG TicketTest"
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
     begin
         SpeedGateLibrary.DefaultSetup(false, true, '', '');
-        LogEntryNo := SpeedGate.CreateInitialEntry(GetOneTicket(), '', '');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidatePermitted(LogEntryNo);
+
+        ValidatePermitted(SpeedGate.CreateAdmitToken(GetOneTicket(), '', ''));
     end;
 
     [Test]
@@ -68,13 +56,10 @@ codeunit 85217 "NPR SG TicketTest"
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
     begin
         SpeedGateLibrary.DefaultSetup(true, true, '', '');
-        LogEntryNo := SpeedGate.CreateInitialEntry(GetOneTicket(), '', '');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidateDeniedUnknown(LogEntryNo);
+
+        ValidateDeniedUnknown(SpeedGate.CreateAdmitToken(GetOneTicket(), '', ''));
     end;
 
     [Test]
@@ -83,13 +68,10 @@ codeunit 85217 "NPR SG TicketTest"
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
     begin
         SpeedGateLibrary.DefaultSetup(true, true, 'FOOBAR', '');
-        LogEntryNo := SpeedGate.CreateInitialEntry(GetOneTicket(), '', '');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidateDeniedUnknown(LogEntryNo);
+
+        ValidateDeniedUnknown(SpeedGate.CreateAdmitToken(GetOneTicket(), '', ''));
     end;
 
     [Test]
@@ -98,13 +80,10 @@ codeunit 85217 "NPR SG TicketTest"
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
     begin
         SpeedGateLibrary.DefaultSetup(true, true, '', '');
-        LogEntryNo := SpeedGate.CreateInitialEntry(GetOneTicket(), '', 'FOOBAR');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidateDeniedUnknown(LogEntryNo);
+
+        ValidateDeniedUnknown(SpeedGate.CreateAdmitToken(GetOneTicket(), '', 'FOOBAR'));
     end;
 
     [Test]
@@ -113,13 +92,10 @@ codeunit 85217 "NPR SG TicketTest"
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
     begin
         SpeedGateLibrary.DefaultSetup(false, true, '', '');
-        LogEntryNo := SpeedGate.CreateInitialEntry(GetOneTicket(), '', 'FOOBAR');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidatePermitted(LogEntryNo);
+
+        ValidatePermitted(SpeedGate.CreateAdmitToken(GetOneTicket(), '', 'FOOBAR'));
     end;
 
     [Test]
@@ -128,14 +104,11 @@ codeunit 85217 "NPR SG TicketTest"
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
     begin
         SpeedGateLibrary.DefaultSetup(false, true, '', '');
         SpeedGateLibrary.GateSetup('GATE01', false, '', '');
-        LogEntryNo := SpeedGate.CreateInitialEntry(GetOneTicket(), '', 'GATE01');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidateDeniedUnknown(LogEntryNo);
+
+        ValidateDeniedUnknown(SpeedGate.CreateAdmitToken(GetOneTicket(), '', 'GATE01'));
     end;
 
     [Test]
@@ -144,14 +117,11 @@ codeunit 85217 "NPR SG TicketTest"
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
     begin
         SpeedGateLibrary.DefaultSetup(false, false, '', '');
         SpeedGateLibrary.GateSetup('GATE01', true, '', '');
-        LogEntryNo := SpeedGate.CreateInitialEntry(GetOneTicket(), '', 'GATE01');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidatePermitted(LogEntryNo);
+
+        ValidatePermitted(SpeedGate.CreateAdmitToken(GetOneTicket(), '', 'GATE01'));
     end;
 
     [Test]
@@ -160,14 +130,11 @@ codeunit 85217 "NPR SG TicketTest"
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
     begin
         SpeedGateLibrary.DefaultSetup(false, false, '', '');
         SpeedGateLibrary.GateSetup('GATE01', false, '', '');
-        LogEntryNo := SpeedGate.CreateInitialEntry(GetOneTicket(), '', 'GATE01');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidateDeniedUnknown(LogEntryNo);
+
+        ValidateDeniedUnknown(SpeedGate.CreateAdmitToken(GetOneTicket(), '', 'GATE01'));
     end;
 
 
@@ -177,8 +144,6 @@ codeunit 85217 "NPR SG TicketTest"
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
         ExternalTicketNumber: Code[30];
         WhitelistCode: Code[10];
     begin
@@ -188,9 +153,7 @@ codeunit 85217 "NPR SG TicketTest"
         SpeedGateLibrary.DefaultSetup(false, false, '', '');
         SpeedGateLibrary.GateSetup('GATE01', true, '', WhitelistCode);
 
-        LogEntryNo := SpeedGate.CreateInitialEntry(ExternalTicketNumber, '', 'GATE01');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidatePermitted(LogEntryNo);
+        ValidatePermitted(SpeedGate.CreateAdmitToken(ExternalTicketNumber, '', 'GATE01'));
     end;
 
     [Test]
@@ -199,8 +162,6 @@ codeunit 85217 "NPR SG TicketTest"
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
         ExternalTicketNumber: Code[30];
         WhitelistCode: Code[10];
     begin
@@ -210,9 +171,7 @@ codeunit 85217 "NPR SG TicketTest"
         SpeedGateLibrary.DefaultSetup(false, false, '', '');
         SpeedGateLibrary.GateSetup('GATE01', true, '', WhitelistCode);
 
-        LogEntryNo := SpeedGate.CreateInitialEntry(GetOneTicket(), '', 'GATE01');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidateDeniedRejected(LogEntryNo);
+        ValidateDeniedRejected(SpeedGate.CreateAdmitToken(GetOneTicket(), '', 'GATE01'));
     end;
 
     [Test]
@@ -221,8 +180,6 @@ codeunit 85217 "NPR SG TicketTest"
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
         ExternalTicketNumber: Code[30];
         WhitelistCode: Code[10];
     begin
@@ -232,9 +189,7 @@ codeunit 85217 "NPR SG TicketTest"
         SpeedGateLibrary.DefaultSetup(false, false, '', '');
         SpeedGateLibrary.GateSetup('GATE01', true, '', WhitelistCode);
 
-        LogEntryNo := SpeedGate.CreateInitialEntry('FOOBAR', '', 'GATE01');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidateDeniedUnknown(LogEntryNo);
+        ValidateDeniedUnknown(SpeedGate.CreateAdmitToken('FOOBAR', '', 'GATE01'));
     end;
 
     [Test]
@@ -243,8 +198,6 @@ codeunit 85217 "NPR SG TicketTest"
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
         ExternalTicketNumber: Code[30];
         WhitelistCode: Code[10];
     begin
@@ -253,9 +206,7 @@ codeunit 85217 "NPR SG TicketTest"
         SpeedGateLibrary.DefaultSetup(false, false, '', '');
         SpeedGateLibrary.GateSetup('GATE01', true, '', '');
 
-        LogEntryNo := SpeedGate.CreateInitialEntry(ExternalTicketNumber, 'FOOBAR', 'GATE01');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidateDeniedRejected(LogEntryNo);
+        ValidateDeniedRejected(SpeedGate.CreateAdmitToken(ExternalTicketNumber, 'FOOBAR', 'GATE01'));
     end;
 
     [Test]
@@ -264,8 +215,6 @@ codeunit 85217 "NPR SG TicketTest"
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
         ExternalTicketNumber: Code[30];
         WhitelistCode: Code[10];
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
@@ -280,9 +229,7 @@ codeunit 85217 "NPR SG TicketTest"
         SpeedGateLibrary.DefaultSetup(false, false, '', '');
         SpeedGateLibrary.GateSetup('GATE01', true, '', '');
 
-        LogEntryNo := SpeedGate.CreateInitialEntry(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidatePermitted(LogEntryNo);
+        ValidatePermitted(SpeedGate.CreateAdmitToken(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01'));
     end;
 
     [Test]
@@ -291,8 +238,6 @@ codeunit 85217 "NPR SG TicketTest"
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
         ExternalTicketNumber: Code[30];
         WhitelistCode: Code[10];
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
@@ -310,9 +255,7 @@ codeunit 85217 "NPR SG TicketTest"
         SpeedGateLibrary.DefaultSetup(false, false, '', '');
         SpeedGateLibrary.GateSetup('GATE01', true, TicketProfileCode, '');
 
-        LogEntryNo := SpeedGate.CreateInitialEntry(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidateDeniedUnknown(LogEntryNo);
+        ValidateDeniedUnknown(SpeedGate.CreateAdmitToken(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01'));
     end;
 
     [Test]
@@ -321,8 +264,6 @@ codeunit 85217 "NPR SG TicketTest"
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
         ExternalTicketNumber: Code[30];
         WhitelistCode: Code[10];
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
@@ -342,9 +283,7 @@ codeunit 85217 "NPR SG TicketTest"
         SpeedGateLibrary.DefaultSetup(false, false, '', '');
         SpeedGateLibrary.GateSetup('GATE01', true, TicketProfileCode, WhitelistCode);
 
-        LogEntryNo := SpeedGate.CreateInitialEntry(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidateDeniedTicket(LogEntryNo);
+        ValidateDeniedTicket(SpeedGate.CreateAdmitToken(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01'));
     end;
 
     [Test]
@@ -353,8 +292,6 @@ codeunit 85217 "NPR SG TicketTest"
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
         ExternalTicketNumber: Code[30];
         WhitelistCode: Code[10];
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
@@ -375,9 +312,7 @@ codeunit 85217 "NPR SG TicketTest"
         SpeedGateLibrary.DefaultSetup(false, false, '', '');
         SpeedGateLibrary.GateSetup('GATE01', true, TicketProfileCode, WhitelistCode);
 
-        LogEntryNo := SpeedGate.CreateInitialEntry(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidateDeniedTicket(LogEntryNo);
+        ValidateDeniedTicket(SpeedGate.CreateAdmitToken(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01'));
     end;
 
     [Test]
@@ -386,8 +321,6 @@ codeunit 85217 "NPR SG TicketTest"
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
         ExternalTicketNumber: Code[30];
         WhitelistCode: Code[10];
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
@@ -408,9 +341,7 @@ codeunit 85217 "NPR SG TicketTest"
         SpeedGateLibrary.DefaultSetup(false, false, '', '');
         SpeedGateLibrary.GateSetup('GATE01', true, TicketProfileCode, WhitelistCode);
 
-        LogEntryNo := SpeedGate.CreateInitialEntry(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidateDeniedTicket(LogEntryNo);
+        ValidateDeniedTicket(SpeedGate.CreateAdmitToken(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01'));
     end;
 
     [Test]
@@ -419,8 +350,6 @@ codeunit 85217 "NPR SG TicketTest"
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
         ExternalTicketNumber: Code[30];
         WhitelistCode: Code[10];
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
@@ -441,9 +370,7 @@ codeunit 85217 "NPR SG TicketTest"
         SpeedGateLibrary.DefaultSetup(false, false, '', '');
         SpeedGateLibrary.GateSetup('GATE01', true, TicketProfileCode, WhitelistCode);
 
-        LogEntryNo := SpeedGate.CreateInitialEntry(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidateDeniedTicket(LogEntryNo);
+        ValidateDeniedTicket(SpeedGate.CreateAdmitToken(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01'));
     end;
 
     [Test]
@@ -452,8 +379,6 @@ codeunit 85217 "NPR SG TicketTest"
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
         ExternalTicketNumber: Code[30];
         WhitelistCode: Code[10];
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
@@ -474,9 +399,7 @@ codeunit 85217 "NPR SG TicketTest"
         SpeedGateLibrary.DefaultSetup(false, false, '', '');
         SpeedGateLibrary.GateSetup('GATE01', true, TicketProfileCode, WhitelistCode);
 
-        LogEntryNo := SpeedGate.CreateInitialEntry(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidatePermitted(LogEntryNo);
+        ValidatePermitted(SpeedGate.CreateAdmitToken(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01'));
     end;
 
     [Test]
@@ -485,8 +408,6 @@ codeunit 85217 "NPR SG TicketTest"
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
         ExternalTicketNumber: Code[30];
         WhitelistCode: Code[10];
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
@@ -507,9 +428,7 @@ codeunit 85217 "NPR SG TicketTest"
         SpeedGateLibrary.DefaultSetup(false, false, '', '');
         SpeedGateLibrary.GateSetup('GATE01', true, TicketProfileCode, WhitelistCode);
 
-        LogEntryNo := SpeedGate.CreateInitialEntry(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidatePermitted(LogEntryNo);
+        ValidatePermitted(SpeedGate.CreateAdmitToken(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01'));
     end;
 
     [Test]
@@ -518,8 +437,6 @@ codeunit 85217 "NPR SG TicketTest"
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
         ExternalTicketNumber: Code[30];
         WhitelistCode: Code[10];
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
@@ -540,9 +457,7 @@ codeunit 85217 "NPR SG TicketTest"
         SpeedGateLibrary.DefaultSetup(false, false, '', '');
         SpeedGateLibrary.GateSetup('GATE01', true, TicketProfileCode, WhitelistCode);
 
-        LogEntryNo := SpeedGate.CreateInitialEntry(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidatePermitted(LogEntryNo);
+        ValidatePermitted(SpeedGate.CreateAdmitToken(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01'));
     end;
 
     [Test]
@@ -551,8 +466,6 @@ codeunit 85217 "NPR SG TicketTest"
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
         ExternalTicketNumber: Code[30];
         WhitelistCode: Code[10];
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
@@ -573,9 +486,7 @@ codeunit 85217 "NPR SG TicketTest"
         SpeedGateLibrary.DefaultSetup(false, false, '', '');
         SpeedGateLibrary.GateSetup('GATE01', true, TicketProfileCode, WhitelistCode);
 
-        LogEntryNo := SpeedGate.CreateInitialEntry(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidatePermitted(LogEntryNo);
+        ValidatePermitted(SpeedGate.CreateAdmitToken(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01'));
     end;
 
     [Test]
@@ -584,8 +495,6 @@ codeunit 85217 "NPR SG TicketTest"
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
         ExternalTicketNumber: Code[30];
         WhitelistCode: Code[10];
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
@@ -606,9 +515,7 @@ codeunit 85217 "NPR SG TicketTest"
         SpeedGateLibrary.DefaultSetup(false, false, '', '');
         SpeedGateLibrary.GateSetup('GATE01', true, TicketProfileCode, WhitelistCode);
 
-        LogEntryNo := SpeedGate.CreateInitialEntry(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidatePermitted(LogEntryNo);
+        ValidatePermitted(SpeedGate.CreateAdmitToken(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01'));
     end;
 
     [Test]
@@ -617,8 +524,6 @@ codeunit 85217 "NPR SG TicketTest"
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
         ExternalTicketNumber: Code[30];
         WhitelistCode: Code[10];
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
@@ -639,9 +544,7 @@ codeunit 85217 "NPR SG TicketTest"
         SpeedGateLibrary.DefaultSetup(false, false, '', '');
         SpeedGateLibrary.GateSetup('GATE01', true, TicketProfileCode, WhitelistCode);
 
-        LogEntryNo := SpeedGate.CreateInitialEntry(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidateDeniedTicket(LogEntryNo);
+        ValidateDeniedTicket(SpeedGate.CreateAdmitToken(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01'));
     end;
 
     [Test]
@@ -650,8 +553,6 @@ codeunit 85217 "NPR SG TicketTest"
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
         ExternalTicketNumber: Code[30];
         WhitelistCode: Code[10];
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
@@ -672,9 +573,7 @@ codeunit 85217 "NPR SG TicketTest"
         SpeedGateLibrary.DefaultSetup(false, false, '', '');
         SpeedGateLibrary.GateSetup('GATE01', true, TicketProfileCode, WhitelistCode);
 
-        LogEntryNo := SpeedGate.CreateInitialEntry(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidateDeniedTicket(LogEntryNo);
+        ValidateDeniedTicket(SpeedGate.CreateAdmitToken(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01'));
     end;
 
     [Test]
@@ -684,8 +583,6 @@ codeunit 85217 "NPR SG TicketTest"
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
         TicketLibrary: Codeunit "NPR Library - Ticket Module";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
         ExternalTicketNumber: Code[30];
         WhitelistCode: Code[10];
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
@@ -709,9 +606,7 @@ codeunit 85217 "NPR SG TicketTest"
         SpeedGateLibrary.DefaultSetup(false, false, '', '');
         SpeedGateLibrary.GateSetup('GATE01', true, TicketProfileCode, WhitelistCode);
 
-        LogEntryNo := SpeedGate.CreateInitialEntry(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidateDeniedTicket(LogEntryNo);
+        ValidateDeniedTicket(SpeedGate.CreateAdmitToken(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01'));
     end;
 
     [Test]
@@ -721,8 +616,6 @@ codeunit 85217 "NPR SG TicketTest"
         SpeedGate: Codeunit "NPR SG SpeedGate";
         SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
         TicketLibrary: Codeunit "NPR Library - Ticket Module";
-        LogEntryNo: Integer;
-        EntryLog: Record "NPR SGEntryLog";
         ExternalTicketNumber: Code[30];
         WhitelistCode: Code[10];
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
@@ -747,48 +640,73 @@ codeunit 85217 "NPR SG TicketTest"
         SpeedGateLibrary.DefaultSetup(false, false, '', '');
         SpeedGateLibrary.GateSetup('GATE01', true, TicketProfileCode, WhitelistCode);
 
-        LogEntryNo := SpeedGate.CreateInitialEntry(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01');
-        SpeedGate.CheckNumberAtGate(LogEntryNo);
-        ValidatePermitted(LogEntryNo);
+        ValidatePermitted(SpeedGate.CreateAdmitToken(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01'));
+
     end;
 
     [Normal]
-    procedure ValidatePermitted(EntryLogNo: Integer)
+    procedure ValidatePermitted(AdmitToken: Guid)
     var
         EntryLog: Record "NPR SGEntryLog";
+        SpeedGate: Codeunit "NPR SG SpeedGate";
     begin
-        EntryLog.Get(EntryLogNo);
+        EntryLog.SetCurrentKey(Token);
+        EntryLog.SetFilter(Token, '=%1', AdmitToken);
+        EntryLog.FindFirst();
+
         EntryLog.TestField(ReferenceNumberType, EntryLog.ReferenceNumberType::TICKET);
         EntryLog.TestField(EntryStatus, EntryLog.EntryStatus::PERMITTED_BY_GATE);
+
+        SpeedGate.Admit(AdmitToken, 1);
+        ValidateAdmitted(EntryLog.ReferenceNo, EntryLog.AdmissionCode, EntryLog.ScannerId);
     end;
 
     [Normal]
-    procedure ValidateDeniedUnknown(EntryLogNo: Integer)
+    procedure ValidateDeniedUnknown(AdmitToken: Guid)
     var
         EntryLog: Record "NPR SGEntryLog";
+        SpeedGate: Codeunit "NPR SG SpeedGate";
     begin
-        EntryLog.Get(EntryLogNo);
+        EntryLog.SetCurrentKey(Token);
+        EntryLog.SetFilter(Token, '=%1', AdmitToken);
+        EntryLog.FindFirst();
+
         EntryLog.TestField(ReferenceNumberType, EntryLog.ReferenceNumberType::UNKNOWN);
         EntryLog.TestField(EntryStatus, EntryLog.EntryStatus::DENIED_BY_GATE);
+
+        asserterror SpeedGate.Admit(AdmitToken, 1);
     end;
 
-
-    procedure ValidateDeniedRejected(EntryLogNo: Integer)
+    [Normal]
+    procedure ValidateDeniedRejected(AdmitToken: Guid)
     var
         EntryLog: Record "NPR SGEntryLog";
+        SpeedGate: Codeunit "NPR SG SpeedGate";
     begin
-        EntryLog.Get(EntryLogNo);
+        EntryLog.SetCurrentKey(Token);
+        EntryLog.SetFilter(Token, '=%1', AdmitToken);
+        EntryLog.FindFirst();
+
         EntryLog.TestField(ReferenceNumberType, EntryLog.ReferenceNumberType::REJECTED);
         EntryLog.TestField(EntryStatus, EntryLog.EntryStatus::DENIED_BY_GATE);
+
+        asserterror SpeedGate.Admit(AdmitToken, 1);
     end;
 
-    procedure ValidateDeniedTicket(EntryLogNo: Integer)
+    [Normal]
+    procedure ValidateDeniedTicket(AdmitToken: Guid)
     var
         EntryLog: Record "NPR SGEntryLog";
+        SpeedGate: Codeunit "NPR SG SpeedGate";
     begin
-        EntryLog.Get(EntryLogNo);
+        EntryLog.SetCurrentKey(Token);
+        EntryLog.SetFilter(Token, '=%1', AdmitToken);
+        EntryLog.FindFirst();
+
         EntryLog.TestField(ReferenceNumberType, EntryLog.ReferenceNumberType::TICKET);
         EntryLog.TestField(EntryStatus, EntryLog.EntryStatus::DENIED_BY_GATE);
+
+        asserterror SpeedGate.Admit(AdmitToken, 1);
     end;
 
     [Normal]
@@ -830,6 +748,28 @@ codeunit 85217 "NPR SG TicketTest"
         ApiOk := TicketApiLibrary.ConfirmTicketReservation(ResponseToken, SendNotificationTo, ExternalOrderNo, ScannerStation, TmpCreatedTickets, ResponseMessage);
         Assert.IsTrue(ApiOk, ResponseMessage);
         Assert.AreEqual(TmpCreatedTickets.Count(), NumberOfTicketOrders * TicketQuantityPerOrder, 'Number of tickets confirmed does not match number of tickets requested.');
+    end;
+
+    [Normal]
+    local procedure ValidateAdmitted(ExternalTicketNumber: Code[30]; AdmissionCode: Code[20]; GateCode: Code[10])
+    var
+        Ticket: Record "NPR TM Ticket";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+    begin
+        Ticket.SetFilter(Ticket."External Ticket No.", '=%1', ExternalTicketNumber);
+        Ticket.FindFirst();
+
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        TicketAccessEntry.FindFirst();
+        TicketAccessEntry.TestField("Admission Code", AdmissionCode);
+        TicketAccessEntry.TestField("Access Date");
+        TicketAccessEntry.TestField("Access Time");
+
+        DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+        DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::ADMITTED);
+        DetTicketAccessEntry.FindFirst();
+        //DetTicketAccessEntry.TestField("Scanner Station ID", GateCode);
     end;
 
     [Normal]
