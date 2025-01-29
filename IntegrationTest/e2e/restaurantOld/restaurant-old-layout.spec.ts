@@ -17,6 +17,7 @@ test.describe("Restaurant old layout", () => {
     wall,
     bar,
   }) => {
+    await page.waitForTimeout(5000)
     // check if location that should be created already exists and remove it
     const existingLocation = page.frameLocator('iframe[title="Framework"]').locator('div').filter({ hasText: /^Edited Location$/ }).nth(2);
     if(await existingLocation.isVisible()) {
