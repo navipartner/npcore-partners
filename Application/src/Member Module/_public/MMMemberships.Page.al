@@ -27,11 +27,15 @@
                 var
                     Membership: Record "NPR MM Membership";
                     SmartSearch: Codeunit "NPR MM Smart Search";
+                    CurrentEntryNo: Integer;
                 begin
+                    CurrentEntryNo := Rec."Entry No.";
+                    Rec.CopyFilter(Blocked, Membership.Blocked);
                     Rec.Reset();
                     Rec.ClearMarks();
                     Rec.MarkedOnly(false);
                     if (_SearchTerm = '') then begin
+                        Membership.CopyFilter(Blocked, Rec.Blocked);
                         CurrPage.Update(false);
                         exit;
                     end;
@@ -40,6 +44,7 @@
 
                     Rec.Copy(Membership);
                     Rec.SetLoadFields();
+                    if Rec.Get(CurrentEntryNo) then;
                     Rec.MarkedOnly(true);
                     CurrPage.Update(false);
                 end;
