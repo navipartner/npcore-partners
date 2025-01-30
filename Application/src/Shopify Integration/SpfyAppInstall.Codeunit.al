@@ -9,6 +9,7 @@ codeunit 6184801 "NPR Spfy App Install"
         SpfyAppUpgrade: Codeunit "NPR Spfy App Upgrade";
     begin
         SpfyAppUpgrade.UpdateShopifySetup();
+        SpfyAppUpgrade.RegisterShopifyAppRequestListenerWebservice();
     end;
 }
 #endif

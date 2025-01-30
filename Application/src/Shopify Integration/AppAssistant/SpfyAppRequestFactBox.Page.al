@@ -1,10 +1,10 @@
 #if not BC17
-page 6184708 "NPR Spfy WH Notif.Line FactBox"
+page 6184937 "NPR Spfy App Request FactBox"
 {
     Extensible = false;
-    Caption = 'Shopify Webhook Notification Payload';
+    Caption = 'Shopify App Request Payload';
     PageType = CardPart;
-    SourceTable = "NPR Spfy Webhook Notification";
+    SourceTable = "NPR Spfy App Request";
     UsageCategory = None;
     Editable = false;
 
@@ -13,9 +13,9 @@ page 6184708 "NPR Spfy WH Notif.Line FactBox"
         area(content)
         {
 #if BC18 or BC19 or BC20 or BC21 or BC22 or BC23
-            usercontrol(NotificationPayloadDataUC; "Microsoft.Dynamics.Nav.Client.WebPageViewer")
+            usercontrol(RequestPayloadDataUC; "Microsoft.Dynamics.Nav.Client.WebPageViewer")
 #else
-            usercontrol(NotificationPayloadDataUC; WebPageViewer)
+            usercontrol(RequestPayloadDataUC; WebPageViewer)
 #endif
             {
                 ApplicationArea = NPRShopify;
@@ -31,18 +31,18 @@ page 6184708 "NPR Spfy WH Notif.Line FactBox"
 
     trigger OnAfterGetRecord()
     begin
-        NotificationPayload := Rec.GetPayload();
+        RequestPayload := Rec.GetPayload();
         if IsReady then
             FillAddIn();
     end;
 
     local procedure FillAddIn()
     begin
-        CurrPage.NotificationPayloadDataUC.SetContent(StrSubstNo('<textarea readonly Id="NPRSpfyWebhookRequestDataTextArea" style="width:100%;height:100%;resize: none;">%1</textarea>', NotificationPayload));
+        CurrPage.RequestPayloadDataUC.SetContent(StrSubstNo('<textarea readonly Id="NPRSpfyAppRequestDataTextArea" style="width:100%;height:100%;resize: none;">%1</textarea>', RequestPayload));
     end;
 
     var
-        NotificationPayload: Text;
+        RequestPayload: Text;
         IsReady: Boolean;
 }
 #endif

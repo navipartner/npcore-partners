@@ -92,7 +92,7 @@ page 6184707 "NPR Spfy Webhook Notifications"
             action(ShowErrorMessage)
             {
                 Caption = 'Show Error';
-                ToolTip = 'Shows the error message raised by the notification processing (in cases, when the process has failed).';
+                ToolTip = 'Shows the error message raised by the notification processing (if the process has failed).';
                 Image = PrevErrorMessage;
                 Promoted = true;
                 PromotedCategory = Process;
@@ -128,7 +128,7 @@ page 6184707 "NPR Spfy Webhook Notifications"
             action(ShowRelated)
             {
                 Caption = 'Show Related';
-                ToolTip = 'Navigates to related record in Business Central.';
+                ToolTip = 'Navigates to the related record in Business Central.';
                 Image = ViewSourceDocumentLine;
                 Promoted = true;
                 PromotedCategory = Process;
