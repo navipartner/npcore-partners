@@ -20,6 +20,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         UpdateShopifyStoreDoNotSyncSalesPrices();
         EnableMetafieldDataLogSubscriber();
         RemoveIncorrectlyAssignedIDs();
+        RegisterShopifyAppRequestListenerWebservice();
     end;
 
     internal procedure UpdateShopifySetup()
@@ -36,6 +37,21 @@ codeunit 6184802 "NPR Spfy App Upgrade"
             exit;
         ShopifySetup."Shopify Api Version" := ShopifySetup2."Shopify Api Version";
         ShopifySetup.Modify();
+    end;
+
+    internal procedure RegisterShopifyAppRequestListenerWebservice()
+    var
+        SpfyAppRequestWS: Codeunit "NPR Spfy App Request WS";
+    begin
+        _UpgradeStep := 'RegisterShopifyAppRequestListenerWebservice';
+        if HasUpgradeTag() then
+            exit;
+        LogStart();
+
+        SpfyAppRequestWS.RegisterShopifyAppRequestListenerWebservice();
+
+        SetUpgradeTag();
+        LogFinish();
     end;
 
     internal procedure SetDataProcessingHandlerID()
