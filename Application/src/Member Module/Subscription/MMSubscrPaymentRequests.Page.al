@@ -29,14 +29,14 @@ page 6184832 "NPR MM Subscr.Payment Requests"
                     ToolTip = 'Specifies the value of the PSP field.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
-                field(Type; Rec.Type)
-                {
-                    ToolTip = 'Specifies the type of requested transaction.';
-                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-                }
                 field(Status; Rec.Status)
                 {
                     ToolTip = 'Specifies the value of the Status field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field(Type; Rec.Type)
+                {
+                    ToolTip = 'Specifies the value of the Type field.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Description; Rec.Description)
@@ -69,6 +69,11 @@ page 6184832 "NPR MM Subscr.Payment Requests"
                     ToolTip = 'Specifies the value of the Payment PSP Reference field.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field("Pay by Link ID"; Rec."Pay by Link ID")
+                {
+                    ToolTip = 'Specifies the value of the Pay by Link field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
                 field("Result Code"; Rec."Result Code")
                 {
                     ToolTip = 'Specifies the value of the Refuse Reason Code field.';
@@ -88,6 +93,21 @@ page 6184832 "NPR MM Subscr.Payment Requests"
                 {
                     ToolTip = 'Specifies the value of the Process Try Count field.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field("Pay by Link URL"; Rec."Pay by Link URL")
+                {
+                    ToolTip = 'Specifies the value of the Pay by Link URL field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                    trigger OnDrillDown()
+                    begin
+                        Hyperlink(Rec."Pay by Link URL");
+                    end;
+                }
+                field("Pay By Link Expires At"; Rec."Pay By Link Expires At")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Pay By Link Expires At field.';
                 }
                 field(Posted; Rec.Posted)
                 {
@@ -308,7 +328,7 @@ page 6184832 "NPR MM Subscr.Payment Requests"
     var
         SubsPayRequestUtils: Codeunit "NPR MM Subs Pay Request Utils";
     begin
-        SubsPayRequestUtils.SetSubscrPaymentRequestStatusCancelled(Rec);
+        SubsPayRequestUtils.SetSubscrPaymentRequestStatusCancelled(Rec, false);
     end;
 
     local procedure FindPostedEntries()

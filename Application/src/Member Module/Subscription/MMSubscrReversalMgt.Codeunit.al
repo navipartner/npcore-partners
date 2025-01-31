@@ -48,6 +48,7 @@ codeunit 6248187 "NPR MM Subscr. Reversal Mgt."
         SubscrReversalRequest.Amount := -SubscriptionRequest.Amount;
         SubscrReversalRequest."Currency Code" := SubscriptionRequest."Currency Code";
         SubscrReversalRequest."Item No." := SubscriptionRequest."Item No.";
+        SubscrReversalRequest."Created from Entry No." := SubscriptionRequest."Entry No.";
 
         SubscrPmtReversalRequest.Init();
         SubscrPmtReversalRequest."Entry No." := 0;
@@ -79,7 +80,7 @@ codeunit 6248187 "NPR MM Subscr. Reversal Mgt."
 
     local procedure CheckIsReversible(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request")
     begin
-        if not (SubscrPaymentRequest.Type in [SubscrPaymentRequest.Type::Payment, SubscrPaymentRequest.Type::ChargebackReversed]) then
+        if not (SubscrPaymentRequest.Type in [SubscrPaymentRequest.Type::Payment, SubscrPaymentRequest.Type::PayByLink, SubscrPaymentRequest.Type::ChargebackReversed]) then
             SubscrPaymentRequest.FieldError(Type);
         SubscrPaymentRequest.TestField(Reversed, false);
     end;
@@ -130,7 +131,7 @@ codeunit 6248187 "NPR MM Subscr. Reversal Mgt."
                 SubscrPaymentRequest.SetRange("Reversed by Entry No.", SubscrPmtReversalRequest."Entry No.");
                 SubscrPaymentRequest.SetFilter("Entry No.", '<>%1', SubscrPmtReversalRequest."Entry No.");
                 if not SubscrPaymentRequest.IsEmpty() then
-                    SubsPayRequestUtils.SetSubscrPaymentRequestStatus(SubscrPmtReversalRequest, Enum::"NPR MM Payment Request Status"::Cancelled);
+                    SubsPayRequestUtils.SetSubscrPaymentRequestStatus(SubscrPmtReversalRequest, Enum::"NPR MM Payment Request Status"::Cancelled, false);
             until SubscrPmtReversalRequest.Next() = 0;
     end;
 }

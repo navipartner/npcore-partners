@@ -62,6 +62,11 @@ table 6150963 "NPR MM Subs Pay Req Log Entry"
             Caption = 'Manual';
             DataClassification = SystemMetadata;
         }
+        field(14; "Webhook Request Entry No."; Integer)
+        {
+            Caption = 'Webhook Request Entry No.';
+            DataClassification = SystemMetadata;
+        }
     }
 
     keys

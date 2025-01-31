@@ -27,7 +27,7 @@ codeunit 6185097 "NPR MM Subs Pay Req Log Utils"
         SubsPayReqLogEntry.Insert(true);
     end;
 
-    internal procedure UpdateEntry(var SubsPayReqLogEntry: Record "NPR MM Subs Pay Req Log Entry"; RequestText: Text; ResponseText: Text; ProcessingStatus: Enum "NPR MM SubsPayReqLogProcStatus"; ErrorMessage: Text; SubscriptionsPaymentGatewayCode: Code[10])
+    internal procedure UpdateEntry(var SubsPayReqLogEntry: Record "NPR MM Subs Pay Req Log Entry"; RequestText: Text; ResponseText: Text; ProcessingStatus: Enum "NPR MM SubsPayReqLogProcStatus"; ErrorMessage: Text; SubscriptionsPaymentGatewayCode: Code[10]; WebhookEntryNo: Integer)
     var
         IsModified: Boolean;
     begin
@@ -54,6 +54,11 @@ codeunit 6185097 "NPR MM Subs Pay Req Log Utils"
 
         if SubsPayReqLogEntry."Subs. Payment Gateway Code" <> SubscriptionsPaymentGatewayCode then begin
             SubsPayReqLogEntry."Subs. Payment Gateway Code" := SubscriptionsPaymentGatewayCode;
+            IsModified := true;
+        end;
+
+        if SubsPayReqLogEntry."Webhook Request Entry No." <> WebhookEntryNo then begin
+            SubsPayReqLogEntry."Webhook Request Entry No." := WebhookEntryNo;
             IsModified := true;
         end;
 

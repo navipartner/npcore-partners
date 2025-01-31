@@ -4,7 +4,7 @@ codeunit 6185103 "NPR MM Subs Pay Request Utils"
 
     internal procedure ProcessSubsPayRequestWithConfirmation(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; SkipTryCountUpdate: Boolean)
     var
-        SubscrPaymentIHandler: Interface "NPR MM Subscr.Payment IHandler";
+        SubscrPaymentIHandler: Interface "NPR MM Subs Payment IHandler";
         ConfirmManagement: Codeunit "Confirm Management";
         ConfirmLbl: Label 'Are you sure you want to process entry no. %1?', Comment = '%1 Entry No.';
     begin
@@ -18,17 +18,19 @@ codeunit 6185103 "NPR MM Subs Pay Request Utils"
         SubscrPaymentRequest.Get(SubscrPaymentRequest.RecordId);
     end;
 
-    local procedure SetSubscrPaymentRequestStatusWithConfirmation(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; NewStatus: Enum "NPR MM Payment Request Status")
+    local procedure SetSubscrPaymentRequestStatusWithConfirmation(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; NewStatus: Enum "NPR MM Payment Request Status"; LogChange: Boolean) Success: Boolean
     var
         ConfirmManagement: Codeunit "Confirm Management";
         NewStatusConfirmLbl: Label 'Are you sure you want to set the status of entry no. %1 to %2?', Comment = '%1 - entry no., %2 - Status';
     begin
         if not ConfirmManagement.GetResponseOrDefault(StrSubstNo(NewStatusConfirmLbl, SubscrPaymentRequest."Entry No.", NewStatus), true) then
             exit;
-        SetSubscrPaymentRequestStatus(SubscrPaymentRequest, NewStatus);
+        SetSubscrPaymentRequestStatus(SubscrPaymentRequest, NewStatus, LogChange);
+
+        Success := true;
     end;
 
-    internal procedure SetSubscrPaymentRequestStatus(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; NewStatus: Enum "NPR MM Payment Request Status")
+    internal procedure SetSubscrPaymentRequestStatus(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; NewStatus: Enum "NPR MM Payment Request Status"; LogChange: Boolean)
     var
         SubsPayReqLogEntry: Record "NPR MM Subs Pay Req Log Entry";
         SubsPayReqLogUtils: Codeunit "NPR MM Subs Pay Req Log Utils";
@@ -41,16 +43,28 @@ codeunit 6185103 "NPR MM Subs Pay Request Utils"
         if NewStatus = NewStatus::Cancelled then
             SubscrReversalMgt.CancelReversal(SubscrPaymentRequest);
 
-        SubsPayReqLogUtils.LogEntry(SubscrPaymentRequest, '', '', true, SubsPayReqLogEntry);
+        if LogChange then
+            SubsPayReqLogUtils.LogEntry(SubscrPaymentRequest, '', '', true, SubsPayReqLogEntry);
     end;
 
-    internal procedure SetSubscrPaymentRequestStatusCancelled(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request")
+    internal procedure SetSubscrPaymentRequestStatusCancelled(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; SkipTryCountUpdate: Boolean)
     var
+        SubscrPaymentIHandler: Interface "NPR MM Subs Payment IHandler";
         CannotCancelCapturedErr: Label 'Captured subscription payment requests cannot be cancelled. Please request a refund instead.';
+
     begin
         if SubscrPaymentRequest.Status = SubscrPaymentRequest.Status::Captured then
             Error(CannotCancelCapturedErr);
-        SetSubscrPaymentRequestStatusWithConfirmation(SubscrPaymentRequest, Enum::"NPR MM Payment Request Status"::Cancelled);
+
+        if not SetSubscrPaymentRequestStatusWithConfirmation(SubscrPaymentRequest, Enum::"NPR MM Payment Request Status"::Cancelled, false) then
+            exit;
+
+        SubscrPaymentIHandler := SubscrPaymentRequest.PSP;
+        if not SubscrPaymentIHandler.ProcessPaymentRequest(SubscrPaymentRequest, SkipTryCountUpdate, true) then
+            Error(GetLastErrorText());
+
+        //Refresh record after processing
+        SubscrPaymentRequest.Get(SubscrPaymentRequest.RecordId);
     end;
 
     local procedure CreateSubscriptionPaymentRequestProcessingJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry") Created: Boolean;

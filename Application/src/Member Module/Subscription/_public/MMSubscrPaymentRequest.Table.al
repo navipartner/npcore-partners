@@ -84,6 +84,21 @@ table 6150921 "NPR MM Subscr. Payment Request"
             Caption = 'PSP Reference';
             DataClassification = CustomerContent;
         }
+        field(130; "Pay by Link URL"; Text[2048])
+        {
+            Caption = 'Pay by Link URL';
+            DataClassification = CustomerContent;
+        }
+        field(140; "Pay by Link ID"; Code[20])
+        {
+            Caption = 'Pay by Link ID';
+            DataClassification = CustomerContent;
+        }
+        field(150; "Pay By Link Expires At"; DateTime)
+        {
+            Caption = 'Pay By Link Expires At';
+            DataClassification = CustomerContent;
+        }
         field(120; "Payment PSP Reference"; Code[16])
         {
             Caption = 'Payment PSP Reference';
@@ -189,6 +204,7 @@ table 6150921 "NPR MM Subscr. Payment Request"
         key(Key4; PSP, "Batch No.") { }
         key(Key5; "Reversed by Entry No.") { }
         key(Key6; "PSP Reference", PSP, Reconciled, Reversed) { }
+        key(Key7; "Pay by Link ID", Status) { }
     }
 
     internal procedure CheckSubscrPaymentRequestStatusCanBeChanged()

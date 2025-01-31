@@ -115,6 +115,12 @@ page 6184833 "NPR MM Subscr. Requests"
                     ToolTip = 'Specifies the value of the Process Try Count field.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field("Created from Entry No."; Rec."Created from Entry No.")
+                {
+                    ToolTip = 'Specifies the value of the Created from Entry No. field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Visible = false;
+                }
                 field(SystemCreatedAt; Rec.SystemCreatedAt)
                 {
                     ToolTip = 'Specifies the value of the SystemCreatedAt field.';
@@ -322,7 +328,7 @@ page 6184833 "NPR MM Subscr. Requests"
     var
         SubscrRequestUtils: Codeunit "NPR MM Subscr. Request Utils";
     begin
-        SubscrRequestUtils.SetSubscriptionRequestStatusCancelledWithConfirmation(Rec);
+        SubscrRequestUtils.SetSubscriptionRequestStatusCancelledWithConfirmation(Rec, true);
     end;
 
     local procedure FindPostedEntries()

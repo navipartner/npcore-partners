@@ -985,6 +985,11 @@
     end;
 
     procedure AddMembershipRenewalFailureNotification(MembershipEntryNo: Integer; MembershipCode: Code[20]; RejectedReasonCode: Text[50]; RejectedReasonDescription: Text[250])
+    begin
+        AddMembershipRenewalFailureNotification(MembershipEntryNo, MembershipCode, RejectedReasonCode, RejectedReasonDescription, '');
+    end;
+
+    procedure AddMembershipRenewalFailureNotification(MembershipEntryNo: Integer; MembershipCode: Code[20]; RejectedReasonCode: Text[50]; RejectedReasonDescription: Text[250]; PayByLinkURL: Text[2048])
     var
         MembershipSetup: Record "NPR MM Membership Setup";
         CommunitySetup: Record "NPR MM Member Community";
@@ -992,10 +997,10 @@
         MembershipSetup.Get(MembershipCode);
         CommunitySetup.Get(MembershipSetup."Community Code");
 
-        AddMembershipRenewalFailureNotificationWorker(MembershipEntryNo, RejectedReasonCode, RejectedReasonDescription, MembershipSetup, CommunitySetup);
+        AddMembershipRenewalFailureNotificationWorker(MembershipEntryNo, RejectedReasonCode, RejectedReasonDescription, MembershipSetup, CommunitySetup, PayByLinkURL);
     end;
 
-    local procedure AddMembershipRenewalFailureNotificationWorker(MembershipEntryNo: Integer; RejectedReasonCode: Text[50]; RejectedReasonDescription: Text[250]; MembershipSetup: Record "NPR MM Membership Setup"; CommunitySetup: Record "NPR MM Member Community")
+    local procedure AddMembershipRenewalFailureNotificationWorker(MembershipEntryNo: Integer; RejectedReasonCode: Text[50]; RejectedReasonDescription: Text[250]; MembershipSetup: Record "NPR MM Membership Setup"; CommunitySetup: Record "NPR MM Member Community"; PayByLinkURL: Text[2048])
     var
         NotificationSetup: Record "NPR MM Member Notific. Setup";
         MembershipNotification: Record "NPR MM Membership Notific.";
@@ -1042,6 +1047,7 @@
         MembershipNotification."Processing Method" := NotificationSetup."Processing Method";
         MembershipNotification."Rejected Reason Code" := RejectedReasonCode;
         MembershipNotification."Rejected Reason Description" := RejectedReasonDescription;
+        MembershipNotification."Pay by Link URL" := PayByLinkURL;
         MembershipNotification.Insert();
     end;
 

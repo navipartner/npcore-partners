@@ -25,11 +25,13 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
             exit;
     end;
 
-    local procedure SetSubscriptionRequestStatus(var SubscrRequest: Record "NPR MM Subscr. Request"; NewStatus: Enum "NPR MM Subscr. Request Status")
+    local procedure SetSubscriptionRequestStatus(var SubscrRequest: Record "NPR MM Subscr. Request"; NewStatus: Enum "NPR MM Subscr. Request Status"; SkipTryCountUpdate: Boolean)
     var
         SubsReqLogEntry: Record "NPR MM Subs Req Log Entry";
         SubsReqLogUtils: Codeunit "NPR MM Subs Req Log Utils";
         SubscrReversalMgt: Codeunit "NPR MM Subscr. Reversal Mgt.";
+        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+        SubsPaymentIHandler: Interface "NPR MM Subs Payment IHandler";
     begin
         if SubscrRequest.Status = NewStatus then
             exit;
@@ -37,19 +39,28 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
         SubscrRequest.Validate(Status, NewStatus);
         SubscrRequest.Validate("Processing Status", SubscrRequest."Processing Status"::Success);
         SubscrRequest.Modify(true);
-        if NewStatus = NewStatus::Cancelled then
+        if NewStatus = NewStatus::Cancelled then begin
             SubscrReversalMgt.CancelReversal(SubscrRequest);
+            SubscrPaymentRequest.Reset();
+            SubscrPaymentRequest.SetRange("Subscr. Request Entry No.", SubscrRequest."Entry No.");
+            if SubscrPaymentRequest.FindLast() then begin
+                ClearLastError();
+                SubsPaymentIHandler := SubscrPaymentRequest.PSP;
+                if not SubsPaymentIHandler.ProcessPaymentRequest(SubscrPaymentRequest, SkipTryCountUpdate, true) then
+                    Error(GetLastErrorText());
+            end;
+        end;
 
         SubsReqLogUtils.LogEntry(SubscrRequest, true, SubsReqLogEntry);
     end;
 
-    local procedure SetSubscriptionRequestStatusCancelled(var SubscrRequest: Record "NPR MM Subscr. Request")
+    local procedure SetSubscriptionRequestStatusCancelled(var SubscrRequest: Record "NPR MM Subscr. Request"; SkipTryCountUpdate: Boolean)
     begin
         CheckSuccessfulPaymentRequestsExistAndGiveError(SubscrRequest);
-        SetSubscriptionRequestStatus(SubscrRequest, Enum::"NPR MM Subscr. Request Status"::Cancelled);
+        SetSubscriptionRequestStatus(SubscrRequest, Enum::"NPR MM Subscr. Request Status"::Cancelled, SkipTryCountUpdate);
     end;
 
-    internal procedure SetSubscriptionRequestStatusCancelledWithConfirmation(var SubscrRequest: Record "NPR MM Subscr. Request")
+    internal procedure SetSubscriptionRequestStatusCancelledWithConfirmation(var SubscrRequest: Record "NPR MM Subscr. Request"; SkipTryCountUpdate: Boolean)
     var
         ConfirmManagement: Codeunit "Confirm Management";
         NewStatusConfirmLbl: Label 'Are you sure you want to set the status of entry no. %1 to %2?', Comment = '%1 - entry no., %2 - Status';
@@ -57,7 +68,7 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
         if not ConfirmManagement.GetResponseOrDefault(StrSubstNo(NewStatusConfirmLbl, SubscrRequest."Entry No.", Enum::"NPR MM Subscr. Request Status"::Cancelled), true) then
             exit;
 
-        SetSubscriptionRequestStatusCancelled(SubscrRequest);
+        SetSubscriptionRequestStatusCancelled(SubscrRequest, SkipTryCountUpdate);
     end;
 
     local procedure CheckSuccessfulPaymentRequestsExist(SubscrRequest: Record "NPR MM Subscr. Request"; var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request") Found: Boolean
@@ -104,7 +115,7 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
             exit;
         CheckSuccessfulPaymentRequestsExistAndGiveError(SubscrRequest);
         repeat
-            SubsPayRequestUtils.SetSubscrPaymentRequestStatus(SubscrPaymentRequest, NewPmtRequestStatus);
+            SubsPayRequestUtils.SetSubscrPaymentRequestStatus(SubscrPaymentRequest, NewPmtRequestStatus, false);
         until SubscrPaymentRequest.Next() = 0;
     end;
 

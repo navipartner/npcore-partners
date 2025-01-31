@@ -63,6 +63,13 @@ page 6184871 "NPR MM Sub Pay Req Log Entries"
                     ToolTip = 'Specifies the value of the Created by User Name.';
                     Editable = false;
                 }
+                field("Webhook Request Entry No."; Rec."Webhook Request Entry No.")
+                {
+                    Caption = 'Webhook Request Entry No.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ToolTip = 'Specifies the value of the Webhook Request Entry No.';
+                    Editable = false;
+                }
                 field(SystemCreatedBy; Rec.SystemCreatedBy)
                 {
                     Caption = 'Created by';

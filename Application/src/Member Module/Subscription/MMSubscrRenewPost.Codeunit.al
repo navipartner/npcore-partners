@@ -101,7 +101,7 @@ codeunit 6185121 "NPR MM Subscr. Renew: Post"
     local procedure PostPayment(SubscriptionRequest: Record "NPR MM Subscr. Request"; SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; Membership: Record "NPR MM Membership"; RecurringPaymentSetup: Record "NPR MM Recur. Paym. Setup"; PostingDocumentNo: Code[20])
     var
         GenJnlLine: Record "Gen. Journal Line";
-        SubscrPaymentIHandler: Interface "NPR MM Subscr.Payment IHandler";
+        SubscrPaymentIHandler: Interface "NPR MM Subs Payment IHandler";
         AppliesToDocType: Enum "Gen. Journal Document Type";
         PaymentAccountType: Enum "Gen. Journal Account Type";
         AppliesToDocNo: Code[20];
@@ -111,7 +111,7 @@ codeunit 6185121 "NPR MM Subscr. Renew: Post"
         if SubscrPaymentRequest.Posted then
             exit;
         PostingDescription := StrSubstNo(AUTORENEW_TEXT, Membership."External Membership No.", SubscriptionRequest."New Valid From Date", SubscriptionRequest."New Valid Until Date");
-        if SubscrPaymentRequest.Type = SubscrPaymentRequest.Type::Payment then
+        if (SubscrPaymentRequest.Type = SubscrPaymentRequest.Type::Payment) or (SubscrPaymentRequest.Type = SubscrPaymentRequest.Type::PayByLink) then
             SubscrPaymentRequest."Posting Document Type" := SubscrPaymentRequest."Posting Document Type"::Payment
         else
             SubscrPaymentRequest."Posting Document Type" := SubscrPaymentRequest."Posting Document Type"::Refund;

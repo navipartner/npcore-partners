@@ -183,12 +183,11 @@ table 6150801 "NPR Adyen Setup"
             trigger OnValidate()
             var
                 AdyenManagement: Codeunit "NPR Adyen Management";
-                ProccessPostPaymentLine: Label 'Process Posting Payment Lines for posted documents.';
             begin
                 if "PayByLink Enable Auto Posting" then
-                    AdyenManagement.CreateAutoRescheduleAdyenJob(Codeunit::"NPR Adyen Post Payment Lines", ProccessPostPaymentLine, 1, 600) //Reschedule to run again in 10 minutes on error
+                    AdyenManagement.SchedulePostPaymentLinesJQ()
                 else
-                    AdyenManagement.SetOnHoldJob(Codeunit::"NPR Adyen Post Payment Lines");
+                    AdyenManagement.SetOnHoldPostPaymentLinesJQ();
             end;
         }
         field(190; "Pay By Link Exp. Duration"; Duration)
@@ -225,7 +224,7 @@ table 6150801 "NPR Adyen Setup"
                 if not MagentoPaymentGateway.Get(Rec."Pay By Link Gateaway Code") then
                     exit;
                 If MagentoPaymentGateway."Integration Type" = MagentoPaymentGateway."Integration Type"::Adyen then
-                    CreateAdyenJobs();
+                    SetupPayByLink();
             end;
 
         }
@@ -312,26 +311,43 @@ table 6150801 "NPR Adyen Setup"
             Error(ExperationErr, MaxDurationTxt);
     end;
 
-    local procedure CreateAdyenJobs()
+    local procedure SetupPayByLink()
     var
-        WebhookSetup: Record "NPR Adyen Webhook Setup";
         MerchantAccount: Record "NPR Adyen Merchant Account";
         AdyenWebhookType: Enum "NPR Adyen Webhook Type";
         AdyenManagement: Codeunit "NPR Adyen Management";
-        ProccessPaymentStatus: Label 'Process Payment Status for Adyen Pay by Link.';
         AuthorisationEventFilter: Label 'AUTHORISATION', Locked = true;
     begin
         if Rec."Enable Pay by Link" then begin
-            AdyenManagement.CreateAutoRescheduleAdyenJob(Codeunit::"NPR Adyen PayByLink Status JQ", ProccessPaymentStatus, 1, 30); //Reschedule to run again in 30 seconds on error
+            AdyenManagement.SchedulePayByLinkStatusJQ();
+
+            if Rec."PayByLink Enable Auto Posting" then
+                AdyenManagement.SchedulePostPaymentLinesJQ();
+
             AdyenManagement.UpdateMerchantList(0);
             if MerchantAccount.FindSet() then
                 repeat
-                    AdyenManagement.InitWebhookSetup(WebhookSetup, AuthorisationEventFilter, MerchantAccount.Name, AdyenWebhookType::standard);
+                    AdyenManagement.EnsureAdyenWebhookSetup(AuthorisationEventFilter, MerchantAccount.Name, AdyenWebhookType::standard);
                 until MerchantAccount.Next() = 0;
-            AdyenManagement.CreateWebhook(WebhookSetup);
         end else begin
-            AdyenManagement.SetOnHoldJob(Codeunit::"NPR Adyen PayByLink Status JQ");
-            AdyenManagement.SetOnHoldJob(Codeunit::"NPR Adyen Post Payment Lines");
+            if not IsSubsPayByLinkEnabled() then
+                AdyenManagement.SetOnHoldPayByLinkStatusJQ();
+            AdyenManagement.SetOnHoldPostPaymentLinesJQ();
         end;
+    end;
+
+
+    local procedure IsSubsPayByLinkEnabled(): Boolean
+    var
+        SubsPaymentGateway: Record "NPR MM Subs. Payment Gateway";
+        SubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup";
+    begin
+        SubsPaymentGateway.SetRange("Integration Type", SubsPaymentGateway."Integration Type"::Adyen);
+        SubsPaymentGateway.SetRange(Status, SubsPaymentGateway.Status::Enabled);
+        SubsPaymentGateway.SetLoadFields("Integration Type", Status, Code);
+        if SubsPaymentGateway.FindFirst() then
+            if SubsAdyenPGSetup.Get(SubsPaymentGateway.Code) then
+                if SubsAdyenPGSetup."Card Update by Pay by Link" then
+                    exit(true);
     end;
 }

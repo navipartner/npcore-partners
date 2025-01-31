@@ -10,4 +10,5 @@ enum 6059835 "NPR MM Payment Request Type"
     value(20; RefundRefersed) { Caption = 'Reversed Refund'; }
     value(30; Chargeback) { Caption = 'Chargeback'; }
     value(40; ChargebackReversed) { Caption = 'Reversed Chargeback'; }
+    value(50; "PayByLink") { Caption = 'Pay By Link'; }
 }
