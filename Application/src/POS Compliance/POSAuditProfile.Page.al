@@ -65,6 +65,13 @@
                     begin
                         exit(POSAuditLogMgt.LookupAuditHandler(Text));
                     end;
+
+                    trigger OnValidate()
+                    begin
+                        if xRec."Audit Handler" = Rec."Audit Handler" then
+                            exit;
+                        SetAllowSalesAndReturnInSameTransEnabled();
+                    end;
                 }
                 field("Allow Zero Amount Sales"; Rec."Allow Zero Amount Sales")
                 {
@@ -81,6 +88,7 @@
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies whether sales and returns lines are allowed in the same sale transaction.';
+                    Enabled = AllowSalesAndReturnInSameTransEnabled;
                 }
             }
             group(Printing)
@@ -146,4 +154,27 @@
             }
         }
     }
+
+    trigger OnOpenPage()
+    begin
+        SetAllowSalesAndReturnInSameTransEnabled();
+    end;
+
+    local procedure SetAllowSalesAndReturnInSameTransEnabled()
+    var
+        ATAuditMgt: Codeunit "NPR AT Audit Mgt.";
+        BGSISAuditMgt: Codeunit "NPR BG SIS Audit Mgt.";
+        ITAuditMgt: Codeunit "NPR IT Audit Mgt.";
+        RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
+        KSAAuditMgt: Codeunit "NPR KSA Audit Mgt.";
+    begin
+        AllowSalesAndReturnInSameTransEnabled := (Rec."Audit Handler" = ATAuditMgt.HandlerCode())
+                                            or (Rec."Audit Handler" = BGSISAuditMgt.HandlerCode())
+                                            or (Rec."Audit Handler" = ITAuditMgt.HandlerCode())
+                                            or (Rec."Audit Handler" = RSAuditMgt.HandlerCode())
+                                            or (Rec."Audit Handler" = KSAAuditMgt.HandlerCode());
+    end;
+
+    var
+        AllowSalesAndReturnInSameTransEnabled: Boolean;
 }
