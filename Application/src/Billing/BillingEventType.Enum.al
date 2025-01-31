@@ -1,0 +1,12 @@
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+enum 6059854 "NPR Billing Event Type"
+{
+    Access = Internal;
+    Extensible = false;
+
+    value(0; InternalDevelopmentEvent)
+    {
+        Caption = 'Internal Development Event', Locked = true;
+    }
+}
+#endif
