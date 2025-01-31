@@ -26,7 +26,6 @@ page 6059775 "NPR APIV1 - External POS Sale"
                 field(entryNo; Rec."Entry No.")
                 {
                     Caption = 'Entry No.', Locked = true;
-                    Editable = false;
                 }
                 field(startTime; Rec."Start Time")
                 {
@@ -75,13 +74,42 @@ page 6059775 "NPR APIV1 - External POS Sale"
                 {
                     Caption = 'Reference', Locked = true;
                 }
-                field(convertedToPOSEntry; Rec."Converted To POS Entry")
-                {
-                    Caption = 'Converted To POS Entry', Locked = true;
-                }
                 field(posEntrySystemId; Rec."POS Entry System Id")
                 {
                     Caption = 'POS Entry System Id', Locked = true;
+                }
+
+                field(smsTemplateCode; Rec."SMS Template")
+                {
+                    Caption = 'SMS Template', Locked = true;
+                }
+                field(emailTemplateCode; Rec."Email Template")
+                {
+                    Caption = 'E-mail Template', Locked = true;
+                }
+                field(externalPosSaleId; Rec."External Pos Sale Id")
+                {
+                    Caption = 'External Pos Sale Id', Locked = true;
+                }
+                field(externalPosId; Rec."External Pos Id")
+                {
+                    Caption = 'External Pos Id', Locked = true;
+                }
+                field(sendReceiptToEmail; Rec."Send Receipt: Email")
+                {
+                    Caption = 'Send Receipt: Email', Locked = true;
+                }
+                field(sendReceiptToSms; Rec."Send Receipt: SMS")
+                {
+                    Caption = 'Send Receipt: SMS', Locked = true;
+                }
+                field(email; Rec."E-mail")
+                {
+                    Caption = 'E-mail', Locked = true;
+                }
+                field(phoneNumber; Rec."Phone Number")
+                {
+                    Caption = 'Phone Number', Locked = true;
                 }
 
                 part(externalPosSaleLines; "NPR APIV1 - Ext. POS Sale Line")
@@ -94,46 +122,12 @@ page 6059775 "NPR APIV1 - External POS Sale"
             }
         }
     }
-
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     var
-        POSSaleCU: Codeunit "NPR POS Sale";
+        ExtPOSSaleProcessing: Codeunit "NPR Ext. POS Sale Processing";
     begin
-        IF Rec."Salesperson Code" = '' then begin
-            GetUserSetup();
-            Rec."Salesperson Code" := UserSetup."Salespers./Purch. Code";
-        end;
-        Rec.TestField("Salesperson Code");
-
-        IF Rec.Date = 0D then
-            Rec.Date := System.Today();
-
-        IF Rec."Start Time" = 0T then
-            Rec."Start Time" := System.Time();
-
-        IF Rec."Register No." = '' then begin
-            GetUserSetup();
-            Rec."Register No." := UserSetup."NPR POS Unit No.";
-        end;
-        Rec.TestField("Register No.");
-
-        IF Rec."Sales Ticket No." = '' then
-            Rec."Sales Ticket No." := POSSaleCU.GetNextReceiptNo(Rec."Register No.");
-
-        CurrPage.externalPosSaleLines.Page.SetExternalPOSSale(Rec);
+        Rec.Insert(true);
+        ExtPOSSaleProcessing.TryAutoFillExternalPOSSale(Rec);
+        exit(false);
     end;
-
-    local procedure GetUserSetup()
-    begin
-        IF UserSetupRetrieved then
-            exit;
-
-        UserSetup.Get(UserId);
-        UserSetupRetrieved := true;
-    end;
-
-    var
-        UserSetup: Record "User Setup";
-        UserSetupRetrieved: Boolean;
-
 }

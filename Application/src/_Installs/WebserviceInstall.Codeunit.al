@@ -6,6 +6,7 @@ codeunit 6014471 "NPR Webservice Install"
     trigger OnInstallAppPerCompany()
     begin
         InitMPOSWebService();
+        InitEmergencyMPOSWebService();
         InitVippsMobilepayWebService();
         InitNpCsCollectWS();
         InitNpDcNonPOSCouponWS();
@@ -24,6 +25,13 @@ codeunit 6014471 "NPR Webservice Install"
         MPOSWebservice: Codeunit "NPR MPOS Webservice";
     begin
         MPOSWebservice.InitMPOSWebService();
+    end;
+
+    local procedure InitEmergencyMPOSWebService()
+    var
+        EmergencyMPOSWebservice: Codeunit "NPR Emergency mPOS Api";
+    begin
+        EmergencyMPOSWebservice.InitEmergencyMPOSWebService();
     end;
 
     local procedure InitVippsMobilepayWebService()

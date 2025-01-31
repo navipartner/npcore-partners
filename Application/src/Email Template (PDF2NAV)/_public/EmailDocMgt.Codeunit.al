@@ -456,7 +456,6 @@
         RecRef.GetTable(POSEntry);
         if EmailManagement.GetEmailAddressFromRecRef(RecRef) = '' then
             exit;
-
         SendReport(POSEntry, true);
     end;
 }

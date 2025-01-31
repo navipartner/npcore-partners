@@ -25,21 +25,15 @@ codeunit 6014625 "NPR Ext. POS Sale Processor" implements "NPR Nc Import List IP
     var
         ExtPOSSale: Record "NPR External POS Sale";
         ExtPOSSaleConverter: Codeunit "NPR Ext. POS Sale Converter";
+        ExtPOSSaleProcessing: Codeunit "NPR Ext. POS Sale Processing";
     begin
         GetExternalPOSSale(ImportEntry, ExtPOSSale);
         ClearLastError();
         IF NOT ExtPOSSaleConverter.RUN(ExtPOSSale) then begin
-            AddConversionError(ExtPOSSale, GetLastErrorText());
+            ExtPOSSaleProcessing.AddConversionError(ExtPOSSale, GetLastErrorText());
             Commit();
             Error(ProcessingErrorLbl, ExtPOSSale.TableCaption(), ExtPOSSale."Entry No.");
         end;
-    end;
-
-    procedure AddConversionError(var ExtPOSSale: Record "NPR External POS Sale"; ErrorTxt: Text)
-    begin
-        ExtPOSSale."Has Conversion Error" := true;
-        ExtPOSSale."Last Conversion Error Message" := CopyStr(ErrorTxt, 1, MaxStrLen(ExtPOSSale."Last Conversion Error Message"));
-        ExtPOSSale.Modify();
     end;
 
     procedure GetExternalPOSSale(ImportEntry: Record "NPR Nc Import Entry"; var ExtPOSSale: Record "NPR External POS Sale")

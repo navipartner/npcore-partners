@@ -11,6 +11,7 @@
             AutoIncrement = true;
             Caption = 'Entry No.';
             DataClassification = CustomerContent;
+            Editable = false;
         }
 
         field(10; "Register No."; Code[10])
@@ -258,6 +259,73 @@
                   DATABASE::"Salesperson/Purchaser", "Salesperson Code");
             end;
         }
+        field(210; "User ID"; Code[50])
+        {
+            Caption = 'User ID';
+            DataClassification = CustomerContent;
+            Description = 'NPR5.54';
+            Editable = false;
+        }
+
+        field(300; "External Pos Id"; Text[50])
+        {
+            Caption = 'External Pos Id';
+            DataClassification = CustomerContent;
+        }
+        field(301; "Email Template"; Code[20])
+        {
+            Caption = 'Email Template';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR E-mail Template Header";
+        }
+        field(302; "SMS Template"; Code[20])
+        {
+            Caption = 'SMS Template';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR SMS Template Header";
+        }
+        field(303; "External Pos Sale Id"; Text[50])
+        {
+            Caption = 'External Pos Sale Id';
+            DataClassification = CustomerContent;
+        }
+
+        field(304; "Send Receipt: Email"; Boolean)
+        {
+            Caption = 'Send Receipt: Email';
+            DataClassification = CustomerContent;
+        }
+        field(305; "Send Receipt: SMS"; Boolean)
+        {
+            Caption = 'Send Receipt: SMS';
+            DataClassification = CustomerContent;
+        }
+        field(306; "Phone Number"; Text[30])
+        {
+            Caption = 'Phone Number';
+            DataClassification = CustomerContent;
+        }
+        field(307; "E-mail"; Text[250])
+        {
+            Caption = 'E-mail';
+            DataClassification = CustomerContent;
+        }
+        field(308; "SMS Receipt Log"; Integer)
+        {
+            Caption = 'SMS Receipt Log';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR SMS Log";
+        }
+        field(309; "Email Receipt Sent"; Boolean)
+        {
+            Caption = 'E-mail Receipt Sent';
+            DataClassification = CustomerContent;
+        }
+        field(310; "SMS Receipt Sent"; Boolean)
+        {
+            Caption = 'SMS Receipt Sent';
+            DataClassification = CustomerContent;
+        }
 
         field(480; "Dimension Set ID"; Integer)
         {
@@ -272,18 +340,13 @@
             end;
         }
 
-        field(210; "User ID"; Code[50])
-        {
-            Caption = 'User ID';
-            DataClassification = CustomerContent;
-            Description = 'NPR5.54';
-            Editable = false;
-        }
+
 
         field(1550; "Converted To POS Entry"; Boolean)
         {
             Caption = 'Converted To POS Entry';
             DataClassification = SystemMetadata;
+            Editable = false;
         }
 
         field(1551; "Has Conversion Error"; Boolean)
@@ -307,6 +370,14 @@
         {
             Caption = 'POS Entry System Id';
             DataClassification = SystemMetadata;
+            Editable = false;
+        }
+        field(1561; "POS Entry No."; Integer)
+        {
+            Caption = 'POS Entry No.';
+            DataClassification = CustomerContent;
+            Editable = false;
+            TableRelation = "NPR POS Entry";
         }
         field(6010; "Sales Channel"; Code[20])
         {
@@ -329,6 +400,19 @@
         key(Key3; "Converted To POS Entry", "Has Conversion Error", "POS Store Code")
         {
         }
+        key(Key4; "Send Receipt: SMS", "SMS Receipt Sent")
+        {
+
+        }
+        key(Key5; "Send Receipt: Email", "Email Receipt Sent")
+        {
+
+        }
+        key(Key6; "POS Entry No.")
+        {
+
+        }
+
     }
 
 
@@ -475,6 +559,7 @@
         ExtSaleLinePOS.SetRange("External POS Sale Entry No.", Rec."Entry No.");
         exit(ExtSaleLinePOS.FindFirst());
     end;
+
 
     trigger OnInsert()
     var

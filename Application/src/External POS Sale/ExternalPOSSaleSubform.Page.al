@@ -13,11 +13,19 @@
         {
             repeater(General)
             {
+                field(LineNo; Rec."Line No.")
+                {
+                    Caption = 'Line Number';
+                    ToolTip = 'Specifies the Line Number';
+                    ApplicationArea = NPRRetail;
+                    Editable = false;
+                }
                 field(type; Rec."Line Type")
                 {
                     Caption = 'Type';
                     ToolTip = 'Specifies the value of the Type field';
                     ApplicationArea = NPRRetail;
+                    Editable = false;
                 }
                 field(no; Rec."No.")
                 {
@@ -25,11 +33,19 @@
                     ToolTip = 'Specifies the value of the No field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Barcode Reference"; Rec."Barcode Reference")
+                {
+                    Caption = 'Barcode Reference';
+                    ToolTip = 'Specifies the value of the Barcode Reference field';
+                    ApplicationArea = NPRRetail;
+                    Editable = false;
+                }
                 field("date"; Rec."Date")
                 {
                     Caption = 'Date';
                     ToolTip = 'Specifies the value of the Date field';
                     ApplicationArea = NPRRetail;
+                    Editable = false;
                 }
                 field(variantCode; Rec."Variant Code")
                 {
@@ -42,6 +58,7 @@
                     Caption = 'Quantity';
                     ToolTip = 'Specifies the value of the Quantity field';
                     ApplicationArea = NPRRetail;
+                    Editable = false;
                 }
                 field(unitPrice; Rec."Unit Price")
                 {
@@ -92,6 +109,7 @@
                     Caption = 'Currency Code';
                     ToolTip = 'Specifies the value of the Currency Code field';
                     ApplicationArea = NPRRetail;
+                    Editable = false;
                 }
                 field(priceIncludesVAT; Rec."Price Includes VAT")
                 {
@@ -104,12 +122,14 @@
                     Caption = 'Description';
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRRetail;
+                    Editable = false;
                 }
                 field(description2; Rec."Description 2")
                 {
                     Caption = 'Description 2';
                     ToolTip = 'Specifies the value of the Description 2 field';
                     ApplicationArea = NPRRetail;
+                    Editable = false;
                 }
                 field(customDescr; Rec."Custom Descr")
                 {
@@ -254,5 +274,4 @@
             }
         }
     }
-
 }

@@ -5,7 +5,6 @@ codeunit 6059905 "NPR Cross Reference"
         POSCrossRefMgt: Codeunit "NPR POS Cross Reference Mgt.";
     begin
         POSCrossRefMgt.InitReference(SystemId, GlobalReference, TableName, RecordValue);
-
     end;
 
     procedure RemoveReference(SystemId: Guid; TableName: Text[250])
@@ -13,7 +12,6 @@ codeunit 6059905 "NPR Cross Reference"
         POSCrossRefMgt: Codeunit "NPR POS Cross Reference Mgt.";
     begin
         POSCrossRefMgt.RemoveReference(SystemId, TableName);
-
     end;
 
     procedure GetCrossReferenceIds(TableName: Text[250]; RecordValue: Text[100]; ReferenceNo: Code[50]; var ListOfSystemId: List of [Guid])

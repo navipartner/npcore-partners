@@ -1798,10 +1798,9 @@
         POSEntryOut := GlobalPOSEntry;
     end;
     #region External POS Sale
-    internal procedure CreatePOSEntryFromExternalPOSSale(var ExtPOSSale: Record "NPR External POS Sale")
+    internal procedure CreatePOSEntryFromExternalPOSSale(var ExtPOSSale: Record "NPR External POS Sale"; var POSEntry: Record "NPR POS Entry")
     var
         POSPeriodRegister: Record "NPR POS Period Register";
-        POSEntry: Record "NPR POS Entry";
         POSAuditLog: Record "NPR POS Audit Log";
         POSUnit: Record "NPR POS Unit";
         POSEntryManagement: Codeunit "NPR POS Entry Management";
@@ -1849,6 +1848,7 @@
         ExtPOSSale."POS Entry System Id" := POSEntry.SystemId;
         ExtPOSSale."Has Conversion Error" := false;
         ExtPOSSale."Last Conversion Error Message" := '';
+        ExtPOSSale."POS Entry No." := POSEntry."Entry No.";
         ExtPOSSale.Modify();
     end;
 

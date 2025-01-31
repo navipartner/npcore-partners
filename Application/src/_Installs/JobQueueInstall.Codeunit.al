@@ -41,6 +41,7 @@
             AddSMSJobQueue();
             AddRSAuditJobQueue();
             AddATFiscalJobQueues();
+            AddExternalPOSSaleQueues();
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddJobQueues'));
         end;
 
@@ -133,6 +134,17 @@
         NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
     begin
         NcSetupMgt.SetupDefaultNcImportListProcessingJobQueue(true);
+    end;
+
+    local procedure AddExternalPOSSaleQueues()
+    var
+        ExtSaleConvertJQ: Codeunit "NPR Ext. Sale Convert JQ";
+        ExtSaleEmailJQ: Codeunit "NPR Ext. Sale Email JQ";
+        ExtSaleSMSJQ: Codeunit "NPR Ext. Sale SMS JQ";
+    begin
+        ExtSaleConvertJQ.AddExtPOSSaleConversionJobQueue();
+        ExtSaleEmailJQ.AddExtPOSSaleSendEmailReceiptJobQueue();
+        ExtSaleSMSJQ.AddExtPOSSaleSMSReceiptJobQueue();
     end;
 
     local procedure AddJQLogEntryCleanupJobQueue()
