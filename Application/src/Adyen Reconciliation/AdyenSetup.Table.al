@@ -254,6 +254,7 @@ table 6150801 "NPR Adyen Setup"
             ELSE
             IF ("EFT Res. Account Type" = CONST("Bank Account")) "Bank Account";
         }
+
         field(260; "Active Subs. Payment Gateways"; Integer)
         {
             Caption = 'Active Subs. Payment Gateways';

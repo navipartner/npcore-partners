@@ -522,6 +522,9 @@
             EFTTransactionRequest."Payment Instrument Type" := JToken.AsValue().AsText();
 
         if TrySelectToken(JObject, 'CardData.MaskedPan', JToken, false) then
+            EFTTransactionRequest."Card Number" := JToken.AsValue().AsText()
+        //The Mobile integration serilisation has uppcase on the last part..
+        else if TrySelectToken(JObject, 'CardData.MaskedPAN', JToken, false) then
             EFTTransactionRequest."Card Number" := JToken.AsValue().AsText();
 
         if TrySelectToken(JObject, 'StoredValueAccountID', JToken, false) then begin
@@ -743,17 +746,17 @@
         exit(true);
     end;
 
-    local procedure ValidateHeader(JObject: JsonObject; EFTTransactionRequest: Record "NPR EFT Transaction Request")
+    local procedure ValidateHeader(JObject: JsonObject; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
-        ServiceID: Integer;
+        ServiceID: Text;
         MessageCategory: Text;
         ExpectedMessageCategory: Text;
         ERROR_HEADER_CATEGORY: Label 'Error: Header category %1, expected %2';
         JToken: JsonToken;
     begin
         TrySelectToken(JObject, 'ServiceID', JToken, true);
-        Evaluate(ServiceID, JToken.AsValue().AsText());
-        EFTTransactionRequest.TestField("Entry No.", ServiceID);
+        ServiceID := JToken.AsValue().AsText();
+        EFTTransactionRequest.TestField("Reference Number Input", ServiceID);
 
         case EFTTransactionRequest."Processing Type" of
             EFTTransactionRequest."Processing Type"::REFUND:
@@ -780,6 +783,11 @@
         MessageCategory := JToken.AsValue().AsText();
         if MessageCategory <> ExpectedMessageCategory then
             Error(ERROR_HEADER_CATEGORY, MessageCategory, ExpectedMessageCategory);
+        if (EFTTransactionRequest."Hardware ID" = '') then begin
+            if (TrySelectToken(JObject, 'POIID', JToken, false)) then
+                EFTTransactionRequest."Hardware ID" := JToken.AsValue().AsText();
+        end;
+
     end;
 
     [TryFunction]

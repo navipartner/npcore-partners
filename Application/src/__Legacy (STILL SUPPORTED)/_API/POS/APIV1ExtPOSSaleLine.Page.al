@@ -9,6 +9,7 @@ page 6059788 "NPR APIV1 - Ext. POS Sale Line"
     DelayedInsert = true;
     EntityName = 'externalPosSaleLine';
     EntitySetName = 'externalPosSaleLines';
+    ODataKeyFields = SystemId;
     PageType = API;
     SourceTable = "NPR External POS Sale Line";
 
@@ -48,6 +49,10 @@ page 6059788 "NPR APIV1 - Ext. POS Sale Line"
                 field(no; Rec."No.")
                 {
                     Caption = 'No.', Locked = true;
+                }
+                field(barcodeReference; Rec."Barcode Reference")
+                {
+                    Caption = 'Barcode Reference', Locked = true;
                 }
                 field("date"; Rec."Date")
                 {
@@ -210,6 +215,24 @@ page 6059788 "NPR APIV1 - Ext. POS Sale Line"
                 {
                     Caption = 'Return Reason Code', Locked = true;
                 }
+
+                field(paymentType; Rec."Payment Type")
+                {
+                    Caption = 'Payment Type', Locked = true;
+                }
+
+                part(externalPosEftLine; "NPR APIV1 - Ext. POS EFT Line")
+                {
+                    Caption = 'External Pos Sale Line', Locked = true;
+#if not BC17
+                    Multiplicity = ZeroOrOne;
+#endif
+                    EntityName = 'externalPosEftLine';
+                    EntitySetName = 'externalPosEftLines';
+                    SubPageLink =
+                        "External POS Sale Entry No." = field("External POS Sale Entry No."),
+                        "External Pos SaleLine No" = field("Line No.");
+                }
             }
         }
     }
@@ -225,31 +248,14 @@ page 6059788 "NPR APIV1 - Ext. POS Sale Line"
 
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     var
-        LineNoInt: Integer;
-        LastExtPOSSalesLine: Record "NPR External POS Sale Line";
-        Currency: Record Currency;
+        ExtPOSSaleProcessing: Codeunit "NPR Ext. POS Sale Processing";
     begin
-        IF Rec."Line No." = 0 then begin
-            LineNoInt += 10000;
-            LastExtPOSSalesLine.SetRange("External POS Sale Entry No.", Rec."External POS Sale Entry No.");
-            IF LastExtPOSSalesLine.FindLast() then
-                LineNoInt := LastExtPOSSalesLine."Line No." + 10000;
-
-            Rec."Line No." := LineNoInt;
-        end;
-
-        // try calculate discounts if not provided via api call
-        IF (Rec."Discount %" <> 0) AND (Rec."Discount Amount" = 0) then begin
-            Rec.GetCurrency(Currency);
-            Rec."Discount Amount" := Round((Rec.Quantity * Rec."Unit Price") * (Rec."Discount %" / 100), Currency."Amount Rounding Precision");
-        end;
-        IF (Rec."Discount Amount" <> 0) AND (Rec."Discount %" = 0) then begin
-            Rec.GetCurrency(Currency);
-            Rec."Discount %" := Round(Rec."Discount Amount" / (Rec.Quantity * Rec."Unit Price") * 100, Currency."Amount Rounding Precision");
-        end;
-
-        If Rec."Sale Type" = Rec."Sale Type"::Sale then
-            Rec."Price Includes VAT" := ExternalPOSSale."Prices Including VAT";
+        Rec.Insert(true);
+        ExtPOSSaleProcessing.TryAutoFillExternalPOSSaleLine(Rec, ExternalPOSSale);
+        exit(false);
     end;
+
+
+
 
 }

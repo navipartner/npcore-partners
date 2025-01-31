@@ -106,6 +106,24 @@
         EmailMgt.SendReport(ReportID, RecRef, EmailAddr, Silent);
     end;
 
+    procedure SendReportPOSEntry(var PosEntry: Record "NPR POS Entry"; Silent: Boolean; Email: Text[250])
+    var
+        RecRef: RecordRef;
+        EmailMgt: Codeunit "NPR E-mail Management";
+        ReportID: Integer;
+    begin
+        RecRef.GetTable(PosEntry);
+        if not Silent then
+            if not EmailMgt.ConfirmResendEmail(RecRef) then
+                exit;
+
+        ReportID := EmailMgt.GetReportIDFromRecRef(RecRef);
+        if ReportID = 0 then
+            exit;
+
+        EmailMgt.SendReport(ReportID, RecRef, Email, Silent);
+    end;
+
 
     procedure POSEntryTableId(): Integer
     begin

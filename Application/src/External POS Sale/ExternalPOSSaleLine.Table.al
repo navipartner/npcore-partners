@@ -11,6 +11,7 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR External POS Sale";
         }
+
         field(10; "Register No."; Code[10])
         {
             Caption = 'POS Unit No.';
@@ -53,6 +54,14 @@
             Caption = 'Type';
             DataClassification = CustomerContent;
         }
+
+        field(52; "Payment Type"; Option)
+        {
+            Caption = 'Payment Type';
+            DataClassification = CustomerContent;
+            OptionMembers = "","Cash","EFT";
+        }
+
         field(60; "No."; Code[20])
         {
             Caption = 'No.';
@@ -131,6 +140,21 @@
                 Validate("Unit Cost (LCY)", GetUnitCostLCY());
             end;
         }
+        field(44; "Barcode Reference"; Code[50])
+        {
+            Caption = 'Barcode Reference';
+            DataClassification = CustomerContent;
+
+            trigger OnLookup()
+            begin
+
+            end;
+
+            trigger OnValidate()
+            begin
+
+            end;
+        }
         field(75; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
@@ -175,6 +199,7 @@
             trigger OnValidate()
             var
                 UOMMgt: Codeunit "Unit of Measure Management";
+                Item: Record Item;
             begin
                 case true of
                     "Line Type" <> "Line Type"::Item:
@@ -182,9 +207,11 @@
                             "Qty. per Unit of Measure" := 1;
                         end;
                     else begin
-                        GetItem();
-                        "Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(Item, "Unit of Measure Code");
-                        "Quantity (Base)" := CalcBaseQty(Quantity);
+                        if (TryGetItem(Item)) then begin
+                            "Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(Item, "Unit of Measure Code");
+                            "Quantity (Base)" := CalcBaseQty(Quantity);
+                        end;
+
                     end;
                 end;
             end;
@@ -199,6 +226,7 @@
 
             trigger OnValidate()
             var
+                Item: Record Item;
                 Err001: Label 'Quantity at %2 %1 can only be 1 or -1';
                 Err003: Label 'A quantity must be specified on the line';
             begin
@@ -218,11 +246,11 @@
                         end;
                     "Line Type"::Item:
                         begin
-                            GetItem();
-                            "Quantity (Base)" := CalcBaseQty(Quantity);
-
-                            CalculateCostPrice();
-                            UpdateAmounts(Rec);
+                            if (TryGetItem(Item)) then begin
+                                "Quantity (Base)" := CalcBaseQty(Quantity);
+                                CalculateCostPrice();
+                                UpdateAmounts(Rec);
+                            end;
                         end;
                 end;
                 UpdateCost();
@@ -344,7 +372,6 @@
         {
             Caption = 'Currency Code';
             DataClassification = CustomerContent;
-            Editable = false;
             TableRelation = Currency;
         }
 
@@ -636,7 +663,7 @@
     }
 
     var
-        Item: Record Item;
+        CachedItem: Record Item;
         ExtSalePOS: Record "NPR External POS Sale";
         Currency: Record Currency;
         POSUnitGlobal: Record "NPR POS Unit";
@@ -668,13 +695,12 @@
     end;
 
     local procedure InitFromItem()
+    var
+        Item: Record Item;
     begin
-        if "No." = '' then
+        if (not TryGetItem(Item)) then
             exit;
-
-        TestItem();
-        GetItem();
-
+        TestItem(Item);
         "Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
         "VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
         "Item Category Code" := Item."Item Category Code";
@@ -696,12 +722,14 @@
     local procedure InitFromItemCategory()
     var
         ItemCategory: Record "Item Category";
+        Item: Record Item;
     begin
         if "No." = '' then
             exit;
 
         ItemCategory.Get("No.");
-        GetItem();
+        if (not TryGetItem(Item)) then
+            exit;
         Item.TestField("NPR Group sale");
         "Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
         "VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
@@ -775,9 +803,11 @@
 
     procedure CalculateCostPrice()
     var
+        Item: Record Item;
         VATPercent: Decimal;
     begin
-        GetItem();
+        if (not TryGetItem(Item)) then
+            exit;
 
         if (Item."NPR Group sale") and (Item."Profit %" <> 0) then
             Validate("Unit Cost (LCY)", ((1 - Item."Profit %" / 100) * "Unit Price" / (1 + VATPercent / 100)) * "Qty. per Unit of Measure")
@@ -790,14 +820,10 @@
         Cost := "Unit Cost (LCY)" * Quantity;
     end;
 
-    local procedure TestItem()
+    local procedure TestItem(Item: Record Item)
     var
         ItemVariant: Record "Item Variant";
     begin
-        if "No." = '' then
-            exit;
-
-        Item.Get("No.");
         Item.TestField(Blocked, false);
         Item.TestField("Gen. Prod. Posting Group");
         if Item.Type = Item.Type::Inventory then
@@ -819,11 +845,20 @@
         POSPaymentMethod.TestField("Block POS Payment", false);
     end;
 
-    local procedure GetItem()
+    local procedure TryGetItem(var Item: Record Item): Boolean
     begin
-        TestField("No.");
-        if "No." <> Item."No." then
-            Item.Get("No.");
+        if ("No." = '') then
+            exit(false);
+        if (CachedItem."No." = "No.") then begin
+            Item := CachedItem;
+            exit(true);
+        end;
+        if (not Item.Get("No.")) then begin
+            exit(false);
+        end else begin
+            CachedItem := Item;
+            exit(true);
+        end;
     end;
 
     local procedure CalcBaseQty(Qty: Decimal): Decimal
@@ -846,12 +881,14 @@
 
     procedure SerialNoLookup2(): Boolean
     var
+        Item: Record Item;
         TempItemLedgerEntry: Record "Item Ledger Entry" temporary;
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
         TestField("Line Type", "Line Type"::Item);
 
-        GetItem();
+        if (not TryGetItem(Item)) then
+            exit(false);
         Item.TestField("Costing Method", Item."Costing Method"::Specific);
         ItemLedgerEntry.SetCurrentKey(Open, Positive, "Item No.", "Serial No.");
         ItemLedgerEntry.SetRange(Open, true);
@@ -934,6 +971,7 @@
 
     procedure GetUnitCostLCY(): Decimal
     var
+        Item: Record Item;
         ItemLedgerEntry: Record "Item Ledger Entry";
         ItemTrackingCode: Record "Item Tracking Code";
         TxtNoSerial: Label 'No open Item Ledger Entry has been found with the Serial No. %2';
@@ -942,7 +980,8 @@
             exit("Unit Cost");
 
         if ("Serial No." <> '') and (Quantity > 0) then begin
-            GetItem();
+            if (not TryGetItem(Item)) then
+                exit;
             Item.TestField("Item Tracking Code");
             ItemTrackingCode.Get(Item."Item Tracking Code");
             if ItemTrackingCode."SN Specific Tracking" then begin
@@ -963,6 +1002,7 @@
 
     procedure SerialNoValidate()
     var
+        Item: Record Item;
         SaleLinePOS2: Record "NPR POS Sale Line";
         NPRSalePOS: Record "NPR POS Sale";
         ItemTrackingCode: Record "Item Tracking Code";
@@ -978,7 +1018,8 @@
         TotalItemLedgerEntryQuantity := 0;
         TestField(Quantity);
 
-        GetItem();
+        if (not TryGetItem(Item)) then
+            exit;
         Item.TestField("Item Tracking Code");
         ItemTrackingCode.Get(Item."Item Tracking Code");
 
@@ -1124,20 +1165,23 @@
 
     procedure UpdateVAT()
     var
+        Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         TempPOSSaleLine: Record "NPR POS Sale Line" temporary;
         TempPOSSale: Record "NPR POS Sale" temporary;
+        POSSaleTax: Record "NPR POS Sale Tax";
     begin
         if (Rec."Line Type" <> Enum::"NPR POS Sale Line Type"::"Item") then
             exit;
-
-        GetItem();
+        if (not Item.Get(Rec."No.")) then
+            exit;
 
         Rec."Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
         Rec."VAT Bus. Posting Group" := Item."VAT Bus. Posting Gr. (Price)";
         Rec."VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
         VATPostingSetup.Get(Rec."VAT Bus. Posting Group", Rec."VAT Prod. Posting Group");
+        Rec."Unit Price" := Item."Unit Price";
         Rec."VAT %" := VATPostingSetup."VAT %";
         Rec."VAT Identifier" := VATPostingSetup."VAT Identifier";
         Rec."VAT Calculation Type" := VATPostingSetup."VAT Calculation Type";
@@ -1146,6 +1190,9 @@
         TempPOSSaleLine.Insert();
         POSSaleTaxCalc.CalculateTax(TempPOSSaleLine, TempPOSSale, 0);
         CopyFromPosSaleLine(TempPOSSaleLine);
+        POSSaleTax."Source Rec. System Id" := TempPOSSaleLine.SystemId;
+        if (POSSaleTax.Find()) then
+            POSSaleTax.Delete();
     end;
 
     procedure CopyToPosSaleLine(var POSSaleLine: Record "NPR POS Sale Line")
