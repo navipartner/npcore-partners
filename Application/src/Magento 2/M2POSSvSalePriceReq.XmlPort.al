@@ -148,6 +148,32 @@ xmlport 6151145 "NPR M2 POS Sv. Sale Price Req."
                             end;
                         }
                     }
+                    textelement(BenefitLines)
+                    {
+                        MaxOccurs = Once;
+                        MinOccurs = Zero;
+                        tableelement(tmpbenefitlineresponse; "NPR Total Disc Ben Item Buffer")
+                        {
+                            MaxOccurs = Unbounded;
+                            MinOccurs = Zero;
+                            XmlName = 'BenefitLine';
+                            UseTemporary = true;
+                            fieldattribute(ItemNumber; tmpbenefitlineresponse."Item No.")
+                            {
+                            }
+                            fieldattribute(Quantity; tmpbenefitlineresponse.Quantity)
+                            {
+                            }
+                            fieldattribute(UnitPrice; tmpbenefitlineresponse."Unit Price")
+                            {
+                            }
+                        }
+                        trigger OnBeforePassVariable()
+                        begin
+                            if tmpbenefitlineresponse.IsEmpty() then
+                                currXMLport.Skip();
+                        end;
+                    }
                 }
             }
         }
@@ -184,7 +210,7 @@ xmlport 6151145 "NPR M2 POS Sv. Sale Price Req."
         StartTime := Time;
     end;
 
-    internal procedure SetResponse(var TmpSalePOS: Record "NPR POS Sale" temporary; var TmpSaleLinePOS: Record "NPR POS Sale Line" temporary)
+    internal procedure SetResponse(var TmpSalePOS: Record "NPR POS Sale" temporary; var TmpSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempNPRTotalDiscBenItemBuffer: Record "NPR Total Disc Ben Item Buffer" temporary)
     begin
 
         ExecutionTime := StrSubstNo(ExecutionTimeLbl, Format((Time - StartTime), 0, 9));
@@ -197,6 +223,13 @@ xmlport 6151145 "NPR M2 POS Sv. Sale Price Req."
                 TmpSalesLineResponse.TransferFields(TmpSaleLinePOS, true);
                 TmpSalesLineResponse.Insert();
             until (TmpSaleLinePOS.Next() = 0);
+
+            TempNPRTotalDiscBenItemBuffer.Reset();
+            if TempNPRTotalDiscBenItemBuffer.FindSet() then
+                repeat
+                    tmpbenefitlineresponse.TransferFields(TempNPRTotalDiscBenItemBuffer, true);
+                    tmpbenefitlineresponse.Insert();
+                until TempNPRTotalDiscBenItemBuffer.Next() = 0;
 
             ResponseCode := 'OK';
             ResponseDescription := '';

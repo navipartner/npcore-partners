@@ -36,6 +36,7 @@ codeunit 6014559 "NPR TM Dynamic Price"
         M2PriceService: Codeunit "NPR M2 POS Price WebService";
         TempSalePOS: Record "NPR POS Sale" temporary;
         TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
+        TempTotalDiscBenItemBuffer: Record "NPR Total Disc Ben Item Buffer" temporary;
         OriginalWorkDate: Date;
     begin
         TempSalePOS."Sales Ticket No." := Format(AdmCapacityPriceBuffer.EntryNo);
@@ -55,7 +56,7 @@ codeunit 6014559 "NPR TM Dynamic Price"
 
         OriginalWorkDate := WorkDate();
         WorkDate(AdmCapacityPriceBuffer.ReferenceDate);
-        ValidErpPrice := M2PriceService.TryPosQuoteRequest(TempSalePOS, TempSaleLinePOS);
+        ValidErpPrice := M2PriceService.TryPosQuoteRequest(TempSalePOS, TempSaleLinePOS, TempTotalDiscBenItemBuffer);
         if (ValidErpPrice) then begin
             AdmCapacityPriceBuffer.UnitPrice := TempSaleLinePOS."Unit Price";
             AdmCapacityPriceBuffer.DiscountPct := TempSaleLinePOS."Discount %";
