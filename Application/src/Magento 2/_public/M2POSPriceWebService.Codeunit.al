@@ -4,22 +4,23 @@
     var
         TempSalePOS: Record "NPR POS Sale" temporary;
         TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
+        TempNPRTotalDiscBenItemBuffer: Record "NPR Total Disc Ben Item Buffer" temporary;
     begin
         SelectLatestVersion();
 
         POSPriceRequest.Import();
         POSPriceRequest.GetRequest(TempSalePOS, TempSaleLinePOS);
 
-        if (TryPosQuoteRequest(TempSalePOS, TempSaleLinePOS)) then begin
+        if (TryPosQuoteRequest(TempSalePOS, TempSaleLinePOS, TempNPRTotalDiscBenItemBuffer)) then begin
             OnBeforeSetPOSQuoteResponse(TempSalePOS, TempSaleLinePOS);
-            POSPriceRequest.SetResponse(TempSalePOS, TempSaleLinePOS);
+            POSPriceRequest.SetResponse(TempSalePOS, TempSaleLinePOS, TempNPRTotalDiscBenItemBuffer);
         end else begin
             POSPriceRequest.SetErrorResponse(GetLastErrorText);
         end;
     end;
 
     [TryFunction]
-    internal procedure TryPosQuoteRequest(var TmpSalePOS: Record "NPR POS Sale" temporary; var TmpSaleLinePOS: Record "NPR POS Sale Line" temporary)
+    internal procedure TryPosQuoteRequest(var TmpSalePOS: Record "NPR POS Sale" temporary; var TmpSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempNPRTotalDiscBenItemBuffer: Record "NPR Total Disc Ben Item Buffer" temporary)
     var
         Customer: Record Customer;
         VATBusPostingGroup: Code[20];
@@ -123,6 +124,7 @@
         end;
 
         TotalDiscountManagement.ApplyTotalDiscount(TmpSalePOS, TmpSaleLinePOS, Today());
+        GetTotalDiscountBenefitItemsForSale(TempNPRTotalDiscBenItemBuffer, TmpSaleLinePOS);
         TmpSaleLinePOS.Reset();
         if (TmpSaleLinePOS.FindSet()) then
             repeat
@@ -135,6 +137,50 @@
                     end;
                 end;
             until (TmpSaleLinePOS.Next() = 0);
+    end;
+
+    local procedure GetTotalDiscountBenefitItemsForSale(var TempNPRTotalDiscBenItemBuffer: Record "NPR Total Disc Ben Item Buffer" temporary;
+                                                           TempSaleLinePOS: Record "NPR POS Sale Line" temporary)
+    var
+        TempTotalDiscBenItemBufferHelper: Record "NPR Total Disc Ben Item Buffer" temporary;
+        NPRTotalDiscountBenefit: Record "NPR Total Discount Benefit";
+        TotalDiscountManagement: Codeunit "NPR Total Discount Management";
+        TemporaryRecordErrorLbl: Label 'The provided table is not temporary';
+    begin
+        if not TempNPRTotalDiscBenItemBuffer.IsTemporary() then
+            Error(TemporaryRecordErrorLbl);
+
+        TempNPRTotalDiscBenItemBuffer.Reset();
+        if not TempNPRTotalDiscBenItemBuffer.IsEmpty() then
+            TempNPRTotalDiscBenItemBuffer.DeleteAll();
+
+        NPRTotalDiscountBenefit.Reset();
+        NPRTotalDiscountBenefit.SetRange("Total Discount Code", TempSaleLinePOS."Total Discount Code");
+        NPRTotalDiscountBenefit.SetRange("Step Amount", TempSaleLinePOS."Total Discount Step");
+        NPRTotalDiscountBenefit.SetFilter(Type, '%1|%2', NPRTotalDiscountBenefit.Type::Item, NPRTotalDiscountBenefit.Type::"Item List");
+
+        if not NPRTotalDiscountBenefit.FindSet(false) then
+            exit;
+
+        repeat
+            case NPRTotalDiscountBenefit.Type of
+                NPRTotalDiscountBenefit.Type::Item:
+                    TotalDiscountManagement.PopulateTotalDiscountBenefitBufferFromTotalDiscountBenefit(NPRTotalDiscountBenefit,
+                                                                           TempTotalDiscBenItemBufferHelper);
+                NPRTotalDiscountBenefit.Type::"Item List":
+                    begin
+                        TotalDiscountManagement.PopulateTotalDiscountBenefitBufferFromItemList(NPRTotalDiscountBenefit,
+                                                                                                      TempTotalDiscBenItemBufferHelper);
+                        TempTotalDiscBenItemBufferHelper.Reset();
+                    end;
+            end;
+            if TempTotalDiscBenItemBufferHelper.FindSet() then
+                repeat
+                    TempNPRTotalDiscBenItemBuffer.Init();
+                    TempNPRTotalDiscBenItemBuffer.TransferFields(TempTotalDiscBenItemBufferHelper);
+                    TempNPRTotalDiscBenItemBuffer.Insert();
+                until TempTotalDiscBenItemBufferHelper.Next() = 0
+        until NPRTotalDiscountBenefit.Next() = 0;
     end;
 
     procedure ItemPrice(var ItemPriceRequest: XMLport "NPR M2 Item Price Request")

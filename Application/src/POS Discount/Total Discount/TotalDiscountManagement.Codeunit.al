@@ -802,8 +802,8 @@ codeunit 6151077 "NPR Total Discount Management"
         Found := not SaleLinePOS.IsEmpty;
     end;
 
-    local procedure PopulateTotalDiscountBenefitBufferFromTotalDiscountBenefit(NPRTotalDiscountBenefit: Record "NPR Total Discount Benefit";
-                                                                               var TempNPRTotalDiscBenItemBuffer: Record "NPR Total Disc Ben Item Buffer" temporary)
+    internal procedure PopulateTotalDiscountBenefitBufferFromTotalDiscountBenefit(NPRTotalDiscountBenefit: Record "NPR Total Discount Benefit";
+                                                                              var TempNPRTotalDiscBenItemBuffer: Record "NPR Total Disc Ben Item Buffer" temporary)
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
@@ -860,7 +860,7 @@ codeunit 6151077 "NPR Total Discount Management"
         TempNPRTotalDiscBenItemBuffer.Modify();
     end;
 
-    local procedure PopulateTotalDiscountBenefitBufferFromItemList(NPRTotalDiscountBenefit: Record "NPR Total Discount Benefit";
+    internal procedure PopulateTotalDiscountBenefitBufferFromItemList(NPRTotalDiscountBenefit: Record "NPR Total Discount Benefit";
                                                                    var TempNPRTotalDiscBenItemBuffer: Record "NPR Total Disc Ben Item Buffer" temporary)
     var
         Item: Record Item;
