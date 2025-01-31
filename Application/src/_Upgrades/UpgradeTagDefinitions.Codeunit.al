@@ -238,6 +238,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Pay View Dimension", 'SetDimensionMandatoryTrueForListOption'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Dragonglass Service", 'PublishDragonglassWebService'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Global Sales", 'SetIsReturnOnGlobalPOSSalesLine'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Adyen Refund", 'CreateAdyenRefundjobs'));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -900,6 +901,11 @@
                 case UpgradeStep of
                     'SetIsReturnOnGlobalPOSSalesLine':
                         exit('NPR-SetIsReturnOnGlobalPOSSalesLine-20241227')
+                end;
+            Codeunit::"NPR UPG Adyen Refund":
+                case UpgradeStep of
+                    'CreateAdyenRefundJobs':
+                        exit('NPR-CreateAdyenRefundJobs-20250128')
                 end;
         end;
     end;

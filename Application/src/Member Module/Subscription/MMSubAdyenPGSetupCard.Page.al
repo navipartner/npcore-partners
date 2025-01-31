@@ -54,6 +54,27 @@ page 6184870 "NPR MM Sub Adyen PG Setup Card"
                     end;
                 }
             }
+            group("Pay by Link")
+            {
+                field("Card Update by Pay by Link"; Rec."Card Update by Pay by Link")
+                {
+                    Caption = 'Card Update';
+                    ToolTip = 'Enables card updates via pay by link if a subscription payment fails';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field("Pay By Link Exp. Duration"; Rec."Pay By Link Exp. Duration")
+                {
+                    Caption = 'Pay By Link Exp. Duration';
+                    ToolTip = 'Specifies the duration of the pay by link';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field("Pay by Link Rec Proc Model"; Rec."Pay by Link Rec Proc Model")
+                {
+                    Caption = 'Recurring Processing Model';
+                    ToolTip = 'Specifies the recurring processing model of the payment token created by pay by link';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+            }
             group(Posting)
             {
                 field("Payment Account Type"; Rec."Payment Account Type")

@@ -151,6 +151,11 @@
             Caption = 'Rejected Reason Description';
             DataClassification = CustomerContent;
         }
+        field(550; "Pay by Link URL"; Text[2048])
+        {
+            Caption = 'Pay by Link URL';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

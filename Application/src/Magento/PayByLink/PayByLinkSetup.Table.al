@@ -89,7 +89,7 @@ table 6150892 "NPR Pay by Link Setup"
                 if not MagentoPaymentGateway.Get(Rec."Payment Gateaway Code") then
                     exit;
                 If MagentoPaymentGateway."Integration Type" = MagentoPaymentGateway."Integration Type"::Adyen then
-                    CreateAdyenJobs();
+                    SetupPayByLink();
             end;
 
         }
@@ -120,7 +120,7 @@ table 6150892 "NPR Pay by Link Setup"
             Error(ExperationErr, MaxDurationTxt);
     end;
 
-    local procedure CreateAdyenJobs()
+    local procedure SetupPayByLink()
     var
         WebhookSetup: Record "NPR Adyen Webhook Setup";
         MerchantAccount: Record "NPR Adyen Merchant Account";

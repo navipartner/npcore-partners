@@ -43,6 +43,7 @@ codeunit 6184921 "NPR Adyen PayByLink Status"
         JsonValueToken: JsonToken;
         PaymentLinkID: Text;
         MagentoPaymentLine: Record "NPR Magento Payment Line";
+        MMSubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
     begin
         if JsonObjectToken.IsObject() then begin
             JsonObjectToken.AsObject().Get('NotificationRequestItem', JsonObjectToken);
@@ -51,9 +52,14 @@ codeunit 6184921 "NPR Adyen PayByLink Status"
                 JsonValueToken.AsObject().Get('paymentLinkId', JsonValueToken);
                 PaymentLinkID := CopyStr(JsonValueToken.AsValue().AsText(), 1, MaxStrLen(MagentoPaymentLine."Payment ID"));
                 MagentoPaymentLine.SetRange("Payment ID", PaymentLinkID);
-
-                MagentoPaymentLine.FindFirst();
-                ModifyMagentoPaymentLine(JsonObjectToken, AdyenWebhook, JsonValueToken, MagentoPaymentLine);
+                if MagentoPaymentLine.FindFirst() then
+                    ModifyMagentoPaymentLine(JsonObjectToken, AdyenWebhook, JsonValueToken, MagentoPaymentLine)
+                else begin
+                    //subscription
+                    MMSubscrPaymentRequest.SetRange("Pay by Link ID", PaymentLinkID);
+                    if MMSubscrPaymentRequest.FindFirst() then
+                        ModifyAuthSubsPaymentReq(JsonObjectToken, AdyenWebhook, MMSubscrPaymentRequest);
+                end;
             end;
         end;
     end;
@@ -84,5 +90,20 @@ codeunit 6184921 "NPR Adyen PayByLink Status"
                         AdyenManagement.CreateGeneralLog(AdyenWebhookLogType::Process, true, SuccessProcessedLbl, AdyenWebhook."Entry No.");
                     end;
                 end;
+    end;
+
+    local procedure ModifyAuthSubsPaymentReq(JsonObjectToken: JsonToken; var AdyenWebhook: Record "NPR Adyen Webhook"; MMSubscrPaymentRequest: Record "NPR MM Subscr. Payment Request")
+    var
+        AdyenManagement: Codeunit "NPR Adyen Management";
+        AdyenWebhookLogType: Enum "NPR Adyen Webhook Log Type";
+        SuccessProcessedLbl: Label 'Adyen Webhook Request was successfully processed.';
+        MMSubscrPmtAdyen: Codeunit "NPR MM Subscr.Pmt.: Adyen";
+    begin
+        MMSubscrPmtAdyen.ProcessPayByLinkWebhook(JsonObjectToken, AdyenWebhook, MMSubscrPaymentRequest);
+
+        AdyenWebhook.Status := AdyenWebhook.Status::Processed;
+        AdyenWebhook."Processed Date" := CurrentDateTime();
+        AdyenWebhook.Modify();
+        AdyenManagement.CreateGeneralLog(AdyenWebhookLogType::Process, true, SuccessProcessedLbl, AdyenWebhook."Entry No.");
     end;
 }

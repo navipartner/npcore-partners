@@ -35,19 +35,9 @@ table 6150920 "NPR MM Member Payment Method"
             DataClassification = CustomerContent;
 
             trigger OnValidate()
-            var
-                MemberPaymentMethod: Record "NPR MM Member Payment Method";
             begin
                 if (Status = Status::Archived) and Default then
                     Default := false;
-                if Default then begin
-                    MemberPaymentMethod.SetRange("Table No.", "Table No.");
-                    MemberPaymentMethod.SetRange("BC Record ID", "BC Record ID");
-                    MemberPaymentMethod.SetRange(Status, MemberPaymentMethod.Status::Active);
-                    MemberPaymentMethod.SetFilter("Entry No.", '<>%1', "Entry No.");
-                    if not MemberPaymentMethod.IsEmpty() then
-                        MemberPaymentMethod.ModifyAll(Status, MemberPaymentMethod.Status::Archived);
-                end;
             end;
         }
         field(30; "Payment Instrument Type"; Text[30])

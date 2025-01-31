@@ -10,10 +10,10 @@ codeunit 6185111 "NPR MM Subscr. Pay Req Proc JQ"
     local procedure ProcessSubscriptionPaymentRequests()
     var
         SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
-        SubscrPaymentIHandler: Interface "NPR MM Subscr.Payment IHandler";
+        SubscrPaymentIHandler: Interface "NPR MM Subs Payment IHandler";
     begin
         SubscrPaymentRequest.Reset();
-        SubscrPaymentRequest.SetRange(Status, SubscrPaymentRequest.Status::New, SubscrPaymentRequest.Status::Requested);
+        SubscrPaymentRequest.SetRange(Status, SubscrPaymentRequest.Status::New);
         if not SubscrPaymentRequest.FindSet() then
             exit;
 

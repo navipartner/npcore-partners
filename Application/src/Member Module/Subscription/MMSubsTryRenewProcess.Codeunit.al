@@ -46,6 +46,8 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
         Subscription: Record "NPR MM Subscription";
         SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
         MemberNotification: Codeunit "NPR MM Member Notification";
+        SubscrPaymentIHandler: Interface "NPR MM Subs Payment IHandler";
+        PaymentLinkUrl: Text[2048];
     begin
         Subscription.Get(SubscriptionRequest."Subscription Entry No.");
         Membership.Get(Subscription."Membership Entry No.");
@@ -56,13 +58,17 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
         SubscrPaymentRequest.SetCurrentKey("Subscr. Request Entry No.", Status);
         SubscrPaymentRequest.SetRange("Subscr. Request Entry No.", SubscriptionRequest."Entry No.");
         SubscrPaymentRequest.SetRange(Status, SubscrPaymentRequest.Status::Rejected);
-        SubscrPaymentRequest.SetLoadFields("Rejected Reason Code", "Rejected Reason Description");
         SubscrPaymentRequest.FindLast();
 
-        MemberNotification.AddMembershipRenewalFailureNotification(Subscription."Membership Entry No.", Subscription."Membership Code", SubscrPaymentRequest."Rejected Reason Code", SubscrPaymentRequest."Rejected Reason Description");
+        SubscrPaymentIHandler := SubscrPaymentRequest.PSP;
+        if not SubscrPaymentIHandler.ProcessPaymentRequest(SubscrPaymentRequest, false, false) then
+            Error(GetLastErrorText());
 
         SubscriptionRequest.Validate("Processing Status", SubscriptionRequest."Processing Status"::Success);
         SubscriptionRequest.Modify(true);
+
+        PaymentLinkUrl := FindPayByLink(SubscrPaymentRequest);
+        MemberNotification.AddMembershipRenewalFailureNotification(Subscription."Membership Entry No.", Subscription."Membership Code", SubscrPaymentRequest."Rejected Reason Code", SubscrPaymentRequest."Rejected Reason Description", PaymentLinkUrl);
     end;
 
     local procedure ProcessConfirmedStatus(var SubscriptionRequest: Record "NPR MM Subscr. Request")
@@ -152,7 +158,7 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
     local procedure ProcessRequestedErrorStatus(var SubscriptionRequest: Record "NPR MM Subscr. Request")
     var
         SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
-        SubscrPaymentIHandler: Interface "NPR MM Subscr.Payment IHandler";
+        SubscrPaymentIHandler: Interface "NPR MM Subs Payment IHandler";
     begin
         SubscrPaymentRequest.Reset();
         SubscrPaymentRequest.SetCurrentKey("Subscr. Request Entry No.", Status);
@@ -263,6 +269,28 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
         if MembershipEntry2.FindLast() then
             if MembershipEntry2."Entry No." > MembershipEntry."Entry No." then
                 Error(MustBeTheLastErr, MembershipEntry."Entry No.");
+    end;
+
+    local procedure FindPayByLink(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request") PayByLinkUrl: Text[2048]
+    var
+        PayByLinkSubscriptionRequest: Record "NPR MM Subscr. Request";
+        PayByLinkSubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+    begin
+        PayByLinkSubscriptionRequest.Reset();
+        PayByLinkSubscriptionRequest.SetRange("Created from Entry No.", SubscrPaymentRequest."Entry No.");
+        PayByLinkSubscriptionRequest.SetRange(Type, PayByLinkSubscriptionRequest.Type::Renew);
+        PayByLinkSubscriptionRequest.SetLoadFields("Entry No.");
+        if not PayByLinkSubscriptionRequest.FindLast() then
+            exit;
+
+        PayByLinkSubscrPaymentRequest.Reset();
+        PayByLinkSubscrPaymentRequest.SetRange("Subscr. Request Entry No.", PayByLinkSubscriptionRequest."Entry No.");
+        PayByLinkSubscrPaymentRequest.SetRange(Type, PayByLinkSubscrPaymentRequest.Type::PayByLink);
+        PayByLinkSubscrPaymentRequest.SetLoadFields("Pay by Link URL");
+        if not PayByLinkSubscrPaymentRequest.FindLast() then
+            exit;
+
+        PayByLinkUrl := PayByLinkSubscrPaymentRequest."Pay by Link URL";
     end;
 
     internal procedure SetSkipTryCountUpdate(SkipTryCountUpdate: Boolean)

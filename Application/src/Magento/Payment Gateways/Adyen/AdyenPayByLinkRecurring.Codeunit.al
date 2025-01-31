@@ -1,4 +1,4 @@
-codeunit 6248224 "NPR Adyen Refund Status"
+codeunit 6185114 "NPR Adyen PayByLink Recurring"
 {
     Access = Internal;
     TableNo = "NPR Adyen Webhook";
@@ -37,13 +37,13 @@ codeunit 6248224 "NPR Adyen Refund Status"
         end;
     end;
 
+
     [TryFunction]
     local procedure ProcessNotificationItem(JsonObjectToken: JsonToken; var AdyenWebhook: Record "NPR Adyen Webhook")
     var
         JsonValueToken: JsonToken;
-        pspReference: Text;
+        PaymentLinkID: Code[20];
         MMSubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
-        Success: Text;
         AdyenManagement: Codeunit "NPR Adyen Management";
         AdyenWebhookLogType: Enum "NPR Adyen Webhook Log Type";
         SuccessProcessedLbl: Label 'Adyen Webhook Request was successfully processed.';
@@ -52,18 +52,17 @@ codeunit 6248224 "NPR Adyen Refund Status"
         if JsonObjectToken.IsObject() then begin
             JsonObjectToken.AsObject().Get('NotificationRequestItem', JsonObjectToken);
             if JsonObjectToken.IsObject() then begin
-                JsonObjectToken.AsObject().Get('pspReference', JsonValueToken);
-                pspReference := CopyStr(JsonValueToken.AsValue().AsText(), 1, MaxStrLen(MMSubscrPaymentRequest."PSP Reference"));
-                MMSubscrPaymentRequest.SetRange("PSP Reference", pspReference);
-                if MMSubscrPaymentRequest.FindFirst() then begin
-                    JsonObjectToken.AsObject().Get('success', JsonValueToken);
-                    Success := JsonValueToken.AsValue().AsText();
-                    MMSubscrPmtAdyen.ProcessRefundWebhook(JsonObjectToken, MMSubscrPaymentRequest, Success, AdyenWebhook."Entry No.");
-                    AdyenWebhook.Status := AdyenWebhook.Status::Processed;
-                    AdyenWebhook."Processed Date" := CurrentDateTime();
-                    AdyenWebhook.Modify();
-                    AdyenManagement.CreateGeneralLog(AdyenWebhookLogType::Process, true, SuccessProcessedLbl, AdyenWebhook."Entry No.");
-                end;
+                JsonObjectToken.AsObject().Get('additionalData', JsonValueToken);
+                JsonValueToken.AsObject().Get('paymentLinkId', JsonValueToken);
+                PaymentLinkID := CopyStr(JsonValueToken.AsValue().AsText(), 1, MaxStrLen(MMSubscrPaymentRequest."Pay by Link ID"));
+                MMSubscrPaymentRequest.SetRange("Pay by Link ID", PaymentLinkID);
+                if MMSubscrPaymentRequest.FindFirst() then
+                    if MMSubscrPaymentRequest.Status <> MMSubscrPaymentRequest.Status::Captured then
+                        MMSubscrPmtAdyen.ProcessPayByLinkWebhook(JsonObjectToken, AdyenWebhook, MMSubscrPaymentRequest);
+                AdyenWebhook.Status := AdyenWebhook.Status::Processed;
+                AdyenWebhook."Processed Date" := CurrentDateTime();
+                AdyenWebhook.Modify();
+                AdyenManagement.CreateGeneralLog(AdyenWebhookLogType::Process, true, SuccessProcessedLbl, AdyenWebhook."Entry No.");
             end;
         end;
     end;

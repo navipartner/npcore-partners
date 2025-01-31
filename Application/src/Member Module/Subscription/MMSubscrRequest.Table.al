@@ -155,6 +155,11 @@ table 6150923 "NPR MM Subscr. Request"
             Caption = 'Processing Status Change Date';
             DataClassification = CustomerContent;
         }
+        field(230; "Created from Entry No."; BigInteger)
+        {
+            Caption = 'Created from Entry No.';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

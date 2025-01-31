@@ -7,12 +7,8 @@ codeunit 6184933 "NPR Adyen PayByLink Status JQ"
         AdyenManagement: Codeunit "NPR Adyen Management";
         AdyenWebhookLogType: Enum "NPR Adyen Webhook Log Type";
         WebhookProcessing: Codeunit "NPR Adyen Webhook Processing";
-        AdyenSetup: Record "NPR Adyen Setup";
     begin
-        if not AdyenSetup.Get() then
-            exit;
-
-        if not AdyenSetup."Enable Pay by Link" then
+        if not IsSetupEnabled() then
             exit;
 
         AdyenWebhook.SetRange("Event Code", AdyenWebhook."Event Code"::AUTHORISATION);
@@ -29,25 +25,26 @@ codeunit 6184933 "NPR Adyen PayByLink Status JQ"
             until AdyenWebhook.Next() = 0;
     end;
 
-#if BC17 or BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
-#else
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnCheckIfIsNPRecurringJob, '', false, false)]
-#endif
-    local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
+    local procedure IsSetupEnabled() SetupEnabled: Boolean;
+    var
+        AdyenSetup: Record "NPR Adyen Setup";
+        SubsPaymentGateway: Record "NPR MM Subs. Payment Gateway";
+        SubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup";
     begin
-        if Handled then
-            exit;
-        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
-           (JobQueueEntry."Object ID to Run" = CurrCodeunitID())
-        then begin
-            IsNpJob := true;
-            Handled := true;
-        end;
-    end;
+        SetupEnabled := false;
 
-    local procedure CurrCodeunitID(): Integer
-    begin
-        exit(Codeunit::"NPR Adyen PayByLink Status JQ");
+        //Magento PayByLink
+        if AdyenSetup.Get() then
+            if AdyenSetup."Enable Pay by Link" then
+                SetupEnabled := true;
+
+        //Subscription PayByLink Card Update
+        SubsPaymentGateway.SetRange("Integration Type", SubsPaymentGateway."Integration Type"::Adyen);
+        SubsPaymentGateway.SetRange(Status, SubsPaymentGateway.Status::Enabled);
+        SubsPaymentGateway.SetLoadFields("Integration Type", Status, Code);
+        if SubsPaymentGateway.FindFirst() then
+            if SubsAdyenPGSetup.Get(SubsPaymentGateway.Code) then
+                if SubsAdyenPGSetup."Card Update by Pay by Link" then
+                    SetupEnabled := true;
     end;
 }

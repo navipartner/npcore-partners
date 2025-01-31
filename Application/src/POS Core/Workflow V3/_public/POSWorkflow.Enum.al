@@ -1041,7 +1041,6 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'RS_INS_REF_SALE', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action - Ins. RefSale";
     }
-
     value(170; "EFT_CONFIRMATION")
     {
         Caption = 'EFT_CONFIRMATION', Locked = true, MaxLength = 20;

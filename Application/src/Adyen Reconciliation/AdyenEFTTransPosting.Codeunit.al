@@ -41,7 +41,7 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         POSPostingSetup: Record "NPR POS Posting Setup";
         SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
         POSPostEntries: Codeunit "NPR POS Post Entries";
-        SubscrPaymentIHandler: Interface "NPR MM Subscr.Payment IHandler";
+        SubscrPaymentIHandler: Interface "NPR MM Subs Payment IHandler";
         CouldNotDeterminePOSPostingSetupLbl: Label 'The system was unable to locate the corresponding POS Posting Setup for the Sale: %1.';
     begin
         case _ReconciliationLine."Matching Table Name" of

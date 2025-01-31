@@ -55,7 +55,7 @@ page 6184869 "NPR MM Subs. Payment Gateways"
 
                 trigger OnAction()
                 var
-                    ISubscrPaymentIHandler: Interface "NPR MM Subscr.Payment IHandler";
+                    ISubscrPaymentIHandler: Interface "NPR MM Subs Payment IHandler";
                 begin
                     ISubscrPaymentIHandler := Rec."Integration Type";
                     ISubscrPaymentIHandler.RunSetupCard(Rec.Code);
