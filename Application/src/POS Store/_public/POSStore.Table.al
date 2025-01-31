@@ -132,6 +132,27 @@
             Caption = 'Location Code';
             DataClassification = CustomerContent;
             TableRelation = Location WHERE("Use As In-Transit" = CONST(false));
+            trigger OnLookup()
+            var
+                Location: Record Location;
+                LocationList: Page "Location List";
+                IsHandled: Boolean;
+            begin
+                OnBeforeNormalLookupLocationCode(Rec, IsHandled);
+                if IsHandled then
+                    exit;
+
+                // Normal Lookup if any condition from subscriber procedures above is not met.
+                LocationList.LookupMode := true;
+                Location.FilterGroup(2);
+                Location.SetRange("Use As In-Transit", false);
+                Location.FilterGroup(0);
+                LocationList.SetTableView(Location);
+                if not (LocationList.RunModal() = Action::LookupOK) then
+                    exit;
+                LocationList.GetRecord(Location);
+                Rec.Validate("Location Code", Location.Code);
+            end;
         }
         field(26; "Language Code"; Code[10])
         {
@@ -460,6 +481,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterValidateShortcutDimCode(var POSStore: Record "NPR POS Store"; xPOSStore: Record "NPR POS Store"; FieldNumber: Integer; var ShortcutDimCode: Code[20])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeNormalLookupLocationCode(var POSStore: Record "NPR POS Store"; var IsHandled: Boolean)
     begin
     end;
 }
