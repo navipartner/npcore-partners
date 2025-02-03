@@ -331,6 +331,7 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                     ToolTip = 'Specifies the value of the Send To SEF field.';
                     trigger OnValidate()
                     begin
+                        RSEInvoiceMgt.CheckIfSalesOrderCanBeSentToSEF(Rec, RSEIAuxSalesHeader);
                         RSEIAuxSalesHeader.SaveRSEIAuxSalesHeaderFields();
                         IsDocForSendingToSEF := RSEIAuxSalesHeader."NPR RS EI Send To SEF";
                         RSEIAuxSalesHeader.SetReferenceNumberFromSalesHeader(Rec);
