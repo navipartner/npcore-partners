@@ -416,7 +416,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
         RSPOSUnitMapping.ChangeCompany(CompanyName);
         RSPOSUnitMapping.ModifyAll("RS Sandbox PIN", 0);
         RSPOSUnitMapping.ModifyAll("RS Sandbox JID", '');
-        RSPOSUnitMapping.ModifyAll("RS Sandbox Token", '');
+        RSPOSUnitMapping.ModifyAll("RS Sandbox Token", '00000000-0000-0000-0000-000000000000');
     end;
 #endif
 
