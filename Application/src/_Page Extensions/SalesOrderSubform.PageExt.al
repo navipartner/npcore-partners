@@ -66,6 +66,19 @@ pageextension 6014447 "NPR Sales Order Subform" extends "Sales Order Subform"
             }
         }
 #endif
+
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        modify("Location Code")
+        {
+            trigger OnAfterValidate()
+            var
+                RSEInvoiceMgt: Codeunit "NPR RS E-Invoice Mgt.";
+            begin
+                if RSEInvoiceMgt.CheckIfDocumentShouldBeSentToSEFBasedOnLocationCodeOnSalesLines(xRec, Rec) then
+                    CurrPage.Update(true);
+            end;
+        }
+#endif
     }
     actions
     {

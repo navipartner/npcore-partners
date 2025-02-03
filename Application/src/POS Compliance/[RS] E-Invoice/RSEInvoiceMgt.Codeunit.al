@@ -428,6 +428,27 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
             RSEInvoiceDocument.ModifyAll("Document No.", Rec."No.");
     end;
 
+    internal procedure CheckIfDocumentShouldBeSentToSEFBasedOnLocationCodeOnSalesLines(xSalesLine: Record "Sales Line"; var SalesLine: Record "Sales Line"): Boolean
+    var
+        SalesHeader: Record "Sales Header";
+        RSEIAuxSalesHeader: Record "NPR RS EI Aux Sales Header";
+    begin
+        if not IsRSEInvoiceEnabled() then
+            exit(false);
+        if not (SalesLine.Type = SalesLine.Type::Item) then
+            exit(false);
+        if IsRetailLocation(SalesLine."Location Code") = IsRetailLocation(xSalesLine."Location Code") then
+            exit(false);
+
+        SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.");
+        RSEIAuxSalesHeader.ReadRSEIAuxSalesHeaderFields(SalesHeader);
+        if not RSEIAuxSalesHeader."NPR RS EI Send To SEF" then
+            exit(false);
+        RSEIAuxSalesHeader."NPR RS EI Send To SEF" := false;
+        RSEIAuxSalesHeader.SaveRSEIAuxSalesHeaderFields();
+        exit(true);
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostSalesDoc', '', false, false)]
     local procedure SalesPost_OnBeforePostSalesDoc(var SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
     var
@@ -435,7 +456,7 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
         RSEIAuxSalesHeader: Record "NPR RS EI Aux Sales Header";
         RSEIAuxCustomer: Record "NPR RS EI Aux Customer";
         ConfirmManagement: Codeunit "Confirm Management";
-        EInvoiceCustomerNotSendingToSEFQst: Label 'The Customer %1 is an E-Invoice customer. The document %2 will not be sent to SEF. Are you sure you want to proceed?', Comment = '%1 = Cusotmer No., %2 = Document No.';
+        EInvoiceCustomerNotSendingToSEFQst: Label 'The Customer %1 is an E-Invoice customer. The document %2 is not selected for sending to SEF. Are you sure you want to proceed?', Comment = '%1 = Customer No., %2 = Document No.';
     begin
         if not IsRSEInvoiceEnabled() then
             exit;
@@ -811,26 +832,40 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
     var
         ConfirmManagement: Codeunit "Confirm Management";
         NotAnEInvoiceCustomerQst: Label 'Customer %1 is not an E-Invoice customer. Are you sure document %2 should be sent to SEF?', Comment = '%1 = Customer No., %2 = Document No.';
-    begin
-        if IsRSEInvoiceCustomer(CustomerNo) then
-            exit(CheckIfDocumentShouldBeSentForEInvoiceCustomer(CustomerNo, DocumentNo, SendToSEFChecked));
-
-        if SendToSEFChecked then
-            exit(ConfirmManagement.GetResponseOrDefault(StrSubstNo(NotAnEInvoiceCustomerQst, CustomerNo, DocumentNo), false));
-
-        exit(false);
-    end;
-
-    local procedure CheckIfDocumentShouldBeSentForEInvoiceCustomer(CustomerNo: Code[20]; DocumentNo: Code[20]; SendToSEFChecked: Boolean): Boolean
-    var
-        ConfirmManagement: Codeunit "Confirm Management";
         ShouldSendDocumentToSEFQst: Label 'Are you sure document %1 should be sent to SEF?', Comment = '%1 = Document No.';
-        CustomerEInvoiceDocumentNotSentToSEFQst: Label 'Customer %1 is an E-Invoice customer. Document %2 is not selected for sending to SEF. Do you want to continue?', Comment = '%1 - Customer No., %2 - Document No.';
     begin
-        if SendToSEFChecked then
+        if not SendToSEFChecked then
+            exit(false);
+
+        if IsRSEInvoiceCustomer(CustomerNo) then
             exit(ConfirmManagement.GetResponseOrDefault(StrSubstNo(ShouldSendDocumentToSEFQst, DocumentNo), true))
         else
-            exit(not (ConfirmManagement.GetResponseOrDefault(StrSubstNo(CustomerEInvoiceDocumentNotSentToSEFQst, CustomerNo, DocumentNo), false)));
+            exit(ConfirmManagement.GetResponseOrDefault(StrSubstNo(NotAnEInvoiceCustomerQst, CustomerNo, DocumentNo), true));
+    end;
+
+    internal procedure CheckIfSalesOrderCanBeSentToSEF(SalesHeader: Record "Sales Header"; RSEIAuxSalesHeader: Record "NPR RS EI Aux Sales Header")
+    var
+        SalesLine: Record "Sales Line";
+        DocumentWithRetailLinesCannotBeSentToSEFErr: Label 'Document that contains Sales Lines with retail location cannot be sent to SEF.';
+    begin
+        if not RSEIAuxSalesHeader."NPR RS EI Send To SEF" then
+            exit;
+        SalesLine.SetLoadFields("Location Code");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.SetRange(Type, SalesLine.Type::Item);
+        if not SalesLine.FindFirst() then
+            exit;
+        if IsRetailLocation(SalesLine."Location Code") then
+            Error(DocumentWithRetailLinesCannotBeSentToSEFErr);
+    end;
+
+    local procedure IsRetailLocation(LocationCode: Code[10]): Boolean
+    var
+        Location: Record Location;
+    begin
+        if not Location.Get(LocationCode) then
+            exit(false);
+        exit(Location."NPR Retail Location");
     end;
 
     #endregion RS E-Invoice Sales Mgt. Helper Procedures
