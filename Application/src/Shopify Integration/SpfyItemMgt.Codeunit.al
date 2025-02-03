@@ -18,8 +18,6 @@ codeunit 6184812 "NPR Spfy Item Mgt."
 
             Database::"Item Variant":
                 begin
-                    if not SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::Items) then
-                        exit;
                     TaskCreated := ProcessItemVariant(DataLogEntry);
                 end;
 
@@ -183,10 +181,18 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         SpfyScheduleSend: Codeunit "NPR Spfy Schedule Send Tasks";
         RecRef: RecordRef;
         VariantSku: Text;
+        ItemIntegrIsEnabled: Boolean;
+        ItemPriceIntegrIsEnabled: Boolean;
         ProcessRec: Boolean;
     begin
         if DataLogEntry."Type of Change" = DataLogEntry."Type of Change"::Rename then
             exit;  //Renames are not supported
+
+        ItemIntegrIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::Items);
+        ItemPriceIntegrIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Item Prices");
+        if not (ItemIntegrIsEnabled or ItemPriceIntegrIsEnabled) then
+            exit;
+
         ProcessRec := FindItemVariant(DataLogEntry, ItemVariant);
         if not ProcessRec and (DataLogEntry."Table ID" = Database::"Item Variant") and
            (DataLogEntry."Type of Change" = DataLogEntry."Type of Change"::Delete)
@@ -216,9 +222,18 @@ codeunit 6184812 "NPR Spfy Item Mgt."
                 NcTask.Type := NcTask.Type::Delete;
         end;
 
+        if ItemIntegrIsEnabled then
+            repeat
+                RecRef.GetTable(ItemVariant);
+                TaskCreated := SpfyScheduleSend.InitNcTask(SpfyStoreItemLink."Shopify Store Code", RecRef, VariantSku, NcTask.Type, NcTask) or TaskCreated;
+            until SpfyStoreItemLink.Next() = 0;
+
+        if not (ItemPriceIntegrIsEnabled and (NcTask.Type = NcTask.Type::Insert)) then
+            exit;
+        Commit();
+        SpfyStoreItemLink.FindSet();
         repeat
-            RecRef.GetTable(ItemVariant);
-            TaskCreated := SpfyScheduleSend.InitNcTask(SpfyStoreItemLink."Shopify Store Code", RecRef, VariantSku, NcTask.Type, NcTask) or TaskCreated;
+            UpdateItemPrices(SpfyStoreItemLink);
         until SpfyStoreItemLink.Next() = 0;
     end;
 
@@ -235,6 +250,8 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         RecRef: RecordRef;
         ItemIntegrIsEnabled: Boolean;
         InventoryIntegrIsEnabled: Boolean;
+        ItemPriceIntegrIsEnabled: Boolean;
+        NewItem: Boolean;
     begin
         if DataLogEntry."Type of Change" in [DataLogEntry."Type of Change"::Rename, DataLogEntry."Type of Change"::Delete] then
             exit;
@@ -247,22 +264,28 @@ codeunit 6184812 "NPR Spfy Item Mgt."
             exit;
         ItemIntegrIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items, SpfyStoreItemLink."Shopify Store Code");
         InventoryIntegrIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels", SpfyStoreItemLink."Shopify Store Code");
-        if not (ItemIntegrIsEnabled or InventoryIntegrIsEnabled) then
+        ItemPriceIntegrIsEnabled := SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Item Prices", SpfyStoreItemLink."Shopify Store Code");
+        if not (ItemIntegrIsEnabled or InventoryIntegrIsEnabled or ItemPriceIntegrIsEnabled) then
             exit;
         if not TestRequiredFields(Item, false) then
             exit;
 
+        NewItem := SpfyStoreItemLink."Sync. to this Store" and not SpfyStoreItemLink."Synchronization Is Enabled";
+
         if ItemIntegrIsEnabled then begin
             DataLogEntry."Type of Change" := DataLogEntry."Type of Change"::Modify;
             TaskCreated := ScheduleItemSync(DataLogEntry, Item, SpfyStoreItemLink);
-            if SpfyStoreItemLink."Sync. to this Store" and not SpfyStoreItemLink."Synchronization Is Enabled" then
+            if NewItem then
                 TaskCreated := ScheduleCostSync(SpfyStoreItemLink."Shopify Store Code", Item) or TaskCreated;
         end;
 
-        if InventoryIntegrIsEnabled then begin
-            Commit();
+        if not (InventoryIntegrIsEnabled or (NewItem and ItemPriceIntegrIsEnabled)) then
+            exit;
+        Commit();
+        if InventoryIntegrIsEnabled then
             UpdateInventoryLevels(SpfyStoreItemLink);
-        end;
+        if ItemPriceIntegrIsEnabled then
+            UpdateItemPrices(SpfyStoreItemLink);
     end;
 
     local procedure ProcessMetafield(DataLogEntry: Record "NPR Data Log Record") TaskCreated: Boolean
@@ -719,6 +742,20 @@ codeunit 6184812 "NPR Spfy Item Mgt."
     local procedure UpdateInventoryLevels(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link")
     begin
         Codeunit.Run(Codeunit::"NPR Spfy Item Recalc.Invt.Lev.", SpfyStoreItemLink);
+    end;
+
+    local procedure UpdateItemPrices(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link")
+    var
+        Item: Record Item;
+        ShopifyStore: Record "NPR Spfy Store";
+        ItemPriceMgt: Codeunit "NPR Spfy Item Price Mgt.";
+    begin
+        if not (ShopifyStore.Get(SpfyStoreItemLink."Shopify Store Code") and Item.Get(SpfyStoreItemLink."Item No.")) then
+            exit;
+        ShopifyStore.SetRecFilter();
+        Item.SetRecFilter();
+
+        ItemPriceMgt.CalculateItemPrices(ShopifyStore, Item, false, Today());
     end;
 
     local procedure CheckItemIsSynchronized(Item: Record Item): Boolean
