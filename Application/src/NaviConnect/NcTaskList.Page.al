@@ -222,7 +222,7 @@
             {
                 Caption = 'Set as Not Postponed';
                 Image = ChangeStatus;
-                ToolTip = 'Sets selected tasks as not postponed. The system may mark tasks as "Postponed" to defer processing when it needs to process certain types of tasks together in a batch, rather than individually. The Postponed field should be cleared automatically once the system has finished processing. However, if the process was interrupted abruptly, the tasks may remain deferred. In this case, you can use this function to return the task to it''s original state.';
+                ToolTip = 'This action removes the "Postponed" checkmarks (flags) from selected tasks. Tasks are flagged as "Postponed" when the system needs to defer processing because certain types of tasks should be processed together in a batch rather than individually. This means that there may be a process currently working on these tasks. The flags should be cleared automatically once the system has finished processing. It is strongly recommended that you do not remove the flags manually (using this action) as this may result in a task being processed more than once. You should only do this if you are absolutely sure that no processes are currently running (for example, if a task processing job was abruptly interrupted, the tasks may remain deferred and you may want to reset the flags manually).';
                 ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
@@ -479,7 +479,7 @@
         Counter: Integer;
         Window: Dialog;
         NoPostponedTasksWhereSelectedLbl: Label 'No Postponed tasks where selected.';
-        UnmarkPostponedTasksLbl: Label 'You have selected multiple tasks. Only tasks marked as "Postponed" will be updated. You will not be able to manually revert this action.\Are you sure you want to continue?';
+        UnmarkPostponedTasksLbl: Label 'This action removes the "Postponed" checkmarks (flags) from selected tasks. Tasks are flagged as "Postponed" when the system needs to defer processing because certain types of tasks should be processed together in a batch rather than individually. This means that there may be a process currently working on these tasks. The flags should be cleared automatically once the system has finished processing. It is strongly recommended that you do not remove the flags manually (using this action) as this may result in a task being processed more than once. You should only do this if you are absolutely sure that no processes are currently running (for example, if a task processing job was abruptly interrupted, the tasks may remain deferred and you may want to reset the flags manually).\Are you sure you want to continue?';
     begin
         CurrPage.SetSelectionFilter(Task);
         Task.SetRange(Postponed, true);

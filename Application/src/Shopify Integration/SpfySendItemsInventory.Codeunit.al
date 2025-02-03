@@ -306,6 +306,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         NcTask."Last Processing Completed at" := CurrentDateTime();
         NcTask."Last Processing Duration" := (NcTask."Last Processing Completed at" - NcTask."Last Processing Started at") / 1000;
         NcTask.Postponed := false;
+        NcTask."Postponed At" := 0DT;
         NcTask.Response.CreateOutStream(OStream);
         if ErrorText = '' then begin
             ShopifyResponse.WriteTo(ShopifyResponseText);
@@ -316,7 +317,6 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         if Success then begin
             NcTask.Processed := true;
             NcTask."Process Error" := false;
-            NcTask."Postponed At" := 0DT;
         end else
             NcTask."Process Error" := true;
 
@@ -1498,6 +1498,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                 end;
                 NcTask."Last Processing Started at" := NcTaskIn."Last Processing Started at";
                 NcTask."Last Processing Duration" := 0;
+                NcTask."Process Count" += 1;
 
                 NcTask.Modify();
             end else
