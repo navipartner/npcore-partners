@@ -70,7 +70,7 @@
                     begin
                         if xRec."Audit Handler" = Rec."Audit Handler" then
                             exit;
-                        SetAllowSalesAndReturnInSameTransEnabled();
+                        SetTransactionsSetupVisible();
                     end;
                 }
                 field("Allow Zero Amount Sales"; Rec."Allow Zero Amount Sales")
@@ -84,11 +84,17 @@
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Prompts for return reason when returning items in POS';
                 }
-                field(AllowSalesAndReturnInSameTrans; Rec.AllowSalesAndReturnInSameTrans)
+
+                group(TransactionsSetup)
                 {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies whether sales and returns lines are allowed in the same sale transaction.';
-                    Enabled = AllowSalesAndReturnInSameTransEnabled;
+                    ShowCaption = false;
+                    Visible = TransactionsSetupVisible;
+
+                    field(AllowSalesAndReturnInSameTrans; Rec.AllowSalesAndReturnInSameTrans)
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies whether sales and returns lines are allowed in the same sale transaction.';
+                    }
                 }
             }
             group(Printing)
@@ -157,10 +163,10 @@
 
     trigger OnOpenPage()
     begin
-        SetAllowSalesAndReturnInSameTransEnabled();
+        SetTransactionsSetupVisible();
     end;
 
-    local procedure SetAllowSalesAndReturnInSameTransEnabled()
+    local procedure SetTransactionsSetupVisible()
     var
         ATAuditMgt: Codeunit "NPR AT Audit Mgt.";
         BGSISAuditMgt: Codeunit "NPR BG SIS Audit Mgt.";
@@ -168,7 +174,7 @@
         RSAuditMgt: Codeunit "NPR RS Audit Mgt.";
         KSAAuditMgt: Codeunit "NPR KSA Audit Mgt.";
     begin
-        AllowSalesAndReturnInSameTransEnabled := (Rec."Audit Handler" = ATAuditMgt.HandlerCode())
+        TransactionsSetupVisible := (Rec."Audit Handler" = ATAuditMgt.HandlerCode())
                                             or (Rec."Audit Handler" = BGSISAuditMgt.HandlerCode())
                                             or (Rec."Audit Handler" = ITAuditMgt.HandlerCode())
                                             or (Rec."Audit Handler" = RSAuditMgt.HandlerCode())
@@ -176,5 +182,5 @@
     end;
 
     var
-        AllowSalesAndReturnInSameTransEnabled: Boolean;
+        TransactionsSetupVisible: Boolean;
 }
