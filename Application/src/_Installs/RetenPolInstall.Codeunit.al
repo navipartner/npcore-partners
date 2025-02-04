@@ -49,7 +49,7 @@
         AddSalesPriceMaintRetentionPolicy(IsUpgrade);
 
 #if not BC17
-        AddShopifyLogRetentionPolicy(IsUpgrade);
+        AddShopifyRetentionPolicies(IsUpgrade);
 #endif
 
         if IsUpgrade then
@@ -198,16 +198,43 @@
     end;
 
 #if not BC17
-    local procedure AddShopifyLogRetentionPolicy(IsUpgrade: Boolean)
+    local procedure AddShopifyRetentionPolicies(IsUpgrade: Boolean)
     begin
         if IsUpgrade then
-            if HasUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'ShopifyLog') then
+            if HasUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'Shopify') then
                 exit;
 
         AddAllowedTable(Database::"NPR Spfy Log", Enum::"Retention Period Enum"::"1 Month", Enum::"Reten. Pol. Deleting"::Default);
+        AddAllowedTable(Database::"NPR Spfy App Request", Enum::"Retention Period Enum"::"1 Month", Enum::"Reten. Pol. Deleting"::Default);
+        AddShopifyWebhookNotificationRetentionPolicy();
 
         if IsUpgrade then
-            SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'ShopifyLog');
+            SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'Shopify');
+    end;
+
+    local procedure AddShopifyWebhookNotificationRetentionPolicy()
+    var
+        SpfyWebhookNotification: Record "NPR Spfy Webhook Notification";
+        RetenPolAllowedTables: Codeunit "Reten. Pol. Allowed Tables";
+        RecRef: RecordRef;
+        RtnPeriodEnum: Enum "Retention Period Enum";
+        TableFilters: JsonArray;
+    begin
+        RemoveRetentionPolicy(Database::"NPR Spfy Webhook Notification");
+
+        SpfyWebhookNotification.SetRange(Status, SpfyWebhookNotification.Status::New, SpfyWebhookNotification.Status::Error);
+        RtnPeriodEnum := RtnPeriodEnum::"3 Months";
+        RecRef.GetTable(SpfyWebhookNotification);
+        RetenPolAllowedTables.AddTableFilterToJsonArray(TableFilters, RtnPeriodEnum, RecRef.SystemCreatedAtNo(), true, false, RecRef);
+
+        SpfyWebhookNotification.SetRange(Status, SpfyWebhookNotification.Status::Processed, SpfyWebhookNotification.Status::Cancelled);
+        RtnPeriodEnum := RtnPeriodEnum::"1 Month";
+        RecRef.GetTable(SpfyWebhookNotification);
+        RetenPolAllowedTables.AddTableFilterToJsonArray(TableFilters, RtnPeriodEnum, RecRef.SystemCreatedAtNo(), true, false, RecRef);
+
+        RetenPolAllowedTables.AddAllowedTable(Database::"NPR Spfy Webhook Notification", RecRef.SystemCreatedAtNo(), TableFilters);
+
+        CreateRetentionPolicySetup(Database::"NPR Spfy Webhook Notification", GetRetentionPeriodCode(RtnPeriodEnum), true, false);
     end;
 #endif
 
