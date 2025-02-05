@@ -131,12 +131,13 @@ codeunit 6059993 "NPR HL Integration Mgt."
         InStr: InStream;
         DateString: Text;
         EmptyResponseTxt: Label '{}', Locked = true;
+        RequestError: Label 'Error sending request to HeyLoyalty: %1 %2/%3', Comment = '%1 - HTTP status code, %2 - response text, %3 - response content';
     begin
         ClearLastError();
 
         //Only heybooking requests will have request content payload
         if NcTask."Table No." = Database::"NPR TM Ticket Notif. Entry" then
-            if NcTask."Data Output".HasValue then begin
+            if NcTask."Data Output".HasValue() then begin
                 NcTask."Data Output".CreateInStream(InStr);
                 Content.WriteFrom(InStr);
 
@@ -156,8 +157,7 @@ codeunit 6059993 "NPR HL Integration Mgt."
         Headers.Add('Accept', 'application/json');
         Headers.Add('User-Agent', 'Dynamics 365');
 
-        if not Client.Send(RequestMsg, ResponseMsg) then
-            Error(GetLastErrorText);
+        Client.Send(RequestMsg, ResponseMsg);
 
         SaveResponse(NcTask, ResponseMsg);
 
@@ -165,7 +165,7 @@ codeunit 6059993 "NPR HL Integration Mgt."
             ResponseText := '';
 
         if not ResponseMsg.IsSuccessStatusCode() then
-            Error('%1: %2\%3', ResponseMsg.HttpStatusCode(), ResponseMsg.ReasonPhrase, ResponseText);
+            Error(RequestError, ResponseMsg.HttpStatusCode(), ResponseMsg.ReasonPhrase(), ResponseText);
 
         if ResponseText = '' then
             ResponseText := EmptyResponseTxt;
