@@ -401,17 +401,17 @@ codeunit 6059942 "NPR RS Audit Mgt."
             exit;
 
         RSFiscalizationSetup.ChangeCompany(CompanyName);
-        if RSFiscalizationSetup.Get() then begin
-            Clear(RSFiscalizationSetup."Sandbox URL");
-            Clear(RSFiscalizationSetup."Configuration URL");
-            Clear(RSFiscalizationSetup."TaxPayer Admin Portal URL");
-            Clear(RSFiscalizationSetup."TaxCore API URL");
-            Clear(RSFiscalizationSetup."VSDC URL");
-            Clear(RSFiscalizationSetup."Root URL");
-            Clear(RSFiscalizationSetup."NPT Server URL");
-            RSFiscalizationSetup.Modify();
-        end else
+        if not (RSFiscalizationSetup.Get() and RSFiscalizationSetup."Enable RS Fiscal") then
             exit;
+
+        Clear(RSFiscalizationSetup."Sandbox URL");
+        Clear(RSFiscalizationSetup."Configuration URL");
+        Clear(RSFiscalizationSetup."TaxPayer Admin Portal URL");
+        Clear(RSFiscalizationSetup."TaxCore API URL");
+        Clear(RSFiscalizationSetup."VSDC URL");
+        Clear(RSFiscalizationSetup."Root URL");
+        Clear(RSFiscalizationSetup."NPT Server URL");
+        RSFiscalizationSetup.Modify();
 
         RSPOSUnitMapping.ChangeCompany(CompanyName);
         RSPOSUnitMapping.ModifyAll("RS Sandbox PIN", 0);

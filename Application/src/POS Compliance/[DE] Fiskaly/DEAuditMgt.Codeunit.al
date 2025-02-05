@@ -86,10 +86,9 @@
             exit;
 
         DEFiscalizationSetup.ChangeCompany(CompanyName);
-        if DEFiscalizationSetup.Get() then
-            DEFiscalizationSetup.Delete()
-        else
+        if not (DEFiscalizationSetup.Get() and DEFiscalizationSetup."Enable DE Fiscal") then
             exit;
+        DEFiscalizationSetup.Delete();
 
         DEAuditSetup.ChangeCompany(CompanyName);
         if DEAuditSetup.FindSet(true) then begin

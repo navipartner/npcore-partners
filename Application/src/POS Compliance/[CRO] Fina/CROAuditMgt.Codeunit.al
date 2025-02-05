@@ -58,14 +58,14 @@ codeunit 6151547 "NPR CRO Audit Mgt."
             exit;
 
         CROFiscalizationSetup.ChangeCompany(CompanyName);
-        if CROFiscalizationSetup.Get() then begin
-            Clear(CROFiscalizationSetup."Signing Certificate");
-            Clear(CROFiscalizationSetup."Signing Certificate Password");
-            Clear(CROFiscalizationSetup."Signing Certificate Thumbprint");
-            Clear(CROFiscalizationSetup."Certificate Subject OIB");
-            Clear(CROFiscalizationSetup."Environment URL");
-            CROFiscalizationSetup.Modify();
-        end;
+        if not (CROFiscalizationSetup.Get() and CROFiscalizationSetup."Enable CRO Fiscal") then
+            exit;
+        Clear(CROFiscalizationSetup."Signing Certificate");
+        Clear(CROFiscalizationSetup."Signing Certificate Password");
+        Clear(CROFiscalizationSetup."Signing Certificate Thumbprint");
+        Clear(CROFiscalizationSetup."Certificate Subject OIB");
+        Clear(CROFiscalizationSetup."Environment URL");
+        CROFiscalizationSetup.Modify();
     end;
 #endif
 

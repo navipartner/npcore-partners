@@ -54,11 +54,11 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
             exit;
 
         BGFiscalizationSetup.ChangeCompany(CompanyName);
-        if BGFiscalizationSetup.Get() then begin
-            BGFiscalizationSetup."BG SIS Fiscal Enabled" := false;
-            BGFiscalizationSetup.Modify();
-        end else
+        if not (BGFiscalizationSetup.Get() and BGFiscalizationSetup."BG SIS Fiscal Enabled") then
             exit;
+
+        BGFiscalizationSetup."BG SIS Fiscal Enabled" := false;
+        BGFiscalizationSetup.Modify();
 
         BGSISPOSUnitMapping.ChangeCompany(CompanyName);
         BGSISPOSUnitMapping.SetFilter("Fiscal Printer IP Address", '<>''');
