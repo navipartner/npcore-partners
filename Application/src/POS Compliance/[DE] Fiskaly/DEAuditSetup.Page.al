@@ -34,11 +34,13 @@
                     field("Api URL"; Rec."Api URL")
                     {
                         ApplicationArea = NPRDEFiscal;
+                        ShowMandatory = true;
                         ToolTip = 'Specifies the URL for the Fiskaly API';
                     }
                     field("Submission Api URL"; Rec."Submission Api URL")
                     {
                         ApplicationArea = NPRDEFiscal;
+                        ShowMandatory = true;
                         ToolTip = 'Specifies the URL for the Fiskaly submission API.';
                     }
                     field("DSFINVK Api URL"; Rec."DSFINVK Api URL")
@@ -335,7 +337,7 @@
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        SetDefaultValues();
+        Rec.SetDefaultValuesForNewRecord();
     end;
 
     trigger OnAfterGetCurrRecord()
@@ -353,18 +355,4 @@
         DESecretMgt: Codeunit "NPR DE Secret Mgt.";
         ApiKeyField: Text[200];
         ApiSecretField: Text[200];
-
-    local procedure SetDefaultValues()
-    var
-        SIGNDESumbissionAPIURLLbl: Label 'https://kassensichv.fiskaly.com/submission-api/v1', Locked = true;
-        SIGNDEV2APIURLLbl: Label 'https://kassensichv-middleware.fiskaly.com/api/v2', Locked = true;
-    begin
-        if Rec."Api URL" = '' then
-            Rec."Api URL" := SIGNDEV2APIURLLbl;
-
-        if Rec."Submission Api URL" = '' then
-            Rec."Submission Api URL" := SIGNDESumbissionAPIURLLbl;
-
-        Rec.SetDefaultLegalPersonFieldValues();
-    end;
 }

@@ -406,6 +406,20 @@
         TestField("Taxpayer Created");
     end;
 
+    internal procedure SetDefaultValuesForNewRecord()
+    var
+        SIGNDESumbissionAPIURLLbl: Label 'https://kassensichv.fiskaly.com/submission-api/v1', Locked = true;
+        SIGNDEV2APIURLLbl: Label 'https://kassensichv-middleware.fiskaly.com/api/v2', Locked = true;
+    begin
+        if Rec."Api URL" = '' then
+            Rec."Api URL" := SIGNDEV2APIURLLbl;
+
+        if Rec."Submission Api URL" = '' then
+            Rec."Submission Api URL" := SIGNDESumbissionAPIURLLbl;
+
+        Rec.SetDefaultLegalPersonFieldValues();
+    end;
+
     internal procedure SetDefaultLegalPersonFieldValues()
     var
         CompanyInformation: Record "Company Information";

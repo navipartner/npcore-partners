@@ -3,6 +3,9 @@ page 6184779 "NPR Setup DE TSS Code"
 {
     Caption = 'Setup DE TSS Code Mapping';
     Extensible = false;
+    ObsoleteReason = 'Introduced page NPR Setup DE Fiskaly instead.';
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-02-09';
     PageType = NavigatePage;
 
     layout

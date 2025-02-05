@@ -2,6 +2,9 @@ page 6184745 "NPR DE POS Unit Step"
 {
     Caption = 'DE POS Unit Profile Setup';
     Extensible = false;
+    ObsoleteReason = 'Introduced page NPR DE TSS Clients Step instead.';
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-02-09';
     PageType = ListPart;
     SourceTable = "NPR DE POS Unit Aux. Info";
     SourceTableTemporary = true;
@@ -43,10 +46,10 @@ page 6184745 "NPR DE POS Unit Step"
         {
             action("Create Client")
             {
+                ApplicationArea = NPRDEFiscal;
                 Caption = 'Create Fiskaly Client';
                 Image = InsertFromCheckJournal;
                 ToolTip = 'Creates Client ID on Fiskaly for DE fiscalization.';
-                ApplicationArea = NPRDEFiscal;
 
                 trigger OnAction()
                 var
