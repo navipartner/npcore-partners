@@ -21,6 +21,7 @@
         PostTicket := JQParamStrMgt.GetParamValueAsBoolean(ParamPostTicket());
         PostMember := JQParamStrMgt.GetParamValueAsBoolean(ParamPostMember());
 
+        SalesHeader.SetAutoCalcFields("Amount Including VAT");
         if SalesHeader.FindSet() then
             repeat
                 if PostTicket then
@@ -90,7 +91,6 @@
         if SalesLine.FindSet() then
             repeat
                 if Item.Get(SalesLine."No.") and (Item."NPR Ticket Type" = '') then
-                
                     exit(true);
             until SalesLine.Next() = 0;
 
@@ -133,6 +133,9 @@
         PaymentLine: Record "NPR Magento Payment Line";
     begin
         if SkipPaymentCheck then
+            exit(true);
+
+        if SalesHeader."Amount Including VAT" = 0 then
             exit(true);
 
         PaymentLine.SetRange("Document Table No.", DATABASE::"Sales Header");
