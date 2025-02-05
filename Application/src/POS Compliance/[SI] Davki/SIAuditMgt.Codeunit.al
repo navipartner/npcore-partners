@@ -759,7 +759,7 @@ codeunit 6151546 "NPR SI Audit Mgt."
         RequestMessage: HttpRequestMessage;
         InStr: InStream;
         RequestMessageLbl: Label '{"certificateBase64": "%1","certificatePass": "%2","methodType": "%3", "URLToSend": "%4", "contentToSign": "%5"}', Locked = true;
-        SignAndSendXMLAzureFunctionURLLbl: Label 'https://slofiscalcompilance.azurewebsites.net/api/SignAndSend?code=', Locked = true;
+        SignAndSendXMLAzureFunctionURLLbl: Label 'https://slocompilance.azurewebsites.net/api/SignAndSend?code=', Locked = true;
         CertBase64: Text;
         Url: Text;
         XMLDocText: Text;
@@ -794,7 +794,7 @@ codeunit 6151546 "NPR SI Audit Mgt."
         RequestMessage: HttpRequestMessage;
         InStr: InStream;
         RequestMessageLbl: Label '{"certificateBase64": "%1","certificatePass": "%2","baseValue": "%3"}', Locked = true;
-        SignZOIAzureFunctionURLLbl: Label 'https://slofiscalcompilance.azurewebsites.net/api/GenerateZOI?code=', Locked = true;
+        SignZOIAzureFunctionURLLbl: Label 'https://slocompilance.azurewebsites.net/api/GenerateZOI?code=', Locked = true;
         CertBase64: Text;
         Url: Text;
         XMLDocText: Text;
