@@ -358,6 +358,11 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         ToolTip = 'Specifies the ticket type that will be used with the item.';
                         ApplicationArea = NPRRetail;
                     }
+                    field("NPR POS Admit Action"; Rec."NPR POS Admit Action")
+                    {
+                        ToolTip = 'Specifies how tickets on this item will be printed and admitted.';
+                        ApplicationArea = NPRRetail;
+                    }
                     field("NPR Print Tags"; Rec."NPR Print Tags")
                     {
                         ToolTip = 'Specifies the item print tags.';
