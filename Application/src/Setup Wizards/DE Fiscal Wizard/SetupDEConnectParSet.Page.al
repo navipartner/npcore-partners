@@ -1,8 +1,11 @@
 page 6184778 "NPR Setup DE Connect Par. Set"
 {
     Caption = 'DE Connection Parameter Set';
-    PageType = NavigatePage;
     Extensible = false;
+    ObsoleteReason = 'Introduced page NPR Setup DE Fiskaly instead.';
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-02-09';
+    PageType = NavigatePage;
 
     layout
     {
@@ -16,10 +19,10 @@ page 6184778 "NPR Setup DE Connect Par. Set"
                 Visible = TopBannerVisible and not FinishActionEnabled;
                 field(MediaResourcesStandard; MediaResourcesStandard."Media Reference")
                 {
+                    ApplicationArea = NPRRetail;
                     Editable = false;
                     ShowCaption = false;
                     ToolTip = 'Specifies the value of the MediaResourcesStandard.Media Reference field';
-                    ApplicationArea = NPRRetail;
                 }
             }
             group(FinishedBanner)
@@ -29,10 +32,10 @@ page 6184778 "NPR Setup DE Connect Par. Set"
                 Visible = TopBannerVisible and FinishActionEnabled;
                 field(MediaResourcesDone; MediaResourcesDone."Media Reference")
                 {
+                    ApplicationArea = NPRRetail;
                     Editable = false;
                     ShowCaption = false;
                     ToolTip = 'Specifies the value of the MediaResourcesDone.Media Reference field';
-                    ApplicationArea = NPRRetail;
                 }
             }
 
@@ -74,10 +77,10 @@ page 6184778 "NPR Setup DE Connect Par. Set"
                         field(EmptyVar3; EmptyVar)
                         {
 
+                            ApplicationArea = NPRRetail;
                             Caption = ' ';
                             ToolTip = 'Specifies the value of the EmptyVar field';
                             Visible = false;
-                            ApplicationArea = NPRRetail;
                         }
                     }
                     part(SetupDEConnectParameterSet; "NPR DE Connect. Parameter Set")
@@ -107,12 +110,12 @@ page 6184778 "NPR Setup DE Connect Par. Set"
         {
             action(ActionBack)
             {
+                ApplicationArea = NPRRetail;
                 Caption = 'Back';
                 Enabled = BackActionEnabled;
                 Image = PreviousRecord;
                 InFooterBar = true;
                 ToolTip = 'Executes the Back action';
-                ApplicationArea = NPRRetail;
                 trigger OnAction();
                 begin
                     NextStep(true);
@@ -120,12 +123,12 @@ page 6184778 "NPR Setup DE Connect Par. Set"
             }
             action(ActionNext)
             {
+                ApplicationArea = NPRRetail;
                 Caption = 'Next';
                 Enabled = NextActionEnabled;
                 Image = NextRecord;
                 InFooterBar = true;
                 ToolTip = 'Executes the Next action';
-                ApplicationArea = NPRRetail;
                 trigger OnAction();
                 begin
                     NextStep(false);
@@ -133,12 +136,12 @@ page 6184778 "NPR Setup DE Connect Par. Set"
             }
             action(ActionFinish)
             {
+                ApplicationArea = NPRRetail;
                 Caption = 'Finish';
                 Enabled = FinishActionEnabled;
                 Image = Approve;
                 InFooterBar = true;
                 ToolTip = 'Executes the Finish action';
-                ApplicationArea = NPRRetail;
                 trigger OnAction();
                 begin
                     FinishAction();

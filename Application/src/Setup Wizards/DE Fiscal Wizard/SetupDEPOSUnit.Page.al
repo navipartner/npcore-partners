@@ -2,6 +2,9 @@ page 6184780 "NPR Setup DE POS Unit"
 {
     Caption = 'Setup DE POS Unit Mapping';
     Extensible = false;
+    ObsoleteReason = 'Introduced page NPR Setup DE Fiskaly instead.';
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-02-09';
     PageType = NavigatePage;
 
     layout

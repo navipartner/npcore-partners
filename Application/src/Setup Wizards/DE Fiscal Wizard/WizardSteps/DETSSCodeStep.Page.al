@@ -2,6 +2,9 @@ page 6184754 "NPR DE TSS Code Step"
 {
     Caption = 'DE TSS Code Setup';
     Extensible = false;
+    ObsoleteReason = 'Introduced page NPR DE TSS Step instead.';
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-02-09';
     PageType = ListPart;
     SourceTable = "NPR DE TSS";
     SourceTableTemporary = true;
@@ -33,10 +36,10 @@ page 6184754 "NPR DE TSS Code Step"
         {
             action(RefreshTSSList)
             {
-                Caption = 'Refresh TSS List';
-                ToolTip = 'Copies information about all existing Technical Security Systems (TSS) from Fiskaly to BC.';
-                Image = LinkWeb;
                 ApplicationArea = NPRDEFiscal;
+                Caption = 'Refresh TSS List';
+                Image = LinkWeb;
+                ToolTip = 'Copies information about all existing Technical Security Systems (TSS) from Fiskaly to BC.';
                 trigger OnAction()
                 var
                     DEFiskalyCommunication: Codeunit "NPR DE Fiskaly Communication";
@@ -51,10 +54,10 @@ page 6184754 "NPR DE TSS Code Step"
             }
             action("Create TSS")
             {
-                Caption = 'Create Fiskaly TSS';
-                ToolTip = 'Creates Technical Security System (TSS) at Fiskaly for DE fiscalization.';
-                Image = InsertFromCheckJournal;
                 ApplicationArea = NPRDEFiscal;
+                Caption = 'Create Fiskaly TSS';
+                Image = InsertFromCheckJournal;
+                ToolTip = 'Creates Technical Security System (TSS) at Fiskaly for DE fiscalization.';
 
                 trigger OnAction()
                 var
@@ -76,10 +79,10 @@ page 6184754 "NPR DE TSS Code Step"
             }
             action(SetStatusUninitialized)
             {
-                Caption = 'Set as Uninitialized';
-                ToolTip = 'Change status of selected Technical Security System (TSS) to ''Uninitialized''. Should be run, if current status of TSS is ''Created''.';
-                Image = UnitConversions;
                 ApplicationArea = NPRDEFiscal;
+                Caption = 'Set as Uninitialized';
+                Image = UnitConversions;
+                ToolTip = 'Change status of selected Technical Security System (TSS) to ''Uninitialized''. Should be run, if current status of TSS is ''Created''.';
 
                 trigger OnAction()
                 var
@@ -97,10 +100,10 @@ page 6184754 "NPR DE TSS Code Step"
             }
             action(AssignAdminPIN)
             {
-                Caption = 'Assign Admin PIN';
-                ToolTip = 'Assignes new admin PIN to selected Technical Security System (TSS) at Fiskaly.';
-                Image = CustomerCode;
                 ApplicationArea = NPRDEFiscal;
+                Caption = 'Assign Admin PIN';
+                Image = CustomerCode;
+                ToolTip = 'Assignes new admin PIN to selected Technical Security System (TSS) at Fiskaly.';
 
                 trigger OnAction()
                 var
@@ -122,10 +125,10 @@ page 6184754 "NPR DE TSS Code Step"
             }
             action(InitializeTSS)
             {
-                Caption = 'Initialize TSS';
-                ToolTip = 'Initializes selected Technical Security System (TSS) at Fiskaly.';
-                Image = Approval;
                 ApplicationArea = NPRDEFiscal;
+                Caption = 'Initialize TSS';
+                Image = Approval;
+                ToolTip = 'Initializes selected Technical Security System (TSS) at Fiskaly.';
 
                 trigger OnAction()
                 var
@@ -146,10 +149,10 @@ page 6184754 "NPR DE TSS Code Step"
             }
             action(ShowClientsAtFiskaly)
             {
-                Caption = 'Show Clients at Fiskaly';
-                ToolTip = 'Downloads a list of Fiskaly clients associated with this Technical Security System (TSS).';
-                Image = LaunchWeb;
                 ApplicationArea = NPRDEFiscal;
+                Caption = 'Show Clients at Fiskaly';
+                Image = LaunchWeb;
+                ToolTip = 'Downloads a list of Fiskaly clients associated with this Technical Security System (TSS).';
 
                 trigger OnAction()
                 var
@@ -161,10 +164,10 @@ page 6184754 "NPR DE TSS Code Step"
             }
             action(DisableTSS)
             {
-                Caption = 'Disable TSS';
-                ToolTip = 'Disables selected Technical Security System (TSS) at Fiskaly.';
-                Image = Reject;
                 ApplicationArea = NPRDEFiscal;
+                Caption = 'Disable TSS';
+                Image = Reject;
+                ToolTip = 'Disables selected Technical Security System (TSS) at Fiskaly.';
 
                 trigger OnAction()
                 var

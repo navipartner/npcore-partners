@@ -4,6 +4,9 @@ page 6184763 "NPR DE Connect. Parameter Set"
     Extensible = false;
     PageType = ListPart;
     SourceTable = "NPR DE Audit Setup";
+    ObsoleteReason = 'Introduced page NPR DE Conn. Param. Sets Step instead.';
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-02-09';
     UsageCategory = None;
 
     layout
@@ -81,6 +84,7 @@ page 6184763 "NPR DE Connect. Parameter Set"
         if Rec."Api URL" = '' then
             Rec."Api URL" := 'https://kassensichv-middleware.fiskaly.com/api/v2';
     end;
+
     trigger OnAfterGetCurrRecord()
     begin
         ApiKeyField := '';
@@ -91,6 +95,7 @@ page 6184763 "NPR DE Connect. Parameter Set"
         if DESecretMgt.HasSecretKey(Rec.ApiSecretLbl()) then
             ApiSecretField := '***';
     end;
+
     var
         DESecretMgt: Codeunit "NPR DE Secret Mgt.";
         ApiKeyField: Text[200];
