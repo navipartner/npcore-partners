@@ -327,8 +327,12 @@
                 Voucher.Get(NpRvSalesLineReference."Voucher No.");
 
             NpRvSalesLine.Type = NpRvSalesLine.Type::"New Voucher":
-                if (NpRvSalesLineReference."Voucher No." = '') or not Voucher.Get(NpRvSalesLineReference."Voucher No.") then begin
-                    InsertIssuedVoucher(VoucherType, NpRvSalesLine, NpRvSalesLineReference."Voucher No.", NpRvSalesLineReference."Reference No.", Voucher);
+                begin
+                    if NpRvSalesLineReference."Reference No." = '' then
+                        VoucherType.TestField("Reference No. Pattern");
+                    if (NpRvSalesLineReference."Voucher No." = '') or not Voucher.Get(NpRvSalesLineReference."Voucher No.") then begin
+                        InsertIssuedVoucher(VoucherType, NpRvSalesLine, NpRvSalesLineReference."Voucher No.", NpRvSalesLineReference."Reference No.", Voucher);
+                    end;
                 end;
         end;
 
@@ -1241,7 +1245,6 @@
     begin
         if VoucherType."Reference No. Type" <> VoucherType."Reference No. Type"::Pattern then
             exit('');
-        VoucherType.TestField("Reference No. Pattern");
 
         for i := 1 to 100 do begin
             ReferenceNo := GenerateReferenceNo(VoucherType."Reference No. Pattern", Voucher."No.", MaxStrLen(Voucher."Reference No."));
@@ -1259,7 +1262,9 @@
     begin
         if VoucherType."Reference No. Type" <> VoucherType."Reference No. Type"::EAN13 then
             exit('');
-        VoucherType.TestField("Reference No. Pattern");
+
+        if VoucherType."Reference No. Pattern" = '' then
+            exit;
 
         for i := 1 to 100 do begin
             ReferenceNo := GenerateReferenceNo(VoucherType."Reference No. Pattern", Voucher."No.", MaxStrLen(Voucher."Reference No."));
