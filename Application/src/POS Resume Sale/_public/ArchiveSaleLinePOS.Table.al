@@ -525,7 +525,7 @@
         }
         field(154; "Sales Document Pdf2Nav"; Boolean)
         {
-            Caption = 'Sales Document Pdf2Nav';
+            Caption = 'Sales Document Pdf2BC';
             DataClassification = CustomerContent;
         }
         field(155; "Posted Sales Document Type"; Option)

@@ -4,7 +4,7 @@ codeunit 6059877 "NPR POS Action: Imp. Pstd. Inv" implements "NPR IPOS Workflow"
 
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
-        ActionDescription: Label 'Import and open standard NAV posted invoices to current POS sale';
+        ActionDescription: Label 'Import and open standard BC posted invoices to current POS sale';
         ParamSelectCust_CptLbl: Label 'Select Customer';
         ParamSelectCust_DescLbl: Label 'Enable/Disable customer selection';
         ParamSalesDocViewString_CptLbl: Label 'Posted Sales Invoice View String';

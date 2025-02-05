@@ -28,7 +28,7 @@
         SendPostedPdf2Nav: Boolean;
         PrintingErrorTxt: Label 'Printing of Documents failed with error: %1';
         SendingErrorTxt: Label 'Sending of Documents failed with error: %1';
-        Pdf2NavSendingErrorTxt: Label 'Sending of Documents via Pdf2Nav failed with error: %1';
+        Pdf2NavSendingErrorTxt: Label 'Sending of Documents via Pdf2BC failed with error: %1';
         RetailPrintErrorTxt: Label 'Retail printing of Documents failed with error: %1';
         RetailPrint: Boolean;
         CreatedSalesHeader: Record "Sales Header";

@@ -18,9 +18,9 @@
         CaptionSelectCustomer: Label 'Select Customer';
         DescSelectCustomer: Label 'Prompt for customer selection if none on sale';
         CaptionSendDocument: Label 'Send Document';
-        CaptionPdf2NavDocument: Label 'Pdf2Nav Document';
+        CaptionPdf2NavDocument: Label 'Pdf2BC Document';
         DescSendDocument: Label 'Handle output via document sending profiles';
-        DescPdf2NavDocument: Label 'Handle output via PDF2NAV';
+        DescPdf2NavDocument: Label 'Handle output via PDF2BC';
         SalesDocImpMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
     begin
         WorkflowConfig.AddActionDescription(ActionDescription);

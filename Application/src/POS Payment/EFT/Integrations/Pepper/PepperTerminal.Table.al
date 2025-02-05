@@ -118,7 +118,7 @@
         }
         field(151; "NAV Receipt Encoding"; Option)
         {
-            Caption = 'NAV Receipt Encoding';
+            Caption = 'BC Receipt Encoding';
             DataClassification = CustomerContent;
             OptionCaption = 'Default,utf-8,iso-8859-1,iso-8859-2,iso-8859-3,iso-8859-4,iso-8859-5,iso-8859-6,iso-8859-7,iso-8859-8,iso-8859-9,iso-8859-13,iso-8859-15';
             OptionMembers = Default,"utf-8","iso-8859-1","iso-8859-2","iso-8859-3","iso-8859-4","iso-8859-5","iso-8859-6","iso-8859-7","iso-8859-8","iso-8859-9","iso-8859-13","iso-8859-15";

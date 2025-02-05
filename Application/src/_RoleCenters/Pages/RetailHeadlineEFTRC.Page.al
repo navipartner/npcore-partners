@@ -122,7 +122,7 @@
     var
         HeadlineManagement: Codeunit "NPR NP Retail Headline Mgt.";
         DefaultFieldsVisible: Boolean;
-        DocumentationTxt: Label 'Want to learn more about %1?', Comment = '%1 is the NAV short product name.';
+        DocumentationTxt: Label 'Want to learn more about %1?', Comment = '%1 is the BC short product name.';
         DocumentationUrlTxt: Label 'https://go.microsoft.com/fwlink/?linkid=867580', Locked = true;
         GreetingText: Text;
         DocumentationText: Text;

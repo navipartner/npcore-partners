@@ -1003,7 +1003,7 @@
             }
             group(PDF2NAV)
             {
-                Caption = 'PDF2NAV';
+                Caption = 'PDF2BC';
                 Image = SendEmailPDF;
                 action(EmailLog)
                 {
