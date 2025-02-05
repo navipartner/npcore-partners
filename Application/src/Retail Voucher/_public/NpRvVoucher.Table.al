@@ -528,7 +528,6 @@
         if "Reference No." = '' then
             InitReferenceNo();
 
-        TestField("Reference No.");
 
         if not VoucherMgt.CheckReferenceNoHasNotBeenUsedBefore("No.", "Reference No.") then
             Error(ReferenceAlreadyUsedErr, "Reference No.");
