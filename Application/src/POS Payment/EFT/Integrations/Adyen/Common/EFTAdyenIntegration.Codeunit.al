@@ -432,8 +432,12 @@ codeunit 6184639 "NPR EFT Adyen Integration"
 
         EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
 
-        if not (GetAcquireCardFirst(EFTSetup) or (GetCreateRecurringContract(EFTSetup) <> 0)) then
+        if GetCreateRecurringContract(EFTSetup) <> 0 then
             exit(false);
+
+        if not GetAcquireCardFirst(EFTSetup) then
+            exit(false);
+
         if not POSSession.IsInitialized() then
             exit(false);
 
@@ -578,7 +582,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         case EFTTransactionRequest."Auxiliary Operation ID" of
             8:
                 begin
-                    exit(ShouldProceedToAquireCard(EFTTransactionRequest, ContinueOnTransactionEntryNo));
+                    exit(ShouldProceedToPurchaseTransactionAfterSubscriptionConfirmation(EFTTransactionRequest, ContinueOnTransactionEntryNo));
                 end;
             else
                 EFTTransactionRequest.FieldError("Auxiliary Operation ID");
@@ -606,7 +610,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         exit(true);
     end;
 
-    local procedure ShouldProceedToAquireCard(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var ContinueOnTransactionEntryNo: Integer): Boolean
+    local procedure ShouldProceedToPurchaseTransactionAfterSubscriptionConfirmation(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var ContinueOnTransactionEntryNo: Integer): Boolean
     var
         EFTPaymentTransactionRequest: Record "NPR EFT Transaction Request";
     begin
@@ -615,7 +619,6 @@ codeunit 6184639 "NPR EFT Adyen Integration"
 
         if not EFTTransactionRequest."Confirmed Flag" then
             exit(false);
-
 
         EFTPaymentTransactionRequest.Get(EFTTransactionRequest."Initiated from Entry No.");
         EFTPaymentTransactionRequest.Recoverable := true;
