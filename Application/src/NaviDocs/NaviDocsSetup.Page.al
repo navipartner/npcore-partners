@@ -59,8 +59,8 @@
                 field("Pdf2Nav Send pdf"; Rec."Pdf2Nav Send pdf")
                 {
 
-                    Caption = 'Pdf2Nav send via NaviDocs';
-                    ToolTip = 'Specifies the value of the Pdf2Nav send via NaviDocs field';
+                    Caption = 'Pdf2BC send via NaviDocs';
+                    ToolTip = 'Specifies the value of the Pdf2BC send via NaviDocs field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Pdf2Nav Table Filter"; Rec."Pdf2Nav Table Filter")

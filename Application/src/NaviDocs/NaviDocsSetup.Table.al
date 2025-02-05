@@ -88,12 +88,12 @@
         }
         field(3000; "Pdf2Nav Send pdf"; Boolean)
         {
-            Caption = 'Pdf2Nav Send pdf';
+            Caption = 'Pdf2BC Send pdf';
             DataClassification = CustomerContent;
         }
         field(3001; "Pdf2Nav Table Filter"; Text[100])
         {
-            Caption = 'Pdf2Nav Table Filter';
+            Caption = 'Pdf2BC Table Filter';
             DataClassification = CustomerContent;
         }
     }

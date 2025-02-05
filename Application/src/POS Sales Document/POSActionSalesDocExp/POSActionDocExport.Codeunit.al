@@ -3,10 +3,10 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
     Access = Internal;
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
-        ActionDescription: Label 'Export current sale to a standard NAV sales document';
+        ActionDescription: Label 'Export current sale to a standard BC sales document';
         TextYourRefLabel: Label 'Enter a value for the field ''Your Reference''';
         TextConfirmTitle: Label 'Confirm action';
-        TextConfirmLead: Label 'Export active sale to NAV sales document?';
+        TextConfirmLead: Label 'Export active sale to BC sales document?';
         TextPrepaymentTitle: Label 'Prepayment';
         TextPrepaymentPctLead: Label 'Please specify prepayment % to be paid after export';
         TextPrepaymentAmountLead: Label 'Please specify prepayment amount to be paid after export';
@@ -30,7 +30,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         CaptionTransferDim: Label 'Transfer Dimensions';
         CaptionTransferTaxSetup: Label 'Transfer Tax Setup';
         CaptionAutoResrvSalesLine: Label 'Auto Reserve Sales Line';
-        CaptionSendPdf2Nav: Label 'Send PDF2NAV';
+        CaptionSendPdf2Nav: Label 'Send PDF2BC';
         CaptionRetailPrint: Label 'Retail Confirmation Print';
         CaptionOpenDoc: Label 'Open Document';
         CaptionCheckCustCredit: Label 'Check Customer Credit Error';
@@ -40,7 +40,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         DescAskYourRef: Label 'Ask user to input ''Your Reference''';
         DescConfirm: Label 'Ask user to confirm before any export is performed';
         DescAskOperation: Label 'Ask user to select posting type';
-        DescPrint: Label 'Print standard NAV report after export & posting is done';
+        DescPrint: Label 'Print standard BC report after export & posting is done';
         DescInvoice: Label 'Invoice exported document';
         DescReceive: Label 'Receive exported document';
         DescShip: Label 'Ship exported sales document';
@@ -54,7 +54,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         DescTransferDim: Label 'Transfer dimensions from sale to exported document';
         DescTransferTaxSetup: Label 'Transfer tax setup from sale to exported document';
         DescAutoResrvSalesLine: Label 'Automatically reserve items on exported document';
-        DescSendPdf2Nav: Label 'Handle document output via PDF2NAV';
+        DescSendPdf2Nav: Label 'Handle document output via PDF2BC';
         DescRetailPrint: Label 'Print receipt confirming exported document';
         DescOpenDoc: Label 'Open sales document page after export is done';
         DescCheckCustCredit: Label 'Check the customer credit before export is done, returns an error';
@@ -70,15 +70,15 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         CaptionPrepayIsAmount: Label 'Prepayment Amount Input';
         DescPrepayIsAmount: Label 'Input prepayment amount instead of percent in prompt';
         CaptionSetSend: Label 'Send Document';
-        DescSetSend: Label 'Output NAV report after export & posting, via document sending profiles';
+        DescSetSend: Label 'Output BC report after export & posting, via document sending profiles';
         CaptionSendPrepayDoc: Label 'Send Prepayment Document';
-        DescSendPrepayDoc: Label 'Output prepayment NAV report via document sending profiles, after payment in new sale';
-        CaptionPdf2NavPrepayDoc: Label 'Prepayment PDF2NAV';
-        DescPdf2NavPrepayDoc: Label 'Output prepayment NAV report via PDF2NAV, after payment in new sale';
+        DescSendPrepayDoc: Label 'Output prepayment BC report via document sending profiles, after payment in new sale';
+        CaptionPdf2NavPrepayDoc: Label 'Prepayment PDF2BC';
+        DescPdf2NavPrepayDoc: Label 'Output prepayment BC report via PDF2BC, after payment in new sale';
         CaptionSendPayAndPost: Label 'Pay&Post Send Document';
-        DescSendPayAndPost: Label 'Output NAV report via document sending profiles, after payment in new sale';
-        CaptionPdf2NavPayAndPost: Label 'Pay&Post PDF2NAV';
-        DescPdf2NavPayAndPost: Label 'Output NAV report via PDF2NAV, after payment in new sale';
+        DescSendPayAndPost: Label 'Output BC report via document sending profiles, after payment in new sale';
+        CaptionPdf2NavPayAndPost: Label 'Pay&Post PDF2BC';
+        DescPdf2NavPayAndPost: Label 'Output BC report via PDF2BC, after payment in new sale';
         CaptionSelectCustomer: Label 'Select Customer';
         DescSelectCustomer: Label 'Force selection of customer if missing from sale.';
         CaptionBlockEmptySale: Label 'Block Empty Sale';

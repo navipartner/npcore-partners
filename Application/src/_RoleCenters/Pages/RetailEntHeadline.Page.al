@@ -88,7 +88,7 @@
 
     var
         HeadlineManagement: Codeunit "NPR NP Retail Headline Mgt.";
-        DocumentationTxt: Label 'Want to learn more about %1?', Comment = '%1 is the NAV short product name.';
+        DocumentationTxt: Label 'Want to learn more about %1?', Comment = '%1 is the BC short product name.';
         GreetingText: Text;
         DocumentationText: Text[250];
         IssuedTicketText: Text[250];

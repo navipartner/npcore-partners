@@ -12,8 +12,8 @@ codeunit 6150862 "NPR POS Action: Doc. Pay&Post" implements "NPR IPOS Workflow"
         DescOpenDoc: Label 'Open the selected order before remaining amount is imported';
         CaptionSendDoc: Label 'Send Document';
         DescSendDoc: Label 'Use Document Sending Profiles to send the posted document';
-        CaptionPdf2NavDoc: Label 'Pdf2Nav Send Document';
-        DescPdf2NavDoc: Label 'Use Pdf2Nav to send the posted document';
+        CaptionPdf2NavDoc: Label 'Pdf2BC Send Document';
+        DescPdf2NavDoc: Label 'Use Pdf2BC to send the posted document';
         CaptionAutoQtyToInvoice: Label 'Auto. Qty. to Invoice';
         CaptionAutoQtyToShip: Label 'Auto. Qty. to Ship';
         CaptionAutoQtyToReceive: Label 'Auto. Qty. to Receive';

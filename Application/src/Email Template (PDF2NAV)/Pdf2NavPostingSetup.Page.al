@@ -1,7 +1,7 @@
 ﻿page 6059790 "NPR Pdf2Nav Posting Setup"
 {
     Extensible = false;
-    Caption = 'Pdf2Nav Posting Setup';
+    Caption = 'Pdf2BC Posting Setup';
     PageType = Card;
     SourceTable = "NPR SalesPost Pdf2Nav Setup";
     UsageCategory = None;
@@ -14,7 +14,7 @@
             {
                 group("When posting with Pdf2Nav:")
                 {
-                    Caption = 'When posting with Pdf2Nav:';
+                    Caption = 'When posting with Pdf2BC:';
                     field("Always Print Ship"; Rec."Always Print Ship")
                     {
                         ToolTip = 'Specifies the value of the Always Print Sales Shipment field';

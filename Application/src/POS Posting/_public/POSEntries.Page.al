@@ -394,7 +394,7 @@
             }
             group(PDF2NAV)
             {
-                Caption = 'PDF2NAV';
+                Caption = 'PDF2BC';
                 action(EmailLog)
                 {
                     Caption = 'E-mail Log';

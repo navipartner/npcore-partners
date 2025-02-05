@@ -81,7 +81,7 @@
         }
         field(10; "Sales Document Pdf2Nav"; Boolean)
         {
-            Caption = 'Sales Document Pdf2Nav';
+            Caption = 'Sales Document Pdf2BC';
             DataClassification = CustomerContent;
         }
         field(12; "Sales Document Delete"; Boolean)
