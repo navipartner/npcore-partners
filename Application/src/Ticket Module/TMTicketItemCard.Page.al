@@ -85,6 +85,16 @@ page 6059884 "NPR TM Ticket Item Card"
                         _Item.Modify();
                     end;
                 }
+                field(POSAdmitAction; _Item."NPR POS Admit Action")
+                {
+                    ToolTip = 'Specifies if tickets will be printed and admitted in the Print & Admit POS Action.';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    trigger OnValidate()
+                    begin
+                        _Item.Modify();
+                    end;
+                }
+
             }
             part(TicketBom; "NPR TM Ticket BOM Part")
             {

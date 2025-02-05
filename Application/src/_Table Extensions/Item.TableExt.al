@@ -256,6 +256,11 @@ tableextension 6014427 "NPR Item" extends Item
                     Rec."NPR Visibility" := Rec."NPR Visibility"::Hidden;
             end;
         }
+        field(6059785; "NPR POS Admit Action"; Enum "NPR TM POS Admit Action")
+        {
+            Caption = 'POS Admit Action';
+            DataClassification = CustomerContent;
+        }
         field(6150937; "NPR CreateAttractionWallet"; Boolean)
         {
             Caption = 'Create Attraction Wallet';

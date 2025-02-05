@@ -1058,6 +1058,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Implementation = "NPR IPOS Workflow" = "NPR POSAction: ChangePmtMethod";
 
     }
+    value(351; "TM_PRINT_AND_ADMIT")
+    {
+        Caption = 'TM_PRINT_AND_ADMIT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action Print and Admit";
+    }
     value(330; "SI_INS_RET_SALE")
     {
         Caption = 'SI_INS_RET_SALE', Locked = true, MaxLength = 20;
