@@ -206,10 +206,9 @@ codeunit 6184647 "NPR IT Audit Mgt."
             exit;
 
         ITFiscalizationSetup.ChangeCompany(CompanyName);
-        if ITFiscalizationSetup.Get() then
-            ITFiscalizationSetup.Delete()
-        else
+        if not (ITFiscalizationSetup.Get() and ITFiscalizationSetup."Enable IT Fiscal") then
             exit;
+        ITFiscalizationSetup.Delete();
 
         ITPOSUnitMapping.ChangeCompany(CompanyName);
         ITPOSUnitMapping.SetFilter("Fiscal Printer IP Address", '<>''');

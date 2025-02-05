@@ -55,19 +55,19 @@ codeunit 6184848 "NPR AT Audit Mgt."
             exit;
 
         ATFiscalizationSetup.ChangeCompany(CompanyName);
-        if ATFiscalizationSetup.Get() then begin
-            if ATSecretMgt.HasSecretKey(ATFiscalizationSetup.GetFONParticipantId()) then
-                ATSecretMgt.RemoveSecretKey(ATFiscalizationSetup.GetFONParticipantId());
-
-            if ATSecretMgt.HasSecretKey(ATFiscalizationSetup.GetFONUserId()) then
-                ATSecretMgt.RemoveSecretKey(ATFiscalizationSetup.GetFONUserId());
-
-            if ATSecretMgt.HasSecretKey(ATFiscalizationSetup.GetFONUserPIN()) then
-                ATSecretMgt.RemoveSecretKey(ATFiscalizationSetup.GetFONUserPIN());
-
-            ATFiscalizationSetup.Delete();
-        end else
+        if not (ATFiscalizationSetup.Get() and ATFiscalizationSetup."AT Fiscal Enabled") then
             exit;
+
+        if ATSecretMgt.HasSecretKey(ATFiscalizationSetup.GetFONParticipantId()) then
+            ATSecretMgt.RemoveSecretKey(ATFiscalizationSetup.GetFONParticipantId());
+
+        if ATSecretMgt.HasSecretKey(ATFiscalizationSetup.GetFONUserId()) then
+            ATSecretMgt.RemoveSecretKey(ATFiscalizationSetup.GetFONUserId());
+
+        if ATSecretMgt.HasSecretKey(ATFiscalizationSetup.GetFONUserPIN()) then
+            ATSecretMgt.RemoveSecretKey(ATFiscalizationSetup.GetFONUserPIN());
+
+        ATFiscalizationSetup.Delete();
 
         ATOrganization.ChangeCompany(CompanyName);
         if ATOrganization.FindSet(true) then

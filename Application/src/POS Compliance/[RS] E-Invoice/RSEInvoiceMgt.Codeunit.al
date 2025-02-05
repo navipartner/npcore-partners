@@ -14,11 +14,11 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
             exit;
 
         RSEInvoiceSetup.ChangeCompany(CompanyName);
-        if RSEInvoiceSetup.Get() then begin
-            Clear(RSEInvoiceSetup."API Key");
-            Clear(RSEInvoiceSetup."API URL");
-            RSEInvoiceSetup.Modify();
-        end
+        if not (RSEInvoiceSetup.Get() and RSEInvoiceSetup."Enable RS E-Invoice") then
+            exit;
+        Clear(RSEInvoiceSetup."API Key");
+        Clear(RSEInvoiceSetup."API URL");
+        RSEInvoiceSetup.Modify();
     end;
 #endif
 

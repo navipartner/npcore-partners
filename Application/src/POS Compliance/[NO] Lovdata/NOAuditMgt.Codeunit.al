@@ -80,12 +80,12 @@ codeunit 6151548 "NPR NO Audit Mgt."
             exit;
 
         NOFiscalizationSetup.ChangeCompany(CompanyName);
-        if NOFiscalizationSetup.Get() then begin
-            Clear(NOFiscalizationSetup."Signing Certificate");
-            Clear(NOFiscalizationSetup."Signing Certificate Password");
-            Clear(NOFiscalizationSetup."Signing Certificate Thumbprint");
-            NOFiscalizationSetup.Modify();
-        end;
+        if not (NOFiscalizationSetup.Get() and NOFiscalizationSetup."Enable NO Fiscal") then
+            exit;
+        Clear(NOFiscalizationSetup."Signing Certificate");
+        Clear(NOFiscalizationSetup."Signing Certificate Password");
+        Clear(NOFiscalizationSetup."Signing Certificate Thumbprint");
+        NOFiscalizationSetup.Modify();
     end;
 #endif
 

@@ -203,10 +203,9 @@
             exit;
 
         SEFiscalizationSetup.ChangeCompany(CompanyName);
-        if SEFiscalizationSetup.Get() then
-            SEFiscalizationSetup.Delete()
-        else
+        if not (SEFiscalizationSetup.Get() and SEFiscalizationSetup."Enable SE Fiscal") then
             exit;
+        SEFiscalizationSetup.Delete();
 
         CleanCashSetup.ChangeCompany(CompanyName);
         CleanCashSetup.ModifyAll("Organization ID", '');
