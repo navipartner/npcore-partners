@@ -103,7 +103,7 @@ codeunit 6248219 "NPR MembershipCatalogAgent"
             SalesSetup."Business Flow Type"::ADD_ANONYMOUS_MEMBER:
                 exit('addAnonymousMember');
             SalesSetup."Business Flow Type"::ADD_NAMED_MEMBER:
-                exit('addNamedMember');
+                exit('addMember');
         end;
     end;
 }
