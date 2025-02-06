@@ -77,6 +77,12 @@ table 6150987 "NPR SGEntryLog"
             Caption = 'Api Error Number';
         }
 
+        field(117; ApiErrorMessage; Text[250])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Api Error Message';
+        }
+
         field(120; ExtraEntityTableId; integer)
         {
             DataClassification = CustomerContent;
@@ -86,6 +92,12 @@ table 6150987 "NPR SGEntryLog"
         {
             DataClassification = CustomerContent;
             Caption = 'Extra Entity Id';
+        }
+
+        field(130; ProfileLineId; Guid)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Profile Line Id';
         }
     }
 

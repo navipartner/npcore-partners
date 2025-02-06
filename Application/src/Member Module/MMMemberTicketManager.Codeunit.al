@@ -443,7 +443,7 @@
         Member.Get(MemberEntryNo);
         ExternalItemNo := MemberRetailIntegration.POS_GetExternalTicketItemForMembership(MembershipEntryNo, false);
 
-        TicketIsReused := SelectReusableTicket(Member."Entry No.", '', AdmissionCode, PosUnitNo, Qty, TicketTokenToIgnore, Ticket);
+        TicketIsReused := SelectReusableTicket(Member."Entry No.", ExternalItemNo, AdmissionCode, PosUnitNo, Qty, TicketTokenToIgnore, Ticket);
         if ((not TicketIsReused) and (ExternalItemNo = '')) then
             Error(MemberTicketNotSetup, Member."External Member No.", AdmissionCode, PosUnitNo);
 
@@ -459,6 +459,49 @@
 
         ExternalTicketNo := Ticket."External Ticket No.";
     end;
+
+    internal procedure MemberGuestFastCheckInNoPrint(MembershipAdmissionSetupId: Guid; AttemptTicketReuse: Boolean; MembershipEntryNo: Integer; MemberEntryNo: Integer; AdmissionCode: Code[20]; PosUnitNo: Code[10]; Qty: Integer; TicketTokenToIgnore: Text[100]; var ExternalTicketNo: Text[30])
+    var
+        MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+        MembershipAdmissionSetup: Record "NPR MM Members. Admis. Setup";
+        Member: Record "NPR MM Member";
+        Membership: Record "NPR MM Membership";
+        MemberTicketNotSetup: Label 'No ticket reservation found for member %1 that is valid for today, with admission code [%2] or an admission code selected from POS unit [%3].';
+        TicketNo: Code[20];
+        ItemNo: Code[20];
+        VariantCode: Code[10];
+        ResolvingTable: Integer;
+        TicketIsReused: Boolean;
+        ErrorReason: Text;
+        ExternalItemNo: Code[50];
+        Ticket: Record "NPR TM Ticket";
+    begin
+        MembershipAdmissionSetup.GetBySystemId(MembershipAdmissionSetupId);
+        Membership.Get(MembershipEntryNo);
+        Member.Get(MemberEntryNo);
+
+        ExternalItemNo := MembershipAdmissionSetup."Ticket No.";
+
+        if (AttemptTicketReuse) then
+            TicketIsReused := SelectReusableTicket(Member."Entry No.", ExternalItemNo, AdmissionCode, PosUnitNo, Qty, TicketTokenToIgnore, Ticket);
+
+        if ((not TicketIsReused) and (ExternalItemNo = '')) then
+            Error(MemberTicketNotSetup, Member."External Member No.", AdmissionCode, PosUnitNo);
+
+        // Create new ticket - only possible when ExternalItemNo <> ''
+        if (not TicketIsReused) then begin
+            if (not (MemberRetailIntegration.TranslateBarcodeToItemVariant(ExternalItemNo, ItemNo, VariantCode, ResolvingTable))) then
+                Error(MISSING_CROSSREF);
+
+            MemberRetailIntegration.IssueTicketFromMemberScan(true, ItemNo, VariantCode, Member, TicketNo, ErrorReason);
+            TicketManagement.RegisterArrivalScanTicket("NPR TM TicketIdentifierType"::INTERNAL_TICKET_NO, TicketNo, AdmissionCode, -1, PosUnitNo, '', false);
+            Ticket.Get(TicketNo);
+        end;
+
+        ExternalTicketNo := Ticket."External Ticket No.";
+    end;
+
 
     local procedure BuildMemberGuestRequest(MembershipEntryNo: Integer; MemberEntryNo: Integer; var TmpTicketReservationRequest: Record "NPR TM Ticket Reservation Req." temporary): Boolean
     var
