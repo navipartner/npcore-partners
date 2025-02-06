@@ -153,10 +153,12 @@ page 6184906 "NPR SG EntryLogList"
     var
         ApiError: Enum "NPR API Error Code";
     begin
-        _ErrorMessage := '';
-        if (Rec.ApiErrorNumber <> 0) then begin
-            ApiError := Enum::"NPR API Error Code".FromInteger(Rec.ApiErrorNumber);
-            _ErrorMessage := Format(ApiError, 0, 1)
-        end;
+        _ErrorMessage := Rec.ApiErrorMessage;
+
+        if (_ErrorMessage = '') then
+            if (Rec.ApiErrorNumber <> 0) then begin
+                ApiError := Enum::"NPR API Error Code".FromInteger(Rec.ApiErrorNumber);
+                _ErrorMessage := Format(ApiError, 0, 1)
+            end;
     end;
 }

@@ -73,13 +73,15 @@ types:
               description: "Guest 1"
               admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
               maxNumberOfGuests: 1
+              guestsAdmittedToday: 0
 
   MemberDetails:
     properties:
       memberId: simpleTypes.MemberId
-      firstName: simpleTypes.FirstName
-      lastName: simpleTypes.LastName
-      hasPicture: simpleTypes.HasPicture
+      firstName: optional<simpleTypes.FirstName>
+      lastName: optional<simpleTypes.LastName>
+      hasPicture: optional<simpleTypes.HasPicture>
+      picture: optional<simpleTypes.Base64Image>
     examples:
       - name: ExampleMemberDetails
         value:
@@ -111,6 +113,7 @@ types:
       description: simpleTypes.Description
       admissionCode: simpleTypes.AdmissionCode
       maxNumberOfGuests: simpleTypes.MaxNumberOfGuests
+      guestsAdmittedToday: simpleTypes.GuestsAdmittedToday
 
   WalletDetails:
     docs:

@@ -58,6 +58,13 @@ types:
       - name: ExampleQuantity
         value: 1
 
+  GuestsAdmittedToday:
+    type: integer
+    docs: The number of guests admitted today.
+    examples:
+      - name: ExampleQuantity
+        value: 1
+
   ScanCount:
     type: integer
     docs: The number of times the ticket has been scanned
