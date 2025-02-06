@@ -8,6 +8,7 @@ page 6059845 "NPR Generic Filter Page"
     PageType = List;
     SourceTable = "Field";
     UsageCategory = None;
+    Permissions = TableData "Field" = rm;
 
     layout
     {
@@ -417,9 +418,9 @@ page 6059845 "NPR Generic Filter Page"
                         SortingKeyEndPos := StrPos(CompleteFilterText, ')' + WhereKeyWord) - 1;
                     end;
                 else begin
-                        FilterStartPosition := StrLen(CompleteFilterText) + 1;
-                        SortingKeyEndPos := StrPos(CompleteFilterText, ')') - 1;
-                    end;
+                    FilterStartPosition := StrLen(CompleteFilterText) + 1;
+                    SortingKeyEndPos := StrPos(CompleteFilterText, ')') - 1;
+                end;
             end;
             SortingKey := CopyStr(PadStr(CompleteFilterText, SortingKeyEndPos), StrLen(SortingKeyWord) + 1);
             CompleteFilterText := CopyStr(CompleteFilterText, FilterStartPosition);

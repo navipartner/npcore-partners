@@ -270,34 +270,63 @@
         end;
     end;
 
-    local procedure SetPOSUnitFilter(TableNo: Integer; var FilterStringText: Text)
+    local procedure SetPOSUnitFilter(TableNo: Integer; var FilterText: Text)
     var
+        DataTypeManagement: Codeunit "Data Type Management";
+        GenericFilterEvents: Codeunit "NPR Generic Filter Events";
+        FieldRef: FieldRef;
         FilterRecRef: RecordRef;
-        FilterRecVariant: Variant;
-        POSEntry: Record "NPR POS Entry";
+        Handled: Boolean;
     begin
+        GenericFilterEvents.OnBeforeSetCurrentPOSUnitFilter(TableNo, FilterText, Handled);
+        if Handled then
+            exit;
 
         FilterRecRef.Open(TableNo);
-        if FilterStringText <> '' then FilterRecRef.SetView(FilterStringText);
-        FilterRecVariant := FilterRecRef;
 
-        case TableNo of
-            DATABASE::"NPR POS Entry":
-                begin
-                    POSEntry.SetView(FilterRecRef.GetView());
-                    POSEntry.CopyFilters(FilterRecVariant);
-                    POSEntry.SetFilter("POS Unit No.", '=%1', GetPosUnitNo());
-                    FilterStringText := POSEntry.GetView();
-                end;
+        if FilterText <> '' then
+            FilterRecRef.SetView(FilterText);
+
+        case true of
+            DataTypeManagement.FindFieldByName(FilterRecRef, FieldRef, 'POS Unit No.'):
+                FieldRef.SetRange(GetPosUnitNo());
+            DataTypeManagement.FindFieldByName(FilterRecRef, FieldRef, 'Register No.'):
+                FieldRef.SetRange(GetPosUnitNo());
+            DataTypeManagement.FindFieldByName(FilterRecRef, FieldRef, 'POS Unit'):
+                FieldRef.SetRange(GetPosUnitNo());
+            DataTypeManagement.FindFieldByName(FilterRecRef, FieldRef, 'Sales Register No.'):
+                FieldRef.SetRange(GetPosUnitNo());
+            DataTypeManagement.FindFieldByName(FilterRecRef, FieldRef, 'NPR CRO POS Unit'):
+                FieldRef.SetRange(GetPosUnitNo());
+            DataTypeManagement.FindFieldByName(FilterRecRef, FieldRef, 'NPR Register Number'):
+                FieldRef.SetRange(GetPosUnitNo());
+            DataTypeManagement.FindFieldByName(FilterRecRef, FieldRef, 'NPR POS Unit No.'):
+                FieldRef.SetRange(GetPosUnitNo());
+            DataTypeManagement.FindFieldByName(FilterRecRef, FieldRef, 'Cash Register No.'):
+                FieldRef.SetRange(GetPosUnitNo());
+            DataTypeManagement.FindFieldByName(FilterRecRef, FieldRef, 'Cash Register Id'):
+                FieldRef.SetRange(GetPosUnitNo());
+            DataTypeManagement.FindFieldByName(FilterRecRef, FieldRef, 'PosUnitNo'):
+                FieldRef.SetRange(GetPosUnitNo());
+            DataTypeManagement.FindFieldByName(FilterRecRef, FieldRef, 'Register'):
+                FieldRef.SetRange(GetPosUnitNo());
         end;
+
+        FilterText := FilterRecRef.GetView();
+
+        GenericFilterEvents.OnAfterSetCurrentPOSUnitFilter(TableNo, FilterText);
     end;
 
-    local procedure GetPosUnitNo(): Code[10]
+    local procedure GetPosUnitNo():
+                                Code[10]
     var
         POSFrontEndManagement: Codeunit "NPR POS Front End Management";
-        POSSession: Codeunit "NPR POS Session";
-        POSSetup: Codeunit "NPR POS Setup";
-        POSUnit: Record "NPR POS Unit";
+        POSSession:
+                Codeunit "NPR POS Session";
+        POSSetup:
+                Codeunit "NPR POS Setup";
+        POSUnit:
+                Record "NPR POS Unit";
     begin
 
         if (POSSession.IsActiveSession(POSFrontEndManagement)) then begin
