@@ -20,30 +20,54 @@ codeunit 6248217 "NPR Event Billing Client"
         NpBillingApiUrlProductionTok: Label 'https://bc-billing-proxy-api.npretail.app', Locked = true;
         AkvNpBillingApiSharedKeyTok: Label 'NpBillingApiSharedKey', Locked = true;
 
-    procedure RegisterEvent(EventType: Enum "NPR Billing Event Type"; Qty: Decimal)
+    /// <summary>
+    /// Registers an event with the specified identifier, type, and quantity.
+    /// This overload provides a simplified interface by passing an empty metadata object.
+    /// The EventId is used to ensure idempotency, meaning each EventId can only be registered once in the target database.
+    /// </summary>
+    /// <param name="EventId">The unique identifier of the event. Used to ensure idempotency.</param>
+    /// <param name="EventType">The type of the event, defined by the NPR Billing Event Type enumeration.</param>
+    /// <param name="Qty">The quantity associated with the event.</param>
+    /// <returns>Returns true if the event was successfully registered; otherwise, false.</returns>
+    procedure RegisterEvent(EventId: Guid; EventType: Enum "NPR Billing Event Type"; Qty: Decimal): Boolean
     var
         EmptyMetadata: JsonObject;
     begin
-        RegisterEvent(EventType, Qty, EmptyMetadata.AsToken());
+        exit(RegisterEvent(EventId, EventType, Qty, EmptyMetadata.AsToken()));
     end;
 
-    procedure RegisterEvent(EventType: Enum "NPR Billing Event Type"; Qty: Decimal; Metadata: JsonToken)
+    /// <summary>
+    /// Registers an event with the specified identifier, type, quantity, and metadata.
+    /// The EventId is used to ensure idempotency, meaning each EventId can only be registered once in the target database.
+    /// </summary>
+    /// <param name="EventId">The unique identifier of the event. Used to ensure idempotency.</param>
+    /// <param name="EventType">The type of the event, defined by the NPR Billing Event Type enumeration.</param>
+    /// <param name="Qty">The quantity associated with the event.</param>
+    /// <param name="Metadata">Additional metadata related to the event, passed as a JSON token.</param>
+    /// <returns>Returns true if the event was successfully registered; otherwise, false.</returns>
+    procedure RegisterEvent(EventId: Guid; EventType: Enum "NPR Billing Event Type"; Qty: Decimal; Metadata: JsonToken): Boolean
     begin
-        RegisterEventInternal(EventType, Qty, Metadata);
+        exit(RegisterEventInternal(EventId, EventType, Qty, Metadata));
     end;
 
-    local procedure RegisterEventInternal(EventType: Enum "NPR Billing Event Type"; Qty: Decimal; Metadata: JsonToken)
+    local procedure RegisterEventInternal(EventId: Guid; EventType: Enum "NPR Billing Event Type"; Qty: Decimal; Metadata: JsonToken): Boolean
     var
         LogCustDims: Dictionary of [Text, Text];
+        TryMethodSuccessful: Boolean;
+        HttpMethodSucessful: Boolean;
     begin
-        if (not TryRegisterEvent(EventType, Qty, Metadata)) then begin
+        TryMethodSuccessful := TryRegisterEvent(EventId, EventType, Qty, Metadata, HttpMethodSucessful);
+
+        if (not TryMethodSuccessful) then begin
             LogCustDims.Add('operation', 'TryRegisterEvent');
             Session.LogMessage('NPR_API_NpBilling', GetLastErrorText(), Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, LogCustDims);
         end;
+
+        exit(TryMethodSuccessful and HttpMethodSucessful);
     end;
 
     [TryFunction]
-    local procedure TryRegisterEvent(EventType: Enum "NPR Billing Event Type"; Qty: Decimal; Metadata: JsonToken)
+    local procedure TryRegisterEvent(EventId: Guid; EventType: Enum "NPR Billing Event Type"; Qty: Decimal; Metadata: JsonToken; var HttpMethodSucessful: Boolean)
     var
         RequestJToken: JsonToken;
     begin
@@ -52,8 +76,8 @@ codeunit 6248217 "NPR Event Billing Client"
         if (not SendToBillingDB()) then
             exit;
 
-        RequestJToken := GetEventJson(EventType, Qty, Metadata);
-        ProcessData(RequestJToken);
+        RequestJToken := GetEventJson(EventId, EventType, Qty, Metadata);
+        HttpMethodSucessful := ProcessData(RequestJToken);
     end;
 
     local procedure InitSessionVars()
@@ -71,7 +95,7 @@ codeunit 6248217 "NPR Event Billing Client"
         SessionVarsInitialized := true;
     end;
 
-    local procedure GetEventJson(EventType: Enum "NPR Billing Event Type"; Qty: Decimal; Metadata: JsonToken): JsonToken
+    local procedure GetEventJson(EventId: Guid; EventType: Enum "NPR Billing Event Type"; Qty: Decimal; Metadata: JsonToken): JsonToken
     var
         JsonBuilder: Codeunit "NPR Json Builder";
         MetadataJsonString: Text;
@@ -82,7 +106,7 @@ codeunit 6248217 "NPR Event Billing Client"
             .Initialize()
             .AddProperty('tableName', 'public.bceventstd')
             .StartObject('values')
-                .AddProperty('event_id', CreateGuid())
+                .AddProperty('event_id', EventId)
                 .AddProperty('timestamp', ConvertDateTimeToPostgresDT(CurrentDateTime()))
                 .AddProperty('is_saas', IsSaaSValue)
                 .AddProperty('tenant_id', CopyStr(TenantId, 1, 50))
@@ -99,7 +123,7 @@ codeunit 6248217 "NPR Event Billing Client"
             .BuildAsJsonToken());
     end;
 
-    local procedure ProcessData(ReqJsonToken: JsonToken)
+    local procedure ProcessData(ReqJsonToken: JsonToken) RetVal: Boolean
     var
         SentryScope: Codeunit "NPR Sentry Scope";
         SentryActiveSpan: Codeunit "NPR Sentry Span";
@@ -115,7 +139,8 @@ codeunit 6248217 "NPR Event Billing Client"
 
         Response := SendData(ReqJsonToken);
 
-        if (not Response.GetIsSuccessStatusCode()) then begin
+        RetVal := Response.GetIsSuccessStatusCode();
+        if (not RetVal) then begin
             ReqJsonToken.WriteTo(ReqTokenText);
             LogCustDims.Add('operation', 'HttpRequest');
             LogCustDims.Add('http.request.body', ReqTokenText);
@@ -124,6 +149,8 @@ codeunit 6248217 "NPR Event Billing Client"
         end;
 
         SentryRegisterBillingEventSpan.Finish();
+
+        exit(RetVal);
     end;
 
     local procedure SendData(ReqJsonToken: JsonToken) Response: Codeunit "Http Response Message"
