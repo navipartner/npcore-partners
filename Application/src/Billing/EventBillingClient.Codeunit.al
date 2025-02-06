@@ -32,7 +32,7 @@ codeunit 6248217 "NPR Event Billing Client"
         RegisterEventInternal(EventType, Qty, Metadata);
     end;
 
-    procedure RegisterEventInternal(EventType: Enum "NPR Billing Event Type"; Qty: Decimal; Metadata: JsonToken)
+    local procedure RegisterEventInternal(EventType: Enum "NPR Billing Event Type"; Qty: Decimal; Metadata: JsonToken)
     var
         LogCustDims: Dictionary of [Text, Text];
     begin
