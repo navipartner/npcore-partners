@@ -41,12 +41,20 @@ pageextension 6014532 "NPR Company Information" extends "Company Information"
                 ToolTip = 'Executes the Check NP Retail License action.';
                 trigger OnAction()
                 var
+                    Company: Record Company;
                     TempClientDiagnostic: Record "NPR Client Diagnostic v2" temporary;
-                    ServiceTierUserMgt: Codeunit "NPR Service Tier User Mgt.";
+                    EnvironmentInformation: Codeunit "Environment Information";
                 begin
+                    if EnvironmentInformation.IsSandbox() then
+                        exit;
+
+                    if Company.Get(CompanyName()) then
+                        if Company."Evaluation Company" then
+                            exit;
+
                     TempClientDiagnostic."User Security ID" := UserSecurityId();
-                    TempClientDiagnostic."User Login Type" := TempClientDiagnostic."User Login Type"::POS;
-                    ServiceTierUserMgt.InitCaseSystemCallback(TempClientDiagnostic);
+                    TempClientDiagnostic."User Login Type" := TempClientDiagnostic."User Login Type"::BC;
+                    if Codeunit.Run(Codeunit::"NPR Invoke CaseSystem Login", TempClientDiagnostic) then;
                 end;
             }
         }
