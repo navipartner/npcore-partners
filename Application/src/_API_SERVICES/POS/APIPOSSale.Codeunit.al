@@ -4,12 +4,18 @@ codeunit 6185056 "NPR API POS Sale" implements "NPR API Request Handler"
     Access = Internal;
 
     procedure Handle(var Request: Codeunit "NPR API Request"): Codeunit "NPR API Response"
+    var
+        APIPOSSalesperson: Codeunit "NPR API POS Salesperson";
     begin
         case true of
             Request.Match('GET', '/pos/sale/search'):
                 exit(SearchSale(Request));
             Request.Match('GET', '/pos/sale/:saleId'):
                 exit(GetSale(Request));
+            Request.Match('POST', 'pos/salesperson/login'):
+                exit(APIPOSSalesperson.Login(Request));
+            request.Match('GET', 'pos/salesperson/:id'):
+                exit(APIPOSSalesperson.GetSalesperson(Request));
         end;
     end;
 
