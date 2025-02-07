@@ -532,6 +532,9 @@
             if (TenantDiagnostic."POS Stores" <> TenantDiagnostic."POS Stores Sent on Last Upd.") or (TenantDiagnostic."POS Units" <> TenantDiagnostic."POS Units Sent on Last Upd.") then
                 ShouldSendRequest := true;
 
+        if GuiAllowed then
+            ShouldSendRequest := true;
+
         if not ShouldSendRequest then
             exit;
 
@@ -605,6 +608,9 @@
         if not ShouldSendRequest then
             if (SaasTenantDiagnostic."POS Stores" <> SaasTenantDiagnostic."POS Stores Sent on Last Upd.") or (SaasTenantDiagnostic."POS Units" <> SaasTenantDiagnostic."POS Units Sent on Last Upd.") then
                 ShouldSendRequest := true;
+
+        if GuiAllowed then
+            ShouldSendRequest := true;
 
         if not ShouldSendRequest then
             exit;

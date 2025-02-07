@@ -12,7 +12,7 @@
     begin
         if NPREnvironmentMgt.IsDemo() or NPREnvironmentMgt.IsTest() then
             exit;
-        if not ShouldSendClientDiagnostic(UserLoginType, ClientDiagnostic) then
+        if (not ShouldSendClientDiagnostic(UserLoginType, ClientDiagnostic)) and (not GuiAllowed()) then
             exit;
 
         FindMySession(_ActiveSession);
