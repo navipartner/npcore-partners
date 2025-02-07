@@ -499,10 +499,7 @@
                     SaleLinePOS."Line Type"::"Issue Voucher":
                         SalesLine.Type := SalesLine.Type::"G/L Account";
                     SaleLinePOS."Line Type"::Comment:
-                        begin
-                            SalesLine.Type := SalesLine.Type::" ";
-                            SalesLine.Validate(Quantity, SaleLinePOS.Quantity);
-                        end;
+                        SalesLine.Type := SalesLine.Type::" ";
                     else
                         SalesLine.Type := SalesLine.Type::Item;
                 end;
