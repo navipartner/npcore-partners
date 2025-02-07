@@ -106,6 +106,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
     internal procedure Admit(ResponseJson: Codeunit "NPR JSON Builder"; Token: Guid; Quantity: Integer): Codeunit "NPR JSON Builder"
     var
         ValidationRequest: Record "NPR SGEntryLog";
+        TicketId: Guid;
     begin
         ValidationRequest.SetCurrentKey(Token);
         ValidationRequest.SetFilter(Token, '=%1', Token);
@@ -115,8 +116,13 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
                 if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::TICKET) then
                     AdmitTicket(ValidationRequest, ResponseJson);
 
-                if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::MEMBER_CARD) then
-                    AdmitMemberCard(ValidationRequest, ResponseJson, Quantity);
+                if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::MEMBER_CARD) then begin
+                    if (not IsNullGuid(TicketId) and (ValidationRequest.ExtraEntityTableId = 0)) then begin
+                        ValidationRequest.ExtraEntityId := TicketId;
+                        ValidationRequest.ExtraEntityTableId := Database::"NPR TM Ticket";
+                    end;
+                    TicketId := AdmitMemberCard(ValidationRequest, ResponseJson, Quantity);
+                end;
 
                 if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::WALLET) then
                     AdmitWallet(ValidationRequest, ResponseJson);
@@ -162,7 +168,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             .EndObject();
     end;
 
-    local procedure AdmitMemberCard(ValidationRequest: Record "NPR SGEntryLog"; ResponseJson: Codeunit "NPR JSON Builder"; Quantity: Integer)
+    local procedure AdmitMemberCard(ValidationRequest: Record "NPR SGEntryLog"; ResponseJson: Codeunit "NPR JSON Builder"; Quantity: Integer): Guid
     var
         SpeedGateMgr: Codeunit "NPR SG SpeedGate";
         Ticket: Record "NPR TM Ticket";
@@ -206,6 +212,8 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
                 until (ValidationRequestResponse.Next() = 0);
             end;
         end;
+
+        exit(Ticket.SystemId);
     end;
 
     internal procedure MarkAsDenied(var Request: Codeunit "NPR API Request"; ErrorCode: Enum "NPR API Error Code"; ErrorMessage: Text) Response: Codeunit "NPR API Response"
@@ -551,7 +559,8 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
                 MemberCardProfileLine.Init();
 
         MembershipGuest.SetFilter("Membership  Code", '=%1', MembershipCode);
-        MembershipGuest.SetFilter("Admission Code", '=%1', SourceValidationRequest.AdmissionCode);
+        if (SourceValidationRequest.AdmissionCode <> '') then
+            MembershipGuest.SetFilter("Admission Code", '=%1', SourceValidationRequest.AdmissionCode);
 
         ShowGuests := MembershipGuest.FindSet()
                       and MemberCard.GetBySystemId(SourceValidationRequest.EntityId)
