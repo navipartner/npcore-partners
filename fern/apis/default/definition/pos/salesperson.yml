@@ -1,0 +1,76 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+
+types:
+  salespersonId: 
+    type: uuid
+    docs: The id of a salesperson.
+
+  SalespersonLogin:
+    docs: A request to login a salesperson
+    properties:
+      pin: string
+    examples:
+      - name: ExampleSalespersonLogin
+        value:
+          pin: "1234"
+  
+  SalespersonInfo:
+    docs: Information about a salesperson
+    properties:
+      id: salespersonId
+      code: 
+        type: string
+        docs: The code of the Salesperson
+      name: 
+        type: string
+        docs: The name of the Salesperson
+    examples:
+      - name: ExampleSalespersonInfo
+        value:
+          id: "12345678-1234-1234-1234-123456789012"
+          code: "12345"
+          name: "Salesperson Name"
+
+service:
+  auth: true
+  base-path: /pos
+  endpoints: 
+    getSalesperson:
+      display-name: Salesperson
+      docs: Get a Salesperson by Id
+      method: GET
+      path: "/salesperson/{id}"
+      path-parameters:
+        id: salespersonId
+      request:
+        name: getSalespersonRequest
+      response: SalespersonInfo
+      examples:
+        - name: Example successful login
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            id: "12345678-1234-1234-1234-123456789012"
+          response:
+            body: $SalespersonInfo.ExampleSalespersonInfo
+
+    login:
+      display-name: Login
+      docs: Validate a salesperson's pin
+      method: POST
+      path: "/salesperson/login"
+      request: SalespersonLogin
+      response: SalespersonInfo
+      examples:
+        - name: Example successful login
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          request: $SalespersonLogin.ExampleSalespersonLogin
+          response:
+            body: $SalespersonInfo.ExampleSalespersonInfo
