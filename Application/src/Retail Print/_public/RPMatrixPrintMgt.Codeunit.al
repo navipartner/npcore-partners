@@ -385,7 +385,7 @@ codeunit 6014547 "NPR RP Matrix Print Mgt."
                     TemplateLine."Hide HRI");
     end;
 
-    local procedure UpdateField(X: Integer; Y: Integer; Align: Integer; Width: Integer; Rotation: Integer; Height: Integer; Font: Text[30]; Text: Text[2048]; HideHRI: Boolean)
+    internal procedure UpdateField(X: Integer; Y: Integer; Align: Integer; Width: Integer; Rotation: Integer; Height: Integer; Font: Text[30]; Text: Text[2048]; HideHRI: Boolean)
     begin
         TempGlobalBuffer."Line No." := CurrentLineNo;
         TempGlobalBuffer.Text := Text;

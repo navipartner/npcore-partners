@@ -70,4 +70,9 @@ codeunit 6060039 "NPR RP Matrix Print"
     begin
         RPMatrixPrintMgt.SetDecimalRounding(DecimalRoundingIn);
     end;
+
+    procedure UpdateField(X: Integer; Y: Integer; Align: Integer; Width: Integer; Rotation: Integer; Height: Integer; Font: Text[30]; Text: Text[2048]; HideHRI: Boolean)
+    begin
+        RPMatrixPrintMgt.UpdateField(X, Y, Align, Width, Rotation, Height, Font, Text, HideHRI);
+    end;
 }
