@@ -118,7 +118,6 @@ codeunit 6060069 "NPR POSAction Deliv. CnC Ord.B"
         SaleLinePOS: Record "NPR POS Sale Line";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        TempNpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon" temporary;
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
@@ -160,7 +159,7 @@ codeunit 6060069 "NPR POSAction Deliv. CnC Ord.B"
             POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
             SaleLinePOS.SetCurrentKey("Register No.", "Sales Ticket No.", Date, "Sale Type", "Line No.");
             SaleLinePOS.SetRecFilter();
-            SalesDocImpMgt.SalesDocumentToPOSCustom(POSSession, SalesHeader, TempNpDcSaleLinePOSCoupon, false, false);
+            SalesDocImpMgt.SalesDocumentToPOSCustom(POSSession, SalesHeader, false, false);
             SaleLinePOS.SetFilter("Line No.", '>%1', SaleLinePOS."Line No.");
             if SaleLinePOS.FindSet() then
                 repeat
