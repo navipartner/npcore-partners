@@ -9,7 +9,9 @@ codeunit 6185034 "NPR MM Subscr. Renew Proc. JQ"
         NpPaySetup: Record "NPR Adyen Setup";
         SubscrRenewProcess: Codeunit "NPR MM Subscr. Renew: Process";
     begin
-        NpPaySetup.Get();
+        if not NpPaySetup.Get() then
+            exit;
+
         SubscriptionRequest.SetFilter(Type, '%1|%2', SubscriptionRequest.Type::Renew, SubscriptionRequest.Type::Regret);
         if NpPaySetup."Auto Process Subs Req Errors" then begin
             SubscriptionRequest.SetFilter("Processing Status", '%1|%2', SubscriptionRequest."Processing Status"::Pending, SubscriptionRequest."Processing Status"::Error);
