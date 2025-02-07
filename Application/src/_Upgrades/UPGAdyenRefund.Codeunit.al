@@ -16,28 +16,32 @@ codeunit 6248240 "NPR UPG Adyen Refund"
 
     local procedure CreateAdyenRefundJobs()
     var
-        RefundEventFilter: Label 'REFUND', Locked = true;
-        AdyenManagement: Codeunit "NPR Adyen Management";
         SubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup";
         MMSubsPaymentGateway: Record "NPR MM Subs. Payment Gateway";
+        NpPaySetup: Record "NPR Adyen Setup";
+        AdyenManagement: Codeunit "NPR Adyen Management";
+        RefundEventFilter: Label 'REFUND', Locked = true;
         AdyenWebhookType: Enum "NPR Adyen Webhook Type";
     begin
         UpgradeStep := 'CreateAdyenRefundJobs';
         if HasUpgradeTag() then
             exit;
 
-        MMSubsPaymentGateway.SetRange("Integration Type", MMSubsPaymentGateway."Integration Type"::Adyen);
-        MMSubsPaymentGateway.SetRange(Status, MMSubsPaymentGateway.Status::Enabled);
-        if not MMSubsPaymentGateway.FindFirst() then
-            exit;
+        if NpPaySetup.Get() then
+            if NpPaySetup."Enable Reconciliation" and (NpPaySetup."Management API Key" <> '') then begin
 
-        SubsAdyenPGSetup.SetLoadFields("Merchant Name");
-        if not SubsAdyenPGSetup.Get(MMSubsPaymentGateway.Code) then
-            exit;
+                MMSubsPaymentGateway.SetRange("Integration Type", MMSubsPaymentGateway."Integration Type"::Adyen);
+                MMSubsPaymentGateway.SetRange(Status, MMSubsPaymentGateway.Status::Enabled);
+                if MMSubsPaymentGateway.FindFirst() then begin
 
-        AdyenManagement.EnsureAdyenWebhookSetup(RefundEventFilter, SubsAdyenPGSetup."Merchant Name", AdyenWebhookType::standard);
-        AdyenManagement.ScheduleRefundStatusJQ();
+                    SubsAdyenPGSetup.SetLoadFields("Merchant Name");
+                    if SubsAdyenPGSetup.Get(MMSubsPaymentGateway.Code) then begin
 
+                        AdyenManagement.EnsureAdyenWebhookSetup(RefundEventFilter, SubsAdyenPGSetup."Merchant Name", AdyenWebhookType::standard);
+                        AdyenManagement.ScheduleRefundStatusJQ();
+                    end;
+                end;
+            end;
         SetUpgradeTag();
     end;
 
