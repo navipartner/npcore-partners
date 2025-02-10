@@ -5,7 +5,7 @@ imports:
   posApiTypes: ./../pos/pos-api-types.yml
 
 types:
-  saleId:
+  externalSaleId:
     type: uuid
 
   lineId:
@@ -32,7 +32,7 @@ types:
 
   ExternalPOSSale:
     properties:
-      saleId: saleId
+      saleId: externalSaleId
       startedAt: datetime
       posStore: string
       posUnit: string
@@ -215,14 +215,14 @@ types:
 
 service:
   auth: true
-  base-path: /externalpos
+  base-path: /pos
   endpoints:
     # Until pagination helpers are in place, we will leave this out
     #
     # listExternalPOSSales:
     #   display-name: List External POS Sales
     #   method: GET
-    #   path: "/sales"
+    #   path: "/externalsale"
     #   response: list<ExternalPOSSale>
     #   examples:
     #     - name: ExampleExternalPOSSales
@@ -237,9 +237,9 @@ service:
     getExternalPOSSale:
       display-name: Get External POS Sale
       method: GET
-      path: "/sales/{saleId}"
+      path: "/externalsale/{saleId}"
       path-parameters:
-        saleId: saleId
+        saleId: externalSaleId
       response: ExternalPOSSale
       examples:
         - name: ExampleExternalPOSSales
@@ -254,7 +254,7 @@ service:
     createExternalPOSSale:
       display-name: Create External POS Sale
       method: POST
-      path: "/sales"
+      path: "/externalsale"
       request: CreateExternalPOSSale
       response:
         type: ExternalPOSSale

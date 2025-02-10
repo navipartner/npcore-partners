@@ -5,9 +5,9 @@ codeunit 6185057 "NPR API POS Resolver" implements "NPR API Module Resolver"
 
     procedure Resolve(var Request: Codeunit "NPR API Request"): Interface "NPR API Request Handler"
     var
-        POSSaleAPI: Codeunit "NPR API POS Sale";
+        APIPOSHandler: Codeunit "NPR API POS Handler";
     begin
-        exit(POSSaleAPI);
+        exit(APIPOSHandler);
     end;
 
     procedure GetRequiredPermissionSet(): Text

@@ -13,6 +13,9 @@ enum 6059812 "NPR API Module" implements "NPR API Module Resolver"
     }
     value(2; externalpos)
     {
+        ObsoleteState = Pending;
+        ObsoleteTag = '2025-02-05';
+        ObsoleteReason = 'Segment path changed from externalpos to pos.';
         Implementation = "NPR API Module Resolver" = "NPR API External POS Resolver";
     }
 

@@ -45,7 +45,7 @@ codeunit 6248216 "NPR API External POS Sale" implements "NPR API Request Handler
     end;
     */
 
-    local procedure GetSale(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    internal procedure GetSale(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         ExternalPOSSale: Record "NPR External POS Sale";
         Json: Codeunit "NPR Json Builder";
@@ -67,7 +67,7 @@ codeunit 6248216 "NPR API External POS Sale" implements "NPR API Request Handler
         exit(Response.RespondOK(SaleToJson(Json, ExternalPOSSale)));
     end;
 
-    local procedure CreateSale(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    internal procedure CreateSale(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         CreateJson: JsonObject;
         Success: Boolean;
