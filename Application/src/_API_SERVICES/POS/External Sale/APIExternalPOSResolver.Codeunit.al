@@ -2,6 +2,9 @@
 codeunit 6248215 "NPR API External POS Resolver" implements "NPR API Module Resolver"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-02-05';
+    ObsoleteReason = 'Segment path changed from externalpos to pos.';
     procedure Resolve(var Request: codeunit "NPR API Request"): Interface "NPR API Request Handler"
     var
         EXTPOSSaleAPI: Codeunit "NPR API External POS Sale";

@@ -202,13 +202,9 @@ navigation:
           - pos.salesperson:
               title: Salesperson
               summary: ./docs/pages/pos/salesperson.mdx
-
-        - section: External POS
-          summary: ./docs/pages/externalpos/overview.mdx
-          contents:
-          - externalpos.externalpossale:
+          - pos.externalsale:
               title: External POS Sale
-              summary: ./docs/pages/externalpos/externalpossale.mdx
+              summary: ./docs/pages/pos/externalpossale.mdx
 
 
 navbar-links:

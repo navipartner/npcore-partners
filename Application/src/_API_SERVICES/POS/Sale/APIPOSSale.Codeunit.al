@@ -1,25 +1,9 @@
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
-codeunit 6185056 "NPR API POS Sale" implements "NPR API Request Handler"
+codeunit 6248255 "NPR API POS Sale"
 {
     Access = Internal;
 
-    procedure Handle(var Request: Codeunit "NPR API Request"): Codeunit "NPR API Response"
-    var
-        APIPOSSalesperson: Codeunit "NPR API POS Salesperson";
-    begin
-        case true of
-            Request.Match('GET', '/pos/sale/search'):
-                exit(SearchSale(Request));
-            Request.Match('GET', '/pos/sale/:saleId'):
-                exit(GetSale(Request));
-            Request.Match('POST', 'pos/salesperson/login'):
-                exit(APIPOSSalesperson.Login(Request));
-            request.Match('GET', 'pos/salesperson/:id'):
-                exit(APIPOSSalesperson.GetSalesperson(Request));
-        end;
-    end;
-
-    local procedure SearchSale(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    procedure SearchSale(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         POSUnitFilter: Text;
         POSSale: Record "NPR POS Sale";
@@ -42,7 +26,7 @@ codeunit 6185056 "NPR API POS Sale" implements "NPR API Request Handler"
         exit(Response.RespondOK(POSSaleAsJson(POSSale, WithLines)));
     end;
 
-    local procedure GetSale(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    internal procedure GetSale(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         saleId: Text;
         POSSale: Record "NPR POS Sale";
