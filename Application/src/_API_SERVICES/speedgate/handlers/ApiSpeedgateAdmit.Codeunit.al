@@ -336,7 +336,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         WalletAssetLine.SetFilter(Type, '=%1', ENUM::"NPR WalletLineType"::Ticket);
         if (WalletAssetLine.FindSet()) then begin
             repeat
-                StartSingleTicketAnonymousDTO(ResponseJson, WalletAssetLine.LineTypeSystemId, ValidationRequest.AdmissionCode);
+                StartSingleTicketAnonymousDTO(ResponseJson, ValidationRequest.ScannerId, WalletAssetLine.LineTypeSystemId, ValidationRequest.AdmissionCode);
             until (WalletAssetLine.Next() = 0);
         end;
         ResponseJson.EndArray();
@@ -355,38 +355,61 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
     end;
 
     local procedure StartSingleTicketDTO(var ResponseJson: Codeunit "NPR JSON Builder"; ValidationRequest: Record "NPR SGEntryLog"): Codeunit "NPR JSON Builder"
-    begin
-        ResponseJson
-            .StartObject('ticket')
-            .AddObject(SingleTicketDTO(ResponseJson, ValidationRequest.EntityId, ValidationRequest.AdmissionCode))
-            .EndObject();
-        exit(ResponseJson);
-    end;
-
-    local procedure StartSingleTicketAnonymousDTO(var ResponseJson: Codeunit "NPR JSON Builder"; TicketId: Guid; AdmissionCode: Code[20]): Codeunit "NPR JSON Builder"
-    begin
-        ResponseJson
-            .StartObject()
-            .AddObject(SingleTicketDTO(ResponseJson, TicketId, AdmissionCode))
-            .EndObject();
-        exit(ResponseJson);
-    end;
-
-
-    local procedure SingleTicketDTO(var ResponseJson: Codeunit "NPR JSON Builder"; TicketId: Guid; AdmissionCode: Code[20]): Codeunit "NPR JSON Builder"
     var
         Ticket: Record "NPR TM Ticket";
         AccessEntry: Record "NPR TM Ticket Access Entry";
+    begin
+        if (not Ticket.GetBySystemId(ValidationRequest.EntityId)) then
+            exit(ResponseJson);
+
+        AccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        AccessEntry.SetFilter("Admission Code", '=%1', ValidationRequest.AdmissionCode);
+        if (not AccessEntry.FindFirst()) then
+            exit(ResponseJson);
+
+        ResponseJson
+            .StartObject('ticket')
+            .AddObject(SingleTicketDTO(ResponseJson, Ticket, AccessEntry))
+            .EndObject();
+        exit(ResponseJson);
+    end;
+
+    local procedure StartSingleTicketAnonymousDTO(var ResponseJson: Codeunit "NPR JSON Builder"; ScannerId: Code[10]; TicketId: Guid; AdmissionCode: Code[20]): Codeunit "NPR JSON Builder"
+    var
+        Ticket: Record "NPR TM Ticket";
+        AccessEntry: Record "NPR TM Ticket Access Entry";
+        SpeedGate: Codeunit "NPR SG SpeedGate";
+        ValidAdmitToCodes: List of [Code[20]];
+    begin
+        if (not Ticket.GetBySystemId(TicketId)) then
+            exit(ResponseJson);
+
+        if (AdmissionCode = '') then begin
+            if (not (SpeedGate.CheckTicket(ScannerId, Ticket."External Ticket No.", AdmissionCode, ValidAdmitToCodes))) then
+                exit(ResponseJson);
+        end else begin
+            ValidAdmitToCodes.Add(AdmissionCode);
+        end;
+
+        foreach AdmissionCode in ValidAdmitToCodes do begin
+            AccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+            AccessEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
+
+            if (AccessEntry.FindFirst()) then
+                ResponseJson
+                    .StartObject()
+                    .AddObject(SingleTicketDTO(ResponseJson, Ticket, AccessEntry))
+                    .EndObject();
+        end;
+
+        exit(ResponseJson);
+    end;
+
+    local procedure SingleTicketDTO(var ResponseJson: Codeunit "NPR JSON Builder"; Ticket: Record "NPR TM Ticket"; AccessEntry: Record "NPR TM Ticket Access Entry"): Codeunit "NPR JSON Builder"
+    var
         DetAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         AdmitCount: Integer;
     begin
-        if (not Ticket.GetBySystemId(TicketId)) then
-            exit(ResponseJson.AddProperty('ticket', 'not found'));
-
-        AccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
-        AccessEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
-        if (not AccessEntry.FindFirst()) then
-            exit(ResponseJson.AddProperty('ticket', 'not found'));
 
         if (AccessEntry."Access Date" > 0D) then begin
             DetAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', AccessEntry."Entry No.");
@@ -398,10 +421,10 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         end;
 
         ResponseJson
-            .AddProperty('ticketId', Format(TicketId, 0, 4).ToLower())
+            .AddProperty('ticketId', Format(Ticket.SystemId, 0, 4).ToLower())
             .AddProperty('ticketNumber', Ticket."External Ticket No.")
             .AddProperty('itemNo', Ticket."Item No.")
-            .AddProperty('admissionCode', AdmissionCode)
+            .AddProperty('admissionCode', AccessEntry."Admission Code")
             .AddProperty('admitCount', AdmitCount)
             .AddObject(AddRequiredProperty(ResponseJson, 'admittedAt', DetAccessEntry.SystemCreatedAt))
             .AddObject(AddPrintedTicketDetails(ResponseJson, Ticket));
