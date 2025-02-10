@@ -120,6 +120,8 @@ types:
       Details of a wallet and its tickets
     properties:
       walletId: simpleTypes.WalletId
+      referenceNumber: simpleTypes.ReferenceNumber
+      validToAdmit: simpleTypes.ValidToAdmit
       tickets: list<TicketDetail>
 
 ############################

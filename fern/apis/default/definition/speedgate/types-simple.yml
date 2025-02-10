@@ -175,6 +175,13 @@ types:
       - name: ExampleWalletId
         value: "12345678-aaaa-12d3-aabb-426614174000" 
 
+  ValidToAdmit:
+    type: boolean
+    docs: Indicates if the wallet is valid to admit, ie there is a single ticket or member card that is valid to attempt to admit in this gate.
+    examples:
+      - name: ExampleValidToAdmit
+        value: true
+
   # Member Related Types
 
   CommunityCode:

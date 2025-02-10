@@ -113,6 +113,8 @@ service:
               referenceNumberType: wallet
               wallet: 
                 walletId: $simpleTypes.WalletId.ExampleWalletId
+                referenceNumber: $simpleTypes.ReferenceNumber.ExampleWalletId
+                validToAdmit: true
                 tickets:
                   - $compositeTypes.TicketDetail.ExampleTicketDetail
 
