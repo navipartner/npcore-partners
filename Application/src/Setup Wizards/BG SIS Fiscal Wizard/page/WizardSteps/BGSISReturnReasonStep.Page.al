@@ -20,7 +20,7 @@ page 6151519 "NPR BG SIS Return Reason Step"
                 }
                 field("BG SIS Return Reason"; Rec."BG SIS Return Reason")
                 {
-                    ApplicationArea = NPRBGSISFiscal;
+                    ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Return Reason that is possible to use in Bulgaria.';
                 }
             }

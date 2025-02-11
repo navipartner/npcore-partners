@@ -55,6 +55,7 @@
         ATSCU.FilterGroup(-1);
         ATSCU.SetFilter("Pending At", '<>%1', 0DT);
         ATSCU.SetFilter("Created At", '<>%1', 0DT);
+        ATSCU.FilterGroup(0);
         if not ATSCU.IsEmpty() then
             Error(CannotDeleteErr, TableCaption(), Code, ATSCU.TableCaption());
     end;
