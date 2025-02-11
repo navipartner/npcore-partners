@@ -16,6 +16,16 @@ test.describe("Balancing v4 test", () => {
       process.env?.[`E2E_USER_${workerInfo.parallelIndex}_USERNAME`],
       process.env?.[`E2E_USER_${workerInfo.parallelIndex}_PASSWORD`]
     );
+    const agreeOnBalancingQty = page
+    .frameLocator("iframe")
+    .getByText("Do you agree?");
+
+  if (await agreeOnBalancingQty.isVisible()) {
+    await page
+      .frameLocator("iframe")
+      .getByRole("button", { name: "Yes", exact: true })
+      .click();
+  }
     await page
       .frameLocator("iframe")
       .getByRole("button", { name: "Other functions" })

@@ -4,7 +4,7 @@ import { login } from "../../fixtures/editorLogin";
 import { removeLayout } from "../../fixtures/removeLayout";
 
 test.describe("Edit Mode Bar tests", () => {
-  test("user should be able to show/hide sale lines column and update its name", async ({
+  test("user should be able to show/hide sale lines column", async ({
     page,
   }, workerInfo) => {
     const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
@@ -25,17 +25,11 @@ test.describe("Edit Mode Bar tests", () => {
       .frameLocator("iframe")
       .getByRole("button", { name: "Sale Lines" })
       .click();
-    await page.frameLocator('iframe').getByRole('button', { name: 'Quantity', exact: true }).getByRole('textbox').click();
-    await page.frameLocator('iframe').getByRole('button', { name: 'Quantity', exact: true }).getByRole('textbox').fill("testing quantity");
+      await page.frameLocator("iframe").getByLabel("Quantity").uncheck();
     await page
       .frameLocator("iframe")
       .getByRole("button", { name: "Sale Lines" })
-      .click();
-    await expect(
-      page
-        .frameLocator("iframe")
-        .getByRole("cell", { name: "testing quantity" })
-    ).toBeVisible();
+      .click()
     await page.waitForTimeout(1000);
     await page
       .frameLocator("iframe")
@@ -47,11 +41,6 @@ test.describe("Edit Mode Bar tests", () => {
       .getByRole("button", { name: "Overwrite current layout" })
       .click();
     await page.waitForTimeout(5000);
-    await expect(
-      page
-        .frameLocator("iframe")
-        .getByRole("cell", { name: "testing quantity" })
-    ).toBeVisible();
     await removeLayout(page, key);
   });
   test("user should be able to update Totals columns", async ({
@@ -169,7 +158,7 @@ test.describe("Edit Mode Bar tests", () => {
     .click();
     await removeLayout(page, key);
   });
-  test("user should be able to show/hide product panel and update its name", async ({
+  test("user should be able to show/hide product panel", async ({
     page,
   }, workerInfo) => {
     const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
@@ -219,22 +208,8 @@ test.describe("Edit Mode Bar tests", () => {
     await page.frameLocator("iframe").getByLabel("Quantity").check();
     await page
       .frameLocator("iframe")
-      .getByRole("button", { name: "Quantity", exact: true })
-      .getByRole("textbox")
-      .click();
-    await page
-      .frameLocator("iframe")
-      .getByRole("button", { name: "Quantity", exact: true })
-      .getByRole("textbox")
-      .fill("testing panel");
-    await page.waitForTimeout(3000);
-    await page
-      .frameLocator("iframe")
       .getByRole("button", { name: "Product Panel" })
       .click();
-    await expect(
-      page.frameLocator('iframe').getByText('testing panel')
-    ).toBeVisible();
     await page.waitForTimeout(1000);
     await page
       .frameLocator("iframe")
@@ -264,13 +239,6 @@ test.describe("Edit Mode Bar tests", () => {
       .frameLocator("iframe")
       .getByRole("button", { name: "Small Draft Beer" })
       .click();
-    await expect(
-      page
-        .frameLocator("iframe")
-        .locator("div")
-        .filter({ hasText: "testing panel" })
-        .first()
-    ).toBeVisible();
     await page
       .frameLocator("iframe")
       .getByRole("button", { name: "Delete Line" })

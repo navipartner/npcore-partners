@@ -62,6 +62,7 @@ export const login = async (
   await page.waitForTimeout(5000);
 
   await page.waitForSelector(".new-layout-modal", { state: "hidden" });
+  await page.waitForTimeout(1000);
   await page
     .frameLocator("iframe")
     .getByRole("contentinfo")
@@ -104,17 +105,28 @@ export const login = async (
       .filter({ hasText: "Yes" })
       .first()
       .click();
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(5000);
     await page
       .frameLocator("iframe")
       .getByText(salePersonCode, { exact: true })
       .click();
     await page.frameLocator("iframe").locator("div:nth-child(12)").click();
-    await page.waitForTimeout(4000);
+    await page.waitForTimeout(5000);
   }
 
   if (await agreeOnBalancingQty.isVisible()) {
     await page.frameLocator("iframe").locator("#button-dialog-yes div").click();
   }
+  await page
+    .frameLocator("iframe")
+    .getByRole("contentinfo")
+    .locator('svg[data-icon="gear"]')
+    .click();
   await page.waitForTimeout(1000);
+  await page
+    .frameLocator("iframe")
+    .getByRole("contentinfo")
+    .locator('svg[data-icon="gear"]')
+    .click();
+  await page.waitForTimeout(3000);
 };

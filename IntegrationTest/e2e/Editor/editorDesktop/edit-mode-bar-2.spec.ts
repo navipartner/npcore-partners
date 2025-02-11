@@ -33,7 +33,7 @@ test.describe("Edit Mode Bar tests 2", () => {
       .frameLocator("iframe")
       .getByRole("button", { name: "Change Quantity Small Draft" })
       .click();
-    await page.frameLocator("iframe").locator("#button10 div").click();
+    await page.frameLocator("iframe").locator('span').filter({ hasText: '5' }).first().click();
     await page
       .frameLocator("iframe")
       .locator("span")
