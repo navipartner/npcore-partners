@@ -20,7 +20,7 @@ report 6014554 "NPR CRO Fiscal Bill A4"
             column(LogTimeStamp; Format("Log Timestamp", 8, '<Hours24>:<Minutes,2>:<Seconds,2>')) { }
             column(EntryDate; Format("Entry Date", 0, '<Day,2>/<Month,2>/<Year4>')) { }
             column(JIRCode; "JIR Code") { }
-            column(Bill; StrSubstNo(BillLbl, "POS Store Code", "POS Unit No.", "Bill No.")) { }
+            column(Bill; StrSubstNo(BillLbl, "Bill No.", "POS Store Code", "POS Unit No.")) { }
             column(ZKICode; "ZKI Code") { }
             column(OperatorName; OperatorName) { }
             column(QRCode; QRCode) { }
@@ -369,7 +369,7 @@ report 6014554 "NPR CRO Fiscal Bill A4"
         if CurrReport.Preview() then begin
             if "CRO POS Audit Log Aux Info"."Receipt Printed" then
                 CopyText := MessageLbl
-            else 
+            else
                 "CRO POS Audit Log Aux Info"."Receipt Printed" := true;
         end
     end;
@@ -444,7 +444,7 @@ report 6014554 "NPR CRO Fiscal Bill A4"
         _DocumentNo: Code[20];
         _CROAuditEntryType: Enum "NPR CRO Audit Entry Type";
         _AuditEntryNo: Integer;
-        BillLbl: Label 'RAČUN %1/%2/%3', Comment = '%1 = POS Store Code, %2 = POS Unit No., %3 = Receipt No.', Locked = true;
+        BillLbl: Label 'RAČUN %1/%2/%3', Comment = '%1 = Receipt No., %2 = POS Store Code, %3 = POS Unit No.', Locked = true;
         CompanyName: Text;
         CompanyWebsite: Text;
         CompanyCity: Text;
