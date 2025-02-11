@@ -80,7 +80,7 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
         ResolveTicketRequest(ReferenceNo, PrintandAdmitBuffer);
     end;
 
-    local procedure ResolveTicket(ReferenceNo: Text; var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer" temporary)
+    Internal procedure ResolveTicket(ReferenceNo: Text; var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer" temporary)
     var
         Ticket: Record "NPR TM Ticket";
     begin
@@ -104,7 +104,7 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
         PrintandAdmitBuffer.Insert();
     end;
 
-    local procedure ResolveMemberCard(ReferenceNo: Text; var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer" temporary)
+    internal procedure ResolveMemberCard(ReferenceNo: Text; var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer" temporary)
     var
         MemberCard: Record "NPR MM Member Card";
     begin
@@ -128,7 +128,7 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
         PrintandAdmitBuffer.Insert();
     end;
 
-    local procedure ResolveWallet(ReferenceNo: Text; var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer" temporary)
+    internal procedure ResolveWallet(ReferenceNo: Text; var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer" temporary)
     var
         AttractionWallet: Record "NPR AttractionWallet";
     begin
@@ -147,7 +147,7 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
         PrintandAdmitBuffer.Insert();
     end;
 
-    local procedure ResolveTicketRequest(ReferenceNo: Text; var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer" temporary)
+    internal procedure ResolveTicketRequest(ReferenceNo: Text; var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer" temporary)
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
