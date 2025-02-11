@@ -261,11 +261,7 @@ test.describe("Mobile add and remove editable buttons", () => {
     await page.frameLocator("iframe").getByText("Icon").click();
     await page.frameLocator("iframe").locator(".select__indicator").click();
     await page
-      .frameLocator("iframe")
-      .locator("#react-select-10-option-0 div")
-      .filter({ hasText: "0" })
-      .locator("div")
-      .click();
+      .frameLocator("iframe").locator('#react-select-12-option-0').click();
     await page.frameLocator('iframe').locator('.custom-color-picker__palette-color').first().click();
     await page.frameLocator("iframe").getByText("Icon").click();
     await page.waitForTimeout(1000);

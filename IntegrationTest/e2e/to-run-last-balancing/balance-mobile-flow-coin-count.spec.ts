@@ -11,6 +11,12 @@ const createBalancingButtonAndDoASale = async (page) => {
       .locator("svg")
       .click();
     await page.waitForTimeout(1000);
+    const balancingText = page
+    .frameLocator("iframe")
+    .getByText("Confirm Bin Contents.");
+  if (await balancingText.isVisible()) {
+    await page.frameLocator("iframe").locator("#button-dialog-yes div").click();
+  }
     await page
       .frameLocator("iframe")
       .getByTestId("MOBILE_BUTTON_VIEW.COLUMNS")
