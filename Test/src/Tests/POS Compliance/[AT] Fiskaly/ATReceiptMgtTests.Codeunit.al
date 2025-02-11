@@ -6,8 +6,6 @@ codeunit 85197 "NPR AT Receipt Mgt. Tests"
     var
         Item: Record Item;
         ATCashRegister: Record "NPR AT Cash Register";
-        ATOrganization: Record "NPR AT Organization";
-        ATSCU: Record "NPR AT SCU";
         POSPaymentMethod: Record "NPR POS Payment Method";
         POSUnit: Record "NPR POS Unit";
         Salesperson: Record "Salesperson/Purchaser";
@@ -147,6 +145,8 @@ codeunit 85197 "NPR AT Receipt Mgt. Tests"
 
     local procedure InitializeData()
     var
+        ATOrganization: Record "NPR AT Organization";
+        ATSCU: Record "NPR AT SCU";
         VoucherTypeDefault: Record "NPR NpRv Voucher Type";
         POSAuditLog: Record "NPR POS Audit Log";
         POSAuditProfile: Record "NPR POS Audit Profile";

@@ -184,7 +184,7 @@ page 6184684 "NPR Setup AT Fiskaly"
                 group(NotAllMandatoryDataPopulatedMsg)
                 {
                     Caption = '';
-                    InstructionalText = 'Unable to complete AT Fiscalization Setup. Please ensure all required fields, including enabling AT fiscalization are filled correctly.';
+                    InstructionalText = 'Unable to complete AT Fiskaly Setup. Please ensure all required data is created and set correctly.';
                     Visible = not DataPopulated;
                 }
                 group(AllMandatoryDataPopulatedMsg)

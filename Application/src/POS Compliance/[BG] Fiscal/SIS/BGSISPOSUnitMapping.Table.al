@@ -93,7 +93,7 @@ table 6060097 "NPR BG SIS POS Unit Mapping"
 
     internal procedure CheckIsPrinterModelPopulated()
     var
-        NotPopulatedErr: Label '%1 must be populated for %2 POS Unit Mapping.', Comment = '%1 - Printer Model field caption, %2 - POS Unit No. field caption';
+        NotPopulatedErr: Label '%1 must be populated for %2 POS Unit Mapping.', Comment = '%1 - Printer Model field caption, %2 - POS Unit No. field value';
     begin
         if "Printer Model" = "Printer Model"::" " then
             Error(NotPopulatedErr, FieldCaption("Printer Model"), "POS Unit No.");

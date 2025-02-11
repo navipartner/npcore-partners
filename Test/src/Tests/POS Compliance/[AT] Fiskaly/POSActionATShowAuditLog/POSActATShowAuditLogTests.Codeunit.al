@@ -53,7 +53,7 @@ codeunit 85192 "NPR POSActATShowAuditLog Tests"
         POSEntryNo2 := DoItemSale();
 
         // [WHEN] Use action for showing all signed AT POS Audit Log Aux. Info records
-        POSActionATAuditLkpB.ShowATAuditLog(Show::All);
+        POSActionATAuditLkpB.ShowATAuditLog(Show::AllSigned);
 
         // [THEN] All signed AT POS Audit Log Aux. Info records are shown
         // handled in ModalPageHandler_ATPOSAuditLogAuxInfo_Show
@@ -76,7 +76,7 @@ codeunit 85192 "NPR POSActATShowAuditLog Tests"
         POSEntryNo2 := DoItemSaleWithoutSigning();
 
         // [WHEN] Use action for showing all non-signed AT POS Audit Log Aux. Info records
-        POSActionATAuditLkpB.ShowATAuditLog(Show::All);
+        POSActionATAuditLkpB.ShowATAuditLog(Show::AllNonSigned);
 
         // [THEN] All non-signed AT POS Audit Log Aux. Info records are shown
         // handled in ModalPageHandler_ATPOSAuditLogAuxInfo_Show

@@ -82,7 +82,7 @@ codeunit 85193 "NPR Library AT Fiscal"
             CopyStr(
                 LibraryUtility.GenerateRandomCode(ATOrganization.FieldNo(Code), Database::"NPR AT Organization"),
                 1,
-                LibraryUtility.GetFieldLength(Database::"Return Reason", ATOrganization.FieldNo(Code))));
+                LibraryUtility.GetFieldLength(Database::"NPR AT Organization", ATOrganization.FieldNo(Code))));
         ATOrganization.Validate(Description, ATOrganization.Code);  // Validating Description as Code because value is not important.
         ATOrganization.Insert(true);
     end;
@@ -104,7 +104,7 @@ codeunit 85193 "NPR Library AT Fiscal"
             CopyStr(
                 LibraryUtility.GenerateRandomCode(ATSCU.FieldNo(Code), Database::"NPR AT SCU"),
                 1,
-                LibraryUtility.GetFieldLength(Database::"Return Reason", ATSCU.FieldNo(Code))));
+                LibraryUtility.GetFieldLength(Database::"NPR AT SCU", ATSCU.FieldNo(Code))));
         ATSCU.Validate(Description, ATSCU.Code);  // Validating Description as Code because value is not important.
         ATSCU.Insert(true);
     end;
@@ -232,6 +232,8 @@ codeunit 85193 "NPR Library AT Fiscal"
     var
         CompanyInformation: Record "Company Information";
     begin
+        CompanyInformation.Get();
+
         ResponseText :=
             '{' +
             '   "_id": "' + Format(ATSCU.SystemId, 0, 4).ToLower() + '",' +
@@ -262,6 +264,8 @@ codeunit 85193 "NPR Library AT Fiscal"
     var
         CompanyInformation: Record "Company Information";
     begin
+        CompanyInformation.Get();
+
         ResponseText :=
             '{' +
             '   "_id": "' + Format(ATSCU.SystemId, 0, 4).ToLower() + '",' +
@@ -294,6 +298,8 @@ codeunit 85193 "NPR Library AT Fiscal"
     var
         CompanyInformation: Record "Company Information";
     begin
+        CompanyInformation.Get();
+
         ResponseText :=
             '{' +
             '   "_id": "' + Format(ATSCU.SystemId, 0, 4).ToLower() + '",' +

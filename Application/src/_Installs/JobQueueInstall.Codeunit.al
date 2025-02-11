@@ -42,6 +42,7 @@
             AddRSAuditJobQueue();
             AddATFiscalJobQueues();
             AddExternalPOSSaleQueues();
+            AddESFiscalJobQueues();
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'AddJobQueues'));
         end;
 
@@ -179,6 +180,13 @@
         ATAuditMgt: Codeunit "NPR AT Audit Mgt.";
     begin
         ATAuditMgt.InitATFiscalJobQueues(ATAuditMgt.IsATFiscalizationEnabled());
+    end;
+
+    local procedure AddESFiscalJobQueues()
+    var
+        ESAuditMgt: Codeunit "NPR ES Audit Mgt.";
+    begin
+        ESAuditMgt.InitESFiscalJobQueues(ESAuditMgt.IsESFiscalizationEnabled());
     end;
 
     local procedure AddInventoryAdjmtJobQueues()

@@ -730,6 +730,8 @@
             if SaleLinePOS."Shortcut Dimension 2 Code" = '' then
                 SaleLinePOS.Validate("Shortcut Dimension 2 Code", NPRPOSUnit."Global Dimension 2 Code");
         until SaleLinePOS.Next() = 0;
+
+        OnAfterValidateSaleBeforeEnd(Sale);
     end;
 
     internal procedure ResumeExistingSale(SalePOS_ToResume: Record "NPR POS Sale"; POSUnitIn: Record "NPR POS Unit"; FrontEndIn: Codeunit "NPR POS Front End Management"; SetupIn: Codeunit "NPR POS Setup"; ThisIn: Codeunit "NPR POS Sale")
@@ -922,6 +924,11 @@
 
     [IntegrationEvent(TRUE, false)]
     local procedure OnBeforeEndSale(SaleHeader: Record "NPR POS Sale")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterValidateSaleBeforeEnd(var SalePOS: Record "NPR POS Sale")
     begin
     end;
 

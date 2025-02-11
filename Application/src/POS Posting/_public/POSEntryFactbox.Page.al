@@ -304,6 +304,28 @@
                     end;
                 }
             }
+            group(ESPOSAuditLogGroup)
+            {
+                ShowCaption = false;
+                Visible = ShowESAudit;
+                field("ES POS Audit Log"; Rec."ES POS Audit Log")
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'ES POS Audit Log Exists';
+                    ToolTip = 'Specifies the details of ES POS Audit Log information.';
+
+                    trigger OnDrillDown()
+                    var
+                        ESPOSAuditLogAuxInfo: Record "NPR ES POS Audit Log Aux. Info";
+                    begin
+                        ESPOSAuditLogAuxInfo.FilterGroup(10);
+                        ESPOSAuditLogAuxInfo.SetRange("Audit Entry Type", ESPOSAuditLogAuxInfo."Audit Entry Type"::"POS Entry");
+                        ESPOSAuditLogAuxInfo.SetRange("POS Entry No.", Rec."Entry No.");
+                        ESPOSAuditLogAuxInfo.FilterGroup(0);
+                        Page.RunModal(0, ESPOSAuditLogAuxInfo);
+                    end;
+                }
+            }
         }
     }
 
@@ -374,6 +396,7 @@
         Clear(ShowSIAudit);
         Clear(ShowBGSISAudit);
         Clear(ShowATAudit);
+        Clear(ShowESAudit);
     end;
 
     local procedure SetShowVariables(POSAuditProfile: Record "NPR POS Audit Profile")
@@ -385,6 +408,7 @@
         SIAuditMgt: Codeunit "NPR SI Audit Mgt.";
         BGSISAuditMgt: Codeunit "NPR BG SIS Audit Mgt.";
         ATAuditMgt: Codeunit "NPR AT Audit Mgt.";
+        ESAuditMgt: Codeunit "NPR ES Audit Mgt.";
     begin
         case POSAuditProfile."Audit Handler" of
             CleanCashXCCSPProtocol.HandlerCode():
@@ -401,6 +425,8 @@
                 ShowBGSISAudit := true;
             ATAuditMgt.HandlerCode():
                 ShowATAudit := true;
+            ESAuditMgt.HandlerCode():
+                ShowESAudit := true;
         end;
     end;
 
@@ -412,5 +438,6 @@
         ShowSIAudit: Boolean;
         ShowBGSISAudit: Boolean;
         ShowATAudit: Boolean;
+        ShowESAudit: Boolean;
 }
 
