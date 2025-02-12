@@ -2794,6 +2794,7 @@
         EndSeparator: Text[10];
         StartSeparator: Text[10];
         OptionCaption: Text[1024];
+        OptionAsText: Text;
     begin
         StartSeparator := '{[';
         EndSeparator := ']}';
@@ -2815,12 +2816,32 @@
                 case FieldRef.Type of
                     FieldType::Option:
                         begin
-                            OptionCaption := Format(FieldRef.OptionMembers);
-                            Evaluate(OptionInt, Format(FieldRef.Value));
+                            OptionAsText := '';
+                            if (StrPos(UpperCase(FieldRef.OptionCaption), UpperCase(Format(FieldRef.Value))) > 0) then
+                                OptionAsText := UpperCase(FieldRef.OptionCaption);
+
+                            if (StrPos(UpperCase(FieldRef.OptionMembers), UpperCase(Format(FieldRef.Value))) > 0) then
+                                OptionAsText := UpperCase(FieldRef.OptionMembers);
+
+                            if (OptionAsText <> '') then begin
+
+                                if (OptionAsText[1] = ',') then OptionInt := 2 else OptionInt := 1;
+                                while StrPos(SelectStr(OptionInt, OptionAsText), UpperCase(Format(FieldRef.Value))) = 0 do
+                                    OptionInt += 1;
+                                OptionInt -= 1;
+
+                            end else begin
+
+                                if (not Evaluate(OptionInt, Format(FieldRef.Value, 0, 9), 9)) then
+                                    OptionInt := 0;
+                            end;
+
+                            OptionCaption := Format(FieldRef.OptionCaption);
                             for i := 1 to OptionInt do
                                 OptionCaption := DelStr(OptionCaption, 1, StrPos(OptionCaption, ','));
                             if (StrPos(OptionCaption, ',') <> 0) then
                                 OptionCaption := DelStr(OptionCaption, StrPos(OptionCaption, ','));
+
                             NewLine := InsStr(NewLine, OptionCaption, StartPos);
                         end;
                     FieldType::DateTime:
