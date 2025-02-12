@@ -1,7 +1,7 @@
 ﻿report 6150614 "NPR POS Entry Sales Details"
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = False;
 #ENDIF
     DefaultLayout = RDLC;
     RDLCLayout = './src/_Reports/layouts/NPR POS Entry Sales Details.rdlc';
@@ -86,6 +86,9 @@
                     DataItemLink = "POS Entry No." = FIELD("POS Entry No."), "Line No." = FIELD("Line No.");
                     DataItemTableView = SORTING("POS Entry No.", "Line No.") WHERE(Type = FILTER(Item));
                     column(Type_POS_Sales_Item_Line; Type)
+                    {
+                    }
+                    column(Item_No_POS_Sales_Item_Line; "No.")
                     {
                     }
                     column(No_POS_Sales_Item_Line; NoText)
