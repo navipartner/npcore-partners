@@ -64,6 +64,55 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
         exit(GenerateCapacityDTO(AdmCapacityPriceBuffer));
     end;
 
+
+    internal procedure GetSchedules(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        AdmCapacityPriceBuffer: Record "NPR TM AdmCapacityPriceBuffer";
+        QueryParameterValue: Text;
+        ResponseMessage: Text;
+
+        // Request parameters
+        StartDate: Date;
+        EndDate: Date;
+        AdmissionCode: Code[20];
+        ScheduleCode: Code[20];
+    begin
+        if (Request.QueryParams().ContainsKey('admissionCode')) then
+            AdmissionCode := CopyStr(UpperCase(Request.QueryParams().Get('admissionCode')), 1, MaxStrLen(AdmissionCode));
+        if (AdmissionCode = '') then
+            exit(Response.RespondBadRequest('Missing required field admission code'));
+
+        if (Request.QueryParams().ContainsKey('startDate')) then
+            QueryParameterValue := Request.QueryParams().Get('startDate');
+        if (QueryParameterValue <> '') then
+            if (not Evaluate(StartDate, QueryParameterValue, 9)) then
+                exit(Response.RespondBadRequest('Invalid start date, expected format is yyyy-mm-dd'));
+        if (Request.QueryParams().ContainsKey('endDate')) then
+            QueryParameterValue := Request.QueryParams().Get('endDate');
+        if (QueryParameterValue <> '') then
+            if (not Evaluate(EndDate, QueryParameterValue, 9)) then
+                exit(Response.RespondBadRequest('Invalid end date, expected format is yyyy-mm-dd'));
+
+
+        if (Request.QueryParams().ContainsKey('scheduleCode')) then
+            ScheduleCode := CopyStr(UpperCase(Request.QueryParams().Get('scheduleCode')), 1, MaxStrLen(ScheduleCode));
+
+
+        exit(GetSchedules(AdmissionCode, StartDate, EndDate, ScheduleCode, AdmCapacityPriceBuffer, ResponseMessage));
+    end;
+
+    internal procedure GetSchedules(AdmissionCode: Code[20]; StartDate: Date; EndDate: Date; ScheduleCode: Code[20]; var AdmCapacityPriceBuffer: Record "NPR TM AdmCapacityPriceBuffer"; var ResponseMessage: Text) Response: Codeunit "NPR API Response"
+    var
+        Admission: Record "NPR TM Admission";
+    begin
+        if not Admission.Get(AdmissionCode) then begin
+            SetErrorMessage(ResponseMessage, 'Invalid Admission Code');
+            exit(Response.RespondBadRequest(ResponseMessage));
+        end;
+        exit(GenerateSchedule(Admission, StartDate, EndDate, ScheduleCode));
+    end;
+
+
     local procedure GenerateCapacityDTO(var AdmCapacityPriceBuffer: Record "NPR TM AdmCapacityPriceBuffer") Response: Codeunit "NPR API Response"
     var
         ResponseJson: Codeunit "NPR JSON Builder";
@@ -110,6 +159,31 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
         ResponseJson.EndArray();
         Response.RespondOK(ResponseJson.BuildAsArray());
 
+    end;
+
+    local procedure GenerateSchedule(Admission: Record "NPR TM Admission"; StartDate: Date; EndDate: Date; ScheduleCode: Code[20]) Response: Codeunit "NPR API Response"
+    var
+        ResponseJson: Codeunit "NPR JSON Builder";
+        TimeHelper: Codeunit "NPR TM TimeHelper";
+        LocalDateTime: DateTime;
+        LocalDate: Date;
+        LocalTime: Time;
+        EnumEncoder: Codeunit "NPR TicketingApiTranslations";
+    begin
+        ResponseJson.Initialize();
+
+        LocalDateTime := TimeHelper.GetLocalTimeAtAdmission(Admission."Admission Code");
+        LocalDate := DT2Date(LocalDateTime);
+        LocalTime := DT2Time(LocalDateTime);
+
+        ResponseJson.StartObject()
+            .AddProperty('admissionCode', Admission."Admission Code")
+            .AddProperty('capacityControl', EnumEncoder.EncodeCapacity(Admission."Capacity Control"))
+            .AddArray(ScheduleEntrySimple(Admission, LocalDate, LocalTime, StartDate, EndDate, ScheduleCode, (Admission."Capacity Control" = Admission."Capacity Control"::"NONE"), ResponseJson))
+        .EndObject();
+
+        Responsejson.EndObject();
+        Response.RespondOK(ResponseJson.Build());
     end;
 
     local procedure ScheduleEntryDTO(AdmCapacityPriceBuffer: Record "NPR TM AdmCapacityPriceBuffer"; var ResponseJson: Codeunit "NPR JSON Builder"; LocalDate: Date; LocalTime: Time; AdmissionCapacityControlNone: Boolean): Codeunit "NPR JSON Builder"
@@ -190,6 +264,85 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
                     .AddObject(PriceDTO(AdmCapacityPriceBuffer, ResponseJson, AdmissionScheduleEntry, LocalDate, LocalTime))
                     .AddObject(SalesDTO(ResponseJson, AdmissionScheduleEntry))
                 .EndObject()
+
+            until (AdmissionScheduleEntry.Next() = 0);
+        end;
+
+        ResponseJson.EndArray();
+        exit(ResponseJson);
+    end;
+
+    local procedure ScheduleEntrySimple(Admission: Record "NPR TM Admission"; LocalDate: Date; LocalTime: Time; StartDate: Date; EndDate: Date; ScheduleCode: Code[20]; AdmissionCapacityControlNone: Boolean; var ResponseJson: Codeunit "NPR JSON Builder"): Codeunit "NPR JSON Builder"
+    var
+        CalendarManagement: Codeunit "NPR TMBaseCalendarManager";
+        TempCustomizedCalendarChange: Record "Customized Calendar Change" temporary;
+        AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        Schedule: Record "NPR TM Admis. Schedule";
+        EnumEncoder: Codeunit "NPR TicketingApiTranslations";
+        CapacityStatusCode: Option;
+        BlockSaleReason: Enum "NPR TM Sch. Block Sales Reason";
+        CalendarDesc: Text;
+        IsNonWorking: Boolean;
+        DurationAsInt: Integer;
+    begin
+        ResponseJson.StartArray('schedules');
+
+        AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', Admission."Admission Code");
+        if ScheduleCode <> '' then
+            AdmissionScheduleEntry.SetFilter("Schedule Code", '=%1', ScheduleCode);
+        AdmissionScheduleEntry.SetFilter("Admission Start Date", '%1..', StartDate);
+        AdmissionScheduleEntry.SetFilter("Admission End Date", '..%1', EndDate);
+        AdmissionScheduleEntry.SetFilter("Visibility On Web", '=%1', AdmissionScheduleEntry."Visibility On Web"::VISIBLE);
+        AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
+        if (AdmissionScheduleEntry.FindSet()) then begin
+            repeat
+                if (not Schedule.Get(AdmissionScheduleEntry."Schedule Code")) then
+                    Schedule.Init();
+                TempCustomizedCalendarChange.DeleteAll();
+                CapacityStatusCode := _CapacityStatusCodeOption::OK;
+                BlockSaleReason := BlockSaleReason::OpenForSales;
+
+                if (AdmissionCapacityControlNone) then begin
+                    CapacityStatusCode := _CapacityStatusCodeOption::UNLIMITED_CAPACITY;
+                    BlockSaleReason := BlockSaleReason::OpenForSales;
+                end;
+
+                CalendarManagement.CheckTicketBomAdmissionIsNonWorking(Admission, AdmissionScheduleEntry."Admission Start Date", TempCustomizedCalendarChange);
+                IsNonWorking := TempCustomizedCalendarChange.Nonworking;
+                CalendarDesc := TempCustomizedCalendarChange.Description;
+
+                if (IsNonWorking) then
+                    CapacityStatusCode := _CapacityStatusCodeOption::NON_WORKING;
+
+                if ((CapacityStatusCode = _CapacityStatusCodeOption::OK) and (CalendarDesc <> '')) then
+                    CapacityStatusCode := _CapacityStatusCodeOption::CALENDAR_WARNING;
+
+                if (CapacityStatusCode in [_CapacityStatusCodeOption::OK, _CapacityStatusCodeOption::UNLIMITED_CAPACITY]) then begin
+                    if (AdmissionScheduleEntry."Admission Is" = AdmissionScheduleEntry."Admission Is"::CLOSED) then
+                        CapacityStatusCode := _CapacityStatusCodeOption::CLOSED;
+                    if (AdmissionScheduleEntry."Admission End Date" < LocalDate) then
+                        CapacityStatusCode := _CapacityStatusCodeOption::CLOSED;
+                    if ((AdmissionScheduleEntry."Admission End Date" = LocalDate) and (AdmissionScheduleEntry."Admission End Time" < LocalTime)) then
+                        CapacityStatusCode := _CapacityStatusCodeOption::CLOSED;
+                end;
+
+                DurationAsInt := Round((AdmissionScheduleEntry."Admission End Time" - AdmissionScheduleEntry."Admission Start Time") / 1000, 1);
+                ResponseJson.StartObject()
+                    .AddProperty('externalNumber', AdmissionScheduleEntry."External Schedule Entry No.")
+                    .AddProperty('scheduleCode', AdmissionScheduleEntry."Schedule Code")
+                    .AddProperty('description', Schedule.Description)
+                    .AddProperty('startDate', AdmissionScheduleEntry."Admission Start Date")
+                    .AddProperty('startTime', AdmissionScheduleEntry."Admission Start Time")
+                    .AddProperty('endDate', AdmissionScheduleEntry."Admission End Date")
+                    .AddProperty('endTime', AdmissionScheduleEntry."Admission End Time")
+                    .AddProperty('duration', DurationAsInt)
+                    .AddProperty('allocatable', CapacityStatusCode in [_CapacityStatusCodeOption::OK, _CapacityStatusCodeOption::CALENDAR_WARNING, _CapacityStatusCodeOption::UNLIMITED_CAPACITY])
+                    .AddProperty('allocationModel', EnumEncoder.EncodeAllocationBy(AdmissionScheduleEntry."Allocation By"))
+                    .AddProperty('initialCapacity', AdmissionScheduleEntry."Max Capacity Per Sch. Entry")
+                    .AddProperty('explanation', GetMessageText(CapacityStatusCode, CalendarDesc, BlockSaleReason.AsInteger()))
+                    .AddObject(AddPropertyNotNull(ResponseJson, 'arrivalFromTime', AdmissionScheduleEntry."Event Arrival From Time"))
+                    .AddObject(AddPropertyNotNull(ResponseJson, 'arrivalUntilTime', AdmissionScheduleEntry."Event Arrival Until Time"))
+                        .EndObject()
 
             until (AdmissionScheduleEntry.Next() = 0);
         end;

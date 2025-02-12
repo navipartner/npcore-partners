@@ -351,3 +351,52 @@ types:
       examples:
         - name: ExamplePrintedAt
           value: "2024-10-11T12:13:00Z"
+
+  StartDate:
+    type: date
+    docs: A date to use as a starting date of a period for the schedule search. 
+    examples:
+      - name: ExampleScheduleFromDate
+        value: "2025-01-31"
+
+  EndDate:
+    type: date
+    docs: A date to use as a ending date of a period for the schedule search. 
+    examples:
+      - name: ExampleScheduleToDate
+        value: "2025-03-31"
+
+  InitialCapacity:
+    type: integer
+    docs: The initial capacity for the schedule. Note that this number can be 0 which means there is no capacity specified.
+
+  ScheduleCode:
+    type: string
+    docs: A unique code that identifies a specific admission schedule.
+    examples:
+      - name: ExampleScheduleCastle
+        value: "EVENT1"
+  Duration:
+    type: integer
+    docs: The duration of the schedule in seconds.
+    examples:
+      - name: ExampleDuration
+        value: 10800
+  StartTime:
+    type: string
+    docs: The time when time slot starts.
+    examples:
+      - name: ExampleStartTime
+        value: "09:00"
+  EndTime:
+    type: string
+    docs: The time when time slot ends.
+    examples:
+      - name: ExampleEndTime
+        value: "12:00"
+  ScheduleDescription:
+    type: string
+    docs: A description of the schedule.
+    examples:
+      - name: ExampleScheduleDescription
+        value: "Morning schedule"

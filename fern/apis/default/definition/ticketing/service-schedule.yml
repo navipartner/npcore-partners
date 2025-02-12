@@ -1,0 +1,58 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  simpleTypes: ./types-simple.yml
+  compositeTypes: ./types-composite.yml
+  globalApiTypes: ./../global-api-types.yml
+
+service:
+  display-name: Schedule
+  auth: true
+  base-path: /ticket
+
+  endpoints:
+    getSchedule:
+      docs: 
+        Retrieve the schedule for a period for a ticket admission. 
+        Note that an ticket item may have multiple admissions with different schedules so use correct admission.
+      path: /schedule/search
+      method: GET
+      request: 
+        name: schedule
+        query-parameters:
+          admissionCode: simpleTypes.AdmissionCode
+          startDate: simpleTypes.StartDate
+          endDate: simpleTypes.EndDate
+          scheduleCode: optional<simpleTypes.ScheduleCode>
+      response: 
+        docs: Returns a schedule for the specified ticket admission.
+        type: AdmissionSchedule
+      examples:
+        ### Success
+        - name: ExampleSchedules
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+            startDate: $simpleTypes.StartDate.ExampleScheduleFromDate
+            endDate: $simpleTypes.EndDate.ExampleScheduleToDate
+          response:
+              body: 
+                admissionCode: "CASTLE"
+                capacityControl: sales
+                schedules: 
+                  - $compositeTypes.ScheduleEntryDetails.ExampleMorning
+                  - $compositeTypes.ScheduleEntryDetails.ExampleEvening
+                                           
+types:
+## Response types
+  ## Top Level Response types
+  AdmissionSchedule: 
+    docs: 
+      Provides detailed capacity and availability information for a specific admission associated with a ticket item. 
+    properties:
+      admissionCode: simpleTypes.AdmissionCode
+      capacityControl: simpleTypes.CapacityControl
+      schedules: list<compositeTypes.ScheduleEntryDetails>

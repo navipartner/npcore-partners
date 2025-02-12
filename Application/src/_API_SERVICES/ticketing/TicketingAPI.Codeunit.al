@@ -12,22 +12,30 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
         if (Request.Paths().Get(1) = 'ticketing') then // Obsolete
             exit(Response.RespondBadRequest('Segment path changed from ticketing to ticket, check the API documentation for the correct path.'));
 
+        if (Request.Match('GET', '/ticket')) then
+            exit(Handle(_ApiFunction::FIND_TICKETS, Request));
+
         if (Request.Match('GET', '/ticket/catalog')) then
             exit(Handle(_ApiFunction::CATALOG, Request));
+
+        if (Request.Match('GET', '/ticket/:ticketId')) then
+            exit(Handle(_ApiFunction::GET_TICKET, Request));
 
         if (Request.Match('GET', '/ticket/catalog/:storCode')) then
             exit(Handle(_ApiFunction::CATALOG, Request));
 
-
         if (Request.Match('GET', '/ticket/capacity/search')) then
             exit(Handle(_ApiFunction::CAPACITY_SEARCH, Request));
 
+        if (Request.Match('GET', '/ticket/reservation/:token')) then
+            exit(Handle(_ApiFunction::GET_RESERVATION, Request));
 
-        if (Request.Match('GET', '/ticket')) then
-            exit(Handle(_ApiFunction::FIND_TICKETS, Request));
+        if (Request.Match('GET', '/ticket/schedule/search')) then
+            exit(Handle(_ApiFunction::SCHEDULE_SEARCH, Request));
 
-        if (Request.Match('GET', '/ticket/:ticketId')) then
-            exit(Handle(_ApiFunction::GET_TICKET, Request));
+        if (Request.Match('GET', '/ticket/reservation/:token/tickets')) then
+            exit(Handle(_ApiFunction::GET_RESERVATION_TICKETS, Request));
+
 
         if (Request.Match('POST', '/ticket/:ticketId/requestRevoke')) then
             exit(Handle(_ApiFunction::REQUEST_REVOKE_TICKET, Request));
@@ -56,13 +64,6 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
         if (Request.Match('POST', '/ticket/:ticketId/exchangeForCoupon')) then
             exit(Handle(_ApiFunction::EXCHANGE_TICKET_FOR_COUPON, Request));
 
-
-        if (Request.Match('GET', '/ticket/reservation/:token')) then
-            exit(Handle(_ApiFunction::GET_RESERVATION, Request));
-
-        if (Request.Match('GET', '/ticket/reservation/:token/tickets')) then
-            exit(Handle(_ApiFunction::GET_RESERVATION_TICKETS, Request));
-
         if (Request.Match('POST', '/ticket/reservation')) then
             exit(Handle(_ApiFunction::CREATE_RESERVATION, Request));
 
@@ -75,8 +76,10 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
         if (Request.Match('POST', '/ticket/reservation/:token/confirm')) then
             exit(Handle(_ApiFunction::CONFIRM_RESERVATION, Request));
 
+
         if (Request.Match('PUT', '/ticket/reservation/:token')) then
             exit(Handle(_ApiFunction::UPDATE_RESERVATION, Request));
+
 
     end;
 

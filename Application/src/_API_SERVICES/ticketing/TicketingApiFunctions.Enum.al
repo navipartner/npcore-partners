@@ -12,6 +12,10 @@ enum 6059815 "NPR TicketingApiFunctions"
     {
         Caption = 'Get capacity';
     }
+    value(120; SCHEDULE_SEARCH)
+    {
+        Caption = 'Get schedule';
+    }
 
     value(200; CATALOG)
     {

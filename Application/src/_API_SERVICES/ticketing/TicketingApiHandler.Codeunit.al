@@ -38,6 +38,8 @@ codeunit 6185082 "NPR TicketingApiHandler"
         case _ApiFunction of
             _ApiFunction::CAPACITY_SEARCH:
                 _Response := Capacity.GetTimeSlots(_Request);
+            _ApiFunction::SCHEDULE_SEARCH:
+                _Response := Capacity.GetSchedules(_Request);
 
             _ApiFunction::CATALOG:
                 _Response := Catalog.GetCatalog(_Request);
