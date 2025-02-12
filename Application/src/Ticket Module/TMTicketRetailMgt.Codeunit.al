@@ -12,8 +12,7 @@
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
     begin
 
-        //-TM1.19 [266372]
-        AssignSameSchedule(Token);
+        AssignSameSchedule(Token, (SaleLinePOS.Indentation > 0));
         AssignSameNotificationAddress(Token);
 
         TicketReservationRequest.Reset();
@@ -279,11 +278,14 @@
         exit(TicketNotifyParticipant.AcquireTicketParticipantForce(Token, SuggestMethod, SuggestAddress, SuggestName, ForceDialog));
     end;
 
-    procedure AssignSameSchedule(Token: Text[100])
+    procedure AssignSameSchedule(Token: Text[100]; ExploreSameScheduleCode: Boolean)
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketReservationRequest2: Record "NPR TM Ticket Reservation Req.";
+        AdmScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        AdmScheduleEntry2: Record "NPR TM Admis. Schedule Entry";
     begin
+
 
         TicketReservationRequest.Reset();
         TicketReservationRequest.SetCurrentKey("Session Token ID");
@@ -305,6 +307,53 @@
                     TicketReservationRequest."Scheduled Time Description" := TicketReservationRequest2."Scheduled Time Description";
                     TicketReservationRequest.Modify();
                 end;
+            until (TicketReservationRequest.Next() = 0);
+        end;
+
+        if (not ExploreSameScheduleCode) then
+            exit;
+
+        // Try harder to find a schedule, check if this admission is configured to have same schedule code used for another admission on the same sale
+        // Example: if Admission A has selected to use schedule code 1, then check if Admission B also uses schedule code 1 on the selected date and if so set schedule code 1 on Admission B 
+        TicketReservationRequest.Reset();
+        TicketReservationRequest.SetCurrentKey("Session Token ID");
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        TicketReservationRequest.SetFilter("External Adm. Sch. Entry No.", '<=%1', 0);
+        if (TicketReservationRequest.FindSet()) then begin
+
+            AdmScheduleEntry2.SetCurrentKey("External Schedule Entry No.");
+            AdmScheduleEntry.SetCurrentKey("Admission Code", "Schedule Code", "Admission Start Date");
+
+            TicketReservationRequest2.Reset();
+            if (TicketReservationRequest."Receipt No." <> '') then begin
+                TicketReservationRequest2.SetFilter("Receipt No.", '=%1', TicketReservationRequest."Receipt No.");
+            end else begin
+                TicketReservationRequest2.SetFilter("Session Token ID", '=%1', Token);
+            end;
+
+            repeat
+                TicketReservationRequest2.SetFilter("Admission Code", '<>%1', TicketReservationRequest."Admission Code");
+                TicketReservationRequest2.SetFilter("External Adm. Sch. Entry No.", '>%1', 0);
+                if (TicketReservationRequest2.FindSet()) then begin
+                    repeat
+
+                        AdmScheduleEntry2.SetFilter("External Schedule Entry No.", '=%1', TicketReservationRequest2."External Adm. Sch. Entry No.");
+                        AdmScheduleEntry2.SetFilter(Cancelled, '=%1', false);
+                        if (AdmScheduleEntry2.FindFirst()) then begin
+
+                            AdmScheduleEntry.SetFilter("Admission Code", '=%1', TicketReservationRequest."Admission Code");
+                            AdmScheduleEntry.SetFilter("Schedule Code", '=%1', AdmScheduleEntry2."Schedule Code");
+                            AdmScheduleEntry.SetFilter("Admission Start Date", '=%1', AdmScheduleEntry2."Admission Start Date");
+                            AdmScheduleEntry.SetFilter(Cancelled, '=%1', false);
+                            If (AdmScheduleEntry.FindFirst()) then begin
+                                TicketReservationRequest."External Adm. Sch. Entry No." := AdmScheduleEntry."External Schedule Entry No.";
+                                TicketReservationRequest."Scheduled Time Description" := StrSubstNo('(%1) %2', AdmScheduleEntry."Admission Start Date", AdmScheduleEntry."Admission Start Time");
+                                TicketReservationRequest.Modify();
+                            end;
+                        end;
+                    until (TicketReservationRequest2.Next() = 0);
+                end;
+
             until (TicketReservationRequest.Next() = 0);
         end;
     end;
@@ -761,7 +810,7 @@
         Token := TicketRequestManager.POS_CreateReservationRequest(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS.Quantity, ExternalMemberNo);
         Commit();
 
-        AssignSameSchedule(Token);
+        AssignSameSchedule(Token, (SaleLinePOS.Indentation > 0));
         AssignSameNotificationAddress(Token);
 
         TicketReservationRequest.Reset();
