@@ -108,7 +108,11 @@ navigation:
                   - endpoint: ticketing.service-reservations.confirmReservation
                   - endpoint: ticketing.service-reservations.getReservation
                   - endpoint: ticketing.service-reservations.getTickets
-
+            - ticketing.service-schedule:
+                title: Schedule
+                summary: ./docs/pages/ticketing/schedule-summary.mdx
+                contents:
+                  - endpoint: ticketing.service-schedule.getSchedule
         - section: Memberships
           summary: ./docs/pages/memberships/overview.mdx
           contents:

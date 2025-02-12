@@ -182,3 +182,54 @@ types:
         value:
           admissionDetails: $AdmissionDetails.ExampleAdmissionCastle
           scheduleDetails: $ScheduleDetails.ExampleEvening
+ 
+  ScheduleEntryDetails: 
+    docs: Details of the schedule for a specific time slot.
+    properties:
+      externalNumber: simpleTypes.ScheduleNumber
+      scheduleCode: simpleTypes.ScheduleCode
+      description: simpleTypes.ScheduleDescription
+      startDate: simpleTypes.StartDate
+      startTime: simpleTypes.StartTime
+      endDate: simpleTypes.EndDate
+      endTime: simpleTypes.EndTime 
+      duration: simpleTypes.Duration
+      arrivalFromTime: optional<simpleTypes.ArrivalFromTime>
+      arrivalUntilTime: optional<simpleTypes.ArrivalUntilTime>
+      allocatable: simpleTypes.Allocatable
+      allocationModel: simpleTypes.AllocationModel
+      initialCapacity: simpleTypes.InitialCapacity
+      explanation:  simpleTypes.AllocationExplanation
+    examples:
+      - name: ExampleMorning
+        value:
+          externalNumber: 1234
+          scheduleCode: "MORNING"
+          description: "Morning schedule"
+          startDate: "2025-01-31"
+          startTime: "09:00"
+          endDate: "2024-10-15"
+          endTime: "12:00"
+          duration: 10800
+          arrivalFromTime: "08:30"
+          arrivalUntilTime: "10:00"
+          allocatable: true
+          allocationModel: "capacity"
+          initialCapacity: 1000
+          explanation: Ok. 
+      - name: ExampleEvening
+        value:
+          externalNumber: 1243
+          scheduleCode: "EVENING"
+          description: "Evening schedule"
+          startDate: $simpleTypes.ReferenceDate.ExampleCheckCapacityDate
+          startTime: "17:00"  
+          endDate: $simpleTypes.ReferenceDate.ExampleCheckCapacityDate
+          endTime: "20:00"
+          duration: 10800
+          arrivalFromTime: "16:30"
+          arrivalUntilTime: "18:00"
+          allocatable: true
+          allocationModel: "capacity"
+          initialCapacity: 1000
+          explanation: Ok. 

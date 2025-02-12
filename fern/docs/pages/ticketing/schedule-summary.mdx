@@ -1,0 +1,33 @@
+---
+title: "Introduction"
+hide-toc: false
+---
+<Markdown src="../snippets/endpoint-verb-styles.mdx" />
+
+The schedule API is responsible for displaying all available schedule entries visible on web for specified time period.
+
+Key Concepts:
+
+    * Admissions: 
+        Admissions define the specific areas or events a ticket grants access to. 
+        Each admission has a unique admission code, along with descriptive information and various predefined limits, 
+        such as capacity or entry restrictions. These limits and policies can be set at different hierarchical levels, 
+        allowing flexibility in how capacity is controlled.
+
+    * Time-Based Validity: 
+        In addition to defining what a ticket allows access to, the admission must also specify when the access is valid. 
+        Every admission needs to be linked to a specific time slot to ensure proper scheduling. 
+        In cases where the time is not explicitly provided, the system may assign a time slot automatically (defined by setup), 
+        which is particularly useful for scenarios like walk-up ticket sales at kiosks, 
+        where tickets should be valid immediately upon purchase.
+
+    * Time Slot Visibility: All web available time slots are displayed to the consumer, even if they are no longer 
+        allocatable (e.g., fully booked or sold out). This is intentional, as it allows the system to provide 
+        visibility into popular events, offering a sense of urgency or exclusivity that can drive consumer interest.
+    
+    * Schedules: 
+        Admission schedules define when a location will be open or when an event will be occurring. 
+        Multiple schedules can be applied to the same admission object. The setup defines how these entries
+        should be generated based on available rules. Only one entry per date is permitted,
+        so automatic rescheduling is possible if the schedule definition changes.
+
