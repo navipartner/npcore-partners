@@ -165,7 +165,7 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
         modify(TotalSales2)
         {
             Caption = 'Sales ERP - Fiscal Year';
-            ToolTip = 'Specifies your total sales turnover with the customer in the current fiscal year. It is calculated from amounts excluding VAT on all completed and open invoices(credit sales) and credit memos.';
+            ToolTip = 'Specifies your total sales turnover with the customer in the current fiscal year. It is calculated from amounts excluding VAT on all posted invoices(credit sales) and credit memos.';
         }
         addafter(TotalSales2)
         {
