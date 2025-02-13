@@ -686,6 +686,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
     var
         SpfyStoreItemVariantLink: Record "NPR Spfy Store-Item Link";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        SpfyIntegrationEvents: Codeunit "NPR Spfy Integration Events";
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
         Barcode: Text;
         Title: Text;
@@ -733,6 +734,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             if Title <> '' then
                 VariantJObject.Add('title', Title);
         end;
+        SpfyIntegrationEvents.OnAfterGenerateVariantJObject(ItemVariant, VariantJObject);
 
         exit(true);
     end;
