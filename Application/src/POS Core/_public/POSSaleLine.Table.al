@@ -1240,7 +1240,41 @@
             ObsoleteState = Removed;
             ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Not used';
-
+        }
+        field(506; "EFT Card Number"; Text[30])
+        {
+            Caption = 'Card Number';
+            DataClassification = CustomerContent;
+        }
+        field(507; "EFT Card Application ID"; Text[30])
+        {
+            Caption = 'Card Application Id';
+            DataClassification = CustomerContent;
+        }
+        field(508; "EFT Card Name"; Text[24])
+        {
+            Caption = 'Card Name';
+            DataClassification = CustomerContent;
+        }
+        field(509; "EFT Card Expiry Year"; Text[4])
+        {
+            Caption = 'Card Expiry Year';
+            DataClassification = CustomerContent;
+        }
+        field(510; "EFT Card Expiry Month"; Text[2])
+        {
+            Caption = 'Card Expiry Month';
+            DataClassification = CustomerContent;
+        }
+        field(511; "EFT Payment Brand"; Text[30])
+        {
+            Caption = 'Payment Brand';
+            DataClassification = CustomerContent;
+        }
+        field(512; "EFT Payment Account Reference"; Text[100])
+        {
+            Caption = 'Payment Account Reference';
+            DataClassification = CustomerContent;
         }
         field(550; "Drawer Opened"; Boolean)
         {

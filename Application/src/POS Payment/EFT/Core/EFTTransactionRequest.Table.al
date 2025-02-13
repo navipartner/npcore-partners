@@ -456,6 +456,11 @@
             Caption = 'Payment Brand';
             DataClassification = CustomerContent;
         }
+        field(637; "Payment Account Reference"; Text[100])
+        {
+            Caption = 'Payment Account Reference';
+            DataClassification = CustomerContent;
+        }
         field(650; "Additional Info"; BLOB)
         {
             Caption = 'Additional Info';

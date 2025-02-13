@@ -396,6 +396,16 @@
         POSLine."EFT Approved" := EFTTransactionRequest.Successful;
         POSLine.Description := CopyStr(EFTTransactionRequest."POS Description", 1, MaxStrLen(POSLine.Description));
         POSLine.Reference := CopyStr(EFTTransactionRequest."Reference Number Output", 1, MaxStrLen(POSLine.Reference));
+
+        // Card metadata
+        POSLine."EFT Card Number" := EFTTransactionRequest."Card Number";
+        POSLine."EFT Card Name" := EFTTransactionRequest."Card Name";
+        POSLine."EFT Card Application ID" := EFTTransactionRequest."Card Application ID";
+        POSLine."EFT Card Expiry Month" := EFTTransactionRequest."Card Expiry Month";
+        POSLine."EFT Card Expiry Year" := EFTTransactionRequest."Card Expiry Year";
+        POSLine."EFT Payment Brand" := EFTTransactionRequest."Payment Brand";
+        POSLine."EFT Payment Account Reference" := EFTTransactionRequest."Payment Account Reference";
+
         if POSLine."EFT Approved" then begin
             POSLine."Amount Including VAT" := EFTTransactionRequest."Result Amount";
             POSLine."Currency Amount" := POSLine."Amount Including VAT";

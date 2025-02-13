@@ -277,6 +277,41 @@
             Caption = 'POS Payment Line Created At';
             DataClassification = CustomerContent;
         }
+        field(511; "EFT Card Number"; Text[30])
+        {
+            Caption = 'Card Number';
+            DataClassification = CustomerContent;
+        }
+        field(512; "EFT Card Application ID"; Text[30])
+        {
+            Caption = 'Card Application Id';
+            DataClassification = CustomerContent;
+        }
+        field(513; "EFT Card Name"; Text[24])
+        {
+            Caption = 'Card Name';
+            DataClassification = CustomerContent;
+        }
+        field(514; "EFT Card Expiry Year"; Text[4])
+        {
+            Caption = 'Card Expiry Year';
+            DataClassification = CustomerContent;
+        }
+        field(515; "EFT Card Expiry Month"; Text[2])
+        {
+            Caption = 'Card Expiry Month';
+            DataClassification = CustomerContent;
+        }
+        field(516; "EFT Payment Brand"; Text[30])
+        {
+            Caption = 'Payment Brand';
+            DataClassification = CustomerContent;
+        }
+        field(517; "EFT Payment Account Reference"; Text[100])
+        {
+            Caption = 'Payment Account Reference';
+            DataClassification = CustomerContent;
+        }
         field(600; "Entry Date"; Date)
         {
             CalcFormula = Lookup("NPR POS Entry"."Entry Date" WHERE("Entry No." = FIELD("POS Entry No.")));
