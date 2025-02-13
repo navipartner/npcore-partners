@@ -139,6 +139,9 @@ page 6184879 "NPR SG SpeedGateListPart"
         CityCardProfile: Record "NPR DocLXCityCardLocation";
     begin
         _DocLxCityCardProfileName := '';
+        if (IsNullGuid(Rec.DocLxCityCardProfileId)) then
+            exit;
+
         if ((Rec.PermitDocLxCityCard) and (CityCardProfile.GetBySystemId(Rec.DocLxCityCardProfileId))) then begin
             _DocLxCityCardProfileName := CityCardProfile.Description;
             if (_DocLxCityCardProfileName = '') then

@@ -116,9 +116,21 @@
 
                 trigger OnAction()
                 var
-                    TicketManagement: Codeunit "NPR TM Ticket Management";
+                    Ticket: Record "NPR TM Ticket";
+                    SpeedGate: Codeunit "NPR SG SpeedGate";
+                    GateId: Code[10];
+                    AdmitToken: Guid;
+                    ReasonMessage: Text;
                 begin
-                    TicketManagement.RegisterArrivalScanTicket("NPR TM TicketIdentifierType"::INTERNAL_TICKET_NO, Rec."Ticket No.", Rec."Admission Code", -1, '', '', false);
+                    GateId := SpeedGate.CreateSystemGate(6059786);
+                    Ticket.Get(Rec."Ticket No.");
+                    AdmitToken := SpeedGate.CreateAdmitToken(Ticket."External Ticket No.", Rec."Admission Code", GateId);
+                    Commit();
+
+                    if (not SpeedGate.CheckAdmit(AdmitToken, 1, ReasonMessage)) then begin
+                        Commit(); // commit the transactions log entry before showing the error message
+                        Error(ReasonMessage);
+                    end;
                 end;
             }
             action("Register Departure")

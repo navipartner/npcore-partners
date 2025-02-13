@@ -272,13 +272,19 @@
 
                 trigger OnAction()
                 var
-                    MemberWebService: Codeunit "NPR MM Member WebService";
-                    ResponseMessage: Text;
+                    SpeedGate: Codeunit "NPR SG SpeedGate";
+                    GateId: Code[10];
+                    AdmitToken: Guid;
+                    ReasonMessage: Text;
                 begin
-                    if (not MemberWebService.MemberCardRegisterArrival(Rec."External Card No.", '', 'RTC-CLIENT', ResponseMessage)) then
-                        Error(ResponseMessage);
+                    GateId := SpeedGate.CreateSystemGate(6060130);
+                    AdmitToken := SpeedGate.CreateAdmitToken(Rec."External Card No.", '', GateId);
+                    Commit();
 
-                    Message(ResponseMessage);
+                    if (not SpeedGate.CheckAdmit(AdmitToken, 1, ReasonMessage)) then begin
+                        Commit(); // commit the transactions log entry before showing the error message
+                        Error(ReasonMessage);
+                    end;
                 end;
             }
             action("Arrival Log")

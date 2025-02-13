@@ -6,6 +6,16 @@ codeunit 6185130 "NPR SG SpeedGate"
         _NumberType: Option REJECTED,NOT_WHITELISTED,TICKET,MEMBER_CARD,WALLET,DOC_LX_CITY_CARD;
         _ApiErrors: Enum "NPR API Error Code";
 
+        _TokenToAdmit: Guid;
+        _QuantityToAdmit: Integer;
+
+
+    trigger OnRun()
+    begin
+        if (not IsNullGuid(_TokenToAdmit)) then
+            Admit(_TokenToAdmit, _QuantityToAdmit);
+    end;
+
     internal procedure CreateAdmitToken(ReferenceNumber: Text[100]; AdmissionCode: Code[20]; ScannerId: Code[10]) AdmitToken: Guid
     var
         EntryNo: Integer;
@@ -46,6 +56,49 @@ codeunit 6185130 "NPR SG SpeedGate"
 
         until (ValidationRequest.Next() = 0);
 
+    end;
+
+    internal procedure CheckAdmit(Token: Guid; Quantity: Integer; var ResponseMessage: Text): Boolean
+    var
+        ThisCodeunit: Codeunit "NPR SG SpeedGate";
+    begin
+        ThisCodeunit.SetAdmitToken(Token, Quantity);
+        ClearLastError();
+
+        if (ThisCodeunit.Run()) then
+            exit(true);
+
+        ResponseMessage := GetLastErrorText();
+        MarkAsDenied(Token, _ApiErrors::denied_by_speedgate, ResponseMessage);
+
+        exit(false);
+    end;
+
+    internal procedure SetAdmitToken(Token: Guid; Quantity: Integer)
+    begin
+        _TokenToAdmit := Token;
+        _QuantityToAdmit := Quantity;
+    end;
+
+    internal procedure CreateSystemGate(ObjectId: Integer) GateId: Code[10]
+    var
+        SpeedGateSetup: Record "NPR SG SpeedGate";
+        ScannerId: Code[10];
+    begin
+        ScannerId := CopyStr(StrSubstNo('BC-%1', ObjectId), 1, MaxStrLen(SpeedGateSetup.ScannerId));
+        SpeedGateSetup.SetFilter(ScannerId, '=%1', ScannerId);
+        if (not SpeedGateSetup.FindFirst()) then begin
+            SpeedGateSetup.Init();
+            SpeedGateSetup.ScannerId := ScannerId;
+            SpeedGateSetup.Enabled := true;
+            SpeedGateSetup.Description := CopyStr(StrSubstNo('Created by system for internal validation, source is object: %1', ObjectId), 1, MaxStrLen(SpeedGateSetup.Description));
+            SpeedGateSetup.PermitTickets := true;
+            SpeedGateSetup.PermitMemberCards := true;
+            SpeedGateSetup.PermitWallets := true;
+            SpeedGateSetup.PermitDocLxCityCard := false; // true requires a city card profile
+            SpeedGateSetup.Insert(true);
+        end;
+        exit(SpeedGateSetup.ScannerId);
     end;
 
     internal procedure CreateInitialEntry(ReferenceNumber: Text[100]; AdmissionCode: Code[20]; ScannerId: Code[10]) EntryNo: Integer
@@ -165,10 +218,16 @@ codeunit 6185130 "NPR SG SpeedGate"
         case ValidationRequest.ExtraEntityTableId of
             0: // Originates from a Member Card scan
                // Has a commit inside
-                MemberTicketManager.MemberFastCheckInNoPrint(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", ValidationRequest.AdmissionCode, '', 1, '', ExternalTicketNo);
+                begin
+                    MemberTicketManager.MemberFastCheckInNoPrint(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", ValidationRequest.AdmissionCode, '', 1, '', ExternalTicketNo);
+                    MemberLimitationMgr.UpdateLogEntry(ValidationRequest.MemberCardLogEntryNo, 0, ExternalTicketNo);
+                end;
 
             Database::"NPR MM Member Card": // Originates from Wallet number    
-                MemberTicketManager.MemberFastCheckInNoPrint(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", ValidationRequest.AdmissionCode, '', 1, '', ExternalTicketNo);
+                begin
+                    MemberTicketManager.MemberFastCheckInNoPrint(MemberCard."Membership Entry No.", MemberCard."Member Entry No.", ValidationRequest.AdmissionCode, '', 1, '', ExternalTicketNo);
+                    MemberLimitationMgr.UpdateLogEntry(ValidationRequest.MemberCardLogEntryNo, 0, ExternalTicketNo);
+                end;
 
             Database::"NPR MM Members. Admis. Setup": // Guests
                 begin
@@ -189,6 +248,7 @@ codeunit 6185130 "NPR SG SpeedGate"
                     end;
 
                     MemberTicketManager.MemberGuestFastCheckInNoPrint(ValidationRequest.ExtraEntityId, false, MemberCard."Membership Entry No.", MemberCard."Member Entry No.", ValidationRequest.AdmissionCode, '', 1, '', ExternalTicketNo);
+                    MemberLimitationMgr.UpdateLogEntry(ValidationRequest.MemberCardLogEntryNo, 0, StrSubstNo('%1 x %2', Quantity, MembershipAdmissionSetup."Description"));
                 end;
 
             Database::"NPR TM Ticket":
@@ -204,6 +264,8 @@ codeunit 6185130 "NPR SG SpeedGate"
                         ValidationRequest.AdmissionCode,
                         -1, '', // PosUnitNo, 
                         ValidationRequest.ScannerId, false);
+
+                    MemberLimitationMgr.UpdateLogEntry(ValidationRequest.MemberCardLogEntryNo, 0, ExternalTicketNo);
                 end;
 
             else
@@ -851,5 +913,36 @@ codeunit 6185130 "NPR SG SpeedGate"
         exit(TempCustomCalendarChange.Nonworking);
     end;
 
+    internal procedure MarkAsDenied(Token: Guid; ErrorCode: Enum "NPR API Error Code"; ErrorMessage: Text)
+    var
+        ValidationRequest: Record "NPR SGEntryLog";
+        MemberLimitationMgr: Codeunit "NPR MM Member Lim. Mgr.";
+        MemberCard: Record "NPR MM Member Card";
+        ResponseMessage: Text;
+        ResponseCode: Integer;
+    begin
+        if (ErrorCode.AsInteger() = 0) then
+            ErrorCode := ErrorCode::denied_by_speedgate;
 
+        ValidationRequest.SetCurrentKey(Token);
+        ValidationRequest.SetFilter("Token", '=%1', Token);
+        if (ValidationRequest.FindSet()) then begin
+            repeat
+                ValidationRequest.EntryStatus := ValidationRequest.EntryStatus::DENIED;
+                if (ValidationRequest.ApiErrorNumber = 0) then
+                    ValidationRequest.ApiErrorNumber := ErrorCode.AsInteger();
+                ValidationRequest.ApiErrorMessage := CopyStr(ErrorMessage, 1, MaxStrLen(ValidationRequest.ApiErrorMessage));
+                ValidationRequest.Modify();
+
+                if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::MEMBER_CARD) then begin
+                    if (MemberCard.GetBySystemId(ValidationRequest.EntityId)) then begin
+                        if (ValidationRequest.MemberCardLogEntryNo = 0) then
+                            ValidationRequest.MemberCardLogEntryNo := MemberLimitationMgr.WS_CheckLimitMemberCardArrival(MemberCard."External Card No.", ValidationRequest.AdmissionCode, ValidationRequest.ScannerId, ValidationRequest.MemberCardLogEntryNo, ResponseMessage, ResponseCode);
+                        MemberLimitationMgr.UpdateLogEntry(ValidationRequest.MemberCardLogEntryNo, ErrorCode.AsInteger(), ErrorMessage);
+                    end;
+                end;
+
+            until (ValidationRequest.Next() = 0);
+        end;
+    end;
 }
