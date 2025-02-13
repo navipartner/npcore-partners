@@ -218,52 +218,25 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
 
     internal procedure MarkAsDenied(var Request: Codeunit "NPR API Request"; ErrorCode: Enum "NPR API Error Code"; ErrorMessage: Text) Response: Codeunit "NPR API Response"
     var
+        SpeedGateMgr: Codeunit "NPR SG SpeedGate";
         Body: JsonObject;
         JTokens, JTokenElements : JsonToken;
         ArrayOfTokens: JsonArray;
         TokenObject: JsonObject;
         TokenText: Text[100];
         Token: Guid;
-        ValidationRequest: Record "NPR SGEntryLog";
-        MemberLimitationMgr: Codeunit "NPR MM Member Lim. Mgr.";
-        MemberCard: Record "NPR MM Member Card";
-        ResponseMessage: Text;
-        ResponseCode: Integer;
     begin
         Body := Request.BodyJson().AsObject();
         if (not Body.Get('tokens', JTokens)) then
             exit;
-
-        if (ErrorCode.AsInteger() = 0) then
-            ErrorCode := ErrorCode::denied_by_speedgate;
 
         ArrayOfTokens := JTokens.AsArray();
         foreach JTokenElements in ArrayOfTokens do begin
             TokenObject := JTokenElements.AsObject();
             if (TokenObject.Get('token', JTokens)) then begin
                 TokenText := CopyStr(JTokens.AsValue().AsText(), 1, MaxStrLen(TokenText));
-                if (Evaluate(Token, TokenText)) then begin
-                    ValidationRequest.SetCurrentKey(Token);
-                    ValidationRequest.SetFilter("Token", '=%1', Token);
-                    if (ValidationRequest.FindSet()) then begin
-                        repeat
-                            ValidationRequest.EntryStatus := ValidationRequest.EntryStatus::DENIED;
-                            if (ValidationRequest.ApiErrorNumber = 0) then
-                                ValidationRequest.ApiErrorNumber := ErrorCode.AsInteger();
-                            ValidationRequest.ApiErrorMessage := CopyStr(ErrorMessage, 1, MaxStrLen(ValidationRequest.ApiErrorMessage));
-                            ValidationRequest.Modify();
-
-                            if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::MEMBER_CARD) then begin
-                                if (MemberCard.GetBySystemId(ValidationRequest.EntityId)) then begin
-                                    if (ValidationRequest.MemberCardLogEntryNo = 0) then
-                                        ValidationRequest.MemberCardLogEntryNo := MemberLimitationMgr.WS_CheckLimitMemberCardArrival(MemberCard."External Card No.", ValidationRequest.AdmissionCode, ValidationRequest.ScannerId, ValidationRequest.MemberCardLogEntryNo, ResponseMessage, ResponseCode);
-                                    MemberLimitationMgr.UpdateLogEntry(ValidationRequest.MemberCardLogEntryNo, ErrorCode.AsInteger(), ErrorMessage);
-                                end;
-                            end;
-
-                        until (ValidationRequest.Next() = 0);
-                    end;
-                end;
+                if (Evaluate(Token, TokenText)) then
+                    SpeedGateMgr.MarkAsDenied(Token, ErrorCode, ErrorMessage);
             end;
         end;
 
@@ -675,5 +648,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
                 exit('unknown');
         end;
     end;
+
+
 }
 #endif

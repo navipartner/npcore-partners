@@ -405,7 +405,7 @@
         // Create new ticket - only possible when ExternalItemNo <> ''
         if (not TicketIsReused) then begin
             if (not (MemberRetailIntegration.TranslateBarcodeToItemVariant(ExternalItemNo, ItemNo, VariantCode, ResolvingTable))) then
-                Error(MISSING_CROSSREF);
+                Error(MISSING_CROSSREF, ExternalItemNo);
 
             MemberRetailIntegration.IssueTicketFromMemberScan(true, ItemNo, VariantCode, Member, TicketNo, ErrorReason);
             TicketManagement.RegisterArrivalScanTicket("NPR TM TicketIdentifierType"::INTERNAL_TICKET_NO, TicketNo, AdmissionCode, -1, PosUnitNo, '', false);
@@ -450,7 +450,7 @@
         // Create new ticket - only possible when ExternalItemNo <> ''
         if (not TicketIsReused) then begin
             if (not (MemberRetailIntegration.TranslateBarcodeToItemVariant(ExternalItemNo, ItemNo, VariantCode, ResolvingTable))) then
-                Error(MISSING_CROSSREF);
+                Error(MISSING_CROSSREF, ExternalItemNo);
 
             MemberRetailIntegration.IssueTicketFromMemberScan(true, ItemNo, VariantCode, Member, TicketNo, ErrorReason);
             TicketManagement.RegisterArrivalScanTicket("NPR TM TicketIdentifierType"::INTERNAL_TICKET_NO, TicketNo, AdmissionCode, -1, PosUnitNo, '', false);
@@ -492,7 +492,7 @@
         // Create new ticket - only possible when ExternalItemNo <> ''
         if (not TicketIsReused) then begin
             if (not (MemberRetailIntegration.TranslateBarcodeToItemVariant(ExternalItemNo, ItemNo, VariantCode, ResolvingTable))) then
-                Error(MISSING_CROSSREF);
+                Error(MISSING_CROSSREF, ExternalItemNo);
 
             MemberRetailIntegration.IssueTicketFromMemberScan(true, ItemNo, VariantCode, Member, TicketNo, ErrorReason);
             TicketManagement.RegisterArrivalScanTicket("NPR TM TicketIdentifierType"::INTERNAL_TICKET_NO, TicketNo, AdmissionCode, -1, PosUnitNo, '', false);
