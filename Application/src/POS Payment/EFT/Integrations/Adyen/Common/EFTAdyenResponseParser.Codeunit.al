@@ -679,6 +679,8 @@
                     EFTTransactionRequest."Card Expiry Month" := NameValueCollection.Get(Key);
                 'cardtype':
                     EFTTransactionRequest."Payment Brand" := NameValueCollection.Get(Key);
+                'paymentaccountreference':
+                    EFTTransactionRequest."Payment Account Reference" := NameValueCollection.Get(Key);
             end;
         end;
     end;

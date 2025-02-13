@@ -789,6 +789,14 @@
         POSEntryPaymentLine.EFT := POSSaleLine."EFT Approved";
         POSEntryPaymentLine.SystemId := POSSaleLine.SystemId;
 
+        POSEntryPaymentLine."EFT Card Number" := POSSaleLine."EFT Card Number";
+        POSEntryPaymentLine."EFT Card Name" := POSSaleLine."EFT Card Name";
+        POSEntryPaymentLine."EFT Card Application ID" := POSSaleLine."EFT Card Application ID";
+        POSEntryPaymentLine."EFT Card Expiry Month" := POSSaleLine."EFT Card Expiry Month";
+        POSEntryPaymentLine."EFT Card Expiry Year" := POSSaleLine."EFT Card Expiry Year";
+        POSEntryPaymentLine."EFT Payment Brand" := POSSaleLine."EFT Payment Brand";
+        POSEntryPaymentLine."EFT Payment Account Reference" := POSSaleLine."EFT Payment Account Reference";
+
         POSEntryPaymentLine."Shortcut Dimension 1 Code" := POSSaleLine."Shortcut Dimension 1 Code";
         POSEntryPaymentLine."Shortcut Dimension 2 Code" := POSSaleLine."Shortcut Dimension 2 Code";
         POSEntryPaymentLine."Dimension Set ID" := POSSaleLine."Dimension Set ID";
