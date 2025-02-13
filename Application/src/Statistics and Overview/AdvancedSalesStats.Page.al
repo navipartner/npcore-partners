@@ -652,6 +652,11 @@
             ValueEntry.SetRange("Global Dimension 2 Code", Dim2Filter)
         else
             ValueEntry.SetRange("Global Dimension 2 Code");
+
+        if ItemNoFilter <> '' then
+            ValueEntry.SetFilter("Item No.", ItemNoFilter)
+        else
+            ValueEntry.SetRange("Item No.");
     end;
 
     internal procedure CalcCostAndSalesAmountFromVE(var CostAmount: Decimal; var SalesAmount: Decimal)
@@ -710,6 +715,12 @@
                         ValueEntry.SetRange("Global Dimension 2 Code", Dim2Filter)
                     else
                         ValueEntry.SetRange("Global Dimension 2 Code");
+
+                    if ItemNoFilter <> '' then
+                        ValueEntry.SetFilter("Item No.", ItemNoFilter)
+                    else
+                        ValueEntry.SetRange("Item No.");
+
                     ValueEntry.CalcSums("Cost Amount (Actual)", "Sales Amount (Actual)");
                     CostAmount := ValueEntry."Cost Amount (Actual)";
                     SalesAmount := ValueEntry."Sales Amount (Actual)";
