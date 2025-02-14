@@ -127,6 +127,9 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
                 if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::WALLET) then
                     AdmitWallet(ValidationRequest, ResponseJson);
 
+                if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::DOC_LX_CITY_CARD) then
+                    AdmitCityCard(ValidationRequest, ResponseJson);
+
             until (ValidationRequest.Next() = 0);
         end;
 
@@ -165,6 +168,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             .AddProperty('itemNo', Ticket."Item No.")
             .AddProperty('admissionCode', ValidationRequest.AdmissionCode)
             .AddObject(AddPrintedTicketDetails(ResponseJson, Ticket))
+            .AddProperty('ticketNumber', ValidationRequest.AdmittedReferenceNo)
             .EndObject();
     end;
 
@@ -214,6 +218,27 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         end;
 
         exit(Ticket.SystemId);
+    end;
+
+    local procedure AdmitCityCard(ValidationRequest: Record "NPR SGEntryLog"; ResponseJson: Codeunit "NPR JSON Builder")
+    var
+        SpeedGateMgr: Codeunit "NPR SG SpeedGate";
+        Ticket: Record "NPR TM Ticket";
+    begin
+        Ticket.GetBySystemId(SpeedGateMgr.ValidateAdmitDocLXCityCard(ValidationRequest));
+
+        ResponseJson
+            .StartObject()
+            .AddProperty('token', Format(ValidationRequest.Token, 0, 4).ToLower())
+            .AddProperty('referenceNumberType', 'docLxCityCard')
+            .AddProperty('referenceNumber', ValidationRequest.ReferenceNo)
+            .AddProperty('ticketId', Format(Ticket.SystemId, 0, 4).ToLower())
+            .AddProperty('status', 'admitted')
+            .AddProperty('itemNo', Ticket."Item No.")
+            .AddProperty('admissionCode', ValidationRequest.AdmissionCode)
+            .AddObject(AddPrintedTicketDetails(ResponseJson, Ticket))
+            .AddProperty('ticketNumber', ValidationRequest.AdmittedReferenceNo)
+            .EndObject();
     end;
 
     internal procedure MarkAsDenied(var Request: Codeunit "NPR API Request"; ErrorCode: Enum "NPR API Error Code"; ErrorMessage: Text) Response: Codeunit "NPR API Response"
@@ -282,10 +307,40 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             ValidationRequest.ReferenceNumberType::WALLET:
                 exit(SingleWalletDTO(ResponseJson, ValidationRequest));
             ValidationRequest.ReferenceNumberType::DOC_LX_CITY_CARD:
-                exit(ResponseJson.AddProperty('docLxCityCard', ValidationRequest.ReferenceNo));
+                exit(SingleDocLxCityCard(ResponseJson, ValidationRequest));
             else
                 exit(ResponseJson.AddProperty('unknown', ValidationRequest.ReferenceNo));
         end;
+    end;
+
+    local procedure SingleDocLxCityCard(var ResponseJson: Codeunit "NPR JSON Builder"; ValidationRequest: Record "NPR SGEntryLog"): Codeunit "NPR JSON Builder"
+    var
+        CityCard: Record "NPR DocLXCityCardHistory";
+    begin
+        CityCard.GetBySystemId(ValidationRequest.EntityId);
+
+        ResponseJson
+            .StartObject('docLxCityCard')
+            .AddProperty('cityCardId', Format(ValidationRequest.EntityId, 0, 4).ToLower())
+            .AddProperty('referenceNumber', ValidationRequest.ReferenceNo)
+            .AddProperty('validToAdmit', (CityCard.ValidationResultCode = '200'));
+
+        if (CityCard.ValidationResultCode = '200') then
+            ResponseJson
+                .AddProperty('articleId', CityCard.ArticleId)
+                .AddProperty('articleName', CityCard.ArticleName)
+                .AddProperty('categoryName', CityCard.CategoryName)
+                .AddProperty('activationDateTime', CityCard.ActivationDate)
+                .AddProperty('validUntilDateTime', CityCard.ValidUntilDate)
+                .AddProperty('validTimeSpan', CityCard.ValidTimeSpan)
+                .AddProperty('shopKey', CityCard.ShopKey);
+
+        ResponseJson
+            .AddProperty('validationResultCode', CityCard.ValidationResultCode)
+            .AddProperty('validationResultMessage', CityCard.ValidationResultMessage)
+            .EndObject();
+
+        exit(ResponseJson);
     end;
 
     local procedure SingleWalletDTO(var ResponseJson: Codeunit "NPR JSON Builder"; ValidationRequest: Record "NPR SGEntryLog"): Codeunit "NPR JSON Builder"

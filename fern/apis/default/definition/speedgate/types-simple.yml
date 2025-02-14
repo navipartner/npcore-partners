@@ -137,6 +137,8 @@ types:
         value: MEM789012
       - name: ExampleWalletId
         value: WAL345678
+      - name: ExampleCityCard
+        value: CIC345678
 
   TicketNumber:
     type: string
@@ -150,6 +152,7 @@ types:
       - ticket
       - wallet
       - memberCard
+      - docLxCityCard
 
   ReferenceNumberType:
     type: ReferenceNumberTypeEnum
@@ -182,8 +185,91 @@ types:
       - name: ExampleValidToAdmit
         value: true
 
-  # Member Related Types
 
+  # City Card Related Types
+  CityCardId: 
+    type: uuid
+    docs: Id of City Card API interaction
+    examples:
+      - name: Example
+        value: 114476d6-dcea-ef11-a8fb-ede7395eaee4
+  
+  ArticleId:
+    type: string
+    docs: Unique identifier for an city card article.
+    examples:
+      - name: ExampleArticleId
+        value: "ADULT-1"
+
+  ArticleName:
+    type: string
+    docs: Name of the article.
+    examples:
+      - name: ExampleArticleName
+        value: "Copenhagen Card Discover 24 hours Adults"
+
+  CategoryName:
+    type: string
+    docs: Name of the category.
+    examples:
+      - name: ExampleCategoryName
+        value: "Adult"
+
+  ActivationDateTime:
+    type: datetime
+    docs: The date and time when the article was activated.
+    examples:
+      - name: ExampleActivationDateTime
+        value: "2025-01-17T14:23:41.000Z"
+
+  ValidUntilDateTime:
+    type: datetime
+    docs: The date and time until the article is valid.
+    examples:
+      - name: ExampleValidUntilDateTime
+        value: "2029-01-18T14:23:41.000Z"
+
+  ValidTimeSpan:
+    type: integer
+    docs: The time span in hours for which the article is valid.
+    examples:
+      - name: ExampleValidTimeSpan
+        value: 24
+
+  ShopKey:
+    type: string
+    docs: Key representing the product .
+    examples:
+      - name: ExampleShopKey
+        value: "SHOP-KEY"
+
+  ValidToAdmitCityCard:
+    type: boolean
+    docs: Indicates if the city card is valid to admit.
+    examples:
+      - name: ExampleValidToAdmit
+        value: true
+
+  ValidationResultCode:
+    type: string
+    docs: Code representing the result of the validation.
+    examples:
+      - name: ExampleAlreadyScanned
+        value: "523"
+      - name: ExampleOk
+        value: "200"
+
+  ValidationResultMessage:
+    type: string
+    docs: Message representing the result of the validation.
+    examples:
+      - name: ExampleAlreadyScanned
+        value: "Already scanned / Scannet tidligere = ugyldig (10.01.2024 13:22)"
+      - name: ExampleOk
+        value: "OK"
+
+
+  # Member Related Types
   CommunityCode:
     type: string
     docs: Code representing the community associated with the membership.

@@ -160,6 +160,64 @@ codeunit 6184830 "NPR DocLXCityCard"
         Result.ReadFrom(StrSubstNo(_ErrorJsonLabel, 5305, StrSubstNo(GeneralError, CardNumber)));
     end;
 
+    internal procedure ExchangeCouponForTicket(CouponNo: Code[20]; EntryNo: Integer; var TicketId: Guid): Boolean
+    var
+        LogEntry: Record "NPR DocLXCityCardHistory";
+        Coupon: Record "NPR NpDc Coupon";
+        Ticket: Record "NPR TM Ticket";
+
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        Token: Text[100];
+        ResponseMessage: Text;
+        TicketNo: Code[20];
+        ItemNo: Code[20];
+    begin
+        LogEntry.Get(EntryNo);
+
+        if (not Coupon.Get(CouponNo)) then
+            exit(false);
+
+        if (not GetCouponExtraItem(Coupon."Coupon Type", ItemNo)) then
+            exit(false);
+
+        ArchiveCoupon(CouponNo);
+
+        Token := TicketRequestManager.CreateReservationRequest(ItemNo, '', 1, '');
+        TicketRequestManager.SetReservationRequestExtraInfo(Token, '', CouponNo, '');
+        TicketRequestManager.IssueTicketFromReservationToken(Token, true, ResponseMessage);
+        TicketRequestManager.ConfirmReservationRequestWithValidate(Token);
+        if (not TicketRequestManager.GetTokenTicket(Token, TicketNo)) then
+            Error('Exchanged Coupon for Ticket, but no ticket was found for token %1', Token);
+
+        Ticket.Get(TicketNo);
+        TicketId := Ticket.SystemId;
+        LogEntry.TicketNo := TicketNo;
+        LogEntry.Modify();
+        exit(true);
+    end;
+
+
+    local procedure GetCouponExtraItem(CouponType: Code[20]; var ItemNo: Code[20]): Boolean
+    var
+        CouponItem: Record "NPR NpDc Extra Coupon Item";
+    begin
+        CouponItem.SetFilter("Coupon Type", '=%1', CouponType);
+        if (not CouponItem.FindFirst()) then
+            exit(false);
+
+        ItemNo := CouponItem."Item No.";
+        exit(ItemNo <> '');
+    end;
+
+    local procedure ArchiveCoupon(CouponNo: Code[20])
+    var
+        Coupon: Record "NPR NpDc Coupon";
+        CouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
+    begin
+        if (Coupon.Get(CouponNo)) then
+            CouponMgt.ArchiveCoupon(Coupon);
+    end;
+
     local procedure IssueCoupon(CouponTypeCode: Code[20]; var CouponNo: Code[20]; var CouponReferenceNo: Text[50]; ValidTimeSpanHours: Integer)
     var
         CouponType: Record "NPR NpDc Coupon Type";

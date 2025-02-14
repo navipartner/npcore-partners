@@ -118,6 +118,24 @@ service:
                 tickets:
                   - $compositeTypes.TicketDetail.ExampleTicketDetail
 
+        - name: "CityCard Reference"
+          docs: Example of a successful identification of a city card from DocLX.
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          request:
+            referenceNumber: $simpleTypes.ReferenceNumber.ExampleCityCard
+            scannerId: $simpleTypes.ScannerId.ExampleSpeedgate
+            admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+          response:
+            body:
+              token: $simpleTypes.Token.ExampleAdmitToken
+              referenceNumberType: docLxCityCard
+              docLxCityCard: $compositeTypes.DocLxCityCardDetails.ExampleSuccess
+
+
+
     admitToken:
       docs: 
         This endpoint processes tokens received from tryAdmit to grant admission. Each token in the request specifies a quantity for admission (useful for guests).

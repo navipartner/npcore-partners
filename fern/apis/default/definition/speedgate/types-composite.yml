@@ -27,6 +27,9 @@ types:
       # In case of a wallet
       wallet: optional<WalletDetails>
 
+      # In case of a DocLX City Card
+      docLxCityCard: optional<DocLxCityCardDetails>
+
 
   TicketDetail:
     docs:
@@ -89,6 +92,36 @@ types:
           firstName: $simpleTypes.FirstName.ExampleFirstName
           lastName: $simpleTypes.LastName.ExampleLastName
           hasPicture: $simpleTypes.HasPicture.ExampleHasPicture
+
+  DocLxCityCardDetails:
+    properties:
+      cityCardId: simpleTypes.CityCardId
+      referenceNumber: simpleTypes.ReferenceNumber
+      validToAdmit: simpleTypes.ValidToAdmitCityCard
+      articleId: optional<simpleTypes.ArticleId>
+      articleName: optional<simpleTypes.ArticleName>
+      categoryName: optional<simpleTypes.CategoryName>
+      activationDateTime: optional<simpleTypes.ActivationDateTime>
+      validUntilDateTime: optional<simpleTypes.ValidUntilDateTime>
+      validTimeSpan: optional<simpleTypes.ValidTimeSpan>
+      shopKey: optional<simpleTypes.ShopKey>
+      validationResultCode: simpleTypes.ValidationResultCode
+      validationResultMessage: simpleTypes.ValidationResultMessage
+    examples:
+      - name: ExampleSuccess
+        value:
+          cityCardId: $simpleTypes.CityCardId.Example
+          referenceNumber: $simpleTypes.ReferenceNumber.ExampleCityCard
+          validToAdmit: $simpleTypes.ValidToAdmitCityCard.ExampleValidToAdmit
+          articleId: $simpleTypes.ArticleId.ExampleArticleId
+          articleName: $simpleTypes.ArticleName.ExampleArticleName
+          categoryName: $simpleTypes.CategoryName.ExampleCategoryName
+          activationDateTime: $simpleTypes.ActivationDateTime.ExampleActivationDateTime
+          validUntilDateTime: $simpleTypes.ValidUntilDateTime.ExampleValidUntilDateTime
+          validTimeSpan: $simpleTypes.ValidTimeSpan.ExampleValidTimeSpan
+          shopKey: $simpleTypes.ShopKey.ExampleShopKey
+          validationResultCode: $simpleTypes.ValidationResultCode.ExampleOk
+          validationResultMessage: $simpleTypes.ValidationResultMessage.ExampleOk
 
   PreviousScan:
     properties:
