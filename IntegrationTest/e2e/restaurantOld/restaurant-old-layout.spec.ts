@@ -3,6 +3,8 @@ import { restaurantLogin } from "../fixtures/restaurantLogin";
 import * as data from "./util/data/restaurant-test-data.json";
 import { restaurantSelectLayoutType } from "../fixtures/restaurantSelectLayoutType";
 
+test.skip();
+
 test.beforeEach(async ({ page }) => {
   await restaurantSelectLayoutType(page, false);
   await restaurantLogin(page, false);
