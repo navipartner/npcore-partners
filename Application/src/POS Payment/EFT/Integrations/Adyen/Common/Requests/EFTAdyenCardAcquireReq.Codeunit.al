@@ -28,7 +28,10 @@ codeunit 6184592 "NPR EFT Adyen CardAcquire Req"
         Json.WriteEndObject(); // SaleTransactionID
         Json.WriteEndObject(); // SaleData
         Json.WriteStartObject('CardAcquisitionTransaction');
-        if EFTTransactionRequest."Auxiliary Operation ID" = 2 then begin
+        if (
+            (EFTTransactionRequest."Auxiliary Operation ID" = "NPR EFT Adyen Aux Operation"::ACQUIRE_CARD.AsInteger()) and
+            (EFTTransactionRequest."Initiated from Entry No." > 0)
+        ) then begin
             OriginalEFTTransactionRequest.Get(EFTTransactionRequest."Initiated from Entry No.");
             Json.WriteStringProperty('TotalAmount', Format(OriginalEFTTransactionRequest."Amount Input", 0, '<Precision,2:3><Standard Format,9>'));
         end;
