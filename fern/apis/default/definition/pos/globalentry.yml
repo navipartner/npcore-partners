@@ -1,0 +1,272 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+
+types:
+  StoreCode:
+    type: string
+    docs: Identification of the store
+  PosUnitCode:
+    type: string
+    docs: Identification of the POS unit
+
+  EntryTypeEnum:
+    enum:
+      - name: DirectSale
+        value: 'Direct Sale'
+      - name: CreditSale
+        value: 'Credit Sale'
+  LineTypeEnum:
+    enum:
+      - name: blank
+        value: ' '
+      - name: GLAccount
+        value: 'G/L Account'
+      - name: Item
+        value: 'Item'
+      - name: Customer
+        value: 'Customer'
+      - name: Voucher
+        value: 'Voucher'
+      - name: Payout
+        value: 'Payout'
+      - name: Rounding
+        value: 'Rounding'
+
+  POSEntry:
+    properties:
+      posStore: StoreCode
+      posUnit: PosUnitCode
+      documentNo: 
+        type: string
+        docs: Sales ticket no.
+      company: optional<string>
+      entryTime: datetime
+      entryType: EntryTypeEnum
+      customerNo: optional<string>
+      postingDate: date
+      fiscalNumber: string
+      salesperson: optional<string>
+      currencyCode: optional<string>
+      currencyFactor: optional<double>
+      salesAmount: double
+      discountAmount: double
+      totalAmountExclVAT: double
+      totalAmountInclVAT: double
+      totalVATAmount: double
+      salesLines: 
+        type: optional<list<SaleLine>>
+        docs: List of sold items
+      paymentLines: 
+        type: optional<list<PaymentLine>>
+        docs: List of payments
+      posInfos: 
+        type: optional<list<POSInfo>>
+        docs: List of Info entries
+      extensionFields: 
+        type: optional<list<ExtensionField>>
+        docs: Additional data. Definition of fieldId and format of data in fieldValue have to be agreed with receiver of data
+    examples:
+      - name: ExampleCreateSale
+        value:
+          posStore: "0321"
+          posUnit: "POS-031"
+          documentNo: "12345678"
+          company: "Sales Company"
+          entryTime: "2024-12-25T12:43:56Z"
+          entryType: "Direct Sale"
+          customerNo: "D000188"
+          postingDate: "2025-09-16"
+          fiscalNumber: "F0078865"
+          salesperson: "CLARK"
+          currencyCode: "USD"
+          currencyFactor: 1.23
+          salesAmount: 4.5
+          discountAmount: 6.78
+          totalAmountExclVAT: 90.12
+          totalAmountInclVAT: 34.5
+          totalVATAmount: 6.7
+          salesLines: 
+            - $SaleLine.SaleLineExample
+          paymentLines:
+            - $PaymentLine.PaymentLineExample
+          posInfos:
+            - $POSInfo.POSInfoExample
+          extensionFields:
+            - $ExtensionField.HeaderExtensionFieldExample
+
+  SaleLine:
+    properties:
+      lineNo: integer
+      type: LineTypeEnum        
+      code: string
+      variantCode: optional<string>
+      referenceNumber: optional<string>
+      bomItemCode: optional<string>
+      locationCode: optional<string>
+      description: optional<string>
+      description2: optional<string>
+      quantity: double
+      unitOfMeasureCode: optional<string>
+      baseQuantity: double
+      unitPrice: double
+      currencyCode: optional<string>
+      vatPct: double
+      lineDiscountPct: double
+      lineDiscountAmountExclVAT: double
+      lineDiscountAmountInclVAT: double
+      lineAmount: double
+      amountExclVAT: double
+      amountInclVAT: double
+      lineDiscountAmountExclVATLCY: double
+      lineDiscountAmountInclVATLCY: double
+      amountExclVATLCY: double
+      amountInclVATLCY: double
+      globalReference: optional<string>
+      extensionFields: 
+        type: optional<list<ExtensionField>>
+        docs: Additional data. Definition of fieldId and format of data in fieldValue have to be agreed with receiver of data
+
+    examples:
+      - name: SaleLineExample
+        value:
+          lineNo: 1
+          type: Item
+          code: "15235"
+          variantCode: "025"
+          referenceNumber: "9780201379624"
+          bomItemCode: "66"
+          locationCode: "LOC-01"
+          description: ""
+          description2: ""
+          quantity: 9.11
+          unitOfMeasureCode: "PCS"
+          baseQuantity: 1
+          unitPrice: 1.2345
+          currencyCode: "USD"
+          vatPct: 6.789
+          lineDiscountPct: 0.12
+          lineDiscountAmountExclVAT: 3.45
+          lineDiscountAmountInclVAT: 6.78
+          lineAmount: 9.01
+          amountExclVAT: 2.34
+          amountInclVAT: 5.67
+          lineDiscountAmountExclVATLCY: 8.90
+          lineDiscountAmountInclVATLCY: 1.23
+          amountExclVATLCY: 4.56
+          amountInclVATLCY: 7.89
+          globalReference: "D6E88A5E52E542F0AAA96F08F40B6EC9"
+          extensionFields:
+            - $ExtensionField.LineExtensionFieldExample
+
+  PaymentLine:
+    properties:   
+      lineNo: integer
+      documentNo: optional<string>
+      paymentMethod: string
+      description: optional<string>
+      amountLCY: double
+      amount: double
+      currencyCode: optional<string>
+      extensionFields: 
+        type: optional<list<ExtensionField>>
+        docs: Additional data. Definition of fieldId and format of data in fieldValue have to be agreed with receiver of data
+    examples:
+      - name: PaymentLineExample
+        value:
+          lineNo: 1
+          documentNo: "12345678"
+          paymentMethod: "CASH"
+          description: "Cash payment"
+          amountLCY: 4.56
+          amount: 7.89
+          currencyCode: "USD"
+          extensionFields:
+            - $ExtensionField.PaymentExtensionFieldExample
+
+  POSInfo:
+    properties:
+      lineNo: integer
+      saleLineNo: optional<integer>
+      infoCode: optional<string>
+      code: optional<string>
+      description: optional<string>
+      quantity: optional<double>
+      price: optional<double>
+      netAmount: optional<double>
+      grossAmount: optional<double>
+      discountAmount: optional<double>
+      extensionFields: 
+        type: optional<list<ExtensionField>>
+        docs: Additional data. Definition of fieldId and format of data in fieldValue have to be agreed with receiver of data
+    examples:
+      - name: POSInfoExample
+        value:
+          lineNo: 4
+          saleLineNo: 1
+          infoCode: "AFK"
+          code: "123-ABC"
+          description: "description"
+          quantity: 1
+          price: 1.23
+          netAmount: 4.56
+          grossAmount: 7.89
+          discountAmount: 0.12
+          extensionFields:
+            - $ExtensionField.PosInfoExtensionFieldExample
+
+  ExtensionField:
+    docs: additional data. Definition of fieldId and format of data in fieldvalue have to be agreed
+    properties:
+      fieldId: integer
+      fieldValue: string
+    examples:
+      - name: HeaderExtensionFieldExample
+        value:
+          fieldId: 50100
+          fieldValue: "value to apply to the custom field on pos entry"
+      - name: LineExtensionFieldExample
+        value:
+          fieldId: 50100
+          fieldValue: "value to apply to the custom field on sales line"
+      - name: PaymentExtensionFieldExample
+        value:
+          fieldId: 50100
+          fieldValue: "value to apply to custom field on payment line"
+      - name: PosInfoExtensionFieldExample
+        value:
+          fieldId: 50100
+          fieldValue: "value to apply to custom field on payment line"
+      
+  GlobalEntryResponse:
+    properties:
+      id: 
+        type: uuid
+        docs: Unique identifier of the added entry
+
+
+
+service:
+  display-name: Global POS Entry
+  auth: false
+  base-path: /pos
+  endpoints: 
+    postGlobalEntry:
+      display-name: Create Global Entry
+      docs: Endpoint for adding a new sale to Global Entry. The sale is identified by the combination of Store, POS Unit and Document No. This combination must be unique for the sale to be added.
+      path: "/globalentry"
+      method: POST
+      request:
+        name: createSale
+        body: POSEntry
+      response: GlobalEntryResponse
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          request: $POSEntry.ExampleCreateSale
+          response:
+            body:
+              id: "0d200aa6-aacd-4b78-b673-c4fb7461f5ea"

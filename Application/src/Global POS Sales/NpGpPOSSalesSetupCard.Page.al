@@ -45,7 +45,38 @@
                         ToolTip = 'Specifies the value of the Service Url field';
                         ApplicationArea = NPRRetail;
                     }
-
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+                    field("Use OData api"; Rec."Use api")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies if the OData api is used';
+                    }
+                    field("OData Base Url"; Rec."OData Base Url")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the base url for the OData api. The base url can be found by opening the page ''NaviPartner API URL'' in the company to receive the Global POS Sales transactions';
+                    }
+                    group(OData)
+                    {
+                        ShowCaption = false;
+                        Visible = Rec."Use api";
+                        field("Environment Type"; Rec."Environment Type")
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies the environment type of the endpoint';
+                        }
+                        field("Last exported POS Entry"; Rec."Last exported POS Entry")
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies the Entry No. of the last exported POS Entry.';
+                        }
+                        field("Last exported"; Rec."Last exported")
+                        {
+                            ApplicationArea = NPRRetail;
+                            ToolTip = 'Specifies the time for the lastest export.';
+                        }
+                    }
+#endif
                     group(Authorization)
                     {
                         Caption = 'Authorization';
@@ -120,7 +151,9 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+                Visible = not Rec."Use api";
+#endif
                 ToolTip = 'Executes the Validate Global POS Sales Setup action';
                 ApplicationArea = NPRRetail;
 

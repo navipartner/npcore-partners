@@ -38,6 +38,49 @@
 
     actions
     {
+        area(Processing)
+        {
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+            action(SetupJobQueue)
+            {
+                Caption = 'Setup Job Queue';
+                Image = Setup;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                ToolTip = 'Sets up a Job Queue Entry to automate export of POS Entries to Global Sales endpoints';
+                ApplicationArea = NPRNaviConnect;
+                Visible = Rec."Use api";
+
+                trigger OnAction()
+                var
+                    JobQueueEntry: Record "Job Queue Entry";
+                    NpGpExporttoAPI: Codeunit "NPR NpGp Export to API";
+                begin
+                    CurrPage.SaveRecord();
+                    NpGpExporttoAPI.CreateExportProcessingJobQueueEntry(JobQueueEntry);
+                    if not IsNullGuid(JobQueueEntry.ID) then
+                        Page.Run(Page::"Job Queue Entry Card", JobQueueEntry);
+                end;
+            }
+#endif
+        }
+        area(Navigation)
+        {
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+            action(ExportLog)
+            {
+                Caption = 'Export Log';
+                ToolTip = 'Shows the log of exported POS Entries for this setup';
+                Image = Log;
+                RunObject = page "NPR NpGp Export Log";
+                RunPageLink = "POS Sales Setup Code" = field(Code);
+                ApplicationArea = NPRRetail;
+                Visible = Rec."Use api";
+            }
+#endif            
+        }
     }
 }
 

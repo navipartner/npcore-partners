@@ -87,7 +87,7 @@
         until TempNpGpPOSSalesEntry2.Next() = 0;
     end;
 
-    local procedure InsertPOSSalesEntry(var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSInfoPOSEntry: Record "NPR NpGp POS Info POS Entry" temporary; var TempNpGpPOSPaymentLine: Record "NPR NpGp POS Payment Line" temporary)
+    procedure InsertPOSSalesEntry(var TempNpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry" temporary; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary; var TempNpGpPOSInfoPOSEntry: Record "NPR NpGp POS Info POS Entry" temporary; var TempNpGpPOSPaymentLine: Record "NPR NpGp POS Payment Line" temporary): Guid
     var
         NpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry";
         TempNpGpPOSSalesLine2: Record "NPR NpGp POS Sales Line" temporary;
@@ -145,6 +145,7 @@
             repeat
                 InsertPosInfoPosPaymentLine(NpGpPOSSalesEntry, TempNpGpPOSPaymentLine2);
             until TempNpGpPOSPaymentLine2.Next() = 0;
+        exit(NpGpPOSSalesEntry.SystemId);
     end;
 
     local procedure InsertPosSalesLine(NpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry"; var TempNpGpPOSSalesLine: Record "NPR NpGp POS Sales Line" temporary)

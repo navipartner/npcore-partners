@@ -51,7 +51,9 @@
 #if not BC17
         AddShopifyRetentionPolicies(IsUpgrade);
 #endif
-
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+        AddNpGpExportLogPolicy(IsUpgrade);
+#endif
         if IsUpgrade then
             LogMessageStopwatch.LogFinish();
     end;
@@ -267,6 +269,37 @@
             SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'SalesPriceMaintenance');
     end;
 
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+    local procedure AddNpGpExportLogPolicy(IsUpgrade: Boolean)
+    var
+        NpGpExportLog: Record "NPR NpGp Export Log";
+        RecRef: RecordRef;
+        RetenPolAllowedTables: Codeunit "Reten. Pol. Allowed Tables";
+        RtnPeriodEnum: Enum "Retention Period Enum";
+        TableFilters: JsonArray;
+
+    begin
+        if IsUpgrade then
+            if HasUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NpGpExportLog') then
+                exit;
+        NpGpExportLog.SetRange(Sent, false);
+        RtnPeriodEnum := RtnPeriodEnum::"Never Delete";
+        RecRef.GetTable(NpGpExportLog);
+        RetenPolAllowedTables.AddTableFilterToJsonArray(TableFilters, RtnPeriodEnum, RecRef.SystemCreatedAtNo(), true, false, RecRef);
+
+        NpGpExportLog.SetRange(Sent, true);
+        RtnPeriodEnum := RtnPeriodEnum::"1 Week";
+        RecRef.GetTable(NpGpExportLog);
+        RetenPolAllowedTables.AddTableFilterToJsonArray(TableFilters, RtnPeriodEnum, RecRef.SystemCreatedAtNo(), true, false, RecRef);
+
+        RetenPolAllowedTables.AddAllowedTable(Database::"NPR NpGp Export Log", RecRef.SystemCreatedAtNo(), TableFilters);
+        CreateRetentionPolicySetup(Database::"NPR NpGp Export Log", GetRetentionPeriodCode(RtnPeriodEnum), true, false);
+
+        if IsUpgrade then
+            SetUpgradeTag(Codeunit::"NPR Reten. Pol. Install", 'NpGpExportLog');
+
+    end;
+#endif
     local procedure AddAllowedTable(TableId: Integer; RtnPeriodEnum: Enum "Retention Period Enum"; RetenPolDeleting: Enum "Reten. Pol. Deleting")
     var
         RetenPolAllowedTables: Codeunit "Reten. Pol. Allowed Tables";

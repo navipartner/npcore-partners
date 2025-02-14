@@ -16,7 +16,10 @@ enum 6059810 "NPR API Error Code"
     {
         Caption = 'The selected resource does not exist.', Locked = true;
     }
-
+    value(6248189; globalsale_duplicate_key)
+    {
+        Caption = 'Duplicate key.', Locked = true;
+    }
     value(6060000; capacity_exceeded)
     {
         Caption = 'The capacity has been exceeded. Entry is not allowed.', Locked = true;

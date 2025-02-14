@@ -209,6 +209,9 @@ navigation:
           - pos.externalsale:
               title: External POS Sale
               summary: ./docs/pages/pos/externalpossale.mdx
+          - pos.globalentry:
+              title: Global POS Entry
+              summary: ./docs/pages/pos/globalentry.mdx
 
 
 navbar-links:

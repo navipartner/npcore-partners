@@ -8,6 +8,7 @@ codeunit 6185056 "NPR API POS Handler" implements "NPR API Request Handler"
         APIPOSSale: Codeunit "NPR API POS Sale";
         APIPOSSalesperson: Codeunit "NPR API POS Salesperson";
         APIExternalPOSSale: Codeunit "NPR API External POS Sale";
+        APIPOSGlobalEntry: Codeunit "NPR API POS Global Entry";
     begin
         case true of
             Request.Match('GET', '/pos/sale/search'):
@@ -22,6 +23,8 @@ codeunit 6185056 "NPR API POS Handler" implements "NPR API Request Handler"
                 exit(APIExternalPOSSale.GetSale(Request));
             Request.Match('POST', '/pos/externalsale'):
                 exit(APIExternalPOSSale.CreateSale(Request));
+            Request.Match('POST', '/pos/globalentry'):
+                exit(APIPOSGlobalEntry.InsertPosSalesEntries(Request));
         end;
     end;
 }

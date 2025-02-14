@@ -77,6 +77,56 @@
             ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Discontinued in BC17';
         }
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+        field(30; "Use api"; Boolean)
+        {
+            Caption = 'Use api';
+            DataClassification = CustomerContent;
+            trigger OnValidate()
+            var
+                NpGpExporttoAPI: Codeunit "NPR NpGp Export to API";
+            begin
+                if "Use api" and ("Service Url" <> '') and ("OData Base Url" = '') then
+                    "OData Base Url" := SoapUrlToODataUrl("Service Url");
+                if "Use api" then
+                    NpGpExporttoAPI.InitExportControl(Rec.Code);
+            end;
+        }
+#endif
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+        field(31; "OData Base Url"; Text[250])
+        {
+            Caption = 'OData Base Url';
+            DataClassification = CustomerContent;
+        }
+#endif
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+        field(33; "Environment Type"; Option)
+        {
+            Caption = 'Environment Type';
+            OptionMembers = Saas,OnPrem,Crane;
+            OptionCaption = 'Saas,OnPrem,Crane';
+            DataClassification = CustomerContent;
+        }
+#endif
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+        field(34; "Last exported POS Entry"; Integer)
+        {
+            Caption = 'Last exported POS Entry';
+            FieldClass = FlowField;
+            CalcFormula = lookup("NPR NpGp Export Control"."Last Entry No. Exported" where("POS Sales Setup Code" = field(Code)));
+            Editable = false;
+        }
+#endif
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+        field(35; "Last exported"; DateTime)
+        {
+            Caption = 'Last exported';
+            FieldClass = FlowField;
+            CalcFormula = lookup("NPR NpGp Export Control"."Last Exported Date" where("POS Sales Setup Code" = field(Code)));
+            Editable = false;
+        }
+#endif
     }
 
     keys
@@ -115,5 +165,42 @@
         iAuth.SetAuthorizationValue(RequestHeaders, AuthParamsBuff);
     end;
 
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+    local procedure SoapUrlToODataUrl(SoapUrl: Text[250]): Text[250]
+    var
+        TenantID: Text;
+        TenantGuid: Guid;
+        EnvironmentName: Text;
+        ServiceCompanyName: Text;
+        TextList: List of [Text];
+        Index: Integer;
+    begin
+        if not SoapUrl.ToLower().Contains('/codeunit/') then
+            exit('');
+        if not SoapUrl.ToLower().Contains('/ws/') then
+            exit('');
+        TextList := SoapUrl.ToLower().Split('/');
+        Index := TextList.LastIndexOf('codeunit');
+        if TextList.Get(Index - 2) <> 'ws' then
+            exit('');
+        TextList := SoapUrl.Split('/');
+        ServiceCompanyName := TextList.Get(Index - 1);
+        EnvironmentName := TextList.Get(Index - 3);
+        if Evaluate(TenantGuid, TextList.Get(Index - 4)) then begin
+            TenantID := TextList.Get(Index - 4);
+            Rec."Environment Type" := Rec."Environment Type"::Saas;
+        end else begin
+            Index := Index - 4;
+            while (Index > 0) and (not TextList.Get(Index).ToLower().Contains('.dynamics-retail')) do
+                Index -= 1;
+            TextList := TextList.Get(Index).Split('.');
+            TenantID := TextList.Get(1);
+            Rec."Environment Type" := Rec."Environment Type"::Crane;
+        end;
+#pragma warning disable AA0139
+        exit(StrSubstNo('https://api.npretail.app/%1/%2/%3/', TenantID, EnvironmentName, ServiceCompanyName));
+#pragma warning restore        
+    end;
+#endif
 }
 
