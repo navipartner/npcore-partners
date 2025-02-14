@@ -351,7 +351,8 @@ codeunit 6014436 "NPR RP Boca Label Device Lib." implements "NPR IMatrix Printer
     local procedure PrintText(Font: Text[50]; Modifiers: Text[10]; Alignment: Option; Rotation: Text[2]; X: Integer; Y: Integer; Input: Text[100])
     var
         HW: Text[10];
-        CTR: Integer;
+        CTR, RTJ : Integer;
+        Row, Col : Integer;
     begin
         // We assume that the Modifiers are not ill-formatted
         if Modifiers <> '' then
@@ -361,32 +362,97 @@ codeunit 6014436 "NPR RP Boca Label Device Lib." implements "NPR IMatrix Printer
 
         case Alignment of
             0:
-                AddStringToBuffer(StrSubstNo('<%1><RC%2,%3><%4><HW%5>%6', Rotation, (_PrintWidth - X), Y, Font, HW, Input));
+                begin
+                    Row := (_PrintWidth - X);
+                    Col := Y;
+                    AddStringToBuffer(StrSubstNo('<%1><RC%2,%3><%4><HW%5>%6', Rotation, Row, Col, Font, HW, Input));
+                end;
             1:
                 begin
-                    // Assume that the X-coordinate is the center, hence we define the field width 2 times the location
-                    if X > (_PrintWidth DIV 2) then
-                        CTR := _PrintWidth - X;
-                    CTR := X * 2;
-                    // Might need to handle rotation at a later point as well. Seek inspiration in the right-alignment case
-                    AddStringToBuffer(StrSubstNo('<%1><RC%2,%3><%4><HW%5><CTR%6>~%7~', Rotation, ((_PrintWidth - X) + (CTR DIV 2)), Y, Font, HW, CTR, Input));
+                    case Rotation of
+                        'RL':
+                            begin
+                                // Assume that the X-coordinate is the center, hence we define the field width 2 times the location
+                                if X > (_PrintWidth DIV 2) then begin
+                                    Row := (_PrintWidth - X) * 2;
+                                    CTR := (_PrintWidth - X) * 2;
+                                end else begin
+                                    Row := _PrintWidth;
+                                    CTR := X * 2;
+                                end;
+                                Col := Y;
+                            end;
+                        'NR':
+                            begin
+                                // Assume that the Y-coordinate is the center, hence we define the field width 2 times the location
+                                if Y > (_PrintHeight DIV 2) then begin
+                                    Col := Y - (_PrintHeight - Y);
+                                    CTR := (_PrintHeight - Y) * 2;
+                                end else begin
+                                    Col := 0;
+                                    CTR := Y * 2;
+                                end;
+                                Row := (_PrintWidth - X);
+                            end;
+                        'RR':
+                            begin
+                                // Assume that the X-coordinate is the center, hence we define the field width 2 times the location
+                                if X > (_PrintWidth DIV 2) then begin
+                                    Row := 0;
+                                    CTR := (_PrintWidth - X) * 2;
+                                end else begin
+                                    Row := _PrintWidth - (X * 2);
+                                    CTR := X * 2;
+                                end;
+                                Col := Y;
+                            end;
+                        'RU':
+                            begin
+                                // Assume that the Y-coordinate is the center, hence we define the field width 2 times the location
+                                if Y > (_PrintHeight DIV 2) then begin
+                                    Col := _PrintHeight;
+                                    CTR := (_PrintHeight - Y) * 2;
+                                end else begin
+                                    Col := Y * 2;
+                                    CTR := Y * 2;
+                                end;
+                                Row := (_PrintWidth - X);
+                            end;
+                    end;
+                    AddStringToBuffer(StrSubstNo('<%1><RC%2,%3><%4><HW%5><CTR%6>~%7~', Rotation, Row, Col, Font, HW, CTR, Input));
                 end;
             2:
-                case Rotation of
-                    'RL':
-                        AddStringToBuffer(StrSubstNo('<%1><RC%2,%3><%4><HW%5><RTJ%6>~%7~', Rotation, _PrintWidth, Y, Font, HW, X, Input));
-                    'NR':
-                        AddStringToBuffer(StrSubstNo('<%1><RC%2,%3><%4><HW%5><RTJ%6>~%7~', Rotation, (_PrintWidth - X), 0, Font, HW, Y, Input));
-                    'RR':
-                        AddStringToBuffer(StrSubstNo('<%1><RC%2,%3><%4><HW%5><RTJ%6>~%7~', Rotation, 0, Y, Font, HW, (_PrintWidth - X), Input));
-                    'RU':
-                        begin
-                            if _PrintHeight = 0 then
-                                Error(ErrPrintHeightWithRotationLbl);
+                begin
+                    case Rotation of
+                        'RL':
+                            begin
+                                Row := _PrintWidth;
+                                Col := Y;
+                                RTJ := X;
+                            end;
+                        'NR':
+                            begin
+                                Row := _PrintWidth - X;
+                                Col := 0;
+                                RTJ := Y;
+                            end;
+                        'RR':
+                            begin
+                                Row := 0;
+                                Col := Y;
+                                RTJ := _PrintWidth - X;
+                            end;
+                        'RU':
+                            begin
+                                if _PrintHeight = 0 then
+                                    Error(ErrPrintHeightWithRotationLbl);
 
-                            AddStringToBuffer(StrSubstNo('<%1><RC%2,%3><%4><HW%5><RTJ%6>~%7~', Rotation, (_PrintWidth - X), _PrintHeight, Font, HW, (_PrintHeight - Y), Input));
-                        end;
-
+                                Row := _PrintWidth - X;
+                                Col := _PrintHeight;
+                                RTJ := _PrintHeight - Y;
+                            end;
+                    end;
+                    AddStringToBuffer(StrSubstNo('<%1><RC%2,%3><%4><HW%5><RTJ%6>~%7~', Rotation, Row, Col, Font, HW, RTJ, Input));
                 end;
         end;
     end;
