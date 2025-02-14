@@ -466,6 +466,11 @@
         exit(NoOfDays * 86400000);
     end;
 
+    internal procedure HoursToDuration(NoOfHours: Integer): Duration
+    begin
+        exit(MinutesToDuration(NoOfHours * 60));
+    end;
+
     internal procedure MinutesToDuration(NoOfMinutes: Integer): Duration
     begin
         exit(NoOfMinutes * 60000);
