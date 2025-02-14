@@ -132,6 +132,12 @@ table 6150826 "NPR DocLXCityCardHistory"
             DataClassification = CustomerContent;
             Caption = 'Coupon Result Message';
         }
+
+        field(70; TicketNo; Code[20])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Ticket No.';
+        }
     }
 
 

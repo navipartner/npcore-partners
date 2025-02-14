@@ -54,6 +54,9 @@ codeunit 6185130 "NPR SG SpeedGate"
             if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::WALLET) then
                 ValidateAdmitWallet(ValidationRequest);
 
+            if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::DOC_LX_CITY_CARD) then
+                ValidateAdmitDocLXCityCard(ValidationRequest);
+
         until (ValidationRequest.Next() = 0);
 
     end;
@@ -115,6 +118,47 @@ codeunit 6185130 "NPR SG SpeedGate"
         exit(EntryLog.EntryNo);
     end;
 
+    internal procedure ValidateAdmitDocLXCityCard(var ValidationRequest: Record "NPR SGEntryLog"): Guid
+    var
+        DocLXCityCard: Codeunit "NPR DocLXCityCard";
+        LogEntryNo: Integer;
+        LogEntry: Record "NPR DocLXCityCardHistory";
+        Ticket: Record "NPR TM Ticket";
+        TicketId: Guid;
+        CityCardNo: Code[20];
+    begin
+        if (IsNullGuid(ValidationRequest.EntityId)) then
+            Error('The tryAdmit request was not able to validate the city card.');
+
+        if (not LogEntry.GetBySystemId(ValidationRequest.EntityId)) then
+            Error('The tryAdmit request was not able to validate the city card.');
+
+        if (not (LogEntry.ValidationResultCode = '200')) then
+            Error('The city card is not valid: %1', LogEntry.ValidationResultMessage);
+
+        CityCardNo := CopyStr(ValidationRequest.ReferenceNo, 1, MaxStrLen(CityCardNo));
+        DocLXCityCard.RedeemCityCard(CityCardNo, LogEntry.CityCode, LogEntry.LocationCode, LogEntryNo);
+        LogEntry.GetBySystemId(ValidationRequest.EntityId);
+        if (not (LogEntry.RedemptionResultCode = '200')) then
+            Error('The city card could not be redeemed: %1', LogEntry.RedemptionResultMessage);
+
+        DocLXCityCard.AcquireCoupon(CityCardNo, LogEntry.CityCode, LogEntry.LocationCode, ValidationRequest.ScannerId, LogEntryNo);
+
+        LogEntry.Get(LogEntryNo);
+        if (not DocLXCityCard.ExchangeCouponForTicket(LogEntry.CouponNo, LogEntryNo, TicketId)) then
+            Error('The city card could not be exchanged for a ticket.');
+
+        Ticket.GetBySystemId(TicketId);
+
+        //ValidationRequest.AdmissionCode := '';
+        ValidationRequest.ExtraEntityTableId := Database::"NPR TM Ticket";
+        ValidationRequest.ExtraEntityId := Ticket.SystemId;
+        ValidationRequest.Modify();
+
+        exit(ValidateAdmitTicket(ValidationRequest));
+
+    end;
+
     internal procedure ValidateAdmitWallet(var ValidationRequest: Record "NPR SGEntryLog"): Guid
     begin
         if (ValidationRequest.ExtraEntityTableId = 0) then
@@ -138,7 +182,9 @@ codeunit 6185130 "NPR SG SpeedGate"
         ResponseMessage: Text;
     begin
         ResponseMessage := 'Invalid Validation Request';
-        if (not (ValidationRequest.ReferenceNumberType in [ValidationRequest.ReferenceNumberType::TICKET, ValidationRequest.ReferenceNumberType::WALLET])) then
+        if (not (ValidationRequest.ReferenceNumberType in [ValidationRequest.ReferenceNumberType::TICKET,
+                                                           ValidationRequest.ReferenceNumberType::WALLET,
+                                                           ValidationRequest.ReferenceNumberType::DOC_LX_CITY_CARD])) then
             Error('The admit request contains an unhandled Type: %1', ValidationRequest.ReferenceNumberType);
 
         if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::TICKET) then
@@ -146,6 +192,10 @@ codeunit 6185130 "NPR SG SpeedGate"
                 Error(ResponseMessage);
 
         if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::WALLET) then
+            if (not Ticket.GetBySystemId(ValidationRequest.ExtraEntityId)) then
+                Error(ResponseMessage);
+
+        if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::DOC_LX_CITY_CARD) then
             if (not Ticket.GetBySystemId(ValidationRequest.ExtraEntityId)) then
                 Error(ResponseMessage);
 
@@ -341,7 +391,7 @@ codeunit 6185130 "NPR SG SpeedGate"
 
                 _NumberType::DOC_LX_CITY_CARD:
                     if (PermitCityCard) then
-                        NumberPermitted := true; // not yet implemented;
+                        NumberPermitted := CheckForDocLXCityCard(CityCardProfileId, ValidationRequest.ReferenceNo, ValidationRequest.ScannerId, EntityId);
 
                 _NumberType::NOT_WHITELISTED:
                     begin
@@ -489,6 +539,30 @@ codeunit 6185130 "NPR SG SpeedGate"
 
         until ((NumberWhiteListLine.Next() = 0) or (NumberType = _NumberType::REJECTED));
 
+    end;
+
+    local procedure CheckForDocLXCityCard(CityCardProfileId: Guid; Number: Text[100]; ScannerId: Code[10]; var EntityId: Guid): Boolean
+    var
+        DocLXCityCard: Codeunit "NPR DocLXCityCard";
+        CityCardLocation: Record "NPR DocLXCityCardLocation";
+        LogEntryNo: Integer;
+        LogEntry: Record "NPR DocLXCityCardHistory";
+        CityCardNo: Code[20];
+    begin
+        if (IsNullGuid(CityCardProfileId)) then
+            exit(false);
+
+        if (not CityCardLocation.GetBySystemId(CityCardProfileId)) then
+            exit(false);
+
+        CityCardNo := CopyStr(Number, 1, MaxStrLen(CityCardNo));
+        DocLXCityCard.ValidateCityCard(CityCardNo, CityCardLocation.CityCode, CityCardLocation.Code, ScannerId, LogEntryNo);
+
+        if (not LogEntry.Get(LogEntryNo)) then
+            exit(false);
+
+        EntityId := LogEntry.SystemId;
+        exit(true);
     end;
 
     local procedure CheckForWallet(TicketProfileCode: Code[10]; MemberCardProfileCode: Code[10]; var ValidationRequest: Record "NPR SGEntryLog"; var EntityId: Guid; var AdmitToCodes: List of [Code[20]]; var ProfileLineId: Guid): Boolean
