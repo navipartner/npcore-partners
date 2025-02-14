@@ -25,7 +25,7 @@ codeunit 6184596 "NPR EFT Adyen AbortAcquire Req"
         Json.WriteStringProperty('TransactionAction', 'AbortTransaction');
         if EFTTransactionRequest."Processed Entry No." <> 0 then begin
             OriginalEFTTransactionRequest.Get(EFTTransactionRequest."Processed Entry No.");
-            if OriginalEFTTransactionRequest."Auxiliary Operation ID" in [4, 5] then begin
+            if OriginalEFTTransactionRequest."Auxiliary Operation ID" in ["NPR EFT Adyen Aux Operation"::DETECT_SHOPPER.AsInteger(), "NPR EFT Adyen Aux Operation"::CLEAR_SHOPPER.AsInteger()] then begin
                 Json.WriteStartObject('DisplayOutput');
                 Json.WriteStringProperty('Device', 'CustomerDisplay');
                 Json.WriteStringProperty('InfoQualify', 'Display');

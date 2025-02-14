@@ -24,19 +24,19 @@ codeunit 6184611 "NPR EFT Adyen Response Handler"
                     EndLookupTransaction(EFTTransactionRequest, Response);
                 EFTTransactionRequest."Processing Type"::AUXILIARY:
                     case EFTTransactionRequest."Auxiliary Operation ID" of
-                        1:
+                        "NPR EFT Adyen Aux Operation"::ABORT_TRX.AsInteger():
                             EndAbortTransaction(EFTTransactionRequest);
-                        2:
+                        "NPR EFT Adyen Aux Operation"::ACQUIRE_CARD.AsInteger():
                             EndAcquireCard(EFTTransactionRequest, Response);
-                        3:
+                        "NPR EFT Adyen Aux Operation"::ABORT_ACQUIRED.AsInteger():
                             EndAbortAcquireCard(EFTTransactionRequest);
-                        4:
+                        "NPR EFT Adyen Aux Operation"::DETECT_SHOPPER.AsInteger():
                             EndAcquireCard(EFTTransactionRequest, Response);
-                        5:
+                        "NPR EFT Adyen Aux Operation"::CLEAR_SHOPPER.AsInteger():
                             EndAcquireCard(EFTTransactionRequest, Response);
-                        6:
+                        "NPR EFT Adyen Aux Operation"::DISABLE_CONTRACT.AsInteger():
                             EndClearShopperContract(EFTTransactionRequest, Response);
-                        8:
+                        "NPR EFT Adyen Aux Operation"::SUBSCRIPTION_CONFIRM.AsInteger():
                             EndSubscriptionConfirmation(EFTTransactionRequest, Response);
                     end;
             end;
@@ -282,7 +282,7 @@ codeunit 6184611 "NPR EFT Adyen Response Handler"
     var
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
-        if not (EFTTransactionRequest."Auxiliary Operation ID" in [2, 3]) then
+        if not (EFTTransactionRequest."Auxiliary Operation ID" in ["NPR EFT Adyen Aux Operation"::ACQUIRE_CARD.AsInteger(), "NPR EFT Adyen Aux Operation"::ABORT_ACQUIRED.AsInteger()]) then
             exit;
         if (EFTTransactionRequest."Initiated from Entry No." = 0) then
             exit;
@@ -304,7 +304,7 @@ codeunit 6184611 "NPR EFT Adyen Response Handler"
     var
         OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
     begin
-        if not (EFTTransactionRequest."Auxiliary Operation ID" in [8]) then
+        if not (EFTTransactionRequest."Auxiliary Operation ID" = "NPR EFT Adyen Aux Operation"::SUBSCRIPTION_CONFIRM.AsInteger()) then
             exit;
         if (EFTTransactionRequest."Initiated from Entry No." = 0) then
             exit;
@@ -366,7 +366,11 @@ codeunit 6184611 "NPR EFT Adyen Response Handler"
                     Message := StrSubstNo(TRX_ERROR, Format(EFTTransactionRequest."Processing Type"), EFTTransactionRequest."Result Description", EFTTransactionRequest."Result Display Text", EFTTransactionRequest."NST Error");
                 EFTTransactionRequest."Processing Type"::AUXILIARY:
                     case EFTTransactionRequest."Auxiliary Operation ID" of
-                        2, 4, 5, 6, 8:
+                        "NPR EFT Adyen Aux Operation"::ACQUIRE_CARD.AsInteger(),
+                        "NPR EFT Adyen Aux Operation"::DETECT_SHOPPER.AsInteger(),
+                        "NPR EFT Adyen Aux Operation"::CLEAR_SHOPPER.AsInteger(),
+                        "NPR EFT Adyen Aux Operation"::DISABLE_CONTRACT.AsInteger(),
+                        "NPR EFT Adyen Aux Operation"::SUBSCRIPTION_CONFIRM.AsInteger():
                             Message := StrSubstNo(TRX_ERROR, Format(EftTransactionRequest."Auxiliary Operation Desc."), EftTransactionRequest."Result Description", EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
                     end;
             end;

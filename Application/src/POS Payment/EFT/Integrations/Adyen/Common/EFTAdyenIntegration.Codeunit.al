@@ -171,7 +171,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
             exit;
 
         if (EftTransactionRequest."Processing Type" = EftTransactionRequest."Processing Type"::AUXILIARY)
-            and (EftTransactionRequest."Auxiliary Operation ID" = 6) then begin
+            and (EftTransactionRequest."Auxiliary Operation ID" = "NPR EFT Adyen Aux Operation"::DISABLE_CONTRACT.AsInteger()) then begin
             RequestMechanism := RequestMechanism::Synchronous;
             exit;
         end;
@@ -218,7 +218,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
             exit;
         if EftTransactionRequest."Processing Type" <> EftTransactionRequest."Processing Type"::AUXILIARY then
             exit;
-        if EftTransactionRequest."Auxiliary Operation ID" <> 6 then
+        if EftTransactionRequest."Auxiliary Operation ID" <> "NPR EFT Adyen Aux Operation"::DISABLE_CONTRACT.AsInteger() then
             exit;
 
         EFTAdyenContractMgmt.DisableRecurringContract(EftTransactionRequest);
@@ -550,16 +550,16 @@ codeunit 6184639 "NPR EFT Adyen Integration"
             exit(false);
 
         case EFTTransactionRequest."Auxiliary Operation ID" of
-            2:
+            "NPR EFT Adyen Aux Operation"::ACQUIRE_CARD.AsInteger():
                 begin
                     exit(ShouldProceedToPurchaseTransaction(EFTTransactionRequest, ContinueOnTransactionEntryNo));
                 end;
-            4:
+            "NPR EFT Adyen Aux Operation"::DETECT_SHOPPER.AsInteger():
                 begin
                     DetectShopper(EFTTransactionRequest);
                     exit(false);
                 end;
-            5:
+            "NPR EFT Adyen Aux Operation"::CLEAR_SHOPPER.AsInteger():
                 begin
                     ClearShopperContract(EFTTransactionRequest);
                     exit(false);
@@ -580,7 +580,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
             exit(false);
 
         case EFTTransactionRequest."Auxiliary Operation ID" of
-            8:
+            "NPR EFT Adyen Aux Operation"::SUBSCRIPTION_CONFIRM.AsInteger():
                 begin
                     exit(ShouldProceedToPurchaseTransactionAfterSubscriptionConfirmation(EFTTransactionRequest, ContinueOnTransactionEntryNo));
                 end;
@@ -600,6 +600,9 @@ codeunit 6184639 "NPR EFT Adyen Integration"
             exit(false);
 
         if CancelContractCreation(EFTTransactionRequest) then
+            exit(false);
+
+        if (EFTTransactionRequest."Initiated from Entry No." = 0) then
             exit(false);
 
         EFTPaymentTransactionRequest.Get(EFTTransactionRequest."Initiated from Entry No.");

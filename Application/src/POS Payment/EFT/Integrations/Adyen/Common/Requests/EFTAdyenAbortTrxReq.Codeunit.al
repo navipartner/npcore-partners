@@ -42,7 +42,7 @@ codeunit 6184595 "NPR EFT Adyen AbortTrx Req"
                 exit('Payment');
             else
                 case ProcessedEFTTransactionRequest."Auxiliary Operation ID" of
-                    8:
+                    "NPR EFT Adyen Aux Operation"::SUBSCRIPTION_CONFIRM.AsInteger():
                         exit('Input');
                     else
                         exit('CardAcquisition');

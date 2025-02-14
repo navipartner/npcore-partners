@@ -59,7 +59,7 @@ codeunit 6184636 "NPR EFT Adyen Abort Mgmt"
         LastEFTTransactionRequest: Record "NPR EFT Transaction Request";
         EntryNoToCheck: Integer;
     begin
-        if (EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::AUXILIARY) and (EFTTransactionRequest."Auxiliary Operation ID" = 2) then
+        if (EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::AUXILIARY) and (EFTTransactionRequest."Auxiliary Operation ID" = "NPR EFT Adyen Aux Operation"::ACQUIRE_CARD.AsInteger()) then
             EFTTransactionRequest.Get(EFTTransactionRequest."Initiated from Entry No."); //Filter to last trx before this chain
 
         LastEFTTransactionRequest.SetRange("Register No.", EFTTransactionRequest."Register No.");
@@ -75,7 +75,13 @@ codeunit 6184636 "NPR EFT Adyen Abort Mgmt"
         EntryNoToCheck := LastEFTTransactionRequest."Entry No.";
 
         LastEFTTransactionRequest.SetRange("Processing Type", LastEFTTransactionRequest."Processing Type"::AUXILIARY);
-        LastEFTTransactionRequest.SetFilter("Auxiliary Operation ID", '%1|%2|%3', 2, 4, 5);
+        LastEFTTransactionRequest.SetFilter(
+            "Auxiliary Operation ID",
+            '%1|%2|%3',
+            "NPR EFT Adyen Aux Operation"::ACQUIRE_CARD.AsInteger(),
+            "NPR EFT Adyen Aux Operation"::DETECT_SHOPPER.AsInteger(),
+            "NPR EFT Adyen Aux Operation"::CLEAR_SHOPPER.AsInteger()
+        );
         if LastEFTTransactionRequest.FindLast() then
             if LastEFTTransactionRequest."Entry No." > EntryNoToCheck then
                 EntryNoToCheck := LastEFTTransactionRequest."Entry No.";

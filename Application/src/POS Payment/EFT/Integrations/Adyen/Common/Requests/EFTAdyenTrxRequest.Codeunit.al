@@ -134,7 +134,7 @@ codeunit 6184589 "NPR EFT Adyen Trx Request"
     begin
         AcquireCardRequestOut.SetRange("Initiated from Entry No.", EFTTransactionRequest."Entry No.");
         AcquireCardRequestOut.SetRange("Processing Type", AcquireCardRequestOut."Processing Type"::AUXILIARY);
-        AcquireCardRequestOut.SetRange("Auxiliary Operation ID", 2);
+        AcquireCardRequestOut.SetRange("Auxiliary Operation ID", "NPR EFT Adyen Aux Operation"::ACQUIRE_CARD.AsInteger());
         AcquireCardRequestOut.SetRange(Successful, true);
         exit(AcquireCardRequestOut.FindFirst());
     end;

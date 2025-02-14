@@ -35,44 +35,44 @@
 
         tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
-        tmpEFTAuxOperation."Auxiliary ID" := 1;
+        tmpEFTAuxOperation."Auxiliary ID" := Enum::"NPR EFT Adyen Aux Operation"::ABORT_TRX.AsInteger();
         tmpEFTAuxOperation.Description := CopyStr(ABORT_TRX, 1, MaxStrLen(tmpEFTAuxOperation.Description));
         tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
-        tmpEFTAuxOperation."Auxiliary ID" := 2;
+        tmpEFTAuxOperation."Auxiliary ID" := Enum::"NPR EFT Adyen Aux Operation"::ACQUIRE_CARD.AsInteger();
         tmpEFTAuxOperation.Description := CopyStr(ACQUIRE_CARD, 1, MaxStrLen(tmpEFTAuxOperation.Description));
         tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
-        tmpEFTAuxOperation."Auxiliary ID" := 3;
+        tmpEFTAuxOperation."Auxiliary ID" := Enum::"NPR EFT Adyen Aux Operation"::ABORT_ACQUIRED.AsInteger();
         tmpEFTAuxOperation.Description := CopyStr(ABORT_ACQUIRED, 1, MaxStrLen(tmpEFTAuxOperation.Description));
         tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
-        tmpEFTAuxOperation."Auxiliary ID" := 4;
+        tmpEFTAuxOperation."Auxiliary ID" := Enum::"NPR EFT Adyen Aux Operation"::DETECT_SHOPPER.AsInteger();
         tmpEFTAuxOperation.Description := CopyStr(DETECT_SHOPPER, 1, MaxStrLen(tmpEFTAuxOperation.Description));
         tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
-        tmpEFTAuxOperation."Auxiliary ID" := 5;
+        tmpEFTAuxOperation."Auxiliary ID" := Enum::"NPR EFT Adyen Aux Operation"::CLEAR_SHOPPER.AsInteger();
         tmpEFTAuxOperation.Description := CopyStr(CLEAR_SHOPPER, 1, MaxStrLen(tmpEFTAuxOperation.Description));
         tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
-        tmpEFTAuxOperation."Auxiliary ID" := 6;
+        tmpEFTAuxOperation."Auxiliary ID" := Enum::"NPR EFT Adyen Aux Operation"::DISABLE_CONTRACT.AsInteger();
         tmpEFTAuxOperation.Description := CopyStr(DISABLE_CONTRACT, 1, MaxStrLen(tmpEFTAuxOperation.Description));
         tmpEFTAuxOperation.Insert();
 
         tmpEFTAuxOperation.Init();
         tmpEFTAuxOperation."Integration Type" := IntegrationType();
-        tmpEFTAuxOperation."Auxiliary ID" := 8;
-        tmpEFTAuxOperation.Description := SUBSCRIPTION_CONFIRM;
+        tmpEFTAuxOperation."Auxiliary ID" := Enum::"NPR EFT Adyen Aux Operation"::SUBSCRIPTION_CONFIRM.AsInteger();
+        tmpEFTAuxOperation.Description := CopyStr(SUBSCRIPTION_CONFIRM, 1, MaxStrLen(tmpEFTAuxOperation.Description));
         tmpEFTAuxOperation.Insert();
     end;
 

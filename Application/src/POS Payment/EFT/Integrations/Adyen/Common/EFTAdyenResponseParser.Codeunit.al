@@ -773,11 +773,13 @@
                 ExpectedMessageCategory := 'Diagnosis';
             EFTTransactionRequest."Processing Type"::AUXILIARY:
                 case EFTTransactionRequest."Auxiliary Operation ID" of
-                    2, 4, 5:
+                    "NPR EFT Adyen Aux Operation"::ACQUIRE_CARD.AsInteger(),
+                    "NPR EFT Adyen Aux Operation"::DETECT_SHOPPER.AsInteger(),
+                    "NPR EFT Adyen Aux Operation"::CLEAR_SHOPPER.AsInteger():
                         ExpectedMessageCategory := 'CardAcquisition';
-                    3:
+                    "NPR EFT Adyen Aux Operation"::ABORT_ACQUIRED.AsInteger():
                         ExpectedMessageCategory := 'EnableService';
-                    8:
+                    "NPR EFT Adyen Aux Operation"::SUBSCRIPTION_CONFIRM.AsInteger():
                         ExpectedMessageCategory := 'Input';
                 end;
         end;
