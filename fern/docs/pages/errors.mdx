@@ -53,7 +53,35 @@ The following unique error codes are used in our API:
 | **`saas_environment_not_found`** | Provided tenant environment name (parameter `environment`) is not a valid environment name for the selected tenant. |
 | **`saas_company_not_found`** | Provided company name (parameter `company`) is not a valid company name for the selected tenant and environment. |
 | **`server_timeout`** | Server timeout. |
-| **`admission_not_allowed_ticket_is_revoked`** | Admission is not allowed because the ticket has been revoked. |
-| **`admission_not_allowed_to_many_admissions`** | Admission is not allowed because there have been too many admissions. |
-| **`admission_not_allowed_wrong_date_or_time`** | Admission is not allowed due to an incorrect date or time. | 
-| **`ticket_not_found`** | The requested ticket could not be found. |
+| **`unsupported_http_method`** | The http method is not supported for this endpoint.| 
+| **`resource_not_found`** | The selected resource does not exist.| 
+| **`capacity_exceeded`** | The capacity has been exceeded. Entry is not allowed.| 
+| **`invalid_reference`** | The reference is invalid.| 
+| **`reservation_not_found`** | The required reservation for the ticket was not found.| 
+| **`not_valid`** | The ticket is not valid.| 
+| **`reservation_mismatch`** | Your reservation is not for the current event.| 
+| **`admission_not_open`** | The admission code is not open.| 
+| **`admission_not_open_entry`** | The admission code is not open for this entry.| 
+| **`not_confirmed`** | The ticket has not been confirmed.| 
+| **`reservation_not_for_today`** | The reservation is not valid for today.| 
+| **`reservation_capacity_exceeded`** | The reservation capacity has been exceeded.| 
+| **`ticket_canceled`** | The ticket has been canceled.| 
+| **`ticket_not_valid_yet`** | The ticket is not valid yet.| 
+| **`ticket_expired`** | The ticket has expired.| 
+| **`quantity_change_not_allowed`** | The quantity change is not allowed.| 
+| **`no_default_schedule`** | No default schedule could be found.| 
+| **`missing_payment`** | The ticket is missing a payment transaction.| 
+| **`schedule_entry_expired`** | The schedule entry has expired.| 
+| **`reservation_not_for_now`** | The reservation is not valid for now.| 
+| **`concurrent_capacity_exceeded`** | The concurrent capacity has been exceeded.| 
+| **`reschedule_not_allowed`** | Rescheduling is not allowed.| 
+| **`invalid_admission_code`** | The admission code is invalid.| 
+| **`has_payment`** | The ticket has already been paid.| 
+| **`duration_exceeded`** | The admission duration has expired.| 
+| **`member_card_limitation_error`** | Limitations on member card apply and deny admission.| 
+| **`denied_by_speedgate`** | The reference number was denied by the gate.| 
+| **`scanner_not_found`** | The scanner was not found.| 
+| **`scanner_id_required`** | The scanner id is required.| 
+| **`scanner_not_enabled`** | The scanner is not enabled.| 
+| **`number_not_whitelisted`** | The reference number was not whitelisted by the gate.| 
+| **`number_rejected`** | The reference number was actively rejected by gate setup.|
