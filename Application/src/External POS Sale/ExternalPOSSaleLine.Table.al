@@ -144,16 +144,6 @@
         {
             Caption = 'Barcode Reference';
             DataClassification = CustomerContent;
-
-            trigger OnLookup()
-            begin
-
-            end;
-
-            trigger OnValidate()
-            begin
-
-            end;
         }
         field(75; "Location Code"; Code[10])
         {
@@ -1165,33 +1155,17 @@
 
     procedure UpdateVAT()
     var
-        Item: Record Item;
-        VATPostingSetup: Record "VAT Posting Setup";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         TempPOSSaleLine: Record "NPR POS Sale Line" temporary;
         TempPOSSale: Record "NPR POS Sale" temporary;
         POSSaleTax: Record "NPR POS Sale Tax";
     begin
-        if (Rec."Line Type" <> Enum::"NPR POS Sale Line Type"::"Item") then
-            exit;
-        if (not Item.Get(Rec."No.")) then
-            exit;
-
-        Rec."Gen. Prod. Posting Group" := Item."Gen. Prod. Posting Group";
-        Rec."VAT Bus. Posting Group" := Item."VAT Bus. Posting Gr. (Price)";
-        Rec."VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
-        VATPostingSetup.Get(Rec."VAT Bus. Posting Group", Rec."VAT Prod. Posting Group");
-        Rec."Unit Price" := Item."Unit Price";
-        Rec."VAT %" := VATPostingSetup."VAT %";
-        Rec."VAT Identifier" := VATPostingSetup."VAT Identifier";
-        Rec."VAT Calculation Type" := VATPostingSetup."VAT Calculation Type";
         TempPOSSaleLine.Init();
         CopyToPosSaleLine(TempPOSSaleLine);
         TempPOSSaleLine.Insert();
         POSSaleTaxCalc.CalculateTax(TempPOSSaleLine, TempPOSSale, 0);
         CopyFromPosSaleLine(TempPOSSaleLine);
-        POSSaleTax."Source Rec. System Id" := TempPOSSaleLine.SystemId;
-        if (POSSaleTax.Find()) then
+        if POSSaleTax.Get(TempPOSSaleLine.SystemId) then
             POSSaleTax.Delete();
     end;
 
