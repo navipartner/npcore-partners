@@ -55,7 +55,7 @@ codeunit 6151058 "NPR Job Queue User Handler"
     local procedure IsRefreshJobQueueEntriesEnabled(var JobQueueRefreshSetup: Record "NPR Job Queue Refresh Setup"): Boolean
     begin
         JobQueueRefreshSetup.GetSetup();
-        exit(JobQueueRefreshSetup.Enabled);
+        exit(JobQueueRefreshSetup.Enabled and not JobQueueRefreshSetup."Use External JQ Refresher");
     end;
 
     local procedure ShouldRefreshJobQueueEntries(JobQueueRefreshSetup: Record "NPR Job Queue Refresh Setup") ShouldRefresh: Boolean
