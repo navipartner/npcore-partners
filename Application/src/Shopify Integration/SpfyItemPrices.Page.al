@@ -78,6 +78,7 @@ page 6184831 "NPR Spfy Item Prices"
 
                 trigger OnAction()
                 var
+                    ShopifyStore: Record "NPR Spfy Store";
                     SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
                     SpfyCalculateItemPricesParams: Report "NPR Spfy Calculate Item Prices";
                     ConfirmQst: Label 'This function will recalculate Item Prices for all or selected Shopify integrated items.';
@@ -85,7 +86,9 @@ page 6184831 "NPR Spfy Item Prices"
                     SpfyIntegrationMgt.CheckIsEnabled("NPR Spfy Integration Area"::"Item Prices", '');
                     if not Confirm(ConfirmQst + '\' + SpfyIntegrationMgt.LongRunningProcessConfirmQst(), false) then
                         exit;
-
+                    ShopifyStore.SetRange(Enabled, true);
+                    ShopifyStore.SetRange("Do Not Sync. Sales Prices", false);
+                    SpfyCalculateItemPricesParams.SetTableView(ShopifyStore);
                     SpfyCalculateItemPricesParams.RunModal();
                 end;
             }

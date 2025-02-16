@@ -561,6 +561,7 @@ tableextension 6014427 "NPR Item" extends Item
         {
             Caption = 'Shopify Store Filter';
             FieldClass = FlowFilter;
+            TableRelation = "NPR Spfy Store".Code;
         }
         field(6151553; "NPR Spfy Synced Item"; Boolean)
         {

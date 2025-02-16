@@ -19,6 +19,7 @@ codeunit 6185048 "NPR Spfy Item Price Mgt."
         ItemPrice: Record "NPR Spfy Item Price";
         TempItemPrice: Record "NPR Spfy Item Price" temporary;
         ItemVariant: Record "Item Variant";
+        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
         Window: Dialog;
         CalculatedPrices: Integer;
         RecNo: Integer;
@@ -72,23 +73,27 @@ codeunit 6185048 "NPR Spfy Item Price Mgt."
             Item.SetRange("NPR Spfy Store Filter", ShopifyStoreCode);
             if Item.FindSet() then
                 repeat
-                    if Item."NPR Spfy Synced Item" or Item."NPR Spfy Synced Item (Planned)" then begin
-                        ItemVariant.Reset();
-                        ItemVariant.SetRange("Item No.", Item."No.");
+                    if Item."NPR Spfy Synced Item" or Item."NPR Spfy Synced Item (Planned)" then
+                        if SpfyItemMgt.AvailableInShopifyVariantsExist(Item."No.", ShopifyStoreCode) then begin
+                            ItemVariant.Reset();
+                            ItemVariant.SetRange("Item No.", Item."No.");
 #if BC18 or BC19 or BC20 or BC21 or BC22
-                        ItemVariant.SetRange("NPR Blocked", false);
+                            ItemVariant.SetRange("NPR Blocked", false);
 #else
-                        ItemVariant.SetRange(Blocked, false);
+                            ItemVariant.SetRange(Blocked, false);
 #endif
-                        if not ItemVariant.IsEmpty() then begin
                             Item.CopyFilter("Variant Filter", ItemVariant.Code);
+                            ItemVariant.SetRange("NPR Spfy Store Filter", ShopifyStoreCode);
+                            ItemVariant.SetAutoCalcFields("NPR Spfy Not Available");
                             if ItemVariant.FindSet() then
                                 repeat
-                                    TempItemPrice."Shopify Store Code" := ShopifyStoreCode;
-                                    TempItemPrice."Item No." := ItemVariant."Item No.";
-                                    TempItemPrice."Variant Code" := ItemVariant.Code;
-                                    if not TempItemPrice.Find() then
-                                        TempItemPrice.Insert();
+                                    if not ItemVariant."NPR Spfy Not Available" then begin
+                                        TempItemPrice."Shopify Store Code" := ShopifyStoreCode;
+                                        TempItemPrice."Item No." := ItemVariant."Item No.";
+                                        TempItemPrice."Variant Code" := ItemVariant.Code;
+                                        if not TempItemPrice.Find() then
+                                            TempItemPrice.Insert();
+                                    end;
                                 until ItemVariant.Next() = 0;
                         end else begin
                             TempItemPrice."Shopify Store Code" := ShopifyStoreCode;
@@ -97,7 +102,6 @@ codeunit 6185048 "NPR Spfy Item Price Mgt."
                             if not TempItemPrice.Find() then
                                 TempItemPrice.Insert();
                         end;
-                    end;
 
                     if not Silent then begin
                         RecNo += 1;
@@ -121,7 +125,6 @@ codeunit 6185048 "NPR Spfy Item Price Mgt."
                 ItemPrice.Reset();
                 TempItemPrice.SetRange("Shopify Store Code", TempItemPrice."Shopify Store Code");
                 if SpfyProductPriceCalc.Initialize(TempItemPrice."Shopify Store Code", ItemPricesCalculationDate) then begin
-
 
                     if FullRecalculation then
                         MarkObsoleteItemPrices(TempItemPrice."Shopify Store Code", ItemPrice);
@@ -258,6 +261,19 @@ codeunit 6185048 "NPR Spfy Item Price Mgt."
         ItemPrice.SetCurrentKey("Shopify Store Code", "Item No.", "Variant Code");  //PK
         ItemPrice.SetRange("Item No.");
         ItemPrice.SetRange("Variant Code");
+    end;
+
+    procedure ClearItemPrices(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link")
+    var
+        ItemPrice: Record "NPR Spfy Item Price";
+    begin
+        ItemPrice.SetCurrentKey("Item No.", "Variant Code");
+        ItemPrice.SetRange("Item No.", SpfyStoreItemLink."Item No.");
+        if SpfyStoreItemLink."Variant Code" <> '' then
+            ItemPrice.SetRange("Variant Code", SpfyStoreItemLink."Variant Code");
+        ItemPrice.SetRange("Shopify Store Code", SpfyStoreItemLink."Shopify Store Code");
+        If not ItemPrice.IsEmpty() then
+            ItemPrice.DeleteAll();
     end;
 
     local procedure RecalcItemPrice(ItemPriceParam: Record "NPR Spfy Item Price"; var ItemPriceOut: Record "NPR Spfy Item Price"; ItemPricesCalculationDate: Date; var ItemPriceUpdated: Boolean): Boolean

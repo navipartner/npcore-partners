@@ -10,6 +10,8 @@ report 6014551 "NPR Spfy Calculate Item Prices"
     {
         dataitem("NPR Spfy Store"; "NPR Spfy Store")
         {
+            RequestFilterFields = Code;
+
             trigger OnPreDataItem()
             begin
                 CurrReport.Break();
@@ -17,6 +19,8 @@ report 6014551 "NPR Spfy Calculate Item Prices"
         }
         dataitem(Item; Item)
         {
+            RequestFilterFields = "No.", "Variant Filter";
+
             trigger OnPreDataItem()
             begin
                 CurrReport.Break();

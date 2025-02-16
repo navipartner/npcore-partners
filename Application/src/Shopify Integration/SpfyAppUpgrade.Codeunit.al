@@ -18,7 +18,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         StoreSpecificIntegrationSetups();
         UpdateShopifyPaymentModule();
         UpdateShopifyStoreDoNotSyncSalesPrices();
-        EnableMetafieldDataLogSubscriber();
+        EnableItemRelatedDataLogSubscribers();
         RemoveIncorrectlyAssignedIDs();
         RegisterShopifyAppRequestListenerWebservice();
     end;
@@ -192,11 +192,11 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         LogFinish();
     end;
 
-    internal procedure EnableMetafieldDataLogSubscriber()
+    internal procedure EnableItemRelatedDataLogSubscribers()
     var
         ShopifyStore: Record "NPR Spfy Store";
     begin
-        _UpgradeStep := 'EnableMetafieldDataLogSubscriber';
+        _UpgradeStep := 'EnableItemRelatedDataLogSubscribers';
         if HasUpgradeTag() then
             exit;
         LogStart();

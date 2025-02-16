@@ -110,6 +110,23 @@ tableextension 6014442 "NPR Item Variant" extends "Item Variant"
             ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Replaced by SystemRowVersion';
         }
+#if not BC17
+        field(6151552; "NPR Spfy Store Filter"; Code[20])
+        {
+            Caption = 'Shopify Store Filter';
+            FieldClass = FlowFilter;
+            TableRelation = "NPR Spfy Store".Code;
+        }
+        field(6151553; "NPR Spfy Not Available"; Boolean)
+        {
+            Caption = 'Not Available in Shopify';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = lookup("NPR Spfy Item Variant Modif."."Not Available" where("Item No." = field("Item No."),
+                                                                "Variant Code" = field(Code),
+                                                                "Shopify Store Code" = field("NPR Spfy Store Filter")));
+        }
+#endif
     }
 
     keys
