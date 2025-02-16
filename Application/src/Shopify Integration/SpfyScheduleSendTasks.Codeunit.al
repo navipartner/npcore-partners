@@ -181,6 +181,7 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
             Database::"Stockkeeping Unit",
             Database::"Item Reference",
             Database::"NPR Spfy Store-Item Link",
+            Database::"NPR Spfy Item Variant Modif.",
             Database::"NPR Spfy Entity Metafield",
             Database::"NPR Spfy Item Price",
             Database::"NPR Spfy Inventory Level":
@@ -265,6 +266,7 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
                 end;
             Database::"Item Variant",
             Database::"Item Reference",
+            Database::"NPR Spfy Item Variant Modif.",
             Database::"NPR Spfy Entity Metafield":
                 IsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::Items);
             Database::"Stockkeeping Unit",

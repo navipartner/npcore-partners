@@ -344,13 +344,16 @@ page 6184704 "NPR Spfy Store Card"
                     PromotedIsBig = true;
                     PromotedOnly = true;
                     PromotedCategory = Category4;
+                    Visible = false;
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '2025-02-16';
+                    ObsoleteReason = 'Use the "Sync. Items" action instead and filter by the "Magento Item" field.';
 
                     trigger OnAction()
                     var
-                        SendItemAndInventory: Codeunit "NPR Spfy Send Items&Inventory";
+                        ReplacedErr: Label 'Use the "Sync. Items" action instead and filter by the "Magento Item" field.';
                     begin
-                        CurrPage.SaveRecord();
-                        SendItemAndInventory.EnableIntegrationForMagentoItems(Rec.Code, true);
+                        Error(ReplacedErr);
                     end;
                 }
                 action(SyncItems)

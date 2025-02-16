@@ -62,20 +62,6 @@ page 6184553 "NPR Spfy Integration Setup"
             group(InitialSetup)
             {
                 Caption = 'Initial Setup';
-                action(EnableIntegrationForMagentoItems)
-                {
-                    Caption = 'Enable Integr. for Magento Items';
-                    ToolTip = 'Enables Shopify integration for all existing Magento items.';
-                    ApplicationArea = NPRShopify;
-                    Image = CheckDuplicates;
-
-                    trigger OnAction()
-                    var
-                        SendItemAndInventory: Codeunit "NPR Spfy Send Items&Inventory";
-                    begin
-                        SendItemAndInventory.EnableIntegrationForMagentoItems(SelectShopifyStore(), true);
-                    end;
-                }
                 action(SyncItems)
                 {
                     Caption = 'Sync. Items';
@@ -156,6 +142,12 @@ page 6184553 "NPR Spfy Integration Setup"
     var
         ShopifyStore: Record "NPR Spfy Store";
     begin
+        if ShopifyStore.Count() = 1 then begin
+            ShopifyStore.FindFirst();
+            StoreCode := ShopifyStore.Code;
+            exit;
+        end;
+
         if Page.RunModal(0, ShopifyStore) <> "Action"::LookupOK then
             Error('');
         StoreCode := ShopifyStore.Code;

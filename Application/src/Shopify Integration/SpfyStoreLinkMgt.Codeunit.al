@@ -163,22 +163,59 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
     end;
 
 #if BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Table, Database::"Item Variant", 'OnBeforeDeleteEvent', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::"Item Variant", OnBeforeDeleteEvent, '', false, false)]
+#endif
+    local procedure ItemVariant_CheckIsNotSyncedWithShopify(var Rec: Record "Item Variant"; RunTrigger: Boolean)
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+        SpfyStoreItemVariantLink: Record "NPR Spfy Store-Item Link";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        ShopifySyncedVariantErr: Label 'Cannot delete item %1 variant %2 because it is already synced with Shopify.', Comment = '%1 - Item No., %2 - Variant Code';
+    begin
+        if Rec.IsTemporary() then
+            exit;
+        if ShopifyStore.IsEmpty() then
+            exit;
+
+        SpfyStoreItemVariantLink.Type := SpfyStoreItemVariantLink.Type::"Variant";
+        SpfyStoreItemVariantLink."Item No." := Rec."Item No.";
+        SpfyStoreItemVariantLink."Variant Code" := Rec."Code";
+        ShopifyStore.FindSet();
+        repeat
+            SpfyStoreItemVariantLink."Shopify Store Code" := ShopifyStore.Code;
+            if SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy ID Type"::"Entry ID") <> '' then
+                Error(ShopifySyncedVariantErr, Rec."Item No.", Rec."Code");
+        until ShopifyStore.Next() = 0;
+    end;
+
+#if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Table, Database::"Item Variant", 'OnAfterDeleteEvent', '', false, false)]
 #else
     [EventSubscriber(ObjectType::Table, Database::"Item Variant", OnAfterDeleteEvent, '', false, false)]
 #endif
     local procedure ItemVariant_RemoveAssignedShopifyID(var Rec: Record "Item Variant"; RunTrigger: Boolean)
     var
-        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        ShopifyStore: Record "NPR Spfy Store";
+        SpfyStoreItemVariantLink: Record "NPR Spfy Store-Item Link";
+        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
+        SendItemAndInventory: Codeunit "NPR Spfy Send Items&Inventory";
     begin
-        if Rec.IsTemporary() or not RunTrigger then
+        if Rec.IsTemporary() then
+            exit;
+        if ShopifyStore.IsEmpty() then
             exit;
 
-        SpfyStoreItemLink.SetRange(Type, SpfyStoreItemLink.Type::"Variant");
-        SpfyStoreItemLink.SetRange("Item No.", Rec."Item No.");
-        SpfyStoreItemLink.SetRange("Variant Code", Rec."Code");
-        if not SpfyStoreItemLink.IsEmpty() then
-            SpfyStoreItemLink.DeleteAll(true);
+        SpfyStoreItemVariantLink.Type := SpfyStoreItemVariantLink.Type::"Variant";
+        SpfyStoreItemVariantLink."Item No." := Rec."Item No.";
+        SpfyStoreItemVariantLink."Variant Code" := Rec."Code";
+        ShopifyStore.FindSet();
+        repeat
+            SpfyStoreItemVariantLink."Shopify Store Code" := ShopifyStore.Code;
+            SendItemAndInventory.ClearVariantShopifyIDs(SpfyStoreItemVariantLink);
+            SpfyItemMgt.RemoveShopifyItemVariantModification(SpfyStoreItemVariantLink);
+        until ShopifyStore.Next() = 0;
     end;
     #endregion
 }
