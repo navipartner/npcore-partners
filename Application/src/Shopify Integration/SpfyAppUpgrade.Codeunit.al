@@ -21,6 +21,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         EnableItemRelatedDataLogSubscribers();
         RemoveIncorrectlyAssignedIDs();
         RegisterShopifyAppRequestListenerWebservice();
+        UpgradeAllowedFinancialStatuses();
     end;
 
     internal procedure UpdateShopifySetup()
@@ -145,6 +146,34 @@ codeunit 6184802 "NPR Spfy App Upgrade"
                     ShopifyStore."Send Negative Inventory" := ShopifySetup."Send Negative Inventory";
                     ShopifyStore.Modify();
                 until ShopifyStore.Next() = 0;
+
+        SetUpgradeTag();
+        LogFinish();
+    end;
+
+    internal procedure UpgradeAllowedFinancialStatuses()
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+    begin
+        _UpgradeStep := 'UpgradeAllowedFinancialStatuses';
+        if HasUpgradeTag() then
+            exit;
+        LogStart();
+
+        if ShopifyStore.FindSet() then
+            repeat
+                case ShopifyStore."Allowed Payment Statuses" of
+                    ShopifyStore."Allowed Payment Statuses"::Authorized:
+                        ShopifyStore.AddAllowedOrderFinancialStatus(Enum::"NPR Spfy Order FinancialStatus"::Authorized);
+                    ShopifyStore."Allowed Payment Statuses"::Paid:
+                        ShopifyStore.AddAllowedOrderFinancialStatus(Enum::"NPR Spfy Order FinancialStatus"::Paid);
+                    ShopifyStore."Allowed Payment Statuses"::Both:
+                        begin
+                            ShopifyStore.AddAllowedOrderFinancialStatus(Enum::"NPR Spfy Order FinancialStatus"::Authorized);
+                            ShopifyStore.AddAllowedOrderFinancialStatus(Enum::"NPR Spfy Order FinancialStatus"::Paid);
+                        end;
+                end;
+            until ShopifyStore.Next() = 0;
 
         SetUpgradeTag();
         LogFinish();

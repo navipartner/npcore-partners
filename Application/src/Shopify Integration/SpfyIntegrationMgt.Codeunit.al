@@ -128,17 +128,74 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         exit(_ShopifyStore."Set Shopify Name/Descr. in BC");
     end;
 
-    procedure IsAllowedFinancialStatus(FinancialStatus: Text; ShopifyStore: Record "NPR Spfy Store"): Boolean
+    procedure IsAllowedFinancialStatus(FinancialStatus: Text; ShopifyStoreCode: Code[20]): Boolean
+    var
+        SpfyAllowedFinStatus: Record "NPR Spfy Allowed Fin. Status";
+        OrderFinancialStatus: Enum "NPR Spfy Order FinancialStatus";
     begin
         case FinancialStatus of
+            'pending':
+                OrderFinancialStatus := OrderFinancialStatus::Pending;
             'authorized':
-                exit(ShopifyStore."Allowed Payment Statuses" in
-                    [ShopifyStore."Allowed Payment Statuses"::Authorized, ShopifyStore."Allowed Payment Statuses"::Both]);
+                OrderFinancialStatus := OrderFinancialStatus::Authorized;
             'paid':
-                exit(ShopifyStore."Allowed Payment Statuses" in
-                    [ShopifyStore."Allowed Payment Statuses"::Paid, ShopifyStore."Allowed Payment Statuses"::Both]);
+                OrderFinancialStatus := OrderFinancialStatus::Paid;
+            else
+                exit(false);
         end;
-        exit(false);
+        exit(SpfyAllowedFinStatus.Get(ShopifyStoreCode, OrderFinancialStatus));
+    end;
+
+    procedure SelectAllowedFinancialStatuses(ShopifyStoreCode: Code[20])
+    var
+        SpfyAllowedFinStatus: Record "NPR Spfy Allowed Fin. Status";
+        TempSpfyAllowedFinStatus: Record "NPR Spfy Allowed Fin. Status" temporary;
+        SpfySelectFinStatuses: Page "NPR Spfy Select Fin. Statuses";
+        Ordinal: Integer;
+    begin
+        foreach Ordinal in Enum::"NPR Spfy Order FinancialStatus".Ordinals() do begin
+            TempSpfyAllowedFinStatus.Init();
+            TempSpfyAllowedFinStatus."Shopify Store Code" := ShopifyStoreCode;
+            TempSpfyAllowedFinStatus."Order Financial Status" := Enum::"NPR Spfy Order FinancialStatus".FromInteger(Ordinal);
+            TempSpfyAllowedFinStatus.Insert();
+        end;
+        SpfyAllowedFinStatus.SetRange("Shopify Store Code", ShopifyStoreCode);
+        if SpfyAllowedFinStatus.FindSet() then
+            repeat
+                if TempSpfyAllowedFinStatus.Get(ShopifyStoreCode, SpfyAllowedFinStatus."Order Financial Status") then
+                    TempSpfyAllowedFinStatus.Mark(true);
+            until SpfyAllowedFinStatus.Next() = 0;
+
+        Clear(SpfySelectFinStatuses);
+        SpfySelectFinStatuses.SetDataset(TempSpfyAllowedFinStatus);
+        SpfySelectFinStatuses.LookupMode(true);
+        if SpfySelectFinStatuses.RunModal() <> Action::LookupOK then
+            exit;
+        SpfySelectFinStatuses.GetDataset(TempSpfyAllowedFinStatus);
+
+        if not SpfyAllowedFinStatus.IsEmpty() then
+            SpfyAllowedFinStatus.DeleteAll();
+        TempSpfyAllowedFinStatus.MarkedOnly(true);
+        if TempSpfyAllowedFinStatus.FindSet() then
+            repeat
+                SpfyAllowedFinStatus := TempSpfyAllowedFinStatus;
+                SpfyAllowedFinStatus.Insert();
+            until TempSpfyAllowedFinStatus.Next() = 0;
+    end;
+
+    procedure GetAllowedFinancialStatusesAsCommaString(ShopifyStoreCode: Code[20]): Text
+    var
+        SpfyAllowedFinStatus: Record "NPR Spfy Allowed Fin. Status";
+        AllowedFinancialStatuses: Text;
+    begin
+        SpfyAllowedFinStatus.SetRange("Shopify Store Code", ShopifyStoreCode);
+        if SpfyAllowedFinStatus.FindSet() then
+            repeat
+                if AllowedFinancialStatuses <> '' then
+                    AllowedFinancialStatuses += ', ';
+                AllowedFinancialStatuses += Format(SpfyAllowedFinStatus."Order Financial Status");
+            until SpfyAllowedFinStatus.Next() = 0;
+        exit(AllowedFinancialStatuses);
     end;
 
     procedure CreatePmtLinesOnOrderImport(ShopifyStoreCode: Code[20]): Boolean

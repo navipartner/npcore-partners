@@ -16,6 +16,8 @@ codeunit 6185020 "NPR Spfy Store Background Task"
         if not Page.GetBackgroundParameters().ContainsKey('StoreCode') then
             exit;
         ShopifyStoreCode := CopyStr(Page.GetBackgroundParameters().Get('StoreCode'), 1, MaxStrLen(ShopifyStoreCode));
+        if ShopifyStoreCode = '' then
+            exit;
         ShopifyStore.Get(ShopifyStoreCode);
         ClearLastError();
         if not SpfyCommunicationHandler.GetShopifyStoreConfiguration(ShopifyStore.Code, ShopifyResponse) then

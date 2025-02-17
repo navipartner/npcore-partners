@@ -75,7 +75,7 @@ page 6184704 "NPR Spfy Store Card"
                 field("No. of Prices per Request"; Rec."No. of Prices per Request")
                 {
                     ToolTip = 'Specifies the number of item prices that can be sent to Shopify in a single batch price update request. The default value is 100, which will be used by the system if you set the field value to zero.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRShopify;
                     Enabled = _ItemListIntegrationIsEnabled;
                 }
                 group(ItemWebhooks)
@@ -188,12 +188,22 @@ page 6184704 "NPR Spfy Store Card"
                         UpdateControlVisibility();
                     end;
                 }
-                field("Allowed Payment Statuses"; Rec."Allowed Payment Statuses")
+                field("Allowed Payment Statuses"; _SpfyIntegrationMgt.GetAllowedFinancialStatusesAsCommaString(Rec.Code))
                 {
-                    ToolTip = 'Specifies allowed Shopify payment statuses. New orders will only be imported from Shopify if the order has an allowed payment status.';
+                    Caption = 'Allowed Financial Statuses';
+                    ToolTip = 'Specifies allowed Shopify order financial (payment) statuses. New orders will only be imported from Shopify if the order has an allowed financial status.';
                     ApplicationArea = NPRShopify;
                     Enabled = _SalesOrderIntegrationIsEnabled;
                     Importance = Additional;
+                    Editable = false;
+                    AssistEdit = true;
+
+                    trigger OnAssistEdit()
+                    begin
+                        CurrPage.SaveRecord();
+                        _SpfyIntegrationMgt.SelectAllowedFinancialStatuses(Rec.Code);
+                        CurrPage.Update(false);
+                    end;
                 }
                 field("Get Payment Lines from Shopify"; Rec."Get Payment Lines from Shopify")
                 {
@@ -280,14 +290,12 @@ page 6184704 "NPR Spfy Store Card"
                     StyleExpr = true;
 
                     trigger OnDrillDown()
-                    var
-                        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
                     begin
                         Rec.TestField("Shopify Url");
                         Rec.TestField("Shopify Access Token");
                         CurrPage.SaveRecord();
                         Commit();
-                        SpfyIntegrationMgt.TestShopifyStoreConnection(Rec.Code);
+                        _SpfyIntegrationMgt.TestShopifyStoreConnection(Rec.Code);
                         CurrPage.Update(false);
                     end;
                 }
@@ -421,13 +429,12 @@ page 6184704 "NPR Spfy Store Card"
 
     trigger OnAfterGetCurrRecord()
     var
-        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         Parameters: Dictionary of [Text, Text];
     begin
         UpdateControlVisibility();
         CheckCurrencyCode();
 
-        if SpfyIntegrationMgt.IsEnabled(Enum::"NPR Spfy Integration Area"::" ", Rec.Code) then begin
+        if _SpfyIntegrationMgt.IsEnabled(Enum::"NPR Spfy Integration Area"::" ", Rec.Code) then begin
             Parameters.Add('StoreCode', Rec.Code);
             CurrPage.EnqueueBackgroundTask(_BackgroundTaskId, Codeunit::"NPR Spfy Store Background Task", Parameters);
         end;
@@ -538,6 +545,7 @@ page 6184704 "NPR Spfy Store Card"
     var
         TempxShopifyStore: Record "NPR Spfy Store" temporary;
         _SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        _SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         _BackgroundTaskId: Integer;
         _AutoSetAsShopifyItem: Boolean;
         _AutoSyncItemChanges: Boolean;

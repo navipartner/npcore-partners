@@ -163,10 +163,16 @@ table 6150810 "NPR Spfy Store"
 
             trigger OnValidate()
             var
+                SpfyAllowedFinStatus: Record "NPR Spfy Allowed Fin. Status";
                 OrderMgt: Codeunit "NPR Spfy Order Mgt.";
             begin
                 Modify();
                 OrderMgt.SetupJobQueues();
+                if "Sales Order Integration" then begin
+                    SpfyAllowedFinStatus.SetRange("Shopify Store Code", Code);
+                    if SpfyAllowedFinStatus.IsEmpty() then
+                        AddAllowedOrderFinancialStatus(Enum::"NPR Spfy Order FinancialStatus"::Authorized);
+                end;
             end;
         }
         field(81; "Post on Completion"; Boolean)
@@ -227,6 +233,9 @@ table 6150810 "NPR Spfy Store"
             DataClassification = CustomerContent;
             OptionMembers = Authorized,Paid,Both;
             OptionCaption = 'Authorized,Paid,Both';
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-02-23';
+            ObsoleteReason = 'Replaced by table 6151045 "NPR Spfy Allowed Fin. Status"';
         }
         field(130; "Retail Voucher Integration"; Boolean)
         {
@@ -356,6 +365,15 @@ table 6150810 "NPR Spfy Store"
         Error(RecordCannotBeRenamedErr, Rec.TableCaption());
     end;
 
+    trigger OnDelete()
+    var
+        SpfyAllowedFinStatus: Record "NPR Spfy Allowed Fin. Status";
+    begin
+        SpfyAllowedFinStatus.SetRange("Shopify Store Code", Code);
+        if not SpfyAllowedFinStatus.IsEmpty() then
+            SpfyAllowedFinStatus.DeleteAll();
+    end;
+
     internal procedure NoOfPriceUpdatesPerRequest(): Integer
     begin
         if "No. of Prices per Request" > 0 then
@@ -385,6 +403,17 @@ table 6150810 "NPR Spfy Store"
             exit(true);
         end;
         exit(false);
+    end;
+
+    internal procedure AddAllowedOrderFinancialStatus(OrderFinancialStatus: Enum "NPR Spfy Order FinancialStatus")
+    var
+        SpfyAllowedFinStatus: Record "NPR Spfy Allowed Fin. Status";
+    begin
+        SpfyAllowedFinStatus.Init();
+        SpfyAllowedFinStatus."Shopify Store Code" := "Code";
+        SpfyAllowedFinStatus."Order Financial Status" := OrderFinancialStatus;
+        if not SpfyAllowedFinStatus.Find() then
+            SpfyAllowedFinStatus.Insert();
     end;
 }
 #endif

@@ -20,7 +20,6 @@ codeunit 6184808 "NPR Spfy Create Order" implements "NPR Nc Import List IProcess
         ClearLastError();  //Do not save error text in Import List, if order processing completed successfully
     end;
 
-
     local procedure ImportOrder(ShopifyStoreCode: Code[20]; Order: JsonToken)
     var
         SalesHeader: Record "Sales Header";
@@ -32,6 +31,26 @@ codeunit 6184808 "NPR Spfy Create Order" implements "NPR Nc Import List IProcess
         OrderMgt.InsertSalesHeader(ShopifyStoreCode, Order, SalesHeader);
         OrderMgt.InsertSalesLines(ShopifyStoreCode, Order, SalesHeader, false);
         OrderMgt.InsertPaymentLines(ShopifyStoreCode, Order, SalesHeader);
+        ReleaseOrder(SalesHeader);
+    end;
+
+    local procedure ReleaseOrder(var SalesHeader: Record "Sales Header")
+    var
+        NpEcDocument: Record "NPR NpEc Document";
+        NpEcStore: Record "NPR NpEc Store";
+    begin
+        Clear(NpEcStore);
+        NpEcDocument.SetCurrentKey("Document Type", "Document No.");
+        NpEcDocument.SetRange("Document Type", NpEcDocument."Document Type"::"Sales Order");
+        NpEcDocument.SetRange("Document No.", SalesHeader."No.");
+        if NpEcDocument.FindFirst() then
+            if NpEcStore.Get(NpEcDocument."Store Code") then;
+
+        if NpEcStore."Release Order on Import" then begin
+            Commit();
+            SalesHeader.SetHideValidationDialog(true);
+            if Codeunit.Run(Codeunit::"Release Sales Document", SalesHeader) then;  //no errors during the release process should result in a failed import
+        end;
     end;
 }
 #endif
