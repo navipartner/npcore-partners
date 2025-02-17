@@ -1,14 +1,28 @@
 const main = async ({ workflow, popup, captions, parameters }) => {
   let memberCardDetails;
+  let result;
   debugger;
   if (
     parameters.DefaultInputValue.length == 0 &&
     parameters.DialogPrompt == 1
   ) {
-    const result = await popup.input({
+    memberCardDetails = await workflow.respond("CheckMemberInitialized");
+
+    let tempCardNumber = parameters.DefaultInputValue;
+    if (
+      memberCardDetails != null &&
+      memberCardDetails.MemberScanned != null &&
+      memberCardDetails.MemberScanned.CardNumber !== "" &&
+      (tempCardNumber === null ||
+      tempCardNumber === "")
+    ) {
+      tempCardNumber = memberCardDetails.MemberScanned.CardNumber;
+    }
+
+    result = await popup.input({
       caption: captions.MemberCardPrompt,
       title: captions.MembershipTitle,
-      value: parameters.DefaultInputValue,
+      value: tempCardNumber,
     });
     if (result === null) {
       return " ";

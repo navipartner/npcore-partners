@@ -75,6 +75,8 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
                 FrontEnd.WorkflowResponse(GetMembershipAlterationLookupChoices(Context, POSSession, FrontEnd));
             'DoManageMembership':
                 FrontEnd.WorkflowResponse(ManageMembershipAction(Context, POSSession, FrontEnd));
+            'CheckMemberInitialized':
+                FrontEnd.WorkflowResponse(MemberInitialized());
             else
                 exit;
         end;
@@ -91,6 +93,7 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         ForeignCommunityCode: Code[20];
         MemberCardEntryNo: Integer;
         MemberArrival: Codeunit "NPR POS Action: MM Member ArrB";
+        POSMemberSession: Codeunit "NPR POS Member Session";
     begin
         if (not Context.GetIntegerParameter('Function', FunctionId)) then
             FunctionId := 0;
@@ -98,6 +101,9 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         GetCustomParam(Context, SelectReq);
         GetFrontEndInputs(Context, ExternalMemberCardNo, FrontEndInputMethod);
         ForeignCommunityCode := CopyStr(Context.GetStringParameter('ForeignCommunityCode'), 1, MaxStrLen(ForeignCommunityCode));
+
+        if (ExternalMemberCardNo <> '') then
+            POSMemberSession.SetMember(ExternalMemberCardNo);
 
         case FunctionId of
             0:
@@ -132,6 +138,18 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
                 POSActionMemberMgtWF3B.CancelAutoRenew(ExternalMemberCardNo);
         end;
         exit(Response);
+    end;
+
+    local procedure MemberInitialized() Response: JsonObject
+    var
+        POSMemberSession: Codeunit "NPR POS Member Session";
+        MemberExternalCardNo: Text[100];
+    begin
+        if not POSMemberSession.IsInitialized() then
+            exit;
+
+        MemberExternalCardNo := POSMemberSession.GetMemberCardExternalCardNo();
+        Response.Add('memberExternalCardNo', MemberExternalCardNo);
     end;
 
     local procedure GetMembershipEntryLookupJson(FrontEndInputMethod: Option; ExternalMemberCardNo: Text[100]) LookupProperties: JsonObject;
@@ -183,6 +201,7 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         Membership: Record "NPR MM Membership";
         MemberCard: Record "NPR MM Member Card";
         POSActionMemberMgtWF3B: Codeunit "NPR POS Action Member MgtWF3-B";
+        POSMemberSession: Codeunit "NPR POS Member Session";
         FunctionId: Integer;
         REGRET_OPTION: Label 'Regret options...';
         EXTEND_OPTION: Label 'Extend options...';
@@ -206,6 +225,9 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         if (not Context.GetString('memberCardInput', TextOut)) then
             TextOut := '';
         ExternalMemberCardNo := CopyStr(TextOut, 1, MaxStrLen(ExternalMemberCardNo));
+
+        if (ExternalMemberCardNo <> '') then
+            POSMemberSession.SetMember(ExternalMemberCardNo);
 
         POSActionMemberMgtWF3B.GetMembershipFromCardNumberWithUI(MemberSelectionMethod::NO_PROMPT, ExternalMemberCardNo, Membership, MemberCard, false);
 
@@ -395,7 +417,7 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionMemberMgtWF3.js### 
-'let main=async({workflow:d,context:n,popup:l,captions:u,parameters:e})=>{e.Function<0&&(e.Function=e.Function["Member Arrival"]);let s=u.DialogTitle.substitute(e.Function);if(e.DefaultInputValue.length==0&&e.DialogPrompt<=e.DialogPrompt["Member Card Number"]&&(n.memberCardInput=await l.input({caption:u.MemberCardPrompt,title:u.windowTitle}),n.memberCardInput===null))return;if(e.DefaultInputValue.length>0&&(n.memberCardInput=e.DefaultInputValue),e.Function>=e.Function["Regret Membership Entry"]&&e.Function<=e.Function["Cancel Membership"]){let i=await d.respond("GetMembershipAlterationLookup");if(n.memberCardInput=i.cardnumber,i.data?.length==0){await l.error({title:u.windowTitle,caption:i.notFoundMessage});return}let a=data.createArrayDriver(i.data),o=data.createDataSource(a);o.loadAll=!1;let r=await l.lookup({title:i.title,configuration:{className:"custom-lookup",styleSheet:"",layout:i.layout,result:c=>c?c.map(b=>b?b.itemno:null):null},source:o});if(r===null||r.length===0)return;n.itemNumber=r[0].itemno}let t=await d.respond("DoManageMembership");if(e.Function==e.Function["View Membership Entry"]){let i=data.createArrayDriver(t.data),a=data.createDataSource(i),o=await l.lookup({title:t.title,configuration:{className:"custom-lookup",styleSheet:"",layout:t.layout},source:a})}debugger;const m=e.ToastMessageTimer!==null&&e.ToastMessageTimer!==void 0&&e.ToastMessageTimer!==0?e.ToastMessageTimer:15;t.MemberScanned&&m>0&&toast.memberScanned({memberImg:t.MemberScanned.ImageDataUrl,memberName:t.MemberScanned.Name,validForAdmission:t.MemberScanned.Valid,hideAfter:m,memberExpiry:t.MemberScanned.ExpiryDate})};'
+'let main=async({workflow:u,context:n,popup:l,captions:a,parameters:e})=>{e.Function<0&&(e.Function=e.Function["Member Arrival"]);debugger;let r=await u.respond("CheckMemberInitialized");r!=null&&r.memberExternalCardNo!=null&&r.memberExternalCardNo!==""&&(n.memberCardInput=r.memberExternalCardNo);let g=a.DialogTitle.substitute(e.Function);if(e.DefaultInputValue.length==0&&e.DialogPrompt<=e.DialogPrompt["Member Card Number"]&&(n.memberCardInput=await l.input({caption:a.MemberCardPrompt,title:a.windowTitle,value:n.memberCardInput}),n.memberCardInput===null))return;if(e.DefaultInputValue.length>0&&(n.memberCardInput=e.DefaultInputValue),e.Function>=e.Function["Regret Membership Entry"]&&e.Function<=e.Function["Cancel Membership"]){let i=await u.respond("GetMembershipAlterationLookup");if(n.memberCardInput=i.cardnumber,i.data?.length==0){await l.error({title:a.windowTitle,caption:i.notFoundMessage});return}let o=data.createArrayDriver(i.data),m=data.createDataSource(o);m.loadAll=!1;let d=await l.lookup({title:i.title,configuration:{className:"custom-lookup",styleSheet:"",layout:i.layout,result:c=>c?c.map(s=>s?s.itemno:null):null},source:m});if(d===null||d.length===0)return;n.itemNumber=d[0].itemno}let t=await u.respond("DoManageMembership");if(e.Function==e.Function["View Membership Entry"]){let i=data.createArrayDriver(t.data),o=data.createDataSource(i),m=await l.lookup({title:t.title,configuration:{className:"custom-lookup",styleSheet:"",layout:t.layout},source:o})}debugger;const b=e.ToastMessageTimer!==null&&e.ToastMessageTimer!==void 0&&e.ToastMessageTimer!==0?e.ToastMessageTimer:15;t.MemberScanned&&b>0&&toast.memberScanned({memberImg:t.MemberScanned.ImageDataUrl,memberName:t.MemberScanned.Name,validForAdmission:t.MemberScanned.Valid,hideAfter:b,memberExpiry:t.MemberScanned.ExpiryDate})};'
         )
     end;
 
