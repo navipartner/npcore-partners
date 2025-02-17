@@ -41,7 +41,7 @@ report 6014551 "NPR Spfy Calculate Item Prices"
                     {
                         Caption = 'Price Date';
                         ToolTip = 'Specifies the date from which the calculated item price will be effective.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRShopify;
 
                         trigger OnValidate()
                         var

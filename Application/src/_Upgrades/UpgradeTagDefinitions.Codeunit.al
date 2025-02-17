@@ -214,6 +214,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'EnableItemRelatedDataLogSubscribers'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'RemoveIncorrectlyAssignedIDs'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'RegisterShopifyAppRequestListenerWebservice'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'UpgradeAllowedFinancialStatuses'));
 #endif
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Dig. Rcpt. Enable", 'UpgradeDigitalReceiptSetupEnable'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Dig. Rcpt. Enable", 'UpdateDigitalReceiptSetupTable'));
@@ -820,6 +821,8 @@
                         exit('NPR-Spfy-RemoveIncorrectlyAssignedIDs-20241118');
                     'RegisterShopifyAppRequestListenerWebservice':
                         exit('NPR-Spfy-RegisterShopifyAppRequestListenerWebservice-20250130');
+                    'UpgradeAllowedFinancialStatuses':
+                        exit('NPR-Spfy-UpgradeAllowedFinancialStatuses-20250216');
                 end;
 #endif
             Codeunit::"NPR UPG Dig. Rcpt. Enable":
