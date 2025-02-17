@@ -1,12 +1,11 @@
 page 6184582 "NPR Adyen Merchant Setup"
 {
     Extensible = false;
-    UsageCategory = Administration;
-    ApplicationArea = NPRRetail;
+    UsageCategory = none;
     Caption = 'NP Pay Merchant Account Setup';
     PageType = Card;
     SourceTable = "NPR Adyen Merchant Setup";
-    AdditionalSearchTerms = 'NP Pay setup,NP Pay reconciliation setup,NP Pay merchant setup';
+    InsertAllowed = false;
 
     layout
     {
@@ -19,6 +18,7 @@ page 6184582 "NPR Adyen Merchant Setup"
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Company ID.';
+                    Editable = false;
                 }
                 field("Posting Source Code"; Rec."Posting Source Code")
                 {
