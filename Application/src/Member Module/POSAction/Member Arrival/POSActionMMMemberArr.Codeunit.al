@@ -57,6 +57,8 @@ codeunit 6060140 "NPR POS Action: MM Member Arr." implements "NPR IPOS Workflow"
         case Step of
             'MemberArrival':
                 FrontEnd.WorkflowResponse(SetMemberArrival(Context, Setup));
+            'CheckMemberInitialized':
+                FrontEnd.WorkflowResponse(MemberInitialized());
         end;
     end;
 
@@ -73,6 +75,7 @@ codeunit 6060140 "NPR POS Action: MM Member Arr." implements "NPR IPOS Workflow"
         DialogMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
         POSWorkflowMethod: Option POS,Automatic,GuestCheckIn;
         ForeignCommunityCode: Code[20];
+        POSMemberSession: Codeunit "NPR POS Member Session";
     begin
         DefaultInputValue := Context.GetStringParameter('DefaultInputValue');
         ForeignCommunityCode := CopyStr(Context.GetStringParameter('ForeignCommunityCode'), 1, MaxStrLen(ForeignCommunityCode));
@@ -108,6 +111,22 @@ codeunit 6060140 "NPR POS Action: MM Member Arr." implements "NPR IPOS Workflow"
         AdmissionCode := CopyStr(Context.GetStringParameter('AdmissionCode'), 1, MaxStrLen(AdmissionCode));
 
         MemberCardEntryNo := POSActionMemberArrival.MemberArrival(DefaultInputValue, DialogMethodType, POSWorkflowType, MemberCardNumber, AdmissionCode, Setup, ForeignCommunityCode);
+
+        if (MemberCardEntryNo > 0) then
+            POSMemberSession.SetMember(MemberCardEntryNo);
+        POSActionMemberArrival.AddToastMemberScannedData(MemberCardEntryNo, 0, Response);
+    end;
+
+    local procedure MemberInitialized() Response: JsonObject
+    var
+        POSMemberSession: Codeunit "NPR POS Member Session";
+        POSActionMemberArrival: Codeunit "NPR POS Action: MM Member ArrB";
+        MemberCardEntryNo: Integer;
+    begin
+        if not POSMemberSession.IsInitialized() then
+            exit;
+
+        MemberCardEntryNo := POSMemberSession.GetMemberCardEntryNo();
         POSActionMemberArrival.AddToastMemberScannedData(MemberCardEntryNo, 0, Response);
     end;
 
@@ -180,7 +199,7 @@ codeunit 6060140 "NPR POS Action: MM Member Arr." implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionMMMemberArr.js###
-'const main=async({workflow:n,popup:t,captions:i,parameters:e})=>{let a;debugger;if(e.DefaultInputValue.length==0&&e.DialogPrompt==1){const r=await t.input({caption:i.MemberCardPrompt,title:i.MembershipTitle,value:e.DefaultInputValue});if(r===null)return" ";a=await n.respond("MemberArrival",{membercard_number:r})}else a=await n.respond("MemberArrival");const m=e.ToastMessageTimer!==null&&e.ToastMessageTimer!==void 0&&e.ToastMessageTimer!==0?e.ToastMessageTimer:15;a.MemberScanned&&m>0&&toast.memberScanned({memberImg:a.MemberScanned.ImageDataUrl,memberName:a.MemberScanned.Name,validForAdmission:a.MemberScanned.Valid,hideAfter:m,memberExpiry:a.MemberScanned.ExpiryDate})};'
+'const main=async({workflow:r,popup:t,captions:i,parameters:a})=>{let e,m;debugger;if(a.DefaultInputValue.length==0&&a.DialogPrompt==1){e=await r.respond("CheckMemberInitialized");let n=a.DefaultInputValue;if(e!=null&&e.MemberScanned!=null&&e.MemberScanned.CardNumber!==""&&(n===null||n==="")&&(n=e.MemberScanned.CardNumber),m=await t.input({caption:i.MemberCardPrompt,title:i.MembershipTitle,value:n}),m===null)return" ";e=await r.respond("MemberArrival",{membercard_number:m})}else e=await r.respond("MemberArrival");const l=a.ToastMessageTimer!==null&&a.ToastMessageTimer!==void 0&&a.ToastMessageTimer!==0?a.ToastMessageTimer:15;e.MemberScanned&&l>0&&toast.memberScanned({memberImg:e.MemberScanned.ImageDataUrl,memberName:e.MemberScanned.Name,validForAdmission:e.MemberScanned.Valid,hideAfter:l,memberExpiry:e.MemberScanned.ExpiryDate})};'
         );
     end;
 }

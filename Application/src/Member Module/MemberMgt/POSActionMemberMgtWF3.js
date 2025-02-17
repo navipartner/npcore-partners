@@ -2,12 +2,19 @@ let main = async ({workflow, context, popup, captions, parameters}) => {
     if (parameters.Function < 0) {
         parameters.Function = parameters.Function["Member Arrival"];
     };
+    debugger;
+    let memberCardNo = await workflow.respond("CheckMemberInitialized");
+
+    if (memberCardNo != null && memberCardNo.memberExternalCardNo != null && memberCardNo.memberExternalCardNo !== "")
+    {
+        context.memberCardInput = memberCardNo.memberExternalCardNo;
+    }
     
     let windowTitle = captions.DialogTitle.substitute(parameters.Function);
 
     // Prompt for member card number    
     if (parameters.DefaultInputValue.length == 0 && parameters.DialogPrompt <= parameters.DialogPrompt ["Member Card Number"]) {
-        context.memberCardInput = await popup.input({caption: captions.MemberCardPrompt, title: captions.windowTitle});
+        context.memberCardInput = await popup.input({caption: captions.MemberCardPrompt, title: captions.windowTitle, value: context.memberCardInput});
         if (context.memberCardInput === null) {return;}
     }
 
@@ -44,7 +51,6 @@ let main = async ({workflow, context, popup, captions, parameters}) => {
         
         context.itemNumber = result[0].itemno;
     }
-
  
     // Process the main request
     let membershipResponse = await workflow.respond ("DoManageMembership");
