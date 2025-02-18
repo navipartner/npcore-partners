@@ -5,7 +5,7 @@ codeunit 6184589 "NPR EFT Adyen Trx Request"
     procedure GetRequestJson(EFTTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"): Text
     var
         Json: Codeunit "Json Text Reader/Writer";
-        TransactionConditions: Text;
+        TransactionConditions: Integer;
         AcquireCardRequest: Record "NPR EFT Transaction Request";
         JsonText: Text;
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
@@ -40,11 +40,21 @@ codeunit 6184589 "NPR EFT Adyen Trx Request"
         if EFTTransactionRequest."Processing Type" = EFTTransactionRequest."Processing Type"::PAYMENT then
             Json.WriteStringProperty('CashBackAmount', Format(EFTTransactionRequest."Cashback Amount", 0, '<Precision,2:3><Standard Format,9>'));
         Json.WriteEndObject(); // AmountsReq
-        TransactionConditions := GetTransactionConditions(EFTSetup);
-        if TransactionConditions <> '' then begin
+        TransactionConditions := EFTAdyenIntegration.GetTransactionCondition(EFTSetup);
+        if TransactionConditions in [1, 2, 4] then begin
             Json.WriteStartObject('TransactionConditions');
             Json.WriteStartArray('AllowedPaymentBrand');
-            Json.WriteValue(TransactionConditions);
+            case TransactionConditions of
+                1:
+                    Json.WriteValue('alipay');
+                2:
+                    Json.WriteValue('wechat');
+                4:
+                    begin
+                        Json.WriteValue('mc');
+                        Json.WriteValue('visa');
+                    end;
+            end;
             Json.WriteEndArray();
             Json.WriteEndObject(); // TransactionConditions
         end;
@@ -112,22 +122,6 @@ codeunit 6184589 "NPR EFT Adyen Trx Request"
             end;
 
         exit(Value);
-    end;
-
-    local procedure GetTransactionConditions(EFTSetup: Record "NPR EFT Setup"): Text
-    var
-        EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
-        Condition: Integer;
-    begin
-        Condition := EFTAdyenIntegration.GetTransactionCondition(EFTSetup);
-        case Condition of
-            1:
-                exit('alipay');
-            2:
-                exit('wechat');
-        end;
-
-        exit('');
     end;
 
     procedure GetLinkedCardAcquisition(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var AcquireCardRequestOut: Record "NPR EFT Transaction Request"): Boolean
