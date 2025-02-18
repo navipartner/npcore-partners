@@ -1198,4 +1198,9 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'REPRINT_WALLET', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action Reprint Wallet";
     }
+    value(6248258; SPEEDGATE_ADMISSSION)
+    {
+        Caption = 'SPEEDGATE_ADMISSSION', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action SG Admission";
+    }
 }
