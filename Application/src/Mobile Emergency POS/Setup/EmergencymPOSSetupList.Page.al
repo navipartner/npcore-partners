@@ -4,6 +4,8 @@ page 6184885 "NPR Emergency mPOS Setup List"
     ApplicationArea = NPRRetail;
     UsageCategory = Lists;
     Extensible = false;
+    InsertAllowed = false;
+    Editable = false;
     SourceTable = "NPR Emergency mPOS Setup";
     CardPageId = "NPR Emergency mPOS Setup";
     Caption = 'Emergency mPOS Setup';

@@ -39,6 +39,12 @@ table 6150955 "NPR Emergency mPOS Setup"
             DataClassification = CustomerContent;
             TableRelation = "NPR E-mail Template Header";
         }
+        field(7; "Salespers/Purchaser Code"; Code[20])
+        {
+            Caption = 'Salespers/Purchaser Code';
+            DataClassification = CustomerContent;
+            TableRelation = "Salesperson/Purchaser";
+        }
     }
 
     keys
@@ -53,15 +59,15 @@ table 6150955 "NPR Emergency mPOS Setup"
     var
         Setup: JsonObject;
         QrJson: Text;
+        ManualPaymentMethods: JsonArray;
+        EmergencyPOSPayMethods: Record "NPR Emergency POS Pay Methods";
         NPPayPOSPaymentSetup: Record "NPR NP Pay POS Payment Setup";
         GeneralLedgerSetup: Record "General Ledger Setup";
         EnvironmentInformation: Codeunit "Environment Information";
         AzureADTenant: Codeunit "Azure AD Tenant";
-        UserSetup: Record "User Setup";
         Company: Record Company;
         POSPaymentMethod: Record "NPR POS Payment Method";
     begin
-        UserSetup.Get(UserId());
         GeneralLedgerSetup.FindFirst();
         NPPayPOSPaymentSetup.Get(Rec."NP Pay POS Payment Setup");
         Setup.Add('AdyenEncKeyId', NPPayPOSPaymentSetup."Encryption Key Id");
@@ -71,15 +77,26 @@ table 6150955 "NPR Emergency mPOS Setup"
         Setup.Add('AdyenMerchantAccount', NPPayPOSPaymentSetup."Merchant Account");
         Setup.Add('AdyenEnvironment', Format(NPPayPOSPaymentSetup.Environment));
         POSPaymentMethod.Get(Rec."EFT Payment Method");
+        //Backward compatible START
         Setup.Add('Payment_EftPaymentMethodCode', Rec."EFT Payment Method");
         Setup.Add('Payment_EftPaymentMethodMonetaryUnit', POSPaymentMethod."Rounding Precision");
-        //Setup.Add('Payment_EftPaymentMethodDecimals', POSPaymentMethod.);
+        //Backward compatible END
+        Setup.Add('Payment_EftPaymentMethod', CreatePosPaymentMethodObject(POSPaymentMethod));
         POSPaymentMethod.Get(Rec."Cash Payment Method");
+        //Backward compatible START
         Setup.Add('Payment_CashPaymentMethodCode', Rec."Cash Payment Method");
         Setup.Add('Payment_CashPaymentMethodMonetaryUnit', POSPaymentMethod."Rounding Precision");
-        //Setup.Add('Payment_CashPaymentMethodDecimals', Rec."Cash Payment Method");
+        //Backward compatible END
+        Setup.Add('Payment_CashPaymentMethod', CreatePosPaymentMethodObject(POSPaymentMethod));
+        EmergencyPOSPayMethods.SetFilter("Emergency POS Setup Code", Rec.Code);
+        if (EmergencyPOSPayMethods.FindSet()) then begin
+            repeat begin
+                POSPaymentMethod.Get(EmergencyPOSPayMethods."POS Payment Method Code");
+                ManualPaymentMethods.Add(CreatePosPaymentMethodObject(POSPaymentMethod));
+            end until EmergencyPOSPayMethods.Next() = 0;
+            Setup.Add('Payment_ManualPaymentMethods', ManualPaymentMethods);
+        end;
         Setup.Add('Payment_Currency', GeneralLedgerSetup."LCY Code");
-        Setup.Add('Payment_PosUnitId', UserSetup."NPR POS Unit No.");
 
         if (EnvironmentInformation.IsOnPrem()) then begin
             Setup.Add('Bc_OnPremWebServiceUrl', GetUrl(ClientType::Default));
@@ -97,9 +114,16 @@ table 6150955 "NPR Emergency mPOS Setup"
         Setup.Add('Bc_CompanyId', Format(Company.Id).Replace('{', '').Replace('}', ''));
         Setup.Add('Bc_SMSTemplateCode', Rec."SMS Template");
         Setup.Add('Bc_EmailTemplateCode', Rec."Email Template");
-        //This is default if none is specified.
-        Setup.Add('Bc_SalesPersonCode', UserSetup."Salespers./Purch. Code");
+        Setup.Add('Bc_SalesPersonCode', Rec."Salespers/Purchaser Code");
         Setup.WriteTo(QrJson);
         exit(QrJson);
+    end;
+
+    local procedure CreatePosPaymentMethodObject(POSPaymentMethod: Record "NPR POS Payment Method") PosPaymetnMethod: JsonObject
+    begin
+        PosPaymetnMethod.Add('Code', POSPaymentMethod.Code);
+        PosPaymetnMethod.Add('Description', POSPaymentMethod.Description);
+        PosPaymetnMethod.Add('MonetaryUnit', POSPaymentMethod."Rounding Precision");
+        PosPaymetnMethod.Add('RoundingType', POSPaymentMethod."Rounding Type");
     end;
 }
