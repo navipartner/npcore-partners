@@ -21,7 +21,7 @@ codeunit 6059890 "NPR POS Action: EFT Softpay" implements "NPR IPOS Workflow"
     var
         EftInterface: Codeunit "NPR EFT Interface";
         EftTransactionRequest: Record "NPR EFT Transaction Request";
-
+        OriginalEftTransactionRequest: Record "NPR EFT Transaction Request";
         ContextRequest: JsonObject;
         SoftpayResponse: JsonObject;
         SoftpayRequest: JsonObject;
@@ -41,7 +41,6 @@ codeunit 6059890 "NPR POS Action: EFT Softpay" implements "NPR IPOS Workflow"
         EftTransactionRequest.Get(JToken.AsValue().AsInteger());
         RemoveSensitiveInfo(SoftpayRequest);
         Log(JToken.AsValue().AsInteger(), Step, SoftpayRequest, SoftpayResponse);
-
         Success := False;
         EndSale := False;
 
@@ -71,18 +70,28 @@ codeunit 6059890 "NPR POS Action: EFT Softpay" implements "NPR IPOS Workflow"
                     if (SoftpayResponse.Get('HasSoftpayResult', JToken) and JToken.AsValue().AsBoolean()) then begin
                         if (SoftpayResponse.Get('RequestSuccessfull', JToken) and JToken.AsValue().AsBoolean()) then begin
                             HandleTransactionResponseInfo(EftTransactionRequest, SoftpayResponse);
+                            if (EftTransactionRequest."Processing Type" = EftTransactionRequest."Processing Type"::LOOK_UP) then begin
+                                EftTransactionRequest.Successful := True;
+                            end;
                             EftTransactionRequest."External Result Known" := True;
-                            EftTransactionRequest.Successful := True;
-                            Success := True;
-                            EndSale := True;
+                            Success := EftTransactionRequest.Successful;
+                            EndSale := EftTransactionRequest.Successful;
+                            ;
                         end else begin
-                            HandleTransactionResponseInfo(EftTransactionRequest, SoftpayResponse);
-                            SoftpayResponse.Get('Message', JToken);
-                            ErrorTitle := 'Softpay request Failed';
-                            ErrorCaption := 'The softpay request failed: ' + JToken.AsValue().AsText();
-                            EftTransactionRequest."Client Error" := ErrorCaption;
-                            EftTransactionRequest."External Result Known" := True;
-                            EftTransactionRequest.Successful := False;
+                            if (EftTransactionRequest."Processing Type" = EftTransactionRequest."Processing Type"::LOOK_UP) then begin
+                                OriginalEftTransactionRequest.Get(EftTransactionRequest."Processed Entry No.");
+                                OriginalEftTransactionRequest.Recoverable := False;
+                                OriginalEftTransactionRequest.Modify();
+                            end else begin
+                                HandleTransactionResponseInfo(EftTransactionRequest, SoftpayResponse);
+                                SoftpayResponse.Get('Message', JToken);
+                                ErrorTitle := 'Softpay request Failed';
+                                ErrorCaption := 'The softpay request failed: ' + JToken.AsValue().AsText();
+                                EftTransactionRequest."Client Error" := ErrorCaption;
+                                EftTransactionRequest."External Result Known" := True;
+                                EftTransactionRequest.Successful := False;
+                            end;
+
                         end;
                     end else begin
                         SoftpayResponse.Get('Message', JToken);
@@ -144,11 +153,14 @@ codeunit 6059890 "NPR POS Action: EFT Softpay" implements "NPR IPOS Workflow"
     var
         JToken: JsonToken;
         EFTPaymentMapping: Codeunit "NPR EFT Payment Mapping";
+        OriginalEFTTransactionRequest: Record "NPR EFT Transaction Request";
         POSPaymentMethod: Record "NPR POS Payment Method";
         Out: OutStream;
     begin
-        if (SoftpayResponse.Get('TransactionState', JToken) and not JToken.AsValue().IsNull()) then
+        if (SoftpayResponse.Get('TransactionState', JToken) and not JToken.AsValue().IsNull()) then begin
             EftTransactionRequest."Result Description" := JToken.AsValue().AsText();
+            EftTransactionRequest.Successful := JToken.AsValue().AsText().ToUpper() = 'COMPLETED';
+        end;
         if (SoftpayResponse.Get('PartialPan', JToken) and not JToken.AsValue().IsNull()) then
             EftTransactionRequest."Card Number" := JToken.AsValue().AsText();
         if (SoftpayResponse.Get('ApplicationID', JToken) and not JToken.AsValue().IsNull()) then
@@ -157,9 +169,17 @@ codeunit 6059890 "NPR POS Action: EFT Softpay" implements "NPR IPOS Workflow"
             EftTransactionRequest."Card Name" := JToken.AsValue().AsText();
         if (SoftpayResponse.Get('Amount', JToken) and not JToken.AsValue().IsNull()) then begin
             EftTransactionRequest."Amount Output" := JToken.AsValue().AsDecimal();
-            EftTransactionRequest."Result Amount" := JToken.AsValue().AsDecimal();
-            if (EftTransactionRequest."Processing Type" = EftTransactionRequest."Processing Type"::REFUND) then
-                EftTransactionRequest."Result Amount" := JToken.AsValue().AsDecimal() * -1;
+            if (EftTransactionRequest.Successful) then begin
+                EftTransactionRequest."Result Amount" := JToken.AsValue().AsDecimal();
+                if (EftTransactionRequest."Processing Type" = EftTransactionRequest."Processing Type"::REFUND) or
+                (
+                    (EftTransactionRequest."Processing Type" = EftTransactionRequest."Processing Type"::LOOK_UP) and
+                    (OriginalEFTTransactionRequest.Get(EftTransactionRequest."Processed Entry No.")) and
+                    (OriginalEFTTransactionRequest."Processing Type" = EftTransactionRequest."Processing Type"::REFUND)
+                ) then
+                    EftTransactionRequest."Result Amount" := JToken.AsValue().AsDecimal() * -1;
+            end;
+
         end;
         if (SoftpayResponse.Get('ReceiptContent', JToken) and not JToken.AsValue().IsNull) then begin
             if (not EftTransactionRequest."Receipt 1".HasValue) then begin
@@ -178,7 +198,7 @@ codeunit 6059890 "NPR POS Action: EFT Softpay" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionEFTSoftpay.Codeunit.js###
-'let main=async r=>{const{context:a,workflow:o,popup:s}=r;if(window.parent.jsBridge==null||navigator.userAgent.indexOf("Android")==-1)return await s.error("You can only use Softpay on Android devices.","Device error"),{success:!1};if(window.parent.jsBridge.SoftpayProtocol==null||window.parent.jsBridge.SoftpayProtocol===void 0)return await s.error("Softpay integration not found. Either you are using an outdated version of the Mobile App or the device is not supported.","Device error"),{success:!1};let e={SoftpayAction:a.request.SoftpayAction,Step:null,RequestID:null,Amount:a.request.Amount,Currency:a.request.Currency,IntegratorID:a.request.IntegratorID,IntegratorCredentials:a.request.IntegratorCredentials.split(""),SoftpayUsername:a.request.SoftpayUsername,SoftpayPassword:a.request.SoftpayPassword.split("")},t=null;try{switch(e.SoftpayAction){case"Refund":case"Payment":var i=await SendMPOSAsync(e);if(t=await o.respond("IDRecieved",{SoftpayResponse:i,SoftpayRequest:e}),t.success){e.RequestID=i.RequestID;let n=await SendMPOSAsync(e);t=await o.respond("TransactionFinished",{SoftpayResponse:n,SoftpayRequest:e})}break;case"GetTransaction":e.RequestID=a.request.RequestID;var p=await SendMPOSAsync(e);t=await o.respond("TransactionFinished",{SoftpayResponse:p,SoftpayRequest:e});break;default:t=await o.respond("Failed",{ErrorMessage:"Command: "+e.SoftpayAction+" Is not supported",SoftpayRequest:e,SoftpayResponse:null})}}catch(n){t=await o.respond("Failed",{ErrorMessage:n.message,SoftpayRequest:e,SoftpayResponse:null})}return t.success||await s.error(t.errorcaption,t.errortitle),{success:t.succes,tryEndSale:t.endSale}},step=1;async function SendMPOSAsync(r){let a=window.parent.jsBridge;return r.Step=step++,JSON.parse(await a.SoftpayProtocol(JSON.stringify(r)))}'
+'const main=async a=>{const{context:o,workflow:s,popup:r}=a;if(window.parent.jsBridge==null||navigator.userAgent.indexOf("Android")==-1)return await r.error("You can only use Softpay on Android devices.","Device error"),{success:!1};if(window.parent.jsBridge.SoftpayProtocol==null||window.parent.jsBridge.SoftpayProtocol===void 0)return await r.error("Softpay integration not found. Either you are using an outdated version of the Mobile App or the device is not supported.","Device error"),{success:!1};const e={SoftpayAction:o.request.SoftpayAction,Step:null,RequestID:null,Amount:o.request.Amount,Currency:o.request.Currency,IntegratorID:o.request.IntegratorID,IntegratorCredentials:o.request.IntegratorCredentials.split(""),SoftpayUsername:o.request.SoftpayUsername,SoftpayPassword:o.request.SoftpayPassword.split("")};let t=null;try{switch(e.SoftpayAction){case"Refund":case"Payment":var i=await SendMPOSAsync(e);if(t=await s.respond("IDRecieved",{SoftpayResponse:i,SoftpayRequest:e}),t.success){e.RequestID=i.RequestID;const n=await SendMPOSAsync(e);t=await s.respond("TransactionFinished",{SoftpayResponse:n,SoftpayRequest:e})}break;case"GetTransaction":e.RequestID=o.request.RequestID;var p=await SendMPOSAsync(e);t=await s.respond("TransactionFinished",{SoftpayResponse:p,SoftpayRequest:e});break;default:t=await s.respond("Failed",{ErrorMessage:"Command: "+e.SoftpayAction+" Is not supported",SoftpayRequest:e,SoftpayResponse:null})}}catch(n){t=await s.respond("Failed",{ErrorMessage:n.message,SoftpayRequest:e,SoftpayResponse:null})}return t.success||await r.error(t.errorcaption,t.errortitle),{success:t.succes,tryEndSale:t.endSale}};let step=1;async function SendMPOSAsync(a){const o=window.parent.jsBridge;return a.Step=step++,JSON.parse(await o.SoftpayProtocol(JSON.stringify(a)))}'
         );
     end;
 #pragma warning restore AA0139
