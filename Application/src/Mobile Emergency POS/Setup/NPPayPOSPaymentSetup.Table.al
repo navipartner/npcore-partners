@@ -27,6 +27,7 @@ table 6150972 "NPR NP Pay POS Payment Setup"
         field(5; "Payment API Key"; Text[500])
         {
             DataClassification = CustomerContent;
+            ExtendedDatatype = Masked;
         }
         field(6; "Merchant Account"; Text[50])
         {

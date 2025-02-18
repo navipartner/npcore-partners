@@ -4,6 +4,8 @@ page 6184886 "NPR NP Pay POS Payment Setups"
     ApplicationArea = NPRRetail;
     UsageCategory = Lists;
     Extensible = false;
+    InsertAllowed = false;
+    Editable = false;
     SourceTable = "NPR NP Pay POS Payment Setup";
     CardPageId = "NPR NP Pay POS Payment Setup";
     Caption = 'NP Pay POS Payment Setup';

@@ -27,6 +27,7 @@ page 6184887 "NPR NP Pay POS Payment Setup"
                 ApplicationArea = NPRRetail;
                 Caption = 'API Key';
                 ToolTip = 'Specifies the API key used for accessing NP Pay APIs.';
+                ExtendedDatatype = Masked;
             }
             field(Environment; Rec.Environment)
             {

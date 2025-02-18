@@ -9,15 +9,12 @@ codeunit 6248233 "NPR Ext. POS Sale Processing"
         POSUnit: Record "NPR POS Unit";
         POSStore: Record "NPR POS Store";
         POSPostingProfile: Record "NPR POS Posting Profile";
-        MissingUserSetupLbl: Label 'The field "salespersonCode" is empty and no default setup is specified for user id: %1';
+        MissingUserSetupLbl: Label 'The field "salespersonCode" is empty. Please include the Salesperson code';
     begin
-        UserSetup.Get(UserId());
-        IF ExternalPOSSale."Salesperson Code" = '' then begin
-            ExternalPOSSale."Salesperson Code" := UserSetup."Salespers./Purch. Code";
-        end;
         if (ExternalPOSSale."Salesperson Code" = '') then
-            Error(MissingUserSetupLbl, UserSetup."User ID");
+            Error(MissingUserSetupLbl);
         if ExternalPOSSale."Register No." = '' then begin
+            UserSetup.Get(UserId());
             ExternalPOSSale."Register No." := UserSetup."NPR POS Unit No.";
         end;
         ExternalPOSSale.TestField("Register No.");

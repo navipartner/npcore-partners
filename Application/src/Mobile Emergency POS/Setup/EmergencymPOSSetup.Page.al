@@ -48,6 +48,21 @@ page 6184928 "NPR Emergency mPOS Setup"
                     Caption = 'Email Template';
                     ToolTip = 'Specifies which Email template to use when sending Email receipt.';
                 }
+                field("Salespers/Purchaser Code"; Rec."Salespers/Purchaser Code")
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Salesperson / Purchaser Code';
+                    ToolTip = 'Specifies which Salesperson / Purchaser Code fo which to put the sale under';
+                }
+            }
+            group("Payment Methods")
+            {
+                part("POS Payment Methods"; "NPR Emergency POS Pay. Methods")
+                {
+                    Caption = 'Additional POS Payment Methods';
+                    ApplicationArea = NPRRetail;
+                    SubPageLink = "Emergency POS Setup Code" = field(Code);
+                }
             }
         }
     }
