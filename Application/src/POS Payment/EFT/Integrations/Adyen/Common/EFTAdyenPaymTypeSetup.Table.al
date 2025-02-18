@@ -29,8 +29,8 @@
         {
             Caption = 'Transaction Condition';
             DataClassification = CustomerContent;
-            OptionCaption = 'None,Alipay,WeChat,Gift Card';
-            OptionMembers = "NONE",ALIPAY,WECHAT,GIFTCARD;
+            OptionCaption = 'None,Alipay,WeChat,Gift Card,Visa and Mastercard';
+            OptionMembers = "NONE",ALIPAY,WECHAT,GIFTCARD,"VISA and MASTERCARD";
         }
         field(5; "Create Recurring Contract"; Option)
         {
