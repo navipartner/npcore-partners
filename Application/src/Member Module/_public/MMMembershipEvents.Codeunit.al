@@ -115,6 +115,11 @@
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterPOSActionMemberLoyReadMemberCardNumber(var MemberCardNumber: Text[50])
+    begin
+    end;
+
     #endregion
 
     #region SmartSearch

@@ -75,6 +75,7 @@ codeunit 6060146 "NPR POS Action: MM Member Loy." implements "NPR IPOS Workflow"
         BusinessLogic: Codeunit "NPR POSAction: MM Member Loy.B";
         POSSession: Codeunit "NPR POS Session";
         POSSale: Codeunit "NPR POS Sale";
+        MMMembershipEvents: Codeunit "NPR MM Membership Events";
         FunctionId: Integer;
         MemberCardNumber: Text[50];
         ForeignCommunityCode: Code[20];
@@ -99,7 +100,7 @@ codeunit 6060146 "NPR POS Action: MM Member Loy." implements "NPR IPOS Workflow"
 
         if (MemberCardNumber = '') then
             MemberCardNumber := CopyStr(POSSalesInfo."Scanned Card Data", 1, MaxStrLen(MemberCardNumber));
-
+        MMMembershipEvents.OnAfterPOSActionMemberLoyReadMemberCardNumber(MemberCardNumber);
         case FunctionId of
             0:
                 Response := BusinessLogic.SetCustomer(MemberCardNumber, ForeignCommunityCode);
