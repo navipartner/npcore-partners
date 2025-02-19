@@ -280,6 +280,7 @@
                     trigger OnValidate()
                     begin
                         CheckFirstName();
+                        UpdateMemberInfoOnReuse(Rec, Rec.FieldNo("First Name"));
                     end;
                 }
                 field("Middle Name"; Rec."Middle Name")
@@ -305,6 +306,7 @@
                     trigger OnValidate()
                     begin
                         CheckPhone();
+                        UpdateMemberInfoOnReuse(Rec, Rec.FieldNo("Phone No."));
                     end;
                 }
                 field("Auxiliary Phone No."; AuxiliaryPhoneNoField)
@@ -325,6 +327,7 @@
                                 begin
                                     Rec.Validate("Phone No.", AuxiliaryPhoneNoField);
                                     CheckPhone();
+                                    UpdateMemberInfoOnReuse(Rec, Rec.FieldNo("Phone No."));
                                 end;
                             StrLen(AuxiliaryPhoneNoField) > 30:
                                 if AuxiliaryPhoneNoField.Substring(1, 4) <> 'http' then
@@ -333,6 +336,7 @@
                                 if AuxiliaryPhoneNoField.Substring(1, 4) <> 'http' then begin
                                     Rec.Validate("Phone No.", AuxiliaryPhoneNoField);
                                     CheckPhone();
+                                    UpdateMemberInfoOnReuse(Rec, Rec.FieldNo("Phone No."));
                                 end;
 #pragma warning restore AA0139
                         end;
@@ -509,6 +513,7 @@
                     trigger OnValidate()
                     begin
                         CheckEmail();
+                        UpdateMemberInfoOnReuse(Rec, Rec.FieldNo("E-Mail Address"));
                     end;
                 }
                 field("Store Code"; Rec."Store Code")
@@ -1070,6 +1075,106 @@
         _BlockDetails: Text;
         AuxiliaryPhoneNoField: Text[100];
 
+        _ReuseExistingMember: Boolean;
+
+    local procedure UpdateMemberInfoOnReuse(var InfoCapture: Record "NPR MM Member Info Capture"; FromFieldId: Integer): Boolean
+    var
+        MembershipSetup: Record "NPR MM Membership Setup";
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        MemberCommunity: Record "NPR MM Member Community";
+        Member: Record "NPR MM Member";
+    begin
+        if (not _ReuseExistingMember) then
+            exit;
+
+        if (InfoCapture."Item No." = '') then
+            exit;
+
+        MembershipSalesSetup.SetFilter(Type, '=%1', MembershipSalesSetup.Type::ITEM);
+        MembershipSalesSetup.SetFilter("No.", '=%1', InfoCapture."Item No.");
+        if (not MembershipSalesSetup.FindFirst()) then
+            exit;
+
+        MembershipSetup.Get(MembershipSalesSetup."Membership Code");
+        MemberCommunity.Get(MembershipSetup."Community Code");
+
+        Member.Reset();
+        case MemberCommunity."Member Unique Identity" of
+
+            MemberCommunity."Member Unique Identity"::EMAIL:
+                if (FromFieldId = InfoCapture.FieldNo(InfoCapture."E-Mail Address")) then
+                    if (InfoCapture."E-Mail Address" <> '') then
+                        Member.SetFilter("E-Mail Address", '=%1', InfoCapture."E-Mail Address");
+
+            MemberCommunity."Member Unique Identity"::PHONENO:
+                if (FromFieldId = InfoCapture.FieldNo(InfoCapture."Phone No.")) then
+                    if (InfoCapture."Phone No." <> '') then
+                        Member.SetFilter("Phone No.", '=%1', InfoCapture."Phone No.");
+
+            MemberCommunity."Member Unique Identity"::EMAIL_OR_PHONE:
+                if (FromFieldId in [InfoCapture.FieldNo(InfoCapture."E-Mail Address"), InfoCapture.FieldNo(InfoCapture."Phone No.")]) then begin
+                    if (InfoCapture."E-Mail Address" <> '') then
+                        Member.SetFilter("E-Mail Address", '=%1', InfoCapture."E-Mail Address");
+                    if (InfoCapture."Phone No." <> '') then
+                        Member.SetFilter("Phone No.", '=%1', InfoCapture."Phone No.");
+                end;
+
+            MemberCommunity."Member Unique Identity"::EMAIL_AND_PHONE:
+                if (FromFieldId in [InfoCapture.FieldNo(InfoCapture."E-Mail Address"), InfoCapture.FieldNo(InfoCapture."Phone No.")]) then
+                    if (InfoCapture."E-Mail Address" <> '') and (InfoCapture."Phone No." <> '') then begin
+                        Member.SetFilter("E-Mail Address", '=%1', InfoCapture."E-Mail Address");
+                        Member.SetFilter("Phone No.", '=%1', InfoCapture."Phone No.");
+                    end;
+
+            MemberCommunity."Member Unique Identity"::EMAIL_AND_FIRST_NAME:
+                if (FromFieldId in [InfoCapture.FieldNo(InfoCapture."E-Mail Address"), InfoCapture.FieldNo(InfoCapture."First Name")]) then
+                    if (InfoCapture."E-Mail Address" <> '') and (InfoCapture."First Name" <> '') then begin
+                        Member.SetFilter("E-Mail Address", '=%1', InfoCapture."E-Mail Address");
+                        Member.SetFilter("First Name", '=%1', InfoCapture."First Name");
+                    end;
+
+            MemberCommunity."Member Unique Identity"::NONE:
+                exit;
+
+            MemberCommunity."Member Unique Identity"::SSN:
+                if (FromFieldId = InfoCapture.FieldNo(InfoCapture."Social Security No.")) then
+                    if (InfoCapture."Social Security No." <> '') then
+                        Member.SetFilter("Social Security No.", '=%1', InfoCapture."Social Security No.");
+        end;
+
+        if (not Member.HasFilter()) then
+            exit;
+
+        Member.SetFilter(Blocked, '=%1', false);
+        if (not Member.FindFirst()) then
+            exit;
+
+        // Reuse the existing member, pull in data and allow edit.
+        InfoCapture."External Member No" := Member."External Member No.";
+        InfoCapture."Member Entry No" := Member."Entry No.";
+
+        InfoCapture."First Name" := Member."First Name";
+        InfoCapture."Last Name" := Member."Last Name";
+        InfoCapture."E-Mail Address" := Member."E-Mail Address";
+        InfoCapture."Phone No." := Member."Phone No.";
+        InfoCapture."Social Security No." := Member."Social Security No.";
+        InfoCapture."Middle Name" := Member."Middle Name";
+        InfoCapture."News Letter" := Member."E-Mail News Letter";
+        InfoCapture."Store Code" := Member."Store Code";
+        InfoCapture.Address := Member.Address;
+        InfoCapture.City := Member.City;
+        InfoCapture."Post Code Code" := Member."Post Code Code";
+        InfoCapture."Country Code" := Member."Country Code";
+        InfoCapture.Country := Member.Country;
+        InfoCapture.Gender := Member.Gender;
+        InfoCapture.Birthday := Member.Birthday;
+        InfoCapture.PreferredLanguageCode := Member.PreferredLanguageCode;
+        CurrPage.Update(false);
+
+        exit(true);
+
+    end;
+
 
     local procedure CheckFirstName()
     var
@@ -1259,6 +1364,31 @@
                             SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("Phone No."), (MemberInfoCapture."Phone No." = ''));
                         MemberCommunity."Member Unique Identity"::SSN:
                             SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("Social Security No."), (MemberInfoCapture."Social Security No." = ''));
+
+                        MemberCommunity."Member Unique Identity"::EMAIL_OR_PHONE:
+                            if ((MemberInfoCapture."E-Mail Address" = '') and (MemberInfoCapture."Phone No." = '')) then begin
+                                SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("E-Mail Address"), (MemberInfoCapture."E-Mail Address" = ''));
+                                SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("Phone No."), (MemberInfoCapture."Phone No." = ''));
+                            end;
+                        MemberCommunity."Member Unique Identity"::EMAIL_AND_PHONE:
+                            begin
+                                if ((MemberInfoCapture."E-Mail Address" = '') or (MemberInfoCapture."Phone No." = '')) then begin
+                                    if (MemberInfoCapture."E-Mail Address" = '') then
+                                        SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("E-Mail Address"), (MemberInfoCapture."E-Mail Address" = ''));
+                                    if (MemberInfoCapture."Phone No." = '') then
+                                        SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("Phone No."), (MemberInfoCapture."Phone No." = ''));
+                                end;
+                            end;
+                        MemberCommunity."Member Unique Identity"::EMAIL_AND_FIRST_NAME:
+                            begin
+                                if ((MemberInfoCapture."E-Mail Address" = '') or (MemberInfoCapture."First Name" = '')) then begin
+                                    if (MemberInfoCapture."E-Mail Address" = '') then
+                                        SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("E-Mail Address"), (MemberInfoCapture."E-Mail Address" = ''));
+                                    if (MemberInfoCapture."Phone No." = '') then
+                                        SetMissingInfo(MissingInformation, MissingFields, MemberInfoCapture.FieldCaption("First Name"), (MemberInfoCapture."First Name" = ''));
+                                end;
+                            end;
+
                     end;
 
                     if (ActivationDateEditable) and (MemberInfoCapture."Document Date" = 0D) then
@@ -1477,6 +1607,8 @@
                 Rec."Member Card Type" := MembershipSalesSetup."Member Card Type";
 
                 _ShowAutoRenew := MemberCommunity."Membership to Cust. Rel.";
+
+                _ReuseExistingMember := (MemberCommunity."Create Member UI Violation" = MemberCommunity."Create Member UI Violation"::REUSE);
 
                 case MembershipSalesSetup."Business Flow Type" of
                     MembershipSalesSetup."Business Flow Type"::MEMBERSHIP:
