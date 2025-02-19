@@ -171,6 +171,7 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
         BlankReferenceNoErr: Label 'Reference No. can''t be blank';
     begin
         GetParameterValues(Context, VoucherTypeCode, ParamEndSale, ReferenceNo, VoucherListEnabled, SelectedAmount);
+        OnAfterGetVoucherPaymentReferenceNo(ReferenceNo);
         if ReferenceNo = '' then
             Error(BlankReferenceNoErr);
     end;
@@ -400,6 +401,11 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
 
     [IntegrationEvent(false, false)]
     local procedure OnRunLegacyWorkflow(FrontEnd: Codeunit "NPR POS Front End Management"; var POSAction: Record "NPR POS Action"; VoucherType: Code[20]; EndSale: Boolean; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetVoucherPaymentReferenceNo(var ReferenceNo: Text)
     begin
     end;
 
