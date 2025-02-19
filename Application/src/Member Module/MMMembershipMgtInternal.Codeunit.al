@@ -345,11 +345,13 @@
         ErrorText: Text;
         MemberCount: Integer;
         GuardianMemberEntryNo: Integer;
+        ReuseExistingMember: Boolean;
     begin
 
         Membership.Get(MembershipEntryNo);
         MembershipSetup.Get(Membership."Membership Code");
         Community.Get(Membership."Community Code");
+        ReuseExistingMember := false;
 
         Member.Init();
         if (Member.Get(CheckMemberUniqueId(Community.Code, MembershipInfoCapture))) then begin
@@ -357,18 +359,23 @@
             ValidateMemberFields(Membership."Entry No.", Member, ErrorText);
             Member.Modify();
             MemberEntryNo := Member."Entry No.";
-            exit(MemberEntryNo <> 0);
+
+            ReuseExistingMember := (Community."Create Member UI Violation" = Community."Create Member UI Violation");
+            if (not ReuseExistingMember) then
+                exit(MemberEntryNo <> 0);
         end;
 
-        Member."External Member No." := AssignExternalMemberNo(MembershipInfoCapture."External Member No", Membership."Community Code");
-        SetMemberFields(Member, MembershipInfoCapture);
-
-        Member.Insert(true);
+        if (not ReuseExistingMember) then begin
+            Member."External Member No." := AssignExternalMemberNo(MembershipInfoCapture."External Member No", Membership."Community Code");
+            SetMemberFields(Member, MembershipInfoCapture);
+            Member.Insert(true);
+        end;
 
         if (not CreateMemberRole(Member."Entry No.", MembershipEntryNo, MembershipInfoCapture, MemberCount, ReasonText)) then
             exit(false);
 
-        CreateMemberCommunicationDefaultSetup(Member."Entry No.");
+        if (not ReuseExistingMember) then
+            CreateMemberCommunicationDefaultSetup(Member."Entry No.");
 
         if (MembershipInfoCapture."Guardian External Member No." <> '') then begin
             GuardianMemberEntryNo := GetMemberFromExtMemberNo(MembershipInfoCapture."Guardian External Member No.");
@@ -1142,8 +1149,12 @@
                         MemberInfoCapture.AcceptDuplicate := true;
                         exit(0);
                     end;
+
                 Community."Create Member UI Violation"::REUSE:
-                    ;
+                    begin
+                        MemberInfoCapture.AcceptDuplicate := true;
+                    end;
+
                 else
                     Error(CASE_MISSING, Community.FieldName("Create Member UI Violation"), Community."Create Member UI Violation");
             end;
