@@ -42,7 +42,7 @@ types:
       salespersonCode:
         type: optional<string>
         docs: Determines the code of the salesperson performing the external sale. If omitted the system will attempt to use the one assigned to the API user.
-      customerId: optional<string>
+      customerId: optional<uuid>
       pricesIncludeVAT: boolean
       externalDocumentNo:
         type: optional<string>
@@ -62,6 +62,7 @@ types:
           posUnit: "0101"
           receiptNo: "123ABCD"
           salespersonCode: "1234"
+          customerId: "0053e689-81bb-403d-be15-e05332ceb85f"
           pricesIncludeVAT: true
           convertedToPOSEntry: true
           posEntryId: "e3ddb678-30e8-45e3-9e88-96d7cf703ac1"
@@ -131,7 +132,7 @@ types:
       salespersonCode:
         type: optional<string>
         docs: Determines the code of the salesperson performing the external sale. If omitted the system will attempt to use the one assigned to the API user.
-      customerId: optional<string>
+      customerId: optional<uuid>
       pricesIncludeVAT: boolean
       externalDocumentNo:
         type: optional<string>
@@ -146,6 +147,7 @@ types:
           posUnit: "0101"
           receiptNo: "123ABCD"
           salespersonCode: "1234"
+          customerId: "0053e689-81bb-403d-be15-e05332ceb85f"
           pricesIncludeVAT: true
           saleLines: 
             - $CreateExternalPOSSaleLine.ExampleSaleLineRequest
