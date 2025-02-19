@@ -258,6 +258,7 @@ codeunit 6248216 "NPR API External POS Sale" implements "NPR API Request Handler
     internal procedure SaleToJson(var Json: Codeunit "NPR Json Builder"; ExternalPOSSale: Record "NPR External POS Sale"): Codeunit "NPR Json Builder"
     var
         ExternalPOSSaleLine: Record "NPR External POS Sale Line";
+        Customer: Record Customer;
     begin
         Json.StartObject()
             .AddProperty('saleId', Format(ExternalPOSSale.SystemId, 0, 4).ToLower())
@@ -266,8 +267,11 @@ codeunit 6248216 "NPR API External POS Sale" implements "NPR API Request Handler
             .AddProperty('posUnit', ExternalPOSSale."Register No.")
             .AddProperty('receiptNo', ExternalPOSSale."Sales Ticket No.")
             .AddProperty('salespersonCode', ExternalPOSSale."Salesperson Code");
-        if (ExternalPOSSale."Customer No." <> '') then
-            Json.AddProperty('customerId', ExternalPOSSale."Customer No.");
+        if (ExternalPOSSale."Customer No." <> '') then begin
+            Customer.SetLoadFields("No.", SystemId);
+            if (Customer.Get(ExternalPOSSale."Customer No.")) then
+                Json.AddProperty('customerId', Format(Customer.SystemId, 0, 4).ToLower());
+        end;
         Json.AddProperty('pricesIncludeVAT', ExternalPOSSale."Prices Including VAT");
         if (ExternalPOSSale."External Document No." <> '') then
             Json.AddProperty('externalDocumentNo', ExternalPOSSale."External Document No.");
