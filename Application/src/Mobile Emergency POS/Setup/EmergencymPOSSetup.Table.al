@@ -45,6 +45,12 @@ table 6150955 "NPR Emergency mPOS Setup"
             DataClassification = CustomerContent;
             TableRelation = "Salesperson/Purchaser";
         }
+
+        field(8; "CSV Url"; Text[500])
+        {
+            Caption = 'CSV Url';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -115,6 +121,7 @@ table 6150955 "NPR Emergency mPOS Setup"
         Setup.Add('Bc_SMSTemplateCode', Rec."SMS Template");
         Setup.Add('Bc_EmailTemplateCode', Rec."Email Template");
         Setup.Add('Bc_SalesPersonCode', Rec."Salespers/Purchaser Code");
+        Setup.Add('CSVUrl', Rec."CSV Url");
         Setup.WriteTo(QrJson);
         exit(QrJson);
     end;
