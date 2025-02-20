@@ -7,7 +7,7 @@ imports:
 
 service:
   display-name: Reservations
-  auth: false
+  auth: true
   base-path: /ticket
   endpoints:
 

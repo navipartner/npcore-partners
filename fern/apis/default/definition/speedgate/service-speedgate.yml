@@ -7,7 +7,7 @@ imports:
 
 service:
   display-name: Speedgate
-  auth: false
+  auth: true
   base-path: /speedgate
 
   endpoints:
