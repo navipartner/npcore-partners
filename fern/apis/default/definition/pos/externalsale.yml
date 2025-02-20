@@ -249,7 +249,7 @@ service:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
-            saleId: "971c0b28-d649-4ae3-a1e7-2a3ea336ef87"
+            saleId: "4ca28ccc-e84b-4788-973c-c8ce5a59383b"
           response:
             body: $ExternalPOSSale.ExampleSale
 

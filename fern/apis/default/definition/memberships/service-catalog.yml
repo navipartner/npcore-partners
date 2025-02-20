@@ -7,7 +7,7 @@ imports:
   
 service:
   display-name: Catalog
-  auth: false
+  auth: true
   base-path: /membership
 
   endpoints:

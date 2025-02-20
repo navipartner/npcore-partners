@@ -7,7 +7,7 @@ imports:
 
 service:
   display-name: Tickets
-  auth: false
+  auth: true
   base-path: /ticket
   endpoints:
 

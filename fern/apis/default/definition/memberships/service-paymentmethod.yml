@@ -79,7 +79,7 @@ types:
 
 service:
   display-name: Payment method
-  auth: false
+  auth: true
   base-path: /membership
   endpoints:
 

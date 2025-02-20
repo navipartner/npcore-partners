@@ -7,7 +7,7 @@ imports:
 
 service:
   display-name: Card
-  auth: false
+  auth: true
   base-path: /membership
 
   endpoints:
