@@ -60,14 +60,4 @@
     begin
         AltSaleCancelDescription := NewAltSaleCancelDescription;
     end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Resume Sale Mgt.", 'OnBeforePromptResumeSale', '', false, false)]
-    local procedure SetCancelOrPark(var SalePOS: Record "NPR POS Sale"; POSSession: Codeunit "NPR POS Session"; var SkipDialog: Boolean; var ActionOption: Option " ",Resume,CancelAndNew,SaveAsQuote,SkipAndNew; var ActionOnCancelError: Option " ",Resume,SaveAsQuote,ShowError; var Handled: Boolean)
-    begin
-        /*
-        SkipDialog := TRUE;
-        ActionOption := ActionOption::CancelAndNew;
-        ActionOnCancelError := ActionOnCancelError::SaveAsQuote;
-        */
-    end;
 }

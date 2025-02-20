@@ -54,6 +54,7 @@
 
     local procedure SaleToResumeIsSelected(var SalePOS: Record "NPR POS Sale"; POSUnit: Record "NPR POS Unit"; POSSession: Codeunit "NPR POS Session"; var POSQuoteEntryNo: Integer): Boolean
     var
+        ResumeSaleMgtEvents: Codeunit "NPR Resume Sale Mgt Events";
         ActionOnCancelError: Option " ",Resume,SaveAsQuote,ShowError;
         ActionOption: Option " ",Resume,CancelAndNew,SaveAsQuote,SkipAndNew;
         ForceSaveAsQuote: Boolean;
@@ -68,7 +69,7 @@
             ActionOption := ActionOption::CancelAndNew;  //Silently cancel any unfinished sale with no lines
         ActionOnCancelError := ActionOnCancelError::SaveAsQuote;
 
-        OnBeforePromptResumeSale(SalePOS, POSSession, SkipDialog, ActionOption, ActionOnCancelError, Handled);
+        ResumeSaleMgtEvents.OnBeforePromptResumeSale(SalePOS, POSSession, SkipDialog, ActionOption, ActionOnCancelError, Handled);
         if Handled then
             exit(ActionOption = ActionOption::Resume);
 
@@ -219,10 +220,5 @@
     procedure SetAlternativeCancelDescription(NewAltSaleCancelDescription: Text)
     begin
         AltSaleCancelDescription := NewAltSaleCancelDescription;
-    end;
-
-    [IntegrationEvent(false, false)]
-    internal procedure OnBeforePromptResumeSale(var SalePOS: Record "NPR POS Sale"; POSSession: Codeunit "NPR POS Session"; var SkipDialog: Boolean; var ActionOption: Option " ",Resume,CancelAndNew,SaveAsQuote; var ActionOnCancelError: Option " ",Resume,SaveAsQuote,ShowError; var Handled: Boolean)
-    begin
     end;
 }
