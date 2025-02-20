@@ -54,6 +54,12 @@ page 6184928 "NPR Emergency mPOS Setup"
                     Caption = 'Salesperson / Purchaser Code';
                     ToolTip = 'Specifies which Salesperson / Purchaser Code fo which to put the sale under';
                 }
+                field("CSV Url"; Rec."CSV Url")
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'CSV Url';
+                    ToolTip = 'Specifies a url from which to download a self-hosted CSV containing Item shortcuts';
+                }
             }
             group("Payment Methods")
             {
