@@ -1,6 +1,5 @@
 page 6059888 "NPR TM Ticket Item List"
 {
-    Extensible = False;
     PageType = List;
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
     UsageCategory = Lists;

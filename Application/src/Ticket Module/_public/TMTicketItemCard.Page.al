@@ -1,6 +1,5 @@
 page 6059884 "NPR TM Ticket Item Card"
 {
-    Extensible = False;
     PageType = Card;
     UsageCategory = None;
     SourceTable = "Item Variant";
