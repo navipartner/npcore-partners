@@ -3712,6 +3712,7 @@
         Customer: Record Customer;
         ConfigTemplateHeader: Record "Config. Template Header";
         MembershipRole: Record "NPR MM Membership Role";
+        PendingCustomerUpdate: Record "NPR MM Pending Customer Update";
         ConfigTemplateMgt: Codeunit "Config. Template Management";
         RecRef: RecordRef;
         MemberNotification: Codeunit "NPR MM Member Notification";
@@ -3783,12 +3784,21 @@
                 MembershipSetup.Get(Membership."Membership Code");
                 if (MembershipSetup."Customer Config. Template Code" <> '') then begin
                     ConfigTemplateHeader.Get(MembershipSetup."Customer Config. Template Code");
-                    if (Customer.Get(Membership."Customer No.")) then begin
-                        RecRef.GetTable(Customer);
-                        ConfigTemplateMgt.UpdateRecord(ConfigTemplateHeader, RecRef);
-                        RecRef.SetTable(Customer);
-                        Customer.Modify(true);
-                    end;
+                    if (Customer.Get(Membership."Customer No.")) then
+                        if MembershipSetup."Defer Cust. Update Alterations" and (MembershipLedgerEntry."Valid From Date" > WorkDate()) then begin
+                            PendingCustomerUpdate.Init();
+                            PendingCustomerUpdate."Entry No." := 0;
+                            PendingCustomerUpdate.Insert();
+                            PendingCustomerUpdate."Customer No." := Customer."No.";
+                            PendingCustomerUpdate."Customer Config. Template Code" := MembershipSetup."Customer Config. Template Code";
+                            PendingCustomerUpdate."Valid From Date" := MembershipLedgerEntry."Valid From Date";
+                            PendingCustomerUpdate.Modify();
+                        end else begin
+                            RecRef.GetTable(Customer);
+                            ConfigTemplateMgt.UpdateRecord(ConfigTemplateHeader, RecRef);
+                            RecRef.SetTable(Customer);
+                            Customer.Modify(true);
+                        end;
                 end;
             end;
         end;

@@ -300,6 +300,11 @@
                     ToolTip = 'Specifies the value of the Validate Age Against field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field("Defer Cust. Update Alterations"; Rec."Defer Cust. Update Alterations")
+                {
+                    ToolTip = 'Specifies if customer defer update on alterations should be run';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
             }
         }
     }
@@ -475,6 +480,27 @@
                 RunObject = page "NPR MM Membership Rapid Pckg.";
                 ToolTip = 'Executes the Deploy Rapidstart Package for Member module From Azure Blob Storage';
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+            }
+            action(CreateJQMembershipCustomerUpdate)
+            {
+                Caption = 'Create Membership Pending Customer Upate Job Queue';
+                Image = Job;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                ToolTip = 'Creates Job Queue to execute Defer Customer Update for Membership';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                trigger OnAction()
+                var
+                    JobQueueEntries: Page "Job Queue Entries";
+                    StartJobQueueEntrMsg: Label 'Please make sure to start Job Queue Entry on Defer Customer Update On Alterations';
+                begin
+                    InitMembershipCustomerPendingUpdate();
+                    Commit();
+                    Message(StartJobQueueEntrMsg);
+                    JobQueueEntries.Run();
+                end;
             }
         }
     }
@@ -666,7 +692,43 @@
             Window.Close();
 
         end;
+    end;
 
+    local procedure InitMembershipCustomerPendingUpdate(): Boolean
+    var
+        JobQueueCategory: Record "Job Queue Category";
+        JobQueueEntry: Record "Job Queue Entry";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
+        NotBeforeDateTime: DateTime;
+        NextRunDateFormula: DateFormula;
+        JobCategoryDescrLbl: Label 'Membership Customer Update', MaxLength = 30;
+        JobQueueDescrLbl: Label 'Membership Customer Pending Update', MaxLength = 250;
+    begin
+        NotBeforeDateTime := CreateDateTime(Today, 020000T);
+        Evaluate(NextRunDateFormula, '<1D>');
+        JobQueueMgt.SetJobTimeout(4, 0);  //4 hours
+        JobQueueCategory.InsertRec(JQCategoryCode(), JobCategoryDescrLbl);
+
+        if JobQueueMgt.InitRecurringJobQueueEntry(
+            JobQueueEntry."Object Type to Run"::Codeunit,
+            Codeunit::"NPR MM Update Customer Pending",
+            '',
+            JobQueueDescrLbl,
+            NotBeforeDateTime,
+            DT2Time(NotBeforeDateTime),
+            030000T,
+            NextRunDateFormula,
+            JQCategoryCode(),
+            JobQueueEntry)
+        then begin
+            JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
+            exit(true);
+        end;
+    end;
+
+    local procedure JQCategoryCode(): Code[10]
+    begin
+        exit('MEMCUSTUPD');
     end;
 }
 

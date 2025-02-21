@@ -412,6 +412,20 @@
             ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'HeyLoyalty values are now stored in a dedicated mapping table 6059839 "NPR HL Mapped Value".';
         }
+        field(810; "Defer Cust. Update Alterations"; Boolean)
+        {
+            Caption = 'Defer Customer Update On Alterations';
+            DataClassification = CustomerContent;
+            trigger OnValidate()
+            var
+                JobQueueEntry: Record "Job Queue Entry";
+                JobQueueEntryMissingErr: Label 'Job Queue Entry is missing for Defer Customer Update On Alterations.';
+            begin
+                if Rec."Defer Cust. Update Alterations" then
+                    if (not JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR MM Update Customer Pending")) then
+                        Error(JobQueueEntryMissingErr);
+            end;
+        }
     }
 
     keys
