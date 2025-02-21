@@ -402,9 +402,12 @@ codeunit 6248220 "NPR MemberApiAgent"
             if (not JToken.AsValue().IsNull()) then
                 MemberInfoCapture."Store Code" := JToken.AsValue().AsText();
 
+        if (Request.QueryParams().ContainsKey('allowMergeOnConflict')) then
+            MemberInfoCapture.AllowMergeOnConflict := (Request.QueryParams().Get('allowMergeOnConflict').ToLower() in ['true', '1']);
+
         MemberInfoCapture."Import Entry Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
     end;
-# pragma warning restore AA0139
+#pragma warning restore AA0139
 
     local procedure DecodeGdprConsent(ConsentText: Text): Option
     var

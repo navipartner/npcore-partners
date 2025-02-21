@@ -84,4 +84,14 @@ The following unique error codes are used in our API:
 | **`scanner_id_required`** | The scanner id is required.| 
 | **`scanner_not_enabled`** | The scanner is not enabled.| 
 | **`number_not_whitelisted`** | The reference number was not whitelisted by the gate.| 
-| **`number_rejected`** | The reference number was actively rejected by gate setup.|
+| **`number_rejected`** | The reference number was actively rejected by gate setup.
+| **`member_unique_id_violation`** | Member with same unique id already exists.|
+| **`member_count_exceeded`** | Member count exceeded.|
+| **`member_card_exists`** | Member card already exists.|
+| **`no_admin_member`** | No admin member found.|
+| **`member_card_blank`** | Member card can not be blank.|
+| **`invalid_contact`** | The provided contact number is not valid in context of the customer.|
+| **`age_verification_setup`** | Add member failed on age verification because item number for sales was not provided.|
+| **`age_verification`** | Age verification failed.|
+| **`allow_member_merge_not_set`** | This request violates the community’s member identity uniqueness rule. See the API documentation for merge options.|
+| **`member_card_limitation_error`** | Limitations on member card apply and deny admission.|

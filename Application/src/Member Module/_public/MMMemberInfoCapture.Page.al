@@ -1075,7 +1075,7 @@
         _BlockDetails: Text;
         AuxiliaryPhoneNoField: Text[100];
 
-        _ReuseExistingMember: Boolean;
+        _ReUseExistingMember: Boolean;
 
     local procedure UpdateMemberInfoOnReuse(var InfoCapture: Record "NPR MM Member Info Capture"; FromFieldId: Integer): Boolean
     var
@@ -1084,11 +1084,14 @@
         MemberCommunity: Record "NPR MM Member Community";
         Member: Record "NPR MM Member";
     begin
-        if (not _ReuseExistingMember) then
+        if (not _ReUseExistingMember) then
             exit;
 
         if (InfoCapture."Item No." = '') then
             exit;
+
+        InfoCapture."External Member No" := '';
+        InfoCapture."Member Entry No" := 0;
 
         MembershipSalesSetup.SetFilter(Type, '=%1', MembershipSalesSetup.Type::ITEM);
         MembershipSalesSetup.SetFilter("No.", '=%1', InfoCapture."Item No.");
@@ -1097,6 +1100,7 @@
 
         MembershipSetup.Get(MembershipSalesSetup."Membership Code");
         MemberCommunity.Get(MembershipSetup."Community Code");
+        CurrPage.Update(false);
 
         Member.Reset();
         case MemberCommunity."Member Unique Identity" of
@@ -1114,7 +1118,7 @@
             MemberCommunity."Member Unique Identity"::EMAIL_OR_PHONE:
                 if (FromFieldId in [InfoCapture.FieldNo(InfoCapture."E-Mail Address"), InfoCapture.FieldNo(InfoCapture."Phone No.")]) then begin
                     if (InfoCapture."E-Mail Address" <> '') then
-                        Member.SetFilter("E-Mail Address", '=%1', InfoCapture."E-Mail Address");
+                        Member.SetFilter("E-Mail Address", '=%1', lowercase(InfoCapture."E-Mail Address"));
                     if (InfoCapture."Phone No." <> '') then
                         Member.SetFilter("Phone No.", '=%1', InfoCapture."Phone No.");
                 end;
@@ -1122,7 +1126,7 @@
             MemberCommunity."Member Unique Identity"::EMAIL_AND_PHONE:
                 if (FromFieldId in [InfoCapture.FieldNo(InfoCapture."E-Mail Address"), InfoCapture.FieldNo(InfoCapture."Phone No.")]) then
                     if (InfoCapture."E-Mail Address" <> '') and (InfoCapture."Phone No." <> '') then begin
-                        Member.SetFilter("E-Mail Address", '=%1', InfoCapture."E-Mail Address");
+                        Member.SetFilter("E-Mail Address", '=%1', lowercase(InfoCapture."E-Mail Address"));
                         Member.SetFilter("Phone No.", '=%1', InfoCapture."Phone No.");
                     end;
 
@@ -1130,7 +1134,7 @@
                 if (FromFieldId in [InfoCapture.FieldNo(InfoCapture."E-Mail Address"), InfoCapture.FieldNo(InfoCapture."First Name")]) then
                     if (InfoCapture."E-Mail Address" <> '') and (InfoCapture."First Name" <> '') then begin
                         Member.SetFilter("E-Mail Address", '=%1', InfoCapture."E-Mail Address");
-                        Member.SetFilter("First Name", '=%1', InfoCapture."First Name");
+                        Member.SetFilter("First Name", '%1', '@' + InfoCapture."First Name");
                     end;
 
             MemberCommunity."Member Unique Identity"::NONE:
@@ -1608,7 +1612,9 @@
 
                 _ShowAutoRenew := MemberCommunity."Membership to Cust. Rel.";
 
-                _ReuseExistingMember := (MemberCommunity."Create Member UI Violation" = MemberCommunity."Create Member UI Violation"::REUSE);
+                _ReUseExistingMember := (MemberCommunity."Create Member UI Violation" in
+                                            [MemberCommunity."Create Member UI Violation"::REUSE,
+                                             MemberCommunity."Create Member UI Violation"::MERGE_MEMBER]);
 
                 case MembershipSalesSetup."Business Flow Type" of
                     MembershipSalesSetup."Business Flow Type"::MEMBERSHIP:

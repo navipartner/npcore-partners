@@ -21,15 +21,7 @@
                     Importance = Promoted;
                     ToolTip = 'Specifies the value of the External Member No. field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-
-                    trigger OnValidate()
-                    begin
-
-                        if ((Rec."External Member No." <> xRec."External Member No.") and (xRec."External Member No." <> '')) then
-                            if (not Confirm(EXT_NO_CHANGE, false)) then
-                                Error('');
-
-                    end;
+                    Editable = false;
                 }
                 field("Display Name"; Rec."Display Name")
                 {
@@ -40,9 +32,9 @@
                 }
                 field("First Name"; Rec."First Name")
                 {
-
                     ToolTip = 'Specifies the value of the First Name field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Editable = _FirstNameEditable;
                 }
                 field("Middle Name"; Rec."Middle Name")
                 {
@@ -60,6 +52,7 @@
                 {
                     ToolTip = 'Specifies the value of the E-Mail Address field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Editable = _EmailEditable;
                     trigger OnValidate()
                     begin
                         ValidateMemberEmail(Rec);
@@ -69,6 +62,7 @@
                 {
                     ToolTip = 'Specifies the value of the Phone No. field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Editable = _PhoneNumberEditable;
                     trigger OnValidate()
                     begin
                         ValidateMemberPhoneNumber(Rec);
@@ -701,6 +695,27 @@
 
                 end;
             }
+            action(ChangeMemberUniqueId)
+            {
+                Caption = 'Change Members Unique Id';
+                Ellipsis = true;
+                Image = Union;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+
+                ToolTip = 'Executes the action to update fields on the member that makes up the unique id according to the community.';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                trigger OnAction()
+                var
+                    ChangeUniqueIdPage: Page "NPR MemberUpdateUniqueId";
+                begin
+                    ChangeUniqueIdPage.SetMember(Rec);
+                    ChangeUniqueIdPage.RunModal();
+                    CurrPage.Update(false);
+                end;
+            }
 
         }
         area(navigation)
@@ -936,8 +951,20 @@
     end;
 
     trigger OnAfterGetRecord()
+    var
+        MembershipMgmt: Codeunit "NPR MM MembershipMgtInternal";
+        Community: Record "NPR MM Member Community";
     begin
         GetMasterDataAttributeValue();
+        _FirstNameEditable := true;
+        _EmailEditable := true;
+        _PhoneNumberEditable := true;
+
+        if (MembershipMgmt.CheckGetCommunityUniqueIdRules(Rec."Entry No.", Community)) then begin
+            _FirstNameEditable := not (Community."Member Unique Identity" in [Community."Member Unique Identity"::EMAIL_AND_FIRST_NAME]);
+            _EmailEditable := not (Community."Member Unique Identity" in [Community."Member Unique Identity"::EMAIL_AND_FIRST_NAME, Community."Member Unique Identity"::EMAIL]);
+            _PhoneNumberEditable := not (Community."Member Unique Identity" in [Community."Member Unique Identity"::EMAIL_AND_PHONE, Community."Member Unique Identity"::EMAIL_OR_PHONE, Community."Member Unique Identity"::PHONENO]);
+        end;
     end;
 
     trigger OnOpenPage()
@@ -964,6 +991,9 @@
     end;
 
     var
+        _FirstNameEditable: Boolean;
+        _EmailEditable: Boolean;
+        _PhoneNumberEditable: Boolean;
         Membership: Record "NPR MM Membership";
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         CONFIRM_PRINT: Label 'Do you want to print a member account card for %1?';
@@ -985,7 +1015,6 @@
         NPRAttrVisible10: Boolean;
         RaptorEnabled: Boolean;
         NO_ENTRIES: Label 'No entries found for member %1.';
-        EXT_NO_CHANGE: Label 'Please note that changing the external number requires re-printing of documents where this number is used. Do you want to continue?';
 
     local procedure SetMasterDataAttributeValue(AttributeNumber: Integer)
     begin

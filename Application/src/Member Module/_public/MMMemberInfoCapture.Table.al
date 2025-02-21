@@ -250,6 +250,11 @@
             Caption = 'Accept Duplicate';
             DataClassification = CustomerContent;
         }
+        field(191; AllowMergeOnConflict; Boolean)
+        {
+            Caption = 'Allow Merge On Conflict';
+            DataClassification = CustomerContent;
+        }
         field(200; "User Logon ID"; Code[80])
         {
             Caption = 'User Logon ID';

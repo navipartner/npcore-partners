@@ -161,19 +161,49 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
         end;
 
         ResponseMessage := GetLastErrorText();
-        ApiError := ErrorToEnum();
+        ApiError := ErrorToEnum(ResponseMessage);
 
         Response.CreateErrorResponse(ApiError, ResponseMessage);
         LogMessage(ApiFunction, (Time() - StartTime), Response.GetStatusCode(), Response);
         exit(Response);
     end;
 
-    local procedure ErrorToEnum(): Enum "NPR API Error Code"
+    local procedure ErrorToEnum(ErrorMessage: Text): Enum "NPR API Error Code"
     begin
+        if (ErrorMessage.StartsWith('[-127001]')) then
+            exit(Enum::"NPR API Error Code"::member_count_exceeded);
+
+        if (ErrorMessage.StartsWith('[-127002]')) then
+            exit(Enum::"NPR API Error Code"::member_card_exists);
+
+        if (ErrorMessage.StartsWith('[-127003]')) then
+            exit(Enum::"NPR API Error Code"::no_admin_member);
+
+        if (ErrorMessage.StartsWith('[-127004]')) then
+            exit(Enum::"NPR API Error Code"::member_card_blank);
+
+        if (ErrorMessage.StartsWith('[-127005]')) then
+            exit(Enum::"NPR API Error Code"::invalid_contact);
+
+        if (ErrorMessage.StartsWith('[-127006]')) then
+            exit(Enum::"NPR API Error Code"::age_verification_setup);
+
+        if (ErrorMessage.StartsWith('[-127007]')) then
+            exit(Enum::"NPR API Error Code"::age_verification);
+
+        if (ErrorMessage.StartsWith('[-127008]')) then
+            exit(Enum::"NPR API Error Code"::allow_member_merge_not_set);
+
+        if (ErrorMessage.StartsWith('[-127009]')) then
+            exit(Enum::"NPR API Error Code"::member_unique_id_violation);
+
         exit(Enum::"NPR API Error Code"::generic_error);
     end;
 
-    local procedure LogMessage(Function: Enum "NPR MembershipApiFunctions"; DurationMs: Decimal; HttpStatusCode: Integer; Response: Codeunit "NPR API Response")
+    local procedure LogMessage(Function: Enum "NPR MembershipApiFunctions";
+        DurationMs: Decimal;
+        HttpStatusCode: Integer;
+        Response: Codeunit "NPR API Response")
     var
         CustomDimensions: Dictionary of [Text, Text];
         ActiveSession: Record "Active Session";

@@ -6,10 +6,9 @@
         MembershipEvents: Codeunit "NPR MM Membership Events";
 
         CASE_MISSING: Label '%1 value %2 is missing its implementation.';
-        TO_MANY_MEMBERS: Label 'Max number of members exceeded.\\The membership %1 of type %2 allows a maximum of %3 members per membership.';
+        TO_MANY_MEMBERS: Label 'Max number of members exceeded. The membership %1 of type %2 allows a maximum of %3 members per membership.';
         LOGIN_ID_EXIST: Label 'The selected member logon id [%1] is already in use.\\Member %2.';
         LOGIN_ID_BLANK: Label 'The %1 can''t be blank when the setting for %2 is %3.';
-        MEMBER_EXIST: Label 'Member ID [%1] is already in use.';
 
         MEMBER_BLOCKED: Label 'Member ID [%1] is blocked. Block date is %2.';
         MEMBER_ROLE_BLOCKED: Label 'Member ID [%1] has no active role in membership [%2].';
@@ -50,7 +49,9 @@
         INVALID_CONTACT_NO: Label '-127005';
         AGE_VERIFICATION_SETUP_NO: Label '-127006';
         AGE_VERIFICATION_NO: Label '-127007';
-        NO_LEDGER_ENTRY: Label 'The membership %1 is not valid.\\It must be activated, but there is no ledger entry associated with that membership that can be actived.';
+        ALLOW_MEMBER_MERGE_NOT_SET_NO: Label '-127008';
+        MEMBER_WITH_UID_EXISTS_NO: Label '-127009';
+        NO_LEDGER_ENTRY: Label 'The membership %1 is not valid.\\It must be activated, but there is no ledger entry associated with that membership that can be activated.';
         NOT_ACTIVATED: Label 'The membership is marked as activate on first use, but has not been activated yet. Retry the action after the membership has been activated.';
         NOT_FOUND: Label '%1 not found. %2';
         GRACE_PERIOD: Label 'The %1 is not allowed because of grace period constraint.';
@@ -58,7 +59,8 @@
         INVALID_ACTIVATION_DATE: Label 'The option %1 for %2 is not valid for alteration type %3.';
         AGE_VERIFICATION_SETUP: Label 'Add member failed on age verification because item number for sales was not provided.';
         AGE_VERIFICATION: Label 'Member %1 does not meet the age constraint of %2 years set on this product.';
-
+        ALLOW_MEMBER_MERGE_NOT_SET: Label 'This request violates the community’s unique member identity rules. See the API documentation for merge options.';
+        MEMBER_WITH_UID_EXISTS: Label 'Member with unique ID [%1] with name: %2 is already in use.';
 
     internal procedure CreateMembershipInteractive(var MemberInfoCapture: Record "NPR MM Member Info Capture") ExternalCardNumber: Text[100];
     var
@@ -430,6 +432,199 @@
         exit(MemberEntryNo <> 0);
     end;
 
+    internal procedure UpdateMemberUniqueId(OriginalMember: Record "NPR MM Member"; NewFirstName: Text[50]; NewEmail: Text[80]; NewPhoneNumber: Text[30]; NewExternalMemberNo: Code[20])
+    var
+        AllMembersUpdated: Boolean;
+        Member: Record "NPR MM Member";
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+        Community: Record "NPR MM Member Community";
+        MultipleCommunities: Label 'The member exist in multiple communities that employ different unique ID rules for the members. Merging members based on unique ID is not possible.';
+        MemberEntryNo: Integer;
+    begin
+        if (not (CheckGetCommunityUniqueIdRules(OriginalMember."Entry No.", Community))) then
+            Error(MultipleCommunities);
+
+        MemberInfoCapture."First Name" := NewFirstName;
+        MemberInfoCapture."E-Mail Address" := NewEmail;
+        MemberInfoCapture."Phone No." := NewPhoneNumber;
+        MemberInfoCapture."Member Entry No" := OriginalMember."Entry No.";
+
+        Member.Get(OriginalMember."Entry No.");
+        repeat
+            MemberEntryNo := Member."Entry No.";
+            UpdateMemberUniqueIdWorker(OriginalMember, NewFirstName, NewEmail, NewPhoneNumber, NewExternalMemberNo);
+            SetMemberUniqueIdFilter(Community, MemberInfoCapture, Member);
+            AllMembersUpdated := not Member.FindFirst();
+        until ((AllMembersUpdated) or (MemberEntryNo = Member."Entry No."));
+    end;
+
+    local procedure UpdateMemberUniqueIdWorker(OriginalMember: Record "NPR MM Member"; NewFirstName: Text[50]; NewEmail: Text[80]; NewPhoneNumber: Text[30]; NewExternalMemberNo: Code[20])
+    var
+        MemberToUpdate: Record "NPR MM Member";
+        Membership: Record "NPR MM Membership";
+        MembershipRole: Record "NPR MM Membership Role";
+
+        MembershipLogEntry: Record "NPR MM Member Arr. Log Entry";
+        Ticket: Record "NPR TM Ticket";
+        ReservationReq: Record "NPR TM Ticket Reservation Req.";
+        NotificationEntry: Record "NPR MM Member Notific. Entry";
+        SponsorTicketEntry: Record "NPR MM Sponsors. Ticket Entry";
+
+        ChangeExternalMemberNo: Boolean;
+        ChangeFirstName: Boolean;
+        ChangeEmail: Boolean;
+        ChangePhoneNumber: Boolean;
+
+    begin
+        if (not MemberToUpdate.Get(OriginalMember."Entry No.")) then
+            exit;
+
+        MemberToUpdate."First Name" := NewFirstName;
+        MemberToUpdate."E-Mail Address" := NewEmail;
+        MemberToUpdate."Phone No." := NewPhoneNumber;
+        MemberToUpdate."External Member No." := NewExternalMemberNo;
+        MemberToUpdate."Display Name" := GetDisplayName(MemberToUpdate);
+        MemberToUpdate.Modify();
+
+        ChangeExternalMemberNo := (MemberToUpdate."External Member No." = OriginalMember."External Member No.");
+        ChangeFirstName := (MemberToUpdate."First Name" = OriginalMember."First Name");
+        ChangeEmail := (MemberToUpdate."E-Mail Address" = OriginalMember."E-Mail Address");
+        ChangePhoneNumber := (MemberToUpdate."Phone No." = OriginalMember."Phone No.");
+
+        MembershipRole.SetFilter("Member Entry No.", '=%1', OriginalMember."Entry No.");
+        if (MembershipRole.FindSet()) then
+            repeat
+                Membership.Get(MembershipRole."Membership Entry No.");
+                if (ChangeExternalMemberNo) then begin
+                    MembershipLogEntry.SetCurrentKey("External Membership No.", "External Member No.", "Event Type", "Response Type", "Local Date");
+                    MembershipLogEntry.SetFilter("External Membership No.", '=%1', Membership."External Membership No.");
+                    MembershipLogEntry.SetFilter("External Member No.", '=%1', OriginalMember."External Member No.");
+                    MembershipLogEntry.ModifyAll("External Member No.", NewExternalMemberNo);
+                end;
+
+                NotificationEntry.SetCurrentKey("Membership Entry No.");
+                NotificationEntry.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
+                NotificationEntry.SetFilter("External Member No.", '=%1', OriginalMember."External Member No.");
+                if (ChangeFirstName) then
+                    NotificationEntry.ModifyAll("First Name", NewFirstName);
+                if (ChangeEmail) then
+                    NotificationEntry.ModifyAll("E-Mail Address", NewEmail);
+                if (ChangePhoneNumber) then
+                    NotificationEntry.ModifyAll("Phone No.", NewPhoneNumber);
+                if (ChangeExternalMemberNo) then
+                    NotificationEntry.ModifyAll("External Member No.", NewExternalMemberNo);
+
+                SponsorTicketEntry.SetCurrentKey("Membership Entry No.");
+                SponsorTicketEntry.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
+                SponsorTicketEntry.SetFilter("External Member No.", '=%1', OriginalMember."External Member No.");
+                if (ChangeFirstName) then
+                    SponsorTicketEntry.ModifyAll("First Name", NewFirstName);
+                if (ChangeEmail) then
+                    SponsorTicketEntry.ModifyAll("E-Mail Address", NewEmail);
+                if (ChangePhoneNumber) then
+                    SponsorTicketEntry.ModifyAll("Phone No.", NewPhoneNumber);
+                if (ChangeExternalMemberNo) then
+                    SponsorTicketEntry.ModifyAll("External Member No.", NewExternalMemberNo);
+
+            until (MembershipRole.Next() = 0);
+
+        if (ChangeExternalMemberNo) then begin
+            Ticket.SetFilter("External Member Card No.", '=%1', OriginalMember."External Member No.");
+            Ticket.SetLoadFields("External Member Card No.");
+            Ticket.ModifyAll("External Member Card No.", NewExternalMemberNo);
+        end;
+
+        if (ChangeExternalMemberNo) then begin
+            ReservationReq.SetFilter("External Member No.", '=%1', OriginalMember."External Member No.");
+            ReservationReq.SetLoadFields("External Member No.");
+            ReservationReq.ModifyAll("External Member No.", NewExternalMemberNo);
+        end;
+
+    end;
+
+    internal procedure MergeMemberUniqueId(MemberToKeep: Record "NPR MM Member"; NewFirstName: Text[50]; NewEmail: Text[80]; NewPhoneNumber: Text[30]; NewExternalMemberNo: Code[20])
+    var
+        AllMembersUpdated: Boolean;
+        Member: Record "NPR MM Member";
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+        Community: Record "NPR MM Member Community";
+        MultipleCommunities: Label 'The member exist in multiple communities that employ different unique ID rules for the members. Merging members based on unique ID is not possible.';
+        MemberEntryNo: Integer;
+    begin
+        if (not (CheckGetCommunityUniqueIdRules(MemberToKeep."Entry No.", Community))) then
+            Error(MultipleCommunities);
+
+        MemberInfoCapture."First Name" := NewFirstName;
+        MemberInfoCapture."E-Mail Address" := NewEmail;
+        MemberInfoCapture."Phone No." := NewPhoneNumber;
+        MemberInfoCapture."Member Entry No" := MemberToKeep."Entry No.";
+
+        Member.Get(MemberToKeep."Entry No.");
+        repeat
+            MemberEntryNo := Member."Entry No.";
+            MergeMemberUniqueIdWorker(Community, MemberToKeep, NewFirstName, NewEmail, NewPhoneNumber, NewExternalMemberNo);
+            SetMemberUniqueIdFilter(Community, MemberInfoCapture, Member);
+            AllMembersUpdated := not Member.FindFirst();
+        until ((AllMembersUpdated) or (MemberEntryNo = Member."Entry No."));
+
+    end;
+
+    local procedure MergeMemberUniqueIdWorker(Community: Record "NPR MM Member Community"; MemberToKeep: Record "NPR MM Member"; NewFirstName: Text[50]; NewEmail: Text[80]; NewPhoneNumber: Text[30]; NewExternalMemberNo: Code[20])
+    var
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+        MemberToRemove: Record "NPR MM Member";
+
+        AdmissionServiceEntry: Record "NPR MM Admis. Service Entry";
+        MemberCommunicationProfiles: Record "NPR MM Member Communication";
+        MemberCard: Record "NPR MM Member Card";
+        MemberNotification: Record "NPR MM Membership Notific.";
+        MembershipRole: Record "NPR MM Membership Role";
+    begin
+
+        MemberInfoCapture."First Name" := NewFirstName;
+        MemberInfoCapture."E-Mail Address" := NewEmail;
+        MemberInfoCapture."Phone No." := NewPhoneNumber;
+        MemberInfoCapture."Member Entry No" := MemberToKeep."Entry No.";
+
+        SetMemberUniqueIdFilter(Community, MemberInfoCapture, MemberToRemove);
+        if (not MemberToRemove.FindFirst()) then
+            exit;
+
+        UpdateMemberUniqueIdWorker(MemberToKeep, NewFirstName, NewEmail, NewPhoneNumber, NewExternalMemberNo);
+
+        AdmissionServiceEntry.SetFilter("Member Entry No.", '=%1', MemberToRemove."Entry No.");
+        AdmissionServiceEntry.SetLoadFields("Member Entry No.");
+        AdmissionServiceEntry.ModifyAll("Member Entry No.", MemberToKeep."Entry No.");
+
+        MemberCommunicationProfiles.SetFilter("Member Entry No.", '=%1', MemberToRemove."Entry No.");
+        if (MemberCommunicationProfiles.FindSet()) then
+            repeat
+                MemberCommunicationProfiles.Delete();
+                MemberCommunicationProfiles."Member Entry No." := MemberToKeep."Entry No.";
+                if (not MemberCommunicationProfiles.Insert()) then;
+            until (MemberCommunicationProfiles.Next() = 0);
+
+        MemberCard.SetCurrentKey("Member Entry No.");
+        MemberCard.SetFilter("Member Entry No.", '=%1', MemberToRemove."Entry No.");
+        MemberCard.ModifyAll("Member Entry No.", MemberToKeep."Entry No.");
+
+        MemberNotification.SetFilter("Member Entry No.", '=%1', MemberToRemove."Entry No.");
+        MemberNotification.ModifyAll("Member Entry No.", MemberToKeep."Entry No.");
+
+        MembershipRole.SetFilter("Member Entry No.", '=%1', MemberToRemove."Entry No.");
+        if (MembershipRole.FindSet()) then
+            repeat
+                MembershipRole.Delete();
+                MembershipRole."Member Entry No." := MemberToKeep."Entry No.";
+                if (not MembershipRole.Insert()) then;
+            until (MembershipRole.Next() = 0);
+
+        DeleteMember(MemberToRemove."Entry No.", true);
+
+        MembershipEvents.OnAfterMemberIsMerged(MemberToKeep, MemberToRemove);
+    end;
+
+
     internal procedure DeleteMember(MemberEntryNo: Integer; ForceMemberDelete: Boolean)
     var
         Member: Record "NPR MM Member";
@@ -594,6 +789,7 @@
         Member: Record "NPR MM Member";
         Membership: Record "NPR MM Membership";
         ErrorText: Text;
+        CommunityCode: Code[20];
     begin
 
         if (not Member.Get(MemberEntryNo)) then
@@ -602,6 +798,10 @@
         if (not Membership.Get(MembershipEntryNo)) then
             exit(false);
 
+        if (GetMemberCommunityCode(MemberEntryNo, CommunityCode)) then
+            CheckMemberUniqueId(CommunityCode, MembershipInfoCapture);
+
+        Member.Get(MemberEntryNo);
         SetMemberFields(Member, MembershipInfoCapture);
         ValidateMemberFields(Membership."Entry No.", Member, ErrorText);
         Member.Modify();
@@ -976,7 +1176,7 @@
         exit(CardEntryNo <> 0);
     end;
 
-    internal procedure ValidateMemberFirstName(Member: Record "NPR MM Member")
+    internal procedure ValidateMemberFirstName(Member: Record "NPR MM Member") ConflictsWithMemberEntryNo: Integer
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         Community: Record "NPR MM Member Community";
@@ -994,10 +1194,10 @@
         MemberInfoCapture."Member Entry No" := Member."Entry No.";
         MemberInfoCapture."First Name" := Member."First Name";
         MemberInfoCapture."E-Mail Address" := Member."E-Mail Address";
-        CheckMemberUniqueId(CommunityCode, MemberInfoCapture);
+        ConflictsWithMemberEntryNo := CheckMemberUniqueId(CommunityCode, MemberInfoCapture);
     end;
 
-    internal procedure ValidateMemberPhoneNumber(Member: Record "NPR MM Member")
+    internal procedure ValidateMemberPhoneNumber(Member: Record "NPR MM Member") ConflictsWithMemberEntryNo: Integer
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         Community: Record "NPR MM Member Community";
@@ -1017,10 +1217,10 @@
         MemberInfoCapture."Member Entry No" := Member."Entry No.";
         MemberInfoCapture."Phone No." := Member."Phone No.";
         MemberInfoCapture."E-Mail Address" := Member."E-Mail Address";
-        CheckMemberUniqueId(CommunityCode, MemberInfoCapture);
+        ConflictsWithMemberEntryNo := CheckMemberUniqueId(CommunityCode, MemberInfoCapture);
     end;
 
-    internal procedure ValidateMemberEmail(Member: Record "NPR MM Member")
+    internal procedure ValidateMemberEmail(Member: Record "NPR MM Member") ConflictsWithMemberEntryNo: Integer
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         Community: Record "NPR MM Member Community";
@@ -1042,17 +1242,17 @@
         MemberInfoCapture."Phone No." := Member."Phone No.";
         MemberInfoCapture."First Name" := Member."First Name";
         MemberInfoCapture."E-Mail Address" := Member."E-Mail Address";
-        CheckMemberUniqueId(CommunityCode, MemberInfoCapture);
+        ConflictsWithMemberEntryNo := CheckMemberUniqueId(CommunityCode, MemberInfoCapture);
     end;
 
     internal procedure CheckMemberUniqueId(CommunityCode: Code[20]; var MemberInfoCapture: Record "NPR MM Member Info Capture") MemberEntryNo: Integer
     var
         Community: Record "NPR MM Member Community";
         Member: Record "NPR MM Member";
-        RequireField: Label '%1 is required.';
-        RequireFieldOrField: Label 'Either %1 or %2 is required.';
-        RequireFieldAndField: Label 'Both %1 and %2 are required.';
         MEMBER_REUSE: Label 'Member with unique ID [%1] with name: %2 is already in use.\Do you want to create duplicate member?';
+        ConflictingMemberExists: Boolean;
+        ConflictExists: Boolean;
+        ResponseMessage: Text;
     begin
 
         if (not Community.Get(CommunityCode)) then
@@ -1065,11 +1265,75 @@
             exit(Member."Entry No.");
         end;
 
+        SetMemberUniqueIdFilter(Community, MemberInfoCapture, Member);
+        ConflictingMemberExists := Member.FindFirst();
+
+        ConflictExists := false;
+        MembershipEvents.OnCheckMemberUniqueIdViolation(Community, MemberInfoCapture, Member, ConflictExists);
+        if (not ConflictExists) then
+            exit(0);
+
+        if (ConflictingMemberExists) then begin
+            if ((MemberInfoCapture."Guardian External Member No." <> '') and
+                (MemberInfoCapture."Guardian External Member No." = Member."External Member No.")) then
+                exit(0);
+
+            case Community."Create Member UI Violation" of
+                Community."Create Member UI Violation"::Error:
+                    RaiseError(ResponseMessage, StrSubstNo(MEMBER_WITH_UID_EXISTS, Member.GetFilters(), Member."Display Name"), MEMBER_WITH_UID_EXISTS_NO);
+
+                Community."Create Member UI Violation"::Confirm:
+                    begin
+                        if (MemberInfoCapture.AcceptDuplicate) then
+                            exit(0);
+
+                        if (GuiAllowed()) then
+                            if (not Confirm(MEMBER_REUSE, false, Member.GetFilters(), Member."Display Name")) then
+                                Error(ABORTED);
+
+                        MemberInfoCapture.AcceptDuplicate := true;
+                        exit(0);
+                    end;
+
+                Community."Create Member UI Violation"::REUSE:
+                    MemberInfoCapture.AcceptDuplicate := true;
+
+                Community."Create Member UI Violation"::MERGE_MEMBER:
+                    // UI operations handle this differently by selecting data from the conflicting member
+                    // Note that a user may change the unique id fields in the UI before confirming, so cannot merge here.
+                    if (not GuiAllowed()) then begin
+                        if (not MemberInfoCapture.AllowMergeOnConflict) then
+                            RaiseError(ResponseMessage, ALLOW_MEMBER_MERGE_NOT_SET, ALLOW_MEMBER_MERGE_NOT_SET_NO);
+                        if (Member.Get(MemberInfoCapture."Member Entry No")) then
+                            MergeMemberUniqueId(Member, MemberInfoCapture."First Name", MemberInfoCapture."E-Mail Address", MemberInfoCapture."Phone No.", MemberInfoCapture."External Member No");
+                    end;
+                else
+                    Error(CASE_MISSING, Community.FieldName("Create Member UI Violation"), Community."Create Member UI Violation");
+            end;
+            exit(Member."Entry No.");
+        end;
+
+        exit(0);
+    end;
+
+
+    internal procedure SetMemberUniqueIdFilter(Community: Record "NPR MM Member Community"; MemberInfoCapture: Record "NPR MM Member Info Capture"; var Member: Record "NPR MM Member")
+    var
+        RequireField: Label '%1 is required.';
+        RequireFieldOrField: Label 'Either %1 or %2 is required.';
+        RequireFieldAndField: Label 'Both %1 and %2 are required.';
+        FiltersAreSet: Boolean;
+    begin
         Member.FilterGroup(240);
         Member.SetFilter(Blocked, '=%1', false);
         if (MemberInfoCapture."Member Entry No" <> 0) then
             Member.SetFilter("Entry No.", '<>%1', MemberInfoCapture."Member Entry No");
         Member.FilterGroup(0);
+
+        FiltersAreSet := false;
+        MembershipEvents.OnSetMemberUniqueIdFilter(Community, MemberInfoCapture, Member, FiltersAreSet);
+        if (FiltersAreSet) then
+            exit;
 
         case Community."Member Unique Identity" of
             Community."Member Unique Identity"::NONE:
@@ -1128,40 +1392,6 @@
             else
                 Error(CASE_MISSING, Community.FieldName("Member Unique Identity"), Community."Member Unique Identity");
         end;
-
-        if (Member.FindFirst()) then begin
-            if ((MemberInfoCapture."Guardian External Member No." <> '') and
-                (MemberInfoCapture."Guardian External Member No." = Member."External Member No.")) then
-                exit(0);
-
-            case Community."Create Member UI Violation" of
-                Community."Create Member UI Violation"::Error:
-                    Error(MEMBER_EXIST, Member.GetFilters());
-                Community."Create Member UI Violation"::Confirm:
-                    begin
-                        if (MemberInfoCapture.AcceptDuplicate) then
-                            exit(0);
-
-                        if (GuiAllowed()) then
-                            if (not Confirm(MEMBER_REUSE, false, Member.GetFilters(), Member."Display Name")) then
-                                Error(ABORTED);
-
-                        MemberInfoCapture.AcceptDuplicate := true;
-                        exit(0);
-                    end;
-
-                Community."Create Member UI Violation"::REUSE:
-                    begin
-                        MemberInfoCapture.AcceptDuplicate := true;
-                    end;
-
-                else
-                    Error(CASE_MISSING, Community.FieldName("Create Member UI Violation"), Community."Create Member UI Violation");
-            end;
-            exit(Member."Entry No.");
-        end;
-
-        exit(0);
     end;
 
     internal procedure BlockMembership(MembershipEntryNo: Integer; Block: Boolean)
@@ -2961,7 +3191,34 @@
         exit(true);
     end;
 
-    internal procedure GetMemberCount(MembershipEntryno: Integer; var AdminMemberCount: Integer; var MemberMemberCount: Integer; var AnonymousMemberCount: Integer)
+    internal procedure CheckGetCommunityUniqueIdRules(MemberEntryNo: Integer; var Community: Record "NPR MM Member Community"): Boolean
+    var
+        MembershipRole: Record "NPR MM Membership Role";
+        Membership: Record "NPR MM Membership";
+        CommunityCheck: Record "NPR MM Member Community";
+    begin
+
+        MembershipRole.SetFilter("Member Entry No.", '=%1', MemberEntryNo);
+        if (MembershipRole.FindSet()) then begin
+            repeat
+                Membership.Get(MembershipRole."Membership Entry No.");
+                CommunityCheck.Get(Membership."Community Code");
+
+                if (Community.Code = '') then
+                    Community.Get(Membership."Community Code");
+
+                if (CommunityCheck.Code <> Community.Code) then
+                    if (CommunityCheck."Member Unique Identity" <> Community."Member Unique Identity") then
+                        exit(false);
+                if (CommunityCheck."Create Member UI Violation" <> Community."Create Member UI Violation") then
+                    exit(false);
+
+            until MembershipRole.Next() = 0;
+        end;
+        exit(true);
+    end;
+
+    internal procedure GetMemberCount(MembershipEntryNo: Integer; var AdminMemberCount: Integer; var MemberMemberCount: Integer; var AnonymousMemberCount: Integer)
     var
         MembershipRole: Record "NPR MM Membership Role";
     begin
@@ -2970,22 +3227,22 @@
         MemberMemberCount := 0;
         AnonymousMemberCount := 0;
 
-        MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryno);
+        MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
         MembershipRole.SetFilter("Member Role", '=%1', MembershipRole."Member Role"::ADMIN);
         MembershipRole.SetFilter(Blocked, '=%1', false);
         AdminMemberCount := MembershipRole.Count();
 
-        MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryno);
+        MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
         MembershipRole.SetFilter("Member Role", '=%1', MembershipRole."Member Role"::MEMBER);
         MembershipRole.SetFilter(Blocked, '=%1', false);
         MemberMemberCount := MembershipRole.Count();
 
-        MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryno);
+        MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
         MembershipRole.SetFilter("Member Role", '=%1', MembershipRole."Member Role"::DEPENDENT);
         MembershipRole.SetFilter(Blocked, '=%1', false);
         MemberMemberCount += MembershipRole.Count();
 
-        MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryno);
+        MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
         MembershipRole.SetFilter("Member Role", '=%1', MembershipRole."Member Role"::ANONYMOUS);
         MembershipRole.SetFilter(Blocked, '=%1', false);
         if (MembershipRole.FindFirst()) then
@@ -4405,8 +4662,6 @@
         OutStr: OutStream;
         CountryName: Text;
         PlaceHolderLbl: Label '%1%2', Locked = true;
-        PlaceHolder2Lbl: Label '%1 %2', Locked = true;
-        PlaceHolder3Lbl: Label '%1 %2 %3', Locked = true;
     begin
 
         CurrentMember.Copy(Member);
@@ -4478,18 +4733,29 @@
             Member.Image.ImportStream(InStr, Member.FieldName(Image));
         end;
 
-        Member."Display Name" := StrSubstNo(PlaceHolder2Lbl, Member."First Name", Member."Last Name");
-
-        if (StrLen(Member."Middle Name") > 0) then
-            if (StrLen(Member."First Name") + StrLen(Member."Middle Name") + StrLen(Member."Last Name") + 2 <= MaxStrLen(Member."Display Name")) then
-                Member."Display Name" := StrSubstNo(PlaceHolder3Lbl, Member."First Name", Member."Middle Name", Member."Last Name");
-
+        Member."Display Name" := GetDisplayName(Member);
         Member."Store Code" := MemberInfoCapture."Store Code";
 
         MembershipEvents.OnAfterSetMemberFields(Member, MemberInfoCapture);
         MembershipEvents.OnAfterMemberFieldsAssignmentEvent(CurrentMember, Member);
 
         exit;
+    end;
+
+
+    internal procedure GetDisplayName(Member: Record "NPR MM Member") DisplayName: Text[100]
+    begin
+
+        DisplayName := Member."Last Name";
+
+        if ((StrLen(Member."First Name") + StrLen(Member."Last Name")) < MaxStrLen(DisplayName)) then
+            DisplayName := CopyStr(StrSubstNo('%1 %2', Member."First Name", Member."Last Name"), 1, MaxStrLen(DisplayName));
+
+        if (StrLen(Member."Middle Name") > 0) then
+            if (StrLen(Member."First Name") + StrLen(Member."Middle Name") + StrLen(Member."Last Name") + 2 <= MaxStrLen(Member."Display Name")) then
+                DisplayName := CopyStr(StrSubstNo('%1 %2 %3', Member."First Name", Member."Middle Name", Member."Last Name"), 1, MaxStrLen(DisplayName));
+
+        exit(DisplayName);
     end;
 
     internal procedure ValidateMemberFields(MembershipEntryNo: Integer; Member: Record "NPR MM Member"; ResponseMessage: Text): Boolean
@@ -4547,6 +4813,13 @@
 
         Member.Get(MemberEntryNo);
         Membership.Get(MembershipEntryNo);
+
+        // When community is REUSE and a membership is created with multiple members and they share the same unique identity
+        if (MembershipRole.Get(MembershipEntryNo, MemberEntryNo)) then begin
+            MemberCount := GetMembershipMemberCount(MembershipEntryNo);
+            exit(true);
+        end;
+
         MembershipSetup.Get(Membership."Membership Code");
 
         MembershipRoleGuardian.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);

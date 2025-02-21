@@ -25,6 +25,8 @@ service:
       request:
         name: addMember
         body: AddMemberRequest
+        query-parameters:
+          allowMergeOnConflict: optional<simpleTypes.AllowMergeOnConflict>
       response: 
         type: AddMemberResponse
         status-code: 201
@@ -35,6 +37,8 @@ service:
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          query-parameters: 
+            allowMergeOnConflict: $simpleTypes.AllowMergeOnConflict.ExampleAllowMergeOnConflict
           request: $AddMemberRequest.ExampleAddMember
           response:
             body: $AddMemberResponse.ExampleAddMember
@@ -119,6 +123,8 @@ service:
       request:
         name: updateMember
         body: UpdateMemberRequest
+        query-parameters:
+          allowMergeOnConflict: optional<simpleTypes.AllowMergeOnConflict>
       response: UpdateMemberResponse
       examples:
         - name: ExampleUpdateMember
@@ -127,6 +133,8 @@ service:
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             memberId: $simpleTypes.MemberId.ExampleMemberId
+          query-parameters: 
+            allowMergeOnConflict: $simpleTypes.AllowMergeOnConflict.ExampleAllowMergeOnConflict
           request: $UpdateMemberRequest.ExampleUpdateMember
           response: 
             body: $UpdateMemberResponse.ExampleUpdateMember
