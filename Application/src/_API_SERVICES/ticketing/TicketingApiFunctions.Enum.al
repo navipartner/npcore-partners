@@ -8,6 +8,7 @@ enum 6059815 "NPR TicketingApiFunctions"
         Caption = 'No operation';
     }
 
+    #region Operational List Functions
     value(100; CAPACITY_SEARCH)
     {
         Caption = 'Get capacity';
@@ -21,7 +22,9 @@ enum 6059815 "NPR TicketingApiFunctions"
     {
         Caption = 'Search catalog';
     }
+    #endregion
 
+    #region Ticket
     value(300; GET_TICKET)
     {
         Caption = 'Get ticket';
@@ -68,6 +71,8 @@ enum 6059815 "NPR TicketingApiFunctions"
         Caption = 'Clear confirm print ticket';
     }
 
+    #endregion
+    #region Reservation
     value(400; CREATE_RESERVATION)
     {
         Caption = 'Create reservation';
@@ -96,5 +101,14 @@ enum 6059815 "NPR TicketingApiFunctions"
     {
         Caption = 'Get reservation tickets';
     }
+
+    #endregion
+
+    #region Reports
+    value(900; DYNAMIC_PRICE_PROFILE_LIST)
+    {
+        Caption = 'Get dynamic price profile list';
+    }
+    #endregion
 }
 #endif
