@@ -335,6 +335,11 @@
                 RunPageLink = "POS Entry No." = FIELD("Entry No.");
                 ToolTip = 'Displays sales and payment lines.';
                 ApplicationArea = NPRRetail;
+                ObsoleteState = Pending;
+                ObsoleteTag = '2025-02-23';
+                ObsoleteReason = 'Stability and optimization reasons.';
+                Visible = false;
+                Enabled = false;
             }
             action("Tax Lines")
             {
@@ -609,6 +614,11 @@
                     RunObject = Page "NPR POS Entry Sales & Payments";
                     ToolTip = 'Displays the sales & payment line List.';
                     ApplicationArea = NPRRetail;
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '2025-02-23';
+                    ObsoleteReason = 'Stability and optimization reasons.';
+                    Visible = false;
+                    Enabled = false;
                 }
                 action("Tax Line List")
                 {

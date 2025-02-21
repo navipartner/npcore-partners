@@ -372,6 +372,11 @@
                     RunObject = Page "NPR POS Entry Sales & Payments";
                     ToolTip = 'View POS Entry Sales & Payment List that have been done.';
                     ApplicationArea = NPRRetail;
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '2025-02-23';
+                    ObsoleteReason = 'Stability and optimization reasons.';
+                    Visible = false;
+                    Enabled = false;
 
                 }
                 Action("EFT Transaction Request")
