@@ -9,9 +9,7 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
     procedure Handle(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     begin
 
-        if (Request.Paths().Get(1) = 'ticketing') then // Obsolete
-            exit(Response.RespondBadRequest('Segment path changed from ticketing to ticket, check the API documentation for the correct path.'));
-
+        #region GET
         if (Request.Match('GET', '/ticket')) then
             exit(Handle(_ApiFunction::FIND_TICKETS, Request));
 
@@ -33,10 +31,14 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
         if (Request.Match('GET', '/ticket/schedule/search')) then
             exit(Handle(_ApiFunction::SCHEDULE_SEARCH, Request));
 
+        if (Request.Match('GET', '/ticket/reports/dynamicPriceProfileList')) then
+            exit(Handle(_ApiFunction::DYNAMIC_PRICE_PROFILE_LIST, Request));
+
         if (Request.Match('GET', '/ticket/reservation/:token/tickets')) then
             exit(Handle(_ApiFunction::GET_RESERVATION_TICKETS, Request));
+        #endregion
 
-
+        #region POST
         if (Request.Match('POST', '/ticket/:ticketId/requestRevoke')) then
             exit(Handle(_ApiFunction::REQUEST_REVOKE_TICKET, Request));
 
@@ -75,12 +77,14 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
 
         if (Request.Match('POST', '/ticket/reservation/:token/confirm')) then
             exit(Handle(_ApiFunction::CONFIRM_RESERVATION, Request));
+        #endregion
 
-
+        #region PUT
         if (Request.Match('PUT', '/ticket/reservation/:token')) then
             exit(Handle(_ApiFunction::UPDATE_RESERVATION, Request));
+        #endregion
 
-
+        exit(Response.RespondResourceNotFound('API endpoint not found'));
     end;
 
     local procedure Handle(ApiFunction: Enum "NPR TicketingApiFunctions"; var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
