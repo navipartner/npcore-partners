@@ -969,10 +969,10 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                         '',
                         SkipTryCountUpdate,
                         SubscrPaymentRequest."PSP Reference",
-                        '',
-                        '',
-                        '',
-                        0DT,
+                        SubscrPaymentRequest."Payment PSP Reference",
+                        SubscrPaymentRequest."Pay by Link ID",
+                        SubscrPaymentRequest."Pay by Link URL",
+                        SubscrPaymentRequest."Pay By Link Expires At",
                         0);
 
     end;
@@ -1017,9 +1017,9 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                         SkipTryCountUpdate,
                         SubscrPaymentRequest."PSP Reference",
                         SubscrPaymentRequest."Payment PSP Reference",
-                        '',
-                        '',
-                        0DT,
+                        SubscrPaymentRequest."Pay by Link ID",
+                        SubscrPaymentRequest."Pay by Link URL",
+                        SubscrPaymentRequest."Pay By Link Expires At",
                         0);
     end;
 
@@ -1062,9 +1062,9 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                         SkipTryCountUpdate,
                         SubscrPaymentRequest."PSP Reference",
                         SubscrPaymentRequest."Payment PSP Reference",
-                        '',
-                        '',
-                        0DT,
+                        SubscrPaymentRequest."Pay by Link ID",
+                        SubscrPaymentRequest."Pay by Link URL",
+                        SubscrPaymentRequest."Pay By Link Expires At",
                         0);
     end;
 
