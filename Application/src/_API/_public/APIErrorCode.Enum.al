@@ -113,6 +113,51 @@ enum 6059810 "NPR API Error Code"
         Caption = 'The admission duration has expired.', Locked = true;
     }
 
+
+    value(6060140; member_unique_id_violation)
+    {
+        Caption = 'Member with same unique id already exists.', Locked = true;
+    }
+    value(6060141; member_count_exceeded)
+    {
+        Caption = 'Member count exceeded.', Locked = true;
+    }
+
+    value(6060142; member_card_exists)
+    {
+        Caption = 'Member card already exists.', Locked = true;
+    }
+
+    value(6060143; no_admin_member)
+    {
+        Caption = 'No admin member found.', Locked = true;
+    }
+
+    value(6060144; member_card_blank)
+    {
+        Caption = 'Member card is blank.', Locked = true;
+    }
+
+    value(6060145; invalid_contact)
+    {
+        Caption = 'The provided contact number is not valid in context of the customer.', Locked = true;
+    }
+
+    value(6060146; age_verification_setup)
+    {
+        Caption = 'Add member failed on age verification because item number for sales was not provided.', Locked = true;
+    }
+
+    value(6060147; age_verification)
+    {
+        Caption = 'Age verification failed.', Locked = true;
+    }
+
+    value(6060148; allow_member_merge_not_set)
+    {
+        Caption = 'This request violates the community’s member identity uniqueness rule. See the API documentation for merge options.', Locked = true;
+    }
+
     value(6060149; member_card_limitation_error)
     {
         Caption = 'Limitations on member card apply and deny admission.', Locked = true;

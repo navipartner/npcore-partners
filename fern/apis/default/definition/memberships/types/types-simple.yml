@@ -769,3 +769,30 @@ types:
     examples:
       - name: ExampleNewMembership
         value: newMembership
+
+  AllowMergeOnConflict:
+    type: integer
+    docs: |
+      Determines how the system should handle member uniqueness conflicts when adding or updating a member.
+      This setting enforces community rules regarding member duplication and allows for automated resolution
+      through member merging.
+
+      **Options:**
+      - **`0` (default)**: Do not merge.
+        - If a member conflict is detected (i.e., another member exists that violates uniqueness rules), the request will be rejected with an error indicating a member conflict.
+        - This ensures no changes are made to existing members and prevents unintended merges.
+
+      - **`1` (allow merge)**: Merge members according to the community’s uniqueness configuration.
+        - The member specified in the request (being added or updated) will take precedence.
+        - All other conflicting members will be **deleted** and their associations (e.g., memberships, cards) will be **transferred** to the surviving member.
+        - Merging occurs only if the community setup explicitly permits member merging for the detected conflict scenario.
+        - No merge will occur if the community configuration disallows merging, even if this parameter is set to `1`.
+
+      **Important Notes:**
+      - Member merges are irreversible. Deleted members cannot be recovered after a successful merge.
+      - Transferred associations include memberships, cards and other data linked to the conflicting members.
+      - If no conflicts are found, setting this parameter has no effect.
+
+    examples:
+      - name: ExampleAllowMergeOnConflict
+        value: 1

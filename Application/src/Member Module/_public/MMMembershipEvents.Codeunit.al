@@ -98,6 +98,26 @@
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    [CommitBehavior(CommitBehavior::Error)]
+    internal procedure OnCheckMemberUniqueIdViolation(Community: Record "NPR MM Member Community"; MemberInfoCapture: Record "NPR MM Member Info Capture"; var ConflictingMember: Record "NPR MM Member"; var ConflictExists: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    [CommitBehavior(CommitBehavior::Error)]
+    internal procedure OnAfterMemberIsMerged(OriginalMember: Record "NPR MM Member"; NewMember: Record "NPR MM Member")
+    begin
+    end;
+
+
+    [IntegrationEvent(false, false)]
+    [CommitBehavior(CommitBehavior::Error)]
+    internal procedure OnSetMemberUniqueIdFilter(Community: Record "NPR MM Member Community"; MemberInfoCapture: Record "NPR MM Member Info Capture"; var ConflictingMember: Record "NPR MM Member"; var FilterSet: Boolean)
+    begin
+    end;
+
+
     #region Loyalty
 
     [IntegrationEvent(false, false)]

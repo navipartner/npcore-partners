@@ -53,8 +53,8 @@
         {
             Caption = 'Create Member UI Violation';
             DataClassification = CustomerContent;
-            OptionCaption = 'Error,Confirm,Reuse (Silent)';
-            OptionMembers = ERROR,CONFIRM,REUSE;
+            OptionCaption = 'Error,Confirm,Reuse,Merge';
+            OptionMembers = ERROR,CONFIRM,REUSE,MERGE_MEMBER;
         }
         field(22; "Member Logon Credentials"; Option)
         {
