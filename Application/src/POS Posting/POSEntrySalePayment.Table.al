@@ -2,8 +2,6 @@ table 6014694 "NPR POS Entry Sale & Payment"
 {
     Caption = 'POS Entry Sale & Payment';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR POS Entry Sales & Payments";
-    LookupPageID = "NPR POS Entry Sales & Payments";
     TableType = Temporary;
     Access = Internal;
 

@@ -1,8 +1,7 @@
 page 6059982 "NPR POS Entry Sales & Payments"
 {
     PageType = List;
-    UsageCategory = Lists;
-    ApplicationArea = NPRRetail;
+    UsageCategory = None;
     SourceTable = "NPR POS Entry Sale & Payment";
     SourceTableView = sorting("POS Entry No.") order(descending);
     SourceTableTemporary = true;
@@ -10,6 +9,9 @@ page 6059982 "NPR POS Entry Sales & Payments"
     ContextSensitiveHelpPage = 'docs/retail/posting_setup/explanation/accounting_entries/';
     Extensible = False;
     Editable = false;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-02-23';
+    ObsoleteReason = 'Stability and optimization reasons.';
 
     layout
     {
