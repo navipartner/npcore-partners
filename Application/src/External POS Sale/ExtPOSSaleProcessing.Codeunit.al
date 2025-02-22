@@ -94,6 +94,7 @@ codeunit 6248233 "NPR Ext. POS Sale Processing"
                         ExternalPOSSaleLine."Qty. per Unit of Measure" := UOMMgt.GetQtyPerUnitOfMeasure(Item, ExternalPOSSaleLine."Unit of Measure Code");
                         ExternalPOSSaleLine."Quantity (Base)" := Round(ExternalPOSSaleLine.Quantity * ExternalPOSSaleLine."Qty. per Unit of Measure", 0.00001);
                     end;
+
                     // try calculate discounts if not provided via api call
                     IF (ExternalPOSSaleLine."Discount %" <> 0) AND (ExternalPOSSaleLine."Discount Amount" = 0) then begin
                         ExternalPOSSaleLine.GetCurrency(Currency);
@@ -125,20 +126,60 @@ codeunit 6248233 "NPR Ext. POS Sale Processing"
     [TryFunction]
     internal procedure ValidateExternalPOSData(var ExternalPOSSale: Record "NPR External POS Sale")
     var
-        ExternalPOSSaleLine: Record "NPR External POS Sale Line";
         RecordAlreadyConvertedErr: Label 'This record was already converted into a POS Entry.';
-        NoNumberSpecifiedinSaleLineErrLbl: Label 'There was no ''No.'' specified for the line number %1, sale is not valid!';
     begin
         //Validate Header
         IF ExternalPOSSale."Converted To POS Entry" then
             Error(RecordAlreadyConvertedErr);
         //Validate Lines
+        ValidateSaleLinesData(ExternalPOSSale);
+        ValidateBalance(ExternalPOSSale);
+    end;
+
+    local procedure ValidateSaleLinesData(ExternalPOSSale: Record "NPR External POS Sale")
+    var
+        ExternalPOSSaleLine: Record "NPR External POS Sale Line";
+        NoNumberSpecifiedinSaleLineErrLbl: Label 'There was no ''No.'' specified for one or more sale lines, sale is not valid!';
+    begin
+        ExternalPOSSaleLine.SetRange("External POS Sale Entry No.", ExternalPOSSale."Entry No.");
+        ExternalPOSSaleLine.SetRange("No.", '');
+        if (not ExternalPOSSaleLine.IsEmpty()) then
+            Error(NoNumberSpecifiedinSaleLineErrLbl);
+    end;
+
+    local procedure ValidateBalance(ExternalPOSSale: Record "NPR External POS Sale")
+    var
+        ExternalPOSSaleLine: Record "NPR External POS Sale Line";
+        SaleAmount: Decimal;
+        PaidAmount: Decimal;
+        RoundingAmount: Decimal;
+        SaleBalanceNotValidErrLbl: Label 'The end balance was not correct, can''t convert to POS Entry';
+    begin
         ExternalPOSSaleLine.SetRange("External POS Sale Entry No.", ExternalPOSSale."Entry No.");
         ExternalPOSSaleLine.FindSet();
-        repeat begin
-            if (ExternalPOSSaleLine."No." = '') then
-                Error(NoNumberSpecifiedinSaleLineErrLbl, ExternalPOSSaleLine."Line No.");
-        end until ExternalPOSSaleLine.Next() = 0;
+        repeat
+            case ExternalPOSSaleLine."Line Type" of
+                Enum::"NPR POS Sale Line Type"::"BOM List",
+                Enum::"NPR POS Sale Line Type"::"Customer Deposit",
+                Enum::"NPR POS Sale Line Type"::"GL Payment",
+                Enum::"NPR POS Sale Line Type"::"Issue Voucher",
+                Enum::"NPR POS Sale Line Type"::Item,
+                Enum::"NPR POS Sale Line Type"::"Item Category":
+                    begin
+                        SaleAmount += ExternalPOSSaleLine."Amount Including VAT";
+                    end;
+                Enum::"NPR POS Sale Line Type"::"POS Payment":
+                    begin
+                        PaidAmount += ExternalPOSSaleLine."Amount Including VAT";
+                    end;
+                Enum::"NPR POS Sale Line Type"::Rounding:
+                    begin
+                        RoundingAmount += ExternalPOSSaleLine."Amount Including VAT";
+                    end;
+            end;
+        until ExternalPOSSaleLine.Next() = 0;
+        if (SaleAmount - PaidAmount - RoundingAmount <> 0) then
+            Error(SaleBalanceNotValidErrLbl);
     end;
 
     local procedure TryFindItemFromBarcode(var ExternalPOSSaleLine: Record "NPR External POS Sale Line")
