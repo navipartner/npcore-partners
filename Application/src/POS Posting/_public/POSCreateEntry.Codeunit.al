@@ -1808,6 +1808,7 @@
     #region External POS Sale
     internal procedure CreatePOSEntryFromExternalPOSSale(var ExtPOSSale: Record "NPR External POS Sale"; var POSEntry: Record "NPR POS Entry")
     var
+        ExtPOSSaleProcessing: Codeunit "NPR Ext. POS Sale Processing";
         POSPeriodRegister: Record "NPR POS Period Register";
         POSAuditLog: Record "NPR POS Audit Log";
         POSUnit: Record "NPR POS Unit";
@@ -1816,11 +1817,15 @@
         POSUnitManager: Codeunit "NPR POS Manage POS Unit";
         ExtSaleCancelled: Boolean;
         WasModified: Boolean;
+        ValidationErrorLbl: Label 'Validation Error - External POS Sale data was invalid: %1';
     begin
         Clear(GlobalPOSEntry);
         ValidateSaleHeaderExt(ExtPOSSale);
 
         OnBeforeCreatePOSEntryFromExternalPOSSale(ExtPOSSale);
+
+        IF not ExtPOSSaleProcessing.ValidateExternalPOSData(ExtPOSSale) then
+            Error(ValidationErrorLbl, GetLastErrorText());
 
         if not GetPOSPeriodRegisterExt(ExtPOSSale, POSPeriodRegister, true) then begin
             POSUnit.Get(ExtPOSSale."Register No.");

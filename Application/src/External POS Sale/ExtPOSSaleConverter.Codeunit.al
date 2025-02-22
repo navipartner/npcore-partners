@@ -5,17 +5,13 @@
     trigger OnRun()
     var
         POSCreateEntry: Codeunit "NPR POS Create Entry";
-        ExtPOSSaleProcessing: Codeunit "NPR Ext. POS Sale Processing";
         POSEntry: Record "NPR POS Entry";
         POSSaleCU: Codeunit "NPR POS Sale";
-        ValidationErrorLbl: Label 'Validation Error - External POS Sale data was invalid: %1';
     begin
         Rec.LockTable();
         Rec.Find();
         if (Rec."Converted To POS Entry") then
             exit;
-        IF not ExtPOSSaleProcessing.ValidateExternalPOSData(Rec) then
-            Error(ValidationErrorLbl, GetLastErrorText());
         Rec."Sales Ticket No." := POSSaleCU.GetNextReceiptNo(Rec."Register No.");
         CreateEftData(Rec);
         POSCreateEntry.CreatePOSEntryFromExternalPOSSale(Rec, POSEntry);
