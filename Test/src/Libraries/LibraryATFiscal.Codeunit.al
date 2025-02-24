@@ -28,7 +28,6 @@ codeunit 85193 "NPR Library AT Fiscal"
         POSAuditProfile."Audit Handler" := ATAuditMgt.HandlerCode();
         POSAuditProfile."Audit Log Enabled" := true;
         POSAuditProfile."Fill Sale Fiscal No. On" := POSAuditProfile."Fill Sale Fiscal No. On"::Successful;
-        POSAuditProfile.AllowSalesAndReturnInSameTrans := false;
         POSAuditProfile."Balancing Fiscal No. Series" := CreateNumberSeries();
         POSAuditProfile."Sale Fiscal No. Series" := CreateNumberSeries();
         POSAuditProfile."Sales Ticket No. Series" := CreateNumberSeries();
