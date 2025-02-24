@@ -44,7 +44,6 @@ codeunit 6059942 "NPR RS Audit Mgt."
         if not IsRSAuditEnabled(POSUnit."POS Audit Profile") then
             exit;
 
-        CheckSalesAndReturnsInSameTransaction(SaleHeader, POSUnit."POS Audit Profile");
         VerifyPINCodeWithError(POSUnit."No.");
         VerifyGTINandTaxCategory(SaleHeader);
     end;
@@ -227,6 +226,60 @@ codeunit 6059942 "NPR RS Audit Mgt."
         Item.SetRange(GTIN, EanBoxValue);
         if not Item.IsEmpty() then
             InScope := true;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnAfterInsertPOSSaleLineBeforeCommit', '', false, false)]
+    local procedure OnAfterInsertPOSSaleLineBeforeCommit(var SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSSaleLine2: Record "NPR POS Sale Line";
+        SameSignErr: Label 'Cannot have sale and return in the same transaction';
+    begin
+        if not IsRSFiscalActive() then
+            exit;
+        POSUnit.Get(SaleLinePOS."Register No.");
+        if not IsRSAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        if SaleLinePOS."Line No." = 10000 then
+            exit;
+        if not (SaleLinePOS."Line Type" in [SaleLinePOS."Line Type"::Item, SaleLinePOS."Line Type"::"Issue Voucher"]) then
+            exit;
+        if not GetFirstSaleLinePOSOfTypeItemOrVoucher(POSSaleLine2, SaleLinePOS) then
+            exit;
+        if (POSSaleLine2.Quantity > 0) and (SaleLinePOS.Quantity > 0) then
+            exit;
+        if (POSSaleLine2.Quantity < 0) and (SaleLinePOS.Quantity < 0) then
+            exit;
+        if not ChangeQtyOnPOSSaleLine(SaleLinePOS) then
+            Error(SameSignErr);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnBeforeSetQuantity', '', false, false)]
+    local procedure OnBeforeSetQuantity(var SaleLinePOS: Record "NPR POS Sale Line"; var NewQuantity: Decimal)
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSSaleLine2: Record "NPR POS Sale Line";
+        SameSignErr: Label 'Cannot have sale and return in the same transaction';
+    begin
+        if not IsRSFiscalActive() then
+            exit;
+        POSUnit.Get(SaleLinePOS."Register No.");
+        if not IsRSAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        if SaleLinePOS.Quantity = NewQuantity then
+            exit;
+        if not (SaleLinePOS."Line Type" in [SaleLinePOS."Line Type"::Item, SaleLinePOS."Line Type"::"Issue Voucher"]) then
+            exit;
+        if not GetFirstSaleLinePOSOfTypeItemOrVoucher(POSSaleLine2, SaleLinePOS) then
+            exit;
+        if (POSSaleLine2.Quantity > 0) and (NewQuantity > 0) then
+            exit;
+        if (POSSaleLine2.Quantity < 0) and (NewQuantity < 0) then
+            exit;
+        if not ChangeQtyOnAllPOSSaleLines(SaleLinePOS) then
+            Error(SameSignErr);
     end;
     #endregion
 
@@ -815,7 +868,6 @@ codeunit 6059942 "NPR RS Audit Mgt."
 
         POSUnit.GetProfile(POSAuditProfile);
         POSAuditProfile.TestField("Do Not Print Receipt on Sale", false);
-        POSAuditProfile.TestField(AllowSalesAndReturnInSameTrans, false);
 
         VerifyPINCodeWithError(POSUnit."No.");
     end;
@@ -879,31 +931,6 @@ codeunit 6059942 "NPR RS Audit Mgt."
         RSPOSUnitMapping.TestField("RS Sandbox PIN");
         if not RSFiscalizationSetup."Exclude Token from URL" then
             RSPOSUnitMapping.TestField("RS Sandbox Token");
-    end;
-
-    local procedure CheckSalesAndReturnsInSameTransaction(SaleHeader: Record "NPR POS Sale"; POSAuditProfileCode: Code[20])
-    var
-        POSAuditProfile: Record "NPR POS Audit Profile";
-        POSSaleLine: Record "NPR POS Sale Line";
-        SalesAndReturnsNotAllowedInSameTransactionErr: Label 'It is not allowed to sale and return item(s) in same transaction.';
-    begin
-        POSAuditProfile.Get(POSAuditProfileCode);
-        if POSAuditProfile.AllowSalesAndReturnInSameTrans then
-            exit;
-
-        POSSaleLine.SetCurrentKey("Register No.", "Sales Ticket No.", "Line Type");
-        POSSaleLine.SetRange("Register No.", SaleHeader."Register No.");
-        POSSaleLine.SetRange("Sales Ticket No.", SaleHeader."Sales Ticket No.");
-        POSSaleLine.SetRange("Line Type", POSSaleLine."Line Type"::Item);
-        POSSaleLine.SetFilter(Quantity, '>0');
-        if POSSaleLine.IsEmpty() then
-            exit;
-
-        POSSaleLine.SetFilter(Quantity, '<0');
-        if POSSaleLine.IsEmpty() then
-            exit;
-
-        Error(SalesAndReturnsNotAllowedInSameTransactionErr);
     end;
 
     internal procedure IsDataSetOnSalesInvoiceDoc(RSAuxSalesInvHeader: Record "NPR RS Aux Sales Inv. Header"): Boolean
@@ -1240,6 +1267,45 @@ codeunit 6059942 "NPR RS Audit Mgt."
         EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
         EanBoxEvent."Event Codeunit" := Codeunit::"NPR POS Action: Insert Item";
         EanBoxEvent.Insert(true);
+    end;
+
+    local procedure GetFirstSaleLinePOSOfTypeItemOrVoucher(var POSSaleLine2: Record "NPR POS Sale Line"; POSSaleLine: Record "NPR POS Sale Line"): Boolean
+    begin
+        POSSaleLine2.SetFilter("Line Type", '%1|%2', POSSaleLine2."Line Type"::Item, POSSaleLine2."Line Type"::"Issue Voucher");
+        POSSaleLine2.SetRange("Sales Ticket No.", POSSaleLine."Sales Ticket No.");
+        POSSaleLine2.SetFilter("Line No.", '<>%1', POSSaleLine."Line No.");
+        exit(POSSaleLine2.FindFirst());
+    end;
+
+    local procedure ChangeQtyOnAllPOSSaleLines(var SaleLinePOS: Record "NPR POS Sale Line"): Boolean
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        ConfirmManagement: Codeunit "Confirm Management";
+        ChangeQuantityQst: Label 'Sales and Return are not allowed in the same transaction. Do you want to set negative Quantity for all existing Sales Lines?';
+    begin
+        if not (ConfirmManagement.GetResponseOrDefault(ChangeQuantityQst, false)) then
+            exit(false);
+        POSSaleLine.SetFilter("Line Type", '%1|%2', POSSaleLine."Line Type"::Item, POSSaleLine."Line Type"::"Issue Voucher");
+        POSSaleLine.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
+        POSSaleLine.SetFilter("Line No.", '<>%1', SaleLinePOS."Line No.");
+        if POSSaleLine.FindSet(true) then
+            repeat
+                POSSaleLine.Validate(Quantity, -POSSaleLine.Quantity);
+                POSSaleLine.Modify(true);
+            until POSSaleLine.Next() = 0;
+        exit(true);
+    end;
+
+    local procedure ChangeQtyOnPOSSaleLine(var POSSaleLine: Record "NPR POS Sale Line"): Boolean
+    var
+        ConfirmManagement: Codeunit "Confirm Management";
+        ChangeQuantityQst: Label 'Sales and Return are not allowed in the same transaction. Do you want to change the Quantity of the line you''re about to add?';
+    begin
+        if not (ConfirmManagement.GetResponseOrDefault(ChangeQuantityQst, false)) then
+            exit(false);
+
+        POSSaleLine.Validate(Quantity, -POSSaleLine.Quantity);
+        exit(POSSaleLine.Modify(true));
     end;
     #endregion
 }

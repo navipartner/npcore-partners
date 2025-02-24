@@ -141,6 +141,9 @@
         {
             Caption = 'Allow Sales and Returns in Same Transaction';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-03-02';
+            ObsoleteReason = 'Not used anymore.';
         }
         field(140; "Bin Eject After Credit Sale"; Boolean)
         {

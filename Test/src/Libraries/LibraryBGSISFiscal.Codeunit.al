@@ -204,7 +204,6 @@ codeunit 85172 "NPR Library BG SIS Fiscal"
         POSAuditProfile."Audit Log Enabled" := true;
         POSAuditProfile."Fill Sale Fiscal No. On" := POSAuditProfile."Fill Sale Fiscal No. On"::Successful;
         POSAuditProfile."Require Item Return Reason" := true;
-        POSAuditProfile.AllowSalesAndReturnInSameTrans := false;
         POSAuditProfile."Balancing Fiscal No. Series" := CreateNumberSeries();
         POSAuditProfile."Sale Fiscal No. Series" := CreateNumberSeries();
         POSAuditProfile."Sales Ticket No. Series" := CreateNumberSeries();
