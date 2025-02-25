@@ -37,7 +37,22 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn" implements "NPR IPOS Workflow"
                 FrontEnd.WorkflowResponse(GenerateItemAddonConfig(Context, Sale, SaleLine));
             'SetItemAddons':
                 FrontEnd.WorkflowResponse(OnActionRunAddOns(Context));
+            'CancelTicketItemLine':
+                CancelTicketItemLine(Context);
         end;
+    end;
+
+    local procedure CancelTicketItemLine(Context: Codeunit "NPR POS JSON Helper")
+    var
+        POSSession: Codeunit "NPR POS Session";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        DeletePOSLineB: Codeunit "NPR POSAct:Delete POS Line-B";
+        POSActionDeleteLine: Codeunit "NPR POSAction: Delete POS Line";
+    begin
+        POSSession.GetSaleLine(POSSaleLine);
+        POSActionDeleteLine.SetPositionForPOSSaleLine(Context, POSSaleLine);
+        POSActionDeleteLine.OnBeforeDeleteSaleLinePOS(POSSaleLine);
+        DeletePOSLineB.DeleteSaleLine(POSSaleLine);
     end;
 
     local procedure DefineBaseLineNo(Context: Codeunit "NPR POS JSON Helper"; POSSaleLine: Codeunit "NPR POS Sale Line") Response: JsonObject
@@ -343,7 +358,7 @@ codeunit 6151128 "NPR POS Action: Run Item AddOn" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionRunItemAddOn.js###
-'const main=async({workflow:n,popup:i,context:a,captions:c})=>{const{AskForApplyToLine:r,ApplyToDialogOptions:A}=await n.respond("DefineBaseLineNo");if(r){const e=await i.optionsMenu({title:c.SelectLine,oneTouch:!0,options:A});if(!e)return;a.BaseLineNo=e.id}const{ApplyItemAddOnNo:s,CompulsoryAddOn:d,UserSelectionRequired:o,ItemAddonConfigAsString:l}=await n.respond("GetSalesLineAddonConfigJson");let t={};if(o){const e=JSON.parse(l),p=await i.configuration(e);t=await n.respond("SetItemAddons",{ApplyItemAddOnNo:s,CompulsoryAddOn:d,UserSelectionRequired:o,UserSelectedAddons:p})}else t=await n.respond("SetItemAddons",{ApplyItemAddOnNo:s,CompulsoryAddOn:d,UserSelectionRequired:o});if(t.TicketTokens&&t.TicketTokens.length>0)for(const e of t.TicketTokens)await n.run("TM_SCHEDULE_SELECT",{context:{TicketToken:e,EditSchedule:!0}})};'
+'const main=async({workflow:e,popup:i,context:a,captions:l})=>{const{AskForApplyToLine:r,ApplyToDialogOptions:A}=await e.respond("DefineBaseLineNo");if(r){const n=await i.optionsMenu({title:l.SelectLine,oneTouch:!0,options:A});if(!n)return;a.BaseLineNo=n.id}const{ApplyItemAddOnNo:s,CompulsoryAddOn:d,UserSelectionRequired:o,ItemAddonConfigAsString:p}=await e.respond("GetSalesLineAddonConfigJson");let t={};if(o){const n=JSON.parse(p),c=await i.configuration(n);t=await e.respond("SetItemAddons",{ApplyItemAddOnNo:s,CompulsoryAddOn:d,UserSelectionRequired:o,UserSelectedAddons:c})}else t=await e.respond("SetItemAddons",{ApplyItemAddOnNo:s,CompulsoryAddOn:d,UserSelectionRequired:o});if(t.TicketTokens&&t.TicketTokens.length>0){for(const n of t.TicketTokens)if((await e.run("TM_SCHEDULE_SELECT",{context:{TicketToken:n,EditSchedule:!0}})).cancel){await e.respond("CancelTicketItemLine");return}}};'
         );
     end;
 }

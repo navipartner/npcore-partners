@@ -270,8 +270,6 @@
 
         TicketManager.LockResources('IssueTicketFromReservation');
 
-        // TicketReservationRequest.Get(TicketReservationRequest."Entry No.");
-
         if (TicketReservationRequest."Request Status" <> TicketReservationRequest."Request Status"::CONFIRMED) then begin
             if (not TicketReservationRequest."Admission Created") then
                 _IssueNewTickets(TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest.Quantity, TicketReservationRequest."Entry No.");

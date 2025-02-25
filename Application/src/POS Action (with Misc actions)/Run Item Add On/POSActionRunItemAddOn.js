@@ -1,6 +1,7 @@
 const main = async ({ workflow, popup, context, captions }) => {
-  const { AskForApplyToLine, ApplyToDialogOptions } =
-    await workflow.respond("DefineBaseLineNo");
+  const { AskForApplyToLine, ApplyToDialogOptions } = await workflow.respond(
+    "DefineBaseLineNo"
+  );
 
   if (AskForApplyToLine) {
     const result = await popup.optionsMenu({
@@ -44,12 +45,17 @@ const main = async ({ workflow, popup, context, captions }) => {
     ItemAddonsResult.TicketTokens.length > 0
   ) {
     for (const token of ItemAddonsResult.TicketTokens) {
-      await workflow.run("TM_SCHEDULE_SELECT", {
+      const scheduleSelection = await workflow.run("TM_SCHEDULE_SELECT", {
         context: {
           TicketToken: token,
           EditSchedule: true,
         },
       });
+
+      if (scheduleSelection.cancel) {
+        await workflow.respond("CancelTicketItemLine");
+        return;
+      }
     }
   }
 };

@@ -410,7 +410,7 @@ codeunit 6151543 "NPR TM Client API BL"
             if (TicketRequest."External Adm. Sch. Entry No." > 0) then begin
                 AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', TicketRequest."External Adm. Sch. Entry No.");
                 AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
-                HaveScheduleEntry := AdmissionScheduleEntry.FindFirst()
+                HaveScheduleEntry := AdmissionScheduleEntry.FindFirst();
             end;
 
             if (not TicketRequest."Admission Created") then begin

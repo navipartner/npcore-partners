@@ -1,8 +1,17 @@
 const main = async ({ workflow, context, popup }) => {
   debugger;
+
+  const wfAssign = await workflow.respond("AssignSameSchedule", context);
+
+  if (wfAssign.CancelScheduleSelection) {
+    toast.error(wfAssign.Message);
+    return { cancel: true };
+  }
+
+  if (!wfAssign.EditSchedule) return { cancel: false };
+
   const wfConfig = await workflow.respond("ConfigureWorkflow", context);
 
-  debugger;
   if (context.EditSchedule) {
     const result = await popup.entertainment.scheduleSelection({
       token: context.TicketToken,

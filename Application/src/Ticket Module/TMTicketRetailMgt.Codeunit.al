@@ -792,9 +792,6 @@
         Token: Text[100];
         TokenLineNumber: Integer;
         ExternalMemberNo: Code[20];
-        POSSession: Codeunit "NPR POS Session";
-        FrontEnd: Codeunit "NPR POS Front End Management";
-        SeatingUI: Codeunit "NPR TM Seating UI";
         RequiredAdmissionHasTimeSlots, AllAdmissionsRequired : Boolean;
     begin
         if (not GuiAllowed()) then
@@ -843,42 +840,48 @@
                     SaleLinePOS."Description 2" := TicketReservationRequest."Scheduled Time Description";
 
                 SaleLinePOS.Modify();
+
                 Commit();
-
-                POSSession.GetFrontEnd(FrontEnd);
-                SeatingUI.ShowSelectSeatUI(FrontEnd, Token, false);
-
                 exit(1); // nothing to confirm;
+            end;
+
+            if (TicketRetailManager.UseFrontEndScheduleUX()) then begin
+                // Remove the the unhappy time slot assigned.
+                TicketReservationRequest.Reset();
+                TicketReservationRequest.SetCurrentKey("Session Token ID");
+                TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+                if (TicketReservationRequest.FindSet()) then begin
+                    if ((not TicketReservationRequest."Admission Created") and (TicketReservationRequest."External Adm. Sch. Entry No." > 0)) then begin
+                        TicketReservationRequest."External Adm. Sch. Entry No." := 0;
+                        TicketReservationRequest.Modify();
+                    end;
+                end;
             end;
         end;
 
-        Commit();
+        if (TicketRetailManager.UseFrontEndScheduleUX()) then
+            exit(1);
 
+        Commit();
         ResponseCode := -1;
         ResponseMessage := ABORTED;
         if (AcquireTicketAdmissionSchedule(Token, SaleLinePOS, true, ResponseMessage)) then
             ResponseCode := TicketRequestManager.IssueTicketFromReservationToken(Token, false, ResponseMessage);
 
-        if (ResponseCode = -1) and (TicketRetailManager.UseFrontEndScheduleUX()) then
-            ResponseCode := 0;
-
         if (ResponseCode = 0) then begin
-            Commit();
-
-            if (not TicketRetailManager.UseFrontEndScheduleUX()) then
-                AcquireTicketParticipant(Token, ExternalMemberNo, false);
 
             Commit();
+            AcquireTicketParticipant(Token, ExternalMemberNo, false);
 
-            POSSession.GetFrontEnd(FrontEnd);
-            SeatingUI.ShowSelectSeatUI(FrontEnd, Token, false);
-
+            Commit();
             exit(1);
         end;
 
         TicketRequestManager.LockResources('NewTicketSales_3');
-        SaleLinePOS.Delete();
-        TicketRequestManager.DeleteReservationRequest(Token, true);
+        if (SaleLinePOS.Indentation = 0) then begin
+            SaleLinePOS.Delete();
+            TicketRequestManager.DeleteReservationRequest(Token, true);
+        end;
         Commit();
         Error(ResponseMessage);
     end;
