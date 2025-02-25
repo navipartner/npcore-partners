@@ -118,7 +118,7 @@
         if IsHandled then
             exit;
 
-        if CheckImportListErrors(ServiceEndPoint) then begin
+        if CheckNoUnprocessedImportListEntries(ServiceEndPoint) then begin
             BatchId := CreateGuid();
             repeat
                 OnBeforeSendWebRequest(Response, NextLinkURI, IsHandledSendWebRequest);
@@ -756,12 +756,12 @@
         Exit(NOT (ReplicationCounterOfEntity < ReplicationEndPoint."Replication Counter")); // means that we try to manually process an older version of the record which would overwrite latest changes.
     end;
 
-    local procedure CheckImportListErrors(ServiceEndpoint: Record "NPR Replication Endpoint"): Boolean
+    local procedure CheckNoUnprocessedImportListEntries(ServiceEndpoint: Record "NPR Replication Endpoint"): Boolean
     var
         ImportEntry: Record "NPR Nc Import Entry";
     begin
         ImportEntry.SetRange("Document ID", Format(ServiceEndpoint.RecordId));
-        ImportEntry.SetRange("Runtime Error", true);
+        ImportEntry.SetRange(Imported, false);
         exit(ImportEntry.IsEmpty());
     end;
 
