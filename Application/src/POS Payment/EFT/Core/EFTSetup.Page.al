@@ -83,45 +83,6 @@
 
                 end;
             }
-
-            action(MobilepayMigration)
-            {
-                Caption = 'Mobilepay Migration';
-                Image = CalculateLines;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-
-                ToolTip = 'Creates Vipps equivivalent of Mobilepay';
-                ApplicationArea = NPRRetail;
-
-                trigger OnAction()
-                var
-                    Migration: Codeunit "NPR Vipps Mp Migration";
-                begin
-                    Migration.MigrateMobilepaytoVipps();
-                end;
-            }
-            action("MobilepayMigration Delete Test")
-            {
-                Caption = 'Mobilepay Migration Delete Test';
-                Image = Delete;
-                Promoted = true;
-                PromotedOnly = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-
-                ToolTip = 'Delete Vipps equivivalent of Mobilepay';
-                ApplicationArea = NPRRetail;
-
-                trigger OnAction()
-                var
-                    Migration: Codeunit "NPR Vipps Mp Migration";
-                begin
-                    Migration.ClearALLVippsSetup();
-                end;
-            }
         }
     }
 }
