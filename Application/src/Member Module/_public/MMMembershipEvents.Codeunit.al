@@ -98,6 +98,8 @@
     begin
     end;
 
+
+    #region Member Merge
     [IntegrationEvent(false, false)]
     [CommitBehavior(CommitBehavior::Error)]
     internal procedure OnCheckMemberUniqueIdViolation(Community: Record "NPR MM Member Community"; MemberInfoCapture: Record "NPR MM Member Info Capture"; var ConflictingMember: Record "NPR MM Member"; var ConflictExists: Boolean)
@@ -117,6 +119,12 @@
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    [CommitBehavior(CommitBehavior::Error)]
+    internal procedure OnBeforeApplyExistingMemberInformation(Community: Record "NPR MM Member Community"; FromFieldId: Integer; Member: Record "NPR MM Member"; var MemberInfoCapture: Record "NPR MM Member Info Capture"; var Handled: Boolean);
+    begin
+    end;
+    #endregion
 
     #region Loyalty
 

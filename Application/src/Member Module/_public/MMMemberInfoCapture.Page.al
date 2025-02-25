@@ -1083,6 +1083,8 @@
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         MemberCommunity: Record "NPR MM Member Community";
         Member: Record "NPR MM Member";
+        Handled: Boolean;
+        MembershipEvents: Codeunit "NPR MM Membership Events";
     begin
         if (not _ReUseExistingMember) then
             exit;
@@ -1153,6 +1155,13 @@
         if (not Member.FindFirst()) then
             exit;
 
+        Handled := false;
+        MembershipEvents.OnBeforeApplyExistingMemberInformation(MemberCommunity, FromFieldId, Member, InfoCapture, Handled);
+        if (Handled) then begin
+            CurrPage.Update(false);
+            exit(true);
+        end;
+
         // Reuse the existing member, pull in data and allow edit.
         InfoCapture."External Member No" := Member."External Member No.";
         InfoCapture."Member Entry No" := Member."Entry No.";
@@ -1173,12 +1182,11 @@
         InfoCapture.Gender := Member.Gender;
         InfoCapture.Birthday := Member.Birthday;
         InfoCapture.PreferredLanguageCode := Member.PreferredLanguageCode;
-        CurrPage.Update(false);
 
+        CurrPage.Update(false);
         exit(true);
 
     end;
-
 
     local procedure CheckFirstName()
     var
