@@ -48,9 +48,12 @@ codeunit 6248233 "NPR Ext. POS Sale Processing"
     var
         LineNoInt: Integer;
         LastExtPOSSalesLine: Record "NPR External POS Sale Line";
+        POSUnit: Record "NPR POS Unit";
         Currency: Record Currency;
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
+        POSPostingProfile: Record "NPR POS Posting Profile";
+        POSStore: Record "NPR POS Store";
         UOMMgt: Codeunit "Unit of Measure Management";
     begin
         ExternalPOSSale.Get(ExternalPOSSaleLine."External POS Sale Entry No.");
@@ -87,7 +90,6 @@ codeunit 6248233 "NPR Ext. POS Sale Processing"
                         ExternalPOSSaleLine."VAT Bus. Posting Group" := Item."VAT Bus. Posting Gr. (Price)";
                         ExternalPOSSaleLine."VAT Prod. Posting Group" := Item."VAT Prod. Posting Group";
                         VATPostingSetup.Get(ExternalPOSSaleLine."VAT Bus. Posting Group", ExternalPOSSaleLine."VAT Prod. Posting Group");
-                        ExternalPOSSaleLine."Unit Price" := Item."Unit Price";
                         ExternalPOSSaleLine."VAT %" := VATPostingSetup."VAT %";
                         ExternalPOSSaleLine."VAT Identifier" := VATPostingSetup."VAT Identifier";
                         ExternalPOSSaleLine."VAT Calculation Type" := VATPostingSetup."VAT Calculation Type";
@@ -118,6 +120,20 @@ codeunit 6248233 "NPR Ext. POS Sale Processing"
                         ExternalPOSSaleLine.Amount := ExternalPOSSaleLine."Amount Including VAT";
                     if (ExternalPOSSaleLine.Quantity = 0) then
                         ExternalPOSSaleLine.Quantity := 1;
+                end;
+            Enum::"NPR POS Sale Line Type"::Rounding:
+                begin
+                    ExternalPOSSaleLine.Amount := ExternalPOSSaleLine."Amount Including VAT";
+                    //Is always *-1 of Amount Incl VAT in POS.
+                    ExternalPOSSaleLine."Unit Price" := ExternalPOSSaleLine."Amount Including VAT" * -1;
+                    if (ExternalPOSSaleLine."No." = '') then
+                        if (POSUnit.Get(ExternalPOSSale."Register No.")) then
+                            if (POSStore.Get(POSUnit."POS Store Code")) then
+                                if (POSPostingProfile.Get(POSStore."POS Posting Profile")) then begin
+                                    ExternalPOSSaleLine."No." := POSPostingProfile."POS Sales Rounding Account";
+                                end
+
+
                 end;
         end;
         ExternalPOSSaleLine.Modify();
@@ -178,7 +194,7 @@ codeunit 6248233 "NPR Ext. POS Sale Processing"
                     end;
             end;
         until ExternalPOSSaleLine.Next() = 0;
-        if (SaleAmount - PaidAmount - RoundingAmount <> 0) then
+        if (SaleAmount - PaidAmount + RoundingAmount <> 0) then
             Error(SaleBalanceNotValidErrLbl);
     end;
 
