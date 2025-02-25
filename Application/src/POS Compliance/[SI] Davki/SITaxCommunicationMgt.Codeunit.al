@@ -472,6 +472,7 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
             BaseValue += BaseChunk;
         end;
         BaseValue := BaseValue.Replace('"', '\"');
+        BaseValue := BaseValue.Replace('<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>', '');
     end;
 
     local procedure ReverseBaseValueFormat(var BaseValue: Text)
