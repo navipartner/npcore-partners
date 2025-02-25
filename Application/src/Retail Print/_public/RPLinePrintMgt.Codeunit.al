@@ -594,7 +594,7 @@
             FourColumnDistribution[4] := 0.25;
     end;
 
-    local procedure UpdateField(Column: Integer; Align: Integer; Width: Integer; Font: Text[30]; Text: Text[2048]; HideHRI: Boolean; Height: Integer)
+    internal procedure UpdateField(Column: Integer; Align: Integer; Width: Integer; Font: Text[30]; Text: Text[2048]; HideHRI: Boolean; Height: Integer)
     begin
         if AutoLineBreak and (LastColumnNo >= Column) then begin
             LastColumnNo := 0;

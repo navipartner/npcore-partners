@@ -105,4 +105,9 @@ codeunit 6150960 "NPR RP Line Print"
     begin
         RPLinePrintMgt.ProcessTemplate(Code, RecRef);
     end;
+
+    procedure UpdateField(Column: Integer; Align: Integer; Width: Integer; Font: Text[30]; Text: Text[2048]; HideHRI: Boolean; Height: Integer)
+    begin
+        RPLinePrintMgt.UpdateField(Column, Align, Width, Font, Text, HideHRI, Height);
+    end;
 }
