@@ -22,6 +22,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         RemoveIncorrectlyAssignedIDs();
         RegisterShopifyAppRequestListenerWebservice();
         UpgradeAllowedFinancialStatuses();
+        RescheduleInventorySyncTasks();
     end;
 
     internal procedure UpdateShopifySetup()
@@ -251,6 +252,39 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         ShopifyAssignedID.SetRange("Table No.", Database::"Item Variant");
         if not ShopifyAssignedID.IsEmpty() then
             ShopifyAssignedID.DeleteAll();
+
+        SetUpgradeTag();
+        LogFinish();
+    end;
+
+    internal procedure RescheduleInventorySyncTasks()
+    var
+        NcTask: Record "NPR Nc Task";
+        NcTask2: Record "NPR Nc Task";
+        NcTask3: Record "NPR Nc Task";
+    begin
+        _UpgradeStep := 'RescheduleInventorySync';
+        if HasUpgradeTag() then
+            exit;
+        LogStart();
+
+        NcTask.SetRange("Table No.", Database::"NPR Spfy Inventory Level");
+        NcTask.SetRange(Processed, true);
+        NcTask.SetFilter("Log Date", '%1..', CreateDateTime(20250217D, 0T));
+        NcTask.Ascending(false);
+        if NcTask.FindSet(true) then
+            repeat
+                NcTask2.SetRange("Table No.", NcTask."Table No.");
+                NcTask2.SetRange(Processed, false);
+                NcTask2.SetRange("Record Value", NcTask."Record Value");
+                NcTask2.SetRange("Store Code", NcTask."Store Code");
+                if NcTask2.IsEmpty() then begin
+                    NcTask3 := NcTask;
+                    NcTask3.Processed := false;
+                    NcTask3."Process Count" := 0;
+                    NcTask3.Modify();
+                end;
+            until NcTask.Next() = 0;
 
         SetUpgradeTag();
         LogFinish();
