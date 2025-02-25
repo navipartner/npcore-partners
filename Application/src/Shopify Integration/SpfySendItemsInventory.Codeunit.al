@@ -532,10 +532,11 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         RecRef.Get(NcTask."Record ID");
         RecRef.SetTable(InventoryLevel);
 
-        if not ItemVariant.Get(InventoryLevel."Item No.", InventoryLevel."Variant Code") or SpfyItemMgt.ItemVariantIsBlocked(ItemVariant) then begin
-            SetResponse(NcTask, StrSubstNo(ItemVariantDoesNotExistErr, InventoryLevel."Item No.", InventoryLevel."Variant Code"));
-            exit(false);
-        end;
+        if InventoryLevel."Variant Code" <> '' then
+            if not ItemVariant.Get(InventoryLevel."Item No.", InventoryLevel."Variant Code") or SpfyItemMgt.ItemVariantIsBlocked(ItemVariant) then begin
+                SetResponse(NcTask, StrSubstNo(ItemVariantDoesNotExistErr, InventoryLevel."Item No.", InventoryLevel."Variant Code"));
+                exit(false);
+            end;
         GetStoreItemLink(InventoryLevel."Item No.", InventoryLevel."Shopify Store Code", SpfyStoreItemLink);  //Check integration is enabled for the item
 
         Clear(SpfyStoreItemLink);
