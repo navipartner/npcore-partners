@@ -137,7 +137,7 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
 
         case EftTransactionRequest."Integration Type" of
             EFTAdyenIntegration.CloudIntegrationType(),
-            EFTAdyenIntegration.LocalIntegrationType():
+            EFTAdyenIntegration.HWCIntegrationType():
                 SubscriptionPSP := SubscriptionPSP::Adyen;
         end;
 

@@ -4,6 +4,9 @@ enum 6014611 "NPR EFT Adyen Local Trx Status"
     Access = Internal;
 #endif
     Extensible = false;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-02-16';
+    ObsoleteReason = 'Adyen Local implemented as Adyen HWC instead';
 
     value(0; AcquireCardInitiated)
     {

@@ -71,7 +71,7 @@ codeunit 6059778 "NPR POS Action: Payment WF2 BL"
         EFTSetup.FindSetup(SalePOS."Register No.", PaymentMethodCode);
         case EFTSetup."EFT Integration Type" of
             EFTAdyenIntegration.CloudIntegrationType(),
-            EFTAdyenIntegration.LocalIntegrationType():
+            EFTAdyenIntegration.HWCIntegrationType():
                 PaymentMethodAssigned := EFTAdyenIntegration.CheckMMPaymentMethodAssignedToPOSSale(EFTSetup, SalePOS."Sales Ticket No.");
         end;
     end;
