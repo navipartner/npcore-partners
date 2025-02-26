@@ -1251,7 +1251,6 @@
         Member: Record "NPR MM Member";
         MEMBER_REUSE: Label 'Member with unique ID [%1] with name: %2 is already in use.\Do you want to create duplicate member?';
         ConflictingMemberExists: Boolean;
-        ConflictExists: Boolean;
         ResponseMessage: Text;
     begin
 
@@ -1268,9 +1267,8 @@
         SetMemberUniqueIdFilter(Community, MemberInfoCapture, Member);
         ConflictingMemberExists := Member.FindFirst();
 
-        ConflictExists := false;
-        MembershipEvents.OnCheckMemberUniqueIdViolation(Community, MemberInfoCapture, Member, ConflictExists);
-        if (not ConflictExists) then
+        MembershipEvents.OnCheckMemberUniqueIdViolation(Community, MemberInfoCapture, Member, ConflictingMemberExists);
+        if (not ConflictingMemberExists) then
             exit(0);
 
         if (ConflictingMemberExists) then begin
