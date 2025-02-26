@@ -1,6 +1,9 @@
 codeunit 6184637 "NPR POS Action EFT Adyen Local" implements "NPR IPOS Workflow"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-02-16';
+    ObsoleteReason = 'Adyen Local implemented as Adyen HWC instead';
 
     procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
     var
