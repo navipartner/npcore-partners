@@ -12,11 +12,11 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         exit(EFTAdyenCloudIntegrat.IntegrationType());
     end;
 
-    procedure LocalIntegrationType(): Code[20]
+    procedure HWCIntegrationType(): Code[20]
     var
-        EFTAdyenLocalIntegrat: Codeunit "NPR EFT Adyen Local Integrat.";
+        EFTAdyenHWCIntegrat: Codeunit "NPR EFT Adyen HWC Integrat.";
     begin
-        exit(EFTAdyenLocalIntegrat.IntegrationType());
+        exit(EFTAdyenHWCIntegrat.IntegrationType());
     end;
 
     procedure MposTapToPayIntegrationType(): Code[20]
@@ -38,7 +38,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
     var
         EFTSetup: Record "NPR EFT Setup";
     begin
-        if not (EftTransactionRequest."Integration Type" in [CloudIntegrationType(), LocalIntegrationType(), MposTapToPayIntegrationType(), MposLanIntegrationType()]) then
+        if not (EftTransactionRequest."Integration Type" in [CloudIntegrationType(), HWCIntegrationType(), MposTapToPayIntegrationType(), MposLanIntegrationType()]) then
             exit;
         Handled := true;
 
@@ -61,7 +61,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
     var
         OriginalEftTransactionRequest: Record "NPR EFT Transaction Request";
     begin
-        if not (EftTransactionRequest."Integration Type" in [CloudIntegrationType(), LocalIntegrationType(), MposTapToPayIntegrationType(), MposLanIntegrationType()]) then
+        if not (EftTransactionRequest."Integration Type" in [CloudIntegrationType(), HWCIntegrationType(), MposTapToPayIntegrationType(), MposLanIntegrationType()]) then
             exit;
         Handled := true;
 
@@ -85,7 +85,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
     var
         OriginalEftTransactionRequest: Record "NPR EFT Transaction Request";
     begin
-        if not (EftTransactionRequest."Integration Type" in [CloudIntegrationType(), LocalIntegrationType(), MposTapToPayIntegrationType(), MposLanIntegrationType()]) then
+        if not (EftTransactionRequest."Integration Type" in [CloudIntegrationType(), HWCIntegrationType(), MposTapToPayIntegrationType(), MposLanIntegrationType()]) then
             exit;
         Handled := true;
 
@@ -114,7 +114,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
     var
         OriginalEftTransactionRequest: Record "NPR EFT Transaction Request";
     begin
-        if not (EftTransactionRequest."Integration Type" in [CloudIntegrationType(), LocalIntegrationType(), MposLanIntegrationType()]) then
+        if not (EftTransactionRequest."Integration Type" in [CloudIntegrationType(), HWCIntegrationType(), MposLanIntegrationType()]) then
             exit;
         Handled := true;
 
@@ -138,7 +138,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateVerifySetupRequest', '', false, false)]
     local procedure OnCreateVerifySetupRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
-        if not (EftTransactionRequest."Integration Type" in [CloudIntegrationType(), LocalIntegrationType()]) then
+        if not (EftTransactionRequest."Integration Type" in [CloudIntegrationType(), HWCIntegrationType()]) then
             exit;
         Handled := true;
 
@@ -151,7 +151,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnCreateAuxRequest', '', false, false)]
     local procedure OnCreateAuxRequest(var EftTransactionRequest: Record "NPR EFT Transaction Request"; var Handled: Boolean)
     begin
-        if not (EftTransactionRequest."Integration Type" in [CloudIntegrationType(), LocalIntegrationType()]) then
+        if not (EftTransactionRequest."Integration Type" in [CloudIntegrationType(), HWCIntegrationType()]) then
             exit;
         Handled := true;
 
@@ -166,8 +166,9 @@ codeunit 6184639 "NPR EFT Adyen Integration"
     var
         EFTAdyenUnitSetup: Record "NPR EFT Adyen Unit Setup";
         EFTAdyenPaymTypeSetup: Record "NPR EFT Adyen Paym. Type Setup";
+        EFTAdyenHWCIntegrat: Codeunit "NPR EFT Adyen HWC Integrat.";
     begin
-        if not (EftTransactionRequest."Integration Type" in [CloudIntegrationType(), LocalIntegrationType(), MposTapToPayIntegrationType(), MposLanIntegrationType()]) then
+        if not (EftTransactionRequest."Integration Type" in [CloudIntegrationType(), HWCIntegrationType(), MposTapToPayIntegrationType(), MposLanIntegrationType()]) then
             exit;
 
         if (EftTransactionRequest."Processing Type" = EftTransactionRequest."Processing Type"::AUXILIARY)
@@ -190,7 +191,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         end;
         Request.Add('unattended', EftTransactionRequest."Self Service");
         Request.Add('PaymentSetupCode', EftTransactionRequest."POS Payment Type Code");
-        if (EftTransactionRequest."Integration Type" in [MposLanIntegrationType(), LocalIntegrationType()]) then begin
+        if (EftTransactionRequest."Integration Type" in [MposLanIntegrationType(), HWCIntegrationType()]) then begin
             GetUnitSetupParameters(EftTransactionRequest."Register No.", EFTAdyenUnitSetup);
             Request.Add('LocalTerminalIpAddress', GetTerminalEndpoint(EFTAdyenUnitSetup));
         end;
@@ -200,8 +201,11 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         case EftTransactionRequest."Integration Type" of
             CloudIntegrationType():
                 Workflow := Format(Enum::"NPR POS Workflow"::EFT_ADYEN_CLOUD);
-            LocalIntegrationType():
-                Workflow := Format(Enum::"NPR POS Workflow"::EFT_ADYEN_LOCAL);
+            HWCIntegrationType():
+                begin
+                    Request.Add('hwcRequest', EFTAdyenHWCIntegrat.BuildTransactionRequest(EftTransactionRequest."Entry No."));
+                    Workflow := Format(Enum::"NPR POS Workflow"::EFT_ADYEN_HWC);
+                end;
             MposTapToPayIntegrationType():
                 Workflow := Format(Enum::"NPR POS Workflow"::EFT_ADYEN_MPOS_TTP);
             MposLanIntegrationType():
@@ -214,7 +218,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
     var
         EFTAdyenContractMgmt: Codeunit "NPR EFT Adyen Contract Mgmt.";
     begin
-        if not (EftTransactionRequest."Integration Type" in [CloudIntegrationType(), LocalIntegrationType()]) then
+        if not (EftTransactionRequest."Integration Type" in [CloudIntegrationType(), HWCIntegrationType()]) then
             exit;
         if EftTransactionRequest."Processing Type" <> EftTransactionRequest."Processing Type"::AUXILIARY then
             exit;
@@ -333,7 +337,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
 
         if EFTTransactionRequest."Recurring Detail Reference" = '' then
             exit;
-        if not (EftTransactionRequest."Integration Type" in [CloudIntegrationType(), LocalIntegrationType()]) then
+        if not (EftTransactionRequest."Integration Type" in [CloudIntegrationType(), HWCIntegrationType()]) then
             exit;
         if EftTransactionRequest."Processing Type" <> EftTransactionRequest."Processing Type"::PAYMENT then
             exit;
@@ -383,7 +387,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
             if EFTAdyenCloudIntegrat.GetEnvironment(EFTSetup) <> 0 then
                 EFTTransactionRequest.Mode := EFTTransactionRequest.Mode::"TEST Remote";
         end;
-        if (EFTTransactionRequest."Integration Type" in [MposLanIntegrationType(), LocalIntegrationType()]) then begin
+        if (EFTTransactionRequest."Integration Type" in [MposLanIntegrationType(), HWCIntegrationType()]) then begin
             GetUnitSetupParameters(EFTSetup."POS Unit No.", EFTAdyenUnitSetup);
             EFTTransactionRequest."Hardware ID" := CopyStr(EFTAdyenUnitSetup.POIID, 1, MaxStrLen(EFTTransactionRequest."Hardware ID"));
         end;
@@ -404,6 +408,38 @@ codeunit 6184639 "NPR EFT Adyen Integration"
     procedure GetTerminalEndpoint(EFTAdyenUnitSetup: Record "NPR EFT Adyen Unit Setup"): Text
     begin
         exit(StrSubstNo('https://%1:8443/nexo', EFTAdyenUnitSetup."Terminal LAN IP"));
+    end;
+
+    procedure GetTerminalEndpoint(EFTSetup: Record "NPR EFT Setup"): Text
+    var
+        EFTAdyenUnitSetup: Record "NPR EFT Adyen Unit Setup";
+    begin
+        GetUnitSetupParameters(EFTSetup."POS Unit No.", EFTAdyenUnitSetup);
+        exit(GetTerminalEndpoint(EFTAdyenUnitSetup));
+    end;
+
+    procedure GetLocalKeyIdentifier(EFTSetupIn: Record "NPR EFT Setup"): Text
+    var
+        EFTAdyenPaymentTypeSetup: Record "NPR EFT Adyen Paym. Type Setup";
+    begin
+        GetPaymentTypeParameters(EFTSetupIn, EFTAdyenPaymentTypeSetup);
+        exit(EFTAdyenPaymentTypeSetup."Local Key Identifier");
+    end;
+
+    procedure GetLocalKeyPassphrase(EFTSetupIn: Record "NPR EFT Setup"): Text
+    var
+        EFTAdyenPaymentTypeSetup: Record "NPR EFT Adyen Paym. Type Setup";
+    begin
+        GetPaymentTypeParameters(EFTSetupIn, EFTAdyenPaymentTypeSetup);
+        exit(EFTAdyenPaymentTypeSetup."Local Key Passphrase");
+    end;
+
+    procedure GetLocalKeyVersion(EFTSetupIn: Record "NPR EFT Setup"): Integer
+    var
+        EFTAdyenPaymentTypeSetup: Record "NPR EFT Adyen Paym. Type Setup";
+    begin
+        GetPaymentTypeParameters(EFTSetupIn, EFTAdyenPaymentTypeSetup);
+        exit(EFTAdyenPaymentTypeSetup."Local Key Version");
     end;
 
     procedure VoidTransactionAfterSignatureDecline(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var VoidEntryNo: Integer)
@@ -525,7 +561,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
     local procedure GetCreateEFTShopperRecognition(EntityKey: Code[20]; EntityType: Option Customer,Contact,Membership; IntegrationType: Code[20]; var EFTShopperRecognition: Record "NPR EFT Shopper Recognition")
     begin
         EFTShopperRecognition.Reset();
-        EFTShopperRecognition.SetFilter("Integration Type", '%1|%2', CloudIntegrationType(), LocalIntegrationType());
+        EFTShopperRecognition.SetFilter("Integration Type", '%1|%2', CloudIntegrationType(), HWCIntegrationType());
         EFTShopperRecognition.SetRange("Entity Key", EntityKey);
         EFTShopperRecognition.SetRange("Entity Type", EntityType);
 
@@ -652,7 +688,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
 
         ShopperFound := EFTShopperRecognition.Get(CloudIntegrationType(), EFTTransactionRequest."External Customer ID");
         if not ShopperFound then
-            ShopperFound := EFTShopperRecognition.Get(LocalIntegrationType(), EFTTransactionRequest."External Customer ID");
+            ShopperFound := EFTShopperRecognition.Get(HWCIntegrationType(), EFTTransactionRequest."External Customer ID");
 
         if ShopperFound then begin
             if not Confirm(CLEAR_SHOPPER_PROMPT_MATCH, false, EFTTransactionRequest."External Customer ID", EFTShopperRecognition."Entity Type", EFTShopperRecognition."Entity Key") then
@@ -711,7 +747,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         end;
 
         if not EFTShopperRecognition.Get(CloudIntegrationType(), EFTTransactionRequest."External Customer ID") then begin
-            if not EFTShopperRecognition.Get(LocalIntegrationType(), EFTTransactionRequest."External Customer ID") then begin
+            if not EFTShopperRecognition.Get(HWCIntegrationType(), EFTTransactionRequest."External Customer ID") then begin
                 Message(UNKNOWN_SHOPPER, EFTTransactionRequest."External Customer ID");
                 exit;
             end;
@@ -731,7 +767,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
             exit(false);
 
         if not EFTShopperRecognition.Get(CloudIntegrationType(), EftTransactionRequest."External Customer ID") then
-            if not EFTShopperRecognition.Get(LocalIntegrationType(), EftTransactionRequest."External Customer ID") then
+            if not EFTShopperRecognition.Get(HWCIntegrationType(), EftTransactionRequest."External Customer ID") then
                 exit(false);
 
         POSSale.GetCurrentSale(SalePOS);
@@ -796,7 +832,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
             if EFTShopperRecognition.Get(CloudIntegrationType(), EFTTransactionRequest."External Customer ID") then begin
                 CurrentShopperRef += StrSubstNo(CurrentShopperRefLbl, Format(EFTShopperRecognition."Entity Type"), EFTShopperRecognition."Entity Key");
             end else
-                if EFTShopperRecognition.Get(LocalIntegrationType(), EFTTransactionRequest."External Customer ID") then begin
+                if EFTShopperRecognition.Get(HWCIntegrationType(), EFTTransactionRequest."External Customer ID") then begin
                     CurrentShopperRef += StrSubstNo(CurrentShopperRefLbl, Format(EFTShopperRecognition."Entity Type"), EFTShopperRecognition."Entity Key");
                 end;
             Message(StrSubstNo(CONTRACT_DUPLICATE, EFTShopperRecognition.FieldCaption("Shopper Reference"), CurrentShopperRef));
