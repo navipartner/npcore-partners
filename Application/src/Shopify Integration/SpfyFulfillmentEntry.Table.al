@@ -4,9 +4,7 @@ table 6150815 "NPR Spfy Fulfillment Entry"
     Access = Internal;
     Caption = 'Shopify Fulfillment Entry';
     DataClassification = CustomerContent;
-    ObsoleteState = Pending;
-    ObsoleteTag = '2024-12-20';
-    ObsoleteReason = 'Table type will be changed to temporary';
+    TableType = Temporary;
 
     fields
     {

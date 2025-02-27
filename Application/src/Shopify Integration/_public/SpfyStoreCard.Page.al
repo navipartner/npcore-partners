@@ -342,28 +342,6 @@ page 6184704 "NPR Spfy Store Card"
             group(InitialSetup)
             {
                 Caption = 'Initial Setup';
-                action(EnableIntegrationForMagentoItems)
-                {
-                    Caption = 'Enable Integr. for Magento Items';
-                    ToolTip = 'Enables Shopify integration for all existing Magento items.';
-                    ApplicationArea = NPRShopify;
-                    Image = CheckDuplicates;
-                    Promoted = true;
-                    PromotedIsBig = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Category4;
-                    Visible = false;
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '2025-02-16';
-                    ObsoleteReason = 'Use the "Sync. Items" action instead and filter by the "Magento Item" field.';
-
-                    trigger OnAction()
-                    var
-                        ReplacedErr: Label 'Use the "Sync. Items" action instead and filter by the "Magento Item" field.';
-                    begin
-                        Error(ReplacedErr);
-                    end;
-                }
                 action(SyncItems)
                 {
                     Caption = 'Sync. Items';

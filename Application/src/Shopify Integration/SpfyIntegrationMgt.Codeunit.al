@@ -346,6 +346,13 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
             exit(Position + LastIndexOf(CopyStr(Input, Position + 1), UntilChr));
     end;
 
+    procedure LowerFirstLetter(TextStringIn: Text): Text
+    begin
+        if TextStringIn = '' then
+            exit;
+        exit(LowerCase(CopyStr(TextStringIn, 1, 1)) + CopyStr(TextStringIn, 2));
+    end;
+
     procedure UnsupportedIntegrationTable(NcTask: Record "NPR Nc Task"; CallerFunction: Text)
     var
         UnsupportedErr: Label '%1: unsupported integration table %2 %3';

@@ -67,7 +67,7 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
         exit(NcTaskProcessor.Code);
     end;
 
-    local procedure CreateTaskSetupEntry(TaskProcessorCode: Code[20]; TableId: Integer)
+    local procedure CreateTaskSetupEntry(TaskProcessorCode: Code[20]; TableId: Integer; CodeunitId: Integer)
     var
         NcTaskSetup: Record "NPR Nc Task Setup";
     begin
@@ -81,29 +81,7 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
         NcTaskSetup."Entry No." := 0;
         NcTaskSetup."Task Processor Code" := TaskProcessorCode;
         NcTaskSetup."Table No." := TableId;
-        case TableId of
-            Database::Item,
-            Database::"Item Variant",
-            Database::"Item Reference",
-            Database::"Inventory Buffer",
-            Database::"NPR Spfy Entity Metafield",
-            Database::"NPR Spfy Item Price",
-            Database::"NPR Spfy Inventory Level":
-                NcTaskSetup."Codeunit ID" := Codeunit::"NPR Spfy Send Items&Inventory";
-
-            Database::"NPR NpRv Voucher",
-            Database::"NPR NpRv Arch. Voucher",
-            Database::"NPR NpRv Voucher Entry":
-                NcTaskSetup."Codeunit ID" := Codeunit::"NPR Spfy Send Voucher";
-
-            Database::"Sales Shipment Header",
-            Database::"Return Receipt Header":
-                NcTaskSetup."Codeunit ID" := Codeunit::"NPR Spfy Send Fulfillment";
-
-            Database::"Sales Invoice Header",
-            Database::"NPR Magento Payment Line":
-                NcTaskSetup."Codeunit ID" := Codeunit::"NPR Spfy Capture Payment";
-        end;
+        NcTaskSetup."Codeunit ID" := CodeunitId;
         NcTaskSetup.Insert();
     end;
 
@@ -208,29 +186,29 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
     begin
         if (Task."Task Processor Code" = '') or (Task."Task Processor Code" <> GetShopifyTaskProcessorCode(false)) then
             exit;
-        if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items, Task."Store Code") then begin
-            CreateTaskSetupEntry(Task."Task Processor Code", Database::Item);
-            CreateTaskSetupEntry(Task."Task Processor Code", Database::"Item Variant");
-            CreateTaskSetupEntry(Task."Task Processor Code", Database::"Item Reference");
-            CreateTaskSetupEntry(Task."Task Processor Code", Database::"Inventory Buffer");
-            CreateTaskSetupEntry(Task."Task Processor Code", Database::"NPR Spfy Entity Metafield");
-        end;
-        if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels", Task."Store Code") then begin
-            CreateTaskSetupEntry(Task."Task Processor Code", Database::"NPR Spfy Inventory Level");
-        end;
-        if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Item Prices", Task."Store Code") then begin
-            CreateTaskSetupEntry(Task."Task Processor Code", Database::"NPR Spfy Item Price");
-        end;
-        if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Retail Vouchers", Task."Store Code") then begin
-            CreateTaskSetupEntry(Task."Task Processor Code", Database::"NPR NpRv Voucher");
-            CreateTaskSetupEntry(Task."Task Processor Code", Database::"NPR NpRv Arch. Voucher");
-            CreateTaskSetupEntry(Task."Task Processor Code", Database::"NPR NpRv Voucher Entry");
-        end;
-        if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Sales Orders", Task."Store Code") then begin
-            CreateTaskSetupEntry(Task."Task Processor Code", Database::"Sales Shipment Header");
-            CreateTaskSetupEntry(Task."Task Processor Code", Database::"Return Receipt Header");
-            CreateTaskSetupEntry(Task."Task Processor Code", Database::"Sales Invoice Header");
-            CreateTaskSetupEntry(task."Task Processor Code", Database::"NPR Magento Payment Line");
+        case Task."Table No." of
+            Database::Item,
+            Database::"Item Variant",
+            Database::"Item Reference",
+            Database::"Inventory Buffer",
+            Database::"NPR Spfy Tag Update Request",
+            Database::"NPR Spfy Entity Metafield",
+            Database::"NPR Spfy Inventory Level",
+            Database::"NPR Spfy Item Price":
+                CreateTaskSetupEntry(Task."Task Processor Code", Task."Table No.", Codeunit::"NPR Spfy Send Items&Inventory");
+
+            Database::"NPR NpRv Voucher",
+            Database::"NPR NpRv Arch. Voucher",
+            Database::"NPR NpRv Voucher Entry":
+                CreateTaskSetupEntry(Task."Task Processor Code", Task."Table No.", Codeunit::"NPR Spfy Send Voucher");
+
+            Database::"Sales Shipment Header",
+            Database::"Return Receipt Header":
+                CreateTaskSetupEntry(Task."Task Processor Code", Task."Table No.", Codeunit::"NPR Spfy Send Fulfillment");
+
+            Database::"Sales Invoice Header",
+            Database::"NPR Magento Payment Line":
+                CreateTaskSetupEntry(Task."Task Processor Code", Task."Table No.", Codeunit::"NPR Spfy Capture Payment");
         end;
     end;
 
@@ -264,19 +242,23 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
                     if not IsEnabled then
                         IsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Inventory Levels");
                 end;
+
             Database::"Item Variant",
             Database::"Item Reference",
             Database::"NPR Spfy Item Variant Modif.",
             Database::"NPR Spfy Entity Metafield":
                 IsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::Items);
+
             Database::"Stockkeeping Unit",
             Database::"NPR Spfy Inventory Level",
             Database::"Sales Line",
             Database::"Transfer Line",
             Database::"Item Ledger Entry":
                 IsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Inventory Levels");
+
             Database::"NPR Spfy Item Price":
                 IsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Item Prices");
+
             Database::"NPR NpRv Voucher",
             Database::"NPR NpRv Arch. Voucher",
             Database::"NPR NpRv Voucher Entry":

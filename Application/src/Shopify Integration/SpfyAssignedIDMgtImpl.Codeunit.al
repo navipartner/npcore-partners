@@ -63,7 +63,11 @@ codeunit 6184803 "NPR Spfy Assigned ID Mgt Impl."
     begin
         ShopifyAssignedID.Reset();
         if ForUpdate then
+#if not (BC18 or BC19 or BC20 or BC21)
+            ShopifyAssignedID.ReadIsolation := IsolationLevel::UpdLock;
+#else
             ShopifyAssignedID.LockTable();
+#endif
         ShopifyAssignedID.SetCurrentKey("Shopify ID Type", "Shopify ID");
         ShopifyAssignedID.SetRange("Shopify ID Type", ShopifyIDType);
         ShopifyAssignedID.SetRange("Shopify ID", ShopifyID);

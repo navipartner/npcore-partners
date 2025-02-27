@@ -178,12 +178,18 @@
     var
         NaviConnectTaskField: Record "NPR Nc Task Field";
         NcTaskOutput: Record "NPR Nc Task Output";
+#if not BC17
+        SpfyTagMgt: Codeunit "NPR Spfy Tag Mgt.";
+#endif
     begin
         NaviConnectTaskField.SetRange("Task Entry No.", "Entry No.");
         NaviConnectTaskField.DeleteAll();
 
         NcTaskOutput.SetRange("Task Entry No.", "Entry No.");
         NcTaskOutput.DeleteAll();
+
+#if not BC17
+        SpfyTagMgt.RemoveTagUpdateRequests("Entry No.");
+#endif
     end;
 }
-

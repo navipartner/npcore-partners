@@ -16,6 +16,8 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                 SendItemCost(Rec);
             Database::"NPR Spfy Entity Metafield":
                 SendMetafields(Rec);
+            Database::"NPR Spfy Tag Update Request":
+                SendTags(Rec);
             Database::"NPR Spfy Inventory Level":
                 SendShopifyInventoryUpdate(Rec);
             Database::"NPR Spfy Item Price":
@@ -62,6 +64,38 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             Error(GetLastErrorText());
 
         UpdateItemWithDataFromShopify(NcTask, ShopifyResponse, false);
+    end;
+
+    local procedure SendTags(var NcTask: Record "NPR Nc Task")
+    var
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+        TagUpdateErrors: JsonToken;
+        ShopifyResponse: JsonToken;
+        SendToShopify: Boolean;
+        Success: Boolean;
+    begin
+        Clear(NcTask."Data Output");
+        Clear(NcTask.Response);
+        ClearLastError();
+        Success := true;
+
+        PrepareTagUpdateRequest(NcTask, SendToShopify);
+        if SendToShopify then
+            Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse);
+
+        NcTask.Modify();
+        Commit();
+
+        if not Success then
+            Error(GetLastErrorText());
+        if ShopifyResponse.SelectToken('data.tagsRemove.userErrors', TagUpdateErrors) then
+            if TagUpdateErrors.IsArray() then
+                if TagUpdateErrors.AsArray().Count() > 0 then
+                    Error('');
+        if ShopifyResponse.SelectToken('data.tagsAdd.userErrors', TagUpdateErrors) then
+            if TagUpdateErrors.IsArray() then
+                if TagUpdateErrors.AsArray().Count() > 0 then
+                    Error('');
     end;
 
     local procedure SendItemVariant(var NcTask: Record "NPR Nc Task")
@@ -406,6 +440,21 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         RequestJObject.Add('product', ProductJObject);
         NcTask."Data Output".CreateOutStream(OStream);
         RequestJObject.WriteTo(OStream);
+    end;
+
+    local procedure PrepareTagUpdateRequest(var NcTask: Record "NPR Nc Task"; var SendToShopify: Boolean)
+    var
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        SpfyTagMgt: Codeunit "NPR Spfy Tag Mgt.";
+        QueryStream: OutStream;
+        ShopifyProductID: Text[30];
+        ShopifyProductIdEmptyErr: Label 'The item has not yet been synced with Shopify. The tags will be sent when the item is synced.';
+    begin
+        ShopifyProductID := SpfyAssignedIDMgt.GetAssignedShopifyID(NcTask."Record ID", "NPR Spfy ID Type"::"Entry ID");
+        if ShopifyProductID = '' then
+            Error(ShopifyProductIdEmptyErr);
+        NcTask."Data Output".CreateOutStream(QueryStream);
+        SendToShopify := SpfyTagMgt.ShopifyEntityTagsUpdateQuery(NcTask, Enum::"NPR Spfy Tag Owner Type"::PRODUCT, ShopifyProductID, QueryStream);
     end;
 
     local procedure PrepareItemVariantUpdateRequest(var NcTask: Record "NPR Nc Task"; var ItemVariant: Record "Item Variant"; var ShopifyItemID: Text[30]; var ShopifyVariantID: Text[30]): Boolean
