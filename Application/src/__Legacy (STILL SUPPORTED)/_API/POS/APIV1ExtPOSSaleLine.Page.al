@@ -223,8 +223,10 @@ page 6059788 "NPR APIV1 - Ext. POS Sale Line"
 
                 part(externalPosEftLine; "NPR APIV1 - Ext. POS EFT Line")
                 {
+#if BC17
+                    CaptionML = ENU = 'Multiplicity=ZeroOrOne';
+#else
                     Caption = 'External Pos Sale Line', Locked = true;
-#if not BC17
                     Multiplicity = ZeroOrOne;
 #endif
                     EntityName = 'externalPosEftLine';
