@@ -105,7 +105,8 @@ table 6150955 "NPR Emergency mPOS Setup"
         Setup.Add('Payment_Currency', GeneralLedgerSetup."LCY Code");
 
         if (EnvironmentInformation.IsOnPrem()) then begin
-            Setup.Add('Bc_OnPremWebServiceUrl', GetUrl(ClientType::Default));
+            Setup.Add('Bc_OnPremOdataV4WebServiceUrl', GetUrl(ClientType::ODataV4));
+            Setup.Add('Bc_OnPremAPIWebServiceUrl', GetUrl(ClientType::Api));
             Setup.Add('Bc_ProductType', 'Buisness_Central_OnPrem');
             Setup.Add('Bc_AuthType', 'BasicAuth');
             Setup.Add('Bc_TenantId', TenantId());
