@@ -173,7 +173,11 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
                 end;
         end;
 
+#if not (BC18 or BC19 or BC20 or BC21)
+        InventoryLevel.ReadIsolation := IsolationLevel::UpdLock;
+#else
         InventoryLevel.LockTable();
+#endif
         InventoryLevel := InventoryLevelParam;
         if not InventoryLevel.Find() then begin
             InventoryLevel.Inventory := StockQty;
@@ -349,7 +353,11 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
             TotalRecNo := TempInventoryLevel.Count();
         end;
 
+#if not (BC18 or BC19 or BC20 or BC21)
+        InventoryLevel.ReadIsolation := IsolationLevel::UpdLock;
+#else
         InventoryLevel.LockTable();
+#endif
         TempInventoryLevel.SetCurrentKey("Shopify Store Code", "Item No.", "Shopify Location ID", "Variant Code");
         if TempInventoryLevel.FindSet() then
             repeat

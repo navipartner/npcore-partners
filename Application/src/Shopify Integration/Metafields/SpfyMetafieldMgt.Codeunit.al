@@ -108,11 +108,12 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
 
     local procedure ShopifyEntityMetafieldsSetRequestQuery(ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type"; ShopifyOwnerID: Text[30]; var OwnerTypeTxt: Text; var QueryStream: OutStream)
     var
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         RequestJson: JsonObject;
         QueryTok: Label 'query GetMetafieldsSet { %1(id: "gid://shopify/%2/%3") { id title metafields(first: 250) { edges { node { id namespace key value compareDigest type definition { id }}}}}}', Locked = true;
     begin
         OwnerTypeTxt := GetOwnerTypeAsText(ShopifyOwnerType);
-        RequestJson.Add('query', StrSubstNo(QueryTok, LowerFirstLetter(OwnerTypeTxt), OwnerTypeTxt, ShopifyOwnerID));
+        RequestJson.Add('query', StrSubstNo(QueryTok, SpfyIntegrationMgt.LowerFirstLetter(OwnerTypeTxt), OwnerTypeTxt, ShopifyOwnerID));
         RequestJson.WriteTo(QueryStream);
     end;
 
@@ -120,6 +121,7 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
     var
         NcTask: Record "NPR Nc Task";
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         QueryStream: OutStream;
         MetafieldsSet: JsonToken;
         ShopifyResponse: JsonToken;
@@ -131,7 +133,7 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
         NcTask."Data Output".CreateOutStream(QueryStream);
         ShopifyEntityMetafieldsSetRequestQuery(ShopifyOwnerType, ShopifyOwnerID, OwnerTypeTxt, QueryStream);
         if SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse) then
-            if ShopifyResponse.SelectToken(StrSubstNo('data.%1.metafields.edges', LowerFirstLetter(OwnerTypeTxt)), MetafieldsSet) then
+            if ShopifyResponse.SelectToken(StrSubstNo('data.%1.metafields.edges', SpfyIntegrationMgt.LowerFirstLetter(OwnerTypeTxt)), MetafieldsSet) then
                 UpdateBCMetafieldData(EntityRecID, ShopifyOwnerType, MetafieldsSet);
     end;
 
@@ -530,13 +532,6 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
     local procedure OwnerTypeEnumValueName(OwnerType: Enum "NPR Spfy Metafield Owner Type") Result: Text
     begin
         OwnerType.Names().Get(OwnerType.Ordinals().IndexOf(OwnerType.AsInteger()), Result);
-    end;
-
-    local procedure LowerFirstLetter(TextStringIn: Text): Text
-    begin
-        if TextStringIn = '' then
-            exit;
-        exit(LowerCase(CopyStr(TextStringIn, 1, 1)) + CopyStr(TextStringIn, 2));
     end;
 
 #if BC18 or BC19 or BC20 or BC21

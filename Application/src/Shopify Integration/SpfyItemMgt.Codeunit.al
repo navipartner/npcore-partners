@@ -73,16 +73,18 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         DataLogSubscriberMgt: Codeunit "NPR Data Log Sub. Mgt.";
         RecRef: RecordRef;
-        CostIsUpdated: Boolean;
         ItemIntegrIsEnabled: Boolean;
         InventoryIntegrIsEnabled: Boolean;
         ProcessRec: Boolean;
         xRecRestored: Boolean;
+        Updated_Cost: Boolean;
+        Updated_Tags: Boolean;
     begin
-        if ((DataLogEntry."Table ID" = Database::Item) and (DataLogEntry."Type of Change" = DataLogEntry."Type of Change"::Delete)) or
+        if ((DataLogEntry."Table ID" = Database::Item) and
+            (DataLogEntry."Type of Change" in [DataLogEntry."Type of Change"::Insert, DataLogEntry."Type of Change"::Delete])) or
            (DataLogEntry."Type of Change" = DataLogEntry."Type of Change"::Rename)
         then
-            exit;  //Renames and deletes of Shopify syncronized items are not allowed; Renames of related tables are not processed
+            exit;  //Renames and deletes of Shopify syncronized items are not allowed; Renames of related tables are not processed; New items are processed when integration is enabled for the item in the Store Item Link table
 
         ItemIntegrIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::Items);
         InventoryIntegrIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Inventory Levels");
@@ -119,26 +121,34 @@ codeunit 6184812 "NPR Spfy Item Mgt."
                 Item := xItem;
 
         if ItemIntegrIsEnabled then begin
-            CostIsUpdated := Item."Last Direct Cost" <> xItem."Last Direct Cost";
-            repeat
-                if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items, SpfyStoreItemLink."Shopify Store Code") then begin
-                    TaskCreated := ScheduleItemSync(DataLogEntry, Item, SpfyStoreItemLink) or TaskCreated;
-                    if (DataLogEntry."Type of Change" = DataLogEntry."Type of Change"::Insert) or
-                       ((DataLogEntry."Type of Change" = DataLogEntry."Type of Change"::Modify) and CostIsUpdated)
-                    then
-                        TaskCreated := ScheduleCostSync(SpfyStoreItemLink."Shopify Store Code", Item) or TaskCreated;
-                end;
-            until SpfyStoreItemLink.Next() = 0;
+            if (DataLogEntry."Table ID" = Database::Item) and (DataLogEntry."Type of Change" = DataLogEntry."Type of Change"::Modify) then begin
+                Updated_Cost := Item."Last Direct Cost" <> xItem."Last Direct Cost";
+                Updated_Tags := Item."Item Category Code" <> xItem."Item Category Code";
+            end;
+            if (DataLogEntry."Table ID" = Database::"Item Reference") or Updated_Cost or Updated_Tags then
+                repeat
+                    if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items, SpfyStoreItemLink."Shopify Store Code") then begin
+                        if DataLogEntry."Table ID" = Database::"Item Reference" then
+                            TaskCreated := ScheduleItemSync(DataLogEntry, Item, SpfyStoreItemLink) or TaskCreated;
+                        if Updated_Tags then
+                            TaskCreated := ScheduleTagsSync(SpfyStoreItemLink, Item."Item Category Code", xItem."Item Category Code") or TaskCreated;
+                        if Updated_Cost then
+                            TaskCreated := ScheduleCostSync(SpfyStoreItemLink."Shopify Store Code", Item) or TaskCreated;
+                    end;
+                until SpfyStoreItemLink.Next() = 0;
         end;
 
-        if InventoryIntegrIsEnabled then begin
-            Commit();
-            SpfyStoreItemLink.FindSet();
-            repeat
-                if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels", SpfyStoreItemLink."Shopify Store Code") then
-                    UpdateInventoryLevels(SpfyStoreItemLink);
-            until SpfyStoreItemLink.Next() = 0;
-        end;
+        if InventoryIntegrIsEnabled then
+            if (DataLogEntry."Table ID" = Database::Item) and (DataLogEntry."Type of Change" = DataLogEntry."Type of Change"::Modify) and
+               (Item."NPR Spfy Safety Stock Quantity" <> xItem."NPR Spfy Safety Stock Quantity")
+            then begin
+                Commit();
+                SpfyStoreItemLink.FindSet();
+                repeat
+                    if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels", SpfyStoreItemLink."Shopify Store Code") then
+                        UpdateInventoryLevels(SpfyStoreItemLink);
+                until SpfyStoreItemLink.Next() = 0;
+            end;
     end;
 
     local procedure ScheduleItemSync(DataLogEntry: Record "NPR Data Log Record"; Item: Record Item; SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"): Boolean
@@ -311,8 +321,10 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         if ItemIntegrIsEnabled then begin
             DataLogEntry."Type of Change" := DataLogEntry."Type of Change"::Modify;
             TaskCreated := ScheduleItemSync(DataLogEntry, Item, SpfyStoreItemLink);
-            if NewItem then
+            if NewItem then begin
                 TaskCreated := ScheduleCostSync(SpfyStoreItemLink."Shopify Store Code", Item) or TaskCreated;
+                TaskCreated := ScheduleTagsSync(SpfyStoreItemLink, Item."Item Category Code", '') or TaskCreated;
+            end;
         end;
 
         if not (InventoryIntegrIsEnabled or (NewItem and ItemPriceIntegrIsEnabled)) then
@@ -482,6 +494,68 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         InventoryBuffer."Item No." := Item."No.";
         RecRef.GetTable(InventoryBuffer);
         exit(SpfyScheduleSend.InitNcTask(ShopifyStoreCode, RecRef, InventoryBuffer."Item No.", NcTask.Type::Modify, NcTask));
+    end;
+
+    local procedure ScheduleTagsSync(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; ItemCategoryCode: Code[20]; xItemCategoryCode: Code[20]): Boolean
+    var
+        NcTask: Record "NPR Nc Task";
+        TagUpdateRequest: Record "NPR Spfy Tag Update Request";
+        SpfyScheduleSend: Codeunit "NPR Spfy Schedule Send Tasks";
+        RecRef: RecordRef;
+        Updated: Boolean;
+    begin
+        if ItemCategoryCode = xItemCategoryCode then
+            exit;
+#if not (BC18 or BC19 or BC20 or BC21)
+        TagUpdateRequest.ReadIsolation := IsolationLevel::UpdLock;
+#else
+        TagUpdateRequest.LockTable();
+#endif
+        Updated := false;
+        if xItemCategoryCode <> '' then
+            Updated := AddItemCategoryTagUpdateRequests(SpfyStoreItemLink.RecordId(), xItemCategoryCode, TagUpdateRequest.Type::Remove, TagUpdateRequest);
+        if ItemCategoryCode <> '' then
+            Updated := AddItemCategoryTagUpdateRequests(SpfyStoreItemLink.RecordId(), ItemCategoryCode, TagUpdateRequest.Type::"Add", TagUpdateRequest) or Updated;
+        if not Updated then
+            exit(false);
+        RecRef.GetTable(TagUpdateRequest);
+        exit(SpfyScheduleSend.InitNcTask(SpfyStoreItemLink."Shopify Store Code", RecRef, SpfyStoreItemLink.RecordId(), SpfyStoreItemLink."Item No.", NcTask.Type::Modify, 0DT, 0DT, NcTask));
+    end;
+
+    local procedure AddItemCategoryTagUpdateRequests(RecID: RecordId; ItemCategoryCode: Code[20]; Type: Option; var TagUpdateRequest: Record "NPR Spfy Tag Update Request"): Boolean
+    var
+        ItemCategory: Record "Item Category";
+        Updated: Boolean;
+    begin
+        if ItemCategoryCode = '' then
+            exit;
+        if not ItemCategory.Get(ItemCategoryCode) then
+            exit;
+        repeat
+            TagUpdateRequest.SetCurrentKey("Table No.", "BC Record ID", "Tag Value");
+            TagUpdateRequest.SetRange("Table No.", RecID.TableNo());
+            TagUpdateRequest.SetRange("BC Record ID", RecID);
+            TagUpdateRequest.SetRange("Tag Value", ItemCategory.Description);
+            if not TagUpdateRequest.FindFirst() or (TagUpdateRequest."Nc Task Entry No." <> 0) then begin
+                TagUpdateRequest.Init();
+                TagUpdateRequest."Table No." := RecID.TableNo();
+                TagUpdateRequest."BC Record ID" := RecID;
+                TagUpdateRequest.Source := TagUpdateRequest.Source::"Item Category";
+                TagUpdateRequest.Type := Type;
+                TagUpdateRequest."Tag Value" := ItemCategory.Description;
+                TagUpdateRequest."Entry No." := 0;
+                TagUpdateRequest.Insert();
+                Updated := true;
+            end;
+            if (TagUpdateRequest.Type <> Type) or (TagUpdateRequest.Source <> TagUpdateRequest.Source::"Item Category") then begin
+                TagUpdateRequest.Type := Type;
+                TagUpdateRequest.Source := TagUpdateRequest.Source::"Item Category";
+                TagUpdateRequest.Modify();
+                Updated := true;
+            end;
+            ItemCategory.Mark(true);  //prevent infinite loop
+        until not ItemCategory.Get(ItemCategory."Parent Category") or ItemCategory.Mark();
+        exit(Updated);
     end;
 
     procedure GetProductVariantSku(ItemNo: Code[20]; VariantCode: Code[10]): Text

@@ -233,7 +233,7 @@ table 6150810 "NPR Spfy Store"
             DataClassification = CustomerContent;
             OptionMembers = Authorized,Paid,Both;
             OptionCaption = 'Authorized,Paid,Both';
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2025-02-23';
             ObsoleteReason = 'Replaced by table 6151045 "NPR Spfy Allowed Fin. Status"';
         }
