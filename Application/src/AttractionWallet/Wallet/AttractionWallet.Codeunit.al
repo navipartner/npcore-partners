@@ -189,7 +189,7 @@ codeunit 6185062 "NPR AttractionWallet"
             ReservationRequest.SetFilter("Receipt No.", '=%1', SalesTicketNo);
             ReservationRequest.SetFilter("Line No.", '=%1', SaleLineNo);
             ReservationRequest.SetFilter("Primary Request Line", '=%1', true);
-            AddTicketAssets(WalletEntryNoList, SalesItemNo, Item.Description, ReservationRequest);
+            AddTicketAssets(WalletEntryNoList, ReservationRequest);
         end;
 
         WalletCoupon.SetFilter(TriggerOnItemNo, '=%1', SalesItemNo);
@@ -202,7 +202,7 @@ codeunit 6185062 "NPR AttractionWallet"
             InfoCapture.SetCurrentKey("Receipt No.", "Line No.");
             InfoCapture.SetFilter("Receipt No.", '=%1', SalesTicketNo);
             InfoCapture.SetFilter("Line No.", '=%1', SaleLineNo);
-            AddMembershipCardAssets(WalletEntryNoList, SalesItemNo, Item.Description, InfoCapture);
+            AddMembershipCardAssets(WalletEntryNoList, InfoCapture);
         end;
     end;
 
@@ -237,35 +237,47 @@ codeunit 6185062 "NPR AttractionWallet"
 
     internal procedure AddTicketsToWallet(WalletEntryNo: Integer; TicketIds: List of [Guid])
     var
+        TicketId: Guid;
+    begin
+        foreach TicketId in TicketIds do
+            AddTicketToWallet(WalletEntryNo, TicketId);
+    end;
+
+    internal procedure AddTicketToWallet(WalletEntryNo: Integer; TicketId: Guid)
+    var
         WalletAssetLine: Record "NPR WalletAssetLine";
         Ticket: Record "NPR TM Ticket";
-        TicketId: Guid;
         Item: Record Item;
     begin
-        foreach TicketId in TicketIds do begin
-            Ticket.GetBySystemId(TicketId);
-            Item.Get(Ticket."Item No.");
 
+        Ticket.GetBySystemId(TicketId);
+        Item.Get(Ticket."Item No.");
+
+        WalletAssetLine.SetCurrentKey(Type, LineTypeSystemId);
+        WalletAssetLine.SetFilter(Type, '=%1', ENUM::"NPR WalletLineType"::Ticket);
+        WalletAssetLine.SetFilter(LineTypeSystemId, '=%1', Ticket.SystemId);
+        if (not WalletAssetLine.FindFirst()) then begin
             WalletAssetLine.Init();
             WalletAssetLine.TransactionId := GetWalletTransactionId(WalletEntryNo);
             WalletAssetLine.ItemNo := Ticket."Item No.";
             WalletAssetLine.Description := Item.Description;
             WalletAssetLine.TransferControlledBy := ENUM::"NPR WalletRole"::Holder;
             WalletAssetLine.Type := ENUM::"NPR WalletLineType"::Ticket;
-            WalletAssetLine.DocumentNumber := TIcket."Sales Receipt No.";
+            WalletAssetLine.DocumentNumber := Ticket."Sales Receipt No.";
+            if (WalletAssetLine.DocumentNumber = '') then
+                WalletAssetLine.DocumentNumber := Ticket."Sales Header No.";
 
             WalletAssetLine.EntryNo := 0;
             WalletAssetLine.LineTypeSystemId := Ticket.SystemId;
             WalletAssetLine.LineTypeReference := Ticket."External Ticket No.";
             WalletAssetLine.Insert();
-
-            AddAssetToWallet(WalletAssetLine.EntryNo, WalletEntryNo);
         end;
+
+        AddAssetToWallet(WalletAssetLine.EntryNo, WalletEntryNo);
     end;
 
-    local procedure AddTicketAssets(WalletEntryNoList: List of [Integer]; ItemNo: Code[20]; Description: Text[100]; var ReservationRequest: Record "NPR TM Ticket Reservation Req.")
+    local procedure AddTicketAssets(WalletEntryNoList: List of [Integer]; var ReservationRequest: Record "NPR TM Ticket Reservation Req.")
     var
-        WalletAssetLine: Record "NPR WalletAssetLine";
         Ticket: Record "NPR TM Ticket";
         WalletEntryNo: Integer;
         WalletIndex: Integer;
@@ -286,20 +298,7 @@ codeunit 6185062 "NPR AttractionWallet"
                     WalletEntryNoList.Get(WalletIndex + 1, WalletEntryNo);
                     WalletIndex += 1;
 
-                    WalletAssetLine.Init();
-                    WalletAssetLine.TransactionId := GetWalletTransactionId(WalletEntryNo);
-                    WalletAssetLine.ItemNo := ItemNo;
-                    WalletAssetLine.Description := Description;
-                    WalletAssetLine.TransferControlledBy := ENUM::"NPR WalletRole"::Holder;
-                    WalletAssetLine.Type := ENUM::"NPR WalletLineType"::Ticket;
-                    WalletAssetLine.DocumentNumber := TIcket."Sales Receipt No.";
-
-                    WalletAssetLine.EntryNo := 0;
-                    WalletAssetLine.LineTypeSystemId := Ticket.SystemId;
-                    WalletAssetLine.LineTypeReference := Ticket."External Ticket No.";
-                    WalletAssetLine.Insert();
-
-                    AddAssetToWallet(WalletAssetLine.EntryNo, WalletEntryNo);
+                    AddTicketToWallet(WalletEntryNo, Ticket.SystemId);
                 until (Ticket.Next() = 0);
             end;
         until (ReservationRequest.Next() = 0);
@@ -342,20 +341,30 @@ codeunit 6185062 "NPR AttractionWallet"
 
     internal procedure AddMemberCardsToWallet(WalletEntryNo: Integer; MemberCardIds: List of [Guid])
     var
+        MemberCardId: Guid;
+    begin
+        foreach MemberCardId in MemberCardIds do
+            AddMemberCardToWallet(WalletEntryNo, MemberCardId);
+    end;
+
+    internal procedure AddMemberCardToWallet(WalletEntryNo: Integer; MemberCardId: Guid)
+    var
         MembershipCard: Record "NPR MM Member Card";
         WalletAssetLine: Record "NPR WalletAssetLine";
         MembershipEntry: Record "NPR MM Membership Entry";
-        MemberCardId: Guid;
     begin
 
-        foreach MemberCardId in MemberCardIds do begin
-            MembershipCard.GetBySystemId(MemberCardId);
+        MembershipCard.GetBySystemId(MemberCardId);
 
-            MembershipEntry.SetCurrentKey("Membership Entry No.");
-            MembershipEntry.SetFilter("Membership Entry No.", '=%1', MembershipCard."Membership Entry No.");
-            MembershipEntry.SetFilter(Context, '=%1', MembershipEntry.Context::NEW);
-            MembershipEntry.FindFirst();
+        MembershipEntry.SetCurrentKey("Membership Entry No.");
+        MembershipEntry.SetFilter("Membership Entry No.", '=%1', MembershipCard."Membership Entry No.");
+        MembershipEntry.SetFilter(Context, '=%1', MembershipEntry.Context::NEW);
+        MembershipEntry.FindFirst();
 
+        WalletAssetLine.SetCurrentKey(Type, LineTypeSystemId);
+        WalletAssetLine.SetFilter(Type, '=%1', ENUM::"NPR WalletLineType"::MEMBERSHIP);
+        WalletAssetLine.SetFilter(LineTypeSystemId, '=%1', MembershipCard.SystemId);
+        if (not WalletAssetLine.FindFirst()) then begin
             WalletAssetLine.Init();
             WalletAssetLine.TransactionId := GetWalletTransactionId(WalletEntryNo);
             WalletAssetLine.ItemNo := MembershipEntry."Item No.";
@@ -370,16 +379,15 @@ codeunit 6185062 "NPR AttractionWallet"
             WalletAssetLine.LineTypeSystemId := MembershipCard.SystemId;
             WalletAssetLine.LineTypeReference := MembershipCard."External Card No.";
             WalletAssetLine.Insert();
-            AddAssetToWallet(WalletAssetLine.EntryNo, WalletEntryNo);
-        end
+        end;
+
+        AddAssetToWallet(WalletAssetLine.EntryNo, WalletEntryNo);
 
     end;
 
-    local procedure AddMembershipCardAssets(WalletEntryNoList: List of [Integer]; ItemNo: Code[20]; Description: Text[100]; var InfoCapture: Record "NPR MM Member Info Capture")
+    local procedure AddMembershipCardAssets(WalletEntryNoList: List of [Integer]; var InfoCapture: Record "NPR MM Member Info Capture")
     var
         MembershipCard: Record "NPR MM Member Card";
-
-        WalletAssetLine: Record "NPR WalletAssetLine";
         WalletEntryNo: Integer;
         WalletIndex: Integer;
     begin
@@ -395,21 +403,9 @@ codeunit 6185062 "NPR AttractionWallet"
             MembershipCard.SetCurrentKey("Membership Entry No.", "Member Entry No.");
             MembershipCard.SetFilter("Membership Entry No.", '=%1', InfoCapture."Membership Entry No.");
             MembershipCard.SetFilter("Member Entry No.", '=%1', InfoCapture."Member Entry No");
-            if (MembershipCard.FindFirst()) then begin
-                WalletAssetLine.Init();
-                WalletAssetLine.TransactionId := GetWalletTransactionId(WalletEntryNo);
-                WalletAssetLine.ItemNo := ItemNo;
-                WalletAssetLine.Description := Description;
-                WalletAssetLine.TransferControlledBy := ENUM::"NPR WalletRole"::Holder;
-                WalletAssetLine.Type := ENUM::"NPR WalletLineType"::MEMBERSHIP;
-                WalletAssetLine.DocumentNumber := InfoCapture."Receipt No.";
+            if (MembershipCard.FindFirst()) then
+                AddMemberCardToWallet(WalletEntryNo, MembershipCard.SystemId);
 
-                WalletAssetLine.EntryNo := 0;
-                WalletAssetLine.LineTypeSystemId := MembershipCard.SystemId;
-                WalletAssetLine.LineTypeReference := MembershipCard."External Card No.";
-                WalletAssetLine.Insert();
-                AddAssetToWallet(WalletAssetLine.EntryNo, WalletEntryNo);
-            end;
         until (InfoCapture.Next() = 0);
     end;
 
@@ -475,6 +471,7 @@ codeunit 6185062 "NPR AttractionWallet"
         WalletAssetHeader: Record "NPR WalletAssetHeader";
         Wallet: Record "NPR AttractionWallet";
     begin
+
         Wallet.Get(WalletEntryNo);
         WalletAssetHeaderRef.SetCurrentKey(LinkToTableId, LinkToSystemId);
         WalletAssetHeaderRef.SetFilter(LinkToTableId, '=%1', Database::"NPR AttractionWallet");
@@ -487,6 +484,14 @@ codeunit 6185062 "NPR AttractionWallet"
         end;
 
         WalletAssetHeader.Get(WalletAssetHeaderRef.WalletHeaderEntryNo);
+
+        WalletAssetHeaderRef.SetCurrentKey(LinkToTableId, LinkToSystemId);
+        WalletAssetHeaderRef.SetFilter(LinkToTableId, '=%1', TableId);
+        WalletAssetHeaderRef.SetFilter(LinkToSystemId, '=%1', SystemId);
+        WalletAssetHeaderRef.SetFilter(LinkToReference, '=%1', Reference);
+        WalletAssetHeaderRef.SetFilter(WalletHeaderEntryNo, '=%1', WalletAssetHeader.EntryNo);
+        if (not WalletAssetHeaderRef.IsEmpty()) then
+            exit;
 
         Clear(WalletAssetHeaderRef);
         WalletAssetHeaderRef.WalletHeaderEntryNo := WalletAssetHeader.EntryNo;
@@ -612,8 +617,9 @@ codeunit 6185062 "NPR AttractionWallet"
     local procedure AddAssetToWallet(AssetEntryNo: Integer; WalletEntryNo: Integer): Integer
     var
         AttractionWallet: Record "NPR AttractionWallet";
-        WalletAssetLineRef: Record "NPR WalletAssetLineReference";
+        WalletAssetLineRef, WalletAssetLineRefSuperseded : Record "NPR WalletAssetLineReference";
         WalletAssetLine: Record "NPR WalletAssetLine";
+        Superseded: Boolean;
     begin
         if (not WalletAssetLine.Get(AssetEntryNo)) then
             exit;
@@ -621,10 +627,25 @@ codeunit 6185062 "NPR AttractionWallet"
         if (not AttractionWallet.Get(WalletEntryNo)) then
             exit;
 
+        WalletAssetLineRef.SetCurrentKey(WalletAssetLineEntryNo, SupersededBy);
+        WalletAssetLineRefSuperseded.SetFilter(WalletAssetLineEntryNo, '=%1', AssetEntryNo);
+        WalletAssetLineRefSuperseded.SetFilter(SupersededBy, '=%1', 0);
+        WalletAssetLineRefSuperseded.SetFilter(WalletEntryNo, '=%1', WalletEntryNo);
+        if (not WalletAssetLineRefSuperseded.IsEmpty()) then
+            exit; // Asset already added to my wallet
+
+        WalletAssetLineRefSuperseded.SetFilter(WalletEntryNo, '<>%1', WalletEntryNo);
+        Superseded := WalletAssetLineRefSuperseded.FindFirst();
+
         WalletAssetLineRef.EntryNo := 0;
         WalletAssetLineRef.WalletAssetLineEntryNo := WalletAssetLine.EntryNo;
         WalletAssetLineRef.WalletEntryNo := WalletEntryNo;
         WalletAssetLineRef.Insert();
+
+        if (Superseded) then begin
+            WalletAssetLineRefSuperseded.SupersededBy := WalletAssetLineRef.EntryNo;
+            WalletAssetLineRefSuperseded.Modify();
+        end;
 
         exit(WalletAssetLineRef.EntryNo);
     end;
@@ -717,6 +738,8 @@ codeunit 6185062 "NPR AttractionWallet"
         CreateWallet(CreateGuid(), Name, Wallet);
 
         WalletReferenceNumber := Wallet.ReferenceNumber;
+        AddHeaderReference(Wallet.EntryNo, Database::"NPR AttractionWallet", Wallet.SystemId, Wallet.ReferenceNumber);
+
         exit(Wallet.EntryNo);
     end;
 

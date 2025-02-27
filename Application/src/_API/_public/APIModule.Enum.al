@@ -48,5 +48,10 @@ enum 6059812 "NPR API Module" implements "NPR API Module Resolver"
     {
         Implementation = "NPR API Module Resolver" = "NPR ApiSpeedgateResolver";
     }
+
+    value(6248328; attractionWallet)
+    {
+        Implementation = "NPR API Module Resolver" = "NPR AttrWalletModuleResolver";
+    }
 }
 #endif

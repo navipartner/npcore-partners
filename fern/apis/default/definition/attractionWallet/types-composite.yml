@@ -1,0 +1,113 @@
+imports:
+  simpleTypes: ./types-simple.yml
+
+types:
+
+  ## Composite types
+
+  ## Wallet details
+  WalletDetails:
+    docs: 
+      Details of a wallet.
+    properties:
+      walletId: simpleTypes.WalletId
+      referenceNumber: simpleTypes.WalletReferenceNumber
+      description: simpleTypes.Description
+      expiryDatetime: simpleTypes.ExpiryDatetime
+      lastPrintedAt: simpleTypes.LastPrintedAt
+      printCount: simpleTypes.PrintCount
+      assets: optional<list<AssetDetails>>
+    examples:
+      - name: ExampleWalletDetails
+        value:
+          walletId: $simpleTypes.WalletId.ExampleWalletId
+          referenceNumber: $simpleTypes.WalletReferenceNumber.ExampleWalletReferenceNumber
+          description: $simpleTypes.Description.ExampleDescription
+          expiryDatetime: $simpleTypes.ExpiryDatetime.ExampleExpiryDatetime
+          lastPrintedAt: $simpleTypes.LastPrintedAt.ExampleLastPrintedAt
+          printCount: $simpleTypes.PrintCount.ExamplePrintCount
+          assets:
+            - $AssetDetails.ExampleTicket1
+            - $AssetDetails.ExampleMemberCard1
+
+  ## Ticket details
+  AssetDetails:
+    docs:
+      Details of a ticket.
+    properties:
+      id: simpleTypes.Id
+      type: simpleTypes.AssetType
+      assetId: simpleTypes.AssetId
+      itemNo: simpleTypes.AssetItemNo
+      description: simpleTypes.AssetDescription
+      referenceNumber: simpleTypes.AssetReferenceNumber
+      isSuperseded: simpleTypes.AssetIsSuperseded
+      expiryDatetime: optional<simpleTypes.AssetExpiryDatetime>
+    examples:
+      - name: ExampleTicket1
+        value:
+          id: $simpleTypes.Id.ExampleId1
+          type: ticket
+          assetId: $simpleTypes.AssetId.ExampleTicketId1
+          itemNo: $simpleTypes.AssetItemNo.ExampleItemNo
+          description: $simpleTypes.AssetDescription.ExampleTicketDescription
+          referenceNumber: $simpleTypes.AssetReferenceNumber.ExampleTicketReferenceNumber
+          isSuperseded: $simpleTypes.AssetIsSuperseded.ExampleIsSuperseded
+          expiryDatetime: $simpleTypes.AssetExpiryDatetime.ExampleExpiryDatetime
+      - name: ExampleMemberCard1
+        value:
+          id: $simpleTypes.Id.ExampleId2
+          type: membership
+          assetId: $simpleTypes.AssetId.ExampleMemberCardId1
+          itemNo: $simpleTypes.AssetItemNo.ExampleItemNo2
+          description: $simpleTypes.AssetDescription.ExampleMemberCardDescription
+          referenceNumber: $simpleTypes.AssetReferenceNumber.ExampleMemberCardReferenceNumber
+          isSuperseded: $simpleTypes.AssetIsSuperseded.ExampleIsSuperseded
+          expiryDatetime: $simpleTypes.AssetExpiryDatetime.ExampleExpiryDatetime
+
+  AssetHistory:
+    docs: 
+      The history of an asset in a wallet.
+    properties:
+      id: simpleTypes.Id
+      type: simpleTypes.AssetType
+      assetId: simpleTypes.AssetId
+      itemNo: simpleTypes.AssetItemNo
+      description: simpleTypes.AssetDescription
+      referenceNumber: simpleTypes.AssetReferenceNumber
+      transactionId: simpleTypes.AssetTransactionId
+      history: list<AssetHistoryEntry>
+    examples:
+      - name: ExampleAssetHistory
+        value:
+          id: $simpleTypes.Id.ExampleId1
+          type: ticket
+          assetId: $simpleTypes.AssetId.ExampleTicketId1
+          itemNo: $simpleTypes.AssetItemNo.ExampleItemNo
+          description: $simpleTypes.AssetDescription.ExampleTicketDescription
+          referenceNumber: $simpleTypes.AssetReferenceNumber.ExampleTicketReferenceNumber
+          transactionId: $simpleTypes.AssetTransactionId.ExampleTransactionId
+          history:
+            - $AssetHistoryEntry.ExampleAssetHistoryEntry
+
+  AssetHistoryEntry:
+    properties:
+      entryNo: simpleTypes.AssetEntryNo
+      supersededByEntryNo: simpleTypes.AssetSupersededByEntryNo
+      expiryDatetime: simpleTypes.AssetExpiryDatetime
+      walletId: simpleTypes.WalletId
+      walletReferenceNumber: simpleTypes.WalletReferenceNumber
+      walletExpirationDate: simpleTypes.ExpiryDatetime
+      createdAt: simpleTypes.AssetCreatedAt
+      modifiedAt: simpleTypes.AssetModifiedAt
+    examples:
+      - name: ExampleAssetHistoryEntry
+        value:
+          entryNo: $simpleTypes.AssetEntryNo.ExampleEntryNo
+          supersededByEntryNo: 0  # 0 indicates that the asset is not superseded
+          expiryDatetime: $simpleTypes.AssetExpiryDatetime.ExampleExpiryDatetime
+          walletId: $simpleTypes.WalletId.ExampleWalletId
+          walletReferenceNumber: $simpleTypes.WalletReferenceNumber.ExampleWalletReferenceNumber
+          walletExpirationDate: $simpleTypes.ExpiryDatetime.ExampleExpiryDatetime
+          createdAt: $simpleTypes.AssetCreatedAt.ExampleCreatedAt
+          modifiedAt: $simpleTypes.AssetModifiedAt.ExampleModifiedAt

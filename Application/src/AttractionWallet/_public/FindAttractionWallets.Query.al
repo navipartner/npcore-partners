@@ -10,7 +10,18 @@ query 6014491 "NPR FindAttractionWallets"
             column(ReferenceNumber; LinkToReference)
             {
             }
+            column(LinkToTableId; LinkToTableId)
+            {
+            }
+            column(ExpirationDate; ExpirationDate)
+            {
+            }
 
+            column(Count)
+            {
+                // aggregate column to trigger the select distinct
+                Method = Count;
+            }
             dataitem(WalletHeader; "NPR WalletAssetHeader")
             {
                 DataItemLink = EntryNo = WalletAssetHeaderReference.WalletHeaderEntryNo;
