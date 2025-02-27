@@ -1,0 +1,145 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  simpleTypes: ./types-simple.yml
+  compositeTypes: ./types-composite.yml
+  globalApiTypes: ./../global-api-types.yml
+
+service:
+  display-name: Attraction Wallet
+  auth: true
+  base-path: /attractionWallet
+
+  endpoints:
+
+    createWallet:
+      docs: Create a new wallet.
+      display-name: Create Wallet
+      method: POST
+      path: ""
+      request:
+        name: createWallet
+        body: CreateWalletRequest
+      response: compositeTypes.WalletDetails
+      examples:
+        - name: CreateWalletRequest
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          request: $CreateWalletRequest.CreateWalletRequest
+          response:
+            body: $compositeTypes.WalletDetails.ExampleWalletDetails
+
+
+    addToWallet:
+      docs: Add assets to a wallet.
+      display-name: Add to Wallet
+      method: POST
+      path: /{walletId}
+      path-parameters:
+        walletId: simpleTypes.WalletId
+      request:
+        name: addToWallet
+        body: AddToWalletRequest
+      response: compositeTypes.WalletDetails
+      examples:
+        - name: AddToWalletRequest
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            walletId: $simpleTypes.WalletId.ExampleWalletId
+          request: $AddToWalletRequest.AddToWalletRequest
+          response:
+            body: $compositeTypes.WalletDetails.ExampleWalletDetails
+
+    getWallet:
+      docs: Get a wallet by its ID.
+      display-name: Get Wallet
+      method: GET
+      path: /{walletId}
+      path-parameters:
+        walletId: simpleTypes.WalletId
+      request:
+        name: GetWallet
+      response: compositeTypes.WalletDetails
+      examples:
+        - name: GetWallets
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            walletId: $simpleTypes.WalletId.ExampleWalletId
+          response:
+            body: $compositeTypes.WalletDetails.ExampleWalletDetails
+
+    findWallet:
+      docs: Find a wallet by any of its external references.
+      display-name: Find Wallet
+      method: GET
+      path: ""
+      request:
+        name: findWallet
+        query-parameters:
+          referenceNumber: simpleTypes.WalletReferenceNumber
+      response: list<compositeTypes.WalletDetails>
+      examples:
+        - name: FindWallets
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            referenceNumber: $simpleTypes.WalletReferenceNumber.ExampleWalletReferenceNumber
+          response:
+            body: 
+              - $compositeTypes.WalletDetails.ExampleWalletDetails
+
+    assetHistory:
+      docs: Get the history of an asset in a wallet.
+      display-name: Asset History
+      method: GET
+      path: /assetHistory/{assetId}
+      path-parameters:
+        assetId: simpleTypes.AssetId
+      request:
+        name: assetHistory
+      response: compositeTypes.AssetHistory
+      examples:
+        - name: AssetHistory
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            assetId: $simpleTypes.AssetId.ExampleAssetId
+          response:
+            body: $compositeTypes.AssetHistory.ExampleAssetHistory
+
+types:
+
+  CreateWalletRequest:
+    properties:
+      name: simpleTypes.Description
+      tickets: list<simpleTypes.AssetId>
+      memberCards: list<simpleTypes.AssetId>
+    examples:
+      - name: CreateWalletRequest
+        value:
+          name: "My wallet holds my tickets, coupons and vouchers for the event."
+          tickets: 
+            - $simpleTypes.AssetId.ExampleTicketId1
+          memberCards: 
+            - $simpleTypes.AssetId.ExampleMemberCardId1
+
+  AddToWalletRequest:
+    properties:
+      tickets: list<simpleTypes.AssetId>
+      memberCards: list<simpleTypes.AssetId>
+    examples:
+      - name: AddToWalletRequest
+        value:
+          tickets: 
+            - $simpleTypes.AssetId.ExampleTicketId1
+          memberCards: 
+            - $simpleTypes.AssetId.ExampleMemberCardId1

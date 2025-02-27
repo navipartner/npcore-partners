@@ -197,6 +197,15 @@ navigation:
                   - endpoint: speedgate.service-speedgate.tryAdmit
                   - endpoint: speedgate.service-speedgate.admitToken
 
+        - section: Attraction Wallet
+          summary: ./docs/pages/attractionWallet/overview.mdx
+          contents:
+            - attractionWallet.service-attractionWallet:
+                title: Attraction Wallet
+                contents:
+                  - endpoint: attractionWallet.service-attractionWallet.createWallet
+
+
         - section: POS
           summary: ./docs/pages/pos/overview.mdx
           contents:

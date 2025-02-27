@@ -1,0 +1,170 @@
+types:
+  ## Simple types
+
+  WalletId:
+    type: uuid
+    docs: A globally unique identifier for the wallet.
+    examples: 
+      - name: ExampleWalletId
+        value: "a2cbd5bc-5cf4-ef11-b3a1-a1084fe21c78"
+
+  WalletReferenceNumber:
+    type: string
+    docs: The visual reference number associated with the wallet.
+    examples: 
+      - name: ExampleWalletReferenceNumber
+        value: "141234529930210327"
+
+  Description:
+    type: string
+    docs: A human-readable description of the wallet.
+    examples: 
+      - name: ExampleDescription 
+        value: "My wallet holds my tickets, coupons and vouchers for the event."
+
+  ExpiryDatetime:
+    type: string
+    docs: The expiry datetime of the wallet in ISO 8601 format. Use an empty string if not applicable.
+    examples: 
+      - name: ExampleExpiryDatetime
+        value: "2026-12-31T23:59:59Z"
+
+  LastPrintedAt:
+    type: string
+    docs: The datetime when the wallet was last printed in ISO 8601 format. Use an empty string if not applicable.
+    examples: 
+      - name: ExampleLastPrintedAt
+        value: "2026-12-31T23:59:59Z"
+
+  PrintCount:
+    type: integer
+    docs: The number of times the wallet has been printed.
+    examples: 
+      - name: ExamplePrintCount
+        value: 1
+
+  AssetEntryNo:
+    type: integer
+    docs: The internal entry number associated with the asset.
+    examples: 
+      - name: ExampleEntryNo
+        value: 772
+      - name: ExampleEntryNo2
+        value: 774
+
+  AssetSupersededByEntryNo:
+    type: integer
+    docs: The internal entry number of the asset that superseded this asset.
+    examples: 
+      - name: ExampleSupersededByEntryNo
+        value: 773
+
+    
+
+  Id:
+    type: uuid
+    docs: |
+      A unique identifier for this asset line within the wallet. 
+      This identifier is independent of the specific type of asset it represents, ensuring consistency and uniqueness across different asset types.
+    examples: 
+      - name: ExampleId1
+        value: "2c3a84c7-059f-41d3-8033-0d94e08d4b13"
+      - name: ExampleId2
+        value: "7e8f90ab-cdef-1234-5678-90abcdef1234"
+
+  AssetId:
+    type: uuid
+    docs: A globally unique identifier for the asset being referenced (e.g., a ticketId, couponId, voucherId, or memberCardId).
+    examples: 
+      - name: ExampleAssetId
+        value: "2c3a84c7-059f-41d3-8033-0d94e08d4b13"
+      - name: ExampleTicketId1
+        value: "3d4b95d8-16e0-42e4-9b2a-1d95f08d5c14"
+      - name: ExampleTicketId2
+        value: "4e5c06e9-27f1-53f5-ac3b-2e06f19e6d15"
+      - name: ExampleMemberCardId1
+        value: "5f6d17fa-38a2-64a6-bd4c-3f17a20f7e16"
+      - name: ExampleMemberCardId2
+        value: "6a7b8c9d-7e8f-90ab-cdef-1234567890ab"
+
+  AssetTypeEnum:
+    enum:
+      - ticket
+      - coupon
+      - voucher
+      - membership
+
+  AssetType:
+    type: AssetTypeEnum
+    docs: Specifies the type of asset being referenced (e.g., "ticket").
+    examples: 
+      - name: ExampleTicket
+        value: "ticket"
+      - name: ExampleCoupon
+        value: "coupon"
+      - name: ExampleVoucher
+        value: "voucher"
+      - name: ExampleMembership
+        value: "membership"
+
+  AssetItemNo:
+    type: string
+    docs: The item number associated with the asset.
+    examples: 
+      - name: ExampleItemNo
+        value: "31005"
+      - name: ExampleItemNo2
+        value: "320100"
+
+  AssetDescription:
+    type: string
+    docs: A human-readable description of the asset.
+    examples: 
+      - name: ExampleTicketDescription
+        value: "General Admission"
+      - name: ExampleMemberCardDescription
+        value: "Membership Card"
+
+  AssetReferenceNumber:
+    type: string
+    docs: The reference number associated with the asset.
+    examples: 
+      - name: ExampleTicketReferenceNumber
+        value: "ATF-BIL010665L-3"
+      - name: ExampleMemberCardReferenceNumber
+        value: "CARD-FWGEASWFJFD"
+
+  AssetIsSuperseded:
+    type: boolean
+    docs: Indicates whether the asset ownership has been superseded. If the asset has been added to a different wallet, this value is true.
+    examples: 
+      - name: ExampleIsSuperseded
+        value: false
+
+  AssetExpiryDatetime:
+    type: string
+    docs: The expiry datetime of the asset in ISO 8601 format. 
+    examples: 
+      - name: ExampleExpiryDatetime
+        value: "2026-12-31T23:59:59Z"
+
+  AssetTransactionId:
+    type: uuid
+    docs: A globally unique identifier for the transaction associated with the asset.
+    examples: 
+      - name: ExampleTransactionId
+        value: "2c3a84c7-059f-41d3-8033-0d94e08d4b13"
+
+  AssetCreatedAt:
+    type: string
+    docs: The datetime when the asset was created in ISO 8601 format.
+    examples: 
+      - name: ExampleCreatedAt
+        value: "2024-12-31T13:59:59Z"
+
+  AssetModifiedAt:
+    type: string
+    docs: The datetime when the asset was last updated in ISO 8601 format.
+    examples: 
+      - name: ExampleModifiedAt
+        value: "2024-12-31T17:59:59Z"
