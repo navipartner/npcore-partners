@@ -195,6 +195,42 @@
                     end;
                 }
             }
+
+            cuegroup(Coupons)
+            {
+                Caption = 'Coupons';
+                field(CouponItems; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo(Coupons))))
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the list of Coupons.';
+                    Caption = 'Coupons';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
+
+                    trigger OnDrillDown()
+                    begin
+                        Page.Run(Page::"NPR NpDc Coupons");
+                    end;
+                }
+            }
+
+            cuegroup(Vouchers)
+            {
+                Caption = 'Vouchers';
+                field(VoucherItems; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo(Vouchers))))
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the list of Vouchers.';
+                    Caption = 'Vouchers';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
+
+                    trigger OnDrillDown()
+                    begin
+                        Page.Run(Page::"NPR NpRv Vouchers");
+                    end;
+                }
+            }
         }
     }
 
