@@ -112,7 +112,51 @@ enum 6059810 "NPR API Error Code"
     {
         Caption = 'The admission duration has expired.', Locked = true;
     }
+    value(6060036; ticket_blocked)
+    {
+        Caption = 'The ticket is blocked.', Locked = true;
+    }
+    value(6060037; ticket_not_valid_for_suggested_admission)
+    {
+        Caption = 'The ticket is not valid for the suggested admission.', Locked = true;
+    }
+    value(6060038; ticket_not_allowed)
+    {
+        Caption = 'The ticket is not allowed.', Locked = true;
+    }
+    value(6060039; wallet_expired)
+    {
+        Caption = 'The wallet has expired.', Locked = true;
+    }
 
+    value(6060134; member_card_blocked)
+    {
+        Caption = 'Member card is blocked.', Locked = true;
+    }
+
+    value(6060135; member_card_not_allowed)
+    {
+        Caption = 'Member card is not allowed.', Locked = true;
+    }
+
+    value(6060136; member_card_expired)
+    {
+        Caption = 'Member card has expired.', Locked = true;
+    }
+
+    value(6060137; membership_setup_missing_ticket_item)
+    {
+        Caption = 'Membership setup is missing ticket item.', Locked = true;
+    }
+    value(6060138; membership_setup_missing)
+    {
+        Caption = 'Membership setup is missing.', Locked = true;
+    }
+
+    value(6060139; membership_blocked)
+    {
+        Caption = 'Membership is blocked', Locked = true;
+    }
 
     value(6060140; member_unique_id_violation)
     {
