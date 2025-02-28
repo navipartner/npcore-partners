@@ -164,7 +164,7 @@ service:
          the `upgradeMembership` endpoint to execute the upgrade.
       display-name: Get Upgrade Options
       method: GET
-      path: /{membershipId}/upgrade/options
+      path: /{membershipId}/upgradeOptions
       path-parameters:
         membershipId: simpleTypes.MembershipId
       request:
@@ -214,7 +214,7 @@ service:
         endpoint to apply the extension.
       display-name: Get Extend Options
       method: GET
-      path: /{membershipId}/extend/options
+      path: /{membershipId}/extendOptions
       path-parameters:
         membershipId: simpleTypes.MembershipId
       request:
