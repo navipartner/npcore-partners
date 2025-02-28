@@ -168,6 +168,91 @@
                     ApplicationArea = NPRRetail;
                 }
             }
+            group(Ticket)
+            {
+                Caption = 'Ticket';
+                action("Ticket Type")
+                {
+                    Caption = 'Ticket Type';
+                    RunObject = Page "NPR TM Ticket Type";
+                    ToolTip = 'View or edit detailed information about the ticket types such as admission registration, number of series, activation method etc.';
+                    ApplicationArea = NPRRetail;
+                }
+                action(TicketItems)
+                {
+                    Caption = 'Ticket Items';
+                    RunObject = Page "NPR TM Ticket Item List";
+                    ToolTip = 'View or edit detailed information about the ticket Items, such as the ticket item configuration and constraints, etc.';
+                    ApplicationArea = NPRRetail;
+                }
+
+                action("Ticket BOM")
+                {
+                    Caption = 'Ticket BOM';
+                    RunObject = Page "NPR TM Ticket BOM";
+                    ToolTip = 'View or edit detailed information about the ticket BOMs, such as the admission code, item number, admission entry validation, etc.';
+                    ApplicationArea = NPRRetail;
+                }
+                action("Ticket Schedules")
+                {
+                    Caption = 'Ticket Schedules';
+                    RunObject = Page "NPR TM Ticket Schedules";
+                    ToolTip = 'View or edit detailed information about the ticket schedules such as schedule code and type, start from, recurrence pattern etc.';
+                    ApplicationArea = NPRRetail;
+                }
+                action("Ticket Admissions")
+                {
+                    Caption = 'Ticket Admissions';
+                    RunObject = Page "NPR TM Ticket Admissions";
+                    ToolTip = 'View or edit detailed information about the ticket admissions such as capacity limits, default schedule, capacity control etc.';
+                    ApplicationArea = NPRRetail;
+                }
+                action("Admission Schedule Lines")
+                {
+                    Caption = 'Admission Schedule Lines';
+                    RunObject = Page "NPR TM Admis. Schedule Lines";
+                    ToolTip = 'View or edit detailed information about the admission schedule lines such as admission code, schedule code, process order, scheduled start time and stop time etc.';
+                    ApplicationArea = NPRRetail;
+                }
+            }
+            group(Coupon)
+            {
+                Caption = 'Coupon';
+                action(CouponSetup)
+                {
+                    Caption = 'Coupon Setup';
+                    RunObject = Page "NPR NpDc Coupon Setup";
+                    ToolTip = 'View or edit detailed information about the coupon setups such as coupon type, coupon code, coupon value etc.';
+                    ApplicationArea = NPRRetail;
+                }
+                action(CouponTypes)
+                {
+                    Caption = 'Coupon Types';
+                    RunObject = Page "NPR NpDc Coupon Types";
+                    ToolTip = 'View or edit detailed information about the coupon types such as coupon type code, description, coupon value etc.';
+                    ApplicationArea = NPRRetail;
+                }
+                action(TicketCouponProfiles)
+                {
+                    Caption = 'Ticket Coupon Profiles';
+                    RunObject = Page "NPR TM CouponProfileList";
+                    ToolTip = 'View or edit detailed information about the ticket coupon profiles such as coupon type, coupon code, coupon value etc.';
+                    ApplicationArea = NPRRetail;
+                }
+            }
+
+            group(Voucher)
+            {
+                Caption = 'Voucher';
+                action(VoucherTypes)
+                {
+                    Caption = 'Voucher Types';
+                    RunObject = Page "NPR NpRv Voucher Types";
+                    ToolTip = 'View or edit detailed information about the voucher types such as voucher type code, description, voucher value etc.';
+                    ApplicationArea = NPRRetail;
+                }
+
+            }
             group(Loyalty)
             {
                 Caption = 'Loyalty';
@@ -238,65 +323,6 @@
                     ApplicationArea = NPRRetail;
                 }
             }
-            group(Ticket)
-            {
-                Caption = 'Ticket';
-                action("Ticket Type")
-                {
-
-                    Caption = 'Ticket Type';
-                    RunObject = Page "NPR TM Ticket Type";
-                    ToolTip = 'View or edit detailed information about the ticket types such as admission registration, number of series, activation method etc.';
-
-                    ApplicationArea = NPRRetail;
-                }
-                action(TicketItems)
-                {
-
-                    Caption = 'Ticket Items';
-                    RunObject = Page "NPR TM Ticket Item List";
-                    ToolTip = 'View or edit detailed information about the ticket Items, such as the ticket item configuration and constraints, etc.';
-
-                    ApplicationArea = NPRRetail;
-                }
-
-                action("Ticket BOM")
-                {
-
-                    Caption = 'Ticket BOM';
-                    RunObject = Page "NPR TM Ticket BOM";
-                    ToolTip = 'View or edit detailed information about the ticket BOMs, such as the admission code, item number, admission entry validation, etc.';
-
-                    ApplicationArea = NPRRetail;
-                }
-                action("Ticket Schedules")
-                {
-
-                    Caption = 'Ticket Schedules';
-                    RunObject = Page "NPR TM Ticket Schedules";
-                    ToolTip = 'View or edit detailed information about the ticket schedules such as schedule code and type, start from, recurrence pattern etc.';
-
-                    ApplicationArea = NPRRetail;
-                }
-                action("Ticket Admissions")
-                {
-
-                    Caption = 'Ticket Admissions';
-                    RunObject = Page "NPR TM Ticket Admissions";
-                    ToolTip = 'View or edit detailed information about the ticket admissions such as capacity limits, default schedule, capacity control etc.';
-
-                    ApplicationArea = NPRRetail;
-                }
-                action("Admission Schedule Lines")
-                {
-
-                    Caption = 'Admission Schedule Lines';
-                    RunObject = Page "NPR TM Admis. Schedule Lines";
-                    ToolTip = 'View or edit detailed information about the admission schedule lines such as admission code, schedule code, process order, scheduled start time and stop time etc.';
-
-                    ApplicationArea = NPRRetail;
-                }
-            }
             group(Restaurant)
             {
                 Caption = 'Restaurant';
@@ -336,16 +362,34 @@
                     Image = PaymentJournal;
                     RunObject = Page "NPR POS Menus";
                     ToolTip = 'View or edit detailed information about the POS menus and related entities like Buttons for each menu.';
-
+                    ApplicationArea = NPRRetail;
+                }
+                action(POSStoreList)
+                {
+                    Caption = 'POS Store List';
+                    RunObject = Page "NPR POS Store List";
+                    ToolTip = 'View or edit detailed information about the POS store list and related entities like store code, description, location etc.';
+                    ApplicationArea = NPRRetail;
+                }
+                action(POSUnitList)
+                {
+                    Caption = 'POS Unit List';
+                    RunObject = Page "NPR POS Unit List";
+                    ToolTip = 'View or edit detailed information about the POS unit list and related entities like unit code, description, location etc.';
+                    ApplicationArea = NPRRetail;
+                }
+                action(POSUserList)
+                {
+                    Caption = 'POS User List';
+                    RunObject = Page "User Setup";
+                    ToolTip = 'View or edit detailed information about the POS user list and related entities like user code, description, location etc.';
                     ApplicationArea = NPRRetail;
                 }
                 action(POSDragonglass)
                 {
-
                     Caption = 'Open POS';
                     RunObject = Codeunit "NPR Open POS Page";
                     ToolTip = 'Opens the POS created to another window.';
-
                     ApplicationArea = NPRRetail;
                 }
             }

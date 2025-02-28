@@ -136,6 +136,19 @@
             FieldClass = FlowField;
             CalcFormula = count("NPR MM Subscr. Payment Request" where("Status" = filter('Rejected'), "Status Change Date" = field("Subs. Date Filter")));
         }
+        field(30; Coupons; Integer)
+        {
+            Caption = 'Coupons';
+            FieldClass = FlowField;
+            CalcFormula = Count("NPR NpDc Coupon");
+        }
+
+        field(41; Vouchers; integer)
+        {
+            Caption = 'Vouchers';
+            FieldClass = FlowField;
+            CalcFormula = count("NPR NpRv Voucher");
+        }
         field(1000; "Subs. Date Filter"; Date)
         {
             Caption = 'Subscriptions Date Filter';
