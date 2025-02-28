@@ -225,6 +225,19 @@
         exit(EFTReceiptText);
     end;
 
+    procedure GetEFTExternalCustomerId(SalesTicketNo: Code[20]; RegisterNo: Code[10]; Started: DateTime; DTDifference: Integer; ExternalCustomerIdProvider: Text[50]): Text[50]
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+    begin
+        EFTTransactionRequest.SetRange("Sales Ticket No.", SalesTicketNo);
+        EFTTransactionRequest.SetRange("Register No.", RegisterNo);
+        EFTTransactionRequest.SetFilter(Started, '%1..%2', Started, Started + DTDifference);
+        EFTTransactionRequest.SetFilter("External Customer ID", '<>%1', '');
+        EFTTransactionRequest.SetRange("External Customer ID Provider", ExternalCustomerIdProvider);
+        if EFTTransactionRequest.FindFirst() then
+            exit(EFTTransactionRequest."External Customer ID");
+    end;
+
     #region Response Handlers
     procedure HandleGenericWorkflowResponse(EftTrxRequest: Record "NPR EFT Transaction Request"; IntegrationRequest: JsonObject; IntegrationResponse: JsonObject; Result: JsonObject)
     var
