@@ -2937,6 +2937,8 @@
         Ticket."External Member Card No." := ReservationRequest."External Member No.";
         Ticket."Sales Receipt No." := ReservationRequest."Receipt No.";
         Ticket."Line No." := ReservationRequest."Line No.";
+        Ticket."Sales Header Type" := Ticket."Sales Header Type"::External;
+        Ticket."Sales Header No." := ReservationRequest."External Order No.";
         Ticket."External Ticket No." := ReservationRequest.PreAssignedTicketNumber;
         Ticket.AmountInclVAT := ReservationRequest.TicketUnitAmountInclVat;
         Ticket.AmountExclVAT := ReservationRequest.TicketUnitAmountExclVat;

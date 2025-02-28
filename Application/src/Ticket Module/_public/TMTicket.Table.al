@@ -104,8 +104,8 @@
         field(61; "Sales Header Type"; Option)
         {
             Caption = 'Sales Header Type';
-            OptionCaption = 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order';
-            OptionMembers = Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order";
+            OptionCaption = 'Quote,Order,Invoice,Credit Memo,Blanket Order,Return Order,External';
+            OptionMembers = Quote,"Order",Invoice,"Credit Memo","Blanket Order","Return Order",External;
             DataClassification = CustomerContent;
         }
         field(62; "Sales Header No."; Code[20])
