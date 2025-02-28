@@ -14,6 +14,7 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt." implements "NPR IPOS Workflow"
         ParameterDiscType_OptionsLbl: Label 'Amount,Percent,None', Locked = true;
         ParameterQuantity_CptLbl: Label 'Quantity';
         ParameterScanReference_CaptLbl: Label 'Scan Reference Nos';
+        ParameterIssueVoucherPerQuantity_CaptLbl: Label 'Issue Voucher per Quantity';
         ParameterVoucherTypeCode_CaptLbl: Label 'Voucher Type Code';
         Text001: Label 'Select Voucher Type';
         Text002: Label 'Issue Retail Vouchers';
@@ -56,6 +57,7 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt." implements "NPR IPOS Workflow"
             ParameterDiscType_OptionCaptionLbl);
         WorkflowConfig.AddIntegerParameter('Quantity', 0, ParameterQuantity_CptLbl, ParameterQuantity_CptLbl);
         WorkflowConfig.AddBooleanParameter('ScanReferenceNos', false, ParameterScanReference_CaptLbl, ParameterScanReference_CaptLbl);
+        WorkflowConfig.AddBooleanParameter('IssueVoucherPerQuantity', false, ParameterIssueVoucherPerQuantity_CaptLbl, ParameterIssueVoucherPerQuantity_CaptLbl);
         WorkflowConfig.AddTextParameter('VoucherTypeCode', '', ParameterVoucherTypeCode_CaptLbl, ParameterVoucherTypeCode_CaptLbl);
     end;
 
@@ -101,8 +103,19 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt." implements "NPR IPOS Workflow"
         Amount: Decimal;
         Discount: Decimal;
         Quantity: Integer;
+        Idx: Integer;
+        StartIdx: Integer;
+        QuantityPerLine: Integer;
         DiscountType: Text;
         CustomReferenceNo: Text;
+        SendToEmail: Text;
+        SendToPhoneNo: Text;
+        IssueVoucherPerQuantity: Boolean;
+        ScanReferenceNos: Boolean;
+        SendMethodPrint: Boolean;
+        SendMethodEmail: Boolean;
+        SendMethodSMS: Boolean;
+        ShouldIssueVoucherPerQuantity: Boolean;
     begin
         Context.SetScopePath('VoucherTypeCode');
         VoucherType.Get(UpperCase(Context.GetString('VoucherTypeCode')));
@@ -115,6 +128,14 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt." implements "NPR IPOS Workflow"
             CustomReferenceNo := '';
         NpRvModuleMgt.OnBeforeIssueVoucherCheckCustomReferenceNo(CustomReferenceNo);
 
+        if not Context.GetBooleanParameter('ScanReferenceNos', ScanReferenceNos) then
+            ScanReferenceNos := false;
+
+        if not Context.GetBooleanParameter('IssueVoucherPerQuantity', IssueVoucherPerQuantity) then
+            IssueVoucherPerQuantity := false;
+
+        ShouldIssueVoucherPerQuantity := not ScanReferenceNos and IssueVoucherPerQuantity;
+
         Context.SetScopeParameters();
         DiscountType := Context.GetString('DiscountType');
         if DiscountType <> '2' then begin
@@ -122,24 +143,45 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt." implements "NPR IPOS Workflow"
             Discount := Context.GetDecimal('discount_input');
         end;
 
-        NpRvModuleMgt.OnBeforeIssueVoucher(VoucherType, Quantity, Amount, DiscountType, Discount);
-
-#pragma warning disable AA0139
-        IssueVoucherMgtB.IssueVoucherCreate(POSSaleLine, TempVoucher, VoucherType, DiscountType, Quantity, Amount, Discount, CustomReferenceNo);
-#pragma warning restore AA0139
-        IssueVoucherMgtB.CreateNpRvSalesLine(POSSale, NpRvSalesLine, TempVoucher, VoucherType, POSSaleLine);
-
-        OnIssueVoucherBeforeNpRvSalesLineModify(POSSale, NpRvSalesLine, TempVoucher, VoucherType, POSSaleLine);
+        if not IssueVoucherPerQuantity then begin
+            StartIdx := Quantity;
+            QuantityPerLine := Quantity;
+        end else begin
+            StartIdx := 1;
+            QuantityPerLine := 1;
+        end;
 
         Context.SetScopeRoot();
-        NpRvSalesLine."Send via Print" := Context.GetBoolean('SendMethodPrint');
-        NpRvSalesLine."Send via E-mail" := Context.GetBoolean('SendMethodEmail');
-        NpRvSalesLine."Send via SMS" := Context.GetBoolean('SendMethodSMS');
-        NpRvSalesLine."E-mail" := CopyStr(Context.GetString('SendToEmail'), 1, MaxStrLen(NpRvSalesLine."E-mail"));
-        NpRvSalesLine."Phone No." := CopyStr(Context.GetString('SendToPhoneNo'), 1, MaxStrLen(NpRvSalesLine."Phone No."));
-        NpRvSalesLine.Modify();
+        SendMethodPrint := Context.GetBoolean('SendMethodPrint');
+        SendMethodEmail := Context.GetBoolean('SendMethodEmail');
+        SendMethodSMS := Context.GetBoolean('SendMethodSMS');
+        SendToEmail := Context.GetString('SendToEmail');
+        SendToPhoneNo := Context.GetString('SendToPhoneNo');
 
-        IssueVoucherMgtB.CreateNpRvSalesLineRef(NpRvSalesLine, TempVoucher);
+
+        for Idx := StartIdx to Quantity do begin
+            TempVoucher.Reset();
+            if not TempVoucher.IsEmpty then
+                TempVoucher.DeleteAll();
+
+            NpRvModuleMgt.OnBeforeIssueVoucher(VoucherType, QuantityPerLine, Quantity, Amount, DiscountType, Discount, ScanReferenceNos, IssueVoucherPerQuantity, ShouldIssueVoucherPerQuantity);
+
+#pragma warning disable AA0139
+            IssueVoucherMgtB.IssueVoucherCreate(POSSaleLine, TempVoucher, VoucherType, DiscountType, QuantityPerLine, Amount, Discount, CustomReferenceNo);
+#pragma warning restore AA0139
+            IssueVoucherMgtB.CreateNpRvSalesLine(POSSale, NpRvSalesLine, TempVoucher, VoucherType, POSSaleLine);
+
+            OnIssueVoucherBeforeNpRvSalesLineModify(POSSale, NpRvSalesLine, TempVoucher, VoucherType, POSSaleLine);
+
+            NpRvSalesLine."Send via Print" := SendMethodPrint;
+            NpRvSalesLine."Send via E-mail" := SendMethodEmail;
+            NpRvSalesLine."Send via SMS" := SendMethodSMS;
+            NpRvSalesLine."E-mail" := CopyStr(SendToEmail, 1, MaxStrLen(NpRvSalesLine."E-mail"));
+            NpRvSalesLine."Phone No." := CopyStr(SendToPhoneNo, 1, MaxStrLen(NpRvSalesLine."Phone No."));
+            NpRvSalesLine.Modify();
+
+            IssueVoucherMgtB.CreateNpRvSalesLineRef(NpRvSalesLine, TempVoucher);
+        end;
     end;
 
     local procedure SelectSendMethod(Context: Codeunit "NPR POS JSON Helper"; POSSale: Codeunit "NPR POS Sale") Response: JsonObject

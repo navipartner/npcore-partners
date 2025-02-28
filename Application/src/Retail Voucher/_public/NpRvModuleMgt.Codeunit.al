@@ -114,7 +114,7 @@
     end;
 
     [IntegrationEvent(false, false)]
-    internal procedure OnBeforeIssueVoucher(VoucherType: Record "NPR NpRv Voucher Type"; var Quantity: Integer; var Amount: Decimal; var DiscountType: Text; var Discount: Decimal)
+    internal procedure OnBeforeIssueVoucher(VoucherType: Record "NPR NpRv Voucher Type"; var QuantityPerLine: Integer; var Quantity: Integer; var Amount: Decimal; var DiscountType: Text; var Discount: Decimal; ScanReferenceNos: Boolean; IssueVoucherPerQuantity: Boolean; ShouldIssueVoucherPerQuantity: Boolean)
     begin
     end;
     #endregion
