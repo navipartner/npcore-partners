@@ -18,6 +18,7 @@ codeunit 6184908 "NPR Adyen Recon. Upgrade"
         UpdateAdyenReconciliationDocumentProcessingStatus();
         UpdateAdyenReconciliationRelation();
         UpdateManuallyMatchedLines();
+        FixMagentoPaymentLines();
     end;
 
     local procedure UpdatePSPReferenceForEFTTrans()
@@ -198,6 +199,50 @@ codeunit 6184908 "NPR Adyen Recon. Upgrade"
                     RecLine.Modify();
                 end;
             until RecLine.Next() = 0;
+
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure FixMagentoPaymentLines()
+    var
+        ReconLine: Record "NPR Adyen Recon. Line";
+        ReconHeader: Record "NPR Adyen Reconciliation Hdr";
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+    begin
+        UpgradeStep := 'FixMagentoPaymentLines';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep)) then
+            exit;
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Adyen Recon. Upgrade', UpgradeStep);
+
+        // Mark all Magento Payments included in the already imported Reconciliaiton documents as not reconciled 
+        ReconLine.Reset();
+        ReconLine.SetFilter(Status, '<>%1&<>%2', ReconLine.Status::"Not to be Posted", ReconLine.Status::Posted);
+        ReconLine.SetFilter("Merchant Account", '%1', '*Ecom*');
+        if ReconLine.FindSet(true) then
+            repeat
+                MagentoPaymentLine.Reset();
+                MagentoPaymentLine.SetRange("Transaction ID", ReconLine."PSP Reference");
+                MagentoPaymentLine.SetRange(Amount, Abs(ReconLine."Amount (LCY)"));
+                MagentoPaymentLine.SetRange(Reconciled, true);
+                if ReconLine."Transaction Type" = ReconLine."Transaction Type"::Refunded then
+                    MagentoPaymentLine.SetFilter("Date Refunded", '<>%1', 0D)
+                else
+                    MagentoPaymentLine.SetRange("Date Refunded", 0D);
+
+                if MagentoPaymentLine.FindFirst() then begin
+                    MagentoPaymentLine.Reconciled := false;
+                    MagentoPaymentLine."Reconciliation Date" := 0D;
+                    MagentoPaymentLine.Modify();
+                    ReconLine.Status := ReconLine.Status::"Failed to Match";
+                    ReconLine.Modify();
+                    if ReconHeader.Get(ReconLine."Document No.") then
+                        if ReconHeader.Status <> ReconHeader.Status::Unmatched then begin
+                            ReconHeader.Status := ReconHeader.Status::Unmatched;
+                            ReconHeader.Modify();
+                        end;
+                end;
+            until ReconLine.Next() = 0;
 
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();

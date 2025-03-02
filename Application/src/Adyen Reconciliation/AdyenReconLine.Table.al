@@ -594,6 +594,14 @@ table 6150874 "NPR Adyen Recon. Line"
             "Amount(AAC)" := "Amount (TCY)";
     end;
 
+    trigger OnDelete()
+    var
+        _AdyenTransactionMatching: Codeunit "NPR Adyen Trans. Matching";
+    begin
+        if Rec.Status in [Rec.Status::Matched, Rec.Status::"Matched Manually", Rec.Status::Reconciled] then
+            _AdyenTransactionMatching.RevertPaymentReconciliation(Rec, Rec."Matching Table Name");
+    end;
+
     internal procedure IsPosted(RecalcFlowFields: Boolean): Boolean
     begin
         if RecalcFlowFields then

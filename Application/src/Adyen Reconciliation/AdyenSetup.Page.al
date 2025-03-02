@@ -266,6 +266,30 @@ page 6184531 "NPR Adyen Setup"
                         _AdyenManagement.SetReconciledEFTMagentoUpgrade();
                     end;
                 }
+                action("Recreate Recon. Docs")
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Recreate unposted Recon. Docs';
+                    Image = Create;
+                    ToolTip = 'This action will recreate all unposted reconciliation documents and try to match them.';
+
+                    trigger OnAction()
+                    var
+                        ReconHeader: Record "NPR Adyen Reconciliation Hdr";
+                        AdyenRecreateRecDoc: Codeunit "NPR Adyen Recreate Rec. Doc.";
+                    begin
+                        // Recreate all not-yet-posted Reconciliation Documents to import missing Transaction Fee lines
+                        ReconHeader.Reset();
+                        ReconHeader.SetCurrentKey(Status);
+                        ReconHeader.SetFilter(Status, '<>%1', ReconHeader.Status::Posted);
+                        if ReconHeader.FindSet() then begin
+                            repeat
+                                Clear(AdyenRecreateRecDoc);
+                                AdyenRecreateRecDoc.Run(ReconHeader);
+                            until ReconHeader.Next() = 0;
+                        end;
+                    end;
+                }
             }
         }
     }

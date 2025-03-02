@@ -87,17 +87,12 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         if not WebhookRequest.Get(RecHeader."Webhook Request ID") then
             Error(WebhookRequestDoesNotExistLbl, Format(RecHeader."Webhook Request ID"));
 
-        if RecLine.FindSet(true) then
-            RecLine.DeleteAll();
+        if not RecLine.IsEmpty() then
+            RecLine.DeleteAll(true);
 
         GetReportData(WebhookRequest, true);
         InsertedEntryAmount := InsertReconciliationLines(RecHeader."Merchant Account", RecHeader."Batch Number", RecHeader, WebhookRequest);
 
-        /*
-        RecLine.SetRange(Status, RecLine.Status::Posted);
-        if RecLine.FindSet() then
-            DeletedEntryAmount := DeleteDuplicateEntries(RecLine, RecHeader);
-        */
         exit(InsertedEntryAmount);
     end;
 
@@ -631,6 +626,8 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         MagentoPaymentLine.Reset();
         MagentoPaymentLine.SetRange("Transaction ID", ReconciliationLine."PSP Reference");
         MagentoPaymentLine.SetFilter("Payment Gateway Code", FilterPGCodes);
+        MagentoPaymentLine.SetFilter(Amount, '=%1', Abs(ReconciliationLine."Amount (LCY)"));
+
         if not (ReconciliationLine."Transaction Type" in
             [ReconciliationLine."Transaction Type"::Chargeback,
             ReconciliationLine."Transaction Type"::SecondChargeback,
@@ -641,6 +638,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             MagentoPaymentLine.SetRange(Reconciled, false)
         else
             MagentoPaymentLine.SetRange(Reversed, false);
+
         if not MagentoPaymentLine.FindFirst() then
             exit;
 
@@ -1492,30 +1490,18 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         RecLine: Record "NPR Adyen Recon. Line";
     begin
         RecLine.Reset();
+        RecLine.SetRange("Transaction Type", ReconciliationLine."Transaction Type");
+        RecLine.SetRange("Merchant Account", ReconciliationLine."Merchant Account");
+
         if ReconciliationLine."PSP Reference" <> '' then begin
             RecLine.SetRange("PSP Reference", ReconciliationLine."PSP Reference");
-            RecLine.SetRange("Transaction Type", ReconciliationLine."Transaction Type");
             RecLine.SetRange("Amount (TCY)", ReconciliationLine."Amount (TCY)");
-            if RecLine.IsEmpty() then
-                exit(true);
         end else begin
-            case ReconciliationLine."Transaction Type" of
-                ReconciliationLine."Transaction Type"::Fee:
-                    begin
-                        RecLine.SetRange("Modification Reference", ReconciliationLine."Modification Reference");
-                        RecLine.SetRange("Transaction Type", ReconciliationLine."Transaction Type");
-                        RecLine.SetRange("Amount (TCY)", ReconciliationLine."Amount (TCY)");
-                        if RecLine.IsEmpty() then
-                            exit(true);
-                    end;
-                else begin
-                    RecLine.SetRange("Transaction Type", ReconciliationLine."Transaction Type");
-                    RecLine.SetRange("Amount(AAC)", ReconciliationLine."Amount(AAC)");
-                    if RecLine.IsEmpty() then
-                        exit(true);
-                end;
-            end;
+            RecLine.SetRange("Modification Reference", ReconciliationLine."Modification Reference");
+            RecLine.SetRange("Amount(AAC)", ReconciliationLine."Amount(AAC)");
         end;
+        if RecLine.IsEmpty() then
+            exit(true);
     end;
 
     local procedure GetColumnIndex(FieldName: Text; ReportType: Enum "NPR Adyen Report Type"): Integer
@@ -1596,7 +1582,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         Commit();
     end;
 
-    local procedure RevertPaymentReconciliation(ReconciliationLine: Record "NPR Adyen Recon. Line"; MatchingTable: Enum "NPR Adyen Trans. Rec. Table")
+    internal procedure RevertPaymentReconciliation(ReconciliationLine: Record "NPR Adyen Recon. Line"; MatchingTable: Enum "NPR Adyen Trans. Rec. Table")
     var
         EFTTransRequest: Record "NPR EFT Transaction Request";
         MagentoPaymentLine: Record "NPR Magento Payment Line";
@@ -1678,6 +1664,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         MatchValidationPassed: Boolean;
         ManualMatchTransactionError02: Label 'Failed to match with Magento Payment Line (Document Type: %1, Document No.: %2, Document Line No.: %3) because Amounts aren''t equal.';
     begin
+        /*
         if ReconciliationLine."Transaction Type" in
             [ReconciliationLine."Transaction Type"::Chargeback,
             ReconciliationLine."Transaction Type"::SecondChargeback,
@@ -1688,7 +1675,8 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             MatchValidationPassed := Abs(MagentoPaymentLine.Amount) = Abs(ReconciliationLine."Amount (TCY)")
         else
             MatchValidationPassed := MagentoPaymentLine.Amount = ReconciliationLine."Amount (TCY)";
-
+        */
+        MatchValidationPassed := Abs(MagentoPaymentLine.Amount) = Abs(ReconciliationLine."Amount (LCY)"); // "Magento Payment Line" Amount seems to be always positive which causes refunds to fail during matching.
         MatchValidationPassed := MatchValidationPassed and GLSetup.Get() and (GLSetup."LCY Code" = ReconciliationLine."Transaction Currency Code");
 
         if MatchValidationPassed then
