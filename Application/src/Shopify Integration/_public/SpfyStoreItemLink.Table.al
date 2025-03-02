@@ -120,5 +120,15 @@ table 6150811 "NPR Spfy Store-Item Link"
     begin
         Error(RecordCannotBeRenamedErr, Rec.TableCaption);
     end;
+
+    internal procedure SetShopifyDescription(NewShopifyDescription: Text)
+    var
+        OStream: OutStream;
+    begin
+        if "Shopify Description".HasValue() then
+            Clear("Shopify Description");
+        "Shopify Description".CreateOutStream(OStream, TextEncoding::UTF8);
+        OStream.WriteText(NewShopifyDescription);
+    end;
 }
 #endif

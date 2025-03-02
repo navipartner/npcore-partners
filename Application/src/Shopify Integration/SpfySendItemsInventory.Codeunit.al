@@ -31,7 +31,6 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         _JsonHelper: Codeunit "NPR Json Helper";
         _ShopifyInventoryItemID: Text[30];
         _ShopifyProductID: Text[30];
-        _ShopifyProductStatus: Text;
         _ShopifyVariantID: Text[30];
         _InventoryItemIDNotFoundErr: Label 'Shopify Inventory Item ID could not be found for %1=%2, %3=%4 at Shopify Store %5', Comment = '%1 = Item No. fieldcaption, %2 = Item No., %3 = Variant Code fieldcaption, %4 = Variant Code, %5 = Shopify Store Code';
         _QueryingShopifyLbl: Label 'Querying Shopify...';
@@ -718,7 +717,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                     ProductJObject.Add('title', GetItemTitle(Item, SpfyStoreItemLink."Shopify Store Code"));
             if SpfyStoreItemLink."Shopify Description".HasValue() then begin
                 SpfyStoreItemLink.CalcFields("Shopify Description");
-                SpfyStoreItemLink."Shopify Description".CreateInStream(IStream);
+                SpfyStoreItemLink."Shopify Description".CreateInStream(IStream, TextEncoding::UTF8);
                 while not IStream.EOS do begin
                     IStream.ReadText(Line);
                     LongDescription += Line;
@@ -1016,7 +1015,6 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
         ShopifyVariant: JsonToken;
         ShopifyVariants: JsonToken;
-        OStream: OutStream;
         ShopifyItemID: Text[30];
         xShopifyItemID: Text[30];
         ShopifyProductDetailedDescr: Text;
@@ -1045,7 +1043,9 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                 ShopifyResponse.SelectToken('product.variants', ShopifyVariants);  //Raise error
         end;
         ShopifyProductTitle := _JsonHelper.GetJText(ShopifyResponse, 'product.title', MaxStrLen(SpfyStoreItemLink."Shopify Name"), false);
-        ShopifyProductDetailedDescr := _JsonHelper.GetJText(ShopifyResponse, 'product.body_html', false);
+        ShopifyProductDetailedDescr := _JsonHelper.GetJText(ShopifyResponse, 'product.descriptionHtml', false);
+        if ShopifyProductDetailedDescr = '' then
+            ShopifyProductDetailedDescr := _JsonHelper.GetJText(ShopifyResponse, 'product.body_html', false);
         ShopifyProductStatus := _JsonHelper.GetJText(ShopifyResponse, 'product.status', false);
         BCIsNameDescriptionMaster := _SpfyIntegrationMgt.IsSendShopifyNameAndDescription(NcTask."Store Code");
 
@@ -1077,20 +1077,18 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                     if Evaluate(SpfyStoreItemLink."Shopify Status", UpperCase(ShopifyProductStatus)) then;
                 if ((ShopifyProductTitle <> '') or not BCIsNameDescriptionMaster) and (SpfyStoreItemLink."Shopify Name" <> ShopifyProductTitle) then
                     SpfyStoreItemLink."Shopify Name" := CopyStr(ShopifyProductTitle, 1, MaxStrLen(SpfyStoreItemLink."Shopify Name"));
-                if (ShopifyProductDetailedDescr <> '') or not BCIsNameDescriptionMaster then begin
-                    if SpfyStoreItemLink."Shopify Description".HasValue() then
-                        Clear(SpfyStoreItemLink."Shopify Description");
-                    SpfyStoreItemLink."Shopify Description".CreateOutStream(OStream);
-                    OStream.WriteText(ShopifyProductDetailedDescr);
-                end;
+                if (ShopifyProductDetailedDescr <> '') or not BCIsNameDescriptionMaster then
+                    SpfyStoreItemLink.SetShopifyDescription(ShopifyProductDetailedDescr);
 
                 ModifySpfyStoreItemLink(SpfyStoreItemLink, true);
                 xShopifyItemID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
                 SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID", ShopifyItemID, false);
                 UpdateMetafieldsFromShopify(SpfyStoreItemLink, ShopifyItemID);
 
-                if (CalledByWebhook and not xSyncEnabled) or ((xShopifyItemID <> '') and (ShopifyItemID <> xShopifyItemID)) then
+                if (CalledByWebhook and not xSyncEnabled) or ((xShopifyItemID <> '') and (ShopifyItemID <> xShopifyItemID)) then begin
                     RecalculateInventoryLevels(SpfyStoreItemLink);
+                    RecalculatePrices(SpfyStoreItemLink);
+                end;
                 FirstVariant := false;
             end;
             UpdateItemVariant(NcTask."Store Code", ShopifyVariant, ItemVariant);
@@ -1134,8 +1132,10 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
 
         if ((xShopifyVariantID <> '') and (ShopifyVariantID <> xShopifyVariantID)) or
            ((xShopifyInventoryItemID <> '') and (ShopifyInventoryItemID <> xShopifyInventoryItemID))
-        then
+        then begin
             RecalculateInventoryLevels(SpfyStoreItemVariantLink);
+            RecalculatePrices(SpfyStoreItemVariantLink);
+        end;
 
         if ShopifyVariantID <> '' then
             UpdateMetafieldsFromShopify(SpfyStoreItemVariantLink, ShopifyVariantID);
@@ -1167,6 +1167,13 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             Item.SetRange("Variant Filter", SpfyStoreItemLink."Variant Code");
         InventoryLevelMgt.ClearInventoryLevels(SpfyStoreItemLink);
         InventoryLevelMgt.InitializeInventoryLevels(SpfyStoreItemLink."Shopify Store Code", Item, true);
+    end;
+
+    local procedure RecalculatePrices(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link")
+    var
+        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
+    begin
+        SpfyItemMgt.UpdateItemPrices(SpfyStoreItemLink);
     end;
 
     procedure SelectShopifyLocation(ShopifyStoreCode: Code[20]; var SelectedLocationID: Text[30]): Boolean
@@ -1241,8 +1248,8 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         ReceivedShopifyID: Text;
         SkuFilterString: Text;
         Success: Boolean;
-        ProductGraphQLQueryTok: Label '{ products(first: 1, query: "%1") { edges { node { id title }}}}', Locked = true;
-        ProductVariantGraphQLQueryTok: Label '{ productVariants(first: 1, query: "sku:%1") { edges { node { id sku title product { id title status } inventoryItem { id tracked }}}}}', Locked = true;
+        ProductGraphQLQueryTok: Label '{ products(first: 1, query: "%1") {edges{node{id}}}}', Locked = true;
+        ProductVariantGraphQLQueryTok: Label '{ productVariants(first: 1, query: "sku:%1") {edges{node{id product{id} inventoryItem{id}}}}}', Locked = true;
     begin
         if (SpfyStoreItemLink."Item No." = _LastQueriedSpfyStoreItemLink."Item No.") and
            (SpfyStoreItemLink."Variant Code" = _LastQueriedSpfyStoreItemLink."Variant Code") and
@@ -1263,7 +1270,6 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             ReceivedShopifyID :=
                 _JsonHelper.GetJText(ShopifyResponse, '$[''data''].[''productVariants''].[''edges''][0].[''node''].[''product''].[''id'']', false);
             ShopifyProductID := CopyStr(_SpfyIntegrationMgt.RemoveUntil(ReceivedShopifyID, '/'), 1, MaxStrLen(ShopifyProductID));
-            _ShopifyProductStatus := _JsonHelper.GetJText(ShopifyResponse, '$[''data''].[''productVariants''].[''edges''][0].[''node''].[''product''].[''status'']', false);
 
             ReceivedShopifyID :=
                 _JsonHelper.GetJText(ShopifyResponse, '$[''data''].[''productVariants''].[''edges''][0].[''node''].[''id'']', false);
@@ -1326,6 +1332,42 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                 FilterString := FilterString + StrSubstNo(SkuTok, SpfyItemMgt.GetProductVariantSku(ItemVariant."Item No.", ItemVariant.Code));
                 NumberOfVariantsIncluded += 1;
             until (ItemVariant.Next() = 0) or (NumberOfVariantsIncluded >= MaxNumberOfVariants);
+    end;
+
+    local procedure RequestAndUpdateAuxiliaryProductData(var SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; ShopifyProductID: Text[30])
+    var
+        TempNcTask: Record "NPR Nc Task" temporary;
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+        OStream: OutStream;
+        ShopifyResponse: JsonToken;
+        RequestJson: JsonObject;
+        VariablesJson: JsonObject;
+        ReceivedShopifyString: Text;
+        Success: Boolean;
+        QueryTok: Label 'query GetProduct($productID: ID!) {product(id: $productID) {id title status descriptionHtml}}', Locked = true;
+    begin
+        VariablesJson.Add('productID', StrSubstNo('gid://shopify/Product/%1', ShopifyProductID));
+        RequestJson.Add('query', QueryTok);
+        RequestJson.Add('variables', VariablesJson);
+
+        TempNcTask."Store Code" := SpfyStoreItemLink."Shopify Store Code";
+        TempNcTask."Data Output".CreateOutStream(OStream);
+        RequestJson.WriteTo(OStream);
+
+        ClearLastError();
+        Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(TempNcTask, true, ShopifyResponse);
+        if not Success then
+            exit;
+
+        ReceivedShopifyString := _JsonHelper.GetJText(ShopifyResponse, 'data.product.title', false);
+        if ReceivedShopifyString <> '' then
+            SpfyStoreItemLink."Shopify Name" := CopyStr(ReceivedShopifyString, 1, MaxStrLen(SpfyStoreItemLink."Shopify Name"));
+        ReceivedShopifyString := _JsonHelper.GetJText(ShopifyResponse, 'data.product.descriptionHtml', false);
+        if ReceivedShopifyString <> '' then
+            SpfyStoreItemLink.SetShopifyDescription(ReceivedShopifyString);
+        ReceivedShopifyString := _JsonHelper.GetJText(ShopifyResponse, 'data.product.status', false);
+        if ReceivedShopifyString <> '' then
+            if Evaluate(SpfyStoreItemLink."Shopify Status", UpperCase(ReceivedShopifyString)) then;
     end;
 
     local procedure GenerateTmpItemVariantList(Item: Record Item; var ItemVariantOut: Record "Item Variant")
@@ -1411,11 +1453,12 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         SpfyStoreItemVariantLink: Record "NPR Spfy Store-Item Link";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
         SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
         SpfyStoreLinkMgt: Codeunit "NPR Spfy Store Link Mgt.";
         ShopifyInventoryItemID: Text[30];
-        ShopifyItemID: Text[30];
-        xShopifyItemID: Text[30];
+        ShopifyProductID: Text[30];
+        xShopifyProductID: Text[30];
         ShopifyVariantID: Text[30];
         LinkExists: Boolean;
     begin
@@ -1427,8 +1470,8 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         if not LinkExists then
             SpfyStoreItemLink.Init();
 
-        ShopifyItemID := GetShopifyItemID(SpfyStoreItemLink, WithDialog);
-        if ShopifyItemID = '' then begin
+        ShopifyProductID := GetShopifyItemID(SpfyStoreItemLink, WithDialog);
+        if ShopifyProductID = '' then begin
             if not LinkExists and CreateAtShopify then begin
                 SpfyStoreLinkMgt.UpdateStoreItemLinks(Item);
                 LinkExists := SpfyStoreItemLink.Find();
@@ -1448,14 +1491,14 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
 
         SpfyStoreLinkMgt.UpdateStoreItemLinks(Item);
         SpfyStoreItemLink.Find();
-        xShopifyItemID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+        xShopifyProductID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
         SpfyStoreItemVariantLink := SpfyStoreItemLink;
         SpfyStoreItemVariantLink.Type := SpfyStoreItemVariantLink.Type::Variant;
 
         //TODO: refactor for Shopify item integration with master/slave item approach
-        SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID", ShopifyItemID, false);
-        if Evaluate(SpfyStoreItemLink."Shopify Status", UpperCase(_ShopifyProductStatus)) then;
-        SpfyMetafieldMgt.RequestMetafieldValuesFromShopifyAndUpdateBCData(SpfyStoreItemLink.RecordId(), "NPR Spfy Metafield Owner Type"::PRODUCT, ShopifyItemID, SpfyStoreItemLink."Shopify Store Code");
+        SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID", ShopifyProductID, false);
+        RequestAndUpdateAuxiliaryProductData(SpfyStoreItemLink, ShopifyProductID);
+        SpfyMetafieldMgt.RequestMetafieldValuesFromShopifyAndUpdateBCData(SpfyStoreItemLink.RecordId(), "NPR Spfy Metafield Owner Type"::PRODUCT, ShopifyProductID, SpfyStoreItemLink."Shopify Store Code");
 
         ShopifyVariantID := GetShopifyVariantID(SpfyStoreItemVariantLink, false);
         SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy ID Type"::"Entry ID", ShopifyVariantID, false);
@@ -1482,8 +1525,12 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         SpfyStoreItemLink."Synchronization Is Enabled" := true;
         ModifySpfyStoreItemLink(SpfyStoreItemLink, DisableDataLog);
 
-        if (xShopifyItemID <> '') and (ShopifyItemID <> xShopifyItemID) then
+        if (xShopifyProductID <> '') and (ShopifyProductID <> xShopifyProductID) then begin
             RecalculateInventoryLevels(SpfyStoreItemLink);
+            RecalculatePrices(SpfyStoreItemLink);
+        end;
+        if not DisableDataLog then
+            SpfyItemMgt.ScheduleTagsSync(SpfyStoreItemLink, Item."Item Category Code", '');
     end;
 
     local procedure ModifySpfyStoreItemLink(var SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; DisableDataLog: Boolean)

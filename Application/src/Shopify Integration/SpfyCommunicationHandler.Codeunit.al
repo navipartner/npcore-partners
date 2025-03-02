@@ -441,11 +441,9 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         OutStr: OutStream;
     begin
         Content := ResponseMsg.Content();
-
-        clear(NcTask.Response);
-        NcTask.Response.CreateInStream(InStr);
         Content.ReadAs(InStr);
 
+        clear(NcTask.Response);
         NcTask.Response.CreateOutStream(OutStr);
         CopyStream(OutStr, InStr);
     end;

@@ -496,7 +496,7 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         exit(SpfyScheduleSend.InitNcTask(ShopifyStoreCode, RecRef, InventoryBuffer."Item No.", NcTask.Type::Modify, NcTask));
     end;
 
-    local procedure ScheduleTagsSync(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; ItemCategoryCode: Code[20]; xItemCategoryCode: Code[20]): Boolean
+    internal procedure ScheduleTagsSync(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; ItemCategoryCode: Code[20]; xItemCategoryCode: Code[20]): Boolean
     var
         NcTask: Record "NPR Nc Task";
         TagUpdateRequest: Record "NPR Spfy Tag Update Request";
@@ -888,7 +888,7 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         Codeunit.Run(Codeunit::"NPR Spfy Item Recalc.Invt.Lev.", SpfyStoreItemLink);
     end;
 
-    local procedure UpdateItemPrices(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link")
+    internal procedure UpdateItemPrices(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link")
     var
         Item: Record Item;
         ShopifyStore: Record "NPR Spfy Store";
