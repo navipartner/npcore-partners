@@ -1304,6 +1304,20 @@ codeunit 6184796 "NPR Adyen Management"
         InitWebhookSetup(WebhookSetup, WebhookEventFilter, MerchantAccount, AdyenWebhookType);
         CreateWebhook(WebhookSetup);
     end;
+
+    internal procedure DownloadReportData(AdyenWebhookRequest: Record "NPR AF Rec. Webhook Request")
+    var
+        InS: InStream;
+        FileName: Text;
+        ReportHasNoDataLbl: Label 'Webhook request %1 has no Report data!';
+    begin
+        if not AdyenWebhookRequest."Report Data".HasValue() then
+            Error(ReportHasNoDataLbl, AdyenWebhookRequest.ID);
+        AdyenWebhookRequest.CalcFields("Report Data");
+        AdyenWebhookRequest."Report Data".CreateInStream(InS);
+        FileName := AdyenWebhookRequest."Report Name";
+        DownloadFromStream(InS, '', '', '', FileName);
+    end;
     #endregion
 
     var

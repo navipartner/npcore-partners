@@ -223,6 +223,22 @@ page 6184519 "NPR AF Rec. Webhook Requests"
                     Window.Close();
                 end;
             }
+            action("Download original report")
+            {
+                Caption = 'Download original report';
+                ApplicationArea = NPRRetail;
+                Image = Download;
+                Tooltip = 'Running this action will download the original Report Data.';
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+
+                trigger OnAction()
+                begin
+                    _AdyenManagement.DownloadReportData(Rec);
+                end;
+            }
         }
     }
 
