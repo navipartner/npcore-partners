@@ -98,7 +98,7 @@ report 6014527 "NPR Spfy Item Re-sycn Options"
                     field(RegisterChangesInDataLog; RegisterInDataLog)
                     {
                         Caption = 'Register in Data Log';
-                        ToolTip = 'Specifies if you want the change registered in the Data Log. This will trigger item data sending request to Shopify (if item synchronization is enabled), and iventory level recalculation (inventory integration is enabled).';
+                        ToolTip = 'Specifies whether you want the change to be recorded in the Data Log. This may result in a request to update the product data sent to Shopify (if item synchronization is enabled).';
                         ApplicationArea = NPRShopify;
                         Editable = not CreateAtShopify;
 
