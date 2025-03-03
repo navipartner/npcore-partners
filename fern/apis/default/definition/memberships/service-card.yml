@@ -157,6 +157,50 @@ service:
           response:
             body: $WalletSentResponse.ExampleSendToWallet
 
+    blockCard:
+      docs:
+        Block a specific member card from further activity. 
+        This is typically used in scenarios where a member's access needs to be temporarily or permanently disabled. 
+      display-name: Block Card
+      method: POST
+      path: /member/{cardId}/block
+      path-parameters:
+        cardId: simpleTypes.CardId
+      request:
+        name: blockCard
+      response: BlockCardResponse
+      examples:
+        - name: ExampleBlockMember
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            cardId: $simpleTypes.CardId.ExampleCardId
+          response: 
+            body: $BlockCardResponse.ExampleBlockCard
+
+    unblockCard:
+      docs:
+        Unblock a specific member card from a previously blocked state. 
+        This is typically used in scenarios where a member's access needs to be reinstated after being blocked. 
+      display-name: Unblock Card
+      method: POST
+      path: /member/{cardId}/unblock
+      path-parameters:
+        cardId: simpleTypes.CardId
+      request:
+        name: unblockCard
+      response: BlockCardResponse
+      examples:
+        - name: ExampleUnblockMember
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            cardId: $simpleTypes.CardId.ExampleCardId
+          response: 
+            body: $BlockCardResponse.ExampleUnBlockCard
+
 
     # printMemberCard:
     #   docs: Print a member's card
@@ -286,3 +330,16 @@ types:
           landingUrl: "https://example.com"
           androidUrl: "https://example.com/android"
           iosUrl: "https://example.com/ios"
+
+  # Block Member Card Service
+  BlockCardResponse:
+    docs: Response to blocking or unblocking a member card
+    properties:
+      card: compositeTypes.MemberCardEntity
+    examples:
+      - name: ExampleBlockCard
+        value:
+          card: $compositeTypes.MemberCardEntity.ExampleMemberCardBlocked
+      - name: ExampleUnBlockCard
+        value:
+          card: $compositeTypes.MemberCardEntity.ExampleMemberCard
