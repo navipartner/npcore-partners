@@ -409,6 +409,11 @@ page 6150765 "NPR TM Admission Card"
         DisplayTimeZoneName(Rec.TimeZoneNo);
     end;
 
+    trigger OnOpenPage()
+    begin
+        _ManagedByAdmission := true;
+    end;
+
     var
         _CalendarManager: Codeunit "Calendar Management";
         _TMCalendarManager: Codeunit "NPR TMBaseCalendarManager";
