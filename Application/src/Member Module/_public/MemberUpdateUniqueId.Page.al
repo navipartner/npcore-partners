@@ -22,6 +22,8 @@ page 6184962 "NPR MemberUpdateUniqueId"
                     EXT_NO_CHANGE: Label 'Please note that changing the external number requires re-printing of documents where this number is used. Do you want to continue?';
                     Member: Record "NPR MM Member";
                 begin
+                    OnBeforeValidateNewExternalMemberNo(_Community, _SourceMember, _NewExternalMemberNo);
+
                     _ExternalMemberNumberChanged := (_NewExternalMemberNo <> _SourceMember."External Member No.") and (_SourceMember."External Member No." <> '');
                     if (_ExternalMemberNumberChanged) then begin
 
@@ -47,6 +49,8 @@ page 6184962 "NPR MemberUpdateUniqueId"
                 var
                     FirstNameRequired: Label 'First Name is required';
                 begin
+                    OnBeforeValidateNewFirstName(_Community, _SourceMember, _NewFirstName);
+
                     if (_NewFirstName = '') then
                         Error(FirstNameRequired);
 
@@ -67,6 +71,8 @@ page 6184962 "NPR MemberUpdateUniqueId"
                 var
                     EmailRequired: Label 'Email is required';
                 begin
+                    OnBeforeValidateNewEmail(_Community, _SourceMember, _NewEmail);
+
                     if (_NewEmail = '') then
                         Error(EmailRequired);
 
@@ -87,6 +93,9 @@ page 6184962 "NPR MemberUpdateUniqueId"
                 var
                     PhoneNoRequired: Label 'Phone Number is required';
                 begin
+
+                    OnBeforeValidateNewPhoneNumber(_Community, _SourceMember, _NewPhoneNumber);
+
                     if (_NewPhoneNumber = '') then
                         Error(PhoneNoRequired);
 
@@ -232,7 +241,25 @@ page 6184962 "NPR MemberUpdateUniqueId"
         end;
     end;
 
+    [IntegrationEvent(false, false)]
+    procedure OnBeforeValidateNewPhoneNumber(Community: Record "NPR MM Member Community"; Member: Record "NPR MM Member"; var NewPhoneNumber: Text[30])
+    begin
+    end;
 
+    [IntegrationEvent(false, false)]
+    procedure OnBeforeValidateNewEmail(Community: Record "NPR MM Member Community"; Member: Record "NPR MM Member"; var NewEmail: Text[80])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnBeforeValidateNewFirstName(Community: Record "NPR MM Member Community"; Member: Record "NPR MM Member"; var NewFirstName: Text[50])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnBeforeValidateNewExternalMemberNo(Community: Record "NPR MM Member Community"; SourceMember: Record "NPR MM Member"; var NewExternalMemberNo: Code[20])
+    begin
+    end;
 
     var
         _SourceMember: Record "NPR MM Member";
