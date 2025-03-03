@@ -44,6 +44,12 @@
                 {
                     ToolTip = 'Specifies the value of the Pin Code field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    visible = false;
+                }
+                field("Membership Code"; Rec."Membership Code")
+                {
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ToolTip = 'Specifies the value of the Membership Code field';
                 }
                 field("Valid Until"; Rec."Valid Until")
                 {
