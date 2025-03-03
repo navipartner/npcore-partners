@@ -703,8 +703,8 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
     var
         NcTask: Record "NPR Nc Task";
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
+        TypeHelper: Codeunit "Type Helper";
         IStream: InStream;
-        Line: Text;
         LongDescription: Text;
     begin
         if ShopifyItemID <> '' then
@@ -718,10 +718,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             if SpfyStoreItemLink."Shopify Description".HasValue() then begin
                 SpfyStoreItemLink.CalcFields("Shopify Description");
                 SpfyStoreItemLink."Shopify Description".CreateInStream(IStream, TextEncoding::UTF8);
-                while not IStream.EOS do begin
-                    IStream.ReadText(Line);
-                    LongDescription += Line;
-                end;
+                LongDescription := TypeHelper.ReadAsTextWithSeparator(IStream, TypeHelper.CRLFSeparator());
                 if LongDescription <> '' then
                     ProductJObject.Add('body_html', LongDescription);
             end;
