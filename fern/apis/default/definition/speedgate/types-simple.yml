@@ -373,3 +373,10 @@ types:
     examples:
       - name: ExampleBase64Image
         value: SGVsbG8gV29ybGQ=
+
+  HasNotes:
+    type: boolean
+    docs: Indicates if the member has extra information such as notes attached.
+    examples:
+      - name: ExampleHasNotes
+        value: true

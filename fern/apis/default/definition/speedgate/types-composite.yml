@@ -84,6 +84,7 @@ types:
       firstName: optional<simpleTypes.FirstName>
       lastName: optional<simpleTypes.LastName>
       hasPicture: optional<simpleTypes.HasPicture>
+      hasNotes: optional<simpleTypes.HasNotes>
       picture: optional<simpleTypes.Base64Image>
     examples:
       - name: ExampleMemberDetails
@@ -92,6 +93,7 @@ types:
           firstName: $simpleTypes.FirstName.ExampleFirstName
           lastName: $simpleTypes.LastName.ExampleLastName
           hasPicture: $simpleTypes.HasPicture.ExampleHasPicture
+          hasNotes: $simpleTypes.HasNotes.ExampleHasNotes
 
   DocLxCityCardDetails:
     properties:

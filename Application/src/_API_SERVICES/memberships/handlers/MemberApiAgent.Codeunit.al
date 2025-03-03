@@ -58,7 +58,7 @@ codeunit 6248220 "NPR MemberApiAgent"
         ResponseJson: Codeunit "NPR JSON Builder";
     begin
         if (not GetMemberById(Request, 3, Member)) then
-            exit(Response.RespondBadRequest('Invalid member ID'));
+            exit(InvalidMemberIdResponse());
 
         ResponseJson.StartObject()
             .AddObject(StartMemberDTO(ResponseJson, Member, true))
@@ -75,7 +75,7 @@ codeunit 6248220 "NPR MemberApiAgent"
         MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
     begin
         if (not GetMemberById(Request, 3, Member)) then
-            exit(Response.RespondBadRequest('Invalid member ID'));
+            exit(InvalidMemberIdResponse());
 
         MembershipRole.SetFilter("Member Entry No.", '=%1', Member."Entry No.");
         if (not MembershipRole.FindSet()) then
@@ -101,7 +101,7 @@ codeunit 6248220 "NPR MemberApiAgent"
         MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
     begin
         if (not GetMemberById(Request, 3, Member)) then
-            exit(Response.RespondBadRequest('Invalid member ID'));
+            exit(InvalidMemberIdResponse());
 
         MembershipRole.SetFilter("Member Entry No.", '=%1', Member."Entry No.");
         if (not MembershipRole.FindSet()) then
@@ -127,7 +127,7 @@ codeunit 6248220 "NPR MemberApiAgent"
         Base64StringImage: Text;
     begin
         if (not GetMemberById(Request, 3, Member)) then
-            exit(Response.RespondBadRequest('Invalid member ID'));
+            exit(InvalidMemberIdResponse());
 
         if (not Member.Image.HasValue()) then
             exit(Response.RespondBadRequest('Member has no image'));
@@ -151,7 +151,7 @@ codeunit 6248220 "NPR MemberApiAgent"
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
     begin
         if (not GetMemberById(Request, 3, Member)) then
-            exit(Response.RespondBadRequest('Invalid member ID'));
+            exit(InvalidMemberIdResponse());
 
         JObject := Request.BodyJson().AsObject();
         if (not JObject.Get('image', JToken)) then
@@ -209,7 +209,7 @@ codeunit 6248220 "NPR MemberApiAgent"
         ResponseJson: Codeunit "NPR JSON Builder";
     begin
         if (not GetMemberById(Request, 3, Member)) then
-            exit(Response.RespondBadRequest('Invalid member ID'));
+            exit(InvalidMemberIdResponse());
 
         // !Problem when member has multiple community memberships
         MembershipRole.SetFilter("Member Entry No.", '=%1', Member."Entry No.");
@@ -238,7 +238,58 @@ codeunit 6248220 "NPR MemberApiAgent"
 
     end;
 
+    internal procedure GetMemberNotes(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        Member: Record "NPR MM Member";
+    begin
+        if (not GetMemberById(Request, 3, Member)) then
+            exit(InvalidMemberIdResponse());
+
+        exit(Response.RespondOK(MemberNotesDTO(Member).BuildAsArray()));
+
+    end;
+
+    internal procedure AddMemberNote(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        Member: Record "NPR MM Member";
+        RecordLink: Record "Record Link";
+        RecordLinkManagement: Codeunit "Record Link Management";
+        JToken: JsonToken;
+        TitleText: Text;
+        CommentText: Text;
+        Body: JsonObject;
+    begin
+
+        if (not GetMemberById(Request, 3, Member)) then
+            exit(InvalidMemberIdResponse());
+
+        Body := Request.BodyJson().AsObject();
+
+        if (Body.Get('title', JToken)) then
+            TitleText := JToken.AsValue().AsText();
+
+        Body.Get('comment', JToken);
+        CommentText := JToken.AsValue().AsText();
+
+        RecordLink.Get(Member.AddLink('', TitleText));
+        RecordLink.Type := RecordLink.Type::Note;
+        RecordLink."User ID" := CopyStr(UserId, 1, MaxStrLen(RecordLink."User ID"));
+        RecordLinkManagement.WriteNote(RecordLink, CommentText);
+        RecordLink.Modify(true);
+
+        exit(Response.RespondOK(MemberNotesDTO(Member).BuildAsArray()));
+
+    end;
+
+
     // *****************************************
+
+    local procedure InvalidMemberIdResponse() Response: Codeunit "NPR API Response"
+    begin
+        exit(Response.RespondBadRequest('Invalid member ID'));
+    end;
+
+
     internal procedure GetMemberById(var Request: Codeunit "NPR API Request"; PathPosition: Integer; var Member: Record "NPR MM Member"): Boolean
     var
         MemberIdText: Text[50];
@@ -564,7 +615,8 @@ codeunit 6248220 "NPR MemberApiAgent"
             .AddProperty('email', Member."E-Mail Address")
             .AddProperty('phoneNo', Member."Phone No.")
             .AddObject(AddRequiredProperty(ResponseJson, 'birthday', Member.Birthday))
-            .AddProperty('hasPicture', Member.Image.HasValue());
+            .AddProperty('hasPicture', Member.Image.HasValue())
+            .AddProperty('hasNotes', Member.HasLinks());
         exit(ResponseJson);
     end;
 
@@ -649,5 +701,40 @@ codeunit 6248220 "NPR MemberApiAgent"
         ResponseJson.EndArray();
         exit(ResponseJson);
     end;
+
+
+    local procedure MemberNotesDTO(Member: Record "NPR MM Member") ResponseJson: Codeunit "NPR JSON Builder";
+    var
+        RecordLink: Record "Record Link";
+        RecordLinkManagement: Codeunit "Record Link Management";
+
+        CommentText: Text;
+    begin
+        ResponseJson.StartArray();
+
+        RecordLink.SetCurrentKey("Record ID");
+        RecordLink.SetFilter("Record ID", '=%1', Member.RecordId());
+        RecordLink.SetFilter(Type, '=%1', RecordLink.Type::Note);
+        RecordLink.SetAutoCalcFields(Note);
+        if (RecordLink.FindSet()) then begin
+            repeat
+                CommentText := RecordLinkManagement.ReadNote(RecordLink);
+                ResponseJson
+                    .StartObject('note')
+                    .AddProperty('id', Format(RecordLink.SystemId, 0, 4).ToLower())
+                    .AddProperty('title', RecordLink.Description)
+                    .AddProperty('comment', CommentText)
+                    .AddProperty('createdAt', RecordLink.SystemCreatedAt)
+                    .AddProperty('modifiedAt', RecordLink.SystemModifiedAt)
+                    .EndObject();
+
+            until (RecordLink.Next() = 0);
+        end;
+
+        ResponseJson.EndArray();
+        exit(ResponseJson);
+    end;
+
+
 }
 #endif

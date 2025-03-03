@@ -615,10 +615,17 @@ types:
 
   CreatedAt:
     type: datetime
-    docs: Date and time when the membership period was created.
+    docs: Date and time when the entity was created.
     examples:
       - name: ExampleCreatedAt
         value: "2024-09-17T00:00:00"
+
+  ModifiedAt:
+    type: datetime
+    docs: Date and time when the entity was updated.
+    examples:
+      - name: ExampleModifiedAt
+        value: "2024-09-18T00:00:00"
 
   Context:
     type: string
@@ -796,3 +803,32 @@ types:
     examples:
       - name: ExampleAllowMergeOnConflict
         value: 1
+
+
+  NoteTitle:
+    type: string
+    docs: Title of the note.
+    examples:
+      - name: ExampleNoteTitle
+        value: "Important Note"
+
+  NoteComment:
+    type: string
+    docs: Comment of the note.
+    examples:
+      - name: ExampleNoteComment
+        value: "This is the full text describing the content of this important note."
+
+  NoteId:
+    type: uuid
+    docs: Unique identifier for a note.
+    examples:
+      - name: ExampleNoteId
+        value: 12345678-abcd-1234-5678-1234567890ab
+
+  HasNotes:
+    type: boolean
+    docs: Indicates if the member has extra information such as notes attached.
+    examples:
+      - name: ExampleHasNotes
+        value: true

@@ -445,6 +445,7 @@ types:
       memberNumber: simpleTypes.MemberNumber
       blocked: simpleTypes.Blocked
       hasPicture: optional<simpleTypes.HasPicture>
+      hasNotes: optional<simpleTypes.HasNotes>
     examples:
       - name : ExampleMember
         value:
@@ -464,6 +465,7 @@ types:
           email: $simpleTypes.Email.ExampleEmail
           blocked: $simpleTypes.Blocked.ExampleBlocked
           hasPicture: $simpleTypes.HasPicture.ExampleHasPicture
+          hasNotes: $simpleTypes.HasNotes.ExampleHasNotes
       - name : ExampleMemberBlocked
         value:
           memberId: $simpleTypes.MemberId.ExampleMemberId
@@ -482,6 +484,7 @@ types:
           email: $simpleTypes.Email.ExampleEmail
           blocked: $simpleTypes.Blocked.ExampleBlockedTrue
           hasPicture: $simpleTypes.HasPicture.ExampleHasPicture
+          hasNotes: $simpleTypes.HasNotes.ExampleHasNotes
 
   MemberCardEntity:
     docs:
@@ -847,5 +850,26 @@ types:
       itemDescription: simpleTypes.Description
       shortDescription: simpleTypes.Description
       fullDescription: simpleTypes.Description
+
+  Note:
+    docs: |
+      A note is two text fields, title and comment that can be added to a member or membership. 
+      It is used to store additional information or comments about the member or membership.
+    properties:
+      id: simpleTypes.NoteId
+      title: simpleTypes.NoteTitle
+      comment: simpleTypes.NoteComment
+      createdAt: simpleTypes.CreatedAt
+      modifiedAt: simpleTypes.ModifiedAt
+    examples:
+      - name: ExampleNote
+        value:
+          id: $simpleTypes.NoteId.ExampleNoteId
+          title: $simpleTypes.NoteTitle.ExampleNoteTitle
+          comment: $simpleTypes.NoteComment.ExampleNoteComment
+          createdAt: $simpleTypes.CreatedAt.ExampleCreatedAt
+          modifiedAt: $simpleTypes.ModifiedAt.ExampleModifiedAt
+
+      
 
 ###########################
