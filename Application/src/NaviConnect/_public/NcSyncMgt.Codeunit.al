@@ -71,6 +71,7 @@
         FTPConn: Record "NPR FTP Connection";
         NoConLbl: Label 'No FTP Connection is specified.';
         MakeFtpUrlErr: Label 'Creation of directory %1 failed.\\(%2)', Comment = '%1=Foldername;%2=GetLastErrorText()';
+        DataEncoding: TextEncoding;
     begin
         if not ValidFilename(Filename) then
             Error(FileIsNotValidErr, Filename);
@@ -104,7 +105,9 @@
         TempImportEntry."Runtime Error" := false;
         TempImportEntry."Document Source".CreateOutStream(OutStr, TextEncoding::UTF8);
 
-        FileContent := Base64Convert.FromBase64(JToken.AsValue().AsText());
+        DataEncoding := TextEncoding::UTF8;
+        OnBeforeCreateDocumentSourceStream(ImportType, TempImportEntry."Document Name", DataEncoding);
+        FileContent := Base64Convert.FromBase64(JToken.AsValue().AsText(), DataEncoding);
         OutStr.WriteText(FileContent);
 
         if ImportType."Ftp Backup Dir Path" = '' then begin
@@ -726,6 +729,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnCheckIfIsBatchProcessing(Task: Record "NPR Nc Task"; var BatchProcessing: Boolean; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreateDocumentSourceStream(ImportType: Record "NPR Nc Import Type"; DocumentName: Text[100]; var DataEncodeing: TextEncoding)
     begin
     end;
     #endregion events
