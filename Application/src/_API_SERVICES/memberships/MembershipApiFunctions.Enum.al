@@ -35,6 +35,7 @@ enum 6059827 "NPR MembershipApiFunctions"
         Caption = 'Get membership members';
     }
 
+
     value(110; CREATE_MEMBERSHIP)
     {
         Caption = 'Create a new membership';
@@ -104,6 +105,16 @@ enum 6059827 "NPR MembershipApiFunctions"
     value(307; UPDATE_MEMBER)
     {
         Caption = 'Update a member';
+    }
+
+    value(308; GET_MEMBER_NOTES)
+    {
+        Caption = 'Get member notes';
+    }
+
+    value(309; ADD_MEMBER_NOTE)
+    {
+        Caption = 'Add member note';
     }
 
     value(320; GET_CARD_USING_ID)

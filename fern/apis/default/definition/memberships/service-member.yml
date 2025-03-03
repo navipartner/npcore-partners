@@ -31,7 +31,7 @@ service:
         type: AddMemberResponse
         status-code: 201
       examples:
-        - name: ExampleAddMember
+        - name: Example Add Member
           path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
@@ -55,7 +55,7 @@ service:
         name: getMember
       response: GetMemberResponse 
       examples:
-        - name: ExampleGetMember
+        - name: Example Get Member
           path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
@@ -80,7 +80,7 @@ service:
         name: blockMember
       response: BlockMemberResponse
       examples:
-        - name: ExampleBlockMember
+        - name: Example Block Member
           path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
@@ -102,7 +102,7 @@ service:
         name: unblockMember
       response: UnblockMemberResponse
       examples:
-        - name: ExampleUnblockMember
+        - name: Example Unblock Member
           path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
@@ -127,7 +127,7 @@ service:
           allowMergeOnConflict: optional<simpleTypes.AllowMergeOnConflict>
       response: UpdateMemberResponse
       examples:
-        - name: ExampleUpdateMember
+        - name: Example Update Member
           path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
@@ -151,7 +151,7 @@ service:
         name: getMemberImage
       response: GetMemberImageResponse
       examples:
-        - name: ExampleGetMemberImage
+        - name: Example Get Member Image
           path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
@@ -174,7 +174,7 @@ service:
         body: SetMemberImageRequest
       response: SetMemberImageResponse
       examples:
-        - name: ExampleSetMemberImage
+        - name: Example Set Member Image
           path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
@@ -204,7 +204,7 @@ service:
           offset: optional<simpleTypes.Offset>
       response: GetMemberListResponse 
       examples:
-        - name: ExampleFindMembers
+        - name: Example Find Members
           path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
@@ -221,6 +221,54 @@ service:
           response: 
             body: $GetMemberListResponse.ExampleGetMember
 
+    getMemberNotes:
+      docs:
+        Retrieve notes associated with a specific member. 
+        This endpoint returns a list of notes that have been added to a member's profile.
+      display-name: Get Member Notes
+      method: GET
+      path: /member/{memberId}/notes
+      path-parameters:
+        memberId: simpleTypes.MemberId  
+      request:
+        name: "Get Member Notes"
+      response: list<compositeTypes.Note>
+      examples:
+        - name: Example Get Member Notes
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            memberId: $simpleTypes.MemberId.ExampleMemberId
+          response: 
+            body: 
+              - $compositeTypes.Note.ExampleNote
+
+    addMemberNote:
+      docs:
+        Add a note to a specific member's profile.
+        This endpoint allows you to add a note to a member's profile, providing additional context or information about the member.
+        This endpoint returns a list of notes that have been added to a member's profile.
+      display-name: Add Member Note
+      method: POST
+      path: /member/{memberId}/note
+      path-parameters:
+        memberId: simpleTypes.MemberId  
+      request:
+        name: addMemberNotes
+        body: AddNoteRequest
+      response: list<compositeTypes.Note>
+      examples:
+        - name: Example Member Notes
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            memberId: $simpleTypes.MemberId.ExampleMemberId
+          request: $AddNoteRequest.ExampleAddNote
+          response: 
+            body: 
+              - $compositeTypes.Note.ExampleNote
 
 types:
   # Add Member Service
@@ -327,3 +375,14 @@ types:
       - name: ExampleUpdateMember
         value:
           member: $compositeTypes.MemberEntityResponse.ExampleMember
+
+  AddNoteRequest:
+    docs: Request to add a note to a member
+    properties:
+      title: simpleTypes.NoteTitle
+      comment: simpleTypes.NoteComment
+    examples:
+      - name: ExampleAddNote
+        value:
+          title: $simpleTypes.NoteTitle.ExampleNoteTitle
+          comment: $simpleTypes.NoteComment.ExampleNoteComment

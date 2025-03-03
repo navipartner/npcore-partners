@@ -527,7 +527,8 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             ResponseJson
                 .AddProperty('firstName', Member."First Name")
                 .AddProperty('lastName', Member."Last Name")
-                .AddProperty('hasPicture', Member.Image.HasValue());
+                .AddProperty('hasPicture', Member.Image.HasValue())
+                .AddProperty('hasNotes', Member.HasLinks());
 
         if (MemberCardProfileLine.IncludeMemberPhoto) then
             if (MembershipManagement.GetMemberImage(Member."Entry No.", Base64StringImage)) then
@@ -581,6 +582,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
                 .AddProperty('firstName', Member."First Name")
                 .AddProperty('lastName', Member."Last Name")
                 .AddProperty('hasPicture', Member.Image.HasValue())
+                .AddProperty('hasNotes', Member.HasLinks())
             .EndObject()
             .EndObject();
 

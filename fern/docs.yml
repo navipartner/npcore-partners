@@ -143,6 +143,8 @@ navigation:
                   - endpoint: memberships.service-member.findMembers
                   - endpoint: memberships.service-member.blockMember
                   - endpoint: memberships.service-member.unblockMember
+                  - endpoint: memberships.service-member.getMemberNotes
+                  - endpoint: memberships.service-member.addMemberNote
             - memberships.service-card:
                 title: Card
                 summary: ./docs/pages/memberships/card-introduction.mdx

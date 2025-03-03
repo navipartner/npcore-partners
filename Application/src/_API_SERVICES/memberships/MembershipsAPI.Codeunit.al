@@ -70,6 +70,9 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
 
         if (Request.Match('GET', '/membership/member/:memberId/image')) then
             exit(Handle(_ApiFunction::GET_MEMBER_IMAGE, Request));
+
+        if (Request.Match('GET', '/membership/member/:memberId/notes')) then
+            exit(Handle(_ApiFunction::GET_MEMBER_NOTES, Request));
         // ************************************************************
 
         if (Request.Match('POST', '/membership')) then
@@ -109,6 +112,9 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
 
         if (Request.Match('POST', '/membership/member/:memberId/unblock')) then
             exit(Handle(_ApiFunction::UNBLOCK_MEMBER, Request));
+
+        if (Request.Match('POST', '/membership/member/:memberId/note')) then
+            exit(Handle(_ApiFunction::ADD_MEMBER_NOTE, Request));
 
         if (Request.Match('POST', '/membership/card/:cardId/block')) then
             exit(Handle(_ApiFunction::BLOCK_CARD, Request));
