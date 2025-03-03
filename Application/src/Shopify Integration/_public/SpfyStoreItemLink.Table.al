@@ -123,12 +123,28 @@ table 6150811 "NPR Spfy Store-Item Link"
 
     internal procedure SetShopifyDescription(NewShopifyDescription: Text)
     var
+        TempBlob: Codeunit "Temp Blob";
+        IStream: InStream;
         OStream: OutStream;
+        Tb: TextBuilder;
+        ContentLine: Text;
     begin
         if "Shopify Description".HasValue() then
             Clear("Shopify Description");
-        "Shopify Description".CreateOutStream(OStream, TextEncoding::UTF8);
+        if NewShopifyDescription = '' then
+            exit;
+
+        //remove unnecessary line breaks
+        TempBlob.CreateOutStream(OStream, TextEncoding::UTF8);
         OStream.WriteText(NewShopifyDescription);
+        TempBlob.CreateInStream(IStream);
+        while not IStream.EOS do begin
+            IStream.ReadText(ContentLine);
+            Tb.Append(ContentLine);
+        end;
+
+        "Shopify Description".CreateOutStream(OStream, TextEncoding::UTF8);
+        OStream.WriteText(Tb.ToText());
     end;
 }
 #endif
