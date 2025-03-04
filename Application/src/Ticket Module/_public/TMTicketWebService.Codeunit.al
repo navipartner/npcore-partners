@@ -32,7 +32,7 @@
             exit(false);
         end;
 
-        Ticket.SetFilter("External Ticket No.", '=%1', ExternalTicketNo);
+        Ticket.SetFilter("External Ticket No.", '=%1', CopyStr(ExternalTicketNo, 1, MaxStrLen(Ticket."External Ticket No.")));
         if (Ticket.IsEmpty()) then begin
             // Try Ticket Request Token
             ArrivalSuccess := AttemptTicket.AttemptValidateTicketForArrival("NPR TM TicketIdentifierType"::EXTERNAL_ORDER_REF, ExternalTicketNo, AdmissionCode, -1, '', ScannerStationId, MessageText);
