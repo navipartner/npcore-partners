@@ -5,15 +5,20 @@ codeunit 6185123 "NPR MembershipApiAgent"
 
     internal procedure GetMembershipByNumber(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
-        MembershipNo: Code[20];
+        Number: Code[20];
     begin
 
-        if (not Request.QueryParams().ContainsKey('membershipNumber')) then
-            exit(Response.RespondBadRequest('Membership number is required.'));
+        if (Request.QueryParams().ContainsKey('membershipNumber')) then begin
+            Number := CopyStr(UpperCase(Request.QueryParams().Get('membershipNumber')), 1, MaxStrLen(Number));
+            exit(GetMembershipByNumber(Number));
+        end;
 
-        MembershipNo := CopyStr(UpperCase(Request.QueryParams().Get('membershipNumber')), 1, MaxStrLen(MembershipNo));
+        if (Request.QueryParams().ContainsKey('customerNumber')) then begin
+            Number := CopyStr(UpperCase(Request.QueryParams().Get('customerNumber')), 1, MaxStrLen(Number));
+            exit(GetMembershipByCustomerNumber(Number));
+        end;
 
-        exit(GetMembershipByNumber(MembershipNo));
+        exit(Response.RespondBadRequest('membershipNumber or customerNumber is required.'));
     end;
 
     internal procedure GetMembershipById(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
@@ -181,6 +186,24 @@ codeunit 6185123 "NPR MembershipApiAgent"
     begin
         Membership.SetCurrentKey("External Membership No.");
         Membership.SetFilter("External Membership No.", '=%1', MembershipNumber);
+        if (not Membership.FindFirst()) then
+            exit(Response.RespondResourceNotFound('Membership not found.'));
+
+        ResponseJson.StartObject()
+            .AddObject(StartMembershipDTO(ResponseJson, Membership, false))
+        .EndObject();
+
+        exit(Response.RespondOK(ResponseJson.Build()));
+    end;
+
+    local procedure GetMembershipByCustomerNumber(CustomerNumber: Code[20]) Response: Codeunit "NPR API Response"
+    var
+        Membership: Record "NPR MM Membership";
+        ResponseJson: Codeunit "NPR JSON Builder";
+    begin
+        Membership.SetCurrentKey("Customer No.");
+        Membership.SetFilter("Customer No.", '=%1', CustomerNumber);
+        Membership.SetFilter("Blocked", '=%1', false);
         if (not Membership.FindFirst()) then
             exit(Response.RespondResourceNotFound('Membership not found.'));
 
