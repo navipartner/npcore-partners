@@ -352,30 +352,26 @@
             AvgBasket := 0;
     end;
 
-    procedure GetissuedTicketToday(var AvgIssued: Text[250])
+    procedure GetIssuedTicketToday(var AvgIssued: Text[250])
     var
-        TMTicketType: Record "NPR TM Ticket";
+        Ticket: Record "NPR TM Ticket";
+        TicketCountLabel: Label 'Tickets issued today: %1';
     begin
-        TMTicketType.Reset();
-        TMTicketType.SetRange("Document Date", Today);
-        AvgIssued := 'Ticket issued for today is ' + Format(TMTicketType.Count());
-    end;
-
-    procedure GetTicketAdmissionToday(var AvgAdmission: Text[250])
-    var
-        TMAdmissionScheduleLines: Record "NPR TM Admis. Schedule Lines";
-    begin
-        TMAdmissionScheduleLines.Reset();
-        AvgAdmission := 'Ticket admission for day is ' + Format(TMAdmissionScheduleLines.Count());
+        Ticket.Reset();
+        Ticket.SetCurrentKey("Document Date");
+        Ticket.SetFilter("Document Date", '=%1', Today());
+        AvgIssued := StrSubstNo(TicketCountLabel, Format(Ticket.Count()));
     end;
 
     procedure GetMembersCreatedToday(var AvgMember: Text[250])
     var
-        MMMember: Record "NPR MM Membership";
+        Membership: Record "NPR MM Membership";
+        MemberCountLabel: Label 'Memberships activated today: %1';
     begin
-        MMMember.Reset();
-        MMMember.SetRange("Issued Date", Today);
-        AvgMember := 'No of new member for today is ' + Format(MMMember.Count());
+        Membership.Reset();
+        Membership.SetCurrentKey("Issued Date");
+        Membership.SetFilter("Issued Date", '=%1', Today());
+        AvgMember := StrSubstNo(MemberCountLabel, Format(Membership.Count()));
     end;
 
     procedure DrillDownSalesThisMonthLastYear()

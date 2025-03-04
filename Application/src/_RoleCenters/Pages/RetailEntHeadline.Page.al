@@ -22,18 +22,6 @@
                     ApplicationArea = NPRRetail;
                 }
             }
-            group(Control3)
-            {
-                ShowCaption = false;
-                field("Ticket Admissions"; TicketAdmission)
-                {
-
-
-                    Editable = false;
-                    ToolTip = 'Specifies the number of the ticket admissions.';
-                    ApplicationArea = NPRRetail;
-                }
-            }
             group(Control6)
             {
                 ShowCaption = false;
@@ -70,14 +58,10 @@
             Rec.Modify();
 
         HeadlineManagement.GetUserGreetingText(GreetingText);
-
-
+        HeadlineManagement.GetMembersCreatedToday(MembersCreated);
+        HeadlineManagement.GetIssuedTicketToday(IssuedTicketText);
 
         DocumentationText := StrSubstNo(DocumentationTxt, PRODUCTNAME.Short());
-
-        HeadlineManagement.GetTicketAdmissionToday(TicketAdmission);
-        HeadlineManagement.GetMembersCreatedToday(MembersCreated);
-        HeadlineManagement.GetissuedTicketToday(IssuedTicketText);
 
         if Uninitialized then
             // table is uninitialized because of permission issues. OnAfterGetRecord won't be called
@@ -92,7 +76,6 @@
         GreetingText: Text;
         DocumentationText: Text[250];
         IssuedTicketText: Text[250];
-        TicketAdmission: Text[250];
         MembersCreated: Text[250];
 
 

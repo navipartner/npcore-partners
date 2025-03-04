@@ -201,6 +201,9 @@
         key(Key7; "External Member Card No.", "Item No.", "Variant Code", "Document Date")
         {
         }
+
+        key(key8; "Document Date")
+        { }
     }
 
     fieldgroups
