@@ -271,6 +271,10 @@
         key(Key4; "External Membership No.")
         {
         }
+        key(Key5; "Issued Date")
+        {
+        }
+
     }
 
     fieldgroups
