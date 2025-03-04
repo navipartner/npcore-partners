@@ -874,7 +874,7 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         RequestJson.Add('variables', variablesJson.AsToken().AsObject());
         Clear(TempNcTask);
         TempNcTask."Store Code" := SpfyStoreItemLink."Shopify Store Code";
-        TempNcTask."Data Output".CreateOutStream(OStream);
+        TempNcTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
         RequestJson.WriteTo(OStream);
 
         ClearLastError();

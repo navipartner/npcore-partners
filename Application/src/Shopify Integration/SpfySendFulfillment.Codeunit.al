@@ -209,18 +209,18 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
 
     local procedure GenerateFulfillmentPayloadJson(var NcTask: Record "NPR Nc Task"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Entry" temporary; var SendToShopify: Boolean)
     var
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         ItemsByFulfillmentOrder: JsonArray;
         OrderLines: JsonArray;
         ChildJObject: JsonObject;
         JObject: JsonObject;
         OutStr: OutStream;
-        NoFulfillmentAvailableErr: Label 'No Shopify fulfillment order lines are available to process';
+        NoFulfillmentAvailableErr: Label 'There are no Shopify fulfillment order lines available to process. Everything may have already been fulfilled. Please check fulfillment status in Shopify.';
         ShipmentPostedMsg: Label 'BC: the packages has been successfully shipped';
     begin
         SendToShopify := false;
         if CalculatedFulfillmentLines.IsEmpty() then begin
-            NcTask."Data Output".CreateOutStream(OutStr);
-            OutStr.WriteText(NoFulfillmentAvailableErr);
+            SpfyIntegrationMgt.SetResponse(NcTask, NoFulfillmentAvailableErr);
             exit;
         end;
 
@@ -249,7 +249,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         ChildJObject.Add('line_items_by_fulfillment_order', ItemsByFulfillmentOrder);
 
         JObject.Add('fulfillment', ChildJObject);
-        NcTask."Data Output".CreateOutStream(OutStr);
+        NcTask."Data Output".CreateOutStream(OutStr, TextEncoding::UTF8);
         JObject.WriteTo(OutStr);
         SendToShopify := true;
     end;

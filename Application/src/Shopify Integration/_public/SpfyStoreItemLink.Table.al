@@ -137,7 +137,7 @@ table 6150811 "NPR Spfy Store-Item Link"
         //remove unnecessary line breaks
         TempBlob.CreateOutStream(OStream, TextEncoding::UTF8);
         OStream.WriteText(NewShopifyDescription);
-        TempBlob.CreateInStream(IStream);
+        TempBlob.CreateInStream(IStream, TextEncoding::UTF8);
         while not IStream.EOS do begin
             IStream.ReadText(ContentLine);
             Tb.Append(ContentLine);

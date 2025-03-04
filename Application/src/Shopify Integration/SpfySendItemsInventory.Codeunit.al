@@ -360,7 +360,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         NcTask."Last Processing Duration" := (NcTask."Last Processing Completed at" - NcTask."Last Processing Started at") / 1000;
         NcTask.Postponed := false;
         NcTask."Postponed At" := 0DT;
-        NcTask.Response.CreateOutStream(OStream);
+        NcTask.Response.CreateOutStream(OStream, TextEncoding::UTF8);
         if ErrorText = '' then begin
             ShopifyResponse.WriteTo(ShopifyResponseText);
             OStream.WriteText(ShopifyResponseText);
@@ -437,7 +437,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         ProductJObject.Add('variants', ProductVariantsJArray);
 
         RequestJObject.Add('product', ProductJObject);
-        NcTask."Data Output".CreateOutStream(OStream);
+        NcTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
         RequestJObject.WriteTo(OStream);
     end;
 
@@ -452,7 +452,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         ShopifyProductID := SpfyAssignedIDMgt.GetAssignedShopifyID(NcTask."Record ID", "NPR Spfy ID Type"::"Entry ID");
         if ShopifyProductID = '' then
             Error(ShopifyProductIdEmptyErr);
-        NcTask."Data Output".CreateOutStream(QueryStream);
+        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
         SendToShopify := SpfyTagMgt.ShopifyEntityTagsUpdateQuery(NcTask, Enum::"NPR Spfy Tag Owner Type"::PRODUCT, ShopifyProductID, QueryStream);
     end;
 
@@ -473,11 +473,11 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         RecRef := NcTask."Record ID".GetRecord();
         RecRef.SetTable(ItemVariant);
         if not ItemVariant.Find() and (NcTask.Type <> NcTask.Type::Delete) then begin
-            SetResponse(NcTask, StrSubstNo(ItemVariantDoesNotExistErr, ItemVariant."Item No.", ItemVariant.Code));
+            _SpfyIntegrationMgt.SetResponse(NcTask, StrSubstNo(ItemVariantDoesNotExistErr, ItemVariant."Item No.", ItemVariant.Code));
             exit(false);
         end;
         if not Item.Get(ItemVariant."Item No.") then begin
-            SetResponse(NcTask, StrSubstNo(ItemDoesNotExistErr, ItemVariant."Item No."));
+            _SpfyIntegrationMgt.SetResponse(NcTask, StrSubstNo(ItemDoesNotExistErr, ItemVariant."Item No."));
             exit(false);
         end;
 
@@ -487,7 +487,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         if ShopifyItemID = '' then
             ShopifyItemID := GetShopifyItemID(SpfyStoreItemLink, false);
         if ShopifyItemID = '' then begin
-            SetResponse(NcTask, ShopifyProductIdEmptyErr);
+            _SpfyIntegrationMgt.SetResponse(NcTask, ShopifyProductIdEmptyErr);
             exit(false);
         end;
 
@@ -498,7 +498,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                     NcTask.Type := NcTask.Type::Insert;
                 NcTask.Type::Delete:
                     begin
-                        SetResponse(NcTask, ShopifyVariantIdEmptyErr);
+                        _SpfyIntegrationMgt.SetResponse(NcTask, ShopifyVariantIdEmptyErr);
                         exit(false);
                     end;
             end;
@@ -508,7 +508,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
 
         if NcTask.Type <> NcTask.Type::Delete then begin
             RequestJObject.Add('variant', VariantJObject);
-            NcTask."Data Output".CreateOutStream(OStream);
+            NcTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
             RequestJObject.WriteTo(OStream);
         end;
         exit(true);
@@ -539,7 +539,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         RequestJObjectChild.Add('cost', Item."Last Direct Cost");
         RequestJObject.Add('inventory_item', RequestJObjectChild);
 
-        NcTaskOutput.Data.CreateOutStream(OStream);
+        NcTaskOutput.Data.CreateOutStream(OStream, TextEncoding::UTF8);
         RequestJObject.WriteTo(OStream);
     end;
 
@@ -559,7 +559,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         else
             ShopifyOwnerType := ShopifyOwnerType::PRODUCTVARIANT;
         ShopifyOwnerID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
-        NcTask."Data Output".CreateOutStream(QueryStream);
+        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
         SendToShopify := SpfyMetafieldMgt.ShopifyEntityMetafieldValueUpdateQuery(SpfyStoreItemLink.RecordId(), ShopifyOwnerType, ShopifyOwnerID, SpfyStoreItemLink."Shopify Store Code", QueryStream);
     end;
 
@@ -582,7 +582,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
 
         if InventoryLevel."Variant Code" <> '' then
             if not ItemVariant.Get(InventoryLevel."Item No.", InventoryLevel."Variant Code") or SpfyItemMgt.ItemVariantIsBlocked(ItemVariant) then begin
-                SetResponse(NcTask, StrSubstNo(ItemVariantDoesNotExistErr, InventoryLevel."Item No.", InventoryLevel."Variant Code"));
+                _SpfyIntegrationMgt.SetResponse(NcTask, StrSubstNo(ItemVariantDoesNotExistErr, InventoryLevel."Item No.", InventoryLevel."Variant Code"));
                 exit(false);
             end;
         GetStoreItemLink(InventoryLevel."Item No.", InventoryLevel."Shopify Store Code", SpfyStoreItemLink);  //Check integration is enabled for the item
@@ -593,7 +593,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         SpfyStoreItemLink."Variant Code" := InventoryLevel."Variant Code";
         SpfyStoreItemLink."Shopify Store Code" := InventoryLevel."Shopify Store Code";
         if SpfyItemMgt.ItemVariantNotAvailableInShopify(SpfyStoreItemLink) then begin
-            SetResponse(NcTask, VariantNotAvailErr);
+            _SpfyIntegrationMgt.SetResponse(NcTask, VariantNotAvailErr);
             exit(false);
         end;
 
@@ -614,7 +614,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         RequestJObject.Add('available', Format(InventoryLevel.AvailableInventory(), 0, 9));
 
         NcTask."Store Code" := InventoryLevel."Shopify Store Code";
-        NcTask."Data Output".CreateOutStream(OStream);
+        NcTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
         RequestJObject.WriteTo(OStream);
         exit(true);
     end;
@@ -654,16 +654,16 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             NcTaskOut."Last Processing Started at" := CurrentDateTime();
             NcTaskOut."Process Error" := not RecRef.Get(NcTaskIn."Record ID");
             if NcTaskOut."Process Error" then
-                SetResponse(NcTaskOut, StrSubstNo(SourceRecNotFoundErr, NcTaskIn.TableCaption(), NcTaskIn."Entry No.", NcTaskIn."Record ID"))
+                _SpfyIntegrationMgt.SetResponse(NcTaskOut, StrSubstNo(SourceRecNotFoundErr, NcTaskIn.TableCaption(), NcTaskIn."Entry No.", NcTaskIn."Record ID"))
             else begin
                 RecRef.SetTable(ItemPrice);
                 NcTaskOut."Process Error" := ItemPrice."Starting Date" > Today() + 1;
                 if NcTaskOut."Process Error" then
-                    SetResponse(NcTaskOut, FuturePriceErr)
+                    _SpfyIntegrationMgt.SetResponse(NcTaskOut, FuturePriceErr)
                 else begin
                     NcTaskOut."Process Error" := not GetStoreItemLink(ItemPrice."Item No.", ItemPrice."Shopify Store Code", false, SpfyStoreItemLink);  //Check integration is enabled for the item
                     if NcTaskOut."Process Error" then
-                        SetResponse(NcTaskOut, ItemIntegrNotEnabledErr)
+                        _SpfyIntegrationMgt.SetResponse(NcTaskOut, ItemIntegrNotEnabledErr)
                     else begin
                         ShopifyItemID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
                         if ShopifyItemID = '' then
@@ -673,9 +673,9 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                         if NcTaskOut."Process Error" then begin
                             case true of
                                 ShopifyItemID = '':
-                                    SetResponse(NcTaskOut, StrSubstNo(ShopifyProductIDIsMissingLbl, ItemPrice."Item No."));
+                                    _SpfyIntegrationMgt.SetResponse(NcTaskOut, StrSubstNo(ShopifyProductIDIsMissingLbl, ItemPrice."Item No."));
                                 ShopifyVariantID = '':
-                                    SetResponse(NcTaskOut, StrSubstNo(ShopifyVariantIDIsMissingLbl, ItemPrice."Variant Code", ItemPrice."Item No."));
+                                    _SpfyIntegrationMgt.SetResponse(NcTaskOut, StrSubstNo(ShopifyVariantIDIsMissingLbl, ItemPrice."Variant Code", ItemPrice."Item No."));
                             end;
                         end else begin
                             NcTaskOut."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
@@ -688,15 +688,6 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             NcTaskOut.Insert();
             NcTaskIn.Delete();
         until (NcTaskIn.Next() = 0) or (IncludedNcTasks >= MaxItemPricesPerRequest);
-    end;
-
-    local procedure SetResponse(var NcTask: Record "NPR Nc Task"; ResponseTxt: Text)
-    var
-        OutStr: OutStream;
-    begin
-        NcTask.Response.CreateOutStream(OutStr, TextEncoding::UTF8);
-        OutStr.WriteText(ResponseTxt);
-        NcTask."Last Processing Started at" := CurrentDateTime();
     end;
 
     local procedure AddItemInfo(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; Item: Record Item; NcTaskType: Integer; ShopifyItemID: Text[30]; var ProductJObject: JsonObject)
@@ -1258,7 +1249,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         RequestJson.Add('query', StrSubstNo(ProductVariantGraphQLQueryTok, SpfyItemMgt.GetProductVariantSku(SpfyStoreItemLink."Item No.", SpfyStoreItemLink."Variant Code")));
 
         TempNcTask."Store Code" := SpfyStoreItemLink."Shopify Store Code";
-        TempNcTask."Data Output".CreateOutStream(OStream);
+        TempNcTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
         RequestJson.WriteTo(OStream);
 
         ClearLastError();
@@ -1283,7 +1274,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                     RequestJson.Add('query', StrSubstNo(ProductGraphQLQueryTok, SkuFilterString));
                     Clear(TempNcTask);
                     TempNcTask."Store Code" := SpfyStoreItemLink."Shopify Store Code";
-                    TempNcTask."Data Output".CreateOutStream(OStream);
+                    TempNcTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
                     RequestJson.WriteTo(OStream);
 
                     ClearLastError();
@@ -1348,7 +1339,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         RequestJson.Add('variables', VariablesJson);
 
         TempNcTask."Store Code" := SpfyStoreItemLink."Shopify Store Code";
-        TempNcTask."Data Output".CreateOutStream(OStream);
+        TempNcTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
         RequestJson.WriteTo(OStream);
 
         ClearLastError();

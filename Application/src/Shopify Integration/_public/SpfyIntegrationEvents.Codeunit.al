@@ -78,8 +78,18 @@ codeunit 6184824 "NPR Spfy Integration Events"
     begin
     end;
 
+    [Obsolete('Use isolated event "OnModifyPaymentLineAfterCaptureIsolated" instead', '2025-03-09')]
     [IntegrationEvent(false, false)]
     internal procedure OnModifyPaymentLineAfterCapture(var PaymentLine: Record "NPR Magento Payment Line"; var NcTask: Record "NPR Nc Task")
+    begin
+    end;
+
+#if (BC18 or BC19)
+    [IntegrationEvent(false, false)]
+#else
+    [IntegrationEvent(false, false, true)]  //isolated event
+#endif
+    internal procedure OnModifyPaymentLineAfterCaptureIsolated(var PaymentLine: Record "NPR Magento Payment Line"; var NcTask: Record "NPR Nc Task")
     begin
     end;
 

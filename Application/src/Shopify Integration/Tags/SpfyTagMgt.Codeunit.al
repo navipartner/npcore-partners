@@ -56,7 +56,7 @@ codeunit 6248287 "NPR Spfy Tag Mgt."
         RequestJson.Add('variables', VariablesJson);
 
         NcTask."Store Code" := ShopifyStoreCode;
-        NcTask."Data Output".CreateOutStream(QueryStream);
+        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
         RequestJson.WriteTo(QueryStream);
         exit(SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ShopifyResponse));
     end;
