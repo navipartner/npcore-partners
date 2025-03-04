@@ -53,17 +53,24 @@ codeunit 6184804 "NPR Spfy Capture Payment"
             Success := SpfyCommunicationHandler.SendTransactionRequest(NcTask);
 
         if SaveToDb then begin
+            NcTask.Modify();
+            Commit();
             if Success then begin
                 RecRef.Get(NcTask."Record ID");
                 RecRef.SetTable(PaymentLine);
                 if PaymentLine.Find() then begin
                     PaymentLine."Date Captured" := Today;
-                    SpfyIntegrationEvents.OnModifyPaymentLineAfterCapture(PaymentLine, NcTask);
                     PaymentLine.Modify();
+                    Commit();
+                    SpfyIntegrationEvents.OnModifyPaymentLineAfterCaptureIsolated(PaymentLine, NcTask);
+                    if not PaymentLine.Posted then begin
+                        Commit();
+                        ClearLastError();
+                        if not Codeunit.Run(Codeunit::"NPR Spfy Post Payment Line", PaymentLine) then
+                            AddPostingErrorMessageToNcTask(NcTask);
+                    end;
                 end;
             end;
-            NcTask.Modify();
-            Commit();
         end;
 
         if not Success then
@@ -140,7 +147,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         JChildObject.Add('kind', Format(RequestType, 0, 1));
         JChildObject.Add('parent_id', TransactionID);
         JObject.Add('transaction', JChildObject);
-        NcTask."Data Output".CreateOutStream(OutStr);
+        NcTask."Data Output".CreateOutStream(OutStr, TextEncoding::UTF8);
         JObject.WriteTo(OutStr);
     end;
 
@@ -155,9 +162,9 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         RecRef: RecordRef;
-        JArray: JsonArray;
-        JObject: JsonObject;
-        JToken: JsonToken;
+        ShopifyResponse: JsonObject;
+        Transaction: JsonToken;
+        Transactions: JsonToken;
         ShopifyOrderID: Text[30];
         ShopifyTransactionID: Text[30];
         ShopifyTransactionKind: Text;
@@ -197,54 +204,55 @@ codeunit 6184804 "NPR Spfy Capture Payment"
 
         ClearLastError();
         if StopOnRequestError then begin
-            SpfyCommunicationHandler.GetShopifyOrderTransactions(NcTask, JObject);
+            SpfyCommunicationHandler.GetShopifyOrderTransactions(NcTask, ShopifyResponse);
             Success := true;
         end else
-            Success := SpfyCommunicationHandler.TryGetShopifyOrderTransactions(NcTask, JObject);
+            Success := SpfyCommunicationHandler.TryGetShopifyOrderTransactions(NcTask, ShopifyResponse);
         if Success then begin
-            JObject.SelectToken('transactions', JToken);
-            JArray := JToken.AsArray();
-            foreach JToken in JArray do begin
-                ShopifyTransactionKind := JsonHelper.GetJText(JToken, 'kind', false);
-                if ShopifyTransactionKind in ['authorization', 'sale'] then
-                    if JsonHelper.GetJText(JToken, 'status', false) = 'success' then begin
+            ShopifyResponse.SelectToken('transactions', Transactions);
+            if Transactions.IsArray() then
+                foreach Transaction in Transactions.AsArray() do begin
+                    ShopifyTransactionKind := JsonHelper.GetJText(Transaction, 'kind', false);
+                    if ShopifyTransactionKind in ['authorization', 'sale'] then
+                        if JsonHelper.GetJText(Transaction, 'status', false) = 'success' then begin
 #pragma warning disable AA0139
-                        ShopifyTransactionID := JsonHelper.GetJText(JToken, 'id', MaxStrLen(ShopifyTransactionID), true);
+                            ShopifyTransactionID := JsonHelper.GetJText(Transaction, 'id', MaxStrLen(ShopifyTransactionID), true);
 #pragma warning restore AA0139
 
-                        PaymentLine.LockTable();
-                        AlreadyAssigned := false;
-                        SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"NPR Magento Payment Line", "NPR Spfy ID Type"::"Entry ID", ShopifyTransactionID, ShopifyAssignedID);
-                        if ShopifyAssignedID.FindSet() then
-                            repeat
-                                if RecRef.Get(ShopifyAssignedID."BC Record ID") then begin
-                                    RecRef.SetTable(PaymentLine2);
-                                    AlreadyAssigned :=
-                                        (PaymentLine2."Document Table No." = PaymentLineParam."Document Table No.") and
-                                        ((PaymentLine2."Document Type" = PaymentLineParam."Document Type") or (PaymentLineParam."Document Table No." = Database::"Sales Invoice Header")) and
-                                        (PaymentLine2."Document No." = PaymentLineParam."Document No.");
+                            AlreadyAssigned := false;
+                            SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"NPR Magento Payment Line", "NPR Spfy ID Type"::"Entry ID", ShopifyTransactionID, ShopifyAssignedID);
+                            if ShopifyAssignedID.FindSet() then
+                                repeat
+                                    if RecRef.Get(ShopifyAssignedID."BC Record ID") then begin
+                                        RecRef.SetTable(PaymentLine2);
+                                        AlreadyAssigned :=
+                                            (PaymentLine2."Document Table No." = PaymentLineParam."Document Table No.") and
+                                            ((PaymentLine2."Document Type" = PaymentLineParam."Document Type") or (PaymentLineParam."Document Table No." = Database::"Sales Invoice Header")) and
+                                            (PaymentLine2."Document No." = PaymentLineParam."Document No.");
+                                        if AlreadyAssigned then
+                                            PaymentLine := PaymentLine2;
+                                    end;
+                                until (ShopifyAssignedID.Next() = 0) or AlreadyAssigned;
+
+                            if not AlreadyAssigned then begin
+                                if not PaymentLine.FindLast() then
+                                    PaymentLine."Line No." := 0;
+
+                                GiftCardTransaction := false;
+                                if ShopifyTransactionKind = 'sale' then
+                                    GiftCardTransaction := AddGiftCardPaymentLine(Transaction, PaymentLineParam, PaymentLine);
+                                if not GiftCardTransaction then begin
+                                    InitCreditCardPaymentLine(Transaction, NcTask."Store Code", PaymentLineParam, PaymentLine);
+                                    PaymentLine."No." := ShopifyTransactionID;
+                                    PaymentLine.Insert(true);
                                 end;
-                            until (ShopifyAssignedID.Next() = 0) or AlreadyAssigned;
-
-                        if not AlreadyAssigned then begin
-                            if not PaymentLine.FindLast() then
-                                PaymentLine."Line No." := 0;
-
-                            GiftCardTransaction := false;
-                            if ShopifyTransactionKind = 'sale' then
-                                GiftCardTransaction := AddGiftCardPaymentLine(JToken, PaymentLineParam, PaymentLine);
-                            if not GiftCardTransaction then begin
-                                InitCreditCardPaymentLine(JToken, NcTask."Store Code", PaymentLineParam, PaymentLine);
-                                PaymentLine."No." := ShopifyTransactionID;
-                                PaymentLine.Insert(true);
+                                SpfyAssignedIDMgt.AssignShopifyID(PaymentLine.RecordId(), "NPR Spfy ID Type"::"Entry ID", ShopifyTransactionID, false);
                             end;
-                            SpfyAssignedIDMgt.AssignShopifyID(PaymentLine.RecordId(), "NPR Spfy ID Type"::"Entry ID", ShopifyTransactionID, false);
 
-                            if ScheduleCapture and (ShopifyTransactionKind = 'authorization') then
+                            if ScheduleCapture and (ShopifyTransactionKind = 'authorization') and (PaymentLine."Date Captured" = 0D) then
                                 SchedulePmtLineProcessing(NcTask."Store Code", PaymentLine, ShopifyOrderID, NcTask.Type::Insert);
                         end;
-                    end;
-            end;
+                end;
         end;
     end;
 
@@ -380,6 +388,27 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         if not PaymentGateway.get(PaymentLine."Payment Gateway Code") then
             exit(false);
         exit(PaymentGateway."Enable Capture" and (PaymentGateway."Integration Type" = PaymentGateway."Integration Type"::Shopify));
+    end;
+
+    local procedure AddPostingErrorMessageToNcTask(var NcTask: Record "NPR Nc Task")
+    var
+        TypeHelper: Codeunit "Type Helper";
+        IStream: InStream;
+        OStream: OutStream;
+        Tb: TextBuilder;
+        PostingErr: Label 'The payment capture process completed successfully.\However, the payment posting routine has ended with the following error: %1.\You will need to post the payment manually.\\The payment capture response:';
+    begin
+        Tb.Append(StrSubstNo(PostingErr, GetLastErrorText()));
+        Tb.Append(TypeHelper.CRLFSeparator());
+        If NcTask.Response.HasValue() then begin
+            NcTask.Response.CreateInStream(IStream, TextEncoding::UTF8);
+            Tb.Append(TypeHelper.ReadAsTextWithSeparator(IStream, TypeHelper.CRLFSeparator()));
+        end;
+        Clear(NcTask.Response);
+        NcTask.Response.CreateOutStream(OStream, TextEncoding::UTF8);
+        OStream.WriteText(Tb.ToText());
+        NcTask.Modify();
+        Commit();
     end;
 
 #if BC18 or BC19 or BC20 or BC21

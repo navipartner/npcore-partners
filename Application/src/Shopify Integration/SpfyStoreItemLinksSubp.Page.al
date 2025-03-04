@@ -82,14 +82,14 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
                         OutStr: OutStream;
                         InStr: InStream;
                     begin
-                        TempBlob.CreateOutStream(OutStr);
+                        TempBlob.CreateOutStream(OutStr, TextEncoding::UTF8);
                         Rec.CalcFields("Shopify Description");
-                        Rec."Shopify Description".CreateInStream(InStr);
+                        Rec."Shopify Description".CreateInStream(InStr, TextEncoding::UTF8);
                         CopyStream(OutStr, InStr);
                         if MagentoFunctions.NaviEditorEditTempBlob(TempBlob) then begin
                             if TempBlob.HasValue() then begin
-                                TempBlob.CreateInStream(InStr);
-                                Rec."Shopify Description".CreateOutStream(OutStr);
+                                TempBlob.CreateInStream(InStr, TextEncoding::UTF8);
+                                Rec."Shopify Description".CreateOutStream(OutStr, TextEncoding::UTF8);
                                 CopyStream(OutStr, InStr);
                             end else
                                 Clear(Rec."Shopify Description");

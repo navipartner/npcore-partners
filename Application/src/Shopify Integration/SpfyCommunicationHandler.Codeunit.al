@@ -68,7 +68,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
     begin
         NcTask."Store Code" := ShopifyStoreCode;
         RequestJson.Add('query', 'query { shop { id name currencyCode plan { displayName shopifyPlus } } }');
-        NcTask."Data Output".CreateOutStream(QueryStream);
+        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
         RequestJson.WriteTo(QueryStream);
 
         exit(ExecuteShopifyGraphQLRequest(NcTask, false, ShopifyResponse));
@@ -383,10 +383,14 @@ codeunit 6184924 "NPR Spfy Communication Handler"
 
             Success := ResponseMsg.IsSuccessStatusCode();
             if not Success then
-                if RetryCounter >= MaxRetries then
-                    Retry := false
-                else
-                    Retry := ResponseAllowsRetries(ResponseMsg)
+                case true of
+                    RetryCounter >= MaxRetries:
+                        Retry := false;
+                    TreatAsSuccess(NcTask, ResponseMsg):
+                        Retry := false;
+                    else
+                        Retry := ResponseAllowsRetries(ResponseMsg);
+                end;
         until Success or not Retry;
 
         SaveResponse(NcTask, ResponseMsg);
@@ -415,7 +419,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         InStr: InStream;
     begin
         if NcTask."Data Output".HasValue() then begin
-            NcTask."Data Output".CreateInStream(InStr);
+            NcTask."Data Output".CreateInStream(InStr, TextEncoding::UTF8);
             Content.WriteFrom(InStr);
 
             Content.GetHeaders(Headers);
@@ -436,15 +440,12 @@ codeunit 6184924 "NPR Spfy Communication Handler"
 
     local procedure SaveResponse(var NcTask: Record "NPR Nc Task"; var ResponseMsg: HttpResponseMessage)
     var
-        Content: HttpContent;
         InStr: InStream;
         OutStr: OutStream;
     begin
-        Content := ResponseMsg.Content();
-        Content.ReadAs(InStr);
-
-        clear(NcTask.Response);
-        NcTask.Response.CreateOutStream(OutStr);
+        ResponseMsg.Content().ReadAs(InStr);
+        Clear(NcTask.Response);
+        NcTask.Response.CreateOutStream(OutStr, TextEncoding::UTF8);
         CopyStream(OutStr, InStr);
     end;
 
@@ -528,6 +529,19 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         exit(IsError);
     end;
 
+    local procedure TreatAsSuccess(NcTask: Record "NPR Nc Task"; ResponseMsg: HttpResponseMessage): Boolean
+    var
+        ResponseText: Text;
+        ErrorTxt: Text;
+    begin
+        if not ResponseMsg.Content().ReadAs(ResponseText) then
+            ResponseText := '';
+        if ResponseText = '' then
+            ResponseText := '{}';
+        ErrorTxt := 'n/a';
+        exit(TreatAsSuccess(NcTask, ResponseMsg, ResponseText, ErrorTxt));
+    end;
+
     local procedure TreatAsSuccess(NcTask: Record "NPR Nc Task"; ResponseMsg: HttpResponseMessage; ResponseText: Text; var ErrorTxt: Text): Boolean
     var
         ErrorJToken: JsonToken;
@@ -551,7 +565,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
                         IsSuccess := ErrorJToken.AsValue().AsText() = AlreadyDisabledTok;
             end;
         if not IsSuccess and (ErrorTxt = '') then
-            ErrorTxt := StrSubstNo('%1: %2\%3', ResponseMsg.HttpStatusCode(), ResponseMsg.ReasonPhrase, ResponseText);
+            ErrorTxt := StrSubstNo('%1: %2\%3', ResponseMsg.HttpStatusCode(), ResponseMsg.ReasonPhrase(), ResponseText);
         exit(IsSuccess);
     end;
 

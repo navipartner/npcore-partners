@@ -45,6 +45,7 @@ codeunit 6184815 "NPR Spfy Post Order" implements "NPR Nc Import List IProcess"
         end;
 
         OrderMgt.InsertSalesLines(ShopifyStoreCode, Order, SalesHeader, true);
+        OrderMgt.InsertPaymentLines(ShopifyStoreCode, Order, SalesHeader);
         Commit();
 
         OrderMgt.PostOrder(SalesHeader);

@@ -323,6 +323,15 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
             ShopifyStoreID := CopyStr(CopyStr(RetrievedFieldValue, RetrievedFieldValue.LastIndexOf('/') + 1, StrLen(RetrievedFieldValue)), 1, MaxStrLen(ShopifyStoreID));
     end;
 
+    procedure SetResponse(var NcTask: Record "NPR Nc Task"; ResponseTxt: Text)
+    var
+        OutStr: OutStream;
+    begin
+        NcTask.Response.CreateOutStream(OutStr, TextEncoding::UTF8);
+        OutStr.WriteText(ResponseTxt);
+        NcTask."Last Processing Started at" := CurrentDateTime();
+    end;
+
     internal procedure RemoveUntil(Input: Text; UntilChr: Char) Output: Text
     var
         Position: Integer;

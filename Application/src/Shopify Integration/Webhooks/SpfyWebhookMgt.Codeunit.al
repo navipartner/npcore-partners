@@ -109,7 +109,7 @@ codeunit 6184942 "NPR Spfy Webhook Mgt."
 
         NcTask."Store Code" := ShopifyStoreCode;
         NcTask."Record Value" := CopyStr(StrSubstNo('%1: %2', ShopifyStoreCode, JsonHelper.GetJText(WebhookConfig.AsToken(), 'topic', false)), 1, MaxStrLen(NcTask."Record Value"));
-        NcTask."Data Output".CreateOutStream(OutStr);
+        NcTask."Data Output".CreateOutStream(OutStr, TextEncoding::UTF8);
         Request.WriteTo(OutStr);
 
         ShopifyResponse := SpfyCommunicationHandler.RegisterWebhook(NcTask);

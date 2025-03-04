@@ -45,7 +45,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
                     Success := SpfyCommunicationHandler.SendGiftCardUpdateRequest(NcTask, ShopifyGiftCardID, ShopifyResponse);
             end;
         if Success and not SendToShopify then begin
-            NcTask.Response.CreateOutStream(OutStr);
+            NcTask.Response.CreateOutStream(OutStr, TextEncoding::UTF8);
             OutStr.WriteText(GetLastErrorText());
         end;
         NcTask.Modify();
@@ -75,7 +75,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         if SendToShopify then
             Success := SpfyCommunicationHandler.SendGiftCardBalanceAdjustmentRequest(NcTask, ShopifyGiftCardID);
         if Success and not SendToShopify then begin
-            NcTask.Response.CreateOutStream(OutStr);
+            NcTask.Response.CreateOutStream(OutStr, TextEncoding::UTF8);
             OutStr.WriteText(GetLastErrorText());
         end;
         NcTask.Modify();
@@ -106,7 +106,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
                 if Success then
                     MarkVoucherAsDisabled(NcTask, ShopifyResponse)
             end else begin
-                NcTask.Response.CreateOutStream(OutStr);
+                NcTask.Response.CreateOutStream(OutStr, TextEncoding::UTF8);
                 OutStr.WriteText(GetLastErrorText());
             end;
             NcTask.Modify();
@@ -155,7 +155,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
 
         AddVoucherInfo(Voucher, ShopifyGiftCardID, VoucherJObject);
         RequestJObject.Add('gift_card', VoucherJObject);
-        NcTask."Data Output".CreateOutStream(OStream);
+        NcTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
         RequestJObject.WriteTo(OStream);
         SendToShopify := true;
     end;
@@ -221,7 +221,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         RequestJObject.Add('adjustment', AdjmtJObject);
 
         NcTask."Store Code" := ShopifyStoreCode;
-        NcTask."Data Output".CreateOutStream(OStream);
+        NcTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
         RequestJObject.WriteTo(OStream);
     end;
 
@@ -378,7 +378,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
                     NcTask2."Last Processing Started at" := 0DT;
                     NcTask2."Last Processing Completed at" := CurrentDateTime();
                     NcTask2."Last Processing Duration" := 0;
-                    NcTask2.Response.CreateOutStream(OutStr);
+                    NcTask2.Response.CreateOutStream(OutStr, TextEncoding::UTF8);
                     OutStr.WriteText(ReasonTxt);
                     NcTask2.Modify();
                 end;

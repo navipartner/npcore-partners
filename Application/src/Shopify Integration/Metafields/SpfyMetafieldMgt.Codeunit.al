@@ -130,7 +130,7 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
         if not MetafieldMappingExist(ShopifyStoreCode, ShopifyOwnerType) then
             exit;
         NcTask."Store Code" := ShopifyStoreCode;
-        NcTask."Data Output".CreateOutStream(QueryStream);
+        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
         ShopifyEntityMetafieldsSetRequestQuery(ShopifyOwnerType, ShopifyOwnerID, OwnerTypeTxt, QueryStream);
         if SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse) then
             if ShopifyResponse.SelectToken(StrSubstNo('data.%1.metafields.edges', SpfyIntegrationMgt.LowerFirstLetter(OwnerTypeTxt)), MetafieldsSet) then
@@ -242,7 +242,7 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
     begin
         NcTask."Store Code" := ShopifyStoreCode;
         RequestJson.Add('query', StrSubstNo(QueryTok, OwnerTypeEnumValueName(OwnerType)));
-        NcTask."Data Output".CreateOutStream(QueryStream);
+        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
         RequestJson.WriteTo(QueryStream);
 
         exit(SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ShopifyResponse));
