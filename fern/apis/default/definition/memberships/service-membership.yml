@@ -58,24 +58,34 @@ service:
 
     getMembershipNumber:
       docs: 
-        Use this endpoint to retrieve membership details based on the membership number. 
-        This is helpful when the ID isn't available but the membership number is known.
+        Use this endpoint to retrieve membership details based on the membership or customer number. 
+        This is helpful when the ID isn't available but the membership number or customer number is known.
       display-name: Get using Number
       method: GET
       path: ''
       request:
         name: getMembershipNumber
         query-parameters:
-          membershipNumber: simpleTypes.MembershipNumber
+          membershipNumber: optional<simpleTypes.MembershipNumber>
+          customerNumber: optional<simpleTypes.CustomerNumber>
       response: GetMembershipResponse
       examples:
-        - name: ExampleGetMembershipNumber
+        - name: "Example Get Membership (Membership Number)"
           path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
           query-parameters:
             membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
+          response:
+            body: $GetMembershipResponse.ExampleGetMembership
+        - name: "Example Get Membership (Customer Number)"
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
           response:
             body: $GetMembershipResponse.ExampleGetMembership
 
