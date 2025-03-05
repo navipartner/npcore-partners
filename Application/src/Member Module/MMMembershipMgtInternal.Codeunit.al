@@ -1268,8 +1268,6 @@
         ConflictingMemberExists := Member.FindFirst();
 
         MembershipEvents.OnCheckMemberUniqueIdViolation(Community, MemberInfoCapture, Member, ConflictingMemberExists);
-        if (not ConflictingMemberExists) then
-            exit(0);
 
         if (ConflictingMemberExists) then begin
             if ((MemberInfoCapture."Guardian External Member No." <> '') and
@@ -1308,8 +1306,14 @@
                 else
                     Error(CASE_MISSING, Community.FieldName("Create Member UI Violation"), Community."Create Member UI Violation");
             end;
+
             exit(Member."Entry No.");
         end;
+
+        if (not ConflictingMemberExists) then
+            if ((MemberInfoCapture."Member Entry No" <> 0)
+                and (Community."Create Member UI Violation" in [Community."Create Member UI Violation"::REUSE, Community."Create Member UI Violation"::MERGE_MEMBER])) then
+                exit(MemberInfoCapture."Member Entry No");
 
         exit(0);
     end;
