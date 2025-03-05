@@ -573,7 +573,7 @@ codeunit 6185130 "NPR SG SpeedGate"
         exit(true);
     end;
 
-    local procedure CheckForWallet(TicketProfileCode: Code[10]; MemberCardProfileCode: Code[10]; var ValidationRequest: Record "NPR SGEntryLog"; var EntityId: Guid; var AdmitToCodes: List of [Code[20]]; var ProfileLineId: Guid; var ReferenceNumberIdentified: Boolean): Boolean
+    local procedure CheckForWallet(TicketProfileCode: Code[10]; MemberCardProfileCode: Code[10]; var ValidationRequest: Record "NPR SGEntryLog"; var EntityId: Guid; var AdmitToCodes: List of [Code[20]]; var ProfileLineId: Guid; var NumberIdentified: Boolean): Boolean
     var
         Number: Text[100];
         SuggestedAdmissionCode: Code[20];
@@ -589,8 +589,9 @@ codeunit 6185130 "NPR SG SpeedGate"
 
         Wallet.SetCurrentKey(ReferenceNumber);
         Wallet.SetFilter(ReferenceNumber, '=%1', CopyStr(UpperCase(Number), 1, MaxStrLen(Wallet.ReferenceNumber)));
-        ReferenceNumberIdentified := Wallet.FindSet();
-        if (not ReferenceNumberIdentified) then
+        NumberIdentified := Wallet.FindSet();
+
+        if (not NumberIdentified) then
             exit(false);
 
         if (Wallet.ExpirationDate <> 0DT) and (Wallet.ExpirationDate < CurrentDateTime()) then
@@ -725,6 +726,9 @@ codeunit 6185130 "NPR SG SpeedGate"
         Ticket.SetCurrentKey("External Ticket No.");
         Ticket.SetFilter("External Ticket No.", '=%1', CopyStr(UpperCase(Number), 1, MaxStrLen(Ticket."External Ticket No.")));
         NumberIdentified := Ticket.FindFirst();
+
+        if (not NumberIdentified) then
+            exit(false);
 
         if (Ticket.Blocked) then
             exit(SetApiError(_ApiErrors::ticket_blocked));
