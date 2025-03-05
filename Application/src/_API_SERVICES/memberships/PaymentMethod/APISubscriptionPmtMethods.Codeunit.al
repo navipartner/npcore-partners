@@ -140,9 +140,6 @@ codeunit 6185107 "NPR API SubscriptionPmtMethods"
             MemberPaymentMethod.Insert(true);
         end;
 
-        if MemberPaymentMethod.Default then
-            PaymentMethodMgt.UpdateMembershipWithDefaultAutoRenewPaymentMethod(Membership);
-
         Json.StartObject('');
         PaymentMethodAsJson(MemberPaymentMethod, 'paymentMethod', true, Json);
         Json.EndObject();

@@ -67,7 +67,7 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
             MemberPaymentMethod.SetCurrentKey("Created from System Id");
             MemberPaymentMethod.SetRange("Created from System Id", EFTTransactionRequest.SystemId);
             if MemberPaymentMethod.FindFirst() then
-                SetMembePaymentMethodAsDefault(EFTTransactionRequest, MemberPaymentMethod)
+                SetMembePaymentMethodAsDefault(MemberPaymentMethod)
             else begin
                 Customer.SetLoadFields("No.");
                 if Customer.Get(SalePOS."Customer No.") then begin
@@ -77,16 +77,17 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
                     Membership.SetLoadFields("Entry No.");
                     if Membership.FindFirst() then
                         if FindMemberPaymentMethod(EFTTransactionRequest, Membership, MemberPaymentMethod) then
-                            SetMembePaymentMethodAsDefault(EFTTransactionRequest, MemberPaymentMethod);
+                            SetMembePaymentMethodAsDefault(MemberPaymentMethod);
                 end;
             end;
         until EFTTransactionRequest.Next() = 0;
     end;
 
-    local procedure SetMembePaymentMethodAsDefault(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var MemberPaymentMethod: Record "NPR MM Member Payment Method")
+    local procedure SetMembePaymentMethodAsDefault(var MemberPaymentMethod: Record "NPR MM Member Payment Method")
     var
         Membership: Record "NPR MM Membership";
         Modi: Boolean;
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
     begin
         if not MemberPaymentMethod.Default then begin
             MemberPaymentMethod.Validate(Default, true);
@@ -102,13 +103,14 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
 
         if MemberPaymentMethod."Table No." = Database::"NPR MM Membership" then
             if Membership.Get(MemberPaymentMethod."BC Record ID") then
-                UpdateMembership(EftTransactionRequest, Membership);
+                MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, true, false);
     end;
 
     internal procedure SetMembePaymentMethodAsDefault(PaymentLine: Record "NPR Magento Payment Line"; var MemberPaymentMethod: Record "NPR MM Member Payment Method")
     var
         Membership: Record "NPR MM Membership";
         Modi: Boolean;
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
     begin
         if not MemberPaymentMethod.Default then begin
             MemberPaymentMethod.Validate(Default, true);
@@ -124,7 +126,7 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
 
         if MemberPaymentMethod."Table No." = Database::"NPR MM Membership" then
             if Membership.Get(MemberPaymentMethod."BC Record ID") then
-                UpdateMembership(PaymentLine, Membership);
+                MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, true, false);
     end;
 
     internal procedure FindMemberPaymentMethod(EftTransactionRequest: Record "NPR EFT Transaction Request"; Membership: Record "NPR MM Membership"; var MemberPaymentMethod: Record "NPR MM Member Payment Method") Found: Boolean
@@ -178,34 +180,6 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
 
         Found := MemberPaymentMethod.FindFirst();
     end;
-
-    internal procedure UpdateMembership(EftTransactionRequest: Record "NPR EFT Transaction Request"; var Membership: Record "NPR MM Membership")
-    var
-        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
-    begin
-        MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, true, false);
-
-        if Membership."Auto-Renew Payment Method Code" = EftTransactionRequest."POS Payment Type Code" then
-            exit;
-        Membership."Auto-Renew Payment Method Code" := EftTransactionRequest."POS Payment Type Code";
-        Membership.Modify();
-
-    end;
-
-    internal procedure UpdateMembership(PaymentLine: Record "NPR Magento Payment Line"; var Membership: Record "NPR MM Membership")
-    var
-        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
-    begin
-        MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, true, false);
-        if Membership."Auto-Renew Payment Method Code" = PaymentLine."Source No." then
-            exit;
-
-#pragma warning disable AA0139
-        Membership."Auto-Renew Payment Method Code" := PaymentLine."Source No.";
-#pragma warning restore AA0139
-        Membership.Modify();
-    end;
-
 
     internal procedure DeleteMemberPaymentMethods(SalePOS: Record "NPR POS Sale")
     var
@@ -296,24 +270,6 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
         MemberPaymentMethod."Payment Brand" := PaymentLine.Brand;
         MemberPaymentMethod."Created from System Id" := PaymentLine.SystemId;
         MemberPaymentMethod.Modify(true);
-    end;
-
-    internal procedure UpdateMembershipWithDefaultAutoRenewPaymentMethod(var Membership: Record "NPR MM Membership")
-    var
-        NPPaySetup: Record "NPR Adyen Setup";
-    begin
-        if Membership."Auto-Renew Payment Method Code" <> '' then
-            exit;
-
-        NPPaySetup.SetLoadFields("Def Auto Renew Pay Method Code");
-        if not NPPaySetup.Get() then
-            exit;
-
-        if NPPaySetup."Def Auto Renew Pay Method Code" = '' then
-            exit;
-
-        Membership."Auto-Renew Payment Method Code" := NPPaySetup."Def Auto Renew Pay Method Code";
-        Membership.Modify(true);
     end;
 
     local procedure GetLastDateOfMonth(DateText: Text) LastDate: Date
