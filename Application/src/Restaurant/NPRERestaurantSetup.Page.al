@@ -155,15 +155,10 @@
             group(POSActions)
             {
                 Caption = 'Restaurant View';
-                group(RestViewLayout)
+                field("Restaurant View Layout"; Rec."Restaurant View Layout")
                 {
-                    Visible = RestViewLayoutSelectionIsVisible;
-                    ShowCaption = false;
-                    field("Restaurant View Layout"; Rec."Restaurant View Layout")
-                    {
-                        ToolTip = 'Specifies the layout type you want to use for your restaurant view.';
-                        ApplicationArea = NPRRetail;
-                    }
+                    ToolTip = 'Specifies the layout type you want to use for your restaurant view.';
+                    ApplicationArea = NPRRetail;
                 }
                 field("Save Layout Action"; Rec."Save Layout Action")
                 {
@@ -402,14 +397,12 @@
     var
         AzureADTenant: Codeunit "Azure AD Tenant";
         KitchenOrderMgt: Codeunit "NPR NPRE Kitchen Order Mgt.";
-        SetupProxy: Codeunit "NPR NPRE Restaur. Setup Proxy";
     begin
         if not Rec.Get() then
             Rec.Insert(true);
 
         ShowKDS := KitchenOrderMgt.KDSAvailable();
         HasAzureADConnection := AzureADTenant.GetAadTenantId() <> '';
-        RestViewLayoutSelectionIsVisible := SetupProxy.ModernRestaurantLayoutFeatureFlagIsEnabled();
     end;
 
     trigger OnAfterGetCurrRecord()
@@ -423,7 +416,6 @@
         HasAzureADConnection: Boolean;
         NewWaiterPadActionRefreshNeeded: Boolean;
         RefreshEnabled: Boolean;
-        RestViewLayoutSelectionIsVisible: Boolean;
         SaveLayoutActionRefreshNeeded: Boolean;
         SelectRestaurantActionRefreshNeeded: Boolean;
         SelectTableActionRefreshNeeded: Boolean;
