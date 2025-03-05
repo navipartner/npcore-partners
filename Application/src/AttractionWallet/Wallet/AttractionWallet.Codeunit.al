@@ -531,6 +531,7 @@ codeunit 6185062 "NPR AttractionWallet"
         Wallet: Record "NPR AttractionWallet";
         IntermediaryWallet: Record "NPR AttractionWalletSaleHdr";
         IntermediaryWalletLine: Record "NPR AttractionWalletSaleLine";
+        WalletEvents: Codeunit "NPR AttractionWalletEvents";
     begin
         if (Quantity <= 0) then
             exit;
@@ -547,6 +548,8 @@ codeunit 6185062 "NPR AttractionWallet"
                     WalletEntryNoList.Add(CreateWallet(CreateGuid(), IntermediaryWallet.Name, Wallet));
                     IntermediaryWallet.WalletEntryNo := Wallet.EntryNo;
                     IntermediaryWallet.Modify();
+
+                    WalletEvents.OnAfterCreateWalletFromPOSSaleLine(IntermediaryWalletLine.SaleLineId, Wallet.EntryNo);
                 end;
             until (IntermediaryWalletLine.Next() = 0);
         end;

@@ -37,7 +37,7 @@ codeunit 6185105 "NPR POSAction WalletAssign" implements "NPR IPOS Workflow"
         if (Quantity <= 0) then
             Error(InvalidQuantity);
 
-        WalletAssignments.SetSalesContext(PosSale.SystemId, PosSaleLine."Line No.", Quantity);
+        WalletAssignments.SetSalesContext(PosSale.SystemId, PosSaleLine.SystemId, PosSaleLine."Line No.", Quantity);
         WalletSaleLine.SetCurrentKey(SaleHeaderSystemId, LineNumber);
         WalletSaleLine.SetFilter(SaleHeaderSystemId, '=%1', PosSale.SystemId);
         WalletSaleLine.SetFilter(LineNumber, '=%1', PosSaleLine."Line No.");

@@ -73,7 +73,7 @@ codeunit 6185076 "NPR AttractionWalletCreate"
 
         TopUp := (Item."NPR CreateAttractionWallet" or SaleLinePOSAddOn.AddToWallet);
         if (TopUp) then
-            TopUpIntermediateWalletsForLine(POSSale.SystemId, SaleLinePOS."Line No.", TargetQuantity);
+            TopUpIntermediateWalletsForLine(POSSale.SystemId, SaleLinePOS.SystemId, SaleLinePOS."Line No.", TargetQuantity);
 
     end;
 
@@ -107,7 +107,7 @@ codeunit 6185076 "NPR AttractionWalletCreate"
         if (TargetQuantity <> NewQuantity) then
             Error(InvalidQuantity);
 
-        AdjustIntermediateWalletQuantityForLine(POSSale.SystemId, SaleLinePOS."Line No.", OrgQuantity, TargetQuantity);
+        AdjustIntermediateWalletQuantityForLine(POSSale.SystemId, SaleLinePOS.SystemId, SaleLinePOS."Line No.", OrgQuantity, TargetQuantity);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale Line", 'OnBeforeDeleteEvent', '', true, false)]
@@ -128,7 +128,7 @@ codeunit 6185076 "NPR AttractionWalletCreate"
             until (IntermediaryWalletLine.Next() = 0);
     end;
 
-    internal procedure CreateIntermediateWallet(SaleId: Guid; SaleLineNumber: Integer; QtyToCreate: Integer; MaxQuantity: Integer)
+    internal procedure CreateIntermediateWallet(SaleId: Guid; SaleLineId: Guid; SaleLineNumber: Integer; QtyToCreate: Integer; MaxQuantity: Integer)
     var
         IntermediaryWallet: Record "NPR AttractionWalletSaleHdr";
         IntermediaryWalletLine: Record "NPR AttractionWalletSaleLine";
@@ -156,11 +156,11 @@ codeunit 6185076 "NPR AttractionWalletCreate"
             LastWalletNumber := IntermediaryWallet.WalletNumber;
 
         for i := 1 to QtyToCreate do begin
-            CreateIntermediateWallet(SaleId, SaleLineNumber, LastWalletNumber + i, '', '', 0);
+            CreateIntermediateWallet(SaleId, SaleLineId, SaleLineNumber, LastWalletNumber + i, '', '', 0);
         end;
     end;
 
-    internal procedure CreateIntermediateWalletForExistingWallet(SaleId: Guid; SaleLineNumber: Integer; Name: Text[100]; ReferenceNumber: Code[50]; ExistingWalletEntryNo: Integer)
+    internal procedure CreateIntermediateWalletForExistingWallet(SaleId: Guid; SaleLineId: Guid; SaleLineNumber: Integer; Name: Text[100]; ReferenceNumber: Code[50]; ExistingWalletEntryNo: Integer)
     var
         IntermediaryWallet: Record "NPR AttractionWalletSaleHdr";
         WalletNumber: Integer;
@@ -176,10 +176,10 @@ codeunit 6185076 "NPR AttractionWalletCreate"
         if (IntermediaryWallet.FindLast()) then
             WalletNumber := IntermediaryWallet.WalletNumber + 1;
 
-        CreateIntermediateWallet(SaleId, SaleLineNumber, WalletNumber, Name, ReferenceNumber, ExistingWalletEntryNo);
+        CreateIntermediateWallet(SaleId, SaleLineId, SaleLineNumber, WalletNumber, Name, ReferenceNumber, ExistingWalletEntryNo);
     end;
 
-    internal procedure CreateIntermediateWallet(SaleId: Guid; SaleLineNumber: Integer; WalletNumber: Integer; Name: Text[100]; ReferenceNumber: Code[50]; ExistingWalletEntryNo: Integer)
+    internal procedure CreateIntermediateWallet(SaleId: Guid; SaleLineId: Guid; SaleLineNumber: Integer; WalletNumber: Integer; Name: Text[100]; ReferenceNumber: Code[50]; ExistingWalletEntryNo: Integer)
     var
         IntermediaryWallet: Record "NPR AttractionWalletSaleHdr";
     begin
@@ -196,29 +196,30 @@ codeunit 6185076 "NPR AttractionWalletCreate"
         if (not IntermediaryWallet.Insert()) then
             ; // Ignore existing records
 
-        AddIntermediateWalletLine(IntermediaryWallet, SaleLineNumber);
+        AddIntermediateWalletLine(IntermediaryWallet, SaleLineId, SaleLineNumber);
     end;
 
-    internal procedure AddIntermediateWalletLine(IntermediaryWallet: Record "NPR AttractionWalletSaleHdr"; LineNumber: Integer): Boolean
+    internal procedure AddIntermediateWalletLine(IntermediaryWallet: Record "NPR AttractionWalletSaleHdr"; SaleLineId: Guid; LineNumber: Integer): Boolean
     var
         IntermediaryWalletLine: Record "NPR AttractionWalletSaleLine";
     begin
         IntermediaryWalletLine.SaleHeaderSystemId := IntermediaryWallet.SaleHeaderSystemId;
         IntermediaryWalletLine.LineNumber := LineNumber;
+        IntermediaryWalletLine.SaleLineId := SaleLineId;
         IntermediaryWalletLine.WalletNumber := IntermediaryWallet.WalletNumber;
         exit(IntermediaryWalletLine.Insert());
     end;
 
-    internal procedure AdjustIntermediateWalletQuantityForLine(SaleId: Guid; SaleLineNumber: Integer; OrgQuantity: Integer; NewQuantity: Integer)
+    internal procedure AdjustIntermediateWalletQuantityForLine(SaleId: Guid; SaleLineId: Guid; SaleLineNumber: Integer; OrgQuantity: Integer; NewQuantity: Integer)
     begin
         if (OrgQuantity < NewQuantity) then
-            TopUpIntermediateWalletsForLine(SaleId, SaleLineNumber, NewQuantity);
+            TopUpIntermediateWalletsForLine(SaleId, SaleLineId, SaleLineNumber, NewQuantity);
 
         if (OrgQuantity > NewQuantity) then
             RemoveIntermediateWalletsForLine(SaleId, SaleLineNumber, NewQuantity);
     end;
 
-    internal procedure TopUpIntermediateWalletsForLine(SaleId: Guid; SaleLineNumber: Integer; TargetQuantity: Integer)
+    internal procedure TopUpIntermediateWalletsForLine(SaleId: Guid; SaleLineId: Guid; SaleLineNumber: Integer; TargetQuantity: Integer)
     var
         IntermediaryWallet: Record "NPR AttractionWalletSaleHdr";
         IntermediaryWalletLine: Record "NPR AttractionWalletSaleLine";
@@ -240,13 +241,13 @@ codeunit 6185076 "NPR AttractionWalletCreate"
         if (ExistingCount > CurrentCount) then begin
             IntermediaryWallet.FindSet();
             repeat
-                if (AddIntermediateWalletLine(IntermediaryWallet, SaleLineNumber)) then
+                if (AddIntermediateWalletLine(IntermediaryWallet, SaleLineId, SaleLineNumber)) then
                     CurrentCount += 1;
             until (IntermediaryWallet.Next() = 0) or (CurrentCount >= TargetQuantity);
         end;
 
         if (CurrentCount < TargetQuantity) then
-            CreateIntermediateWallet(SaleId, SaleLineNumber, TargetQuantity - CurrentCount, TargetQuantity);
+            CreateIntermediateWallet(SaleId, SaleLineId, SaleLineNumber, TargetQuantity - CurrentCount, TargetQuantity);
 
     end;
 

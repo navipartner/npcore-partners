@@ -20,6 +20,11 @@ table 6150968 "NPR AttractionWalletSaleLine"
             DataClassification = CustomerContent;
             Caption = 'Wallet Number';
         }
+        field(4; SaleLineId; Guid)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Sales Line Id';
+        }
 
     }
 
