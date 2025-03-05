@@ -4242,7 +4242,6 @@
                 Membership."Replicated At" := CurrentDateTime();
             if (MemberInfoCapture."Enable Auto-Renew") then
                 Membership."Auto-Renew" := Membership."Auto-Renew"::YES_INTERNAL;
-            Membership."Auto-Renew Payment Method Code" := MemberInfoCapture."Auto-Renew Payment Method Code";
 
             Membership.Insert(true);
             MembershipCreated := true;

@@ -277,6 +277,9 @@ table 6150801 "NPR Adyen Setup"
             Caption = 'Default Auto-Renew Payment Method Code';
             DataClassification = CustomerContent;
             TableRelation = "Payment Method".Code;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-03-05';
+            ObsoleteReason = 'Not used.';
         }
     }
     keys
