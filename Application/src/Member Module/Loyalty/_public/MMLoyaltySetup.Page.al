@@ -1,7 +1,5 @@
 ﻿page 6060105 "NPR MM Loyalty Setup"
 {
-    Extensible = False;
-
     Caption = 'Loyalty Setup';
     ContextSensitiveHelpPage = 'docs/entertainment/loyalty/intro/';
     PageType = List;
