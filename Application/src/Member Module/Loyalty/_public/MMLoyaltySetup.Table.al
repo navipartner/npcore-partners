@@ -1,7 +1,5 @@
 ﻿table 6060140 "NPR MM Loyalty Setup"
 {
-    Extensible = false;
-
     Caption = 'Loyalty Setup';
     DataClassification = CustomerContent;
 
