@@ -36,7 +36,7 @@ page 6184875 "NPR AttractionWalletAssignment"
 
                     WalletList.GetRecord(IntermediaryWallet);
                     ValidateNumberOfWallets();
-                    WalletManager.AddIntermediateWalletLine(IntermediaryWallet, Rec.LineNumber);
+                    WalletManager.AddIntermediateWalletLine(IntermediaryWallet, Rec.SaleLineId, Rec.LineNumber);
                 end;
 
                 trigger OnValidate()
@@ -51,7 +51,7 @@ page 6184875 "NPR AttractionWalletAssignment"
                     // Relative Wallet Number
                     if (Evaluate(WalletNumber, _SelectWalletReference)) then
                         if (IntermediaryWallet.Get(Rec.SaleHeaderSystemId, WalletNumber)) then begin
-                            WalletManager.AddIntermediateWalletLine(IntermediaryWallet, Rec.LineNumber);
+                            WalletManager.AddIntermediateWalletLine(IntermediaryWallet, Rec.SaleLineId, Rec.LineNumber);
                             exit;
                         end;
 
@@ -61,7 +61,7 @@ page 6184875 "NPR AttractionWalletAssignment"
                     IntermediaryWallet.SetFilter(SaleHeaderSystemId, '=%1', Rec.SaleHeaderSystemId);
                     IntermediaryWallet.SetFilter(ReferenceNumber, '=%1', _SelectWalletReference);
                     if (IntermediaryWallet.FindFirst()) then begin
-                        WalletManager.AddIntermediateWalletLine(IntermediaryWallet, Rec.LineNumber);
+                        WalletManager.AddIntermediateWalletLine(IntermediaryWallet, Rec.SaleLineId, Rec.LineNumber);
                         exit;
                     end;
 
@@ -72,7 +72,7 @@ page 6184875 "NPR AttractionWalletAssignment"
                         error('Invalid reference number');
 
                     WalletManager.CreateIntermediateWalletForExistingWallet(
-                        Rec.SaleHeaderSystemId, Rec.LineNumber,
+                        Rec.SaleHeaderSystemId, Rec.SaleLineId, Rec.LineNumber,
                         ExistingWallet.Description, ExistingWallet.ReferenceNumber, ExistingWallet.EntryNo);
 
                     _SelectWalletReference := '';
@@ -166,7 +166,7 @@ page 6184875 "NPR AttractionWalletAssignment"
                 var
                     WalletHandler: Codeunit "NPR AttractionWalletCreate";
                 begin
-                    WalletHandler.CreateIntermediateWallet(_SaleHeaderSystemId, _LineNumber, 1, _MaxQuantity);
+                    WalletHandler.CreateIntermediateWallet(_SaleHeaderSystemId, _SaleLineId, _LineNumber, 1, _MaxQuantity);
                     CurrPage.Update(false);
                 end;
             }
@@ -206,7 +206,7 @@ page 6184875 "NPR AttractionWalletAssignment"
                 var
                     WalletHandler: Codeunit "NPR AttractionWalletCreate";
                 begin
-                    WalletHandler.TopUpIntermediateWalletsForLine(Rec.SaleHeaderSystemId, Rec.LineNumber, _MaxQuantity);
+                    WalletHandler.TopUpIntermediateWalletsForLine(Rec.SaleHeaderSystemId, Rec.SaleLineId, Rec.LineNumber, _MaxQuantity);
                     CurrPage.Update(false);
                 end;
             }
@@ -244,9 +244,10 @@ page 6184875 "NPR AttractionWalletAssignment"
             error(MaxWalletsExceeded);
     end;
 
-    internal procedure SetSalesContext(SaleHeaderSystemId: Guid; LineNumber: Integer; MaxQuantity: Integer)
+    internal procedure SetSalesContext(SaleHeaderSystemId: Guid; SaleLineId: Guid; LineNumber: Integer; MaxQuantity: Integer)
     begin
         _SaleHeaderSystemId := SaleHeaderSystemId;
+        _SaleLineId := SaleLineId;
         _LineNumber := LineNumber;
         _MaxQuantity := MaxQuantity;
     end;
@@ -255,8 +256,8 @@ page 6184875 "NPR AttractionWalletAssignment"
         _Name: Text[100];
         _ReferenceNumber: Code[50];
         _SaleHeaderSystemId: Guid;
+        _SaleLineId: Guid;
         _LineNumber: Integer;
         _MaxQuantity: Integer;
-
         _SelectWalletReference: Code[50];
 }
