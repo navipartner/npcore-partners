@@ -810,6 +810,7 @@ codeunit 6185130 "NPR SG SpeedGate"
     var
         MemberCard: Record "NPR MM Member Card";
         Membership: Record "NPR MM Membership";
+        Member: Record "NPR MM Member";
         MembershipSetup: Record "NPR MM Membership Setup";
         MemberCardProfile: Record "NPR SG MemberCardProfile";
         MemberCardProfileLine: Record "NPR SG MemberCardProfileLine";
@@ -835,11 +836,17 @@ codeunit 6185130 "NPR SG SpeedGate"
         if (not Membership.Get(MemberCard."Membership Entry No.")) then
             exit(false);
 
+        if (not Member.Get(MemberCard."Member Entry No.")) then
+            exit(false);
+
         if (MemberCard.Blocked) then
             exit(SetApiError(_ApiErrors::member_card_blocked));
 
         if (Membership.Blocked) then
             exit(SetApiError(_ApiErrors::membership_blocked));
+
+        if Member.Blocked then
+            exit(SetApiError(_ApiErrors::member_blocked));
 
         if (not MembershipSetup.Get(Membership."Membership Code")) then
             exit(SetApiError(_ApiErrors::membership_setup_missing));

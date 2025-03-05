@@ -129,6 +129,11 @@ enum 6059810 "NPR API Error Code"
         Caption = 'The wallet has expired.', Locked = true;
     }
 
+    value(6060133; member_blocked)
+    {
+        Caption = 'Member is blocked.', Locked = true;
+    }
+
     value(6060134; member_card_blocked)
     {
         Caption = 'Member card is blocked.', Locked = true;
