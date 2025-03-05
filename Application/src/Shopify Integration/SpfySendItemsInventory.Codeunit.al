@@ -1232,12 +1232,13 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         OStream: OutStream;
         ShopifyResponse: JsonToken;
         RequestJson: JsonObject;
+        VariablesJson: JsonObject;
         Window: Dialog;
         ReceivedShopifyID: Text;
         SkuFilterString: Text;
         Success: Boolean;
-        ProductGraphQLQueryTok: Label '{ products(first: 1, query: "%1") {edges{node{id}}}}', Locked = true;
-        ProductVariantGraphQLQueryTok: Label '{ productVariants(first: 1, query: "sku:%1") {edges{node{id product{id} inventoryItem{id}}}}}', Locked = true;
+        ProductGraphQLQueryTok: Label 'query FindProductBySku($skuFilter: String!) {products(first: 1, query: $skuFilter) {edges{node{id}}}}', Locked = true;
+        ProductVariantGraphQLQueryTok: Label 'query FindProductVariantBySku($skuFilter: String!) {productVariants(first: 1, query: $skuFilter) {edges{node{id product{id} inventoryItem{id}}}}}', Locked = true;
     begin
         if (SpfyStoreItemLink."Item No." = _LastQueriedSpfyStoreItemLink."Item No.") and
            (SpfyStoreItemLink."Variant Code" = _LastQueriedSpfyStoreItemLink."Variant Code") and
@@ -1246,7 +1247,9 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             exit(true);
         if WithDialog then
             Window.Open(_QueryingShopifyLbl);
-        RequestJson.Add('query', StrSubstNo(ProductVariantGraphQLQueryTok, SpfyItemMgt.GetProductVariantSku(SpfyStoreItemLink."Item No.", SpfyStoreItemLink."Variant Code")));
+        VariablesJson.Add('skuFilter', 'sku:' + SpfyItemMgt.GetProductVariantSku(SpfyStoreItemLink."Item No.", SpfyStoreItemLink."Variant Code"));
+        RequestJson.Add('query', ProductVariantGraphQLQueryTok);
+        RequestJson.Add('variables', VariablesJson);
 
         TempNcTask."Store Code" := SpfyStoreItemLink."Shopify Store Code";
         TempNcTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
@@ -1271,7 +1274,10 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                 SkuFilterString := GenerateItemVariantSKUsGraphQLFilter(SpfyStoreItemLink."Item No.");
                 if SkuFilterString <> '' then begin
                     Clear(RequestJson);
-                    RequestJson.Add('query', StrSubstNo(ProductGraphQLQueryTok, SkuFilterString));
+                    Clear(VariablesJson);
+                    VariablesJson.Add('skuFilter', SkuFilterString);
+                    RequestJson.Add('query', ProductGraphQLQueryTok);
+                    RequestJson.Add('variables', VariablesJson);
                     Clear(TempNcTask);
                     TempNcTask."Store Code" := SpfyStoreItemLink."Shopify Store Code";
                     TempNcTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
