@@ -18,6 +18,8 @@ codeunit 6185060 "NPR UPG Subscriptions"
         ScheduleSubscriptionPaymentRequestProcessingJobQueue();
         ScheduleSubscriptionRequestProcessingJobQueue();
         UpdateSubscriptionAutoRenewStatus();
+        UpdateSubscriptionRenewReqJobStartTime();
+        UpdateSubscriptionRenewProcJobStartTime();
     end;
 
     internal procedure CreateSubscriptions()
@@ -137,6 +139,67 @@ codeunit 6185060 "NPR UPG Subscriptions"
         SetUpgradeTag();
     end;
 
+    local procedure UpdateSubscriptionRenewProcJobStartTime()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        UpgradeStep := 'UpdateSubscriptionRenewProcJobStartTime';
+        if HasUpgradeTag() then
+            exit;
+
+        JobQueueEntry.Reset();
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR MM Subscr. Renew Proc. JQ");
+        if JobQueueEntry.FindLast() then
+            SetJobStartTime(JobQueueEntry, 230000T);
+
+        SetUpgradeTag();
+    end;
+
+    local procedure UpdateSubscriptionRenewReqJobStartTime()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        UpgradeStep := 'UpdateSubscriptionRenewReqJobStartTime';
+        if HasUpgradeTag() then
+            exit;
+
+        JobQueueEntry.Reset();
+        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
+        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR MM Subscr. Renew Req. JQ");
+        if JobQueueEntry.FindLast() then
+            SetJobStartTime(JobQueueEntry, 060000T);
+
+        SetUpgradeTag();
+    end;
+
+    local procedure SetJobStartTime(JobQueueEntry: Record "Job Queue Entry"; StartingTime: Time)
+    var
+        StartDateTime: DateTime;
+        IsModified: Boolean;
+    begin
+        StartDateTime := CreateDateTime(Today, StartingTime);
+        if CurrentDateTime > StartDateTime then
+            StartDateTime := CreateDateTime(CalcDate('<+1D>', Today), StartingTime);
+
+        if JobQueueEntry."Earliest Start Date/Time" <> StartDateTime then
+            IsModified := true;
+
+        if JobQueueEntry."Starting Time" <> StartingTime then
+            IsModified := true;
+
+        if IsModified then begin
+            if JobQueueEntry.Status <> JobQueueEntry.Status::"On Hold" then
+                JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold");
+            if JobQueueEntry."Earliest Start Date/Time" <> StartDateTime then
+                JobQueueEntry."Earliest Start Date/Time" := StartDateTime;
+            if JobQueueEntry."Starting Time" <> StartingTime then
+                JobQueueEntry."Starting Time" := StartingTime;
+            JobQueueEntry.Modify();
+            if not JobQueueEntry."NPR Manually Set On Hold" then
+                JobQueueEntry.SetStatus(JobQueueEntry.Status::Ready);
+        end;
+    end;
 
     local procedure HasUpgradeTag(): Boolean
     begin
