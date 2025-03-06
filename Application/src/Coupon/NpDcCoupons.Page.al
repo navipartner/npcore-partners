@@ -105,13 +105,16 @@
                     var
                         Coupon: Record "NPR NpDc Coupon";
                         NpDcCouponMgt: Codeunit "NPR NpDc Coupon Mgt.";
+                        BatchPrint: Boolean;
                     begin
                         CurrPage.SetSelectionFilter(Coupon);
                         if not Coupon.FindSet() then
                             exit;
 
+                        BatchPrint := Coupon.Count > 1;
+
                         repeat
-                            NpDcCouponMgt.PrintCoupon(Coupon);
+                            NpDcCouponMgt.PrintCoupon(Coupon, BatchPrint);
                         until Coupon.Next() = 0;
                     end;
                 }
