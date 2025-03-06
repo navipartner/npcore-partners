@@ -132,7 +132,17 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
             StartDateTime := CreateDateTime(CalcDate('<+1D>', Today), 060000T);
 
         SubscriptionsJobQueueCategoryCode := SubscriptionMgtImpl.GetSubscriptionsJobQueueCategoryCode();
-        if not NPRJobQueueManagement.InitRecurringJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR MM Subscr. Renew Req. JQ", '', DescriptionLbl, StartDateTime, 1440, SubscriptionsJobQueueCategoryCode, JobQueueEntry) then
+        if not NPRJobQueueManagement.InitRecurringJobQueueEntry(
+            JobQueueEntry."Object Type to Run"::Codeunit,
+            Codeunit::"NPR MM Subscr. Renew Req. JQ",
+            '',
+            DescriptionLbl,
+            StartDateTime,
+            060000T,
+            230000T,
+            1440,
+            SubscriptionsJobQueueCategoryCode,
+            JobQueueEntry) then
             exit;
 
         JobQueueEntry."Maximum No. of Attempts to Run" := 999999999;
@@ -182,7 +192,17 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
             StartDateTime := CreateDateTime(CalcDate('<+1D>', Today), 230000T);
 
         SubscriptionsJobQueueCategoryCode := SubscriptionMgtImpl.GetSubscriptionsJobQueueCategoryCode();
-        if not NPRJobQueueManagement.InitRecurringJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR MM Subscr. Renew Proc. JQ", '', DescriptionLbl, StartDateTime, 1440, SubscriptionsJobQueueCategoryCode, JobQueueEntry) then
+        if not NPRJobQueueManagement.InitRecurringJobQueueEntry(
+            JobQueueEntry."Object Type to Run"::Codeunit,
+            Codeunit::"NPR MM Subscr. Renew Proc. JQ",
+            '',
+            DescriptionLbl,
+            StartDateTime,
+            230000T,
+            060000T,
+            1440,
+            SubscriptionsJobQueueCategoryCode,
+            JobQueueEntry) then
             exit;
 
         JobQueueEntry."Maximum No. of Attempts to Run" := 999999999;
