@@ -532,8 +532,6 @@ codeunit 6184796 "NPR Adyen Management"
     local procedure IsPayByLinkSetupEnabled() SetupEnabled: Boolean;
     var
         AdyenSetup: Record "NPR Adyen Setup";
-        SubsPaymentGateway: Record "NPR MM Subs. Payment Gateway";
-        SubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup";
         MagentoPaymentGateway: Record "NPR Magento Payment Gateway";
     begin
         SetupEnabled := false;
@@ -546,13 +544,8 @@ codeunit 6184796 "NPR Adyen Management"
                         SetupEnabled := true;
 
         //Subscription PayByLink Card Update
-        SubsPaymentGateway.SetRange("Integration Type", SubsPaymentGateway."Integration Type"::Adyen);
-        SubsPaymentGateway.SetRange(Status, SubsPaymentGateway.Status::Enabled);
-        SubsPaymentGateway.SetLoadFields("Integration Type", Status, Code);
-        if SubsPaymentGateway.FindFirst() then
-            if SubsAdyenPGSetup.Get(SubsPaymentGateway.Code) then
-                if SubsAdyenPGSetup."Card Update by Pay by Link" then
-                    SetupEnabled := true;
+        if IsSubsPGEnabled() then
+            SetupEnabled := true;
     end;
 
     internal procedure ScheduleRefundStatusJQ()
@@ -1292,6 +1285,15 @@ codeunit 6184796 "NPR Adyen Management"
         if JsonContent.Get('additionalData', ContentToken) then
             if ContentToken.AsObject().Get('paymentLinkId', JsonValueToken) then
                 PaymentLinkId := CopyStr(JsonValueToken.AsValue().AsText(), 1, MaxStrLen(PaymentLinkId));
+    end;
+
+    internal procedure IsSubsPGEnabled() SetupEnabled: Boolean
+    var
+        SubsPaymentGateway: Record "NPR MM Subs. Payment Gateway";
+    begin
+        SubsPaymentGateway.SetRange("Integration Type", SubsPaymentGateway."Integration Type"::Adyen);
+        SubsPaymentGateway.SetRange(Status, SubsPaymentGateway.Status::Enabled);
+        SetupEnabled := not SubsPaymentGateway.IsEmpty;
     end;
 
     internal procedure EnsureAdyenWebhookSetup(WebhookEventFilter: Text[2048]; MerchantAccount: Text[80]; AdyenWebhookType: Enum "NPR Adyen Webhook Type")

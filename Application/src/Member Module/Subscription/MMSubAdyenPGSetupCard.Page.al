@@ -56,12 +56,6 @@ page 6184870 "NPR MM Sub Adyen PG Setup Card"
             }
             group("Pay by Link")
             {
-                field("Card Update by Pay by Link"; Rec."Card Update by Pay by Link")
-                {
-                    Caption = 'Card Update';
-                    ToolTip = 'Enables card updates via pay by link if a subscription payment fails';
-                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-                }
                 field("Pay By Link Exp. Duration"; Rec."Pay By Link Exp. Duration")
                 {
                     Caption = 'Pay By Link Exp. Duration';
