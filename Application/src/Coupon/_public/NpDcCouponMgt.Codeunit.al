@@ -972,5 +972,29 @@
         end;
     end;
 
+    procedure PrintCoupon(Coupon: Record "NPR NpDc Coupon"; BatchPrint: Boolean)
+    var
+        RPTemplateMgt: Codeunit "NPR RP Template Mgt.";
+        ShowReqPage: Boolean;
+    begin
+        if not BatchPrint then
+            ShowReqPage := true;
+
+        case Coupon."Print Object Type" of
+            Coupon."Print Object Type"::Template:
+                begin
+                    Coupon.TestField("Print Template Code");
+                    Coupon.SetRecFilter();
+                    RPTemplateMgt.PrintTemplate(Coupon."Print Template Code", Coupon, 0);
+                end;
+            Coupon."Print Object Type"::Report:
+                begin
+                    Coupon.TestField("Print Object ID");
+                    Coupon.SetRecFilter();
+                    Report.Run(Coupon."Print Object ID", ShowReqPage, false, Coupon);
+                end;
+        end;
+    end;
+
     #endregion Print
 }
