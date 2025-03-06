@@ -37,9 +37,6 @@ codeunit 6185052 "NPR API Request Processor"
         requestBodyStr: Text;
         responseCodeunit: Codeunit "NPR API Response";
         jsonParser: Codeunit "NPR JSON Parser";
-        UserPermissions: Codeunit "User Permissions";
-        AccessControl: Record "Access Control";
-        CurrentModuleInfo: ModuleInfo;
         SentryTraceHeader: Text;
         SentryTraceHeaderValues: List of [Text];
     begin
@@ -79,10 +76,9 @@ codeunit 6185052 "NPR API Request Processor"
 
         requestCodeunit.Init(requestHttpMethod, requestPath, requestRelativePathSegments, requestQueryParams, requestHeaders, requestBodyJson);
 
-        NavApp.GetCurrentModuleInfo(CurrentModuleInfo);
         apiModuleResolver := apiModule;
 # pragma warning disable AA0139
-        if not UserPermissions.HasUserPermissionSetAssigned(UserSecurityId(), CompanyName(), apiModuleResolver.GetRequiredPermissionSet(), AccessControl.Scope::System, CurrentModuleInfo.Id) then begin
+        if not HasUserPermissionSetAssigned(UserSecurityId(), CompanyName(), apiModuleResolver.GetRequiredPermissionSet()) then begin
 # pragma warning restore AA0139
             // For the API module, we require explicit permission sets declared on the entra app for each module to avoid "BC365 FULL ACCESS + NPR RETAIL" as go-to everywhere in prod.
             exit(responseCodeunit.RespondForbidden(StrSubstNo('Missing permissions: %1', apiModuleResolver.GetRequiredPermissionSet())).GetResponseJson());
@@ -121,5 +117,16 @@ codeunit 6185052 "NPR API Request Processor"
         CurrCodeunit := Codeunit::"NPR API Request Processor";
         WebServiceMgt.CreateTenantWebService(WebService."Object Type"::Codeunit, CurrCodeunit, 'npr_rest_api', true);
     end;
+
+    local procedure HasUserPermissionSetAssigned(UserSecurityId: Guid; Company: Text; RoleId: Code[20]): Boolean
+    var
+        AccessControl: Record "Access Control";
+    begin
+        AccessControl.SetRange("User Security ID", UserSecurityId);
+        AccessControl.SetRange("Role ID", RoleId);
+        AccessControl.SetFilter("Company Name", '%1|%2', '', Company);
+        exit(not AccessControl.IsEmpty());
+    end;
+
 }
 #endif
