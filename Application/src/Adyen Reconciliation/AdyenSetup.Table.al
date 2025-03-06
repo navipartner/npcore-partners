@@ -333,24 +333,9 @@ table 6150801 "NPR Adyen Setup"
                     AdyenManagement.EnsureAdyenWebhookSetup(AuthorisationEventFilter, MerchantAccount.Name, AdyenWebhookType::standard);
                 until MerchantAccount.Next() = 0;
         end else begin
-            if not IsSubsPayByLinkEnabled() then
+            if not AdyenManagement.IsSubsPGEnabled() then
                 AdyenManagement.SetOnHoldPayByLinkStatusJQ();
             AdyenManagement.SetOnHoldPostPaymentLinesJQ();
         end;
-    end;
-
-
-    local procedure IsSubsPayByLinkEnabled(): Boolean
-    var
-        SubsPaymentGateway: Record "NPR MM Subs. Payment Gateway";
-        SubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup";
-    begin
-        SubsPaymentGateway.SetRange("Integration Type", SubsPaymentGateway."Integration Type"::Adyen);
-        SubsPaymentGateway.SetRange(Status, SubsPaymentGateway.Status::Enabled);
-        SubsPaymentGateway.SetLoadFields("Integration Type", Status, Code);
-        if SubsPaymentGateway.FindFirst() then
-            if SubsAdyenPGSetup.Get(SubsPaymentGateway.Code) then
-                if SubsAdyenPGSetup."Card Update by Pay by Link" then
-                    exit(true);
     end;
 }

@@ -38,10 +38,9 @@ table 6150962 "NPR MM Subs Adyen PG Setup"
         {
             Caption = 'Card Update by Pay by Link';
             DataClassification = CustomerContent;
-            trigger OnValidate()
-            begin
-                SetupPayByLink();
-            end;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-02-27';
+            ObsoleteReason = 'Not used.';
         }
         field(7; "Pay By Link Exp. Duration"; Duration)
         {
@@ -167,38 +166,5 @@ table 6150962 "NPR MM Subs Adyen PG Setup"
             else
                 Error(UnsupportedEnvironmentErr, Format(Rec.Environment));
         end;
-    end;
-
-    local procedure SetupPayByLink()
-    var
-        MerchantAccount: Record "NPR Adyen Merchant Account";
-        AdyenWebhookType: Enum "NPR Adyen Webhook Type";
-        AdyenManagement: Codeunit "NPR Adyen Management";
-        AuthorisationEventFilter: Label 'AUTHORISATION', Locked = true;
-        RecurringContractFilter: Label 'RECURRING_CONTRACT', Locked = true;
-    begin
-        if Rec."Card Update by Pay by Link" then begin
-            AdyenManagement.SchedulePayByLinkStatusJQ();
-            AdyenManagement.ScheduleRecurringContractJQ();
-            AdyenManagement.SchedulePayByLinkCancelJQ();
-            AdyenManagement.UpdateMerchantList(0);
-            if MerchantAccount.FindSet() then
-                repeat
-                    AdyenManagement.EnsureAdyenWebhookSetup(AuthorisationEventFilter, MerchantAccount.Name, AdyenWebhookType::standard);
-                    AdyenManagement.EnsureAdyenWebhookSetup(RecurringContractFilter, MerchantAccount.Name, AdyenWebhookType::standard);
-                until MerchantAccount.Next() = 0;
-        end else begin
-            if not IsPayByLinkEnabled() then
-                AdyenManagement.SetOnHoldPayByLinkStatusJQ();
-        end;
-    end;
-
-    local procedure IsPayByLinkEnabled(): Boolean
-    var
-        AdyenSetup: Record "NPR Adyen Setup";
-    begin
-        if AdyenSetup.Get() then
-            if AdyenSetup."Enable Pay by Link" then
-                exit(true);
     end;
 }

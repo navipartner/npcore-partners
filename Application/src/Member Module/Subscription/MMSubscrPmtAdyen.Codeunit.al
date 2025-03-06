@@ -802,11 +802,6 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
             exit;
         end;
 
-        if not SubsAdyenPGSetup."Card Update by Pay by Link" then begin
-            Success := true;
-            exit;
-        end;
-
         if not CheckRejectedStatusCanBeProcessed(SubscrPaymentRequest) then begin
             Success := true;
             exit;
@@ -2187,7 +2182,6 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
     procedure EnableIntegration(var SubsPaymentGateway: Record "NPR MM Subs. Payment Gateway")
     var
         SubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup";
-        AdyenManagement: Codeunit "NPR Adyen Management";
     begin
         if SubsPaymentGateway."Integration Type" <> SubsPaymentGateway."Integration Type"::Adyen then
             exit;
@@ -2197,13 +2191,35 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         SubsAdyenPGSetup.TestField("Merchant Name");
 
         EnsureAdyenSetup();
-        CreateRefundWebhook(SubsAdyenPGSetup."Merchant Name");
-        AdyenManagement.ScheduleRefundStatusJQ();
+        SetupPayByLink();
 
         if SubsPaymentGateway.Status <> SubsPaymentGateway.Status::Enabled then begin
             SubsPaymentGateway.Status := SubsPaymentGateway.Status::Enabled;
             SubsPaymentGateway.Modify(true);
         end;
+    end;
+
+    local procedure SetupPayByLink()
+    var
+        AdyenWebhookType: Enum "NPR Adyen Webhook Type";
+        AdyenManagement: Codeunit "NPR Adyen Management";
+        MerchantAccount: Record "NPR Adyen Merchant Account";
+        AuthorisationEventFilter: Label 'AUTHORISATION', Locked = true;
+        RecurringContractFilter: Label 'RECURRING_CONTRACT', Locked = true;
+        RefundEventFilter: Label 'REFUND', Locked = true;
+    begin
+        AdyenManagement.SchedulePayByLinkStatusJQ();
+        AdyenManagement.ScheduleRecurringContractJQ();
+        AdyenManagement.SchedulePayByLinkCancelJQ();
+        AdyenManagement.ScheduleRefundStatusJQ();
+
+        AdyenManagement.UpdateMerchantList(0);
+        if MerchantAccount.FindSet() then
+            repeat
+                AdyenManagement.EnsureAdyenWebhookSetup(AuthorisationEventFilter, MerchantAccount.Name, AdyenWebhookType::standard);
+                AdyenManagement.EnsureAdyenWebhookSetup(RecurringContractFilter, MerchantAccount.Name, AdyenWebhookType::standard);
+                AdyenManagement.EnsureAdyenWebhookSetup(RefundEventFilter, MerchantAccount.Name, AdyenWebhookType::standard);
+            until MerchantAccount.Next() = 0;
     end;
 
     local procedure EnsureAdyenSetup()
@@ -2219,15 +2235,6 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
             NPPaySetup.Validate("Enable Reconciliation", true);
             NPPaySetup.Modify();
         end;
-    end;
-
-    internal procedure CreateRefundWebhook(MerchantName: Text[50])
-    var
-        AdyenManagement: Codeunit "NPR Adyen Management";
-        RefundEventFilter: Label 'REFUND', Locked = true;
-        AdyenWebhookType: Enum "NPR Adyen Webhook Type";
-    begin
-        AdyenManagement.EnsureAdyenWebhookSetup(RefundEventFilter, MerchantName, AdyenWebhookType::standard);
     end;
 
     procedure DisableIntegration(var SubsPaymentGateway: Record "NPR MM Subs. Payment Gateway")

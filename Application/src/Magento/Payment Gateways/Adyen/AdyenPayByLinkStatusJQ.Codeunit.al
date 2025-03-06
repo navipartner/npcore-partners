@@ -28,8 +28,7 @@ codeunit 6184933 "NPR Adyen PayByLink Status JQ"
     local procedure IsSetupEnabled() SetupEnabled: Boolean;
     var
         AdyenSetup: Record "NPR Adyen Setup";
-        SubsPaymentGateway: Record "NPR MM Subs. Payment Gateway";
-        SubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup";
+        AdyenManagement: Codeunit "NPR Adyen Management";
     begin
         SetupEnabled := false;
 
@@ -39,12 +38,7 @@ codeunit 6184933 "NPR Adyen PayByLink Status JQ"
                 SetupEnabled := true;
 
         //Subscription PayByLink Card Update
-        SubsPaymentGateway.SetRange("Integration Type", SubsPaymentGateway."Integration Type"::Adyen);
-        SubsPaymentGateway.SetRange(Status, SubsPaymentGateway.Status::Enabled);
-        SubsPaymentGateway.SetLoadFields("Integration Type", Status, Code);
-        if SubsPaymentGateway.FindFirst() then
-            if SubsAdyenPGSetup.Get(SubsPaymentGateway.Code) then
-                if SubsAdyenPGSetup."Card Update by Pay by Link" then
-                    SetupEnabled := true;
+        If AdyenManagement.IsSubsPGEnabled() then
+            SetupEnabled := true;
     end;
 }
