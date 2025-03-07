@@ -128,8 +128,8 @@ page 6150805 "NPR SaaS Import Setup"
 
             action(CreateAADApp)
             {
-                Caption = 'Create Azure AD App';
-                ToolTip = 'Register an Azure AD Application in tenant and prompt for permission. Must be run by a global admin in SaaS.';
+                Caption = 'Create Entra ID App';
+                ToolTip = 'Register a Microsoft Entra ID Application in tenant and prompt for permission. Must be run by a global admin in SaaS.';
                 Image = ApprovalSetup;
                 ApplicationArea = NPRRetail;
 

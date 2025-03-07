@@ -190,13 +190,13 @@ page 6150720 "NPR HL Integration Setup"
                 }
                 group("Azure Active Directory OAuth")
                 {
-                    Caption = 'Azure Active Directory OAuth';
+                    Caption = 'Microsoft Entra ID OAuth';
                     Image = XMLSetup;
                     Visible = HasAzureADConnection;
                     action("Create Azure AD App")
                     {
-                        Caption = 'Create Azure AD App';
-                        ToolTip = 'Running this action will create an Azure AD App and a accompaning client secret.';
+                        Caption = 'Create Entra ID App';
+                        ToolTip = 'Running this action will create a Microsoft Entra ID App and an accompanying client secret.';
                         ApplicationArea = NPRHeyLoyalty;
                         Image = Setup;
 
@@ -209,8 +209,8 @@ page 6150720 "NPR HL Integration Setup"
                     }
                     action("Create Azure AD App Secret")
                     {
-                        Caption = 'Create Azure AD App Secret';
-                        ToolTip = 'Running this action will create a client secret for an existing Azure AD App.';
+                        Caption = 'Create Entra ID App Secret';
+                        ToolTip = 'Running this action will create a client secret for an existing Microsoft Entra ID App.';
                         ApplicationArea = NPRHeyLoyalty;
                         Image = Setup;
 

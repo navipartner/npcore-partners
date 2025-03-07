@@ -680,7 +680,7 @@ codeunit 6184796 "NPR Adyen Management"
         ErrorTxt: Text;
         ClientIdLbl: Label '{eb29ef3d-edea-44b1-b5f7-4bd4eb360c29}', Locked = true;
     begin
-        //Register Azure AD Adyent Application and Try Grant Permissions
+        //Register Azure AD (Microsoft Entra ID) Adyent Application and Try Grant Permissions
         Evaluate(ClientId, ClientIdLbl);
         PermissionSets.Add('NPR Adyen Webhook');
         AADApplicationMgt.RegisterAzureADApplication(ClientId, 'Adyen Webhook', PermissionSets);

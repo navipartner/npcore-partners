@@ -130,8 +130,8 @@ page 6151349 "NPR Vipps Mp Unit Setup"
     local procedure CreateAzureADVippsMobilepayApplication(var AADApplication: Record "AAD Application")
     var
         AADApplicationInterface: Codeunit "AAD Application Interface";
-        MissingPermissionsErr: Label 'You need to have write permission to both %1 and %2. If you do not have access to manage users and Azure AD Applications, you cannot perform this action', Comment = '%1 = table caption of "AAD Application", %2 = table caption of "Access Control"';
-        UserDoestNotExistErr: Label 'The user associated with the Azure AD App (%1) does not exist. System cannot assign permissions. Before the app can be used, make sure to create the user and assign appropriate permissions', Comment = '%1 = Azure AD App Client ID';
+        MissingPermissionsErr: Label 'You need to have write permission to both %1 and %2. If you do not have access to manage users and Entra ID Applications, you cannot perform this action', Comment = '%1 = table caption of "AAD Application", %2 = table caption of "Access Control"';
+        UserDoestNotExistErr: Label 'The user associated with the Entra ID App (%1) does not exist. System cannot assign permissions. Before the app can be used, make sure to create the user and assign appropriate permissions', Comment = '%1 = Entra ID App Client ID';
         AppInfo: ModuleInfo;
         AccessControl: Record "Access Control";
         User: Record User;

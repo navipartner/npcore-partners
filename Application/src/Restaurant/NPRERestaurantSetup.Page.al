@@ -350,7 +350,7 @@
                     action("Create MS Entra App")
                     {
                         Caption = 'Create Microsoft Entra App';
-                        ToolTip = 'Running this action will create a Microsoft Entra Application and a accompaning client secret. You’ll need this if you want to use the NaviParter KDS display functionality.';
+                        ToolTip = 'Running this action will create a Microsoft Entra Application and an accompanying client secret. You’ll need this if you want to use the NaviParter KDS display functionality.';
                         ApplicationArea = NPRRetail;
                         Image = Setup;
 

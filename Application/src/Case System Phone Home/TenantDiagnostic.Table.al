@@ -14,7 +14,7 @@ table 6014696 "NPR Tenant Diagnostic"
         }
         field(2; "Azure AD Tenant ID"; Text[50])
         {
-            Caption = 'Azure AD Tenant ID';
+            Caption = 'Entra ID Tenant ID';
             DataClassification = CustomerContent;
             ObsoleteState = Pending;
             ObsoleteTag = '2023-06-28';

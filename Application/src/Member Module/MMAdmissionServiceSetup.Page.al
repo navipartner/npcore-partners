@@ -109,8 +109,8 @@
 
                 action(CreateNewAzureADApplication)
                 {
-                    Caption = 'Create New Azure AD Application';
-                    ToolTip = 'Running this action will create an Azure AD App and a accompanying client secret.';
+                    Caption = 'Create New Entra ID Application';
+                    ToolTip = 'Running this action will create a Microsoft Entra ID App and an accompanying client secret.';
                     Image = Setup;
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
@@ -134,8 +134,8 @@
 
                 action(CreateNewAADApplicationSecret)
                 {
-                    Caption = 'Create New Azure AD Application Secret';
-                    ToolTip = 'Running this action will create a client secret for an existing Azure AD App.';
+                    Caption = 'Create New Entra ID Application Secret';
+                    ToolTip = 'Running this action will create a client secret for an existing Microsoft Entra ID App.';
                     Image = Setup;
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 

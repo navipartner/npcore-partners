@@ -1002,14 +1002,14 @@
                 }
                 group("Azure Active Directory OAuth")
                 {
-                    Caption = 'Azure Active Directory OAuth';
+                    Caption = 'Microsoft Entra ID OAuth';
                     Visible = HasAzureADConnection;
                     Image = XMLSetup;
 
                     action("Create Azure AD App")
                     {
-                        Caption = 'Create Azure AD App';
-                        ToolTip = 'Running this action will create an Azure AD App and a accompaning client secret.';
+                        Caption = 'Create Entra ID App';
+                        ToolTip = 'Running this action will create a Microsoft Entra ID App and an accompanying client secret.';
                         Image = Setup;
                         ApplicationArea = NPRRetail;
 
@@ -1022,8 +1022,8 @@
                     }
                     action("Create Azure AD App Secret")
                     {
-                        Caption = 'Create Azure AD App Secret';
-                        ToolTip = 'Running this action will create a client secret for an existing Azure AD App.';
+                        Caption = 'Create Entra ID App Secret';
+                        ToolTip = 'Running this action will create a client secret for an existing Microsoft Entra ID App.';
                         Image = Setup;
                         ApplicationArea = NPRRetail;
 

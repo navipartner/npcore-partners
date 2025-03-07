@@ -4,21 +4,21 @@ codeunit 6060060 "NPR AAD Application Mgt."
 
     var
         BadApiResponseErr: Label 'Received a bad response from the API.\Status Code: %1 - %2\Body: %3', Comment = '%1 = status code, %2 = reason phrase, %3 = body';
-        CreatedAzureADAppSuccessMsg: Label 'Successfully created Azure AD application with the following details:\\Client ID: %1\Client Secret: %2\Tenant ID: %3\\The secret expires at: %4\\NOTE! The secret cannot be seen after this message is closed. Copy it to a safe place.\\Remember to grant admin consent to the app before use if you haven''t already done this.', Comment = '%1 = client id, %2 = client secret, %3 = azure ad tenant id, %4 = expiration date';
-        CreateAADAppCreationOfSecretFailedMsg: Label 'Successfully created Azure AD application, but FAILED to create a secret.\\Client ID: %1\Tenant ID: %2', Comment = '%1 = client id, %2 = azure ad tenant id';
-        CreatedSecretMsg: Label 'Created secret for Azure AD App. Details:\\Client ID: %1\Client Secret: %2\Tenant ID: %3\\Expires: %4\\NOTE! The secret cannot be seen after this message is closed. Copy it to a safe place.', Comment = '%1 = client id, %2 = client secret, %3 = azure ad tenant id, %4 = expiration date';
-        CouldNotCreateAADAppErr: Label 'Could not create Azure AD App with the Microsoft Graph API.\\Error message: %1', Comment = '%1 = error message';
+        CreatedAzureADAppSuccessMsg: Label 'Successfully created Entra ID application with the following details:\\Client ID: %1\Client Secret: %2\Tenant ID: %3\\The secret expires at: %4\\NOTE! The secret cannot be seen after this message is closed. Copy it to a safe place.\\Remember to grant admin consent to the app before use if you haven''t already done this.', Comment = '%1 = client id, %2 = client secret, %3 = entra id tenant id, %4 = expiration date';
+        CreateAADAppCreationOfSecretFailedMsg: Label 'Successfully created Entra ID application, but FAILED to create a secret.\\Client ID: %1\Tenant ID: %2', Comment = '%1 = client id, %2 = entra id tenant id';
+        CreatedSecretMsg: Label 'Created secret for Entra ID App. Details:\\Client ID: %1\Client Secret: %2\Tenant ID: %3\\Expires: %4\\NOTE! The secret cannot be seen after this message is closed. Copy it to a safe place.', Comment = '%1 = client id, %2 = client secret, %3 = entra id tenant id, %4 = expiration date';
+        CouldNotCreateAADAppErr: Label 'Could not create Entra ID App with the Microsoft Graph API.\\Error message: %1', Comment = '%1 = error message';
         CouldNotCreateSecretErr: Label 'Could not create secret. Error message was:\\%1';
-        MissingPermissionsErr: Label 'You need to have write permission to both %1 and %2. If you do not have access to manage users and Azure AD Applications, you cannot perform this action', Comment = '%1 = table caption of "AAD Application", %2 = table caption of "Access Control"';
+        MissingPermissionsErr: Label 'You need to have write permission to both %1 and %2. If you do not have access to manage users and Entra ID Applications, you cannot perform this action', Comment = '%1 = table caption of "AAD Application", %2 = table caption of "Access Control"';
         ResponseMalformedValueNotArrayOrObjectErr: Label 'The response from the Graph API is malformed. Expected "value" to be either an array or an object, but it is neither.\\Response: %1', Comment = '%1 = response body';
-        NoAzureADRegisteredErr: Label 'System was not able to acquire the Azure AD Tenant ID. This is required to be able to get an access token.';
+        NoAzureADRegisteredErr: Label 'System was not able to acquire the Entra ID Tenant ID. This is required to be able to get an access token.';
         CouldNotGetAccessTokenErr: Label 'Unable to get an access token to Microsoft''s Graph API.\\Error message: %1', Comment = '%1 = error message';
-        UserDoestNotExistErr: Label 'The user associated with the Azure AD App (%1) does not exist. System cannot assign permissions. Before the app can be used, make sure to create the user and assign appropriate permissions', Comment = '%1 = Azure AD App Client ID';
-        CouldNotFindObjectIdFromAppIdErr: Label 'Could not find Azure AD App Object ID from the given Azure AD App ID (%1)', Comment = '%1 = Azure AD App ID';
+        UserDoestNotExistErr: Label 'The user associated with the Entra ID App (%1) does not exist. System cannot assign permissions. Before the app can be used, make sure to create the user and assign appropriate permissions', Comment = '%1 = Entra ID App Client ID';
+        CouldNotFindObjectIdFromAppIdErr: Label 'Could not find Entra ID App Object ID from the given Entra ID App ID (%1)', Comment = '%1 = Entra ID App ID';
         GrantConsentQst: Label 'Before being able to use the newly created app it requires admin consent to be granted. Do you want to do that now?';
-        ErrorDuringAppConsentErr: Label 'An error occurred while giving consent to the Azure AD app.\\Error message: %1', Comment = '%1 = error message';
+        ErrorDuringAppConsentErr: Label 'An error occurred while giving consent to the Entra ID app.\\Error message: %1', Comment = '%1 = error message';
         ConsentFailedErr: Label 'Failed to give consent.';
-        WaitingForAppToBeReadyMsg: Label 'Waiting for the Azure AD App to be ready for approval...';
+        WaitingForAppToBeReadyMsg: Label 'Waiting for the Entra ID App to be ready for approval...';
         ParameterValueEmptyErr: Label '%1 cannot be blank.', Comment = '%1 = name of the parameter that was evaluated.';
         FindExistingEntraAppsErr: Label 'An error occurred while searching for existing Entra apps with DisplayName = %1 in Entra directory. Error message was:\\%2', Comment = '%1 = name of the application, %2 = error message.';
         ExistingAppRegisteredOnlyMsg: Label 'The Entra application %1 has already been found in the Entra directory, so it was only registered in Business Central.', Comment = '%1 = name of the application';
