@@ -99,6 +99,7 @@
 
         NpCsDocument.Modify(true);
         LogPosting(NpCsDocument, SalesHeader, '');
+        Commit();
         NpCsWorkflowMgt.ScheduleRunWorkflowDelay(NpCsDocument, 10000);
     end;
 

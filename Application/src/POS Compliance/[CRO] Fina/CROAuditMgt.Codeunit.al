@@ -324,9 +324,9 @@ codeunit 6151547 "NPR CRO Audit Mgt."
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Post Entries", 'OnBeforeCheckAndPostGenJournal', '', false, false)]
     local procedure UpdateDSXVATDateFieldOnGenJournalLine(var GenJournalLine: Record "Gen. Journal Line"; var POSEntry: Record "NPR POS Entry")
     var
+        GLSetup: Record "General Ledger Setup";
         RecordRef: RecordRef;
         FieldRef: FieldRef;
-        GLSetup: Record "General Ledger Setup";
     begin
         if not IsCROFiscalActive() then
             exit;
@@ -404,7 +404,9 @@ codeunit 6151547 "NPR CRO Audit Mgt."
     var
         CROAuxSalespPurch: Record "NPR CRO Aux Salesperson/Purch.";
         CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info";
+        NpCsDocument: Record "NPR NpCs Document";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
+        NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
     begin
         CROPOSAuditLogAuxInfo.Init();
         CROPOSAuditLogAuxInfo."Audit Entry Type" := CROPOSAuditLogAuxInfo."Audit Entry Type"::"POS Entry";
@@ -423,9 +425,18 @@ codeunit 6151547 "NPR CRO Audit Mgt."
 
         SaveCustomerDataToAuditLog(CROPOSAuditLogAuxInfo, POSEntry."Customer No.");
 
-        CheckPaymentMethod(POSEntry, CROPOSAuditLogAuxInfo);
+        CROPOSAuditLogAuxInfo."Collect in Store" := NpCsCollectMgt.IsDeliveredCollectInStoreDocument(NpCsDocument, NpCsDocument."Delivery Document Type"::"POS Entry", CROPOSAuditLogAuxInfo."Source Document No.");
+        if CROPOSAuditLogAuxInfo."Collect in Store" then begin
+            NpCsDocument.SetLoadFields("Document Type", "Document No.", "Prepaid Amount");
+            SetTotalAmount(CROPOSAuditLogAuxInfo, NpCsDocument);
+            SetPaymentMethod(CROPOSAuditLogAuxInfo, NpCsDocument, POSEntry."Entry No.");
+        end else
+            SetPaymentMethod(CROPOSAuditLogAuxInfo, POSEntry."Entry No.");
 
         CROPOSAuditLogAuxInfo.Insert(true);
+
+        if CROPOSAuditLogAuxInfo."Collect in Store" then
+            UpdateCROAuxSalesHeaderPosUnit(NpCsDocument);
     end;
 
     local procedure InsertCROPOSAuditLogAuxInfo(SalesInvoiceHeader: Record "Sales Invoice Header"): Boolean
@@ -535,7 +546,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
             Error(MissingOIBErr);
     end;
 
-    local procedure CheckPaymentMethod(POSEntry: Record "NPR POS Entry"; var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
+    local procedure SetPaymentMethod(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; POSEntryNo: Integer)
     var
         CROPOSPaymMethMapping: Record "NPR CRO POS Paym. Method Mapp.";
         CROPOSPaymMethMapping2: Record "NPR CRO POS Paym. Method Mapp.";
@@ -543,24 +554,21 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         POSEntryPaymentLine2: Record "NPR POS Entry Payment Line";
         PaymentMappingNonExistentErr: Label 'Selected POS Payment Method Mapping does not exist.';
     begin
-        POSEntry.CalcFields("Payment Lines");
         POSEntryPaymentLine.SetLoadFields("POS Payment Method Code", "Amount (LCY)");
-        POSEntryPaymentLine2.SetLoadFields("POS Payment Method Code", "Amount (LCY)");
+        POSEntryPaymentLine.SetRange("POS Entry No.", POSEntryNo);
+        POSEntryPaymentLine.SetFilter("Amount (LCY)", '>0');
 
-        case POSEntry."Payment Lines" of
+        case POSEntryPaymentLine.Count() of
             1:
                 begin
-                    POSEntryPaymentLine.SetFilter("Amount (LCY)", '>0');
-                    POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
                     if POSEntryPaymentLine.FindFirst() then begin
                         CROPOSPaymMethMapping.Get(POSEntryPaymentLine."POS Payment Method Code");
                         CROPOSAuditLogAuxInfo.Validate("Payment Method Code", CROPOSPaymMethMapping."Payment Method Code");
                     end;
                 end;
             else begin
-                POSEntryPaymentLine.SetFilter("Amount (LCY)", '>0');
-                POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-                POSEntryPaymentLine2.SetRange("POS Entry No.", POSEntry."Entry No.");
+                POSEntryPaymentLine2.SetLoadFields("POS Payment Method Code", "Amount (LCY)");
+                POSEntryPaymentLine2.SetRange("POS Entry No.", POSEntryNo);
                 POSEntryPaymentLine2.SetFilter("Amount (LCY)", '>0');
                 if not POSEntryPaymentLine.FindFirst() then
                     exit;
@@ -580,7 +588,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
                         if CROPOSPaymMethMapping.FindFirst() then
                             CROPOSAuditLogAuxInfo.Validate("Payment Method Code", CROPOSPaymMethMapping."Payment Method Code")
                         else
-                            CROPOSAuditLogAuxInfo.Validate("Payment Method Code");
+                            CROPOSAuditLogAuxInfo.Validate("Payment Method Code", '');
                     end else begin
                         CROPOSPaymMethMapping.Get(POSEntryPaymentLine."POS Payment Method Code");
                         CROPOSAuditLogAuxInfo.Validate("Payment Method Code", CROPOSPaymMethMapping."Payment Method Code");
@@ -588,6 +596,69 @@ codeunit 6151547 "NPR CRO Audit Mgt."
                 until POSEntryPaymentLine2.Next() = 0;
             end
         end;
+    end;
+
+    local procedure SetPaymentMethod(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; var NpCsDocument: Record "NPR NpCs Document"; POSEntryNo: Integer)
+    var
+        CROPaymentMethodMapping: Record "NPR CRO Payment Method Mapping";
+        CROPOSPaymMethMapping: Record "NPR CRO POS Paym. Method Mapp.";
+        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
+        SalesHeader: Record "Sales Header";
+        CROPaymentMethods: List of [Enum "NPR CRO Payment Method"];
+        CROPaymentMethod: Enum "NPR CRO Payment Method";
+    begin
+        POSEntryPaymentLine.SetLoadFields("POS Payment Method Code", "Amount (LCY)");
+        POSEntryPaymentLine.SetFilter("Amount (LCY)", '>0');
+        POSEntryPaymentLine.SetRange("POS Entry No.", POSEntryNo);
+        if POSEntryPaymentLine.FindSet() then
+            repeat
+                CROPOSPaymMethMapping.Get(POSEntryPaymentLine."POS Payment Method Code");
+                if not CROPaymentMethods.Contains(CROPOSPaymMethMapping."Payment Method") then
+                    CROPaymentMethods.Add(CROPOSPaymMethMapping."Payment Method");
+            until POSEntryPaymentLine.Next() = 0;
+
+        NpCsDocument.FindSet();
+
+        repeat
+            SalesHeader.Get(NpCsDocument."Document Type", NpCsDocument."Document No.");
+            CROPaymentMethodMapping.Get(SalesHeader."Payment Method Code");
+            if not CROPaymentMethods.Contains(CROPaymentMethodMapping."CRO Payment Method") then
+                CROPaymentMethods.Add(CROPaymentMethodMapping."CRO Payment Method");
+        until NpCsDocument.Next() = 0;
+
+        case CROPaymentMethods.Count() of
+            1:
+                begin
+                    CROPaymentMethod := CROPaymentMethods.Get(1);
+                    CROPOSAuditLogAuxInfo."Payment Method" := CROPaymentMethod;
+                end
+            else
+                CROPOSAuditLogAuxInfo."Payment Method" := CROPOSAuditLogAuxInfo."Payment Method"::Other;
+        end;
+    end;
+
+    local procedure SetTotalAmount(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; var NpCsDocument: Record "NPR NpCs Document")
+    begin
+        NpCsDocument.FindSet();
+
+        repeat
+            CROPOSAuditLogAuxInfo."Total Amount" += NpCsDocument."Prepaid Amount";
+        until NpCsDocument.Next() = 0;
+    end;
+
+    local procedure UpdateCROAuxSalesHeaderPosUnit(var NpCsDocument: Record "NPR NpCs Document")
+    var
+        CROAuxSalesHeader: Record "NPR CRO Aux Sales Header";
+        SalesHeader: Record "Sales Header";
+    begin
+        NpCsDocument.FindSet();
+
+        repeat
+            SalesHeader.Get(NpCsDocument."Document Type", NpCsDocument."Document No.");
+            CROAuxSalesHeader.ReadCROAuxSalesHeaderFields(SalesHeader);
+            CROAuxSalesHeader."NPR CRO POS Unit" := '';
+            CROAuxSalesHeader.SaveCROAuxSalesHeaderFields();
+        until NpCsDocument.Next() = 0;
     end;
 
     internal procedure CalculateZKI(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")

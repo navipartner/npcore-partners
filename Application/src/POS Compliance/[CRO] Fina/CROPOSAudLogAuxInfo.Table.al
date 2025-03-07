@@ -156,6 +156,11 @@ table 6060059 "NPR CRO POS Aud. Log Aux. Info"
             Editable = false;
             FieldClass = FlowField;
         }
+        field(30; "Collect in Store"; Boolean)
+        {
+            Caption = 'Collect in Store';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
