@@ -630,6 +630,7 @@
                     EntryNo: Integer;
                     AzureSetupCount: Integer;
                     ForceIncludeAzureSetup: Boolean;
+                    ConfirmSendForAllMembershipRolesLbl: Label 'Do you want to send the welcome notifications for all Membership Roles?\To send for specific roles, please use the "Create Welcome Notification" action from the membership lines.\\Continue?';
                 begin
                     AzureMemberRegistration.SetFilter(Enabled, '=%1', true);
                     AzureSetupCount := AzureMemberRegistration.Count();
@@ -645,6 +646,11 @@
 
                     MembershipRole.SetFilter("Member Entry No.", '=%1', Rec."Entry No.");
                     MembershipRole.SetFilter(Blocked, '=%1', false);
+
+                    if MembershipRole.Count > 1 then
+                        if not Confirm(ConfirmSendForAllMembershipRolesLbl, true) then
+                            exit;
+
                     if (MembershipRole.FindSet()) then begin
                         repeat
                             MemberNotification.AddMemberWelcomeNotificationWorker(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", AzureMemberRegistration.AzureRegistrationSetupCode, EntryNoList);
@@ -675,10 +681,16 @@
                     MembershipNotification: Record "NPR MM Membership Notific.";
                     MembershipRole: Record "NPR MM Membership Role";
                     EntryNo: Integer;
+                    ConfirmSendForAllMembershipRolesLbl: Label 'Do you want to send the wallet notifications for all Membership Roles?\To send for specific roles, please use the "Send Wallet Notification" action from the membership lines.\\Continue?';
                 begin
 
                     MembershipRole.SetFilter("Member Entry No.", '=%1', Rec."Entry No.");
                     MembershipRole.SetFilter(Blocked, '=%1', false);
+
+                    if MembershipRole.Count > 1 then
+                        if not Confirm(ConfirmSendForAllMembershipRolesLbl, true) then
+                            exit;
+
                     if (MembershipRole.FindSet()) then begin
                         repeat
                             if (MembershipRole."Wallet Pass Id" <> '') then
