@@ -97,6 +97,85 @@
 
     actions
     {
+        area(processing)
+        {
+            action("Create Welcome Notification")
+            {
+                Caption = 'Create Welcome Notification';
+                Image = Interaction;
+
+                ToolTip = 'Executes the Create Welcome Notification action';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                trigger OnAction()
+                var
+                    MemberNotification: Codeunit "NPR MM Member Notification";
+                    MembershipNotification: Record "NPR MM Membership Notific.";
+                    MembershipRole: Record "NPR MM Membership Role";
+                    AzureMemberRegistration: Record "NPR MM AzureMemberRegSetup";
+                    EntryNoList: List of [Integer];
+                    EntryNo: Integer;
+                    AzureSetupCount: Integer;
+                    ForceIncludeAzureSetup: Boolean;
+                begin
+                    AzureMemberRegistration.SetFilter(Enabled, '=%1', true);
+                    AzureSetupCount := AzureMemberRegistration.Count();
+                    if (AzureSetupCount > 0) then
+                        ForceIncludeAzureSetup := Confirm('Force include the Azure Member Registration information? Else it will be determined by original membership sales item.', false);
+
+                    if (ForceIncludeAzureSetup) and (AzureSetupCount = 1) then
+                        AzureMemberRegistration.FindFirst();
+
+                    if (ForceIncludeAzureSetup) and (AzureSetupCount > 1) then
+                        if (Page.RunModal(Page::"NPR MM AzureMemberRegList", AzureMemberRegistration) <> Action::LookupOK) then
+                            Error('');
+
+                    CurrPage.SetSelectionFilter(MembershipRole);
+                    if (MembershipRole.FindSet()) then begin
+                        repeat
+                            MemberNotification.AddMemberWelcomeNotificationWorker(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", AzureMemberRegistration.AzureRegistrationSetupCode, EntryNoList);
+
+                            foreach EntryNo in EntryNoList do
+                                if (MembershipNotification.Get(EntryNo)) then
+                                    if (MembershipNotification."Processing Method" = MembershipNotification."Processing Method"::INLINE) then
+                                        MemberNotification.HandleMembershipNotification(MembershipNotification);
+
+                        until (MembershipRole.Next() = 0);
+                    end;
+                end;
+            }
+            action("Send Wallet Notification")
+            {
+                Caption = 'Send Wallet Notification';
+                Image = Interaction;
+
+                ToolTip = 'Creates a wallet notification message and sends it when processing method is set to inline';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                trigger OnAction()
+                var
+                    MemberNotification: Codeunit "NPR MM Member Notification";
+                    MembershipNotification: Record "NPR MM Membership Notific.";
+                    MembershipRole: Record "NPR MM Membership Role";
+                    EntryNo: Integer;
+                begin
+                    CurrPage.SetSelectionFilter(MembershipRole);
+                    if (MembershipRole.FindSet()) then begin
+                        repeat
+                            if (MembershipRole."Wallet Pass Id" <> '') then
+                                EntryNo := MemberNotification.CreateUpdateWalletNotification(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", 0, TODAY);
+
+                            if (MembershipRole."Wallet Pass Id" = '') then
+                                EntryNo := MemberNotification.CreateWalletSendNotification(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", 0, TODAY);
+
+                            if (MembershipNotification.Get(EntryNo)) then
+                                if (MembershipNotification."Processing Method" = MembershipNotification."Processing Method"::INLINE) then
+                                    MemberNotification.HandleMembershipNotification(MembershipNotification);
+                        until (MembershipRole.Next() = 0);
+                    end;
+                end;
+            }
+        }
     }
 
     internal procedure GetSelectedMembershipEntryNo(): Integer
