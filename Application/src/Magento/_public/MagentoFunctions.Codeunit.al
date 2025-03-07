@@ -52,13 +52,14 @@
 
     procedure NaviEditorEditTempBlob(var TempBlob: Codeunit "Temp Blob") NewValue: Boolean
     var
+        TypeHelper: Codeunit "Type Helper";
         TextEditorDialog: Page "NPR Text Editor Dialog";
         InStr: InStream;
         OutStr: OutStream;
         HtmlText: Text;
     begin
         TempBlob.CreateInStream(InStr);
-        InStr.ReadText(HtmlText);
+        HtmlText := TypeHelper.ReadAsTextWithSeparator(InStr, TypeHelper.CRLFSeparator());
         Clear(TextEditorDialog);
 
         TextEditorDialog.InitTextEditorOptionKeyAndValueBuffer();

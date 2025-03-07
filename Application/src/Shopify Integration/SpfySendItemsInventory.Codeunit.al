@@ -708,7 +708,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                     ProductJObject.Add('title', GetItemTitle(Item, SpfyStoreItemLink."Shopify Store Code"));
             if SpfyStoreItemLink."Shopify Description".HasValue() then begin
                 SpfyStoreItemLink.CalcFields("Shopify Description");
-                SpfyStoreItemLink."Shopify Description".CreateInStream(IStream, TextEncoding::UTF8);
+                SpfyStoreItemLink."Shopify Description".CreateInStream(IStream);
                 LongDescription := TypeHelper.ReadAsTextWithSeparator(IStream, TypeHelper.CRLFSeparator());
                 if LongDescription <> '' then
                     ProductJObject.Add('body_html', LongDescription);
