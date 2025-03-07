@@ -19,7 +19,6 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
     end;
 
     #region CRO Tax Communication - XML Document Creation
-
     local procedure CreateAndFiscalizePOSSale(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; Subsequent: Boolean)
     var
         POSEntry: Record "NPR POS Entry";
@@ -46,6 +45,9 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
                     VATElements.Add(CreateXmlElement('Iznos', CROAuditMgt.FormatDecimal(POSEntryTaxLine."Tax Amount")));
                     VATSection.Add(VATElements);
                 until POSEntryTaxLine.Next() = 0;
+
+            if CROPOSAuditLogAuxInfo."Collect in Store" then
+                AddCollectInStoreVATSection(POSEntry."Entry No.", VATElements, VATSection);
 
             AddVoucherVATSection(CROPOSAuditLogAuxInfo, VATElements, VATSection);
 
@@ -117,7 +119,7 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
         SignBillAndSendToTA(CROPOSAuditLogAuxInfo, Document);
     end;
 
-    internal procedure CreateAndFiscalizeSalesCrMemoRefund(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; Subsequent: Boolean)
+    local procedure CreateAndFiscalizeSalesCrMemoRefund(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; Subsequent: Boolean)
     var
         SalesCrMemoLines: Record "Sales Cr.Memo Line";
         Document: XmlDocument;
@@ -229,6 +231,48 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
             Content.Add(CreateXmlElement('NakDost', 'true'))
         else
             Content.Add(CreateXmlElement('NakDost', 'false'));
+    end;
+
+    local procedure AddCollectInStoreVATSection(POSEntryNo: Integer; var VATElements: XmlElement; var VATSection: XmlElement)
+    var
+        SalesInvoiceLine: Record "Sales Invoice Line";
+        SalesLine: Record "Sales Line";
+        NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
+        PostedSalesInvoiceNo: Code[20];
+        SalesOrderNo: Code[20];
+        PostedSalesInvoices: List of [Code[20]];
+        SalesOrders: List of [Code[20]];
+    begin
+        NpCsCollectMgt.FindDocumentsForDeliveredCollectInStoreDocument(POSEntryNo, PostedSalesInvoices, SalesOrders);
+
+        foreach SalesOrderNo in SalesOrders do begin
+            SalesLine.SetLoadFields("VAT %", "Amount Including VAT", "VAT Base Amount");
+            SalesLine.SetRange("Document Type", SalesLine."Document Type"::Order);
+            SalesLine.SetRange("Document No.", SalesOrderNo);
+            SalesLine.SetFilter(Type, '<>%1', SalesLine.Type::" ");
+            if SalesLine.FindSet() then
+                repeat
+                    VATElements := XmlElement.Create('Porez');
+                    VATElements.Add(CreateXmlElement('Stopa', CROAuditMgt.FormatDecimal(SalesLine."VAT %")));
+                    VATElements.Add(CreateXmlElement('Osnovica', CROAuditMgt.FormatDecimal(SalesLine."VAT Base Amount")));
+                    VATElements.Add(CreateXmlElement('Iznos', CROAuditMgt.FormatDecimal(SalesLine."Amount Including VAT" - SalesLine."VAT Base Amount")));
+                    VATSection.Add(VATElements);
+                until SalesLine.Next() = 0
+        end;
+
+        foreach PostedSalesInvoiceNo in PostedSalesInvoices do begin
+            SalesInvoiceLine.SetLoadFields("VAT %", "Amount Including VAT", "VAT Base Amount");
+            SalesInvoiceLine.SetRange("Document No.", PostedSalesInvoiceNo);
+            SalesInvoiceLine.SetFilter(Type, '<>%1', SalesInvoiceLine.Type::" ");
+            if SalesInvoiceLine.FindSet() then
+                repeat
+                    VATElements := XmlElement.Create('Porez');
+                    VATElements.Add(CreateXmlElement('Stopa', CROAuditMgt.FormatDecimal(SalesInvoiceLine."VAT %")));
+                    VATElements.Add(CreateXmlElement('Osnovica', CROAuditMgt.FormatDecimal(SalesInvoiceLine."VAT Base Amount")));
+                    VATElements.Add(CreateXmlElement('Iznos', CROAuditMgt.FormatDecimal(SalesInvoiceLine."Amount Including VAT" - SalesInvoiceLine."VAT Base Amount")));
+                    VATSection.Add(VATElements);
+                until SalesInvoiceLine.Next() = 0;
+        end;
     end;
 
     local procedure AddVoucherVATSection(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; var VATElements: XmlElement; var VATSection: XmlElement)
@@ -400,7 +444,6 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
         BaseValue := BaseValue.Replace('xmlns=""', '');
         BaseValue := BaseValue.Replace('"', '\"');
     end;
-
     #endregion
 
     #region CRO Tax Communication - Test Procedures
@@ -410,7 +453,6 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
         CROPOSAuditLogAuxInfo."JIR Code" := CopyStr(GetJIRCodeFromResponse(ResponseText), 1, MaxStrLen(CROPOSAuditLogAuxInfo."JIR Code"));
         CROPOSAuditLogAuxInfo.Modify();
     end;
-
     #endregion
 
     [IntegrationEvent(true, false)]

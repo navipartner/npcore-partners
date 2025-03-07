@@ -1011,4 +1011,54 @@
     begin
     end;
     #endregion
+
+    #region Helper procedures
+    internal procedure IsDeliveredCollectInStoreDocument(var NpCsDocument: Record "NPR NpCs Document"; DeliveryDocumentType: Integer; DeliveryDocumentNo: Code[20]): Boolean
+    begin
+        NpCsDocument.SetCurrentKey("Delivery Document Type", "Delivery Document No.");
+        NpCsDocument.SetRange("Delivery Document Type", DeliveryDocumentType);
+        NpCsDocument.SetRange("Delivery Document No.", DeliveryDocumentNo);
+        NpCsDocument.SetRange(Type, NpCsDocument.Type::"Collect in Store");
+        exit(not NpCsDocument.IsEmpty());
+    end;
+
+    internal procedure FindDocumentsForDeliveredCollectInStoreDocument(POSEntryNo: Integer; var PostedSalesInvoices: List of [Code[20]]; var SalesOrders: List of [Code[20]])
+    var
+        SalesHeader: Record "Sales Header";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
+        POSEntrySalesDocLink2: Record "NPR POS Entry Sales Doc. Link";
+    begin
+        POSEntrySalesDocLink.SetRange("POS Entry No.", POSEntryNo);
+        POSEntrySalesDocLink.SetRange("POS Entry Reference Type", POSEntrySalesDocLink."POS Entry Reference Type"::SALESLINE);
+        POSEntrySalesDocLink.SetRange("Sales Document Type", POSEntrySalesDocLink."Sales Document Type"::ORDER);
+        POSEntrySalesDocLink.SetRange("Post Sales Document Status", POSEntrySalesDocLink."Post Sales Document Status"::"Not To Be Posted");
+        if POSEntrySalesDocLink.FindSet() then
+            repeat
+                POSEntrySalesDocLink2.SetRange("POS Entry No.", POSEntrySalesDocLink."POS Entry No.");
+                POSEntrySalesDocLink2.SetRange("POS Entry Reference Type", POSEntrySalesDocLink."POS Entry Reference Type");
+                POSEntrySalesDocLink2.SetRange("POS Entry Reference Line No.", POSEntrySalesDocLink."POS Entry Reference Line No.");
+                POSEntrySalesDocLink2.SetRange("Sales Document Type", POSEntrySalesDocLink."Sales Document Type"::POSTED_INVOICE);
+                POSEntrySalesDocLink2.SetRange("Post Sales Document Status", POSEntrySalesDocLink."Post Sales Document Status");
+                if not POSEntrySalesDocLink2.FindSet() then begin
+                    if SalesHeader.Get(SalesHeader."Document Type"::Order, POSEntrySalesDocLink."Sales Document No") then begin
+                        if not SalesOrders.Contains(SalesHeader."No.") then
+                            SalesOrders.Add(SalesHeader."No.")
+                    end else begin
+                        SalesInvoiceHeader.SetCurrentKey("Order No.");
+                        SalesInvoiceHeader.SetRange("Order No.", POSEntrySalesDocLink."Sales Document No");
+                        if SalesInvoiceHeader.FindSet() then
+                            repeat
+                                if not PostedSalesInvoices.Contains(SalesInvoiceHeader."No.") then
+                                    PostedSalesInvoices.Add(SalesInvoiceHeader."No.");
+                            until SalesInvoiceHeader.Next() = 0;
+                    end;
+                end else
+                    repeat
+                        if not PostedSalesInvoices.Contains(POSEntrySalesDocLink2."Sales Document No") then
+                            PostedSalesInvoices.Add(POSEntrySalesDocLink2."Sales Document No");
+                    until POSEntrySalesDocLink2.Next() = 0
+            until POSEntrySalesDocLink.Next() = 0;
+    end;
+    #endregion
 }

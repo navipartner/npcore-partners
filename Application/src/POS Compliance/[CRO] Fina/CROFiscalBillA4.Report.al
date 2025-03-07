@@ -46,7 +46,7 @@ report 6014554 "NPR CRO Fiscal Bill A4"
                 begin
                     case "CRO POS Audit Log Aux Info"."Audit Entry Type" of
                         "CRO POS Audit Log Aux Info"."Audit Entry Type"::"POS Entry":
-                            FillPOSEntryRecords("CRO POS Audit Log Aux Info", "POS Entry Lines", "POS Entry Tax Lines", "POS Entry Payment Lines");
+                            FillPOSSaleRecords("CRO POS Audit Log Aux Info", "POS Entry Lines", "POS Entry Tax Lines", "POS Entry Payment Lines");
                         "CRO POS Audit Log Aux Info"."Audit Entry Type"::"Sales Credit Memo":
                             FillSalesCrMemoRecords("CRO POS Audit Log Aux Info", "POS Entry Lines", "POS Entry Tax Lines", "POS Entry Payment Lines");
                         "CRO POS Audit Log Aux Info"."Audit Entry Type"::"Sales Invoice":
@@ -179,18 +179,25 @@ report 6014554 "NPR CRO Fiscal Bill A4"
         _DocumentNo := DocumentNo;
     end;
 
-    local procedure FillPOSEntryRecords(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; var POSEntryLines: Record "NPR POS Entry Sales Line" temporary;
-    var POSEntryTaxLines: Record "NPR POS Entry Tax Line" temporary; var POSEntryPaymentLines: Record "NPR POS Entry Payment Line" temporary)
+    local procedure FillPOSSaleRecords(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; var POSEntrySalesLines: Record "NPR POS Entry Sales Line" temporary; var POSEntryTaxLines: Record "NPR POS Entry Tax Line" temporary; var POSEntryPaymentLines: Record "NPR POS Entry Payment Line" temporary)
     var
         Customer: Record Customer;
         POSEntry: Record "NPR POS Entry";
-        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        SalesHeader: Record "Sales Header";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        SalesInvoiceLine: Record "Sales Invoice Line";
+        SalesLine: Record "Sales Line";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
+        NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
+        PostedSalesInvoiceNo: Code[20];
+        SalesOrderNo: Code[20];
         AmountInclTaxDict: Dictionary of [Decimal, Decimal];
         TaxableAmountDict: Dictionary of [Decimal, Decimal];
         TaxAmountDict: Dictionary of [Decimal, Decimal];
         NextLineNo: Integer;
+        PostedSalesInvoices: List of [Code[20]];
+        SalesOrders: List of [Code[20]];
     begin
         POSEntry.SetLoadFields("Customer No.", "Salesperson Code");
         POSEntry.Get(CROPOSAuditLogAuxInfo."POS Entry No.");
@@ -203,96 +210,151 @@ report 6014554 "NPR CRO Fiscal Bill A4"
             CustomerName := Customer.Name;
             CustomerPostCity := Customer."Post Code" + ' ' + Customer.City;
         end;
-        POSEntryPaymentLine.SetRange("POS Entry No.", CROPOSAuditLogAuxInfo."POS Entry No.");
-        POSEntryPaymentLine.SetLoadFields("POS Payment Method Code", "Amount (LCY)");
-        POSEntryPaymentLine.FindSet();
-        repeat
-            POSEntryPaymentLines.Init();
-            POSEntryPaymentLines.TransferFields(POSEntryPaymentLine);
-            POSEntryPaymentLines.Insert();
-        until POSEntryPaymentLine.Next() = 0;
 
         POSEntrySalesLine.SetRange("POS Entry No.", CROPOSAuditLogAuxInfo."POS Entry No.");
         POSEntrySalesLine.SetFilter(Type, '%1|%2', POSEntrySalesLine.Type::Item, POSEntrySalesLine.Type::Voucher);
-        if not POSEntrySalesLine.FindSet() then
-            exit;
-        NextLineNo := 10000;
-        repeat
-            POSEntryLines.Init();
-            POSEntryLines.TransferFields(POSEntrySalesLine);
+        if POSEntrySalesLine.FindSet() then
+            repeat
+                POSEntrySalesLines.Init();
+                POSEntrySalesLines.TransferFields(POSEntrySalesLine);
+                AddAmountToDecimalDictionary(TaxableAmountDict, POSEntrySalesLine."VAT %", POSEntrySalesLine."VAT Base Amount");
+                AddAmountToDecimalDictionary(TaxAmountDict, POSEntrySalesLine."VAT %", POSEntrySalesLine."Amount Incl. VAT" - POSEntrySalesLine."Amount Excl. VAT");
+                AddAmountToDecimalDictionary(AmountInclTaxDict, POSEntrySalesLine."VAT %", POSEntrySalesLine."Amount Incl. VAT");
+                POSEntrySalesLines.Insert();
+            until POSEntrySalesLine.Next() = 0;
 
-            POSEntryLines."POS Entry No." := CROPOSAuditLogAuxInfo."POS Entry No.";
-            POSEntryLines."Line No." := NextLineNo;
-            NextLineNo += 10000;
-            AddAmountToDecimalDictionary(TaxableAmountDict, POSEntrySalesLine."VAT %", POSEntrySalesLine."VAT Base Amount");
-            AddAmountToDecimalDictionary(TaxAmountDict, POSEntrySalesLine."VAT %", POSEntrySalesLine."Amount Incl. VAT" - POSEntrySalesLine."Amount Excl. VAT");
-            AddAmountToDecimalDictionary(AmountInclTaxDict, POSEntrySalesLine."VAT %", POSEntrySalesLine."Amount Incl. VAT");
-            POSEntryLines.Insert();
-        until POSEntrySalesLine.Next() = 0;
+        if CROPOSAuditLogAuxInfo."Collect in Store" then begin
+            NpCsCollectMgt.FindDocumentsForDeliveredCollectInStoreDocument(CROPOSAuditLogAuxInfo."POS Entry No.", PostedSalesInvoices, SalesOrders);
+
+            foreach SalesOrderNo in SalesOrders do begin
+                SalesLine.SetLoadFields("No.", Description, Quantity, "Unit Price", "Amount Including VAT", "Unit of Measure Code", "Line Discount %", "Line Discount Amount", "VAT %", "VAT Base Amount");
+                SalesLine.SetRange("Document Type", SalesLine."Document Type"::Order);
+                SalesLine.SetRange("Document No.", SalesOrderNo);
+                SalesLine.SetFilter(Type, '<>%1', SalesLine.Type::" ");
+                if SalesLine.FindSet() then begin
+                    SalesHeader.Get(SalesHeader."Document Type"::Order, SalesOrderNo);
+                    NextLineNo := GetNextLineNo(POSEntrySalesLines, POSEntry."Entry No.");
+
+                    repeat
+                        POSEntrySalesLines.Init();
+                        POSEntrySalesLines."POS Entry No." := CROPOSAuditLogAuxInfo."POS Entry No.";
+                        POSEntrySalesLines."Line No." := NextLineNo;
+                        POSEntrySalesLines.Type := POSEntrySalesLines.Type::Item;
+                        POSEntrySalesLines."No." := SalesLine."No.";
+                        POSEntrySalesLines.Description := SalesLine.Description;
+                        POSEntrySalesLines.Quantity := SalesLine.Quantity;
+                        POSEntrySalesLines."Unit Price" := SalesLine."Unit Price";
+                        POSEntrySalesLines."Amount Incl. VAT" := SalesLine."Amount Including VAT";
+                        POSEntrySalesLines."Unit of Measure Code" := SalesLine."Unit of Measure Code";
+                        POSEntrySalesLines."Line Discount %" := SalesLine."Line Discount %";
+                        POSEntrySalesLines."Line Discount Amount Incl. VAT" := SalesLine."Line Discount Amount";
+                        AddAmountToDecimalDictionary(TaxableAmountDict, SalesLine."VAT %", SalesLine."VAT Base Amount");
+                        AddAmountToDecimalDictionary(TaxAmountDict, SalesLine."VAT %", (SalesLine."Amount Including VAT" - SalesLine."VAT Base Amount"));
+                        AddAmountToDecimalDictionary(AmountInclTaxDict, SalesLine."VAT %", SalesLine."Amount Including VAT");
+                        POSEntrySalesLines.Insert();
+                        NextLineNo += 10000
+                    until SalesLine.Next() = 0;
+                end;
+            end;
+
+            foreach PostedSalesInvoiceNo in PostedSalesInvoices do begin
+                SalesInvoiceLine.SetLoadFields("No.", Description, Quantity, "Unit Price", "Amount Including VAT", "Unit of Measure Code", "Line Discount %", "Line Discount Amount", "VAT %", "VAT Base Amount");
+                SalesInvoiceLine.SetRange("Document No.", PostedSalesInvoiceNo);
+                SalesInvoiceLine.SetFilter(Type, '<>%1', SalesInvoiceLine.Type::" ");
+                if SalesInvoiceLine.FindSet() then begin
+                    SalesInvoiceHeader.Get(SalesInvoiceLine."Document No.");
+                    NextLineNo := GetNextLineNo(POSEntrySalesLines, POSEntry."Entry No.");
+
+                    repeat
+                        POSEntrySalesLines.Init();
+                        POSEntrySalesLines."POS Entry No." := CROPOSAuditLogAuxInfo."POS Entry No.";
+                        POSEntrySalesLines."Line No." := NextLineNo;
+                        POSEntrySalesLines.Type := POSEntrySalesLines.Type::Item;
+                        POSEntrySalesLines."No." := SalesInvoiceLine."No.";
+                        POSEntrySalesLines.Description := SalesInvoiceLine.Description;
+                        POSEntrySalesLines.Quantity := SalesInvoiceLine.Quantity;
+                        POSEntrySalesLines."Unit Price" := SalesInvoiceLine."Unit Price";
+                        POSEntrySalesLines."Amount Incl. VAT" := SalesInvoiceLine."Amount Including VAT";
+                        POSEntrySalesLines."Unit of Measure Code" := SalesInvoiceLine."Unit of Measure Code";
+                        POSEntrySalesLines."Line Discount %" := SalesInvoiceLine."Line Discount %";
+                        POSEntrySalesLines."Line Discount Amount Incl. VAT" := SalesInvoiceLine."Line Discount Amount";
+                        AddAmountToDecimalDictionary(TaxableAmountDict, SalesInvoiceLine."VAT %", SalesInvoiceLine."VAT Base Amount");
+                        AddAmountToDecimalDictionary(TaxAmountDict, SalesInvoiceLine."VAT %", (SalesInvoiceLine."Amount Including VAT" - SalesInvoiceLine."VAT Base Amount"));
+                        AddAmountToDecimalDictionary(AmountInclTaxDict, SalesInvoiceLine."VAT %", SalesInvoiceLine."Amount Including VAT");
+                        POSEntrySalesLines.Insert();
+                        NextLineNo += 10000
+                    until SalesInvoiceLine.Next() = 0;
+                end;
+            end;
+        end;
+
+        POSEntryPaymentLines.Init();
+        POSEntryPaymentLines."POS Payment Method Code" := Format(CROPOSAuditLogAuxInfo."Payment Method");
+        POSEntryPaymentLines."Amount (LCY)" := "CRO POS Audit Log Aux Info"."Total Amount";
+        POSEntryPaymentLines.Insert();
 
         FillTaxField(POSEntryTaxLines, AmountInclTaxDict, TaxableAmountDict, TaxAmountDict);
     end;
 
-    local procedure FillSalesCrMemoRecords(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; var POSEntryLines: Record "NPR POS Entry Sales Line" temporary;
-    var POSEntryTaxLines: Record "NPR POS Entry Tax Line" temporary; var POSEntryPaymentLines: Record "NPR POS Entry Payment Line" temporary)
+    local procedure FillSalesCrMemoRecords(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; var POSEntrySalesLines: Record "NPR POS Entry Sales Line" temporary; var POSEntryTaxLines: Record "NPR POS Entry Tax Line" temporary; var POSEntryPaymentLines: Record "NPR POS Entry Payment Line" temporary)
     var
-        SalesCreditMemo: Record "Sales Cr.Memo Header";
-        SalesCreditMemoLine: Record "Sales Cr.Memo Line";
+        SalesCreditHeader: Record "Sales Cr.Memo Header";
+        SalesCrMemoLine: Record "Sales Cr.Memo Line";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         AmountInclTaxDict: Dictionary of [Decimal, Decimal];
         TaxableAmountDict: Dictionary of [Decimal, Decimal];
         TaxAmountDict: Dictionary of [Decimal, Decimal];
         NextLineNo: Integer;
     begin
-        if not SalesCreditMemo.Get(CROPOSAuditLogAuxInfo."Source Document No.") then
+        if not SalesCreditHeader.Get(CROPOSAuditLogAuxInfo."Source Document No.") then
             exit;
 
-        if SalespersonPurchaser.Get(SalesCreditMemo."Salesperson Code") then
+        if SalespersonPurchaser.Get(SalesCreditHeader."Salesperson Code") then
             OperatorName := SalespersonPurchaser.Name;
 
-        CustomerAddress := SalesCreditMemo."Sell-to Address";
-        CustomerName := SalesCreditMemo."Sell-to Customer Name";
-        CustomerPostCity := SalesCreditMemo."Sell-to Post Code" + ' ' + SalesCreditMemo."Sell-to City";
+        CustomerAddress := SalesCreditHeader."Sell-to Address";
+        CustomerName := SalesCreditHeader."Sell-to Customer Name";
+        CustomerPostCity := SalesCreditHeader."Sell-to Post Code" + ' ' + SalesCreditHeader."Sell-to City";
 
         POSEntryPaymentLines.Init();
-        POSEntryPaymentLines."POS Payment Method Code" := SalesCreditMemo."Payment Method Code";
+        POSEntryPaymentLines."POS Payment Method Code" := Format(CROPOSAuditLogAuxInfo."Payment Method");
         POSEntryPaymentLines."Amount (LCY)" := "CRO POS Audit Log Aux Info"."Total Amount";
         POSEntryPaymentLines.Insert();
 
-        SalesCreditMemoLine.SetRange("Document No.", CROPOSAuditLogAuxInfo."Source Document No.");
-        SalesCreditMemoLine.SetRange(Type, SalesCreditMemoLine.Type::Item);
-        if not SalesCreditMemoLine.FindSet() then
+        SalesCrMemoLine.SetLoadFields("No.", Description, Quantity, "Unit Price", "Amount Including VAT", "Unit of Measure Code", "Line Discount %", "Line Discount Amount", "VAT %", "VAT Base Amount");
+        SalesCrMemoLine.SetRange("Document No.", CROPOSAuditLogAuxInfo."Source Document No.");
+        SalesCrMemoLine.SetRange(Type, SalesCrMemoLine.Type::Item);
+        if not SalesCrMemoLine.FindSet() then
             exit;
 
         NextLineNo := 10000;
         repeat
-            POSEntryLines.Init();
-            POSEntryLines.Type := POSEntryLines.Type::Item;
-            POSEntryLines."POS Entry No." := CROPOSAuditLogAuxInfo."POS Entry No.";
-            POSEntryLines."Line No." := NextLineNo;
+            POSEntrySalesLines.Init();
+            POSEntrySalesLines."POS Entry No." := CROPOSAuditLogAuxInfo."POS Entry No.";
+            POSEntrySalesLines."Line No." := NextLineNo;
+            POSEntrySalesLines.Type := POSEntrySalesLines.Type::Item;
+            POSEntrySalesLines."No." := SalesCrMemoLine."No.";
+            POSEntrySalesLines.Description := SalesCrMemoLine.Description;
+            POSEntrySalesLines.Quantity := -SalesCrMemoLine.Quantity;
+            POSEntrySalesLines."Unit Price" := -SalesCrMemoLine."Unit Price";
+            POSEntrySalesLines."Amount Incl. VAT" := -SalesCrMemoLine."Amount Including VAT";
+            POSEntrySalesLines."Unit of Measure Code" := SalesCrMemoLine."Unit of Measure Code";
+            POSEntrySalesLines."Line Discount %" := SalesCrMemoLine."Line Discount %";
+            POSEntrySalesLines."Line Discount Amount Incl. VAT" := -SalesCrMemoLine."Line Discount Amount";
+            AddAmountToDecimalDictionary(TaxableAmountDict, SalesCrMemoLine."VAT %", -SalesCrMemoLine."VAT Base Amount");
+            AddAmountToDecimalDictionary(TaxAmountDict, SalesCrMemoLine."VAT %", -(SalesCrMemoLine."Amount Including VAT" - SalesCrMemoLine."VAT Base Amount"));
+            AddAmountToDecimalDictionary(AmountInclTaxDict, SalesCrMemoLine."VAT %", -SalesCrMemoLine."Amount Including VAT");
+            POSEntrySalesLines.Insert();
             NextLineNo += 10000;
-            POSEntryLines.Description := SalesCreditMemoLine.Description;
-            POSEntryLines.Quantity := -SalesCreditMemoLine.Quantity;
-            POSEntryLines."Unit Price" := -SalesCreditMemoLine."Unit Price";
-            POSEntryLines."Amount Incl. VAT" := -SalesCreditMemoLine."Amount Including VAT";
-            POSEntryLines."Unit of Measure Code" := SalesCreditMemoLine."Unit of Measure Code";
-            POSEntryLines."Line Discount %" := SalesCreditMemoLine."Line Discount %";
-            POSEntryLines."Line Discount Amount Incl. VAT" := -SalesCreditMemoLine."Line Discount Amount";
-            POSEntryLines."No." := SalesCreditMemoLine."No.";
-            AddAmountToDecimalDictionary(TaxableAmountDict, SalesCreditMemoLine."VAT %", -SalesCreditMemoLine."VAT Base Amount");
-            AddAmountToDecimalDictionary(TaxAmountDict, SalesCreditMemoLine."VAT %", -(SalesCreditMemoLine."Amount Including VAT" - SalesCreditMemoLine.Amount));
-            AddAmountToDecimalDictionary(AmountInclTaxDict, SalesCreditMemoLine."VAT %", -SalesCreditMemoLine."Amount Including VAT");
-            POSEntryLines.Insert();
-        until SalesCreditMemoLine.Next() = 0;
+        until SalesCrMemoLine.Next() = 0;
 
         FillTaxField(POSEntryTaxLines, AmountInclTaxDict, TaxableAmountDict, TaxAmountDict);
     end;
 
-    local procedure FillSalesInvoiceRecords(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; var POSEntryLines: Record "NPR POS Entry Sales Line" temporary;
-    var POSEntryTaxLines: Record "NPR POS Entry Tax Line" temporary; var POSEntryPaymentLines: Record "NPR POS Entry Payment Line" temporary)
+    local procedure FillSalesInvoiceRecords(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; var POSEntrySalesLines: Record "NPR POS Entry Sales Line" temporary; var POSEntryTaxLines: Record "NPR POS Entry Tax Line" temporary; var POSEntryPaymentLines: Record "NPR POS Entry Payment Line" temporary)
     var
         SalesInvoiceHeader: Record "Sales Invoice Header";
-        SalesInvoicesLine: Record "Sales Invoice Line";
+        SalesInvoiceLine: Record "Sales Invoice Line";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         AmountInclTaxDict: Dictionary of [Decimal, Decimal];
         TaxableAmountDict: Dictionary of [Decimal, Decimal];
@@ -310,31 +372,36 @@ report 6014554 "NPR CRO Fiscal Bill A4"
         CustomerPostCity := SalesInvoiceHeader."Sell-to Post Code" + ' ' + SalesInvoiceHeader."Sell-to City";
 
         POSEntryPaymentLines.Init();
-        POSEntryPaymentLines."POS Payment Method Code" := SalesInvoiceHeader."Payment Method Code";
+        POSEntryPaymentLines."POS Payment Method Code" := Format(CROPOSAuditLogAuxInfo."Payment Method");
         POSEntryPaymentLines."Amount (LCY)" := "CRO POS Audit Log Aux Info"."Total Amount";
         POSEntryPaymentLines.Insert();
 
-        SalesInvoicesLine.SetRange("Document No.", CROPOSAuditLogAuxInfo."Source Document No.");
-        SalesInvoicesLine.SetRange("Type", SalesInvoicesLine."Type"::Item);
-        if not SalesInvoicesLine.FindSet() then
+        SalesInvoiceLine.SetLoadFields("No.", Description, Quantity, "Unit Price", "Amount Including VAT", "Unit of Measure Code", "Line Discount %", "Line Discount Amount", "VAT %", "VAT Base Amount");
+        SalesInvoiceLine.SetRange("Document No.", CROPOSAuditLogAuxInfo."Source Document No.");
+        SalesInvoiceLine.SetRange("Type", SalesInvoiceLine."Type"::Item);
+        if not SalesInvoiceLine.FindSet() then
             exit;
 
         NextLineNo := 10000;
         repeat
-            POSEntryLines.Init();
-            POSEntryLines.TransferFields(SalesInvoicesLine);
-            POSEntryLines."Line Discount %" := SalesInvoicesLine."Line Discount %";
-            POSEntryLines."No." := SalesInvoicesLine."No.";
-            POSEntryLines.Description := SalesInvoicesLine.Description;
-            POSEntryLines.Type := POSEntryLines.Type::Item;
-            POSEntryLines."POS Entry No." := CROPOSAuditLogAuxInfo."POS Entry No.";
-            POSEntryLines."Line No." := NextLineNo;
+            POSEntrySalesLines.Init();
+            POSEntrySalesLines."POS Entry No." := CROPOSAuditLogAuxInfo."POS Entry No.";
+            POSEntrySalesLines."Line No." := NextLineNo;
+            POSEntrySalesLines.Type := POSEntrySalesLines.Type::Item;
+            POSEntrySalesLines."No." := SalesInvoiceLine."No.";
+            POSEntrySalesLines.Description := SalesInvoiceLine.Description;
+            POSEntrySalesLines.Quantity := SalesInvoiceLine.Quantity;
+            POSEntrySalesLines."Unit Price" := SalesInvoiceLine."Unit Price";
+            POSEntrySalesLines."Amount Incl. VAT" := SalesInvoiceLine."Amount Including VAT";
+            POSEntrySalesLines."Unit of Measure Code" := SalesInvoiceLine."Unit of Measure Code";
+            POSEntrySalesLines."Line Discount %" := SalesInvoiceLine."Line Discount %";
+            POSEntrySalesLines."Line Discount Amount Incl. VAT" := SalesInvoiceLine."Line Discount Amount";
+            AddAmountToDecimalDictionary(TaxableAmountDict, SalesInvoiceLine."VAT %", SalesInvoiceLine."VAT Base Amount");
+            AddAmountToDecimalDictionary(TaxAmountDict, SalesInvoiceLine."VAT %", (SalesInvoiceLine."Amount Including VAT" - SalesInvoiceLine."VAT Base Amount"));
+            AddAmountToDecimalDictionary(AmountInclTaxDict, SalesInvoiceLine."VAT %", SalesInvoiceLine."Amount Including VAT");
+            POSEntrySalesLines.Insert();
             NextLineNo += 10000;
-            AddAmountToDecimalDictionary(TaxableAmountDict, SalesInvoicesLine."VAT %", SalesInvoicesLine."VAT Base Amount");
-            AddAmountToDecimalDictionary(TaxAmountDict, SalesInvoicesLine."VAT %", (SalesInvoicesLine."Amount Including VAT" - SalesInvoicesLine.Amount));
-            AddAmountToDecimalDictionary(AmountInclTaxDict, SalesInvoicesLine."VAT %", SalesInvoicesLine."Amount Including VAT");
-            POSEntryLines.Insert();
-        until SalesInvoicesLine.Next() = 0;
+        until SalesInvoiceLine.Next() = 0;
 
         FillTaxField(POSEntryTaxLines, AmountInclTaxDict, TaxableAmountDict, TaxAmountDict);
     end;
@@ -440,14 +507,24 @@ report 6014554 "NPR CRO Fiscal Bill A4"
                 FormattedAddrArray[2] := PhoneLbl + CompanyInfo."Phone No.";
     end;
 
+    local procedure GetNextLineNo(var POSEntryLines: Record "NPR POS Entry Sales Line" temporary; POSEntryNo: Integer) NextLineNo: Integer
+    begin
+        POSEntryLines.Reset();
+        POSEntryLines.SetRange("POS Entry No.", POSEntryNo);
+        if POSEntryLines.FindLast() then
+            NextLineNo := POSEntryLines."Line No." + 10000
+        else
+            NextLineNo := 10000;
+    end;
+
     var
         _DocumentNo: Code[20];
         _CROAuditEntryType: Enum "NPR CRO Audit Entry Type";
         _AuditEntryNo: Integer;
         BillLbl: Label 'RAČUN %1/%2/%3', Comment = '%1 = Receipt No., %2 = POS Store Code, %3 = POS Unit No.', Locked = true;
+        CompanyCity: Text;
         CompanyName: Text;
         CompanyWebsite: Text;
-        CompanyCity: Text;
         CopyText: Text;
         CustomerAddress: Text;
         CustomerName: Text;
