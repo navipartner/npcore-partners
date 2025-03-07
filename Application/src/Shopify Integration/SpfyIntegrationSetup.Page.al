@@ -92,14 +92,14 @@ page 6184553 "NPR Spfy Integration Setup"
                 }
                 group("Azure Active Directory OAuth")
                 {
-                    Caption = 'Azure Active Directory OAuth';
+                    Caption = 'Microsoft Entra ID OAuth';
                     Image = XMLSetup;
                     Visible = HasAzureADConnection;
 
                     action("Register Webhook Handler App")
                     {
                         Caption = 'Register Webhook Handler App';
-                        ToolTip = 'Running this action will register the NaviPartner Shopify webhook handler Entra app and ask for an admin consent. The action must be run by a user who is both an Azure Active Directory administrator and a BC administrator. You won’t be able to use Shopify webhooks until this action is completed.';
+                        ToolTip = 'Running this action will register the NaviPartner Shopify webhook handler Entra app and ask for an admin consent. The action must be run by a user who is both a Microsoft Entra ID administrator and a BC administrator. You won’t be able to use Shopify webhooks until this action is completed.';
                         ApplicationArea = NPRShopify;
                         Image = Setup;
 

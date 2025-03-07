@@ -9,7 +9,7 @@ table 6059814 "NPR Saas Tenant Diagnostic"
     {
         field(2; "Azure AD Tenant ID"; Text[50])
         {
-            Caption = 'Azure AD Tenant ID';
+            Caption = 'Entra ID Tenant ID';
             DataClassification = CustomerContent;
         }
         field(10; "POS Stores"; Integer)
@@ -54,7 +54,7 @@ table 6059814 "NPR Saas Tenant Diagnostic"
         }
         field(55; "Last DT AzTenant ID Sent to CS"; DateTime)
         {
-            Caption = 'Last DateTime Azure AD Tenant ID Sent to Case System';
+            Caption = 'Last DateTime Entra ID Tenant ID Sent to Case System';
             DataClassification = CustomerContent;
         }
     }

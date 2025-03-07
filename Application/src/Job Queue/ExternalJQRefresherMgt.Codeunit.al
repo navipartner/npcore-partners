@@ -31,7 +31,7 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
         ErrorTxt: Text;
         ClientIdLbl: Label '{bdf6bb95-9dad-4504-91ab-8404427f4043}', Locked = true;
     begin
-        //Register Azure AD Cloudflare Application and Try Grant Permissions
+        //Register Azure AD (Microsoft Entra ID) Cloudflare Application and Try Grant Permissions
         Evaluate(ClientId, ClientIdLbl);
         AADApplication.SetRange("Client Id", ClientId);
         if not AADApplication.IsEmpty() then begin
