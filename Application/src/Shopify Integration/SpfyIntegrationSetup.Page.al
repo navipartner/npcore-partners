@@ -65,7 +65,7 @@ page 6184553 "NPR Spfy Integration Setup"
                 action(SyncItems)
                 {
                     Caption = 'Sync. Items';
-                    ToolTip = 'Executes intial item synchronization between BC and Shopify. System will go through items in BC and mark those already existing in Shopify as ''Shopify Items''';
+                    ToolTip = 'Executes initial item synchronization between BC and Shopify. The system will iterate through items in BC and identify those that already exist in Shopify. The system will also update item statuses, names, descriptions and metafields from Shopify and create requests to assign product tags in Shopify based on the item categories selected for the items in BC.';
                     ApplicationArea = NPRShopify;
                     Image = CheckList;
 
