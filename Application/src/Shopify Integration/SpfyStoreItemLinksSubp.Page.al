@@ -237,7 +237,7 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
             action(SyncItems)
             {
                 Caption = 'Update Sync. Status';
-                ToolTip = 'Updates item synchronization status between BC and Shopify. System will go through Shopify stores and mark the item as synchronized, if it has already been created on the store.';
+                ToolTip = 'Updates item synchronization status between BC and Shopify. The system will go through Shopify stores and mark the item as synchronized if it has already been created on the store. The system will also update the item status, name, description and metafields from Shopify, and create a request to assign product tags in Shopify based on the item category.';
                 ApplicationArea = NPRShopify;
                 Image = CheckList;
 

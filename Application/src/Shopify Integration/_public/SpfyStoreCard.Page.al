@@ -345,7 +345,7 @@ page 6184704 "NPR Spfy Store Card"
                 action(SyncItems)
                 {
                     Caption = 'Sync. Items';
-                    ToolTip = 'Executes intial item synchronization between BC and Shopify. System will go through items in BC and mark those already existing in Shopify as ''Shopify Items''';
+                    ToolTip = 'Executes initial item synchronization between BC and Shopify. The system will iterate through items in BC and identify those that already exist in Shopify. The system will also update item statuses, names, descriptions and metafields from Shopify and create requests to assign product tags in Shopify based on the item categories selected for the items in BC.';
                     ApplicationArea = NPRShopify;
                     Image = CheckList;
                     Promoted = true;
@@ -364,7 +364,7 @@ page 6184704 "NPR Spfy Store Card"
                 action(SyncRetailVouchers)
                 {
                     Caption = 'Sync. Vouchers';
-                    ToolTip = 'Executes intial retail voucher migration from BC to Shopify. System will go through retail vouchers in BC and create those marked as synchronizable with your selected Shopify Store as gift cards at the store. System will also update gift cards balances at Shopify, if needed.';
+                    ToolTip = 'Executes initial retail voucher migration from BC to Shopify. The system will iterate through retail vouchers in BC and create those marked as synchronizable with your selected Shopify store as gift cards in the store. The system will also update gift card balances in Shopify as needed.';
                     ApplicationArea = NPRShopify;
                     Image = Migration;
                     Promoted = true;
