@@ -38,12 +38,10 @@ table 6059870 "NPR Job Queue Refresh Setup"
             begin
                 if "Use External JQ Refresher" and EnvironmentInformation.IsOnPrem() then
                     Error(OnPremLbl);
-
-                ExternalJQRefresherMgt.ToggleTenantWebService("Use External JQ Refresher");
-
-                if "Use External JQ Refresher" then
-                    ResponseText := ExternalJQRefresherMgt.ManageExternalJQRefresherTenants(TenantManageOptions::create)
-                else
+                if "Use External JQ Refresher" then begin
+                    ExternalJQRefresherMgt.CreateTenantWebService();
+                    ResponseText := ExternalJQRefresherMgt.ManageExternalJQRefresherTenants(TenantManageOptions::create);
+                end else
                     ResponseText := ExternalJQRefresherMgt.ManageExternalJQRefresherTenants(TenantManageOptions::delete);
 
                 Message(ResponseText);
