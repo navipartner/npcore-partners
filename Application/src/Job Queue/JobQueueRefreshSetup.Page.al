@@ -55,8 +55,10 @@ page 6150891 "NPR Job Queue Refresh Setup"
                     var
                         ResponseText: Text;
                     begin
+                        CurrPage.SaveRecord();
                         ResponseText := _ExternalJQRefresherMgt.SendRefreshRequest();
                         Message(ResponseText);
+                        CurrPage.Update(false);
                     end;
                 }
 

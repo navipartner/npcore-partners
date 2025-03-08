@@ -12,12 +12,17 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
         TypeHelper: Codeunit "Type Helper";
         CompanyNameUrlEncoded: Text;
         RequestUrl: Text;
-        BaseURL: Label 'https://job-queue-refresher-tenant-manager.navipartner-prelive.workers.dev/?tenantID=%1&environmentName=%2&companyName=%3&action=%4', Locked = true;
+        BaseURL: Label 'https://job-queue-refresher-tenant-manager%1/?tenantID=%2&environmentName=%3&companyName=%4&action=%5', Locked = true;
+        SandboxEndpoint: Label '-prelive.navipartner-prelive.workers.dev', Locked = true;
+        LiveEndpoint: Label '.npretail.app', Locked = true;
     begin
         CompanyNameUrlEncoded := CompanyName();
         TypeHelper.UrlEncode(CompanyNameUrlEncoded);
 
-        RequestUrl := StrSubstNo(BaseURL, AzureADTenant.GetAadTenantId(), EnvironmentInformation.GetEnvironmentName(), CompanyNameUrlEncoded, ExtJQRefresherEnumValueName(action));
+        if EnvironmentInformation.IsProduction() then
+            RequestUrl := StrSubstNo(BaseURL, LiveEndpoint, AzureADTenant.GetAadTenantId(), EnvironmentInformation.GetEnvironmentName(), CompanyNameUrlEncoded, ExtJQRefresherEnumValueName(action))
+        else
+            RequestUrl := StrSubstNo(BaseURL, SandboxEndpoint, AzureADTenant.GetAadTenantId(), EnvironmentInformation.GetEnvironmentName(), CompanyNameUrlEncoded, ExtJQRefresherEnumValueName(action));
 
         exit(CreateCloudflareHttpRequest('', RequestUrl, Enum::"Http Request Type"::POST));
     end;
@@ -119,14 +124,6 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
             TenantWebService.Delete(true);
     end;
 
-    internal procedure ToggleTenantWebService(UseExternalJQRefresher: Boolean)
-    begin
-        if UseExternalJQRefresher then
-            CreateTenantWebService()
-        else
-            RemoveTenantWebService();
-    end;
-
     internal procedure SendRefreshRequest(): Text
     var
         TypeHelper: Codeunit "Type Helper";
@@ -134,12 +131,18 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
         AzureADTenant: Codeunit "Azure AD Tenant";
         EnvironmentInformation: Codeunit "Environment Information";
         RequestUrl: Text;
-        BaseUrl: Label 'https://job-queue-refresher.navipartner-prelive.workers.dev/?tenantID=%1&environmentName=%2&companyName=%3', Locked = true;
+        BaseUrl: Label 'https://job-queue-refresher%1/?tenantID=%2&environmentName=%3&companyName=%4', Locked = true;
+        SandboxEndpoint: Label '-prelive.navipartner-prelive.workers.dev', Locked = true;
+        LiveEndpoint: Label '.npretail.app', Locked = true;
     begin
         CompanyNameUrlEncoded := CompanyName();
         TypeHelper.UrlEncode(CompanyNameUrlEncoded);
 
-        RequestUrl := StrSubstNo(BaseURL, AzureADTenant.GetAadTenantId(), EnvironmentInformation.GetEnvironmentName(), CompanyNameUrlEncoded);
+        if EnvironmentInformation.IsProduction() then
+            RequestUrl := StrSubstNo(BaseUrl, LiveEndpoint, AzureADTenant.GetAadTenantId(), EnvironmentInformation.GetEnvironmentName(), CompanyNameUrlEncoded)
+        else
+            RequestUrl := StrSubstNo(BaseUrl, SandboxEndpoint, AzureADTenant.GetAadTenantId(), EnvironmentInformation.GetEnvironmentName(), CompanyNameUrlEncoded);
+
         exit(CreateCloudflareHttpRequest('', RequestUrl, Enum::"Http Request Type"::POST));
     end;
 
@@ -186,4 +189,34 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
     begin
         RefresherOption.Names().Get(RefresherOption.Ordinals().IndexOf(RefresherOption.AsInteger()), Result);
     end;
+
+#if not (BC17 or BC18)
+    [EventSubscriber(ObjectType::Report, Report::"Copy Company", 'OnAfterCreatedNewCompanyByCopyCompany', '', false, false)]
+    local procedure DisableExtJQRefresher_OnAfterCreatedNewCompanyByCopyCompany(NewCompanyName: Text[30])
+    var
+        JQRefresherSetup: Record "NPR Job Queue Refresh Setup";
+    begin
+        if (NewCompanyName <> '') and (NewCompanyName <> CompanyName()) then
+            JQRefresherSetup.ChangeCompany(NewCompanyName);
+        if JQRefresherSetup.Get() and JQRefresherSetup."Use External JQ Refresher" then begin
+            JQRefresherSetup."Use External JQ Refresher" := false;
+            JQRefresherSetup.Modify();
+        end;
+    end;
+
+#if BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Environment Cleanup", 'OnClearCompanyConfig', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Environment Cleanup", OnClearCompanyConfig, '', false, false)]
+#endif
+    local procedure DisableExtJQRefresher_OnClearCompanyConfiguration(CompanyName: Text; SourceEnv: Enum "Environment Type"; DestinationEnv: Enum "Environment Type")
+    var
+        JQRefresherSetup: Record "NPR Job Queue Refresh Setup";
+    begin
+        if JQRefresherSetup.Get() and JQRefresherSetup."Use External JQ Refresher" then begin
+            JQRefresherSetup.Validate("Use External JQ Refresher", false);
+            JQRefresherSetup.Modify();
+        end;
+    end;
+#endif
 }
