@@ -71,6 +71,7 @@ page 6184962 "NPR MemberUpdateUniqueId"
                 var
                     EmailRequired: Label 'Email is required';
                 begin
+                    _NewEmail := LowerCase(_NewEmail);
                     OnBeforeValidateNewEmail(_Community, _SourceMember, _NewEmail);
 
                     if (_NewEmail = '') then

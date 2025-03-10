@@ -298,7 +298,7 @@
 
             Community."Member Unique Identity"::EMAIL:
                 if (FldEmail <> '') then begin
-                    Member.SetFilter("E-Mail Address", '=%1', FldEmail);
+                    Member.SetFilter("E-Mail Address", '=%1', LowerCase(FldEmail));
                 end else begin
                     exit(false);
                 end;
