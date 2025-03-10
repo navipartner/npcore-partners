@@ -199,19 +199,19 @@
         Response."Response Success" := true;
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'OnAfterPostMagentoPayment', '', true, false)]
-    local procedure CancelOutstandingPaymentLines(SalesInvHeader: Record "Sales Invoice Header")
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Magento Pmt. Mgt.", 'OnAfterCaptureSalesInvoice', '', true, false)]
+    local procedure CancelOutstandingPaymentLines(SalesInvHdrNo: Code[20])
     var
         PaymentLine: Record "NPR Magento Payment Line";
         MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
         CancelPaymentLine: Record "NPR Magento Payment Line";
     begin
-        if SalesInvHeader.IsTemporary then
+        if SalesInvHdrNo = '' then
             exit;
 
         PaymentLine.SetRange("Document Table No.", Database::"Sales Invoice Header");
         PaymentLine.SetRange("Document Type", PaymentLine."Document Type"::Quote);
-        PaymentLine.SetRange("Document No.", SalesInvHeader."No.");
+        PaymentLine.SetRange("Document No.", SalesInvHdrNo);
         if PaymentLine.IsEmpty then
             exit;
 

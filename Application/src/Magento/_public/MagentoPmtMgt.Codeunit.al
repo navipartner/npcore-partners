@@ -654,6 +654,9 @@
 
         CaptureSalesInvoice(SalesInvHdrNo);
         Commit();
+
+        OnAfterCaptureSalesInvoice(SalesInvHdrNo);
+        Commit();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnAfterFinalizePostingOnBeforeCommit', '', true, true)]
@@ -1320,6 +1323,12 @@
     local procedure OnAfterPostMagentoPayment(SalesInvHeader: Record "Sales Invoice Header")
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCaptureSalesInvoice(SalesInvHdrNo: Code[20])
+    begin
+    end;
+
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterProcessingPaymentLine(var PaymentLine: Record "NPR Magento Payment Line"; PaymentEventType: Option " ",Capture,Refund,Cancel; Response: Record "NPR PG Payment Response")
