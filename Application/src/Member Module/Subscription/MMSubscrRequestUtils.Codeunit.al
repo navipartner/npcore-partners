@@ -96,6 +96,7 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
     internal procedure UpdateUnprocessableStatusInSubscriptionPaymentRequestStatus(SubscrRequest: Record "NPR MM Subscr. Request")
     var
         SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+        SubscrPaymentRequestForModify: Record "NPR MM Subscr. Payment Request";
         SubsPayRequestUtils: Codeunit "NPR MM Subs Pay Request Utils";
         NewPmtRequestStatus: Enum "NPR MM Payment Request Status";
     begin
@@ -111,11 +112,13 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
         SubscrPaymentRequest.SetCurrentKey("Subscr. Request Entry No.", Status);
         SubscrPaymentRequest.SetRange("Subscr. Request Entry No.", SubscrRequest."Entry No.");
         SubscrPaymentRequest.SetFilter(Status, '<>%1', NewPmtRequestStatus);
+        SubscrPaymentRequest.SetLoadFields("Subscr. Request Entry No.", Status, "Entry No.");
         if not SubscrPaymentRequest.FindSet() then
             exit;
         CheckSuccessfulPaymentRequestsExistAndGiveError(SubscrRequest);
         repeat
-            SubsPayRequestUtils.SetSubscrPaymentRequestStatus(SubscrPaymentRequest, NewPmtRequestStatus, false);
+            SubscrPaymentRequestForModify.Get(SubscrPaymentRequest.RecordId);
+            SubsPayRequestUtils.SetSubscrPaymentRequestStatus(SubscrPaymentRequestForModify, NewPmtRequestStatus, false);
         until SubscrPaymentRequest.Next() = 0;
     end;
 
