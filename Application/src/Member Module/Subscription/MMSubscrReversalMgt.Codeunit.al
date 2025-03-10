@@ -48,7 +48,7 @@ codeunit 6248187 "NPR MM Subscr. Reversal Mgt."
         SubscrReversalRequest.Amount := -SubscriptionRequest.Amount;
         SubscrReversalRequest."Currency Code" := SubscriptionRequest."Currency Code";
         SubscrReversalRequest."Item No." := SubscriptionRequest."Item No.";
-        SubscrReversalRequest."Created from Entry No." := SubscriptionRequest."Entry No.";
+        SubscrReversalRequest."Created from Entry No." := SubscrPaymentRequest."Entry No.";
 
         SubscrPmtReversalRequest.Init();
         SubscrPmtReversalRequest."Entry No." := 0;
