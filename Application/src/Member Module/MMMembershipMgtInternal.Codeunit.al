@@ -1344,7 +1344,7 @@
                 begin
                     if (MemberInfoCapture."E-Mail Address" = '') then
                         Error(RequireField, MemberInfoCapture.FieldCaption("E-Mail Address"));
-                    Member.SetFilter("E-Mail Address", '=%1', MemberInfoCapture."E-Mail Address");
+                    Member.SetFilter("E-Mail Address", '=%1', LowerCase(MemberInfoCapture."E-Mail Address"));
                 end;
             Community."Member Unique Identity"::PHONENO:
                 begin
@@ -1363,7 +1363,7 @@
                     if ((MemberInfoCapture."E-Mail Address" = '') or (MemberInfoCapture."Phone No." = '')) then
                         Error(RequireFieldAndField, MemberInfoCapture.FieldCaption("E-Mail Address"), MemberInfoCapture.FieldCaption("Phone No."));
                     Member.SetCurrentKey("E-Mail Address");
-                    Member.SetFilter("E-Mail Address", '=%1', MemberInfoCapture."E-Mail Address");
+                    Member.SetFilter("E-Mail Address", '=%1', LowerCase(MemberInfoCapture."E-Mail Address"));
                     Member.SetFilter("Phone No.", '=%1', MemberInfoCapture."Phone No.");
                 end;
             Community."Member Unique Identity"::EMAIL_OR_PHONE:
@@ -1372,14 +1372,14 @@
                         Error(RequireFieldOrField, MemberInfoCapture.FieldCaption("E-Mail Address"), MemberInfoCapture.FieldCaption("Phone No."));
 
                     if ((MemberInfoCapture."E-Mail Address" <> '') and (MemberInfoCapture."Phone No." = '')) then
-                        Member.SetFilter("E-Mail Address", '=%1', MemberInfoCapture."E-Mail Address");
+                        Member.SetFilter("E-Mail Address", '=%1', LowerCase(MemberInfoCapture."E-Mail Address"));
 
                     if ((MemberInfoCapture."E-Mail Address" = '') and (MemberInfoCapture."Phone No." <> '')) then
                         Member.SetFilter("Phone No.", '=%1', MemberInfoCapture."Phone No.");
 
                     if ((MemberInfoCapture."E-Mail Address" <> '') and (MemberInfoCapture."Phone No." <> '')) then begin
                         Member.FilterGroup(-1);
-                        Member.SetFilter("E-Mail Address", '=%1', MemberInfoCapture."E-Mail Address");
+                        Member.SetFilter("E-Mail Address", '=%1', LowerCase(MemberInfoCapture."E-Mail Address"));
                         Member.SetFilter("Phone No.", '=%1', MemberInfoCapture."Phone No.");
                     end;
                 end;
@@ -1388,7 +1388,7 @@
                     if ((MemberInfoCapture."E-Mail Address" = '') or (MemberInfoCapture."First Name" = '')) then
                         Error(RequireFieldAndField, MemberInfoCapture.FieldCaption("E-Mail Address"), MemberInfoCapture.FieldCaption("First Name"));
                     Member.SetCurrentKey("E-Mail Address");
-                    Member.SetFilter("E-Mail Address", '=%1', MemberInfoCapture."E-Mail Address");
+                    Member.SetFilter("E-Mail Address", '=%1', LowerCase(MemberInfoCapture."E-Mail Address"));
                     Member.SetFilter("First Name", '%1', '@' + MemberInfoCapture."First Name");
                 end;
             else
