@@ -10,7 +10,7 @@ codeunit 6185051 "NPR API Request"
         _Headers: Dictionary of [Text, Text];
         _BodyJson: JsonToken;
 
-    #region Initializer
+#region Initializer
     procedure Init(RequestHttpMethod: Enum "Http Method"; RequestPath: Text; RequestRelativePathSegments: List of [Text]; RequestQueryParams: Dictionary of [Text, Text];
         RequestHeaders: Dictionary of [Text, Text]; RequestBodyJson: JsonToken)
     begin
@@ -22,9 +22,9 @@ codeunit 6185051 "NPR API Request"
         _BodyJson := RequestBodyJson;
         _ModuleName := _RelativePathSegments.Get(1);
     end;
-    #endregion
+#endregion
 
-    #region Getters
+#region Getters
     procedure HttpMethod(): Enum "Http Method"
     begin
         exit(_HttpMethod);
@@ -94,6 +94,36 @@ codeunit 6185051 "NPR API Request"
         exit(true);
     end;
 
-    #endregion
+    /// <summary>
+    /// Call this procedure at the top of your API request handler if you have business logic that 
+    /// is sensitive to cache misses. It will make your caching approach pessimistic, 
+    /// meaning unless the API consumer uses our header correctly, we will skip reading from cache.
+    /// This is much better than just calling SelectLatestVersion() always, as it will still be possible
+    /// for a well-behaving consumer to use the cache as much as possible while guaranteeing robustness
+    /// in all cases.
+    /// </summary>
+    procedure SkipCacheIfNonStickyRequest(TableIds: List of [Integer])
+    var
+        RequestServerId: Integer;
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22 and not BC23 and not BC24
+        TableId: Integer;
+#endif
+    begin
+        if (_Headers.ContainsKey('x-server-cache-id')) then begin
+            Evaluate(RequestServerId, _Headers.Get('x-server-cache-id'));
+            if (RequestServerId = ServiceInstanceId()) then
+                exit;
+        end;
+
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22 and not BC23 and not BC24
+        foreach TableId in TableIds do begin
+            SelectLatestVersion(TableId);
+        end;
+#else
+        SelectLatestVersion(); // Skip cache for all tables in the entire request processing
+#endif
+    end;
+
+#endregion
 }
 #endif

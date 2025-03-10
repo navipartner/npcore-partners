@@ -1,0 +1,81 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+  possaleTypes: ./possale.yml
+
+types:
+  POSSaleCompletedEvent:
+    extends: globalApiTypes.WebhookEvent
+    properties:
+      payload: POSSaleCompletedEventPayload
+    examples:
+      - name: ExampleEvent
+        value:
+          initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
+          timestamp: "2024-06-28T12:00:00Z"
+          companyName: "CRONUS International Ltd."
+          companyId: "b56a418d-8205-4d3a-bdbb-25d94e42abbd"
+          appId: "992c2309-cca4-43cb-9e41-911f482ec088"
+          clientState: "secret_value_from_subscription_creation_mirrored" 
+          eventName: "pos_sale_completed"
+          payload: $POSSaleCompletedEventPayload.ExamplePayload
+
+  POSSaleCompletedEventPayload:
+    properties:
+      saleId: possaleTypes.saleId
+      posUnit: string
+      receiptNo: string
+      fiscalDocumentNo: string
+      customerNo: string
+    examples:
+      - name: ExamplePayload
+        value:
+          saleId: "e20d09ad-ab74-4f31-912f-ea58d3c9e653"
+          posUnit: "POS-031"
+          receiptNo: "D12345678"
+          fiscalDocumentNo: "FS12345678"
+          customerNo: "C12345678"
+
+  POSUnitBalancedEvent:
+    extends: globalApiTypes.WebhookEvent
+    properties:
+      payload: POSUnitBalancedEventPayload
+    examples:
+      - name: ExampleEvent
+        value:
+          initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
+          timestamp: "2024-06-28T12:00:00Z"
+          companyName: "CRONUS International Ltd."
+          companyId: "b56a418d-8205-4d3a-bdbb-25d94e42abbd"
+          appId: "992c2309-cca4-43cb-9e41-911f482ec088"
+          clientState: "secret_value_from_subscription_creation_mirrored" 
+          eventName: "pos_unit_balanced"
+          payload: $POSUnitBalancedEventPayload.ExamplePayload
+
+  POSUnitBalancedEventPayload:
+    properties:
+      posWorkshiftCheckpointId: uuid
+      posUnit: string
+    examples:
+      - name: ExamplePayload
+        value:
+          posWorkshiftCheckpointId: "e20d09ad-ab74-4f31-912f-ea58d3c9e653"
+          posUnit: "POS-031"
+
+webhooks: 
+  posSaleCompleted: 
+    display-name: POS Sale Completed
+    docs: Event "pos_sale_completed". Triggered when a POS sale ends successfully. Your endpoint will receive this POST request.
+    method: POST 
+    payload: POSSaleCompletedEvent
+    examples: 
+      - payload: $POSSaleCompletedEvent.ExampleEvent
+
+  posUnitBalanced: 
+    display-name: POS Unit Balanced
+    docs: Event "pos_unit_balanced". Triggered when a POS unit has been balanced (Z-report). Your endpoint will receive this POST request.
+    method: POST 
+    payload: POSUnitBalancedEvent
+    examples: 
+      - payload: $POSUnitBalancedEvent.ExampleEvent

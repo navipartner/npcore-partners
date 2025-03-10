@@ -109,11 +109,10 @@ codeunit 6185052 "NPR API Request Processor"
         WebServiceMgt: Codeunit "Web Service Management";
         CurrCodeunit: Variant;
     begin
-        if ((not WebService.ReadPermission) and (not WebService.WritePermission)) then begin
+        if ((not WebService.ReadPermission) or (not WebService.WritePermission)) then begin
             exit;
         end;
 
-        //CurrCodeunit := this;
         CurrCodeunit := Codeunit::"NPR API Request Processor";
         WebServiceMgt.CreateTenantWebService(WebService."Object Type"::Codeunit, CurrCodeunit, 'npr_rest_api', true);
     end;

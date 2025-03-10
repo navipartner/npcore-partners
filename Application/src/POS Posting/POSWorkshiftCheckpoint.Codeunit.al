@@ -258,6 +258,7 @@
         POSWorkshiftCheckpoint: Record "NPR POS Workshift Checkpoint";
         POSPaymentBinCheckpoint: Record "NPR POS Payment Bin Checkp.";
         IsManager: Boolean;
+        POSWebhooks: Codeunit "NPR POS Webhooks";
     begin
 
         POSUnit.Get(UnitNo);
@@ -293,6 +294,8 @@
             AggregateWorkshifts(UnitNo, CheckPointEntryNo, Mode);
 
         Commit();
+
+        POSWebhooks.InvokeUnitBalancedWebhook(POSWorkshiftCheckpoint.SystemId);
 
         exit(CheckPointEntryNo);
 

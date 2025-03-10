@@ -219,6 +219,7 @@
         Post: Boolean;
         Posted: Boolean;
         Type: Option Proforma,Draft;
+        POSWebhooks: Codeunit "NPR POS Webhooks";
     begin
         POSSale.GetCurrentSale(SalePOS);
         SalePOS.TestField("Customer No.");
@@ -277,6 +278,8 @@
         POSSale.SetEnded(true);
 
         Commit();
+
+        POSWebhooks.InvokeEndOfSaleWebhook(SalePOS.SystemId); // wrapped in case MS new webhooks cause unpredictable errors
 
         if Post and Posted then begin
             if _Print then begin

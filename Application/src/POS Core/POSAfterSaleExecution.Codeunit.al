@@ -4,10 +4,6 @@
     trigger OnRun()
     begin
         case OnRunType of
-            // If somebody accidentally (or even intentionall) calls this codeunit without defining what kind of
-            // run type is needed, then codeunit simply exits
-            OnRunType::Undefined:
-                exit;
             OnRunType::RunAfterEndSale:
                 begin
                     PosSaleCodeunit.InvokeOnFinishSaleWorkflow(Rec);
