@@ -62,6 +62,14 @@ pageextension 6014455 "NPR Salesperson/Purchaser Card" extends "Salesperson/Purc
                 end;
             }
         }
+        addafter("Commission %")
+        {
+            field("NPR Maximum Cash Returnsale"; Rec."NPR Maximum Cash Returnsale")
+            {
+                ToolTip = 'Specifies the maximum cash on return sale of the salesperson/purchaser.';
+                ApplicationArea = NPRRetail;
+            }
+        }
     }
 
     var

@@ -2,7 +2,7 @@
 {
     Extensible = false;
     Caption = 'Top 10 Salespersons';
-    CardPageID = "NPR Salesperson Card";
+    CardPageID = "Salesperson/Purchaser Card";
     Editable = true;
     PageType = ListPart;
     RefreshOnActivate = true;
@@ -53,7 +53,7 @@
                         trigger OnDrillDown()
                         begin
                             SalesPerson.Get(Rec.Code);
-                            Page.Run(Page::"NPR Salesperson Card", SalesPerson);
+                            Page.Run(Page::"Salesperson/Purchaser Card", SalesPerson);
                         end;
                     }
                     field(Name; Rec.Name)

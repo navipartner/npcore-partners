@@ -4,6 +4,9 @@
     Caption = 'Salesperson/Purchaser Card';
     SourceTable = "Salesperson/Purchaser";
     UsageCategory = None;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-03-09';
+    ObsoleteReason = 'Not being used. Please use MS standard Salesperson/Purchaser Card page';
     layout
     {
         area(content)
