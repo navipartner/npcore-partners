@@ -829,12 +829,15 @@
     var
         Success: Boolean;
         AfterEndSaleErr: Label 'An error occurred after the sale ended: %1';
+        POSWebhooks: Codeunit "NPR POS Webhooks";
     begin
         //Any error at this time would leave the POS with inconsistent front-end state.
         ClearLastError();
         Success := RunAfterEndSale_OnRun(xRec);
         if not Success then
             Message(AfterEndSaleErr, GetLastErrorText);
+
+        POSWebhooks.InvokeEndOfSaleWebhook(xRec.SystemId);
     end;
 
     local procedure LogStopwatch(Keyword: Text; Duration: Duration)

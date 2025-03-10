@@ -136,6 +136,8 @@ codeunit 6185053 "NPR API Response"
             _Headers.Get(HeaderKey, HeaderValue);
             HeadersJson.Add(HeaderKey, HeaderValue);
         end;
+        HeadersJson.Add('x-server-cache-id', ServiceInstanceId());
+
         ResponseJson.Add('headers', HeadersJson);
         ResponseJson.Add('frontmatter', true);
 

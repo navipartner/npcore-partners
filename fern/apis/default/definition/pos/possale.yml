@@ -16,6 +16,7 @@ types:
   POSSaleLine:
     docs: A sale line in an active POS sale
     properties:
+      id: uuid
       sortKey: integer
       type: posApiTypes.POSSaleLineType
       code: string
@@ -28,9 +29,11 @@ types:
       vatPercent: double
       amountInclVat: double
       amount: double
+      unitOfMeasure: string
     examples:
       - name: ExampleSaleLine
         value:
+          id: 8408f65c-3a3f-4a62-a459-a94fd6ff9063
           sortKey: 10000
           type: "Item"
           code: "M12345"
@@ -43,10 +46,12 @@ types:
           vatPercent: 25
           amountInclVat: 100
           amount: 80
+          unitOfMeasure: "PCS"
   
   POSPaymentLine:
     docs: A payment line in an active POS sale
     properties:
+      id: uuid
       sortKey: integer
       code: string
       description: string
@@ -54,6 +59,7 @@ types:
     examples:
       - name: ExamplePaymentLine
         value:
+          id: 80c340c5-00ce-46c5-8a32-8736e59b7816
           sortKey: 20000
           code: "CASH"
           description: "Cash"
@@ -94,7 +100,7 @@ service:
       request:
         name: searchPOSSaleRequest
         query-parameters:
-          posunit: POSUnitFilter
+          posUnit: POSUnitFilter
           withLines: boolean
       response: POSSale
       examples:
@@ -105,7 +111,7 @@ service:
           response:
             body: $POSSale.ExamplePOSSale
           query-parameters:
-            posunit: "POS-031"
+            posUnit: "POS-031"
             withLines: true
 
     getPOSSale:

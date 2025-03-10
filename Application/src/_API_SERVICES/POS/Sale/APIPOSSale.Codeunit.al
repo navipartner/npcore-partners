@@ -9,6 +9,8 @@ codeunit 6248255 "NPR API POS Sale"
         POSSale: Record "NPR POS Sale";
         WithLines: Boolean;
     begin
+        Request.SkipCacheIfNonStickyRequest(POSSaleTableIds());
+
         if (not Request.QueryParams().ContainsKey('posunit')) then
             exit(Response.RespondBadRequest('Missing required query parameter: posunit'));
         POSUnitFilter := Request.QueryParams().Get('posunit');
@@ -16,7 +18,6 @@ codeunit 6248255 "NPR API POS Sale"
         if Request.QueryParams().ContainsKey('withLines') then
             Evaluate(WithLines, Request.QueryParams().Get('withLines'));
 
-        SelectLatestVersion();
         POSSale.ReadIsolation := IsolationLevel::ReadCommitted;
         POSSale.SetLoadFields(SystemId, "Sales Ticket No.", "Register No.", "Customer No.", "SystemCreatedAt");
         POSSale.SetFilter("Register No.", '=%1', POSUnitFilter);
@@ -32,6 +33,8 @@ codeunit 6248255 "NPR API POS Sale"
         POSSale: Record "NPR POS Sale";
         WithLines: Boolean;
     begin
+        Request.SkipCacheIfNonStickyRequest(POSSaleTableIds());
+
         saleId := Request.Paths().Get(3);
         if saleId = '' then
             exit(Response.RespondBadRequest('Missing required path parameter: saleId'));
@@ -39,7 +42,6 @@ codeunit 6248255 "NPR API POS Sale"
         if Request.QueryParams().ContainsKey('withLines') then
             Evaluate(WithLines, Request.QueryParams().Get('withLines'));
 
-        SelectLatestVersion();
         POSSale.ReadIsolation := IsolationLevel::ReadCommitted;
         POSSale.SetLoadFields(SystemId, "Sales Ticket No.", "Register No.", Date, "Start Time", "Customer No.");
         if not POSSale.GetBySystemId(saleId) then
@@ -69,6 +71,7 @@ codeunit 6248255 "NPR API POS Sale"
             if POSSaleLine.FindSet() then
                 repeat
                     Json.StartObject('')
+                        .AddProperty('id', POSSaleLine.SystemId)
                         .AddProperty('sortKey', POSSaleLine."Line No.")
                         .AddProperty('type', POSSaleLine."Line Type".Names.Get(POSSaleLine."Line Type".Ordinals().IndexOf(POSSaleLine."Line Type".AsInteger())))
                         .AddProperty('code', POSSaleLine."No.")
@@ -81,6 +84,7 @@ codeunit 6248255 "NPR API POS Sale"
                         .AddProperty('vatPercent', POSSaleLine."VAT %")
                         .AddProperty('amountInclVat', POSSaleLine."Amount Including VAT")
                         .AddProperty('amount', POSSaleLine.Amount)
+                        .AddProperty('unitOfMeasure', POSSaleLine."Unit of Measure Code")
                     .EndObject();
                 until POSSaleLine.Next() = 0;
             Json.EndArray();
@@ -92,6 +96,7 @@ codeunit 6248255 "NPR API POS Sale"
             if POSSaleLine.FindSet() then
                 repeat
                     Json.StartObject('')
+                        .AddProperty('id', POSSaleLine.SystemId)
                         .AddProperty('sortKey', POSSaleLine."Line No.")
                         .AddProperty('code', POSSaleLine."No.")
                         .AddProperty('description', POSSaleLine.Description)
@@ -101,6 +106,15 @@ codeunit 6248255 "NPR API POS Sale"
             Json.EndArray();
         end;
         Json.EndObject();
+    end;
+
+    local procedure POSSaleTableIds(): List of [Integer]
+    var
+        TableIdList: List of [Integer];
+    begin
+        TableIdList.Add(Database::"NPR POS Sale");
+        TableIdList.Add(Database::"NPR POS Sale Line");
+        exit(TableIdList);
     end;
 }
 #endif

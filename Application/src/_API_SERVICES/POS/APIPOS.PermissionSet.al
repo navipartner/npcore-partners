@@ -5,5 +5,7 @@ permissionset 6014412 "NPR API POS"
     Assignable = true;
     Caption = 'NPR API - POS';
     IncludedPermissionSets = "NPR API Core";
+    Permissions =
+        Codeunit "NPR POS Webhooks" = X;
 }
 #endif

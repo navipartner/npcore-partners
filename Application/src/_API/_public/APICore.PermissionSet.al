@@ -6,9 +6,13 @@ permissionset 6014408 "NPR API Core"
     Caption = 'NPR API - Core';
     Access = Public;
     IncludedPermissionSets =
-        "D365 AUTOMATION";
+        "D365 AUTOMATION",
+        "Ext. Events - Subscr";
+    ExcludedPermissionSets =
+        "NPR All Webhooks"; // Removes all our webhooks upfront so only the specific modules added on an Entra App can be used
 
     Permissions =
         tabledata * = rimd;
+
 }
 #endif

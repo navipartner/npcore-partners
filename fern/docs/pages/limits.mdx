@@ -1,0 +1,23 @@
+---
+title: "Rate Limits"
+slug: limits
+---
+
+The following limits apply **per Entra App**:
+
+| Limit | Description | Value |
+|-------|-------------|--------|
+| Max body size | The maximum request body size in MB. | 350 |
+| Max concurrent requests | The maximum number of requests that can be processed at the same time. Requests that exceed this limit wait in a queue until a slot becomes available. Requests timeout after 8 minutes, returning HTTP 503 | 5 |
+| Max connections | The maximum number of simultaneous requests, including processed and queued requests. Exceeding this limit returns HTTP 429 | 100 |
+| Max request queue size | The maximum number of queued requests waiting to be processed. Exceeding this limit returns HTTP 429| 95 |
+| Speed (rate) | The maximum number of requests that can be submitted within a 5-minute sliding window. Exceeding this limit returns HTTP 429 | 6000 |
+
+
+## Retry strategy
+Your integration should be resilient to temporary failures, HTTP 429 and HTTP 503.  
+Exponential backoff is our recommended strategy for retrying requests.
+
+
+## Increase throughput
+If you need more throughput than the limits allow, you can create multiple Entra Apps and spread your requests across them.
