@@ -1110,7 +1110,7 @@
             MemberCommunity."Member Unique Identity"::EMAIL:
                 if (FromFieldId = InfoCapture.FieldNo(InfoCapture."E-Mail Address")) then
                     if (InfoCapture."E-Mail Address" <> '') then
-                        Member.SetFilter("E-Mail Address", '=%1', InfoCapture."E-Mail Address");
+                        Member.SetFilter("E-Mail Address", '=%1', LowerCase(InfoCapture."E-Mail Address"));
 
             MemberCommunity."Member Unique Identity"::PHONENO:
                 if (FromFieldId = InfoCapture.FieldNo(InfoCapture."Phone No.")) then
@@ -1120,7 +1120,7 @@
             MemberCommunity."Member Unique Identity"::EMAIL_OR_PHONE:
                 if (FromFieldId in [InfoCapture.FieldNo(InfoCapture."E-Mail Address"), InfoCapture.FieldNo(InfoCapture."Phone No.")]) then begin
                     if (InfoCapture."E-Mail Address" <> '') then
-                        Member.SetFilter("E-Mail Address", '=%1', lowercase(InfoCapture."E-Mail Address"));
+                        Member.SetFilter("E-Mail Address", '=%1', LowerCase(InfoCapture."E-Mail Address"));
                     if (InfoCapture."Phone No." <> '') then
                         Member.SetFilter("Phone No.", '=%1', InfoCapture."Phone No.");
                 end;
@@ -1128,14 +1128,14 @@
             MemberCommunity."Member Unique Identity"::EMAIL_AND_PHONE:
                 if (FromFieldId in [InfoCapture.FieldNo(InfoCapture."E-Mail Address"), InfoCapture.FieldNo(InfoCapture."Phone No.")]) then
                     if (InfoCapture."E-Mail Address" <> '') and (InfoCapture."Phone No." <> '') then begin
-                        Member.SetFilter("E-Mail Address", '=%1', lowercase(InfoCapture."E-Mail Address"));
+                        Member.SetFilter("E-Mail Address", '=%1', LowerCase(InfoCapture."E-Mail Address"));
                         Member.SetFilter("Phone No.", '=%1', InfoCapture."Phone No.");
                     end;
 
             MemberCommunity."Member Unique Identity"::EMAIL_AND_FIRST_NAME:
                 if (FromFieldId in [InfoCapture.FieldNo(InfoCapture."E-Mail Address"), InfoCapture.FieldNo(InfoCapture."First Name")]) then
                     if (InfoCapture."E-Mail Address" <> '') and (InfoCapture."First Name" <> '') then begin
-                        Member.SetFilter("E-Mail Address", '=%1', InfoCapture."E-Mail Address");
+                        Member.SetFilter("E-Mail Address", '=%1', LowerCase(InfoCapture."E-Mail Address"));
                         Member.SetFilter("First Name", '%1', '@' + InfoCapture."First Name");
                     end;
 
