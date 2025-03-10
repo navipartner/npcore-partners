@@ -2,7 +2,7 @@
 {
     Extensible = False;
     Caption = 'Top 10 Sales Persons';
-    CardPageID = "NPR Salesperson Card";
+    CardPageID = "Salesperson/Purchaser Card";
     Editable = false;
     PageType = ListPart;
     UsageCategory = None;
