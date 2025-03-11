@@ -116,6 +116,9 @@ codeunit 6185076 "NPR AttractionWalletCreate"
         POSSale: Record "NPR POS Sale";
         IntermediaryWalletLine: Record "NPR AttractionWalletSaleLine";
     begin
+        if (Rec.IsTemporary()) then
+            exit;
+
         if (not POSSale.Get(Rec."Register No.", Rec."Sales Ticket No.")) then
             exit;
 
