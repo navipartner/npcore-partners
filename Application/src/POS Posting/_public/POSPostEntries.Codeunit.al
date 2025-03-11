@@ -1729,6 +1729,9 @@
                 exit;
         end;
 
+        if GenJournalLine."Posting Date" < CustLedgerEntry."Posting Date" then
+            exit;  //Application must not be posted with the posting date of the earlier entry.
+
         GenJournalLine.Validate("Applies-to Doc. Type", POSPostingBuffer."Applies-to Doc. Type");
         GenJournalLine.Validate("Applies-to Doc. No.", POSPostingBuffer."Applies-to Doc. No.");
         GenJournalLine.Validate("Currency Code", CustLedgerEntry."Currency Code"); //one might be blank while other is LCY
