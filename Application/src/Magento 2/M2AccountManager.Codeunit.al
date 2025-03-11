@@ -1328,6 +1328,8 @@
 
     local procedure TransferMemberInfoToCapture(Member: Record "NPR MM Member"; var MemberInfoCapture: Record "NPR MM Member Info Capture")
     begin
+        MemberInfoCapture."Member Entry No" := Member."Entry No.";
+
         MemberInfoCapture."First Name" := CopyStr(Member."First Name", 1, MaxStrLen(MemberInfoCapture."First Name"));
         MemberInfoCapture."Middle Name" := CopyStr(Member."Middle Name", 1, MaxStrLen(MemberInfoCapture."Middle Name"));
         MemberInfoCapture."Last Name" := CopyStr(Member."Last Name", 1, MaxStrLen(MemberInfoCapture."Last Name"));

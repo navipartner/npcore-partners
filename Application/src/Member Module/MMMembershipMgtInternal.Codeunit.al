@@ -798,8 +798,9 @@
         if (not Membership.Get(MembershipEntryNo)) then
             exit(false);
 
-        if (GetMemberCommunityCode(MemberEntryNo, CommunityCode)) then
-            CheckMemberUniqueId(CommunityCode, MembershipInfoCapture);
+        if (CurrentClientType <> ClientType::SOAP) then // To not disturb the SOAP service that uses the same function 
+            if (GetMemberCommunityCode(MemberEntryNo, CommunityCode)) then
+                CheckMemberUniqueId(CommunityCode, MembershipInfoCapture);
 
         Member.Get(MemberEntryNo);
         SetMemberFields(Member, MembershipInfoCapture);
@@ -841,6 +842,7 @@
         MemberRetailIntegration.MemberJSonToMemberInfo(JsonMember, MemberInfo);
 
         MemberInfo."Notification Method" := Member."Notification Method";
+        MemberInfo."Member Entry No" := MemberRole."Member Entry No.";
         if (not UpdateMember(MemberRole."Membership Entry No.", MemberRole."Member Entry No.", MemberInfo)) then
             exit(false);
 
