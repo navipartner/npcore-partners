@@ -11,20 +11,22 @@ codeunit 6185053 "NPR API Response"
         _ResponseBody: JsonToken;
         _ResponseJsonStream: InStream;
         _StreamInitialized: Boolean;
-        NPRVersionHeader: Label 'NPR-Version', Locked = true;
         UnsupportedHttpMethodErr: Label 'Http method %1 is not supported', Comment = '%1 = name of the Http method, do not translate';
         UnsupportedErrorStatusCodeErr: Label 'Status Code %1 is not a supported status code for error handling. This is not a user error; it is a development error.';
         ResourceNotFoundErr: Label '%1 Not Found', Comment = '%1 = the resource requested by the client';
 
     #region Initialization
     procedure Init(): Codeunit "NPR API Response"
+    var
+        ApplicationSystemConstants: Codeunit "Application System Constants";
     begin
         InitcurrCodeunit();
         Clear(_Headers);
         Clear(_ResponseBody);
         _StatusCode := 200; // Default to OK
         AddHeader('Content-Type', 'application/json');
-        AddHeader(NPRVersionHeader, GetNPRetailVersion(), true);
+        AddHeader('x-npr-version', GetNPRetailVersion(), true);
+        AddHeader('x-bc-platform-version', ApplicationSystemConstants.PlatformProductVersion(), true);
         exit(_CurrCodeunit);
     end;
     #endregion
@@ -122,6 +124,19 @@ codeunit 6185053 "NPR API Response"
         JsonStreamOut := _ResponseJsonStream;
     end;
 
+    internal procedure AddMetadataHeaders(SessionMetadata: Codeunit "NPR API Session Metadata"): Codeunit "NPR API Response";
+    begin
+        AddHeader('x-npr-start-time', Format(SessionMetadata.GetStartTime(), 0, 9));
+        AddHeader('x-npr-end-time', Format(CurrentDateTime(), 0, 9));
+        AddHeader('x-npr-duration', Format(CurrentDateTime() - SessionMetadata.GetStartTime()));
+        AddHeader('x-npr-sql-rows-read-total', Format(SessionInformation.SqlRowsRead()));
+        AddHeader('x-npr-sql-statements-executed-total', Format(SessionInformation.SqlStatementsExecuted()));
+        AddHeader('x-npr-sql-rows-read-api', Format(SessionInformation.SqlRowsRead() - SessionMetadata.GetStartRowsRead()));
+        AddHeader('x-npr-sql-statements-executed-api', Format(SessionInformation.SqlStatementsExecuted() - SessionMetadata.GetStartStatementsExecuted()));
+
+        exit(_CurrCodeunit);
+    end;
+
     procedure GetResponseJson() ResponseJson: JsonObject
     var
         HeadersJson: JsonObject;
@@ -129,6 +144,7 @@ codeunit 6185053 "NPR API Response"
         HeaderValue: Text;
         Base64Convert: Codeunit "Base64 Convert";
     begin
+
         ResponseJson.Add('statusCode', _StatusCode);
 
         Clear(HeadersJson);

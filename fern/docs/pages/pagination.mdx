@@ -1,0 +1,50 @@
+---
+title: "Pagination"
+slug: pagination
+---
+
+Our APIs use a cursor based pagination model to handle large result sets efficiently. This article explains how to navigate through paginated results and how to use our data synchronization features.
+
+## Pagination Structure
+
+All paginated responses have the following JSON structure:
+
+```json
+{
+  "morePages": true,
+  "nextPageKey": "c29tZSBiYXNlNjQgc3RyaW5n",
+  "nextPageURL": "https://api.npretail.app/tenant/env/company/resource?pageKey=c29tZSBiYXNlNjQgc3RyaW5n",
+  "data": [
+    {
+      /* resource item 1 */
+    },
+    {
+      /* resource item 2 */
+    },
+    {
+      /* resource item .. */
+    },
+    {
+      /* resource item n */
+    }
+  ]
+}
+```
+
+## Pagination Response Properties
+
+| Property      | Type    | Description                                                            |
+| ------------- | ------- | ---------------------------------------------------------------------- |
+| `morePages`   | boolean | Indicates whether more pages of results exist beyond the current page. |
+| `nextPageKey` | string  | A token that can be used to retrieve the next page of results.         |
+| `nextPageURL` | string  | A fully formed URL that is intended as a shortcut to retrieve next page.  |
+| `data`        | array   | The actual array of resource items.                                    |
+
+## Pagination Query Parameters
+
+When making requests to paginated endpoints, you can use the following query parameters:
+
+| Parameter  | Type    | Description                                                                    |
+| ---------- | ------- | ------------------------------------------------------------------------------ |
+| `pageSize` | integer | Optional. Specifies the number of items to return per page.                    |
+| `pageKey`  | string  | Optional. A token provided in the previous response to retrieve the next page. |

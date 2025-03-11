@@ -208,5 +208,4 @@ codeunit 85042 "NPR Replication API Tests"
         RepEndpoint.Enabled := TRUE;
         RepEndpoint.Insert();
     end;
-
 }

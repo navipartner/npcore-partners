@@ -1,0 +1,126 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+
+types:
+  ItemId:
+    type: string
+    docs: The unique identifier for an item.
+
+  Item:
+    docs: Represents an inventory item in the system.
+    properties:
+      id: uuid
+      code: string
+      description: string
+      description2: string
+      baseUnitOfMeasure: string
+      itemDiscGroup: string
+      itemCategoryCode: string
+      vatProdPostingGroup: string
+      inventory: double
+      hasVariants: boolean
+      rowVersion: string
+    examples:
+      - name: ExampleItem
+        value:
+          id: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+          code: "A1000"
+          description: "Office Chair"
+          description2: "Ergonomic Design"
+          baseUnitOfMeasure: "PCS"
+          itemDiscGroup: "FURNITURE"
+          itemCategoryCode: "CHAIR"
+          vatProdPostingGroup: "STANDARD"
+          inventory: 42.0
+          hasVariants: true
+          rowVersion: "12345678901234567890"
+
+  ListItem:
+    docs: Represents an inventory item in the system.
+    properties:
+      id: uuid
+      code: string
+      description: string
+      description2: string
+      baseUnitOfMeasure: string
+      itemDiscGroup: string
+      itemCategoryCode: string
+      vatProdPostingGroup: string
+      rowVersion: optional<string>
+    examples:
+      - name: ExampleItem
+        value:
+          id: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+          code: "A1000"
+          description: "Office Chair"
+          description2: "Ergonomic Design"
+          baseUnitOfMeasure: "PCS"
+          itemDiscGroup: "FURNITURE"
+          itemCategoryCode: "CHAIR"
+          vatProdPostingGroup: "STANDARD"
+          rowVersion: "12345678901234567890"
+
+  PaginatedItems:
+    docs: A paginated response containing multiple items
+    properties:
+      morePages: boolean
+      nextPageKey: string
+      nextPageURL: string
+      data: list<ListItem>
+    examples:
+      - name: ExamplePaginatedItems
+        value:
+          morePages: true
+          nextPageKey: "c29tZSBiYXNlNjQgc3RyaW5n"
+          nextPageURL: "https://api.npretail.app/tenant/env/company/inventory/item?pageKey=c29tZSBiYXNlNjQgc3RyaW5n&lastRowVersion=12345678901234567890"
+          data:
+            - $ListItem.ExampleItem
+            - $ListItem.ExampleItem
+
+service:
+  auth: true
+  display-name: Item Service
+  base-path: /inventory
+  endpoints:
+    getItem:
+      display-name: Get Item
+      docs: Get an item by its code
+      method: GET
+      path: "/item/{id}"
+      path-parameters:
+        id: ItemId
+      response: Item
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            id: "A1000"
+          response:
+            body: $Item.ExampleItem
+
+    getItems:
+      display-name: Get Items
+      docs: Get a list of items with pagination
+      method: GET
+      path: "/item"
+      request:
+        name: getItemsRequest
+        query-parameters:
+          itemCode: optional<string>
+          pageSize: optional<integer>
+          pageKey: optional<string>
+          lastRowVersion: optional<string>
+          sync: optional<boolean>
+      response: PaginatedItems
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            pageSize: 50
+          response:
+            body: $PaginatedItems.ExamplePaginatedItems

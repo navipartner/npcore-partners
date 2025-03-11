@@ -42,6 +42,12 @@ navigation:
     - page: Versioning
       icon: fa-solid fa-code-branch
       path: docs/pages/versioning.mdx
+    - page: Pagination
+      icon: fa-solid fa-list-ol
+      path: docs/pages/pagination.mdx
+    - page: Replication
+      icon: fa-solid fa-sync-alt
+      path: docs/pages/replication.mdx
     - page: Performance
       icon: fa-solid fa-gauge-high
       path: docs/pages/performance.mdx
@@ -213,7 +219,6 @@ navigation:
                 contents:
                   - endpoint: attractionWallet.service-attractionWallet.createWallet
 
-
         - section: POS
           summary: ./docs/pages/pos/overview.mdx
           contents:
@@ -231,7 +236,28 @@ navigation:
               summary: ./docs/pages/pos/globalentry.mdx
           - pos.poswebhooks:
               title: Webhooks
-
+              
+        - section: Inventory
+          summary: ./docs/pages/inventory/overview.mdx
+          contents:
+          - inventory.barcode:
+              title: Barcodes
+              summary: ./docs/pages/inventory/barcode.mdx
+          - inventory.item:
+              title: Items
+              summary: ./docs/pages/inventory/item.mdx
+          - inventory.itemledgerentry:
+              title: Item Ledger Entries
+              summary: ./docs/pages/inventory/itemledgerentry.mdx
+          - inventory.itemcategory:
+              title: Item Categories
+              summary: ./docs/pages/inventory/itemcategory.mdx
+          - inventory.itemvariant:
+              title: Item Variants
+              summary: ./docs/pages/inventory/itemvariant.mdx
+          - inventory.itemtranslation:
+              title: Item Translations
+              summary: ./docs/pages/inventory/itemtranslation.mdx
 
 navbar-links:
   - type: secondary

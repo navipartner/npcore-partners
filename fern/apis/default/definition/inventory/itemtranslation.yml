@@ -1,0 +1,76 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+
+types:
+  ItemTranslation:
+    docs: Represents an item translation in the system.
+    properties:
+      id: uuid
+      itemCode: string
+      languageCode: string
+      variantCode: string
+      description: string
+      description2: string
+      rowVersion: optional<string>
+    examples:
+      - name: ExampleItemTranslation
+        value:
+          id: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+          itemCode: "A1000"
+          languageCode: "da-DK"
+          variantCode: "RED"
+          description: "Kontorstol - Rød"
+          description2: "Ergonomisk Design - Rød Farve"
+          rowVersion: "12345678901234567890"
+          
+  PaginatedItemTranslations:
+    docs: A paginated response containing multiple item translations
+    properties:
+      morePages: boolean
+      nextPageKey: string
+      nextPageURL: string
+      data: list<ItemTranslation>
+    examples:
+      - name: ExamplePaginatedItemTranslations
+        value:
+          morePages: true
+          nextPageKey: "c29tZSBiYXNlNjQgc3RyaW5n"
+          nextPageURL: "https://api.npretail.app/tenant/env/company/inventory/itemtranslation?pageKey=c29tZSBiYXNlNjQgc3RyaW5n&lastRowVersion=12345678901234567890"
+          data:
+            - $ItemTranslation.ExampleItemTranslation
+            - $ItemTranslation.ExampleItemTranslation
+
+service:
+  auth: true
+  display-name: Item Translation Service
+  base-path: /inventory
+  endpoints:
+    getItemTranslations:
+      display-name: Get Item Translations
+      docs: Get a list of item translations with pagination
+      method: GET
+      path: "/itemtranslation"
+      request:
+        name: getItemTranslationsRequest
+        query-parameters:
+          itemCode: optional<string>
+          languageCode: optional<string>
+          variantCode: optional<string>
+          pageSize: optional<integer>
+          pageKey: optional<string>
+          lastRowVersion: optional<string>
+          sync: optional<boolean>
+      response: PaginatedItemTranslations
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            itemCode: "A1000"
+            languageCode: "da-DK"
+            pageSize: 50
+          response:
+            body: $PaginatedItemTranslations.ExamplePaginatedItemTranslations

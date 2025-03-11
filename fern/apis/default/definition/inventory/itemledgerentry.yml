@@ -1,0 +1,126 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+
+types:
+  ItemLedgerEntryType:
+    docs: The type of the item ledger entry.
+    enum:
+      - name: PURCHASE
+        value: 'Purchase'
+      - name: SALE
+        value: 'Sale'
+      - name: POSITIVE_ADJMT
+        value: 'Positive Adjmt.'
+      - name: NEGATIVE_ADJMT
+        value: 'Negative Adjmt.'
+      - name: TRANSFER
+        value: 'Transfer'
+      - name: CONSUMPTION
+        value: 'Consumption'
+      - name: OUTPUT
+        value: 'Output'
+      - name: BLANK
+        value: ' '
+      - name: ASSEMBLY_CONSUMPTION
+        value: 'Assembly Consumption'
+      - name: ASSEMBLY_OUTPUT
+        value: 'Assembly Output'
+
+  ItemLedgerEntry:
+    docs: Represents an item ledger entry in the system.
+    properties:
+      id: uuid
+      entryNo: integer
+      itemCode: string
+      postingDate: date
+      entryType: ItemLedgerEntryType
+      sourceNo: string
+      documentNo: string
+      globalDimension1Code: string
+      globalDimension2Code: string
+      locationCode: string
+      dropShipment: boolean
+      variantCode: string
+      lotNo: string
+      serialNo: string
+      unitOfMeasureCode: string
+      packageNo: string
+      quantity: double
+      description: string
+      externalDocumentNo: string
+      open: boolean
+      rowVersion: optional<string>
+    examples:
+      - name: ExampleItemLedgerEntry
+        value:
+          id: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+          entryNo: 1234
+          itemCode: "A1000"
+          postingDate: "2024-02-28"
+          entryType: 'Sale'
+          sourceNo: "C100"
+          documentNo: "INV-001"
+          globalDimension1Code: "SALES"
+          globalDimension2Code: "NORTH"
+          locationCode: "MAIN"
+          dropShipment: false
+          variantCode: "RED"
+          lotNo: "LOT123"
+          serialNo: "SER456"
+          unitOfMeasureCode: "PCS"
+          packageNo: "PKG789"
+          quantity: 5
+          description: "Sale of Office Chair"
+          externalDocumentNo: "PO-789"
+          open: false
+          rowVersion: "12345678901234567890"
+  
+  PaginatedItemLedgerEntries:
+    docs: A paginated response containing multiple item ledger entries
+    properties:
+      morePages: boolean
+      nextPageKey: string
+      nextPageURL: string
+      data: list<ItemLedgerEntry>
+    examples:
+      - name: ExamplePaginatedItemLedgerEntries
+        value:
+          morePages: true
+          nextPageKey: "c29tZSBiYXNlNjQgc3RyaW5n"
+          nextPageURL: "https://api.npretail.app/tenant/env/company/inventory/itemledgerentry?pageKey=c29tZSBiYXNlNjQgc3RyaW5n&lastRowVersion=12345678901234567890"
+          data:
+            - $ItemLedgerEntry.ExampleItemLedgerEntry
+            - $ItemLedgerEntry.ExampleItemLedgerEntry
+
+service:
+  auth: true
+  display-name: Item Ledger Entry Service
+  base-path: /inventory
+  endpoints:
+    getItemLedgerEntries:
+      display-name: Get Item Ledger Entries
+      docs: Get a list of item ledger entries with pagination
+      method: GET
+      path: "/itemledgerentry"
+      request:
+        name: getItemLedgerEntriesRequest
+        query-parameters:
+          itemCode: optional<string>
+          documentNo: optional<string>
+          pageSize: optional<integer>
+          pageKey: optional<string>
+          lastRowVersion: optional<string>
+          sync: optional<boolean>
+      response: PaginatedItemLedgerEntries
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            itemCode: "A1000"
+            pageSize: 50
+          response:
+            body: $PaginatedItemLedgerEntries.ExamplePaginatedItemLedgerEntries
