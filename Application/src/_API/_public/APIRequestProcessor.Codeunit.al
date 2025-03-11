@@ -4,6 +4,8 @@ codeunit 6185052 "NPR API Request Processor"
     var
         EmptyPathErr: Label 'The path is empty.';
         SentryTracerHeaderNameTok: Label 'x-sentry-trace-header', Locked = true;
+        _SessionMetadata: Codeunit "NPR API Session Metadata";
+
 
     [ServiceEnabled]
     procedure httpmethod(message: Text): Text
@@ -12,6 +14,10 @@ codeunit 6185052 "NPR API Request Processor"
         responseJson: JsonObject;
         responseString: Text;
     begin
+        _SessionMetadata.SetStartTime(CurrentDateTime());
+        _SessionMetadata.SetStartRowsRead(SessionInformation.SqlRowsRead());
+        _SessionMetadata.SetStartStatementsExecuted(SessionInformation.SqlStatementsExecuted());
+
         requestJson.ReadFrom(message);
         responseJson := ProcessRequest(requestJson);
         responseString := Format(responseJson);
@@ -71,7 +77,7 @@ codeunit 6185052 "NPR API Request Processor"
             foreach requestPathSegment in requestRelativePathSegments do begin
                 requestPathSegmentsStr += StrSubstNo('/%1', requestPathSegment)
             end;
-            exit(responseCodeunit.RespondResourceNotFound(requestPathSegmentsStr).GetResponseJson());
+            exit(responseCodeunit.RespondResourceNotFound(requestPathSegmentsStr).AddMetadataHeaders(_SessionMetadata).GetResponseJson());
         end;
 
         requestCodeunit.Init(requestHttpMethod, requestPath, requestRelativePathSegments, requestQueryParams, requestHeaders, requestBodyJson);
@@ -81,7 +87,7 @@ codeunit 6185052 "NPR API Request Processor"
         if not HasUserPermissionSetAssigned(UserSecurityId(), CompanyName(), apiModuleResolver.GetRequiredPermissionSet()) then begin
 # pragma warning restore AA0139
             // For the API module, we require explicit permission sets declared on the entra app for each module to avoid "BC365 FULL ACCESS + NPR RETAIL" as go-to everywhere in prod.
-            exit(responseCodeunit.RespondForbidden(StrSubstNo('Missing permissions: %1', apiModuleResolver.GetRequiredPermissionSet())).GetResponseJson());
+            exit(responseCodeunit.RespondForbidden(StrSubstNo('Missing permissions: %1', apiModuleResolver.GetRequiredPermissionSet())).AddMetadataHeaders(_SessionMetadata).GetResponseJson());
         end;
 
         requestResolver := apiModuleResolver.Resolve(requestCodeunit);
@@ -92,15 +98,15 @@ codeunit 6185052 "NPR API Request Processor"
                     responseCodeunit := requestResolver.Handle(requestCodeunit);
                 end;
             else begin
-                exit(responseCodeunit.RespondBadRequestUnsupportedHttpMethod(requestHttpMethod).GetResponseJson());
+                exit(responseCodeunit.RespondBadRequestUnsupportedHttpMethod(requestHttpMethod).AddMetadataHeaders(_SessionMetadata).GetResponseJson());
             end;
         end;
 
         if (not responseCodeunit.IsInitialized()) then begin
-            exit(responseCodeunit.RespondResourceNotFound().GetResponseJson());
+            exit(responseCodeunit.RespondResourceNotFound().AddMetadataHeaders(_SessionMetadata).GetResponseJson());
         end;
 
-        exit(responseCodeunit.GetResponseJson());
+        exit(responseCodeunit.AddMetadataHeaders(_SessionMetadata).GetResponseJson());
     end;
 
     procedure RegisterService()

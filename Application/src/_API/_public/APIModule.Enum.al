@@ -18,8 +18,10 @@ enum 6059812 "NPR API Module" implements "NPR API Module Resolver"
         ObsoleteReason = 'Segment path changed from externalpos to pos.';
         Implementation = "NPR API Module Resolver" = "NPR API External POS Resolver";
     }
-
-
+    value(3; inventory)
+    {
+        Implementation = "NPR API Module Resolver" = "NPR API Inventory Resolver";
+    }
     value(6185039; ticketing)
     {
         Implementation = "NPR API Module Resolver" = "NPR TicketingModuleResolver";

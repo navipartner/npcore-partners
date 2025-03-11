@@ -1,0 +1,78 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+
+types:
+  Barcode:
+    docs: Represents a barcode reference in the system.
+    properties:
+      id: uuid
+      itemCode: string
+      variantCode: string
+      unitOfMeasure: string
+      barcode: string
+      description: string
+      description2: string
+      rowVersion: optional<string>
+    examples:
+      - name: ExampleBarcode
+        value:
+          id: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+          itemCode: "A1000"
+          variantCode: "RED"
+          unitOfMeasure: "PCS"
+          barcode: "123456789012"
+          description: "Office Chair - Red"
+          description2: "Ergonomic Design - Red Color"
+          rowVersion: "12345678901234567890"
+          
+  PaginatedBarcodes:
+    docs: A paginated response containing multiple barcodes
+    properties:
+      morePages: boolean
+      nextPageKey: string
+      nextPageURL: string
+      data: list<Barcode>
+    examples:
+      - name: ExamplePaginatedBarcodes
+        value:
+          morePages: true
+          nextPageKey: "c29tZSBiYXNlNjQgc3RyaW5n"
+          nextPageURL: "https://api.npretail.app/tenant/env/company/inventory/barcode?pageKey=c29tZSBiYXNlNjQgc3RyaW5n"
+          data:
+            - $Barcode.ExampleBarcode
+            - $Barcode.ExampleBarcode
+
+service:
+  auth: true
+  display-name: Barcode Service
+  base-path: /inventory
+  endpoints:
+    getBarcodes:
+      display-name: Get Barcodes
+      docs: Get a list of barcodes with pagination
+      method: GET
+      path: "/barcode"
+      request:
+        name: getBarcodesRequest
+        query-parameters:
+          value: optional<string>
+          itemCode: optional<string>
+          variantCode: optional<string>
+          unitOfMeasure: optional<string>
+          pageSize: optional<integer>
+          pageKey: optional<string>
+          lastRowVersion: optional<string>
+          sync: optional<boolean>
+      response: PaginatedBarcodes
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            value: "123456789012"
+            pageSize: 50
+          response:
+            body: $PaginatedBarcodes.ExamplePaginatedBarcodes

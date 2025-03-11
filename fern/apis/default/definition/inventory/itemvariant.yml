@@ -1,0 +1,71 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+
+types:
+  ItemVariant:
+    docs: Represents an item variant in the system.
+    properties:
+      id: uuid
+      itemCode: string
+      variantCode: string
+      description: string
+      description2: string
+      rowVersion: optional<string>
+    examples:
+      - name: ExampleItemVariant
+        value:
+          id: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+          itemCode: "A1000"
+          variantCode: "RED"
+          description: "Office Chair - Red"
+          description2: "Ergonomic Design - Red Color"
+          rowVersion: "12345678901234567890"
+          
+  PaginatedItemVariants:
+    docs: A paginated response containing multiple item variants
+    properties:
+      morePages: boolean
+      nextPageKey: string
+      nextPageURL: string
+      data: list<ItemVariant>
+    examples:
+      - name: ExamplePaginatedItemVariants
+        value:
+          morePages: true
+          nextPageKey: "c29tZSBiYXNlNjQgc3RyaW5n"
+          nextPageURL: "https://api.npretail.app/tenant/env/company/inventory/itemvariant?pageKey=c29tZSBiYXNlNjQgc3RyaW5n&lastRowVersion=12345678901234567890"
+          data:
+            - $ItemVariant.ExampleItemVariant
+            - $ItemVariant.ExampleItemVariant
+
+service:
+  auth: true
+  display-name: Item Variant Service
+  base-path: /inventory
+  endpoints:
+    getItemVariants:
+      display-name: Get Item Variants
+      docs: Get a list of item variants with pagination
+      method: GET
+      path: "/itemvariant"
+      request:
+        name: getItemVariantsRequest
+        query-parameters:
+          itemCode: optional<string>
+          pageSize: optional<integer>
+          pageKey: optional<string>
+          lastRowVersion: optional<string>
+          sync: optional<boolean>
+      response: PaginatedItemVariants
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            itemCode: "A1000"
+            pageSize: 50
+          response:
+            body: $PaginatedItemVariants.ExamplePaginatedItemVariants
