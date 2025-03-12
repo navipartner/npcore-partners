@@ -707,6 +707,7 @@
         POSActMemberMgt.UpdateMembershipOnSaleLineInsert(Rec);
         InvokeOnAfterInsertSaleLineWorkflow(Rec);
 
+        RefreshCurrent();
         OnAfterInsertPOSSaleLineBeforeCommit(Rec);
         OnAfterInsertPOSSaleLine(Rec);
         Commit();
