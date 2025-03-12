@@ -130,6 +130,9 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
                 if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::DOC_LX_CITY_CARD) then
                     AdmitCityCard(ValidationRequest, ResponseJson);
 
+                if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::TICKET_REQUEST) then
+                    AdmitTicketRequest(ValidationRequest, ResponseJson);
+
             until (ValidationRequest.Next() = 0);
         end;
 
@@ -161,9 +164,30 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         ResponseJson
             .StartObject()
             .AddProperty('token', Format(ValidationRequest.Token, 0, 4).ToLower())
-            .AddProperty('referenceNumberType', 'ticket')
-            .AddProperty('referenceNumber', Ticket."External Ticket No.")
-            .AddProperty('ticketId', Format(ValidationRequest.EntityId, 0, 4).ToLower())
+            .AddProperty('referenceNumberType', ReferenceNumberTypeAsText(ValidationRequest.ReferenceNumberType))
+            .AddProperty('referenceNumber', ValidationRequest.ReferenceNo)
+            .AddProperty('ticketId', Format(Ticket.SystemId, 0, 4).ToLower())
+            .AddProperty('status', 'admitted')
+            .AddProperty('itemNo', Ticket."Item No.")
+            .AddProperty('admissionCode', ValidationRequest.AdmissionCode)
+            .AddObject(AddPrintedTicketDetails(ResponseJson, Ticket))
+            .AddProperty('ticketNumber', ValidationRequest.AdmittedReferenceNo)
+            .EndObject();
+    end;
+
+    local procedure AdmitTicketRequest(ValidationRequest: Record "NPR SGEntryLog"; ResponseJson: Codeunit "NPR JSON Builder")
+    var
+        SpeedGateMgr: Codeunit "NPR SG SpeedGate";
+        Ticket: Record "NPR TM Ticket";
+    begin
+        Ticket.GetBySystemId(SpeedGateMgr.ValidateAdmitTicket(ValidationRequest));
+
+        ResponseJson
+            .StartObject()
+            .AddProperty('token', Format(ValidationRequest.Token, 0, 4).ToLower())
+            .AddProperty('referenceNumberType', ReferenceNumberTypeAsText(ValidationRequest.ReferenceNumberType))
+            .AddProperty('referenceNumber', ValidationRequest.ReferenceNo)
+            .AddProperty('ticketId', Format(Ticket.SystemId, 0, 4).ToLower())
             .AddProperty('status', 'admitted')
             .AddProperty('itemNo', Ticket."Item No.")
             .AddProperty('admissionCode', ValidationRequest.AdmissionCode)
@@ -175,7 +199,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
     local procedure AdmitMemberCard(ValidationRequest: Record "NPR SGEntryLog"; ResponseJson: Codeunit "NPR JSON Builder"; Quantity: Integer): Guid
     var
         SpeedGateMgr: Codeunit "NPR SG SpeedGate";
-        Ticket: Record "NPR TM Ticket";
+        Ticket, GuestTicket : Record "NPR TM Ticket";
         ValidationRequestResponse: Record "NPR SGEntryLog";
     begin
         Ticket.GetBySystemId(SpeedGateMgr.ValidateAdmitMemberCard(ValidationRequest, Quantity));
@@ -184,7 +208,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             ResponseJson
                 .StartObject()
                 .AddProperty('token', Format(ValidationRequest.Token, 0, 4).ToLower())
-                .AddProperty('referenceNumberType', 'memberCard')
+                .AddProperty('referenceNumberType', ReferenceNumberTypeAsText(ValidationRequest.ReferenceNumberType))
                 .AddProperty('referenceNumber', ValidationRequest.ReferenceNo)
                 .AddProperty('ticketId', Format(Ticket.SystemId, 0, 4).ToLower())
                 .AddProperty('status', 'admitted')
@@ -200,19 +224,21 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             ValidationRequestResponse.SetFilter(EntryStatus, '=%1', ValidationRequest.EntryStatus::ADMITTED);
             if (ValidationRequestResponse.FindSet()) then begin
                 repeat
-                    ResponseJson
-                        .StartObject()
-                        .AddProperty('token', Format(ValidationRequestResponse.Token, 0, 4).ToLower())
-                        .AddProperty('referenceNumberType', 'memberCard')
-                        .AddProperty('referenceNumber', ValidationRequestResponse.ReferenceNo)
-                        .AddProperty('ticketId', Format(Ticket.SystemId, 0, 4).ToLower())
-                        .AddProperty('status', 'admitted')
-                        .AddProperty('itemNo', Ticket."Item No.")
-                        .AddProperty('admissionCode', ValidationRequestResponse.AdmissionCode)
-                        .AddObject(AddPrintedTicketDetails(ResponseJson, Ticket))
-                        .AddProperty('memberCardId', Format(ValidationRequestResponse.EntityId, 0, 4).ToLower())
-                        .AddProperty('ticketNumber', ValidationRequestResponse.AdmittedReferenceNo)
-                        .EndObject();
+                    if (GuestTicket.GetBySystemId(ValidationRequestResponse.AdmittedReferenceId)) then
+                        ResponseJson
+                            .StartObject()
+                            .AddProperty('token', Format(ValidationRequestResponse.Token, 0, 4).ToLower())
+                            .AddProperty('referenceNumberType', ReferenceNumberTypeAsText(ValidationRequest.ReferenceNumberType))
+                            .AddProperty('referenceNumber', ValidationRequestResponse.ReferenceNo)
+                            .AddProperty('ticketId', Format(ValidationRequestResponse.AdmittedReferenceId, 0, 4).ToLower())
+                            .AddProperty('status', 'admitted')
+                            .AddProperty('itemNo', GuestTicket."Item No.")
+                            .AddProperty('admissionCode', ValidationRequestResponse.AdmissionCode)
+                            .AddObject(AddPrintedTicketDetails(ResponseJson, GuestTicket))
+                            .AddProperty('memberCardId', Format(ValidationRequestResponse.EntityId, 0, 4).ToLower())
+                            .AddProperty('ticketNumber', ValidationRequestResponse.AdmittedReferenceNo)
+                            .EndObject();
+
                 until (ValidationRequestResponse.Next() = 0);
             end;
         end;
@@ -230,7 +256,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         ResponseJson
             .StartObject()
             .AddProperty('token', Format(ValidationRequest.Token, 0, 4).ToLower())
-            .AddProperty('referenceNumberType', 'docLxCityCard')
+            .AddProperty('referenceNumberType', ReferenceNumberTypeAsText(ValidationRequest.ReferenceNumberType))
             .AddProperty('referenceNumber', ValidationRequest.ReferenceNo)
             .AddProperty('ticketId', Format(Ticket.SystemId, 0, 4).ToLower())
             .AddProperty('status', 'admitted')
@@ -308,6 +334,9 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
                 exit(SingleWalletDTO(ResponseJson, ValidationRequest));
             ValidationRequest.ReferenceNumberType::DOC_LX_CITY_CARD:
                 exit(SingleDocLxCityCard(ResponseJson, ValidationRequest));
+            ValidationRequest.ReferenceNumberType::TICKET_REQUEST:
+                exit(SingleTicketRequestDTO(ResponseJson, ValidationRequest));
+
             else
                 exit(ResponseJson.AddProperty('unknown', ValidationRequest.ReferenceNo));
         end;
@@ -381,6 +410,46 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         ResponseJson.EndObject();
         exit(ResponseJson);
     end;
+
+    local procedure SingleTicketRequestDTO(var ResponseJson: Codeunit "NPR JSON Builder"; ValidationRequest: Record "NPR SGEntryLog"): Codeunit "NPR JSON Builder"
+    var
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        Ticket: Record "NPR TM Ticket";
+        AccessEntry: Record "NPR TM Ticket Access Entry";
+        ValidationRequestResult: Record "NPR SGEntryLog";
+    begin
+        if (not TicketRequest.GetBySystemId(ValidationRequest.EntityId)) then
+            exit(ResponseJson);
+
+        ResponseJson
+            .StartObject('ticketRequest')
+            .AddProperty('ticketRequestId', Format(ValidationRequest.EntityId, 0, 4).ToLower())
+            .AddProperty('referenceNumber', ValidationRequest.ReferenceNo)
+            .AddProperty('numberOfTickets', TicketRequest.Quantity)
+            .StartArray('tickets');
+
+        ValidationRequestResult.SetCurrentKey(Token);
+        ValidationRequestResult.SetFilter(Token, '=%1', ValidationRequest.Token);
+        if (ValidationRequestResult.FindSet()) then begin
+            repeat
+
+                if (Ticket.GetBySystemId(ValidationRequestResult.ExtraEntityId)) then begin
+                    AccessEntry.SetCurrentKey("Ticket No.");
+                    AccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+                    AccessEntry.SetFilter("Admission Code", '=%1', ValidationRequestResult.AdmissionCode);
+                    if (AccessEntry.FindFirst()) then
+                        ResponseJson
+                            .StartObject()
+                            .AddObject(SingleTicketDTO(ResponseJson, Ticket, AccessEntry))
+                            .EndObject();
+                end;
+            until (ValidationRequestResult.Next() = 0);
+        end;
+
+        ResponseJson.EndArray().EndObject();
+        exit(ResponseJson);
+    end;
+
 
     local procedure StartSingleTicketDTO(var ResponseJson: Codeunit "NPR JSON Builder"; ValidationRequest: Record "NPR SGEntryLog"): Codeunit "NPR JSON Builder"
     var
@@ -685,6 +754,8 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
                 exit('wallet');
             ValidationRequest.ReferenceNumberType::DOC_LX_CITY_CARD:
                 exit('docLxCityCard');
+            ValidationRequest.ReferenceNumberType::TICKET_REQUEST:
+                exit('ticketRequest');
             else
                 exit('unknown');
         end;

@@ -67,6 +67,11 @@ page 6184906 "NPR SG EntryLogList"
                     ToolTip = 'Specifies the value of the Scanner Id field.', Comment = '%';
                     ApplicationArea = NPRRetail;
                 }
+                field(ScannerDescription; Rec.ScannerDescription)
+                {
+                    ToolTip = 'Specifies the value of the Scanner Description field.', Comment = '%';
+                    ApplicationArea = NPRRetail;
+                }
                 field(AdmissionCode; Rec.AdmissionCode)
                 {
                     ToolTip = 'Specifies the value of the Admission Code field.', Comment = '%';
@@ -78,6 +83,48 @@ page 6184906 "NPR SG EntryLogList"
                     ToolTip = 'Specifies the value of the Api Error Number field.', Comment = '%';
                     ApplicationArea = NPRRetail;
                 }
+                field(ApiErrorNumber; Rec.ApiErrorNumber)
+                {
+                    ToolTip = 'Specifies the value of the Api Error Number field.', Comment = '%';
+                    ApplicationArea = NPRRetail;
+                    Visible = false;
+                }
+                field(EntityId; Rec.EntityId)
+                {
+                    ToolTip = 'Specifies the value of the Entity Id field.', Comment = '%';
+                    ApplicationArea = NPRRetail;
+                    Visible = false;
+                }
+                field(ExtraEntityId; Rec.ExtraEntityId)
+                {
+                    ToolTip = 'Specifies the value of the Extra Entity Id field.', Comment = '%';
+                    ApplicationArea = NPRRetail;
+                    Visible = false;
+                }
+                field(ExtraEntityTableId; Rec.ExtraEntityTableId)
+                {
+                    ToolTip = 'Specifies the value of the Extra Entity Table Id field.', Comment = '%';
+                    ApplicationArea = NPRRetail;
+                    Visible = false;
+                }
+                field(ApiErrorMessage; Rec.ApiErrorMessage)
+                {
+                    ToolTip = 'Specifies the value of the Api Error Message field.', Comment = '%';
+                    ApplicationArea = NPRRetail;
+                    Visible = false;
+                }
+                field(MemberCardLogEntryNo; Rec.MemberCardLogEntryNo)
+                {
+                    ToolTip = 'Specifies the value of the Member Card Log Entry No field.', Comment = '%';
+                    ApplicationArea = NPRRetail;
+                    Visible = false;
+                }
+                field(ProfileLineId; Rec.ProfileLineId)
+                {
+                    ToolTip = 'Specifies the value of the Profile Line Id field.', Comment = '%';
+                    ApplicationArea = NPRRetail;
+                    Visible = false;
+                }
             }
         }
     }
@@ -86,11 +133,11 @@ page 6184906 "NPR SG EntryLogList"
     {
         area(Navigation)
         {
-            action(Tickets)
+            action(Scanned)
             {
                 ApplicationArea = NPRRetail;
-                Caption = 'Tickets';
-                ToolTip = 'Navigate to Ticket List';
+                Caption = 'Reference No';
+                ToolTip = 'Navigate to Reference No';
                 Image = Navigate;
                 Promoted = true;
                 PromotedOnly = true;
@@ -100,26 +147,59 @@ page 6184906 "NPR SG EntryLogList"
                 trigger OnAction()
                 var
                     Ticket: Record "NPR TM Ticket";
-                    TempTickets: Record "NPR TM Ticket" temporary;
+                    MemberCard: Record "NPR MM Member Card";
+                    TicketRequest: Record "NPR TM Ticket Reservation Req.";
+                    Wallet: Record "NPR AttractionWallet";
+                    WalletPage: Page "NPR AttractionWallet";
+                    DocLXCityCard: Record "NPR DocLXCityCardHistory";
                 begin
-                    Ticket.Reset();
-                    Ticket.SetCurrentKey("External Ticket No.");
-                    Ticket.SetFilter("External Ticket No.", '=%1', Rec.ReferenceNo);
-                    if (Ticket.FindSet()) then
-                        repeat
-                            TempTickets.TransferFields(Ticket, true);
-                            if (not TempTickets.Insert()) then;
-                        until (Ticket.Next() = 0);
 
-                    Page.Run(Page::"NPR TM Ticket List", TempTickets);
+                    case Rec.ReferenceNumberType of
+                        Rec.ReferenceNumberType::Ticket:
+                            begin
+                                Ticket.Reset();
+                                Ticket.SetCurrentKey("External Ticket No.");
+                                Ticket.SetFilter("External Ticket No.", '=%1', CopyStr(Rec.ReferenceNo, 1, MaxStrLen(Ticket."External Ticket No.")));
+                                Page.Run(Page::"NPR TM Ticket List", Ticket);
+                            end;
+                        Rec.ReferenceNumberType::MEMBER_CARD:
+                            begin
+                                MemberCard.Reset();
+                                MemberCard.SetCurrentKey("External Card No.");
+                                MemberCard.SetFilter("External Card No.", '=%1', CopyStr(Rec.ReferenceNo, 1, MaxStrLen(MemberCard."External Card No.")));
+                                Page.Run(Page::"NPR MM Member Card List", MemberCard);
+                            end;
+
+                        Rec.ReferenceNumberType::TICKET_REQUEST:
+                            begin
+                                TicketRequest.Reset();
+                                TicketRequest.SetCurrentKey("Session Token ID");
+                                TicketRequest.SetFilter("Session Token ID", '=%1', CopyStr(Rec.ReferenceNo, 1, MaxStrLen(TicketRequest."Session Token ID")));
+                                Page.Run(Page::"NPR TM Ticket Request", TicketRequest);
+                            end;
+                        Rec.ReferenceNumberType::WALLET:
+                            begin
+                                WalletPage.SetSearch(CopyStr(Rec.ReferenceNo, 1, MaxStrLen(Wallet.ReferenceNumber)));
+                                WalletPage.Run();
+                            end;
+
+                        Rec.ReferenceNumberType::DOC_LX_CITY_CARD:
+                            begin
+                                DocLXCityCard.Reset();
+                                DocLXCityCard.SetCurrentKey(CardNumber);
+                                DocLXCityCard.SetFilter(CardNumber, '=%1', CopyStr(Rec.ReferenceNo, 1, MaxStrLen(DocLXCityCard.CardNumber)));
+                                Page.Run(Page::"NPR DocLXCityCardHistoryList", DocLXCityCard);
+                            end;
+                    end;
+
                 end;
             }
 
-            action(MemberCard)
+            action(Admitted)
             {
                 ApplicationArea = NPRRetail;
-                Caption = 'Member Card';
-                ToolTip = 'Navigate to Member Card List';
+                Caption = 'Admitted';
+                ToolTip = 'Navigate to Admitted Ticket';
                 Image = Navigate;
                 Promoted = true;
                 PromotedOnly = true;
@@ -129,19 +209,15 @@ page 6184906 "NPR SG EntryLogList"
 
                 trigger OnAction()
                 var
-                    MemberCard: Record "NPR MM Member Card";
-                    TempMemberCard: Record "NPR MM Member Card" temporary;
+                    Ticket: Record "NPR TM Ticket";
                 begin
-                    MemberCard.Reset();
-                    MemberCard.SetCurrentKey("External Card No.");
-                    MemberCard.SetFilter("External Card No.", '=%1', Rec.ReferenceNo);
-                    if (MemberCard.FindSet()) then
-                        repeat
-                            TempMemberCard.TransferFields(MemberCard, true);
-                            if (not TempMemberCard.Insert()) then;
-                        until (MemberCard.Next() = 0);
+                    if (Rec.AdmittedReferenceNo = '') then
+                        exit;
 
-                    Page.Run(Page::"NPR MM Member Card List", TempMemberCard);
+                    Ticket.Reset();
+                    Ticket.SetCurrentKey("External Ticket No.");
+                    Ticket.SetFilter("External Ticket No.", '=%1', CopyStr(Rec.AdmittedReferenceNo, 1, MaxStrLen(Ticket."External Ticket No.")));
+                    Page.Run(Page::"NPR TM Ticket List", Ticket);
                 end;
             }
         }

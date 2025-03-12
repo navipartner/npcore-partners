@@ -37,6 +37,12 @@ table 6150987 "NPR SGEntryLog"
             Caption = 'Scanner Id';
         }
 
+        field(31; ScannerDescription; Text[250])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Scanner Description';
+        }
+
         field(40; AdmissionCode; Code[20])
         {
             DataClassification = CustomerContent;
@@ -52,12 +58,17 @@ table 6150987 "NPR SGEntryLog"
             DataClassification = CustomerContent;
             Caption = 'Admitted Reference No';
         }
+        field(56; AdmittedReferenceId; Guid)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Admitted Reference Id';
+        }
         field(100; ReferenceNumberType; Option)
         {
             DataClassification = CustomerContent;
             Caption = 'Entry Type';
-            OptionMembers = REJECTED,UNKNOWN,TICKET,MEMBER_CARD,WALLET,DOC_LX_CITY_CARD;
-            OptionCaption = 'Rejected,Unknown,Ticket,Member Card,Wallet,City Card';
+            OptionMembers = REJECTED,UNKNOWN,TICKET,MEMBER_CARD,WALLET,DOC_LX_CITY_CARD,TICKET_REQUEST;
+            OptionCaption = 'Rejected,Unknown,Ticket,Member Card,Wallet,City Card,Ticket Request';
         }
 
         field(105; MemberCardLogEntryNo; Integer)
