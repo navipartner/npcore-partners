@@ -18,6 +18,12 @@ table 6150983 "NPR SG TicketProfile"
             Caption = 'Description';
         }
 
+        field(20; PermitTicketRequestToken; Boolean)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Permit Ticket Request Token';
+        }
+
         field(100; ValidationMode; Option)
         {
             DataClassification = CustomerContent;

@@ -30,6 +30,9 @@ types:
       # In case of a DocLX City Card
       docLxCityCard: optional<DocLxCityCardDetails>
 
+      # in case of a ticket request
+      ticketRequest: optional<TicketRequestDetails>
+
 
   TicketDetail:
     docs:
@@ -53,7 +56,15 @@ types:
           admitCount: 0
           printedAt: $simpleTypes.PrintedAt.ExamplePrintedAt
           printCount: 1
-
+      - name: ExampleTicketDetail2
+        value:
+          ticketId: $simpleTypes.TicketId.ExampleTicketId2
+          ticketNumber: $simpleTypes.TicketNumber.ExampleTicketNumber2
+          itemNo: $simpleTypes.ItemNo.ExampleItemNo
+          admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+          admitCount: 0
+          printedAt: $simpleTypes.PrintedAt.ExamplePrintedAt
+          printCount: 1
 
   MemberCardDetails:
     docs:
@@ -124,6 +135,22 @@ types:
           shopKey: $simpleTypes.ShopKey.ExampleShopKey
           validationResultCode: $simpleTypes.ValidationResultCode.ExampleOk
           validationResultMessage: $simpleTypes.ValidationResultMessage.ExampleOk
+
+  TicketRequestDetails:
+    properties:
+      ticketRequestId: simpleTypes.TicketRequestId
+      referenceNumber: simpleTypes.ReferenceNumber
+      numberOfTickets: simpleTypes.NumberOfTicketsInRequest
+      tickets: list<TicketDetail>
+    examples:
+      - name: ExampleTicketRequestDetails
+        value:
+          ticketRequestId: $simpleTypes.TicketRequestId.ExampleTicketRequestId
+          referenceNumber: $simpleTypes.ReferenceNumber.ExampleTicketToken
+          numberOfTickets: $simpleTypes.NumberOfTicketsInRequest.ExampleNumberOfTickets
+          tickets:
+            - $TicketDetail.ExampleTicketDetail
+            - $TicketDetail.ExampleTicketDetail2
 
   PreviousScan:
     properties:

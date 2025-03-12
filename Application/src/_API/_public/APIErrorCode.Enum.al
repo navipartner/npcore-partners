@@ -122,13 +122,16 @@ enum 6059810 "NPR API Error Code"
     }
     value(6060038; ticket_not_allowed)
     {
-        Caption = 'The ticket is not allowed.', Locked = true;
+        Caption = 'The ticket is not allowed since no valid admission code could be found.', Locked = true;
     }
     value(6060039; wallet_expired)
     {
         Caption = 'The wallet has expired.', Locked = true;
     }
-
+    value(6060040; ticket_reservation_has_no_tickets)
+    {
+        Caption = 'The ticket reservation has no tickets.', Locked = true;
+    }
     value(6060133; member_blocked)
     {
         Caption = 'Member is blocked.', Locked = true;

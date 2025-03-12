@@ -36,6 +36,8 @@ types:
     examples:
       - name: ExampleTicketId
         value: "cccccccc-e89b-12d3-a456-426614174000"
+      - name: ExampleTicketId2
+        value: "ccccccdd-e89b-12d3-a456-426614174001"
 
   ItemNo:
     type: string
@@ -139,6 +141,8 @@ types:
         value: WAL345678
       - name: ExampleCityCard
         value: CIC345678
+      - name : ExampleTicketToken
+        value: 2D9FE68FC94748AB9D626C759029FA2B
 
   TicketNumber:
     type: string
@@ -146,13 +150,17 @@ types:
     examples:
       - name: ExampleTicketNumber
         value: "TIC123456"
+      - name: ExampleTicketNumber2
+        value: TIC789012
 
   ReferenceNumberTypeEnum:
     enum:
+      - unknown
       - ticket
       - wallet
       - memberCard
       - docLxCityCard
+      - ticketRequest
 
   ReferenceNumberType:
     type: ReferenceNumberTypeEnum
@@ -364,7 +372,20 @@ types:
     examples:
       - name: ExampleMemberCardId
         value: "12121212-aaaa-aaaa-a456-426614174000"
+# Ticket Token Request
+  TicketRequestId:
+    type: uuid
+    docs: Unique identifier for a ticket request token.
+    examples:
+      - name: ExampleTicketRequestId
+        value: "12345678-aaaa-12d3-a456-426614174000"
 
+  NumberOfTicketsInRequest:
+    type: integer
+    docs: The number of tickets in the request.
+    examples:
+      - name: ExampleNumberOfTickets
+        value: 2
 
   # ScannerId setup
   Base64Image:

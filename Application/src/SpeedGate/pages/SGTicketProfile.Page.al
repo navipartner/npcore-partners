@@ -22,7 +22,11 @@ page 6184895 "NPR SG TicketProfile"
                 ToolTip = 'Specifies the value of the Description field.', Comment = '%';
                 ApplicationArea = NPRRetail;
             }
-
+            field(PermitTicketRequestToken; Rec.PermitTicketRequestToken)
+            {
+                ToolTip = 'Specifies whether the Ticket Request Token is accepted as scannable for admission.', Comment = '%';
+                ApplicationArea = NPRRetail;
+            }
             field(ListBias; Rec.ValidationMode)
             {
                 ToolTip = 'Specifies the value of the ListBias field.', Comment = '%';

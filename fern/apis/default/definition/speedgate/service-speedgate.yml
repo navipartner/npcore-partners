@@ -134,7 +134,21 @@ service:
               referenceNumberType: docLxCityCard
               docLxCityCard: $compositeTypes.DocLxCityCardDetails.ExampleSuccess
 
-
+        - name: "Ticket Token Reference"
+          docs: Example of a successful identification of a ticket token as seen from the ticket reservation request.
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          request:
+            referenceNumber: $simpleTypes.ReferenceNumber.ExampleTicketToken
+            scannerId: $simpleTypes.ScannerId.ExampleSpeedgate
+            admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+          response:
+            body:
+              token: $simpleTypes.Token.ExampleAdmitToken
+              referenceNumberType: ticketRequest
+              ticketRequest: $compositeTypes.TicketRequestDetails.ExampleTicketRequestDetails
 
     admitToken:
       docs: 
