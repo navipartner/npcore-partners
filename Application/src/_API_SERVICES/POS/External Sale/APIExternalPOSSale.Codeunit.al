@@ -19,31 +19,71 @@ codeunit 6248216 "NPR API External POS Sale" implements "NPR API Request Handler
         end;
     end;
 
-    /**
-     * Until we have pagination helpers in place, we will leave the list endpoint out
-     *
-    local procedure ListSales() Response: Codeunit "NPR API Response"
+    internal procedure ListSales(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         ExternalPOSSale: Record "NPR External POS Sale";
-        Json: Codeunit "NPR Json Builder";
+        JsonArray: Codeunit "NPR Json Builder";
+        Params: Dictionary of [Text, Text];
+        POSUnitFilter: Text;
+        ReceiptNoFilter: Text;
+        PageSize: Integer;
+        PageContinuation: Boolean;
+        RecRef: RecordRef;
+        DataFound: Boolean;
+        MoreRecords: Boolean;
+        Itt: Integer;
+        PageKey: Text;
+        JObject: JsonObject;
     begin
-        // TODO: Change to use the optional cache clear included in PR
-        // https://github.com/navipartner/npcore/pull/8009
-        SelectLatestVersion();
+        Request.SkipCacheIfNonStickyRequest(GetTableIds());
+        Params := Request.QueryParams();
 
-        Json.StartArray();
+        if (Params.Get('posUnit', POSUnitFilter)) then
+            ExternalPOSSale.SetRange("Register No.", POSUnitFilter);
+        if (Params.Get('receiptNo', ReceiptNoFilter)) then
+            ExternalPOSSale.SetRange("Sales Ticket No.", ReceiptNoFilter);
+
+        if (Params.ContainsKey('pageSize')) then
+            Evaluate(PageSize, Params.Get('pageSize'));
+
+        if (Params.ContainsKey('pageKey')) then begin
+            ExternalPOSSale.Reset();
+            RecRef.GetTable(ExternalPOSSale);
+            Request.ApplyPageKey(Params.Get('pageKey'), RecRef);
+            RecRef.SetTable(ExternalPOSSale);
+            PageContinuation := true;
+        end;
+
+        JsonArray.StartArray();
 
         SetLoadFieldsOnSale(ExternalPOSSale);
         ExternalPOSSale.ReadIsolation := IsolationLevel::ReadCommitted;
-        if (ExternalPOSSale.FindSet()) then
-            repeat
-                Json.AddObject(SaleToJson(Json, ExternalPOSSale));
-            until ExternalPOSSale.Next() = 0;
-        Json.EndArray();
 
-        exit(Response.RespondOK(Json.BuildAsArray()));
+        if (PageContinuation) then
+            DataFound := ExternalPOSSale.Find('>')
+        else
+            DataFound := ExternalPOSSale.Find('-');
+
+        if (DataFound) then
+            repeat
+                JsonArray.AddObject(SaleToJson(JsonArray, ExternalPOSSale));
+                Itt += 1;
+                if (Itt = PageSize) then begin
+                    RecRef.GetTable(ExternalPOSSale);
+                    PageKey := Request.GetPageKey(RecRef);
+                end;
+                MoreRecords := ExternalPOSSale.Next() <> 0;
+            until (not MoreRecords) or (Itt = PageSize);
+
+        JsonArray.EndArray();
+
+        JObject.Add('morePages', MoreRecords);
+        JObject.Add('nextPageKey', PageKey);
+        JObject.Add('nextPageURL', Request.GetNextPageUrl(PageKey));
+        JObject.Add('data', JsonArray.BuildAsArray());
+
+        exit(Response.RespondOK(JObject));
     end;
-    */
 
     internal procedure GetSale(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
@@ -55,9 +95,7 @@ codeunit 6248216 "NPR API External POS Sale" implements "NPR API Request Handler
         if (saleId = '') then
             exit(Response.RespondBadRequest('Missing required path parameter: saleId'));
 
-        // TODO: Change to use the optional cache clear included in PR
-        // https://github.com/navipartner/npcore/pull/8009
-        SelectLatestVersion();
+        Request.SkipCacheIfNonStickyRequest(GetTableIds());
 
         SetLoadFieldsOnSale(ExternalPOSSale);
         ExternalPOSSale.ReadIsolation := IsolationLevel::ReadCommitted;
@@ -363,5 +401,11 @@ codeunit 6248216 "NPR API External POS Sale" implements "NPR API Request Handler
         end;
     end;
     #endregion
+
+    local procedure GetTableIds() TableIds: List of [Integer]
+    begin
+        TableIds.Add(Database::"NPR External POS Sale");
+        TableIds.Add(Database::"NPR External POS Sale Line");
+    end;
 }
 #endif

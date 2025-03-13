@@ -215,26 +215,43 @@ types:
           eftType: adyen
           eftData: Base64EncodedResponse
 
+  PaginatedExternalPOSSale:
+    docs: A paginated response containing a list of External POS Sales
+    properties:
+      moreRecords: boolean
+      nextPageKey: string
+      nextPageURL: string
+      data: list<ExternalPOSSale>
+
 service:
   auth: true
   base-path: /pos
   endpoints:
-    # Until pagination helpers are in place, we will leave this out
-    #
-    # listExternalPOSSales:
-    #   display-name: List External POS Sales
-    #   method: GET
-    #   path: "/externalsale"
-    #   response: list<ExternalPOSSale>
-    #   examples:
-    #     - name: ExampleExternalPOSSales
-    #       path-parameters:
-    #         tenant: $globalApiTypes.tenant.Exampletenant
-    #         environment: $globalApiTypes.environment.ExampleenvironmentProduction
-    #         company: $globalApiTypes.Company.ExampleCompanyCronus
-    #       response:
-    #         body:
-    #           - $ExternalPOSSale.ExampleSale
+    listExternalPOSSales:
+      display-name: List External POS Sales
+      method: GET
+      path: "/externalsale"
+      request:
+        name: listExternalPOSSales
+        query-parameters:
+          posUnit: optional<string>
+          receiptNo: optional<string>
+          pageSize: optional<integer>
+          pageKey: optional<string>
+      response: PaginatedExternalPOSSale
+      examples:
+        - name: ExampleExternalPOSSales
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          response:
+            body:
+              moreRecords: true
+              nextPageKey: "eyJ2aWV3IjoiVkVSU0lPTigxKSBTT1JUSU5HKEZpZWxkMSkgV0hFUkUoRmllbGQxMD0xKDAxKSkiLCJpbmRleEZpZWxkcyI6eyIxIjoiMiJ9fQ=="
+              nextPageURL: "https://api.npretail.app/tenant/env/company/pos/externalsale?pageSize=1&pageKey=eyJ2aWV3IjoiVkVSU0lPTigxKSBTT1JUSU5HKEZpZWxkMSkgV0hFUkUoRmllbGQxMD0xKDAxKSkiLCJpbmRleEZpZWxkcyI6eyIxIjoiMiJ9fQ=="
+              data:
+                - $ExternalPOSSale.ExampleSale
 
     getExternalPOSSale:
       display-name: Get External POS Sale

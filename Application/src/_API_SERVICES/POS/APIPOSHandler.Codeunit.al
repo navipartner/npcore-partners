@@ -21,6 +21,8 @@ codeunit 6185056 "NPR API POS Handler" implements "NPR API Request Handler"
                 exit(APIPOSSalesperson.GetSalesperson(Request));
             Request.Match('GET', '/pos/externalsale/:saleId'):
                 exit(APIExternalPOSSale.GetSale(Request));
+            Request.Match('GET', '/pos/externalsale'):
+                exit(APIExternalPOSSale.ListSales(Request));
             Request.Match('POST', '/pos/externalsale'):
                 exit(APIExternalPOSSale.CreateSale(Request));
             Request.Match('POST', '/pos/globalentry'):
