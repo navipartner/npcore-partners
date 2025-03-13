@@ -77,7 +77,11 @@ page 6184909 "NPR MM Set Auto-Renew Status"
     begin
         case AutoRenewStatus of
             AutoRenewStatus::NO:
-                MembershipMgtInternal.DisableMembershipAutoRenewal(Membership, CreateMemberNotification, true);
+                begin
+                    MembershipMgtInternal.DisableMembershipAutoRenewal(Membership, CreateMemberNotification, true);
+                    MembershipMgtInternal.RegretSubscription(Membership);
+
+                end;
             AutoRenewStatus::YES_EXTERNAL:
                 MembershipMgtInternal.EnableMembershipExternalAutoRenewal(Membership, CreateMemberNotification, true);
             AutoRenewStatus::YES_INTERNAL:

@@ -686,7 +686,7 @@
                 if (not Confirm(CONFIRM_SYNC, true, Membership.Count())) then
                     Error('');
             repeat
-                MembershipManagement.SynchronizeCustomerAndContact(Membership."Entry No.");
+                MembershipManagement.SynchronizeCustomerAndContact(Membership);
             until (Membership.Next() = 0);
         end;
     end;

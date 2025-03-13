@@ -349,7 +349,6 @@
         GuardianMemberEntryNo: Integer;
         ReuseExistingMember: Boolean;
     begin
-
         Membership.Get(MembershipEntryNo);
         MembershipSetup.Get(Membership."Membership Code");
         Community.Get(Membership."Community Code");
@@ -403,7 +402,7 @@
             MembershipRole.SetFilter(Blocked, '=%1', false);
             MembershipRole.FindFirst();
 
-            UpdateCustomerFromMember(MembershipEntryNo, MembershipRole."Member Entry No.");
+            UpdateCustomerFromMember(Membership, MembershipRole."Member Entry No.");
 
             if (MemberCount > 1) then
                 AddCustomerContact(MembershipEntryNo, Member."Entry No."); // The member just being added.
@@ -682,6 +681,7 @@
     var
         GuardianMemberEntryNo: Integer;
         MembershipRole: Record "NPR MM Membership Role";
+        Membership: Record "NPR MM Membership";
     begin
 
         if (MembershipEntryNo = 0) then
@@ -699,7 +699,8 @@
         MembershipRole.SetFilter("Member Role", '=%1|=%2', MembershipRole."Member Role"::ADMIN, MembershipRole."Member Role"::DEPENDENT);
         MembershipRole.SetFilter(Blocked, '=%1', false);
         MembershipRole.FindFirst();
-        UpdateCustomerFromMember(MembershipEntryNo, MembershipRole."Member Entry No.");
+        Membership.Get(MembershipEntryNo);
+        UpdateCustomerFromMember(Membership, MembershipRole."Member Entry No.");
 
         exit(true);
 
@@ -811,8 +812,7 @@
             AddGuardianMember(MembershipEntryNo, MembershipInfoCapture."Guardian External Member No.", MembershipInfoCapture."GDPR Approval");
 
         TransferInfoCaptureAttributes(MembershipInfoCapture."Entry No.", Database::"NPR MM Member", Member."Entry No.");
-        SynchronizeCustomerAndContact(MembershipEntryNo);
-
+        SynchronizeCustomerAndContact(Membership);
         exit(true);
     end;
 
@@ -1662,8 +1662,10 @@
 
         ReasonText := StrSubstNo(PlaceHolderLbl, MemberInfoCapture."Information Context", MembershipEntry.Context, MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date");
 
-        if (WithUpdate) then
+        if (WithUpdate) then begin
+            RegretSubscription(Membership);
             CarryOutMembershipRegret(MembershipEntry);
+        end;
 
         OutStartDate := MembershipEntry."Valid From Date";
         OutUntilDate := MembershipEntry."Valid Until Date";
@@ -1717,7 +1719,8 @@
 
         if MembershipEntry."Original Context" in [MembershipEntry."Original Context"::NEW, MembershipEntry."Original Context"::RENEW, MembershipEntry."Original Context"::AUTORENEW, MembershipEntry."Original Context"::EXTEND] then begin
             Membership.Get(MembershipEntry."Membership Entry No.");
-            DisableMembershipAutoRenewal(Membership, true, false);
+            if not Membership.Blocked then
+                DisableMembershipAutoRenewal(Membership, true, false);
         end;
 
         MembershipEvents.OnAfterInsertMembershipEntry(MembershipEntry);
@@ -1867,6 +1870,9 @@
         if ((WithConfirm) and (GuiAllowed())) then
             if (not Confirm(CONFIRM_CANCEL, false, MembershipAlterationSetup.Description, MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date", EndDateNew)) then
                 exit(false);
+
+        if WithUpdate then
+            RegretSubscription(Membership);
 
         CancelledFraction := 1 - CalculatePeriodStartToDateFraction(MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date", EndDateNew);
         case MembershipAlterationSetup."Price Calculation" of
@@ -2025,6 +2031,9 @@
         if (WithConfirm) and (GuiAllowed()) then
             if (not Confirm(RENEW_MEMBERSHIP, false, MembershipAlterationSetup.Description, StartDateNew, EndDateNew)) then
                 exit(false);
+
+        if WithUpdate then
+            RegretSubscription(Membership);
 
         if (MembershipAlterationSetup."To Membership Code" <> '') then
             if (not (ValidateChangeMembershipCode(WithConfirm, Membership."Entry No.", MembershipAlterationSetup."To Membership Code", ReasonText))) then
@@ -2212,6 +2221,9 @@
             if (not Confirm(EXTEND_MEMBERSHIP, false, MembershipAlterationSetup.Description, StartDateNew, EndDateNew)) then
                 exit(false);
 
+        if WithUpdate then
+            RegretSubscription(Membership);
+
         if (MembershipAlterationSetup."To Membership Code" <> '') then
             if (not (ValidateChangeMembershipCode(WithConfirm, Membership."Entry No.", MembershipAlterationSetup."To Membership Code", ReasonText))) then
                 exit(ExitFalseOrWithError(WithConfirm, ReasonText));
@@ -2388,7 +2400,6 @@
                   MembershipAlterationSetup.FieldCaption("Alteration Activate From"), Format(MembershipAlterationSetup."Alteration Type"));
                 exit(ExitFalseOrWithError(WithConfirm, ReasonText));
             end;
-
         end;
 
         EndDateCurrent := CalcDate('<-1D>', StartDateNew);
@@ -2408,6 +2419,9 @@
         if (WithConfirm) and (GuiAllowed()) then
             if (not Confirm(UPGRADE_MEMBERSHIP, false, MembershipAlterationSetup.Description, StartDateNew, EndDateNew)) then
                 exit(false);
+
+        if WithUpdate then
+            RegretSubscription(Membership);
 
         if (not (ValidateChangeMembershipCode(WithConfirm, Membership."Entry No.", MembershipAlterationSetup."To Membership Code", ReasonText))) then
             exit(ExitFalseOrWithError(WithConfirm, ReasonText));
@@ -3032,11 +3046,10 @@
 
     end;
 
-    internal procedure SynchronizeCustomerAndContact(MembershipEntryNo: Integer)
+    internal procedure SynchronizeCustomerAndContact(Membership: Record "NPR MM Membership")
     var
         Community: Record "NPR MM Member Community";
         MembershipSetup: Record "NPR MM Membership Setup";
-        Membership: Record "NPR MM Membership";
         MembershipRole: Record "NPR MM Membership Role";
         AdminMemberEntryNo: Integer;
         ConfigTemplateHeader: Record "Config. Template Header";
@@ -3044,8 +3057,6 @@
         RecRef: RecordRef;
         Customer: Record Customer;
     begin
-
-        Membership.Get(MembershipEntryNo);
         MembershipSetup.Get(Membership."Membership Code");
         Community.Get(Membership."Community Code");
 
@@ -3070,7 +3081,7 @@
             Customer.Modify(true);
         end;
 
-        MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
+        MembershipRole.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
         MembershipRole.SetFilter("Member Role", '=%1', MembershipRole."Member Role"::GUARDIAN);
         MembershipRole.SetFilter(Blocked, '=%1', false);
 
@@ -3079,22 +3090,23 @@
 
         end else begin
             MembershipRole.SetFilter("Member Role", '=%1', MembershipRole."Member Role"::ADMIN);
+            MembershipRole.SetFilter(Blocked, '=%1', Membership.Blocked);
             if (not MembershipRole.FindFirst()) then
                 exit;
             AdminMemberEntryNo := MembershipRole."Member Entry No.";
         end;
 
-        UpdateCustomerFromMember(MembershipEntryNo, AdminMemberEntryNo);
+        UpdateCustomerFromMember(Membership, AdminMemberEntryNo);
 
         MembershipRole.Reset();
-        MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
+        MembershipRole.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
         MembershipRole.SetFilter("Member Entry No.", '<>%1', AdminMemberEntryNo);
         MembershipRole.SetFilter("Member Role", '<>%1&<>%2', MembershipRole."Member Role"::ANONYMOUS, MembershipRole."Member Role"::GUARDIAN);
 
         MembershipRole.SetFilter(Blocked, '=%1', false);
         if (MembershipRole.FindSet()) then begin
             repeat
-                AddCustomerContact(MembershipEntryNo, MembershipRole."Member Entry No.");
+                AddCustomerContact(Membership."Entry No.", MembershipRole."Member Entry No.");
             until (MembershipRole.Next() = 0);
         end;
     end;
@@ -4340,9 +4352,8 @@
         exit(Customer."No.");
     end;
 
-    local procedure UpdateCustomerFromMember(MembershipEntryNo: Integer; MemberEntryNo: Integer)
+    local procedure UpdateCustomerFromMember(Membership: Record "NPR MM Membership"; MemberEntryNo: Integer)
     var
-        Membership: Record "NPR MM Membership";
         GuardianMembership: Record "NPR MM Membership";
         Member: Record "NPR MM Member";
         MembershipRole: Record "NPR MM Membership Role";
@@ -4355,10 +4366,8 @@
         MagentoSetup: Record "NPR Magento Setup";
         Community: Record "NPR MM Member Community";
     begin
-
-        Membership.Get(MembershipEntryNo);
         Member.Get(MemberEntryNo);
-        MembershipRole.Get(MembershipEntryNo, MemberEntryNo);
+        MembershipRole.Get(Membership."Entry No.", MemberEntryNo);
 
         if (not Community.Get(Membership."Community Code")) then
             Community.Init();
@@ -4411,7 +4420,9 @@
         Customer.Validate("Phone No.", CopyStr(Member."Phone No.", 1, MaxStrLen(Customer."Phone No.")));
         Customer.Validate("E-Mail", CopyStr(Member."E-Mail Address", 1, MaxStrLen(Customer."E-Mail")));
         if (Membership.Blocked) then
-            Customer.Validate(Blocked, Customer.Blocked::All);
+            Customer.Validate(Blocked, Customer.Blocked::All)
+        else
+            Customer.Validate(Blocked, Customer.Blocked::" ");
 
         Customer.Modify();
 
@@ -4460,7 +4471,7 @@
                     MembershipRole.Modify();
                 end;
 
-                UpdateContactFromMember(MembershipEntryNo, Member);
+                UpdateContactFromMember(Membership."Entry No.", Member);
             end;
         end;
     end;
@@ -6178,5 +6189,35 @@
         if AlterationGroup = '' then
             exit(true);
         exit(MMMembersAlterLine.Get(AlterationGroup, MembershipAlterationSetup.SystemId));
+    end;
+
+    procedure RegretSubscription(Membership: Record "NPR MM Membership")
+    var
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+        SubscriptionMgtIml: Codeunit "NPR MM Subscription Mgt. Impl.";
+    begin
+        if SubscriptionMgtIml.CheckIfPendingSubscriptionRequestExist(Membership."Entry No.", SubscriptionRequest) then
+            CancelSubscription(SubscriptionRequest);
+    end;
+
+    local procedure CancelSubscription(var Rec: Record "NPR MM Subscr. Request")
+    var
+        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+        SubscrReversalMgt: Codeunit "NPR MM Subscr. Reversal Mgt.";
+        SubscrPmtReversalRequest: Record "NPR MM Subscr. Payment Request";
+    begin
+        SubscrPaymentRequest.SetRange("Subscr. Request Entry No.", Rec."Entry No.");
+        if SubscrPaymentRequest.IsEmpty then
+            exit;
+        SubscrPaymentRequest.FindLast();
+        if SubscrPaymentRequest.Status in [SubscrPaymentRequest.Status::New, SubscrPaymentRequest.Status::Requested] then
+            if SubscrPaymentRequest.Type = SubscrPaymentRequest.Type::PayByLink then
+                SubscrReversalMgt.RequestRefund(Rec, SubscrPaymentRequest, true, SubscrPmtReversalRequest)
+            else begin
+                SubscrPaymentRequest.Validate(Status, SubscrPaymentRequest.Status::Cancelled);
+                SubscrPaymentRequest.Modify(true);
+            end
+        else
+            SubscrReversalMgt.RequestRefund(Rec, SubscrPaymentRequest, true, SubscrPmtReversalRequest);
     end;
 }

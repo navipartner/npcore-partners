@@ -249,4 +249,21 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
         Subscription."Auto-Renew" := Membership."Auto-Renew";
         Subscription.Modify(true);
     end;
+
+    procedure CheckIfPendingSubscriptionRequestExist(MembershipEntryNo: Integer; var SubscriptionRequest: Record "NPR MM Subscr. Request"): Boolean
+    var
+        Subscription: Record "NPR MM Subscription";
+    begin
+        Subscription.Reset();
+        Subscription.SetCurrentKey("Membership Entry No.");
+        Subscription.SetRange("Membership Entry No.", MembershipEntryNo);
+        if not Subscription.FindFirst() then
+            exit(false);
+
+        SubscriptionRequest.SetRange("Subscription Entry No.", Subscription."Entry No.");
+        SubscriptionRequest.SetFilter(Status, '%1|%2|%3', SubscriptionRequest.Status::New, SubscriptionRequest.Status::Requested, SubscriptionRequest.Status::Confirmed);
+        SubscriptionRequest.SetRange("Processing Status", SubscriptionRequest."Processing Status"::Pending);
+        SubscriptionRequest.SetRange(Reversed, false);
+        exit(SubscriptionRequest.FindFirst());
+    end;
 }

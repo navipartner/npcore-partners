@@ -1,7 +1,7 @@
 ﻿report 6060128 "NPR MM Sync. Community Cust."
 {
 #IF NOT BC17
-    Extensible = False; 
+    Extensible = False;
 #ENDIF
     Caption = 'Sync. Community Customers';
     ProcessingOnly = true;
@@ -55,7 +55,7 @@
 
                 if (Membership.FindSet()) then
                     repeat
-                        MembershipManagement.SynchronizeCustomerAndContact(Membership."Entry No.");
+                        MembershipManagement.SynchronizeCustomerAndContact(Membership);
                         if (CurrentRow mod UpdateWindowEvery = 0) then
                             Window.Update(2, Round(CurrentRow / MaxRow * 10000, 1));
                         CurrentRow += 1;

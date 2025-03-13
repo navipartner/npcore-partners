@@ -82,7 +82,7 @@ codeunit 6185121 "NPR MM Subscr. Renew: Post"
         Subscription.Get(SubscriptionRequest."Subscription Entry No.");
         Membership.Get(Subscription."Membership Entry No.");
         Membership.TestField("Customer No.");
-        MembershipSetup.Get(Membership."Membership Code");
+        MembershipSetup.Get(SubscriptionRequest."Membership Code");
         MembershipSetup.TestField("Recurring Payment Code");
         RecurringPaymentSetup.Get(MembershipSetup."Recurring Payment Code");
         RecurringPaymentSetup.TestField("Source Code");

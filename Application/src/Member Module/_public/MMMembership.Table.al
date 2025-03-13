@@ -42,7 +42,7 @@
                 Rec."Blocked At" := CreateDateTime(0D, 0T);
                 Rec."Blocked By" := '';
                 if (Rec.Blocked) then begin
-                    Rec."Blocked At" := CurrentDateTime();
+                Rec."Blocked At" := CurrentDateTime();
                     Rec."Blocked By" := CopyStr(UserId(), 1, MaxStrLen(Rec."Blocked By"));
                 end;
 
@@ -51,11 +51,11 @@
                 if (MembershipRole.FindSet()) then begin
                     repeat
 
-                        MembershipRole.Validate(Blocked, Blocked);
+                        MembershipRole.Validate(Blocked, Rec.Blocked);
                         MembershipRole.Modify();
 
                         if (Contact.Get(MembershipRole."Contact No.")) then begin
-                            Contact.Validate("NPR Magento Contact", not Blocked);
+                            Contact.Validate("NPR Magento Contact", not Rec.Blocked);
                             Contact.Modify();
                         end;
                     until (MembershipRole.Next() = 0);
@@ -64,8 +64,10 @@
                 Subscription.SetRange("Membership Entry No.", "Entry No.");
                 if Subscription.FindSet() then
                     repeat
+                        If Rec.Blocked then
+                            CheckIfPendingSubsRequestExist(Subscription);
                         if Subscription.Blocked <> Blocked then begin
-                            Subscription.Validate(Blocked, Blocked);
+                            Subscription.Validate(Blocked, Rec.Blocked);
                             Subscription.Modify(true);
                         end;
                     until Subscription.Next() = 0;
@@ -301,7 +303,16 @@
             if (Community."Membership to Cust. Rel.") then
                 exit;
 
-        MembershipManagement.SynchronizeCustomerAndContact(Rec."Entry No.");
+        MembershipManagement.SynchronizeCustomerAndContact(Rec);
+    end;
+
+    local procedure CheckIfPendingSubsRequestExist(Subscription: Record "NPR MM Subscription")
+    var
+        SubscriptionPendingErr: Label 'You cannot block this membership because a pending subscription request exists for Membership Entry No. %1.';
+    begin
+        Subscription.CalcFields("Outst. Subscr. Requests Exist");
+        if Subscription."Outst. Subscr. Requests Exist" then
+            Error(SubscriptionPendingErr, Rec."Entry No.");
     end;
 
     var
