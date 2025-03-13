@@ -516,7 +516,7 @@
                 var
                     MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
                 begin
-                    MembershipManagement.SynchronizeCustomerAndContact(Rec."Entry No.");
+                    MembershipManagement.SynchronizeCustomerAndContact(Rec);
                 end;
             }
             action("Redeem Points")

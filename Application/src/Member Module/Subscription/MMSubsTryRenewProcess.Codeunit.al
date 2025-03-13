@@ -188,8 +188,10 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
     var
         SubscriptionRequest2: Record "NPR MM Subscr. Request";
         RequestSubscrRenewal: Codeunit "NPR MM Subscr. Renew: Request";
+        MMMembership: Record "NPR MM Membership";
         PeriodDoesNotMatchErr: Label 'Renewal period does not match for membership entry No. %1. The membership validity period may have been changed after the automatic subscription renewal request was created.', Comment = '%1 - membership entry number';
         PriceDoesNotMatchErr: Label 'The renewal amount does not match for membership entry No. %1. The membership type may have been changed after the automatic subscription renewal request was created.', Comment = '%1 - membership entry number';
+        MembershipBlockedErr: Label 'Membership entry No. %1 is blocked. The renewal process cannot continue.', Comment = '%1 - membership entry number';
     begin
         SubscriptionRequest2 := SubscriptionRequest;
         RequestSubscrRenewal.CalculateSubscriptionRenewal(Subscription, SubscriptionRequest2);
@@ -199,6 +201,10 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
             Error(PeriodDoesNotMatchErr, Subscription."Membership Entry No.");
         If SubscriptionRequest.Amount <> SubscriptionRequest2.Amount then
             Error(PriceDoesNotMatchErr, Subscription."Membership Entry No.");
+
+        If MMMembership.Get(Subscription."Membership Entry No.") then
+            if MMMembership.Blocked then
+                Error(MembershipBlockedErr, Subscription."Membership Entry No.");
     end;
 
     local procedure CloseSubscriptionRequestChain(SubscriptionRequest: Record "NPR MM Subscr. Request")
@@ -215,7 +221,6 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
     var
         MembershipSetup: Record "NPR MM Membership Setup";
         RecurringPaymentSetup: Record "NPR MM Recur. Paym. Setup";
-        Subscription: Record "NPR MM Subscription";
         SubscrRenewPost: Codeunit "NPR MM Subscr. Renew: Post";
         PostingDocumentNo: Code[20];
     begin
@@ -226,10 +231,8 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
         if SubscriptionRequest."Posting Document No." <> '' then
             PostingDocumentNo := SubscriptionRequest."Posting Document No."
         else begin
-            Subscription.SetLoadFields("Membership Code");
-            Subscription.Get(SubscriptionRequest."Subscription Entry No.");
             MembershipSetup.SetLoadFields("Recurring Payment Code");
-            MembershipSetup.Get(Subscription."Membership Code");
+            MembershipSetup.Get(SubscriptionRequest."Membership Code");
             RecurringPaymentSetup.SetLoadFields("Document No. Series");
             RecurringPaymentSetup.Get(MembershipSetup."Recurring Payment Code");
             PostingDocumentNo := SubscrRenewPost.GetPostingDocumentNo(RecurringPaymentSetup);

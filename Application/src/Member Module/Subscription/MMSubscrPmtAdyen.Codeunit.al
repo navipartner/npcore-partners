@@ -61,15 +61,42 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
     end;
 
     local procedure ProcessNewStatus(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; SkipTryCountUpdate: Boolean; Manual: Boolean) Success: Boolean
+    var
+        SubscrPaymentRequest2: Record "NPR MM Subscr. Payment Request";
     begin
         case SubscrPaymentRequest.Type of
             SubscrPaymentRequest.Type::PayByLink:
                 Success := ProcessNewPayByLinkStatus(SubscrPaymentRequest, SkipTryCountUpdate, Manual);
             SubscrPaymentRequest.Type::Refund:
-                Success := ProcessNewRefundStatus(SubscrPaymentRequest, SkipTryCountUpdate, Manual);
+                begin
+                    If IfReversedReqIsPayByLinkRequested(SubscrPaymentRequest, SubscrPaymentRequest2) then
+                        Success := CancelRequests(SubscrPaymentRequest, SubscrPaymentRequest2, SkipTryCountUpdate, Manual)
+                    else
+                        Success := ProcessNewRefundStatus(SubscrPaymentRequest, SkipTryCountUpdate, Manual);
+                end;
             else
                 Success := ProcessNewPaymentStatus(SubscrPaymentRequest, SkipTryCountUpdate, Manual);
         end;
+    end;
+
+    local procedure IfReversedReqIsPayByLinkRequested(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var SubscrPaymentRequest2: Record "NPR MM Subscr. Payment Request"): Boolean
+    begin
+        SubscrPaymentRequest2.SetLoadFields("Entry No.", Reversed, "Reversed by Entry No.");
+        SubscrPaymentRequest2.SetRange("Reversed by Entry No.", SubscrPaymentRequest."Entry No.");
+        SubscrPaymentRequest2.Setrange(Type, SubscrPaymentRequest2.Type::PayByLink);
+        SubscrPaymentRequest2.Setrange(SubscrPaymentRequest2.Status, SubscrPaymentRequest2.Status::Requested);
+        exit(SubscrPaymentRequest2.FindFirst());
+    end;
+
+    local procedure CancelRequests(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var SubscrPaymentRequest2: Record "NPR MM Subscr. Payment Request"; SkipTryCountUpdate: Boolean; Manual: Boolean) Success: Boolean
+    begin
+        if not ProcessCanceledStatus(SubscrPaymentRequest2, SkipTryCountUpdate, Manual) then
+            exit;
+
+        SubscrPaymentRequest.Validate(Status, SubscrPaymentRequest.Status::Cancelled);
+        SubscrPaymentRequest.Modify(true);
+
+        Success := true;
     end;
 
     local procedure ProcessNewPaymentStatus(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; SkipTryCountUpdate: Boolean; Manual: Boolean) Success: Boolean
@@ -90,6 +117,9 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         ShopperReference: Text[50];
         PSPReference: Text[16];
     begin
+        if POSRenewLineExist(SubscrPaymentRequest) then
+            exit;
+
         SubsPayReqLogUtils.LogEntry(SubscrPaymentRequest,
                                     '',
                                     '',
@@ -340,6 +370,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         RecurPaymSetup: Record "NPR MM Recur. Paym. Setup";
         SubsPayReqLogEntry: Record "NPR MM Subs Pay Req Log Entry";
         SubsPayReqLogUtils: Codeunit "NPR MM Subs Pay Req Log Utils";
+        SubscrPmtOriginalRequest: Record "NPR MM Subscr. Payment Request";
         StatusCode: Integer;
         Request: Text;
         Response: Text;
@@ -351,7 +382,6 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         PaymentToken: Text;
         ShopperReference: Text[50];
         PSPReference: Text[16];
-        OriginalPSPReference: Text[16];
         PaymentPSPReference: Text[16];
     begin
         SubsPayReqLogUtils.LogEntry(SubscrPaymentRequest,
@@ -482,32 +512,31 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
             exit;
         end;
 
-
-        if not TryGetOriginalPSPReference(SubscrPaymentRequest, OriginalPSPReference) then begin
+        if not TryGetOriginalPaymentRequest(SubscrPaymentRequest, SubscrPmtOriginalRequest) then begin
             ErrorMessage := GetLastErrorText();
             ProcessResponse(SubscrPaymentRequest,
-                            SubsPayReqLogEntry,
-                            '',
-                            '',
-                            ErrorMessage,
-                            Enum::"NPR MM Payment Request Status"::Error,
-                            SubsPayReqLogEntry."Processing Status"::Error,
-                            RecurPaymSetup."Max. Pay. Process Try Count",
-                            '',
-                            '',
-                            '',
-                            SubsAdyenPGSetup.Code,
-                            SkipTryCountUpdate,
-                            '',
-                            '',
-                            '',
-                            '',
-                            0DT,
-                            0);
+                           SubsPayReqLogEntry,
+                           '',
+                           '',
+                           ErrorMessage,
+                           Enum::"NPR MM Payment Request Status"::Error,
+                           SubsPayReqLogEntry."Processing Status"::Error,
+                           RecurPaymSetup."Max. Pay. Process Try Count",
+                           '',
+                           '',
+                           '',
+                           SubsAdyenPGSetup.Code,
+                           SkipTryCountUpdate,
+                           '',
+                           '',
+                           '',
+                           '',
+                           0DT,
+                           0);
             exit;
         end;
 
-        URL := URL + '/' + OriginalPSPReference + '/refunds';
+        URL := URL + '/' + SubscrPmtOriginalRequest."PSP Reference" + '/refunds';
         if not TryGetPmtRefundRequestJsonText(SubscrPaymentRequest, Request) then begin
             ErrorMessage := GetLastErrorText();
             ProcessResponse(SubscrPaymentRequest,
@@ -1459,17 +1488,14 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
     local procedure TryGetRecurringPaymentSetup(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var RecurPaymSetup: Record "NPR MM Recur. Paym. Setup")
     var
         SubscriptionRequest: Record "NPR MM Subscr. Request";
-        Subscription: Record "NPR MM Subscription";
         MembershipSetup: Record "NPR MM Membership Setup";
     begin
-        SubscriptionRequest.SetLoadFields("Subscription Entry No.");
+        SubscriptionRequest.SetLoadFields("Subscription Entry No.", "Membership Code");
         SubscriptionRequest.Get(SubscrPaymentRequest."Subscr. Request Entry No.");
 
-        Subscription.SetLoadFields("Membership Code");
-        Subscription.Get(SubscriptionRequest."Subscription Entry No.");
-
         MembershipSetup.SetLoadFields("Recurring Payment Code");
-        MembershipSetup.Get(Subscription."Membership Code");
+        MembershipSetup.Get(SubscriptionRequest."Membership Code");
+        MembershipSetup.TestField("Recurring Payment Code");
 
         RecurPaymSetup.SetLoadFields("Max. Pay. Process Try Count");
         RecurPaymSetup.Get(MembershipSetup."Recurring Payment Code");
@@ -2152,13 +2178,10 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
     end;
 
     [TryFunction]
-    local procedure TryGetOriginalPSPReference(var SubscrPmtRefundRequest: Record "NPR MM Subscr. Payment Request"; var PSPReference: Text[16])
-    var
-        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+    local procedure TryGetOriginalPaymentRequest(var SubscrPmtRefundRequest: Record "NPR MM Subscr. Payment Request"; var SubscrPmtOriginalRequest: Record "NPR MM Subscr. Payment Request")
     begin
-        SubscrPaymentRequest.SetRange("Reversed by Entry No.", SubscrPmtRefundRequest."Entry No.");
-        SubscrPaymentRequest.FindFirst();
-        PSPReference := SubscrPaymentRequest."PSP Reference";
+        SubscrPmtOriginalRequest.SetRange("Reversed by Entry No.", SubscrPmtRefundRequest."Entry No.");
+        SubscrPmtOriginalRequest.FindLast();
     end;
 
     [TryFunction]
@@ -2237,8 +2260,32 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         end;
     end;
 
+    local procedure POSRenewLineExist(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request") LineExist: Boolean
+    var
+        Membership: Record "NPR MM Membership";
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+    begin
+        GetMembership(SubscrPaymentRequest, Membership);
+
+        MemberInfoCapture.SetRange("Membership Entry No.", Membership."Entry No.");
+        MemberInfoCapture.SetRange("Response Status", MemberInfoCapture."Response Status"::REGISTERED);
+        MemberInfoCapture.SetFilter("Receipt No.", '<>%1', '');
+        MemberInfoCapture.SetFilter("Line No.", '<>%1', 0);
+        LineExist := not MemberInfoCapture.IsEmpty();
+    end;
+
+    internal procedure CreateRefundWebhook(MerchantName: Text[50])
+    var
+        AdyenManagement: Codeunit "NPR Adyen Management";
+        RefundEventFilter: Label 'REFUND', Locked = true;
+        AdyenWebhookType: Enum "NPR Adyen Webhook Type";
+    begin
+        AdyenManagement.EnsureAdyenWebhookSetup(RefundEventFilter, MerchantName, AdyenWebhookType::standard);
+    end;
+
     procedure DisableIntegration(var SubsPaymentGateway: Record "NPR MM Subs. Payment Gateway")
     begin
+
 
     end;
 }

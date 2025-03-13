@@ -10,6 +10,7 @@ codeunit 6185103 "NPR MM Subs Pay Request Utils"
     begin
         if not ConfirmManagement.GetResponseOrDefault(StrSubstNo(ConfirmLbl, SubscrPaymentRequest."Entry No."), true) then
             exit;
+        ClearLastError();
         SubscrPaymentIHandler := SubscrPaymentRequest.PSP;
         if not SubscrPaymentIHandler.ProcessPaymentRequest(SubscrPaymentRequest, SkipTryCountUpdate, true) then
             Error(GetLastErrorText());
