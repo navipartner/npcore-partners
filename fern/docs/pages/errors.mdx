@@ -81,8 +81,9 @@ The following unique error codes are used in our API:
 | **`duration_exceeded`** | The admission duration has expired.| 
 | **`ticket_blocked`** | The ticket is blocked.| 
 | **`ticket_not_valid_for_suggested_admission`** | The ticket is not valid for the suggested admission.| 
-| **`ticket_not_allowed`** | The ticket is not allowed.| 
+| **`ticket_not_allowed`** | The ticket is not allowed since no valid admission code could be found.| 
 | **`wallet_expired`** | The wallet has expired.| 
+| **`ticket_reservation_has_no_tickets`** | The ticket reservation has no tickets.| 
 | **`member_blocked`** | Member is blocked.| 
 | **`member_card_blocked`** | Member card is blocked.| 
 | **`member_card_not_allowed`** | Member card is not allowed.| 
@@ -105,4 +106,4 @@ The following unique error codes are used in our API:
 | **`scanner_id_required`** | The scanner id is required.| 
 | **`scanner_not_enabled`** | The scanner is not enabled.| 
 | **`number_not_whitelisted`** | The reference number was not whitelisted by the gate.| 
-| **`number_rejected`** | The reference number was actively rejected by gate setup.|
+| **`number_rejected`** | The reference number was actively rejected by gate setup.| 
