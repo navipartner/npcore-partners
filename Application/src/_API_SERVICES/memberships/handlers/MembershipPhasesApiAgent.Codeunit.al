@@ -302,8 +302,8 @@ codeunit 6248225 "NPR MembershipPhasesApiAgent"
                     .AddProperty('blocked', MembershipEntry."Blocked")
                     .AddProperty('membershipCode', MembershipEntry."Membership Code")
                     .AddProperty('description', MembershipEntry.Description)
-                    .AddProperty('validFromDate', MembershipEntry."Valid From Date")
-                    .AddProperty('validUntilDate', MembershipEntry."Valid Until Date")
+                    .AddObject(AddRequiredProperty(ResponseJson, 'validFromDate', MembershipEntry."Valid From Date"))
+                    .AddObject(AddRequiredProperty(ResponseJson, 'validUntilDate', MembershipEntry."Valid Until Date"))
                     .AddProperty('createdAt', MembershipEntry."Created At")
 
                     .AddProperty('documentNumber', MembershipEntry."Document No.")
@@ -318,6 +318,14 @@ codeunit 6248225 "NPR MembershipPhasesApiAgent"
             ResponseJson.EndArray();
         end;
 
+    end;
+
+    local procedure AddRequiredProperty(var ResponseJson: Codeunit "NPR JSON Builder"; PropertyName: Text; PropertyValue: Date): Codeunit "NPR JSON Builder"
+    begin
+        if (PropertyValue = 0D) then
+            exit(ResponseJson.AddProperty(PropertyName));
+
+        exit(ResponseJson.AddProperty(PropertyName, PropertyValue));
     end;
 
 }

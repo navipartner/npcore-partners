@@ -240,7 +240,8 @@ codeunit 6185123 "NPR MembershipApiAgent"
             .AddProperty('blocked', Membership.Blocked)
             .AddObject(AddRequiredProperty(ResponseJson, 'validFromDate', ValidFrom))
             .AddObject(AddRequiredProperty(ResponseJson, 'validUntilDate', ValidUntil))
-            .AddProperty('customerNumber', Membership."Customer No.");
+            .AddProperty('customerNumber', Membership."Customer No.")
+            .AddProperty('autoRenewalActivated', Membership."Auto-Renew" <> Membership."Auto-Renew"::NO);
 
         exit(ResponseJson);
     end;
