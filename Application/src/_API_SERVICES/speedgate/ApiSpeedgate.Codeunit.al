@@ -8,8 +8,12 @@ codeunit 6185116 "NPR ApiSpeedgate" implements "NPR API Request Handler"
 
     procedure Handle(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     begin
-        if (Request.Match('GET', '/speedgate/setup')) then
+        if (Request.Match('GET', '/speedgate')) then
             exit(Handle(_Functions::GET_SPEEDGATE_SETUP, Request));
+
+        if (Request.Match('GET', '/speedgate/:id')) then
+            exit(Handle(_Functions::GET_SPEEDGATE_SETUP, Request));
+
 
         if (Request.Match('POST', '/speedgate/try')) then
             exit(Handle(_Functions::TRY_ADMIT, Request));
@@ -62,8 +66,6 @@ codeunit 6185116 "NPR ApiSpeedgate" implements "NPR API Request Handler"
         if (not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId())) then
             ActiveSession.Init();
 
-        JsonObj := Response.GetJson();
-
         CustomDimensions.Add('NPR_FunctionName', Function.Names.Get(Function.Ordinals.IndexOf(Function.AsInteger())));
         CustomDimensions.Add('NPR_DurationMs', Format(DurationMs, 0, 9));
 
@@ -82,6 +84,8 @@ codeunit 6185116 "NPR ApiSpeedgate" implements "NPR API Request Handler"
 
             Session.LogMessage('NPR_API_Speedgate', ResponseMessage, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
         end else begin
+            JsonObj := Response.GetJson();
+
             ResponseMessage := StrSubstNo('Failure - HTTP %1', HttpStatusCode);
             if (JsonObj.Get('message', JToken)) then
                 CustomDimensions.Add('NPR_ErrorText', JToken.AsValue().AsText());

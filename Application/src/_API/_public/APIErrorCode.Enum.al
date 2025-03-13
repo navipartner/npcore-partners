@@ -7,6 +7,22 @@ enum 6059810 "NPR API Error Code"
         Caption = 'An error occurred. See HTTP status code.', Locked = true;
     }
 
+    value(1; saas_tenant_not_found)
+    {
+        Caption = 'Provided tenant GUID (parameter `tenant`) is not a valid tenant ID.', Locked = true;
+    }
+    value(2; saas_environment_not_found)
+    {
+        Caption = 'Provided tenant environment name (parameter `environment`) is not a valid environment name for the selected tenant.', Locked = true;
+    }
+    value(3; saas_company_not_found)
+    {
+        Caption = 'Provided company name (parameter `company`) is not a valid company name for the selected tenant and environment.', Locked = true;
+    }
+    value(4; server_timeout)
+    {
+        Caption = 'The server timed out while processing the request.', Locked = true;
+    }
     value(10; unsupported_http_method)
     {
         Caption = 'The http method is not supported for this endpoint.', Locked = true;

@@ -120,12 +120,26 @@ types:
       - name: ExampleDefaultAdmission
         value: true
 
+  ScannerSystemId:
+    type: uuid
+    docs: A unique id that identifies a specific speedgate scanner setup.
+    examples:
+      - name: ExampleScannerSystemId
+        value: "12345678-aaaa-12d3-a456-426614174000"
+
   ScannerId:
     type: string
-    docs: A unique code that identifies a specific speedgate.
+    docs: A human friendly unique code that identifies a specific speedgate.
     examples:
       - name: ExampleSpeedgate
         value: GATE1
+
+  ScannerIdQueryParameter:
+    type: string
+    docs: A human friendly unique code that identifies a specific speedgate. Supports filtering such as * for wildcard matching f.ex. GATE*
+    examples:
+      - name: ExampleSpeedgate
+        value: GATE*
 
   ReferenceNumber:
     type: string
@@ -400,4 +414,60 @@ types:
     docs: Indicates if the member has extra information such as notes attached.
     examples:
       - name: ExampleHasNotes
+        value: true
+
+  RequireScannerId:
+    type: boolean
+    docs: Indicates if the speedgate requires a scanner id when scanning a reference number. When not providing a scanner id, a set of default profiles will be used for configuration.
+    examples:
+      - name: ExampleRequireScannerId
+        value: true
+
+  ImageProfileCode: 
+    type: string
+    docs: Code representing the image profile.
+    examples:
+      - name: ExampleImageProfileCode
+        value: "IMAGES-1"
+
+  TicketProfileCode:
+    type: string
+    docs: Code representing the ticket profile.
+    examples:
+      - name: ExampleTicketProfileCode
+        value: "TICKETS-1"
+
+  MemberCardProfileCode:
+    type: string
+    docs: Code representing the member card profile.
+    examples:
+      - name: ExampleMemberCardProfileCode
+        value: "CARDS-1"
+
+  PermitTickets:
+    type: boolean
+    docs: Indicates if the scanner will permit tickets when scanned.
+    examples:
+      - name: ExamplePermitTickets
+        value: true
+
+  PermitMemberCards:
+    type: boolean
+    docs: Indicates if the scanner will permit member cards when scanned.
+    examples:
+      - name: ExamplePermitMemberCards
+        value: true
+
+  PermitWallets:
+    type: boolean
+    docs: Indicates if the scanner will permit wallets when scanned.
+    examples:
+      - name: ExamplePermitWallets
+        value: true
+
+  PermitDocLxCityCards:
+    type: boolean
+    docs: Indicates if the scanner will permit DocLX city cards when scanned.
+    examples:
+      - name: ExamplePermitDocLxCityCards
         value: true

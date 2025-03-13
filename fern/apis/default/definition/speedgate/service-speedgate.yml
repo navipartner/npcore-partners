@@ -12,12 +12,38 @@ service:
 
   endpoints:
 
-    getSetup:
+    findScanners:
+      docs: 
+        This endpoint retrieves a list of all scanners registered within the specified company.
+        <br><br><b>Scanner Id Filter</b>
+        <br>The `ScannerId` parameter allows you to filter the list by scanner Id. It supports wildcards, enabling partial matches to retrieve multiple related scanners efficiently.
+      path: ""
+      method: GET
+      request: 
+        name: findScanners
+        query-parameters:
+          scannerId: simpleTypes.ScannerIdQueryParameter
+      response:
+        docs: Returns a list of scanners according t .
+        type: compositeTypes.ScannerIdSetupResponseShort
+      examples:
+        - name: "List of scanners defined"
+          docs: Example of a successful retrieval of a speedgate setup.
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            scannerId: $simpleTypes.ScannerIdQueryParameter.ExampleSpeedgate
+          response:
+            body: $compositeTypes.ScannerIdSetupResponseShort.ExampleScannerIdSetupResponseShort
+
+    getScannerSetup:
       docs: 
         This endpoint retrieves the setup details for a specific gate, such as the gate's name, location, and the admission codes it supports.  
-      path: /setup/{scannerId}
+      path: /{id}
       path-parameters:
-        scannerId: simpleTypes.ScannerId
+        id: simpleTypes.ScannerSystemId
       method: GET
       request: 
         name: getSetup
@@ -31,23 +57,10 @@ service:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
-            scannerId: $simpleTypes.ScannerId.ExampleSpeedgate
+            id: $simpleTypes.ScannerSystemId.ExampleScannerSystemId
           response:
-            body:
-              scannerId: $simpleTypes.ScannerId.ExampleSpeedgate
-              name: "Speedgate 1"
-              location: "Main Entrance"
-              admissions:
-                - code: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
-                  description: "Castle Admission"
-                  default: true
-                - code: $simpleTypes.AdmissionCode.ExampleAdmissionTreasure
-                  description: "Treasure Tour Admission"
-                - code: $simpleTypes.AdmissionCode.ExampleAdmissionDungeon
-                  description: "Dungeon Tour Admission"
-              acceptsTickets: true
-              acceptsMemberCards: true
-              acceptsWallets: true
+            body: $compositeTypes.ScannerIdSetupResponse.ExampleScannerIdSetupResponse
+
 
     tryAdmit:
       docs: 

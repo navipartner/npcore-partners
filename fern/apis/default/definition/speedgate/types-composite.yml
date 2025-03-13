@@ -256,18 +256,74 @@ types:
           
 
 ############################
+  ScannerIdSetupResponseShort:
+    docs: 
+      List of configured and enabled scanners.
+    properties:
+      requireScannerId: simpleTypes.RequireScannerId
+      permitTickets: simpleTypes.PermitTickets
+      permitMemberCards: simpleTypes.PermitMemberCards
+      permitWallets: simpleTypes.PermitWallets
+      imageProfileCode: simpleTypes.ImageProfileCode
+      ticketProfileCode: simpleTypes.TicketProfileCode
+      memberCardProfileCode: simpleTypes.MemberCardProfileCode
+      scanners: list<ScannerIdSetupResponseList>
+    examples:
+      - name: ExampleScannerIdSetupResponseShort
+        value:
+          requireScannerId: $simpleTypes.RequireScannerId.ExampleRequireScannerId
+          permitTickets: $simpleTypes.PermitTickets.ExamplePermitTickets
+          permitMemberCards: $simpleTypes.PermitMemberCards.ExamplePermitMemberCards
+          permitWallets: $simpleTypes.PermitWallets.ExamplePermitWallets
+          imageProfileCode: $simpleTypes.ImageProfileCode.ExampleImageProfileCode
+          ticketProfileCode: $simpleTypes.TicketProfileCode.ExampleTicketProfileCode
+          memberCardProfileCode: $simpleTypes.MemberCardProfileCode.ExampleMemberCardProfileCode
+          scanners:
+            - id: $simpleTypes.ScannerSystemId.ExampleScannerSystemId
+              scannerId: $simpleTypes.ScannerId.ExampleSpeedgate
+              description: $simpleTypes.Description.ExampleDescription
+
+  ScannerIdSetupResponseList:
+    docs: 
+      List of configured and enabled scanners.
+    properties:
+      id: simpleTypes.ScannerSystemId
+      scannerId: simpleTypes.ScannerId
+      description: simpleTypes.Description
+    examples:
+      - name: ExampleScannerIdSetupResponseShort
+        value:
+          id: $simpleTypes.ScannerSystemId.ExampleScannerSystemId
+          scannerId: $simpleTypes.ScannerId.ExampleSpeedgate
+          description: $simpleTypes.Description.ExampleDescription
 
   ScannerIdSetupResponse:
     docs: 
-      Response to setup a gate.
+      Capabilities configured for scanner.
     properties:
+      id: simpleTypes.ScannerSystemId
       scannerId: simpleTypes.ScannerId
-      name: simpleTypes.Description
-      location: optional<simpleTypes.Description>
-      readyImage: optional<simpleTypes.Base64Image>
-      successImage: optional<simpleTypes.Base64Image>
-      failureImage: optional<simpleTypes.Base64Image>
-      admissions: list<AdmissionInfo>
-      acceptsTickets: optional<boolean>
-      acceptsMemberCards: optional<boolean>
-      acceptsWallets: optional<boolean>
+      description: simpleTypes.Description
+      enabled: boolean
+      permitTickets: simpleTypes.PermitTickets
+      permitMemberCards: simpleTypes.PermitMemberCards
+      permitWallets: simpleTypes.PermitWallets
+      permitDocLxCityCards: simpleTypes.PermitDocLxCityCards
+      imageProfileCode: simpleTypes.ImageProfileCode
+      ticketProfileCode: simpleTypes.TicketProfileCode
+      memberCardProfileCode: simpleTypes.MemberCardProfileCode
+    examples:
+      - name: ExampleScannerIdSetupResponse
+        value:
+          id: $simpleTypes.ScannerSystemId.ExampleScannerSystemId
+          scannerId: $simpleTypes.ScannerId.ExampleSpeedgate
+          description: $simpleTypes.Description.ExampleDescription
+          enabled: true
+          permitTickets: $simpleTypes.PermitTickets.ExamplePermitTickets
+          permitMemberCards: $simpleTypes.PermitMemberCards.ExamplePermitMemberCards
+          permitWallets: $simpleTypes.PermitWallets.ExamplePermitWallets
+          permitDocLxCityCards: $simpleTypes.PermitDocLxCityCards.ExamplePermitDocLxCityCards
+          imageProfileCode: $simpleTypes.ImageProfileCode.ExampleImageProfileCode
+          ticketProfileCode: $simpleTypes.TicketProfileCode.ExampleTicketProfileCode
+          memberCardProfileCode: $simpleTypes.MemberCardProfileCode.ExampleMemberCardProfileCode
+
