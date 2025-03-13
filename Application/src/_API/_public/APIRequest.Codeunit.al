@@ -10,7 +10,7 @@ codeunit 6185051 "NPR API Request"
         _Headers: Dictionary of [Text, Text];
         _BodyJson: JsonToken;
 
-#region Initializer
+    #region Initializer
     procedure Init(RequestHttpMethod: Enum "Http Method"; RequestPath: Text; RequestRelativePathSegments: List of [Text]; RequestQueryParams: Dictionary of [Text, Text];
         RequestHeaders: Dictionary of [Text, Text]; RequestBodyJson: JsonToken)
     begin
@@ -22,9 +22,9 @@ codeunit 6185051 "NPR API Request"
         _BodyJson := RequestBodyJson;
         _ModuleName := _RelativePathSegments.Get(1);
     end;
-#endregion
+    #endregion
 
-#region Getters
+    #region Getters
     procedure HttpMethod(): Enum "Http Method"
     begin
         exit(_HttpMethod);
@@ -429,7 +429,7 @@ codeunit 6185051 "NPR API Request"
         end;
     end;
 
-    local procedure GetNextPageUrl(NextPageKey: Text): Text
+    internal procedure GetNextPageUrl(NextPageKey: Text): Text
     var
         Url: Text;
         QueryParam: Text;
@@ -457,7 +457,7 @@ codeunit 6185051 "NPR API Request"
 
         Exit(Url + QueryString);
     end;
-    
+
     /// <summary>
     /// Call this procedure at the top of your API request handler if you have business logic that 
     /// is sensitive to cache misses. It will make your caching approach pessimistic, 
@@ -488,6 +488,6 @@ codeunit 6185051 "NPR API Request"
 #endif
     end;
 
-#endregion
+    #endregion
 }
 #endif
