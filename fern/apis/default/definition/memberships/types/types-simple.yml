@@ -165,6 +165,13 @@ types:
       - name: Cancel
         value: 62349999-ffff-aaaa-bbbb-6234567890ff
  
+  AutoRenewalActivated:
+    type: boolean
+    docs: Indicates if the membership is set to auto-renew.
+    examples:
+      - name: ExampleAutoRenewalActivated
+        value: true
+
   LifecycleActionEnum:
     enum:
       - new

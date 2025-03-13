@@ -26,6 +26,7 @@ types:
           validUntilDate: $simpleTypes.ValidUntilDate.ExampleValidUntilDate
           customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
           blocked: $simpleTypes.Blocked.ExampleBlocked
+          autoRenewalActivated: false
           members:
             - $MemberDTOWithinMembership.ExampleMembershipToMember
 
@@ -212,6 +213,7 @@ types:
           validUntilDate: $simpleTypes.ValidUntilDate.ExampleValidUntilDate
           customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
           blocked: $simpleTypes.Blocked.ExampleBlocked
+          autoRenewalActivated: false
           cards: 
             - $MemberCardEntity.ExampleMemberCard
 
@@ -373,6 +375,7 @@ types:
       customerNumber: optional<simpleTypes.CustomerNumber>
       documentId: optional<simpleTypes.DocumentId>
       blocked: simpleTypes.Blocked
+      autoRenewalActivated: simpleTypes.AutoRenewalActivated
     examples:
       - name: ExampleMembership
         value:
@@ -385,6 +388,7 @@ types:
           validUntilDate: $simpleTypes.ValidUntilDate.ExampleValidUntilDate
           customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
           blocked: $simpleTypes.Blocked.ExampleBlocked
+          autoRenewalActivated: true
       - name: ExampleMembershipBlocked
         value:
           membershipId: $simpleTypes.MembershipId.ExampleMembershipId
@@ -396,6 +400,7 @@ types:
           validUntilDate: $simpleTypes.ValidUntilDate.ExampleValidUntilDate
           customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
           blocked: $simpleTypes.Blocked.ExampleBlockedTrue
+          autoRenewalActivated: false
 
   MemberEntityRequest:
     docs:
@@ -537,6 +542,7 @@ types:
           validUntilDate: $simpleTypes.ValidUntilDate.ExampleValidUntilDate
           customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
           blocked: $simpleTypes.Blocked.ExampleBlocked
+          autoRenewalActivated: false
           entries:
               - $MembershipTimeEntryEntity.ExampleActivateEntry
       - name: ExampleCancel
@@ -550,6 +556,7 @@ types:
           validUntilDate: $simpleTypes.LifecycleDate.CancelDate
           customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
           blocked: $simpleTypes.Blocked.ExampleBlocked
+          autoRenewalActivated: false
           entries:
               - $MembershipTimeEntryEntity.ExampleCancelEntry
       - name: ExampleRenew
@@ -563,6 +570,7 @@ types:
           validUntilDate: $simpleTypes.LifecycleDate.RenewUntilDate
           customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
           blocked: $simpleTypes.Blocked.ExampleBlocked
+          autoRenewalActivated: false
           entries:
               - $MembershipTimeEntryEntity.ExampleActivateEntry
               - $MembershipTimeEntryEntity.ExampleRenewEntry
@@ -577,6 +585,7 @@ types:
           validUntilDate: $simpleTypes.LifecycleDate.ValidUntilDate
           customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
           blocked: $simpleTypes.Blocked.ExampleBlocked
+          autoRenewalActivated: false
           entries:
               - $MembershipTimeEntryEntity.ExampleCancelEntry
               - $MembershipTimeEntryEntity.ExampleUpgradeEntry
@@ -591,6 +600,7 @@ types:
           validUntilDate: $simpleTypes.LifecycleDate.ExtendUntilDate
           customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
           blocked: $simpleTypes.Blocked.ExampleBlocked
+          autoRenewalActivated: false
           entries:
               - $MembershipTimeEntryEntity.ExampleCancelEntry
               - $MembershipTimeEntryEntity.ExampleExtendEntry
@@ -606,8 +616,8 @@ types:
       blocked: simpleTypes.Blocked
       membershipCode: simpleTypes.MembershipCode
       description: simpleTypes.Description
-      validFromDate: simpleTypes.ValidFromDate
-      validUntilDate: simpleTypes.ValidUntilDate
+      validFromDate: optional<simpleTypes.ValidFromDate>
+      validUntilDate: optional<simpleTypes.ValidUntilDate>
       createdAt: simpleTypes.CreatedAt
       activateOnFirstUse: simpleTypes.ActivateOnFirstUse
       documentNumber: simpleTypes.DocumentNo
@@ -727,6 +737,7 @@ types:
           validUntilDate: $simpleTypes.LifecycleDate.RenewUntilDate
           customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
           blocked: $simpleTypes.Blocked.ExampleBlocked
+          autoRenewalActivated: false
           options:
               - $LifecycleOptionDTO.ExampleRenew
       - name: ExampleUpgrade
@@ -740,6 +751,7 @@ types:
           validUntilDate: $simpleTypes.LifecycleDate.ValidUntilDate
           customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
           blocked: $simpleTypes.Blocked.ExampleBlocked
+          autoRenewalActivated: false
           options:
               - $LifecycleOptionDTO.ExampleUpgrade
       - name: ExampleExtend
@@ -753,6 +765,7 @@ types:
           validUntilDate: $simpleTypes.LifecycleDate.ExtendUntilDate
           customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
           blocked: $simpleTypes.Blocked.ExampleBlocked
+          autoRenewalActivated: false
           options:
               - $LifecycleOptionDTO.ExampleExtend
       - name: ExampleCancel
@@ -766,6 +779,7 @@ types:
           validUntilDate: $simpleTypes.LifecycleDate.ValidUntilDate
           customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
           blocked: $simpleTypes.Blocked.ExampleBlocked
+          autoRenewalActivated: false
           options:
               - $LifecycleOptionDTO.ExampleCancel
 
