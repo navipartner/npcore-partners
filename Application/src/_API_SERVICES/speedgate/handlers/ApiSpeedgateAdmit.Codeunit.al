@@ -3,7 +3,66 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
 {
     Access = Internal;
     internal procedure GetSetup(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        ScannerDefault: Record "NPR SG SpeedGateDefault";
+        Scanner: Record "NPR SG SpeedGate";
+        ResponseJson: Codeunit "NPR JSON Builder";
     begin
+
+        // List
+        if (Request.Paths().Count = 1) then begin
+            if (Request.QueryParams().ContainsKey('scannerId')) then
+                Scanner.SetFilter(ScannerId, Request.QueryParams().Get('scannerId'));
+
+            if (not ScannerDefault.Get()) then
+                exit(Response.RespondBadRequest('Speedgate setup not found'));
+
+            ResponseJson.StartObject()
+                .AddProperty('requireScannerId', ScannerDefault.RequireScannerId);
+
+            if (not ScannerDefault.RequireScannerId) then
+                ResponseJson
+                    .AddProperty('permitTickets', ScannerDefault.PermitTickets)
+                    .AddProperty('permitMemberCards', ScannerDefault.PermitMemberCards)
+                    .AddProperty('permitWallets', ScannerDefault.PermitWallets)
+                    .AddProperty('imageProfileCode', ScannerDefault.ImageProfileCode)
+                    .AddProperty('ticketProfileCode', ScannerDefault.DefaultTicketProfileCode)
+                    .AddProperty('memberCardProfileCode', ScannerDefault.DefaultMemberCardProfileCode);
+
+            Scanner.SetFilter(Enabled, '=%1', true);
+            ResponseJson.StartArray('scanners');
+            if (Scanner.FindSet()) then
+                repeat
+                    ResponseJson.StartObject();
+                    ResponseJson.AddProperty('id', Format(Scanner.SystemId, 0, 4).ToLower());
+                    ResponseJson.AddProperty('scannerId', Scanner.ScannerId);
+                    ResponseJson.AddProperty('description', Scanner.Description);
+                    ResponseJson.EndObject();
+                until (Scanner.Next() = 0);
+            ResponseJson.EndArray().EndObject();
+
+            exit(Response.RespondOK(ResponseJson.Build()));
+        end;
+
+        // Details
+        if (not Scanner.GetBySystemId(Request.Paths().Get(2))) then
+            exit(Response.RespondBadRequest('Scanner not found'));
+
+        ResponseJson.StartObject()
+            .AddProperty('id', Format(Scanner.SystemId, 0, 4).ToLower())
+            .AddProperty('scannerId', Scanner.ScannerId)
+            .AddProperty('description', Scanner.Description)
+            .AddProperty('enabled', Scanner.Enabled)
+            .AddProperty('permitTickets', Scanner.PermitTickets)
+            .AddProperty('permitMemberCards', Scanner.PermitMemberCards)
+            .AddProperty('permitWallets', Scanner.PermitWallets)
+            .AddProperty('permitDocLxCityCards', Scanner.PermitDocLxCityCard)
+            .AddProperty('imageProfileCode', Scanner.ImageProfileCode)
+            .AddProperty('ticketProfileCode', Scanner.TicketProfileCode)
+            .AddProperty('memberCardProfileCode', Scanner.MemberCardProfileCode)
+            .EndObject();
+
+        exit(Response.RespondOK(ResponseJson.Build()));
 
     end;
 

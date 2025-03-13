@@ -48,13 +48,14 @@ The following unique error codes are used in our API:
 
 | Error Code | Description                              |
 |------|------------------------------------------|
-| **`generic_error`** | An unspecified error has occurred. This is the default error code if nothing more specific applies, check the HTTP status code and the message. |
-| **`saas_tenant_not_found`** | Provided tenant GUID (parameter `tenant`) is not a valid tenant ID. |
-| **`saas_environment_not_found`** | Provided tenant environment name (parameter `environment`) is not a valid environment name for the selected tenant. |
-| **`saas_company_not_found`** | Provided company name (parameter `company`) is not a valid company name for the selected tenant and environment. |
-| **`server_timeout`** | Server timeout. |
+| **`generic_error`** | An error occurred. See HTTP status code.| 
+| **`saas_tenant_not_found`** | Provided tenant GUID (parameter `tenant`) is not a valid tenant ID.| 
+| **`saas_environment_not_found`** | Provided tenant environment name (parameter `environment`) is not a valid environment name for the selected tenant.| 
+| **`saas_company_not_found`** | Provided company name (parameter `company`) is not a valid company name for the selected tenant and environment.| 
+| **`server_timeout`** | The server timed out while processing the request.| 
 | **`unsupported_http_method`** | The http method is not supported for this endpoint.| 
 | **`resource_not_found`** | The selected resource does not exist.| 
+| **`globalsale_duplicate_key`** | Duplicate key.| 
 | **`capacity_exceeded`** | The capacity has been exceeded. Entry is not allowed.| 
 | **`invalid_reference`** | The reference is invalid.| 
 | **`reservation_not_found`** | The required reservation for the ticket was not found.| 
@@ -78,33 +79,30 @@ The following unique error codes are used in our API:
 | **`invalid_admission_code`** | The admission code is invalid.| 
 | **`has_payment`** | The ticket has already been paid.| 
 | **`duration_exceeded`** | The admission duration has expired.| 
+| **`ticket_blocked`** | The ticket is blocked.| 
+| **`ticket_not_valid_for_suggested_admission`** | The ticket is not valid for the suggested admission.| 
+| **`ticket_not_allowed`** | The ticket is not allowed.| 
+| **`wallet_expired`** | The wallet has expired.| 
+| **`member_blocked`** | Member is blocked.| 
+| **`member_card_blocked`** | Member card is blocked.| 
+| **`member_card_not_allowed`** | Member card is not allowed.| 
+| **`member_card_expired`** | Member card has expired.| 
+| **`membership_setup_missing_ticket_item`** | Membership setup is missing ticket item.| 
+| **`membership_setup_missing`** | Membership setup is missing.| 
+| **`membership_blocked`** | Membership is blocked| 
+| **`member_unique_id_violation`** | Member with same unique id already exists.| 
+| **`member_count_exceeded`** | Member count exceeded.| 
+| **`member_card_exists`** | Member card already exists.| 
+| **`no_admin_member`** | No admin member found.| 
+| **`member_card_blank`** | Member card is blank.| 
+| **`invalid_contact`** | The provided contact number is not valid in context of the customer.| 
+| **`age_verification_setup`** | Add member failed on age verification because item number for sales was not provided.| 
+| **`age_verification`** | Age verification failed.| 
+| **`allow_member_merge_not_set`** | This request violates the community’s member identity uniqueness rule. See the API documentation for merge options.| 
 | **`member_card_limitation_error`** | Limitations on member card apply and deny admission.| 
 | **`denied_by_speedgate`** | The reference number was denied by the gate.| 
 | **`scanner_not_found`** | The scanner was not found.| 
 | **`scanner_id_required`** | The scanner id is required.| 
 | **`scanner_not_enabled`** | The scanner is not enabled.| 
 | **`number_not_whitelisted`** | The reference number was not whitelisted by the gate.| 
-| **`number_rejected`** | The reference number was actively rejected by gate setup.
-| **`member_unique_id_violation`** | Member with same unique id already exists.|
-| **`member_count_exceeded`** | Member count exceeded.|
-| **`member_card_exists`** | Member card already exists.|
-| **`no_admin_member`** | No admin member found.|
-| **`member_card_blank`** | Member card can not be blank.|
-| **`invalid_contact`** | The provided contact number is not valid in context of the customer.|
-| **`age_verification_setup`** | Add member failed on age verification because item number for sales was not provided.|
-| **`age_verification`** | Age verification failed.|
-| **`allow_member_merge_not_set`** | This request violates the community’s member identity uniqueness rule. See the API documentation for merge options.|
-| **`member_card_limitation_error`** | Limitations on member card apply and deny admission.|
-| **`ticket_blocked`** | The ticket is blocked.|
-| **`ticket_not_valid_for_suggested_admission`** | The ticket is not valid for the suggested admission.|
-| **`ticket_not_allowed`** | The ticket is not allowed.|
-| **`wallet_expired`** | The wallet has expired.|
-| **`member_card_blocked`** | Member card is blocked.|
-| **`member_card_not_allowed`** | Member card is not allowed.|
-| **`member_card_expired`** | Member card has expired.|
-| **`membership_setup_missing_ticket_item`** | Membership setup is missing ticket item.|
-| **`membership_setup_missing`** | Membership setup is missing.|
-| **`membership_blocked`** | Membership is blocked|
-
-
-
+| **`number_rejected`** | The reference number was actively rejected by gate setup.|

@@ -207,7 +207,8 @@ navigation:
             - speedgate.service-speedgate:
                 title: Speedgate
                 contents:
-                  - endpoint: speedgate.service-speedgate.getSetup
+                  - endpoint: speedgate.service-speedgate.findScanners
+                  - endpoint: speedgate.service-speedgate.getScannerSetup
                   - endpoint: speedgate.service-speedgate.tryAdmit
                   - endpoint: speedgate.service-speedgate.admitToken
 
