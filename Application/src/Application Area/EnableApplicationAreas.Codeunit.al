@@ -20,6 +20,9 @@ codeunit 6151349 "NPR Enable Application Areas"
         EnableFiscalizationApplicationAreas(TempApplicationAreaSetup);
         EnableInternalPOSScenariosAndHideOldRelatedPages(TempApplicationAreaSetup);
         EnableOnlyNewPOSEditorAndHideOldRelatedPages(TempApplicationAreaSetup);
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        EnableNPEmail(TempApplicationAreaSetup);
+#endif
     end;
 
     local procedure EnableRetailApplicationAreas(var TempApplicationAreaSetup: Record "Application Area Setup" temporary)
@@ -91,6 +94,13 @@ codeunit 6151349 "NPR Enable Application Areas"
     begin
         TempApplicationAreaSetup."NPR New POS Editor" := not IsFeatureEnabled(Feature::"New POS Editor");
     end;
+
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+    local procedure EnableNPEmail(var TempApplicationAreaSetup: Record "Application Area Setup" temporary)
+    begin
+        TempApplicationAreaSetup."NPR NP Email" := IsFeatureEnabled(Feature::"NP Email");
+    end;
+#endif
 
     local procedure IsFeatureEnabled(FeatureToCheck: Enum "NPR Feature"): Boolean
     var

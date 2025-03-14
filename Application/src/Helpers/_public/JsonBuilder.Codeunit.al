@@ -340,6 +340,18 @@ codeunit 6184982 "NPR Json Builder"
         exit(RootJsonToken);
     end;
 
+    /// <summary>
+    /// Generate output as a text string.
+    /// </summary>
+    /// <returns>Text</returns>
+    procedure BuildAsText() JsonText: Text
+    var
+        JObject: JsonObject;
+    begin
+        JObject := Build();
+        JObject.WriteTo(JsonText);
+    end;
+
     local procedure AddTokenToParent(PropertyName: Text; NewToken: JsonToken)
     var
         ParentObject: JsonObject;

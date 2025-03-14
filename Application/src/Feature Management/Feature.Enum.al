@@ -78,4 +78,11 @@ enum 6014577 "NPR Feature" implements "NPR Feature Management"
         Caption = 'POS Statistics Dashboard', Locked = true, MaxLength = 50;
         Implementation = "NPR Feature Management" = "NPR POS Stat Dashboard Feature";
     }
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+    value(130; "NP Email")
+    {
+        Caption = 'NP Email', Locked = true, MaxLength = 50;
+        Implementation = "NPR Feature Management" = "NPR NP Email Feature";
+    }
+#endif
 }

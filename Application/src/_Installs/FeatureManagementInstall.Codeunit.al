@@ -36,7 +36,6 @@ codeunit 6151434 "NPR Feature Management Install"
         FeatureManagement: Interface "NPR Feature Management";
         Feature: Enum "NPR Feature";
     begin
-        ExistingFeature.SetRange(Feature, Feature::Retail, Feature::"POS Statistics Dashboard");
         if ExistingFeature.FindSet() then
             repeat
                 TempExistingFeature := ExistingFeature;
@@ -59,6 +58,9 @@ codeunit 6151434 "NPR Feature Management Install"
         AddFeature(Feature::"POS Scenarios Obsoleted");
         AddFeature(Feature::"New POS Editor");
         AddFeature(Feature::"POS Statistics Dashboard");
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        AddFeature(Feature::"NP Email");
+#endif
 
         if ExistingFeature.FindSet() then
             repeat

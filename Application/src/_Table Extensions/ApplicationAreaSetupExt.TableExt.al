@@ -47,6 +47,11 @@ tableextension 6014680 "NPR Application Area Setup Ext" extends "Application Are
             Caption = 'NaviPartner HeyLoyalty Integration';
             DataClassification = CustomerContent;
         }
+        field(6014401; "NPR NP Email"; Boolean)
+        {
+            Caption = 'NaviPartner NP Email';
+            DataClassification = CustomerContent;
+        }
         field(6060109; "NPR RS Local"; Boolean)
         {
             Caption = 'NaviPartner RS Localization';
