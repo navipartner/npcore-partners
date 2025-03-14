@@ -163,8 +163,8 @@ service:
             company: $globalApiTypes.Company.ExampleCompanyCronus
             token: $simpleTypes.Token.ExampleToken
           request:
-            ticketHolder: John Doe
-            notificationAddress: john.doe@acme.com
+            ticketHolder: $simpleTypes.TicketHolder.ExampleTicketHolder
+            notificationAddress: $simpleTypes.NotificationAddress.ExampleEmail
             paymentReference: PAY123456
           response:
             body:
@@ -351,7 +351,7 @@ types:
       unitPrice: double
       unitPriceInclVat: double
       currencyCode: string
-      ticketHolder: optional<string>
+      ticketHolder: optional<simpleTypes.TicketHolder>
     examples: 
       - name: ExampleTicketConfirmed
         value:
@@ -366,7 +366,7 @@ types:
           unitPrice: 80.00
           unitPriceInclVat: 100.00
           currencyCode: DKK
-          ticketHolder: John Doe
+          ticketHolder: $simpleTypes.TicketHolder.ExampleTicketHolder
       - name: ExampleTicketUnconfirmed
         value:
           validFrom: 2024-10-15T00:00:00Z

@@ -606,6 +606,14 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         exit(ResponseJson.AddProperty(PropertyName, PropertyValue));
     end;
 
+    local procedure AddRequiredProperty(var ResponseJson: Codeunit "NPR JSON Builder"; PropertyName: Text; PropertyValue: Text): Codeunit "NPR JSON Builder"
+    begin
+        if (PropertyValue = '') then
+            exit(ResponseJson.AddProperty(PropertyName)); // Empty property with null value (not "")
+
+        exit(ResponseJson.AddProperty(PropertyName, PropertyValue));
+    end;
+
     local procedure SingleMembershipDTO(var ResponseJson: Codeunit "NPR JSON Builder"; ValidationRequest: Record "NPR SGEntryLog"): Codeunit "NPR JSON Builder"
     var
         MemberCard: Record "NPR MM Member Card";
@@ -615,6 +623,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         MemberCardProfileLine: Record "NPR SG MemberCardProfileLine";
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         Base64StringImage: Text;
+        TimeZoneHelper: Codeunit "NPR TM TimeHelper";
     begin
         if (not MemberCard.GetBySystemId(ValidationRequest.EntityId)) then
             exit(ResponseJson.AddProperty('memberCard', 'not found'));
@@ -643,7 +652,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             .AddProperty('memberCardId', Format(MemberCard.SystemId, 0, 4).ToLower())
             .AddProperty('membershipId', Format(Membership.SystemId, 0, 4).ToLower())
             .StartObject('previousScan')
-                .AddObject(AddRequiredProperty(ResponseJson, 'scannedAt', MemberCardSwipe."Created At"))
+                .AddObject(AddRequiredProperty(ResponseJson, 'scannedAt', TimeZoneHelper.FormatDateTimeWithAdmissionTimeZone(MemberCardSwipe."Admission Code", TimeZoneHelper.AdjustZuluToAdmissionLocalDateTime(MemberCardSwipe."Admission Code", MemberCardSwipe."Created At"))))
                 .AddProperty('scannerId', MemberCardSwipe."Scanner Station Id")
                 .AddProperty('admissionCode', MemberCardSwipe."Admission Code")
                 .AddProperty('status', ResponseTypeToText(MemberCardSwipe."Response Type"))

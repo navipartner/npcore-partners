@@ -67,6 +67,8 @@ types:
     examples:
       - name: ExampleEmail
         value: "john@acme.com"
+      - name: ExamplePhone
+        value: "+46701234567"
 
   PaymentReference:
     type: string
@@ -119,10 +121,23 @@ types:
   UnitPrice:
     type: double
     docs: The unit price of the ticket.
+    examples:
+      - name: ExampleUnitPrice
+        value: 100.0
+
+  UnitPriceInclVat:
+    type: double
+    docs: The unit price including VAT of the ticket.
+    examples:
+      - name: ExampleUnitPrice
+        value: 100.0
 
   UnitPriceIncludesVat:
     type: boolean
     docs: Indicates if the unit price includes VAT.
+    examples:
+      - name: ExampleUnitPriceIncludesVat
+        value: true  
 
   DiscountPct:
     type: double
@@ -146,6 +161,13 @@ types:
     type: string
     docs: The customer number of the user making the request. The customer number affects pricing.
 
+  IssuedAt:
+    type: datetime
+    docs: The date and time when the ticket was issued
+    examples:
+      - name: ExampleIssuedAt
+        value: "2024-10-11T12:13:00Z"
+
   ReferenceDate:
     type: date
     docs: A date to use as a reference for the capacity search. If not specified, the current date will be used. 
@@ -162,9 +184,9 @@ types:
     docs: A date and time to use as a reference for the capacity search. If not specified, the current date and time will be used. 
     examples:
       - name: ExampleValidFrom
-        value: 2024-10-15T00:00:00Z
+        value: 2024-10-15T22:00:00Z
       - name: ExampleValidUntil
-        value: 2024-10-15T23:59:59Z
+        value: 2024-10-15T21:59:59Z
       - name: ExamplePrintedAt
         value: 2024-10-15T12:00:00Z
 

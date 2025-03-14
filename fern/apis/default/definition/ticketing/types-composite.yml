@@ -126,13 +126,16 @@ types:
       ticketId: simpleTypes.TicketId
       ticketNumber: simpleTypes.TicketExternalNumber
       reservationToken: simpleTypes.Token
+      itemNumber: simpleTypes.ItemNumber
       validFrom: datetime
       validUntil: datetime
+      issuedAt: simpleTypes.IssuedAt
       pinCode: optional<simpleTypes.PinCode>
       unitPrice: optional<double>
       unitPriceInclVat: optional<double>
       currencyCode: optional<string>
-      ticketHolder: optional<string>
+      ticketHolder: optional<simpleTypes.TicketHolder>
+      notificationAddress: optional<simpleTypes.NotificationAddress>
       printCount: optional<integer>
       printedAt: optional<datetime>
       content: list<TicketContent>
@@ -143,13 +146,16 @@ types:
           ticketId: $simpleTypes.TicketId.ExampleTicket1
           ticketNumber: $simpleTypes.TicketExternalNumber.ExampleTicket1
           reservationToken : $simpleTypes.Token.ExampleToken
+          itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
           validFrom: $simpleTypes.ReferenceDateTime.ExampleValidFrom
           validUntil: $simpleTypes.ReferenceDateTime.ExampleValidUntil
+          issuedAt: $simpleTypes.IssuedAt.ExampleIssuedAt
           pinCode: 12-34
           unitPrice: 80.00
           unitPriceInclVat: 100.00
           currencyCode: DKK
-          ticketHolder: John Doe
+          ticketHolder: $simpleTypes.TicketHolder.ExampleTicketHolder
+          notificationAddress: $simpleTypes.NotificationAddress.ExampleEmail
           printCount: 1
           printedAt: $simpleTypes.ReferenceDateTime.ExamplePrintedAt
           content: 
@@ -160,10 +166,12 @@ types:
           ticketId: $simpleTypes.TicketId.ExampleTicket1
           ticketNumber: $simpleTypes.TicketExternalNumber.ExampleTicket1
           reservationToken : $simpleTypes.Token.ExampleToken
+          itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
           validFrom: $simpleTypes.ReferenceDateTime.ExampleValidFrom
           validUntil: $simpleTypes.ReferenceDateTime.ExampleValidUntil
+          issuedAt: $simpleTypes.IssuedAt.ExampleIssuedAt
           pinCode: 12-34
-          ticketHolder: John Doe
+          ticketHolder: $simpleTypes.TicketHolder.ExampleTicketHolder
           content: 
             - $TicketContent.ExampleTicketContent2
           description: $Descriptions.ExampleTicket31001
