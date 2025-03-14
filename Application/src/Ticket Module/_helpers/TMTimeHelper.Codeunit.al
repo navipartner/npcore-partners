@@ -135,6 +135,56 @@ codeunit 6184773 "NPR TM TimeHelper"
     end;
     #endregion
 
+    #region Create DateTime
+    internal procedure FormatDateTimeWithAdmissionTimeZone(AdmissionCode: Code[20]; LocalDate: Date; LocalTime: Time) LocalDateTimeAsText: Text
+    begin
+        exit(FormatDateTimeWithAdmissionTimeZone(AdmissionCode, CreateDateTime(LocalDate, LocalTime)));
+    end;
+
+    internal procedure FormatDateTimeWithAdmissionTimeZone(AdmissionCode: Code[20]; LocalDateTime: DateTime) LocalDateTimeAsText: Text
+    var
+        OffsetDuration: Duration;
+    begin
+        if (DT2Date(LocalDateTime) = 0D) then
+            exit('');
+
+        // Get the time zone offset for the given admission (the general setup time zone is used if the admission does not have a time zone)
+        OffsetDuration := GetTimeZoneOffsetForAdmission(AdmissionCode, LocalDateTime);
+        LocalDateTimeAsText := Format(LocalDateTime, 0, _UFormat) + GetTimeZoneOffsetAsText(OffsetDuration);
+    end;
+
+    internal procedure AdjustZuluToAdmissionLocalDateTime(AdmissionCode: Code[20]; LocalDateTime: DateTime): DateTime
+    begin
+        if (DT2Date(LocalDateTime) = 0D) then
+            exit(LocalDateTime);
+
+        exit(LocalDateTime + GetTimeZoneOffsetForAdmission(AdmissionCode, LocalDateTime));
+    end;
+
+    internal procedure GetTimeZoneOffsetForAdmission(AdmissionCode: Code[20]; DateTimeToCheck: DateTime) OffsetDuration: Duration
+    var
+        IsDaylightSavingsTime: Boolean;
+        TimeZoneNo: Integer;
+        TicketSetup: Record "NPR TM Ticket Setup";
+        Admission: Record "NPR TM Admission";
+        TimeZone: Record "Time Zone";
+    begin
+        if not TicketSetup.Get() then
+            TicketSetup.Init();
+
+        TimeZoneNo := TicketSetup.ServiceTimeZoneNo;
+
+        if Admission.Get(AdmissionCode) then
+            if Admission.TimeZoneNo <> 0 then
+                TimeZoneNo := Admission.TimeZoneNo;
+
+        OffsetDuration := GetDstOffset(TimeZoneNo, DT2Date(DateTimeToCheck), IsDaylightSavingsTime);
+
+        if (TimeZone.Get(TimeZoneNo)) then
+            OffsetDuration += GetTimeZoneOffset(TimeZone.ID);
+    end;
+    #endregion
+
     local procedure GetTimeZoneLocalTime(TimeZoneNo: Integer; var TimeZoneCode: Code[20]; var IsDaylightSavingsTime: Boolean) LocalDateTime: DateTime
     var
         TimeZone: Record "Time Zone";
@@ -161,6 +211,22 @@ codeunit 6184773 "NPR TM TimeHelper"
         TypeHelper: Codeunit "Type Helper";
     begin
         TypeHelper.GetTimezoneOffset(TimeZoneOffset, TimeZoneId);
+    end;
+
+    local procedure GetTimeZoneOffsetAsText(TimezoneOffsetMs: Duration) TimeZoneCode: Code[20]
+    var
+        OffsetSign: Text;
+        Hours: Integer;
+        Minutes: Integer;
+    begin
+        TimeZoneCode := _UTCTimeZoneCode;
+
+        Hours := Round(TimezoneOffsetMs Div 3600000);
+        Minutes := Round((Abs(TimezoneOffsetMs) - Abs(Hours * 3600000)) Div 60000);
+        OffsetSign := '+';
+        if (TimezoneOffsetMs < 0) then
+            OffsetSign := '-';
+        TimeZoneCode := CopyStr(StrSubstNo('%1%2:%3', OffsetSign, Format(Hours, 0, '<Integer>').PadLeft(2, '0'), Format(Minutes, 0, '<Integer>').PadLeft(2, '0')), 1, MaxStrLen(TimeZoneCode));
     end;
 
     local procedure GetUserTimeZoneOffsetAsText(var TimezoneOffsetMs: Duration) TimeZoneCode: Code[20]

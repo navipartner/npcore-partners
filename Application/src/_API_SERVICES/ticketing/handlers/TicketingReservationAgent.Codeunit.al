@@ -443,6 +443,7 @@ codeunit 6185083 "NPR TicketingReservationAgent"
     var
         Ticket: Record "NPR TM Ticket";
         GeneralLedgerSetup: Record "General Ledger Setup";
+        TimeZoneHelper: Codeunit "NPR TM TimeHelper";
     begin
         GeneralLedgerSetup.Get();
         Ticket.SetCurrentKey("Ticket Reservation Entry No.");
@@ -451,8 +452,8 @@ codeunit 6185083 "NPR TicketingReservationAgent"
             exit(ResponseJson);
 
         ResponseJson.StartObject('ticket')
-            .AddProperty('validFrom', CreateDateTime(Ticket."Valid From Date", Ticket."Valid From Time"))
-            .AddProperty('validUntil', CreateDateTime(Ticket."Valid To Date", Ticket."Valid To Time"))
+            .AddProperty('validFrom', TimeZoneHelper.FormatDateTimeWithAdmissionTimeZone('', Ticket."Valid From Date", Ticket."Valid From Time"))
+            .AddProperty('validUntil', TimeZoneHelper.FormatDateTimeWithAdmissionTimeZone('', Ticket."Valid To Date", Ticket."Valid To Time"))
             .AddProperty('unitPrice', Ticket.AmountExclVat)
             .AddProperty('unitPriceInclVat', Ticket.AmountInclVat)
             .AddProperty('currencyCode', GeneralLedgerSetup."LCY Code")

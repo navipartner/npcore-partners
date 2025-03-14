@@ -59,6 +59,13 @@ service:
             response:
               body: 
                 - ticketId: $simpleTypes.TicketId.ExampleTicket1
+                  ticketNumber: $simpleTypes.TicketExternalNumber.ExampleTicket1
+                  itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
+                  validFrom: $simpleTypes.ReferenceDateTime.ExampleValidFrom
+                  validUntil: $simpleTypes.ReferenceDateTime.ExampleValidUntil
+                  issuedAt: $simpleTypes.IssuedAt.ExampleIssuedAt
+                  unitPrice: $simpleTypes.UnitPrice.ExampleUnitPrice
+                  unitPriceInclVat: $simpleTypes.UnitPriceInclVat.ExampleUnitPrice
               
     requestRevokeTicket:
       docs: 
@@ -323,6 +330,13 @@ types:
     docs: Response to a find ticket request
     properties:
       ticketId: simpleTypes.TicketId
+      ticketNumber: simpleTypes.TicketExternalNumber
+      itemNumber: simpleTypes.ItemNumber
+      validFrom: datetime
+      validUntil: datetime
+      issuedAt: simpleTypes.IssuedAt
+      unitPrice: simpleTypes.UnitPrice
+      unitPriceInclVat: simpleTypes.UnitPriceInclVat
 
   RevokeTicketRequest:
     docs: Request to revoke a ticket
