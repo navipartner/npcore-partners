@@ -223,31 +223,11 @@ page 6150753 "NPR HL HeyLoyalty Members"
                 trigger OnAction()
                 var
                     HLMember: Record "NPR HL HeyLoyalty Member";
-                    HLSendMembers: Codeunit "NPR HL Send Members";
-                    HLWSMgt: Codeunit "NPR HL Member Webhook Handler";
-                    Window: Dialog;
-                    RecNo: Integer;
-                    TotalRecNo: Integer;
-                    DialogTxt01Lbl: Label 'Fetching HeyLoyalty data...\\';
-                    DialogTxt02Lbl: Label '@1@@@@@@@@@@@@@@@@@@@@@@@@@';
+                    UpdateMemberFromHL: Codeunit "NPR HL Update Member from HL";
                 begin
                     CurrPage.SetSelectionFilter(HLMember);
-                    TotalRecNo := HLMember.Count();
-                    if HLMember.FindSet() then begin
-                        Window.Open(
-                            DialogTxt01Lbl +
-                            DialogTxt02Lbl);
-                        RecNo := 0;
-                        repeat
-                            RecNo += 1;
-                            Window.Update(1, Round(RecNo / TotalRecNo * 10000, 1));
-                            if HLMember."HeyLoyalty Id" = '' then
-                                HLMember."HeyLoyalty Id" := HLSendMembers.GetHeyLoyaltyMemberID(HLMember, false);
-                            HLWSMgt.UpsertMember(HLMember."HeyLoyalty Id");
-                            Commit();
-                        until HLMember.Next() = 0;
-                        CurrPage.Update(false);
-                    end;
+                    UpdateMemberFromHL.UpdateMembersFromHL(HLMember);
+                    CurrPage.Update(false);
                 end;
             }
             action(DeleteRec)
