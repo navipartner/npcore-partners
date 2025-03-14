@@ -39,6 +39,7 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
         PrinterDeviceSettings.Value := 'PC852';
         PrinterDeviceSettings.Insert();
 
+        Commit(); //fix for printing from mPOS (RunModal() run)
         Printer.ProcessBuffer(Codeunit::"NPR SI Fiscal Thermal Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
 
         SIPOSAuditLogAuxInfo."Receipt Printed" := true;
