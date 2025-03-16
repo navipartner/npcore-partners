@@ -54,7 +54,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                 NcTask.Type::Modify:
                     Success := SpfyCommunicationHandler.SendItemUpdateRequest(NcTask, ShopifyItemID, ShopifyResponse);
                 NcTask.Type::Delete:
-                    Success := SpfyCommunicationHandler.SendItemDeleteRequest(NcTask, ShopifyItemID);
+                    Success := SpfyCommunicationHandler.SendItemDeleteRequest(NcTask, ShopifyItemID, ShopifyResponse);
             end;
         NcTask.Modify();
         Commit();
