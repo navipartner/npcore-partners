@@ -152,12 +152,13 @@ codeunit 6184924 "NPR Spfy Communication Handler"
     end;
 
     [TryFunction]
-    procedure SendItemDeleteRequest(var NcTask: Record "NPR Nc Task"; ShopifyItemID: Text[30])
+    procedure SendItemDeleteRequest(var NcTask: Record "NPR Nc Task"; ShopifyItemID: Text[30]; var ShopifyResponse: JsonToken)
     var
         Url: Text;
     begin
         Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('products/%1.json', ShopifyItemID);
         SendShopifyRequest(NcTask, Enum::"Http Request Type"::DELETE, Url);
+        ShopifyResponse.ReadFrom('{"product":{"id":"' + ShopifyItemID + '"}}');
     end;
 
     [TryFunction]
