@@ -36,6 +36,33 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
         Page.Run(0, SpfyEntityMetafield);
     end;
 
+    internal procedure InitStoreItemLinkMetafields(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link")
+    var
+        ItemAttributeValueMapping: Record "Item Attribute Value Mapping";
+        SpfyEntityMetafield: Record "NPR Spfy Entity Metafield";
+        DataLogMgt: Codeunit "NPR Data Log Management";
+    begin
+#if not (BC18 or BC19 or BC20 or BC21)
+        SpfyEntityMetafield.ReadIsolation := IsolationLevel::UpdLock;
+#else
+        SpfyEntityMetafield.LockTable();
+#endif
+        SpfyEntityMetafield.SetRange("Table No.", Database::"NPR Spfy Store-Item Link");
+        SpfyEntityMetafield.SetRange("BC Record ID", SpfyStoreItemLink.RecordId());
+        if not SpfyEntityMetafield.IsEmpty() then begin
+            DataLogMgt.DisableDataLog(true);
+            SpfyEntityMetafield.DeleteAll();
+            DataLogMgt.DisableDataLog(false);
+        end;
+
+        ItemAttributeValueMapping.SetRange("Table ID", Database::Item);
+        ItemAttributeValueMapping.SetRange("No.", SpfyStoreItemLink."Item No.");
+        if ItemAttributeValueMapping.FindSet() then
+            repeat
+                ProcessItemAttributeMappingChange(ItemAttributeValueMapping, SpfyStoreItemLink."Shopify Store Code", false);
+            until ItemAttributeValueMapping.Next() = 0;
+    end;
+
     internal procedure ProcessMetafieldMappingChange(var SpfyMetafieldMapping: Record "NPR Spfy Metafield Mapping"; xMetafieldID: Text[30]; Removed: Boolean; Silent: Boolean)
     var
         ItemAttribute: Record "Item Attribute";
@@ -88,7 +115,7 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
 
         ItemAttributeValueMapping.FindSet();
         repeat
-            ProcessItemAttributeMappingChange(ItemAttributeValueMapping, Removed);
+            ProcessItemAttributeMappingChange(ItemAttributeValueMapping, '', Removed);
         until ItemAttributeValueMapping.Next() = 0;
     end;
 
@@ -284,7 +311,7 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
         exit(Metafields.Count() > 0);
     end;
 
-    local procedure ProcessItemAttributeMappingChange(ItemAttributeValueMapping: Record "Item Attribute Value Mapping"; Removed: Boolean)
+    local procedure ProcessItemAttributeMappingChange(ItemAttributeValueMapping: Record "Item Attribute Value Mapping"; ShopifyStoreCode: Code[20]; Removed: Boolean)
     var
         ItemAttribute: Record "Item Attribute";
         ItemAttributeValue: Record "Item Attribute Value";
@@ -299,7 +326,7 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
         if not (ItemAttributeValueMapping."Table ID" in [Database::Item]) then
             exit;
         ItemAttribute.Get(ItemAttributeValueMapping."Item Attribute ID");
-        FilterMetafieldMapping(ItemAttribute.RecordId(), '', SpfyMetafieldMapping);
+        FilterMetafieldMapping(ItemAttribute.RecordId(), ShopifyStoreCode, SpfyMetafieldMapping);
         if SpfyMetafieldMapping.IsEmpty() then
             exit;
         SpfyMetafieldMapping.FindSet();
@@ -350,6 +377,8 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
 
             SpfyEntityMetafield.Init();
             SpfyEntityMetafield."Entry No." := 0;
+            SpfyEntityMetafield.Insert();
+
             SpfyEntityMetafield."Table No." := Params."BC Record ID".TableNo();
             SpfyEntityMetafield."BC Record ID" := Params."BC Record ID";
             SpfyEntityMetafield."Owner Type" := Params."Owner Type";
@@ -359,7 +388,7 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
             SpfyEntityMetafield."Metafield Value Version ID" := Params."Metafield Value Version ID";
             if DisableDataLog then
                 DataLogMgt.DisableDataLog(true);
-            SpfyEntityMetafield.Insert(true);
+            SpfyEntityMetafield.Modify(true);
             if DisableDataLog then
                 DataLogMgt.DisableDataLog(false);
             exit;
@@ -371,6 +400,7 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
             SpfyEntityMetafield.Delete(true);
             if DisableDataLog then
                 DataLogMgt.DisableDataLog(false);
+            exit;
         end;
 
         if (Params."Metafield Value" = SpfyEntityMetafield."Metafield Value") and
@@ -543,7 +573,7 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
     begin
         if Rec.IsTemporary() then
             exit;
-        ProcessItemAttributeMappingChange(Rec, false);
+        ProcessItemAttributeMappingChange(Rec, '', false);
     end;
 
 #if BC18 or BC19 or BC20 or BC21
@@ -555,7 +585,7 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
     begin
         if Rec.IsTemporary() then
             exit;
-        ProcessItemAttributeMappingChange(Rec, false);
+        ProcessItemAttributeMappingChange(Rec, '', false);
     end;
 
 #if BC18 or BC19 or BC20 or BC21
@@ -567,7 +597,7 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
     begin
         if Rec.IsTemporary() then
             exit;
-        ProcessItemAttributeMappingChange(Rec, true);
+        ProcessItemAttributeMappingChange(Rec, '', true);
     end;
 
 #if BC18 or BC19 or BC20 or BC21

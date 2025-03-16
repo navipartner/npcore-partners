@@ -28,7 +28,7 @@ codeunit 6184799 "NPR Spfy DLog Subscr.Mgt.Impl."
                     AddDataLogSetupEntity(
                         IntegrationArea, Database::"NPR Spfy Item Variant Modif.", DataLogSetup."Log Insertion"::Simple, DataLogSetup."Log Modification"::Simple, DataLogSetup."Log Deletion"::" ", JobQueueMgt.DaysToDuration(7));
                     AddDataLogSetupEntity(
-                        IntegrationArea, Database::"NPR Spfy Entity Metafield", DataLogSetup."Log Insertion"::Simple, DataLogSetup."Log Modification"::Simple, DataLogSetup."Log Deletion"::" ", JobQueueMgt.DaysToDuration(7));
+                        IntegrationArea, Database::"NPR Spfy Entity Metafield", DataLogSetup."Log Insertion"::" ", DataLogSetup."Log Modification"::Simple, DataLogSetup."Log Deletion"::" ", JobQueueMgt.DaysToDuration(7));
                 end;
             "NPR Spfy Integration Area"::"Inventory Levels":
                 begin

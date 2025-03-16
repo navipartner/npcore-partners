@@ -217,6 +217,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'RegisterShopifyAppRequestListenerWebservice'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'UpgradeAllowedFinancialStatuses'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'RescheduleInventorySync'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'UpdateMetafieldDataLogSetup'));
 #endif
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Dig. Rcpt. Enable", 'UpgradeDigitalReceiptSetupEnable'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Dig. Rcpt. Enable", 'UpdateDigitalReceiptSetupTable'));
@@ -831,6 +832,8 @@
                         exit('NPR-Spfy-UpgradeAllowedFinancialStatuses-20250216');
                     'RescheduleInventorySync':
                         exit('NPR-Spfy-RescheduleInventorySync-20250225');
+                    'UpdateMetafieldDataLogSetup':
+                        exit('NPR-Spfy-UpdateMetafieldDataLogSetup-20250316');
                 end;
 #endif
             Codeunit::"NPR UPG Dig. Rcpt. Enable":
