@@ -189,13 +189,29 @@ codeunit 6184942 "NPR Spfy Webhook Mgt."
 
     local procedure RemoveShopifWebhookListenerWebservice()
     var
-        SpfyWebhookSubscription: Record "NPR Spfy Webhook Subscription";
         TenantWebService: Record "Tenant Web Service";
     begin
-        if not SpfyWebhookSubscription.IsEmpty() then
+        if ShopifWebhookSubscriptionsExist() then
             exit;
         if ShopifWebhookListenerWebserviceExists(TenantWebService) then
             TenantWebService.Delete(true);
+    end;
+
+    local procedure ShopifWebhookSubscriptionsExist(): Boolean
+    var
+        Company: Record Company;
+        SpfyWebhookSubscription: Record "NPR Spfy Webhook Subscription";
+    begin
+        if not SpfyWebhookSubscription.IsEmpty() then
+            exit(true);
+        Company.SetFilter(Name, '<>%1', CopyStr(CompanyName(), 1, MaxStrLen(Company.Name)));
+        if Company.Find('-') then
+            repeat
+                SpfyWebhookSubscription.ChangeCompany(Company.Name);
+                if not SpfyWebhookSubscription.IsEmpty() then
+                    exit(true);
+            until Company.Next() = 0;
+        exit(false);
     end;
 
     local procedure ShopifWebhookListenerWebserviceExists(var TenantWebService: Record "Tenant Web Service"): Boolean

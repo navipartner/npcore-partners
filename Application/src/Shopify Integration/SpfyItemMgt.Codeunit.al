@@ -346,7 +346,7 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         RecRef: RecordRef;
         RecRef2: RecordRef;
     begin
-        if DataLogEntry."Type of Change" in [DataLogEntry."Type of Change"::Rename, DataLogEntry."Type of Change"::Delete] then
+        if DataLogEntry."Type of Change" <> DataLogEntry."Type of Change"::Modify then
             exit;
 
         RecRef := DataLogEntry."Record ID".GetRecord();
@@ -376,14 +376,7 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         end;
 
         clear(NcTask);
-        case DataLogEntry."Type of Change" of
-            DataLogEntry."Type of Change"::Insert:
-                NcTask.Type := NcTask.Type::Insert;
-            DataLogEntry."Type of Change"::Modify:
-                NcTask.Type := NcTask.Type::Modify;
-            else
-                exit;
-        end;
+        NcTask.Type := NcTask.Type::Modify;
         TaskCreated := SpfyScheduleSend.InitNcTask(SpfyStoreItemLink."Shopify Store Code", RecRef, SpfyEntityMetafield."BC Record ID", GetProductVariantSku(SpfyStoreItemLink."Item No.", SpfyStoreItemLink."Variant Code"), NcTask.Type, 0DT, 0DT, NcTask);
     end;
 
