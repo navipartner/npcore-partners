@@ -47,13 +47,13 @@ codeunit 6150717 "NPR POS Webhooks"
     end;
 
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24)
-    [ExternalBusinessEvent('pos_sale_completed', 'POS Sale Completed', 'Triggered when a POS sale ends and a POS entry is created', EventCategory::"NPR POS")]
+    [ExternalBusinessEvent('pos_sale_completed', 'POS Sale Completed', 'Triggered when a POS sale ends and a POS entry is created', EventCategory::"NPR POS", '1.0')]
     [RequiredPermissions(PermissionObjectType::Codeunit, Codeunit::"NPR POS Webhooks", 'X')]
     local procedure OnPOSSaleCompleted(saleId: Guid; posUnit: Code[10]; receiptNo: Code[20]; fiscalDocumentNo: Code[20]; customerNo: Code[20])
     begin
     end;
 
-    [ExternalBusinessEvent('pos_unit_balanced', 'POS Unit Balanced', 'Triggered when a POS unit is balanced', EventCategory::"NPR POS")]
+    [ExternalBusinessEvent('pos_unit_balanced', 'POS Unit Balanced', 'Triggered when a POS unit is balanced', EventCategory::"NPR POS", '1.0')]
     [RequiredPermissions(PermissionObjectType::Codeunit, Codeunit::"NPR POS Webhooks", 'X')]
     local procedure OnPOSUnitBalanced(workshiftCheckpointId: Guid; posUnit: Code[10])
     begin
