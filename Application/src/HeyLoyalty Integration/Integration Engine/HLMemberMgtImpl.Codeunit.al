@@ -632,6 +632,9 @@ codeunit 6059995 "NPR HL Member Mgt. Impl."
 
     procedure GetUnsubscribedAtFromResponse(HeyLoyaltyResponse: JsonToken; DefaultValue: DateTime): DateTime
     begin
+        if DefaultValue <> 0DT then
+            if HeyLoyaltyResponse.AsObject().Contains('unsubscribed_at') then
+                DefaultValue := 0DT;
         exit(JsonHelper.GetJDT(HeyLoyaltyResponse, 'unsubscribed_at', false, DefaultValue));
     end;
 
