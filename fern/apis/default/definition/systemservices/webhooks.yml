@@ -1,0 +1,227 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+  commonApiTypes: ./../common-api-types.yml
+  posWebhooks: ./../pos/poswebhooks.yml
+
+types:
+  SubscriptionType:
+    docs: Defines the type of subscription supported by the webhook system. Currently, only the "Webhook" type is valid.
+    enum:
+      - Dataverse
+      - Webhook
+
+  SubscriptionId:
+    type: uuid
+    docs: Unique identifier (UUID) for a webhook subscription. Required for retrieving or deleting an existing webhook subscription through the API.
+    examples:
+      - name: default
+        value: 9a381cbf-ad95-4c20-a35d-e94125a91f9e
+
+  WebhookEventName:
+    type: string
+    docs: Represents the specific name of the external business event that triggers the webhook notification.
+    examples: 
+      - name: default
+        value: pos_sale_completed
+
+  WebhookEventVersion:
+    type: string
+    docs: Specifies the version of the webhook event. If no version is provided, it defaults to the standard version '1.0'.
+    examples: 
+      - name: default
+        value: "1.0"
+  
+  WebhookNotificationUrl:
+      type: string
+      docs: The full URL endpoint that will receive webhook notifications when the specified event occurs.
+      examples:
+        - name: default
+          value: https://webhook.site/7bb075d4-62ff-4bd9-8832-502c9ed94ab7
+
+  ODataEtag:
+    type: string
+    docs: An internal property (a version control mechanism used by OData to manage concurrency and track changes in resource entities).
+    examples:
+      - name: default
+        value: "W/\"JzIwOzEwNzkxMzk5ODM2MTM3MjIwMTQ2MTswMDsn\""
+
+  AppId:
+    type: uuid
+    docs: Unique identifier (UUID) of the application associated with the webhook subscription. Use only for webhooks included in custom applications (custom webhooks).
+    examples:
+      - name: default
+        value: $commonApiTypes.BcAppId.NpCore
+
+  UserId:
+    type: uuid
+    docs: Unique identifier (UUID) representing the user who created or modified the webhook subscription.
+    examples:
+      - name: default
+        value: 6ea36ab6-941a-405b-a184-94ddebff707e
+
+  CompanyName:
+    type: string
+    docs: Name of the company within the Business Central environment for which the webhook subscription is configured.
+    examples:
+      - name: default
+        value: $globalApiTypes.Company.ExampleCompanyCronus
+
+  CompanyId:
+    type: uuid
+    docs: Unique identifier (UUID) of the company in the Business Central environment.
+    examples:
+      - name: default
+        value: a2518dbc-2baf-ef11-b8eb-6045bde99e24
+
+  ClientState:
+    type: string
+    docs: 
+      The `clientState` property must be provided in the `POST` requests bodies. `clientState` is included in the body of a webhook notification and can be used as an opaque token; a shared secret, enabling the subscriber to verify notifications. 
+      The value can be any string up to 50 characters, we recommend using a unique value for each subscription (ideally as a UUID or a base64 encoded string etc.).
+    examples:
+      - name: default
+        value: "HVA0Y6B84KBNISG45W6CA4TNE38CHSBASD"
+
+  WebhookSubscriptionsResponse:
+    properties:
+      '@odata.context': string
+      value: list<WebhookSubscription>      
+    docs: Represents the API response containing a collection of webhook subscriptions.
+    examples:
+      - name: WebhookSubscriptionResponseDefaultExample
+        value:
+          '@odata.context': https://api.businesscentral.dynamics.com/v2.0/production/api/v2.0/$metadata#externaleventsubscriptions
+          value:
+            - $WebhookSubscription.WebhookSubscriptionExample
+
+
+  WebhookSubscription:
+    properties:
+      '@odata.etag': ODataEtag
+      id: SubscriptionId
+      companyId: uuid
+      timestamp: long
+      appId: AppId
+      eventName: WebhookEventName
+      companyName: CompanyName
+      userId: UserId
+      notificationUrl: WebhookNotificationUrl
+      lastModifiedDateTime: datetime
+      clientState: ClientState
+      subscriptionType: SubscriptionType
+      eventVersion: WebhookEventVersion
+      subscriptionState: string
+      systemCreatedAt: datetime
+      systemCreatedBy: UserId
+      systemModifiedAt: datetime
+      systemModifiedBy: UserId
+    docs: Represents a webhook subscription, detailing its configuration, state, and metadata within the Business Central environment.
+    examples:
+      - name: WebhookSubscriptionExample
+        value:
+          '@odata.etag': $ODataEtag.default
+          id: $SubscriptionId.default
+          companyId: $CompanyId.default
+          timestamp: 183372
+          appId: $AppId.default
+          eventName: $WebhookEventName.default
+          companyName: $globalApiTypes.Company.ExampleCompanyCronus
+          userId: $UserId.default
+          notificationUrl: $WebhookNotificationUrl.default
+          lastModifiedDateTime: "2024-12-02T20:45:29Z"
+          clientState: "$ClientState.default"
+          subscriptionType: "Webhook"
+          eventVersion: $WebhookEventVersion.default
+          subscriptionState: "Active"
+          systemCreatedAt: "2024-12-02T20:45:29.053Z"
+          systemCreatedBy: $UserId.default
+          systemModifiedAt: "2024-12-02T20:45:29.053Z"
+          systemModifiedBy: $UserId.default
+
+  WebhookSubscriptionRequest:
+    docs: Defines the required and optional parameters for creating a new webhook subscription in the system.
+    properties:
+      notificationUrl: WebhookNotificationUrl
+      eventName: WebhookEventName
+      appId: optional<AppId>
+      eventVersion: optional<WebhookEventVersion>
+      clientState: optional<ClientState>
+    examples:
+      - name: WebhookSubscriptionRequestExample
+        value:
+          notificationUrl: $WebhookNotificationUrl.default
+          eventName: $WebhookEventName.default
+          clientState: $ClientState.default
+
+service:
+  auth: true
+  base-path: ""
+  availability: pre-release
+  endpoints:
+
+    getSubscriptions:
+      display-name: Get subscriptions
+      docs: Retrieves all existing webhook subscriptions for a specified company, providing comprehensive details about each external event subscription.
+      path: "/webhooks"
+      method: GET
+      response: WebhookSubscriptionsResponse
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          response:
+            body: $WebhookSubscriptionsResponse.WebhookSubscriptionResponseDefaultExample
+
+    getSubscription:
+      display-name: Get subscription
+      docs: Fetches detailed information about a specific webhook subscription using its unique identifier, returning full subscription metadata.
+      path: /webhook/{id}
+      path-parameters:
+        id: SubscriptionId
+      method: GET
+      response: WebhookSubscriptionsResponse
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            id: $SubscriptionId.default
+          response:
+            body: $WebhookSubscriptionsResponse.WebhookSubscriptionResponseDefaultExample
+
+    createSubscription:
+      display-name: Create subscription
+      docs: Creates a new webhook subscription for a specific external business event, configuring the notification endpoint and event details.
+      path: /webhook
+      method: POST
+      request: WebhookSubscriptionRequest
+      response: WebhookSubscription
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          request: $WebhookSubscriptionRequest.WebhookSubscriptionRequestExample
+          response:
+            body: $WebhookSubscription.WebhookSubscriptionExample
+
+    deleteSubscription:
+      display-name: Delete subscription
+      docs: Permanently removes an existing webhook subscription by its unique identifier, immediately stopping future event notifications.
+      path: /webhook/{id}
+      path-parameters:
+        id: SubscriptionId
+      method: DELETE
+      request:
+        name: deleteSubscription
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            id: $SubscriptionId.default
+
+            

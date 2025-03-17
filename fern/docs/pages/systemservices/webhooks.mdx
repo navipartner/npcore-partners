@@ -1,0 +1,52 @@
+---
+title: Webhook Integration Guide
+---
+
+Webhooks allow your application to receive real-time event notifications from our system. Instead of polling for updates, you can configure a URL endpoint where we will send event payloads as POST requests.
+
+You can explore available webhooks in this portal.
+
+## Quick Start
+
+<AccordionGroup>
+  <Accordion title="1. Create a webhook subscription">
+    Subscribe to an event you chose:
+    <EndpointRequestSnippet endpoint="POST /:tenant/:environment/:company/webhook" example="WebhookSubscriptionRequestExample" />
+  </Accordion>
+
+  <Accordion title="2. Webhook notifications">
+    When a webhooks is triggered, you'll receive a POST request:
+    ```json
+    {
+      "value": [
+        {
+          "appId": "992c2309-cca4-43cb-9e41-911f482ec088",
+          "clientState": "HVA0Y6B84KBNISG45W6CA4TNE38CHSBASD",
+          "eventName": "pos_sale_completed",
+          "eventVersion": "1.0",
+          "timestamp": "2024-01-15T10:30:00Z",
+          "companyName": "CRONUS International Ltd.",
+          "payload": {
+            "saleId": "e20d09ad-ab74-4f31-912f-ea58d3c9e653",
+            "posUnit": "POS-031",
+            "receiptNo": "D12345678",
+            "fiscalDocumentNo": "FS12345678",
+            "customerNo": "C12345678"
+          }
+        }
+      ]
+    }
+    ```
+  </Accordion>
+
+  <Accordion title="3. Webhook subscription management">    
+    | Action | Endpoint |
+    |--------|----------|
+    | List all webhook subscriptions | `GET /webhooks` |
+    | Get a webhook subscription | `GET /webhook/{id}` |
+    | Create a webhook subscription | `POST /webhook` |
+    | Delete a webhook subscription | `DELETE /webhook/{id}` |
+
+    For complete webhook endpoint references, navigate  [here](api-reference/system-services/webhooks).
+  </Accordion>
+</AccordionGroup>

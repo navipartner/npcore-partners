@@ -54,6 +54,9 @@ navigation:
     - page: Rate Limits
       icon: fa-solid fa-clock
       path: docs/pages/limits.mdx
+    - page: Webhooks
+      icon: fa-solid fa-webhook
+      path: ./docs/pages/systemservices/webhooks.mdx             
     # Hidden pages (accessible only from specific areas):
     - page: Crane
       path: docs/pages/crane.mdx
@@ -79,6 +82,8 @@ navigation:
           - systemservices.helloworld:
               title: Hello World
               summary: ./docs/pages/systemservices/helloworld.mdx
+          - systemservices.webhooks:
+              title: Webhooks
         - section: Ticketing
           summary: ./docs/pages/ticketing/overview.mdx
           contents:

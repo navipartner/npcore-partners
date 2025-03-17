@@ -32,14 +32,5 @@ types:
     examples: 
       - name: ExampleCompanyCronus
         value: CRONUS%20International%20Ltd.
-
-  #Extend this and add the missing "payload" from your own webhook types
-  WebhookEvent:
-    properties:
-      initiatingUserAADObjectId: string
-      timestamp: datetime
-      companyName: string
-      companyId: uuid
-      appId: uuid
-      clientState: string
-      eventName: string
+      - name: ExampleCompanyCronusFull
+        value: CRONUS International Ltd.
