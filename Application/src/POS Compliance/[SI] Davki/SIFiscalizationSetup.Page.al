@@ -80,6 +80,11 @@ page 6150767 "NPR SI Fiscalization Setup"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies if the receipt should be automatically printed after sales document posting.';
                 }
+                field("Print EFT Information"; Rec."Print EFT Information")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies if additional information about EFT transaction should be printed after the regular receipt';
+                }
             }
             group(Mailing)
             {

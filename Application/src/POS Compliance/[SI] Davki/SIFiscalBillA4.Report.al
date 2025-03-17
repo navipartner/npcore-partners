@@ -30,6 +30,7 @@ report 6014556 "NPR SI Fiscal Bill A4"
             column(CustomerAddress; CustomerAddress) { }
             column(CustomerVATNo; "Customer VAT Number") { }
             column(CopyText; CopyText) { }
+            column(EftReceiptText; EftReceiptText) { }
             dataitem("POS Entry Lines"; "NPR POS Entry Sales Line")
             {
                 UseTemporary = true;
@@ -120,6 +121,8 @@ report 6014556 "NPR SI Fiscal Bill A4"
                 end;
 
                 IsPrintedCopy();
+
+                SetEftReceiptText();
             end;
         }
         dataitem("POS Entry Payment Lines"; "NPR POS Entry Payment Line")
@@ -452,6 +455,42 @@ report 6014556 "NPR SI Fiscal Bill A4"
         end;
     end;
 
+    local procedure SetEftReceiptText()
+    var
+        SIFiscalizationSetup: Record "NPR SI Fiscalization Setup";
+        EFTReceipt: Record "NPR EFT Receipt";
+        POSEntry: Record "NPR POS Entry";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        CRLF: Text;
+    begin
+        if not ("SI POS Audit Log Aux Info"."Audit Entry Type" = "SI POS Audit Log Aux Info"."Audit Entry Type"::"POS Entry") then
+            exit;
+        SIFiscalizationSetup.Get();
+        if not SIFiscalizationSetup."Print EFT Information" then
+            exit;
+
+        POSEntry.Get("SI POS Audit Log Aux Info"."POS Entry No.");
+        EFTTransactionRequest.SetRange("Sales Ticket No.", POSEntry."Document No.");
+        EFTTransactionRequest.SetRange(Successful, true);
+        if not EFTTransactionRequest.FindSet() then
+            exit;
+
+        CRLF[1] := 13;
+        CRLF[2] := 10;
+        repeat
+            EFTReceipt.SetRange("EFT Trans. Request Entry No.", EFTTransactionRequest."Entry No.");
+            if EFTReceipt.FindSet() then
+                repeat
+                    if EftReceiptText = '' then
+                        EftReceiptText := EFTReceipt.Text
+                    else
+                        EftReceiptText += EFTReceipt.Text + CRLF;
+                until EFTReceipt.Next() = 0;
+
+            EftReceiptText += CRLF;
+        until EFTTransactionRequest.Next() = 0;
+    end;
+
     local procedure FillTaxField(AmountInclTaxDict: Dictionary of [Decimal, Decimal]; TaxableAmountDict: Dictionary of [Decimal, Decimal]; TaxAmountDict: Dictionary of [Decimal, Decimal])
     var
         TaxKey: Decimal;
@@ -538,4 +577,5 @@ report 6014556 "NPR SI Fiscal Bill A4"
         QRCode: Text;
         StoreDetailsLine: Text;
         AddrArray: array[2] of Text[100];
+        EftReceiptText: Text;
 }

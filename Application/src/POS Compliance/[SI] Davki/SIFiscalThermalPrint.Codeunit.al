@@ -34,6 +34,9 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
 
         PrintThermalLine('PAPERCUT', 'COMMAND', false, 'CENTER', true, false);
 
+        if PrintEFTReceiptInformation(SIPOSAuditLogAuxInfo) then
+            PrintThermalLine('PAPERCUT', 'COMMAND', false, 'CENTER', true, false);
+
         PrinterDeviceSettings.Init();
         PrinterDeviceSettings.Name := 'ENCODING';
         PrinterDeviceSettings.Value := 'PC852';
@@ -323,6 +326,40 @@ codeunit 6151588 "NPR SI Fiscal Thermal Print"
         PrintTextLine(StrSubstNo(VATRegNoLbl, Customer."VAT Registration No."), 'CENTER', true);
     end;
 
+    local procedure PrintEFTReceiptInformation(SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"): Boolean
+    var
+        SIFiscalizationSetup: Record "NPR SI Fiscalization Setup";
+        EFTReceipt: Record "NPR EFT Receipt";
+        POSEntry: Record "NPR POS Entry";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        EFTReceiptText: Text;
+    begin
+        if not (SIPOSAuditLogAuxInfo."Audit Entry Type" = SIPOSAuditLogAuxInfo."Audit Entry Type"::"POS Entry") then
+            exit(false);
+        SIFiscalizationSetup.Get();
+        if not SIFiscalizationSetup."Print EFT Information" then
+            exit(false);
+
+        POSEntry.Get(SIPOSAuditLogAuxInfo."POS Entry No.");
+        EFTTransactionRequest.SetRange("Sales Ticket No.", POSEntry."Document No.");
+        EFTTransactionRequest.SetRange(Successful, true);
+        if not EFTTransactionRequest.FindSet() then
+            exit(false);
+
+        repeat
+            EFTReceipt.SetRange("EFT Trans. Request Entry No.", EFTTransactionRequest."Entry No.");
+            if EFTReceipt.FindSet() then
+                repeat
+                    EFTReceiptText := CopyStr(EFTReceipt.Text.Trim(), 1, MaxStrLen(EFTReceipt.Text));
+                    PrintTextLine(CopyStr(EFTReceiptText, 1, ReceiptWidth()), 'CENTER', false);
+
+                    if StrLen(EFTReceiptText) > ReceiptWidth() then
+                        PrintTextLine(CopyStr(EFTReceiptText, ReceiptWidth() + 1, ReceiptWidth()), 'CENTER', false);
+                until EFTReceipt.Next() = 0;
+        until EFTTransactionRequest.Next() = 0;
+
+        exit(EFTReceiptText <> '');
+    end;
     #endregion
 
     #region SI Fiscal Thermal Print - Printing Procedures
