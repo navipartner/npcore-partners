@@ -1681,8 +1681,8 @@ codeunit 85087 "NPR POS Get Event Tests"
         Assert.AreEqual(JobPlanningLine."Unit of Measure Code", POSSaleLineRec."Unit of Measure Code", StrSubstNo(ValuesAreDifferentMsg, POSSaleLineRec.FieldCaption("Unit of Measure Code")));
         Assert.AreEqual(JobPlanningLine."Qty. to Transfer to Invoice", POSSaleLineRec.Quantity, StrSubstNo(ValuesAreDifferentMsg, POSSaleLineRec.FieldCaption(Quantity)));
         Assert.AreEqual(JobPlanningLine."Unit Price", POSSaleLineRec."Unit Price", StrSubstNo(ValuesAreDifferentMsg, POSSaleLineRec.FieldCaption("Unit Price")));
-        Assert.AreEqual(JobTask."Global Dimension 1 Code", POSSaleLineRec."Shortcut Dimension 1 Code", StrSubstNo(ValuesAreDifferentMsg, POSSaleLineRec.FieldCaption("Shortcut Dimension 1 Code")));
-        Assert.AreEqual(JobTask."Global Dimension 2 Code", POSSaleLineRec."Shortcut Dimension 2 Code", StrSubstNo(ValuesAreDifferentMsg, POSSaleLineRec.FieldCaption("Shortcut Dimension 2 Code")));
+        Assert.AreEqual(POSSaleRec."Shortcut Dimension 1 Code", POSSaleLineRec."Shortcut Dimension 1 Code", StrSubstNo(ValuesAreDifferentMsg, POSSaleLineRec.FieldCaption("Shortcut Dimension 1 Code")));
+        Assert.AreEqual(POSSaleRec."Shortcut Dimension 2 Code", POSSaleLineRec."Shortcut Dimension 2 Code", StrSubstNo(ValuesAreDifferentMsg, POSSaleLineRec.FieldCaption("Shortcut Dimension 2 Code")));
         Assert.AreEqual(JobPlanningLine."Line Discount %", POSSaleLineRec."Discount %", StrSubstNo(ValuesAreDifferentMsg, POSSaleLineRec.FieldCaption("Discount %")));
         Assert.AreEqual(JobPlanningLine."Line Discount Amount", POSSaleLineRec."Discount Amount", StrSubstNo(ValuesAreDifferentMsg, POSSaleLineRec.FieldCaption("Discount Amount")));
         Assert.AreEqual(false, POSSaleLineRec."Price Includes VAT", StrSubstNo(ValuesAreDifferentMsg, POSSaleLineRec.FieldCaption("Price Includes VAT")));
