@@ -1,0 +1,20 @@
+types:
+  #Extend this and add the missing "payload" from your own webhook types
+  WebhookEvent:
+    properties:
+      initiatingUserAADObjectId: string
+      timestamp: datetime
+      companyName: string
+      companyId: uuid
+      appId: uuid
+      clientState: string
+      eventName: string
+      eventVersion: string
+
+  BcAppId:
+    type: uuid
+    docs: 
+      The unique identifier of the Business Central app.
+    examples:
+      - name: NpCore
+        value: "992c2309-cca4-43cb-9e41-911f482ec088"
