@@ -93,6 +93,36 @@ codeunit 85174 "NPR TM ImportTicketTest"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure ImportOrdersWithLineNumbers()
+    var
+        ItemNo: Code[20];
+        Import: Codeunit "NPR TM Import Ticket Facade";
+        ResponseMessage: Text;
+        Success: Boolean;
+        JobId: Code[40];
+        TempTicketImport: Record "NPR TM ImportTicketHeader" temporary;
+        TempTicketImportLine: Record "NPR TM ImportTicketLine" temporary;
+        Schedules: Dictionary of [Code[20], Time];
+        EventTime: Time;
+        Assert: Codeunit Assert;
+    begin
+        ItemNo := SelectImportTestScenario(Schedules);
+        Schedules.Get('ALL_DAY', EventTime);
+
+        CreateTicketsToImport(ItemNo, Today(), CalcDate('<+5D>'), EventTime, 5, 3, true, TempTicketImport, TempTicketImportLine, true);
+        Success := Import.ImportTicketsFromJson(GenerateJson(TempTicketImport, TempTicketImportLine), false, ResponseMessage, JobId);
+        Assert.AreEqual(true, Success, ResponseMessage);
+
+        ValidateLog(JobId, Success, 5 * 3, ResponseMessage);
+        ValidateHeader(JobId, Success, TempTicketImport);
+        ValidateLine(JobId, Success, TempTicketImportLine);
+        ValidateTickets(JobId);
+        ValidateArrival(JobId);
+    end;
+
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure ImportOrdersReservation()
     var
         ItemNo: Code[20];
@@ -583,6 +613,9 @@ codeunit 85174 "NPR TM ImportTicketTest"
             Assert.AreEqual(TempTicketImportLine.DiscountAmountInclVat, TicketImportLine.DiscountAmountInclVat, TicketImportLine.FieldCaption(DiscountAmountInclVat));
             Assert.AreEqual(TempTicketImportLine.CurrencyCode, TicketImportLine.CurrencyCode, TicketImportLine.FieldCaption(CurrencyCode));
 
+            if (TempTicketImportLine.TicketRequestTokenLine <> 0) then
+                Assert.AreEqual(TempTicketImportLine.TicketRequestTokenLine, TicketImportLine.TicketRequestTokenLine, TicketImportLine.FieldCaption(TicketRequestTokenLine));
+
         until (TempTicketImportLine.Next() = 0);
     end;
 
@@ -685,11 +718,38 @@ codeunit 85174 "NPR TM ImportTicketTest"
         var TempTicketImport: Record "NPR TM ImportTicketHeader" temporary;
         var TempTicketImportLine: Record "NPR TM ImportTicketLine" temporary
         )
+    begin
+        CreateTicketsToImport(
+            ItemReference,
+            SalesDate,
+            ExpectedVisitDate,
+            ExpectedVisitTime,
+            OrdersToGenerate,
+            TicketsPerOrder,
+            WithPaymentReference,
+            TempTicketImport,
+            TempTicketImportLine,
+            false);
+    end;
+
+    local procedure CreateTicketsToImport(
+        ItemReference: Code[20];
+        SalesDate: Date;
+        ExpectedVisitDate: Date;
+        ExpectedVisitTime: Time;
+        OrdersToGenerate: Integer;
+        TicketsPerOrder: Integer;
+        WithPaymentReference: Boolean;
+        var TempTicketImport: Record "NPR TM ImportTicketHeader" temporary;
+        var TempTicketImportLine: Record "NPR TM ImportTicketLine" temporary;
+        AssignOrderLineNumber: Boolean
+        )
     var
         TicketLibrary: Codeunit "NPR Library - Ticket Module";
         OrderIndex, TicketIndex : Integer;
         VatRate, ExchangeRate : Decimal;
         CurrencyCode: Code[10];
+        OrderLineNumber: Integer;
     begin
 
         CurrencyCode := 'EUR';
@@ -704,6 +764,9 @@ codeunit 85174 "NPR TM ImportTicketTest"
             if (WithPaymentReference) then
                 TicketLibrary.GenerateRandomCode(TempTicketImport.PaymentReference, MaxStrLen(TempTicketImport.PaymentReference));
 
+            if (AssignOrderLineNumber) then
+                OrderLineNumber := 10 + Random(10);
+
             TempTicketImport.CurrencyCode := CurrencyCode;
             TicketLibrary.GenerateRandomText(TempTicketImport.TicketHolderEMail, MaxStrLen(TempTicketImport.TicketHolderEMail));
             TempTicketImport.TicketHolderEMail[3 + Random(10)] := '@';
@@ -713,6 +776,8 @@ codeunit 85174 "NPR TM ImportTicketTest"
             for TicketIndex := 1 to TicketsPerOrder do begin
                 TempTicketImportLine.Init();
                 TempTicketImportLine.OrderId := TempTicketImport.OrderId;
+                if (AssignOrderLineNumber) then
+                    TempTicketImportLine.TicketRequestTokenLine += OrderLineNumber + 10 + Random(10);
                 TempTicketImportLine.ItemReferenceNumber := ItemReference;
                 TempTicketImportLine.ExpectedVisitDate := ExpectedVisitDate;
                 TempTicketImportLine.ExpectedVisitTime := ExpectedVisitTime;
@@ -768,6 +833,9 @@ codeunit 85174 "NPR TM ImportTicketTest"
                     Ticket.ReadFrom('{}');
                     Ticket.Add('preAssignedTicketNumber', TempTicketImportLine.PreAssignedTicketNumber);
                     Ticket.Add('itemReferenceNumber', TempTicketImportLine.ItemReferenceNumber);
+                    if (TempTicketImportLine.TicketRequestTokenLine <> 0) then
+                        Ticket.Add('orderLineNumber', TempTicketImportLine.TicketRequestTokenLine);
+
                     Ticket.Add('description', TempTicketImportLine.Description);
                     Ticket.Add('expectedVisitDate', TempTicketImportLine.ExpectedVisitDate);
                     Ticket.Add('expectedVisitTime', TempTicketImportLine.ExpectedVisitTime);

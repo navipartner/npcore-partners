@@ -56,6 +56,9 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
             Archive(Token, _TempTicketImport);
             AuthorizationCode := CopyStr(TicketManagement.GenerateNumberPattern(TicketSetup."Authorization Code Scheme", '-'), 1, MaxStrLen(AuthorizationCode));
             repeat
+                if (_TempTicketImportLine.TicketRequestTokenLine <> 0) then
+                    TokenLine := _TempTicketImportLine.TicketRequestTokenLine;
+
                 Archive(Token, TokenLine, _TempTicketImportLine);
                 CreateTicketRequest(_TempTicketImportLine, AuthorizationCode);
                 TokenLine += 1;

@@ -168,6 +168,7 @@ codeunit 6184689 "NPR TM ImportTicketControl"
                 TempTicketImportLine.Init();
                 TempTicketImportLine.OrderId := TempTicketImport.OrderId;
                 TempTicketImportLine.JobId := JobId;
+                TempTicketImportLine.TicketRequestTokenLine := GetAsInteger(Ticket, 'orderLineNumber', false);
                 TempTicketImportLine.PreAssignedTicketNumber := Format(GetAsText(Ticket, 'preAssignedTicketNumber', MaxStrLen(TempTicketImportLine.PreAssignedTicketNumber), false));
 
                 if TempTicketImportLine.PreAssignedTicketNumber = '' then begin
@@ -239,6 +240,22 @@ codeunit 6184689 "NPR TM ImportTicketControl"
         if (StrLen(KeyValue) > MaxLength) then
             Error(ValueExceedsLength, KeyValue, KeyName, MaxLength);
     end;
+
+    local procedure GetAsInteger(JObject: JsonObject; KeyName: Text; Mandatory: Boolean) KeyValue: Integer
+    var
+        JToken: JsonToken;
+    begin
+        KeyValue := 0;
+
+        if (not JObject.Get(KeyName, JToken)) then begin
+            if (Mandatory) then
+                Error(MandatoryKeyMissing, KeyName);
+            exit;
+        end;
+
+        KeyValue := JToken.AsValue().AsInteger();
+    end;
+
 
     local procedure GetAsDecimal(JObject: JsonObject; KeyName: Text; Mandatory: Boolean) KeyValue: Decimal
     var
