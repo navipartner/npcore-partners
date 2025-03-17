@@ -23,13 +23,15 @@ codeunit 6248278 "NPR POS Action SG Admission" implements "NPR IPOS Workflow"
         case Step of
             'validate_reference':
                 FrontEnd.WorkflowResponse(OnActionValidateReference(Context));
+            'membercard_validation':
+                FrontEnd.WorkflowResponse(OnActionMemberCardValidation(Context));
         end;
     end;
 
     local procedure GetActionScript(): Text
     begin
         exit(
-'let main = async ({workflow ,parameters, context, popup, captions}) => {windowTitle = captions.Welcome;if (!parameters.input_reference_no) {context.input_reference_no = await popup.input({ title: captions.InputReferenceNoTitle, caption: captions.InputReferenceNo });if (!context.input_reference_no) { return };} else {context.input_reference_no = parameters.input_reference_no;}const actionResponse = await workflow.respond("validate_reference");if (actionResponse.success) {toast.success (`Welcome ${actionResponse.table_capt} ${actionResponse.reference_no}`, {title: windowTitle});}};'
+'let main = async ({workflow , parameters, context, popup, captions}) => {let memberCardDetails;windowTitle = captions.Welcome;if (!parameters.input_reference_no) {context.input_reference_no = await popup.input({ title: captions.InputReferenceNoTitle, caption: captions.InputReferenceNo });if (!context.input_reference_no) { return };} else { context.input_reference_no = parameters.input_reference_no; }const actionResponse = await workflow.respond("validate_reference"); memberCardDetails = await workflow.respond("membercard_validation");if (actionResponse.success) {if (memberCardDetails.MemberScanned){toast.memberScanned({memberImg: memberCardDetails.MemberScanned.ImageDataUrl,memberName: memberCardDetails.MemberScanned.Name,validForAdmission: memberCardDetails.MemberScanned.Valid,memberExpiry: memberCardDetails.MemberScanned.ExpiryDate,});}else { toast.success (`Welcome ${actionResponse.table_capt} ${actionResponse.reference_no}`, {title: windowTitle});} }};'
 );
     end;
 
@@ -61,6 +63,23 @@ codeunit 6248278 "NPR POS Action SG Admission" implements "NPR IPOS Workflow"
             Response.Add('table_capt', GetTableCaption(ReferenceNo));
             Response.Add('welcome_message', WelcomeMsg)
         end;
+    end;
+
+    local procedure OnActionMemberCardValidation(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
+    var
+        MemberCard: Record "NPR MM Member Card";
+        POSActionMemberArrival: Codeunit "NPR POS Action: MM Member ArrB";
+        ReferenceNo: Text[100];
+    begin
+        ReferenceNo := CopyStr(Context.GetString('input_reference_no'), 1, MaxStrLen(ReferenceNo));
+        if ReferenceNo = '' then
+            exit;
+
+        MemberCard.SetRange("External Card No.", CopyStr(ReferenceNo, 1, MaxStrLen(MemberCard."External Card No.")));
+        if not MemberCard.FindFirst() then
+            exit;
+
+        POSActionMemberArrival.AddToastMemberScannedData(MemberCard."Entry No.", 0, Response);
     end;
 
     procedure AdmissionCodeParamName(): Text[30];
