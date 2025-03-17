@@ -703,6 +703,8 @@ codeunit 85002 "NPR Library - POS Master Data"
     procedure CreatePartialVoucherType(var VoucherType: Record "NPR NpRv Voucher Type"; AllowTopUp: Boolean)
     var
         LibraryERM: Codeunit "Library - ERM";
+        GeneralPostingSetup: Record "General Posting Setup";
+        GLAccount: Record "G/L Account";
     begin
         VoucherType.Init();
         if (not VoucherType.Get('PARTIAL')) then begin
@@ -710,6 +712,12 @@ codeunit 85002 "NPR Library - POS Master Data"
             VoucherType.Insert();
         end;
         VoucherType."Account No." := LibraryERM.CreateGLAccountWithSalesSetup();
+
+        GLAccount.Get(VoucherType."Account No.");
+        GeneralPostingSetup.Get(GLAccount."Gen. Bus. Posting Group", GLAccount."Gen. Prod. Posting Group");
+        LibraryERM.SetGeneralPostingSetupSalesAccounts(GeneralPostingSetup);
+        GeneralPostingSetup.Modify();
+
         VoucherType."No. Series" := LibraryERM.CreateNoSeriesCode('P');
         VoucherType."Arch. No. Series" := LibraryERM.CreateNoSeriesCode('PA');
         VoucherType."Reference No. Type" := VoucherType."Reference No. Type"::Pattern;
