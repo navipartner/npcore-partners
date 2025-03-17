@@ -167,6 +167,7 @@ service:
             ticketId: $simpleTypes.TicketId.ExampleTicket1
           response:
             body:
+              printedAt: null
               printCount: $simpleTypes.PrintCountResponse.ExamplePrintCount
 
     validateArrival:
@@ -453,6 +454,7 @@ types:
 
   ClearConfirmPrintResponse:
     properties:
+      printedAt: optional<simpleTypes.PrintedAt>
       printCount: simpleTypes.PrintCountResponse
     examples:
       - name: ExampleClearConfirmPrint
