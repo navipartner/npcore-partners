@@ -5,11 +5,9 @@ codeunit 6184931 "NPR Adyen Webhook Processing"
 
     trigger OnRun()
     var
-        ReportReady: Codeunit "NPR Adyen Process Report Ready";
-        AdyenPayByLinkStatus: Codeunit "NPR Adyen PayByLink Status";
         AdyenWebhook: Record "NPR Adyen Webhook";
-        AdyenRecurringContract: Codeunit "NPR Adyen PayByLink Recurring";
-        AdyenRefundStatus: Codeunit "NPR Adyen Refund Status";
+        TryWebhookProcess: Codeunit "NPR Adyen Try Webhook Process";
+        AdyenManagement: Codeunit "NPR Adyen Management";
     begin
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         AdyenWebhook.ReadIsolation := IsolationLevel::UpdLock;
@@ -19,23 +17,14 @@ codeunit 6184931 "NPR Adyen Webhook Processing"
         AdyenWebhook.Get(Rec."Entry No.");
         if AdyenWebhook.Status = AdyenWebhook.Status::Processed then
             exit;
-        case AdyenWebhook."Event Code" of
-            "NPR Adyen Webhook Event Code"::REPORT_AVAILABLE:
-                begin
-                    ReportReady.ProcessReportReadyWebhook(AdyenWebhook);
-                end;
-            "NPR Adyen Webhook Event Code"::AUTHORISATION:
-                begin
-                    AdyenPayByLinkStatus.Run(AdyenWebhook);
-                end;
-            "NPR Adyen Webhook Event Code"::RECURRING_CONTRACT:
-                begin
-                    AdyenRecurringContract.Run(AdyenWebhook);
-                end;
-            "NPR Adyen Webhook Event Code"::REFUND:
-                begin
-                    AdyenRefundStatus.Run(AdyenWebhook);
-                end;
+
+        Commit();
+        if not TryWebhookProcess.Run(AdyenWebhook) then begin
+            AdyenManagement.CreateGeneralLog(Enum::"NPR Adyen Webhook Log Type"::Error, false, GetLastErrorText(), Rec."Entry No.");
+            AdyenWebhook.Status := Rec.Status::Error;
+            AdyenWebhook."Processed Date" := CurrentDateTime();
+            AdyenWebhook.Modify();
         end;
+        Commit();
     end;
 }

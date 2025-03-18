@@ -189,8 +189,6 @@ page 6184665 "NPR Adyen Webhooks"
                     AdyenWebhook: Record "NPR Adyen Webhook";
                     ConfirmProcessLbl: Label 'This will process the selected Webhook/Webhooks.\\Do you wish to proceed?';
                     AdyenWebhookProcessing: Codeunit "NPR Adyen Webhook Processing";
-                    AdyenManagement: Codeunit "NPR Adyen Management";
-                    LogType: enum "NPR Adyen Webhook Log Type";
                 begin
                     CurrPage.SetSelectionFilter(AdyenWebhook);
                     AdyenWebhook.SetFilter(Status, '%1|%2|%3', AdyenWebhook.Status::Canceled, AdyenWebhook.Status::New, AdyenWebhook.Status::Error);
@@ -200,12 +198,7 @@ page 6184665 "NPR Adyen Webhooks"
                         exit;
                     if AdyenWebhook.FindSet() then
                         repeat
-                            if not AdyenWebhookProcessing.Run(AdyenWebhook) then begin
-                                AdyenManagement.CreateGeneralLog(LogType::Error, false, GetLastErrorText(), AdyenWebhook."Entry No.");
-                                AdyenWebhook.Status := AdyenWebhook.Status::Error;
-                                AdyenWebhook.Modify();
-                                Commit();
-                            end;
+                            AdyenWebhookProcessing.Run(AdyenWebhook);
                         until AdyenWebhook.Next() = 0;
                     CurrPage.Update(false);
                 end;
