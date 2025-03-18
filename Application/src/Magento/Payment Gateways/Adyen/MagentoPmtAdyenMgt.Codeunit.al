@@ -940,15 +940,14 @@
     internal procedure CheckUnproccesedWebhook(var PaymentLine: Record "NPR Magento Payment Line")
     var
         AdyenWebhook: Record "NPR Adyen Webhook";
-        AdyenPayByLinkStatus: Codeunit "NPR Adyen PayByLink Status";
+        WebhookProcessing: Codeunit "NPR Adyen Webhook Processing";
     begin
         AdyenWebhook.SetRange("PSP Reference", PaymentLine."Payment ID");
         AdyenWebhook.SetRange(Status, AdyenWebhook.Status::New);
         if not AdyenWebhook.FindLast() then
             exit;
 
-        AdyenPayByLinkStatus.Run(AdyenWebhook);
-        Commit();
+        WebhookProcessing.Run(AdyenWebhook);
 
         PaymentLine.GetBySystemId(PaymentLine.SystemId);
     end;

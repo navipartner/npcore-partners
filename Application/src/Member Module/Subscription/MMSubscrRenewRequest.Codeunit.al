@@ -127,7 +127,7 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
         MemberPaymentMethod.TestField("Payment Token");
     end;
 
-    local procedure GetBatchNo(): Integer
+    internal procedure GetBatchNo(): Integer
     var
         SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
     begin

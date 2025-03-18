@@ -836,7 +836,9 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
             exit;
         end;
 
-        if not TryCreatePayByLinkSubscriptionRequest(SubscrPaymentRequest, PayByLinkSubscrPaymentRequest, PayByLinkSubscrRequest) then begin
+        Commit();
+
+        if not CreatePayByLinkSubscriptionRequest(SubscrPaymentRequest, PayByLinkSubscrPaymentRequest, PayByLinkSubscrRequest) then begin
             ErrorMessage := GetLastErrorText();
             ProcessResponse(SubscrPaymentRequest,
                             SubsPayReqLogEntry,
@@ -1092,7 +1094,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                         0);
     end;
 
-    procedure ProcessRefundWebhook(var JsonObjectToken: JsonToken; var MMSubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; Success: Text; WebhookEntryNo: Integer)
+    procedure ProcessRefundWebhook(var JsonObjectToken: JsonToken; var MMSubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; Success: Text; WebhookEntryNo: Integer) Processed: Boolean;
     var
         ErrorMessage: Text;
         JsonValueToken: JsonToken;
@@ -1168,9 +1170,11 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                 '',
                 0DT,
                 WebhookEntryNo);
+
+        Processed := true;
     end;
 
-    procedure ProcessPayByLinkWebhook(JsonObjectToken: JsonToken; var AdyenWebhook: Record "NPR Adyen Webhook"; MMSubscrPaymentRequest: Record "NPR MM Subscr. Payment Request")
+    procedure ProcessPayByLinkWebhook(JsonObjectToken: JsonToken; var AdyenWebhook: Record "NPR Adyen Webhook"; MMSubscrPaymentRequest: Record "NPR MM Subscr. Payment Request") Processed: Boolean;
     var
         JsonValueToken: JsonToken;
         JsonAddDataToken: JsonToken;
@@ -1253,6 +1257,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                         MMSubscrPaymentRequest."Pay by Link URL",
                         MMSubscrPaymentRequest."Pay By Link Expires At",
                         AdyenWebhook."Entry No.");
+
+        Processed := true;
     end;
 
 
@@ -2123,58 +2129,21 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         end;
     end;
 
-    [TryFunction]
-    local procedure TryCreatePayByLinkSubscriptionRequest(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var PayByLinkSubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var PayByLinkSubscriptionRequest: Record "NPR MM Subscr. Request")
+
+    local procedure CreatePayByLinkSubscriptionRequest(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var PayByLinkSubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var PayByLinkSubscriptionRequest: Record "NPR MM Subscr. Request") Success: Boolean
     var
-        SubscriptionRequest: Record "NPR MM Subscr. Request";
+        SubsTryMethods: Codeunit "NPR MM Subs Try Methods";
     begin
-        SubscriptionRequest.Get(SubscrPaymentRequest."Subscr. Request Entry No.");
+        Clear(SubsTryMethods);
+        SubsTryMethods.SetSubscriptionRequestEntryNo(SubscrPaymentRequest."Subscr. Request Entry No.");
+        SubsTryMethods.SetSubscriptionPaymentRequestEntryNo(SubscrPaymentRequest."Entry No.");
+        SubsTryMethods.SetProcessingOption(1);
+        Success := SubsTryMethods.Run();
+        if not Success then
+            exit;
 
-        PayByLinkSubscriptionRequest.Init();
-        PayByLinkSubscriptionRequest."Subscription Entry No." := SubscriptionRequest."Subscription Entry No.";
-        PayByLinkSubscriptionRequest.Type := PayByLinkSubscriptionRequest.Type::Renew;
-        PayByLinkSubscriptionRequest."Item No." := SubscriptionRequest."Item No.";
-        PayByLinkSubscriptionRequest.Description := SubscriptionRequest.Description;
-        PayByLinkSubscriptionRequest.Amount := SubscriptionRequest.Amount;
-        PayByLinkSubscriptionRequest."Currency Code" := SubscriptionRequest."Currency Code";
-        PayByLinkSubscriptionRequest."New Valid From Date" := SubscriptionRequest."New Valid From Date";
-        PayByLinkSubscriptionRequest."New Valid Until Date" := SubscriptionRequest."New Valid Until Date";
-        PayByLinkSubscriptionRequest."Created from Entry No." := SubscrPaymentRequest."Entry No.";
-        PayByLinkSubscriptionRequest.Insert();
-
-        CreatePayByLinkSubscrPaymentRequest(SubscrPaymentRequest, PayByLinkSubscrPaymentRequest, PayByLinkSubscriptionRequest);
-
-    end;
-
-    local procedure GetBatchNo() BatchNo: Integer;
-    var
-        SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
-    begin
-#if not (BC17 or BC18 or BC19 or BC20 or BC21)
-        SubscrPaymentRequest.ReadIsolation := IsolationLevel::UpdLock;
-#else
-            SubscrPaymentRequest.LockTable();
-#endif
-        SubscrPaymentRequest.SetCurrentKey("Batch No.");
-        if SubscrPaymentRequest.FindLast() then
-            BatchNo := SubscrPaymentRequest."Batch No." + 1
-        else
-            BatchNo := 1;
-    end;
-
-    local procedure CreatePayByLinkSubscrPaymentRequest(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var NewSubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var NewSubscriptionRequest: Record "NPR MM Subscr. Request")
-    begin
-        NewSubscrPaymentRequest.Init();
-        NewSubscrPaymentRequest."Entry No." := 0;
-        NewSubscrPaymentRequest."Batch No." := GetBatchNo();
-        NewSubscrPaymentRequest."Subscr. Request Entry No." := NewSubscriptionRequest."Entry No.";
-        NewSubscrPaymentRequest.Status := NewSubscrPaymentRequest.Status::New;
-        NewSubscrPaymentRequest.PSP := SubscrPaymentRequest.PSP;
-        NewSubscrPaymentRequest.Amount := SubscrPaymentRequest.Amount;
-        NewSubscrPaymentRequest."Currency Code" := SubscrPaymentRequest."Currency Code";
-        NewSubscrPaymentRequest.Description := SubscrPaymentRequest.Description;
-        NewSubscrPaymentRequest.Type := NewSubscrPaymentRequest.Type::PayByLink;
-        NewSubscrPaymentRequest.Insert();
+        SubsTryMethods.GetPayByLinkSubscriptionRequest(PayByLinkSubscriptionRequest);
+        SubsTryMethods.GetPayByLinkSubscriptionPaymentRequest(PayByLinkSubscrPaymentRequest);
     end;
 
     [TryFunction]
