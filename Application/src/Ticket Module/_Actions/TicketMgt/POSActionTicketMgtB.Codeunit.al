@@ -46,7 +46,7 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
         ResponseText := StrSubstNo(SingleTicketsAdmittedMessage, AdmittedCount);
     end;
 
-    internal procedure RevokeTicketReservation(POSSession: Codeunit "NPR POS Session"; ExternalTicketNumber: Code[50])
+    internal procedure RevokeTicketReservation(POSSession: Codeunit "NPR POS Session"; ExternalTicketNumber: Code[50]): Guid
     var
         TicketManagement: Codeunit "NPR TM Ticket Management";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
@@ -87,6 +87,8 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
         SaleLinePOS."No." := Ticket."Item No.";
         SaleLinePOS."Variant Code" := Ticket."Variant Code";
         SaleLinePOS.Quantity := -1;
+        SaleLinePOS.Description := ExternalTicketNumber;
+        SaleLinePOS."Description 2" := TicketReservationRequest."Scheduled Time Description";
 
         SaleLinePOS."Return Sale Sales Ticket No." := Ticket."Sales Receipt No.";
 
@@ -129,6 +131,7 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
         POSSaleLine.SetUnitPrice(UnitPrice);
         AddAdditionalExperienceRevokeLines(POSSession, Ticket, SaleLinePOS."Sales Ticket No.");
 
+        exit(SaleLinePOS.SystemId);
     end;
 
     internal procedure EditReservation(POSSession: Codeunit "NPR POS Session"; TicketReference: Code[50])
