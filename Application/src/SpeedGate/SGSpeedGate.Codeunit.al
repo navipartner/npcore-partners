@@ -266,6 +266,9 @@ codeunit 6185130 "NPR SG SpeedGate"
         TicketCount: Integer;
         ValidFromDate, ValidUntilDate : Date;
         InvalidRequest: Label 'Invalid Validation Request';
+        NoTimeFramesError: Label 'Membership is not valid, it has no timeframes. Please contact the support team for assistance.';
+        NotValidForTodayError: Label 'Membership is not valid for today, it is valid from %1 until %2.';
+        GuestCardinalityError: Label 'The number of guests requested (%1) exceeds the maximum number of guests in setup (%2)';
     begin
 
         if (Quantity < 1) then
@@ -287,8 +290,11 @@ codeunit 6185130 "NPR SG SpeedGate"
         if (MemberManagement.MembershipNeedsActivation(MemberCard."Membership Entry No.")) then
             MemberManagement.ActivateMembershipLedgerEntry(MemberCard."Membership Entry No.", Today());
 
-        if (not MemberManagement.GetMembershipValidDate(MemberCard."Membership Entry No.", Today(), ValidFromDate, ValidUntilDate)) then
-            Error('Membership is not valid for today, it is valid from %1 until %2', ValidFromDate, ValidUntilDate);
+        if (not MemberManagement.GetMembershipValidDate(MemberCard."Membership Entry No.", Today(), ValidFromDate, ValidUntilDate)) then begin
+            if (ValidFromDate = 0D) and (ValidUntilDate = 0D) then
+                Error(NoTimeFramesError);
+            Error(NotValidForTodayError, ValidFromDate, ValidUntilDate);
+        end;
 
         ResponseMessage := '';
         ValidationRequest.MemberCardLogEntryNo := MemberLimitationMgr.WS_CheckLimitMemberCardArrival(MemberCard."External Card No.", ValidationRequest.AdmissionCode, ValidationRequest.ScannerId, LogEntryNo, ResponseMessage, ResponseCode);
@@ -315,7 +321,7 @@ codeunit 6185130 "NPR SG SpeedGate"
                     MembershipAdmissionSetup.GetBySystemId(ValidationRequest.ExtraEntityId);
                     if (MembershipAdmissionSetup."Cardinality Type" = MembershipAdmissionSetup."Cardinality Type"::LIMITED) then
                         if (Quantity > MembershipAdmissionSetup."Max Cardinality") then
-                            Error('The number of guests requested (%1) exceeds the maximum cardinality for the guest setup (%2)', Quantity, MembershipAdmissionSetup."Max Cardinality");
+                            Error(GuestCardinalityError, Quantity, MembershipAdmissionSetup."Max Cardinality");
 
                     for TicketCount := 2 to Quantity do begin
                         ExtraGuestValidationRequest := ValidationRequest;
