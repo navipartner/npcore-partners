@@ -1208,4 +1208,9 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'SPEEDGATE_ADMISSSION', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action SG Admission";
     }
+    value(6248358; TM_REBOOK_FOR_TODAY)
+    {
+        Caption = 'TM_REBOOK_FOR_TODAY', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction TMRebookForToday";
+    }
 }

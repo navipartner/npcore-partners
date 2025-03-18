@@ -641,6 +641,8 @@
                 exit;
             if (TicketRequestManager.IsRequestStatusConfirmed(Token)) then
                 exit;
+            if (TicketRequestManager.IsConfirmedRevokeRequest(Token)) then
+                exit;
 
             TicketRequestManager.DeleteReservationRequest(Token, true);
         end;

@@ -1433,9 +1433,9 @@
         ReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
-
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         DetTicketAccessEntry2: Record "NPR TM Det. Ticket AccessEntry";
+
         TotalRefundAmount: Decimal;
         AdmissionRefundAmount: Decimal;
         TotalPct: Decimal;
@@ -1825,6 +1825,19 @@
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         if (TicketReservationRequest.FindFirst()) then
             exit(TicketReservationRequest."Revoke Ticket Request");
+
+        exit(false);
+    end;
+
+    procedure IsConfirmedRevokeRequest(Token: Text[100]): Boolean
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+
+        TicketReservationRequest.SetCurrentKey("Session Token ID");
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        if (TicketReservationRequest.FindFirst()) then
+            exit((TicketReservationRequest."Revoke Ticket Request") and (TicketReservationRequest."Request Status" = TicketReservationRequest."Request Status"::CANCELED));
 
         exit(false);
     end;
