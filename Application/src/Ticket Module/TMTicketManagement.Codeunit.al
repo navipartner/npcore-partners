@@ -104,6 +104,11 @@
         IsValid: Boolean;
     begin
         TicketRequestManager.LockResources('IssueTicketsFromToken');
+
+        if (TicketRequestManager.IsChangeRequest(Token)) then begin
+            TicketRequestManager.ConfirmReservationRequestWithValidate(Token, TokenLineNumber);
+        end;
+
         if (TicketRequestManager.IsReservationRequest(Token)) then begin
 
             Ticket.Reset();
@@ -1057,10 +1062,37 @@
 
                 NotifyParticipant.CreateAdmissionWelcomeReminder(TicketAccessEntry, Ticket."External Member Card No.");
                 NotifyParticipant.CreateAdmissionReservationReminder(TicketAccessEntry, Ticket."External Member Card No.");
+            end;
+        until (AdmissionBOM.Next() = 0);
+    end;
 
+    internal procedure CreatePaymentEntryType(Ticket: Record "NPR TM Ticket"; PaymentType: Option PAYMENT,PREPAID,POSTPAID; PaymentReferenceNo: Code[20]; CustomerNo: Code[20]; AdmissionCode: Code[20])
+    var
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        Item: Record Item;
+        TicketType: Record "NPR TM Ticket Type";
+        Admission: Record "NPR TM Admission";
+        NotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
+    begin
+        Item.Get(Ticket."Item No.");
+        TicketType.Get(Item."NPR Ticket Type");
+        Admission.Get(AdmissionCode);
+        TicketAccessEntry.SetCurrentKey("Ticket No.", "Admission Code");
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
+
+        if (TicketAccessEntry.FindFirst()) then begin
+            RegisterPayment_Worker(TicketAccessEntry."Entry No.", PaymentType, PaymentReferenceNo);
+
+            if (CustomerNo <> '') then begin
+                TicketAccessEntry."Customer No." := CustomerNo;
+                TicketAccessEntry.Modify();
             end;
 
-        until (AdmissionBOM.Next() = 0);
+            NotifyParticipant.CreateAdmissionWelcomeReminder(TicketAccessEntry, Ticket."External Member Card No.");
+            NotifyParticipant.CreateAdmissionReservationReminder(TicketAccessEntry, Ticket."External Member Card No.");
+
+        end;
     end;
 
     procedure AttemptChangeConfirmedTicketQuantity(TicketNo: Code[20]; AdmissionCode: Code[20]; NewTicketQuantity: Integer; var ResponseMessage: Text): Boolean

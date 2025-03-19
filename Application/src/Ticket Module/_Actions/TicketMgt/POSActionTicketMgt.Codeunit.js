@@ -1,5 +1,4 @@
-let main = async ({ workflow, context, popup, parameters, captions}) => 
-{
+let main = async ({ workflow, context, popup, parameters, captions }) => {
     var functionNames = [
         "Admission Count",
         "Register Arrival",
@@ -18,7 +17,7 @@ let main = async ({ workflow, context, popup, parameters, captions}) =>
         "Standard",
         "MPOS NFC Scan"
     ];
-    
+
     let functionId = Number(parameters.Function);
     let inputId = Number(parameters.InputMethod);
     let inputMethod = inputNames[inputId];
@@ -29,15 +28,15 @@ let main = async ({ workflow, context, popup, parameters, captions}) =>
     await workflow.respond("ConfigureWorkflow", actionSettings);
     debugger;
 
-    let ticketNumber; 
+    let ticketNumber;
     if (context.ShowTicketDialog) {
         if (inputMethod === "Standard") {
-            ticketNumber = await popup.input ({
-                caption: captions.TicketPrompt, 
+            ticketNumber = await popup.input({
+                caption: captions.TicketPrompt,
                 title: windowTitle
             });
-            
-            if (!ticketNumber) 
+
+            if (!ticketNumber)
                 return;
 
         } else if (inputMethod === "MPOS NFC Scan") {
@@ -65,9 +64,9 @@ let main = async ({ workflow, context, popup, parameters, captions}) =>
     actionSettings.TicketNumber = ticketNumber;
     await workflow.respond("RefineWorkflow", actionSettings);
     let ticketQuantity;
-    if (context.ShowTicketQtyDialog) { 
+    if (context.ShowTicketQtyDialog) {
         ticketQuantity = await popup.numpad({
-            caption: captions.TicketQtyPrompt.substitute(context.TicketMaxQty), 
+            caption: captions.TicketQtyPrompt.substitute(context.TicketMaxQty),
             title: windowTitle
         });
         if (ticketQuantity === null) // cancel returns null
@@ -76,25 +75,29 @@ let main = async ({ workflow, context, popup, parameters, captions}) =>
     let ticketReference;
     if (context.ShowReferenceDialog) {
         ticketReference = await popup.input({
-            caption: captions.ReferencePrompt, 
+            caption: captions.ReferencePrompt,
             title: windowTitle
         });
         if (ticketReference === null) // cancel returns null
             return;
     }
     if (context.UseFrontEndUx) {
-
         const scheduleSelection = await workflow.run('TM_SCHEDULE_SELECT', {
             context: {
                 TicketToken: context.TicketToken,
                 EditTicketHolder: functionId === 3 || functionId === 5,
-                EditSchedule: functionId === 3
+                EditSchedule: functionId === 3 || functionId === 10,
+                FunctionId: functionId
             }
-        })
+        });
 
         if (scheduleSelection.cancel) {
-            toast.warning ('Schedule not updated', {title: windowTitle});
+            toast.warning('Schedule not updated', { title: windowTitle });
             return;
+        }
+        if (functionId === 10)
+        {
+            const actionResponse2 = await workflow.respond("FinalizeTicketChange", actionSettings);
         }
 
     } else {
@@ -103,18 +106,19 @@ let main = async ({ workflow, context, popup, parameters, captions}) =>
         const actionResponse = await workflow.respond("DoAction", actionSettings);
 
         if (actionResponse.coupon) {
-            toast.success (`Coupon: ${actionResponse.coupon.reference_no}`, {title: windowTitle});
+            toast.success(`Coupon: ${actionResponse.coupon.reference_no}`, { title: windowTitle });
             await workflow.run('SCAN_COUPON', { parameters: { ReferenceNo: actionResponse.coupon.reference_no } });
         }
     }
 
-    if (context.Verbose) { 
-        await popup.message ({
-            caption: context.VerboseMessage, 
-            title: windowTitle});
+    if (context.Verbose) {
+        await popup.message({
+            caption: context.VerboseMessage,
+            title: windowTitle
+        });
     } else {
-        if(context.VerboseMessage){ 
-            toast.success (context.VerboseMessage, {title: windowTitle});
+        if (context.VerboseMessage) {
+            toast.success(context.VerboseMessage, { title: windowTitle });
         }
     }
 

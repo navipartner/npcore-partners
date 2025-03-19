@@ -34,9 +34,36 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
         SuggestNotificationAddress: Text[100];
         SuggestTicketHolderName: Text[100];
         Token: Text[100];
+        NewToken: Text[100];
         ForceEditTicketHolder: Boolean;
+        FunctionId: Integer;
+        Ticket: Record "NPR TM Ticket";
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        POSFunction: Codeunit "NPR POS Action - Ticket Mgt B.";
+        POSSession: Codeunit "NPR POS Session";
+        TicketReference: Code[50];
     begin
         Token := CopyStr(Context.GetString('TicketToken'), 1, MaxStrLen(Token));
+        Context.GetInteger('FunctionId', FunctionId);
+
+        if FunctionId = 10 then begin //if ticket request has all lines confirmed, not need to create request?
+            TicketRequest.SetCurrentKey("Session Token ID");
+            TicketRequest.SetFilter("Session Token ID", '=%1', Token);
+            if TicketRequest.FindFirst() then begin
+                Ticket.SetRange("Ticket Reservation Entry No.", TicketRequest."Entry No.");
+                if Ticket.FindFirst() then
+                    TicketReference := Ticket."External Ticket No.";
+            end;
+
+            if TicketReference = '' then
+                TicketReference := CopyStr(Token, 1, MaxStrLen(TicketReference));
+
+            POSFunction.AddAdditionalExperience(POSSession, TicketReference);
+        end;
+
+        NewToken := GetNewTicketToken(Token);
+        if NewToken <> '' then
+            Context.SetContext('TicketToken', NewToken);
 
         Response.Add('ticketHolderTitle', 'Ticket Holder');
         Response.Add('ticketHolderCaption', 'Please provide ticket holder information.');
@@ -63,6 +90,27 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
         Response.Add('CaptureTicketHolder', RequireParticipantInformation in [RequireParticipantInformation::OPTIONAL, RequireParticipantInformation::REQUIRED]);
 
         exit;
+    end;
+
+    local procedure GetNewTicketToken(TicketReference: Code[100]) Token: Text[100]
+    var
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketRequestEntryNo: Integer;
+    begin
+        if (TicketReference <> '') then begin
+            TicketRequest.SetCurrentKey("Session Token ID");
+            TicketRequest.SetFilter("Session Token ID", '=%1', TicketReference);
+            if TicketRequest.FindFirst() then
+                TicketRequestEntryNo := TicketRequest."Entry No.";
+        end;
+
+        if TicketRequestEntryNo <> 0 then begin
+            Clear(TicketRequest);
+            TicketRequest.SetFilter("Request Status", '%1|%2|%3', TicketRequest."Request Status"::REGISTERED, TicketRequest."Request Status"::WIP, TicketRequest."Request Status"::OPTIONAL);
+            TicketRequest.SetRange("Superseeds Entry No.", TicketRequestEntryNo);
+            if TicketRequest.FindLast() then
+                Token := TicketRequest."Session Token ID";
+        end;
     end;
 
     local procedure SetTicketHolder(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject

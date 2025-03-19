@@ -644,8 +644,9 @@
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
         TicketManagement: Codeunit "NPR TM Ticket Management";
+        EntryNos: List of [Integer];
+        EntryNo: Integer;
     begin
-
         TicketReservationRequest.Reset();
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
@@ -653,6 +654,7 @@
             TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', TokenLineNumber);
         TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::CONFIRMED);
 
+        TicketReservationRequest.SetFilter("Admission Inclusion", '=%1', TicketReservationRequest."Admission Inclusion"::REQUIRED);
         TicketReservationRequest.FindSet();
         repeat
             if (TicketReservationRequest.Default) then
@@ -660,7 +662,7 @@
 
             Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
             if (Ticket.FindSet()) then begin
-
+                EntryNos.Add(Ticket."Ticket Reservation Entry No.");
                 repeat
 
                     if (TicketReservationRequest."Payment Option" <> TicketReservationRequest."Payment Option"::UNPAID) then
@@ -669,6 +671,21 @@
                 until (Ticket.Next() = 0);
             end;
         until (TicketReservationRequest.Next() = 0);
+
+        TicketReservationRequest.SetFilter("Admission Inclusion", '=%1', TicketReservationRequest."Admission Inclusion"::SELECTED);
+        if TicketReservationRequest.FindSet() then
+            repeat
+                foreach EntryNo in EntryNos do begin
+                    Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', EntryNo);
+                    if (Ticket.FindSet()) then begin
+                        repeat
+                            if (TicketReservationRequest."Payment Option" <> TicketReservationRequest."Payment Option"::UNPAID) then
+                                TicketManagement.CreatePaymentEntryType(Ticket, TicketReservationRequest."Payment Option", TicketReservationRequest."External Order No.", TicketReservationRequest."Customer No.", TicketReservationRequest."Admission Code");
+
+                        until (Ticket.Next() = 0);
+                    end;
+                end;
+            until (TicketReservationRequest.Next() = 0);
     end;
 
     procedure ConfirmReservationRequest(Token: Text[100]; var ResponseMessage: Text) ReservationConfirmed: Boolean
@@ -1811,7 +1828,19 @@
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         if (TicketReservationRequest.FindFirst()) then
-            exit(not TicketReservationRequest."Revoke Ticket Request");
+            exit((not TicketReservationRequest."Revoke Ticket Request") and (TicketReservationRequest."Entry Type" = TicketReservationRequest."Entry Type"::PRIMARY));
+
+        exit(false);
+    end;
+
+    procedure IsChangeRequest(Token: Text[100]): Boolean
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+        TicketReservationRequest.SetCurrentKey("Session Token ID");
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        if (TicketReservationRequest.FindFirst()) then
+            exit((not TicketReservationRequest."Revoke Ticket Request") and (TicketReservationRequest."Entry Type" = TicketReservationRequest."Entry Type"::CHANGE));
 
         exit(false);
     end;
