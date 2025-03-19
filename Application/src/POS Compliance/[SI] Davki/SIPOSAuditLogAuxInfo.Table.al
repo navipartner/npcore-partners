@@ -191,6 +191,11 @@ table 6059838 "NPR SI POS Audit Log Aux. Info"
             DataClassification = CustomerContent;
             TableRelation = "NPR SI Salesbook Receipt";
         }
+        field(50; "Collect in Store"; Boolean)
+        {
+            Caption = 'Collect in Store';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

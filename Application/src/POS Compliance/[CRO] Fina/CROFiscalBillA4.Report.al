@@ -184,8 +184,6 @@ report 6014554 "NPR CRO Fiscal Bill A4"
         Customer: Record Customer;
         POSEntry: Record "NPR POS Entry";
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
-        SalesHeader: Record "Sales Header";
-        SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesInvoiceLine: Record "Sales Invoice Line";
         SalesLine: Record "Sales Line";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
@@ -232,7 +230,6 @@ report 6014554 "NPR CRO Fiscal Bill A4"
                 SalesLine.SetRange("Document No.", SalesOrderNo);
                 SalesLine.SetFilter(Type, '<>%1', SalesLine.Type::" ");
                 if SalesLine.FindSet() then begin
-                    SalesHeader.Get(SalesHeader."Document Type"::Order, SalesOrderNo);
                     NextLineNo := GetNextLineNo(POSEntrySalesLines, POSEntry."Entry No.");
 
                     repeat
@@ -262,7 +259,6 @@ report 6014554 "NPR CRO Fiscal Bill A4"
                 SalesInvoiceLine.SetRange("Document No.", PostedSalesInvoiceNo);
                 SalesInvoiceLine.SetFilter(Type, '<>%1', SalesInvoiceLine.Type::" ");
                 if SalesInvoiceLine.FindSet() then begin
-                    SalesInvoiceHeader.Get(SalesInvoiceLine."Document No.");
                     NextLineNo := GetNextLineNo(POSEntrySalesLines, POSEntry."Entry No.");
 
                     repeat
@@ -298,7 +294,7 @@ report 6014554 "NPR CRO Fiscal Bill A4"
 
     local procedure FillSalesCrMemoRecords(CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; var POSEntrySalesLines: Record "NPR POS Entry Sales Line" temporary; var POSEntryTaxLines: Record "NPR POS Entry Tax Line" temporary; var POSEntryPaymentLines: Record "NPR POS Entry Payment Line" temporary)
     var
-        SalesCreditHeader: Record "Sales Cr.Memo Header";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
         AmountInclTaxDict: Dictionary of [Decimal, Decimal];
@@ -306,15 +302,15 @@ report 6014554 "NPR CRO Fiscal Bill A4"
         TaxAmountDict: Dictionary of [Decimal, Decimal];
         NextLineNo: Integer;
     begin
-        if not SalesCreditHeader.Get(CROPOSAuditLogAuxInfo."Source Document No.") then
+        if not SalesCrMemoHeader.Get(CROPOSAuditLogAuxInfo."Source Document No.") then
             exit;
 
-        if SalespersonPurchaser.Get(SalesCreditHeader."Salesperson Code") then
+        if SalespersonPurchaser.Get(SalesCrMemoHeader."Salesperson Code") then
             OperatorName := SalespersonPurchaser.Name;
 
-        CustomerAddress := SalesCreditHeader."Sell-to Address";
-        CustomerName := SalesCreditHeader."Sell-to Customer Name";
-        CustomerPostCity := SalesCreditHeader."Sell-to Post Code" + ' ' + SalesCreditHeader."Sell-to City";
+        CustomerAddress := SalesCrMemoHeader."Sell-to Address";
+        CustomerName := SalesCrMemoHeader."Sell-to Customer Name";
+        CustomerPostCity := SalesCrMemoHeader."Sell-to Post Code" + ' ' + SalesCrMemoHeader."Sell-to City";
 
         POSEntryPaymentLines.Init();
         POSEntryPaymentLines."POS Payment Method Code" := Format(CROPOSAuditLogAuxInfo."Payment Method");
