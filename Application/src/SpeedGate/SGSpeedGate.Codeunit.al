@@ -18,6 +18,14 @@ codeunit 6185130 "NPR SG SpeedGate"
 
     internal procedure CreateAdmitToken(ReferenceNumber: Text[100]; AdmissionCode: Code[20]; ScannerId: Code[10]) AdmitToken: Guid
     var
+        ErrorMessage: Text;
+        HaveError: Boolean;
+    begin
+        exit(CreateAdmitToken(ReferenceNumber, AdmissionCode, ScannerId, false, HaveError, ErrorMessage));
+    end;
+
+    internal procedure CreateAdmitToken(ReferenceNumber: Text[100]; AdmissionCode: Code[20]; ScannerId: Code[10]; FailWithError: Boolean; var HaveError: Boolean; var ErrorMessage: Text) AdmitToken: Guid
+    var
         EntryNo: Integer;
         ValidationRequest: Record "NPR SGEntryLog";
     begin
@@ -25,19 +33,54 @@ codeunit 6185130 "NPR SG SpeedGate"
         CheckNumberAtGate(EntryNo);
         ValidationRequest.Get(EntryNo);
 
+        HaveError := CheckAdmitTokenForError(ValidationRequest.Token, FailWithError, ErrorMessage);
+
         AdmitToken := ValidationRequest.Token; // Note, multiple records can be created in CheckNumberAtGate having the same Token
+    end;
+
+    internal procedure CheckAdmitTokenForError(Token: Guid; ThrowError: Boolean; var ErrorMessage: Text) InvalidToken: Boolean
+    var
+        ValidationRequest: Record "NPR SGEntryLog";
+        ApiError: Enum "NPR API Error Code";
+    begin
+        InvalidToken := true;
+
+        ValidationRequest.SetCurrentKey(Token);
+        ValidationRequest.SetFilter(Token, '=%1', Token);
+        ValidationRequest.SetFilter(EntryStatus, '<>%1', ValidationRequest.EntryStatus::PERMITTED_BY_GATE);
+        if (not ValidationRequest.FindSet()) then
+            exit(not InvalidToken);
+
+        InvalidToken := true;
+
+        if (ValidationRequest.ApiErrorNumber <> 0) then begin
+            ApiError := Enum::"NPR API Error Code".FromInteger(ValidationRequest.ApiErrorNumber);
+            ErrorMessage := StrSubstNo('%1 %2', Format(ApiError, 0, 1), ValidationRequest.ApiErrorMessage);
+        end;
+
+        if (ValidationRequest.ApiErrorNumber = 0) then
+            ErrorMessage := ValidationRequest.ApiErrorMessage;
+
+        if (ErrorMessage = '') then
+            ErrorMessage := StrSubstNo('The admit token is not valid: %1', ValidationRequest.EntryStatus);
+
+        if (ThrowError) then
+            Error(ErrorMessage);
+
+        exit(InvalidToken);
     end;
 
     internal procedure Admit(Token: Guid; Quantity: Integer)
     var
         ValidationRequest: Record "NPR SGEntryLog";
         TicketId: Guid;
+        ReasonMessage: Text;
     begin
         ValidationRequest.SetCurrentKey(Token);
         ValidationRequest.SetFilter(Token, '=%1', Token);
         ValidationRequest.SetFilter(EntryStatus, '=%1', ValidationRequest.EntryStatus::PERMITTED_BY_GATE);
         if (not ValidationRequest.FindSet()) then
-            Error('The admit token is not valid');
+            CheckAdmitTokenForError(Token, true, ReasonMessage);
 
         repeat
             if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::TICKET) then
@@ -68,6 +111,7 @@ codeunit 6185130 "NPR SG SpeedGate"
     var
         ThisCodeunit: Codeunit "NPR SG SpeedGate";
     begin
+
         ThisCodeunit.SetAdmitToken(Token, Quantity);
         ClearLastError();
 

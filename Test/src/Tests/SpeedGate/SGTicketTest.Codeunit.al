@@ -234,6 +234,175 @@ codeunit 85217 "NPR SG TicketTest"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure TryAdmitGateSetup_04_ValidAdmission_02()
+    var
+        SpeedGate: Codeunit "NPR SG SpeedGate";
+        SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
+        ExternalTicketNumber: Code[30];
+        WhitelistCode: Code[10];
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        Ticket: Record "NPR TM Ticket";
+        HaveError: Boolean;
+        ErrorMessage: Text;
+    begin
+        ExternalTicketNumber := GetOneTicket();
+        Ticket.SetFilter(Ticket."External Ticket No.", '=%1', ExternalTicketNumber);
+        Ticket.FindFirst();
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        TicketAccessEntry.FindFirst();
+
+        SpeedGateLibrary.DefaultSetup(false, false, '', '');
+        SpeedGateLibrary.GateSetup('GATE01', true, '', '');
+
+        SpeedGate.Admit(SpeedGate.CreateAdmitToken(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01', true, HaveError, ErrorMessage), 1);
+        if (HaveError) or (ErrorMessage <> '') then
+            Error('Expected no error and no error message, but got %1: %2', HaveError, ErrorMessage);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure TryAdmitGateSetup_04_RevokedTicket_01()
+    var
+        SpeedGate: Codeunit "NPR SG SpeedGate";
+        SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
+        ExternalTicketNumber: Code[30];
+        WhitelistCode: Code[10];
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        Ticket: Record "NPR TM Ticket";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketCount: Integer;
+        AmountToReverse: Decimal;
+        QtyToReverse: Integer;
+        Token: Text[100];
+    begin
+        ExternalTicketNumber := GetOneTicket();
+        Ticket.SetFilter(Ticket."External Ticket No.", '=%1', ExternalTicketNumber);
+        Ticket.FindFirst();
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        TicketAccessEntry.FindFirst();
+
+        SpeedGateLibrary.DefaultSetup(false, false, '', '');
+        SpeedGateLibrary.GateSetup('GATE01', true, '', '');
+
+        AmountToReverse := 0;
+        QtyToReverse := 0;
+        TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", 'RECEIPT-NO', 0, AmountToReverse, QtyToReverse);
+        TicketRequestManager.RevokeReservationTokenRequest(Token, false);
+
+        ValidateDeniedTicket(SpeedGate.CreateAdmitToken(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01'));
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure TryAdmitGateSetup_04_RevokedTicket_02()
+    var
+        SpeedGate: Codeunit "NPR SG SpeedGate";
+        SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
+        ExternalTicketNumber: Code[30];
+        WhitelistCode: Code[10];
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        Ticket: Record "NPR TM Ticket";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketCount: Integer;
+        AmountToReverse: Decimal;
+        QtyToReverse: Integer;
+        Token: Text[100];
+        HaveError: Boolean;
+        ErrorMessage: Text;
+    begin
+        ExternalTicketNumber := GetOneTicket();
+        Ticket.SetFilter(Ticket."External Ticket No.", '=%1', ExternalTicketNumber);
+        Ticket.FindFirst();
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        TicketAccessEntry.FindFirst();
+
+        SpeedGateLibrary.DefaultSetup(false, false, '', '');
+        SpeedGateLibrary.GateSetup('GATE01', true, '', '');
+
+        AmountToReverse := 0;
+        QtyToReverse := 0;
+        TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", 'RECEIPT-NO', 0, AmountToReverse, QtyToReverse);
+        TicketRequestManager.RevokeReservationTokenRequest(Token, false);
+
+        asserterror SpeedGate.CreateAdmitToken(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01', true, HaveError, ErrorMessage);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure TryAdmitGateSetup_04_RevokedTicket_03()
+    var
+        SpeedGate: Codeunit "NPR SG SpeedGate";
+        SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
+        ExternalTicketNumber: Code[30];
+        WhitelistCode: Code[10];
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        Ticket: Record "NPR TM Ticket";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketCount: Integer;
+        AmountToReverse: Decimal;
+        QtyToReverse: Integer;
+        Token: Text[100];
+        HaveError: Boolean;
+        ErrorMessage: Text;
+    begin
+        ExternalTicketNumber := GetOneTicket();
+        Ticket.SetFilter(Ticket."External Ticket No.", '=%1', ExternalTicketNumber);
+        Ticket.FindFirst();
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        TicketAccessEntry.FindFirst();
+
+        SpeedGateLibrary.DefaultSetup(false, false, '', '');
+        SpeedGateLibrary.GateSetup('GATE01', true, '', '');
+
+        AmountToReverse := 0;
+        QtyToReverse := 0;
+        TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", 'RECEIPT-NO', 0, AmountToReverse, QtyToReverse);
+        TicketRequestManager.RevokeReservationTokenRequest(Token, false);
+
+        SpeedGate.CreateAdmitToken(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01', false, HaveError, ErrorMessage);
+
+        if (not HaveError) or (ErrorMessage = '') then
+            Error('Expected error and error message, but got none');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure TryAdmitGateSetup_04_RevokedTicket_04()
+    var
+        SpeedGate: Codeunit "NPR SG SpeedGate";
+        SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
+        ExternalTicketNumber: Code[30];
+        WhitelistCode: Code[10];
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        Ticket: Record "NPR TM Ticket";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketCount: Integer;
+        AmountToReverse: Decimal;
+        QtyToReverse: Integer;
+        Token: Text[100];
+        HaveError: Boolean;
+        ErrorMessage: Text;
+
+    begin
+        ExternalTicketNumber := GetOneTicket();
+        Ticket.SetFilter(Ticket."External Ticket No.", '=%1', ExternalTicketNumber);
+        Ticket.FindFirst();
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        TicketAccessEntry.FindFirst();
+
+        SpeedGateLibrary.DefaultSetup(false, false, '', '');
+        SpeedGateLibrary.GateSetup('GATE01', true, '', '');
+
+        AmountToReverse := 0;
+        QtyToReverse := 0;
+        TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", 'RECEIPT-NO', 0, AmountToReverse, QtyToReverse);
+        TicketRequestManager.RevokeReservationTokenRequest(Token, false);
+
+        asserterror SpeedGate.Admit(SpeedGate.CreateAdmitToken(ExternalTicketNumber, TicketAccessEntry."Admission Code", 'GATE01', false, HaveError, ErrorMessage), 1);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure TryAdmitGateSetup_05_TicketProfile_01()
     var
         SpeedGate: Codeunit "NPR SG SpeedGate";
