@@ -1414,6 +1414,7 @@
         Ticket: Record "NPR TM Ticket";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         NotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
+        TicketDeferral: Codeunit "NPR TM RevenueDeferral";
     begin
 
         if (not TicketAccessEntry.Get(TicketAccessEntryNo)) then
@@ -1434,6 +1435,7 @@
         TicketRequestManager.OnAfterBlockTicketPublisher(Ticket."No.");
         NotifyParticipant.CreateRevokeNotification(TicketAccessEntry);
 
+        TicketDeferral.AbortDeferral(Ticket."No.");
     end;
 
     procedure ValidateTicketReference(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer)
