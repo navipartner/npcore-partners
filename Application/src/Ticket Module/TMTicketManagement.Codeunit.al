@@ -91,10 +91,10 @@
         if (not TicketAction.GetRequestToken(POSEntry."Document No.", POSSalesLine."Line No.", Token, TokenLineNumber)) then
             exit;
 
-        ConfirmAndAdmitTicketsFromToken(Token, TokenLineNumber, POSEntry."Document No.", POSSalesLine."Line No.", POSEntry."POS Unit No.");
+        ConfirmAndAdmitTicketsFromToken(Token, TokenLineNumber, POSEntry."Document No.", POSSalesLine."Line No.", POSEntry."POS Unit No.", POSSalesLine."Amount Incl. VAT (LCY)" / POSSalesLine.Quantity, POSSalesLine."Amount Excl. VAT (LCY)" / POSSalesLine.Quantity);
     end;
 
-    procedure ConfirmAndAdmitTicketsFromToken(Token: Text[100]; TokenLineNumber: Integer; SalesReceiptNo: Code[20]; SalesLineNo: Integer; PosUnitNo: Code[10])
+    procedure ConfirmAndAdmitTicketsFromToken(Token: Text[100]; TokenLineNumber: Integer; SalesReceiptNo: Code[20]; SalesLineNo: Integer; PosUnitNo: Code[10]; UnitAmountInclVat: Decimal; UnitAmountExclVat: Decimal)
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketType: Record "NPR TM Ticket Type";
@@ -119,6 +119,10 @@
 
                 TicketRequestManager.ConfirmReservationRequestWithValidate(Token, TokenLineNumber);
                 repeat
+
+                    Ticket.AmountInclVat := UnitAmountInclVat;
+                    Ticket.AmountExclVat := UnitAmountExclVat;
+                    Ticket.Modify();
 
                     if (TicketType.Get(Ticket."Ticket Type Code")) then begin
 
