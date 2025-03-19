@@ -525,6 +525,8 @@
                 if (ChangeExternalMemberNo) then
                     SponsorTicketEntry.ModifyAll("External Member No.", NewExternalMemberNo);
 
+                UpdateContactFromMember(MembershipRole."Membership Entry No.", MemberToUpdate);
+
             until (MembershipRole.Next() = 0);
 
         if (ChangeExternalMemberNo) then begin
@@ -4476,6 +4478,7 @@
         end;
     end;
 
+    [CommitBehavior(CommitBehavior::Error)]
     internal procedure UpdateContactFromMember(MembershipEntryNo: Integer; Member: Record "NPR MM Member")
     var
         Membership: Record "NPR MM Membership";

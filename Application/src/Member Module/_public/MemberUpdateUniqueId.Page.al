@@ -139,27 +139,34 @@ page 6184962 "NPR MemberUpdateUniqueId"
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     var
         MembershipMgmt: Codeunit "NPR MM MembershipMgtInternal";
-        ErrorMsg: Label 'A member with the same unique ID exists and causes a conflict. Please resolve the conflict before closing the page or click No abort.';
+        ErrorMsg: Label 'A member with the same unique ID exists and causes a conflict. Please resolve the conflict before closing the page or click No to abort.';
+        ConfirmAction: Label 'This is action is not reversible. It may take some time to complete. Are you sure you want to continue?';
+        ConfirmUpdateExternalNumber: Label 'You are about to update member external id. Are you sure you want to continue?';
     begin
         if CloseAction = Action::Yes then begin
 
-            if (not Confirm('This is action is not reversible. It may take some time to complete. Are you sure you want to continue?', false)) then
-                exit(true);
-
             if (_ExternalMemberNumberChanged) then begin
+                if (not confirm(ConfirmUpdateExternalNumber, false)) then
+                    Error('');
+
                 _SourceMember."External Member No." := _NewExternalMemberNo;
                 _SourceMember.Modify(true);
             end;
 
             if (_UniqueIdentityChanged) then begin
+
+                if (_ConflictExists and not _Merge) then
+                    Error(ErrorMsg);
+
+                if (not Confirm(ConfirmAction, false)) then
+                    Error('');
+
                 if (not _ConflictExists) then
                     MembershipMgmt.UpdateMemberUniqueId(_SourceMember, _NewFirstName, _NewEmail, _NewPhoneNumber, _NewExternalMemberNo);
 
                 if (_ConflictExists and _Merge) then
                     MembershipMgmt.MergeMemberUniqueId(_SourceMember, _NewFirstName, _NewEmail, _NewPhoneNumber, _NewExternalMemberNo);
 
-                if (_ConflictExists and not _Merge) then
-                    Error(ErrorMsg);
             end;
         end;
 
