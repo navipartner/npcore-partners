@@ -171,6 +171,22 @@ EventDate: Date) ValidRequest: Boolean
         DeferRevenueRequest.Modify();
     end;
 
+    internal procedure AbortDeferral(TicketNo: Code[20])
+    var
+        DeferRevenueRequest: Record "NPR TM DeferRevenueRequest";
+    begin
+        DeferRevenueRequest.SetCurrentKey(TicketNo);
+        DeferRevenueRequest.SetFilter(TicketNo, '=%1', TicketNo);
+        if (DeferRevenueRequest.FindSet()) then begin
+            repeat
+                if (not (DeferRevenueRequest.Status in [DeferRevenueRequest.Status::DEFERRED, DeferRevenueRequest.Status::DEFERRED_FORCED])) then begin
+                    DeferRevenueRequest.Status := DeferRevenueRequest.Status::DEFERRAL_ABORTED;
+                    DeferRevenueRequest.Modify();
+                end;
+            until (DeferRevenueRequest.Next() = 0);
+        end;
+    end;
+
     local procedure ProcessStatusRegistered()
     var
         DeferRevenueRequest, DeferRevenueRequestUpdate : Record "NPR TM DeferRevenueRequest";
@@ -234,7 +250,7 @@ EventDate: Date) ValidRequest: Boolean
         DeferRevenueProfile: Record "NPR TM DeferRevenueProfile";
     begin
         Handled := False;
-        if (DeferRevenueRequest.Status in [DeferRevenueRequest.Status::UNRESOLVED, DeferRevenueRequest.Status::DEFERRED, DeferRevenueRequest.Status::IMMEDIATE]) then
+        if (DeferRevenueRequest.Status in [DeferRevenueRequest.Status::UNRESOLVED, DeferRevenueRequest.Status::DEFERRED, DeferRevenueRequest.Status::IMMEDIATE, DeferRevenueRequest.Status::DEFERRAL_ABORTED]) then
             exit;
 
         if (not TicketReservationRequest.Get(DeferRevenueRequest.ReservationRequestEntryNo)) then

@@ -14,8 +14,8 @@ table 6150776 "NPR TM DeferRevenueRequest"
         {
             Caption = 'Status';
             DataClassification = CustomerContent;
-            OptionMembers = UNRESOLVED,REGISTERED,WAITING,PENDING_DEFERRAL,DEFERRED,IMMEDIATE,DEFERRED_FORCED;
-            OptionCaption = 'Unresolved,Registered,Waiting,Pending Deferral,Deferred,Immediate,Deferred (Forced)';
+            OptionMembers = UNRESOLVED,REGISTERED,WAITING,PENDING_DEFERRAL,DEFERRED,IMMEDIATE,DEFERRED_FORCED,DEFERRAL_ABORTED;
+            OptionCaption = 'Unresolved,Registered,Waiting,Pending Deferral,Deferred,Immediate,Deferred (Forced),Deferral Aborted';
         }
         field(6; AttemptedRegisterCount; Integer)
         {
@@ -84,7 +84,7 @@ table 6150776 "NPR TM DeferRevenueRequest"
             Caption = 'Defer Revenue Profile Code';
             DataClassification = CustomerContent;
         }
-            field(100; SourceType; Option)
+        field(100; SourceType; Option)
         {
             Caption = 'Source Type';
             DataClassification = CustomerContent;
