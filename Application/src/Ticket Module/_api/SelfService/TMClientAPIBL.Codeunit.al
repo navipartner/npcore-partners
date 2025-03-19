@@ -176,7 +176,6 @@ codeunit 6151543 "NPR TM Client API BL"
         exit(ResponseText);
     end;
 
-
     internal procedure MakeReservationAction(ReservationRequest: JsonArray) ResponseText: Text
     var
         TicketRequest: Record "NPR TM Ticket Reservation Req.";
@@ -189,6 +188,7 @@ codeunit 6151543 "NPR TM Client API BL"
         LinesArray: JsonArray;
         ResponseMessage: Text;
         TicketCreateSuccess: Boolean;
+        TicketUpdateSuccess: Boolean;
         SalesReceipt: Code[20];
         SalesReceiptLineNo: Integer;
     begin
@@ -240,16 +240,30 @@ codeunit 6151543 "NPR TM Client API BL"
                 Request := RequestToken.AsObject();
                 Token := CopyStr(GetAsText(Request, 'token', ValidationErrorList), 1, MaxStrLen(Token));
 
-                if (TicketRequestManager.TokenRequestExists(Token)) then begin
-                    TicketRequestManager.GetReceiptFromToken(SalesReceipt, SalesReceiptLineNo, Token);
-                    TicketRequestManager.DeleteReservationRequest(Token, true);
+                Request.Get('lines', RequestTokenLine);
+
+                Clear(TicketRequest);
+                if (Token <> '') then begin
+                    TicketRequest.SetCurrentKey("Session Token ID");
+                    TicketRequest.SetFilter("Session Token ID", '=%1', Token);
+                    if TicketRequest.FindFirst() then
+                        if TicketRequest."Entry Type" = TicketRequest."Entry Type"::CHANGE then begin
+                            UpdateReservation(RequestTokenLine.AsArray(), TicketRequest, Token, SalesReceipt, TicketUpdateSuccess);
+                        end;
                 end;
 
-                Request.Get('lines', RequestTokenLine);
-                CreateReservation(RequestTokenLine.AsArray(), Token, SalesReceipt, SalesReceiptLineNo, TicketCreateSuccess, ResponseMessage);
-                if (TicketCreateSuccess) then
-                    UpdateSalesLine(SalesReceipt, SalesReceiptLineNo, Token);
-                GetRequestDetails(JBuilder, Token, TicketCreateSuccess, ResponseMessage);
+                if (not TicketUpdateSuccess) then begin
+                    if (TicketRequestManager.TokenRequestExists(Token)) then begin
+                        TicketRequestManager.GetReceiptFromToken(SalesReceipt, SalesReceiptLineNo, Token);
+                        TicketRequestManager.DeleteReservationRequest(Token, true);
+                    end;
+
+                    CreateReservation(RequestTokenLine.AsArray(), Token, SalesReceipt, SalesReceiptLineNo, TicketCreateSuccess, ResponseMessage);
+                    if (TicketCreateSuccess) then
+                        UpdateSalesLine(SalesReceipt, SalesReceiptLineNo, Token);
+                end;
+
+                GetRequestDetails(JBuilder, Token, TicketCreateSuccess or TicketUpdateSuccess, ResponseMessage);
             end;
         end;
         JBuilder.WriteEndArray(); // response
@@ -257,6 +271,136 @@ codeunit 6151543 "NPR TM Client API BL"
 
         ResponseText := JBuilder.GetJSonAsText();
         exit(ResponseText);
+    end;
+
+    local procedure UpdateReservation(Lines: JsonArray; TicketRequest: Record "NPR TM Ticket Reservation Req."; Token: Text[100]; var SalesReceiptNumber: Code[20]; var Success: Boolean)
+    var
+        Ticket: Record "NPR TM Ticket";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+        POSSession: Codeunit "NPR POS Session";
+        TicketWebRequestManager: Codeunit "NPR TM Ticket WebService Mgr";
+        ExternalId: List of [Integer];
+    begin
+        if not SetTicketRequestInfo(TicketRequest, Lines, Token) then
+            exit;
+
+        Commit();
+        Ticket.SetRange("Ticket Reservation Entry No.", TicketRequest."Superseeds Entry No.");
+        if (Ticket.FindSet()) then
+            repeat
+                TicketRequest.Reset();
+                TicketRequest.SetFilter(Quantity, '<>0');
+                TicketRequest.SetRange("Session Token ID", Token);
+                TicketRequest.FindSet();
+                repeat
+                    TicketManagement.RescheduleDynamicTicketAdmission(Ticket."No.", TicketRequest."External Adm. Sch. Entry No.", true, TicketRequest."Request Status Date Time", POSSession, SalesReceiptNumber, TicketRequest."Entry No.");
+                until (TicketRequest.Next() = 0);
+            until (Ticket.Next() = 0);
+
+        Commit();
+
+        ExternalId.Add(TicketRequest."Ext. Line Reference No.");
+        TicketWebRequestManager.FinalizeTicketReservation(Token, ExternalId);
+
+        Commit();
+
+        UpdateTicketReservationAfterFinalize(Token, SalesReceiptNumber, Ticket."No.");
+
+        Success := true;
+    end;
+
+    local procedure UpdateTicketReservationAfterFinalize(Token: Text[100]; SalesReceiptNumber: Code[20]; TicketNo: Code[20])
+    var
+        TicketRequest: Record "NPR TM Ticket Reservation Req.";
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        DtldTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+    begin
+        TicketRequest.SetFilter(Quantity, '<>0');
+        TicketRequest.SetRange("Session Token ID", Token);
+        if TicketRequest.FindSet() then
+            repeat
+                if (TicketRequest."External Adm. Sch. Entry No." > 0) then begin
+                    ScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', TicketRequest."External Adm. Sch. Entry No.");
+                    ScheduleEntry.SetFilter(Cancelled, '=%1', false);
+                    if (ScheduleEntry.FindFirst()) then
+                        TicketRequest."Scheduled Time Description" := StrSubstNo('%1 - %2', ScheduleEntry."Admission Start Date", ScheduleEntry."Admission Start Time");
+
+                    if TicketRequest."Admission Inclusion" = TicketRequest."Admission Inclusion"::REQUIRED then
+                        TicketRequest."Payment Option" := TicketRequest."Payment Option"::UNPAID;
+                end else begin
+                    if TicketRequest."Admission Inclusion" = TicketRequest."Admission Inclusion"::NOT_SELECTED then begin
+                        TicketRequest."Request Status" := TicketRequest."Request Status"::OPTIONAL;
+                        TicketRequest.Quantity := 0;
+
+                        Clear(TicketAccessEntry);
+                        TicketAccessEntry.SetRange("Ticket No.", TicketNo);
+                        TicketAccessEntry.SetRange("Admission Code", TicketRequest."Admission Code");
+                        TicketAccessEntry.FindFirst();
+
+                        DtldTicketAccessEntry.SetRange("Ticket Access Entry No.", TicketAccessEntry."Entry No.");
+                        DtldTicketAccessEntry.SetRange(Type, DtldTicketAccessEntry.Type::PAYMENT);
+                        if not DtldTicketAccessEntry.IsEmpty() then begin
+                            case TicketAccessEntry.Status of
+                                TicketAccessEntry.Status::ACCESS:
+                                    TicketAccessEntry.Status := TicketAccessEntry.Status::BLOCKED;
+                            end;
+                            TicketAccessEntry.Modify();
+                        end;
+                    end;
+                end;
+
+                TicketRequest."Receipt No." := SalesReceiptNumber;
+                TicketRequest.Modify();
+            until (TicketRequest.Next() = 0);
+
+        Commit();
+    end;
+
+    local procedure SetTicketRequestInfo(TicketRequest: Record "NPR TM Ticket Reservation Req."; Lines: JsonArray; Token: Text[100]): Boolean
+    var
+        TicketBOM: Record "NPR TM Ticket Admission BOM";
+        Admission: Record "NPR TM Admission";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        Line: JsonToken;
+        ResolvingTable: Integer;
+        INVALID_ITEM_REFERENCE: Label 'Reference %1 does not resolve to neither an item reference nor an item number.';
+    begin
+        Clear(TicketRequest);
+        TicketRequest.SetFilter("Session Token ID", '=%1', Token);
+        if not TicketRequest.FindSet() then
+            exit(false);
+
+        foreach Line in Lines do begin
+            TicketRequest."External Item Code" := CopyStr(GetAsText(Line.AsObject(), 'itemReference', ''), 1, MaxStrLen(TicketRequest."External Item Code"));
+            TicketRequest.Quantity := GetAsInteger(Line.AsObject(), 'quantity', 0);
+            TicketRequest."External Member No." := CopyStr(GetAsText(Line.AsObject(), 'memberNumber', ''), 1, MaxStrLen(TicketRequest."External Member No."));
+            TicketRequest."Admission Code" := CopyStr(GetAsText(Line.AsObject(), 'admissionCode', ''), 1, MaxStrLen(TicketRequest."Admission Code"));
+            TicketRequest."External Adm. Sch. Entry No." := GetAsInteger(Line.AsObject(), 'scheduleId', 0);
+            TicketRequest."Notification Address" := CopyStr(GetAsText(Line.AsObject(), 'notificationAddress', ''), 1, MaxStrLen(TicketRequest."Notification Address"));
+            TicketRequest."Admission Created" := TicketRequest."External Adm. Sch. Entry No." > 0;
+
+            if (not TicketRequestManager.TranslateBarcodeToItemVariant(TicketRequest."External Item Code", TicketRequest."Item No.", TicketRequest."Variant Code", ResolvingTable)) then
+                Error(INVALID_ITEM_REFERENCE, TicketRequest."External Item Code");
+
+            TicketBOM.Get(TicketRequest."Item No.", TicketRequest."Variant Code", TicketRequest."Admission Code");
+            Admission.Get(TicketRequest."Admission Code");
+
+            TicketRequest.Default := TicketBOM.Default;
+            TicketRequest."Admission Inclusion" := TicketBOM."Admission Inclusion";
+            if (TicketBOM."Admission Inclusion" <> TicketBOM."Admission Inclusion"::REQUIRED) then
+                TicketRequest."Admission Inclusion" := TicketBOM."Admission Inclusion"::SELECTED;
+
+            if ((TicketRequest."Admission Inclusion" = TicketBOM."Admission Inclusion"::SELECTED) and (TicketRequest.Quantity = 0)) then
+                TicketRequest."Admission Inclusion" := TicketBOM."Admission Inclusion"::NOT_SELECTED;
+
+            TicketRequest."Admission Description" := Admission.Description;
+            TicketRequest.Modify();
+
+            TicketRequest.Next(); //Move to next request line
+        end;
+
+        exit(true);
     end;
 
     local procedure UpdateSalesLine(SalesReceiptNumber: Code[20]; SalesReceiptLineNo: Integer; Token: Text[100])
@@ -1195,6 +1339,7 @@ codeunit 6151543 "NPR TM Client API BL"
     begin
         exit(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')));
     end;
+
 #pragma warning restore
 
 }

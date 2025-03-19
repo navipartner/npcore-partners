@@ -110,7 +110,6 @@
         TicketCreated: Boolean;
         Line: Integer;
     begin
-
         //Import remaining BOM lines per line no
         foreach Line in Lines do
             AddRemainingReservationRequestEntries(Token, Line);
@@ -131,7 +130,6 @@
                         TicketReservationRequest."Request Status" := TicketReservationRequest."Request Status"::REGISTERED;
                         TicketReservationRequest.Modify();
                     end else begin
-
                         CreateResponse(TicketReservationRequest, TicketReservationResponse);
                         if (ValidTicketRequest(TicketReservationRequest, TicketReservationResponse)) then begin
 
@@ -142,7 +140,6 @@
                             end;
                         end;
                     end;
-
                 until ((TicketReservationRequest.Next() = 0));
             end;
         end;

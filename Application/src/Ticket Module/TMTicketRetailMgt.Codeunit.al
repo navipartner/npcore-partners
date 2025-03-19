@@ -396,11 +396,11 @@
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         DisplayTicketReservationRequest: Page "NPR TM Ticket Make Reserv.";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketPosAction: Codeunit "NPR POSAction: Ticket Mgt.";
         ResolvedByTable: Integer;
         ResultCode: Integer;
         Token: Text[100];
     begin
-
         TicketReservationRequest.Get(Ticket."Ticket Reservation Entry No.");
         if (not TicketRequestManager.CreateChangeRequestDynamicTicket(Ticket."External Ticket No.",
                   TicketReservationRequest."Authorization Code", Token, ResponseMessage)) then
@@ -414,6 +414,9 @@
         end;
 
         ResultCode := 0;
+        if (TicketPosAction.UseFrontEndUxForScheduleSelection2()) then
+            exit(false); // Schedule selection will be shown later
+
         repeat
             Clear(DisplayTicketReservationRequest);
             DisplayTicketReservationRequest.LoadTicketRequest(Token);
