@@ -5,12 +5,12 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
     var
         SIFiscalizationSetup: Record "NPR SI Fiscalization Setup";
         SIAuditMgt: Codeunit "NPR SI Audit Mgt.";
+        DateTimeFormatLbl: Label '%1T%2', Locked = true, Comment = '%1 = Entry Date, %2 = Time Stamp';
         FuNamespaceUriLbl: Label 'http://www.fu.gov.si/', Locked = true;
         SoapEnvNamespaceUriLbl: Label 'http://schemas.xmlsoap.org/soap/envelope/', Locked = true;
         XmlDsigNamespaceUriLbl: Label 'http://www.w3.org/2000/09/xmldsig#', Locked = true;
         XmlSchemaNamespaceUriLbl: Label 'http://www.w3.org/2001/XMLSchema-instance', Locked = true;
         XPathExcludeNamespacePatternLbl: Label '//*[local-name()=''%1'']', Locked = true;
-        DateTimeFormatLbl: Label '%1T%2', Locked = true, Comment = '%1 = Entry Date, %2 = Time Stamp';
 
     internal procedure CreateNormalSale(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"; isSubsequent: Boolean)
     var
@@ -105,9 +105,9 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
         Body: XmlElement;
         Envelope: XmlElement;
         Header: XmlElement;
-        SalesBookInvoiceElement: XmlElement;
-        SalesBookIdentifierElement: XmlElement;
         InvoiceRequestElement: XmlElement;
+        SalesBookIdentifierElement: XmlElement;
+        SalesBookInvoiceElement: XmlElement;
     begin
         CompanyInformation.Get();
         SIFiscalizationSetup.Get();
@@ -177,27 +177,39 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
     local procedure AddPOSEntryTaxSection(var InvoiceElement: XmlElement; SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info")
     var
         POSEntryTaxLines: Record "NPR POS Entry Tax Line";
-        TaxesSection: XmlElement;
-        TaxAmounts: XmlElement;
+        DictKey: Decimal;
         ExemptedFromTaxAmount: Decimal;
+        TaxableAmountDict: Dictionary of [Decimal, Decimal];
+        TaxAmountDict: Dictionary of [Decimal, Decimal];
+        DictKeysList: List of [Decimal];
+        TaxAmounts: XmlElement;
+        TaxesSection: XmlElement;
     begin
         TaxesSection := XmlElement.Create('TaxesPerSeller', FuNamespaceUriLbl);
 
         POSEntryTaxLines.SetLoadFields("Tax %", "Tax Base Amount", "Tax Amount");
         POSEntryTaxLines.SetRange("POS Entry No.", SIPOSAuditLogAuxInfo."POS Entry No.");
-        POSEntryTaxLines.SetFilter("Tax %", '<>%1', 0);
         if POSEntryTaxLines.FindSet() then
             repeat
-                TaxAmounts := XmlElement.Create('VAT', FuNamespaceUriLbl);
-                TaxAmounts.Add(CreateXmlElement('TaxRate', FuNamespaceUriLbl, FormatDecimalField(POSEntryTaxLines."Tax %")));
-                TaxAmounts.Add(CreateXmlElement('TaxableAmount', FuNamespaceUriLbl, FormatDecimalField(POSEntryTaxLines."Tax Base Amount")));
-                TaxAmounts.Add(CreateXmlElement('TaxAmount', FuNamespaceUriLbl, FormatDecimalField(POSEntryTaxLines."Tax Amount")));
-                TaxesSection.Add(TaxAmounts);
+                AddAmountToDecimalDict(TaxableAmountDict, POSEntryTaxLines."Tax %", POSEntryTaxLines."Tax Base Amount");
+                AddAmountToDecimalDict(TaxAmountDict, POSEntryTaxLines."Tax %", POSEntryTaxLines."Tax Amount");
             until POSEntryTaxLines.Next() = 0;
 
-        POSEntryTaxLines.SetFilter("Tax %", '=%1', 0);
-        POSEntryTaxLines.CalcSums("Tax Base Amount");
-        ExemptedFromTaxAmount := POSEntryTaxLines."Tax Base Amount";
+        if SIPOSAuditLogAuxInfo."Collect in Store" then
+            AddCollectInStoreTaxSection(SIPOSAuditLogAuxInfo."POS Entry No.", TaxableAmountDict, TaxAmountDict);
+
+        TaxesSection := XmlElement.Create('TaxesPerSeller', FuNamespaceUriLbl);
+        DictKeysList := TaxableAmountDict.Keys();
+        foreach DictKey in DictKeysList do
+            if DictKey = 0 then
+                ExemptedFromTaxAmount += TaxableAmountDict.Get(DictKey)
+            else begin
+                TaxAmounts := XmlElement.Create('VAT', FuNamespaceUriLbl);
+                TaxAmounts.Add(CreateXmlElement('TaxRate', FuNamespaceUriLbl, FormatDecimalField(DictKey)));
+                TaxAmounts.Add(CreateXmlElement('TaxableAmount', FuNamespaceUriLbl, FormatDecimalField(TaxableAmountDict.Get(DictKey))));
+                TaxAmounts.Add(CreateXmlElement('TaxAmount', FuNamespaceUriLbl, FormatDecimalField(TaxAmountDict.Get(DictKey))));
+                TaxesSection.Add(TaxAmounts);
+            end;
 
         if ExemptedFromTaxAmount <> 0 then
             TaxesSection.Add(CreateXmlElement('ExemptVATTaxableAmount', FuNamespaceUriLbl, FormatDecimalField(ExemptedFromTaxAmount)));
@@ -205,16 +217,52 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
         InvoiceElement.Add(TaxesSection);
     end;
 
+    local procedure AddCollectInStoreTaxSection(POSEntryNo: Integer; var TaxableAmountDict: Dictionary of [Decimal, Decimal]; var TaxAmountDict: Dictionary of [Decimal, Decimal])
+    var
+        SalesInvoiceLine: Record "Sales Invoice Line";
+        SalesLine: Record "Sales Line";
+        NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
+        PostedSalesInvoiceNo: Code[20];
+        SalesOrderNo: Code[20];
+        PostedSalesInvoices: List of [Code[20]];
+        SalesOrders: List of [Code[20]];
+    begin
+        NpCsCollectMgt.FindDocumentsForDeliveredCollectInStoreDocument(POSEntryNo, PostedSalesInvoices, SalesOrders);
+
+        foreach SalesOrderNo in SalesOrders do begin
+            SalesLine.SetLoadFields("VAT %", "Amount Including VAT", "VAT Base Amount");
+            SalesLine.SetRange("Document Type", SalesLine."Document Type"::Order);
+            SalesLine.SetRange("Document No.", SalesOrderNo);
+            SalesLine.SetFilter(Type, '<>%1', SalesLine.Type::" ");
+            if SalesLine.FindSet() then
+                repeat
+                    AddAmountToDecimalDict(TaxableAmountDict, SalesLine."VAT %", SalesLine."VAT Base Amount");
+                    AddAmountToDecimalDict(TaxAmountDict, SalesLine."VAT %", SalesLine."Amount Including VAT" - SalesLine."VAT Base Amount");
+                until SalesLine.Next() = 0
+        end;
+
+        foreach PostedSalesInvoiceNo in PostedSalesInvoices do begin
+            SalesInvoiceLine.SetLoadFields("VAT %", "Amount Including VAT", "VAT Base Amount");
+            SalesInvoiceLine.SetRange("Document No.", PostedSalesInvoiceNo);
+            SalesInvoiceLine.SetFilter(Type, '<>%1', SalesInvoiceLine.Type::" ");
+            if SalesInvoiceLine.FindSet() then
+                repeat
+                    AddAmountToDecimalDict(TaxableAmountDict, SalesInvoiceLine."VAT %", SalesInvoiceLine."VAT Base Amount");
+                    AddAmountToDecimalDict(TaxAmountDict, SalesInvoiceLine."VAT %", SalesInvoiceLine."Amount Including VAT" - SalesInvoiceLine."VAT Base Amount");
+                until SalesInvoiceLine.Next() = 0;
+        end;
+    end;
+
     local procedure AddSalesInvoiceTaxSection(var InvoiceElement: XmlElement; SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info")
     var
         SalesInvoiceLine: Record "Sales Invoice Line";
+        DictKey: Decimal;
+        ExemptedFromTaxAmount: Decimal;
         TaxableAmountDict: Dictionary of [Decimal, Decimal];
         TaxAmountDict: Dictionary of [Decimal, Decimal];
         DictKeysList: List of [Decimal];
-        DictKey: Decimal;
-        TaxesSection: XmlElement;
         TaxAmounts: XmlElement;
-        ExemptedFromTaxAmount: Decimal;
+        TaxesSection: XmlElement;
     begin
         SalesInvoiceLine.SetLoadFields("VAT %", "VAT Base Amount", "Amount Including VAT");
         SalesInvoiceLine.SetRange(Type, SalesInvoiceLine.Type::Item);
@@ -227,7 +275,7 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
 
         TaxesSection := XmlElement.Create('TaxesPerSeller', FuNamespaceUriLbl);
         DictKeysList := TaxableAmountDict.Keys();
-        foreach DictKey in DictKeysList do begin
+        foreach DictKey in DictKeysList do
             if DictKey = 0 then
                 ExemptedFromTaxAmount += TaxableAmountDict.Get(DictKey)
             else begin
@@ -237,7 +285,6 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
                 TaxAmounts.Add(CreateXmlElement('TaxAmount', FuNamespaceUriLbl, FormatDecimalField(TaxAmountDict.Get(DictKey))));
                 TaxesSection.Add(TaxAmounts);
             end;
-        end;
 
         if ExemptedFromTaxAmount <> 0 then
             TaxesSection.Add(CreateXmlElement('ExemptVATTaxableAmount', FuNamespaceUriLbl, FormatDecimalField(ExemptedFromTaxAmount)));
@@ -248,13 +295,13 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
     local procedure AddSalesCrMemoTaxSection(var InvoiceElement: XmlElement; SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info")
     var
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
+        DictKey: Decimal;
+        ExemptedFromTaxAmount: Decimal;
         TaxableAmountDict: Dictionary of [Decimal, Decimal];
         TaxAmountDict: Dictionary of [Decimal, Decimal];
         DictKeysList: List of [Decimal];
-        DictKey: Decimal;
-        TaxesSection: XmlElement;
         TaxAmounts: XmlElement;
-        ExemptedFromTaxAmount: Decimal;
+        TaxesSection: XmlElement;
     begin
         SalesCrMemoLine.SetLoadFields("VAT %", "VAT Base Amount", "Amount Including VAT");
         SalesCrMemoLine.SetRange(Type, SalesCrMemoLine.Type::Item);
@@ -267,7 +314,7 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
 
         TaxesSection := XmlElement.Create('TaxesPerSeller', FuNamespaceUriLbl);
         DictKeysList := TaxableAmountDict.Keys();
-        foreach DictKey in DictKeysList do begin
+        foreach DictKey in DictKeysList do
             if DictKey = 0 then
                 ExemptedFromTaxAmount += TaxableAmountDict.Get(DictKey)
             else begin
@@ -277,7 +324,6 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
                 TaxAmounts.Add(CreateXmlElement('TaxAmount', FuNamespaceUriLbl, FormatDecimalField(-TaxAmountDict.Get(DictKey))));
                 TaxesSection.Add(TaxAmounts);
             end;
-        end;
 
         if ExemptedFromTaxAmount <> 0 then
             TaxesSection.Add(CreateXmlElement('ExemptVATTaxableAmount', FuNamespaceUriLbl, FormatDecimalField(ExemptedFromTaxAmount)));
@@ -287,13 +333,13 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
 
     local procedure AddReturnInfoSection(SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"; var BaseDocument: XmlDocument)
     var
+        ReturnPOSAuditLogRecordNotFoundErr: Label 'Could not find necessary return receipt information.';
+        ReturnAdditionalInfoList: List of [Text];
+        DocumentRoot: XmlElement;
         ReferenceInvoice: XmlElement;
         ReferenceInvoiceID: XmlElement;
-        DocumentRoot: XmlElement;
         DocumentNode: XmlNode;
         DocumentNode2: XmlNode;
-        ReturnAdditionalInfoList: List of [Text];
-        ReturnPOSAuditLogRecordNotFoundErr: Label 'Could not find necessary return receipt information.';
     begin
         BaseDocument.GetRoot(DocumentRoot);
         DocumentRoot.GetDescendantElements().Get(3, DocumentNode);
@@ -320,10 +366,10 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
         POSStore: Record "NPR POS Store";
         TimeStampLbl: Label '%1T%2Z', Locked = true, Comment = '%1 = Entry Date, %2 = Time Stamp';
         FormattedDateTime: Text;
+        IdPoruke: Text;
         ParsedAddress: Text;
         ParsedHouseNumber: Text;
         ParsedHouseNumberAdditional: Text;
-        IdPoruke: Text;
         Address: XmlElement;
         Body: XmlElement;
         BPIdentifier: XmlElement;
@@ -410,9 +456,9 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
     local procedure SignBillAndSendToTA(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"; MethodType: Text; var ReceiptDocument: XmlDocument)
     var
         TempBlob: Codeunit "Temp Blob";
+        IsHandled: Boolean;
         IStream: InStream;
         OStream: OutStream;
-        IsHandled: Boolean;
         BaseValue: Text;
         ResponseText: Text;
     begin
@@ -599,8 +645,8 @@ codeunit 6151587 "NPR SI Tax Communication Mgt."
     var
         ConfirmManagement: Codeunit "Confirm Management";
         IsHandled: Boolean;
-        POSStoreRegisteredSuccessfulyMsg: Label 'POS Store %1 registered successfully.', Comment = '%1 = POS Store Code';
         POSStoreAlreadyRegisteredQst: Label 'POS Store %1 is already registered. Are you sure you want to continue with registration?', Comment = '%1 = POS Store Code';
+        POSStoreRegisteredSuccessfulyMsg: Label 'POS Store %1 registered successfully.', Comment = '%1 = POS Store Code';
         BaseValue: Text;
         ResponseText: Text;
         Document: XmlDocument;

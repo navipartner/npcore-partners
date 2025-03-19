@@ -8,9 +8,9 @@ codeunit 6151546 "NPR SI Audit Mgt."
         Initialized: Boolean;
         CAPTION_CERT_SUCCESS: Label 'Certificate with thumbprint %1 was uploaded successfully';
         CAPTION_OVERWRITE_CERT: Label 'Are you sure you want to overwrite the existing certificate?';
+        DateTimeFormatLbl: Label '%1T%2', Locked = true, Comment = '%1 = Date, %2 = Time';
         ERROR_MISSING_KEY: Label 'The selected certificate does not contain the private key';
         RecordInTableForFieldNotFoundErr: Label 'Record not found in table %1 for %2 : %3', Comment = '%1 = Table Caption, %2 = Field Caption, %3 = Field Value';
-        DateTimeFormatLbl: Label '%1T%2', Locked = true, Comment = '%1 = Date, %2 = Time';
         ReturnAdditionalInfoFormatLbl: Label '%1;%2;%3', Locked = true, Comment = '%1 = Return Business Premise ID, %2 = Return Cash Register ID, %3 = Return Receipt Date/Time';
 
     #region SI Fiscal - POS Handling Subscribers
@@ -354,11 +354,13 @@ codeunit 6151546 "NPR SI Audit Mgt."
 
     local procedure InsertSIPOSAuditLogAuxInfo(POSEntry: Record "NPR POS Entry"; POSStore: Record "NPR POS Store"; POSUnit: Record "NPR POS Unit"; POSAuditLog: Record "NPR POS Audit Log")
     var
+        NpCsDocument: Record "NPR NpCs Document";
         POSRMALine: Record "NPR POS RMA Line";
         SIAuxSalespPurch: Record "NPR SI Aux Salesperson/Purch.";
-        SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
         ReturnSIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
+        SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
         SalespersonPurchaser: Record "Salesperson/Purchaser";
+        NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
     begin
         POSEntry.CalcFields("Payment Amount");
         SIPOSAuditLogAuxInfo.Init();
@@ -392,21 +394,30 @@ codeunit 6151546 "NPR SI Audit Mgt."
         SIPOSAuditLogAuxInfo."Salesperson Code" := POSEntry."Salesperson Code";
         SaveCustomerDataToAuditLog(SIPOSAuditLogAuxInfo, POSEntry."Customer No.");
 
+        SIPOSAuditLogAuxInfo."Collect in Store" := NpCsCollectMgt.IsDeliveredCollectInStoreDocument(NpCsDocument, NpCsDocument."Delivery Document Type"::"POS Entry", SIPOSAuditLogAuxInfo."Source Document No.");
+        if SIPOSAuditLogAuxInfo."Collect in Store" then begin
+            NpCsDocument.SetLoadFields("Document Type", "Document No.", "Prepaid Amount");
+            SetAmounts(SIPOSAuditLogAuxInfo, NpCsDocument);
+        end;
+
         if SaveSalesbookReceiptInfo(POSAuditLog, SIPOSAuditLogAuxInfo) then begin
             SIPOSAuditLogAuxInfo.Insert();
         end else begin
             SIPOSAuditLogAuxInfo.Insert(true);
             CalculateAndSignZOI(SIPOSAuditLogAuxInfo);
         end;
+
+        if SIPOSAuditLogAuxInfo."Collect in Store" then
+            UpdateSIAuxSalesHeaderPosUnit(NpCsDocument);
     end;
 
     local procedure InsertSIPOSAuditLogAuxInfo(SalesInvoiceHeader: Record "Sales Invoice Header")
     var
-        SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
-        SIAuxSalesInvHeader: Record "NPR SI Aux Sales Inv. Header";
-        SalespersonPurchaser: Record "Salesperson/Purchaser";
-        SIAuxSalespPurch: Record "NPR SI Aux Salesperson/Purch.";
         POSUnit: Record "NPR POS Unit";
+        SIAuxSalesInvHeader: Record "NPR SI Aux Sales Inv. Header";
+        SIAuxSalespPurch: Record "NPR SI Aux Salesperson/Purch.";
+        SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
+        SalespersonPurchaser: Record "Salesperson/Purchaser";
     begin
         SIPOSAuditLogAuxInfo.Init();
         SIPOSAuditLogAuxInfo."Audit Entry Type" := SIPOSAuditLogAuxInfo."Audit Entry Type"::"Sales Invoice Header";
@@ -435,12 +446,12 @@ codeunit 6151546 "NPR SI Audit Mgt."
 
     local procedure InsertSIPOSAuditLogAuxInfo(SalesCrMemoHeader: Record "Sales Cr.Memo Header")
     var
-        SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
-        SIAuxSalesCrMemoHeader: Record "NPR SI Aux Sales CrMemo Header";
-        SalespersonPurchaser: Record "Salesperson/Purchaser";
-        SIAuxSalespPurch: Record "NPR SI Aux Salesperson/Purch.";
         POSUnit: Record "NPR POS Unit";
+        SIAuxSalesCrMemoHeader: Record "NPR SI Aux Sales CrMemo Header";
+        SIAuxSalespPurch: Record "NPR SI Aux Salesperson/Purch.";
         ReturnSIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
+        SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
+        SalespersonPurchaser: Record "Salesperson/Purchaser";
     begin
         SIPOSAuditLogAuxInfo.Init();
         SIPOSAuditLogAuxInfo."Audit Entry Type" := SIPOSAuditLogAuxInfo."Audit Entry Type"::"Sales Cr. Memo Header";
@@ -477,6 +488,31 @@ codeunit 6151546 "NPR SI Audit Mgt."
         CalculateAndSignZOI(SIPOSAuditLogAuxInfo);
     end;
 
+    local procedure SetAmounts(var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"; var NpCsDocument: Record "NPR NpCs Document")
+    begin
+        NpCsDocument.FindSet();
+
+        repeat
+            SIPOSAuditLogAuxInfo."Total Amount" += NpCsDocument."Prepaid Amount";
+            SIPOSAuditLogAuxInfo."Payment Amount" += NpCsDocument."Prepaid Amount";
+        until NpCsDocument.Next() = 0;
+    end;
+
+    local procedure UpdateSIAuxSalesHeaderPosUnit(var NpCsDocument: Record "NPR NpCs Document")
+    var
+        SIAuxSalesHeader: Record "NPR SI Aux Sales Header";
+        SalesHeader: Record "Sales Header";
+    begin
+        NpCsDocument.FindSet();
+
+        repeat
+            SalesHeader.Get(NpCsDocument."Document Type", NpCsDocument."Document No.");
+            SIAuxSalesHeader.ReadSIAuxSalesHeaderFields(SalesHeader);
+            SIAuxSalesHeader."NPR SI POS Unit" := '';
+            SIAuxSalesHeader.SaveSIAuxSalesHeaderFields();
+        until NpCsDocument.Next() = 0;
+    end;
+
     local procedure SaveSalesbookReceiptInfo(POSAuditLog: Record "NPR POS Audit Log"; var SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info"): Boolean
     var
         SalePOS: Record "NPR POS Sale";
@@ -511,9 +547,9 @@ codeunit 6151546 "NPR SI Audit Mgt."
 
     local procedure VerifyIsDataSetOnSalesDocuments(SalesHeader: Record "Sales Header")
     var
-        SalespersonPurchaser: Record "Salesperson/Purchaser";
-        SIAuxSalespersonPurch: Record "NPR SI Aux Salesperson/Purch.";
         SIAuxSalesHeader: Record "NPR SI Aux Sales Header";
+        SIAuxSalespersonPurch: Record "NPR SI Aux Salesperson/Purch.";
+        SalespersonPurchaser: Record "Salesperson/Purchaser";
     begin
         if not IsSIFiscalActive() then
             exit;
@@ -539,12 +575,12 @@ codeunit 6151546 "NPR SI Audit Mgt."
 
     local procedure CreateSalesInvoiceSale(SalesInvHeaderNo: Code[20])
     var
-        SIFiscalizationSetup: Record "NPR SI Fiscalization Setup";
-        SalesInvoiceHeader: Record "Sales Invoice Header";
         SIAuxSalesInvHeader: Record "NPR SI Aux Sales Inv. Header";
+        SIFiscalizationSetup: Record "NPR SI Fiscalization Setup";
         SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
-        SITaxCommunicationMgt: Codeunit "NPR SI Tax Communication Mgt.";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
         SIFiscalThermalPrint: Codeunit "NPR SI Fiscal Thermal Print";
+        SITaxCommunicationMgt: Codeunit "NPR SI Tax Communication Mgt.";
     begin
         if not IsSIFiscalActive() then
             exit;
@@ -569,12 +605,12 @@ codeunit 6151546 "NPR SI Audit Mgt."
 
     local procedure CreateSalesCreditMemoSale(SalesCrMemoHeaderNo: Code[20])
     var
-        SIFiscalizationSetup: Record "NPR SI Fiscalization Setup";
-        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SIAuxSalesCrMemoHeader: Record "NPR SI Aux Sales CrMemo Header";
+        SIFiscalizationSetup: Record "NPR SI Fiscalization Setup";
         SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info";
-        SITaxCommunicationMgt: Codeunit "NPR SI Tax Communication Mgt.";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SIFiscalThermalPrint: Codeunit "NPR SI Fiscal Thermal Print";
+        SITaxCommunicationMgt: Codeunit "NPR SI Tax Communication Mgt.";
         AppliesToDocumentNotFiscalizedErr: Label 'Sales Credit Memo %1 cannot be fiscalized, because Sales Document %2 to which it applies to was not fiscalized.', Comment = '%1 = Sales Credit Memo No., %2 = Applies-to Document No.';
     begin
         if not IsSIFiscalActive() then
