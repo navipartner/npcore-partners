@@ -1092,9 +1092,6 @@
         if (InfoCapture."Item No." = '') then
             exit;
 
-        InfoCapture."External Member No" := '';
-        InfoCapture."Member Entry No" := 0;
-
         MembershipSalesSetup.SetFilter(Type, '=%1', MembershipSalesSetup.Type::ITEM);
         MembershipSalesSetup.SetFilter("No.", '=%1', InfoCapture."Item No.");
         if (not MembershipSalesSetup.FindFirst()) then
@@ -1150,6 +1147,9 @@
 
         if (not Member.HasFilter()) then
             exit;
+
+        InfoCapture."External Member No" := '';
+        InfoCapture."Member Entry No" := 0;
 
         Member.SetFilter(Blocked, '=%1', false);
         if (not Member.FindFirst()) then
@@ -2103,6 +2103,9 @@
         Rec.Validate("Membership Code", Membership."Membership Code");
         Rec.Validate("External Member No", Member."External Member No.");
         Rec.Validate("Valid Until", MemberCard."Valid Until");
+
+        Rec."Membership Entry No." := Membership."Entry No.";
+        Rec."Member Entry No" := Member."Entry No.";
 
         CurrPage.Update(true);
     end;
