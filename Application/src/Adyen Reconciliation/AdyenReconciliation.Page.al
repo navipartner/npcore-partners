@@ -230,7 +230,7 @@ page 6184502 "NPR Adyen Reconciliation"
                 {
                     Caption = 'Post Entries';
                     Image = PostingEntries;
-                    Enabled = _PostingAllowed and not _DocumentPosted;
+                    Enabled = not _DocumentPosted;
                     ToolTip = 'Running this action will post transactions.';
                     ApplicationArea = NPRRetail;
 
@@ -254,7 +254,7 @@ page 6184502 "NPR Adyen Reconciliation"
                 {
                     Caption = 'Set as Reconciled';
                     Image = PostingEntries;
-                    Enabled = not _PostingAllowed and not _DocumentReconciled and not _DocumentPosted;
+                    Enabled = not _DocumentReconciled and not _DocumentPosted;
                     ToolTip = 'Running this action will set transactions as Reconciled.';
                     ApplicationArea = NPRRetail;
 
@@ -350,7 +350,6 @@ page 6184502 "NPR Adyen Reconciliation"
     begin
         _AdyenSetup.GetRecordOnce();
         _PostWithTransactionDate := _AdyenSetup."Post with Transaction Date";
-        _PostingAllowed := _AdyenSetup."Enable Automatic Posting";
     end;
 
     var
@@ -360,7 +359,6 @@ page 6184502 "NPR Adyen Reconciliation"
         _IsExternalReport: Boolean;
         _DocumentPosted: Boolean;
         _DocumentReconciled: Boolean;
-        _PostingAllowed: Boolean;
         _PostWithTransactionDate: Boolean;
         _OpeningBalanceNull: Boolean;
         _ClosingBalanceNull: Boolean;

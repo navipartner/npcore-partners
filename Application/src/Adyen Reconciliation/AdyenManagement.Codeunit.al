@@ -266,6 +266,9 @@ codeunit 6184796 "NPR Adyen Management"
         else
             Error(ResponseText);
 
+        if pagesTotal = 0 then
+            exit;
+
         if not JsonObject.Get('data', JsonToken) then
             Error(ResponseText);
 
