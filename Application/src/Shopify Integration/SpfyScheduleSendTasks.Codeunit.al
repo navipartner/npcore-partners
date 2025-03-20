@@ -182,6 +182,21 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
 #else
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Sync. Mgt.", OnBeforeProcessTask, '', true, false)]
 #endif
+    local procedure CreateTaskSetup_OnBeforeProcessTask(var Task: Record "NPR Nc Task")
+    begin
+        CreateTaskSetup(Task);
+    end;
+
+#if BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Sync. Mgt.", 'OnBeforeProcessTaskBatch', '', true, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Sync. Mgt.", OnBeforeProcessTaskBatch, '', true, false)]
+#endif
+    local procedure CreateTaskSetup_OnBeforeProcessTaskBatch(var Task: Record "NPR Nc Task")
+    begin
+        CreateTaskSetup(Task);
+    end;
+
     local procedure CreateTaskSetup(var Task: Record "NPR Nc Task")
     begin
         if (Task."Task Processor Code" = '') or (Task."Task Processor Code" <> GetShopifyTaskProcessorCode(false)) then
