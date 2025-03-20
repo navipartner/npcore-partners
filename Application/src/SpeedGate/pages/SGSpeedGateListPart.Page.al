@@ -87,6 +87,12 @@ page 6184879 "NPR SG SpeedGateListPart"
                     Caption = 'City Card Profile';
                     Editable = false;
                 }
+                field(ItemsProfileCode; Rec.ItemsProfileCode)
+                {
+                    ToolTip = 'Specifies the value of the Additional Items Profile Code field.', Comment = '%';
+                    ApplicationArea = NPRRetail;
+                }
+
             }
         }
     }

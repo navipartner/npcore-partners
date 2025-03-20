@@ -267,6 +267,7 @@ types:
       imageProfileCode: simpleTypes.ImageProfileCode
       ticketProfileCode: simpleTypes.TicketProfileCode
       memberCardProfileCode: simpleTypes.MemberCardProfileCode
+      items: list<ScannerItemProfileLine>
       scanners: list<ScannerIdSetupResponseList>
     examples:
       - name: ExampleScannerIdSetupResponseShort
@@ -278,6 +279,8 @@ types:
           imageProfileCode: $simpleTypes.ImageProfileCode.ExampleImageProfileCode
           ticketProfileCode: $simpleTypes.TicketProfileCode.ExampleTicketProfileCode
           memberCardProfileCode: $simpleTypes.MemberCardProfileCode.ExampleMemberCardProfileCode
+          items:
+            - $ScannerItemProfileLine.ExampleScannerItemProfileLine
           scanners:
             - id: $simpleTypes.ScannerSystemId.ExampleScannerSystemId
               scannerId: $simpleTypes.ScannerId.ExampleSpeedgate
@@ -312,6 +315,7 @@ types:
       imageProfileCode: simpleTypes.ImageProfileCode
       ticketProfileCode: simpleTypes.TicketProfileCode
       memberCardProfileCode: simpleTypes.MemberCardProfileCode
+      items: list<ScannerItemProfileLine>
     examples:
       - name: ExampleScannerIdSetupResponse
         value:
@@ -326,4 +330,22 @@ types:
           imageProfileCode: $simpleTypes.ImageProfileCode.ExampleImageProfileCode
           ticketProfileCode: $simpleTypes.TicketProfileCode.ExampleTicketProfileCode
           memberCardProfileCode: $simpleTypes.MemberCardProfileCode.ExampleMemberCardProfileCode
+          items:
+            - $ScannerItemProfileLine.ExampleScannerItemProfileLine
 
+  ScannerItemProfileLine:
+    docs:
+      A scanner station can provide additional simple service options f.ex. free ticket. This is a list of the available options.
+    properties:
+      itemNo: simpleTypes.ItemNo
+      description: simpleTypes.Description
+      description2: optional<simpleTypes.Description>
+      presentationOrder: simpleTypes.PresentationOrder
+    examples:
+      - name: ExampleScannerItemProfileLine
+        value:
+          itemNo: $simpleTypes.ItemNo.ExampleItemNo
+          description: $simpleTypes.Description.ExampleDescription
+          description2: $simpleTypes.Description.ExampleDescription
+          presentationOrder: 1
+    

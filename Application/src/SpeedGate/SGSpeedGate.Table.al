@@ -90,6 +90,13 @@ table 6150974 "NPR SG SpeedGate"
             Editable = false;
         }
 
+        field(90; ItemsProfileCode; Code[10])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Items Profile Code';
+            TableRelation = "NPR SG ItemsProfile";
+        }
+
     }
 
     keys

@@ -471,3 +471,10 @@ types:
     examples:
       - name: ExamplePermitDocLxCityCards
         value: true
+
+  PresentationOrder:
+    type: integer
+    docs: The order in which the scanner will present the items.
+    examples:
+      - name: ExamplePresentationOrder
+        value: 1

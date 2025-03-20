@@ -58,9 +58,15 @@ table 6150975 "NPR SG SpeedGateDefault"
             Caption = 'Allowed Numbers List';
             TableRelation = "NPR SG AllowedNumbersList";
         }
+
+        field(90; ItemsProfileCode; Code[10])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Items Profile Code';
+            TableRelation = "NPR SG ItemsProfile";
+        }
+
     }
-
-
     keys
     {
         key(Key1; Code)
