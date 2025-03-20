@@ -29,29 +29,11 @@ codeunit 6184929 "NPR Adyen Post Payment Lines"
             until MagentoPaymentLine.Next() = 0;
     end;
 
-    [TryFunction]
-    procedure TryPostPaymentLine(MagentoPaymentLine: Record "NPR Magento Payment Line");
-    var
-        GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
-        MagentoPmtAdyenMgt: Codeunit "NPR Magento Pmt. Mgt.";
-    begin
-        MagentoPmtAdyenMgt.PostPaymentLine(MagentoPaymentLine, GenJnlPostLine);
-    end;
-
-
-    [TryFunction]
-    local procedure TryCapturePaymentLine(MagentoPaymentLine: Record "NPR Magento Payment Line");
-    var
-        MagentoPmtAdyenMgt: Codeunit "NPR Magento Pmt. Mgt.";
-    begin
-        MagentoPmtAdyenMgt.CapturePaymentLine(MagentoPaymentLine);
-    end;
-
     local procedure UpdateMagentoPaymentLine(var MagentoPaymentLine: Record "NPR Magento Payment Line")
     var
         AdyenSetup: Record "NPR Adyen Setup";
     begin
-        If not AdyenSetup.Get(MagentoPaymentLine."Payment Gateway Code") then
+        If not AdyenSetup.Get() then
             exit;
 
         MagentoPaymentLine."Try Posting Count" += 1;
@@ -63,16 +45,16 @@ codeunit 6184929 "NPR Adyen Post Payment Lines"
     local procedure ProcessPaymentLine(var MagentoPaymentLine: Record "NPR Magento Payment Line")
     var
         MagentoPmtAdyenMgt: Codeunit "NPR Magento Pmt. Mgt.";
+        PostPaymentLine: Codeunit "NPR Magento Post Payment Line";
         Success: Boolean;
     begin
         ClearLastError();
-        Success := TryPostPaymentLine(MagentoPaymentLine);
+        Success := PostPaymentLine.Run(MagentoPaymentLine);
         MagentoPmtAdyenMgt.InsertPostingLog(MagentoPaymentLine, Success);
         if not Success then
             UpdateMagentoPaymentLine(MagentoPaymentLine);
         Commit();
         if Success then
-            TryCapturePaymentLine(MagentoPaymentLine);
+            MagentoPmtAdyenMgt.CapturePaymentLine(MagentoPaymentLine);
     end;
-
 }
