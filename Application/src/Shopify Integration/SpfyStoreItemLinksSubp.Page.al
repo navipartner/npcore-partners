@@ -7,6 +7,7 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
     SourceTable = "NPR Spfy Store-Item Link";
     UsageCategory = None;
     DeleteAllowed = false;
+    InsertAllowed = false;
 
     layout
     {
@@ -36,6 +37,7 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
                 {
                     ToolTip = 'Specifies a Shopify store the linked item is integrated to.';
                     ApplicationArea = NPRShopify;
+                    Editable = false;
                 }
                 field("Store Integration Is Enabled"; Rec."Store Integration Is Enabled")
                 {

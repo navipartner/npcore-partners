@@ -8,6 +8,7 @@
         TempTask: Record "NPR Nc Task" temporary;
         FTPClient: Codeunit "NPR AF FTP Client";
         SFTPClient: Codeunit "NPR AF Sftp Client";
+        TaskSetupNotFoundErr: Label 'No Task Setup found: %1', Comment = '%1 - task setup table filters.';
 
     #region "Download Ftp"
 
@@ -209,20 +210,25 @@
         TaskSetup.SetCurrentKey("Task Processor Code", "Table No.", "Codeunit ID");
         TaskSetup.SetRange("Task Processor Code", Task."Task Processor Code");
         TaskSetup.SetRange("Table No.", Task."Table No.");
-        if TaskSetup.FindSet() then
-            repeat
-                // Due to NST caching and the possiblity that another
-                // NST has updated the records in the meantime, we
-                // skip caching here.
-                SelectLatestVersion();
+        if not TaskSetup.FindSet() then begin
+            ClearLastError();
+            TaskError(Task, StrSubstNo(TaskSetupNotFoundErr, TaskSetup.GetFilters()));
+            exit(false);
+        end;
 
-                if Task.Get(Task."Entry No.") then;
-                ClearLastError();
-                if not Codeunit.Run(TaskSetup."Codeunit ID", Task) then begin
-                    TaskError(Task);
-                    exit(false);
-                end;
-            until TaskSetup.Next() = 0;
+        repeat
+            // Due to NST caching and the possiblity that another
+            // NST has updated the records in the meantime, we
+            // skip caching here.
+            SelectLatestVersion();
+
+            if Task.Get(Task."Entry No.") then;
+            ClearLastError();
+            if not Codeunit.Run(TaskSetup."Codeunit ID", Task) then begin
+                TaskError(Task);
+                exit(false);
+            end;
+        until TaskSetup.Next() = 0;
         TaskComplete(Task);
         exit(true);
     end;
@@ -230,18 +236,28 @@
     procedure ProcessTaskBatch(var Task: Record "NPR Nc Task"): Boolean
     var
         TaskSetup: Record "NPR Nc Task Setup";
+        Task2: Record "NPR Nc Task";
     begin
         OnBeforeProcessTaskBatch(Task);
 
         TaskSetup.SetCurrentKey("Task Processor Code", "Table No.", "Codeunit ID");
         TaskSetup.SetRange("Task Processor Code", Task."Task Processor Code");
         TaskSetup.SetRange("Table No.", Task."Table No.");
-        if TaskSetup.FindSet() then
-            repeat
-                Commit();
-                SelectLatestVersion();
-                if Codeunit.Run(TaskSetup."Codeunit ID", Task) then;
-            until TaskSetup.Next() = 0;
+        if not TaskSetup.FindSet() then begin
+            ClearLastError();
+            if Task.FindSet() then
+                repeat
+                    if Task2.Get(Task."Entry No.") then
+                        TaskError(Task2, StrSubstNo(TaskSetupNotFoundErr, TaskSetup.GetFilters()));
+                until Task.Next() = 0;
+            exit(false);
+        end;
+
+        repeat
+            Commit();
+            SelectLatestVersion();
+            if Codeunit.Run(TaskSetup."Codeunit ID", Task) then;
+        until TaskSetup.Next() = 0;
         exit(true);
     end;
 
@@ -296,19 +312,26 @@
 
     local procedure TaskError(var NaviConnectTask: Record "NPR Nc Task")
     var
-        NcTaskMgt: Codeunit "NPR Nc Task Mgt.";
-        OutStream: OutStream;
         ErrorText: Text;
-        SkipErrorClearing: Boolean;
     begin
         NaviConnectTask.LockTable();
         if not NaviConnectTask.Get(NaviConnectTask."Entry No.") then
             exit;
 
-        NaviConnectTask."Last Processing Completed at" := CurrentDateTime;
-        NaviConnectTask."Last Processing Duration" := (NaviConnectTask."Last Processing Completed at" - NaviConnectTask."Last Processing Started at") / 1000;
-
         ErrorText := GetLastErrorText();
+        TaskError(NaviConnectTask, ErrorText);
+    end;
+
+    local procedure TaskError(var NaviConnectTask: Record "NPR Nc Task"; ErrorText: Text)
+    var
+        NcTaskMgt: Codeunit "NPR Nc Task Mgt.";
+        OutStream: OutStream;
+        SkipErrorClearing: Boolean;
+    begin
+        NaviConnectTask.Processed := false;
+        NaviConnectTask."Process Error" := true;
+        NaviConnectTask."Last Processing Completed at" := CurrentDateTime();
+        NaviConnectTask."Last Processing Duration" := (NaviConnectTask."Last Processing Completed at" - NaviConnectTask."Last Processing Started at") / 1000;
 
         if ErrorText <> '' then begin
             NaviConnectTask.Response.CreateOutStream(OutStream, TextEncoding::UTF8);
