@@ -27,8 +27,8 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
                     .AddProperty('permitWallets', ScannerDefault.PermitWallets)
                     .AddProperty('imageProfileCode', ScannerDefault.ImageProfileCode)
                     .AddProperty('ticketProfileCode', ScannerDefault.DefaultTicketProfileCode)
-                    .AddProperty('memberCardProfileCode', ScannerDefault.DefaultMemberCardProfileCode);
-
+                    .AddProperty('memberCardProfileCode', ScannerDefault.DefaultMemberCardProfileCode)
+                    .AddArray(AddScannerItemsProfileLines(ResponseJson, ScannerDefault.ItemsProfileCode));
             Scanner.SetFilter(Enabled, '=%1', true);
             ResponseJson.StartArray('scanners');
             if (Scanner.FindSet()) then
@@ -60,10 +60,31 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             .AddProperty('imageProfileCode', Scanner.ImageProfileCode)
             .AddProperty('ticketProfileCode', Scanner.TicketProfileCode)
             .AddProperty('memberCardProfileCode', Scanner.MemberCardProfileCode)
+            .AddArray(AddScannerItemsProfileLines(ResponseJson, Scanner.ItemsProfileCode))
             .EndObject();
 
         exit(Response.RespondOK(ResponseJson.Build()));
+    end;
 
+    local procedure AddScannerItemsProfileLines(var ResponseJson: Codeunit "NPR JSON Builder"; ItemsProfileCode: Code[10]): Codeunit "NPR JSON Builder"
+    var
+        ItemsProfileLine: Record "NPR SG ItemsProfileLine";
+    begin
+        ResponseJson.StartArray('items');
+        ItemsProfileLine.SetCurrentKey(Code, PresentationOrder);
+        ItemsProfileLine.SetFilter(Code, '=%1', ItemsProfileCode);
+        if (ItemsProfileLine.FindSet()) then
+            repeat
+                ResponseJson.StartObject()
+                    .AddProperty('itemNo', ItemsProfileLine.ItemNo)
+                    .AddProperty('description', ItemsProfileLine.Description)
+                    .AddProperty('description2', ItemsProfileLine.Description2)
+                    .AddProperty('presentationOrder', ItemsProfileLine.PresentationOrder)
+                    .EndObject();
+            until (ItemsProfileLine.Next() = 0);
+        ResponseJson.EndArray();
+
+        exit(ResponseJson);
     end;
 
     internal procedure TryAdmit(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"

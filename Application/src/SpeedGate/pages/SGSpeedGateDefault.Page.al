@@ -32,6 +32,11 @@ page 6184878 "NPR SG SpeedGateDefault"
                     ToolTip = 'Specifies the value of the Number White List field.', Comment = '%';
                     ApplicationArea = NPRRetail;
                 }
+                field(ItemsProfileCode; Rec.ItemsProfileCode)
+                {
+                    ToolTip = 'Specifies the value of the Additional Items Profile Code field.', Comment = '%';
+                    ApplicationArea = NPRRetail;
+                }
 
                 Group(Tickets)
                 {
@@ -144,6 +149,19 @@ page 6184878 "NPR SG SpeedGateDefault"
                 PromotedCategory = Process;
                 PromotedOnly = true;
                 RunObject = page "NPR DocLXCityCardLocationList";
+            }
+
+            action(ItemProfiles)
+            {
+                Caption = 'Item Profiles';
+                Tooltip = 'This action navigates to the Item Profiles setup';
+                ApplicationArea = NPRRetail;
+                Image = List;
+                Promoted = true;
+                PromotedIsBig = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                RunObject = page "NPR SG ItemsProfiles";
             }
         }
     }
