@@ -147,13 +147,10 @@
             Caption = 'Issued Date';
             DataClassification = CustomerContent;
         }
-        field(30; "Auto-Renew"; Option)
+        field(30; "Auto-Renew"; Enum "NPR MM MembershipAutoRenew")
         {
             Caption = 'Auto-Renew';
             DataClassification = CustomerContent;
-            OptionCaption = 'No,Yes (Internal),Yes (External)';
-            OptionMembers = NO,YES_INTERNAL,YES_EXTERNAL;
-
             trigger OnValidate()
             begin
                 TestField("Customer No.");

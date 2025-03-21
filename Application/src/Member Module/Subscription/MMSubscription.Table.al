@@ -64,12 +64,10 @@ table 6150918 "NPR MM Subscription"
             Caption = 'Subscr. Request Type Filter';
             FieldClass = FlowFilter;
         }
-        field(230; "Auto-Renew"; Option)
+        field(230; "Auto-Renew"; ENUM "NPR MM MembershipAutoRenew")
         {
             Caption = 'Auto-Renew';
             DataClassification = CustomerContent;
-            OptionCaption = 'No,Yes (Internal),Yes (External)';
-            OptionMembers = NO,YES_INTERNAL,YES_EXTERNAL;
         }
     }
 

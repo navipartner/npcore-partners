@@ -43,7 +43,7 @@ page 6184909 "NPR MM Set Auto-Renew Status"
     var
         _Membership: Record "NPR MM Membership";
         _NotifyMember: Boolean;
-        _AutoRenewStatus: Option NO,YES_INTERNAL,YES_EXTERNAL;
+        _AutoRenewStatus: ENUM "NPR MM MembershipAutoRenew";
 
     trigger OnOpenPage()
     var
@@ -71,7 +71,7 @@ page 6184909 "NPR MM Set Auto-Renew Status"
         Membership := _Membership;
     end;
 
-    local procedure ProcessResponse(var Membership: Record "NPR MM Membership"; CreateMemberNotification: Boolean; AutoRenewStatus: Option NO,YES_INTERNAL,YES_EXTERNAL)
+    local procedure ProcessResponse(var Membership: Record "NPR MM Membership"; CreateMemberNotification: Boolean; AutoRenewStatus: ENUM "NPR MM MembershipAutoRenew")
     var
         MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
     begin
