@@ -307,6 +307,7 @@
         CaptionGlobalSmall: Label 'Small';
         CaptionGlobalMedium: Label 'Medium';
         CaptionGlobalLarge: Label 'Large';
+        CaptionGlobalXLarge: Label 'X Large';
         CaptionGlobalLeft: Label 'Left';
         CaptionGlobalCenter: Label 'Center';
         CaptionGlobalRight: Label 'Right';
@@ -522,6 +523,7 @@
         IconsEditorPleaseProvideTooltipLbl: Label 'Please provide tooltip';
         IconsEditorOnlyWithSelectedLineLbl: Label 'Only with selected line';
         IconsEditorOnlyWhenItemsInSaleLbl: Label 'Only when items in sale';
+        IconsEditorSelectCaptionBackgroundColorLbl: Label 'Select caption background color';
         VariablesEditorMenuDeleteConfirmationLbl: Label 'Any other buttons using this menu will not be able to access it anymore! Are you sure you want to delete ';
         VariablesEditorIdBlankErrorLbl: Label 'ID cannot be blank';
         VariablesEditorMaxLenghtErrorLbl: Label 'Max length is 30 chars. Please pick a different name.';
@@ -613,6 +615,7 @@
         WizardModalChooseLanguageDescriptionLbl: Label 'What is your preferred language?';
         WizardModalChoosePresetDescriptionLbl: Label 'Choose from existing presets or create your own';
         WizardModalFinalizeDescriptionLbl: Label 'Confirm your selection';
+        GlobalSettingsStatisticsTabLbl: Label 'Statistics';
         GlobalSettingsModalLbl: Label 'Password requirements for opening edit mode : ';
         GlobalSettingsModalEditorTabButtonLbl: Label 'Editor';
         GlobalSettingsModalEditorMaintenanceTabLbl: Label 'Maintenance';
@@ -640,7 +643,12 @@
         GlobalSettingsMaintenanceShowLastStackTraceLbl: Label 'Show last error stacktrace : ';
         GlobalSettingsFirstDayOfTheWeekDatePickerLbl: Label 'First day of the week';
         GlobalSettingsDatePickerSettingsTitleLbl: Label 'Date Picker Settings';
+        GlobalSettingsReservationDialogCalendarSizeLbl: Label 'Reservation dialog calendar size :';
+        GlobalSettingsReservationDialogCalendarDateRangeLbl: Label 'Reservation dialog calendar days ahead range :';
         GlobalSettingsDialogTabLbl: Label 'Dialog';
+        GlobalSettingsNotificationsTabLbl: Label 'Notifications';
+        GlobalSettingsNotificationsImageSizeSelectionLbl: Label 'Image Size Selection';
+        GlobalSettingsNotificationsPreferableImageSizeLbl: Label 'Please select the preferable image size:';
         GlobalSettingsHIDSettingsLabelLbl: Label 'HID Settings';
         GlobalShortcutsErrorShortcutAlreadyExistsLbl: Label 'Shortcut already exists';
         GlobalShortcutsErrorShortcutIsPredefinedLbl: Label 'Shortcut is predefined';
@@ -677,6 +685,10 @@
         GlobalSettingsSystemWorkFlowItemLbl: Label 'Add Item to Order :';
         GlobalSettingsSystemWorkFlowCustomerSelectLbl: Label 'Customer Select :';
         GlobalSettingsSystemWorkFlowMakePaymentLbl: Label 'Make Payment :';
+        GlobalSettingsNestedMenuToCloseAfterActionLbl: Label 'Nested menus to close after action:';
+        GlobalSettingsNestedMenuToCloseLoginMenusLbl: Label 'Login menus:';
+        GlobalSettingsNestedMenuToCloseSaleMenusLbl: Label 'Sale menus:';
+        GlobalSettingsNestedMenuToClosePaymentMenusLbl: Label 'Payment menus:';
         GlobalSettingsSystemWorkFlowSelectWorkflowLbl: Label 'Select Workflow';
         GlobalSettingsSystemWorkNoEditableVariablesLbl: Label 'No Editable Variables';
         GlobalSettingsSystemWorkflowTextEnterLbl: Label 'Enter text :';
@@ -708,6 +720,10 @@
         RestaurantEditModeNewElementAddTableLbl: Label 'Add Table';
         RestaurantEditModeNewElementAddWallLbl: Label 'Add Wall';
         RestaurantEditModeNewElementAddBarLbl: Label 'Add Bar';
+        RestaurantSeatingComponentRenameLbl: Label 'Rename';
+        RestaurantSeatingComponentRemoveLbl: Label 'Remove';
+        RestaurantSeatingComponentConfigureLbl: Label 'Configure';
+        RestaurantSeatingComponentDuplicateLbl: Label 'Duplicate';
         BinTransferNotCompletedConfirmationLbl: Label 'You have not reviewed and confirmed the counting. Are you sure you want to cancel bin transfer?';
         BinTransferCashCountFinalizedLbl: Label 'finalized';
         BinTransferCashCountTransferAmountTooMuchLbl: Label 'The amount you are attempting to transfer is higher than the counted amount. Please correct this before proceeding.';
@@ -782,6 +798,7 @@
         StatisticsTotalSalesTitleLbl: Label 'Total Sales Statistics';
         StatisticsSalesPerCustomerTitleLbl: Label 'Sales Per Customer Statistics';
         StatisticsSalesPerProductQuantityTitleLbl: Label 'Sales Per Product Quantity';
+        StatisticsTotalSalesStatisticsTitleLbl: Label 'Total Amount of Sales';
         StatisticsTotalSalesLbl: Label 'Total Sales';
         StatisticsSalesPerCustomerLbl: Label 'Sales Per Customer';
         StatisticsSalesPerProductLbl: Label 'Sales Per Product';
@@ -789,6 +806,10 @@
         StatisticsWeekModeLbl: Label 'Week';
         StatisticsShowDetailsLbl: Label 'Show Details';
         StatisticsHideDetailsLbl: Label 'Hide Details';
+        StatisticsTotalCustomersTitleLbl: Label 'Total Amount of Customers';
+        StatisticsTotalCustomersLbl: Label 'Total Customers';
+        StatisticsAvgSalePerCustomerTitleTbl: Label 'Avg. Sale Per Customer';
+        StatisticsAvgSalePricePerItemTitleTbl: Label 'Avg. Sale Price Per Item';
         LastSaleDateLbl: Label 'Last Sale date';
     begin
         Captions.Add('Sale_ReceiptNo', CaptionLabelReceiptNo);
@@ -836,6 +857,7 @@
         Captions.Add('Global_Small', CaptionGlobalSmall);
         Captions.Add('Global_Medium', CaptionGlobalMedium);
         Captions.Add('Global_Large', CaptionGlobalLarge);
+        Captions.Add('Global_XLarge', CaptionGlobalXLarge);
         Captions.Add('Global_Left', CaptionGlobalLeft);
         Captions.Add('Global_Center', CaptionGlobalCenter);
         Captions.Add('Global_Right', CaptionGlobalRight);
@@ -1043,6 +1065,7 @@
         Captions.Add('Icons_Editor_PleaseProvideTooltip', IconsEditorPleaseProvideTooltipLbl);
         Captions.Add('Icons_Editor_OnlyWithSelectedLine', IconsEditorOnlyWithSelectedLineLbl);
         Captions.Add('Icons_Editor_OnlyWhenItemsInSale', IconsEditorOnlyWhenItemsInSaleLbl);
+        Captions.Add('Icons_Editor_SelectCaptionBackgroundColor', IconsEditorSelectCaptionBackgroundColorLbl);
         Captions.Add('Variables_Editor_MenuDeleteConfirmation', VariablesEditorMenuDeleteConfirmationLbl);
         Captions.Add('Variables_Editor_IdBlankError', VariablesEditorIdBlankErrorLbl);
         Captions.Add('Variables_Editor_MaxLengthError', VariablesEditorMaxLenghtErrorLbl);
@@ -1134,6 +1157,7 @@
         Captions.Add('Wizard_Modal_ChooseLanguageDescription', WizardModalChooseLanguageDescriptionLbl);
         Captions.Add('Wizard_Modal_ChoosePresetDescription', WizardModalChoosePresetDescriptionLbl);
         Captions.Add('Wizard_Modal_FinalizeDescription', WizardModalFinalizeDescriptionLbl);
+        Captions.Add('Global_Settings_StatisticsTab', GlobalSettingsStatisticsTabLbl);
         Captions.Add('Global_Settings_PasswordRequirementForEditMode', GlobalSettingsModalLbl);
         Captions.Add('Global_Settings_Authorization', GlobalSettingsAuthorizationLbl);
         Captions.Add('Global_Settings_Modal_RestaurantTabButton', GlobalSettingsModalRestaurantTabButtonLbl);
@@ -1158,6 +1182,10 @@
         Captions.Add('Global_Settings_SystemWorkFlowLogin', GlobalSettingsSystemWorkFlowLoginLbl);
         Captions.Add('Global_Settings_SystemWorkFlowItem', GlobalSettingsSystemWorkFlowItemLbl);
         Captions.Add('Global_Settings_SystemWorkFlowMake_Payment', GlobalSettingsSystemWorkFlowMakePaymentLbl);
+        Captions.Add('Global_Settings_NestedMenuToCloseAfterAction', GlobalSettingsNestedMenuToCloseAfterActionLbl);
+        Captions.Add('Global_Settings_NestedMenuToCloseLoginMenus', GlobalSettingsNestedMenuToCloseLoginMenusLbl);
+        Captions.Add('Global_Settings_NestedMenuToCloseSaleMenus', GlobalSettingsNestedMenuToCloseSaleMenusLbl);
+        Captions.Add('Global_Settings_NestedMenuToClosePaymentMenus', GlobalSettingsNestedMenuToClosePaymentMenusLbl);
         Captions.Add('Global_Settings_SystemWorkFlowCustomer_Select', GlobalSettingsSystemWorkFlowCustomerSelectLbl);
         Captions.Add('Global_Settings_SystemWorkFlowSelectWorkflow', GlobalSettingsSystemWorkFlowSelectWorkflowLbl);
         Captions.Add('Global_Settings_SystemWorkNoEditableVariables', GlobalSettingsSystemWorkNoEditableVariablesLbl);
@@ -1174,8 +1202,13 @@
         Captions.Add('Global_Settings_Maintenance_ErrorHandling', GlobalSettingsMaintenanceErrorHandlingLbl);
         Captions.Add('Global_Settings_Maintenance_ShowLastStackTrace', GlobalSettingsMaintenanceShowLastStackTraceLbl);
         Captions.Add('Global_Settings_FirstDayOfTheWeekDatePickerLabel', GlobalSettingsFirstDayOfTheWeekDatePickerLbl);
+        Captions.Add('Global_Settings_ReservationDialogCalendarSize', GlobalSettingsReservationDialogCalendarSizeLbl);
+        Captions.Add('Global_Settings_ReservationDialogCalendarDateRange', GlobalSettingsReservationDialogCalendarDateRangeLbl);
         Captions.Add('Global_Settings_DatePickerSettingsTitle', GlobalSettingsDatePickerSettingsTitleLbl);
         Captions.Add('Global_Settings_DialogTab', GlobalSettingsDialogTabLbl);
+        Captions.Add('Global_Settings_NotificationsTab', GlobalSettingsNotificationsTabLbl);
+        Captions.Add('Global_Settings_NotificationsPreferableImageSize', GlobalSettingsNotificationsPreferableImageSizeLbl);
+        Captions.Add('Global_Settings_NotificationsImageSizeSelection', GlobalSettingsNotificationsImageSizeSelectionLbl);
         Captions.Add('Global_Settings_HID_SettingsLabel', GlobalSettingsHIDSettingsLabelLbl);
         Captions.Add('Global_Shortcuts_Error_ShortcutAlreadyExists', GlobalShortcutsErrorShortcutAlreadyExistsLbl);
         Captions.Add('Global_Shortcuts_Error_ShortcutIsPredefined', GlobalShortcutsErrorShortcutIsPredefinedLbl);
@@ -1230,6 +1263,10 @@
         Captions.Add('Restaurant_EditMode_NewElement_AddTable', RestaurantEditModeNewElementAddTableLbl);
         Captions.Add('Restaurant_EditMode_NewElement_AddWall', RestaurantEditModeNewElementAddWallLbl);
         Captions.Add('Restaurant_EditMode_NewElement_AddBar', RestaurantEditModeNewElementAddBarLbl);
+        Captions.Add('Restaurant_SeatingComponent_Rename', RestaurantSeatingComponentRenameLbl);
+        Captions.Add('Restaurant_SeatingComponent_Remove', RestaurantSeatingComponentRemoveLbl);
+        Captions.Add('Restaurant_SeatingComponent_Configure', RestaurantSeatingComponentConfigureLbl);
+        Captions.Add('Restaurant_SeatingComponent_Duplicate', RestaurantSeatingComponentDuplicateLbl);
         Captions.Add('BinTransfer_NotCompletedConfirmation', BinTransferNotCompletedConfirmationLbl);
         Captions.Add('BinTransfer_CashCountFinalized', BinTransferCashCountFinalizedLbl);
         Captions.Add('BinTransfer_CashCountTransferAmountTooMuch', BinTransferCashCountTransferAmountTooMuchLbl);
@@ -1304,6 +1341,7 @@
         Captions.Add('Statistics_TotalSalesTitle', StatisticsTotalSalesTitleLbl);
         Captions.Add('Statistics_SalesPerCustomerTitle', StatisticsSalesPerCustomerTitleLbl);
         Captions.Add('Statistics_SalesPerProductQuantityTitle', StatisticsSalesPerProductQuantityTitleLbl);
+        Captions.Add('Statistics_TotalSalesStatisticsTitle', StatisticsTotalSalesStatisticsTitleLbl);
         Captions.Add('Statistics_TotalSales', StatisticsTotalSalesLbl);
         Captions.Add('Statistics_SalesPerCustomer', StatisticsSalesPerCustomerLbl);
         Captions.Add('Statistics_SalesPerProduct', StatisticsSalesPerProductLbl);
@@ -1311,6 +1349,10 @@
         Captions.Add('Statistics_WeekMode', StatisticsWeekModeLbl);
         Captions.Add('Statistics_ShowDetails', StatisticsShowDetailsLbl);
         Captions.Add('Statistics_HideDetails', StatisticsHideDetailsLbl);
+        Captions.Add('Statistics_TotalCustomersTitle', StatisticsTotalCustomersTitleLbl);
+        Captions.Add('Statistics_TotalCustomers', StatisticsTotalCustomersLbl);
+        Captions.Add('Statistics_AvgSalePerCustomerTitle', StatisticsAvgSalePerCustomerTitleTbl);
+        Captions.Add('Statistics_AvgSalePricePerItemTitle', StatisticsAvgSalePricePerItemTitleTbl);
         Captions.Add('LastSale_Date', LastSaleDateLbl);
 
         RecRef.Open(DATABASE::"NPR POS Sale Line");
