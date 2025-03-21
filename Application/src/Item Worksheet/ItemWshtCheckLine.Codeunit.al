@@ -42,7 +42,7 @@
         ItemCategory: Record "Item Category";
         NoSeries: Record "No. Series";
         ItemWorksheetVariantLineToCreate: Record "NPR Item Worksh. Variant Line";
-        ItemWkshtValidateTestRnr: Codeunit "NPR Item Wksht.Valid.Test Rnr.";
+        ItemWkshtValidation: Codeunit "NPR Item Wksht. Validation";
         ItemWshtRegisterLine: Codeunit "NPR Item Wsht.Register Line";
         IsUpdated: Boolean;
         ErrorText: Text;
@@ -159,14 +159,14 @@
         end;
         if ItemWkshtLine.Action in [ItemWkshtLine.Action::UpdateAndCreateVariants, ItemWkshtLine.Action::UpdateOnly] then
             ItemWshtRegisterLine.InsertChangeRecords(ItemWkshtLine);
+
         if ((CalledFromRegister = false) and (ItemWorksheetTemplate."Test Validation" = ItemWorksheetTemplate."Test Validation"::"On Check"))
-          or
-           ((CalledFromRegister = true) and (ItemWorksheetTemplate."Test Validation" = ItemWorksheetTemplate."Test Validation"::"On Check and On Register")) then begin
-            ItemWkshtValidateTestRnr.SetItemWorksheetLine(ItemWkshtLine);
-            ItemWkshtValidateTestRnr.Run();
-            ErrorText := ItemWkshtValidateTestRnr.GetErrormessage();
-            if ErrorText <> '' then begin
-                ProcessError(ItemWkshtLine, CopyStr(ErrorText, 1, 1024), StopOnError);
+           or ((CalledFromRegister = true) and (ItemWorksheetTemplate."Test Validation" = ItemWorksheetTemplate."Test Validation"::"On Check and On Register")) then begin
+            Commit();
+            if not ItemWkshtValidation.Run(ItemWkshtLine) then begin
+                ErrorText := GetLastErrorText();
+                if ErrorText <> '' then
+                    ProcessError(ItemWkshtLine, CopyStr(ErrorText, 1, 1024), StopOnError);
             end;
         end;
         _ItemWorksheetVariantLine.Reset();
