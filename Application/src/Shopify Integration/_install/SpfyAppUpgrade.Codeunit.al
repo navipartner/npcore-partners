@@ -24,6 +24,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         UpgradeAllowedFinancialStatuses();
         RescheduleInventorySyncTasks();
         UpdateMetafieldDataLogSetup();
+        SetDefaultProductStatus();
     end;
 
     internal procedure UpdateShopifySetup()
@@ -303,6 +304,27 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         DataLogSetupTable.SetRange("Table ID", Database::"NPR Spfy Entity Metafield");
         if not DataLogSetupTable.IsEmpty() then
             DataLogSetupTable.ModifyAll("Log Insertion", DataLogSetupTable."Log Insertion"::" ");
+
+        SetUpgradeTag();
+        LogFinish();
+    end;
+
+    internal procedure SetDefaultProductStatus()
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+    begin
+        _UpgradeStep := 'SetDefaultProductStatus';
+        if HasUpgradeTag() then
+            exit;
+        LogStart();
+
+        if ShopifyStore.FindSet() then
+            repeat
+                if not (ShopifyStore."New Product Status" in [ShopifyStore."New Product Status"::DRAFT, ShopifyStore."New Product Status"::ACTIVE]) then begin
+                    ShopifyStore."New Product Status" := ShopifyStore."New Product Status"::DRAFT;
+                    ShopifyStore.Modify();
+                end;
+            until ShopifyStore.Next() = 0;
 
         SetUpgradeTag();
         LogFinish();

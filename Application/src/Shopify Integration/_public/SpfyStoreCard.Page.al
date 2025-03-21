@@ -17,7 +17,7 @@ page 6184704 "NPR Spfy Store Card"
                 Caption = 'General';
                 field("Code"; Rec."Code")
                 {
-                    ToolTip = 'Specifies a unique ID that will be used by BC to refer to this store.';
+                    ToolTip = 'Specifies a unique ID that will be used by Business Central to refer to this store.';
                     ApplicationArea = NPRShopify;
                     ShowMandatory = true;
                 }
@@ -54,9 +54,15 @@ page 6184704 "NPR Spfy Store Card"
                         UpdateControlVisibility();
                     end;
                 }
+                field("New Product Status"; Rec."New Product Status")
+                {
+                    ToolTip = 'Specifies the status that will be assigned by default to new products created in Shopify from Business Central.';
+                    ApplicationArea = NPRShopify;
+                    Enabled = _ItemListIntegrationIsEnabled;
+                }
                 field("Set Shopify Name/Descr. in BC"; Rec."Set Shopify Name/Descr. in BC")
                 {
-                    ToolTip = 'Specifies whether you want to be able to update Shopify item names and descriptions from within BC.';
+                    ToolTip = 'Specifies whether you want to be able to update Shopify item names and descriptions from within Business Central.';
                     ApplicationArea = NPRShopify;
                     Enabled = _ItemListIntegrationIsEnabled;
                 }
@@ -164,7 +170,7 @@ page 6184704 "NPR Spfy Store Card"
                 }
                 field("Voucher Type (Sold at Shopify)"; Rec."Voucher Type (Sold at Shopify)")
                 {
-                    ToolTip = 'Specifies the voucher type to create retail vouchers in BC for gift cards sold directly on Shopify.';
+                    ToolTip = 'Specifies the voucher type to create retail vouchers in Business Central for gift cards sold directly on Shopify.';
                     ApplicationArea = NPRShopify;
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -207,40 +213,40 @@ page 6184704 "NPR Spfy Store Card"
                 }
                 field("Get Payment Lines from Shopify"; Rec."Get Payment Lines from Shopify")
                 {
-                    ToolTip = 'Specifies when the system should retrieve order payment information from Shopify and create sales order payment lines in BC. This can be when the order is first imported or just before the payment capture requests are sent to Shopify.';
+                    ToolTip = 'Specifies when the system should retrieve order payment information from Shopify and create sales order payment lines in Business Central. This can be when the order is first imported or just before the payment capture requests are sent to Shopify.';
                     ApplicationArea = NPRShopify;
                     Enabled = _SalesOrderIntegrationIsEnabled;
                     Importance = Additional;
                 }
                 field("Post on Completion"; Rec."Post on Completion")
                 {
-                    ToolTip = 'Specifies whether the system should automatically post the sales order in BC when the associated Shopify order is marked as closed in Shopify.';
+                    ToolTip = 'Specifies whether the system should automatically post the sales order in Business Central when the associated Shopify order is marked as closed in Shopify.';
                     ApplicationArea = NPRShopify;
                     Enabled = _SalesOrderIntegrationIsEnabled;
                     Importance = Additional;
                 }
                 field("Delete on Cancellation"; Rec."Delete on Cancellation")
                 {
-                    ToolTip = 'Specifies whether the system should automatically delete the sales order in BC when the associated Shopify order is cancelled in Shopify.';
+                    ToolTip = 'Specifies whether the system should automatically delete the sales order in Business Central when the associated Shopify order is cancelled in Shopify.';
                     ApplicationArea = NPRShopify;
                     Enabled = _SalesOrderIntegrationIsEnabled;
                     Importance = Additional;
                 }
                 field("Send Order Fulfillments"; Rec."Send Order Fulfillments")
                 {
-                    ToolTip = 'Specifies whether to send order fulfillment requests from BC to Shopify. Order fulfillment requests are sent for sales orders that have been posted as shipped.';
+                    ToolTip = 'Specifies whether to send order fulfillment requests from Business Central to Shopify. Order fulfillment requests are sent for sales orders that have been posted as shipped.';
                     ApplicationArea = NPRShopify;
                     Enabled = _SalesOrderIntegrationIsEnabled;
                 }
                 field("Send Payment Capture Requests"; Rec."Send Payment Capture Requests")
                 {
-                    ToolTip = 'Specifies whether to send payment capture requests from BC to Shopify. Payment capture requests are sent for sales orders that have been posted as invoiced.';
+                    ToolTip = 'Specifies whether to send payment capture requests from Business Central to Shopify. Payment capture requests are sent for sales orders that have been posted as invoiced.';
                     ApplicationArea = NPRShopify;
                     Enabled = _SalesOrderIntegrationIsEnabled;
                 }
                 field("Send Close Order Requets"; Rec."Send Close Order Requets")
                 {
-                    ToolTip = 'Specifies whether to send close order requests from BC to Shopify. Close order requests are sent for sales orders that have been posted as invoiced.';
+                    ToolTip = 'Specifies whether to send close order requests from Business Central to Shopify. Close order requests are sent for sales orders that have been posted as invoiced.';
                     ApplicationArea = NPRShopify;
                     Enabled = _SalesOrderIntegrationIsEnabled;
                 }
@@ -345,7 +351,7 @@ page 6184704 "NPR Spfy Store Card"
                 action(SyncItems)
                 {
                     Caption = 'Sync. Items';
-                    ToolTip = 'Executes initial item synchronization between BC and Shopify. The system will iterate through items in BC and identify those that already exist in Shopify. The system will also update item statuses, names, descriptions and metafields from Shopify and create requests to assign product tags in Shopify based on the item categories selected for the items in BC.';
+                    ToolTip = 'Executes initial item synchronization between Business Central and Shopify. The system will iterate through items in Business Central and identify those that already exist in Shopify. The system will also update item statuses, names, descriptions and metafields from Shopify and create requests to assign product tags in Shopify based on the item categories selected for the items in Business Central.';
                     ApplicationArea = NPRShopify;
                     Image = CheckList;
                     Promoted = true;
@@ -364,7 +370,7 @@ page 6184704 "NPR Spfy Store Card"
                 action(SyncRetailVouchers)
                 {
                     Caption = 'Sync. Vouchers';
-                    ToolTip = 'Executes initial retail voucher migration from BC to Shopify. The system will iterate through retail vouchers in BC and create those marked as synchronizable with your selected Shopify store as gift cards in the store. The system will also update gift card balances in Shopify as needed.';
+                    ToolTip = 'Executes initial retail voucher migration from Business Central to Shopify. The system will iterate through retail vouchers in Business Central and create those marked as synchronizable with your selected Shopify store as gift cards in the store. The system will also update gift card balances in Shopify as needed.';
                     ApplicationArea = NPRShopify;
                     Image = Migration;
                     Promoted = true;
@@ -388,7 +394,7 @@ page 6184704 "NPR Spfy Store Card"
             action(LocationLinks)
             {
                 Caption = 'Linked Locations';
-                ToolTip = 'View and set up BC-Shopify location links.';
+                ToolTip = 'View and set up Business Central-Shopify location links.';
                 ApplicationArea = NPRShopify;
                 Image = LinkWeb;
                 RunObject = Page "NPR Spfy Store-Location Links";

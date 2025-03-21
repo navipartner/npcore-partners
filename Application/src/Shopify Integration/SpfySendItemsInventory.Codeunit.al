@@ -720,7 +720,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                     ProductJObject.Add('product_type', 'new');
                     ProductJObject.Add('published', false);
                     ProductJObject.Add('published_scope', 'web');
-                    ProductJObject.Add('status', 'draft');
+                    ProductJObject.Add('status', LowerCase(ProductStatusEnumValueName(_SpfyIntegrationMgt.DefaultNewProductStatus(SpfyStoreItemLink."Shopify Store Code"))));
                 end;
             NcTask.Type::Modify:
                 if not SpfyItemMgt.TestRequiredFields(Item, false) or not SpfyStoreItemLink."Sync. to this Store" then
@@ -1601,6 +1601,11 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
     local procedure CurrCodeunitID(): Integer
     begin
         exit(Codeunit::"NPR Spfy Send Items&Inventory");
+    end;
+
+    local procedure ProductStatusEnumValueName(ProductStatus: Enum "NPR Spfy Product Status") Result: Text
+    begin
+        ProductStatus.Names().Get(ProductStatus.Ordinals().IndexOf(ProductStatus.AsInteger()), Result);
     end;
 
     local procedure SetNcTaskPostponed(var NcTaskIn: Record "NPR Nc Task"; var RequestString: Text) Success: Boolean
