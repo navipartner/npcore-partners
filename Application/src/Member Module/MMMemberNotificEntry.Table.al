@@ -296,12 +296,10 @@
             Caption = 'Pin Code';
             DataClassification = CustomerContent;
         }
-        field(165; "Auto-Renew"; Option)
+        field(165; "Auto-Renew"; ENUM "NPR MM MembershipAutoRenew")
         {
             Caption = 'Auto-Renew';
             DataClassification = CustomerContent;
-            OptionCaption = 'No,Yes (Internal),Yes (External)';
-            OptionMembers = NO,YES_INTERNAL,YES_EXTERNAL;
         }
         field(166; "Auto-Renew Payment Method Code"; Code[10])
         {
