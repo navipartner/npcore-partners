@@ -67,4 +67,61 @@ codeunit 6060127 "NPR MM Membership Mgt."
     begin
         MembershipManagement.CancelMembership(MemberInfoCapture, WithConfirm, WithUpdate, MembershipStartDate, MembershipUntilDate, UnitPrice);
     end;
+
+    procedure BlockMembership(MembershipEntryNo: Integer)
+    var
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+        MembershipManagement.BlockMembership(MembershipEntryNo, true);
+    end;
+
+    procedure UnblockMembership(MembershipEntryNo: Integer)
+    var
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+        MembershipManagement.BlockMembership(MembershipEntryNo, false);
+    end;
+
+    procedure BlockMember(MembershipEntryNo: Integer; MemberEntryNo: Integer)
+    var
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+        MembershipManagement.BlockMember(MembershipEntryNo, MemberEntryNo, true);
+    end;
+
+    procedure UnblockMember(MembershipEntryNo: Integer; MemberEntryNo: Integer)
+    var
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+        MembershipManagement.BlockMember(MembershipEntryNo, MemberEntryNo, false);
+    end;
+
+    procedure BlockMemberCard(CardEntryNo: Integer)
+    var
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+        MembershipManagement.BlockMemberCard(CardEntryNo, true);
+    end;
+
+    procedure UnblockMemberCard(CardEntryNo: Integer)
+    var
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+        MembershipManagement.BlockMemberCard(CardEntryNo, false);
+    end;
+
+    procedure BlockMemberCards(MembershipEntryNo: Integer; MemberEntryNo: Integer)
+    var
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+        MembershipManagement.BlockMemberCards(MembershipEntryNo, MemberEntryNo, true);
+    end;
+
+    procedure UnblockMemberCards(MembershipEntryNo: Integer; MemberEntryNo: Integer)
+    var
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+        MembershipManagement.BlockMemberCards(MembershipEntryNo, MemberEntryNo, false);
+    end;
+
 }
