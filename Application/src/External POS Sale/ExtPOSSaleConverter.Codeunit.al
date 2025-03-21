@@ -12,7 +12,8 @@
         Rec.Find();
         if (Rec."Converted To POS Entry") then
             exit;
-        Rec."Sales Ticket No." := POSSaleCU.GetNextReceiptNo(Rec."Register No.");
+        if (Rec."Sales Ticket No." = '') then
+            Rec."Sales Ticket No." := POSSaleCU.GetNextReceiptNo(Rec."Register No.");
         CreateEftData(Rec);
         POSCreateEntry.CreatePOSEntryFromExternalPOSSale(Rec, POSEntry);
         Rec.Modify();
