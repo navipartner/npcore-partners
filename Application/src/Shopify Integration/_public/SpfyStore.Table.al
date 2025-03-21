@@ -119,6 +119,13 @@ table 6150810 "NPR Spfy Store"
             Caption = 'Set Shopify Name/Descr. in BC';
             DataClassification = CustomerContent;
         }
+        field(63; "New Product Status"; Enum "NPR Spfy Product Status")
+        {
+            Caption = 'New Product Status';
+            DataClassification = CustomerContent;
+            ValuesAllowed = DRAFT, ACTIVE;
+            InitValue = DRAFT;
+        }
         field(70; "Send Inventory Updates"; Boolean)
         {
             Caption = 'Send Inventory Updates';

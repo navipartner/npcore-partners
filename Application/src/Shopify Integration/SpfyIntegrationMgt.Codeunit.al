@@ -128,6 +128,14 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         exit(_ShopifyStore."Set Shopify Name/Descr. in BC");
     end;
 
+    procedure DefaultNewProductStatus(ShopifyStoreCode: Code[20]): Enum "NPR Spfy Product Status"
+    begin
+        GetStore(ShopifyStoreCode);
+        if not (_ShopifyStore."New Product Status" in [_ShopifyStore."New Product Status"::DRAFT, _ShopifyStore."New Product Status"::ACTIVE]) then
+            exit(_ShopifyStore."New Product Status"::DRAFT);
+        exit(_ShopifyStore."New Product Status");
+    end;
+
     procedure IsAllowedFinancialStatus(FinancialStatus: Text; ShopifyStoreCode: Code[20]): Boolean
     var
         SpfyAllowedFinStatus: Record "NPR Spfy Allowed Fin. Status";
