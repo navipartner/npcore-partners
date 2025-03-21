@@ -53,6 +53,9 @@
                 "Unit Price" := Item."Unit Price";
                 Description := Item.Description;
                 Validate("Variant Code");
+
+                if ("Variant Code" = '') then
+                    "Description 2" := Item."Description 2";
             end;
         }
         field(20; "Variant Code"; Code[10])
