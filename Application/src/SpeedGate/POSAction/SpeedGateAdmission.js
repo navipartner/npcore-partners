@@ -8,7 +8,8 @@ let main = async ({workflow , parameters, context, popup, captions}) => {
 {
         context.input_reference_no = parameters.input_reference_no;       
     }
-    const actionResponse = await workflow.respond("validate_reference");
+    await workflow.respond("try_admit"); 
+    const actionResponse = await workflow.respond("admit_token");
     memberCardDetails = await workflow.respond("membercard_validation");
     if (actionResponse.success) {
     if (memberCardDetails.MemberScanned)
