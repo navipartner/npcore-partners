@@ -430,9 +430,6 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
         ADMIT_MEMBERS: Label 'Do you want to admit the member(s) automatically?';
         InputMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;
     begin
-        if (ExternalMemberCardNo <> '') then
-            if (not MemberCard.Get(MembershipManagement.GetCardEntryNoFromExtCardNo(ExternalMemberCardNo))) then
-                ExternalMemberCardNo := '';
 
         if (ExternalMemberCardNo = '') then
             GetMembershipFromCardNumberWithUI(InputMethod::NO_PROMPT, ExternalMemberCardNo, Membership, MemberCard, false);
@@ -466,8 +463,6 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
                 MemberInfoCapture."Auto-Admit Member" := true;
         end;
 
-        MemberInfoCapture."Member Entry No" := MemberCard."Member Entry No.";
-        MemberInfoCapture."Card Entry No." := MemberCard."Entry No.";
         MemberInfoCapture.Modify();
 
         AddItemToPOS(POSSaleLine, MemberInfoEntryNo, ItemNo, MembershipAlterationSetup.Description, CopyStr(ExternalMemberCardNo, 1, 80), 1, MemberInfoCapture."Unit Price", SaleLinePOS);
