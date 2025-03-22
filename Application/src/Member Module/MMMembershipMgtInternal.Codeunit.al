@@ -2321,11 +2321,7 @@
         MemberInfoCapture.Init();
         MemberInfoCapture."Entry No." := 0;
 
-        MemberInfoCapture."Membership Entry No." := Membership."Entry No.";
-        MemberInfoCapture."Membership Code" := Membership."Membership Code";
-        MemberInfoCapture."External Membership No." := Membership."External Membership No.";
-        MemberInfoCapture."Item No." := UpgradeWithItemNo;
-
+        PrefillMemberInfoCapture(MemberInfoCapture, Member, Membership, ExternalMemberCardNo, UpgradeWithItemNo);
         MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::UPGRADE;
         MemberInfoCapture."Document Date" := Today(); // Active
 
