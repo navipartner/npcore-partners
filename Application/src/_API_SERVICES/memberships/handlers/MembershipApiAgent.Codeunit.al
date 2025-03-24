@@ -54,9 +54,11 @@ codeunit 6185123 "NPR MembershipApiAgent"
             ResponseJson.StartObject()
                 .AddObject(StartMembershipDTO(ResponseJson, Membership, false))
                 .EndObject();
+            MemberInfoCapture.Delete();
             exit(Response.RespondCreated(ResponseJson.Build()));
         end;
 
+        MemberInfoCapture.Delete();
         exit(Response.RespondBadRequest('Membership creation failed.'));
     end;
 
@@ -179,6 +181,7 @@ codeunit 6185123 "NPR MembershipApiAgent"
     end;
 
     // ************
+    # region Private Methods
     local procedure GetMembershipByNumber(MembershipNumber: Code[20]) Response: Codeunit "NPR API Response"
     var
         Membership: Record "NPR MM Membership";
@@ -426,6 +429,8 @@ codeunit 6185123 "NPR MembershipApiAgent"
         MemberInfoCapture.TestField("Item No.");
 
     end;
-# pragma warning restore AA0139
+    #endregion Private Methods
+
+#pragma warning restore AA0139
 }
 #endif

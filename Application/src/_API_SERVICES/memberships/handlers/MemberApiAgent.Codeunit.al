@@ -192,9 +192,11 @@ codeunit 6248220 "NPR MemberApiAgent"
             ResponseJson.StartObject()
                 .AddObject(StartMemberDTO(ResponseJson, Membership."Entry No.", Member, false, true))
                 .EndObject();
+            MemberInfoCapture.Delete();
             exit(Response.RespondCreated(ResponseJson.Build()));
         end;
 
+        MemberInfoCapture.Delete();
         exit(Response.RespondBadRequest('Member creation failed.'));
 
     end;
@@ -231,9 +233,11 @@ codeunit 6248220 "NPR MemberApiAgent"
             ResponseJson.StartObject()
                 .AddObject(StartMemberDTO(ResponseJson, Member, false))
                 .EndObject();
+            MemberInfoCapture.Delete();
             exit(Response.RespondOk(ResponseJson.Build()));
         end;
 
+        MemberInfoCapture.Delete();
         exit(Response.RespondBadRequest('Member creation failed.'));
 
     end;
@@ -734,7 +738,6 @@ codeunit 6248220 "NPR MemberApiAgent"
         ResponseJson.EndArray();
         exit(ResponseJson);
     end;
-
 
 }
 #endif
