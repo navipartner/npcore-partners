@@ -861,16 +861,29 @@
         AdmSchEntry: Record "NPR TM Admis. Schedule Entry";
         Admission: Record "NPR TM Admission";
         NotificationEntry: Record "NPR TM Ticket Notif. Entry";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        Item: Record Item;
+        NpDesignerSetup: Record "NPR NPDesignerSetup";
     begin
 #pragma warning disable AA0217
         Ticket.Get(DetTicketAccessEntry."Ticket No.");
         TicketReservationRequest.Get(Ticket."Ticket Reservation Entry No.");
+
+        if (not Item.Get(Ticket."Item No.")) then
+            Item.Init();
 
         AdmSchEntry.SetFilter("External Schedule Entry No.", '=%1', DetTicketAccessEntry."External Adm. Sch. Entry No.");
         AdmSchEntry.SetFilter(Cancelled, '=%1', false);
         AdmSchEntry.FindLast();
 
         Admission.Get(AdmSchEntry."Admission Code");
+
+        TicketBom.SetFilter("Item No.", '=%1', Ticket."Item No.");
+        TicketBom.SetFilter(NPDesignerTemplateId, '<>%1', '');
+        TicketBom.SetFilter(Default, '=%1', true);
+        if (TicketBom.FindFirst()) then
+            NpDesignerSetup.Get();
+
 
         NotificationEntry."Entry No." := 0;
         NotificationEntry."Notification Trigger" := NotificationEntry."Notification Trigger"::REMINDER;
@@ -939,6 +952,12 @@
         NotificationEntry."Relevant Date" := AdmSchEntry."Admission Start Date";
         NotificationEntry."Relevant Time" := AdmSchEntry."Admission Start Time";
         NotificationEntry."Relevant Datetime" := CreateDateTime(NotificationEntry."Relevant Date", NotificationEntry."Relevant Time");
+
+        NotificationEntry.NPDesignerTemplateId := TicketBom.NPDesignerTemplateId;
+        if (NotificationEntry.NPDesignerTemplateId <> '') then
+            if (NpDesignerSetup.PublicTicketURL <> '') then
+                // https://tickets.npretail.app?reservation=%1&design=%2
+                NotificationEntry."Published Ticket URL" := StrSubstNo(NpDesignerSetup.PublicTicketURL, Format(Ticket.SystemId, 0, 4).ToLower(), NotificationEntry.NPDesignerTemplateId);
 
         NotificationEntry."Notification Method" := NotificationEntry."Notification Method"::NA;
         if (NotificationEntry."Notification Address" <> '') then begin

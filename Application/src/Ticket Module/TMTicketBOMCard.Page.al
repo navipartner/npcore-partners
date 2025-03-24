@@ -189,6 +189,12 @@ page 6059886 "NPR TM Ticket BOM Card"
                     ToolTip = 'Specifies which events will trigger notifications to be sent to the ticket holder. This option is useful for CRM purposes.';
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                 }
+                field(DesignLayoutLabel; Rec.NPDesignerTemplateLabel)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Design Layout Label field.', Comment = '%';
+                }
+
             }
             group(eTicket)
             {
@@ -208,12 +214,6 @@ page 6059886 "NPR TM Ticket BOM Card"
                 {
                     ToolTip = 'Specifies the URL to the server on which you can share the ticket with customers.';
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                }
-                field(DesignLayoutLabel; Rec.NPDesignerTemplateLabel)
-                {
-                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Design Layout Label field.', Comment = '%';
-
                 }
             }
             group(Misc)
