@@ -210,6 +210,7 @@ codeunit 6185076 "NPR AttractionWalletCreate"
         IntermediaryWalletLine.LineNumber := LineNumber;
         IntermediaryWalletLine.SaleLineId := SaleLineId;
         IntermediaryWalletLine.WalletNumber := IntermediaryWallet.WalletNumber;
+
         exit(IntermediaryWalletLine.Insert());
     end;
 
@@ -226,8 +227,14 @@ codeunit 6185076 "NPR AttractionWalletCreate"
     var
         IntermediaryWallet: Record "NPR AttractionWalletSaleHdr";
         IntermediaryWalletLine: Record "NPR AttractionWalletSaleLine";
+        SaleLinePOS: Record "NPR POS Sale Line";
         CurrentCount, ExistingCount : Integer;
+        ReuseExistingWallets: Boolean;
     begin
+        ReuseExistingWallets := false;
+        if (SaleLinePOS.GetBySystemId(SaleLineId)) then
+            ReuseExistingWallets := (SaleLinePOS.Indentation > 0);
+
         // Get current assigned count
         IntermediaryWalletLine.SetCurrentKey(SaleHeaderSystemId, LineNumber);
         IntermediaryWalletLine.SetFilter(SaleHeaderSystemId, '=%1', SaleId);
@@ -237,21 +244,50 @@ codeunit 6185076 "NPR AttractionWalletCreate"
             exit;
 
         // Add existing wallets not yet assigned to this line. (brute force)
-        IntermediaryWallet.SetCurrentKey(SaleHeaderSystemId);
-        IntermediaryWallet.SetFilter(SaleHeaderSystemId, '=%1', SaleId);
-        ExistingCount := IntermediaryWallet.Count();
+        if (ReuseExistingWallets) then begin
+            IntermediaryWallet.SetCurrentKey(SaleHeaderSystemId, WalletNumber);
+            IntermediaryWallet.SetFilter(SaleHeaderSystemId, '=%1', SaleId);
+            ExistingCount := IntermediaryWallet.Count();
 
-        if (ExistingCount > CurrentCount) then begin
-            IntermediaryWallet.FindSet();
-            repeat
-                if (AddIntermediateWalletLine(IntermediaryWallet, SaleLineId, SaleLineNumber)) then
-                    CurrentCount += 1;
-            until (IntermediaryWallet.Next() = 0) or (CurrentCount >= TargetQuantity);
+            if (ExistingCount > CurrentCount) then begin
+                IntermediaryWallet.FindSet();
+                repeat
+                    if (WalletNumberIsLegalToAssign(IntermediaryWallet.WalletNumber, SaleId, SaleLineId)) then
+                        if (AddIntermediateWalletLine(IntermediaryWallet, SaleLineId, SaleLineNumber)) then
+                            CurrentCount += 1;
+                until (IntermediaryWallet.Next() = 0) or (CurrentCount >= TargetQuantity);
+            end;
         end;
 
         if (CurrentCount < TargetQuantity) then
             CreateIntermediateWallet(SaleId, SaleLineId, SaleLineNumber, TargetQuantity - CurrentCount, TargetQuantity);
 
+    end;
+
+    local procedure WalletNumberIsLegalToAssign(WalletNumber: Integer; SaleId: Guid; SaleLineId: Guid): Boolean
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+        IntermediaryWalletLine: Record "NPR AttractionWalletSaleLine";
+    begin
+
+        if (not SaleLinePOS.GetBySystemId(SaleLineId)) then
+            exit(false);
+
+        SaleLinePOSAddOn.SetCurrentKey("Register No.", "Sales Ticket No.", "Sale Type", "Sale Date", "Sale Line No.", "Line No.");
+        SaleLinePOSAddOn.SetFilter("Register No.", '=%1', SaleLinePOS."Register No.");
+        SaleLinePOSAddOn.SetFilter("Sales Ticket No.", '=%1', SaleLinePOS."Sales Ticket No.");
+        SaleLinePOSAddOn.SetFilter("Sale Type", '=%1', SaleLinePOSAddOn."Sale Type"::Sale);
+        SaleLinePOSAddOn.SetFilter("Sale Date", '=%1', SaleLinePOS.Date);
+        SaleLinePOSAddOn.SetFilter("Sale Line No.", '=%1', SaleLinePOS."Line No.");
+        if (not SaleLinePOSAddOn.FindFirst()) then
+            exit(false);
+
+        IntermediaryWalletLine.SetCurrentKey(SaleHeaderSystemId, LineNumber);
+        IntermediaryWalletLine.SetFilter(SaleHeaderSystemId, '=%1', SaleId);
+        IntermediaryWalletLine.SetFilter(LineNumber, '=%1', SaleLinePOSAddOn."Applies-to Line No.");
+        IntermediaryWalletLine.SetFilter(WalletNumber, '=%1', WalletNumber);
+        exit(not IntermediaryWalletLine.IsEmpty());
     end;
 
     internal procedure RemoveIntermediateWalletsForLine(SaleId: Guid; SaleLineNumber: Integer; TargetQuantity: Integer)
