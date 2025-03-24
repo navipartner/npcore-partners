@@ -196,6 +196,8 @@ codeunit 6248223 "NPR MemberCardApiAgent"
         if (MemberInfoCapture."Member Card Type" in [MemberInfoCapture."Member Card Type"::CARD_PASSSERVER, MemberInfoCapture."Member Card Type"::PASSSERVER]) then
             MemberNotification.CreateWalletSendNotification(NewCard."Membership Entry No.", NewCard."Member Entry No.", NewCard."Entry No.", Today());
 
+        MemberInfoCapture.Delete();
+
     end;
 
     local procedure ReplaceCardWorker(var Request: Codeunit "NPR API Request"; CardToReplace: Record "NPR MM Member Card"; var NewCard: Record "NPR MM Member Card")
@@ -237,6 +239,7 @@ codeunit 6248223 "NPR MemberCardApiAgent"
         if (MemberInfoCapture."Member Card Type" in [MemberInfoCapture."Member Card Type"::CARD_PASSSERVER, MemberInfoCapture."Member Card Type"::PASSSERVER]) then
             MemberNotification.CreateWalletSendNotification(NewCard."Membership Entry No.", NewCard."Member Entry No.", NewCard."Entry No.", Today());
 
+        MemberInfoCapture.Delete();
     end;
 
 

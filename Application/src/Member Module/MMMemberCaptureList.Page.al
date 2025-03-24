@@ -88,6 +88,26 @@
                     ImportMembers();
                 end;
             }
+
+            action(DeleteSelected)
+            {
+                ApplicationArea = NPRMembershipAdvanced;
+                Caption = 'Delete Selected';
+                ToolTip = 'Deletes the selected records, this is a clean-up action and should be used with caution.';
+                Image = Delete;
+                Promoted = false;
+
+                trigger OnAction()
+                var
+                    MemberInfoCapture: Record "NPR MM Member Info Capture";
+                begin
+                    CurrPage.SetSelectionFilter(MemberInfoCapture);
+                    if (MemberInfoCapture.FindSet()) then
+                        repeat
+                            MemberInfoCapture.Delete();
+                        until (MemberInfoCapture.Next() = 0);
+                end;
+            }
         }
     }
 
