@@ -291,6 +291,21 @@
             Caption = 'Initiated in Shopify';
             DataClassification = CustomerContent;
         }
+        field(460; "Spfy Send from Shopify"; Boolean)
+        {
+            Caption = 'Send from Shopify';
+            DataClassification = CustomerContent;
+        }
+        field(470; "Spfy Send on"; DateTime)
+        {
+            Caption = 'Send on Date-Time';
+            DataClassification = CustomerContent;
+        }
+        field(480; "Spfy Liquid Template Suffix"; Text[20])
+        {
+            Caption = 'Shopify Liquid Template Suffix';
+            DataClassification = CustomerContent;
+        }
 #endif
         field(1000; Id; Guid)
         {

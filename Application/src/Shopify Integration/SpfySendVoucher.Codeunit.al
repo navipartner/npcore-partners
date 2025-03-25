@@ -27,7 +27,6 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         ShopifyResponse: JsonToken;
         OutStr: OutStream;
-        ShopifyGiftCardID: Text[30];
         SendToShopify: Boolean;
         Success: Boolean;
     begin
@@ -36,14 +35,9 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         ClearLastError();
         Success := false;
 
-        Success := PrepareVoucherUpdateRequest(NcTask, ShopifyGiftCardID, SendToShopify);
+        Success := PrepareVoucherUpdateRequest(NcTask, SendToShopify);
         if SendToShopify then
-            case NcTask.Type of
-                NcTask.Type::Insert:
-                    Success := SpfyCommunicationHandler.SendGiftCardCreateRequest(NcTask, ShopifyResponse);
-                NcTask.Type::Modify:
-                    Success := SpfyCommunicationHandler.SendGiftCardUpdateRequest(NcTask, ShopifyGiftCardID, ShopifyResponse);
-            end;
+            Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse);
         if Success and not SendToShopify then begin
             NcTask.Response.CreateOutStream(OutStr, TextEncoding::UTF8);
             OutStr.WriteText(GetLastErrorText());
@@ -53,7 +47,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
 
         if Success then begin
             if SendToShopify then
-                UpdateVoucherWithDataFromShopify(NcTask, ShopifyResponse)
+                UpdateVoucherWithDataFromShopify(NcTask, ShopifyResponse);
         end else
             Error(GetLastErrorText());
     end;
@@ -118,16 +112,15 @@ codeunit 6184820 "NPR Spfy Send Voucher"
     end;
 
     [TryFunction]
-    local procedure PrepareVoucherUpdateRequest(var NcTask: Record "NPR Nc Task"; var ShopifyGiftCardID: Text[30]; var SendToShopify: Boolean)
+    local procedure PrepareVoucherUpdateRequest(var NcTask: Record "NPR Nc Task"; var SendToShopify: Boolean)
     var
         Voucher: Record "NPR NpRv Voucher";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         SpfyRetailVoucherMgt: Codeunit "NPR Spfy Retail Voucher Mgt.";
         VoucherRecRef: RecordRef;
-        VoucherJObject: JsonObject;
-        RequestJObject: JsonObject;
         OStream: OutStream;
         ShopifyStoreCode: Code[20];
+        ShopifyGiftCardID: Text[30];
         ShopifyGiftCardIdEmptyErr: Label 'Shopify gift card Id must be specified for %1', Comment = '%1 - Retail voucher record id';
         VoucherArchivedErr: Label 'Retail Voucher %1 has already been archived. No need to send the create request to Shopify', Comment = '%1 - Retail Voucher No.';
     begin
@@ -153,10 +146,8 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         NcTask."Record ID" := VoucherRecRef.RecordId();
         NcTask."Store Code" := ShopifyStoreCode;
 
-        AddVoucherInfo(Voucher, ShopifyGiftCardID, VoucherJObject);
-        RequestJObject.Add('gift_card', VoucherJObject);
         NcTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
-        RequestJObject.WriteTo(OStream);
+        ShopifyGiftCardUpsertQuery(Voucher, ShopifyGiftCardID, ShopifyStoreCode, OStream);
         SendToShopify := true;
     end;
 
@@ -272,28 +263,152 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         Error(ErrorText);
     end;
 
-    local procedure AddVoucherInfo(Voucher: Record "NPR NpRv Voucher"; ShopifyGiftCardID: Text[30]; var VoucherJObject: JsonObject)
+    internal procedure ShopifyGiftCardUpsertQuery(Voucher: Record "NPR NpRv Voucher"; ShopifyGiftCardID: Text[30]; ShopifyStoreCode: Code[20]; var QueryStream: OutStream)
+    var
+        Customer: Record Customer;
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
+        RecipientAttributesJson: JsonObject;
+        RequestJson: JsonObject;
+        VariablesJson: JsonObject;
+        VoucherJson: JsonObject;
+        CreateQueryTok: Label 'mutation CreateGiftCard($input: GiftCardCreateInput!) {giftCardCreate(input: $input) {giftCard {id} userErrors {message field code}}}', Locked = true;
+        UpdateQueryTok: Label 'mutation UpdateGiftCard($id: ID!, $input: GiftCardUpdateInput!) {giftCardUpdate(id: $id, input: $input) {giftCard {id} userErrors {message field}}}', Locked = true;
     begin
         if ShopifyGiftCardID <> '' then begin
-            VoucherJObject.Add('id', ShopifyGiftCardID);
+            RequestJson.Add('query', UpdateQueryTok);
+            VariablesJson.Add('id', 'gid://shopify/GiftCard/' + ShopifyGiftCardID);
         end else begin
+            RequestJson.Add('query', CreateQueryTok);
             Voucher.CalcFields("Initial Amount");
-            VoucherJObject.Add('initial_value', Format(Voucher."Initial Amount", 0, 9));
-            VoucherJObject.Add('currency', LCYCode());
-            VoucherJObject.Add('code', Voucher."Reference No.");
+            VoucherJson.Add('initialValue', Format(Voucher."Initial Amount", 0, 9));
+            VoucherJson.Add('code', Voucher."Reference No.");
+            if Voucher."Spfy Liquid Template Suffix" <> '' then
+                VoucherJson.Add('templateSuffix', Voucher."Spfy Liquid Template Suffix");
         end;
-        VoucherJObject.Add('expires_on', Format(DT2Date(Voucher."Ending Date"), 0, 9));
-        VoucherJObject.Add('note', UpdatedFromBCNote());
+        VoucherJson.Add('expiresOn', Format(DT2Date(Voucher."Ending Date"), 0, 9));
+        VoucherJson.Add('note', UpdatedFromBCNote());
+
+        if (ShopifyGiftCardID = '') and (Voucher."Spfy Send from Shopify") and (Voucher."E-mail" <> '') then begin
+            Customer."E-Mail" := Voucher."E-mail";
+            Customer.Name := Voucher.Name;
+            Customer."Name 2" := Voucher."Name 2";
+
+            RecipientAttributesJson.Add('id', RecipientCustomerID(Customer, ShopifyStoreCode));
+            RecipientAttributesJson.Add('message', Voucher."Voucher Message");
+            RecipientAttributesJson.Add('preferredName', Voucher.Name + Voucher."Name 2");
+            if Voucher."Spfy Send on" <> 0DT then
+                if Voucher."Spfy Send on" > JobQueueMgt.NowWithDelayInSeconds(60) then
+                    RecipientAttributesJson.Add('sendNotificationAt', Voucher."Spfy Send on");
+            VoucherJson.Add('recipientAttributes', RecipientAttributesJson);
+        end;
+
+        VariablesJson.Add('input', VoucherJson);
+        RequestJson.Add('variables', VariablesJson);
+        RequestJson.WriteTo(QueryStream);
+    end;
+
+    local procedure RecipientCustomerID(Customer: Record Customer; ShopifyStoreCode: Code[20]) ShopifyCustomerID: Text
+    var
+        ShopifyResponse: JsonToken;
+    begin
+        //Find Shopify customer by email
+        ClearLastError();
+        if not FindShopifyCustomerByEmail(Customer."E-Mail", ShopifyStoreCode, ShopifyResponse) then
+            Error(GetLastErrorText());
+        if ShopifyResponse.SelectToken('data.customers.edges', ShopifyResponse) and ShopifyResponse.IsArray() then
+            if ShopifyResponse.AsArray().Count() > 0 then begin
+                ShopifyResponse.AsArray().Get(0, ShopifyResponse);
+                ShopifyCustomerID := JsonHelper.GetJText(ShopifyResponse, 'node.id', false);
+                if ShopifyCustomerID <> '' then
+                    exit;
+            end;
+
+        //Create Shopify customer
+        Clear(ShopifyResponse);
+        if not CreateShopifyCustomer(Customer, ShopifyStoreCode, ShopifyResponse) then
+            Error(GetLastErrorText());
+        ShopifyCustomerID := JsonHelper.GetJText(ShopifyResponse, 'data.customerCreate.customer.id', true);
+    end;
+
+    local procedure FindShopifyCustomerByEmail(Email: Text; ShopifyStoreCode: Code[20]; var ShopifyResponse: JsonToken): Boolean
+    var
+        NcTask: Record "NPR Nc Task";
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+        QueryStream: OutStream;
+        RequestJson: JsonObject;
+        VariablesJson: JsonObject;
+        QueryTok: Label 'query FindCustomerByEmail($searchCriteria: String!) {customers(first: 1, query: $searchCriteria) {edges{node{id email verifiedEmail}}}}', Locked = true;
+    begin
+        VariablesJson.Add('searchCriteria', 'email:' + Email);
+        RequestJson.Add('query', QueryTok);
+        RequestJson.Add('variables', VariablesJson);
+
+        NcTask."Store Code" := ShopifyStoreCode;
+        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
+        RequestJson.WriteTo(QueryStream);
+        exit(SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse));
+    end;
+
+    local procedure CreateShopifyCustomer(Customer: Record Customer; ShopifyStoreCode: Code[20]; var ShopifyResponse: JsonToken): Boolean
+    var
+        NcTask: Record "NPR Nc Task";
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+        QueryStream: OutStream;
+        CustomerJson: JsonObject;
+        RequestJson: JsonObject;
+        VariablesJson: JsonObject;
+        QueryTok: Label 'mutation CreateCustomer($input: CustomerInput!) {customerCreate(input: $input) {customer {id email firstName lastName} userErrors {message field}}}', Locked = true;
+    begin
+        CustomerJson.Add('email', Customer."E-Mail");
+        AddCustomerName(Customer, CustomerJson);
+        VariablesJson.Add('input', CustomerJson);
+        RequestJson.Add('query', QueryTok);
+        RequestJson.Add('variables', VariablesJson);
+
+        NcTask."Store Code" := ShopifyStoreCode;
+        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
+        RequestJson.WriteTo(QueryStream);
+        exit(SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse));
+    end;
+
+    local procedure AddCustomerName(Customer: Record Customer; var CustomerJson: JsonObject)
+    var
+        FullName: Text;
+        LastSpacePosition: Integer;
+    begin
+        FullName := Customer.Name + Customer."Name 2";
+        FullName := FullName.Trim();
+        LastSpacePosition := FullName.LastIndexOf(' ');
+        if LastSpacePosition > 1 then begin
+            CustomerJson.Add('firstName', FullName.Substring(1, LastSpacePosition - 1));
+            CustomerJson.Add('lastName', FullName.Substring(LastSpacePosition + 1));
+        end else
+            CustomerJson.Add('firstName', FullName);
     end;
 
     local procedure UpdateVoucherWithDataFromShopify(NcTask: Record "NPR Nc Task"; ShopifyResponse: JsonToken)
     var
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        FullShopifyGiftCardID: Text;
         ShopifyGiftCardID: Text[30];
     begin
-#pragma warning disable AA0139
-        ShopifyGiftCardID := JsonHelper.GetJText(ShopifyResponse, 'gift_card.id', MaxStrLen(ShopifyGiftCardID), true);
-#pragma warning restore AA0139
+        if not (NcTask.Type in [NcTask.Type::Insert, NcTask.Type::Modify]) then
+            exit;
+        case NcTask.Type of
+            NcTask.Type::Insert:
+                FullShopifyGiftCardID := JsonHelper.GetJText(ShopifyResponse, 'data.giftCardCreate.giftCard.id', MaxStrLen(FullShopifyGiftCardID), false);
+            NcTask.Type::Modify:
+                FullShopifyGiftCardID := JsonHelper.GetJText(ShopifyResponse, 'data.giftCardUpdate.giftCard.id', MaxStrLen(FullShopifyGiftCardID), false);
+        end;
+#pragma warning disable AA0139        
+        if FullShopifyGiftCardID.LastIndexOf('/') > 0 then
+            ShopifyGiftCardID := CopyStr(FullShopifyGiftCardID, FullShopifyGiftCardID.LastIndexOf('/') + 1)
+        else
+            ShopifyGiftCardID := FullShopifyGiftCardID;
+#pragma warning restore AA0139        
+        if ShopifyGiftCardID = '' then
+            Error('');  //The system will record shopify response as the error message
+
         SpfyAssignedIDMgt.AssignShopifyID(NcTask."Record ID", "NPR Spfy ID Type"::"Entry ID", ShopifyGiftCardID, false);
     end;
 
@@ -319,17 +434,6 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         NoteLbl: Label 'Updated from Business Central', MaxLength = 30;
     begin
         exit(NoteLbl);
-    end;
-
-    local procedure LCYCode(): Code[10]
-    var
-        GLSetup: Record "General Ledger Setup";
-    begin
-        if not GLSetup.Get() then
-            GLSetup.Init();
-        if GLSetup."LCY Code" = '' then
-            GLSetup."LCY Code" := 'DKK';
-        exit(GLSetup."LCY Code");
     end;
 
     local procedure SalesOrderReservedAmount(Voucher: Record "NPR NpRv Voucher"): Decimal

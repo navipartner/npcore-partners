@@ -30,7 +30,7 @@
 
                         trigger OnValidate()
                         begin
-                            UpdateControls();
+                            UpdateShopifyControls();
                         end;
 #endif
                     }
@@ -317,7 +317,7 @@
             {
                 Caption = 'Shopify';
                 Visible = ShopifyIntegrationIsEnabled and VourcherTypeShopifyIntegrationIsEnabled;
-                field("Shopify Gift Card ID"; SpfyAssignedIDMgt.GetAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID"))
+                field("Shopify Gift Card ID"; ShopifyGiftCardID)
                 {
                     Caption = 'Shopify Gift Card ID';
                     Editable = false;
@@ -339,6 +339,22 @@
 
                         CurrPage.Update(false);
                     end;
+                }
+                group(SendFromShopify)
+                {
+                    ShowCaption = false;
+                    field("Spfy Send from Shopify"; Rec."Spfy Send from Shopify")
+                    {
+                        ToolTip = 'Specifies whether you want the voucher to be sent to the recipient’s email address via Shopify. If enabled, the system will use the email address, customer name and voucher message from the voucher card to send the voucher to the recipient.';
+                        ApplicationArea = NPRShopify;
+                        Editable = ShopifyGiftCardID = '';
+                    }
+                    field("Spfy Send on"; Rec."Spfy Send on")
+                    {
+                        ToolTip = 'Specifies the date and time when Shopify should send the voucher to the recipient.';
+                        ApplicationArea = NPRShopify;
+                        Enabled = Rec."Spfy Send from Shopify";
+                    }
                 }
             }
 #endif
@@ -446,6 +462,7 @@
 #if not BC17
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         SpfyRetailVoucherMgt: Codeunit "NPR Spfy Retail Voucher Mgt.";
+        ShopifyGiftCardID: Text[30];
         ShopifyIntegrationIsEnabled: Boolean;
         VourcherTypeShopifyIntegrationIsEnabled: Boolean;
 
@@ -458,6 +475,7 @@
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
+        ShopifyGiftCardID := '';
         VourcherTypeShopifyIntegrationIsEnabled := false;
     end;
 #endif
@@ -465,13 +483,21 @@
     trigger OnAfterGetCurrRecord()
     begin
         UpdateControls();
+#if not BC17
+        UpdateShopifyControls();
+#endif
     end;
 
     local procedure UpdateControls()
     begin
         PrintUsingTemplate := Rec."Print Object Type" = Rec."Print Object Type"::Template;
-#if not BC17
-        VourcherTypeShopifyIntegrationIsEnabled := SpfyRetailVoucherMgt.IsShopifyIntegratedVoucherType(Rec."Voucher Type");
-#endif
     end;
+
+#if not BC17
+    local procedure UpdateShopifyControls()
+    begin
+        ShopifyGiftCardID := SpfyAssignedIDMgt.GetAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+        VourcherTypeShopifyIntegrationIsEnabled := SpfyRetailVoucherMgt.IsShopifyIntegratedVoucherType(Rec."Voucher Type");
+    end;
+#endif
 }

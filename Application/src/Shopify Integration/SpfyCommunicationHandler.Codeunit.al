@@ -241,32 +241,6 @@ codeunit 6184924 "NPR Spfy Communication Handler"
     end;
 
     [TryFunction]
-    procedure SendGiftCardCreateRequest(var NcTask: Record "NPR Nc Task"; var ShopifyResponse: JsonToken)
-    var
-        ResponseText: Text;
-        Url: Text;
-    begin
-        CheckRequestContent(NcTask);
-
-        Url := GetShopifyUrl(NcTask."Store Code") + 'gift_cards.json';
-        ResponseText := SendShopifyRequest(NcTask, Enum::"Http Request Type"::POST, Url);
-        ShopifyResponse.ReadFrom(ResponseText);
-    end;
-
-    [TryFunction]
-    procedure SendGiftCardUpdateRequest(var NcTask: Record "NPR Nc Task"; ShopifyGiftCardID: Text[30]; var ShopifyResponse: JsonToken)
-    var
-        ResponseText: Text;
-        Url: Text;
-    begin
-        CheckRequestContent(NcTask);
-
-        Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('gift_cards/%1.json', ShopifyGiftCardID);
-        ResponseText := SendShopifyRequest(NcTask, Enum::"Http Request Type"::PUT, Url);
-        ShopifyResponse.ReadFrom(ResponseText);
-    end;
-
-    [TryFunction]
     procedure SendGiftCardDisableRequest(var NcTask: Record "NPR Nc Task"; ShopifyGiftCardID: Text[30]; var ShopifyResponse: JsonToken)
     var
         ResponseText: Text;

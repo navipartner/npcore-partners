@@ -346,6 +346,23 @@
             ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'We don''t need to store barcode image.';
         }
+#if not BC17
+        field(460; "Spfy Send from Shopify"; Boolean)
+        {
+            Caption = 'Send from Shopify';
+            DataClassification = CustomerContent;
+        }
+        field(470; "Spfy Send on"; DateTime)
+        {
+            Caption = 'Send on Date-Time';
+            DataClassification = CustomerContent;
+        }
+        field(480; "Spfy Liquid Template Suffix"; Text[20])
+        {
+            Caption = 'Shopify Liquid Template Suffix';
+            DataClassification = CustomerContent;
+        }
+#endif
         field(1000; "Issue Date"; Date)
         {
             CalcFormula = Min("NPR NpRv Voucher Entry"."Posting Date" WHERE("Voucher No." = FIELD("No."),
