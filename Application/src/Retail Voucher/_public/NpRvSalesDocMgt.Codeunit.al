@@ -1464,14 +1464,19 @@
         NpRvSalesLine.Insert(true);
     end;
 
-    internal procedure InsertNpRVSalesLineReference(var NpRvSalesLine: Record "NPR NpRv Sales Line"; var TempNpRvVoucher: Record "NPR NpRv Voucher" temporary)
+    internal procedure InsertNpRVSalesLineReference(var NpRvSalesLine: Record "NPR NpRv Sales Line"; var NpRvVoucher: Record "NPR NpRv Voucher")
     var
         NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.";
     begin
+        InsertNpRVSalesLineReference(NpRvSalesLine, NpRvVoucher, NpRvSalesLineReference);
+    end;
+
+    internal procedure InsertNpRVSalesLineReference(var NpRvSalesLine: Record "NPR NpRv Sales Line"; var NpRvVoucher: Record "NPR NpRv Voucher"; var NpRvSalesLineReference: Record "NPR NpRv Sales Line Ref.")
+    begin
         NpRvSalesLineReference.Init();
         NpRvSalesLineReference.Id := CreateGuid();
-        NpRvSalesLineReference."Voucher No." := TempNpRvVoucher."No.";
-        NpRvSalesLineReference."Reference No." := TempNpRvVoucher."Reference No.";
+        NpRvSalesLineReference."Voucher No." := NpRvVoucher."No.";
+        NpRvSalesLineReference."Reference No." := NpRvVoucher."Reference No.";
         NpRvSalesLineReference."Sales Line Id" := NpRvSalesLine.Id;
         NpRvSalesLineReference.Insert(true);
     end;

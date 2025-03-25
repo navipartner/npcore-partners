@@ -323,17 +323,16 @@
     begin
         case true of
             (NpRvSalesLine."Document Source" = NpRvSalesLine."Document Source"::"Sales Document") and NpRvSalesLine.IsCreditDocType(),
-            NpRvSalesLine.Type = NpRvSalesLine.Type::"Top-up":
+            (NpRvSalesLine.Type = NpRvSalesLine.Type::"Top-up") and (NpRvSalesLineReference."Voucher No." <> ''):
                 Voucher.Get(NpRvSalesLineReference."Voucher No.");
 
-            NpRvSalesLine.Type = NpRvSalesLine.Type::"New Voucher":
-                begin
-                    if NpRvSalesLineReference."Reference No." = '' then
-                        VoucherType.TestField("Reference No. Pattern");
-                    if (NpRvSalesLineReference."Voucher No." = '') or not Voucher.Get(NpRvSalesLineReference."Voucher No.") then begin
-                        InsertIssuedVoucher(VoucherType, NpRvSalesLine, NpRvSalesLineReference."Voucher No.", NpRvSalesLineReference."Reference No.", Voucher);
-                    end;
+            else begin
+                if NpRvSalesLineReference."Reference No." = '' then
+                    VoucherType.TestField("Reference No. Pattern");
+                if (NpRvSalesLineReference."Voucher No." = '') or not Voucher.Get(NpRvSalesLineReference."Voucher No.") then begin
+                    InsertIssuedVoucher(VoucherType, NpRvSalesLine, NpRvSalesLineReference."Voucher No.", NpRvSalesLineReference."Reference No.", Voucher);
                 end;
+            end;
         end;
 
         PostIssueVoucher(Voucher, VoucherType, VoucherAmount, NpRvSalesLine);
@@ -389,6 +388,11 @@
         Voucher."Send via E-mail" := NpRvSalesLine."Send via E-mail";
         Voucher."Send via SMS" := NpRvSalesLine."Send via SMS";
         Voucher."Voucher Message" := NpRvSalesLine."Voucher Message";
+#if not BC17
+        Voucher."Spfy Send from Shopify" := NpRvSalesLine."Spfy Send from Shopify";
+        Voucher."Spfy Send on" := NpRvSalesLine."Spfy Send on";
+        Voucher."Spfy Liquid Template Suffix" := nprvSalesLine."Spfy Liquid Template Suffix";
+#endif
         if ModifyVoucherRec then
             Voucher.Modify(true);
     end;

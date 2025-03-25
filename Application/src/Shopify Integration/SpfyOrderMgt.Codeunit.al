@@ -965,7 +965,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
                             LastDetEntryNo += 1;
                             FulfillmEntryDetailBuffer.Init();
                             FulfillmEntryDetailBuffer."Entry No." := LastDetEntryNo;
-                            FulfillmEntryDetailBuffer."Parent Entry No." := fulFillmentLineBuffer."Entry No.";
+                            FulfillmEntryDetailBuffer."Parent Entry No." := FulFillmentLineBuffer."Entry No.";
 #pragma warning disable AA0139
                             FulfillmEntryDetailBuffer."Gift Card ID" := JsonHelper.GetJText(GiftCard, 'id', MaxStrLen(FulfillmEntryDetailBuffer."Gift Card ID"), true);
                             FulfillmEntryDetailBuffer."Gift Card Reference No." := JsonHelper.GetJText(GiftCard, 'masked_code', MaxStrLen(FulfillmEntryDetailBuffer."Gift Card Reference No."), true);
@@ -984,24 +984,23 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         NpEcDocument: Record "NPR NpEc Document";
         NpEcStore: Record "NPR NpEc Store";
         SalesLine: Record "Sales Line";
-        ShopifyStore: Record "NPR Spfy Store";
         VoucherType: Record "NPR NpRv Voucher Type";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
+        PropertyDict: Dictionary of [Text, Text];
         UnitPrice: Decimal;
         OrderLineID: Text[30];
         Sku: Text;
         Handled: Boolean;
         IsGiftCard: Boolean;
+        IsNPGiftCard: Boolean;
         UnknownIdErr: Label 'Unknown %1: %2%3';
     begin
         OrderLineID := GetOrderID(OrderLine);
-        IsGiftCard := JsonHelper.GetJBoolean(OrderLine, 'gift_card', false);
+        IsGiftCard := OrderLineIsGiftCard(OrderLine, IsNPGiftCard);
         if IsGiftCard then begin
-            ShopifyStore.Get(ShopifyStoreCode);
-            ShopifyStore.TestField("Voucher Type (Sold at Shopify)");
-            VoucherType.Get(ShopifyStore."Voucher Type (Sold at Shopify)");
-            VoucherType.TestField("Account No.");
+            GetOrderLineProperties(OrderLine, PropertyDict);
+            GetVoucherType(ShopifyStoreCode, PropertyDict, VoucherType);
         end else
             if not SpfyItemMgt.ParseItem(OrderLine, ItemVariant, Sku) then
                 Error(UnknownIdErr, 'sku', Sku, StrSubstNo(' (line ID: %1, name: %2)', OrderLineID, JsonHelper.GetJText(OrderLine, 'name', false)));
@@ -1054,7 +1053,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
             if SalesLine."Unit Price" <> 0 then
                 SalesLine.Validate("Line Discount Amount", CalcLineDiscountAmount(OrderLine, SalesLine));
             if IsGiftCard then begin
-                SetRetailVoucher(SalesHeader, SalesLine, VoucherType, FulfillmentLineBuffer, FulfillmEntryDetailBuffer);
+                SetRetailVoucher(SalesHeader, SalesLine, IsNPGiftCard, VoucherType, PropertyDict, FulfillmentLineBuffer, FulfillmEntryDetailBuffer);
                 FulfillmEntryDetailBuffer.Reset();
             end;
         end;
@@ -1062,7 +1061,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         SpfyIntegrationEvents.OnAfterInsertSalesLine(SalesHeader, SalesLine, LastLineNo);
     end;
 
-    local procedure SetRetailVoucher(SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; VoucherType: Record "NPR NpRv Voucher Type"; FulfillmentLineBuffer: Record "NPR Spfy Fulfillment Entry"; var FulfillmEntryDetailBuffer: Record "NPR Spfy Fulfillm.Entry Detail")
+    local procedure SetRetailVoucher(SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; IsNpGiftCard: Boolean; VoucherType: Record "NPR NpRv Voucher Type"; PropertyDict: Dictionary of [Text, Text]; FulfillmentLineBuffer: Record "NPR Spfy Fulfillment Entry"; var FulfillmEntryDetailBuffer: Record "NPR Spfy Fulfillm.Entry Detail")
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Voucher: Record "NPR NpRv Voucher";
@@ -1077,11 +1076,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         if not NpRvSalesLine.IsEmpty() then
             NpRvSalesLine.DeleteAll(true);
 
-        if not FulfillmentLineBuffer."Gift Card" then
-            exit;
-        FulfillmEntryDetailBuffer.SetRange("Parent Entry No.", FulfillmentLineBuffer."Entry No.");
-        FulfillmEntryDetailBuffer.SetFilter("Gift Card ID", '<>%1', '');
-        if not FulfillmEntryDetailBuffer.FindSet() then
+        if not (FulfillmentLineBuffer."Gift Card" or IsNpGiftCard) then
             exit;
 
         NpRvSalesLine.Init();
@@ -1094,9 +1089,14 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         NpRvSalesLine."Voucher Type" := VoucherType.Code;
         NpRvSalesLine.Type := NpRvSalesLine.Type::"Top-up";
         NpRvSalesLine.Description := CopyStr(SalesLine.Description, 1, MaxStrLen(NpRvSalesLine.Description));
-        NpRvSalesLine."Spfy Initiated in Shopify" := true;
+        NpRvSalesLine."Spfy Initiated in Shopify" := not IsNpGiftCard;
+        UpdateVoucherRecipient(PropertyDict, NpRvSalesLine);
         NpRvSalesLine.Insert(true);
 
+        FulfillmEntryDetailBuffer.SetRange("Parent Entry No.", FulfillmentLineBuffer."Entry No.");
+        FulfillmEntryDetailBuffer.SetFilter("Gift Card ID", '<>%1', '');
+        if not FulfillmEntryDetailBuffer.FindSet() then
+            exit;
         repeat
             SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"NPR NpRv Voucher", "NPR Spfy ID Type"::"Entry ID", FulfillmEntryDetailBuffer."Gift Card ID", ShopifyAssignedID);
             if ShopifyAssignedID.FindLast() then
@@ -1108,6 +1108,87 @@ codeunit 6184814 "NPR Spfy Order Mgt."
 
             NpRvSalesDocMgt.InsertNpRVSalesLineReference(NpRvSalesLine, Voucher);
         until FulfillmEntryDetailBuffer.Next() = 0;
+    end;
+
+    local procedure OrderLineIsGiftCard(OrderLine: JsonToken; var IsNPGiftCard: Boolean): Boolean
+    var
+        OrderLineProperties: JsonToken;
+        OrderLineProperty: JsonToken;
+    begin
+        IsNPGiftCard := false;
+        if JsonHelper.GetJBoolean(OrderLine, 'gift_card', false) then
+            exit(true);
+        if not (JsonHelper.GetJsonToken(OrderLine, 'properties', OrderLineProperties) and OrderLineProperties.IsArray()) then
+            exit(false);
+        foreach OrderLineProperty in OrderLineProperties.AsArray() do
+            if JsonHelper.GetJText(OrderLineProperty, 'name', false) = '_is_giftcard' then begin
+                IsNPGiftCard := JsonHelper.GetJBoolean(OrderLineProperty, 'value', false);
+                exit(IsNPGiftCard);
+            end;
+    end;
+
+    local procedure GetOrderLineProperties(OrderLine: JsonToken; var PropertyDict: Dictionary of [Text, Text]): Boolean
+    var
+        OrderLineProperties: JsonToken;
+        OrderLineProperty: JsonToken;
+        PropertyName: Text;
+        PropertyValue: Text;
+    begin
+        Clear(PropertyDict);
+        if not JsonHelper.GetJsonToken(OrderLine, 'properties', OrderLineProperties) or not OrderLineProperties.IsArray() then
+            exit(false);
+        foreach OrderLineProperty in OrderLineProperties.AsArray() do begin
+            PropertyName := JsonHelper.GetJText(OrderLineProperty, 'name', false);
+            if PropertyName <> '' then begin
+                PropertyValue := JsonHelper.GetJText(OrderLineProperty, 'value', false);
+                if PropertyValue <> '' then
+                    PropertyDict.Add(PropertyName, PropertyValue);
+            end;
+        end;
+    end;
+
+    local procedure GetVoucherType(ShopifyStoreCode: Code[20]; PropertyDict: Dictionary of [Text, Text]; var VoucherType: Record "NPR NpRv Voucher Type")
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+        PropertyValue: Text;
+        VoucherTypeCode: Code[20];
+    begin
+        if PropertyDict.Get('_np_voucher_type', PropertyValue) then
+            VoucherTypeCode := CopyStr(PropertyValue, 1, MaxStrLen(VoucherTypeCode));
+        if (VoucherTypeCode = '') or not VoucherType.Get(VoucherTypeCode) then begin
+            ShopifyStore.Get(ShopifyStoreCode);
+            ShopifyStore.TestField("Voucher Type (Sold at Shopify)");
+            VoucherType.Get(ShopifyStore."Voucher Type (Sold at Shopify)");
+        end;
+        VoucherType.TestField("Account No.");
+    end;
+
+    local procedure UpdateVoucherRecipient(PropertyDict: Dictionary of [Text, Text]; var NpRvSalesLine: Record "NPR NpRv Sales Line")
+    var
+        PropertyKey: Text;
+        PropertyValue: Text;
+    begin
+        foreach PropertyKey in PropertyDict.Keys() do begin
+            PropertyValue := PropertyDict.Get(PropertyKey);
+            case PropertyKey of
+                '_send_giftcard':
+                    NpRvSalesLine."Spfy Send from Shopify" := LowerCase(PropertyValue) in ['on', 'true', 'yes', '1'];
+                'Recipient Email':
+                    NpRvSalesLine."E-mail" := CopyStr(PropertyValue, 1, MaxStrLen(NpRvSalesLine."E-mail"));
+                'Recipient Name':
+                    begin
+                        NpRvSalesLine.Name := CopyStr(PropertyValue, 1, MaxStrLen(NpRvSalesLine.Name));
+                        if StrLen(PropertyValue) > MaxStrLen(NpRvSalesLine.Name) then
+                            NpRvSalesLine."Name 2" := CopyStr(PropertyValue, MaxStrLen(NpRvSalesLine.Name) + 1, MaxStrLen(NpRvSalesLine."Name 2"));
+                    end;
+                'Message':
+                    NpRvSalesLine."Voucher Message" := CopyStr(PropertyValue, 1, MaxStrLen(NpRvSalesLine."Voucher Message"));
+                'Template Suffix':
+                    NpRvSalesLine."Spfy Liquid Template Suffix" := CopyStr(PropertyValue, 1, MaxStrLen(NpRvSalesLine."Spfy Liquid Template Suffix"));
+                'Send On':
+                    if Evaluate(NpRvSalesLine."Spfy Send on", PropertyValue, 9) then;
+            end;
+        end;
     end;
 
     local procedure InsertSalesLineShipmentFee(ShippingLine: JsonToken; SalesHeader: Record "Sales Header"; var LastLineNo: Integer)
