@@ -1085,8 +1085,9 @@ codeunit 6185130 "NPR SG SpeedGate"
                     end;
 
                     if (MemberCardProfileLine.AdmissionCode <> '') then
-                        if (not AdmitToCodes.Contains(MemberCardProfileLine.AdmissionCode)) then
-                            AdmitToCodes.Add(MemberCardProfileLine.AdmissionCode);
+                        if (TicketBom.Get(MembershipSetup."Ticket Item Barcode", '', MemberCardProfileLine.AdmissionCode)) then
+                            if (not AdmitToCodes.Contains(MemberCardProfileLine.AdmissionCode)) then
+                                AdmitToCodes.Add(MemberCardProfileLine.AdmissionCode);
 
                     ProfileLineId := MemberCardProfileLine.SystemId;
                 end;
