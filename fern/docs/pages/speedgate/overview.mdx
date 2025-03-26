@@ -7,11 +7,13 @@ The Speedgate endpoints offer a streamlined approach to admitting guests by acce
 
 When a reference number is valid and unambiguous, the process concludes with a set of tokens to finalize the guest’s admission and, if applicable, any accompanying guests.
 
-Upon receiving a reference number, the system resolves it into one of three categories:
+Upon receiving a reference number, the system resolves it into one of these categories:
 
 * Ticket Number: Returns a single admission token that allows entry for the ticket holder.
 * Member Card Number: Provides tokens not only for the cardholder but also for any associated guests, including details on the type of guest and the maximum allowable count.
-* Wallet ID: Retrieves a collection of tickets tied to the wallet, each with its own admission parameters, which can then be individually processed.
+* Wallet Id: Retrieves a collection of tickets tied to the wallet, each with its own admission parameters, which can then be individually processed. When there is no ambiguity (a single asset is could be selected as valid for the speedgate), the speedgate will allow immediate admit using the admit token directly.
+* Ticket Reservation Request: This value is the token used during the ticket reservation process and can represent any number of tickets. When scanned all tickets in the request will be admitted.
+* City Card: The integration with DocLx allows scanning and admitting f.ex. Copenhagen City Card directly in the speed gate.
 
 Each successful tryAdmit call provides these tokens as authorization for the admitToken endpoint, allowing for flexible and controlled admission. 
 

@@ -90,6 +90,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
     internal procedure TryAdmit(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         SpeedGateMgr: Codeunit "NPR SG SpeedGate";
+        BlankReferenceNumber: Label 'Missing value for required field: referenceNumber';
         LogEntryNo: Integer;
         Body: JsonObject;
         JValueToken: JsonToken;
@@ -107,6 +108,9 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
 
         if (Body.Get('scannerId', JValueToken)) then
             ScannerId := CopyStr(JValueToken.AsValue().AsText(), 1, MaxStrLen(ScannerId));
+
+        if (ReferenceNumber = '') then
+            exit(Response.RespondBadRequest(BlankReferenceNumber));
 
         LogEntryNo := SpeedGateMgr.CreateInitialEntry(ReferenceNumber, AdmissionCode, ScannerId);
         Commit();
@@ -829,7 +833,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         exit(MemberValidationRequest.Token);
     end;
 
-    local procedure ReferenceNumberTypeAsText(ReferenceNumberType: Option): Text
+    internal procedure ReferenceNumberTypeAsText(ReferenceNumberType: Option): Text
     var
         ValidationRequest: Record "NPR SGEntryLog";
     begin
@@ -850,7 +854,27 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         end;
     end;
 
-    local procedure ResponseTypeToText(ResponseType: Option): Text
+    internal procedure EntryStatusAsText(EntryStatus: Option): Text
+    var
+        ValidationRequest: Record "NPR SGEntryLog";
+    begin
+        case EntryStatus of
+            ValidationRequest.EntryStatus::ADMITTED:
+                exit('admitted');
+            ValidationRequest.EntryStatus::PERMITTED_BY_GATE:
+                exit('permittedByGate');
+            ValidationRequest.EntryStatus::DENIED:
+                exit('denied');
+            ValidationRequest.EntryStatus::DENIED_BY_GATE:
+                exit('deniedByGate');
+            ValidationRequest.EntryStatus::INITIALIZED:
+                exit('initialized');
+            else
+                exit('unknown');
+        end;
+    end;
+
+    internal procedure ResponseTypeToText(ResponseType: Option): Text
     var
         MemberCardSwipe: Record "NPR MM Member Arr. Log Entry";
     begin

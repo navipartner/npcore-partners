@@ -13,6 +13,11 @@ enum 6059826 "NPR ApiSpeedgateFunctions"
         Caption = 'Get speedgate setup';
     }
 
+    value(110; LOOKUP_REFERENCE_NUMBER)
+    {
+        Caption = 'Lookup reference number';
+    }
+
     value(200; TRY_ADMIT)
     {
         Caption = 'Try admit';
