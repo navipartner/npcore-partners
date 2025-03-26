@@ -38,6 +38,14 @@ page 6184847 "NPR AttractionWalletAssets"
                     Editable = false;
                 }
 
+                field(AssetBlocked; _AssetBlocked)
+                {
+                    Caption = 'Blocked';
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Blocked field for the asset in question.';
+                    Editable = false;
+                }
+
                 field(DocumentNumber; Rec.DocumentNumber)
                 {
                     Caption = 'Document Number';
@@ -142,6 +150,8 @@ page 6184847 "NPR AttractionWalletAssets"
 
 
     trigger OnAfterGetRecord()
+    var
+        Ticket: Record "NPR TM Ticket";
     begin
         _WalletHolder := '';
         TempAssetLineRef.Reset();
@@ -153,8 +163,16 @@ page 6184847 "NPR AttractionWalletAssets"
             _WalletHolder := TempWallet.ReferenceNumber;
             if (TempWallet.Description <> '') then
                 _WalletHolder := TempWallet.Description;
-        end
+        end;
 
+        case Rec.Type of
+            Rec.Type::TICKET:
+                if (Ticket.GetBySystemId(Rec.LineTypeSystemId)) then
+                    _AssetBlocked := Ticket.Blocked;
+            else
+                _AssetBlocked := false;
+
+        end;
     end;
 
     internal procedure ShowSelectedAssets(var Wallets: Record "NPR AttractionWallet" temporary)
@@ -254,5 +272,7 @@ page 6184847 "NPR AttractionWalletAssets"
         TempAssetLineRef: Record "NPR WalletAssetLineReference" temporary;
         TempWallet: Record "NPR AttractionWallet" temporary;
         _WalletHolder: Text;
+
+        _AssetBlocked: Boolean;
 
 }
