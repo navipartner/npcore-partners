@@ -144,7 +144,7 @@ test.describe("Edit Mode Bar tests 2", () => {
       .frameLocator("iframe")
       .locator(
         ".flex > div > .select > .css-b62m3t-container > .react-select__control"
-      )
+      ).nth(0)
       .click();
 
     await page
