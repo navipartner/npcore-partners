@@ -106,6 +106,13 @@ types:
       - name: ExampleAdmitCount
         value: 1
 
+  AttemptedAt:
+    type: datetime
+    docs: The date and time when the reference number was attempted to be admitted.
+    examples:
+      - name: ExampleAttemptedAt
+        value: "2024-10-11T12:13:00Z"
+
   AdmittedAt:
     type: datetime
     docs: The date and time when the ticket was admitted.
@@ -158,6 +165,28 @@ types:
       - name : ExampleTicketToken
         value: 2D9FE68FC94748AB9D626C759029FA2B
 
+  ReferenceNumber2:
+    type: string
+    docs: The number sent to speedgate to open the gate
+    examples:
+      - name: ExampleTicketNumber
+        value: TIC123456
+
+  ReferenceId:  
+    docs: The unique identifier for the reference number.
+    type: uuid
+    examples:
+      - name: ExampleReferenceId
+        value: "12345678-aaaa-12d3-a456-426614174000"
+
+  ReferenceId2:  
+    docs: The unique identifier for the reference number.
+    type: uuid
+    examples:
+      - name: ExampleReferenceId2
+        value: "12345678-aaaa-12d3-a456-426614174000"
+
+
   TicketNumber:
     type: string
     docs: The number of the ticket.
@@ -186,6 +215,9 @@ types:
       - admitted
       - denied
       - unknown
+      - deniedByGate
+      - permittedByGate
+      - initialized
       - validationFailure
 
   AdmittedStatus:
@@ -478,3 +510,66 @@ types:
     examples:
       - name: ExamplePresentationOrder
         value: 1
+
+  ApiErrorNumber:
+    type: integer
+    docs: The error number returned by the API.
+    examples:
+      - name: ExampleApiErrorNumber
+        value: 123
+
+  ApiErrorMessage:
+    type: string
+    docs: The error message returned by the API.
+    examples:
+      - name: ExampleApiErrorMessage
+        value: "An error occurred while processing the request."
+
+  ExtraEntityTypeEnum:
+    enum:
+      - memberGuest
+      - memberCard
+      - ticket
+
+  ExtraEntityType:
+    type: ExtraEntityTypeEnum
+    docs: 
+      When scanning a reference number it can cascade into other types of reference numbers. 
+      This is the type used to qualify the reference number id that was identified.
+      <br><br>
+      The following types are supported and used in different scenarios<br>
+        `memberGuest`
+        <li>when a member card is scanned and a guests can be admitted for free</li>
+
+        `memberCard`
+        <li>when a wallet is scanned and a member card can be admitted</li>
+      
+        `ticket`
+        <li>when a wallet is scanned and a ticket can be admitted</li>
+        <li>when a member card is scanned and multiple admissions will be admitted</li>
+        
+
+    examples:
+      - name: ExampleMemberGuest
+        value: memberGuest
+
+  ExtraEntityId:
+    type: uuid
+    docs: The unique identifier of the resource to use.
+    examples:
+      - name: ExampleMemberGuest
+        value: "12345678-aaaa-12d3-a456-426614174000"
+
+  ExtraEntityDescription:
+    type: string
+    docs: The description of the resource.
+    examples:
+      - name: ExampleMemberGuest
+        value: "Bring your friend for free."
+
+  EntryNumber:
+    type: integer
+    docs: The sequence number of the scan entry.
+    examples:
+      - name: ExampleEntryNumber
+        value: 123456

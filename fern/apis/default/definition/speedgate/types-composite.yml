@@ -349,3 +349,51 @@ types:
           description2: $simpleTypes.Description.ExampleDescription
           presentationOrder: 1
     
+################
+  ReferenceNumberLookupResponse:
+    docs: 
+      Response to lookup a reference number.
+    properties:
+      referenceNumber: simpleTypes.ReferenceNumber
+
+      referenceNumberType: simpleTypes.ReferenceNumberType
+      referenceId: optional<simpleTypes.ReferenceId>
+      scannerId: simpleTypes.ScannerId
+      scannerDescription: simpleTypes.Description
+      admissionCode: optional<simpleTypes.AdmissionCode>
+      admitToken: simpleTypes.Token
+
+      entryStatus: simpleTypes.AdmittedStatus
+      attemptedAt: simpleTypes.AttemptedAt
+      admittedReferenceNumber: optional<simpleTypes.ReferenceNumber2>
+      admittedReferenceId: optional<simpleTypes.ReferenceId2>
+      
+      admittedAt: optional<simpleTypes.AdmittedAt>
+      errorNumber: simpleTypes.ApiErrorNumber
+      errorMessage: optional<simpleTypes.ApiErrorMessage>
+      type: optional<simpleTypes.ExtraEntityType>
+      typeId: optional<simpleTypes.ExtraEntityId>
+      typeDescription: optional<simpleTypes.ExtraEntityDescription>
+      entryNumber: simpleTypes.EntryNumber
+    examples:
+      - name: Example1
+        value:
+          referenceNumber: $simpleTypes.ReferenceNumber.ExampleTicketNumber
+          
+          referenceNumberType: ticket
+          referenceId: $simpleTypes.ReferenceId.ExampleReferenceId
+          scannerId: $simpleTypes.ScannerId.ExampleSpeedgate
+          scannerDescription: $simpleTypes.Description.ExampleDescription
+          admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+          admitToken: $simpleTypes.Token.ExampleAdmitToken
+
+          entryStatus: admitted
+          attemptedAt: $simpleTypes.AttemptedAt.ExampleAttemptedAt
+          admittedReferenceNumber: $simpleTypes.ReferenceNumber2.ExampleTicketNumber
+          admittedReferenceId: $simpleTypes.ReferenceId2.ExampleReferenceId2
+          admittedAt: $simpleTypes.AdmittedAt.ExampleAdmittedAt
+          errorNumber: 0
+          errorMessage: ""
+          entryNumber: 123456
+
+

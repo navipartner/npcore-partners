@@ -45,10 +45,14 @@ codeunit 6185117 "NPR ApiSpeedgateHandler"
     procedure HandleFunction()
     var
         Speedgate: Codeunit "NPR ApiSpeedgateAdmit";
+        Reports: Codeunit "NPR ApiSpeedgateReports";
     begin
         case _ApiFunction of
             _ApiFunction::GET_SPEEDGATE_SETUP:
                 _Response := Speedgate.GetSetup(_Request);
+
+            _ApiFunction::LOOKUP_REFERENCE_NUMBER:
+                _Response := Reports.LookupReferenceNumber(_Request);
 
             _ApiFunction::TRY_ADMIT:
                 _Response := Speedgate.TryAdmit(_Request);

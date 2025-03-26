@@ -66,8 +66,10 @@ service:
       docs: 
         This endpoint attempts to validate a customer's reference number and identifies it as either a ticket, member card, or wallet. Each type provides different responses.
         <br><br><b>Ticket Reference</b> Returns a single token that you can use with the admitToken endpoint.
-        <br><b>Member Card</b> Reference Returns a primary token for the member and additional tokens for any guests, with details such as guest type and max number of guests.
-        <br><b>Wallet Reference</b> Returns a list of tickets, each with relevant admission details, which can be individually used in subsequent calls to tryAdmit.
+        <br><br><b>Member Card</b> Reference Returns a primary token for the member and additional tokens for any guests, with details such as guest type and max number of guests.
+        <br><br><b>Wallet Reference</b> Returns a list of tickets, each with relevant admission details, which can be individually used in subsequent calls to tryAdmit.
+        <br><br><b>City Card Reference</b> Returns a token for the city card, which can be used with the admit endpoint.
+        <br><br><b>Ticket Token Reference</b> Returns an admit token and a list of tickets that will be admitted when the admit token is used.
       path: /try
       method: POST
       request: 
@@ -205,6 +207,33 @@ service:
               admittedTokens:
                 - $compositeTypes.AdmitResponse.ExampleAdmitMemberCardResponse
   
+    referenceNumberLookup:
+      docs: 
+        This endpoint retrieves the details of a reference number, including its type and status. 
+        It can be used to check the history of a reference number.
+      path: "/lookup"
+      method: GET
+      request: 
+        name: referenceNumberLookup
+        query-parameters:
+          referenceNumber: simpleTypes.ReferenceNumber
+      response:
+        docs: Returns a list all usages of the reference number in the speedgate.
+        type: list<compositeTypes.ReferenceNumberLookupResponse>
+      examples:
+        - name: "Usage log for reference number"
+          docs: Example of a successful retrieval of log for a reference number.
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            referenceNumber: $simpleTypes.ReferenceNumber.ExampleTicketNumber
+          response:
+            body: 
+              - $compositeTypes.ReferenceNumberLookupResponse.Example1
+
+
 types:
   AdmittedTokensResponse:
     properties:
