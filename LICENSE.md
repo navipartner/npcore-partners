@@ -1,0 +1,1 @@
+The code in this repository is NOT licensed for usage without a commercial relationship with NaviPartner that explicitly grants usage rights. We provide this code publicly solely for the purpose of Partner PTE development, troubleshooting, and feedback purposes.
