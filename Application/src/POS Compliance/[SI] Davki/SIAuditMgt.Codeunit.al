@@ -739,14 +739,26 @@ codeunit 6151546 "NPR SI Audit Mgt."
     var
         BaseValue: Text;
         ResponseText: Text;
+        ZOICodeNotSignedErr: Label 'There was an error generating and signing ZOI Code.';
     begin
         FormatBaseZOIValue(BaseValue, SIPOSAuditLogAuxInfo);
         if not SignZOICode(BaseValue, ResponseText) then
-            exit;
-#pragma warning disable AA0139
-        SIPOSAuditLogAuxInfo."ZOI Code" := ResponseText;
-#pragma warning restore AA0139
+            Error(ZOICodeNotSignedErr);
+
+        SIPOSAuditLogAuxInfo."ZOI Code" := CopyStr(ResponseText, 1, MaxStrLen(SIPOSAuditLogAuxInfo."ZOI Code"));
         SIPOSAuditLogAuxInfo.Modify();
+    end;
+
+    local procedure SignZOICode(BaseValue: Text; var ResponseText: Text): Boolean
+    var
+        ErrorCounter: Integer;
+    begin
+        for ErrorCounter := 1 to 3 do begin
+            if not SendRequestForZOISignature(BaseValue, ResponseText) then
+                exit(false);
+            if StrLen(ResponseText) = 32 then
+                exit(true);
+        end;
     end;
 
     local procedure FormatBaseZOIValue(var BaseValue: Text; SIPOSAuditLogAuxInfo: Record "NPR SI POS Audit Log Aux. Info")
@@ -822,7 +834,7 @@ codeunit 6151546 "NPR SI Audit Mgt."
             exit(true)
     end;
 
-    internal procedure SignZOICode(BaseValue: Text; var ResponseText: Text): Boolean
+    internal procedure SendRequestForZOISignature(BaseValue: Text; var ResponseText: Text): Boolean
     var
         KeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         Content: HttpContent;
@@ -858,8 +870,8 @@ codeunit 6151546 "NPR SI Audit Mgt."
         RequestMessage.Method('POST');
         RequestMessage.Content(Content);
         RequestMessage.GetHeaders(Headers);
-        if SendHttpRequest(RequestMessage, ResponseText, false) then
-            exit(true)
+
+        exit(SendHttpRequest(RequestMessage, ResponseText, false));
     end;
 
     internal procedure SetHeader(var Headers: HttpHeaders; HeaderName: Text; HeaderValue: Text)
@@ -895,7 +907,6 @@ codeunit 6151546 "NPR SI Audit Mgt."
 
         exit(IsResponseSuccess);
     end;
-
     #endregion
 
     #region SI Fiscal - Certificate Handling
