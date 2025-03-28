@@ -185,6 +185,8 @@
     internal procedure AdjustPriceOnSalesLine(var SaleLinePOS: Record "NPR POS Sale Line"; NewQuantity: Integer; Token: Text[100]; TokenLineNumber: Integer)
     var
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+        xSaleLinePOS: Record "NPR POS Sale Line";
+        POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
         TicketPrice: Codeunit "NPR TM Dynamic Price";
         TicketUnitPrice: Decimal;
         DiscountAmount: Decimal;
@@ -193,8 +195,13 @@
         DiscountAmount := 0;
         DiscountPercent := 0;
 
-        if (SaleLinePOS.Quantity <> NewQuantity) then
+        if (SaleLinePOS.Quantity <> NewQuantity) then begin
+            xSaleLinePOS := SaleLinePOS;
             SaleLinePOS.Validate(Quantity, NewQuantity);
+            SaleLinePOS.Modify();
+            POSSalesDiscountCalcMgt.OnAfterModifySaleLinePOS(SaleLinePOS, xSaleLinePOS);
+            SaleLinePOS.Get(SaleLinePOS.RecordId);
+        end;
 
         if (SaleLinePOS."Discount %" <> 0) then begin
             SaleLinePOSAddOn.SetCurrentKey("Register No.", "Sales Ticket No.", "Sale Type", "Sale Date", "Sale Line No.", "Line No.");
@@ -226,6 +233,7 @@
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
         SaleLinePOS."Eksp. Salgspris" := false;
         SaleLinePOS."Custom Price" := false;
+        SaleLinePOS.Modify();
     end;
 
 
