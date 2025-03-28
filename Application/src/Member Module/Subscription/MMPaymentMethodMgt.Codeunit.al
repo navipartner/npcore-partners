@@ -83,7 +83,7 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
         until EFTTransactionRequest.Next() = 0;
     end;
 
-    local procedure SetMembePaymentMethodAsDefault(var MemberPaymentMethod: Record "NPR MM Member Payment Method")
+    internal procedure SetMembePaymentMethodAsDefault(var MemberPaymentMethod: Record "NPR MM Member Payment Method")
     var
         Membership: Record "NPR MM Membership";
         Modi: Boolean;

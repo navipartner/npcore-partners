@@ -886,6 +886,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         MemberPaymentMethod: Record "NPR MM Member Payment Method";
         Membership: Record "NPR MM Membership";
         MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+        MMPaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
     begin
         if not Membership.Get(MMMemberInfoCapture."Membership Entry No.") then
             exit;
@@ -893,13 +894,17 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         if MemberPaymentMethod.Get(MMMemberInfoCapture."Member Payment Method") then
             MemberPaymentMethod.Delete();
 
-        AddMemberPaymentMethod(EftTransactionRequest, true, MemberPaymentMethod, Membership);
+        if MMPaymentMethodMgt.FindMemberPaymentMethod(EftTransactionRequest, Membership, MemberPaymentMethod) then
+            MMPaymentMethodMgt.SetMembePaymentMethodAsDefault(MemberPaymentMethod)
+        else begin
+            AddMemberPaymentMethod(EftTransactionRequest, true, MemberPaymentMethod, Membership);
 
-        MMMemberInfoCapture."Enable Auto-Renew" := true;
-        MMMemberInfoCapture."Member Payment Method" := MemberPaymentMethod."Entry No.";
-        MMMemberInfoCapture.Modify();
+            MMMemberInfoCapture."Enable Auto-Renew" := true;
+            MMMemberInfoCapture."Member Payment Method" := MemberPaymentMethod."Entry No.";
+            MMMemberInfoCapture.Modify();
 
-        MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, true, false);
+            MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, true, false);
+        end;
     end;
 
     local procedure AddPaymentMethodToExistingMembership(EftTransactionRequest: Record "NPR EFT Transaction Request"; var MemberPaymentMethod: Record "NPR MM Member Payment Method")
