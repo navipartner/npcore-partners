@@ -13,12 +13,12 @@ codeunit 6059947 "NPR Package Management"
         SalesHeader: Record "Sales Header";
         SalesShipmentHeader: Record "Sales Shipment Header";
         PakkeShippingAgent: Record "NPR Package Shipping Agent";
-        PackageDimension: record "NPR Package Dimension";
+        PackageDimension: Record "NPR Package Dimension";
     begin
-        case RecRef.NUMBER of
-            DATABASE::"Sales Header":
+        case RecRef.Number of
+            Database::"Sales Header":
                 begin
-                    RecRef.SETTABLE(SalesHeader);
+                    RecRef.SetTable(SalesHeader);
                     if SalesHeader.Find() then begin
                         if (SalesHeader."Document Type" = SalesHeader."Document Type"::Invoice) or (SalesHeader."Document Type" = SalesHeader."Document Type"::Order) then begin
 
@@ -26,54 +26,54 @@ codeunit 6059947 "NPR Package Management"
                             if SalesHeader."NPR Package Quantity" = 0 then
                                 exit;
 
-                            SalesLine.SETRANGE("Document Type", SalesHeader."Document Type");
-                            SalesLine.SETRANGE("Document No.", SalesHeader."No.");
-                            SalesLine.SETRANGE(Type, SalesLine.Type::Item);
-                            SalesLine.SETFILTER("Net Weight", '<>0');
+                            SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+                            SalesLine.SetRange("Document No.", SalesHeader."No.");
+                            SalesLine.SetRange(Type, SalesLine.Type::Item);
+                            SalesLine.SetFilter("Net Weight", '<>0');
                             if SalesLine.IsEmpty() then
                                 exit;
 
 
-                            if not PakkeShippingAgent.GET(SalesHeader."Shipping Agent Code") then
+                            if not PakkeShippingAgent.Get(SalesHeader."Shipping Agent Code") then
                                 exit
                             else
-                                SalesHeader.TESTFIELD(SalesHeader."Shipping Agent Service Code");
+                                SalesHeader.TestField(SalesHeader."Shipping Agent Service Code");
 
                             if SalesHeader."Ship-to Code" <> '' then begin
-                                ShiptoAddress.GET(SalesHeader."Sell-to Customer No.", SalesHeader."Ship-to Code");
+                                ShiptoAddress.Get(SalesHeader."Sell-to Customer No.", SalesHeader."Ship-to Code");
                                 if PakkeShippingAgent."Phone Mandatory" then
-                                    ShiptoAddress.TESTFIELD("Phone No.");
+                                    ShiptoAddress.TestField("Phone No.");
 
                                 if PakkeShippingAgent."Email Mandatory" then
-                                    ShiptoAddress.TESTFIELD("E-Mail");
+                                    ShiptoAddress.TestField("E-Mail");
 
                             end else begin
 
-                                Customer.GET(SalesHeader."Sell-to Customer No.");
+                                Customer.Get(SalesHeader."Sell-to Customer No.");
                                 if PakkeShippingAgent."Phone Mandatory" then
-                                    Customer.TESTFIELD("Phone No.");
+                                    Customer.TestField("Phone No.");
 
                                 if PakkeShippingAgent."Email Mandatory" then
-                                    Customer.TESTFIELD("E-Mail");
+                                    Customer.TestField("E-Mail");
                             end;
 
-                            SalesHeader.TESTFIELD("Ship-to Name");
-                            SalesHeader.TESTFIELD("Ship-to Address");
-                            SalesHeader.TESTFIELD("Ship-to Post Code");
-                            SalesHeader.TESTFIELD("Ship-to City");
+                            SalesHeader.TestField("Ship-to Name");
+                            SalesHeader.TestField("Ship-to Address");
+                            SalesHeader.TestField("Ship-to Post Code");
+                            SalesHeader.TestField("Ship-to City");
 
                             if PakkeShippingAgent."Ship to Contact Mandatory" then
-                                SalesHeader.TESTFIELD("Ship-to Contact");
+                                SalesHeader.TestField("Ship-to Contact");
 
-                            PackageDimension.setrange("Document Type", PackageDimension."Document Type"::Order);
-                            PackageDimension.setrange("Document No.", SalesHeader."No.");
-                            PackageDimension.setfilter(Quantity, '<>0');
-                            if PackageDimension.Findset() then
+                            PackageDimension.SetRange("Document Type", PackageDimension."Document Type"::Order);
+                            PackageDimension.SetRange("Document No.", SalesHeader."No.");
+                            PackageDimension.SetFilter(Quantity, '<>0');
+                            if PackageDimension.FindSet() then
                                 repeat
-                                    if PakkeshippingAgent."LxWxH Dimensions Required" then begin
+                                    if PakkeShippingAgent."LxWxH Dimensions Required" then begin
                                         PackageDimension.TestField(Length);
                                         PackageDimension.TestField(Width);
-                                        PackageDimension.TestField(height);
+                                        PackageDimension.TestField(Height);
                                     end;
                                     if PakkeShippingAgent."Volume Required" then
                                         PackageDimension.TestField(Volume);
@@ -85,42 +85,42 @@ codeunit 6059947 "NPR Package Management"
                         end;
                     end;
                 end;
-            DATABASE::"Sales Shipment Header":
+            Database::"Sales Shipment Header":
                 begin
-                    RecRef.SETTABLE(SalesShipmentHeader);
-                    if SalesShipmentHeader.FIND() then begin
+                    RecRef.SetTable(SalesShipmentHeader);
+                    if SalesShipmentHeader.Find() then begin
 
-                        SalesShipmentHeader.TESTFIELD("Shipping Agent Code");
-                        PakkeShippingAgent.GET(SalesShipmentHeader."Shipping Agent Code");
+                        SalesShipmentHeader.TestField("Shipping Agent Code");
+                        PakkeShippingAgent.Get(SalesShipmentHeader."Shipping Agent Code");
 
-                        SalesShipmentHeader.TESTFIELD("Shipping Agent Service Code");
+                        SalesShipmentHeader.TestField("Shipping Agent Service Code");
 
-                        PakkeShippingAgent.GET(SalesShipmentHeader."Shipping Agent Code");
-                        if SalesHeader."Ship-to Code" <> '' then begin
-                            ShiptoAddress.GET(SalesShipmentHeader."Sell-to Customer No.", SalesShipmentHeader."Ship-to Code");
+                        PakkeShippingAgent.Get(SalesShipmentHeader."Shipping Agent Code");
+                        if SalesShipmentHeader."Ship-to Code" <> '' then begin
+                            ShiptoAddress.Get(SalesShipmentHeader."Sell-to Customer No.", SalesShipmentHeader."Ship-to Code");
                             if PakkeShippingAgent."Phone Mandatory" then
-                                ShiptoAddress.TESTFIELD("Phone No.");
+                                ShiptoAddress.TestField("Phone No.");
 
                             if PakkeShippingAgent."Email Mandatory" then
-                                ShiptoAddress.TESTFIELD("E-Mail");
+                                ShiptoAddress.TestField("E-Mail");
 
                         end else begin
 
-                            Customer.GET(SalesShipmentHeader."Sell-to Customer No.");
+                            Customer.Get(SalesShipmentHeader."Sell-to Customer No.");
                             if PakkeShippingAgent."Phone Mandatory" then
-                                Customer.TESTFIELD("Phone No.");
+                                Customer.TestField("Phone No.");
 
                             if PakkeShippingAgent."Email Mandatory" then
-                                Customer.TESTFIELD("E-Mail");
+                                Customer.TestField("E-Mail");
                         end;
 
-                        SalesShipmentHeader.TESTFIELD("Ship-to Name");
-                        SalesShipmentHeader.TESTFIELD("Ship-to Address");
-                        SalesShipmentHeader.TESTFIELD("Ship-to Post Code");
-                        SalesShipmentHeader.TESTFIELD("Ship-to City");
+                        SalesShipmentHeader.TestField("Ship-to Name");
+                        SalesShipmentHeader.TestField("Ship-to Address");
+                        SalesShipmentHeader.TestField("Ship-to Post Code");
+                        SalesShipmentHeader.TestField("Ship-to City");
 
                         if PakkeShippingAgent."Ship to Contact Mandatory" then
-                            SalesShipmentHeader.TESTFIELD("Ship-to Contact");
+                            SalesShipmentHeader.TestField("Ship-to Contact");
                     end;
                 end;
         end;
@@ -130,8 +130,8 @@ codeunit 6059947 "NPR Package Management"
     var
         SalesShipmentLine: Record "Sales Shipment Line";
     begin
-        SalesShipmentLine.SETRANGE("Document No.", SalesShipmentHeader."No.");
-        SalesShipmentLine.SETFILTER("Net Weight", '<>%1', 0);
+        SalesShipmentLine.SetRange("Document No.", SalesShipmentHeader."No.");
+        SalesShipmentLine.SetFilter("Net Weight", '<>%1', 0);
         exit(not SalesShipmentLine.IsEmpty());
     end;
 
@@ -148,37 +148,37 @@ codeunit 6059947 "NPR Package Management"
         if not InitPackageProvider() then
             exit;
 
-        ShipmentDocument.SETRANGE("Table No.", RecRef.NUMBER);
-        ShipmentDocument.SETRANGE(RecordID, RecRef.RECORDID);
-        if ShipmentDocument.FINDLAST() then
+        ShipmentDocument.SetRange("Table No.", RecRef.Number);
+        ShipmentDocument.SetRange(RecordID, RecRef.RecordId);
+        if ShipmentDocument.FindLast() then
             DocFound := true
         else begin
-            CLEAR(ShipmentDocument);
-            ShipmentDocument.INIT();
-            ShipmentDocument.VALIDATE("Entry No.", 0);
-            ShipmentDocument.VALIDATE("Table No.", RecRef.NUMBER);
-            ShipmentDocument.VALIDATE(RecordID, RecRef.RECORDID);
-            ShipmentDocument.VALIDATE("Creation Time", CURRENTDATETIME);
+            Clear(ShipmentDocument);
+            ShipmentDocument.Init();
+            ShipmentDocument.Validate("Entry No.", 0);
+            ShipmentDocument.Validate("Table No.", RecRef.Number);
+            ShipmentDocument.Validate(RecordID, RecRef.RecordId);
+            ShipmentDocument.Validate("Creation Time", CurrentDateTime);
         end;
-        case RecRef.NUMBER of
+        case RecRef.Number of
 
-            DATABASE::"Sales Shipment Header":
+            Database::"Sales Shipment Header":
                 begin
-                    RecRef.SETTABLE(SalesShipmentHeader);
-                    if SalesShipmentHeader.FIND() then begin
+                    RecRef.SetTable(SalesShipmentHeader);
+                    if SalesShipmentHeader.Find() then begin
                         SalesShipmentHeader.CalcFields("NPR Package Quantity");
                         if SalesShipmentHeader."Shipment Method Code" = '' then exit;
                         if CheckNetWeight(SalesShipmentHeader) = false then exit;
                         if SalesShipmentHeader."NPR Package Quantity" = 0 then exit;
 
                         if not DocFound then
-                            ShipmentDocument.INSERT(true);
-                        Customer.GET(SalesShipmentHeader."Sell-to Customer No.");
-                        CLEAR(ShipToAddress);
+                            ShipmentDocument.Insert(true);
+                        Customer.Get(SalesShipmentHeader."Sell-to Customer No.");
+                        Clear(ShipToAddress);
                         ShipmentDocument."Document No." := SalesShipmentHeader."No.";
                         ShipmentDocument."Document Type" := ShipmentDocument."Document Type"::"Posted Shipment";
                         ShipmentDocument."Location Code" := SalesShipmentHeader."Location Code";
-                        if ShipToAddress.GET(SalesShipmentHeader."Sell-to Customer No.", SalesShipmentHeader."Ship-to Code") then begin
+                        if ShipToAddress.Get(SalesShipmentHeader."Sell-to Customer No.", SalesShipmentHeader."Ship-to Code") then begin
                             ShipmentDocument."Ship-to Code" := SalesShipmentHeader."Ship-to Code";
                             ShipmentDocument."E-Mail" := ShipToAddress."E-Mail";
                             ShipmentDocument."SMS No." := ShipToAddress."Phone No.";
@@ -214,14 +214,14 @@ codeunit 6059947 "NPR Package Management"
                         ShipmentDocument."Package Code" := SalesShipmentHeader."NPR Package Code";
 
                         ShipmentDocument."Total Weight" := 0;
-                        SalesShipmentLine.SETRANGE("Document No.", SalesShipmentHeader."No.");
-                        SalesShipmentLine.SETRANGE(Type, SalesShipmentLine.Type::Item);
-                        SalesShipmentLine.SETFILTER("Net Weight", '<>0');
-                        if SalesShipmentLine.FINDSET() then
+                        SalesShipmentLine.SetRange("Document No.", SalesShipmentHeader."No.");
+                        SalesShipmentLine.SetRange(Type, SalesShipmentLine.Type::Item);
+                        SalesShipmentLine.SetFilter("Net Weight", '<>0');
+                        if SalesShipmentLine.FindSet() then
                             repeat
                                 ShipmentDocument."Total Weight" += SalesShipmentLine."Net Weight" * SalesShipmentLine.Quantity;
-                            until SalesShipmentLine.NEXT() = 0;
-                        ShipmentDocument."Total Weight" := ROUND(ShipmentDocument."Total Weight", 1, '>') * 1000;
+                            until SalesShipmentLine.Next() = 0;
+                        ShipmentDocument."Total Weight" := Round(ShipmentDocument."Total Weight", 1, '>') * 1000;
                         if SalesShipmentHeader."NPR Delivery Location" <> '' then begin
                             ShipmentDocument.Name := SalesShipmentHeader."Bill-to Name";
                             ShipmentDocument.Address := SalesShipmentHeader."Bill-to Address";
@@ -244,8 +244,8 @@ codeunit 6059947 "NPR Package Management"
 
                         if PackageProviderSetup."Order No. to Reference" then
                             if SalesShipmentHeader."Order No." <> '' then
-                                ShipmentDocument.Reference := COPYSTR(SalesShipmentHeader."Order No.", 1,
-                                                                      MAXSTRLEN(ShipmentDocument.Reference));
+                                ShipmentDocument.Reference := CopyStr(SalesShipmentHeader."Order No.", 1,
+                                                                      MaxStrLen(ShipmentDocument.Reference));
 
                         if (PackageProviderSetup."Order No. or Ext Doc No to ref") then begin
                             if SalesShipmentHeader."External Document No." <> '' then
@@ -261,44 +261,44 @@ codeunit 6059947 "NPR Package Management"
                 end;
         end;
 
-        CompanyInfo.GET();
+        CompanyInfo.Get();
         ShipmentDocument."Sender VAT Reg. No" := CompanyInfo."VAT Registration No.";
         if ShipmentDocument."Country/Region Code" = '' then
             ShipmentDocument."Country/Region Code" := CompanyInfo."Country/Region Code";
-        if ShipmentDocument."Shipment Date" < TODAY then
-            ShipmentDocument."Shipment Date" := TODAY;
+        if ShipmentDocument."Shipment Date" < Today then
+            ShipmentDocument."Shipment Date" := Today;
 
         ShipmondoEvents.AddEntryOnBeforeShipmentDocumentModify(ShipmentDocument, RecRef);
-        ShipmentDocument.MODIFY(true);
+        ShipmentDocument.Modify(true);
 
-        COMMIT();
+        Commit();
         exit(true);
     end;
 
     procedure PostDimension(RecRef: RecordRef)
     var
-        PackageDimension: record "NPR Package Dimension";
-        PackageDimension1: record "NPR Package Dimension";
+        PackageDimension: Record "NPR Package Dimension";
+        PackageDimension1: Record "NPR Package Dimension";
         PackageDimensionDetails: Record "NPR Package Dimension Details";
         PostPackageDimensionDetails: Record "NPR Package Dimension Details";
         SalesShipmentHeader: Record "Sales Shipment Header";
     begin
-        RecRef.SETTABLE(SalesShipmentHeader);
-        PackageDimension.Setrange("Document Type", PackageDimension."Document Type"::Shipment);
-        PackageDimension.Setrange("Document No.", SalesShipmentHeader."No.");
+        RecRef.SetTable(SalesShipmentHeader);
+        PackageDimension.SetRange("Document Type", PackageDimension."Document Type"::Shipment);
+        PackageDimension.SetRange("Document No.", SalesShipmentHeader."No.");
         if not PackageDimension.IsEmpty() then exit;
 
-        PackageDimension.reset();
-        PackageDimension.Setrange("Document Type", PackageDimension."Document Type"::Order);
-        PackageDimension.Setrange("Document No.", SalesShipmentHeader."Order No.");
-        PackageDimension.Setfilter(Quantity, '<>0');
-        if PackageDimension.findset() then
+        PackageDimension.Reset();
+        PackageDimension.SetRange("Document Type", PackageDimension."Document Type"::Order);
+        PackageDimension.SetRange("Document No.", SalesShipmentHeader."Order No.");
+        PackageDimension.SetFilter(Quantity, '<>0');
+        if PackageDimension.FindSet() then
             repeat
-                PackageDimension1.init();
+                PackageDimension1.Init();
                 PackageDimension1.TransferFields(PackageDimension);
                 PackageDimension1."Document Type" := PackageDimension1."Document Type"::Shipment;
                 PackageDimension1."Document No." := SalesShipmentHeader."No.";
-                PackageDimension1.insert();
+                PackageDimension1.Insert();
 
                 PackageDimensionDetails.Reset();
                 PackageDimensionDetails.SetRange("Document Type", PackageDimension."Document Type"::Order);
@@ -306,16 +306,16 @@ codeunit 6059947 "NPR Package Management"
                 PackageDimensionDetails.SetRange("Package Dimension Line No.", PackageDimension."Line No.");
                 if PackageDimensionDetails.FindSet() then
                     repeat
-                        PostPackageDimensionDetails.init();
+                        PostPackageDimensionDetails.Init();
                         PostPackageDimensionDetails.TransferFields(PackageDimensionDetails);
                         PostPackageDimensionDetails."Document Type" := PostPackageDimensionDetails."Document Type"::Shipment;
                         PostPackageDimensionDetails."Document No." := SalesShipmentHeader."No.";
-                        PostPackageDimensionDetails.insert();
+                        PostPackageDimensionDetails.Insert();
                     until PackageDimensionDetails.Next() = 0;
 
-                PackageDimension.delete();
+                PackageDimension.Delete();
             until PackageDimension.Next() = 0;
-        commit();
+        Commit();
     end;
 
 
@@ -323,30 +323,30 @@ codeunit 6059947 "NPR Package Management"
     var
         SalesLine: Record "Sales Line";
         PakkeShippingAgent: Record "NPR Package Shipping Agent";
-        PackageDimension: record "NPR Package Dimension";
+        PackageDimension: Record "NPR Package Dimension";
     begin
         if Rec."Shipment Method Code" = '' then exit;
 
-        if not PakkeShippingAgent.GET(Rec."Shipping Agent Code") then
+        if not PakkeShippingAgent.Get(Rec."Shipping Agent Code") then
             exit;
 
         if PackageProviderSetup."Default Weight" > 0 then begin
-            SalesLine.SETRANGE(SalesLine."Document Type", Rec."Document Type");
-            SalesLine.SETRANGE("Document No.", Rec."No.");
-            SalesLine.SETRANGE(Type, SalesLine.Type::Item);
-            SalesLine.SETRANGE("Net Weight", 0);
-            SalesLine.MODIFYALL("Net Weight", PackageProviderSetup."Default Weight");
+            SalesLine.SetRange(SalesLine."Document Type", Rec."Document Type");
+            SalesLine.SetRange("Document No.", Rec."No.");
+            SalesLine.SetRange(Type, SalesLine.Type::Item);
+            SalesLine.SetRange("Net Weight", 0);
+            SalesLine.ModifyAll("Net Weight", PackageProviderSetup."Default Weight");
         end;
 
-        PackageDimension.setrange("Document Type", PackageDimension."Document Type"::Order);
-        PackageDimension.setrange("Document No.", rec."No.");
+        PackageDimension.SetRange("Document Type", PackageDimension."Document Type"::Order);
+        PackageDimension.SetRange("Document No.", Rec."No.");
         if not PackageDimension.IsEmpty() then
             exit;
         PackageDimension.Init();
         PackageDimension."Document Type" := PackageDimension."Document Type"::Order;
-        PackageDimension."Document No." := rec."No.";
+        PackageDimension."Document No." := Rec."No.";
         PackageDimension."Line No." := 10000;
-        PackageDimension.Quantity := Rec."npr Kolli";
+        PackageDimension.Quantity := Rec."NPR Kolli";
 
         if PakkeShippingAgent."Declared Value Required" then
             PopulatePackageAmountFields(Rec, PackageDimension);
@@ -359,34 +359,34 @@ codeunit 6059947 "NPR Package Management"
 
     local procedure UpdatePackageCode(Rec: Record "Sales Header");
     var
-        PackageDimension: record "NPR Package Dimension";
+        PackageDimension: Record "NPR Package Dimension";
     begin
-        if rec."NPR Package Code" <> '' then begin
-            PackageDimension.Setrange("Document Type", PackageDimension."Document Type"::Order);
-            PackageDimension.Setrange("Document No.", rec."No.");
-            PackageDimension.Setfilter("Package Code", '%1', '');
-            PackageDimension.modifyall("Package Code", rec."NPR Package Code");
+        if Rec."NPR Package Code" <> '' then begin
+            PackageDimension.SetRange("Document Type", PackageDimension."Document Type"::Order);
+            PackageDimension.SetRange("Document No.", Rec."No.");
+            PackageDimension.SetFilter("Package Code", '%1', '');
+            PackageDimension.ModifyAll("Package Code", Rec."NPR Package Code");
         end;
     end;
 
     local procedure UpdatePackageQuantity(Rec: Record "Sales Header");
     var
-        PackageDimension: record "NPR Package Dimension";
+        PackageDimension: Record "NPR Package Dimension";
     begin
-        PackageDimension.Setrange("Document Type", PackageDimension."Document Type"::Order);
-        PackageDimension.Setrange("Document No.", rec."No.");
-        if PackageDimension.count = 1 then begin
-            PackageDimension.findfirst();
-            PackageDimension.Quantity := Rec."npr Kolli";
-            PackageDimension.modify();
+        PackageDimension.SetRange("Document Type", PackageDimension."Document Type"::Order);
+        PackageDimension.SetRange("Document No.", Rec."No.");
+        if PackageDimension.Count = 1 then begin
+            PackageDimension.FindFirst();
+            PackageDimension.Quantity := Rec."NPR Kolli";
+            PackageDimension.Modify();
         end;
     end;
 
     local procedure GetPackageDimensions(Rec: Record "Sales Header"; var PackageDimension: Record "NPR Package Dimension") Found: Boolean;
     begin
         PackageDimension.Reset();
-        PackageDimension.Setrange("Document Type", PackageDimension."Document Type"::Order);
-        PackageDimension.Setrange("Document No.", Rec."No.");
+        PackageDimension.SetRange("Document Type", PackageDimension."Document Type"::Order);
+        PackageDimension.SetRange("Document No.", Rec."No.");
         Found := (PackageDimension.Find('-') and (PackageDimension.Next() = 0));
     end;
 
@@ -564,29 +564,29 @@ codeunit 6059947 "NPR Package Management"
     [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterValidateEvent', 'NPR Package Code', false, false)]
     local procedure OnAfterModifyPackageCode(var Rec: Record "Sales Header"; var xRec: Record "Sales Header"; CurrFieldNo: Integer);
     begin
-        if Rec.ISTEMPORARY then
+        if Rec.IsTemporary then
             exit;
         if not InitPackageProvider() then
             exit;
-        UpdatePackageCode(rec);
+        UpdatePackageCode(Rec);
         UpdatePackageAmountFields(Rec);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterValidateEvent', 'NPR Kolli', false, false)]
     local procedure OnAfterModifyNPRKolli(var Rec: Record "Sales Header"; var xRec: Record "Sales Header"; CurrFieldNo: Integer);
     begin
-        if Rec.ISTEMPORARY then
+        if Rec.IsTemporary then
             exit;
         if not InitPackageProvider() then
             exit;
-        UpdatePackageQuantity(rec);
+        UpdatePackageQuantity(Rec);
         UpdatePackageAmountFields(Rec);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterValidateEvent', 'Shipping Agent Service Code', false, false)]
     local procedure OnAfterModifyShippingAgentSerEventSalesHeader(var Rec: Record "Sales Header"; var xRec: Record "Sales Header"; CurrFieldNo: Integer);
     begin
-        if Rec.ISTEMPORARY then
+        if Rec.IsTemporary then
             exit;
 
         if not InitPackageProvider() then
@@ -596,7 +596,7 @@ codeunit 6059947 "NPR Package Management"
 
     local procedure InitPackageProvider(): Boolean;
     begin
-        if not PackageProviderSetup.GET() then
+        if not PackageProviderSetup.Get() then
             exit(false);
 
         if not PackageProviderSetup."Enable Shipping" then
