@@ -1551,7 +1551,7 @@
                     XML += '<VATAmount>' + Format(PosSalesLine."Amount Incl. VAT" - PosSalesLine."Amount Excl. VAT", 0, '<Precision,2:2><Standard Format,2>') + '</VATAmount>';
                     XML += '<NetAmount>' + Format(PosSalesLine."Amount Excl. VAT", 0, '<Precision,2:2><Standard Format,2>') + '</NetAmount>';
                     XML += '<Quantity>' + Format(Round(PosSalesLine.Quantity, 1, '>')) + '</Quantity>'; //Round up - They only accept integer quantity
-                    XML += '<GoodDescription>' + Format(CopyStr(EscapeSpecialChars(PosSalesLine.Description), 1, 50)) + '</GoodDescription>';
+                    XML += '<GoodDescription>' + Format(TrimUnexpectedGoodDescriptionEnding(CopyStr(EscapeSpecialChars(PosSalesLine.Description), 1, 50))) + '</GoodDescription>';
                     XML += '</PurchaseItem>';
                 end;
             until PosSalesLine.Next() = 0;
@@ -1561,6 +1561,27 @@
         XML += '</PurchaseDetails>';
 
         exit(XML);
+    end;
+
+    internal procedure TrimUnexpectedGoodDescriptionEnding(GoodDescription: Text[50]) ReturnText: Text
+    var
+#if BC17
+        Match: Codeunit DotNet_Match;
+        RegEx: Codeunit DotNet_Regex;
+#else
+        TempMatches: Record Matches temporary;
+        Regex: Codeunit Regex;
+#endif
+        RegexPattern: Label '&(?!(#\d+;))', Locked = true;
+    begin
+#if BC17
+        RegEx.Regex(RegexPattern);
+        RegEx.Match(GoodDescription, Match);
+        exit(DelStr(GoodDescription, Match.Index() + 1));
+#else
+        Regex.Match(GoodDescription, RegexPattern, 0, TempMatches);
+        exit(DelStr(GoodDescription, TempMatches.Index + 1));
+#endif
     end;
 
     local procedure GetPurchasePaymentMethodsXML(): Text
