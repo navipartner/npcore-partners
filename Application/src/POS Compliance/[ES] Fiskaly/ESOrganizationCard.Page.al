@@ -115,6 +115,17 @@
                     ApplicationArea = NPRESFiscal;
                     ToolTip = 'Specifies the version of software.';
                 }
+                field("Responsibility Declaration URL"; Rec."Responsibility Declaration URL")
+                {
+                    ApplicationArea = NPRESFiscal;
+                    Enabled = Rec."Responsibility Declaration URL" <> '';
+                    ToolTip = 'Specifies the URL where the responsibility declaration document is stored.';
+
+                    trigger OnDrillDown()
+                    begin
+                        ShowResponsibilityDeclaration();
+                    end;
+                }
             }
         }
     }
@@ -197,6 +208,22 @@
                     CurrPage.Update(false);
                 end;
             }
+            action(ViewResponsibilityDeclaration)
+            {
+                ApplicationArea = NPRESFiscal;
+                Caption = 'View Responsibility Declaration';
+                Enabled = Rec."Responsibility Declaration URL" <> '';
+                Image = View;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                ToolTip = 'Views responsibility declaration document stored at the URL if responsibility declaration exists for the territory.';
+
+                trigger OnAction()
+                begin
+                    ShowResponsibilityDeclaration();
+                end;
+            }
         }
     }
 
@@ -221,5 +248,11 @@
     begin
         APIKeyValue := CopyStr(ESSecretMgt.GetSecretKey(Rec.GetAPIKeyName()), 1, MaxStrLen(APIKeyValue));
         APISecretValue := CopyStr(ESSecretMgt.GetSecretKey(Rec.GetAPISecretName()), 1, MaxStrLen(APISecretValue));
+    end;
+
+    local procedure ShowResponsibilityDeclaration()
+    begin
+        Rec.TestField("Responsibility Declaration URL");
+        Hyperlink(Rec."Responsibility Declaration URL");
     end;
 }

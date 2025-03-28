@@ -1412,6 +1412,10 @@ codeunit 6184937 "NPR ES Fiskaly Communication"
         ResponseJson.SelectToken('$.content.version', PropertyValue);
         ESOrganization."Software Version" := CopyStr(PropertyValue.AsValue().AsText(), 1, MaxStrLen(ESOrganization."Software Version"));
 
+        Clear(ESOrganization."Responsibility Declaration URL");
+        if ResponseJson.SelectToken('$.content.responsibility_declaration', PropertyValue) then
+            ESOrganization."Responsibility Declaration URL" := CopyStr(PropertyValue.AsValue().AsText(), 1, MaxStrLen(ESOrganization."Responsibility Declaration URL"));
+
         ESOrganization.Modify(true);
     end;
 
