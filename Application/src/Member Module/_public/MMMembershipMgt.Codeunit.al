@@ -1,10 +1,35 @@
 codeunit 6060127 "NPR MM Membership Mgt."
 {
+    /// <summary>
+    /// This function allows you to create a new membership.
+    /// <br />
+    /// If `CreateMembershipLedgerEntry` is set to false, the membership will not be active because it will not have an active timeframe created.
+    /// To do so, call `StartMembership()` subsequently.
+    /// </summary>
+    /// <param name="MembershipSalesSetup">Sales setup to issue membership from.</param>
+    /// <param name="MemberInfoCapture">Record containing information about member.</param>
+    /// <param name="CreateMembershipLedgerEntry">Determine if the initial timeframe is created or not.</param>
+    /// <returns>The entry no of the created membership.</returns>
     procedure CreateMembershipAll(MembershipSalesSetup: Record "NPR MM Members. Sales Setup"; var MemberInfoCapture: Record "NPR MM Member Info Capture"; CreateMembershipLedgerEntry: Boolean) MembershipEntryNo: Integer
     var
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
     begin
         MembershipEntryNo := MembershipManagement.CreateMembershipAll(MembershipSalesSetup, MemberInfoCapture, CreateMembershipLedgerEntry);
+    end;
+
+    /// <summary>
+    /// Add an initial timeframe to the given membership.
+    /// </summary>
+    /// <param name="MembershipEntryNo">The membership to add the timeframe to.</param>
+    /// <param name="ReferenceDate">The reference date from which the activation should be calculated.</param>
+    /// <param name="MembershipSalesSetup">The sales setup containing rules.</param>
+    /// <param name="MemberInfoCapture">Record containing information about the sale that's starting the membership.</param>
+    /// <returns>The entry no of the created membership ledger entry.</returns>
+    procedure StartMembership(MembershipEntryNo: Integer; ReferenceDate: Date; MembershipSalesSetup: Record "NPR MM Members. Sales Setup"; MemberInfoCapture: Record "NPR MM Member Info Capture") LedgerEntryNo: Integer
+    var
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+        LedgerEntryNo := MembershipManagement.AddMembershipLedgerEntry_NEW(MembershipEntryNo, ReferenceDate, MembershipSalesSetup, MemberInfoCapture);
     end;
 
     procedure GetMembershipFromExtCardNo(ExternalCardNo: Text[100]; ReferenceDate: Date; var ReasonNotFound: Text) MembershipEntryNo: Integer
