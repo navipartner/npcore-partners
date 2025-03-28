@@ -116,6 +116,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         PaymentToken: Text;
         ShopperReference: Text[50];
         PSPReference: Text[16];
+        TempMMMemberPaymentMethod: Record "NPR MM Member Payment Method" temporary;
     begin
         if POSRenewLineExist(SubscrPaymentRequest) then
             exit;
@@ -315,6 +316,9 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
 
         if not TryGetPSPReferenceFromResponse(Response, PSPReference) then
             Clear(PSPReference);
+
+        if TryGetCardChanged(Response, TempMMMemberPaymentMethod) then
+            UpdatePaymentMethod(SubscrPaymentRequest, TempMMMemberPaymentMethod);
 
         if not TryProcessResultCode(ResultCode, RejectedReasonCode, RejectedReasonDescription) then begin
             ErrorMessage := GetLastErrorText();
@@ -2227,6 +2231,75 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
             NPPaySetup.Validate("Enable Reconciliation", true);
             NPPaySetup.Modify();
         end;
+    end;
+
+    local procedure TryGetCardChanged(Response: Text; var TempMMMemberPaymentMethod: Record "NPR MM Member Payment Method" temporary) Success: Boolean
+    var
+        JsonObject: JsonObject;
+        JsonObjectToken: JsonToken;
+        JsonValueToken: JsonToken;
+    begin
+        if Response = '' then
+            exit;
+
+        if not JsonObject.ReadFrom(Response) then
+            exit;
+
+        if not JsonObject.Get('additionalData', JsonObjectToken) then
+            exit;
+
+        if not JsonObjectToken.AsObject().Get('realtimeAccountUpdaterStatus', JsonValueToken) then
+            exit;
+
+        TempMMMemberPaymentMethod.Init();
+
+        if JsonObjectToken.AsObject().Get('cardSummary', JsonValueToken) then
+            TempMMMemberPaymentMethod."PAN Last 4 Digits" := CopyStr(JsonValueToken.AsValue().AsText(), 1, MaxStrLen(TempMMMemberPaymentMethod."PAN Last 4 Digits"));
+
+        if JsonObjectToken.AsObject().Get('expiryDate', JsonValueToken) then
+            TempMMMemberPaymentMethod."Expiry Date" := GetLastDayOfExpiryMonth(JsonValueToken.AsValue().AsText());
+
+        if JsonObjectToken.AsObject().Get('cardPaymentMethod', JsonValueToken) then
+            TempMMMemberPaymentMethod."Payment Brand" := CopyStr(JsonValueToken.AsValue().AsText(), 1, MaxStrLen(TempMMMemberPaymentMethod."Payment Brand"));
+
+        TempMMMemberPaymentMethod.Insert();
+        Success := true;
+    end;
+
+    local procedure UpdatePaymentMethod(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var TempMMMemberPaymentMethod: Record "NPR MM Member Payment Method" temporary)
+    var
+        MMPaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
+        MemberPaymentMethod: Record "NPR MM Member Payment Method";
+        SubscrRequest: Record "NPR MM Subscr. Request";
+        Subscription: Record "NPR MM Subscription";
+        PaymentMethodChanged: Boolean;
+    begin
+        SubscrRequest.SetLoadFields("Subscription Entry No.");
+        SubscrRequest.Get(SubscrPaymentRequest."Subscr. Request Entry No.");
+
+        Subscription.SetLoadFields("Membership Entry No.");
+        Subscription.Get(SubscrRequest."Subscription Entry No.");
+
+        if not MMPaymentMethodMgt.GetMemberPaymentMethod(Subscription."Membership Entry No.", MemberPaymentMethod) then
+            exit;
+
+        if MemberPaymentMethod."PAN Last 4 Digits" <> TempMMMemberPaymentMethod."PAN Last 4 Digits" then begin
+            MemberPaymentMethod."PAN Last 4 Digits" := TempMMMemberPaymentMethod."PAN Last 4 Digits";
+            PaymentMethodChanged := true;
+        end;
+
+        if MemberPaymentMethod."Expiry Date" <> TempMMMemberPaymentMethod."Expiry Date" then begin
+            MemberPaymentMethod."Expiry Date" := TempMMMemberPaymentMethod."Expiry Date";
+            PaymentMethodChanged := true;
+        end;
+
+        if MemberPaymentMethod."Payment Brand" <> TempMMMemberPaymentMethod."Payment Brand" then begin
+            MemberPaymentMethod."Payment Brand" := TempMMMemberPaymentMethod."Payment Brand";
+            PaymentMethodChanged := true;
+        end;
+
+        if PaymentMethodChanged then
+            MemberPaymentMethod.Modify();
     end;
 
     local procedure POSRenewLineExist(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request") LineExist: Boolean
