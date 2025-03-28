@@ -1,6 +1,5 @@
 ﻿page 6059785 "NPR TM Ticket List"
 {
-    Extensible = False;
     Caption = 'Ticket List';
     DeleteAllowed = false;
     Editable = true;
