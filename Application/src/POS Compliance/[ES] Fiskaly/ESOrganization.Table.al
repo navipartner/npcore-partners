@@ -44,6 +44,7 @@
                         ErrorIfThereIsAnyRelatedSigner();
 
                     Clear("Taxpayer Created");
+                    Clear("Responsibility Declaration URL");
                 end;
             end;
         }
@@ -94,6 +95,13 @@
             Caption = 'Software Version';
             DataClassification = CustomerContent;
             Editable = false;
+        }
+        field(110; "Responsibility Declaration URL"; Text[250])
+        {
+            Caption = 'Responsibility Declaration URL';
+            DataClassification = CustomerContent;
+            Editable = false;
+            ExtendedDatatype = URL;
         }
     }
 
