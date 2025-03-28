@@ -11,11 +11,13 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
         ScannerId_DescLbl: Label 'Specifies the fixed Scanner Id to be used for the action';
         ReferenceCaptionLbl: Label 'Enter Reference No.';
         ReferenceTitleLbl: Label 'Print & Admit by reference';
+        ReferenceInputLbl: Label 'Reference Input';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddTextParameter('AdmissionCode', '', AdmissionCode_CptLbl, AdmissionCode_DescLbl);
         WorkflowConfig.AddTextParameter('ScannerId', '', ScannerId_CptLbl, ScannerId_DescLbl);
+        WorkflowConfig.AddTextParameter('reference_input', '', ReferenceInputLbl, ReferenceInputLbl);
         WorkflowConfig.AddLabel('ReferenceTitle', ReferenceTitleLbl);
         WorkflowConfig.AddLabel('ReferenceCaption', ReferenceCaptionLbl);
     end;
@@ -283,7 +285,6 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
             exit;
         if Ticket.GetBySystemId(PrintandAdmitBuffer."System Id") then
             SpeedGate.Admit(SpeedGate.CreateAdmitToken(Ticket."External Ticket No.", AdmissionCode, ScannerId), 1);
-
     end;
 
     local procedure AdmitMemberCard(PrintandAdmitBuffer: Record "NPR Print and Admit Buffer"; AdmissionCode: Code[20]; ScannerId: Code[10])
@@ -348,11 +349,83 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
         end;
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'DiscoverEanBoxEvents', '', true, true)]
+    local procedure DiscoverEanBoxEvents(var EanBoxEvent: Record "NPR Ean Box Event")
+    var
+        Text000Lbl: Label 'Print and Admit';
+    begin
+        if not EanBoxEvent.Get(ActionCode()) then begin
+            EanBoxEvent.Init();
+            EanBoxEvent.Code := ActionCode();
+            EanBoxEvent."Module Name" := CopyStr(Text000Lbl, 1, MaxStrLen(EanBoxEvent."Module Name"));
+            EanBoxEvent.Description := CopyStr(Text000Lbl, 1, MaxStrLen(EanBoxEvent.Description));
+            EanBoxEvent."Action Code" := ActionCode();
+            EanBoxEvent."POS View" := EanBoxEvent."POS View"::Sale;
+            EanBoxEvent."Event Codeunit" := CurrCodeunitId();
+            EanBoxEvent.Insert(true);
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Setup Mgt.", 'OnInitEanBoxParameters', '', true, true)]
+    local procedure OnInitEanBoxParameters(var Sender: Codeunit "NPR POS Input Box Setup Mgt."; EanBoxEvent: Record "NPR Ean Box Event")
+    begin
+        case EanBoxEvent.Code of
+            ActionCode():
+                Sender.SetNonEditableParameterValues(EanBoxEvent, 'reference_input', true, '');
+        end;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Input Box Evt Handler", 'SetEanBoxEventInScope', '', true, false)]
+    local procedure SetEanBoxEventInScope(EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
+    begin
+        if EanBoxSetupEvent."Event Code" <> ActionCode() then
+            exit;
+
+        if RecordFound(EanBoxValue) then
+            Inscope := true;
+    end;
+
+    local procedure RecordFound(ReferenceNo: Text): Boolean
+    var
+        MemberCard: Record "NPR MM Member Card";
+        Ticket: Record "NPR TM Ticket";
+        AttractionWallet: Record "NPR AttractionWallet";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+        MemberCard.SetRange("External Card No.", CopyStr(ReferenceNo, 1, MaxStrLen(MemberCard."External Card No.")));
+        if not MemberCard.IsEmpty() then
+            exit(true);
+
+        Ticket.SetRange("External Ticket No.", CopyStr(ReferenceNo, 1, MaxStrLen(Ticket."External Ticket No.")));
+        if not Ticket.IsEmpty() then
+            exit(true);
+
+        AttractionWallet.SetRange(ReferenceNumber, CopyStr(ReferenceNo, 1, MaxStrLen(AttractionWallet.ReferenceNumber)));
+        if not AttractionWallet.IsEmpty() then
+            exit(true);
+
+        TicketReservationRequest.SetRange("Session Token ID", CopyStr(ReferenceNo, 1, MaxStrLen(TicketReservationRequest."Session Token ID")));
+        if not TicketReservationRequest.IsEmpty then
+            exit(true);
+
+        exit(false);
+    end;
+
+    local procedure ActionCode(): Code[20]
+    begin
+        exit(Format(Enum::"NPR POS Workflow"::TM_PRINT_AND_ADMIT));
+    end;
+
+    local procedure CurrCodeunitId(): Integer
+    begin
+        exit(Codeunit::"NPR POS Action Print and Admit");
+    end;
+
     local procedure GetActionScript(): Text
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionPrintandAdmit.js###
-        'const main=async({workflow:e,parameters:i,popup:n,context:a,captions:t})=>{if(a.reference_input=await n.input({title:t.ReferenceTitle,caption:t.ReferenceCaption}),a.reference_input==null)return" ";let r=await e.respond("fill_data");await e.respond("handle_data",{buffer_data:r})};'
+        'const main = async ({ workflow, parameters, popup, context, captions }) => {if (!parameters.reference_input) { context.reference_input = await popup.input({title: captions.ReferenceTitle,caption: captions.ReferenceCaption,});if (context.reference_input == null) {return(" ");}} else{context.reference_input = parameters.reference_input; }let result = await workflow.respond("fill_data");await workflow.respond("handle_data", { buffer_data: result });};'
         );
     end;
 }
