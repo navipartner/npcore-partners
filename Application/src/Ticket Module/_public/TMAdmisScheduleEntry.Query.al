@@ -3,6 +3,7 @@ query 6014486 "NPR TM Admis. Schedule Entry"
     Access = Public;
     QueryType = Normal;
     Caption = 'Admission Schedule Entry';
+    OrderBy = ascending(AdmissionStartDate, AdmissionStartTime);
 
     elements
     {
