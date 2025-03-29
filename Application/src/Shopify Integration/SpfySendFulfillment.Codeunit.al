@@ -44,7 +44,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
     end;
 
     [TryFunction]
-    local procedure PrepareFulfillment(var NcTask: Record "NPR Nc Task"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Entry" temporary; var SendToShopify: Boolean)
+    local procedure PrepareFulfillment(var NcTask: Record "NPR Nc Task"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Entry"; var SendToShopify: Boolean)
     var
         TempAvailableFulfillmentLines: Record "NPR Spfy Fulfillment Entry" temporary;
         JsonHelper: Codeunit "NPR Json Helper";
@@ -91,7 +91,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         GenerateFulfillmentPayloadJson(NcTask, CalculatedFulfillmentLines, SendToShopify);
     end;
 
-    local procedure CalculateFulfillmentLines(NcTask: Record "NPR Nc Task"; var AvailableFulfillmentLines: Record "NPR Spfy Fulfillment Entry" temporary; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Entry" temporary)
+    local procedure CalculateFulfillmentLines(NcTask: Record "NPR Nc Task"; var AvailableFulfillmentLines: Record "NPR Spfy Fulfillment Entry"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Entry")
     var
         ReturnReceiptHeader: Record "Return Receipt Header";
         ReturnReceiptLine: Record "Return Receipt Line";
@@ -153,7 +153,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         SpfyIntegrationEvents.OnCheckIfIsEligibleForFulfillmentSending(RecID, SpfyOrderLineId, Eligible);
     end;
 
-    local procedure UpdateFulfillmentBuffer(RecID: RecordId; var AvailableFulfillmentLines: Record "NPR Spfy Fulfillment Entry" temporary; SpfyOrderLineId: Text[30]; Qty: Decimal; FulfillMaxAvailableQty: Boolean; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Entry" temporary)
+    local procedure UpdateFulfillmentBuffer(RecID: RecordId; var AvailableFulfillmentLines: Record "NPR Spfy Fulfillment Entry"; SpfyOrderLineId: Text[30]; Qty: Decimal; FulfillMaxAvailableQty: Boolean; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Entry")
     var
         CurrentQtyToFulfill: Decimal;
         NextEntryNo: Integer;
@@ -194,7 +194,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
             until (AvailableFulfillmentLines.Next() = 0) or (Qty = 0);
     end;
 
-    local procedure SaveFulfillmentEntries(var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Entry" temporary)
+    local procedure SaveFulfillmentEntries(var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Entry")
     var
         ShopifyFulfillmentEntry: Record "NPR Spfy Fulfillment Entry";
     begin
@@ -207,7 +207,17 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
             until CalculatedFulfillmentLines.Next() = 0;
     end;
 
-    local procedure GenerateFulfillmentPayloadJson(var NcTask: Record "NPR Nc Task"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Entry" temporary; var SendToShopify: Boolean)
+    local procedure DeleteFulfillmentEntries(RecID: RecordId)
+    var
+        ShopifyFulfillmentEntry: Record "NPR Spfy Fulfillment Entry";
+    begin
+        ShopifyFulfillmentEntry.SetRange("Table No.", RecID.TableNo());
+        ShopifyFulfillmentEntry.SetRange("BC Record ID", RecID);
+        if not ShopifyFulfillmentEntry.IsEmpty() then
+            ShopifyFulfillmentEntry.DeleteAll();
+    end;
+
+    local procedure GenerateFulfillmentPayloadJson(var NcTask: Record "NPR Nc Task"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Entry"; var SendToShopify: Boolean)
     var
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         ItemsByFulfillmentOrder: JsonArray;
@@ -303,6 +313,26 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
             RecRef.GetTable(ReturnReceiptHeader);
         end;
         SpfyScheduleSend.InitNcTask(NcTask."Store Code", RecRef, ShopifyOrderID, NcTask.Type::Insert, NcTask);
+    end;
+
+#if BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Table, Database::"Sales Shipment Line", 'OnAfterDeleteEvent', '', true, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::"Sales Shipment Line", OnAfterDeleteEvent, '', true, false)]
+#endif
+    local procedure OnAfterDeleteSalesShipmentLine_CleanUpFulfillmentEntries(var Rec: Record "Sales Shipment Line")
+    begin
+        DeleteFulfillmentEntries(Rec.RecordId());
+    end;
+
+#if BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Table, Database::"Return Receipt Line", 'OnAfterDeleteEvent', '', true, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::"Return Receipt Line", OnAfterDeleteEvent, '', true, false)]
+#endif
+    local procedure OnAfterDeleteReturnReceiptLine_CleanUpFulfillmentEntries(var Rec: Record "Return Receipt Line")
+    begin
+        DeleteFulfillmentEntries(Rec.RecordId());
     end;
 }
 #endif
