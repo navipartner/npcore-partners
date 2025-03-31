@@ -1459,8 +1459,7 @@
         NpRvSalesLine."Voucher Message" := TempNpRvVoucher."Voucher Message";
         NpRvSalesLine.Description := TempNpRvVoucher.Description;
         NpRvSalesLine.Validate("Customer No.", SalesHeader."Sell-to Customer No.");
-        if (not NpRvSalesLine."Send via Print") and (not NpRvSalesLine."Send via SMS") and (NpRvSalesLine."E-mail" <> '') then
-            NpRvSalesLine."Send via E-mail" := true;
+        NpRvSalesLine.UpdateIsSendViaEmail();
         NpRvSalesLine.Insert(true);
     end;
 

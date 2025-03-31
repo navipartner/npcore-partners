@@ -264,7 +264,32 @@
 #if not BC17
         field(400; "Disabled at Shopify"; Boolean)
         {
-            Caption = 'Disabled at Shopify';
+            Caption = 'Deactivated at Shopify';
+            DataClassification = CustomerContent;
+        }
+        field(460; "Spfy Send from Shopify"; Boolean)
+        {
+            Caption = 'Send from Shopify';
+            DataClassification = CustomerContent;
+        }
+        field(470; "Spfy Send on"; DateTime)
+        {
+            Caption = 'Send on Date-Time';
+            DataClassification = CustomerContent;
+        }
+        field(480; "Spfy Liquid Template Suffix"; Text[20])
+        {
+            Caption = 'Shopify Liquid Template Suffix';
+            DataClassification = CustomerContent;
+        }
+        field(490; "Spfy Recipient E-mail"; Text[80])
+        {
+            Caption = 'Recipient E-mail';
+            DataClassification = CustomerContent;
+        }
+        field(500; "Spfy Recipient Name"; Text[150])
+        {
+            Caption = 'Recipient Name';
             DataClassification = CustomerContent;
         }
 #endif

@@ -391,7 +391,9 @@
 #if not BC17
         Voucher."Spfy Send from Shopify" := NpRvSalesLine."Spfy Send from Shopify";
         Voucher."Spfy Send on" := NpRvSalesLine."Spfy Send on";
-        Voucher."Spfy Liquid Template Suffix" := nprvSalesLine."Spfy Liquid Template Suffix";
+        Voucher."Spfy Liquid Template Suffix" := NpRvSalesLine."Spfy Liquid Template Suffix";
+        Voucher."Spfy Recipient Name" := NpRvSalesLine."Spfy Recipient Name";
+        Voucher."Spfy Recipient E-mail" := NpRvSalesLine."Spfy Recipient E-mail";
 #endif
         if ModifyVoucherRec then
             Voucher.Modify(true);
@@ -900,6 +902,13 @@
         ArchVoucher."Send via E-mail" := Voucher."Send via E-mail";
         ArchVoucher."Send via SMS" := Voucher."Send via SMS";
         ArchVoucher.Comment := Voucher.Comment;
+#if not BC17
+        ArchVoucher."Spfy Send from Shopify" := Voucher."Spfy Send from Shopify";
+        ArchVoucher."Spfy Send on" := Voucher."Spfy Send on";
+        ArchVoucher."Spfy Liquid Template Suffix" := Voucher."Spfy Liquid Template Suffix";
+        ArchVoucher."Spfy Recipient Name" := Voucher."Spfy Recipient Name";
+        ArchVoucher."Spfy Recipient E-mail" := Voucher."Spfy Recipient E-mail";
+#endif
         OnBeforeInsertArchivedVoucher(Voucher, ArchVoucher);
         ArchVoucher.Insert();
     end;

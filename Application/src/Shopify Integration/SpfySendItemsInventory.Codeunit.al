@@ -68,7 +68,6 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
     local procedure SendTags(var NcTask: Record "NPR Nc Task")
     var
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
-        TagUpdateErrors: JsonToken;
         ShopifyResponse: JsonToken;
         SendToShopify: Boolean;
         Success: Boolean;
@@ -87,14 +86,8 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
 
         if not Success then
             Error(GetLastErrorText());
-        if ShopifyResponse.SelectToken('data.tagsRemove.userErrors', TagUpdateErrors) then
-            if TagUpdateErrors.IsArray() then
-                if TagUpdateErrors.AsArray().Count() > 0 then
-                    Error('');
-        if ShopifyResponse.SelectToken('data.tagsAdd.userErrors', TagUpdateErrors) then
-            if TagUpdateErrors.IsArray() then
-                if TagUpdateErrors.AsArray().Count() > 0 then
-                    Error('');
+        if SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse) then
+            Error('');  //The system will record Shopify response as the error message
     end;
 
     local procedure SendItemVariant(var NcTask: Record "NPR Nc Task")

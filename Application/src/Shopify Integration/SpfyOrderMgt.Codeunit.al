@@ -1090,7 +1090,8 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         NpRvSalesLine.Type := NpRvSalesLine.Type::"Top-up";
         NpRvSalesLine.Description := CopyStr(SalesLine.Description, 1, MaxStrLen(NpRvSalesLine.Description));
         NpRvSalesLine."Spfy Initiated in Shopify" := not IsNpGiftCard;
-        UpdateVoucherRecipient(PropertyDict, NpRvSalesLine);
+        NpRvSalesLine.Validate("Customer No.", SalesHeader."Sell-to Customer No.");
+        UpdateVoucherRecipient(PropertyDict, IsNpGiftCard, NpRvSalesLine);
         NpRvSalesLine.Insert(true);
 
         FulfillmEntryDetailBuffer.SetRange("Parent Entry No.", FulfillmentLineBuffer."Entry No.");
@@ -1163,31 +1164,32 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         VoucherType.TestField("Account No.");
     end;
 
-    local procedure UpdateVoucherRecipient(PropertyDict: Dictionary of [Text, Text]; var NpRvSalesLine: Record "NPR NpRv Sales Line")
+    local procedure UpdateVoucherRecipient(PropertyDict: Dictionary of [Text, Text]; IsNpGiftCard: Boolean; var NpRvSalesLine: Record "NPR NpRv Sales Line")
     var
         PropertyKey: Text;
         PropertyValue: Text;
     begin
+        NpRvSalesLine."Spfy Send from Shopify" := IsNpGiftCard;
+        NpRvSalesLine."Spfy Liquid Template Suffix" := '';
+        NpRvSalesLine."Spfy Send on" := 0DT;
+
         foreach PropertyKey in PropertyDict.Keys() do begin
             PropertyValue := PropertyDict.Get(PropertyKey);
-            case PropertyKey of
-                '_send_giftcard':
-                    NpRvSalesLine."Spfy Send from Shopify" := LowerCase(PropertyValue) in ['on', 'true', 'yes', '1'];
-                'Recipient Email':
-                    NpRvSalesLine."E-mail" := CopyStr(PropertyValue, 1, MaxStrLen(NpRvSalesLine."E-mail"));
-                'Recipient Name':
-                    begin
-                        NpRvSalesLine.Name := CopyStr(PropertyValue, 1, MaxStrLen(NpRvSalesLine.Name));
-                        if StrLen(PropertyValue) > MaxStrLen(NpRvSalesLine.Name) then
-                            NpRvSalesLine."Name 2" := CopyStr(PropertyValue, MaxStrLen(NpRvSalesLine.Name) + 1, MaxStrLen(NpRvSalesLine."Name 2"));
-                    end;
-                'Message':
-                    NpRvSalesLine."Voucher Message" := CopyStr(PropertyValue, 1, MaxStrLen(NpRvSalesLine."Voucher Message"));
-                'Template Suffix':
-                    NpRvSalesLine."Spfy Liquid Template Suffix" := CopyStr(PropertyValue, 1, MaxStrLen(NpRvSalesLine."Spfy Liquid Template Suffix"));
-                'Send On':
-                    if Evaluate(NpRvSalesLine."Spfy Send on", PropertyValue, 9) then;
-            end;
+            if PropertyValue <> '' then
+                case PropertyKey of
+                    //'_send_giftcard':
+                    //    NpRvSalesLine."Spfy Send from Shopify" := LowerCase(PropertyValue) in ['on', 'true', 'yes', '1'];
+                    'Recipient Email':
+                        NpRvSalesLine."Spfy Recipient E-mail" := CopyStr(PropertyValue, 1, MaxStrLen(NpRvSalesLine."Spfy Recipient E-mail"));
+                    'Recipient Name':
+                        NpRvSalesLine."Spfy Recipient Name" := CopyStr(PropertyValue, 1, MaxStrLen(NpRvSalesLine."Spfy Recipient Name"));
+                    'Message':
+                        NpRvSalesLine."Voucher Message" := CopyStr(PropertyValue, 1, MaxStrLen(NpRvSalesLine."Voucher Message"));
+                    'Template Suffix':
+                        NpRvSalesLine."Spfy Liquid Template Suffix" := CopyStr(PropertyValue, 1, MaxStrLen(NpRvSalesLine."Spfy Liquid Template Suffix"));
+                    'Send On':
+                        if Evaluate(NpRvSalesLine."Spfy Send on", PropertyValue, 9) then;
+                end;
         end;
     end;
 

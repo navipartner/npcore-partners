@@ -65,11 +65,7 @@ codeunit 6185022 "NPR NpRv Module Pay. - Shopify"
 #endif
     local procedure OnRunApplyPaymentSalesDoc(VoucherType: Record "NPR NpRv Voucher Type"; SalesHeader: Record "Sales Header"; var NpRvSalesLine: Record "NPR NpRv Sales Line"; var Handled: Boolean)
     var
-        PaymentLine: Record "NPR Magento Payment Line";
-        ModulePayDefault: Codeunit "NPR NpRv Module Pay.: Default";
         ModulePayPartial: Codeunit "NPR NpRv Module Pay. - Partial";
-        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt.";
-        PartialApplicationAllowed: Boolean;
     begin
         if Handled then
             exit;
@@ -78,21 +74,7 @@ codeunit 6185022 "NPR NpRv Module Pay. - Shopify"
 
         Handled := true;
 
-        PartialApplicationAllowed := IsShopifyPlusSubscription(VoucherType.GetStoreCode());
-        if not PartialApplicationAllowed then begin
-            NpRvSalesLine.Get(NpRvSalesLine.Id);
-            PartialApplicationAllowed := NpRvSalesLine."Spfy Initiated in Shopify";
-            if not PartialApplicationAllowed then begin
-                NpRvSalesLine.TestField("Document Source", NpRvSalesLine."Document Source"::"Payment Line");
-                PaymentLine.Get(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", NpRvSalesLine."Document Line No.");
-                PartialApplicationAllowed := SpfyAssignedIDMgt.GetAssignedShopifyID(PaymentLine.RecordId(), "NPR Spfy ID Type"::"Entry ID") <> '';
-            end;
-        end;
-
-        if PartialApplicationAllowed then
-            ModulePayPartial.ApplyPaymentSalesDoc(VoucherType, SalesHeader, NpRvSalesLine)
-        else
-            ModulePayDefault.ApplyPaymentSalesDoc(VoucherType, SalesHeader, NpRvSalesLine);
+        ModulePayPartial.ApplyPaymentSalesDoc(VoucherType, SalesHeader, NpRvSalesLine);
     end;
 
 #if BC18 or BC19 or BC20 or BC21
@@ -103,8 +85,6 @@ codeunit 6185022 "NPR NpRv Module Pay. - Shopify"
     local procedure OnPreApplyPaymentV3(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary; var SalePOS: Record "NPR POS Sale"; VoucherType: Record "NPR NpRv Voucher Type"; ReferenceNo: Text; SuggestedAmount: Decimal)
     begin
         if not IsSubscriber(VoucherType) then
-            exit;
-        if not IsShopifyPlusSubscription(VoucherType.GetStoreCode()) then
             exit;
 
         IF (TempNpRvVoucherBuffer.Amount > SuggestedAmount) AND (SuggestedAmount <> 0) THEN
@@ -118,7 +98,6 @@ codeunit 6185022 "NPR NpRv Module Pay. - Shopify"
 #endif
     local procedure OnRunApplyPaymentV3(POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line"; EndSale: Boolean; var Handled: Boolean; var ActionContext: JsonObject)
     var
-        ModulePayDefault: Codeunit "NPR NpRv Module Pay.: Default";
         ModulePayPartial: Codeunit "NPR NpRv Module Pay. - Partial";
     begin
         if Handled then
@@ -128,10 +107,7 @@ codeunit 6185022 "NPR NpRv Module Pay. - Shopify"
 
         Handled := true;
 
-        if IsShopifyPlusSubscription(VoucherType.GetStoreCode()) then
-            ModulePayPartial.ApplyPayment(POSSession, VoucherType, SaleLinePOSVoucher, ActionContext)
-        else
-            ModulePayDefault.ApplyPayment(POSSession, VoucherType, SaleLinePOSVoucher, EndSale, ActionContext);
+        ModulePayPartial.ApplyPayment(POSSession, VoucherType, SaleLinePOSVoucher, ActionContext);
     end;
 
     local procedure CurrCodeunitId(): Integer
@@ -142,13 +118,6 @@ codeunit 6185022 "NPR NpRv Module Pay. - Shopify"
     local procedure IsSubscriber(VoucherType: Record "NPR NpRv Voucher Type"): Boolean
     begin
         exit(VoucherType."Apply Payment Module" = ModuleCode());
-    end;
-
-    local procedure IsShopifyPlusSubscription(ShopifyStoreCode: Code[20]): Boolean
-    var
-        ShopifyStore: Record "NPR Spfy Store";
-    begin
-        exit(ShopifyStore.Get(ShopifyStoreCode) and ShopifyStore."Shopify Plus Subscription");
     end;
 }
 #endif

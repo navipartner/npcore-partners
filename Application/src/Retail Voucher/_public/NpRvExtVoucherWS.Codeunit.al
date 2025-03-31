@@ -351,8 +351,7 @@
         NpRvSalesLine."Send via Print" := NpRvExtVoucherBuffer."Send via Print";
         NpRvSalesLine."Send via E-mail" := NpRvExtVoucherBuffer."Send via E-mail";
         NpRvSalesLine."Send via SMS" := NpRvExtVoucherBuffer."Send via SMS";
-        if (not NpRvSalesLine."Send via Print") and (not NpRvSalesLine."Send via SMS") and (NpRvSalesLine."E-mail" <> '') then
-            NpRvSalesLine."Send via E-mail" := true;
+        NpRvSalesLine.UpdateIsSendViaEmail();
         if NpRvExtVoucherBuffer."Voucher Message" <> '' then
             NpRvSalesLine."Voucher Message" := NpRvExtVoucherBuffer."Voucher Message";
     end;
@@ -409,8 +408,7 @@
         NpRvVoucher."Send via Print" := NpRvExtVoucherBuffer."Send via Print";
         NpRvVoucher."Send via E-mail" := NpRvExtVoucherBuffer."Send via E-mail";
         NpRvVoucher."Send via SMS" := NpRvExtVoucherBuffer."Send via SMS";
-        if (not NpRvVoucher."Send via Print") and (not NpRvVoucher."Send via SMS") and (NpRvVoucher."E-mail" <> '') then
-            NpRvVoucher."Send via E-mail" := true;
+        NpRvVoucher.UpdateIsSendViaEmail();
         if NpRvExtVoucherBuffer."Voucher Message" <> '' then
             NpRvVoucher."Voucher Message" := NpRvExtVoucherBuffer."Voucher Message";
     end;

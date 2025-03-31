@@ -228,41 +228,6 @@ codeunit 6184924 "NPR Spfy Communication Handler"
     end;
 
     [TryFunction]
-    procedure RetrieveGiftCardInfoFromShopify(ShopifyStoreCode: Code[20]; ShopifyGiftCardID: Text[30]; var ShopifyResponse: JsonToken)
-    var
-        NcTask: Record "NPR Nc Task";
-        ResponseText: Text;
-        Url: Text;
-    begin
-        NcTask."Store Code" := ShopifyStoreCode;
-        Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('gift_cards/%1.json', ShopifyGiftCardID);
-        ResponseText := SendShopifyRequest(NcTask, Enum::"Http Request Type"::GET, Url);
-        ShopifyResponse.ReadFrom(ResponseText);
-    end;
-
-    [TryFunction]
-    procedure SendGiftCardDisableRequest(var NcTask: Record "NPR Nc Task"; ShopifyGiftCardID: Text[30]; var ShopifyResponse: JsonToken)
-    var
-        ResponseText: Text;
-        Url: Text;
-    begin
-        Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('gift_cards/%1/disable.json', ShopifyGiftCardID);
-        ResponseText := SendShopifyRequest(NcTask, Enum::"Http Request Type"::POST, Url);
-        ShopifyResponse.ReadFrom(ResponseText);
-    end;
-
-    [TryFunction]
-    procedure SendGiftCardBalanceAdjustmentRequest(var NcTask: Record "NPR Nc Task"; ShopifyGiftCardID: Text[30])
-    var
-        Url: Text;
-    begin
-        CheckRequestContent(NcTask);
-
-        Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('gift_cards/%1/adjustments.json', ShopifyGiftCardID);
-        SendShopifyRequest(NcTask, Enum::"Http Request Type"::POST, Url);
-    end;
-
-    [TryFunction]
     procedure GetRegisteredWebhooks(SpfyStoreCode: Code[20]; Topic: Text; var ShopifyResponse: JsonToken)
     var
         NcTask: Record "NPR Nc Task";
@@ -292,6 +257,24 @@ codeunit 6184924 "NPR Spfy Communication Handler"
 
         Url := GetShopifyUrl(NcTask."Store Code") + 'webhooks.json';
         ShopifyResponse.ReadFrom(SendShopifyRequest(NcTask, Enum::"Http Request Type"::POST, Url));
+    end;
+
+    procedure UserErrorsExistInGraphQLResponse(ShopifyResponse: JsonToken): Boolean
+    var
+        ResponseDataItemUserErrors: JsonToken;
+        ResponseDataSet: JsonToken;
+        DataKey: Text;
+    begin
+        if not (ShopifyResponse.SelectToken('data', ResponseDataSet) and ResponseDataSet.IsObject()) then
+            exit(false);
+
+        foreach DataKey in ResponseDataSet.AsObject().Keys() do
+            if ResponseDataSet.SelectToken(DataKey + '.userErrors', ResponseDataItemUserErrors) then
+                if ResponseDataItemUserErrors.IsArray() then
+                    if ResponseDataItemUserErrors.AsArray().Count() > 0 then
+                        exit(true);
+
+        exit(false);
     end;
 
     local procedure CheckRequestContent(var NcTask: Record "NPR Nc Task")

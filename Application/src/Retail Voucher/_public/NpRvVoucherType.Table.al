@@ -69,14 +69,6 @@
         {
             Caption = 'Allow Top-up';
             DataClassification = CustomerContent;
-
-#if not BC17
-            trigger OnValidate()
-            begin
-                if "Integrate with Shopify" and "Allow Top-up" then
-                    CheckShopifySubscription(GetStoreCode());
-            end;
-#endif
         }
         field(63; "Print Object Type"; Enum "NPR Print Object Type")
         {
@@ -327,22 +319,6 @@
         SpfyStore.SetLoadFields(Code);
         if SpfyStore.FindFirst() then
             Error(StoreCodeMissingErr, SpfyStore.Code);
-    end;
-
-    local procedure CheckShopifySubscription(ShopifyStoreCode: Code[20])
-    var
-        ShopifyStore: Record "NPR Spfy Store";
-        PartialPaymentsNotAllowedLbl: Label 'Partial payments and top-ups are only allowed with Shopify Plus subscription.';
-    begin
-        if ShopifyStoreCode = '' then
-            exit;
-
-        ShopifyStore.Get(ShopifyStoreCode);
-        if ShopifyStore."Shopify Plus Subscription" then
-            exit;
-
-        if "Allow Top-up" then
-            Error(PartialPaymentsNotAllowedLbl);
     end;
 #endif
 }

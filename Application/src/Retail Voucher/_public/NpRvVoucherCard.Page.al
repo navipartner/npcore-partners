@@ -349,11 +349,26 @@
                         ApplicationArea = NPRShopify;
                         Editable = ShopifyGiftCardID = '';
                     }
+                    field("Spfy Recipient Name"; Rec."Spfy Recipient Name")
+                    {
+                        ToolTip = 'Specifies the name of the voucher recipient. If this field is empty, the system will use the customer name from the voucher card.';
+                        ApplicationArea = NPRShopify;
+                        Enabled = Rec."Spfy Send from Shopify";
+                        Editable = ShopifyGiftCardID = '';
+                    }
+                    field("Spfy Recipient E-mail"; Rec."Spfy Recipient E-mail")
+                    {
+                        ToolTip = 'Specifies the email address of the voucher recipient. If this field is empty, the system will use the customer email address from the voucher card.';
+                        ApplicationArea = NPRShopify;
+                        Enabled = Rec."Spfy Send from Shopify";
+                        Editable = ShopifyGiftCardID = '';
+                    }
                     field("Spfy Send on"; Rec."Spfy Send on")
                     {
                         ToolTip = 'Specifies the date and time when Shopify should send the voucher to the recipient.';
                         ApplicationArea = NPRShopify;
                         Enabled = Rec."Spfy Send from Shopify";
+                        Editable = ShopifyGiftCardID = '';
                     }
                 }
             }

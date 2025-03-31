@@ -306,6 +306,16 @@
             Caption = 'Shopify Liquid Template Suffix';
             DataClassification = CustomerContent;
         }
+        field(490; "Spfy Recipient E-mail"; Text[80])
+        {
+            Caption = 'Recipient E-mail';
+            DataClassification = CustomerContent;
+        }
+        field(500; "Spfy Recipient Name"; Text[150])
+        {
+            Caption = 'Recipient Name';
+            DataClassification = CustomerContent;
+        }
 #endif
         field(1000; Id; Guid)
         {
@@ -402,5 +412,15 @@
     internal procedure IsCreditDocType(): Boolean
     begin
         exit("Document Type" in ["Document Type"::"Return Order", "Document Type"::"Credit Memo"]);
+    end;
+
+    internal procedure UpdateIsSendViaEmail()
+    begin
+#if BC17
+        if not ("Send via Print" or "Send via SMS") and ("E-mail" <> '') then
+#else        
+        if not ("Send via Print" or "Send via SMS" or "Spfy Send from Shopify") and ("E-mail" <> '') then
+#endif
+            "Send via E-mail" := true;
     end;
 }
