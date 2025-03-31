@@ -85,4 +85,9 @@ enum 6014577 "NPR Feature" implements "NPR Feature Management"
         Implementation = "NPR Feature Management" = "NPR NP Email Feature";
     }
 #endif
+    value(140; "POS Webservice Sessions")
+    {
+        Caption = 'POS Webservice Sessions', Locked = true, MaxLength = 50;
+        Implementation = "NPR Feature Management" = "NPR POS Webservice Sessions";
+    }
 }

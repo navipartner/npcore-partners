@@ -22,7 +22,8 @@ codeunit 6059925 "NPR POS Layout Assistant"
              'RequestWorkflowList',
              'UserCulture',
              'CallRefreshData',
-             'LegacyPOSMenus']
+             'LegacyPOSMenus',
+             'GetUserImpersonationOAuthToken']
         then
             Handled := true;
 
@@ -49,6 +50,8 @@ codeunit 6059925 "NPR POS Layout Assistant"
                 CallRefreshData();
             'LegacyPOSMenus':
                 GetPOSMenus(Context, FrontEnd);
+            'GetUserImpersonationOAuthToken':
+                GetUserImpersonationOAuthToken(Context, FrontEnd);
         end;
     end;
 
@@ -452,6 +455,50 @@ codeunit 6059925 "NPR POS Layout Assistant"
         Response: JsonObject;
     begin
         Response.Add('POSMenus', POSUIManagement.InitializeMenus(Menu));
+        FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
+    end;
+
+    local procedure GetUserImpersonationOAuthToken(Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
+    var
+        Response: JsonObject;
+        Success: Boolean;
+        AccessToken: Text;
+        FeatureEnabled: Boolean;
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23)
+        AuthCodeErr: Text;
+        OAuth2: Codeunit OAuth2;
+        Scopes: List of [Text];
+        NaviPartnerFeature: Interface "NPR Feature Management";
+        ClientId: Label '68cf603a-ec34-4946-afe6-c43930b274c7', Locked = true;
+        RedirectURL: Label 'https://businesscentral.dynamics.com/OAuthLanding.htm', Locked = true;
+        OAuthAuthorityUrl: Label 'https://login.microsoftonline.com/%1/oauth2/v2.0/authorize', Locked = true;
+        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+        ClientSecret: Text;
+        AzureADTenant: Codeunit "Azure AD Tenant";
+#endif
+    begin
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23)
+        FeatureEnabled := AzureKeyVaultMgt.TryGetAzureKeyVaultSecret('DragonglassAppRegistrationClientSecret', ClientSecret);
+        if FeatureEnabled then begin
+            Scopes.Add('Financials.ReadWrite.All');
+            NaviPartnerFeature := Enum::"NPR Feature"::"POS Webservice Sessions";
+            if NaviPartnerFeature.IsFeatureEnabled() then begin
+                if Oauth2.AcquireAuthorizationCodeTokenFromCache(ClientId, ClientSecret, RedirectURL, StrSubstNo(OAuthAuthorityUrl, AzureADTenant.GetAadTenantId()), Scopes, AccessToken) and (AccessToken <> '') then begin
+                    Success := true;
+                end else begin
+                    if GuiAllowed then begin
+                        if Oauth2.AcquireTokenByAuthorizationCode(ClientId, ClientSecret, StrSubstNo(OAuthAuthorityUrl, AzureADTenant.GetAadTenantId()), RedirectURL, Scopes, Enum::"Prompt Interaction"::None, AccessToken, AuthCodeErr) and (AccessToken <> '') then begin
+                            Success := true;
+                        end;
+                    end
+                end;
+            end;
+        end;
+#endif
+
+        Response.Add('success', Success);
+        Response.Add('token', AccessToken);
+        Response.Add('featureEnabled', FeatureEnabled);
         FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
     end;
 }

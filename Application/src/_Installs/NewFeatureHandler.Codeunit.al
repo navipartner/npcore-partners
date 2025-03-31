@@ -59,6 +59,19 @@ codeunit 6150632 "NPR New Feature Handler"
         LogMessageStopwatch.LogFinish();
     end;
 
+    internal procedure HandlePOSWebserviceSessionsFeature()
+    var
+        Feature: Record "NPR Feature";
+        POSWebserviceSessions: Codeunit "NPR POS Webservice Sessions";
+    begin
+        if not Feature.Get(POSWebserviceSessions.GetFeatureId()) then
+            exit;
+        if Feature.Enabled then
+            exit;
+        Feature.Enabled := true;
+        Feature.Modify();
+    end;
+
     local procedure POSEditorFeatureHandle()
     var
         Feature: Record "NPR Feature";
