@@ -163,18 +163,27 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
         TicketRequest."External Adm. Sch. Entry No." := GetAdmissionTimeSlot(TicketRequest."Admission Code", Admission."Default Schedule", TempTicketImportLine.ExpectedVisitDate, TempTicketImportLine.ExpectedVisitTime);
         TicketRequest."Scheduled Time Description" := StrSubstNo('%1 - %2', TempTicketImportLine.ExpectedVisitDate, TempTicketImportLine.ExpectedVisitTime);
 
+
+        TicketRequestManager.SetListPriceForRequestEntry(TicketRequest);
+
         // Quantity is one - so same as unit amount
+        TicketRequest.TicketListPriceExclVat := TicketRequest.UnitAmount;
+        TicketRequest.TicketListPriceInclVat := TicketRequest.UnitAmountInclVat;
+
+        // Quantity is for import - so same as unit amount
         TicketRequest.Amount := TempTicketImportLine.Amount;
         TicketRequest.AmountInclVat := TempTicketImportLine.AmountInclVat;
+
         TicketRequest.UnitAmount := TempTicketImportLine.Amount;
         TicketRequest.UnitAmountInclVat := TempTicketImportLine.AmountInclVat;
+
         // Printed Amount. This is the amount that will be printed on the ticket.
         TicketRequest.TicketUnitAmountExclVat := TempTicketImportLine.Amount;
         TicketRequest.TicketUnitAmountInclVat := TempTicketImportLine.AmountInclVat;
+
         TicketRequest.Insert();
 
         TicketRequestManager.IssueTicketFromReservation(TicketRequest);
-
     end;
 
     local procedure Archive(Token: Text[100]; TokenLine: Integer; var TempTicketImportLine: Record "NPR TM ImportTicketLine" temporary)

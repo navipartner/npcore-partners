@@ -383,56 +383,16 @@
     internal procedure AssignListPrice(Token: Text[100])
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
-        Admission: Record "NPR TM Admission";
-        AdmScheduleEntry: Record "NPR TM Admis. Schedule Entry";
-        PriceCalculation: Codeunit "NPR TM Dynamic Price";
-        UnitPrice: Decimal;
-        DiscountPct: Decimal;
-        UnitPriceIncludesVat: Boolean;
-        UnitPriceVatPercentage: Decimal;
-        ReferenceDate: Date;
         TicketPriceDict: Dictionary of [Integer, Dictionary of [Integer, Decimal]];
         ExtLineReferenceNo: Integer;
-        TimeHelper: Codeunit "NPR TM TimeHelper";
-        LocalDateTime: DateTime;
-        LocalDate: Date;
-        LocalTime: Time;
     begin
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         TicketReservationRequest.SetFilter(AmountSource, '=%1', TicketReservationRequest.AmountSource::BC);
         if (TicketReservationRequest.FindSet()) then begin
             repeat
-
-                ReferenceDate := Today();
-
-                AdmScheduleEntry.SetCurrentKey("External Schedule Entry No.");
-                AdmScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', TicketReservationRequest."External Adm. Sch. Entry No.");
-                AdmScheduleEntry.SetFilter(Cancelled, '=%1', false);
-                if (AdmScheduleEntry.FindFirst()) then
-                    ReferenceDate := AdmScheduleEntry."Admission Start Date";
-
-                LocalDateTime := TimeHelper.GetLocalTimeAtAdmission(AdmScheduleEntry."Admission Code");
-                LocalDate := DT2Date(LocalDateTime);
-                LocalTime := DT2Time(LocalDateTime);
-
-                if (TicketReservationRequest."Admission Inclusion" = TicketReservationRequest."Admission Inclusion"::REQUIRED) then begin
-                    PriceCalculation.CalculateErpUnitPrice(
-                        TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest."Customer No.", ReferenceDate, TicketReservationRequest.Quantity,
-                        UnitPrice, DiscountPct, UnitPriceIncludesVat, UnitPriceVatPercentage);
-                    PriceCalculation.SetTicketAdmissionDynamicUnitPrice(TicketReservationRequest, AdmScheduleEntry, UnitPrice, DiscountPct, UnitPriceIncludesVat, UnitPriceVatPercentage, LocalDate, LocalTime);
+                if (SetListPriceForRequestEntry(TicketReservationRequest)) then
                     TicketReservationRequest.Modify();
-                end;
-
-                if (TicketReservationRequest."Admission Inclusion" <> TicketReservationRequest."Admission Inclusion"::REQUIRED) then begin
-                    if (Admission.Get(TicketReservationRequest."Admission Code")) then begin
-                        PriceCalculation.CalculateErpUnitPrice(
-                            Admission."Additional Experience Item No.", '', TicketReservationRequest."Customer No.", ReferenceDate, TicketReservationRequest.Quantity,
-                            UnitPrice, DiscountPct, UnitPriceIncludesVat, UnitPriceVatPercentage);
-                        PriceCalculation.SetTicketAdmissionDynamicUnitPrice(TicketReservationRequest, AdmScheduleEntry, UnitPrice, DiscountPct, UnitPriceIncludesVat, UnitPriceVatPercentage, LocalDate, LocalTime);
-                        TicketReservationRequest.Modify();
-                    end;
-                end;
 
                 if (TicketReservationRequest."Admission Inclusion" <> TicketReservationRequest."Admission Inclusion"::NOT_SELECTED) then
                     AggregateTicketPriceDetails(TicketReservationRequest, TicketPriceDict);
@@ -449,10 +409,61 @@
                 if (TicketReservationRequest.FindFirst()) then begin
                     TicketReservationRequest.TicketUnitAmountExclVat := TicketPriceDict.Get(ExtLineReferenceNo).Get(1);
                     TicketReservationRequest.TicketUnitAmountInclVat := TicketPriceDict.Get(ExtLineReferenceNo).Get(2);
+                    TicketReservationRequest.TicketListPriceExclVat := TicketPriceDict.Get(ExtLineReferenceNo).Get(1);
+                    TicketReservationRequest.TicketListPriceInclVat := TicketPriceDict.Get(ExtLineReferenceNo).Get(2);
                     TicketReservationRequest.Modify();
                 end;
             end;
         end;
+    end;
+
+    internal procedure SetListPriceForRequestEntry(var TicketReservationRequest: Record "NPR TM Ticket Reservation Req.") PriceUpdated: Boolean
+    var
+        AdmScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        Admission: Record "NPR TM Admission";
+        PriceCalculation: Codeunit "NPR TM Dynamic Price";
+        UnitPrice: Decimal;
+        DiscountPct: Decimal;
+        UnitPriceIncludesVat: Boolean;
+        UnitPriceVatPercentage: Decimal;
+        ReferenceDate: Date;
+        TimeHelper: Codeunit "NPR TM TimeHelper";
+        LocalDateTime: DateTime;
+        LocalDate: Date;
+        LocalTime: Time;
+    begin
+        ReferenceDate := Today();
+        PriceUpdated := false;
+
+        AdmScheduleEntry.SetCurrentKey("External Schedule Entry No.");
+        AdmScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', TicketReservationRequest."External Adm. Sch. Entry No.");
+        AdmScheduleEntry.SetFilter(Cancelled, '=%1', false);
+        if (AdmScheduleEntry.FindFirst()) then
+            ReferenceDate := AdmScheduleEntry."Admission Start Date";
+
+        LocalDateTime := TimeHelper.GetLocalTimeAtAdmission(AdmScheduleEntry."Admission Code");
+        LocalDate := DT2Date(LocalDateTime);
+        LocalTime := DT2Time(LocalDateTime);
+
+        if (TicketReservationRequest."Admission Inclusion" = TicketReservationRequest."Admission Inclusion"::REQUIRED) then begin
+            PriceCalculation.CalculateErpUnitPrice(
+                TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest."Customer No.", ReferenceDate, TicketReservationRequest.Quantity,
+                UnitPrice, DiscountPct, UnitPriceIncludesVat, UnitPriceVatPercentage);
+            PriceCalculation.SetTicketAdmissionDynamicUnitPrice(TicketReservationRequest, AdmScheduleEntry, UnitPrice, DiscountPct, UnitPriceIncludesVat, UnitPriceVatPercentage, LocalDate, LocalTime);
+            PriceUpdated := true;
+        end;
+
+        if (TicketReservationRequest."Admission Inclusion" <> TicketReservationRequest."Admission Inclusion"::REQUIRED) then begin
+            if (Admission.Get(TicketReservationRequest."Admission Code")) then begin
+                PriceCalculation.CalculateErpUnitPrice(
+                    Admission."Additional Experience Item No.", '', TicketReservationRequest."Customer No.", ReferenceDate, TicketReservationRequest.Quantity,
+                    UnitPrice, DiscountPct, UnitPriceIncludesVat, UnitPriceVatPercentage);
+                PriceCalculation.SetTicketAdmissionDynamicUnitPrice(TicketReservationRequest, AdmScheduleEntry, UnitPrice, DiscountPct, UnitPriceIncludesVat, UnitPriceVatPercentage, LocalDate, LocalTime);
+                PriceUpdated := true;
+            end;
+        end;
+
+        exit(PriceUpdated);
     end;
 
     local procedure AggregateTicketPriceDetails(TicketReservationRequest: Record "NPR TM Ticket Reservation Req."; TicketPriceDict: Dictionary of [Integer, Dictionary of [Integer, Decimal]])
@@ -2982,8 +2993,10 @@
         Ticket."Sales Header Type" := Ticket."Sales Header Type"::External;
         Ticket."Sales Header No." := ReservationRequest."External Order No.";
         Ticket."External Ticket No." := ReservationRequest.PreAssignedTicketNumber;
-        Ticket.AmountInclVAT := ReservationRequest.TicketUnitAmountInclVat;
-        Ticket.AmountExclVAT := ReservationRequest.TicketUnitAmountExclVat;
+        Ticket.AmountInclVat := ReservationRequest.TicketUnitAmountInclVat;
+        Ticket.AmountExclVat := ReservationRequest.TicketUnitAmountExclVat;
+        Ticket.ListPriceInclVat := ReservationRequest.TicketListPriceInclVat;
+        Ticket.ListPriceExclVat := ReservationRequest.TicketListPriceExclVat;
 
         if (UserSetup.Get(CopyStr(UserId(), 1, MaxStrLen(UserSetup."User ID")))) then
             Ticket."Salesperson Code" := UserSetup."Salespers./Purch. Code";

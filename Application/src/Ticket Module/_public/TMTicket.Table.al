@@ -176,6 +176,17 @@
             Caption = 'Amount Excl. VAT';
             DataClassification = CustomerContent;
         }
+        field(115; ListPriceInclVat; Decimal)
+        {
+            Caption = 'List Price Incl. VAT';
+            DataClassification = CustomerContent;
+        }
+        field(116; ListPriceExclVat; Decimal)
+        {
+            Caption = 'List Price Excl. VAT';
+            DataClassification = CustomerContent;
+        }
+
     }
 
     keys

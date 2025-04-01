@@ -225,6 +225,16 @@
             OptionCaption = 'Direct,Prepaid,Postpaid,Not Paid';
             OptionMembers = DIRECT,PREPAID,POSTPAID,UNPAID;
         }
+        field(105; TicketListPriceExclVat; Decimal)
+        {
+            Caption = 'Ticket List Price Excl. VAT';
+            DataClassification = CustomerContent;
+        }
+        field(106; TicketListPriceInclVat; Decimal)
+        {
+            Caption = 'Ticket List Price Incl. VAT';
+            DataClassification = CustomerContent;
+        }
         field(110; "Customer No."; Code[20])
         {
             Caption = 'Customer No.';

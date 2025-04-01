@@ -161,15 +161,26 @@
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the External Member Card No. field';
                 }
+                field(ListPriceInclVat; Rec.ListPriceInclVat)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the List Price Incl. Vat field. Ths should be the product price before discount.';
+                }
+                field(ListPriceExclVat; Rec.ListPriceExclVat)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the List Price Excl. Vat field. This should be the product price before discount.';
+                    Visible = false;
+                }
                 field(AmountInclVat; Rec.AmountInclVat)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Amount Incl. Vat field';
+                    ToolTip = 'Specifies the value of the Amount Incl. Vat field. This should be the sales price after discount.';
                 }
                 field(AmountExclVat; Rec.AmountExclVat)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Amount Excl. Vat field';
+                    ToolTip = 'Specifies the value of the Amount Excl. Vat field. This should be the sales price after discount.';
                     Visible = false;
                 }
                 field("No. Of Access"; Rec."No. Of Access")

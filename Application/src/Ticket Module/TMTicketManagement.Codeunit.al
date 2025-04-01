@@ -87,14 +87,25 @@
         Token: Text[100];
         TokenLineNumber: Integer;
         TicketAction: Codeunit "NPR POS Action - Ticket Mgt B.";
+        ListPriceInclVat: Decimal;
+        ListPriceExclVat: Decimal;
     begin
         if (not TicketAction.GetRequestToken(POSEntry."Document No.", POSSalesLine."Line No.", Token, TokenLineNumber)) then
             exit;
 
-        ConfirmAndAdmitTicketsFromToken(Token, TokenLineNumber, POSEntry."Document No.", POSSalesLine."Line No.", POSEntry."POS Unit No.", POSSalesLine."Amount Incl. VAT (LCY)" / POSSalesLine.Quantity, POSSalesLine."Amount Excl. VAT (LCY)" / POSSalesLine.Quantity);
+        if (POSEntry."Prices Including VAT") then begin
+            ListPriceInclVat := POSSalesLine."Unit Price";
+            ListPriceExclVat := POSSalesLine."Unit Price" / (1 + (POSSalesLine."VAT %") / 100);
+        end else begin
+            ListPriceInclVat := POSSalesLine."Unit Price" * (1 + (POSSalesLine."VAT %") / 100);
+            ListPriceExclVat := POSSalesLine."Unit Price";
+        end;
+        ConfirmAndAdmitTicketsFromToken(Token, TokenLineNumber, POSEntry."Document No.", POSSalesLine."Line No.", POSEntry."POS Unit No.",
+            POSSalesLine."Amount Incl. VAT (LCY)" / POSSalesLine.Quantity, POSSalesLine."Amount Excl. VAT (LCY)" / POSSalesLine.Quantity,
+            ListPriceInclVat, ListPriceExclVat);
     end;
 
-    procedure ConfirmAndAdmitTicketsFromToken(Token: Text[100]; TokenLineNumber: Integer; SalesReceiptNo: Code[20]; SalesLineNo: Integer; PosUnitNo: Code[10]; UnitAmountInclVat: Decimal; UnitAmountExclVat: Decimal)
+    procedure ConfirmAndAdmitTicketsFromToken(Token: Text[100]; TokenLineNumber: Integer; SalesReceiptNo: Code[20]; SalesLineNo: Integer; PosUnitNo: Code[10]; UnitAmountInclVat: Decimal; UnitAmountExclVat: Decimal; UnitPriceInclVat: Decimal; UnitPriceExclVat: Decimal)
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketType: Record "NPR TM Ticket Type";
@@ -122,6 +133,8 @@
 
                     Ticket.AmountInclVat := UnitAmountInclVat;
                     Ticket.AmountExclVat := UnitAmountExclVat;
+                    Ticket.ListPriceInclVat := UnitPriceInclVat;
+                    Ticket.ListPriceExclVat := UnitPriceExclVat;
                     Ticket.Modify();
 
                     if (TicketType.Get(Ticket."Ticket Type Code")) then begin
