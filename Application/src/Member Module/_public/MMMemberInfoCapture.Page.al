@@ -663,6 +663,7 @@
                     ShowMandatory = ExternalCardNoMandatory;
                     ToolTip = 'Specifies the value of the External Card No. field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Editable = _ExternalCardNumberEditable;
                 }
                 field("Pin Code"; Rec."Pin Code")
                 {
@@ -670,6 +671,7 @@
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Pin Code field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Editable = _ExternalCardNumberEditable;
                 }
                 field("Valid Until"; Rec."Valid Until")
                 {
@@ -975,6 +977,7 @@
 
         _ShowNewMemberSection := true;
         _ShowNewCardSection := true;
+        _ExternalCardNumberEditable := true;
     end;
 
     trigger OnOpenPage()
@@ -1039,6 +1042,7 @@
         ExternalMembershipNo: Code[20];
         _ShowNewMemberSection: Boolean;
         _ShowNewCardSection: Boolean;
+        _ExternalCardNumberEditable: Boolean;
         _ShowAddToMembershipSection: Boolean;
         _ShowAddMemberCardSection: Boolean;
         _ShowReplaceCardSection: Boolean;
@@ -1565,6 +1569,7 @@
         MembershipSetup: Record "NPR MM Membership Setup";
         MembershipEntry: Record "NPR MM Membership Entry";
         ValidUntilBaseDate: Date;
+        FeatureFlag: Codeunit "NPR Feature Flags Management";
     begin
 
         _PreSelectedCustomerContact := ((Rec."Contact No." <> '') or (Rec."Customer No." <> '')) and not Rec."Originates From File Import";
@@ -1639,6 +1644,11 @@
                                 _ShowNewMemberSection := false;
                                 _ShowAzureSection := true;
                             end;
+
+                            if (FeatureFlag.IsEnabled('memberCardFieldNonEditable')) then
+                                _ExternalCardNumberEditable := (Rec."External Card No." = '')
+                            else
+                                _ExternalCardNumberEditable := true;
                         end;
                     MembershipSalesSetup."Business Flow Type"::ADD_NAMED_MEMBER:
                         _ShowAddToMembershipSection := true;
