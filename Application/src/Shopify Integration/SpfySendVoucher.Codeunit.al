@@ -510,7 +510,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
 
     local procedure CreatedFromNPRetailNote(): Text[50]
     var
-        NoteLbl: Label 'Created from NP Retail (Business Central) 12345678', MaxLength = 50;  //DEBUG
+        NoteLbl: Label 'Created from NP Retail (Business Central)', MaxLength = 50;
     begin
         exit(NoteLbl);
     end;

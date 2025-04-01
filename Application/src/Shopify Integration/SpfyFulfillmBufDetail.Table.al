@@ -1,8 +1,8 @@
 #if not BC17
-table 6150996 "NPR Spfy Fulfillm.Entry Detail"
+table 6150996 "NPR Spfy Fulfillm. Buf. Detail"
 {
     Access = Internal;
-    Caption = 'Shopify Fulfillment Entry Detail';
+    Caption = 'Shopify Fulfillment Buffer Detail';
     DataClassification = CustomerContent;
     TableType = Temporary;
 
@@ -17,7 +17,7 @@ table 6150996 "NPR Spfy Fulfillm.Entry Detail"
         {
             DataClassification = CustomerContent;
             Caption = 'Parent Entry No.';
-            TableRelation = "NPR Spfy Fulfillment Entry"."Entry No.";
+            TableRelation = "NPR Spfy Fulfillment Buffer"."Entry No.";
         }
         field(10; "Gift Card ID"; Text[30])
         {

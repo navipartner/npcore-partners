@@ -897,8 +897,8 @@ codeunit 6184814 "NPR Spfy Order Mgt."
 
     procedure InsertSalesLines(ShopifyStoreCode: Code[20]; Order: JsonToken; SalesHeader: Record "Sales Header"; ForPosting: Boolean)
     var
-        TempFulfillmentLineBuffer: Record "NPR Spfy Fulfillment Entry" temporary;
-        TempFulfillmEntryDetailBuffer: Record "NPR Spfy Fulfillm.Entry Detail" temporary;
+        TempFulfillmentLineBuffer: Record "NPR Spfy Fulfillment Buffer" temporary;
+        TempFulfillmEntryDetailBuffer: Record "NPR Spfy Fulfillm. Buf. Detail" temporary;
         OrderLines: JsonToken;
         OrderLine: JsonToken;
         LastLineNo: Integer;
@@ -914,7 +914,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
                 InsertSalesLineShipmentFee(OrderLine, SalesHeader, LastLineNo);
     end;
 
-    local procedure CalculateFulfillments(Order: JsonToken; var FulfillmentLineBuffer: Record "NPR Spfy Fulfillment Entry"; var FulfillmEntryDetailBuffer: Record "NPR Spfy Fulfillm.Entry Detail")
+    local procedure CalculateFulfillments(Order: JsonToken; var FulfillmentLineBuffer: Record "NPR Spfy Fulfillment Buffer"; var FulfillmEntryDetailBuffer: Record "NPR Spfy Fulfillm. Buf. Detail")
     var
         Fulfillment: JsonToken;
         FulfillmentLine: JsonToken;
@@ -978,7 +978,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
                 end;
     end;
 
-    local procedure InsertSalesLine(ShopifyStoreCode: Code[20]; OrderLine: JsonToken; var FulfillmentLineBuffer: Record "NPR Spfy Fulfillment Entry"; var FulfillmEntryDetailBuffer: Record "NPR Spfy Fulfillm.Entry Detail"; SalesHeader: Record "Sales Header"; ForPosting: Boolean; var LastLineNo: Integer)
+    local procedure InsertSalesLine(ShopifyStoreCode: Code[20]; OrderLine: JsonToken; var FulfillmentLineBuffer: Record "NPR Spfy Fulfillment Buffer"; var FulfillmEntryDetailBuffer: Record "NPR Spfy Fulfillm. Buf. Detail"; SalesHeader: Record "Sales Header"; ForPosting: Boolean; var LastLineNo: Integer)
     var
         ItemVariant: Record "Item Variant";
         NpEcDocument: Record "NPR NpEc Document";
@@ -1061,7 +1061,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         SpfyIntegrationEvents.OnAfterInsertSalesLine(SalesHeader, SalesLine, LastLineNo);
     end;
 
-    local procedure SetRetailVoucher(SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; IsNpGiftCard: Boolean; VoucherType: Record "NPR NpRv Voucher Type"; PropertyDict: Dictionary of [Text, Text]; FulfillmentLineBuffer: Record "NPR Spfy Fulfillment Entry"; var FulfillmEntryDetailBuffer: Record "NPR Spfy Fulfillm.Entry Detail")
+    local procedure SetRetailVoucher(SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; IsNpGiftCard: Boolean; VoucherType: Record "NPR NpRv Voucher Type"; PropertyDict: Dictionary of [Text, Text]; FulfillmentLineBuffer: Record "NPR Spfy Fulfillment Buffer"; var FulfillmEntryDetailBuffer: Record "NPR Spfy Fulfillm. Buf. Detail")
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         Voucher: Record "NPR NpRv Voucher";

@@ -1,9 +1,10 @@
 #if not BC17
-table 6151144 "NPR Spfy Fulfillment Entry"
+table 6150815 "NPR Spfy Fulfillment Buffer"
 {
     Access = Internal;
-    Caption = 'Shopify Fulfillment Entry';
+    Caption = 'Shopify Fulfillment Buffer';
     DataClassification = CustomerContent;
+    TableType = Temporary;
 
     fields
     {
@@ -11,7 +12,6 @@ table 6151144 "NPR Spfy Fulfillment Entry"
         {
             DataClassification = CustomerContent;
             Caption = 'Entry No.';
-            AutoIncrement = true;
         }
         field(2; "Table No."; Integer)
         {

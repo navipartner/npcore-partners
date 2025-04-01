@@ -21,7 +21,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
 
     local procedure SendShopifyFulfillment(var NcTask: Record "NPR Nc Task")
     var
-        TempCalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Entry" temporary;
+        TempCalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Buffer" temporary;
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         SendToShopify: Boolean;
         Success: Boolean;
@@ -44,9 +44,9 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
     end;
 
     [TryFunction]
-    local procedure PrepareFulfillment(var NcTask: Record "NPR Nc Task"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Entry"; var SendToShopify: Boolean)
+    local procedure PrepareFulfillment(var NcTask: Record "NPR Nc Task"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Buffer"; var SendToShopify: Boolean)
     var
-        TempAvailableFulfillmentLines: Record "NPR Spfy Fulfillment Entry" temporary;
+        TempAvailableFulfillmentLines: Record "NPR Spfy Fulfillment Buffer" temporary;
         JsonHelper: Codeunit "NPR Json Helper";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
@@ -91,7 +91,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         GenerateFulfillmentPayloadJson(NcTask, CalculatedFulfillmentLines, SendToShopify);
     end;
 
-    local procedure CalculateFulfillmentLines(NcTask: Record "NPR Nc Task"; var AvailableFulfillmentLines: Record "NPR Spfy Fulfillment Entry"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Entry")
+    local procedure CalculateFulfillmentLines(NcTask: Record "NPR Nc Task"; var AvailableFulfillmentLines: Record "NPR Spfy Fulfillment Buffer"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Buffer")
     var
         ReturnReceiptHeader: Record "Return Receipt Header";
         ReturnReceiptLine: Record "Return Receipt Line";
@@ -153,7 +153,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         SpfyIntegrationEvents.OnCheckIfIsEligibleForFulfillmentSending(RecID, SpfyOrderLineId, Eligible);
     end;
 
-    local procedure UpdateFulfillmentBuffer(RecID: RecordId; var AvailableFulfillmentLines: Record "NPR Spfy Fulfillment Entry"; SpfyOrderLineId: Text[30]; Qty: Decimal; FulfillMaxAvailableQty: Boolean; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Entry")
+    local procedure UpdateFulfillmentBuffer(RecID: RecordId; var AvailableFulfillmentLines: Record "NPR Spfy Fulfillment Buffer"; SpfyOrderLineId: Text[30]; Qty: Decimal; FulfillMaxAvailableQty: Boolean; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Buffer")
     var
         CurrentQtyToFulfill: Decimal;
         NextEntryNo: Integer;
@@ -194,14 +194,14 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
             until (AvailableFulfillmentLines.Next() = 0) or (Qty = 0);
     end;
 
-    local procedure SaveFulfillmentEntries(var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Entry")
+    local procedure SaveFulfillmentEntries(var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Buffer")
     var
         ShopifyFulfillmentEntry: Record "NPR Spfy Fulfillment Entry";
     begin
         CalculatedFulfillmentLines.SetCurrentKey("Table No.", "BC Record ID");
         if CalculatedFulfillmentLines.FindSet() then
             repeat
-                ShopifyFulfillmentEntry := CalculatedFulfillmentLines;
+                ShopifyFulfillmentEntry.TransferFields(CalculatedFulfillmentLines);
                 ShopifyFulfillmentEntry."Entry No." := 0;
                 ShopifyFulfillmentEntry.Insert();
             until CalculatedFulfillmentLines.Next() = 0;
@@ -217,7 +217,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
             ShopifyFulfillmentEntry.DeleteAll();
     end;
 
-    local procedure GenerateFulfillmentPayloadJson(var NcTask: Record "NPR Nc Task"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Entry"; var SendToShopify: Boolean)
+    local procedure GenerateFulfillmentPayloadJson(var NcTask: Record "NPR Nc Task"; var CalculatedFulfillmentLines: Record "NPR Spfy Fulfillment Buffer"; var SendToShopify: Boolean)
     var
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         ItemsByFulfillmentOrder: JsonArray;
