@@ -571,6 +571,7 @@ codeunit 6151543 "NPR TM Client API BL"
             JBuilder.WriteStringProperty('admissionDescription', TicketRequest."Admission Description");
             JBuilder.WriteBooleanProperty('admissionCreated', TicketRequest."Admission Created");
             JBuilder.WriteRawProperty('quantity', TicketRequest.Quantity);
+            JBuilder.WriteBooleanProperty('quantityIsFixed', IsQuantityFixed(TicketRequest));
 
             JBuilder.WriteStartObject('schedule');
             JBuilder.WriteRawProperty('id', TicketRequest."External Adm. Sch. Entry No.");
@@ -755,7 +756,7 @@ codeunit 6151543 "NPR TM Client API BL"
             TicketRequest."Ext. Line Reference No." := 4711; // External id is to group multiple different tickets withing same token. Not used in this API.
 
             TicketRequest."External Item Code" := CopyStr(GetAsText(Line.AsObject(), 'itemReference', ''), 1, MaxStrLen(TicketRequest."External Item Code"));
-            TicketRequest.Quantity := GetAsInteger(Line.AsObject(), 'quantity', 0);
+            TicketRequest.Quantity := ValidateChangeQuantity(SalesReceiptNumber, SalesReceiptLineNo, GetAsInteger(Line.AsObject(), 'quantity', 0));
             TicketRequest."External Member No." := CopyStr(GetAsText(Line.AsObject(), 'memberNumber', ''), 1, MaxStrLen(TicketRequest."External Member No."));
             TicketRequest."Admission Code" := CopyStr(GetAsText(Line.AsObject(), 'admissionCode', ''), 1, MaxStrLen(TicketRequest."Admission Code"));
             TicketRequest."External Adm. Sch. Entry No." := GetAsInteger(Line.AsObject(), 'scheduleId', 0);
@@ -1178,6 +1179,56 @@ codeunit 6151543 "NPR TM Client API BL"
 
         JBuilder.WriteEndObject();
     end;
+
+    local procedure ValidateChangeQuantity(SalesReceiptNo: Code[20]; SalesReceiptLineNo: Integer; NewQuantity: Integer): Integer
+    var
+        QUANTITY_IS_FIXED: Label 'The quantity of Item AddOn dependent line is fixed and cannot be changed in this way.';
+        CurrentQuantity: Decimal;
+    begin
+        if (IsQuantityFixed(SalesReceiptNo, SalesReceiptLineNo, CurrentQuantity)) then
+            if (CurrentQuantity <> NewQuantity) then begin
+                Message(QUANTITY_IS_FIXED);
+                exit(CurrentQuantity);
+            end;
+
+        exit(NewQuantity);
+    end;
+
+    local procedure IsQuantityFixed(TicketRequest: Record "NPR TM Ticket Reservation Req."): Boolean
+    var
+        SalesQuantity: Decimal;
+    begin
+        exit(IsQuantityFixed(TicketRequest."Receipt No.", TicketRequest."Line No.", SalesQuantity));
+    end;
+
+    local procedure IsQuantityFixed(SalesReceiptNo: Code[20]; SalesReceiptLineNo: Integer; var SalesQuantity: Decimal) FixedQuantity: Boolean
+    var
+        PosSaleLine: Record "NPR POS Sale Line";
+        ItemSaleAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+    begin
+        FixedQuantity := false;
+
+        PosSaleLine.SetFilter("Sales Ticket No.", '=%1', SalesReceiptNo);
+        PosSaleLine.SetFilter("Line No.", '=%1', SalesReceiptLineNo);
+        if (not PosSaleLine.FindFirst()) then
+            exit(false);
+
+        SalesQuantity := PosSaleLine.Quantity;
+
+        if (PosSaleLine.Indentation > 0) then begin
+            ItemSaleAddOn.SetCurrentKey("Register No.", "Sales Ticket No.", "Sale Type", "Sale Date", "Sale Line No.", "Line No.");
+            ItemSaleAddOn.SetFilter("Register No.", '=%1', PosSaleLine."Register No.");
+            ItemSaleAddOn.SetFilter("Sales Ticket No.", '=%1', PosSaleLine."Sales Ticket No.");
+            ItemSaleAddOn.SetFilter("Sale Type", '=%1', PosSaleLine."Sale Type");
+            ItemSaleAddOn.SetFilter("Sale Date", '=%1', PosSaleLine."Date");
+            ItemSaleAddOn.SetFilter("Sale Line No.", '=%1', PosSaleLine."Line No.");
+            if (ItemSaleAddOn.FindFirst()) then begin
+                FixedQuantity := ItemSaleAddOn."Fixed Quantity";
+            end;
+        end;
+
+    end;
+
 
     local procedure GetMessageText(CapacityStatusCode: Option; ReasonText: Text; BlockSalesReason: Integer): Text
     var
