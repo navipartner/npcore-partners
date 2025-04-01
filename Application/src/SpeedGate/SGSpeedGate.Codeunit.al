@@ -778,7 +778,7 @@ codeunit 6185130 "NPR SG SpeedGate"
         TicketIds: List of [Guid];
         ProfileLineId: Guid;
         TicketNumberIdentified: Boolean;
-        AdmissionCode: Code[20];
+        AdmissionCode, RequestedAdmissionCode : Code[20];
         FirstValidationRequestHandled: Boolean;
     begin
         NumberIdentified := false;
@@ -806,6 +806,8 @@ codeunit 6185130 "NPR SG SpeedGate"
             exit(SetApiError(_ApiErrors::ticket_not_valid_for_suggested_admission));
 
         FirstValidationRequestHandled := false;
+        RequestedAdmissionCode := ValidationRequest.AdmissionCode;
+
         TicketRequest.Reset();
         TicketRequest.SetCurrentKey("Session Token ID");
         TicketRequest.SetFilter("Session Token ID", '=%1', CopyStr(UpperCase(ValidationRequest.ReferenceNo), 1, MaxStrLen(TicketRequest."Session Token ID")));
@@ -826,7 +828,7 @@ codeunit 6185130 "NPR SG SpeedGate"
             until (Ticket.Next() = 0);
 
             // all tickets are the same for the primary request line - check one and get list of admission codes 
-            if (not IsTicketValidForAdmit(TicketProfileCode, Ticket."External Ticket No.", ValidationRequest.AdmissionCode, TicketId, AdmitToCodes, ProfileLineId, TicketNumberIdentified)) then
+            if (not IsTicketValidForAdmit(TicketProfileCode, Ticket."External Ticket No.", RequestedAdmissionCode, TicketId, AdmitToCodes, ProfileLineId, TicketNumberIdentified)) then
                 exit(false);
 
             // Set the validation request template fields

@@ -497,21 +497,25 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
 
     local procedure SingleTicketRequestDTO(var ResponseJson: Codeunit "NPR JSON Builder"; ValidationRequest: Record "NPR SGEntryLog"): Codeunit "NPR JSON Builder"
     var
-        TicketRequest: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
         AccessEntry: Record "NPR TM Ticket Access Entry";
         ValidationRequestResult: Record "NPR SGEntryLog";
+        NumberOfTickets: Integer;
     begin
-        if (not TicketRequest.GetBySystemId(ValidationRequest.EntityId)) then
-            exit(ResponseJson);
+        ValidationRequestResult.Reset();
+        ValidationRequestResult.SetCurrentKey(Token);
+        ValidationRequestResult.SetFilter(Token, '=%1', ValidationRequest.Token);
+        ValidationRequestResult.SetFilter(AdmissionCode, '=%1', ValidationRequest.AdmissionCode);
+        NumberOfTickets := ValidationRequestResult.Count();
 
         ResponseJson
             .StartObject('ticketRequest')
             .AddProperty('ticketRequestId', Format(ValidationRequest.EntityId, 0, 4).ToLower())
             .AddProperty('referenceNumber', ValidationRequest.ReferenceNo)
-            .AddProperty('numberOfTickets', TicketRequest.Quantity)
+            .AddProperty('numberOfTickets', NumberOfTickets)
             .StartArray('tickets');
 
+        ValidationRequestResult.Reset();
         ValidationRequestResult.SetCurrentKey(Token);
         ValidationRequestResult.SetFilter(Token, '=%1', ValidationRequest.Token);
         if (ValidationRequestResult.FindSet()) then begin

@@ -145,6 +145,9 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
 
         TicketBOM.SetFilter("Item No.", '=%1', TicketRequest."Item No.");
         TicketBOM.SetFilter("Variant Code", '=%1', TicketRequest."Variant Code");
+        if (TicketBOM.Count() <> 1) then
+            Error('Tickets with multiple BOM lines are currently not supported when importing tickets.'); // Since this function is not looping the admission BOM, we can only have one BOM line.
+
         TicketBOM.SetFilter(Default, '=%1', true);
         TicketBOM.FindFirst(); // Must fail when no admission is marked default.
 
