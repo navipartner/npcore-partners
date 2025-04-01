@@ -130,6 +130,10 @@ table 6150987 "NPR SGEntryLog"
         key(Key4; ScannerId)
         {
         }
+
+        key(Key5; AdmittedReferenceNo)
+        {
+        }
     }
 
 

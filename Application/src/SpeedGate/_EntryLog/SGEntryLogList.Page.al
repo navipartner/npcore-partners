@@ -41,6 +41,12 @@ page 6184906 "NPR SG EntryLogList"
                     ToolTip = 'Specifies the value of the Entry Type field.', Comment = '%';
                     ApplicationArea = NPRRetail;
                 }
+                field(SubType; _SubType)
+                {
+                    ToolTip = 'Specifies the value of the Subtype field.', Comment = '%';
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Subtype';
+                }
                 field(EntryStatus; Rec.EntryStatus)
                 {
                     ToolTip = 'Specifies the value of the Entry Status field.', Comment = '%';
@@ -224,10 +230,15 @@ page 6184906 "NPR SG EntryLogList"
     }
     var
         _ErrorMessage: Text;
+        _SubType: Text;
 
     trigger OnAfterGetRecord()
     var
         ApiError: Enum "NPR API Error Code";
+        GuestLbl: Label 'Guest';
+        MemberLbl: Label 'Member Card';
+        CardholderLbl: Label 'Cardholder';
+        TicketLbl: Label 'Ticket';
     begin
         _ErrorMessage := Rec.ApiErrorMessage;
 
@@ -236,5 +247,23 @@ page 6184906 "NPR SG EntryLogList"
                 ApiError := Enum::"NPR API Error Code".FromInteger(Rec.ApiErrorNumber);
                 _ErrorMessage := Format(ApiError, 0, 1)
             end;
+
+        _SubType := '';
+        case Rec.ExtraEntityTableId of
+            6060135:
+                _SubType := GuestLbl;
+            6060131:
+                _SubType := MemberLbl;
+            6059785:
+                case Rec.ReferenceNumberType of
+                    Rec.ReferenceNumberType::MEMBER_CARD:
+                        _SubType := CardholderLbl
+                    else
+                        _SubType := TicketLbl;
+                end;
+            else
+                if (Rec.ReferenceNumberType = Rec.ReferenceNumberType::MEMBER_CARD) then
+                    _SubType := CardholderLbl;
+        end;
     end;
 }

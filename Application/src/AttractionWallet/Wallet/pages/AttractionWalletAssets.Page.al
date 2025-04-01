@@ -152,6 +152,7 @@ page 6184847 "NPR AttractionWalletAssets"
     trigger OnAfterGetRecord()
     var
         Ticket: Record "NPR TM Ticket";
+        Wallet: Record "NPR AttractionWallet";
     begin
         _WalletHolder := '';
         TempAssetLineRef.Reset();
@@ -159,10 +160,14 @@ page 6184847 "NPR AttractionWalletAssets"
         TempAssetLineRef.SetFilter(WalletAssetLineEntryNo, '=%1', Rec.EntryNo);
         TempAssetLineRef.SetFilter(SupersededBy, '=%1', 0);
         if (TempAssetLineRef.FindFirst()) then begin
-            TempWallet.Get(TempAssetLineRef.WalletEntryNo);
-            _WalletHolder := TempWallet.ReferenceNumber;
-            if (TempWallet.Description <> '') then
-                _WalletHolder := TempWallet.Description;
+            if (TempWallet.Get(TempAssetLineRef.WalletEntryNo)) then begin
+                _WalletHolder := TempWallet.ReferenceNumber;
+                if (TempWallet.Description <> '') then
+                    _WalletHolder := TempWallet.Description;
+            end else
+                if (Wallet.Get(TempAssetLineRef.WalletEntryNo)) then
+                    _WalletHolder := Wallet.ReferenceNumber; // This means I am the not the holder of the asset
+
         end;
 
         case Rec.Type of

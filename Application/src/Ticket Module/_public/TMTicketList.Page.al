@@ -356,6 +356,17 @@
                                 TempEntryLog.TransferFields(EntryLog, true);
                                 if (not TempEntryLog.Insert()) then;
                             until (EntryLog.Next() = 0);
+                        EntryLog.Reset();
+
+                        EntryLog.Reset();
+                        EntryLog.SetCurrentKey(AdmittedReferenceNo);
+                        EntryLog.SetFilter(AdmittedReferenceNo, '=%1', Rec."External Ticket No.");
+                        if (EntryLog.FindSet()) then
+                            repeat
+                                TempEntryLog.TransferFields(EntryLog, true);
+                                if (not TempEntryLog.Insert()) then;
+                            until (EntryLog.Next() = 0);
+
                         Page.Run(Page::"NPR SG EntryLogList", TempEntryLog);
                     end;
 
