@@ -75,18 +75,24 @@ codeunit 85216 "NPR Library - SG Ticket"
     end;
 
     procedure CreateProfile() ListCode: Code[10]
+    begin
+        exit(CreateProfile(false));
+    end;
+
+    procedure CreateProfile(PermitTheTicketRequestToken: Boolean) ListCode: Code[10]
     var
         TicketProfile: Record "NPR SG TicketProfile";
         TicketLibrary: Codeunit "NPR Library - Ticket Module";
     begin
         ListCode := TicketLibrary.GenerateCode10();
-        if (TicketProfile.Get(ListCode)) then begin
+        if (TicketProfile.Get(ListCode)) then
             TicketProfile.Delete();
-        end;
-        TicketProfile.Code := ListCode;
-        TicketProfile.Insert(true);
 
+        TicketProfile.Code := ListCode;
+        TicketProfile.PermitTicketRequestToken := PermitTheTicketRequestToken;
+        TicketProfile.Insert(true);
     end;
+
 
     procedure AddToProfile(Code: Code[10]; Allow: Boolean; ItemNo: Code[20]; AdmissionCode: Code[20]; CalendarCode: Code[10]; FromTime: Time; UntilTime: Time)
     var

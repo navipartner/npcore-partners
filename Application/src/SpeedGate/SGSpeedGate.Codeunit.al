@@ -778,7 +778,8 @@ codeunit 6185130 "NPR SG SpeedGate"
         TicketIds: List of [Guid];
         ProfileLineId: Guid;
         TicketNumberIdentified: Boolean;
-        AdmissionCode, TempAdmissionCode : Code[20];
+        AdmissionCode: Code[20];
+        FirstValidationRequestHandled: Boolean;
     begin
         NumberIdentified := false;
 
@@ -804,37 +805,65 @@ codeunit 6185130 "NPR SG SpeedGate"
         if (TicketRequest.IsEmpty()) then
             exit(SetApiError(_ApiErrors::ticket_not_valid_for_suggested_admission));
 
+        FirstValidationRequestHandled := false;
         TicketRequest.Reset();
         TicketRequest.SetCurrentKey("Session Token ID");
         TicketRequest.SetFilter("Session Token ID", '=%1', CopyStr(UpperCase(ValidationRequest.ReferenceNo), 1, MaxStrLen(TicketRequest."Session Token ID")));
         TicketRequest.SetFilter("Primary Request Line", '=%1', true);
-        TicketRequest.FindFirst();
-
-        // Get all the tickets for the request
-        Ticket.SetCurrentKey("Ticket Reservation Entry No.");
-        Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketRequest."Entry No.");
-        if (not Ticket.FindSet()) then
-            exit(SetApiError(_ApiErrors::ticket_reservation_has_no_tickets));
-
+        TicketRequest.FindSet();
         repeat
-            TicketIds.Add(Ticket.SystemId);
-        until (Ticket.Next() = 0);
+            Clear(TicketIds);
+            Clear(AdmitToCodes);
 
-        // all tickets are the same - check one and get list of admission codes 
-        if (not IsTicketValidForAdmit(TicketProfileCode, Ticket."External Ticket No.", ValidationRequest.AdmissionCode, TicketId, AdmitToCodes, ProfileLineId, TicketNumberIdentified)) then
-            exit(false);
+            // Get all the tickets for the request
+            Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+            Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketRequest."Entry No.");
+            if (not Ticket.FindSet()) then
+                exit(SetApiError(_ApiErrors::ticket_reservation_has_no_tickets));
 
-        // Set the validation request template fields
-        ValidationRequest.ExtraEntityTableId := Database::"NPR TM Ticket";
-        ValidationRequest.ReferenceNumberType := _NumberType::TICKET_REQUEST;
-        ValidationRequest.EntryStatus := ValidationRequest.EntryStatus::PERMITTED_BY_GATE;
-        ValidationRequest.EntityId := TicketRequest.SystemId;
-        ValidationRequest.ProfileLineId := ProfileLineId;
+            repeat
+                TicketIds.Add(Ticket.SystemId);
+            until (Ticket.Next() = 0);
 
-        // Update the existing validation request with the ticket id
-        ValidationRequest.ExtraEntityId := TicketId;
-        ValidationRequest.Modify();
+            // all tickets are the same for the primary request line - check one and get list of admission codes 
+            if (not IsTicketValidForAdmit(TicketProfileCode, Ticket."External Ticket No.", ValidationRequest.AdmissionCode, TicketId, AdmitToCodes, ProfileLineId, TicketNumberIdentified)) then
+                exit(false);
 
+            // Set the validation request template fields
+            ValidationRequest.ExtraEntityTableId := Database::"NPR TM Ticket";
+            ValidationRequest.ReferenceNumberType := _NumberType::TICKET_REQUEST;
+            ValidationRequest.EntryStatus := ValidationRequest.EntryStatus::PERMITTED_BY_GATE;
+            ValidationRequest.EntityId := TicketRequest.SystemId;
+            ValidationRequest.ProfileLineId := ProfileLineId;
+            if (not FirstValidationRequestHandled) then begin
+                // The initial validation request is already created for the first ticket and admission code
+                // Update the existing validation request with the ticket id
+                ValidationRequest.ExtraEntityId := TicketId;
+                ManageValidationRequestForFirstTicket(ValidationRequest, AdmitToCodes);
+
+                TicketIds.Remove(TicketId);
+                FirstValidationRequestHandled := true;
+            end;
+
+            // create a validation request for each remaining ticket and admission code
+            foreach TicketId in TicketIds do begin
+                ValidationRequest.ExtraEntityId := TicketId;
+                foreach AdmissionCode in AdmitToCodes do begin
+                    ValidationRequest.ExtraEntityId := TicketId;
+                    ValidationRequest.AdmissionCode := AdmissionCode;
+                    ValidationRequest.EntryNo := 0;
+                    ValidationRequest.Insert();
+                end;
+            end;
+        until (TicketRequest.Next() = 0);
+
+        exit(true);
+    end;
+
+    local procedure ManageValidationRequestForFirstTicket(ValidationRequest: Record "NPR SGEntryLog"; var AdmitToCodes: List of [Code[20]])
+    var
+        AdmissionCode, TempAdmissionCode : Code[20];
+    begin
         if (AdmitToCodes.Contains(ValidationRequest.AdmissionCode)) then begin
             AdmitToCodes.Remove(ValidationRequest.AdmissionCode);
             TempAdmissionCode := ValidationRequest.AdmissionCode;
@@ -852,24 +881,11 @@ codeunit 6185130 "NPR SG SpeedGate"
             ValidationRequest.AdmissionCode := AdmissionCode;
             ValidationRequest.Insert();
         end;
-        TicketIds.Remove(TicketId);
 
         if (TempAdmissionCode <> '') then
             AdmitToCodes.Add(TempAdmissionCode);
 
-        // create a validation request for each remaining ticket and admission code
-        foreach TicketId in TicketIds do begin
-            ValidationRequest.ExtraEntityId := TicketId;
-            foreach AdmissionCode in AdmitToCodes do begin
-                ValidationRequest.AdmissionCode := AdmissionCode;
-                ValidationRequest.EntryNo := 0;
-                ValidationRequest.Insert();
-            end;
-        end;
-
-        exit(true);
     end;
-
 
     local procedure CheckForTicket(TicketProfileCode: Code[10]; Number: Text[100]; SuggestedAdmissionCode: Code[20]; var TicketId: Guid; var AdmitToCodes: List of [Code[20]]; var ProfileLineId: Guid; var NumberIdentified: Boolean): Boolean
     var
@@ -952,9 +968,10 @@ codeunit 6185130 "NPR SG SpeedGate"
         if (AdmitToCodes.Count = 0) then begin
             if (TicketProfileCode = '') then begin
                 TicketProfile.ValidationMode := TicketProfile.ValidationMode::FLEXIBLE;
-            end else if (not TicketProfile.Get(TicketProfileCode)) then begin
-                TicketProfile.ValidationMode := TicketProfile.ValidationMode::STRICT;
-            end;
+            end else
+                if (not TicketProfile.Get(TicketProfileCode)) then begin
+                    TicketProfile.ValidationMode := TicketProfile.ValidationMode::STRICT;
+                end;
 
             if (TicketProfile.ValidationMode = TicketProfile.ValidationMode::FLEXIBLE) then begin
                 TicketBom.Reset();
@@ -1098,9 +1115,10 @@ codeunit 6185130 "NPR SG SpeedGate"
         if (AdmitToCodes.Count = 0) and (SuggestedAdmissionCode = '') then begin
             if (MemberCardProfileCode = '') then begin
                 MemberCardProfile.ValidationMode := MemberCardProfile.ValidationMode::FLEXIBLE;
-            end else if (not MemberCardProfile.Get(MemberCardProfileCode)) then begin
-                MemberCardProfile.ValidationMode := MemberCardProfile.ValidationMode::STRICT;
-            end;
+            end else
+                if (not MemberCardProfile.Get(MemberCardProfileCode)) then begin
+                    MemberCardProfile.ValidationMode := MemberCardProfile.ValidationMode::STRICT;
+                end;
 
             if (MemberCardProfile.ValidationMode = MemberCardProfile.ValidationMode::FLEXIBLE) then begin
                 TicketBom.Reset();

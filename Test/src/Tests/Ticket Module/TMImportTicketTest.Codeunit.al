@@ -707,7 +707,7 @@ codeunit 85174 "NPR TM ImportTicketTest"
         until (TicketImportLine.Next() = 0);
     end;
 
-    local procedure CreateTicketsToImport(
+    internal procedure CreateTicketsToImport(
         ItemReference: Code[20];
         SalesDate: Date;
         ExpectedVisitDate: Date;
@@ -805,7 +805,7 @@ codeunit 85174 "NPR TM ImportTicketTest"
         end;
     end;
 
-    local procedure GenerateJson(
+    internal procedure GenerateJson(
         var TempTicketImport: Record "NPR TM ImportTicketHeader" temporary;
         var TempTicketImportLine: Record "NPR TM ImportTicketLine" temporary
         ) TicketBatch: JsonObject
@@ -864,7 +864,7 @@ codeunit 85174 "NPR TM ImportTicketTest"
         TicketBatch.Add('ticketBatch', TicketOrders);
     end;
 
-    local procedure SelectImportTestScenario_Reservation(var Schedules: Dictionary of [Code[20], Time]) ItemNo: Code[20]
+    internal procedure SelectImportTestScenario_Reservation(var Schedules: Dictionary of [Code[20], Time]) ItemNo: Code[20]
     var
         TicketLibrary: Codeunit "NPR Library - Ticket Module";
     begin
@@ -873,7 +873,7 @@ codeunit 85174 "NPR TM ImportTicketTest"
     end;
 
 
-    local procedure SelectImportTestScenario(var Schedules: Dictionary of [Code[20], Time]) ItemNo: Code[20]
+    internal procedure SelectImportTestScenario(var Schedules: Dictionary of [Code[20], Time]) ItemNo: Code[20]
     var
         TicketLibrary: Codeunit "NPR Library - Ticket Module";
     begin

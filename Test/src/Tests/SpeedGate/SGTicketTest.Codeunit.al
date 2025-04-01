@@ -813,6 +813,7 @@ codeunit 85217 "NPR SG TicketTest"
 
     end;
 
+
     [Normal]
     procedure ValidatePermitted(AdmitToken: Guid)
     var
@@ -892,12 +893,11 @@ codeunit 85217 "NPR SG TicketTest"
     end;
 
     [Normal]
-    procedure CreateTicket(TicketQuantityPerOrder: Integer; var TmpCreatedTickets: Record "NPR TM Ticket" temporary)
+    procedure CreateTicket(TicketQuantityPerOrder: Integer; var TmpCreatedTickets: Record "NPR TM Ticket" temporary) ResponseToken: Text[100];
     var
         TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
         Assert: Codeunit "Assert";
         ItemNo: Code[20];
-        ResponseToken: Text;
         ResponseMessage: Text;
         ApiOk: Boolean;
         NumberOfTicketOrders: Integer;
@@ -937,7 +937,9 @@ codeunit 85217 "NPR SG TicketTest"
 
         DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
         DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::ADMITTED);
-        DetTicketAccessEntry.FindFirst();
+        if (DetTicketAccessEntry.Count() <> 1) then
+            Error('Expected 1 Admitted DetTicketAccessEntry, but found %1', DetTicketAccessEntry.Count());
+
         //DetTicketAccessEntry.TestField("Scanner Station ID", GateCode);
     end;
 
