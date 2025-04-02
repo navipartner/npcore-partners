@@ -841,6 +841,8 @@ codeunit 6185130 "NPR SG SpeedGate"
                 // The initial validation request is already created for the first ticket and admission code
                 // Update the existing validation request with the ticket id
                 ValidationRequest.ExtraEntityId := TicketId;
+                ValidationRequest.Modify();
+
                 ManageValidationRequestForFirstTicket(ValidationRequest, AdmitToCodes);
 
                 TicketIds.Remove(TicketId);
