@@ -480,7 +480,8 @@ codeunit 6059925 "NPR POS Layout Assistant"
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23)
         FeatureEnabled := AzureKeyVaultMgt.TryGetAzureKeyVaultSecret('DragonglassAppRegistrationClientSecret', ClientSecret);
         if FeatureEnabled then begin
-            Scopes.Add('Financials.ReadWrite.All');
+            Scopes.Add('https://api.businesscentral.dynamics.com/Financials.ReadWrite.All');
+            Scopes.Add('https://api.businesscentral.dynamics.com/user_impersonation');
             NaviPartnerFeature := Enum::"NPR Feature"::"POS Webservice Sessions";
             if NaviPartnerFeature.IsFeatureEnabled() then begin
                 if Oauth2.AcquireAuthorizationCodeTokenFromCache(ClientId, ClientSecret, RedirectURL, StrSubstNo(OAuthAuthorityUrl, AzureADTenant.GetAadTenantId()), Scopes, AccessToken) and (AccessToken <> '') then begin
