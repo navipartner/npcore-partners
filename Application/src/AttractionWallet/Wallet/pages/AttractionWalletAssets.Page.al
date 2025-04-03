@@ -18,7 +18,7 @@ page 6184847 "NPR AttractionWalletAssets"
                 field(Type; Rec."Type")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Asset Type field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Asset Type field.';
                     Editable = false;
                 }
 
@@ -26,7 +26,7 @@ page 6184847 "NPR AttractionWalletAssets"
                 {
                     Caption = 'Description';
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Description field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Description field.';
                     Editable = false;
                 }
 
@@ -34,7 +34,7 @@ page 6184847 "NPR AttractionWalletAssets"
                 {
                     Caption = 'Asset Reference Number';
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Asset Reference field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Asset Reference field.';
                     Editable = false;
                 }
 
@@ -50,16 +50,23 @@ page 6184847 "NPR AttractionWalletAssets"
                 {
                     Caption = 'Document Number';
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Document Number field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Document Number field.';
                     Editable = false;
                 }
 
+                field(BundleReferenceNo; _BundleReferenceNumber)
+                {
+                    Caption = 'Bundle Ref. No.';
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Bundle Reference Number field.';
+                    Editable = false;
+                }
                 field(Holder; _WalletHolder)
                 {
                     Editable = true;
                     Caption = 'Wallet Reference Number';
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Holder field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Holder field.';
                     trigger OnValidate()
                     var
                         AssetLineRefNew: Record "NPR WalletAssetLineReference";
@@ -98,7 +105,7 @@ page 6184847 "NPR AttractionWalletAssets"
                 {
                     Caption = 'Located Via';
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Transfer Controlled By field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Transfer Controlled By field.';
                     Editable = false;
                 }
             }
@@ -152,8 +159,11 @@ page 6184847 "NPR AttractionWalletAssets"
     trigger OnAfterGetRecord()
     var
         Ticket: Record "NPR TM Ticket";
+        BundledAssets: Record "NPR NpIa POSEntryLineBndlAsset";
+        BundleId: Record "NPR NpIa POSEntryLineBundleId";
         Wallet: Record "NPR AttractionWallet";
     begin
+        _BundleReferenceNumber := '';
         _WalletHolder := '';
         TempAssetLineRef.Reset();
         TempAssetLineRef.SetCurrentKey(WalletAssetLineEntryNo);
@@ -172,11 +182,18 @@ page 6184847 "NPR AttractionWalletAssets"
 
         case Rec.Type of
             Rec.Type::TICKET:
-                if (Ticket.GetBySystemId(Rec.LineTypeSystemId)) then
-                    _AssetBlocked := Ticket.Blocked;
+                begin
+                    if (Ticket.GetBySystemId(Rec.LineTypeSystemId)) then
+                        _AssetBlocked := Ticket.Blocked;
+                    BundledAssets.SetCurrentKey(AssetTableId, AssetSystemId);
+                    BundledAssets.SetFilter(AssetTableId, '=%1', Database::"NPR TM Ticket");
+                    BundledAssets.SetFilter(AssetSystemId, '=%1', Rec.LineTypeSystemId);
+                    if (BundledAssets.FindFirst()) then
+                        if (BundleId.Get(BundledAssets.AppliesToSaleLineId, BundledAssets.Bundle)) then
+                            _BundleReferenceNumber := BundleId.ReferenceNumber;
+                end;
             else
                 _AssetBlocked := false;
-
         end;
     end;
 
@@ -277,7 +294,7 @@ page 6184847 "NPR AttractionWalletAssets"
         TempAssetLineRef: Record "NPR WalletAssetLineReference" temporary;
         TempWallet: Record "NPR AttractionWallet" temporary;
         _WalletHolder: Text;
-
         _AssetBlocked: Boolean;
+        _BundleReferenceNumber: Text[50];
 
 }

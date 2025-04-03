@@ -423,6 +423,7 @@
         POSEntrySalesLine."Return Sale Sales Ticket No." := POSSaleLine."Return Sale Sales Ticket No.";
         OnBeforeInsertPOSSalesLine(POSSale, POSSaleLine, POSEntry, POSEntrySalesLine);
         POSEntrySalesLine.Insert(false, true);
+        ManageAddOns(POSSaleLine, POSEntrySalesLine);
         OnAfterInsertPOSSalesLine(POSSale, POSSaleLine, POSEntry, POSEntrySalesLine);
     end;
 
@@ -1368,6 +1369,141 @@
         until (not PaymentBinCheckpointQuery.Read());
 
         exit(POSEntry."Entry No.");
+    end;
+
+    local procedure ManageAddOns(POSSaleLine: Record "NPR POS Sale Line"; POSEntrySaleLine: Record "NPR POS Entry Sales Line")
+    begin
+        CreateItemAddOnBundleId(POSSaleLine, POSEntrySaleLine);
+        CreateItemAddOnLines(POSSaleLine, POSEntrySaleLine);
+        AssignTicketsToBundle(POSSaleLine, POSEntrySaleLine);
+    end;
+
+    local procedure CreateItemAddOnBundleId(POSSaleLine: Record "NPR POS Sale Line"; POSEntrySaleLine: Record "NPR POS Entry Sales Line")
+    var
+        AddOnSaleLine: Record "NPR NpIa SaleLinePOS AddOn";
+        Addon: Record "NPR NpIa Item AddOn";
+        BundleReference: Record "NPR NpIa POSEntryLineBundleId";
+        BundleNumber: Integer;
+    begin
+        if (Round(POSEntrySaleLine.Quantity, 1) <> POSEntrySaleLine.Quantity) then
+            exit;
+
+        AddOnSaleLine.SetRange("Register No.", POSSaleLine."Register No.");
+        AddOnSaleLine.SetRange("Sales Ticket No.", POSSaleLine."Sales Ticket No.");
+        AddOnSaleLine.SetRange("Sale Type", POSSaleLine."Sale Type");
+        AddOnSaleLine.SetRange("Sale Date", POSSaleLine.Date);
+        AddOnSaleLine.SetRange("Applies-to Line No.", POSSaleLine."Line No.");
+        if (not AddOnSaleLine.FindFirst()) then
+            exit;
+
+        if (not Addon.Get(AddOnSaleLine."AddOn No.")) then
+            exit;
+
+        if (not Addon.WalletTemplate) then
+            exit;
+
+        for BundleNumber := 1 to POSEntrySaleLine.Quantity do begin
+            BundleReference.Init();
+            BundleReference.POSEntrySaleLineId := POSSaleLine.SystemId;
+            BundleReference.Bundle := BundleNumber;
+            BundleReference.ReferenceNumber := CopyStr(DelChr(Format(CreateGuid()).ToUpper(), '=', '{}-'), 1, MaxStrLen(BundleReference.ReferenceNumber));
+            BundleReference.Insert();
+        end;
+    end;
+
+    local procedure CreateItemAddOnLines(POSSaleLine: Record "NPR POS Sale Line"; POSEntrySaleLine: Record "NPR POS Entry Sales Line")
+    var
+        AddOnSaleLine: Record "NPR NpIa SaleLinePOS AddOn";
+        AddOnPOSEntrySaleLine: Record "NPR NpIa POSEntrySaleLineAddOn";
+        MasterPosSaleLine: Record "NPR POS Sale Line";
+        BundleReference: Record "NPR NpIa POSEntryLineBundleId";
+        AppliesToId: Guid;
+    begin
+        AddOnSaleLine.SetRange("Register No.", POSSaleLine."Register No.");
+        AddOnSaleLine.SetRange("Sales Ticket No.", POSSaleLine."Sales Ticket No.");
+        AddOnSaleLine.SetRange("Sale Type", POSSaleLine."Sale Type");
+        AddOnSaleLine.SetRange("Sale Date", POSSaleLine.Date);
+        AddOnSaleLine.SetRange("Sale Line No.", POSSaleLine."Line No.");
+        if (not AddOnSaleLine.FindFirst()) then
+            exit;
+
+        Clear(AppliesToId);
+        MasterPosSaleLine.SetLoadFields(SystemId, "Line No.");
+        MasterPosSaleLine.SetRange("Register No.", POSSaleLine."Register No.");
+        MasterPosSaleLine.SetRange("Sales Ticket No.", POSSaleLine."Sales Ticket No.");
+        MasterPosSaleLine.SetRange(Date, POSSaleLine.Date);
+        MasterPosSaleLine.SetRange("Line No.", AddOnSaleLine."Applies-to Line No.");
+        if (not MasterPosSaleLine.FindFirst()) then
+            exit;
+
+        BundleReference.SetFilter(POSEntrySaleLineId, '=%1', MasterPosSaleLine.SystemId);
+        if (BundleReference.IsEmpty()) then
+            exit;
+
+        AddOnPOSEntrySaleLine.Init();
+        AddOnPOSEntrySaleLine.POSEntrySaleLineId := POSEntrySaleLine.SystemId;
+        AddOnPOSEntrySaleLine.PosEntrySaleLineNo := POSSaleLine."Line No.";
+        AddOnPOSEntrySaleLine.AppliesToSaleLineId := MasterPosSaleLine.SystemId;
+        AddOnPOSEntrySaleLine.AppliesToSaleLineNo := MasterPosSaleLine."Line No.";
+        AddOnPOSEntrySaleLine.AddOnNo := AddOnSaleLine."AddOn No.";
+        AddOnPOSEntrySaleLine.AddOnLineNo := AddOnSaleLine."AddOn Line No.";
+        AddOnPOSEntrySaleLine.AddToWallet := AddOnSaleLine.AddToWallet;
+        AddOnPOSEntrySaleLine.AddOnItemNo := AddOnSaleLine.AddOnItemNo;
+        AddOnPOSEntrySaleLine.Insert();
+
+    end;
+
+    local procedure AssignTicketsToBundle(POSSaleLine: Record "NPR POS Sale Line"; POSEntrySaleLine: Record "NPR POS Entry Sales Line")
+    var
+        BundleQuery: Query "NPR NpIa POSEntrySaleLineAddOn";
+        BundleAsset: Record "NPR NpIa POSEntryLineBndlAsset";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        Ticket: Record "NPR TM Ticket";
+        TicketIds: List of [Guid];
+        i: Integer;
+        BundleFound: Boolean;
+    begin
+
+        TicketReservationRequest.SetCurrentKey("Receipt No.", "Line No.");
+        TicketReservationRequest.SetFilter("Receipt No.", '=%1', POSSaleLine."Sales Ticket No.");
+        TicketReservationRequest.SetFilter("Line No.", '=%1', POSSaleLine."Line No.");
+        TicketReservationRequest.SetLoadFields("Entry No.");
+        if (TicketReservationRequest.FindSet()) then begin
+            repeat
+                Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+                Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
+                Ticket.SetLoadFields(SystemId);
+                if (Ticket.FindSet()) then begin
+                    repeat
+                        TicketIds.Add(Ticket.SystemId);
+                    until (Ticket.Next() = 0);
+                end;
+            until (TicketReservationRequest.Next() = 0);
+        end;
+
+        BundleQuery.SetFilter(POSEntrySaleLineId, '=%1', POSEntrySaleLine.SystemId);
+        BundleQuery.SetFilter(BundleSequence, '>%1', 0);
+
+        i := 1;
+        while (i <= TicketIds.Count()) do begin
+            BundleFound := false;
+            BundleQuery.Open();
+            while (BundleQuery.Read()) do begin
+                BundleFound := true;
+                if (i <= TicketIds.Count()) then begin
+                    BundleAsset.POSEntrySaleLineId := BundleQuery.POSEntrySaleLineId;
+                    BundleAsset.Bundle := BundleQuery.BundleSequence;
+                    BundleAsset.AppliesToSaleLineId := BundleQuery.AppliesToSaleLineId;
+                    BundleAsset.AssetTableId := Database::"NPR TM Ticket";
+                    BundleAsset.AssetSystemId := TicketIds.Get(i);
+                    BundleAsset.Insert();
+                    i += 1;
+                end;
+            end;
+            if (not BundleFound) then
+                break;
+        end;
+
     end;
 
     local procedure CreateRMAEntry(POSEntry: Record "NPR POS Entry"; SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line")

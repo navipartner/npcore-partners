@@ -203,6 +203,17 @@
                     PAGE.RunModal(PAGE::"NPR POS Entry Rel. Sales Doc.", POSEntrySalesDocLink);
                 end;
             }
+
+            action(BundleReferences)
+            {
+                Caption = 'Item Addon Bundle References';
+                Image = AssemblyOrder;
+                RunObject = Page "NPR NpIa POSEntryLineBundle";
+                RunPageLink = POSEntrySaleLineId = FIELD(SystemId);
+                ToolTip = 'Executes the Bundle References action';
+                ApplicationArea = NPRRetail;
+            }
+
         }
     }
 
