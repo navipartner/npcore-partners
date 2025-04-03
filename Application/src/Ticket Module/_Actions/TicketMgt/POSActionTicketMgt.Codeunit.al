@@ -286,7 +286,7 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
                         POSFunction.RegisterArrival(ExternalTicketNumber, AdmissionCode, PosUnitNo, WithTicketPrint, ResponseText);
                 end;
             2:
-                POSFunction.RevokeTicketReservation(POSSession, ExternalTicketNumber);
+                POSFunction.RevokeTicketReservation(POSSession, ExternalTicketNumber, false);
             3:
                 POSFunction.EditReservation(POSSession, ExternalTicketNumber);
             4:

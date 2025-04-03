@@ -46,7 +46,7 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
         ResponseText := StrSubstNo(SingleTicketsAdmittedMessage, AdmittedCount);
     end;
 
-    internal procedure RevokeTicketReservation(POSSession: Codeunit "NPR POS Session"; ExternalTicketNumber: Code[50]): Guid
+    internal procedure RevokeTicketReservation(POSSession: Codeunit "NPR POS Session"; ExternalTicketNumber: Code[50]; UseTicketListPrice: Boolean): Guid
     var
         TicketManagement: Codeunit "NPR TM Ticket Management";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
@@ -96,6 +96,7 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
         POSSaleLine.RefreshCurrent();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
+        // Default to actual sales price
         UnitPrice := SaleLinePOS."Unit Price";
         if (SaleLinePOS."Price Includes VAT") then
             if (Ticket.AmountInclVat <> 0) then
@@ -117,6 +118,18 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
                         UnitPrice := PosEntrySalesLine."Amount Excl. VAT" / PosEntrySalesLine.Quantity;
                 end;
             end;
+        end;
+
+        // When intent is to automatically rebook, use the list price of the ticket. 
+        // This will carry the value of original discount forward to new ticket (if any).
+        if (UseTicketListPrice) then begin
+            if (SaleLinePOS."Price Includes VAT") then
+                if (Ticket.ListPriceInclVat <> 0) then
+                    UnitPrice := Ticket.ListPriceInclVat;
+
+            if (not SaleLinePOS."Price Includes VAT") then
+                if (Ticket.ListPriceExclVat <> 0) then
+                    UnitPrice := Ticket.ListPriceExclVat;
         end;
 
         ResponseCode := TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", UnitPrice, RevokeQuantity, ResponseMessage);
