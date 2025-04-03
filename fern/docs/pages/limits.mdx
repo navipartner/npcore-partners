@@ -12,6 +12,7 @@ The following limits apply **per Entra App**:
 | Max connections | The maximum number of simultaneous requests, including processed and queued requests. Exceeding this limit returns HTTP 429 | 100 |
 | Max request queue size | The maximum number of queued requests waiting to be processed. Exceeding this limit returns HTTP 429| 95 |
 | Speed (rate) | The maximum number of requests that can be submitted within a 5-minute sliding window. Exceeding this limit returns HTTP 429 | 6000 |
+| Operation timeout | The maximum request timeout in minutes, returning HTTP 408. | 8 |
 
 
 ## Retry strategy
