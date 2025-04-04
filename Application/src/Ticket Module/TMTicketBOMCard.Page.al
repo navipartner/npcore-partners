@@ -7,6 +7,7 @@ page 6059886 "NPR TM Ticket BOM Card"
     Caption = 'Ticket Bill-of-Material';
     PromotedActionCategories = 'New,Process,Report,Create Tickets,Navigate';
     ContextSensitiveHelpPage = 'docs/entertainment/ticket/intro/';
+    DelayedInsert = true;
 
     layout
     {
@@ -22,6 +23,8 @@ page 6059886 "NPR TM Ticket BOM Card"
                     {
                         ToolTip = 'Specifies the identification number of an item created in the ERP system that is used in the POS for selling a specific ticket. ';
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                        NotBlank = true;
+                        ShowMandatory = true;
                     }
                     field("Variant Code"; Rec."Variant Code")
                     {
@@ -33,6 +36,8 @@ page 6059886 "NPR TM Ticket BOM Card"
                     {
                         ToolTip = 'Specifies the type of admission that the ticket can be used for. Tickets offer different levels of clearance, and they may allow access to multiple sites (e.g., dungeon and treasury tours in a castle).';
                         ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                        NotBlank = true;
+                        ShowMandatory = true;
                     }
                 }
                 field(Description; Rec.Description)

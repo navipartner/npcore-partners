@@ -10,6 +10,7 @@
     PromotedActionCategories = 'New,Process,Report,Create Tickets,Navigate,History';
     CardPageId = "NPR TM Ticket BOM Card";
     Editable = true;
+    DelayedInsert = true;
 
     layout
     {
@@ -21,6 +22,8 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the item No. used to create this specific ticket configuration. The same Item No. can be added multiple times with different Ticket Admissions or if variants are applied.';
+                    NotBlank = true;
+                    ShowMandatory = true;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
@@ -32,6 +35,8 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the specific Ticket admission that the ticket can be used for. Multiple Ticket admissions can be applied to the same Ticket Item configuration.';
+                    NotBlank = true;
+                    ShowMandatory = true;
                 }
                 field(Default; Rec.Default)
                 {

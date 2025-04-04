@@ -8,7 +8,7 @@
     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
     PromotedActionCategories = 'New,Process,Report,Calculate Entries,Navigate';
     ContextSensitiveHelpPage = 'docs/entertainment/ticket/intro/';
-
+    DelayedInsert = true;
     layout
     {
         area(content)
@@ -19,11 +19,15 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Admission Code field';
+                    NotBlank = true;
+                    ShowMandatory = true;
                 }
                 field("Schedule Code"; Rec."Schedule Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Schedule Code field';
+                    NotBlank = true;
+                    ShowMandatory = true;
                 }
                 field("Capacity Limit By"; Rec."Capacity Limit By")
                 {
