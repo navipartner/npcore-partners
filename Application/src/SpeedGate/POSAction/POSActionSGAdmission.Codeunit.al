@@ -126,6 +126,7 @@ codeunit 6248278 "NPR POS Action SG Admission" implements "NPR IPOS Workflow"
         MemberCard: Record "NPR MM Member Card";
         Ticket: Record "NPR TM Ticket";
         AttractionWallet: Record "NPR AttractionWallet";
+        WalletExternalReference: Record "NPR AttractionWalletExtRef";
     begin
         MemberCard.SetRange("External Card No.", CopyStr(ReferenceNo, 1, MaxStrLen(MemberCard."External Card No.")));
         if not MemberCard.IsEmpty() then
@@ -134,6 +135,10 @@ codeunit 6248278 "NPR POS Action SG Admission" implements "NPR IPOS Workflow"
         Ticket.SetRange("External Ticket No.", CopyStr(ReferenceNo, 1, MaxStrLen(Ticket."External Ticket No.")));
         if not Ticket.IsEmpty() then
             exit(Ticket.TableCaption);
+
+        WalletExternalReference.SetRange(ExternalReference, CopyStr(ReferenceNo, 1, MaxStrLen(WalletExternalReference.ExternalReference)));
+        if (not WalletExternalReference.IsEmpty()) then
+            exit(AttractionWallet.TableCaption());
 
         AttractionWallet.SetRange(ReferenceNumber, CopyStr(ReferenceNo, 1, MaxStrLen(AttractionWallet.ReferenceNumber)));
         if not AttractionWallet.IsEmpty() then

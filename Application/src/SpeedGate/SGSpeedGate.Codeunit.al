@@ -658,6 +658,7 @@ codeunit 6185130 "NPR SG SpeedGate"
         Number: Text[100];
         SuggestedAdmissionCode: Code[20];
         Wallet: Record "NPR AttractionWallet";
+        WalletExternalReference: Record "NPR AttractionWalletExtRef";
         TicketIds, MemberCardIds : List of [Guid];
         MemberCardId, TicketId : Guid;
         MemberCard: Record "NPR MM Member Card";
@@ -667,9 +668,18 @@ codeunit 6185130 "NPR SG SpeedGate"
         Number := ValidationRequest.ReferenceNo;
         SuggestedAdmissionCode := ValidationRequest.AdmissionCode;
 
-        Wallet.SetCurrentKey(ReferenceNumber);
-        Wallet.SetFilter(ReferenceNumber, '=%1', CopyStr(UpperCase(Number), 1, MaxStrLen(Wallet.ReferenceNumber)));
-        NumberIdentified := Wallet.FindSet();
+        WalletExternalReference.SetLoadFields(WalletEntryNo, BlockedAt, ExpiresAt);
+        if (WalletExternalReference.Get(Number)) then begin
+            if (WalletExternalReference.BlockedAt <> 0DT) then
+                exit(SetApiError(_ApiErrors::wallet_expired));
+            if (WalletExternalReference.ExpiresAt <> 0DT) and (WalletExternalReference.ExpiresAt < CurrentDateTime()) then
+                exit(SetApiError(_ApiErrors::wallet_expired));
+            Wallet.SetRange(EntryNo, WalletExternalReference.WalletEntryNo);
+        end else begin
+            Wallet.SetCurrentKey(ReferenceNumber);
+            Wallet.SetFilter(ReferenceNumber, '=%1', CopyStr(UpperCase(Number), 1, MaxStrLen(Wallet.ReferenceNumber)));
+        end;
+        NumberIdentified := Wallet.FindFirst();
 
         if (not NumberIdentified) then
             exit(false);

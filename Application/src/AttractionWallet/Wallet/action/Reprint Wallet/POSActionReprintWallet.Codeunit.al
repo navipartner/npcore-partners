@@ -50,7 +50,7 @@ codeunit 6248257 "NPR POS Action Reprint Wallet" implements "NPR IPOS Workflow"
         end;
 
         if (_WalletEntryNoList.Count = 0) then
-            FindWalletDirectly(CopyStr(ReferenceNo, 1, 50), _WalletEntryNoList);
+            FindWalletDirectly(CopyStr(ReferenceNo, 1, 100), _WalletEntryNoList);
     end;
 
     local procedure FindWalletsFromPOSSale(POSEntrySystemId: Guid; var _WalletEntryNoList: List of [Integer])
@@ -81,11 +81,21 @@ codeunit 6248257 "NPR POS Action Reprint Wallet" implements "NPR IPOS Workflow"
             until WalletAssetHeaderRef.Next() = 0;
     end;
 
-    local procedure FindWalletDirectly(ReferenceNo: Code[50]; var _WalletEntryNoList: List of [Integer])
+    local procedure FindWalletDirectly(ReferenceNo: Text[100]; var _WalletEntryNoList: List of [Integer])
     var
         Wallet: Record "NPR AttractionWallet";
+        WalletExternalReference: Record "NPR AttractionWalletExtRef";
     begin
-        Wallet.SetRange(ReferenceNumber, ReferenceNo);
+        WalletExternalReference.SetLoadFields(WalletEntryNo);
+        if (WalletExternalReference.Get(ReferenceNo)) then
+            Wallet.SetRange(EntryNo, WalletExternalReference.WalletEntryNo)
+        else
+            if (StrLen(ReferenceNo) <= MaxStrLen(Wallet.ReferenceNumber)) then begin
+                Wallet.SetCurrentKey(ReferenceNumber);
+                Wallet.SetRange(ReferenceNumber, ReferenceNo);
+            end else
+                exit;
+
         if Wallet.FindFirst() then
             if not _WalletEntryNoList.Contains(Wallet.EntryNo) then
                 _WalletEntryNoList.Add(Wallet.EntryNo);
@@ -95,7 +105,7 @@ codeunit 6248257 "NPR POS Action Reprint Wallet" implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionReprintWallet.Codeunit.js###
-        'const main=async({workflow:l,popup:i,captions:e})=>{let t=await i.input({title:e.title,caption:e.referenceNoPrompt});t!==null&&await l.respond("ReprintWallet",{ReferenceNo:t})};'
+        'const main=async({workflow:n,popup:i,captions:e})=>{const t=await i.input({title:e.title,caption:e.referenceNoPrompt});t!==null&&await n.respond("ReprintWallet",{ReferenceNo:t})};'
         );
     end;
 }

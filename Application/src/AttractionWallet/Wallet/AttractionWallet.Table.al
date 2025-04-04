@@ -52,6 +52,9 @@ table 6150937 "NPR AttractionWallet"
         key(Key2; ReferenceNumber)
         {
             Clustered = false;
+#if not (BC17 or BC18)
+            IncludedFields = ExpirationDate;
+#endif
         }
 
     }

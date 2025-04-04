@@ -21,6 +21,11 @@ table 6150936 "NPR WalletAssetSetup"
             Caption = 'Wallet Reference Pattern';
             DataClassification = CustomerContent;
         }
+        field(21; ExtReferencePattern; Code[30])
+        {
+            Caption = 'Wallet External Reference Pattern';
+            DataClassification = CustomerContent;
+        }
 
         field(30; EnableEndOfSalePrint; Boolean)
         {

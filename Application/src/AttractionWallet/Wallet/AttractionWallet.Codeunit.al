@@ -501,6 +501,63 @@ codeunit 6185062 "NPR AttractionWallet"
         WalletAssetHeaderRef.Insert();
     end;
 
+    internal procedure CreateNewExternalReference(WalletEntryNo: Integer)
+    var
+        Wallet: Record "NPR AttractionWallet";
+    begin
+        Wallet.Get(WalletEntryNo);
+        CreateNewExternalReference(Wallet);
+    end;
+
+    internal procedure CreateNewExternalReference(Wallet: Record "NPR AttractionWallet")
+    var
+        WalletExternalReference: Record "NPR AttractionWalletExtRef";
+    begin
+        WalletExternalReference.Init();
+        WalletExternalReference.ExternalReference := GenerateWalletExternalReference(CopyStr(Wallet.ReferenceNumber, 1, 20));
+        WalletExternalReference.WalletEntryNo := Wallet.EntryNo;
+        WalletExternalReference.Insert(true);
+    end;
+
+    internal procedure BlockAllExternalReferences(WalletEntryNo: Integer)
+    var
+        WalletExternalReference: Record "NPR AttractionWalletExtRef";
+        BlockTime: DateTime;
+    begin
+#if (BC17 or BC18 or BC19 or BC20 or BC21)
+        WalletExternalReference.LockTable();
+#else
+        WalletExternalReference.ReadIsolation := IsolationLevel::UpdLock;
+#endif
+        WalletExternalReference.SetFilter(WalletEntryNo, '=%1', WalletEntryNo);
+        WalletExternalReference.SetFilter(BlockedAt, '=%1', 0DT);
+        if (not WalletExternalReference.FindSet()) then
+            exit;
+
+        BlockTime := CurrentDateTime();
+        repeat
+            WalletExternalReference.BlockedAt := BlockTime;
+            WalletExternalReference.Modify();
+        until WalletExternalReference.Next() = 0;
+    end;
+
+    internal procedure BlockExternalReference(ExternalReference: Text[100])
+    var
+        WalletExternalReference: Record "NPR AttractionWalletExtRef";
+    begin
+#if (BC17 or BC18 or BC19 or BC20 or BC21)
+        WalletExternalReference.LockTable();
+#else
+        WalletExternalReference.ReadIsolation := IsolationLevel::UpdLock;
+#endif
+        WalletExternalReference.SetFilter(ExternalReference, '=%1', ExternalReference);
+        WalletExternalReference.SetFilter(BlockedAt, '=%1', 0DT);
+        if (not WalletExternalReference.FindFirst()) then
+            exit;
+        WalletExternalReference.BlockedAt := CurrentDateTime();
+        WalletExternalReference.Modify();
+    end;
+
     local procedure CreateOwnerWallet(var WalletAssetHeader: Record "NPR WalletAssetHeader"): Integer
     var
         Wallet: Record "NPR AttractionWallet";
@@ -558,6 +615,7 @@ codeunit 6185062 "NPR AttractionWallet"
     internal procedure CreateWallet(WalletSystemId: Guid; Description: Text[100]; var Wallet: Record "NPR AttractionWallet"): Integer
     var
         WalletSequenceNumber: Text[30];
+        WalletExternalReference: Record "NPR AttractionWalletExtRef";
     begin
         Wallet.Init();
         Wallet.EntryNo := 0;
@@ -571,6 +629,13 @@ codeunit 6185062 "NPR AttractionWallet"
         Wallet.ReferenceNumber := GenerateWalletReference(WalletSequenceNumber.PadLeft(10, '0'));
 #pragma warning restore AA0139
         Wallet.Modify();
+
+        WalletExternalReference.Init();
+#pragma warning disable AA0139 // PadLeft returns a Text, not a Code[20]
+        WalletExternalReference.ExternalReference := GenerateWalletExternalReference(WalletSequenceNumber.PadLeft(10, '0'));
+#pragma warning disable AA0139
+        WalletExternalReference.WalletEntryNo := Wallet.EntryNo;
+        WalletExternalReference.Insert(true);
 
         exit(Wallet.EntryNo);
     end;
@@ -665,6 +730,20 @@ codeunit 6185062 "NPR AttractionWallet"
             Setup.ReferencePattern := '[S]';
 
         exit(TicketManagement.GenerateNumberPattern(Setup.ReferencePattern, ReferenceNo));
+    end;
+
+    local procedure GenerateWalletExternalReference(ReferenceNo: Code[20]): Text[100]
+    var
+        Setup: Record "NPR WalletAssetSetup";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+    begin
+        if (not Setup.Get()) then
+            Setup.Init();
+
+        if (Setup.ExtReferencePattern = '') then
+            Setup.ExtReferencePattern := '[S][N*1]';
+
+        exit(TicketManagement.GenerateNumberPattern(Setup.ExtReferencePattern, ReferenceNo));
     end;
 
     local procedure CreateWalletAssetHeader(var WalletAssetHeader: Record "NPR WalletAssetHeader"): boolean

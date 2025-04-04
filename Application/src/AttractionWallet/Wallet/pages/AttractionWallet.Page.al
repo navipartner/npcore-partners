@@ -29,27 +29,32 @@ page 6184846 "NPR AttractionWallet"
                     ShowSelectedWallets();
                 end;
             }
-            repeater(GroupName)
+            group(WalletResults)
             {
+                Caption = 'Results';
 
-                field(ReferenceNumber; Rec.ReferenceNumber)
+                repeater(GroupName)
                 {
-                    Caption = 'Wallet Reference Number';
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Reference Number field.', Comment = '%';
-                    Editable = false;
-                }
-                field(Description; Rec.Description)
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Description field.', Comment = '%';
-                    Editable = true;
-                }
-                field(ExpirationDate; Rec.ExpirationDate)
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Expiration Date field.', Comment = '%';
-                    Editable = true;
+
+                    field(ReferenceNumber; Rec.ReferenceNumber)
+                    {
+                        Caption = 'Wallet Reference Number';
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Reference Number field.';
+                        Editable = false;
+                    }
+                    field(Description; Rec.Description)
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Description field.';
+                        Editable = true;
+                    }
+                    field(ExpirationDate; Rec.ExpirationDate)
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Expiration Date field.';
+                        Editable = true;
+                    }
                 }
             }
 
@@ -57,6 +62,13 @@ page 6184846 "NPR AttractionWallet"
             {
                 ApplicationArea = NPRRetail;
                 Caption = 'Assets';
+                UpdatePropagation = Both;
+            }
+
+            part(ExternalReferences; "NPR AttractionWalletExtRefs")
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'External References';
                 UpdatePropagation = Both;
             }
         }
@@ -136,6 +148,24 @@ page 6184846 "NPR AttractionWallet"
                     WalletMgr: Codeunit "NPR AttractionWallet";
                 begin
                     WalletMgr.PrintWallet(Rec.EntryNo, Enum::"NPR WalletPrintType"::WALLET);
+                end;
+            }
+            action(CreateNewExternalRef)
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Create New External Reference';
+                ToolTip = 'Running this action will create a new external reference';
+                Image = Line;
+                Promoted = true;
+                PromotedOnly = true;
+                Scope = Repeater;
+
+                trigger OnAction()
+                var
+                    WalletMgr: Codeunit "NPR AttractionWallet";
+                begin
+                    WalletMgr.CreateNewExternalReference(Rec.EntryNo);
+                    ShowSelectedWallets();
                 end;
             }
         }
@@ -238,6 +268,7 @@ page 6184846 "NPR AttractionWallet"
         Rec.MarkedOnly(true);
 
         CurrPage.Assets.Page.ShowSelectedAssets(TempSelectedWallets);
+        CurrPage.ExternalReferences.Page.ShowSelectedWallets(TempSelectedWallets);
         CurrPage.Update(false);
     end;
 
@@ -245,6 +276,7 @@ page 6184846 "NPR AttractionWallet"
     var
         Wallet: Record "NPR AttractionWallet";
         WalletAssetHeaderRef: Record "NPR WalletAssetHeaderReference";
+        WalletExternalReference: Record "NPR AttractionWalletExtRef";
         AssetLine: Record "NPR WalletAssetLine";
         AssetHeader: Record "NPR WalletAssetHeader";
     begin
@@ -272,10 +304,17 @@ page 6184846 "NPR AttractionWallet"
                 until (WalletAssetHeaderRef.Next() = 0);
             end;
 
-            // if reference is a Wallet then Assets Held By Wallet
             Wallet.Reset();
-            Wallet.SetCurrentKey(ReferenceNumber);
-            Wallet.SetFilter(ReferenceNumber, '=%1', WalletReference);
+
+            // if reference is a Wallet or external reference then Assets Held By Wallet
+            WalletExternalReference.SetLoadFields(WalletEntryNo);
+            if (WalletExternalReference.Get(WalletReference)) then
+                Wallet.SetFilter(EntryNo, '=%1', WalletExternalReference.WalletEntryNo)
+            else begin
+                Wallet.SetCurrentKey(ReferenceNumber);
+                Wallet.SetFilter(ReferenceNumber, '=%1', WalletReference);
+            end;
+
             if (Wallet.FindFirst()) then begin
                 TempSelectedWallets.TransferFields(Wallet, true);
                 TempSelectedWallets.SystemId := Wallet.SystemId;

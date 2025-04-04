@@ -133,13 +133,35 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
     internal procedure ResolveWallet(ReferenceNo: Text; var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer" temporary)
     var
         AttractionWallet: Record "NPR AttractionWallet";
+        WalletExternalReference: Record "NPR AttractionWalletExtRef";
+        FilterSet: Boolean;
     begin
-        if StrLen(ReferenceNo) > MaxStrLen(AttractionWallet.ReferenceNumber) then
+        if (StrLen(ReferenceNo) > MaxStrLen(WalletExternalReference.ExternalReference)) and (StrLen(ReferenceNo) > MaxStrLen(AttractionWallet.ReferenceNumber)) then
             exit;
-        AttractionWallet.SetRange(ReferenceNumber, UpperCase(ReferenceNo));
+        if (StrLen(ReferenceNo) <= MaxStrLen(WalletExternalReference.ExternalReference)) then begin
+            WalletExternalReference.SetLoadFields(WalletEntryNo);
+            WalletExternalReference.SetRange(ExternalReference, ReferenceNo);
+            WalletExternalReference.SetFilter(BlockedAt, '=%1', 0DT);
+            WalletExternalReference.SetFilter(ExpiresAt, '>%1|=%2', CurrentDateTime(), 0DT);
+            if (WalletExternalReference.FindFirst()) then begin
+                AttractionWallet.SetRange(EntryNo, WalletExternalReference.WalletEntryNo);
+                FilterSet := true;
+            end;
+        end;
+
+        if (StrLen(ReferenceNo) <= MaxStrLen(AttractionWallet.ReferenceNumber)) and (not FilterSet) then begin
+            AttractionWallet.SetCurrentKey(ReferenceNumber);
+            AttractionWallet.SetRange(ReferenceNumber, UpperCase(ReferenceNo));
+            FilterSet := true;
+        end;
+
+        if (not FilterSet) then
+            exit;
+
         AttractionWallet.SetFilter(ExpirationDate, '=%1|<=%2', 0DT, CurrentDateTime());
         if not AttractionWallet.FindFirst() then
             exit;
+
         PrintandAdmitBuffer.Init();
         PrintandAdmitBuffer.Type := PrintandAdmitBuffer.Type::ATTRACTION_WALLET;
         PrintandAdmitBuffer."System Id" := AttractionWallet.SystemId;
@@ -390,6 +412,7 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
         MemberCard: Record "NPR MM Member Card";
         Ticket: Record "NPR TM Ticket";
         AttractionWallet: Record "NPR AttractionWallet";
+        WalletExternalReference: Record "NPR AttractionWalletExtRef";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
     begin
         MemberCard.SetRange("External Card No.", CopyStr(ReferenceNo, 1, MaxStrLen(MemberCard."External Card No.")));
@@ -398,6 +421,10 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
 
         Ticket.SetRange("External Ticket No.", CopyStr(ReferenceNo, 1, MaxStrLen(Ticket."External Ticket No.")));
         if not Ticket.IsEmpty() then
+            exit(true);
+
+        WalletExternalReference.SetRange(ExternalReference, ReferenceNo);
+        if (not WalletExternalReference.IsEmpty()) then
             exit(true);
 
         AttractionWallet.SetRange(ReferenceNumber, CopyStr(ReferenceNo, 1, MaxStrLen(AttractionWallet.ReferenceNumber)));
@@ -425,7 +452,7 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionPrintandAdmit.js###
-        'const main = async ({ workflow, parameters, popup, context, captions }) => {if (!parameters.reference_input) { context.reference_input = await popup.input({title: captions.ReferenceTitle,caption: captions.ReferenceCaption,});if (context.reference_input == null) {return(" ");}} else{context.reference_input = parameters.reference_input; }let result = await workflow.respond("fill_data");await workflow.respond("handle_data", { buffer_data: result });};'
+        'const main=async({workflow:n,parameters:i,popup:t,context:e,captions:r})=>{if(i.reference_input)e.reference_input=i.reference_input;else if(e.reference_input=await t.input({title:r.ReferenceTitle,caption:r.ReferenceCaption}),e.reference_input==null)return" ";let a=await n.respond("fill_data");await n.respond("handle_data",{buffer_data:a})};'
         );
     end;
 }
