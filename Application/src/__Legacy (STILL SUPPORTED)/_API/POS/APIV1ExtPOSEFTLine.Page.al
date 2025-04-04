@@ -15,31 +15,34 @@ page 6184905 "NPR APIV1 - Ext. POS EFT Line"
     {
         area(Content)
         {
-            field(externalPosSaleEntry; Rec."External POS Sale Entry No.")
+            repeater(General)
             {
-                Caption = 'externalPosSaleEntry';
-                Editable = false;
-            }
-            field(externalPosSaleLineNo; Rec."External Pos SaleLine No")
-            {
-                Caption = 'externalPosSaleLineNo';
-                Editable = false;
-            }
-            field(eftType; Rec."EFT Type")
-            {
-                Caption = 'eftType';
-            }
-            field(eftBase64Data; EftBase64Data)
-            {
-                Caption = 'eftBase64Data';
-            }
-            field(processingType; Rec."Processing Type")
-            {
-                Caption = 'processingType';
-            }
-            field(eftReference; Rec."EFT Reference")
-            {
-                Caption = 'eftReference';
+                field(externalPosSaleEntry; Rec."External POS Sale Entry No.")
+                {
+                    Caption = 'externalPosSaleEntry';
+                    Editable = false;
+                }
+                field(externalPosSaleLineNo; Rec."External Pos SaleLine No")
+                {
+                    Caption = 'externalPosSaleLineNo';
+                    Editable = false;
+                }
+                field(eftType; Rec."EFT Type")
+                {
+                    Caption = 'eftType';
+                }
+                field(eftBase64Data; EftBase64Data)
+                {
+                    Caption = 'eftBase64Data';
+                }
+                field(processingType; Rec."Processing Type")
+                {
+                    Caption = 'processingType';
+                }
+                field(eftReference; Rec."EFT Reference")
+                {
+                    Caption = 'eftReference';
+                }
             }
         }
     }
@@ -52,8 +55,24 @@ page 6184905 "NPR APIV1 - Ext. POS EFT Line"
         outS: OutStream;
     begin
         if (EftBase64Data <> '') then begin
-            Rec.Base64Data.CreateOutStream(outS, TextEncoding::UTF16);
+            Rec.Base64Data.CreateOutStream(outS, TextEncoding::UTF8);
             outS.WriteText(EftBase64Data);
+        end;
+    end;
+
+    trigger OnAfterGetRecord()
+    var
+        InStr: InStream;
+        buffer: Text;
+    begin
+        Clear(EftBase64Data);
+        if Rec.Base64Data.HasValue() then begin
+            Rec.CalcFields(Rec.Base64Data);
+            Rec.Base64Data.CreateInStream(InStr);
+            while not InStr.EOS do begin
+                if (InStr.ReadText(buffer) > 0) then
+                    EftBase64Data += buffer;
+            end;
         end;
     end;
 }
