@@ -216,6 +216,14 @@ page 6151245 "NPR Retail Setup RC"
                     ToolTip = 'View or edit the EFT BIN Groups';
                     ApplicationArea = NPRRetail;
                 }
+                action("NP Pay Setup")
+                {
+                    Caption = 'NP Pay Setup';
+                    RunObject = Page "NPR Adyen Setup";
+
+                    Tooltip = 'View or edit the NP Pay Setup';
+                    ApplicationArea = NPRRetail;
+                }
             }
             group("Coupons & Vouchers")
             {
