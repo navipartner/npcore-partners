@@ -43,6 +43,13 @@
             Caption = 'Default POS Payment Bin';
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Payment Bin";
+            trigger OnValidate()
+            var
+                CannotChangePaymentBinWhileOpenErr: Label 'You cannot change Default POS Payment Bin while POS unit status is set to "Open"';
+            begin
+                if (Rec."Default POS Payment Bin" <> xRec."Default POS Payment Bin") and (Rec.Status = Rec.Status::OPEN) then
+                    Error(CannotChangePaymentBinWhileOpenErr);
+            end;
         }
         field(20; Status; Option)
         {
