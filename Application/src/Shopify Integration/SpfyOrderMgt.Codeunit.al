@@ -769,8 +769,12 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         Company: Text;
         SellToName: Text;
         BillingAddress: JsonToken;
+        IsHandled: Boolean;
     begin
-        FindCustomer(NpEcStore, Order, Customer);
+        IsHandled := false;
+        SpfyIntegrationEvents.OnBeforeFindCustomer(Order, Customer, SalesHeader, IsHandled);
+        if not IsHandled then
+            FindCustomer(NpEcStore, Order, Customer);
         SalesHeader.Validate("Sell-to Customer No.", Customer."No.");
 
         if Order.SelectToken('billing_address', BillingAddress) then begin

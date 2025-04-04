@@ -30,5 +30,12 @@ codeunit 6184805 "NPR Spfy Integration Public"
     begin
         exit(SpfyItemMgt.GetShopifyPictureUrl(SpfyStoreItemLink));
     end;
+
+    procedure ExecuteShopifyGraphQLRequest(var NcTask: Record "NPR Nc Task"; CheckIntegrationIsEnabled: Boolean; var ShopifyResponse: JsonToken) Success: Boolean
+    var
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+    begin
+        Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, CheckIntegrationIsEnabled, ShopifyResponse);
+    end;
 }
 #endif
