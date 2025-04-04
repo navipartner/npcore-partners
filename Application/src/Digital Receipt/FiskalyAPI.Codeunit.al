@@ -151,13 +151,12 @@ codeunit 6184663 "NPR Fiskaly API"
 
         POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSEntrySalesLine.SetLoadFields("No.", Description, "Description 2", "VAT %", "Amount Incl. VAT (LCY)", "Line Amount", "Line Dsc. Amt. Incl. VAT (LCY)", "Unit Price", "Amount Incl. VAT", "Line Discount Amount Incl. VAT", Type, "Amount Excl. VAT", Quantity);
-        if not POSEntrySalesLine.FindSet() then
-            exit;
-        Clear(LinesJsonArray);
-        repeat
-            CreateReceiptLineJSON(POSEntry, POSEntrySalesLine, TotalDiscountValue, LinesJsonArray);
-        until POSEntrySalesLine.Next() = 0;
-
+        if POSEntrySalesLine.FindSet() then begin
+            Clear(LinesJsonArray);
+            repeat
+                CreateReceiptLineJSON(POSEntry, POSEntrySalesLine, TotalDiscountValue, LinesJsonArray);
+            until POSEntrySalesLine.Next() = 0;
+        end;
 
         CreateReceiptPaymentAmountsJSON(POSEntry, TotalPOSPaymentAmount, DataJsonObject, PaymentTypeJsonArray);
 
