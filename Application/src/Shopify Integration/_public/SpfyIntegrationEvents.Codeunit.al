@@ -127,5 +127,10 @@ codeunit 6184824 "NPR Spfy Integration Events"
     internal procedure OnAfterGenerateVariantJObject(ItemVariant: Record "Item Variant"; var VariantJObject: JsonObject)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterUpdateAllowBackorder(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; Allow: Boolean)
+    begin
+    end;
 }
 #endif

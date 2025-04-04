@@ -33,6 +33,11 @@ table 6151028 "NPR Spfy Item Variant Modif."
             Caption = 'Not Available in Shopify';
             DataClassification = CustomerContent;
         }
+        field(110; "Allow Backorder"; Boolean)
+        {
+            Caption = 'Allow Backorder';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {
@@ -42,12 +47,5 @@ table 6151028 "NPR Spfy Item Variant Modif."
         }
         key(NotAvailabe; "Not Available") { }
     }
-
-    trigger OnRename()
-    var
-        RecordCannotBeRenamedErr: Label '%1 record cannot be renamed.';
-    begin
-        Error(RecordCannotBeRenamedErr, Rec.TableCaption);
-    end;
 }
 #endif

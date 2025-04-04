@@ -51,6 +51,11 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
                     ToolTip = 'Specifies whether the item has been requested to be integrated with the Shopify store.';
                     ApplicationArea = NPRShopify;
                     Editable = ItemListIntegrationIsEnabled;
+
+                    trigger OnValidate()
+                    begin
+                        CheckIntegrationIsEnabled();
+                    end;
                 }
                 field("Synchronization Is Enabled"; Rec."Synchronization Is Enabled")
                 {
@@ -179,6 +184,19 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
                         SpfyMetafieldMgt.ShowEntitySyncedMetafields(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy Metafield Owner Type"::PRODUCTVARIANT);
                     end;
                 }
+                field("Allow Backorder"; AllowBackorder)
+                {
+                    Caption = 'Allow Backorder';
+                    ToolTip = 'Specifies whether the item can still be sold on Shopify when it is out of stock. If the item has variants, this field must be set separately for each variant.';
+                    ApplicationArea = NPRShopify;
+                    Editable = ItemListIntegrationIsEnabled;
+
+                    trigger OnValidate()
+                    begin
+                        CheckIntegrationIsEnabled();
+                        SpfyItemMgt.SetAllowBackorder(SpfyStoreItemVariantLink, AllowBackorder, false);
+                    end;
+                }
                 field("Shopify Inventory Item ID"; SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy ID Type"::"Inventory Item ID"))
                 {
                     Caption = 'Shopify Inventory Item ID';
@@ -279,12 +297,14 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         SpfyStoreItemVariantLink: Record "NPR Spfy Store-Item Link";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
         SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
+        AllowBackorder: Boolean;
         ItemListIntegrationIsEnabled: Boolean;
+        ItemIntegrIsNotEnabledErr: Label 'Item integration is not enabled for the store. You cannot adjust this parameter.';
 
     trigger OnOpenPage()
-    var
-        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
     begin
         ItemListIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::Items);
     end;
@@ -299,12 +319,19 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
             SpfyStoreItemLink.Type := SpfyStoreItemLink.Type::Item;
             SpfyStoreItemLink."Variant Code" := '';
         end;
+        AllowBackorder := SpfyItemMgt.AllowBackorder(SpfyStoreItemVariantLink);
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
         Clear(SpfyStoreItemLink);
         Clear(SpfyStoreItemVariantLink);
+    end;
+
+    local procedure CheckIntegrationIsEnabled()
+    begin
+        if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items, Rec."Shopify Store Code") then
+            Error(ItemIntegrIsNotEnabledErr);
     end;
 }
 #endif

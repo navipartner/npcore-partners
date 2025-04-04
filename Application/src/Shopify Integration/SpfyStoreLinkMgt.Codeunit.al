@@ -149,7 +149,7 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
 #else
     [EventSubscriber(ObjectType::Table, Database::Item, OnAfterDeleteEvent, '', false, false)]
 #endif
-    local procedure Item_RemoveAssignedShopifyID(var Rec: Record Item; RunTrigger: Boolean)
+    local procedure Item_RemoveStoreLinks(var Rec: Record Item; RunTrigger: Boolean)
     var
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
     begin
@@ -216,6 +216,38 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
             SendItemAndInventory.ClearVariantShopifyIDs(SpfyStoreItemVariantLink);
             SpfyItemMgt.RemoveShopifyItemVariantModification(SpfyStoreItemVariantLink);
         until ShopifyStore.Next() = 0;
+    end;
+
+#if BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Table, Database::"Item Variant", 'OnAfterInsertEvent', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::"Item Variant", OnAfterInsertEvent, '', false, false)]
+#endif
+    local procedure ItemVariant_UpdateStoreLink(var Rec: Record "Item Variant"; RunTrigger: Boolean)
+    var
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        SpfyStoreItemVariantLink: Record "NPR Spfy Store-Item Link";
+        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        SpfyStoreItemLink.SetRange(Type, SpfyStoreItemLink.Type::Item);
+        SpfyStoreItemLink.SetRange("Item No.", Rec."Item No.");
+        SpfyStoreItemLink.SetRange("Variant Code", '');
+        if SpfyStoreItemLink.IsEmpty() then
+            exit;
+        SpfyStoreItemLink.SetAutoCalcFields("Allow Backorder");
+        SpfyStoreItemLink.FindSet();
+        repeat
+            if SpfyStoreItemLink."Allow Backorder" then begin
+                SpfyStoreItemVariantLink.Type := SpfyStoreItemVariantLink.Type::"Variant";
+                SpfyStoreItemVariantLink."Item No." := Rec."Item No.";
+                SpfyStoreItemVariantLink."Variant Code" := Rec."Code";
+                SpfyStoreItemVariantLink."Shopify Store Code" := SpfyStoreItemLink."Shopify Store Code";
+                SpfyItemMgt.SetAllowBackorder(SpfyStoreItemVariantLink, SpfyStoreItemLink."Allow Backorder", true);
+            end;
+        until SpfyStoreItemLink.Next() = 0;
     end;
     #endregion
 }

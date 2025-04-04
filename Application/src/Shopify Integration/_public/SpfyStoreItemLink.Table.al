@@ -83,6 +83,13 @@ table 6150811 "NPR Spfy Store-Item Link"
             Caption = 'Shopify Status';
             DataClassification = CustomerContent;
         }
+        field(150; "Allow Backorder"; Boolean)
+        {
+            Caption = 'Allow Backorder';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = lookup("NPR Spfy Item Variant Modif."."Allow Backorder" where("Item No." = field("Item No."), "Variant Code" = field("Variant Code"), "Shopify Store Code" = field("Shopify Store Code")));
+        }
     }
     keys
     {

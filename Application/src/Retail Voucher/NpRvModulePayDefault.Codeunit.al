@@ -194,8 +194,7 @@
         NpRvSalesLineNew."Reference No." := TempNpRvVoucher."Reference No.";
         NpRvSalesLineNew.Description := TempNpRvVoucher.Description;
         NpRvSalesLineNew.Validate("Customer No.", SalesHeader."Sell-to Customer No.");
-        if (not NpRvSalesLineNew."Send via Print") and (not NpRvSalesLineNew."Send via SMS") and (NpRvSalesLineNew."E-mail" <> '') then
-            NpRvSalesLineNew."Send via E-mail" := true;
+        NpRvSalesLineNew.UpdateIsSendViaEmail();
         NpRvSalesLineNew.Insert(true);
 
         NpRvSalesDocMgt.InsertNpRVSalesLineReference(NpRvSalesLineNew, TempNpRvVoucher);
@@ -309,8 +308,7 @@
         NpRvSalesLineNew."Reference No." := TempNpRvVoucher."Reference No.";
         NpRvSalesLineNew.Description := TempNpRvVoucher.Description;
         NpRvSalesLineNew.Validate("Customer No.", SalesHeader."Sell-to Customer No.");
-        if (not NpRvSalesLineNew."Send via Print") and (not NpRvSalesLineNew."Send via SMS") and (NpRvSalesLineNew."E-mail" <> '') then
-            NpRvSalesLineNew."Send via E-mail" := true;
+        NpRvSalesLineNew.UpdateIsSendViaEmail();
         NpRvSalesLineNew.Insert(true);
 
         NpRvSalesDocMgt.InsertNpRVSalesLineReference(NpRvSalesLineNew, TempNpRvVoucher);

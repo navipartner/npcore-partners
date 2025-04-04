@@ -113,7 +113,10 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
         NcTask."Not Before Date-Time" := NotBeforeDateTime;
 
         NcTask2.SetCurrentKey(Type, "Table No.", "Record Position");
-        NcTask2.SetRange(Type, NcTask.Type);
+        if NcTask.Type = NcTask.Type::Modify then
+            NcTask2.SetRange(Type, NcTask.Type::Insert, NcTask.Type::Modify)
+        else
+            NcTask2.SetRange(Type, NcTask.Type);
         NcTask2.SetRange("Table No.", NcTask."Table No.");
         NcTask2.SetRange(Processed, false);
         NcTask2.SetRange("Task Processor Code", NcTask."Task Processor Code");

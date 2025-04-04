@@ -37,14 +37,29 @@ page 6184565 "NPR Spfy Item Variant IDs Subp"
                     trigger OnValidate()
                     var
                         ConfirmRemovalQst: Label 'Are you sure you want to mark the item variant as not available in the Shopify store? The item variant will be removed from the store.';
-                        ItemIntegrIsNotEnabledErr: Label 'Item integration is not enabled for the store. You cannot adjust this parameter.';
                     begin
+                        TestRequiredFields();
                         if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items, SpfyStoreItemVariantLink."Shopify Store Code") then
                             Error(ItemIntegrIsNotEnabledErr);
                         if NotAvailableInShopify then
                             if not Confirm(ConfirmRemovalQst, false) then
                                 Error('');
                         SpfyItemMgt.SetItemVariantAsNotAvailableInShopify(SpfyStoreItemVariantLink, NotAvailableInShopify);
+                        CurrPage.Update(false);
+                    end;
+                }
+                field("Allow Backorder"; AllowBackorder)
+                {
+                    Caption = 'Allow Backorder';
+                    ToolTip = 'Specifies whether the item variant can still be sold on Shopify when it is out of stock.';
+                    ApplicationArea = NPRShopify;
+
+                    trigger OnValidate()
+                    begin
+                        TestRequiredFields();
+                        if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items, SpfyStoreItemVariantLink."Shopify Store Code") then
+                            Error(ItemIntegrIsNotEnabledErr);
+                        SpfyItemMgt.SetAllowBackorder(SpfyStoreItemVariantLink, AllowBackorder, false);
                         CurrPage.Update(false);
                     end;
                 }
@@ -93,8 +108,10 @@ page 6184565 "NPR Spfy Item Variant IDs Subp"
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
+        AllowBackorder: Boolean;
         NotAvailableInShopify: Boolean;
         ItemIntegrIsEnabled: Boolean;
+        ItemIntegrIsNotEnabledErr: Label 'Item integration is not enabled for the store. You cannot adjust this parameter.';
 
     trigger OnOpenPage()
     begin
@@ -105,6 +122,7 @@ page 6184565 "NPR Spfy Item Variant IDs Subp"
     begin
         SpfyStoreItemVariantLink."Shopify Store Code" := Rec."Shopify Store Code";
         NotAvailableInShopify := SpfyItemMgt.ItemVariantNotAvailableInShopify(SpfyStoreItemVariantLink);
+        AllowBackorder := SpfyItemMgt.AllowBackorder(SpfyStoreItemVariantLink);
     end;
 
     procedure SetItemVariant(ItemVariant: Record "Item Variant")
