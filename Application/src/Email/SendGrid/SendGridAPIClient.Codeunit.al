@@ -9,8 +9,10 @@ codeunit 6248263 "NPR SendGrid API Client"
      * https://www.twilio.com/docs/sendgrid/api-reference/users-api/update-a-users-profile
      */
     [TryFunction]
+    [NonDebuggable]
     internal procedure TryUpdateProfile(AccountId: Integer; ProfileUpdate: JsonObject)
     var
+        Account: Record "NPR NP Email Account";
         Client: HttpClient;
         Content: HttpContent;
         ContentHeaders: HttpHeaders;
@@ -24,6 +26,8 @@ codeunit 6248263 "NPR SendGrid API Client"
         BufText: Text;
         FailedToUpdateProfileErr: Label 'Failed to update NP Email account profile.\Status code: %1\Body: %2', Comment = '%1 = http status code, %2 = response body';
     begin
+        Account.Get(AccountId);
+
         ProfileUpdate.WriteTo(RequestTxt);
         Content.WriteFrom(RequestTxt);
         Content.GetHeaders(ContentHeaders);
@@ -31,9 +35,9 @@ codeunit 6248263 "NPR SendGrid API Client"
         SetHeader(ContentHeaders, 'Content-Type', 'application/json');
 
         RequestMsg.Content := Content;
-        RequestMsg.SetRequestUri(GetBaseUrl() + '/v3/user/profile');
+        RequestMsg.SetRequestUri(GetBaseUrl(Account) + '/v3/user/profile');
         RequestMsg.GetHeaders(RequestHeaders);
-        SetHeader(RequestHeaders, 'Authorization', StrSubstNo('Bearer %1', GetAuthorizationValue(AccountId)));
+        SetHeader(RequestHeaders, 'Authorization', StrSubstNo('Bearer %1', Account.GetApiKey()));
         RequestMsg.Method := 'PATCH';
 
         Client.Send(RequestMsg, ResponseMsg);
@@ -196,24 +200,22 @@ codeunit 6248263 "NPR SendGrid API Client"
     local procedure GenerateClient(AccountId: Integer): HttpClient
     var
         Client: HttpClient;
+        Account: Record "NPR NP Email Account";
     begin
-        Client.SetBaseAddress(GetBaseUrl());
-        Client.DefaultRequestHeaders().Add('Authorization', StrSubstNo('Bearer %1', GetAuthorizationValue(AccountId)));
+        Account.Get(AccountId);
+        Client.SetBaseAddress(GetBaseUrl(Account));
+        Client.DefaultRequestHeaders().Add('Authorization', StrSubstNo('Bearer %1', Account.GetApiKey()));
         exit(Client);
     end;
 
-    local procedure GetBaseUrl(): Text
+    local procedure GetBaseUrl(Account: Record "NPR NP Email Account"): Text
     begin
-        exit('https://api.sendgrid.com');
-    end;
-
-    [NonDebuggable]
-    local procedure GetAuthorizationValue(AccountId: Integer): Text
-    var
-        NPEmailAccount: Record "NPR NP Email Account";
-    begin
-        NPEmailAccount.Get(AccountId);
-        exit(NPEmailAccount.GetApiKey());
+        case Account.AccountRegion of
+            "NPR SendGridAccountRegion"::GLOBAL:
+                exit('https://api.sendgrid.com');
+            "NPR SendGridAccountRegion"::EU:
+                exit('https://api.eu.sendgrid.com');
+        end;
     end;
 
     local procedure SetHeader(Headers: HttpHeaders; HeaderName: Text; HeaderValue: Text)

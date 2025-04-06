@@ -37,6 +37,11 @@ table 6151033 "NPR NP Email Account"
             Caption = 'Company Name';
             DataClassification = CustomerContent;
         }
+        field(7; AccountRegion; Enum "NPR SendGridAccountRegion")
+        {
+            Caption = 'Account Region';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

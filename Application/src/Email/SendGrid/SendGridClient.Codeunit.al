@@ -81,6 +81,7 @@ codeunit 6248264 "NPR SendGrid Client"
 
         NPEmailAccount.Init();
         NPEmailAccount.AccountId := JHelper.GetJBigInteger(TempToken, 'user_id', true);
+        NPEmailAccount.AccountRegion := TextToRegion(JHelper.GetJText(TempToken, 'region', true));
 #pragma warning disable AA0139
         NPEmailAccount.Username := AccountName;
 #pragma warning restore AA0139
@@ -106,6 +107,7 @@ codeunit 6248264 "NPR SendGrid Client"
                 .AddProperty('entra_id', EnvironmentIdentifier)
                 .AddProperty('email', NPEmailAccount.BillingEmail)
                 .AddProperty('password', GenerateRandomPassword(24))
+                .AddProperty('region', RegionToText(NPEmailAccount.AccountRegion))
             .EndObject();
 
         Content.WriteFrom(Json.BuildAsText());
@@ -352,6 +354,28 @@ codeunit 6248264 "NPR SendGrid Client"
         if (Headers.Contains(HeaderName)) then
             Headers.Remove(HeaderName);
         Headers.Add(HeaderName, HeaderValue);
+    end;
+
+    local procedure RegionToText(Region: Enum "NPR SendGridAccountRegion"): Text
+    begin
+        case Region of
+            Region::GLOBAL:
+                exit('global');
+            Region::EU:
+                exit('eu');
+        end;
+    end;
+
+    local procedure TextToRegion(RegionText: Text) Region: Enum "NPR SendGridAccountRegion"
+    begin
+        case RegionText.ToLower() of
+            'global':
+                exit(Region::GLOBAL);
+            'eu':
+                exit(Region::EU);
+        end;
+
+        exit(Region::GLOBAL);
     end;
     #endregion
 }
