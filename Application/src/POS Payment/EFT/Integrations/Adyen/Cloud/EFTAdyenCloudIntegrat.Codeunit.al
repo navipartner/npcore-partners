@@ -119,7 +119,7 @@
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
     begin
         EFTAdyenintegration.GetPaymentTypeParameters(EFTSetupIn, EFTAdyenPaymentTypeSetup);
-        exit(EFTAdyenPaymentTypeSetup."API Key");
+        exit(EFTAdyenPaymentTypeSetup.GetApiKey());
     end;
 
     procedure GetEnvironment(EFTSetupIn: Record "NPR EFT Setup"): Integer

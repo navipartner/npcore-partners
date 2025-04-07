@@ -1374,7 +1374,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                 exit(false);
             end;
 
-            HttpClient.DefaultRequestHeaders.Add('x-api-key', _AdyenSetup."Download Report API Key");
+            HttpClient.DefaultRequestHeaders.Add('x-api-key', _AdyenSetup.GetDownloadReportApiKey());
             HttpClient.Get(ReportWebhookRequest."Report Download URL", HttpResponseMessage);
             if (HttpResponseMessage.IsSuccessStatusCode()) then begin
                 HttpContent := HttpResponseMessage.Content();

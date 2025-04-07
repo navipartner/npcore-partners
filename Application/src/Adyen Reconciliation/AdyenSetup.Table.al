@@ -28,9 +28,11 @@ table 6150801 "NPR Adyen Setup"
                 WebService: Record "Web Service Aggregate";
                 AdyenManagement: Codeunit "NPR Adyen Management";
                 WebServiceManagement: Codeunit "Web Service Management";
+                ManagmentApiKeyErr: Label 'Management API Key must have a value in NP Pay Setup';
             begin
                 WebServiceManagement.CreateTenantWebService(WebService."Object Type"::Codeunit, Codeunit::"NPR AF Rec. API Request", 'AdyenWebhook', "Enable Reconciliation");
-                TestField("Management API Key");
+                if not Rec.HasManagementAPIKey() then
+                    Error(ManagmentApiKeyErr);
                 AdyenManagement.UpdateMerchantList(0);
             end;
         }
@@ -47,10 +49,12 @@ table 6150801 "NPR Adyen Setup"
                 AdyenTrMatchingSession: Codeunit "NPR Adyen Tr. Matching Session";
                 ReportReadyEventFilter: Label 'REPORT_AVAILABLE', Locked = true;
                 AdyenWebhookType: Enum "NPR Adyen Webhook Type";
+                ManagmentApiKeyErr: Label 'Management API Key must have a value in NP Pay Setup';
             begin
                 AdyenTrMatchingSession.SetupReconciliationTaskProcessingJobQueue("Enable Reconcil. Automation");
                 if "Enable Reconcil. Automation" then begin
-                    TestField("Management API Key");
+                    if not Rec.HasManagementAPIKey() then
+                        Error(ManagmentApiKeyErr);
                     AdyenManagement.UpdateMerchantList(0);
 
                     if MerchantAccount.FindSet() and WebhookSetup.IsEmpty() then
@@ -78,19 +82,29 @@ table 6150801 "NPR Adyen Setup"
         {
             DataClassification = CustomerContent;
             Caption = 'Management API Key';
-
-            trigger OnValidate()
-            var
-                AdyenManagement: Codeunit "NPR Adyen Management";
-            begin
-                if "Management API Key" <> '' then
-                    AdyenManagement.TestApiKey("Management API Key", "Environment Type");
-            end;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-04-02';
+            ObsoleteReason = 'Replaced with Isolated Storage Management API Key Token';
+        }
+        field(45; "Management API Key Token"; Guid)
+        {
+            Caption = 'Management API Key';
+            DataClassification = CustomerContent;
+            ExtendedDatatype = Masked;
         }
         field(50; "Download Report API Key"; Text[2048])
         {
             DataClassification = CustomerContent;
             Caption = 'Download Report API Key';
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-04-02';
+            ObsoleteReason = 'Replaced with Isolated Storage Download Report API Key Token';
+        }
+        field(55; "Download Report API Key Token"; Guid)
+        {
+            Caption = 'Download Report API Key';
+            DataClassification = CustomerContent;
+            ExtendedDatatype = Masked;
         }
         field(60; "Active Webhooks"; Integer)
         {
@@ -337,5 +351,80 @@ table 6150801 "NPR Adyen Setup"
                 AdyenManagement.SetOnHoldPayByLinkStatusJQ();
             AdyenManagement.SetOnHoldPostPaymentLinesJQ();
         end;
+    end;
+
+    trigger OnDelete()
+    var
+    begin
+        DeleteManagementAPIKey();
+        DeleteDownloadReportAPIKey();
+    end;
+
+    [NonDebuggable]
+    internal procedure GetManagementApiKey() ApiKeyValue: Text
+    begin
+        IsolatedStorage.Get("Management API Key Token", DataScope::Company, ApiKeyValue);
+    end;
+
+    [NonDebuggable]
+    internal procedure SetManagementAPIKey(NewApiKeyValue: Text)
+    begin
+        if (IsNullGuid(Rec."Management API Key Token")) then
+            Rec."Management API Key Token" := CreateGuid();
+
+        if (EncryptionEnabled()) then
+            IsolatedStorage.SetEncrypted(Rec."Management API Key Token", NewApiKeyValue, DataScope::Company)
+        else
+            IsolatedStorage.Set(Rec."Management API Key Token", NewApiKeyValue, DataScope::Company);
+    end;
+
+    internal procedure DeleteManagementAPIKey()
+    begin
+        if (IsNullGuid(Rec."Management API Key Token")) then
+            exit;
+
+        IsolatedStorage.Delete(Rec."Management API Key Token", DataScope::Company);
+    end;
+
+    internal procedure HasManagementAPIKey(): Boolean
+    begin
+        if (IsNullGuid(Rec."Management API Key Token")) then
+            exit(false);
+
+        exit(IsolatedStorage.Contains(Rec."Management API Key Token", DataScope::Company));
+    end;
+
+    [NonDebuggable]
+    internal procedure GetDownloadReportApiKey() ApiKeyValue: Text
+    begin
+        IsolatedStorage.Get("Download Report API Key Token", DataScope::Company, ApiKeyValue);
+    end;
+
+    [NonDebuggable]
+    internal procedure SetDownloadReportAPIKey(NewApiKeyValue: Text)
+    begin
+        if (IsNullGuid(Rec."Download Report API Key Token")) then
+            Rec."Download Report API Key Token" := CreateGuid();
+
+        if (EncryptionEnabled()) then
+            IsolatedStorage.SetEncrypted(Rec."Download Report API Key Token", NewApiKeyValue, DataScope::Company)
+        else
+            IsolatedStorage.Set(Rec."Download Report API Key Token", NewApiKeyValue, DataScope::Company);
+    end;
+
+    internal procedure DeleteDownloadReportAPIKey()
+    begin
+        if (IsNullGuid(Rec."Download Report API Key Token")) then
+            exit;
+
+        IsolatedStorage.Delete(Rec."Download Report API Key Token", DataScope::Company);
+    end;
+
+    internal procedure HasDownloadReportAPIKey(): Boolean
+    begin
+        if (IsNullGuid(Rec."Download Report API Key Token")) then
+            exit(false);
+
+        exit(IsolatedStorage.Contains(Rec."Download Report API Key Token", DataScope::Company));
     end;
 }

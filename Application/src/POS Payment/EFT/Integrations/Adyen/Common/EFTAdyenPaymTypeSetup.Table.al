@@ -17,6 +17,9 @@
             Caption = 'API Key';
             DataClassification = CustomerContent;
             ExtendedDatatype = Masked;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-04-02';
+            ObsoleteReason = 'Replaced with Isolated Storage API Key Token';
         }
         field(3; Environment; Option)
         {
@@ -121,6 +124,12 @@
             Caption = 'Enable Tipping';
             DataClassification = CustomerContent;
         }
+        field(21; "API Key Token"; Guid)
+        {
+            Caption = 'API Key';
+            DataClassification = CustomerContent;
+            ExtendedDatatype = Masked;
+        }
     }
 
     keys
@@ -147,5 +156,45 @@
         KeyMaterial.WriteValue(Rec."Local Key Version");
         KeyMaterial.WriteEndObject(); //root
         exit(KeyMaterial.GetJSonAsText());
+    end;
+
+    trigger OnDelete()
+    var
+    begin
+        DeleteAPIKey();
+    end;
+
+    [NonDebuggable]
+    internal procedure GetApiKey() ApiKeyValue: Text
+    begin
+        IsolatedStorage.Get("API Key Token", DataScope::Company, ApiKeyValue);
+    end;
+
+    [NonDebuggable]
+    internal procedure SetAPIKey(NewApiKeyValue: Text)
+    begin
+        if (IsNullGuid(Rec."API Key Token")) then
+            Rec."API Key Token" := CreateGuid();
+
+        if (EncryptionEnabled()) then
+            IsolatedStorage.SetEncrypted(Rec."API Key Token", NewApiKeyValue, DataScope::Company)
+        else
+            IsolatedStorage.Set(Rec."API Key Token", NewApiKeyValue, DataScope::Company);
+    end;
+
+    internal procedure DeleteAPIKey()
+    begin
+        if (IsNullGuid(Rec."API Key Token")) then
+            exit;
+
+        IsolatedStorage.Delete(Rec."API Key Token", DataScope::Company);
+    end;
+
+    internal procedure HasAPIKey(): Boolean
+    begin
+        if (IsNullGuid(Rec."API Key Token")) then
+            exit(false);
+
+        exit(IsolatedStorage.Contains(Rec."API Key Token", DataScope::Company));
     end;
 }

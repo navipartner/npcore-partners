@@ -38,11 +38,24 @@ page 6184531 "NPR Adyen Setup"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Environment Type.';
                 }
-                field("Management API Key"; Rec."Management API Key")
+                field(ManagementAPIKey; _APIManagementSecretKey)
                 {
+                    Caption = 'API Key';
+                    ToolTip = 'Specifies the value of the Management API Key field';
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the Management API Key.';
                     ExtendedDatatype = Masked;
+                    trigger OnValidate()
+                    var
+                        AdyenManagement: Codeunit "NPR Adyen Management";
+                    begin
+                        if (_APIManagementSecretKey = '') then
+                            Rec.DeleteManagementAPIKey()
+                        else begin
+                            Rec.SetManagementAPIKey(_APIManagementSecretKey);
+                            if Rec.HasManagementAPIKey() then
+                                AdyenManagement.TestApiKey(Rec."Environment Type");
+                        end;
+                    end;
                 }
             }
             group(Reconciliation)
@@ -68,11 +81,20 @@ page 6184531 "NPR Adyen Setup"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Indicates the date and time when the reconciliation posting process began operation.';
                 }
-                field("Download Report API Key"; Rec."Download Report API Key")
+                field(DownloadReportAPIKey; _APIDownloadReportSecretKey)
                 {
+                    Caption = 'Download Report API Key';
+                    ToolTip = 'Specifies the value of the API Key field';
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the Download Report API Key.';
                     ExtendedDatatype = Masked;
+                    trigger OnValidate()
+                    begin
+                        if (_APIDownloadReportSecretKey = '') then
+                            Rec.DeleteDownloadReportAPIKey()
+                        else
+                            Rec.SetDownloadReportAPIKey(_APIDownloadReportSecretKey);
+                    end;
+
                 }
                 field("Post Chargebacks Automatically"; Rec."Post Chargebacks Automatically")
                 {
@@ -312,12 +334,20 @@ page 6184531 "NPR Adyen Setup"
         Rec.CalcFields("Active Webhooks");
         _IsSaaS := not EnvironmentInformation.IsOnPrem();
 
-        if Rec."Management API Key" <> '' then
-            _AdyenManagement.TestApiKey(Rec."Management API Key", Rec."Environment Type");
+        if (Rec.HasManagementAPIKey()) then
+            _APIManagementSecretKey := '***';
+
+        if (Rec.HasDownloadReportAPIKey()) then
+            _APIDownloadReportSecretKey := '***';
+
+        if Rec.HasManagementAPIKey() then
+            _AdyenManagement.TestApiKey(Rec."Environment Type");
     end;
 
     var
         _AdyenGenericSetup: Record "NPR Adyen Setup";
         _AdyenManagement: Codeunit "NPR Adyen Management";
         _IsSaaS: Boolean;
+        _APIManagementSecretKey: Text;
+        _APIDownloadReportSecretKey: Text;
 }

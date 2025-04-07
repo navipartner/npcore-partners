@@ -59,11 +59,20 @@
                 Caption = 'Cloud Integration';
                 Visible = _IsCloud;
 
-                field("API Key"; Rec."API Key")
+                field(APISecretKey; _APISecretKey)
                 {
-
+                    Caption = 'API Key';
                     ToolTip = 'Specifies the value of the API Key field';
                     ApplicationArea = NPRRetail;
+                    ExtendedDatatype = Masked;
+                    trigger OnValidate()
+                    begin
+                        if (_APISecretKey = '') then
+                            Rec.DeleteAPIKey()
+                        else
+                            Rec.SetAPIKey(_APISecretKey);
+                    end;
+
                 }
                 field(Environment; Rec.Environment)
                 {
@@ -105,11 +114,21 @@
             {
                 Caption = 'Tap-To-Pay (TTP)';
                 Visible = _IsTapToPay;
-                field("API Key TTP"; Rec."API Key")
-                {
 
+                field("API Key TTP"; _APISecretKey)
+                {
                     ToolTip = 'Specifies the value of the API Key field';
+                    Caption = 'API Key TTP';
                     ApplicationArea = NPRRetail;
+                    ExtendedDatatype = Masked;
+
+                    trigger OnValidate()
+                    begin
+                        if (_APISecretKey = '') then
+                            Rec.DeleteAPIKey()
+                        else
+                            Rec.SetAPIKey(_APISecretKey);
+                    end;
                 }
 
                 field("TTP: EncKey Id"; Rec."Local Key Identifier")
@@ -205,9 +224,16 @@
         SetLocal();
     end;
 
+    trigger OnAfterGetRecord()
+    begin
+        if (Rec.HasAPIKey()) then
+            _APISecretKey := '***';
+    end;
+
 
     var
         _IsCloud: Boolean;
         _IsLocalOrMposLan: Boolean;
         _IsTapToPay: Boolean;
+        _APISecretKey: Text;
 }

@@ -21,7 +21,7 @@ codeunit 6184796 "NPR Adyen Management"
         if not InitiateAdyenManagement() then
             exit;
 
-        HttpClient.DefaultRequestHeaders().Add('x-api-key', _AdyenSetup."Management API Key");
+        HttpClient.DefaultRequestHeaders().Add('x-api-key', _AdyenSetup.GetManagementApiKey());
         RequestURL := GetManagementAPIURL(_AdyenSetup."Environment Type") + GetMerchantsEndpoint + '?pageSize=100';
         if PageNumber > 0 then
             RequestURL += '&pageNumber=' + Format(PageNumber)
@@ -669,9 +669,12 @@ codeunit 6184796 "NPR Adyen Management"
     #region Initiate
     [TryFunction]
     local procedure InitiateAdyenManagement()
+    var
+        ManagmentApiKeyErr: Label 'Management API Key must have a value in NP Pay Setup';
     begin
         _AdyenSetup.GetRecordOnce();
-        _AdyenSetup.TestField("Management API Key");
+        if not _AdyenSetup.HasManagementAPIKey() then
+            Error(ManagmentApiKeyErr);
         _AdyenSetup.TestField("Company ID");
     end;
 
@@ -702,13 +705,14 @@ codeunit 6184796 "NPR Adyen Management"
         HttpResponseMessage: HttpResponseMessage;
         ResponseText: Text;
     begin
-        if _AdyenSetup."Management API Key" = '' then
+        if not _AdyenSetup.HasManagementAPIKey() then
             exit;
+
         Clear(HttpRequestMessage);
         HttpContent.GetHeaders(HttpHeaders);
         HttpHeaders.Clear();
         HttpHeaders.Add('Content-Type', 'text/json; charset="utf-8"');
-        HttpHeaders.Add('x-api-key', _AdyenSetup."Management API Key");
+        HttpHeaders.Add('x-api-key', _AdyenSetup.GetManagementApiKey());
 
         if (RequestText <> '') and (not (Method in [Enum::"Http Request Type"::GET])) then
             HttpContent.WriteFrom(RequestText);
@@ -785,7 +789,8 @@ codeunit 6184796 "NPR Adyen Management"
             Page.Run(Page::"NPR Adyen Reconciliation Logs", Logs);
     end;
 
-    internal procedure TestApiKey(ManagementAPIKey: Text[2048]; EnvironmentType: Enum "NPR Adyen Environment Type")
+    [NonDebuggable]
+    internal procedure TestApiKey(EnvironmentType: Enum "NPR Adyen Environment Type")
     var
         RequestURL: Text;
         GetCompaniesEndpoint: Label '/companies', Locked = true;
@@ -795,14 +800,18 @@ codeunit 6184796 "NPR Adyen Management"
         HttpRequestMessage: HttpRequestMessage;
         HttpResponseMessage: HttpResponseMessage;
         ManagementKeyIsNotValidLbl: Label 'Management API key is not valid. Please update the Management API key.';
+        NPPaySetup: Record "NPR Adyen Setup";
     begin
+        if not NPPaySetup.Get() then
+            exit;
+
         RequestURL := GetManagementAPIURL(EnvironmentType) + GetCompaniesEndpoint;
 
         Clear(HttpRequestMessage);
         HttpContent.GetHeaders(HttpHeaders);
         HttpHeaders.Clear();
         HttpHeaders.Add('Content-Type', 'text/json; charset="utf-8"');
-        HttpHeaders.Add('x-api-key', ManagementAPIKey);
+        HttpHeaders.Add('x-api-key', NPPaySetup.GetManagementApiKey());
 
         HttpRequestMessage.Content := HttpContent;
         HttpRequestMessage.SetRequestUri(RequestUrl);
@@ -1137,7 +1146,7 @@ codeunit 6184796 "NPR Adyen Management"
     begin
         InitiateAdyenManagement();
 
-        HttpClient.DefaultRequestHeaders().Add('x-api-key', _AdyenSetup."Download Report API Key");
+        HttpClient.DefaultRequestHeaders().Add('x-api-key', _AdyenSetup.GetDownloadReportApiKey());
         if Live then
             ReportDownloadURLString := StrSubstNo(ReportDownloadURL, MerchantAccount, LiveURL)
         else

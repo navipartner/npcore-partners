@@ -61,7 +61,7 @@ page 6150838 "NPR EFT Adyen Unit Setup"
                             Message(PayParameterNotFoundLbl);
                             exit(false);
                         end;
-                        if (EFTAdyenPaymTypeSetup."API Key" = '') then begin
+                        if not EFTAdyenPaymTypeSetup.HasAPIKey() then begin
                             Message(NeedApiKeyLbl);
                             exit(false);
                         end;
@@ -72,7 +72,7 @@ page 6150838 "NPR EFT Adyen Unit Setup"
                         if not (AdyenStoreAPI.GetMerchantStoresIdAndNames(
                             EFTAdyenPaymTypeSetup.Environment = EFTAdyenPaymTypeSetup.Environment::TEST,
                             EFTAdyenPaymTypeSetup."Merchant Account",
-                            EFTAdyenPaymTypeSetup."API Key",
+                            EFTAdyenPaymTypeSetup.GetApiKey(),
                             Stores)) then begin
                             Message(StrSubstNo(StoreLookupErrLbl, GetLastErrorText()));
                             exit(false);
