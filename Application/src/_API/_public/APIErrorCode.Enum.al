@@ -148,6 +148,10 @@ enum 6059810 "NPR API Error Code"
     {
         Caption = 'The ticket reservation has no tickets.', Locked = true;
     }
+    value(6060041; ticket_is_rejected_by_profile)
+    {
+        Caption = 'The ticket was actively rejected by a profile rule.', Locked = true;
+    }
     value(6060133; member_blocked)
     {
         Caption = 'Member is blocked.', Locked = true;

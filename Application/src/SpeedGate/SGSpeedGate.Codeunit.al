@@ -928,13 +928,14 @@ codeunit 6185130 "NPR SG SpeedGate"
         TicketProfileLine: Record "NPR SG TicketProfileLine";
         Ticket: Record "NPR TM Ticket";
         TicketBom: Record "NPR TM Ticket Admission BOM";
+        AdmissionCode: Code[20];
+        RejectedAdmitToCodes: List of [Code[20]];
 
         AdmissionLocalTime: DateTime;
         LocalTime: Time;
         LocalDate: Date;
         TimeHelper: Codeunit "NPR TM TimeHelper";
-        IsPermittedAdmission: Boolean;
-
+        IsRuleValid: Boolean;
     begin
         Ticket.SetCurrentKey("External Ticket No.");
         Ticket.SetFilter("External Ticket No.", '=%1', CopyStr(UpperCase(Number), 1, MaxStrLen(Ticket."External Ticket No.")));
@@ -964,14 +965,14 @@ codeunit 6185130 "NPR SG SpeedGate"
             TicketProfileLine.SetFilter(RuleType, '=%1', TicketProfileLine.RuleType::ALLOW);
             if (TicketProfileLine.FindSet()) then
                 repeat
-                    IsPermittedAdmission := true; // Assume working hours
+                    IsRuleValid := true; // Assume working hours
                     if (TicketProfileLine.CalendarCode <> '') then
-                        IsPermittedAdmission := not (CheckAdmissionIsNonWorking(TicketBom."Admission Code", TicketProfileLine.CalendarCode, LocalDate));
+                        IsRuleValid := not (CheckAdmissionIsNonWorking(TicketBom."Admission Code", TicketProfileLine.CalendarCode, LocalDate));
 
                     if (TicketProfileLine.PermitFromTime <> 0T) and (TicketProfileLine.PermitUntilTime <> 0T) then
-                        IsPermittedAdmission := IsPermittedAdmission and (LocalTime >= TicketProfileLine.PermitFromTime) and (LocalTime <= TicketProfileLine.PermitUntilTime);
+                        IsRuleValid := IsRuleValid and (LocalTime >= TicketProfileLine.PermitFromTime) and (LocalTime <= TicketProfileLine.PermitUntilTime);
 
-                    if (IsPermittedAdmission) then begin
+                    if (IsRuleValid) then begin
                         if (not AdmitToCodes.Contains(TicketBom."Admission Code")) then
                             AdmitToCodes.Add(TicketBom."Admission Code");
                         ProfileLineId := TicketProfileLine.SystemId;
@@ -998,6 +999,38 @@ codeunit 6185130 "NPR SG SpeedGate"
             if (TicketProfile.ValidationMode = TicketProfile.ValidationMode::STRICT) then
                 exit(SetApiError(_ApiErrors::ticket_not_allowed));
         end;
+
+        foreach AdmissionCode in AdmitToCodes do begin
+            AdmissionLocalTime := TimeHelper.GetLocalTimeAtAdmission(TicketBom."Admission Code");
+            LocalTime := DT2Time(AdmissionLocalTime);
+            LocalDate := DT2Date(AdmissionLocalTime);
+
+            TicketProfileLine.SetFilter(Code, '=%1', TicketProfileCode);
+            TicketProfileLine.SetFilter(ItemNo, '=%1', Ticket."Item No.");
+            TicketProfileLine.SetFilter(RuleType, '=%1', TicketProfileLine.RuleType::REJECT);
+            TicketProfileLine.SetFilter(AdmissionCode, '=%1', AdmissionCode);
+            if (TicketProfileLine.IsEmpty()) then
+                TicketProfileLine.SetFilter(AdmissionCode, '=%1', '');
+
+            if (TicketProfileLine.FindFirst()) then begin
+                IsRuleValid := true;
+                if (TicketProfileLine.CalendarCode <> '') then
+                    IsRuleValid := not (CheckAdmissionIsNonWorking(TicketBom."Admission Code", TicketProfileLine.CalendarCode, LocalDate));
+
+                if (TicketProfileLine.PermitFromTime <> 0T) and (TicketProfileLine.PermitUntilTime <> 0T) then
+                    IsRuleValid := IsRuleValid and (LocalTime >= TicketProfileLine.PermitFromTime) and (LocalTime <= TicketProfileLine.PermitUntilTime);
+
+                if (IsRuleValid) then
+                    RejectedAdmitToCodes.Add(AdmissionCode);
+            end;
+        end;
+
+        foreach AdmissionCode in RejectedAdmitToCodes do
+            if (AdmitToCodes.Contains(AdmissionCode)) then
+                AdmitToCodes.Remove(AdmissionCode);
+
+        if (AdmitToCodes.Count = 0) then
+            exit(SetApiError(_ApiErrors::ticket_is_rejected_by_profile));
 
         TicketId := Ticket.SystemId;
         exit(true);

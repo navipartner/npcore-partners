@@ -48,23 +48,12 @@ table 6150984 "NPR SG TicketProfileLine"
         field(45; PermitFromTime; Time)
         {
             DataClassification = CustomerContent;
-            Caption = 'Permit From Time';
-            trigger OnValidate()
-            begin
-                if (Rec.RuleType = Rec.RuleType::REJECT) then
-                    Error(RequiresPermitRule);
-            end;
+            Caption = 'From Time';
         }
         field(46; PermitUntilTime; Time)
         {
             DataClassification = CustomerContent;
-            Caption = 'Permit Until Time';
-            trigger OnValidate()
-            begin
-                if (Rec.RuleType = Rec.RuleType::REJECT) then
-                    Error(RequiresPermitRule);
-            end;
-
+            Caption = 'Until Time';
         }
         field(100; RuleType; Option)
         {
@@ -72,7 +61,6 @@ table 6150984 "NPR SG TicketProfileLine"
             Caption = 'Rule Type';
             OptionMembers = ALLOW,REJECT;
             OptionCaption = 'Allow,Reject';
-            Editable = false;
             InitValue = ALLOW;
         }
     }
@@ -92,9 +80,6 @@ table 6150984 "NPR SG TicketProfileLine"
             Caption = 'Ticket Profiles for Speedgate';
         }
     }
-
-    var
-        RequiresPermitRule: Label 'Permit Time cannot be set when Rule Type is Deny';
 
     trigger OnInsert()
     var

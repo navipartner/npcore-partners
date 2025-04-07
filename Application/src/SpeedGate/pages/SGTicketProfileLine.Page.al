@@ -31,7 +31,6 @@ page 6184896 "NPR SG TicketProfileLine"
                 {
                     ToolTip = 'Specifies the value of the Rule Type field.', Comment = '%';
                     ApplicationArea = NPRRetail;
-                    Editable = false;
                 }
                 field(Description; Rec.Description)
                 {
@@ -68,4 +67,26 @@ page 6184896 "NPR SG TicketProfileLine"
             }
         }
     }
+
+    trigger OnInsertRecord(BelowxRec: Boolean): Boolean
+    begin
+        ValidateRejectRule();
+    end;
+
+    trigger OnModifyRecord(): Boolean
+    begin
+        ValidateRejectRule();
+    end;
+
+    local procedure ValidateRejectRule()
+    var
+        RequiredForRejectRule: Label 'The field %1 is required for a reject rule.';
+    begin
+        if (Rec.RuleType <> Rec.RuleType::REJECT) then
+            exit;
+
+        if (Rec.ItemNo = '') then
+            Error(RequiredForRejectRule, Rec.FieldCaption(ItemNo));
+
+    end;
 }
