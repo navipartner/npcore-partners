@@ -27,6 +27,7 @@ codeunit 6185053 "NPR API Response"
         AddHeader('Content-Type', 'application/json');
         AddHeader('x-npr-version', GetNPRetailVersion(), true);
         AddHeader('x-bc-platform-version', ApplicationSystemConstants.PlatformProductVersion(), true);
+        AddHeader('x-bc-user-id', UserSecurityId(), true);
         exit(_CurrCodeunit);
     end;
     #endregion
