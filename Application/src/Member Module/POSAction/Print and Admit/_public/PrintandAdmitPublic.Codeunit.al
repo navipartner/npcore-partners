@@ -21,6 +21,13 @@ codeunit 6150689 "NPR Print and Admit Public"
         POSActionPrintandAdmit.ResolveWallet(ReferenceNo, PrintandAdmitBuffer);
     end;
 
+    procedure ResolveWallet(ReferenceNo: Text; var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer" temporary; AdmissionCode: Code[20])
+    var
+        POSActionPrintandAdmit: Codeunit "NPR POS Action Print and Admit";
+    begin
+        POSActionPrintandAdmit.ResolveWallet(ReferenceNo, PrintandAdmitBuffer, AdmissionCode);
+    end;
+
     procedure ResolveTicketRequest(ReferenceNo: Text; var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer" temporary)
     var
         POSActionPrintandAdmit: Codeunit "NPR POS Action Print and Admit";

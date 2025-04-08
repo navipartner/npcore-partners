@@ -12,11 +12,14 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
         ReferenceCaptionLbl: Label 'Enter Reference No.';
         ReferenceTitleLbl: Label 'Print & Admit by reference';
         ReferenceInputLbl: Label 'Reference Input';
+        ShowDataLbl: Label 'Show Data';
+        ShowDataDescrLbl: Label 'Shows the data that is going to be printed and/or admitted';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddTextParameter('AdmissionCode', '', AdmissionCode_CptLbl, AdmissionCode_DescLbl);
         WorkflowConfig.AddTextParameter('ScannerId', '', ScannerId_CptLbl, ScannerId_DescLbl);
+        WorkflowConfig.AddBooleanParameter('ShowData', false, ShowDataLbl, ShowDataDescrLbl);
         WorkflowConfig.AddTextParameter('reference_input', '', ReferenceInputLbl, ReferenceInputLbl);
         WorkflowConfig.AddLabel('ReferenceTitle', ReferenceTitleLbl);
         WorkflowConfig.AddLabel('ReferenceCaption', ReferenceCaptionLbl);
@@ -37,11 +40,15 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
         PrintandAdmitBuffer: Record "NPR Print and Admit Buffer";
         PrintandAdmitPublic: Codeunit "NPR Print and Admit Public";
         ReferenceNo: Text;
-        NoDataFoundErr: label 'No data found for the reference';
+        AdmissionCode: Code[20];
+        NoDataFoundErr: Label 'No data found for the reference';
     begin
+#pragma warning disable AA0139
+        AdmissionCode := Context.GetStringParameter('AdmissionCode');
+#pragma warning disable AA0139
         ReferenceNo := Context.GetString('reference_input');
         if ReferenceNo <> '' then
-            ResolveReferenceNo(ReferenceNo, PrintandAdmitBuffer);
+            ResolveReferenceNo(ReferenceNo, PrintandAdmitBuffer, AdmissionCode);
         PrintandAdmitPublic.OnGetDataForReference(ReferenceNo, PrintandAdmitBuffer);
         if PrintandAdmitBuffer.IsEmpty then
             error(NoDataFoundErr);
@@ -53,10 +60,13 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
         PrintandAdmitBuffer: Record "NPR Print and Admit Buffer";
         PrintandAdmitPublic: Codeunit "NPR Print and Admit Public";
         JArray: JsonArray;
+        ShowDataPrintAdmit: Boolean;
     begin
         JArray := Context.GetJToken('buffer_data').AsArray();
         JsonToBufferTable(JArray, PrintandAdmitBuffer);
-        ShowData(PrintandAdmitBuffer);
+        ShowDataPrintAdmit := Context.GetBooleanParameter('ShowData');
+        if ShowDataPrintAdmit then
+            ShowData(PrintandAdmitBuffer);
         if PrintandAdmitBuffer.IsEmpty then
             exit;
         PrintandAdmitPublic.OnBeforeHandleBuffer(PrintandAdmitBuffer);
@@ -74,11 +84,11 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
         PrintandAdmit.GetTable(PrintandAdmitBuffer);
     end;
 
-    local procedure ResolveReferenceNo(ReferenceNo: Text; var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer" temporary)
+    local procedure ResolveReferenceNo(ReferenceNo: Text; var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer" temporary; AdmissionCode: Code[20])
     begin
         ResolveTicket(ReferenceNo, PrintandAdmitBuffer);
         ResolveMemberCard(ReferenceNo, PrintandAdmitBuffer);
-        ResolveWallet(ReferenceNo, PrintandAdmitBuffer);
+        ResolveWallet(ReferenceNo, PrintandAdmitBuffer, AdmissionCode);
         ResolveTicketRequest(ReferenceNo, PrintandAdmitBuffer);
     end;
 
@@ -130,7 +140,7 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
         PrintandAdmitBuffer.Insert();
     end;
 
-    internal procedure ResolveWallet(ReferenceNo: Text; var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer" temporary)
+    internal procedure ResolveWallet(ReferenceNo: Text; var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer" temporary; AdmissionCode: Code[20])
     var
         AttractionWallet: Record "NPR AttractionWallet";
         WalletExternalReference: Record "NPR AttractionWalletExtRef";
@@ -161,6 +171,51 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
         AttractionWallet.SetFilter(ExpirationDate, '=%1|<=%2', 0DT, CurrentDateTime());
         if not AttractionWallet.FindFirst() then
             exit;
+
+        AddWalletAssetLinesToBuffer(AttractionWallet, PrintandAdmitBuffer, AdmissionCode);
+    end;
+
+    internal procedure ResolveWallet(ReferenceNo: Text; var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer" temporary)
+    var
+        AttractionWallet: Record "NPR AttractionWallet";
+    begin
+        if StrLen(ReferenceNo) > MaxStrLen(AttractionWallet.ReferenceNumber) then
+            exit;
+        AttractionWallet.SetRange(ReferenceNumber, UpperCase(ReferenceNo));
+        AttractionWallet.SetFilter(ExpirationDate, '=%1|<=%2', 0DT, CurrentDateTime());
+        if not AttractionWallet.FindFirst() then
+            exit;
+
+        AddWalletAssetLinesToBuffer(AttractionWallet, PrintandAdmitBuffer, '');
+    end;
+
+    local procedure AddWalletAssetLinesToBuffer(AttractionWallet: Record "NPR AttractionWallet"; var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer" temporary; AdmissionCode: Code[20])
+    var
+        WalletAssetLine: Record "NPR WalletAssetLine";
+        Ticket: Record "NPR TM Ticket";
+        WalletAgent: Codeunit "NPR AttractionWallet";
+        SGSpeedGate: Codeunit "NPR SG SpeedGate";
+        AdmitToCodes: List of [Code[20]];
+        TicketId: Guid;
+        ProfileLineId: Guid;
+        ReferenceNumberIdentified: Boolean;
+    begin
+        WalletAssetLine.SetFilter(TransactionId, '=%1', WalletAgent.GetWalletTransactionId(AttractionWallet.EntryNo));
+        WalletAssetLine.SetFilter(Type, '=%1', Enum::"NPR WalletLineType"::Ticket);
+        if (not WalletAssetLine.FindSet()) then
+            exit;
+        repeat
+            if (SGSpeedGate.CheckForTicket('', WalletAssetLine.LineTypeReference, AdmissionCode, TicketId, AdmitToCodes, ProfileLineId, ReferenceNumberIdentified)) then
+                if not PrintandAdmitBuffer.Get(PrintandAdmitBuffer.Type::ATTRACTION_WALLET, WalletAssetLine.LineTypeSystemId) then begin
+                    PrintandAdmitBuffer.Init();
+                    PrintandAdmitBuffer.Type := PrintandAdmitBuffer.Type::ATTRACTION_WALLET;
+                    PrintandAdmitBuffer."System Id" := WalletAssetLine.LineTypeSystemId;
+                    Ticket.GetBySystemId(WalletAssetLine.LineTypeSystemId);
+                    PrintandAdmitBuffer."Visual Id" := Ticket."External Ticket No.";
+                    SetPrintAdmit(Ticket."Item No.", PrintandAdmitBuffer.Print, PrintandAdmitBuffer.Admit);
+                    PrintandAdmitBuffer.Insert();
+                end;
+        until (WalletAssetLine.Next() = 0);
 
         PrintandAdmitBuffer.Init();
         PrintandAdmitBuffer.Type := PrintandAdmitBuffer.Type::ATTRACTION_WALLET;
@@ -289,13 +344,13 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
 
     local procedure PrintWallet(PrintandAdmitBuffer: Record "NPR Print and Admit Buffer")
     var
-        AttractionWallet: Record "NPR AttractionWallet";
-        WalletMgr: Codeunit "NPR AttractionWallet";
+        Ticket: Record "NPR TM Ticket";
+        TMTicketManagement: Codeunit "NPR TM Ticket Management";
     begin
         if not (PrintandAdmitBuffer.Print and (PrintandAdmitBuffer.Type = PrintandAdmitBuffer.Type::ATTRACTION_WALLET)) then
             exit;
-        if AttractionWallet.GetBySystemId(PrintandAdmitBuffer."System Id") then
-            WalletMgr.PrintWallet(AttractionWallet.EntryNo, Enum::"NPR WalletPrintType"::WALLET);
+        if Ticket.GetBySystemId(PrintandAdmitBuffer."System Id") then
+            TMTicketManagement.DoTicketPrint(Ticket);
     end;
 
     local procedure AdmitTicket(PrintandAdmitBuffer: Record "NPR Print and Admit Buffer"; AdmissionCode: Code[20]; ScannerId: Code[10])
@@ -322,13 +377,13 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
 
     local procedure AdmitWallet(var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer"; AdmissionCode: Code[20]; ScannerId: Code[10])
     var
-        AttractionWallet: Record "NPR AttractionWallet";
+        Ticket: Record "NPR TM Ticket";
         SpeedGate: Codeunit "NPR SG SpeedGate";
     begin
         if not (PrintandAdmitBuffer.Admit and (PrintandAdmitBuffer.Type = PrintandAdmitBuffer.Type::ATTRACTION_WALLET)) then
             exit;
-        if attractionWallet.GetBySystemId(PrintandAdmitBuffer."System Id") then
-            SpeedGate.Admit(SpeedGate.CreateAdmitToken(AttractionWallet.ReferenceNumber, AdmissionCode, ScannerId), 1);
+        if Ticket.GetBySystemId(PrintandAdmitBuffer."System Id") then
+            SpeedGate.Admit(SpeedGate.CreateAdmitToken(Ticket."External Ticket No.", AdmissionCode, ScannerId), 1);
     end;
 
     local procedure BufferTableToJson(var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer") Array: JsonArray

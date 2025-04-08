@@ -901,7 +901,7 @@ codeunit 6185130 "NPR SG SpeedGate"
 
     end;
 
-    local procedure CheckForTicket(TicketProfileCode: Code[10]; Number: Text[100]; SuggestedAdmissionCode: Code[20]; var TicketId: Guid; var AdmitToCodes: List of [Code[20]]; var ProfileLineId: Guid; var NumberIdentified: Boolean): Boolean
+    internal procedure CheckForTicket(TicketProfileCode: Code[10]; Number: Text[100]; SuggestedAdmissionCode: Code[20]; var TicketId: Guid; var AdmitToCodes: List of [Code[20]]; var ProfileLineId: Guid; var NumberIdentified: Boolean): Boolean
     var
         TicketProfile: Record "NPR SG TicketProfile";
         TicketProfileLine: Record "NPR SG TicketProfileLine";
