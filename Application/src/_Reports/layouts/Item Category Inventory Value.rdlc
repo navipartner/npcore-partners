@@ -7,7 +7,6 @@
         <DataProvider>SQL</DataProvider>
         <ConnectString />
       </ConnectionProperties>
-      <rd:SecurityType>None</rd:SecurityType>
       <rd:DataSourceID>059290cb-10a3-4a5b-9012-de040660f0cd</rd:DataSourceID>
     </DataSource>
   </DataSources>
@@ -19,16 +18,31 @@
             <TablixBody>
               <TablixColumns>
                 <TablixColumn>
-                  <Width>4.65463cm</Width>
+                  <Width>3.37551cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>3.93168cm</Width>
+                  <Width>3.82657cm</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>1.95658cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>2.0661cm</Width>
+                  <Width>1.94341cm</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>2.13139cm</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>2.14894cm</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>1.97369cm</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>1.95617cm</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>1.78702cm</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>2.13139cm</Width>
@@ -38,18 +52,6 @@
                 </TablixColumn>
                 <TablixColumn>
                   <Width>2.13139cm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>2.13139cm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>2.13139cm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>2.13139cm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>2.19668cm</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -259,6 +261,42 @@
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>Textbox6</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox3">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Sum(Fields!Item_NetChange.Value, "ItemCategory", Recursive)</Value>
+                                  <Style>
+                                    <FontFamily>Segoe UI</FontFamily>
+                                    <FontSize>6.5pt</FontSize>
+                                    <FontWeight>Bold</FontWeight>
+                                    <Format>0.00</Format>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Right</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox3</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -663,6 +701,41 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
+                        <Textbox Name="Textbox4">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!Item_NetChange.Value</Value>
+                                  <Style>
+                                    <FontFamily>Segoe UI</FontFamily>
+                                    <FontSize>6.5pt</FontSize>
+                                    <Format>0.00</Format>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Right</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox4</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
                         <Textbox Name="Textbox23">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
@@ -1009,6 +1082,42 @@
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>Textbox137</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox5">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Sum(Fields!Item2_NetChange.Value)</Value>
+                                  <Style>
+                                    <FontFamily>Segoe UI</FontFamily>
+                                    <FontSize>6.5pt</FontSize>
+                                    <FontWeight>Bold</FontWeight>
+                                    <Format>0.00</Format>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Right</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox5</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -1413,6 +1522,41 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
+                        <Textbox Name="Textbox9">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Fields!Item2_NetChange.Value</Value>
+                                  <Style>
+                                    <FontFamily>Segoe UI</FontFamily>
+                                    <FontSize>6.5pt</FontSize>
+                                    <Format>0.00</Format>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Right</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox9</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
                         <Textbox Name="Textbox229">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
@@ -1763,6 +1907,50 @@
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>Textbox119</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                            <TopBorder>
+                              <Style>Solid</Style>
+                            </TopBorder>
+                            <BottomBorder>
+                              <Color>Black</Color>
+                              <Style>Solid</Style>
+                              <Width>1pt</Width>
+                            </BottomBorder>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
+                        <Textbox Name="Textbox10">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>=Sum(Fields!Item_NetChange.Value) + Sum(Fields!Item2_NetChange.Value)</Value>
+                                  <Style>
+                                    <FontFamily>Segoe UI</FontFamily>
+                                    <FontSize>7pt</FontSize>
+                                    <FontWeight>Bold</FontWeight>
+                                    <Format>0.00</Format>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Right</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox10</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -2206,6 +2394,40 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
+                        <Textbox Name="Textbox13">
+                          <CanGrow>true</CanGrow>
+                          <KeepTogether>true</KeepTogether>
+                          <Paragraphs>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value />
+                                  <Style>
+                                    <FontFamily>Segoe UI</FontFamily>
+                                    <FontSize>6.5pt</FontSize>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Right</TextAlign>
+                              </Style>
+                            </Paragraph>
+                          </Paragraphs>
+                          <rd:DefaultName>Textbox13</rd:DefaultName>
+                          <Style>
+                            <Border>
+                              <Style>None</Style>
+                            </Border>
+                            <PaddingLeft>2pt</PaddingLeft>
+                            <PaddingRight>2pt</PaddingRight>
+                            <PaddingTop>2pt</PaddingTop>
+                            <PaddingBottom>2pt</PaddingBottom>
+                          </Style>
+                        </Textbox>
+                      </CellContents>
+                    </TablixCell>
+                    <TablixCell>
+                      <CellContents>
                         <Textbox Name="Textbox30">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
@@ -2361,6 +2583,7 @@
                 <TablixMember />
                 <TablixMember />
                 <TablixMember />
+                <TablixMember />
               </TablixMembers>
             </TablixColumnHierarchy>
             <TablixRowHierarchy>
@@ -2370,15 +2593,6 @@
                     <GroupExpressions>
                       <GroupExpression>=Fields!ItemCategory_Code.Value</GroupExpression>
                     </GroupExpressions>
-                    <Filters>
-                      <Filter>
-                        <FilterExpression>=Sum(Fields!Item_InventoryValue.Value, "ItemCategory", Recursive)</FilterExpression>
-                        <Operator>GreaterThan</Operator>
-                        <FilterValues>
-                          <FilterValue DataType="Integer">0</FilterValue>
-                        </FilterValues>
-                      </Filter>
-                    </Filters>
                     <Parent>=Fields!ItemCategory_ParentCategory.Value</Parent>
                   </Group>
                   <SortExpressions>
@@ -2422,15 +2636,6 @@
                     <GroupExpressions>
                       <GroupExpression>=Fields!ItemCategory2_Code.Value</GroupExpression>
                     </GroupExpressions>
-                    <Filters>
-                      <Filter>
-                        <FilterExpression>=Sum(Fields!Item2_InventoryValue.Value)</FilterExpression>
-                        <Operator>GreaterThan</Operator>
-                        <FilterValues>
-                          <FilterValue DataType="Integer">0</FilterValue>
-                        </FilterValues>
-                      </Filter>
-                    </Filters>
                   </Group>
                   <SortExpressions>
                     <SortExpression>
@@ -2468,7 +2673,7 @@
             <Top>0.17896cm</Top>
             <Left>0cm</Left>
             <Height>2.82894cm</Height>
-            <Width>27.59401cm</Width>
+            <Width>27.49345cm</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -2479,7 +2684,7 @@
         <Height>3.0079cm</Height>
         <Style />
       </Body>
-      <Width>27.59401cm</Width>
+      <Width>27.49345cm</Width>
       <Page>
         <PageHeader>
           <Height>5.26014cm</Height>
@@ -2505,7 +2710,7 @@
                 </Paragraph>
               </Paragraphs>
               <Top>2.60437cm</Top>
-              <Left>17.77417cm</Left>
+              <Left>17.67362cm</Left>
               <Height>0.47592cm</Height>
               <Width>9.81983cm</Width>
               <Style>
@@ -2556,7 +2761,7 @@
                 </Paragraph>
               </Paragraphs>
               <Top>1.01787cm</Top>
-              <Left>17.77417cm</Left>
+              <Left>17.67362cm</Left>
               <Height>0.47592cm</Height>
               <Width>9.81983cm</Width>
               <ZIndex>2</ZIndex>
@@ -2584,7 +2789,7 @@
                 </Paragraph>
               </Paragraphs>
               <Top>1.5467cm</Top>
-              <Left>17.77417cm</Left>
+              <Left>17.67362cm</Left>
               <Height>0.47592cm</Height>
               <Width>9.81983cm</Width>
               <ZIndex>3</ZIndex>
@@ -2612,7 +2817,7 @@
                 </Paragraph>
               </Paragraphs>
               <Top>2.07554cm</Top>
-              <Left>17.77417cm</Left>
+              <Left>17.67362cm</Left>
               <Height>0.47592cm</Height>
               <Width>9.81983cm</Width>
               <ZIndex>4</ZIndex>
@@ -2696,7 +2901,7 @@
               <rd:DefaultName>Textbox4</rd:DefaultName>
               <Top>1.65638in</Top>
               <Height>0.38317in</Height>
-              <Width>1.83253in</Width>
+              <Width>1.32894in</Width>
               <ZIndex>7</ZIndex>
               <Style>
                 <Border>
@@ -2741,9 +2946,9 @@
               </Paragraphs>
               <rd:DefaultName>Textbox24</rd:DefaultName>
               <Top>1.65638in</Top>
-              <Left>1.83253in</Left>
+              <Left>1.32894in</Left>
               <Height>0.38317in</Height>
-              <Width>1.54791in</Width>
+              <Width>1.48582in</Width>
               <ZIndex>8</ZIndex>
               <Style>
                 <Border>
@@ -2788,9 +2993,9 @@
               </Paragraphs>
               <rd:DefaultName>Textbox25</rd:DefaultName>
               <Top>1.65638in</Top>
-              <Left>3.38044in</Left>
+              <Left>2.81477in</Left>
               <Height>0.38317in</Height>
-              <Width>0.77031in</Width>
+              <Width>0.79101in</Width>
               <ZIndex>9</ZIndex>
               <Style>
                 <Border>
@@ -2835,9 +3040,9 @@
               </Paragraphs>
               <rd:DefaultName>Textbox27</rd:DefaultName>
               <Top>1.65638in</Top>
-              <Left>4.15074in</Left>
+              <Left>3.60577in</Left>
               <Height>0.38317in</Height>
-              <Width>0.81342in</Width>
+              <Width>0.76512in</Width>
               <ZIndex>10</ZIndex>
               <Style>
                 <Border>
@@ -2882,9 +3087,9 @@
               </Paragraphs>
               <rd:DefaultName>Textbox186</rd:DefaultName>
               <Top>1.65638in</Top>
-              <Left>4.96417in</Left>
+              <Left>4.37089in</Left>
               <Height>0.38317in</Height>
-              <Width>0.83913in</Width>
+              <Width>0.83914in</Width>
               <ZIndex>11</ZIndex>
               <Style>
                 <Border>
@@ -2929,9 +3134,9 @@
               </Paragraphs>
               <rd:DefaultName>Textbox258</rd:DefaultName>
               <Top>1.65638in</Top>
-              <Left>5.8033in</Left>
+              <Left>5.21003in</Left>
               <Height>0.38317in</Height>
-              <Width>0.83913in</Width>
+              <Width>0.84603in</Width>
               <ZIndex>12</ZIndex>
               <Style>
                 <Border>
@@ -2976,9 +3181,9 @@
               </Paragraphs>
               <rd:DefaultName>Textbox257</rd:DefaultName>
               <Top>1.65638in</Top>
-              <Left>6.64243in</Left>
+              <Left>6.05606in</Left>
               <Height>0.38317in</Height>
-              <Width>0.83913in</Width>
+              <Width>0.77704in</Width>
               <ZIndex>13</ZIndex>
               <Style>
                 <Border>
@@ -3023,9 +3228,9 @@
               </Paragraphs>
               <rd:DefaultName>Textbox64</rd:DefaultName>
               <Top>1.65638in</Top>
-              <Left>7.48156in</Left>
+              <Left>7.60325in</Left>
               <Height>0.38317in</Height>
-              <Width>0.83913in</Width>
+              <Width>0.70355in</Width>
               <ZIndex>14</ZIndex>
               <Style>
                 <Border>
@@ -3070,7 +3275,7 @@
               </Paragraphs>
               <rd:DefaultName>Textbox65</rd:DefaultName>
               <Top>1.65638in</Top>
-              <Left>8.32069in</Left>
+              <Left>8.3068in</Left>
               <Height>0.38317in</Height>
               <Width>0.83913in</Width>
               <ZIndex>15</ZIndex>
@@ -3117,7 +3322,7 @@
               </Paragraphs>
               <rd:DefaultName>Textbox260</rd:DefaultName>
               <Top>1.65638in</Top>
-              <Left>9.15982in</Left>
+              <Left>9.14593in</Left>
               <Height>0.38317in</Height>
               <Width>0.83913in</Width>
               <ZIndex>16</ZIndex>
@@ -3164,10 +3369,57 @@
               </Paragraphs>
               <rd:DefaultName>Textbox68</rd:DefaultName>
               <Top>1.65638in</Top>
-              <Left>9.99895in</Left>
+              <Left>9.98506in</Left>
               <Height>0.38317in</Height>
-              <Width>0.86483in</Width>
+              <Width>0.83913in</Width>
               <ZIndex>17</ZIndex>
+              <Style>
+                <Border>
+                  <Style>None</Style>
+                </Border>
+                <TopBorder>
+                  <Color>Black</Color>
+                  <Style>Solid</Style>
+                  <Width>1pt</Width>
+                </TopBorder>
+                <BottomBorder>
+                  <Color>Black</Color>
+                  <Style>Solid</Style>
+                  <Width>1pt</Width>
+                </BottomBorder>
+                <VerticalAlign>Middle</VerticalAlign>
+                <PaddingLeft>2pt</PaddingLeft>
+                <PaddingRight>2pt</PaddingRight>
+                <PaddingTop>2pt</PaddingTop>
+                <PaddingBottom>2pt</PaddingBottom>
+              </Style>
+            </Textbox>
+            <Textbox Name="Textbox69">
+              <CanGrow>true</CanGrow>
+              <KeepTogether>true</KeepTogether>
+              <Paragraphs>
+                <Paragraph>
+                  <TextRuns>
+                    <TextRun>
+                      <Value>=Parameters!NetChangeCaptionLbl.Value</Value>
+                      <Style>
+                        <FontFamily>Segoe UI</FontFamily>
+                        <FontSize>6.5pt</FontSize>
+                        <FontWeight>Bold</FontWeight>
+                      </Style>
+                    </TextRun>
+                  </TextRuns>
+                  <Style>
+                    <TextAlign>Right</TextAlign>
+                  </Style>
+                </Paragraph>
+              </Paragraphs>
+              <rd:DefaultName>Textbox64</rd:DefaultName>
+              <Top>1.65997in</Top>
+              <Left>6.83311in</Left>
+              <Height>0.37958in</Height>
+              <Width>0.77015in</Width>
+              <ZIndex>18</ZIndex>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -3343,6 +3595,15 @@
       </DefaultValue>
       <Prompt>ProfitPctCaptionLbl</Prompt>
     </ReportParameter>
+    <ReportParameter Name="NetChangeCaptionLbl">
+      <DataType>String</DataType>
+      <DefaultValue>
+        <Values>
+          <Value>NetChangeCaptionLbl</Value>
+        </Values>
+      </DefaultValue>
+      <Prompt>NetChangeCaptionLbl</Prompt>
+    </ReportParameter>
     <ReportParameter Name="TotalCaptionLbl">
       <DataType>String</DataType>
       <DefaultValue>
@@ -3356,7 +3617,7 @@
   <ReportParametersLayout>
     <GridLayoutDefinition>
       <NumberOfColumns>1</NumberOfColumns>
-      <NumberOfRows>16</NumberOfRows>
+      <NumberOfRows>17</NumberOfRows>
       <CellDefinitions>
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
@@ -3436,6 +3697,11 @@
         <CellDefinition>
           <ColumnIndex>0</ColumnIndex>
           <RowIndex>15</RowIndex>
+          <ParameterName>NetChangeCaptionLbl</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>0</ColumnIndex>
+          <RowIndex>16</RowIndex>
           <ParameterName>TotalCaptionLbl</ParameterName>
         </CellDefinition>
       </CellDefinitions>
@@ -3574,6 +3840,12 @@ End Function
         <Field Name="Item_COGSLCYFormat">
           <DataField>Item_COGSLCYFormat</DataField>
         </Field>
+        <Field Name="Item_NetChange">
+          <DataField>Item_NetChange</DataField>
+        </Field>
+        <Field Name="Item_NetChangeFormat">
+          <DataField>Item_NetChangeFormat</DataField>
+        </Field>
         <Field Name="ItemCategory2_Code">
           <DataField>ItemCategory2_Code</DataField>
         </Field>
@@ -3633,6 +3905,12 @@ End Function
         </Field>
         <Field Name="Item2_COGSLCYFormat">
           <DataField>Item2_COGSLCYFormat</DataField>
+        </Field>
+        <Field Name="Item2_NetChange">
+          <DataField>Item2_NetChange</DataField>
+        </Field>
+        <Field Name="Item2_NetChangeFormat">
+          <DataField>Item2_NetChangeFormat</DataField>
         </Field>
       </Fields>
       <Query>

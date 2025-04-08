@@ -28,7 +28,7 @@ report 6014448 "NPR Item Cat. Inv. Value"
 
             dataitem(Item; Item)
             {
-                CalcFields = "Sales (Qty.)", "Sales (LCY)", Inventory, "COGS (LCY)", "Purchases (Qty.)";
+                CalcFields = "Sales (Qty.)", "Sales (LCY)", Inventory, "COGS (LCY)", "Purchases (Qty.)", "Net Change";
                 DataItemLink = "Item Category Code" = field(Code);
                 DataItemTableView = sorting("No.");
                 RequestFilterFields = "Vendor No.", "Global Dimension 1 Filter", "Date Filter";
@@ -44,6 +44,7 @@ report 6014448 "NPR Item Cat. Inv. Value"
                 column(Item_InventoryValue; Inventory * "Last Direct Cost") { }
                 column(Item_Profit; "Sales (LCY)" - "COGS (LCY)") { }
                 column(Item_COGSLCY; "COGS (LCY)") { }
+                column(Item_NetChange; "Net Change") { }
 
                 trigger OnAfterGetRecord()
                 begin
@@ -61,7 +62,7 @@ report 6014448 "NPR Item Cat. Inv. Value"
 
             dataitem(Item2; Item)
             {
-                CalcFields = "Sales (Qty.)", "Purchases (Qty.)", "Sales (LCY)", Inventory, "COGS (LCY)";
+                CalcFields = "Sales (Qty.)", "Purchases (Qty.)", "Sales (LCY)", Inventory, "COGS (LCY)", "Net Change";
                 DataItemTableView = sorting("No.") where("Item Category Code" = const(''));
 
                 column(Item2_No; "No.") { }
@@ -75,6 +76,7 @@ report 6014448 "NPR Item Cat. Inv. Value"
                 column(Item2_InventoryValue; Inventory * "Last Direct Cost") { }
                 column(Item2_Profit; "Sales (LCY)" - "COGS (LCY)") { }
                 column(Item2_COGSLCY; "COGS (LCY)") { }
+                column(Item2_NetChange; "Net Change") { }
 
                 trigger OnAfterGetRecord()
                 begin
@@ -131,6 +133,7 @@ report 6014448 "NPR Item Cat. Inv. Value"
         UnitContributionMarginCaptionLbl = 'Unit Contribution Margin';
         TurnoverRateCaptionLbl = 'Turnover rate';
         ProfitPctCaptionLbl = 'Profit %';
+        NetChangeCaptionLbl = 'Net Change';
         TotalCaptionLbl = 'Total';
     }
 
