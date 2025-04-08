@@ -52,6 +52,7 @@ page 6184531 "NPR Adyen Setup"
                             Rec.DeleteManagementAPIKey()
                         else begin
                             Rec.SetManagementAPIKey(_APIManagementSecretKey);
+                            Rec.Modify();
                             if Rec.HasManagementAPIKey() then
                                 AdyenManagement.TestApiKey(Rec."Environment Type");
                         end;
