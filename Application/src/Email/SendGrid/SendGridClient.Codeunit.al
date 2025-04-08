@@ -315,12 +315,17 @@ codeunit 6248264 "NPR SendGrid Client"
             repeat
                 Json.StartObject()
                         .AddProperty('content', EmailMessage.Attachments_GetContentBase64())
-                        .AddProperty('filename', EmailMessage.Attachments_GetName())
-                        .AddProperty('type', EmailMessage.Attachments_GetContentType());
+                        .AddProperty('filename', EmailMessage.Attachments_GetName());
+
+                if (EmailMessage.Attachments_GetContentType() <> '') then
+                    Json.AddProperty('type', EmailMessage.Attachments_GetContentType());
+
                 if (EmailMessage.Attachments_IsInline()) then
                     Json.AddProperty('disposition', 'inline').AddProperty('content_id', EmailMessage.Attachments_GetContentId())
                 else
                     Json.AddProperty('disposition', 'attachment');
+
+                Json.EndObject();
             until EmailMessage.Attachments_Next() = 0;
             Json.EndArray(); // attachments
         end;
