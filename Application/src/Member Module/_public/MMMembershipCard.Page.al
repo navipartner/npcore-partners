@@ -120,6 +120,26 @@
                     ToolTip = 'Specifies the value of the Auto-Renew Payment Method Code field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field(HasAutoRenewalPaymentMethod; HasAutoRenewalPaymentMethod)
+                {
+                    Caption = 'Has Auto Renewal Payment Method';
+                    ToolTip = 'Specifies if there is a valid payment method set for auto-renewal of this membership.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    OptionCaption = 'Yes,No';
+                    Editable = false;
+                    trigger OnDrillDown()
+                    var
+                        MemberPaymentMethod: Record "NPR MM Member Payment Method";
+                    begin
+                        MemberPaymentMethod.FilterGroup(2);
+                        MemberPaymentMethod.SetRange("Table No.", Database::"NPR MM Membership");
+                        MemberPaymentMethod.SetRange("BC Record ID", Rec.RecordId());
+                        MemberPaymentMethod.SetRange(Default, true);
+                        MemberPaymentMethod.SetRange(Status, MemberPaymentMethod.Status::Active);
+                        MemberPaymentMethod.FilterGroup(0);
+                        Page.Run(0, MemberPaymentMethod);
+                    end;
+                }
                 field("Document ID"; Rec."Document ID")
                 {
 
@@ -1003,6 +1023,7 @@
             exit;
 
         GetMasterDataAttributeValue();
+        GetAutoRenewPaymentMethod();
     end;
 
     trigger OnOpenPage()
@@ -1054,6 +1075,21 @@
         RaptorEnabled: Boolean;
         MEMBERSHIP_EXPIRED: Label 'Expired';
         EXT_NO_CHANGE: Label 'Please note that changing the external number requires re-printing of documents where this number is used. Do you want to continue?';
+        HasAutoRenewalPaymentMethod: Option Yes,No;
+
+    local procedure GetAutoRenewPaymentMethod()
+    var
+        MemberPaymentMethod: Record "NPR MM Member Payment Method";
+    begin
+        HasAutoRenewalPaymentMethod := HasAutoRenewalPaymentMethod::No;
+        MemberPaymentMethod.SetRange("Table No.", Database::"NPR MM Membership");
+        MemberPaymentMethod.SetRange("BC Record ID", Rec.RecordId);
+        MemberPaymentMethod.SetRange(Status, MemberPaymentMethod.Status::Active);
+        MemberPaymentMethod.SetRange(Default, true);
+
+        if MemberPaymentMethod.FindFirst() then
+            HasAutoRenewalPaymentMethod := HasAutoRenewalPaymentMethod::Yes;
+    end;
 
     local procedure AddMembershipMember()
     var
