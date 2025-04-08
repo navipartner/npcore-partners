@@ -156,6 +156,12 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
             DataClassification = CustomerContent;
             TableRelation = "NPR MM Loyalty Sales Channel".Code;
         }
+        field(6151445; "NPR Retail Type"; Code[20])
+        {
+            Caption = 'Retail Type';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR Retail Type";
+        }
 
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         modify("Sell-to Customer No.")

@@ -52,6 +52,7 @@
         PrintProformaInv: Boolean;
         AsyncPosting: Boolean;
         SkipPaymentLineCheck: Boolean;
+        RetailType: Code[20];
         CUSTOMER_CREDIT_CHECK_FAILED: Label 'Customer credit check failed';
 
     procedure SetAsk(AskIn: Boolean)
@@ -203,6 +204,11 @@
     internal procedure SetSkipPaymentLineCheck(SkipPaymentLineCheckIn: Boolean)
     begin
         SkipPaymentLineCheck := SkipPaymentLineCheckIn;
+    end;
+
+    internal procedure SetRetailType(RetailTypeIn: Code[20])
+    begin
+        RetailType := RetailTypeIn;
     end;
 
     procedure ProcessPOSSale(POSSale: Codeunit "NPR POS Sale")
@@ -439,6 +445,9 @@
             SalesHeader."NPR Order Type" := OrderType;
 
         SalesHeader.Validate("Prices Including VAT", SalePOS."Prices Including VAT");
+
+        if RetailType <> '' then
+            SalesHeader.Validate("NPR Retail Type", RetailType);
 
         TransferInfoFromSalePOS(SalePOS, SalesHeader);
         GetImportedFromInvoiceNo(SalePOS, SalesHeader);

@@ -111,6 +111,8 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         CaptionPrintProformaInvoice: Label 'Print Pro Forma Invoice';
         CaptionVoucherTypeCode: Label 'Voucher Type';
         DescVoucherTypeCode: Label 'Specifies Voucher Type';
+        CaptionRetailType: Label 'Retail Type';
+        DescRetailType: Label 'Assigns retail type to the the sales document';
         CaptionAskForVouchers: Label 'Ask for vouchers';
         DescriptionAskForVouchers: Label 'Prompt for scanning a voucher';
         CaptionAskForVoucherType: Label 'Ask for voucher type';
@@ -206,6 +208,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         WorkflowConfig.AddTextParameter('CustomerTableView', '', CaptionCustomerTableView, DescCustomerTableView);
         WorkflowConfig.AddTextParameter('POSPaymentMethodCode', '', CaptionPOSPaymentMethodCode, DescPOSPaymentMethodCode);
         WorkflowConfig.AddTextParameter('VoucherTypeCode', '', CaptionVoucherTypeCode, DescVoucherTypeCode);
+        WorkflowConfig.AddTextParameter('RetailType', '', CaptionRetailType, DescRetailType);
         WorkflowConfig.AddIntegerParameter('CustomerLookupPage', 0, CaptionCustomerLookupPage, DescCustomerLookupPage);
         WorkflowConfig.AddBooleanParameter('EnforceCustomerFilter', false, CaptionEnforceCustomerFilter, DescEnforceCustomerFilter);
         WorkflowConfig.AddBooleanParameter('SetPrintProformaInvoice', false, CaptionPrintProformaInvoice, CaptionPrintProformaInvoice);
@@ -592,6 +595,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         PaymentMethodCodeSource: Option "Sales Header Default","Force Blank Code","Specific Payment Method Code";
         SpecificLocationCode: Code[10];
         PaymentMethodCode: Code[10];
+        RetailType: Code[20];
         PrepaymentIsAmount: Boolean;
         PayAndPost: Boolean;
         FullPosting: Boolean;
@@ -624,6 +628,9 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
             RetailSalesDocMgt.SetShowCreationMessage();
 
         POSSaleLine.CalculateBalance(AmountExclVAT, VATAmount, AmountInclVAT);
+
+        RetailType := CopyStr(Context.GetStringParameter('RetailType'), 1, MaxStrLen(RetailType));
+        RetailSalesDocMgt.SetRetailType(RetailType);
 
         DocumentTypePozitive := Context.GetIntegerParameter('SetDocumentType');
         DocumentTypeNegative := Context.GetIntegerParameter('SetNegBalDocumentType');

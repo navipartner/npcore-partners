@@ -58,6 +58,12 @@ pageextension 6014440 "NPR Sales Order" extends "Sales Order"
                 Visible = false;
                 ToolTip = 'Specifies the value of the Posting No. field.';
             }
+            field("NPR Retail Type"; Rec."NPR Retail Type")
+            {
+                ApplicationArea = NPRRetail;
+                Visible = false;
+                ToolTip = 'Specifies the retail type of the document.';
+            }
         }
 
         addafter(Control85)
