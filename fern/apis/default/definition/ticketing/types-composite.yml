@@ -241,3 +241,53 @@ types:
           allocationModel: "capacity"
           initialCapacity: 1000
           explanation: Ok. 
+
+  TicketAccessEvent:
+    docs: Details of an access event for a ticket
+    properties:
+      event: simpleTypes.TicketAccessEventType
+      eventAt: datetime
+
+  TicketAccessHistory:
+    docs: Details of the access history for a ticket
+    properties:
+      admissionCode: simpleTypes.AdmissionCode
+      firstAdmissionAt: optional<datetime>
+      blocked: boolean
+      events: optional<list<TicketAccessEvent>>
+
+  FindTicketResponse:
+    docs: Response to a find ticket request
+    properties:
+      ticketId: simpleTypes.TicketId
+      ticketNumber: simpleTypes.TicketExternalNumber
+      itemNumber: simpleTypes.ItemNumber
+      validFrom: datetime
+      validUntil: datetime
+      issuedAt: simpleTypes.IssuedAt
+      blocked: boolean
+      unitPrice: simpleTypes.UnitPrice
+      unitPriceInclVat: simpleTypes.UnitPriceInclVat
+      accessHistory: list<TicketAccessHistory>
+    examples:
+      - name: ExampleFindTicketWithDetails
+        value:
+          ticketId: $simpleTypes.TicketId.ExampleTicket1
+          ticketNumber: $simpleTypes.TicketExternalNumber.ExampleTicket1
+          itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
+          validFrom: $simpleTypes.ReferenceDateTime.ExampleValidFrom
+          validUntil: $simpleTypes.ReferenceDateTime.ExampleValidUntil
+          issuedAt: $simpleTypes.IssuedAt.ExampleIssuedAt
+          blocked: false
+          unitPrice: $simpleTypes.UnitPrice.ExampleUnitPrice
+          unitPriceInclVat: $simpleTypes.UnitPriceInclVat.ExampleUnitPrice
+          accessHistory:
+            - admissionCode: CASTLE
+              firstAdmissionAt: "2025-01-31T09:12:00Z"
+              blocked: false
+              events:
+                - event: admitted
+                  eventAt: "2025-01-31T09:12:00Z"
+                - event: departed
+                  eventAt: "2025-01-31T12:47:00Z"
+        

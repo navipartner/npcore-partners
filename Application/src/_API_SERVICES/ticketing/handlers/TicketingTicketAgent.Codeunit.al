@@ -20,21 +20,30 @@ codeunit 6185080 "NPR TicketingTicketAgent"
 
     internal procedure FindTickets(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
+        TicketIdText: Text[50];
         ExternalNumber: Text[30];
         NotificationAddress: Text[100];
+        WithEvents: Boolean;
     begin
+        if (Request.QueryParams().ContainsKey('withEvents')) then
+            WithEvents := (Request.QueryParams().Get('withEvents').ToLower() = 'true');
+
+        if (Request.QueryParams().ContainsKey('ticketId')) then begin
+            TicketIdText := CopyStr(UpperCase(Request.QueryParams().Get('ticketId')), 1, MaxStrLen(TicketIdText));
+            exit(FindTicketByTicketID(TicketIdText, WithEvents));
+        end;
+
         if (Request.QueryParams().ContainsKey('externalNumber')) then begin
             ExternalNumber := CopyStr(UpperCase(Request.QueryParams().Get('externalNumber')), 1, MaxStrLen(ExternalNumber));
-
-            exit(FindTicketByExternalNumber(ExternalNumber));
+            exit(FindTicketByExternalNumber(ExternalNumber, WithEvents));
         end;
 
         if (Request.QueryParams().ContainsKey('notificationAddress')) then begin
-            NotificationAddress := CopyStr(Request.QueryParams().Get('notificationAddress'), 1, MaxStrLen(ExternalNumber));
-
-            exit(FindTicketByNotificationAddress(NotificationAddress));
+            NotificationAddress := CopyStr(Request.QueryParams().Get('notificationAddress'), 1, MaxStrLen(NotificationAddress));
+            exit(FindTicketByNotificationAddress(NotificationAddress, WithEvents));
         end;
 
+        exit(Response.RespondBadRequest('Invalid request - missing query parameter ticketId, externalNumber or notificationAddress'));
     end;
 
     internal procedure RequestRevokeTicket(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
@@ -392,21 +401,40 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         exit(true);
     end;
 
-    local procedure FindTicketByExternalNumber(ExternalNumber: Text[30]) Response: Codeunit "NPR API Response"
+    local procedure FindTicketByTicketID(TicketIdText: Text[50]; WithEvents: Boolean) Response: Codeunit "NPR API Response"
     var
         Ticket: Record "NPR TM Ticket";
+        TicketId: Guid;
         ResponseJson: Codeunit "NPR JSON Builder";
     begin
-        Ticket.SetFilter("External Ticket No.", '=%1', ExternalNumber);
-        if (not Ticket.FindFirst()) then
+        if (not Evaluate(TicketId, TicketIdText)) then
             exit(Response.RespondResourceNotFound('Invalid Ticket - Ticket not found'));
 
-        ResponseJson.StartArray().AddObject(TicketIdDTO(ResponseJson, Ticket)).EndArray();
+        if (not Ticket.GetBySystemId(TicketId)) then
+            exit(Response.RespondResourceNotFound('Invalid Ticket - Ticket not found'));
+
+        ResponseJson.StartArray().AddObject(FindTicketDTO(ResponseJson, Ticket, WithEvents)).EndArray();
 
         exit(Response.RespondOk(ResponseJson.BuildAsArray()));
     end;
 
-    local procedure FindTicketByNotificationAddress(NotificationAddress: Text) Response: Codeunit "NPR API Response"
+
+    local procedure FindTicketByExternalNumber(ExternalNumber: Text[30]; WithEvents: Boolean) Response: Codeunit "NPR API Response"
+    var
+        Ticket: Record "NPR TM Ticket";
+        ResponseJson: Codeunit "NPR JSON Builder";
+    begin
+        Ticket.SetCurrentKey("External Ticket No.");
+        Ticket.SetFilter("External Ticket No.", '=%1', ExternalNumber);
+        if (not Ticket.FindFirst()) then
+            exit(Response.RespondResourceNotFound('Invalid Ticket - Ticket not found'));
+
+        ResponseJson.StartArray().AddObject(FindTicketDTO(ResponseJson, Ticket, WithEvents)).EndArray();
+
+        exit(Response.RespondOk(ResponseJson.BuildAsArray()));
+    end;
+
+    local procedure FindTicketByNotificationAddress(NotificationAddress: Text; WithEvents: Boolean) Response: Codeunit "NPR API Response"
     var
         ReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
@@ -429,6 +457,8 @@ codeunit 6185080 "NPR TicketingTicketAgent"
 
         ReservationRequest.SetCurrentKey("Notification Address");
         ReservationRequest.SetFilter("Notification Address", '%1', CopyStr('@' + NotificationAddress, 1, MaxStrLen(ReservationRequest."Notification Address")));
+        ReservationRequest.SetLoadFields("Notification Address", "Entry No.");
+
         if (not ReservationRequest.FindSet()) then
             exit(Response.RespondResourceNotFound('Invalid notification address - Ticket not found'));
 
@@ -436,9 +466,10 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         repeat
             Ticket.SetCurrentKey("Ticket Reservation Entry No.");
             Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', ReservationRequest."Entry No.");
+            Ticket.SetLoadFields("External Ticket No.", "Item No.", "Valid From Date", "Valid From Time", "Valid To Date", "Valid To Time", "No.", AmountExclVat, AmountInclVat, Blocked, PrintedDateTime, PrintCount, SystemCreatedAt);
             if (Ticket.FindSet()) then begin
                 repeat
-                    ResponseJson.AddObject(TicketIdDTO(ResponseJson, Ticket));
+                    ResponseJson.AddObject(FindTicketDTO(ResponseJson, Ticket, WithEvents));
                 until (Ticket.Next() = 0);
             end;
         until (ReservationRequest.Next() = 0);
@@ -447,7 +478,7 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         exit(Response.RespondOk(ResponseJson.BuildAsArray()));
     end;
 
-    local procedure TicketIdDTO(var ResponseJson: Codeunit "NPR JSON Builder"; Ticket: Record "NPR TM Ticket"): Codeunit "NPR JSON Builder";
+    local procedure FindTicketDTO(var ResponseJson: Codeunit "NPR JSON Builder"; Ticket: Record "NPR TM Ticket"; WithEvents: Boolean): Codeunit "NPR JSON Builder";
     var
         TimeZoneHelper: Codeunit "NPR TM TimeHelper";
     begin
@@ -459,12 +490,58 @@ codeunit 6185080 "NPR TicketingTicketAgent"
             .AddProperty('validFrom', TimeZoneHelper.FormatDateTimeWithAdmissionTimeZone('', Ticket."Valid From Date", Ticket."Valid From Time"))
             .AddProperty('validUntil', TimeZoneHelper.FormatDateTimeWithAdmissionTimeZone('', Ticket."Valid To Date", Ticket."Valid To Time"))
             .AddProperty('issuedAt', TimeZoneHelper.FormatDateTimeWithAdmissionTimeZone('', TimeZoneHelper.AdjustZuluToAdmissionLocalDateTime('', Ticket.SystemCreatedAt)))
+            .AddProperty('blocked', Ticket.Blocked)
             .AddProperty('unitPrice', Ticket.AmountExclVat)
             .AddProperty('unitPriceInclVat', Ticket.AmountInclVat)
+            .AddArray(TicketHistoryDTO(ResponseJson, 'accessHistory', Ticket, WithEvents))
         .EndObject();
 
         exit(ResponseJson);
     end;
+
+    local procedure TicketHistoryDTO(var ResponseJson: Codeunit "NPR JSON Builder"; ArrayName: Text; Ticket: Record "NPR TM Ticket"; WithEvents: Boolean): Codeunit "NPR JSON Builder";
+    var
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        TicketAccessEntryLine: Record "NPR TM Det. Ticket AccessEntry";
+        TimeHelper: Codeunit "NPR TM TimeHelper";
+    begin
+        ResponseJson.StartArray(ArrayName);
+
+        TicketAccessEntry.SetCurrentKey("Ticket No.");
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        TicketAccessEntry.SetLoadFields("Admission Code", "Access Date", "Access Time", Status, "Entry No.");
+        if (TicketAccessEntry.FindSet()) then begin
+            repeat
+                ResponseJson.StartObject()
+                    .AddProperty('admissionCode', TicketAccessEntry."Admission Code")
+                    .AddObject(AddRequiredProperty(ResponseJson, 'firstAdmissionAt', TimeHelper.FormatDateTimeWithAdmissionTimeZone(TicketAccessEntry."Admission Code", TicketAccessEntry."Access Date", TicketAccessEntry."Access Time")))
+                    .AddProperty('blocked', (TicketAccessEntry.Status = TicketAccessEntry.Status::BLOCKED));
+
+                if (WithEvents) then begin
+                    ResponseJson.StartArray('events');
+                    TicketAccessEntryLine.SetCurrentKey("Ticket Access Entry No.", Type);
+                    TicketAccessEntryLine.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
+                    TicketAccessEntryLine.SetFilter(Type, '=%1|=%2|=%3', TicketAccessEntryLine.Type::ADMITTED, TicketAccessEntryLine.Type::CANCELED_ADMISSION, TicketAccessEntryLine.Type::DEPARTED);
+                    TicketAccessEntryLine.SetLoadFields(SystemCreatedAt, Type);
+                    if (TicketAccessEntryLine.FindSet()) then begin
+                        repeat
+                            ResponseJson.StartObject()
+                                .AddProperty('event', AdmissionTypeToText(TicketAccessEntryLine.Type))
+                                .AddProperty('eventAt', TimeHelper.FormatDateTimeWithAdmissionTimeZone(TicketAccessEntry."Admission Code", TimeHelper.AdjustZuluToAdmissionLocalDateTime(TicketAccessEntry."Admission Code", TicketAccessEntryLine.SystemCreatedAt)))
+                                .EndObject();
+                        until (TicketAccessEntryLine.Next() = 0);
+                    end;
+                    ResponseJson.EndArray();
+                end;
+
+                ResponseJson.EndObject();
+            until (TicketAccessEntry.Next() = 0);
+        end;
+
+        ResponseJson.EndArray();
+        exit(ResponseJson);
+    end;
+
 
     internal procedure SingleTicket(Ticket: Record "NPR TM Ticket"; StoreCode: Code[32]) Response: Codeunit "NPR API Response"
     var
@@ -643,6 +720,43 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         exit(ResponseJson);
     end;
 
+    local procedure AdmissionTypeToText(AdmissionType: Option): Text[50]
+    var
+        TicketAccessEntryLine: Record "NPR TM Det. Ticket AccessEntry";
+    begin
+        case AdmissionType of
+            TicketAccessEntryLine.Type::INITIAL_ENTRY:
+                exit('initialEntry');
+            TicketAccessEntryLine.Type::RESERVATION:
+                exit('reservation');
+            TicketAccessEntryLine.Type::ADMITTED:
+                exit('admitted');
+            TicketAccessEntryLine.Type::DEPARTED:
+                exit('departed');
+            TicketAccessEntryLine.Type::CONSUMED:
+                exit('consumed');
+            TicketAccessEntryLine.Type::CANCELED_ADMISSION:
+                exit('canceledAdmission');
+            TicketAccessEntryLine.Type::PAYMENT:
+                exit('payment');
+            TicketAccessEntryLine.Type::PREPAID:
+                exit('prePaid');
+            TicketAccessEntryLine.Type::POSTPAID:
+                exit('postPaid');
+            TicketAccessEntryLine.Type::CANCELED_RESERVATION:
+                exit('canceledReservation');
+            else
+                exit('unknown');
+        end;
+    end;
+
+    local procedure AddRequiredProperty(var ResponseJson: Codeunit "NPR JSON Builder"; PropertyName: Text; PropertyValue: Text): Codeunit "NPR JSON Builder"
+    begin
+        if (PropertyValue = '') then
+            exit(ResponseJson.AddProperty(PropertyName)); // Empty property with null value (not "")
+
+        exit(ResponseJson.AddProperty(PropertyName, PropertyValue));
+    end;
 #pragma warning disable AA0139
     local procedure CreateDocumentId(): Text[50]
     begin

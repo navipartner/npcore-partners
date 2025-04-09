@@ -166,7 +166,7 @@ types:
     docs: The date and time when the ticket was issued
     examples:
       - name: ExampleIssuedAt
-        value: "2024-10-11T12:13:00Z"
+        value: "2024-10-15T12:13:00Z"
 
   ReferenceDate:
     type: date
@@ -184,9 +184,9 @@ types:
     docs: A date and time to use as a reference for the capacity search. If not specified, the current date and time will be used. 
     examples:
       - name: ExampleValidFrom
-        value: 2024-10-15T22:00:00Z
+        value: 2024-10-15T00:00:00Z
       - name: ExampleValidUntil
-        value: 2024-10-15T21:59:59Z
+        value: 2025-10-14T23:59:59Z
       - name: ExamplePrintedAt
         value: 2024-10-15T12:00:00Z
 
@@ -398,27 +398,50 @@ types:
     examples:
       - name: ExampleScheduleCastle
         value: "EVENT1"
+  
   Duration:
     type: integer
     docs: The duration of the schedule in seconds.
     examples:
       - name: ExampleDuration
         value: 10800
+  
   StartTime:
     type: string
     docs: The time when time slot starts.
     examples:
       - name: ExampleStartTime
         value: "09:00"
+  
   EndTime:
     type: string
     docs: The time when time slot ends.
     examples:
       - name: ExampleEndTime
         value: "12:00"
+
   ScheduleDescription:
     type: string
     docs: A description of the schedule.
     examples:
       - name: ExampleScheduleDescription
         value: "Morning schedule"
+
+  TicketAccessEventTypeEnum:
+    enum:
+      - initialEntry
+      - reservation
+      - admitted
+      - departed
+      - consumed
+      - canceledAdmission
+      - payment
+      - prePaid
+      - postPaid
+      - canceledReservation
+      - unknown
+
+  TicketAccessEventType:
+      type: TicketAccessEventTypeEnum
+      docs: 
+        The types of events that can occur for a ticket.

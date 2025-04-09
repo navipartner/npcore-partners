@@ -39,7 +39,9 @@ service:
 
     findTicket:
       docs: 
-        Retrieves ticket id about a specific ticket using its unique external ticket number for further processing.
+        Retrieves ticket id and access details about a specific ticket or range of tickets depending on which query parameter used.
+        <br> - Filter using `ticketId`, `externalNumber` or `notificationAddress` to get a specific ticket or list of ticket.
+        <br> - Specify `withEvents` to include ticket events in the response.
       display-name: Find Ticket
       method: GET
       path: ''
@@ -47,7 +49,10 @@ service:
         name: findTicket
         query-parameters:
           externalNumber: optional<simpleTypes.TicketExternalNumber>
-      response: list<FindTicketResponse>
+          ticketId: optional<simpleTypes.TicketId>
+          notificationAddress: optional<simpleTypes.NotificationAddress>
+          withEvents: optional<boolean>
+      response: list<compositeTypes.FindTicketResponse>
       examples:
           - name: ExampleFindTicket
             path-parameters:
@@ -58,14 +63,7 @@ service:
               externalNumber: $simpleTypes.TicketExternalNumber.ExampleTicket1
             response:
               body: 
-                - ticketId: $simpleTypes.TicketId.ExampleTicket1
-                  ticketNumber: $simpleTypes.TicketExternalNumber.ExampleTicket1
-                  itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
-                  validFrom: $simpleTypes.ReferenceDateTime.ExampleValidFrom
-                  validUntil: $simpleTypes.ReferenceDateTime.ExampleValidUntil
-                  issuedAt: $simpleTypes.IssuedAt.ExampleIssuedAt
-                  unitPrice: $simpleTypes.UnitPrice.ExampleUnitPrice
-                  unitPriceInclVat: $simpleTypes.UnitPriceInclVat.ExampleUnitPrice
+                - $compositeTypes.FindTicketResponse.ExampleFindTicketWithDetails
               
     requestRevokeTicket:
       docs: 
@@ -326,18 +324,6 @@ types:
     docs: Request to get ticket details
     properties:
       ticketNumber: simpleTypes.TicketExternalNumber
-
-  FindTicketResponse:
-    docs: Response to a find ticket request
-    properties:
-      ticketId: simpleTypes.TicketId
-      ticketNumber: simpleTypes.TicketExternalNumber
-      itemNumber: simpleTypes.ItemNumber
-      validFrom: datetime
-      validUntil: datetime
-      issuedAt: simpleTypes.IssuedAt
-      unitPrice: simpleTypes.UnitPrice
-      unitPriceInclVat: simpleTypes.UnitPriceInclVat
 
   RevokeTicketRequest:
     docs: Request to revoke a ticket

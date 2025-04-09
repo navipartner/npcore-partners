@@ -290,12 +290,24 @@
         }
         key(Key2; "Session Token ID", "Ext. Line Reference No.", "Admission Inclusion")
         {
+#if not (BC17 or BC18)
+            IncludedFields = "Request Status", "Expires Date Time", "Primary Request Line", "Admission Created";
+#endif
+
         }
         key(Key3; "Receipt No.", "Line No.")
         {
+#if not (BC17 or BC18)
+            IncludedFields = "Session Token ID", "Ext. Line Reference No.", "Admission Inclusion", "Request Status", "Expires Date Time", "Primary Request Line", "Admission Created";
+#endif
+
         }
         key(Key4; "Request Status", "Expires Date Time")
         {
+#if not (BC17 or BC18)
+            IncludedFields = "Session Token ID", "Ext. Line Reference No.", "Admission Inclusion", "Primary Request Line", "Admission Created";
+#endif
+
         }
         key(Key5; "Superseeds Entry No.")
         {
@@ -305,10 +317,21 @@
         }
         key(Key7; "Session Token ID", "Admission Inclusion")
         {
+#if not (BC17 or BC18)
+            IncludedFields = "Ext. Line Reference No.", "Request Status", "Expires Date Time", "Primary Request Line", "Admission Created";
+#endif
+
         }
         key(Key8; "External Order No.")
         {
         }
+        key(Key9; "Notification Address")
+        {
+#if not (BC17 or BC18)
+            IncludedFields = "Session Token ID", "Ext. Line Reference No.", "Admission Inclusion", "Request Status", "Expires Date Time", "Primary Request Line", "Admission Created";
+#endif
+        }
+
     }
 
     fieldgroups
