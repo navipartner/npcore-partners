@@ -53,6 +53,7 @@
         AsyncPosting: Boolean;
         SkipPaymentLineCheck: Boolean;
         RetailType: Code[20];
+        ManualLinePrepaymentControl: Boolean;
         CUSTOMER_CREDIT_CHECK_FAILED: Label 'Customer credit check failed';
 
     procedure SetAsk(AskIn: Boolean)
@@ -209,6 +210,11 @@
     internal procedure SetRetailType(RetailTypeIn: Code[20])
     begin
         RetailType := RetailTypeIn;
+    end;
+
+    internal procedure SetManualLinePrepaymentControl(ManualLinePrepaymentControlIn: Boolean)
+    begin
+        ManualLinePrepaymentControl := ManualLinePrepaymentControlIn;
     end;
 
     procedure ProcessPOSSale(POSSale: Codeunit "NPR POS Sale")
@@ -911,10 +917,13 @@
 
         SalesHeader.TestField("Document Type", SalesHeader."Document Type"::Order);
 
-        if SaleLinePOS."Sales Doc. Prepay Is Percent" then
-            POSPrepaymentMgt.SetPrepaymentPercentageToPay(SalesHeader, SaleLinePOS."Sales Doc. Prepayment Value")
+        if SaleLinePOS."Prepayment Manual Line Control" then
+            POSPrepaymentMgt.SetManualLinePrepaymentPercentageToPay(SalesHeader)
         else
-            POSPrepaymentMgt.SetPrepaymentAmountToPayInclVAT(SalesHeader, SaleLinePOS."Sales Doc. Prepayment Value");
+            if SaleLinePOS."Sales Doc. Prepay Is Percent" then
+                POSPrepaymentMgt.SetPrepaymentPercentageToPay(SalesHeader, SaleLinePOS."Sales Doc. Prepayment Value")
+            else
+                POSPrepaymentMgt.SetPrepaymentAmountToPayInclVAT(SalesHeader, SaleLinePOS."Sales Doc. Prepayment Value");
 
         Pdf2Nav := SaleLinePOS."Sales Document Pdf2Nav";
         Send := SaleLinePOS."Sales Document Send";
@@ -1089,12 +1098,14 @@
         SaleLinePOS: Record "NPR POS Sale Line";
         POSPrepaymentMgt: Codeunit "NPR POS Prepayment Mgt.";
     begin
-        if ValueIsAmount then begin
-            POSPrepaymentMgt.SetPrepaymentAmountToPayInclVAT(SalesHeader, PrepaymentValue);
-            PrepaymentAmount := PrepaymentValue;
-        end else begin
-            PrepaymentAmount := POSPrepaymentMgt.SetPrepaymentPercentageToPay(SalesHeader, PrepaymentValue);
-        end;
+        if ManualLinePrepaymentControl then
+            PrepaymentAmount := POSPrepaymentMgt.SetManualLinePrepaymentPercentageToPay(SalesHeader)
+        else
+            if ValueIsAmount then begin
+                POSPrepaymentMgt.SetPrepaymentAmountToPayInclVAT(SalesHeader, PrepaymentValue);
+                PrepaymentAmount := PrepaymentValue;
+            end else
+                PrepaymentAmount := POSPrepaymentMgt.SetPrepaymentPercentageToPay(SalesHeader, PrepaymentValue);
 
         if PrepaymentAmount = 0 then
             exit;
@@ -1119,6 +1130,7 @@
         SaleLinePOS."Sales Document No." := SalesHeader."No.";
         SaleLinePOS."Sales Document Prepayment" := true;
         SaleLinePOS."Sales Doc. Prepayment Value" := PrepaymentValue;
+        SaleLinePOS."Prepayment Manual Line Control" := ManualLinePrepaymentControl;
         SaleLinePOS."Sales Doc. Prepay Is Percent" := not ValueIsAmount;
         SaleLinePOS."Sales Document Print" := Print;
         SaleLinePOS."Sales Document Send" := Send;

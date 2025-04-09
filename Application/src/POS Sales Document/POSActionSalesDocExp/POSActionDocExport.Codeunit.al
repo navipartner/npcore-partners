@@ -119,6 +119,8 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         DescAskForVoucherType: Label 'The system is going to ask for the voucher type before scanning';
         CaptionEnableVoucherList: Label 'Open Voucher List';
         DescEnableVoucherList: Label 'Open Voucher List if Reference No. is blank';
+        CaptionPrepaymentManualLineControl: Label 'Prepayment Manual Line Control';
+        DescPrepaymentManualLineControl: Label 'Allows for manual control of prepayment amounts and percentage on sales document lines.';
         OptionNameSetDocumentType: Label 'Order,Invoice,Quote,Restrict,BlanketOrder', Locked = true;
         OptionCptSetDocumentType: Label 'Order,Invoice,Quote,Restrict,Blanket Order';
         OptionNameSetNegBalDocumentType: Label 'ReturnOrder,CreditMemo,Restrict', Locked = true;
@@ -216,6 +218,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         WorkflowConfig.AddBooleanParameter('AskForVouchers', true, CaptionAskForVouchers, DescriptionAskForVouchers);
         WorkflowConfig.AddBooleanParameter('AskForVoucherType', false, CaptionAskForVoucherType, DescAskForVoucherType);
         WorkflowConfig.AddBooleanParameter('EnableVoucherList', false, CaptionEnableVoucherList, DescEnableVoucherList);
+        WorkflowConfig.AddBooleanParameter('PrepaymentManualLineControl', false, CaptionPrepaymentManualLineControl, DescPrepaymentManualLineControl);
         WorkflowConfig.AddTextParameter('GroupCode', '', CaptionGroupCode, DescGroupCode);
         //labels
         WorkflowConfig.AddLabel('ExtDocNo', GetExternalDocumentNo());
@@ -282,6 +285,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
 
     local procedure DocumentPayment(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"): JsonObject;
     var
+        PrepaymentManualLineControl: Boolean;
         PayAndPost: Boolean;
         PayAndPostPrint: Boolean;
         PrepaymentIsAmount: Boolean;
@@ -310,6 +314,12 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
 
         ReadAdditionalParameters(Context, PrepaymentIsAmount, PayAndPost, FullPosting, POSPaymentReservation);
 
+        Context.GetBooleanParameter('PrepaymentManualLineControl', PrepaymentManualLineControl);
+        if PrepaymentManualLineControl then begin
+            PrepaymentValue := CalcManualLineControlPrepayment(SalesHeader."Document Type", SalesHeader."No.");
+            PrepaymentIsAmount := false;
+        end;
+
         PrepaymentPdf2Nav := Context.GetBooleanParameter('Pdf2NavPrepaymentDocument');
         PrepaymentSend := Context.GetBooleanParameter('SendPrepaymentDocument');
         PayAndPostPdf2Nav := Context.GetBooleanParameter('Pdf2NavPayAndPostDocument');
@@ -321,7 +331,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
             POSSession.StartTransaction();
             POSSession.ChangeViewSale();
             POSSalesDocumentPost := POSAsyncPosting.GetPOSSalePostingMandatoryFlow();
-            POSActionDocExportB.HandlePrepayment(POSSession, SalesHeader, PrepaymentValue, PrepaymentIsAmount, PrintPrepayment, PrepaymentSend, PrepaymentPdf2Nav, POSSalesDocumentPost);
+            POSActionDocExportB.HandlePrepayment(POSSession, SalesHeader, PrepaymentValue, PrepaymentIsAmount, PrintPrepayment, PrepaymentSend, PrepaymentPdf2Nav, POSSalesDocumentPost, PrepaymentManualLineControl);
         end else
             if PayAndPost then begin
                 //End sale, auto start new sale, and insert payment line.
@@ -338,8 +348,14 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
     local procedure PreparePreWorkflows(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale") Response: JsonObject
     var
         PaymentParameters: JsonObject;
+        PrepaymentManualLineControl: Boolean;
     begin
         PaymentParameters := SetPaymentParameters(Context);
+
+        Context.GetBooleanParameter('PrepaymentManualLineControl', PrepaymentManualLineControl);
+        if PrepaymentManualLineControl then
+            PaymentParameters.Replace('prompt_prepayment', false);
+
         ValidatePaymentParameters(PaymentParameters);
         Response.Add('preWorkflows', AddPreWorkflowsToRun(Context, Sale, PaymentParameters));
         Response.Add('additionalParameters', PaymentParameters);
@@ -553,6 +569,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         PayAndPost: Boolean;
         FullPosting: Boolean;
         POSPaymentReservation: Boolean;
+        PrepaymentManualLineControl: Boolean;
         RemainingAmount: Decimal;
     begin
         Sale.GetCurrentSale(SalePOS);
@@ -567,6 +584,10 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         ValidateSale(SalePOS, RetailSalesDocMgt, Context, CustomerTableView);
 
         ReadAdditionalParameters(Context, PrepaymentIsAmount, PayAndPost, FullPosting, POSPaymentReservation);
+
+        Context.GetBooleanParameter('PrepaymentManualLineControl', PrepaymentManualLineControl);
+        if PrepaymentManualLineControl then
+            PrepaymentIsAmount := false;
 
         if POSPaymentReservation then begin
             POSActionDocExportB.CheckVATSetupsExist(SalePOS);
@@ -820,8 +841,18 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
             FullPosting := false;
             exit;
         end;
-
     end;
+
+    local procedure CalcManualLineControlPrepayment(DocumentType: Enum "Sales Document Type"; DocumentNo: Code[20]): Decimal
+    var
+        SalesLine: Record "Sales Line";
+    begin
+        SalesLine.SetRange("Document Type", DocumentType);
+        SalesLine.SetRange("Document No.", DocumentNo);
+        SalesLine.CalcSums("Prepmt. Line Amount");
+        exit(SalesLine."Prepmt. Line Amount");
+    end;
+
     #region UnpackGroupCodeSetup
     local procedure UnpackGroupCodeSetup(Context: Codeunit "NPR POS JSON Helper";
                                          var GroupCodesEnabled: Boolean;

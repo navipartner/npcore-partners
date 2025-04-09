@@ -12,6 +12,7 @@
         Print: Boolean;
         Send: Boolean;
         Pdf2Nav: Boolean;
+        PrepaymentManualLineControl: Boolean;
         POSSalesDocumentPost: Enum "NPR POS Sales Document Post";
         TextDirectInvocationNotAllowed: Label 'You must not run codeunit "NPR POS Handle Payment" directly.';
 
@@ -38,7 +39,10 @@
 
             case HandleType of
                 HandleType::Prepayment:
-                    RetailSalesDocMgt.CreatePrepaymentLine(POSSession, SalesHeader, PrepaymentValue, Print, Send, Pdf2Nav, POSSalesDocumentPost, PrepaymentIsAmount);
+                    begin
+                        RetailSalesDocMgt.SetManualLinePrepaymentControl(PrepaymentManualLineControl);
+                        RetailSalesDocMgt.CreatePrepaymentLine(POSSession, SalesHeader, PrepaymentValue, Print, Send, Pdf2Nav, POSSalesDocumentPost, PrepaymentIsAmount);
+                    end;
 
                 HandleType::Post:
                     RetailSalesDocImpMgt.SalesDocumentAmountToPOS(POSSession, SalesHeader, true, true, true, Print, Pdf2Nav, Send, POSSalesDocumentPost)
@@ -48,7 +52,7 @@
         end;
     end;
 
-    procedure HandlePrepaymentTransactional(POSSessionIn: Codeunit "NPR POS Session"; SalesHeaderIn: Record "Sales Header"; PrepaymentValueIn: Decimal; PrepaymentIsAmountIn: Boolean; PrintIn: Boolean; SendIn: Boolean; Pdf2NavIn: Boolean; Self: Codeunit "NPR POS Doc. Export Try Pay"; SalePostingIn: Enum "NPR POS Sales Document Post") Success: Boolean
+    procedure HandlePrepaymentTransactional(POSSessionIn: Codeunit "NPR POS Session"; SalesHeaderIn: Record "Sales Header"; PrepaymentValueIn: Decimal; PrepaymentIsAmountIn: Boolean; PrintIn: Boolean; SendIn: Boolean; Pdf2NavIn: Boolean; Self: Codeunit "NPR POS Doc. Export Try Pay"; SalePostingIn: Enum "NPR POS Sales Document Post"; PrepaymentManualLineControlIn: Boolean) Success: Boolean
     begin
         POSSession := POSSessionIn;
         SalesHeader := SalesHeaderIn;
@@ -58,6 +62,7 @@
         Send := SendIn;
         Pdf2Nav := Pdf2NavIn;
         POSSalesDocumentPost := SalePostingIn;
+        PrepaymentManualLineControl := PrepaymentManualLineControlIn;
 
         HandleType := HandleType::Prepayment;
 

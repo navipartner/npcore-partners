@@ -131,14 +131,14 @@ codeunit 6059913 "NPR POS Action: Doc. ExportB"
         RetailSalesDocMgt.SetPaymentMethod(SpecificPaymentMethodCode);
     end;
 
-    internal procedure HandlePrepayment(POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; PrepaymentValue: Decimal; PrepaymentIsAmount: Boolean; Print: Boolean; Send: Boolean; Pdf2Nav: Boolean; SalePosting: Enum "NPR POS Sales Document Post")
+    internal procedure HandlePrepayment(POSSession: Codeunit "NPR POS Session"; SalesHeader: Record "Sales Header"; PrepaymentValue: Decimal; PrepaymentIsAmount: Boolean; Print: Boolean; Send: Boolean; Pdf2Nav: Boolean; SalePosting: Enum "NPR POS Sales Document Post"; PrepaymentManualLineControl: Boolean)
     var
         HandlePayment: Codeunit "NPR POS Doc. Export Try Pay";
         ERR_PREPAY: Label 'Sale was exported correctly but prepayment in new sale failed: %1';
     begin
         //An error after sale end, before front end sync, is not allowed so we catch all
         Commit();
-        if not HandlePayment.HandlePrepaymentTransactional(POSSession, SalesHeader, PrepaymentValue, PrepaymentIsAmount, Print, Send, Pdf2Nav, HandlePayment, SalePosting) then
+        if not HandlePayment.HandlePrepaymentTransactional(POSSession, SalesHeader, PrepaymentValue, PrepaymentIsAmount, Print, Send, Pdf2Nav, HandlePayment, SalePosting, PrepaymentManualLineControl) then
             Message(ERR_PREPAY, GetLastErrorText);
     end;
 

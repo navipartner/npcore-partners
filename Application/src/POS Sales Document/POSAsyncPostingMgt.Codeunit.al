@@ -25,10 +25,13 @@ codeunit 6151380 "NPR POS Async. Posting Mgt."
     begin
         SalesHeader.TestField("Document Type", SalesHeader."Document Type"::Order);
 
-        if SaleLinePOS."Sales Doc. Prepay Is Percent" then
-            POSPrepaymentMgt.SetPrepaymentPercentageToPay(SalesHeader, SaleLinePOS."Sales Doc. Prepayment Value")
+        if SaleLinePOS."Prepayment Manual Line Control" then
+            POSPrepaymentMgt.SetManualLinePrepaymentPercentageToPay(SalesHeader)
         else
-            POSPrepaymentMgt.SetPrepaymentAmountToPayInclVAT(SalesHeader, SaleLinePOS."Sales Doc. Prepayment Value");
+            if SaleLinePOS."Sales Doc. Prepay Is Percent" then
+                POSPrepaymentMgt.SetPrepaymentPercentageToPay(SalesHeader, SaleLinePOS."Sales Doc. Prepayment Value")
+            else
+                POSPrepaymentMgt.SetPrepaymentAmountToPayInclVAT(SalesHeader, SaleLinePOS."Sales Doc. Prepayment Value");
     end;
 
     internal procedure ReadyToBePosted(SalesHeader: Record "Sales Header"): Boolean

@@ -1831,6 +1831,11 @@
             Caption = 'Store Ship Profile Line No.';
             DataClassification = CustomerContent;
         }
+        field(10025; "Prepayment Manual Line Control"; Boolean)
+        {
+            Caption = 'Prepayment Manual Line Control';
+            DataClassification = CustomerContent;
+        }
         field(6014511; "Label No."; Code[8])
         {
             Caption = 'Label Number';

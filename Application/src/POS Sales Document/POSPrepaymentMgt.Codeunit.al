@@ -114,6 +114,39 @@
         exit(SalesLine."Prepmt. Amt. Incl. VAT");
     end;
 
+    procedure SetManualLinePrepaymentPercentageToPay(SalesHeader: Record "Sales Header"): Decimal
+    var
+        SalesLine: Record "Sales Line";
+        PrepaymentPercentage: Decimal;
+    begin
+        if SalesHeader."Currency Code" <> '' then begin
+            GLSetup.Get();
+            SalesHeader.TestField("Currency Code", GLSetup."LCY Code");
+        end;
+
+        ApplyFilters(SalesHeader, SalesLine);
+        if not SalesLine.FindSet(true) then
+            exit;
+
+        SalesLine.SetHideValidationDialog(true);
+        SalesLine.SuspendStatusCheck(true);
+        repeat
+            PrepaymentPercentage := SalesLine."Prepayment %";
+            SalesLine.Validate("Prepmt. Line Amount", SalesLine."Prepmt. Amt. Inv."); //Set prepayment amount back to invoiced, in case someone modified it without posting.
+            SalesLine.Validate("Prepayment %", PrepaymentPercentage); // Re-validating after Prepmt. Line Amount has been reset to invoiced amount
+
+            if SalesLine."Prepayment %" = 0 then begin
+                SalesLine."Prepayment Amount" := 0;
+                SalesLine."Prepmt. Amt. Incl. VAT" := 0;
+            end;
+            SalesLine.Modify();
+        until SalesLine.Next() = 0;
+
+        CalcPrepmtVatAmounts(SalesHeader, SalesLine);
+        SalesLine.CalcSums(SalesLine."Prepmt. Amt. Incl. VAT");
+        exit(SalesLine."Prepmt. Amt. Incl. VAT");
+    end;
+
     local procedure CalcRemainingLinePrepmtAmtToInvoice(SalesLine: Record "Sales Line"; PricesInclidingVAT: Boolean; RoundingPrecision: Decimal): Decimal
     var
         RemainingLineAmtToInvoice: Decimal;
