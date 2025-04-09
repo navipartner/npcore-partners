@@ -6,9 +6,9 @@ codeunit 6184827 "NPR Adyen Fee Posting"
         GenJnlLine: Record "Gen. Journal Line";
         GLSetup: Record "General Ledger Setup";
         AdyenManagement: Codeunit "NPR Adyen Management";
-        AmountType: Enum "NPR Adyen Recon. Amount Type";
         EFTTransPosting: Codeunit "NPR Adyen EFT Trans. Posting";
         GenJournalPostLine: Codeunit "Gen. Jnl.-Post Line";
+        AmountType: Enum "NPR Adyen Recon. Amount Type";
     begin
         GenJnlLine.Init();
         GenJnlLine.SetSuppressCommit(true);

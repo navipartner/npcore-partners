@@ -93,6 +93,11 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         GetReportData(WebhookRequest, true);
         InsertedEntryAmount := InsertReconciliationLines(RecHeader."Merchant Account", RecHeader."Batch Number", RecHeader, WebhookRequest);
 
+        if (InsertedEntryAmount > 0) and (RecHeader.Status <> RecHeader.Status::Unmatched) then begin
+            RecHeader.Status := RecHeader.Status::Unmatched;
+            RecHeader.Modify();
+        end;
+
         exit(InsertedEntryAmount);
     end;
 

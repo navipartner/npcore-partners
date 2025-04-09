@@ -85,14 +85,14 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
     local procedure CreatePostGL(Amount: Decimal; AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20];
         BalAccountType: Enum "Gen. Journal Account Type";
         BalAccountNo: Code[20];
-        DimensionSetID: Integer;
+        InheritedDimensionSetID: Integer;
         CurrencyCode: Code[20];
         Description: Text[100];
         ReturnBalancingAccountNo: Boolean): Integer;
     var
         GenJnlLine: Record "Gen. Journal Line";
+        AdyenManagement: Codeunit "NPR Adyen Management";
         GenJournalPostLine: Codeunit "Gen. Jnl.-Post Line";
-        DimensionManagement: Codeunit DimensionManagement;
         GLEntryNo: Integer;
         BalancingGLEntryNo: Integer;
     begin
@@ -112,10 +112,8 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
 
         GenJnlLine.Validate(Amount, Amount);
         GenJnlLine.Description := Description;
-        if DimensionSetID > 0 then begin
-            GenJnlLine."Dimension Set ID" := DimensionSetID;
-            DimensionManagement.UpdateGlobalDimFromDimSetID(GenJnlLine."Dimension Set ID", GenJnlLine."Shortcut Dimension 1 Code", GenJnlLine."Shortcut Dimension 2 Code");
-        end;
+        if InheritedDimensionSetID <> 0 then
+            AdyenManagement.CreateDim(GenJnlLine, 0, InheritedDimensionSetID, AccountNo, _AdyenMerchantSetup."Posting Source Code");
 
         GenJnlLine."Source Code" := _AdyenMerchantSetup."Posting Source Code";
         GLEntryNo := PostGenJnlLine(GenJnlLine, GenJournalPostLine);
@@ -123,6 +121,9 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         GenJnlLine."Account Type" := BalAccountType;
         GenJnlLine.Validate("Account No.", BalAccountNo);
         GenJnlLine.Validate(Amount, -GenJnlLine.Amount);
+        if InheritedDimensionSetID <> 0 then
+            AdyenManagement.CreateDim(GenJnlLine, 0, InheritedDimensionSetID, BalAccountNo, _AdyenMerchantSetup."Posting Source Code");
+
         BalancingGLEntryNo := PostGenJnlLine(GenJnlLine, GenJournalPostLine);
 
         if ReturnBalancingAccountNo then
@@ -232,7 +233,6 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
                 SetDimensions(SalesInvHeader, DimensionSetID);
         end else
             SetDimensions(SalesHeader, DimensionSetID);
-
         PostEntryToGL(DimensionSetID);
     end;
 

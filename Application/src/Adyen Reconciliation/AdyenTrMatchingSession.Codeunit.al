@@ -21,6 +21,7 @@ codeunit 6184786 "NPR Adyen Tr. Matching Session"
 
         // Process all not processed Webhook Entries
         RecWebhookRequests.Reset();
+        RecWebhookRequests.SetCurrentKey(Processed);
         RecWebhookRequests.SetRange(Processed, false);
 
         if RecWebhookRequests.IsEmpty() then

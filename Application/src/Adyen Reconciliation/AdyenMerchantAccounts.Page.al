@@ -148,6 +148,7 @@ page 6184552 "NPR Adyen Merchant Accounts"
                 trigger OnAction()
                 var
                     MerchantAccountSetup: Record "NPR Adyen Merchant Setup";
+                    AdyenManagement: Codeunit "NPR Adyen Management";
                     CreateNewMerchantAccountSetupLbl: Label '%1 merchant account does not have a setup. Do you wish to create it?', Comment = '%1 - Merchant account name';
                 begin
                     Rec.TestField(Name);
@@ -156,6 +157,7 @@ page 6184552 "NPR Adyen Merchant Accounts"
                             exit;
                         MerchantAccountSetup.Init();
                         MerchantAccountSetup."Merchant Account" := Rec.Name;
+                        AdyenManagement.InitSourceCodeAndDimPriorities(MerchantAccountSetup);
                         MerchantAccountSetup.Insert();
                     end;
                     Page.Run(Page::"NPR Adyen Merchant Setup", MerchantAccountSetup);

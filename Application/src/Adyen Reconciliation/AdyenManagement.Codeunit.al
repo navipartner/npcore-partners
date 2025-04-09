@@ -784,7 +784,6 @@ codeunit 6184796 "NPR Adyen Management"
     begin
         Logs.Reset();
         Logs.SetRange("Webhook Request ID", WebhookRequest.ID);
-        Logs.SetFilter("Creation Date", '>=%1', CreateDateTime(Today(), 0T));
         if not Logs.IsEmpty() then
             Page.Run(Page::"NPR Adyen Reconciliation Logs", Logs);
     end;
@@ -1216,6 +1215,34 @@ codeunit 6184796 "NPR Adyen Management"
         end;
     end;
 
+    internal procedure CreateDim(var GenJnlLine: Record "Gen. Journal Line"; CurrFieldNo: Integer; InheritedDimensionSetID: Integer; AccountNo: Code[20]; SourceCode: Code[10])
+    var
+        DimMgt: Codeunit DimensionManagement;
+#if not (BC17 or BC18 or BC19)
+        DimSourceList: List of [Dictionary of [Integer, Code[20]]];
+        DimSource: Dictionary of [Integer, Code[20]];
+#else
+        TableID: array[10] of Integer;
+        No: array[10] of Code[20];
+#endif
+    begin
+#if not (BC17 or BC18 or BC19)
+        DimSource.Add(Database::"G/L Account", AccountNo);
+        DimSourceList.Add(DimSource);
+        GenJnlLine."Dimension Set ID" :=
+            DimMgt.GetRecDefaultDimID(
+                GenJnlLine, CurrFieldNo, DimSourceList, SourceCode,
+                GenJnlLine."Shortcut Dimension 1 Code", GenJnlLine."Shortcut Dimension 2 Code", InheritedDimensionSetID, Database::Customer);
+#else
+        TableID[1] := Database::"G/L Account";
+        No[1] := AccountNo;
+        GenJnlLine."Dimension Set ID" :=
+            DimMgt.GetRecDefaultDimID(
+                GenJnlLine, CurrFieldNo, TableID, No, SourceCode,
+                GenJnlLine."Shortcut Dimension 1 Code", GenJnlLine."Shortcut Dimension 2 Code", InheritedDimensionSetID, Database::Customer);
+#endif
+    end;
+
     [TryFunction]
     local procedure RecordWebhookData(JsonRequest: JsonObject; var AdyenWebhook: Record "NPR Adyen Webhook")
     var
@@ -1331,6 +1358,46 @@ codeunit 6184796 "NPR Adyen Management"
         AdyenWebhookRequest."Report Data".CreateInStream(InS);
         FileName := AdyenWebhookRequest."Report Name";
         DownloadFromStream(InS, '', '', '', FileName);
+    end;
+
+    internal procedure InitSourceCodeAndDimPriorities(var MerchantSetup: Record "NPR Adyen Merchant Setup")
+    var
+        SourceCode: Record "Source Code";
+        DimensionPriority: Record "Default Dimension Priority";
+        NPPay_SourceCode: Label 'NPPAYRECON', Locked = true;
+        NPPay_SourceCodeDescr: Label 'NPPay Reconciliation';
+    begin
+        if MerchantSetup."Posting Source Code" = '' then begin
+            if not SourceCode.Get(NPPay_SourceCode) then begin
+                SourceCode.Init();
+                SourceCode.Code := NPPay_SourceCode;
+                SourceCode.Description := NPPay_SourceCodeDescr;
+                SourceCode.Insert();
+            end;
+            MerchantSetup."Posting Source Code" := SourceCode.Code;
+        end;
+
+        DimensionPriority.SetRange("Source Code", MerchantSetup."Posting Source Code");
+        if DimensionPriority.IsEmpty() then begin
+            CreateDefaultDimPriority(MerchantSetup."Posting Source Code", 15, 1);
+            CreateDefaultDimPriority(MerchantSetup."Posting Source Code", 18, 2);
+        end;
+    end;
+
+    local procedure CreateDefaultDimPriority(SourceCode: Code[10]; TableID: Integer; Priority: Integer)
+    var
+        DimensionPriority: Record "Default Dimension Priority";
+    begin
+        DimensionPriority.SetRange("Source Code", SourceCode);
+        DimensionPriority.SetRange("Table ID", TableID);
+        if not DimensionPriority.IsEmpty() then
+            exit;
+
+        DimensionPriority.Init();
+        DimensionPriority."Source Code" := SourceCode;
+        DimensionPriority."Table ID" := TableID;
+        DimensionPriority.Priority := Priority;
+        DimensionPriority.Insert();
     end;
     #endregion
 

@@ -11,6 +11,7 @@ page 6184534 "NPR Adyen Reconciliation List"
     AdditionalSearchTerms = 'NP Pay Reconciliation';
     Editable = false;
     DeleteAllowed = true;
+    HelpLink = 'https://docs.navipartner.com/docs/np_pay/explanation/reconciliation/';
 
     layout
     {

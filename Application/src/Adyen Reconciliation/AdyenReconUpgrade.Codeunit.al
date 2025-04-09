@@ -19,6 +19,7 @@ codeunit 6184908 "NPR Adyen Recon. Upgrade"
         UpdateAdyenReconciliationRelation();
         UpdateManuallyMatchedLines();
         FixMagentoPaymentLines();
+        UpgradeMerchantAccountSetups();
     end;
 
     local procedure UpdatePSPReferenceForEFTTrans()
@@ -243,6 +244,26 @@ codeunit 6184908 "NPR Adyen Recon. Upgrade"
                         end;
                 end;
             until ReconLine.Next() = 0;
+
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure UpgradeMerchantAccountSetups()
+    var
+        MerchantSetup: Record "NPR Adyen Merchant Setup";
+        AdyenManagement: Codeunit "NPR Adyen Management";
+    begin
+        UpgradeStep := 'UpgradeMerchantAccountSetups';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep)) then
+            exit;
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Adyen Recon. Upgrade', UpgradeStep);
+
+        if MerchantSetup.FindSet() then
+            repeat
+                AdyenManagement.InitSourceCodeAndDimPriorities(MerchantSetup);
+                MerchantSetup.Modify();
+            until MerchantSetup.Next() = 0;
 
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();
