@@ -176,7 +176,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         POSSession.GetSaleLine(SaleLine);
         SaleLine.InsertLine(Line, false);
         AddAccessories(Item, SaleLine);
-        AutoExplodeBOM(Item, SaleLine);
+        AutoExplodeBOM(Item, Line);
         _BaseLineNo := Line."Line No.";
     end;
 
@@ -205,9 +205,8 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         exit(_BaseLineNo)
     end;
 
-    local procedure AutoExplodeBOM(Item: Record Item; POSSaleLine: Codeunit "NPR POS Sale Line")
+    local procedure AutoExplodeBOM(Item: Record Item; SaleLinePOS: Record "NPR POS Sale Line")
     var
-        SaleLinePOS: Record "NPR POS Sale Line";
         Level: Integer;
     begin
         if not Item."NPR Explode BOM auto" then
@@ -216,7 +215,6 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         if not Item."Assembly BOM" then
             exit;
 
-        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
         SaleLinePOS.Validate("Line Type", SaleLinePOS."Line Type"::"BOM List");
         SaleLinePOS."Discount Type" := SaleLinePOS."Discount Type"::"BOM List";
         SaleLinePOS."Discount Code" := SaleLinePOS."No.";

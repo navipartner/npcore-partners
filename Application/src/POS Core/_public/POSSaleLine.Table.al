@@ -1952,10 +1952,12 @@
     trigger OnDelete()
     var
         SaleLinePOS: Record "NPR POS Sale Line";
+        TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
         ErrNoDeleteDep: Label 'Deposit line from a rental is not to be deleted.';
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         EFTInterface: Codeunit "NPR EFT Interface";
         IsAllowed, Handled : Boolean;
+        LineDeleted: Boolean;
     begin
         if Rec."EFT Approved" then begin
             EFTInterface.AllowVoidEFTRequestOnPaymentLineDelete(Rec, IsAllowed, Handled);
@@ -1979,8 +1981,12 @@
                             repeat
                                 if SaleLinePOS."Line Type" = "Line Type"::"BOM List" then
                                     SaleLinePOS.Validate("No.");
-                                if "Line No." <> SaleLinePOS."Line No." then
-                                    SaleLinePOS.Delete();
+                                if "Line No." <> SaleLinePOS."Line No." then begin
+                                    TempSaleLinePOS := SaleLinePOS;
+                                    LineDeleted := SaleLinePOS.Delete();
+                                end;
+                                if LineDeleted then
+                                    DeleteAccessoriesForPOSSaleLine(TempSaleLinePOS);
                             until SaleLinePOS.Next() = 0;
                     end;
             end;
@@ -2396,6 +2402,8 @@
                             SaleLinePOS.Insert(true);
                         if FromLineNo = 0 then
                             FromLineNo := SaleLinePOS."Line No.";
+
+                        AddAccessoriesForBOMComponent(SaleLinePOS);
 
                         ToLineNo := SaleLinePOS."Line No.";
 
@@ -3288,6 +3296,48 @@
     begin
         ShipmentBinAvailable := Bin.Get(Location.Code, Location."Shipment Bin Code");
         exit(Location."Require Shipment" and ShipmentBinAvailable);
+    end;
+
+    local procedure AddAccessoriesForBOMComponent(SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        Item: Record Item;
+        AccessorySparePart: Record "NPR Accessory/Spare Part";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSActionInsertItemB: Codeunit "NPR POS Action: Insert Item B";
+        POSSession: Codeunit "NPR POS Session";
+    begin
+        AccessorySparePart.SetRange(Type, AccessorySparePart.Type::Accessory);
+        AccessorySparePart.SetRange(Code, SaleLinePOS."No.");
+        if AccessorySparePart.IsEmpty() then
+            exit;
+
+        if not Item.Get(SaleLinePOS."No.") then
+            exit;
+        POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetPosition(SaleLinePOS.GetPosition());
+        POSActionInsertItemB.AddAccessories(Item, POSSaleLine);
+    end;
+
+    internal procedure DeleteAccessoriesForPOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        SaleLinePOS2: Record "NPR POS Sale Line";
+    begin
+        if not (SaleLinePOS."Line Type" in [SaleLinePOS."Line Type"::Item, SaleLinePOS."Line Type"::"BOM List"]) then
+            exit;
+        if SaleLinePOS."No." in ['', '*'] then
+            exit;
+
+        SaleLinePOS2.SetRange("Register No.", SaleLinePOS."Register No.");
+        SaleLinePOS2.SetRange("Sales Ticket No.", SaleLinePOS."Sales Ticket No.");
+        SaleLinePOS2.SetFilter("Line No.", '<>%1', SaleLinePOS."Line No.");
+        SaleLinePOS2.SetRange("Main Line No.", SaleLinePOS."Line No.");
+        SaleLinePOS2.SetRange(Accessory, true);
+        SaleLinePOS2.SetRange("Main Item No.", SaleLinePOS."No.");
+        if SaleLinePOS2.IsEmpty() then
+            exit;
+
+        SaleLinePOS2.SetSkipCalcDiscount(true);
+        SaleLinePOS2.DeleteAll(false);
     end;
 
     [IntegrationEvent(false, false)]
