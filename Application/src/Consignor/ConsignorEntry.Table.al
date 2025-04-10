@@ -99,7 +99,7 @@
     var
         Text001: Label 'Status must be released';
 
-    procedure InsertFromSalesHeader(InCode: Code[20])
+    procedure InsertFromSalesHeader(InCode: Code[20]; DocumentType: Enum "Sales Document Type")
     var
         SalesLine: Record "Sales Line";
         TempWeight: Decimal;
@@ -108,7 +108,7 @@
             exit;
         Init();
         Type := Type::Order;
-        SalesLine.SetRange("Document Type", SalesLine."Document Type"::Order);
+        SalesLine.SetRange("Document Type", DocumentType);
         SalesLine.SetRange("Document No.", InCode);
         SalesLine.SetRange(Type, SalesLine.Type::Item);
         SalesLine.SetFilter("Net Weight", '<>0');
@@ -118,6 +118,11 @@
             until SalesLine.Next() = 0;
         Weight := TempWeight;
         InsertHeader(InCode);
+    end;
+
+    procedure InsertFromSalesHeader(InCode: Code[20])
+    begin
+        InsertFromSalesHeader(InCode, "Sales Document Type"::Order)
     end;
 
     procedure InsertFromShipmentHeader(InCode: Code[20])
