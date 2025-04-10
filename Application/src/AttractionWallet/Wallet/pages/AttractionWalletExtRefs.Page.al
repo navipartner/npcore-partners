@@ -3,6 +3,7 @@ page 6185039 "NPR AttractionWalletExtRefs"
     Extensible = false;
     PageType = ListPart;
     UsageCategory = None;
+    Editable = false;
     InsertAllowed = false;
     DeleteAllowed = false;
     SourceTable = "NPR AttractionWalletExtRef";
@@ -28,6 +29,12 @@ page 6185039 "NPR AttractionWalletExtRefs"
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Expires At field.';
+                }
+                field(_WalletReferenceNumber; _WalletReferenceNumber)
+                {
+                    Caption = 'Wallet Reference Number';
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Wallet Reference Number field.';
                 }
             }
         }
@@ -56,6 +63,20 @@ page 6185039 "NPR AttractionWalletExtRefs"
         }
     }
 
+    var
+        TempWallets: Record "NPR AttractionWallet" temporary;
+        _WalletReferenceNumber: Text;
+
+    trigger OnAfterGetRecord()
+    begin
+        Clear(_WalletReferenceNumber);
+        if (TempWallets.Get(Rec.WalletEntryNo)) then begin
+            _WalletReferenceNumber := TempWallets.ReferenceNumber;
+            if (TempWallets.Description <> '') then
+                _WalletReferenceNumber := TempWallets.Description;
+        end
+    end;
+
     internal procedure ShowSelectedWallets(var Wallets: Record "NPR AttractionWallet" temporary)
     var
         WalletExternalReference: Record "NPR AttractionWalletExtRef";
@@ -67,6 +88,10 @@ page 6185039 "NPR AttractionWalletExtRefs"
         Wallets.Reset();
         if (Wallets.FindSet()) then
             repeat
+                TempWallets.TransferFields(Wallets, true);
+                TempWallets.SystemId := Wallets.SystemId;
+                if (not TempWallets.Insert()) then;
+
                 WalletExternalReference.Reset();
                 WalletExternalReference.SetRange(WalletEntryNo, Wallets.EntryNo);
                 if (WalletExternalReference.FindSet()) then
