@@ -72,7 +72,7 @@ table 6150816 "NPR Spfy Inventory Level"
         If Inventory < 0 then
             if not SpfyIntegrationMgt.IsSendNegativeInventory("Shopify Store Code") then
                 exit(0);
-        Exit(Inventory);
+        Exit(Round(Inventory, 1, '<'));
     end;
 }
 #endif
