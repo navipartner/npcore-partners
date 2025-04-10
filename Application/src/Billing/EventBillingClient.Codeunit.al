@@ -234,13 +234,19 @@ codeunit 6248217 "NPR Event Billing Client"
 
     local procedure GetEnvironmentType(): Integer
     begin
+        if (not EnvInfo.IsSaaSInfrastructure()) then begin
+            // For non-SaaS environments let's try to identify known non-production environments first (e.g. Crane):
+            if (not GetIsRealProductionEnvironment()) then
+                exit(-1);
+        end;
+
         case true of
             EnvInfo.IsProduction():
-                exit(1);
+                exit(Enum::"Environment Type"::Production.AsInteger());
             EnvInfo.IsSandbox():
-                exit(2);
+                exit(Enum::"Environment Type"::Sandbox.AsInteger());
             else
-                exit(0);
+                exit(-1)
         end;
     end;
 
