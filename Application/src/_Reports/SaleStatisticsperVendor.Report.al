@@ -224,7 +224,8 @@
         }
         trigger OnOpenPage()
         begin
-            InventoryDate := Today();
+            if InventoryDate = 0D then
+                InventoryDate := Today();
         end;
     }
 
