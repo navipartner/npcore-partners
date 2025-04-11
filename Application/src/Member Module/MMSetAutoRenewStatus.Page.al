@@ -28,7 +28,6 @@ page 6184909 "NPR MM Set Auto-Renew Status"
             {
                 Caption = 'Auto-Renew';
                 ToolTip = 'Specify the auto-renew status for the membership';
-                OptionCaption = 'No,Yes (Internal),Yes (External)';
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
             field(NotifyMember; _NotifyMember)
@@ -74,6 +73,9 @@ page 6184909 "NPR MM Set Auto-Renew Status"
     local procedure ProcessResponse(var Membership: Record "NPR MM Membership"; CreateMemberNotification: Boolean; AutoRenewStatus: ENUM "NPR MM MembershipAutoRenew")
     var
         MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+        PaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
+        MemberPaymentMethod: Record "NPR MM Member Payment Method";
+        MembershipAutoRenewalWithoutPaymentMethodErr: Label 'You must specify a membership default payment method before enabling auto-renewal.';
     begin
         case AutoRenewStatus of
             AutoRenewStatus::NO:
@@ -85,7 +87,11 @@ page 6184909 "NPR MM Set Auto-Renew Status"
             AutoRenewStatus::YES_EXTERNAL:
                 MembershipMgtInternal.EnableMembershipExternalAutoRenewal(Membership, CreateMemberNotification, true);
             AutoRenewStatus::YES_INTERNAL:
-                MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, CreateMemberNotification, true);
+                begin
+                    if not PaymentMethodMgt.GetMemberPaymentMethod(Membership."Entry No.", MemberPaymentMethod) then
+                        Error(MembershipAutoRenewalWithoutPaymentMethodErr);
+                    MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, CreateMemberNotification, true);
+                end;
         end;
     end;
 }
