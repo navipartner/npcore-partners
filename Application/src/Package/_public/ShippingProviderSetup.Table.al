@@ -213,6 +213,14 @@ table 6014574 "NPR Shipping Provider Setup"
             Caption = 'Default Width';
             DataClassification = CustomerContent;
         }
+        field(205; "Shipmondo API Environment"; Option)
+        {
+            Caption = 'Shipmondo API Environment';
+            DataClassification = CustomerContent;
+            OptionCaption = 'Production,Sandbox';
+            OptionMembers = "Production","Sandbox";
+            InitValue = "Production";
+        }
     }
 
     keys

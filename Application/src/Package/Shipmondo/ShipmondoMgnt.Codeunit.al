@@ -763,8 +763,18 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
     end;
 
     local procedure BaseURL(): Text[250]
+    var
+        ShippingProviderSetup: Record "NPR Shipping Provider Setup";
     begin
-        exit('https://app.shipmondo.com/api/public/v3/')
+        if ShippingProviderSetup.Get() and (ShippingProviderSetup."Shipping Provider" = ShippingProviderSetup."Shipping Provider"::Shipmondo) then begin
+            case ShippingProviderSetup."Shipmondo API Environment" of
+                ShippingProviderSetup."Shipmondo API Environment"::Production:
+                    exit('https://app.shipmondo.com/api/public/v3/');
+                ShippingProviderSetup."Shipmondo API Environment"::Sandbox:
+                    exit('https://sandbox.shipmondo.com/api/public/v3/');
+            end;
+        end else
+            exit('https://app.shipmondo.com/api/public/v3/')
     end;
 }
 

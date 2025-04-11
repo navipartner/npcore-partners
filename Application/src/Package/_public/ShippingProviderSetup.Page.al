@@ -23,6 +23,21 @@ page 6014574 "NPR Shipping Provider Setup"
                 {
                     ToolTip = 'Specifies the Shipping Provider To Use';
                     ApplicationArea = NPRRetail;
+                    trigger OnValidate()
+                    begin
+                        CurrPage.Update();
+                    end;
+                }
+                group(ShipmondoAPIEnvironment)
+                {
+                    ShowCaption = false;
+                    Visible = Rec."Shipping Provider" = Rec."Shipping Provider"::Shipmondo;
+                    Editable = Rec."Shipping Provider" = Rec."Shipping Provider"::Shipmondo;
+                    field("Shipmondo API Environment"; Rec."Shipmondo API Environment")
+                    {
+                        ToolTip = 'Specifies the value of the Shipmondo API Environment field.';
+                        ApplicationArea = NPRRetail;
+                    }
                 }
                 field("Api User"; Rec."Api User")
                 {
