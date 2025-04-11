@@ -15,7 +15,7 @@ codeunit 6151032 "NPR POS Tracking Utils"
         ActiveLbl: Label 'active';
         WrongSerial_InstrLbl: Label ' \Press OK to re-enter serial number now. \Press Cancel to enter serial number later.\';
     begin
-        Item.SetLoadFields(Description, "Item Tracking Code");
+        Item.SetLoadFields(Description, "Item Tracking Code", "Prevent Negative Inventory");
         if not Item.Get(ItemNo) then
             exit;
 
@@ -40,7 +40,8 @@ codeunit 6151032 "NPR POS Tracking Utils"
         ItemLedgerEntry.SetRange("Serial No.", SerialNumber);
         ItemLedgerEntry.SetRange("Item No.", ItemNo);
         ItemLedgerEntry.SetFilter("Variant Code", VariantCode);
-        ItemLedgerEntry.SetRange("Location Code", LocationCode);
+        if CheckPreventNegativeInventory(Item) then
+            ItemLedgerEntry.SetRange("Location Code", LocationCode);
 
         ItemLedgerEntry.SetLoadFields("Variant Code");
         CanBeUsed := ItemLedgerEntry.FindSet(false);
@@ -354,4 +355,16 @@ codeunit 6151032 "NPR POS Tracking Utils"
         RequiresLotNo := ItemRequiresLotNo(Item, UseSpecificLotNo);
     end;
 
+    local procedure CheckPreventNegativeInventory(Item: Record Item): Boolean
+    var
+        InventorySetup: Record "Inventory Setup";
+    begin
+        if not InventorySetup.Get() then
+            exit;
+        if (Item."Prevent Negative Inventory" = Item."Prevent Negative Inventory"::Yes) then
+            exit(true);
+        if (Item."Prevent Negative Inventory" = Item."Prevent Negative Inventory"::Default) then
+            if InventorySetup."Prevent Negative Inventory" then
+                exit(true);
+    end;
 }
