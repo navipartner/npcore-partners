@@ -107,6 +107,9 @@ codeunit 6150840 "NPR EFT Planet PAX Integ"
     var
         EftTypeErrLabl: Label 'The EFT operation ''%1'' is not supported.';
         PlanetConfig: Record "NPR EFT Planet PAX Config";
+        ProcessingTypePaymentLbl: Label 'Payment', Locked = true;
+        ProcessingTypeRefund: Label 'Refund', Locked = true;
+        ProcessingTypeTxt: Text;
     begin
         if (not EftTransactionRequest.IsType(IntegrationType())) then
             exit;
@@ -120,9 +123,16 @@ codeunit 6150840 "NPR EFT Planet PAX Integ"
             EftTransactionRequest."Processing Type"::PAYMENT,
             EftTransactionRequest."Processing Type"::REFUND]) then begin
 
+            case EftTransactionRequest."Processing Type" of
+                EftTransactionRequest."Processing Type"::PAYMENT:
+                    ProcessingTypeTxt := ProcessingTypePaymentLbl;
+                EftTransactionRequest."Processing Type"::REFUND:
+                    ProcessingTypeTxt := ProcessingTypeRefund;
+            end;
+
             RequestMechanism := RequestMechanism::POSWorkflow;
             Request.Add('EFTEntryNo', EftTransactionRequest."Entry No.");
-            Request.Add('EFTReqType', Format(EftTransactionRequest."Processing Type"));
+            Request.Add('EFTReqType', ProcessingTypeTxt);
             Request.Add('formattedAmount', Format(EFTTransactionRequest."Amount Input", 0, '<Precision,2:2><Standard Format,2>'));
             exit;
         end;
