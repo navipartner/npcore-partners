@@ -1952,12 +1952,10 @@
     trigger OnDelete()
     var
         SaleLinePOS: Record "NPR POS Sale Line";
-        TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
         ErrNoDeleteDep: Label 'Deposit line from a rental is not to be deleted.';
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         EFTInterface: Codeunit "NPR EFT Interface";
         IsAllowed, Handled : Boolean;
-        LineDeleted: Boolean;
     begin
         if Rec."EFT Approved" then begin
             EFTInterface.AllowVoidEFTRequestOnPaymentLineDelete(Rec, IsAllowed, Handled);
@@ -1976,18 +1974,22 @@
                         SaleLinePOS.SetRange("Register No.", "Register No.");
                         SaleLinePOS.SetRange("Sales Ticket No.", "Sales Ticket No.");
                         SaleLinePOS.SetRange(Date, Date);
-                        SaleLinePOS.SetRange("Discount Code", "Discount Code");
+                        if "Line Type" = "Line Type"::"BOM List" then
+                            SaleLinePOS.SetRange("Parent BOM Line No.", "Line No.")
+                        else
+                            SaleLinePOS.SetRange("Parent BOM Line No.", "Parent BOM Line No.");
                         if SaleLinePOS.FindSet() then
                             repeat
-                                if SaleLinePOS."Line Type" = "Line Type"::"BOM List" then
-                                    SaleLinePOS.Validate("No.");
                                 if "Line No." <> SaleLinePOS."Line No." then begin
-                                    TempSaleLinePOS := SaleLinePOS;
-                                    LineDeleted := SaleLinePOS.Delete();
+                                    SaleLinePOS.Delete();
+                                    DeleteAccessoriesForPOSSaleLine(SaleLinePOS);
                                 end;
-                                if LineDeleted then
-                                    DeleteAccessoriesForPOSSaleLine(TempSaleLinePOS);
                             until SaleLinePOS.Next() = 0;
+                        if "Line Type" <> "Line Type"::"BOM List" then
+                            if SaleLinePOS.Get("Register No.", "Sales Ticket No.", Date, "Sale Type", "Parent BOM Line No.") then begin
+                                SaleLinePOS.Delete();
+                                DeleteAccessoriesForPOSSaleLine(SaleLinePOS);
+                            end;
                     end;
             end;
         end;
