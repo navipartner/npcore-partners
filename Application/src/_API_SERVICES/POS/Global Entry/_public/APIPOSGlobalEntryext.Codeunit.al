@@ -31,5 +31,25 @@ codeunit 6248260 "NPR API POS Global Entry Ext"
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    internal procedure SetNpGpPOSSalesEntryExtensionData(NpGpPOSSalesEntry: Record "NPR NpGp POS Sales Entry"; var ExtensionFieldsData: Dictionary of [Integer, Text])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure SetNpGpPOSSalesLineExtensionData(NpGpPOSSalesLine: Record "NPR NpGp POS Sales Line"; var ExtensionFieldsData: Dictionary of [Integer, Text])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure SetNpGpPOSInfoPOSEntryExtensionData(NpGpPOSInfoPOSEntry: Record "NPR NpGp POS Info POS Entry"; var ExtensionFieldsData: Dictionary of [Integer, Text])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure SetNpGpPOSPaymentLineExtensionData(NpGpPOSPaymentLine: Record "NPR NpGp POS Payment Line"; var ExtensionFieldsData: Dictionary of [Integer, Text])
+    begin
+    end;
+
 }
 #endif

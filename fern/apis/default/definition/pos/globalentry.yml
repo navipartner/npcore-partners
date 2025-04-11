@@ -7,9 +7,33 @@ types:
   StoreCode:
     type: string
     docs: Identification of the store
+    examples:
+      - name: ExampleStoreCode
+        value: "0321"
   PosUnitCode:
     type: string
     docs: Identification of the POS unit
+    examples:
+      - name: ExamplePosUnitCode
+        value: "POS-031"
+  DocumentNo:
+    type: string
+    docs: Sales ticket no.
+    examples:
+      - name: ExampleDocumentNo
+        value: "12345678"
+  GlobalReference:
+    type: string
+    docs: A unique reference to the sales line.
+    examples:
+      - name: ExampleGlobalReference
+        value: "D6E88A5E52E542F0AAA96F08F40B6EC9"
+  GlobalEntryId:
+    type: uuid
+    docs: The id of a Global Entry.
+    examples:
+      - name: ExampleGlobalEntryId
+        value: 4ca28ccc-e84b-4788-973c-c8ce5a59383b
 
   EntryTypeEnum:
     enum:
@@ -34,13 +58,11 @@ types:
       - name: Rounding
         value: 'Rounding'
 
-  POSEntry:
+  CreateGlobalEntry:
     properties:
       posStore: StoreCode
       posUnit: PosUnitCode
-      documentNo: 
-        type: string
-        docs: Sales ticket no.
+      documentNo: DocumentNo
       company: optional<string>
       entryTime: datetime
       entryType: EntryTypeEnum
@@ -56,10 +78,10 @@ types:
       totalAmountInclVAT: double
       totalVATAmount: double
       salesLines: 
-        type: optional<list<SaleLine>>
+        type: optional<list<CreateGlobalEntrySaleLine>>
         docs: List of sold items
       paymentLines: 
-        type: optional<list<PaymentLine>>
+        type: optional<list<GlobalEntryPaymentLine>>
         docs: List of payments
       posInfos: 
         type: optional<list<POSInfo>>
@@ -70,33 +92,35 @@ types:
     examples:
       - name: ExampleCreateSale
         value:
-          posStore: "0321"
-          posUnit: "POS-031"
-          documentNo: "12345678"
+          posStore: $StoreCode.ExampleStoreCode
+          posUnit: $PosUnitCode.ExamplePosUnitCode
+          documentNo: $DocumentNo.ExampleDocumentNo
           company: "Sales Company"
           entryTime: "2024-12-25T12:43:56Z"
           entryType: "Direct Sale"
           customerNo: "D000188"
-          postingDate: "2025-09-16"
+          postingDate: "2024-12-25"
           fiscalNumber: "F0078865"
           salesperson: "CLARK"
-          currencyCode: "USD"
-          currencyFactor: 1.23
-          salesAmount: 4.5
-          discountAmount: 6.78
-          totalAmountExclVAT: 90.12
-          totalAmountInclVAT: 34.5
-          totalVATAmount: 6.7
+          currencyCode: ""
+          currencyFactor: 1
+          salesAmount: 649.9
+          discountAmount: 80
+          totalAmountExclVAT: 519.92
+          totalAmountInclVAT: 649.9
+          totalVATAmount: 129.98
           salesLines: 
-            - $SaleLine.SaleLineExample
+            - $CreateGlobalEntrySaleLine.ExampleCreateGlobalEntrySaleLine1
+            - $CreateGlobalEntrySaleLine.ExampleCreateGlobalEntrySaleLine2
+            - $CreateGlobalEntrySaleLine.ExampleCreateGlobalEntrySaleLineRounding
           paymentLines:
-            - $PaymentLine.PaymentLineExample
+            - $GlobalEntryPaymentLine.ExampleGlobalEntryPaymentLine
           posInfos:
-            - $POSInfo.POSInfoExample
+            - $POSInfo.ExamplePOSInfo
           extensionFields:
-            - $ExtensionField.HeaderExtensionFieldExample
+            - $ExtensionField.ExampleHeaderExtensionField
 
-  SaleLine:
+  CreateGlobalEntrySaleLine:
     properties:
       lineNo: integer
       type: LineTypeEnum        
@@ -123,47 +147,99 @@ types:
       lineDiscountAmountInclVATLCY: double
       amountExclVATLCY: double
       amountInclVATLCY: double
-      globalReference: optional<string>
+      globalReference: optional<GlobalReference>
       extensionFields: 
         type: optional<list<ExtensionField>>
         docs: Additional data. Definition of fieldId and format of data in fieldValue have to be agreed with receiver of data
 
     examples:
-      - name: SaleLineExample
+      - name: ExampleCreateGlobalEntrySaleLine1
         value:
           lineNo: 1
           type: Item
-          code: "15235"
+          code: "80005"
           variantCode: "025"
           referenceNumber: "9780201379624"
           bomItemCode: "66"
           locationCode: "LOC-01"
-          description: ""
-          description2: ""
-          quantity: 9.11
+          description: "Hummel Hamar Leggings"
+          description2: "Co:BLUE Sz:L"
+          quantity: 1
           unitOfMeasureCode: "PCS"
           baseQuantity: 1
-          unitPrice: 1.2345
-          currencyCode: "USD"
-          vatPct: 6.789
-          lineDiscountPct: 0.12
-          lineDiscountAmountExclVAT: 3.45
-          lineDiscountAmountInclVAT: 6.78
-          lineAmount: 9.01
-          amountExclVAT: 2.34
-          amountInclVAT: 5.67
-          lineDiscountAmountExclVATLCY: 8.90
-          lineDiscountAmountInclVATLCY: 1.23
-          amountExclVATLCY: 4.56
-          amountInclVATLCY: 7.89
-          globalReference: "D6E88A5E52E542F0AAA96F08F40B6EC9"
+          unitPrice: 249.9
+          currencyCode: ""
+          vatPct: 25
+          lineDiscountPct: 0
+          lineDiscountAmountExclVAT: 0
+          lineDiscountAmountInclVAT: 0
+          lineAmount: 249.90
+          amountExclVAT: 199.92
+          amountInclVAT: 249.90
+          lineDiscountAmountExclVATLCY: 0
+          lineDiscountAmountInclVATLCY: 0
+          amountExclVATLCY: 199.92
+          amountInclVATLCY: 249.90
+          globalReference: $GlobalReference.ExampleGlobalReference
           extensionFields:
-            - $ExtensionField.LineExtensionFieldExample
+            - $ExtensionField.ExampleLineExtensionField
 
-  PaymentLine:
+      - name: ExampleCreateGlobalEntrySaleLine2
+        value:
+          lineNo: 2
+          type: Item
+          code: "80006"
+          variantCode: "L"
+          referenceNumber: "9780201379648"
+          locationCode: "LOC-01"
+          description: "Hummel Alta T-shirt"
+          description2: "Co:RED Sz:L"
+          quantity: 2
+          unitOfMeasureCode: "PCS"
+          baseQuantity: 2
+          unitPrice: 250
+          currencyCode: ""
+          vatPct: 25
+          lineDiscountPct: 20
+          lineDiscountAmountExclVAT: 80
+          lineDiscountAmountInclVAT: 100
+          lineAmount: 400
+          amountExclVAT: 320
+          amountInclVAT: 400
+          lineDiscountAmountExclVATLCY: 80
+          lineDiscountAmountInclVATLCY: 100
+          amountExclVATLCY: 320
+          amountInclVATLCY: 400
+          globalReference: "84E18BA8D5494605B605CD6192068FC2"
+
+      - name: ExampleCreateGlobalEntrySaleLineRounding
+        value:
+          lineNo: 3
+          type: Rounding
+          code: "ROUNDINGS"
+          locationCode: "LOC-01"
+          description: "Rounding"
+          quantity: 1
+          unitOfMeasureCode: ""
+          baseQuantity: 1
+          unitPrice: 0.1
+          currencyCode: ""
+          vatPct: 0
+          lineDiscountPct: 0
+          lineDiscountAmountExclVAT: 0
+          lineDiscountAmountInclVAT: 0
+          lineAmount: 0
+          amountExclVAT: 0.1
+          amountInclVAT: 0.1
+          lineDiscountAmountExclVATLCY: 0
+          lineDiscountAmountInclVATLCY: 0
+          amountExclVATLCY: 0.1
+          amountInclVATLCY: 0.1
+
+  GlobalEntryPaymentLine:
     properties:   
       lineNo: integer
-      documentNo: optional<string>
+      documentNo: optional<DocumentNo>
       paymentMethod: string
       description: optional<string>
       amountLCY: double
@@ -173,17 +249,17 @@ types:
         type: optional<list<ExtensionField>>
         docs: Additional data. Definition of fieldId and format of data in fieldValue have to be agreed with receiver of data
     examples:
-      - name: PaymentLineExample
+      - name: ExampleGlobalEntryPaymentLine
         value:
           lineNo: 1
-          documentNo: "12345678"
+          documentNo: $DocumentNo.ExampleDocumentNo
           paymentMethod: "CASH"
           description: "Cash payment"
-          amountLCY: 4.56
-          amount: 7.89
-          currencyCode: "USD"
+          amountLCY: 650
+          amount: 650
+          currencyCode: ""
           extensionFields:
-            - $ExtensionField.PaymentExtensionFieldExample
+            - $ExtensionField.ExamplePaymentExtensionField
 
   POSInfo:
     properties:
@@ -201,7 +277,7 @@ types:
         type: optional<list<ExtensionField>>
         docs: Additional data. Definition of fieldId and format of data in fieldValue have to be agreed with receiver of data
     examples:
-      - name: POSInfoExample
+      - name: ExamplePOSInfo
         value:
           lineNo: 4
           saleLineNo: 1
@@ -209,12 +285,12 @@ types:
           code: "123-ABC"
           description: "description"
           quantity: 1
-          price: 1.23
-          netAmount: 4.56
-          grossAmount: 7.89
-          discountAmount: 0.12
+          price: 249.9
+          netAmount: 199.92
+          grossAmount: 249.9
+          discountAmount: 0
           extensionFields:
-            - $ExtensionField.PosInfoExtensionFieldExample
+            - $ExtensionField.ExamplePosInfoExtensionField
 
   ExtensionField:
     docs: additional data. Definition of fieldId and format of data in fieldvalue have to be agreed
@@ -222,36 +298,336 @@ types:
       fieldId: integer
       fieldValue: string
     examples:
-      - name: HeaderExtensionFieldExample
+      - name: ExampleHeaderExtensionField
         value:
           fieldId: 50100
           fieldValue: "value to apply to the custom field on pos entry"
-      - name: LineExtensionFieldExample
+      - name: ExampleLineExtensionField
         value:
           fieldId: 50100
           fieldValue: "value to apply to the custom field on sales line"
-      - name: PaymentExtensionFieldExample
+      - name: ExamplePaymentExtensionField
         value:
           fieldId: 50100
           fieldValue: "value to apply to custom field on payment line"
-      - name: PosInfoExtensionFieldExample
+      - name: ExamplePosInfoExtensionField
         value:
           fieldId: 50100
-          fieldValue: "value to apply to custom field on payment line"
-      
-  GlobalEntryResponse:
+          fieldValue: "value to apply to custom field on pos info"
+
+  GlobalEntrySale:
+    properties:
+      id: GlobalEntryId
+      posStore: StoreCode
+      posUnit: PosUnitCode      
+      documentNo: DocumentNo
+      company: optional<string>
+      entryTime: datetime
+      entryType: EntryTypeEnum
+      customerNo: optional<string>
+      postingDate: date
+      fiscalNumber: string
+      salesperson: optional<string>
+      currencyCode: optional<string>
+      currencyFactor: optional<double>
+      salesAmount: double
+      discountAmount: double
+      totalAmountExclVAT: double
+      totalAmountInclVAT: double
+      totalVATAmount: double
+      salesLines: 
+        type: optional<list<GlobalEntrySaleLine>>
+        docs: List of sold items
+      paymentLines: 
+        type: optional<list<GlobalEntryPaymentLine>>
+        docs: List of payments
+      posInfos: 
+        type: optional<list<POSInfo>>
+        docs: List of Info entries
+      extensionFields: 
+        type: optional<list<ExtensionField>>
+        docs: Additional data. Definition of fieldId and format of data in fieldValue have to be agreed with receiver of data
+    examples:
+      - name: ExampleGlobalEntryFullSale
+        value:
+          id: $GlobalEntryId.ExampleGlobalEntryId
+          posStore: $StoreCode.ExampleStoreCode
+          posUnit: $PosUnitCode.ExamplePosUnitCode
+          documentNo: $DocumentNo.ExampleDocumentNo
+          company: "Sales Company"
+          entryTime: "2024-12-25T12:43:56Z"
+          entryType: "Direct Sale"
+          customerNo: "D000188"
+          postingDate: "2024-12-25"
+          fiscalNumber: "F0078865"
+          salesperson: "CLARK"
+          currencyCode: ""
+          currencyFactor: 1
+          salesAmount: 649.9
+          discountAmount: 80
+          totalAmountExclVAT: 519.92
+          totalAmountInclVAT: 649.9
+          totalVATAmount: 129.98
+          salesLines: 
+            - $GlobalEntrySaleLine.ExampleGlobalEntrySaleLine1
+            - $GlobalEntrySaleLine.ExampleGlobalEntrySaleLine2
+            - $GlobalEntrySaleLine.ExampleGlobalEntrySaleLineRounding
+          paymentLines:
+            - $GlobalEntryPaymentLine.ExampleGlobalEntryPaymentLine
+          posInfos:
+            - $POSInfo.ExamplePOSInfo
+          extensionFields:
+            - $ExtensionField.ExampleHeaderExtensionField
+      - name: ExampleGlobalEntrySingleSalesline
+        value:
+          id: $GlobalEntryId.ExampleGlobalEntryId
+          posStore: $StoreCode.ExampleStoreCode
+          posUnit: $PosUnitCode.ExamplePosUnitCode
+          documentNo: $DocumentNo.ExampleDocumentNo
+          company: "Sales Company"
+          entryTime: "2024-12-25T12:43:56Z"
+          entryType: "Direct Sale"
+          customerNo: "D000188"
+          postingDate: "2024-12-25"
+          fiscalNumber: "F0078865"
+          salesperson: "CLARK"
+          currencyCode: ""
+          currencyFactor: 1
+          salesAmount: 649.9
+          discountAmount: 80
+          totalAmountExclVAT: 519.92
+          totalAmountInclVAT: 649.9
+          totalVATAmount: 129.98
+          salesLines: 
+            - $GlobalEntrySaleLine.ExampleGlobalEntrySaleLine1
+          paymentLines:
+            - $GlobalEntryPaymentLine.ExampleGlobalEntryPaymentLine
+          posInfos:
+            - $POSInfo.ExamplePOSInfo
+          extensionFields:
+            - $ExtensionField.ExampleHeaderExtensionField
+
+  GlobalEntrySaleLine:
+    #copy of CreateGlobalEntrySaleLine with added returnedQuantity
+    properties:
+      lineNo: integer
+      type: LineTypeEnum        
+      code: string
+      variantCode: optional<string>
+      referenceNumber: optional<string>
+      bomItemCode: optional<string>
+      locationCode: optional<string>
+      description: optional<string>
+      description2: optional<string>
+      quantity: double
+      returnedQuantity: double
+      unitOfMeasureCode: optional<string>
+      baseQuantity: double
+      unitPrice: double
+      currencyCode: optional<string>
+      vatPct: double
+      lineDiscountPct: double
+      lineDiscountAmountExclVAT: double
+      lineDiscountAmountInclVAT: double
+      lineAmount: double
+      amountExclVAT: double
+      amountInclVAT: double
+      lineDiscountAmountExclVATLCY: double
+      lineDiscountAmountInclVATLCY: double
+      amountExclVATLCY: double
+      amountInclVATLCY: double
+      globalReference: optional<GlobalReference>
+      extensionFields: 
+        type: optional<list<ExtensionField>>
+        docs: Additional data. Definition of fieldId and format of data in fieldValue have to be agreed with receiver of data
+
+    examples:
+      - name: ExampleGlobalEntrySaleLine1
+        value:
+          lineNo: 1
+          type: Item
+          code: "80005"
+          variantCode: "025"
+          referenceNumber: "9780201379624"
+          bomItemCode: "66"
+          locationCode: "LOC-01"
+          description: "Hummel Hamar Leggings"
+          description2: "Co:BLUE Sz:L"
+          quantity: 1
+          returnedQuantity: 0
+          unitOfMeasureCode: "PCS"
+          baseQuantity: 1
+          unitPrice: 249.9
+          currencyCode: ""
+          vatPct: 25
+          lineDiscountPct: 0
+          lineDiscountAmountExclVAT: 0
+          lineDiscountAmountInclVAT: 0
+          lineAmount: 249.90
+          amountExclVAT: 199.92
+          amountInclVAT: 249.90
+          lineDiscountAmountExclVATLCY: 0
+          lineDiscountAmountInclVATLCY: 0
+          amountExclVATLCY: 199.92
+          amountInclVATLCY: 249.90
+          globalReference: $GlobalReference.ExampleGlobalReference
+          extensionFields:
+            - $ExtensionField.ExampleLineExtensionField
+
+      - name: ExampleGlobalEntrySaleLine2
+        value:
+          lineNo: 2
+          type: Item
+          code: "80006"
+          variantCode: "L"
+          referenceNumber: "9780201379648"
+          locationCode: "LOC-01"
+          description: "Hummel Alta T-shirt"
+          description2: "Co:RED Sz:L"
+          quantity: 2
+          returnedQuantity: 1
+          unitOfMeasureCode: "PCS"
+          baseQuantity: 2
+          unitPrice: 250
+          currencyCode: ""
+          vatPct: 25
+          lineDiscountPct: 20
+          lineDiscountAmountExclVAT: 80
+          lineDiscountAmountInclVAT: 100
+          lineAmount: 400
+          amountExclVAT: 320
+          amountInclVAT: 400
+          lineDiscountAmountExclVATLCY: 80
+          lineDiscountAmountInclVATLCY: 100
+          amountExclVATLCY: 320
+          amountInclVATLCY: 400
+          globalReference: "84E18BA8D5494605B605CD6192068FC2"
+
+      - name: ExampleGlobalEntrySaleLineRounding
+        value:
+          lineNo: 3
+          type: Rounding
+          code: "ROUNDINGS"
+          locationCode: "LOC-01"
+          description: "Rounding"
+          quantity: 1
+          returnedQuantity: 0
+          unitOfMeasureCode: ""
+          baseQuantity: 1
+          unitPrice: 0.1
+          currencyCode: ""
+          vatPct: 0
+          lineDiscountPct: 0
+          lineDiscountAmountExclVAT: 0
+          lineDiscountAmountInclVAT: 0
+          lineAmount: 0
+          amountExclVAT: 0.1
+          amountInclVAT: 0.1
+          lineDiscountAmountExclVATLCY: 0
+          lineDiscountAmountInclVATLCY: 0
+          amountExclVATLCY: 0.1
+          amountInclVATLCY: 0.1
+
+  SearchGlobalEntryResponse:
+    properties:
+      globaleEntries: list<GlobalEntrySale>
+    examples:
+      - name: ExampleSearchGlobalEntryResponse
+        value:
+          globaleEntries: 
+            - $GlobalEntrySale.ExampleGlobalEntryFullSale
+
+  GlobalEntryPostResponse:
     properties:
       id: 
         type: uuid
         docs: Unique identifier of the added entry
-
+    examples:
+      - name: ExampleResponse
+        value:
+          id: $GlobalEntryId.ExampleGlobalEntryId
 
 
 service:
   display-name: Global POS Entry
-  auth: false
+  auth: true
   base-path: /pos
   endpoints: 
+    getGlobalEntry:
+      display-name: Get using Id
+      path: "/globalentry/{id}"
+      method: GET
+      path-parameters: 
+        id: GlobalEntryId
+      response: GlobalEntrySale
+      examples:
+        - name: Response
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            id: $GlobalEntryId.ExampleGlobalEntryId
+          response:
+            body: $GlobalEntrySale.ExampleGlobalEntryFullSale
+
+    getGlobalEntryByReference:
+      display-name: Get Global Entry by Global Reference.
+      docs: "Search for Global Entry by Global Reference. Returns either the full sale or only the sales line matching the Global Reference."
+      path: "/globalentry/getbyreference"
+      method: GET
+      request:
+        name: getGlobalEntryRequest
+        query-parameters:
+          globalReference: GlobalReference
+          fullSale: optional<boolean>
+      response: GlobalEntrySale
+      examples:
+        - name: FullSale Response
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            globalReference: $GlobalReference.ExampleGlobalReference
+            fullSale: true
+          response:
+            body: $GlobalEntrySale.ExampleGlobalEntryFullSale
+        - name: Single Salesline Response
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            globalReference: $GlobalReference.ExampleGlobalReference
+            fullSale: false
+          response:
+            body: $GlobalEntrySale.ExampleGlobalEntrySingleSalesline
+
+
+    searchGlobalEntry:
+      display-name: Search Global Entry
+      docs: "Search for Global Entries by Document No, Store and POS Unit."
+      path: "/globalentry/search"
+      method: GET
+      request:
+        name: searchGlobalEntryRequest
+        query-parameters:
+          documentNo: DocumentNo
+          posStore: optional<StoreCode>
+          posUnit: optional<PosUnitCode>      
+      response: SearchGlobalEntryResponse
+      examples:
+        - name: Response
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            documentNo: $DocumentNo.ExampleDocumentNo
+            posStore: $StoreCode.ExampleStoreCode
+          response:
+            body: $SearchGlobalEntryResponse.ExampleSearchGlobalEntryResponse
+
     postGlobalEntry:
       display-name: Create Global Entry
       docs: Endpoint for adding a new sale to Global Entry. The sale is identified by the combination of Store, POS Unit and Document No. This combination must be unique for the sale to be added.
@@ -259,14 +635,13 @@ service:
       method: POST
       request:
         name: createSale
-        body: POSEntry
-      response: GlobalEntryResponse
+        body: CreateGlobalEntry
+      response: GlobalEntryPostResponse
       examples:
         - path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
-          request: $POSEntry.ExampleCreateSale
+          request: $CreateGlobalEntry.ExampleCreateSale
           response:
-            body:
-              id: "0d200aa6-aacd-4b78-b673-c4fb7461f5ea"
+            body: $GlobalEntryPostResponse.ExampleResponse
