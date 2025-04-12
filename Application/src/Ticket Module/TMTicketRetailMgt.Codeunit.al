@@ -766,10 +766,13 @@
         if (ReceiptNo = '') then
             exit(false);
 
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
+        TicketReservationRequest.ReadIsolation(IsolationLevel::ReadUncommitted);
+#ENDIF
         TicketReservationRequest.SetCurrentKey("Receipt No.");
         TicketReservationRequest.SetFilter("Receipt No.", '=%1', ReceiptNo);
         TicketReservationRequest.SetFilter("Line No.", '=%1', LineNumber);
-
+        TicketReservationRequest.SetLoadFields("Session Token ID", "Ext. Line Reference No.");
         if (TicketReservationRequest.FindFirst()) then begin
             Token := TicketReservationRequest."Session Token ID";
             TokenLineNumber := TicketReservationRequest."Ext. Line Reference No.";

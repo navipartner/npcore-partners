@@ -120,7 +120,7 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         ResponseJson: Codeunit "NPR Json Builder";
     begin
-        TicketRequestManager.DeleteReservationTokenRequest(Token);
+        TicketRequestManager.DeleteReservationTokenRequestV2(Token);
 
         ResponseJson.StartObject()
             .AddProperty('token', Token)
@@ -246,10 +246,11 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         ResolvingTable: Integer;
         INVALID_ITEM_REFERENCE: Label 'Reference %1 does not resolve to neither an item reference nor an item number.';
     begin
-        TicketRequestManager.ExpireReservationRequests();
+        TicketRequestManager.ExpireReservationRequestsV2();
+        Commit();
 
         if (Token <> '') then
-            TicketRequestManager.DeleteReservationRequest(Token, true);
+            TicketRequestManager.DeleteReservationRequestV2(Token, true);
 
         if (Token = '') then
             Token := CopyStr(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')), 1, MaxStrLen(Token));

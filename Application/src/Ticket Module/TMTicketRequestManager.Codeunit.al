@@ -84,6 +84,145 @@
         exit(TicketReservationRequest.FindFirst());
     end;
 
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+    [CommitBehavior(CommitBehavior::Error)]
+    procedure DeleteReservationRequestV2(Token: Text[100]; RemoveRequest: Boolean)
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketReservationRequest2: Record "NPR TM Ticket Reservation Req.";
+        TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
+        Ticket, TicketUpdate : Record "NPR TM Ticket";
+        DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        TicketAccessStatistics: Record "NPR TM Ticket Access Stats";
+        TicketNotification: Record "NPR TM Ticket Notif. Entry";
+        ExpireDateTime: DateTime;
+    begin
+
+        TicketReservationRequest.ReadIsolation := IsolationLevel::ReadUncommitted;
+        TicketReservationRequest.SetCurrentKey("Session Token ID");
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::CONFIRMED);
+        TicketReservationRequest.SetLoadFields("Session Token ID", "Request Status", "Entry Type");
+        if (TicketReservationRequest.FindFirst()) then
+            Error(CHANGE_NOT_ALLOWED);
+
+        TicketReservationRequest.SetFilter("Request Status", '<>%1 & <>%2', TicketReservationRequest."Request Status"::RESERVED, TicketReservationRequest."Request Status"::WAITINGLIST);
+        if (not TicketReservationRequest.FindSet()) then
+            exit;
+
+        // If the entries we are about to delete has been included in statistics, we need to reverse the statistics
+        // (when the detailed entries entry number is less than or equal to the highest access entry number in the statistics)
+        TicketAccessStatistics.SetCurrentKey("Highest Access Entry No.");
+        if (not TicketAccessStatistics.FindLast()) then
+            TicketAccessStatistics.Init();
+
+        ExpireDateTime := CalculateNewExpireTime();
+        repeat
+
+            if (TicketReservationRequest."Entry Type" = TicketReservationRequest."Entry Type"::PRIMARY) then begin
+
+                Ticket.SetLoadFields("No.");
+                Ticket.ReadIsolation := IsolationLevel::ReadUnCommitted;
+                Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+                Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
+                if (Ticket.FindSet()) then begin
+                    repeat
+                        // Clean up ticket statistics in case it was aggregated before completion
+                        // NOTE: Statistics are not aggregated for tickets when job is run and regardless of the status of the ticket, aggregation tracks highest entry numbers only
+                        DetailedTicketAccessEntry.Reset();
+                        DetailedTicketAccessEntry.ReadIsolation := IsolationLevel::ReadUncommitted;
+                        DetailedTicketAccessEntry.SetCurrentKey("Ticket No.");
+                        DetailedTicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+                        if (DetailedTicketAccessEntry.FindSet()) then begin
+                            repeat
+                                if (DetailedTicketAccessEntry."Entry No." <= TicketAccessStatistics."Highest Access Entry No.") then // Reverse aggregated statistics
+                                    ReverseInitialEntryStatistics(DetailedTicketAccessEntry, TicketAccessStatistics."Highest Access Entry No.");
+                            until (DetailedTicketAccessEntry.Next() = 0);
+                        end;
+
+                        DetailedTicketAccessEntryDelete(Ticket."No.");
+                        TicketAccessEntryDelete(Ticket."No.");
+
+                        TicketNotification.ReadIsolation := IsolationLevel::UpdLock;
+                        TicketNotification.SetCurrentKey("Ticket No.");
+                        TicketNotification.SetLoadFields("Ticket No.");
+                        TicketNotification.SetFilter("Ticket No.", '=%1', Ticket."No.");
+                        if (TicketNotification.FindSet()) then
+                            repeat
+                                TicketNotification.Delete();
+                            until TicketNotification.Next() = 0;
+
+                        TicketUpdate.ReadIsolation := IsolationLevel::UpdLock;
+                        TicketUpdate.Get(Ticket."No.");
+                        TicketUpdate.Delete();
+
+                    until (Ticket.Next() = 0);
+                end;
+            end;
+
+            TicketReservationRequest2.ReadIsolation := IsolationLevel::UpdLock;
+            TicketReservationRequest2.SetLoadFields("Entry No.", "Admission Created", "Request Status", "Expires Date Time");
+            TicketReservationRequest2.Get(TicketReservationRequest."Entry No.");
+            if (not RemoveRequest) then begin
+                TicketReservationRequest2."Admission Created" := false;
+                TicketReservationRequest2."Request Status" := TicketReservationRequest."Request Status"::EXPIRED;
+                TicketReservationRequest2."Expires Date Time" := ExpireDateTime;
+                TicketReservationRequest2.Modify();
+            end;
+
+            if (RemoveRequest) then begin
+                TicketReservationResponse.SetCurrentKey("Session Token ID");
+                TicketReservationResponse.SetFilter("Session Token ID", '=%1', Token);
+                TicketReservationResponse.SetLoadFields("Session Token ID");
+                if (TicketReservationResponse.FindSet()) then
+                    repeat
+                        TicketReservationResponse.Delete();
+                    until (TicketReservationResponse.Next() = 0);
+                TicketReservationRequest2.Delete();
+            end;
+
+        until (TicketReservationRequest.Next() = 0);
+
+    end;
+
+    local procedure DetailedTicketAccessEntryDelete(TicketNo: Code[20])
+    var
+        DetailedTicketAccessEntry, DetailedTicketAccessEntryUpdate : Record "NPR TM Det. Ticket AccessEntry";
+    begin
+
+        DetailedTicketAccessEntry.ReadIsolation := IsolationLevel::ReadUnCommitted;
+        DetailedTicketAccessEntry.SetCurrentKey("Ticket No.");
+        DetailedTicketAccessEntry.SetLoadFields("Ticket No.");
+        DetailedTicketAccessEntry.SetFilter("Ticket No.", '=%1', TicketNo);
+
+        if (DetailedTicketAccessEntry.FindSet()) then begin
+            DetailedTicketAccessEntryUpdate.ReadIsolation := IsolationLevel::UpdLock;
+            repeat
+                DetailedTicketAccessEntryUpdate.Get(DetailedTicketAccessEntry."Entry No.");
+                DetailedTicketAccessEntryUpdate.Delete();
+            until (DetailedTicketAccessEntry.Next() = 0);
+        end;
+    end;
+
+    local procedure TicketAccessEntryDelete(TicketNo: Code[20])
+    var
+        TicketAccessEntry, TicketAccessEntryUpdate : Record "NPR TM Ticket Access Entry";
+    begin
+        TicketAccessEntry.ReadIsolation := IsolationLevel::ReadUnCommitted;
+        TicketAccessEntry.SetCurrentKey("Ticket No.");
+        TicketAccessEntry.SetLoadFields("Entry No.");
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', TicketNo);
+        if (TicketAccessEntry.FindSet()) then begin
+            TicketAccessEntryUpdate.ReadIsolation := IsolationLevel::UpdLock;
+            repeat
+                TicketAccessEntryUpdate.Get(TicketAccessEntry."Entry No.");
+                TicketAccessEntryUpdate.Delete();
+            until (TicketAccessEntry.Next() = 0);
+        end;
+
+    end;
+#endif
+
     procedure DeleteReservationRequest(Token: Text[100]; RemoveRequest: Boolean)
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
@@ -882,6 +1021,21 @@
         DeleteReservationRequest(TicketReservationRequest."Session Token ID", true);
     end;
 
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+    procedure DeleteReservationTokenRequestV2(Token: Text[100])
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+
+        // Cancel a ticket request by deleting it - possible when it has not yet been confirmed.
+        TicketReservationRequest.SetCurrentKey("Session Token ID");
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        TicketReservationRequest.FindSet();
+
+        DeleteReservationRequestV2(TicketReservationRequest."Session Token ID", true);
+    end;
+#endif
+
     procedure RevokeReservationTokenRequest(Token: Text[100]; DeferUntilPosting: Boolean)
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
@@ -904,6 +1058,104 @@
         end;
 
     end;
+
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+    internal procedure ExpireReservationRequestsV2(): Integer
+    begin
+        exit(ExpireReservationRequestsV2(30));
+    end;
+
+    [CommitBehavior(CommitBehavior::Error)]
+    internal procedure ExpireReservationRequestsV2(MaxNumberOfTokensPerSession: Integer): Integer
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        RequestMutex: Record "NPR TM TicketRequestMutex";
+        ExpiredTokens, DeletedTokens : List of [Text[100]];
+        Token: Text[100];
+        MySessionId: Integer;
+    begin
+        if (MaxNumberOfTokensPerSession <= 0) then
+            MaxNumberOfTokensPerSession := 30;
+
+        MySessionId := SessionId();
+
+        // Scan REGISTERED and expire tokens that are older than X minutes
+        TicketReservationRequest.Reset();
+        TicketReservationRequest.ReadIsolation := IsolationLevel::ReadUnCommitted;
+        TicketReservationRequest.SetLoadFields("Session Token ID", "Request Status", "Expires Date Time");
+        TicketReservationRequest.SetCurrentKey("Request Status", "Expires Date Time");
+        TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::REGISTERED);
+        TicketReservationRequest.SetFilter("Expires Date Time", '>%1 & <%2', CreateDateTime(0D, 0T), CurrentDateTime());
+        TicketReservationRequest.SetFilter("Primary Request Line", '=%1', true);
+
+        if (TicketReservationRequest.FindSet()) then
+            repeat
+                Token := TicketReservationRequest."Session Token ID";
+                if (not ExpiredTokens.Contains(Token)) then
+                    if (RequestMutex.Acquire(Token, MySessionId)) then
+                        ExpiredTokens.Add(Token);
+            until (TicketReservationRequest.Next() = 0) or (ExpiredTokens.Count() >= MaxNumberOfTokensPerSession);
+
+        foreach Token in ExpiredTokens do
+            DeleteReservationRequestV2(Token, false);
+
+        // Scan EXPIRED and delete tokens that are older than X minutes
+        if (ExpiredTokens.Count() < MaxNumberOfTokensPerSession) then begin
+            TicketReservationRequest.Reset();
+            TicketReservationRequest.ReadIsolation := IsolationLevel::ReadUnCommitted;
+            TicketReservationRequest.SetLoadFields("Session Token ID", "Request Status", "Expires Date Time");
+            TicketReservationRequest.SetCurrentKey("Request Status", "Expires Date Time");
+            TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::EXPIRED);
+            TicketReservationRequest.SetFilter("Expires Date Time", '>%1 & <%2', CreateDateTime(0D, 0T), CurrentDateTime());
+
+            if (TicketReservationRequest.FindSet()) then
+                repeat
+                    Token := TicketReservationRequest."Session Token ID";
+                    if (not DeletedTokens.Contains(Token)) then
+                        if (RequestMutex.Acquire(Token, MySessionId)) then
+                            DeletedTokens.Add(Token);
+
+                until (TicketReservationRequest.Next() = 0) or (DeletedTokens.Count() + ExpiredTokens.Count() >= MaxNumberOfTokensPerSession);
+
+            foreach Token in DeletedTokens do
+                DeleteReservationRequestV2(Token, true);
+        end;
+
+        // Client up the mutex table
+        foreach Token in ExpiredTokens do
+            if (RequestMutex.Get(Token)) then
+                RequestMutex.Delete();
+
+        foreach Token in DeletedTokens do
+            if (RequestMutex.Get(Token)) then
+                RequestMutex.Delete();
+
+        if (ExpiredTokens.Count() + DeletedTokens.Count() > 0) then begin
+            if (ExpiredTokens.Count() + DeletedTokens.Count() >= MaxNumberOfTokensPerSession) then
+                EmitExpiryMessageToTelemetry(StrSubstNo('Reservation Request Expiry: was capped by max number to handle per session: %1, expired: %2, deleted: %3.', MaxNumberOfTokensPerSession, ExpiredTokens.Count(), DeletedTokens.Count()), Verbosity::Warning)
+            else
+                EmitExpiryMessageToTelemetry(StrSubstNo('Reservation Request Expiry: expired: %1, deleted: %2.', ExpiredTokens.Count(), DeletedTokens.Count()), Verbosity::Normal);
+        end;
+
+        exit(ExpiredTokens.Count() + DeletedTokens.Count());
+    end;
+
+    local procedure EmitExpiryMessageToTelemetry(MessageText: Text; MsgVerbosity: Verbosity)
+    var
+        CustomDimensions: Dictionary of [Text, Text];
+        ActiveSession: Record "Active Session";
+    begin
+        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
+        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
+        CustomDimensions.Add('NPR_TenantId', Database.TenantId());
+        CustomDimensions.Add('NPR_CompanyName', CompanyName());
+        CustomDimensions.Add('NPR_UserID', ActiveSession."User ID");
+        CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
+        CustomDimensions.Add('NPR_SessionUniqId', ActiveSession."Session Unique ID");
+
+        Session.LogMessage('NPR_TM_TicketRequestExpiry', MessageText, MsgVerbosity, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
+    end;
+#endif
 
     procedure ExpireReservationRequests()
     var
@@ -1296,6 +1548,7 @@
     begin
 
         TicketReservationRequest.Reset();
+        TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         if (not TicketReservationRequest.FindSet()) then
             exit(false);
@@ -2259,6 +2512,7 @@
 
         if (ExpirySeconds = 0) then
             ExpirySeconds := 1500;
+
     end;
 
     // ***************** EVENTS
