@@ -106,7 +106,7 @@ codeunit 6151548 "NPR NO Audit Mgt."
         if not IsNOAuditEnabled(POSUnit."POS Audit Profile") then
             exit;
 
-        POSAuditLogMgt.CreateEntryExtended(POSSaleLineRecord.RecordId, POSAuditLog."Action Type"::DELETE_POS_SALE_LINE, 0, '', POSSaleLineRecord."Register No.", AuditLogDescriptionTxt, Format(POSSaleLineRecord."Amount Including VAT"));
+        POSAuditLogMgt.CreateEntryExtended(POSSaleLineRecord.RecordId, POSAuditLog."Action Type"::DELETE_POS_SALE_LINE, 0, '', POSSaleLineRecord."Register No.", AuditLogDescriptionTxt, Format(POSSaleLineRecord."Amount Including VAT", 0, 9));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POSAction: Cancel Sale B", 'OnBeforeDeletePOSSaleLine', '', false, false)]
@@ -135,7 +135,7 @@ codeunit 6151548 "NPR NO Audit Mgt."
         until POSSaleLineRecord.Next() = 0;
 
         POSSaleLineRecord.CalcSums("Amount Including VAT");
-        POSAuditLogMgt.CreateEntryExtended(SalePOS.RecordId, POSAuditLog."Action Type"::CANCEL_POS_SALE_LINE, 0, '', SalePOS."Register No.", AuditLogDescriptionTxt, Format(POSSaleLineRecord."Amount Including VAT"));
+        POSAuditLogMgt.CreateEntryExtended(SalePOS.RecordId, POSAuditLog."Action Type"::CANCEL_POS_SALE_LINE, 0, '', SalePOS."Register No.", AuditLogDescriptionTxt, Format(POSSaleLineRecord."Amount Including VAT", 0, 9));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action - Discount B", 'OnBeforeSetDiscount', '', false, false)]
@@ -202,9 +202,9 @@ codeunit 6151548 "NPR NO Audit Mgt."
         POSSale.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.");
         AuditLogDescription := StrSubstNo(PriceCheckedByTxt, POSSale."Salesperson Code");
         if PriceExclVAT then
-            ItemPriceAsText := Format(SaleLinePOS.Amount)
+            ItemPriceAsText := Format(SaleLinePOS.Amount, 0, 9)
         else
-            ItemPriceAsText := Format(SaleLinePOS."Amount Including VAT");
+            ItemPriceAsText := Format(SaleLinePOS."Amount Including VAT", 0, 9);
 
         AdditionalInfo := StrSubstNo(AdditionalInfoLbl, SaleLinePOS."No.", SaleLinePOS.Description, SaleLinePOS."Description 2", ItemPriceAsText);
 

@@ -249,7 +249,7 @@ codeunit 6060034 "NPR NO Report Statistics Mgt."
         POSAuditLog.SetLoadFields("Additional Information");
         if POSAuditLog.FindSet() then
             repeat
-                if Evaluate(ConvertVar, POSAuditLog."Additional Information") then
+                if Evaluate(ConvertVar, POSAuditLog."Additional Information", 9) then
                     Amount += ConvertVar;
             until POSAuditLog.Next() = 0;
     end;
@@ -315,11 +315,9 @@ codeunit 6060034 "NPR NO Report Statistics Mgt."
 
 
     #region Find, Get and Filter data
-
     internal procedure FindPreviousZReport(var PreviousZReport: Record "NPR POS Workshift Checkpoint"; POSUnitNo: Code[10]; WorkshiftEntryNo: Integer): Boolean
     begin
         PreviousZReport.Reset();
-        PreviousZReport.SetCurrentKey("POS Unit No.", Open, "Type");
         PreviousZReport.SetFilter(Type, '=%1|=%2', PreviousZReport.Type::ZREPORT, PreviousZReport.Type::WORKSHIFT_CLOSE);
         PreviousZReport.SetFilter(Open, '=%1', false);
         PreviousZReport.SetFilter("POS Unit No.", '=%1', POSUnitNo);

@@ -528,6 +528,12 @@ codeunit 6184562 "NPR NO Fiscal Thermal Print"
 
     local procedure FormatNumber(Input: Decimal): Text
     begin
+        if Abs(Input) > 999999999999999.99 then // maximum format value of decimal data type in Business Central is +/- 999,999,999,999,999.99
+            if Input > 0 then
+                exit(Format(999999999999999.99, 0, '<SIGN><INTEGER><DECIMALS,3>'))
+            else
+                exit(Format(-999999999999999.99, 0, '<SIGN><INTEGER><DECIMALS,3>'));
+
         exit(Format(Input, 0, '<SIGN><INTEGER><DECIMALS,3>'));
     end;
 

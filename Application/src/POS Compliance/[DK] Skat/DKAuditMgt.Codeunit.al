@@ -121,7 +121,7 @@ codeunit 6184669 "NPR DK Audit Mgt."
 
         POSSaleLineRecord.CalcSums("Amount Including VAT");
         Amount := POSSaleLineRecord."Amount Including VAT";
-        POSAuditLogMgt.CreateEntryExtended(SalePOS.RecordId, POSAuditLog."Action Type"::CANCEL_POS_SALE_LINE, 0, '', SalePOS."Register No.", AuditLogDescLbl, Format(Amount));
+        POSAuditLogMgt.CreateEntryExtended(SalePOS.RecordId, POSAuditLog."Action Type"::CANCEL_POS_SALE_LINE, 0, '', SalePOS."Register No.", AuditLogDescLbl, Format(Amount, 0, 9));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action - Discount B", 'OnBeforeSetDiscount', '', false, false)]
