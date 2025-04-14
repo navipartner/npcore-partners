@@ -91,6 +91,7 @@ codeunit 6184793 "NPR RS EI Out Sales Inv. Mgt."
     begin
         SalesInvoiceLine.SetLoadFields(Type, "Line No.", Description, "Unit of Measure", "Line Discount Amount", "VAT Bus. Posting Group", "VAT Prod. Posting Group", "VAT %", "Unit Price", "Line Discount %", "Line Discount Amount");
         SalesInvoiceLine.SetRange("Document No.", SalesInvoiceHeader."No.");
+        SalesInvoiceLine.SetFilter(Type, '<>%1', SalesInvoiceLine.Type::" ");
         if SalesInvoiceLine.IsEmpty() then
             exit;
 

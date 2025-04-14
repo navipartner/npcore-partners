@@ -676,21 +676,12 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
     var
         Customer: Record Customer;
         CompanyInfo: Record "Company Information";
-        RSEIAuxSalesCrMemoHdr: Record "NPR RSEI Aux Sales Cr.Memo Hdr";
         RSEIPaymentMethodMapp: Record "NPR RS EI Payment Method Mapp.";
         PaymMethMappingNotFoundErr: Label 'Payment Method Mapping for %1: %2 has not been found in %3.', Comment = '%1 = Payment Method Code Caption, %2 = Payment Method Code, %3 = Payment Mapping Table Caption';
-        TaxLiabilityCodeMustBeChosenErr: Label 'Tax Liability Code must not be empty.';
     begin
         if not IsRSEInvoiceEnabled() then
             exit;
 
-        RSEIAuxSalesCrMemoHdr.ReadRSEIAuxSalesCrMemoHdrFields(SalesCrMemoHeader);
-        if not (RSEIAuxSalesCrMemoHdr."NPR RS EI Send To SEF") then
-            exit;
-
-        if not SalesCrMemoHeader."Prepayment Credit Memo" then
-            if (RSEIAuxSalesCrMemoHdr."NPR RS EI Tax Liability Method" in [RSEIAuxSalesCrMemoHdr."NPR RS EI Tax Liability Method"::" "]) and GuiAllowed() then
-                Error(TaxLiabilityCodeMustBeChosenErr);
         CompanyInfo.Get();
         Customer.Get(SalesCrMemoHeader."Sell-to Customer No.");
 
@@ -986,10 +977,10 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
 
         CheckIsDocTypeSetOnAllEntries(TempRSEInvoiceDocument);
         TempRSEInvoiceDocument.SetFilter("Document Type", '<>%1', TempRSEInvoiceDocument."Document Type"::" ");
-        TempRSEInvoiceDocument.FindSet();
-        repeat
-            RSEIInPurchInvMgt.InsertPurchaseDocument(TempRSEInvoiceDocument)
-        until TempRSEInvoiceDocument.Next() = 0;
+        if TempRSEInvoiceDocument.FindSet() then
+            repeat
+                RSEIInPurchInvMgt.InsertPurchaseDocument(TempRSEInvoiceDocument)
+            until TempRSEInvoiceDocument.Next() = 0;
     end;
 
     local procedure CheckIsDocTypeSetOnAllEntries(var TempRSEInvoiceDocument: Record "NPR RS E-Invoice Document" temporary)

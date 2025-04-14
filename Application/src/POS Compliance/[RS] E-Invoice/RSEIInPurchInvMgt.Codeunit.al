@@ -38,7 +38,11 @@ codeunit 6184883 "NPR RS EI In Purch. Inv. Mgt."
 
         case TempRSEInvoiceDocument."Invoice Type Code" of
             TempRSEInvoiceDocument."Invoice Type Code"::"381":
-                SetPurchaseCrMemoDocumentType(TempRSEInvoiceDocument, InvoiceElement, NamespaceManager);
+                begin
+                    if not CheckIfOriginalPurchaseInvImported(InvoiceElement, NamespaceManager) then
+                        exit;
+                    SetPurchaseCrMemoDocumentType(TempRSEInvoiceDocument, InvoiceElement, NamespaceManager);
+                end;
             TempRSEInvoiceDocument."Invoice Type Code"::"386":
                 SetPrepaymentPurchaseInvDocumentType(TempRSEInvoiceDocument);
         end;
@@ -469,8 +473,18 @@ codeunit 6184883 "NPR RS EI In Purch. Inv. Mgt."
     begin
         RSEInvoiceMgt.GetTextValue(HelperText, InvoiceElement, 'cac:BillingReference/cac:InvoiceDocumentReference/cbc:ID', NamespaceManager);
         RSEInvoiceDocument.SetRange("Invoice Document No.", HelperText);
-        RSEInvoiceDocument.FindFirst();
-        TempRSEInvoiceDocument.Prepayment := RSEInvoiceDocument.Prepayment;
+        if RSEInvoiceDocument.FindFirst() then
+            TempRSEInvoiceDocument.Prepayment := RSEInvoiceDocument.Prepayment;
+    end;
+
+    local procedure CheckIfOriginalPurchaseInvImported(InvoiceElement: XmlElement; NamespaceManager: XmlNamespaceManager): Boolean
+    var
+        RSEInvoiceDocument: Record "NPR RS E-Invoice Document";
+        HelperText: Text;
+    begin
+        RSEInvoiceMgt.GetTextValue(HelperText, InvoiceElement, 'cac:BillingReference/cac:InvoiceDocumentReference/cbc:ID', NamespaceManager);
+        RSEInvoiceDocument.SetRange("Invoice Document No.", HelperText);
+        exit(not RSEInvoiceDocument.IsEmpty());
     end;
 
     #endregion RS E-Invoice Helper Procedures

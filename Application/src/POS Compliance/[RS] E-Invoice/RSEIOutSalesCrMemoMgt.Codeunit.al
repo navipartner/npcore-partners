@@ -5,7 +5,6 @@ codeunit 6184888 "NPR RSEI Out SalesCr.Memo Mgt."
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
     var
         RSEInvoiceMgt: Codeunit "NPR RS E-Invoice Mgt.";
-        RSEITaxLiabilityCode: Enum "NPR RS EI Tax Liability Method";
         XsdUrlNamespaceLbl: Label 'http://www.w3.org/2001/XMLSchema', Locked = true;
         XsiUrlNamespaceLbl: Label 'http://www.w3.org/2001/XMLSchema-instance', Locked = true;
         XmlnsUrnNamespaceLbl: Label 'urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2', Locked = true;
@@ -89,6 +88,7 @@ codeunit 6184888 "NPR RSEI Out SalesCr.Memo Mgt."
         CreditNoteElement: XmlElement;
     begin
         SalesCrMemoLine.SetRange("Document No.", SalesCrMemoHeader."No.");
+        SalesCrMemoLine.SetFilter(Type, '<>%1', SalesCrMemoLine.Type::" ");
         if not SalesCrMemoLine.FindSet() then
             exit;
 
@@ -163,8 +163,7 @@ codeunit 6184888 "NPR RSEI Out SalesCr.Memo Mgt."
 
         InvoicePeriodElement := RSEInvoiceMgt.CreateXmlElement('InvoicePeriod', RSEInvoiceMgt.GetCacNamespace(), '');
 
-        InvoicePeriodElement.Add(RSEInvoiceMgt.CreateXmlElement('DescriptionCode', RSEInvoiceMgt.GetCbcNamespace(),
-          RSEITaxLiabilityCode.Names().Get(RSEITaxLiabilityCode.Ordinals().IndexOf(RSEIAuxSalesCrMemoHdr."NPR RS EI Tax Liability Method".AsInteger()))));
+        InvoicePeriodElement.Add(RSEInvoiceMgt.CreateXmlElement('DescriptionCode', RSEInvoiceMgt.GetCbcNamespace(), '0'));
 
         CreditNoteElement.Add(InvoicePeriodElement);
     end;
@@ -449,7 +448,7 @@ codeunit 6184888 "NPR RSEI Out SalesCr.Memo Mgt."
 
     local procedure AddSalesCrMemoLineInformation(var CreditNoteElement: XmlElement; SalesCrMemoHeader: Record "Sales Cr.Memo Header"; SalesCrMemoLine: Record "Sales Cr.Memo Line")
     var
-        VATPostingSetup: Record "VAT Posting Setup";
+        RSEIVATPostSetupMap: Record "NPR RS EI VAT Post. Setup Map.";
         UOMMapping: Record "NPR RS EI UOM Mapping";
         RSEInvoiceSetup: Record "NPR RS E-Invoice Setup";
         CreditNoteLineElement: XmlElement;
@@ -485,10 +484,10 @@ codeunit 6184888 "NPR RSEI Out SalesCr.Memo Mgt."
         SellersItemIdElement.Add(RSEInvoiceMgt.CreateXmlElement('ID', RSEInvoiceMgt.GetCbcNamespace(), SalesCrMemoLine."No."));
         ItemElement.Add(SellersItemIdElement);
 
-        VATPostingSetup.Get(SalesCrMemoLine."VAT Bus. Posting Group", SalesCrMemoLine."VAT Prod. Posting Group");
+        RSEIVATPostSetupMap.Get(SalesCrMemoLine."VAT Bus. Posting Group", SalesCrMemoLine."VAT Prod. Posting Group");
 
         ClassifiedTaxCatElement := RSEInvoiceMgt.CreateXmlElement('ClassifiedTaxCategory', RSEInvoiceMgt.GetCacNamespace(), '');
-        ClassifiedTaxCatElement.Add(RSEInvoiceMgt.CreateXmlElement('ID', RSEInvoiceMgt.GetCbcNamespace(), VATPostingSetup."Tax Category"));
+        ClassifiedTaxCatElement.Add(RSEInvoiceMgt.CreateXmlElement('ID', RSEInvoiceMgt.GetCbcNamespace(), RSEInvoiceMgt.GetAllowedTaxCategoryName(RSEIVATPostSetupMap."NPR RS EI Tax Category".AsInteger())));
         ClassifiedTaxCatElement.Add(RSEInvoiceMgt.CreateXmlElement('Percent', RSEInvoiceMgt.GetCbcNamespace(), RSEInvoiceMgt.FormatDecimal(SalesCrMemoLine."VAT %")));
         TaxSchemeElement := RSEInvoiceMgt.CreateXmlElement('TaxScheme', RSEInvoiceMgt.GetCacNamespace(), '');
         TaxSchemeElement.Add(RSEInvoiceMgt.CreateXmlElement('ID', RSEInvoiceMgt.GetCbcNamespace(), 'VAT'));
