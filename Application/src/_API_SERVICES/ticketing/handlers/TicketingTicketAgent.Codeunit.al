@@ -407,11 +407,12 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         TicketId: Guid;
         ResponseJson: Codeunit "NPR JSON Builder";
     begin
-        if (not Evaluate(TicketId, TicketIdText)) then
-            exit(Response.RespondResourceNotFound('Invalid Ticket - Ticket not found'));
+        Ticket.Init();
+        Ticket.SetLoadFields("External Ticket No.", "Item No.", "Valid From Date", "Valid From Time", "Valid To Date", "Valid To Time", "No.", AmountExclVat, AmountInclVat, Blocked, PrintedDateTime, PrintCount, SystemCreatedAt);
 
-        if (not Ticket.GetBySystemId(TicketId)) then
-            exit(Response.RespondResourceNotFound('Invalid Ticket - Ticket not found'));
+        if (Evaluate(TicketId, TicketIdText)) then
+            if (not Ticket.GetBySystemId(TicketId)) then
+                Ticket.Init();
 
         ResponseJson.StartArray().AddObject(FindTicketDTO(ResponseJson, Ticket, WithEvents)).EndArray();
 
@@ -426,8 +427,9 @@ codeunit 6185080 "NPR TicketingTicketAgent"
     begin
         Ticket.SetCurrentKey("External Ticket No.");
         Ticket.SetFilter("External Ticket No.", '=%1', ExternalNumber);
+        Ticket.SetLoadFields("External Ticket No.", "Item No.", "Valid From Date", "Valid From Time", "Valid To Date", "Valid To Time", "No.", AmountExclVat, AmountInclVat, Blocked, PrintedDateTime, PrintCount, SystemCreatedAt);
         if (not Ticket.FindFirst()) then
-            exit(Response.RespondResourceNotFound('Invalid Ticket - Ticket not found'));
+            Ticket.Init();
 
         ResponseJson.StartArray().AddObject(FindTicketDTO(ResponseJson, Ticket, WithEvents)).EndArray();
 
@@ -439,10 +441,13 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         ReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
         ResponseJson: Codeunit "NPR JSON Builder";
+        BadFilter: Boolean;
     begin
+        BadFilter := false;
+
         if (NotificationAddress.Contains('@')) then
             if (StrLen(NotificationAddress.Replace('@', '')) + 1 <> StrLen(NotificationAddress)) then
-                exit(Response.RespondResourceNotFound('Invalid notification address - Ticket not found'));
+                BadFilter := true;
 
         if (not NotificationAddress.Contains('@')) then
             if (NotificationAddress.ToUpper().StartsWith('%2B')) then
@@ -451,30 +456,29 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         NotificationAddress := DelChr(NotificationAddress, '<=>', '*?|&');
         NotificationAddress := NotificationAddress.Replace('..', '');
         NotificationAddress := NotificationAddress.Replace('@', '?');
-
         if (NotificationAddress = '') then
-            exit(Response.RespondResourceNotFound('Invalid notification address - Ticket not found'));
+            BadFilter := true;
 
         ReservationRequest.SetCurrentKey("Notification Address");
         ReservationRequest.SetFilter("Notification Address", '%1', CopyStr('@' + NotificationAddress, 1, MaxStrLen(ReservationRequest."Notification Address")));
         ReservationRequest.SetLoadFields("Notification Address", "Entry No.");
 
-        if (not ReservationRequest.FindSet()) then
-            exit(Response.RespondResourceNotFound('Invalid notification address - Ticket not found'));
-
         ResponseJson.StartArray();
-        repeat
-            Ticket.SetCurrentKey("Ticket Reservation Entry No.");
-            Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', ReservationRequest."Entry No.");
-            Ticket.SetLoadFields("External Ticket No.", "Item No.", "Valid From Date", "Valid From Time", "Valid To Date", "Valid To Time", "No.", AmountExclVat, AmountInclVat, Blocked, PrintedDateTime, PrintCount, SystemCreatedAt);
-            if (Ticket.FindSet()) then begin
+        if (not BadFilter) then begin
+            if (ReservationRequest.FindSet()) then
                 repeat
-                    ResponseJson.AddObject(FindTicketDTO(ResponseJson, Ticket, WithEvents));
-                until (Ticket.Next() = 0);
-            end;
-        until (ReservationRequest.Next() = 0);
-
+                    Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+                    Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', ReservationRequest."Entry No.");
+                    Ticket.SetLoadFields("External Ticket No.", "Item No.", "Valid From Date", "Valid From Time", "Valid To Date", "Valid To Time", "No.", AmountExclVat, AmountInclVat, Blocked, PrintedDateTime, PrintCount, SystemCreatedAt);
+                    if (Ticket.FindSet()) then begin
+                        repeat
+                            ResponseJson.AddObject(FindTicketDTO(ResponseJson, Ticket, WithEvents));
+                        until (Ticket.Next() = 0);
+                    end;
+                until (ReservationRequest.Next() = 0);
+        end;
         ResponseJson.EndArray();
+
         exit(Response.RespondOk(ResponseJson.BuildAsArray()));
     end;
 
@@ -482,6 +486,8 @@ codeunit 6185080 "NPR TicketingTicketAgent"
     var
         TimeZoneHelper: Codeunit "NPR TM TimeHelper";
     begin
+        if (Ticket."External Ticket No." = '') then
+            exit(ResponseJson);
 
         ResponseJson.StartObject()
             .AddProperty('ticketId', Format(Ticket.SystemId, 0, 4).ToLower())
