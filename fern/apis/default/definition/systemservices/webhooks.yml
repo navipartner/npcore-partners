@@ -164,7 +164,7 @@ service:
     getSubscriptions:
       display-name: Get subscriptions
       docs: Retrieves all existing webhook subscriptions for a specified company, providing comprehensive details about each external event subscription.
-      path: "/webhooks"
+      path: "/webhook"
       method: GET
       response: WebhookSubscriptionsResponse
       examples:
