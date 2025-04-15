@@ -20,15 +20,13 @@ codeunit 6184933 "NPR Adyen PayByLink Status JQ"
 
     local procedure IsSetupEnabled() SetupEnabled: Boolean;
     var
-        AdyenSetup: Record "NPR Adyen Setup";
         AdyenManagement: Codeunit "NPR Adyen Management";
     begin
         SetupEnabled := false;
 
         //Magento PayByLink
-        if AdyenSetup.Get() then
-            if AdyenSetup."Enable Pay by Link" then
-                SetupEnabled := true;
+        if AdyenManagement.IsMagentoPayByLinkEnabled() then
+            SetupEnabled := true;
 
         //Subscription PayByLink Card Update
         If AdyenManagement.IsSubsPGEnabled() then

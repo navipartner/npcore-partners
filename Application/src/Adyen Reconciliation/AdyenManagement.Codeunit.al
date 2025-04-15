@@ -533,18 +533,12 @@ codeunit 6184796 "NPR Adyen Management"
     end;
 
     local procedure IsPayByLinkSetupEnabled() SetupEnabled: Boolean;
-    var
-        AdyenSetup: Record "NPR Adyen Setup";
-        MagentoPaymentGateway: Record "NPR Magento Payment Gateway";
     begin
         SetupEnabled := false;
 
         //Magento PayByLink
-        if AdyenSetup.Get() then
-            if AdyenSetup."Enable Pay by Link" then
-                if MagentoPaymentGateway.Get(AdyenSetup."Pay By Link Gateaway Code") then
-                    if MagentoPaymentGateway."Integration Type" = MagentoPaymentGateway."Integration Type"::Adyen then
-                        SetupEnabled := true;
+        If IsMagentoPayByLinkEnabled() then
+            SetupEnabled := true;
 
         //Subscription PayByLink Card Update
         if IsSubsPGEnabled() then
@@ -1324,6 +1318,18 @@ codeunit 6184796 "NPR Adyen Management"
         if JsonContent.Get('additionalData', ContentToken) then
             if ContentToken.AsObject().Get('paymentLinkId', JsonValueToken) then
                 PaymentLinkId := CopyStr(JsonValueToken.AsValue().AsText(), 1, MaxStrLen(PaymentLinkId));
+    end;
+
+    internal procedure IsMagentoPayByLinkEnabled() SetupEnabled: Boolean
+    var
+        AdyenSetup: Record "NPR Adyen Setup";
+        MagentoPaymentGateway: Record "NPR Magento Payment Gateway";
+    begin
+        if AdyenSetup.Get() then
+            if AdyenSetup."Enable Pay by Link" then
+                if MagentoPaymentGateway.Get(AdyenSetup."Pay By Link Gateaway Code") then
+                    if MagentoPaymentGateway."Integration Type" = MagentoPaymentGateway."Integration Type"::Adyen then
+                        SetupEnabled := true;
     end;
 
     internal procedure IsSubsPGEnabled() SetupEnabled: Boolean

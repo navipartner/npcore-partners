@@ -37,6 +37,7 @@ table 6150961 "NPR MM Subs. Payment Gateway"
                     CheckStatus();
 
                 EnableIntegration();
+                DisableIntegration();
             end;
         }
     }
@@ -94,5 +95,15 @@ table 6150961 "NPR MM Subs. Payment Gateway"
         ISubscrPaymentIHandler.EnableIntegration(Rec);
     end;
 
+    local procedure DisableIntegration()
+    var
+        ISubscrPaymentIHandler: Interface "NPR MM Subs Payment IHandler";
+    begin
+        if Rec.Status <> Rec.Status::Disabled then
+            exit;
+
+        ISubscrPaymentIHandler := Rec."Integration Type";
+        ISubscrPaymentIHandler.DisableIntegration(Rec);
+    end;
 
 }

@@ -2195,6 +2195,26 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         end;
     end;
 
+    procedure DisableIntegration(var SubsPaymentGateway: Record "NPR MM Subs. Payment Gateway")
+    var
+        AdyenManagement: Codeunit "NPR Adyen Management";
+    begin
+        if SubsPaymentGateway."Integration Type" <> SubsPaymentGateway."Integration Type"::Adyen then
+            exit;
+
+        AdyenManagement.SetOnHoldJob(Codeunit::"NPR Adyen Recurring ContractJQ");
+        AdyenManagement.SetOnHoldJob(Codeunit::"NPR Adyen Refund Status JQ");
+        AdyenManagement.SetOnHoldJob(Codeunit::"NPR Adyen PayByLink Cancel JQ");
+
+        if not AdyenManagement.IsMagentoPayByLinkEnabled() then
+            AdyenManagement.SetOnHoldPayByLinkStatusJQ();
+
+        if SubsPaymentGateway.Status <> SubsPaymentGateway.Status::Disabled then begin
+            SubsPaymentGateway.Status := SubsPaymentGateway.Status::Disabled;
+            SubsPaymentGateway.Modify(true);
+        end;
+    end;
+
     local procedure SetupPayByLink()
     var
         AdyenWebhookType: Enum "NPR Adyen Webhook Type";
@@ -2323,11 +2343,5 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         AdyenWebhookType: Enum "NPR Adyen Webhook Type";
     begin
         AdyenManagement.EnsureAdyenWebhookSetup(RefundEventFilter, MerchantName, AdyenWebhookType::standard);
-    end;
-
-    procedure DisableIntegration(var SubsPaymentGateway: Record "NPR MM Subs. Payment Gateway")
-    begin
-
-
     end;
 }
