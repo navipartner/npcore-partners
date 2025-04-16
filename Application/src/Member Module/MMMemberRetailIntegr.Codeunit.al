@@ -1158,9 +1158,30 @@
         MemberInfo."Country Code" := TextHelper.AsText10('cc', Member);
         MemberInfo."E-Mail Address" := LowerCase(TextHelper.AsText80('em', Member));
         MemberInfo."Phone No." := TextHelper.AsText30('pn', Member);
+        MemberInfo."Birthday" := DateHelper('bd', Member);
 
         MemberInfo."News Letter" := GetNewsLetter(Member);
         MemberInfo.Gender := GetGender(Member);
+    end;
+
+    local procedure DateHelper(Name: Text[20]; JObject: JsonObject): Date
+    var
+        JToken: JsonToken;
+        DateValue: Date;
+    begin
+        if (not (JObject.Get(Name, JToken))) then
+            exit(0D);
+
+        if (JToken.AsValue().IsNull) then
+            exit(0D);
+
+        if (JToken.AsValue().AsText() = '') then
+            exit(0D);
+
+        if (not Evaluate(DateValue, JToken.AsValue().AsText(), 9)) then // ISO 8601 format
+            exit(0D);
+
+        exit(DateValue);
     end;
 
     local procedure GetNewsLetter(JObject: JsonObject): Option
