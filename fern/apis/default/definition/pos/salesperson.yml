@@ -34,6 +34,118 @@ types:
           code: "12345"
           name: "Salesperson Name"
 
+  BlockSalesPerson:
+    docs: Blocks a specific salesperson
+    properties:
+      id: salespersonId
+      code: 
+        type: string
+        docs: The code of the Salesperson
+      name: 
+        type: string
+        docs: The name of the Salesperson
+      blocked:
+        type: boolean
+        docs: Specifies if the Salesperson is blocked
+    examples:
+      - name: ExampleBlockSalesPerson
+        value:
+          id: "12345678-1234-1234-1234-123456789012"
+          code: "12345"
+          name: "Salesperson Name"
+          blocked: true
+
+  UnblockSalesPerson:
+    docs: Unblocks a specific salesperson
+    properties:
+      id: salespersonId
+      code: 
+        type: string
+        docs: The code of the Salesperson
+      name: 
+        type: string
+        docs: The name of the Salesperson
+      blocked:
+        type: boolean
+        docs: Specifies if the Salesperson is blocked
+    examples:
+      - name: ExampleUnblockSalesPerson
+        value:
+          id: "12345678-1234-1234-1234-123456789012"
+          code: "12345"
+          name: "Salesperson Name"
+          blocked: true
+
+  CreateSalesPersonResponse:
+     docs: Creates a Salesperson
+     properties:
+      id: salespersonId
+      code: 
+        type: string
+        docs: The code of the Salesperson
+      name: 
+        type: string
+        docs: The name of the Salesperson
+      email:
+        type: string
+        docs: The email of the Salesperson
+      phoneNo:
+        type: string
+        docs: The Phone no. of the Salesperson
+      isSupervisor:
+        type: boolean
+        docs: Specifies if it is a Supervisor
+      posUnitGroup:
+        type: string
+        docs: The POS Unit Group of the Salesperson
+     examples:
+      - name: ExampleCreateSalesPerson
+        value:
+          id: "12345678-1234-1234-1234-123456789012"
+          code: "12345"
+          name: "Salesperson Name"
+          email: "john.doe@yahoo.com"
+          phoneNo: "+45521535353"
+          isSupervisor: true
+          posUnitGroup: "1"
+
+  CreateSalesPersonRequest:
+    docs: Creates a Salesperson
+    properties:
+      id: salespersonId
+      code: 
+        type: string
+        docs: The code of the Salesperson
+      name: 
+        type: string
+        docs: The name of the Salesperson
+      email:
+        type: string
+        docs: The email of the Salesperson
+      phoneNo:
+        type: string
+        docs: The Phone no. of the Salesperson
+      registerPassword:
+        type: string
+        docs: The Register password of the Salesperson
+      isSupervisor:
+        type: boolean
+        docs: Specifies if it is a Supervisor
+      posUnitGroup:
+        type: string
+        docs: The POS Unit Group of the Salesperson 
+    examples:
+      - name: ExampleCreateSalesPersonRequest
+        value:
+          id: "12345678-1234-1234-1234-123456789012"
+          code: "12345"
+          name: "Salesperson Name"
+          email: "john.doe@yahoo.com"
+          phoneNo: "+45521535353"
+          registerPassword : "12456"
+          isSupervisor: true
+          posUnitGroup: "1"  
+
 service:
   auth: true
   base-path: /pos
@@ -74,3 +186,63 @@ service:
           request: $SalespersonLogin.ExampleSalespersonLogin
           response:
             body: $SalespersonInfo.ExampleSalespersonInfo
+
+    BlockSalespersonPurchaser:
+      display-name: Block Salesperson
+      docs: Block a Salesperson by Id
+      method: POST
+      path: "/salesperson/{id}/block"
+      path-parameters:
+        id: salespersonId
+      request:
+        name: BlockSalesPersonPurchaser
+      response: BlockSalesPerson
+      examples:
+        - name: Example successful block
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            id: "12345678-1234-1234-1234-123456789012"
+          response:
+            body: $BlockSalesPerson.ExampleBlockSalesPerson
+
+    UnblockSalespersonPurchaser:
+      display-name: Unblock Salesperson
+      docs: Unblock a Salesperson by Id
+      method: POST
+      path: "/salesperson/{id}/unblock"
+      path-parameters:
+        id: salespersonId
+      request:
+        name: UnblockSalesPersonPurchaser
+      response: UnblockSalesPerson
+      examples:
+        - name: Example successful unblock
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            id: "12345678-1234-1234-1234-123456789012"
+          response:
+            body: $UnblockSalesPerson.ExampleUnblockSalesPerson
+
+    CreateSalesPersonPurchaser:
+      display-name: Create Salesperson
+      docs: Creates a Salesperson
+      method: POST
+      path: "/salesperson"
+      request:
+        name: CreateSalesPersonPurchaser
+        body: CreateSalesPersonRequest
+      response: CreateSalesPersonResponse
+      examples:
+        - name: Example successful create Salesperson
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          request: $CreateSalesPersonRequest.ExampleCreateSalesPersonRequest
+          response:
+            body: $CreateSalesPersonResponse.ExampleCreateSalesPerson
+          
