@@ -250,7 +250,7 @@ codeunit 6248358 "NPR POSAction TMRebookForToday" implements "NPR IPOS Workflow"
             TicketReservationRequest."External Adm. Sch. Entry No." := 0;
             TicketReservationRequest."Scheduled Time Description" := '';
             if (AdmissionScheduleEntry.FindFirst()) then begin
-                TicketReservationRequest."External Adm. Sch. Entry No." := AdmissionScheduleEntry."Entry No.";
+                TicketReservationRequest."External Adm. Sch. Entry No." := AdmissionScheduleEntry."External Schedule Entry No.";
                 TicketReservationRequest."Scheduled Time Description" := StrSubstNo(DateTimeLbl, AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
             end;
 
