@@ -14,6 +14,8 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
         ReferenceInputLbl: Label 'Reference Input';
         ShowDataLbl: Label 'Show Data';
         ShowDataDescrLbl: Label 'Shows the data that is going to be printed and/or admitted';
+        WelcomeMsgLbl: Label 'Welcome';
+        PrintFailedErrLabl: Label 'Printing of one or more references did not succeed.';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
@@ -23,6 +25,8 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
         WorkflowConfig.AddTextParameter('reference_input', '', ReferenceInputLbl, ReferenceInputLbl);
         WorkflowConfig.AddLabel('ReferenceTitle', ReferenceTitleLbl);
         WorkflowConfig.AddLabel('ReferenceCaption', ReferenceCaptionLbl);
+        WorkflowConfig.AddLabel('welcomeMsg', WelcomeMsgLbl);
+        WorkflowConfig.AddLabel('printingFailed', PrintFailedErrLabl);
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
@@ -55,12 +59,15 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
         exit(BufferTableToJson(PrintandAdmitBuffer));
     end;
 
-    local procedure HandleData(Context: Codeunit "NPR POS JSON Helper"): JsonObject
+    local procedure HandleData(Context: Codeunit "NPR POS JSON Helper") WorkflowResponse: JsonObject
     var
         PrintandAdmitBuffer: Record "NPR Print and Admit Buffer";
         PrintandAdmitPublic: Codeunit "NPR Print and Admit Public";
         JArray: JsonArray;
         ShowDataPrintAdmit: Boolean;
+        AdmittedReferences: JsonArray;
+        TryPrint: Codeunit "NPR PrintAdmitTryPrint";
+        PrintSuccessful: Boolean;
     begin
         JArray := Context.GetJToken('buffer_data').AsArray();
         JsonToBufferTable(JArray, PrintandAdmitBuffer);
@@ -70,8 +77,17 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
         if PrintandAdmitBuffer.IsEmpty then
             exit;
         PrintandAdmitPublic.OnBeforeHandleBuffer(PrintandAdmitBuffer);
-        HandlePrint(PrintandAdmitBuffer);
-        HandleAdmit(PrintandAdmitBuffer, Context);
+
+        HandleAdmit(PrintandAdmitBuffer, Context, AdmittedReferences);
+        WorkflowResponse.Add('admittedReferences', AdmittedReferences);
+
+        // Regardless of what might happen with the print we want to commit the admits
+        Commit();
+
+        PrintSuccessful := TryPrint.Run(PrintandAdmitBuffer);
+        WorkflowResponse.Add('printSuccessful', PrintSuccessful);
+        if (not PrintSuccessful) then
+            WorkflowResponse.Add('printErrorMsg', GetLastErrorText());
     end;
 
     local procedure ShowData(var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer")
@@ -279,27 +295,15 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
             exit(MembershipEntry."Item No.");
     end;
 
-    local procedure HandlePrint(var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer" temporary)
-    begin
-        PrintandAdmitBuffer.SetRange(Print, true);
-        if PrintandAdmitBuffer.FindSet() then
-            repeat
-                case PrintandAdmitBuffer.Type of
-                    PrintandAdmitBuffer.Type::TICKET:
-                        PrintTicket(PrintandAdmitBuffer);
-                    PrintandAdmitBuffer.Type::MEMBER_CARD:
-                        PrintMemberCard(PrintandAdmitBuffer);
-                    PrintandAdmitBuffer.Type::ATTRACTION_WALLET:
-                        PrintWallet(PrintandAdmitBuffer);
-                end;
-            until PrintandAdmitBuffer.Next() = 0;
-        PrintandAdmitBuffer.SetRange(Print);
-    end;
-
-    local procedure HandleAdmit(var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer"; Context: Codeunit "NPR POS JSON Helper")
+    local procedure HandleAdmit(var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer"; Context: Codeunit "NPR POS JSON Helper"; var AdmittedReferences: JsonArray)
     var
         AdmissionCode: Code[20];
         ScannerId: Code[10];
+        AdmittedReference, MemberDetails : JsonObject;
+        TableCaption: Text;
+        DummyTicket: Record "NPR TM Ticket";
+        DummyMemberCard: Record "NPR MM Member Card";
+        DummyWallet: Record "NPR AttractionWallet";
     begin
 #pragma warning disable AA0139
         AdmissionCode := Context.GetStringParameter('AdmissionCode');
@@ -310,47 +314,33 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
             repeat
                 case PrintandAdmitBuffer.Type of
                     PrintandAdmitBuffer.Type::TICKET:
-                        AdmitTicket(PrintandAdmitBuffer, AdmissionCode, ScannerId);
+                        begin
+                            AdmitTicket(PrintandAdmitBuffer, AdmissionCode, ScannerId);
+                            TableCaption := DummyTicket.TableCaption();
+                        end;
                     PrintandAdmitBuffer.Type::MEMBER_CARD:
-                        AdmitMemberCard(PrintandAdmitBuffer, AdmissionCode, ScannerId);
+                        begin
+                            AdmitMemberCard(PrintandAdmitBuffer, AdmissionCode, ScannerId, MemberDetails);
+                            TableCaption := DummyMemberCard.TableCaption();
+                        end;
                     PrintandAdmitBuffer.Type::ATTRACTION_WALLET:
-                        AdmitWallet(PrintandAdmitBuffer, AdmissionCode, ScannerId);
+                        begin
+                            AdmitWallet(PrintandAdmitBuffer, AdmissionCode, ScannerId);
+                            TableCaption := DummyWallet.TableCaption();
+                        end;
                 end;
+
+                Clear(AdmittedReference);
+                AdmittedReference.Add('type', PrintandAdmitBuffer.Type);
+                AdmittedReference.Add('tableCaption', TableCaption);
+                AdmittedReference.Add('referenceId', PrintandAdmitBuffer."Visual Id");
+
+                if (PrintandAdmitBuffer.Type = PrintandAdmitBuffer.Type::MEMBER_CARD) then
+                    AdmittedReference.Add('memberDetails', MemberDetails);
+
+                AdmittedReferences.Add(AdmittedReference);
             until PrintandAdmitBuffer.Next() = 0;
         PrintandAdmitBuffer.SetRange(Admit);
-    end;
-
-    local procedure PrintTicket(PrintandAdmitBuffer: Record "NPR Print and Admit Buffer")
-    var
-        Ticket: Record "NPR TM Ticket";
-        TMTicketManagement: Codeunit "NPR TM Ticket Management";
-    begin
-        if not (PrintandAdmitBuffer.Print and (PrintandAdmitBuffer.Type = PrintandAdmitBuffer.Type::TICKET)) then
-            exit;
-        if Ticket.GetBySystemId(PrintandAdmitBuffer."System Id") then
-            TMTicketManagement.DoTicketPrint(Ticket);
-    end;
-
-    local procedure PrintMemberCard(PrintandAdmitBuffer: Record "NPR Print and Admit Buffer")
-    var
-        MemberCard: Record "NPR MM Member Card";
-        MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
-    begin
-        if not (PrintandAdmitBuffer.Print and (PrintandAdmitBuffer.Type = PrintandAdmitBuffer.Type::MEMBER_CARD)) then
-            exit;
-        if MemberCard.GetBySystemId(PrintandAdmitBuffer."System Id") then
-            MemberRetailIntegration.PrintMemberCard(MemberCard."Member Entry No.", MemberCard."Entry No.");
-    end;
-
-    local procedure PrintWallet(PrintandAdmitBuffer: Record "NPR Print and Admit Buffer")
-    var
-        Ticket: Record "NPR TM Ticket";
-        TMTicketManagement: Codeunit "NPR TM Ticket Management";
-    begin
-        if not (PrintandAdmitBuffer.Print and (PrintandAdmitBuffer.Type = PrintandAdmitBuffer.Type::ATTRACTION_WALLET)) then
-            exit;
-        if Ticket.GetBySystemId(PrintandAdmitBuffer."System Id") then
-            TMTicketManagement.DoTicketPrint(Ticket);
     end;
 
     local procedure AdmitTicket(PrintandAdmitBuffer: Record "NPR Print and Admit Buffer"; AdmissionCode: Code[20]; ScannerId: Code[10])
@@ -364,15 +354,22 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
             SpeedGate.Admit(SpeedGate.CreateAdmitToken(Ticket."External Ticket No.", AdmissionCode, ScannerId), 1);
     end;
 
-    local procedure AdmitMemberCard(PrintandAdmitBuffer: Record "NPR Print and Admit Buffer"; AdmissionCode: Code[20]; ScannerId: Code[10])
+    local procedure AdmitMemberCard(PrintandAdmitBuffer: Record "NPR Print and Admit Buffer"; AdmissionCode: Code[20]; ScannerId: Code[10]; var AdmittedMemberDetails: JsonObject)
     var
         MemberCard: Record "NPR MM Member Card";
         SpeedGate: Codeunit "NPR SG SpeedGate";
+        POSActionMemberArrival: Codeunit "NPR POS Action: MM Member ArrB";
     begin
+        Clear(AdmittedMemberDetails);
         if not (PrintandAdmitBuffer.Admit and (PrintandAdmitBuffer.Type = PrintandAdmitBuffer.Type::MEMBER_CARD)) then
             exit;
-        if MemberCard.GetBySystemId(PrintandAdmitBuffer."System Id") then
-            SpeedGate.Admit(SpeedGate.CreateAdmitToken(MemberCard."External Card No.", AdmissionCode, ScannerId), 1);
+
+        MemberCard.SetLoadFields("Entry No.", "External Card No.");
+        if (not MemberCard.GetBySystemId(PrintandAdmitBuffer."System Id")) then
+            exit;
+
+        SpeedGate.Admit(SpeedGate.CreateAdmitToken(MemberCard."External Card No.", AdmissionCode, ScannerId), 1);
+        POSActionMemberArrival.AddToastMemberScannedData(MemberCard."Entry No.", 0, AdmittedMemberDetails);
     end;
 
     local procedure AdmitWallet(var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer"; AdmissionCode: Code[20]; ScannerId: Code[10])
@@ -507,7 +504,7 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionPrintandAdmit.js###
-        'const main=async({workflow:n,parameters:i,popup:t,context:e,captions:r})=>{if(i.reference_input)e.reference_input=i.reference_input;else if(e.reference_input=await t.input({title:r.ReferenceTitle,caption:r.ReferenceCaption}),e.reference_input==null)return" ";let a=await n.respond("fill_data");await n.respond("handle_data",{buffer_data:a})};'
+        'const main=async({workflow:t,parameters:n,popup:m,context:r,captions:a,toast:l})=>{if(n.reference_input)r.reference_input=n.reference_input;else if(r.reference_input=await m.input({title:a.ReferenceTitle,caption:a.ReferenceCaption}),r.reference_input===null)return;const s=await t.respond("fill_data"),i=await t.respond("handle_data",{buffer_data:s});i.admittedReferences&&i.admittedReferences.forEach(e=>{switch(e.type){case 1:{e.memberDetails&&l.memberScanned({memberImg:e.memberDetails.MemberScanned.ImageDataUrl,memberName:e.memberDetails.MemberScanned.Name,validForAdmission:e.memberDetails.MemberScanned.Valid,memberExpiry:e.memberDetails.MemberScanned.ExpiryDate});break}default:{l.success(`${a.welcomeMsg} ${e.tableCaption} ${e.referenceId}`,{title:a.welcomeMsg});break}}}),i.printSuccessful||await m.error(`${a.printingFailed} ${i.printErrorMsg}`)};'
         );
     end;
 }

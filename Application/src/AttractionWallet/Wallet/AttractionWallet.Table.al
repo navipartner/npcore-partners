@@ -1,7 +1,9 @@
 table 6150937 "NPR AttractionWallet"
 {
     Access = Internal;
+    Caption = 'Attraction Wallet';
     DataClassification = CustomerContent;
+
     fields
     {
         field(1; EntryNo; Integer)
