@@ -4,6 +4,7 @@
 
     var
         MembershipEvents: Codeunit "NPR MM Membership Events";
+        _MembershipWebhooks: Codeunit "NPR MM MembershipWebhooks";
 
         CASE_MISSING: Label '%1 value %2 is missing its implementation.';
         TO_MANY_MEMBERS: Label 'Max number of members exceeded. The membership %1 of type %2 allows a maximum of %3 members per membership.';
@@ -3610,6 +3611,7 @@
             if (MemberInfoCapture."Member Card Type" in [MemberInfoCapture."Member Card Type"::CARD_PASSSERVER, MemberInfoCapture."Member Card Type"::PASSSERVER]) then
                 EntryNo := MemberNotification.CreateWalletSendNotification(MembershipEntryNo, Member."Entry No.", 0, TODAY);
 
+        _MembershipWebhooks.TriggerMemberAddedWebhookCall(MembershipEntryNo, Member."Entry No.", Member.SystemId);
     end;
 
     local procedure ValidAlterationGracePeriod(MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; MembershipEntry: Record "NPR MM Membership Entry"; ReferenceDate: Date): Boolean
@@ -4048,9 +4050,9 @@
 
         MembershipLedgerEntry."Auto-Renew Entry No." := MemberInfoCapture."Auto-Renew Entry No.";
         MembershipLedgerEntry.Insert();
+        Membership.Get(MembershipEntryNo);
 
         if (MembershipLedgerEntry.Context in [MembershipLedgerEntry.Context::UPGRADE, MembershipLedgerEntry.Context::RENEW]) then begin
-            Membership.Get(MembershipEntryNo);
             if (Membership."Customer No." <> '') then begin
                 MembershipSetup.Get(Membership."Membership Code");
                 if (MembershipSetup."Customer Config. Template Code" <> '') then begin
@@ -4075,6 +4077,7 @@
         end;
 
         MembershipEvents.OnAfterInsertMembershipEntry(MembershipLedgerEntry);
+        _MembershipWebhooks.TriggerMembershipEntryWebhookCall(Membership.SystemId, MembershipLedgerEntry.SystemId);
 
         if (not MembershipLedgerEntry."Activate On First Use") then begin
             AddMembershipRenewalNotification(MembershipLedgerEntry);
@@ -4154,6 +4157,7 @@
         end;
 
         MembershipEvents.OnAfterInsertMembershipEntry(MembershipEntry);
+        _MembershipWebhooks.TriggerMembershipActivatedWebhookCall(Membership.SystemId, MembershipEntry.SystemId);
 
         AddMembershipRenewalNotification(MembershipEntry);
         SubscriptionMgtImpl.UpdateMembershipSubscriptionDetails(Membership, MembershipEntry);

@@ -1,0 +1,114 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+  simpleTypes: ./types/types-simple.yml
+  compositeTypes: ./types/types-composite.yml
+
+webhooks:
+  # Membership Created:
+  membership_created:
+    display-name: Membership Created
+    docs: 
+      Event name `membership_created`<br><br>
+      This webhook is triggered when the first period for a membership is created. Note that membership might not have any members yet.
+      Use the <a href="/api-reference/memberships/service-lifecycle/get-membership-history">Get Membership History</a> endpoint to retrieve full details about the membership’s validity periods.
+    method: POST
+    payload: compositeTypes.MembershipCreatedEvent
+    examples:
+      - payload: $compositeTypes.MembershipCreatedEvent.ExampleEvent
+
+  # Add Member:
+  membershipMember_added:
+    display-name: Member Added
+    docs: 
+      Event name `membershipMember_added`<br><br>
+      This webhook is triggered when a member is added to a membership. 
+    method: POST
+    payload: compositeTypes.MemberAddedEvent
+    examples:
+      - payload: $compositeTypes.MemberAddedEvent.ExampleEvent
+
+  # Renew:
+  membershipPeriodRenew_staged:
+    display-name: Membership Renew Staged
+    docs: 
+      Event name `membershipPeriodRenew_staged`<br><br>
+      This webhook is triggered when a membership renewal period is added to the membership. Note that this change may have a future activation date.
+      Use the <a href="/api-reference/memberships/service-lifecycle/get-membership-history">Get Membership History</a> endpoint to retrieve full details about the membership’s validity periods.
+    method: POST
+    payload: compositeTypes.MembershipPeriodStaged
+    examples:
+      - payload: $compositeTypes.MembershipPeriodStaged.ExampleRenew
+
+  # Upgrade:
+  membershipPeriodUpgrade_staged:
+    display-name: Membership Upgrade Staged
+    docs: 
+      Event name `membershipPeriodUpgrade_staged`<br><br>
+      This webhook is triggered when a membership upgrade period is added to the membership. Note that this change may have a future activation date.
+      Use the <a href="/api-reference/memberships/service-lifecycle/get-membership-history">Get Membership History</a> endpoint to retrieve full details about the membership’s validity periods.
+    method: POST
+    payload: compositeTypes.MembershipPeriodStaged
+    examples:
+      - payload: $compositeTypes.MembershipPeriodStaged.ExampleUpgrade
+
+  # Extend:
+  membershipPeriodExtend_staged:
+    display-name: Membership Extend Staged
+    docs: 
+      Event name `membershipPeriodExtend_staged`<br><br>
+      This webhook is triggered when a membership extension period is added to the membership. Note that this change may have a future activation date.
+      Use the <a href="/api-reference/memberships/service-lifecycle/get-membership-history">Get Membership History</a> endpoint to retrieve full details about the membership’s validity periods.
+    method: POST
+    payload: compositeTypes.MembershipPeriodStaged
+    examples:
+      - payload: $compositeTypes.MembershipPeriodStaged.ExampleExtend  
+
+  # AutoRenew: 
+  membershipPeriodAutoRenew_staged:
+    display-name: Membership Auto Renew Staged
+    docs: 
+      Event name `membershipPeriodAutoRenew_staged`<br><br>
+      This webhook is triggered when a membership auto-renew period is added to the membership. Note that this change may have a future activation date.
+      Use the <a href="/api-reference/memberships/service-lifecycle/get-membership-history">Get Membership History</a> endpoint to retrieve full details about the membership’s validity periods.
+    method: POST
+    payload: compositeTypes.MembershipPeriodStaged
+    examples:
+      - payload: $compositeTypes.MembershipPeriodStaged.ExampleAutoRenew
+
+  # Cancel:
+  membershipPeriod_cancel:
+    display-name: Membership Period Cancel
+    docs: 
+      Event name `membershipPeriod_cancel`<br><br>
+      This webhook is triggered when a membership period is cancelled - the valid until date is changed with intent to end the membership prematurely.
+      Use the <a href="/api-reference/memberships/service-lifecycle/get-membership-history">Get Membership History</a> endpoint to retrieve full details about the membership’s validity periods.
+    method: POST
+    payload: compositeTypes.MembershipPeriodStaged
+    examples:
+      - payload: $compositeTypes.MembershipPeriodStaged.ExampleCancel
+
+  # Regret:
+  membershipPeriod_regret:
+    display-name: Membership Period Regret
+    docs: 
+      Event name `membershipPeriod_regret`<br><br>
+      This webhook is triggered when a membership period is regretted - the valid until date is changed with intent to end the membership prematurely.
+      Use the <a href="/api-reference/memberships/service-lifecycle/get-membership-history">Get Membership History</a> endpoint to retrieve full details about the membership’s validity periods.
+    method: POST
+    payload: compositeTypes.MembershipPeriodStaged
+    examples:
+      - payload: $compositeTypes.MembershipPeriodStaged.ExampleRegret
+
+  # Activated
+  membershipPeriod_activated:
+    display-name: Membership Period Activated
+    docs: 
+      Event name `membershipPeriod_activated`<br><br>
+      This webhook is triggered when a membership is activated. 
+      Use the <a href="/api-reference/memberships/service-lifecycle/get-membership-history">Get Membership History</a> endpoint to retrieve full details about the membership’s validity periods.
+    method: POST
+    payload: compositeTypes.MembershipActivatedEvent
+    examples:
+      - payload: $compositeTypes.MembershipActivatedEvent.ExampleEvent

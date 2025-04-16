@@ -180,6 +180,7 @@ types:
       - extend
       - cancel
       - autoRenew
+      - regret
 
   LifecycleAction:
     type: LifecycleActionEnum
@@ -197,6 +198,8 @@ types:
         value: autoRenew
       - name: ExampleCancel
         value: cancel
+      - name: ExampleRegret
+        value: regret
 
   LifecycleDate:
     type: date

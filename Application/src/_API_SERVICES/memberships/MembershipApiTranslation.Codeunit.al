@@ -3,7 +3,7 @@ codeunit 6248221 "NPR MembershipApiTranslation"
 {
     Access = Internal;
 
-    internal procedure MemberRoleToText(MemberRole: Option): Text
+    internal procedure MemberRoleToText(MemberRole: Option): Text[50]
     var
         MembershipRole: Record "NPR MM Membership Role";
     begin
@@ -55,7 +55,7 @@ codeunit 6248221 "NPR MembershipApiTranslation"
         end;
     end;
 
-    internal procedure MembershipEntryContextToText(Context: Option): Text
+    internal procedure MembershipEntryContextToText(Context: Option): Text[50]
     var
         MembershipEntry: Record "NPR MM Membership Entry";
     begin

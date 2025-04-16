@@ -2,7 +2,9 @@
 
 imports:
   simpleTypes: ./types-simple.yml
- 
+  commonApiTypes: ./../../common-api-types.yml
+  globalApiTypes: ./../../global-api-types.yml
+
 types:
 
   MembershipDTO:
@@ -884,6 +886,202 @@ types:
           createdAt: $simpleTypes.CreatedAt.ExampleCreatedAt
           modifiedAt: $simpleTypes.ModifiedAt.ExampleModifiedAt
 
-      
+### WEB HOOKS
+
+  MembershipCreatedEvent:
+    extends: commonApiTypes.WebhookEvent
+    properties:
+      payload: MembershipCreatedEventPayload
+    examples:
+      - name: ExampleEvent
+        value:
+          initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
+          timestamp: "2024-06-28T12:00:00Z"
+          companyName: $globalApiTypes.Company.ExampleCompanyCronusFull
+          companyId: "b56a418d-8205-4d3a-bdbb-25d94e42abbd"
+          appId: "992c2309-cca4-43cb-9e41-911f482ec088"
+          clientState: "secret_value_from_subscription_creation_mirrored" 
+          eventName: "membership_created"
+          eventVersion: "1.0"
+          payload: $MembershipCreatedEventPayload.ExamplePayload
+
+  MembershipCreatedEventPayload:
+    properties:
+      membershipId: simpleTypes.MembershipId
+      entryId: simpleTypes.TimeEntryId
+    examples:
+      - name: ExamplePayload
+        value:
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          entryId: $simpleTypes.TimeEntryId.Activate
+
+
+  MemberAddedEvent:
+    extends: commonApiTypes.WebhookEvent
+    properties:
+      payload: MemberAddedEventPayload
+    examples:
+      - name: ExampleEvent
+        value:
+          initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
+          timestamp: "2024-06-28T12:00:00Z"
+          companyName: $globalApiTypes.Company.ExampleCompanyCronusFull
+          companyId: "b56a418d-8205-4d3a-bdbb-25d94e42abbd"
+          appId: "992c2309-cca4-43cb-9e41-911f482ec088"
+          clientState: "secret_value_from_subscription_creation_mirrored" 
+          eventName: "membershipMember_added"
+          eventVersion: "1.0"
+          payload: $MemberAddedEventPayload.ExamplePayload
+
+  MemberAddedEventPayload:
+    properties:
+      membershipId: simpleTypes.MembershipId
+      memberId: simpleTypes.MemberId
+      role: simpleTypes.Role
+    examples:
+      - name: ExamplePayload
+        value:
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          memberId: $simpleTypes.MemberId.ExampleMemberId
+          role: $simpleTypes.Role.ExampleRoleAdmin
+
+  MembershipPeriodStaged:
+    extends: commonApiTypes.WebhookEvent
+    properties:
+      payload: MembershipPeriodStagedPayload
+    examples:
+      - name: ExampleRenew
+        value:
+          initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
+          timestamp: "2024-06-28T12:00:00Z"
+          companyName: $globalApiTypes.Company.ExampleCompanyCronusFull
+          companyId: "b56a418d-8205-4d3a-bdbb-25d94e42abbd"
+          appId: "992c2309-cca4-43cb-9e41-911f482ec088"
+          clientState: "secret_value_from_subscription_creation_mirrored" 
+          eventName: "membershipPeriodRenew_staged"
+          eventVersion: "1.0"
+          payload: $MembershipPeriodStagedPayload.ExampleRenew
+      - name: ExampleUpgrade
+        value:
+          initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
+          timestamp: "2024-06-28T12:00:00Z"
+          companyName: $globalApiTypes.Company.ExampleCompanyCronusFull
+          companyId: "b56a418d-8205-4d3a-bdbb-25d94e42abbd"
+          appId: "992c2309-cca4-43cb-9e41-911f482ec088"
+          clientState: "secret_value_from_subscription_creation_mirrored" 
+          eventName: "membershipPeriodUpgrade_staged"
+          eventVersion: "1.0"
+          payload: $MembershipPeriodStagedPayload.ExampleUpgrade
+      - name: ExampleExtend
+        value:
+          initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
+          timestamp: "2024-06-28T12:00:00Z"
+          companyName: $globalApiTypes.Company.ExampleCompanyCronusFull
+          companyId: "b56a418d-8205-4d3a-bdbb-25d94e42abbd"
+          appId: "992c2309-cca4-43cb-9e41-911f482ec088"
+          clientState: "secret_value_from_subscription_creation_mirrored" 
+          eventName: "membershipPeriodExtend_staged"
+          eventVersion: "1.0"
+          payload: $MembershipPeriodStagedPayload.ExampleExtend
+      - name: ExampleAutoRenew
+        value:
+          initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
+          timestamp: "2024-06-28T12:00:00Z"
+          companyName: $globalApiTypes.Company.ExampleCompanyCronusFull
+          companyId: "b56a418d-8205-4d3a-bdbb-25d94e42abbd"
+          appId: "992c2309-cca4-43cb-9e41-911f482ec088"
+          clientState: "secret_value_from_subscription_creation_mirrored" 
+          eventName: "membershipPeriodAutoRenew_staged"
+          eventVersion: "1.0"
+          payload: $MembershipPeriodStagedPayload.ExampleAutoRenew
+      - name: ExampleCancel      
+        value:
+          initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
+          timestamp: "2024-06-28T12:00:00Z"
+          companyName: $globalApiTypes.Company.ExampleCompanyCronusFull
+          companyId: "b56a418d-8205-4d3a-bdbb-25d94e42abbd"
+          appId: "992c2309-cca4-43cb-9e41-911f482ec088"
+          clientState: "secret_value_from_subscription_creation_mirrored" 
+          eventName: "membershipPeriod_cancel"
+          eventVersion: "1.0"
+          payload: $MembershipPeriodStagedPayload.ExampleCancel
+      - name: ExampleRegret
+        value:
+          initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
+          timestamp: "2024-06-28T12:00:00Z"
+          companyName: $globalApiTypes.Company.ExampleCompanyCronusFull
+          companyId: "b56a418d-8205-4d3a-bdbb-25d94e42abbd"
+          appId: "992c2309-cca4-43cb-9e41-911f482ec088"
+          clientState: "secret_value_from_subscription_creation_mirrored" 
+          eventName: "membershipPeriod_regret"
+          eventVersion: "1.0"
+          payload: $MembershipPeriodStagedPayload.ExampleRegret
+        
+
+  MembershipPeriodStagedPayload:
+    properties:
+      membershipId: simpleTypes.MembershipId
+      entryId: simpleTypes.TimeEntryId
+      lifecycleAction : simpleTypes.LifecycleAction
+    examples:
+      - name: ExampleRenew
+        value:
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          entryId: $simpleTypes.TimeEntryId.Renew
+          lifecycleAction : $simpleTypes.LifecycleAction.ExampleRenew
+      - name: ExampleUpgrade
+        value:
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          entryId: $simpleTypes.TimeEntryId.Upgrade
+          lifecycleAction : $simpleTypes.LifecycleAction.ExampleUpgrade
+      - name: ExampleExtend
+        value:
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          entryId: $simpleTypes.TimeEntryId.Extend
+          lifecycleAction : $simpleTypes.LifecycleAction.ExampleExtend
+      - name: ExampleAutoRenew
+        value:
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          entryId: $simpleTypes.TimeEntryId.Renew
+          lifecycleAction : $simpleTypes.LifecycleAction.ExampleAutoRenew
+      - name: ExampleCancel
+        value:
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          entryId: $simpleTypes.TimeEntryId.Cancel
+          lifecycleAction : $simpleTypes.LifecycleAction.ExampleCancel
+      - name: ExampleRegret
+        value:
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          entryId: $simpleTypes.TimeEntryId.Activate
+          lifecycleAction : $simpleTypes.LifecycleAction.ExampleRegret
+  
+  MembershipActivatedEvent:
+    extends: commonApiTypes.WebhookEvent
+    properties:
+      payload: MembershipActivatedPayload
+    examples:
+      - name: ExampleEvent
+        value:
+          initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
+          timestamp: "2024-06-28T12:00:00Z"
+          companyName: $globalApiTypes.Company.ExampleCompanyCronusFull
+          companyId: "b56a418d-8205-4d3a-bdbb-25d94e42abbd"
+          appId: "992c2309-cca4-43cb-9e41-911f482ec088"
+          clientState: "secret_value_from_subscription_creation_mirrored" 
+          eventName: "membershipPeriod_activated"
+          eventVersion: "1.0"
+          payload: $MembershipActivatedPayload.ExamplePayload
+
+  MembershipActivatedPayload:
+    properties:
+      membershipId: simpleTypes.MembershipId
+      entryId: simpleTypes.TimeEntryId
+    examples:
+      - name: ExamplePayload
+        value:
+          membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          entryId: $simpleTypes.TimeEntryId.Activate
+
+
 
 ###########################

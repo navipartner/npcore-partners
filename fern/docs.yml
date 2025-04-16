@@ -205,6 +205,9 @@ navigation:
                 summary: ./docs/pages/memberships/misc-introduction.mdx
                 contents:
                   - endpoint: memberships.service-misc.resolveIdentifier
+            
+            - memberships.webhooks:
+                title: Webhooks
 
         - section: Speedgate
           summary: ./docs/pages/speedgate/overview.mdx
