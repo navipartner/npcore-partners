@@ -48,6 +48,14 @@ page 6059914 "NPR APIV1 PBICustomer"
                 {
                     Caption = 'City', Locked = true;
                 }
+                field(email; Rec."E-Mail")
+                {
+                    Caption = 'E-Mail', Locked = true;
+                }
+                field(phoneNo; Rec."Phone No.")
+                {
+                    Caption = 'Phone No.', Locked = true;
+                }
                 field(countryRegionCode; Rec."Country/Region Code")
                 {
                     Caption = 'Country/Region Code', Locked = true;
@@ -72,6 +80,12 @@ page 6059914 "NPR APIV1 PBICustomer"
                 {
                     Caption = 'Last Modified Date Time', Locked = true;
                 }
+#if not (BC17 or BC18 or BC19 or BC20)
+                field(systemRowVersion; Rec.SystemRowVersion)
+                {
+                    Caption = 'System Row Version', Locked = true;
+                }
+#endif
             }
         }
     }

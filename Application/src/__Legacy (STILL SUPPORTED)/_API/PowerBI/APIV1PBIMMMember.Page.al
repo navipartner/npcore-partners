@@ -47,9 +47,29 @@ page 6150782 "NPR APIV1 PBIMMMember"
                 {
                     Caption = 'Created Datetime', Locked = True;
                 }
+                field(firstName; Rec."First Name")
+                {
+                    Caption = 'First Name', Locked = true;
+                }
+                field(middleName; Rec."Middle Name")
+                {
+                    Caption = 'Middle Name', Locked = true;
+                }
+                field(lastName; Rec."Last Name")
+                {
+                    Caption = 'Last Name', Locked = true;
+                }
                 field(displayName; Rec."Display Name")
                 {
                     Caption = 'Display Name', Locked = True;
+                }
+                field(emailAddress; Rec."E-Mail Address")
+                {
+                    Caption = 'E-Mail Address', Locked = true;
+                }
+                field(phoneNo; Rec."Phone No.")
+                {
+                    Caption = 'Phone No.', Locked = true;
                 }
                 field(externalMemberNo; Rec."External Member No.")
                 {
@@ -71,6 +91,12 @@ page 6150782 "NPR APIV1 PBIMMMember"
                 {
                     Caption = 'Newsletter', Locked = True;
                 }
+#if not (BC17 or BC18 or BC19 or BC20)
+                field(systemRowVersion; Rec.SystemRowVersion)
+                {
+                    Caption = 'System Row Version', Locked = true;
+                }
+#endif
             }
         }
     }
