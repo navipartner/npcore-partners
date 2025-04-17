@@ -602,7 +602,6 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         ShopifyStore: Record "NPR Spfy Store";
     begin
         ShopifyStore.Get(ShopifyStoreCode);
-        ShopifyStore.TestField(Enabled);
         ShopifyStore.TestField("Shopify Access Token");
 
         exit(ShopifyStore."Shopify Access Token");

@@ -400,6 +400,19 @@ page 6184704 "NPR Spfy Store Card"
                 RunObject = Page "NPR Spfy Store-Location Links";
                 RunPageLink = "Shopify Store Code" = field(Code);
             }
+            action(SalesChannels)
+            {
+                Caption = 'Sales Channels';
+                ToolTip = 'View the list of Shopify sales channels for your shop and select the ones you want to use when creating new products in Shopify.';
+                ApplicationArea = NPRShopify;
+                Image = List;
+                Promoted = true;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+                PromotedCategory = Category4;
+                RunObject = Page "NPR Spfy Sales Channels";
+                RunPageLink = "Shopify Store Code" = field(Code);
+            }
         }
     }
 

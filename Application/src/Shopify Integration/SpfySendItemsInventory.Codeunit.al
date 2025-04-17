@@ -1008,6 +1008,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
         SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
+        SpfySalesChannelMgt: Codeunit "NPR Spfy Sales Channel Mgt.";
         ShopifyVariant: JsonToken;
         ShopifyVariants: JsonToken;
         ShopifyItemID: Text[30];
@@ -1036,6 +1037,9 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             end else
                 ShopifyResponse.SelectToken('product.variants', ShopifyVariants);  //Raise error
         end;
+        if NcTask.Type = NcTask.Type::Insert then
+            SpfySalesChannelMgt.PublishProductToSalesChannels(NcTask."Store Code", ShopifyItemID);
+
         ShopifyProductTitle := _JsonHelper.GetJText(ShopifyResponse, 'product.title', MaxStrLen(SpfyStoreItemLink."Shopify Name"), false);
         ShopifyProductDetailedDescr := _JsonHelper.GetJText(ShopifyResponse, 'product.descriptionHtml', false);
         if ShopifyProductDetailedDescr = '' then
