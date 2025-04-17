@@ -3440,6 +3440,13 @@
         exit(GetCommunicationMethodWorker(MemberEntryNo, MembershipEntryNo, MemberCommunication."Message Type"::AUTORENEWAL_ENABLED, Method, Address, Engine));
     end;
 
+    internal procedure GetCommunicationMethod_PaymentMethodCollect(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
+    var
+        MemberCommunication: Record "NPR MM Member Communication";
+    begin
+        exit(GetCommunicationMethodWorker(MemberEntryNo, MembershipEntryNo, MemberCommunication."Message Type"::PAYMENT_METHOD_COLLECTION, Method, Address, Engine));
+    end;
+
     internal procedure GetCommunicationMethod_AutoRenewalDisabled(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
     var
         MemberCommunication: Record "NPR MM Member Communication";

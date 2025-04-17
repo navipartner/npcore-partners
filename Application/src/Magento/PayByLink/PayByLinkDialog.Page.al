@@ -11,6 +11,7 @@ page 6184597 "NPR Pay by Link Dialog"
         {
             group(GroupName)
             {
+
                 field(Amount; Amount)
                 {
                     ApplicationArea = NPRRetail;
@@ -76,7 +77,6 @@ page 6184597 "NPR Pay by Link Dialog"
         SendEmail: Boolean;
         LinkExpiration: Duration;
         ReSending: Boolean;
-
 
     procedure SetValues(NewAmount: Decimal; NewEmail: Text[80]; NewPhoneNo: Text[30]; NewSendEmail: Boolean; NewSendSMS: Boolean; NewLinkExpiration: Duration)
     begin

@@ -61,7 +61,7 @@ codeunit 6248294 "NPR MM Subs Try Methods"
     begin
         Clear(PayByLinkSubscriptionRequest);
 
-        SubscriptionRequest.SetLoadFields("Subscription Entry No.", "Item No.", Description, Amount, "Currency Code", "New Valid From Date", "New Valid Until Date", "Entry No.");
+        SubscriptionRequest.SetLoadFields("Subscription Entry No.", "Item No.", Description, Amount, "Currency Code", "New Valid From Date", "New Valid Until Date", "Entry No.", "Membership Code");
         SubscriptionRequest.Get(OriginalSubscriptionRequestEntryNo);
 
         PayByLinkSubscriptionRequest.Init();
@@ -74,6 +74,7 @@ codeunit 6248294 "NPR MM Subs Try Methods"
         PayByLinkSubscriptionRequest."New Valid From Date" := SubscriptionRequest."New Valid From Date";
         PayByLinkSubscriptionRequest."New Valid Until Date" := SubscriptionRequest."New Valid Until Date";
         PayByLinkSubscriptionRequest."Created from Entry No." := OriginalSubscriptionPaymentRequestEntryNo;
+        PayByLinkSubscriptionRequest."Membership Code" := SubscriptionRequest."Membership Code";
         PayByLinkSubscriptionRequest.Insert();
     end;
 
@@ -97,6 +98,7 @@ codeunit 6248294 "NPR MM Subs Try Methods"
         PayByLinkSubscriptionPaymentRequest."Currency Code" := OriginalSubscriptionPaymentRequest."Currency Code";
         PayByLinkSubscriptionPaymentRequest.Description := OriginalSubscriptionPaymentRequest.Description;
         PayByLinkSubscriptionPaymentRequest.Type := PayByLinkSubscriptionPaymentRequest.Type::PayByLink;
+        PayByLinkSubscriptionPaymentRequest."Set Membership Auto-Renew" := true;
         PayByLinkSubscriptionPaymentRequest.Insert();
     end;
 

@@ -183,7 +183,7 @@ table 6150923 "NPR MM Subscr. Request"
         if not SubscrPaymentRequest.IsEmpty() then begin
             SubscrPaymentRequest.SetRange(Status, SubscrPaymentRequest.Status::Requested);
             if not SubscrPaymentRequest.IsEmpty() then
-                Error(UnfinishedPmtReqestsErr);
+                Error(UnfinishedPmtReqestsErr, Rec.TableCaption(), Rec."Entry No.");
             SubscrPaymentRequest.SetRange(Status);
             SubscrPaymentRequest.DeleteAll(true);
         end;

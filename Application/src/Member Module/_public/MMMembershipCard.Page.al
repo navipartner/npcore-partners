@@ -122,7 +122,7 @@
                 }
                 field(HasAutoRenewalPaymentMethod; HasAutoRenewalPaymentMethod)
                 {
-                    Caption = 'Has Auto Renewal Payment Method';
+                    Caption = 'Auto-Renew Payment Method';
                     ToolTip = 'Specifies if there is a valid payment method set for auto-renewal of this membership.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     OptionCaption = 'Yes,No';
@@ -680,6 +680,23 @@
                 begin
                     MembershipMgtInternal.SetAutoRenewStatusWithConfirmPage(Rec);
                     CurrPage.Update(true);
+                end;
+            }
+            action("Collect Payment Method")
+            {
+                Caption = 'Collect Payment Method';
+                Image = LinkWeb;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                ToolTip = 'This action will collect new Payment Method via Pay By Link';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                trigger OnAction()
+                var
+                    SubscriptionMgtImpt: Codeunit "NPR MM Subscription Mgt. Impl.";
+                begin
+                    SubscriptionMgtImpt.CreatePayByLinkPaymentMethodCollect(Rec);
                 end;
             }
         }

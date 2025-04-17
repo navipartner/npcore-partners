@@ -266,4 +266,13 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
         SubscriptionRequest.SetRange(Reversed, false);
         exit(SubscriptionRequest.FindFirst());
     end;
+
+    internal procedure CreatePayByLinkPaymentMethodCollect(Membership: Record "NPR MM Membership")
+    var
+        MMPaymentMethodCollection: Page "NPR MM PaymentMethodCollection";
+    begin
+        Clear(MMPaymentMethodCollection);
+        MMPaymentMethodCollection.SetMembership(Membership);
+        MMPaymentMethodCollection.RunModal();
+    end;
 }

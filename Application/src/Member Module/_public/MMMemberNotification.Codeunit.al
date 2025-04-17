@@ -193,6 +193,15 @@
 
                     exit(_NOTIFICATION_ACTION::SEND); // Send
                 end;
+            MembershipNotification."Notification Trigger"::PAYMENT_METHOD_COLLECTION:
+                begin
+                    // Notification Date is offset from subscription starts
+                    StartDate := MembershipNotification."Date To Notify";
+                    if (StartDate < Today) then
+                        StartDate := Today();
+
+                    exit(_NOTIFICATION_ACTION::SEND); // valid, send notification
+                end;
         end;
 
         exit(_NOTIFICATION_ACTION::CANCEL);
@@ -484,6 +493,8 @@
                 FoundAddress := MembershipManagement.GetCommunicationMethod_AutoRenewalEnabled(MemberEntryNo, MembershipEntryNo, Method, NotificationAddress, NotificationEngine);
             MembershipNotification."Notification Trigger"::AUTORENEWAL_DISABLED:
                 FoundAddress := MembershipManagement.GetCommunicationMethod_AutoRenewalDisabled(MemberEntryNo, MembershipEntryNo, Method, NotificationAddress, NotificationEngine);
+            MembershipNotification."Notification Trigger"::PAYMENT_METHOD_COLLECTION:
+                FoundAddress := MembershipManagement.GetCommunicationMethod_PaymentMethodCollect(MemberEntryNo, MembershipEntryNo, Method, NotificationAddress, NotificationEngine);
         end;
 
         case Method of
@@ -1047,6 +1058,63 @@
         MembershipNotification."Processing Method" := NotificationSetup."Processing Method";
         MembershipNotification."Rejected Reason Code" := RejectedReasonCode;
         MembershipNotification."Rejected Reason Description" := RejectedReasonDescription;
+        MembershipNotification."Pay by Link URL" := PayByLinkURL;
+        MembershipNotification.Insert();
+    end;
+
+    procedure AddMembershipPaymentMethodCollectNotification(MembershipEntryNo: Integer; MembershipCode: Code[20]; PayByLinkURL: Text[2048])
+    var
+        MembershipSetup: Record "NPR MM Membership Setup";
+        CommunitySetup: Record "NPR MM Member Community";
+    begin
+        MembershipSetup.Get(MembershipCode);
+        CommunitySetup.Get(MembershipSetup."Community Code");
+
+        AddMembershipPaymentMethodCollectNotificationWorker(MembershipEntryNo, MembershipSetup, CommunitySetup, PayByLinkURL);
+    end;
+
+    local procedure AddMembershipPaymentMethodCollectNotificationWorker(MembershipEntryNo: Integer; MembershipSetup: Record "NPR MM Membership Setup"; CommunitySetup: Record "NPR MM Member Community"; PayByLinkURL: Text[2048])
+    var
+        NotificationSetup: Record "NPR MM Member Notific. Setup";
+        MembershipNotification: Record "NPR MM Membership Notific.";
+    begin
+        MembershipNotification.SetCurrentKey("Membership Entry No.");
+        MembershipNotification.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
+        MembershipNotification.SetFilter("Notification Trigger", '=%1', MembershipNotification."Notification Trigger"::PAYMENT_METHOD_COLLECTION);
+        MembershipNotification.SetFilter("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);
+        if (MembershipNotification.FindSet(true)) then begin
+            repeat
+                MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::CANCELED;
+                MembershipNotification."Notification Processed At" := CurrentDateTime();
+                MembershipNotification."Notification Processed By User" := CopyStr(UserId, 1, MaxStrLen(MembershipNotification."Notification Processed By User"));
+                MembershipNotification.Modify();
+            until (MembershipNotification.Next() = 0);
+        end;
+
+        NotificationSetup.SetCurrentKey(Type, "Community Code", "Membership Code", "Days Before");
+        NotificationSetup.SetFilter(Type, '=%1', NotificationSetup.Type::PAYMENT_METHOD_COLLECTION);
+        NotificationSetup.SetFilter("Community Code", '=%1', CommunitySetup.Code);
+        NotificationSetup.SetFilter("Membership Code", '=%1', MembershipSetup.Code);
+        if (not NotificationSetup.FindLast()) then begin
+            NotificationSetup.SetFilter("Membership Code", '=%1', '');
+            if (not NotificationSetup.FindLast()) then begin
+                NotificationSetup.SetFilter("Community Code", '=%1', '');
+                if (not NotificationSetup.FindLast()) then
+                    exit;
+            end;
+        end;
+
+        MembershipNotification.Reset();
+        MembershipNotification.Init();
+        MembershipNotification."Entry No." := 0;
+        MembershipNotification."Membership Entry No." := MembershipEntryNo;
+        MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::PENDING;
+        MembershipNotification."Notification Code" := NotificationSetup.Code;
+        MembershipNotification."Date To Notify" := Today;
+        MembershipNotification."Notification Trigger" := MembershipNotification."Notification Trigger"::PAYMENT_METHOD_COLLECTION;
+        MembershipNotification."Template Filter Value" := NotificationSetup."Template Filter Value";
+        MembershipNotification."Target Member Role" := NotificationSetup."Target Member Role";
+        MembershipNotification."Processing Method" := NotificationSetup."Processing Method";
         MembershipNotification."Pay by Link URL" := PayByLinkURL;
         MembershipNotification.Insert();
     end;

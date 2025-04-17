@@ -750,8 +750,6 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         if not TryGetPayByLinkExpiresAtFromResponse(Response, PayByLinkExpiresAt) then
             Clear(PayByLinkExpiresAt);
 
-
-
         ErrorMessage := '';
         ProcessResponse(SubscrPaymentRequest,
                         SubsPayReqLogEntry,
@@ -772,7 +770,30 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                          PayByLinkUrl,
                          PayByLinkExpiresAt,
                          0);
+
+        CreatePaymentCollectionNotification(SubscrPaymentRequest);
         Success := true;
+    end;
+
+    local procedure CreatePaymentCollectionNotification(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request")
+    var
+        Subscription: Record "NPR MM Subscription";
+        MemberNotification: Codeunit "NPR MM Member Notification";
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+    begin
+        if not SubscriptionRequest.Get(SubscrPaymentRequest."Subscr. Request Entry No.") then
+            exit;
+
+        if SubscriptionRequest.Type <> SubscriptionRequest.Type::"Payment Method Collection" then
+            exit;
+
+        if SubscrPaymentRequest.Type <> SubscrPaymentRequest.Type::PayByLink then
+            exit;
+
+        if not Subscription.Get(SubscriptionRequest."Subscription Entry No.") then
+            exit;
+
+        MemberNotification.AddMembershipPaymentMethodCollectNotification(Subscription."Membership Entry No.", Subscription."Membership Code", SubscrPaymentRequest."Pay by Link URL");
     end;
 
     [TryFunction]
@@ -1192,6 +1213,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         Status: Enum "NPR MM Payment Request Status";
         ErrorMessage: Text;
         PSPReference: Text[16];
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
     begin
         MMSubsPayReqLogUtils.LogEntry(MMSubscrPaymentRequest,
                                        '',
@@ -1233,11 +1255,9 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         end else
             Status := Status::Authorized;
 
+        If MMSubscrPaymentRequest."Set Membership Auto-Renew" then
+            MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, true, false);
 
-        if Membership."Auto-Renew" <> Membership."Auto-Renew"::YES_INTERNAL then begin
-            Membership."Auto-Renew" := Membership."Auto-Renew"::YES_INTERNAL;
-            Membership.Modify(true);
-        end;
 
         if JsonObjectToken.AsObject().Get('pspReference', JsonValueToken) then
             PSPReference := CopyStr(JsonValueToken.AsValue().AsText(), 1, MaxStrLen(PSPReference));
@@ -1397,8 +1417,11 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         SubscrRequest: Record "NPR MM Subscr. Request";
         Subscription: Record "NPR MM Subscription";
         MMPaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
+        EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
+        EntityType: Option Customer,Contact,Membership;
+        EFTShopperRecognition: Record "NPR EFT Shopper Recognition";
     begin
-        SubscrRequest.SetLoadFields("Subscription Entry No.");
+        SubscrRequest.SetLoadFields("Subscription Entry No.", Type);
         SubscrRequest.Get(SubscrPaymentRequest."Subscr. Request Entry No.");
 
         Subscription.SetLoadFields("Membership Entry No.");
@@ -1406,6 +1429,13 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
 
         MMPaymentMethodMgt.GetMemberPaymentMethod(Subscription."Membership Entry No.", MemberPaymentMethod);
         ShopperReference := MemberPaymentMethod."Shopper Reference";
+
+        //first Membership Payment Method
+        If SubscrRequest.Type = SubscrRequest.Type::"Payment Method Collection" then
+            if ShopperReference = '' then begin
+                EFTAdyenIntegration.GetCreateEFTShopperRecognition(Format(Subscription."Membership Entry No."), EntityType::Membership, EFTAdyenIntegration.CloudIntegrationType(), EFTShopperRecognition);
+                ShopperReference := EFTShopperRecognition."Shopper Reference";
+            end;
     end;
 
     local procedure GetMerchantName() MerchantName: Text[50];
@@ -1436,8 +1466,9 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         Subscription: Record "NPR MM Subscription";
         SubscrRequest: Record "NPR MM Subscr. Request";
         ReferenceLbl: Label 'Membership no. %1 subs. pay. request no. %2', Comment = '%1 - Membership external no %2 - subscription payment request no.', Locked = true;
+        PaymentCollectionReferenceLbl: Label 'Payment Method Collection - Membership No. %1', Comment = '%1 - Membership external no', Locked = true;
     begin
-        SubscrRequest.SetLoadFields("Subscription Entry No.");
+        SubscrRequest.SetLoadFields("Subscription Entry No.", Type);
         SubscrRequest.Get(SubscrPaymentRequest."Subscr. Request Entry No.");
 
         Subscription.SetLoadFields("Membership Entry No.");
@@ -1446,7 +1477,10 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         Membership.SetLoadFields("External Membership No.");
         Membership.Get(Subscription."Membership Entry No.");
 
-        Reference := StrSubstNo(ReferenceLbl, Membership."External Membership No.", SubscrPaymentRequest."Entry No.");
+        if SubscrRequest.Type = SubscrRequest.Type::"Payment Method Collection" then
+            Reference := StrSubstNo(PaymentCollectionReferenceLbl, Membership."External Membership No.")
+        else
+            Reference := StrSubstNo(ReferenceLbl, Membership."External Membership No.", SubscrPaymentRequest."Entry No.");
     end;
 
     [TryFunction]
@@ -1617,6 +1651,13 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
 
                     if Modified then
                         SubscriptionRequest.Modify(true);
+                end;
+            Status::Captured:
+                begin
+                    if SubscriptionRequest.Type = SubscriptionRequest.Type::"Payment Method Collection" then begin
+                        SubscriptionRequest.Validate("Processing Status", SubscriptionRequest."Processing Status"::Success);
+                        SubscriptionRequest.Modify(true);
+                    end;
                 end;
         end;
     end;
@@ -1879,6 +1920,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         end;
 
         GetMemberShopperReference(SubscrPaymentRequest, ShopperReference);
+
         //root
         Json.WriteStartObject('');
 
@@ -2109,6 +2151,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         UpdateSubscriptionRequestStatus(SubscrPaymentRequest,
                                         Status,
                                         ProcessingStatus);
+
         case ProcessingStatus of
             ProcessingStatus::Success:
                 SubsPayReqLogUtils.UpdateEntry(SubsPayReqLogEntry,

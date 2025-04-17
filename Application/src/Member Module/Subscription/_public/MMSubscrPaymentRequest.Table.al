@@ -190,6 +190,11 @@ table 6150921 "NPR MM Subscr. Payment Request"
             DataClassification = CustomerContent;
             Caption = 'Status Change Date';
         }
+        field(340; "Set Membership Auto-Renew"; Boolean)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Auto-Renew';
+        }
     }
 
     keys

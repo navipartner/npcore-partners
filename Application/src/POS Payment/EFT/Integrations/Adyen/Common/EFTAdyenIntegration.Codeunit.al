@@ -558,7 +558,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         EFTTransactionRequest."Internal Customer ID" := EFTShopperRecognition."Shopper Reference";
     end;
 
-    local procedure GetCreateEFTShopperRecognition(EntityKey: Code[20]; EntityType: Option Customer,Contact,Membership; IntegrationType: Code[20]; var EFTShopperRecognition: Record "NPR EFT Shopper Recognition")
+    internal procedure GetCreateEFTShopperRecognition(EntityKey: Code[20]; EntityType: Option Customer,Contact,Membership; IntegrationType: Code[20]; var EFTShopperRecognition: Record "NPR EFT Shopper Recognition")
     begin
         EFTShopperRecognition.Reset();
         EFTShopperRecognition.SetFilter("Integration Type", '%1|%2', CloudIntegrationType(), HWCIntegrationType());

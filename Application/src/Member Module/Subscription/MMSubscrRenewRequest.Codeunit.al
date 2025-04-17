@@ -57,6 +57,28 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
         Commit();
     end;
 
+    internal procedure CreateSubscriptionPaymentMethodCollectionRequest(var Subscription: Record "NPR MM Subscription"; PSP: Enum "NPR MM Subscription PSP"; var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; AutoRenewStatus: Boolean)
+    var
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+        SubscriptionBlockedErrorLbl: Label 'Subscription no. %1 is blocked.', Comment = '%1 - subscription no.';
+        PaymentMtdCollectDescrTxt: Label '%1 membership Payment Method Collection', Comment = '%1 - membership code';
+    begin
+        if Subscription.Blocked then
+            Error(SubscriptionBlockedErrorLbl, Subscription."Entry No.");
+
+        SubscriptionRequest.Init();
+        SubscriptionRequest."Subscription Entry No." := Subscription."Entry No.";
+        SubscriptionRequest."Membership Code" := Subscription."Membership Code";
+        SubscriptionRequest.Type := SubscriptionRequest.Type::"Payment Method Collection";
+        SubscriptionRequest.Status := SubscriptionRequest.Status::New;
+        SubscriptionRequest.Description := CopyStr(StrSubstNo(PaymentMtdCollectDescrTxt, Subscription."Membership Code"), 1, MaxStrLen(SubscriptionRequest.Description));
+        SubscriptionRequest."Entry No." := 0;
+        SubscriptionRequest.Insert();
+
+        CreatePaymentMethodCollectionSubscPaymentRequest(Subscription, SubscriptionRequest, SubscrPaymentRequest, PSP, AutoRenewStatus);
+        Commit();
+    end;
+
     internal procedure CalculateSubscriptionRenewal(Subscription: Record "NPR MM Subscription"; var SubscriptionRequest: Record "NPR MM Subscr. Request")
     var
         RenewWithItemNo: Code[20];
@@ -105,6 +127,22 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
         SubscrPaymentRequest.Amount := SubscriptionRequest.Amount;
         SubscrPaymentRequest."Currency Code" := SubscriptionRequest."Currency Code";
         SubscrPaymentRequest.Description := SubscriptionRequest.Description;
+        SubscrPaymentRequest.Insert();
+    end;
+
+    Internal procedure CreatePaymentMethodCollectionSubscPaymentRequest(Subscription: Record "NPR MM Subscription"; SubscriptionRequest: Record "NPR MM Subscr. Request"; var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; PSP: Enum "NPR MM Subscription PSP"; AutoRenew: Boolean)
+    begin
+        SubscrPaymentRequest.Init();
+        SubscrPaymentRequest."Entry No." := 0;
+        SubscrPaymentRequest."Batch No." := GetBatchNo();
+        SubscrPaymentRequest."Subscr. Request Entry No." := SubscriptionRequest."Entry No.";
+        SubscrPaymentRequest.Type := SubscrPaymentRequest.Type::PayByLink;
+        SubscrPaymentRequest.Status := SubscrPaymentRequest.Status::New;
+        SubscrPaymentRequest.PSP := PSP;
+        SubscrPaymentRequest.Amount := SubscriptionRequest.Amount;
+        SubscrPaymentRequest."Currency Code" := SubscriptionRequest."Currency Code";
+        SubscrPaymentRequest.Description := SubscriptionRequest.Description;
+        SubscrPaymentRequest."Set Membership Auto-Renew" := AutoRenew;
         SubscrPaymentRequest.Insert();
     end;
 
