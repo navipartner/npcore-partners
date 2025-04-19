@@ -281,7 +281,7 @@
         Commit();
     end;
 
-    procedure SetupJobQueue(Enabled: Boolean)
+    procedure SetupJobQueue(Enabled: Boolean; Silent: Boolean)
     var
         JobQueueCategory: Record "Job Queue Category";
         JobQueueEntry: Record "Job Queue Entry";
@@ -306,12 +306,12 @@
                 JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
                 Commit();
 
-                if Confirm(DailyUpdateQst) then
-                    PAGE.Run(PAGE::"Job Queue Entry Card", JobQueueEntry);
+                if not Silent then
+                    if Confirm(DailyUpdateQst) then
+                        PAGE.Run(PAGE::"Job Queue Entry Card", JobQueueEntry);
             end;
         end else
-            if JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, CODEUNIT::"NPR Raptor Send Data") then
-                JobQueueEntry.Cancel();
+            JobQueueMgt.CancelNpManagedJobs(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR Raptor Send Data");
     end;
 
     procedure ShowJobQueueEntry()
@@ -484,7 +484,7 @@
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
     local procedure RefreshJobQueueEntry()
     begin
-        SetupJobQueue(RaptorSetup.Get() and RaptorSetup."Enable Raptor Functions");
+        SetupJobQueue(RaptorSetup.Get() and RaptorSetup."Enable Raptor Functions", true);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]

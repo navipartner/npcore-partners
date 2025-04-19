@@ -58,7 +58,7 @@
             begin
                 if "Send Data to Raptor" then
                     TestField("Enable Raptor Functions", true);
-                RaptorMgt.SetupJobQueue("Send Data to Raptor");
+                RaptorMgt.SetupJobQueue("Send Data to Raptor", false);
             end;
         }
         field(17; "Tracking Service Type"; Text[30])

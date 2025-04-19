@@ -680,12 +680,11 @@
     local procedure DisableJobQueueEntries(CustomerGDPRSetup: Record "NPR Customer GDPR SetUp")
     var
         JobQueueEntry: Record "Job Queue Entry";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
     begin
         FilterJobQueueEntries(JobQueueEntry, CustomerGDPRSetup);
-        if JobQueueEntry.FindSet() then
-            repeat
-                JobQueueEntry.Cancel();
-            until JobQueueEntry.Next() = 0;
+        if not JobQueueEntry.IsEmpty() then
+            JobQueueMgt.CancelNpManagedJobs(JobQueueEntry);
     end;
 
     local procedure FilterJobQueueEntries(var JobQueueEntry: Record "Job Queue Entry"; CustomerGDPRSetup: Record "NPR Customer GDPR SetUp")

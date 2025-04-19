@@ -634,12 +634,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
             end;
         end;
 
-        if JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR RS Fiscal BG Comm. Batch") then begin
-            JobQueueEntry.FindSet(true);
-            repeat
-                JobQueueEntry.Cancel();
-            until JobQueueEntry.Next() = 0;
-        end;
+        JobQueueMgt.CancelNpManagedJobs(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR RS Fiscal BG Comm. Batch");
         exit(false);
     end;
 

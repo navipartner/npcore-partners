@@ -5,7 +5,7 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
     var
         ServiceNameTok: Label 'ExternalJQRefresher', Locked = true, MaxLength = 240;
 
-    internal procedure ManageExternalJQRefresherTenants(action: Enum "NPR Ext. JQ Refresher Options"): Text
+    internal procedure ManageExternalJQRefresherTenants(action: Enum "NPR Ext. JQ Refresher Options"; var HttpResponseMessage: HttpResponseMessage)
     var
         AzureADTenant: Codeunit "Azure AD Tenant";
         EnvironmentInformation: Codeunit "Environment Information";
@@ -24,7 +24,7 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
         else
             RequestUrl := StrSubstNo(BaseURL, SandboxEndpoint, AzureADTenant.GetAadTenantId(), EnvironmentInformation.GetEnvironmentName(), CompanyNameUrlEncoded, ExtJQRefresherEnumValueName(action));
 
-        exit(CreateCloudflareHttpRequest('', RequestUrl, Enum::"Http Request Type"::POST));
+        CreateCloudflareHttpRequest('', RequestUrl, Enum::"Http Request Type"::POST, HttpResponseMessage);
     end;
 
     internal procedure CreateSaaSSetup()
@@ -86,13 +86,16 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
     internal procedure ValidateExternalJQRefresherTenantManager()
     var
         TenantManageOptions: Enum "NPR Ext. JQ Refresher Options";
+        HttpResponseMessage: HttpResponseMessage;
         ResponseText: Text;
         JsonObject: JsonObject;
         JsonToken: JsonToken;
         ResponseIsEmptyLbl: Label 'JQ Runner''s database returned an empty response.';
         TenantInformationDoesNotExistLbl: Label 'Tenant information does not exist in the JQ Runner''s database.';
     begin
-        ResponseText := ManageExternalJQRefresherTenants(TenantManageOptions::select);
+        ManageExternalJQRefresherTenants(TenantManageOptions::select, HttpResponseMessage);
+        HttpResponseMessage.Content().ReadAs(ResponseText);
+
         if ResponseText = '' then
             Error(ResponseIsEmptyLbl);
 
@@ -124,7 +127,7 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
             TenantWebService.Delete(true);
     end;
 
-    internal procedure SendRefreshRequest(): Text
+    internal procedure SendRefreshRequest(var HttpResponseMessage: HttpResponseMessage): Text
     var
         TypeHelper: Codeunit "Type Helper";
         CompanyNameUrlEncoded: Text;
@@ -143,8 +146,147 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
         else
             RequestUrl := StrSubstNo(BaseUrl, SandboxEndpoint, AzureADTenant.GetAadTenantId(), EnvironmentInformation.GetEnvironmentName(), CompanyNameUrlEncoded);
 
-        exit(CreateCloudflareHttpRequest('', RequestUrl, Enum::"Http Request Type"::POST));
+        CreateCloudflareHttpRequest('', RequestUrl, Enum::"Http Request Type"::POST, HttpResponseMessage);
     end;
+
+    #region Azure AD application
+    internal procedure CreateAzureADApplication(AppDisplayName: Text[50]; var ClientID: Guid; var ClientSecret: Text)
+    var
+        AADApplicationMgt: Codeunit "NPR AAD Application Mgt.";
+        PermissionSets: List of [Code[20]];
+    begin
+#if not BC17
+        PermissionSets.Add('NPR Ext JQ Refresher');
+#else
+        PermissionSets.Add('D365 AUTOMATION');
+        PermissionSets.Add('SUPER (DATA)');
+#endif
+        AADApplicationMgt.SetSilent(true);
+        AADApplicationMgt.CreateAzureADApplicationAndSecret(AppDisplayName, SecretDisplayName(), PermissionSets);
+        AADApplicationMgt.GetApplicationIDAndSecret(ClientID, ClientSecret);
+    end;
+
+    [NonDebuggable]
+    internal procedure ManageJQRefresherUser(ClientID: Guid; ClientSecret: Text; action: Enum "NPR Ext. JQ Refresher Options"; var HttpResponseMessage: HttpResponseMessage)
+    var
+        AzureADTenant: Codeunit "Azure AD Tenant";
+        EnvironmentInformation: Codeunit "Environment Information";
+        RequestUrl: Text;
+        BaseUrl: Label 'https://job-queue-refresher-entra-app-manager%1/?action=%2', Locked = true;
+        SandboxEndpoint: Label '-prelive.navipartner-prelive.workers.dev', Locked = true;
+        LiveEndpoint: Label '.npretail.app', Locked = true;
+        RequestBodyString: Label '{"TenantID_EnvironmentName_ClientID": "%1|%2|%3", "ClientSecret": "%4"}';
+        RequestText: Text;
+    begin
+        if EnvironmentInformation.IsProduction() then
+            RequestUrl := StrSubstNo(BaseUrl, LiveEndpoint, ExtJQRefresherEnumValueName(action))
+        else
+            RequestUrl := StrSubstNo(BaseUrl, SandboxEndpoint, ExtJQRefresherEnumValueName(action));
+
+        RequestText := StrSubstNo(RequestBodyString, AzureADTenant.GetAadTenantId(), EnvironmentInformation.GetEnvironmentName(), Format(ClientID), ClientSecret);
+
+        CreateCloudflareHttpRequest(RequestText, RequestUrl, Enum::"Http Request Type"::POST, HttpResponseMessage);
+    end;
+
+    internal procedure RefreshJobQueueEntries()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        JQMonitorEntry: Record "NPR Monitored Job Queue Entry";
+        JQMonitorEntry2: Record "NPR Monitored Job Queue Entry";
+        JQRefreshSetup: Record "NPR Job Queue Refresh Setup";
+    begin
+        JQMonitorEntry.SetRange("NP Managed Job", true);
+        JQMonitorEntry.SetRange("NPR Entra App User Name", UserID);
+        JQRefreshSetup.GetSetup();
+        if JQRefreshSetup."Default Refresher User" <> '' then
+            if JQRefreshSetup."Default Refresher User" = UserID then
+                JQMonitorEntry.SetFilter("NPR Entra App User Name", '%1|%2', UserID, '');
+
+        if JQMonitorEntry.FindSet() then
+            repeat
+                JQMonitorEntry2 := JQMonitorEntry;
+                if JobQueueEntry.Get(JQMonitorEntry2."Job Queue Entry ID") then
+                    RefreshJobQueueEntry(JQMonitorEntry2)
+                else begin
+                    JQMonitorEntry2."Job Queue Entry ID" := RefreshJobQueueEntry(JQMonitorEntry2);
+                    JQMonitorEntry2.Modify();
+                end;
+            until JQMonitorEntry.Next() = 0;
+    end;
+
+    internal procedure RequestJQRefresherUser(var DefaultRefresherUser: Text[250])
+    var
+        AADApplication: Record "AAD Application";
+        AccessControl: Record "Access Control";
+        User: Record User;
+        AADApplicationPage: Page "AAD Application List";
+        PermissionSetLbl: Label 'NPR EXT JQ REFRESHER', Locked = true;
+    begin
+        if AADApplication.FindSet() then
+            repeat
+                if AccessControl.Get(AADApplication."User ID", PermissionSetLbl, '', AccessControl.Scope::System, AADApplication."App ID") then
+                    AADApplication.Mark(true);
+            until AADApplication.Next() = 0;
+
+        AADApplication.MarkedOnly(true);
+        AADApplicationPage.SetTableView(AADApplication);
+        AADApplicationPage.LookupMode := true;
+        if AADApplicationPage.RunModal() <> Action::LookupOK then
+            exit;
+        AADApplicationPage.GetRecord(AADApplication);
+        if User.Get(AADApplication."User ID") then
+            DefaultRefresherUser := User."User Name";
+    end;
+
+    internal procedure CreateExternalJQRefresherUser(Rec: Record "NPR Job Queue Refresh Setup")
+    var
+        AADApplication: Record "AAD Application";
+        JQRefreshSetup: Record "NPR Job Queue Refresh Setup";
+        User: Record User;
+        ExternalJQRefresherMgt: Codeunit "NPR External JQ Refresher Mgt.";
+        ExtJQRefresherEntraApp: Report "NPR Ext JQ Refresher Entra App";
+        HttpResponseMessage: HttpResponseMessage;
+        AppDisplayName: Text[50];
+        ClientSecret: Text;
+        ResponseText: Text;
+        ClientID: Guid;
+        EntraAppFailedToCreateLbl: Label 'Entra App "%1" could not be created.\Please retry.';
+        EntraAppIsMissingConsentLbl: Label '"%1" Entra App was successfully created and registered but the required permissions has not yet been granted. Please grant required permissions before expecting of the External Job Queue Refresher to use it.';
+        EntraAppRegisterSuccessLbl: Label '"%1" Entra App was successfully created and registered.';
+    begin
+        AppDisplayName := CopyStr(ExtJQRefresherEntraApp.RequestAppDisplayName(), 1, MaxStrLen(AppDisplayName));
+        if AppDisplayName = '' then
+            exit;
+        ExternalJQRefresherMgt.CreateAzureADApplication(AppDisplayName, ClientID, ClientSecret);
+        if not AADApplication.Get(ClientID) then
+            Error(EntraAppFailedToCreateLbl, AppDisplayName);
+        ExternalJQRefresherMgt.ManageJQRefresherUser(ClientID, ClientSecret, Enum::"NPR Ext. JQ Refresher Options"::create, HttpResponseMessage);
+        if not HttpResponseMessage.IsSuccessStatusCode() then begin
+            HttpResponseMessage.Content().ReadAs(ResponseText);
+            Message(ResponseText);
+            exit;
+        end;
+
+        JQRefreshSetup.GetSetup();
+        if JQRefreshSetup."Default Refresher User" = '' then
+            if User.Get(AADApplication."User ID") then begin
+                JQRefreshSetup."Default Refresher User" := User."User Name";
+                JQRefreshSetup.Modify();
+            end;
+
+        if not AADApplication."Permission Granted" then
+            Message(EntraAppIsMissingConsentLbl, AppDisplayName)
+        else
+            Message(EntraAppRegisterSuccessLbl, AppDisplayName);
+    end;
+
+    local procedure SecretDisplayName(): Text
+    var
+        SecretDisplayNameLbl: Label 'NaviPartner External Job Queue Refresher integration - %1', Comment = '%1 = today''s date', Locked = true;
+    begin
+        exit(StrSubstNo(SecretDisplayNameLbl, Format(Today(), 0, 9)));
+    end;
+    #endregion
 
     local procedure ExternalJQRefresherListenerWebserviceExists(var TenantWebService: Record "Tenant Web Service"): Boolean
     begin
@@ -152,7 +294,7 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
     end;
 
     [NonDebuggable]
-    local procedure CreateCloudflareHttpRequest(RequestText: Text; RequestUrl: Text; Method: Enum "Http Request Type"): Text
+    local procedure CreateCloudflareHttpRequest(RequestText: Text; RequestUrl: Text; Method: Enum "Http Request Type"; var HttpResponseMessage: HttpResponseMessage)
     var
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         HttpClient: HttpClient;
@@ -160,8 +302,6 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
         HttpContentHeaders: HttpHeaders;
         HttpRequestHeaders: HttpHeaders;
         HttpRequestMessage: HttpRequestMessage;
-        HttpResponseMessage: HttpResponseMessage;
-        ResponseText: Text;
         KeyLbl: Label 'NPCloudflareJQRefresherAPIKey', Locked = True;
     begin
         Clear(HttpRequestMessage);
@@ -180,14 +320,25 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
         HttpRequestMessage.Method := Method.Names().Get(Method.Ordinals().IndexOf(Method.AsInteger()));
 
         HttpClient.Send(HttpRequestMessage, HttpResponseMessage);
-        HttpResponseMessage.Content().ReadAs(ResponseText);
-
-        exit(ResponseText);
     end;
 
     local procedure ExtJQRefresherEnumValueName(RefresherOption: Enum "NPR Ext. JQ Refresher Options") Result: Text
     begin
         RefresherOption.Names().Get(RefresherOption.Ordinals().IndexOf(RefresherOption.AsInteger()), Result);
+    end;
+
+    local procedure RefreshJobQueueEntry(JQMonitorEntry: Record "NPR Monitored Job Queue Entry"): Guid
+    var
+        Parameters: Record "Job Queue Entry";
+        JobQueueEntry: Record "Job Queue Entry";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
+    begin
+        clear(Parameters);
+        Parameters.TransferFields(JQMonitorEntry, false);
+        if JobQueueMgt.InitRecurringJobQueueEntry(Parameters, JobQueueEntry) then begin
+            JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
+            exit(JobQueueEntry.ID);
+        end;
     end;
 
 #if not (BC17 or BC18)

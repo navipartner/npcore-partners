@@ -51,16 +51,14 @@
 
             trigger OnValidate()
             var
-                ImportType: Record "NPR Nc Import Type";            
+                ImportType: Record "NPR Nc Import Type";
                 ServiceAPI: Codeunit "NPR BTF Service API";
             begin
-                if Rec.Enabled then begin
-                    ServiceAPI.RegisterNcImportType(CopyStr(Rec."EndPoint ID", 1, MaxStrlen(ImportType.Code)), Rec.Description, GetImportListUpdateHandler());
-                    ServiceAPI.ScheduleJobQueueEntry(Rec);
-                end else begin
+                if Rec.Enabled then
+                    ServiceAPI.RegisterNcImportType(CopyStr(Rec."EndPoint ID", 1, MaxStrlen(ImportType.Code)), Rec.Description, GetImportListUpdateHandler())
+                else
                     ServiceAPI.DeleteNcImportType(CopyStr(Rec."EndPoint ID", 1, MaxStrlen(ImportType.Code)));
-                    ServiceAPI.CancelJob(Rec);
-                end;
+                ServiceAPI.ScheduleJobQueueEntry(Rec);
             end;
         }
         field(7; "Sequence Order"; Integer)
@@ -109,12 +107,8 @@
         RenameNotAllowedErr: Label 'Rename not allowed. Instead, delete and recreate record.';
 
     trigger OnDelete()
-    var
-        ImportType: Record "NPR Nc Import Type";
-        ServiceAPI: Codeunit "NPR BTF Service API";
     begin
-        ServiceAPI.DeleteNcImportType(CopyStr(Rec."EndPoint ID", 1, MaxStrlen(ImportType.Code)));
-        ServiceAPI.CancelJob(Rec);
+        Validate(Enabled, false);
     end;
 
     trigger OnRename()

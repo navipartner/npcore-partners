@@ -44,11 +44,8 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
             JobQueueEntry.SetFilter("Parameter String", '%1&%2',
                 StrSubstNo(FilterPlaceholderTok, NcTaskListProcessing.ParamProcessor(), GetShopifyTaskProcessorCode(false)),
                 StrSubstNo(FilterPlaceholderTok, NcTaskListProcessing.ParamStoreCode(), ShopifyStoreCode));
-            if JobQueueEntry.FindSet() then
-                repeat
-                    JobQueueEntry.Cancel();
-                    Commit();
-                until JobQueueEntry.Next() = 0;
+            if not JobQueueEntry.IsEmpty() then
+                JobQueueMgt.CancelNpManagedJobs(JobQueueEntry);
         end;
     end;
 

@@ -401,7 +401,7 @@ codeunit 6184796 "NPR Adyen Management"
                 NoOfMinutesBetweenRuns,
                 '',
                 JobQueueEntry)
-            then
+        then
             JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
     end;
 

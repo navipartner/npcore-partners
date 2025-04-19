@@ -47,10 +47,6 @@
             SalesSetup."Job Queue Category Code",
             JobQueueEntryGlobal)
         then begin
-            if JobQueueEntryGlobal."Report Output Type" <> JobQueueEntryGlobal."Report Output Type"::"None (Processing only)" then begin
-                JobQueueEntryGlobal."Report Output Type" := JobQueueEntryGlobal."Report Output Type"::"None (Processing only)";
-                JobQueueEntryGlobal.Modify();
-            end;
             JobQueueEntryGlobal.Mark(true);
             JobQueueMgt.StartJobQueueEntry(JobQueueEntryGlobal);
         end;
@@ -67,8 +63,7 @@
         NoMoreEntries: Boolean;
     begin
         GetTimingParameters(NotBeforeDateTime, NextRunDateFormula);
-        if PostInvCostToGLJobQueueExists(NotBeforeDateTime) then
-            exit;
+        RemovedUnmanagedPostInvCostToGLJobQueues(NotBeforeDateTime);
 
         if JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR Post Inventory Cost to G/L") then
             repeat
@@ -97,35 +92,38 @@
     end;
 
     local procedure AdjCostJobQueueExists(AtDateTime: DateTime): Boolean
-    begin
-        exit(JobQueueEntryExists(JobQueueEntryGlobal."Object Type to Run"::Report, Report::"Adjust Cost - Item Entries", AtDateTime));
-    end;
-
-    local procedure PostInvCostToGLJobQueueExists(AtDateTime: DateTime): Boolean
     var
         JobQueueEntry: Record "Job Queue Entry";
     begin
-        if JobQueueEntryExists(JobQueueEntryGlobal."Object Type to Run"::Report, Report::"Post Inventory Cost to G/L", AtDateTime) then
-            exit(true);
-#if not BC17
-        if JobQueueEntryExists(JobQueueEntryGlobal."Object Type to Run"::Codeunit, Codeunit::"Post Inventory Cost to G/L", AtDateTime) then
-            exit(true);
-#endif
-        exit(JobQueueEntryExists(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR Post Inventory Cost to G/L", AtDateTime));
+        exit(JobQueueEntryExists(JobQueueEntryGlobal."Object Type to Run"::Report, Report::"Adjust Cost - Item Entries", AtDateTime, JobQueueEntry));
     end;
 
-    local procedure JobQueueEntryExists(ObjectTypeToRun: Integer; ObjectIdToRun: Integer; AtDateTime: DateTime): Boolean
+    local procedure RemovedUnmanagedPostInvCostToGLJobQueues(AtDateTime: DateTime)
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        if JobQueueEntryExists(JobQueueEntryGlobal."Object Type to Run"::Report, Report::"Post Inventory Cost to G/L", AtDateTime, JobQueueEntry) then
+            JobQueueEntry.Cancel();
+#if not BC17
+        if JobQueueEntryExists(JobQueueEntryGlobal."Object Type to Run"::Codeunit, Codeunit::"Post Inventory Cost to G/L", AtDateTime, JobQueueEntry) then
+            JobQueueEntry.Cancel();
+#endif
+    end;
+
+    local procedure JobQueueEntryExists(ObjectTypeToRun: Integer; ObjectIdToRun: Integer; AtDateTime: DateTime; var JobQueueEntryOut: Record "Job Queue Entry"): Boolean
     var
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueMgt: Codeunit "NPR Job Queue Management";
     begin
+        Clear(JobQueueEntryOut);
         JobQueueEntry."Object Type to Run" := ObjectTypeToRun;
         JobQueueEntry.Validate("Object ID to Run", ObjectIdToRun);
         JobQueueEntry."Earliest Start Date/Time" := AtDateTime;
         if not JobQueueMgt.JobQueueEntryExists(JobQueueEntry, JobQueueEntryGlobal) then
             exit(false);
+        JobQueueEntryOut := JobQueueEntryGlobal;
 
-        exit(not (JobQueueEntryGlobal.Status in [JobQueueEntryGlobal.Status::"On Hold", JobQueueEntryGlobal.Status::Error]));
+        exit(not (JobQueueEntryOut.Status in [JobQueueEntryOut.Status::"On Hold", JobQueueEntryOut.Status::Error]));
     end;
 
     local procedure GetTimingParameters(var NotBeforeDateTime: DateTime; var NextRunDateFormula: DateFormula)

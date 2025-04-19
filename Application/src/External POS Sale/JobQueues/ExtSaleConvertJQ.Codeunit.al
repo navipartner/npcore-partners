@@ -39,8 +39,11 @@ codeunit 6248236 "NPR Ext. Sale Convert JQ"
         JobQueueDescrLbl: Label 'External POS Sale Conversion', MaxLength = 250;
     begin
         JobQueueManagement.SetJobTimeout(4, 0);  //4 hours
+        JobQueueManagement.SetMaxNoOfAttemptsToRun(999999999);
+        JobQueueManagement.SetRerunDelay(10);
+        JobQueueManagement.SetAutoRescheduleAndNotifyOnError(true, 20, '');
 
-        if not JobQueueManagement.InitRecurringJobQueueEntry(
+        if JobQueueManagement.InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,
             Codeunit::"NPR Ext. Sale Convert JQ",
             '',
@@ -50,14 +53,7 @@ codeunit 6248236 "NPR Ext. Sale Convert JQ"
             GetExternalSaleCategory(),
             JobQueueEntry)
         then
-            exit;
-
-        JobQueueEntry."Maximum No. of Attempts to Run" := 999999999;
-        JobQueueEntry."Rerun Delay (sec.)" := 10;
-        JobQueueEntry."NPR Auto-Resched. after Error" := true;
-        JobQueueEntry."NPR Auto-Resched. Delay (sec.)" := 20;
-        JobQueueEntry.Modify(true);
-        JobQueueManagement.StartJobQueueEntry(JobQueueEntry);
+            JobQueueManagement.StartJobQueueEntry(JobQueueEntry);
     end;
 
     internal procedure GetExternalSaleCategory(): Code[10]

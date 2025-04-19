@@ -443,12 +443,7 @@ codeunit 6184866 "NPR ES Audit Mgt."
             then
                 JobQueueManagement.StartJobQueueEntry(JobQueueEntry);
         end else
-            if JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR ES Retrieve Software JQ") then begin
-                JobQueueEntry.FindSet(true);
-                repeat
-                    JobQueueEntry.Cancel();
-                until JobQueueEntry.Next() = 0;
-            end;
+            JobQueueManagement.CancelNpManagedJobs(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR ES Retrieve Software JQ");
     end;
 
     local procedure InitESRetrievePendingInvoicesJobQueue(ATFiscalizationEnabled: Boolean)
@@ -472,12 +467,7 @@ codeunit 6184866 "NPR ES Audit Mgt."
             then
                 JobQueueManagement.StartJobQueueEntry(JobQueueEntry);
         end else
-            if JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR ES Retrieve Pending Inv JQ") then begin
-                JobQueueEntry.FindSet(true);
-                repeat
-                    JobQueueEntry.Cancel();
-                until JobQueueEntry.Next() = 0;
-            end;
+            JobQueueManagement.CancelNpManagedJobs(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR ES Retrieve Pending Inv JQ");
     end;
 
     local procedure DefaultESFiscalJobQueueCategoryCode(): Code[10]

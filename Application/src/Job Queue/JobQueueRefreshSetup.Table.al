@@ -33,6 +33,7 @@ table 6059870 "NPR Job Queue Refresh Setup"
                 ExternalJQRefresherMgt: Codeunit "NPR External JQ Refresher Mgt.";
                 EnvironmentInformation: Codeunit "Environment Information";
                 TenantManageOptions: Enum "NPR Ext. JQ Refresher Options";
+                HttpResponseMessage: HttpResponseMessage;
                 ResponseText: Text;
                 OnPremLbl: Label 'NP Retail External JQ Refresher integration is supported only on Cloud environment.\Current environment - ''OnPrem''.';
             begin
@@ -40,11 +41,24 @@ table 6059870 "NPR Job Queue Refresh Setup"
                     Error(OnPremLbl);
                 if "Use External JQ Refresher" then begin
                     ExternalJQRefresherMgt.CreateTenantWebService();
-                    ResponseText := ExternalJQRefresherMgt.ManageExternalJQRefresherTenants(TenantManageOptions::create);
+                    ExternalJQRefresherMgt.ManageExternalJQRefresherTenants(TenantManageOptions::create, HttpResponseMessage);
                 end else
-                    ResponseText := ExternalJQRefresherMgt.ManageExternalJQRefresherTenants(TenantManageOptions::delete);
-
+                    ExternalJQRefresherMgt.ManageExternalJQRefresherTenants(TenantManageOptions::delete, HttpResponseMessage);
+                HttpResponseMessage.Content().ReadAs(ResponseText);
                 Message(ResponseText);
+            end;
+        }
+        field(50; "Default Refresher User"; Text[250])
+        {
+            Caption = 'Default JQ Runner User Name';
+            DataClassification = CustomerContent;
+            TableRelation = "AAD Application";
+
+            trigger OnLookup()
+            var
+                ExternalJQRefresherMgt: Codeunit "NPR External JQ Refresher Mgt.";
+            begin
+                ExternalJQRefresherMgt.RequestJQRefresherUser("Default Refresher User");
             end;
         }
     }

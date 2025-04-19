@@ -110,8 +110,7 @@ codeunit 6184975 "NPR MM LoyaltyRetryQueueMgr"
     begin
         LoyaltyServiceEndpoint.SetFilter(Type, '=%1', LoyaltyServiceEndpoint.Type::LoyaltyServices);
         if (LoyaltyServiceEndpoint.IsEmpty()) then begin
-            if (JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitID())) then
-                JobQueueEntry.Cancel();
+            JobQueueManagement.CancelNpManagedJobs(JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitID());
             exit;
         end;
 

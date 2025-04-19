@@ -259,6 +259,7 @@ codeunit 6059993 "NPR HL Integration Mgt."
         DummyNcTask: Record "NPR Nc Task";
         JobQueueEntry: Record "Job Queue Entry";
         HLScheduleSend: Codeunit "NPR HL Schedule Send Tasks";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
         NcTaskListProcessing: Codeunit "NPR Nc Task List Processing";
         NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
         ParameterFilterTxt: text;
@@ -271,11 +272,8 @@ codeunit 6059993 "NPR HL Integration Mgt."
             JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
             JobQueueEntry.SetRange("Object ID to Run", NcSetupMgt.TaskListProcessingCodeunit());
             JobQueueEntry.SetFilter("Parameter String", ParameterFilterTxt);
-            if JobQueueEntry.FindSet() then
-                repeat
-                    JobQueueEntry.Cancel();
-                    Commit();
-                until JobQueueEntry.Next() = 0;
+            if not JobQueueEntry.IsEmpty() then
+                JobQueueMgt.CancelNpManagedJobs(JobQueueEntry);
         end;
     end;
 

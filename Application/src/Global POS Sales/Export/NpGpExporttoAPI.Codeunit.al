@@ -37,25 +37,29 @@ codeunit 6248268 "NPR NpGp Export to API"
         Commit();
     end;
 
-    procedure CreateExportProcessingJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry")
+    procedure CreateExportProcessingJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry"): Boolean
     var
-        NPRJobQueueManagement: Codeunit "NPR Job Queue Management";
+        JobQueueManagement: Codeunit "NPR Job Queue Management";
         JobQueueCategoryCode: Code[10];
         DescriptionLbl: Label 'Processes Export of POS Entries to Global Sale';
         StartDateTime: DateTime;
     begin
-        if GetExistingJobQueueEntry(JobQueueEntry) then
-            exit;
-        StartDateTime := NPRJobQueueManagement.NowWithDelayInSeconds(5);
+        StartDateTime := JobQueueManagement.NowWithDelayInSeconds(5);
         JobQueueCategoryCode := GetJobQueueCategoryCode();
-        if not NPRJobQueueManagement.InitRecurringJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR NpGp Export to API", '', DescriptionLbl, StartDateTime, 15, JobQueueCategoryCode, JobQueueEntry) then
-            exit;
 
-        JobQueueEntry."Maximum No. of Attempts to Run" := 10;
-        JobQueueEntry."Rerun Delay (sec.)" := 10;
-        JobQueueEntry."NPR Auto-Resched. after Error" := true;
-        JobQueueEntry."NPR Auto-Resched. Delay (sec.)" := 20;
-        JobQueueEntry.Modify(true);
+        JobQueueManagement.SetMaxNoOfAttemptsToRun(10);
+        JobQueueManagement.SetRerunDelay(10);
+        JobQueueManagement.SetAutoRescheduleAndNotifyOnError(true, 20, '');
+        exit(
+            JobQueueManagement.InitRecurringJobQueueEntry(
+                JobQueueEntry."Object Type to Run"::Codeunit,
+                Codeunit::"NPR NpGp Export to API",
+                '',
+                DescriptionLbl,
+                StartDateTime,
+                15,
+                JobQueueCategoryCode,
+                JobQueueEntry));
     end;
 
     local procedure ExportNpGpPOSSalesSetup(NpGpPOSSalesSetup: Record "NPR NpGp POS Sales Setup")
@@ -376,17 +380,6 @@ codeunit 6248268 "NPR NpGp Export to API"
         exit(JsonHelper.GetJText(JObject.AsToken(), 'code', false) = APIErrorCode.Names.Get(APIErrorCode.Ordinals.IndexOf(APIErrorCode.AsInteger())));
     end;
 
-    local procedure GetExistingJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry"): Boolean
-    begin
-        JobQueueEntry.Reset();
-        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR NpGp Export to API");
-        if JobQueueEntry.FindFirst() then
-            exit(true);
-        JobQueueEntry.Reset();
-        exit(false);
-    end;
-
     local procedure GetJobQueueCategoryCode() JobQueueCategoryCode: Code[10]
     var
         JobQueueCategory: Record "Job Queue Category";
@@ -402,13 +395,13 @@ codeunit 6248268 "NPR NpGp Export to API"
     var
         NpGpPOSSalesSetup: Record "NPR NpGp POS Sales Setup";
         JobQueueEntry: Record "Job Queue Entry";
-        NPRJobQueueManagement: Codeunit "NPR Job Queue Management";
+        JobQueueManagement: Codeunit "NPR Job Queue Management";
     begin
         NpGpPOSSalesSetup.SetRange("Use api", true);
         if NpGpPOSSalesSetup.IsEmpty then
             exit;
-        CreateExportProcessingJobQueueEntry(JobQueueEntry);
-        NPRJobQueueManagement.StartJobQueueEntry(JobQueueEntry);
+        if CreateExportProcessingJobQueueEntry(JobQueueEntry) then
+            JobQueueManagement.StartJobQueueEntry(JobQueueEntry);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]

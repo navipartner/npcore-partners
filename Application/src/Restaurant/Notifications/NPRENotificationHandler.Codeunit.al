@@ -290,8 +290,7 @@ codeunit 6184777 "NPR NPRE Notification Handler"
             then
                 JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
         end else
-            if JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, CodeunitID) then
-                JobQueueEntry.Cancel();
+            JobQueueMgt.CancelNpManagedJobs(JobQueueEntry."Object Type to Run"::Codeunit, CodeunitID);
     end;
 
     local procedure GetJobQueueCategoryCode(): Code[10]

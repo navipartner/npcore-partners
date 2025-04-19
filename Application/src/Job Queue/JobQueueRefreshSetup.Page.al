@@ -27,11 +27,27 @@ page 6150891 "NPR Job Queue Refresh Setup"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies whether refreshing the list of NP Retail related job queue entries should be performed by an external Job Queue Refresher Worker regardless of user activity.';
                 }
+                group(DefaultRefresherUser)
+                {
+                    ShowCaption = false;
+                    Visible = _ExternalJQRefresherIsEnabled;
+                    field("Default Refresher User"; Rec."Default Refresher User")
+                    {
+                        ApplicationArea = NPRRetail;
+                        Tooltip = 'Specifies the default Job Queue runner user which will be used for refreshing job queue entries if no Job Queue runner is specified.';
+                    }
+                }
                 field("Last Refreshed"; Rec."Last Refreshed")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the date and time when the list of NP Retail related job queue entries was refreshed the last time.';
                 }
+            }
+            part("Monitored Job Queues"; "NPR Monitored JQ Entries")
+            {
+                Caption = 'Monitored Job Queues';
+                UpdatePropagation = Both;
+                ApplicationArea = NPRRetail;
             }
         }
     }
@@ -53,10 +69,12 @@ page 6150891 "NPR Job Queue Refresh Setup"
 
                     trigger OnAction()
                     var
+                        HttpResponseMessage: HttpResponseMessage;
                         ResponseText: Text;
                     begin
                         CurrPage.SaveRecord();
-                        ResponseText := _ExternalJQRefresherMgt.SendRefreshRequest();
+                        _ExternalJQRefresherMgt.SendRefreshRequest(HttpResponseMessage);
+                        HttpResponseMessage.Content().ReadAs(ResponseText);
                         Message(ResponseText);
                         CurrPage.Update(false);
                     end;
@@ -72,7 +90,9 @@ page 6150891 "NPR Job Queue Refresh Setup"
 
                     trigger OnAction()
                     begin
+                        CurrPage.SaveRecord();
                         ToggleExtJQRefresher(true);
+                        CurrPage.Update(false);
                     end;
                 }
                 action("Disable External JQ Refresher")
@@ -85,19 +105,28 @@ page 6150891 "NPR Job Queue Refresh Setup"
 
                     trigger OnAction()
                     begin
+                        CurrPage.SaveRecord();
                         ToggleExtJQRefresher(false);
+                        CurrPage.Update(false);
                     end;
                 }
-                action("Create External JQ Refresher Entra App")
+                action("Create External JQ Refresher User")
                 {
+                    Caption = 'Create External JQ Refresher User';
+                    ToolTip = 'This action will create a new Microsoft Entra ID App and an accompanying client secret.';
                     ApplicationArea = NPRRetail;
-                    Caption = 'Create External JQ Refresher Entra App';
-                    Image = Action;
-                    ToolTip = 'Running this action will try to create the JQ Runner Entra app.\This action can only be used by a user that is an Entra ID Global Administrator. The procedure will create a single-tenant Entra app on your behalf and ask for the required admin consent.';
+                    Image = Setup;
 
                     trigger OnAction()
+                    var
+                        ExternalJQRefresherMgt: Codeunit "NPR External JQ Refresher Mgt.";
+                        WarningLbl: Label 'This action will create a new Entra App user for the External Job Queue Refresher and automatically register it. You don''t need to save Client ID and Client Secret values.\Are you sure you want to continue?';
                     begin
-                        _ExternalJQRefresherMgt.CreateSaaSSetup();
+                        if not Confirm(WarningLbl) then
+                            exit;
+                        CurrPage.SaveRecord();
+                        ExternalJQRefresherMgt.CreateExternalJQRefresherUser(Rec);
+                        CurrPage.Update(false);
                     end;
                 }
             }
@@ -112,11 +141,7 @@ page 6150891 "NPR Job Queue Refresh Setup"
         Rec.GetSetup();
         if Rec."Use External JQ Refresher" then begin
             ClearLastError();
-            if not _ExternalJQRefresherMgt.ValidateSaaSSetup() then begin
-                ConfigurationsValidationNotification.Message(GetLastErrorText());
-                ConfigurationsValidationNotification.Scope := NotificationScope::LocalScope;
-                ConfigurationsValidationNotification.Send();
-            end else if not _ExternalJQRefresherMgt.ValidateExternalJQRefresherTenantManager() then begin
+            if not _ExternalJQRefresherMgt.ValidateExternalJQRefresherTenantManager() then begin
                 Rec."Use External JQ Refresher" := false;
                 Rec.Modify();
                 ConfigurationsValidationNotification.Message(GetLastErrorText() + ' ' + DisablingExternalJQWorkerLbl);
@@ -129,9 +154,6 @@ page 6150891 "NPR Job Queue Refresh Setup"
 
     local procedure ToggleExtJQRefresher(Enable: Boolean)
     begin
-        ClearLastError();
-        if Enable and not _ExternalJQRefresherMgt.ValidateSaaSSetup() then
-            Error(GetLastErrorText());
         Rec.Validate("Use External JQ Refresher", Enable);
         Rec.Modify();
         _ExternalJQRefresherIsEnabled := Enable;

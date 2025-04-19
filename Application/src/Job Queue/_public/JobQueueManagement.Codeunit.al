@@ -14,6 +14,8 @@
         NotifProfileCodeOnError: Code[20];
         StoreCode: Code[20];
         AutoRescheduleOnErrorDelaySec: Integer;
+        MaxNoOfAttemptsToRun: Integer;
+        RerunDelaySec: Integer;
         AutoRescheduleOnError: Boolean;
         ShowAutoCreatedClause: Boolean;
         ParamNameAndValueLbl: Label '%1=%2', Locked = true;
@@ -253,6 +255,8 @@
         Parameters."NPR Auto-Resched. after Error" := AutoRescheduleOnError;
         Parameters."NPR Auto-Resched. Delay (sec.)" := AutoRescheduleOnErrorDelaySec;
         Parameters."NPR Notif. Profile on Error" := NotifProfileCodeOnError;
+        Parameters."Maximum No. of Attempts to Run" := MaxNoOfAttemptsToRun;
+        Parameters."Rerun Delay (sec.)" := RerunDelaySec;
         ClearAdditionalParams();
 
         exit(InitRecurringJobQueueEntry(Parameters, JobQueueEntryOut));
@@ -263,17 +267,20 @@
         JobQueueEntry: Record "Job Queue Entry";
         Handled: Boolean;
         Success: Boolean;
+        MonitoredJobRefreshActive: Boolean;
     begin
-        CheckRequiredPermissions();
+        MonitoredJobRefreshActive := IsMonitoredJobRefreshRoutineActive();
+        if not MonitoredJobRefreshActive then begin
+            CheckRequiredPermissions();
+            Clear(JobQueueEntryOut);
+            OnBeforeInitRecurringJobQueueEntry(Parameters, JobQueueEntryOut, Success, Handled);
+            if Handled then
+                exit(Success);
 
-        Clear(JobQueueEntryOut);
-        OnBeforeInitRecurringJobQueueEntry(Parameters, JobQueueEntryOut, Success, Handled);
-        if Handled then
-            exit(Success);
-
-        if JobQueueEntryExists(Parameters, JobQueueEntryOut) then begin
-            UpdateJobQueueEntry(Parameters, JobQueueEntryOut);
-            exit(true);
+            if JobQueueEntryExists(Parameters, JobQueueEntryOut) then begin
+                UpdateJobQueueEntry(Parameters, JobQueueEntryOut);
+                exit(true);
+            end;
         end;
 
         JobQueueEntry.Init();
@@ -292,7 +299,8 @@
         JobQueueEntry."NPR Notif. Profile on Error" := Parameters."NPR Notif. Profile on Error";
 
         OnBeforeInsertRecurringJobQueueEntry(JobQueueEntry);
-        JobQueueEntry.Insert(true);
+        if not MonitoredJobRefreshActive then
+            JobQueueEntry.Insert(true);
 
         JobQueueEntryOut := JobQueueEntry;
         exit(true);
@@ -392,8 +400,14 @@
     internal procedure ActivateJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry"; NotBeforeDateTime: DateTime) Activated: Boolean
     var
         EnvironmentInformation: Codeunit "Environment Information";
+        MonitoredJobQueueMgt: Codeunit "NPR Monitored Job Queue Mgt.";
         ValidStartDT: Boolean;
     begin
+        if IsMonitoredJobRefreshRoutineActive() then begin
+            MonitoredJobQueueMgt.AddMonitoredJobQueueEntry(JobQueueEntry, true);
+            exit;
+        end;
+
         Activated := false;
         if not TaskScheduler.CanCreateTask() then
             exit;
@@ -423,6 +437,38 @@
         end;
         JobQueueEntry.Restart();
         Activated := true;
+    end;
+
+    internal procedure CancelNpManagedJobs(ObjectTypeToRun: Option; ObjectIdToRun: Integer)
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        if not JobQueueEntry.FindJobQueueEntry(ObjectTypeToRun, ObjectIdToRun) then
+            exit;
+        CancelNpManagedJobs(JobQueueEntry);
+    end;
+
+    internal procedure CancelNpManagedJobs(ObjectTypeToRun: Option; ObjectIdToRun: Integer; RecID: RecordId)
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        JobQueueEntry.SetRange("Object Type to Run", ObjectTypeToRun);
+        JobQueueEntry.SetRange("Object ID to Run", ObjectIdToRun);
+        JobQueueEntry.SetRange("Record ID to Process", RecID);
+        if JobQueueEntry.IsEmpty() then
+            exit;
+        CancelNpManagedJobs(JobQueueEntry);
+    end;
+
+    internal procedure CancelNpManagedJobs(var JobQueueEntry: Record "Job Queue Entry")
+    var
+        MonitoredJobQueueMgt: Codeunit "NPR Monitored Job Queue Mgt.";
+    begin
+        JobQueueEntry.FindSet(true);
+        repeat
+            JobQueueEntry.Cancel();
+            MonitoredJobQueueMgt.RemoveMonitoredJobQueueEntry(JobQueueEntry);
+        until JobQueueEntry.Next() = 0;
     end;
 
     local procedure HasValidStartDT(JobQueueEntry: Record "Job Queue Entry"; NotBeforeDateTime: DateTime): Boolean
@@ -624,9 +670,15 @@
         FeatureFlagsManagement.ScheduleGetFeatureFlagsIntegration();
     end;
 
-    internal procedure RefreshNPRJobQueueList()
+    internal procedure RefreshNPRJobQueueList(CallRefreshProcedure: Boolean)
+    var
+        MonitoredJobQueueMgt: Codeunit "NPR Monitored Job Queue Mgt.";
     begin
-        OnRefreshNPRJobQueueList();
+        BindSubscription(MonitoredJobQueueMgt);
+        OnRefreshNPRJobQueueList();  //update monitored jobs
+        if UnBindSubscription(MonitoredJobQueueMgt) then;
+        if CallRefreshProcedure then
+            RefreshJobQueues();  //loop through monitored jobs and create job queue entries if needed
     end;
 
     internal procedure CreateAndAssignJobQueueCategory(): Code[10]
@@ -793,12 +845,24 @@
         NotifProfileCodeOnError := NotifProfileCode;
     end;
 
+    procedure SetMaxNoOfAttemptsToRun(NoOfAttempts: Integer)
+    begin
+        MaxNoOfAttemptsToRun := NoOfAttempts;
+    end;
+
+    procedure SetRerunDelay(DelaySec: Integer)
+    begin
+        RerunDelaySec := DelaySec;
+    end;
+
     local procedure ClearAdditionalParams()
     begin
         Clear(JobTimeout);
         Clear(AutoRescheduleOnError);
         Clear(AutoRescheduleOnErrorDelaySec);
         Clear(NotifProfileCodeOnError);
+        Clear(MaxNoOfAttemptsToRun);
+        Clear(RerunDelaySec);
     end;
 
     local procedure NextDueRunDateTime(JobQueueEntry: Record "Job Queue Entry"): DateTime
@@ -939,6 +1003,39 @@
     internal procedure SetStoreCode(NewStoreCode: Code[20])
     begin
         StoreCode := NewStoreCode;
+    end;
+
+    internal procedure JobQueueIsManagedByApp(JobQueueEntry: Record "Job Queue Entry"; var RefreshingCanBeToggled: Boolean) Managed: Boolean
+    var
+        ManagedByAppJQ: Record "NPR Managed By App Job Queue";
+        Handled: Boolean;
+    begin
+        OnBeforeJobQueueIsManagedByApp(JobQueueEntry, Managed, Handled);
+        if Handled then begin
+            RefreshingCanBeToggled := false;
+            exit;
+        end;
+
+        OnCheckIfIsNPRecurringJob(JobQueueEntry, Managed, Handled);
+        RefreshingCanBeToggled := not Handled;
+        if Handled then
+            exit;
+
+        Managed := ManagedByAppJQ.Get(JobQueueEntry.ID) and ManagedByAppJQ."Managed by App";
+    end;
+
+    local procedure IsMonitoredJobRefreshRoutineActive() Result: Boolean
+    var
+        Handled: Boolean;
+    begin
+        IsInMonitoredJobUpdate(Result, Handled);
+    end;
+
+    local procedure RefreshJobQueues()
+    var
+        ExtJQRefresherMgt: Codeunit "NPR External JQ Refresher Mgt.";
+    begin
+        ExtJQRefresherMgt.RefreshJobQueueEntries();
     end;
 
 #if BC17 or BC18 or BC19 or BC20 or BC21
@@ -1204,6 +1301,16 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnCheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeJobQueueIsManagedByApp(JobQueueEntry: Record "Job Queue Entry"; var Managed: Boolean; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure IsInMonitoredJobUpdate(var Result: Boolean; var Handled: Boolean)
     begin
     end;
 }

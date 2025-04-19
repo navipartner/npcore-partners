@@ -270,11 +270,10 @@ codeunit 6014641 "NPR BTF Service API"
         NcImportListProcessing: Codeunit "NPR Nc Import List Processing";
         ParamNameAndValueLbl: Label '%1=%2', locked = true;
     begin
-        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-        JobQueueEntry.SetRange("Object ID to Run", CODEUNIT::"NPR Nc Import List Processing");
-        JobQueueEntry.SetRange("Record ID to Process", ServiceEndPoint.RecordId());
-        if JobQueueEntry.FindFirst() then
+        if not ServiceEndPoint.Enabled then begin
+            JobQueueMgt.CancelNpManagedJobs(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR Nc Import List Processing", ServiceEndPoint.RecordId());
             exit;
+        end;
 
         Clear(JQParamStrMgt);
         JQParamStrMgt.AddToParamDict(StrSubstNo(ParamNameAndValueLbl, NcImportListProcessing.ParamImportType(), ServiceEndPoint."EndPoint ID"));
@@ -284,7 +283,7 @@ codeunit 6014641 "NPR BTF Service API"
         CreateJobQueueCategory(JobQueueCategory, ServiceEndPoint);
         if JobQueueMgt.InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,
-            CODEUNIT::"NPR Nc Import List Processing",
+            Codeunit::"NPR Nc Import List Processing",
             JQParamStrMgt.GetParamListAsCSString(),
             CopyStr(Strsubstno(APIIntegrationLbl, ServiceEndPoint."EndPoint ID"), 1, MaxStrLen(JobQueueEntry.Description)),
             CurrentDateTime(),
@@ -295,10 +294,7 @@ codeunit 6014641 "NPR BTF Service API"
             ServiceEndPoint.RecordId(),
             JobQueueEntry)
         then
-            if not ServiceEndPoint.Enabled then
-                JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold")
-            else
-                JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
+            JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
     end;
 
     local procedure CreateJobQueueCategory(var JobQueueCategory: Record "Job Queue Category"; ServiceEndPoint: Record "NPR BTF Service EndPoint")
@@ -320,17 +316,13 @@ codeunit 6014641 "NPR BTF Service API"
             ImportType.DeleteAll();
     end;
 
+    [Obsolete('No longer needed. The jobs should be cancelled within the ScheduleJobQueueEntry() procedure.', '2025-04-20')]
     procedure CancelJob(ServiceEndpoint: Record "NPR BTF Service Endpoint")
     var
         JobQueueEntry: Record "Job Queue Entry";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
     begin
-        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-        JobQueueEntry.SetRange("Object ID to Run", CODEUNIT::"NPR Nc Import List Processing");
-        if Format(ServiceEndPoint.RecordId()) <> '' then
-            JobQueueEntry.SetFilter("Record ID to Process", Format(ServiceEndPoint.RecordId()));
-        if not JobQueueEntry.FindFirst() then
-            exit;
-        JobQueueEntry.Cancel();
+        JobQueueMgt.CancelNpManagedJobs(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR Nc Import List Processing", ServiceEndPoint.RecordId());
     end;
 
     procedure ShowJobQueueEntries(RecId: RecordId)

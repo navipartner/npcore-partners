@@ -161,8 +161,7 @@ codeunit 6059912 "NPR MM Membership Stat. Mgmt."
         NextRunDateFormula: DateFormula;
     begin
         if MMMemberCommunity.IsEmpty() then begin
-            if JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitID()) then
-                JobQueueEntry.Cancel();
+            JobQueueManagement.CancelNpManagedJobs(JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitID());
             exit;
         end;
 

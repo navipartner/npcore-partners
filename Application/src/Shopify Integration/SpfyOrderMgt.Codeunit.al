@@ -219,8 +219,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
 
             JobQueueMgt.ScheduleNcImportListProcessing(JobQueueEntry, ShopifyImportListTaskPrefix() + '*', '', 5);
         end else
-            if JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitId()) then
-                JobQueueEntry.Cancel();
+            JobQueueMgt.CancelNpManagedJobs(JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitId());
     end;
 
     local procedure ShopifyImportListTaskPrefix(): Text

@@ -31,8 +31,7 @@ codeunit 6184953 "NPR Spfy Webhook Processor JQ"
         if not Enable then begin
             if not SpfyWebhookSubscription.IsEmpty() then
                 exit;
-            if JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitId()) then
-                JobQueueEntry.Cancel();
+            JobQueueMgt.CancelNpManagedJobs(JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitId());
         end else
             if JobQueueMgt.InitRecurringJobQueueEntry(
                 JobQueueEntry."Object Type to Run"::Codeunit,

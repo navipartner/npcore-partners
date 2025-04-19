@@ -72,9 +72,8 @@ codeunit 6184786 "NPR Adyen Tr. Matching Session"
     var
         AdyenSetup: Record "NPR Adyen Setup";
     begin
-        Clear(AdyenSetup);
-        AdyenSetup.GetRecordOnce();
-        SetupReconciliationTaskProcessingJobQueue(AdyenSetup."Enable Reconcil. Automation");
+        if AdyenSetup.Get() then
+            SetupReconciliationTaskProcessingJobQueue(AdyenSetup."Enable Reconcil. Automation");
     end;
 
     procedure SetupReconciliationTaskProcessingJobQueue(Enable: Boolean)
@@ -82,18 +81,12 @@ codeunit 6184786 "NPR Adyen Tr. Matching Session"
         ProccessPostPaymentLine: Label 'Process Reconciliation Documents.';
         JobQueueEntry: Record "Job Queue Entry";
         AdyenManagement: Codeunit "NPR Adyen Management";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
     begin
         if Enable then
             AdyenManagement.CreateAutoRescheduleAdyenJob(Codeunit::"NPR Adyen Tr. Matching Session", ProccessPostPaymentLine, 300)
-        else begin
-            JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-            JobQueueEntry.SetRange("Object ID to Run", CurrCodeunitID());
-            if JobQueueEntry.FindSet() then
-                repeat
-                    JobQueueEntry.Cancel();
-                    Commit();
-                until JobQueueEntry.Next() = 0;
-        end;
+        else
+            JobQueueMgt.CancelNpManagedJobs(JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitID());
     end;
 
     local procedure CurrCodeunitID(): Integer

@@ -475,12 +475,7 @@ codeunit 6184848 "NPR AT Audit Mgt."
             then
                 JobQueueManagement.StartJobQueueEntry(JobQueueEntry);
         end else
-            if JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR AT Validate Receipts JQ") then begin
-                JobQueueEntry.FindSet(true);
-                repeat
-                    JobQueueEntry.Cancel();
-                until JobQueueEntry.Next() = 0;
-            end;
+            JobQueueManagement.CancelNpManagedJobs(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR AT Validate Receipts JQ");
     end;
 
     local procedure InitATImportOtherControlReceiptsJobQueue(ATFiscalizationEnabled: Boolean)
@@ -504,12 +499,7 @@ codeunit 6184848 "NPR AT Audit Mgt."
             then
                 JobQueueManagement.StartJobQueueEntry(JobQueueEntry);
         end else
-            if JobQueueEntry.FindJobQueueEntry(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR AT Imp Other Ctrl Rcpt JQ") then begin
-                JobQueueEntry.FindSet(true);
-                repeat
-                    JobQueueEntry.Cancel();
-                until JobQueueEntry.Next() = 0;
-            end;
+            JobQueueManagement.CancelNpManagedJobs(JobQueueEntry."Object Type to Run"::Codeunit, Codeunit::"NPR AT Imp Other Ctrl Rcpt JQ");
     end;
 
     local procedure DefaultATFiscalJobQueueCategoryCode(): Code[10]

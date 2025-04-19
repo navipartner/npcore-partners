@@ -25,19 +25,47 @@ pageextension 6014424 "NPR Job Queue Entry Card" extends "Job Queue Entry Card"
                 ApplicationArea = NPRRetail;
                 ToolTip = 'Specifies whether the job queue entry was manually set on hold.';
             }
+            field("NPR Managed by App"; _ManagedByApp)
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Managed by App';
+                ToolTip = 'Specifies whether this Job Queue entry is allowed to be managed by the NP Refresher functionality.';
+                Editable = _RefreshingCanBeToggled;
+
+                trigger OnValidate()
+                var
+                    ManagedByAppJobQueue: Record "NPR Managed By App Job Queue";
+                    MonitoredJQMgt: Codeunit "NPR Monitored Job Queue Mgt.";
+                begin
+                    if not _ManagedByApp then begin
+                        if ManagedByAppJobQueue.Get(Rec.ID) then
+                            ManagedByAppJobQueue.Delete();
+                        MonitoredJQMgt.RemoveMonitoredJobQueueEntry(Rec);
+                        CurrPage.Update(false);
+                    end else begin
+                        if not ManagedByAppJobQueue.Get(Rec.ID) then begin
+                            ManagedByAppJobQueue.Init();
+                            ManagedByAppJobQueue.ID := Rec.ID;
+                            ManagedByAppJobQueue."Managed by App" := _ManagedByApp;
+                            ManagedByAppJobQueue.Insert();
+                        end;
+                        MonitoredJQMgt.AddMonitoredJobQueueEntry(Rec, _ManagedByApp);
+                    end;
+                end;
+            }
         }
     }
     actions
     {
         modify("Set On Hold")
         {
-            Visible = not NPRRetailAppAreaEnabled;
-            Enabled = not NPRRetailAppAreaEnabled;
+            Visible = not _NPRRetailAppAreaEnabled;
+            Enabled = not _NPRRetailAppAreaEnabled;
         }
 #if not (BC17 or BC18 or BC19 or BC20)
         modify("Set On Hold_Promoted")
         {
-            Visible = not NPRRetailAppAreaEnabled;
+            Visible = not _NPRRetailAppAreaEnabled;
         }
 #endif
         addafter("Set On Hold")
@@ -52,7 +80,7 @@ pageextension 6014424 "NPR Job Queue Entry Card" extends "Job Queue Entry Card"
                 PromotedCategory = Process;
 #endif
                 ToolTip = 'Change the status of the entry.';
-                Visible = NPRRetailAppAreaEnabled;
+                Visible = _NPRRetailAppAreaEnabled;
 
                 trigger OnAction()
                 var
@@ -77,7 +105,14 @@ pageextension 6014424 "NPR Job Queue Entry Card" extends "Job Queue Entry Card"
     var
         EnableApplicationAreas: Codeunit "NPR Enable Application Areas";
     begin
-        NPRRetailAppAreaEnabled := EnableApplicationAreas.IsNPRRetailApplicationAreaEnabled();
+        _NPRRetailAppAreaEnabled := EnableApplicationAreas.IsNPRRetailApplicationAreaEnabled();
+    end;
+
+    trigger OnAfterGetCurrRecord()
+    var
+        JobQueueManagement: Codeunit "NPR Job Queue Management";
+    begin
+        _ManagedByApp := JobQueueManagement.JobQueueIsManagedByApp(Rec, _RefreshingCanBeToggled);
     end;
 
     local procedure RecallModifyOnlyWhenReadOnlyNotification()
@@ -98,5 +133,7 @@ pageextension 6014424 "NPR Job Queue Entry Card" extends "Job Queue Entry Card"
     end;
 
     var
-        NPRRetailAppAreaEnabled: Boolean;
+        _NPRRetailAppAreaEnabled: Boolean;
+        _ManagedByApp: Boolean;
+        _RefreshingCanBeToggled: Boolean;
 }

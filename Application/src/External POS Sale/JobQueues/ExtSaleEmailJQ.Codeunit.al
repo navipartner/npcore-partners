@@ -75,8 +75,11 @@ codeunit 6248239 "NPR Ext. Sale Email JQ"
         JobQueueDescrLbl: Label 'External POS Sale Email Receipt Sender', MaxLength = 250;
     begin
         JobQueueManagement.SetJobTimeout(4, 0);  //4 hours
+        JobQueueManagement.SetMaxNoOfAttemptsToRun(999999999);
+        JobQueueManagement.SetRerunDelay(10);
+        JobQueueManagement.SetAutoRescheduleAndNotifyOnError(true, 20, '');
 
-        if not JobQueueManagement.InitRecurringJobQueueEntry(
+        if JobQueueManagement.InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,
             Codeunit::"NPR Ext. Sale Email JQ",
             '',
@@ -86,13 +89,23 @@ codeunit 6248239 "NPR Ext. Sale Email JQ"
             ExtSaleConvertJQ.GetExternalSaleCategory(),
             JobQueueEntry)
         then
-            exit;
+            JobQueueManagement.StartJobQueueEntry(JobQueueEntry);
+    end;
 
-        JobQueueEntry."Maximum No. of Attempts to Run" := 999999999;
-        JobQueueEntry."Rerun Delay (sec.)" := 10;
-        JobQueueEntry."NPR Auto-Resched. after Error" := true;
-        JobQueueEntry."NPR Auto-Resched. Delay (sec.)" := 20;
-        JobQueueEntry.Modify(true);
-        JobQueueManagement.StartJobQueueEntry(JobQueueEntry);
+#if BC17 or BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnCheckIfIsNPRecurringJob, '', false, false)]
+#endif
+    local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
+    begin
+        if Handled then
+            exit;
+        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
+           (JobQueueEntry."Object ID to Run" = Codeunit::"NPR Ext. Sale Email JQ")
+        then begin
+            IsNpJob := true;
+            Handled := true;
+        end;
     end;
 }

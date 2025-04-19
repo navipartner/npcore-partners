@@ -1987,11 +1987,8 @@
             JobQueueMgt.InitRecurringJobQueueEntry(
                 JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitId(), '', JobQueueDescriptionLbl, CurrentDateTime(), 1, '', JobQueueEntry);
             JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
-        end else begin
-            JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-            JobQueueEntry.SetRange("Object ID to Run", CurrCodeunitId());
-            JobQueueEntry.DeleteTasks();
-        end;
+        end else
+            JobQueueMgt.CancelNpManagedJobs(JobQueueEntry."Object Type to Run"::Codeunit, CurrCodeunitId());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]

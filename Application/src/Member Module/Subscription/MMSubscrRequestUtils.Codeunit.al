@@ -122,10 +122,10 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
         until SubscrPaymentRequest.Next() = 0;
     end;
 
-    local procedure CreateSubscriptionRequestCreationJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry") Created: Boolean;
+    local procedure CreateSubscriptionRequestCreationJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry"): Boolean
     var
         SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
-        NPRJobQueueManagement: Codeunit "NPR Job Queue Management";
+        JobQueueManagement: Codeunit "NPR Job Queue Management";
         SubscriptionsJobQueueCategoryCode: Code[10];
         DescriptionLbl: Label 'Creates subscription requests for expiring memberships';
         StartDateTime: DateTime;
@@ -133,39 +133,23 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
         StartDateTime := CreateDateTime(Today, 060000T);
         if CurrentDateTime > StartDateTime then
             StartDateTime := CreateDateTime(CalcDate('<+1D>', Today), 060000T);
-
         SubscriptionsJobQueueCategoryCode := SubscriptionMgtImpl.GetSubscriptionsJobQueueCategoryCode();
-        if not NPRJobQueueManagement.InitRecurringJobQueueEntry(
-            JobQueueEntry."Object Type to Run"::Codeunit,
-            Codeunit::"NPR MM Subscr. Renew Req. JQ",
-            '',
-            DescriptionLbl,
-            StartDateTime,
-            060000T,
-            230000T,
-            1440,
-            SubscriptionsJobQueueCategoryCode,
-            JobQueueEntry) then
-            exit;
 
-        JobQueueEntry."Maximum No. of Attempts to Run" := 999999999;
-        JobQueueEntry."Rerun Delay (sec.)" := 10;
-        JobQueueEntry."NPR Auto-Resched. after Error" := true;
-        JobQueueEntry."NPR Auto-Resched. Delay (sec.)" := 20;
-        JobQueueEntry.Modify(true);
-
-        Created := true;
-    end;
-
-    local procedure CheckIfSubscriptionRequestCreationJobQueueEntryScheduled() GetFeatureFlagsScheduled: Boolean;
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-    begin
-        JobQueueEntry.Reset();
-        JobQueueEntry.SetRange(Status, JobQueueEntry.Status::Ready);
-        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR MM Subscr. Renew Req. JQ");
-        GetFeatureFlagsScheduled := not JobQueueEntry.IsEmpty;
+        JobQueueManagement.SetMaxNoOfAttemptsToRun(999999999);
+        JobQueueManagement.SetRerunDelay(10);
+        JobQueueManagement.SetAutoRescheduleAndNotifyOnError(true, 20, '');
+        exit(
+            JobQueueManagement.InitRecurringJobQueueEntry(
+                JobQueueEntry."Object Type to Run"::Codeunit,
+                Codeunit::"NPR MM Subscr. Renew Req. JQ",
+                '',
+                DescriptionLbl,
+                StartDateTime,
+                060000T,
+                230000T,
+                1440,
+                SubscriptionsJobQueueCategoryCode,
+                JobQueueEntry));
     end;
 
     internal procedure ScheduleSubscriptionRequestCreationJobQueueEntry()
@@ -173,19 +157,14 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueManagement: Codeunit "NPR Job Queue Management";
     begin
-        if CheckIfSubscriptionRequestCreationJobQueueEntryScheduled() then
-            exit;
-
-        if not CreateSubscriptionRequestCreationJobQueueEntry(JobQueueEntry) then
-            exit;
-
-        JobQueueManagement.StartJobQueueEntry(JobQueueEntry);
+        if CreateSubscriptionRequestCreationJobQueueEntry(JobQueueEntry) then
+            JobQueueManagement.StartJobQueueEntry(JobQueueEntry);
     end;
 
-    local procedure CreateSubscriptionRequestProcessingJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry") Created: Boolean;
+    local procedure CreateSubscriptionRequestProcessingJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry"): Boolean
     var
         SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
-        NPRJobQueueManagement: Codeunit "NPR Job Queue Management";
+        JobQueueManagement: Codeunit "NPR Job Queue Management";
         SubscriptionsJobQueueCategoryCode: Code[10];
         DescriptionLbl: Label 'Process subscription requests for expiring memberships';
         StartDateTime: DateTime;
@@ -193,39 +172,23 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
         StartDateTime := CreateDateTime(Today, 230000T);
         if CurrentDateTime > StartDateTime then
             StartDateTime := CreateDateTime(CalcDate('<+1D>', Today), 230000T);
-
         SubscriptionsJobQueueCategoryCode := SubscriptionMgtImpl.GetSubscriptionsJobQueueCategoryCode();
-        if not NPRJobQueueManagement.InitRecurringJobQueueEntry(
-            JobQueueEntry."Object Type to Run"::Codeunit,
-            Codeunit::"NPR MM Subscr. Renew Proc. JQ",
-            '',
-            DescriptionLbl,
-            StartDateTime,
-            230000T,
-            060000T,
-            1440,
-            SubscriptionsJobQueueCategoryCode,
-            JobQueueEntry) then
-            exit;
 
-        JobQueueEntry."Maximum No. of Attempts to Run" := 999999999;
-        JobQueueEntry."Rerun Delay (sec.)" := 10;
-        JobQueueEntry."NPR Auto-Resched. after Error" := true;
-        JobQueueEntry."NPR Auto-Resched. Delay (sec.)" := 20;
-        JobQueueEntry.Modify(true);
-
-        Created := true;
-    end;
-
-    local procedure CheckIfSubscriptionRequestProcessingJobQueueEntryScheduled() GetFeatureFlagsScheduled: Boolean;
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-    begin
-        JobQueueEntry.Reset();
-        JobQueueEntry.SetRange(Status, JobQueueEntry.Status::Ready);
-        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-        JobQueueEntry.SetRange("Object ID to Run", Codeunit::"NPR MM Subscr. Renew Proc. JQ");
-        GetFeatureFlagsScheduled := not JobQueueEntry.IsEmpty;
+        JobQueueManagement.SetMaxNoOfAttemptsToRun(999999999);
+        JobQueueManagement.SetRerunDelay(10);
+        JobQueueManagement.SetAutoRescheduleAndNotifyOnError(true, 20, '');
+        exit(
+            JobQueueManagement.InitRecurringJobQueueEntry(
+                JobQueueEntry."Object Type to Run"::Codeunit,
+                Codeunit::"NPR MM Subscr. Renew Proc. JQ",
+                '',
+                DescriptionLbl,
+                StartDateTime,
+                230000T,
+                060000T,
+                1440,
+                SubscriptionsJobQueueCategoryCode,
+                JobQueueEntry));
     end;
 
     internal procedure ScheduleSubscriptionRequestProcessingJobQueueEntry()
@@ -233,13 +196,8 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueManagement: Codeunit "NPR Job Queue Management";
     begin
-        if CheckIfSubscriptionRequestProcessingJobQueueEntryScheduled() then
-            exit;
-
-        if not CreateSubscriptionRequestProcessingJobQueueEntry(JobQueueEntry) then
-            exit;
-
-        JobQueueManagement.StartJobQueueEntry(JobQueueEntry);
+        if CreateSubscriptionRequestProcessingJobQueueEntry(JobQueueEntry) then
+            JobQueueManagement.StartJobQueueEntry(JobQueueEntry);
     end;
 
     internal procedure OpenLogEntries(SubscrRequest: Record "NPR MM Subscr. Request")
