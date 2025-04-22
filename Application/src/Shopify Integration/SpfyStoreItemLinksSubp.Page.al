@@ -197,6 +197,19 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
                         SpfyItemMgt.SetAllowBackorder(SpfyStoreItemVariantLink, AllowBackorder, false);
                     end;
                 }
+                field("Do Not Track Inventory"; DoNotTrackInventory)
+                {
+                    Caption = 'Do Not Track Inventory';
+                    ToolTip = 'Specifies whether the item inventory is tracked in Shopify. If the item has variants, this field must be set separately for each variant.';
+                    ApplicationArea = NPRShopify;
+                    Editable = ItemListIntegrationIsEnabled;
+
+                    trigger OnValidate()
+                    begin
+                        CheckIntegrationIsEnabled();
+                        SpfyItemMgt.SetDoNotTrackInventory(SpfyStoreItemVariantLink, DoNotTrackInventory, false);
+                    end;
+                }
                 field("Shopify Inventory Item ID"; SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy ID Type"::"Inventory Item ID"))
                 {
                     Caption = 'Shopify Inventory Item ID';
@@ -301,6 +314,7 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
         SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
         AllowBackorder: Boolean;
+        DoNotTrackInventory: Boolean;
         ItemListIntegrationIsEnabled: Boolean;
         ItemIntegrIsNotEnabledErr: Label 'Item integration is not enabled for the store. You cannot adjust this parameter.';
 
@@ -320,6 +334,7 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
             SpfyStoreItemLink."Variant Code" := '';
         end;
         AllowBackorder := SpfyItemMgt.AllowBackorder(SpfyStoreItemVariantLink);
+        DoNotTrackInventory := SpfyItemMgt.DoNotTrackInventory(SpfyStoreItemVariantLink);
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)

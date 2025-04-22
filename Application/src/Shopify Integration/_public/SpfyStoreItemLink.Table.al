@@ -90,6 +90,13 @@ table 6150811 "NPR Spfy Store-Item Link"
             FieldClass = FlowField;
             CalcFormula = lookup("NPR Spfy Item Variant Modif."."Allow Backorder" where("Item No." = field("Item No."), "Variant Code" = field("Variant Code"), "Shopify Store Code" = field("Shopify Store Code")));
         }
+        field(160; "Do Not Track Inventory"; Boolean)
+        {
+            Caption = 'Do Not Track Inventory';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = lookup("NPR Spfy Item Variant Modif."."Do Not Track Inventory" where("Item No." = field("Item No."), "Variant Code" = field("Variant Code"), "Shopify Store Code" = field("Shopify Store Code")));
+        }
     }
     keys
     {

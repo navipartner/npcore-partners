@@ -132,5 +132,10 @@ codeunit 6184824 "NPR Spfy Integration Events"
     internal procedure OnAfterUpdateAllowBackorder(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; Allow: Boolean)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterUpdateDoNotTrackInventory(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; DoNotTrack: Boolean)
+    begin
+    end;
 }
 #endif

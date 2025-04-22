@@ -142,10 +142,13 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
     var
         InventoryLevel: Record "NPR Spfy Inventory Level";
         Item: Record Item;
+        SpfyItemVariantModif: Record "NPR Spfy Item Variant Modif.";
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
         StockQty: Decimal;
         IncludeTransferOrders: Option No,Outbound,All;
     begin
+        if SpfyItemVariantModif.Get(InventoryLevelParam."Item No.", InventoryLevelParam."Variant Code", InventoryLevelParam."Shopify Store Code") and SpfyItemVariantModif."Do Not Track Inventory" then
+            exit(false);  //inventory level is not tracked for this item variant in this store
         if InventoryLevelParam."Variant Code" = '' then begin
             if SpfyItemMgt.AvailableInShopifyVariantsExist(InventoryLevelParam."Item No.", InventoryLevelParam."Shopify Store Code") then
                 exit(false);  //Do not calculate inventory level for blank variant if there are synced variants available for the item
@@ -153,6 +156,8 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
             if SpfyItemMgt.ItemVariantNotAvailableInShopify(InventoryLevelParam."Item No.", InventoryLevelParam."Variant Code", InventoryLevelParam."Shopify Store Code") then
                 exit(false);
         if not Item.Get(InventoryLevelParam."Item No.") then
+            exit(false);
+        if Item.Type <> Item.Type::Inventory then
             exit(false);
         IncludeTransferOrders := SpfyIntegrationMgt.IncludeTrasferOrders(InventoryLevelParam."Shopify Store Code");
 
@@ -302,7 +307,7 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
                     TotalRecNo += Item.Count() * ShopifyStoreLocations.Count();
         end;
 
-        Item.SetAutoCalcFields("NPR Spfy Synced Item", "NPR Spfy Synced Item (Planned)");
+        Item.SetAutoCalcFields("NPR Spfy Synced Item", "NPR Spfy Synced Item (Planned)", "NPR Do Not Track Inventory");
         foreach ShopifyStoreCode in ShopifyStores do
             if ShopifyLocations.Get(ShopifyStoreCode, ShopifyStoreLocations) then begin
                 Item.SetRange("NPR Spfy Store Filter", ShopifyStoreCode);
@@ -320,10 +325,10 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
 #endif
                                     Item.CopyFilter("Variant Filter", ItemVariant.Code);
                                     ItemVariant.SetRange("NPR Spfy Store Filter", ShopifyStoreCode);
-                                    ItemVariant.SetAutoCalcFields("NPR Spfy Not Available");
+                                    ItemVariant.SetAutoCalcFields("NPR Spfy Not Available", "NPR Do Not Track Inventory");
                                     if ItemVariant.FindSet() then
                                         repeat
-                                            if not ItemVariant."NPR Spfy Not Available" then begin
+                                            if not (ItemVariant."NPR Spfy Not Available" or ItemVariant."NPR Do Not Track Inventory") then begin
                                                 TempInventoryLevel."Shopify Store Code" := ShopifyStoreCode;
                                                 TempInventoryLevel."Shopify Location ID" := ShopifyLocationID;
                                                 TempInventoryLevel."Item No." := ItemVariant."Item No.";
@@ -332,14 +337,15 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
                                                     TempInventoryLevel.Insert();
                                             end;
                                         until ItemVariant.Next() = 0;
-                                end else begin
-                                    TempInventoryLevel."Shopify Store Code" := ShopifyStoreCode;
-                                    TempInventoryLevel."Shopify Location ID" := ShopifyLocationID;
-                                    TempInventoryLevel."Item No." := Item."No.";
-                                    TempInventoryLevel."Variant Code" := '';
-                                    if not TempInventoryLevel.Find() then
-                                        TempInventoryLevel.Insert();
-                                end;
+                                end else
+                                    if not Item."NPR Do Not Track Inventory" then begin
+                                        TempInventoryLevel."Shopify Store Code" := ShopifyStoreCode;
+                                        TempInventoryLevel."Shopify Location ID" := ShopifyLocationID;
+                                        TempInventoryLevel."Item No." := Item."No.";
+                                        TempInventoryLevel."Variant Code" := '';
+                                        if not TempInventoryLevel.Find() then
+                                            TempInventoryLevel.Insert();
+                                    end;
 
                             if not Silent then begin
                                 RecNo += 1;

@@ -109,6 +109,7 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
     var
         ShopifyStore: Record "NPR Spfy Store";
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
     begin
         if Item."No." = '' then
             exit;
@@ -123,6 +124,8 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
                     SpfyStoreItemLink.Init();
                     SpfyStoreItemLink.Insert();
                 end;
+                if Item.Type <> Item.Type::Inventory then
+                    SpfyItemMgt.SetDoNotTrackInventory(Item."No.", ShopifyStore.Code, true, not SpfyStoreItemLink."Sync. to this Store");
             until ShopifyStore.Next() = 0;
     end;
 
@@ -237,16 +240,17 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
         SpfyStoreItemLink.SetRange("Variant Code", '');
         if SpfyStoreItemLink.IsEmpty() then
             exit;
-        SpfyStoreItemLink.SetAutoCalcFields("Allow Backorder");
+        SpfyStoreItemLink.SetAutoCalcFields("Allow Backorder", "Do Not Track Inventory");
         SpfyStoreItemLink.FindSet();
         repeat
-            if SpfyStoreItemLink."Allow Backorder" then begin
-                SpfyStoreItemVariantLink.Type := SpfyStoreItemVariantLink.Type::"Variant";
-                SpfyStoreItemVariantLink."Item No." := Rec."Item No.";
-                SpfyStoreItemVariantLink."Variant Code" := Rec."Code";
-                SpfyStoreItemVariantLink."Shopify Store Code" := SpfyStoreItemLink."Shopify Store Code";
+            SpfyStoreItemVariantLink.Type := SpfyStoreItemVariantLink.Type::"Variant";
+            SpfyStoreItemVariantLink."Item No." := Rec."Item No.";
+            SpfyStoreItemVariantLink."Variant Code" := Rec."Code";
+            SpfyStoreItemVariantLink."Shopify Store Code" := SpfyStoreItemLink."Shopify Store Code";
+            if SpfyStoreItemLink."Allow Backorder" then
                 SpfyItemMgt.SetAllowBackorder(SpfyStoreItemVariantLink, SpfyStoreItemLink."Allow Backorder", true);
-            end;
+            if SpfyStoreItemLink."Do Not Track Inventory" then
+                SpfyItemMgt.SetDoNotTrackInventory(SpfyStoreItemVariantLink, SpfyStoreItemLink."Do Not Track Inventory", true);
         until SpfyStoreItemLink.Next() = 0;
     end;
     #endregion

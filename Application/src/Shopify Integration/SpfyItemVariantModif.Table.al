@@ -38,6 +38,11 @@ table 6151028 "NPR Spfy Item Variant Modif."
             Caption = 'Allow Backorder';
             DataClassification = CustomerContent;
         }
+        field(120; "Do Not Track Inventory"; Boolean)
+        {
+            Caption = 'Do Not Track Inventory';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {

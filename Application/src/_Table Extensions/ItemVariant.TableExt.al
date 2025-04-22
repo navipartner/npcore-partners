@@ -126,6 +126,15 @@ tableextension 6014442 "NPR Item Variant" extends "Item Variant"
                                                                 "Variant Code" = field(Code),
                                                                 "Shopify Store Code" = field("NPR Spfy Store Filter")));
         }
+        field(6151554; "NPR Do Not Track Inventory"; Boolean)
+        {
+            Caption = 'Do Not Track Inventory';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = lookup("NPR Spfy Item Variant Modif."."Do Not Track Inventory" where("Item No." = field("Item No."),
+                                                                "Variant Code" = field(Code),
+                                                                "Shopify Store Code" = field("NPR Spfy Store Filter")));
+        }
 #endif
     }
 

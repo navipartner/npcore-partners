@@ -63,6 +63,21 @@ page 6184565 "NPR Spfy Item Variant IDs Subp"
                         CurrPage.Update(false);
                     end;
                 }
+                field("Do Not Track Inventory"; DoNotTrackInventory)
+                {
+                    Caption = 'Do Not Track Inventory';
+                    ToolTip = 'Specifies whether the item variant inventory is tracked in Shopify.';
+                    ApplicationArea = NPRShopify;
+
+                    trigger OnValidate()
+                    begin
+                        TestRequiredFields();
+                        if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items, SpfyStoreItemVariantLink."Shopify Store Code") then
+                            Error(ItemIntegrIsNotEnabledErr);
+                        SpfyItemMgt.SetDoNotTrackInventory(SpfyStoreItemVariantLink, DoNotTrackInventory, false);
+                        CurrPage.Update(false);
+                    end;
+                }
                 field("NPR Spfy Variant ID"; SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy ID Type"::"Entry ID"))
                 {
                     Caption = 'Shopify Variant ID';
@@ -109,6 +124,7 @@ page 6184565 "NPR Spfy Item Variant IDs Subp"
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
         AllowBackorder: Boolean;
+        DoNotTrackInventory: Boolean;
         NotAvailableInShopify: Boolean;
         ItemIntegrIsEnabled: Boolean;
         ItemIntegrIsNotEnabledErr: Label 'Item integration is not enabled for the store. You cannot adjust this parameter.';
@@ -123,6 +139,7 @@ page 6184565 "NPR Spfy Item Variant IDs Subp"
         SpfyStoreItemVariantLink."Shopify Store Code" := Rec."Shopify Store Code";
         NotAvailableInShopify := SpfyItemMgt.ItemVariantNotAvailableInShopify(SpfyStoreItemVariantLink);
         AllowBackorder := SpfyItemMgt.AllowBackorder(SpfyStoreItemVariantLink);
+        DoNotTrackInventory := SpfyItemMgt.DoNotTrackInventory(SpfyStoreItemVariantLink);
     end;
 
     procedure SetItemVariant(ItemVariant: Record "Item Variant")
