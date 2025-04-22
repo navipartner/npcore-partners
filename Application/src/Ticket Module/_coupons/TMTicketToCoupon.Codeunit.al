@@ -95,8 +95,12 @@ codeunit 6184871 "NPR TM TicketToCoupon"
             end;
 
             CouponValue := 0;
-            if (CouponProfile.ForceTicketAmount) then
-                CouponValue := Ticket.AmountInclVat;
+            case CouponProfile.ForceAmount of
+                "NPR TM CouponForceAmount"::AMOUNT_INCL_VAT:
+                    CouponValue := Ticket.AmountInclVat;
+                "NPR TM CouponForceAmount"::LIST_PRICE_INCL_VAT:
+                    CouponValue := Ticket.ListPriceInclVat;
+            end;
 
             IssueCoupon(CouponProfile."CouponType", TicketCoupons.CouponNo, TicketCoupons.CouponReferenceNo, CouponValidFrom, CouponValidUntil, CouponValue);
 

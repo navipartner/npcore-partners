@@ -961,6 +961,11 @@
                     'update-additional-information-in-pos-audit-log':
                         exit('NPR-update-additional-information-in-pos-audit-log-20250411');
                 end;
+            Codeunit::"NPR UPGTicket":
+                case UpgradeStep of
+                    'CouponProfileForceAmountBoolToEnum':
+                        exit('NPR-Update-TicketCouponProfile-ForceAmountBoolToEnum-20250416');
+                end;
         end;
     end;
 }

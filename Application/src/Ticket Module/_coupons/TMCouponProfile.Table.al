@@ -65,6 +65,14 @@ table 6150842 "NPR TM CouponProfile"
         {
             Caption = 'Force Ticket Amount';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-04-16';
+            ObsoleteReason = 'Moved to enum "ForceAmount" to allow more options.';
+        }
+        field(51; ForceAmount; Enum "NPR TM CouponForceAmount")
+        {
+            Caption = 'Force Amount';
+            DataClassification = CustomerContent;
         }
 
     }

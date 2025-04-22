@@ -52,10 +52,10 @@ page 6184592 "NPR TM CouponProfileList"
                     ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Enabled field.';
                 }
-                field(ForceTicketAmount; Rec.ForceTicketAmount)
+                field(ForceAmount; Rec.ForceAmount)
                 {
                     ApplicationArea = NPRTicketDynamicPrice, NPRTicketAdvanced;
-                    ToolTip = 'Specifies the value of the Force Ticket Amount field.';
+                    ToolTip = 'Specifies the value of the Force Amount field.';
                 }
                 field(RequiredAdmissionCode; Rec.RequiredAdmissionCode)
                 {
