@@ -33,11 +33,13 @@ codeunit 6060077 "NPR UPG POS Input Box Events"
         EanBoxEvent: Record "NPR Ean Box Event";
         TicketArrivalCodeLbl: Label 'TICKET_ARRIVAL', Locked = true;
         TicketMgtActionCodeLbl: Label 'TM_TICKETMGMT_3', Locked = true;
+        POSRefreshWorkflows: Codeunit "NPR POS Refresh Workflows";
     begin
         if not EanBoxEvent.Get(TicketArrivalCodeLbl) then
             exit;
         if EanBoxEvent."Action Code" = TicketMgtActionCodeLbl then
             exit;
+        POSRefreshWorkflows.RefreshAll();
         EanBoxEvent."Action Code" := TicketMgtActionCodeLbl;
         EanBoxEvent.Modify();
     end;
@@ -48,11 +50,13 @@ codeunit 6060077 "NPR UPG POS Input Box Events"
         SetupCode: Label 'SALE', Locked = true;
         TicketArrivalCodeLbl: Label 'TICKET_ARRIVAL', Locked = true;
         TicketMgtActionCodeLbl: Label 'TM_TICKETMGMT_3', Locked = true;
+        POSRefreshWorkflows: Codeunit "NPR POS Refresh Workflows";
     begin
         if not EanBoxEventSetup.Get(SetupCode, TicketArrivalCodeLbl) then
             exit;
         if EanBoxEventSetup."Action Code" = TicketMgtActionCodeLbl then
             exit;
+        POSRefreshWorkflows.RefreshAll();
         EanBoxEventSetup."Action Code" := TicketMgtActionCodeLbl;
         EanBoxEventSetup.Modify();
     end;

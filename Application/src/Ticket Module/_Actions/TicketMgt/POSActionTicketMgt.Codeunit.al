@@ -459,8 +459,10 @@ codeunit 6060123 "NPR POSAction: Ticket Mgt." implements "NPR IPOS Workflow"
         case EanBoxEvent.Code of
             EventCodeExternalTicketNo():
                 begin
-                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'DefaultTicketNumber', true, '');
-                    Sender.SetNonEditableParameterValues(EanBoxEvent, 'Function', false, 'Register Arrival');
+                    if EanBoxEvent."Action Code" = Format(Enum::"NPR POS Workflow"::TM_TICKETMGMT_3) then begin
+                        Sender.SetNonEditableParameterValues(EanBoxEvent, 'DefaultTicketNumber', true, '');
+                        Sender.SetNonEditableParameterValues(EanBoxEvent, 'Function', false, 'Register Arrival');
+                    end;
                 end;
         end;
     end;

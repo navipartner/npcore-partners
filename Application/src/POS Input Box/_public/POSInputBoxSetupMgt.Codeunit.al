@@ -194,8 +194,12 @@
     var
         EanBoxParameter: Record "NPR Ean Box Parameter";
         PrevRec: Text;
+        POSActionParameter: Record "NPR POS Action Parameter";
     begin
         if StrLen(Name) > MaxStrLen(EanBoxParameter.Name) then
+            exit;
+
+        if not POSActionParameter.Get(EanBoxParameter."Action Code", EanBoxParameter.Name) then
             exit;
 
         EanBoxParameter.SetRange("Event Code", EanBoxEvent.Code);
