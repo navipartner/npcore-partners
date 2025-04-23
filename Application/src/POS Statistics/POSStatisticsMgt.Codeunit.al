@@ -19,7 +19,7 @@ codeunit 6059818 "NPR POS Statistics Mgt."
         POSSingleStatsBuffer.Insert();
     end;
 
-    procedure FillCurrentStatsBuffer(var POSCurrentStatsBuffer: Record "NPR POS Single Stats Buffer"; var POSSale: Record "NPR POS Sale")
+    procedure FillCurrentStatsBuffer(var POSCurrentStatsBuffer: Record "NPR POS Single Stats Buffer"; var POSSale: Record "NPR POS Sale"; AlwaysUseUnitCost: Boolean)
     var
         POSSaleLine: Record "NPR POS Sale Line";
     begin
@@ -38,8 +38,8 @@ codeunit 6059818 "NPR POS Statistics Mgt."
             else
                 POSCurrentStatsBuffer."Return Sales Quantity" -= POSSaleLine.Quantity;
 
-            POSCurrentStatsBuffer."Cost Amount" += GetCostAmount(POSSaleLine) * POSSaleLine.Quantity;
-            POSCurrentStatsBuffer."Profit Amount" += POSSaleLine.Amount - (GetCostAmount(POSSaleLine) * POSSaleLine.Quantity);
+            POSCurrentStatsBuffer."Cost Amount" += GetCostAmount(POSSaleLine, AlwaysUseUnitCost) * POSSaleLine.Quantity;
+            POSCurrentStatsBuffer."Profit Amount" += POSSaleLine.Amount - (GetCostAmount(POSSaleLine, AlwaysUseUnitCost) * POSSaleLine.Quantity);
             POSCurrentStatsBuffer."Sales Amount" += POSSaleLine.Amount;
             POSCurrentStatsBuffer."Discount Amount" += POSSaleLine."Discount Amount";
             POSCurrentStatsBuffer."Tax Amount" += POSSaleLine."Amount Including VAT" - POSSaleLine.Amount;
@@ -456,7 +456,7 @@ codeunit 6059818 "NPR POS Statistics Mgt."
         exit(Amount / Total);
     end;
 
-    local procedure GetCostAmount(POSSaleLine: Record "NPR POS Sale Line") Cost: Decimal
+    local procedure GetCostAmount(POSSaleLine: Record "NPR POS Sale Line"; AlwaysUseUnitCost: Boolean) Cost: Decimal
     var
         Item: Record Item;
     begin
@@ -468,6 +468,11 @@ codeunit 6059818 "NPR POS Statistics Mgt."
         Item.SetLoadFields("Last Direct Cost", "Unit Cost");
         if not Item.Get(POSSaleLine."No.") then
             exit;
+
+        if AlwaysUseUnitCost then begin
+            Cost := Item."Unit Cost";
+            exit;
+        end;
 
         if Item."Last Direct Cost" <> 0 then
             Cost := Item."Last Direct Cost"

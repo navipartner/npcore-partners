@@ -16,6 +16,7 @@ codeunit 85105 "NPR POS Act. CurSaleStat Tests"
     procedure RunObject()
     var
         POSSale: Codeunit "NPR POS Sale";
+        AlwaysUseUnitCost: Boolean;
         RunPageCodeunit: Codeunit "NPR POS Action: CurSaleStats-B";
     begin
         // [Given] POS & Payment setup
@@ -25,7 +26,7 @@ codeunit 85105 "NPR POS Act. CurSaleStat Tests"
         LibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
 
         //[When]
-        RunPageCodeunit.RunSalesStatsPage();
+        RunPageCodeunit.RunSalesStatsPage(AlwaysUseUnitCost);
 
     end;
 

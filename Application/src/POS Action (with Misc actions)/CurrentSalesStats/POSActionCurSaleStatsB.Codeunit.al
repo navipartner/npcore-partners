@@ -1,7 +1,7 @@
 codeunit 6060076 "NPR POS Action: CurSaleStats-B"
 {
     Access = Internal;
-    procedure RunSalesStatsPage()
+    procedure RunSalesStatsPage(AlwaysUseUnitCost: Boolean)
     var
         POSSale: Record "NPR POS Sale";
         POSCurrentStatsBuffer: Record "NPR POS Single Stats Buffer";
@@ -12,7 +12,7 @@ codeunit 6060076 "NPR POS Action: CurSaleStats-B"
         POSSession.GetSale(SalePOS);
         SalePOS.GetCurrentSale(POSSale);
 
-        POSStatisticsMgt.FillCurrentStatsBuffer(POSCurrentStatsBuffer, POSSale);
+        POSStatisticsMgt.FillCurrentStatsBuffer(POSCurrentStatsBuffer, POSSale, AlwaysUseUnitCost);
         Page.RunModal(Page::"NPR POS Current Sale Stats", POSCurrentStatsBuffer);
     end;
 }
