@@ -87,6 +87,7 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
         end;
 
         if VoucherType = '' then begin
+            NPRPOSActionScanVoucher2B.ValidateVoucher(ReferenceNo);
             Response.Add('voucherType', '');
             Response.Add('askForAmount', false);
             Response.Add('suggestedAmount', 0);

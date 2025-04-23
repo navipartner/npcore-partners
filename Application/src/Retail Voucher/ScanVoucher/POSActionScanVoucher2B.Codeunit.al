@@ -145,4 +145,24 @@ codeunit 6150631 "NPR POS Action Scan Voucher2B"
 
         ParentId := VoucherSaleLine.Id;
     end;
+
+    internal procedure ValidateVoucher(ReferenceNo: Text[50])
+    var
+        ArchVoucher: Record "NPR NpRv Arch. Voucher";
+        ArchvoucherEntry: Record "NPR NpRv Arch. Voucher Entry";
+        Voucher: Record "NPR NpRv Voucher";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        VourcherRedeemedErr: Label 'The voucher with Reference No. %1 has already been redeemed in another transaction on %2.', Comment = '%1 - voucher reference number, 2% - date';
+        InvalidReferenceErr: Label 'Invalid Reference No. %1', Comment = '%1 - Reference Number value';
+    begin
+        if NpRvVoucherMgt.FindVoucher('', ReferenceNo, Voucher) then
+            exit;
+        if NpRvVoucherMgt.FindArchivedVoucher('', ReferenceNo, ArchVoucher) then begin
+            ArchvoucherEntry.SetCurrentKey("Arch. Voucher No.");
+            ArchvoucherEntry.SetRange("Arch. Voucher No.", ArchVoucher."No.");
+            if ArchvoucherEntry.FindLast() then;
+            Error(VourcherRedeemedErr, ReferenceNo, ArchvoucherEntry."Posting Date");
+        end else
+            Error(InvalidReferenceErr, ReferenceNo);
+    end;
 }
