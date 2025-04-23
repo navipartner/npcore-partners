@@ -44,7 +44,9 @@ page 6184875 "NPR AttractionWalletAssignment"
                     IntermediaryWallet: Record "NPR AttractionWalletSaleHdr";
                     WalletManager: Codeunit "NPR AttractionWalletCreate";
                     ExistingWallet: Record "NPR AttractionWallet";
+                    WalletExtRef: Record "NPR AttractionWalletExtRef";
                     WalletNumber: Integer;
+                    InvalidReferenceErr: Label 'Invalid reference number';
                 begin
                     ValidateNumberOfWallets();
 
@@ -66,10 +68,19 @@ page 6184875 "NPR AttractionWalletAssignment"
                     end;
 
                     // Existing Wallet, not yet added to intermediate wallet list
-                    ExistingWallet.SetCurrentKey(ReferenceNumber);
-                    ExistingWallet.SetFilter(ReferenceNumber, '=%1', _SelectWalletReference);
+                    WalletExtRef.SetLoadFields(WalletEntryNo);
+                    WalletExtRef.SetRange(ExternalReference, _SelectWalletReference);
+                    WalletExtRef.SetFilter(BlockedAt, '=%1', 0DT);
+                    WalletExtRef.SetFilter(ExpiresAt, '>%1|%2', CurrentDateTime(), 0DT);
+                    if (WalletExtRef.FindFirst()) then
+                        ExistingWallet.SetRange(EntryNo, WalletExtRef.WalletEntryNo)
+                    else begin
+                        ExistingWallet.SetCurrentKey(ReferenceNumber);
+                        ExistingWallet.SetFilter(ReferenceNumber, '=%1', _SelectWalletReference);
+                    end;
+
                     if (not ExistingWallet.FindFirst()) then
-                        error('Invalid reference number');
+                        Error(InvalidReferenceErr);
 
                     WalletManager.CreateIntermediateWalletForExistingWallet(
                         Rec.SaleHeaderSystemId, Rec.SaleLineId, Rec.LineNumber,

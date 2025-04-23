@@ -141,6 +141,7 @@ page 6184846 "NPR AttractionWallet"
                 Caption = 'Print';
                 Image = Print;
                 Promoted = true;
+                PromotedCategory = Process;
                 PromotedOnly = true;
                 Scope = Repeater;
                 trigger OnAction()
@@ -157,6 +158,7 @@ page 6184846 "NPR AttractionWallet"
                 ToolTip = 'Running this action will create a new external reference';
                 Image = Line;
                 Promoted = true;
+                PromotedCategory = Process;
                 PromotedOnly = true;
                 Scope = Repeater;
 
@@ -179,6 +181,7 @@ page 6184846 "NPR AttractionWallet"
                 Caption = 'Navigate';
                 Image = Navigate;
                 Promoted = true;
+                PromotedCategory = Process;
                 PromotedOnly = true;
                 Scope = Repeater;
                 trigger OnAction()
