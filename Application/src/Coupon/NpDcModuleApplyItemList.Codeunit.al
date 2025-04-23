@@ -494,7 +494,7 @@
             NpDcCouponListItemAssignOption::"Highest price",
             NpDcCouponListItemAssignOption::"Lowest price":
                 begin
-                    CreateTempNpDcCouponListItemsHighestLowest(TempNpDcCouponListItem, SaleLinePOSCoupon);
+                    CreateTempNpDcCouponListItemsHighestLowest(TempNpDcCouponListItem, SaleLinePOSCoupon, NpDcCouponListItemAssignOption);
                 end;
         end;
     end;
@@ -508,12 +508,13 @@
         if NpDcCouponListItem.FindSet() then begin
             repeat
                 TempNpDcCouponListItem.Copy(NpDcCouponListItem);
+                TempNpDcCouponListItem."Apply Discount" := TempNpDcCouponListItem."Apply Discount"::Priority;
                 TempNpDcCouponListItem.Insert();
             until NpDcCouponListItem.Next() = 0;
         end;
     end;
 
-    local procedure CreateTempNpDcCouponListItemsHighestLowest(var TempNpDcCouponListItem: Record "NPR NpDc Coupon List Item" temporary; SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon")
+    local procedure CreateTempNpDcCouponListItemsHighestLowest(var TempNpDcCouponListItem: Record "NPR NpDc Coupon List Item" temporary; SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; NpDcCouponListItemAssignOption: Option "Priority","Highest price","Lowest price")
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         LineNo: Integer;
@@ -531,12 +532,12 @@
             LineNo := GetInitialTempNpDcCouponListItemLineNo(TempNpDcCouponListItem);
 
             repeat
-                CreateTempNpDcCouponListItemFromSpecificScenario(TempNpDcCouponListItem, SaleLinePOSCoupon, SaleLinePOS, LineNo);
+                CreateTempNpDcCouponListItemFromSpecificScenario(TempNpDcCouponListItem, SaleLinePOSCoupon, SaleLinePOS, LineNo, NpDcCouponListItemAssignOption);
             until SaleLinePOS.Next() = 0;
         end;
     end;
 
-    local procedure CreateTempNpDcCouponListItemFromSpecificScenario(var TempNpDcCouponListItem: Record "NPR NpDc Coupon List Item" temporary; SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; SaleLinePOS: Record "NPR POS Sale Line"; var LineNo: Integer)
+    local procedure CreateTempNpDcCouponListItemFromSpecificScenario(var TempNpDcCouponListItem: Record "NPR NpDc Coupon List Item" temporary; SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; SaleLinePOS: Record "NPR POS Sale Line"; var LineNo: Integer; NpDcCouponListItemAssignOption: Option "Priority","Highest price","Lowest price")
     var
         NpDcCouponListItem: Record "NPR NpDc Coupon List Item";
     begin
@@ -544,7 +545,7 @@
         NpDcCouponListItem.SetRange(Type, NpDcCouponListItem.Type::Item);
         NpDcCouponListItem.SetRange("No.", SaleLinePOS."No.");
         if not NpDcCouponListItem.IsEmpty() then begin
-            CreateTempNpDcCouponListItem(TempNpDcCouponListItem, SaleLinePOS, SaleLinePOSCoupon."Coupon Type", LineNo);
+            CreateTempNpDcCouponListItem(TempNpDcCouponListItem, SaleLinePOS, SaleLinePOSCoupon."Coupon Type", LineNo, NpDcCouponListItemAssignOption);
             exit;
         end;
 
@@ -552,7 +553,7 @@
             NpDcCouponListItem.SetRange(Type, NpDcCouponListItem.Type::"Item Categories");
             NpDcCouponListItem.SetRange("No.", SaleLinePOS."Item Category Code");
             if not NpDcCouponListItem.IsEmpty() then begin
-                CreateTempNpDcCouponListItem(TempNpDcCouponListItem, SaleLinePOS, SaleLinePOSCoupon."Coupon Type", LineNo);
+                CreateTempNpDcCouponListItem(TempNpDcCouponListItem, SaleLinePOS, SaleLinePOSCoupon."Coupon Type", LineNo, NpDcCouponListItemAssignOption);
                 exit;
             end;
         end;
@@ -561,7 +562,7 @@
             NpDcCouponListItem.SetRange(Type, NpDcCouponListItem.Type::"Item Disc. Group");
             NpDcCouponListItem.SetRange("No.", SaleLinePOS."Item Disc. Group");
             if not NpDcCouponListItem.IsEmpty() then begin
-                CreateTempNpDcCouponListItem(TempNpDcCouponListItem, SaleLinePOS, SaleLinePOSCoupon."Coupon Type", LineNo);
+                CreateTempNpDcCouponListItem(TempNpDcCouponListItem, SaleLinePOS, SaleLinePOSCoupon."Coupon Type", LineNo, NpDcCouponListItemAssignOption);
                 exit;
             end;
         end;
@@ -570,7 +571,7 @@
             NpDcCouponListItem.SetRange(Type, NpDcCouponListItem.Type::"Magento Brand");
             NpDcCouponListItem.SetRange("No.", SaleLinePOS."Magento Brand");
             if not NpDcCouponListItem.IsEmpty() then
-                CreateTempNpDcCouponListItem(TempNpDcCouponListItem, SaleLinePOS, SaleLinePOSCoupon."Coupon Type", LineNo);
+                CreateTempNpDcCouponListItem(TempNpDcCouponListItem, SaleLinePOS, SaleLinePOSCoupon."Coupon Type", LineNo, NpDcCouponListItemAssignOption);
         end;
     end;
 
@@ -585,7 +586,7 @@
         exit(LineNo);
     end;
 
-    local procedure CreateTempNpDcCouponListItem(var TempNpDcCouponListItem: Record "NPR NpDc Coupon List Item" temporary; SaleLinePOS: Record "NPR POS Sale Line"; CouponType: Code[20]; var LineNo: Integer)
+    local procedure CreateTempNpDcCouponListItem(var TempNpDcCouponListItem: Record "NPR NpDc Coupon List Item" temporary; SaleLinePOS: Record "NPR POS Sale Line"; CouponType: Code[20]; var LineNo: Integer; NpDcCouponListItemAssignOption: Option "Priority","Highest price","Lowest price")
     begin
         TempNpDcCouponListItem.Init();
         TempNpDcCouponListItem."Coupon Type" := CouponType;
@@ -593,6 +594,7 @@
         TempNpDcCouponListItem.Type := TempNpDcCouponListItem.Type::Item;
         TempNpDcCouponListItem."No." := SaleLinePOS."No.";
         TempNpDcCouponListItem."Unit Price" := SaleLinePOS."Unit Price";
+        TempNpDcCouponListItem."Apply Discount" := NpDcCouponListItemAssignOption;
         TempNpDcCouponListItem.Insert();
 
         LineNo += 10000;
@@ -699,7 +701,13 @@
 
         LineAmountBuffer.Reset();
         LineAmountBuffer.SetCurrentKey("Amount Including VAT");
-        LineAmountBuffer.Ascending(false);
+        case NpDcCouponListItem."Apply Discount" of
+            NpDcCouponListItem."Apply Discount"::"Highest price",
+            NpDcCouponListItem."Apply Discount"::Priority:
+                LineAmountBuffer.Ascending(false);
+            else
+                LineAmountBuffer.Ascending(true);
+        end;
         if not LineAmountBuffer.FindSet() then
             exit;
 
