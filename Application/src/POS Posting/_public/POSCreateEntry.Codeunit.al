@@ -797,6 +797,7 @@
         POSEntryPaymentLine."EFT Card Expiry Year" := POSSaleLine."EFT Card Expiry Year";
         POSEntryPaymentLine."EFT Payment Brand" := POSSaleLine."EFT Payment Brand";
         POSEntryPaymentLine."EFT Payment Account Reference" := POSSaleLine."EFT Payment Account Reference";
+        POSEntryPaymentLine."EFT Shopper Country" := POSSaleLine."EFT Shopper Country";
 
         POSEntryPaymentLine."Shortcut Dimension 1 Code" := POSSaleLine."Shortcut Dimension 1 Code";
         POSEntryPaymentLine."Shortcut Dimension 2 Code" := POSSaleLine."Shortcut Dimension 2 Code";

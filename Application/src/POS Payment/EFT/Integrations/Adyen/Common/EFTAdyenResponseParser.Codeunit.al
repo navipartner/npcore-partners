@@ -681,6 +681,8 @@
                     EFTTransactionRequest."Payment Brand" := NameValueCollection.Get(Key);
                 'paymentaccountreference':
                     EFTTransactionRequest."Payment Account Reference" := NameValueCollection.Get(Key);
+                'shoppercountry':
+                    EFTTransactionRequest."Shopper Country" := NameValueCollection.Get(Key);
             end;
         end;
     end;

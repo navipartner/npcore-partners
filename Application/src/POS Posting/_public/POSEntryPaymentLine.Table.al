@@ -312,6 +312,11 @@
             Caption = 'Payment Account Reference';
             DataClassification = CustomerContent;
         }
+        field(518; "EFT Shopper Country"; Text[20])
+        {
+            Caption = 'Shopper Country';
+            DataClassification = CustomerContent;
+        }
         field(600; "Entry Date"; Date)
         {
             CalcFormula = Lookup("NPR POS Entry"."Entry Date" WHERE("Entry No." = FIELD("POS Entry No.")));

@@ -461,6 +461,11 @@
             Caption = 'Payment Account Reference';
             DataClassification = CustomerContent;
         }
+        field(638; "Shopper Country"; Text[20])
+        {
+            Caption = 'Shopper Country';
+            DataClassification = CustomerContent;
+        }
         field(650; "Additional Info"; BLOB)
         {
             Caption = 'Additional Info';

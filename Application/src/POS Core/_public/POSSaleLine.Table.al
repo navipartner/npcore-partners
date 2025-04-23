@@ -1276,6 +1276,11 @@
             Caption = 'Payment Account Reference';
             DataClassification = CustomerContent;
         }
+        field(513; "EFT Shopper Country"; Text[20])
+        {
+            Caption = 'Shopper Country';
+            DataClassification = CustomerContent;
+        }
         field(550; "Drawer Opened"; Boolean)
         {
             Caption = 'Drawer Opened';

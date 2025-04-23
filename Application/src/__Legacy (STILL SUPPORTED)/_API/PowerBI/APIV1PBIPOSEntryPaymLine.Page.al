@@ -236,6 +236,28 @@ page 6184941 "NPR APIV1PBIPOSEntryPaymLine"
                 {
                     Caption = 'Voucher Category', Locked = true;
                 }
+                field(eftCardNumber; Rec."EFT Card Number")
+                {
+                    Caption = 'EFT Card Number', Locked = true;
+                }
+                field(eftPaymentBrand; Rec."EFT Payment Brand")
+                {
+                    Caption = 'EFT Payment Brand', Locked = true;
+                }
+                field(eftPaymentAccountReference; Rec."EFT Payment Account Reference")
+                {
+                    Caption = 'EFT Payment Account Reference', Locked = true;
+                }
+                field(eftShopperCountry; Rec."EFT Shopper Country")
+                {
+                    Caption = 'EFT Shopper Country', Locked = true;
+                }
+#if not (BC17 or BC18 or BC19 or BC20)
+                field(systemRowVersion; Rec.SystemRowVersion)
+                {
+                    Caption = 'System Row Version', Locked = true;
+                }
+#endif
             }
         }
     }

@@ -418,6 +418,7 @@
         POSLine."EFT Card Expiry Year" := EFTTransactionRequest."Card Expiry Year";
         POSLine."EFT Payment Brand" := EFTTransactionRequest."Payment Brand";
         POSLine."EFT Payment Account Reference" := EFTTransactionRequest."Payment Account Reference";
+        POSLine."EFT Shopper Country" := EFTTransactionRequest."Shopper Country";
 
         if POSLine."EFT Approved" then begin
             POSLine."Amount Including VAT" := EFTTransactionRequest."Result Amount";
