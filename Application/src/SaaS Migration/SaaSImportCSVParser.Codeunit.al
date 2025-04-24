@@ -67,7 +67,22 @@ codeunit 6151093 "NPR SaaS Import CSV Parser"
                   TableData "Workflow Step Argument Archive" = rimd,
                   TableData "Warehouse Entry" = rimd,
                   TableData "Warehouse Register" = rimd,
-                  TableData "Res. Ledger Entry" = rmid;
+                  TableData "Res. Ledger Entry" = rmid,
+                  TableData "Bank Account Statement" = rmid,
+                  TableData "Bank Account Statement Line" = rmid,
+                  TableData "Issued Reminder Header" = rmid,
+                  TableData "Issued Reminder Line" = rmid,
+                  TableData "Reminder/Fin. Charge Entry" = rmid,
+                  TableData "Field Monitoring Setup" = rmid,
+                  TableData "Cancelled Document" = rmid,
+                  TableData "Retention Period" = rmid,
+                  TableData "Retention Policy Setup" = rmid,
+#IF NOT (BC17 or BC18 or BC19 or BC20 or BC21)
+                  TableData "Email Outbox" = rmid,
+                  TableData "Email Related Record" = rmid,
+                  TableData "Sent Email" = rmid,
+#endif
+                  TableData "Retention Policy Setup Line" = rmid;
 
     trigger OnRun()
     var
