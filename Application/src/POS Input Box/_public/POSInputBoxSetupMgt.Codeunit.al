@@ -199,7 +199,7 @@
         if StrLen(Name) > MaxStrLen(EanBoxParameter.Name) then
             exit;
 
-        if not POSActionParameter.Get(EanBoxParameter."Action Code", EanBoxParameter.Name) then
+        if not POSActionParameter.Get(EanBoxEvent."Action Code", Name) then
             exit;
 
         EanBoxParameter.SetRange("Event Code", EanBoxEvent.Code);
