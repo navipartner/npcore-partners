@@ -9,4 +9,9 @@ enum 6014519 "NPR POS Costumer Input Context"
         Caption = 'Money Back', Locked = true,
         Comment = 'This value is used for sales where money is given back to the costumer.';
     }
+    value(1; "RETURN_INFORMATION")
+    {
+        Caption = 'Return Information', Locked = true,
+        Comment = 'This value is used for return sales.';
+    }
 }

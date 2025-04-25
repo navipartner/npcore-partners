@@ -14,4 +14,9 @@
         Caption = 'Vipps MobilePay', Locked = true;
         Implementation = "NPR MM IAdd. Info. Request" = "NPR MM VippsMP Add. Info. Req.";
     }
+    value(2; Adyen)
+    {
+        Caption = 'Adyen', Locked = true;
+        Implementation = "NPR MM IAdd. Info. Request" = "NPR Adyen Data Collection";
+    }
 }

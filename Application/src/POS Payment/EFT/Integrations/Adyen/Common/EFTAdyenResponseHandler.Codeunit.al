@@ -370,7 +370,10 @@ codeunit 6184611 "NPR EFT Adyen Response Handler"
                         "NPR EFT Adyen Aux Operation"::DETECT_SHOPPER.AsInteger(),
                         "NPR EFT Adyen Aux Operation"::CLEAR_SHOPPER.AsInteger(),
                         "NPR EFT Adyen Aux Operation"::DISABLE_CONTRACT.AsInteger(),
-                        "NPR EFT Adyen Aux Operation"::SUBSCRIPTION_CONFIRM.AsInteger():
+                        "NPR EFT Adyen Aux Operation"::SUBSCRIPTION_CONFIRM.AsInteger(),
+                        "NPR EFT Adyen Aux Operation"::ACQUIRE_SIGNATURE.AsInteger(),
+                        "NPR EFT Adyen Aux Operation"::ACQUIRE_PHONE_NO.AsInteger(),
+                        "NPR EFT Adyen Aux Operation"::ACQUIRE_EMAIL.AsInteger():
                             Message := StrSubstNo(TRX_ERROR, Format(EftTransactionRequest."Auxiliary Operation Desc."), EftTransactionRequest."Result Description", EftTransactionRequest."Result Display Text", EftTransactionRequest."NST Error");
                     end;
             end;
@@ -379,7 +382,7 @@ codeunit 6184611 "NPR EFT Adyen Response Handler"
         if Message <> '' then
             exit(true);
     end;
-#endif         
+#endif
 
     local procedure HandleTrxResponse(var EftTransactionRequest: Record "NPR EFT Transaction Request")
     var

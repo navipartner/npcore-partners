@@ -140,6 +140,34 @@
         CheckHandled(EFTSetup."EFT Integration Type", EFTTransactionRequest, Format(EFTTransactionRequest."Processing Type"::VOID), Handled);
     end;
 
+    procedure CreateVoidRequestForDataCollection(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; POSUnitNo: Code[10]; SalesReceiptNo: Code[20]; RequestEntryNoToVoid: Integer; IsManualVoid: Boolean)
+    var
+        OriginalTransactionRequest: Record "NPR EFT Transaction Request";
+    begin
+        OriginalTransactionRequest.Get(RequestEntryNoToVoid);
+
+        InitGenericRequest(EFTTransactionRequest, POSUnitNo, SalesReceiptNo, OriginalTransactionRequest."POS Payment Type Code");
+
+        OriginalTransactionRequest.TestField("Integration Type", EFTTransactionRequest."Integration Type");
+        if IsManualVoid then
+            OriginalTransactionRequest.TestField("Manual Voidable", true)
+        else
+            OriginalTransactionRequest.TestField("Auto Voidable", true);
+        OriginalTransactionRequest.TestField(Reversed, false);
+
+        if (not OriginalTransactionRequest.Successful) and (OriginalTransactionRequest.Recovered) then begin
+            OriginalTransactionRequest.Get(OriginalTransactionRequest."Recovered by Entry No.");
+        end;
+        OriginalTransactionRequest.TestField(Successful, true);
+        OriginalTransactionRequest.TestField(Finished);
+        OriginalTransactionRequest.TestField("External Result Known", true);
+
+        EFTTransactionRequest."Currency Code" := OriginalTransactionRequest."Currency Code";
+        EFTTransactionRequest."Amount Input" := OriginalTransactionRequest."Result Amount" * -1;
+        EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::VOID;
+        EFTTransactionRequest."Processed Entry No." := RequestEntryNoToVoid;
+    end;
+
     procedure CreateVerifySetupRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; POSUnitNo: Code[10]; SalesReceiptNo: Code[20])
     var
         EFTInterface: Codeunit "NPR EFT Interface";
@@ -189,6 +217,23 @@
         EFTTransactionRequest."Auxiliary Operation Desc." := TempEFTAuxOperation.Description;
         EFTInterface.OnCreateAuxRequest(EFTTransactionRequest, Handled);
         CheckHandled(EFTSetup."EFT Integration Type", EFTTransactionRequest, Format(EFTTransactionRequest."Processing Type"::AUXILIARY), Handled);
+    end;
+
+    procedure CreateAuxRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; AuxFunction: Integer; POSUnitNo: Code[10]; SalesReceiptNo: Code[20]; POSPaymentMethod: Text)
+    var
+        EFTInterface: Codeunit "NPR EFT Interface";
+        TempEFTAuxOperation: Record "NPR EFT Aux Operation" temporary;
+    begin
+        InitGenericRequest(EFTTransactionRequest, POSUnitNo, SalesReceiptNo, POSPaymentMethod);
+
+        EFTInterface.OnDiscoverAuxiliaryOperations(TempEFTAuxOperation);
+        TempEFTAuxOperation.SetRange("Integration Type", EFTTransactionRequest."Integration Type");
+        TempEFTAuxOperation.SetRange("Auxiliary ID", AuxFunction);
+        TempEFTAuxOperation.FindFirst();
+
+        EFTTransactionRequest."Processing Type" := EFTTransactionRequest."Processing Type"::AUXILIARY;
+        EFTTransactionRequest."Auxiliary Operation ID" := AuxFunction;
+        EFTTransactionRequest."Auxiliary Operation Desc." := TempEFTAuxOperation.Description;
     end;
 
     procedure CreateGiftcardLoadRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"; POSUnitNo: Code[10]; SalesReceiptNo: Code[20]; CurrencyCode: Code[10]; AmountToLoad: Decimal)
@@ -356,6 +401,45 @@
             SalePOS.Get(POSUnitNo, SalesReceiptNo);
             EFTTransactionRequest."Sales ID" := SalePOS.SystemId;
         end;
+    end;
+
+    local procedure InitGenericRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; POSUnitNo: Code[10]; SalesReceiptNo: Code[20]; POSPaymentMethodCode: Text)
+    var
+        SalePOS: Record "NPR POS Sale";
+        POSUnit: Record "NPR POS Unit";
+        ReturnInfoCollectSetup: Record "NPR Return Info Collect Setup";
+        MMMemberInfoIntSetup: Record "NPR MM Member Info. Int. Setup";
+        EFTAdyenCloudIntegrat: Codeunit "NPR EFT Adyen Cloud Integrat.";
+        AdyenCloudIntegrationTypeLbl: Label 'ADYEN_CLOUD', Locked = true;
+    begin
+        EFTTransactionRequest.Init();
+        MMMemberInfoIntSetup.Get();
+        if MMMemberInfoIntSetup."Request Return Info" = MMMemberInfoIntSetup."Request Return Info"::Adyen then
+            EFTTransactionRequest."Integration Type" := AdyenCloudIntegrationTypeLbl;
+        EFTTransactionRequest."Integration Version Code" := '3.0'; //Adyen Terminal API Protocol v3.0
+        EFTTransactionRequest."POS Payment Type Code" := CopyStr(POSPaymentMethodCode, 1, MaxStrLen(EFTTransactionRequest."POS Payment Type Code"));
+        EFTTransactionRequest."Original POS Payment Type Code" := CopyStr(POSPaymentMethodCode, 1, MaxStrLen(EFTTransactionRequest."Original POS Payment Type Code"));
+        EFTTransactionRequest."Hardware ID" := CopyStr(EFTAdyenCloudIntegrat.GetPOIIDFromReturnCollectionSetup(POSUnitNo), 1, MaxStrLen(EFTTransactionRequest."Hardware ID"));
+        EFTTransactionRequest."Register No." := POSUnitNo;
+        EFTTransactionRequest."Sales Ticket No." := SalesReceiptNo;
+        EFTTransactionRequest."User ID" := CopyStr(UserId, 1, MaxStrLen(EFTTransactionRequest."User ID"));
+        EFTTransactionRequest.Started := CurrentDateTime;
+        EFTTransactionRequest.Token := CreateGuid();
+        if POSUnitNo <> '' then begin
+            POSUnit.Get(POSUnitNo);
+            EFTTransactionRequest."Self Service" := POSUnit."POS Type" = POSUnit."POS Type"::UNATTENDED;
+        end;
+
+        if (POSUnitNo <> '') and (SalesReceiptNo <> '') then begin
+            SalePOS.Get(POSUnitNo, SalesReceiptNo);
+            EFTTransactionRequest."Sales ID" := SalePOS.SystemId;
+        end;
+
+        ReturnInfoCollectSetup.Get();
+        if ReturnInfoCollectSetup.Environment = ReturnInfoCollectSetup.Environment::Live then
+            EFTTransactionRequest.Mode := EFTTransactionRequest.Mode::Production
+        else
+            EFTTransactionRequest.Mode := EFTTransactionRequest.Mode::"TEST Remote";
     end;
 
     local procedure EndGenericRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request")

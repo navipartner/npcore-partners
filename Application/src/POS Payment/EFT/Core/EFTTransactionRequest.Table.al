@@ -234,6 +234,11 @@
             Caption = 'Result Description';
             DataClassification = CustomerContent;
         }
+        field(255; "Signature Data"; Blob)
+        {
+            Caption = 'Signature Data';
+            DataClassification = CustomerContent;
+        }
         field(260; "Bookkeeping Period"; Text[4])
         {
             Caption = 'Bookkeeping Period';
@@ -564,6 +569,11 @@
         field(870; "Confirmed Flag"; Boolean)
         {
             Caption = 'Confirmed Flag';
+            DataClassification = CustomerContent;
+        }
+        field(880; "Created From Data Collection"; Boolean)
+        {
+            Caption = 'Created From Data Colletion';
             DataClassification = CustomerContent;
         }
         field(10000; "FF Moved to POS Entry"; Boolean)

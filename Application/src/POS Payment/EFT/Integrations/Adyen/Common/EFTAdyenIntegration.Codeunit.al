@@ -331,6 +331,12 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
         MMMemberInfoCapture: Record "NPR MM Member Info Capture";
     begin
+        if (EftTransactionRequest."Auxiliary Operation ID" in [Enum::"NPR EFT Adyen Aux Operation"::ACQUIRE_SIGNATURE.AsInteger(),
+                                                                Enum::"NPR EFT Adyen Aux Operation"::ACQUIRE_PHONE_NO.AsInteger(),
+                                                                Enum::"NPR EFT Adyen Aux Operation"::ACQUIRE_EMAIL.AsInteger()]) or
+        ((EftTransactionRequest."Auxiliary Operation ID" = Enum::"NPR EFT Adyen Aux Operation"::ABORT_TRX.AsInteger()) and EftTransactionRequest."Created From Data Collection") then
+            exit;
+
         EFTSetup.FindSetup(EftTransactionRequest."Register No.", EftTransactionRequest."Original POS Payment Type Code");
         if EFTAdyenIntegration.GetCreateRecurringContract(EFTSetup) = EFTAdyenPaymentTypeSetup."Create Recurring Contract"::NO then
             exit;
@@ -667,6 +673,70 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         exit(true);
     end;
 
+    internal procedure ContinueAfterSignatureVerification(TransactionEntryNo: Integer; var ContinueOnTransactionEntryNo: Integer): Boolean
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+    begin
+        if not EFTTransactionRequest.Get(TransactionEntryNo) then
+            exit(false);
+
+        if EFTTransactionRequest."Processing Type" <> EFTTransactionRequest."Processing Type"::AUXILIARY then
+            exit(false);
+
+        case EFTTransactionRequest."Auxiliary Operation ID" of
+            "NPR EFT Adyen Aux Operation"::ACQUIRE_SIGNATURE.AsInteger():
+                begin
+                    exit(ShouldProceedToTransactionAfterSignatureConfirmation(EFTTransactionRequest, ContinueOnTransactionEntryNo));
+                end;
+            else
+                EFTTransactionRequest.FieldError("Auxiliary Operation ID");
+        end;
+    end;
+
+    internal procedure ContinueAfterPhoneNoVerification(TransactionEntryNo: Integer; var ContinueOnTransactionEntryNo: Integer): Boolean
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+    begin
+        if not EFTTransactionRequest.Get(TransactionEntryNo) then
+            exit(false);
+
+        if EFTTransactionRequest."Processing Type" <> EFTTransactionRequest."Processing Type"::AUXILIARY then
+            exit(false);
+
+        case EFTTransactionRequest."Auxiliary Operation ID" of
+            "NPR EFT Adyen Aux Operation"::ACQUIRE_PHONE_NO.AsInteger():
+                begin
+                    exit(ShouldProceedToTransactionAfterPhoneNoConfirmation(EFTTransactionRequest, ContinueOnTransactionEntryNo));
+                end;
+            else
+                EFTTransactionRequest.FieldError("Auxiliary Operation ID");
+        end;
+    end;
+
+    local procedure ShouldProceedToTransactionAfterSignatureConfirmation(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var ContinueOnTransactionEntryNo: Integer): Boolean
+    begin
+        if not EFTTransactionRequest.Successful then
+            exit(false);
+
+        if not EFTTransactionRequest."Confirmed Flag" then
+            exit(false);
+
+        ContinueOnTransactionEntryNo := EFTTransactionRequest."Entry No.";
+        exit(true);
+    end;
+
+    local procedure ShouldProceedToTransactionAfterPhoneNoConfirmation(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var ContinueOnTransactionEntryNo: Integer): Boolean
+    begin
+        if not EFTTransactionRequest.Successful then
+            exit(false);
+
+        if not EFTTransactionRequest."Confirmed Flag" then
+            exit(false);
+
+        ContinueOnTransactionEntryNo := EFTTransactionRequest."Entry No.";
+        exit(true);
+    end;
+
     local procedure ClearShopperContract(EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         EFTShopperRecognition: Record "NPR EFT Shopper Recognition";
@@ -871,6 +941,13 @@ codeunit 6184639 "NPR EFT Adyen Integration"
             AdyenCloudPaymentSetup."Log Level"::NONE:
                 EFTTransactionLoggingMgt.WriteLogEntry(EntryNo, Description, '');
         end;
+    end;
+
+    internal procedure WriteGenericDataCollectionLogEntry(EntryNo: Integer; Description: Text; Logs: Text)
+    var
+        EFTTransactionLoggingMgt: Codeunit "NPR EFT Trx Logging Mgt.";
+    begin
+        EFTTransactionLoggingMgt.WriteLogEntry(EntryNo, Description, '');
     end;
 
     local procedure GetLogLevel(EFTSetupIn: Record "NPR EFT Setup"): Integer

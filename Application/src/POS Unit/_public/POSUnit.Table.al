@@ -1,4 +1,4 @@
-﻿table 6150615 "NPR POS Unit"
+table 6150615 "NPR POS Unit"
 {
     Caption = 'POS Unit';
     DataClassification = CustomerContent;

@@ -33,4 +33,16 @@ enum 6059849 "NPR EFT Adyen Aux Operation"
     {
         Caption = 'Subscription Confirmation';
     }
+    value(9; ACQUIRE_SIGNATURE)
+    {
+        Caption = 'Acquire Signature';
+    }
+    value(10; ACQUIRE_PHONE_NO)
+    {
+        Caption = 'Acquire Phone No';
+    }
+    value(11; ACQUIRE_EMAIL)
+    {
+        Caption = 'Acquire EMail';
+    }
 }

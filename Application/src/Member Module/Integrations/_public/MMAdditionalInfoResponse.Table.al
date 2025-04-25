@@ -147,6 +147,46 @@
             Caption = 'Alt. Addr. Post Code';
             DataClassification = CustomerContent;
         }
+        field(28; Started; Boolean)
+        {
+            Caption = 'Started';
+            DataClassification = CustomerContent;
+        }
+        field(29; Completed; Boolean)
+        {
+            Caption = 'Completed';
+            DataClassification = CustomerContent;
+        }
+        field(30; Success; Boolean)
+        {
+            Caption = 'Success';
+            DataClassification = CustomerContent;
+        }
+        field(31; "Signature Data"; Blob)
+        {
+            Caption = 'Signature Data';
+            DataClassification = CustomerContent;
+        }
+        field(32; "Confirmed Flag"; Boolean)
+        {
+            Caption = 'Confirmed Flage';
+            DataClassification = CustomerContent;
+        }
+        field(33; "Response Result"; Text[50])
+        {
+            Caption = 'Response Result';
+            DataClassification = CustomerContent;
+        }
+        field(34; "Error Condition"; Text[50])
+        {
+            Caption = 'Error Condition';
+            DataClassification = CustomerContent;
+        }
+        field(35; "Screen Timeout"; Boolean)
+        {
+            Caption = 'Screen Timeout';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

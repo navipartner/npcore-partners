@@ -11,6 +11,9 @@
         CLEAR_SHOPPER: Label 'Clear Shopper from Card', MaxLength = 50;
         DISABLE_CONTRACT: Label 'Disable Shopper Recurring Contract', MaxLength = 50;
         SUBSCRIPTION_CONFIRM: Label 'Subscription Confirmation', MaxLength = 50;
+        SIGNATURE_COLLECTION: Label 'Signature Collection', MaxLength = 50;
+        PHONE_NO_COLLECTION: Label 'Phone No Collection', MaxLength = 50;
+        EMAIL_COLLECTION: Label 'EMail Collection', MaxLength = 50;
 
     procedure IntegrationType(): Code[20]
     begin
@@ -74,6 +77,24 @@
         tmpEFTAuxOperation."Auxiliary ID" := Enum::"NPR EFT Adyen Aux Operation"::SUBSCRIPTION_CONFIRM.AsInteger();
         tmpEFTAuxOperation.Description := CopyStr(SUBSCRIPTION_CONFIRM, 1, MaxStrLen(tmpEFTAuxOperation.Description));
         tmpEFTAuxOperation.Insert();
+
+        tmpEFTAuxOperation.Init();
+        tmpEFTAuxOperation."Integration Type" := IntegrationType();
+        tmpEFTAuxOperation."Auxiliary ID" := Enum::"NPR EFT Adyen Aux Operation"::ACQUIRE_SIGNATURE.AsInteger();
+        tmpEFTAuxOperation.Description := CopyStr(SIGNATURE_COLLECTION, 1, MaxStrLen(tmpEFTAuxOperation.Description));
+        tmpEFTAuxOperation.Insert();
+
+        tmpEFTAuxOperation.Init();
+        tmpEFTAuxOperation."Integration Type" := IntegrationType();
+        tmpEFTAuxOperation."Auxiliary ID" := Enum::"NPR EFT Adyen Aux Operation"::ACQUIRE_PHONE_NO.AsInteger();
+        tmpEFTAuxOperation.Description := CopyStr(PHONE_NO_COLLECTION, 1, MaxStrLen(tmpEFTAuxOperation.Description));
+        tmpEFTAuxOperation.Insert();
+
+        tmpEFTAuxOperation.Init();
+        tmpEFTAuxOperation."Integration Type" := IntegrationType();
+        tmpEFTAuxOperation."Auxiliary ID" := Enum::"NPR EFT Adyen Aux Operation"::ACQUIRE_EMAIL.AsInteger();
+        tmpEFTAuxOperation.Description := CopyStr(EMAIL_COLLECTION, 1, MaxStrLen(tmpEFTAuxOperation.Description));
+        tmpEFTAuxOperation.Insert();
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EFT Interface", 'OnConfigureIntegrationUnitSetup', '', false, false)]
@@ -113,6 +134,15 @@
 #pragma warning restore AA0139
     end;
 
+    procedure GetPOIIDFromReturnCollectionSetup(POSUnitNo: Code[10]): Text[250]
+    var
+        ReturnInfoDeviceSetting: Record "NPR Return Info Device Setting";
+    begin
+        if not ReturnInfoDeviceSetting.Get(POSUnitNo) then
+            exit;
+        exit(ReturnInfoDeviceSetting."Terminal ID");
+    end;
+
     procedure GetAPIKey(EFTSetupIn: Record "NPR EFT Setup"): Text
     var
         EFTAdyenPaymentTypeSetup: Record "NPR EFT Adyen Paym. Type Setup";
@@ -120,6 +150,14 @@
     begin
         EFTAdyenintegration.GetPaymentTypeParameters(EFTSetupIn, EFTAdyenPaymentTypeSetup);
         exit(EFTAdyenPaymentTypeSetup.GetApiKey());
+    end;
+
+    procedure GetAPIKeyFromReturnCollectionSetup(): Text
+    var
+        ReturnInfoCollectSetup: Record "NPR Return Info Collect Setup";
+    begin
+        if ReturnInfoCollectSetup.Get() then
+            exit(ReturnInfoCollectSetup.GetApiKey());
     end;
 
     procedure GetEnvironment(EFTSetupIn: Record "NPR EFT Setup"): Integer

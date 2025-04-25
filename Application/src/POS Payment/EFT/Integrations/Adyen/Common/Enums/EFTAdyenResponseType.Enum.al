@@ -45,4 +45,16 @@ enum 6014605 "NPR EFT Adyen Response Type"
     {
         Caption = 'SubscriptionConfirmation';
     }
+    value(10; SignatureAcquisition)
+    {
+        Caption = 'Signature Acquisition';
+    }
+    value(11; PhoneNoAcquisition)
+    {
+        Caption = 'Phone No Acquisition';
+    }
+    value(12; EMailAcquisition)
+    {
+        Caption = 'EMail Acquisition';
+    }
 }

@@ -13,6 +13,25 @@ codeunit 6184636 "NPR EFT Adyen Abort Mgmt"
         EFTFrameworkMgt.CreateAuxRequest(AbortEFTTransactionRequest, EFTSetup, 1, EFTTransactionRequest."Register No.", EFTTransactionRequest."Sales Ticket No.");
 #pragma warning restore AA0139
         AbortEFTTransactionRequest."Processed Entry No." := EFTTransactionRequest."Entry No.";
+        if AbortEFTTransactionRequest."Hardware ID" = '' then
+            AbortEFTTransactionRequest."Hardware ID" := EFTTransactionRequest."Hardware ID";
+        AbortEFTTransactionRequest.Modify();
+        Commit();
+        Exit(AbortEFTTransactionRequest."Entry No.");
+    end;
+
+    internal procedure CreateAbortDataCollectionTransactionRequest(EFTTransactionRequest: Record "NPR EFT Transaction Request") EntryNo: Integer
+    var
+        EFTFrameworkMgt: Codeunit "NPR EFT Framework Mgt.";
+        AbortEFTTransactionRequest: Record "NPR EFT Transaction Request";
+    begin
+        EFTFrameworkMgt.CreateAuxRequest(AbortEFTTransactionRequest, 1, EFTTransactionRequest."Register No.", EFTTransactionRequest."Sales Ticket No.", EFTTransactionRequest."POS Payment Type Code");
+        AbortEFTTransactionRequest."Created From Data Collection" := true;
+        AbortEFTTransactionRequest."Processed Entry No." := EFTTransactionRequest."Entry No.";
+        if AbortEFTTransactionRequest."Hardware ID" = '' then
+            AbortEFTTransactionRequest."Hardware ID" := EFTTransactionRequest."Hardware ID";
+        AbortEFTTransactionRequest.Insert();
+        AbortEFTTransactionRequest."Reference Number Input" := Format(AbortEFTTransactionRequest."Entry No.");
         AbortEFTTransactionRequest.Modify();
         Commit();
         Exit(AbortEFTTransactionRequest."Entry No.");

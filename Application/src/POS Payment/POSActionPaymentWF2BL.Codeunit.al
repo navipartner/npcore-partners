@@ -1,7 +1,7 @@
 codeunit 6059778 "NPR POS Action: Payment WF2 BL"
 {
     Access = Internal;
-    internal procedure PrepareForPayment(PaymentLine: Codeunit "NPR POS Payment Line"; PaymentMethodCode: Code[10]; var WorkflowNameOut: Code[20]; var POSPaymentMethodOut: Record "NPR POS Payment Method"; var AmountOut: Decimal; var ForceAmount: Boolean)
+    internal procedure PrepareForPayment(PaymentLine: Codeunit "NPR POS Payment Line"; PaymentMethodCode: Code[10]; var WorkflowNameOut: Code[20]; var POSPaymentMethodOut: Record "NPR POS Payment Method"; var AmountOut: Decimal; var ForceAmount: Boolean; var CollectReturnInformation: Boolean)
     var
         ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
         PaymentLinePOS: Record "NPR POS Sale Line";
@@ -27,14 +27,15 @@ codeunit 6059778 "NPR POS Action: Payment WF2 BL"
             AmountOut := 0;
 
         PaymentLine.GetPaymentLine(PaymentLinePOS);
-        PaymentProcessingEvents.OnAfterCalculateSuggestionPaymentAmount(PaymentLinePOS."Sales Ticket No.", SalesAmount, PaidAmount, POSPaymentMethodOut, ReturnPOSPaymentMethod, AmountOut);
+        PaymentProcessingEvents.OnAfterCalculateSuggestionPaymentAmount(PaymentLinePOS."Sales Ticket No.", SalesAmount, PaidAmount, POSPaymentMethodOut, ReturnPOSPaymentMethod, AmountOut, CollectReturnInformation);
     end;
 
     internal procedure PrepareForPayment(PaymentLine: Codeunit "NPR POS Payment Line"; PaymentMethodCode: Code[10]; var WorkflowNameOut: Code[20]; var POSPaymentMethodOut: Record "NPR POS Payment Method"; var AmountOut: Decimal)
     var
         ForceAmount: Boolean;
+        CollectReturnInformation: Boolean;
     begin
-        PrepareForPayment(PaymentLine, PaymentMethodCode, WorkflowNameOut, POSPaymentMethodOut, AmountOut, ForceAmount);
+        PrepareForPayment(PaymentLine, PaymentMethodCode, WorkflowNameOut, POSPaymentMethodOut, AmountOut, ForceAmount, CollectReturnInformation);
     end;
 
     internal procedure AttemptEndCurrentSale(PaymentMethodCode: Code[10]): Boolean

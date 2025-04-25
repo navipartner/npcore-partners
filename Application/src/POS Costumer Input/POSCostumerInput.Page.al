@@ -63,6 +63,17 @@ page 6150774 "NPR POS Costumer Input"
 #ENDIF
 
                 }
+                field("E-Mail"; Rec."E-Mail")
+                {
+                    ApplicationArea = NPRRetail;
+                    Editable = false;
+                    Caption = 'Customer E-Mail';
+                    ToolTip = 'The e-mail given by the customer';
+#IF NOT BC17
+                    AboutTitle = 'Customer E-Mail';
+                    AboutText = 'The e-mail given by the customer';
+#ENDIF
+                }
             }
             group(InputHtml)
             {
@@ -72,25 +83,35 @@ page 6150774 "NPR POS Costumer Input"
                     ApplicationArea = NPRRetail;
 
                     trigger Ready()
-                    var
-                        InputObj: JsonObject;
-                        SignStream: InStream;
-                        SignatureTxt: Text;
-                        tmp: Text;
                     begin
-                        if (Rec.Signature.HasValue()) then begin
-                            Rec.CalcFields(Rec.Signature);
-                            Rec.Signature.CreateInStream(SignStream);
-                            repeat
-                                SignStream.ReadText(tmp);
-                                SignatureTxt := SignatureTxt + tmp;
-                            until SignStream.EOS();
-                            InputObj.Add('Signature', SignatureTxt);
-                            CurrPage.HtmlInput.SendInputDataAndLabelV2(InputObj, False, '', '', '', '');
-                        end
+                        FillAddIn();
                     end;
                 }
             }
         }
     }
+    trigger OnAfterGetCurrRecord()
+    begin
+        Rec.CalcFields(Rec.Signature);
+        FillAddIn();
+    end;
+
+    local procedure FillAddIn()
+    var
+        InputObj: JsonObject;
+        SignStream: InStream;
+        SignatureTxt: Text;
+        tmp: Text;
+    begin
+        if (Rec.Signature.HasValue()) then begin
+            Rec.CalcFields(Rec.Signature);
+            Rec.Signature.CreateInStream(SignStream);
+            repeat
+                SignStream.ReadText(tmp);
+                SignatureTxt := SignatureTxt + tmp;
+            until SignStream.EOS();
+            InputObj.Add('Signature', SignatureTxt);
+            CurrPage.HtmlInput.SendInputDataAndLabelV2(InputObj, False, '', '', '', '');
+        end
+    end;
 }

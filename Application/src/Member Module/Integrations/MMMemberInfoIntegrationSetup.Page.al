@@ -37,6 +37,15 @@ page 6184877 "NPR MM Member Info. Int. Setup"
                         ToolTip = 'Specifies the integration used for the OnAssistEdit functionality of the Phone No. field.';
                     }
                 }
+                group("Return Request Info")
+                {
+                    Caption = 'Return Request Info';
+                    field("Request Return Info"; Rec."Request Return Info")
+                    {
+                        ApplicationArea = NPRRetail;
+                        Tooltip = 'Specifies the integration used for collection return information.';
+                    }
+                }
             }
             group(Setup)
             {
@@ -46,6 +55,23 @@ page 6184877 "NPR MM Member Info. Int. Setup"
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Tooltip = 'Specifies the implicit prefix for integrations using a phone number to send the request.';
                 }
+            }
+        }
+    }
+    actions
+    {
+        area(Processing)
+        {
+            action("Return Information Collection Setup")
+            {
+                Caption = 'Return Information Collection Setup';
+                RunObject = Page "NPR Return Info Collect Setup";
+                ToolTip = 'Opens setup for collecting return information.';
+                ApplicationArea = NPRRetail;
+                Image = Setup;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
             }
         }
     }

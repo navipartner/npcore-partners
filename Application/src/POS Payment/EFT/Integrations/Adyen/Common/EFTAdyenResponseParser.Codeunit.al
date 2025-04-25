@@ -477,7 +477,7 @@
             ParsePaymentInstrumentData(JToken.AsObject(), EFTTransactionRequest);
     end;
 
-    local procedure ParseInputResponse(JObject: JsonObject; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
+    internal procedure ParseInputResponse(JObject: JsonObject; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         JToken: JsonToken;
     begin
@@ -643,7 +643,7 @@
         end;
     end;
 
-    local procedure ParseAdditionalDataString(DataString: Text; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
+    internal procedure ParseAdditionalDataString(DataString: Text; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
     var
         NameValueCollection: Dictionary of [Text, Text];
 #IF BC17
@@ -722,7 +722,7 @@
         end;
     end;
 
-    local procedure TrySelectToken(JObject: JsonObject; Path: Text; var JToken: JsonToken; WithError: Boolean): Boolean
+    internal procedure TrySelectToken(JObject: JsonObject; Path: Text; var JToken: JsonToken; WithError: Boolean): Boolean
     begin
         if WithError then begin
             JObject.SelectToken(Path, JToken);
@@ -733,7 +733,7 @@
         exit(true);
     end;
 
-    local procedure TrySelectValue(JObject: JsonObject; Path: Text; var JValue: JsonValue; WithError: Boolean): Boolean
+    internal procedure TrySelectValue(JObject: JsonObject; Path: Text; var JValue: JsonValue; WithError: Boolean): Boolean
     var
         JToken: JsonToken;
     begin

@@ -24,6 +24,7 @@ const main = async ({ workflow, popup, parameters, context, captions }) => {
     amountPrompt,
     forceAmount,
     mmPaymentMethodAssigned,
+    collectReturnInformation,
   } = await workflow.respond("preparePaymentWorkflow");
 
   if (mmPaymentMethodAssigned) {
@@ -39,6 +40,18 @@ const main = async ({ workflow, popup, parameters, context, captions }) => {
     });
     if (suggestedAmount === null) return {}; // user cancelled dialog
     if (suggestedAmount === 0 && remainingAmount > 0) return {}; // user paid 0 with remaining amount
+  }
+  if (collectReturnInformation) {
+    if (remainingAmount === suggestedAmount) {
+      const dataCollectionResponse = await workflow.run("DATA_COLLECTION", {
+        parameters: {
+          requestCollectInformation: "ReturnInformation",
+        },
+      });
+      if (!dataCollectionResponse.success) {
+        return {};
+      }
+    }
   }
 
   if (suggestedAmount === 0 && remainingAmount === 0 && !forceAmount) {

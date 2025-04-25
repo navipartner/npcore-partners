@@ -31,6 +31,21 @@
             Caption = 'Environment';
             DataClassification = CustomerContent;
         }
+        field(6; "EFT Transaction No."; Integer)
+        {
+            Caption = 'EFT Transaction No.';
+            DataClassification = CustomerContent;
+        }
+        field(7; "Add. Info. Request"; Enum "NPR MM Add. Info. Request")
+        {
+            Caption = 'Add. Info. Request';
+            DataClassification = CustomerContent;
+        }
+        field(8; "Data Collection Step"; Enum "NPR Data Collect Step")
+        {
+            Caption = 'Data Collection Step';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

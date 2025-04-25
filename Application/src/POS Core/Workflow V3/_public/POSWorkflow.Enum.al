@@ -1223,4 +1223,9 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'TM_REBOOK_FOR_TODAY', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POSAction TMRebookForToday";
     }
+    value(6248359; DATA_COLLECTION)
+    {
+        Caption = 'DATA_COLLECTION', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action Data Collection";
+    }
 }

@@ -815,6 +815,42 @@ codeunit 6184796 "NPR Adyen Management"
         if not HttpResponseMessage.IsSuccessStatusCode() then
             Error(ManagementKeyIsNotValidLbl);
     end;
+
+    [NonDebuggable]
+    internal procedure TestReturnInfoCollectSetupApiKey(EnvironmentType: Enum "NPR Adyen Environment Type")
+    var
+        ReturnInfoCollectSetup: Record "NPR Return Info Collect Setup";
+        RequestURL: Text;
+        ResponseTxt: Text;
+        HttpClient: HttpClient;
+        HttpContent: HttpContent;
+        HttpHeaders: HttpHeaders;
+        HttpRequestMessage: HttpRequestMessage;
+        HttpResponseMessage: HttpResponseMessage;
+        GetCompaniesEndpoint: Label '/companies', Locked = true;
+        ResponseErrorLbl: Label 'Received a bad response from the API.\Status Code: %1 - %2. Body: %3', Comment = '%1 = status code, %2 = reason phrase, %3 = body';
+    begin
+        if not ReturnInfoCollectSetup.Get() then
+            exit;
+
+        RequestURL := GetManagementAPIURL(EnvironmentType) + GetCompaniesEndpoint;
+
+        Clear(HttpRequestMessage);
+        HttpContent.GetHeaders(HttpHeaders);
+        HttpHeaders.Clear();
+        HttpHeaders.Add('Content-Type', 'text/json; charset="utf-8"');
+        HttpHeaders.Add('x-api-key', ReturnInfoCollectSetup.GetApiKey());
+
+        HttpRequestMessage.Content := HttpContent;
+        HttpRequestMessage.SetRequestUri(RequestUrl);
+        HttpRequestMessage.Method := 'GET';
+
+        HttpClient.Send(HttpRequestMessage, HttpResponseMessage);
+        HttpResponseMessage.Content.ReadAs(ResponseTxt);
+
+        if not HttpResponseMessage.IsSuccessStatusCode() then
+            Error(ResponseErrorLbl, HttpResponseMessage.HttpStatusCode(), HttpResponseMessage.ReasonPhrase(), ResponseTxt);
+    end;
     #endregion
 
     #region Reconciliation

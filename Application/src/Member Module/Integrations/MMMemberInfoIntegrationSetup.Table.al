@@ -34,6 +34,11 @@ table 6150971 "NPR MM Member Info. Int. Setup"
                     Error(MissingOperatorPrefixErr);
             end;
         }
+        field(5; "Request Return Info"; Enum "NPR Return Info. Request")
+        {
+            Caption = 'Request Return Info';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

@@ -1,4 +1,4 @@
-﻿page 6150617 "NPR POS Unit Card"
+page 6150617 "NPR POS Unit Card"
 {
     UsageCategory = None;
     Caption = 'POS Unit Card';

@@ -34,7 +34,10 @@ table 6059810 "NPR POS Costumer Input"
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Entry";
         }
-
+        field(6; "E-Mail"; Text[50])
+        {
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {

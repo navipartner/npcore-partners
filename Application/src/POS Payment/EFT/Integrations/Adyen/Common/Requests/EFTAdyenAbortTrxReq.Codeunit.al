@@ -2,7 +2,7 @@ codeunit 6184595 "NPR EFT Adyen AbortTrx Req"
 {
     Access = Internal;
 
-    procedure GetRequestJson(EFTTransactionRequest: Record "NPR EFT Transaction Request"; EFTSetup: Record "NPR EFT Setup"): Text
+    procedure GetRequestJson(EFTTransactionRequest: Record "NPR EFT Transaction Request"): Text
     var
         Json: Codeunit "Json Text Reader/Writer";
     begin
@@ -42,7 +42,10 @@ codeunit 6184595 "NPR EFT Adyen AbortTrx Req"
                 exit('Payment');
             else
                 case ProcessedEFTTransactionRequest."Auxiliary Operation ID" of
-                    "NPR EFT Adyen Aux Operation"::SUBSCRIPTION_CONFIRM.AsInteger():
+                    "NPR EFT Adyen Aux Operation"::SUBSCRIPTION_CONFIRM.AsInteger(),
+                    "NPR EFT Adyen Aux Operation"::ACQUIRE_SIGNATURE.AsInteger(),
+                    "NPR EFT Adyen Aux Operation"::ACQUIRE_PHONE_NO.AsInteger(),
+                    "NPR EFT Adyen Aux Operation"::ACQUIRE_EMAIL.AsInteger():
                         exit('Input');
                     else
                         exit('CardAcquisition');
