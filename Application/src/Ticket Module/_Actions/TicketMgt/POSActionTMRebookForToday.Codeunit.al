@@ -34,6 +34,8 @@ codeunit 6248358 "NPR POSAction TMRebookForToday" implements "NPR IPOS Workflow"
     local procedure DoRebookTicket(Context: Codeunit "NPR POS JSON Helper")
     var
         WalletAssets: Query "NPR AttractionWalletAssets";
+        Wallet: Query "NPR FindAttractionWallets";
+        WalletFacade: Codeunit "NPR AttractionWalletFacade";
         ReferenceNumber: Text[50];
         AdditionalItemNo: Code[20];
         IsWallet: Boolean;
@@ -46,13 +48,15 @@ codeunit 6248358 "NPR POSAction TMRebookForToday" implements "NPR IPOS Workflow"
         if (ReferenceNumber = '') then
             exit;
 
-        WalletAssets.SetFilter(WalletAssets.WalletReferenceNumber, '=%1', ReferenceNumber);
-        if (WalletAssets.Open()) then
+        WalletFacade.FindWalletByReferenceNumber(ReferenceNumber, Wallet);
+        if (Wallet.Read()) then begin
+            WalletFacade.GetWalletAssets(Wallet.WalletReferenceNumber, WalletAssets);
             while (WalletAssets.Read()) do begin
                 IsWallet := true;
                 if (WalletAssets.AssetType = WalletAssets.AssetType::TICKET) then
                     RevokeTicketCount += HandleTicketOrReservation(WalletAssets.AssetReferenceNumber, AdditionalItemNo, ReferenceNumber, WalletAssets.WalletEntryNo);
             end;
+        end;
 
         if (not IsWallet) then
             RevokeTicketCount := HandleTicketOrReservation(ReferenceNumber, AdditionalItemNo, '', 0);
