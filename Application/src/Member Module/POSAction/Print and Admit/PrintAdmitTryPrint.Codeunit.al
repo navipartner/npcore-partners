@@ -49,12 +49,13 @@ codeunit 6248398 "NPR PrintAdmitTryPrint"
 
     local procedure PrintWallet(PrintandAdmitBuffer: Record "NPR Print and Admit Buffer")
     var
-        Ticket: Record "NPR TM Ticket";
-        TMTicketManagement: Codeunit "NPR TM Ticket Management";
+        AttractionWallet: Record "NPR AttractionWallet";
+        AttractionWalletPrint: Codeunit "NPR AttractionWallet";
     begin
         if not (PrintandAdmitBuffer.Print and (PrintandAdmitBuffer.Type = PrintandAdmitBuffer.Type::ATTRACTION_WALLET)) then
             exit;
-        if Ticket.GetBySystemId(PrintandAdmitBuffer."System Id") then
-            TMTicketManagement.DoTicketPrint(Ticket);
+
+        if AttractionWallet.GetBySystemId(PrintandAdmitBuffer."System Id") then
+            AttractionWalletPrint.PrintWallet(AttractionWallet.EntryNo, Enum::"NPR WalletPrintType"::WALLET)
     end;
 }

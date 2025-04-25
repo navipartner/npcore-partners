@@ -229,6 +229,7 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
                     Ticket.GetBySystemId(WalletAssetLine.LineTypeSystemId);
                     PrintandAdmitBuffer."Visual Id" := Ticket."External Ticket No.";
                     SetPrintAdmit(Ticket."Item No.", PrintandAdmitBuffer.Print, PrintandAdmitBuffer.Admit);
+                    PrintandAdmitBuffer.Print := false;
                     PrintandAdmitBuffer.Insert();
                 end;
         until (WalletAssetLine.Next() = 0);
