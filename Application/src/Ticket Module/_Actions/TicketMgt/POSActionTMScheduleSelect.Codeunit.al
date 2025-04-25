@@ -166,9 +166,16 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
         RequiredAdmissionHasTimeSlots, OnlyRequiredAdmissions : Boolean;
         Item: Record "Item";
         HaveSaleTicketSalesLine: Boolean;
+        FunctionId: Integer;
     begin
 
         Token := CopyStr(Context.GetString('TicketToken'), 1, MaxStrLen(Token));
+
+        // 3 Edit Schedule (forced)
+        FunctionId := -1;
+        if (Context.HasProperty('FunctionId')) then
+            FunctionId := Context.GetInteger('FunctionId');
+
         HaveSaleTicketSalesLine := true;
         SaleLine.GetCurrentSaleLine(SaleLinePOS);
 
@@ -202,7 +209,7 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
         TicketReservationRequest.SetFilter("Admission Inclusion", '<>%1', TicketReservationRequest."Admission Inclusion"::REQUIRED);
         OnlyRequiredAdmissions := TicketReservationRequest.IsEmpty();
 
-        if (not (RequiredAdmissionHasTimeSlots and OnlyRequiredAdmissions)) then begin
+        if ((not (RequiredAdmissionHasTimeSlots and OnlyRequiredAdmissions)) or (FunctionId = 3)) then begin
             Response.Add('CancelScheduleSelection', false);
             Response.Add('EditSchedule', true);
             exit(Response);
