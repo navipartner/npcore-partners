@@ -228,7 +228,10 @@ codeunit 6248358 "NPR POSAction TMRebookForToday" implements "NPR IPOS Workflow"
         SaleLinePos: Record "NPR POS Sale Line";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        TicketManager: Codeunit "NPR TM Ticket Management";
+        EntryNo: Integer;
         DateTimeLbl: Label '%1 - %2', Locked = true;
+        ScheduleContext: Option Admit,Sale;
     begin
         if not SaleLinePos.GetBySystemId(RevokeSalesLineId) then
             exit;
@@ -240,16 +243,32 @@ codeunit 6248358 "NPR POSAction TMRebookForToday" implements "NPR IPOS Workflow"
             exit;
 
         repeat
-            AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', TicketReservationRequest."Admission Code");
-            AdmissionScheduleEntry.SetFilter("Admission Start Date", '=%1', Today());
-            AdmissionScheduleEntry.SetFilter("Admission Start Time", '<=%1', Time());
-            AdmissionScheduleEntry.SetFilter("Admission End Time", '>=%1', Time());
-            AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
-            AdmissionScheduleEntry.SetFilter("Admission Is", '=%1', AdmissionScheduleEntry."Admission Is"::OPEN);
-
             TicketReservationRequest."External Adm. Sch. Entry No." := 0;
             TicketReservationRequest."Scheduled Time Description" := '';
-            if (AdmissionScheduleEntry.FindFirst()) then begin
+
+            // Schedule Selection rule Today and Next Available
+            EntryNo := TicketManager.GetCurrentScheduleEntry(TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest."Admission Code", false, ScheduleContext::Sale);
+
+            // Try harder - manually set the entry no. to the first entry for today
+            if (EntryNo = 0) then begin
+                AdmissionScheduleEntry.Reset();
+                AdmissionScheduleEntry.SetCurrentKey("Admission Start Date", "Admission Start Time");
+                AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', TicketReservationRequest."Admission Code");
+                AdmissionScheduleEntry.SetFilter("Admission Start Date", '=%1', Today());
+                AdmissionScheduleEntry.SetFilter("Admission Is", '=%1', AdmissionScheduleEntry."Admission Is"::OPEN);
+                AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
+                if (AdmissionScheduleEntry.FindFirst()) then begin
+                    EntryNo := AdmissionScheduleEntry."Entry No.";
+
+                    // Narrow down to the time of day
+                    AdmissionScheduleEntry.SetFilter("Admission Start Time", '<=%1', Time());
+                    AdmissionScheduleEntry.SetFilter("Admission End Time", '>=%1', Time());
+                    if (AdmissionScheduleEntry.FindFirst()) then
+                        EntryNo := AdmissionScheduleEntry."Entry No.";
+                end;
+            end;
+
+            if (AdmissionScheduleEntry.Get(EntryNo)) then begin
                 TicketReservationRequest."External Adm. Sch. Entry No." := AdmissionScheduleEntry."External Schedule Entry No.";
                 TicketReservationRequest."Scheduled Time Description" := StrSubstNo(DateTimeLbl, AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
             end;
