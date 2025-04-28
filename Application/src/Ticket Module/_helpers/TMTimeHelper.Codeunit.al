@@ -129,7 +129,8 @@ codeunit 6184773 "NPR TM TimeHelper"
 
         // When BC type casts from .net datetime to datetime in web client, it magically applies the user timezone offset and daylight savings. 
         // So we are not getting UTC time unless we remove those offsets.
-        if (CurrentClientType = ClientType::Web) then
+        if (CurrentClientType = ClientType::Web) or
+           (CurrentClientType = ClientType::Phone) then
             UtcDateTime := UtcDateTime - GetUserTimeZoneOffset() - GetDstOffset(TimeZoneNo, DT2Date(UtcDateTime), IsDaylightSavingsTime);
 
     end;
