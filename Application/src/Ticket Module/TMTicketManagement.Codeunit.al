@@ -2609,7 +2609,17 @@
         exit(CloseTicketAccessEntry(ClosedByAccessEntry, DetailedTicketAccessEntry.Type::ADMITTED));
     end;
 
-    local procedure CloseTicketAccessEntry(var ClosedByAccessEntry: Record "NPR TM Det. Ticket AccessEntry"; ClosingEntryType: Option) Closed: Boolean
+    local procedure CloseTicketAccessEntry(var ClosedByAccessEntry: Record "NPR TM Det. Ticket AccessEntry"; ClosingEntryType: Option): Boolean
+    begin
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        exit(CloseTicketAccessEntryV2(ClosedByAccessEntry, ClosingEntryType));
+#else
+        exit(CloseTicketAccessEntryV1(ClosedByAccessEntry, ClosingEntryType));
+#endif
+    end;
+
+#if (BC17 or BC18 or BC19 or BC20 or BC21)
+    local procedure CloseTicketAccessEntryV1(var ClosedByAccessEntry: Record "NPR TM Det. Ticket AccessEntry"; ClosingEntryType: Option) Closed: Boolean
     var
         DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         EntryNo: Integer;
@@ -2640,6 +2650,47 @@
 
         exit(Closed);
     end;
+#endif
+
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+    local procedure CloseTicketAccessEntryV2(var ClosedByAccessEntry: Record "NPR TM Det. Ticket AccessEntry"; ClosingEntryType: Option) Closed: Boolean
+    var
+        DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        DetailedTicketAccessEntryUpdate: Record "NPR TM Det. Ticket AccessEntry";
+        EntryNo: Integer;
+    begin
+
+        DetailedTicketAccessEntry.SetCurrentKey("Ticket Access Entry No.", Type, Open, "Posting Date");
+        DetailedTicketAccessEntry.ReadIsolation := IsolationLevel::ReadUncommitted;
+        DetailedTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', ClosedByAccessEntry."Ticket Access Entry No.");
+        DetailedTicketAccessEntry.SetFilter(Type, '=%1', ClosingEntryType);
+        DetailedTicketAccessEntry.SetFilter(Open, '=%1', true);
+        if (DetailedTicketAccessEntry.FindLast()) then begin
+            EntryNo := DetailedTicketAccessEntry."Entry No.";
+
+            // Prefer an entry without a closed link and that has same quantity
+            DetailedTicketAccessEntry.SetFilter("Closed By Entry No.", '=%1', 0);
+            DetailedTicketAccessEntry.SetFilter(Quantity, '=%1', ClosedByAccessEntry.Quantity);
+            if (DetailedTicketAccessEntry.FindFirst()) then
+                EntryNo := DetailedTicketAccessEntry."Entry No.";
+
+            DetailedTicketAccessEntryUpdate.ReadIsolation := IsolationLevel::UpdLock;
+            DetailedTicketAccessEntryUpdate.Get(EntryNo);
+            DetailedTicketAccessEntryUpdate."Closed By Entry No." := ClosedByAccessEntry."Entry No.";
+            DetailedTicketAccessEntryUpdate.Open := false;
+            DetailedTicketAccessEntryUpdate.Modify();
+            Closed := true;
+        end;
+
+        if (ClosedByAccessEntry.Type = ClosedByAccessEntry.Type::DEPARTED) then
+            ClosedByAccessEntry."External Adm. Sch. Entry No." := DetailedTicketAccessEntry."External Adm. Sch. Entry No.";
+
+        if (ClosedByAccessEntry.Quantity < 0) then
+            ClosedByAccessEntry."External Adm. Sch. Entry No." := DetailedTicketAccessEntry."External Adm. Sch. Entry No.";
+
+        exit(Closed);
+    end;
+#endif
 
     local procedure GetReservationEntry(TicketAccessEntryNo: Integer; var DetailedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry"): Boolean
     begin
@@ -2705,6 +2756,9 @@
             Admission.Get(AdmissionCode);
 
             AdmissionSchEntry.Reset();
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+            AdmissionSchEntry.ReadIsolation := IsolationLevel::ReadUncommitted;
+#endif
             AdmissionSchEntry.SetCurrentKey("Admission Start Date", "Admission Start Time");
             AdmissionSchEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
             AdmissionSchEntry.SetFilter("Admission Start Date", '=%1', AdmissionDate);
@@ -2716,15 +2770,14 @@
                 if (AdmissionSchManagement.IsUpdateScheduleEntryRequired(AdmissionCode, Today())) then
                     AdmissionSchManagement.CreateAdmissionSchedule(AdmissionCode, false, AdmissionDate, 'NPRTMTicketManagement.GetAdmScheduleEntry.1()');
 
-                // still empty, try harder
-                if (AdmissionSchEntry.IsEmpty()) then
+                // still empty, try harder, FindFirst() uses index hinting
+                if (not AdmissionSchEntry.FindFirst()) then
                     AdmissionSchManagement.CreateAdmissionSchedule(AdmissionCode, false, AdmissionDate, 'NPRTMTicketManagement.GetAdmScheduleEntry.2()');
             end;
 
-            if (AdmissionSchEntry.IsEmpty()) then
+            if (not AdmissionSchEntry.FindSet()) then
                 exit(false);
 
-            AdmissionSchEntry.FindSet();
             ReferenceTime := CreateDateTime(AdmissionDate, AdmissionTime);
             repeat
 
@@ -3096,6 +3149,9 @@
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         SeatingReservationEntry: Record "NPR TM Seating Reserv. Entry";
     begin
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        AdmissionScheduleEntry.ReadIsolation := IsolationLevel::ReadUncommitted;
+#endif
         AdmissionScheduleEntry.Get(AdmissionScheduleEntryNo);
 
         case CapacityControl of
@@ -3104,24 +3160,18 @@
 
             Admission."Capacity Control"::SALES:
                 begin
-                    // Performance / Deadlock. SUM (x) flowfield issues SQL with statement for repeatable read "with(UPDLOCK)"
-                    // TODO
                     AdmissionScheduleEntry.CalcFields("Initial Entry (All)");
                     AdmittedCount := AdmissionScheduleEntry."Initial Entry (All)";
                 end;
 
             Admission."Capacity Control"::ADMITTED:
                 begin
-                    // Performance / Deadlock. SUM (x) flowfield issues SQL with statement for repeatable read "with(UPDLOCK)"
-                    // TODO
                     AdmissionScheduleEntry.CalcFields("Open Admitted");
                     AdmittedCount := AdmissionScheduleEntry."Open Admitted";
                 end;
 
             Admission."Capacity Control"::FULL:
                 begin
-                    // Performance / Deadlock. SUM (x) flowfield issues SQL with statement for repeatable read "with(UPDLOCK)"
-                    // TODO
                     AdmissionScheduleEntry.CalcFields("Open Reservations", "Open Admitted");
                     AdmittedCount := AdmissionScheduleEntry."Open Admitted" + AdmissionScheduleEntry."Open Reservations";
                 end;
@@ -3355,6 +3405,10 @@
             exit;
 
         Schedule.Get(AdmissionScheduleEntry."Schedule Code");
+
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        AdmissionScheduleEntry.ReadIsolation := IsolationLevel::ReadUncommitted;
+#endif
         AdmissionSchedule.Get(AdmissionScheduleEntry."Admission Code", AdmissionScheduleEntry."Schedule Code");
 
         GetTicketCapacity(Ticket."Item No.", Ticket."Variant Code", Admission."Admission Code", Schedule."Schedule Code", AdmissionScheduleEntry."Entry No.", MaxCapacity, CapacityControl);
@@ -3367,8 +3421,6 @@
 
             Admission."Capacity Control"::SALES:
                 begin
-                    // Performance / Deadlock. SUM (x) flowfield issues SQL with statement for repeatable read "with(UPDLOCK)"
-                    // TODO
                     AdmissionScheduleEntry.CalcFields("Open Reservations (All)");
                     AdmittedCount := AdmissionScheduleEntry."Open Reservations (All)";
                 end;
@@ -3376,8 +3428,6 @@
             Admission."Capacity Control"::ADMITTED, // Admitted and Full mode are the same when it comes to reservations
             Admission."Capacity Control"::FULL:
                 begin
-                    // Performance / Deadlock. SUM (x) flowfield issues SQL with statement for repeatable read "with(UPDLOCK)"
-                    // TODO
                     AdmissionScheduleEntry.CalcFields("Open Reservations", "Open Admitted");
                     AdmittedCount := AdmissionScheduleEntry."Open Admitted" + AdmissionScheduleEntry."Open Reservations";
                 end;
@@ -3877,9 +3927,9 @@
         DocumentEntry.Init();
         DocumentEntry."Entry No." := DocumentEntry."Entry No." + 1;
         DocumentEntry."Table ID" := DocTableID;
-#if BC17         
+#if BC17
         DocumentEntry."Document Type" := DocType;
-#else        
+#else
         DocumentEntry."Document Type" := "Document Entry Document Type".FromInteger(DocType);
 #endif
         DocumentEntry."Document No." := DocNoFilter;

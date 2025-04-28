@@ -100,7 +100,6 @@
         }
         key(Key2; "External Adm. Sch. Entry No.", Type, Open, "Posting Date")
         {
-            SumIndexFields = Quantity;
         }
         key(Key3; "Ticket No.", Type, Open, "Posting Date")
         {

@@ -252,6 +252,9 @@
         }
         key(Key2; "External Schedule Entry No.")
         {
+#if not (BC17 or BC18)
+            IncludedFields = "Admission Code", "Schedule Code", "Admission Start Date", "Admission Start Time", Cancelled;
+#endif
         }
         key(Key3; "Admission Code", "Schedule Code", "Admission Start Date")
         {

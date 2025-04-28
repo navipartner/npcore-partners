@@ -80,8 +80,11 @@ types:
     enum:
       - registered
       - confirmed
+      - alreadyConfirmed
       - canceled
       - expired
+      - reserved
+      - optional
 
   ReservationStatus:
     type: ReservationStatusEnum

@@ -74,7 +74,7 @@ codeunit 6185046 "NPR TicketingApiTranslations"
         end;
     end;
 
-    internal procedure EncodeRequestStatus(RequestStatus: Option): Text
+    internal procedure EncodeRequestStatus(RequestStatus: Option; DuplicateMessage: Boolean): Text
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
     begin
@@ -84,7 +84,10 @@ codeunit 6185046 "NPR TicketingApiTranslations"
             TicketReservationRequest."Request Status"::REGISTERED:
                 exit('registered');
             TicketReservationRequest."Request Status"::CONFIRMED:
-                exit('confirmed');
+                if (DuplicateMessage) then
+                    exit('alreadyConfirmed')
+                else
+                    exit('confirmed');
             TicketReservationRequest."Request Status"::EXPIRED:
                 exit('expired');
             TicketReservationRequest."Request Status"::CANCELED:

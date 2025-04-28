@@ -35,4 +35,14 @@ table 6151154 "NPR TM TicketRequestMutex"
         exit(Mutex.Insert());
     end;
 
+    internal procedure Release(Token: Text[100]): Boolean
+    var
+        Mutex: Record "NPR TM TicketRequestMutex";
+    begin
+        if (not Mutex.Get(Token)) then
+            exit(false);
+
+        exit(Mutex.Delete());
+    end;
+
 }

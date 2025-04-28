@@ -92,6 +92,7 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
         TicketingApiHandler: Codeunit "NPR TicketingApiHandler";
         StartTime: Time;
         ResponseMessage: Text;
+        CallStack: Text;
         ApiError: Enum "NPR API Error Code";
     begin
         StartTime := Time();
@@ -100,16 +101,17 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
         TicketingApiHandler.SetRequest(ApiFunction, Request);
         if (TicketingApiHandler.Run()) then begin
             Response := TicketingApiHandler.GetResponse();
-            LogMessage(ApiFunction, (Time() - StartTime), Response.GetStatusCode(), Response);
+            LogMessage(ApiFunction, (Time() - StartTime), Response.GetStatusCode(), Response, '');
             exit(Response);
         end;
 
         // When the code throws an error, the response is not set by the handler
         ResponseMessage := GetLastErrorText();
+        CallStack := GetLastErrorCallStack();
         ApiError := ErrorToEnum();
 
         Response.CreateErrorResponse(ApiError, ResponseMessage);
-        LogMessage(ApiFunction, (Time() - StartTime), Response.GetStatusCode(), Response);
+        LogMessage(ApiFunction, (Time() - StartTime), Response.GetStatusCode(), Response, CallStack);
         exit(Response);
     end;
 
@@ -118,7 +120,7 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
         exit(Enum::"NPR API Error Code"::generic_error);
     end;
 
-    local procedure LogMessage(Function: Enum "NPR TicketingApiFunctions"; DurationMs: Decimal; HttpStatusCode: Integer; Response: Codeunit "NPR API Response")
+    local procedure LogMessage(Function: Enum "NPR TicketingApiFunctions"; DurationMs: Decimal; HttpStatusCode: Integer; Response: Codeunit "NPR API Response"; CallStack: Text)
     var
         CustomDimensions: Dictionary of [Text, Text];
         ActiveSession: Record "Active Session";
@@ -139,6 +141,7 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
         CustomDimensions.Add('NPR_UserID', ActiveSession."User ID");
         CustomDimensions.Add('NPR_SessionId', Format(Database.SessionId(), 0, 9));
         CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
+        CustomDimensions.Add('NPR_CallStack', CallStack);
 
         if (HttpStatusCode in [200 .. 299]) then begin
             ResponseMessage := StrSubstNo('Success - HTTP %1', HttpStatusCode);

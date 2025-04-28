@@ -1032,18 +1032,24 @@
         TMTicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
     begin
         TicketReservationRequest.SetCurrentKey("Session Token ID");
+        TicketReservationRequest.SetLoadFields("Item No.", "Variant Code", "Quantity", "Ext. Line Reference No.", "External Member No.", "Receipt No.", "Line No.", "Ext. Line Reference No.");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
-        TicketReservationRequest.SetRange("Ext. Line Reference No.", Line);
+        TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', Line);
         if (TicketReservationRequest.FindFirst()) then begin
             TMTicketAdmissionBOM.SetFilter("Item No.", '=%1', TicketReservationRequest."Item No.");
             TMTicketAdmissionBOM.SetFilter("Variant Code", '=%1', TicketReservationRequest."Variant Code");
+            TMTicketAdmissionBOM.SetLoadFields("Admission Code");
             TMTicketAdmissionBOM.FindSet();
             repeat
+                TicketReservationRequest2.SetCurrentKey("Session Token ID", "Ext. Line Reference No.");
                 TicketReservationRequest2.SetFilter("Session Token ID", '=%1', Token);
-                TicketReservationRequest2.SetRange("Admission Code", TMTicketAdmissionBOM."Admission Code");
-                TicketReservationRequest2.SetRange("Ext. Line Reference No.", Line);
-                if TicketReservationRequest2.IsEmpty() then
-                    TMTicketRequestManager.POS_AppendToReservationRequest(Token, TicketReservationRequest."Receipt No.", TicketReservationRequest."Line No.", TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TMTicketAdmissionBOM."Admission Code", TicketReservationRequest.Quantity, 0, TicketReservationRequest."External Member No.", TicketReservationRequest."Ext. Line Reference No.");
+                TicketReservationRequest2.SetFilter("Admission Code", '=%1', TMTicketAdmissionBOM."Admission Code");
+                TicketReservationRequest2.SetFilter("Ext. Line Reference No.", '=%1', Line);
+                TicketReservationRequest2.SetFilter("Admission Inclusion", '=%1', TicketReservationRequest."Admission Inclusion"::REQUIRED);
+                TicketReservationRequest2.SetLoadFields("Entry No.");
+                if (not TicketReservationRequest2.FindFirst()) then
+                    TMTicketRequestManager.POS_AppendToReservationRequest(Token, TicketReservationRequest."Receipt No.", TicketReservationRequest."Line No.", TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code",
+                                                                          TMTicketAdmissionBOM."Admission Code", TicketReservationRequest.Quantity, 0, TicketReservationRequest."External Member No.", TicketReservationRequest."Ext. Line Reference No.");
             until (TMTicketAdmissionBOM.Next() = 0);
         end;
     end;

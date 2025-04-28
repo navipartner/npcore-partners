@@ -51,6 +51,7 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         TicketHolderName: Text[100];
         NotificationAddress: Text[80];
         PaymentReference: Code[20];
+        ErrorCode: Code[10];
         ErrorMessage: Text;
     begin
         ReservationId := CopyStr(Request.Paths().Get(3), 1, MaxStrLen(ReservationId));
@@ -65,10 +66,10 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         if (Body.Get('paymentReference', JValueToken)) then
             PaymentReference := CopyStr(JValueToken.AsValue().AsText(), 1, MaxStrLen(PaymentReference));
 
-        if (not ConfirmReservation(ReservationId, TicketHolderName, NotificationAddress, PaymentReference, ErrorMessage)) then
+        if (not ConfirmReservation(ReservationId, TicketHolderName, NotificationAddress, PaymentReference, ErrorCode, ErrorMessage)) then
             exit(Response.RespondBadRequest('Error confirming reservation: ' + ErrorMessage));
 
-        exit(GetReservation(ReservationId));
+        exit(GetReservation(ReservationId, ErrorCode = '-1206'));
     end;
 
     internal procedure GetReservationTickets(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
@@ -87,6 +88,11 @@ codeunit 6185083 "NPR TicketingReservationAgent"
     // ******************************
     // Internal functions
     internal procedure GetReservation(Token: Code[100]) Response: Codeunit "NPR API Response"
+    begin
+        exit(GetReservation(Token, false));
+    end;
+
+    local procedure GetReservation(Token: Code[100]; AlreadyConfirm: Boolean) Response: Codeunit "NPR API Response"
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         ResponseJson: Codeunit "NPR Json Builder";
@@ -99,7 +105,7 @@ codeunit 6185083 "NPR TicketingReservationAgent"
 
         ResponseJson.StartObject()
             .AddProperty('token', Token)
-            .AddProperty('reservationStatus', _Translation.EncodeRequestStatus(TicketReservationRequest."Request Status"))
+            .AddProperty('reservationStatus', _Translation.EncodeRequestStatus(TicketReservationRequest."Request Status", AlreadyConfirm))
             .AddArray(ReservationDTO(ResponseJson, 'reservations', Token))
             .AddObject(AddPropertyNotNull(ResponseJson, 'expiresAt', GetExpiryDateTimeValue(TicketReservationRequest)))
             .EndObject();
@@ -124,7 +130,7 @@ codeunit 6185083 "NPR TicketingReservationAgent"
 
         ResponseJson.StartObject()
             .AddProperty('token', Token)
-            .AddProperty('reservationStatus', _Translation.EncodeRequestStatus(TicketReservationRequest."Request Status"::CANCELED))
+            .AddProperty('reservationStatus', _Translation.EncodeRequestStatus(TicketReservationRequest."Request Status"::CANCELED, false))
             .EndObject();
 
         exit(Response.RespondOK(ResponseJson.Build()));
@@ -302,10 +308,13 @@ codeunit 6185083 "NPR TicketingReservationAgent"
 
         Ticket.Reset();
         TicketRequest.SetCurrentKey("Session Token ID");
+        TicketRequest.SetLoadFields("Admission Created", "External Adm. Sch. Entry No.", "Admission Code", "Scheduled Time Description");
         TicketRequest.SetFilter("Session Token ID", '=%1', Token);
         TicketRequest.FindSet();
         repeat
             if (TicketRequest."Admission Created") then begin
+                TicketResponse.SetCurrentKey("Session Token ID");
+                TicketResponse.SetLoadFields("Request Entry No.");
                 TicketResponse.SetFilter("Session Token ID", '=%1', Token);
                 if (TicketResponse.FindFirst()) then begin
                     Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketResponse."Request Entry No.");
@@ -313,6 +322,8 @@ codeunit 6185083 "NPR TicketingReservationAgent"
                         AccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
                         AccessEntry.SetFilter("Admission Code", '=%1', TicketRequest."Admission Code");
                         if (AccessEntry.FindFirst()) then begin
+                            DetailedEntry.SetCurrentKey("Ticket Access Entry No.");
+                            DetailedEntry.SetLoadFields("External Adm. Sch. Entry No.");
                             DetailedEntry.SetFilter("Ticket Access Entry No.", '=%1', AccessEntry."Entry No.");
                             DetailedEntry.SetFilter(Quantity, '>%1', 0);
                             DetailedEntry.SetFilter(Type, '=%1', DetailedEntry.Type::RESERVATION);
@@ -491,12 +502,12 @@ codeunit 6185083 "NPR TicketingReservationAgent"
 
 
 
-    local procedure ConfirmReservation(Token: Code[100]; TicketHolderName: Text[100]; NotificationAddress: Text[80]; PaymentReference: Code[20]; ErrorMessage: Text): Boolean
+    local procedure ConfirmReservation(Token: Code[100]; TicketHolderName: Text[100]; NotificationAddress: Text[80]; PaymentReference: Code[20]; var ErrorCode: Code[10]; var ErrorMessage: Text): Boolean
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
     begin
         TicketRequestManager.SetReservationRequestExtraInfo(Token, NotificationAddress, PaymentReference, TicketHolderName);
-        if (not (TicketRequestManager.ConfirmReservationRequest(Token, ErrorMessage))) then
+        if (not (TicketRequestManager.ConfirmReservationRequest(Token, 0, ErrorCode, ErrorMessage))) then
             exit(false);
 
         exit(true);

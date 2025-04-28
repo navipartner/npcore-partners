@@ -697,6 +697,8 @@ codeunit 6185080 "NPR TicketingTicketAgent"
     begin
         ResponseJson.StartObject(ObjectName);
 
+        ScheduleEntry.SetCurrentKey("External Schedule Entry No.");
+        ScheduleEntry.SetLoadFields("External Schedule Entry No.", "Schedule Code", "Admission Start Date", "Admission Start Time", "Admission End Date", "Admission End Time", "Event Arrival From Time", "Event Arrival Until Time");
         ScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', ExtScheduleEntryNo);
         ScheduleEntry.SetFilter(Cancelled, '=%1', false);
         if (ScheduleEntry.FindFirst()) then begin

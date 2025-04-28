@@ -113,24 +113,29 @@ EventDate: Date) ValidRequest: Boolean
         if (DeferRevenueRequest.Status <> DeferRevenueRequest.Status::REGISTERED) then
             exit;
 
+        TicketAccessEntry.SetLoadFields("Ticket No.", "Admission Code");
         if (not TicketAccessEntry.Get(DeferRevenueRequest.TicketAccessEntryNo)) then
             exit;
 
+        Ticket.SetLoadFields("No.", "Ticket Type Code", "Item No.", "Variant Code", "Ticket Reservation Entry No.", "Valid To Date");
         if (not Ticket.Get(TicketAccessEntry."Ticket No.")) then
             exit;
 
+        TicketType.SetLoadFields("Code", "Defer Revenue", "DeferRevenueProfileCode");
         if (not TicketType.Get(Ticket."Ticket Type Code")) then
             exit;
 
         if ((not TicketType."Defer Revenue") or (TicketType.DeferRevenueProfileCode = '')) then
             exit;
 
+        TicketBOM.SetLoadFields("Item No.", "Variant Code", "Admission Code", DeferRevenue);
         if (not TicketBOM.Get(Ticket."Item No.", Ticket."Variant Code", TicketAccessEntry."Admission Code")) then
             exit;
 
         if (not TicketBOM.DeferRevenue) then
             exit;
 
+        TicketRequest.SetLoadFields("Session Token ID", "Ext. Line Reference No.");
         if (not TicketRequest.Get(Ticket."Ticket Reservation Entry No.")) then
             exit;
 
@@ -145,10 +150,13 @@ EventDate: Date) ValidRequest: Boolean
         DeferRevenueRequest.DeferRevenueProfileCode := TicketType.DeferRevenueProfileCode;
         DeferRevenueRequest.SalesDate := SalesDate;
 
+        DetailedTicketEntry.SetCurrentKey("Ticket Access Entry No.", Type);
+        DetailedTicketEntry.SetLoadFields("External Adm. Sch. Entry No.", Quantity);
         DetailedTicketEntry.SetFilter("Ticket Access Entry No.", '=%1', DeferRevenueRequest.TicketAccessEntryNo);
         DetailedTicketEntry.SetFilter(Type, '=%1', DetailedTicketEntry.Type::RESERVATION);
         DetailedTicketEntry.SetFilter(Quantity, '>%1', 0);
         if (DetailedTicketEntry.FindFirst()) then begin
+            ScheduledEntry.SetCurrentKey("External Schedule Entry No.");
             ScheduledEntry.SetFilter("External Schedule Entry No.", '=%1', DetailedTicketEntry."External Adm. Sch. Entry No.");
             ScheduledEntry.SetFilter(Cancelled, '=%1', false);
             if (ScheduledEntry.FindFirst()) then

@@ -8,7 +8,7 @@
 
     var
         CHANGE_NOT_ALLOWED: Label 'Confirmed tickets can''t be changed.';
-        TOKEN_EXPIRED: Label 'The ticket-token %1 has expired. Use PreConfirm to re-reserve tickets.';
+
         EXTERNAL_ITEM_CHANGE: Label 'Changing the sales item when there is an active ticket reservation, is not supported. Please delete the POS line and start over.';
         REVOKE_UNUSED_ERROR: Label 'Ticket %1 has been used for entry to %2 at %3 and can''t be revoked due to the revoke policy set on item %4 for admission %5.';
         TICKET_CANCELLED: Label 'Ticket %1 has already been revoked at %2 and can''t be revoked again.';
@@ -24,13 +24,20 @@
         MAX_TO_REVOKE: Label 'Maximum number of tickets to revoke is %1.';
         MISSING_RECIPIENT: Label '%1 is blank.';
         NOT_ETICKET: Label '%1 has no %2 marked for %3 in %4.';
-        SALES_NOT_STARTED_1200: Label 'Ticket sales does not start until %1 for %2 using ticket item %3 %4.';
-        SALES_STOPPED_1201: Label 'Ticket sales ended at %1 for %2 using ticket item %3 %4.';
-        WAITINGLIST_REQUIRED_1202: Label 'Waitinglist reference code is required to book a ticket for this time schedule.';
-
         INVALID_TICKET_PIN: Label 'The combination of ticket number and pin code is not valid.';
         NOT_CONFIRMED: Label 'The ticket request must be confirmed prior to change.';
         BAD_REFERENCE: Label 'The template field reference %1 on line %2 is invalid.';
+
+        SALES_NOT_STARTED_1200: Label 'Ticket sales does not start until %1 for %2 using ticket item %3 %4.';
+        SALES_STOPPED_1201: Label 'Ticket sales ended at %1 for %2 using ticket item %3 %4.';
+        WAITINGLIST_REQUIRED_1202: Label 'Waiting list reference code is required to book a ticket for this time schedule.';
+        UNCONFIRMED_TOKEN_NOT_FOUND_1203: Label 'An unconfirmed ticket-token with value %1 was not found.';
+        TOKEN_EXPIRED_1204: Label 'The ticket-token %1 has expired. Use PreConfirm to re-reserve tickets.';
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        TOKEN_PROCESSING_CONFLICT_1205: Label 'Another request is currently processing this token. Please retry shortly.';
+        TOKEN_ALREADY_CONFIRMED_1206: Label 'The ticket-token %1 has already been confirmed and can not be confirmed again.';
+        _FeatureFlagManagement: Codeunit "NPR Feature Flags Management";
+#endif  
 
     procedure LockResources(Source: Text)
     var
@@ -82,6 +89,19 @@
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         exit(TicketReservationRequest.FindFirst());
+    end;
+
+
+    procedure DeleteReservationRequest(Token: Text[100]; RemoveRequest: Boolean)
+    begin
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        if (_FeatureFlagManagement.IsEnabled('enableTriStateLockingFeaturesInTicketModule')) then begin
+            DeleteReservationRequestV2(Token, RemoveRequest);
+            exit;
+        end;
+#endif
+        DeleteReservationRequestV1(Token, RemoveRequest);
+
     end;
 
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
@@ -222,8 +242,7 @@
 
     end;
 #endif
-
-    procedure DeleteReservationRequest(Token: Text[100]; RemoveRequest: Boolean)
+    local procedure DeleteReservationRequestV1(Token: Text[100]; RemoveRequest: Boolean)
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
@@ -401,6 +420,17 @@
     end;
 
     procedure IssueTicketFromReservation(TicketReservationRequest: Record "NPR TM Ticket Reservation Req.")
+    begin
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        if (_FeatureFlagManagement.IsEnabled('enableTriStateLockingFeaturesInTicketModule')) then begin
+            IssueTicketFromReservationV2(TicketReservationRequest);
+            exit;
+        end;
+#endif
+        IssueTicketFromReservationV1(TicketReservationRequest);
+    end;
+
+    local procedure IssueTicketFromReservationV1(TicketReservationRequest: Record "NPR TM Ticket Reservation Req.")
     var
         Ticket: Record "NPR TM Ticket";
         TicketManager: Codeunit "NPR TM Ticket Request Manager";
@@ -423,11 +453,36 @@
                 repeat
                     _IssueOneAdmission(TicketReservationRequest, Ticket, TicketReservationRequest."Admission Code", 1, true, AdmissionAllowOverAllocationConfirmed);
                 until (Ticket.Next() = 0);
+            end;
+        end;
+    end;
+
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+    local procedure IssueTicketFromReservationV2(TicketReservationRequest: Record "NPR TM Ticket Reservation Req.")
+    var
+        Ticket: Record "NPR TM Ticket";
+        AdmissionAllowOverAllocationConfirmed: Enum "NPR TM Ternary";
+    begin
+
+        if (TicketReservationRequest."Request Status" <> TicketReservationRequest."Request Status"::CONFIRMED) then begin
+            if (not TicketReservationRequest."Admission Created") then
+                _IssueNewTickets(TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest.Quantity, TicketReservationRequest."Entry No.");
+        end;
+
+        if ((TicketReservationRequest."Request Status" = TicketReservationRequest."Request Status"::CONFIRMED) and
+            (not TicketReservationRequest."Admission Created")) then begin
+
+            Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservationRequest."Entry No.");
+            AdmissionAllowOverAllocationConfirmed := AdmissionAllowOverAllocationConfirmed::TERNARY_FALSE;
+            if (Ticket.FindSet()) then begin
+                repeat
+                    _IssueOneAdmission(TicketReservationRequest, Ticket, TicketReservationRequest."Admission Code", 1, true, AdmissionAllowOverAllocationConfirmed);
+                until (Ticket.Next() = 0);
 
             end;
         end;
-
     end;
+#endif
 
     local procedure _IssueNewTickets(ItemNo: Code[20]; VariantCode: Code[10]; Quantity: Integer; RequestEntryNo: Integer)
     var
@@ -695,6 +750,7 @@
 
         // Lets see if (there is a specific request for the admission code,) then it might carry some additional scheduling information
         ReservationRequest.SetCurrentKey("Session Token ID");
+        ReservationRequest.SetLoadFields("Session Token ID", "Ext. Line Reference No.", "Item No.", "Variant Code", "Admission Code", "External Adm. Sch. Entry No.", "Scheduled Time Description", "Admission Created", "Request Status", "Admission Description", "Expires Date Time", "Waiting List Reference Code", "Admission Inclusion");
         ReservationRequest.SetFilter("Session Token ID", '=%1', SourceRequest."Session Token ID");
         ReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', SourceRequest."Ext. Line Reference No.");
         ReservationRequest.SetFilter("Item No.", '=%1', Ticket."Item No.");
@@ -706,6 +762,7 @@
 
             // Does the request carry schedule info for this admission?
             if (ReservationRequest."External Adm. Sch. Entry No." <> 0) then begin
+                AdmissionSchEntry.SetCurrentKey("External Schedule Entry No.");
                 AdmissionSchEntry.SetFilter("External Schedule Entry No.", '=%1', ReservationRequest."External Adm. Sch. Entry No.");
                 AdmissionSchEntry.SetFilter(Cancelled, '=%1', false);
                 if (AdmissionSchEntry.FindFirst()) then begin
@@ -730,6 +787,7 @@
 
             // Does the source requests schedule info apply to this admission?
             if (SourceRequest."External Adm. Sch. Entry No." <> 0) then begin
+                AdmissionSchEntry.SetCurrentKey("External Schedule Entry No.");
                 AdmissionSchEntry.SetFilter("External Schedule Entry No.", '=%1', SourceRequest."External Adm. Sch. Entry No.");
                 AdmissionSchEntry.SetFilter(Cancelled, '=%1', false);
                 if (not AdmissionSchEntry.FindFirst()) then
@@ -767,7 +825,7 @@
             exit; // Normal
 
         if (WaitingListReferenceCode = '') then
-            Error('[%1] - %2', -1202, WAITINGLIST_REQUIRED_1202);
+            RaiseError(WAITINGLIST_REQUIRED_1202, '-1202');
 
         if (not TicketWaitingListMgr.GetWaitingListAdmSchEntry(WaitingListReferenceCode, CreateDateTime(Today, Time), true, AdmissionSchEntryWaitingList, TicketWaitingList, ResponseMessage)) then
             Error(ResponseMessage);
@@ -780,16 +838,16 @@
         if ((TicketBom.Default) and (Quantity > 0)) then begin
 
             if ((TicketBom."Sales From Date" <> 0D) and (ReferenceDate < TicketBom."Sales From Date")) then
-                Error(SALES_NOT_STARTED_1200, TicketBom."Sales From Date", TicketBom."Admission Code", TicketBom."Item No.", TicketBom."Variant Code");
+                RaiseError(StrSubstNo(SALES_NOT_STARTED_1200, TicketBom."Sales From Date", TicketBom."Admission Code", TicketBom."Item No.", TicketBom."Variant Code"), '-1200');
 
             if ((TicketBom."Sales Until Date" <> 0D) and (ReferenceDate > TicketBom."Sales Until Date")) then
-                Error(SALES_STOPPED_1201, TicketBom."Sales Until Date", TicketBom."Admission Code", TicketBom."Item No.", TicketBom."Variant Code");
+                RaiseError(StrSubstNo(SALES_STOPPED_1201, TicketBom."Sales Until Date", TicketBom."Admission Code", TicketBom."Item No.", TicketBom."Variant Code"), '-1201');
 
         end;
 
     end;
 
-    procedure FinalizePayment(Token: Text[100]; TokenLineNumber: Integer)
+    local procedure FinalizePayment(Token: Text[100]; TokenLineNumber: Integer)
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
@@ -839,16 +897,26 @@
     end;
 
     procedure ConfirmReservationRequest(Token: Text[100]; var ResponseMessage: Text) ReservationConfirmed: Boolean
+    var
+        ResponseCode: Code[10];
     begin
-        exit(ConfirmReservationRequest(Token, 0, ResponseMessage));
+        exit(ConfirmReservationRequest(Token, 0, ResponseCode, ResponseMessage));
+    end;
+
+    internal procedure ConfirmReservationRequest(Token: Text[100]; TokenLineNumber: Integer; var ResponseCode: Code[10]; var ResponseMessage: Text) ReservationConfirmed: Boolean
+    begin
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        if (_FeatureFlagManagement.IsEnabled('enableTriStateLockingFeaturesInTicketModule')) then
+            exit(ConfirmReservationRequestV2(Token, TokenLineNumber, ResponseCode, ResponseMessage));
+#endif
+        exit(ConfirmReservationRequestV1(Token, TokenLineNumber, ResponseCode, ResponseMessage));
     end;
 
     [CommitBehavior(CommitBehavior::Error)]
-    internal procedure ConfirmReservationRequest(Token: Text[100]; TokenLineNumber: Integer; var ResponseMessage: Text) ReservationConfirmed: Boolean
+    local procedure ConfirmReservationRequestV1(Token: Text[100]; TokenLineNumber: Integer; var ResponseCode: Code[10]; var ResponseMessage: Text) ReservationConfirmed: Boolean
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
-        UNCONFIRMED_TOKEN_NOT_FOUND: Label 'An unconfirmed ticket-token with value %1 was not found.';
     begin
 
         ReservationConfirmed := true;
@@ -860,14 +928,16 @@
             TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', TokenLineNumber);
         TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::EXPIRED);
         if (not TicketReservationRequest.IsEmpty()) then begin
-            ResponseMessage := StrSubstNo(TOKEN_EXPIRED, Token);
+            ResponseMessage := StrSubstNo(TOKEN_EXPIRED_1204, Token);
+            ResponseCode := '-1204';
             ReservationConfirmed := false;
         end;
 
         if (ReservationConfirmed) then begin
             TicketReservationRequest.SetFilter("Request Status", '=%1|=%2', TicketReservationRequest."Request Status"::REGISTERED, TicketReservationRequest."Request Status"::RESERVED);
             if (not TicketReservationRequest.FindSet()) then begin
-                ResponseMessage := StrSubstNo(UNCONFIRMED_TOKEN_NOT_FOUND, Token);
+                ResponseMessage := StrSubstNo(UNCONFIRMED_TOKEN_NOT_FOUND_1203, Token);
+                ResponseCode := '-1203';
                 ReservationConfirmed := false;
             end;
         end;
@@ -915,6 +985,153 @@
         exit(true);
     end;
 
+    // BC22 and later
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+    [CommitBehavior(CommitBehavior::Error)]
+    local procedure ConfirmReservationRequestV2(Token: Text[100]; TokenLineNumber: Integer; var ResponseCode: Code[10]; var ResponseMessage: Text) FinalizeReservation: Boolean
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
+        Now: DateTime;
+        RequestMutex: Record "NPR TM TicketRequestMutex";
+        MutexKey: Text[100];
+    begin
+        Now := CurrentDateTime();
+        FinalizeReservation := true;
+        ResponseMessage := '';
+
+        // Check if expired
+        TicketReservationRequest.ReadIsolation := IsolationLevel::ReadUncommitted;
+        TicketReservationRequest.SetLoadFields("Session Token ID", "Ext. Line Reference No.", "Request Status", "Admission Inclusion");
+        TicketReservationRequest.SetCurrentKey("Session Token ID");
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::EXPIRED);
+        if (TokenLineNumber <> 0) then
+            TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', TokenLineNumber);
+        if (TicketReservationRequest.FindFirst()) then begin
+            ResponseMessage := StrSubstNo(TOKEN_EXPIRED_1204, Token);
+            ResponseCode := '-1204';
+            FinalizeReservation := false;
+        end;
+
+        // Check if REGISTERED or RESERVED exists
+        if (FinalizeReservation) then begin
+            TicketReservationRequest.SetFilter("Request Status", '=%1|=%2',
+                TicketReservationRequest."Request Status"::REGISTERED,
+                TicketReservationRequest."Request Status"::RESERVED);
+            if (not TicketReservationRequest.FindFirst()) then begin
+                ResponseMessage := StrSubstNo(UNCONFIRMED_TOKEN_NOT_FOUND_1203, Token);
+                ResponseCode := '-1203';
+                FinalizeReservation := false;
+            end;
+        end;
+
+        // Check if already CONFIRMED
+        if (not FinalizeReservation) then begin
+            TicketReservationRequest.SetFilter("Request Status", '<>%1', TicketReservationRequest."Request Status"::CONFIRMED);
+            TicketReservationRequest.SetFilter("Admission Inclusion", '=%1|=%2', TicketReservationRequest."Admission Inclusion"::REQUIRED, TicketReservationRequest."Admission Inclusion"::SELECTED);
+            if (not TicketReservationRequest.FindFirst()) then begin
+                ResponseMessage := StrSubstNo(TOKEN_ALREADY_CONFIRMED_1206, Token);
+                ResponseCode := '-1206';
+                exit(true);
+            end;
+        end;
+
+        // Update response object with status and message
+        // (Somewhat legacy - used by SOAP)
+        TicketReservationResponse.ReadIsolation := IsolationLevel::UpdLock;
+        TicketReservationResponse.SetCurrentKey("Session Token ID", "Ext. Line Reference No.");
+        TicketReservationResponse.SetFilter("Session Token ID", '=%1', Token);
+        if (TokenLineNumber <> 0) then
+            TicketReservationResponse.SetFilter("Ext. Line Reference No.", '=%1', TokenLineNumber);
+        if (TicketReservationResponse.FindSet()) then
+            repeat
+                TicketReservationResponse.Status := FinalizeReservation;
+                TicketReservationResponse.Confirmed := FinalizeReservation;
+                TicketReservationResponse."Response Message" := CopyStr(ResponseMessage, 1, MaxStrLen(TicketReservationResponse."Response Message"));
+                TicketReservationResponse.Modify();
+            until (TicketReservationResponse.Next()) = 0;
+
+        MutexKey := StrSubstNo('%1:%2', Token, TokenLineNumber);
+        if (not RequestMutex.Acquire(MutexKey, SessionId())) then begin
+            ResponseMessage := StrSubstNo(TOKEN_PROCESSING_CONFLICT_1205);
+            ResponseCode := '-1205';
+            FinalizeReservation := false;
+        end;
+
+        if (not FinalizeReservation) then begin
+            EmitMessageToTelemetry(ResponseMessage);
+            exit(false);
+        end;
+
+        // ##### Success path #####
+        TicketReservationRequest.Reset();
+        TicketReservationRequest.ReadIsolation := IsolationLevel::UpdLock;
+        TicketReservationRequest.SetCurrentKey("Session Token ID");
+        TicketReservationRequest.SetLoadFields("Session Token ID", "Ext. Line Reference No.", "Request Status", "Admission Inclusion", "Payment Option");
+        TicketReservationRequest.SetCurrentKey("Session Token ID");
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        if (TokenLineNumber <> 0) then
+            TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', TokenLineNumber);
+        TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::RESERVED);
+        if (TicketReservationRequest.FindSet()) then
+            repeat
+                TicketReservationRequest."Payment Option" := TicketReservationRequest."Payment Option"::DIRECT;
+                TicketReservationRequest.Modify();
+            until (TicketReservationRequest.Next()) = 0;
+
+        // Confirm required and selected admissions
+        TicketReservationRequest.Reset();
+        TicketReservationRequest.ReadIsolation := IsolationLevel::UpdLock;
+        TicketReservationRequest.SetCurrentKey("Session Token ID");
+        TicketReservationRequest.SetLoadFields("Session Token ID", "Ext. Line Reference No.", "Request Status", "Admission Inclusion", "Request Status Date Time", "Expires Date Time");
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        if (TokenLineNumber <> 0) then
+            TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', TokenLineNumber);
+        TicketReservationRequest.SetFilter("Request Status", '=%1|=%2',
+            TicketReservationRequest."Request Status"::REGISTERED,
+            TicketReservationRequest."Request Status"::RESERVED);
+        TicketReservationRequest.SetFilter("Admission Inclusion", '=%1|=%2',
+            TicketReservationRequest."Admission Inclusion"::REQUIRED,
+            TicketReservationRequest."Admission Inclusion"::SELECTED);
+        if (TicketReservationRequest.FindSet()) then
+            repeat
+                TicketReservationRequest."Request Status" := TicketReservationRequest."Request Status"::CONFIRMED;
+                TicketReservationRequest."Request Status Date Time" := Now;
+                TicketReservationRequest."Expires Date Time" := CreateDateTime(0D, 0T);
+                TicketReservationRequest.Modify();
+            until (TicketReservationRequest.Next()) = 0;
+
+        // Set OPTIONAL for not selected
+        TicketReservationRequest.Reset();
+        TicketReservationRequest.ReadIsolation := IsolationLevel::UpdLock;
+        TicketReservationRequest.SetCurrentKey("Session Token ID");
+        TicketReservationRequest.SetLoadFields("Session Token ID", "Ext. Line Reference No.", "Request Status", "Admission Inclusion", "Request Status Date Time", "Expires Date Time");
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        if (TokenLineNumber <> 0) then
+            TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', TokenLineNumber);
+        TicketReservationRequest.SetFilter("Request Status", '=%1|=%2',
+            TicketReservationRequest."Request Status"::REGISTERED,
+            TicketReservationRequest."Request Status"::RESERVED);
+        TicketReservationRequest.SetFilter("Admission Inclusion", '=%1', TicketReservationRequest."Admission Inclusion"::NOT_SELECTED);
+        if TicketReservationRequest.FindSet() then
+            repeat
+                TicketReservationRequest."Request Status" := TicketReservationRequest."Request Status"::OPTIONAL;
+                TicketReservationRequest."Request Status Date Time" := Now;
+                TicketReservationRequest."Expires Date Time" := CreateDateTime(0D, 0T);
+                TicketReservationRequest.Modify();
+            until (TicketReservationRequest.Next() = 0);
+
+        FinalizePayment(Token, TokenLineNumber);
+        RequestMutex.Release(MutexKey);
+
+        ResponseCode := '';
+        ResponseMessage := 'OK';
+        exit(true);
+    end;
+#endif
+
+
     local procedure EmitMessageToTelemetry(MessageText: Text)
     var
         CustomDimensions: Dictionary of [Text, Text];
@@ -945,9 +1162,10 @@
     procedure ConfirmReservationRequestWithValidate(Token: Text[100]; TokenLineNumber: Integer)
     var
         ResponseMessage: Text;
+        ResponseCode: Code[10];
     begin
-        if (not ConfirmReservationRequest(Token, TokenLineNumber, ResponseMessage)) then
-            Error(ResponseMessage);
+        if (not ConfirmReservationRequest(Token, TokenLineNumber, ResponseCode, ResponseMessage)) then
+            RaiseError(ResponseMessage, ResponseCode);
     end;
 
     procedure ConfirmChangeRequest(Token: Text[100]);
@@ -1158,6 +1376,17 @@
 #endif
 
     procedure ExpireReservationRequests()
+    begin
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        if (_FeatureFlagManagement.IsEnabled('enableTriStateLockingFeaturesInTicketModule')) then begin
+            ExpireReservationRequestsV2(30);
+            exit;
+        end;
+#endif
+        ExpireReservationRequestsV1();
+    end;
+
+    local procedure ExpireReservationRequestsV1()
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketReservationRequest2: Record "NPR TM Ticket Reservation Req.";
@@ -1548,8 +1777,12 @@
     begin
 
         TicketReservationRequest.Reset();
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        TicketReservationRequest.ReadIsolation := IsolationLevel::UpdLock;
+#endif
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        TicketReservationRequest.SetLoadFields("Request Status", "Receipt No.", "Notification Method", "Notification Address", "Payment Option", "External Order No.", "TicketHolderName");
         if (not TicketReservationRequest.FindSet()) then
             exit(false);
 
@@ -1569,7 +1802,7 @@
             if (ExternalOrderNo <> '') then
                 TicketReservationRequest."Payment Option" := TicketReservationRequest."Payment Option"::PREPAID;
 
-            if ((TicketReservationRequest."Receipt No." = '') and (TicketReservationRequest."External Order No." = '')) then
+            if ((TicketReservationRequest."Receipt No." = '') and (ExternalOrderNo = '')) then
                 TicketReservationRequest."Payment Option" := TicketReservationRequest."Payment Option"::UNPAID;
 
             if (TicketHolderName <> '') then
@@ -3497,6 +3730,20 @@
                 exit(Item."Unit Price");
         exit(0)
 
+    end;
+
+
+    local procedure RaiseError(MessageText: Text; MessageId: Text)
+    var
+        ResponseMessage: Text;
+        ResponseLbl: Label '[%1] - %2', Locked = true;
+    begin
+        ResponseMessage := MessageText;
+
+        if (MessageId <> '') then
+            ResponseMessage := StrSubstNo(ResponseLbl, MessageId, MessageText);
+
+        Error(ResponseMessage);
     end;
 
 }

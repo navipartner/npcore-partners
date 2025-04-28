@@ -361,6 +361,8 @@
             if (not (DetTicketAccessEntry.Type in [DetTicketAccessEntry.Type::PAYMENT, DetTicketAccessEntry.Type::PREPAID, DetTicketAccessEntry.Type::POSTPAID])) then
                 exit;
 
+            ReserveTicketAccessEntry.SetCurrentKey("Ticket Access Entry No.", Type);
+            ReserveTicketAccessEntry.SetLoadFields("Ticket Access Entry No.", Type, Quantity);
             ReserveTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', DetTicketAccessEntry."Ticket Access Entry No.");
             ReserveTicketAccessEntry.SetFilter(Type, '=%1', ReserveTicketAccessEntry.Type::RESERVATION);
             ReserveTicketAccessEntry.SetFilter(Quantity, '>%1', 0);
@@ -370,6 +372,7 @@
             ReservationConfirmed := DetTicketAccessEntry.Get(ReserveTicketAccessEntry."Entry No.");
         end;
 
+        AdmissionScheduleEntry.SetCurrentKey("External Schedule Entry No.");
         AdmissionScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', DetTicketAccessEntry."External Adm. Sch. Entry No.");
         AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
         if (not AdmissionScheduleEntry.FindLast()) then
@@ -733,7 +736,7 @@
         NotificationProfile: Record "NPR TM Notification Profile";
         ProfileLine: Record "NPR TM Notif. Profile Line";
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
-        NotificationEntry: Record "NPR TM Ticket Notif. Entry";
+        NotificationEntry, NotificationEntry2 : Record "NPR TM Ticket Notif. Entry";
         Member: Record "NPR MM Member";
     begin
         if (not Ticket.Get(TicketAccessEntry."Ticket No.")) then
@@ -757,17 +760,32 @@
         if (not ProfileLine.FindSet()) then
             exit(0);
 
+        DetTicketAccessEntry.SetCurrentKey("Ticket Access Entry No.", Type);
         DetTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
         DetTicketAccessEntry.SetFilter(Type, '=%1', DetTicketAccessEntry.Type::INITIAL_ENTRY);
         if (not DetTicketAccessEntry.FindFirst()) then
             exit(0);
-
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        NotificationEntry.ReadIsolation := IsolationLevel::ReadUncommitted;
+#endif
+        NotificationEntry.SetCurrentKey("Ticket No.", "Notification Send Status");
+        NotificationEntry.SetLoadFields("Notification Send Status");
         NotificationEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
         NotificationEntry.SetFilter("Admission Code", '=%1', TicketAccessEntry."Admission Code");
         NotificationEntry.SetFilter("Notification Trigger", '=%1', NotificationEntry."Notification Trigger"::REMINDER);
         NotificationEntry.SetFilter("Ticket Trigger Type", '=%1', NotificationEntry."Ticket Trigger Type"::WELCOME);
         NotificationEntry.SetFilter("Notification Send Status", '=%1', NotificationEntry."Notification Send Status"::PENDING);
-        NotificationEntry.ModifyAll("Notification Send Status", NotificationEntry."Notification Send Status"::CANCELED);
+        if (NotificationEntry.FindSet()) then begin
+            repeat
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+                NotificationEntry2.ReadIsolation := IsolationLevel::UpdLock;
+#endif
+                NotificationEntry.SetLoadFields("Notification Send Status");
+                NotificationEntry2.Get(NotificationEntry."Entry No.");
+                NotificationEntry2."Notification Send Status" := NotificationEntry2."Notification Send Status"::CANCELED;
+                NotificationEntry2.Modify();
+            until (NotificationEntry.Next() = 0);
+        end;
 
         GetMember(MemberNumber, Member);
 

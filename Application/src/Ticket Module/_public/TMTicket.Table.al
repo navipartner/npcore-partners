@@ -228,8 +228,17 @@
     begin
         GetTicketType();
 
-        if ("No." = '') then
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23)
+        if (Rec."No. Series" = '') then
+            Rec."No. Series" := _TicketType."No. Series";
+
+        if (Rec."No." = '') then
+            Rec."No." := _NoSeriesMgt.GetNextNo(Rec."No. Series", Today());
+#else
+            if ("No." = '') then
             _NoSeriesMgt.InitSeries(_TicketType."No. Series", xRec."No. Series", Today, Rec."No.", Rec."No. Series");
+#endif
+
 
         Rec."Last Date Modified" := Today();
 
@@ -263,7 +272,11 @@
 
     var
         _TicketType: Record "NPR TM Ticket Type";
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23)
+        _NoSeriesMgt: Codeunit "No. Series";
+#else
         _NoSeriesMgt: Codeunit NoSeriesManagement;
+#endif
         _TicketMgt: Codeunit "NPR TM Ticket Management";
 
     internal procedure GetTicketType()
