@@ -167,5 +167,10 @@ tableextension 6014680 "NPR Application Area Setup Ext" extends "Application Are
             Caption = 'NaviPartner DE Fiscalization';
             DataClassification = CustomerContent;
         }
+        field(6060128; "NPR HU Laurel Fiscal"; Boolean)
+        {
+            Caption = 'NaviPartner HU Laurel Fiscalization';
+            DataClassification = CustomerContent;
+        }
     }
 }

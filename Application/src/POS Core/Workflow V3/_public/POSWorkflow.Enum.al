@@ -831,6 +831,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'DISCOUNT', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action - Discount";
     }
+    value(170; "EFT_CONFIRMATION")
+    {
+        Caption = 'EFT_CONFIRMATION', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction: GetConfirmation";
+    }
     value(171; "SS-PAYMENT")
     {
         Caption = 'SS-PAYMENT', Locked = true, MaxLength = 20;
@@ -1056,32 +1061,45 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'RS_INS_REF_SALE', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action - Ins. RefSale";
     }
-    value(170; "EFT_CONFIRMATION")
+    value(330; "SI_INS_RET_SALE")
     {
-        Caption = 'EFT_CONFIRMATION', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POSAction: GetConfirmation";
+        Caption = 'SI_INS_RET_SALE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: SI Ins RetSale";
     }
     value(340; "EFT_TEXT")
     {
         Caption = 'EFT_TEXT', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POSAction: GetText";
     }
-
     value(350; "MM_CHANGE_PMT_METHOD")
     {
         Caption = 'MM_CHANGE_PMT_METHOD', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POSAction: ChangePmtMethod";
-
     }
     value(351; "TM_PRINT_AND_ADMIT")
     {
         Caption = 'TM_PRINT_AND_ADMIT', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action Print and Admit";
     }
-    value(330; "SI_INS_RET_SALE")
+    value(370; "HUL_FCU_MGT")
     {
-        Caption = 'SI_INS_RET_SALE', Locked = true, MaxLength = 20;
-        Implementation = "NPR IPOS Workflow" = "NPR POS Action: SI Ins RetSale";
+        Caption = 'HUL_FCU_MGT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: HU L FP Mgt.";
+    }
+    value(371; "HUL_RECEIPT_MGT")
+    {
+        Caption = 'HUL_RECEIPT_MGT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: HU L Receipt";
+    }
+    value(372; "HUL_CASH_MGT")
+    {
+        Caption = 'HUL_CASH_MGT', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: HUL Cash Mgt";
+    }
+    value(373; "HUL_INS_REF_SALE")
+    {
+        Caption = 'HUL_INS_REF_SALE', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: HUL InsRefSale";
     }
     value(6184573; SS_EFT_RECONCILE)
     {
