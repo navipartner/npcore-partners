@@ -90,4 +90,14 @@ enum 6014577 "NPR Feature" implements "NPR Feature Management"
         Caption = 'POS Webservice Sessions', Locked = true, MaxLength = 50;
         Implementation = "NPR Feature Management" = "NPR POS Webservice Sessions";
     }
+    value(150; "New Sales Receipt Experience")
+    {
+        Caption = 'New Sales Receipt Experience';
+        Implementation = "NPR Feature Management" = "NPR New Sales Receipt Exp";
+    }
+    value(160; "New EFT Receipt Experience")
+    {
+        Caption = 'New EFT Receipt Experience';
+        Implementation = "NPR Feature Management" = "NPR New EFT Receipt Exp";
+    }
 }

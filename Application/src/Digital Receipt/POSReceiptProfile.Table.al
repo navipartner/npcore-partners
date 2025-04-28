@@ -45,6 +45,11 @@ table 6150742 "NPR POS Receipt Profile"
             Caption = 'Send E-mail Receipt On Sale';
             DataClassification = CustomerContent;
         }
+        field(70; "Show Barcode as QR Code"; Boolean)
+        {
+            Caption = 'Show Barcode as QR Code';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

@@ -135,6 +135,23 @@
         end
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"NPR Report Selection Retail", 'OnBeforeValidateEvent', 'Print Template', false, false)]
+    local procedure ReportSelectionRetailOnBeforeValidateEventPrintTemplate(var Rec: Record "NPR Report Selection Retail")
+    var
+        NewSalesReceiptExp: Codeunit "NPR New Sales Receipt Exp";
+        NewEFTReceiptExp: Codeunit "NPR New EFT Receipt Exp";
+        OldExperienceUsageLbl: Label 'Templates are not supported in new experience usage. Please use Codeunit ID field to specify the template.';
+    begin
+        case Rec."Report Type" of
+            Enum::"NPR Report Selection Type"::"Sales Receipt (POS Entry)":
+                if NewSalesReceiptExp.IsFeatureEnabled() then
+                    Error(OldExperienceUsageLbl);
+            Enum::"NPR Report Selection Type"::"Terminal Receipt":
+                if NewEFTReceiptExp.IsFeatureEnabled() then
+                    Error(OldExperienceUsageLbl);
+        end;
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterRunReportSelectionRecord(ReportSelectionRetail: Record "NPR Report Selection Retail"; RecRef: RecordRef)
     begin

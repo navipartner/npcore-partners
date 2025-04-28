@@ -62,6 +62,8 @@ codeunit 6151434 "NPR Feature Management Install"
         AddFeature(Feature::"NP Email");
 #endif
         AddFeature(Feature::"POS Webservice Sessions");
+        AddFeature(Feature::"New Sales Receipt Experience");
+        AddFeature(Feature::"New EFT Receipt Experience");
 
         if ExistingFeature.FindSet() then
             repeat
@@ -82,6 +84,8 @@ codeunit 6151434 "NPR Feature Management Install"
         NewFeatureHandler.HandleScenarioObsoletedFeature();
         NewFeatureHandler.HandlePOSStatisticsDashboardFeature();
         NewFeatureHandler.HandlePOSWebserviceSessionsFeature();
+        NewFeatureHandler.HandleNewSalesReceiptExperience();
+        NewFeatureHandler.HandleNewEFTReceiptExperience();
         RefreshExperienceTierCurrentCompany();
     end;
 

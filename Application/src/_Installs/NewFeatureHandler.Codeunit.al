@@ -59,6 +59,44 @@ codeunit 6150632 "NPR New Feature Handler"
         LogMessageStopwatch.LogFinish();
     end;
 
+    internal procedure HandleNewSalesReceiptExperience()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagsDef: Codeunit "NPR Upgrade Tag Definitions";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR New Feature Handler', 'NewSalesReceiptExperienceHandle');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'NewSalesReceiptExperienceHandle')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        NewSalesReceiptExperienceHandle();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'NewSalesReceiptExperienceHandle'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    internal procedure HandleNewEFTReceiptExperience()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagsDef: Codeunit "NPR Upgrade Tag Definitions";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR New Feature Handler', 'NewEFTReceiptExperienceHandle');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'NewEFTReceiptExperienceHandle')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        NewEFTReceiptExperienceHandle();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'NewEFTReceiptExperienceHandle'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
     internal procedure HandlePOSWebserviceSessionsFeature()
     var
         Feature: Record "NPR Feature";
@@ -109,6 +147,40 @@ codeunit 6150632 "NPR New Feature Handler"
             exit;
         Feature.Enabled := true;
         Feature.Modify();
+    end;
+
+    local procedure NewSalesReceiptExperienceHandle()
+    var
+        ReportSelectionRetail: Record "NPR Report Selection Retail";
+        Feature: Record "NPR Feature";
+        NewSalesReceiptExp: Codeunit "NPR New Sales Receipt Exp";
+    begin
+        if not Feature.Get(NewSalesReceiptExp.GetFeatureId()) then
+            exit;
+        if Feature.Enabled then
+            exit;
+        Feature.Enabled := true;
+        Feature.Modify();
+
+        ReportSelectionRetail.SetRange("Report Type", ReportSelectionRetail."Report Type"::"Sales Receipt (POS Entry)");
+        ReportSelectionRetail.ModifyAll("Print Template", '');
+    end;
+
+    local procedure NewEFTReceiptExperienceHandle()
+    var
+        ReportSelectionRetail: Record "NPR Report Selection Retail";
+        Feature: Record "NPR Feature";
+        NewEFTReceiptExp: Codeunit "NPR New EFT Receipt Exp";
+    begin
+        if not Feature.Get(NewEFTReceiptExp.GetFeatureId()) then
+            exit;
+        if Feature.Enabled then
+            exit;
+        Feature.Enabled := true;
+        Feature.Modify();
+
+        ReportSelectionRetail.SetRange("Report Type", ReportSelectionRetail."Report Type"::"Terminal Receipt");
+        ReportSelectionRetail.ModifyAll("Print Template", '');
     end;
 
     local procedure CurrCodeunitId(): Integer

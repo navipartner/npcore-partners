@@ -30,6 +30,11 @@ page 6150757 "NPR POS Receipt Profile"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies if e-mail with receipt will be sent after Sale';
                 }
+                field("Show Barcode as QR Code "; Rec."Show Barcode as QR Code")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies if barcode will be shown as QR Code';
+                }
             }
             group("Digital Receipt")
             {
