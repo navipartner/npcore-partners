@@ -18,7 +18,7 @@
 
                     Caption = 'Selected';
                     ToolTip = 'Specifies the value of the Selected field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 field("Field Caption"; Rec."Field Caption")
                 {
@@ -26,7 +26,7 @@
                     Caption = 'E-mail Template';
                     Editable = false;
                     ToolTip = 'Specifies the value of the E-mail Template field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
             }
         }

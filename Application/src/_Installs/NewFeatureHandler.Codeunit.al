@@ -72,6 +72,15 @@ codeunit 6150632 "NPR New Feature Handler"
         Feature.Modify();
     end;
 
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+    internal procedure HandleNewEmailFeature()
+    var
+        NewEmailFeature: Codeunit "NPR NewEmailExpFeature";
+    begin
+        NewEmailFeature.SetFeatureEnabled(true);
+    end;
+#endif
+
     local procedure POSEditorFeatureHandle()
     var
         Feature: Record "NPR Feature";

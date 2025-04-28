@@ -3,18 +3,6 @@ codeunit 6248264 "NPR SendGrid Client"
 {
     Access = Internal;
 
-    internal procedure GetEnvironmentIdentifier(): Text
-    var
-        AzureAdTenant: Codeunit "Azure AD Tenant";
-        EnvInfo: Codeunit "Environment Information";
-    begin
-        if (EnvInfo.IsSaaSInfrastructure()) then
-            exit(AzureAdTenant.GetAadTenantId());
-        if (GetUrl(ClientType::Web).Contains('dynamics-retail.net')) then
-            exit(StrSubstNo('%1-test', UserId()));
-        exit(TenantId());
-    end;
-
     #region Central Database
     [NonDebuggable]
     internal procedure GetApiKeyFromD1Database(EnvironmentIdentifier: Text; var ApiKey: Text)
@@ -153,7 +141,7 @@ codeunit 6248264 "NPR SendGrid Client"
         JObject: JsonObject;
     begin
         JObject := APIClient.CreateSenderIdentity(AccountId, Identity.ToRequestJson());
-        Identity.FromJson(AccountId, JObject);
+        Identity.FromJson(AccountId, JObject.AsToken());
         Identity.Insert();
     end;
     #endregion
@@ -247,17 +235,84 @@ codeunit 6248264 "NPR SendGrid Client"
         APIClient: Codeunit "NPR SendGrid API Client";
         EmailObject: JsonObject;
     begin
-        EmailObject := ConvertEmailMessageToJson(EmailMessage, Account);
+        EmailObject := ConvertRegularEmailMessageToJson(EmailMessage, Account);
         APIClient.SendEmail(Account.NPEmailAccountId, EmailObject);
     end;
 
-    local procedure ConvertEmailMessageToJson(EmailMessage: Codeunit "Email Message"; Account: Record "NPR NPEmailWebSMTPEmailAccount"): JsonObject
+    internal procedure SendDynamicEmail(EmailMessage: Codeunit "Email Message"; Account: Record "NPR NPEmailWebSMTPEmailAccount")
+    var
+        EmailObject: JsonObject;
+        APIClient: Codeunit "NPR SendGrid API Client";
+    begin
+        EmailObject := ConvertTemplateEmailToJson(EmailMessage, Account);
+        APIClient.SendEmail(Account.NPEmailAccountId, EmailObject);
+    end;
+
+    local procedure ConvertTemplateEmailToJson(EmailMessage: Codeunit "Email Message"; Account: Record "NPR NPEmailWebSMTPEmailAccount"): JsonObject
+    var
+        Json: Codeunit "NPR Json Builder";
+        EmailJson: JsonObject;
+        BufToken: JsonToken;
+    begin
+        EmailJson.ReadFrom(EmailMessage.GetBody());
+
+        Json.StartObject();
+
+        Json.StartArray('personalizations').StartObject();
+        Json.AddObject(SetPersonalizations(Json, EmailMessage));
+        EmailJson.SelectToken('npemail_dynamic_template_data', BufToken);
+        Json.AddProperty('dynamic_template_data', BufToken.AsObject());
+        Json.EndObject().EndArray(); // personalizations
+
+        Json.AddObject(SetFrom(Json, Account));
+        Json.AddObject(SetReplyTo(Json, Account));
+
+        Json.AddObject(SetAttachments(Json, EmailMessage));
+
+        EmailJson.SelectToken('npemail_dynamic_template_id', BufToken);
+        Json.AddProperty('template_id', BufToken.AsValue().AsText());
+
+        Json.EndObject();
+
+        exit(Json.Build());
+    end;
+
+    local procedure ConvertRegularEmailMessageToJson(EmailMessage: Codeunit "Email Message"; Account: Record "NPR NPEmailWebSMTPEmailAccount"): JsonObject
+    var
+        Json: Codeunit "NPR Json Builder";
+    begin
+        Json.StartObject();
+
+        Json.StartArray('personalizations').StartObject();
+        Json.AddObject(SetPersonalizations(Json, EmailMessage));
+        Json.EndObject().EndArray(); // personalizations
+
+        Json.AddObject(SetFrom(Json, Account));
+        Json.AddObject(SetReplyTo(Json, Account));
+
+        Json.AddProperty('subject', EmailMessage.GetSubject());
+
+        Json.StartArray('content')
+            .StartObject();
+        if (EmailMessage.IsBodyHTMLFormatted()) then
+            Json.AddProperty('type', 'text/html')
+        else
+            Json.AddProperty('type', 'text/plain');
+        Json.AddProperty('value', EmailMessage.GetBody())
+            .EndObject()
+            .EndArray(); // content
+
+        Json.AddObject(SetAttachments(Json, EmailMessage));
+
+        Json.EndObject(); // the main object
+        exit(Json.Build());
+    end;
+
+    local procedure SetPersonalizations(var Json: Codeunit "NPR Json Builder"; EmailMessage: Codeunit "Email Message"): Codeunit "NPR Json Builder"
     var
         RecipientList: List of [Text];
         ToEmail: Text;
-        Json: Codeunit "NPR Json Builder";
     begin
-        Json.StartObject().StartArray('personalizations').StartObject();
 
         EmailMessage.GetRecipients("Email Recipient Type"::"To", RecipientList);
         if (RecipientList.Count > 0) then begin
@@ -283,14 +338,22 @@ codeunit 6248264 "NPR SendGrid Client"
             Json.EndArray();
         end;
 
-        Json.EndObject().EndArray(); // personalizations
+        exit(Json);
+    end;
 
+    local procedure SetFrom(var Json: Codeunit "NPR Json Builder"; Account: Record "NPR NPEmailWebSMTPEmailAccount"): Codeunit "NPR Json Builder"
+    begin
         Json.StartObject('from')
                 .AddProperty('email', Account.FromEmailAddress);
         if (Account.FromName <> '') then
             Json.AddProperty('name', Account.FromName);
         Json.EndObject(); // from
 
+        exit(Json);
+    end;
+
+    local procedure SetReplyTo(var Json: Codeunit "NPR Json Builder"; Account: Record "NPR NPEmailWebSMTPEmailAccount"): Codeunit "NPR Json Builder"
+    begin
         if (Account.ReplyToEmailAddress <> '') then begin
             Json.StartObject('reply_to').AddProperty('email', Account.ReplyToEmailAddress);
             if (Account.ReplyToName <> '') then
@@ -298,18 +361,11 @@ codeunit 6248264 "NPR SendGrid Client"
             Json.EndObject(); // reply_to
         end;
 
-        Json.AddProperty('subject', EmailMessage.GetSubject());
+        exit(Json);
+    end;
 
-        Json.StartArray('content')
-            .StartObject();
-        if (EmailMessage.IsBodyHTMLFormatted()) then
-            Json.AddProperty('type', 'text/html')
-        else
-            Json.AddProperty('type', 'text/plain');
-        Json.AddProperty('value', EmailMessage.GetBody())
-            .EndObject()
-            .EndArray(); // content
-
+    local procedure SetAttachments(var Json: Codeunit "NPR Json Builder"; EmailMessage: Codeunit "Email Message"): Codeunit "NPR Json Builder"
+    begin
         if (EmailMessage.Attachments_First()) then begin
             Json.StartArray('attachments');
             repeat
@@ -330,9 +386,7 @@ codeunit 6248264 "NPR SendGrid Client"
             Json.EndArray(); // attachments
         end;
 
-        Json.EndObject(); // the main object
-
-        exit(Json.Build());
+        exit(Json);
     end;
     #endregion
 
@@ -381,6 +435,18 @@ codeunit 6248264 "NPR SendGrid Client"
         end;
 
         exit(Region::GLOBAL);
+    end;
+
+    internal procedure GetEnvironmentIdentifier(): Text
+    var
+        AzureAdTenant: Codeunit "Azure AD Tenant";
+        EnvInfo: Codeunit "Environment Information";
+    begin
+        if (EnvInfo.IsSaaSInfrastructure()) then
+            exit(AzureAdTenant.GetAadTenantId());
+        if (GetUrl(ClientType::Web).Contains('dynamics-retail.net')) then
+            exit(StrSubstNo('%1-test', UserId()));
+        exit(TenantId());
     end;
     #endregion
 }

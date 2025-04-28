@@ -60,6 +60,7 @@ codeunit 6151434 "NPR Feature Management Install"
         AddFeature(Feature::"POS Statistics Dashboard");
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         AddFeature(Feature::"NP Email");
+        AddFeature(Feature::"New Email Experience");
 #endif
         AddFeature(Feature::"POS Webservice Sessions");
 
@@ -82,6 +83,9 @@ codeunit 6151434 "NPR Feature Management Install"
         NewFeatureHandler.HandleScenarioObsoletedFeature();
         NewFeatureHandler.HandlePOSStatisticsDashboardFeature();
         NewFeatureHandler.HandlePOSWebserviceSessionsFeature();
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        NewFeatureHandler.HandleNewEmailFeature();
+#endif
         RefreshExperienceTierCurrentCompany();
     end;
 

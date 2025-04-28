@@ -17,25 +17,52 @@ page 6184952 "NPR SendGrid Sender Identities"
             {
                 field(Id; Rec.Id)
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRNPEmail;
                     ToolTip = 'Specifies the id';
                 }
                 field(Nickname; Rec.Nickname)
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRNPEmail;
                     ToolTip = 'Specifies the nickname';
                 }
                 field("From E-mail Address"; Rec.FromEmailAddress)
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRNPEmail;
                     ToolTip = 'Specifies the from e-mail address';
                 }
                 field(Verified; Rec.Verified)
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRNPEmail;
                     ToolTip = 'Specifies the verified';
                 }
             }
+        }
+    }
+
+    actions
+    {
+        area(Processing)
+        {
+            action(UpdateSenderIdentities)
+            {
+                Caption = 'Update Identities';
+                ToolTip = 'Running this action will update the identities from the central server.';
+                ApplicationArea = NPRNPEmail;
+                Image = UpdateXML;
+
+                trigger OnAction()
+                var
+                    Client: Codeunit "NPR SendGrid Client";
+                begin
+                    Client.UpdateLocalSenderIdentities();
+                    CurrPage.Update(false);
+                end;
+            }
+        }
+
+        area(Promoted)
+        {
+            actionref(Promoted_UpdateSenderIdentities; UpdateSenderIdentities) { }
         }
     }
 }

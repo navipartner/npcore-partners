@@ -17,7 +17,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Mail Body Line field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
             }
         }

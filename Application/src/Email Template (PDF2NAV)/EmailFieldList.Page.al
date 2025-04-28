@@ -24,14 +24,14 @@
 
                     Caption = 'No.';
                     ToolTip = 'Specifies the value of the No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 field("Field Caption"; Rec."Field Caption")
                 {
 
                     Caption = 'Field Name';
                     ToolTip = 'Specifies the value of the Field Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
             }
         }

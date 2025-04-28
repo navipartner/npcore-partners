@@ -10,7 +10,7 @@
     SaveValues = true;
     SourceTable = "NPR E-mail Attachment";
     SourceTableView = sorting("Table No.", "Primary Key", "Line No.");
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRLegacyEmail;
 
     layout
     {
@@ -24,13 +24,13 @@
 
                     Visible = false;
                     ToolTip = 'Specifies the value of the Line No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 field(Description; Rec.Description)
                 {
 
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
             }
         }
@@ -42,7 +42,7 @@
         {
             action(UploadFile)
             {
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRLegacyEmail;
                 Caption = 'Upload File';
                 ToolTip = 'Uploads file to the email attachment';
                 Image = Insert;

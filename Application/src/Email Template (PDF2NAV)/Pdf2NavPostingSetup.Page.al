@@ -18,12 +18,12 @@
                     field("Always Print Ship"; Rec."Always Print Ship")
                     {
                         ToolTip = 'Specifies the value of the Always Print Sales Shipment field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRLegacyEmail;
                     }
                     field("Always Print Receive"; Rec."Always Print Receive")
                     {
                         ToolTip = 'Specifies the value of the Always Print Sales Return Receipt field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRLegacyEmail;
                     }
                 }
             }

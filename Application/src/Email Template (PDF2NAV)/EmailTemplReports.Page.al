@@ -7,7 +7,7 @@
     UsageCategory = Administration;
 
     SourceTable = "NPR E-mail Templ. Report";
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRLegacyEmail;
 
     layout
     {
@@ -19,19 +19,19 @@
                 {
 
                     ToolTip = 'Specifies the value of the Report ID field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 field(Filename; Rec.Filename)
                 {
 
                     ToolTip = 'Specifies the value of the Filename field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 field("Report Name"; Rec."Report Name")
                 {
 
                     ToolTip = 'Specifies the value of the Report Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
             }
         }

@@ -20,74 +20,74 @@
                     Style = Standard;
                     StyleExpr = true;
                     ToolTip = 'Specifies the value of the Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 field(Description; Rec.Description)
                 {
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 field("Table No."; Rec."Table No.")
                 {
                     ToolTip = 'Specifies the value of the Table No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 field(Filename; Rec.Filename)
                 {
                     ToolTip = 'Specifies the value of the Filename field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 field(Subject; Rec.Subject)
                 {
                     ToolTip = 'Specifies the value of the Subject field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 field("Verify Recipient"; Rec."Verify Recipient")
                 {
                     ToolTip = 'Specifies the value of the Verify Recipient field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 field("Sender as bcc"; Rec."Sender as bcc")
                 {
                     ToolTip = 'Specifies the value of the Sender as bcc field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 field("From E-mail Name"; Rec."From E-mail Name")
                 {
                     ToolTip = 'Specifies the value of the From E-mail Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                     ShowMandatory = true;
                 }
                 field("From E-mail Address"; Rec."From E-mail Address")
                 {
                     ToolTip = 'Specifies the value of the From E-mail Address field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                     ShowMandatory = true;
                 }
                 field("Email Scenario"; Rec."Email Scenario")
                 {
                     ToolTip = 'Specifies the e-mail scenario that the e-mail will be sent as';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 field("Default Recipient Address"; Rec."Default Recipient Address")
                 {
                     ToolTip = 'Specifies the value of the Default recipient e-mail address field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 field("Default Recipient Address CC"; Rec."Default Recipient Address CC")
                 {
                     ToolTip = 'Specifies the value of the Default recipient e-mail address (CC) field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 field("Default Recipient Address BCC"; Rec."Default Recipient Address BCC")
                 {
                     ToolTip = 'Specifies the value of the Default recipient e-mail address (BCC) field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 field("Report ID"; Rec."Report ID")
                 {
                     ToolTip = 'Specifies the value of the Report ID field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 group(Control6150644)
                 {
@@ -96,14 +96,14 @@
                     field("Use HTML Template"; Rec."Use HTML Template")
                     {
                         ToolTip = 'Specifies the value of the Use HTML Template field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRLegacyEmail;
                     }
                     field(HTMLTemplateHasValue; Format(Rec."HTML Template".HasValue))
                     {
                         AssistEdit = true;
                         Caption = 'HTML Template';
                         ToolTip = 'Specifies the value of the HTML Template field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRLegacyEmail;
 
                         trigger OnAssistEdit()
                         var
@@ -132,25 +132,25 @@
                 {
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Fieldnumber Start Tag field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 field("Fieldnumber End Tag"; Rec."Fieldnumber End Tag")
                 {
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Fieldnumber End Tag field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 field(Group; Rec.Group)
                 {
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Group field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 field("Transactional E-mail"; Rec."Transactional E-mail")
                 {
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the Transactional E-mail field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 group(Control6150643)
                 {
@@ -160,7 +160,7 @@
                     {
                         Importance = Additional;
                         ToolTip = 'Specifies the value of the Transactional E-mail Code field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRLegacyEmail;
                     }
                 }
             }
@@ -171,7 +171,7 @@
                 SubPageLink = "E-mail Template Code" = field(Code);
                 SubPageView = sorting("E-mail Template Code", "Line No.");
                 Visible = (Rec."Transactional E-mail" = 0) or (Rec."Transactional E-mail Code" = '');
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRLegacyEmail;
             }
         }
         area(FactBoxes)
@@ -182,7 +182,7 @@
                 ShowFilter = false;
                 SubPageLink = TableNo = field("Table No.");
                 SubPageView = sorting(TableNo, "No.");
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRLegacyEmail;
             }
         }
     }
@@ -197,7 +197,7 @@
                 Image = View;
                 Visible = (Rec."Transactional E-mail" = 0) or (Rec."Transactional E-mail Code" = '');
                 ToolTip = 'Executes the View HTML Template action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRLegacyEmail;
 
                 trigger OnAction()
                 var
@@ -212,7 +212,7 @@
                 Image = Import;
                 Visible = (Rec."Transactional E-mail" = 0) or (Rec."Transactional E-mail Code" = '');
                 ToolTip = 'Executes the Import HTML Template action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRLegacyEmail;
 
                 trigger OnAction()
                 var
@@ -228,7 +228,7 @@
                 Image = Export;
                 Visible = (Rec."Transactional E-mail" = 0) or (Rec."Transactional E-mail Code" = '');
                 ToolTip = 'Executes the Export HTML Template action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRLegacyEmail;
 
                 trigger OnAction()
                 var
@@ -243,7 +243,7 @@
                 Image = Copy;
                 Visible = (Rec."Transactional E-mail" = 0) or (Rec."Transactional E-mail Code" = '');
                 ToolTip = 'Executes the Copy From E-Mail Template action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRLegacyEmail;
 
                 trigger OnAction()
                 var
@@ -258,7 +258,7 @@
                 Image = Delete;
                 Visible = (Rec."Transactional E-mail" = 0) or (Rec."Transactional E-mail Code" = '');
                 ToolTip = 'Executes the Delete HTML Template action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRLegacyEmail;
 
                 trigger OnAction()
                 var
@@ -273,7 +273,7 @@
                 Image = SendMail;
                 Visible = true;
                 ToolTip = 'Send Test E-mail';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRLegacyEmail;
 
                 trigger OnAction()
                 var
@@ -295,7 +295,7 @@
                 RunPageLink = "Table No." = field("Table No.");
                 RunPageView = sorting("Entry No.");
                 ToolTip = 'Executes the E-mail Log action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRLegacyEmail;
             }
             action(EmailTemplateFilters)
             {
@@ -306,14 +306,14 @@
                               "Table No." = field("Table No.");
                 RunPageView = sorting("E-mail Template Code", "Table No.", "Line No.");
                 ToolTip = 'Executes the Email Template Filters action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRLegacyEmail;
             }
             action(AttachedFiles)
             {
                 Caption = 'Attached Files';
                 Image = MailAttachment;
                 ToolTip = 'Executes the Attached Files action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRLegacyEmail;
 
                 trigger OnAction()
                 var
@@ -334,7 +334,7 @@
                 RunObject = page "NPR E-mail Templ. Reports";
                 RunPageLink = "E-mail Template Code" = field(Code);
                 ToolTip = 'Executes the Additional Reports action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRLegacyEmail;
             }
         }
     }
