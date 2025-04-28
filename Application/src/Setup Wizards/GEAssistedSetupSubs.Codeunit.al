@@ -28,6 +28,7 @@
         AddDKFiscalizationSetupsWizard();
         AddFRFiscalizationSetupsWizard();
         AddESFiscalizationSetupsWizard();
+        AddHULFiscalizationSetupsWizard();
     end;
 
     local procedure AddRetailSetupsWizard()
@@ -307,6 +308,20 @@
         AssistedSetup.Add(GetAppId(), Page::"NPR Setup ES Return Reason Map", ESFiscalizationSetupTxt, AssistedSetupGroup::NPRESFiscal);
     end;
 
+    local procedure AddHULFiscalizationSetupsWizard()
+    var
+        AssistedSetup: Codeunit "Assisted Setup";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        HULFiscalizationSetupTxt: Label 'Welcome to Hungarian Laurel Fiscalization Setup';
+    begin
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup HU L Fiscal", HULFiscalizationSetupTxt, AssistedSetupGroup::NPRHULFiscal);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup HU L POS Aud. Prof.", HULFiscalizationSetupTxt, AssistedSetupGroup::NPRHULFiscal);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup HU L POS Paym. Meth.", HULFiscalizationSetupTxt, AssistedSetupGroup::NPRHULFiscal);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup HU L VAT PostSetup", HULFiscalizationSetupTxt, AssistedSetupGroup::NPRHULFiscal);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup HUL Return Reason", HULFiscalizationSetupTxt, AssistedSetupGroup::NPRHULFiscal);
+        AssistedSetup.Add(GetAppId(), Page::"NPR Setup HU L POS Unit", HULFiscalizationSetupTxt, AssistedSetupGroup::NPRHULFiscal);
+    end;
+
     procedure GetAppId(): Guid
     var
         EmptyGuid: Guid;
@@ -348,6 +363,7 @@
         DKFiscalizationSetups();
         FRFiscalizationSetups();
         ESFiscalizationSetups();
+        HULFiscalizationSetups();
 #if not BC18
         if Checklist.IsChecklistVisible() then
             HideChecklistIfPOSEntryExist();
@@ -1708,7 +1724,7 @@
 
     #region Common Functions
     //This region contains common functions used by all Setup Wizards and Checklists
-    local procedure GetChecklistUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup,DEFiscalization,BEFiscalization,IRLFiscalization,NOFiscalization,HUMSFiscalization,SECCFiscalization,DKFiscalization,FRFiscalization,ESFiscalization): Code[250]
+    local procedure GetChecklistUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup,DEFiscalization,BEFiscalization,IRLFiscalization,NOFiscalization,HUMSFiscalization,SECCFiscalization,DKFiscalization,FRFiscalization,ESFiscalization,HULFiscalization): Code[250]
     begin
         case Modul of
             Modul::Retail:
@@ -1723,7 +1739,7 @@
         end;
     end;
 
-    local procedure GetAssistedSetupUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup,DEFiscalization,BEFiscalization,IRLFiscalization,NOFiscalization,HUMSFiscalization,SECCFiscalization,DKFiscalization,FRFiscalization,ESFiscalization): Code[250]
+    local procedure GetAssistedSetupUpgradeTag(Modul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup,DEFiscalization,BEFiscalization,IRLFiscalization,NOFiscalization,HUMSFiscalization,SECCFiscalization,DKFiscalization,FRFiscalization,ESFiscalization,HULFiscalization): Code[250]
     begin
         case Modul of
             Modul::Retail:
@@ -1783,6 +1799,9 @@
             Modul::ESFiscalization:
                 // For Any change, increase version
                 exit('NPR-AssistedSetup-ESFiscalization-v1.0');
+            Modul::HULFiscalization:
+                // For Any change, increase version
+                exit('NPR-AssistedSetup-HULFiscalization-v1.0');
         end;
     end;
 
@@ -2935,6 +2954,8 @@
                 GuidedExperience.ResetAssistedSetup(ObjectType::Page, Page::"NPR Setup HU MS Fiscal");
             AssistedSetupGroup::NPRESFiscal:
                 GuidedExperience.ResetAssistedSetup(ObjectType::Page, Page::"NPR Setup ES Fiscal");
+            AssistedSetupGroup::NPRHULFiscal:
+                GuidedExperience.ResetAssistedSetup(ObjectType::Page, Page::"NPR Setup HU L Fiscal");
         end;
     end;
 
@@ -4288,6 +4309,269 @@
     end;
     #endregion
 
+    #region HU Laurel Fiscalization Wizards
+    local procedure HULFiscalizationSetups()
+    var
+        UpgradeTag: Codeunit "Upgrade Tag";
+    begin
+        if not (Session.CurrentClientType() in [ClientType::Web, ClientType::Windows, ClientType::Desktop]) then
+            exit;
+
+        if UpgradeTag.HasUpgradeTag(GetAssistedSetupUpgradeTag(ThisModul::HULFiscalization)) then
+            exit;
+
+        RemoveHULFiscalizationSetupGuidedExperience();
+
+        AddHULFiscalizationSetupsWizard();
+
+        UpgradeTag.SetUpgradeTag(GetAssistedSetupUpgradeTag(ThisModul::HULFiscalization));
+    end;
+
+    local procedure RemoveHULFiscalizationSetupGuidedExperience()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup HU L Fiscal");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup HU L POS Aud. Prof.");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup HU L POS Paym. Meth.");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup HU L VAT PostSetup");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup HUL Return Reason");
+        GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup HU L POS Unit");
+    end;
+    local procedure AddHULFiscalizationSetupsWizard()
+    begin
+        EnableHULFiscalSetupWizard();
+        EnableHULPOSAuditProfileSetupWizard();
+        EnableHULPOSPaymMethMappingSetupWizard();
+        EnableHULVATPostingSetupMappWizardSetup();
+        EnableHULReturnReasonMappingWizardSetup();
+        EnableHULPOSUnitMappingWizardSetup();
+    end;
+
+    local procedure EnableHULFiscalSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Enable Fiscalization', Locked = true;
+        SetupDescriptionTxt: Label 'Enable Fiscalization', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup HU L Fiscal") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                1,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup HU L Fiscal",
+                                                AssistedSetupGroup::NPRHULFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableHULPOSAuditProfileSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup POS Audit Profile', Locked = true;
+        SetupDescriptionTxt: Label 'Setup POS Audit Profile', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup HU L POS Aud. Prof.") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                1,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup HU L POS Aud. Prof.",
+                                                AssistedSetupGroup::NPRHULFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableHULPOSPaymMethMappingSetupWizard()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup POS Payment Methods', Locked = true;
+        SetupDescriptionTxt: Label 'Setup POS Payment Methods', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup HU L POS Paym. Meth.") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                2,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup HU L POS Paym. Meth.",
+                                                AssistedSetupGroup::NPRHULFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableHULVATPostingSetupMappWizardSetup()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup VAT Posting Setups', Locked = true;
+        SetupDescriptionTxt: Label 'Setup VAT Posting Setups', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup HU L VAT PostSetup") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                1,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup HU L VAT PostSetup",
+                                                AssistedSetupGroup::NPRHULFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableHULReturnReasonMappingWizardSetup()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup Return Reasons', Locked = true;
+        SetupDescriptionTxt: Label 'Setup Return Reasons', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup HUL Return Reason") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                1,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup HUL Return Reason",
+                                                AssistedSetupGroup::NPRHULFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    local procedure EnableHULPOSUnitMappingWizardSetup()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+        GuidedExperienceType: Enum "Guided Experience Type";
+        AssistedSetupGroup: Enum "Assisted Setup Group";
+        VideoCategory: Enum "Video Category";
+        WizardNameLbl: Label 'Setup POS Units', Locked = true;
+        SetupDescriptionTxt: Label 'Setup POS Units', Locked = true;
+    begin
+        if not GuidedExperience.Exists(GuidedExperienceType::"Assisted Setup", ObjectType::Page, Page::"NPR Setup HU L POS Unit") then
+            GuidedExperience.InsertAssistedSetup(WizardNameLbl,
+                                                WizardNameLbl,
+                                                SetupDescriptionTxt,
+                                                1,
+                                                ObjectType::Page,
+                                                Page::"NPR Setup HU L POS Unit",
+                                                AssistedSetupGroup::NPRHULFiscal,
+                                                '',
+                                                VideoCategory::ReadyForBusiness,
+                                                '');
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup HU L Fiscal", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupHULFiscalWizard_OnAfterFinishStep(DataPopulated: Boolean)
+    begin
+        if DataPopulated then
+            UpdateSetupHULFiscalWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup HU L POS Aud. Prof.", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupHULPOSAuditProfileWizard_OnAfterFinishStep(DataPopulated: Boolean)
+    begin
+        if DataPopulated then
+            UpdateSetupHULPOSAuditWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup HU L POS Paym. Meth.", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupHULPOSPaymMethodWizard_OnAfterFinishStep(DataPopulated: Boolean)
+    begin
+        if DataPopulated then
+            UpdateSetupHULPOSPaymMethodWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup HU L VAT PostSetup", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupHULVATPostingSetupWizard_OnAfterFinishStep(DataPopulated: Boolean)
+    begin
+        if DataPopulated then
+            UpdateSetupHULVATPostingSetupWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup HUL Return Reason", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupHULReturnReasonWizard_OnAfterFinishStep(DataPopulated: Boolean)
+    begin
+        if DataPopulated then
+            UpdateSetupHULReturnReasonWizardStatus();
+    end;
+
+    [EventSubscriber(ObjectType::Page, Page::"NPR Setup HU L POS Unit", 'OnAfterFinishStep', '', false, false)]
+    local procedure SetupHULPOSUnitWizard_OnAfterFinishStep(DataPopulated: Boolean)
+    begin
+        if DataPopulated then
+            UpdateSetupHULPOSUnitWizardStatus();
+    end;
+
+    local procedure UpdateSetupHULFiscalWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup HU L Fiscal");
+    end;
+
+    local procedure UpdateSetupHULPOSAuditWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup HU L POS Aud. Prof.");
+    end;
+
+    local procedure UpdateSetupHULPOSPaymMethodWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup HU L POS Paym. Meth.");
+    end;
+
+    local procedure UpdateSetupHULVATPostingSetupWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup HU L VAT PostSetup");
+    end;
+
+    local procedure UpdateSetupHULReturnReasonWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup HUL Return Reason");
+    end;
+
+    local procedure UpdateSetupHULPOSUnitWizardStatus()
+    var
+        GuidedExperience: Codeunit "Guided Experience";
+    begin
+        GuidedExperience.CompleteAssistedSetup(ObjectType::Page, Page::"NPR Setup HU L POS Unit");
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR HU L Fiscalization Setup", 'OnAfterValidateEvent', 'HU Laurel Fiscal Enabled', false, false)]
+    local procedure ResetHULFiscalWizard_OnAfterValidateESFiscalEnabled(var Rec: Record "NPR HU L Fiscalization Setup"; var xRec: Record "NPR HU L Fiscalization Setup"; CurrFieldNo: Integer)
+    begin
+        if (Rec."HU Laurel Fiscal Enabled" <> xRec."HU Laurel Fiscal Enabled") and not Rec."HU Laurel Fiscal Enabled" then
+            ResetSetupFiscalWizardStatus(Enum::"Assisted Setup Group"::NPRHULFiscal);
+    end;
+    #endregion
+
 #if not (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22)
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Checklist Banner", 'OnBeforeUpdateBannerLabels', '', false, false)]
     local procedure ChecklistBannerOnBeforeUpdateBannerLabels(var IsHandled: Boolean; var DescriptionTxt: Text; var TitleTxt: Text; var HeaderTxt: Text)
@@ -4313,6 +4597,6 @@
 
     var
         Checklist: Codeunit Checklist;
-        ThisModul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup,DEFiscalization,BEFiscalization,IRLFiscalization,NOFiscalization,SECCFiscalization,HUMSFiscalizationSetup,DKFiscalization,FRFiscalizationSetup,ESFiscalization;
+        ThisModul: Option Retail,Restaurant,Attraction,CROFiscalizationSetup,RSFiscalizationSetup,BGSISFiscalization,SIFiscalizationSetup,ITFiscalizationSetup,ATFiscalization,RSEInvoiceSetup,DEFiscalization,BEFiscalization,IRLFiscalization,NOFiscalization,SECCFiscalization,HUMSFiscalizationSetup,DKFiscalization,FRFiscalizationSetup,ESFiscalization,HULFiscalization;
 #endif
 }

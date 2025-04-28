@@ -76,4 +76,8 @@ enumextension 6014402 "NPR Assisted Setup Group" extends "Assisted Setup Group"
     {
         Caption = 'NP ES Fiscalization';
     }
+    value(6014419; NPRHULFiscal)
+    {
+        Caption = 'NP HU Laurel Fiscalization';
+    }
 }
