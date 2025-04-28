@@ -69,33 +69,30 @@ table 6151042 "NPR SendGrid Sender Identity"
         }
     }
 
-    internal procedure FromJson(pNPEmailAccountId: Integer; Json: JsonObject)
+    internal procedure FromJson(pNPEmailAccountId: Integer; Json: JsonToken)
     var
         JsonHelper: Codeunit "NPR Json Helper";
-        JToken: JsonToken;
     begin
-        JToken := Json.AsToken();
-
-        Rec.Id := JsonHelper.GetJInteger(JToken, 'id', true);
+        Rec.Id := JsonHelper.GetJInteger(Json, 'id', true);
         Rec.NPEmailAccountId := pNPEmailAccountId;
-        Rec.Nickname := CopyStr(JsonHelper.GetJText(JToken, 'nickname', true), 1, MaxStrLen(Rec.Nickname));
-        Rec.FromName := CopyStr(JsonHelper.GetJText(JToken, 'from.name', false), 1, MaxStrLen(Rec.FromName));
+        Rec.Nickname := CopyStr(JsonHelper.GetJText(Json, 'nickname', true), 1, MaxStrLen(Rec.Nickname));
+        Rec.FromName := CopyStr(JsonHelper.GetJText(Json, 'from.name', false), 1, MaxStrLen(Rec.FromName));
 #pragma warning disable AA0139
-        Rec.FromEmailAddress := JsonHelper.GetJText(JToken, 'from.email', false);
+        Rec.FromEmailAddress := JsonHelper.GetJText(Json, 'from.email', false);
 #pragma warning restore AA0139
-        Rec.ReplyToName := CopyStr(JsonHelper.GetJText(JToken, 'reply_to.name', false), 1, MaxStrLen(Rec.ReplyToName));
+        Rec.ReplyToName := CopyStr(JsonHelper.GetJText(Json, 'reply_to.name', false), 1, MaxStrLen(Rec.ReplyToName));
 #pragma warning disable AA0139
-        Rec.ReplyToEmailAddress := JsonHelper.GetJText(JToken, 'reply_to.email', false);
+        Rec.ReplyToEmailAddress := JsonHelper.GetJText(Json, 'reply_to.email', false);
 #pragma warning restore AA0139
-        Rec.Address := CopyStr(JsonHelper.GetJText(JToken, 'address', true), 1, MaxStrLen(Rec.Address));
-        Rec.Address2 := CopyStr(JsonHelper.GetJText(JToken, 'address_2', false), 1, MaxStrLen(Rec.Address2));
-        Rec.City := CopyStr(JsonHelper.GetJText(JToken, 'city', true), 1, MaxStrLen(Rec.City));
-        Rec.Country := CopyStr(JsonHelper.GetJText(JToken, 'country', false), 1, MaxStrLen(Rec.Country));
-        Rec.Zip := CopyStr(JsonHelper.GetJText(JToken, 'zip', false), 1, MaxStrLen(Rec.Zip));
-        Rec.Verified := JsonHelper.GetJBoolean(JToken, 'verified.status', true);
+        Rec.Address := CopyStr(JsonHelper.GetJText(Json, 'address', true), 1, MaxStrLen(Rec.Address));
+        Rec.Address2 := CopyStr(JsonHelper.GetJText(Json, 'address_2', false), 1, MaxStrLen(Rec.Address2));
+        Rec.City := CopyStr(JsonHelper.GetJText(Json, 'city', true), 1, MaxStrLen(Rec.City));
+        Rec.Country := CopyStr(JsonHelper.GetJText(Json, 'country', false), 1, MaxStrLen(Rec.Country));
+        Rec.Zip := CopyStr(JsonHelper.GetJText(Json, 'zip', false), 1, MaxStrLen(Rec.Zip));
+        Rec.Verified := JsonHelper.GetJBoolean(Json, 'verified.status', true);
     end;
 
-    internal procedure AddFromJson(pNPEmailAccountId: Integer; Json: JsonObject)
+    internal procedure AddFromJson(pNPEmailAccountId: Integer; Json: JsonToken)
     begin
         Rec.Init();
         Rec.FromJson(pNPEmailAccountId, Json);

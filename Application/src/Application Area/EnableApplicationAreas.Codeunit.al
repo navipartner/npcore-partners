@@ -97,8 +97,16 @@ codeunit 6151349 "NPR Enable Application Areas"
 
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
     local procedure EnableNPEmail(var TempApplicationAreaSetup: Record "Application Area Setup" temporary)
+    var
+        IsNPEmailEnabled: Boolean;
+        IsNewEmailExpEnabled: Boolean;
     begin
-        TempApplicationAreaSetup."NPR NP Email" := IsFeatureEnabled(Feature::"NP Email");
+        IsNPEmailEnabled := IsFeatureEnabled(Feature::"NP Email");
+        IsNewEmailExpEnabled := IsFeatureEnabled(Feature::"New Email Experience");
+
+        TempApplicationAreaSetup."NPR NP Email" := IsNPEmailEnabled;
+        TempApplicationAreaSetup."NPR NP Email Templ" := IsNewEmailExpEnabled;
+        TempApplicationAreaSetup."NPR Legacy Email" := (not IsNewEmailExpEnabled);
     end;
 #endif
 

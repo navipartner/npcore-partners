@@ -7,7 +7,7 @@
     UsageCategory = Administration;
 
     SourceTable = "NPR E-mail Template Filter";
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRLegacyEmail;
 
     layout
     {
@@ -19,19 +19,19 @@
                 {
 
                     ToolTip = 'Specifies the value of the Field No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 field("Field Name"; Rec."Field Name")
                 {
 
                     ToolTip = 'Specifies the value of the Field Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 field(Value; Rec.Value)
                 {
 
                     ToolTip = 'Specifies the value of the Value field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
             }
         }

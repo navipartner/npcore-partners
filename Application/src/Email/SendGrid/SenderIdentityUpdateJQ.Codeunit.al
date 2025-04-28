@@ -16,5 +16,52 @@ codeunit 6248273 "NPR Sender Identity Update JQ"
 
         Client.UpdateLocalSenderIdentities();
     end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", OnAfterValidateEvent, "Object ID to Run", true, true)]
+    local procedure SetJobQueueEntryName(var Rec: Record "Job Queue Entry")
+    begin
+        if (Rec."Object Type to Run" <> Rec."Object Type to Run"::Codeunit) then
+            exit;
+        if (Rec."Object ID to Run" <> Codeunit::"NPR Sender Identity Update JQ") then
+            exit;
+
+        Rec.Description := CopyStr(GetJobDescription(), 1, MaxStrLen(Rec.Description));
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnRefreshNPRJobQueueList, '', true, true)]
+    local procedure OnRefreshNPRJobQueueList()
+    var
+        JobQueueManagement: Codeunit "NPR Job Queue Management";
+        JobQueueEntry: Record "Job Queue Entry";
+        Feature: Codeunit "NPR NP Email Feature";
+    begin
+        if (not Feature.IsFeatureEnabled()) then
+            exit;
+
+        if JobQueueManagement.InitRecurringJobQueueEntry(
+                JobQueueEntry."Object Type to Run"::Codeunit,
+                Codeunit::"NPR Sender Identity Update JQ",
+                '',
+                GetJobDescription(),
+                CurrentDateTime(),
+                5,
+                'NP EMAIL',
+                JobQueueEntry
+        ) then
+            JobQueueManagement.StartJobQueueEntry(JobQueueEntry);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnCheckIfIsNPRecurringJob, '', true, true)]
+    local procedure OnCheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
+    begin
+        IsNpJob := ((JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and (JobQueueEntry."Object ID to Run" = Codeunit::"NPR Sender Identity Update JQ"));
+    end;
+
+    local procedure GetJobDescription(): Text[250]
+    var
+        FetchLatestTemplatesLbl: Label 'Fetch NP Email Sender Identities', MaxLength = 250;
+    begin
+        exit(FetchLatestTemplatesLbl);
+    end;
 }
 #endif

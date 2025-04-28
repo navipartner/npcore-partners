@@ -666,6 +666,10 @@
     var
         RecordRef: RecordRef;
         EMailMgt: Codeunit "NPR E-mail Management";
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        NPEmail: Codeunit "NPR NP Email";
+        NewEmailExperienceFeature: Codeunit "NPR NewEmailExpFeature";
+#endif
     begin
 
         RecordRef.GetTable(MemberNotificationEntry);
@@ -676,7 +680,16 @@
                 MemberNotificationEntry."Notification Engine"::M2_EMAILER:
                     ResponseMessage := SendEmailUsingM2Engine(MemberNotificationEntry);
                 MemberNotificationEntry."Notification Engine"::NATIVE:
-                    EMailMgt.AttemptSendEmail(RecordRef, MemberNotificationEntry."E-Mail Address", ResponseMessage);
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+                    if (NewEmailExperienceFeature.IsFeatureEnabled()) then begin
+                        ResponseMessage := '';
+                        if (not NPEmail.TrySendEmail(MemberNotificationEntry."Template Filter Value", MemberNotificationEntry, MemberNotificationEntry."E-Mail Address", MemberNotificationEntry.PreferredLanguageCode)) then begin
+                            ResponseMessage := GetLastErrorText();
+                            exit(false);
+                        end;
+                    end else
+#endif
+                        EMailMgt.AttemptSendEmail(RecordRef, MemberNotificationEntry."E-Mail Address", ResponseMessage);
             end;
         end;
 

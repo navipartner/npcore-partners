@@ -7,7 +7,7 @@
     UsageCategory = Administration;
 
     SourceTable = "NPR E-mail Log";
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRLegacyEmail;
 
     layout
     {
@@ -19,44 +19,44 @@
                 {
 
                     ToolTip = 'Specifies the value of the Recipient E-mail field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 field("From E-mail"; Rec."From E-mail")
                 {
 
                     ToolTip = 'Specifies the value of the From E-mail field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 field("E-mail subject"; Rec."E-mail subject")
                 {
 
                     ToolTip = 'Specifies the value of the E-mail subject field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 field(Filename; Rec.Filename)
                 {
 
                     Visible = false;
                     ToolTip = 'Specifies the value of the Filename field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 field("Sent Date"; Rec."Sent Date")
                 {
 
                     ToolTip = 'Specifies the value of the Sent Date field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 field("Sent Time"; Rec."Sent Time")
                 {
 
                     ToolTip = 'Specifies the value of the Sent time field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
                 field("Sent Username"; Rec."Sent Username")
                 {
 
                     ToolTip = 'Specifies the value of the Sent by Username field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRLegacyEmail;
                 }
             }
         }

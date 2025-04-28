@@ -194,6 +194,11 @@ codeunit 6184982 "NPR Json Builder"
         exit(AddPropertyInternal(PropertyName, PropertyValue));
     end;
 
+    procedure AddProperty(PropertyName: Text; PropertyValue: JsonObject): Codeunit "NPR Json Builder"
+    begin
+        exit(AddPropertyInternal(PropertyName, PropertyValue));
+    end;
+
     /// <summary>
     /// Add a property with a JSON value.
     /// </summary>
@@ -221,6 +226,7 @@ codeunit 6184982 "NPR Json Builder"
     local procedure AddPropertyInternal(PropertyName: Text; PropertyValue: Variant): Codeunit "NPR Json Builder"
     var
         JValue: JsonValue;
+        JObject: JsonObject;
         NewObject: JsonObject;
     begin
         InitcurrCodeunit();
@@ -230,8 +236,13 @@ codeunit 6184982 "NPR Json Builder"
             IsRootSet := true;
             TokenStack.Add(CurrentJsonToken);
         end;
-        JValue := CreateJsonValue(PropertyValue);
-        AddTokenToParent(PropertyName, JValue.AsToken());
+        if (PropertyValue.IsJsonObject) then begin
+            JObject := PropertyValue;
+            AddTokenToParent(PropertyName, JObject.AsToken());
+        end else begin
+            JValue := CreateJsonValue(PropertyValue);
+            AddTokenToParent(PropertyName, JValue.AsToken());
+        end;
         exit(currCodeunit);
     end;
 

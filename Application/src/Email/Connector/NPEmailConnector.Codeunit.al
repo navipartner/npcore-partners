@@ -1,5 +1,5 @@
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
-codeunit 6248262 "NPR NP Email Web SMTP" implements "Email Connector"
+codeunit 6248262 "NPR NP Email Connector" implements "Email Connector"
 {
     Access = Internal;
 
@@ -9,13 +9,18 @@ codeunit 6248262 "NPR NP Email Web SMTP" implements "Email Connector"
 
     procedure Send(EmailMessage: Codeunit "Email Message"; AccountId: Guid)
     var
-        SendGridEmailAccount: Record "NPR NPEmailWebSMTPEmailAccount";
+        NPEmailAccount: Record "NPR NPEmailWebSMTPEmailAccount";
         Client: Codeunit "NPR SendGrid Client";
+        JToken: JsonToken;
     begin
-        SendGridEmailAccount.SetAutoCalcFields(SenderIdentityVerified);
-        SendGridEmailAccount.Get(AccountId);
-        SendGridEmailAccount.TestField(SenderIdentityVerified);
-        Client.SendEmail(EmailMessage, SendGridEmailAccount);
+        NPEmailAccount.SetAutoCalcFields(SenderIdentityVerified);
+        NPEmailAccount.Get(AccountId);
+        NPEmailAccount.TestField(SenderIdentityVerified);
+
+        if (JToken.ReadFrom(EmailMessage.GetBody())) and (JToken.SelectToken('npemail_dynamic_template_data', JToken)) then
+            Client.SendDynamicEmail(EmailMessage, NPEmailAccount)
+        else
+            Client.SendEmail(EmailMessage, NPEmailAccount);
     end;
 
     procedure GetAccounts(var Accounts: Record "Email Account")
@@ -90,7 +95,7 @@ codeunit 6248262 "NPR NP Email Web SMTP" implements "Email Connector"
 
     procedure GetDescription(): Text[250]
     var
-        EmailDescriptionLbl: Label 'NP Email SMTP sending powered by SendGrid';
+        EmailDescriptionLbl: Label 'NP Email sending powered by SendGrid';
     begin
         exit(EmailDescriptionLbl);
     end;

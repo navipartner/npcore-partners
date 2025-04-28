@@ -150,6 +150,10 @@
     var
         RecordRef: RecordRef;
         EMailMgt: Codeunit "NPR E-mail Management";
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        NPEmail: Codeunit "NPR NP Email";
+        NewEmailExpFeature: Codeunit "NPR NewEmailExpFeature";
+#endif
     begin
 
         if (TicketNotificationEntry."Notification Address" = '') then begin
@@ -158,7 +162,16 @@
         end;
 
         RecordRef.GetTable(TicketNotificationEntry);
-        EMailMgt.AttemptSendEmail(RecordRef, TicketNotificationEntry."Notification Address", ResponseMessage);
+
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        if (NewEmailExpFeature.IsFeatureEnabled()) then begin
+            if (not NPEmail.TrySendEmail(TicketNotificationEntry."Template Code", TicketNotificationEntry, TicketNotificationEntry."Notification Address")) then begin
+                ResponseMessage := GetLastErrorText();
+                exit(false);
+            end;
+        end else
+#endif
+            EMailMgt.AttemptSendEmail(RecordRef, TicketNotificationEntry."Notification Address", ResponseMessage);
 
         if (ResponseMessage <> '') then
             EmitTicketNotificationTelemetry(TicketNotificationEntry, ResponseMessage);

@@ -54,21 +54,52 @@ codeunit 6248263 "NPR SendGrid API Client"
     end;
     #endregion
 
+    #region Dynamic Templates
+    [TryFunction]
+    internal procedure TryGetDynamicTemplates(AccountId: Integer; var TempDynamicTemplate: Record "NPR SendGridDynamicTemplate" temporary)
+    var
+        Client: HttpClient;
+        ResponseMsg: HttpResponseMessage;
+        ResponseTxt: Text;
+        JToken: JsonToken;
+        BufToken: JsonToken;
+        FailedToFetchDynamicTemplatesErr: Label 'Failed to fetch dynamic templates from the API.\Status code: %1\Body: %2', Comment = '%1 = http status code, %2 = http body';
+    begin
+        Client := GenerateClient(AccountId);
+
+        Client.Get('/v3/templates?generations=dynamic', ResponseMsg);
+        if (not ResponseMsg.Content.ReadAs(ResponseTxt)) then;
+
+        if (not ResponseMsg.IsSuccessStatusCode()) then
+            Error(FailedToFetchDynamicTemplatesErr, ResponseMsg.HttpStatusCode(), ResponseTxt);
+
+        JToken.ReadFrom(ResponseTxt);
+        JToken.SelectToken('templates', JToken);
+        foreach BufToken in JToken.AsArray() do
+            TempDynamicTemplate.AddFromJson(BufToken);
+    end;
+    #endregion
+
     #region Domain and DNS Management
     internal procedure GetSenderIdentities(AccountId: Integer; var TempSenderIdentities: Record "NPR SendGrid Sender Identity" temporary)
     var
         Client: HttpClient;
         ResponseMsg: HttpResponseMessage;
-        InStr: InStream;
+        ResponseTxt: Text;
         JToken: JsonToken;
         BufToken: JsonToken;
+        FailedToFetchDynamicTemplatesErr: Label 'Failed to fetch sender identities from the API.\Status code: %1\Body: %2', Comment = '%1 = http status code, %2 = http body';
     begin
         Client := GenerateClient(AccountId);
         Client.Get('/v3/senders', ResponseMsg);
-        ResponseMsg.Content.ReadAs(InStr);
-        JToken.ReadFrom(InStr);
+        if (not ResponseMsg.Content.ReadAs(ResponseTxt)) then;
+
+        if (not ResponseMsg.IsSuccessStatusCode()) then
+            Error(FailedToFetchDynamicTemplatesErr, ResponseMsg.HttpStatusCode(), ResponseTxt);
+
+        JToken.ReadFrom(ResponseTxt);
         foreach BufToken in JToken.AsArray() do
-            TempSenderIdentities.AddFromJson(AccountId, BufToken.AsObject());
+            TempSenderIdentities.AddFromJson(AccountId, BufToken);
     end;
 
     /**
