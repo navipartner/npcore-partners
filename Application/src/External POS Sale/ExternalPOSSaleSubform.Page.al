@@ -6,6 +6,7 @@
     PageType = ListPart;
     SourceTable = "NPR External POS Sale Line";
     UsageCategory = None;
+    DeleteAllowed = false;
 
     layout
     {

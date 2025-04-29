@@ -50,4 +50,18 @@ table 6150988 "NPR External POS Sale Eft Line"
         {
         }
     }
+
+    procedure GetBase64DataText() ReturnText: Text
+    var
+        InS: InStream;
+        StreamData: Text;
+    begin
+        Rec.CalcFields(Base64Data);
+        Rec.Base64Data.CreateInStream(InS);
+        while not InS.EOS() do begin
+            if (InS.ReadText(StreamData) > 0) then
+                ReturnText += StreamData;
+        end;
+        exit(ReturnText);
+    end;
 }

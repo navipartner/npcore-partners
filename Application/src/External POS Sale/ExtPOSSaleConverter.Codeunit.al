@@ -27,8 +27,6 @@
         Base64Convert: Codeunit "Base64 Convert";
         EftResponseDataBase64: Text;
         EftResponseData: Text;
-        StreamData: Text;
-        InS: InStream;
         EftPaymenLineNotFoundLbl: Label 'EFT Data not found for payment Line number: %1';
     begin
         ExternalPOSSale.TestField("Sales Ticket No.");
@@ -38,24 +36,30 @@
         if (not ExternalPOSSaleLine.FindSet()) then
             exit;
         repeat begin
+            Clear(EftResponseDataBase64);
+            Clear(EftResponseData);
+            ExternalPOSSaleEftLine.Reset();
+
             if (not ExternalPOSSaleEftLine.Get(ExternalPOSSale."Entry No.", ExternalPOSSaleLine."Line No.")) then begin
                 Error(EftPaymenLineNotFoundLbl, ExternalPOSSaleLine."Line No.");
             end else begin
-                ExternalPOSSaleEftLine.CalcFields(Base64Data);
-                ExternalPOSSaleEftLine.Base64Data.CreateInStream(InS);
-                while not InS.EOS() do begin
-                    if (InS.ReadText(StreamData) > 0) then
-                        EftResponseDataBase64 += StreamData;
-                end;
+                EftResponseDataBase64 := ExternalPOSSaleEftLine.GetBase64DataText();
                 EftResponseData := Base64Convert.FromBase64(EftResponseDataBase64);
-                EFTTransactionRequest.Init();
-                EFTTransactionRequest.Insert();
+                CreateNewEFTTransactionRequest(EFTTransactionRequest);
                 EFTTransactionRequestPrefill(ExternalPOSSale, EFTTransactionRequest, ExternalPOSSaleLine, ExternalPOSSaleEftLine);
                 EFTTransactionRequestIntegrationHandle(EFTTransactionRequest, EftResponseData, ExternalPOSSaleEftLine);
                 ExternalPOSSaleLine."No." := EFTTransactionRequest."POS Payment Type Code";
                 ExternalPOSSaleLine.Modify();
             end;
-        end until ExternalPOSSaleLine.Next() <> 1;
+        end until ExternalPOSSaleLine.Next() = 0;
+    end;
+
+    local procedure CreateNewEFTTransactionRequest(var EFTTransactionRequest: Record "NPR EFT Transaction Request")
+    begin
+        EFTTransactionRequest.Reset();
+        EFTTransactionRequest.Init();
+        EFTTransactionRequest."Entry No." := 0;
+        EFTTransactionRequest.Insert();
     end;
 
     local procedure EFTTransactionRequestPrefill(
