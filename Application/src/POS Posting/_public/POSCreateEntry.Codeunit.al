@@ -1952,6 +1952,7 @@
         POSEntryManagement: Codeunit "NPR POS Entry Management";
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
         POSUnitManager: Codeunit "NPR POS Manage POS Unit";
+        POSActionIssueDigRcptB: Codeunit "NPR POS Action: IssueDigRcpt B";
         ExtSaleCancelled: Boolean;
         WasModified: Boolean;
         ValidationErrorLbl: Label 'Validation Error - External POS Sale data was invalid: %1';
@@ -1992,6 +1993,9 @@
         end;
 
         OnAfterInsertPOSEntryFromExternalPOSSale(ExtPOSSale, POSEntry);
+        if ExtPOSSale."Send Receipt: Email" or ExtPOSSale."Send Receipt: SMS" then
+            POSActionIssueDigRcptB.CreateDigitalReceipt(POSEntry);
+
         GlobalPOSEntry := POSEntry;
 
         ExtPOSSale."Converted To POS Entry" := true;

@@ -77,4 +77,23 @@ codeunit 6060074 "NPR POS Action: IssueDigRcpt B"
     begin
         FooterText := StrSubstNo(FooterTextPlaceholderLabel, FooterTextLbl, FooterTermsLbl, FooterConditionsLbl);
     end;
+
+    internal procedure CreateDigitalReceipt(POSEntry: Record "NPR POS Entry")
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSReceiptProfile: Record "NPR POS Receipt Profile";
+        DigitalReceiptLink: Text;
+        FooterText: Text;
+    begin
+        if not POSUnit.Get(POSEntry."POS Unit No.") then
+            exit;
+
+        if not POSReceiptProfile.Get(POSUnit."POS Receipt Profile") then
+            exit;
+
+        if not POSReceiptProfile."Enable Digital Receipt" then
+            exit;
+
+        CreateDigitalReceipt(POSEntry."Document No.", DigitalReceiptLink, FooterText);
+    end;
 }
