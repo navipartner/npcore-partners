@@ -2704,6 +2704,13 @@
         exit(DetailedTicketAccessEntry.FindLast());
     end;
 
+    procedure GetCurrentScheduleEntryForSales(ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]): Integer
+    var
+        ScheduleContext: Option Admit,Sale;
+    begin
+        exit(GetCurrentScheduleEntry(ItemNo, VariantCode, AdmissionCode, false, ScheduleContext::Sale));
+    end;
+
     procedure GetCurrentScheduleEntry(Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; WithCreate: Boolean): Integer
     begin
         exit(GetCurrentScheduleEntry(Ticket."Item No.", Ticket."Variant Code", AdmissionCode, WithCreate, 0));

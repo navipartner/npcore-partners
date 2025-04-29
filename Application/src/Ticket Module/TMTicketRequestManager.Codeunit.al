@@ -623,27 +623,34 @@
         ReferenceDate: Date;
         TimeHelper: Codeunit "NPR TM TimeHelper";
         LocalDateTime: DateTime;
-        LocalDate: Date;
-        LocalTime: Time;
+        TicketManager: Codeunit "NPR TM Ticket Management";
+        EntryNo: Integer;
     begin
         ReferenceDate := Today();
         PriceUpdated := false;
-
-        AdmScheduleEntry.SetCurrentKey("External Schedule Entry No.");
-        AdmScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', TicketReservationRequest."External Adm. Sch. Entry No.");
-        AdmScheduleEntry.SetFilter(Cancelled, '=%1', false);
-        if (AdmScheduleEntry.FindFirst()) then
-            ReferenceDate := AdmScheduleEntry."Admission Start Date";
-
         LocalDateTime := TimeHelper.GetLocalTimeAtAdmission(AdmScheduleEntry."Admission Code");
-        LocalDate := DT2Date(LocalDateTime);
-        LocalTime := DT2Time(LocalDateTime);
+
+        // Get Schedule Entry - if not set, use the current schedule entry
+        if (TicketReservationRequest."External Adm. Sch. Entry No." <= 0) then begin
+            EntryNo := TicketManager.GetCurrentScheduleEntryForSales(TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest."Admission Code");
+            if (AdmScheduleEntry.Get(EntryNo)) then begin
+                ReferenceDate := AdmScheduleEntry."Admission Start Date";
+                TicketReservationRequest."External Adm. Sch. Entry No." := AdmScheduleEntry."External Schedule Entry No.";
+            end;
+
+        end else begin
+            AdmScheduleEntry.SetCurrentKey("External Schedule Entry No.");
+            AdmScheduleEntry.SetFilter("External Schedule Entry No.", '=%1', TicketReservationRequest."External Adm. Sch. Entry No.");
+            AdmScheduleEntry.SetFilter(Cancelled, '=%1', false);
+            if (AdmScheduleEntry.FindFirst()) then
+                ReferenceDate := AdmScheduleEntry."Admission Start Date";
+        end;
 
         if (TicketReservationRequest."Admission Inclusion" = TicketReservationRequest."Admission Inclusion"::REQUIRED) then begin
             PriceCalculation.CalculateErpUnitPrice(
                 TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest."Customer No.", ReferenceDate, TicketReservationRequest.Quantity,
                 UnitPrice, DiscountPct, UnitPriceIncludesVat, UnitPriceVatPercentage);
-            PriceCalculation.SetTicketAdmissionDynamicUnitPrice(TicketReservationRequest, AdmScheduleEntry, UnitPrice, DiscountPct, UnitPriceIncludesVat, UnitPriceVatPercentage, LocalDate, LocalTime);
+            PriceCalculation.SetTicketAdmissionDynamicUnitPrice(TicketReservationRequest, AdmScheduleEntry, UnitPrice, DiscountPct, UnitPriceIncludesVat, UnitPriceVatPercentage, LocalDateTime);
             PriceUpdated := true;
         end;
 
@@ -652,7 +659,7 @@
                 PriceCalculation.CalculateErpUnitPrice(
                     Admission."Additional Experience Item No.", '', TicketReservationRequest."Customer No.", ReferenceDate, TicketReservationRequest.Quantity,
                     UnitPrice, DiscountPct, UnitPriceIncludesVat, UnitPriceVatPercentage);
-                PriceCalculation.SetTicketAdmissionDynamicUnitPrice(TicketReservationRequest, AdmScheduleEntry, UnitPrice, DiscountPct, UnitPriceIncludesVat, UnitPriceVatPercentage, LocalDate, LocalTime);
+                PriceCalculation.SetTicketAdmissionDynamicUnitPrice(TicketReservationRequest, AdmScheduleEntry, UnitPrice, DiscountPct, UnitPriceIncludesVat, UnitPriceVatPercentage, LocalDateTime);
                 PriceUpdated := true;
             end;
         end;

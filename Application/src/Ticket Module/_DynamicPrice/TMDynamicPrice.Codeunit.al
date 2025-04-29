@@ -120,9 +120,8 @@ codeunit 6014559 "NPR TM Dynamic Price"
         var ReservationRequest: Record "NPR TM Ticket Reservation Req.";
         AdmScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         OriginalUnitPrice: Decimal; DiscountPct: Decimal; PriceIncludesVAT: Boolean; VatPercentage: Decimal;
-        ReferenceDate: Date; ReferenceTime: Time)
+        ReferenceDateDate: DateTime)
     var
-
         PriceRule: Record "NPR TM Dynamic Price Rule";
         GeneralLedgerSetup: Record "General Ledger Setup";
         HavePriceRule: Boolean;
@@ -130,7 +129,7 @@ codeunit 6014559 "NPR TM Dynamic Price"
     begin
 
         if (AdmScheduleEntry."Entry No." > 0) and (AdmScheduleEntry."External Schedule Entry No." > 0) then
-            HavePriceRule := SelectPriceRule(AdmScheduleEntry, ReservationRequest."Item No.", ReservationRequest."Variant Code", ReferenceDate, ReferenceTime, PriceRule);
+            HavePriceRule := SelectPriceRule(AdmScheduleEntry, ReservationRequest."Item No.", ReservationRequest."Variant Code", DT2Date(ReferenceDateDate), DT2Time(ReferenceDateDate), PriceRule);
         if (HavePriceRule) then
             EvaluatePriceRule(PriceRule, OriginalUnitPrice, PriceIncludesVAT, VatPercentage, false, BasePrice, AddonPrice);
 
