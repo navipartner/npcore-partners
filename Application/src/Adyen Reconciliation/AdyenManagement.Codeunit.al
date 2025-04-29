@@ -851,6 +851,17 @@ codeunit 6184796 "NPR Adyen Management"
         if not HttpResponseMessage.IsSuccessStatusCode() then
             Error(ResponseErrorLbl, HttpResponseMessage.HttpStatusCode(), HttpResponseMessage.ReasonPhrase(), ResponseTxt);
     end;
+
+    internal procedure SetEFTAdyenIntegrationFilter(var EFTTransactionRequest: Record "NPR EFT Transaction Request")
+    var
+        AdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integrat.";
+        AdyenTTPIntegration: Codeunit "NPR EFT Adyen TTP Integ.";
+        AdyenMposLanIntegration: Codeunit "NPR EFT Adyen Mpos Lan Integ.";
+        AdyenHWCIntegration: Codeunit "NPR EFT Adyen HWC Integrat.";
+        AdyenLocalIntegration: Codeunit "NPR EFT Adyen Local Integrat.";
+    begin
+        EFTTransactionRequest.SetFilter("Integration Type", '%1|%2|%3|%4|%5', AdyenCloudIntegration.IntegrationType(), AdyenTTPIntegration.IntegrationType(), AdyenMposLanIntegration.IntegrationType(), AdyenHWCIntegration.IntegrationType(), AdyenLocalIntegration.IntegrationType());
+    end;
     #endregion
 
     #region Reconciliation
@@ -894,8 +905,6 @@ codeunit 6184796 "NPR Adyen Management"
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         PaymentGateway: Record "NPR Magento Payment Gateway";
-        AdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integrat.";
-        AdyenLocalIntegration: Codeunit "NPR EFT Adyen Local Integrat.";
         EFTEntries: Integer;
         MagentoEntries: Integer;
         ProcessedEntries: Integer;
@@ -913,7 +922,7 @@ codeunit 6184796 "NPR Adyen Management"
         EFTTransactionRequest.SetFilter(Finished, '<%1', AdyenSetup."Recon. Integr. Starting Date");
         EFTTransactionRequest.SetRange(Reconciled, false);
         EFTTransactionRequest.SetRange("Financial Impact", true);
-        EFTTransactionRequest.SetFilter("Integration Type", '%1|%2', AdyenCloudIntegration.IntegrationType(), AdyenLocalIntegration.IntegrationType());
+        SetEFTAdyenIntegrationFilter(EFTTransactionRequest);
         if EFTTransactionRequest.FindSet(true) then begin
             EFTEntries := EFTTransactionRequest.Count();
             Window.Open(UpdatingEFTLbl);

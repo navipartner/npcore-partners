@@ -103,8 +103,6 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                         SubscrPaymentRequests: Page "NPR MM Subscr.Payment Requests";
                         SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
                         PaymentGateway: Record "NPR Magento Payment Gateway";
-                        AdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integrat.";
-                        AdyenLocalIntegration: Codeunit "NPR EFT Adyen Local Integrat.";
                         AdyenTransMatching: Codeunit "NPR Adyen Trans. Matching";
                         FilterPGCodes: Text;
                     begin
@@ -113,7 +111,7 @@ page 6184503 "NPR Adyen Reconciliation Lines"
                                 begin
                                     if _AdyenManagement.ManualMatchingAllowed(Rec) then begin
                                         EFTTransaction.FilterGroup(2);
-                                        EFTTransaction.SetFilter("Integration Type", '%1|%2', AdyenCloudIntegration.IntegrationType(), AdyenLocalIntegration.IntegrationType());
+                                        _AdyenManagement.SetEFTAdyenIntegrationFilter(EFTTransaction);
                                         if not (Rec."Transaction Type" in
                                             [Rec."Transaction Type"::Chargeback,
                                             Rec."Transaction Type"::SecondChargeback,

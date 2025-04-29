@@ -25,8 +25,7 @@ codeunit 6184908 "NPR Adyen Recon. Upgrade"
     local procedure UpdatePSPReferenceForEFTTrans()
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        AdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integrat.";
-        AdyenLocalIntegration: Codeunit "NPR EFT Adyen Local Integrat.";
+        AdyenManagement: Codeunit "NPR Adyen Management";
     begin
         UpgradeStep := 'UpdatePSPReferenceForEFTTrans';
         if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep)) then
@@ -34,7 +33,7 @@ codeunit 6184908 "NPR Adyen Recon. Upgrade"
         LogMessageStopwatch.LogStart(CompanyName(), 'NPR Adyen Recon. Upgrade', UpgradeStep);
 
         EFTTransactionRequest.Reset();
-        EFTTransactionRequest.SetFilter("Integration Type", '%1|%2', AdyenCloudIntegration.IntegrationType(), AdyenLocalIntegration.IntegrationType());
+        AdyenManagement.SetEFTAdyenIntegrationFilter(EFTTransactionRequest);
         if EFTTransactionRequest.FindSet(true) then
             repeat
                 if EFTTransactionRequest."External Transaction ID".Split('.').Count = 2 then begin

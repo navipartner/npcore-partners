@@ -567,12 +567,10 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         PaymentLine: Record "NPR POS Entry Payment Line";
-        AdyenCloudIntegration: Codeunit "NPR EFT Adyen Cloud Integrat.";
-        AdyenLocalIntegration: Codeunit "NPR EFT Adyen Local Integrat.";
     begin
         EFTTransactionRequest.Reset();
         EFTTransactionRequest.SetRange("PSP Reference", ReconciliationLine."PSP Reference");
-        EFTTransactionRequest.SetFilter("Integration Type", '%1|%2', AdyenCloudIntegration.IntegrationType(), AdyenLocalIntegration.IntegrationType());
+        _AdyenManagement.SetEFTAdyenIntegrationFilter(EFTTransactionRequest);
         if not (ReconciliationLine."Transaction Type" in
             [ReconciliationLine."Transaction Type"::Chargeback,
             ReconciliationLine."Transaction Type"::SecondChargeback,
