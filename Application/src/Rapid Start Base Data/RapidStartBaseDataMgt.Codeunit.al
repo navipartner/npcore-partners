@@ -44,6 +44,7 @@
         XMLNode: XmlNode;
         XMLNodeList: XmlNodeList;
     begin
+        CheckAndUnblockOutboundHttpCallsForInternalDevPlatform();
         httpClient.Get(URL, httpResponseMessage);
         httpResponseMessage.Content.ReadAs(inStream);
         XmlDocument.ReadFrom(inStream, XMLDoc);
@@ -66,6 +67,7 @@
         XMLNodeList: XmlNodeList;
         HelperXMLNode: XMLNode;
     begin
+        CheckAndUnblockOutboundHttpCallsForInternalDevPlatform();
         HttpClient.Get(URL, HttpResponseMessage);
         httpResponseMessage.Content.ReadAs(InStream);
         XmlDocument.ReadFrom(InStream, XMLDoc);
@@ -97,6 +99,8 @@
         if GuiAllowed then
             if not Confirm(ConfirmImportQst) then
                 exit;
+
+        CheckAndUnblockOutboundHttpCallsForInternalDevPlatform();
 
         if configPackage.Get(PackageCode) then
             configPackage.Delete(true);
@@ -133,5 +137,56 @@
                 end;
             until ConfigPackageTable.Next() = 0;
         end;
+    end;
+
+    /// <summary>
+    /// Local method that will enable outbound HTTP calls for the internal dev platform.
+    /// This method might be needed somewhere else in the future but until that momement let's keep it
+    /// here, by purpose. We don't want to enable outbound HTTP calls blindly here and there.
+    /// </summary>
+    local procedure CheckAndUnblockOutboundHttpCallsForInternalDevPlatform()
+    var
+        NAVAppSetting: Record "NAV App Setting";
+#if not BC1700
+        EnvironmentInfo: Codeunit "Environment Information";
+#endif
+        AppInfo: ModuleInfo;
+        WebUrl: Text;
+    begin
+        // If UI sesssion let's force the user to click on the button to enable outbound HTTP calls.
+        // This is a safety measure to avoid enabling outbound HTTP calls by mistake.
+        if (GuiAllowed) then
+            exit;
+
+        // For good reason we don't want to enable outbound HTTP calls for the SaaS infrastructure without a human interaction.
+#if not BC1700
+        if (EnvironmentInfo.IsSaaSInfrastructure()) then
+            exit;
+#endif
+
+        WebUrl := GetUrl(ClientType::Web);
+
+        // Let's enable it for the dev platform only for now.
+        if (not (WebUrl.Contains('dynamics-retail.net'))) then
+            exit;
+
+        NavApp.GetCurrentModuleInfo(AppInfo);
+
+        // Let's exit silently and avoid permission errors here.
+        if ((not NAVAppSetting.ReadPermission) and (not NAVAppSetting.WritePermission)) then
+            exit;
+
+        if not NAVAppSetting.Get(AppInfo.Id) then begin
+            NAVAppSetting.Init();
+            NAVAppSetting."App ID" := AppInfo.Id;
+            if not NAVAppSetting.Insert() then
+                exit;
+        end;
+
+        if (NAVAppSetting."Allow HttpClient Requests") then
+            exit;
+
+        NAVAppSetting."Allow HttpClient Requests" := true;
+        if not NavAppSetting.Modify(true) then;
     end;
 }
