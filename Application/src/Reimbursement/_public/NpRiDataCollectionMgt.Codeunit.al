@@ -126,7 +126,7 @@
         NpRiReimbursementTemplate."Data Collection Filters".CreateInStream(InStream);
         XmlDocument.ReadFrom(InStream, XMLDoc);
 
-        IF not XMLDoc.SelectSingleNode('DataItems/DataItem[@name="' + TableViewName + '"]', XMLNode) then
+        IF not XMLDoc.SelectSingleNode('ReportParameters/DataItems/DataItem[@name="' + TableViewName + '"]', XMLNode) then
             exit;
         TableView := XMLNode.AsXmlElement().InnerText;
 

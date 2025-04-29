@@ -257,6 +257,8 @@
 
         NpRiReimbursementEntry.CalcSums(Amount);
         CreateReimbursementApplicationEntry(NpRiReimbursement, -NpRiReimbursementEntry.Amount, NpRiReimbursementEntryApply);
+
+        NpRiReimbursementEntry.ModifyAll("Closed by Entry No.", NpRiReimbursementEntryApply."Entry No."); //Needed for procedure RunSalesInvReimbursementDocuments
     end;
 
     local procedure CreateReimbursementApplicationEntry(NpRiReimbursement: Record "NPR NpRi Reimbursement"; Amount: Decimal; var NpRiReimbursementEntryApply: Record "NPR NpRi Reimbursement Entry")
