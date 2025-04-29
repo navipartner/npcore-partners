@@ -15,7 +15,6 @@
     begin
         JobQueueInstall.AddJobQueues();
         RemoveObsoleteEntraApp();
-        RecreateMonitoredJobQueueEntries();
     end;
 
     local procedure RemoveObsoleteEntraApp()
@@ -42,21 +41,6 @@
             if User.Get(UserID) then
                 User.Delete();
         end;
-
-        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Upgrade", UpgradeStep));
-        LogMessageStopwatch.LogFinish();
-    end;
-
-    local procedure RecreateMonitoredJobQueueEntries()
-    var
-        MonitoredJobQueueMgt: Codeunit "NPR Monitored Job Queue Mgt.";
-    begin
-        UpgradeStep := 'RecreateMonitoredJobQueueEntries';
-        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Upgrade", UpgradeStep)) then
-            exit;
-        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Job Queue Upgrade', UpgradeStep);
-
-        MonitoredJobQueueMgt.RecreateMonitoredJobQueueEntries();
 
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();

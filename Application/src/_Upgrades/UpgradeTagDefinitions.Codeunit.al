@@ -63,7 +63,6 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetManuallySetOnHold'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateRetentionJobQueue'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Upgrade", 'RemoveObsoleteEntraApp'));
-        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Upgrade", 'RecreateMonitoredJobQueueEntries'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Prices Install"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Event Report Layout Upg."));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Sales Pr. Maint. Setup"));
@@ -521,8 +520,6 @@
                         Exit('NPRUpgradePriceLogTaskQue');
                     'RemoveObsoleteEntraApp':
                         Exit('NPRRemoveObsoleteEntraApp-20250319');
-                    'RecreateMonitoredJobQueueEntries':
-                        Exit('RecreateMonitoredJobQueueEntries-20250414');
                 end;
             Codeunit::"NPR UPG PaymentV2":
                 Exit('NPRUPGPaymentV2-20220913');
