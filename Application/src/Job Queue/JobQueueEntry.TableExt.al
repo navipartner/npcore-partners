@@ -24,5 +24,10 @@ tableextension 6014472 "NPR Job Queue Entry" extends "Job Queue Entry"
             Caption = 'Manually Set On Hold';
             DataClassification = CustomerContent;
         }
+        field(6014409; "NPR Heartbeat URL"; Text[150])
+        {
+            Caption = 'Heartbeat URL';
+            DataClassification = CustomerContent;
+        }
     }
 }

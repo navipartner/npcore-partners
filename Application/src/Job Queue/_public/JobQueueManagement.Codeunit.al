@@ -855,6 +855,19 @@
         RerunDelaySec := DelaySec;
     end;
 
+    [TryFunction]
+    internal procedure SendHeartbeat(JobQueueEntry: Record "Job Queue Entry")
+    var
+        HttpClient: HttpClient;
+        HttpRequestMessage: HttpRequestMessage;
+        HttpResponseMessage: HttpResponseMessage;
+    begin
+        HttpRequestMessage.SetRequestUri(JobQueueEntry."NPR Heartbeat URL");
+        HttpRequestMessage.Method := 'POST';
+        HttpClient.Timeout(5000);
+        HttpClient.Send(HttpRequestMessage, HttpResponseMessage);
+    end;
+
     local procedure ClearAdditionalParams()
     begin
         Clear(JobTimeout);
@@ -1254,6 +1267,18 @@
         if NewStatus <> JobQueueEntry.Status::"On Hold" then
             JobQueueEntry."NPR Manually Set On Hold" := false;
     end;
+
+#if BC17 or BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue Dispatcher", 'OnAfterExecuteJob', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue Dispatcher", OnAfterSuccessExecuteJob, '', false, false)]
+#endif
+    local procedure SendHeartbeatOnAfterSuccessExecuteJob(var JobQueueEntry: Record "Job Queue Entry")
+    begin
+        if (JobQueueEntry.Status <> JobQueueEntry.Status::Error) and (JobQueueEntry."NPR Heartbeat URL" <> '') then
+            SendHeartbeat(JobQueueEntry);
+    end;
+
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeScheduleNcTaskProcessing(var JobQueueEntry: Record "Job Queue Entry"; TaskProcessorCode: Code[20]; var EnableTaskListUpdate: Boolean; var JobQueueCatagoryCode: Code[10]; var Handled: Boolean)

@@ -53,6 +53,11 @@ pageextension 6014424 "NPR Job Queue Entry Card" extends "Job Queue Entry Card"
                     end;
                 end;
             }
+            field("NPR Heartbeat URL"; Rec."NPR Heartbeat URL")
+            {
+                ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the URL of where to send a heartbeat on Job Queue''s successful execution.';
+            }
         }
     }
     actions

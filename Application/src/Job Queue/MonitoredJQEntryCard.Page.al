@@ -120,6 +120,11 @@ page 6185042 "NPR Monitored JQ Entry Card"
                     ToolTip = 'Specifies whether this Job Queue entry is allowed to be managed by the NP Refresher functionality.';
                     Editable = _RefreshingCanBeToggled;
                 }
+                field("NPR Heartbeat URL"; Rec."NPR Heartbeat URL")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the URL of where to send a heartbeat on Job Queue''s successful execution.';
+                }
             }
             group("Report Parameters")
             {

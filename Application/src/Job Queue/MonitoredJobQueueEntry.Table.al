@@ -295,6 +295,11 @@ table 6151148 "NPR Monitored Job Queue Entry"
             Caption = 'NP Managed Job';
             DataClassification = CustomerContent;
         }
+        field(6014409; "NPR Heartbeat URL"; Text[150])
+        {
+            Caption = 'Heartbeat URL';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {
