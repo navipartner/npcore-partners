@@ -138,7 +138,7 @@
             group(CustomerInfo)
             {
                 Caption = 'Customer Information';
-                Editable = false;
+                Editable = true;
                 field("Send Receipt: Email"; Rec."Send Receipt: Email")
                 {
                     ApplicationArea = NPRRetail;
