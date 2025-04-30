@@ -43,7 +43,11 @@
         POSAuditLog.SetFilter("Additional Information", '<>%1', '');
         if POSAuditLog.FindSet(true) then
             repeat
-                NewAdditionalInformation := POSAuditLog."Additional Information";
+                if POSAuditLog."Additional Information" <> '0' then
+                    NewAdditionalInformation := POSAuditLog."Additional Information"
+                else
+                    NewAdditionalInformation := '0.00';
+
                 NewAdditionalInformation := RemoveNonNumericChars(NewAdditionalInformation);
                 NewAdditionalInformation := NewAdditionalInformation.Replace(',', '.');
                 WholeNumber := CopyStr(NewAdditionalInformation, 1, StrLen(NewAdditionalInformation) - 3);
@@ -74,7 +78,11 @@
         POSAuditLog.SetFilter("Additional Information", '<>%1', '');
         if POSAuditLog.FindSet(true) then
             repeat
-                NewAdditionalInformation := POSAuditLog."Additional Information";
+                if POSAuditLog."Additional Information" <> '0' then
+                    NewAdditionalInformation := POSAuditLog."Additional Information"
+                else
+                    NewAdditionalInformation := '0.00';
+
                 NewAdditionalInformation := RemoveNonNumericChars(NewAdditionalInformation);
                 NewAdditionalInformation := NewAdditionalInformation.Replace(',', '.');
                 WholeNumber := CopyStr(NewAdditionalInformation, 1, StrLen(NewAdditionalInformation) - 3);
