@@ -48,8 +48,9 @@ table 6150811 "NPR Spfy Store-Item Link"
                 ConfirmDisableSyncLbl: Label 'Are you sure you want to disable synchronization for Item %1 with Shopify Store %2? If you confirm, the item will be marked as archived on the Shopify Store.', Comment = '%1 - Item No., %2 - Shopify Store Code';
             begin
                 if xRec."Sync. to this Store" and not "Sync. to this Store" then
-                    if not Confirm(ConfirmDisableSyncLbl, false, "Item No.", "Shopify Store Code") then
-                        Error('');
+                    if GuiAllowed then
+                        if not Confirm(ConfirmDisableSyncLbl, false, "Item No.", "Shopify Store Code") then
+                            Error('');
                 if "Sync. to this Store" then begin
                     Modify();
                     SpfyMetafieldMgt.InitStoreItemLinkMetafields(Rec);
