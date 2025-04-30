@@ -12,14 +12,14 @@ table 6151028 "NPR Spfy Item Variant Modif."
         {
             Caption = 'Item No.';
             DataClassification = CustomerContent;
-            TableRelation = Item;
+            TableRelation = Item."No.";
             NotBlank = true;
         }
         field(20; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
             DataClassification = CustomerContent;
-            TableRelation = "Item Variant" where("Item No." = field("Item No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(30; "Shopify Store Code"; Code[20])
         {

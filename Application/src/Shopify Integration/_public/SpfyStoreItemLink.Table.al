@@ -21,14 +21,14 @@ table 6150811 "NPR Spfy Store-Item Link"
         {
             Caption = 'Item No.';
             DataClassification = CustomerContent;
-            TableRelation = Item;
+            TableRelation = Item."No.";
             NotBlank = true;
         }
         field(30; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
             DataClassification = CustomerContent;
-            TableRelation = if (Type = const("Variant")) "Item Variant" where("Item No." = field("Item No."));
+            TableRelation = if (Type = const("Variant")) "Item Variant".Code where("Item No." = field("Item No."));
         }
         field(40; "Shopify Store Code"; Code[20])
         {

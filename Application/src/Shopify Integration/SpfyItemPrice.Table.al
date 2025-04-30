@@ -25,7 +25,7 @@ table 6150924 "NPR Spfy Item Price"
         {
             Caption = 'Shopify Store Code';
             DataClassification = CustomerContent;
-            TableRelation = "NPR Spfy Store";
+            TableRelation = "NPR Spfy Store".Code;
         }
         field(4; "Unit Price"; Decimal)
         {
