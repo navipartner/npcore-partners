@@ -12,7 +12,6 @@ permissionset 6014408 "NPR API Core"
         "NPR All Webhooks"; // Removes all our webhooks upfront so only the specific modules added on an Entra App can be used
 
     Permissions =
-        tabledata * = rimd;
-
+        tabledata * = RIMD;
 }
 #endif

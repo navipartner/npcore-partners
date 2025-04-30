@@ -90,6 +90,13 @@ codeunit 6185052 "NPR API Request Processor"
             exit(responseCodeunit.RespondForbidden(StrSubstNo('Missing permissions: %1', apiModuleResolver.GetRequiredPermissionSet())).AddMetadataHeaders(_SessionMetadata).GetResponseJson());
         end;
 
+# pragma warning disable AA0139
+        if HasUserPermissionSetAssigned(UserSecurityId(), CompanyName(), 'NPR NP RETAIL') then begin
+# pragma warning restore AA0139
+            // For the API module, we want people to pick explicit permission sets instead of the lazy "give me everything" NPR NP RETAIL approach.
+            exit(responseCodeunit.RespondForbidden('Unsupported permission: NPR NP RETAIL').AddMetadataHeaders(_SessionMetadata).GetResponseJson());
+        end;
+
         requestResolver := apiModuleResolver.Resolve(requestCodeunit);
 
         case requestHttpMethod of
