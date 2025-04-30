@@ -50,84 +50,6 @@
             exit(false);
     end;
 
-    local procedure CreateItemWorksheetLinesFromIncomingDocument(IncomingDocument: Record "Incoming Document")
-    var
-        ErrorMessage: Record "Error Message";
-        ErrorMessage2: Record "Error Message";
-        ItemWorksheetLine: Record "NPR Item Worksheet Line";
-        DirectUnitCost: Decimal;
-        NoOfMissingItems: Integer;
-        ItemGroupText: Text;
-        VendorItemDescription: Text;
-        VendorItemNo: Text;
-        VendorNo: Text;
-    begin
-        NoOfMissingItems := 0;
-        ErrorMessage.SetRange("Context Record ID", IncomingDocument.RecordId);
-        ErrorMessage.SetRange("Table Number", DATABASE::"NPR Item Worksheet Line");
-        ErrorMessage.SetRange("Field Number", ItemWorksheetLine.FieldNo("Vend Item No."));
-        if ErrorMessage.FindSet() then
-            repeat
-                NoOfMissingItems := NoOfMissingItems + 1;
-                ErrorMessage2.Reset();
-                ErrorMessage2.SetRange("Context Record ID", IncomingDocument.RecordId);
-                ErrorMessage2.SetRange("Table Number", DATABASE::"NPR Item Worksheet Line");
-                if ErrorMessage2.FindSet() then
-                    repeat
-                        if Format(ErrorMessage2."Record ID") = Format(ErrorMessage."Record ID") then begin
-#IF BC17 or BC18 or BC19 or BC20 or BC21
-#pragma warning disable AL0432
-                            case ErrorMessage2."Field Number" of
-                                ItemWorksheetLine.FieldNo("Vend Item No."):
-                                    VendorItemNo := ErrorMessage2.Description;
-                                ItemWorksheetLine.FieldNo("Item Category Code"):
-                                    ItemGroupText := ErrorMessage2.Description;
-                                ItemWorksheetLine.FieldNo(Description):
-                                    VendorItemDescription := ErrorMessage2.Description;
-                                ItemWorksheetLine.FieldNo("Vendor No."):
-                                    VendorNo := ErrorMessage2.Description;
-                                ItemWorksheetLine.FieldNo("Direct Unit Cost"):
-                                    begin
-                                        Evaluate(DirectUnitCost, ErrorMessage2.Description, 9);
-                                        Clear(DirectUnitCost);
-                                    end;
-                            end;
-#pragma warning restore AL0432
-#ELSE
-                            case ErrorMessage2."Field Number" of
-                                ItemWorksheetLine.FieldNo("Vend Item No."):
-                                    VendorItemNo := ErrorMessage2.Message;
-                                ItemWorksheetLine.FieldNo("Item Category Code"):
-                                    ItemGroupText := ErrorMessage2.Message;
-                                ItemWorksheetLine.FieldNo(Description):
-                                    VendorItemDescription := ErrorMessage2.Message;
-                                ItemWorksheetLine.FieldNo("Vendor No."):
-                                    VendorNo := ErrorMessage2.Message;
-                                ItemWorksheetLine.FieldNo("Direct Unit Cost"):
-                                    begin
-                                        Evaluate(DirectUnitCost, ErrorMessage2.Message, 9);
-                                        Clear(DirectUnitCost);
-                                    end;
-                            end;
-#ENDIF
-
-                        end;
-                    until ErrorMessage2.Next() = 0;
-                ErrorMessage.Modify(true);
-            until ErrorMessage.Next() = 0;
-        ErrorMessage.Reset();
-        ErrorMessage.SetRange("Context Record ID", IncomingDocument.RecordId);
-        ErrorMessage.SetRange("Table Number", DATABASE::"NPR Item Worksheet Line");
-        ErrorMessage.SetFilter("Field Number", '<>%1', ItemWorksheetLine.FieldNo("Vend Item No."));
-        ErrorMessage.DeleteAll(true);
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Release Incoming Document", 'OnAfterCreateDocFromIncomingDocFail', '', true, true)]
-    local procedure OnAfterCreateDocFromIncomingDocFailCreateItemWorksheetLines(var IncomingDocument: Record "Incoming Document")
-    begin
-        CreateItemWorksheetLinesFromIncomingDocument(IncomingDocument);
-    end;
-
     [EventSubscriber(ObjectType::Table, Database::"Incoming Document", 'OnCheckIncomingDocCreateDocRestrictions', '', true, true)]
     local procedure OnCheckIncomingDocCreateDocRestrictionsCheckReopen(var Sender: Record "Incoming Document")
     var
@@ -145,4 +67,3 @@
     begin
     end;
 }
-
