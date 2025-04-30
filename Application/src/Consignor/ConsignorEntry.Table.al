@@ -104,7 +104,7 @@
         SalesLine: Record "Sales Line";
         TempWeight: Decimal;
     begin
-        if not CheckSalesHeader(InCode) then
+        if not CheckSalesHeader(InCode, DocumentType) then
             exit;
         Init();
         Type := Type::Order;
@@ -162,11 +162,11 @@
         Insert(true);
     end;
 
-    local procedure CheckSalesHeader(InCode: Code[20]): Boolean
+    local procedure CheckSalesHeader(InCode: Code[20]; DocumentType: Enum "Sales Document Type"): Boolean
     var
         SalesHeader: Record "Sales Header";
     begin
-        SalesHeader.Get(SalesHeader."Document Type"::Order, InCode);
+        SalesHeader.Get(DocumentType, InCode);
 
         if SalesHeader.Status <> SalesHeader.Status::Released then
             Error(Text001);
