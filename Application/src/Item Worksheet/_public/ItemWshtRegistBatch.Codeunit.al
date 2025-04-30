@@ -1,6 +1,6 @@
 ﻿codeunit 6060044 "NPR Item Wsht.-Regist. Batch"
 {
-    Access = Internal;
+    Access = Public;
     TableNo = "NPR Item Worksheet Line";
 
     trigger OnRun()
@@ -44,15 +44,16 @@
 
     local procedure CreateWindow()
     begin
-        Window.Open(
-          CheckingLinesLbl +
-          RegisterLinesLbl);
+        if GuiAllowed then
+            Window.Open(
+              CheckingLinesLbl +
+              RegisterLinesLbl);
     end;
 
     local procedure CreateRegisteredWorksheet()
     var
         ItemWorksheet: Record "NPR Item Worksheet";
-        ItemWorksheetCU:Codeunit "NPR Item Worksheet";
+        ItemWorksheetCU: Codeunit "NPR Item Worksheet";
     begin
         ItemWkshLine.FindFirst();
         ItemWkshLine.TestField("Worksheet Name");
@@ -69,7 +70,8 @@
         StartLineNo := ItemWkshLine."Line No.";
         repeat
             LineCount := LineCount + 1;
-            Window.Update(2, LineCount);
+            if GuiAllowed then
+                Window.Update(2, LineCount);
             case ItemWorksheetTemplate."Error Handling" of
                 ItemWorksheetTemplate."Error Handling"::StopOnFirst:
                     ItemWkshCheckLine.RunCheck(ItemWkshLine, true, true);
@@ -94,8 +96,10 @@
         ItemWkshLine.FindSet();
         repeat
             LineCount := LineCount + 1;
-            Window.Update(3, LineCount);
-            Window.Update(4, Round(LineCount / NoOfRecords * 10000, 1));
+            if GuiAllowed then begin
+                Window.Update(3, LineCount);
+                Window.Update(4, Round(LineCount / NoOfRecords * 10000, 1));
+            end;
             ItemWorksheetLine := ItemWkshLine;
             Codeunit.Run(Codeunit::"NPR Item Wsht.Register Line", ItemWorksheetLine);
         until ItemWkshLine.Next() = 0;
@@ -121,4 +125,3 @@
     begin
     end;
 }
-
