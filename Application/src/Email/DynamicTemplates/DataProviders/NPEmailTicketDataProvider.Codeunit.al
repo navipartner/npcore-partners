@@ -36,6 +36,7 @@ codeunit 6248408 "NPR NPEmailTicketDataProvider" implements "NPR IDynamicTemplat
         JObject.Add('eticket_pass_id', Entry."eTicket Pass Id");
         JObject.Add('eticket_pass_landing_url', Entry."eTicket Pass Landing URL");
         JObject.Add('published_ticket_url', Entry."Published Ticket URL");
+        JObject.Add('npdesigner_template_id', Entry.NPDesignerTemplateId);
         exit(JObject);
     end;
 
@@ -65,6 +66,7 @@ codeunit 6248408 "NPR NPEmailTicketDataProvider" implements "NPR IDynamicTemplat
         JObject.Add('eticket_pass_id', 'ABCDE1234');
         JObject.Add('eticket_pass_landing_url', 'https://passes.example.com');
         JObject.Add('published_ticket_url', 'https://tickets.example.com');
+        JObject.Add('npdesigner_template_id', 'ENTRY_TEMPLATE');
         exit(JObject);
     end;
 
