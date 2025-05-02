@@ -59,6 +59,12 @@ types:
       - name: ExampleSupersededByEntryNo
         value: 773
 
+  ExternalWalletReferenceNumber:
+    type: string
+    docs: Any external identity associated with the wallet.
+    examples: 
+      - name: ExampleExternalWalletReferenceNumber
+        value: "john.doe@acme.com"
     
 
   Id:
@@ -110,7 +116,9 @@ types:
   AssetItemNo:
     type: string
     docs: The item number associated with the asset.
-    examples: 
+    examples:
+      - name: ExampleWalletNo
+        value: "10009" 
       - name: ExampleItemNo
         value: "31005"
       - name: ExampleItemNo2
@@ -168,3 +176,38 @@ types:
     examples: 
       - name: ExampleModifiedAt
         value: "2024-12-31T17:59:59Z"
+
+  WithDetails:
+    type: boolean
+    docs: Indicates whether the asset details should be included in the response.
+    examples: 
+      - name: ExampleWithDetailsTrue
+        value: true
+
+  ValidFrom:
+    type: datetime
+    docs: The date and time when the ticket becomes valid.
+    examples:
+      - name: ExampleValidFrom
+        value: "2024-10-15T12:00:00Z"
+
+  ValidUntil:
+    type: datetime
+    docs: The date and time when the ticket expires.
+    examples:
+      - name: ExampleValidUntil
+        value: "2024-10-15T23:59:59Z"
+
+  IssuedAt:
+    type: datetime
+    docs: The date and time when the ticket was issued
+    examples:
+      - name: ExampleIssuedAt
+        value: "2024-10-15T12:13:00Z"
+
+  AdmissionCode:
+    type: string
+    docs: A unique code that identifies a specific admission.
+    examples:
+      - name: ExampleAdmissionCastle
+        value: CASTLE

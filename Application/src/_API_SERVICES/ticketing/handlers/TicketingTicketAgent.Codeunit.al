@@ -505,7 +505,7 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         exit(ResponseJson);
     end;
 
-    local procedure TicketHistoryDTO(var ResponseJson: Codeunit "NPR JSON Builder"; ArrayName: Text; Ticket: Record "NPR TM Ticket"; WithEvents: Boolean): Codeunit "NPR JSON Builder";
+    internal procedure TicketHistoryDTO(var ResponseJson: Codeunit "NPR JSON Builder"; ArrayName: Text; Ticket: Record "NPR TM Ticket"; WithEvents: Boolean): Codeunit "NPR JSON Builder";
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         TicketAccessEntryLine: Record "NPR TM Det. Ticket AccessEntry";
@@ -573,17 +573,13 @@ codeunit 6185080 "NPR TicketingTicketAgent"
                             CurrencyCode: Code[10];
                             var TicketDescriptionBuffer: Record "NPR TM TempTicketDescription";
                             ReservationRequest: Record "NPR TM Ticket Reservation Req."): Codeunit "NPR JSON Builder";
-    var
-        TimeZoneHelper: Codeunit "NPR TM TimeHelper";
     begin
         ResponseJson.StartObject()
             .AddProperty('ticketId', Format(Ticket.SystemId, 0, 4).ToLower())
             .AddProperty('ticketNumber', Ticket."External Ticket No.")
             .AddProperty('itemNumber', Ticket."Item No.")
             .AddProperty('reservationToken', ReservationRequest."Session Token ID")
-            .AddProperty('validFrom', TimeZoneHelper.FormatDateTimeWithAdmissionTimeZone('', Ticket."Valid From Date", Ticket."Valid From Time"))
-            .AddProperty('validUntil', TimeZoneHelper.FormatDateTimeWithAdmissionTimeZone('', Ticket."Valid To Date", Ticket."Valid To Time"))
-            .AddProperty('issuedAt', TimeZoneHelper.FormatDateTimeWithAdmissionTimeZone('', TimeZoneHelper.AdjustZuluToAdmissionLocalDateTime('', Ticket.SystemCreatedAt)))
+            .AddObject(TicketValidDateProperties(ResponseJson, Ticket))
 
             .AddArray(AdmissionDetailsDTO(ResponseJson, 'content', Ticket, TicketDescriptionBuffer))
             .StartObject('description')
@@ -602,6 +598,17 @@ codeunit 6185080 "NPR TicketingTicketAgent"
             .AddObject(AddPrintedTicketDetails(ResponseJson, Ticket))
         .EndObject();
 
+        exit(ResponseJson);
+    end;
+
+    internal procedure TicketValidDateProperties(ResponseJson: Codeunit "NPR JSON Builder"; Ticket: Record "NPR TM Ticket"): Codeunit "NPR JSON Builder";
+    var
+        TimeZoneHelper: Codeunit "NPR TM TimeHelper";
+    begin
+        ResponseJson
+            .AddProperty('validFrom', TimeZoneHelper.FormatDateTimeWithAdmissionTimeZone('', Ticket."Valid From Date", Ticket."Valid From Time"))
+            .AddProperty('validUntil', TimeZoneHelper.FormatDateTimeWithAdmissionTimeZone('', Ticket."Valid To Date", Ticket."Valid To Time"))
+            .AddProperty('issuedAt', TimeZoneHelper.FormatDateTimeWithAdmissionTimeZone('', TimeZoneHelper.AdjustZuluToAdmissionLocalDateTime('', Ticket.SystemCreatedAt)));
         exit(ResponseJson);
     end;
 

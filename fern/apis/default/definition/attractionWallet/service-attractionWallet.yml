@@ -63,6 +63,8 @@ service:
         walletId: simpleTypes.WalletId
       request:
         name: GetWallet
+        query-parameters:
+          withDetails: optional<simpleTypes.WithDetails>
       response: compositeTypes.WalletDetails
       examples:
         - name: GetWallets
@@ -71,6 +73,8 @@ service:
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             walletId: $simpleTypes.WalletId.ExampleWalletId
+          query-parameters:
+            withDetails: $simpleTypes.WithDetails.ExampleWithDetailsTrue
           response:
             body: $compositeTypes.WalletDetails.ExampleWalletDetails
 
@@ -123,6 +127,7 @@ types:
       name: simpleTypes.Description
       tickets: list<simpleTypes.AssetId>
       memberCards: list<simpleTypes.AssetId>
+      externalReferenceNumbers: optional<list<simpleTypes.ExternalWalletReferenceNumber>>
     examples:
       - name: CreateWalletRequest
         value:
@@ -131,6 +136,9 @@ types:
             - $simpleTypes.AssetId.ExampleTicketId1
           memberCards: 
             - $simpleTypes.AssetId.ExampleMemberCardId1
+          externalReferenceNumbers: 
+            - $simpleTypes.ExternalWalletReferenceNumber.ExampleExternalWalletReferenceNumber
+
 
   AddToWalletRequest:
     properties:

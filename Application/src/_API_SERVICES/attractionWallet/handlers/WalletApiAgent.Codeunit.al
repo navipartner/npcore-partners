@@ -10,32 +10,27 @@ codeunit 6248331 "NPR WalletApiAgent"
     #region API functions
     internal procedure FindWalletUsingReferenceNumber(Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
-        ReferenceNumber: Text;
+        ReferenceNumber: Text[100];
         FindWallet: Query "NPR FindAttractionWallets";
+        AttractionWallet: Codeunit "NPR AttractionWalletFacade";
         ResponseJson: Codeunit "NPR Json Builder";
         ReferenceNumberRequired: Label 'Missing required parameter: referenceNumber', Locked = true;
+        Wallet: Record "NPR AttractionWallet";
     begin
 
         if (not Request.QueryParams().ContainsKey('referenceNumber')) then
             exit(Response.RespondBadRequest(ReferenceNumberRequired));
 
-        ReferenceNumber := Request.QueryParams().Get('referenceNumber');
+        ReferenceNumber := CopyStr(Request.QueryParams().Get('referenceNumber'), 1, MaxStrLen(ReferenceNumber));
         if (ReferenceNumber = '') then
             exit(Response.RespondBadRequest(ReferenceNumberRequired));
 
         ResponseJson.StartArray();
 
-        FindWallet.SetFilter(ReferenceNumber, '=%1', ReferenceNumber);
-        FindWallet.Open();
+        AttractionWallet.FindWalletByReferenceNumber(ReferenceNumber, FindWallet);
         while (FindWallet.Read()) do begin
-            ResponseJson.StartObject()
-                .AddProperty('walletId', Format(FindWallet.WalletSystemId, 0, 4).ToLower())
-                .AddProperty('referenceNumber', FindWallet.WalletReferenceNumber)
-                .AddProperty('description', FindWallet.WalletDescription)
-                .AddProperty('expiryDatetime', FindWallet.WalletExpirationDate)
-                .AddProperty('lastPrintedAt', FindWallet.WalletLastPrintAt)
-                .AddProperty('printCount', FindWallet.WalletPrintCount)
-                .EndObject();
+            Wallet.Get(FindWallet.WalletEntryNo);
+            ResponseJson := WalletContentDTO(ResponseJson.StartObject(), Wallet).EndObject();
         end;
         ResponseJson.EndArray();
         FindWallet.Close();
@@ -46,13 +41,16 @@ codeunit 6248331 "NPR WalletApiAgent"
     internal procedure GetWalletUsingId(Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         Wallet: Record "NPR AttractionWallet";
+        WithDetails: Boolean;
     begin
 
         if (not GetWalletById(Request, 2, Wallet)) then
             exit(Response.RespondBadRequest(_InvalidWalletId));
 
-        exit(GetAssetsResponse(Wallet));
+        if (Request.QueryParams().ContainsKey('withDetails')) then
+            WithDetails := (Request.QueryParams().Get('withDetails').ToLower() = 'true');
 
+        exit(GetAssetsResponse(Wallet, WithDetails));
     end;
 
     internal procedure AddAssets(Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
@@ -75,7 +73,7 @@ codeunit 6248331 "NPR WalletApiAgent"
             if (JToken.IsArray()) then
                 StoreMemberCards(Wallet, JToken.AsArray());
 
-        exit(GetAssetsResponse(Wallet));
+        exit(GetAssetsResponse(Wallet, false));
     end;
 
     internal procedure CreateWallet(Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
@@ -103,7 +101,11 @@ codeunit 6248331 "NPR WalletApiAgent"
             if (JToken.IsArray()) then
                 StoreMemberCards(Wallet, JToken.AsArray());
 
-        exit(GetAssetsResponse(Wallet));
+        if (Body.Get('externalReferenceNumbers', JToken)) then
+            if (JToken.IsArray()) then
+                AddWalletExternalReferences(Wallet, JToken.AsArray());
+
+        exit(GetAssetsResponse(Wallet, false));
     end;
 
     internal procedure GetAssetHistory(Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
@@ -151,20 +153,29 @@ codeunit 6248331 "NPR WalletApiAgent"
 
 
     #region Helper methods
-    local procedure GetAssetsResponse(Wallet: Record "NPR AttractionWallet") Response: Codeunit "NPR API Response"
-    var
-        WalletAssets: Query "NPR AttractionWalletAssets";
-        ResponseJson: Codeunit "NPR Json Builder";
+    local procedure WalletContentDTO(ResponseJson: Codeunit "NPR Json Builder"; Wallet: Record "NPR AttractionWallet"): Codeunit "NPR Json Builder"
     begin
-        ResponseJson.StartObject()
+        ResponseJson
             .AddProperty('walletId', Format(Wallet.SystemId, 0, 4).ToLower())
             .AddProperty('referenceNumber', Wallet.ReferenceNumber)
             .AddProperty('description', Wallet.Description)
+            .AddProperty('originatesFromItemNo', Wallet.OriginatesFromItemNo)
             .AddProperty('expiryDatetime', Wallet.ExpirationDate)
             .AddProperty('lastPrintedAt', Wallet.LastPrintAt)
-            .AddProperty('printCount', Wallet.PrintCount)
-            .StartArray('assets');
+            .AddProperty('printCount', Wallet.PrintCount);
+        exit(ResponseJson);
+    end;
 
+
+    local procedure GetAssetsResponse(Wallet: Record "NPR AttractionWallet"; WithDetails: Boolean) Response: Codeunit "NPR API Response"
+    var
+        WalletAssets: Query "NPR AttractionWalletAssets";
+        ResponseJson: Codeunit "NPR Json Builder";
+        Ticket: Record "NPR TM Ticket";
+    begin
+        ResponseJson := WalletContentDTO(ResponseJson.StartObject(), Wallet);
+
+        ResponseJson.StartArray('assets');
         WalletAssets.SetFilter(WalletSystemId, '=%1', Wallet.SystemId);
         WalletAssets.Open();
         while (WalletAssets.Read()) do begin
@@ -177,8 +188,15 @@ codeunit 6248331 "NPR WalletApiAgent"
                 .AddProperty('description', WalletAssets.AssetDescription)
                 .AddProperty('referenceNumber', WalletAssets.AssetReferenceNumber)
                 .AddProperty('isSuperseded', WalletAssets.SupersededByEntryNo <> 0)
-                .AddObject(AddOptionalProperty(ResponseJson, 'expiryDatetime', WalletAssets.AssetExpirationDate))
-                .EndObject();
+                .AddObject(AddOptionalProperty(ResponseJson, 'expiryDatetime', WalletAssets.AssetExpirationDate));
+
+            if (WithDetails) then
+                if (WalletAssets.AssetType = WalletAssets.AssetType::Ticket) then begin
+                    Ticket.GetBySystemId(WalletAssets.AssetSystemId);
+                    ResponseJson.AddObject(AddTicketDetails(ResponseJson, Ticket));
+                end;
+
+            ResponseJson.EndObject();
         end;
 
         ResponseJson.EndArray()
@@ -186,6 +204,18 @@ codeunit 6248331 "NPR WalletApiAgent"
         WalletAssets.Close();
 
         exit(Response.RespondOk(ResponseJson.Build()));
+    end;
+
+    local procedure AddTicketDetails(ResponseJson: Codeunit "NPR Json Builder"; Ticket: Record "NPR TM Ticket"): Codeunit "NPR Json Builder"
+    var
+        TicketAgent: Codeunit "NPR TicketingTicketAgent";
+    begin
+        ResponseJson
+            .StartObject('ticketDetails')
+            .AddObject(TicketAgent.TicketValidDateProperties(ResponseJson, Ticket))
+            .AddArray(TicketAgent.TicketHistoryDTO(ResponseJson, 'accessHistory', Ticket, false))
+            .EndObject();
+        exit(ResponseJson);
     end;
 
     local procedure AddOptionalProperty(Json: Codeunit "NPR Json Builder"; PropertyName: Text; Value: DateTime): Codeunit "NPR Json Builder"
@@ -238,6 +268,17 @@ codeunit 6248331 "NPR WalletApiAgent"
             end;
 
         AttractionWallet.AddMemberCardsToWallet(Wallet.EntryNo, MemberCardIds);
+    end;
+
+    local procedure AddWalletExternalReferences(Wallet: Record "NPR AttractionWallet"; References: JsonArray)
+    var
+        AttractionWallet: Codeunit "NPR AttractionWalletFacade";
+        Reference: JsonToken;
+        NullGuid: Guid;
+    begin
+        foreach Reference in References do
+            if (Reference.IsValue()) then
+                AttractionWallet.SetWalletReferenceNumber(Wallet.EntryNo, 0, NullGuid, CopyStr(Reference.AsValue().AsText(), 1, 100));
     end;
 
     local procedure GetWalletById(var Request: Codeunit "NPR API Request"; PathPosition: Integer; var Wallet: Record "NPR AttractionWallet"): Boolean

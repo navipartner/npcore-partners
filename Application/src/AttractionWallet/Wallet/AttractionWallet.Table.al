@@ -19,6 +19,12 @@ table 6150937 "NPR AttractionWallet"
             Caption = 'Reference Number';
         }
 
+        field(15; OriginatesFromItemNo; Code[20])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Originates From Item No.';
+        }
+
         field(20; Description; Text[100])
         {
             DataClassification = CustomerContent;

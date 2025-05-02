@@ -55,6 +55,12 @@ page 6184846 "NPR AttractionWallet"
                         ToolTip = 'Specifies the value of the Expiration Date field.';
                         Editable = true;
                     }
+                    field(OriginatesFromItemNo; Rec.OriginatesFromItemNo)
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Originates From Item No. field.';
+                        Editable = true;
+                    }
                 }
             }
 
@@ -247,10 +253,10 @@ page 6184846 "NPR AttractionWallet"
     end;
 
     var
-        _WalletReference: Code[50];
+        _WalletReference: Text[100];
         TempSelectedWallets: Record "NPR AttractionWallet" temporary;
 
-    internal procedure SetSearch(WalletReference: Code[50]);
+    internal procedure SetSearch(WalletReference: Text[100]);
     begin
         _WalletReference := WalletReference;
     end;
@@ -275,7 +281,7 @@ page 6184846 "NPR AttractionWallet"
         CurrPage.Update(false);
     end;
 
-    local procedure FindWalletAssets(WalletReference: Code[50])
+    local procedure FindWalletAssets(WalletReference: Text[100])
     var
         Wallet: Record "NPR AttractionWallet";
         WalletAssetHeaderRef: Record "NPR WalletAssetHeaderReference";

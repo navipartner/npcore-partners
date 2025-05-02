@@ -16,6 +16,7 @@ types:
       expiryDatetime: simpleTypes.ExpiryDatetime
       lastPrintedAt: simpleTypes.LastPrintedAt
       printCount: simpleTypes.PrintCount
+      originatesFromItemNo: optional<simpleTypes.AssetItemNo>
       assets: optional<list<AssetDetails>>
     examples:
       - name: ExampleWalletDetails
@@ -26,6 +27,7 @@ types:
           expiryDatetime: $simpleTypes.ExpiryDatetime.ExampleExpiryDatetime
           lastPrintedAt: $simpleTypes.LastPrintedAt.ExampleLastPrintedAt
           printCount: $simpleTypes.PrintCount.ExamplePrintCount
+          originatesFromItemNo: $simpleTypes.AssetItemNo.ExampleWalletNo
           assets:
             - $AssetDetails.ExampleTicket1
             - $AssetDetails.ExampleMemberCard1
@@ -43,6 +45,7 @@ types:
       referenceNumber: simpleTypes.AssetReferenceNumber
       isSuperseded: simpleTypes.AssetIsSuperseded
       expiryDatetime: optional<simpleTypes.AssetExpiryDatetime>
+      ticketDetails: optional<TicketDetails>
     examples:
       - name: ExampleTicket1
         value:
@@ -54,6 +57,7 @@ types:
           referenceNumber: $simpleTypes.AssetReferenceNumber.ExampleTicketReferenceNumber
           isSuperseded: $simpleTypes.AssetIsSuperseded.ExampleIsSuperseded
           expiryDatetime: $simpleTypes.AssetExpiryDatetime.ExampleExpiryDatetime
+          ticketDetails: $TicketDetails.ExampleTicketDetails
       - name: ExampleMemberCard1
         value:
           id: $simpleTypes.Id.ExampleId2
@@ -111,3 +115,33 @@ types:
           walletExpirationDate: $simpleTypes.ExpiryDatetime.ExampleExpiryDatetime
           createdAt: $simpleTypes.AssetCreatedAt.ExampleCreatedAt
           modifiedAt: $simpleTypes.AssetModifiedAt.ExampleModifiedAt
+
+  TicketDetails:
+    docs: 
+      Details of a ticket.
+    properties:
+      validFrom: simpleTypes.ValidFrom
+      validUntil: simpleTypes.ValidUntil
+      issuedAt: simpleTypes.IssuedAt
+      accessHistory: list<TicketAccessHistory>
+    examples:
+      - name: ExampleTicketDetails
+        value:
+          validFrom: $simpleTypes.ValidFrom.ExampleValidFrom
+          validUntil: $simpleTypes.ValidUntil.ExampleValidUntil
+          issuedAt: $simpleTypes.IssuedAt.ExampleIssuedAt
+          accessHistory:
+            - $TicketAccessHistory.ExampleTicketAccessHistory
+
+  TicketAccessHistory:
+    docs: Details of the access history for a ticket
+    properties:
+      admissionCode: simpleTypes.AdmissionCode
+      firstAdmissionAt: optional<datetime>
+      blocked: boolean
+    examples:
+      - name: ExampleTicketAccessHistory
+        value:
+          admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
+          firstAdmissionAt: "2025-01-31T09:12:00Z"
+          blocked: false

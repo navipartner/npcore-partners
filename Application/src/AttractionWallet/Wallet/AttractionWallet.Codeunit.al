@@ -37,7 +37,7 @@ codeunit 6185062 "NPR AttractionWallet"
         if (IntermediaryWalletLine.IsEmpty()) then
             exit;
 
-        CreateWallets(POSSale.SystemId, SaleLinePOS."Line No.", SaleLinePOS.Quantity, WalletEntryNoList);
+        CreateWallets(POSSale.SystemId, SaleLinePOS."Line No.", SaleLinePOS.Quantity, SaleLinePOS."No.", WalletEntryNoList);
         CreateAssets(WalletEntryNoList, POSSale."Sales Ticket No.", SaleLinePOS."Line No.", SaleLinePOS."No.", SaleLinePOS.Quantity);
         AddReferencesToWalletFromPosSale(POSSale, WalletEntryNoList);
 
@@ -563,7 +563,7 @@ codeunit 6185062 "NPR AttractionWallet"
         Wallet: Record "NPR AttractionWallet";
         WalletAssetHeaderRef: Record "NPR WalletAssetHeaderReference";
     begin
-        CreateWallet(CreateGuid(), '', Wallet);
+        CreateWallet(CreateGuid(), '', '', Wallet);
 
         WalletAssetHeaderRef.Init();
         WalletAssetHeaderRef.WalletHeaderEntryNo := WalletAssetHeader.EntryNo;
@@ -583,7 +583,7 @@ codeunit 6185062 "NPR AttractionWallet"
         WalletEntryNo := CreateOwnerWallet(WalletAssetHeader);
     end;
 
-    local procedure CreateWallets(SaleId: Guid; SaleLineNumber: Integer; Quantity: Integer; var WalletEntryNoList: List of [Integer])
+    local procedure CreateWallets(SaleId: Guid; SaleLineNumber: Integer; Quantity: Integer; ItemNo: Code[20]; var WalletEntryNoList: List of [Integer])
     var
         Wallet: Record "NPR AttractionWallet";
         IntermediaryWallet: Record "NPR AttractionWalletSaleHdr";
@@ -602,7 +602,7 @@ codeunit 6185062 "NPR AttractionWallet"
                 if (Wallet.Get(IntermediaryWallet.WalletEntryNo)) then begin
                     WalletEntryNoList.Add(Wallet.EntryNo)
                 end else begin
-                    WalletEntryNoList.Add(CreateWallet(CreateGuid(), IntermediaryWallet.Name, Wallet));
+                    WalletEntryNoList.Add(CreateWallet(CreateGuid(), ItemNo, IntermediaryWallet.Name, Wallet));
                     IntermediaryWallet.WalletEntryNo := Wallet.EntryNo;
                     IntermediaryWallet.Modify();
 
@@ -612,13 +612,14 @@ codeunit 6185062 "NPR AttractionWallet"
         end;
     end;
 
-    internal procedure CreateWallet(WalletSystemId: Guid; Description: Text[100]; var Wallet: Record "NPR AttractionWallet"): Integer
+    internal procedure CreateWallet(WalletSystemId: Guid; ItemNo: Code[20]; Description: Text[100]; var Wallet: Record "NPR AttractionWallet"): Integer
     var
         WalletSequenceNumber: Text[30];
         WalletExternalReference: Record "NPR AttractionWalletExtRef";
     begin
         Wallet.Init();
         Wallet.EntryNo := 0;
+        Wallet.OriginatesFromItemNo := ItemNo;
         Wallet.Description := Description;
         Wallet.SystemId := WalletSystemId;
         if (not Wallet.Insert()) then
@@ -810,14 +811,14 @@ codeunit 6185062 "NPR AttractionWallet"
 
 
     #region facade implementation
-    internal procedure CreateWalletFromFacade(Name: Text[100]; var WalletReferenceNumber: Text[50]) WalletEntryNo: Integer
+    internal procedure CreateWalletFromFacade(OriginatesFromItemNo: Code[20]; Name: Text[100]; var WalletReferenceNumber: Text[50]) WalletEntryNo: Integer
     var
         Wallet: Record "NPR AttractionWallet";
     begin
         if (not IsWalletEnabled()) then
             exit(0);
 
-        CreateWallet(CreateGuid(), Name, Wallet);
+        CreateWallet(CreateGuid(), OriginatesFromItemNo, Name, Wallet);
 
         WalletReferenceNumber := Wallet.ReferenceNumber;
         AddHeaderReference(Wallet.EntryNo, Database::"NPR AttractionWallet", Wallet.SystemId, Wallet.ReferenceNumber);
