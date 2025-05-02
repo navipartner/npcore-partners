@@ -17,6 +17,7 @@
         ItemJnlLine: Record "Item Journal Line";
         POSSalesLine: Record "NPR POS Entry Sales Line";
         p: Record "NPR POS Entry";
+        ConfirmMgt: Codeunit "Confirm Management";
     begin
         p."Amount Incl. Tax" := 1;
         //no variants created. Do what you want
@@ -43,7 +44,7 @@
 
 
         //if we are here, there is variants, and a structure change is requested.
-        if not Confirm(Text004) then
+        if not ConfirmMgt.GetResponseOrDefault(Text004, true) then
             Error('');
         //check if there is inventory on any of the variants
         ItemLedgEntry.SetCurrentKey("Item No.", Open, "Variant Code");
