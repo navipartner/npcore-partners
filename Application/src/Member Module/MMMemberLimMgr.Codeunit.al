@@ -7,7 +7,7 @@
     end;
 
     var
-        ContraintText: Text;
+        ConstraintText: Text;
         USER_CONFIRM_MESSAGE: Label '%1\\Do you want to allow action anyway?';
 
     procedure LogMemberCardArrival(ExternalMemberCardNo: Text[100]; AdmissionCode: Code[20]; ScannerStationId: Code[10]; ResponseMessage: Text; ResponseCode: Integer): Integer
@@ -82,7 +82,7 @@
         MemberArrivalLogEntry."Event Type" := MemberArrivalLogEntry."Event Type"::ARRIVAL;
         MemberArrivalLogEntry."Created At" := CurrentDateTime();
         MemberArrivalLogEntry."Local Date" := DT2Date(TimeHelper.GetLocalTimeAtAdmission(AdmissionCode));
-        MemberArrivalLogEntry."Local Time" := DT2Time(TimeHelper.GetLocalTimeAtAdmission(AdmissionCode)); // Time() from webclient and webservice are different
+        MemberArrivalLogEntry."Local Time" := DT2Time(TimeHelper.GetLocalTimeAtAdmission(AdmissionCode)); // Time() from web client and web service are different
 
         MemberArrivalLogEntry."External Membership No." := ExternalMemberShipNo;
         MemberArrivalLogEntry."External Member No." := ExternalMemberNo;
@@ -296,7 +296,7 @@
                         if (ResponseMessage = '') then
                             ResponseMessage := '[%5%4] - Membership Limitation Setup, rule %5 prevents this action. Threshold %1, Rule Match Count: %2, Entry Constraint: %3';
 
-                        ResponseMessage := StrSubstNo(ResponseMessage, RuleCondition, RuleMatchCount, ContraintText, MembershipLimitationSetup."Response Code", RuleNo);
+                        ResponseMessage := StrSubstNo(ResponseMessage, RuleCondition, RuleMatchCount, ConstraintText, MembershipLimitationSetup."Response Code", RuleNo);
                         ResponseCode := MembershipLimitationSetup."Response Code";
                     end;
 
@@ -319,7 +319,6 @@
         MembershipLimitationSetup.Get(RuleEntryNo);
 
         MemberArrivalLogEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
-        MemberArrivalLogEntry.SetFilter("Temporary Card", '=%1', false);
         MemberArrivalLogEntry.SetFilter("Entry No.", '<>%1', IgnoreLogEntryNo);
 
         case MembershipLimitationSetup."Constraint Source" of
@@ -377,24 +376,24 @@
 
         MatchCount := MemberArrivalLogEntry.Count();
 
-        ContraintText := '';
+        ConstraintText := '';
         if (MemberArrivalLogEntry.FindFirst()) then begin
             case MembershipLimitationSetup."Constraint Type" of
                 MembershipLimitationSetup."Constraint Type"::RELATIVE_TIME:
-                    ContraintText := StrSubstNo(PlaceHolderLbl, MembershipLimitationSetup."Constraint Seconds" - Round((CurrentDateTime() - MemberArrivalLogEntry."Created At") / 1000, 1));
+                    ConstraintText := StrSubstNo(PlaceHolderLbl, MembershipLimitationSetup."Constraint Seconds" - Round((CurrentDateTime() - MemberArrivalLogEntry."Created At") / 1000, 1));
                 MembershipLimitationSetup."Constraint Type"::FIXED_TIME:
-                    ContraintText := StrSubstNo(PlaceHolder2Lbl, MemberArrivalLogEntry."Local Date", MemberArrivalLogEntry."Local Time");
+                    ConstraintText := StrSubstNo(PlaceHolder2Lbl, MemberArrivalLogEntry."Local Date", MemberArrivalLogEntry."Local Time");
                 MembershipLimitationSetup."Constraint Type"::DATEFORMULA:
-                    ContraintText := StrSubstNo(PlaceHolder2Lbl, MemberArrivalLogEntry."Local Date", MemberArrivalLogEntry."Local Time");
+                    ConstraintText := StrSubstNo(PlaceHolder2Lbl, MemberArrivalLogEntry."Local Date", MemberArrivalLogEntry."Local Time");
             end;
         end else begin
             case MembershipLimitationSetup."Constraint Type" of
                 MembershipLimitationSetup."Constraint Type"::RELATIVE_TIME:
-                    ContraintText := StrSubstNo(PlaceHolderLbl, MembershipLimitationSetup."Constraint Seconds");
+                    ConstraintText := StrSubstNo(PlaceHolderLbl, MembershipLimitationSetup."Constraint Seconds");
                 MembershipLimitationSetup."Constraint Type"::FIXED_TIME:
-                    ContraintText := StrSubstNo(PlaceHolder2Lbl, MembershipLimitationSetup."Constraint From Time", MembershipLimitationSetup."Constraint Until Time");
+                    ConstraintText := StrSubstNo(PlaceHolder2Lbl, MembershipLimitationSetup."Constraint From Time", MembershipLimitationSetup."Constraint Until Time");
                 MembershipLimitationSetup."Constraint Type"::DATEFORMULA:
-                    ContraintText := StrSubstNo(PlaceHolderLbl, Today());
+                    ConstraintText := StrSubstNo(PlaceHolderLbl, Today());
             end;
         end;
 
