@@ -101,7 +101,8 @@ page 6184707 "NPR Spfy Webhook Notifications"
 
                 trigger OnAction()
                 begin
-                    Rec.TestField(Status, Rec.Status::Error);
+                    if not (Rec.Status in [Rec.Status::Error, Rec.Status::Cancelled]) then
+                        Rec.FieldError(Status);
                     Message(Rec.GetErrorMessage());
                 end;
             }

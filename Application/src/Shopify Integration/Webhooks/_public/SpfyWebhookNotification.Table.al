@@ -166,7 +166,7 @@ table 6150883 "NPR Spfy Webhook Notification"
         ErrorText: Text;
         NoErrorMessageTxt: Label 'No details were provided for the error.';
     begin
-        if Status <> Status::Error then
+        if not (Status in [Status::Error, Status::Cancelled]) then
             exit('');
         ErrorText := '';
         if "Last Error Message".HasValue() then begin
