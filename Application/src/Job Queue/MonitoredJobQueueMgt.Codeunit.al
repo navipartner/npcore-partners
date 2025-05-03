@@ -69,8 +69,13 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
         JobQueueManagement.RefreshNPRJobQueueList(false);
         if not ManagedByAppJobQueue.IsEmpty() then
             repeat
-                if JobQueueEntry.Get(ManagedByAppJobQueue.ID) then
-                    AddMonitoredJobQueueEntry(JobQueueEntry, false);
+                if JobQueueEntry.Get(ManagedByAppJobQueue.ID) then begin
+                    if not JobQueueManagement.SkipUpdateNPManagedMonitoredJobs() and JobQueueManagement.IsNPRecurringJob(JobQueueEntry) then
+                        ManagedByAppJobQueue.Delete()
+                    else
+                        if ManagedByAppJobQueue."Managed by App" then
+                            AddMonitoredJobQueueEntry(JobQueueEntry, false);
+                end;
             until ManagedByAppJobQueue.Next() = 0;
     end;
 
@@ -89,5 +94,58 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
             JobQueueEntry.SetRange("Job Queue Category Code");
 
         exit(JobQueueEntry.FindFirst());
+    end;
+
+    internal procedure LookUpJobQueues(var JobQueueEntry: Record "Job Queue Entry"): Boolean
+    var
+        MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
+        JobQueueManagement: Codeunit "NPR Job Queue Management";
+        JobQueueEntries: Page "Job Queue Entries";
+        IsNPJob: Boolean;
+        ManagedByApp: Boolean;
+        NotMandatoryJob: Boolean;
+        IsNPJobErr: Label 'Job Queue Entry ''%1 %2 %3'' can not be added manually.';
+        MonitoredEntryAlreadyExistsErr: Label 'Monitored Job Queue Entry ''%1 %2 %3'' already exists!';
+    begin
+        JobQueueEntries.LookupMode := true;
+        if not (JobQueueEntries.RunModal() = Action::LookupOK) then
+            exit;
+
+        JobQueueEntries.GetRecord(JobQueueEntry);
+
+        IsNPJob := JobQueueManagement.IsNPRecurringJob(JobQueueEntry);
+        if IsNPJob then
+            Error(IsNPJobErr, JobQueueEntry."Object Type to Run", JobQueueEntry."Object ID to Run", GetObjCaption(JobQueueEntry));
+
+        MonitoredJQEntry.SetRange("Job Queue Entry ID", JobQueueEntry.ID);
+        if not MonitoredJQEntry.IsEmpty() then begin
+            Error(MonitoredEntryAlreadyExistsErr, JobQueueEntry."Object Type to Run", JobQueueEntry."Object ID to Run", GetObjCaption(JobQueueEntry));
+        end;
+
+        ManagedByApp := JobQueueManagement.JobQueueIsManagedByApp(JobQueueEntry, NotMandatoryJob);
+        AssignJobQueueEntryToManagedAndMonitored(NotMandatoryJob, ManagedByApp, JobQueueEntry);
+        exit(true);
+    end;
+
+    local procedure GetObjCaption(JobQueueEntry: Record "Job Queue Entry"): Text
+    var
+        AllObjWithCaption: Record AllObjWithCaption;
+    begin
+        AllObjWithCaption.Get(JobQueueEntry."Object Type to Run", JobQueueEntry."Object ID to Run");
+        exit(AllObjWithCaption."Object Caption");
+    end;
+
+    internal procedure AssignJobQueueEntryToManagedAndMonitored(NotMandatoryJob: Boolean; ManagedByApp: Boolean; JobQueueEntry: Record "Job Queue Entry")
+    var
+        ManagedByAppJobQueue: Record "NPR Managed By App Job Queue";
+    begin
+        if NotMandatoryJob and not ManagedByAppJobQueue.Get(JobQueueEntry.ID) then begin
+            ManagedByAppJobQueue.Init();
+            ManagedByAppJobQueue.ID := JobQueueEntry.ID;
+            ManagedByAppJobQueue."Managed by App" := ManagedByApp;
+            ManagedByAppJobQueue.Insert();
+        end;
+
+        AddMonitoredJobQueueEntry(JobQueueEntry, ManagedByApp);
     end;
 }

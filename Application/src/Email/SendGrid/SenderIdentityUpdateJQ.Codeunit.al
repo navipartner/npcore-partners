@@ -54,7 +54,14 @@ codeunit 6248273 "NPR Sender Identity Update JQ"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnCheckIfIsNPRecurringJob, '', true, true)]
     local procedure OnCheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
     begin
-        IsNpJob := ((JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and (JobQueueEntry."Object ID to Run" = Codeunit::"NPR Sender Identity Update JQ"));
+        if Handled then
+            exit;
+        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
+           (JobQueueEntry."Object ID to Run" = Codeunit::"NPR Sender Identity Update JQ")
+        then begin
+            IsNpJob := true;
+            Handled := true;
+        end;
     end;
 
     local procedure GetJobDescription(): Text[250]

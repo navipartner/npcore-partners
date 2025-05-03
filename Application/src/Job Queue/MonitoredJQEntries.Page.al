@@ -51,7 +51,7 @@ page 6185041 "NPR Monitored JQ Entries"
                     ApplicationArea = NPRRetail;
                     Caption = 'NP Managed Job';
                     ToolTip = 'Specifies whether this Job Queue entry is allowed to be managed by the NP Refresher functionality.';
-                    Editable = _RefreshingCanBeToggled;
+                    Editable = false;
                 }
                 field("Parameter String"; Rec."Parameter String")
                 {
@@ -96,7 +96,7 @@ page 6185041 "NPR Monitored JQ Entries"
                 ApplicationArea = NPRRetail;
                 Caption = 'Recreate Monitored Jobs';
                 Image = RefreshLines;
-                Tooltip = 'This action will delete all Monitored Job Queue entries from the list above and create them over.';
+                Tooltip = 'This action will recreate the list of monitored job queue entries to ensure that all mandatory NaviParter job queues and any custom job queues manually marked as ''Managed by App'' are included and properly monitored by the refresher.';
 
                 trigger OnAction()
                 var
@@ -119,27 +119,30 @@ page 6185041 "NPR Monitored JQ Entries"
                 trigger OnAction()
                 var
                     JobQueueEntry: Record "Job Queue Entry";
-                    MonitoredJQMgt: Codeunit "NPR Monitored Job Queue Mgt.";
-                    JobQueueEntryCard: Page "Job Queue Entry Card";
                 begin
-                    if not MonitoredJQMgt.FindJQEntry(Rec, JobQueueEntry) then
+                    if not _MonitoredJQMgt.FindJQEntry(Rec, JobQueueEntry) then
                         exit;
 
-                    JobQueueEntryCard.SetTableView(JobQueueEntry);
-                    JobQueueEntryCard.RunModal();
+                    Page.Run(PAGE::"Job Queue Entry Card", JobQueueEntry);
+                end;
+            }
+            action("Add Custom Job Queue Entry")
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Add Custom Job Queue Entry';
+                Image = Add;
+                ToolTip = 'Select a custom job queue entry from the full list to add it to the monitored jobs.';
+
+                trigger OnAction()
+                var
+                    JobQueueEntry: Record "Job Queue Entry";
+                begin
+                    if _MonitoredJQMgt.LookUpJobQueues(JobQueueEntry) then
+                        CurrPage.Update(false);
                 end;
             }
         }
     }
-
-    trigger OnAfterGetCurrRecord()
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-        JobQueueManagement: Codeunit "NPR Job Queue Management";
-    begin
-        if JobQueueEntry.Get(Rec."Job Queue Entry ID") then
-            JobQueueManagement.JobQueueIsManagedByApp(JobQueueEntry, _RefreshingCanBeToggled);
-    end;
 
     trigger OnAfterGetRecord()
     var
@@ -151,5 +154,5 @@ page 6185041 "NPR Monitored JQ Entries"
 
     var
         _ExternalJQRefresherIsEnabled: Boolean;
-        _RefreshingCanBeToggled: Boolean;
+        _MonitoredJQMgt: Codeunit "NPR Monitored Job Queue Mgt.";
 }

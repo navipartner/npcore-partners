@@ -42,15 +42,8 @@ pageextension 6014424 "NPR Job Queue Entry Card" extends "Job Queue Entry Card"
                             ManagedByAppJobQueue.Delete();
                         MonitoredJQMgt.RemoveMonitoredJobQueueEntry(Rec);
                         CurrPage.Update(false);
-                    end else begin
-                        if not ManagedByAppJobQueue.Get(Rec.ID) then begin
-                            ManagedByAppJobQueue.Init();
-                            ManagedByAppJobQueue.ID := Rec.ID;
-                            ManagedByAppJobQueue."Managed by App" := _ManagedByApp;
-                            ManagedByAppJobQueue.Insert();
-                        end;
-                        MonitoredJQMgt.AddMonitoredJobQueueEntry(Rec, _ManagedByApp);
-                    end;
+                    end else
+                        MonitoredJQMgt.AssignJobQueueEntryToManagedAndMonitored(true, true, Rec);
                 end;
             }
             field("NPR Heartbeat URL"; Rec."NPR Heartbeat URL")

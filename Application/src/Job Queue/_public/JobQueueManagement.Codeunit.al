@@ -674,11 +674,20 @@
     var
         MonitoredJobQueueMgt: Codeunit "NPR Monitored Job Queue Mgt.";
     begin
-        BindSubscription(MonitoredJobQueueMgt);
-        OnRefreshNPRJobQueueList();  //update monitored jobs
-        if UnBindSubscription(MonitoredJobQueueMgt) then;
+        if not SkipUpdateNPManagedMonitoredJobs() then begin
+            BindSubscription(MonitoredJobQueueMgt);
+            OnRefreshNPRJobQueueList();  //update monitored jobs
+            if UnBindSubscription(MonitoredJobQueueMgt) then;
+        end;
         if CallRefreshProcedure then
             RefreshJobQueues();  //loop through monitored jobs and create job queue entries if needed
+    end;
+
+    internal procedure SkipUpdateNPManagedMonitoredJobs() Skip: Boolean
+    var
+        Handled: Boolean;
+    begin
+        OnBeforeUpdateNPMonitoredJobs(Skip, Handled);
     end;
 
     internal procedure CreateAndAssignJobQueueCategory(): Code[10]
@@ -1336,6 +1345,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure IsInMonitoredJobUpdate(var Result: Boolean; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateNPMonitoredJobs(var Skip: Boolean; var Handled: Boolean)
     begin
     end;
 }

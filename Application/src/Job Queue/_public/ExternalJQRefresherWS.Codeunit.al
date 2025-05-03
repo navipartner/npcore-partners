@@ -10,7 +10,7 @@ codeunit 6248230 "NPR External JQ Refresher WS"
         SuccessLbl: Label 'Successfully Refreshed.';
     begin
         JobQueueRefreshSetup.GetSetup();
-        if JobQueueRefreshSetup."Use External JQ Refresher" then begin
+        if JobQueueRefreshSetup."Use External JQ Refresher" and JobQueueRefreshSetup.Enabled then begin
             ExtJQRefresherMgt.RefreshJobQueueEntries();
             JobQueueRefreshSetup."Last Refreshed" := CurrentDateTime();
             JobQueueRefreshSetup.Modify();

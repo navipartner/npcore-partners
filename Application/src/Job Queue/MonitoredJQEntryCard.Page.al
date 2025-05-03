@@ -1,7 +1,6 @@
 page 6185042 "NPR Monitored JQ Entry Card"
 {
-    ApplicationArea = NPRRetail;
-    UsageCategory = Administration;
+    UsageCategory = None;
     Caption = 'Monitored Job Queue Entry';
     PageType = Card;
     SourceTable = "NPR Monitored Job Queue Entry";
@@ -118,7 +117,7 @@ page 6185042 "NPR Monitored JQ Entry Card"
                     ApplicationArea = NPRRetail;
                     Caption = 'NP Managed Job';
                     ToolTip = 'Specifies whether this Job Queue entry is allowed to be managed by the NP Refresher functionality.';
-                    Editable = _RefreshingCanBeToggled;
+                    Editable = false;
                 }
                 field("NPR Heartbeat URL"; Rec."NPR Heartbeat URL")
                 {
@@ -294,28 +293,14 @@ page 6185042 "NPR Monitored JQ Entry Card"
                     var
                         JobQueueEntry: Record "Job Queue Entry";
                         MonitoredJQMgt: Codeunit "NPR Monitored Job Queue Mgt.";
-                        JobQueueEntryCard: Page "Job Queue Entry Card";
                     begin
                         if not MonitoredJQMgt.FindJQEntry(Rec, JobQueueEntry) then
                             exit;
 
-                        JobQueueEntryCard.SetTableView(JobQueueEntry);
-                        JobQueueEntryCard.RunModal();
+                        Page.Run(PAGE::"Job Queue Entry Card", JobQueueEntry);
                     end;
                 }
             }
         }
     }
-
-    trigger OnAfterGetCurrRecord()
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-        JobQueueManagement: Codeunit "NPR Job Queue Management";
-    begin
-        if JobQueueEntry.Get(Rec."Job Queue Entry ID") then
-            JobQueueManagement.JobQueueIsManagedByApp(JobQueueEntry, _RefreshingCanBeToggled);
-    end;
-
-    var
-        _RefreshingCanBeToggled: Boolean;
 }

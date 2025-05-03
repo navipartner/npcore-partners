@@ -21,6 +21,22 @@ codeunit 6248236 "NPR Ext. Sale Convert JQ"
             until ExternalPOSSale.Next() = 0;
     end;
 
+#if BC17 or BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnCheckIfIsNPRecurringJob', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnCheckIfIsNPRecurringJob, '', false, false)]
+#endif
+    local procedure CheckIfIsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; var IsNpJob: Boolean; var Handled: Boolean)
+    begin
+        if Handled then
+            exit;
+        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
+           (JobQueueEntry."Object ID to Run" = Codeunit::"NPR Ext. Sale Convert JQ")
+        then begin
+            IsNpJob := true;
+            Handled := true;
+        end;
+    end;
 
 #if BC17 or BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
