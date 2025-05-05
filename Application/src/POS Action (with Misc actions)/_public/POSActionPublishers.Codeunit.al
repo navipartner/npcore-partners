@@ -5,6 +5,11 @@ codeunit 6151068 "NPR POS Action Publishers"
     internal procedure OnBeforeGetItemFromItemSearch(var ItemIdentifierString: Text; var ItemFound: Boolean; var Handled: Boolean)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnBeforeAddCustomertoSales(SaleHeader: Record "NPR POS Sale"; Customer: Record Customer)
+    begin
+    end;
     #region CUSTOMER_DEPOSIT
     procedure CreateCustomerDeposit(DepositType: Option ApplyCustomerEntries,InvoiceNoPrompt,AmountPrompt,MatchCustomerBalance,CrMemoNoPrompt;
                             CustomerEntryView: Text;

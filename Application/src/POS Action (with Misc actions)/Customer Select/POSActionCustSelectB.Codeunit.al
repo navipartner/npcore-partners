@@ -5,6 +5,7 @@ codeunit 6059824 "NPR POS Action: Cust. Select-B"
     procedure AttachCustomer(var SalePOS: Record "NPR POS Sale"; CustomerTableView: Text; CustomerLookupPage: Integer; SpecificCustomerNo: Text; CustomerOverdueCheck: Boolean) Success: Boolean;
     var
         Customer: Record Customer;
+        POSActionPublishers: Codeunit "NPR POS Action Publishers";
         CustomerCreditWarningLbl: Label 'The customer has overdue balance of %1. Do you want to continue?';
         BalanceAmt: Decimal;
     begin
@@ -22,6 +23,8 @@ codeunit 6059824 "NPR POS Action: Cust. Select-B"
                 if not Confirm(StrSubstNo(customerCreditWarningLbl, BalanceAmt)) then
                     exit;
 
+        POSActionPublishers.OnBeforeAddCustomertoSales(SalePOS, Customer);
+
         SalePOS.Validate("Customer No.", Customer."No.");
         SalePOS.Modify(true);
         Success := true;
@@ -32,6 +35,7 @@ codeunit 6059824 "NPR POS Action: Cust. Select-B"
     procedure AttachCustomerRequired(SalePOS: Record "NPR POS Sale") Success: Boolean
     var
         Customer: Record Customer;
+        POSActionPublishers: Codeunit "NPR POS Action Publishers";
         PrevRec: Text;
         CustomerHasBeenBlockedMsg: Label 'The customer has been blocked for further business and cannot be selected.';
     begin
@@ -45,6 +49,8 @@ codeunit 6059824 "NPR POS Action: Cust. Select-B"
         until not (Customer.Blocked = Customer.Blocked::All);
 
         PrevRec := Format(SalePOS);
+
+        POSActionPublishers.OnBeforeAddCustomertoSales(SalePOS, Customer);
 
         SalePOS.Validate("Customer No.", Customer."No.");
 
@@ -79,4 +85,6 @@ codeunit 6059824 "NPR POS Action: Cust. Select-B"
     local procedure OnAfterAttachCustomer(SaleHeader: Record "NPR POS Sale"; Success: Boolean)
     begin
     end;
+
+
 }
