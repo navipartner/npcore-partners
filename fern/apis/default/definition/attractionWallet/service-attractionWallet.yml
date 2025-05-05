@@ -76,7 +76,7 @@ service:
           query-parameters:
             withDetails: $simpleTypes.WithDetails.ExampleWithDetailsTrue
           response:
-            body: $compositeTypes.WalletDetails.ExampleWalletDetails
+            body: $compositeTypes.WalletDetails.ExampleWalletDetailsWithDetails
 
     findWallet:
       docs: Find a wallet by any of its external references.
@@ -86,7 +86,7 @@ service:
       request:
         name: findWallet
         query-parameters:
-          referenceNumber: simpleTypes.WalletReferenceNumber
+          referenceNumber: simpleTypes.ExternalWalletReferenceNumber
       response: list<compositeTypes.WalletDetails>
       examples:
         - name: FindWallets
