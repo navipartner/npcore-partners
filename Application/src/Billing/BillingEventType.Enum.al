@@ -8,5 +8,9 @@ enum 6059854 "NPR Billing Event Type"
     {
         Caption = 'Internal Development Event', Locked = true;
     }
+    value(1; POSLogin)
+    {
+        Caption = 'POS Login', Locked = true;
+    }
 }
 #endif
