@@ -84,7 +84,7 @@ codeunit 6185130 "NPR SG SpeedGate"
 
         repeat
             if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::TICKET) then
-                ValidateAdmitTicket(ValidationRequest);
+                ValidateAdmitTicket(ValidationRequest, Quantity);
 
             if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::MEMBER_CARD) then begin
                 if (not IsNullGuid(TicketId) and (ValidationRequest.ExtraEntityTableId = 0)) then begin
@@ -168,6 +168,7 @@ codeunit 6185130 "NPR SG SpeedGate"
         EntryLog.AdmissionCode := AdmissionCode;
         EntryLog.ScannerId := ScannerId;
         EntryLog.ScannerDescription := Scanners.Description;
+        EntryLog.SuggestedQuantity := 1;
         EntryLog.Insert();
         exit(EntryLog.EntryNo);
     end;
@@ -230,6 +231,11 @@ codeunit 6185130 "NPR SG SpeedGate"
     end;
 
     internal procedure ValidateAdmitTicket(var ValidationRequest: Record "NPR SGEntryLog"): Guid
+    begin
+        exit(ValidateAdmitTicket(ValidationRequest, 1));
+    end;
+
+    internal procedure ValidateAdmitTicket(var ValidationRequest: Record "NPR SGEntryLog"; Quantity: Integer): Guid
     var
         TicketManagement: Codeunit "NPR TM Ticket Management";
         Ticket: Record "NPR TM Ticket";
@@ -260,6 +266,10 @@ codeunit 6185130 "NPR SG SpeedGate"
 
         ValidationRequest.AdmittedReferenceNo := Ticket."External Ticket No.";
         ValidationRequest.AdmittedReferenceId := Ticket.SystemId;
+        ValidationRequest.AdmittedQuantity := Quantity;
+
+        if (Quantity <> ValidationRequest.SuggestedQuantity) then
+            TicketManagement.ChangeConfirmedTicketQuantity(Ticket."No.", ValidationRequest.AdmissionCode, Quantity);
 
         TicketManagement.RegisterArrivalScanTicket("NPR TM TicketIdentifierType"::EXTERNAL_TICKET_NO,
             CopyStr(ValidationRequest.AdmittedReferenceNo, 1, 30),
@@ -346,6 +356,7 @@ codeunit 6185130 "NPR SG SpeedGate"
         if (ResponseCode <> 0) then
             Error(ResponseMessage);
 
+        ValidationRequest.AdmittedQuantity := 1;
         case ValidationRequest.ExtraEntityTableId of
             0: // Originates from a Member Card scan
                // Has a commit inside
@@ -434,10 +445,12 @@ codeunit 6185130 "NPR SG SpeedGate"
         EntityId: Guid;
         ProfileLineId: Guid;
         ReferenceNumberIdentified: Boolean;
+        SuggestedQuantity: Integer;
     begin
         _ApiErrors := _ApiErrors::denied_by_speedgate;
         DetectedNumberType := _NumberType::NOT_WHITELISTED;
         ValidationRequest.Get(LogEntryNo);
+        SuggestedQuantity := ValidationRequest.SuggestedQuantity;
 
         if (not GetValidationProfilesForScanner(ValidationRequest.ScannerId, WhiteListProfileCode, TicketProfileCode, PermitTickets, MemberCardProfileCode, PermitMemberships, WalletProfileCode, PermitWallets, CityCardProfileId, PermitCityCard, ValidationRequest.ApiErrorNumber)) then begin
             ValidationRequest.ReferenceNumberType := ValidationRequest.ReferenceNumberType::UNKNOWN;
@@ -462,7 +475,7 @@ codeunit 6185130 "NPR SG SpeedGate"
             case DetectedNumberType of
                 _NumberType::TICKET:
                     if (PermitTickets) then
-                        NumberPermitted := CheckForTicket(TicketProfileCode, ValidationRequest.ReferenceNo, ValidationRequest.AdmissionCode, EntityId, AdmitToAdmissionCodes, ProfileLineId, ReferenceNumberIdentified);
+                        NumberPermitted := CheckForTicket(TicketProfileCode, ValidationRequest.ReferenceNo, ValidationRequest.AdmissionCode, EntityId, AdmitToAdmissionCodes, ProfileLineId, ReferenceNumberIdentified, SuggestedQuantity);
 
                 _NumberType::MEMBER_CARD:
                     if (PermitMemberships) then
@@ -470,7 +483,7 @@ codeunit 6185130 "NPR SG SpeedGate"
 
                 _NumberType::WALLET:
                     if (PermitWallets) then
-                        NumberPermitted := CheckForWallet(TicketProfileCode, MemberCardProfileCode, ValidationRequest, EntityId, AdmitToAdmissionCodes, ProfileLineId, ReferenceNumberIdentified);
+                        NumberPermitted := CheckForWallet(TicketProfileCode, MemberCardProfileCode, ValidationRequest, EntityId, AdmitToAdmissionCodes, ProfileLineId, ReferenceNumberIdentified, SuggestedQuantity);
 
                 _NumberType::DOC_LX_CITY_CARD:
                     if (PermitCityCard) then
@@ -500,7 +513,7 @@ codeunit 6185130 "NPR SG SpeedGate"
 
         // When no whitelist profile is defined, check number in this order
         if (PermitTickets and not NumberPermitted) then begin
-            NumberPermitted := CheckForTicket(TicketProfileCode, ValidationRequest.ReferenceNo, ValidationRequest.AdmissionCode, EntityId, AdmitToAdmissionCodes, ProfileLineId, ReferenceNumberIdentified);
+            NumberPermitted := CheckForTicket(TicketProfileCode, ValidationRequest.ReferenceNo, ValidationRequest.AdmissionCode, EntityId, AdmitToAdmissionCodes, ProfileLineId, ReferenceNumberIdentified, SuggestedQuantity);
             if (ReferenceNumberIdentified) then
                 DetectedNumberType := _NumberType::TICKET;
 
@@ -518,7 +531,7 @@ codeunit 6185130 "NPR SG SpeedGate"
         end;
 
         if (PermitWallets and not NumberPermitted) then begin
-            NumberPermitted := CheckForWallet(TicketProfileCode, MemberCardProfileCode, ValidationRequest, EntityId, AdmitToAdmissionCodes, ProfileLineId, ReferenceNumberIdentified);
+            NumberPermitted := CheckForWallet(TicketProfileCode, MemberCardProfileCode, ValidationRequest, EntityId, AdmitToAdmissionCodes, ProfileLineId, ReferenceNumberIdentified, SuggestedQuantity);
             if (ReferenceNumberIdentified) then
                 DetectedNumberType := _NumberType::WALLET;
         end;
@@ -538,6 +551,7 @@ codeunit 6185130 "NPR SG SpeedGate"
         ValidationRequest.EntryStatus := ValidationRequest.EntryStatus::PERMITTED_BY_GATE;
         ValidationRequest.EntityId := EntityId;
         ValidationRequest.ProfileLineId := ProfileLineId;
+        ValidationRequest.SuggestedQuantity := SuggestedQuantity;
         ValidationRequest.Modify();
 
         if (AdmitToAdmissionCodes.Contains(ValidationRequest.AdmissionCode)) then
@@ -653,7 +667,7 @@ codeunit 6185130 "NPR SG SpeedGate"
         exit(true);
     end;
 
-    local procedure CheckForWallet(TicketProfileCode: Code[10]; MemberCardProfileCode: Code[10]; var ValidationRequest: Record "NPR SGEntryLog"; var EntityId: Guid; var AdmitToCodes: List of [Code[20]]; var ProfileLineId: Guid; var NumberIdentified: Boolean): Boolean
+    local procedure CheckForWallet(TicketProfileCode: Code[10]; MemberCardProfileCode: Code[10]; var ValidationRequest: Record "NPR SGEntryLog"; var EntityId: Guid; var AdmitToCodes: List of [Code[20]]; var ProfileLineId: Guid; var NumberIdentified: Boolean; SuggestedQuantity: Integer): Boolean
     var
         Number: Text[100];
         SuggestedAdmissionCode: Code[20];
@@ -694,7 +708,7 @@ codeunit 6185130 "NPR SG SpeedGate"
             Ticket.GetBySystemId(TicketIds.Get(1));
             ValidationRequest.ExtraEntityId := TicketIds.Get(1);
             ValidationRequest.ExtraEntityTableId := Database::"NPR TM Ticket";
-            CheckForTicket(TicketProfileCode, Ticket."External Ticket No.", SuggestedAdmissionCode, TicketId, AdmitToCodes, ProfileLineId, ReferenceNumberIsTicket);
+            CheckForTicket(TicketProfileCode, Ticket."External Ticket No.", SuggestedAdmissionCode, TicketId, AdmitToCodes, ProfileLineId, ReferenceNumberIsTicket, SuggestedQuantity);
         end;
 
         if (TicketIds.Count() = 0) and (MemberCardIds.Count() = 1) then begin
@@ -775,6 +789,7 @@ codeunit 6185130 "NPR SG SpeedGate"
     begin
         if (not GetValidationProfilesForScanner(ScannerId, WhiteListProfileCode, TicketProfileCode, PermitTickets, MemberCardProfileCode, PermitMemberships, WalletProfileCode, PermitWallets, CityCardProfileId, PermitCityCard, ApiErrorNumber)) then
             exit(false);
+
         exit(CheckForTicket(TicketProfileCode, TicketNo, AdmissionCode, TicketId, AdmitToCodes, ProfileLineId, ReferenceNumberIdentified));
     end;
 
@@ -790,8 +805,10 @@ codeunit 6185130 "NPR SG SpeedGate"
         TicketNumberIdentified: Boolean;
         AdmissionCode, RequestedAdmissionCode : Code[20];
         FirstValidationRequestHandled: Boolean;
+        SuggestedQuantity: Integer;
     begin
         NumberIdentified := false;
+        SuggestedQuantity := ValidationRequest.SuggestedQuantity;
 
         if (TicketProfileCode = '') then
             exit(false);
@@ -838,7 +855,7 @@ codeunit 6185130 "NPR SG SpeedGate"
             until (Ticket.Next() = 0);
 
             // all tickets are the same for the primary request line - check one and get list of admission codes 
-            if (not IsTicketValidForAdmit(TicketProfileCode, Ticket."External Ticket No.", RequestedAdmissionCode, TicketId, AdmitToCodes, ProfileLineId, TicketNumberIdentified)) then
+            if (not IsTicketValidForAdmit(TicketProfileCode, Ticket."External Ticket No.", RequestedAdmissionCode, TicketId, AdmitToCodes, ProfileLineId, TicketNumberIdentified, SuggestedQuantity)) then
                 exit(false);
 
             // Set the validation request template fields
@@ -847,6 +864,7 @@ codeunit 6185130 "NPR SG SpeedGate"
             ValidationRequest.EntryStatus := ValidationRequest.EntryStatus::PERMITTED_BY_GATE;
             ValidationRequest.EntityId := TicketRequest.SystemId;
             ValidationRequest.ProfileLineId := ProfileLineId;
+            ValidationRequest.SuggestedQuantity := SuggestedQuantity;
             if (not FirstValidationRequestHandled) then begin
                 // The initial validation request is already created for the first ticket and admission code
                 // Update the existing validation request with the ticket id
@@ -903,13 +921,20 @@ codeunit 6185130 "NPR SG SpeedGate"
 
     internal procedure CheckForTicket(TicketProfileCode: Code[10]; Number: Text[100]; SuggestedAdmissionCode: Code[20]; var TicketId: Guid; var AdmitToCodes: List of [Code[20]]; var ProfileLineId: Guid; var NumberIdentified: Boolean): Boolean
     var
+        SuggestedQuantity: Integer;
+    begin
+        exit(CheckForTicket(TicketProfileCode, Number, SuggestedAdmissionCode, TicketId, AdmitToCodes, ProfileLineId, NumberIdentified, SuggestedQuantity));
+    end;
+
+    local procedure CheckForTicket(TicketProfileCode: Code[10]; Number: Text[100]; SuggestedAdmissionCode: Code[20]; var TicketId: Guid; var AdmitToCodes: List of [Code[20]]; var ProfileLineId: Guid; var NumberIdentified: Boolean; var SuggestedQuantity: Integer): Boolean
+    var
         TicketProfile: Record "NPR SG TicketProfile";
         TicketProfileLine: Record "NPR SG TicketProfileLine";
     begin
         NumberIdentified := false;
 
         if (TicketProfileCode = '') then
-            exit(IsTicketValidForAdmit(TicketProfileCode, Number, SuggestedAdmissionCode, TicketId, AdmitToCodes, ProfileLineId, NumberIdentified));
+            exit(IsTicketValidForAdmit(TicketProfileCode, Number, SuggestedAdmissionCode, TicketId, AdmitToCodes, ProfileLineId, NumberIdentified, SuggestedQuantity));
 
         if (not TicketProfile.Get(TicketProfileCode)) then
             exit(false); // Ticket profile is invalid - all tickets are denied
@@ -919,14 +944,16 @@ codeunit 6185130 "NPR SG SpeedGate"
             if (TicketProfileLine.IsEmpty()) then
                 exit(false); // Ticket profile is empty - all tickets are denied
 
-        exit(IsTicketValidForAdmit(TicketProfileCode, Number, SuggestedAdmissionCode, TicketId, AdmitToCodes, ProfileLineId, NumberIdentified));
+        exit(IsTicketValidForAdmit(TicketProfileCode, Number, SuggestedAdmissionCode, TicketId, AdmitToCodes, ProfileLineId, NumberIdentified, SuggestedQuantity));
     end;
 
-    local procedure IsTicketValidForAdmit(TicketProfileCode: Code[10]; Number: Text[100]; SuggestedAdmissionCode: Code[20]; var TicketId: Guid; var AdmitToCodes: List of [Code[20]]; var ProfileLineId: Guid; var NumberIdentified: Boolean): Boolean
+    local procedure IsTicketValidForAdmit(TicketProfileCode: Code[10]; Number: Text[100]; SuggestedAdmissionCode: Code[20]; var TicketId: Guid; var AdmitToCodes: List of [Code[20]]; var ProfileLineId: Guid; var NumberIdentified: Boolean; var SuggestedQuantity: Integer): Boolean
     var
         TicketProfile: Record "NPR SG TicketProfile";
         TicketProfileLine: Record "NPR SG TicketProfileLine";
         Ticket: Record "NPR TM Ticket";
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        TicketType: Record "NPR TM Ticket Type";
         TicketBom: Record "NPR TM Ticket Admission BOM";
         AdmissionCode: Code[20];
         RejectedAdmitToCodes: List of [Code[20]];
@@ -954,6 +981,9 @@ codeunit 6185130 "NPR SG SpeedGate"
         if (not TicketBom.FindSet()) then
             exit(SetApiError(_ApiErrors::ticket_not_valid_for_suggested_admission));
 
+        if (not TicketType.Get(Ticket."Ticket Type Code")) then
+            TicketType.Init();
+
         repeat
             AdmissionLocalTime := TimeHelper.GetLocalTimeAtAdmission(TicketBom."Admission Code");
             LocalTime := DT2Time(AdmissionLocalTime);
@@ -978,6 +1008,19 @@ codeunit 6185130 "NPR SG SpeedGate"
                         ProfileLineId := TicketProfileLine.SystemId;
                     end;
                 until (TicketProfileLine.Next() = 0);
+
+            TicketAccessEntry.SetCurrentKey("Ticket No.", "Admission Code");
+            TicketAccessEntry.SetLoadFields(Quantity, Status);
+            TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+            TicketAccessEntry.SetFilter("Admission Code", '=%1', TicketBom."Admission Code");
+            TicketAccessEntry.FindFirst();
+
+            if (TicketAccessEntry.Status = TicketAccessEntry.Status::BLOCKED) then
+                exit(SetApiError(_ApiErrors::ticket_blocked));
+
+            if (TicketType."Admission Registration" = TicketType."Admission Registration"::GROUP) then
+                SuggestedQuantity := TicketAccessEntry.Quantity;
+
         until (TicketBom.Next() = 0);
 
         if (AdmitToCodes.Count = 0) then begin

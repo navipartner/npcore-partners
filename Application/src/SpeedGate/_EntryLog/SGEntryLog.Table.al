@@ -63,6 +63,16 @@ table 6150987 "NPR SGEntryLog"
             DataClassification = CustomerContent;
             Caption = 'Admitted Reference Id';
         }
+        field(60; SuggestedQuantity; Integer)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Suggested Quantity';
+        }
+        field(61; AdmittedQuantity; Integer)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Admitted Quantity';
+        }
         field(100; ReferenceNumberType; Option)
         {
             DataClassification = CustomerContent;

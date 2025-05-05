@@ -239,6 +239,8 @@ page 6184906 "NPR SG EntryLogList"
         MemberLbl: Label 'Member Card';
         CardholderLbl: Label 'Cardholder';
         TicketLbl: Label 'Ticket';
+        TicketIndividualLbl: Label 'Individual';
+        TicketGroupLbl: Label 'Group';
     begin
         _ErrorMessage := Rec.ApiErrorMessage;
 
@@ -262,8 +264,19 @@ page 6184906 "NPR SG EntryLogList"
                         _SubType := TicketLbl;
                 end;
             else
-                if (Rec.ReferenceNumberType = Rec.ReferenceNumberType::MEMBER_CARD) then
-                    _SubType := CardholderLbl;
+                case Rec.ReferenceNumberType of
+
+                    Rec.ReferenceNumberType::MEMBER_CARD:
+                        _SubType := CardholderLbl;
+
+                    Rec.ReferenceNumberType::TICKET:
+                        if (Rec.SuggestedQuantity <= 1) then
+                            _SubType := TicketIndividualLbl
+                        else
+                            _SubType := TicketGroupLbl;
+                end;
         end;
+
+
     end;
 }

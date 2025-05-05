@@ -44,6 +44,8 @@ types:
         admissionCode: simpleTypes.AdmissionCode
         admitCount: simpleTypes.AdmitCount
         admittedAt: optional<simpleTypes.AdmittedAt>
+        confirmedGroupQuantity: optional<simpleTypes.ConfirmedGroupQuantity>
+        unconfirmedGroupQuantity: optional<simpleTypes.UnconfirmedGroupQuantity>
         printedAt: optional<simpleTypes.PrintedAt>
         printCount: optional<simpleTypes.PrintCount>
     examples:

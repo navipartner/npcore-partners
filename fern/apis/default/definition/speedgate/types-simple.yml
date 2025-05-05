@@ -141,6 +141,20 @@ types:
       - name: ExampleSpeedgate
         value: GATE1
 
+  ConfirmedGroupQuantity:
+    type: integer
+    docs: The final number of attendees admitted with the group ticket. Set by the operator at first admission and used for all subsequent scans.
+    examples:
+      - name: ExampleConfirmedGroupQuantity
+        value: 17
+  
+  UnconfirmedGroupQuantity:
+    type: integer
+    docs: The initially intended number of attendees for a group ticket. This value is provisional and may be adjusted by the operator upon first admission.
+    examples:
+      - name: ExampleUnconfirmedGroupQuantity
+        value: 20
+
   ScannerIdQueryParameter:
     type: string
     docs: A human friendly unique code that identifies a specific speedgate. Supports filtering such as * for wildcard matching f.ex. GATE*
@@ -547,7 +561,6 @@ types:
         `ticket`
         <li>when a wallet is scanned and a ticket can be admitted</li>
         <li>when a member card is scanned and multiple admissions will be admitted</li>
-        
 
     examples:
       - name: ExampleMemberGuest
@@ -573,3 +586,4 @@ types:
     examples:
       - name: ExampleEntryNumber
         value: 123456
+

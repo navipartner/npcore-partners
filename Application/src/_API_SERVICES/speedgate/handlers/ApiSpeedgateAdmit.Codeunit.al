@@ -172,10 +172,9 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             TokenText := CopyStr(JTokens.AsValue().AsText(), 1, MaxStrLen(TokenText));
             Evaluate(Token, TokenText);
 
+            Quantity := 0;
             if (TokenObject.Get('quantity', JTokens)) then
-                Quantity := JTokens.AsValue().AsInteger()
-            else
-                Quantity := 1;
+                Quantity := JTokens.AsValue().AsInteger();
 
             ResponseJson := Admit(ResponseJson, Token, Quantity);
         end;
@@ -187,18 +186,26 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         Response.RespondOK(ResponseJson.Build());
     end;
 
-    internal procedure Admit(ResponseJson: Codeunit "NPR JSON Builder"; Token: Guid; Quantity: Integer): Codeunit "NPR JSON Builder"
+    internal procedure Admit(ResponseJson: Codeunit "NPR JSON Builder"; Token: Guid; InitialQuantity: Integer): Codeunit "NPR JSON Builder"
     var
         ValidationRequest: Record "NPR SGEntryLog";
         TicketId: Guid;
+        Quantity: Integer;
     begin
         ValidationRequest.SetCurrentKey(Token);
         ValidationRequest.SetFilter(Token, '=%1', Token);
         ValidationRequest.SetFilter(EntryStatus, '=%1', ValidationRequest.EntryStatus::PERMITTED_BY_GATE);
         if (ValidationRequest.FindSet()) then begin
             repeat
+                Quantity := InitialQuantity;
+                if (Quantity <= 0) then
+                    Quantity := ValidationRequest.SuggestedQuantity;
+
+                if (Quantity <= 0) then
+                    Quantity := 1;
+
                 if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::TICKET) then
-                    AdmitTicket(ValidationRequest, ResponseJson);
+                    AdmitTicket(ValidationRequest, ResponseJson, Quantity);
 
                 if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::MEMBER_CARD) then begin
                     if (not IsNullGuid(TicketId) and (ValidationRequest.ExtraEntityTableId = 0)) then begin
@@ -209,7 +216,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
                 end;
 
                 if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::WALLET) then
-                    AdmitWallet(ValidationRequest, ResponseJson);
+                    AdmitWallet(ValidationRequest, ResponseJson, Quantity);
 
                 if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::DOC_LX_CITY_CARD) then
                     AdmitCityCard(ValidationRequest, ResponseJson);
@@ -223,7 +230,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         exit(ResponseJson);
     end;
 
-    local procedure AdmitWallet(ValidationRequest: Record "NPR SGEntryLog"; ResponseJson: Codeunit "NPR JSON Builder")
+    local procedure AdmitWallet(ValidationRequest: Record "NPR SGEntryLog"; ResponseJson: Codeunit "NPR JSON Builder"; Quantity: Integer)
     begin
         if (ValidationRequest.ExtraEntityTableId = 0) then
             Error('The tryAdmit request was not able to preselect a product for admission.');
@@ -232,18 +239,18 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             Error('The admit request contains an unhandled Entity: %1', ValidationRequest.ExtraEntityTableId);
 
         if (ValidationRequest.ExtraEntityTableId = Database::"NPR TM Ticket") then
-            AdmitTicket(ValidationRequest, ResponseJson);
+            AdmitTicket(ValidationRequest, ResponseJson, Quantity);
 
         if (ValidationRequest.ExtraEntityTableId = Database::"NPR MM Member Card") then
             AdmitMemberCard(ValidationRequest, ResponseJson, 1);
     end;
 
-    local procedure AdmitTicket(ValidationRequest: Record "NPR SGEntryLog"; ResponseJson: Codeunit "NPR JSON Builder")
+    local procedure AdmitTicket(ValidationRequest: Record "NPR SGEntryLog"; ResponseJson: Codeunit "NPR JSON Builder"; Quantity: Integer)
     var
         SpeedGateMgr: Codeunit "NPR SG SpeedGate";
         Ticket: Record "NPR TM Ticket";
     begin
-        Ticket.GetBySystemId(SpeedGateMgr.ValidateAdmitTicket(ValidationRequest));
+        Ticket.GetBySystemId(SpeedGateMgr.ValidateAdmitTicket(ValidationRequest, Quantity));
 
         ResponseJson
             .StartObject()
@@ -594,6 +601,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
     var
         DetAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
         AdmitCount: Integer;
+        GroupQuantity: Integer;
     begin
 
         if (AccessEntry."Access Date" > 0D) then begin
@@ -605,12 +613,22 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
                 DetAccessEntry.FindLast();
         end;
 
+        GroupQuantity := Round(AccessEntry.Quantity, 1);
+
         ResponseJson
             .AddProperty('ticketId', Format(Ticket.SystemId, 0, 4).ToLower())
             .AddProperty('ticketNumber', Ticket."External Ticket No.")
             .AddProperty('itemNo', Ticket."Item No.")
             .AddProperty('admissionCode', AccessEntry."Admission Code")
-            .AddProperty('admitCount', AdmitCount)
+            .AddProperty('admitCount', AdmitCount);
+
+        if (GroupQuantity > 1) then
+            if (AdmitCount > 0) then
+                ResponseJson.AddProperty('confirmedGroupQuantity', GroupQuantity)
+            else
+                ResponseJson.AddProperty('unconfirmedGroupQuantity', GroupQuantity);
+
+        ResponseJson
             .AddObject(AddRequiredProperty(ResponseJson, 'admittedAt', DetAccessEntry.SystemCreatedAt))
             .AddObject(AddPrintedTicketDetails(ResponseJson, Ticket));
 

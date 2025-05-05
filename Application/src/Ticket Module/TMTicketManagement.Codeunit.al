@@ -22,7 +22,7 @@
         NOT_CONFIRMED: Label 'Ticket %1 has not been confirmed.';
         MISSING_PAYMENT: Label 'Ticket %1 is missing the payment transaction.';
 
-        HAS_PAYMENT: Label 'Ticket %1 has already been paid so group quantity may not be increased.';
+        HAS_PAYMENT: Label 'Ticket %1 does not permit changes to quantity after payment.';
         TICKET_CANCELED: Label 'Ticket %1 has been canceled and is not valid.';
         ADMISSION_MISMATCH: Label 'The Schedule Entry %1 is for admission to %2, but the Ticket Access Entry requires %3.';
         NO_SCHEDULE_FOR_ADM: Label 'There is no valid admission schedule available for %1 today.';
