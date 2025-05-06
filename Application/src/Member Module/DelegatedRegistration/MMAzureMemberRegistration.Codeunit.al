@@ -393,11 +393,16 @@ codeunit 6151383 "NPR MM AzureMemberRegistration"
         Response: HttpResponseMessage;
         DeleteFromQueueUrl: Label 'https://%1.queue.core.windows.net/%2/messages/%3?popreceipt=%4&%5', Locked = true;
         SharedAccessSignature: Text;
+        TypeHelper: Codeunit "Type Helper";
+        UrlEncodedPopReceipt: Text;
     begin
         SharedAccessSignature := GetSecret(_AzureKeyVaultNamePrefix, StorageAccountName);
 
+        UrlEncodedPopReceipt := PopReceipt;
+        TypeHelper.UrlEncode(UrlEncodedPopReceipt);
+
         Request.Method('DELETE');
-        Request.SetRequestUri(StrSubstNo(DeleteFromQueueUrl, StorageAccountName, QueueName, MessageId, PopReceipt, SharedAccessSignature));
+        Request.SetRequestUri(StrSubstNo(DeleteFromQueueUrl, StorageAccountName, QueueName, MessageId, UrlEncodedPopReceipt, SharedAccessSignature));
         Request.GetHeaders(Headers);
         Headers.Add('If-Match', '*');
 
