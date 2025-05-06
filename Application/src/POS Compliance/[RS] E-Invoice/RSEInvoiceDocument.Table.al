@@ -148,14 +148,12 @@ table 6150804 "NPR RS E-Invoice Document"
 
     internal procedure SetRequestContent(RequestText: Text)
     var
-        TenantMedia: Record "Tenant Media";
         TempBlob: Codeunit "Temp Blob";
         InStream: InStream;
         OutStream: OutStream;
     begin
         if "Request Content".HasValue() then
-            if TenantMedia.Get("Request Content".MediaId) then
-                TenantMedia.Delete(true);
+            RSEInvoiceMgt.ClearTenantMedia("Request Content".MediaId);
 
         TempBlob.CreateOutStream(OutStream, TextEncoding::UTF8);
         OutStream.WriteText(RequestText);
@@ -181,14 +179,12 @@ table 6150804 "NPR RS E-Invoice Document"
 
     internal procedure SetResponseContent(ResponseText: Text)
     var
-        TenantMedia: Record "Tenant Media";
         TempBlob: Codeunit "Temp Blob";
         InStream: InStream;
         OutStream: OutStream;
     begin
         if "Response Content".HasValue() then
-            if TenantMedia.Get("Response Content".MediaId) then
-                TenantMedia.Delete(true);
+            RSEInvoiceMgt.ClearTenantMedia("Response Content".MediaId);
 
         TempBlob.CreateOutStream(OutStream, TextEncoding::UTF8);
         OutStream.WriteText(ResponseText);
@@ -237,7 +233,6 @@ table 6150804 "NPR RS E-Invoice Document"
 
     internal procedure GetDocumentAttachmentsBase64(var AttachmentsText: List of [Text]): Boolean
     var
-        RSEInvoiceMgt: Codeunit "NPR RS E-Invoice Mgt.";
         Document: XmlDocument;
         InvoiceElement: XmlElement;
         DocumentBodyNode: XmlNode;
@@ -273,5 +268,7 @@ table 6150804 "NPR RS E-Invoice Document"
         exit(AttachmentsText.Count() > 0);
     end;
 
+var
+    RSEInvoiceMgt: Codeunit "NPR RS E-Invoice Mgt.";
 #endif
 }

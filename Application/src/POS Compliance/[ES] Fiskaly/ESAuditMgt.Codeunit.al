@@ -1,7 +1,7 @@
 codeunit 6184866 "NPR ES Audit Mgt."
 {
     Access = Internal;
-
+    Permissions = TableData "Tenant Media" = rd;
     var
         Enabled: Boolean;
         Initialized: Boolean;
@@ -695,6 +695,14 @@ codeunit 6184866 "NPR ES Audit Mgt."
 
         POSSaleLine.Validate(Quantity, -POSSaleLine.Quantity);
         exit(POSSaleLine.Modify(true));
+    end;
+
+    internal procedure ClearTenantMedia(MediaId: Guid)
+    var
+        TenantMedia: Record "Tenant Media";
+    begin
+        if TenantMedia.Get(MediaId) then
+            TenantMedia.Delete(true);
     end;
     #endregion
 

@@ -1,6 +1,7 @@
 codeunit 6151610 "NPR BG SIS Audit Mgt."
 {
     Access = Internal;
+    Permissions = TableData "Tenant Media" = rd;
 
     var
         Enabled: Boolean;
@@ -429,6 +430,14 @@ codeunit 6151610 "NPR BG SIS Audit Mgt."
         BGSISPOSAuditLogAux.SetRange("POS Unit No.", OldPOSUnit."No.");
         if not BGSISPOSAuditLogAux.IsEmpty() then
             Error(CannotRenameErr, OldPOSUnit.TableCaption(), OldPOSUnit."No.", BGSISPOSAuditLogAux.TableCaption());
+    end;
+
+    internal procedure ClearTenantMedia(MediaId: Guid)
+    var
+        TenantMedia: Record "Tenant Media";
+    begin
+        if TenantMedia.Get(MediaId) then
+            TenantMedia.Delete(true);
     end;
     #endregion
 

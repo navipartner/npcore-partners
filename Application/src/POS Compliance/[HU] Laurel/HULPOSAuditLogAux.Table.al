@@ -197,14 +197,12 @@ table 6150995 "NPR HU L POS Audit Log Aux."
 
     internal procedure SetRequestText(RequestText: Text)
     var
-        TenantMedia: Record "Tenant Media";
         TempBlob: Codeunit "Temp Blob";
         InStream: InStream;
         OutStream: OutStream;
     begin
         if "Request Content".HasValue() then
-            if TenantMedia.Get("Request Content".MediaId) then
-                TenantMedia.Delete(true);
+            HULAuditMgt.ClearTenantMedia("Request Content".MediaId);
 
         TempBlob.CreateOutStream(OutStream, TextEncoding::UTF8);
         OutStream.WriteText(RequestText);
@@ -214,14 +212,12 @@ table 6150995 "NPR HU L POS Audit Log Aux."
 
     internal procedure SetResponseText(ResponseText: Text)
     var
-        TenantMedia: Record "Tenant Media";
         TempBlob: Codeunit "Temp Blob";
         InStream: InStream;
         OutStream: OutStream;
     begin
         if "Response Content".HasValue() then
-            if TenantMedia.Get("Response Content".MediaId) then
-                TenantMedia.Delete(true);
+            HULAuditMgt.ClearTenantMedia("Response Content".MediaId);
 
         TempBlob.CreateOutStream(OutStream, TextEncoding::UTF8);
         OutStream.WriteText(ResponseText);
@@ -236,4 +232,7 @@ table 6150995 "NPR HU L POS Audit Log Aux."
         DateTimePart := "FCU Timestamp".Split(' ');
         exit(DateTimePart.Get(1));
     end;
+
+    var
+        HULAuditMgt: Codeunit "NPR HU L Audit Mgt.";
 }
