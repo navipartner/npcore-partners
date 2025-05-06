@@ -76,6 +76,12 @@ page 6059968 "NPR APIV1 PBITMTicketAccessEnt"
                 {
                     Caption = 'Last Modified Date Filter', Locked = true;
                 }
+#if not (BC17 or BC18 or BC19 or BC20)
+                field(systemRowVersion; Rec.SystemRowVersion)
+                {
+                    Caption = 'System Row Version', Locked = true;
+                }
+#endif
             }
         }
     }

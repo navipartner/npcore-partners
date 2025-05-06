@@ -68,6 +68,12 @@ page 6059928 "NPR APIV1 PBIItemCategory"
                 {
                     Caption = 'Main Category Code';
                 }
+#if not (BC17 or BC18 or BC19 or BC20)
+                field(systemRowVersion; Rec.SystemRowVersion)
+                {
+                    Caption = 'System Row Version', Locked = true;
+                }
+#endif
             }
         }
     }

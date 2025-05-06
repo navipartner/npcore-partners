@@ -40,6 +40,12 @@ page 6059916 "NPR APIV1 PBIDimensionSet"
                 {
                     Caption = 'Dimension Value ID', Locked = true;
                 }
+#if not (BC17 or BC18 or BC19 or BC20)
+                field(systemRowVersion; Rec.SystemRowVersion)
+                {
+                    Caption = 'System Row Version', Locked = true;
+                }
+#endif
             }
         }
     }

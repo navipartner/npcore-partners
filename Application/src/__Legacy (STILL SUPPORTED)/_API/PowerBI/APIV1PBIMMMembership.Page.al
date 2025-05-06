@@ -60,6 +60,12 @@ page 6059933 "NPR APIV1 PBIMMMembership"
                 {
                     Caption = 'Auto-Renew Payment Method Code', Locked = true;
                 }
+#if not (BC17 or BC18 or BC19 or BC20)
+                field(systemRowVersion; Rec.SystemRowVersion)
+                {
+                    Caption = 'System Row Version', Locked = true;
+                }
+#endif
             }
         }
     }

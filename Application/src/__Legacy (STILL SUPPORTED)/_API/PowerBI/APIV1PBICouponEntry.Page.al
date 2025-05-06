@@ -104,6 +104,12 @@ page 6150841 "NPR APIV1 PBICouponEntry"
                 {
                     Caption = 'User ID';
                 }
+#if not (BC17 or BC18 or BC19 or BC20)
+                field(systemRowVersion; Rec.SystemRowVersion)
+                {
+                    Caption = 'System Row Version', Locked = true;
+                }
+#endif
             }
         }
     }

@@ -32,9 +32,13 @@ page 6059915 "NPR APIV1 PBIDimension"
                 {
                     Caption = 'Name', Locked = true;
                 }
-
+#if not (BC17 or BC18 or BC19 or BC20)
+                field(systemRowVersion; Rec.SystemRowVersion)
+                {
+                    Caption = 'System Row Version', Locked = true;
+                }
+#endif
             }
         }
-
     }
 }
