@@ -308,6 +308,7 @@
         CaptionGlobalMedium: Label 'Medium';
         CaptionGlobalLarge: Label 'Large';
         CaptionGlobalXLarge: Label 'X Large';
+        CaptionGlobalXXLarge: Label 'XX Large';
         CaptionGlobalLeft: Label 'Left';
         CaptionGlobalCenter: Label 'Center';
         CaptionGlobalRight: Label 'Right';
@@ -686,6 +687,10 @@
         DialogItemSelectionMinQuantityLbl: Label 'Min Quantity';
         DialogItemSelectionMaxQuantityLbl: Label 'Max Quantity';
         DialogItemSelectionInvalidConfigurationLbl: Label '(INVALID CONFIGURATION)';
+        DialogSignatureValidationApproveLbl: Label 'Approve';
+        DialogSignatureValidationDeclineLbl: Label 'Decline';
+        DialogSignatureValidationSignatureVerificationLbl: Label 'Signature Verification';
+        DialogButtonsPreviewLbl: Label 'Dialog buttons preview';
         NumberOfGuestsForWaiterPadLbl: Label 'Number of guests for waiter pad:';
         NumberOfGuestsAtActiveTableLbl: Label 'Number of guests at table:';
         GlobalSettingsSystemWorkflowsLbl: Label 'System workflows';
@@ -709,6 +714,7 @@
         ColorPickerDeleteColorLbl: Label 'Delete Color';
         ColorPickerSaveColorLbl: Label 'Save Color';
         ScheduleDialogAdmissionsTableAdmissionCodeLbl: Label 'Admission Code';
+        ScheduleDialogAdmissionsTableRestOfTheMonthLabelLbl: Label 'rest of the month';
         ScheduleDialogAdmissionsTableScheduledTimeDescriptionLbl: Label 'Scheduled time description';
         ScheduleDialogAdmissionsTableAdmissionDescriptionLbl: Label 'Admission description';
         ScheduleDialogScheduleAdmissionLbl: Label 'Admission';
@@ -718,6 +724,7 @@
         ScheduleDialogDialogScheduleRequestErrorLbl: Label 'Something went wrong when creating your ticket, please check the selected times and try again.';
         ScheduleDialogAdmissionsTableEnterEditModeDescriptionLbl: Label 'Enter edit mode to edit layout.';
         ScheduleDialogAdmissionsTableExitEditModeDescriptionLbl: Label 'Exit edit mode.';
+        ScheduleDialogAdmissionsTableFindAllTimeslotsLbl: Label 'Find all timeslots';
         RestaurantMenusEditorPleaseIgnoreLbl: Label 'Please ignore this if you are not using restaurant';
         RestaurantMenusEditorAdminButtonsLbl: Label 'Admin Buttons';
         RestaurantMenusEditorWaiterPadMenuLbl: Label 'Waiter Pad Menu';
@@ -867,6 +874,7 @@
         Captions.Add('Global_Medium', CaptionGlobalMedium);
         Captions.Add('Global_Large', CaptionGlobalLarge);
         Captions.Add('Global_XLarge', CaptionGlobalXLarge);
+        Captions.Add('Global_XXLarge', CaptionGlobalXXLarge);
         Captions.Add('Global_Left', CaptionGlobalLeft);
         Captions.Add('Global_Center', CaptionGlobalCenter);
         Captions.Add('Global_Right', CaptionGlobalRight);
@@ -1256,11 +1264,16 @@
         Captions.Add('Dialog_ItemSelection_MinQuantity', DialogItemSelectionMinQuantityLbl);
         Captions.Add('Dialog_ItemSelection_MaxQuantity', DialogItemSelectionMaxQuantityLbl);
         Captions.Add('Dialog_ItemSelection_InvalidConfiguration', DialogItemSelectionInvalidConfigurationLbl);
+        Captions.Add('DialogSignatureValidation_Approve', DialogSignatureValidationApproveLbl);
+        Captions.Add('DialogSignatureValidation_Decline', DialogSignatureValidationDeclineLbl);
+        Captions.Add('DialogSignatureValidation_SignatureVerification', DialogSignatureValidationSignatureVerificationLbl);
+        Captions.Add('DialogButtons_Preview', DialogButtonsPreviewLbl);
         Captions.Add('Number_Of_Guests_ForWaiterPad', NumberOfGuestsForWaiterPadLbl);
         Captions.Add('Number_Of_Guests_At_Active_Table_ForTable', NumberOfGuestsAtActiveTableLbl);
         Captions.Add('Color_Picker_DeleteColor', ColorPickerDeleteColorLbl);
         Captions.Add('Color_Picker_SaveColor', ColorPickerSaveColorLbl);
         Captions.Add('ScheduleDialog_Admissions_Table_AdmissionCode', ScheduleDialogAdmissionsTableAdmissionCodeLbl);
+        Captions.Add('ScheduleDialog_Admissions_Table_RestOfTheMonthLabel', ScheduleDialogAdmissionsTableRestOfTheMonthLabelLbl);
         Captions.Add('ScheduleDialog_Admissions_Table_ScheduledTimeDescription', ScheduleDialogAdmissionsTableScheduledTimeDescriptionLbl);
         Captions.Add('ScheduleDialog_Admissions_Table_AdmissionDescription', ScheduleDialogAdmissionsTableAdmissionDescriptionLbl);
         Captions.Add('ScheduleDialog_Schedule_Admission', ScheduleDialogScheduleAdmissionLbl);
@@ -1270,6 +1283,7 @@
         Captions.Add('ScheduleDialog_Dialog_Schedule_RequestError', ScheduleDialogDialogScheduleRequestErrorLbl);
         Captions.Add('ScheduleDialog_Admissions_Table_EnterEditModeDescription', ScheduleDialogAdmissionsTableEnterEditModeDescriptionLbl);
         Captions.Add('ScheduleDialog_Admissions_Table_ExitEditModeDescription', ScheduleDialogAdmissionsTableExitEditModeDescriptionLbl);
+        Captions.Add('ScheduleDialog_Admissions_Table_FindAllTimeslots', ScheduleDialogAdmissionsTableFindAllTimeslotsLbl);
         Captions.Add('Restaurant_Menus_Editor_PleaseIgnore', RestaurantMenusEditorPleaseIgnoreLbl);
         Captions.Add('Restaurant_Menus_Editor_AdminButtons', RestaurantMenusEditorAdminButtonsLbl);
         Captions.Add('Restaurant_Menus_Editor_WaiterPadMenu', RestaurantMenusEditorWaiterPadMenuLbl);
