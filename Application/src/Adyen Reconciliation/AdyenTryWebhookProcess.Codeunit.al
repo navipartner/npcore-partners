@@ -116,27 +116,27 @@ codeunit 6248332 "NPR Adyen Try Webhook Process"
 
     local procedure AuthorizeMagentoPaymentLine(JsonObjectToken: JsonToken; var MagentoPaymentLine: Record "NPR Magento Payment Line") Processed: Boolean;
     var
+        JsonHelper: Codeunit "NPR Json Helper";
         MagentoPmtMgt: Codeunit "NPR Magento Pmt. Adyen Mgt.";
         Amount: Decimal;
         AmountTxt: Text;
         TransactionId: Text;
-        AmountJsonToken: JsonToken;
+        Success: Boolean;
     begin
-        if not JsonObjectToken.AsObject().Get('pspReference', AmountJsonToken) then
+        TransactionId := JsonHelper.GetJText(JsonObjectToken, 'pspReference', false);
+        if TransactionId = '' then
             exit;
 
-        TransactionId := AmountJsonToken.AsValue().AsText();
+        Success := JsonHelper.GetJBoolean(JsonObjectToken, 'success', false);
+        if not Success then begin
+            Processed := true;
+            exit;
+        end;
 
-        if not JsonObjectToken.AsObject().Get('amount', AmountJsonToken) then
+        AmountTxt := JsonHelper.GetJText(JsonObjectToken, 'amount.value', false);
+        if AmountTxt = '' then
             exit;
 
-        if not AmountJsonToken.IsObject() then
-            exit;
-
-        if not AmountJsonToken.AsObject().Get('value', AmountJsonToken) then
-            exit;
-
-        AmountTxt := AmountJsonToken.AsValue().AsText();
         Amount := MagentoPmtMgt.ConvertFromAdyenPayAmount(AmountTxt);
 
         if Amount <> MagentoPaymentLine."Requested Amount" then
@@ -144,8 +144,8 @@ codeunit 6248332 "NPR Adyen Try Webhook Process"
 
         MagentoPaymentLine.Validate("Transaction ID", TransactionId);
         MagentoPaymentLine."No." := CopyStr(MagentoPaymentLine."Transaction ID", 1, MaxStrLen(MagentoPaymentLine."No."));
-        MagentoPaymentLine.Amount := MagentoPaymentLine."Requested Amount";
         MagentoPaymentLine."Date Authorized" := Today;
+        MagentoPaymentLine.Amount := MagentoPaymentLine."Requested Amount";
         MagentoPaymentLine.Modify();
 
         Processed := true;
@@ -169,12 +169,9 @@ codeunit 6248332 "NPR Adyen Try Webhook Process"
         if not MMSubscrPaymentRequest.FindFirst() then
             exit;
 
-        if MMSubscrPaymentRequest.Status = MMSubscrPaymentRequest.Status::Captured then
-            exit;
-
-        MMSubscrPmtAdyen.ProcessPayByLinkWebhook(NotificationItem, AdyenWebhook, MMSubscrPaymentRequest);
         Processed := true;
-
+        if MMSubscrPaymentRequest.Status <> MMSubscrPaymentRequest.Status::Captured then
+            Processed := MMSubscrPmtAdyen.ProcessPayByLinkWebhook(NotificationItem, AdyenWebhook, MMSubscrPaymentRequest);
 
         ExecuteUpdateWebhookStatusProcessed(AdyenWebhook);
     end;

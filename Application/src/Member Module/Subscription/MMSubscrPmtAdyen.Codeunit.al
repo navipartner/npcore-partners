@@ -1208,12 +1208,14 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         PaymentTokenExist: Boolean;
         MMSubsPayReqLogEntry: Record "NPR MM Subs Pay Req Log Entry";
         MMSubsPayReqLogUtils: Codeunit "NPR MM Subs Pay Req Log Utils";
+        JsonHelper: Codeunit "NPR Json Helper";
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
         ProcessingStatus: Enum "NPR MM SubsPayReqLogProcStatus";
         SubsAdyenPGSetup: Record "NPR MM Subs Adyen PG Setup";
         Status: Enum "NPR MM Payment Request Status";
         ErrorMessage: Text;
         PSPReference: Text[16];
-        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+        Success: Boolean;
     begin
         MMSubsPayReqLogUtils.LogEntry(MMSubscrPaymentRequest,
                                        '',
@@ -1242,6 +1244,12 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                             MMSubscrPaymentRequest."Pay by Link URL",
                             MMSubscrPaymentRequest."Pay By Link Expires At",
                             AdyenWebhook."Entry No.");
+            exit;
+        end;
+
+        Success := JsonHelper.GetJBoolean(JsonObjectToken, 'success', false);
+        if not Success then begin
+            Processed := true;
             exit;
         end;
 
