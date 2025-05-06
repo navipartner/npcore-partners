@@ -39,8 +39,9 @@ codeunit 6248358 "NPR POSAction TMRebookForToday" implements "NPR IPOS Workflow"
         ReferenceNumber: Text[50];
         AdditionalItemNo: Code[20];
         IsWallet: Boolean;
-        RevokeTicketCount: Integer;
+        RevokeCount: Integer;
         NothingToRevoke: Label 'There is nothing to revoke for this reference number.';
+        AmountRevoked: Decimal;
     begin
         ReferenceNumber := CopyStr(Context.GetString('TicketReference'), 1, MaxStrLen(ReferenceNumber));
         AdditionalItemNo := CopyStr(Context.GetStringParameter('ItemNumber'), 1, MaxStrLen(AdditionalItemNo));
@@ -53,30 +54,40 @@ codeunit 6248358 "NPR POSAction TMRebookForToday" implements "NPR IPOS Workflow"
             WalletFacade.GetWalletAssets(Wallet.WalletReferenceNumber, WalletAssets);
             while (WalletAssets.Read()) do begin
                 IsWallet := true;
+                RevokeCount := 1;
                 if (WalletAssets.AssetType = WalletAssets.AssetType::TICKET) then
-                    RevokeTicketCount += HandleTicketOrReservation(WalletAssets.AssetReferenceNumber, AdditionalItemNo, ReferenceNumber, WalletAssets.WalletEntryNo);
+                    RebookOneTicket(WalletAssets.AssetReferenceNumber, ReferenceNumber, WalletAssets.WalletEntryNo, AmountRevoked);
             end;
+
+            GobbleNegativeAmount(AdditionalItemNo, RevokeCount, AmountRevoked);
         end;
 
         if (not IsWallet) then
-            RevokeTicketCount := HandleTicketOrReservation(ReferenceNumber, AdditionalItemNo, '', 0);
+            RevokeCount := RebookTicketWorker(ReferenceNumber, AdditionalItemNo);
 
-        if (RevokeTicketCount = 0) then
+        if (RevokeCount = 0) then
             error(NothingToRevoke);
 
     end;
 
-    local procedure HandleTicketOrReservation(TicketReferenceNumber: Text[50]; AdditionalItemNo: Code[20]; WalletReferenceNumber: Text[50]; WalletEntryNo: Integer) TotalRevokeCount: Integer;
+    local procedure RebookTicketWorker(TicketReferenceNumber: Text[50]; AdditionalItemNo: Code[20]) TotalRevokeCount: Integer;
     var
         ReservationRequest: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
         UnitPrice, AmountRevoked : Decimal;
         SaleLineCount: Integer;
         RevokeCount: Integer;
+        AmountToGobble, TotalAmountToGobble : Decimal;
+        QuantityPerUnit: Integer;
     begin
+        // Revoke the ticket and create a new one for today
+        TotalRevokeCount := RebookOneTicket(TicketReferenceNumber, TotalAmountToGobble);
+        if (TotalRevokeCount > 0) then begin
+            GobbleNegativeAmount(AdditionalItemNo, TotalRevokeCount, TotalAmountToGobble);
+            exit(TotalRevokeCount);
+        end;
 
-        SaleLineCount := _CreatedSalesLineIds.Count();
-
+        // Revoke the ticket reservation and create new for today
         ReservationRequest.Reset();
         ReservationRequest.SetCurrentKey("Session Token ID");
         ReservationRequest.SetFilter("Session Token ID", '=%1', CopyStr(TicketReferenceNumber, 1, MaxStrLen(ReservationRequest."Session Token ID")));
@@ -88,41 +99,60 @@ codeunit 6248358 "NPR POSAction TMRebookForToday" implements "NPR IPOS Workflow"
                 Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', ReservationRequest."Entry No.");
                 Ticket.SetFilter(Blocked, '=%1', false);
                 if (Ticket.FindSet()) then begin
+                    SaleLineCount := _CreatedSalesLineIds.Count() + 1;
                     repeat
-                        RevokeTicket(Ticket."External Ticket No.", UnitPrice);
-                        AmountRevoked -= UnitPrice;
-                        RevokeCount += 1;
+                        RevokeTicket(Ticket, UnitPrice, QuantityPerUnit);
+                        AmountRevoked -= UnitPrice * QuantityPerUnit;
+                        RevokeCount += QuantityPerUnit;
                     until (Ticket.Next() = 0);
                 end;
 
                 if (RevokeCount > 0) then
-                    CreateTicketSalesAndGobbleOverflow(AdditionalItemNo, SaleLineCount, RevokeCount, AmountRevoked, WalletReferenceNumber, WalletEntryNo);
+                    CreateTicketSales(SaleLineCount, RevokeCount, AmountRevoked, AmountToGobble);
 
                 TotalRevokeCount += RevokeCount;
-                RevokeCount := 0;
+                TotalAmountToGobble += AmountToGobble;
+                AmountToGobble := 0;
                 AmountRevoked := 0;
-                SaleLineCount := _CreatedSalesLineIds.Count();
-
+                RevokeCount := 0;
             until (ReservationRequest.Next() = 0);
-            exit;
+
+            GobbleNegativeAmount(AdditionalItemNo, TotalRevokeCount, TotalAmountToGobble);
         end;
+    end;
+
+    local procedure RebookOneTicket(TicketReferenceNumber: Text[50]; var AmountToGobble: Decimal) RevokeCount: Integer;
+    begin
+        RevokeCount := RebookOneTicket(TicketReferenceNumber, '', 0, AmountToGobble);
+    end;
+
+    local procedure RebookOneTicket(TicketReferenceNumber: Text[50]; WalletReferenceNumber: Text[50]; WalletEntryNo: Integer; var AmountToGobble: Decimal) RevokeCount: Integer;
+    var
+        Ticket: Record "NPR TM Ticket";
+        UnitPrice, AmountRevoked : Decimal;
+        SaleLineCount: Integer;
+        QuantityPerUnit: Integer;
+    begin
 
         Ticket.Reset();
         Ticket.SetCurrentKey("External Ticket No.");
         Ticket.SetFilter("External Ticket No.", '=%1', CopyStr(TicketReferenceNumber, 1, MaxStrLen(Ticket."External Ticket No.")));
         Ticket.SetFilter(Blocked, '=%1', false);
         if (Ticket.FindFirst()) then begin
-            RevokeTicket(Ticket."External Ticket No.", UnitPrice);
-            AmountRevoked := -UnitPrice;
-            RevokeCount := 1;
-            CreateTicketSalesAndGobbleOverflow(AdditionalItemNo, SaleLineCount, RevokeCount, AmountRevoked, WalletReferenceNumber, WalletEntryNo);
-            TotalRevokeCount := RevokeCount;
-            exit;
+            RevokeTicket(Ticket, UnitPrice, QuantityPerUnit);
+            AmountRevoked := -UnitPrice * QuantityPerUnit;
+            RevokeCount := QuantityPerUnit;
+            SaleLineCount := _CreatedSalesLineIds.Count();
+            CreateTicketSales(SaleLineCount, RevokeCount, AmountRevoked, WalletReferenceNumber, WalletEntryNo, AmountToGobble);
         end;
-
     end;
 
-    local procedure CreateTicketSalesAndGobbleOverflow(AdditionalItemNo: Code[20]; SaleLineCount: Integer; RevokeTicketCount: Integer; TotalPrice: Decimal; WalletReferenceNumber: Text[50]; WalletEntryNo: Integer): Boolean;
+    local procedure CreateTicketSales(SaleLineCount: Integer; RevokeTicketCount: Integer; TotalPrice: Decimal; var AmountToGobble: Decimal): Boolean;
+    begin
+        exit(CreateTicketSales(SaleLineCount, RevokeTicketCount, TotalPrice, '', 0, AmountToGobble));
+    end;
+
+    local procedure CreateTicketSales(SaleLineCount: Integer; RevokeTicketCount: Integer; TotalPrice: Decimal; WalletReferenceNumber: Text[50]; WalletEntryNo: Integer; var AmountToGobble: Decimal): Boolean;
     var
         ReservationRequest: Record "NPR TM Ticket Reservation Req.";
         // Ticket: Record "NPR TM Ticket";
@@ -136,14 +166,15 @@ codeunit 6248358 "NPR POSAction TMRebookForToday" implements "NPR IPOS Workflow"
         IssueNewTicketProblem: Label 'There was a problem issuing the new ticket. %1';
     begin
 
-        SaleLinePos.GetBySystemId(_CreatedSalesLineIds.Get(SaleLineCount + 1));
+        SaleLinePos.GetBySystemId(_CreatedSalesLineIds.Get(SaleLineCount));
 
         ReservationRequest.Reset();
+        ReservationRequest.SetCurrentKey("Receipt No.", "Line No.");
         ReservationRequest.SetFilter("Receipt No.", '%1', SaleLinePos."Sales Ticket No.");
         ReservationRequest.SetFilter("Line No.", '%1', SaleLinePos."Line No.");
         ReservationRequest.FindFirst(); // One of the revoking request lines with todays admission schedule time description
 
-        // Create sales for new tickets for today
+        // Create sales for new tickets for today 
         NewSalesLineId := CreateSalesLine(SaleLinePos."Line No." - 1, SaleLinePos."No.", SaleLinePos."Variant Code", ReservationRequest."Scheduled Time Description", RevokeTicketCount, 0);
         SaleLinePos.GetBySystemId(NewSalesLineId);
 
@@ -157,12 +188,13 @@ codeunit 6248358 "NPR POSAction TMRebookForToday" implements "NPR IPOS Workflow"
 
         if (RetailHandler.UseFrontEndScheduleUX()) then begin
             ReservationRequest.Reset();
+            ReservationRequest.SetCurrentKey("Receipt No.", "Line No.");
             ReservationRequest.SetFilter("Receipt No.", '%1', SaleLinePos."Sales Ticket No.");
             ReservationRequest.SetFilter("Line No.", '%1', SaleLinePos."Line No.");
             ReservationRequest.FindFirst(); // Issuing Request line
 
             if (0 <> RequestHandler.IssueTicketFromReservationToken(ReservationRequest."Session Token ID", false, ResponseMessage)) then begin
-                // Delete all the created sales lines
+                // On error - delete all the created sales lines
                 foreach SalesLineIdToDelete in _CreatedSalesLineIds do begin
                     SaleLinePos.GetBySystemId(SalesLineIdToDelete);
                     SaleLinePos.Delete(true);
@@ -172,31 +204,56 @@ codeunit 6248358 "NPR POSAction TMRebookForToday" implements "NPR IPOS Workflow"
             end;
         end;
 
-        // Create a sales line to soak up the overflow amount
-        if (TotalPrice < 0) then begin
-            SaleLinePos.GetBySystemId(_CreatedSalesLineIds.Get(_CreatedSalesLineIds.Count()));
-            if (AdditionalItemNo <> '') then
-                NewSalesLineId := CreateSalesLine(SaleLinePos."Line No." + 10000, AdditionalItemNo, '', '', RevokeTicketCount, Abs(TotalPrice) / RevokeTicketCount);
-        end;
-
+        AmountToGobble += TotalPrice;
         exit(true);
     end;
 
-    local procedure RevokeTicket(TicketReferenceNumber: Text[50]; var UnitPrice: Decimal)
+    local procedure GobbleNegativeAmount(AdditionalItemNo: Code[20]; RevokeCount: Integer; Amount: Decimal): Boolean;
+    var
+        SaleLinePos: Record "NPR POS Sale Line";
+    begin
+        if ((RevokeCount <> 0) and (Amount < 0)) then begin
+            SaleLinePos.GetBySystemId(_CreatedSalesLineIds.Get(_CreatedSalesLineIds.Count() - 1));
+            if (AdditionalItemNo <> '') then
+                CreateSalesLine(SaleLinePos."Line No." + 10000, AdditionalItemNo, '', '', RevokeCount, Abs(Amount) / RevokeCount);
+        end;
+    end;
+
+    local procedure RevokeTicket(Ticket: Record "NPR TM Ticket"; var UnitPrice: Decimal; var QuantityToRebook: Integer)
     var
         PosRevoke: Codeunit "NPR POS Action - Ticket Mgt B.";
         POSSession: Codeunit "NPR POS Session";
         SaleLinePos: Record "NPR POS Sale Line";
         RevokeSalesLineId: Guid;
+        QtyPerUoM: integer;
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
     begin
-        RevokeSalesLineId := PosRevoke.RevokeTicketReservation(POSSession, TicketReferenceNumber, true);
+        QuantityToRebook := 1;
+
+        RevokeSalesLineId := PosRevoke.RevokeTicketReservation(POSSession, Ticket."External Ticket No.", true);
         _CreatedSalesLineIds.Add(RevokeSalesLineId);
 
-        SaleLinePos.GetBySystemId(RevokeSalesLineId);
-        UnitPrice := SaleLinePos."Unit Price";
+        // In case of a group ticket we need to get the quantity per unit of measure from the ticket access entry to reproduce new ticket sales lines
+        TicketAccessEntry.Reset();
+        TicketAccessEntry.SetCurrentKey("Ticket No.");
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        TicketAccessEntry.FindFirst();
+        QtyPerUoM := Round(TicketAccessEntry.Quantity, 1);
 
-        // Update the revoke request with admission schedule entries that are for today - the create new ticket process will pick up the existing schedule
-        AdjustScheduleSelection(RevokeSalesLineId);
+        SaleLinePos.GetBySystemId(RevokeSalesLineId);
+        UnitPrice := SaleLinePos."Unit Price" / QtyPerUoM;
+
+        if (QtyPerUoM > 1) then begin // Hmm - sketchy - but we need to rebook with the remaining quantity
+            TicketReservationRequest.Get(Ticket."Ticket Reservation Entry No.");
+            QuantityToRebook := TicketReservationRequest.Quantity;
+            if (TicketAccessEntry.Quantity < TicketReservationRequest.Quantity) then begin
+                QuantityToRebook := TicketReservationRequest.Quantity - Round(TicketAccessEntry.Quantity, 1);
+                UnitPrice := SaleLinePos."Unit Price" / QuantityToRebook;
+            end;
+        end;
+
+        AdjustScheduleSelectionForToday(RevokeSalesLineId);
     end;
 
     local procedure CreateSalesLine(LineNo: Integer; ItemNo: Code[20]; VariantCode: Code[10]; Description2: Text[50]; Quantity: Decimal; UnitPrice: Decimal): Guid
@@ -227,7 +284,7 @@ codeunit 6248358 "NPR POSAction TMRebookForToday" implements "NPR IPOS Workflow"
         exit(SaleLinePos.SystemId);
     end;
 
-    local procedure AdjustScheduleSelection(RevokeSalesLineId: Guid)
+    local procedure AdjustScheduleSelectionForToday(RevokeSalesLineId: Guid)
     var
         SaleLinePos: Record "NPR POS Sale Line";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
