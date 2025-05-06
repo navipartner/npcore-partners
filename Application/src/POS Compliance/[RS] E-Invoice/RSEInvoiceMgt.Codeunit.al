@@ -1,6 +1,7 @@
 codeunit 6184860 "NPR RS E-Invoice Mgt."
 {
     Access = Internal;
+    Permissions = TableData "Tenant Media" = rd;
 
     #region RS E-Invoice - Sandbox Env. Cleanup
 
@@ -859,6 +860,13 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
         exit(Location."NPR Retail Location");
     end;
 
+    internal procedure ClearTenantMedia(MediaId: Guid)
+    var
+        TenantMedia: Record "Tenant Media";
+    begin
+        if TenantMedia.Get(MediaId) then
+            TenantMedia.Delete(true);
+    end;
     #endregion RS E-Invoice Sales Mgt. Helper Procedures
 
     #region RS E-Invoice Purchase Mgt. Helper Procedures

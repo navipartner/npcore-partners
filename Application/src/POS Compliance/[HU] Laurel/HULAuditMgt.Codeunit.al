@@ -1,7 +1,7 @@
 codeunit 6185037 "NPR HU L Audit Mgt."
 {
     Access = Internal;
-
+    Permissions = TableData "Tenant Media" = rd;
     var
         CustomerInfoMandatoryErr: Label 'You must input customer information for this sale.';
         SameSignErr: Label 'Cannot have sale and return in the same transaction.';
@@ -430,6 +430,14 @@ codeunit 6185037 "NPR HU L Audit Mgt."
         HULFiscalisationSetup: Page "NPR HU L Fiscalization Setup";
     begin
         HULFiscalisationSetup.RunModal();
+    end;
+
+    internal procedure ClearTenantMedia(MediaId: Guid)
+    var
+        TenantMedia: Record "Tenant Media";
+    begin
+        if TenantMedia.Get(MediaId) then
+            TenantMedia.Delete(true);
     end;
     #endregion
 

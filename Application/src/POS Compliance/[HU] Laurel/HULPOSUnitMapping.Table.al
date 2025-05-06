@@ -67,14 +67,13 @@ table 6151115 "NPR HU L POS Unit Mapping"
 
     internal procedure SetDailyTotalsText(DailyTotals: Text)
     var
-        TenantMedia: Record "Tenant Media";
+        HULAuditMgt: Codeunit "NPR HU L Audit Mgt.";
         TempBlob: Codeunit "Temp Blob";
         InStream: InStream;
         OutStream: OutStream;
     begin
         if "POS FCU Daily Totals".HasValue() then
-            if TenantMedia.Get("POS FCU Daily Totals".MediaId) then
-                TenantMedia.Delete(true);
+            HULAuditMgt.ClearTenantMedia("POS FCU Daily Totals".MediaId);
 
         TempBlob.CreateOutStream(OutStream, TextEncoding::UTF8);
         OutStream.WriteText(DailyTotals);

@@ -2,6 +2,7 @@ codeunit 6184848 "NPR AT Audit Mgt."
 {
     Access = Internal;
     SingleInstance = true;
+    Permissions = TableData "Tenant Media" = rd;
 
     var
         Enabled: Boolean;
@@ -654,6 +655,14 @@ codeunit 6184848 "NPR AT Audit Mgt."
                 exit(ATPOSAuditLogAuxInfo."Source Document No.");
             end;
         end;
+    end;
+
+    internal procedure ClearTenantMedia(MediaId: Guid)
+    var
+        TenantMedia: Record "Tenant Media";
+    begin
+        if TenantMedia.Get(MediaId) then
+            TenantMedia.Delete(true);
     end;
     #endregion
 

@@ -174,14 +174,13 @@ table 6150857 "NPR AT POS Audit Log Aux. Info"
 
     internal procedure SetQRCode(QRCode: Text)
     var
-        TenantMedia: Record "Tenant Media";
+        ATAuditMgt: Codeunit "NPR AT Audit Mgt.";
         TempBlob: Codeunit "Temp Blob";
         OutStream: OutStream;
         InStream: InStream;
     begin
         if "QR Code".HasValue() then
-            if TenantMedia.Get("QR Code".MediaId) then
-                TenantMedia.Delete(true);
+            ATAuditMgt.ClearTenantMedia("QR Code".MediaId);
 
         TempBlob.CreateOutStream(OutStream, TextEncoding::UTF8);
         OutStream.WriteText(QRCode);

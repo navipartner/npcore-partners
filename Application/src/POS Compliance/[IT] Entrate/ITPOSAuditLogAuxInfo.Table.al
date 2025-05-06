@@ -125,14 +125,12 @@ table 6150738 "NPR IT POS Audit Log Aux Info"
 
     internal procedure SetRequestContent(RequestText: Text)
     var
-        TenantMedia: Record "Tenant Media";
         TempBlob: Codeunit "Temp Blob";
         InStream: InStream;
         OutStream: OutStream;
     begin
         if "Request Content".HasValue() then
-            if TenantMedia.Get("Request Content".MediaId) then
-                TenantMedia.Delete(true);
+            ITAuditMgt.ClearTenantMedia("Request Content".MediaId);
 
         TempBlob.CreateOutStream(OutStream, TextEncoding::UTF8);
         OutStream.WriteText(RequestText);
@@ -142,14 +140,12 @@ table 6150738 "NPR IT POS Audit Log Aux Info"
 
     internal procedure SetResponseContent(ResponseText: Text)
     var
-        TenantMedia: Record "Tenant Media";
         TempBlob: Codeunit "Temp Blob";
         InStream: InStream;
         OutStream: OutStream;
     begin
         if "Response Content".HasValue() then
-            if TenantMedia.Get("Response Content".MediaId) then
-                TenantMedia.Delete(true);
+            ITAuditMgt.ClearTenantMedia("Response Content".MediaId);
 
         TempBlob.CreateOutStream(OutStream, TextEncoding::UTF8);
         OutStream.WriteText(ResponseText);
@@ -157,4 +153,6 @@ table 6150738 "NPR IT POS Audit Log Aux Info"
         "Response Content".ImportStream(InStream, FieldCaption("Response Content"));
     end;
 
+var
+    ITAuditMgt: Codeunit "NPR IT Audit Mgt.";
 }

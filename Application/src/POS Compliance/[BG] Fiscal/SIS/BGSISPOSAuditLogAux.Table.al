@@ -184,14 +184,13 @@ table 6150735 "NPR BG SIS POS Audit Log Aux."
 
     internal procedure SetRequestText(RequestText: Text)
     var
-        TenantMedia: Record "Tenant Media";
+        BGSISAuditMgt: Codeunit "NPR BG SIS Audit Mgt.";
         TempBlob: Codeunit "Temp Blob";
         InStream: InStream;
         OutStream: OutStream;
     begin
         if "Request Content".HasValue() then
-            if TenantMedia.Get("Request Content".MediaId) then
-                TenantMedia.Delete(true);
+            BGSISAuditMgt.ClearTenantMedia("Request Content".MediaId);
 
         TempBlob.CreateOutStream(OutStream, TextEncoding::UTF8);
         OutStream.WriteText(RequestText);
@@ -223,8 +222,7 @@ table 6150735 "NPR BG SIS POS Audit Log Aux."
     //     OutStream: OutStream;
     // begin
     //     if "Receipt Content".HasValue() then
-    //         if TenantMedia.Get("Receipt Content".MediaId) then
-    //             TenantMedia.Delete(true);
+    //         BGSISAuditMgt.ClearTenantMedia("Receipt Content".MediaId);
 
     //     TempBlob.CreateOutStream(OutStream);
     //     OutStream.WriteText(ReceiptData);

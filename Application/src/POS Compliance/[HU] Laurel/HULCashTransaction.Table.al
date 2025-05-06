@@ -121,14 +121,12 @@ table 6151044 "NPR HU L Cash Transaction"
 
     internal procedure SetRequestText(RequestText: Text)
     var
-        TenantMedia: Record "Tenant Media";
         TempBlob: Codeunit "Temp Blob";
         InStream: InStream;
         OutStream: OutStream;
     begin
         if "Request Content".HasValue() then
-            if TenantMedia.Get("Request Content".MediaId) then
-                TenantMedia.Delete(true);
+            HULAuditMgt.ClearTenantMedia("Request Content".MediaId);
 
         TempBlob.CreateOutStream(OutStream, TextEncoding::UTF8);
         OutStream.WriteText(RequestText);
@@ -160,18 +158,19 @@ table 6151044 "NPR HU L Cash Transaction"
 
     internal procedure SetResponseText(ResponseText: Text)
     var
-        TenantMedia: Record "Tenant Media";
         TempBlob: Codeunit "Temp Blob";
         InStream: InStream;
         OutStream: OutStream;
     begin
         if "Response Content".HasValue() then
-            if TenantMedia.Get("Response Content".MediaId) then
-                TenantMedia.Delete(true);
+            HULAuditMgt.ClearTenantMedia("Response Content".MediaId);
 
         TempBlob.CreateOutStream(OutStream, TextEncoding::UTF8);
         OutStream.WriteText(ResponseText);
         TempBlob.CreateInStream(InStream, TextEncoding::UTF8);
         "Response Content".ImportStream(InStream, FieldCaption("Response Content"));
     end;
+
+    var
+        HULAuditMgt: Codeunit "NPR HU L Audit Mgt.";
 }
