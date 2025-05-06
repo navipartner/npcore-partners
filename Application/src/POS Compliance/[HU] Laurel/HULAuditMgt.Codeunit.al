@@ -83,18 +83,6 @@ codeunit 6185037 "NPR HU L Audit Mgt."
         if not ChangeQtyOnAllPOSSaleLines(SaleLinePOS) then
             Error(SameSignErr);
     end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: Rev. Dir. Sale", 'OnBeforeHendleReverse', '', false, false)]
-    local procedure OnBeforeHandleReverse(Setup: Codeunit "NPR POS Setup"; var SalesTicketNo: Code[20]; Context: Codeunit "NPR POS JSON Helper");
-    var
-        POSUnit: Record "NPR POS Unit";
-    begin
-        Setup.GetPOSUnit(POSUnit);
-        if not IsHULaurelAuditEnabled(POSUnit."POS Audit Profile") then
-            exit;
-
-        SalesTicketNo := GetPOSSalesTicketNoFromAuditLog(Context);
-    end;
     #endregion
 
     #region HU Laurel Fiscal - Audit Profile Mgt
@@ -739,36 +727,6 @@ codeunit 6185037 "NPR HU L Audit Mgt."
         if not POSEntrySalesLine.FindFirst() then
             exit(false);
         exit(HULPOSAuditLogAux.FindAuditLog(POSEntrySalesLine."POS Entry No."));
-    end;
-
-    local procedure GetPOSSalesTicketNoFromAuditLog(Context: Codeunit "NPR POS JSON Helper"): Code[20]
-    var
-        HULPOSAuditLogAux: Record "NPR HU L POS Audit Log Aux.";
-        SalesTicketNo: Text[50];
-    begin
-        SalesTicketNo := CopyStr(UpperCase(Context.GetString('receipt')), 1, MaxStrLen(SalesTicketNo));
-
-        HULPOSAuditLogAux.FilterGroup(10);
-        HULPOSAuditLogAux.SetRange("FCU Full Document No.", SalesTicketNo);
-        HULPOSAuditLogAux.FilterGroup(0);
-
-        case HULPOSAuditLogAux.Count() of
-            0:
-                exit('');
-            1:
-                begin
-                    if HULPOSAuditLogAux.FindFirst() then
-                        exit(HULPOSAuditLogAux."Source Document No.");
-
-                    exit('');
-                end;
-            else begin
-                if Page.RunModal(0, HULPOSAuditLogAux) <> Action::LookupOK then
-                    exit('');
-
-                exit(HULPOSAuditLogAux."Source Document No.");
-            end;
-        end;
     end;
     #endregion
 }
