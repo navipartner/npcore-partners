@@ -1016,6 +1016,7 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         MemberPaymentMethod.Insert(true);
         MemberPaymentMethod."Payment Token" := EFTTransactionRequest."Recurring Detail Reference";
         MemberPaymentMethod."Shopper Reference" := EFTTransactionRequest."Internal Customer ID";
+        MemberPaymentMethod."Masked PAN" := EftTransactionRequest."Card Number";
         MemberPaymentMethod."PAN Last 4 Digits" := CopyStr(DELSTR(EFTTransactionRequest."Card Number", 1, STRLEN(EFTTransactionRequest."Card Number") - 4), 1, MaxStrLen(MemberPaymentMethod."PAN Last 4 Digits"));
         MemberPaymentMethod."Expiry Date" := GetLastDayOfMonth(EFTTransactionRequest."Card Expiry Year", EFTTransactionRequest."Card Expiry Month");
         MemberPaymentMethod.PSP := MemberPaymentMethod.PSP::Adyen;

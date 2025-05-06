@@ -84,6 +84,19 @@ navigation:
               summary: ./docs/pages/systemservices/helloworld.mdx
           - systemservices.webhooks:
               title: Webhooks
+        - section: Accounts
+          contents:
+            - account.service-account:
+                title: Accounts
+                contents:
+                  - endpoint: account.service-account.findAccounts
+                  - endpoint: account.service-account.getAccount
+                  - endpoint: account.service-account.createAccount
+            - account.service-account-payment-method:
+                title: Payment Methods
+                contents:
+                  - endpoint: account.service-account-payment-method.getPaymentMethods
+                  - endpoint: account.service-account-payment-method.createPaymentMethod
         - section: Ticketing
           summary: ./docs/pages/ticketing/overview.mdx
           contents:

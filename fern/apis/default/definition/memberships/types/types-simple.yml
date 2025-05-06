@@ -552,6 +552,15 @@ types:
       - name: ExamplePaymentBrand
         value: "visa"
 
+  PaymentMethodMaskedPAN:
+    type: string
+    docs: The masked PAN of the card. The exact structure depends on the PSP.
+    examples:
+      - name: ExamplePaymentMethodMaskedPAN
+        value: "541333 **** 1234"
+      - name: ExamplePaymentMethodMaskedPAN2
+        value: "541333 **** 5678"
+
   PaymentMethodPANLastDigits:
     type: string
     docs: The last 4 digits of the payment card number.

@@ -2032,6 +2032,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                 MMMemberPaymentMethod.Validate(Status, MMMemberPaymentMethod.Status::Active);
                 MMMemberPaymentMethod.Modify();
             end;
+
             exit;
         end;
 
@@ -2043,6 +2044,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         MMMemberPaymentMethod."Payment Token" := TempMemberPaymentMethod."Payment Token";
         MMMemberPaymentMethod."Payment Instrument Type" := CardInstrumentTypeLbl;
         MMMemberPaymentMethod."Shopper Reference" := TempMemberPaymentMethod."Shopper Reference";
+        MMMemberPaymentMethod."Masked PAN" := TempMemberPaymentMethod."Masked PAN";
         MMMemberPaymentMethod."PAN Last 4 Digits" := TempMemberPaymentMethod."PAN Last 4 Digits";
         MMMemberPaymentMethod."Expiry Date" := TempMemberPaymentMethod."Expiry Date";
         MMMemberPaymentMethod."Payment Brand" := TempMemberPaymentMethod."Payment Brand";

@@ -43,6 +43,11 @@ page 6184835 "NPR MM Member Payment Methods"
                     ToolTip = 'Specifies the payment method brand.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field("Masked PAN"; Rec."Masked PAN")
+                {
+                    ToolTip = 'Specifies the masked PAN of the payment card.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
                 field("PAN Last 4 Digits"; Rec."PAN Last 4 Digits")
                 {
                     ToolTip = 'Specifies the last 4 digits of the payment card number.';
