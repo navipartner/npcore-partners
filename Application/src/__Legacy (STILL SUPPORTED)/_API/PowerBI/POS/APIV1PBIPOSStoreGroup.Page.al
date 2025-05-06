@@ -35,6 +35,12 @@ page 6184932 "NPR APIV1 PBI POS Store Group"
                 {
                     SubPageLink = "No." = field("No.");
                 }
+#if not (BC17 or BC18 or BC19 or BC20)
+                field(systemRowVersion; Rec.SystemRowVersion)
+                {
+                    Caption = 'System Row Version', Locked = true;
+                }
+#endif
             }
         }
     }

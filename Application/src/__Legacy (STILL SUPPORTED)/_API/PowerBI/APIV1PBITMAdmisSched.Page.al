@@ -163,6 +163,12 @@ page 6150783 "NPR APIV1 PBITMAdmisSched"
                 {
                     Caption = 'System Created By', Locked = true;
                 }
+#if not (BC17 or BC18 or BC19 or BC20)
+                field(systemRowVersion; Rec.SystemRowVersion)
+                {
+                    Caption = 'System Row Version', Locked = true;
+                }
+#endif
 
             }
         }

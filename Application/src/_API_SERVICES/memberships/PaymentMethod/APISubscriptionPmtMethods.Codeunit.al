@@ -87,6 +87,7 @@ codeunit 6185107 "NPR API SubscriptionPmtMethods"
             TempMemberPaymentMethod.PSP := Enum::"NPR MM Subscription PSP".FromInteger(Enum::"NPR MM Subscription PSP".Ordinals().Get(Enum::"NPR MM Subscription PSP".Names().IndexOf(PSPAsString)));
         TempMemberPaymentMethod."Payment Brand" := CopyStr(JsonHelper.GetJText(RequestBody, 'paymentMethod.paymentBrand', false), 1, MaxStrLen(TempMemberPaymentMethod."Payment Brand"));
         TempMemberPaymentMethod."Payment Instrument Type" := CopyStr(JsonHelper.GetJText(RequestBody, 'paymentMethod.paymentInstrument', false), 1, MaxStrLen(TempMemberPaymentMethod."Payment Instrument Type"));
+        TempMemberPaymentMethod."Masked PAN" := CopyStr(JsonHelper.GetJText(RequestBody, 'paymentMethod.maskedPAN', false), 1, MaxStrLen(TempMemberPaymentMethod."Masked PAN"));
         TempMemberPaymentMethod."PAN Last 4 Digits" := CopyStr(JsonHelper.GetJText(RequestBody, 'paymentMethod.PANLastDigits', false), 1, MaxStrLen(TempMemberPaymentMethod."PAN Last 4 Digits"));
         TempMemberPaymentMethod."Expiry Date" := JsonHelper.GetJDate(RequestBody, 'paymentMethod.expiryDate', false);
         TempMemberPaymentMethod.Default := JsonHelper.GetJBoolean(RequestBody, 'paymentMethod.default', false);
@@ -131,6 +132,7 @@ codeunit 6185107 "NPR API SubscriptionPmtMethods"
             MemberPaymentMethod.PSP := TempMemberPaymentMethod.PSP;
             MemberPaymentMethod."Payment Brand" := TempMemberPaymentMethod."Payment Brand";
             MemberPaymentMethod."Payment Instrument Type" := TempMemberPaymentMethod."Payment Instrument Type";
+            MemberPaymentMethod."Masked PAN" := TempMemberPaymentMethod."Masked PAN";
             MemberPaymentMethod."PAN Last 4 Digits" := TempMemberPaymentMethod."PAN Last 4 Digits";
             MemberPaymentMethod."Expiry Date" := TempMemberPaymentMethod."Expiry Date";
             MemberPaymentMethod.Validate(Default, TempMemberPaymentMethod.Default);
@@ -212,10 +214,11 @@ codeunit 6185107 "NPR API SubscriptionPmtMethods"
         exit(Response.RespondOK(Json));
     end;
 
-    local procedure PaymentMethodAsJson(MemberPaymentMethod: Record "NPR MM Member Payment Method"; JsonObjectName: Text; WithToken: Boolean; var Json: Codeunit "NPR Json Builder")
+    internal procedure PaymentMethodAsJson(MemberPaymentMethod: Record "NPR MM Member Payment Method"; JsonObjectName: Text; WithToken: Boolean; var Json: Codeunit "NPR Json Builder")
     begin
         Json.StartObject(JsonObjectName)
             .AddProperty('id', Format(MemberPaymentMethod.SystemId, 0, 4).ToLower())
+            .AddProperty('maskedPAN', MemberPaymentMethod."Masked PAN")
             .AddProperty('PANLastDigits', MemberPaymentMethod."PAN Last 4 Digits")
             .AddProperty('PSP', PSPEnumValueName(MemberPaymentMethod.PSP))
             .AddProperty('alias', MemberPaymentMethod."Payment Method Alias")

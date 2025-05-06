@@ -181,6 +181,22 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
         Found := MemberPaymentMethod.FindFirst();
     end;
 
+    internal procedure FindPaymentMethod(PaymentToken: Text[64]; ShopperReference: Text[50]; SubscriptionPSP: Enum "NPR MM Subscription PSP"; UserAccount: Record "NPR UserAccount"; var MemberPaymentMethod: Record "NPR MM Member Payment Method") Found: Boolean
+    begin
+        if PaymentToken = '' then
+            exit;
+
+        MemberPaymentMethod.Reset();
+        MemberPaymentMethod.SetCurrentKey("Table No.", "BC Record ID", PSP, "Payment Token", "Shopper Reference");
+        MemberPaymentMethod.SetRange("BC Record ID", UserAccount.RecordId());
+        MemberPaymentMethod.SetRange("Table No.", UserAccount.RecordId().TableNo);
+        MemberPaymentMethod.SetRange("Payment Token", PaymentToken);
+        MemberPaymentMethod.SetRange("Shopper Reference", ShopperReference);
+        MemberPaymentMethod.SetRange(PSP, SubscriptionPSP);
+
+        Found := MemberPaymentMethod.FindFirst();
+    end;
+
     internal procedure DeleteMemberPaymentMethods(SalePOS: Record "NPR POS Sale")
     var
         SalesLinePOS: Record "NPR POS Sale Line";

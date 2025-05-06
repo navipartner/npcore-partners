@@ -168,6 +168,12 @@ page 6184951 "NPR APIV1 PBI POSPaymentMethod"
                 {
                     Caption = 'Zero as Default on Popup';
                 }
+#if not (BC17 or BC18 or BC19 or BC20)
+                field(systemRowVersion; Rec.SystemRowVersion)
+                {
+                    Caption = 'System Row Version', Locked = true;
+                }
+#endif
             }
         }
     }

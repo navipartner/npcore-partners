@@ -1,0 +1,45 @@
+types:
+  
+  UserAccount:
+    docs:
+      Defines a user account. The user account can be used in various contexts and is a key component in the unified commerce experience.
+    properties:
+      id:
+        docs: The unique id of the account.
+        type: uuid
+      firstName:
+        docs: The First Name of the account owner.
+        type: string
+      lastName:
+        docs: The Last Name of the account owner.
+        type: string
+      displayName:
+        docs: The Display Name of the account owner. It's a combination of the first- and last name of the account.
+        type: string
+      phoneNumber: string
+      emailAddress: string
+    examples:
+      - name: ExampleUserAccount
+        value:
+          id: e2cfea9f-385e-4d83-8b50-42256885b03a
+          firstName: "Jane"
+          lastName: "Doe"
+          displayName: "Jane Doe"
+          phoneNumber: "12345678"
+          emailAddress: "jane@example.com"
+
+  CreateUserAccount:
+    docs:
+      Defines the request used to create a user account.
+    properties:
+      firstName: optional<string>
+      lastName: optional<string>
+      phoneNumber: optional<string>
+      emailAddress: string
+    examples:
+      - name: ExampleCreateAccountFullInfo
+        value:
+          firstName: "Jane"
+          lastName: "Doe"
+          phoneNumber: "12345678"
+          emailAddress: "jane@example.com"

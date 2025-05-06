@@ -31,6 +31,12 @@ page 6150785 "NPR APIV1 PBITMDynamicPrProf"
                 {
                     Caption = 'Description';
                 }
+#if not (BC17 or BC18 or BC19 or BC20)
+                field(systemRowVersion; Rec.SystemRowVersion)
+                {
+                    Caption = 'System Row Version', Locked = true;
+                }
+#endif
 
             }
         }

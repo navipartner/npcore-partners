@@ -60,6 +60,12 @@ page 6150780 "NPR APIV1 PBISalesHeader"
                 {
                     Caption = 'No. of Archived Versions', Locked = true;
                 }
+#if not (BC17 or BC18 or BC19 or BC20)
+                field(systemRowVersion; Rec.SystemRowVersion)
+                {
+                    Caption = 'System Row Version', Locked = true;
+                }
+#endif
             }
         }
     }

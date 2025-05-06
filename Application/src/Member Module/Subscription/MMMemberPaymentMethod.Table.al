@@ -55,6 +55,11 @@ table 6150920 "NPR MM Member Payment Method"
             Caption = 'PAN Last 4 Digits';
             DataClassification = CustomerContent;
         }
+        field(51; "Masked PAN"; Text[30])
+        {
+            Caption = 'Masked PAN';
+            DataClassification = CustomerContent;
+        }
         field(60; "Expiry Date"; Date)
         {
             Caption = 'Expiry Date';

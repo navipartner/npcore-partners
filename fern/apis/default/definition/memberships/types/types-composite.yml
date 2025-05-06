@@ -228,6 +228,7 @@ types:
       status: optional<simpleTypes.PaymentMethodStatus>
       paymentInstrument: optional<simpleTypes.PaymentInstrument>
       paymentBrand: optional<simpleTypes.PaymentBrand>
+      maskedPAN: optional<simpleTypes.PaymentMethodMaskedPAN>
       PANLastDigits: optional<simpleTypes.PaymentMethodPANLastDigits>
       expiryDate: optional<simpleTypes.ExpiryDate>
       default: optional<simpleTypes.Default>
@@ -239,6 +240,7 @@ types:
           status: $simpleTypes.PaymentMethodStatus.ExamplePaymentMethodStatusActive
           paymentInstrument: $simpleTypes.PaymentInstrument.ExamplePaymentInstrument
           paymentBrand: $simpleTypes.PaymentBrand.ExamplePaymentBrand
+          maskedPAN: $simpleTypes.PaymentMethodMaskedPAN.ExamplePaymentMethodMaskedPAN
           PANLastDigits: $simpleTypes.PaymentMethodPANLastDigits.ExamplePaymentMethodPANLastDigits
           expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDateEOM
           default: $simpleTypes.Default.ExampleDefaultTrue
@@ -260,6 +262,7 @@ types:
           status: $simpleTypes.PaymentMethodStatus.ExamplePaymentMethodStatusActive
           paymentInstrument: $simpleTypes.PaymentInstrument.ExamplePaymentInstrument
           paymentBrand: $simpleTypes.PaymentBrand.ExamplePaymentBrand
+          maskedPAN: $simpleTypes.PaymentMethodMaskedPAN.ExamplePaymentMethodMaskedPAN
           PANLastDigits: $simpleTypes.PaymentMethodPANLastDigits.ExamplePaymentMethodPANLastDigits
           expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDateEOM
           default: $simpleTypes.Default.ExampleDefaultTrue
@@ -271,6 +274,7 @@ types:
           status: $simpleTypes.PaymentMethodStatus.ExamplePaymentMethodStatusActive
           paymentInstrument: $simpleTypes.PaymentInstrument.ExamplePaymentInstrument
           paymentBrand: $simpleTypes.PaymentBrand.ExamplePaymentBrand
+          maskedPAN: $simpleTypes.PaymentMethodMaskedPAN.ExamplePaymentMethodMaskedPAN2
           PANLastDigits: $simpleTypes.PaymentMethodPANLastDigits.ExamplePaymentMethodPANLastDigits2
           expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDateEOM
           default: $simpleTypes.Default.ExampleDefault
@@ -282,6 +286,7 @@ types:
           status: $simpleTypes.PaymentMethodStatus.ExamplePaymentMethodStatusArchived
           paymentInstrument: $simpleTypes.PaymentInstrument.ExamplePaymentInstrument
           paymentBrand: $simpleTypes.PaymentBrand.ExamplePaymentBrand
+          maskedPAN: $simpleTypes.PaymentMethodMaskedPAN.ExamplePaymentMethodMaskedPAN
           PANLastDigits: $simpleTypes.PaymentMethodPANLastDigits.ExamplePaymentMethodPANLastDigits
           expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDateExpired
           default: $simpleTypes.Default.ExampleDefault
@@ -303,6 +308,7 @@ types:
           status: $simpleTypes.PaymentMethodStatus.ExamplePaymentMethodStatusActive
           paymentInstrument: $simpleTypes.PaymentInstrument.ExamplePaymentInstrument
           paymentBrand: $simpleTypes.PaymentBrand.ExamplePaymentBrand
+          maskedPAN: $simpleTypes.PaymentMethodMaskedPAN.ExamplePaymentMethodMaskedPAN
           PANLastDigits: $simpleTypes.PaymentMethodPANLastDigits.ExamplePaymentMethodPANLastDigits
           expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDateEOM
           default: $simpleTypes.Default.ExampleDefault
@@ -326,6 +332,7 @@ types:
           status: $simpleTypes.PaymentMethodStatus.ExamplePaymentMethodStatusActive
           paymentInstrument: $simpleTypes.PaymentInstrument.ExamplePaymentInstrument
           paymentBrand: $simpleTypes.PaymentBrand.ExamplePaymentBrand
+          maskedPAN: $simpleTypes.PaymentMethodMaskedPAN.ExamplePaymentMethodMaskedPAN
           PANLastDigits: $simpleTypes.PaymentMethodPANLastDigits.ExamplePaymentMethodPANLastDigits
           expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDateEOM
           default: $simpleTypes.Default.ExampleDefault
@@ -339,6 +346,7 @@ types:
           status: $simpleTypes.PaymentMethodStatus.ExamplePaymentMethodStatusActive
           paymentInstrument: $simpleTypes.PaymentInstrument.ExamplePaymentInstrument
           paymentBrand: $simpleTypes.PaymentBrand.ExamplePaymentBrand
+          maskedPAN: $simpleTypes.PaymentMethodMaskedPAN.ExamplePaymentMethodMaskedPAN
           PANLastDigits: $simpleTypes.PaymentMethodPANLastDigits.ExamplePaymentMethodPANLastDigits
           expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDateEOM
           default: $simpleTypes.Default.ExampleDefaultTrue
