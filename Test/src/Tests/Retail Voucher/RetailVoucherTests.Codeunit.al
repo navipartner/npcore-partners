@@ -5,6 +5,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
 
     var
         _Item: Record "Item";
+        _Item2: Record Item;
         _POSPaymentMethodCash: Record "NPR POS Payment Method";
         _POSSetup: Record "NPR POS Setup";
         _POSStore: Record "NPR POS Store";
@@ -1091,6 +1092,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
             NPRLibraryPOSMasterData.CreatePOSStore(_POSStore, POSPostingProfile.Code);
             NPRLibraryPOSMasterData.CreatePOSUnit(_POSUnit, _POSStore.Code, POSPostingProfile.Code);
             NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(_Item, _POSUnit, _POSStore);
+            NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(_Item2, _POSUnit, _POSStore);
             NPRLibraryPOSMasterData.CreatePOSPaymentMethod(_POSPaymentMethodCash, _POSPaymentMethodCash."Processing Type"::CASH, '', false);
             _POSPaymentMethodCash."Rounding Precision" := 0.01;
             _POSPaymentMethodCash.Modify();
@@ -1099,6 +1101,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         end;
 
         NPRLibraryPOSMasterData.ItemReferenceCleanup();
+        DeleteVoucherItemsDefaultVoucher(_VoucherTypeDefault."Payment Type");
 
         Commit();
     end;
@@ -1157,6 +1160,22 @@ codeunit 85024 "NPR Retail Voucher Tests"
         _Item."Unit Price" := VoucherAmount;
         _Item.Modify();
         NPRLibraryPOSMock.CreateItemLine(_POSSession, _Item."No.", 1);
+        NPRLibraryPOSMasterData.OpenPOSUnit(_POSUnit);
+    end;
+
+    local procedure CreateTwoItemTransaction(FirstItemUnitPrice: Decimal; SecondItemUnitPrice: Decimal)
+    var
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+    begin
+        _Item.Get(_Item."No.");
+        _Item."Unit Price" := FirstItemUnitPrice;
+        _Item.Modify();
+        _Item2.Get(_Item2."No.");
+        _Item2."Unit Price" := SecondItemUnitPrice;
+        _Item2.Modify();
+        NPRLibraryPOSMock.CreateItemLine(_POSSession, _Item."No.", 1);
+        NPRLibraryPOSMock.CreateItemLine(_POSSession, _Item2."No.", 1);
         NPRLibraryPOSMasterData.OpenPOSUnit(_POSUnit);
     end;
 
@@ -5737,6 +5756,661 @@ codeunit 85024 "NPR Retail Voucher Tests"
         EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS, VoucherAmount, Qty);
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure IssueReturnVoucherForItemPresentOnPOSSale()
+    // [SCENARIO] Add an item on POS sale for return. Issure return voucher and end transaction. Check if transaction ended correctly
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        TransactionEnded: Boolean;
+    begin
+        Initialize();
+
+        // [GIVEN] Initialize POS session and sale
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Create and return item in POS transaction
+        CreateItemTransaction(2000);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        SaleLinePOS.Validate(Quantity, -1);
+        SaleLinePOS.Modify();
+
+        // [WHEN] Issue return voucher
+        NpRvVoucherMgt.IssueReturnVoucher(_POSSession, _VoucherTypeDefault.Code, -SaleLinePOS."Amount Including VAT", '', '', false, false, false);
+
+        // [THEN] Check if sale ended correctly
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, 0, '');
+        Assert.IsTrue(TransactionEnded, 'Transaction end is not according to test scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ScanVoucherWithItemNotAddedToVoucherItemsOnPOSSale()
+    // [SCENARIO] Add an item to sale which is not added to payment method linked to voucher. Scan the voucher. Check if voucher can be used with item
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        POSPaymentMethodOut: Record "NPR POS Payment Method";
+        Assert: Codeunit "Assert";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+        POSActionScanVoucher2B: Codeunit "NPR POS Action Scan Voucher2B";
+        RemainingAmount: Decimal;
+        VoucherHasItemLimitation: Boolean;
+    begin
+        Initialize();
+
+        //Add random item to voucher items
+        AddItemToVoucherItems(_VoucherTypeDefault."Payment Type", '1000');
+
+        // [GIVEN] Initialize POS session and sale
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Voucher created in POS transaction
+        CreateVoucherInPOSTransaction(NpRvVoucher, 500, _VoucherTypeDefault.Code);
+
+        // [GIVEN] Create item in new POS transaction
+        CreateItemTransaction(2000);
+
+        // [THEN] Simulate the behavior of scanning the voucher
+        _POSSession.GetPaymentLine(POSPaymentLine);
+        POSActionScanVoucher2B.CalculateRemainingAmount(POSPaymentLine, _VoucherTypeDefault."Payment Type", POSPaymentMethodOut, RemainingAmount);
+        VoucherHasItemLimitation := POSActionScanVoucher2B.VoucherHasItemFilterLimitation(NpRvVoucher);
+
+        // [THEN] Check if voucher scanned correctly
+        Assert.IsTrue(VoucherHasItemLimitation and (RemainingAmount = 0), 'Voucher can be used with item on POS sale and that is not according to scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ScanVoucherWithItemAddedToVoucherItemsOnPOSSale()
+    // [SCENARIO] Add an item to POS sale which is added to payment method linked to voucher. Scan the voucher with amount lesser than one on POS sale. Check if voucher redeemed correctly
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        POSPaymentMethodOut: Record "NPR POS Payment Method";
+        PaymentSaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        Assert: Codeunit "Assert";
+        POSActionScanVoucher2B: Codeunit "NPR POS Action Scan Voucher2B";
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+        Sale: Codeunit "NPR POS Sale";
+        SaleLine: Codeunit "NPR POS Sale Line";
+        VoucherAmount: Decimal;
+        SuggestedAmount: Decimal;
+        VoucherHasItemLimitation: Boolean;
+        ActionContext: JsonObject;
+    begin
+        Initialize();
+
+        //Add item to voucher items
+        AddItemToVoucherItems(_VoucherTypeDefault."Payment Type", _Item."No.");
+
+        // [GIVEN] Voucher created in POS transaction
+        VoucherAmount := 500;
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, _VoucherTypeDefault.Code);
+
+        // [GIVEN] Create item in new POS transaction
+        CreateItemTransaction(2000);
+
+        _POSSession.GetPaymentLine(POSPaymentLine);
+        _POSSession.GetSale(Sale);
+        Sale.GetCurrentSale(SalePOS);
+
+        // [THEN] Scan the voucher
+        POSActionScanVoucher2B.CalculateRemainingAmount(POSPaymentLine, _VoucherTypeDefault."Payment Type", POSPaymentMethodOut, SuggestedAmount);
+        if SuggestedAmount > VoucherAmount then
+            SuggestedAmount := VoucherAmount;
+        VoucherHasItemLimitation := POSActionScanVoucher2B.VoucherHasItemFilterLimitation(NpRvVoucher);
+        Assert.IsTrue(VoucherHasItemLimitation and (SuggestedAmount <> 0), 'Voucher cannot be used with item on POS sale and that is not according to scenario.');
+        POSActionScanVoucher2B.ProcessPayment(_VoucherTypeDefault.Code, NpRvVoucher."Reference No.", SuggestedAmount, Sale, POSPaymentLine, SaleLine, false, ActionContext);
+
+        PaymentSaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        PaymentSaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        PaymentSaleLinePOS.SetRange(Date, SalePOS.Date);
+        PaymentSaleLinePOS.SetRange("Line Type", PaymentSaleLinePOS."Line Type"::"POS Payment");
+        PaymentSaleLinePOS.SetRange("No.", POSPaymentMethodOut.Code);
+        PaymentSaleLinePOS.SetRange("Discount Code", NpRvVoucher."No.");
+        PaymentSaleLinePOS.FindFirst();
+
+        // [THEN] Check if amount on POS payment sale line is calculated correctly
+        Assert.IsTrue(PaymentSaleLinePOS."Amount Including VAT" = VoucherAmount, 'Voucher not applied correctly.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ScanVoucherWithItemAddedToVoucherItemsOnPOSSaleOverpayWithVoucher()
+    // [SCENARIO] Add an item to POS sale which is added to payment method linked to voucher. Scan the voucher with amount higher than one on POS sale. Check if voucher redeemed correctly
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        POSPaymentMethodOut: Record "NPR POS Payment Method";
+        PaymentSaleLinePOS: Record "NPR POS Sale Line";
+        ReturnVoucherPaymentSaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        Assert: Codeunit "Assert";
+        POSActionScanVoucher2B: Codeunit "NPR POS Action Scan Voucher2B";
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+        Sale: Codeunit "NPR POS Sale";
+        SaleLine: Codeunit "NPR POS Sale Line";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        VoucherAmount: Decimal;
+        SuggestedAmount: Decimal;
+        VoucherHasItemLimitation: Boolean;
+        ActionContext: JsonObject;
+    begin
+        Initialize();
+
+        //Add item to voucher items
+        AddItemToVoucherItems(_VoucherTypeDefault."Payment Type", _Item."No.");
+
+        // [GIVEN] Voucher created in POS transaction
+        VoucherAmount := 2000;
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, _VoucherTypeDefault.Code);
+
+        // [GIVEN] Create item in new POS transaction
+        CreateItemTransaction(500);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        _POSSession.GetPaymentLine(POSPaymentLine);
+        _POSSession.GetSale(Sale);
+        Sale.GetCurrentSale(SalePOS);
+
+        // [THEN] Scan the voucher
+        POSActionScanVoucher2B.CalculateRemainingAmount(POSPaymentLine, _VoucherTypeDefault."Payment Type", POSPaymentMethodOut, SuggestedAmount);
+        if SuggestedAmount > VoucherAmount then
+            SuggestedAmount := VoucherAmount;
+        VoucherHasItemLimitation := POSActionScanVoucher2B.VoucherHasItemFilterLimitation(NpRvVoucher);
+        Assert.IsTrue(VoucherHasItemLimitation and (SuggestedAmount <> 0), 'Voucher cannot be used with item on POS sale and that is not according to scenario.');
+        POSActionScanVoucher2B.ProcessPayment(_VoucherTypeDefault.Code, NpRvVoucher."Reference No.", SuggestedAmount, Sale, POSPaymentLine, SaleLine, false, ActionContext);
+        NpRvVoucherMgt.IssueReturnVoucher(_POSSession, _VoucherTypeDefault.Code, VoucherAmount - SuggestedAmount, '', '', false, false, false);
+
+        // [THEN] Get POS payment lines
+        GetPOSPaymentLines(PaymentSaleLinePOS, ReturnVoucherPaymentSaleLinePOS, SalePOS, POSPaymentMethodOut.Code, NpRvVoucher."No.");
+
+        // [THEN] Check if amounts on POS payment sale lines are calculated correctly
+        Assert.IsTrue(PaymentSaleLinePOS."Amount Including VAT" = VoucherAmount, 'Voucher not applied correctly.');
+        Assert.IsTrue(ReturnVoucherPaymentSaleLinePOS."Amount Including VAT" = SaleLinePOS."Amount Including VAT" - VoucherAmount, 'Voucher not applied correctly.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ScanVoucherTwoItemsOneAddedToVoucherItemsOtherNotOnPOSSale()
+    // [SCENARIO] Add two items to POS sale, one is in voucher items, other is not. Scan the voucher with amount higher than one on POS sale. Check if voucher redeemed correctly
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        POSPaymentMethodOut: Record "NPR POS Payment Method";
+        PaymentSaleLinePOS: Record "NPR POS Sale Line";
+        ReturnVoucherPaymentSaleLinePOS: Record "NPR POS Sale Line";
+        SecondSaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        Assert: Codeunit "Assert";
+        POSActionScanVoucher2B: Codeunit "NPR POS Action Scan Voucher2B";
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+        Sale: Codeunit "NPR POS Sale";
+        SaleLine: Codeunit "NPR POS Sale Line";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        VoucherAmount: Decimal;
+        SuggestedAmount: Decimal;
+        VoucherHasItemLimitation: Boolean;
+        ActionContext: JsonObject;
+    begin
+        Initialize();
+
+        //Add item to voucher items
+        AddItemToVoucherItems(_VoucherTypeDefault."Payment Type", _Item2."No.");
+
+        // [GIVEN] Voucher created in POS transaction
+        VoucherAmount := 2000;
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, _VoucherTypeDefault.Code);
+
+        // [GIVEN] Create two items in new POS transaction
+        CreateTwoItemTransaction(500, 600);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SecondSaleLinePOS);
+
+        _POSSession.GetPaymentLine(POSPaymentLine);
+        _POSSession.GetSale(Sale);
+        Sale.GetCurrentSale(SalePOS);
+
+        // [THEN] Scan the voucher
+        POSActionScanVoucher2B.CalculateRemainingAmount(POSPaymentLine, _VoucherTypeDefault."Payment Type", POSPaymentMethodOut, SuggestedAmount);
+        if SuggestedAmount > VoucherAmount then
+            SuggestedAmount := VoucherAmount;
+        VoucherHasItemLimitation := POSActionScanVoucher2B.VoucherHasItemFilterLimitation(NpRvVoucher);
+        Assert.IsTrue(VoucherHasItemLimitation and (SuggestedAmount <> 0), 'Voucher cannot be used with item on POS sale and that is not according to scenario.');
+        POSActionScanVoucher2B.ProcessPayment(_VoucherTypeDefault.Code, NpRvVoucher."Reference No.", SuggestedAmount, Sale, POSPaymentLine, SaleLine, false, ActionContext);
+        NpRvVoucherMgt.IssueReturnVoucher(_POSSession, _VoucherTypeDefault.Code, VoucherAmount - SuggestedAmount, '', '', false, false, false);
+
+        // [THEN] Get POS payment lines
+        GetPOSPaymentLines(PaymentSaleLinePOS, ReturnVoucherPaymentSaleLinePOS, SalePOS, POSPaymentMethodOut.Code, NpRvVoucher."No.");
+
+        // [THEN] Check if amounts on POS payment sale lines are calculated correctly
+        Assert.IsTrue(PaymentSaleLinePOS."Amount Including VAT" = VoucherAmount, 'Voucher not applied correctly.');
+        Assert.IsTrue(ReturnVoucherPaymentSaleLinePOS."Amount Including VAT" = SecondSaleLinePOS."Amount Including VAT" - VoucherAmount, 'Voucher not applied correctly.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ScanVoucherTwoItemsBothAddedToVoucherItemsOnPOSSale()
+    // [SCENARIO] Add two items to POS sale, both in voucher items. Scan the voucher with amount higher than one on POS sale. Check if voucher redeemed correctly
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        POSPaymentMethodOut: Record "NPR POS Payment Method";
+        PaymentSaleLinePOS: Record "NPR POS Sale Line";
+        ReturnVoucherPaymentSaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SecondSaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        Assert: Codeunit "Assert";
+        POSActionScanVoucher2B: Codeunit "NPR POS Action Scan Voucher2B";
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+        Sale: Codeunit "NPR POS Sale";
+        SaleLine: Codeunit "NPR POS Sale Line";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        VoucherAmount: Decimal;
+        SuggestedAmount: Decimal;
+        VoucherHasItemLimitation: Boolean;
+        ActionContext: JsonObject;
+    begin
+        Initialize();
+
+        //Add item to voucher items
+        AddItemToVoucherItems(_VoucherTypeDefault."Payment Type", _Item."No.");
+        AddItemToVoucherItems(_VoucherTypeDefault."Payment Type", _Item2."No.");
+
+        // [GIVEN] Voucher created in POS transaction
+        VoucherAmount := 2000;
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, _VoucherTypeDefault.Code);
+
+        // [GIVEN] Create two items in new POS transaction
+        CreateTwoItemTransaction(500, 600);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SecondSaleLinePOS);
+
+        _POSSession.GetPaymentLine(POSPaymentLine);
+        _POSSession.GetSale(Sale);
+        Sale.GetCurrentSale(SalePOS);
+
+        // [THEN] Scan the voucher
+        POSActionScanVoucher2B.CalculateRemainingAmount(POSPaymentLine, _VoucherTypeDefault."Payment Type", POSPaymentMethodOut, SuggestedAmount);
+        if SuggestedAmount > VoucherAmount then
+            SuggestedAmount := VoucherAmount;
+        VoucherHasItemLimitation := POSActionScanVoucher2B.VoucherHasItemFilterLimitation(NpRvVoucher);
+        Assert.IsTrue(VoucherHasItemLimitation and (SuggestedAmount <> 0), 'Voucher cannot be used with item on POS sale and that is not according to scenario.');
+        POSActionScanVoucher2B.ProcessPayment(_VoucherTypeDefault.Code, NpRvVoucher."Reference No.", SuggestedAmount, Sale, POSPaymentLine, SaleLine, false, ActionContext);
+        NpRvVoucherMgt.IssueReturnVoucher(_POSSession, _VoucherTypeDefault.Code, VoucherAmount - SuggestedAmount, '', '', false, false, false);
+
+        // [THEN] Get POS payment lines
+        GetPOSPaymentLines(PaymentSaleLinePOS, ReturnVoucherPaymentSaleLinePOS, SalePOS, POSPaymentMethodOut.Code, NpRvVoucher."No.");
+
+        // [THEN] Check if amounts on POS payment sale lines are calculated correctly
+        Assert.IsTrue(PaymentSaleLinePOS."Amount Including VAT" = VoucherAmount, 'Voucher not applied correctly.');
+        Assert.IsTrue(ReturnVoucherPaymentSaleLinePOS."Amount Including VAT" = SaleLinePOS."Amount Including VAT" + SecondSaleLinePOS."Amount Including VAT" - VoucherAmount, 'Voucher not applied correctly.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ScanTwoVouchersWithItemAddedToVoucherItemsOnPOSSaleOverpayWithFirstVoucher()
+    // [SCENARIO] Add an item to POS sale which is added to payment method linked to voucher. Scan first voucher with amount higher than one on POS sale. Scan second voucher. Check if second voucher can be scanned
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        POSPaymentMethodOut: Record "NPR POS Payment Method";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SalePOS: Record "NPR POS Sale";
+        Assert: Codeunit "Assert";
+        POSActionScanVoucher2B: Codeunit "NPR POS Action Scan Voucher2B";
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+        Sale: Codeunit "NPR POS Sale";
+        SaleLine: Codeunit "NPR POS Sale Line";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        VoucherAmount: Decimal;
+        SuggestedAmount: Decimal;
+        VoucherHasItemLimitation: Boolean;
+        ActionContext: JsonObject;
+    begin
+        Initialize();
+
+        //Add item to voucher items
+        AddItemToVoucherItems(_VoucherTypeDefault."Payment Type", _Item."No.");
+
+        // [GIVEN] Voucher created in POS transaction
+        VoucherAmount := 2000;
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, _VoucherTypeDefault.Code);
+
+        // [GIVEN] Create item in new POS transaction
+        CreateItemTransaction(500);
+
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        _POSSession.GetPaymentLine(POSPaymentLine);
+        _POSSession.GetSale(Sale);
+        Sale.GetCurrentSale(SalePOS);
+
+        // [THEN] Scan first voucher
+        POSActionScanVoucher2B.CalculateRemainingAmount(POSPaymentLine, _VoucherTypeDefault."Payment Type", POSPaymentMethodOut, SuggestedAmount);
+        if SuggestedAmount > VoucherAmount then
+            SuggestedAmount := VoucherAmount;
+        VoucherHasItemLimitation := POSActionScanVoucher2B.VoucherHasItemFilterLimitation(NpRvVoucher);
+        Assert.IsTrue(VoucherHasItemLimitation and (SuggestedAmount <> 0), 'Voucher cannot be used with item on POS sale and that is not according to scenario.');
+        POSActionScanVoucher2B.ProcessPayment(_VoucherTypeDefault.Code, NpRvVoucher."Reference No.", SuggestedAmount, Sale, POSPaymentLine, SaleLine, false, ActionContext);
+        NpRvVoucherMgt.IssueReturnVoucher(_POSSession, _VoucherTypeDefault.Code, VoucherAmount - SuggestedAmount, '', '', false, false, false);
+
+        // [THEN] Try to scan second voucher
+        POSActionScanVoucher2B.CalculateRemainingAmount(POSPaymentLine, _VoucherTypeDefault."Payment Type", POSPaymentMethodOut, SuggestedAmount);
+        if SuggestedAmount > VoucherAmount then
+            SuggestedAmount := VoucherAmount;
+        VoucherHasItemLimitation := POSActionScanVoucher2B.VoucherHasItemFilterLimitation(NpRvVoucher);
+
+        // [THEN] Check that second vocuher was not applied to sale
+        Assert.IsTrue(VoucherHasItemLimitation and (SuggestedAmount = 0), 'Second voucher should not be appied to sale.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ScanVoucherWithItemNotAddedToVoucherItemsOnSalesOrder()
+    // [SCENARIO] Add an item to sales order which is not added to payment method linked to voucher. Scan the voucher. Check if voucher can be used with item
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalesHeader: Record "Sales Header";
+        Assert: Codeunit "Assert";
+        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
+        VoucherCannotBeUsedWithItemsErr: Label 'Voucher cannot be used with items currently present on Sales Order.';
+    begin
+        Initialize();
+
+        //Add random item to voucher items
+        AddItemToVoucherItems(_VoucherTypeDefault."Payment Type", '1000');
+
+        // [GIVEN] Voucher created in POS transaction
+        CreateVoucherInPOSTransaction(NpRvVoucher, 500, _VoucherTypeDefault.Code);
+
+        // [THEN] Create sales order with one line
+        CreateSalesOrder(SalesHeader, false);
+
+        // [THEN] Redeem voucher on sales order
+        asserterror NpRvSalesDocMgt.RedeemVoucher(SalesHeader, NpRvVoucher."Reference No.");
+
+        Assert.ExpectedError(VoucherCannotBeUsedWithItemsErr);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ScanVoucherWithItemAddedToVoucherItemsOnSalesOrder()
+    // [SCENARIO] Add an item to sales order which is added to payment method linked to voucher. Scan the voucher. Check if voucher can be used with item
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalesHeader: Record "Sales Header";
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+        Assert: Codeunit "Assert";
+        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
+        VoucherAmount: Decimal;
+    begin
+        Initialize();
+        _Item."Unit Price" := 1000;
+        _Item.Modify();
+
+        //Add item to voucher items
+        AddItemToVoucherItems(_VoucherTypeDefault."Payment Type", _Item."No.");
+
+        // [GIVEN] Voucher created in POS transaction
+        VoucherAmount := 500;
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, _VoucherTypeDefault.Code);
+
+        // [THEN] Create sales order with one line
+        CreateSalesOrder(SalesHeader, false);
+
+        // [THEN] Redeem voucher on sales order and get payment line
+        NpRvSalesDocMgt.RedeemVoucher(SalesHeader, NpRvVoucher."Reference No.");
+
+        MagentoPaymentLine.SetRange("Document Table No.", Database::"Sales Header");
+        MagentoPaymentLine.SetRange("Document Type", MagentoPaymentLine."Document Type"::Order);
+        MagentoPaymentLine.SetRange("Document No.", SalesHeader."No.");
+        MagentoPaymentLine.SetRange("Payment Type", MagentoPaymentLine."Payment Type"::Voucher);
+        MagentoPaymentLine.SetRange("No.", NpRvVoucher."Reference No.");
+        MagentoPaymentLine.FindFirst();
+
+        // [THEN] Check if voucher redeemed successfully
+        Assert.IsTrue(MagentoPaymentLine.Amount = VoucherAmount, 'Voucher not redeemed correctly.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ScanVoucherWithItemAddedToVoucherItemsOnSalesOrderOverpayWithVoucher()
+    // [SCENARIO] Add an item to sales order which is added to payment method linked to voucher. Scan the voucher with amount higher than one on sales order. Check if voucher redeemed correctly
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalesHeader: Record "Sales Header";
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+        ReturnVoucherMagentoPaymentLine: Record "NPR Magento Payment Line";
+        ItemSaleLine: Record "Sales Line";
+        Assert: Codeunit "Assert";
+        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
+        VoucherAmount: Decimal;
+    begin
+        Initialize();
+        _Item."Unit Price" := 500;
+        _Item.Modify();
+
+        //Add item to voucher items
+        AddItemToVoucherItems(_VoucherTypeDefault."Payment Type", _Item."No.");
+
+        // [GIVEN] Voucher created in POS transaction
+        VoucherAmount := 2000;
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, _VoucherTypeDefault.Code);
+
+        // [THEN] Create sales order with one line
+        CreateSalesOrder(SalesHeader, false);
+
+        ItemSaleLine.SetRange("Document Type", ItemSaleLine."Document Type"::Order);
+        ItemSaleLine.SetRange("Document No.", SalesHeader."No.");
+        ItemSaleLine.SetRange(Type, ItemSaleLine.Type::Item);
+        ItemSaleLine.SetRange("No.", _Item."No.");
+        ItemSaleLine.CalcSums("Amount Including VAT");
+
+        // [THEN] Redeem voucher on sales order
+        NpRvSalesDocMgt.RedeemVoucher(SalesHeader, NpRvVoucher."Reference No.");
+
+        // [THEN] Get payment lines
+        GetSalesOrderPaymentLines(MagentoPaymentLine, ReturnVoucherMagentoPaymentLine, SalesHeader."No.", NpRvVoucher."Reference No.");
+
+        // [THEN] Check if voucher redeemed successfully
+        Assert.IsTrue(MagentoPaymentLine."Requested Amount" = ItemSaleLine."Amount Including VAT", 'Voucher not redeemed correctly.');
+        Assert.IsTrue(ReturnVoucherMagentoPaymentLine.Amount = -(MagentoPaymentLine.Amount - ItemSaleLine."Amount Including VAT"), 'Voucher not redeemed correctly.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ScanVoucherWithItemAddedOtherItemNotAddedToVoucherItemsOnSalesOrder()
+    // [SCENARIO] Add items to sales order. One is added to payment method linked to voucher, other is not. Scan the voucher. Check if voucher redeemed correctly
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalesHeader: Record "Sales Header";
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+        ReturnVoucherMagentoPaymentLine: Record "NPR Magento Payment Line";
+        ItemSaleLine: Record "Sales Line";
+        Assert: Codeunit "Assert";
+        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
+        VoucherAmount: Decimal;
+    begin
+        Initialize();
+        _Item."Unit Price" := 500;
+        _Item.Modify();
+        _Item2."Unit Price" := 500;
+        _Item2.Modify();
+
+        //Add item to voucher items
+        AddItemToVoucherItems(_VoucherTypeDefault."Payment Type", _Item."No.");
+
+        // [GIVEN] Voucher created in POS transaction
+        VoucherAmount := 2000;
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, _VoucherTypeDefault.Code);
+
+        // [THEN] Create sales order with 2 lines. Second line item is not in voucher items
+        CreateSalesOrder(SalesHeader, true);
+
+        ItemSaleLine.SetRange("Document Type", ItemSaleLine."Document Type"::Order);
+        ItemSaleLine.SetRange("Document No.", SalesHeader."No.");
+        ItemSaleLine.SetRange(Type, ItemSaleLine.Type::Item);
+        ItemSaleLine.SetRange("No.", _Item."No.");
+        ItemSaleLine.CalcSums("Amount Including VAT");
+
+        // [THEN] Redeem voucher on sales order
+        NpRvSalesDocMgt.RedeemVoucher(SalesHeader, NpRvVoucher."Reference No.");
+
+        // [THEN] Get payment lines
+        GetSalesOrderPaymentLines(MagentoPaymentLine, ReturnVoucherMagentoPaymentLine, SalesHeader."No.", NpRvVoucher."Reference No.");
+
+        // [THEN] Check if voucher redeemed successfully
+        Assert.IsTrue(MagentoPaymentLine."Requested Amount" = ItemSaleLine."Amount Including VAT", 'Voucher not redeemed correctly.');
+        Assert.IsTrue(ReturnVoucherMagentoPaymentLine.Amount = -(MagentoPaymentLine.Amount - ItemSaleLine."Amount Including VAT"), 'Voucher not redeemed correctly.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ScanVoucherWithTwoItemsAddedToVoucherItemsOnSalesOrder()
+    // [SCENARIO] Add items to sales order, both of them in voucher items. Scan the voucher. Check if voucher redeemed correctly
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalesHeader: Record "Sales Header";
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+        ReturnVoucherMagentoPaymentLine: Record "NPR Magento Payment Line";
+        ItemSaleLine: Record "Sales Line";
+        Assert: Codeunit "Assert";
+        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
+        VoucherAmount: Decimal;
+    begin
+        Initialize();
+        _Item."Unit Price" := 500;
+        _Item.Modify();
+        _Item2."Unit Price" := 600;
+        _Item2.Modify();
+
+        //Add items to voucher items
+        AddItemToVoucherItems(_VoucherTypeDefault."Payment Type", _Item."No.");
+        AddItemToVoucherItems(_VoucherTypeDefault."Payment Type", _Item2."No.");
+
+        // [GIVEN] Voucher created in POS transaction
+        VoucherAmount := 2000;
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, _VoucherTypeDefault.Code);
+
+        // [THEN] Create sales order with 2 lines
+        CreateSalesOrder(SalesHeader, true);
+
+        ItemSaleLine.SetRange("Document Type", ItemSaleLine."Document Type"::Order);
+        ItemSaleLine.SetRange("Document No.", SalesHeader."No.");
+        ItemSaleLine.SetRange(Type, ItemSaleLine.Type::Item);
+        ItemSaleLine.CalcSums("Amount Including VAT");
+
+        // [THEN] Redeem voucher on sales order
+        NpRvSalesDocMgt.RedeemVoucher(SalesHeader, NpRvVoucher."Reference No.");
+
+        // [THEN] Get payment lines
+        GetSalesOrderPaymentLines(MagentoPaymentLine, ReturnVoucherMagentoPaymentLine, SalesHeader."No.", NpRvVoucher."Reference No.");
+
+        // [THEN] Check if voucher redeemed successfully
+        Assert.IsTrue(MagentoPaymentLine."Requested Amount" = ItemSaleLine."Amount Including VAT", 'Voucher not redeemed correctly.');
+        Assert.IsTrue(ReturnVoucherMagentoPaymentLine.Amount = -(MagentoPaymentLine.Amount - ItemSaleLine."Amount Including VAT"), 'Voucher not redeemed correctly.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ScanVoucherWithItemAddedToVoucherItemsOnSalesOrderOverpayWithVoucherPostOrderCreateMemoPostMemo()
+    // [SCENARIO] Add an item to sales order which is added to payment method linked to voucher. Scan the voucher with amount higher than one on sales order. 
+    //            Check if payment lines are created correctly. Post sales order. Create credit memo from posted sales invoice. Post credit memo.
+    //            Check if payment line on credit memo is created correctly.
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalesHeader: Record "Sales Header";
+        CreditMemoSalesHeader: Record "Sales Header";
+        SalesHeaderMagentoPaymentLine: Record "NPR Magento Payment Line";
+        SalesHeaderReturnVoucherMagentoPaymentLine: Record "NPR Magento Payment Line";
+        SalesCrMemoMagentoPaymentLine: Record "NPR Magento Payment Line";
+        ItemSaleLine: Record "Sales Line";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        Assert: Codeunit "Assert";
+        NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
+        SalesPost: Codeunit "Sales-Post";
+        VoucherAmount: Decimal;
+    begin
+        Initialize();
+        _Item."Unit Price" := 500;
+        _Item.Modify();
+
+        // Delete all sales order in case that random functions are creating duplicate data
+        SalesHeader.DeleteAll();
+
+        //Add item to voucher items
+        AddItemToVoucherItems(_VoucherTypeDefault."Payment Type", _Item."No.");
+
+        // [GIVEN] Voucher created in POS transaction
+        VoucherAmount := 2000;
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, _VoucherTypeDefault.Code);
+
+        // [THEN] Create sales order with one line
+        CreateSalesOrder(SalesHeader, false);
+
+        ItemSaleLine.SetRange("Document Type", ItemSaleLine."Document Type"::Order);
+        ItemSaleLine.SetRange("Document No.", SalesHeader."No.");
+        ItemSaleLine.SetRange(Type, ItemSaleLine.Type::Item);
+        ItemSaleLine.SetRange("No.", _Item."No.");
+        ItemSaleLine.CalcSums("Amount Including VAT");
+
+        // [THEN] Redeem voucher on sales order
+        NpRvSalesDocMgt.RedeemVoucher(SalesHeader, NpRvVoucher."Reference No.");
+
+        // [THEN] Get payment lines
+        GetSalesOrderPaymentLines(SalesHeaderMagentoPaymentLine, SalesHeaderReturnVoucherMagentoPaymentLine, SalesHeader."No.", NpRvVoucher."Reference No.");
+
+        // [THEN] Check if voucher redeemed successfully
+        Assert.IsTrue(SalesHeaderMagentoPaymentLine."Requested Amount" = ItemSaleLine."Amount Including VAT", 'Voucher not redeemed correctly.');
+        Assert.IsTrue(SalesHeaderReturnVoucherMagentoPaymentLine.Amount = -(SalesHeaderMagentoPaymentLine.Amount - ItemSaleLine."Amount Including VAT"), 'Voucher not redeemed correctly.');
+
+        // [THEN] Post sales order and get posted sales invoice
+        SalesHeader.Ship := true;
+        SalesHeader.Invoice := true;
+        SalesHeader.Modify();
+        SalesPost.Run(SalesHeader);
+        SalesInvoiceHeader.FindLast();
+
+        // [THEN] Create sales credit memo from posted sales invoice
+        CreateCreditMemoDocument(SalesInvoiceHeader, CreditMemoSalesHeader, Enum::"Sales Document Type"::"Credit Memo");
+
+        // [THEN] Post sales credit memo and get payment line
+        SalesPost.Run(CreditMemoSalesHeader);
+        SalesCrMemoHeader.FindLast();
+        SalesCrMemoMagentoPaymentLine.SetRange("Document Table No.", Database::"Sales Cr.Memo Header");
+        SalesCrMemoMagentoPaymentLine.SetRange("Document Type", SalesCrMemoMagentoPaymentLine."Document Type"::Quote);
+        SalesCrMemoMagentoPaymentLine.SetRange("Document No.", SalesCrMemoHeader."No.");
+        SalesCrMemoMagentoPaymentLine.SetRange("Payment Type", SalesCrMemoMagentoPaymentLine."Payment Type"::Voucher);
+        SalesCrMemoMagentoPaymentLine.FindFirst();
+
+        // [THEN] Check if voucher amount on credit memo is the same as on the sales order
+        Assert.IsTrue(SalesHeaderMagentoPaymentLine."Requested Amount" = SalesCrMemoMagentoPaymentLine.Amount, 'Payment line on posted sales credit memo not created correctly');
+    end;
+
     local procedure EndSaleAndCheckRetailVoucherEntriesAmount(SalePOS: Record "NPR POS Sale"; VoucherAmount: Decimal; Quantity: Integer)
     var
         NpRvVoucherEntry: Record "NPR NpRv Voucher Entry";
@@ -5773,5 +6447,90 @@ codeunit 85024 "NPR Retail Voucher Tests"
             exit;
         VATPostingSetup.Validate("VAT %", 0);
         VATPostingSetup.Modify(true);
+    end;
+
+    local procedure AddItemToVoucherItems(POSPaymentMethodCode: Code[10]; ItemNo: Code[20])
+    var
+        POSPaymentMethodItem: Record "NPR POS Payment Method Item";
+        LineNo: Integer;
+    begin
+        LineNo := 10000;
+        POSPaymentMethodItem.SetRange("POS Payment Method Code", POSPaymentMethodCode);
+        if POSPaymentMethodItem.FindLast() then
+            LineNo := POSPaymentMethodItem."Line No." + 10000;
+        POSPaymentMethodItem.Init();
+        POSPaymentMethodItem."POS Payment Method Code" := POSPaymentMethodCode;
+        POSPaymentMethodItem."Line No." := LineNo;
+        POSPaymentMethodItem.Type := POSPaymentMethodItem.Type::Item;
+        POSPaymentMethodItem."No." := ItemNo;
+        POSPaymentMethodItem.Insert();
+    end;
+
+    local procedure CreateSalesOrder(var SalesHeader: Record "Sales Header"; TwoItemsInSalesOrder: Boolean)
+    var
+        SalesLine: Record "Sales Line";
+        LibrarySales: Codeunit "Library - Sales";
+    begin
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, '');
+        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, _Item."No.", 1);
+        if TwoItemsInSalesOrder then
+            LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, _Item2."No.", 1);
+    end;
+
+    local procedure DeleteVoucherItemsDefaultVoucher(POSPaymentMethodCode: Code[10])
+    var
+        POSPaymentMethodItem: Record "NPR POS Payment Method Item";
+    begin
+        POSPaymentMethodItem.SetRange("POS Payment Method Code", POSPaymentMethodCode);
+        POSPaymentMethodItem.DeleteAll();
+    end;
+
+    local procedure GetPOSPaymentLines(var PaymentSaleLinePOS: Record "NPR POS Sale Line"; var ReturnVoucherPaymentSaleLinePOS: Record "NPR POS Sale Line";
+                                        SalePOS: Record "NPR POS Sale"; POSPaymentMethodCode: Code[10]; VoucherNo: Code[20])
+    begin
+        PaymentSaleLinePOS.SetRange("Register No.", SalePOS."Register No.");
+        PaymentSaleLinePOS.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        PaymentSaleLinePOS.SetRange(Date, SalePOS.Date);
+        PaymentSaleLinePOS.SetRange("Line Type", PaymentSaleLinePOS."Line Type"::"POS Payment");
+        PaymentSaleLinePOS.SetRange("No.", POSPaymentMethodCode);
+        PaymentSaleLinePOS.SetRange("Discount Code", VoucherNo);
+        PaymentSaleLinePOS.FindFirst();
+
+        ReturnVoucherPaymentSaleLinePOS.CopyFilters(PaymentSaleLinePOS);
+        ReturnVoucherPaymentSaleLinePOS.SetRange("No.");
+        ReturnVoucherPaymentSaleLinePOS.SetRange("Discount Code");
+        ReturnVoucherPaymentSaleLinePOS.SetFilter("Amount Including VAT", '<%1', 0);
+        ReturnVoucherPaymentSaleLinePOS.FindFirst();
+    end;
+
+    local procedure GetSalesOrderPaymentLines(var MagentoPaymentLine: Record "NPR Magento Payment Line"; var ReturnVoucherMagentoPaymentLine: Record "NPR Magento Payment Line"; DocumentNo: Code[20]; VoucherReferenceNo: Text[50])
+    begin
+        MagentoPaymentLine.SetRange("Document Table No.", Database::"Sales Header");
+        MagentoPaymentLine.SetRange("Document Type", MagentoPaymentLine."Document Type"::Order);
+        MagentoPaymentLine.SetRange("Document No.", DocumentNo);
+        MagentoPaymentLine.SetRange("Payment Type", MagentoPaymentLine."Payment Type"::Voucher);
+        MagentoPaymentLine.SetRange("No.", VoucherReferenceNo);
+        MagentoPaymentLine.FindFirst();
+
+        ReturnVoucherMagentoPaymentLine.SetRange("Document Table No.", Database::"Sales Header");
+        ReturnVoucherMagentoPaymentLine.SetRange("Document Type", ReturnVoucherMagentoPaymentLine."Document Type"::Order);
+        ReturnVoucherMagentoPaymentLine.SetRange("Document No.", DocumentNo);
+        ReturnVoucherMagentoPaymentLine.SetRange("Payment Type", ReturnVoucherMagentoPaymentLine."Payment Type"::Voucher);
+        ReturnVoucherMagentoPaymentLine.FindLast();
+    end;
+
+    local procedure CreateCreditMemoDocument(var SalesInvoiceHeader: Record "Sales Invoice Header"; var SalesHeader: Record "Sales Header"; DocumentType: Enum "Sales Document Type")
+    var
+        CopyDocMgt: Codeunit "Copy Document Mgt.";
+    begin
+        Clear(SalesHeader);
+        SalesHeader."No." := '';
+        SalesHeader."Document Type" := DocumentType;
+        SalesHeader.SetAllowSelectNoSeries();
+        SalesHeader.Insert(true);
+
+        CopyDocMgt.SetPropertiesForCreditMemoCorrection();
+
+        CopyDocMgt.CopySalesDocForInvoiceCancelling(SalesInvoiceHeader."No.", SalesHeader);
     end;
 }
