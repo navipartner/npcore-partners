@@ -143,9 +143,12 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
         InventoryLevel: Record "NPR Spfy Inventory Level";
         Item: Record Item;
         SpfyItemVariantModif: Record "NPR Spfy Item Variant Modif.";
+        SpfyIntegrationEvents: Codeunit "NPR Spfy Integration Events";
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
         StockQty: Decimal;
         IncludeTransferOrders: Option No,Outbound,All;
+        LocationFilter: Text;
+        Handled: Boolean;
     begin
         if SpfyItemVariantModif.Get(InventoryLevelParam."Item No.", InventoryLevelParam."Variant Code", InventoryLevelParam."Shopify Store Code") and SpfyItemVariantModif."Do Not Track Inventory" then
             exit(false);  //inventory level is not tracked for this item variant in this store
@@ -161,21 +164,25 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
             exit(false);
         IncludeTransferOrders := SpfyIntegrationMgt.IncludeTrasferOrders(InventoryLevelParam."Shopify Store Code");
 
-        Item.SetRange("Variant Filter", InventoryLevelParam."Variant Code");
-        Item.SetFilter("Location Filter", GetLocationFilter(InventoryLevelParam."Shopify Store Code", InventoryLevelParam."Shopify Location ID"));
-        Item.CalcFields(Inventory, "Qty. on Sales Order");
-        StockQty := Item.Inventory - Item."Qty. on Sales Order" - SafetyStockQuantity(Item);
-        case IncludeTransferOrders of
-            IncludeTransferOrders::Outbound:
-                begin
-                    Item.CalcFields("Trans. Ord. Shipment (Qty.)");
-                    StockQty := StockQty - Item."Trans. Ord. Shipment (Qty.)";
-                end;
-            IncludeTransferOrders::All:
-                begin
-                    Item.CalcFields("Trans. Ord. Shipment (Qty.)", "Trans. Ord. Receipt (Qty.)", "Qty. in Transit");
-                    StockQty := StockQty - Item."Trans. Ord. Shipment (Qty.)" + Item."Trans. Ord. Receipt (Qty.)" + Item."Qty. in Transit";
-                end;
+        LocationFilter := GetLocationFilter(InventoryLevelParam."Shopify Store Code", InventoryLevelParam."Shopify Location ID");
+        SpfyIntegrationEvents.OnCalculateInventoryLevel(InventoryLevelParam."Shopify Store Code", LocationFilter, InventoryLevelParam."Item No.", InventoryLevelParam."Variant Code", IncludeTransferOrders, StockQty, Handled);
+        if not Handled then begin
+            Item.SetRange("Variant Filter", InventoryLevelParam."Variant Code");
+            Item.SetFilter("Location Filter", LocationFilter);
+            Item.CalcFields(Inventory, "Qty. on Sales Order");
+            StockQty := Item.Inventory - Item."Qty. on Sales Order" - SafetyStockQuantity(Item);
+            case IncludeTransferOrders of
+                IncludeTransferOrders::Outbound:
+                    begin
+                        Item.CalcFields("Trans. Ord. Shipment (Qty.)");
+                        StockQty := StockQty - Item."Trans. Ord. Shipment (Qty.)";
+                    end;
+                IncludeTransferOrders::All:
+                    begin
+                        Item.CalcFields("Trans. Ord. Shipment (Qty.)", "Trans. Ord. Receipt (Qty.)", "Qty. in Transit");
+                        StockQty := StockQty - Item."Trans. Ord. Shipment (Qty.)" + Item."Trans. Ord. Receipt (Qty.)" + Item."Qty. in Transit";
+                    end;
+            end;
         end;
 
 #if not (BC18 or BC19 or BC20 or BC21)

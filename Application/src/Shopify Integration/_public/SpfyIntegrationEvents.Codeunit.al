@@ -149,5 +149,10 @@ codeunit 6184824 "NPR Spfy Integration Events"
     internal procedure OnAfterUpdateDoNotTrackInventory(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; DoNotTrack: Boolean)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnCalculateInventoryLevel(ShopifyStoreCode: Code[20]; LocationFilter: Text; ItemNo: Code[20]; VariantCode: Code[10]; IncludeTransferOrders: Option No,Outbound,All; var StockQty: Decimal; var Handled: Boolean)
+    begin
+    end;
 }
 #endif
