@@ -306,7 +306,8 @@ codeunit 6185083 "NPR TicketingReservationAgent"
             exit(false);
         end;
 
-        Ticket.Reset();
+        TicketRequest.Reset();
+        TicketRequest.ReadIsolation := TicketRequest.ReadIsolation::UpdLock;
         TicketRequest.SetCurrentKey("Session Token ID");
         TicketRequest.SetLoadFields("Admission Created", "External Adm. Sch. Entry No.", "Admission Code", "Scheduled Time Description");
         TicketRequest.SetFilter("Session Token ID", '=%1', Token);

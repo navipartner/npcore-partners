@@ -75,8 +75,11 @@
         NO_DEFAULT_SCHEDULE: Label 'The ticket request did not specify a valid time-slot for admission %1 and the ticket rule is to get the default schedule. But there are currently no time-slots that matches %2 "%3".';
         WORKFLOW_DESC: Label 'Print Ticket';
         CONFIRM_EXCEED_CAPACITY: Label 'Capacity for %1 will be exceeded. Do you want to continue?';
-
         _TicketExecutionContext: Option SALES,ADMISSION;
+
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        _FeatureFlagManagement: Codeunit "NPR Feature Flags Management";
+#endif
 
     /**
     * Finalize ticket from end of sale
@@ -549,6 +552,7 @@
         HighDate := 0D;
 
         // Each admission must only contribute with only one of its INITIAL_ENTRY or RESERVATION entries
+        TicketAccessEntry.SetCurrentKey("Ticket No.");
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
         TicketAccessEntry.SetLoadFields("Admission Code", "Entry No.");
         if (TicketAccessEntry.FindSet()) then begin
@@ -1308,8 +1312,13 @@
 
         if (not GetTicket(TicketIdentifierType, TicketNumber, Ticket)) then
             RaiseError(StrSubstNo(INVALID_REFERENCE, REFERENCE, TicketNumber), INVALID_REFERENCE_NO);
-
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        if (not (_FeatureFlagManagement.IsEnabled('enableTriStateLockingFeaturesInTicketModule'))) then
+            TicketRequestManager.LockResources('RegisterArrival');
+#else
         TicketRequestManager.LockResources('RegisterArrival');
+#endif
+
         Ticket.SetRecFilter();
 
         if ((ScannerStationId <> '') and (AdmissionCode = '')) then
@@ -3303,6 +3312,10 @@
         GetEntryValidationConstraints(TicketType, TicketBOM, EntryValidation, MaxNoOfEntries, FirstLastEntryDurationFormula);
 
         DetailedTicketAccessEntry.SetCurrentKey("Ticket Access Entry No.", Type, Open);
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        DetailedTicketAccessEntry.ReadIsolation := IsolationLevel::ReadUncommitted;
+#endif
+        DetailedTicketAccessEntry.SetLoadFields("Entry No.", "Created Datetime");
         DetailedTicketAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', TicketAccessEntry."Entry No.");
         DetailedTicketAccessEntry.SetFilter(Type, '=%1', DetailedTicketAccessEntry.Type::ADMITTED);
         DetailedTicketAccessEntry.SetFilter(Open, '=%1', true);

@@ -718,7 +718,7 @@
         end;
 
         TicketReservationResponse.Reset();
-        TicketReservationResponse.SetCurrentKey("Session Token ID", "Exires (Seconds)");
+        TicketReservationResponse.SetCurrentKey("Session Token ID", "Ext. Line Reference No.");
         TicketReservationResponse.SetFilter("Session Token ID", '=%1', TicketReservationRequest."Session Token ID");
         TicketReservationResponse.SetFilter("Ext. Line Reference No.", '=%1', TicketReservationRequest."Ext. Line Reference No.");
         if (not TicketReservationResponse.FindFirst()) then begin
