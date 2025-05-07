@@ -38,13 +38,25 @@ codeunit 6184824 "NPR Spfy Integration Events"
     begin
     end;
 
+    [Obsolete('Use the "OnAfterUpsertSalesLine" event instead', '2025-05-04')]
     [IntegrationEvent(false, false)]
     internal procedure OnAfterInsertSalesLine(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; var LastLineNo: Integer)
     begin
     end;
 
     [IntegrationEvent(false, false)]
+    internal procedure OnAfterUpsertSalesLine(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; IsNewLine: Boolean; xSalesLine: Record "Sales Line"; var LastLineNo: Integer)
+    begin
+    end;
+
+    [Obsolete('Use the "OnAfterUpsertSalesLineShipmentFee" event instead', '2025-05-04')]
+    [IntegrationEvent(false, false)]
     internal procedure OnAfterInsertSalesLineShipmentFee(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; var LastLineNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterUpsertSalesLineShipmentFee(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; IsNewLine: Boolean; xSalesLine: Record "Sales Line"; var LastLineNo: Integer)
     begin
     end;
 

@@ -176,17 +176,22 @@ codeunit 6184804 "NPR Spfy Capture Payment"
             Database::"Sales Header":
                 begin
                     RecRef.SetTable(SalesHeader);
+                    SalesHeader.CalcFields("Amount Including VAT");
                     PaymentLineParam."Document Type" := SalesHeader."Document Type";
                     PaymentLineParam."Document No." := SalesHeader."No.";
                     PaymentLineParam."Posting Date" := SalesHeader."Posting Date";
                     PaymentLineParam."External Reference No." := SalesHeader."NPR External Order No.";
+                    PaymentLineParam.Amount := SalesHeader."Amount Including VAT";
                 end;
+
             Database::"Sales Invoice Header":
                 begin
                     RecRef.SetTable(SalesInvHeader);
+                    SalesInvHeader.CalcFields("Amount Including VAT");
                     PaymentLineParam."Document No." := SalesInvHeader."No.";
                     PaymentLineParam."Posting Date" := SalesInvHeader."Posting Date";
                     PaymentLineParam."External Reference No." := SalesInvHeader."NPR External Order No.";
+                    PaymentLineParam.Amount := SalesInvHeader."Amount Including VAT";
                 end;
             else
                 SpfyIntegrationMgt.UnsupportedIntegrationTable(NcTask, StrSubstNo('CU%1.%2', Format(Codeunit::"NPR Spfy Capture Payment"), 'UpdatePmtLinesAndScheduleCapture'));
@@ -251,6 +256,10 @@ codeunit 6184804 "NPR Spfy Capture Payment"
 
                             if ScheduleCapture and (ShopifyTransactionKind = 'authorization') and (PaymentLine."Date Captured" = 0D) then
                                 SchedulePmtLineProcessing(NcTask."Store Code", PaymentLine, ShopifyOrderID, NcTask.Type::Insert);
+
+                            PaymentLineParam.Amount := PaymentLineParam.Amount - PaymentLine.Amount;
+                            if PaymentLineParam.Amount <= 0 then
+                                exit;
                         end;
                 end;
         end;
@@ -277,6 +286,8 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         PaymentLine."Source Table No." := Database::"Payment Method";
         PaymentLine."Source No." := PaymentMethod.Code;
         PaymentLine.Amount := JsonHelper.GetJDecimal(ShopifyTransactionJToken, 'amount', true);
+        If PaymentLine.Amount > PaymentLineParam.Amount then
+            PaymentLine.Amount := PaymentLineParam.Amount;
         PaymentLine."Allow Adjust Amount" := PaymentMapping."Allow Adjust Payment Amount";
         PaymentLine."Payment Gateway Code" := ShopifyPaymentGateway(JsonHelper.GetJText(ShopifyTransactionJToken, 'currency', false));
         SpfyIntegrationEvents.OnAfterInitCreditCardPaymentLine(PaymentLine, PaymentMapping, ShopifyTransactionJToken);
@@ -335,6 +346,8 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         PaymentLine."Source No." := NpRvVoucher."No.";
         PaymentLine."External Reference No." := PaymentLineParam."External Reference No.";
         PaymentLine.Amount := JsonHelper.GetJDecimal(ShopifyTransactionJToken, 'amount', true);
+        If PaymentLine.Amount > PaymentLineParam.Amount then
+            PaymentLine.Amount := PaymentLineParam.Amount;
         PaymentLine.Insert(true);
 
         NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Payment Line";

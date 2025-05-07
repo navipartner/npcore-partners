@@ -203,6 +203,11 @@
                 end;
             end;
         }
+        field(250; "Spfy Auto-Fulfill"; Boolean)
+        {
+            Caption = 'Auto-Fulfill';
+            DataClassification = CustomerContent;
+        }
 #endif
         field(300; "Voucher Message"; Text[250])
         {

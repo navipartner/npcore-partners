@@ -19,32 +19,32 @@ codeunit 6184815 "NPR Spfy Post Order" implements "NPR Nc Import List IProcess"
             SpfyDeleteOrder.DeleteOrder(ImportEntry."Store Code", Order);
             exit;
         end;
-        PostOrder(ImportEntry."Store Code", Order);
+        PostOrder(ImportEntry."Store Code", Order, ImportEntry);
         ClearLastError();  //Do not save error text in Import List, if order processing completed successfully
     end;
 
-    local procedure PostOrder(ShopifyStoreCode: Code[20]; Order: JsonToken)
+    local procedure PostOrder(ShopifyStoreCode: Code[20]; Order: JsonToken; var ImportEntry: Record "NPR Nc Import Entry")
     var
         SalesHeader: Record "Sales Header";
         TempSalesInvHeader: Record "Sales Invoice Header" temporary;
         ReleaseSalesDoc: Codeunit "Release Sales Document";
+        AlreadyPostedMsg: Label 'The order has already been posted. Further processing has been skipped.';
     begin
-        if OrderMgt.FindSalesInvoices(ShopifyStoreCode, Order, TempSalesInvHeader) then
-            exit;
-
         OrderMgt.LockTables();
-        if not OrderMgt.FindSalesOrder(ShopifyStoreCode, Order, SalesHeader) then
+        if not OrderMgt.FindSalesOrder(ShopifyStoreCode, Order, SalesHeader) then begin
+            if OrderMgt.FindSalesInvoices(ShopifyStoreCode, Order, TempSalesInvHeader) then begin
+                OrderMgt.SetImportEntryErrorMsg(ImportEntry, AlreadyPostedMsg);
+                exit;
+            end;
             OrderMgt.InsertSalesHeader(ShopifyStoreCode, Order, SalesHeader)
-        else begin
+        end else begin
             SalesHeader.SetHideValidationDialog(true);
             if SalesHeader.Status = SalesHeader.Status::Released then
                 ReleaseSalesDoc.PerformManualReopen(SalesHeader);
-
-            OrderMgt.DeleteSalesLines(SalesHeader);
             OrderMgt.UpdateSalesHeader(ShopifyStoreCode, Order, SalesHeader);
         end;
 
-        OrderMgt.InsertSalesLines(ShopifyStoreCode, Order, SalesHeader, true);
+        OrderMgt.UpsertSalesLines(ShopifyStoreCode, Order, SalesHeader, true);
         OrderMgt.InsertPaymentLines(ShopifyStoreCode, Order, SalesHeader);
         Commit();
 

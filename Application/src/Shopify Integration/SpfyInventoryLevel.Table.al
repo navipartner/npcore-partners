@@ -18,7 +18,7 @@ table 6150816 "NPR Spfy Inventory Level"
         {
             DataClassification = CustomerContent;
             Caption = 'Item No.';
-            TableRelation = Item WHERE(Type = CONST(Inventory));
+            TableRelation = Item."No." WHERE(Type = CONST(Inventory));
         }
         field(3; "Variant Code"; Code[10])
         {

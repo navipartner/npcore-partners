@@ -342,6 +342,11 @@
                     ApplicationArea = NPRShopify;
                     ToolTip = 'Specifies if retail vouchers of this type are integrated with Shopify.';
                 }
+                field("Spfy Auto-Fulfill"; Rec."Spfy Auto-Fulfill")
+                {
+                    ApplicationArea = NPRShopify;
+                    ToolTip = 'Specifies if retail vouchers of this type sold on Shopify must be automatically fulfilled (posted as shipped in BC) immediately after the Shopify order is imported into BC. Please note that this will not work for Shopify gift cards with reference numbers assigned by Shopify, as these must be fulfilled in Shopify.';
+                }
                 field(ShopifyStoreCode; ShopifyStoreCode)
                 {
                     Caption = 'Shopify Store Code';

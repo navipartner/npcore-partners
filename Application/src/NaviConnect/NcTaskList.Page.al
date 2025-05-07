@@ -373,13 +373,24 @@
     local procedure ImportNewTasks()
     var
         TaskProcessor: Record "NPR Nc Task Processor";
+        TaskProcessorFound: Boolean;
     begin
-        if TaskProcessor.IsEmpty then begin
+        if TaskProcessor.IsEmpty() then begin
             SyncMgt.UpdateTaskProcessor(TaskProcessor);
             Commit();
         end;
-        if PAGE.RunModal(PAGE::"NPR Nc Task Proces. List", TaskProcessor) <> ACTION::LookupOK then
-            exit;
+        if TaskProcessorFilter <> '' then begin
+            TaskProcessor.FilterGroup(10);
+            TaskProcessor.SetFilter(Code, TaskProcessorFilter);
+            if TaskProcessor.Count() = 1 then
+                TaskProcessorFound := TaskProcessor.FindFirst();
+            if not TaskProcessorFound then
+                TaskProcessor.SetRange(Code);
+            TaskProcessor.FilterGroup(0);
+        end;
+        if not TaskProcessorFound then
+            if Page.RunModal(Page::"NPR Nc Task Proces. List", TaskProcessor) <> Action::LookupOK then
+                exit;
 
         TaskMgt.UpdateTasks(TaskProcessor);
         Clear(TaskMgt);

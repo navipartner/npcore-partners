@@ -285,19 +285,25 @@ codeunit 6184814 "NPR Spfy Order Mgt."
     end;
 
     procedure IsAnonymizedCustomerOrder(var ImportEntry: Record "NPR Nc Import Entry"; Order: JsonToken; AnonymizedCustomerMsg: Text): Boolean
-    var
-        OutStr: OutStream;
     begin
         if JsonHelper.GetJText(Order, 'customer.first_name', false) <> 'Anonymous' then
             exit(false);
         if JsonHelper.GetJText(Order, 'customer.last_name', false) <> 'Customer' then
             exit(false);
 
-        ImportEntry."Error Message" := CopyStr(AnonymizedCustomerMsg, 1, MaxStrLen(ImportEntry."Error Message"));
-        ImportEntry."Last Error Message".CreateOutStream(OutStr, TextEncoding::UTF8);
-        OutStr.WriteText(AnonymizedCustomerMsg);
-        ImportEntry.Modify(true);
+        SetImportEntryErrorMsg(ImportEntry, AnonymizedCustomerMsg);
         exit(true);
+    end;
+
+    procedure SetImportEntryErrorMsg(var ImportEntry: Record "NPR Nc Import Entry"; ErrorMsg: Text)
+    var
+        OutStr: OutStream;
+    begin
+        ImportEntry.Get(ImportEntry."Entry No.");
+        ImportEntry."Error Message" := CopyStr(ErrorMsg, 1, MaxStrLen(ImportEntry."Error Message"));
+        ImportEntry."Last Error Message".CreateOutStream(OutStr, TextEncoding::UTF8);
+        OutStr.WriteText(ErrorMsg);
+        ImportEntry.Modify(true);
     end;
 
     procedure OrderExists(ShopifyStoreCode: Code[20]; Order: JsonToken): Boolean
@@ -774,7 +780,8 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         SpfyIntegrationEvents.OnBeforeFindCustomer(Order, Customer, SalesHeader, IsHandled);
         if not IsHandled then
             FindCustomer(NpEcStore, Order, Customer);
-        SalesHeader.Validate("Sell-to Customer No.", Customer."No.");
+        if SalesHeader."Sell-to Customer No." <> Customer."No." then
+            SalesHeader.Validate("Sell-to Customer No.", Customer."No.");
 
         if Order.SelectToken('billing_address', BillingAddress) then begin
             SellToName := JsonHelper.GetJText(BillingAddress, 'first_name', false);
@@ -882,7 +889,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
             if CurrCode <> GLSetup."LCY Code" then
                 Currency.Get(CurrCode)
             else
-                if not Currency.get(CurrCode) then
+                if not Currency.Get(CurrCode) then
                     CurrCode := '';
         end;
         exit(CurrCode);
@@ -892,13 +899,12 @@ codeunit 6184814 "NPR Spfy Order Mgt."
     var
         SalesLine: Record "Sales Line";
     begin
-        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
-        SalesLine.SetRange("Document No.", SalesHeader."No.");
-        if SalesLine.FindFirst() then
+        ApplySalesLineFilter(SalesHeader, SalesLine);
+        if not SalesLine.IsEmpty() then
             SalesLine.DeleteAll(true);
     end;
 
-    procedure InsertSalesLines(ShopifyStoreCode: Code[20]; Order: JsonToken; SalesHeader: Record "Sales Header"; ForPosting: Boolean)
+    procedure UpsertSalesLines(ShopifyStoreCode: Code[20]; Order: JsonToken; SalesHeader: Record "Sales Header"; ForPosting: Boolean)
     var
         TempFulfillmentLineBuffer: Record "NPR Spfy Fulfillment Buffer" temporary;
         TempFulfillmEntryDetailBuffer: Record "NPR Spfy Fulfillm. Buf. Detail" temporary;
@@ -906,15 +912,16 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         OrderLine: JsonToken;
         LastLineNo: Integer;
     begin
+        ClearQtyToShipAndInvoice(SalesHeader, LastLineNo);
         CalculateFulfillments(Order, TempFulfillmentLineBuffer, TempFulfillmEntryDetailBuffer);
         if Order.SelectToken('line_items', OrderLines) and OrderLines.IsArray() then
             foreach OrderLine in OrderLines.AsArray() do
                 if not SkipLine(OrderLine) then
-                    InsertSalesLine(ShopifyStoreCode, OrderLine, TempFulfillmentLineBuffer, TempFulfillmEntryDetailBuffer, SalesHeader, ForPosting, LastLineNo);
+                    UpsertSalesLine(ShopifyStoreCode, OrderLine, TempFulfillmentLineBuffer, TempFulfillmEntryDetailBuffer, SalesHeader, ForPosting, LastLineNo);
 
         if Order.SelectToken('shipping_lines', OrderLines) and OrderLines.IsArray() then
             foreach OrderLine in OrderLines.AsArray() do
-                InsertSalesLineShipmentFee(OrderLine, SalesHeader, LastLineNo);
+                InsertSalesLineShipmentFee(OrderLine, SalesHeader, ForPosting, LastLineNo);
     end;
 
     local procedure CalculateFulfillments(Order: JsonToken; var FulfillmentLineBuffer: Record "NPR Spfy Fulfillment Buffer"; var FulfillmEntryDetailBuffer: Record "NPR Spfy Fulfillm. Buf. Detail")
@@ -981,19 +988,23 @@ codeunit 6184814 "NPR Spfy Order Mgt."
                 end;
     end;
 
-    local procedure InsertSalesLine(ShopifyStoreCode: Code[20]; OrderLine: JsonToken; var FulfillmentLineBuffer: Record "NPR Spfy Fulfillment Buffer"; var FulfillmEntryDetailBuffer: Record "NPR Spfy Fulfillm. Buf. Detail"; SalesHeader: Record "Sales Header"; ForPosting: Boolean; var LastLineNo: Integer)
+    local procedure UpsertSalesLine(ShopifyStoreCode: Code[20]; OrderLine: JsonToken; var FulfillmentLineBuffer: Record "NPR Spfy Fulfillment Buffer"; var FulfillmEntryDetailBuffer: Record "NPR Spfy Fulfillm. Buf. Detail"; SalesHeader: Record "Sales Header"; ForPosting: Boolean; var LastLineNo: Integer)
     var
         ItemVariant: Record "Item Variant";
         NpEcDocument: Record "NPR NpEc Document";
         NpEcStore: Record "NPR NpEc Store";
         SalesLine: Record "Sales Line";
+        xSalesLine: Record "Sales Line";
         VoucherType: Record "NPR NpRv Voucher Type";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
         PropertyDict: Dictionary of [Text, Text];
+        LineDiscountAmount: Decimal;
+        Qty: Decimal;
         UnitPrice: Decimal;
         OrderLineID: Text[30];
         Sku: Text;
+        ExistingLineFound: Boolean;
         Handled: Boolean;
         IsGiftCard: Boolean;
         IsNPGiftCard: Boolean;
@@ -1017,14 +1028,17 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         if NpEcDocument.FindFirst() then
             if NpEcStore.Get(NpEcDocument."Store Code") then;
 
-        LastLineNo += 10000;
-        SalesLine.Init();
-        SalesLine."Document Type" := SalesHeader."Document Type";
-        SalesLine."Document No." := SalesHeader."No.";
-        SalesLine."Line No." := LastLineNo;
-        SalesLine.Insert(true);
-
-        SpfyAssignedIDMgt.AssignShopifyID(SalesLine.RecordId(), "NPR Spfy ID Type"::"Entry ID", OrderLineID, false);
+        ExistingLineFound := FindExistingSalesLine(OrderLineID, SalesLine);
+        if not ExistingLineFound then begin
+            LastLineNo += 10000;
+            SalesLine.Init();
+            SalesLine."Document Type" := SalesHeader."Document Type";
+            SalesLine."Document No." := SalesHeader."No.";
+            SalesLine."Line No." := LastLineNo;
+            SalesLine.Insert(true);
+            SpfyAssignedIDMgt.AssignShopifyID(SalesLine.RecordId(), "NPR Spfy ID Type"::"Entry ID", OrderLineID, false);
+        end;
+        xSalesLine := SalesLine;
 
         FulfillmentLineBuffer.SetRange("Order Line ID", OrderLineID);
         if not FulfillmentLineBuffer.FindFirst() then
@@ -1033,35 +1047,69 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         SpfyIntegrationEvents.OnBeforeFillInSalesLine(OrderLine, FulfillmentLineBuffer."Fulfilled Quantity", ForPosting, ItemVariant, SalesHeader, SalesLine, Handled);
         if not Handled then begin
             if IsGiftCard then begin
-                SalesLine.Validate(Type, SalesLine.Type::"G/L Account");
-                SalesLine.Validate("No.", VoucherType."Account No.");
+                if ExistingLineFound then begin
+                    SalesLine.TestField(Type, SalesLine.Type::"G/L Account");
+                    SalesLine.TestField("No.", VoucherType."Account No.");
+                end else begin
+                    SalesLine.Validate(Type, SalesLine.Type::"G/L Account");
+                    SalesLine.Validate("No.", VoucherType."Account No.");
+                end;
 #pragma warning disable AA0139
                 SalesLine.Description := JsonHelper.GetJText(OrderLine, 'name', MaxStrLen(SalesLine.Description), false);
 #pragma warning restore AA0139
             end else begin
-                SalesLine.Validate(Type, SalesLine.Type::Item);
-                SalesLine.Validate("No.", ItemVariant."Item No.");
-                if ItemVariant.Code <> '' then
-                    SalesLine.Validate("Variant Code", ItemVariant.Code);
+                if ExistingLineFound then begin
+                    SalesLine.TestField(Type, SalesLine.Type::Item);
+                    SalesLine.TestField("No.", ItemVariant."Item No.");
+                    if ItemVariant.Code <> '' then
+                        SalesLine.TestField("Variant Code", ItemVariant.Code);
+                end else begin
+                    SalesLine.Validate(Type, SalesLine.Type::Item);
+                    SalesLine.Validate("No.", ItemVariant."Item No.");
+                    if ItemVariant.Code <> '' then
+                        SalesLine.Validate("Variant Code", ItemVariant.Code);
+                end;
 #pragma warning disable AA0139
                 SalesLine.Description := JsonHelper.GetJText(OrderLine, 'title', MaxStrLen(SalesLine.Description), true);
                 SalesLine."Description 2" := JsonHelper.GetJText(OrderLine, 'variant_title', MaxStrLen(SalesLine."Description 2"), false);
 #pragma warning restore AA0139
             end;
-            SalesLine.Validate(Quantity, JsonHelper.GetJDecimal(OrderLine, 'fulfillable_quantity', true) + FulfillmentLineBuffer."Fulfilled Quantity");
-            if ForPosting then
-                if SalesLine."Qty. to Ship" <> FulfillmentLineBuffer."Fulfilled Quantity" then
-                    SalesLine.Validate("Qty. to Ship", FulfillmentLineBuffer."Fulfilled Quantity");
-            SalesLine.Validate("Unit Price", UnitPrice);
-            if SalesLine."Unit Price" <> 0 then
-                SalesLine.Validate("Line Discount Amount", CalcLineDiscountAmount(OrderLine, SalesLine));
-            if IsGiftCard then begin
+            Qty := JsonHelper.GetJDecimal(OrderLine, 'fulfillable_quantity', true) + FulfillmentLineBuffer."Fulfilled Quantity";
+            if SalesLine.Quantity <> Qty then
+                SalesLine.Validate(Quantity, Qty);
+            case true of
+                IsNPGiftCard and VoucherType."Spfy Auto-Fulfill":
+                    if SalesLine."Qty. to Ship" <> SalesLine."Outstanding Quantity" then
+                        SalesLine.Validate("Qty. to Ship", SalesLine."Outstanding Quantity");
+                ForPosting:
+                    begin
+                        if SalesLine."Qty. to Ship" <> FulfillmentLineBuffer."Fulfilled Quantity" - SalesLine."Quantity Shipped" then
+                            if FulfillmentLineBuffer."Fulfilled Quantity" - SalesLine."Quantity Shipped" <= 0 then
+                                SalesLine.Validate("Qty. to Ship", 0)
+                            else
+                                SalesLine.Validate("Qty. to Ship", FulfillmentLineBuffer."Fulfilled Quantity" - SalesLine."Quantity Shipped");
+                    end;
+                else
+                    SalesLine.Validate("Qty. to Ship", 0);  //Will be reset after posting of auto-fulfillable lines (gift cards)
+            end;
+            if SalesLine."Unit Price" <> UnitPrice then
+                SalesLine.Validate("Unit Price", UnitPrice);
+            if SalesLine."Unit Price" <> 0 then begin
+                LineDiscountAmount := CalcLineDiscountAmount(OrderLine, SalesLine);
+                if SalesLine."Line Discount Amount" <> LineDiscountAmount then
+                    SalesLine.Validate("Line Discount Amount", LineDiscountAmount);
+            end;
+            if IsGiftCard and (not ExistingLineFound or (SalesLine."Outstanding Quantity" <> 0)) then begin
                 SetRetailVoucher(SalesHeader, SalesLine, IsNPGiftCard, VoucherType, PropertyDict, FulfillmentLineBuffer, FulfillmEntryDetailBuffer);
                 FulfillmEntryDetailBuffer.Reset();
             end;
         end;
-        SalesLine.Modify(true);
-        SpfyIntegrationEvents.OnAfterInsertSalesLine(SalesHeader, SalesLine, LastLineNo);
+        if Format(xSalesLine) <> Format(SalesLine) then
+            SalesLine.Modify(true);
+
+        if not ExistingLineFound then
+            SpfyIntegrationEvents.OnAfterInsertSalesLine(SalesHeader, SalesLine, LastLineNo);
+        SpfyIntegrationEvents.OnAfterUpsertSalesLine(SalesHeader, SalesLine, not ExistingLineFound, xSalesLine, LastLineNo);
     end;
 
     local procedure SetRetailVoucher(SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; IsNpGiftCard: Boolean; VoucherType: Record "NPR NpRv Voucher Type"; PropertyDict: Dictionary of [Text, Text]; FulfillmentLineBuffer: Record "NPR Spfy Fulfillment Buffer"; var FulfillmEntryDetailBuffer: Record "NPR Spfy Fulfillm. Buf. Detail")
@@ -1076,6 +1124,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         NpRvSalesLine.SetRange("Document Type", SalesLine."Document Type");
         NpRvSalesLine.SetRange("Document No.", SalesLine."Document No.");
         NpRvSalesLine.SetRange("Document Line No.", SalesLine."Line No.");
+        NpRvSalesLine.SetRange(Posted, false);
         if not NpRvSalesLine.IsEmpty() then
             NpRvSalesLine.DeleteAll(true);
 
@@ -1196,13 +1245,18 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         end;
     end;
 
-    local procedure InsertSalesLineShipmentFee(ShippingLine: JsonToken; SalesHeader: Record "Sales Header"; var LastLineNo: Integer)
+    local procedure InsertSalesLineShipmentFee(ShippingLine: JsonToken; SalesHeader: Record "Sales Header"; ForPosting: Boolean; var LastLineNo: Integer)
     var
         SalesLine: Record "Sales Line";
+        xSalesLine: Record "Sales Line";
         ShipmentMapping: Record "NPR Magento Shipment Mapping";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        SalesLineType: Enum "Sales Line Type";
+        LineDiscountAmount: Decimal;
         ShipmentFee: Decimal;
+        ShippingLineID: Text[30];
         ShipmentFeeTitle: Text;
+        ExistingLineFound: Boolean;
     begin
         ShipmentFee := JsonHelper.GetJDecimal(ShippingLine, 'price', false);
         if ShipmentFee <= 0 then
@@ -1212,38 +1266,61 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         ShipmentMapping.TestField("Shipment Fee No.");
         ShipmentFeeTitle := JsonHelper.GetJText(ShippingLine, 'title', false);
 
-        LastLineNo += 10000;
-        SalesLine.Init();
-        SalesLine."Document Type" := SalesHeader."Document Type";
-        SalesLine."Document No." := SalesHeader."No.";
-        SalesLine."Line No." := LastLineNo;
-        SalesLine.Insert(true);
+        ShippingLineID := GetOrderID(ShippingLine);
 
-        SpfyAssignedIDMgt.AssignShopifyID(SalesLine.RecordId(), "NPR Spfy ID Type"::"Entry ID", GetOrderID(ShippingLine), false);
+        ExistingLineFound := FindExistingSalesLine(ShippingLineID, SalesLine);
+        if not ExistingLineFound then begin
+            LastLineNo += 10000;
+            SalesLine.Init();
+            SalesLine."Document Type" := SalesHeader."Document Type";
+            SalesLine."Document No." := SalesHeader."No.";
+            SalesLine."Line No." := LastLineNo;
+            SalesLine.Insert(true);
+            SpfyAssignedIDMgt.AssignShopifyID(SalesLine.RecordId(), "NPR Spfy ID Type"::"Entry ID", ShippingLineID, false);
+        end;
+        xSalesLine := SalesLine;
 
         case ShipmentMapping."Shipment Fee Type" of
             ShipmentMapping."Shipment Fee Type"::"Charge (Item)":
-                SalesLine.Validate(Type, SalesLine.Type::"Charge (Item)");
+                SalesLineType := SalesLine.Type::"Charge (Item)";
             ShipmentMapping."Shipment Fee Type"::"Fixed Asset":
-                SalesLine.Validate(Type, SalesLine.Type::"Fixed Asset");
+                SalesLineType := SalesLine.Type::"Fixed Asset";
             ShipmentMapping."Shipment Fee Type"::"G/L Account":
-                SalesLine.Validate(Type, SalesLine.Type::"G/L Account");
+                SalesLineType := SalesLine.Type::"G/L Account";
             ShipmentMapping."Shipment Fee Type"::Item:
-                SalesLine.Validate(Type, SalesLine.Type::Item);
+                SalesLineType := SalesLine.Type::Item;
             ShipmentMapping."Shipment Fee Type"::Resource:
-                SalesLine.Validate(Type, SalesLine.Type::Resource);
+                SalesLineType := SalesLine.Type::Resource;
         end;
-        SalesLine.Validate("No.", ShipmentMapping."Shipment Fee No.");
-        SalesLine.Validate(Quantity, 1);
-        SalesLine.Validate("Unit Price", ShipmentFee);
-        SalesLine.validate("Line Discount Amount", CalcLineDiscountAmount(ShippingLine, SalesLine));
+        if ExistingLineFound then begin
+            SalesLine.TestField(Type, SalesLineType);
+            SalesLine.TestField("No.", ShipmentMapping."Shipment Fee No.");
+        end else begin
+            SalesLine.Validate(Type, SalesLineType);
+            SalesLine.Validate("No.", ShipmentMapping."Shipment Fee No.");
+        end;
+
+        if SalesLine.Quantity <> 1 then
+            SalesLine.Validate(Quantity, 1);
+        if ForPosting then
+            SalesLine.Validate("Qty. to Ship", SalesLine."Outstanding Quantity")
+        else
+            SalesLine.Validate("Qty. to Ship", 0);
+        if SalesLine."Unit Price" <> ShipmentFee then
+            SalesLine.Validate("Unit Price", ShipmentFee);
+        LineDiscountAmount := CalcLineDiscountAmount(ShippingLine, SalesLine);
+        if SalesLine."Line Discount Amount" <> LineDiscountAmount then
+            SalesLine.validate("Line Discount Amount", LineDiscountAmount);
         if ShipmentFeeTitle <> '' then begin
             SalesLine.Description := CopyStr(ShipmentFeeTitle, 1, MaxStrLen(SalesLine.Description));
             SalesLine."Description 2" := CopyStr(ShipmentFeeTitle, MaxStrLen(SalesLine.Description) + 1, MaxStrLen(SalesLine."Description 2"));
         end;
-        SalesLine.Modify(true);
+        if Format(xSalesLine) <> Format(SalesLine) then
+            SalesLine.Modify(true);
 
-        SpfyIntegrationEvents.OnAfterInsertSalesLineShipmentFee(SalesHeader, SalesLine, LastLineNo);
+        if not ExistingLineFound then
+            SpfyIntegrationEvents.OnAfterInsertSalesLineShipmentFee(SalesHeader, SalesLine, LastLineNo);
+        SpfyIntegrationEvents.OnAfterUpsertSalesLineShipmentFee(SalesHeader, SalesLine, not ExistingLineFound, xSalesLine, LastLineNo);
     end;
 
     procedure InsertPaymentLines(ShopifyStoreCode: Code[20]; Order: JsonToken; var SalesHeader: Record "Sales Header")
@@ -1341,13 +1418,96 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         exit(Skip);
     end;
 
-    procedure PostOrder(var SalesHeader: Record "Sales Header")
+    procedure PostOrder(var SalesHeader: Record "Sales Header"): Boolean
     var
         SalesPost: Codeunit "Sales-Post";
     begin
+        if not CheckThereAreLinesToPost(SalesHeader) then
+            exit(false);
+        Commit();
+
         SalesHeader.Ship := true;
         SalesHeader.Invoice := true;
         SalesPost.Run(SalesHeader);
+        exit(true);
+    end;
+
+    local procedure ClearQtyToShipAndInvoice(SalesHeader: Record "Sales Header"; var LastLineNo: Integer)
+    var
+        SalesLine: Record "Sales Line";
+    begin
+        LastLineNo := 0;
+        ApplySalesLineFilter(SalesHeader, SalesLine);
+        if SalesLine.IsEmpty() then
+            exit;
+
+        SalesLine.SuspendStatusCheck(true);
+        SalesLine.FindSet(true);
+        repeat
+            SalesLine."Qty. to Ship" := 0;
+            SalesLine."Qty. to Ship (Base)" := 0;
+            SalesLine."Qty. to Invoice" := 0;
+            SalesLine."Qty. to Invoice (Base)" := 0;
+            SalesLine.Modify(true);
+        until SalesLine.Next() = 0;
+        LastLineNo := Round(SalesLine."Line No.", 10000, '<');
+    end;
+
+    internal procedure SetMaxQtyToShipAndInvoice(SalesHeader: Record "Sales Header")
+    var
+        SalesLine: Record "Sales Line";
+        SalesSetup: Record "Sales & Receivables Setup";
+    begin
+        if SalesSetup.Get() then
+            if SalesSetup."Default Quantity to Ship" = SalesSetup."Default Quantity to Ship"::Blank then
+                exit;
+
+        ApplySalesLineFilter(SalesHeader, SalesLine);
+        if SalesLine.IsEmpty() then
+            exit;
+
+        SalesLine.SuspendStatusCheck(true);
+        SalesLine.FindSet(true);
+        repeat
+            SalesLine.Validate("Qty. to Ship", SalesLine."Outstanding Quantity");
+            SalesLine.Modify(true);
+        until SalesLine.Next() = 0;
+        Commit();
+    end;
+
+    local procedure CheckThereAreLinesToPost(SalesHeader: Record "Sales Header"): Boolean
+    var
+        SalesLine: Record "Sales Line";
+    begin
+        ApplySalesLineFilter(SalesHeader, SalesLine);
+        SalesLine.FilterGroup(-1);
+        SalesLine.SetFilter("Qty. to Ship", '<>%1', 0);
+        SalesLine.SetFilter("Qty. to Invoice", '<>%1', 0);
+        SalesLine.FilterGroup(0);
+        exit(not SalesLine.IsEmpty());
+    end;
+
+    local procedure ApplySalesLineFilter(SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line")
+    begin
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+    end;
+
+    local procedure FindExistingSalesLine(OrderLineID: Text[30]; var SalesLine: Record "Sales Line"): Boolean
+    var
+        ShopifyAssignedID: Record "NPR Spfy Assigned ID";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        ExistingLineFound: Boolean;
+    begin
+        SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"Sales Line", "NPR Spfy ID Type"::"Entry ID", OrderLineID, ShopifyAssignedID);
+        if ShopifyAssignedID.Find('+') then
+            repeat
+                ExistingLineFound := SalesLine.Get(ShopifyAssignedID."BC Record ID");
+                if not ExistingLineFound then
+                    ShopifyAssignedID.Delete(true);
+            until ExistingLineFound or (ShopifyAssignedID.Next(-1) = 0);
+
+        exit(ExistingLineFound);
     end;
 
     procedure LockTables()
@@ -1357,6 +1517,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         SalesLine: Record "Sales Line";
         ShopifyAssignedID: Record "NPR Spfy Assigned ID";
     begin
+        //TODO: refactor this
         //Always perform table locking in the same order to prevent deadlocks
         ShopifyAssignedID.LockTable();
         NpEcDocument.LockTable();

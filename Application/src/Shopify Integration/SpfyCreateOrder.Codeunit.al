@@ -29,9 +29,13 @@ codeunit 6184808 "NPR Spfy Create Order" implements "NPR Nc Import List IProcess
 
         OrderMgt.LockTables();
         OrderMgt.InsertSalesHeader(ShopifyStoreCode, Order, SalesHeader);
-        OrderMgt.InsertSalesLines(ShopifyStoreCode, Order, SalesHeader, false);
+        OrderMgt.UpsertSalesLines(ShopifyStoreCode, Order, SalesHeader, false);
         OrderMgt.InsertPaymentLines(ShopifyStoreCode, Order, SalesHeader);
-        ReleaseOrder(SalesHeader);
+
+        if not OrderMgt.PostOrder(SalesHeader) then begin
+            OrderMgt.SetMaxQtyToShipAndInvoice(SalesHeader);
+            ReleaseOrder(SalesHeader);
+        end;
     end;
 
     local procedure ReleaseOrder(var SalesHeader: Record "Sales Header")
@@ -39,6 +43,8 @@ codeunit 6184808 "NPR Spfy Create Order" implements "NPR Nc Import List IProcess
         NpEcDocument: Record "NPR NpEc Document";
         NpEcStore: Record "NPR NpEc Store";
     begin
+        if not SalesHeader.Find() then
+            exit;  //Wasn't created or has already been posted (deleted)
         Clear(NpEcStore);
         NpEcDocument.SetCurrentKey("Document Type", "Document No.");
         NpEcDocument.SetRange("Document Type", NpEcDocument."Document Type"::"Sales Order");
