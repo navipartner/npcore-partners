@@ -1,6 +1,7 @@
 function SendInputDataAndLabelV2(input, showControl, approveLbl, redoLbl, phoneLbl, noInputLbl)
 {
     try{
+        debugger;
         let showPhone = input.PhoneNumber != null && input.PhoneNumber != undefined;;
         let showSign = input.Signature != null && input.Signature != undefined &&  input.Signature !== "[]";
         let showBtns = showControl;
@@ -23,38 +24,54 @@ function SendInputDataAndLabelV2(input, showControl, approveLbl, redoLbl, phoneL
         console.error(e);
     }
 }
-function GetSignatureWidthAndHeight(points)
-{
+function GetSignatureWidthAndHeight(points) {
     let topMost = null;
     let leftMost = null;
     let rightMost = null;
     let botMost = null;
-    for(let i = 0; i< points.length; i++)
-    {
-        for(let j = 0; j < points[i].length; j++)
-        {
-            let point = points[i][j];
-            if (topMost === null || topMost.y > point.y)
-            {
+    
+    // Check if points is a flat array or already properly nested
+    let processedPoints = points;
+    
+    // If this is a flat array of points (not a 2D array), convert it to the expected format
+    if (points.length > 0 && !Array.isArray(points[0])) {
+        // Create a single stroke containing all points
+        processedPoints = [points];
+    }
+    
+    // Now process using the nested structure
+    for (let i = 0; i < processedPoints.length; i++) {
+        for (let j = 0; j < processedPoints[i].length; j++) {
+            let point = processedPoints[i][j];
+            
+            // Skip terminator point if present
+            if (point.x === "FFFF" && point.y === "FFFF") {
+                continue;
+            }
+            
+            if (topMost === null || topMost.y > point.y) {
                 topMost = point;
             }
-            if (leftMost === null || leftMost.x > point.x)
-            {
+            if (leftMost === null || leftMost.x > point.x) {
                 leftMost = point;
             }
-            if (rightMost === null || rightMost.x < point.x)
-            {
+            if (rightMost === null || rightMost.x < point.x) {
                 rightMost = point;
             }
-            if (botMost === null || botMost.y < point.y)
-            {
+            if (botMost === null || botMost.y < point.y) {
                 botMost = point;
             }
         }
     }
+    
+    // Check if we have valid points
+    if (topMost === null || leftMost === null || rightMost === null || botMost === null) {
+        return { startPoint: { x: 0, y: 0 }, width: 0, height: 0 };
+    }
+    
     let w = rightMost.x - leftMost.x;
     let h = botMost.y - topMost.y;
-    return {startPoint: {x: leftMost.x, y: topMost.y}, width: w, height: h};
+    return { startPoint: { x: leftMost.x, y: topMost.y }, width: w, height: h };
 }
 function GetScale(actualHeight, actualWidth, signHeight, signWidth)
 {
@@ -74,37 +91,72 @@ function GetScale(actualHeight, actualWidth, signHeight, signWidth)
  */
 function DrawCanvas(canvas, points)
 {
-    let ctx = canvas.getContext('2d');
-    let prev = null;
-    let penSize = 2;
-    let actualWidth = canvas.getBoundingClientRect().width - 10;
-    let actualHeight = canvas.getBoundingClientRect().height - 10;
-    let pointBox = GetSignatureWidthAndHeight(points);
-    let scale = GetScale(actualHeight, actualWidth, pointBox.height, pointBox.width);
-    ctx.scale(scale, scale);
-    ctx.translate(-(pointBox.startPoint.x -5), -(pointBox.startPoint.y -5));
-    for(let i = 0; i < points.length; i++)
-    {
-        prev = null;
-        for(let j = 0; j < points[i].length; j++)
-        {
-            let point = points[i][j];
-            ctx.beginPath();
-            ctx.arc(point.x, point.y, penSize, 0, 2 * Math.PI, false);
-            ctx.fill();
-            ctx.closePath();
-            if (prev !== null)
-            {
-                ctx.beginPath();
-                ctx.lineWidth = penSize*2;
-                ctx.moveTo(prev.x, prev.y);
-                ctx.lineTo(point.x, point.y);
-                ctx.stroke();
-                ctx.closePath();
-            }
-            prev = point;
+    const transformedSignature = points.map((point) => {
+        if (point.x !== undefined && point.y !== undefined) {
+          return {
+            X: point.x,
+            Y: point.y,
+          };
         }
-    }
+        return point;
+      });
+ 
+      if (canvas.getContext) {
+        const ctx = canvas.getContext("2d");
+        ctx.lineWidth = 3;
+ 
+        if (transformedSignature.length > 1) {
+          let maxX = -Infinity,
+            maxY = -Infinity,
+            minX = Infinity,
+            minY = Infinity;
+ 
+          for (const point of transformedSignature) {
+            const x = parseInt(point.X, 16);
+            const y = parseInt(point.Y, 16);
+            if (x !== 65535 && y !== 65535) {
+              minX = Math.min(minX, x);
+              maxX = Math.max(maxX, x);
+              minY = Math.min(minY, y);
+              maxY = Math.max(maxY, y);
+            }
+          }
+ 
+          const canvasWidth = canvas.width;
+          const canvasHeight = canvas.height;
+ 
+          const scaleX = canvasWidth / (maxX - minX);
+          const scaleY = canvasHeight / (maxY - minY);
+          const scale = Math.min(scaleX, scaleY) * 0.9;
+ 
+          const offsetX = (canvasWidth - (maxX - minX) * scale) / 2;
+          const offsetY = (canvasHeight - (maxY - minY) * scale) / 2;
+ 
+          ctx.beginPath();
+          let firstDot = null;
+ 
+          for (const point of transformedSignature) {
+            const x = parseInt(point.X, 16);
+            const y = parseInt(point.Y, 16);
+ 
+            if (x !== 65535 && y !== 65535) {
+              const scaledX = (x - minX) * scale + offsetX;
+              const scaledY = (y - minY) * scale + offsetY;
+ 
+              // eslint-disable-next-line max-depth
+              if (!firstDot) {
+                ctx.moveTo(scaledX, scaledY);
+                firstDot = true;
+              } else {
+                ctx.lineTo(scaledX, scaledY);
+              }
+            } else {
+              firstDot = null;
+            }
+          }
+          ctx.stroke();
+        }
+      }
 }
 
 function init(phonebox, signaturebox, btns, approveLbl, redoLbl, phoneLbl, noInputLbl)
