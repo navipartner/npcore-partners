@@ -78,13 +78,30 @@ page 6150774 "NPR POS Costumer Input"
             group(InputHtml)
             {
                 Caption = 'Signature';
+                Visible = not ShowReturnDataCollectionAddin;
                 usercontrol("HtmlInput"; "NPR HTML Display Input")
                 {
                     ApplicationArea = NPRRetail;
 
                     trigger Ready()
                     begin
-                        FillAddIn();
+                        if not ShowReturnDataCollectionAddin then
+                            FillAddIn();
+                    end;
+                }
+            }
+            group(ReturnInformation)
+            {
+                Caption = 'Signature';
+                Visible = ShowReturnDataCollectionAddin;
+                usercontrol("POS Customer Input Display"; "NPR POS Customer Input Display")
+                {
+                    ApplicationArea = NPRRetail;
+
+                    trigger Ready()
+                    begin
+                        if ShowReturnDataCollectionAddin then
+                            FillAddIn();
                     end;
                 }
             }
@@ -92,6 +109,12 @@ page 6150774 "NPR POS Costumer Input"
     }
     trigger OnAfterGetCurrRecord()
     begin
+        case Rec.Context of
+            Rec.Context::MONEY_BACK:
+                ShowReturnDataCollectionAddin := false;
+            Rec.Context::RETURN_INFORMATION:
+                ShowReturnDataCollectionAddin := true;
+        end;
         Rec.CalcFields(Rec.Signature);
         FillAddIn();
     end;
@@ -111,7 +134,13 @@ page 6150774 "NPR POS Costumer Input"
                 SignatureTxt := SignatureTxt + tmp;
             until SignStream.EOS();
             InputObj.Add('Signature', SignatureTxt);
-            CurrPage.HtmlInput.SendInputDataAndLabelV2(InputObj, False, '', '', '', '');
+            if ShowReturnDataCollectionAddin then
+                CurrPage."POS Customer Input Display".SendInputDataAndLabelV2(InputObj, False, '', '', '', '')
+            else
+                CurrPage."HtmlInput".SendInputDataAndLabelV2(InputObj, False, '', '', '', '')
         end
     end;
+
+    var
+        ShowReturnDataCollectionAddin: Boolean;
 }
