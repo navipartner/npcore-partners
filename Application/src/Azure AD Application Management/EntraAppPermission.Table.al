@@ -42,4 +42,20 @@ table 6150915 "NPR Entra App Permission"
             Clustered = true;
         }
     }
+
+    trigger OnInsert()
+    begin
+        ValidatePermissionSet();
+    end;
+
+    trigger OnModify()
+    begin
+        ValidatePermissionSet();
+    end;
+
+    local procedure ValidatePermissionSet()
+    begin
+        if Rec."Permission Set ID" = 'NPR NP RETAIL' then
+            FieldError(Rec."Permission Set ID");
+    end;
 }
