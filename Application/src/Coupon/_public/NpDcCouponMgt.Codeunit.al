@@ -751,6 +751,7 @@
 
         SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Comment;
         SaleLinePOS.Description := Coupon.Description;
+        OnAfterSetCouponDescrition(SaleLinePOS, Coupon);
         SaleLinePOS.Quantity := 1;
         SaleLineOut.InsertLine(SaleLinePOS);
 
@@ -1009,4 +1010,11 @@
     end;
 
     #endregion Print
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterSetCouponDescrition(var SaleLinePOS: Record "NPR POS Sale Line"; Coupon: Record "NPR NpDc Coupon")
+    begin
+    end;
+
+
 }
