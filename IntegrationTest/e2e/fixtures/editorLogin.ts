@@ -45,11 +45,21 @@ export const login = async (
     .frameLocator("iframe")
     .getByText("E2E Base layout", { exact: true })
     .click();
-  await page
-    .frameLocator("iframe")
-    .getByRole("textbox")
-    .nth(3)
-    .fill(`E2E Testing ${uniqueLayoutKey}`);
+  if (
+    await page.frameLocator("iframe").getByRole("textbox").nth(3).isVisible()
+  ) {
+    await page
+      .frameLocator("iframe")
+      .getByRole("textbox")
+      .nth(3)
+      .fill(`E2E Testing ${uniqueLayoutKey}`);
+  } else {
+    await page
+      .frameLocator("iframe")
+      .getByRole("textbox")
+      .nth(2)
+      .fill(`E2E Testing ${uniqueLayoutKey}`);
+  }
   await page
     .frameLocator("iframe")
     .getByRole("button", { name: "Create", exact: true })

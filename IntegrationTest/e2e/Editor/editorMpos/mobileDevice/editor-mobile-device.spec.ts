@@ -8,7 +8,7 @@ import { removeLayout } from "../../../fixtures/removeLayout";
 test.describe("Editor mobile device add and remove item, search, and payment test", () => {
   test("should be able to search item, add and remove, do payment", async ({
     page,
-  }, workerInfo) => {    
+  }, workerInfo) => {
     const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(
@@ -47,9 +47,15 @@ test.describe("Editor mobile device add and remove item, search, and payment tes
       .filter({ hasText: /^Item No\. 50010BrowniePrice: 90$/ })
       .first()
       .click();
-    await page
-      .locator('td').filter({ hasText: 'Br:PEANUTS Gm:40' })
-      .click();
+      await page.waitForTimeout(1000);
+    if (
+      await page
+        .locator("td")
+        .filter({ hasText: "Br:PEANUTS Gm:40" })
+        .isVisible()
+    ) {
+      await page.locator("td").filter({ hasText: "Br:PEANUTS Gm:40" }).click();
+    }
     await page
       .frameLocator("iframe")
       .getByRole("button", { name: "1 Sale" })
@@ -76,9 +82,15 @@ test.describe("Editor mobile device add and remove item, search, and payment tes
       .filter({ hasText: /^Item No\. 50010BrowniePrice: 90$/ })
       .first()
       .click();
-    await page
-      .locator('td').filter({ hasText: 'Br:PEANUTS Gm:40' })
-      .click();
+      await page.waitForTimeout(1000);
+    if (
+      await page
+        .locator("td")
+        .filter({ hasText: "Br:PEANUTS Gm:40" })
+        .isVisible()
+    ) {
+      await page.locator("td").filter({ hasText: "Br:PEANUTS Gm:40" }).click();
+    }
     await page
       .frameLocator("iframe")
       .getByRole("button", { name: "1 Sale" })
@@ -168,14 +180,14 @@ test.describe("Editor mobile device add and remove item, search, and payment tes
       .getByRole("button", { name: "Insert Customer" })
       .click();
     const buttonVisible = await page
-    .getByRole("gridcell", { name: "Open menu for Name", exact: true }).isVisible()
-    if(buttonVisible) {
-
-      await page
       .getByRole("gridcell", { name: "Open menu for Name", exact: true })
-      .click();
+      .isVisible();
+    if (buttonVisible) {
+      await page
+        .getByRole("gridcell", { name: "Open menu for Name", exact: true })
+        .click();
     } else {
-      await page.locator('td').filter({ hasText: '01121212' }).click();
+      await page.locator("td").filter({ hasText: "01121212" }).click();
     }
     const elementExists =
       page

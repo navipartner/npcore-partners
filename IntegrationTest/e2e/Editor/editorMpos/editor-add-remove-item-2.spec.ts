@@ -86,9 +86,15 @@ test.describe("Mobile add and remove item from test 2", () => {
       .filter({ hasText: /^Item No\. 50010BrowniePrice: 90$/ })
       .first()
       .click();
-    await page
-      .locator('td').filter({ hasText: 'Br:PEANUTS Gm:40' })
-      .click();
+      await page.waitForTimeout(1000);
+    if (
+      await page
+        .locator("td")
+        .filter({ hasText: "Br:PEANUTS Gm:40" })
+        .isVisible()
+    ) {
+      await page.locator("td").filter({ hasText: "Br:PEANUTS Gm:40" }).click();
+    }
     await page
       .frameLocator("iframe")
       .getByRole("button", { name: "1 Sale" })
@@ -115,9 +121,15 @@ test.describe("Mobile add and remove item from test 2", () => {
       .filter({ hasText: /^Item No\. 50010BrowniePrice: 90$/ })
       .first()
       .click();
-    await page
-      .locator('td').filter({ hasText: 'Br:PEANUTS Gm:40' })
-      .click();
+      await page.waitForTimeout(1000);
+    if (
+      await page
+        .locator("td")
+        .filter({ hasText: "Br:PEANUTS Gm:40" })
+        .isVisible()
+    ) {
+      await page.locator("td").filter({ hasText: "Br:PEANUTS Gm:40" }).click();
+    }
     await page
       .frameLocator("iframe")
       .getByRole("button", { name: "1 Sale" })

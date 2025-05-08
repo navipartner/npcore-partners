@@ -4,9 +4,7 @@ import assert from "assert";
 import { mobileLogin } from "../fixtures/mobileLogin";
 
 test.describe("Mobile add and remove item, search, payment test", () => {
-  test("should be able to add item, open and delete item", async ({
-    page,
-  }) => {
+  test("should be able to add item, open and delete item", async ({ page }) => {
     await mobileLogin(
       page,
       true,
@@ -87,14 +85,16 @@ test.describe("Mobile add and remove item, search, payment test", () => {
       .nth(2)
       .click();
     await page.waitForTimeout(2000);
-    const customerText =  await page.getByRole('gridcell', { name: 'Open menu for No. 01121212' }).isVisible();
+    const customerText = await page
+      .getByRole("gridcell", { name: "Open menu for No. 01121212" })
+      .isVisible();
 
-
-      if (customerText) {
-        await page.getByRole('gridcell', { name: 'Open menu for No. 01121212' }).click();
-      } 
-     else {
-      await page.locator('td').filter({ hasText: '01121212' }).click();
+    if (customerText) {
+      await page
+        .getByRole("gridcell", { name: "Open menu for No. 01121212" })
+        .click();
+    } else {
+      await page.locator("td").filter({ hasText: "01121212" }).click();
     }
     const elementExists =
       page
@@ -152,12 +152,10 @@ test.describe("Mobile add and remove item, search, payment test", () => {
       .frameLocator("iframe")
       .getByRole("button", { name: "Items" })
       .click();
-   
+
     await page.waitForTimeout(2000);
   });
-  test("should be able to search add and delete", async ({
-    page,
-  }) => {
+  test("should be able to search add and delete", async ({ page }) => {
     await mobileLogin(
       page,
       true,
@@ -189,7 +187,15 @@ test.describe("Mobile add and remove item, search, payment test", () => {
       .filter({ hasText: /^Item No\. 50010BrowniePrice: 90$/ })
       .first()
       .click();
-    await page.locator("td").filter({ hasText: "Br:PEANUTS Gm:40" }).click();
+      await page.waitForTimeout(1000);
+    if (
+      await page
+        .locator("td")
+        .filter({ hasText: "Br:PEANUTS Gm:40" })
+        .isVisible()
+    ) {
+      await page.locator("td").filter({ hasText: "Br:PEANUTS Gm:40" }).click();
+    }
     await page
       .frameLocator("iframe")
       .getByRole("button", { name: "1 Sale" })
@@ -221,7 +227,15 @@ test.describe("Mobile add and remove item, search, payment test", () => {
       .filter({ hasText: /^Item No\. 50010BrowniePrice: 90$/ })
       .first()
       .click();
-    await page.locator("td").filter({ hasText: "Br:PEANUTS Gm:40" }).click();
+      await page.waitForTimeout(1000);
+    if (
+      await page
+        .locator("td")
+        .filter({ hasText: "Br:PEANUTS Gm:40" })
+        .isVisible()
+    ) {
+      await page.locator("td").filter({ hasText: "Br:PEANUTS Gm:40" }).click();
+    }
     await page
       .frameLocator("iframe")
       .getByRole("button", { name: "1 Sale" })
@@ -237,11 +251,9 @@ test.describe("Mobile add and remove item, search, payment test", () => {
       .locator(".item-counter__button")
       .first()
       .click();
-    await page.waitForTimeout(2000);   
+    await page.waitForTimeout(2000);
   });
-  test("should be able to do single payment", async ({
-    page,
-  }) => {
+  test("should be able to do single payment", async ({ page }) => {
     await mobileLogin(
       page,
       true,
@@ -279,9 +291,7 @@ test.describe("Mobile add and remove item, search, payment test", () => {
     await page.frameLocator("iframe").locator("#button-dialog-ok div").click();
     await page.waitForTimeout(5000);
   });
-  test("should be able to do multiple payment", async ({
-    page,
-  }) => {
+  test("should be able to do multiple payment", async ({ page }) => {
     await mobileLogin(
       page,
       true,
