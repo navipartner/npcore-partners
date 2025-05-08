@@ -1141,7 +1141,8 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         xDoNotTrackInventory := SpfyItemMgt.DoNotTrackInventory(SpfyStoreItemVariantLink);
 
         SpfyItemMgt.SetAllowBackorder(SpfyStoreItemVariantLink, _JsonHelper.GetJText(ShopifyVariant, 'inventory_policy', false).ToLower() = 'continue', true);
-        SpfyItemMgt.SetDoNotTrackInventory(SpfyStoreItemVariantLink, _JsonHelper.GetJText(ShopifyVariant, 'inventory_management', false).ToLower() <> 'shopify', true);
+        if _JsonHelper.TokenExists(ShopifyVariant, 'inventory_management') then
+            SpfyItemMgt.SetDoNotTrackInventory(SpfyStoreItemVariantLink, _JsonHelper.GetJText(ShopifyVariant, 'inventory_management', false).ToLower() <> 'shopify', true);
 #pragma warning disable AA0139
         ShopifyVariantID := _JsonHelper.GetJText(ShopifyVariant, 'id', MaxStrLen(ShopifyVariantID), true);
         ShopifyInventoryItemID := _JsonHelper.GetJText(ShopifyVariant, 'inventory_item_id', MaxStrLen(ShopifyVariantID), true);

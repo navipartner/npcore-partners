@@ -214,6 +214,13 @@ codeunit 6059994 "NPR Json Helper"
         exit(Token.SelectToken(TokenKey, TokenOut));
     end;
 
+    procedure TokenExists(Token: JsonToken; TokenKey: Text): Boolean
+    var
+        TokenOut: JsonToken;
+    begin
+        exit(Token.SelectToken(TokenKey, TokenOut));
+    end;
+
     local procedure RequiredValueMissingError(Token: JsonToken; Path: Text)
     var
         ValueMissingErr: Label 'Required value missing: %1';
