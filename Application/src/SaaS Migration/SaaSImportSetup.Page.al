@@ -20,6 +20,11 @@ page 6150805 "NPR SaaS Import Setup"
                     ToolTip = 'Disable built-in database subscribers for baseapp modules like graph mgt. change log';
                     ApplicationArea = NPRRetail;
                 }
+                field("Disable Kill Session"; Rec."Disable StopSession")
+                {
+                    ToolTip = 'Specifies the value of the Disable StopSession on Prepare Import field.';
+                    ApplicationArea = NPRRetail;
+                }
             }
             group(Debug)
             {

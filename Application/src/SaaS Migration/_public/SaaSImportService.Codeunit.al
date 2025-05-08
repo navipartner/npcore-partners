@@ -77,11 +77,13 @@ codeunit 6150926 "NPR SaaS Import Service"
         SaaSImportTask.DeleteAll();
         SaaSImportChunk.DeleteAll();
 
-        ActiveSession.SetFilter("Session ID", '<>%1', SessionId());
-        if ActiveSession.FindSet() then
-            repeat
-                StopSession(ActiveSession."Session ID");
-            until ActiveSession.Next() = 0;
+        if not SaaSImportSetup."Disable StopSession" then begin
+            ActiveSession.SetFilter("Session ID", '<>%1', SessionId());
+            if ActiveSession.FindSet() then
+                repeat
+                    StopSession(ActiveSession."Session ID");
+                until ActiveSession.Next() = 0;
+        end;
     end;
 
     procedure GetImportStatus(): Text

@@ -28,6 +28,11 @@ table 6059844 "NPR SaaS Import Setup"
         {
             DataClassification = CustomerContent;
         }
+        field(6; "Disable StopSession"; Boolean)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Disable StopSession on Prepare Import', Locked = true;
+        }
     }
 
 }
