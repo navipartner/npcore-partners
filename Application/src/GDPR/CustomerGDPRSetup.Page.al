@@ -125,14 +125,14 @@
                             CLE.Reset();
                             CLE.SetCurrentKey("Customer No.", "Posting Date", "Currency Code");
                             CLE.SetRange("Customer No.", Customer."No.");
-                            NoTrans := CLE.FindFirst();
+                            NoTrans := not CLE.FindFirst();
 
                             if (NoTrans) then begin
                                 ILE.Reset();
                                 ILE.SetCurrentKey("Source Type", "Source No.", "Item No.", "Variant Code", "Posting Date");
                                 ILE.SetRange(ILE."Source Type", ILE."Source Type"::Customer);
                                 ILE.SetRange(ILE."Source No.", Customer."No.");
-                                NoTrans := ILE.FindFirst();
+                                NoTrans := not ILE.FindFirst();
                             end;
 
                             if (NoTrans) then begin
