@@ -16,6 +16,8 @@ codeunit 6248416 "NPR UserAccountAPI" implements "NPR API Request Handler"
                 exit(FindAccount(Request));
             Request.Match('GET', '/account/:accountId'):
                 exit(GetAccountById(Request));
+            Request.Match('PATCH', '/account/:accountId'):
+                exit(UpdateAccount(Request));
             Request.Match('POST', '/account'):
                 exit(CreateAccount(Request));
         end;
@@ -81,37 +83,106 @@ codeunit 6248416 "NPR UserAccountAPI" implements "NPR API Request Handler"
         UserAccountMgt: Codeunit "NPR UserAccountMgtImpl";
         UserAccount: Record "NPR UserAccount";
         RequestJson: JsonToken;
-        JHelper: Codeunit "NPR Json Helper";
         Json: Codeunit "NPR Json Builder";
-        MailManagement: Codeunit "Mail Management";
-        PhoneNo, EmailAddress : Text;
     begin
         Request.SkipCacheIfNonStickyRequest(GetTableIds());
 
         RequestJson := Request.BodyJson();
 
-        PhoneNo := JHelper.GetJText(RequestJson, 'phoneNumber', false).Trim();
-        if (PhoneNo <> '') then
-            // phone number can only contain a plus and numbers
-            if (DelChr(PhoneNo, '=', '+1234567890') <> '') then
-                exit(Response.RespondBadRequest('Unsupported characters in phoneNumber.'));
-
-        EmailAddress := JHelper.GetJText(RequestJson, 'emailAddress', true).Trim().ToLower();
-        if (EmailAddress <> '') then
-            if (not MailManagement.CheckValidEmailAddress(EmailAddress)) then
-                exit(Response.RespondBadRequest('E-mail Address provided is not valid.'));
-
         UserAccount.Init();
-        UserAccount.Validate(FirstName, JHelper.GetJText(RequestJson, 'firstName', false));
-        UserAccount.Validate(LastName, JHelper.GetJText(RequestJson, 'lastName', false));
-#pragma warning disable AA0139
-        UserAccount.PhoneNo := PhoneNo;
-        UserAccount.EmailAddress := EmailAddress;
-#pragma warning restore AA0139
+        if (not ParseUserAccountFromJson(UserAccount, RequestJson)) then
+            exit(Response.RespondBadRequest(GetLastErrorText()));
+
+        if (UserAccount.EmailAddress = '') then
+            exit(Response.RespondBadRequest('Missing required parameter: emailAddress'));
 
         UserAccountMgt.CreateAccount(UserAccount);
 
         exit(Response.RespondCreated(UserAccountDTO(UserAccount, Json)));
+    end;
+
+    local procedure UpdateAccount(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        UserAccount: Record "NPR UserAccount";
+        TempUserAccount: Record "NPR UserAccount" temporary;
+        UserAccountMgt: Codeunit "NPR UserAccountMgtImpl";
+        RequestJson: JsonToken;
+        AccountIdTxt: Text;
+        AccountId: Guid;
+        IsModified: Boolean;
+        Json: Codeunit "NPR Json Builder";
+    begin
+        Request.SkipCacheIfNonStickyRequest(GetTableIds());
+
+        if (not Request.Paths().Get(2, AccountIdTxt)) then
+            exit(Response.RespondBadRequest('Missing required parameter: accountId'));
+        if (not Evaluate(AccountId, AccountIdTxt)) then
+            exit(Response.RespondBadRequest('Malformed parameter: accountId'));
+
+        UserAccountSetLoadFields(UserAccount);
+        UserAccount.ReadIsolation := IsolationLevel::UpdLock;
+        if (not UserAccount.GetBySystemId(AccountId)) then
+            exit(Response.RespondResourceNotFound());
+
+        TempUserAccount := UserAccount;
+
+        RequestJson := Request.BodyJson();
+
+        if (not ParseUserAccountFromJson(TempUserAccount, RequestJson)) then
+            exit(Response.RespondBadRequest(GetLastErrorText()));
+
+        IsModified := UserAccountMgt.UpdateAccount(UserAccount, TempUserAccount);
+
+        if (IsModified) then
+            UserAccount.Modify(true);
+
+        exit(Response.RespondOK(UserAccountDTO(UserAccount, Json)));
+    end;
+
+    [TryFunction]
+    local procedure ParseUserAccountFromJson(var UserAccount: Record "NPR UserAccount"; RequestJson: JsonToken)
+    var
+        JHelper: Codeunit "NPR Json Helper";
+        PhoneNo, EmailAddress, FirstName, LastName : Text;
+        TypeHelper: Codeunit "Type Helper";
+        MailManagement: Codeunit "Mail Management";
+        TempToken: JsonToken;
+    begin
+        if (RequestJson.IsValue()) then
+            if (RequestJson.AsValue().IsNull()) then
+                Error('Malformed json received as request.');
+
+        if (JHelper.GetJsonToken(RequestJson, 'phoneNumber', TempToken)) then begin
+            PhoneNo := TempToken.AsValue().AsText().Trim();
+            if (PhoneNo <> '') then
+                if (not TypeHelper.IsPhoneNumber(PhoneNo)) then
+                    Error('Unsupported characters in phoneNumber.');
+
+#pragma warning disable AA0139
+            UserAccount.PhoneNo := PhoneNo;
+#pragma warning restore AA0139
+        end;
+
+        if (JHelper.GetJsonToken(RequestJson, 'emailAddress', TempToken)) then begin
+            EmailAddress := TempToken.AsValue().AsText().Trim().ToLower();
+            if (EmailAddress <> '') then
+                if (not MailManagement.CheckValidEmailAddress(EmailAddress)) then
+                    Error('E-mail Address provided is not valid.');
+
+#pragma warning disable AA0139
+            UserAccount.EmailAddress := EmailAddress;
+#pragma warning restore AA0139
+        end;
+
+        if (JHelper.GetJsonToken(RequestJson, 'firstName', TempToken)) then begin
+            FirstName := TempToken.AsValue().AsText().Trim();
+            UserAccount.Validate(FirstName, FirstName);
+        end;
+
+        if (JHelper.GetJsonToken(RequestJson, 'lastName', TempToken)) then begin
+            LastName := TempToken.AsValue().AsText().Trim();
+            UserAccount.Validate(LastName, LastName);
+        end;
     end;
 
     local procedure UserAccountDTO(UserAccount: Record "NPR UserAccount"; var Json: Codeunit "NPR Json Builder"): Codeunit "NPR Json Builder"

@@ -92,6 +92,7 @@ navigation:
                   - endpoint: account.service-account.findAccounts
                   - endpoint: account.service-account.getAccount
                   - endpoint: account.service-account.createAccount
+                  - endpoint: account.service-account.updateAccount
             - account.service-account-payment-method:
                 title: Payment Methods
                 contents:

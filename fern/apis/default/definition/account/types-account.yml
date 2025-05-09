@@ -27,6 +27,14 @@ types:
           displayName: "Jane Doe"
           phoneNumber: "12345678"
           emailAddress: "jane@example.com"
+      - name: ExampleUserAccountJohn
+        value:
+          id: e2cfea9f-385e-4d83-8b50-42256885b03a
+          firstName: "John"
+          lastName: "Doe"
+          displayName: "John Doe"
+          phoneNumber: "87654321"
+          emailAddress: "john@example.com"
 
   CreateUserAccount:
     docs:
@@ -43,3 +51,19 @@ types:
           lastName: "Doe"
           phoneNumber: "12345678"
           emailAddress: "jane@example.com"
+
+  UpdateUserAccount:
+    docs:
+      Defines the request used to update an existing user account.
+    properties:
+      firstName: optional<string>
+      lastName: optional<string>
+      phoneNumber: optional<string>
+      emailAddress: optional<string>
+    examples:
+      - name: ExampleUpdateAccountFullInfo
+        value:
+          firstName: "John"
+          lastName: "Doe"
+          phoneNumber: "87654321"
+          emailAddress: "john@example.com"

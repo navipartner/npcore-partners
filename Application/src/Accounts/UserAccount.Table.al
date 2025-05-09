@@ -64,6 +64,9 @@ table 6151165 "NPR UserAccount"
 
     local procedure UpdateDisplayName()
     begin
-        Rec.DisplayName := Rec.FirstName + ' ' + Rec.LastName;
+        Rec.DisplayName := Rec.FirstName;
+        if (Rec.FirstName <> '') and (Rec.LastName <> '') then
+            Rec.DisplayName += ' ';
+        Rec.DisplayName += Rec.LastName;
     end;
 }

@@ -3,18 +3,40 @@ codeunit 6248404 "NPR UserAccountMgtImpl"
     Access = Internal;
 
     internal procedure CreateAccount(var UserAccount: Record "NPR UserAccount") AccountId: Guid
-    var
-        Setup: Record "NPR UserAccountSetup";
     begin
-        if (not Setup.Get()) then
-            Setup.Init();
-
-        CheckUniqueness(Setup, UserAccount);
+        CheckUniqueness(UserAccount);
 
         UserAccount.SystemId := CreateGuid();
         UserAccount.Insert(true, false);
 
         AccountId := UserAccount.SystemId;
+    end;
+
+    internal procedure UpdateAccount(var AccountToUpdate: Record "NPR UserAccount"; TempUserAccount: Record "NPR UserAccount" temporary) IsModified: Boolean
+    begin
+        TempUserAccount.TestField(SystemId, AccountToUpdate.SystemId);
+
+        CheckUniqueness(TempUserAccount);
+
+        if (AccountToUpdate.FirstName <> TempUserAccount.FirstName) then begin
+            AccountToUpdate.Validate(FirstName, TempUserAccount.FirstName);
+            IsModified := true;
+        end;
+
+        if (AccountToUpdate.LastName <> TempUserAccount.LastName) then begin
+            AccountToUpdate.Validate(LastName, TempUserAccount.LastName);
+            IsModified := true;
+        end;
+
+        if (AccountToUpdate.EmailAddress <> TempUserAccount.EmailAddress) then begin
+            AccountToUpdate.EmailAddress := TempUserAccount.EmailAddress;
+            IsModified := true;
+        end;
+
+        if (AccountToUpdate.PhoneNo <> TempUserAccount.PhoneNo) then begin
+            AccountToUpdate.PhoneNo := TempUserAccount.PhoneNo;
+            IsModified := true;
+        end;
     end;
 
     internal procedure FindAccountByEmail(EmailAddress: Text[80]; var UserAccount: Record "NPR UserAccount") Found: Boolean
@@ -31,12 +53,20 @@ codeunit 6248404 "NPR UserAccountMgtImpl"
         Found := UserAccount.FindSet();
     end;
 
-    local procedure CheckUniqueness(Setup: Record "NPR UserAccountSetup"; UserAccount: Record "NPR UserAccount")
+    local procedure CheckUniqueness(UserAccount: Record "NPR UserAccount")
     var
         UserAccount2: Record "NPR UserAccount";
+        Setup: Record "NPR UserAccountSetup";
     begin
         if (UserAccount.EmailAddress = '') and ((UserAccount.PhoneNo = '') or (not Setup.RequireUniquePhoneNo)) then
             exit;
+
+        if (not Setup.Get()) then
+            Setup.Init();
+
+        // If we are checking uniqueness on an existing account, don't include self
+        if (not IsNullGuid(UserAccount.SystemId)) then
+            UserAccount2.SetFilter(SystemId, '<>%1', UserAccount.SystemId);
 
         UserAccount2.FilterGroup := -1;
         if (UserAccount.EmailAddress <> '') then
