@@ -165,13 +165,10 @@ codeunit 6185037 "NPR HU L Audit Mgt."
         POSUnit.Get(SaleHeader."Register No.");
         if not IsHULaurelAuditEnabled(POSUnit."POS Audit Profile") then
             exit;
-        if not GetPOSSaleLine(SaleHeader) then
+        if not POSSaleLineExists(SaleHeader) then
             exit;
         SaleHeader.CalcFields("Amount Including VAT");
-        if SaleHeader."Amount Including VAT" = 0 then
-            exit;
-
-        IsReturnSale := SaleHeader."Amount Including VAT" < 0;
+        IsReturnSale := (SaleHeader."Amount Including VAT" < 0) or NegativePOSSaleLineExists(SaleHeader);
 
         if ConfirmManagement.GetResponseOrDefault(AddCustomerDataQst, false) then
             CustomerDataEntered := AddCustomerDataToSale(SaleHeader, IsReturnSale);
@@ -181,7 +178,7 @@ codeunit 6185037 "NPR HU L Audit Mgt."
 
         if not IsReturnSale then
             exit;
-        if GetOriginalPOSSaleLine(SaleHeader) then
+        if OriginalPOSSaleLineExists(SaleHeader) then
             exit;
         AddOriginalReceiptDataForReturn(SaleHeader);
     end;
@@ -343,6 +340,11 @@ codeunit 6185037 "NPR HU L Audit Mgt."
     begin
         if POSEntry."Amount Incl. Tax" > 0 then
             exit;
+
+        HULPOSAuditLogAux."Return Reason" := GetFirstPOSSaleLineReturnReasonCodeMapping(POSEntry);
+        if HULPOSAuditLogAux."Return Reason" = HULPOSAuditLogAux."Return Reason"::" " then
+            exit; // This Sale is not a Return, rather it's a zero amount
+
         if GetOriginalAuditEntryForReturn(ReturnHULPOSAuditLogAux, POSEntry) then begin
             DateList := ReturnHULPOSAuditLogAux.GetReceiptDateAsText().Split('.');
             Evaluate(Day, DateList.Get(3));
@@ -367,8 +369,6 @@ codeunit 6185037 "NPR HU L Audit Mgt."
                 HULPOSAuditLogAux."Original Document No." := HULPOSSale."Original No.";
                 HULPOSAuditLogAux."Original Closure No." := HULPOSSale."Original Closure No.";
             end;
-
-        HULPOSAuditLogAux."Return Reason" := GetFirstPOSSaleLineReturnReasonCodeMapping(POSEntry);
         if HULPOSAuditLogAux."Return Reason" in [HULPOSAuditLogAux."Return Reason"::V1, HULPOSAuditLogAux."Return Reason"::V2, HULPOSAuditLogAux."Return Reason"::V3] then
             HULPOSAuditLogAux."Transaction Type" := HULPOSAuditLogAux."Transaction Type"::Return
         else
@@ -527,7 +527,18 @@ codeunit 6185037 "NPR HU L Audit Mgt."
         exit(Round(POSEntryPaymentLine.Amount, 1, '='));
     end;
 
-    local procedure GetOriginalPOSSaleLine(POSSale: Record "NPR POS Sale"): Boolean
+    local procedure NegativePOSSaleLineExists(POSSale: Record "NPR POS Sale"): Boolean
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+    begin
+        POSSaleLine.SetRange("Register No.", POSSale."Register No.");
+        POSSaleLine.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
+        POSSaleLine.SetFilter("Line Type", '%1|%2', POSSaleLine."Line Type"::Item, POSSaleLine."Line Type"::"Issue Voucher");
+        POSSaleLine.SetFilter(Quantity, '<0');
+        exit(not POSSaleLine.IsEmpty());
+    end;
+
+    local procedure OriginalPOSSaleLineExists(POSSale: Record "NPR POS Sale"): Boolean
     var
         POSEntrySaleLine: Record "NPR POS Entry Sales Line";
         POSSaleLine: Record "NPR POS Sale Line";
@@ -539,20 +550,22 @@ codeunit 6185037 "NPR HU L Audit Mgt."
         exit(not POSEntrySaleLine.IsEmpty());
     end;
 
-    local procedure GetPOSSaleLine(var POSSaleLine: Record "NPR POS Sale Line"; POSSale: Record "NPR POS Sale"): Boolean
-    begin
-        POSSaleLine.SetRange("Register No.", POSSale."Register No.");
-        POSSaleLine.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
-        exit(POSSaleLine.FindFirst());
-    end;
-
-    local procedure GetPOSSaleLine(POSSale: Record "NPR POS Sale"): Boolean
+    local procedure POSSaleLineExists(POSSale: Record "NPR POS Sale"): Boolean
     var
         POSSaleLine: Record "NPR POS Sale Line";
     begin
         POSSaleLine.SetRange("Register No.", POSSale."Register No.");
         POSSaleLine.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
+        POSSaleLine.SetFilter("Line Type", '%1|%2', POSSaleLine."Line Type"::Item, POSSaleLine."Line Type"::"Issue Voucher");
         exit(not POSSaleLine.IsEmpty());
+    end;
+
+    local procedure GetPOSSaleLine(var POSSaleLine: Record "NPR POS Sale Line"; POSSale: Record "NPR POS Sale"): Boolean
+    begin
+        POSSaleLine.SetRange("Register No.", POSSale."Register No.");
+        POSSaleLine.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
+        POSSaleLine.SetFilter("Line Type", '%1|%2', POSSaleLine."Line Type"::Item, POSSaleLine."Line Type"::"Issue Voucher");
+        exit(POSSaleLine.FindFirst());
     end;
 
     local procedure AddCustomerDataToSale(POSSale: Record "NPR POS Sale"; Mandatory: Boolean): Boolean
@@ -707,7 +720,8 @@ codeunit 6185037 "NPR HU L Audit Mgt."
     begin
         POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSEntrySalesLine.SetFilter("Return Reason Code", '<>''''');
-        POSEntrySalesLine.FindFirst();
+        if not POSEntrySalesLine.FindFirst() then
+            exit("NPR HU L Return Reason Code"::" ");
         HULReturnReasonMapp.Get(POSEntrySalesLine."Return Reason Code");
         HULReturnReasonMapp.CheckIsHULReturnReasonPopulated();
 

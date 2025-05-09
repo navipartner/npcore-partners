@@ -566,27 +566,20 @@ codeunit 6248367 "NPR HU L Communication Mgt."
     local procedure AddPOSEntryPaymentLines(var JsonTextWriter: Codeunit "Json Text Reader/Writer"; POSEntry: Record "NPR POS Entry"; HULPOSAuditLogAux: Record "NPR HU L POS Audit Log Aux.")
     var
         POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
-        PaymentLineCount: Integer;
+        POSEntryPaymentLineDict: Dictionary of [Code[10], Decimal];
+        POSEntryPaymentLineDictKey: Code[10];
     begin
-        PaymentLineCount := GetPOSPaymentLinesCount(POSEntry);
-        if PaymentLineCount = 0 then
-            PaymentLineCount := 1;
-
-        if HULPOSAuditLogAux."Rounding Amount" <> 0 then
-            JsonTextWriter.WriteStringProperty('iPaymentCnt', PaymentLineCount + 1)
-        else
-            JsonTextWriter.WriteStringProperty('iPaymentCnt', PaymentLineCount);
-
         POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSEntryPaymentLine.SetFilter(Amount, '<>%1', 0);
-        if POSEntryPaymentLine.FindSet() then begin
-            JsonTextWriter.WriteStartArray('payments');
+        if POSEntryPaymentLine.FindSet() then
             repeat
-                JsonTextWriter.WriteStartObject('');
-                AddPaymentLineInformation(JsonTextWriter, POSEntryPaymentLine."POS Payment Method Code", POSEntryPaymentLine.Amount, HULPOSAuditLogAux."Original Document No." <> 0);
-                JsonTextWriter.WriteEndObject();
-            until POSEntryPaymentLine.Next() = 0
-        end else begin
+                if not POSEntryPaymentLineDict.Add(POSEntryPaymentLine."POS Payment Method Code", POSEntryPaymentLine.Amount) then
+                    POSEntryPaymentLineDict.Set(POSEntryPaymentLine."POS Payment Method Code", POSEntryPaymentLineDict.Get(POSEntryPaymentLine."POS Payment Method Code") + POSEntryPaymentLine.Amount);
+            until POSEntryPaymentLine.Next() = 0;
+
+        AddPaymentCountProperty(JsonTextWriter, POSEntryPaymentLineDict.Count(), HULPOSAuditLogAux."Rounding Amount" <> 0);
+
+        if POSEntryPaymentLineDict.Count() = 0 then begin
             JsonTextWriter.WriteStartArray('payments');
             JsonTextWriter.WriteStartObject('');
             JsonTextWriter.WriteStartObject('stPayment');
@@ -595,12 +588,33 @@ codeunit 6248367 "NPR HU L Communication Mgt."
             JsonTextWriter.WriteStringProperty('iFiscalType', Enum::"NPR HU L Payment Fiscal Type"::CASH.AsInteger());
             JsonTextWriter.WriteEndObject(); // stPayment
             JsonTextWriter.WriteEndObject();
+        end else
+            JsonTextWriter.WriteStartArray('payments');
+
+        foreach POSEntryPaymentLineDictKey in POSEntryPaymentLineDict.Keys do begin
+            JsonTextWriter.WriteStartObject('');
+            AddPaymentLineInformation(JsonTextWriter, POSEntryPaymentLineDictKey, POSEntryPaymentLineDict.Get(POSEntryPaymentLineDictKey), HULPOSAuditLogAux."Original Document No." <> 0);
+            JsonTextWriter.WriteEndObject();
         end;
 
         if HULPOSAuditLogAux."Rounding Amount" <> 0 then
             AddPaymentRoundingObj(JsonTextWriter, HULPOSAuditLogAux);
 
         JsonTextWriter.WriteEndArray(); // payments
+    end;
+
+    local procedure AddPaymentCountProperty(var JsonTextWriter: Codeunit "Json Text Reader/Writer"; POSEntryPaymentLineDictCount: Integer; RoundingExists: Boolean)
+    var
+        PaymentLineCount: Integer;
+    begin
+        PaymentLineCount := POSEntryPaymentLineDictCount;
+
+        if PaymentLineCount = 0 then
+            PaymentLineCount := 1;
+        if RoundingExists then
+            PaymentLineCount += 1;
+
+        JsonTextWriter.WriteStringProperty('iPaymentCnt', PaymentLineCount);
     end;
 
     local procedure AddPaymentRoundingObj(var JsonTextWriter: Codeunit "Json Text Reader/Writer"; HULPOSAuditLogAux: Record "NPR HU L POS Audit Log Aux.")
@@ -805,15 +819,6 @@ codeunit 6248367 "NPR HU L Communication Mgt."
         POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
         POSEntrySalesLine.SetFilter(Type, '%1|%2', POSEntrySalesLine.Type::Item, POSEntrySalesLine.Type::Voucher);
         exit(POSEntrySalesLine.Count());
-    end;
-
-    local procedure GetPOSPaymentLinesCount(POSEntry: Record "NPR POS Entry") PaymentLinesCount: Integer
-    var
-        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
-    begin
-        POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        POSEntryPaymentLine.SetFilter(Amount, '<>%1', 0);
-        PaymentLinesCount := POSEntryPaymentLine.Count();
     end;
 
     local procedure GetVATPostSetupMappingIndex(VATBusPostingGroupCode: Code[20]; VATProdPostingGroupCode: Code[20]): Integer
