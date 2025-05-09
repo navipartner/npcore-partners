@@ -578,6 +578,7 @@ codeunit 6248367 "NPR HU L Communication Mgt."
             JsonTextWriter.WriteStringProperty('iPaymentCnt', PaymentLineCount);
 
         POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntryPaymentLine.SetFilter(Amount, '<>%1', 0);
         if POSEntryPaymentLine.FindSet() then begin
             JsonTextWriter.WriteStartArray('payments');
             repeat
@@ -597,27 +598,22 @@ codeunit 6248367 "NPR HU L Communication Mgt."
         end;
 
         if HULPOSAuditLogAux."Rounding Amount" <> 0 then
-            AddPOSEntryRoundingLines(JsonTextWriter, POSEntry, HULPOSAuditLogAux);
+            AddPaymentRoundingObj(JsonTextWriter, HULPOSAuditLogAux);
 
         JsonTextWriter.WriteEndArray(); // payments
     end;
 
-    local procedure AddPOSEntryRoundingLines(var JsonTextWriter: Codeunit "Json Text Reader/Writer"; POSEntry: Record "NPR POS Entry"; HULPOSAuditLogAux: Record "NPR HU L POS Audit Log Aux.")
+    local procedure AddPaymentRoundingObj(var JsonTextWriter: Codeunit "Json Text Reader/Writer"; HULPOSAuditLogAux: Record "NPR HU L POS Audit Log Aux.")
     var
-        POSEntrySalesLine: Record "NPR POS Entry Sales Line";
+        RoundingDescLbl: Label 'Rounding';
     begin
-        POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        POSEntrySalesLine.SetRange(POSEntrySalesLine.Type, POSEntrySalesLine.Type::Rounding);
-        if POSEntrySalesLine.FindSet() then
-            repeat
-                JsonTextWriter.WriteStartObject('');
-                JsonTextWriter.WriteStartObject('stPayment');
-                JsonTextWriter.WriteStringProperty('sName', POSEntrySalesLine.Description);
-                JsonTextWriter.WriteStringProperty('fAmount', FormatDecimalValue(-1 * HULPOSAuditLogAux."Rounding Amount"));
-                JsonTextWriter.WriteStringProperty('iFiscalType', Enum::"NPR HU L Payment Fiscal Type"::ROUNDING.AsInteger());
-                JsonTextWriter.WriteEndObject(); // stPayment
-                JsonTextWriter.WriteEndObject();
-            until POSEntrySalesLine.Next() = 0;
+        JsonTextWriter.WriteStartObject('');
+        JsonTextWriter.WriteStartObject('stPayment');
+        JsonTextWriter.WriteStringProperty('sName', RoundingDescLbl);
+        JsonTextWriter.WriteStringProperty('fAmount', FormatDecimalValue(-1 * HULPOSAuditLogAux."Rounding Amount"));
+        JsonTextWriter.WriteStringProperty('iFiscalType', Enum::"NPR HU L Payment Fiscal Type"::ROUNDING.AsInteger());
+        JsonTextWriter.WriteEndObject(); // stPayment
+        JsonTextWriter.WriteEndObject();
     end;
 
     local procedure AddPaymentLineInformation(var JsonTextWriter: Codeunit "Json Text Reader/Writer"; PaymentMethodCode: Code[10]; Amount: Decimal; ReturnSale: Boolean)
@@ -816,6 +812,7 @@ codeunit 6248367 "NPR HU L Communication Mgt."
         POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
     begin
         POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntryPaymentLine.SetFilter(Amount, '<>%1', 0);
         PaymentLinesCount := POSEntryPaymentLine.Count();
     end;
 
