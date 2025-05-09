@@ -145,6 +145,7 @@ types:
       validFrom: simpleTypes.ValidFrom
       validUntil: simpleTypes.ValidUntil
       issuedAt: simpleTypes.IssuedAt
+      blocked: boolean
       accessHistory: list<TicketAccessHistory>
     examples:
       - name: ExampleTicketDetails
@@ -152,6 +153,7 @@ types:
           validFrom: $simpleTypes.ValidFrom.ExampleValidFrom
           validUntil: $simpleTypes.ValidUntil.ExampleValidUntil
           issuedAt: $simpleTypes.IssuedAt.ExampleIssuedAt
+          blocked: false
           accessHistory:
             - $TicketAccessHistory.ExampleTicketAccessHistory
 

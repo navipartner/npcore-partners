@@ -185,6 +185,7 @@ types:
     properties:
       walletId: simpleTypes.WalletId
       referenceNumber: simpleTypes.ReferenceNumber
+      originatesFromItemNo: simpleTypes.AssetItemNo
       validToAdmit: simpleTypes.ValidToAdmit
       tickets: list<TicketDetail>
 

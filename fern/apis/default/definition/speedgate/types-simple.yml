@@ -45,7 +45,18 @@ types:
     examples:
       - name: ExampleItemNo
         value: "31001"
-
+  
+  AssetItemNo:
+    type: string
+    docs: The item number associated with the asset.
+    examples:
+      - name: ExampleWalletNo
+        value: "10009" 
+      - name: ExampleItemNo
+        value: "31005"
+      - name: ExampleItemNo2
+        value: "320100"
+        
   Quantity: 
     type: integer
     docs: The number of tickets

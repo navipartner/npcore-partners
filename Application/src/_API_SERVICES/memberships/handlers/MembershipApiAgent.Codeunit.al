@@ -312,7 +312,7 @@ codeunit 6185123 "NPR MembershipApiAgent"
                     .AddProperty('cardId', Format(MemberCard.SystemId, 0, 4).ToLower())
                     .AddProperty('cardNumber', MemberCard."External Card No.")
                     .AddProperty('expiryDate', MemberCard."Valid Until")
-                    .AddProperty('temporary', MemberCard.IsTemporary)
+                    .AddProperty('temporary', MemberCard."Card Is Temporary")
                     .AddProperty('blocked', MemberCard.Blocked)
                     .EndObject();
             until (MemberCard.Next() = 0);

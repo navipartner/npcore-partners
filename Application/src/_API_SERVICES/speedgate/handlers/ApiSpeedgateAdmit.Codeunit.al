@@ -476,6 +476,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             .StartObject('wallet')
             .AddProperty('walletId', Format(ValidationRequest.EntityId, 0, 4).ToLower())
             .AddProperty('referenceNumber', ValidationRequest.ReferenceNo)
+            .AddProperty('originatesFromItemNo', Wallet.OriginatesFromItemNo)
             .AddProperty('validToAdmit', ValidationRequest.ExtraEntityTableId in [Database::"NPR TM Ticket", Database::"NPR MM Member Card"]);
 
         ResponseJson.StartArray('tickets');

@@ -129,6 +129,7 @@ service:
               wallet: 
                 walletId: $simpleTypes.WalletId.ExampleWalletId
                 referenceNumber: $simpleTypes.ReferenceNumber.ExampleWalletId
+                originatesFromItemNo: $simpleTypes.AssetItemNo.ExampleWalletNo
                 validToAdmit: true
                 tickets:
                   - $compositeTypes.TicketDetail.ExampleTicketDetail
