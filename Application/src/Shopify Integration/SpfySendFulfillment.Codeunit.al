@@ -224,6 +224,7 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         OrderLines: JsonArray;
         ChildJObject: JsonObject;
         JObject: JsonObject;
+        TrackingInfo: JsonObject;
         OutStr: OutStream;
         NoFulfillmentAvailableErr: Label 'There are no Shopify fulfillment order lines available to process. Everything may have already been fulfilled. Please check fulfillment status in Shopify.';
         ShipmentPostedMsg: Label 'BC: the packages has been successfully shipped';
@@ -257,11 +258,63 @@ codeunit 6184818 "NPR Spfy Send Fulfillment"
         ChildJObject.Add('message', ShipmentPostedMsg);
         ChildJObject.Add('notify_customer', true);
         ChildJObject.Add('line_items_by_fulfillment_order', ItemsByFulfillmentOrder);
+        if GenerateTrackingInfo(NcTask, TrackingInfo) then
+            ChildJObject.Add('tracking_info', TrackingInfo);
 
         JObject.Add('fulfillment', ChildJObject);
         NcTask."Data Output".CreateOutStream(OutStr, TextEncoding::UTF8);
         JObject.WriteTo(OutStr);
         SendToShopify := true;
+    end;
+
+    local procedure GenerateTrackingInfo(var NcTask: Record "NPR Nc Task"; var TrackingInfo: JsonObject): Boolean
+    var
+        SalesShipmentHeader: Record "Sales Shipment Header";
+        ShippingAgent: Record "Shipping Agent";
+        SpfyTrackingCompany: Enum "NPR Spfy Tracking Company";
+        RecRef: RecordRef;
+        TrackingCompanyName: Text;
+        TrackingUrl: Text;
+        Handled: Boolean;
+    begin
+        Clear(TrackingInfo);
+        case NcTask."Table No." of
+            Database::"Sales Shipment Header":
+                begin
+                    RecRef.Get(NcTask."Record ID");
+                    RecRef.SetTable(SalesShipmentHeader);
+                    if SalesShipmentHeader."Package Tracking No." = '' then
+                        exit(false);
+
+                    Handled := false;
+                    SpfyIntegrationEvents.OnGetTrackingCompanyName(SalesShipmentHeader, TrackingCompanyName, Handled);
+                    if not Handled or (TrackingCompanyName = '') then
+                        if SalesShipmentHeader."Shipping Agent Code" <> '' then begin
+                            ShippingAgent.Get(SalesShipmentHeader."Shipping Agent Code");
+                            if ShippingAgent."NPR Spfy Tracking Company" in [ShippingAgent."NPR Spfy Tracking Company"::" ", ShippingAgent."NPR Spfy Tracking Company"::Other] then begin
+                                if ShippingAgent.Name = '' then
+                                    TrackingCompanyName := ShippingAgent.Code
+                                else
+                                    TrackingCompanyName := ShippingAgent.Name;
+                            end else
+                                TrackingCompanyName := SpfyTrackingCompany.Names.Get(SpfyTrackingCompany.Ordinals.IndexOf(ShippingAgent."NPR Spfy Tracking Company".AsInteger()));
+                        end;
+                    if TrackingCompanyName <> '' then
+                        TrackingInfo.Add('company', TrackingCompanyName);
+
+                    TrackingInfo.Add('number', SalesShipmentHeader."Package Tracking No.");
+
+                    Handled := false;
+                    SpfyIntegrationEvents.OnGetTrackingUrl(SalesShipmentHeader, TrackingUrl, Handled);
+                    if not Handled then
+                        if ShippingAgent."Internet Address" <> '' then
+                            TrackingUrl := ShippingAgent.GetTrackingInternetAddr(SalesShipmentHeader."Package Tracking No.");
+                    if TrackingUrl <> '' then
+                        TrackingInfo.Add('url', TrackingUrl);
+
+                    exit(true);
+                end;
+        end;
     end;
 
 #if BC18 or BC19 or BC20 or BC21

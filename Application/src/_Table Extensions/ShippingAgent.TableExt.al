@@ -59,6 +59,12 @@ tableextension 6014429 "NPR Shipping Agent" extends "Shipping Agent"
             ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Upgraded solution for shipmondo does not use this field';
         }
+#if not BC17
+        field(6151550; "NPR Spfy Tracking Company"; Enum "NPR Spfy Tracking Company")
+        {
+            Caption = 'Shopify Tracking Company';
+            DataClassification = CustomerContent;
+        }
+#endif
     }
 }
-

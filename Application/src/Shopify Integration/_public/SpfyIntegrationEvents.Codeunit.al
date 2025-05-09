@@ -154,5 +154,15 @@ codeunit 6184824 "NPR Spfy Integration Events"
     internal procedure OnCalculateInventoryLevel(ShopifyStoreCode: Code[20]; LocationFilter: Text; ItemNo: Code[20]; VariantCode: Code[10]; IncludeTransferOrders: Option No,Outbound,All; var StockQty: Decimal; var Handled: Boolean)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnGetTrackingCompanyName(SalesShipmentHeader: Record "Sales Shipment Header"; var TrackingCompanyName: Text; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnGetTrackingUrl(SalesShipmentHeader: Record "Sales Shipment Header"; var TrackingUrl: Text; var Handled: Boolean)
+    begin
+    end;
 }
 #endif
