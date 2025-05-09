@@ -1246,4 +1246,9 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'DATA_COLLECTION', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action Data Collection";
     }
+    value(6248422; TM_TICKET_ADMIT_EOS)
+    {
+        Caption = 'TM_TICKET_ADMIT_EOS', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction TicketAdmitOnEoS";
+    }
 }

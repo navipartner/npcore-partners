@@ -813,22 +813,554 @@ codeunit 85217 "NPR SG TicketTest"
 
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure AdmitFromEndSales_TicketType_Scan()
+    var
+        SpeedGate: Codeunit "NPR SG SpeedGate";
+        SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
+        Ticket: Record "NPR TM Ticket";
+        TicketType: Record "NPR TM Ticket Type";
+        AdmitToken: Guid;
+        PosUnitNo: Code[10];
+        AdmitToAdmissions: List of [Code[20]];
+        AttemptToAdmit: Boolean;
+        Assert: Codeunit "Assert";
+    begin
+        SpeedGateLibrary.NoSpeedGateSetup();
+        CreatePosUnit(PosUnitNo);
+
+        Ticket.SetFilter(Ticket."External Ticket No.", '=%1', GetOneTicket());
+        Ticket.FindFirst();
+
+        TicketType.Get(Ticket."Ticket Type Code");
+        TicketType."Activation Method" := TicketType."Activation Method"::SCAN;
+        TicketType."Ticket Configuration Source" := TicketType."Ticket Configuration Source"::TICKET_TYPE;
+        TicketType.Modify();
+
+        SpeedGate.SetEndOfSalesAdmitMode();
+        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions);
+
+        Assert.IsFalse(AttemptToAdmit, 'Expected to not be able to admit ticket with SCAN activation method during end sale.');
+        Assert.AreEqual(AdmitToAdmissions.Count(), 0, StrSubstNo('Expected zero admit to admissions, but got %1', AdmitToAdmissions.Count()));
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure AdmitFromEndSales_TicketType_NA()
+    var
+        SpeedGate: Codeunit "NPR SG SpeedGate";
+        SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
+        Ticket: Record "NPR TM Ticket";
+        TicketType: Record "NPR TM Ticket Type";
+        AdmitToken: Guid;
+        PosUnitNo: Code[10];
+        AdmitToAdmissions: List of [Code[20]];
+        AttemptToAdmit: Boolean;
+        Assert: Codeunit "Assert";
+    begin
+        SpeedGateLibrary.NoSpeedGateSetup();
+        CreatePosUnit(PosUnitNo);
+
+        Ticket.SetFilter(Ticket."External Ticket No.", '=%1', GetOneTicket());
+        Ticket.FindFirst();
+
+        TicketType.Get(Ticket."Ticket Type Code");
+        TicketType."Activation Method" := TicketType."Activation Method"::NA;
+        TicketType."Ticket Configuration Source" := TicketType."Ticket Configuration Source"::TICKET_TYPE;
+        TicketType.Modify();
+
+        SpeedGate.SetEndOfSalesAdmitMode();
+        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions);
+
+        Assert.IsFalse(AttemptToAdmit, 'Expected to not be able to admit ticket with NA activation method during end sale.');
+        Assert.AreEqual(AdmitToAdmissions.Count(), 0, StrSubstNo('Expected zero admit to admissions, but got %1', AdmitToAdmissions.Count()));
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure AdmitFromEndSales_TicketType_POS_DEFAULT()
+    var
+        SpeedGate: Codeunit "NPR SG SpeedGate";
+        SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
+        Ticket: Record "NPR TM Ticket";
+        TicketType: Record "NPR TM Ticket Type";
+
+        AdmitToken: Guid;
+        PosUnitNo: Code[10];
+        AdmitToAdmissions: List of [Code[20]];
+        AttemptToAdmit: Boolean;
+        Assert: Codeunit "Assert";
+
+    begin
+        SpeedGateLibrary.NoSpeedGateSetup();
+        CreatePosUnit(PosUnitNo);
+
+        Ticket.SetFilter(Ticket."External Ticket No.", '=%1', GetOneTicket());
+        Ticket.FindFirst();
+
+        TicketType.Get(Ticket."Ticket Type Code");
+        TicketType."Activation Method" := TicketType."Activation Method"::POS_DEFAULT;
+        TicketType."Ticket Configuration Source" := TicketType."Ticket Configuration Source"::TICKET_TYPE;
+        TicketType.Modify();
+
+        SpeedGate.SetEndOfSalesAdmitMode();
+        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions);
+
+        Assert.IsTrue(AttemptToAdmit, 'Expected to be able to admit ticket with POS_DEFAULT activation method during end sale.');
+        Assert.AreEqual(AdmitToAdmissions.Count(), 1, StrSubstNo('Expected 1 admit to admissions, but got %1', AdmitToAdmissions.Count()));
+
+        AdmitToken := SpeedGate.CreateAdmitToken(Ticket."External Ticket No.", '', PosUnitNo);
+        ValidatePermitted(AdmitToken);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure AdmitFromEndSales_TicketType_POS_ALL()
+    var
+        SpeedGate: Codeunit "NPR SG SpeedGate";
+        SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
+        Ticket: Record "NPR TM Ticket";
+        TicketType: Record "NPR TM Ticket Type";
+
+        AdmitToken: Guid;
+        PosUnitNo: Code[10];
+        AdmitToAdmissions: List of [Code[20]];
+        AttemptToAdmit: Boolean;
+        Assert: Codeunit "Assert";
+
+    begin
+        SpeedGateLibrary.NoSpeedGateSetup();
+        CreatePosUnit(PosUnitNo);
+
+        Ticket.SetFilter(Ticket."External Ticket No.", '=%1', GetOneTicketWithTwoAdmissions());
+        Ticket.FindFirst();
+
+        TicketType.Get(Ticket."Ticket Type Code");
+        TicketType."Activation Method" := TicketType."Activation Method"::POS_ALL;
+        TicketType."Ticket Configuration Source" := TicketType."Ticket Configuration Source"::TICKET_TYPE;
+        TicketType.Modify();
+
+        SpeedGate.SetEndOfSalesAdmitMode();
+        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions);
+
+        Assert.IsTrue(AttemptToAdmit, 'Expected to be able to admit ticket with POS_ALL activation method during end sale.');
+        Assert.AreEqual(AdmitToAdmissions.Count(), 2, StrSubstNo('Expected 1 admit to admissions, but got %1', AdmitToAdmissions.Count()));
+
+        AdmitToken := SpeedGate.CreateAdmitToken(Ticket."External Ticket No.", '', PosUnitNo);
+        ValidatePermitted(AdmitToken);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure AdmitFromEndSales_TicketBom_SCAN()
+    var
+        SpeedGate: Codeunit "NPR SG SpeedGate";
+        SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
+        Ticket: Record "NPR TM Ticket";
+        TicketType: Record "NPR TM Ticket Type";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+
+        AdmitToken: Guid;
+        PosUnitNo: Code[10];
+        AdmitToAdmissions: List of [Code[20]];
+        AttemptToAdmit: Boolean;
+        Assert: Codeunit "Assert";
+
+    begin
+        SpeedGateLibrary.NoSpeedGateSetup();
+        CreatePosUnit(PosUnitNo);
+
+        Ticket.SetFilter(Ticket."External Ticket No.", '=%1', GetOneTicketWithTwoAdmissions());
+        Ticket.FindFirst();
+
+        TicketType.Get(Ticket."Ticket Type Code");
+        TicketType."Ticket Configuration Source" := TicketType."Ticket Configuration Source"::TICKET_BOM;
+        TicketType.Modify();
+
+        TicketBom.SetFilter("Item No.", '=%1', Ticket."Item No.");
+        TicketBom.FindSet();
+        repeat
+            TicketBom."Activation Method" := TicketBom."Activation Method"::SCAN;
+            TicketBom.Modify();
+        until TicketBom.Next() = 0;
+
+        SpeedGate.SetEndOfSalesAdmitMode();
+        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions);
+
+        Assert.IsFalse(AttemptToAdmit, 'Expected to not be able to admit ticket with SCAN activation method during end sale.');
+        Assert.AreEqual(AdmitToAdmissions.Count(), 0, StrSubstNo('Expected zero admit to admissions, but got %1', AdmitToAdmissions.Count()));
+
+        asserterror SpeedGate.Admit(SpeedGate.CreateAdmitToken(Ticket."External Ticket No.", '', PosUnitNo), 1);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure AdmitFromEndSales_TicketBom_NA()
+    var
+        SpeedGate: Codeunit "NPR SG SpeedGate";
+        SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
+        Ticket: Record "NPR TM Ticket";
+        TicketType: Record "NPR TM Ticket Type";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+
+        AdmitToken: Guid;
+        PosUnitNo: Code[10];
+        AdmitToAdmissions: List of [Code[20]];
+        AttemptToAdmit: Boolean;
+        Assert: Codeunit "Assert";
+
+    begin
+        SpeedGateLibrary.NoSpeedGateSetup();
+        CreatePosUnit(PosUnitNo);
+
+        Ticket.SetFilter(Ticket."External Ticket No.", '=%1', GetOneTicketWithTwoAdmissions());
+        Ticket.FindFirst();
+
+        TicketType.Get(Ticket."Ticket Type Code");
+        TicketType."Ticket Configuration Source" := TicketType."Ticket Configuration Source"::TICKET_BOM;
+        TicketType.Modify();
+
+        TicketBom.SetFilter("Item No.", '=%1', Ticket."Item No.");
+        TicketBom.FindSet();
+        repeat
+            TicketBom."Activation Method" := TicketBom."Activation Method"::NA;
+            TicketBom.Modify();
+        until TicketBom.Next() = 0;
+
+        SpeedGate.SetEndOfSalesAdmitMode();
+        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions);
+
+        Assert.IsFalse(AttemptToAdmit, 'Expected to not be able to admit ticket with NA activation method during end sale.');
+        Assert.AreEqual(AdmitToAdmissions.Count(), 0, StrSubstNo('Expected zero admit to admissions, but got %1', AdmitToAdmissions.Count()));
+
+        asserterror SpeedGate.Admit(SpeedGate.CreateAdmitToken(Ticket."External Ticket No.", '', PosUnitNo), 1);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure AdmitFromEndSales_TicketBom_POS()
+    var
+        SpeedGate: Codeunit "NPR SG SpeedGate";
+        SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
+        Ticket: Record "NPR TM Ticket";
+        TicketType: Record "NPR TM Ticket Type";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+
+        AdmitToken: Guid;
+        PosUnitNo: Code[10];
+        AdmitToAdmissions: List of [Code[20]];
+        AttemptToAdmit: Boolean;
+        Assert: Codeunit "Assert";
+
+    begin
+        SpeedGateLibrary.NoSpeedGateSetup();
+        CreatePosUnit(PosUnitNo);
+
+        Ticket.SetFilter(Ticket."External Ticket No.", '=%1', GetOneTicketWithTwoAdmissions());
+        Ticket.FindFirst();
+
+        TicketType.Get(Ticket."Ticket Type Code");
+        TicketType."Ticket Configuration Source" := TicketType."Ticket Configuration Source"::TICKET_BOM;
+        TicketType.Modify();
+
+        // Default value is SCAN
+        TicketBom.SetFilter("Item No.", '=%1', Ticket."Item No.");
+        TicketBom.FindFirst();
+        TicketBom."Activation Method" := TicketBom."Activation Method"::POS;
+        TicketBom.Modify();
+
+        SpeedGate.SetEndOfSalesAdmitMode();
+        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions);
+
+        Assert.IsTrue(AttemptToAdmit, 'Expected to not be able to admit ticket with POS activation method during end sale.');
+        Assert.AreEqual(AdmitToAdmissions.Count(), 1, StrSubstNo('Expected zero admit to admissions, but got %1', AdmitToAdmissions.Count()));
+
+        AdmitToken := SpeedGate.CreateAdmitToken(Ticket."External Ticket No.", '', PosUnitNo);
+        ValidatePermitted(AdmitToken);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure AdmitFromEndSales_TicketBom_ALWAYS()
+    var
+        SpeedGate: Codeunit "NPR SG SpeedGate";
+        SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
+        Ticket: Record "NPR TM Ticket";
+        TicketType: Record "NPR TM Ticket Type";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+
+        AdmitToken: Guid;
+        PosUnitNo: Code[10];
+        AdmitToAdmissions: List of [Code[20]];
+        AttemptToAdmit: Boolean;
+        Assert: Codeunit "Assert";
+
+    begin
+        SpeedGateLibrary.NoSpeedGateSetup();
+        CreatePosUnit(PosUnitNo);
+
+        Ticket.SetFilter(Ticket."External Ticket No.", '=%1', GetOneTicketWithTwoAdmissions());
+        Ticket.FindFirst();
+
+        TicketType.Get(Ticket."Ticket Type Code");
+        TicketType."Ticket Configuration Source" := TicketType."Ticket Configuration Source"::TICKET_BOM;
+        TicketType.Modify();
+
+        // Default value is SCAN
+        TicketBom.SetFilter("Item No.", '=%1', Ticket."Item No.");
+        TicketBom.FindLast();
+        TicketBom."Activation Method" := TicketBom."Activation Method"::ALWAYS;
+        TicketBom.Modify();
+
+        SpeedGate.SetEndOfSalesAdmitMode();
+        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions);
+
+        Assert.IsTrue(AttemptToAdmit, 'Expected to be able to admit ticket with ALWAYS activation method during end sale.');
+        Assert.AreEqual(AdmitToAdmissions.Count(), 1, StrSubstNo('Expected zero admit to admissions, but got %1', AdmitToAdmissions.Count()));
+
+        AdmitToken := SpeedGate.CreateAdmitToken(Ticket."External Ticket No.", '', PosUnitNo);
+        ValidatePermitted(AdmitToken);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure AdmitFromEndSales_TicketBom_PER_UNIT()
+    var
+        SpeedGate: Codeunit "NPR SG SpeedGate";
+        SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
+        Ticket: Record "NPR TM Ticket";
+        TicketType: Record "NPR TM Ticket Type";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+
+        AdmitToken: Guid;
+        PosUnitNo: Code[10];
+        AdmitToAdmissions: List of [Code[20]];
+        AttemptToAdmit: Boolean;
+        AdmitCount: Integer;
+        Assert: Codeunit "Assert";
+
+    begin
+        SpeedGateLibrary.NoSpeedGateSetup();
+        CreatePosUnit(PosUnitNo);
+
+        Ticket.SetFilter(Ticket."External Ticket No.", '=%1', GetOneTicketWithTwoAdmissions());
+        Ticket.FindFirst();
+
+        TicketType.Get(Ticket."Ticket Type Code");
+        TicketType."Ticket Configuration Source" := TicketType."Ticket Configuration Source"::TICKET_BOM;
+        TicketType.Modify();
+
+        // Default value is SCAN
+        TicketBom.SetFilter("Item No.", '=%1', Ticket."Item No.");
+        TicketBom.FindSet();
+        repeat
+            TicketBom."Activation Method" := TicketBom."Activation Method"::PER_UNIT;
+            TicketBom.Modify();
+        until TicketBom.Next() = 0;
+
+        // The PER_UNIT will revert to default admission code when no profiles are set up.
+        SpeedGate.SetEndOfSalesAdmitMode();
+        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions);
+
+        Assert.IsTrue(AttemptToAdmit, 'Expected to be able to admit ticket with PER_UNIT activation method during end sale.');
+        Assert.AreEqual(AdmitToAdmissions.Count(), 1, StrSubstNo('Expected zero admit to admissions, but got %1', AdmitToAdmissions.Count()));
+
+        // Speed gate has no profiles, speed gate should end up picking default admission code
+        AdmitToken := SpeedGate.CreateAdmitToken(Ticket."External Ticket No.", '', PosUnitNo);
+        AdmitCount := ValidatePermitted(AdmitToken);
+        Assert.AreEqual(AdmitCount, 1, StrSubstNo('Expected 1 admissions to be admitted, but got %1', AdmitCount));
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure AdmitFromEndSales_TicketBom_PER_UNIT_2()
+    var
+        SpeedGate: Codeunit "NPR SG SpeedGate";
+        SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
+        Ticket: Record "NPR TM Ticket";
+        TicketType: Record "NPR TM Ticket Type";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+
+        TicketProfileCode: Code[10];
+        AdmitToken: Guid;
+        PosUnitNo: Code[10];
+        AdmitToAdmissions: List of [Code[20]];
+        AttemptToAdmit: Boolean;
+        Assert: Codeunit "Assert";
+
+    begin
+        TicketProfileCode := SpeedGateLibrary.CreateProfile();
+        SpeedGateLibrary.DefaultSetup(false, false, TicketProfileCode, '');
+        CreatePosUnit(PosUnitNo);
+
+        Ticket.SetFilter(Ticket."External Ticket No.", '=%1', GetOneTicketWithTwoAdmissions());
+        Ticket.FindFirst();
+
+        TicketType.Get(Ticket."Ticket Type Code");
+        TicketType."Ticket Configuration Source" := TicketType."Ticket Configuration Source"::TICKET_BOM;
+        TicketType.Modify();
+
+        // Default value is SCAN
+        TicketBom.SetFilter("Item No.", '=%1', Ticket."Item No.");
+        TicketBom.FindSet();
+        repeat
+            TicketBom."Activation Method" := TicketBom."Activation Method"::PER_UNIT;
+            TicketBom.Modify();
+        until TicketBom.Next() = 0;
+
+        // The check will not be able to fill the admission code list, so it will be empty. 
+        SpeedGate.SetEndOfSalesAdmitMode();
+        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions);
+
+        Assert.IsFalse(AttemptToAdmit, 'Expected to be able to admit ticket with PER_UNIT activation method during end sale.');
+        Assert.AreEqual(AdmitToAdmissions.Count(), 0, StrSubstNo('Expected zero admit to admissions, but got %1', AdmitToAdmissions.Count()));
+
+        // Speed gate has an empty ticket profile, speed gate admit should fail
+        AdmitToken := SpeedGate.CreateAdmitToken(Ticket."External Ticket No.", '', PosUnitNo);
+        asserterror SpeedGate.Admit(AdmitToken, 1);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure AdmitFromEndSales_TicketBom_PER_UNIT_3()
+    var
+        SpeedGate: Codeunit "NPR SG SpeedGate";
+        SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
+        Ticket: Record "NPR TM Ticket";
+        TicketType: Record "NPR TM Ticket Type";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+
+        TicketProfileCode: Code[10];
+        AdmitToken: Guid;
+        PosUnitNo: Code[10];
+        AdmitToAdmissions: List of [Code[20]];
+        AttemptToAdmit: Boolean;
+        AdmitCount: Integer;
+        Assert: Codeunit "Assert";
+
+    begin
+        TicketProfileCode := SpeedGateLibrary.CreateProfile();
+        SpeedGateLibrary.DefaultSetup(false, false, TicketProfileCode, '');
+        CreatePosUnit(PosUnitNo);
+
+        Ticket.SetFilter(Ticket."External Ticket No.", '=%1', GetOneTicketWithTwoAdmissions());
+        Ticket.FindFirst();
+
+        TicketType.Get(Ticket."Ticket Type Code");
+        TicketType."Ticket Configuration Source" := TicketType."Ticket Configuration Source"::TICKET_BOM;
+        TicketType.Modify();
+
+        // Default value is SCAN, add all admission codes to the profile
+        TicketBom.SetFilter("Item No.", '=%1', Ticket."Item No.");
+        TicketBom.FindSet();
+        repeat
+            TicketBom."Activation Method" := TicketBom."Activation Method"::PER_UNIT;
+            TicketBom.Modify();
+            SpeedGateLibrary.AddToProfile(TicketProfileCode, true, '', TicketBom."Admission Code", '', 0T, 0T);
+        until TicketBom.Next() = 0;
+
+        // The check will not be able to fill the admission code list, so it will be empty. 
+        SpeedGate.SetEndOfSalesAdmitMode();
+        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions);
+
+        Assert.IsTrue(AttemptToAdmit, 'Expected to be able to admit ticket with PER_UNIT activation method during end sale.');
+        Assert.AreEqual(AdmitToAdmissions.Count(), 2, StrSubstNo('Expected zero admit to admissions, but got %1', AdmitToAdmissions.Count()));
+
+        // Speed gate has an ticket profile with valid admissions, speed gate admit should succeed
+        AdmitToken := SpeedGate.CreateAdmitToken(Ticket."External Ticket No.", '', PosUnitNo);
+        AdmitCount := ValidatePermitted(AdmitToken);
+        Assert.AreEqual(AdmitCount, 2, StrSubstNo('Expected 2 admissions to be admitted, but got %1', AdmitCount));
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure AdmitFromEndSales_TicketBom_PER_UNIT_4()
+    var
+        SpeedGate: Codeunit "NPR SG SpeedGate";
+        SpeedGateLibrary: Codeunit "NPR Library - SG Ticket";
+        Ticket: Record "NPR TM Ticket";
+        TicketType: Record "NPR TM Ticket Type";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        PosUnit: Record "NPR POS Unit";
+        PosTicketProfile: Record "NPR TM POS Ticket Profile";
+
+        TicketProfileCode: Code[10];
+        AdmitToken: Guid;
+        PosUnitNo: Code[10];
+        AdmitToAdmissions: List of [Code[20]];
+        AttemptToAdmit: Boolean;
+        AdmitCount: Integer;
+        Assert: Codeunit "Assert";
+        GateId: Guid;
+    begin
+        // Default profile is empty - deny admission
+        SpeedGateLibrary.DefaultSetup(false, false, SpeedGateLibrary.CreateProfile(), '');
+
+        // create a pos unit, assign the scanner id to the profile
+        CreatePosUnit(PosUnitNo);
+        PosUnit.Get(PosUnitNo);
+        PosTicketProfile.Get(PosUnit."POS Ticket Profile");
+
+        TicketProfileCode := SpeedGateLibrary.CreateProfile();
+        GateId := SpeedGateLibrary.GateSetup('GATE01', true, TicketProfileCode, '');
+        PosTicketProfile.ScannerIdForUnitAdmitEoSId := GateId;
+        PosTicketProfile.Modify();
+
+        Ticket.SetFilter(Ticket."External Ticket No.", '=%1', GetOneTicketWithTwoAdmissions());
+        Ticket.FindFirst();
+
+        TicketType.Get(Ticket."Ticket Type Code");
+        TicketType."Ticket Configuration Source" := TicketType."Ticket Configuration Source"::TICKET_BOM;
+        TicketType.Modify();
+
+        // Default value is SCAN, add all admission codes to the profile associated with GATE01
+        TicketBom.SetFilter("Item No.", '=%1', Ticket."Item No.");
+        TicketBom.FindSet();
+        repeat
+            TicketBom."Activation Method" := TicketBom."Activation Method"::PER_UNIT;
+            TicketBom.Modify();
+            SpeedGateLibrary.AddToProfile(TicketProfileCode, true, '', TicketBom."Admission Code", '', 0T, 0T);
+        until TicketBom.Next() = 0;
+
+        // The check will not be able to fill the admission code list, so it will be empty. 
+        SpeedGate.SetEndOfSalesAdmitMode();
+        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions);
+
+        Assert.IsTrue(AttemptToAdmit, 'Expected to be able to admit ticket with PER_UNIT activation method during end sale.');
+        Assert.AreEqual(AdmitToAdmissions.Count(), 2, StrSubstNo('Expected zero admit to admissions, but got %1', AdmitToAdmissions.Count()));
+
+        // Speed gate has an empty ticket profile, 
+        // pos unit has a dedicated gate to read profile from (GATE01) 
+        // speed gate admit should succeed
+        AdmitToken := SpeedGate.CreateAdmitToken(Ticket."External Ticket No.", '', PosUnitNo);
+        AdmitCount := ValidatePermitted(AdmitToken);
+
+        Assert.AreEqual(AdmitCount, 2, StrSubstNo('Expected 2 admissions to be admitted, but got %1', AdmitCount));
+    end;
 
     [Normal]
-    procedure ValidatePermitted(AdmitToken: Guid)
+    procedure ValidatePermitted(AdmitToken: Guid) AdmitCount: Integer
     var
         EntryLog: Record "NPR SGEntryLog";
         SpeedGate: Codeunit "NPR SG SpeedGate";
     begin
         EntryLog.SetCurrentKey(Token);
         EntryLog.SetFilter(Token, '=%1', AdmitToken);
-        EntryLog.FindFirst();
-
-        EntryLog.TestField(ReferenceNumberType, EntryLog.ReferenceNumberType::TICKET);
-        EntryLog.TestField(EntryStatus, EntryLog.EntryStatus::PERMITTED_BY_GATE);
+        EntryLog.FindSet();
+        repeat
+            EntryLog.TestField(ReferenceNumberType, EntryLog.ReferenceNumberType::TICKET);
+            EntryLog.TestField(EntryStatus, EntryLog.EntryStatus::PERMITTED_BY_GATE);
+        until (EntryLog.Next() = 0);
 
         SpeedGate.Admit(AdmitToken, 1);
-        ValidateAdmitted(EntryLog.ReferenceNo, EntryLog.AdmissionCode, EntryLog.ScannerId);
+
+        EntryLog.FindSet();
+        repeat
+            EntryLog.TestField(EntryStatus, EntryLog.EntryStatus::ADMITTED);
+            ValidateAdmitted(EntryLog.ReferenceNo, EntryLog.AdmissionCode, EntryLog.ScannerId);
+            AdmitCount += 1;
+        until (EntryLog.Next() = 0);
     end;
 
     [Normal]
@@ -879,6 +1411,32 @@ codeunit 85217 "NPR SG TicketTest"
         asserterror SpeedGate.Admit(AdmitToken, 1);
     end;
 
+    procedure CreatePosUnit(var PosUnitNo: Code[10])
+    var
+        POSUnit: Record "NPR POS Unit";
+        PosTicketProfile: Record "NPR TM POS Ticket Profile";
+    begin
+
+        if (PosTicketProfile.Get('POS_TM_01')) then
+            PosTicketProfile.Delete();
+
+        PosTicketProfile.Init();
+        PosTicketProfile.Code := 'POS_TM_01';
+        PosTicketProfile."Description" := 'DEFAULT';
+        PosTicketProfile.Insert(true);
+
+        if (POSUnit.Get('POS_TM_01')) then
+            POSUnit.Delete();
+
+        POSUnit.Init();
+        POSUnit."No." := 'POS_TM_01';
+        POSUnit.Name := 'POS_TM_01';
+        POSUnit."POS Ticket Profile" := PosTicketProfile.Code;
+        POSUnit.Insert(true);
+
+        POSUnitNo := POSUnit."No.";
+    end;
+
     [Normal]
     procedure GetOneTicket() ExternalTicketNumber: Code[30]
     var
@@ -887,6 +1445,19 @@ codeunit 85217 "NPR SG TicketTest"
     begin
         TicketQuantityPerOrder := 1;
         CreateTicket(TicketQuantityPerOrder, TmpCreatedTickets);
+        TmpCreatedTickets.Reset();
+        TmpCreatedTickets.FindFirst();
+        ExternalTicketNumber := TmpCreatedTickets."External Ticket No.";
+    end;
+
+    [Normal]
+    procedure GetOneTicketWithTwoAdmissions() ExternalTicketNumber: Code[30]
+    var
+        TicketQuantityPerOrder: Integer;
+        TmpCreatedTickets: Record "NPR TM Ticket" temporary;
+    begin
+        TicketQuantityPerOrder := 1;
+        CreateTicket2(TicketQuantityPerOrder, TmpCreatedTickets);
         TmpCreatedTickets.Reset();
         TmpCreatedTickets.FindFirst();
         ExternalTicketNumber := TmpCreatedTickets."External Ticket No.";
@@ -920,6 +1491,33 @@ codeunit 85217 "NPR SG TicketTest"
     end;
 
     [Normal]
+    procedure CreateTicket2(TicketQuantityPerOrder: Integer; var TmpCreatedTickets: Record "NPR TM Ticket" temporary) ResponseToken: Text[100];
+    var
+        TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
+        Assert: Codeunit "Assert";
+        ItemNo: Code[20];
+        ResponseMessage: Text;
+        ApiOk: Boolean;
+        NumberOfTicketOrders: Integer;
+        MemberNumber: Code[20];
+        ScannerStation: Code[10];
+        SendNotificationTo: Text;
+        ExternalOrderNo: Text;
+    begin
+
+        ItemNo := TicketSmokeTestScenario2();
+
+        NumberOfTicketOrders := 1;
+        ApiOk := TicketApiLibrary.MakeReservation(NumberOfTicketOrders, ItemNo, TicketQuantityPerOrder, MemberNumber, ScannerStation, ResponseToken, ResponseMessage);
+        Assert.IsTrue(ApiOk, ResponseMessage);
+
+        ExternalOrderNo := 'abc'; // Note: Without External Order No., the ticket will not be valid for arrival, capacity will be allocated only.
+        ApiOk := TicketApiLibrary.ConfirmTicketReservation(ResponseToken, SendNotificationTo, ExternalOrderNo, ScannerStation, TmpCreatedTickets, ResponseMessage);
+        Assert.IsTrue(ApiOk, ResponseMessage);
+        Assert.AreEqual(TmpCreatedTickets.Count(), NumberOfTicketOrders * TicketQuantityPerOrder, 'Number of tickets confirmed does not match number of tickets requested.');
+    end;
+
+    [Normal]
     local procedure ValidateAdmitted(ExternalTicketNumber: Code[30]; AdmissionCode: Code[20]; GateCode: Code[10])
     var
         Ticket: Record "NPR TM Ticket";
@@ -930,8 +1528,8 @@ codeunit 85217 "NPR SG TicketTest"
         Ticket.FindFirst();
 
         TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        TicketAccessEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
         TicketAccessEntry.FindFirst();
-        TicketAccessEntry.TestField("Admission Code", AdmissionCode);
         TicketAccessEntry.TestField("Access Date");
         TicketAccessEntry.TestField("Access Time");
 
@@ -949,5 +1547,12 @@ codeunit 85217 "NPR SG TicketTest"
         TicketLibrary: Codeunit "NPR Library - Ticket Module";
     begin
         ItemNo := TicketLibrary.CreateScenario_SmokeTest();
+    end;
+
+    local procedure TicketSmokeTestScenario2() ItemNo: Code[20]
+    var
+        TicketLibrary: Codeunit "NPR Library - Ticket Module";
+    begin
+        ItemNo := TicketLibrary.CreateScenario_SmokeTest2();
     end;
 }

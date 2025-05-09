@@ -8,12 +8,18 @@ codeunit 6185130 "NPR SG SpeedGate"
 
         _TokenToAdmit: Guid;
         _QuantityToAdmit: Integer;
+        _EndOfSaleAdmitMode: Boolean;
 
 
     trigger OnRun()
     begin
         if (not IsNullGuid(_TokenToAdmit)) then
             Admit(_TokenToAdmit, _QuantityToAdmit);
+    end;
+
+    internal procedure SetEndOfSalesAdmitMode()
+    begin
+        _EndOfSaleAdmitMode := true;
     end;
 
     internal procedure CreateAdmitToken(ReferenceNumber: Text[100]; AdmissionCode: Code[20]; ScannerId: Code[10]) AdmitToken: Guid
@@ -155,11 +161,16 @@ codeunit 6185130 "NPR SG SpeedGate"
     var
         EntryLog: Record "NPR SGEntryLog";
         Scanners: Record "NPR SG SpeedGate";
+        PosUnit: Record "NPR POS Unit";
     begin
         Scanners.SetCurrentKey(ScannerId);
         Scanners.SetFilter(ScannerId, '=%1', ScannerId);
-        if (not Scanners.FindFirst()) then
+        if (not Scanners.FindFirst()) then begin
             Scanners.Init();
+            PosUnit.SetLoadFields(Name);
+            if (PosUnit.Get(ScannerId)) then
+                Scanners.Description := PosUnit.Name
+        end;
 
         EntryLog.Init();
         EntryLog.Token := Format(CreateGuid(), 0, 4);
@@ -176,6 +187,7 @@ codeunit 6185130 "NPR SG SpeedGate"
     internal procedure ValidateAdmitDocLXCityCard(var ValidationRequest: Record "NPR SGEntryLog"): Guid
     var
         DocLXCityCard: Codeunit "NPR DocLXCityCard";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
         LogEntryNo: Integer;
         LogEntry: Record "NPR DocLXCityCardHistory";
         Ticket: Record "NPR TM Ticket";
@@ -205,7 +217,7 @@ codeunit 6185130 "NPR SG SpeedGate"
 
         Ticket.GetBySystemId(TicketId);
 
-        //ValidationRequest.AdmissionCode := '';
+        ValidationRequest.AdmissionCode := TicketManagement.GetDefaultAdmissionCode(Ticket."No.");
         ValidationRequest.ExtraEntityTableId := Database::"NPR TM Ticket";
         ValidationRequest.ExtraEntityId := Ticket.SystemId;
         ValidationRequest.Modify();
@@ -470,7 +482,28 @@ codeunit 6185130 "NPR SG SpeedGate"
 
         NumberPermitted := false;
 
-        if (WhiteListProfileCode <> '') then begin
+        if (_EndOfSaleAdmitMode) then begin
+            NumberPermitted := HandleEndOfSaleTryAdmitTicket(ValidationRequest.ReferenceNo, EntityId, AdmitToAdmissionCodes, ReferenceNumberIdentified, SuggestedQuantity);
+            if (ReferenceNumberIdentified) then
+                DetectedNumberType := _NumberType::TICKET;
+
+            if (not NumberPermitted) then begin // No admit during end of sale.
+                _ApiErrors := _ApiErrors::ticket_setup_prevents_admit_during_end_of_sale;
+                ValidationRequest.ReferenceNumberType := DetectedNumberType;
+                ValidationRequest.ApiErrorNumber := _ApiErrors.AsInteger();
+                ValidationRequest.EntryStatus := ValidationRequest.EntryStatus::DENIED_BY_GATE;
+                ValidationRequest.Modify();
+                exit;
+            end;
+
+            if (ReferenceNumberIdentified and NumberPermitted and (AdmitToAdmissionCodes.Count() = 0)) then begin
+                // Per Unit Configuration - treat as regular ticket admission using the scanner id setup to select admission codes
+                PermitTickets := true;
+                NumberPermitted := false; // Reset to false to check for tickets again
+            end;
+        end;
+
+        if (WhiteListProfileCode <> '') and (not NumberPermitted) then begin
             DetermineNumberType(WhiteListProfileCode, ValidationRequest.ReferenceNo, DetectedNumberType, ValidationModeStrict);
             case DetectedNumberType of
                 _NumberType::TICKET:
@@ -545,7 +578,6 @@ codeunit 6185130 "NPR SG SpeedGate"
             ValidationRequest.Modify();
             exit; // Error exit
         end;
-
 
         // **** Happy path ****
         ValidationRequest.EntryStatus := ValidationRequest.EntryStatus::PERMITTED_BY_GATE;
@@ -786,9 +818,18 @@ codeunit 6185130 "NPR SG SpeedGate"
         TicketId: Guid;
         ProfileLineId: Guid;
         ReferenceNumberIdentified: Boolean;
+        SuggestedQuantity: Integer;
     begin
         if (not GetValidationProfilesForScanner(ScannerId, WhiteListProfileCode, TicketProfileCode, PermitTickets, MemberCardProfileCode, PermitMemberships, WalletProfileCode, PermitWallets, CityCardProfileId, PermitCityCard, ApiErrorNumber)) then
             exit(false);
+
+        if (_EndOfSaleAdmitMode) then begin
+            if (not HandleEndOfSaleTryAdmitTicket(TicketNo, TicketId, AdmitToCodes, ReferenceNumberIdentified, SuggestedQuantity)) then
+                exit(false);
+
+            if (AdmitToCodes.Count() > 0) then
+                exit(true);
+        end;
 
         exit(CheckForTicket(TicketProfileCode, TicketNo, AdmissionCode, TicketId, AdmitToCodes, ProfileLineId, ReferenceNumberIdentified));
     end;
@@ -945,6 +986,80 @@ codeunit 6185130 "NPR SG SpeedGate"
                 exit(false); // Ticket profile is empty - all tickets are denied
 
         exit(IsTicketValidForAdmit(TicketProfileCode, Number, SuggestedAdmissionCode, TicketId, AdmitToCodes, ProfileLineId, NumberIdentified, SuggestedQuantity));
+    end;
+
+    local procedure HandleEndOfSaleTryAdmitTicket(Number: Text[100]; var TicketId: Guid; var AdmitToCodes: List of [Code[20]]; var NumberIdentified: Boolean; var SuggestedQuantity: Integer): Boolean
+    var
+        Ticket: Record "NPR TM Ticket";
+        TicketType: Record "NPR TM Ticket Type";
+        TicketBom: Record "NPR TM Ticket Admission BOM";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+        AttemptAdmission: Boolean;
+        PerUnit: Boolean;
+    begin
+        Ticket.SetCurrentKey("External Ticket No.");
+        Ticket.SetFilter("External Ticket No.", '=%1', CopyStr(UpperCase(Number), 1, MaxStrLen(Ticket."External Ticket No.")));
+        NumberIdentified := Ticket.FindFirst();
+
+        if (not NumberIdentified) then
+            exit(false);
+
+        if (Ticket.Blocked) then
+            exit(SetApiError(_ApiErrors::ticket_blocked));
+
+        TicketId := Ticket.SystemId;
+        SuggestedQuantity := 1;
+        TicketType.Get(Ticket."Ticket Type Code");
+
+        if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_TYPE) then begin
+            if (TicketType."Activation Method" = "NPR TM ActivationMethod_Type"::POS_DEFAULT) then
+                AdmitToCodes.Add(TicketManagement.GetDefaultAdmissionCode(Ticket."No."));
+
+            if (TicketType."Activation Method" = "NPR TM ActivationMethod_Type"::POS_ALL) then begin
+                TicketBom.SetCurrentKey("Item No.");
+                TicketBom.SetFilter("Item No.", '=%1', Ticket."Item No.");
+                TicketBom.SetFilter("Variant Code", '=%1', Ticket."Variant Code");
+                TicketBom.FindSet();
+                repeat
+                    if (TicketBom."Admission Inclusion" = TicketBom."Admission Inclusion"::REQUIRED) then
+                        AdmitToCodes.Add(TicketBom."Admission Code");
+                until (TicketBom.Next() = 0);
+            end;
+
+            exit(AdmitToCodes.Count() > 0); // This will handle the unlisted options as well
+        end;
+
+        if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_BOM) then begin
+            TicketBom.SetCurrentKey("Item No.");
+            TicketBom.SetFilter("Item No.", '=%1', Ticket."Item No.");
+            TicketBom.SetFilter("Variant Code", '=%1', Ticket."Variant Code");
+            TicketBom.FindSet();
+            repeat
+                AttemptAdmission := (TicketBom."Admission Inclusion" = TicketBom."Admission Inclusion"::REQUIRED);
+                if (AttemptAdmission) then
+                    case TicketBom."Activation Method" of
+                        "NPR TM ActivationMethod_Bom"::POS:
+                            AdmitToCodes.Add(TicketBom."Admission Code");
+                        "NPR TM ActivationMethod_Bom"::ALWAYS:
+                            AdmitToCodes.Add(TicketBom."Admission Code");
+                        "NPR TM ActivationMethod_Bom"::PER_UNIT:
+                            PerUnit := true; // Fallback to check the admission codes specified for the scanner station (like regular admission)
+                        "NPR TM ActivationMethod_Bom"::SCAN:
+                            ; // No action needed, we are in sales mode
+                        "NPR TM ActivationMethod_Bom"::NA:
+                            ; // Not applicable, no action needed
+                        else
+                            Error('This is a programming error. Unhandled activation method for end of sale ticket admission: Speed Gate -> Ticket BOM -> Activation Method %1', TicketBom."Activation Method");
+                    end;
+            until (TicketBom.Next() = 0);
+
+            if (AdmitToCodes.Count() = 0) and (not PerUnit) then
+                exit(false); // Ticket not intended for admission on sales
+
+            exit(true);
+        end;
+
+        exit(false);
     end;
 
     local procedure IsTicketValidForAdmit(TicketProfileCode: Code[10]; Number: Text[100]; SuggestedAdmissionCode: Code[20]; var TicketId: Guid; var AdmitToCodes: List of [Code[20]]; var ProfileLineId: Guid; var NumberIdentified: Boolean; var SuggestedQuantity: Integer): Boolean
@@ -1239,6 +1354,8 @@ codeunit 6185130 "NPR SG SpeedGate"
     var
         SpeedGateDefault: Record "NPR SG SpeedGateDefault";
         SpeedGate: Record "NPR SG SpeedGate";
+        POSUnit: Record "NPR POS Unit";
+        TicketProfile: Record "NPR TM POS Ticket Profile";
     begin
         WhiteListProfileCode := '';
         TicketProfileCode := '';
@@ -1248,6 +1365,16 @@ codeunit 6185130 "NPR SG SpeedGate"
         WalletProfileCode := '';
         AllowWallets := true;
         AllowCityCards := false;
+
+        if (_EndOfSaleAdmitMode) then begin
+            POSUnit.SetLoadFields("No.", "POS Ticket Profile");
+            if (not POSUnit.Get(CopyStr(ScannerId, 1, MaxStrLen(POSUnit."No.")))) then
+                exit(false);
+
+            if (TicketProfile.Get(POSUnit."POS Ticket Profile")) then
+                if (SpeedGate.Get(TicketProfile.ScannerIdForUnitAdmitEoSId)) then
+                    ScannerId := SpeedGate.ScannerId;
+        end;
 
         if (not SpeedGateDefault.Get()) then
             exit(true);
@@ -1259,7 +1386,6 @@ codeunit 6185130 "NPR SG SpeedGate"
         MemberCardProfileCode := SpeedGateDefault.DefaultMemberCardProfileCode;
         AllowMemberships := SpeedGateDefault.PermitMemberCards;
 
-        //WalletProfile := SpeedGateDefault.WalletProfile;
         AllowWallets := SpeedGateDefault.PermitWallets;
 
         if (SpeedGateDefault.RequireScannerId) then

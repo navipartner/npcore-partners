@@ -23,6 +23,31 @@ table 6150858 "NPR TM POS Ticket Profile"
             Caption = 'Print Ticket On Sale';
             DataClassification = CustomerContent;
         }
+
+        field(20; EndOfSaleAdmitMethod; Enum "NPR TM AdmitTicketOnEoSMethod")
+        {
+            Caption = 'End-Of-Sale Admit Method';
+            DataClassification = CustomerContent;
+            InitValue = LEGACY;
+        }
+        field(21; ShowSpinnerDuringWorkflowAdmit; Boolean)
+        {
+            Caption = 'Show Spinner During Workflow Admit';
+            DataClassification = CustomerContent;
+        }
+        field(22; ScannerIdForUnitAdmitOnEndSale; Code[10])
+        {
+            Caption = 'Scanner ID For Unit Admit On End Of Sale';
+            FieldClass = FlowField;
+            CalcFormula = lookup("NPR SG SpeedGate".ScannerId where(Id = field(ScannerIdForUnitAdmitEoSId)));
+        }
+        field(23; ScannerIdForUnitAdmitEoSId; Guid)
+        {
+            Caption = 'Scanner GUID For Unit Admit On End Of Sale';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR SG SpeedGate".Id;
+        }
+
     }
 
     keys

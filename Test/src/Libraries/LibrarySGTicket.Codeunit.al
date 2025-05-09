@@ -23,7 +23,7 @@ codeunit 85216 "NPR Library - SG Ticket"
         SpeedGateDefault.Insert();
     end;
 
-    procedure GateSetup(ScannerId: Code[10]; PermitTickets: Boolean; TicketProfileCode: Code[10]; AllowedNumbersList: Code[10])
+    procedure GateSetup(ScannerId: Code[10]; PermitTickets: Boolean; TicketProfileCode: Code[10]; AllowedNumbersList: Code[10]): Guid
     var
         SpeedGate: Record "NPR SG SpeedGate";
     begin
@@ -39,6 +39,7 @@ codeunit 85216 "NPR Library - SG Ticket"
         SpeedGate.AllowedNumbersList := AllowedNumbersList;
 
         SpeedGate.Insert(true);
+        exit(SpeedGate.Id);
     end;
 
     procedure AddToWhiteList(Prefix: Code[30]; NumberLength: Integer; Strict: Boolean) ListCode: Code[10]

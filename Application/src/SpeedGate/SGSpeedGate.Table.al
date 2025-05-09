@@ -111,6 +111,13 @@ table 6150974 "NPR SG SpeedGate"
         }
     }
 
+    fieldgroups
+    {
+        fieldgroup(DropDown; ScannerId, Description)
+        {
+
+        }
+    }
     trigger OnInsert()
     var
         SpeedGate: Record "NPR SG SpeedGate";

@@ -111,7 +111,6 @@
     procedure ConfirmAndAdmitTicketsFromToken(Token: Text[100]; TokenLineNumber: Integer; SalesReceiptNo: Code[20]; SalesLineNo: Integer; PosUnitNo: Code[10]; UnitAmountInclVat: Decimal; UnitAmountExclVat: Decimal; UnitPriceInclVat: Decimal; UnitPriceExclVat: Decimal)
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        TicketType: Record "NPR TM Ticket Type";
         Ticket: Record "NPR TM Ticket";
         ResponseMessage: Text;
         IsCheckedBySubscriber: Boolean;
@@ -140,26 +139,10 @@
                     Ticket.ListPriceExclVat := UnitPriceExclVat;
                     Ticket.Modify();
 
-                    if (TicketType.Get(Ticket."Ticket Type Code")) then begin
+                    if (not AdmitTicketsFromWorkflowOnEndSale(PosUnitNo)) then
+                        AdmitTicketFromEndOfSale(Token, Ticket, PosUnitNo);
 
-                        if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_TYPE) then begin
-                            if (TicketType."Activation Method" = "NPR TM ActivationMethod_Type"::POS_DEFAULT) then
-                                RegisterDefaultAdmissionArrivalOnPosSales(Ticket);
-
-                            if (TicketType."Activation Method" = "NPR TM ActivationMethod_Type"::POS_ALL) then
-                                RegisterAllAdmissionArrivalOnPosSales(Ticket);
-                        end;
-
-                        if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_BOM) then
-                            RegisterTicketBomAdmissionArrival(Ticket, PosUnitNo, '', 0);
-
-                    end;
                 until (Ticket.Next() = 0);
-
-                OnAfterPosTicketArrival(IsCheckedBySubscriber, IsValid, Ticket."No.", Ticket."External Member Card No.", Token, ResponseMessage);
-                if ((IsCheckedBySubscriber) and (not IsValid)) then
-                    Error(ResponseMessage);
-
             end;
         end;
 
@@ -167,12 +150,59 @@
             TicketRequestManager.RevokeReservationTokenRequest(Token, false);
 
             OnAfterPosTicketRevoke(IsCheckedBySubscriber, IsValid, Token, ResponseMessage);
-
         end;
     end;
 
+    internal procedure AdmitTicketFromEndOfSale(Token: Text[100]; Ticket: Record "NPR TM Ticket"; PosUnitNo: Code[10]) Admitted: Boolean
+    var
+        TicketType: Record "NPR TM Ticket Type";
+        ResponseMessage: Text;
+        IsCheckedBySubscriber: Boolean;
+        IsValid: Boolean;
+    begin
+        if (not TicketType.Get(Ticket."Ticket Type Code")) then
+            exit;
+
+        if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_TYPE) then begin
+            if (TicketType."Activation Method" = "NPR TM ActivationMethod_Type"::POS_DEFAULT) then
+                Admitted := RegisterDefaultAdmissionArrivalOnPosSales(Ticket);
+
+            if (TicketType."Activation Method" = "NPR TM ActivationMethod_Type"::POS_ALL) then
+                Admitted := RegisterAllAdmissionArrivalOnPosSales(Ticket);
+        end;
+
+        if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_BOM) then
+            Admitted := RegisterTicketBomAdmissionArrival(Ticket, PosUnitNo, '', 0);
+
+        if (Admitted) then begin
+            OnAfterPosTicketArrival(IsCheckedBySubscriber, IsValid, Ticket."No.", Ticket."External Member Card No.", Token, ResponseMessage);
+            if ((IsCheckedBySubscriber) and (not IsValid)) then
+                Error(ResponseMessage);
+        end;
+
+    end;
+
+    internal procedure AdmitTicketsFromWorkflowOnEndSale(PosUnitNo: Code[10]): Boolean
+    var
+        POSUnit: Record "NPR POS Unit";
+        TicketProfile: Record "NPR TM POS Ticket Profile";
+    begin
+        POSUnit.SetLoadFields("POS Ticket Profile");
+        if (not POSUnit.Get(PosUnitNo)) then
+            exit(false);
+
+        if (not TicketProfile.Get(POSUnit."POS Ticket Profile")) then
+            exit(false);
+
+        if (TicketProfile."EndOfSaleAdmitMethod" = TicketProfile."EndOfSaleAdmitMethod"::LEGACY) then
+            exit(false);
+
+        exit(true);
+    end;
+
+
     [IntegrationEvent(false, false)]
-    local procedure OnAfterPosTicketArrival(var IsCheckedBySubscriber: Boolean; var IsValid: Boolean; TicketNumber: Code[20]; TicketExternalMemberReference: Code[20]; Token: Text[100]; var ResponseMessage: Text)
+    internal procedure OnAfterPosTicketArrival(var IsCheckedBySubscriber: Boolean; var IsValid: Boolean; TicketNumber: Code[20]; TicketExternalMemberReference: Code[20]; Token: Text[100]; var ResponseMessage: Text)
     begin
     end;
 
@@ -448,7 +478,8 @@
 
     end;
 
-    procedure ValidateTicketForDeparture(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketIdentifier: Text[50]; AdmissionCode: Code[20])
+    procedure ValidateTicketForDeparture(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketIdentifier: Text[50];
+                                                                   AdmissionCode: Code[20])
     var
         Ticket: Record "NPR TM Ticket";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
@@ -1204,17 +1235,16 @@
         until (TicketAccessEntry.Next() = 0);
     end;
 
-    local procedure RegisterDefaultAdmissionArrivalOnPosSales(Ticket: Record "NPR TM Ticket")
+    local procedure RegisterDefaultAdmissionArrivalOnPosSales(Ticket: Record "NPR TM Ticket"): Boolean
     var
         AdmissionCode: Code[20];
     begin
 
         AdmissionCode := GetDefaultAdmissionCode(Ticket."Item No.", Ticket."Variant Code");
-        ValidateTicketForArrival(Ticket, AdmissionCode);
-
+        exit(ValidateTicketForArrival(Ticket, AdmissionCode));
     end;
 
-    local procedure RegisterAllAdmissionArrivalOnPosSales(Ticket: Record "NPR TM Ticket")
+    local procedure RegisterAllAdmissionArrivalOnPosSales(Ticket: Record "NPR TM Ticket"): Boolean
     var
         Admission: Record "NPR TM Admission";
         TicketBom: Record "NPR TM Ticket Admission BOM";
@@ -1236,6 +1266,7 @@
                     ValidateTicketForArrival(Ticket, Admission."Admission Code");
 
         until (TicketBom.Next() = 0);
+        exit(true);
     end;
 
     local procedure AdmissionIsOptionalAndSelected(Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]): Boolean
@@ -1254,7 +1285,12 @@
         exit(TicketRequest."Admission Inclusion" = TicketRequest."Admission Inclusion"::SELECTED);
     end;
 
-    procedure RegisterArrivalScanTicket(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketReference: Code[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; PosUnitNo: Code[10]; ScannerStationId: Code[10]; WithPrint: Boolean)
+    procedure RegisterArrivalScanTicket(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketReference: Code[50];
+                                                                  AdmissionCode: Code[20];
+                                                                  AdmissionScheduleEntryNo: Integer;
+                                                                  PosUnitNo: Code[10];
+                                                                  ScannerStationId: Code[10];
+                                                                  WithPrint: Boolean)
     var
         AdmittedTicketCount: Integer;
     begin
@@ -1262,7 +1298,12 @@
     end;
 
     [CommitBehavior(CommitBehavior::Error)]
-    procedure RegisterArrivalScanTicket(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketReference: Code[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; PosUnitNo: Code[10]; ScannerStationId: Code[10]; WithPrint: Boolean; var AdmittedTicketCount: Integer)
+    procedure RegisterArrivalScanTicket(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketReference: Code[50];
+                                                                  AdmissionCode: Code[20];
+                                                                  AdmissionScheduleEntryNo: Integer;
+                                                                  PosUnitNo: Code[10];
+                                                                  ScannerStationId: Code[10];
+                                                                  WithPrint: Boolean; var AdmittedTicketCount: Integer)
     begin
         if (TicketIdentifierType <> TicketIdentifierType::EXTERNAL_ORDER_REF) then begin
             ValidateRegisterArrivalScanTicketWorker(TicketIdentifierType, TicketReference, AdmissionCode, AdmissionScheduleEntryNo, PosUnitNo, ScannerStationId, WithPrint);
@@ -1273,7 +1314,12 @@
             ValidateRegisterArrivalScanOrderWorker(TicketIdentifierType, TicketReference, AdmissionCode, AdmissionScheduleEntryNo, PosUnitNo, ScannerStationId, WithPrint, AdmittedTicketCount);
     end;
 
-    local procedure ValidateRegisterArrivalScanOrderWorker(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketReference: Code[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; PosUnitNo: Code[10]; ScannerStationId: Code[10]; WithPrint: Boolean; var AdmittedTicketCount: Integer)
+    local procedure ValidateRegisterArrivalScanOrderWorker(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketReference: Code[50];
+                                                                                     AdmissionCode: Code[20];
+                                                                                     AdmissionScheduleEntryNo: Integer;
+                                                                                     PosUnitNo: Code[10];
+                                                                                     ScannerStationId: Code[10];
+                                                                                     WithPrint: Boolean; var AdmittedTicketCount: Integer)
     var
         TicketRequest: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
@@ -1301,7 +1347,12 @@
 
     end;
 
-    local procedure ValidateRegisterArrivalScanTicketWorker(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketNumber: Code[50]; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; PosUnitNo: Code[10]; ScannerStationId: Code[10]; WithPrint: Boolean)
+    local procedure ValidateRegisterArrivalScanTicketWorker(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketNumber: Code[50];
+                                                                                      AdmissionCode: Code[20];
+                                                                                      AdmissionScheduleEntryNo: Integer;
+                                                                                      PosUnitNo: Code[10];
+                                                                                      ScannerStationId: Code[10];
+                                                                                      WithPrint: Boolean)
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         Ticket: Record "NPR TM Ticket";
@@ -1343,13 +1394,12 @@
             end;
     end;
 
-    internal procedure RegisterTicketBomAdmissionArrival(Ticket: Record "NPR TM Ticket"; PosUnitNo: Code[10]; ScannerStationId: Code[10]; ProcessFlow: Option SALES,SCAN)
+    internal procedure RegisterTicketBomAdmissionArrival(Ticket: Record "NPR TM Ticket"; PosUnitNo: Code[10]; ScannerStationId: Code[10]; ProcessFlow: Option SALES,SCAN) TicketAdmitted: Boolean;
     var
         Admission: Record "NPR TM Admission";
         TicketBom: Record "NPR TM Ticket Admission BOM";
         TicketType: Record "NPR TM Ticket Type";
         PosDefaultAdmission: Record "NPR TM POS Default Admission";
-        TicketAdmitted: Boolean;
         StationType: Option;
         StationIdentifier: Code[10];
         AttemptAdmission: Boolean;
@@ -1496,12 +1546,14 @@
         TicketDeferral.AbortDeferral(Ticket."No.");
     end;
 
-    procedure ValidateTicketReference(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer)
+    procedure ValidateTicketReference(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketIdentifier: Text[50];
+                                                                AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer)
     begin
         ValidateTicketReference(TicketIdentifierType, TicketIdentifier, AdmissionCode, TicketAccessEntryNo, false);
     end;
 
-    internal procedure ValidateTicketReference(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketIdentifier: Text[50]; AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer; SkipPaymentCheck: Boolean)
+    internal procedure ValidateTicketReference(TicketIdentifierType: Enum "NPR TM TicketIdentifierType"; TicketIdentifier: Text[50];
+                                                                         AdmissionCode: Code[20]; var TicketAccessEntryNo: Integer; SkipPaymentCheck: Boolean)
     var
         Ticket: Record "NPR TM Ticket";
     begin
