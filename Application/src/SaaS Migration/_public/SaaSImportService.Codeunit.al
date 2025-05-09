@@ -143,8 +143,13 @@ codeunit 6150926 "NPR SaaS Import Service"
         JOResponse: JsonObject;
         TableID: Integer;
         AllObj: Record AllObj;
+        EmptyFilterErrorLbl: Label 'Filter ListOfTables cannot be empty.';
+        TableDoesNotExistErrorLbl: Label 'Table %1 does not exist in target/destination database. RecordCount not possible.', Comment = '%1 = Table ID';
     begin
         TableList := ListOfTables.Split(';');
+        if TableList.Count() = 0 then
+            Error(EmptyFilterErrorLbl);
+
         foreach TableTxt in TableList do begin
             Evaluate(TableID, TableTxt);
             if AllObj.Get(AllObj."Object Type"::Table, TableID) then begin
@@ -152,7 +157,9 @@ codeunit 6150926 "NPR SaaS Import Service"
                 JOTable.Add('tableId', TableID);
                 JoTable.Add('count', Recref.Count());
                 JAResponse.Add(JOTable);
-            end;
+            end else
+                Error(TableDoesNotExistErrorLbl, TableID);
+
             Clear(JOTable);
             Clear(Recref);
         end;
