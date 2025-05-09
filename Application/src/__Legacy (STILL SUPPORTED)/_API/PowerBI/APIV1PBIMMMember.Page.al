@@ -31,6 +31,10 @@ page 6150782 "NPR APIV1 PBIMMMember"
                 {
                     Caption = 'Blocked', Locked = True;
                 }
+                field(postCode; Rec."Post Code Code")
+                {
+                    Caption = 'Post Code', Locked = true;
+                }
                 field(city; Rec."City")
                 {
                     Caption = 'City', Locked = True;
