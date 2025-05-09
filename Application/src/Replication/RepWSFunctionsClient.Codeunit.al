@@ -43,8 +43,12 @@ codeunit 6014692 "NPR Rep. WS Functions Client" implements "NPR Rep. WS IFunctio
 
     local procedure BuildODataV4URI(FunctionName: Text; ServiceSetup: Record "NPR Replication Service Setup") URI: Text
     begin
-        URI := GetUrl(ClientType::ODataV4).TrimEnd('/');
-        IF URI.ToLower().Contains('?tenant=') then
+        if ServiceSetup."External Database" then
+            URI := ServiceSetup."Service URL".TrimEnd('/api') + '/ODataV4'
+        else
+            URI := GetUrl(ClientType::ODataV4).TrimEnd('/');
+
+        if URI.ToLower().Contains('?tenant=') then
             URI := URI.Remove(URI.ToLower().IndexOf('?tenant='), StrLen(URI) - URI.ToLower().IndexOf('?tenant=') + 1).TrimEnd('/'); // remove tenant
         URI += '/' + FunctionName;
         if ServiceSetup."From Company Tenant" <> '' then
