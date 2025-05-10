@@ -241,6 +241,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         RequestJson: JsonObject;
         VariablesJson: JsonObject;
         VoucherJson: JsonObject;
+        RecipientShopifyCustomerGID: Text;
         CreateQueryTok: Label 'mutation CreateGiftCard($input: GiftCardCreateInput!) {giftCardCreate(input: $input) {giftCard {id} userErrors {message field code}}}', Locked = true;
         UpdateQueryTok: Label 'mutation UpdateGiftCard($id: ID!, $input: GiftCardUpdateInput!) {giftCardUpdate(id: $id, input: $input) {giftCard {id} userErrors {message field}}}', Locked = true;
     begin
@@ -256,9 +257,10 @@ codeunit 6184820 "NPR Spfy Send Voucher"
                 VoucherJson.Add('templateSuffix', Voucher."Spfy Liquid Template Suffix");
             VoucherJson.Add('note', CreatedFromNPRetailNote());
         end;
-        VoucherJson.Add('expiresOn', Format(DT2Date(Voucher."Ending Date"), 0, 9));
+        if Voucher."Ending Date" <> 0DT then
+            VoucherJson.Add('expiresOn', Format(DT2Date(Voucher."Ending Date"), 0, 9));
 
-        if (ShopifyGiftCardID = '') and Voucher."Spfy Send from Shopify" then begin
+        if ShopifyGiftCardID = '' then begin
             if Voucher."Customer No." <> '' then
                 if not Customer.Get(Voucher."Customer No.") then
                     Customer.Init();
@@ -277,14 +279,19 @@ codeunit 6184820 "NPR Spfy Send Voucher"
                         Customer."Name 2" := Voucher."Name 2";
                     end;
 
-                RecipientAttributesJson.Add('id', RecipientCustomerID(Customer, ShopifyStoreCode));
-                if Voucher."Voucher Message" <> '' then
-                    RecipientAttributesJson.Add('message', Voucher."Voucher Message");
-                RecipientAttributesJson.Add('preferredName', GetFullName(Voucher.Name, Voucher."Name 2"));
-                if Voucher."Spfy Send on" <> 0DT then
-                    if Voucher."Spfy Send on" > JobQueueMgt.NowWithDelayInSeconds(60) then
-                        RecipientAttributesJson.Add('sendNotificationAt', Voucher."Spfy Send on");
-                VoucherJson.Add('recipientAttributes', RecipientAttributesJson);
+                RecipientShopifyCustomerGID := RecipientCustomerGID(Customer, ShopifyStoreCode);
+                VoucherJson.Add('customerId', RecipientShopifyCustomerGID);
+
+                if Voucher."Spfy Send from Shopify" then begin
+                    RecipientAttributesJson.Add('id', RecipientShopifyCustomerGID);
+                    if Voucher."Voucher Message" <> '' then
+                        RecipientAttributesJson.Add('message', Voucher."Voucher Message");
+                    RecipientAttributesJson.Add('preferredName', GetFullName(Voucher.Name, Voucher."Name 2"));
+                    if Voucher."Spfy Send on" <> 0DT then
+                        if Voucher."Spfy Send on" > JobQueueMgt.NowWithDelayInSeconds(60) then
+                            RecipientAttributesJson.Add('sendNotificationAt', Voucher."Spfy Send on");
+                    VoucherJson.Add('recipientAttributes', RecipientAttributesJson);
+                end;
             end;
         end;
 
@@ -293,7 +300,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         RequestJson.WriteTo(QueryStream);
     end;
 
-    local procedure RecipientCustomerID(Customer: Record Customer; ShopifyStoreCode: Code[20]) ShopifyCustomerID: Text
+    local procedure RecipientCustomerGID(Customer: Record Customer; ShopifyStoreCode: Code[20]) ShopifyCustomerGID: Text
     var
         ShopifyResponse: JsonToken;
         CustomerCreateQueryErr: Label 'The system was unable to create a customer with email %1 in Shopify. The following error occurred:\%2', Comment = '%1 - customer email address, %2 - Shopify API call error details';
@@ -306,8 +313,8 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         if ShopifyResponse.SelectToken('data.customers.edges', ShopifyResponse) and ShopifyResponse.IsArray() then
             if ShopifyResponse.AsArray().Count() > 0 then begin
                 ShopifyResponse.AsArray().Get(0, ShopifyResponse);
-                ShopifyCustomerID := _JsonHelper.GetJText(ShopifyResponse, 'node.id', false);
-                if ShopifyCustomerID <> '' then
+                ShopifyCustomerGID := _JsonHelper.GetJText(ShopifyResponse, 'node.id', false);
+                if ShopifyCustomerGID <> '' then
                     exit;
             end;
 
@@ -315,7 +322,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         Clear(ShopifyResponse);
         if not CreateShopifyCustomer(Customer, ShopifyStoreCode, ShopifyResponse) then
             Error(CustomerCreateQueryErr, Customer."E-Mail", GetLastErrorText());
-        ShopifyCustomerID := _JsonHelper.GetJText(ShopifyResponse, 'data.customerCreate.customer.id', true);
+        ShopifyCustomerGID := _JsonHelper.GetJText(ShopifyResponse, 'data.customerCreate.customer.id', true);
     end;
 
     local procedure FindShopifyCustomerByEmail(Email: Text; ShopifyStoreCode: Code[20]; var ShopifyResponse: JsonToken): Boolean
