@@ -50,12 +50,14 @@
 
                 NewAdditionalInformation := RemoveNonNumericChars(NewAdditionalInformation);
                 NewAdditionalInformation := NewAdditionalInformation.Replace(',', '.');
-                WholeNumber := CopyStr(NewAdditionalInformation, 1, StrLen(NewAdditionalInformation) - 3);
-                FractionalPart := CopyStr(NewAdditionalInformation, StrLen(NewAdditionalInformation) - 2);
-                NewAdditionalInformation := WholeNumber.Replace('.', '') + FractionalPart;
-                if POSAuditLog."Additional Information" <> NewAdditionalInformation then begin
-                    POSAuditLog."Additional Information" := CopyStr(NewAdditionalInformation, 1, MaxStrLen(POSAuditLog."Additional Information"));
-                    POSAuditLog.Modify();
+                if StrLen(NewAdditionalInformation) > 4 then begin
+                    WholeNumber := CopyStr(NewAdditionalInformation, 1, StrLen(NewAdditionalInformation) - 3);
+                    FractionalPart := CopyStr(NewAdditionalInformation, StrLen(NewAdditionalInformation) - 2);
+                    NewAdditionalInformation := WholeNumber.Replace('.', '') + FractionalPart;
+                    if POSAuditLog."Additional Information" <> NewAdditionalInformation then begin
+                        POSAuditLog."Additional Information" := CopyStr(NewAdditionalInformation, 1, MaxStrLen(POSAuditLog."Additional Information"));
+                        POSAuditLog.Modify();
+                    end;
                 end;
             until POSAuditLog.Next() = 0;
     end;
@@ -85,12 +87,14 @@
 
                 NewAdditionalInformation := RemoveNonNumericChars(NewAdditionalInformation);
                 NewAdditionalInformation := NewAdditionalInformation.Replace(',', '.');
-                WholeNumber := CopyStr(NewAdditionalInformation, 1, StrLen(NewAdditionalInformation) - 3);
-                FractionalPart := CopyStr(NewAdditionalInformation, StrLen(NewAdditionalInformation) - 2);
-                NewAdditionalInformation := WholeNumber.Replace('.', '') + FractionalPart;
-                if POSAuditLog."Additional Information" <> NewAdditionalInformation then begin
-                    POSAuditLog."Additional Information" := CopyStr(NewAdditionalInformation, 1, MaxStrLen(POSAuditLog."Additional Information"));
-                    POSAuditLog.Modify();
+                if StrLen(NewAdditionalInformation) > 4 then begin
+                    WholeNumber := CopyStr(NewAdditionalInformation, 1, StrLen(NewAdditionalInformation) - 3);
+                    FractionalPart := CopyStr(NewAdditionalInformation, StrLen(NewAdditionalInformation) - 2);
+                    NewAdditionalInformation := WholeNumber.Replace('.', '') + FractionalPart;
+                    if POSAuditLog."Additional Information" <> NewAdditionalInformation then begin
+                        POSAuditLog."Additional Information" := CopyStr(NewAdditionalInformation, 1, MaxStrLen(POSAuditLog."Additional Information"));
+                        POSAuditLog.Modify();
+                    end;
                 end;
             until POSAuditLog.Next() = 0;
     end;
