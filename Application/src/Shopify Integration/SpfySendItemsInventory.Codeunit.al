@@ -1576,7 +1576,8 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             RecalculatePrices(SpfyStoreItemLink);
         end;
         if not DisableDataLog then
-            SpfyItemMgt.ScheduleTagsSync(SpfyStoreItemLink, Item."Item Category Code", '');
+            if _SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items, SpfyStoreItemLink."Shopify Store Code") then
+                SpfyItemMgt.ScheduleTagsSync(SpfyStoreItemLink, Item."Item Category Code", '');
     end;
 
     local procedure ModifySpfyStoreItemLink(var SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; DisableDataLog: Boolean)
