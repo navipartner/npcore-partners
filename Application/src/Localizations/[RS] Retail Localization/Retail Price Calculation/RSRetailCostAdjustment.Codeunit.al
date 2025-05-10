@@ -39,15 +39,18 @@ codeunit 6184751 "NPR RS Retail Cost Adjustment"
     local procedure ItemCostManagement_OnAfterSetFilters(var ValueEntry: Record "Value Entry"; var Item: Record Item)
     var
         RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
-        ValueEntryNoFilter: Text;
+        RetailLocationFilter: Text;
     begin
         if not RSRLocalizationMgt.IsRSLocalizationActive() then
             exit;
 
-        ValueEntryNoFilter := FormatFilterDiffFromValueEntryMapping(Item, ValueEntry.GetFilter("Entry No."));
+        if Item."No." = '' then
+            exit;
 
-        if ValueEntryNoFilter <> '' then
-            ValueEntry.SetFilter("Entry No.", StrSubstNo('%1', ValueEntryNoFilter));
+        RetailLocationFilter := CreateRetailLocationsFilter();
+
+        if RetailLocationFilter <> '' then
+            ValueEntry.SetFilter("Location Code", StrSubstNo('%1', RetailLocationFilter));
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Batch", 'OnPostLinesOnAfterPostLine', '', false, false)]
@@ -75,33 +78,24 @@ codeunit 6184751 "NPR RS Retail Cost Adjustment"
 
 #if not (BC17 or BC18 or BC19 or BC20 or BC2100 or BC2101 or BC2102 or BC2103 or BC2105)
 
-    local procedure FormatFilterDiffFromValueEntryMapping(Item: Record Item; BaseFilter: Text) ValueEntryNoFilter: Text
+    local procedure CreateRetailLocationsFilter() LocationCodeFilter: Text
     var
-        RSRetValueEntryMapp: Record "NPR RS Ret. Value Entry Mapp.";
+        Location: Record Location;
         TextBuilder: TextBuilder;
         FilterDiffFormLbl: Label '<>%1', Locked = true, Comment = '%1 = Entry No.';
         AddFilterDiffFormLbl: Label '&<>%1', Locked = true, Comment = '%1 = Entry No.';
     begin
-        if BaseFilter <> '' then
-            TextBuilder.Append(BaseFilter.Replace(',', '|'));
-
-        RSRetValueEntryMapp.SetFilter("Location Code", Item.GetFilter("Location Filter"));
-        RSRetValueEntryMapp.SetRange("Item No.", Item."No.");
-        if RSRetValueEntryMapp.IsEmpty() then begin
-            ValueEntryNoFilter := TextBuilder.ToText();
+        Location.SetRange("NPR Retail Location", true);
+        if not Location.FindSet() then
             exit;
-        end;
+        repeat
+            if TextBuilder.Length = 0 then
+                TextBuilder.Append(StrSubstNo(FilterDiffFormLbl, Location.Code))
+            else
+                TextBuilder.Append(StrSubstNo(AddFilterDiffFormLbl, Location.Code))
+        until Location.Next() = 0;
 
-        RSRetValueEntryMapp.SetLoadFields("Entry No.");
-        if RSRetValueEntryMapp.FindSet() then
-            repeat
-                if TextBuilder.Length = 0 then
-                    TextBuilder.Append(StrSubstNo(FilterDiffFormLbl, RSRetValueEntryMapp."Entry No."))
-                else
-                    TextBuilder.Append(StrSubstNo(AddFilterDiffFormLbl, RSRetValueEntryMapp."Entry No."))
-            until RSRetValueEntryMapp.Next() = 0;
-
-        ValueEntryNoFilter := TextBuilder.ToText();
+        LocationCodeFilter := TextBuilder.ToText();
     end;
 
 #endif
