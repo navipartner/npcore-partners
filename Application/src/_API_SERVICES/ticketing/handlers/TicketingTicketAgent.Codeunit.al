@@ -483,8 +483,6 @@ codeunit 6185080 "NPR TicketingTicketAgent"
     end;
 
     local procedure FindTicketDTO(var ResponseJson: Codeunit "NPR JSON Builder"; Ticket: Record "NPR TM Ticket"; WithEvents: Boolean): Codeunit "NPR JSON Builder";
-    var
-        TimeZoneHelper: Codeunit "NPR TM TimeHelper";
     begin
         if (Ticket."External Ticket No." = '') then
             exit(ResponseJson);
@@ -493,10 +491,7 @@ codeunit 6185080 "NPR TicketingTicketAgent"
             .AddProperty('ticketId', Format(Ticket.SystemId, 0, 4).ToLower())
             .AddProperty('ticketNumber', Ticket."External Ticket No.")
             .AddProperty('itemNumber', Ticket."Item No.")
-            .AddProperty('validFrom', TimeZoneHelper.FormatDateTimeWithAdmissionTimeZone('', Ticket."Valid From Date", Ticket."Valid From Time"))
-            .AddProperty('validUntil', TimeZoneHelper.FormatDateTimeWithAdmissionTimeZone('', Ticket."Valid To Date", Ticket."Valid To Time"))
-            .AddProperty('issuedAt', TimeZoneHelper.FormatDateTimeWithAdmissionTimeZone('', TimeZoneHelper.AdjustZuluToAdmissionLocalDateTime('', Ticket.SystemCreatedAt)))
-            .AddProperty('blocked', Ticket.Blocked)
+            .AddObject(TicketValidDateProperties(ResponseJson, Ticket))
             .AddProperty('unitPrice', Ticket.AmountExclVat)
             .AddProperty('unitPriceInclVat', Ticket.AmountInclVat)
             .AddArray(TicketHistoryDTO(ResponseJson, 'accessHistory', Ticket, WithEvents))
@@ -608,7 +603,8 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         ResponseJson
             .AddProperty('validFrom', TimeZoneHelper.FormatDateTimeWithAdmissionTimeZone('', Ticket."Valid From Date", Ticket."Valid From Time"))
             .AddProperty('validUntil', TimeZoneHelper.FormatDateTimeWithAdmissionTimeZone('', Ticket."Valid To Date", Ticket."Valid To Time"))
-            .AddProperty('issuedAt', TimeZoneHelper.FormatDateTimeWithAdmissionTimeZone('', TimeZoneHelper.AdjustZuluToAdmissionLocalDateTime('', Ticket.SystemCreatedAt)));
+            .AddProperty('issuedAt', TimeZoneHelper.FormatDateTimeWithAdmissionTimeZone('', TimeZoneHelper.AdjustZuluToAdmissionLocalDateTime('', Ticket.SystemCreatedAt)))
+            .AddProperty('blocked', Ticket.Blocked);
         exit(ResponseJson);
     end;
 

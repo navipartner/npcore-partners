@@ -250,44 +250,33 @@ codeunit 6185130 "NPR SG SpeedGate"
     internal procedure ValidateAdmitTicket(var ValidationRequest: Record "NPR SGEntryLog"; Quantity: Integer): Guid
     var
         TicketManagement: Codeunit "NPR TM Ticket Management";
+        TimeHelper: Codeunit "NPR TM TimeHelper";
         Ticket: Record "NPR TM Ticket";
-        ResponseMessage: Text;
+        ResponseMessage: Label 'Invalid Validation Request';
     begin
-        ResponseMessage := 'Invalid Validation Request';
-        if (not (ValidationRequest.ReferenceNumberType in [ValidationRequest.ReferenceNumberType::TICKET,
-                                                           ValidationRequest.ReferenceNumberType::WALLET,
-                                                           ValidationRequest.ReferenceNumberType::DOC_LX_CITY_CARD,
-                                                           ValidationRequest.ReferenceNumberType::TICKET_REQUEST])) then
-            Error('The admit request contains an unhandled Type: %1', ValidationRequest.ReferenceNumberType);
+        case ValidationRequest.ReferenceNumberType of
 
-        if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::TICKET) then
-            if (not Ticket.GetBySystemId(ValidationRequest.EntityId)) then
-                Error(ResponseMessage);
+            ValidationRequest.ReferenceNumberType::TICKET:
+                if (not Ticket.GetBySystemId(ValidationRequest.EntityId)) then
+                    Error(ResponseMessage);
 
-        if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::WALLET) then
-            if (not Ticket.GetBySystemId(ValidationRequest.ExtraEntityId)) then
-                Error(ResponseMessage);
-
-        if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::DOC_LX_CITY_CARD) then
-            if (not Ticket.GetBySystemId(ValidationRequest.ExtraEntityId)) then
-                Error(ResponseMessage);
-
-        if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::TICKET_REQUEST) then
-            if (not Ticket.GetBySystemId(ValidationRequest.ExtraEntityId)) then
-                Error(ResponseMessage);
+            ValidationRequest.ReferenceNumberType::WALLET,
+            ValidationRequest.ReferenceNumberType::DOC_LX_CITY_CARD,
+            ValidationRequest.ReferenceNumberType::TICKET_REQUEST:
+                if (not Ticket.GetBySystemId(ValidationRequest.ExtraEntityId)) then
+                    Error(ResponseMessage);
+            else
+                Error('This is a programming error. The admit request contains an unhandled Type: %1', ValidationRequest.ReferenceNumberType);
+        end;
 
         ValidationRequest.AdmittedReferenceNo := Ticket."External Ticket No.";
         ValidationRequest.AdmittedReferenceId := Ticket.SystemId;
         ValidationRequest.AdmittedQuantity := Quantity;
 
-        if (Quantity <> ValidationRequest.SuggestedQuantity) then
+        if ((Quantity <> ValidationRequest.SuggestedQuantity) and (ValidationRequest.SuggestedQuantity > 1)) then
             TicketManagement.ChangeConfirmedTicketQuantity(Ticket."No.", ValidationRequest.AdmissionCode, Quantity);
 
-        TicketManagement.RegisterArrivalScanTicket("NPR TM TicketIdentifierType"::EXTERNAL_TICKET_NO,
-            CopyStr(ValidationRequest.AdmittedReferenceNo, 1, 30),
-            ValidationRequest.AdmissionCode,
-            -1, '', // PosUnitNo, 
-            ValidationRequest.ScannerId, false);
+        TicketManagement.ValidateTicketForArrival(Ticket, ValidationRequest.AdmissionCode, -1, TimeHelper.GetLocalTimeAtAdmission(ValidationRequest.AdmissionCode));
 
         ValidationRequest.EntryStatus := ValidationRequest.EntryStatus::ADMITTED;
         ValidationRequest.AdmittedAt := CurrentDateTime();
@@ -696,6 +685,11 @@ codeunit 6185130 "NPR SG SpeedGate"
             exit(false);
 
         EntityId := LogEntry.SystemId;
+
+        // Requires the whitelist to precisely match the city card numbers
+        if (not (LogEntry.ValidationResultCode = '200')) then
+            exit(SetApiError(_ApiErrors::city_card_not_valid));
+
         exit(true);
     end;
 

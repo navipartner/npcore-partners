@@ -130,6 +130,7 @@ types:
       validFrom: datetime
       validUntil: datetime
       issuedAt: simpleTypes.IssuedAt
+      blocked: boolean
       pinCode: optional<simpleTypes.PinCode>
       unitPrice: optional<double>
       unitPriceInclVat: optional<double>
@@ -150,6 +151,7 @@ types:
           validFrom: $simpleTypes.ReferenceDateTime.ExampleValidFrom
           validUntil: $simpleTypes.ReferenceDateTime.ExampleValidUntil
           issuedAt: $simpleTypes.IssuedAt.ExampleIssuedAt
+          blocked: false
           pinCode: 12-34
           unitPrice: 80.00
           unitPriceInclVat: 100.00
@@ -170,6 +172,7 @@ types:
           validFrom: $simpleTypes.ReferenceDateTime.ExampleValidFrom
           validUntil: $simpleTypes.ReferenceDateTime.ExampleValidUntil
           issuedAt: $simpleTypes.IssuedAt.ExampleIssuedAt
+          blocked: false
           pinCode: 12-34
           ticketHolder: $simpleTypes.TicketHolder.ExampleTicketHolder
           content: 

@@ -156,6 +156,10 @@ enum 6059810 "NPR API Error Code"
     {
         Caption = 'The ticket setup prevents admit during end of sale.', Locked = true;
     }
+    value(6060043; city_card_not_valid)
+    {
+        Caption = 'The city card is not valid.', Locked = true;
+    }
     value(6060133; member_blocked)
     {
         Caption = 'Member is blocked.', Locked = true;
