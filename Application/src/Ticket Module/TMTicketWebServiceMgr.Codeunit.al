@@ -1045,7 +1045,6 @@
                 TicketReservationRequest2.SetFilter("Session Token ID", '=%1', Token);
                 TicketReservationRequest2.SetFilter("Admission Code", '=%1', TMTicketAdmissionBOM."Admission Code");
                 TicketReservationRequest2.SetFilter("Ext. Line Reference No.", '=%1', Line);
-                TicketReservationRequest2.SetFilter("Admission Inclusion", '=%1', TicketReservationRequest."Admission Inclusion"::REQUIRED);
                 TicketReservationRequest2.SetLoadFields("Entry No.");
                 if (not TicketReservationRequest2.FindFirst()) then
                     TMTicketRequestManager.POS_AppendToReservationRequest(Token, TicketReservationRequest."Receipt No.", TicketReservationRequest."Line No.", TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code",
