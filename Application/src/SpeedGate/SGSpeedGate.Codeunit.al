@@ -276,7 +276,7 @@ codeunit 6185130 "NPR SG SpeedGate"
         if ((Quantity <> ValidationRequest.SuggestedQuantity) and (ValidationRequest.SuggestedQuantity > 1)) then
             TicketManagement.ChangeConfirmedTicketQuantity(Ticket."No.", ValidationRequest.AdmissionCode, Quantity);
 
-        TicketManagement.ValidateTicketForArrival(Ticket, ValidationRequest.AdmissionCode, -1, TimeHelper.GetLocalTimeAtAdmission(ValidationRequest.AdmissionCode));
+        TicketManagement.ValidateTicketForArrival(Ticket, ValidationRequest.AdmissionCode, -1, TimeHelper.GetLocalTimeAtAdmission(ValidationRequest.AdmissionCode), ValidationRequest.ScannerId);
 
         ValidationRequest.EntryStatus := ValidationRequest.EntryStatus::ADMITTED;
         ValidationRequest.AdmittedAt := CurrentDateTime();

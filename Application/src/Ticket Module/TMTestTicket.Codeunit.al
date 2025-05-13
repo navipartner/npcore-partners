@@ -15,7 +15,7 @@ codeunit 6059874 "NPR TM Test Ticket"
         if (not TicketManagement.GetTicket("NPR TM TicketIdentifierType"::EXTERNAL_TICKET_NO, Rec."Ticket Reference No.", Ticket)) then
             Error(NotFound, Rec."Ticket Reference No.");
 
-        TicketManagement.ValidateTicketForArrival(Ticket, Rec."Admission Code", -1, CreateDateTime(Rec."Event Date", Rec."Event Time"));
+        TicketManagement.ValidateTicketForArrival(Ticket, Rec."Admission Code", -1, CreateDateTime(Rec."Event Date", Rec."Event Time"), '');
         Error(ValidLbl);
     end;
 }

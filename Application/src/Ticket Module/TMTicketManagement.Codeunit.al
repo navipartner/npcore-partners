@@ -165,10 +165,10 @@
 
         if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_TYPE) then begin
             if (TicketType."Activation Method" = "NPR TM ActivationMethod_Type"::POS_DEFAULT) then
-                Admitted := RegisterDefaultAdmissionArrivalOnPosSales(Ticket);
+                Admitted := RegisterDefaultAdmissionArrivalOnPosSales(Ticket, '');
 
             if (TicketType."Activation Method" = "NPR TM ActivationMethod_Type"::POS_ALL) then
-                Admitted := RegisterAllAdmissionArrivalOnPosSales(Ticket);
+                Admitted := RegisterAllAdmissionArrivalOnPosSales(Ticket, '');
         end;
 
         if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_BOM) then
@@ -429,18 +429,18 @@
         exit(Codeunit::"NPR TM Ticket Management");
     end;
 
-    internal procedure ValidateTicketForArrival(Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]): Boolean
+    internal procedure ValidateTicketForArrival(Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; ScannerStationId: Text[30]): Boolean
     var
         TimeHelper: Codeunit "NPR TM TimeHelper";
     begin
         if (AdmissionCode = '') then
             AdmissionCode := GetDefaultAdmissionCode(Ticket."Item No.", Ticket."Variant Code");
 
-        ValidateTicketForArrival(Ticket, AdmissionCode, -1, TimeHelper.GetLocalTimeAtAdmission(AdmissionCode)); // Throws error on fail
+        ValidateTicketForArrival(Ticket, AdmissionCode, -1, TimeHelper.GetLocalTimeAtAdmission(AdmissionCode), ScannerStationId); // Throws error on fail
         exit(true);
     end;
 
-    internal procedure ValidateTicketForArrival(Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; EventDateTime: DateTime)
+    internal procedure ValidateTicketForArrival(Ticket: Record "NPR TM Ticket"; AdmissionCode: Code[20]; AdmissionScheduleEntryNo: Integer; EventDateTime: DateTime; ScannerStationId: Text[30])
     var
         Admission: Record "NPR TM Admission";
         TicketAccessEntryNo: Integer;
@@ -461,7 +461,7 @@
         ValidateTicketReference(Ticket, AdmissionCode, TicketAccessEntryNo, false);
         ValidateScheduleReference(TicketAccessEntryNo, AdmissionCode, AdmissionScheduleEntryNo, EventDateTime);
 
-        AdmissionEntryNo := RegisterArrival_Worker(TicketAccessEntryNo, AdmissionScheduleEntryNo, TicketBom.DurationGroupCode, EventDateTime);
+        AdmissionEntryNo := RegisterArrival_Worker(TicketAccessEntryNo, AdmissionScheduleEntryNo, TicketBom.DurationGroupCode, EventDateTime, ScannerStationId);
 
         ValidateAdmissionDependencies(TicketAccessEntryNo);
 
@@ -1235,16 +1235,16 @@
         until (TicketAccessEntry.Next() = 0);
     end;
 
-    local procedure RegisterDefaultAdmissionArrivalOnPosSales(Ticket: Record "NPR TM Ticket"): Boolean
+    local procedure RegisterDefaultAdmissionArrivalOnPosSales(Ticket: Record "NPR TM Ticket"; ScannerStationId: Text[30]): Boolean
     var
         AdmissionCode: Code[20];
     begin
 
         AdmissionCode := GetDefaultAdmissionCode(Ticket."Item No.", Ticket."Variant Code");
-        exit(ValidateTicketForArrival(Ticket, AdmissionCode));
+        exit(ValidateTicketForArrival(Ticket, AdmissionCode, ScannerStationId));
     end;
 
-    local procedure RegisterAllAdmissionArrivalOnPosSales(Ticket: Record "NPR TM Ticket"): Boolean
+    local procedure RegisterAllAdmissionArrivalOnPosSales(Ticket: Record "NPR TM Ticket"; ScannerStationId: Text[30]): Boolean
     var
         Admission: Record "NPR TM Admission";
         TicketBom: Record "NPR TM Ticket Admission BOM";
@@ -1259,11 +1259,11 @@
         repeat
             Admission.Get(TicketBom."Admission Code");
             if (TicketBom."Admission Inclusion" = TicketBom."Admission Inclusion"::REQUIRED) then
-                ValidateTicketForArrival(Ticket, Admission."Admission Code");
+                ValidateTicketForArrival(Ticket, Admission."Admission Code", ScannerStationId);
 
             if (TicketBom."Admission Inclusion" <> TicketBom."Admission Inclusion"::REQUIRED) then
                 if (AdmissionIsOptionalAndSelected(Ticket, Admission."Admission Code")) then
-                    ValidateTicketForArrival(Ticket, Admission."Admission Code");
+                    ValidateTicketForArrival(Ticket, Admission."Admission Code", ScannerStationId);
 
         until (TicketBom.Next() = 0);
         exit(true);
@@ -1384,7 +1384,7 @@
             if (AdmissionCode = '') then
                 AdmissionCode := GetDefaultAdmissionCode(Ticket."Item No.", Ticket."Variant Code");
 
-            ValidateTicketForArrival(Ticket, AdmissionCode, AdmissionScheduleEntryNo, TimeHelper.GetLocalTimeAtAdmission(AdmissionCode));
+            ValidateTicketForArrival(Ticket, AdmissionCode, AdmissionScheduleEntryNo, TimeHelper.GetLocalTimeAtAdmission(AdmissionCode), ScannerStationId);
         end;
 
         if (WithPrint) then
@@ -1427,14 +1427,14 @@
                 case TicketBom."Activation Method" of
                     "NPR TM ActivationMethod_Bom"::SCAN:
                         if (ProcessFlow = ProcessFlow::SCAN) then
-                            TicketAdmitted := TicketAdmitted or ValidateTicketForArrival(Ticket, Admission."Admission Code");
+                            TicketAdmitted := TicketAdmitted or ValidateTicketForArrival(Ticket, Admission."Admission Code", ScannerStationId);
 
                     "NPR TM ActivationMethod_Bom"::POS:
                         if (ProcessFlow = ProcessFlow::SALES) then
-                            TicketAdmitted := TicketAdmitted or ValidateTicketForArrival(Ticket, Admission."Admission Code");
+                            TicketAdmitted := TicketAdmitted or ValidateTicketForArrival(Ticket, Admission."Admission Code", ScannerStationId);
 
                     "NPR TM ActivationMethod_Bom"::ALWAYS:
-                        TicketAdmitted := TicketAdmitted or ValidateTicketForArrival(Ticket, Admission."Admission Code");
+                        TicketAdmitted := TicketAdmitted or ValidateTicketForArrival(Ticket, Admission."Admission Code", ScannerStationId);
 
                     "NPR TM ActivationMethod_Bom"::PER_UNIT:
                         begin
@@ -1450,26 +1450,26 @@
 
                             if (ProcessFlow = ProcessFlow::SCAN) then
                                 if (IsSelectedAdmissionDefaultOnPosScan(Ticket."Item No.", Ticket."Variant Code", Admission."Admission Code", StationType, StationIdentifier)) then
-                                    TicketAdmitted := TicketAdmitted or ValidateTicketForArrival(Ticket, Admission."Admission Code");
+                                    TicketAdmitted := TicketAdmitted or ValidateTicketForArrival(Ticket, Admission."Admission Code", ScannerStationId);
 
                             if (ProcessFlow = ProcessFlow::SALES) then
                                 if (IsSelectedAdmissionDefaultOnPosSale(Ticket."Item No.", Ticket."Variant Code", Admission."Admission Code", StationType, StationIdentifier)) then
-                                    TicketAdmitted := TicketAdmitted or ValidateTicketForArrival(Ticket, Admission."Admission Code");
+                                    TicketAdmitted := TicketAdmitted or ValidateTicketForArrival(Ticket, Admission."Admission Code", ScannerStationId);
                         end;
 
                     "NPR TM ActivationMethod_Bom"::NA: // Fallback (default) to Ticket Type setup
                         begin
                             if (ProcessFlow = ProcessFlow::SALES) then begin
                                 if ((TicketType."Activation Method" = "NPR TM ActivationMethod_Type"::POS_DEFAULT) and TicketBom.Default) then
-                                    TicketAdmitted := TicketAdmitted or ValidateTicketForArrival(Ticket, Admission."Admission Code");
+                                    TicketAdmitted := TicketAdmitted or ValidateTicketForArrival(Ticket, Admission."Admission Code", ScannerStationId);
 
                                 if (TicketType."Activation Method" = "NPR TM ActivationMethod_Type"::POS_ALL) then
-                                    TicketAdmitted := TicketAdmitted or ValidateTicketForArrival(Ticket, Admission."Admission Code");
+                                    TicketAdmitted := TicketAdmitted or ValidateTicketForArrival(Ticket, Admission."Admission Code", ScannerStationId);
                             end;
 
                             if (ProcessFlow = ProcessFlow::SCAN) then
                                 if (TicketBom.Default) then
-                                    TicketAdmitted := TicketAdmitted or ValidateTicketForArrival(Ticket, Admission."Admission Code");
+                                    TicketAdmitted := TicketAdmitted or ValidateTicketForArrival(Ticket, Admission."Admission Code", ScannerStationId);
                         end;
                 end;
             end;
@@ -2268,7 +2268,7 @@
     end;
 
     //local procedure RegisterArrival_Worker(TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer; DurationGroupCode: Code[10]; EventDate: Date; EventTime: Time; TimeZoneCode: Code[20]): Integer
-    local procedure RegisterArrival_Worker(TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer; DurationGroupCode: Code[10]; EventDateTime: DateTime): Integer
+    local procedure RegisterArrival_Worker(TicketAccessEntryNo: Integer; TicketAdmissionSchEntryNo: Integer; DurationGroupCode: Code[10]; EventDateTime: DateTime; ScannerStationId: Text[30]): Integer
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         AdmittedTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
@@ -2301,6 +2301,7 @@
         AdmittedTicketAccessEntry."External Adm. Sch. Entry No." := AdmissionScheduleEntry."External Schedule Entry No.";
         AdmittedTicketAccessEntry.Quantity := TicketAccessEntry.Quantity;
         AdmittedTicketAccessEntry.Open := true;
+        AdmittedTicketAccessEntry."Scanner Station ID" := ScannerStationId;
         AdmittedTicketAccessEntry.Insert(true);
         AdmittedTicketAccessEntry."Created Datetime" := CurrentDateTime();
         AdmittedTicketAccessEntry.AdmittedDate := DT2Date(EventDateTime);
@@ -3914,7 +3915,10 @@
             if (TmpAggregatedPerRequest.Get(TmpTicket."Ticket Reservation Entry No.")) then begin
                 // if the request is missing vital data (customer no) it will not aggregate, no invoice created, no payment was claimed
                 DetTicketAccessEntry.Open := false;
-                DetTicketAccessEntry."Scanner Station ID" := TmpAggregatedPerRequest.Description; // Invoice number
+
+                // This was a bit of misuse, we should not put the invoice number in the scanner station id.
+                // 
+                // DetTicketAccessEntry."Scanner Station ID" := TmpAggregatedPerRequest.Description; // Invoice number
             end;
 
             DetTicketAccessEntry.Modify();

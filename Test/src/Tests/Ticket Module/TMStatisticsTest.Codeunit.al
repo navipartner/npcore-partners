@@ -592,7 +592,7 @@ codeunit 85113 "NPR TM Statistics Test"
     var
         TicketMgt: Codeunit "NPR TM Ticket Management";
     begin
-        TicketMgt.ValidateTicketForArrival(Ticket, '', -1, CreateDateTime(EventDate, EventTime));
+        TicketMgt.ValidateTicketForArrival(Ticket, '', -1, CreateDateTime(EventDate, EventTime), '');
     end;
 
     [Normal]
