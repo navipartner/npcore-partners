@@ -28,8 +28,8 @@ pageextension 6014424 "NPR Job Queue Entry Card" extends "Job Queue Entry Card"
             field("NPR Managed by App"; _ManagedByApp)
             {
                 ApplicationArea = NPRRetail;
-                Caption = 'Managed by App';
-                ToolTip = 'Specifies whether this Job Queue entry is allowed to be managed by the NP Refresher functionality.';
+                Caption = 'Monitored Job';
+                ToolTip = 'Specifies whether this Job Queue entry is monitored by the NP Refresher functionality.';
                 Editable = _RefreshingCanBeToggled;
 
                 trigger OnValidate()
