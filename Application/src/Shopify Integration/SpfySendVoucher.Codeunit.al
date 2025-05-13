@@ -237,11 +237,13 @@ codeunit 6184820 "NPR Spfy Send Voucher"
     var
         Customer: Record Customer;
         JobQueueMgt: Codeunit "NPR Job Queue Management";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         RecipientAttributesJson: JsonObject;
         RequestJson: JsonObject;
         VariablesJson: JsonObject;
         VoucherJson: JsonObject;
-        RecipientShopifyCustomerGID: Text;
+        ShopifyBillToCustGID: Text;
+        ShopifyShipToCustGID: Text;
         CreateQueryTok: Label 'mutation CreateGiftCard($input: GiftCardCreateInput!) {giftCardCreate(input: $input) {giftCard {id} userErrors {message field code}}}', Locked = true;
         UpdateQueryTok: Label 'mutation UpdateGiftCard($id: ID!, $input: GiftCardUpdateInput!) {giftCardUpdate(id: $id, input: $input) {giftCard {id} userErrors {message field}}}', Locked = true;
     begin
@@ -260,38 +262,38 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         if Voucher."Ending Date" <> 0DT then
             VoucherJson.Add('expiresOn', Format(DT2Date(Voucher."Ending Date"), 0, 9));
 
-        if ShopifyGiftCardID = '' then begin
+        if (ShopifyGiftCardID = '') and Voucher."Spfy Send from Shopify" then begin
             if Voucher."Customer No." <> '' then
-                if not Customer.Get(Voucher."Customer No.") then
-                    Customer.Init();
-            if (Customer."E-Mail" <> '') or (Voucher."E-mail" <> '') or (Voucher."Spfy Recipient E-mail" <> '') then begin
-                if Voucher."Spfy Recipient E-mail" <> '' then
-                    Customer."E-Mail" := Voucher."Spfy Recipient E-mail"
-                else
-                    if Voucher."E-mail" <> '' then
-                        Customer."E-Mail" := Voucher."E-mail";
-                if Voucher."Spfy Recipient Name" <> '' then begin
-                    Customer.Name := CopyStr(Voucher."Spfy Recipient Name", 1, MaxStrLen(Customer.Name));
-                    Customer."Name 2" := CopyStr(Voucher."Spfy Recipient Name", MaxStrLen(Customer.Name) + 1, MaxStrLen(Customer."Name 2"));
-                end else
-                    if Voucher.Name + Voucher."Name 2" <> '' then begin
-                        Customer.Name := Voucher.Name;
-                        Customer."Name 2" := Voucher."Name 2";
+                if Customer.Get(Voucher."Customer No.") then begin
+                    ShopifyBillToCustGID := SpfyAssignedIDMgt.GetAssignedShopifyID(Customer.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+                    if ShopifyBillToCustGID <> '' then
+                        ShopifyBillToCustGID := StrSubstNo('gid://shopify/Customer/%1', ShopifyBillToCustGID)
+                    else begin
+                        If Customer."E-Mail" = '' then
+                            Customer."E-Mail" := Voucher."E-mail";
+                        If Customer."E-Mail" <> '' then
+                            ShopifyBillToCustGID := GetCustomerGIDFromShopify(Customer, ShopifyStoreCode);
                     end;
-
-                RecipientShopifyCustomerGID := RecipientCustomerGID(Customer, ShopifyStoreCode);
-                VoucherJson.Add('customerId', RecipientShopifyCustomerGID);
-
-                if Voucher."Spfy Send from Shopify" then begin
-                    RecipientAttributesJson.Add('id', RecipientShopifyCustomerGID);
-                    if Voucher."Voucher Message" <> '' then
-                        RecipientAttributesJson.Add('message', Voucher."Voucher Message");
-                    RecipientAttributesJson.Add('preferredName', GetFullName(Voucher.Name, Voucher."Name 2"));
-                    if Voucher."Spfy Send on" <> 0DT then
-                        if Voucher."Spfy Send on" > JobQueueMgt.NowWithDelayInSeconds(60) then
-                            RecipientAttributesJson.Add('sendNotificationAt', Voucher."Spfy Send on");
-                    VoucherJson.Add('recipientAttributes', RecipientAttributesJson);
+                    if ShopifyBillToCustGID <> '' then
+                        VoucherJson.Add('customerId', ShopifyBillToCustGID);
                 end;
+
+            if Voucher."Spfy Recipient E-mail" <> '' then begin
+                Clear(Customer);
+                Customer."E-Mail" := Voucher."Spfy Recipient E-mail";
+                Customer.Name := CopyStr(Voucher."Spfy Recipient Name", 1, MaxStrLen(Customer.Name));
+                Customer."Name 2" := CopyStr(Voucher."Spfy Recipient Name", MaxStrLen(Customer.Name) + 1, MaxStrLen(Customer."Name 2"));
+
+                ShopifyShipToCustGID := GetCustomerGIDFromShopify(Customer, ShopifyStoreCode);
+
+                RecipientAttributesJson.Add('id', ShopifyShipToCustGID);
+                if Voucher."Voucher Message" <> '' then
+                    RecipientAttributesJson.Add('message', Voucher."Voucher Message");
+                RecipientAttributesJson.Add('preferredName', GetFullName(Customer.Name, Customer."Name 2"));
+                if Voucher."Spfy Send on" <> 0DT then
+                    if Voucher."Spfy Send on" > JobQueueMgt.NowWithDelayInSeconds(60) then
+                        RecipientAttributesJson.Add('sendNotificationAt', Voucher."Spfy Send on");
+                VoucherJson.Add('recipientAttributes', RecipientAttributesJson);
             end;
         end;
 
@@ -300,7 +302,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         RequestJson.WriteTo(QueryStream);
     end;
 
-    local procedure RecipientCustomerGID(Customer: Record Customer; ShopifyStoreCode: Code[20]) ShopifyCustomerGID: Text
+    local procedure GetCustomerGIDFromShopify(Customer: Record Customer; ShopifyStoreCode: Code[20]) ShopifyCustomerGID: Text
     var
         ShopifyResponse: JsonToken;
         CustomerCreateQueryErr: Label 'The system was unable to create a customer with email %1 in Shopify. The following error occurred:\%2', Comment = '%1 - customer email address, %2 - Shopify API call error details';

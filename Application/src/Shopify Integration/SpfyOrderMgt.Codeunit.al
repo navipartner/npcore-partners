@@ -592,9 +592,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
     var
         Customer2: Record Customer;
         NpEcCustomerMapping: Record "NPR NpEc Customer Mapping";
-        ShopifyAssignedID: Record "NPR Spfy Assigned ID";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
-        RecRef: RecordRef;
         CountryCode: Code[10];
         CustomerShopifyID: Text[30];
         CustomerName: Text;
@@ -603,28 +601,28 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         PostCode: Text;
         Found: Boolean;
     begin
-        Clear(Customer);
-        CustomerShopifyID := CopyStr(JsonHelper.GetJText(Order, 'customer.id', false), 1, MaxStrLen(CustomerShopifyID));
-        if CustomerShopifyID <> '' then begin
-            Found := false;
-            SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::Customer, "NPR Spfy ID Type"::"Entry ID", CustomerShopifyID, ShopifyAssignedID);
-            if ShopifyAssignedID.FindSet() then
-                repeat
-                    if RecRef.Get(ShopifyAssignedID."BC Record ID") then begin
-                        RecRef.SetTable(Customer);
-                        Found := Customer.Find() and (Customer.Blocked = Customer.Blocked::" ");
-                    end;
-                until (ShopifyAssignedID.Next() = 0) or Found;
-            if Found then
-                exit;
-            if not Found and (Customer."No." <> '') then
-                Customer.TestField(Blocked, Customer.Blocked::" ");  //raise error
-        end;
-
         Email := JsonHelper.GetJText(Order, 'customer.email', MaxStrLen(Customer."E-Mail"), false);
         Phone := JsonHelper.GetJText(Order, 'customer.phone', MaxStrLen(Customer."Phone No."), false);
         if (Phone = '') then
             Phone := JsonHelper.GetJText(Order, 'customer.default_address.phone', MaxStrLen(Customer."Phone No."), false);
+        CustomerShopifyID := CopyStr(JsonHelper.GetJText(Order, 'customer.id', false), 1, MaxStrLen(CustomerShopifyID));
+        Found := FindCustomerByShopifyID(NpEcStore, CustomerShopifyID, Email, Phone, false, Customer);
+        if not Found and (NpEcStore."Customer Mapping" <> NpEcStore."Customer Mapping"::"Customer No.") then
+            Found := FindCustomerByShopifyID(NpEcStore, CustomerShopifyID, Email, Phone, true, Customer);
+        if Found then begin
+            Customer2 := Customer;
+#pragma warning disable AA0139
+            if (Customer."E-Mail" <> Email) and (Email <> '') then
+                Customer."E-Mail" := Email;
+            if (Customer."Phone No." <> Phone) and (Phone <> '') then
+                Customer."Phone No." := Phone;
+#pragma warning restore AA0139
+            if Format(Customer) <> Format(Customer2) then
+                Customer.Modify();
+            exit;
+        end;
+        if Customer."No." <> '' then
+            Customer.TestField(Blocked, Customer.Blocked::" ");  //raise error
 
         if ((NpEcStore."Customer Mapping" in [NpEcStore."Customer Mapping"::"E-mail", NpEcStore."Customer Mapping"::"E-mail OR Phone No."]) and (Email <> '')) or
            ((NpEcStore."Customer Mapping" in [NpEcStore."Customer Mapping"::"Phone No.", NpEcStore."Customer Mapping"::"E-mail OR Phone No."]) and (Phone <> '')) or
@@ -706,6 +704,32 @@ codeunit 6184814 "NPR Spfy Order Mgt."
 
         NpEcStore.testfield("Spfy Customer No.");
         Customer.Get(NpEcStore."Spfy Customer No.");
+    end;
+
+    local procedure FindCustomerByShopifyID(NpEcStore: Record "NPR NpEc Store"; CustomerShopifyID: Text[30]; Email: Text; Phone: Text; IgnoreEmailPhone: Boolean; var Customer: Record Customer) Found: Boolean
+    var
+        ShopifyAssignedID: Record "NPR Spfy Assigned ID";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        RecRef: RecordRef;
+    begin
+        Clear(Customer);
+        Found := false;
+        if CustomerShopifyID = '' then
+            exit;
+        SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::Customer, "NPR Spfy ID Type"::"Entry ID", CustomerShopifyID, ShopifyAssignedID);
+        if ShopifyAssignedID.FindSet() then
+            repeat
+                RecRef := ShopifyAssignedID."BC Record ID".GetRecord();
+                RecRef.SetTable(Customer);
+                Found := Customer.Find() and (Customer.Blocked = Customer.Blocked::" ");
+                if Found and not IgnoreEmailPhone and
+                   (NpEcStore."Customer Mapping" <> NpEcStore."Customer Mapping"::"Customer No.")
+                then
+                    Found :=
+                        ((NpEcStore."Customer Mapping" in [NpEcStore."Customer Mapping"::"E-mail", NpEcStore."Customer Mapping"::"E-mail OR Phone No."]) and (Customer."E-Mail" = Email)) or
+                        ((NpEcStore."Customer Mapping" in [NpEcStore."Customer Mapping"::"Phone No.", NpEcStore."Customer Mapping"::"E-mail OR Phone No."]) and (Customer."Phone No." = Phone)) or
+                        ((NpEcStore."Customer Mapping" = NpEcStore."Customer Mapping"::"E-mail AND Phone No.") and (Customer."E-Mail" = Email) and (Customer."Phone No." = Phone));
+            until (ShopifyAssignedID.Next() = 0) or Found;
     end;
 
     local procedure CreateCustomerFromTemplate(var Customer: Record Customer; CustomerTemplCode: Code[20])
@@ -1229,8 +1253,6 @@ codeunit 6184814 "NPR Spfy Order Mgt."
             PropertyValue := PropertyDict.Get(PropertyKey);
             if PropertyValue <> '' then
                 case PropertyKey of
-                    //'_send_giftcard':
-                    //    NpRvSalesLine."Spfy Send from Shopify" := LowerCase(PropertyValue) in ['on', 'true', 'yes', '1'];
                     'Recipient Email':
                         NpRvSalesLine."Spfy Recipient E-mail" := CopyStr(PropertyValue, 1, MaxStrLen(NpRvSalesLine."Spfy Recipient E-mail"));
                     'Recipient Name':
