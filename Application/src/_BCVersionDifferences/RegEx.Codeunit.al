@@ -150,7 +150,6 @@
 #else
         TempMatches: Record Matches temporary;
         TempGroups: Record Groups temporary;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
 #endif
         Pattern: Text;
         ReplaceString: Text;
@@ -177,10 +176,7 @@
             Regex.Match(Input, Match);
         end;
 #else
-        if FeatureFlagsManagement.IsEnabled('regexStartingIndexChange') then
-            Regex.Match(Input, Pattern, 0, TempMatches)
-        else
-            Regex.Match(Input, Pattern, 1, TempMatches);
+        Regex.Match(Input, Pattern, 0, TempMatches);
         if TempMatches.FindSet() then
             repeat
                 if TempMatches.Success then begin
