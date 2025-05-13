@@ -30,4 +30,12 @@ tableextension 6014472 "NPR Job Queue Entry" extends "Job Queue Entry"
             DataClassification = CustomerContent;
         }
     }
+
+    trigger OnDelete()
+    var
+        ManagedByApp: Record "NPR Managed By App Job Queue";
+    begin
+        if ManagedByApp.Get(Rec.ID) then
+            ManagedByApp.Delete();
+    end;
 }

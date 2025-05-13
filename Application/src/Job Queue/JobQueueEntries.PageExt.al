@@ -111,7 +111,7 @@ pageextension 6014413 "NPR Job Queue Entries" extends "Job Queue Entries"
                 begin
                     if not Confirm(ConfirmQst, false) then
                         exit;
-                    JobQueueMgt.RefreshNPRJobQueueList(false);
+                    JobQueueMgt.RefreshNPRJobQueueList(true, false);
                 end;
             }
         }

@@ -45,7 +45,7 @@ page 6150891 "NPR Job Queue Refresh Setup"
             }
             part("Monitored Job Queues"; "NPR Monitored JQ Entries")
             {
-                Caption = 'Monitored Job Queues';
+                Caption = 'Monitored Jobs';
                 UpdatePropagation = Both;
                 ApplicationArea = NPRRetail;
             }

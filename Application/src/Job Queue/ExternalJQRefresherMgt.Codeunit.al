@@ -62,27 +62,6 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
     end;
 
     [TryFunction]
-    internal procedure ValidateSaaSSetup()
-    var
-        AADApplication: Record "AAD Application";
-        ClientId: Guid;
-        ClientIdLbl: Label '{bdf6bb95-9dad-4504-91ab-8404427f4043}', Locked = true;
-        EntraAppIsMissingLbl: Label 'JQ Runner Entra App is missing. Please create it by triggering the ''Create JQ Runner Entra App'' action.\This action can only be used by a user that is an Entra ID Global Administrator. The procedure will create a single-tenant Entra app on your behalf and ask for the required admin consent.';
-        EntraAppIsMissingConsentLbl: Label 'JQ Runner Entra App exists but the required permissions has not yet been granted. Please grant required permissions by triggering the ''Create JQ Runner Entra App'' action or proceeding to the ''JQ Runner'' Microsoft Entra Application Card.\This action can only be used by a user that is an Entra ID Global Administrator. The procedure will create a single-tenant Entra app on your behalf and ask for the required admin consent.';
-        EntraAppIsDisabledLbl: Label 'JQ Runner Entra App exists and is configured correctly but it is disabled. Please enable it by triggering the ''Create JQ Runner Entra App'' action or proceeding to the ''JQ Runner'' Microsoft Entra Application Card.\This action can only be used by a user that is an Entra ID Global Administrator. The procedure will create a single-tenant Entra app on your behalf and ask for the required admin consent.';
-    begin
-        Evaluate(ClientId, ClientIdLbl);
-        AADApplication.SetRange("Client Id", ClientId);
-        if AADApplication.IsEmpty() then
-            Error(EntraAppIsMissingLbl);
-        AADApplication.FindFirst();
-        if not AADApplication."Permission Granted" then
-            Error(EntraAppIsMissingConsentLbl);
-        if AADApplication.State = AADApplication.State::Disabled then
-            Error(EntraAppIsDisabledLbl);
-    end;
-
-    [TryFunction]
     internal procedure ValidateExternalJQRefresherTenantManager()
     var
         TenantManageOptions: Enum "NPR Ext. JQ Refresher Options";
@@ -186,32 +165,6 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
         RequestText := StrSubstNo(RequestBodyString, AzureADTenant.GetAadTenantId(), EnvironmentInformation.GetEnvironmentName(), Format(ClientID), ClientSecret);
 
         CreateCloudflareHttpRequest(RequestText, RequestUrl, Enum::"Http Request Type"::POST, HttpResponseMessage);
-    end;
-
-    internal procedure RefreshJobQueueEntries()
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-        JQMonitorEntry: Record "NPR Monitored Job Queue Entry";
-        JQMonitorEntry2: Record "NPR Monitored Job Queue Entry";
-        JQRefreshSetup: Record "NPR Job Queue Refresh Setup";
-    begin
-        JQMonitorEntry.SetRange("NP Managed Job", true);
-        JQMonitorEntry.SetRange("NPR Entra App User Name", UserID);
-        JQRefreshSetup.GetSetup();
-        if JQRefreshSetup."Default Refresher User" <> '' then
-            if JQRefreshSetup."Default Refresher User" = UserID then
-                JQMonitorEntry.SetFilter("NPR Entra App User Name", '%1|%2', UserID, '');
-
-        if JQMonitorEntry.FindSet() then
-            repeat
-                JQMonitorEntry2 := JQMonitorEntry;
-                if JobQueueEntry.Get(JQMonitorEntry2."Job Queue Entry ID") then
-                    RefreshJobQueueEntry(JQMonitorEntry2)
-                else begin
-                    JQMonitorEntry2."Job Queue Entry ID" := RefreshJobQueueEntry(JQMonitorEntry2);
-                    JQMonitorEntry2.Modify();
-                end;
-            until JQMonitorEntry.Next() = 0;
     end;
 
     internal procedure RequestJQRefresherUser(var DefaultRefresherUser: Text[250])
@@ -325,20 +278,6 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
     local procedure ExtJQRefresherEnumValueName(RefresherOption: Enum "NPR Ext. JQ Refresher Options") Result: Text
     begin
         RefresherOption.Names().Get(RefresherOption.Ordinals().IndexOf(RefresherOption.AsInteger()), Result);
-    end;
-
-    local procedure RefreshJobQueueEntry(JQMonitorEntry: Record "NPR Monitored Job Queue Entry"): Guid
-    var
-        Parameters: Record "Job Queue Entry";
-        JobQueueEntry: Record "Job Queue Entry";
-        JobQueueMgt: Codeunit "NPR Job Queue Management";
-    begin
-        clear(Parameters);
-        Parameters.TransferFields(JQMonitorEntry, false);
-        if JobQueueMgt.InitRecurringJobQueueEntry(Parameters, JobQueueEntry) then begin
-            JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
-            exit(JobQueueEntry.ID);
-        end;
     end;
 
 #if not (BC17 or BC18)

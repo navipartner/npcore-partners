@@ -404,7 +404,7 @@
         ValidStartDT: Boolean;
     begin
         if IsMonitoredJobRefreshRoutineActive() then begin
-            MonitoredJobQueueMgt.AddMonitoredJobQueueEntry(JobQueueEntry, true);
+            MonitoredJobQueueMgt.AddMonitoredJobQueueEntry(JobQueueEntry);
             exit;
         end;
 
@@ -670,7 +670,7 @@
         FeatureFlagsManagement.ScheduleGetFeatureFlagsIntegration();
     end;
 
-    internal procedure RefreshNPRJobQueueList(CallRefreshProcedure: Boolean)
+    internal procedure RefreshNPRJobQueueList(CallRefreshProcedure: Boolean; SetUserFilter: Boolean)
     var
         MonitoredJobQueueMgt: Codeunit "NPR Monitored Job Queue Mgt.";
     begin
@@ -680,7 +680,7 @@
             if UnBindSubscription(MonitoredJobQueueMgt) then;
         end;
         if CallRefreshProcedure then
-            RefreshJobQueues();  //loop through monitored jobs and create job queue entries if needed
+            RefreshJobQueues(SetUserFilter);  //loop through monitored jobs and create job queue entries if needed
     end;
 
     internal procedure SkipUpdateNPManagedMonitoredJobs() Skip: Boolean
@@ -1038,11 +1038,14 @@
             exit;
         end;
 
-        OnCheckIfIsNPRecurringJob(JobQueueEntry, Managed, Handled);
-        RefreshingCanBeToggled := not Handled;
-        if Handled then
-            exit;
+        if not SkipUpdateNPManagedMonitoredJobs() then begin
+            OnCheckIfIsNPRecurringJob(JobQueueEntry, Managed, Handled);
+            RefreshingCanBeToggled := not Handled;
+            if Handled then
+                exit;
+        end;
 
+        RefreshingCanBeToggled := true;
         Managed := ManagedByAppJQ.Get(JobQueueEntry.ID) and ManagedByAppJQ."Managed by App";
     end;
 
@@ -1053,11 +1056,11 @@
         IsInMonitoredJobUpdate(Result, Handled);
     end;
 
-    local procedure RefreshJobQueues()
+    local procedure RefreshJobQueues(SetUserFilter: Boolean)
     var
-        ExtJQRefresherMgt: Codeunit "NPR External JQ Refresher Mgt.";
+        MonitoredJobQueueMgt: Codeunit "NPR Monitored Job Queue Mgt.";
     begin
-        ExtJQRefresherMgt.RefreshJobQueueEntries();
+        MonitoredJobQueueMgt.RefreshJobQueueEntries(SetUserFilter);
     end;
 
 #if BC17 or BC18 or BC19 or BC20 or BC21

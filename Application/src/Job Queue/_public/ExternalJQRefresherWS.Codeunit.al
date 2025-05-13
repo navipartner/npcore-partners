@@ -5,13 +5,13 @@ codeunit 6248230 "NPR External JQ Refresher WS"
     procedure RefreshJobQueues() Result: Text
     var
         JobQueueRefreshSetup: Record "NPR Job Queue Refresh Setup";
-        ExtJQRefresherMgt: Codeunit "NPR External JQ Refresher Mgt.";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
         RefresherIsInternallyTurnedOff: Label 'External Refresher is internally turned off.';
         SuccessLbl: Label 'Successfully Refreshed.';
     begin
         JobQueueRefreshSetup.GetSetup();
         if JobQueueRefreshSetup."Use External JQ Refresher" and JobQueueRefreshSetup.Enabled then begin
-            ExtJQRefresherMgt.RefreshJobQueueEntries();
+            JobQueueMgt.RefreshNPRJobQueueList(true, true);
             JobQueueRefreshSetup."Last Refreshed" := CurrentDateTime();
             JobQueueRefreshSetup.Modify();
             Result := SuccessLbl;

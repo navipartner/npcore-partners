@@ -1,6 +1,6 @@
 table 6151148 "NPR Monitored Job Queue Entry"
 {
-    Caption = 'Job Queue Monitor Entry';
+    Caption = 'Monitored Job';
     Access = Internal;
     DataCaptionFields = "Object Type to Run", "Object ID to Run", "Object Caption to Run";
     DataClassification = CustomerContent;
@@ -28,16 +28,6 @@ table 6151148 "NPR Monitored Job Queue Entry"
         {
             Caption = 'Expiration Date/Time';
             DataClassification = CustomerContent;
-
-            trigger OnLookup()
-            begin
-                Validate("Expiration Date/Time", LookupDateTime("Expiration Date/Time", "Earliest Start Date/Time", 0DT));
-            end;
-
-            trigger OnValidate()
-            begin
-                CheckStartAndExpirationDateTime();
-            end;
         }
         field(6; "Earliest Start Date/Time"; DateTime)
         {
@@ -143,36 +133,17 @@ table 6151148 "NPR Monitored Job Queue Entry"
         {
             Caption = 'Starting Time';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                TestField("Recurring Job");
-                if "Starting Time" = 0T then
-                    "Reference Starting Time" := 0DT
-                else
-                    "Reference Starting Time" := CreateDateTime(DMY2Date(1, 1, 2000), "Starting Time");
-            end;
         }
         field(27; "Ending Time"; Time)
         {
             Caption = 'Ending Time';
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                TestField("Recurring Job");
-            end;
         }
         field(28; "Reference Starting Time"; DateTime)
         {
             Caption = 'Reference Starting Time';
             Editable = false;
             DataClassification = CustomerContent;
-
-            trigger OnValidate()
-            begin
-                "Starting Time" := DT2Time("Reference Starting Time");
-            end;
         }
         field(29; "Next Run Date Formula"; DateFormula)
         {
@@ -292,8 +263,11 @@ table 6151148 "NPR Monitored Job Queue Entry"
         }
         field(6014407; "NP Managed Job"; Boolean)
         {
-            Caption = 'NP Managed Job';
+            Caption = 'NP Protected Job';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-05-12';
+            ObsoleteReason = 'Not used anymore.';
         }
         field(6014409; "NPR Heartbeat URL"; Text[150])
         {
@@ -315,35 +289,12 @@ table 6151148 "NPR Monitored Job Queue Entry"
         }
     }
 
-    local procedure CheckStartAndExpirationDateTime()
-    begin
-        if IsExpired("Earliest Start Date/Time") then
-            Error(ExpiresBeforeStartErr, FieldCaption("Expiration Date/Time"), FieldCaption("Earliest Start Date/Time"));
-    end;
-
-    local procedure IsExpired(AtDateTime: DateTime): Boolean
-    begin
-        exit((AtDateTime <> 0DT) and ("Expiration Date/Time" <> 0DT) and ("Expiration Date/Time" < AtDateTime));
-    end;
-
-    local procedure LookupDateTime(InitDateTime: DateTime; EarliestDateTime: DateTime; LatestDateTime: DateTime): DateTime
+    trigger OnDelete()
     var
-        DateTimeDialog: Page "Date-Time Dialog";
-        NewDateTime: DateTime;
+        ManagedByApp: Record "NPR Managed By App Job Queue";
     begin
-        NewDateTime := InitDateTime;
-        if InitDateTime < EarliestDateTime then
-            InitDateTime := EarliestDateTime;
-        if (LatestDateTime <> 0DT) and (InitDateTime > LatestDateTime) then
-            InitDateTime := LatestDateTime;
-
-        DateTimeDialog.SetDateTime(RoundDateTime(InitDateTime, 1000));
-
-        if DateTimeDialog.RunModal() = ACTION::OK then
-            NewDateTime := DateTimeDialog.GetDateTime();
-        exit(NewDateTime);
+        if not isNullGuid(Rec."Job Queue Entry ID") then
+            if ManagedByApp.Get(Rec."Job Queue Entry ID") then
+                ManagedByApp.Delete();
     end;
-
-    var
-        ExpiresBeforeStartErr: Label '%1 must be later than %2.', Comment = '%1 = Expiration Date, %2=Start date';
 }

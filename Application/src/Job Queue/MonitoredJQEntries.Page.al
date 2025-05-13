@@ -2,12 +2,11 @@ page 6185041 "NPR Monitored JQ Entries"
 {
     Extensible = false;
     UsageCategory = None;
-    Caption = 'Monitored Job Queue Entries';
+    Caption = 'Monitored Jobs';
     PageType = ListPart;
     SourceTable = "NPR Monitored Job Queue Entry";
-    CardPageId = "NPR Monitored JQ Entry Card";
     InsertAllowed = false;
-    DeleteAllowed = false;
+    DeleteAllowed = true;
     ModifyAllowed = true;
 
     layout
@@ -46,11 +45,11 @@ page 6185041 "NPR Monitored JQ Entries"
                     Visible = _ExternalJQRefresherIsEnabled;
                     ToolTip = 'Specifies the JQ Runner User Name.';
                 }
-                field("NP Managed Job"; Rec."NP Managed Job")
+                field("NP Managed Job"; _IsProtectedJob)
                 {
                     ApplicationArea = NPRRetail;
-                    Caption = 'NP Managed Job';
-                    ToolTip = 'Specifies whether this Job Queue entry is allowed to be managed by the NP Refresher functionality.';
+                    Caption = 'NP Protected Job';
+                    ToolTip = 'Specifies whether this is a NaviPartner protected job.';
                     Editable = false;
                 }
                 field("Parameter String"; Rec."Parameter String")
@@ -96,12 +95,12 @@ page 6185041 "NPR Monitored JQ Entries"
                 ApplicationArea = NPRRetail;
                 Caption = 'Recreate Monitored Jobs';
                 Image = RefreshLines;
-                Tooltip = 'This action will recreate the list of monitored job queue entries to ensure that all mandatory NaviParter job queues and any custom job queues manually marked as ''Managed by App'' are included and properly monitored by the refresher.';
+                Tooltip = 'This action will recreate the list of monitored jobs to ensure that all NaviParter protected jobs and any custom job queues manually marked as ''Monitored Job'' are included and properly monitored by the refresher.';
 
                 trigger OnAction()
                 var
                     MonitoredJobQueueMgt: Codeunit "NPR Monitored Job Queue Mgt.";
-                    ConfirmLbl: Label 'This action will recreate all Monitored Job Queue entries.\Do you want to continue?';
+                    ConfirmLbl: Label 'This action will recreate all Monitored Jobs.\Do you want to continue?';
                 begin
                     if Confirm(ConfirmLbl) then begin
                         MonitoredJobQueueMgt.RecreateMonitoredJobQueueEntries();
@@ -141,10 +140,36 @@ page 6185041 "NPR Monitored JQ Entries"
                         CurrPage.Update(false);
                 end;
             }
+            action(New)
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'New';
+                Image = CreateDocument;
+                ToolTip = 'Create a new custom monitored job from scratch.';
+
+                trigger OnAction()
+                begin
+                    _MonitoredJQMgt.ManuallyCreateNewMonitoredJQEntry();
+                    CurrPage.Update(false);
+                end;
+            }
+            action(Edit)
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Edit';
+                Image = Edit;
+                ToolTip = 'Edit monitored job.';
+
+                trigger OnAction()
+                begin
+                    _MonitoredJQMgt.ManuallyModifyExistingMonitoredJQEntry(Rec);
+                    CurrPage.Update(false);
+                end;
+            }
         }
     }
 
-    trigger OnAfterGetRecord()
+    trigger OnOpenPage()
     var
         JQRefresherSetup: Record "NPR Job Queue Refresh Setup";
     begin
@@ -152,7 +177,16 @@ page 6185041 "NPR Monitored JQ Entries"
             _ExternalJQRefresherIsEnabled := JQRefresherSetup."Use External JQ Refresher";
     end;
 
+    trigger OnAfterGetRecord()
     var
-        _ExternalJQRefresherIsEnabled: Boolean;
+        TempJQEntry: Record "Job Queue Entry" temporary;
+    begin
+        TempJQEntry.Transferfields(Rec);
+        _IsProtectedJob := _MonitoredJQMgt.IsNPProtectedJob(TempJQEntry);
+    end;
+
+    var
         _MonitoredJQMgt: Codeunit "NPR Monitored Job Queue Mgt.";
+        _ExternalJQRefresherIsEnabled: Boolean;
+        _IsProtectedJob: Boolean;
 }
