@@ -80,6 +80,18 @@ const main = async ({ workflow, parameters, popup, context, captions }) => {
     VoucherRefNo: voucher_input,
     selectedAmount: selectedAmount,
   });
+
+  if (result.tryEndSale && result.collectReturnInformation) {
+    const dataCollectionResponse = await workflow.run("DATA_COLLECTION", {
+      parameters: {
+        requestCollectInformation: "ReturnInformation",
+      },
+    });
+    if (!dataCollectionResponse.success) {
+      return {};
+    }
+  }
+
   if (result.tryEndSale) {
     if (parameters.EndSale) {
       await workflow.run("END_SALE", {

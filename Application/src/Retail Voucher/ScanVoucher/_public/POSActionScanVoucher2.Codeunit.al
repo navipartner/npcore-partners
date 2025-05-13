@@ -140,14 +140,17 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
         VoucherType: Record "NPR NpRv Voucher Type";
         ReturnPOSPaymentMethod: Record "NPR POS Payment Method";
         PaymentLinePOS: Record "NPR POS Sale Line";
+        POSSale: Record "NPR POS Sale";
         ReferenceNo: Text;
         POSActionScanActionB: Codeunit "NPR POS Action Scan Voucher2B";
+        POSActionDataCollectionB: Codeunit "NPR POS Action DataCollectionB";
         ActionContext: JsonObject;
         VoucherTypeCode: Code[20];
         SelectedAmount: Decimal;
         RemainingAmount: Decimal;
         RemainingSalesBalanceAmount: Decimal;
         EndSalePar: Boolean;
+        CollectReturnInformation: Boolean;
         VoucherSalesLineParentId: Guid;
     begin
         HandleParameters(Context, VoucherTypeCode, EndSalePar, ReferenceNo, SelectedAmount);
@@ -158,11 +161,14 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
         POSActionScanActionB.CalculateRemainingAmount(PaymentLine, VoucherType."Payment Type", ReturnPOSPaymentMethod, RemainingAmount);
         RemainingSalesBalanceAmount := POSActionScanActionB.CalculateRemainingSalesBalanceAmount(PaymentLine);
         VoucherSalesLineParentId := POSActionScanActionB.GetVoucherSalesLineId(PaymentLinePOS);
+        Sale.GetCurrentSale(POSSale);
+        POSActionDataCollectionB.CheckIfCollectReturnInformation(POSSale."Sales Ticket No.", CollectReturnInformation);
 
         Response.Add('tryEndSale', HandleWorkflowResponse(Response, ActionContext));
         Response.Add('remainingAmount', RemainingAmount);
         Response.Add('remainingSalesBalanceAmount', RemainingSalesBalanceAmount);
         Response.Add('voucherSalesLineParentId', VoucherSalesLineParentId);
+        Response.Add('collectReturnInformation', CollectReturnInformation);
         exit(Response);
     end;
 
@@ -321,7 +327,7 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionScanVoucher2.js###
-'const main=async({workflow:a,parameters:t,popup:c,context:i,captions:l})=>{let n;const e={tryEndSale:!1,legacy:!1,success:!1,remainingAmount:0,remainingSalesBalanceAmount:0};if(t.VoucherTypeCode)i.voucherType=t.VoucherTypeCode;else if(t.AskForVoucherType&&(i.voucherType=await a.respond("setVoucherType"),!i.voucherType))return e;if(t.ReferenceNo?n=t.ReferenceNo:n=await c.input({title:l.VoucherPaymentTitle,caption:l.ReferenceNo}),n===null)return e;const{selectedVoucherReferenceNo:d,selectedVoucherNo:N,askForAmount:y,suggestedAmount:u,paymentDescription:p,amountPrompt:A,voucherType:w,voucherHasItemLimitation:f}=await a.respond("calculateVoucherInformation",{VoucherRefNo:n});if(i.voucherType=w,!i.voucherType||(n=d,!n))return e;let o=u;if(o===0&&f)return await c.error(l.voucherCannotBeUsedError),e;if(y){let m=!0;for(;m;){if(o=u,u>0&&(o=await c.numpad({title:p,caption:A,value:u}),o===null))return e;m=o>u,m&&await c.message(l.ProposedAmountDifferenceConfirmation.replace("{0}",o).replace("{1}",u))}}let s,h;const r=await a.respond("prepareRequest",{VoucherRefNo:n,selectedAmount:o});return r.tryEndSale?t.EndSale&&await a.run("END_SALE",{parameters:{calledFromWorkflow:"SCAN_VOUCHER_2",paymentNo:r.paymentNo}}):r.workflowVersion==1?await a.respond("doLegacyWorkflow",{workflowName:r.workflowName}):r.workflowName&&(h=await a.run(r.workflowName,{parameters:r.parameters,context:{issueReturnVoucherSilent:f,voucherSalesLineParentId:r.voucherSalesLineParentId}}),r.workflowName==="ISSUE_RETURN_VCHR_2"&&(s=h)),e.success=!0,e.remainingAmount=r.remainingAmount,e.remainingSalesBalanceAmount=r.remainingSalesBalanceAmount,s&&s.returnVoucherAmt!==0&&(e.remainingSalesBalanceAmount+=s.returnVoucherAmt),e};'
+'const main=async({workflow:n,parameters:a,popup:s,context:u,captions:c})=>{let o;const r={tryEndSale:!1,legacy:!1,success:!1,remainingAmount:0,remainingSalesBalanceAmount:0};if(a.VoucherTypeCode)u.voucherType=a.VoucherTypeCode;else if(a.AskForVoucherType&&(u.voucherType=await n.respond("setVoucherType"),!u.voucherType))return r;if(a.ReferenceNo?o=a.ReferenceNo:o=await s.input({title:c.VoucherPaymentTitle,caption:c.ReferenceNo}),o===null)return r;const{selectedVoucherReferenceNo:h,selectedVoucherNo:R,askForAmount:p,suggestedAmount:i,paymentDescription:y,amountPrompt:A,voucherType:N,voucherHasItemLimitation:f}=await n.respond("calculateVoucherInformation",{VoucherRefNo:o});if(u.voucherType=N,!u.voucherType||(o=h,!o))return r;let t=i;if(t===0&&f)return await s.error(c.voucherCannotBeUsedError),r;if(p){let m=!0;for(;m;){if(t=i,i>0&&(t=await s.numpad({title:y,caption:A,value:i}),t===null))return r;m=t>i,m&&await s.message(c.ProposedAmountDifferenceConfirmation.replace("{0}",t).replace("{1}",i))}}let l,d;const e=await n.respond("prepareRequest",{VoucherRefNo:o,selectedAmount:t});return e.tryEndSale&&e.collectReturnInformation&&!(await n.run("DATA_COLLECTION",{parameters:{requestCollectInformation:"ReturnInformation"}})).success?{}:(e.tryEndSale?a.EndSale&&await n.run("END_SALE",{parameters:{calledFromWorkflow:"SCAN_VOUCHER_2",paymentNo:e.paymentNo}}):e.workflowVersion==1?await n.respond("doLegacyWorkflow",{workflowName:e.workflowName}):e.workflowName&&(d=await n.run(e.workflowName,{parameters:e.parameters,context:{issueReturnVoucherSilent:f,voucherSalesLineParentId:e.voucherSalesLineParentId}}),e.workflowName==="ISSUE_RETURN_VCHR_2"&&(l=d)),r.success=!0,r.remainingAmount=e.remainingAmount,r.remainingSalesBalanceAmount=e.remainingSalesBalanceAmount,l&&l.returnVoucherAmt!==0&&(r.remainingSalesBalanceAmount+=l.returnVoucherAmt),r)};'
         );
     end;
 

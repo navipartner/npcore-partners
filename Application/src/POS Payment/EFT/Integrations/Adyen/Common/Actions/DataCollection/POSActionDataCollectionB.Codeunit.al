@@ -566,7 +566,12 @@ codeunit 6150804 "NPR POS Action DataCollectionB"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Payment Processing Events", 'OnAfterCalculateSuggestionPaymentAmount', '', false, false)]
-    local procedure PaymentProcessingEventsOnAfterCalculateSuggestionPaymentAmount(SalesTicketNo: Code[20]; var SuggestPaymentAmount: Decimal; var CollectReturnInformation: Boolean)
+    local procedure PaymentProcessingEventsOnAfterCalculateSuggestionPaymentAmount(SalesTicketNo: Code[20]; var CollectReturnInformation: Boolean)
+    begin
+        CheckIfCollectReturnInformation(SalesTicketNo, CollectReturnInformation)
+    end;
+
+    internal procedure CheckIfCollectReturnInformation(SalesTicketNo: Code[20]; var CollectReturnInformation: Boolean)
     var
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";

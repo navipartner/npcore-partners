@@ -33,7 +33,7 @@ codeunit 6150623 "NPR POSAction: Issue Rtrn Vchr" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionIssueRtrnVchr.js###
-'const main=async({context:e,workflow:n,parameters:t,popup:o,captions:u})=>{let a;await n.respond("validateRequest");const i={returnVoucherAmt:0};if(t.VoucherTypeCode?e.voucherType=t.VoucherTypeCode:e.voucherType=await n.respond("setVoucherType"),e.voucherType==null||e.voucherType=="")return i;if(!e.IsUnattendedPOS&&!e.issueReturnVoucherSilent){if(a=await o.numpad({title:u.IssueReturnVoucherTitle,caption:u.Amount,value:e.voucher_amount}),a===0||a===null)return i}else a=e.voucher_amount;const d=await n.respond("validateAmount",{amountInput:a});if(d==0)return i;const r=await n.respond("select_send_method");r.SendMethodEmail&&(r.SendToEmail=await o.input({title:u.SendViaEmail,caption:u.Email})),r.SendMethodSMS&&(r.SendToPhoneNo=await o.input({title:u.SendViaSMS,caption:u.Phone})),e=Object.assign(e,r);const{paymentNo:s}=await n.respond("issueReturnVoucher",{ReturnVoucherAmount:d});return i.returnVoucherAmt=d,t.ContactInfo&&await n.respond("contactInfo"),t.ScanReferenceNos&&await n.respond("scanReference"),t.EndSale&&await n.run("END_SALE",{parameters:{calledFromWorkflow:"ISSUE_RETURN_VCHR_2",paymentNo:s}}),i};'
+'const main=async({context:e,workflow:n,parameters:t,popup:r,captions:a})=>{let u;await n.respond("validateRequest");const i={returnVoucherAmt:0};if(t.VoucherTypeCode?e.voucherType=t.VoucherTypeCode:e.voucherType=await n.respond("setVoucherType"),e.voucherType==null||e.voucherType=="")return i;if(!e.IsUnattendedPOS&&!e.issueReturnVoucherSilent){if(u=await r.numpad({title:a.IssueReturnVoucherTitle,caption:a.Amount,value:e.voucher_amount}),u===0||u===null)return i}else u=e.voucher_amount;const s=await n.respond("validateAmount",{amountInput:u});if(s==0)return i;const o=await n.respond("select_send_method");o.SendMethodEmail&&(o.SendToEmail=await r.input({title:a.SendViaEmail,caption:a.Email})),o.SendMethodSMS&&(o.SendToPhoneNo=await r.input({title:a.SendViaSMS,caption:a.Phone})),e=Object.assign(e,o);const{paymentNo:d,collectReturnInformation:c}=await n.respond("issueReturnVoucher",{ReturnVoucherAmount:s});return i.returnVoucherAmt=s,t.ContactInfo&&await n.respond("contactInfo"),t.ScanReferenceNos&&await n.respond("scanReference"),t.EndSale&&c&&!(await n.run("DATA_COLLECTION",{parameters:{requestCollectInformation:"ReturnInformation"}})).success?{}:(t.EndSale&&await n.run("END_SALE",{parameters:{calledFromWorkflow:"ISSUE_RETURN_VCHR_2",paymentNo:d}}),i)};'
         );
     end;
 
@@ -82,7 +82,10 @@ codeunit 6150623 "NPR POSAction: Issue Rtrn Vchr" implements "NPR IPOS Workflow"
     var
         VoucherType: Record "NPR NpRv Voucher Type";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
+        SalePOS: Record "NPR POS Sale";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        POSActionDataCollectionB: Codeunit "NPR POS Action DataCollectionB";
+        Sale: Codeunit "NPR POS Sale";
         Amount: Decimal;
         Email: Text[80];
         PhoneNo: Text[30];
@@ -94,6 +97,7 @@ codeunit 6150623 "NPR POSAction: Issue Rtrn Vchr" implements "NPR IPOS Workflow"
         POSSession: Codeunit "NPR POS Session";
         VoucherTypeCode: Code[20];
         EndSalePar: Boolean;
+        CollectReturnInformation: Boolean;
     begin
         GetParameterValues(Context, VoucherTypeCode, EndSalePar);
         VoucherType.Get(VoucherTypeCode);
@@ -118,7 +122,12 @@ codeunit 6150623 "NPR POSAction: Issue Rtrn Vchr" implements "NPR IPOS Workflow"
         NpRvVoucherMgt.IssueReturnVoucher(POSSession, VoucherTypeCode, Amount, Email, PhoneNo, SendMethodPrint, SendMethodEmail, SendMethodSMS, VoucherSalesLineParentId);
 #pragma warning restore AA0139
 
+        POSSession.GetSale(Sale);
+        Sale.GetCurrentSale(SalePOS);
+        POSActionDataCollectionB.CheckIfCollectReturnInformation(SalePOS."Sales Ticket No.", CollectReturnInformation);
+
         Response.Add('paymentNo', VoucherType."Payment Type");
+        Response.Add('collectReturnInformation', CollectReturnInformation);
         exit(Response);
     end;
 

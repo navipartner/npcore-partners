@@ -45,9 +45,12 @@ const main = async ({ context, workflow, parameters, popup, captions }) => {
 
   context = Object.assign(context, send);
 
-  const { paymentNo } = await workflow.respond("issueReturnVoucher", {
-    ReturnVoucherAmount: ReturnVoucherAmount,
-  });
+  const { paymentNo, collectReturnInformation } = await workflow.respond(
+    "issueReturnVoucher",
+    {
+      ReturnVoucherAmount: ReturnVoucherAmount,
+    }
+  );
 
   response.returnVoucherAmt = ReturnVoucherAmount;
 
@@ -57,6 +60,18 @@ const main = async ({ context, workflow, parameters, popup, captions }) => {
   if (parameters.ScanReferenceNos) {
     await workflow.respond("scanReference");
   }
+
+  if (parameters.EndSale && collectReturnInformation) {
+    const dataCollectionResponse = await workflow.run("DATA_COLLECTION", {
+      parameters: {
+        requestCollectInformation: "ReturnInformation",
+      },
+    });
+    if (!dataCollectionResponse.success) {
+      return {};
+    }
+  }
+
   if (parameters.EndSale) {
     await workflow.run("END_SALE", {
       parameters: {
