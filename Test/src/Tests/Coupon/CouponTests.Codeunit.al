@@ -6020,6 +6020,90 @@ codeunit 85074 "NPR Coupon Tests"
         Assert.AreEqual(SaleLinePOS."Discount Amount", 0, 'Discount not calcualted propery after deleting the coupons.');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckCouponDiscountApplicationAfterQtyChangeOnItem()
+    // [SCENARIO] Check if the coupon discount is calculated correctly after quantity change on the item where the coupon is applied
+    var
+        SalePOS: Record "NPR POS Sale";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        CouponType: Record "NPR NpDc Coupon Type";
+        DiscountedItem: Record Item;
+        NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryUtility: Codeunit "Library - Utility";
+        LibrarySales: Codeunit "Library - Sales";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        POSActDeletePOSLineB: Codeunit "NPR POSAct:Delete POS Line-B";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        CouponQty: Integer;
+    begin
+        if not FeatureFlagsManagement.IsEnabled('removeCouponDiscountAfterChangeQuantity') then
+            exit;
+
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Amount application
+        LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 600, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Discounted item that is going to get the discount when the coupon is added
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(DiscountedItem, _POSUnit, _POSStore);
+        DiscountedItem."Unit Price" := 1000;
+        DiscountedItem.Modify(true);
+
+        LibraryCoupon.SetItemListCoupon(CouponType, DiscountedItem, 1);
+
+        CouponQty := 1;
+        CouponType."Max Use per Sale" := 1;
+        CouponType.Modify(true);
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        LibraryPOSMock.CreateItemLine(_POSSession, DiscountedItem."No.", 1);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [GIVEN] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+        SaleLinePOS.Get(SaleLinePOS.RecordId);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon not activated');
+
+        // [THEN] Check if discount applied correctly
+        Assert.AreEqual(SaleLinePOS."Discount Amount", CouponType."Discount Amount", 'Discount not calcualted properly.');
+
+        // [THEN] Change quantity on item sales line
+        POSSaleLine.SetFirst();
+        POSSaleLine.SetQuantity(5);
+        SaleLinePOS.Get(SaleLinePOS.RecordId);
+
+        // [THEN] Check if discount applied correctly. Discount should be the same as initial one, before quantity change
+        Assert.AreEqual(SaleLinePOS."Discount Amount", CouponType."Discount Amount", 'Discount not calcualted properly.');
+
+        // [WHEN] Delete coupon from pos sale
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+        POSActDeletePOSLineB.DeleteSaleLine(POSSaleLine);
+
+        // [THEN] Check if sale line with item has discount amount equal to 0 after deleting the coupons
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+        Assert.AreEqual(SaleLinePOS."Discount Amount", 0, 'Discount not calcualted propery after deleting the coupons.');
+    end;
+
     local procedure Initialize()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
