@@ -122,8 +122,8 @@ codeunit 85012 "NPR Library - Ticket XML API"
         Reservation.SetAttribute('token', '');
 
         for OrderNumber := 1 to OrderCount do begin
-            TicketAdmissionBOM.SetRange(Default, true);
-            TicketAdmissionBOM.FINDSET();
+            TicketAdmissionBOM.SetRange(Default, true); // NOTE causes the ticket bom "admission inclusion" to dictate the optional admissions
+            TicketAdmissionBOM.FindSet();
             repeat
                 TicketAdmission := XmlElement.Create('ticket', NameSpace);
                 TicketAdmission.SetAttribute('external_id', ItemNumber);
@@ -158,6 +158,98 @@ codeunit 85012 "NPR Library - Ticket XML API"
         exit(ReservationStatus);
 
     end;
+
+    procedure MakeDynamicReservation2(OrderCount: Integer; ItemNumber: Code[20]; Quantity: Integer; MemberReference: Code[20]; ScannerStation: Code[10]; OptionalIncludeCount: Integer; var Token: Text[100]; var ResponseMessage: Text): Boolean
+    var
+        TmpBLOBbuffer: Record "NPR BLOB buffer" temporary;
+        TicketAdmissionBOM: Record "NPR TM Ticket Admission BOM";
+        TicketWebService: Codeunit "NPR TM Ticket WebService";
+        MakeReservation: XMLport "NPR TM Ticket Reservation";
+        IStream: InStream;
+        OrderNumber: Integer;
+        OStream: OutStream;
+        NameSpace: Text;
+        XmlAsText: Text;
+        ReservationStatus: Boolean;
+        XmlDec: XmlDeclaration;
+        XmlDoc: XmlDocument;
+        Reservation: XmlElement;
+        TicketAdmission: XmlElement;
+        Tickets: XmlElement;
+    begin
+
+        TicketAdmissionBOM.SetFilter("Item No.", '=%1', ItemNumber);
+
+        NameSpace := 'urn:microsoft-dynamics-nav/xmlports/x6060114';
+
+        XMLDoc := XmlDocument.Create();
+        XMLDec := XmlDeclaration.Create('1.0', 'utf-8', 'yes');
+        XMLDoc.SetDeclaration(XMLDec);
+
+        Reservation := XmlElement.Create('reserve_tickets', NameSpace);
+        Reservation.SetAttribute('token', '');
+
+
+        for OrderNumber := 1 to OrderCount do begin
+
+            // Add all the required admissions first
+            TicketAdmissionBOM.SetFilter("Admission Inclusion", '=%1', TicketAdmissionBOM."Admission Inclusion"::REQUIRED);
+            TicketAdmissionBOM.FindSet();
+            repeat
+                TicketAdmission := XmlElement.Create('ticket', NameSpace);
+                TicketAdmission.SetAttribute('external_id', ItemNumber);
+                TicketAdmission.SetAttribute('line_no', Format(OrderNumber));
+                TicketAdmission.SetAttribute('qty', Format(Quantity));
+                TicketAdmission.SetAttribute('admission_schedule_entry', Format(0));
+                if (MemberReference <> '') then
+                    TicketAdmission.SetAttribute('member_number', MemberReference);
+                TicketAdmission.SetAttribute('admission_code', TicketAdmissionBOM."Admission Code");
+
+                Reservation.Add(TicketAdmission);
+            until (TicketAdmissionBOM.Next() = 0);
+
+            // Add zero, one or more of the optional admissions 
+            if (OptionalIncludeCount > 0) then begin
+                TicketAdmissionBOM.SetFilter("Admission Inclusion", '=%1', TicketAdmissionBOM."Admission Inclusion"::NOT_SELECTED);
+                TicketAdmissionBOM.FindSet();
+                repeat
+                    TicketAdmission := XmlElement.Create('ticket', NameSpace);
+                    TicketAdmission.SetAttribute('external_id', ItemNumber);
+                    TicketAdmission.SetAttribute('line_no', Format(OrderNumber));
+                    TicketAdmission.SetAttribute('qty', Format(Quantity));
+                    TicketAdmission.SetAttribute('admission_schedule_entry', Format(0));
+                    if (MemberReference <> '') then
+                        TicketAdmission.SetAttribute('member_number', MemberReference);
+                    TicketAdmission.SetAttribute('admission_code', TicketAdmissionBOM."Admission Code");
+
+                    Reservation.Add(TicketAdmission);
+
+                    OptionalIncludeCount -= 1;
+                until (TicketAdmissionBOM.Next() = 0) or (OptionalIncludeCount <= 0);
+            end
+        end;
+
+        Tickets := XmlElement.Create('tickets', NameSpace);
+        Tickets.Add(Reservation);
+
+        XmlDoc.Add(Tickets);
+        XmlDoc.WriteTo(XmlAsText);
+
+        TmpBLOBbuffer.Insert();
+        TmpBLOBbuffer."Buffer 1".CreateOutStream(OStream);
+        OStream.WriteText(XmlAsText);
+        TmpBLOBbuffer.Modify();
+
+        TmpBLOBbuffer."Buffer 1".CreateInStream(IStream);
+        MakeReservation.SetSource(IStream);
+
+        TicketWebService.MakeTicketReservation(MakeReservation, ScannerStation);
+
+        ReservationStatus := MakeReservation.GetResult(Token, ResponseMessage);
+        exit(ReservationStatus);
+
+    end;
+
 
     procedure PreConfirmTicketReservation(Token: Text[100]; ScannerStation: Code[10]; var ResponseMessage: Text) PreConfirmationStatus: Boolean
     var

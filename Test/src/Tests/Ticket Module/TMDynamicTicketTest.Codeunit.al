@@ -22,26 +22,70 @@ codeunit 85056 "NPR TM Dynamic Ticket Test"
         ResponseToken, ResponseMessage : Text;
     begin
         InitializeData();
+
         // Make reservation
         ReservationOk := TicketApiLibrary.MakeDynamicReservation(1, TicketItemNo, 1, '', '', ResponseToken, ResponseMessage);
         Assert.IsTrue(ReservationOk, ResponseMessage);
+
         // Check Reservation Request
         TicketReservationReq.SetRange("Session Token ID", ResponseToken);
         Assert.AreEqual(TicketBOMElements, TicketReservationReq.Count(), 'Reservation request line count not as expected');
+
         // Check Ticket
         TicketReservationReq.SetRange(Default, true);
         TicketReservationReq.FindFirst();
         Ticket.SetRange("Ticket Reservation Entry No.", TicketReservationReq."Entry No.");
         Assert.IsTrue(Ticket.FindFirst(), 'Ticket not found');
-        // Check Admissions
+
+        // Check Admissions 
         TicketAccessEntry.SetRange("Ticket No.", Ticket."No.");
         Assert.AreEqual(RequiredBOMElements, TicketAccessEntry.Count(), 'Ticket admission line count not as expected');
+
         //Confirm reservation
         ReservationOk := TicketApiLibrary.ConfirmTicketReservation(ResponseToken, '', '', '', TmpCreatedTickets, ResponseMessage);
         Assert.IsTrue(ReservationOk, ResponseMessage);
     end;
 
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure MakeDynamicTicketReservationAPI_2()
+    var
+        TicketReservationReq: Record "NPR TM Ticket Reservation Req.";
+        Ticket: Record "NPR TM Ticket";
+        TmpCreatedTickets: Record "NPR TM Ticket" temporary;
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
+        Assert: Codeunit Assert;
+        ReservationOk: Boolean;
+        ResponseToken, ResponseMessage : Text;
+        OptionalIncludeCount: Integer;
+    begin
+        InitializeData();
+        OptionalIncludeCount := 1;
+
+        // Make reservation
+        ReservationOk := TicketApiLibrary.MakeDynamicReservation2(1, TicketItemNo, 1, '', '', OptionalIncludeCount, ResponseToken, ResponseMessage);
+        Assert.IsTrue(ReservationOk, ResponseMessage);
+
+        // Check Reservation Request
+        TicketReservationReq.SetRange("Session Token ID", ResponseToken);
+        Assert.AreEqual(TicketBOMElements, TicketReservationReq.Count(), 'Reservation request line count not as expected');
+
+        // Check Ticket
+        TicketReservationReq.SetRange(Default, true);
+        TicketReservationReq.FindFirst();
+        Ticket.SetRange("Ticket Reservation Entry No.", TicketReservationReq."Entry No.");
+        Assert.IsTrue(Ticket.FindFirst(), 'Ticket not found');
+
+        // Check Admissions 
+        TicketAccessEntry.SetRange("Ticket No.", Ticket."No.");
+        Assert.AreEqual(RequiredBOMElements + OptionalIncludeCount, TicketAccessEntry.Count(), 'Ticket admission line count not as expected');
+
+        //Confirm reservation
+        ReservationOk := TicketApiLibrary.ConfirmTicketReservation(ResponseToken, '', '', '', TmpCreatedTickets, ResponseMessage);
+        Assert.IsTrue(ReservationOk, ResponseMessage);
+    end;
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
@@ -58,23 +102,111 @@ codeunit 85056 "NPR TM Dynamic Ticket Test"
     begin
         InitializeData();
         // Make reservation
+
         ReservationOk := TicketApiLibrary.MakeDynamicReservation(1, TicketItemNo, 2, '', '', ResponseToken, ResponseMessage);
         Assert.IsTrue(ReservationOk, ResponseMessage);
         // Check Reservation Request
+
         TicketReservationReq.SetRange("Session Token ID", ResponseToken);
         Assert.AreEqual(TicketBOMElements, TicketReservationReq.Count(), 'Reservation request line count not as expected');
+
         // Check Ticket
         TicketReservationReq.SetRange(Default, true);
         TicketReservationReq.FindFirst();
         Ticket.SetRange("Ticket Reservation Entry No.", TicketReservationReq."Entry No.");
         Assert.IsTrue(Ticket.FindFirst(), 'Ticket not found');
+
         // Check Admissions
         TicketAccessEntry.SetRange("Ticket No.", Ticket."No.");
         Assert.AreEqual(RequiredBOMElements, TicketAccessEntry.Count(), 'Ticket admission line count not as expected');
+
         //Confirm reservation
         ReservationOk := TicketApiLibrary.ConfirmTicketReservation(ResponseToken, '', '', '', TmpCreatedTickets, ResponseMessage);
         Assert.IsTrue(ReservationOk, ResponseMessage);
     end;
+
+
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure Make2DynamicTicketsReservationAPI_2()
+    var
+        TicketReservationReq: Record "NPR TM Ticket Reservation Req.";
+        Ticket: Record "NPR TM Ticket";
+        TmpCreatedTickets: Record "NPR TM Ticket" temporary;
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
+        Assert: Codeunit Assert;
+        ReservationOk: Boolean;
+        ResponseToken, ResponseMessage : Text;
+        OptionalIncludeCount: Integer;
+    begin
+        InitializeData();
+        OptionalIncludeCount := 2;
+
+        // Make reservation
+        ReservationOk := TicketApiLibrary.MakeDynamicReservation2(1, TicketItemNo, 2, '', '', OptionalIncludeCount, ResponseToken, ResponseMessage);
+        Assert.IsTrue(ReservationOk, ResponseMessage);
+
+        // Check Reservation Request
+        TicketReservationReq.SetRange("Session Token ID", ResponseToken);
+        Assert.AreEqual(TicketBOMElements, TicketReservationReq.Count(), 'Reservation request line count not as expected');
+
+        // Check Ticket
+        TicketReservationReq.SetRange(Default, true);
+        TicketReservationReq.FindFirst();
+        Ticket.SetRange("Ticket Reservation Entry No.", TicketReservationReq."Entry No.");
+        Assert.IsTrue(Ticket.FindFirst(), 'Ticket not found');
+
+        // Check Admissions
+        TicketAccessEntry.SetRange("Ticket No.", Ticket."No.");
+        Assert.AreEqual(RequiredBOMElements + OptionalIncludeCount, TicketAccessEntry.Count(), 'Ticket admission line count not as expected');
+
+        //Confirm reservation
+        ReservationOk := TicketApiLibrary.ConfirmTicketReservation(ResponseToken, '', '', '', TmpCreatedTickets, ResponseMessage);
+        Assert.IsTrue(ReservationOk, ResponseMessage);
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure Make2DynamicTicketsReservationAPI_3()
+    var
+        TicketReservationReq: Record "NPR TM Ticket Reservation Req.";
+        Ticket: Record "NPR TM Ticket";
+        TmpCreatedTickets: Record "NPR TM Ticket" temporary;
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        TicketApiLibrary: Codeunit "NPR Library - Ticket XML API";
+        Assert: Codeunit Assert;
+        ReservationOk: Boolean;
+        ResponseToken, ResponseMessage : Text;
+        OptionalIncludeCount: Integer;
+    begin
+        InitializeData();
+        OptionalIncludeCount := 3;
+
+        // Make reservation
+        ReservationOk := TicketApiLibrary.MakeDynamicReservation2(1, TicketItemNo, 2, '', '', OptionalIncludeCount, ResponseToken, ResponseMessage);
+        Assert.IsTrue(ReservationOk, ResponseMessage);
+
+        // Check Reservation Request
+        TicketReservationReq.SetRange("Session Token ID", ResponseToken);
+        Assert.AreEqual(TicketBOMElements, TicketReservationReq.Count(), 'Reservation request line count not as expected');
+
+        // Check Ticket
+        TicketReservationReq.SetRange(Default, true);
+        TicketReservationReq.FindFirst();
+        Ticket.SetRange("Ticket Reservation Entry No.", TicketReservationReq."Entry No.");
+        Assert.IsTrue(Ticket.FindFirst(), 'Ticket not found');
+
+        // Check Admissions
+        TicketAccessEntry.SetRange("Ticket No.", Ticket."No.");
+        Assert.AreEqual(RequiredBOMElements + OptionalIncludeCount, TicketAccessEntry.Count(), 'Ticket admission line count not as expected');
+
+        //Confirm reservation
+        ReservationOk := TicketApiLibrary.ConfirmTicketReservation(ResponseToken, '', '', '', TmpCreatedTickets, ResponseMessage);
+        Assert.IsTrue(ReservationOk, ResponseMessage);
+    end;
+
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
@@ -92,12 +224,15 @@ codeunit 85056 "NPR TM Dynamic Ticket Test"
         InitialAdmissionCount, ChangedAmissionCount : Integer;
     begin
         InitializeData();
+
         // Make reservation
         ReservationOk := TicketApiLibrary.MakeDynamicReservation(1, TicketItemNo, 1, '', '', ResponseToken, ResponseMessage);
         Assert.IsTrue(ReservationOk, ResponseMessage);
+
         //Confirm reservation
         ReservationOk := TicketApiLibrary.ConfirmTicketReservation(ResponseToken, '', '', '', TmpCreatedTickets, ResponseMessage);
         Assert.IsTrue(ReservationOk, ResponseMessage);
+
         // Change reservation
         TmpCreatedTickets.FindFirst();
         ReservationRequest.Get(TmpCreatedTickets."Ticket Reservation Entry No.");
@@ -106,9 +241,11 @@ codeunit 85056 "NPR TM Dynamic Ticket Test"
         TicketAccessEntry.SetRange("Ticket No.", TmpCreatedTickets."No.");
         InitialAdmissionCount := TicketAccessEntry.Count();
         Assert.AreEqual(RequiredBOMElements, InitialAdmissionCount, 'Ticket admission line count not as expected');
+
         //Confirm change with added 1 admission
         ReservationOk := TicketApiLibrary.ConfirmChangeDynamicTicketReservation(ChangeToken, TmpCurrentRequest, TmpTicketReservationResponse, ResponseMessage);
         Assert.IsTrue(ReservationOk, ResponseMessage);
+
         //Check result
         TicketAccessEntry.SetRange("Ticket No.", TmpCreatedTickets."No.");
         ChangedAmissionCount := TicketAccessEntry.Count();

@@ -370,10 +370,15 @@ codeunit 85011 "NPR Library - Ticket Module"
 
     procedure CreateItem(VariantCode: Code[10]; TicketTypeCode: Code[10]; UnitPrice: Decimal) ItemNo: Code[20]
     begin
-        exit(CreateItem('', VariantCode, TicketTypeCode, UnitPrice));
+        exit(CreateItem('', VariantCode, TicketTypeCode, UnitPrice, true));
     end;
 
     procedure CreateItem(ItemCode: Code[20]; VariantCode: Code[10]; TicketTypeCode: Code[10]; UnitPrice: Decimal) ItemNo: Code[20]
+    begin
+        exit(CreateItem(ItemNo, VariantCode, TicketTypeCode, UnitPrice, true));
+    end;
+
+    procedure CreateItem(ItemCode: Code[20]; VariantCode: Code[10]; TicketTypeCode: Code[10]; UnitPrice: Decimal; WithItemReference: Boolean) ItemNo: Code[20]
     var
         TicketItem: Record "Item";
         ItemVariant: Record "Item Variant";
@@ -415,6 +420,9 @@ codeunit 85011 "NPR Library - Ticket Module"
             ItemVariant.Description := TicketItem.Description;
             ItemVariant.Modify();
         end;
+
+        if (not WithItemReference) then
+            exit(TicketItem."No.");
 
         ItemReference.Init();
         ItemReference.SetFilter("Reference Type", '=%1', ItemReference."Reference Type"::"Bar Code");
@@ -677,6 +685,11 @@ codeunit 85011 "NPR Library - Ticket Module"
 
         Item.Get(ItemNo);
         Admission.Get(AdmissionCode);
+        if (AdmissionInclusion > 0) then
+            if (Admission."Additional Experience Item No." = '') then begin
+                Admission."Additional Experience Item No." := CreateItem('', '', '', Random(200) + 100, false);
+                Admission.Modify();
+            end;
 
         TicketBom.Quantity := Quantity;
         TicketBom.Description := Item.Description;
@@ -791,7 +804,7 @@ codeunit 85011 "NPR Library - Ticket Module"
         CreateMinimalSetup();
 
         TicketTypeCode := CreateTicketType(GenerateCode10(), '<+7D>', 0, TicketType."Admission Registration"::INDIVIDUAL, "NPR TM ActivationMethod_Type"::SCAN, TicketType."Ticket Entry Validation"::SINGLE, TicketType."Ticket Configuration Source"::TICKET_BOM);
-        ItemNo := CreateItem('', TicketTypeCode, Random(200) + 100);
+        ItemNo := CreateItem('', '', TicketTypeCode, Random(200) + 100, false);
 
         for i := 1 to TicketBOMElements do begin
             Setup(i, Default, AdmissionInclusion, RequiredBOMElements);
@@ -839,12 +852,14 @@ codeunit 85011 "NPR Library - Ticket Module"
     end;
 
     local procedure Setup(i: Integer; var Default: Boolean; var AdmissionInclusion: Option; RequiredBOMElements: Integer)
+    var
+        TicketBom: Record "NPR TM Ticket Admission BOM";
     begin
         Default := i = 1;
         if i <= RequiredBOMElements then
-            AdmissionInclusion := 0
+            AdmissionInclusion := TicketBom."Admission Inclusion"::REQUIRED
         else
-            AdmissionInclusion := 2;
+            AdmissionInclusion := TicketBom."Admission Inclusion"::NOT_SELECTED;
     end;
 
     local procedure CreateNumberSeries()
