@@ -10,9 +10,9 @@ codeunit 6185046 "NPR TicketingApiTranslations"
             TicketBom."Admission Inclusion"::REQUIRED:
                 exit('mandatory');
             TicketBom."Admission Inclusion"::SELECTED:
-                exit('optional');
+                exit('optionalAndSelected');
             TicketBom."Admission Inclusion"::NOT_SELECTED:
-                exit('optionalSelected');
+                exit('optionalNotSelected');
         end;
     end;
 

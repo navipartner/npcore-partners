@@ -200,14 +200,15 @@ types:
   AdmissionIsIncludedEnum:
     enum:
       - mandatory
-      - optional
-      - optionalSelected
+      - optionalNotSelected
+      - optionalAndSelected
 
   AdmissionIsIncluded:
     type: AdmissionIsIncludedEnum
     docs: 
-      Indicates if the admission is mandatory or optional. Mandatory implies that the admission can not be deselected. 
-      Optional implies that you must opt-in to include the admission, while optionalSelected implies that the admission is optional but selected by default.
+      Indicates if the admission is mandatory or optional. `mandatory` implies that the admission can not be deselected. 
+      `optionalNotSelected` implies that you must opt-in to include the admission, while `optionalAndSelected` implies that the admission is optional and selected and you can opt-out.
+      You opt-in or opt-out by including or excluding the admission in the reservation request.
 
   CapacityControlEnum:
     enum:

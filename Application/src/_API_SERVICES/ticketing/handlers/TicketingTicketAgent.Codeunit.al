@@ -639,7 +639,7 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         if (TicketAccessEntry.FindSet()) then begin
             repeat
                 ResponseJson.StartObject()
-                    .AddObject(AdmissionDTO(ResponseJson, 'admissionDetails', Ticket."Item No.", Ticket."Variant Code", TicketAccessEntry."Admission Code", TicketDescriptionBuffer))
+                    .AddObject(AdmissionDTO(ResponseJson, 'admissionDetails', Ticket."Item No.", Ticket."Variant Code", TicketAccessEntry."Admission Code", 255, TicketDescriptionBuffer))
                     .AddObject(ScheduleDetailsDTO(ResponseJson, 'scheduleDetails', TicketAccessEntry."Entry No."))
                 .EndObject();
             until (TicketAccessEntry.Next() = 0);
@@ -649,7 +649,11 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         exit(ResponseJson);
     end;
 
-    internal procedure AdmissionDTO(var ResponseJson: Codeunit "NPR JSON Builder"; ObjectName: Text; ItemNo: Code[20]; VariantCode: Code[10]; AdmissionCode: Code[20]; var TicketDescriptionBuffer: Record "NPR TM TempTicketDescription"): Codeunit "NPR JSON Builder"
+    internal procedure AdmissionDTO(
+        var ResponseJson: Codeunit "NPR JSON Builder";
+        ObjectName: Text; ItemNo: Code[20]; VariantCode: Code[10];
+        AdmissionCode: Code[20]; AdmissionInclusion: Option;
+        var TicketDescriptionBuffer: Record "NPR TM TempTicketDescription"): Codeunit "NPR JSON Builder"
     var
         Admission: Record "NPR TM Admission";
         TicketBom: Record "NPR TM Ticket Admission Bom";
@@ -658,11 +662,16 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         Admission.Get(AdmissionCode);
         TicketBom.Get(ItemNo, VariantCode, AdmissionCode);
         TicketDescriptionBuffer.Get(ItemNo, VariantCode, AdmissionCode);
+        if (AdmissionInclusion = 255) then begin
+            AdmissionInclusion := TicketBom."Admission Inclusion"::REQUIRED;
+            if (TicketBom."Admission Inclusion" <> TicketBom."Admission Inclusion"::REQUIRED) then
+                AdmissionInclusion := TicketBom."Admission Inclusion"::SELECTED; // Actual tickets will not include admission you opted out of
+        end;
 
         ResponseJson.StartObject(ObjectName)
             .AddProperty('code', TicketBom."Admission Code")
             .AddProperty('default', TicketBom.Default)
-            .AddProperty('included', EnumEncoder.EncodeInclusion(TicketBom."Admission Inclusion"))
+            .AddProperty('included', EnumEncoder.EncodeInclusion(AdmissionInclusion))
             .AddProperty('capacityControl', EnumEncoder.EncodeCapacity(Admission."Capacity Control"))
             .StartObject('description')
                 .AddProperty('title', TicketDescriptionBuffer.Title)
