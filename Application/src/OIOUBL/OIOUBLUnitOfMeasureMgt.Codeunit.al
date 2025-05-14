@@ -58,12 +58,16 @@ codeunit 6060018 "NPR OIOUBL Unit Of Measure Mgt"
     var
         OIOUBLSetup: Record "NPR OIOUBL Setup";
         InternationalUOMCode: Code[10];
+        IsHandled: Boolean;
         InvalidInternationCodeErr: Label '%1 ''%2'': ''%3'' is not a valid value for OIOUBL', Comment = '%1 - tablename, %2 - value, %3 - international UOM COde';
     begin
         if not OIOUBLSetup.IsOIOUBLInstalled() then
             exit;
         if UnitOfMeasure.Code = '' then
             exit('EA');
+        OnBeforeTestUoMCode(UnitOfMeasure, IsHandled);
+        if IsHandled then
+            exit;
         if UnitOfMeasure."International Standard Code" <> '' then
             InternationalUOMCode := UnitOfMeasure."International Standard Code"
         else
@@ -1181,4 +1185,9 @@ codeunit 6060018 "NPR OIOUBL Unit Of Measure Mgt"
             GetAndTestUoMCode(Rec);
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeTestUoMCode(var UnitOfMeasure: record "Unit of Measure"; var IsHandled: Boolean)
+    begin
+
+    end;
 }
