@@ -32,7 +32,7 @@ codeunit 6248422 "NPR POSAction TicketAdmitOnEoS" implements "NPR IPOS Workflow"
         AdmitMethod: Text;
         Tokens: JsonArray;
         Token: JsonToken;
-        TicketsArray: JsonArray;
+        TicketsAdmittedArray, TicketsRejectedArray : JsonArray;
     begin
         CustomParameters := Context.GetJsonObject('customParameters');
 
@@ -48,17 +48,18 @@ codeunit 6248422 "NPR POSAction TicketAdmitOnEoS" implements "NPR IPOS Workflow"
         case AdmitMethod of
             'WORKFLOW_LEGACY':
                 foreach Token in Tokens do
-                    AdmitTicketLegacy(CopyStr(Token.AsValue().AsText(), 1, 100), PosUnitNo, TicketsArray);
+                    AdmitTicketLegacy(CopyStr(Token.AsValue().AsText(), 1, 100), PosUnitNo, TicketsAdmittedArray);
             'WORKFLOW_SPEED_GATE':
                 foreach Token in Tokens do
-                    AdmitTicketSpeedGate(CopyStr(Token.AsValue().AsText(), 1, 100), PosUnitNo, TicketsArray);
+                    AdmitTicketSpeedGate(CopyStr(Token.AsValue().AsText(), 1, 100), PosUnitNo, TicketsAdmittedArray, TicketsRejectedArray);
             else
                 Error('This is a programming error - Invalid admit mode: %1', AdmitMethod);
         end;
 
         Response.Add('admitMethod', AdmitMethod);
         Response.Add('posUnitNo', PosUnitNo);
-        Response.Add('tickets', TicketsArray);
+        Response.Add('ticketsAdmitted', TicketsAdmittedArray);
+        Response.Add('ticketsRejected', TicketsRejectedArray);
     end;
 
 
@@ -67,6 +68,7 @@ codeunit 6248422 "NPR POSAction TicketAdmitOnEoS" implements "NPR IPOS Workflow"
         TicketReservation: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
         TicketManagement: Codeunit "NPR TM Ticket Management";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
     begin
         TicketReservation.SetCurrentKey("Session Token ID");
         TicketReservation.SetFilter("Session Token ID", '=%1', Token);
@@ -76,26 +78,38 @@ codeunit 6248422 "NPR POSAction TicketAdmitOnEoS" implements "NPR IPOS Workflow"
             exit;
 
         repeat
-            Ticket.SetCurrentKey("Ticket Reservation Entry No.");
-            Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservation."Entry No.");
-            if (Ticket.FindSet()) then
-                repeat
-                    if (TicketManagement.AdmitTicketFromEndOfSale(Token, Ticket, PosUnitNo)) then
-                        TicketsArray.Add(Ticket."External Ticket No.");
-                until (Ticket.Next() = 0);
+            if (TicketRequestManager.IsReservationRequest(Token)) then begin
+                Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+                Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservation."Entry No.");
+                if (Ticket.FindSet()) then
+                    repeat
+                        if (TicketReservation.EndOfSaleAdmitMode = TicketReservation.EndOfSaleAdmitMode::SALE) then
+                            if (TicketManagement.AdmitTicketFromEndOfSale(Token, Ticket, PosUnitNo)) then
+                                TicketsArray.Add(Ticket."External Ticket No.");
+
+                        if (TicketReservation.EndOfSaleAdmitMode = TicketReservation.EndOfSaleAdmitMode::SCAN) then
+                            if (TicketManagement.RegisterTicketBomAdmissionArrival(Ticket, PosUnitNo, '', 1)) then
+                                TicketsArray.Add(Ticket."External Ticket No.");
+
+                    until (Ticket.Next() = 0);
+            end;
         until (TicketReservation.Next() = 0);
     end;
 
-    local procedure AdmitTicketSpeedGate(Token: Text[100]; PosUnitNo: Code[10]; var TicketsArray: JsonArray)
+    local procedure AdmitTicketSpeedGate(Token: Text[100]; PosUnitNo: Code[10]; var TicketsAdmittedList: JsonArray; var TicketsRejectedList: JsonArray)
     var
         TicketManagement: Codeunit "NPR TM Ticket Management";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketReservation: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
         SpeedGate: Codeunit "NPR SG SpeedGate";
         AdmitToken: Guid;
         AdmitToCodes: List of [Code[20]];
         IsCheckedBySubscriber, IsValid : Boolean;
+        ResponseCode: Integer;
         ResponseMessage: Text;
+        ApiError: Enum "NPR API Error Code";
+        ErrorMessage: Label '%1: %2';
     begin
         TicketReservation.SetCurrentKey("Session Token ID");
         TicketReservation.SetFilter("Session Token ID", '=%1', Token);
@@ -104,25 +118,32 @@ codeunit 6248422 "NPR POSAction TicketAdmitOnEoS" implements "NPR IPOS Workflow"
         if (not TicketReservation.FindSet()) then
             exit;
 
-        SpeedGate.SetEndOfSalesAdmitMode();
-
         repeat
-            Ticket.SetCurrentKey("Ticket Reservation Entry No.");
-            Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservation."Entry No.");
-            if (Ticket.FindSet()) then
-                repeat
-                    if (SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToCodes)) then begin
+            if (TicketRequestManager.IsReservationRequest(Token)) and (TicketReservation.EndOfSaleAdmitMode <> TicketReservation.EndOfSaleAdmitMode::NO_ADMIT_ON_EOS) then begin
+                SpeedGate.SetEndOfSalesAdmitMode(TicketReservation.EndOfSaleAdmitMode = TicketReservation.EndOfSaleAdmitMode::SALE);
 
-                        AdmitToken := SpeedGate.CreateAdmitToken(Ticket."External Ticket No.", '', PosUnitNo);
-                        SpeedGate.Admit(AdmitToken, 1);
+                Ticket.SetCurrentKey("Ticket Reservation Entry No.");
+                Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservation."Entry No.");
+                if (Ticket.FindSet()) then
+                    repeat
+                        if (SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToCodes, ResponseCode)) then begin
 
-                        TicketsArray.Add(Ticket."External Ticket No.");
-                        TicketManagement.OnAfterPosTicketArrival(IsCheckedBySubscriber, IsValid, Ticket."No.", Ticket."External Member Card No.", Token, ResponseMessage);
-                        if ((IsCheckedBySubscriber) and (not IsValid)) then
-                            Error(ResponseMessage);
+                            AdmitToken := SpeedGate.CreateAdmitToken(Ticket."External Ticket No.", '', PosUnitNo);
+                            SpeedGate.Admit(AdmitToken, 1);
 
-                    end;
-                until (Ticket.Next() = 0);
+                            TicketManagement.OnAfterPosTicketArrival(IsCheckedBySubscriber, IsValid, Ticket."No.", Ticket."External Member Card No.", Token, ResponseMessage);
+                            if ((IsCheckedBySubscriber) and (not IsValid)) then
+                                TicketsRejectedList.Add(ResponseMessage)
+                            else
+                                TicketsAdmittedList.Add(Ticket."External Ticket No.");
+
+                        end else begin
+                            if (ResponseCode > 0) then
+                                TicketsRejectedList.Add(StrSubstNo(ErrorMessage, ResponseCode, ApiError.Names.Get(ApiError.Ordinals.IndexOf(ResponseCode))));
+
+                        end;
+                    until (Ticket.Next() = 0);
+            end;
         until (TicketReservation.Next() = 0);
     end;
 
@@ -173,7 +194,7 @@ codeunit 6248422 "NPR POSAction TicketAdmitOnEoS" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionTicketAdmitOnEoS.Codeunit.js### 
-'const main=async({workflow:s,context:i,popup:n,parameters:r,captions:e})=>{let a=null;i.customParameters.showSpinner&&(a=await n.spinner({caption:"Checking and admitting tickets...",abortEnabled:!1}));try{const{tickets:t}=await s.respond("HandleTicketAdmitOnEoS");if(t.length>0)for(const o of t)toast.success(`${e.ToastBody.substitute(o)}`,{title:e.ToastTitle})}catch(t){toast.error(t.message,{title:e.ToastTitle})}finally{a&&a.close()}};'
+'const main=async({workflow:a,context:n,popup:r,captions:t})=>{let s=null;n.customParameters.showSpinner&&(s=await r.spinner({caption:"Checking and admitting tickets...",abortEnabled:!1}));try{const{ticketsAdmitted:e,ticketsRejected:o}=await a.respond("HandleTicketAdmitOnEoS");if(e.length>0)for(const i of e)toast.success(`${t.ToastBody.substitute(i)}`,{title:t.ToastTitle});if(o.length>0)for(const i of o)toast.error(`${i}`,{title:t.ToastTitle})}catch(e){toast.error(e.message,{title:t.ToastTitle})}finally{s&&s.close()}};'
         )
     end;
 

@@ -1,4 +1,4 @@
-const main = async ({ workflow, context, popup, parameters, captions }) => {
+const main = async ({ workflow, context, popup, captions }) => {
   let spinnerDialog = null;
 
   if (context.customParameters.showSpinner) {
@@ -9,11 +9,21 @@ const main = async ({ workflow, context, popup, parameters, captions }) => {
   }
 
   try {
-    const { tickets } = await workflow.respond("HandleTicketAdmitOnEoS");
+    const { ticketsAdmitted, ticketsRejected } = await workflow.respond(
+      "HandleTicketAdmitOnEoS"
+    );
 
-    if (tickets.length > 0) {
-      for (const ticketNo of tickets) {
+    if (ticketsAdmitted.length > 0) {
+      for (const ticketNo of ticketsAdmitted) {
         toast.success(`${captions.ToastBody.substitute(ticketNo)}`, {
+          title: captions.ToastTitle,
+        });
+      }
+    }
+
+    if (ticketsRejected.length > 0) {
+      for (const rejectMessage of ticketsRejected) {
+        toast.error(`${rejectMessage}`, {
           title: captions.ToastTitle,
         });
       }

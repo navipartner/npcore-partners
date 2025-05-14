@@ -573,12 +573,13 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         AccessEntry: Record "NPR TM Ticket Access Entry";
         SpeedGate: Codeunit "NPR SG SpeedGate";
         ValidAdmitToCodes: List of [Code[20]];
+        ResponseCode: Integer;
     begin
         if (not Ticket.GetBySystemId(TicketId)) then
             exit(ResponseJson);
 
         if (AdmissionCode = '') then begin
-            if (not (SpeedGate.CheckTicket(ScannerId, Ticket."External Ticket No.", AdmissionCode, ValidAdmitToCodes))) then
+            if (not (SpeedGate.CheckTicket(ScannerId, Ticket."External Ticket No.", AdmissionCode, ValidAdmitToCodes, ResponseCode))) then
                 exit(ResponseJson);
         end else begin
             ValidAdmitToCodes.Add(AdmissionCode);

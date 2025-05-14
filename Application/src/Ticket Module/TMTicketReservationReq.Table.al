@@ -270,6 +270,12 @@
             Caption = 'Default';
             DataClassification = CustomerContent;
         }
+        field(140; EndOfSaleAdmitMode; ENUM "NPR TM AdmitTicketOnEoSMode")
+        {
+            Caption = 'End Of Sale Admit Mode';
+            DataClassification = CustomerContent;
+            InitValue = SALE;
+        }
         field(1000; "Receipt No."; Code[20])
         {
             Caption = 'Receipt No.';

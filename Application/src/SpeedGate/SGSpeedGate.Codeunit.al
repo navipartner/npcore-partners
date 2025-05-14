@@ -22,6 +22,13 @@ codeunit 6185130 "NPR SG SpeedGate"
         _EndOfSaleAdmitMode := true;
     end;
 
+    internal procedure SetEndOfSalesAdmitMode(NewMode: Boolean) CurrentMode: Boolean
+    begin
+        CurrentMode := _EndOfSaleAdmitMode;
+        _EndOfSaleAdmitMode := NewMode;
+    end;
+
+
     internal procedure CreateAdmitToken(ReferenceNumber: Text[100]; AdmissionCode: Code[20]; ScannerId: Code[10]) AdmitToken: Guid
     var
         ErrorMessage: Text;
@@ -797,7 +804,7 @@ codeunit 6185130 "NPR SG SpeedGate"
         exit(true);
     end;
 
-    internal procedure CheckTicket(ScannerId: Code[10]; TicketNo: Text[100]; AdmissionCode: Code[20]; var AdmitToCodes: List of [Code[20]]): Boolean
+    internal procedure CheckTicket(ScannerId: Code[10]; TicketNo: Text[100]; AdmissionCode: Code[20]; var AdmitToCodes: List of [Code[20]]; var ResponseCode: Integer): Boolean
     var
         WhiteListProfileCode: Code[10];
         TicketProfileCode: Code[10];
@@ -814,18 +821,27 @@ codeunit 6185130 "NPR SG SpeedGate"
         ReferenceNumberIdentified: Boolean;
         SuggestedQuantity: Integer;
     begin
-        if (not GetValidationProfilesForScanner(ScannerId, WhiteListProfileCode, TicketProfileCode, PermitTickets, MemberCardProfileCode, PermitMemberships, WalletProfileCode, PermitWallets, CityCardProfileId, PermitCityCard, ApiErrorNumber)) then
+        if (not GetValidationProfilesForScanner(ScannerId, WhiteListProfileCode, TicketProfileCode, PermitTickets, MemberCardProfileCode, PermitMemberships, WalletProfileCode, PermitWallets, CityCardProfileId, PermitCityCard, ApiErrorNumber)) then begin
+            ResponseCode := ApiErrorNumber;
             exit(false);
+        end;
 
         if (_EndOfSaleAdmitMode) then begin
-            if (not HandleEndOfSaleTryAdmitTicket(TicketNo, TicketId, AdmitToCodes, ReferenceNumberIdentified, SuggestedQuantity)) then
+            if (not HandleEndOfSaleTryAdmitTicket(TicketNo, TicketId, AdmitToCodes, ReferenceNumberIdentified, SuggestedQuantity)) then begin
+                ResponseCode := _ApiErrors.AsInteger();
                 exit(false);
+            end;
 
             if (AdmitToCodes.Count() > 0) then
                 exit(true);
         end;
 
-        exit(CheckForTicket(TicketProfileCode, TicketNo, AdmissionCode, TicketId, AdmitToCodes, ProfileLineId, ReferenceNumberIdentified));
+        if (not CheckForTicket(TicketProfileCode, TicketNo, AdmissionCode, TicketId, AdmitToCodes, ProfileLineId, ReferenceNumberIdentified)) then begin
+            ResponseCode := _ApiErrors.AsInteger();
+            exit(false);
+        end;
+
+        exit(true);
     end;
 
     local procedure CheckForTicketRequest(TicketProfileCode: Code[10]; ValidationRequest: Record "NPR SGEntryLog"; var NumberIdentified: Boolean): Boolean

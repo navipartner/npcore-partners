@@ -9,18 +9,31 @@ codeunit 6248358 "NPR POSAction TMRebookForToday" implements "NPR IPOS Workflow"
 
         _CreatedSalesLineIds: List of [Guid];
 
-
+        _AdmitMode_Name: Label 'AdmitMode', locked = true;
+        _TicketReference_Name: Label 'TicketReference', locked = true;
+        _ItemNumber_Name: Label 'ItemNumber', locked = true;
 
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
     var
         ItemNumberCaption: Label 'Item Number';
         ItemNumberUsage: Label 'This item number will soak up the overflow amount when new tickets is cheaper than the revoked ticket.';
+
+        AdmitMode_Caption: Label 'Admit Mode';
+        AdmitMode_Desc: Label 'Determines how end of sale admit mode will be handled (Sale=Normal, Scan=As scanned by POS).';
+        AdmitMode_OptionString: Label 'SALE,SCAN,NO_ADMIT_ON_EOS';
+        AdmitMode_OptionCaption: Label 'Sale,Scan,No Admit On End Of Sale';
     begin
         WorkflowConfig.AddActionDescription(_ActionDescription);
         WorkflowConfig.AddJavascript(GetActionScript());
-        WorkflowConfig.AddTextParameter('ItemNumber', '', ItemNumberCaption, ItemNumberUsage);
+        WorkflowConfig.AddTextParameter(_ItemNumber_Name, '', ItemNumberCaption, ItemNumberUsage);
         WorkflowConfig.AddLabel('TicketReferencePrompt', _TicketReferencePrompt);
         WorkflowConfig.AddLabel('WindowTitle', _WindowTitle);
+        WorkflowConfig.AddOptionParameter(_AdmitMode_Name,
+                                 AdmitMode_OptionString,
+                                 CopyStr(SelectStr(1, AdmitMode_OptionString), 1, 250),
+                                 AdmitMode_Caption,
+                                 AdmitMode_Desc,
+                                 AdmitMode_OptionCaption);
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
@@ -40,11 +53,13 @@ codeunit 6248358 "NPR POSAction TMRebookForToday" implements "NPR IPOS Workflow"
         AdditionalItemNo: Code[20];
         IsWallet: Boolean;
         RevokeCount: Integer;
-        NothingToRevoke: Label 'There is nothing to revoke for this reference number.';
+        NothingToRebook: Label 'There is nothing to rebook for this reference number.';
         AmountRevoked: Decimal;
+        SelectedAdmitMode: Option SALE,SCAN,NO_ADMIT_ON_EOS;
     begin
-        ReferenceNumber := CopyStr(Context.GetString('TicketReference'), 1, MaxStrLen(ReferenceNumber));
-        AdditionalItemNo := CopyStr(Context.GetStringParameter('ItemNumber'), 1, MaxStrLen(AdditionalItemNo));
+        ReferenceNumber := CopyStr(Context.GetString(_TicketReference_Name), 1, MaxStrLen(ReferenceNumber));
+        AdditionalItemNo := CopyStr(Context.GetStringParameter(_ItemNumber_Name), 1, MaxStrLen(AdditionalItemNo));
+        SelectedAdmitMode := Context.GetIntegerParameter(_AdmitMode_Name);
 
         if (ReferenceNumber = '') then
             exit;
@@ -66,8 +81,43 @@ codeunit 6248358 "NPR POSAction TMRebookForToday" implements "NPR IPOS Workflow"
             RevokeCount := RebookTicketWorker(ReferenceNumber, AdditionalItemNo);
 
         if (RevokeCount = 0) then
-            error(NothingToRevoke);
+            error(NothingToRebook);
 
+        SetEndOfSaleAdmitMode(SelectedAdmitMode);
+    end;
+
+    local procedure SetEndOfSaleAdmitMode(SelectedAdmitMode: Option SALE,SCAN,NO_ADMIT_ON_EOS)
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        SaleLinePos: Record "NPR POS Sale Line";
+        SalesLineId: Guid;
+    begin
+        foreach SalesLineId in _CreatedSalesLineIds do begin
+            SaleLinePos.GetBySystemId(SalesLineId);
+            TicketReservationRequest.SetCurrentKey("Receipt No.", "Line No.");
+            TicketReservationRequest.SetFilter("Receipt No.", '%1', SaleLinePos."Sales Ticket No.");
+            TicketReservationRequest.SetFilter("Line No.", '%1', SaleLinePos."Line No.");
+            if (TicketReservationRequest.FindSet()) then
+                repeat
+                    if (TicketRequestManager.IsReservationRequest(TicketReservationRequest."Session Token ID")) then
+                        case SelectedAdmitMode of
+                            SelectedAdmitMode::SALE:
+                                TicketReservationRequest.EndOfSaleAdmitMode := TicketReservationRequest.EndOfSaleAdmitMode::SALE;
+                            SelectedAdmitMode::SCAN:
+                                TicketReservationRequest.EndOfSaleAdmitMode := TicketReservationRequest.EndOfSaleAdmitMode::SCAN;
+                            SelectedAdmitMode::NO_ADMIT_ON_EOS:
+                                TicketReservationRequest.EndOfSaleAdmitMode := TicketReservationRequest.EndOfSaleAdmitMode::NO_ADMIT_ON_EOS;
+                            else
+                                TicketReservationRequest.EndOfSaleAdmitMode := TicketReservationRequest.EndOfSaleAdmitMode::SALE;
+                        end;
+
+                    if (TicketRequestManager.IsRevokeRequest(TicketReservationRequest."Session Token ID")) then
+                        TicketReservationRequest.EndOfSaleAdmitMode := ENUM::"NPR TM AdmitTicketOnEoSMode"::NO_ADMIT_ON_EOS;
+
+                    TicketReservationRequest.Modify();
+                until (TicketReservationRequest.Next() = 0);
+        end;
     end;
 
     local procedure RebookTicketWorker(TicketReferenceNumber: Text[50]; AdditionalItemNo: Code[20]) TotalRevokeCount: Integer;

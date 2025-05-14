@@ -141,6 +141,11 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Payment Option field';
                 }
+                field(EndOfSaleAdmitMode; Rec.EndOfSaleAdmitMode)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the End Of Sale Admit Mode field';
+                }
             }
             group(References)
             {

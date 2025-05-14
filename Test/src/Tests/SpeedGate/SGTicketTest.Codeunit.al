@@ -826,6 +826,7 @@ codeunit 85217 "NPR SG TicketTest"
         AdmitToAdmissions: List of [Code[20]];
         AttemptToAdmit: Boolean;
         Assert: Codeunit "Assert";
+        ResponseCode: Integer;
     begin
         SpeedGateLibrary.NoSpeedGateSetup();
         CreatePosUnit(PosUnitNo);
@@ -839,7 +840,7 @@ codeunit 85217 "NPR SG TicketTest"
         TicketType.Modify();
 
         SpeedGate.SetEndOfSalesAdmitMode();
-        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions);
+        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions, ResponseCode);
 
         Assert.IsFalse(AttemptToAdmit, 'Expected to not be able to admit ticket with SCAN activation method during end sale.');
         Assert.AreEqual(AdmitToAdmissions.Count(), 0, StrSubstNo('Expected zero admit to admissions, but got %1', AdmitToAdmissions.Count()));
@@ -858,6 +859,7 @@ codeunit 85217 "NPR SG TicketTest"
         AdmitToAdmissions: List of [Code[20]];
         AttemptToAdmit: Boolean;
         Assert: Codeunit "Assert";
+        ResponseCode: Integer;
     begin
         SpeedGateLibrary.NoSpeedGateSetup();
         CreatePosUnit(PosUnitNo);
@@ -871,7 +873,7 @@ codeunit 85217 "NPR SG TicketTest"
         TicketType.Modify();
 
         SpeedGate.SetEndOfSalesAdmitMode();
-        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions);
+        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions, ResponseCode);
 
         Assert.IsFalse(AttemptToAdmit, 'Expected to not be able to admit ticket with NA activation method during end sale.');
         Assert.AreEqual(AdmitToAdmissions.Count(), 0, StrSubstNo('Expected zero admit to admissions, but got %1', AdmitToAdmissions.Count()));
@@ -891,7 +893,7 @@ codeunit 85217 "NPR SG TicketTest"
         AdmitToAdmissions: List of [Code[20]];
         AttemptToAdmit: Boolean;
         Assert: Codeunit "Assert";
-
+        ResponseCode: Integer;
     begin
         SpeedGateLibrary.NoSpeedGateSetup();
         CreatePosUnit(PosUnitNo);
@@ -905,7 +907,7 @@ codeunit 85217 "NPR SG TicketTest"
         TicketType.Modify();
 
         SpeedGate.SetEndOfSalesAdmitMode();
-        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions);
+        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions, ResponseCode);
 
         Assert.IsTrue(AttemptToAdmit, 'Expected to be able to admit ticket with POS_DEFAULT activation method during end sale.');
         Assert.AreEqual(AdmitToAdmissions.Count(), 1, StrSubstNo('Expected 1 admit to admissions, but got %1', AdmitToAdmissions.Count()));
@@ -928,7 +930,7 @@ codeunit 85217 "NPR SG TicketTest"
         AdmitToAdmissions: List of [Code[20]];
         AttemptToAdmit: Boolean;
         Assert: Codeunit "Assert";
-
+        ResponseCode: Integer;
     begin
         SpeedGateLibrary.NoSpeedGateSetup();
         CreatePosUnit(PosUnitNo);
@@ -942,7 +944,7 @@ codeunit 85217 "NPR SG TicketTest"
         TicketType.Modify();
 
         SpeedGate.SetEndOfSalesAdmitMode();
-        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions);
+        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions, ResponseCode);
 
         Assert.IsTrue(AttemptToAdmit, 'Expected to be able to admit ticket with POS_ALL activation method during end sale.');
         Assert.AreEqual(AdmitToAdmissions.Count(), 2, StrSubstNo('Expected 1 admit to admissions, but got %1', AdmitToAdmissions.Count()));
@@ -966,7 +968,7 @@ codeunit 85217 "NPR SG TicketTest"
         AdmitToAdmissions: List of [Code[20]];
         AttemptToAdmit: Boolean;
         Assert: Codeunit "Assert";
-
+        ResponseCode: Integer;
     begin
         SpeedGateLibrary.NoSpeedGateSetup();
         CreatePosUnit(PosUnitNo);
@@ -986,7 +988,7 @@ codeunit 85217 "NPR SG TicketTest"
         until TicketBom.Next() = 0;
 
         SpeedGate.SetEndOfSalesAdmitMode();
-        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions);
+        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions, ResponseCode);
 
         Assert.IsFalse(AttemptToAdmit, 'Expected to not be able to admit ticket with SCAN activation method during end sale.');
         Assert.AreEqual(AdmitToAdmissions.Count(), 0, StrSubstNo('Expected zero admit to admissions, but got %1', AdmitToAdmissions.Count()));
@@ -1009,7 +1011,7 @@ codeunit 85217 "NPR SG TicketTest"
         AdmitToAdmissions: List of [Code[20]];
         AttemptToAdmit: Boolean;
         Assert: Codeunit "Assert";
-
+        ResponseCode: Integer;
     begin
         SpeedGateLibrary.NoSpeedGateSetup();
         CreatePosUnit(PosUnitNo);
@@ -1029,7 +1031,7 @@ codeunit 85217 "NPR SG TicketTest"
         until TicketBom.Next() = 0;
 
         SpeedGate.SetEndOfSalesAdmitMode();
-        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions);
+        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions, ResponseCode);
 
         Assert.IsFalse(AttemptToAdmit, 'Expected to not be able to admit ticket with NA activation method during end sale.');
         Assert.AreEqual(AdmitToAdmissions.Count(), 0, StrSubstNo('Expected zero admit to admissions, but got %1', AdmitToAdmissions.Count()));
@@ -1052,7 +1054,7 @@ codeunit 85217 "NPR SG TicketTest"
         AdmitToAdmissions: List of [Code[20]];
         AttemptToAdmit: Boolean;
         Assert: Codeunit "Assert";
-
+        ResponseCode: Integer;
     begin
         SpeedGateLibrary.NoSpeedGateSetup();
         CreatePosUnit(PosUnitNo);
@@ -1071,7 +1073,7 @@ codeunit 85217 "NPR SG TicketTest"
         TicketBom.Modify();
 
         SpeedGate.SetEndOfSalesAdmitMode();
-        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions);
+        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions, ResponseCode);
 
         Assert.IsTrue(AttemptToAdmit, 'Expected to not be able to admit ticket with POS activation method during end sale.');
         Assert.AreEqual(AdmitToAdmissions.Count(), 1, StrSubstNo('Expected zero admit to admissions, but got %1', AdmitToAdmissions.Count()));
@@ -1095,7 +1097,7 @@ codeunit 85217 "NPR SG TicketTest"
         AdmitToAdmissions: List of [Code[20]];
         AttemptToAdmit: Boolean;
         Assert: Codeunit "Assert";
-
+        ResponseCode: Integer;
     begin
         SpeedGateLibrary.NoSpeedGateSetup();
         CreatePosUnit(PosUnitNo);
@@ -1114,7 +1116,7 @@ codeunit 85217 "NPR SG TicketTest"
         TicketBom.Modify();
 
         SpeedGate.SetEndOfSalesAdmitMode();
-        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions);
+        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions, ResponseCode);
 
         Assert.IsTrue(AttemptToAdmit, 'Expected to be able to admit ticket with ALWAYS activation method during end sale.');
         Assert.AreEqual(AdmitToAdmissions.Count(), 1, StrSubstNo('Expected zero admit to admissions, but got %1', AdmitToAdmissions.Count()));
@@ -1139,7 +1141,7 @@ codeunit 85217 "NPR SG TicketTest"
         AttemptToAdmit: Boolean;
         AdmitCount: Integer;
         Assert: Codeunit "Assert";
-
+        ResponseCode: Integer;
     begin
         SpeedGateLibrary.NoSpeedGateSetup();
         CreatePosUnit(PosUnitNo);
@@ -1161,7 +1163,7 @@ codeunit 85217 "NPR SG TicketTest"
 
         // The PER_UNIT will revert to default admission code when no profiles are set up.
         SpeedGate.SetEndOfSalesAdmitMode();
-        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions);
+        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions, ResponseCode);
 
         Assert.IsTrue(AttemptToAdmit, 'Expected to be able to admit ticket with PER_UNIT activation method during end sale.');
         Assert.AreEqual(AdmitToAdmissions.Count(), 1, StrSubstNo('Expected zero admit to admissions, but got %1', AdmitToAdmissions.Count()));
@@ -1188,7 +1190,7 @@ codeunit 85217 "NPR SG TicketTest"
         AdmitToAdmissions: List of [Code[20]];
         AttemptToAdmit: Boolean;
         Assert: Codeunit "Assert";
-
+        ResponseCode: Integer;
     begin
         TicketProfileCode := SpeedGateLibrary.CreateProfile();
         SpeedGateLibrary.DefaultSetup(false, false, TicketProfileCode, '');
@@ -1211,7 +1213,7 @@ codeunit 85217 "NPR SG TicketTest"
 
         // The check will not be able to fill the admission code list, so it will be empty. 
         SpeedGate.SetEndOfSalesAdmitMode();
-        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions);
+        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions, ResponseCode);
 
         Assert.IsFalse(AttemptToAdmit, 'Expected to be able to admit ticket with PER_UNIT activation method during end sale.');
         Assert.AreEqual(AdmitToAdmissions.Count(), 0, StrSubstNo('Expected zero admit to admissions, but got %1', AdmitToAdmissions.Count()));
@@ -1238,7 +1240,7 @@ codeunit 85217 "NPR SG TicketTest"
         AttemptToAdmit: Boolean;
         AdmitCount: Integer;
         Assert: Codeunit "Assert";
-
+        ResponseCode: Integer;
     begin
         TicketProfileCode := SpeedGateLibrary.CreateProfile();
         SpeedGateLibrary.DefaultSetup(false, false, TicketProfileCode, '');
@@ -1262,7 +1264,7 @@ codeunit 85217 "NPR SG TicketTest"
 
         // The check will not be able to fill the admission code list, so it will be empty. 
         SpeedGate.SetEndOfSalesAdmitMode();
-        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions);
+        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions, ResponseCode);
 
         Assert.IsTrue(AttemptToAdmit, 'Expected to be able to admit ticket with PER_UNIT activation method during end sale.');
         Assert.AreEqual(AdmitToAdmissions.Count(), 2, StrSubstNo('Expected zero admit to admissions, but got %1', AdmitToAdmissions.Count()));
@@ -1293,6 +1295,7 @@ codeunit 85217 "NPR SG TicketTest"
         AdmitCount: Integer;
         Assert: Codeunit "Assert";
         GateId: Guid;
+        ResponseCode: Integer;
     begin
         // Default profile is empty - deny admission
         SpeedGateLibrary.DefaultSetup(false, false, SpeedGateLibrary.CreateProfile(), '');
@@ -1325,7 +1328,7 @@ codeunit 85217 "NPR SG TicketTest"
 
         // The check will not be able to fill the admission code list, so it will be empty. 
         SpeedGate.SetEndOfSalesAdmitMode();
-        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions);
+        AttemptToAdmit := SpeedGate.CheckTicket(PosUnitNo, Ticket."External Ticket No.", '', AdmitToAdmissions, ResponseCode);
 
         Assert.IsTrue(AttemptToAdmit, 'Expected to be able to admit ticket with PER_UNIT activation method during end sale.');
         Assert.AreEqual(AdmitToAdmissions.Count(), 2, StrSubstNo('Expected zero admit to admissions, but got %1', AdmitToAdmissions.Count()));
