@@ -213,7 +213,6 @@ codeunit 6248331 "NPR WalletApiAgent"
         ResponseJson
             .StartObject('ticketDetails')
             .AddObject(TicketAgent.TicketValidDateProperties(ResponseJson, Ticket))
-            .AddProperty('blocked', Ticket.Blocked)
             .AddArray(TicketAgent.TicketHistoryDTO(ResponseJson, 'accessHistory', Ticket, false))
             .EndObject();
         exit(ResponseJson);
