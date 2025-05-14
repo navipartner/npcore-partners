@@ -8,6 +8,37 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
         PrintLbl: Label 'Printing...';
         FileMoveLbl: Label 'Moving file...';
 
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS JavaScript Interface", 'OnCustomMethod', '', true, true)]
+    local procedure OnRequestPOSLayoutRelatedData(Method: Text; Context: JsonObject; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management"; var Handled: Boolean)
+    begin
+        if Method in
+            ['RequestHWCIPAddress']
+        then
+            Handled := true;
+
+        case Method of
+            'RequestHWCIPAddress':
+                RequestHWCIPAddress(POSSession, Context, FrontEnd);
+        end;
+    end;
+
+    local procedure RequestHWCIPAddress(POSSession: Codeunit "NPR POS Session"; Context: JsonObject; FrontEnd: Codeunit "NPR POS Front End Management")
+    var
+        POSSetup: Codeunit "NPR POS Setup";
+        POSUnit: Record "NPR POS Unit";
+        POSHardwareProfile: Record "NPR POS Hardware Profile";
+        Response: JsonObject;
+    begin
+        POSSession.GetSetup(POSSetup);
+        POSSetup.GetPOSUnit(POSUnit);
+        if POSHardwareProfile.Get(POSUnit."POS Hardware Profile") then begin
+            Response.Add('POSUnit', POSUnit."No.");
+            Response.Add('HWCIPAddress', POSHardwareProfile."IP Address");
+            FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
+        end;
+    end;
+
     internal procedure SendRawPrintRequest(PrinterName: Text; PrintJobBase64: Text)
     var
         Content: JsonObject;

@@ -186,6 +186,11 @@ page 6150617 "NPR POS Unit Card"
                     ToolTip = 'Configure ticket specific settings on the pos unit.';
                     ApplicationArea = NPRRetail;
                 }
+                field("POS Hardware Profile"; Rec."POS Hardware Profile")
+                {
+                    ToolTip = 'Specifies the Hardware Profile of the Hardware Connector.';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
     }

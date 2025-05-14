@@ -244,6 +244,12 @@ table 6150615 "NPR POS Unit"
             ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'Doesn''t have any reference';
         }
+        field(800; "POS Hardware Profile"; Code[20])
+        {
+            Caption = 'POS Hardware Profile';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Hardware Profile";
+        }
         field(570; "POS Restaurant Profile"; Code[20])
         {
             Caption = 'POS Restaurant Profile';
