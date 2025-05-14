@@ -22,12 +22,22 @@ page 6184887 "NPR NP Pay POS Payment Setup"
                 Caption = 'Merchant Account';
                 ToolTip = 'Specifies which Merchant Account should be used for the payment setup.';
             }
-            field("API Key"; Rec."Payment API Key")
+            field("API Key"; _ApiKey)
             {
                 ApplicationArea = NPRRetail;
                 Caption = 'API Key';
                 ToolTip = 'Specifies the API key used for accessing NP Pay APIs.';
                 ExtendedDatatype = Masked;
+
+                trigger OnValidate()
+                begin
+                    if (_ApiKey = '') then
+                        Rec.DeleteAPIKey()
+                    else begin
+                        Rec.SetAPIKey(_ApiKey);
+                        Rec.Modify();
+                    end;
+                end;
             }
             field(Environment; Rec.Environment)
             {
@@ -35,7 +45,6 @@ page 6184887 "NPR NP Pay POS Payment Setup"
                 Caption = 'Environment';
                 ToolTip = 'Specifies which environment to use for the payment setup. Live is for production.';
             }
-
             field("Encryption Key Id"; Rec."Encryption Key Id")
             {
                 ApplicationArea = NPRRetail;
@@ -56,4 +65,13 @@ page 6184887 "NPR NP Pay POS Payment Setup"
             }
         }
     }
+
+    trigger OnOpenPage()
+    begin
+        if Rec.HasAPIKey() then
+            _ApiKey := '***';
+    end;
+
+    var
+        _ApiKey: Text;
 }

@@ -45,10 +45,40 @@ table 6150955 "NPR Emergency mPOS Setup"
             DataClassification = CustomerContent;
             TableRelation = "Salesperson/Purchaser";
         }
-
         field(8; "CSV Url"; Text[500])
         {
             Caption = 'CSV Url';
+            DataClassification = CustomerContent;
+        }
+        field(9; "POS Unit"; Code[10])
+        {
+            Caption = 'POS Unit';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Unit"."No.";
+        }
+        field(10; "Payment Integration"; enum "NPR Emergency mPOS PmntIntgr")
+        {
+            Caption = 'Payment Integration';
+            DataClassification = CustomerContent;
+        }
+        field(11; "Terminal Url"; Text[500])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Terminal Url';
+        }
+        field(12; "Poi Id"; Text[250])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Poi Id';
+        }
+        field(13; "Store Id"; Text[250])
+        {
+            Caption = 'Store Id';
+            DataClassification = CustomerContent;
+        }
+        field(14; "Scanner Type"; enum "NPR Emergency mPOS ScannerType")
+        {
+            Caption = 'Scanner Type';
             DataClassification = CustomerContent;
         }
     }
@@ -79,9 +109,19 @@ table 6150955 "NPR Emergency mPOS Setup"
         Setup.Add('AdyenEncKeyId', NPPayPOSPaymentSetup."Encryption Key Id");
         Setup.Add('AdyenEncKeyVersion', NPPayPOSPaymentSetup."Encryption Key Version");
         Setup.Add('AdyenEncKeyPassphrase', NPPayPOSPaymentSetup."Encryption Key Password");
-        Setup.Add('AdyenApiKey', NPPayPOSPaymentSetup."Payment API Key");
+        Setup.Add('AdyenApiKey', NPPayPOSPaymentSetup.GetApiKey());
         Setup.Add('AdyenMerchantAccount', NPPayPOSPaymentSetup."Merchant Account");
         Setup.Add('AdyenEnvironment', Format(NPPayPOSPaymentSetup.Environment));
+        Setup.Add('AdyenTerminalUrl', Rec."Terminal Url");
+        Setup.Add('AdyenPoiId', Rec."Poi Id");
+        Setup.Add('AdyenStoreId', Rec."Store Id");
+        // Payment integration
+        Setup.Add('Payment_PosUnitId', Rec."POS Unit");
+        Setup.Add('Payment_IntegrationType', Rec."Payment Integration".Names.Get(Rec."Payment Integration".Ordinals.IndexOf(Rec."Payment Integration".AsInteger())));
+
+        //Scanner Type
+        Setup.Add('ScannerType', Rec."Scanner Type".Names.Get(Rec."Scanner Type".Ordinals.IndexOf(Rec."Scanner Type".AsInteger())));
+
         POSPaymentMethod.Get(Rec."EFT Payment Method");
         //Backward compatible START
         Setup.Add('Payment_EftPaymentMethodCode', Rec."EFT Payment Method");

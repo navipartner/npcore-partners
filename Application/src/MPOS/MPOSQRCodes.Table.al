@@ -60,6 +60,32 @@
             Caption = 'QR code';
             DataClassification = CustomerContent;
         }
+
+
+        field(23; "Scanner Type"; enum "NPR MPOS Scanner Type")
+        {
+            Caption = 'Scanner Type';
+            DataClassification = CustomerContent;
+        }
+        field(24; "Adyen Environment"; Option)
+        {
+            Caption = 'Environment';
+            DataClassification = CustomerContent;
+            OptionMembers = "Live","Test";
+            InitValue = Live;
+        }
+        field(25; "Payment Integration"; enum "NPR MPOS Payment Integration")
+        {
+            Caption = 'Payment Integration';
+            DataClassification = CustomerContent;
+        }
+        field(26; "Terminal Url"; Text[500])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Terminal Url';
+        }
+
+
     }
 
     keys
@@ -152,6 +178,11 @@
                       '","F":"' + MPOSQRCode.Company +
                       '","G":"' + PaymentType +
                       '","H":"' + MPOSQRCode."Webservice Url" +
+                      '","I":"' + 
+                      '","J":"' + MPOSQRCode."Scanner Type".Names.Get(MPOSQRCode."Scanner Type".Ordinals.IndexOf(MPOSQRCode."Scanner Type".AsInteger())) +
+                      '","K":"' + Format(MPOSQRCode."Adyen Environment") +
+                      '","L":"' + MPOSQRCode."Payment Integration".Names.Get(MPOSQRCode."Payment Integration".Ordinals.IndexOf(MPOSQRCode."Payment Integration".AsInteger())) +
+                      '","O":"' + MPOSQRCode."Terminal Url" +
                       '"}';
 
         GenerateBarcode(JsonString, TmpQR);
@@ -189,8 +220,12 @@
         JObject.Add('F', MPOSQRCode.Company);
         JObject.Add('G', PaymentType);
         JObject.Add('H', MPOSQRCode."Webservice Url");
+        JObject.Add('I', '');
+        JObject.Add('J', MPOSQRCode."Scanner Type".Names.Get(MPOSQRCode."Scanner Type".Ordinals.IndexOf(MPOSQRCode."Scanner Type".AsInteger())));
+        JObject.Add('K', Format(MPOSQRCode."Adyen Environment"));
+        JObject.Add('L', MPOSQRCode."Payment Integration".Names.Get(MPOSQRCode."Payment Integration".Ordinals.IndexOf(MPOSQRCode."Payment Integration".AsInteger())));
+        JObject.Add('O', MPOSQRCode."Terminal Url");
         JObject.WriteTo(JsonString);
-
         GenerateBarcode(JsonString, TmpQR);
 
         TmpQR.CreateInStream(InStr);
