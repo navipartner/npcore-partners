@@ -413,6 +413,11 @@
         key(Key1; "Code")
         {
         }
+#if not (BC17 or BC18 or BC19 or BC20)
+        key(Replication; SystemRowVersion)
+        {
+        }
+#endif
     }
 
     fieldgroups

@@ -1,0 +1,91 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+
+types:
+
+  POSStore:
+    docs: A POS Store defines a physical location and groups individual POS Units together.
+    properties:
+      id: uuid
+      code: string
+      name: string
+      address: string
+      address2: string
+      postCode: string
+      city: string
+      county: string
+      countryCode: string
+      vatRegistrationNo: string
+    examples:
+      - name: ExamplePOSStoreRetail
+        value:
+          id: "0fbe7be1-330a-f011-a8fd-f8a00ce62e65"
+          code: "01"
+          name: "Retail Store"
+          address: ""
+          address2: ""
+          postCode: "1000"
+          city: "København K"
+          county: ""
+          countryCode: "DK"
+          vatRegistrationNo: "12345678"
+      - name: ExamplePOSStoreAttraction
+        value:
+          id: "fa495d6b-99ae-4866-8e1d-2c227f8352d2"
+          code: "02"
+          name: "World's Best Attraction"
+          address: "Fun Road 1"
+          address2: ""
+          postCode: "1000"
+          city: "København K"
+          county: ""
+          countryCode: "DK"
+          vatRegistrationNo: "12345678"
+
+  PaginatedPOSStores:
+    docs: A paginated response with multiple POS Stores
+    properties:
+      morePages: boolean
+      nextPageKey: string
+      nextPageURL: string
+      data: list<POSStore>
+    examples:
+      - name: ExamplePaginatedPOSStores
+        value:
+          morePages: true
+          nextPageKey: "c29tZSBiYXNlNjQgc3RyaW5n"
+          nextPageURL: "https://api.npretail.app/tenant/env/company/pos/unit?pageKey=c29tZSBiYXNlNjQgc3RyaW5n&lastRowVersion=12345678901234567890"
+          data:
+            - $POSStore.ExamplePOSStoreRetail
+            - $POSStore.ExamplePOSStoreAttraction
+
+service:
+  auth: true
+  base-path: /pos
+  endpoints:
+
+    getPOSStores:
+      display-name: List POS Stores
+      docs: 
+        This endpoint allows you to fetch the POS Stores in the solution. The endpoint supports the `sync` parameter. See more on the [replication article](/replication).
+      method: GET
+      path: /store
+      request:
+        name: getPOSStoresRequest
+        query-parameters:
+          pageSize: optional<integer>
+          pageKey: optional<string>
+          lastRowVersion: optional<string>
+          sync: optional<boolean>
+      response: PaginatedPOSStores
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            pageSize: 50
+          response:
+            body: $PaginatedPOSStores.ExamplePaginatedPOSStores

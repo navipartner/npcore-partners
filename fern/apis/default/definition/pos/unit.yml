@@ -1,0 +1,77 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+  posApiTypes: ./pos-api-types.yml
+
+types:
+
+  POSUnit:
+    docs: A POS Unit defines the individual unit (either full size POS, mPOS, or other type of device) used for performing POS sales and POS related activities.
+    properties:
+      id: uuid
+      code: string
+      name: string
+      posStoreCode:
+        docs: The code of the POS Store that the unit is associated with.
+        type: string
+    examples:
+      - name: ExamplePOSUnitRetail
+        value:
+          id: 0a7e39b2-ec7b-4bbf-9914-1fa01b17657b
+          code: "0101"
+          name: "Copenhagen POS 1"
+          posStoreCode: "01"
+      - name: ExamplePOSUnitAttraction
+        value:
+          id: 0b1a6b08-ac50-423d-a431-5f12e2dc43c3
+          code: "0201"
+          name: "Ticket Sales POS 1"
+          posStoreCode: "02"
+
+  PaginatedPOSUnits:
+    docs: A paginated response containing multiple POS Units
+    properties:
+      morePages: boolean
+      nextPageKey: string
+      nextPageURL: string
+      data: list<POSUnit>
+    examples:
+      - name: ExamplePaginatedPOSUnits
+        value:
+          morePages: true
+          nextPageKey: "c29tZSBiYXNlNjQgc3RyaW5n"
+          nextPageURL: "https://api.npretail.app/tenant/env/company/pos/unit?pageKey=c29tZSBiYXNlNjQgc3RyaW5n&lastRowVersion=12345678901234567890"
+          data:
+            - $POSUnit.ExamplePOSUnitRetail
+            - $POSUnit.ExamplePOSUnitAttraction
+
+
+service:
+  auth: true
+  base-path: /pos
+  endpoints:
+
+    getPOSUnits:
+      display-name: List POS Units
+      docs:
+        This endpoint allows you to fetch the POS Units in the solution. The endpoint supports the `sync` parameter. See more on the [replication article](/replication).
+      method: GET
+      path: "/unit"
+      request:
+        name: getPOSUnitsRequest
+        query-parameters:
+          pageSize: optional<integer>
+          pageKey: optional<string>
+          lastRowVersion: optional<string>
+          sync: optional<boolean>
+      response: PaginatedPOSUnits
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            pageSize: 50
+          response:
+            body: $PaginatedPOSUnits.ExamplePaginatedPOSUnits

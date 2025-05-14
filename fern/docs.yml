@@ -249,6 +249,12 @@ navigation:
           - pos.possale:
               title: POS Sale
               summary: ./docs/pages/pos/possale.mdx
+          - pos.unit:
+              title: POS Unit
+              summary: ./docs/pages/pos/unit.mdx
+          - pos.store:
+              title: POS Store
+              summary: ./docs/pages/pos/store.mdx
           - pos.salesperson:
               title: Salesperson
               summary: ./docs/pages/pos/salesperson.mdx
