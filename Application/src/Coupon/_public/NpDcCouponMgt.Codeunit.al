@@ -751,7 +751,7 @@
 
         SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Comment;
         SaleLinePOS.Description := Coupon.Description;
-        OnAfterSetCouponDescrition(SaleLinePOS, Coupon);
+        OnAfterSetCouponDescription(SaleLinePOS, Coupon);
         SaleLinePOS.Quantity := 1;
         SaleLineOut.InsertLine(SaleLinePOS);
 
@@ -1010,11 +1010,15 @@
     end;
 
     #endregion Print
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterSetCouponDescription(var SaleLinePOS: Record "NPR POS Sale Line"; Coupon: Record "NPR NpDc Coupon")
+    begin
+    end;
 
+    [Obsolete('Obsolete. Not used. Use OnAfterSetCouponDescription', '2025-05-12')]
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetCouponDescrition(var SaleLinePOS: Record "NPR POS Sale Line"; Coupon: Record "NPR NpDc Coupon")
     begin
     end;
-
 
 }
