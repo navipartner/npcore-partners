@@ -58,6 +58,7 @@ codeunit 6248348 "NPR Static Sales Receipt"
         DefaultText3Lbl: Label 'WITHIN 15 DAYS OF PURCHASE';
         DefaultText4Lbl: Label '******';
     begin
+        Printer.SetFont(A11FontLbl);
         // Logo section
         RetailLogo.SetRange("Register No.", POSUnit.GetCurrentPOSUnit());
         if RetailLogo.IsEmpty() then
@@ -67,21 +68,20 @@ codeunit 6248348 "NPR Static Sales Receipt"
         if RetailLogo.FindFirst() then begin
             Printer.SetFont(LogoFontLbl);
             Printer.AddLine(ReceiptLogoLbl, 1);
+            Printer.SetFont(A11FontLbl);
         end;
 
         // POS Store information
         if POSStore.Get(POSEntry."POS Store Code") then begin
             if POSStore.Name <> '' then begin
-                Printer.SetFont(A11FontLbl);
                 Printer.SetBold(true);
                 Printer.SetPadChar(' ');
                 Printer.AddLine(POSStore.Name, 1);
+                Printer.SetBold(false);
             end;
 
-            if POSStore.Address <> '' then begin
-                Printer.SetBold(false);
+            if POSStore.Address <> '' then
                 Printer.AddLine(POSStore.Address, 1);
-            end;
 
             if POSStore."Address 2" <> '' then
                 Printer.AddLine(POSStore."Address 2", 1);
