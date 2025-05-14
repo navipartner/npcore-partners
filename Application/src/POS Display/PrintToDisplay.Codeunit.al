@@ -3,10 +3,10 @@
     Access = Internal;
     trigger OnRun()
     var
-        PrinterDeviceSettings: Record "NPR Printer Device Settings";
+        TempPrinterDeviceSettings: Record "NPR Printer Device Settings" temporary;
     begin
         PrintLines();
-        LinePrintMgt.ProcessBuffer(Codeunit::"NPR Print To Display", Enum::"NPR Line Printer Device"::BixolonDisplay, PrinterDeviceSettings);
+        LinePrintMgt.ProcessBuffer(Codeunit::"NPR Print To Display", Enum::"NPR Line Printer Device"::BixolonDisplay, TempPrinterDeviceSettings);
     end;
 
     var

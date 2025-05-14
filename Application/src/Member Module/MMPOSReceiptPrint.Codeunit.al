@@ -6,7 +6,7 @@
 
     trigger OnRun()
     var
-        PrinterDeviceSettings: Record "NPR Printer Device Settings";
+        TempPrinterDeviceSettings: Record "NPR Printer Device Settings" temporary;
         MembershipEntry: Record "NPR MM Membership Entry";
         MemberRole: Record "NPR MM Membership Role";
         Member: Record "NPR MM Member";
@@ -63,7 +63,7 @@
                 Printer.AddLine('PAPERCUT', 0);
             until Membership.Next() = 0;
 
-        Printer.ProcessBuffer(Codeunit::"NPR MM POS Receipt Print", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
+        Printer.ProcessBuffer(Codeunit::"NPR MM POS Receipt Print", Enum::"NPR Line Printer Device"::Epson, TempPrinterDeviceSettings);
     end;
 
     var

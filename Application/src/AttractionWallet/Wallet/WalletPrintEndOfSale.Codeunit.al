@@ -5,9 +5,9 @@ codeunit 6185079 "NPR WalletPrintEndOfSale"
 
     trigger OnRun()
     var
-        PrinterDeviceSettings: Record "NPR Printer Device Settings";
+        TempPrinterDeviceSettings: Record "NPR Printer Device Settings" temporary;
         Wallet: Record "NPR AttractionWallet";
-    begin
+begin
         Wallet.CopyFilters(Rec);
 
         Printer.SetAutoLineBreak(true);
@@ -16,7 +16,7 @@ codeunit 6185079 "NPR WalletPrintEndOfSale"
         if (Wallet.FindFirst()) then
             PrintOne(Wallet);
 
-        Printer.ProcessBuffer(Codeunit::"NPR TM Report - Ticket", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
+        Printer.ProcessBuffer(Codeunit::"NPR TM Report - Ticket", Enum::"NPR Line Printer Device"::Epson, TempPrinterDeviceSettings);
     end;
 
     var

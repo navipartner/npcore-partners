@@ -8,14 +8,14 @@ codeunit 6248348 "NPR Static Sales Receipt"
 
     trigger OnRun()
     var
-        PrinterDeviceSettings: Record "NPR Printer Device Settings";
+        TempPrinterDeviceSettings: Record "NPR Printer Device Settings" temporary;
     begin
         Printer.SetAutoLineBreak(true);
         Printer.SetThreeColumnDistribution(0.465, 0.35, 0.235);
 
         AddReceiptInformation(Rec);
 
-        Printer.ProcessBuffer(Codeunit::"NPR Static Sales Receipt", Enum::"NPR Line Printer Device"::Epson, PrinterDeviceSettings);
+        Printer.ProcessBuffer(Codeunit::"NPR Static Sales Receipt", Enum::"NPR Line Printer Device"::Epson, TempPrinterDeviceSettings);
     end;
 
     internal procedure AddReceiptInformation(POSEntry: Record "NPR POS Entry")
