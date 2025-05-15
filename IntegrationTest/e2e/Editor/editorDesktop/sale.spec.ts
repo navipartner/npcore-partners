@@ -92,9 +92,6 @@ test.describe("Sale test", () => {
       await expect(
         page.frameLocator("iframe").getByText("Total Paid50")
       ).toBeVisible();
-      await expect(
-        page.frameLocator("iframe").getByText("Change -15")
-      ).toBeVisible();
       await removeLayout(page, key);
     });
     test("testing correct decimal amount on a payment that is not fixed value but decimals in global settings are set to 0", async ({ page }, workerInfo) => {

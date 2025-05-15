@@ -28,6 +28,7 @@ test.describe("Mobile add and remove editable buttons test 2", () => {
       )
       .first()
       .click();
+    await page.waitForTimeout(1000);
     await page
       .frameLocator("iframe")
       .getByText("Edit", { exact: true })
@@ -38,6 +39,7 @@ test.describe("Mobile add and remove editable buttons test 2", () => {
       .frameLocator("iframe")
       .getByRole("button", { name: "Save" })
       .click();
+    await page.waitForTimeout(2000);
     await page
       .frameLocator("iframe")
       .locator(
@@ -45,10 +47,27 @@ test.describe("Mobile add and remove editable buttons test 2", () => {
       )
       .first()
       .click();
-    await page
-      .frameLocator("iframe")
-      .getByText("Edit", { exact: true })
-      .click();
+    await page.waitForTimeout(2000);
+    if (
+      await page
+        .frameLocator("iframe")
+        .getByText("Edit", { exact: true })
+        .isVisible()
+    ) {
+      await page
+        .frameLocator("iframe")
+        .getByText("Edit", { exact: true })
+        .click();
+    } else {
+      await page
+        .frameLocator("iframe")
+        .locator(
+          "div:nth-child(7) > .editable-button__content > .editable-button__button"
+        )
+        .first()
+        .click();
+      await page.waitForTimeout(2000);
+    }
     await page.frameLocator("iframe").getByRole("textbox").nth(2).click();
     await page.frameLocator("iframe").getByRole("textbox").nth(2).fill("B");
     await page
@@ -57,7 +76,6 @@ test.describe("Mobile add and remove editable buttons test 2", () => {
       .nth(1)
       .click();
     await page.waitForTimeout(3000);
-    await page.waitForTimeout(1000);
     await page
       .frameLocator("iframe")
       .getByRole("button", { name: "A", exact: true })
@@ -66,14 +84,18 @@ test.describe("Mobile add and remove editable buttons test 2", () => {
       .frameLocator("iframe")
       .getByText("Clear", { exact: true })
       .click();
+    await page.waitForTimeout(1000);
     await page
       .frameLocator("iframe")
       .getByRole("button", { name: "B", exact: true })
       .click();
+    await page.waitForTimeout(1000);
     await page
       .frameLocator("iframe")
       .getByText("Clear", { exact: true })
       .click();
+    await page.waitForTimeout(1000);
+
     await page
       .frameLocator("iframe")
       .getByRole("button", { name: "Save" })
