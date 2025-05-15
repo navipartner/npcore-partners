@@ -981,6 +981,11 @@
                     'UpgradeNPPayPOSPaymentSetupApiKey':
                         exit('NPR-UpgradeNPPayPOSPaymentSetupApiKey-20250511');
                 end;
+            Codeunit::"NPR UPG API WS":
+                case UpgradeStep of
+                    'APIWS_041224_MMV':
+                        exit('NPR-RegisterRestApiWs-20250515');
+                end;
         end;
     end;
 }
