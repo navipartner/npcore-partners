@@ -161,7 +161,6 @@ codeunit 85074 "NPR Coupon Tests"
         LibrarySales: Codeunit "Library - Sales";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -248,9 +247,7 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         LibrarySales: Codeunit "Library - Sales";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        LibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -342,7 +339,6 @@ codeunit 85074 "NPR Coupon Tests"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -432,7 +428,6 @@ codeunit 85074 "NPR Coupon Tests"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -523,7 +518,6 @@ codeunit 85074 "NPR Coupon Tests"
         LibrarySales: Codeunit "Library - Sales";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -612,7 +606,6 @@ codeunit 85074 "NPR Coupon Tests"
         LibrarySales: Codeunit "Library - Sales";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -705,7 +698,6 @@ codeunit 85074 "NPR Coupon Tests"
         NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
-        SaleLinePOSCouponAmount: Decimal;
         CouponQty: Integer;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
@@ -793,7 +785,6 @@ codeunit 85074 "NPR Coupon Tests"
         NPRPOSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
-        SaleLinePOSCouponAmount: Decimal;
         CouponQty: Integer;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
@@ -885,7 +876,6 @@ codeunit 85074 "NPR Coupon Tests"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -984,7 +974,6 @@ codeunit 85074 "NPR Coupon Tests"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcArchCouponEntryAmount: Decimal;
@@ -1096,7 +1085,6 @@ codeunit 85074 "NPR Coupon Tests"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
-        SaleLinePOSCouponAmount: Decimal;
         CouponQty: Integer;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
@@ -1198,7 +1186,6 @@ codeunit 85074 "NPR Coupon Tests"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
         DiscountAmountWithoutVATAftereCouponAssignmentExtraItem: Decimal;
-        SaleLinePOSCouponAmount: Decimal;
         CouponQty: Integer;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
@@ -1310,7 +1297,6 @@ codeunit 85074 "NPR Coupon Tests"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -1409,7 +1395,6 @@ codeunit 85074 "NPR Coupon Tests"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcArchCouponEntryAmount: Decimal;
@@ -1521,7 +1506,6 @@ codeunit 85074 "NPR Coupon Tests"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -1620,7 +1604,6 @@ codeunit 85074 "NPR Coupon Tests"
         DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
         DiscountAmountWithoutVATAftereCouponAssignmentExtraItem: Decimal;
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcArchCouponEntryAmount: Decimal;
@@ -1728,7 +1711,6 @@ codeunit 85074 "NPR Coupon Tests"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -1835,7 +1817,6 @@ codeunit 85074 "NPR Coupon Tests"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcArchCouponEntryAmount: Decimal;
@@ -1960,7 +1941,6 @@ codeunit 85074 "NPR Coupon Tests"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -2070,7 +2050,6 @@ codeunit 85074 "NPR Coupon Tests"
         DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
         DiscountAmountWithoutVATAftereCouponAssignmentExtraItem: Decimal;
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcArchCouponEntryAmount: Decimal;
@@ -2192,7 +2171,6 @@ codeunit 85074 "NPR Coupon Tests"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -2300,7 +2278,6 @@ codeunit 85074 "NPR Coupon Tests"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcArchCouponEntryAmount: Decimal;
@@ -2428,7 +2405,6 @@ codeunit 85074 "NPR Coupon Tests"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -2537,7 +2513,6 @@ codeunit 85074 "NPR Coupon Tests"
         DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
         DiscountAmountWithoutVATAftereCouponAssignmentExtraItem: Decimal;
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcArchCouponEntryAmount: Decimal;
@@ -2656,7 +2631,6 @@ codeunit 85074 "NPR Coupon Tests"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -2753,7 +2727,6 @@ codeunit 85074 "NPR Coupon Tests"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -2855,7 +2828,6 @@ codeunit 85074 "NPR Coupon Tests"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -2954,7 +2926,6 @@ codeunit 85074 "NPR Coupon Tests"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -3054,7 +3025,6 @@ codeunit 85074 "NPR Coupon Tests"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -3151,7 +3121,6 @@ codeunit 85074 "NPR Coupon Tests"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -3253,7 +3222,6 @@ codeunit 85074 "NPR Coupon Tests"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -3351,7 +3319,6 @@ codeunit 85074 "NPR Coupon Tests"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         DiscountAmountWithoutVATAftereCouponAssignment: Decimal;
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -3522,7 +3489,6 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -3601,7 +3567,6 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -3804,7 +3769,6 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -3892,7 +3856,6 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -3980,7 +3943,6 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -4066,7 +4028,6 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -4152,7 +4113,6 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -4243,7 +4203,6 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -4333,7 +4292,6 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -4415,7 +4373,6 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -4627,7 +4584,6 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
 
@@ -4716,7 +4672,6 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcArchCouponEntryAmount: Decimal;
@@ -4804,7 +4759,6 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcArchCouponEntryAmount: Decimal;
@@ -4895,7 +4849,6 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcArchCouponEntryAmount: Decimal;
@@ -4986,7 +4939,6 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcArchCouponEntryAmount: Decimal;
@@ -5077,7 +5029,6 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcArchCouponEntryAmount: Decimal;
@@ -5163,7 +5114,6 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -5243,7 +5193,6 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         AmountToPay: Decimal;
         TransactionEnded: Boolean;
         NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon";
@@ -5329,7 +5278,6 @@ codeunit 85074 "NPR Coupon Tests"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSActionDiscountB: Codeunit "NPR POS Action - Discount B";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         DiscountAmount: Decimal;
         DiscountPct: Decimal;
         AmountToPay: Decimal;
@@ -5439,7 +5387,6 @@ codeunit 85074 "NPR Coupon Tests"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSActionDiscountB: Codeunit "NPR POS Action - Discount B";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         DiscountAmount: Decimal;
         DiscountPct: Decimal;
         AmountToPay: Decimal;
@@ -5535,10 +5482,8 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         LibrarySales: Codeunit "Library - Sales";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        POSCustDiscandTax: Codeunit "NPR POS Cust. Disc. and Tax";
         POSActionDiscountB: Codeunit "NPR POS Action - Discount B";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         DiscountAmount: Decimal;
         DiscountPct: Decimal;
         AmountToPay: Decimal;
@@ -5647,9 +5592,7 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryUtility: Codeunit "Library - Utility";
         LibrarySales: Codeunit "Library - Sales";
         POSSaleLine: Codeunit "NPR POS Sale Line";
-        POSCustDiscandTax: Codeunit "NPR POS Cust. Disc. and Tax";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
         DiscountAmount: Decimal;
         DiscountPct: Decimal;
         AmountToPay: Decimal;
@@ -5731,7 +5674,6 @@ codeunit 85074 "NPR Coupon Tests"
     procedure CheckCouponDiscountAmountItemListApplicationCouponOverappliedThenDeleted()
     // [SCENARIO] Check discount amount when coupon has been added with an Item List application and deleted after that
     var
-        SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
         SaleLinePOSCoupon: Record "NPR POS Sale Line";
         TempCoupon: Record "NPR NpDc Coupon" temporary;
@@ -5743,15 +5685,10 @@ codeunit 85074 "NPR Coupon Tests"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         LibraryUtility: Codeunit "Library - Utility";
-        LibrarySales: Codeunit "Library - Sales";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         POSActDeletePOSLineB: Codeunit "NPR POSAct:Delete POS Line-B";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
-        AmountToPay: Decimal;
-        TransactionEnded: Boolean;
-        NpDcArchCouponEntryAmount: Decimal;
     begin
         Initialize();
 
@@ -5838,10 +5775,6 @@ codeunit 85074 "NPR Coupon Tests"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         POSActDeletePOSLineB: Codeunit "NPR POSAct:Delete POS Line-B";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
-        AmountToPay: Decimal;
-        TransactionEnded: Boolean;
-        NpDcArchCouponEntryAmount: Decimal;
     begin
         Initialize();
 
@@ -5941,10 +5874,6 @@ codeunit 85074 "NPR Coupon Tests"
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         POSActDeletePOSLineB: Codeunit "NPR POSAct:Delete POS Line-B";
         CouponQty: Integer;
-        SaleLinePOSCouponAmount: Decimal;
-        AmountToPay: Decimal;
-        TransactionEnded: Boolean;
-        NpDcArchCouponEntryAmount: Decimal;
     begin
         Initialize();
 
@@ -6104,6 +6033,237 @@ codeunit 85074 "NPR Coupon Tests"
         Assert.AreEqual(SaleLinePOS."Discount Amount", 0, 'Discount not calcualted propery after deleting the coupons.');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckCouponDiscountItemListApplicationApplyDiscountLowestPriceWithTwoSameItemsDiffertentUOMs()
+    // [SCENARIO] Check if coupon is correctly applied when there is item with different UOMs on sale. Apply discount - lowest price first.
+    var
+        LowerPriceSaleLinePOS: Record "NPR POS Sale Line";
+        HigherPriceSaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        CouponType: Record "NPR NpDc Coupon Type";
+        Item: Record Item;
+        UnitOfMeasure: Record "Unit of Measure";
+        SecondUnitOfMeasure: Record "Unit of Measure";
+        ItemUnitOfMeasure: Record "Item Unit of Measure";
+        SecondItemUnitOfMeasure: Record "Item Unit of Measure";
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryUtility: Codeunit "Library - Utility";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryInventory: Codeunit "Library - Inventory";
+        CouponQty: Integer;
+        ApplyDiscountOption: Option "Priority","Highest price","Lowest price";
+    begin
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Amount Application
+        LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 500, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Item with 2 UOMs
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        LibraryInventory.CreateUnitOfMeasureCode(SecondUnitOfMeasure);
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
+        LibraryInventory.CreateItemUnitOfMeasure(SecondItemUnitOfMeasure, Item."No.", SecondUnitOfMeasure.Code, 5);
+        Item."Base Unit of Measure" := UnitOfMeasure.Code;
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] ITEM_LIST coupon
+        LibraryCoupon.SetItemListCouponApplyDiscountOption(CouponType, Item, 1, ApplyDiscountOption::"Lowest price", 0, 10000);
+        CouponQty := 1;
+        CouponType."Max Use per Sale" := 1;
+        CouponType.Modify(true);
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [GIVEN] 1 item added 2 times on POS with different UOM on each line
+        LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(LowerPriceSaleLinePOS);
+        LowerPriceSaleLinePOS.Validate("Unit of Measure Code", UnitOfMeasure.Code);
+        LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(HigherPriceSaleLinePOS);
+        HigherPriceSaleLinePOS.Validate("Unit of Measure Code", SecondUnitOfMeasure.Code);
+
+        // [GIVEN] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+        LowerPriceSaleLinePOS.Get(LowerPriceSaleLinePOS.RecordId);
+        HigherPriceSaleLinePOS.Get(HigherPriceSaleLinePOS.RecordId);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon no6t activated');
+
+        // [THEN] Check if coupon applied on the line with the lowest price
+        Assert.AreEqual(LowerPriceSaleLinePOS."Discount Amount", CouponType."Discount Amount", 'Discount not calcualted properly.');
+        Assert.AreEqual(HigherPriceSaleLinePOS."Discount Amount", 0, 'Discount not calcualted properly.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckCouponDiscountItemListApplicationApplyDiscountHighestPriceWithTwoSameItemsDiffertentUOMs()
+    // [SCENARIO] Check if coupon is correctly applied when there is item with different UOMs on sale. Apply discount - highest price.
+    var
+        LowerPriceSaleLinePOS: Record "NPR POS Sale Line";
+        HigherPriceSaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        CouponType: Record "NPR NpDc Coupon Type";
+        Item: Record Item;
+        UnitOfMeasure: Record "Unit of Measure";
+        SecondUnitOfMeasure: Record "Unit of Measure";
+        ItemUnitOfMeasure: Record "Item Unit of Measure";
+        SecondItemUnitOfMeasure: Record "Item Unit of Measure";
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryUtility: Codeunit "Library - Utility";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryInventory: Codeunit "Library - Inventory";
+        CouponQty: Integer;
+        ApplyDiscountOption: Option "Priority","Highest price","Lowest price";
+    begin
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Amount Application
+        LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 500, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Item with 2 UOMs
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        LibraryInventory.CreateUnitOfMeasureCode(SecondUnitOfMeasure);
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
+        LibraryInventory.CreateItemUnitOfMeasure(SecondItemUnitOfMeasure, Item."No.", SecondUnitOfMeasure.Code, 5);
+        Item."Base Unit of Measure" := UnitOfMeasure.Code;
+        Item."Unit Price" := 1000;
+        Item.Modify();
+
+        // [GIVEN] ITEM_LIST coupon
+        LibraryCoupon.SetItemListCouponApplyDiscountOption(CouponType, Item, 1, ApplyDiscountOption::"Highest price", 0, 10000);
+        CouponQty := 1;
+        CouponType."Max Use per Sale" := 1;
+        CouponType.Modify(true);
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [GIVEN] 1 item added 2 times on POS with different UOM on each line
+        LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(LowerPriceSaleLinePOS);
+        LowerPriceSaleLinePOS.Validate("Unit of Measure Code", UnitOfMeasure.Code);
+        LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(HigherPriceSaleLinePOS);
+        HigherPriceSaleLinePOS.Validate("Unit of Measure Code", SecondUnitOfMeasure.Code);
+
+        // [GIVEN] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+        LowerPriceSaleLinePOS.Get(LowerPriceSaleLinePOS.RecordId);
+        HigherPriceSaleLinePOS.Get(HigherPriceSaleLinePOS.RecordId);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon no6t activated');
+
+        // [THEN] Check if coupon applied on the line with the lowest price
+        Assert.AreEqual(HigherPriceSaleLinePOS."Discount Amount", CouponType."Discount Amount", 'Discount not calcualted properly.');
+        Assert.AreEqual(LowerPriceSaleLinePOS."Discount Amount", 0, 'Discount not calcualted properly.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckCouponDiscountItemListApplicationApplyDiscountPriorityWithTwoSameItemsDiffertentUOMs()
+    // [SCENARIO] Check if coupon is correctly applied when there are 2 items on sale. Apply discount - priority.
+    var
+        HigherPrioritySaleLinePOS: Record "NPR POS Sale Line";
+        LowerPrioritySaleLinePOS: Record "NPR POS Sale Line";
+        SaleLinePOSCoupon: Record "NPR POS Sale Line";
+        TempCoupon: Record "NPR NpDc Coupon" temporary;
+        CouponType: Record "NPR NpDc Coupon Type";
+        Item: Record Item;
+        SecondItem: Record Item;
+        LibraryCoupon: Codeunit "NPR Library Coupon";
+        Assert: Codeunit Assert;
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        LibraryUtility: Codeunit "Library - Utility";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
+        LibraryInventory: Codeunit "Library - Inventory";
+        CouponQty: Integer;
+        ApplyDiscountOption: Option "Priority","Highest price","Lowest price";
+    begin
+        Initialize();
+
+        // [GIVEN] POS Transaction
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+
+        // [GIVEN] Coupon with Discount Amount Application
+        LibraryCoupon.CreateDiscountAmountCouponType(LibraryUtility.GenerateRandomCode20(CouponType.FieldNo(Code), Database::"NPR NpDc Coupon Type"), CouponType, 500, LibraryUtility.GenerateRandomCode20(CouponType.FieldNo("Reference No. Pattern"), Database::"NPR NpDc Coupon Type"));
+
+        // [GIVEN] Items
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        Item."Unit Price" := 1000;
+        Item.Modify();
+        NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(SecondItem, _POSUnit, _POSStore);
+        SecondItem."Unit Price" := 2000;
+        SecondItem.Modify();
+
+        // [GIVEN] ITEM_LIST coupon
+        LibraryCoupon.SetItemListCouponApplyDiscountOption(CouponType, Item, 1, ApplyDiscountOption::Priority, 1, 10000);
+        LibraryCoupon.SetItemListCouponApplyDiscountOption(CouponType, SecondItem, 1, ApplyDiscountOption::Priority, 0, 20000);
+        CouponQty := 1;
+        CouponType."Max Use per Sale" := 1;
+        CouponType.Modify(true);
+        LibraryCoupon.IssueCouponMultipleQuantity(LibraryUtility.GenerateRandomCode20(TempCoupon.FieldNo("No."), Database::"NPR NpDc Coupon"), CouponType, CouponQty, TempCoupon);
+
+        // [GIVEN] 1 item added 2 times on POS with different UOM on each line
+        LibraryPOSMock.CreateItemLine(_POSSession, Item."No.", 1);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(LowerPrioritySaleLinePOS);
+        LibraryPOSMock.CreateItemLine(_POSSession, SecondItem."No.", 1);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(HigherPrioritySaleLinePOS);
+
+        // [GIVEN] Coupon Scanned in the POS Sale
+        LibraryCoupon.ScanCouponReferenceCode(_POSSession, TempCoupon."Reference No.");
+        POSSaleLine.SetLast();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOSCoupon);
+        LowerPrioritySaleLinePOS.Get(LowerPrioritySaleLinePOS.RecordId);
+        HigherPrioritySaleLinePOS.Get(HigherPrioritySaleLinePOS.RecordId);
+
+        // [THEN] Check if coupon activated
+        Assert.IsTrue(SaleLinePOSCoupon."Line Type" = SaleLinePOSCoupon."Line Type"::Comment, 'Coupon not activated');
+        Assert.IsTrue(SaleLinePOSCoupon.Description = CouponType.Description, 'Coupon no6t activated');
+
+        // [THEN] Check if coupon applied on the line with the lowest price
+        Assert.AreEqual(HigherPrioritySaleLinePOS."Discount Amount", CouponType."Discount Amount", 'Discount not calcualted properly.');
+        Assert.AreEqual(LowerPrioritySaleLinePOS."Discount Amount", 0, 'Discount not calcualted properly.');
+    end;
+
     local procedure Initialize()
     var
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
@@ -6168,11 +6328,7 @@ codeunit 85074 "NPR Coupon Tests"
 
     local procedure CheckCouponAmountsBeforePosting(RegisterNo: Code[10]; SalesTicketNo: Code[20]; Date: Date; LineNo: Integer; SaleLinePOSDiscountAmount: Decimal; CouponType: Record "NPR NpDc Coupon Type"; var NpDcSaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon")
     var
-        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         Assert: Codeunit Assert;
-        NpDcArchCouponEntry: Record "NPR NpDc Arch.Coupon Entry";
-        NpDcArchCouponEntryAmount: Decimal;
-        TransactionEnded: Boolean;
     begin
         NpDcSaleLinePOSCoupon.Reset();
         NpDcSaleLinePOSCoupon.SetRange("Register No.", RegisterNo);

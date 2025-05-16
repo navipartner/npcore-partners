@@ -193,6 +193,40 @@ codeunit 85051 "NPR Library Coupon"
 
     end;
 
+    procedure SetItemListCouponApplyDiscountOption(var CouponType: Record "NPR NpDc Coupon Type";
+                                DiscountedItem: Record Item;
+                                ValidationQty: Decimal;
+                                ApplyDiscountOption: Option "Priority","Highest price","Lowest price";
+                                Priority: Integer;
+                                LineNo: Integer)
+    var
+        NPRNpDcCouponListItem: Record "NPR NpDc Coupon List Item";
+        NPRNpDcModuleApplyItemList: Codeunit "NPR NpDc Module Apply ItemList";
+    begin
+        CouponType."Apply Discount Module" := NPRNpDcModuleApplyItemList.ModuleCode();
+        CouponType.Modify();
+
+        NPRNpDcCouponListItem.Init();
+        NPRNpDcCouponListItem."Coupon Type" := CouponType.Code;
+        NPRNpDcCouponListItem."Line No." := LineNo;
+        NPRNpDcCouponListItem.Validate(Type, NPRNpDcCouponListItem.Type::Item);
+        NPRNpDcCouponListItem.Validate("No.", DiscountedItem."No.");
+        NPRNpDcCouponListItem.Validate(Priority, Priority);
+        NPRNpDcCouponListItem.Insert(true);
+
+        if LineNo <> 10000 then
+            exit;
+            
+        NPRNpDcCouponListItem.Init();
+        NPRNpDcCouponListItem."Coupon Type" := CouponType.Code;
+        NPRNpDcCouponListItem.Validate(Type, NPRNpDcCouponListItem.Type::Item);
+        NPRNpDcCouponListItem.Validate("Apply Discount", ApplyDiscountOption);
+        NPRNpDcCouponListItem.Validate("Validation Quantity", 1);
+        NPRNpDcCouponListItem."Line No." := -1;
+        NPRNpDcCouponListItem.Validate("Max. Quantity", ValidationQty);
+        NPRNpDcCouponListItem.Insert(true);
+    end;
+
     local procedure CreateCouponType(CouponTypeCode: Code[20]; var CouponType: Record "NPR NpDc Coupon Type"): Code[20]
     begin
         CreateCouponSetup();
