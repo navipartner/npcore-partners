@@ -39,7 +39,7 @@
                     CalcFields = "Sales (Qty.)", "Sales (LCY)", "Scheduled Receipt (Qty.)", Inventory, "COGS (LCY)", "Purchases (Qty.)";
                     DataItemLink = "Item Category Code" = field(Code);
                     DataItemTableView = sorting("No.");
-                    RequestFilterFields = "Global Dimension 1 Filter", "Date Filter";
+                    RequestFilterFields = "Global Dimension 1 Filter", "Date Filter", "Item Category Code", Inventory;
 
                     column(Item_No; "No.") { }
                     column(Item_Description; Description) { }
@@ -77,7 +77,6 @@
                 {
                     CalcFields = "Sales (Qty.)", "Purchases (Qty.)", "Sales (LCY)", Inventory, "COGS (LCY)";
                     DataItemTableView = sorting("No.") where("Item Category Code" = const(''));
-                    RequestFilterFields = "Global Dimension 1 Filter", "Date Filter";
 
                     column(Item2_No; "No.") { }
                     column(Item2_Description; Description) { }
