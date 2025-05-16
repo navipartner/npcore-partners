@@ -178,7 +178,7 @@ codeunit 6185037 "NPR HU L Audit Mgt."
 
         if not IsReturnSale then
             exit;
-        if OriginalPOSSaleLineExists(SaleHeader) then
+        if OriginalPOSSaleLineExistsAndIsFiscalized(SaleHeader) then
             exit;
         AddOriginalReceiptDataForReturn(SaleHeader);
     end;
@@ -538,16 +538,24 @@ codeunit 6185037 "NPR HU L Audit Mgt."
         exit(not POSSaleLine.IsEmpty());
     end;
 
-    local procedure OriginalPOSSaleLineExists(POSSale: Record "NPR POS Sale"): Boolean
+    local procedure OriginalPOSSaleLineExistsAndIsFiscalized(POSSale: Record "NPR POS Sale"): Boolean
     var
+        HULPOSAuditLogAux: Record "NPR HU L POS Audit Log Aux.";
         POSEntrySaleLine: Record "NPR POS Entry Sales Line";
         POSSaleLine: Record "NPR POS Sale Line";
         OrigPOSEntry: Guid;
+        OriginalSaleNotFiscalizedByLaurelErr: Label 'Original Sale %1 was not fiscalized by Laurel. You cannot return this sale on POS Unit %2.', Comment = '%1 = Sales Document No, %2 = POS Unit No.';
     begin
         GetPOSSaleLine(POSSaleLine, POSSale);
         OrigPOSEntry := POSSaleLine."Orig.POS Entry S.Line SystemId";
         POSEntrySaleLine.SetRange(SystemId, OrigPOSEntry);
-        exit(not POSEntrySaleLine.IsEmpty());
+        if not POSEntrySaleLine.FindFirst() then
+            exit(false);
+        if not HULPOSAuditLogAux.FindAuditLogBySalesTicket(POSEntrySaleLine."Document No.") then
+            Error(OriginalSaleNotFiscalizedByLaurelErr, POSEntrySaleLine."Document No.", POSSale."Register No.");
+        if HULPOSAuditLogAux."FCU Document No." = 0 then
+            Error(OriginalSaleNotFiscalizedByLaurelErr, POSEntrySaleLine."Document No.", POSSale."Register No.");
+        exit(true);
     end;
 
     local procedure POSSaleLineExists(POSSale: Record "NPR POS Sale"): Boolean
@@ -584,6 +592,7 @@ codeunit 6185037 "NPR HU L Audit Mgt."
         CustomerPostCodeLbl: Label 'Customer Post Code';
         CustomerVATRegistrationNoLbl: Label 'Customer VAT Number';
         InsufficientDataErr: Label 'Insufficient data entered, please input all necessary data.';
+        InputLengthErr: Label 'Input length exceeded for %1, maximum length is %2.', Comment = '%1 = Field Name; %2 = Max Length';
         FoundPOSSale: Boolean;
     begin
         if POSSale."Customer No." <> '' then begin
@@ -615,6 +624,21 @@ codeunit 6185037 "NPR HU L Audit Mgt."
 
         if (CustomerName = '') or (CustomerAddress = '') or (CustomerCity = '') or (CustomerPostCode = '') then
             Error(InsufficientDataErr);
+
+        if StrLen(CustomerName) > 50 then
+            Error(InputLengthErr, CustomerNameLbl, 50);
+
+        if StrLen(CustomerAddress) > 50 then
+            Error(InputLengthErr, CustomerAddressLbl, 50);
+
+        if StrLen(CustomerCity) > 50 then
+            Error(InputLengthErr, CustomerCityLbl, 50);
+
+        if StrLen(CustomerPostCode) > 20 then
+            Error(InputLengthErr, CustomerPostCodeLbl, 20);
+
+        if StrLen(CustomerVATNumber) > 20 then
+            Error(InputLengthErr, CustomerVATRegistrationNoLbl, 20);
 
         FoundPOSSale := HULPOSSale.Get(POSSale.SystemId);
         if not FoundPOSSale then
