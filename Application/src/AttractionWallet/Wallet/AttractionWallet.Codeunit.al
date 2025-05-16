@@ -501,6 +501,28 @@ codeunit 6185062 "NPR AttractionWallet"
         WalletAssetHeaderRef.Insert();
     end;
 
+    internal procedure UpdateEmailAddressOnAllWallets(FromEmail: Text[100]; ToEmail: Text[100])
+    var
+        WalletAssetHeaderRef: Record "NPR WalletAssetHeaderReference";
+        NullGuid: Guid;
+    begin
+#if (BC17 or BC18 or BC19 or BC20 or BC21)
+        WalletAssetHeaderRef.LockTable();
+#else
+        WalletAssetHeaderRef.ReadIsolation := IsolationLevel::UpdLock;
+#endif
+        WalletAssetHeaderRef.SetCurrentKey(LinkToTableId, LinkToReference, SupersededBy);
+        WalletAssetHeaderRef.SetRange(LinkToTableId, 0);
+        WalletAssetHeaderRef.SetRange(LinkToSystemId, NullGuid);
+        WalletAssetHeaderRef.SetRange(LinkToReference, FromEmail);
+        WalletAssetHeaderRef.SetRange(SupersededBy, 0);
+        if (WalletAssetHeaderRef.FindSet()) then
+            repeat
+                WalletAssetHeaderRef.LinkToReference := ToEmail;
+                WalletAssetHeaderRef.Modify();
+            until WalletAssetHeaderRef.Next() = 0;
+    end;
+
     internal procedure CreateNewExternalReference(WalletEntryNo: Integer)
     var
         Wallet: Record "NPR AttractionWallet";

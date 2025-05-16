@@ -49,6 +49,13 @@ codeunit 6185061 "NPR AttractionWalletFacade"
         WalletManagement.AddHeaderReference(WalletEntryNo, TableId, SystemId, Reference);
     end;
 
+    procedure UpdateEmailAddressOnAllWallets(FromEmail: Text[100]; ToEmail: Text[100])
+    var
+        WalletManagement: Codeunit "NPR AttractionWallet";
+    begin
+        WalletManagement.UpdateEmailAddressOnAllWallets(FromEmail, ToEmail);
+    end;
+
     procedure GetWalletAssets(WalletReferenceNumber: Text[100]; var WalletAssets: Query "NPR AttractionWalletAssets")
     begin
         WalletAssets.SetFilter(WalletAssets.WalletReferenceNumber, '=%1', WalletReferenceNumber);
