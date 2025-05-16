@@ -259,11 +259,13 @@
                         or (SaleLinePOS."Total Discount Step" <> TempSaleLinePOS."Total Discount Step")
                     then begin
                         SaleLinePOS.TransferFields(TempSaleLinePOS, false);
+                        UpdateTicketRequestQuantity(SaleLinePOS);
                     end;
                 end else begin
                     SaleLinePOS.Init();
                     SaleLinePOS := TempSaleLinePOS;
                     SaleLinePOS.Insert(false);
+                    CreateCloneTicketRequest(SaleLinePOS);
                 end;
 
                 OnCheckSalesLineUpdateDisc(SaleLinePOS, TempSaleLinePOS);
@@ -446,6 +448,49 @@
     begin
         if not DiscountPriority.IsEmpty() then
             DiscountPriority.DeleteAll();
+    end;
+
+    local procedure UpdateTicketRequestQuantity(var SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+    begin
+        TicketRequestManager.POS_OnModifyQuantity(SaleLinePOS);
+    end;
+
+    local procedure CreateCloneTicketRequest(var SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        DerivedFromSaleLinePOS: Record "NPR POS Sale Line";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        CloneTicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TMTicketRetailMgt: Codeunit "NPR TM Ticket Retail Mgt.";
+        Token, NewToken : Text[100];
+    begin
+        if SaleLinePOS.Quantity <= 0 then
+            exit;
+        if IsNullGuid(SaleLinePOS."Derived from Line") then
+            exit;
+        if not DerivedFromSaleLinePOS.GetBySystemId(SaleLinePOS."Derived from Line") then
+            exit;
+        if not TicketRequestManager.GetTokenFromReceipt(DerivedFromSaleLinePOS."Sales Ticket No.", DerivedFromSaleLinePOS."Line No.", Token) then
+            exit;
+        NewToken := TicketRequestManager.GetNewToken();
+        TicketReservationRequest.SetCurrentKey("Session Token ID");
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        TicketReservationRequest.SetFilter("Receipt No.", '=%1', DerivedFromSaleLinePOS."Sales Ticket No.");
+        TicketReservationRequest.SetFilter("Line No.", '=%1', DerivedFromSaleLinePOS."Line No.");
+        TicketReservationRequest.FindSet(true);
+        repeat
+            CloneTicketReservationRequest.TransferFields(TicketReservationRequest);
+            CloneTicketReservationRequest."Entry No." := 0;
+            CloneTicketReservationRequest."Receipt No." := SaleLinePOS."Sales Ticket No.";
+            CloneTicketReservationRequest."Line No." := SaleLinePOS."Line No.";
+            CloneTicketReservationRequest."Session Token ID" := NewToken;
+            CloneTicketReservationRequest.Quantity := 0;
+            CloneTicketReservationRequest.Insert(true);
+        until TicketReservationRequest.Next() = 0;
+        TicketRequestManager.POS_OnModifyQuantity(SaleLinePOS);
+        TMTicketRetailMgt.AdjustPriceOnSalesLine(SaleLinePOS, SaleLinePOS.Quantity, CloneTicketReservationRequest."Session Token ID", TicketReservationRequest."Ext. Line Reference No.");
     end;
 
     [IntegrationEvent(false, false)]
