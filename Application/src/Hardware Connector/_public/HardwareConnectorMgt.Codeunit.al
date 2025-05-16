@@ -32,11 +32,14 @@ codeunit 6014587 "NPR Hardware Connector Mgt."
     begin
         POSSession.GetSetup(POSSetup);
         POSSetup.GetPOSUnit(POSUnit);
-        if POSHardwareProfile.Get(POSUnit."POS Hardware Profile") then begin
-            Response.Add('POSUnit', POSUnit."No.");
-            Response.Add('HWCIPAddress', POSHardwareProfile."IP Address");
-            FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
-        end;
+        Response.Add('POSUnit', POSUnit."No.");
+
+        if POSHardwareProfile.Get(POSUnit."POS Hardware Profile") then
+            Response.Add('HWCIPAddress', POSHardwareProfile."IP Address")
+        else
+            Response.Add('HWCIPAddress', '');
+
+        FrontEnd.RespondToFrontEndMethod(Context, Response, FrontEnd);
     end;
 
     internal procedure SendRawPrintRequest(PrinterName: Text; PrintJobBase64: Text)
