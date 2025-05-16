@@ -2346,6 +2346,7 @@
         ToLineNo: Integer;
         i: Integer;
         UseSpecTracking: Boolean;
+        IsHandled: Boolean;
     begin
         if Sum = 0 then begin
             if Quantity = 0 then
@@ -2417,6 +2418,10 @@
                     until (i >= TotalComponentQuantity)
                 end;
             until BOMComponent.Next() = 0;
+
+            OnExplodeBOMBeforeValidateDiscount(Rec, ItemNo, FromLineNo, ToLineNo, IsHandled);
+            if IsHandled then
+                exit;
 
             if (UnitPrice <> 0) and (Sum <> 0) then begin
                 SaleLinePOS.Reset();
@@ -3420,4 +3425,10 @@
     local procedure OnAfterInitFromItem(var Rec: Record "NPR POS Sale Line"; Item: Record Item)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnExplodeBOMBeforeValidateDiscount(var Rec: Record "NPR POS Sale Line"; ItemNo: Code[20]; FromLineNo: Integer; ToLineNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
 }
