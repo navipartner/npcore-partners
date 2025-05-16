@@ -7,20 +7,24 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
     var
         TempNcTask: Record "NPR Nc Task" temporary;
         SpfyCapturePayment: Codeunit "NPR Spfy Capture Payment";
+        Success: Boolean;
     begin
         InitNcTaskFromPmtRequest(Request, TempNcTask);
-        SpfyCapturePayment.CaptureShopifyPayment(TempNcTask, false);
-        SetResponse(TempNcTask, Response);
+        if not CheckPrerequisites(TempNcTask, Response) then
+            exit;
+        Success := SpfyCapturePayment.CaptureShopifyPayment(TempNcTask, false);
+        SetResponse(TempNcTask, Response, Success);
     end;
 
     procedure Refund(var Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response")
     var
         TempNcTask: Record "NPR Nc Task" temporary;
         SpfyCapturePayment: Codeunit "NPR Spfy Capture Payment";
+        Success: Boolean;
     begin
         InitNcTaskFromPmtRequest(Request, TempNcTask);
-        SpfyCapturePayment.RefundShopifyPayment(TempNcTask, false);
-        SetResponse(TempNcTask, Response);
+        Success := SpfyCapturePayment.RefundShopifyPayment(TempNcTask, false);
+        SetResponse(TempNcTask, Response, Success);
     end;
 
     procedure Cancel(var Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response")
@@ -84,10 +88,38 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
         NcTask."Record ID" := PaymentLine.RecordId();
     end;
 
-    local procedure SetResponse(var NcTask: Record "NPR Nc Task"; var Response: Record "NPR PG Payment Response")
+    local procedure CheckPrerequisites(NcTask: Record "NPR Nc Task"; var Response: Record "NPR PG Payment Response"): Boolean
+    var
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        IntegrationNotEnabledMsg: Label 'Either sending capture requests is disabled, or Shopify integration is not enabled for store %1.';
     begin
-        Response."Response Success" := true;
+        if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Payment Capture Requests", NcTask."Store Code") then begin
+            SetResponse(StrSubstNo(IntegrationNotEnabledMsg, NcTask."Store Code"), Response, false);
+            if UpdateLastErrorText(StrSubstNo(IntegrationNotEnabledMsg, NcTask."Store Code")) then;
+            exit;
+        end;
+        exit(true);
+    end;
+
+    [TryFunction]
+    local procedure UpdateLastErrorText(ErrorMsg: Text)
+    begin
+        Error(ErrorMsg);
+    end;
+
+    local procedure SetResponse(var NcTask: Record "NPR Nc Task"; var Response: Record "NPR PG Payment Response"; Success: Boolean)
+    begin
+        Response."Response Success" := Success;
         Response."Response Body" := NcTask.Response;
+    end;
+
+    local procedure SetResponse(ResponseMsg: Text; var Response: Record "NPR PG Payment Response"; Success: Boolean)
+    var
+        OStream: OutStream;
+    begin
+        Response."Response Success" := Success;
+        Response."Response Body".CreateOutStream(OStream, TextEncoding::UTF8);
+        OStream.WriteText(ResponseMsg);
     end;
 
 #if BC18 or BC19 or BC20 or BC21

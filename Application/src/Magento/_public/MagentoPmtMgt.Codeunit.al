@@ -60,6 +60,7 @@
 
         Commit();
 
+        PaymentLine.Find();
         PrevRec := Format(PaymentLine);
 
         if (Response."Response Success") then
