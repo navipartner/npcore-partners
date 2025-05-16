@@ -2551,7 +2551,6 @@
     internal procedure CreateDimFromDefaultDim(FieldNo: Integer)
     var
 #IF NOT (BC17 or BC18 or BC19 or BC20 or BC2100 or BC2101 or BC2102 or BC2103)
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         CreateDimensions: Boolean;
 #ENDIF
         DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
@@ -2560,10 +2559,7 @@
         InitDefaultDimensionSources(DefaultDimSource, FieldNo);
 #ENDIF
 #IF NOT (BC17 or BC18 or BC19 or BC20 or BC2100 or BC2101 or BC2102 or BC2103)
-        if FeatureFlagsManagement.IsEnabled('forcePosSalelineDimensions') then
-            CreateDimensions := true
-        else
-            CreateDimensions := DimMgt.IsDefaultDimDefinedForTable(GetTableValuePair(FieldNo));  //First appears in BC21.4
+        CreateDimensions := true;
         if CreateDimensions then
 #ENDIF
 #IF NOT (BC17 or BC18 or BC19)
@@ -2580,32 +2576,6 @@
         DimMgt.AddDimSource(DefaultDimSource, Database::Location, Rec."Location Code", FieldNo = Rec.FieldNo("Location Code"));
 
         OnAfterInitDefaultDimensionSources(Rec, DefaultDimSource, FieldNo);
-    end;
-#ENDIF
-#IF NOT (BC17 or BC18 or BC19 or BC20 or BC2100 or BC2101 or BC2102 or BC2103)
-
-    local procedure GetTableValuePair(FieldNo: Integer) TableValuePair: Dictionary of [Integer, Code[20]]
-    var
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeInitTableValuePair(TableValuePair, FieldNo, IsHandled);
-        if IsHandled then
-            exit;
-
-        case FieldNo of
-            FieldNo("No."):
-                TableValuePair.Add(NPRDimMgt.LineTypeToTableNPR("Line Type"), "No.");
-            FieldNo("Discount Code"):
-                TableValuePair.Add(NPRDimMgt.DiscountTypeToTableNPR("Discount Type"), "Discount Code");
-            FieldNo("Responsibility Center"):
-                TableValuePair.Add(Database::"Responsibility Center", "Responsibility Center");
-            FieldNo("NPRE Seating Code"):
-                TableValuePair.Add(Database::"NPR NPRE Seating", "NPRE Seating Code");
-            FieldNo("Location Code"):
-                TableValuePair.Add(Database::Location, "Location Code");
-        end;
-        OnAfterInitTableValuePair(TableValuePair, FieldNo);
     end;
 #ENDIF
 
@@ -3405,11 +3375,13 @@
 #ENDIF
 #IF NOT (BC17 or BC18 or BC19 or BC20 or BC2100 or BC2101 or BC2102 or BC2103)
 
+    [Obsolete('Not used anymore.', '2025-05-18')]
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInitTableValuePair(var TableValuePair: Dictionary of [Integer, Code[20]]; FieldNo: Integer; var IsHandled: Boolean)
     begin
     end;
 
+    [Obsolete('Not used anymore.', '2025-05-18')]
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitTableValuePair(var TableValuePair: Dictionary of [Integer, Code[20]]; FieldNo: Integer)
     begin
