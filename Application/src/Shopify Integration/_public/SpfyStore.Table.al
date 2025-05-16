@@ -375,10 +375,12 @@ table 6150810 "NPR Spfy Store"
     trigger OnDelete()
     var
         SpfyAllowedFinStatus: Record "NPR Spfy Allowed Fin. Status";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
     begin
         SpfyAllowedFinStatus.SetRange("Shopify Store Code", Code);
         if not SpfyAllowedFinStatus.IsEmpty() then
             SpfyAllowedFinStatus.DeleteAll();
+        SpfyAssignedIDMgt.RemoveAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID");
     end;
 
     internal procedure NoOfPriceUpdatesPerRequest(): Integer

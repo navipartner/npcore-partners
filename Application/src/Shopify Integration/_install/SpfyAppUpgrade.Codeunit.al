@@ -25,6 +25,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         RescheduleInventorySyncTasks();
         UpdateMetafieldDataLogSetup();
         SetDefaultProductStatus();
+        RemoveOrphanShopifyAssignedIDs();
     end;
 
     internal procedure UpdateShopifySetup()
@@ -325,6 +326,27 @@ codeunit 6184802 "NPR Spfy App Upgrade"
                     ShopifyStore.Modify();
                 end;
             until ShopifyStore.Next() = 0;
+
+        SetUpgradeTag();
+        LogFinish();
+    end;
+
+    local procedure RemoveOrphanShopifyAssignedIDs()
+    var
+        ShopifyAssignedID: Record "NPR Spfy Assigned ID";
+        RecRef: RecordRef;
+    begin
+        _UpgradeStep := 'RemoveOrphanShopifyAssignedIDs';
+        if HasUpgradeTag() then
+            exit;
+        LogStart();
+
+        ShopifyAssignedID.SetRange("Table No.", Database::"NPR Spfy Store");
+        if ShopifyAssignedID.FindSet() then
+            repeat
+                if not RecRef.Get(ShopifyAssignedID."BC Record ID") then
+                    ShopifyAssignedID.Delete();
+            until ShopifyAssignedID.Next() = 0;
 
         SetUpgradeTag();
         LogFinish();
