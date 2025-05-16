@@ -247,7 +247,7 @@
         TicketNotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
         MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
         Member: Record "NPR MM Member";
-        SuggestMethod: Option NA,EMAIL,SMS;
+        SuggestMethod: Enum "NPR TM NotificationMethod";
         SuggestAddress: Text[100];
         SuggestName: Text[100];
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";

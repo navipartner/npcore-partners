@@ -249,7 +249,7 @@
         EMAIL_INVALID_CONFIRM: Label 'The %1 seems invalid, do you want to correct it?';
         Admission: Record "NPR TM Admission";
         RequireNotificationAddress: Boolean;
-        SuggestNotificationMethod: Option NA,EMAIL,SMS;
+        SuggestNotificationMethod: Enum "NPR TM NotificationMethod";
         SuggestNotificationAddress: Text[100];
         SuggestTicketHolderName: Text[100];
         NPRAttrTextArray: array[40] of Text[250];
@@ -292,7 +292,7 @@
         RequireNotificationAddress := (Admission."Ticketholder Notification Type" = Admission."Ticketholder Notification Type"::REQUIRED);
     end;
 
-    internal procedure SetDefaultNotification(Method: Option NA,EMAIL,SMS; Address: Text[100]; Name: Text[100])
+    internal procedure SetDefaultNotification(Method: Enum "NPR TM NotificationMethod"; Address: Text[100]; Name: Text[100])
     begin
 
         SuggestNotificationMethod := Method;

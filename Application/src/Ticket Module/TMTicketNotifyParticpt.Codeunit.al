@@ -206,7 +206,7 @@
 
     end;
 
-    internal procedure RequireParticipantInfo(Token: Text[100]; var AdmissionCode: Code[20]; var SuggestNotificationMethod: Option NA,EMAIL,SMS; var SuggestNotificationAddress: Text[100]; var SuggestTicketHolderName: Text[100]) RequireParticipantInformation: Option NOT_REQUIRED,OPTIONAL,REQUIRED;
+    internal procedure RequireParticipantInfo(Token: Text[100]; var AdmissionCode: Code[20]; var SuggestNotificationMethod: Enum "NPR TM NotificationMethod"; var SuggestNotificationAddress: Text[100]; var SuggestTicketHolderName: Text[100]) RequireParticipantInformation: Option NOT_REQUIRED,OPTIONAL,REQUIRED;
     var
         Ticket: Record "NPR TM Ticket";
         Admission: Record "NPR TM Admission";
@@ -276,21 +276,78 @@
         until (TicketReservationRequest.Next() = 0);
     end;
 
-    procedure AcquireTicketParticipant(Token: Text[100]; SuggestNotificationMethod: Option NA,EMAIL,SMS; SuggestNotificationAddress: Text[100]; SuggestTicketHolderName: Text[100]): Boolean
+    internal procedure GetTicketHolderFromNotificationAddress(NotificationAddress: Text[100]; var TicketHolder: Record "NPR TM TicketHolder")
+    var
+        TicketReservationReq: Record "NPR TM Ticket Reservation Req.";
+    begin
+        Clear(TicketHolder);
+        TicketReservationReq.SetCurrentKey("Notification Address");
+        TicketReservationReq.SetRange("Notification Address", NotificationAddress);
+        if (TicketReservationReq.FindSet()) then
+            repeat
+                // Ensure we only add data once in case we have mulitple admissions/tickets on the same token.
+                if (not TicketHolder.Get(TicketReservationReq."Session Token ID")) then begin
+                    TicketHolder.Init();
+                    TicketHolder.FromReservationRequest(TicketReservationReq);
+                    TicketHolder.Insert();
+                end
+            until TicketReservationReq.Next() = 0;
+    end;
+
+    internal procedure SetTicketHolderInfo(var TicketHolder: Record "NPR TM TicketHolder")
+    var
+        TicketReservationReq: Record "NPR TM Ticket Reservation Req.";
+        MailManagement: Codeunit "Mail Management";
+        TypeHelper: Codeunit "Type Helper";
+        InvalidNotificationAddressErr: Label 'The notification address (%1) provided is not valid for the selected notification method (%2).', Comment = '%1 = notification address, %2 = notification method';
+    begin
+#if (BC17 or BC18 or BC19 or BC20 or BC21)
+        TicketReservationReq.LockTable();
+#else
+        TicketReservationReq.ReadIsolation := IsolationLevel::UpdLock;
+#endif
+        TicketReservationReq.SetCurrentKey("Session Token ID");
+
+        TicketHolder.Reset();
+        if (not TicketHolder.FindSet()) then
+            exit;
+
+        repeat
+            case TicketHolder.NotificationMethod of
+                "NPR TM NotificationMethod"::SMS:
+                    if (not TypeHelper.IsPhoneNumber(TicketHolder.NotificationAddress)) then
+                        Error(InvalidNotificationAddressErr, TicketHolder.NotificationAddress, TicketHolder.NotificationMethod);
+                "NPR TM NotificationMethod"::EMAIL:
+                    if (not MailManagement.CheckValidEmailAddress(TicketHolder.NotificationAddress)) then
+                        Error(InvalidNotificationAddressErr, TicketHolder.NotificationAddress, TicketHolder.NotificationMethod);
+            end;
+
+            TicketReservationReq.SetRange("Session Token ID", TicketHolder.ReservationToken);
+            TicketReservationReq.FindSet();
+            repeat
+                TicketReservationReq."Notification Method" := TicketHolder.NotificationMethod;
+                TicketReservationReq."Notification Address" := TicketHolder.NotificationAddress;
+                TicketReservationReq.TicketHolderName := TicketHolder.TicketHolderName;
+                TicketReservationReq.Modify();
+            until TicketReservationReq.Next() = 0;
+        until TicketHolder.Next() = 0;
+    end;
+
+    procedure AcquireTicketParticipant(Token: Text[100]; SuggestNotificationMethod: Enum "NPR TM NotificationMethod"; SuggestNotificationAddress: Text[100]; SuggestTicketHolderName: Text[100]): Boolean
     begin
 
         exit(AcquireTicketParticipantWorker(Token, SuggestNotificationMethod, SuggestNotificationAddress, SuggestTicketHolderName, false));
 
     end;
 
-    procedure AcquireTicketParticipantForce(Token: Text[100]; SuggestNotificationMethod: Option NA,EMAIL,SMS; SuggestNotificationAddress: Text[100]; SuggestTicketHolderName: Text[100]; ForceDialog: Boolean): Boolean
+    procedure AcquireTicketParticipantForce(Token: Text[100]; SuggestNotificationMethod: Enum "NPR TM NotificationMethod"; SuggestNotificationAddress: Text[100]; SuggestTicketHolderName: Text[100]; ForceDialog: Boolean): Boolean
     begin
 
         exit(AcquireTicketParticipantWorker(Token, SuggestNotificationMethod, SuggestNotificationAddress, SuggestTicketHolderName, ForceDialog));
 
     end;
 
-    local procedure AcquireTicketParticipantWorker(Token: Text[100]; SuggestNotificationMethod: Option NA,EMAIL,SMS; SuggestNotificationAddress: Text[100]; SuggestTicketHolderName: Text[100]; ForceDialog: Boolean): Boolean
+    local procedure AcquireTicketParticipantWorker(Token: Text[100]; SuggestNotificationMethod: Enum "NPR TM NotificationMethod"; SuggestNotificationAddress: Text[100]; SuggestTicketHolderName: Text[100]; ForceDialog: Boolean): Boolean
     var
         PageAction: Action;
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";

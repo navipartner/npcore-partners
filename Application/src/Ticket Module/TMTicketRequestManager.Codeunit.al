@@ -2405,7 +2405,7 @@
         NotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
         RequireParticipantInformation: Option NOT_REQUIRED,OPTIONAL,REQUIRED;
         AdmissionCode: Code[20];
-        SuggestNotificationMethod: Option NA,EMAIL,SMS;
+        SuggestNotificationMethod: Enum "NPR TM NotificationMethod";
         SuggestNotificationAddress: Text[100];
         SuggestTicketHolderName: Text[100];
     begin

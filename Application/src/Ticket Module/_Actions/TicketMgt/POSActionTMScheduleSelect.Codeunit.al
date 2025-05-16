@@ -30,7 +30,7 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
 
         RequireParticipantInformation: Option NOT_REQUIRED,OPTIONAL,REQUIRED;
         AdmissionCode: Code[20];
-        SuggestNotificationMethod: Option NA,EMAIL,SMS;
+        SuggestNotificationMethod: Enum "NPR TM NotificationMethod";
         SuggestNotificationAddress: Text[100];
         SuggestTicketHolderName: Text[100];
         Token: Text[100];

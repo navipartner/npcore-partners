@@ -169,12 +169,10 @@
             Caption = 'Waiting List Reference Code';
             DataClassification = CustomerContent;
         }
-        field(80; "Notification Method"; Option)
+        field(80; "Notification Method"; Enum "NPR TM NotificationMethod")
         {
             Caption = 'Notification Method';
             DataClassification = CustomerContent;
-            OptionCaption = ' ,E-Mail,SMS';
-            OptionMembers = NA,EMAIL,SMS;
         }
         field(81; "Notification Address"; Text[100])
         {
