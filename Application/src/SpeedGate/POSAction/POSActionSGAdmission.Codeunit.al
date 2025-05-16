@@ -5,6 +5,7 @@ codeunit 6248278 "NPR POS Action SG Admission" implements "NPR IPOS Workflow"
     var
         InputTxt: Label 'SpeedGate Admission';
         InputTxtDescrTxt: Label 'Input Reference No. Ticket/Member';
+        QtyToAdmitLbl: Label 'Quantity to Admit';
 
     procedure Register(WorkflowConfig: codeunit "NPR POS Workflow Config");
     begin
@@ -16,6 +17,7 @@ codeunit 6248278 "NPR POS Action SG Admission" implements "NPR IPOS Workflow"
         WorkflowConfig.AddLabel('InputReferenceNoTitle', InputTxt);
         WorkflowConfig.AddLabel('InputReferenceNo', InputTxtDescrTxt);
         WorkflowConfig.AddLabel('Welcome', WelcomeMsg);
+        WorkflowConfig.AddLabel('QuantityAdmitLbl', QtyToAdmitLbl);
     end;
 
     procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
@@ -24,7 +26,7 @@ codeunit 6248278 "NPR POS Action SG Admission" implements "NPR IPOS Workflow"
     begin
         case Step of
             'try_admit':
-                TryAdmitToken(Context, ReferenceNo);
+                FrontEnd.WorkflowResponse(TryAdmitToken(Context, ReferenceNo));
             'admit_token':
                 FrontEnd.WorkflowResponse(OnActionAdmit(Context));
             'membercard_validation':
@@ -35,16 +37,26 @@ codeunit 6248278 "NPR POS Action SG Admission" implements "NPR IPOS Workflow"
     local procedure GetActionScript(): Text
     begin
         exit(
-//###NPR_INJECT_FROM_FILE:POSActionSGAdmission.Codeunit.js###
-'let main = async ({workflow , parameters, context, popup, captions}) => {let memberCardDetails;windowTitle = captions.Welcome;if (!parameters.input_reference_no) {context.input_reference_no = await popup.input({ title: captions.InputReferenceNoTitle, caption: captions.InputReferenceNo });if (!context.input_reference_no) { return }; } else {context.input_reference_no = parameters.input_reference_no;  }await workflow.respond("try_admit"); const actionResponse = await workflow.respond("admit_token"); memberCardDetails = await workflow.respond("membercard_validation");if (actionResponse.success) {if (memberCardDetails.MemberScanned){toast.memberScanned({memberImg: memberCardDetails.MemberScanned.ImageDataUrl,memberName: memberCardDetails.MemberScanned.Name,validForAdmission: memberCardDetails.MemberScanned.Valid,memberExpiry: memberCardDetails.MemberScanned.ExpiryDate,  });}else{ toast.success (`Welcome ${actionResponse.table_capt} ${actionResponse.reference_no}`, {title: windowTitle}); } }};'
+//###NPR_INJECT_FROM_FILE:SpeedGateAdmission.js###
+'let main=async({workflow:a,parameters:r,context:n,popup:m,captions:i})=>{let e;if(windowTitle=i.Welcome,r.input_reference_no)n.input_reference_no=r.input_reference_no;else if(n.input_reference_no=await m.input({title:i.InputReferenceNoTitle,caption:i.InputReferenceNo}),!n.input_reference_no)return;const d=await a.respond("try_admit");d.isUnconfirmedGroup?n.quantityToAdmUnconfirmedGroup=await m.numpad({caption:i.QuantityAdmitLbl,title:i.QuantityAdmitLbl,value:d.defaultQuantity}):n.quantityToAdmUnconfirmedGroup=0;const t=await a.respond("admit_token");e=await a.respond("membercard_validation"),t.success&&(e.MemberScanned?toast.memberScanned({memberImg:e.MemberScanned.ImageDataUrl,memberName:e.MemberScanned.Name,validForAdmission:e.MemberScanned.Valid,memberExpiry:e.MemberScanned.ExpiryDate}):t.confirmedGroup?toast.success(`Welcome group of ${t.qtyToAdmit} people`,{title:windowTitle}):toast.success(`Welcome ${t.table_capt} ${t.reference_no}`,{title:windowTitle}))};'
 );
     end;
 
-    local procedure TryAdmitToken(Context: Codeunit "NPR POS JSON Helper"; var ReferenceNo: Text[100]): Boolean
+    local procedure TryAdmitToken(Context: Codeunit "NPR POS JSON Helper"; var ReferenceNo: Text[100]) Response: JsonObject
     var
+        ValidationRequest: Record "NPR SGEntryLog";
+        DetAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        Ticket: Record "NPR TM Ticket";
+        AccessEntry: Record "NPR TM Ticket Access Entry";
+        AdmitToken: Guid;
+        BlankGuid: Guid;
         AdmissionCodeParam: Code[20];
         ScannerIdParam: Code[10];
-        AdmitToken: Guid;
+        AdmitCount: Integer;
+        GroupQuantity: Integer;
+        ConfirmedGroup: Boolean;
+        UnconfirmedGroup: Boolean;
+        IsGroup: Boolean;
     begin
         ReferenceNo := CopyStr(Context.GetString('input_reference_no'), 1, MaxStrLen(ReferenceNo));
         if ReferenceNo = '' then
@@ -53,7 +65,38 @@ codeunit 6248278 "NPR POS Action SG Admission" implements "NPR IPOS Workflow"
         AdmissionCodeParam := CopyStr(Context.GetStringParameter(AdmissionCodeParamName()), 1, MaxStrLen(AdmissionCodeParam));
         ScannerIdParam := CopyStr(Context.GetStringParameter(ScannerIdParamName()), 1, MaxStrLen(ScannerIdParam));
         CreateAdmitToken(ReferenceNo, AdmissionCodeParam, ScannerIdParam, AdmitToken);
+
+        if AdmitToken <> BlankGuid then begin
+            ValidationRequest.SetCurrentKey(Token);
+            ValidationRequest.SetFilter(Token, '=%1', AdmitToken);
+            if ValidationRequest.FindFirst() then
+                if (Ticket.GetBySystemId(ValidationRequest.EntityId)) then begin
+                    AccessEntry.SetCurrentKey("Ticket No.");
+                    AccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+                    AccessEntry.SetFilter("Admission Code", '=%1', ValidationRequest.AdmissionCode);
+                    if AccessEntry.FindFirst() then begin
+                        DetAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', AccessEntry."Entry No.");
+                        DetAccessEntry.SetFilter(Type, '=%1', DetAccessEntry.Type::ADMITTED);
+                        DetAccessEntry.SetFilter(Quantity, '>%1', 0);
+                        AdmitCount := DetAccessEntry.Count;
+                        GroupQuantity := AccessEntry.Quantity;
+                        if (GroupQuantity > 1) then begin
+                            IsGroup := true;
+                            if (AdmitCount > 0) then
+                                ConfirmedGroup := true
+                            else
+                                UnconfirmedGroup := true;
+                        end;
+                    end;
+                end;
+        end;
+        Response.Add('isUnconfirmedGroup', UnconfirmedGroup);
+        Response.Add('defaultQuantity', ValidationRequest.SuggestedQuantity);
+
         Context.SetContext('token', AdmitToken);
+        Context.SetContext('suggestedQty', ValidationRequest.SuggestedQuantity);
+        Context.SetContext('confirmedGroup', ConfirmedGroup);
+        Context.SetContext('isGroup', IsGroup);
     end;
 
     local procedure OnActionAdmit(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
@@ -63,20 +106,44 @@ codeunit 6248278 "NPR POS Action SG Admission" implements "NPR IPOS Workflow"
         BlankGuid: Guid;
         ReasonMessage: Text;
         ReferenceNo: Text[100];
+        ConfirmedGroup: Boolean;
+        IsGroup: Boolean;
+        SuggestedQuantity: Integer;
+        QuantityToAdmitUnconfirmed: Decimal;
+        QtyToAdmit: Integer;
     begin
         ReferenceNo := CopyStr(Context.GetString('input_reference_no'), 1, MaxStrLen(ReferenceNo));
         AdmitToken := Context.GetString('token');
         if AdmitToken = BlankGuid then
             exit;
 
-        if (not SpeedGate.CheckAdmit(AdmitToken, 1, ReasonMessage)) then begin
+        ConfirmedGroup := Context.GetBoolean('confirmedGroup');
+        IsGroup := Context.GetBoolean('isGroup');
+        SuggestedQuantity := Context.GetInteger('suggestedQty');
+        QuantityToAdmitUnconfirmed := Context.GetInteger('quantityToAdmUnconfirmedGroup');
+
+        if IsGroup then begin
+            if ConfirmedGroup then
+                QtyToAdmit := SuggestedQuantity
+            else
+                QtyToAdmit := QuantityToAdmitUnconfirmed;
+        end else
+            QtyToAdmit := 1;
+
+        if QtyToAdmit = 0 then
+            QtyToAdmit := 1;
+
+
+        if (not SpeedGate.CheckAdmit(AdmitToken, QtyToAdmit, ReasonMessage)) then begin
             Commit(); // commit the transactions log entry before showing the error message
             Error(ReasonMessage);
         end else begin
             Response.Add('success', true);
             Response.Add('reference_no', ReferenceNo);
             Response.Add('table_capt', GetTableCaption(ReferenceNo));
-            Response.Add('welcome_message', WelcomeMsg)
+            Response.Add('welcome_message', WelcomeMsg);
+            Response.Add('confirmedGroup', ConfirmedGroup);
+            Response.Add('qtyToAdmit', QtyToAdmit);
         end;
     end;
 
