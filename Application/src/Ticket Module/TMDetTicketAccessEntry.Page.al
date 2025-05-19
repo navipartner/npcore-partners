@@ -85,6 +85,11 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Admitted Time field';
                 }
+                field("Scanner Station ID"; Rec."Scanner Station ID")
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Scanner Station ID field.';
+                }
                 field("Created Datetime"; Rec."Created Datetime")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
