@@ -7,9 +7,10 @@ codeunit 6184951 "NPR Spfy Item Webhook Handler" implements "NPR Spfy Webhook No
     var
         NcTask: Record "NPR Nc Task";
         ShopifyStore: Record "NPR Spfy Store";
+        JsonHelper: Codeunit "NPR Json Helper";
         SendItemAndInventory: Codeunit "NPR Spfy Send Items&Inventory";
         ShopifyPayload: JsonToken;
-        ShopifyProductJOb: JsonObject;
+        ShopifyProductID: Text[30];
     begin
         case SpfyWebhookNotification.Topic of
             SpfyWebhookNotification.Topic::"products/create":
@@ -25,8 +26,10 @@ codeunit 6184951 "NPR Spfy Item Webhook Handler" implements "NPR Spfy Webhook No
         NcTask."Store Code" := ShopifyStore.Code;
 
         ShopifyPayload.ReadFrom(SpfyWebhookNotification.GetPayloadStream());
-        ShopifyProductJOb.Add('product', ShopifyPayload.AsObject());
-        SendItemAndInventory.UpdateItemWithDataFromShopify(NcTask, ShopifyProductJOb.AsToken(), true);
+#pragma warning disable AA0139        
+        ShopifyProductID := JsonHelper.GetJText(ShopifyPayload, 'id', MaxStrLen(ShopifyProductID), true);
+#pragma warning restore AA0139
+        SendItemAndInventory.RetrieveShopifyProductAndUpdateItemWithDataFromShopify(NcTask, ShopifyProductID, true, false);
 
         SpfyWebhookNotification.Status := SpfyWebhookNotification.Status::Processed;
         SpfyWebhookNotification."Number of Process Attempts" += 1;

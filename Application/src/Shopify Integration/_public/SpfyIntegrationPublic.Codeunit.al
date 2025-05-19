@@ -40,9 +40,9 @@ codeunit 6184805 "NPR Spfy Integration Public"
 
     procedure SetAllowBackorder(ItemNo: Code[20]; VariantCode: Code[10]; ShopifyStoreCode: Code[20]; Allow: Boolean; DisableDataLog: Boolean)
     var
-        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
+        SpfyItemVariantModifMgt: Codeunit "NPR Spfy ItemVariantModif Mgt.";
     begin
-        SpfyItemMgt.SetAllowBackorder(ItemNo, VariantCode, ShopifyStoreCode, Allow, DisableDataLog);
+        SpfyItemVariantModifMgt.SetAllowBackorder(ItemNo, VariantCode, ShopifyStoreCode, Allow, DisableDataLog);
     end;
 }
 #endif

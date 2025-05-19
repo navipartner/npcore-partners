@@ -197,7 +197,9 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
         foreach Metafield in MetafieldsSet.AsArray() do begin
             if Metafield.AsObject().Contains('node') then
                 Metafield.SelectToken('node', Metafield);
-            SpfyEntityMetafieldParam."Metafield ID" := CopyStr(SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(Metafield, 'definition.id', true), '/'), 1, MaxStrLen(SpfyEntityMetafieldParam."Metafield ID"));
+#pragma warning disable AA0139
+            SpfyEntityMetafieldParam."Metafield ID" := SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(Metafield, 'definition.id', true), '/');
+#pragma warning restore AA0139
             SpfyEntityMetafieldParam."Metafield Key" := CopyStr(JsonHelper.GetJText(Metafield, 'key', false), 1, MaxStrLen(SpfyEntityMetafieldParam."Metafield Key"));
             SpfyEntityMetafieldParam."Metafield Value" := CopyStr(JsonHelper.GetJText(Metafield, 'value', false), 1, MaxStrLen(SpfyEntityMetafieldParam."Metafield Value"));
             SpfyEntityMetafieldParam."Metafield Value Version ID" := CopyStr(JsonHelper.GetJText(Metafield, 'compareDigest', false), 1, MaxStrLen(SpfyEntityMetafieldParam."Metafield Value Version ID"));
@@ -242,9 +244,9 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
         ReceivedShopifyMetafields := ShopifyResponse.AsArray();
         foreach ReceivedShopifyMetafield in ReceivedShopifyMetafields do begin
             _TempSpfyMetafieldDef.Init();
-            _TempSpfyMetafieldDef.ID := CopyStr(SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(ReceivedShopifyMetafield, 'node.id', true), '/'), 1, MaxStrLen(_TempSpfyMetafieldDef.ID));
-            if not _TempSpfyMetafieldDef.Find() then begin
 #pragma warning disable AA0139
+            _TempSpfyMetafieldDef.ID := SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(ReceivedShopifyMetafield, 'node.id', true), '/');
+            if not _TempSpfyMetafieldDef.Find() then begin
                 _TempSpfyMetafieldDef."Key" := JsonHelper.GetJText(ReceivedShopifyMetafield, 'node.key', MaxStrLen(_TempSpfyMetafieldDef."Key"), true);
                 _TempSpfyMetafieldDef.Name := JsonHelper.GetJText(ReceivedShopifyMetafield, 'node.name', MaxStrLen(_TempSpfyMetafieldDef.Name), false);
                 _TempSpfyMetafieldDef.Type := JsonHelper.GetJText(ReceivedShopifyMetafield, 'node.type.name', MaxStrLen(_TempSpfyMetafieldDef.Type), false);

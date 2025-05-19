@@ -192,9 +192,7 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         DataLogSubscriberMgt: Codeunit "NPR Data Log Sub. Mgt.";
         RecRef: RecordRef;
-        InventoryIntegrIsEnabled: Boolean;
-        ItemIntegrIsEnabled: Boolean;
-        ItemPriceIntegrIsEnabled: Boolean;
+        ItemIntegrIsEnabled, InventoryIntegrIsEnabled, ItemPriceIntegrIsEnabled : Boolean;
         ProcessRec: Boolean;
     begin
         if DataLogEntry."Type of Change" = DataLogEntry."Type of Change"::Rename then
@@ -230,9 +228,7 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         SpfyItemVariantModif: Record "NPR Spfy Item Variant Modif.";
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         ShopifyVariantID: Text[30];
-        InventoryIntegrIsEnabled: Boolean;
-        ItemIntegrIsEnabled: Boolean;
-        ItemPriceIntegrIsEnabled: Boolean;
+        ItemIntegrIsEnabled, InventoryIntegrIsEnabled, ItemPriceIntegrIsEnabled : Boolean;
     begin
         if DataLogEntry."Type of Change" = DataLogEntry."Type of Change"::Rename then
             exit;  //Renames are not supported
@@ -350,6 +346,42 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         end;
     end;
 
+    internal procedure ScheduleMissingVariantSync(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; ItemIntegrIsEnabled: Boolean; InventoryIntegrIsEnabled: Boolean; ItemPriceIntegrIsEnabled: Boolean)
+    var
+        DataLogEntry: Record "NPR Data Log Record";
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
+        SpfyStoreItemVariantLink: Record "NPR Spfy Store-Item Link";
+        SpfyItemVariantModifMgt: Codeunit "NPR Spfy ItemVariantModif Mgt.";
+    begin
+        ItemVariant.SetRange("Item No.", SpfyStoreItemLink."Item No.");
+        if not ItemVariant.FindSet() then
+            exit;
+
+        Item.Get(SpfyStoreItemLink."Item No.");
+        if not TestRequiredFields(Item, false) then
+            exit;
+
+        SpfyStoreItemLink.SetRecFilter();
+        DataLogEntry."Type of Change" := DataLogEntry."Type of Change"::Insert;
+        SpfyStoreItemVariantLink := SpfyStoreItemLink;
+        SpfyStoreItemVariantLink.Type := SpfyStoreItemVariantLink.Type::Variant;
+
+        repeat
+            if GetAssignedShopifyVariantID(ItemVariant."Item No.", ItemVariant.Code, SpfyStoreItemLink."Shopify Store Code") = '' then begin
+                SpfyStoreItemVariantLink."Variant Code" := ItemVariant.Code;
+                if not ItemIntegrIsEnabled then
+                    SpfyItemVariantModifMgt.SetItemVariantAsNotAvailableInShopify(SpfyStoreItemVariantLink, true)
+                else
+                    if not SpfyItemVariantModifMgt.ItemVariantNotAvailableInShopify(SpfyStoreItemVariantLink) then
+                        if TestRequiredFields(ItemVariant) then begin
+                            SpfyStoreItemLink.FindSet();
+                            ScheduleItemVariantSync(DataLogEntry, ItemVariant, SpfyStoreItemLink, ItemIntegrIsEnabled, InventoryIntegrIsEnabled, ItemPriceIntegrIsEnabled);
+                        end;
+            end;
+        until ItemVariant.Next() = 0;
+    end;
+
     local procedure ProcessItemReference(DataLogEntry: Record "NPR Data Log Record") TaskCreated: Boolean
     begin
         DataLogEntry."Type of Change" := DataLogEntry."Type of Change"::Modify;
@@ -361,9 +393,7 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         Item: Record Item;
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         RecRef: RecordRef;
-        ItemIntegrIsEnabled: Boolean;
-        InventoryIntegrIsEnabled: Boolean;
-        ItemPriceIntegrIsEnabled: Boolean;
+        ItemIntegrIsEnabled, InventoryIntegrIsEnabled, ItemPriceIntegrIsEnabled : Boolean;
         NewItem: Boolean;
     begin
         if DataLogEntry."Type of Change" in [DataLogEntry."Type of Change"::Rename, DataLogEntry."Type of Change"::Delete] then
@@ -785,9 +815,9 @@ codeunit 6184812 "NPR Spfy Item Mgt."
 
     procedure TestRequiredInvFields(var Item: Record Item): Boolean
     begin
-        Item.CalcFields("NPR Spfy Synced Item");
+        Item.CalcFields("NPR Spfy Synced Item", "NPR Spfy Synced Item (Planned)");
         exit(
-            Item."NPR Spfy Synced Item" and
+            (Item."NPR Spfy Synced Item" or Item."NPR Spfy Synced Item (Planned)") and
             not Item.Blocked);
     end;
 
@@ -801,6 +831,12 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         TestRequiredFields(Item, true);
         if ItemVariantIsBlocked(ItemVariant) then
             Error(VariantBlockedErr, ItemVariant."Item No.", ItemVariant.Code);
+        CheckVarieties(Item, ItemVariant);
+    end;
+
+    [TryFunction]
+    procedure TryCheckVarieties(Item: Record Item; ItemVariant: Record "Item Variant")
+    begin
         CheckVarieties(Item, ItemVariant);
     end;
 
@@ -849,14 +885,20 @@ codeunit 6184812 "NPR Spfy Item Mgt."
 
     procedure ParseItem(ShopifyJToken: JsonToken; SkuKeyPath: Text; var ItemVariant: Record "Item Variant"; var Sku: Text): Boolean
     var
-        Item: Record Item;
         JsonHelper: Codeunit "NPR Json Helper";
+    begin
+        Sku := UpperCase(JsonHelper.GetJCode(ShopifyJToken, SkuKeyPath, 0, false));
+        exit(ParseItem(Sku, ItemVariant));
+    end;
+
+    procedure ParseItem(Sku: Text; var ItemVariant: Record "Item Variant"): Boolean
+    var
+        Item: Record Item;
         ItemNo: Text;
         VariantCode: Text;
         Position: Integer;
     begin
         Clear(ItemVariant);
-        Sku := UpperCase(JsonHelper.GetJCode(ShopifyJToken, SkuKeyPath, 0, false));
         if Sku = '' then
             exit(false);
         if StrLen(Sku) <= MaxStrLen(Item."No.") then
@@ -933,7 +975,7 @@ codeunit 6184812 "NPR Spfy Item Mgt."
             exit(JsonHelper.GetJText(ShopifyResponse, '$[''data''].[''product''].[''media''].[''nodes''][0].[''image''].[''url'']', false));
     end;
 
-    local procedure UpdateInventoryLevels(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link")
+    internal procedure UpdateInventoryLevels(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link")
     begin
         Codeunit.Run(Codeunit::"NPR Spfy Item Recalc.Invt.Lev.", SpfyStoreItemLink);
     end;
@@ -966,229 +1008,10 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         exit(Item."NPR Spfy Synced Item (Planned)");
     end;
 
-    internal procedure RemoveShopifyItemVariantModification(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link")
-    var
-        SpfyItemVariantModif: Record "NPR Spfy Item Variant Modif.";
-    begin
-        if SpfyStoreItemLink.Type <> SpfyStoreItemLink.Type::Variant then
-            exit;
-        SpfyItemVariantModif.SetRange("Item No.", SpfyStoreItemLink."Item No.");
-        if SpfyStoreItemLink."Variant Code" <> '' then
-            SpfyItemVariantModif.SetRange("Variant Code", SpfyStoreItemLink."Variant Code");
-        SpfyItemVariantModif.SetRange("Shopify Store Code", SpfyStoreItemLink."Shopify Store Code");
-        if not SpfyItemVariantModif.IsEmpty() then
-            SpfyItemVariantModif.DeleteAll();
-    end;
-
-    internal procedure SetItemVariantAsNotAvailableInShopify(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; NotAvailable: Boolean)
-    var
-        SpfyItemVariantModif: Record "NPR Spfy Item Variant Modif.";
-    begin
-        if (SpfyStoreItemLink.Type <> SpfyStoreItemLink.Type::Variant) or
-           (SpfyStoreItemLink."Item No." = '') or (SpfyStoreItemLink."Variant Code" = '') or (SpfyStoreItemLink."Shopify Store Code" = '')
-        then
-            exit;
-
-        SpfyItemVariantModif."Item No." := SpfyStoreItemLink."Item No.";
-        SpfyItemVariantModif."Variant Code" := SpfyStoreItemLink."Variant Code";
-        SpfyItemVariantModif."Shopify Store Code" := SpfyStoreItemLink."Shopify Store Code";
-        if not SpfyItemVariantModif.Find() then begin
-            if not NotAvailable then
-                exit;
-            SpfyItemVariantModif.Init();
-            SpfyItemVariantModif."Not Available" := true;
-            SpfyItemVariantModif.Insert(true);
-            exit;
-        end;
-        if SpfyItemVariantModif."Not Available" = NotAvailable then
-            exit;
-        SpfyItemVariantModif."Not Available" := NotAvailable;
-        SpfyItemVariantModif.Modify(true);
-    end;
-
-    internal procedure SetAllowBackorder(ItemNo: Code[20]; VariantCode: Code[10]; ShopifyStoreCode: Code[20]; Allow: Boolean; DisableDataLog: Boolean)
-    var
-        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
-    begin
-        SpfyStoreItemLink.Type := SpfyStoreItemLink.Type::Variant;
-        SpfyStoreItemLink."Item No." := ItemNo;
-        SpfyStoreItemLink."Variant Code" := VariantCode;
-        SpfyStoreItemLink."Shopify Store Code" := ShopifyStoreCode;
-        SetAllowBackorder(SpfyStoreItemLink, Allow, DisableDataLog);
-    end;
-
-    internal procedure SetAllowBackorder(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; Allow: Boolean; DisableDataLog: Boolean)
-    var
-        SpfyItemVariantModif: Record "NPR Spfy Item Variant Modif.";
-    begin
-        if (SpfyStoreItemLink.Type <> SpfyStoreItemLink.Type::Variant) or
-           (SpfyStoreItemLink."Item No." = '') or (SpfyStoreItemLink."Shopify Store Code" = '')
-        then
-            exit;
-
-        SpfyItemVariantModif."Item No." := SpfyStoreItemLink."Item No.";
-        SpfyItemVariantModif."Variant Code" := SpfyStoreItemLink."Variant Code";
-        SpfyItemVariantModif."Shopify Store Code" := SpfyStoreItemLink."Shopify Store Code";
-        if not SpfyItemVariantModif.Find() then begin
-            if not Allow then
-                exit;
-            SpfyItemVariantModif.Init();
-            SpfyItemVariantModif."Allow Backorder" := true;
-            SaveAllowBackorderToDB(SpfyItemVariantModif, SpfyStoreItemLink, DisableDataLog);
-            exit;
-        end;
-        if SpfyItemVariantModif."Allow Backorder" = Allow then
-            exit;
-        SpfyItemVariantModif."Allow Backorder" := Allow;
-        SaveAllowBackorderToDB(SpfyItemVariantModif, SpfyStoreItemLink, DisableDataLog);
-    end;
-
-    local procedure SaveAllowBackorderToDB(var SpfyItemVariantModif: Record "NPR Spfy Item Variant Modif."; SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; DisableDataLog: Boolean)
-    var
-        DataLogMgt: Codeunit "NPR Data Log Management";
-        SpfyIntegrationEvents: Codeunit "NPR Spfy Integration Events";
-    begin
-        if DisableDataLog then
-            DataLogMgt.DisableDataLog(true);
-        if IsNullGuid(SpfyItemVariantModif.SystemId) then
-            SpfyItemVariantModif.Insert(true)
-        else
-            SpfyItemVariantModif.Modify(true);
-        if DisableDataLog then
-            DataLogMgt.DisableDataLog(false);
-        SpfyIntegrationEvents.OnAfterUpdateAllowBackorder(SpfyStoreItemLink, SpfyItemVariantModif."Allow Backorder");
-    end;
-
-    internal procedure SetDoNotTrackInventory(ItemNo: Code[20]; Set: Boolean)
-    var
-        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
-    begin
-        SpfyStoreItemLink.SetRange(Type, SpfyStoreItemLink.Type::Item);
-        SpfyStoreItemLink.SetRange("Item No.", ItemNo);
-        SpfyStoreItemLink.SetRange("Variant Code", '');
-        SpfyStoreItemLink.SetFilter("Shopify Store Code", '<>%1', '');
-        if SpfyStoreItemLink.FindSet() then
-            repeat
-                SetDoNotTrackInventory(ItemNo, SpfyStoreItemLink."Shopify Store Code", Set, not SpfyStoreItemLink."Sync. to this Store");
-            until SpfyStoreItemLink.Next() = 0;
-    end;
-
-    internal procedure SetDoNotTrackInventory(ItemNo: Code[20]; ShopifyStoreCode: Code[20]; Set: Boolean; DisableDataLog: Boolean)
-    var
-        ItemVariant: Record "Item Variant";
-    begin
-        SetDoNotTrackInventory(ItemNo, '', ShopifyStoreCode, Set, DisableDataLog);
-
-        ItemVariant.SetRange("Item No.", ItemNo);
-        if ItemVariant.FindSet() then
-            repeat
-                SetDoNotTrackInventory(ItemNo, ItemVariant.Code, ShopifyStoreCode, Set, DisableDataLog);
-            until ItemVariant.Next() = 0;
-    end;
-
-    internal procedure SetDoNotTrackInventory(ItemNo: Code[20]; VariantCode: Code[10]; ShopifyStoreCode: Code[20]; Set: Boolean; DisableDataLog: Boolean)
-    var
-        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
-    begin
-        SpfyStoreItemLink.Type := SpfyStoreItemLink.Type::Variant;
-        SpfyStoreItemLink."Item No." := ItemNo;
-        SpfyStoreItemLink."Variant Code" := VariantCode;
-        SpfyStoreItemLink."Shopify Store Code" := ShopifyStoreCode;
-        SetDoNotTrackInventory(SpfyStoreItemLink, Set, DisableDataLog);
-    end;
-
-    internal procedure SetDoNotTrackInventory(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; Set: Boolean; DisableDataLog: Boolean)
-    var
-        SpfyItemVariantModif: Record "NPR Spfy Item Variant Modif.";
-    begin
-        if (SpfyStoreItemLink.Type <> SpfyStoreItemLink.Type::Variant) or
-           (SpfyStoreItemLink."Item No." = '') or (SpfyStoreItemLink."Shopify Store Code" = '')
-        then
-            exit;
-
-        SpfyItemVariantModif."Item No." := SpfyStoreItemLink."Item No.";
-        SpfyItemVariantModif."Variant Code" := SpfyStoreItemLink."Variant Code";
-        SpfyItemVariantModif."Shopify Store Code" := SpfyStoreItemLink."Shopify Store Code";
-        if not SpfyItemVariantModif.Find() then begin
-            if not Set then
-                exit;
-            SpfyItemVariantModif.Init();
-            SpfyItemVariantModif."Do Not Track Inventory" := true;
-            SaveDoNotTrackInventoryToDB(SpfyItemVariantModif, SpfyStoreItemLink, DisableDataLog);
-            exit;
-        end;
-        if SpfyItemVariantModif."Do Not Track Inventory" = Set then
-            exit;
-        SpfyItemVariantModif."Do Not Track Inventory" := Set;
-        SaveDoNotTrackInventoryToDB(SpfyItemVariantModif, SpfyStoreItemLink, DisableDataLog);
-    end;
-
-    local procedure SaveDoNotTrackInventoryToDB(var SpfyItemVariantModif: Record "NPR Spfy Item Variant Modif."; SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; DisableDataLog: Boolean)
-    var
-        DataLogMgt: Codeunit "NPR Data Log Management";
-        InventoryLevelMgt: Codeunit "NPR Spfy Inventory Level Mgt.";
-        SpfyIntegrationEvents: Codeunit "NPR Spfy Integration Events";
-    begin
-        if DisableDataLog then
-            DataLogMgt.DisableDataLog(true);
-        if IsNullGuid(SpfyItemVariantModif.SystemId) then
-            SpfyItemVariantModif.Insert(true)
-        else
-            SpfyItemVariantModif.Modify(true);
-        if DisableDataLog then
-            DataLogMgt.DisableDataLog(false);
-        if SpfyItemVariantModif."Do Not Track Inventory" then
-            InventoryLevelMgt.ClearInventoryLevels(SpfyStoreItemLink);
-        SpfyIntegrationEvents.OnAfterUpdateDoNotTrackInventory(SpfyStoreItemLink, SpfyItemVariantModif."Do Not Track Inventory");
-    end;
-
-    internal procedure ItemVariantNotAvailableInShopify(ItemNo: Code[20]; VariantCode: Code[10]; ShopifyStoreCode: Code[20]): Boolean
-    var
-        SpfyStoreItemVariantLink: Record "NPR Spfy Store-Item Link";
-    begin
-        SpfyStoreItemVariantLink.Type := SpfyStoreItemVariantLink.Type::"Variant";
-        SpfyStoreItemVariantLink."Item No." := ItemNo;
-        SpfyStoreItemVariantLink."Variant Code" := VariantCode;
-        SpfyStoreItemVariantLink."Shopify Store Code" := ShopifyStoreCode;
-        exit(ItemVariantNotAvailableInShopify(SpfyStoreItemVariantLink));
-    end;
-
-    internal procedure ItemVariantNotAvailableInShopify(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"): Boolean
-    var
-        SpfyItemVariantModif: Record "NPR Spfy Item Variant Modif.";
-    begin
-        if (SpfyStoreItemLink.Type <> SpfyStoreItemLink.Type::Variant) or
-           (SpfyStoreItemLink."Item No." = '') or (SpfyStoreItemLink."Variant Code" = '') or (SpfyStoreItemLink."Shopify Store Code" = '')
-        then
-            exit(false);
-
-        if SpfyItemVariantModif.Get(SpfyStoreItemLink."Item No.", SpfyStoreItemLink."Variant Code", SpfyStoreItemLink."Shopify Store Code") then
-            exit(SpfyItemVariantModif."Not Available");
-    end;
-
-    internal procedure AllowBackorder(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"): Boolean
-    begin
-        if (SpfyStoreItemLink.Type <> SpfyStoreItemLink.Type::Variant) or
-           (SpfyStoreItemLink."Item No." = '') or (SpfyStoreItemLink."Shopify Store Code" = '')
-        then
-            exit(false);
-        SpfyStoreItemLink.CalcFields("Allow Backorder");
-        exit(SpfyStoreItemLink."Allow Backorder");
-    end;
-
-    internal procedure DoNotTrackInventory(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"): Boolean
-    begin
-        if (SpfyStoreItemLink.Type <> SpfyStoreItemLink.Type::Variant) or
-           (SpfyStoreItemLink."Item No." = '') or (SpfyStoreItemLink."Shopify Store Code" = '')
-        then
-            exit(false);
-        SpfyStoreItemLink.CalcFields("Do Not Track Inventory");
-        exit(SpfyStoreItemLink."Do Not Track Inventory");
-    end;
-
     internal procedure AvailableInShopifyVariantsExist(ItemNo: Code[20]; ShopifyStoreCode: Code[20]): Boolean
     var
         ItemVariant: Record "Item Variant";
+        SpfyItemVariantModifMgt: Codeunit "NPR Spfy ItemVariantModif Mgt.";
     begin
         ItemVariant.SetRange("Item No.", ItemNo);
 #if BC18 or BC19 or BC20 or BC21 or BC22
@@ -1199,7 +1022,7 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         ItemVariant.SetLoadFields("Item No.", "Code");
         if ItemVariant.Find('-') then
             repeat
-                if not ItemVariantNotAvailableInShopify(ItemVariant."Item No.", ItemVariant."Code", ShopifyStoreCode) then
+                if not SpfyItemVariantModifMgt.ItemVariantNotAvailableInShopify(ItemVariant."Item No.", ItemVariant."Code", ShopifyStoreCode) then
                     exit(true);
             until ItemVariant.Next() = 0;
         exit(false);
@@ -1236,7 +1059,7 @@ codeunit 6184812 "NPR Spfy Item Mgt."
 #endif
     local procedure CheckNotShopifyItemOnDelete(var Rec: Record Item)
     var
-        DeleteNotAllowedErr: Label 'Shopify enabled items cannot be deleted.';
+        DeleteNotAllowedErr: Label 'The item has already been synchronized with one or more Shopify stores. First, you will need to disable item synchronization with all Shopify stores and wait for the changes to sync with Shopify. Only then will you be able to delete the item from Business Central.';
     begin
         if Rec.IsTemporary() then
             exit;
@@ -1250,12 +1073,14 @@ codeunit 6184812 "NPR Spfy Item Mgt."
     [EventSubscriber(ObjectType::Table, Database::Item, OnBeforeModifyEvent, '', true, false)]
 #endif
     local procedure CheckItemTypeAndSetDoNotTrack(var Rec: Record Item; var xRec: Record Item)
+    var
+        SpfyItemVariantModifMgt: Codeunit "NPR Spfy ItemVariantModif Mgt.";
     begin
         if Rec.IsTemporary() then
             exit;
         if xRec.Find() then;
         if (Rec.Type <> Rec.Type::Inventory) and (xRec.Type <> Rec.Type) then
-            SetDoNotTrackInventory(Rec."No.", true);
+            SpfyItemVariantModifMgt.SetDoNotTrackInventory(Rec."No.", true);
     end;
 }
 #endif

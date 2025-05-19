@@ -145,6 +145,7 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
         SpfyItemVariantModif: Record "NPR Spfy Item Variant Modif.";
         SpfyIntegrationEvents: Codeunit "NPR Spfy Integration Events";
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
+        SpfyItemVariantModifMgt: Codeunit "NPR Spfy ItemVariantModif Mgt.";
         StockQty: Decimal;
         IncludeTransferOrders: Option No,Outbound,All;
         LocationFilter: Text;
@@ -156,7 +157,7 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
             if SpfyItemMgt.AvailableInShopifyVariantsExist(InventoryLevelParam."Item No.", InventoryLevelParam."Shopify Store Code") then
                 exit(false);  //Do not calculate inventory level for blank variant if there are synced variants available for the item
         end else
-            if SpfyItemMgt.ItemVariantNotAvailableInShopify(InventoryLevelParam."Item No.", InventoryLevelParam."Variant Code", InventoryLevelParam."Shopify Store Code") then
+            if SpfyItemVariantModifMgt.ItemVariantNotAvailableInShopify(InventoryLevelParam."Item No.", InventoryLevelParam."Variant Code", InventoryLevelParam."Shopify Store Code") then
                 exit(false);
         if not Item.Get(InventoryLevelParam."Item No.") then
             exit(false);
@@ -406,7 +407,8 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
                 until TempInventoryLevel.Next() = 0;  //by Item
 
                 InventoryLevel.MarkedOnly(true);
-                InventoryLevel.DeleteAll();
+                if not InventoryLevel.IsEmpty() then
+                    InventoryLevel.DeleteAll();
                 TempInventoryLevel.SetRange("Shopify Store Code");
             until TempInventoryLevel.Next() = 0;  //by Shopify Store
     end;

@@ -256,7 +256,8 @@
         repeat
             Commit();
             SelectLatestVersion();
-            if Codeunit.Run(TaskSetup."Codeunit ID", Task) then;
+            if not Codeunit.Run(TaskSetup."Codeunit ID", Task) then
+                ;  //TODO: set status to error for unprocessed and postponed tasks
         until TaskSetup.Next() = 0;
         exit(true);
     end;
@@ -679,13 +680,18 @@
 
     procedure IsBatchProcessing(Task: Record "NPR Nc Task") BatchProcessing: Boolean
     var
+#if not BC17
+        SpfyScheduleSend: Codeunit "NPR Spfy Schedule Send Tasks";
+#endif
         Handled: Boolean;
     begin
         OnCheckIfIsBatchProcessing(Task, BatchProcessing, Handled);
         if Handled then
             exit;
 #if not BC17
-        BatchProcessing := Task."Table No." = Database::"NPR Spfy Item Price";
+        if Task."Task Processor Code" <> '' then
+            if Task."Task Processor Code" = SpfyScheduleSend.GetShopifyTaskProcessorCode(false) then
+                BatchProcessing := Task."Table No." in [Database::"Item Variant", Database::"NPR Spfy Item Price"];
 #endif
     end;
 
@@ -701,6 +707,7 @@
         Window: Dialog;
         OpenWindowTxt: Label 'Updating Postponed: #1#############\Total: #2###############';
     begin
+        TempTask.SetCurrentKey("Entry No.");  // Sort by Entry No. to process the tasks in the order they were created
         if not TempTask.FindSet() then
             exit;
         if not Silent and GuiAllowed() then begin
@@ -723,7 +730,7 @@
             TempTask.SetRange("Task Processor Code");
             TempTask.SetRange("Table No.");
             TempTask.SetRange("Store Code");
-        until TempTask.Next() = 0;
+        until not TempTask.FindSet();
         if not Silent and GuiAllowed() then
             Window.Close();
     end;

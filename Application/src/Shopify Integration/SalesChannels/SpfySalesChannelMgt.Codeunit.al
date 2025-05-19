@@ -43,7 +43,7 @@ codeunit 6248401 "NPR Spfy Sales Channel Mgt."
         QueryStream: OutStream;
         RequestJson: JsonObject;
         VariablesJson: JsonObject;
-        FirstPageQueryTok: Label 'query GetSalesChannels($catalogType: CatalogType!) {publications(first: 1, catalogType: $catalogType) {pageInfo {hasNextPage} edges {cursor node {id catalog {id ... on AppCatalog{apps(first: 1) {edges {node {id handle title}}}}}}}}}', Locked = true;
+        FirstPageQueryTok: Label 'query GetSalesChannels($catalogType: CatalogType!) {publications(first: 25, catalogType: $catalogType) {pageInfo {hasNextPage} edges {cursor node {id catalog {id ... on AppCatalog{apps(first: 1) {edges {node {id handle title}}}}}}}}}', Locked = true;
         SubsequentPageQueryTok: Label 'query GetSalesChannels($catalogType: CatalogType!, $afterCursor: String!) {publications(first: 25, after: $afterCursor, catalogType : $catalogType) {pageInfo {hasNextPage} edges {cursor node {id catalog {id ... on AppCatalog{apps(first: 1) {edges {node {id handle title}}}}}}}}}', Locked = true;
     begin
         NcTask."Store Code" := ShopifyStoreCode;
@@ -72,7 +72,9 @@ codeunit 6248401 "NPR Spfy Sales Channel Mgt."
     begin
         foreach Publication in Publications do begin
             Cursor := _JsonHelper.GetJText(Publication, 'cursor', false);
-            SalesChannelID := CopyStr(SpfyIntegrationMgt.RemoveUntil(_JsonHelper.GetJText(Publication, '$.node.id', false), '/'), 1, MaxStrLen(SalesChannelID));
+#pragma warning disable AA0139
+            SalesChannelID := SpfyIntegrationMgt.RemoveUntil(_JsonHelper.GetJText(Publication, '$.node.id', false), '/');
+#pragma warning restore AA0139
             if not SpfySalesChannel.Get(ShopifyStoreCode, SalesChannelID) then begin
                 SpfySalesChannel.Init();
                 SpfySalesChannel."Shopify Store Code" := ShopifyStoreCode;

@@ -79,8 +79,10 @@ codeunit 6151093 "NPR SaaS Import CSV Parser"
                   TableData "Retention Policy Setup" = rmid,
 #IF NOT (BC17 or BC18 or BC19 or BC20 or BC21)
                   TableData "Email Outbox" = rmid,
-                  TableData "Email Related Record" = rmid,
                   TableData "Sent Email" = rmid,
+#endif
+#IF NOT (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24)
+                  TableData "Email Related Record" = rmid,
 #endif
                   TableData "Retention Policy Setup Line" = rmid;
 

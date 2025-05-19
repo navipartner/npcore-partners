@@ -109,7 +109,7 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
     var
         ShopifyStore: Record "NPR Spfy Store";
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
-        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
+        SpfyItemVariantModifMgt: Codeunit "NPR Spfy ItemVariantModif Mgt.";
     begin
         if Item."No." = '' then
             exit;
@@ -125,7 +125,7 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
                     SpfyStoreItemLink.Insert();
                 end;
                 if Item.Type <> Item.Type::Inventory then
-                    SpfyItemMgt.SetDoNotTrackInventory(Item."No.", ShopifyStore.Code, true, not SpfyStoreItemLink."Sync. to this Store");
+                    SpfyItemVariantModifMgt.SetDoNotTrackInventory(Item."No.", ShopifyStore.Code, true, not SpfyStoreItemLink."Sync. to this Store");
             until ShopifyStore.Next() = 0;
     end;
 
@@ -175,7 +175,7 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
         ShopifyStore: Record "NPR Spfy Store";
         SpfyStoreItemVariantLink: Record "NPR Spfy Store-Item Link";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
-        ShopifySyncedVariantErr: Label 'Cannot delete item %1 variant %2 because it is already synced with Shopify.', Comment = '%1 - Item No., %2 - Variant Code';
+        ShopifySyncedVariantErr: Label 'You cannot delete item %1 variant %2 because it is already synced with Shopify. First, please set it as "Not available in Shopify", wait for the changes to sync with Shopify, and then you can safely delete the variant.', Comment = '%1 - Item No., %2 - Variant Code';
     begin
         if Rec.IsTemporary() then
             exit;
@@ -202,7 +202,7 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
     var
         ShopifyStore: Record "NPR Spfy Store";
         SpfyStoreItemVariantLink: Record "NPR Spfy Store-Item Link";
-        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
+        SpfyItemVariantModifMgt: Codeunit "NPR Spfy ItemVariantModif Mgt.";
         SendItemAndInventory: Codeunit "NPR Spfy Send Items&Inventory";
     begin
         if Rec.IsTemporary() then
@@ -217,7 +217,7 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
         repeat
             SpfyStoreItemVariantLink."Shopify Store Code" := ShopifyStore.Code;
             SendItemAndInventory.ClearVariantShopifyIDs(SpfyStoreItemVariantLink);
-            SpfyItemMgt.RemoveShopifyItemVariantModification(SpfyStoreItemVariantLink);
+            SpfyItemVariantModifMgt.RemoveShopifyItemVariantModification(SpfyStoreItemVariantLink);
         until ShopifyStore.Next() = 0;
     end;
 
@@ -230,7 +230,7 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
     var
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         SpfyStoreItemVariantLink: Record "NPR Spfy Store-Item Link";
-        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
+        SpfyItemVariantModifMgt: Codeunit "NPR Spfy ItemVariantModif Mgt.";
     begin
         if Rec.IsTemporary() then
             exit;
@@ -248,9 +248,9 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
             SpfyStoreItemVariantLink."Variant Code" := Rec."Code";
             SpfyStoreItemVariantLink."Shopify Store Code" := SpfyStoreItemLink."Shopify Store Code";
             if SpfyStoreItemLink."Allow Backorder" then
-                SpfyItemMgt.SetAllowBackorder(SpfyStoreItemVariantLink, SpfyStoreItemLink."Allow Backorder", true);
+                SpfyItemVariantModifMgt.SetAllowBackorder(SpfyStoreItemVariantLink, SpfyStoreItemLink."Allow Backorder", true);
             if SpfyStoreItemLink."Do Not Track Inventory" then
-                SpfyItemMgt.SetDoNotTrackInventory(SpfyStoreItemVariantLink, SpfyStoreItemLink."Do Not Track Inventory", true);
+                SpfyItemVariantModifMgt.SetDoNotTrackInventory(SpfyStoreItemVariantLink, SpfyStoreItemLink."Do Not Track Inventory", true);
         until SpfyStoreItemLink.Next() = 0;
     end;
     #endregion

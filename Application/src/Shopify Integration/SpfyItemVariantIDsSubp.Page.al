@@ -44,7 +44,7 @@ page 6184565 "NPR Spfy Item Variant IDs Subp"
                         if NotAvailableInShopify then
                             if not Confirm(ConfirmRemovalQst, false) then
                                 Error('');
-                        SpfyItemMgt.SetItemVariantAsNotAvailableInShopify(SpfyStoreItemVariantLink, NotAvailableInShopify);
+                        SpfyItemVariantModifMgt.SetItemVariantAsNotAvailableInShopify(SpfyStoreItemVariantLink, NotAvailableInShopify);
                         CurrPage.Update(false);
                     end;
                 }
@@ -59,7 +59,7 @@ page 6184565 "NPR Spfy Item Variant IDs Subp"
                         TestRequiredFields();
                         if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items, SpfyStoreItemVariantLink."Shopify Store Code") then
                             Error(ItemIntegrIsNotEnabledErr);
-                        SpfyItemMgt.SetAllowBackorder(SpfyStoreItemVariantLink, AllowBackorder, false);
+                        SpfyItemVariantModifMgt.SetAllowBackorder(SpfyStoreItemVariantLink, AllowBackorder, false);
                         CurrPage.Update(false);
                     end;
                 }
@@ -74,7 +74,7 @@ page 6184565 "NPR Spfy Item Variant IDs Subp"
                         TestRequiredFields();
                         if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items, SpfyStoreItemVariantLink."Shopify Store Code") then
                             Error(ItemIntegrIsNotEnabledErr);
-                        SpfyItemMgt.SetDoNotTrackInventory(SpfyStoreItemVariantLink, DoNotTrackInventory, false);
+                        SpfyItemVariantModifMgt.SetDoNotTrackInventory(SpfyStoreItemVariantLink, DoNotTrackInventory, false);
                         CurrPage.Update(false);
                     end;
                 }
@@ -122,7 +122,7 @@ page 6184565 "NPR Spfy Item Variant IDs Subp"
         SpfyStoreItemVariantLink: Record "NPR Spfy Store-Item Link";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
-        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
+        SpfyItemVariantModifMgt: Codeunit "NPR Spfy ItemVariantModif Mgt.";
         AllowBackorder: Boolean;
         DoNotTrackInventory: Boolean;
         NotAvailableInShopify: Boolean;
@@ -137,9 +137,9 @@ page 6184565 "NPR Spfy Item Variant IDs Subp"
     trigger OnAfterGetRecord()
     begin
         SpfyStoreItemVariantLink."Shopify Store Code" := Rec."Shopify Store Code";
-        NotAvailableInShopify := SpfyItemMgt.ItemVariantNotAvailableInShopify(SpfyStoreItemVariantLink);
-        AllowBackorder := SpfyItemMgt.AllowBackorder(SpfyStoreItemVariantLink);
-        DoNotTrackInventory := SpfyItemMgt.DoNotTrackInventory(SpfyStoreItemVariantLink);
+        NotAvailableInShopify := SpfyItemVariantModifMgt.ItemVariantNotAvailableInShopify(SpfyStoreItemVariantLink);
+        AllowBackorder := SpfyItemVariantModifMgt.AllowBackorder(SpfyStoreItemVariantLink);
+        DoNotTrackInventory := SpfyItemVariantModifMgt.DoNotTrackInventory(SpfyStoreItemVariantLink);
     end;
 
     procedure SetItemVariant(ItemVariant: Record "Item Variant")

@@ -97,7 +97,7 @@ page 6184563 "NPR Spfy Change Assigned ID"
                             begin
                                 case SpfyStoreItemLink.Type of
                                     SpfyStoreItemLink.Type::Item:
-                                        NewShopifyID := SendItemAndInventory.GetShopifyItemID(SpfyStoreItemLink, true);
+                                        NewShopifyID := SendItemAndInventory.GetShopifyProductID(SpfyStoreItemLink, true);
                                     SpfyStoreItemLink.Type::Variant:
                                         NewShopifyID := SendItemAndInventory.GetShopifyVariantID(SpfyStoreItemLink, true);
                                 end;

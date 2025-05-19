@@ -332,12 +332,20 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
     end;
 
     procedure SetResponse(var NcTask: Record "NPR Nc Task"; ResponseTxt: Text)
+    begin
+        SetResponse(NcTask, CurrentDateTime(), 0DT, ResponseTxt);
+    end;
+
+    procedure SetResponse(var NcTask: Record "NPR Nc Task"; ProcessingStartedAt: DateTime; ProcessingCompletedAt: DateTime; ResponseTxt: Text)
     var
         OutStr: OutStream;
     begin
         NcTask.Response.CreateOutStream(OutStr, TextEncoding::UTF8);
         OutStr.WriteText(ResponseTxt);
-        NcTask."Last Processing Started at" := CurrentDateTime();
+        if ProcessingStartedAt <> 0DT then
+            NcTask."Last Processing Started at" := ProcessingStartedAt;
+        if ProcessingCompletedAt <> 0DT then
+            NcTask."Last Processing Completed at" := ProcessingCompletedAt;
     end;
 
     internal procedure RemoveUntil(Input: Text; UntilChr: Char) Output: Text

@@ -153,6 +153,13 @@
                     ToolTip = 'Specifies the date time ';
                     ApplicationArea = NPRNaviConnect;
                 }
+                field("Entry No."; Rec."Entry No.")
+                {
+                    Editable = false;
+                    Visible = false;
+                    ToolTip = 'Specifies the number of the entry, as assigned from the specified number series when the entry was created.';
+                    ApplicationArea = NPRNaviConnect;
+                }
                 field("Last Checked1"; Rec."Last Processing Started at")
                 {
                     Visible = false;
@@ -415,6 +422,7 @@
         Window.Open(OpenWindowTxt);
         Window.Update(2, Task.Count());
         Clear(SyncMgt);
+        Task.SetCurrentKey("Entry No.");  // Sort by Entry No. to process the tasks in the order they were created
         if Task.FindSet() then
             repeat
                 Counter += 1;

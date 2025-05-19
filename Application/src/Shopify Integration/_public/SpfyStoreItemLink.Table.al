@@ -45,7 +45,7 @@ table 6150811 "NPR Spfy Store-Item Link"
             trigger OnValidate()
             var
                 SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
-                ConfirmDisableSyncLbl: Label 'Are you sure you want to disable synchronization for Item %1 with Shopify Store %2? If you confirm, the item will be marked as archived on the Shopify Store.', Comment = '%1 - Item No., %2 - Shopify Store Code';
+                ConfirmDisableSyncLbl: Label 'Are you sure you want to disable synchronization for Item %1 with the Shopify store %2? If you confirm, the item will be removed from the Shopify store.', Comment = '%1 - Item No., %2 - Shopify Store Code';
             begin
                 if xRec."Sync. to this Store" and not "Sync. to this Store" then
                     if GuiAllowed then
@@ -98,6 +98,11 @@ table 6150811 "NPR Spfy Store-Item Link"
             FieldClass = FlowField;
             CalcFormula = lookup("NPR Spfy Item Variant Modif."."Do Not Track Inventory" where("Item No." = field("Item No."), "Variant Code" = field("Variant Code"), "Shopify Store Code" = field("Shopify Store Code")));
         }
+        field(170; Vendor; Text[100])
+        {
+            Caption = 'Vendor';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {
@@ -114,7 +119,7 @@ table 6150811 "NPR Spfy Store-Item Link"
         SpfyEntityMetafield: Record "NPR Spfy Entity Metafield";
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
-        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
+        SpfyItemVariantModifMgt: Codeunit "NPR Spfy ItemVariantModif Mgt.";
         SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
     begin
         SpfyAssignedIDMgt.RemoveAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID");
@@ -124,7 +129,7 @@ table 6150811 "NPR Spfy Store-Item Link"
             SpfyStoreItemLink.Type := SpfyStoreItemLink.Type::"Variant";
             SpfyAssignedIDMgt.RemoveAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
             SpfyAssignedIDMgt.RemoveAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Inventory Item ID");
-            SpfyItemMgt.RemoveShopifyItemVariantModification(SpfyStoreItemLink);
+            SpfyItemVariantModifMgt.RemoveShopifyItemVariantModification(SpfyStoreItemLink);
         end;
         SpfyMetafieldMgt.FilterSpfyEntityMetafields(RecordId(), "NPR Spfy Metafield Owner Type"::PRODUCT, SpfyEntityMetafield);
         SpfyEntityMetafield.SetRange("Owner Type", SpfyEntityMetafield."Owner Type"::PRODUCT, SpfyEntityMetafield."Owner Type"::PRODUCTVARIANT);

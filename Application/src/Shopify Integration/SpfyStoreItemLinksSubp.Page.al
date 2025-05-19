@@ -104,6 +104,11 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
                         end;
                     end;
                 }
+                field(Vendor; Rec.Vendor)
+                {
+                    ToolTip = 'Specifies the vendor name of the item.';
+                    ApplicationArea = NPRShopify;
+                }
                 field("Shopify Product ID"; SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID"))
                 {
                     Caption = 'Shopify Product ID';
@@ -194,7 +199,7 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
                     trigger OnValidate()
                     begin
                         CheckIntegrationIsEnabled();
-                        SpfyItemMgt.SetAllowBackorder(SpfyStoreItemVariantLink, AllowBackorder, false);
+                        SpfyItemVariantModifMgt.SetAllowBackorder(SpfyStoreItemVariantLink, AllowBackorder, false);
                     end;
                 }
                 field("Do Not Track Inventory"; DoNotTrackInventory)
@@ -207,7 +212,7 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
                     trigger OnValidate()
                     begin
                         CheckIntegrationIsEnabled();
-                        SpfyItemMgt.SetDoNotTrackInventory(SpfyStoreItemVariantLink, DoNotTrackInventory, false);
+                        SpfyItemVariantModifMgt.SetDoNotTrackInventory(SpfyStoreItemVariantLink, DoNotTrackInventory, false);
                     end;
                 }
                 field("Shopify Inventory Item ID"; SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemVariantLink.RecordId(), "NPR Spfy ID Type"::"Inventory Item ID"))
@@ -311,7 +316,7 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
         SpfyStoreItemVariantLink: Record "NPR Spfy Store-Item Link";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
-        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
+        SpfyItemVariantModifMgt: Codeunit "NPR Spfy ItemVariantModif Mgt.";
         SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
         AllowBackorder: Boolean;
         DoNotTrackInventory: Boolean;
@@ -333,8 +338,8 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
             SpfyStoreItemLink.Type := SpfyStoreItemLink.Type::Item;
             SpfyStoreItemLink."Variant Code" := '';
         end;
-        AllowBackorder := SpfyItemMgt.AllowBackorder(SpfyStoreItemVariantLink);
-        DoNotTrackInventory := SpfyItemMgt.DoNotTrackInventory(SpfyStoreItemVariantLink);
+        AllowBackorder := SpfyItemVariantModifMgt.AllowBackorder(SpfyStoreItemVariantLink);
+        DoNotTrackInventory := SpfyItemVariantModifMgt.DoNotTrackInventory(SpfyStoreItemVariantLink);
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
