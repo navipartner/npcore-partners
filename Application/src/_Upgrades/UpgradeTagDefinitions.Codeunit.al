@@ -984,6 +984,11 @@
                     'UpgradeNPPayPOSPaymentSetupApiKey':
                         exit('NPR-UpgradeNPPayPOSPaymentSetupApiKey-20250511');
                 end;
+            Codeunit::"NPR UPG BC Health Check WS":
+                case UpgradeStep of
+                    'RegisterService':
+                        exit('NPR-RegisterBCHealthCheckWebService-20250515');
+                end;
             Codeunit::"NPR UPG API WS":
                 case UpgradeStep of
                     'APIWS_041224_MMV':

@@ -17,7 +17,8 @@ codeunit 6014471 "NPR Webservice Install"
         InitRepWSFunctions();
         InitTMTicketWebService();
         InitModernApiWSCodeunits();
-        InitDragonglassPOSService()
+        InitDragonglassPOSService();
+        InitBcHealtCheckService();
     end;
 
     local procedure InitMPOSWebService()
@@ -113,5 +114,16 @@ codeunit 6014471 "NPR Webservice Install"
         DragonglassPOSServiceMgr: Codeunit "NPR POS Dragonglass API";
     begin
         DragonglassPOSServiceMgr.InitPOSDragonglassService();
+    end;
+
+    local procedure InitBcHealtCheckService()
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    var
+        BCHealthCheckMgt: Codeunit "NPR BC Health Check Mgt.";
+#endif
+    begin
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        BCHealthCheckMgt.RegisterService();
+#endif
     end;
 }
