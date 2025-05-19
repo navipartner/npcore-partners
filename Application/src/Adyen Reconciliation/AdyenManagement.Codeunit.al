@@ -96,6 +96,7 @@ codeunit 6184796 "NPR Adyen Management"
         if ResponseObject.Get('description', JsonToken) then
             WebhookSetup.Description := CopyStr(JsonToken.AsValue().AsText(), 1, MaxStrLen(WebhookSetup.Description));
         WebhookSetup.Modify(false);
+        ModifyWebhook(WebhookSetup);
         if (WebhookSetup."Web Service URL" <> '') and (WebhookSetup."Web Service URL".Contains(AFWebServiceURL)) then
             SuggestAFWebServiceURL(WebhookSetup);
         exit(true);
@@ -127,6 +128,8 @@ codeunit 6184796 "NPR Adyen Management"
         RequestObject.Add('password', WebhookSetup."Web Service Password");
 
         if (WebhookSetup.Type = WebhookSetup.Type::standard) and (WebhookSetup."Include Events Filter" <> '') then begin
+            if EventCode.IsEmpty() then
+                RefreshWebhookEventCodes();
             EventCode.Reset();
             EventCode.SetFilter("Event Code", WebhookSetup."Include Events Filter");
             if EventCode.FindSet(false) then begin
@@ -336,9 +339,6 @@ codeunit 6184796 "NPR Adyen Management"
     local procedure CreateWebhookHttpRequestObject(WebhookSetup: Record "NPR Adyen Webhook Setup") RequestText: Text;
     var
         RequestObject: JsonObject;
-        AdditionalSettingsObject: JsonObject;
-        EventCode: Record "NPR Adyen Webhook Event Code";
-        EventCodesArray: JsonArray;
     begin
         RequestObject.Add('type', Format(WebhookSetup.Type));
         RequestObject.Add('url', WebhookSetup."Web Service URL");
@@ -352,17 +352,6 @@ codeunit 6184796 "NPR Adyen Management"
         RequestObject.Add('acceptsSelfSignedCertificate', true);
         RequestObject.Add('acceptsUntrustedRootCertificate', true);
         RequestObject.Add('populateSoapActionHeader', false);
-        if (WebhookSetup.Type = WebhookSetup.Type::standard) and (WebhookSetup."Include Events Filter" <> '') then begin
-            EventCode.Reset();
-            EventCode.SetFilter("Event Code", WebhookSetup."Include Events Filter");
-            if EventCode.FindSet(false) then begin
-                repeat
-                    EventCodesArray.Add(EventCode."Event Code");
-                until EventCode.Next() = 0;
-                AdditionalSettingsObject.Add('includeEventCodes', EventCodesArray);
-                RequestObject.Add('additionalSettings', AdditionalSettingsObject);
-            end;
-        end;
         RequestObject.WriteTo(RequestText);
     end;
 

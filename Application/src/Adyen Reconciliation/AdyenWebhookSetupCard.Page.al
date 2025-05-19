@@ -36,7 +36,7 @@ page 6184550 "NPR Adyen Webhook Setup Card"
                 }
                 field("Include Events Filter"; Rec."Include Events Filter")
                 {
-                    Caption = 'Include Events Filter';
+                    Caption = 'Include Event Filter';
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Event Codes filter that will trigger a Webhook.';
                     Editable = false;
@@ -49,17 +49,23 @@ page 6184550 "NPR Adyen Webhook Setup Card"
                         EventCode: Record "NPR Adyen Webhook Event Code";
                         SelectionFilterMgt: Codeunit SelectionFilterManagement;
                         RecRef: RecordRef;
+                        EventsAllowedForStandardLbl: Label 'The event filter can only be set for the "standard" webhook type.';
+                        NotPossibleToSetFilterLbl: Label 'The event filter is only editable when the webhook is not yet set up.';
                     begin
-                        if (Rec.Type = Rec.Type::standard) then begin
-                            Clear(EventCodes);
-                            EventCodes.LookupMode := true;
-                            if EventCodes.RunModal() = Action::LookupOK then begin
-                                EventCodes.SetSelectionFilter(EventCode);
-                                RecRef.GetTable(EventCode);
-                                Rec."Include Events Filter" := CopyStr(SelectionFilterMgt.GetSelectionFilter(RecRef, EventCode.FieldNo("Event Code")), 1, MaxStrLen(Rec."Include Events Filter"));
-                                Rec.Modify();
-                                CurrPage.Update(false);
-                            end;
+                        if (Rec.Type <> Rec.Type::standard) then
+                            Error(EventsAllowedForStandardLbl);
+
+                        if Rec.ID <> '' then
+                            Error(NotPossibleToSetFilterLbl);
+
+                        Clear(EventCodes);
+                        EventCodes.LookupMode := true;
+                        if EventCodes.RunModal() = Action::LookupOK then begin
+                            EventCodes.SetSelectionFilter(EventCode);
+                            RecRef.GetTable(EventCode);
+                            Rec."Include Events Filter" := CopyStr(SelectionFilterMgt.GetSelectionFilter(RecRef, EventCode.FieldNo("Event Code")), 1, MaxStrLen(Rec."Include Events Filter"));
+                            Rec.Modify();
+                            CurrPage.Update(false);
                         end;
                     end;
                 }

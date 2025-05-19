@@ -30,7 +30,7 @@ page 6184551 "NPR Adyen Webhook Setup List"
                 field("Include Events Filter"; Rec."Include Events Filter")
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the Webhook Events Filter';
+                    ToolTip = 'Specifies the Webhook Event Filter';
                 }
                 field(Description; Rec.Description)
                 {

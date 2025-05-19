@@ -28,7 +28,7 @@ table 6150805 "NPR Adyen Webhook Setup"
         field(25; "Include Events Filter"; Text[2048])
         {
             DataClassification = CustomerContent;
-            Caption = 'Include Events Filter';
+            Caption = 'Include Event Filter';
         }
         field(30; "Web Service URL"; Text[2048])
         {
