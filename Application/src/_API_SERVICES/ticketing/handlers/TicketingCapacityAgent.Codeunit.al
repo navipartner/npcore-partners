@@ -24,24 +24,34 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
         AdmissionCode: Code[20];
         CustomerNumber: Code[20];
     begin
+        ReferenceDate := Today();
+        Quantity := 1;
+
         if (Request.QueryParams().ContainsKey('itemNumber')) then
             ItemReferenceNumber := CopyStr(UpperCase(Request.QueryParams().Get('itemNumber')), 1, MaxStrLen(ItemReferenceNumber));
         if (ItemReferenceNumber = '') then
             exit(Response.RespondBadRequest('Missing required field item number'));
 
+
+        QueryParameterValue := '';
         if (Request.QueryParams().ContainsKey('referenceDate')) then
             QueryParameterValue := Request.QueryParams().Get('referenceDate');
+
         if (QueryParameterValue <> '') then
             if (not Evaluate(ReferenceDate, QueryParameterValue, 9)) then
                 exit(Response.RespondBadRequest('Invalid reference date, expected format is yyyy-mm-dd'));
 
+
+        QueryParameterValue := '';
         if (Request.QueryParams().ContainsKey('quantity')) then
             QueryParameterValue := Request.QueryParams().Get('quantity');
+
         if (QueryParameterValue <> '') then
             if (not Evaluate(Quantity, QueryParameterValue)) then
                 exit(Response.RespondBadRequest('Invalid quantity, expected integer'));
         if (Quantity < 1) then
             exit(Response.RespondBadRequest('Quantity must be greater than 0'));
+
 
         if (Request.QueryParams().ContainsKey('admissionCode')) then
             AdmissionCode := CopyStr(UpperCase(Request.QueryParams().Get('admissionCode')), 1, MaxStrLen(AdmissionCode));
