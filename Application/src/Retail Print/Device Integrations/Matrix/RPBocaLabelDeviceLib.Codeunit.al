@@ -96,6 +96,8 @@ codeunit 6014436 "NPR RP Boca Label Device Lib." implements "NPR IMatrix Printer
                 PrintText(Font, FontParam, POSPrintBuffer.Align, R, POSPrintBuffer.X, POSPrintBuffer.Y, POSPrintBuffer.Text);
             (UpperCase(CopyStr(POSPrintBuffer.Font, 1, 4)) = 'RFID'):
                 PrintRFID(FontParam, POSPrintBuffer.Text);
+            (UpperCase(CopyStr(POSPrintBuffer.Font, 1, 3)) = 'TTF'):
+                PrintTrueTypeText(Font, FontParam, POSPrintBuffer.Align, R, POSPrintBuffer.X, POSPrintBuffer.Y, POSPrintBuffer.Text);
         end;
     end;
 
@@ -238,6 +240,10 @@ codeunit 6014436 "NPR RP Boca Label Device Lib." implements "NPR IMatrix Printer
         AddOption(RetailList, 'F10', '');
         AddOption(RetailList, 'F11', '');
         AddOption(RetailList, 'F12', '');
+
+        AddOption(RetailList, 'TTF 1,12', '');
+        AddOption(RetailList, 'TTF 2,12', '');
+        AddOption(RetailList, 'TTF 3,12', '');
 
         // Regular Barcodes
         AddOption(RetailList, 'EAN13', '');
@@ -453,6 +459,113 @@ codeunit 6014436 "NPR RP Boca Label Device Lib." implements "NPR IMatrix Printer
                             end;
                     end;
                     AddStringToBuffer(StrSubstNo('<%1><RC%2,%3><%4><HW%5><RTJ%6>~%7~', Rotation, Row, Col, Font, HW, RTJ, Input));
+                end;
+        end;
+    end;
+
+    local procedure PrintTrueTypeText(Font: Text[50]; Modifiers: Text[10]; Alignment: Option; Rotation: Text[2]; X: Integer; Y: Integer; Input: Text[100])
+    var
+        CTR, RTJ : Integer;
+        Row, Col : Integer;
+        ModifiersMissingErr: Label 'When using TrueType Fonts (TTF), you MUST specify a fileID (a) and pointSize (b) in the format: TTF a,b';
+    begin
+        // We assume that the Modifiers are not ill-formatted
+        if ((Modifiers = '') or (not Modifiers.Contains(','))) then
+            Error(ModifiersMissingErr);
+
+        case Alignment of
+            0:
+                begin
+                    Row := (_PrintWidth - X);
+                    Col := Y;
+                    AddStringToBuffer(StrSubstNo('<%1><RC%2,%3><TTCP10><%4%5>%6', Rotation, Row, Col, Font, Modifiers, Input)); // Please note that we are changing codepage to 850 (TTCP10) (€-sign is missing)
+                end;
+            1:
+                begin
+                    case Rotation of
+                        'RL':
+                            begin
+                                // Assume that the X-coordinate is the center, hence we define the field width 2 times the location 
+                                if X > (_PrintWidth DIV 2) then begin
+                                    Row := (_PrintWidth - X) * 2;
+                                    CTR := (_PrintWidth - X) * 2;
+                                end else begin
+                                    Row := _PrintWidth;
+                                    CTR := X * 2;
+                                end;
+                                Col := Y;
+                            end;
+                        'NR':
+                            begin
+                                // Assume that the Y-coordinate is the center, hence we define the field width 2 times the location
+                                if Y > (_PrintHeight DIV 2) then begin
+                                    Col := Y - (_PrintHeight - Y);
+                                    CTR := (_PrintHeight - Y) * 2;
+                                end else begin
+                                    Col := 0;
+                                    CTR := Y * 2;
+                                end;
+                                Row := (_PrintWidth - X);
+                            end;
+                        'RR':
+                            begin
+                                // Assume that the X-coordinate is the center, hence we define the field width 2 times the location
+                                if X > (_PrintWidth DIV 2) then begin
+                                    Row := 0;
+                                    CTR := (_PrintWidth - X) * 2;
+                                end else begin
+                                    Row := _PrintWidth - (X * 2);
+                                    CTR := X * 2;
+                                end;
+                                Col := Y;
+                            end;
+                        'RU':
+                            begin
+                                // Assume that the Y-coordinate is the center, hence we define the field width 2 times the location
+                                if Y > (_PrintHeight DIV 2) then begin
+                                    Col := _PrintHeight;
+                                    CTR := (_PrintHeight - Y) * 2;
+                                end else begin
+                                    Col := Y * 2;
+                                    CTR := Y * 2;
+                                end;
+                                Row := (_PrintWidth - X);
+                            end;
+                    end;
+                    AddStringToBuffer(StrSubstNo('<%1><RC%2,%3><TTCP10><%4%5><CTR%6>~%7~', Rotation, Row, Col, Font, Modifiers, CTR, Input)); // Please note that we are changing codepage to 850 (TTCP10) (€-sign is missing)
+                end;
+            2:
+                begin
+                    case Rotation of
+                        'RL':
+                            begin
+                                Row := _PrintWidth;
+                                Col := Y;
+                                RTJ := X;
+                            end;
+                        'NR':
+                            begin
+                                Row := _PrintWidth - X;
+                                Col := 0;
+                                RTJ := Y;
+                            end;
+                        'RR':
+                            begin
+                                Row := 0;
+                                Col := Y;
+                                RTJ := _PrintWidth - X;
+                            end;
+                        'RU':
+                            begin
+                                if _PrintHeight = 0 then
+                                    Error(ErrPrintHeightWithRotationLbl);
+
+                                Row := _PrintWidth - X;
+                                Col := _PrintHeight;
+                                RTJ := _PrintHeight - Y;
+                            end;
+                    end;
+                    AddStringToBuffer(StrSubstNo('<%1><RC%2,%3><TTCP10><%4%5><RTJ%6>~%7~', Rotation, Row, Col, Font, Modifiers, RTJ, Input)); // Please note that we are changing codepage to 850 (TTCP10) (€-sign is missing)
                 end;
         end;
     end;
