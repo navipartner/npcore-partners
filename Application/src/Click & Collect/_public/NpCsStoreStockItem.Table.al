@@ -1,6 +1,7 @@
 ﻿table 6151223 "NPR NpCs Store Stock Item"
 {
-    Access = Internal;
+    Extensible = False;
+
     Caption = 'Collect Store Stock Item';
     DrillDownPageID = "NPR NpCs Store Stock Items";
     LookupPageID = "NPR NpCs Store Stock Items";
