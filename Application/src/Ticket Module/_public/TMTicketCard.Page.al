@@ -1,7 +1,6 @@
 page 6151294 "NPR TM Ticket Card"
 {
     PageType = Card;
-    Extensible = False;
     Caption = 'Ticket Card';
     DeleteAllowed = false;
     InsertAllowed = false;
