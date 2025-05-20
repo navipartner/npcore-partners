@@ -824,7 +824,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                             end;
                         end else begin
                             NcTaskOut."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
-                            OStream.WriteText(StrSubstNo(UpdateProductVariantsMutationLabel, 'NCTask' + Format(NcTaskIn."Entry No."), ShopifyProductID, ShopifyVariantID, Format(ItemPrice."Unit Price", 0, 9), Format(ItemPrice."Compare at Price", 0, 9)));
+                            OStream.WriteText(StrSubstNo(UpdateProductVariantsMutationLabel, 'NCTask' + Format(NcTaskIn."Entry No."), ShopifyProductID, ShopifyVariantID, Format(ItemPrice."Unit Price", 0, 9), GetCompareAtPrice(ItemPrice)));
                         end;
                     end;
                 end;
@@ -833,6 +833,16 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             NcTaskOut.Insert();
             NcTaskIn.Delete();
         until (NcTaskIn.Next() = 0) or (IncludedNcTasks >= MaxItemPricesPerRequest);
+    end;
+
+    local procedure GetCompareAtPrice(ItemPrice: Record "NPR Spfy Item Price"): Text
+    var
+        NullJsonValue: JsonValue;
+    begin
+        if ItemPrice."Unit Price" < ItemPrice."Compare at Price" then
+            exit(Format(ItemPrice."Compare at Price", 0, 9));
+        NullJsonValue.SetValueToNull();
+        exit(Format(NullJsonValue));
     end;
 
     local procedure AddItemInfo(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; Item: Record Item; NcTaskType: Integer; ShopifyProductID: Text[30]; var ProductJObject: JsonObject)
