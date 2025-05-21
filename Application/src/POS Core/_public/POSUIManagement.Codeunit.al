@@ -660,6 +660,8 @@
         GlobalSettingsStatisticsErrorOpeningHoursValueRangeLbl: Label 'Value must be between 0 and 24 and must be a whole number';
         GlobalSettingsStatisticsErrorRequiredLbl: Label 'The value is required';
         GlobalSettingsHIDSettingsLabelLbl: Label 'HID Settings';
+        GlobalSettingsCaptionBoxDisplaySettingLbl: Label 'Caption Box Display Setting';
+        CaptionBoxDisplaySettingDescriptionLbl: Label 'Please choose caption box display data :';
         GlobalShortcutsErrorShortcutAlreadyExistsLbl: Label 'Shortcut already exists';
         GlobalShortcutsErrorShortcutIsPredefinedLbl: Label 'Shortcut is predefined';
         GlobalShortcutsWarningMessageLbl: Label 'Be aware, entering only numbers, only one letter, or just special key like shift, ctrl, space, enter, backspace, delete, insert, F keys, meta  or alt, may activate your shortcut in the middle of typing or scanning items. Consider using combination of special keys, numbers/letters like ctrl+t, ctrl+1, ctrl+shift+p etc.';
@@ -725,6 +727,8 @@
         ScheduleDialogAdmissionsTableEnterEditModeDescriptionLbl: Label 'Enter edit mode to edit layout.';
         ScheduleDialogAdmissionsTableExitEditModeDescriptionLbl: Label 'Exit edit mode.';
         ScheduleDialogAdmissionsTableFindAllTimeslotsLbl: Label 'Find all timeslots';
+        ScheduleDialogAdmissionsTableFindAllTimeslotsDescriptionLbl: Label 'from the selected date will be checked for required admission timeslots. The date range can be adjusted in global settings.';
+        ScheduleDialogAdmissionsTableDaysLabelLbl: Label 'days';
         RestaurantMenusEditorPleaseIgnoreLbl: Label 'Please ignore this if you are not using restaurant';
         RestaurantMenusEditorAdminButtonsLbl: Label 'Admin Buttons';
         RestaurantMenusEditorWaiterPadMenuLbl: Label 'Waiter Pad Menu';
@@ -1236,6 +1240,8 @@
         Captions.Add('Global_Settings_StatisticsErrorOpeningHoursValueRange', GlobalSettingsStatisticsErrorOpeningHoursValueRangeLbl);
         Captions.Add('Global_Settings_StatisticsErrorRequired', GlobalSettingsStatisticsErrorRequiredLbl);
         Captions.Add('Global_Settings_HID_SettingsLabel', GlobalSettingsHIDSettingsLabelLbl);
+        Captions.Add('Global_Settings_CaptionBoxDisplaySetting', GlobalSettingsCaptionBoxDisplaySettingLbl);
+        Captions.Add('Global_Settings_CaptionBoxDisplaySettingDescription', CaptionBoxDisplaySettingDescriptionLbl);
         Captions.Add('Global_Shortcuts_Error_ShortcutAlreadyExists', GlobalShortcutsErrorShortcutAlreadyExistsLbl);
         Captions.Add('Global_Shortcuts_Error_ShortcutIsPredefined', GlobalShortcutsErrorShortcutIsPredefinedLbl);
         Captions.Add('Global_Shortcuts_WarningMessage', GlobalShortcutsWarningMessageLbl);
@@ -1284,6 +1290,8 @@
         Captions.Add('ScheduleDialog_Admissions_Table_EnterEditModeDescription', ScheduleDialogAdmissionsTableEnterEditModeDescriptionLbl);
         Captions.Add('ScheduleDialog_Admissions_Table_ExitEditModeDescription', ScheduleDialogAdmissionsTableExitEditModeDescriptionLbl);
         Captions.Add('ScheduleDialog_Admissions_Table_FindAllTimeslots', ScheduleDialogAdmissionsTableFindAllTimeslotsLbl);
+        Captions.Add('ScheduleDialog_Admissions_Table_FindAllTimeslotsDescription', ScheduleDialogAdmissionsTableFindAllTimeslotsDescriptionLbl);
+        Captions.Add('ScheduleDialog_Admissions_Table_DaysLabel', ScheduleDialogAdmissionsTableDaysLabelLbl);
         Captions.Add('Restaurant_Menus_Editor_PleaseIgnore', RestaurantMenusEditorPleaseIgnoreLbl);
         Captions.Add('Restaurant_Menus_Editor_AdminButtons', RestaurantMenusEditorAdminButtonsLbl);
         Captions.Add('Restaurant_Menus_Editor_WaiterPadMenu', RestaurantMenusEditorWaiterPadMenuLbl);
