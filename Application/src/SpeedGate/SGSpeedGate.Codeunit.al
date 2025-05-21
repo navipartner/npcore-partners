@@ -485,7 +485,7 @@ codeunit 6185130 "NPR SG SpeedGate"
 
             if (not NumberPermitted) then begin // No admit during end of sale.
                 _ApiErrors := _ApiErrors::ticket_setup_prevents_admit_during_end_of_sale;
-                ValidationRequest.ReferenceNumberType := DetectedNumberType;
+                ValidationRequest.ReferenceNumberType := "NPR SG ReferenceNumberType".FromInteger(DetectedNumberType);
                 ValidationRequest.ApiErrorNumber := _ApiErrors.AsInteger();
                 ValidationRequest.EntryStatus := ValidationRequest.EntryStatus::DENIED_BY_GATE;
                 ValidationRequest.Modify();
@@ -566,7 +566,7 @@ codeunit 6185130 "NPR SG SpeedGate"
         end;
 
         // When still not permitted, exit out with error
-        ValidationRequest.ReferenceNumberType := DetectedNumberType;
+        ValidationRequest.ReferenceNumberType := "NPR SG ReferenceNumberType".FromInteger(DetectedNumberType);
         if (not NumberPermitted) then begin
             //_ApiErrors := _ApiErrors::denied_by_speedgate;
             ValidationRequest.ApiErrorNumber := _ApiErrors.AsInteger();
@@ -911,7 +911,7 @@ codeunit 6185130 "NPR SG SpeedGate"
 
             // Set the validation request template fields
             ValidationRequest.ExtraEntityTableId := Database::"NPR TM Ticket";
-            ValidationRequest.ReferenceNumberType := _NumberType::TICKET_REQUEST;
+            ValidationRequest.ReferenceNumberType := ValidationRequest.ReferenceNumberType::TICKET_REQUEST;
             ValidationRequest.EntryStatus := ValidationRequest.EntryStatus::PERMITTED_BY_GATE;
             ValidationRequest.EntityId := TicketRequest.SystemId;
             ValidationRequest.ProfileLineId := ProfileLineId;

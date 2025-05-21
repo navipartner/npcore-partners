@@ -73,12 +73,10 @@ table 6150987 "NPR SGEntryLog"
             DataClassification = CustomerContent;
             Caption = 'Admitted Quantity';
         }
-        field(100; ReferenceNumberType; Option)
+        field(100; ReferenceNumberType; Enum "NPR SG ReferenceNumberType")
         {
             DataClassification = CustomerContent;
             Caption = 'Entry Type';
-            OptionMembers = REJECTED,UNKNOWN,TICKET,MEMBER_CARD,WALLET,DOC_LX_CITY_CARD,TICKET_REQUEST;
-            OptionCaption = 'Rejected,Unknown,Ticket,Member Card,Wallet,City Card,Ticket Request';
         }
 
         field(105; MemberCardLogEntryNo; Integer)

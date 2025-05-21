@@ -857,7 +857,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         exit(MemberValidationRequest.Token);
     end;
 
-    internal procedure ReferenceNumberTypeAsText(ReferenceNumberType: Option): Text
+    internal procedure ReferenceNumberTypeAsText(ReferenceNumberType: Enum "NPR SG ReferenceNumberType"): Text
     var
         ValidationRequest: Record "NPR SGEntryLog";
     begin
