@@ -1,7 +1,7 @@
 codeunit 6059963 "NPR POS Action: Doc. Show-B"
 {
     Access = Internal;
-    procedure ShowSaleDocument(Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; SelectCustomer: Boolean; SelectType: Integer; SalesOrderViewString: Text; GroupCodeFilter: Text)
+    procedure ShowSaleDocument(Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; SelectCustomer: Boolean; SelectType: Integer; SalesOrderViewString: Text; GroupCodeFilter: Text; PageIdToRun: Decimal)
     var
         SalePOS: Record "NPR POS Sale";
         SaleLinePOS: Record "NPR POS Sale Line";
@@ -24,7 +24,7 @@ codeunit 6059963 "NPR POS Action: Doc. Show-B"
             if SalePOS."Customer No." <> '' then
                 SalesHeader.SetRange("Bill-to Customer No.", SalePOS."Customer No.");
             SalesHeader.SetFilter("NPR Group Code", GroupCodeFilter);
-            if not LookupSalesDoc(SalesHeader) then
+            if not LookupSalesDoc(SalesHeader, PageIdToRun) then
                 exit;
         end;
 
@@ -42,15 +42,12 @@ codeunit 6059963 "NPR POS Action: Doc. Show-B"
                          SelectCustomer,
                          SelectType,
                          SalesOrderViewString,
-                         '');
+                         '', 0);
     end;
 
-
-
-
-    local procedure LookupSalesDoc(var SalesHeader: Record "Sales Header"): Boolean
+    local procedure LookupSalesDoc(var SalesHeader: Record "Sales Header"; PageIdToRun: Integer): Boolean
     begin
-        exit(Page.RunModal(0, SalesHeader) = Action::LookupOK);
+        exit(Page.RunModal(PageIdToRun, SalesHeader) = Action::LookupOK);
     end;
 
     procedure CheckCustomer(var SalePOS: Record "NPR POS Sale"; SelectCustomer: Boolean): Boolean

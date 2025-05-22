@@ -87,4 +87,12 @@ codeunit 85094 "NPR POS Sales Doc Show Tests"
         // [Then]
         Assert.IsTrue(SalesOrder."No.".Value = SalesHeader."No.", 'Created Sales Order opened.');
     end;
+
+    local procedure GetDefaultPageId(): Integer
+    var
+        SalesHeader: Record "Sales Header";
+        PageMgt: Codeunit "Page Management";
+    begin
+        exit(PageMgt.GetPageID(SalesHeader));
+    end;
 }
