@@ -2,7 +2,6 @@ codeunit 6151032 "NPR POS Tracking Utils"
 {
     Access = Internal;
 
-
     local procedure SerialNumberCanBeUsedByItem(ItemNo: Code[20]; var VariantCode: Code[10]; SerialNumber: Code[50]; var UserInformationErrorWarning: Text; SerialSelectionFromList: Boolean; LocationCode: Code[10]) CanBeUsed: Boolean
     var
         Item: Record Item;
@@ -10,12 +9,13 @@ codeunit 6151032 "NPR POS Tracking Utils"
         ItemLedgerEntry: Record "Item Ledger Entry";
         SaleLinePOS: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
+        POSTrackingUtilsEvents: Codeunit "NPR POS Tracking Utils Public";
         WrongSerialOnILELbl: Label 'Serial number %1 for item %2 - %3 can not be used since it can not be found as received.', Comment = '%1 = Serial Number, %2 = Item No., %3 = Item Description';
         WrongSerialOnSLPLbl: Label 'Serial number %1 for item %2 - %3 can not be used since it is already on %4 sale %5 on register %6.', Comment = '%1 = Serial Number, %2 = Item No., %3 = Item Description, %4 = Sale, %5 = sales Ticket No, %6 = Register No.';
         ActiveLbl: Label 'active';
         WrongSerial_InstrLbl: Label ' \Press OK to re-enter serial number now. \Press Cancel to enter serial number later.\';
     begin
-        Item.SetLoadFields(Description, "Item Tracking Code", "Prevent Negative Inventory");
+        Item.SetLoadFields(Description, "Item Tracking Code");
         if not Item.Get(ItemNo) then
             exit;
 
@@ -32,7 +32,6 @@ codeunit 6151032 "NPR POS Tracking Utils"
 
         UserInformationErrorWarning := '';
 
-
         ItemLedgerEntry.Reset();
         ItemLedgerEntry.SetCurrentKey("Item No.", Open, "Variant Code", Positive, "Lot No.", "Serial No.");
         ItemLedgerEntry.SetRange(Open, true);
@@ -40,10 +39,10 @@ codeunit 6151032 "NPR POS Tracking Utils"
         ItemLedgerEntry.SetRange("Serial No.", SerialNumber);
         ItemLedgerEntry.SetRange("Item No.", ItemNo);
         ItemLedgerEntry.SetFilter("Variant Code", VariantCode);
-        if CheckPreventNegativeInventory(Item) then
-            ItemLedgerEntry.SetRange("Location Code", LocationCode);
-
+        ItemLedgerEntry.SetRange("Location Code", LocationCode);
         ItemLedgerEntry.SetLoadFields("Variant Code");
+        POSTrackingUtilsEvents.SerialNumberCanBeUsedByItem_OnAfterFilterILE(ItemLedgerEntry);
+
         CanBeUsed := ItemLedgerEntry.FindSet(false);
         if not CanBeUsed then begin
 
@@ -174,6 +173,7 @@ codeunit 6151032 "NPR POS Tracking Utils"
         ItemLedgerEntry: Record "Item Ledger Entry";
         SaleLinePOS: Record "NPR POS Sale Line";
         SalePOS: Record "NPR POS Sale";
+        POSTrackingUtilsEvents: Codeunit "NPR POS Tracking Utils Public";
         WrongLotNoOnILELbl: Label 'Lot No. %1 for item %2 - %3 can not be used since it can not be found as received.', Comment = '%1 = Lot No., %2 = Item No., %3 = Item Description';
         WrongLotNoOnSLPLbl: Label 'Lot No. %1 for item %2 - %3 can not be used since it is already on %4 sale %5 on register %6.', Comment = '%1 = Lot No., %2 = Item No., %3 = Item Description, %4 = Sale, %5 = sales Ticket No, %6 = Register No.';
         ActiveLbl: Label 'active';
@@ -195,7 +195,6 @@ codeunit 6151032 "NPR POS Tracking Utils"
 
         UserInformationErrorWarning := '';
 
-
         ItemLedgerEntry.Reset();
         ItemLedgerEntry.SetCurrentKey("Item No.", Open, "Variant Code", Positive, "Lot No.", "Serial No.");
         ItemLedgerEntry.SetRange(Open, true);
@@ -205,6 +204,7 @@ codeunit 6151032 "NPR POS Tracking Utils"
         ItemLedgerEntry.SetFilter("Variant Code", VariantCode);
         ItemLedgerEntry.SetRange("Location Code", LocationCode);
         ItemLedgerEntry.SetLoadFields("Variant Code", "Remaining Quantity");
+        POSTrackingUtilsEvents.LotCanBeUsedByItem_OnAfterFilterILE(ItemLedgerEntry);
 
         CanBeUsed := ItemLedgerEntry.FindSet(false);
         if not CanBeUsed then begin
@@ -353,18 +353,5 @@ codeunit 6151032 "NPR POS Tracking Utils"
             exit;
 
         RequiresLotNo := ItemRequiresLotNo(Item, UseSpecificLotNo);
-    end;
-
-    local procedure CheckPreventNegativeInventory(Item: Record Item): Boolean
-    var
-        InventorySetup: Record "Inventory Setup";
-    begin
-        if not InventorySetup.Get() then
-            exit;
-        if (Item."Prevent Negative Inventory" = Item."Prevent Negative Inventory"::Yes) then
-            exit(true);
-        if (Item."Prevent Negative Inventory" = Item."Prevent Negative Inventory"::Default) then
-            if InventorySetup."Prevent Negative Inventory" then
-                exit(true);
     end;
 }
