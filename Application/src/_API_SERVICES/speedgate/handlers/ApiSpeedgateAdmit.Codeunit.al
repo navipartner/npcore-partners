@@ -5,6 +5,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
     internal procedure GetSetup(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         ScannerDefault: Record "NPR SG SpeedGateDefault";
+        ScannerCategory: Record "NPR SG Scanner Category";
         Scanner: Record "NPR SG SpeedGate";
         ResponseJson: Codeunit "NPR JSON Builder";
     begin
@@ -37,6 +38,8 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
                     ResponseJson.AddProperty('id', Format(Scanner.SystemId, 0, 4).ToLower());
                     ResponseJson.AddProperty('scannerId', Scanner.ScannerId);
                     ResponseJson.AddProperty('description', Scanner.Description);
+                    if (Scanner.CategoryCode <> '') and (ScannerCategory.Get(Scanner.CategoryCode)) then
+                        AddCategory(ResponseJson, 'category', ScannerCategory);
                     ResponseJson.EndObject();
                 until (Scanner.Next() = 0);
             ResponseJson.EndArray().EndObject();
@@ -59,11 +62,31 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             .AddProperty('permitDocLxCityCards', Scanner.PermitDocLxCityCard)
             .AddProperty('imageProfileCode', Scanner.ImageProfileCode)
             .AddProperty('ticketProfileCode', Scanner.TicketProfileCode)
-            .AddProperty('memberCardProfileCode', Scanner.MemberCardProfileCode)
+            .AddProperty('memberCardProfileCode', Scanner.MemberCardProfileCode);
+        if (Scanner.CategoryCode <> '') and (ScannerCategory.Get(Scanner.CategoryCode)) then
+            AddCategory(ResponseJson, 'category', ScannerCategory);
+        ResponseJson
             .AddArray(AddScannerItemsProfileLines(ResponseJson, Scanner.ItemsProfileCode))
             .EndObject();
 
         exit(Response.RespondOK(ResponseJson.Build()));
+    end;
+
+    internal procedure GetScannerCategories(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        ScannerCategory: Record "NPR SG Scanner Category";
+        Json: Codeunit "NPR Json Builder";
+    begin
+        ScannerCategory.ReadIsolation := IsolationLevel::ReadCommitted;
+
+        Json.StartArray();
+        if (ScannerCategory.FindSet()) then
+            repeat
+                AddCategory(Json, '', ScannerCategory)
+            until ScannerCategory.Next() = 0;
+        Json.EndArray();
+
+        exit(Response.RespondOK(Json.BuildAsArray()));
     end;
 
     local procedure AddScannerItemsProfileLines(var ResponseJson: Codeunit "NPR JSON Builder"; ItemsProfileCode: Code[10]): Codeunit "NPR JSON Builder"
@@ -661,6 +684,16 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             exit(ResponseJson.AddProperty(PropertyName)); // Empty property with null value (not "")
 
         exit(ResponseJson.AddProperty(PropertyName, PropertyValue));
+    end;
+
+    local procedure AddCategory(var ResponseJson: Codeunit "NPR Json Builder"; ObjectName: Text; Category: Record "NPR SG Scanner Category"): Codeunit "NPR Json Builder"
+    begin
+        ResponseJson.StartObject(ObjectName)
+                        .AddProperty('id', Format(Category.SystemId, 0, 4).ToLower())
+                        .AddProperty('code', Category.CategoryCode)
+                        .AddProperty('name', Category.CategoryDescription)
+                    .EndObject();
+        exit(ResponseJson);
     end;
 
     local procedure SingleMembershipDTO(var ResponseJson: Codeunit "NPR JSON Builder"; ValidationRequest: Record "NPR SGEntryLog"): Codeunit "NPR JSON Builder"

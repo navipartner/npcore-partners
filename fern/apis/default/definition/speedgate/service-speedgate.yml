@@ -38,6 +38,25 @@ service:
           response:
             body: $compositeTypes.ScannerIdSetupResponseShort.ExampleScannerIdSetupResponseShort
 
+    findCategories:
+      docs:
+        This endpoint retrieves a list of all categories that scanners can be assigned to.
+      path: /category
+      method: GET
+      response:
+        docs: Returns a list of scanner categories.
+        type: list<compositeTypes.ScannerCategory>
+      examples:
+        - name: "List of categories"
+          docs: Example of a successful retrieval of scanner categories.
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          response:
+            body:
+              - $compositeTypes.ScannerCategory.ExampleEntranceScanners
+
     getScannerSetup:
       docs: 
         This endpoint retrieves the setup details for a specific gate, such as the gate's name, location, and the admission codes it supports.  

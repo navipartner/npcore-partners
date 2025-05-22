@@ -598,3 +598,24 @@ types:
       - name: ExampleEntryNumber
         value: 123456
 
+  ScannerCategoryId:
+    type: uuid
+    docs: The unique uuid of the Speedgate Category.
+    examples:
+      - name: ExampleCategoryIdEntrance
+        value: c2608dfa-5c02-427c-ac40-df538cb98d2f
+
+  ScannerCategoryCode:
+    type: string
+    docs: The code and unique identifier of the Speedgate Category.
+    examples:
+      - name: ExampleCategoryCodeEntrance
+        value: "ENTRANCE"
+
+  ScannerCategoryDescription:
+    type: string
+    docs: The description of the category.
+    examples:
+      - name: ExampleCategoryDescriptionEntrance
+        value: "Entrance Scanners"
+

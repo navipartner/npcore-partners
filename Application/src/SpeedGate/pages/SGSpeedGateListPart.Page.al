@@ -28,6 +28,11 @@ page 6184879 "NPR SG SpeedGateListPart"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Description field.', Comment = '%';
                 }
+                field(CategoryCode; Rec.CategoryCode)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies teh value of the Category Code field.';
+                }
                 field(ImageProfileCode; Rec.ImageProfileCode)
                 {
                     ApplicationArea = NPRRetail;

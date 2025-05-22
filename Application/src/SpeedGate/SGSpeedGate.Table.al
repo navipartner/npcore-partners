@@ -22,6 +22,12 @@ table 6150974 "NPR SG SpeedGate"
             DataClassification = CustomerContent;
             Caption = 'Description';
         }
+        field(11; CategoryCode; Code[10])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Category Code';
+            TableRelation = "NPR SG Scanner Category".CategoryCode;
+        }
 
         field(20; Enabled; Boolean)
         {

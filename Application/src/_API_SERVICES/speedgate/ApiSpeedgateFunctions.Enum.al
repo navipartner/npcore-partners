@@ -12,6 +12,10 @@ enum 6059826 "NPR ApiSpeedgateFunctions"
     {
         Caption = 'Get speedgate setup';
     }
+    value(101; GET_SCANNER_CATEGORIES)
+    {
+        Caption = 'Get Scanner Categories';
+    }
 
     value(110; LOOKUP_REFERENCE_NUMBER)
     {

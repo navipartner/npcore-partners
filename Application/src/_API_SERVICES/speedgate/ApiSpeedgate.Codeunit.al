@@ -11,6 +11,9 @@ codeunit 6185116 "NPR ApiSpeedgate" implements "NPR API Request Handler"
         if (Request.Match('GET', '/speedgate')) then
             exit(Handle(_Functions::GET_SPEEDGATE_SETUP, Request));
 
+        if (Request.Match('GET', '/speedgate/category')) then
+            exit(Handle(_Functions::GET_SCANNER_CATEGORIES, Request));
+
         if (Request.Match('GET', '/speedgate/lookup')) then
             exit(Handle(_Functions::LOOKUP_REFERENCE_NUMBER, Request));
 

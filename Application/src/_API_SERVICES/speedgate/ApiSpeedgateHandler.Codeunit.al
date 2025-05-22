@@ -51,6 +51,9 @@ codeunit 6185117 "NPR ApiSpeedgateHandler"
             _ApiFunction::GET_SPEEDGATE_SETUP:
                 _Response := Speedgate.GetSetup(_Request);
 
+            _ApiFunction::GET_SCANNER_CATEGORIES:
+                _Response := Speedgate.GetScannerCategories(_Request);
+
             _ApiFunction::LOOKUP_REFERENCE_NUMBER:
                 _Response := Reports.LookupReferenceNumber(_Request);
 

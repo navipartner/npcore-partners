@@ -288,6 +288,7 @@ types:
             - id: $simpleTypes.ScannerSystemId.ExampleScannerSystemId
               scannerId: $simpleTypes.ScannerId.ExampleSpeedgate
               description: $simpleTypes.Description.ExampleDescription
+              category: $ScannerCategory.ExampleEntranceScanners
 
   ScannerIdSetupResponseList:
     docs: 
@@ -296,12 +297,14 @@ types:
       id: simpleTypes.ScannerSystemId
       scannerId: simpleTypes.ScannerId
       description: simpleTypes.Description
+      category: optional<ScannerCategory>
     examples:
       - name: ExampleScannerIdSetupResponseShort
         value:
           id: $simpleTypes.ScannerSystemId.ExampleScannerSystemId
           scannerId: $simpleTypes.ScannerId.ExampleSpeedgate
           description: $simpleTypes.Description.ExampleDescription
+          category: $ScannerCategory.ExampleEntranceScanners
 
   ScannerIdSetupResponse:
     docs: 
@@ -318,6 +321,7 @@ types:
       imageProfileCode: simpleTypes.ImageProfileCode
       ticketProfileCode: simpleTypes.TicketProfileCode
       memberCardProfileCode: simpleTypes.MemberCardProfileCode
+      category: optional<ScannerCategory>
       items: list<ScannerItemProfileLine>
     examples:
       - name: ExampleScannerIdSetupResponse
@@ -333,6 +337,7 @@ types:
           imageProfileCode: $simpleTypes.ImageProfileCode.ExampleImageProfileCode
           ticketProfileCode: $simpleTypes.TicketProfileCode.ExampleTicketProfileCode
           memberCardProfileCode: $simpleTypes.MemberCardProfileCode.ExampleMemberCardProfileCode
+          category: $ScannerCategory.ExampleEntranceScanners
           items:
             - $ScannerItemProfileLine.ExampleScannerItemProfileLine
 
@@ -400,3 +405,16 @@ types:
           entryNumber: 123456
 
 
+######
+  ScannerCategory:
+    docs: A category containing a multiple scanners. The category offers a way to group the scanners for representation purposes.
+    properties:
+      id: simpleTypes.ScannerCategoryId
+      code: simpleTypes.ScannerCategoryCode
+      description: simpleTypes.ScannerCategoryDescription
+    examples:
+      - name: ExampleEntranceScanners
+        value:
+          id: $simpleTypes.ScannerCategoryId.ExampleCategoryIdEntrance
+          code: $simpleTypes.ScannerCategoryCode.ExampleCategoryCodeEntrance
+          description: $simpleTypes.ScannerCategoryDescription.ExampleCategoryDescriptionEntrance
