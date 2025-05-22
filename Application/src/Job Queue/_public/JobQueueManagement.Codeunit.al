@@ -599,6 +599,28 @@
             StartJobQueueEntry(JobQueueEntry);
     end;
 
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    internal procedure AddEventBillingSenderJobQueue()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        JobQueueDescrLbl: Label 'Transfer Billing Events', MaxLength = 250;
+    begin
+        SetJobTimeout(4, 0);  //4 hours
+
+        if InitRecurringJobQueueEntry(
+            JobQueueEntry."Object Type to Run"::Codeunit,
+            Codeunit::"NPR Billing Data Sender JQ",
+            '',
+            JobQueueDescrLbl,
+            NowWithDelayInSeconds(360),
+            1,
+            CreateAndAssignEventBillingJobQueueCategory(),
+            JobQueueEntry)
+        then
+            StartJobQueueEntry(JobQueueEntry);
+    end;
+#endif
+
     local procedure RefreshRetentionPolicyJQ()
     var
         JobQueueEntry: Record "Job Queue Entry";
@@ -718,6 +740,19 @@
             JobQueueCategory.InsertRec(JobQueueCategoryTok, JobQueueCategoryDescTxt);
         exit(JobQueueCategory.Code);
     end;
+
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    internal procedure CreateAndAssignEventBillingJobQueueCategory(): Code[10]
+    var
+        JobQueueCategory: Record "Job Queue Category";
+        JobQueueCategoryDescTxt: Label 'Event billing related tasks', MaxLength = 30;
+        JobQueueCategoryTok: Label 'NPR-BILL', Locked = true, MaxLength = 10;
+    begin
+        if not JobQueueCategory.Get(JobQueueCategoryTok) then
+            JobQueueCategory.InsertRec(JobQueueCategoryTok, JobQueueCategoryDescTxt);
+        exit(JobQueueCategory.Code);
+    end;
+#endif
 
     local procedure EmitTelemetryDataOnError(JobQueueLogEntry: Record "Job Queue Log Entry")
     var
@@ -1216,6 +1251,14 @@
         RefreshRetentionPolicyJQ();
     end;
 
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnRefreshNPRJobQueueList, '', false, false)]
+    local procedure AddEventBillingSenderJobQueueOnRefresh()
+    begin
+        AddEventBillingSenderJobQueue();
+    end;
+#endif    
+
 #if BC17 or BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
 #else
@@ -1248,6 +1291,14 @@
             Handled := true;
         end;
     end;
+
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnRefreshNPRJobQueueList, '', false, false)]
+    local procedure RunScheduleEventBillingSenderJQ()
+    begin
+        AddEventBillingSenderJobQueue();
+    end;
+#endif
 
 #if BC17 or BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Company-Initialize", 'OnCompanyInitialize', '', true, false)]

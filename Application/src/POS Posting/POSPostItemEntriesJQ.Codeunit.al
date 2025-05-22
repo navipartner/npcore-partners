@@ -16,6 +16,10 @@ codeunit 6059770 "NPR POS Post Item Entries JQ"
         POSItemEntryStatus: Option;
         CheckInId: Text;
     begin
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        RunBillingJQRunnerCheck();
+#endif
+
         CheckInId := SentryCron.CreateCheckIn(SentryCron.GetOrganizationSlug(), MonitorSlugLbl, 'in_progress', '* * * * *', 0, 30, 240, '');
         POSPostEntries.SetPostCompressed(true);
         POSPostEntries.SetStopOnError(false);
@@ -49,4 +53,13 @@ codeunit 6059770 "NPR POS Post Item Entries JQ"
         if CheckInId <> '' then
             SentryCron.UpdateCheckIn(SentryCron.GetOrganizationSlug(), MonitorSlugLbl, 'ok', CheckInId);
     end;
+
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    local procedure RunBillingJQRunnerCheck()
+    var
+        BillingDataSenderJQ: Codeunit "NPR Billing Data Sender JQ";
+    begin
+        BillingDataSenderJQ.CheckNonRunningTaskViaJQAndProcess(true, 3);
+    end;
+#endif
 }
