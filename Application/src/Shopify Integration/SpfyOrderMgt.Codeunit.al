@@ -1023,7 +1023,6 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
         PropertyDict: Dictionary of [Text, Text];
-        LineDiscountAmount: Decimal;
         Qty: Decimal;
         UnitPrice: Decimal;
         OrderLineID: Text[30];
@@ -1116,13 +1115,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
                 else
                     SalesLine.Validate("Qty. to Ship", 0);  //Will be reset after posting of auto-fulfillable lines (gift cards)
             end;
-            if SalesLine."Unit Price" <> UnitPrice then
-                SalesLine.Validate("Unit Price", UnitPrice);
-            if SalesLine."Unit Price" <> 0 then begin
-                LineDiscountAmount := CalcLineDiscountAmount(OrderLine, SalesLine);
-                if SalesLine."Line Discount Amount" <> LineDiscountAmount then
-                    SalesLine.Validate("Line Discount Amount", LineDiscountAmount);
-            end;
+            SetOrderLineUnitPriceAndDiscount(SalesHeader, ShopifyStoreCode, UnitPrice, CalcLineDiscountAmount(OrderLine, SalesLine), SalesLine);
             if IsGiftCard and (not ExistingLineFound or (SalesLine."Outstanding Quantity" <> 0)) then begin
                 SetRetailVoucher(SalesHeader, SalesLine, IsNPGiftCard, VoucherType, PropertyDict, FulfillmentLineBuffer, FulfillmEntryDetailBuffer);
                 FulfillmEntryDetailBuffer.Reset();
@@ -1134,6 +1127,29 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         if not ExistingLineFound then
             SpfyIntegrationEvents.OnAfterInsertSalesLine(SalesHeader, SalesLine, LastLineNo);
         SpfyIntegrationEvents.OnAfterUpsertSalesLine(SalesHeader, SalesLine, not ExistingLineFound, xSalesLine, LastLineNo);
+    end;
+
+    local procedure SetOrderLineUnitPriceAndDiscount(SalesHeader: Record "Sales Header"; ShopifyStoreCode: Code[20]; ActualUnitPrice: Decimal; LineDiscountAmount: Decimal; var SalesLine: Record "Sales Line")
+    var
+        SpfyProductPriceCalc: Codeunit "NPR Spfy Product Price Calc.";
+        LineUnitPrice: Decimal;
+    begin
+        if SalesLine.Type = SalesLine.Type::Item then begin
+            if SpfyIntegrationMgt.OrderLineSalesPriceType(ShopifyStoreCode) = Enum::"NPR Spfy Order Line Price Type"::"Compare-at-Price" then
+                LineUnitPrice := SpfyProductPriceCalc.CalcCompareAtPrice(ShopifyStoreCode, SalesLine."No.", SalesLine."Variant Code", SalesHeader."Posting Date");
+            if LineUnitPrice < ActualUnitPrice then
+                LineUnitPrice := ActualUnitPrice;
+            if LineUnitPrice > ActualUnitPrice then
+                LineDiscountAmount := LineDiscountAmount + LineUnitPrice * SalesLine.Quantity - ActualUnitPrice * SalesLine.Quantity;
+        end else
+            LineUnitPrice := ActualUnitPrice;
+
+        if SalesLine."Unit Price" <> LineUnitPrice then
+            SalesLine.Validate("Unit Price", LineUnitPrice);
+
+        if SalesLine."Unit Price" <> 0 then
+            if SalesLine."Line Discount Amount" <> LineDiscountAmount then
+                SalesLine.Validate("Line Discount Amount", LineDiscountAmount);
     end;
 
     local procedure SetRetailVoucher(SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; IsNpGiftCard: Boolean; VoucherType: Record "NPR NpRv Voucher Type"; PropertyDict: Dictionary of [Text, Text]; FulfillmentLineBuffer: Record "NPR Spfy Fulfillment Buffer"; var FulfillmEntryDetailBuffer: Record "NPR Spfy Fulfillm. Buf. Detail")

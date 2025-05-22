@@ -2,7 +2,6 @@
 codeunit 6185050 "NPR Spfy Product Price Calc."
 {
     Access = Internal;
-    SingleInstance = true;
     Permissions =
         tabledata Customer = rmid,
         tabledata Item = r,
@@ -16,8 +15,20 @@ codeunit 6185050 "NPR Spfy Product Price Calc."
         _SpfyStoreCode: Code[20];
         _SpfyIntegrationEvents: Codeunit "NPR Spfy Integration Events";
 
+    internal procedure CalcCompareAtPrice(ShopifyStoreCode: Code[20]; ItemNo: Code[20]; VariantCode: Code[10]; ItemPriceDate: Date): Decimal
+    var
+        Item: Record Item;
+        Price: Decimal;
+        ComparePrice: Decimal;
+    begin
+        Item.Get(ItemNo);
+        Initialize(ShopifyStoreCode, ItemPriceDate);
+        CalcPrice(Item, VariantCode, Item."Sales Unit of Measure", Price, ComparePrice);
+        exit(ComparePrice);
+    end;
+
     [TryFunction]
-    internal procedure CalcPrice(Item: Record Item; VariantCode: Code[20]; UnitOfMeasureCode: Code[20]; var Price: Decimal; var ComparePrice: Decimal)
+    internal procedure CalcPrice(Item: Record Item; VariantCode: Code[10]; UnitOfMeasureCode: Code[10]; var Price: Decimal; var ComparePrice: Decimal)
     var
         ItemUnitofMeasure: Record "Item Unit of Measure";
         TempSalesLine: Record "Sales Line" temporary;

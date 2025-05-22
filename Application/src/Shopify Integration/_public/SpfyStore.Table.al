@@ -352,6 +352,11 @@ table 6150810 "NPR Spfy Store"
             Caption = 'No. of Prices per Request';
             DataClassification = CustomerContent;
         }
+        field(620; "Sales Price on Order Lines"; Enum "NPR Spfy Order Line Price Type")
+        {
+            Caption = 'Sales Price on Order Lines';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {

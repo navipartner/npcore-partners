@@ -122,6 +122,12 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         exit(not ShopifyStoreIn."Do Not Sync. Sales Prices");
     end;
 
+    procedure OrderLineSalesPriceType(ShopifyStoreCode: Code[20]): Enum "NPR Spfy Order Line Price Type"
+    begin
+        GetStore(ShopifyStoreCode);
+        exit(_ShopifyStore."Sales Price on Order Lines");
+    end;
+
     procedure IsSendShopifyNameAndDescription(ShopifyStoreCode: Code[20]): Boolean
     begin
         GetStore(ShopifyStoreCode);

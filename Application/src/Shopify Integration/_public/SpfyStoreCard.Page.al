@@ -194,6 +194,12 @@ page 6184704 "NPR Spfy Store Card"
                         UpdateControlVisibility();
                     end;
                 }
+                field("Sales Price on Order Lines"; Rec."Sales Price on Order Lines")
+                {
+                    ToolTip = 'Specifies whether the system should use the actual sales price or the "compare at price" when creating sales order lines from incoming Shopify orders. If the latter option is selected, the difference between the "compare at price" and the actual sales price will be recorded as a discount amount on the sales order line.';
+                    ApplicationArea = NPRShopify;
+                    Enabled = _SalesOrderIntegrationIsEnabled;
+                }
                 field("Allowed Payment Statuses"; _SpfyIntegrationMgt.GetAllowedFinancialStatusesAsCommaString(Rec.Code))
                 {
                     Caption = 'Allowed Financial Statuses';
