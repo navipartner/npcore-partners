@@ -982,6 +982,12 @@
                     Coupon.SetRecFilter();
                     Report.Run(Coupon."Print Object ID", true, false, Coupon);
                 end;
+            Coupon."Print Object Type"::Codeunit:
+                begin
+                    Coupon.TestField("Print Object ID");
+                    Coupon.SetRecFilter();
+                    Codeunit.Run(Coupon."Print Object ID", Coupon);
+                end;
         end;
     end;
 
@@ -1005,6 +1011,12 @@
                     Coupon.TestField("Print Object ID");
                     Coupon.SetRecFilter();
                     Report.Run(Coupon."Print Object ID", ShowReqPage, false, Coupon);
+                end;
+            Coupon."Print Object Type"::Codeunit:
+                begin
+                    Coupon.TestField("Print Object ID");
+                    Coupon.SetRecFilter();
+                    Codeunit.Run(Coupon."Print Object ID", Coupon);
                 end;
         end;
     end;
