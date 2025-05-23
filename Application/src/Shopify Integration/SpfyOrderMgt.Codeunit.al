@@ -439,12 +439,28 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         exit(Found);
     end;
 
-    procedure GetPaymentMapping(PayMethodId: Text; ShopifyStoreCode: Code[20]; var PaymentMapping: Record "NPR Magento Payment Mapping")
+    procedure GetPaymentMapping(Transaction: JsonToken; ShopifyStoreCode: Code[20]; var PaymentMapping: Record "NPR Magento Payment Mapping")
     var
+        ExternalPaymentTypeID: Record "NPR External Payment Type ID";
+        CreditCardCompany: Text;
+        ShopifyPmtGateway: Text;
         ExternalPmtTypeFormatTok: Label '%1_%2', Locked = true;
+        MappingNotFoundErr: Label 'There is no payment mapping set for Shopify store %1, payment gateway "%2" and credit card company "%3".', Comment = '%1 - Shopify store code, %2 - payment gateway, %3 - credit card company';
     begin
         Clear(PaymentMapping);
-        PaymentMapping.Get('Shopify', LowerCase(StrSubstNo(ExternalPmtTypeFormatTok, ShopifyStoreCode, PayMethodId)));
+        ShopifyPmtGateway := JsonHelper.GetJText(Transaction, 'gateway', false);
+        CreditCardCompany := JsonHelper.GetJText(Transaction, 'payment_details.credit_card_company', false);
+
+        ExternalPaymentTypeID.SetCurrentKey("Store Code", "Payment Gateway", "Credit Card Company");
+        ExternalPaymentTypeID.SetRange("Store Code", ShopifyStoreCode);
+        ExternalPaymentTypeID.SetRange("Payment Gateway", CopyStr(ShopifyPmtGateway, 1, MaxStrLen(ExternalPaymentTypeID."Payment Gateway")));
+        ExternalPaymentTypeID.SetRange("Credit Card Company", CopyStr(CreditCardCompany, 1, MaxStrLen(ExternalPaymentTypeID."Credit Card Company")));
+        if ExternalPaymentTypeID.FindFirst() then
+            if PaymentMapping.Get('Shopify', ExternalPaymentTypeID."External Payment Type ID") then
+                exit;
+
+        if not PaymentMapping.Get('Shopify', LowerCase(StrSubstNo(ExternalPmtTypeFormatTok, ShopifyStoreCode, ShopifyPmtGateway))) then
+            Error(MappingNotFoundErr, ShopifyStoreCode, ShopifyPmtGateway, CreditCardCompany);
     end;
 
     local procedure FindNpEcStore(ShopifyStoreCode: Code[20]; Order: JsonToken; var NpEcStoreOut: Record "NPR NpEc Store")

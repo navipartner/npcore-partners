@@ -310,12 +310,10 @@ codeunit 6184804 "NPR Spfy Capture Payment"
     var
         PaymentMethod: Record "Payment Method";
         SpfyOrderMgt: Codeunit "NPR Spfy Order Mgt.";
-        ShopifyPmtGateway: Text;
     begin
-        ShopifyPmtGateway := JsonHelper.GetJText(Transaction, 'gateway', false);
-        SpfyOrderMgt.GetPaymentMapping(ShopifyPmtGateway, ShopifyStoreCode, PaymentMapping);
+        SpfyOrderMgt.GetPaymentMapping(Transaction, ShopifyStoreCode, PaymentMapping);
         PaymentMapping.TestField("Payment Method Code");
-        PaymentMethod.get(PaymentMapping."Payment Method Code");
+        PaymentMethod.Get(PaymentMapping."Payment Method Code");
 
         PaymentLine.Init();
         PaymentLine."Line No." := PaymentLine."Line No." + 10000;

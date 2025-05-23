@@ -6,6 +6,7 @@
     SourceTable = "NPR Magento Payment Mapping";
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
+    DelayedInsert = true;
 
     layout
     {
@@ -22,6 +23,11 @@
                 {
                     ToolTip = 'Specifies the value of the External Payment Type field';
                     ApplicationArea = NPRRetail;
+
+                    trigger OnAssistEdit()
+                    begin
+                        Rec.AssistEditExternalPaymentType();
+                    end;
                 }
                 field("Payment Method Code"; Rec."Payment Method Code")
                 {

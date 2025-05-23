@@ -45,4 +45,12 @@
         {
         }
     }
+
+    internal procedure AssistEditExternalPaymentType()
+    var
+        ExternalPaymentTypeID: Record "NPR External Payment Type ID";
+    begin
+        if Page.RunModal(0, ExternalPaymentTypeID) = Action::LookupOK then
+            "External Payment Type" := ExternalPaymentTypeID."External Payment Type ID";
+    end;
 }
