@@ -82,7 +82,6 @@
             Caption = 'API Password Key';
             DataClassification = EndUserPseudonymousIdentifiers;
         }
-
         field(117; "OAuth2 Setup Code"; Code[20])
         {
             DataClassification = CustomerContent;

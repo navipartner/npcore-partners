@@ -1,10 +1,10 @@
-﻿page 6151027 "NPR NpRv Partner Card"
+﻿page 6151024 "NPR NpRv Global Voucher Setup"
 {
-    Extensible = False;
-    Caption = 'Retail Voucher Partner';
-    PageType = Card;
+    Extensible = true;
     UsageCategory = None;
-    SourceTable = "NPR NpRv Partner";
+    Caption = 'Global Voucher Setup';
+    InsertAllowed = false;
+    SourceTable = "NPR NpRv Global Vouch. Setup";
 
     layout
     {
@@ -15,23 +15,12 @@
                 group(Control6014407)
                 {
                     ShowCaption = false;
-                    field("Code"; Rec.Code)
+                    field("Service Company Name"; Rec."Service Company Name")
                     {
 
-                        ShowMandatory = true;
-                        ToolTip = 'Specifies the value of the Code field';
+                        ToolTip = 'Specifies the value of the Service Company Name field';
                         ApplicationArea = NPRRetail;
                     }
-                    field(Name; Rec.Name)
-                    {
-
-                        ToolTip = 'Specifies the value of the Name field';
-                        ApplicationArea = NPRRetail;
-                    }
-                }
-                group(Control6014408)
-                {
-                    ShowCaption = false;
                     field("Service Url"; Rec."Service Url")
                     {
 
@@ -39,7 +28,6 @@
                         ToolTip = 'Specifies the value of the Service Url field';
                         ApplicationArea = NPRRetail;
                     }
-
                     group(Authorization)
                     {
                         Caption = 'Authorization';
@@ -53,7 +41,6 @@
                                 CurrPage.Update();
                             end;
                         }
-
                         group(BasicAuth)
                         {
                             ShowCaption = false;
@@ -64,11 +51,11 @@
                                 ToolTip = 'Specifies the value of the Service Username field';
                                 ApplicationArea = NPRRetail;
                             }
-                            field("Service Password"; pw)
+                            field("API Password"; pw)
                             {
                                 ToolTip = 'Specifies the value of the User Password field';
                                 ApplicationArea = NPRRetail;
-                                Caption = 'Service Password';
+                                Caption = 'API Password';
                                 ExtendedDatatype = Masked;
                                 trigger OnValidate()
                                 begin
@@ -92,6 +79,8 @@
                             }
                         }
                     }
+
+
                 }
             }
         }
@@ -101,23 +90,23 @@
     {
         area(processing)
         {
-            action("Validate Partner Setup")
+            action("Validate Global Voucher Setup")
             {
-                Caption = 'Validate Partner Setup';
+                Caption = 'Validate Global Voucher Setup';
                 Image = Approve;
                 Promoted = true;
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
 
-                ToolTip = 'Executes the Validate Partner Setup action';
+                ToolTip = 'Executes the Validate Global Voucher Setup action';
                 ApplicationArea = NPRRetail;
 
                 trigger OnAction()
                 var
-                    NpRvPartnerMgt: Codeunit "NPR NpRv Partner Mgt.";
+                    NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
                 begin
-                    if NpRvPartnerMgt.TryValidateGlobalVoucherService(Rec) then
+                    if NpRvVoucherMgt.TryValidateGlobalVoucherSetup(Rec) then
                         Message(Text001)
                     else
                         Error(GetLastErrorText);
@@ -125,6 +114,14 @@
             }
         }
     }
+
+    trigger OnQueryClosePage(CloseAction: Action): Boolean
+    var
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+    begin
+        if not NpRvVoucherMgt.TryValidateGlobalVoucherSetup(Rec) then
+            exit(Confirm(Text000, false));
+    end;
 
     trigger OnOpenPage()
     begin
@@ -139,20 +136,11 @@
         WebServiceAuthHelper.SetAuthenticationFieldsVisibility(Rec.AuthType, IsBasicAuthVisible, IsOAuth2Visible);
     end;
 
-    trigger OnQueryClosePage(CloseAction: Action): Boolean
-    var
-        NpRvPartnerMgt: Codeunit "NPR NpRv Partner Mgt.";
-    begin
-        if not NpRvPartnerMgt.TryValidateGlobalVoucherService(Rec) then
-            exit(Confirm(Text000, false));
-    end;
-
     var
         pw: Text[200];
-
         IsBasicAuthVisible, IsOAuth2Visible : Boolean;
         WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
-        Text000: Label 'Error in Partner Setup\\Close anway?';
-        Text001: Label 'Partner Setup validated successfully';
+        Text000: Label 'Error in Global Voucher Setup\\Close anway?';
+        Text001: Label 'Global Voucher Setup validated successfully';
 }
 
