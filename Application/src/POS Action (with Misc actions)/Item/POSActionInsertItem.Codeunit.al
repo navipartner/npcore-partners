@@ -111,6 +111,8 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
                 FrontEnd.WorkflowResponse(AssignLotNo(Context, Setup));
             'cancelTicketItemLine':
                 CancelTicketItemLine(Context);
+            'getCurrentItemPriceCaption':
+                FrontEnd.WorkflowResponse(GetCurrentItemPriceCaption(Context, Sale));
         end;
     end;
 
@@ -634,6 +636,33 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         POSParameterValue.CopyFilters(TempPOSParameterValue);
     end;
 
+    local procedure GetCurrentItemPriceCaption(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"): Text
+    var
+        ItemIdentifier: Text;
+        ItemIdentifierType: Integer;
+        POSActionInsertItemB: Codeunit "NPR POS Action: Insert Item B";
+        Item: Record Item;
+        ItemReference: Record "Item Reference";
+        ItemPrice: Decimal;
+        Currency: Record Currency;
+    begin
+        ItemIdentifier := Context.GetStringParameter('itemNo');
+        ItemIdentifierType := Context.GetIntegerParameter('itemIdentifierType');
+
+        if (ItemIdentifierType < 0) then
+            ItemIdentifierType := 0;
+
+        Item.SetLoadFields("No.", "VAT Bus. Posting Gr. (Price)", "Unit Price", "NPR Ticket Type");
+        if (not POSActionInsertItemB.TryGetItem(Item, ItemReference, ItemIdentifier, ItemIdentifierType)) then
+            exit;
+
+        ItemPrice := POSActionInsertItemB.CalculateItemPrice(Item, ItemReference, Sale);
+
+        Currency.InitRoundingPrecision();
+
+        exit(Format(Round(ItemPrice, Currency."Amount Rounding Precision")));
+    end;
+
     procedure ActionCode(): Text
     begin
         exit(Format(enum::"NPR POS Workflow"::ITEM));
@@ -892,7 +921,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionInsertItem.js###
-'let main=async({workflow:o,context:i,popup:e,parameters:n,captions:t})=>{debugger;if(i.additionalInformationCollected=!1,!(n.EditDescription&&(i.desc1=await e.input({title:t.editDesc_title,caption:t.editDesc_lead,value:i.defaultDescription}),i.desc1===null))&&!(n.EditDescription2&&(i.desc2=await e.input({title:t.editDesc2_title,caption:t.editDesc2_lead,value:i.defaultDescription}),i.desc2===null))){var{bomComponentLinesWithoutSerialLotNo:a,requiresUnitPriceInputPrompt:s,requiresSerialNoInputPrompt:l,requiresLotNoInputPrompt:r,requiresAdditionalInformationCollection:L,addItemAddOn:d,baseLineNo:N,postAddWorkflows:u,ticketToken:m}=await o.respond("addSalesLine");if(m){const c=await o.run("TM_SCHEDULE_SELECT",{context:{TicketToken:m,EditSchedule:!0}});debugger;if(c.cancel){await o.respond("cancelTicketItemLine");return}}if(L){if(s&&(i.unitPriceInput=await e.numpad({title:t.UnitPriceTitle,caption:t.unitPriceCaption}),i.unitPriceInput===null)||l&&(i.serialNoInput=await e.input({title:t.itemTracking_title,caption:t.itemTracking_lead}),i.serialNoInput===null)||r&&(i.lotNoInput=await e.input({title:t.itemTrackingLotNo_title,caption:t.itemTrackingLot_lead}),i.lotNoInput===null))return;i.additionalInformationCollected=!0;var{bomComponentLinesWithoutSerialLotNo:a,addItemAddOn:d,baseLineNo:N,postAddWorkflows:u}=await o.respond("addSalesLine")}if(await processBomComponentLinesWithoutSerialNoLotNo(a,o,i,n,e,t),d&&(await o.run("RUN_ITEM_ADDONS",{context:{baseLineNo:N},parameters:{SkipItemAvailabilityCheck:!0}}),await o.respond("checkAvailability")),u)for(const c of Object.entries(u)){let[S,f]=c;S&&await o.run(S,{parameters:f})}}};async function processBomComponentLinesWithoutSerialNoLotNo(o,i,e,n,t,a){if(!!o){debugger;for(var s=0;s<o.length;s++){let l=!0,r;for(;l;)l=!1,e.serialNoInput="",e.lotNoInput="",e.bomComponentLineWithoutSerialLotNo=o[s],e.bomComponentLineWithoutSerialLotNo.requiresSerialNoInput&&(n.SelectSerialNo&&!n.SelectSerialNoListEmptyInput&&e.bomComponentLineWithoutSerialLotNo.useSpecTrackingSerialNo?(r=await i.respond("assignSerialNo"),!r.assignSerialNoSuccess&&r.assignSerialNoSuccessErrorText&&await t.confirm({title:a.serialNoError_title,caption:r.assignSerialNoSuccessErrorText})&&(l=!0)):(e.serialNoInput=await t.input({title:a.itemTracking_title,caption:format(a.bomItemTracking_Lead,e.bomComponentLineWithoutSerialLotNo.description,e.bomComponentLineWithoutSerialLotNo.parentBOMDescription)}),(e.serialNoInput||n.SelectSerialNoListEmptyInput)&&(r=await i.respond("assignSerialNo"),!r.assignSerialNoSuccess&&r.assignSerialNoSuccessErrorText&&await t.confirm({title:a.serialNoError_title,caption:r.assignSerialNoSuccessErrorText})&&(l=!0)))),e.bomComponentLineWithoutSerialLotNo.requiresLotNoInput&&(n.SelectLotNo==1&&e.bomComponentLineWithoutSerialLotNo.useSpecTrackingLotNo?(r=await i.respond("assignLotNo"),!r.assignLotNoSuccess&&r.assignLotNoSuccessErrorText&&await t.confirm({title:a.lotNoError_title,caption:r.assignLotNoSuccessErrorText})&&(l=!0)):(e.lotNoInput=await t.input({title:a.ItemTrackingLot_TitleLbl,caption:format(a.bomItemTrackingLot_Lead,e.bomComponentLineWithoutSerialLotNo.description,e.bomComponentLineWithoutSerialLotNo.parentBOMDescription)}),(e.lotNoInput||n.SelectLotNo==2)&&(r=await i.respond("assignLotNo"),!r.assignLotNoSuccess&&r.assignLotNoSuccessErrorText&&await t.confirm({title:a.lotNoError_title,caption:r.assignLotNoSuccessErrorText})&&(l=!0))))}}}function format(o,...i){if(!o.match(/^(?:(?:(?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{[0-9]+\}))+$/))throw new Error("invalid format string.");return o.replace(/((?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{([0-9]+)\})/g,(e,n,t)=>{if(n)return n.replace(/(?:{{)|(?:}})/g,a=>a[0]);if(t>=i.length)throw new Error("argument index is out of range in format");return i[t]})}'
+'const DYNAMIC_CAPTION_CURR_PRICE="#CURRPRICE#",DYNAMIC_CAPTION_HAS_CURR_PRICE=1;let main=async({workflow:r,context:i,popup:e,parameters:n,captions:t})=>{debugger;if(i.additionalInformationCollected=!1,!(n.EditDescription&&(i.desc1=await e.input({title:t.editDesc_title,caption:t.editDesc_lead,value:i.defaultDescription}),i.desc1===null))&&!(n.EditDescription2&&(i.desc2=await e.input({title:t.editDesc2_title,caption:t.editDesc2_lead,value:i.defaultDescription}),i.desc2===null))){var{bomComponentLinesWithoutSerialLotNo:a,requiresUnitPriceInputPrompt:l,requiresSerialNoInputPrompt:s,requiresLotNoInputPrompt:o,requiresAdditionalInformationCollection:p,addItemAddOn:d,baseLineNo:N,postAddWorkflows:u,ticketToken:S}=await r.respond("addSalesLine");if(S){const c=await r.run("TM_SCHEDULE_SELECT",{context:{TicketToken:S,EditSchedule:!0}});debugger;if(c.cancel){await r.respond("cancelTicketItemLine");return}}if(p){if(l&&(i.unitPriceInput=await e.numpad({title:t.UnitPriceTitle,caption:t.unitPriceCaption}),i.unitPriceInput===null)||s&&(i.serialNoInput=await e.input({title:t.itemTracking_title,caption:t.itemTracking_lead}),i.serialNoInput===null)||o&&(i.lotNoInput=await e.input({title:t.itemTrackingLotNo_title,caption:t.itemTrackingLot_lead}),i.lotNoInput===null))return;i.additionalInformationCollected=!0;var{bomComponentLinesWithoutSerialLotNo:a,addItemAddOn:d,baseLineNo:N,postAddWorkflows:u}=await r.respond("addSalesLine")}if(await processBomComponentLinesWithoutSerialNoLotNo(a,r,i,n,e,t),d&&(await r.run("RUN_ITEM_ADDONS",{context:{baseLineNo:N},parameters:{SkipItemAvailabilityCheck:!0}}),await r.respond("checkAvailability")),u)for(const c of Object.entries(u)){let[m,f]=c;m&&await r.run(m,{parameters:f})}}};const getButtonCaption=async({workflow:r,context:i})=>{debugger;const e=getDynamicCaptionTypes(i.currentCaptions);if(e.length<=0)return i.currentCaptions;let n={...i.currentCaptions};if(e.includes(1)){const t=await r.respondInNewSession("getCurrentItemPriceCaption");t&&(n.caption=n.caption?.replace(DYNAMIC_CAPTION_CURR_PRICE,t),n.secondCaption=n.secondCaption?.replace(DYNAMIC_CAPTION_CURR_PRICE,t),n.thirdCaption=n.thirdCaption?.replace(DYNAMIC_CAPTION_CURR_PRICE,t))}return n};function getDynamicCaptionTypes(r){const i=[];return(r.caption?.includes(DYNAMIC_CAPTION_CURR_PRICE)||r.secondCaption?.includes(DYNAMIC_CAPTION_CURR_PRICE)||r.thirdCaption?.includes(DYNAMIC_CAPTION_CURR_PRICE))&&i.push(1),i}async function processBomComponentLinesWithoutSerialNoLotNo(r,i,e,n,t,a){if(r){debugger;for(var l=0;l<r.length;l++){let s=!0,o;for(;s;)s=!1,e.serialNoInput="",e.lotNoInput="",e.bomComponentLineWithoutSerialLotNo=r[l],e.bomComponentLineWithoutSerialLotNo.requiresSerialNoInput&&(n.SelectSerialNo&&!n.SelectSerialNoListEmptyInput&&e.bomComponentLineWithoutSerialLotNo.useSpecTrackingSerialNo?(o=await i.respond("assignSerialNo"),!o.assignSerialNoSuccess&&o.assignSerialNoSuccessErrorText&&await t.confirm({title:a.serialNoError_title,caption:o.assignSerialNoSuccessErrorText})&&(s=!0)):(e.serialNoInput=await t.input({title:a.itemTracking_title,caption:format(a.bomItemTracking_Lead,e.bomComponentLineWithoutSerialLotNo.description,e.bomComponentLineWithoutSerialLotNo.parentBOMDescription)}),(e.serialNoInput||n.SelectSerialNoListEmptyInput)&&(o=await i.respond("assignSerialNo"),!o.assignSerialNoSuccess&&o.assignSerialNoSuccessErrorText&&await t.confirm({title:a.serialNoError_title,caption:o.assignSerialNoSuccessErrorText})&&(s=!0)))),e.bomComponentLineWithoutSerialLotNo.requiresLotNoInput&&(n.SelectLotNo==1&&e.bomComponentLineWithoutSerialLotNo.useSpecTrackingLotNo?(o=await i.respond("assignLotNo"),!o.assignLotNoSuccess&&o.assignLotNoSuccessErrorText&&await t.confirm({title:a.lotNoError_title,caption:o.assignLotNoSuccessErrorText})&&(s=!0)):(e.lotNoInput=await t.input({title:a.ItemTrackingLot_TitleLbl,caption:format(a.bomItemTrackingLot_Lead,e.bomComponentLineWithoutSerialLotNo.description,e.bomComponentLineWithoutSerialLotNo.parentBOMDescription)}),(e.lotNoInput||n.SelectLotNo==2)&&(o=await i.respond("assignLotNo"),!o.assignLotNoSuccess&&o.assignLotNoSuccessErrorText&&await t.confirm({title:a.lotNoError_title,caption:o.assignLotNoSuccessErrorText})&&(s=!0))))}}}function format(r,...i){if(!r.match(/^(?:(?:(?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{[0-9]+\}))+$/))throw new Error("invalid format string.");return r.replace(/((?:[^{}]|(?:\{\{)|(?:\}\}))+)|(?:\{([0-9]+)\})/g,(e,n,t)=>{if(n)return n.replace(/(?:{{)|(?:}})/g,a=>a[0]);if(t>=i.length)throw new Error("argument index is out of range in format");return i[t]})}'
     )
     end;
 

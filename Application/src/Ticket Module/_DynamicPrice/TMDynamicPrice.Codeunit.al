@@ -229,6 +229,49 @@ codeunit 6014559 "NPR TM Dynamic Price"
         exit((OriginalUnitPrice <> NewTicketPrice) and (NewTicketPrice >= 0));
     end;
 
+    procedure CalculateRequiredTicketUnitPrice(TicketItemNo: Code[20]; TicketVariantCode: Code[10]; var Price: Decimal) HasPrice: Boolean
+    var
+        AdmissionScheduleEntryNo: Integer;
+        BasePrice, AddOnPrice, TicketPrice : Decimal;
+        TicketBOM: Record "NPR TM Ticket Admission BOM";
+        AdmSchEntry: Record "NPR TM Admis. Schedule Entry";
+        TicketTimeHelper: Codeunit "NPR TM TimeHelper";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+        TicketDynamicPrice: Codeunit "NPR TM Dynamic Price";
+        CurrDT: DateTime;
+    begin
+        TicketBOM.SetRange("Item No.", TicketItemNo);
+        TicketBOM.SetRange("Variant Code", TicketVariantCode);
+        TicketBOM.SetRange("Admission Inclusion", TicketBOM."Admission Inclusion"::REQUIRED);
+        if (not TicketBOM.FindSet()) then
+            exit(false);
+
+        repeat
+            CurrDT := TicketTimeHelper.GetLocalTimeAtAdmission(TicketBOM."Admission Code");
+            AdmissionScheduleEntryNo := TicketManagement.GetCurrentScheduleEntry(TicketItemNo, TicketVariantCode, TicketBOM."Admission Code", false, 1);
+            if (AdmissionScheduleEntryNo > 0) then begin
+                AdmSchEntry.SetLoadFields("External Schedule Entry No.");
+                AdmSchEntry.Get(AdmissionScheduleEntryNo);
+
+                TicketDynamicPrice.CalculateScheduleEntryPrice(
+                    TicketItemNo,
+                    TicketVariantCode,
+                    TicketBOM."Admission Code",
+                    AdmSchEntry."External Schedule Entry No.",
+                    DT2Date(CurrDT),
+                    DT2Time(CurrDT),
+                    BasePrice,
+                    AddOnPrice
+               );
+
+                TicketPrice += (BasePrice + AddOnPrice);
+            end;
+        until (TicketBOM.Next() = 0);
+
+        Price := RoundAmount(TicketPrice, 0, 0 /* nearest */);
+        exit(true);
+    end;
+
     procedure CalculateScheduleEntryPrice(TicketItemNo: Code[20]; TicketVariantCode: Code[10]; AdmissionCode: Code[20]; ExternalScheduleEntryNo: Integer; BookingDateDate: Date; BookingTime: Time; var BasePrice: Decimal; var AddonPrice: Decimal) HavePriceRule: Boolean
     var
         Item: Record "Item";

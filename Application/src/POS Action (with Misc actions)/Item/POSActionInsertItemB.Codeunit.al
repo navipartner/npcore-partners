@@ -6,6 +6,12 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         _BaseLineNo: Integer;
         _SkipCalcDiscount: Boolean;
 
+    [TryFunction]
+    procedure TryGetItem(var Item: Record Item; var ItemReference: Record "Item Reference"; ItemIdentifier: Text; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin)
+    begin
+        GetItem(Item, ItemReference, ItemIdentifier, ItemIdentifierType);
+    end;
+
     procedure GetItem(var Item: Record Item; var ItemReference: Record "Item Reference"; ItemIdentifier: Text; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin)
     var
         ItemSearchErrLbl: Label 'Could not find a matching item for input %1';
@@ -613,5 +619,26 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
 
             AddItemLine(Item, TempItemReference, ItemIdentifierType::ItemNo, TempNPRTotalDiscBenItemBuffer.Quantity, UnitPrice, '', '', '', POSSession, FrontEnd, true, TempNPRTotalDiscBenItemBuffer."Total Discount Code", TempNPRTotalDiscBenItemBuffer."Total Discount Step", TempNPRTotalDiscBenItemBuffer."Benefit List Code", '');
         until TempNPRTotalDiscBenItemBuffer.Next() = 0;
+    end;
+
+    internal procedure CalculateItemPrice(Item: Record Item; ItemReference: Record "Item Reference"; Sale: Codeunit "NPR POS Sale"): Decimal
+    var
+        VATBusPostingGroup: Code[20];
+        VATPostingSetup: Record "VAT Posting Setup";
+        POSSale: Record "NPR POS Sale";
+        TicketPrice: Decimal;
+        TicketDynamicPrice: Codeunit "NPR TM Dynamic Price";
+    begin
+        if (Item."NPR Ticket Type" <> '') then
+            if (TicketDynamicPrice.CalculateRequiredTicketUnitPrice(Item."No.", ItemReference."Variant Code", TicketPrice)) then
+                exit(TicketPrice);
+
+        VATBusPostingGroup := Item."VAT Bus. Posting Gr. (Price)";
+        if (VATBusPostingGroup = '') then begin
+            Sale.GetCurrentSale(POSSale);
+            VATBusPostingGroup := POSSale."VAT Bus. Posting Group";
+        end;
+        VATPostingSetup.Get(VATBusPostingGroup, Item."VAT Prod. Posting Group");
+        exit(Item.CalcUnitPriceExclVAT() * ((100 + VATPostingSetup."VAT %") / 100));
     end;
 }

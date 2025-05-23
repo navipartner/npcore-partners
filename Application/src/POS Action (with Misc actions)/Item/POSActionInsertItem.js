@@ -1,3 +1,6 @@
+const DYNAMIC_CAPTION_CURR_PRICE = "#CURRPRICE#";
+const DYNAMIC_CAPTION_HAS_CURR_PRICE = 1;
+
 let main = async ({ workflow, context, popup, parameters, captions }) => {
 
     debugger;
@@ -64,6 +67,41 @@ let main = async ({ workflow, context, popup, parameters, captions }) => {
             };
         };
     };
+}
+
+const getButtonCaption = async ({ workflow, context }) => {
+  debugger;
+  const types = getDynamicCaptionTypes(context.currentCaptions);
+  if (types.length <= 0) {
+    return context.currentCaptions;
+  }
+
+  let captions = { ...context.currentCaptions };
+
+  if (types.includes(DYNAMIC_CAPTION_HAS_CURR_PRICE)) {
+    const currentItemPrice = await workflow.respondInNewSession("getCurrentItemPriceCaption");
+    if (currentItemPrice) {
+      captions.caption = captions.caption?.replace(DYNAMIC_CAPTION_CURR_PRICE, currentItemPrice);
+      captions.secondCaption = captions.secondCaption?.replace(DYNAMIC_CAPTION_CURR_PRICE, currentItemPrice);
+      captions.thirdCaption = captions.thirdCaption?.replace(DYNAMIC_CAPTION_CURR_PRICE, currentItemPrice);
+    }
+  };
+
+  return captions;
+}
+
+function getDynamicCaptionTypes(captions) {
+  const types = [];
+
+  if (
+    captions.caption?.includes(DYNAMIC_CAPTION_CURR_PRICE) ||
+    captions.secondCaption?.includes(DYNAMIC_CAPTION_CURR_PRICE) ||
+    captions.thirdCaption?.includes(DYNAMIC_CAPTION_CURR_PRICE)
+  ) {
+    types.push(DYNAMIC_CAPTION_HAS_CURR_PRICE);
+  }
+
+  return types;
 }
 
 async function processBomComponentLinesWithoutSerialNoLotNo(bomComponentLinesWithoutSerialLotNo, workflow, context, parameters, popup, captions) {
