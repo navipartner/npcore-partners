@@ -6,6 +6,7 @@ page 6185064 "NPR External Payment Type IDs"
     SourceTable = "NPR External Payment Type ID";
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
+    DelayedInsert = true;
 
     layout
     {

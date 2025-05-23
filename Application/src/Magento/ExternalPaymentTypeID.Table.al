@@ -42,4 +42,30 @@
         }
         key(Key2; "Store Code", "Payment Gateway", "Credit Card Company") { }
     }
+
+    trigger OnInsert()
+    begin
+        CheckNoDuplicates();
+    end;
+
+    trigger OnModify()
+    begin
+        CheckNoDuplicates();
+    end;
+
+    local procedure CheckNoDuplicates()
+    var
+        ExternalPaymentTypeID: Record "NPR External Payment Type ID";
+        DuplicateEntryErr: Label 'Another entry with the same %1, %2, and %3 already exists. The duplicate entry ID is %4.', Comment = '%1, %2, %3 - Store code, Payment Gateway, Credit Card Company field captions, %4 - External Payment Type ID of the duplicate entry.';
+    begin
+        if ("Store Code" = '') and ("Payment Gateway" = '') and ("Credit Card Company" = '') then
+            exit;
+        ExternalPaymentTypeID.SetCurrentKey("Store Code", "Payment Gateway", "Credit Card Company");
+        ExternalPaymentTypeID.SetRange("Store Code", "Store Code");
+        ExternalPaymentTypeID.SetRange("Payment Gateway", "Payment Gateway");
+        ExternalPaymentTypeID.SetRange("Credit Card Company", "Credit Card Company");
+        ExternalPaymentTypeID.SetFilter("External Payment Type ID", '<>%1', "External Payment Type ID");
+        if ExternalPaymentTypeID.FindFirst() then
+            Error(DuplicateEntryErr, FieldCaption("Store Code"), FieldCaption("Payment Gateway"), FieldCaption("Credit Card Company"), ExternalPaymentTypeID."External Payment Type ID");
+    end;
 }
