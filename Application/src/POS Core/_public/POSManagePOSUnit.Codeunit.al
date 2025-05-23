@@ -109,6 +109,7 @@
         ClosePeriodRegister(POSUnit."No.", ClosingEntryNo);
 
         POSUnit.Modify();
+        POSUnit.DeleteActiveEventForCurrPOSUnit();
     end;
 
     local procedure ClosePeriodRegister(POSUnitNo: Code[10]; ClosingEntryNo: Integer)
