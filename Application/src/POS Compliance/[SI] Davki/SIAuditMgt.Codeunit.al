@@ -758,6 +758,7 @@ codeunit 6151546 "NPR SI Audit Mgt."
                 exit(false);
             if StrLen(ResponseText) = 32 then
                 exit(true);
+            Sleep(1000);
         end;
     end;
 
