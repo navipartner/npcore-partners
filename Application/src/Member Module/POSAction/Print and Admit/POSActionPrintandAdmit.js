@@ -5,6 +5,7 @@ const main = async ({
   context,
   captions,
   toast,
+  i,
 }) => {
   if (!parameters.reference_input) {
     context.reference_input = await popup.input({
@@ -20,7 +21,30 @@ const main = async ({
   }
 
   const result = await workflow.respond("fill_data");
-  const response = await workflow.respond("handle_data", {
+
+  const actiontryadmit = await workflow.respond("try_admit", {
+    buffer_data: result,
+  });
+  if (actiontryadmit.unconfirmedGroup) 
+{
+    const defaultQtyArray = actiontryadmit.defaultQuantityUnconfirmed; 
+    context.quantityToAdmUnconfirmedGroup = [];   
+    for (const defQty of defaultQtyArray)
+{
+      const quantityToAdmUnconfirmed = await popup.numpad({
+      caption: captions.QuantityAdmitLbl,
+      title: captions.QuantityAdmitLbl, 
+      value: defQty.defaultQuantity});
+      
+      context.quantityToAdmUnconfirmedGroup.push({token: defQty.token, qtytoAdmit: quantityToAdmUnconfirmed});
+}
+  } else
+ {
+    context.quantityToAdmUnconfirmedGroup = [];
+}
+
+  const response = await workflow.respond("handle_admit_print", {
+    admit_data: actiontryadmit,
     buffer_data: result,
   });
 
@@ -54,3 +78,4 @@ const main = async ({
     await popup.error(`${captions.printingFailed} ${response.printErrorMsg}`);
   }
 };
+

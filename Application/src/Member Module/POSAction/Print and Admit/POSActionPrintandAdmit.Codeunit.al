@@ -16,6 +16,7 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
         ShowDataDescrLbl: Label 'Shows the data that is going to be printed and/or admitted';
         WelcomeMsgLbl: Label 'Welcome';
         PrintFailedErrLabl: Label 'Printing of one or more references did not succeed.';
+        QtyToAdmitLbl: Label 'Quantity to Admit';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
@@ -27,6 +28,7 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
         WorkflowConfig.AddLabel('ReferenceCaption', ReferenceCaptionLbl);
         WorkflowConfig.AddLabel('welcomeMsg', WelcomeMsgLbl);
         WorkflowConfig.AddLabel('printingFailed', PrintFailedErrLabl);
+        WorkflowConfig.AddLabel('QuantityAdmitLbl', QtyToAdmitLbl);
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
@@ -34,8 +36,10 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
         case Step of
             'fill_data':
                 FrontEnd.WorkflowResponse(FillData(Context));
-            'handle_data':
-                FrontEnd.WorkflowResponse(HandleData(Context));
+            'try_admit':
+                FrontEnd.WorkflowResponse(HandleTryAdmit(Context));
+            'handle_admit_print':
+                FrontEnd.WorkflowResponse(HandlePrintAndAdmit(Context));
         end;
     end;
 
@@ -59,15 +63,14 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
         exit(BufferTableToJson(PrintandAdmitBuffer));
     end;
 
-    local procedure HandleData(Context: Codeunit "NPR POS JSON Helper") WorkflowResponse: JsonObject
+    local procedure HandleTryAdmit(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
     var
         PrintandAdmitBuffer: Record "NPR Print and Admit Buffer";
         PrintandAdmitPublic: Codeunit "NPR Print and Admit Public";
         JArray: JsonArray;
-        ShowDataPrintAdmit: Boolean;
-        AdmittedReferences: JsonArray;
-        TryPrint: Codeunit "NPR PrintAdmitTryPrint";
-        PrintSuccessful: Boolean;
+        TryAdmitArray: JsonArray;
+        UnconfirmedGroup, ShowDataPrintAdmit : Boolean;
+        DefaultQtyGroupUnconfirmedArray: JsonArray;
     begin
         JArray := Context.GetJToken('buffer_data').AsArray();
         JsonToBufferTable(JArray, PrintandAdmitBuffer);
@@ -78,12 +81,62 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
             exit;
         PrintandAdmitPublic.OnBeforeHandleBuffer(PrintandAdmitBuffer);
 
-        HandleAdmit(PrintandAdmitBuffer, Context, AdmittedReferences);
+        TryAdmit(PrintandAdmitBuffer, Context, UnconfirmedGroup, DefaultQtyGroupUnconfirmedArray, TryAdmitArray);
+
+        Response.Add('unconfirmedGroup', UnconfirmedGroup);
+        Response.Add('defaultQuantityUnconfirmed', DefaultQtyGroupUnconfirmedArray);
+        Response.Add('tokens', TryAdmitArray);
+    end;
+
+    local procedure TryAdmit(var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer"; Context: Codeunit "NPR POS JSON Helper";
+                            var UnconfirmedGroup: Boolean; var DefaultQtyGroupUnconfirmed: JsonArray; var TryAdmitArray: JsonArray)
+    var
+        AdmissionCode: Code[20];
+        ScannerId: Code[10];
+    begin
+#pragma warning disable AA0139
+        AdmissionCode := Context.GetStringParameter('AdmissionCode');
+        ScannerId := Context.GetStringParameter('ScannerId');
+#pragma warning restore AA0139
+        PrintandAdmitBuffer.SetRange(Admit, true);
+        if PrintandAdmitBuffer.FindSet() then
+            repeat
+                case PrintandAdmitBuffer.Type of
+                    PrintandAdmitBuffer.Type::TICKET:
+                        TryAdmitTicket(PrintandAdmitBuffer, AdmissionCode, ScannerId, UnconfirmedGroup, DefaultQtyGroupUnconfirmed, TryAdmitArray);
+
+                    PrintandAdmitBuffer.Type::MEMBER_CARD:
+                        TryAdmitMemberCard(PrintandAdmitBuffer, AdmissionCode, ScannerId, TryAdmitArray);
+
+                    PrintandAdmitBuffer.Type::ATTRACTION_WALLET:
+                        TryAdmitWallet(PrintandAdmitBuffer, AdmissionCode, ScannerId, UnconfirmedGroup, DefaultQtyGroupUnconfirmed, TryAdmitArray);
+                end;
+            until PrintandAdmitBuffer.Next() = 0;
+        PrintandAdmitBuffer.SetRange(Admit);
+    end;
+
+    local procedure HandlePrintAndAdmit(Context: Codeunit "NPR POS JSON Helper") WorkflowResponse: JsonObject
+    var
+        PrintandAdmitBuffer: Record "NPR Print and Admit Buffer";
+        JArray: JsonArray;
+        JObject: JsonObject;
+        AdmittedReferences: JsonArray;
+        TryPrint: Codeunit "NPR PrintAdmitTryPrint";
+        PrintSuccessful: Boolean;
+        JTok: JsonToken;
+    begin
+        JObject := Context.GetJToken('admit_data').AsObject();
+        if JObject.Get('tokens', JTok) then
+            JArray := JTok.AsArray();
+
+        HandleAdmit(JArray, Context, AdmittedReferences);
         WorkflowResponse.Add('admittedReferences', AdmittedReferences);
 
         // Regardless of what might happen with the print we want to commit the admits
         Commit();
-
+        Clear(JArray);
+        JArray := Context.GetJToken('buffer_data').AsArray();
+        JsonToBufferTable(JArray, PrintandAdmitBuffer);
         PrintSuccessful := TryPrint.Run(PrintandAdmitBuffer);
         WorkflowResponse.Add('printSuccessful', PrintSuccessful);
         if (not PrintSuccessful) then
@@ -260,7 +313,6 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
                         AddTicketToBuffer(Ticket, PrintandAdmitBuffer);
                     until (Ticket.Next() = 0);
             until (TicketReservationRequest.Next() = 0);
-
     end;
 
     local procedure SetPrintAdmit(ItemNo: Code[20]; var Print: Boolean; var Admit: Boolean)
@@ -296,72 +348,166 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
             exit(MembershipEntry."Item No.");
     end;
 
-    local procedure HandleAdmit(var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer"; Context: Codeunit "NPR POS JSON Helper"; var AdmittedReferences: JsonArray)
+    local procedure HandleAdmit(JTokensArray: JsonArray; Context: Codeunit "NPR POS JSON Helper"; var AdmittedReferences: JsonArray)
     var
-        AdmissionCode: Code[20];
-        ScannerId: Code[10];
-        AdmittedReference, MemberDetails : JsonObject;
-        TableCaption: Text;
         DummyTicket: Record "NPR TM Ticket";
         DummyMemberCard: Record "NPR MM Member Card";
         DummyWallet: Record "NPR AttractionWallet";
+        JsonHelper: Codeunit "NPR Json Helper";
+        AdmittedReference, MemberDetails : JsonObject;
+        TableCaption: Text;
+        Type, QuantityToAdmit, QtyToAdmitUnconfirmedGroup : Integer;
+        Token, SystemId, TokenUnconfirmedGoup : Guid;
+        QtyUnconfirmedTok, QtyToken, JToken : JsonToken;
+        QtyUnconfirmedArray: JsonArray;
+        VisualId: Text[250];
     begin
-#pragma warning disable AA0139
-        AdmissionCode := Context.GetStringParameter('AdmissionCode');
-        ScannerId := Context.GetStringParameter('ScannerId');
-#pragma warning restore AA0139
-        PrintandAdmitBuffer.SetRange(Admit, true);
-        if PrintandAdmitBuffer.FindSet() then
-            repeat
-                case PrintandAdmitBuffer.Type of
-                    PrintandAdmitBuffer.Type::TICKET:
-                        begin
-                            AdmitTicket(PrintandAdmitBuffer, AdmissionCode, ScannerId);
-                            TableCaption := DummyTicket.TableCaption();
-                        end;
-                    PrintandAdmitBuffer.Type::MEMBER_CARD:
-                        begin
-                            AdmitMemberCard(PrintandAdmitBuffer, AdmissionCode, ScannerId, MemberDetails);
-                            TableCaption := DummyMemberCard.TableCaption();
-                        end;
-                    PrintandAdmitBuffer.Type::ATTRACTION_WALLET:
-                        begin
-                            AdmitWallet(PrintandAdmitBuffer, AdmissionCode, ScannerId);
-                            TableCaption := DummyWallet.TableCaption();
-                        end;
-                end;
+        QtyUnconfirmedTok := Context.GetJToken('quantityToAdmUnconfirmedGroup');
+        QtyUnconfirmedArray := QtyUnconfirmedTok.AsArray();
 
-                Clear(AdmittedReference);
-                AdmittedReference.Add('type', PrintandAdmitBuffer.Type);
-                AdmittedReference.Add('tableCaption', TableCaption);
-                AdmittedReference.Add('referenceId', PrintandAdmitBuffer."Visual Id");
+        foreach JToken in JTokensArray do begin
+            Type := JsonHelper.GetJInteger(JToken, 'type', false);
+            Token := JsonHelper.GetJText(JToken, 'token', false);
+            SystemId := JsonHelper.GetJText(JToken, 'systemId', false);
+            VisualId := CopyStr(JsonHelper.GetJText(JToken, 'visualId', false), 1, MaxStrLen(VisualId));
+            QuantityToAdmit := JsonHelper.GetJInteger(JToken, 'quantityToAdmit', false);
 
-                if (PrintandAdmitBuffer.Type = PrintandAdmitBuffer.Type::MEMBER_CARD) then
-                    AdmittedReference.Add('memberDetails', MemberDetails);
+            foreach QtyToken in QtyUnconfirmedArray do begin
+                TokenUnconfirmedGoup := JsonHelper.GetJText(QtyToken, 'token', false);
+                QtyToAdmitUnconfirmedGroup := JsonHelper.GetJInteger(QtyToken, 'qtytoAdmit', false);
+                if TokenUnconfirmedGoup = Token then
+                    QuantityToAdmit := QtyToAdmitUnconfirmedGroup
+            end;
 
-                AdmittedReferences.Add(AdmittedReference);
-            until PrintandAdmitBuffer.Next() = 0;
-        PrintandAdmitBuffer.SetRange(Admit);
+            if QuantityToAdmit < 1 then
+                QuantityToAdmit := 1;
+
+            case
+                Type of
+                0: //Ticket
+                    begin
+                        AdmitTicket(Token, SystemId, QuantityToAdmit);
+                        TableCaption := DummyTicket.TableCaption();
+                    end;
+                1: //Member Card
+                    begin
+                        AdmitMemberCard(Token, SystemId, MemberDetails);
+                        TableCaption := DummyMemberCard.TableCaption();
+                    end;
+                2: //AttractionWallet
+                    begin
+                        AdmitWallet(Token, SystemId);
+                        TableCaption := DummyWallet.TableCaption();
+                    end;
+            end;
+
+            Clear(AdmittedReference);
+            AdmittedReference.Add('type', Type);
+            AdmittedReference.Add('tableCaption', TableCaption);
+            AdmittedReference.Add('referenceId', VisualId);
+
+            if (Type = 1) then
+                AdmittedReference.Add('memberDetails', MemberDetails);
+
+            AdmittedReferences.Add(AdmittedReference);
+        end;
     end;
 
-    local procedure AdmitTicket(PrintandAdmitBuffer: Record "NPR Print and Admit Buffer"; AdmissionCode: Code[20]; ScannerId: Code[10])
+    local procedure TryAdmitTicket(PrintandAdmitBuffer: Record "NPR Print and Admit Buffer"; AdmissionCode: Code[20];
+                                    ScannerId: Code[10]; var UnconfirmedGroup: Boolean; var DefaultQtyGroupUnconfirmed: JsonArray;
+                                     var TryAdmitArray: JsonArray)
     var
         Ticket: Record "NPR TM Ticket";
         SpeedGate: Codeunit "NPR SG SpeedGate";
+        HaveError: Boolean;
+        ErrorMessage: Text;
+        AdmitToken: Guid;
     begin
         if not (PrintandAdmitBuffer.Admit and (PrintandAdmitBuffer.Type = PrintandAdmitBuffer.Type::TICKET)) then
             exit;
-        if Ticket.GetBySystemId(PrintandAdmitBuffer."System Id") then
-            SpeedGate.Admit(SpeedGate.CreateAdmitToken(Ticket."External Ticket No.", AdmissionCode, ScannerId), 1);
+        if Ticket.GetBySystemId(PrintandAdmitBuffer."System Id") then begin
+            AdmitToken := SpeedGate.CreateAdmitToken(Ticket."External Ticket No.", AdmissionCode, ScannerId, false, HaveError, ErrorMessage);
+
+            CheckGroupTicket(PrintandAdmitBuffer, AdmitToken, UnconfirmedGroup, DefaultQtyGroupUnconfirmed, TryAdmitArray);
+        end;
     end;
 
-    local procedure AdmitMemberCard(PrintandAdmitBuffer: Record "NPR Print and Admit Buffer"; AdmissionCode: Code[20]; ScannerId: Code[10]; var AdmittedMemberDetails: JsonObject)
+    local procedure CheckGroupTicket(PrintandAdmitBuffer: Record "NPR Print and Admit Buffer"; AdmitToken: Guid; var UnconfirmedGroup: Boolean;
+                                     var DefaultQtyGroupUnconfirmed: JsonArray; var TryAdmitArray: JsonArray)
+    var
+        ValidationRequest: Record "NPR SGEntryLog";
+        DetAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        AccessEntry: Record "NPR TM Ticket Access Entry";
+        Ticket: Record "NPR TM Ticket";
+        BlankGuid: Guid;
+        AdmitCount, GroupQuantity : Integer;
+        IsGroup: Boolean;
+        ConfirmedGroup: Boolean;
+    begin
+        if AdmitToken <> BlankGuid then begin
+            ValidationRequest.SetCurrentKey(Token);
+            ValidationRequest.SetFilter(Token, '=%1', AdmitToken);
+            if ValidationRequest.FindFirst() then
+                if (Ticket.GetBySystemId(ValidationRequest.EntityId)) then begin
+                    AccessEntry.SetCurrentKey("Ticket No.");
+                    AccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+                    AccessEntry.SetFilter("Admission Code", '=%1', ValidationRequest.AdmissionCode);
+                    if AccessEntry.FindFirst() then begin
+                        DetAccessEntry.SetFilter("Ticket Access Entry No.", '=%1', AccessEntry."Entry No.");
+                        DetAccessEntry.SetFilter(Type, '=%1', DetAccessEntry.Type::ADMITTED);
+                        DetAccessEntry.SetFilter(Quantity, '>%1', 0);
+                        AdmitCount := DetAccessEntry.Count;
+                        GroupQuantity := AccessEntry.Quantity;
+                        if (GroupQuantity > 1) then begin
+                            IsGroup := true;
+                            if (AdmitCount > 0) then
+                                ConfirmedGroup := true
+                            else
+                                UnconfirmedGroup := true;
+                        end;
+                    end;
+                end;
+
+            BuildArrays(PrintandAdmitBuffer, DefaultQtyGroupUnconfirmed, TryAdmitArray, AdmitToken, IsGroup, ConfirmedGroup, ValidationRequest.SuggestedQuantity);
+        end;
+    end;
+
+    local procedure BuildArrays(PrintandAdmitBuffer: Record "NPR Print and Admit Buffer"; var DefaultQtyGroupUnconfirmed: JsonArray;
+                                 var TryAdmitArray: JsonArray; AdmitToken: Guid; IsGroup: Boolean; ConfirmedGroup: Boolean; SuggestedQty: Integer)
+    var
+        TryAdmitObj, DefaultQtyObject : JsonObject;
+    begin
+        Clear(TryAdmitObj);
+        TryAdmitObj.Add('token', AdmitToken);
+        if IsGroup then begin
+            if ConfirmedGroup then
+                TryAdmitObj.Add('quantityToAdmit', SuggestedQty)
+            else begin
+                TryAdmitObj.Add('quantityToAdmit', -1);
+                Clear(DefaultQtyObject);
+                DefaultQtyObject.Add('token', AdmitToken);
+                DefaultQtyObject.Add('defaultQuantity', SuggestedQty);
+                DefaultQtyGroupUnconfirmed.Add(DefaultQtyObject);
+            end;
+        end else
+            TryAdmitObj.Add('quantityToAdmit', 1);
+
+        TryAdmitObj.Add('type', 0);
+        TryAdmitObj.Add('visualId', PrintandAdmitBuffer."Visual Id");
+        TryAdmitObj.Add('systemId', PrintandAdmitBuffer."System Id");
+        TryAdmitArray.Add(TryAdmitObj);
+    end;
+
+    local procedure TryAdmitMemberCard(PrintandAdmitBuffer: Record "NPR Print and Admit Buffer"; AdmissionCode: Code[20]; ScannerId: Code[10]; var TryAdmitArray: JsonArray)
     var
         MemberCard: Record "NPR MM Member Card";
         SpeedGate: Codeunit "NPR SG SpeedGate";
-        POSActionMemberArrival: Codeunit "NPR POS Action: MM Member ArrB";
+        TryAdmitObj: JsonObject;
+        HaveError: Boolean;
+        ErrorMessage: Text;
+        AdmitToken: Guid;
+        PrintAdmitType: Integer;
     begin
-        Clear(AdmittedMemberDetails);
         if not (PrintandAdmitBuffer.Admit and (PrintandAdmitBuffer.Type = PrintandAdmitBuffer.Type::MEMBER_CARD)) then
             exit;
 
@@ -369,19 +515,69 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
         if (not MemberCard.GetBySystemId(PrintandAdmitBuffer."System Id")) then
             exit;
 
-        SpeedGate.Admit(SpeedGate.CreateAdmitToken(MemberCard."External Card No.", AdmissionCode, ScannerId), 1);
-        POSActionMemberArrival.AddToastMemberScannedData(MemberCard."Entry No.", 0, AdmittedMemberDetails);
+        AdmitToken := SpeedGate.CreateAdmitToken(MemberCard."External Card No.", AdmissionCode, ScannerId, false, HaveError, ErrorMessage);
+        if not HaveError then begin
+            Clear(TryAdmitObj);
+            TryAdmitObj.Add('token', PrintandAdmitBuffer.Type);
+            TryAdmitObj.Add('quantityToAdmit', 1);
+            PrintAdmitType := PrintandAdmitBuffer.Type;
+            TryAdmitObj.Add('type', PrintAdmitType);
+            TryAdmitObj.Add('visualId', PrintandAdmitBuffer."Visual Id");
+            TryAdmitObj.Add('systemId', PrintandAdmitBuffer."System Id");
+            TryAdmitArray.Add(TryAdmitObj);
+        end;
     end;
 
-    local procedure AdmitWallet(var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer"; AdmissionCode: Code[20]; ScannerId: Code[10])
+    local procedure TryAdmitWallet(var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer"; AdmissionCode: Code[20];
+                                    ScannerId: Code[10]; var UnconfirmedGroup: Boolean; var DefaultQtyGroupUnconfirmed: JsonArray;
+                                   var TryAdmitArray: JsonArray)
+    var
+        Ticket: Record "NPR TM Ticket";
+        SpeedGate: Codeunit "NPR SG SpeedGate";
+        HaveError: Boolean;
+        ErrorMessage: Text;
+        AdmitToken: Guid;
+    begin
+        if not (PrintandAdmitBuffer.Admit and (PrintandAdmitBuffer.Type = PrintandAdmitBuffer.Type::ATTRACTION_WALLET)) then
+            exit;
+        if Ticket.GetBySystemId(PrintandAdmitBuffer."System Id") then begin
+            AdmitToken := SpeedGate.CreateAdmitToken(Ticket."External Ticket No.", AdmissionCode, ScannerId, false, HaveError, ErrorMessage);
+            CheckGroupTicket(PrintandAdmitBuffer, AdmitToken, UnconfirmedGroup, DefaultQtyGroupUnconfirmed, TryAdmitArray);
+        end;
+    end;
+
+    local procedure AdmitTicket(Token: Guid; SystemId: Guid; QuantityToAdmit: Integer)
     var
         Ticket: Record "NPR TM Ticket";
         SpeedGate: Codeunit "NPR SG SpeedGate";
     begin
-        if not (PrintandAdmitBuffer.Admit and (PrintandAdmitBuffer.Type = PrintandAdmitBuffer.Type::ATTRACTION_WALLET)) then
+        if Ticket.GetBySystemId(SystemId) then
+            SpeedGate.Admit(Token, QuantityToAdmit);
+    end;
+
+    local procedure AdmitMemberCard(Token: Guid; SystemId: Guid; var AdmittedMemberDetails: JsonObject)
+    var
+        MemberCard: Record "NPR MM Member Card";
+        SpeedGate: Codeunit "NPR SG SpeedGate";
+        POSActionMemberArrival: Codeunit "NPR POS Action: MM Member ArrB";
+    begin
+        Clear(AdmittedMemberDetails);
+
+        MemberCard.SetLoadFields("Entry No.", "External Card No.");
+        if (not MemberCard.GetBySystemId(SystemId)) then
             exit;
-        if Ticket.GetBySystemId(PrintandAdmitBuffer."System Id") then
-            SpeedGate.Admit(SpeedGate.CreateAdmitToken(Ticket."External Ticket No.", AdmissionCode, ScannerId), 1);
+
+        SpeedGate.Admit(Token, 1);
+        POSActionMemberArrival.AddToastMemberScannedData(MemberCard."Entry No.", 0, AdmittedMemberDetails);
+    end;
+
+    local procedure AdmitWallet(Token: Guid; SystemId: Guid)
+    var
+        Ticket: Record "NPR TM Ticket";
+        SpeedGate: Codeunit "NPR SG SpeedGate";
+    begin
+        if Ticket.GetBySystemId(SystemId) then
+            SpeedGate.Admit(Token, 1);
     end;
 
     local procedure BufferTableToJson(var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer") Array: JsonArray
@@ -505,7 +701,7 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionPrintandAdmit.js###
-        'const main=async({workflow:t,parameters:n,popup:m,context:r,captions:a,toast:l})=>{if(n.reference_input)r.reference_input=n.reference_input;else if(r.reference_input=await m.input({title:a.ReferenceTitle,caption:a.ReferenceCaption}),r.reference_input===null)return;const s=await t.respond("fill_data"),i=await t.respond("handle_data",{buffer_data:s});i.admittedReferences&&i.admittedReferences.forEach(e=>{switch(e.type){case 1:{e.memberDetails&&l.memberScanned({memberImg:e.memberDetails.MemberScanned.ImageDataUrl,memberName:e.memberDetails.MemberScanned.Name,validForAdmission:e.memberDetails.MemberScanned.Valid,memberExpiry:e.memberDetails.MemberScanned.ExpiryDate});break}default:{l.success(`${a.welcomeMsg} ${e.tableCaption} ${e.referenceId}`,{title:a.welcomeMsg});break}}}),i.printSuccessful||await m.error(`${a.printingFailed} ${i.printErrorMsg}`)};'
+        'const main=async({workflow:n,parameters:d,popup:r,context:i,captions:t,toast:u,i:o})=>{if(d.reference_input)i.reference_input=d.reference_input;else if(i.reference_input=await r.input({title:t.ReferenceTitle,caption:t.ReferenceCaption}),i.reference_input===null)return;const l=await n.respond("fill_data"),m=await n.respond("try_admit",{buffer_data:l});if(m.unconfirmedGroup){const e=m.defaultQuantityUnconfirmed;i.quantityToAdmUnconfirmedGroup=[];for(const s of e){const f=await r.numpad({caption:t.QuantityAdmitLbl,title:t.QuantityAdmitLbl,value:s.defaultQuantity});i.quantityToAdmUnconfirmedGroup.push({token:s.token,qtytoAdmit:f})}}else i.quantityToAdmUnconfirmedGroup=[];const a=await n.respond("handle_admit_print",{admit_data:m,buffer_data:l});a.admittedReferences&&a.admittedReferences.forEach(e=>{switch(e.type){case 1:{e.memberDetails&&u.memberScanned({memberImg:e.memberDetails.MemberScanned.ImageDataUrl,memberName:e.memberDetails.MemberScanned.Name,validForAdmission:e.memberDetails.MemberScanned.Valid,memberExpiry:e.memberDetails.MemberScanned.ExpiryDate});break}default:{u.success(`${t.welcomeMsg} ${e.tableCaption} ${e.referenceId}`,{title:t.welcomeMsg});break}}}),a.printSuccessful||await r.error(`${t.printingFailed} ${a.printErrorMsg}`)};'
         );
     end;
 }
