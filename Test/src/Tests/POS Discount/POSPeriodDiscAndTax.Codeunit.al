@@ -372,6 +372,7 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
         Item: Record Item;
         Customer: Record Customer;
         PeriodDiscountLine: Record "NPR Period Discount Line";
+        GeneralLedgerSetup: Record "General Ledger Setup";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
         SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
@@ -409,10 +410,11 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
         // [GIVEN] Discount
         CreateDiscount(Item, 7, PeriodDiscountLine);
 
-        Item."Unit Price" := Item."Unit Price" / (1 + VATPostingSetup."VAT %" / 100);
+        GeneralLedgerSetup.Get();
+        Item."Unit Price" := Round(Item."Unit Price" / (1 + VATPostingSetup."VAT %" / 100), GeneralLedgerSetup."Unit-Amount Rounding Precision");
         PeriodDiscountLine."Campaign Unit Price" := PeriodDiscountLine."Campaign Unit Price" / (1 + VATPostingSetup."VAT %" / 100);
         LineDiscPct := 100 - PeriodDiscountLine."Campaign Unit Price" / Item."Unit Price" * 100;
-        LineDiscAmt := Item."Unit Price" * LineDiscPct / 100;
+        LineDiscAmt := Round(Item."Unit Price" * LineDiscPct / 100);
         LineAmtExclTax := Item."Unit Price" - LineDiscAmt;
         LineAmtInclTax := LineAmtExclTax * (1 + VATPostingSetup."VAT %" / 100);
 
@@ -727,6 +729,7 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
         POSEntry: Record "NPR POS Entry";
         GLEntry: Record "G/L Entry";
         GeneralPostingSetup: Record "General Posting Setup";
+        GeneralLedgerSetup: Record "General Ledger Setup";
         PeriodDiscountLine: Record "NPR Period Discount Line";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
@@ -743,6 +746,11 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
 
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+
+        // [GIVEN] Unit-Amount Rounding Precision must be with many decimals for this test to work
+        GeneralLedgerSetup.Get();
+        GeneralLedgerSetup."Unit-Amount Rounding Precision" := 0.00000001;
+        GeneralLedgerSetup.Modify();
 
         // [GIVEN] Customer
         CreateCustomer(Customer, false, true);
@@ -4981,4 +4989,5 @@ codeunit 85033 "NPR POS Period Disc. and Tax"
         TaxPostingSetup."Tax Category" := 'E';
         TaxPostingSetup.Modify();
     end;
+
 }

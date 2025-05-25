@@ -139,9 +139,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         // [GIVEN] Customer Discount
         LineDiscPct := CreateDiscount(Item, 9);
 
-        LineDiscAmt := Item."Unit Price" * LineDiscPct / 100;
-        LineAmtInclTax := Item."Unit Price" - LineDiscAmt;
-        LineAmtExclTax := LineAmtInclTax / (1 + VATPostingSetup."VAT %" / 100);
+        CalculateExpectedAmountsNormalTaxBackward(Item."Unit Price", 1, VATPostingSetup."VAT %", LineDiscPct, LineDiscAmt, LineAmtExclTax, LineAmtInclTax);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -203,9 +201,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LineDiscPct := CreateDiscount(Item, 9);
 
         Qty := Round(1 / 3, 0.00001);
-        LineDiscAmt := Qty * Item."Unit Price" * LineDiscPct / 100;
-        LineAmtInclTax := Qty * Item."Unit Price" - LineDiscAmt;
-        LineAmtExclTax := LineAmtInclTax / (1 + VATPostingSetup."VAT %" / 100);
+        CalculateExpectedAmountsNormalTaxBackward(Item."Unit Price", Qty, VATPostingSetup."VAT %", LineDiscPct, LineDiscAmt, LineAmtExclTax, LineAmtInclTax);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -277,6 +273,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LineDiscAmt := (Item."Unit Price" * LineDiscPct / 100) / (1 + VATPostingSetup."VAT %" / 100);
         LineAmtExclTax := UnitPrice - LineDiscAmt;
         LineAmtInclTax := LineAmtExclTax * (1 + VATPostingSetup."VAT %" / 100);
+        CalculateExpectedAmountsNormalTaxForward(Item."Unit Price", 1, VATPostingSetup."VAT %", LineDiscPct, LineDiscAmt, LineAmtExclTax, LineAmtInclTax);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -354,7 +351,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LineDiscAmt := (Qty * Item."Unit Price" * LineDiscPct / 100) / (1 + VATPostingSetup."VAT %" / 100);
         LineAmtExclTax := Qty * UnitPrice - LineDiscAmt;
         LineAmtInclTax := LineAmtExclTax * (1 + VATPostingSetup."VAT %" / 100);
-
+        CalculateExpectedAmountsNormalTaxForward(Item."Unit Price", Qty, VATPostingSetup."VAT %", LineDiscPct, LineDiscAmt, LineAmtExclTax, LineAmtInclTax);
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
@@ -424,9 +421,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         // [GIVEN] Customer Discount
         LineDiscPct := CreateDiscount(Item, 7);
 
-        LineDiscAmt := Item."Unit Price" * LineDiscPct / 100;
-        LineAmtInclTax := Item."Unit Price" - LineDiscAmt;
-        LineAmtExclTax := LineAmtInclTax / (1 + VATPostingSetup."VAT %" / 100);
+        CalculateExpectedAmountsNormalTaxBackward(Item."Unit Price", 1, VATPostingSetup."VAT %", LineDiscPct, LineDiscAmt, LineAmtExclTax, LineAmtInclTax);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -499,9 +494,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LineDiscPct := CreateDiscount(Item, 7);
 
         Qty := 1 / 2;
-        LineDiscAmt := Round(Qty * Item."Unit Price" * LineDiscPct / 100);
-        LineAmtInclTax := Round(Qty * Item."Unit Price") - LineDiscAmt;
-        LineAmtExclTax := Round(LineAmtInclTax / (1 + VATPostingSetup."VAT %" / 100));
+        CalculateExpectedAmountsNormalTaxBackward(Item."Unit Price", Qty, VATPostingSetup."VAT %", LineDiscPct, LineDiscAmt, LineAmtExclTax, LineAmtInclTax);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -572,9 +565,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         // [GIVEN] Customer Discount
         LineDiscPct := CreateDiscount(Item, 9);
 
-        LineDiscAmt := Item."Unit Price" * LineDiscPct / 100;
-        LineAmtInclTax := Item."Unit Price" - LineDiscAmt;
-        LineAmtExclTax := LineAmtInclTax / (1 + VATPostingSetup."VAT %" / 100);
+        CalculateExpectedAmountsNormalTaxBackward(Item."Unit Price", 1, VATPostingSetup."VAT %", LineDiscPct, LineDiscAmt, LineAmtExclTax, LineAmtInclTax);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -670,9 +661,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         LineDiscPct := CreateDiscount(Item, 9);
 
         Qty := Round(1 / 3, 0.00001);
-        LineDiscAmt := Round(Qty * Item."Unit Price" * LineDiscPct / 100);
-        LineAmtInclTax := Qty * Item."Unit Price" - LineDiscAmt;
-        LineAmtExclTax := LineAmtInclTax / (1 + VATPostingSetup."VAT %" / 100);
+        CalculateExpectedAmountsNormalTaxBackward(Item."Unit Price", Qty, VATPostingSetup."VAT %", LineDiscPct, LineDiscAmt, LineAmtExclTax, LineAmtInclTax);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -733,14 +722,13 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         POSEntry: Record "NPR POS Entry";
         GLEntry: Record "G/L Entry";
         GeneralPostingSetup: Record "General Posting Setup";
+        GeneralLedgerSetup: Record "General Ledger Setup";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
         SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
-        LineAmtInclTax: Decimal;
-        LineAmtExclTax: Decimal;
         AmountToPay: Decimal;
         SaleEnded: Boolean;
     begin
@@ -748,6 +736,11 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
 
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+
+        // [GIVEN] Unit-Amount Rounding Precision must be with many decimals for this test to work
+        GeneralLedgerSetup.Get();
+        GeneralLedgerSetup."Unit-Amount Rounding Precision" := 0.00000001;
+        GeneralLedgerSetup.Modify();
 
         // [GIVEN] Customer
         CreateCustomer(Customer, false, true);
@@ -772,15 +765,16 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         // [GIVEN] Customer Discount
         LineDiscPct := CreateDiscount(Item, 7);
 
-        LineDiscAmt := Item."Unit Price" * LineDiscPct / 100;
-        LineAmtExclTax := Item."Unit Price" - LineDiscAmt;
-        LineAmtInclTax := LineAmtExclTax * (1 + VATPostingSetup."VAT %" / 100);
-
+        LineDiscAmt := Round(Item."Unit Price" * LineDiscPct / 100);
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
         // [GIVEN] Add Item to active sale
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", 1);
+
+        // [GIVEN] Customer applied to sale
+        POSSaleUnit.GetCurrentSale(POSSale);
+        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // Get Amount to Pay
         POSSession.GetSaleLine(POSSaleLineUnit);
@@ -790,9 +784,6 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
 
         POSSession.GetSale(POSSaleUnit);
         POSSaleUnit.GetCurrentSale(POSSale);
-
-        // [GIVEN] Customer applied to sale
-        SelectCustomerAction.AttachCustomer(POSSale, '', 0, Customer."No.", false);
 
         // [WHEN] End of Sale
         SaleEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(POSSession, POSPaymentMethod.Code, AmountToPay, '');
@@ -808,7 +799,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         //Verify POS Entry Sales Line
         Assert.IsTrue(POSEntrySalesLine.Find(), 'Sale Line not created');
         Assert.AreEqual(POSSaleLine."Discount %", POSEntrySalesLine."Line Discount %", 'POSSaleLine."Discount %" <>POSEntrySalesLine."Line Discount %"');
-        Assert.AreEqual(POSSaleLine."Discount Amount", Round(POSEntrySalesLine."Line Discount Amount Incl. VAT", POSPaymentMethod."Rounding Precision"), 'POSSaleLine."Discount Amount" <> POSEntrySalesLine."Line Discount Amount Excl. VAT"');
+        Assert.AreEqual(POSSaleLine."Discount Amount", POSEntrySalesLine."Line Discount Amount Excl. VAT", 'POSSaleLine."Discount Amount" <> POSEntrySalesLine."Line Discount Amount Excl. VAT"');
         Assert.AreEqual(POSSaleLine.Amount, POSEntrySalesLine."Amount Excl. VAT", 'POSSaleLine.Amount <> POSEntrySalesLine."Amount Excl. VAT"');
         Assert.AreEqual(POSSaleLine."Amount Including VAT", POSEntrySalesLine."Amount Incl. VAT", 'POSSaleLine."Amount Including VAT" <> POSEntrySalesLine."Amount Incl. VAT"');
         Assert.IsTrue(GeneralPostingSetup.Get(POSSaleLine."Gen. Bus. Posting Group", POSSaleLine."Gen. Prod. Posting Group"), 'General Posting Setup not found');
@@ -844,8 +835,6 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         LineDiscPct: Decimal;
         LineDiscAmt: Decimal;
-        LineAmtInclTax: Decimal;
-        LineAmtExclTax: Decimal;
         AmountToPay: Decimal;
         Qty: Decimal;
         SaleEnded: Boolean;
@@ -880,9 +869,6 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
 
         Qty := Round(2 / 3, 0.00001);
         LineDiscAmt := Round(Qty * Item."Unit Price" * LineDiscPct / 100);
-        LineAmtExclTax := Qty * Item."Unit Price" - LineDiscAmt;
-        LineAmtInclTax := LineAmtExclTax * (1 + VATPostingSetup."VAT %" / 100);
-
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
 
@@ -985,9 +971,7 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         // [GIVEN] Customer Discount
         LineDiscPct := CreateDiscount(Item, 7);
 
-        LineDiscAmt := Item."Unit Price" * LineDiscPct / 100;
-        LineAmtInclTax := Item."Unit Price" - LineDiscAmt;
-        LineAmtExclTax := LineAmtInclTax / (1 + VATPostingSetup."VAT %" / 100);
+        CalculateExpectedAmountsNormalTaxBackward(Item."Unit Price", 1, VATPostingSetup."VAT %", LineDiscPct, LineDiscAmt, LineAmtExclTax, LineAmtInclTax);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -7266,4 +7250,34 @@ codeunit 85031 "NPR POS Cust. Disc. and Tax"
         TaxPostingSetup."Tax Category" := 'E';
         TaxPostingSetup.Modify();
     end;
+
+    local procedure CalculateExpectedAmountsNormalTaxForward(UnitPrice: Decimal; Quantity: Decimal; VATPct: Decimal; DicsPct: Decimal; var LineDiscAmt: Decimal; var LineAmtExclTax: Decimal; var LineAmtInclTax: Decimal)
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+    begin
+        GeneralLedgerSetup.SetLoadFields("Amount Rounding Precision", "Unit-Amount Rounding Precision");
+        if not GeneralLedgerSetup.Get() then
+            GeneralLedgerSetup.Init();
+        UnitPrice := Round(UnitPrice / (1 + VATPct / 100), GeneralLedgerSetup."Unit-Amount Rounding Precision");
+        LineAmtExclTax := UnitPrice * Quantity;
+        LineDiscAmt := Round(LineAmtExclTax * DicsPct / 100, GeneralLedgerSetup."Amount Rounding Precision");
+        LineAmtExclTax := LineAmtExclTax - LineDiscAmt;
+        LineAmtInclTax := Round(LineAmtExclTax * (1 + VATPct / 100), GeneralLedgerSetup."Amount Rounding Precision");
+        LineAmtExclTax := Round(LineAmtExclTax, GeneralLedgerSetup."Amount Rounding Precision");
+    end;
+
+    local procedure CalculateExpectedAmountsNormalTaxBackward(UnitPrice: Decimal; Quantity: Decimal; VATPct: Decimal; DicsPct: Decimal; var LineDiscAmt: Decimal; var LineAmtExclTax: Decimal; var LineAmtInclTax: Decimal)
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+    begin
+        GeneralLedgerSetup.SetLoadFields("Amount Rounding Precision");
+        if not GeneralLedgerSetup.Get() then
+            GeneralLedgerSetup.Init();
+        LineAmtInclTax := UnitPrice * Quantity;
+        LineDiscAmt := Round(LineAmtInclTax * DicsPct / 100, GeneralLedgerSetup."Amount Rounding Precision");
+        LineAmtInclTax := LineAmtInclTax - LineDiscAmt;
+        LineAmtExclTax := Round(LineAmtInclTax / (1 + VATPct / 100), GeneralLedgerSetup."Amount Rounding Precision");
+        LineAmtInclTax := Round(LineAmtInclTax, GeneralLedgerSetup."Amount Rounding Precision");
+    end;
+
 }

@@ -540,6 +540,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         GLEntry: Record "G/L Entry";
         GeneralPostingSetup: Record "General Posting Setup";
         QuantityDiscountLine: Record "NPR Quantity Discount Line";
+        GeneralLedgerSetup: Record "General Ledger Setup";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
         SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
@@ -556,6 +557,11 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
 
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+
+        // [GIVEN] Unit-Amount Rounding Precision must be with many decimals for this test to work
+        GeneralLedgerSetup.Get();
+        GeneralLedgerSetup."Unit-Amount Rounding Precision" := 0.00000001;
+        GeneralLedgerSetup.Modify();
 
         // [GIVEN] Customer
         CreateCustomer(Customer, false, true);
@@ -2547,6 +2553,7 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         Item: Record Item;
         Customer: Record Customer;
         QuantityDiscountLine: Record "NPR Quantity Discount Line";
+        GeneralLedgerSetup: Record "General Ledger Setup";
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
         SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
@@ -2604,9 +2611,10 @@ codeunit 85034 "NPR POS Qty. Disc. and Tax"
         POSSaleLineUnit.SetQuantity(Qty);
 
         //Item price includes tax and active sale line price excludes tax
-        Item."Unit Price" := Item."Unit Price" / (1 + VATPostingSetup."VAT %" / 100);
+        GeneralLedgerSetup.Get();
+        Item."Unit Price" := Round(Item."Unit Price" / (1 + VATPostingSetup."VAT %" / 100), GeneralLedgerSetup."Unit-Amount Rounding Precision");
         LineDiscPct := 100 - (QuantityDiscountLine."Unit Price" / (Item."Unit Price" * (100 + VATPostingSetup."VAT %") / 100) * 100);
-        LineDiscAmt := Qty * Item."Unit Price" * LineDiscPct / 100;
+        LineDiscAmt := Round(Qty * Item."Unit Price" * LineDiscPct / 100);
         LineAmtExclTax := Qty * Item."Unit Price" - LineDiscAmt;
         LineAmtInclTax := LineAmtExclTax * (1 + VATPostingSetup."VAT %" / 100);
 
