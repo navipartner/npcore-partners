@@ -329,7 +329,7 @@
                         DataLogField."Data Log Record Entry No." := RecordEntryNo;
                         DataLogField."Field Value Changed" := FieldValueChanged;
                         if FieldValueChanged then
-                            DataLogField."Previous Field Value" := Format(xFieldRef.Value, 0, 9);
+                            DataLogField."Previous Field Value" := CopyStr(Format(xFieldRef.Value, 0, 9), 1, MaxStrLen(DataLogField."Previous Field Value"));
                         DataLogField.Insert();
                     end;
                 end;
