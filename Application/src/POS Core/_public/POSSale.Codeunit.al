@@ -586,6 +586,7 @@
         ItemTrackingCode: Record "Item Tracking Code";
         ItemTrackingSetup: Record "Item Tracking Setup";
         SerialNoInfo: Record "Serial No. Information";
+        LotNoInfo: Record "Lot No. Information";
         ItemTrackingManagement: Codeunit "Item Tracking Management";
         saleNegCashSum: Decimal;
         CreateServiceItem: codeunit "NPR Create Service Item";
@@ -686,6 +687,10 @@
                         if SaleLinePOS."Lot No." = '' then
                             Error(ErrLotNoRequired, SaleLinePOS."No.", SaleLinePOS.Description);
                     end;
+                    if ItemTrackingSetup."Lot No. Info Required" then begin
+                        LotNoInfo.Get(SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Lot No.");
+                        LotNoInfo.TestField(Blocked, false);
+                    end
                 end else begin
                     if SerialNoInfo.Get(SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Serial No.") then
                         SerialNoInfo.TestField(Blocked, false);
