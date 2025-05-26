@@ -89,6 +89,7 @@ codeunit 6248358 "NPR POSAction TMRebookForToday" implements "NPR IPOS Workflow"
     local procedure SetEndOfSaleAdmitMode(SelectedAdmitMode: Option SALE,SCAN,NO_ADMIT_ON_EOS)
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        Item: Record Item;
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         SaleLinePos: Record "NPR POS Sale Line";
         SalesLineId: Guid;
@@ -105,7 +106,12 @@ codeunit 6248358 "NPR POSAction TMRebookForToday" implements "NPR IPOS Workflow"
                             SelectedAdmitMode::SALE:
                                 TicketReservationRequest.EndOfSaleAdmitMode := TicketReservationRequest.EndOfSaleAdmitMode::SALE;
                             SelectedAdmitMode::SCAN:
-                                TicketReservationRequest.EndOfSaleAdmitMode := TicketReservationRequest.EndOfSaleAdmitMode::SCAN;
+                                begin
+                                    TicketReservationRequest.EndOfSaleAdmitMode := TicketReservationRequest.EndOfSaleAdmitMode::SCAN;
+                                    if (Item.Get(TicketReservationRequest."Item No.")) then
+                                        if (Item."NPR POS Admit Action" in [Item."NPR POS Admit Action"::PRINT, Item."NPR POS Admit Action"::NONE]) then
+                                            TicketReservationRequest.EndOfSaleAdmitMode := TicketReservationRequest.EndOfSaleAdmitMode::NO_ADMIT_ON_EOS;
+                                end;
                             SelectedAdmitMode::NO_ADMIT_ON_EOS:
                                 TicketReservationRequest.EndOfSaleAdmitMode := TicketReservationRequest.EndOfSaleAdmitMode::NO_ADMIT_ON_EOS;
                             else
