@@ -453,7 +453,7 @@
         exit(not VoucherEntry.IsEmpty());
     end;
 
-    local procedure PostIssueVoucher(Voucher: Record "NPR NpRv Voucher"; VoucherType: Record "NPR NpRv Voucher Type"; VoucherAmount: Decimal; var NpRvSalesLine: Record "NPR NpRv Sales Line")
+    internal procedure PostIssueVoucher(Voucher: Record "NPR NpRv Voucher"; VoucherType: Record "NPR NpRv Voucher Type"; VoucherAmount: Decimal; var NpRvSalesLine: Record "NPR NpRv Sales Line")
     var
         VoucherEntry: Record "NPR NpRv Voucher Entry";
         POSUnit: Record "NPR POS Unit";
