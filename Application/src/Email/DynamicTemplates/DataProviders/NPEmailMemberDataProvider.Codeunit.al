@@ -42,6 +42,10 @@ codeunit 6248377 "NPR NPEmailMemberDataProvider" implements "NPR IDynamicTemplat
         JObject.Add('membership_auto_renew', "NPR MM MembershipAutoRenew".Names().Get("NPR MM MembershipAutoRenew".Ordinals().IndexOf("NPR MM MembershipAutoRenew"::YES_INTERNAL.AsInteger())));
         JObject.Add('membership_remaining_points', Entry."Remaining Points");
         JObject.Add('community_description', Entry."Community Description");
+        JObject.Add('subscription_rejected_reason_code', Entry."Rejected Reason Code");
+        JObject.Add('subscription_rejected_reason_description', Entry."Rejected Reason Description");
+        JObject.Add('pay_by_link_url', Entry."Pay by Link URL");
+        JObject.Add('client_sign_up_url', Entry.ClientSignUpUrl);
         JObject.Add('wallet_pass_id', Entry."Wallet Pass Id");
         JObject.Add('wallet_url', Entry."Wallet Pass Landing URL");
         exit(JObject);
@@ -79,6 +83,10 @@ codeunit 6248377 "NPR NPEmailMemberDataProvider" implements "NPR IDynamicTemplat
         JObject.Add('membership_auto_renew', "NPR MM MembershipAutoRenew".Names().Get("NPR MM MembershipAutoRenew".Ordinals().IndexOf("NPR MM MembershipAutoRenew"::YES_INTERNAL.AsInteger())));
         JObject.Add('membership_remaining_points', 0);
         JObject.Add('community_description', 'Awesome member community');
+        JObject.Add('subscription_rejected_reason_code', 'Failed');
+        JObject.Add('subscription_rejected_reason_description', 'Insufficient funds available.');
+        JObject.Add('pay_by_link_url', 'https://payment.example.com/session/123456789');
+        JObject.Add('client_sign_up_url', 'https://signup.example.com/973d46f0-a08c-45e3-a9ac-0da53b28648a');
         JObject.Add('wallet_pass_id', 'ABCD1234');
         JObject.Add('wallet_url', 'https://passes.example.com');
         exit(JObject);
