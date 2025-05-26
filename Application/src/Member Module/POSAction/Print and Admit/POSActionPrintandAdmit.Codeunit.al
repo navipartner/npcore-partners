@@ -518,7 +518,7 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
         AdmitToken := SpeedGate.CreateAdmitToken(MemberCard."External Card No.", AdmissionCode, ScannerId, false, HaveError, ErrorMessage);
         if not HaveError then begin
             Clear(TryAdmitObj);
-            TryAdmitObj.Add('token', PrintandAdmitBuffer.Type);
+            TryAdmitObj.Add('token', AdmitToken);
             TryAdmitObj.Add('quantityToAdmit', 1);
             PrintAdmitType := PrintandAdmitBuffer.Type;
             TryAdmitObj.Add('type', PrintAdmitType);
