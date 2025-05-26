@@ -780,6 +780,7 @@ codeunit 85008 "NPR E-Commerce Tests"
         RecordLink: Record "Record Link";
         LibraryECommerce: Codeunit "NPR Library - E-Commerce";
         EcWebService: codeunit "NPR NpEc Webservice";
+        ECommerceTestManBoundSub: Codeunit "NPR ECommerceTestManBoundSub";
         Assert: Codeunit Assert;
         ShipmentFeeAccNo: Code[20];
     begin
@@ -820,7 +821,9 @@ codeunit 85008 "NPR E-Commerce Tests"
         LoadXml(ImportType, ImportEntry, SalesOrderNo + '.xml', XmlSales);
 
         // [When] Create sales order
+        BindSubscription(ECommerceTestManBoundSub);
         EcWebService.ProcessImportEntry(ImportEntry);
+        UnbindSubscription(ECommerceTestManBoundSub);
         Commit();
 
         // [Then] Verify Sales Order created
@@ -943,6 +946,7 @@ codeunit 85008 "NPR E-Commerce Tests"
         RecordLink: Record "Record Link";
         LibraryECommerce: Codeunit "NPR Library - E-Commerce";
         EcWebService: codeunit "NPR NpEc Webservice";
+        ECommerceTestManBoundSub: Codeunit "NPR ECommerceTestManBoundSub";
         Assert: Codeunit Assert;
     begin
         // [Scenario] Delete sales order
@@ -982,7 +986,9 @@ codeunit 85008 "NPR E-Commerce Tests"
         LoadXml(ImportTypeCreateDoc, ImportEntryCreateDoc, SalesOrderNo + '.xml', XmlSales);
 
         // [Given] Create sales order
+        BindSubscription(ECommerceTestManBoundSub);
         EcWebService.ProcessImportEntry(ImportEntryCreateDoc);
+        UnbindSubscription(ECommerceTestManBoundSub);
         Commit();
 
         // [Given] Load xml with NaviConnect for deleting
@@ -1036,6 +1042,7 @@ codeunit 85008 "NPR E-Commerce Tests"
         EmailTemplateHeader: Record "NPR E-mail Template Header";
         LibraryECommerce: Codeunit "NPR Library - E-Commerce";
         EcWebService: codeunit "NPR NpEc Webservice";
+        ECommerceTestManBoundSub: Codeunit "NPR ECommerceTestManBoundSub";
         Assert: Codeunit Assert;
     begin
         // [Scenario] Create, update and post sales order
@@ -1100,7 +1107,9 @@ codeunit 85008 "NPR E-Commerce Tests"
         LoadXml(ImportTypeCreateDoc, ImportEntryCreateDoc, SalesOrderNo + '.xml', XmlSales);
 
         // [Given] Create sales order
+        BindSubscription(ECommerceTestManBoundSub);
         EcWebService.ProcessImportEntry(ImportEntryCreateDoc);
+        UnbindSubscription(ECommerceTestManBoundSub);
         Commit();
 
         // [Given] Load xml with NaviConnect for posting
@@ -1133,6 +1142,7 @@ codeunit 85008 "NPR E-Commerce Tests"
         EmailTemplateHeader: Record "NPR E-mail Template Header";
         LibraryECommerce: Codeunit "NPR Library - E-Commerce";
         EcWebService: codeunit "NPR NpEc Webservice";
+        ECommerceTestManBoundSub: Codeunit "NPR ECommerceTestManBoundSub";
         Assert: Codeunit Assert;
     begin
         // [Scenario] Create and post sales order in one transaction
@@ -1197,7 +1207,9 @@ codeunit 85008 "NPR E-Commerce Tests"
         LoadXml(ImportType, ImportEntry, SalesOrderNo + '.xml', XmlSales);
 
         // [When] Import and post sales order 
+        BindSubscription(ECommerceTestManBoundSub);
         EcWebService.ProcessImportEntry(ImportEntry);
+        UnbindSubscription(ECommerceTestManBoundSub);
         Commit();
 
         // [Then] Verify Sales Order posted
@@ -1220,6 +1232,7 @@ codeunit 85008 "NPR E-Commerce Tests"
         LibraryECommerce: Codeunit "NPR Library - E-Commerce";
         EcWebService: codeunit "NPR NpEc Webservice";
         NcDependencyFactory: Codeunit "NPR Nc Dependency Factory";
+        ECommerceTestManBoundSub: Codeunit "NPR ECommerceTestManBoundSub";
         ILookup: interface "NPR Nc Import List ILookup";
     begin
         // [Scenario] Lookup sales order
@@ -1259,7 +1272,9 @@ codeunit 85008 "NPR E-Commerce Tests"
         LoadXml(ImportType, ImportEntry, SalesOrderNo + '.xml', XmlSales);
 
         // [Given] Create sales order
+        BindSubscription(ECommerceTestManBoundSub);
         EcWebService.ProcessImportEntry(ImportEntry);
+        UnbindSubscription(ECommerceTestManBoundSub);
         Commit();
 
         // [When] Lookup sales order
@@ -1715,6 +1730,7 @@ codeunit 85008 "NPR E-Commerce Tests"
         LibraryECommerce: Codeunit "NPR Library - E-Commerce";
         EcWebService: codeunit "NPR NpEc Webservice";
         NcDependencyFactory: Codeunit "NPR Nc Dependency Factory";
+        ECommerceTestManBoundSub: Codeunit "NPR ECommerceTestManBoundSub";
         ILookup: interface "NPR Nc Import List ILookup";
     begin
         // [Scenario] Load purchase invoice
@@ -1751,9 +1767,11 @@ codeunit 85008 "NPR E-Commerce Tests"
         Commit();
 
         // [When] Lookup purchase invoice
-        if NcDependencyFactory.CreateNCImportListILookup(ILookup, ImportType) then
+        if NcDependencyFactory.CreateNCImportListILookup(ILookup, ImportType) then begin
+            BindSubscription(ECommerceTestManBoundSub);
             ILookup.RunLookupImportEntry(ImportEntry);
-
+            UnbindSubscription(ECommerceTestManBoundSub);
+        end;
         // [Then] Handle purchase invoice page        
     end;
 
@@ -1866,7 +1884,7 @@ codeunit 85008 "NPR E-Commerce Tests"
         LibraryERM.FindVATPostingSetupInvt(VATPostingSetup);
         XmlSales.Append(StrSubstNo('<vat_percent>%1</vat_percent>', VATPostingSetup."VAT %"));
 
-        XmlSales.Append(StrSubstNo('<line_amount>%1</line_amount>', Qty * UnitPrice));
+        XmlSales.Append(StrSubstNo('<line_amount>%1</line_amount>', Format(Qty * UnitPrice, 0, 9)));
         XmlSales.Append('</sales_order_line>');
         XmlSales.Append(StrSubstNo('<sales_order_line reference_no="%1" type="item">', ItemNo2));
         XmlSales.Append(StrSubstNo('<description>%1</description>', ItemDesc2));
@@ -1876,14 +1894,14 @@ codeunit 85008 "NPR E-Commerce Tests"
         XmlSales.Append('<!-- <discount_pct>Zero or Once</discount_pct> -->');
         XmlSales.Append('<!-- <discount_amount>Zero or Once</discount_amount> -->');
         XmlSales.Append(StrSubstNo('<vat_percent>%1</vat_percent>', VATPostingSetup."VAT %"));
-        XmlSales.Append(StrSubstNo('<line_amount>%1</line_amount>', Qty2 * UnitPrice2));
+        XmlSales.Append(StrSubstNo('<line_amount>%1</line_amount>', Format(Qty2 * UnitPrice2, 0, 9)));
         XmlSales.Append('</sales_order_line>');
         XmlSales.Append(StrSubstNo('<sales_order_line reference_no="%1" type="gl_account">', GLAccountNo));
         XmlSales.Append(StrSubstNo('<description>%1</description>', GLAccName));
         XmlSales.Append('<description_2/>');
         XmlSales.Append(StrSubstNo('<unit_price>%1</unit_price>', Format(UnitPrice3, 0, 9)));
         XmlSales.Append('<quantity>1</quantity>');
-        XmlSales.Append(StrSubstNo('<line_amount>%1</line_amount>', UnitPrice3 * 1));
+        XmlSales.Append(StrSubstNo('<line_amount>%1</line_amount>', Format(UnitPrice3 * 1, 0, 9)));
         XmlSales.Append('</sales_order_line>');
         XmlSales.Append('<sales_order_line type="comment">');
         XmlSales.Append(StrSubstNo('<description>%1</description>', Comment));
@@ -1933,7 +1951,7 @@ codeunit 85008 "NPR E-Commerce Tests"
         XmlPurch.Append('<!-- <discount_amount>Zero or Once</discount_amount> -->');
         LibraryERM.FindVATPostingSetupInvt(VATPostingSetup);
         XmlPurch.Append(StrSubstNo('<vat_percent>%1</vat_percent>', VATPostingSetup."VAT %"));
-        XmlPurch.Append(StrSubstNo('<line_amount>%1</line_amount>', Qty * UnitPrice));
+        XmlPurch.Append(StrSubstNo('<line_amount>%1</line_amount>', Format(Qty * UnitPrice, 0, 9)));
         XmlPurch.Append('</purchase_invoice_line>');
 
         XmlPurch.Append(StrSubstNo('<purchase_invoice_line type="item" reference_no="%1">', ItemNo2));
@@ -1945,7 +1963,7 @@ codeunit 85008 "NPR E-Commerce Tests"
         XmlPurch.Append('<!-- <discount_amount>Zero or Once</discount_amount> -->');
         LibraryERM.FindVATPostingSetupInvt(VATPostingSetup);
         XmlPurch.Append(StrSubstNo('<vat_percent>%1</vat_percent>', VATPostingSetup."VAT %"));
-        XmlPurch.Append(StrSubstNo('<line_amount>%1</line_amount>', Qty2 * UnitPrice2));
+        XmlPurch.Append(StrSubstNo('<line_amount>%1</line_amount>', Format(Qty2 * UnitPrice2, 0, 9)));
         XmlPurch.Append('</purchase_invoice_line>');
 
         XmlPurch.Append(StrSubstNo('<purchase_invoice_line type="gl_account" reference_no="%1">', GLAccountNo));
@@ -1953,7 +1971,7 @@ codeunit 85008 "NPR E-Commerce Tests"
         XmlPurch.Append('<!-- <description_2>Zero or Once</description_2> -->');
         XmlPurch.Append(StrSubstNo('<direct_unit_cost>%1</direct_unit_cost>', Format(UnitPrice3, 0, 9)));
         XmlPurch.Append('<quantity>1</quantity>');
-        XmlPurch.Append(StrSubstNo('<line_amount>%1</line_amount>', 1 * UnitPrice3));
+        XmlPurch.Append(StrSubstNo('<line_amount>%1</line_amount>', Format(UnitPrice3, 0, 9)));
         XmlPurch.Append('</purchase_invoice_line>');
 
         XmlPurch.Append('<purchase_invoice_line type="comment">');

@@ -7731,6 +7731,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        OIOUBLUoMTestDisabler: Codeunit "NPR OIOUBLUoMTestDisabler";
         TotalAmount: Decimal;
         Qty: Decimal;
         DiscountCode: Code[20];
@@ -7745,7 +7746,9 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [GIVEN] Item with unit price and UOM
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        BindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        UnbindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
         Item."Base Unit of Measure" := UnitOfMeasure.Code;
         Item."Unit Price" := 2000;
@@ -7791,6 +7794,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        OIOUBLUoMTestDisabler: Codeunit "NPR OIOUBLUoMTestDisabler";
         Qty: Decimal;
         DiscountCode: Code[20];
     begin
@@ -7804,8 +7808,10 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [GIVEN] Item with unit price and UOM
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        BindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
         LibraryInventory.CreateUnitOfMeasureCode(SecondUnitOfMeasure);
+        UnbindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
         LibraryInventory.CreateItemUnitOfMeasure(SecondItemUnitOfMeasure, Item."No.", SecondUnitOfMeasure.Code, 1);
         Item."Base Unit of Measure" := UnitOfMeasure.Code;
@@ -7852,6 +7858,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        OIOUBLUoMTestDisabler: Codeunit "NPR OIOUBLUoMTestDisabler";
         TotalAmount: Decimal;
         Qty: Decimal;
         DiscountCode: Code[20];
@@ -7865,7 +7872,9 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         EnableDiscount();
 
         // [GIVEN] Items with unit price and UOM
+        BindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        UnbindSubscription(OIOUBLUoMTestDisabler);
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
         LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
         Item."Base Unit of Measure" := UnitOfMeasure.Code;
@@ -7927,6 +7936,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        OIOUBLUoMTestDisabler: Codeunit "NPR OIOUBLUoMTestDisabler";
         TotalAmount: Decimal;
         Qty: Decimal;
         DiscountCode: Code[20];
@@ -7941,13 +7951,17 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [GIVEN] Items with unit price and UOM
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        BindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        UnbindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
         Item."Base Unit of Measure" := UnitOfMeasure.Code;
         Item."Unit Price" := 1000;
         Item.Modify();
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(SecondItem, POSUnit, POSStore);
+        BindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateUnitOfMeasureCode(SecondUnitOfMeasure);
+        UnbindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateItemUnitOfMeasure(SecondItemUnitOfMeasure, SecondItem."No.", SecondUnitOfMeasure.Code, 1);
         SecondItem."Base Unit of Measure" := SecondUnitOfMeasure.Code;
         SecondItem."Unit Price" := 2000;
@@ -8003,6 +8017,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        OIOUBLUoMTestDisabler: Codeunit "NPR OIOUBLUoMTestDisabler";
         FirstTotalAmount: Decimal;
         SecondTotalAmount: Decimal;
         Qty: Decimal;
@@ -8019,13 +8034,17 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [GIVEN] Items with unit price and UOM
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        BindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        UnbindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
         Item."Base Unit of Measure" := UnitOfMeasure.Code;
         Item."Unit Price" := 2000;
         Item.Modify();
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(SecondItem, POSUnit, POSStore);
+        BindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateUnitOfMeasureCode(SecondUnitOfMeasure);
+        UnbindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateItemUnitOfMeasure(SecondItemUnitOfMeasure, SecondItem."No.", SecondUnitOfMeasure.Code, 1);
         SecondItem."Base Unit of Measure" := SecondUnitOfMeasure.Code;
         SecondItem."Unit Price" := 2000;
@@ -8081,6 +8100,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         POSSaleUnit: Codeunit "NPR POS Sale";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        OIOUBLUoMTestDisabler: Codeunit "NPR OIOUBLUoMTestDisabler";
         TotalDiscountAmount: Decimal;
         TotalDiscountAmountForCheck: Decimal;
         Qty: Decimal;
@@ -8097,7 +8117,9 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [GIVEN] Item with unit price and UOM
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        BindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        UnbindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
         Item."Base Unit of Measure" := UnitOfMeasure.Code;
         Item."Unit Price" := 2000;
@@ -8148,6 +8170,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        OIOUBLUoMTestDisabler: Codeunit "NPR OIOUBLUoMTestDisabler";
         Qty: Decimal;
         DiscountCode: Code[20];
     begin
@@ -8161,8 +8184,10 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [GIVEN] Item with unit price and UOM
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        BindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
         LibraryInventory.CreateUnitOfMeasureCode(SecondUnitOfMeasure);
+        UnbindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
         LibraryInventory.CreateItemUnitOfMeasure(SecondItemUnitOfMeasure, Item."No.", SecondUnitOfMeasure.Code, 1);
         Item."Base Unit of Measure" := UnitOfMeasure.Code;
@@ -8211,6 +8236,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         POSSaleUnit: Codeunit "NPR POS Sale";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        OIOUBLUoMTestDisabler: Codeunit "NPR OIOUBLUoMTestDisabler";
         TotalDiscountAmount: Decimal;
         TotalDiscountAmountForCheck: Decimal;
         Qty: Decimal;
@@ -8226,7 +8252,9 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [GIVEN] Items with unit price and UOM
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        BindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        UnbindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
         Item."Unit Price" := 2000;
         Item."Base Unit of Measure" := UnitOfMeasure.Code;
@@ -8294,6 +8322,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         POSSaleUnit: Codeunit "NPR POS Sale";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        OIOUBLUoMTestDisabler: Codeunit "NPR OIOUBLUoMTestDisabler";
         TotalDiscountAmount: Decimal;
         TotalDiscountAmountForCheck: Decimal;
         Qty: Decimal;
@@ -8309,6 +8338,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [GIVEN] Items with unit price and UOM
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        BindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
         LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
         Item."Unit Price" := 1000;
@@ -8316,6 +8346,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(SecondItem, POSUnit, POSStore);
         LibraryInventory.CreateUnitOfMeasureCode(SecondUnitOfMeasure);
+        UnbindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateItemUnitOfMeasure(SecondItemUnitOfMeasure, SecondItem."No.", SecondUnitOfMeasure.Code, 1);
         SecondItem."Unit Price" := 2000;
         SecondItem."Base Unit of Measure" := SecondUnitOfMeasure.Code;
@@ -8378,6 +8409,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         POSSaleUnit: Codeunit "NPR POS Sale";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        OIOUBLUoMTestDisabler: Codeunit "NPR OIOUBLUoMTestDisabler";
         FirstTotalDiscountAmount: Decimal;
         SecondTotalDiscountAmount: Decimal;
         FirstTotalDiscountAmountForCheck: Decimal;
@@ -8396,6 +8428,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [GIVEN] Items with unit price and UOM
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        BindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
         LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
         Item."Unit Price" := 2000;
@@ -8403,6 +8436,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(SecondItem, POSUnit, POSStore);
         LibraryInventory.CreateUnitOfMeasureCode(SecondUnitOfMeasure);
+        UnbindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateItemUnitOfMeasure(SecondItemUnitOfMeasure, SecondItem."No.", SecondUnitOfMeasure.Code, 1);
         SecondItem."Unit Price" := 2000;
         SecondItem."Base Unit of Measure" := SecondUnitOfMeasure.Code;
@@ -8464,6 +8498,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        OIOUBLUoMTestDisabler: Codeunit "NPR OIOUBLUoMTestDisabler";
         DiscountPct: Decimal;
         Qty: Decimal;
         DiscountCode: Code[20];
@@ -8478,7 +8513,9 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [GIVEN] Item with unit price and UOM
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        BindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        UnbindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
         Item."Unit Price" := 2000;
         Item."Base Unit of Measure" := UnitOfMeasure.Code;
@@ -8524,6 +8561,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        OIOUBLUoMTestDisabler: Codeunit "NPR OIOUBLUoMTestDisabler";
         Qty: Decimal;
         DiscountCode: Code[20];
         UOM: Code[10];
@@ -8539,9 +8577,11 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [GIVEN] Item with unit price and UOM
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        BindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
-        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
         LibraryInventory.CreateUnitOfMeasureCode(SecondUnitOfMeasure);
+        UnbindSubscription(OIOUBLUoMTestDisabler);
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
         LibraryInventory.CreateItemUnitOfMeasure(SecondItemUnitOfMeasure, Item."No.", SecondUnitOfMeasure.Code, 1);
         Item."Unit Price" := 2000;
         Item."Base Unit of Measure" := UnitOfMeasure.Code;
@@ -8587,6 +8627,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        OIOUBLUoMTestDisabler: Codeunit "NPR OIOUBLUoMTestDisabler";
         DiscountPct: Decimal;
         Qty: Decimal;
         DiscountCode: Code[20];
@@ -8601,7 +8642,9 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [GIVEN] Items with unit price and UOM
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        BindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        UnbindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
         Item."Unit Price" := 2000;
         Item."Base Unit of Measure" := UnitOfMeasure.Code;
@@ -8662,6 +8705,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        OIOUBLUoMTestDisabler: Codeunit "NPR OIOUBLUoMTestDisabler";
         DiscountPct: Decimal;
         Qty: Decimal;
         DiscountCode: Code[20];
@@ -8676,6 +8720,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [GIVEN] Items with unit price and UOMs
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        BindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
         LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
         Item."Unit Price" := 1000;
@@ -8683,6 +8728,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(SecondItem, POSUnit, POSStore);
         LibraryInventory.CreateUnitOfMeasureCode(SecondUnitOfMeasure);
+        UnbindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateItemUnitOfMeasure(SecondItemUnitOfMeasure, SecondItem."No.", SecondUnitOfMeasure.Code, 1);
         SecondItem."Unit Price" := 2000;
         SecondItem."Base Unit of Measure" := SecondUnitOfMeasure.Code;
@@ -8739,6 +8785,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSaleUnit: Codeunit "NPR POS Sale";
         POSSaleLineUnit: Codeunit "NPR POS Sale Line";
+        OIOUBLUoMTestDisabler: Codeunit "NPR OIOUBLUoMTestDisabler";
         FirstDiscountPct: Decimal;
         SecondDiscountPct: Decimal;
         Qty: Decimal;
@@ -8755,6 +8802,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [GIVEN] Items with unit price and UOMs
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
+        BindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
         LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
         Item."Unit Price" := 2000;
@@ -8762,6 +8810,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
         LibraryPOSMasterData.CreateItemForPOSSaleUsage(SecondItem, POSUnit, POSStore);
         LibraryInventory.CreateUnitOfMeasureCode(SecondUnitOfMeasure);
+        UnbindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateItemUnitOfMeasure(SecondItemUnitOfMeasure, SecondItem."No.", SecondUnitOfMeasure.Code, 1);
         SecondItem."Unit Price" := 2000;
         SecondItem."Base Unit of Measure" := SecondUnitOfMeasure.Code;
