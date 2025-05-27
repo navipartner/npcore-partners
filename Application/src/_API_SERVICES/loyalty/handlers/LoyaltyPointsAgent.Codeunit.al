@@ -204,7 +204,7 @@ codeunit 6248430 "NPR LoyaltyPointsAgent"
 
         MembershipManagement.GetMembershipValidDate(Membership."Entry No.", Today(), ValidFromDate, ValidUntilDate);
 
-        ResponseJson.StartArray('membership').StartObject()
+        ResponseJson.StartObject('membership')
                         .AddObject(HelperFunctions.AddMembershipProperties(ResponseJson, false, Membership, ValidFromDate, ValidUntilDate))
                         .StartObject('accumulated')
                             .AddProperty('untilDate', Format(CalcDate('<-1D>', TransactionsFromDate), 0, 9))
@@ -220,7 +220,7 @@ codeunit 6248430 "NPR LoyaltyPointsAgent"
                             .AddProperty('remaining', Membership."Remaining Points")
                         .EndObject()
                         .StartArray('transactions').AddObject(GetTransactionDTO(ResponseJson, Membership."Entry No.", TransactionsFromDate)).EndArray();
-        ResponseJson.EndObject().EndArray();
+        ResponseJson.EndObject();
 
         exit(Response.RespondOK(ResponseJson));
     end;

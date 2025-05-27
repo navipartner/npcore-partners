@@ -27,6 +27,9 @@ codeunit 6185114 "NPR LoyaltyAPI" implements "NPR API Request Handler"
         if (Request.Match('GET', '/loyalty/coupon/eligibility')) then
             exit(Handle(_ApiFunction::GET_COUPON_ELIGIBILITY, Request));
 
+        if (Request.Match('GET', '/loyalty/coupon/list')) then
+            exit(Handle(_ApiFunction::LIST_COUPON, Request));
+
         // ***** POST ******************************************************
         if (Request.Match('POST', '/loyalty/registerSale')) then
             exit(Handle(_ApiFunction::REGISTER_SALE, Request));
@@ -42,9 +45,6 @@ codeunit 6185114 "NPR LoyaltyAPI" implements "NPR API Request Handler"
 
         if (Request.Match('POST', '/loyalty/coupon/create')) then
             exit(Handle(_ApiFunction::CREATE_COUPON, Request));
-
-        if (Request.Match('POST', '/loyalty/coupon/list')) then
-            exit(Handle(_ApiFunction::LIST_COUPON, Request));
 
         // ***** DELETE *******************************************************
         if (Request.Match('DELETE', '/loyalty/coupon/:couponId')) then

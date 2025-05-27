@@ -158,9 +158,7 @@ codeunit 6248432 "NPR LoyaltyGeneralAgent"
 
         MembershipManagement.GetMembershipValidDate(Membership."Entry No.", Today, DateValidFromDate, DateValidUntilDate);
 
-        ResponseJson.StartObject()
-                        .AddObject(CreateJsonResponseMembershipReceiptList(ResponseJson, Membership, CurrencyCode, DateValidFromDate, DateValidUntilDate, DocumentDate))
-                    .EndObject();
+        ResponseJson := CreateJsonResponseMembershipReceiptList(ResponseJson, Membership, CurrencyCode, DateValidFromDate, DateValidUntilDate, DocumentDate);
 
         exit(Response.RespondOK(ResponseJson));
     end;
@@ -242,9 +240,7 @@ codeunit 6248432 "NPR LoyaltyGeneralAgent"
         ResponseJson.StartObject('response')
                         .AddObject(HelperFunctions.GetStatusResponse(ResponseJson))
                         .AddObject(AddMembership(ResponseJson, Membership, DateValidFromDate, DateValidUntilDate, DocumentDate))
-                        .StartObject('receipts')
-                            .AddArray(AddReceipts(ResponseJson, Membership."Customer No.", CurrencyCode))
-                        .EndObject()
+                        .AddArray(AddReceipts(ResponseJson, Membership."Customer No.", CurrencyCode))
                     .EndObject();
 
         exit(ResponseJson);
@@ -277,7 +273,7 @@ codeunit 6248432 "NPR LoyaltyGeneralAgent"
         POSEntry: Record "NPR POS Entry";
         POSStore: Record "NPR POS Store";
     begin
-        ResponseJson.StartArray();
+        ResponseJson.StartArray('receipts');
         if (CustomerNo <> '') then begin
             POSEntry.SetFilter("Customer No.", '=%1', CustomerNo);
             if (not POSEntry.FindSet()) then begin
@@ -315,7 +311,7 @@ codeunit 6248432 "NPR LoyaltyGeneralAgent"
                                 .AddProperty('time', POSEntry."Ending Time")
                                 .AddProperty('amount', POSEntry."Amount Incl. Tax")
                                 .AddProperty('currencyCode', CurrencyCode)
-                                .AddProperty('varAmount', POSEntry."Tax Amount")
+                                .AddProperty('vatAmount', POSEntry."Tax Amount")
                             .EndObject();
             end;
         until POSEntry.Next() = 0;
