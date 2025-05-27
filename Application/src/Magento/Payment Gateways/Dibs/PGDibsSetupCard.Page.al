@@ -51,7 +51,6 @@ page 6151467 "NPR PG Dibs Setup Card"
                     ToolTip = 'Specifies the value of the Merchant ID field';
                     ApplicationArea = NPRRetail;
                 }
-
             }
         }
     }

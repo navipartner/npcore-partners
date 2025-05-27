@@ -41,6 +41,12 @@ table 6151466 "NPR PG Adyen Setup"
             Caption = 'API Url Prefix';
             DataClassification = CustomerContent;
         }
+        field(13; "Authorization Expiry Formula"; DateFormula)
+        {
+            Caption = 'Payment Authorization Expiration Formula';
+            DataClassification = CustomerContent;
+            InitValue = '28D';
+        }
     }
 
     keys

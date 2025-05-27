@@ -61,6 +61,11 @@ page 6151466 "NPR PG Adyen Setup Card"
                             Rec.SetAPIPassword(APIPasswordTxt);
                     end;
                 }
+                field("Payment Posting Warning Days"; Rec."Authorization Expiry Formula")
+                {
+                    ToolTip = 'Specifies the value of the Payment Posting Warning Days field';
+                    ApplicationArea = NPRRetail;
+                }
             }
 
         }

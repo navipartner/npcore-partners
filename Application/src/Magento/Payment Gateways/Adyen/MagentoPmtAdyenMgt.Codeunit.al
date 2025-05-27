@@ -936,7 +936,6 @@
         Response."Response Success" := true;
     end;
 
-
     internal procedure CheckUnproccesedWebhook(var PaymentLine: Record "NPR Magento Payment Line")
     var
         AdyenWebhook: Record "NPR Adyen Webhook";
@@ -1026,6 +1025,102 @@
 
         exit(true);
     end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostSalesDoc', '', true, true)]
+    local procedure OnBeforePostSalesDoc(var SalesHeader: Record "Sales Header")
+    var
+        PaymentGateway: Record "NPR Magento Payment Gateway";
+    begin
+        PaymentGateway.SetRange("Integration Type", PaymentGateway."Integration Type"::Adyen);
+        PaymentGateway.SetRange("Enable Capture", true);
+        PaymentGateway.SetLoadFields(Code);
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        PaymentGateway.ReadIsolation := PaymentGateway.ReadIsolation::ReadCommitted;
+#endif
+        if PaymentGateway.FindSet() then
+            repeat
+                CheckPaymentLinesAuthorizationExpiration(SalesHeader, PaymentGateway);
+            until PaymentGateway.Next() = 0;
+    end;
+
+    local procedure CheckPaymentLinesAuthorizationExpiration(SalesHeader: Record "Sales Header"; PaymentGateway: Record "NPR Magento Payment Gateway")
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+        TempExpiredPaymentLine: Record "NPR Magento Payment Line" temporary;
+        PGAdyenSetup: Record "NPR PG Adyen Setup";
+        ConfirmManagement: Codeunit "Confirm Management";
+        AuthorizationExpiredLinesFound: Boolean;
+        AuthorizationExpirationDurationDays: Integer;
+        PaymentPostimgWarningPluralLbl: Label 'The authorization of payment line no.: %1 for document no.: %2, payment gateway code: %3 is older than %4 days. Do you want to continue?', Comment = '%1 - line no. %2 - document no., %3 - payment gateway code, %4 - authorization expiration in days';
+        PaymentPostimgWarningSingleLbl: Label 'The authorization of payment line no.: %1 for document no.: %2, payment gateway code: %3 is older than %4 day. Do you want to continue?', Comment = '%1 - line no. %2 - document no., %3 - payment gateway code, %4 - authorization expiration in days';
+        WarningText: Text;
+    begin
+        PGAdyenSetup.SetLoadFields("Authorization Expiry Formula");
+        if not PGAdyenSetup.Get(PaymentGateway.Code) then
+            exit;
+
+        if Format(PGAdyenSetup."Authorization Expiry Formula") = '' then
+            exit;
+
+        AuthorizationExpirationDurationDays := GetAuthorizationExpirationDurationInDays(PGAdyenSetup);
+
+        PaymentLine.Reset();
+        PaymentLine.SetRange("Document Table No.", SalesHeader.RecordId.TableNo);
+        PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
+        PaymentLine.SetRange("Document No.", SalesHeader."No.");
+        PaymentLine.SetFilter(Amount, '<>%1', 0);
+        PaymentLine.SetRange("Date Captured", 0D);
+        PaymentLine.SetRange("Date Canceled", 0D);
+        PaymentLine.SetRange("Manually Canceled Link", false);
+        PaymentLine.SetRange("Payment Gateway Code", PaymentGateway.Code);
+        PaymentLine.SetRange("Payment Type", PaymentLine."Payment Type"::"Payment Method");
+        PaymentLine.SetLoadFields(SystemCreatedAt, "Date Authorized");
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        PaymentLine.ReadIsolation := PaymentLine.ReadIsolation::ReadCommitted;
+#endif
+        if not PaymentLine.FindSet() then
+            exit;
+
+        repeat
+            AuthorizationExpiredLinesFound := CheckAuthorizationExpired(PaymentLine, AuthorizationExpirationDurationDays);
+            if AuthorizationExpiredLinesFound then
+                TempExpiredPaymentLine := PaymentLine;
+        until (PaymentLine.Next() = 0) or AuthorizationExpiredLinesFound;
+
+        if not AuthorizationExpiredLinesFound then
+            exit;
+
+        if AuthorizationExpirationDurationDays = 1 then
+            WarningText := PaymentPostimgWarningSingleLbl
+        else
+            WarningText := PaymentPostimgWarningPluralLbl;
+
+        if not ConfirmManagement.GetResponseOrDefault(StrSubstNo(WarningText, TempExpiredPaymentLine."Line No.", TempExpiredPaymentLine."Document No.", PaymentGateway.Code, AuthorizationExpirationDurationDays), false) then
+            Error('');
+    end;
+
+    local procedure CheckAuthorizationExpired(PaymentLine: Record "NPR Magento Payment Line"; AuthorizationExpirationDurationDays: Integer) AuthorizationExpired: Boolean
+    var
+        CurrAuthorizationDuration: Integer;
+        AuthorizationDate: Date;
+    begin
+        if PaymentLine."Date Authorized" <> 0D then
+            AuthorizationDate := PaymentLine."Date Authorized"
+        else
+            AuthorizationDate := DT2Date(PaymentLine.SystemCreatedAt);
+
+        CurrAuthorizationDuration := Today - AuthorizationDate;
+        AuthorizationExpired := CurrAuthorizationDuration > AuthorizationExpirationDurationDays;
+    end;
+
+    local procedure GetAuthorizationExpirationDurationInDays(PGAdyenSetup: Record "NPR PG Adyen Setup") AuthorizationExpirationDays: Integer
+    begin
+        if Format(PGAdyenSetup."Authorization Expiry Formula") = '' then
+            exit;
+
+        AuthorizationExpirationDays := CalcDate(PGAdyenSetup."Authorization Expiry Formula", Today) - Today;
+    end;
+
     #endregion
 
     #region Interface implementation

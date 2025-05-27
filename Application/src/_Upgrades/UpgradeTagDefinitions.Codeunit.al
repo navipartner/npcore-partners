@@ -259,6 +259,8 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Adyen Api Key", 'UpgradeAdyenDownloadReportApiKey'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR POS Audit Log Upgrade", 'update-additional-information-in-pos-audit-log'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG NP Pay POSPaymentSetup", 'UpgradeNPPayPOSPaymentSetupApiKey'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Adyen Warning Days", 'UpdateAdyenSetup'));
+
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -993,6 +995,11 @@
                 case UpgradeStep of
                     'APIWS_041224_MMV':
                         exit('NPR-RegisterRestApiWs-20250515');
+                end;
+            Codeunit::"NPR UPG Adyen Warning Days":
+                case UpgradeStep of
+                    'UpdateAdyenSetup':
+                        exit('NPR-UpdateAdyenSetup-20250523');
                 end;
         end;
     end;
