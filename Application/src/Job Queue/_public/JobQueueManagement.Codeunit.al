@@ -605,7 +605,7 @@
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueDescrLbl: Label 'Transfer Billing Events', MaxLength = 250;
     begin
-        SetJobTimeout(4, 0);  //4 hours
+        SetJobTimeout(0, 15);
 
         if InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,
@@ -613,7 +613,7 @@
             '',
             JobQueueDescrLbl,
             NowWithDelayInSeconds(360),
-            1,
+            60,
             CreateAndAssignEventBillingJobQueueCategory(),
             JobQueueEntry)
         then
