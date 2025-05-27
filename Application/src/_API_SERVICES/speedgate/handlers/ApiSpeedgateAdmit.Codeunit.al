@@ -822,6 +822,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         TicketsCreatedToday: Integer;
         ShowGuests: Boolean;
         MemberCardProfileLine: Record "NPR SG MemberCardProfileLine";
+        Speedgate: Codeunit "NPR SG SpeedGate";
     begin
         ResponseJson.StartArray('guests');
 
@@ -858,7 +859,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
                     TicketsCreatedToday := Tickets.Count();
                 end;
 
-                AdmitToken := CreateMemberGuestAdmissionToken(SourceValidationRequest, MembershipGuest);
+                AdmitToken := Speedgate.CreateMemberGuestAdmissionToken(SourceValidationRequest, MembershipGuest);
                 if (MembershipGuest."Cardinality Type" = MembershipGuest."Cardinality Type"::UNLIMITED) then
                     MembershipGuest."Max Cardinality" := -1;
 
@@ -875,19 +876,6 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
 
         ResponseJson.EndArray();
         exit(ResponseJson);
-    end;
-
-    local procedure CreateMemberGuestAdmissionToken(SourceValidationRequest: Record "NPR SGEntryLog"; MembershipGuest: Record "NPR MM Members. Admis. Setup"): Guid
-    var
-        MemberValidationRequest: Record "NPR SGEntryLog";
-    begin
-        MemberValidationRequest := SourceValidationRequest;
-        MemberValidationRequest.EntryNo := 0;
-        MemberValidationRequest.Token := CreateGuid();
-        MemberValidationRequest.ExtraEntityTableId := Database::"NPR MM Members. Admis. Setup";
-        MemberValidationRequest.ExtraEntityId := MembershipGuest.SystemId;
-        MemberValidationRequest.Insert();
-        exit(MemberValidationRequest.Token);
     end;
 
     internal procedure ReferenceNumberTypeAsText(ReferenceNumberType: Enum "NPR SG ReferenceNumberType"): Text

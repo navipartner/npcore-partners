@@ -1026,6 +1026,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'EFT_ADYEN_HWC', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action EFT Adyen HWC";
     }
+    value(211; MM_REGISTER_GUEST)
+    {
+        Caption = 'MM_REGISTER_GUEST', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action RegisterGuests";
+    }
     value(280; AT_AUDIT_LOOKUP)
     {
         Caption = 'AT_AUDIT_LOOKUP', Locked = true, MaxLength = 20;

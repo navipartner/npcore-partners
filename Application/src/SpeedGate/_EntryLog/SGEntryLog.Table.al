@@ -118,6 +118,11 @@ table 6150987 "NPR SGEntryLog"
             DataClassification = CustomerContent;
             Caption = 'Profile Line Id';
         }
+        field(135; ParentToken; Guid)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Parent Token Id';
+        }
     }
 
     keys

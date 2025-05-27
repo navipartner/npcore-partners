@@ -83,6 +83,24 @@ codeunit 6185130 "NPR SG SpeedGate"
         exit(InvalidToken);
     end;
 
+    internal procedure CreateMemberGuestAdmissionToken(SourceValidationRequest: Record "NPR SGEntryLog"; MembershipGuest: Record "NPR MM Members. Admis. Setup"): Guid
+    var
+        MemberValidationRequest: Record "NPR SGEntryLog";
+    begin
+        MemberValidationRequest := SourceValidationRequest;
+        MemberValidationRequest.EntryNo := 0;
+        MemberValidationRequest.Token := CreateGuid();
+        MemberValidationRequest.ExtraEntityTableId := Database::"NPR MM Members. Admis. Setup";
+        MemberValidationRequest.ExtraEntityId := MembershipGuest.SystemId;
+        MemberValidationRequest.EntryStatus := MemberValidationRequest.EntryStatus::PERMITTED_BY_GATE;
+        MemberValidationRequest.AdmittedAt := 0DT;
+        MemberValidationRequest.AdmittedReferenceNo := '';
+        Clear(MemberValidationRequest.AdmittedReferenceId);
+        MemberValidationRequest.ParentToken := SourceValidationRequest.Token;
+        MemberValidationRequest.Insert();
+        exit(MemberValidationRequest.Token);
+    end;
+
     internal procedure Admit(Token: Guid; Quantity: Integer)
     var
         ValidationRequest: Record "NPR SGEntryLog";
@@ -395,6 +413,7 @@ codeunit 6185130 "NPR SG SpeedGate"
                         ExtraGuestValidationRequest.AdmittedAt := CurrentDateTime;
                         ExtraGuestValidationRequest.AdmittedReferenceNo := ExternalTicketNo;
                         ExtraGuestValidationRequest.AdmittedReferenceId := GetTicketId(ExtraGuestValidationRequest.AdmittedReferenceNo);
+                        ExtraGuestValidationRequest.ParentToken := ValidationRequest.Token;
                         ExtraGuestValidationRequest.Insert();
                     end;
 
