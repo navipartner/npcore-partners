@@ -5,6 +5,7 @@
     var
         ABORTED: Label 'Aborted.';
         SCHEDULE_ERROR: Label 'There was an error changing the reservation \\%1\\Do you want to try again?';
+        _TicketEvents: Codeunit "NPR TMTicketEvents";
 
     procedure IssueTicket(Token: Text[100]; ExternalMemberNo: Code[20]; ResponseCode: Integer; ResponseMessage: Text; SaleLinePOS: Record "NPR POS Sale Line"; UpdateSalesLine: Boolean) Success: Boolean
     var
@@ -314,6 +315,7 @@
         TicketReservationRequest2: Record "NPR TM Ticket Reservation Req.";
         AdmScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         AdmScheduleEntry2: Record "NPR TM Admis. Schedule Entry";
+        ExternalScheduleEntryNo: Integer;
     begin
 
 
@@ -386,6 +388,35 @@
 
             until (TicketReservationRequest.Next() = 0);
         end;
+
+        // Let a subscriber find the schedule entry when the same-schedule selection fails
+        Clear(TicketReservationRequest2);
+        TicketReservationRequest.Reset();
+        TicketReservationRequest.SetCurrentKey("Session Token ID");
+        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+        TicketReservationRequest.SetFilter("External Adm. Sch. Entry No.", '<=%1', 0);
+        TicketReservationRequest.SetLoadFields("Admission Code", "External Adm. Sch. Entry No.", "Receipt No.", "Item No.", "Variant Code");
+        if (TicketReservationRequest.FindSet()) then begin
+            ExternalScheduleEntryNo := 0;
+            _TicketEvents.OnAssignSameScheduleFailure(TicketReservationRequest."Entry No.", TicketReservationRequest."Receipt No.", TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest."Admission Code", ExternalScheduleEntryNo);
+
+            if (ExternalScheduleEntryNo > 0) then begin
+                AdmScheduleEntry2.Reset();
+                AdmScheduleEntry2.SetCurrentKey("External Schedule Entry No.");
+                AdmScheduleEntry2.SetLoadFields("Admission Code", "Schedule Code", "Admission Start Date", "Admission Start Time");
+                AdmScheduleEntry2.SetFilter("External Schedule Entry No.", '=%1', ExternalScheduleEntryNo);
+                AdmScheduleEntry2.SetFilter("Admission Code", '=%1', TicketReservationRequest."Admission Code");
+                AdmScheduleEntry2.SetFilter(Cancelled, '=%1', false);
+                if (AdmScheduleEntry2.FindFirst()) then begin
+                    TicketReservationRequest2.SetLoadFields("External Adm. Sch. Entry No.", "Scheduled Time Description");
+                    TicketReservationRequest2.Get(TicketReservationRequest."Entry No.");
+                    TicketReservationRequest2."External Adm. Sch. Entry No." := ExternalScheduleEntryNo;
+                    TicketReservationRequest2."Scheduled Time Description" := StrSubstNo('(%1) %2', AdmScheduleEntry2."Admission Start Date", AdmScheduleEntry2."Admission Start Time");
+                    TicketReservationRequest2.Modify();
+                end;
+            end;
+        end;
+
     end;
 
     procedure AssignSameNotificationAddress(Token: Text[100])
