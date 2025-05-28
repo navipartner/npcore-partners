@@ -695,7 +695,7 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
 
                     trigger OnBeforePassVariable()
                     begin
-                        orderno := Format(ShipmentDocument."Entry No.");
+                        orderno := Format(ShipmentDocument.Reference);
                         OnAfterBeforePassVariableOrderNo(ShipmentDocument, orderno);
                     end;
                 }
