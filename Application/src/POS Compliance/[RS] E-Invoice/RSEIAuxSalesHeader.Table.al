@@ -165,7 +165,11 @@ table 6150833 "NPR RS EI Aux Sales Header"
     internal procedure SetReferenceNumberFromSalesHeader(SalesHeader: Record "Sales Header")
     var
         SalesReceivablesSetup: Record "Sales & Receivables Setup";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
         RSEInvoiceMgt: Codeunit "NPR RS E-Invoice Mgt.";
     begin
         if not RSEInvoiceMgt.IsRSEInvoiceEnabled() then
@@ -183,9 +187,17 @@ table 6150833 "NPR RS EI Aux Sales Header"
 
         case SalesHeader."Document Type" of
             SalesHeader."Document Type"::Order, SalesHeader."Document Type"::Invoice:
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                "NPR RS EI Reference Number" := NoSeriesMgt.PeekNextNo(SalesReceivablesSetup."Posted Invoice Nos.");
+#ELSE
                 "NPR RS EI Reference Number" := NoSeriesMgt.GetNextNo(SalesReceivablesSetup."Posted Invoice Nos.", Today(), false);
+#ENDIF
             SalesHeader."Document Type"::"Credit Memo":
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                "NPR RS EI Reference Number" := NoSeriesMgt.PeekNextNo(SalesReceivablesSetup."Posted Credit Memo Nos.")
+#ELSE
                 "NPR RS EI Reference Number" := NoSeriesMgt.GetNextNo(SalesReceivablesSetup."Posted Credit Memo Nos.", Today(), false)
+#ENDIF
         end;
 
         SaveRSEIAuxSalesHeaderFields();

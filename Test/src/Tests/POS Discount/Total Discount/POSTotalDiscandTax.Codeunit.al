@@ -6517,13 +6517,19 @@ codeunit 85148 "NPR POS Total Disc. and Tax"
     var
         Item: Record Item;
         NPRItemBenefitListLine: Record "NPR Item Benefit List Line";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
         NPRItemBenefListHeadUtils: Codeunit "NPR Item Benef List Head Utils";
     begin
         NPRItemBenefitListHeader.Init();
-        NPRItemBenefitListHeader.Code := NoSeriesManagement.GetNextNo(NoSeries.Code,
-                                                                      Today,
-                                                                      true);
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NPRItemBenefitListHeader.Code := NoSeriesManagement.GetNextNo(NoSeries.Code, Today, false);
+#ELSE
+        NPRItemBenefitListHeader.Code := NoSeriesManagement.GetNextNo(NoSeries.Code, Today, true);
+#ENDIF
         NPRItemBenefitListHeader.Insert(true);
 
         CreateItem(Item,

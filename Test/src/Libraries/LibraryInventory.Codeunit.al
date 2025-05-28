@@ -8,7 +8,11 @@ codeunit 85001 "NPR Library - Inventory"
 
     procedure CreateItemCategory(var ItemCategory: Record "Item Category"): Code[20]
     var
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
         ItemCategoryMgt: Codeunit "NPR Item Category Mgt.";
         GeneralPostingSetup: Record "General Posting Setup";
         InventoryPostingGroup: Record "Inventory Posting Group";
@@ -17,7 +21,11 @@ codeunit 85001 "NPR Library - Inventory"
     begin
         Clear(ItemCategory);
 
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        ItemCategory.Code := NoSeriesManagement.GetNextNo(LibraryUtility.GetGlobalNoSeriesCode, Today, false);
+#ELSE
         ItemCategory.Code := NoSeriesManagement.GetNextNo(LibraryUtility.GetGlobalNoSeriesCode, Today, true);
+#ENDIF
         ItemCategory.Insert(true);
 
         VATPostingSetup.SetFilter("VAT Bus. Posting Group", '<>%1', '');

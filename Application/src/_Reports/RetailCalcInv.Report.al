@@ -141,7 +141,11 @@
                         ItemJnlLine.SetRange("Journal Template Name", ItemJnlLine."Journal Template Name");
                         ItemJnlLine.SetRange("Journal Batch Name", ItemJnlLine."Journal Batch Name");
                         if not ItemJnlLine.FindFirst() then
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                            NextDocNo := NoSeriesMgt.PeekNextNo(ItemJnlBatch."No. Series");
+#ELSE
                             NextDocNo := NoSeriesMgt.GetNextNo(ItemJnlBatch."No. Series", PostingDate, false);
+#ENDIF
                         ItemJnlLine.Init();
                     end;
                     if NextDocNo = '' then
@@ -272,7 +276,11 @@
         OldWhseEntry: Record "Warehouse Entry";
         WhseEntry: Record "Warehouse Entry";
         DimBufMgt: Codeunit "Dimension Buffer Management";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
         AdjustPosQty: Boolean;
         HideValidationDialog: Boolean;
         IncludeItemWithNoTransaction: Boolean;
@@ -309,7 +317,11 @@
         if ItemJnlBatch."No. Series" = '' then
             NextDocNo := ''
         else begin
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            NextDocNo := NoSeriesMgt.PeekNextNo(ItemJnlBatch."No. Series");
+#ELSE
             NextDocNo := NoSeriesMgt.GetNextNo(ItemJnlBatch."No. Series", PostingDate, false);
+#ENDIF
             Clear(NoSeriesMgt);
         end;
     end;

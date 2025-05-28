@@ -148,17 +148,30 @@ codeunit 6151079 "NPR Total Disc. Header Utils"
     internal procedure AssitedEdit(var CurrNPRTotalDiscountHeader: Record "NPR Total Discount Header") Assited: Boolean
     var
         NPRTotalDiscountHeader: Record "NPR Total Discount Header";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
         NPRTotalDiscountManagement: Codeunit "NPR Total Discount Management";
     begin
         NPRTotalDiscountHeader := CurrNPRTotalDiscountHeader;
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        if not NoSeriesMgt.LookupRelatedNoSeries(NPRTotalDiscountManagement.GetNoSeries(),
+                                        CurrNPRTotalDiscountHeader."No. Serie",
+                                        NPRTotalDiscountHeader."No. Serie")
+#ELSE
         if not NoSeriesMgt.SelectSeries(NPRTotalDiscountManagement.GetNoSeries(),
                                         CurrNPRTotalDiscountHeader."No. Serie",
                                         NPRTotalDiscountHeader."No. Serie")
+#ENDIF
         then
             exit;
-
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NPRTotalDiscountHeader.Code := NoSeriesMgt.GetNextNo(NPRTotalDiscountHeader."No. Serie");
+#ELSE
         NoSeriesMgt.SetSeries(NPRTotalDiscountHeader.Code);
+#ENDIF
         CurrNPRTotalDiscountHeader := NPRTotalDiscountHeader;
         Assited := true;
     end;
@@ -166,17 +179,30 @@ codeunit 6151079 "NPR Total Disc. Header Utils"
     internal procedure InitNoSeries(var NPRTotalDiscountHeader: Record "NPR Total Discount Header";
                                     var xNPRTotalDiscountHeader: Record "NPR Total Discount Header")
     var
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+        NoSeries: Code[20];
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
         NPRTotalDiscountManagement: Codeunit "NPR Total Discount Management";
     begin
         if NPRTotalDiscountHeader.Code <> '' then
             exit;
 
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeries := NPRTotalDiscountManagement.GetNoSeries();
+        NPRTotalDiscountHeader."No. Serie" := NoSeries;
+        if NoSeriesManagement.AreRelated(NoSeries, xNPRTotalDiscountHeader."No. Serie") then
+            NPRTotalDiscountHeader."No. Serie" := xNPRTotalDiscountHeader."No. Serie";
+        NPRTotalDiscountHeader.Code := NoSeriesManagement.GetNextNo(NPRTotalDiscountHeader."No. Serie");
+#ELSE
         NoSeriesManagement.InitSeries(NPRTotalDiscountManagement.GetNoSeries(),
                                       xNPRTotalDiscountHeader."No. Serie",
                                       0D,
                                       NPRTotalDiscountHeader.Code,
                                       NPRTotalDiscountHeader."No. Serie");
+#ENDIF
     end;
 
     internal procedure CheckIfTotalDiscountEditable(NPRTotalDiscountHeader: Record "NPR Total Discount Header")

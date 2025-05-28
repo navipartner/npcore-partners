@@ -19,7 +19,11 @@
         _ItemWkshLine: Record "NPR Item Worksheet Line";
         RegisteredWorksheetVarietyValue: Record "NPR Reg. Item Wsht Var. Value";
         RegisteredWorksheetLine: Record "NPR Regist. Item Worksh Line";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
         VarietyCloneData: Codeunit "NPR Variety Clone Data";
         CalledFromTest: Boolean;
         VariantExistErr: Label 'Variant already exists.';
@@ -59,7 +63,11 @@
                             ItemNo := _ItemWkshLine.GetNewItemNo();
 
                         if ItemNo = '' then
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                            ItemNo := NoSeriesMgt.GetNextNo(_ItemWkshLine."No. Series");
+#ELSE
                             NoSeriesMgt.InitSeries(_ItemWkshLine."No. Series", '', 0D, ItemNo, _ItemWkshLine."No. Series");
+#ENDIF
 
                         Item.Validate("No.", ItemNo);
                         Item."No. Series" := _ItemWkshLine."No. Series";
@@ -286,19 +294,35 @@
                     1:
                         if (VarietyGroup."Copy Naming Variety 1" = VarietyGroup."Copy Naming Variety 1"::TableCodeAndNoSeries) and
                           (VarietyGroup."No. Series" <> '') then
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                            SuffixCode := NoSeriesMgt.GetNextNo(VarietyGroup."No. Series");
+#ELSE
                             NoSeriesMgt.InitSeries(VarietyGroup."No. Series", '', WorkDate(), SuffixCode, VarietyGroup."No. Series");
+#ENDIF
                     2:
                         if (VarietyGroup."Copy Naming Variety 2" = VarietyGroup."Copy Naming Variety 2"::TableCodeAndNoSeries) and
                           (VarietyGroup."No. Series" <> '') then
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                            SuffixCode := NoSeriesMgt.GetNextNo(VarietyGroup."No. Series");
+#ELSE
                             NoSeriesMgt.InitSeries(VarietyGroup."No. Series", '', WorkDate(), SuffixCode, VarietyGroup."No. Series");
+#ENDIF
                     3:
                         if (VarietyGroup."Copy Naming Variety 3" = VarietyGroup."Copy Naming Variety 3"::TableCodeAndNoSeries) and
                           (VarietyGroup."No. Series" <> '') then
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                            SuffixCode := NoSeriesMgt.GetNextNo(VarietyGroup."No. Series");
+#ELSE
                             NoSeriesMgt.InitSeries(VarietyGroup."No. Series", '', WorkDate(), SuffixCode, VarietyGroup."No. Series");
+#ENDIF
                     4:
                         if (VarietyGroup."Copy Naming Variety 4" = VarietyGroup."Copy Naming Variety 4"::TableCodeAndNoSeries) and
                           (VarietyGroup."No. Series" <> '') then
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                            SuffixCode := NoSeriesMgt.GetNextNo(VarietyGroup."No. Series");
+#ELSE
                             NoSeriesMgt.InitSeries(VarietyGroup."No. Series", '', WorkDate(), SuffixCode, VarietyGroup."No. Series");
+#ENDIF
                 end;
                 if StrPos(VarietyTableFrom, '-') > 0 then
                     PrefixCode := CopyStr(CopyStr(VarietyTableFrom, 1, StrPos(VarietyTableFrom, '-') - 1), 1, MaxStrLen(PrefixCode))
@@ -381,19 +405,35 @@
                     1:
                         if (VarietyGroup."Copy Naming Variety 1" = VarietyGroup."Copy Naming Variety 1"::TableCodeAndNoSeries) and
                           (VarietyGroup."No. Series" <> '') then
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                            SuffixCode := NoSeriesMgt.GetNextNo(VarietyGroup."No. Series");
+#ELSE
                             NoSeriesMgt.InitSeries(VarietyGroup."No. Series", '', WorkDate(), SuffixCode, VarietyGroup."No. Series");
+#ENDIF
                     2:
                         if (VarietyGroup."Copy Naming Variety 2" = VarietyGroup."Copy Naming Variety 2"::TableCodeAndNoSeries) and
                           (VarietyGroup."No. Series" <> '') then
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                            SuffixCode := NoSeriesMgt.GetNextNo(VarietyGroup."No. Series");
+#ELSE
                             NoSeriesMgt.InitSeries(VarietyGroup."No. Series", '', WorkDate(), SuffixCode, VarietyGroup."No. Series");
+#ENDIF
                     3:
                         if (VarietyGroup."Copy Naming Variety 3" = VarietyGroup."Copy Naming Variety 3"::TableCodeAndNoSeries) and
                           (VarietyGroup."No. Series" <> '') then
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                            SuffixCode := NoSeriesMgt.GetNextNo(VarietyGroup."No. Series");
+#ELSE
                             NoSeriesMgt.InitSeries(VarietyGroup."No. Series", '', WorkDate(), SuffixCode, VarietyGroup."No. Series");
+#ENDIF
                     4:
                         if (VarietyGroup."Copy Naming Variety 4" = VarietyGroup."Copy Naming Variety 4"::TableCodeAndNoSeries) and
                           (VarietyGroup."No. Series" <> '') then
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                            SuffixCode := NoSeriesMgt.GetNextNo(VarietyGroup."No. Series");
+#ELSE
                             NoSeriesMgt.InitSeries(VarietyGroup."No. Series", '', WorkDate(), SuffixCode, VarietyGroup."No. Series");
+#ENDIF
                 end;
                 if StrPos(VarietyTableFrom, '-') > 0 then
                     PrefixCode := CopyStr(CopyStr(VarietyTableFrom, 1, StrPos(VarietyTableFrom, '-') - 1), 1, MaxStrLen(PrefixCode))

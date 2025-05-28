@@ -118,14 +118,22 @@
 
     procedure InsertWaiterPad(var WaiterPad: Record "NPR NPRE Waiter Pad"; RunInsert: Boolean)
     var
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
         HospitalitySetup: Record "NPR NPRE Restaurant Setup";
         NewWaiterPadNo: Code[20];
     begin
         HospitalitySetup.Get();
         HospitalitySetup.TestField("Waiter Pad No. Serie");
 
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NewWaiterPadNo := NoSeriesManagement.GetNextNo(HospitalitySetup."Waiter Pad No. Serie", Today, false);
+#ELSE
         NewWaiterPadNo := NoSeriesManagement.GetNextNo(HospitalitySetup."Waiter Pad No. Serie", Today, true);
+#ENDIF
 
         WaiterPad."No." := NewWaiterPadNo;
         if RunInsert then WaiterPad.Insert(true);

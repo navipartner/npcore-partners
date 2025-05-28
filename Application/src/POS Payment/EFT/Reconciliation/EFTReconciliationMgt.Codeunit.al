@@ -88,7 +88,11 @@
         GenJnlTemplate: Record "Gen. Journal Template";
         GenJnlBatch: Record "Gen. Journal Batch";
         GenJnlLine: Record "Gen. Journal Line";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
         GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
         DocumentNo: Code[20];
         NextLineNo: Integer;
@@ -125,17 +129,29 @@
                 NextLineNo := 10000;
             if (DocumentNo = '') and (GenJnlBatch."No. Series" <> '') then begin
                 Clear(NoSeriesMgt);
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                DocumentNo := NoSeriesMgt.PeekNextNo(GenJnlBatch."No. Series", EFTReconciliation."Bank Transfer Date");
+#ELSE
                 DocumentNo := NoSeriesMgt.TryGetNextNo(GenJnlBatch."No. Series", EFTReconciliation."Bank Transfer Date");
+#ENDIF
             end;
             if (DocumentNo = '') and (EFTReconProvider."No. Series" <> '') then begin
                 Clear(NoSeriesMgt);
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                DocumentNo := NoSeriesMgt.GetNextNo(EFTReconProvider."No. Series", EFTReconciliation."Bank Transfer Date", false);
+#ELSE
                 DocumentNo := NoSeriesMgt.GetNextNo(EFTReconProvider."No. Series", EFTReconciliation."Bank Transfer Date", true);
+#ENDIF
             end;
         end;
         if EFTReconProvider.Posting = EFTReconProvider.Posting::Direct then begin
             EFTReconProvider.TestField("No. Series");
             Clear(NoSeriesMgt);
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            DocumentNo := NoSeriesMgt.GetNextNo(EFTReconProvider."No. Series", EFTReconciliation."Bank Transfer Date", false);
+#ELSE
             DocumentNo := NoSeriesMgt.GetNextNo(EFTReconProvider."No. Series", EFTReconciliation."Bank Transfer Date", true);
+#ENDIF
         end;
 
         EFTReconBankAmount.SetRange("Reconciliation No.", EFTReconciliation."No.");

@@ -371,10 +371,22 @@
     trigger OnInsert()
     var
         Date: Record Date;
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSerie: Code[20];
+#ENDIF
     begin
 
-        if Code = '' then
+        if Code = '' then begin
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            NoSerie := GetNoSeries();
+            "No. Series" := NoSerie;
+            if NoSeriesMgt.AreRelated(NoSerie, xRec."No. Series") then
+                "No. Series" := xRec."No. Series";
+            Code := NoSeriesMgt.GetNextNo("No. Series");
+#ELSE
             NoSeriesMgt.InitSeries(GetNoSeries(), xRec."No. Series", 0D, Code, "No. Series");
+#ENDIF
+        end;
 
         Date.SetRange("Period Type", Date."Period Type"::Date);
         "Starting Date" := Today();
@@ -423,15 +435,24 @@
         Text1060007: Label 'Period price: %3 <> %4';
         PeriodDiscountLine: Record "NPR Period Discount Line";
         PeriodDiscountLine2: Record "NPR Period Discount Line";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
         PeriodDiscount: Record "NPR Period Discount";
         DimMgt: Codeunit DimensionManagement;
 
     internal procedure AssistEdit(PeriodDisc: Record "NPR Period Discount"): Boolean
     begin
         PeriodDiscount := Rec;
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        if NoSeriesMgt.LookupRelatedNoSeries(GetNoSeries(), PeriodDisc."No. Series", PeriodDiscount."No. Series") then begin
+            PeriodDiscount.Code := NoSeriesMgt.GetNextNo(PeriodDiscount."No. Series");
+#ELSE
         if NoSeriesMgt.SelectSeries(GetNoSeries(), PeriodDisc."No. Series", PeriodDiscount."No. Series") then begin
             NoSeriesMgt.SetSeries(PeriodDiscount.Code);
+#ENDIF
             Rec := PeriodDiscount;
             exit(true);
         end;

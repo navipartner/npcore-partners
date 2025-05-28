@@ -296,7 +296,11 @@
 
     local procedure TestNoSeries(NoSeriesCode: Code[20])
     var
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
         NextNo: Code[20];
         RequiredLength: Integer;
         InvalidNoSerieErr: Label 'Number Series %1 generates a value (%2) which does not have the required length (%3) for Barcodetype %4';
@@ -308,7 +312,11 @@
             exit;
         if Rec."Barcode Type (Item Cross Ref.)" = Rec."Barcode Type (Item Cross Ref.)"::" " then
             exit;
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NextNo := NoSeriesManagement.PeekNextNo(NoSeriesCode, Today);
+#ELSE
         NextNo := NoSeriesManagement.TryGetNextNo(NoSeriesCode, Today);
+#ENDIF
         case Rec."Barcode Type (Item Cross Ref.)" of
             Rec."Barcode Type (Item Cross Ref.)"::EAN13:
                 RequiredLength := 12;

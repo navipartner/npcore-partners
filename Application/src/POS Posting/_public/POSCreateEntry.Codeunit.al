@@ -1628,7 +1628,11 @@
 
     local procedure FillFiscalNo(var POSEntry: Record "NPR POS Entry"; NoSeriesCode: Code[20]; NoSeriesDate: Date)
     var
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
         POSAuditProfile: Record "NPR POS Audit Profile";
         POSUnit: Record "NPR POS Unit";
     begin
@@ -1642,7 +1646,11 @@
             POSEntry."Fiscal No. Series" := POSAuditProfile."Sales Ticket No. Series";
 
         end else begin
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            POSEntry."Fiscal No." := NoSeriesManagement.GetNextNo(NoSeriesCode, NoSeriesDate, false);
+#ELSE
             POSEntry."Fiscal No." := NoSeriesManagement.GetNextNo(NoSeriesCode, NoSeriesDate, true);
+#ENDIF
             POSEntry."Fiscal No. Series" := NoSeriesCode;
         end;
 

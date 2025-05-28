@@ -23,7 +23,11 @@ codeunit 85162 "NPR Library CRO Fiscal"
         NoSeriesLine.SetRange("Series Code", POSAuditProfile."Sales Ticket No. Series");
         NoSeriesLine.SetRange(Open, true);
         NoSeriesLine.FindLast();
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesLine.Validate(Implementation, NoSeriesLine.Implementation::Sequence);
+#ELSE
         NoSeriesLine.Validate("Allow Gaps in Nos.", true);
+#ENDIF
         NoSeriesLine.Modify();
         POSAuditProfile.Insert();
         POSUnit."POS Audit Profile" := POSAuditProfile.Code;
@@ -53,7 +57,11 @@ codeunit 85162 "NPR Library CRO Fiscal"
         NoSeriesLine.SetRange("Series Code", CROFiscalizationSetup."Bill No. Series");
         NoSeriesLine.SetRange(Open, true);
         NoSeriesLine.FindLast();
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesLine.Validate(Implementation, NoSeriesLine.Implementation::Normal);
+#ELSE
         NoSeriesLine.Validate("Allow Gaps in Nos.", false);
+#ENDIF
         NoSeriesLine.Validate("Starting No.", '1');
         NoSeriesLine.Modify();
         CROFiscalizationSetup.Insert();

@@ -156,14 +156,25 @@
     }
 
     trigger OnInsert()
-    var       
+    var
         ExchangeLabelMgt: Codeunit "NPR Exchange Label Mgt.";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesCode: Code[20];
+#ELSE
         NewNo: Code[20];
-
+#ENDIF
     begin
         if "No." = '' then begin
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            NoSeriesCode := GetNoSeriesCode();
+            "No. Series" := NoSeriesCode;
+            if NoSeriesMgt.AreRelated(NoSeriesCode, xRec."No. Series") then
+                "No. Series" := xRec."No. Series";
+            "No." := CopyStr(NoSeriesMgt.GetNextNo("No. Series"), 1, MaxStrLen("No."));
+#ELSE
             NoSeriesMgt.InitSeries(GetNoSeriesCode(), xRec."No. Series", 0D, NewNo, "No. Series");
             "No." := CopyStr(NewNo, 1, MaxStrLen("No."));
+#ENDIF
         end;
 
         TestField("Store ID");
@@ -182,13 +193,17 @@
         SalesHeader: Record "Sales Header";
     begin
         if not SalesHeader.Get(SalesHeader."Document Type"::Order, Rec."Sales Header No.") then
-            exit;        
+            exit;
         SalesHeader."NPR Exchange Label Barcode" := ParamBarcode;
-        SalesHeader.Modify();        
+        SalesHeader.Modify();
     end;
 
     var
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
 
     procedure GetNoSeriesCode(): Code[20]
     var

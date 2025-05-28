@@ -458,7 +458,11 @@
         DenominationMgt: Codeunit "NPR Denomination Mgt.";
         DimMgt: Codeunit DimensionManagement;
         POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
         DuplicateReceiptNo: Label 'Duplicate Receipt Number: %1';
     begin
 
@@ -480,11 +484,19 @@
             SalePOS."Sales Ticket No." := CopyStr(DelChr(Format(CurrentDateTime(), 0, 9), '<=>', DelChr(Format(CurrentDateTime(), 0, 9), '<=>', '01234567890')), 1, MaxStrLen(SalePOS."Sales Ticket No."));
 
             if (Mode = EodWorkshiftMode::ZREPORT) and (POSEndofDayProfile."Z-Report Number Series" <> '') then
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                SalePOS."Sales Ticket No." := NoSeriesManagement.GetNextNo(POSEndofDayProfile."Z-Report Number Series", Today, false);
+            if (Mode = EodWorkshiftMode::XREPORT) and (POSEndofDayProfile."X-Report Number Series" <> '') then
+                SalePOS."Sales Ticket No." := NoSeriesManagement.GetNextNo(POSEndofDayProfile."X-Report Number Series", Today, false);
+            if (Mode = EodWorkshiftMode::CLOSEWORKSHIFT) and (POSEndofDayProfile."X-Report Number Series" <> '') then
+                SalePOS."Sales Ticket No." := NoSeriesManagement.GetNextNo(POSEndofDayProfile."X-Report Number Series", Today, false);
+#ELSE
                 SalePOS."Sales Ticket No." := NoSeriesManagement.GetNextNo(POSEndofDayProfile."Z-Report Number Series", Today, true);
             if (Mode = EodWorkshiftMode::XREPORT) and (POSEndofDayProfile."X-Report Number Series" <> '') then
                 SalePOS."Sales Ticket No." := NoSeriesManagement.GetNextNo(POSEndofDayProfile."X-Report Number Series", Today, true);
             if (Mode = EodWorkshiftMode::CLOSEWORKSHIFT) and (POSEndofDayProfile."X-Report Number Series" <> '') then
                 SalePOS."Sales Ticket No." := NoSeriesManagement.GetNextNo(POSEndofDayProfile."X-Report Number Series", Today, true);
+#ENDIF
 
             if not POSCreateEntry.IsUniqueDocumentNo(SalePOS."Sales Ticket No.") then
                 Error(DuplicateReceiptNo, SalePOS."Sales Ticket No.");

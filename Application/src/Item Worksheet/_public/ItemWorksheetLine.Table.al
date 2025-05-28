@@ -1967,7 +1967,11 @@
     internal procedure GetNewItemNo(): Code[20]
     var
         InventorySetup: Record "Inventory Setup";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
+        NoSeriesMgt: Codeunit NoSeriesManagement; 
+#ENDIF
         Prefix: Code[4];
         ItemNoLengthExceededErr: Label 'Length %1 for item no. %2 is longer than %3. Please adjust data or use a different %4 on %5.',
                                     Comment = '%1 = string length of new item no., %2 = value of new item no., %3 = max. allowed item no. length, %4 = "Item No. Creation by" field caption, %5 = "Item Worksheet Template" table caption';
@@ -1992,7 +1996,11 @@
         case ItemWorksheetTemplate."Item No. Creation by" of
             ItemWorksheetTemplate."Item No. Creation by"::NoSeriesInWorksheet:
                 begin
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                    "Item No." := NoSeriesMgt.GetNextNo("No. Series");
+#ELSE
                     NoSeriesMgt.InitSeries("No. Series", "No. Series", 0D, "Item No.", "No. Series");
+#ENDIF
                     Prefix := ItemNoPrefix();
                     if StrLen(Prefix + "Item No.") < MaxStrLen("Item No.") then
                         exit(CopyStr(Prefix + "Item No.", 1, 20));

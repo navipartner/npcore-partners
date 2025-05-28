@@ -293,13 +293,24 @@
     var
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+        AllowGapsInNosErr: Label 'Field "Implementation" must be set to "Sequence" in %1 No. Series, Line No.: %2', Comment = '%1 = No. Series Code, %2 - No. Series Line No.';
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
     begin
         if NoSeriesCode = '' then
             exit;
         NoSeries.Get(NoSeriesCode);
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt.GetNoSeriesLine(NoSeriesLine, NoSeriesCode, 0D, false);
+        if not NoSeriesMgt.MayProduceGaps(NoSeriesLine) then
+            Error(AllowGapsInNosErr, NoSeriesLine."Series Code", NoSeriesLine."Line No.");
+#ELSE
         NoSeriesMgt.SetNoSeriesLineFilter(NoSeriesLine, NoSeriesCode, 0D);
         NoSeriesLine.FindFirst();
         NoSeriesLine.TestField("Allow Gaps in Nos.", true);
+#ENDIF
     end;
 }

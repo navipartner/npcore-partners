@@ -601,7 +601,11 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         PmtBin: Record "NPR POS Payment Bin";
         POSUnit: Record "NPR POS Unit";
         BinTransferAnPost: Codeunit "NPR BinTransferPost";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
     begin
         if PmtBinCheckpoint."Direct Transfer Dest. Bin Code" = '' then
             exit;
@@ -622,7 +626,11 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         BinTransferJnlLine.PaymentMethod := PmtBinCheckpoint."Payment Method No.";
         BinTransferJnlLine.Amount := PmtBinCheckpoint."Move To Bin Amount";
         BinTransferJnlLine.ExternalDocumentNo := CopyStr(PmtBinCheckpoint."Move To Bin Reference", 1, MaxStrLen(BinTransferJnlLine.ExternalDocumentNo));
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        BinTransferJnlLine.DocumentNo := NoSeriesMgt.GetNextNo(BinTransferSetup.DocumentNoSeries, Today(), false);
+#ELSE
         BinTransferJnlLine.DocumentNo := NoSeriesMgt.GetNextNo(BinTransferSetup.DocumentNoSeries, Today(), true);
+#ENDIF
         BinTransferJnlLine.EntryNo := 0;
         BinTransferJnlLine.Insert(true);
         TransferDenominations(PmtBinCheckpoint, Enum::"NPR Denomination Target"::MoveToBin, BinTransferJnlLine);
@@ -670,7 +678,11 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         SalePOS: Record "NPR POS Sale";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         POSPostEntries: Codeunit "NPR POS Post Entries";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
         POSEntryNo: Integer;
         Now: DateTime;
         NotReadyForPostingErr: Label 'Counting has not been completed for workshift checkpoint entry No. %1.';
@@ -683,7 +695,11 @@ codeunit 6059837 "NPR POS Action: Bin Transfer B"
         SalePOS."POS Store Code" := SalePOSIn."POS Store Code";
 
         if BinTransferNoSeriesCode <> '' then
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            SalePOS."Sales Ticket No." := NoSeriesManagement.GetNextNo(BinTransferNoSeriesCode, Today(), false)
+#ELSE
             SalePOS."Sales Ticket No." := NoSeriesManagement.GetNextNo(BinTransferNoSeriesCode, Today(), true)
+#ENDIF
         else
             SalePOS."Sales Ticket No." := CopyStr(DelChr(Format(Now, 0, 9), '=', DelChr(Format(Now, 0, 9), '=', '01234567890')), 1, MaxStrLen(SalePOS."Sales Ticket No."));
 

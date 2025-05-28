@@ -42,7 +42,11 @@ codeunit 85193 "NPR Library AT Fiscal"
         NoSeriesLine.SetRange("Series Code", SeriesCode);
         NoSeriesLine.SetRange(Open, true);
         NoSeriesLine.FindLast();
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesLine.Validate(Implementation, NoSeriesLine.Implementation::Sequence);
+#ELSE
         NoSeriesLine.Validate("Allow Gaps in Nos.", true);
+#ENDIF
         NoSeriesLine.Modify();
     end;
 

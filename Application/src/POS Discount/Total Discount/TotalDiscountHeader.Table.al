@@ -15,7 +15,11 @@ table 6059874 "NPR Total Discount Header"
 
             trigger OnValidate()
             var
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                NoSeriesMgt: Codeunit "No. Series";
+#ELSE
                 NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
             begin
                 if Code <> xRec.Code then begin
                     NoSeriesMgt.TestManual("No. Serie");

@@ -132,7 +132,14 @@ table 6059998 "NPR RS Nivelation Header"
             exit;
         LocalizationSetup.Get();
         LocalizationSetup.TestField("RS Nivelation Hdr No. Series");
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        "No. Series" := LocalizationSetup."RS Nivelation Hdr No. Series";
+        if NoSeriesMgt.AreRelated(LocalizationSetup."RS Nivelation Hdr No. Series", xRec."No. Series") then
+            "No. Series" := xRec."No. Series";
+        "No." := NoSeriesMgt.GetNextNo("No. Series");
+#ELSE
         NoSeriesMgt.InitSeries(LocalizationSetup."RS Nivelation Hdr No. Series", xRec."No. Series", 0D, "No.", "No. Series");
+#ENDIF
     end;
 
     local procedure ValidateSourceType()
@@ -221,5 +228,9 @@ table 6059998 "NPR RS Nivelation Header"
 
     var
         LocalizationSetup: Record "NPR RS R Localization Setup";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
 }

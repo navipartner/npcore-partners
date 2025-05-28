@@ -105,12 +105,21 @@ codeunit 6059951 "NPR POSAction: Ins. Customer-B"
 
     local procedure InitCustomerNo(var Customer: Record Customer; CustomerTempl: Record "Customer Templ.")
     var
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
     begin
         if CustomerTempl."No. Series" = '' then
             exit;
 
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        Customer."No. Series" := CustomerTempl."No. Series";
+        Customer."No." := NoSeriesManagement.GetNextNo(Customer."No. Series");
+#ELSE
         NoSeriesManagement.InitSeries(CustomerTempl."No. Series", '', 0D, Customer."No.", Customer."No. Series");
+#ENDIF
     end;
 #endif
     local procedure InitCustomer(var Customer: Record Customer)

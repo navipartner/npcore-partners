@@ -60,7 +60,11 @@ codeunit 6059838 "NPR Create Service Item"
         ServiceItem: Record "Service Item";
         ItemUnitOfMeasure: Record "Item Unit of Measure";
         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
         ResSkillMgt: Codeunit "Resource Skill Mgt.";
         ServLogMgt: Codeunit ServLogManagement;
         TrackingLinesExist: Boolean;
@@ -85,7 +89,12 @@ codeunit 6059838 "NPR Create Service Item"
             if (not TrackingLinesExist) or (not ServItemWithSerialNoExist) then begin
                 ServiceItem.Init();
                 ServiceMgtSetup.TestField("Service Item Nos.");
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                ServiceItem."No. Series" := ServiceMgtSetup."Service Item Nos.";
+                ServiceItem."No." := NoSeriesMgt.GetNextNo(ServiceItem."No. Series");
+#ELSE
                 NoSeriesMgt.InitSeries(ServiceMgtSetup."Service Item Nos.", ServiceItem."No. Series", 0D, ServiceItem."No.", ServiceItem."No. Series");
+#ENDIF
                 ServiceItem.Insert();
             end;
 
@@ -145,7 +154,11 @@ codeunit 6059838 "NPR Create Service Item"
         Item: Record Item;
         ItemUnitOfMeasure: Record "Item Unit of Measure";
         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
         ResSkillMgt: Codeunit "Resource Skill Mgt.";
         ServLogMgt: Codeunit ServLogManagement;
         TrackingLinesExist: Boolean;
@@ -173,7 +186,12 @@ codeunit 6059838 "NPR Create Service Item"
             if (not TrackingLinesExist) or (not ServItemWithSerialNoExist) then begin
                 ServiceItem.Init();
                 ServiceMgtSetup.TestField("Service Item Nos.");
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                ServiceItem."No. Series" := ServiceMgtSetup."Service Item Nos.";
+                ServiceItem."No." := NoSeriesMgt.GetNextNo(ServiceItem."No. Series");
+#ELSE
                 NoSeriesMgt.InitSeries(ServiceMgtSetup."Service Item Nos.", ServiceItem."No. Series", 0D, ServiceItem."No.", ServiceItem."No. Series");
+#ENDIF
                 ServiceItem.Insert();
             end;
 

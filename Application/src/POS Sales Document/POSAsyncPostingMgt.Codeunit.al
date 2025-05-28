@@ -323,7 +323,11 @@ codeunit 6151380 "NPR POS Async. Posting Mgt."
         SalesSetup: Record "Sales & Receivables Setup";
         SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
-        NoSeriesMgt: Codeunit NoSeriesManagement; //trebace direkctiva sigurno
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
+        NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
     begin
         SalesSetup.Get();
         if SalesHeader.Invoice and (SalesHeader."Posting No." = '') then begin
@@ -345,20 +349,32 @@ codeunit 6151380 "NPR POS Async. Posting Mgt."
             if (SalesHeader."No. Series" <> SalesHeader."Posting No. Series") or
                (SalesHeader."Document Type" in [SalesHeader."Document Type"::Order, SalesHeader."Document Type"::"Return Order"])
             then
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                PostingNo := NoSeriesMgt.GetNextNo(SalesHeader."Posting No. Series", SalesHeader."Posting Date", false);
+#ELSE
                 PostingNo := NoSeriesMgt.GetNextNo(SalesHeader."Posting No. Series", SalesHeader."Posting Date", true);
+#ENDIF
 
             // Check for posting conflicts and generate
             if SalesHeader."Document Type" in [SalesHeader."Document Type"::Order, SalesHeader."Document Type"::Invoice] then begin
                 if SalesInvoiceHeader.Get(PostingNo) then begin
                     Clear(SalesInvoiceHeader);
                     while (not SalesInvoiceHeader.Get(PostingNo)) do
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                        PostingNo := NoSeriesMgt.GetNextNo(SalesHeader."Posting No. Series", SalesHeader."Posting Date", false);
+#ELSE
                         PostingNo := NoSeriesMgt.GetNextNo(SalesHeader."Posting No. Series", SalesHeader."Posting Date", true);
+#ENDIF
                 end;
             end else
                 if SalesCrMemoHeader.Get(PostingNo) then begin
                     Clear(SalesCrMemoHeader);
                     while (not SalesCrMemoHeader.Get(PostingNo)) do
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                        PostingNo := NoSeriesMgt.GetNextNo(SalesHeader."Posting No. Series", SalesHeader."Posting Date", false);
+#ELSE
                         PostingNo := NoSeriesMgt.GetNextNo(SalesHeader."Posting No. Series", SalesHeader."Posting Date", true);
+#ENDIF
                 end;
         end
     end;

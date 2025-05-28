@@ -166,7 +166,11 @@
 
     local procedure InitItemNo(var Item: Record Item; ConfigTemplateHeader: Record "Config. Template Header")
     var
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -176,7 +180,12 @@
 
         if ConfigTemplateHeader."Instance No. Series" = '' then
             exit;
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        Item."No. Series" := ConfigTemplateHeader."Instance No. Series";
+        Item."No." := NoSeriesMgt.GetNextNo(Item."No. Series");
+#ELSE
         NoSeriesMgt.InitSeries(ConfigTemplateHeader."Instance No. Series", '', 0D, Item."No.", Item."No. Series");
+#ENDIF
     end;
 
     internal procedure SetupItemFromCategory(var Item: Record Item; var ItemCategory: Record "Item Category")

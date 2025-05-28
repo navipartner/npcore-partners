@@ -55,7 +55,11 @@ codeunit 6151356 "NPR POSAct. RV Save LayoutB"
     var
         LocationLayout: Record "NPR NPRE Location Layout";
         RestaurantSetup: Record "NPR NPRE Restaurant Setup";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
         xLocationLayoutCode: Code[20];
         CouldNotGetNextNoErr: Label 'System could not assign next number from the number series %1. Please adjust the number series or specify another number series on page Restaurant Setup field %2, and try again.', Comment = '%1 - No. Series Code, %2 - Component No. Series field caption';
         NoSeriesDescrTxt: Label 'Restaurant layout component numbering', MaxLength = 100;
@@ -72,7 +76,11 @@ codeunit 6151356 "NPR POSAct. RV Save LayoutB"
             end;
             repeat
                 xLocationLayoutCode := LocationLayout.Code;
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                LocationLayout.Code := NoSeriesManagement.GetNextNo(RestaurantSetup."Component No. Series", Today(), false);
+#ELSE
                 LocationLayout.Code := NoSeriesManagement.GetNextNo(RestaurantSetup."Component No. Series", Today(), true);
+#ENDIF
                 if (LocationLayout.Code = '') or (LocationLayout.Code = xLocationLayoutCode) then
                     Error(CouldNotGetNextNoErr, RestaurantSetup."Component No. Series", RestaurantSetup.FieldCaption("Component No. Series"));
             until not LocationLayout.Find();

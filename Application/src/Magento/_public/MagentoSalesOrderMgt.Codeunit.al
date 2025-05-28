@@ -498,7 +498,11 @@
         ShipmentMapping: Record "NPR Magento Shipment Mapping";
         PaymentMapping: Record "NPR Magento Payment Mapping";
         NPRMagentoMgt: Codeunit "NPR Magento Mgt.";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
         ManulBoundEventSubMgt: Codeunit "NPR Manul Bound Event Sub. Mgt";
         RecRef: RecordRef;
         XmlElement2: XmlElement;
@@ -527,8 +531,14 @@
         SalesHeader.Init();
         SalesHeader."Document Type" := SalesHeader."Document Type"::Order;
         SalesHeader."No." := '';
-        if MagentoWebsite."Sales Order No. Series" <> '' then
+        if MagentoWebsite."Sales Order No. Series" <> '' then begin
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            SalesHeader."No. Series" := MagentoWebsite."Sales Order No. Series";
+            SalesHeader."No." := NoSeriesMgt.GetNextNo(SalesHeader."No. Series");
+#ELSE
             NoSeriesMgt.InitSeries(MagentoWebsite."Sales Order No. Series", SalesHeader."No. Series", Today, SalesHeader."No.", SalesHeader."No. Series");
+#ENDIF
+        end;
 
         SalesHeader."NPR External Order No." := CopyStr(OrderNo, 1, MaxStrLen(SalesHeader."NPR External Order No."));
         SalesHeader."External Document No." := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'external_document_no', MaxStrLen(SalesHeader."External Document No."), false), 1, MaxStrLen(SalesHeader."External Document No."));
@@ -1010,7 +1020,11 @@
         TransferHeader: Record "Transfer Header";
         TransferLine: Record "Transfer Line";
         InvtSetup: Record "Inventory Setup";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
         LineNo: Integer;
     begin
         TransferHeader.SetRange("Transfer-from Code", FromCode);
@@ -1020,7 +1034,11 @@
             InvtSetup.Get();
             InvtSetup.TestField("Transfer Order Nos.");
             TransferHeader.Init();
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            TransferHeader."No." := NoSeriesMgt.GetNextNo(InvtSetup."Transfer Order Nos.", WorkDate(), false);
+#ELSE
             TransferHeader."No." := NoSeriesMgt.GetNextNo(InvtSetup."Transfer Order Nos.", WorkDate(), true);
+#ENDIF
             TransferHeader.Validate("External Document No.", OrderNo);
             TransferHeader.Validate("Transfer-from Code", FromCode);
             TransferHeader.Validate("Transfer-to Code", ToCode);
@@ -1833,7 +1851,11 @@
 
     local procedure InitCustomer(XmlElement: XmlElement; var Cust: Record Customer; MagentoWebsite: Record "NPR Magento Website")
     var
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
     begin
         Initialize();
 
@@ -1849,8 +1871,14 @@
                     Cust."No." := CopyStr(NpXmlDomMgt.GetXmlText(XmlElement, 'phone', MaxStrLen(Cust."No."), false), 1, MaxStrLen(Cust."No."));
                 end;
             else begin
-                if MagentoWebsite."Customer No. Series" <> '' then
+                if MagentoWebsite."Customer No. Series" <> '' then begin
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                    Cust."No. Series" := MagentoWebsite."Customer No. Series";
+                    Cust."No." := NoSeriesMgt.GetNextNo(Cust."No. Series");
+#ELSE
                     NoSeriesMgt.InitSeries(MagentoWebsite."Customer No. Series", Cust."No. Series", Today(), Cust."No.", Cust."No. Series");
+#ENDIF
+                end;
             end;
         end;
     end;

@@ -284,10 +284,26 @@ codeunit 6184850 "NPR FR Audit Mgt."
     local procedure GetNextEventNoSeries(EventType: Option JET,Reprint,Period,MonthPeriod,YearPeriod; POSUnitNo: Code[10]): Code[20]
     var
         FRCertificationNoSeries: Record "NPR FR Audit No. Series";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
     begin
         FRCertificationNoSeries.Get(POSUnitNo);
         case EventType of
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            EventType::JET:
+                exit(NoSeriesManagement.GetNextNo(FRCertificationNoSeries."JET No. Series", Today, false));
+            EventType::Reprint:
+                exit(NoSeriesManagement.GetNextNo(FRCertificationNoSeries."Reprint No. Series", Today, false));
+            EventType::Period:
+                exit(NoSeriesManagement.GetNextNo(FRCertificationNoSeries."Period No. Series", Today, false));
+            EventType::MonthPeriod:
+                exit(NoSeriesManagement.GetNextNo(FRCertificationNoSeries."Grand Period No. Series", Today, false));
+            EventType::YearPeriod:
+                exit(NoSeriesManagement.GetNextNo(FRCertificationNoSeries."Yearly Period No. Series", Today, false));
+#ELSE
             EventType::JET:
                 exit(NoSeriesManagement.GetNextNo(FRCertificationNoSeries."JET No. Series", Today, true));
             EventType::Reprint:
@@ -298,6 +314,7 @@ codeunit 6184850 "NPR FR Audit Mgt."
                 exit(NoSeriesManagement.GetNextNo(FRCertificationNoSeries."Grand Period No. Series", Today, true));
             EventType::YearPeriod:
                 exit(NoSeriesManagement.GetNextNo(FRCertificationNoSeries."Yearly Period No. Series", Today, true));
+#ENDIF
         end;
     end;
 

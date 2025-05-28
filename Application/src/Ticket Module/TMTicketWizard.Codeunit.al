@@ -408,10 +408,18 @@
 
     local procedure GetNextNo(NoSeries: Code[20]): Code[20]
     var
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
     begin
 
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        exit(NoSeriesManagement.GetNextNo(NoSeries, Today, false));
+#ELSE
         exit(NoSeriesManagement.GetNextNo(NoSeries, Today, true));
+#ENDIF
     end;
 
     local procedure AddConfigTemplateLine(TemplateCode: Code[10]; LineNo: Integer; FieldId: Integer; Value: Text[250]): Integer

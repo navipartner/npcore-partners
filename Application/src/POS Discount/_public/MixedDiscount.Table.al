@@ -14,7 +14,11 @@
 
             trigger OnValidate()
             var
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                NoSeriesMgt: Codeunit "No. Series";
+#ELSE
                 NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
             begin
                 if Code <> xRec.Code then begin
                     NoSeriesMgt.TestManual("No. Serie");
@@ -316,7 +320,12 @@
     var
         DatePeriod: Record Date;
         DimMgt: Codeunit DimensionManagement;
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+        NoSeries: Code[20];
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
     begin
         "Created the" := Today();
         DatePeriod.SetRange("Period Type", DatePeriod."Period Type"::Date);
@@ -324,8 +333,17 @@
         if DatePeriod.FindLast() then
             "Ending date" := DatePeriod."Period Start";
 
-        if Code = '' then
+        if Code = '' then begin
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            NoSeries := GetNoSeries();
+            "No. Serie" := NoSeries;
+            if NoSeriesMgt.AreRelated(NoSeries, xRec."No. Serie") then
+                "No. Serie" := xRec."No. Serie";
+            Code := NoSeriesMgt.GetNextNo("No. Serie");
+#ELSE
             NoSeriesMgt.InitSeries(GetNoSeries(), xRec."No. Serie", 0D, Code, "No. Serie");
+#ENDIF
+        end;
 
         DimMgt.UpdateDefaultDim(
           DATABASE::"NPR Mixed Discount", Code,
@@ -349,11 +367,20 @@
     procedure Assistedit(MixedDiscount: Record "NPR Mixed Discount"): Boolean
     var
         MixedDiscount2: Record "NPR Mixed Discount";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
     begin
         MixedDiscount2 := Rec;
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        if NoSeriesMgt.LookupRelatedNoSeries(GetNoSeries(), MixedDiscount."No. Serie", MixedDiscount2."No. Serie") then begin
+            MixedDiscount2.Code := NoSeriesMgt.GetNextNo(MixedDiscount2."No. Serie");
+#ELSE
         if NoSeriesMgt.SelectSeries(GetNoSeries(), MixedDiscount."No. Serie", MixedDiscount2."No. Serie") then begin
             NoSeriesMgt.SetSeries(MixedDiscount2.Code);
+#ENDIF
             Rec := MixedDiscount2;
             exit(true);
         end;

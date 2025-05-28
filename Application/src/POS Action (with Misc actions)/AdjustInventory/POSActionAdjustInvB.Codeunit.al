@@ -44,7 +44,11 @@ codeunit 6059836 "NPR POS Action: Adjust Inv. B"
     var
         POSUnit: Record "NPR POS Unit";
         POSAuditProfile: Record "NPR POS Audit Profile";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
     begin
         TempItemJnlLine.Init();
         TempItemJnlLine.Validate("Item No.", SaleLinePOS."No.");
@@ -54,7 +58,11 @@ codeunit 6059836 "NPR POS Action: Adjust Inv. B"
         POSUnit.TestField("POS Audit Profile");
         POSAuditProfile.Get(POSUnit."POS Audit Profile");
         POSAuditProfile.TestField("Sales Ticket No. Series");
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        TempItemJnlLine."Document No." := NoSeriesMgt.GetNextNo(POSAuditProfile."Sales Ticket No. Series", Today(), false);
+#ELSE
         TempItemJnlLine."Document No." := NoSeriesMgt.GetNextNo(POSAuditProfile."Sales Ticket No. Series", Today(), true);
+#ENDIF
 
         TempItemJnlLine."NPR Register Number" := SaleLinePOS."Register No.";
 

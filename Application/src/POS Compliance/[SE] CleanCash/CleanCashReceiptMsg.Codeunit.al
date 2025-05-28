@@ -70,7 +70,11 @@
         CleanCashTransaction: Record "NPR CleanCash Trans. Request";
         CleanCashVat: Record "NPR CleanCash Trans. VAT";
         CleanCashSetup: Record "NPR CleanCash Setup";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
         ReceiptType: Enum "NPR CleanCash Receipt Type";
     begin
 
@@ -115,7 +119,11 @@
         CleanCashTransaction."Receipt DateTime" := CreateDateTime(PosEntry."Document Date", PosEntry."Ending Time");
         CleanCashTransaction."Receipt Type" := ReceiptType;
 
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        CleanCashTransaction."Receipt Id" := CopyStr(NoSeriesManagement.GetNextNo(CleanCashSetup."CleanCash No. Series", Today, false), 1, MaxStrLen(CleanCashTransaction."Receipt Id"));
+#ELSE
         CleanCashTransaction."Receipt Id" := CopyStr(NoSeriesManagement.GetNextNo(CleanCashSetup."CleanCash No. Series", Today, true), 1, MaxStrLen(CleanCashTransaction."Receipt Id"));
+#ENDIF
         CleanCashTransaction."Organisation No." := CleanCashSetup."Organization ID";
         CleanCashTransaction."Pos Id" := CleanCashSetup."CleanCash Register No.";
 

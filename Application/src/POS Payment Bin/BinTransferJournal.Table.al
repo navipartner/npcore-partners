@@ -160,7 +160,11 @@ table 6151584 "NPR BinTransferJournal"
     var
         BinTransferSetup: Record "NPR Bin Transfer Profile";
         BinTransferJournal: Record "NPR BinTransferJournal";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
     begin
         if (Rec.IsTemporary()) then
             exit;
@@ -176,7 +180,11 @@ table 6151584 "NPR BinTransferJournal"
                 Rec.DocumentNo := BinTransferJournal.DocumentNo;
 
         if ((Rec.DocumentNo = '') and (BinTransferSetup.DocumentNoSeries <> '')) then
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            Rec.DocumentNo := NoSeriesManagement.GetNextNo(BinTransferSetup.DocumentNoSeries, Today(), false);
+#ELSE
             Rec.DocumentNo := NoSeriesManagement.GetNextNo(BinTransferSetup.DocumentNoSeries, Today(), true);
+#ENDIF
     end;
 
     trigger OnModify()

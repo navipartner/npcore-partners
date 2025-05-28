@@ -323,7 +323,11 @@ EventDate: Date) ValidRequest: Boolean
 
     local procedure AggregateDeferrals(var DeferRevenueRequest: Record "NPR TM DeferRevenueRequest"; var RevenueRecognitionBuffer: Record "NPR TM RevenuePostingBuffer")
     var
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NumberSeries: Codeunit "No. Series";
+#ELSE
         NumberSeries: Codeunit NoSeriesManagement;
+#ENDIF
         DeferRevenueProfile: Record "NPR TM DeferRevenueProfile";
         MissingNumberSeries: Label 'Ticket Deferral: %1 %2 requires %3 in %4 %5';
         SourceDocNo: Code[20];
@@ -381,7 +385,11 @@ EventDate: Date) ValidRequest: Boolean
             if (DeferRevenueProfile.PostingMode = DeferRevenueProfile.PostingMode::INLINE) then
                 RevenueRecognitionBuffer.DocumentNo := DeferRevenueRequest.SourceDocumentNo
             else
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                RevenueRecognitionBuffer.DocumentNo := NumberSeries.GetNextNo(DeferRevenueProfile.NoSeries, Today(), false);
+#ELSE
                 RevenueRecognitionBuffer.DocumentNo := NumberSeries.GetNextNo(DeferRevenueProfile.NoSeries, Today(), true);
+#ENDIF
 
             RevenueRecognitionBuffer.Insert();
         end;

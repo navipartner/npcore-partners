@@ -678,15 +678,28 @@
 
     local procedure GetNextNoFromSeries(FromSeries: Code[2]): Code[20]
     var
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
     begin
         case FromSeries OF
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            'TM':
+                exit(NoSeriesManagement.GetNextNo('TM-ATF001', TODAY, false));
+            'C1':
+                exit(NoSeriesManagement.GetNextNo('TM-PK10', TODAY, false));
+            'C2':
+                exit(NoSeriesManagement.GetNextNo('TM-PK20', TODAY, false));
+#ELSE
             'TM':
                 exit(NoSeriesManagement.GetNextNo('TM-ATF001', TODAY, true));
             'C1':
                 exit(NoSeriesManagement.GetNextNo('TM-PK10', TODAY, true));
             'C2':
                 exit(NoSeriesManagement.GetNextNo('TM-PK20', TODAY, true));
+#ENDIF
             else
                 Error('Get Next No %1 from number series is not configured.', FromSeries);
         end;

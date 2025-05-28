@@ -47,7 +47,12 @@ codeunit 6184889 "NPR FR Setup Check"
         NoVATIDFilterErr: Label '%1 must not be empty.';
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+        AllowGapsInNosErr: Label 'Field "Implementation" must be set to "Normal" in %1 No. Series, Line No.: %2', Comment = '%1 = No. Series Code, %2 - No. Series Line No.';
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
         FRAuditMgt: Codeunit "NPR FR Audit Mgt.";
         ERROR_JET_INIT: Label 'JET has not been initialized for %1 %2. This must be done to comply with french NF525 regulations.';
         ReportSelectionRetail: Record "NPR Report Selection Retail";
@@ -76,9 +81,15 @@ codeunit 6184889 "NPR FR Setup Check"
         FRAuditNoSeries.Get(POSUnit."No.");
         FRAuditNoSeries.TestField("Reprint No. Series");
         NoSeries.Get(FRAuditNoSeries."Reprint No. Series");
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement.GetNoSeriesLine(NoSeriesLine, FRAuditNoSeries."Reprint No. Series", Today, false);
+        if NoSeriesManagement.MayProduceGaps(NoSeriesLine) then
+            Error(AllowGapsInNosErr, NoSeriesLine."Series Code", NoSeriesLine."Line No.");
+#ELSE
         NoSeriesManagement.SetNoSeriesLineFilter(NoSeriesLine, FRAuditNoSeries."Reprint No. Series", Today);
         NoSeriesLine.FindFirst();
         NoSeriesLine.TestField("Allow Gaps in Nos.", false);
+#ENDIF
         NumberValue := NoSeriesLine."Last No. Used";
         if NumberValue = '' then
             NumberValue := NoSeriesLine."Starting No.";
@@ -87,9 +98,15 @@ codeunit 6184889 "NPR FR Setup Check"
 
         FRAuditNoSeries.TestField("JET No. Series");
         NoSeries.Get(FRAuditNoSeries."JET No. Series");
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement.GetNoSeriesLine(NoSeriesLine, FRAuditNoSeries."JET No. Series", Today, false);
+        if NoSeriesManagement.MayProduceGaps(NoSeriesLine) then
+            Error(AllowGapsInNosErr, NoSeriesLine."Series Code", NoSeriesLine."Line No.");
+#ELSE
         NoSeriesManagement.SetNoSeriesLineFilter(NoSeriesLine, FRAuditNoSeries."JET No. Series", Today);
         NoSeriesLine.FindFirst();
         NoSeriesLine.TestField("Allow Gaps in Nos.", false);
+#ENDIF
         NumberValue := NoSeriesLine."Last No. Used";
         if NumberValue = '' then
             NumberValue := NoSeriesLine."Starting No.";
@@ -98,9 +115,15 @@ codeunit 6184889 "NPR FR Setup Check"
 
         FRAuditNoSeries.TestField("Period No. Series");
         NoSeries.Get(FRAuditNoSeries."Period No. Series");
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement.GetNoSeriesLine(NoSeriesLine, FRAuditNoSeries."Period No. Series", Today, false);
+        if NoSeriesManagement.MayProduceGaps(NoSeriesLine) then
+            Error(AllowGapsInNosErr, NoSeriesLine."Series Code", NoSeriesLine."Line No.");
+#ELSE
         NoSeriesManagement.SetNoSeriesLineFilter(NoSeriesLine, FRAuditNoSeries."Period No. Series", Today);
         NoSeriesLine.FindFirst();
         NoSeriesLine.TestField("Allow Gaps in Nos.", false);
+#ENDIF
         NumberValue := NoSeriesLine."Last No. Used";
         if NumberValue = '' then
             NumberValue := NoSeriesLine."Starting No.";
@@ -109,9 +132,15 @@ codeunit 6184889 "NPR FR Setup Check"
 
         FRAuditNoSeries.TestField("Grand Period No. Series");
         NoSeries.Get(FRAuditNoSeries."Grand Period No. Series");
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement.GetNoSeriesLine(NoSeriesLine, FRAuditNoSeries."Grand Period No. Series", Today, false);
+        if NoSeriesManagement.MayProduceGaps(NoSeriesLine) then
+            Error(AllowGapsInNosErr, NoSeriesLine."Series Code", NoSeriesLine."Line No.");
+#ELSE
         NoSeriesManagement.SetNoSeriesLineFilter(NoSeriesLine, FRAuditNoSeries."Grand Period No. Series", Today);
         NoSeriesLine.FindFirst();
         NoSeriesLine.TestField("Allow Gaps in Nos.", false);
+#ENDIF
         NumberValue := NoSeriesLine."Last No. Used";
         if NumberValue = '' then
             NumberValue := NoSeriesLine."Starting No.";
@@ -120,9 +149,15 @@ codeunit 6184889 "NPR FR Setup Check"
 
         FRAuditNoSeries.TestField("Yearly Period No. Series");
         NoSeries.Get(FRAuditNoSeries."Yearly Period No. Series");
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement.GetNoSeriesLine(NoSeriesLine, FRAuditNoSeries."Yearly Period No. Series", Today, false);
+        if NoSeriesManagement.MayProduceGaps(NoSeriesLine) then
+            Error(AllowGapsInNosErr, NoSeriesLine."Series Code", NoSeriesLine."Line No.");
+#ELSE
         NoSeriesManagement.SetNoSeriesLineFilter(NoSeriesLine, FRAuditNoSeries."Yearly Period No. Series", Today);
         NoSeriesLine.FindFirst();
         NoSeriesLine.TestField("Allow Gaps in Nos.", false);
+#ENDIF
         NumberValue := NoSeriesLine."Last No. Used";
         if NumberValue = '' then
             NumberValue := NoSeriesLine."Starting No.";
@@ -160,9 +195,15 @@ codeunit 6184889 "NPR FR Setup Check"
 
         POSAuditProfile.TestField("Sale Fiscal No. Series");
         NoSeries.Get(POSAuditProfile."Sale Fiscal No. Series");
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement.GetNoSeriesLine(NoSeriesLine, POSAuditProfile."Sale Fiscal No. Series", Today, false);
+        if NoSeriesManagement.MayProduceGaps(NoSeriesLine) then
+            Error(AllowGapsInNosErr, NoSeriesLine."Series Code", NoSeriesLine."Line No.");
+#ELSE
         NoSeriesManagement.SetNoSeriesLineFilter(NoSeriesLine, POSAuditProfile."Sale Fiscal No. Series", Today);
         NoSeriesLine.FindFirst();
         NoSeriesLine.TestField("Allow Gaps in Nos.", false);
+#ENDIF
         NumberValue := NoSeriesLine."Last No. Used";
         if NumberValue = '' then
             NumberValue := NoSeriesLine."Starting No.";
@@ -171,9 +212,15 @@ codeunit 6184889 "NPR FR Setup Check"
 
         POSAuditProfile.TestField("Credit Sale Fiscal No. Series");
         NoSeries.Get(POSAuditProfile."Credit Sale Fiscal No. Series");
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement.GetNoSeriesLine(NoSeriesLine, POSAuditProfile."Credit Sale Fiscal No. Series", Today, false);
+        if NoSeriesManagement.MayProduceGaps(NoSeriesLine) then
+            Error(AllowGapsInNosErr, NoSeriesLine."Series Code", NoSeriesLine."Line No.");
+#ELSE
         NoSeriesManagement.SetNoSeriesLineFilter(NoSeriesLine, POSAuditProfile."Credit Sale Fiscal No. Series", Today);
         NoSeriesLine.FindFirst();
         NoSeriesLine.TestField("Allow Gaps in Nos.", false);
+#ENDIF
         NumberValue := NoSeriesLine."Last No. Used";
         if NumberValue = '' then
             NumberValue := NoSeriesLine."Starting No.";
@@ -182,9 +229,15 @@ codeunit 6184889 "NPR FR Setup Check"
 
         POSAuditProfile.TestField("Balancing Fiscal No. Series");
         NoSeries.Get(POSAuditProfile."Balancing Fiscal No. Series");
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement.GetNoSeriesLine(NoSeriesLine, POSAuditProfile."Balancing Fiscal No. Series", Today, false);
+        if NoSeriesManagement.MayProduceGaps(NoSeriesLine) then
+            Error(AllowGapsInNosErr, NoSeriesLine."Series Code", NoSeriesLine."Line No.");
+#ELSE
         NoSeriesManagement.SetNoSeriesLineFilter(NoSeriesLine, POSAuditProfile."Balancing Fiscal No. Series", Today);
         NoSeriesLine.FindFirst();
         NoSeriesLine.TestField("Allow Gaps in Nos.", false);
+#ENDIF
         NumberValue := NoSeriesLine."Last No. Used";
         if NumberValue = '' then
             NumberValue := NoSeriesLine."Starting No.";

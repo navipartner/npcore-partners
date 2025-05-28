@@ -4319,7 +4319,11 @@
         ConfigTemplateHeader: Record "Config. Template Header";
         ConfigTemplateMgt: Codeunit "Config. Template Management";
         RecRef: RecordRef;
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
     begin
 
         if (CustTemplateCode = '') then
@@ -4332,7 +4336,11 @@
         Customer."No." := '';
 
         if (CustomerNoSeriesCode <> '') then
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            Customer."No." := NoSeriesManagement.GetNextNo(CustomerNoSeriesCode, 0D, false);
+#ELSE
             Customer."No." := NoSeriesManagement.GetNextNo(CustomerNoSeriesCode, 0D, true);
+#ENDIF
 
         Customer."NPR External Customer No." := ExternalCustomerNo;
         Customer.Insert(true);
@@ -5130,17 +5138,29 @@
     local procedure AssignExternalMembershipNo(CommunityCode: Code[20]) ExternalNo: Code[20]
     var
         Community: Record "NPR MM Member Community";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
     begin
 
         Community.Get(CommunityCode);
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        ExternalNo := NoSeriesManagement.GetNextNo(Community."External Membership No. Series", Today, false);
+#ELSE
         ExternalNo := NoSeriesManagement.GetNextNo(Community."External Membership No. Series", Today, true);
+#ENDIF
     end;
 
     local procedure AssignExternalMemberNo(SuggestedExternalNo: Code[20]; CommunityCode: Code[20]) ExternalNo: Code[20]
     var
         Community: Record "NPR MM Member Community";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
         Member: Record "NPR MM Member";
         ConflictLbl: Label 'Multiple members share the same external member number (%1). Verify number series %2 for issues. This action can not be completed until this has been attended.';
     begin
@@ -5151,7 +5171,11 @@
             exit(SuggestedExternalNo);
         end;
 
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        ExternalNo := NoSeriesManagement.GetNextNo(Community."External Member No. Series", Today, false);
+#ELSE
         ExternalNo := NoSeriesManagement.GetNextNo(Community."External Member No. Series", Today, true);
+#ENDIF
 
         Member.SetCurrentKey("External Member No.");
         Member.SetFilter("External Member No.", '=%1', ExternalNo);
@@ -5217,7 +5241,11 @@
         Itt: Integer;
         Left: Text[10];
         Right: Text[10];
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
         PlaceHolderLbl: Label '%1%2', Locked = true;
     begin
         if (GeneratePattern = '') then
@@ -5269,7 +5297,11 @@
                     'MS':
                         ExtCardNo := StrSubstNo(PlaceHolderLbl, ExtCardNo, ExternalMembershipNo);
                     'S':
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                        ExtCardNo := StrSubstNo(PlaceHolderLbl, ExtCardNo, NoSeriesManagement.GetNextNo(NumberSeries, Today, false));
+#ELSE
                         ExtCardNo := StrSubstNo(PlaceHolderLbl, ExtCardNo, NoSeriesManagement.GetNextNo(NumberSeries, Today, true));
+#ENDIF
                     'N', 'A', 'X':
                         begin
                             Evaluate(PatternLength, Right);

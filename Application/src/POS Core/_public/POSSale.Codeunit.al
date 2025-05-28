@@ -113,7 +113,11 @@
     var
         POSAuditProfile: Record "NPR POS Audit Profile";
         NPRPOSUnit: Record "NPR POS Unit";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
         POSCreateEntry: Codeunit "NPR POS Create Entry";
         DuplicateReceiptNo: Label 'Duplicate Receipt Number %1';
     begin
@@ -122,12 +126,17 @@
         POSAuditProfile.Get(NPRPOSUnit."POS Audit Profile");
         POSAuditProfile.TestField("Sales Ticket No. Series");
 
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        ReceiptNo := NoSeriesManagement.GetNextNo(POSAuditProfile."Sales Ticket No. Series", Today, false);
+#ELSE
         ReceiptNo := NoSeriesManagement.GetNextNo(POSAuditProfile."Sales Ticket No. Series", Today, true);
+#ENDIF
 
         if not POSCreateEntry.IsUniqueDocumentNo(ReceiptNo) then
             Error(DuplicateReceiptNo, ReceiptNo);
     end;
 
+ 
     internal procedure GetContext(var SaleLineOut: Codeunit "NPR POS Sale Line"; var PaymentLineOut: Codeunit "NPR POS Payment Line")
     begin
         SaleLineOut := _SaleLine;

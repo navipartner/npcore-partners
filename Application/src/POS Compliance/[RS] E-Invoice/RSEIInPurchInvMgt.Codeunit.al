@@ -184,7 +184,11 @@ codeunit 6184883 "NPR RS EI In Purch. Inv. Mgt."
     local procedure InitializeDocTypeOnPurhcHeader(var PurchaseHeader: Record "Purchase Header"; PurchaseDocumentType: Enum "Purchase Document Type"; InvoiceElement: XmlElement; NamespaceManager: XmlNamespaceManager)
     var
         PurchasesPayablesSetup: Record "Purchases & Payables Setup";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
         HelperText: Text;
     begin
         PurchasesPayablesSetup.Get();
@@ -193,17 +197,29 @@ codeunit 6184883 "NPR RS EI In Purch. Inv. Mgt."
         case PurchaseDocumentType of
             PurchaseDocumentType::Order:
                 begin
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                    PurchaseHeader."No." := NoSeriesManagement.GetNextNo(PurchasesPayablesSetup."Order Nos.", Today(), false);
+#ELSE
                     PurchaseHeader."No." := NoSeriesManagement.GetNextNo(PurchasesPayablesSetup."Order Nos.", Today(), true);
+#ENDIF
                     PurchaseHeader.Validate("Vendor Invoice No.", HelperText);
                 end;
             PurchaseDocumentType::Invoice:
                 begin
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                    PurchaseHeader."No." := NoSeriesManagement.GetNextNo(PurchasesPayablesSetup."Invoice Nos.", Today(), false);
+#ELSE
                     PurchaseHeader."No." := NoSeriesManagement.GetNextNo(PurchasesPayablesSetup."Invoice Nos.", Today(), true);
+#ENDIF
                     PurchaseHeader.Validate("Vendor Invoice No.", HelperText);
                 end;
             PurchaseDocumentType::"Credit Memo":
                 begin
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                    PurchaseHeader."No." := NoSeriesManagement.GetNextNo(PurchasesPayablesSetup."Credit Memo Nos.", Today(), false);
+#ELSE
                     PurchaseHeader."No." := NoSeriesManagement.GetNextNo(PurchasesPayablesSetup."Credit Memo Nos.", Today(), true);
+#ENDIF
                     PurchaseHeader.Validate("Vendor Cr. Memo No.", HelperText)
                 end;
         end;
@@ -234,11 +250,11 @@ codeunit 6184883 "NPR RS EI In Purch. Inv. Mgt."
     local procedure FindVendorFromRegistrationNumber(var Vendor: Record Vendor; InvoiceElement: XmlElement; NamespaceManager: XmlNamespaceManager): Boolean
     var
         PurchSetup: Record "Purchases & Payables Setup";
-#if BC24
-        NoSeries: Codeunit "No. Series";
-#else
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
-#endif
+#ENDIF
         ConfirmManagement: Codeunit "Confirm Management";
         VendorCard: Page "Vendor Card";
         RegistrationNumberText: Text;
@@ -264,11 +280,11 @@ codeunit 6184883 "NPR RS EI In Purch. Inv. Mgt."
 
         PurchSetup.Get();
         Vendor.Init();
-#if BC24
-        Vendor."No." := NoSeries.GetNextNo(PurchSetup."Vendor Nos.");
-#else
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        Vendor."No." := NoSeriesManagement.GetNextNo(PurchSetup."Vendor Nos.", 0D, false);
+#ELSE
         Vendor."No." := NoSeriesManagement.GetNextNo(PurchSetup."Vendor Nos.", 0D, true);
-#endif
+#ENDIF
         Vendor.Name := CopyStr(VendorName, 1, MaxStrLen(Vendor.Name));
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
         Vendor."Registration Number" := CopyStr(RegistrationNumberText, 1, MaxStrLen(Vendor."Registration Number"));

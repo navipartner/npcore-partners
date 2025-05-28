@@ -444,7 +444,11 @@
     var
         NoSeriesLine: Record "No. Series Line";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
         PostingNo: Code[20];
     begin
         if not SalesHeader.Invoice then
@@ -464,8 +468,12 @@
 
         PostingNo := SalesHeader."Posting No.";
         if PostingNo = '' then begin
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            NoSeriesMgt.GetNoSeriesLine(NoSeriesLine, SalesHeader."Posting No. Series", 0D, false);
+#ELSE
             NoSeriesMgt.SetNoSeriesLineFilter(NoSeriesLine, SalesHeader."Posting No. Series", 0D);
             NoSeriesLine.FindLast();
+#ENDIF
             PostingNo := NoSeriesLine."Last No. Used";
         end;
         NpRvSalesLine.ModifyAll("Posting No.", PostingNo);

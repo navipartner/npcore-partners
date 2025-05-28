@@ -936,7 +936,11 @@
         LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup";
         GenJournalBatch: Record "Gen. Journal Batch";
         GenJournalLine: Record "Gen. Journal Line";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
         GenJnlPostBatch: Codeunit "Gen. Jnl.-Post Batch";
         DocumentNo: Code[20];
         JnlType: Option;
@@ -956,7 +960,11 @@
         GenJournalBatch.FindFirst();
 
         if (GenJournalBatch."No. Series" <> '') then
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            DocumentNo := NoSeriesManagement.PeekNextNo(GenJournalBatch."No. Series", WorkDate());
+#ELSE
             DocumentNo := NoSeriesManagement.TryGetNextNo(GenJournalBatch."No. Series", WorkDate());
+#ENDIF
 
         GenJournalLine.SetFilter("Journal Template Name", '=%1', GenJournalBatch."Journal Template Name");
         GenJournalLine.SetFilter("Journal Batch Name", '=%1', GenJournalBatch.Name);
@@ -981,7 +989,11 @@
     var
         GenJournalBatch: Record "Gen. Journal Batch";
         GenJournalLine: Record "Gen. Journal Line";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
         GenJnlPostBatch: Codeunit "Gen. Jnl.-Post Batch";
         DocumentNo: Code[20];
         JnlType: Option;
@@ -1001,7 +1013,11 @@
         GenJournalBatch.FindFirst();
 
         if (GenJournalBatch."No. Series" <> '') then
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            DocumentNo := NoSeriesManagement.PeekNextNo(GenJournalBatch."No. Series", WorkDate());
+#ELSE
             DocumentNo := NoSeriesManagement.TryGetNextNo(GenJournalBatch."No. Series", WorkDate());
+#ENDIF
 
         GenJournalLine.SetFilter("Journal Template Name", '=%1', GenJournalBatch."Journal Template Name");
         GenJournalLine.SetFilter("Journal Batch Name", '=%1', GenJournalBatch.Name);
@@ -1022,7 +1038,11 @@
     local procedure InvoiceStoreWorker(JournalTemplateName: Code[10]; JournalBatchName: Code[10]; DocumentNo: Code[20]; LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup")
     var
         GenJournalLine: Record "Gen. Journal Line";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
         UntilDate: Date;
         EarnAmount: Decimal;
         BurnAmount: Decimal;
@@ -1059,8 +1079,11 @@
 
         InvoiceNo := DocumentNo;
         if (InvoiceNo = '') then
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            InvoiceNo := NoSeriesManagement.GetNextNo(LoyaltyStoreSetup."Invoice No. Series", UntilDate, false);
+#ELSE
             InvoiceNo := NoSeriesManagement.GetNextNo(LoyaltyStoreSetup."Invoice No. Series", UntilDate, true);
-
+#ENDIF
         GenJournalLine.Init();
         GenJournalLine."Journal Template Name" := JournalTemplateName;
         GenJournalLine."Journal Batch Name" := JournalBatchName;

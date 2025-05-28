@@ -60,7 +60,11 @@
     procedure NonStockPurchase(var PurchaseLine2: Record "Purchase Line")
     var
         InvtSetup: Record "Inventory Setup";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
     begin
         if (PurchaseLine2."Document Type" in
             [PurchaseLine2."Document Type"::"Return Order", PurchaseLine2."Document Type"::"Credit Memo"])
@@ -96,7 +100,12 @@
         ProgWindow.Update(4, PurchaseLine2."No.");
         InvtSetup.Get();
         InvtSetup.TestField("Item Nos.");
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NewItem."No. Series" := InvtSetup."Item Nos.";
+        NewItem."No." := NoSeriesMgt.GetNextNo(NewItem."No. Series");
+#ELSE
         NoSeriesMgt.InitSeries(InvtSetup."Item Nos.", NewItem."No. Series", 0D, NewItem."No.", NewItem."No. Series");
+#ENDIF
         NewItem.Description := NonStock.Description;
         NewItem.Validate(Description, NewItem.Description);
         if not ItemUnitofMeasure.Get(NewItem."No.", NonStock."Unit of Measure") then begin

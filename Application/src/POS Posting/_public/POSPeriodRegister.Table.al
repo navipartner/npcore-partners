@@ -158,7 +158,11 @@
         POSUnit: Record "NPR POS Unit";
         POSStore: Record "NPR POS Store";
         POSPostingProfile: Record "NPR POS Posting Profile";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
     begin
         if ("Document No." <> '') then
             exit;
@@ -166,8 +170,16 @@
         POSUnit.Get("POS Unit No.");
         POSStore.get(POSUnit."POS Store Code");
         POSStore.GetProfile(POSPostingProfile);
-        if POSPostingProfile."POS Period Register No. Series" <> '' then
+        if POSPostingProfile."POS Period Register No. Series" <> '' then begin
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            "No. Series" := POSPostingProfile."POS Period Register No. Series";
+            if NoSeriesMgt.AreRelated(POSPostingProfile."POS Period Register No. Series", xRec."No. Series") then
+                "No. Series" := xRec."No. Series";
+            "Document No." := NoSeriesMgt.GetNextNo("No. Series");
+#ELSE
             NoSeriesMgt.InitSeries(POSPostingProfile."POS Period Register No. Series", xRec."No. Series", WorkDate(), "Document No.", "No. Series");
+#ENDIF
+        end;
     end;
 
     local procedure UpdateTimeStamps()

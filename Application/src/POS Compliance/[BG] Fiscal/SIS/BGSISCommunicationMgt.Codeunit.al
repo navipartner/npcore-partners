@@ -184,7 +184,11 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
     var
         Customer: Record Customer;
         BGSISPOSUnitMapping: Record "NPR BG SIS POS Unit Mapping";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
         ExtendedReceiptNo: Code[20];
         CustomerIDNumberType: Integer;
         CustomerAddress: Text;
@@ -209,10 +213,18 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
 
         BGSISPOSUnitMapping.Get(POSEntry."POS Unit No.");
         if Refund then
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            ExtendedReceiptNo := NoSeriesManagement.PeekNextNo(BGSISPOSUnitMapping."Extended Receipt Cr. Memo No.")
+#ELSE
             ExtendedReceiptNo := NoSeriesManagement.GetNextNo(BGSISPOSUnitMapping."Extended Receipt Cr. Memo No.", WorkDate(), false)
+#ENDIF
         else
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            ExtendedReceiptNo := NoSeriesManagement.PeekNextNo(BGSISPOSUnitMapping."Extended Receipt Invoice No.");
+#ELSE
             ExtendedReceiptNo := NoSeriesManagement.GetNextNo(BGSISPOSUnitMapping."Extended Receipt Invoice No.", WorkDate(), false);
 
+#ENDIF
         JsonTextReaderWriter.WriteStartObject('invoiceData');
         JsonTextReaderWriter.WriteStringProperty('invNumber', ExtendedReceiptNo);
         JsonTextReaderWriter.WriteStringProperty('city', CopyStr(CustomerCity, 1, 30));
@@ -782,7 +794,11 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
 
     internal procedure UpdateBGSISAuditLogForSaleAndRefund(var BGSISPOSAuditLogAux: Record "NPR BG SIS POS Audit Log Aux."; BGSISPOSUnitMapping: Record "NPR BG SIS POS Unit Mapping"; var TempJsonBuffer: Record "JSON Buffer" temporary; RequestText: Text; ExtendedReceipt: Boolean)
     var
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
     begin
         BGSISPOSAuditLogAux.SetRequestText(RequestText);
 
@@ -792,9 +808,15 @@ codeunit 6184476 "NPR BG SIS Communication Mgt."
 
         if ExtendedReceipt then
             if BGSISPOSAuditLogAux."Transaction Type" = BGSISPOSAuditLogAux."Transaction Type"::Refund then
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                BGSISPOSAuditLogAux."Extended Receipt Counter" := NoSeriesManagement.GetNextNo(BGSISPOSUnitMapping."Extended Receipt Cr. Memo No.", WorkDate(), false)
+            else
+                BGSISPOSAuditLogAux."Extended Receipt Counter" := NoSeriesManagement.GetNextNo(BGSISPOSUnitMapping."Extended Receipt Invoice No.", WorkDate(), false);
+#ELSE
                 BGSISPOSAuditLogAux."Extended Receipt Counter" := NoSeriesManagement.GetNextNo(BGSISPOSUnitMapping."Extended Receipt Cr. Memo No.", WorkDate(), true)
             else
                 BGSISPOSAuditLogAux."Extended Receipt Counter" := NoSeriesManagement.GetNextNo(BGSISPOSUnitMapping."Extended Receipt Invoice No.", WorkDate(), true);
+#ENDIF
 
         BGSISPOSAuditLogAux."Fiscal Printer Device No." := BGSISPOSUnitMapping."Fiscal Printer Device No.";
         BGSISPOSAuditLogAux."Fiscal Printer Memory No." := BGSISPOSUnitMapping."Fiscal Printer Memory No.";

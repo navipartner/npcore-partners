@@ -119,11 +119,21 @@
 
     trigger OnInsert()
     var
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
     begin
         InitNoSeries();
         if "No." = '' then begin
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            if NoSeriesMgt.AreRelated("No. Series", xRec."No. Series") then
+                "No. Series" := xRec."No. Series";
+            "No." := NoSeriesMgt.GetNextNo("No. Series");
+#ELSE
             NoSeriesMgt.InitSeries("No. Series", xRec."No. Series", Today, "No.", "No. Series");
+#ENDIF
         end;
     end;
 

@@ -371,13 +371,21 @@
 
     internal procedure GetNextNo(): Code[20]
     var
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
     begin
         if NextNoSeriesCode <> NextNoSeriesCode then
             exit(NextNoSeriesCode);
 
         TestField("No. Series");
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NextNoSeriesCode := NoSeriesMgt.GetNextNo("No. Series", Today, false);
+#ELSE
         NextNoSeriesCode := NoSeriesMgt.GetNextNo("No. Series", Today, true);
+#ENDIF
     end;
 
     internal procedure CopyTableData(Item: Record Item)

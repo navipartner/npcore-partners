@@ -132,11 +132,19 @@
     local procedure NoAssistEdit(): Boolean
     var
         MagentoCustomOption: Record "NPR Magento Custom Option";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
     begin
         MagentoCustomOption.Copy(Rec);
         MagentoCustomOption.InitNoSeries();
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        if NoSeriesMgt.LookupRelatedNoSeries(MagentoCustomOption."No. Series", xRec."No. Series", MagentoCustomOption."No. Series") then
+#ELSE
         if NoSeriesMgt.SelectSeries(MagentoCustomOption."No. Series", xRec."No. Series", MagentoCustomOption."No. Series") then
+#ENDIF
             Rec := MagentoCustomOption;
     end;
 

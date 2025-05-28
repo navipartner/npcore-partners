@@ -275,7 +275,11 @@ codeunit 85002 "NPR Library - POS Master Data"
         LibraryNoSeries.GenerateNoSeries('', NoSeries);
         NoSeriesLine.SetRange("Series Code", NoSeries.Code);
         NoSeriesLine.FindFirst();
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesLine.Validate(Implementation, NoSeriesLine.Implementation::Sequence);
+#ELSE
         NoSeriesLine.Validate("Allow Gaps in Nos.", true);
+#ENDIF
         NoSeriesLine.Modify();
         POSAuditProfile."Bin Eject After Sale" := true;
         POSAuditProfile."Sales Ticket No. Series" := NoSeries.Code;
@@ -299,7 +303,11 @@ codeunit 85002 "NPR Library - POS Master Data"
         LibraryNoSeries.GenerateNoSeries('', NoSeries);
         NoSeriesLine.SetRange("Series Code", NoSeries.Code);
         NoSeriesLine.FindFirst();
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesLine.Validate(Implementation, NoSeriesLine.Implementation::Sequence);
+#ELSE
         NoSeriesLine.Validate("Allow Gaps in Nos.", true);
+#ENDIF
         NoSeriesLine.Modify();
         POSTicketProfile."Print Ticket On Sale" := true;
         POSTicketProfile.Insert();
@@ -309,6 +317,9 @@ codeunit 85002 "NPR Library - POS Master Data"
     var
         LibraryUtility: Codeunit "Library - Utility";
         LibraryNoSeries: Codeunit "NPR Library - No. Series";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ENDIF
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";
     begin
@@ -322,7 +333,11 @@ codeunit 85002 "NPR Library - POS Master Data"
         LibraryNoSeries.GenerateNoSeries('', NoSeries);
         NoSeriesLine.SetRange("Series Code", NoSeries.Code);
         NoSeriesLine.FindFirst();
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesLine.Validate(Implementation, NoSeriesLine.Implementation::Sequence);
+#ELSE
         NoSeriesLine.Validate("Allow Gaps in Nos.", true);
+#ENDIF
         NoSeriesLine.Modify();
         POSMemberProfile.Insert();
     end;
@@ -333,6 +348,9 @@ codeunit 85002 "NPR Library - POS Master Data"
         LibraryNoSeries: Codeunit "NPR Library - No. Series";
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ENDIF
     begin
         POSLoyaltyProfile.Init();
         POSLoyaltyProfile.Validate(
@@ -344,7 +362,11 @@ codeunit 85002 "NPR Library - POS Master Data"
         LibraryNoSeries.GenerateNoSeries('', NoSeries);
         NoSeriesLine.SetRange("Series Code", NoSeries.Code);
         NoSeriesLine.FindFirst();
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesLine.Validate(Implementation, NoSeriesLine.Implementation::Sequence);
+#ELSE
         NoSeriesLine.Validate("Allow Gaps in Nos.", true);
+#ENDIF
         NoSeriesLine.Modify();
         POSLoyaltyProfile."Assign Loyalty On Sale" := true;
         POSLoyaltyProfile.Insert();

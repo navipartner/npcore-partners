@@ -4,7 +4,11 @@ codeunit 6184679 "NPR Ref.No. Assignment-NSeries" implements "NPR Reference No. 
 
     procedure GetReferenceNo(POSEndofDayProfile: Record "NPR POS End of Day Profile"; RefNoTarget: Enum "NPR Reference No. Target"; Parameters: Dictionary of [Text, Text]): Text[50]
     var
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
         NoSeriesCode: Code[20];
         ReferenceNo: Code[20];
         MissingNoSeriesCodeErr: label 'Number series code must be specified when assigning reference number for %1 transaction.', Comment = 'transaction type';
@@ -45,7 +49,11 @@ codeunit 6184679 "NPR Ref.No. Assignment-NSeries" implements "NPR Reference No. 
             Error(MissingNoSeriesCodeErr, Format(RefNoTarget));
         POSEndofDayProfile.ValidateNoSeries(NoSeriesCode);
 
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        ReferenceNo := NoSeriesMgt.GetNextNo(NoSeriesCode);
+#ELSE
         NoSeriesMgt.InitSeries(NoSeriesCode, '', 0D, ReferenceNo, NoSeriesCode);
+#ENDIF
         exit(ReferenceNo);
     end;
 }

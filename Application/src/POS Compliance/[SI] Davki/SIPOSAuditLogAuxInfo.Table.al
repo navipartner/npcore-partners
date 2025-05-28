@@ -214,7 +214,14 @@ table 6059838 "NPR SI POS Audit Log Aux. Info"
         if "Receipt No." = '' then begin
             SIFiscalSetup.Get();
             SIFiscalSetup.TestField("Receipt No. Series");
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            "No. Series" := SIFiscalSetup."Receipt No. Series";
+            if NoSeriesMgt.AreRelated(SIFiscalSetup."Receipt No. Series", xRec."No. Series") then
+                "No. Series" := xRec."No. Series";
+            "Receipt No." := NoSeriesMgt.GetNextNo("No. Series");
+#ELSE
             NoSeriesMgt.InitSeries(SIFiscalSetup."Receipt No. Series", xRec."No. Series", 0D, "Receipt No.", "No. Series");
+#ENDIF
         end;
     end;
 
@@ -252,5 +259,9 @@ table 6059838 "NPR SI POS Audit Log Aux. Info"
 
     var
         SIFiscalSetup: Record "NPR SI Fiscalization Setup";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
 }

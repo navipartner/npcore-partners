@@ -154,11 +154,23 @@
     trigger OnInsert()
     var
         Date: Record Date;
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSerie: Code[20];
+#ENDIF
     begin
         "Creating Date" := Today();
 
-        if "Main No." = '' then
+        if "Main No." = '' then begin
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            NoSerie := GetNoSeries();
+            "No. Series" := NoSerie;
+            if NoSeriesMgt.AreRelated(NoSerie, xRec."No. Series") then
+                "No. Series" := xRec."No. Series";
+            "Main No." := NoSeriesMgt.GetNextNo("No. Series");
+#ELSE
             NoSeriesMgt.InitSeries(GetNoSeries(), xRec."No. Series", 0D, "Main No.", "No. Series");
+#ENDIF
+        end;
 
         Date.SetRange("Period Type", Date."Period Type"::Date);
         "Starting Date" := Today();
@@ -177,7 +189,11 @@
 
     var
         DimMgt: Codeunit DimensionManagement;
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     begin
@@ -191,8 +207,13 @@
         QtyDiscHeader2: Record "NPR Quantity Discount Header";
     begin
         QtyDiscHeader2 := Rec;
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        if NoSeriesMgt.LookupRelatedNoSeries(GetNoSeries(), QtyDiscHeader."No. Series", QtyDiscHeader2."No. Series") then begin
+            QtyDiscHeader2."Main No." := NoSeriesMgt.GetNextNo(QtyDiscHeader2."No. Series");
+#ELSE
         if NoSeriesMgt.SelectSeries(GetNoSeries(), QtyDiscHeader."No. Series", QtyDiscHeader2."No. Series") then begin
             NoSeriesMgt.SetSeries(QtyDiscHeader2."Main No.");
+#ENDIF
             Rec := QtyDiscHeader2;
             exit(true);
         end;

@@ -16,7 +16,11 @@
         TargetJobNo: Code[20];
         TargetJobDescription: Text[100];
         JobsSetup: Record "Jobs Setup";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
         JobPlanningLine: Record "Job Planning Line";
         TempJobPlanningLine: Record "Job Planning Line" temporary;
         JobTask: Record "Job Task";
@@ -54,7 +58,11 @@
             exit(false);
         end;
 
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        TargetJobNo := NoSeriesManagement.GetNextNo(JobsSetup."Job Nos.", 0D, false);
+#ELSE
         TargetJobNo := NoSeriesManagement.GetNextNo(JobsSetup."Job Nos.", 0D, true);
+#ENDIF
         TargetJobDescription := SourceJob.Description;
         CopyJob.SetCopyOptions(CopyJobPrices, CopyQuantity, CopyDimensions, Source, PlanningLineType, LedgerEntryType);
 #if BC17 or BC18 or BC19 

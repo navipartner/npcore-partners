@@ -374,7 +374,11 @@
     procedure GetNextVariantCode(ItemNo: Code[20]; Variant1Code: Code[50]; Variant2Code: Code[50]; Variant3Code: Code[50]; Variant4Code: Code[50]) NewVariantCode: Code[10]
     var
         VarietySetup: Record "NPR Variety Setup";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
     begin
         GetNewVariantCode(ItemNo, Variant1Code, Variant2Code, Variant3Code, Variant4Code, NewVariantCode);
         if NewVariantCode <> '' then
@@ -383,7 +387,11 @@
         VarietySetup.Get();
         VarietySetup.TestField("Variant No. Series");
 
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        exit(CopyStr(NoSeriesMgt.GetNextNo(VarietySetup."Variant No. Series", Today, false), 1, MaxStrLen(NewVariantCode)));
+#ELSE
         exit(CopyStr(NoSeriesMgt.GetNextNo(VarietySetup."Variant No. Series", Today, true), 1, MaxStrLen(NewVariantCode)));
+#ENDIF
     end;
 
     procedure FillDescription(var ItemVariant: Record "Item Variant"; Item: Record Item)
@@ -476,17 +484,29 @@
     internal procedure AddItemRef(ItemNo: Code[20]; VariantCode: Code[10])
     var
         NextCode: Code[20];
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
     begin
         if not GetVRTSetup() then
             exit;
 
         if VariantCode = '' then begin
             VRTSetup.TestField("Item Cross Ref. No. Series (I)");
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            NextCode := NoSeriesMgt.GetNextNo(VRTSetup."Item Cross Ref. No. Series (I)", Today, false);
+#ELSE
             NextCode := NoSeriesMgt.GetNextNo(VRTSetup."Item Cross Ref. No. Series (I)", Today, true);
+#ENDIF
         end else begin
             VRTSetup.TestField("Item Cross Ref. No. Series (V)");
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            NextCode := NoSeriesMgt.GetNextNo(VRTSetup."Item Cross Ref. No. Series (V)", Today, false);
+#ELSE
             NextCode := NoSeriesMgt.GetNextNo(VRTSetup."Item Cross Ref. No. Series (V)", Today, true);
+#ENDIF
         end;
 
         case VRTSetup."Barcode Type (Item Cross Ref.)" of
@@ -737,7 +757,11 @@
     internal procedure ShowEAN13BarcodeNoSetup()
     var
         VarietySetup: Record "NPR Variety Setup";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
         ItemRef1: Record "Item Reference";
         ItemRef2: Record "Item Reference";
         Filler: array[3] of Text;
@@ -749,7 +773,11 @@
             ItemRef1.SetRange("Reference Type", ItemRef1."Reference Type"::"Bar Code");
             ItemRef1.SetFilter("Reference No.", '%1', Format(VarietySetup."EAN-Internal") + '*');
             if ItemRef1.FindLast() then;
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            NextNo[1] := NoSeriesMgt.PeekNextNo(VarietySetup."Internal EAN No. Series", Today);
+#ELSE
             NextNo[1] := NoSeriesMgt.TryGetNextNo(VarietySetup."Internal EAN No. Series", Today);
+#ENDIF
             Filler[1] := PadStr('', 12 - StrLen(Format(VarietySetup."EAN-Internal")) - StrLen(NextNo[1]), '0')
         end;
         if VarietySetup."EAN-External" <> 0 then begin
@@ -757,7 +785,11 @@
             ItemRef2.SetRange("Reference Type", ItemRef2."Reference Type"::"Bar Code");
             ItemRef2.SetFilter("Reference No.", '%1', Format(VarietySetup."EAN-External") + '*');
             if ItemRef2.FindLast() then;
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            NextNo[2] := NoSeriesMgt.PeekNextNo(VarietySetup."External EAN No. Series", Today);
+#ELSE
             NextNo[2] := NoSeriesMgt.TryGetNextNo(VarietySetup."External EAN No. Series", Today);
+#ENDIF
             Filler[2] := PadStr('', 12 - StrLen(Format(VarietySetup."EAN-External")) - StrLen(NextNo[2]), '0')
         end;
 
@@ -1009,14 +1041,22 @@
     local procedure CreateVariantCodeFromNoSeries(ItemNo: Code[20]; Variant1Code: Code[50]; Variant2Code: Code[50]; Variant3Code: Code[50]; Variant4Code: Code[50]; var NewVariantCode: Code[10])
     var
         VarietySetup: Record "NPR Variety Setup";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
     begin
         VarietySetup.Get();
         if not (VarietySetup."Create Variant Code From" in ['', 'CreateVariantCodeFromNoSeries']) then
             exit;
 
         VarietySetup.TestField("Variant No. Series");
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NewVariantCode := CopyStr(NoSeriesMgt.GetNextNo(VarietySetup."Variant No. Series", Today, false), 1, MaxStrLen(NewVariantCode));
+#ELSE
         NewVariantCode := CopyStr(NoSeriesMgt.GetNextNo(VarietySetup."Variant No. Series", Today, true), 1, MaxStrLen(NewVariantCode));
+#ENDIF
     end;
 
     internal procedure GetUnitOfMeasure(ItemNo: Code[20]; ReturnType: Integer): Code[10]

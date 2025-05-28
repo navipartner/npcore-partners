@@ -572,7 +572,11 @@
     var
         CouponEntry: Record "NPR NpDc Coupon Entry";
         CouponSetup: Record "NPR NpDc Coupon Setup";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
     begin
         Coupon.CalcFields(Open);
         if Coupon.Open then
@@ -582,7 +586,11 @@
         CouponSetup.TestField("Arch. Coupon No. Series");
         Coupon."Arch. No." := Coupon."No.";
         if Coupon."No. Series" <> CouponSetup."Arch. Coupon No. Series" then
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            Coupon."Arch. No." := NoSeriesMgt.GetNextNo(CouponSetup."Arch. Coupon No. Series", Today, false);
+#ELSE
             Coupon."Arch. No." := NoSeriesMgt.GetNextNo(CouponSetup."Arch. Coupon No. Series", Today, true);
+#ENDIF
 
         InsertArchivedCoupon(Coupon);
         CouponEntry.SetRange("Coupon No.", Coupon."No.");

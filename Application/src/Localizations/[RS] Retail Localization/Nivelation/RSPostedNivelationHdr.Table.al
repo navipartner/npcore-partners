@@ -110,7 +110,14 @@ table 6060003 "NPR RS Posted Nivelation Hdr"
         if "No." = '' then begin
             LocalizationSetup.Get();
             LocalizationSetup.TestField("RS Posted Niv. No. Series");
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            "No. Series" := LocalizationSetup."RS Posted Niv. No. Series";
+            if NoSeriesMgt.AreRelated(LocalizationSetup."RS Posted Niv. No. Series", xRec."No. Series") then
+                "No. Series" := xRec."No. Series";
+            "No." := NoSeriesMgt.GetNextNo("No. Series");
+#ELSE
             NoSeriesMgt.InitSeries(LocalizationSetup."RS Posted Niv. No. Series", xRec."No. Series", 0D, "No.", "No. Series");
+#ENDIF
         end;
     end;
 
@@ -124,5 +131,9 @@ table 6060003 "NPR RS Posted Nivelation Hdr"
 
     var
         LocalizationSetup: Record "NPR RS R Localization Setup";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
 }

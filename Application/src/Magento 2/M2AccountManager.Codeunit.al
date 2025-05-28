@@ -1046,7 +1046,11 @@
         MarketingSetup: Record "Marketing Setup";
         ContactBusinessRelation: Record "Contact Business Relation";
         MagentoContactShiptoAdrs: Record "NPR Magento Contact ShipToAdr.";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
     begin
         if (not AccountSetup.Get()) then begin
             AccountSetup.Init();
@@ -1080,7 +1084,11 @@
         repeat
             ShiptoAddress."Customer No." := ContactBusinessRelation."No.";
 #pragma warning disable AA0139
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            ShiptoAddress.Code := NoSeriesManagement.GetNextNo(AccountSetup."No. Series Ship-to Address", Today, false);
+#ELSE
             ShiptoAddress.Code := NoSeriesManagement.GetNextNo(AccountSetup."No. Series Ship-to Address", Today, true);
+#ENDIF
 #pragma warning restore
             ShiptoAddress.Insert(true);
 

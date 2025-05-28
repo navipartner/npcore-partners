@@ -27,14 +27,22 @@
     procedure GetNextRFIDValue(): Text
     var
         RFIDSetup: Record "NPR RFID Setup";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
         BigInt: BigInteger;
         HexValue: Text;
     begin
         RFIDSetup.Get();
         RFIDSetup.TestField("RFID Value No. Series");
         RFIDSetup.TestField("RFID Hex Value Length");
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        Evaluate(BigInt, NoSeriesManagement.GetNextNo(RFIDSetup."RFID Value No. Series", WorkDate(), false));
+#ELSE
         Evaluate(BigInt, NoSeriesManagement.GetNextNo(RFIDSetup."RFID Value No. Series", WorkDate(), true));
+#ENDIF
         HexValue := IntToHex(BigInt);
 
         if StrLen(HexValue) > RFIDSetup."RFID Hex Value Length" then

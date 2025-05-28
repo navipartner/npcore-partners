@@ -859,13 +859,21 @@
     local procedure InsertArchivedVoucher(Voucher: Record "NPR NpRv Voucher"; var ArchVoucher: Record "NPR NpRv Arch. Voucher")
     var
         VoucherType: Record "NPR NpRv Voucher Type";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
     begin
         VoucherType.Get(Voucher."Voucher Type");
         Voucher."Arch. No." := Voucher."No.";
         if (Voucher."No. Series" <> VoucherType."Arch. No. Series") and (VoucherType."Arch. No. Series" <> '') then begin
             Voucher."Arch. No. Series" := VoucherType."Arch. No. Series";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            Voucher."Arch. No." := NoSeriesMgt.GetNextNo(VoucherType."Arch. No. Series", Today, false);
+#ELSE
             Voucher."Arch. No." := NoSeriesMgt.GetNextNo(VoucherType."Arch. No. Series", Today, true);
+#ENDIF
         end;
 
         ArchVoucher.Init();

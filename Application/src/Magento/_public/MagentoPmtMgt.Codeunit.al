@@ -467,7 +467,11 @@
         PaymentLine: Record "NPR Magento Payment Line";
         PaymentLine2: Record "NPR Magento Payment Line";
         NoSeriesLine: Record "No. Series Line";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
 #IF NOT BC17
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
 #ENDIF
@@ -482,8 +486,12 @@
         TotalAmountInclVAT := GetTotalAmountInclVat(SalesHeader);
         DocNo := SalesHeader."Posting No.";
         if DocNo = '' then begin
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            NoSeriesMgt.GetNoSeriesLine(NoSeriesLine, SalesHeader."Posting No. Series", 0D, false);
+#ELSE
             NoSeriesMgt.SetNoSeriesLineFilter(NoSeriesLine, SalesHeader."Posting No. Series", 0D);
             NoSeriesLine.FindLast();
+#ENDIF
             DocNo := NoSeriesLine."Last No. Used";
         end;
 
@@ -549,7 +557,11 @@
         PaymentLine: Record "NPR Magento Payment Line";
         PaymentLine2: Record "NPR Magento Payment Line";
         NoSeriesLine: Record "No. Series Line";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
 #IF NOT BC17
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
 #ENDIF
@@ -569,8 +581,12 @@
         TotalAmountInclVAT := GetTotalAmountInclVat(SalesHeader);
         DocNo := SalesHeader."Posting No.";
         if DocNo = '' then begin
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            NoSeriesMgt.GetNoSeriesLine(NoSeriesLine, SalesHeader."Posting No. Series", 0D, false);
+#ELSE
             NoSeriesMgt.SetNoSeriesLineFilter(NoSeriesLine, SalesHeader."Posting No. Series", 0D);
             NoSeriesLine.FindLast();
+#ENDIF
             DocNo := NoSeriesLine."Last No. Used";
         end;
 

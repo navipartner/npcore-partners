@@ -296,7 +296,11 @@
     local procedure ValidateUserInput()
     var
         JobsSetup: Record "Jobs Setup";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
     begin
         if (SourceJobNo = '') or not SourceJob.Get(SourceJob."No.") then
             Error(Text004, SourceJob.TableCaption);
@@ -309,7 +313,11 @@
         JobsSetup.Get();
         JobsSetup.TestField("Job Nos.");
         if TargetJobNo = '' then begin
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            TargetJobNo := NoSeriesManagement.GetNextNo(JobsSetup."Job Nos.", 0D, false);
+#ELSE
             TargetJobNo := NoSeriesManagement.GetNextNo(JobsSetup."Job Nos.", 0D, true);
+#ENDIF
             if not Recurring then
                 if not Confirm(Text002, true, TargetJobNo) then begin
                     TargetJobNo := '';

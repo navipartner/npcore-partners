@@ -50,7 +50,11 @@ codeunit 85213 "NPR Library DE Fiscal"
         NoSeriesLine.SetRange("Series Code", POSAuditProfile."Sales Ticket No. Series");
         NoSeriesLine.SetRange(Open, true);
         NoSeriesLine.FindLast();
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesLine.Validate(Implementation, NoSeriesLine.Implementation::Sequence);
+#ELSE
         NoSeriesLine.Validate("Allow Gaps in Nos.", true);
+#ENDIF
         NoSeriesLine.Modify();
     end;
 

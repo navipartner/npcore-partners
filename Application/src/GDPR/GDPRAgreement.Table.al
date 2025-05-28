@@ -72,13 +72,21 @@
     var
         GDPRSetup: Record "NPR GDPR Setup";
         GDPRAgreementVersion: Record "NPR GDPR Agreement Version";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
     begin
 
         if ("No." = '') then begin
             GDPRSetup.Get();
             GDPRSetup.TestField("Agreement Nos.");
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            "No." := NoSeriesManagement.GetNextNo(GDPRSetup."Agreement Nos.", Today, false);
+#ELSE
             "No." := NoSeriesManagement.GetNextNo(GDPRSetup."Agreement Nos.", Today, true);
+#ENDIF
         end;
 
         if (Format("Anonymize After") = '') then

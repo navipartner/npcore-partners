@@ -52,7 +52,12 @@
         POSAuditProfile: Record "NPR POS Audit Profile";
         NoSeries: Record "No. Series";
         NoSeriesLine: Record "No. Series Line";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+        AllowGapsInNosErr: Label 'Field "Implementation" must be set to "Sequence" in %1 No. Series, Line No.: %2', Comment = '%1 = No. Series Code, %2 - No. Series Line No.';
+#ELSE
         NoSeriesManagement: Codeunit NoSeriesManagement;
+#ENDIF
         POSSetup: Codeunit "NPR POS Setup";
     begin
         POSSession.GetSession(POSSession, true);
@@ -64,9 +69,15 @@
         POSAuditProfile.TestField("Sales Ticket No. Series");
 
         NoSeries.Get(POSAuditProfile."Sales Ticket No. Series");
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement.GetNoSeriesLine(NoSeriesLine, POSAuditProfile."Sales Ticket No. Series", Today, false);
+        if not NoSeriesManagement.MayProduceGaps(NoSeriesLine) then
+            Error(AllowGapsInNosErr, NoSeriesLine."Series Code", NoSeriesLine."Line No.");
+#ELSE
         NoSeriesManagement.SetNoSeriesLineFilter(NoSeriesLine, POSAuditProfile."Sales Ticket No. Series", Today);
         NoSeriesLine.FindFirst();
         NoSeriesLine.TestField("Allow Gaps in Nos.", true);
+#ENDIF
     end;
 
     local procedure ValidateNotAutoCostMgt()

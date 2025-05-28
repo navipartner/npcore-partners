@@ -176,7 +176,14 @@ table 6060059 "NPR CRO POS Aud. Log Aux. Info"
         if "Bill No." = '' then begin
             CROFiscalSetup.Get();
             CROFiscalSetup.TestField("Bill No. Series");
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            "No. Series" := CROFiscalSetup."Bill No. Series";
+            if NoSeriesMgt.AreRelated(CROFiscalSetup."Bill No. Series", xRec."No. Series") then
+                "No. Series" := xRec."No. Series";
+            "Bill No." := NoSeriesMgt.GetNextNo("No. Series");
+#ELSE
             NoSeriesMgt.InitSeries(CROFiscalSetup."Bill No. Series", xRec."No. Series", 0D, "Bill No.", "No. Series");
+#ENDIF
         end;
     end;
 
@@ -226,5 +233,9 @@ table 6060059 "NPR CRO POS Aud. Log Aux. Info"
 
     var
         CROFiscalSetup: Record "NPR CRO Fiscalization Setup";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
         NoSeriesMgt: Codeunit NoSeriesManagement;
+#ENDIF
 }

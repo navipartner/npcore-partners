@@ -218,14 +218,26 @@ report 6014483 "NPR RS Ret. Purch. Price Calc."
     local procedure SetupReportPrintOrderNo()
     var
         LocalizationSetup: Record "NPR RS R Localization Setup";
-        NoSeriesMgt: Codeunit NoSeriesManagement;
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesMgt: Codeunit "No. Series";
+#ELSE
+        NoSeriesMgt: Codeunit NoSeriesManagement; 
+#ENDIF
     begin
         LocalizationSetup.Get();
         case CurrReport.Preview() of
             true:
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                ReportPrintNo := NoSeriesMgt.PeekNextNo(LocalizationSetup."RS Ret. Purch. Report Ord.");
+#ELSE
                 ReportPrintNo := NoSeriesMgt.GetNextNo(LocalizationSetup."RS Ret. Purch. Report Ord.", 0D, false);
+#ENDIF
             false:
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                ReportPrintNo := NoSeriesMgt.GetNextNo(LocalizationSetup."RS Ret. Purch. Report Ord.", 0D, false);
+#ELSE
                 ReportPrintNo := NoSeriesMgt.GetNextNo(LocalizationSetup."RS Ret. Purch. Report Ord.", 0D, true);
+#ENDIF
         end;
     end;
 
