@@ -26,7 +26,7 @@ codeunit 6248278 "NPR POS Action SG Admission" implements "NPR IPOS Workflow"
     begin
         case Step of
             'try_admit':
-                FrontEnd.WorkflowResponse(TryAdmitToken(Context, ReferenceNo));
+                FrontEnd.WorkflowResponse(TryAdmitToken(Context, Setup.GetPOSUnitNo(), ReferenceNo));
             'admit_token':
                 FrontEnd.WorkflowResponse(OnActionAdmit(Context));
             'membercard_validation':
@@ -42,7 +42,7 @@ codeunit 6248278 "NPR POS Action SG Admission" implements "NPR IPOS Workflow"
 );
     end;
 
-    local procedure TryAdmitToken(Context: Codeunit "NPR POS JSON Helper"; var ReferenceNo: Text[100]) Response: JsonObject
+    local procedure TryAdmitToken(Context: Codeunit "NPR POS JSON Helper"; POSUnitNo: Code[10]; var ReferenceNo: Text[100]) Response: JsonObject
     var
         ValidationRequest: Record "NPR SGEntryLog";
         DetAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
@@ -64,6 +64,10 @@ codeunit 6248278 "NPR POS Action SG Admission" implements "NPR IPOS Workflow"
 
         AdmissionCodeParam := CopyStr(Context.GetStringParameter(AdmissionCodeParamName()), 1, MaxStrLen(AdmissionCodeParam));
         ScannerIdParam := CopyStr(Context.GetStringParameter(ScannerIdParamName()), 1, MaxStrLen(ScannerIdParam));
+
+        if (ScannerIdParam = '') then
+            ScannerIdParam := POSUnitNo;
+
         CreateAdmitToken(ReferenceNo, AdmissionCodeParam, ScannerIdParam, AdmitToken);
 
         if AdmitToken <> BlankGuid then begin
@@ -252,21 +256,31 @@ codeunit 6248278 "NPR POS Action SG Admission" implements "NPR IPOS Workflow"
     local procedure SetEanBoxEventInScope(EanBoxSetupEvent: Record "NPR Ean Box Setup Event"; EanBoxValue: Text; var InScope: Boolean)
     var
         ValidationRequest: Record "NPR SGEntryLog";
-        MMMemberCard: Record "NPR MM Member Card";
+        DummyMemberCard: Record "NPR MM Member Card";
         AdmissionCodeParam: Code[20];
         ScannerIdParam: Code[10];
         AdmitToken: Guid;
         BlankGuid: Guid;
+        POSSession: Codeunit "NPR POS Session";
+        POSSetup: Codeunit "NPR POS Setup";
     begin
         if EanBoxSetupEvent."Event Code" <> ActionCode() then
             exit;
-        if StrLen(EanBoxValue) > MaxStrLen(MMMemberCard."External Card No.") then
+        // Member Card is the longest value we support
+        if StrLen(EanBoxValue) > MaxStrLen(DummyMemberCard."External Card No.") then
             exit;
-        if GetTableCaption(EanBoxValue) <> '' then
+        if GetTableCaption(EanBoxValue) <> '' then begin
             Inscope := true;
+            exit;
+        end;
 
         AdmissionCodeParam := CopyStr(GetParameterValue(EanBoxSetupEvent, 'ADMISSION_CODE'), 1, MaxStrLen(AdmissionCodeParam));
         ScannerIdParam := CopyStr(GetParameterValue(EanBoxSetupEvent, 'SCANNER_ID'), 1, MaxStrLen(ScannerIdParam));
+
+        if (ScannerIdParam = '') then begin
+            POSSession.GetSetup(POSSetup);
+            ScannerIdParam := POSSetup.GetPOSUnitNo();
+        end;
 
         if CreateAdmitToken(CopyStr(EanBoxValue, 1, 100), AdmissionCodeParam, ScannerIdParam, AdmitToken) then
             InScope := true;
@@ -274,8 +288,15 @@ codeunit 6248278 "NPR POS Action SG Admission" implements "NPR IPOS Workflow"
         if AdmitToken <> BlankGuid then begin
             ValidationRequest.SetCurrentKey(Token);
             ValidationRequest.SetFilter(Token, '=%1', AdmitToken);
-            if (not ValidationRequest.IsEmpty()) then
+            if (not ValidationRequest.IsEmpty()) then begin
                 ValidationRequest.DeleteAll();
+                /**
+                 * TODO:
+                 * This commit should be removed, in general, we should rewrite this entire section
+                 * so we don't do any database operations and instead do a simple "could this number be valid"-function
+                 */
+                Commit();
+            end;
         end;
     end;
 

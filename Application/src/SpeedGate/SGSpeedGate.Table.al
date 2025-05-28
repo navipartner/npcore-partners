@@ -15,6 +15,7 @@ table 6150974 "NPR SG SpeedGate"
         {
             DataClassification = CustomerContent;
             Caption = 'Scanner Id';
+            NotBlank = true;
         }
 
         field(10; Description; Text[250])

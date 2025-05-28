@@ -37,7 +37,7 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
             'fill_data':
                 FrontEnd.WorkflowResponse(FillData(Context));
             'try_admit':
-                FrontEnd.WorkflowResponse(HandleTryAdmit(Context));
+                FrontEnd.WorkflowResponse(HandleTryAdmit(Context, Setup.GetPOSUnitNo()));
             'handle_admit_print':
                 FrontEnd.WorkflowResponse(HandlePrintAndAdmit(Context));
         end;
@@ -63,7 +63,7 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
         exit(BufferTableToJson(PrintandAdmitBuffer));
     end;
 
-    local procedure HandleTryAdmit(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
+    local procedure HandleTryAdmit(Context: Codeunit "NPR POS JSON Helper"; POSUnitNo: Code[10]) Response: JsonObject
     var
         PrintandAdmitBuffer: Record "NPR Print and Admit Buffer";
         PrintandAdmitPublic: Codeunit "NPR Print and Admit Public";
@@ -81,15 +81,14 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
             exit;
         PrintandAdmitPublic.OnBeforeHandleBuffer(PrintandAdmitBuffer);
 
-        TryAdmit(PrintandAdmitBuffer, Context, UnconfirmedGroup, DefaultQtyGroupUnconfirmedArray, TryAdmitArray);
+        TryAdmit(PrintandAdmitBuffer, Context, POSUnitNo, UnconfirmedGroup, DefaultQtyGroupUnconfirmedArray, TryAdmitArray);
 
         Response.Add('unconfirmedGroup', UnconfirmedGroup);
         Response.Add('defaultQuantityUnconfirmed', DefaultQtyGroupUnconfirmedArray);
         Response.Add('tokens', TryAdmitArray);
     end;
 
-    local procedure TryAdmit(var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer"; Context: Codeunit "NPR POS JSON Helper";
-                            var UnconfirmedGroup: Boolean; var DefaultQtyGroupUnconfirmed: JsonArray; var TryAdmitArray: JsonArray)
+    local procedure TryAdmit(var PrintandAdmitBuffer: Record "NPR Print and Admit Buffer"; Context: Codeunit "NPR POS JSON Helper"; POSUnitNo: Code[10]; var UnconfirmedGroup: Boolean; var DefaultQtyGroupUnconfirmed: JsonArray; var TryAdmitArray: JsonArray)
     var
         AdmissionCode: Code[20];
         ScannerId: Code[10];
@@ -97,6 +96,8 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
 #pragma warning disable AA0139
         AdmissionCode := Context.GetStringParameter('AdmissionCode');
         ScannerId := Context.GetStringParameter('ScannerId');
+        if (ScannerId = '') then
+            ScannerId := POSUnitNo;
 #pragma warning restore AA0139
         PrintandAdmitBuffer.SetRange(Admit, true);
         if PrintandAdmitBuffer.FindSet() then
