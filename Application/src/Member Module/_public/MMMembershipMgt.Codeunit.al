@@ -149,4 +149,30 @@ codeunit 6060127 "NPR MM Membership Mgt."
         MembershipManagement.BlockMemberCards(MembershipEntryNo, MemberEntryNo, false);
     end;
 
+    procedure EnableMembershipInternalAutoRenewal(MembershipEntryNo: Integer; CreateMemberNotification: Boolean; ForceMemberNotification: Boolean)
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+        Membership.Get(MembershipEntryNo);
+        MembershipManagement.EnableMembershipInternalAutoRenewal(Membership, CreateMemberNotification, ForceMemberNotification);
+    end;
+
+    procedure EnableMembershipExternalAutoRenewal(MembershipEntryNo: Integer; CreateMemberNotification: Boolean; ForceMemberNotification: Boolean)
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+        Membership.Get(MembershipEntryNo);
+        MembershipManagement.EnableMembershipExternalAutoRenewal(Membership, CreateMemberNotification, ForceMemberNotification);
+    end;
+
+    procedure DisableMembershipAutoRenewal(MembershipEntryNo: Integer; CreateMemberNotification: Boolean; ForceMemberNotification: Boolean)
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+        Membership.Get(MembershipEntryNo);
+        MembershipManagement.DisableMembershipAutoRenewal(Membership, CreateMemberNotification, ForceMemberNotification);
+    end;
 }

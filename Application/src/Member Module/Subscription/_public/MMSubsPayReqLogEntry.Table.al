@@ -1,6 +1,6 @@
 table 6150963 "NPR MM Subs Pay Req Log Entry"
 {
-    Access = Internal;
+    Extensible = false;
     Caption = 'Subscriptions Payment Request Log Entry';
     DataClassification = CustomerContent;
     LookupPageId = "NPR MM Sub Pay Req Log Entries";
