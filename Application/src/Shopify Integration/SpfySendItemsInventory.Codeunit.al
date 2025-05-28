@@ -576,7 +576,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             NcTaskIn.SetRange("Record Value", NcTaskIn."Record Value")
         else
             NcTaskIn.SetFilter("Record Value", StrSubstNo('%1_*', ItemVariant."Item No."));
-        MaxNoOfVariantsPerRequest := 1;  //TODO: It doesn't seem Shopify currently works correctly with more than 1 variant in a request because an error with one variant causes the whole batch to fail. This should be revised in the future.
+        MaxNoOfVariantsPerRequest := 50;
 
         SetBatchProcessed := not Item.Get(ItemVariant."Item No.");
         if SetBatchProcessed then
@@ -1760,7 +1760,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         DuplicateTaskMgt: Label 'This task is a duplicate of another task (Entry No. %1). The requested update will be handled there.', Comment = '%1 - NaviConnect Task Entry No.';
         VariantBulkDelete_QueryTok: Label 'mutation DeleteProductVariants($productId: ID!, $variants: [ID!]!) {productVariantsBulkDelete(productId: $productId, variantsIds : $variants) {product{id} userErrors{field message}}}', Locked = true;
         VariantBulkInsert_QueryTok: Label 'mutation CreateProductVariants($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {productVariantsBulkCreate(productId: $productId, variants : $variants) {product{id} productVariants{id sku inventoryPolicy selectedOptions{name value optionValue{id name}} inventoryItem{id tracked}} userErrors{field message}}}', Locked = true;
-        VariantBulkUpdate_QueryTok: Label 'mutation UpdateProductVariants($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {productVariantsBulkUpdate(productId: $productId, variants : $variants) {product{id} productVariants{id sku inventoryPolicy selectedOptions{name value optionValue{id name}} inventoryItem{id tracked}} userErrors{field message}}}', Locked = true;
+        VariantBulkUpdate_QueryTok: Label 'mutation UpdateProductVariants($productId: ID!, $variants: [ProductVariantsBulkInput!]!, $allowPartialUpdates: Boolean) {productVariantsBulkUpdate(productId: $productId, variants : $variants, allowPartialUpdates: $allowPartialUpdates) {product{id} productVariants{id sku inventoryPolicy selectedOptions{name value optionValue{id name}} inventoryItem{id tracked}} userErrors{field message}}}', Locked = true;
     begin
         if not NcTaskIn.IsTemporary() then
             FunctionCallOnNonTempVarErr('SetNcTaskPostponed');
@@ -1781,7 +1781,10 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             NcTaskIn.Type::Insert:
                 Request.Add('query', VariantBulkInsert_QueryTok);
             NcTaskIn.Type::Modify:
-                Request.Add('query', VariantBulkUpdate_QueryTok);
+                begin
+                    Request.Add('query', VariantBulkUpdate_QueryTok);
+                    Variables.Add('allowPartialUpdates', true);
+                end;
             NcTaskIn.Type::Delete:
                 Request.Add('query', VariantBulkDelete_QueryTok);
         end;
