@@ -729,6 +729,7 @@
         ScheduleDialogAdmissionsTableFindAllTimeslotsLbl: Label 'Find all timeslots';
         ScheduleDialogAdmissionsTableFindAllTimeslotsDescriptionLbl: Label 'from the selected date will be checked for required admission timeslots. The date range can be adjusted in global settings.';
         ScheduleDialogAdmissionsTableDaysLabelLbl: Label 'days';
+        ScheduleDialog_No_Available_TimeslotsLbl: Label 'There are no available timeslots';
         RestaurantMenusEditorPleaseIgnoreLbl: Label 'Please ignore this if you are not using restaurant';
         RestaurantMenusEditorAdminButtonsLbl: Label 'Admin Buttons';
         RestaurantMenusEditorWaiterPadMenuLbl: Label 'Waiter Pad Menu';
@@ -1292,6 +1293,7 @@
         Captions.Add('ScheduleDialog_Admissions_Table_FindAllTimeslots', ScheduleDialogAdmissionsTableFindAllTimeslotsLbl);
         Captions.Add('ScheduleDialog_Admissions_Table_FindAllTimeslotsDescription', ScheduleDialogAdmissionsTableFindAllTimeslotsDescriptionLbl);
         Captions.Add('ScheduleDialog_Admissions_Table_DaysLabel', ScheduleDialogAdmissionsTableDaysLabelLbl);
+        Captions.Add('ScheduleDialog_No_Available_Timeslots', ScheduleDialog_No_Available_TimeslotsLbl);
         Captions.Add('Restaurant_Menus_Editor_PleaseIgnore', RestaurantMenusEditorPleaseIgnoreLbl);
         Captions.Add('Restaurant_Menus_Editor_AdminButtons', RestaurantMenusEditorAdminButtonsLbl);
         Captions.Add('Restaurant_Menus_Editor_WaiterPadMenu', RestaurantMenusEditorWaiterPadMenuLbl);
