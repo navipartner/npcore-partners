@@ -2,11 +2,6 @@ pageextension 6014487 "NPR Sales Order List" extends "Sales Order List"
 {
     layout
     {
-        modify("No.")
-        {
-            Style = Attention;
-            StyleExpr = HasNotes;
-        }
         addafter("External Document No.")
         {
             field("NPR Magento Coupon"; Rec."NPR Magento Coupon")
@@ -80,6 +75,4 @@ pageextension 6014487 "NPR Sales Order List" extends "Sales Order List"
             }
         }
     }
-    var
-        HasNotes: Boolean;
 }
