@@ -1134,6 +1134,7 @@
         end;
 
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
+        SaleLinePOS.SetIgnoreCustomerCurrency(true);
         SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::"Customer Deposit";
         SaleLinePOS.Validate(Quantity, 1);
         SaleLinePOS.Validate("No.", SalesHeader."Bill-to Customer No.");

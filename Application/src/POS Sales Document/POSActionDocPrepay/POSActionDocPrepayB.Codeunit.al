@@ -23,13 +23,21 @@
 
     internal procedure SelectDocument(SalePOS: Record "NPR POS Sale"; var SalesHeader: Record "Sales Header"): Boolean
     var
+        GLSetup: Record "General Ledger Setup";
         RetailSalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
+        FCYNotSupportedErr: Label 'Prepayment handling for foreign currency sales orders is not supported in POS. Instead, please create and post the required prepayment invoice/credit memo directly from the sales order page. Then, use POS to register the matching payment or refund transaction.';
     begin
+        GLSetup.Get();
         if SalePOS."Customer No." <> '' then
             SalesHeader.SetRange("Bill-to Customer No.", SalePOS."Customer No.");
         SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Order);
+        SalesHeader.SetFilter("Currency Code", '%1|%2', '', GLSetup."LCY Code");
         SetFilterSalesHeader(SalePOS, SalesHeader);
-        exit(RetailSalesDocImpMgt.SelectSalesDocument(SalesHeader.GetView(false), SalesHeader));
+        if not RetailSalesDocImpMgt.SelectSalesDocument(SalesHeader.GetView(false), SalesHeader) then
+            exit(false);
+        if not (SalesHeader."Currency Code" in ['', GLSetup."LCY Code"]) then
+            Error(FCYNotSupportedErr);
+        exit(true);
     end;
 
     internal procedure ConfirmImportInvDiscAmt(SalesHeader: Record "Sales Header"; ConfirmInvDiscAmt: Boolean): Boolean

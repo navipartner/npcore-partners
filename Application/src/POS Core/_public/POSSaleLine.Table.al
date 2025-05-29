@@ -2020,6 +2020,7 @@
         NPRDimMgt: Codeunit "NPR Dimension Mgt.";
         TotalItemLedgerEntryQuantity: Decimal;
         TotalAuditRollQuantity: Decimal;
+        _IgnoreCustomerCurrency: Boolean;
         SkipCalcDiscount: Boolean;
         Text002: Label '%1 %2 is used more than once. Adjust the inventory first, and then continue the transaction';
         Text004: Label '%1 %2 is already used.';
@@ -2710,13 +2711,15 @@
 
         Customer.Get("No.");
         Customer.TestField("Customer Posting Group");
-        if Customer."Currency Code" <> '' then begin
-            GLSetup.Get();
-            Customer.TestField("Currency Code", GLSetup."LCY Code");
-        end;
+        if not _IgnoreCustomerCurrency then
+            if Customer."Currency Code" <> '' then begin
+                GLSetup.Get();
+                Customer.TestField("Currency Code", GLSetup."LCY Code");
+            end;
 
         Description := CopyStr(Customer.Name, 1, MaxStrLen(Description));
-        Validate("Currency Code", Customer."Currency Code");
+        if not _IgnoreCustomerCurrency then
+            Validate("Currency Code", Customer."Currency Code");
     end;
 
     local procedure InitFromGLAccount()
@@ -3322,6 +3325,11 @@
         SaleLinePOS2.DeleteAll(false);
     end;
 
+    procedure SetIgnoreCustomerCurrency(Set: Boolean)
+    begin
+        _IgnoreCustomerCurrency := Set;
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeGetDescription(var POSSaleLine: Record "NPR POS Sale Line"; var IsHandled: Boolean)
     begin
@@ -3402,5 +3410,4 @@
     local procedure OnExplodeBOMBeforeValidateDiscount(var Rec: Record "NPR POS Sale Line"; ItemNo: Code[20]; FromLineNo: Integer; ToLineNo: Integer; var IsHandled: Boolean)
     begin
     end;
-
 }

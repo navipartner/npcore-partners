@@ -69,10 +69,11 @@
         SalesLine.FindSet(true);
         repeat
             LinePrepayment := CalcRemainingLinePrepmtAmtToInvoice(SalesLine, SalesHeader."Prices Including VAT", Currency."Amount Rounding Precision") * SplitRatio + RemainderAmt;
-            RemainderAmt := LinePrepayment - Round(LinePrepayment, Currency."Amount Rounding Precision");
+            RemainderAmt := LinePrepayment;
             LinePrepayment := Round(LinePrepayment, Currency."Amount Rounding Precision");
+            RemainderAmt := RemainderAmt - LinePrepayment;
             SalesLine.Validate("Prepayment %",
-                Round((CalcAmtIncludingVAT(SalesLine."Prepmt. Amt. Inv.", SalesLine."Prepayment VAT %", SalesHeader."Prices Including VAT", Currency."Amount Rounding Precision") + LinePrepayment) * 100 / SalesLine."Amount Including VAT", 0.00001));
+                Round((CalcAmtIncludingVAT(SalesLine."Prepmt. Amt. Inv.", SalesLine."VAT %", SalesHeader."Prices Including VAT", Currency."Amount Rounding Precision") + LinePrepayment) * 100 / SalesLine."Amount Including VAT", 0.00001));
             if LinePrepayment = 0 then begin
                 SalesLine."Prepayment Amount" := 0;
                 SalesLine."Prepmt. Amt. Incl. VAT" := 0;
@@ -156,11 +157,16 @@
         else
             RemainingLineAmtToInvoice := SalesLine."Amount Including VAT";
 
-        exit(RemainingLineAmtToInvoice - CalcAmtIncludingVAT(SalesLine."Prepmt. Amt. Inv." - SalesLine."Prepmt Amt Deducted", SalesLine."Prepayment VAT %", PricesInclidingVAT, RoundingPrecision));
+        exit(RemainingLineAmtToInvoice - CalcAmtIncludingVAT(SalesLine."Prepmt. Amt. Inv." - SalesLine."Prepmt Amt Deducted", SalesLine."VAT %", PricesInclidingVAT, RoundingPrecision));
     end;
 
     local procedure CalcAmtIncludingVAT(Amount: Decimal; VATRate: Decimal; PricesInclidingVAT: Boolean; RoundingPrecision: Decimal) AmountInclVAT: Decimal
     begin
+        if Amount = 0 then begin
+            AmountInclVAT := 0;
+            exit;
+        end;
+
         if PricesInclidingVAT or (VATRate = 0) then
             AmountInclVAT := Amount
         else
@@ -204,8 +210,10 @@
         SalesLine.Reset();
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.SetFilter(Type, '<>%1', SalesLine.Type::" ");
         SalesLine.SetFilter("No.", '<>%1', '');
         SalesLine.SetFilter(Quantity, '>%1', 0);
         SalesLine.SetFilter("Line Amount", '>%1', 0);
+        SalesLine.SetRange("Prepayment Line", false);
     end;
 }
