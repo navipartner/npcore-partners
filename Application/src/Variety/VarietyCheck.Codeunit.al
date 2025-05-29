@@ -18,6 +18,7 @@
         POSSalesLine: Record "NPR POS Entry Sales Line";
         p: Record "NPR POS Entry";
         ConfirmMgt: Codeunit "Confirm Management";
+        POSVariantLineCheck: Query "NPR POS Entry Line Variant";
     begin
         p."Amount Incl. Tax" := 1;
         //no variants created. Do what you want
@@ -77,12 +78,14 @@
                 if not ItemLedgEntry.IsEmpty then
                     Error(Text001, ItemLedgEntry.TableCaption, ItemVar.TableCaption, ItemVar.Code);
 
-                POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
-                POSSalesLine.SetRange("No.", ItemVar."Item No.");
-                POSSalesLine.SetRange("Variant Code", ItemVar.Code);
-                POSSalesLine.SetRange("Item Entry No.", 0);
-                if not POSSalesLine.IsEmpty() then
-                    Error(Text001, POSSalesLine.TableCaption, ItemVar.TableCaption, ItemVar.Code);
+                POSVariantLineCheck.Setrange(Type, POSVariantLineCheck.Type::Item);
+                POSVariantLineCheck.Setrange(No_, ItemVar."Item No.");
+                POSVariantLineCheck.SetRange(Variant_Code, ItemVar.Code);
+                POSVariantLineCheck.SetRange(Item_Entry_No_, 0);
+                if POSVariantLineCheck.Open() then begin
+                    if POSVariantLineCheck.Read() then
+                        Error(Text001, POSSalesLine.TableCaption, ItemVar.TableCaption, ItemVar.Code);
+                end;
 
 #IF (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
                 ItemVar."NPR Blocked" := true;
