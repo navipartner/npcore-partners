@@ -198,6 +198,12 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR MM Members. Alter. Setup"."Sales Item No." WHERE("Alteration Type" = CONST(AUTORENEW));
         }
+        field(101; AutoRenewToOnAgeConstraint; Code[20])
+        {
+            Caption = 'Auto-Renew To On Age Constraint';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM Members. Alter. Setup"."Sales Item No." WHERE("Alteration Type" = CONST(AUTORENEW));
+        }
         field(110; "Not Available Via Web Service"; Boolean)
         {
             Caption = 'Not Available Via Web Service';

@@ -324,6 +324,22 @@
             Caption = 'Notification Token';
             DataClassification = CustomerContent;
         }
+        field(190; NextMembershipCode; Code[20])
+        {
+            Caption = 'Next Membership Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM Membership Setup";
+        }
+        field(191; NextMembershipDescription; Text[100])
+        {
+            Caption = 'Next Membership Description';
+            DataClassification = CustomerContent;
+        }
+        field(192; NextActivationDate; Date)
+        {
+            Caption = 'Next Activation Date';
+            DataClassification = CustomerContent;
+        }
         field(200; "Failed With Message"; Text[250])
         {
             Caption = 'Failed With Message';

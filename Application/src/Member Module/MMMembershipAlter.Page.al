@@ -162,6 +162,11 @@
                     ToolTip = 'Specifies the value of the Auto-Renew To field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field(AutoRenewToOnAgeConstraint; Rec.AutoRenewToOnAgeConstraint)
+                {
+                    ToolTip = 'Specifies the value of the Auto-Renew To On Age Constraint field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
                 field("Not Available Via Web Service"; Rec."Not Available Via Web Service")
                 {
 
@@ -208,7 +213,7 @@
                 field(PrintCardOnAlteration; Rec.PrintCardOnAlteration)
                 {
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-                    ToolTip = 'Specifies the value of the Print Card On Alteration field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Print Card On Alteration field.';
                 }
 
             }

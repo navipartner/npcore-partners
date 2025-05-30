@@ -92,12 +92,13 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
         MembershipLedger: Record "NPR MM Membership Entry";
         MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
+        AlterationRuleSystemId: Guid;
         ReasonText: Text;
     begin
         MembershipLedger.Get(Subscription."Membership Ledger Entry No.");
-        if not MembershipMgt.GetAutoRenewItemNo(MembershipLedger, RenewWithItemNo, ReasonText) then
+        if not MembershipMgt.SelectAutoRenewRule(MembershipLedger, RenewWithItemNo, AlterationRuleSystemId, ReasonText) then
             Error(ReasonText);
-        MembershipAlterationSetup.Get(MembershipAlterationSetup."Alteration Type"::AUTORENEW, Subscription."Membership Code", RenewWithItemNo);
+        MembershipAlterationSetup.GetBySystemId(AlterationRuleSystemId);
 
         SubscriptionRequest.Init();
         MemberInfoCapture.Init();

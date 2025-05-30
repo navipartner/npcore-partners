@@ -265,6 +265,7 @@
         MemberCard: Record "NPR MM Member Card";
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         MembershipSetup: Record "NPR MM Membership Setup";
+        MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
         MemberCommunity: Record "NPR MM Member Community";
         NotificationSetup: Record "NPR MM Member Notific. Setup";
         MembershipEntry: Record "NPR MM Membership Entry";
@@ -276,6 +277,9 @@
         EMailLbl: Label '%1?email=%2', Locked = true;
         MemberInfoJson: JsonObject;
         MemberInfoText: Text;
+        RenewToItemNo: Code[20];
+        AlterationSystemId: Guid;
+        ReasonText: Text;
     begin
         NotificationSetup.Get(MembershipNotification."Notification Code");
 
@@ -361,6 +365,19 @@
 
         if (MemberNotificationEntry."Card Valid Until" = 0D) then
             MemberNotificationEntry."Card Valid Until" := MemberNotificationEntry."Membership Valid Until";
+
+        // figure out if this is a renewal notification if the membership code will change due to age constraints
+        if (MembershipNotification."Notification Trigger" = MembershipNotification."Notification Trigger"::RENEWAL) then begin
+            if (MembershipManagement.SelectAutoRenewRule(MembershipEntry, RenewToItemNo, AlterationSystemId, ReasonText)) then begin
+                if (MembershipAlterationSetup.GetBySystemId(AlterationSystemId)) then begin
+                    MemberNotificationEntry.NextMembershipCode := MembershipAlterationSetup."From Membership Code";
+                    MemberNotificationEntry.NextMembershipDescription := MembershipAlterationSetup.Description;
+                    MemberNotificationEntry.NextActivationDate := Today();
+                    if (MembershipEntry."Valid Until Date" >= Today()) then
+                        MemberNotificationEntry.NextActivationDate := CalcDate('<+1D>', MembershipEntry."Valid Until Date");
+                end;
+            end;
+        end;
 
         // Engine, Method and Address
         MemberNotificationEntry."Notification Engine" := NotificationEngine;

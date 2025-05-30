@@ -705,6 +705,7 @@
             action(Notifications)
             {
                 Caption = 'Notifications';
+                Ellipsis = true;
                 Image = Interaction;
                 Promoted = true;
                 PromotedOnly = true;
@@ -774,6 +775,7 @@
             action(Achievements)
             {
                 Caption = 'Achievements';
+                Ellipsis = true;
                 ToolTip = 'This action opens the achievements and progress list for the membership.';
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 Image = History;
@@ -798,6 +800,7 @@
             action(PaymentMethods)
             {
                 Caption = 'Payment Methods';
+                Ellipsis = true;
                 ToolTip = 'Displays PSP tokenized customer payment methods associated with the membership.';
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 Image = PaymentHistory;
@@ -819,6 +822,7 @@
             action(Subscription)
             {
                 Caption = 'Subscription';
+                Ellipsis = true;
                 ToolTip = 'Opens membership subscription details.';
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 Image = DueDate;
@@ -829,6 +833,20 @@
                 RunObject = page "NPR MM Subscription Details";
                 RunPageLink = "Membership Entry No." = field("Entry No.");
             }
+            action(ScheduledCustomerUpdates)
+            {
+                Caption = 'Scheduled Customer Updates';
+                Ellipsis = true;
+                Image = JobTimeSheet;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                RunObject = Page "NPR MM Pending Customer Update";
+                RunPageLink = "Customer No." = field("Customer No.");
+                ToolTip = 'Opens the list of scheduled customer updates for this membership due to future Renew, Auto-Renew, Upgrade events.';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+            }
+
             group(History)
             {
                 Caption = 'History';

@@ -12,6 +12,12 @@ table 6151064 "NPR MM Pending Customer Update"
             DataClassification = CustomerContent;
             AutoIncrement = true;
         }
+        field(5; MembershipEntryNo; Integer)
+        {
+            Caption = 'Membership Entry No.';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM Membership";
+        }
         field(10; "Customer No."; Code[20])
         {
             Caption = 'Customer No.';
@@ -22,6 +28,13 @@ table 6151064 "NPR MM Pending Customer Update"
         {
             Caption = 'Customer Config. Template Code';
             DataClassification = CustomerContent;
+            TableRelation = "Config. Template Header" WHERE("Table ID" = CONST(18));
+        }
+        field(25; MembershipCode; Code[20])
+        {
+            Caption = 'Membership Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM Membership Setup";
         }
         field(30; "Valid From Date"; Date)
         {
@@ -41,6 +54,13 @@ table 6151064 "NPR MM Pending Customer Update"
         {
         }
         key(Key2; "Valid From Date")
+        {
+        }
+        key(Key3; "Customer No.")
+        {
+        }
+
+        key(Key4; MembershipEntryNo)
         {
         }
     }

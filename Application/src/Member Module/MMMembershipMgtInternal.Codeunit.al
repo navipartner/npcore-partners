@@ -2560,6 +2560,7 @@
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
         MembershipStartDate: Date;
         MembershipUntilDate: Date;
+        AlterationRuleSystemId: Guid;
         PlaceHolder2Lbl: Label '%1 with %2', Locked = true;
     begin
 
@@ -2577,11 +2578,10 @@
             exit(0);
         end;
 
-        MembershipEntry."Membership Code" := Membership."Membership Code";
-        if not GetAutoRenewItemNo(MembershipEntry, RenewWithItemNo, ReasonText) then
+        if (not SelectAutoRenewRule(MembershipEntry, RenewWithItemNo, AlterationRuleSystemId, ReasonText)) then
             exit(0);
 
-        if (not MembershipAlterationSetup.Get(MembershipAlterationSetup."Alteration Type"::AUTORENEW, Membership."Membership Code", RenewWithItemNo)) then begin
+        if (not MembershipAlterationSetup.GetBySystemId(AlterationRuleSystemId)) then begin
             ReasonText := StrSubstNo(NOT_FOUND, 'Auto-Renew item', StrSubstNo(PlaceHolder2Lbl, MembershipEntry.Context::AUTORENEW, RenewWithItemNo));
             exit(0);
         end;
@@ -2590,35 +2590,40 @@
         MemberInfoCapture."Entry No." := 0;
 
         MemberInfoCapture."Membership Entry No." := Membership."Entry No.";
-        MemberInfoCapture."Membership Code" := Membership."Membership Code";
+        MemberInfoCapture."Membership Code" := MembershipAlterationSetup."From Membership Code";
         MemberInfoCapture."External Membership No." := Membership."External Membership No.";
         MemberInfoCapture."Item No." := RenewWithItemNo;
         MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::AUTORENEW;
         MemberInfoCapture."Document Date" := Today(); // Active
+        MemberInfoCapture.Description := MembershipAlterationSetup.Description;
 
         if (not AutoRenewMembershipWorker(MemberInfoCapture, false, Today(), MembershipStartDate, MembershipUntilDate, MemberInfoCapture."Unit Price", ReasonText)) then
             exit(0);
 
         MemberInfoCapture."Valid Until" := MembershipStartDate;
-        MemberInfoCapture.Description := MembershipAlterationSetup.Description;
-
         MemberInfoCapture.Insert();
         exit(MemberInfoCapture."Entry No.");
     end;
 
-    internal procedure GetAutoRenewItemNo(MembershipEntry: Record "NPR MM Membership Entry"; var RenewWithItemNo: Code[20]; var ReasonText: Text): Boolean
+    internal procedure SelectAutoRenewRule(MembershipEntry: Record "NPR MM Membership Entry"; var RenewWithItemNo: Code[20]; var AlterationRuleSystemId: Guid; var ReasonText: Text): Boolean
     var
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        Membership: Record "NPR MM Membership";
         HaveAutoRenewItem: Boolean;
+        EstimatedStartDate, EstimatedUntilDate : Date;
         PlaceHolderLbl: Label '%1 for %2', Locked = true;
+        KeepAutoRenewProduct: Boolean;
+        TargetMembershipCode: Code[20];
     begin
         HaveAutoRenewItem := (RenewWithItemNo <> '');
         if (not HaveAutoRenewItem) then begin
             case MembershipEntry.Context of
                 MembershipEntry.Context::NEW:
                     begin
-                        HaveAutoRenewItem := MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MembershipEntry."Item No.");
+                        if (MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MembershipEntry."Item No.")) then
+                            HaveAutoRenewItem := MembershipAlterationSetup.Get(MembershipAlterationSetup."Alteration Type"::AUTORENEW, MembershipEntry."Membership Code", MembershipSalesSetup."Auto-Renew To");
                         RenewWithItemNo := MembershipSalesSetup."Auto-Renew To";
                     end;
                 MembershipEntry.Context::RENEW:
@@ -2649,17 +2654,42 @@
             RenewWithItemNo := MembershipAlterationSetup."Auto-Renew To";
         end;
 
+        // Check the age constraint - do we need to leave the current membership code?
+        if (MembershipSetup.Get(MembershipEntry."Membership Code")) then
+            if (MembershipSetup."Enable Age Verification") then begin
+                Membership.Get(MembershipEntry."Membership Entry No.");
+                EstimatedStartDate := CalcDate('<+1D>', MembershipEntry."Valid Until Date");
+                EstimatedUntilDate := CalcDate(MembershipAlterationSetup."Membership Duration", EstimatedStartDate);
+
+                if (MembershipAlterationSetup."Age Constraint Type" <> MembershipAlterationSetup."Age Constraint Type"::NA) then begin
+                    if (MembershipAlterationSetup."Age Constraint Type" <> MembershipAlterationSetup."Age Constraint Type"::NA) then begin
+                        TargetMembershipCode := MembershipAlterationSetup."To Membership Code";
+                        MembershipAlterationSetup."To Membership Code" := ''; // Check the age constraint on the current membership code
+                        KeepAutoRenewProduct := CheckAgeConstraintOnMembershipAlter(Membership, MembershipAlterationSetup, Today(), EstimatedStartDate, EstimatedUntilDate, ReasonText);
+                        if (not KeepAutoRenewProduct) then begin
+                            RenewWithItemNo := MembershipAlterationSetup.AutoRenewToOnAgeConstraint;
+                            HaveAutoRenewItem := MembershipAlterationSetup.Get(MembershipAlterationSetup."Alteration Type"::AUTORENEW, TargetMembershipCode, RenewWithItemNo);
+                        end;
+                        if ((not HaveAutoRenewItem) and (not KeepAutoRenewProduct)) then begin
+                            ReasonText := StrSubstNo('Age constraint applies and the members age invalidates the current Auto-Renew rule without providing an alternative. Verify field "%1" for rule: [%2] [%3] [%4]',
+                                MembershipAlterationSetup.FieldCaption(AutoRenewToOnAgeConstraint), MembershipAlterationSetup."Alteration Type"::AUTORENEW, MembershipEntry."Membership Code", MembershipEntry."Item No.");
+                            exit(false);
+                        end;
+                    end;
+                end;
+            end;
+
         if (not HaveAutoRenewItem) then begin
             ReasonText := StrSubstNo(NOT_FOUND, 'Auto-Renew rule', StrSubstNo(PlaceHolderLbl, MembershipEntry.Context, MembershipEntry."Item No."));
             exit(false);
         end;
 
-        if (RenewWithItemNo = '') then begin
+        if (RenewWithItemNo = '') then
             ReasonText := StrSubstNo(NOT_FOUND, 'Auto-Renew rule item', StrSubstNo(PlaceHolderLbl, MembershipEntry.Context, MembershipEntry."Item No."));
-            exit(false);
-        end;
 
-        exit(true);
+        AlterationRuleSystemId := MembershipAlterationSetup.SystemId;
+        exit(RenewWithItemNo <> '');
+
     end;
 
     internal procedure AutoRenewMembership(var MemberInfoCapture: Record "NPR MM Member Info Capture"; WithUpdate: Boolean; var OutStartDate: Date; var OutUntilDate: Date; var SuggestedUnitPrice: Decimal): Boolean
@@ -2691,6 +2721,9 @@
 
         Membership.Get(MemberInfoCapture."Membership Entry No.");
 
+        if (MemberInfoCapture."Membership Code" = '') then
+            MemberInfoCapture."Membership Code" := Membership."Membership Code";
+
         MembershipEntry.SetFilter("Membership Entry No.", '=%1', MemberInfoCapture."Membership Entry No.");
         MembershipEntry.SetFilter(Blocked, '=%1', false);
         MembershipEntry.SetFilter(Context, '<>%1', MembershipEntry.Context::REGRET);
@@ -2702,7 +2735,7 @@
         if (MembershipEntry."Activate On First Use") then
             exit(false);
 
-        MembershipAlterationSetup.Get(MembershipAlterationSetup."Alteration Type"::AUTORENEW, Membership."Membership Code", MemberInfoCapture."Item No.");
+        MembershipAlterationSetup.Get(MembershipAlterationSetup."Alteration Type"::AUTORENEW, MemberInfoCapture."Membership Code", MemberInfoCapture."Item No.");
         ReasonText := StrSubstNo(GRACE_PERIOD, MembershipAlterationSetup."Alteration Type");
         if (not ValidAlterationGracePeriod(MembershipAlterationSetup, MembershipEntry, MemberInfoCapture."Document Date")) then
             exit(false);
@@ -2746,7 +2779,6 @@
             exit(false);
 
         if (WithUpdate) then begin
-            MemberInfoCapture."Membership Code" := Membership."Membership Code";
             if not CarryOutMembershipRenewal(MemberInfoCapture, MembershipAlterationSetup, StartDateNew, EndDateNew, EntryNo, ReasonText) then
                 exit(false);
         end;
@@ -2971,12 +3003,12 @@
 
     end;
 
-    local procedure CalculateLedgerEntryDates_NEW(MembershipSalesSetup: Record "NPR MM Members. Sales Setup"; Perpetual: Boolean; SalesDate: Date; PromptDate: Date; var ValidFromDate: Date; var ValiduntilDate: Date)
+    local procedure CalculateLedgerEntryDates_NEW(MembershipSalesSetup: Record "NPR MM Members. Sales Setup"; Perpetual: Boolean; SalesDate: Date; PromptDate: Date; var ValidFromDate: Date; var ValidUntilDate: Date)
     begin
 
         if (Perpetual) then begin
             ValidFromDate := SalesDate;
-            ValiduntilDate := DMY2Date(31, 12, 9999);
+            ValidUntilDate := DMY2Date(31, 12, 9999);
             exit;
         end;
 
@@ -2994,13 +3026,13 @@
             MembershipSalesSetup."Valid From Base"::FIRST_USE:
                 begin
                     ValidFromDate := 0D;
-                    ValiduntilDate := 0D;
+                    ValidUntilDate := 0D;
                     exit;
                 end;
         end;
 
         MembershipSalesSetup.TestField("Duration Formula");
-        ValiduntilDate := CalcDate(MembershipSalesSetup."Duration Formula", ValidFromDate);
+        ValidUntilDate := CalcDate(MembershipSalesSetup."Duration Formula", ValidFromDate);
 
     end;
 
@@ -3722,18 +3754,18 @@
 
         case MembershipSetup."Validate Age Against" of
             MembershipSetup."Validate Age Against"::SALESDATE_Y,
-  MembershipSetup."Validate Age Against"::SALESDATE_YM,
-  MembershipSetup."Validate Age Against"::SALESDATE_YMD:
+            MembershipSetup."Validate Age Against"::SALESDATE_YM,
+            MembershipSetup."Validate Age Against"::SALESDATE_YMD:
                 ReferenceDate := SalesDate;
 
             MembershipSetup."Validate Age Against"::PERIODBEGIN_Y,
-  MembershipSetup."Validate Age Against"::PERIODBEGIN_YM,
-  MembershipSetup."Validate Age Against"::PERIODBEGIN_YMD:
+            MembershipSetup."Validate Age Against"::PERIODBEGIN_YM,
+            MembershipSetup."Validate Age Against"::PERIODBEGIN_YMD:
                 ReferenceDate := PeriodStartDate;
 
             MembershipSetup."Validate Age Against"::PERIODEND_Y,
-  MembershipSetup."Validate Age Against"::PERIODEND_YM,
-  MembershipSetup."Validate Age Against"::PERIODEND_YMD:
+            MembershipSetup."Validate Age Against"::PERIODEND_YM,
+            MembershipSetup."Validate Age Against"::PERIODEND_YMD:
                 ReferenceDate := PeriodEndDate;
         end;
 
@@ -4059,20 +4091,21 @@
         MembershipLedgerEntry.Insert();
         Membership.Get(MembershipEntryNo);
 
-        if (MembershipLedgerEntry.Context in [MembershipLedgerEntry.Context::UPGRADE, MembershipLedgerEntry.Context::RENEW]) then begin
+        if (MembershipLedgerEntry.Context in [MembershipLedgerEntry.Context::UPGRADE, MembershipLedgerEntry.Context::RENEW, MembershipLedgerEntry.Context::AUTORENEW]) then begin
             if (Membership."Customer No." <> '') then begin
-                MembershipSetup.Get(Membership."Membership Code");
+                MembershipSetup.Get(MembershipLedgerEntry."Membership Code");
                 if (MembershipSetup."Customer Config. Template Code" <> '') then begin
                     ConfigTemplateHeader.Get(MembershipSetup."Customer Config. Template Code");
                     if (Customer.Get(Membership."Customer No.")) then
                         if MembershipSetup."Defer Cust. Update Alterations" and (MembershipLedgerEntry."Valid From Date" > WorkDate()) then begin
                             PendingCustomerUpdate.Init();
                             PendingCustomerUpdate."Entry No." := 0;
-                            PendingCustomerUpdate.Insert();
+                            PendingCustomerUpdate.MembershipEntryNo := MembershipLedgerEntry."Membership Entry No.";
                             PendingCustomerUpdate."Customer No." := Customer."No.";
                             PendingCustomerUpdate."Customer Config. Template Code" := MembershipSetup."Customer Config. Template Code";
+                            PendingCustomerUpdate.MembershipCode := MembershipLedgerEntry."Membership Code";
                             PendingCustomerUpdate."Valid From Date" := MembershipLedgerEntry."Valid From Date";
-                            PendingCustomerUpdate.Modify();
+                            PendingCustomerUpdate.Insert();
                         end else begin
                             RecRef.GetTable(Customer);
                             ConfigTemplateMgt.UpdateRecord(ConfigTemplateHeader, RecRef);
