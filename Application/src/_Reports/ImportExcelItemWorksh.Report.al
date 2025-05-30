@@ -245,10 +245,6 @@
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
                                 if Evaluate(TempDec, ExcelBuf2."Cell Value as Text") then
                                     ItemWorksheetLine.Validate("Direct Unit Cost", TempDec);
-                        if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Sales Price"), MappedColumnNo, FieldLength) then
-                            if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
-                                if Evaluate(TempDec, ExcelBuf2."Cell Value as Text") then
-                                    ItemWorksheetLine.Validate("Sales Price", TempDec);
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Sales Price Currency Code"), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
                                 if ExcelBuf2."Cell Value as Text" <> GLSetup."LCY Code" then
@@ -294,6 +290,10 @@
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
                                 if Evaluate(TempDec, ExcelBuf2."Cell Value as Text") then
                                     ItemWorksheetLine.Validate("Gross Weight", TempDec);
+                        if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Sales Price"), MappedColumnNo, FieldLength) then
+                            if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
+                                if Evaluate(TempDec, ExcelBuf2."Cell Value as Text") then
+                                    ItemWorksheetLine.Validate("Sales Price", TempDec);
                         ItemWorksheetLine.Modify();
                         ProcessColumnMapping(DATABASE::"NPR Item Worksheet Line", '', ExcludeColumnsFilter);
                         ItemWorksheetLine.Get(ItemWorksheetLine."Worksheet Template Name", ItemWorksheetLine."Worksheet Name", ItemWorksheetLine."Line No.");
@@ -410,7 +410,6 @@
                         if ExcelBuf2.Get(ExcelBuf."Row No.", 20) then
                             ItemWorksheetVariantLine.Validate("Internal Bar Code", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
                     end;
-                    ItemWorksheetVariantLine.Validate("Existing Item No.", ItemWorksheetLine."Existing Item No.");
                     ItemWorksheetVariantLine.Validate("Variety 1 Value");
                     ItemWorksheetVariantLine.Validate("Variety 2 Value");
                     ItemWorksheetVariantLine.Validate("Variety 3 Value");
