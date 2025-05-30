@@ -47,7 +47,7 @@ codeunit 6185114 "NPR LoyaltyAPI" implements "NPR API Request Handler"
             exit(Handle(_ApiFunction::CREATE_COUPON, Request));
 
         // ***** DELETE *******************************************************
-        if (Request.Match('DELETE', '/loyalty/coupon/:couponId')) then
+        if (Request.Match('DELETE', '/loyalty/coupon/:membershipNumber/:couponReferenceNo')) then
             exit(Handle(_ApiFunction::DELETE_COUPON, Request));
     end;
 

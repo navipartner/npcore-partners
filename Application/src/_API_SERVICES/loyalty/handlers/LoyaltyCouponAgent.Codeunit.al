@@ -173,9 +173,9 @@ codeunit 6248431 "NPR LoyaltyCouponAgent"
         DocumentDate: Date;
     begin
 #pragma warning disable AA0139
-        MembershipNumber := HelperFunctions.GetQueryParameterFromRequest(_Request, 'membershipNumber');
+        MembershipNumber := _Request.Paths().Get(4);
+        CouponReferenceNo := _Request.Paths().Get(5);
 #pragma warning restore
-        CouponReferenceNo := HelperFunctions.GetQueryParameterFromRequest(_Request, 'couponReference');
         DocumentDate := Today();
 
         if (MembershipNumber <> '') then
@@ -389,9 +389,7 @@ codeunit 6248431 "NPR LoyaltyCouponAgent"
         ResponseJson.StartObject('response')
                         .AddObject(HelperFunctions.GetStatusResponse(ResponseJson))
                         .AddObject(HelperFunctions.AddMembershipProperties(ResponseJson, true, Membership, DateValidFromDate, DateValidUntilDate))
-                        .StartObject('availableCoupons')
-                            .AddObject(GetAvailableCouponsDTO(ResponseJson, TempCoupon))
-                        .EndObject()
+                        .AddArray(GetAvailableCouponsDTO(ResponseJson, TempCoupon))
                     .EndObject();
 
         exit(ResponseJson);
@@ -401,7 +399,7 @@ codeunit 6248431 "NPR LoyaltyCouponAgent"
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
     begin
-        ResponseJson.StartArray('coupon');
+        ResponseJson.StartArray('availableCoupons');
         GeneralLedgerSetup.Get();
 
         repeat

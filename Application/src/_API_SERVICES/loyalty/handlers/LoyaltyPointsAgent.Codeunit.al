@@ -5,8 +5,6 @@ codeunit 6248430 "NPR LoyaltyPointsAgent"
 
     var
         HelperFunctions: Codeunit "NPR Loyalty Helper Functions";
-        Temp_PointsResponse: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
-        _ResponseCode: Text;
         ParametersMandatoryLbl: Label 'At least one parameter is mandatory in request.', Locked = true;
 
     trigger OnRun()
@@ -73,8 +71,8 @@ codeunit 6248430 "NPR LoyaltyPointsAgent"
         else
             HelperFunctions.SetErrorResponse(ResponseMessage, ResponseMessageId);
 
-        if _ResponseCode = 'OK' then
-            exit(Response.RespondOK(GetResponse(ResponseJson)))
+        if HelperFunctions.GetResponseCode() = 'OK' then
+            exit(Response.RespondOK(HelperFunctions.GetResponseByFunctionName(ResponseJson, 'reservePoints')))
         else
             exit(Response.RespondBadRequest(HelperFunctions.GetErrorResponse()))
     end;
@@ -102,8 +100,8 @@ codeunit 6248430 "NPR LoyaltyPointsAgent"
         else
             HelperFunctions.SetErrorResponse(ResponseMessage, ResponseMessageId);
 
-        if _ResponseCode = 'OK' then
-            exit(Response.RespondOK(GetResponse(ResponseJson)))
+        if HelperFunctions.GetResponseCode() = 'OK' then
+            exit(Response.RespondOK(HelperFunctions.GetResponseByFunctionName(ResponseJson, 'cancelReservePoints')))
         else
             exit(Response.RespondBadRequest(HelperFunctions.GetErrorResponse()))
     end;
@@ -131,8 +129,8 @@ codeunit 6248430 "NPR LoyaltyPointsAgent"
         else
             HelperFunctions.SetErrorResponse(ResponseMessage, ResponseMessageId);
 
-        if _ResponseCode = 'OK' then
-            exit(Response.RespondOK(GetResponse(ResponseJson)))
+        if HelperFunctions.GetResponseCode() = 'OK' then
+            exit(Response.RespondOK(HelperFunctions.GetResponseByFunctionName(ResponseJson, 'captureReservePoints')))
         else
             exit(Response.RespondBadRequest(HelperFunctions.GetErrorResponse()))
     end;
@@ -301,19 +299,6 @@ codeunit 6248430 "NPR LoyaltyPointsAgent"
         TempCaptureReservationRequest.Type := JsonMgmt.GetJInteger(CaptureReservationLine, 'type', false);
         TempCaptureReservationRequest."Authorization Code" := CopyStr(JsonMgmt.GetJCode(CaptureReservationLine, 'authorizationCode', false), 1, MaxStrLen(TempCaptureReservationRequest."Authorization Code"));
         TempCaptureReservationRequest.Insert();
-    end;
-
-    local procedure GetResponse(var ResponseJson: Codeunit "NPR JSON Builder"): Codeunit "NPR JSON Builder"
-    begin
-        ResponseJson.AddObject(HelperFunctions.GetStatusResponse(ResponseJson))
-                    .StartObject('points')
-                        .AddProperty('referenceNumber', Temp_PointsResponse."Entry No.")
-                        .AddProperty('authorizationNumber', Temp_PointsResponse."Authorization Code")
-                        .AddProperty('newPointBalance', Temp_PointsResponse.Balance)
-                    .EndObject()
-                .EndObject();
-
-        exit(ResponseJson);
     end;
 
     local procedure AddPointsSummary(var ResponseJson: Codeunit "NPR Json Builder"; var TmpMembershipPointsSummary: Record "NPR MM Members. Points Summary" temporary): Codeunit "NPR Json Builder"

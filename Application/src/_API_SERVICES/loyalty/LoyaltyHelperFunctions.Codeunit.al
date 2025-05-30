@@ -121,12 +121,21 @@ codeunit 6248450 "NPR Loyalty Helper Functions"
             'registerSale':
                 begin
                     ResponseJson.StartObject('points')
-                        .AddProperty('referenceNumber', Temp_PointsResponse."Entry No.")
-                        .AddProperty('authorizationNumber', Temp_PointsResponse."Authorization Code")
-                        .AddProperty('pointsEarned', Temp_PointsResponse."Earned Points")
-                        .AddProperty('pointsSpent', Temp_PointsResponse."Burned Points")
-                        .AddProperty('newPointBalance', Temp_PointsResponse.Balance)
-                    .EndObject();
+                                    .AddProperty('referenceNumber', Temp_PointsResponse."Entry No.")
+                                    .AddProperty('authorizationNumber', Temp_PointsResponse."Authorization Code")
+                                    .AddProperty('pointsEarned', Temp_PointsResponse."Earned Points")
+                                    .AddProperty('pointsSpent', Temp_PointsResponse."Burned Points")
+                                    .AddProperty('newPointBalance', Temp_PointsResponse.Balance)
+                                .EndObject();
+                end;
+            'reservePoints', 'captureReservePoints', 'cancelReservePoints':
+                begin
+                    ResponseJson.AddObject(GetStatusResponse(ResponseJson))
+                                .StartObject('points')
+                                    .AddProperty('referenceNumber', Temp_PointsResponse."Entry No.")
+                                    .AddProperty('authorizationNumber', Temp_PointsResponse."Authorization Code")
+                                    .AddProperty('newPointBalance', Temp_PointsResponse.Balance)
+                                .EndObject();
                 end;
         end;
 

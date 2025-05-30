@@ -142,7 +142,7 @@ codeunit 6248432 "NPR LoyaltyGeneralAgent"
         MembershipEntryNo := HelperFunctions.GetMembershipEntryNo(CardNumber, MembershipNumber, CustomerNumber);
 
         if (MembershipEntryNo = 0) or (not Membership.Get(MembershipEntryNo)) then
-            Response.RespondBadRequest('Invalid membership entry no.');
+            exit(Response.RespondBadRequest('Invalid membership entry no.'));
 
         HelperFunctions.SetResponse('OK', 'Success');
 
@@ -151,7 +151,7 @@ codeunit 6248432 "NPR LoyaltyGeneralAgent"
         Membership.CalcFields("Awarded Points (Sale)", "Awarded Points (Refund)", "Redeemed Points (Withdrawl)", "Redeemed Points (Deposit)", "Expired Points", "Remaining Points");
 
         if not Membership.FindSet() then
-            Response.RespondBadRequest(StrSubstNo('Membership not found for Entry No. "%1" and Date Filter "%2"', MembershipEntryNo, DocumentDate));
+            exit(Response.RespondBadRequest(StrSubstNo('Membership not found for Entry No. "%1" and Date Filter "%2"', MembershipEntryNo, DocumentDate)));
 
         GeneralLedgerSetup.Get();
         CurrencyCode := GeneralLedgerSetup."LCY Code";
