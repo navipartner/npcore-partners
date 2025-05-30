@@ -471,6 +471,7 @@ codeunit 6248367 "NPR HU L Communication Mgt."
         AddPOSEntryPaymentLines(JsonTextWriter, POSEntry, HULPOSAuditLogAux);
 
         JsonTextWriter.WriteEndObject(); // data
+        JsonTextWriter.WriteEndObject();
 
         Request := JsonTextWriter.GetJSonAsText();
 
