@@ -3006,7 +3006,6 @@
         TestField("Line Type", "Line Type"::Item);
 
         GetItem();
-        _Item.TestField("Costing Method", _Item."Costing Method"::Specific);
         ItemLedgerEntry.SetCurrentKey(Open, Positive, "Item No.", "Serial No.");
         ItemLedgerEntry.SetRange(Open, true);
         ItemLedgerEntry.SetRange(Positive, true);

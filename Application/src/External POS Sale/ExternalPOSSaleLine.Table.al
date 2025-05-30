@@ -879,7 +879,7 @@
 
         if (not TryGetItem(Item)) then
             exit(false);
-        Item.TestField("Costing Method", Item."Costing Method"::Specific);
+
         ItemLedgerEntry.SetCurrentKey(Open, Positive, "Item No.", "Serial No.");
         ItemLedgerEntry.SetRange(Open, true);
         ItemLedgerEntry.SetRange(Positive, true);
