@@ -1,0 +1,822 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  simpleTypes: ./types-simple.yml
+  commonApiTypes: ./../../common-api-types.yml
+  globalApiTypes: ./../../global-api-types.yml
+
+types:
+
+  LoyaltyPointsDTO:
+    docs:
+      This is a composite type representing a Membership and its associated Points. 
+      It extends the MembershipEntity and includes a list of Points linked to the membership.
+    extends:
+      LoyaltyMembershipEntity
+    properties:
+      pointSummary: MembershipPointsSummary
+      previousPeriod: MembershipPreviousPeriod
+      loyaltyTiers: MembershipLoyaltyTiers
+      pointsByPeriods: list<MembershipPointsByPeriods>
+    examples:
+      - name: ExampleLoyaltyPointsDTO
+        value:
+          membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
+          communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
+          membershipCode: $simpleTypes.MembershipCode.PLATINUM
+          communityName: $simpleTypes.CommunityName.ExampleCommunityName
+          membershipName: $simpleTypes.MembershipName.ExampleMembershipName
+          issueDate: $simpleTypes.IssueDate.ExampleIssueDate
+          validFromDate: $simpleTypes.ValidFromDate.ExampleValidFromDate
+          validUntilDate: $simpleTypes.ValidUntilDate.ExampleValidUntilDate
+          customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
+          loyaltyCode: $simpleTypes.LoyaltyCode.ExampleLoyaltyCode
+          loyaltyProgram: $simpleTypes.LoyaltyProgram.ExampleLoyaltyProgram
+          loyaltyCollectionPeriod: $simpleTypes.LoyaltyCollectionPeriod.FIXED
+          loyaltyCollectionPeriodName: $simpleTypes.LoyaltyCollectionPeriodName.FIXED
+          loyaltyPointSource: $simpleTypes.LoyaltyPointSource.PREVIOUS_PERIOD
+          loyaltyPointSourceName: $simpleTypes.LoyaltyPointSourceName.PREVIOUS_PERIOD
+          pointSummary: $MembershipPointsSummary.ExampleMembershipPointsSummary
+          previousPeriod: $MembershipPreviousPeriod.ExampleMembershipPreviousPeriod
+          loyaltyTiers: $MembershipLoyaltyTiers.ExampleMembershipLoyaltyTiers
+          pointsByPeriods:
+            - $MembershipPointsByPeriods.ExampleMembershipPointsByPeriodsPrevious
+            - $MembershipPointsByPeriods.ExampleMembershipPointsByPeriodsCurrent
+
+  LoyaltyPointEntriesDTO:
+    docs:
+      This DTO is used when retrieving data from LoyaltyPointEntries endpoint. It contains base fields for membership like
+      membershipCode, IssueDate and valid dates (from/to).
+    extends:
+      LoyaltyMembershipPointEntryEntity
+    properties:
+      accumulated: LoyaltyPointEntriesAccumulated
+      transactions: list<LoyaltyPointEntriesTransactions>
+    examples:
+      - name: ExampleLoyaltyPointEntriesDTO
+        value:
+          membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
+          communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
+          membershipCode: $simpleTypes.MembershipCode.PLATINUM
+          issueDate: $simpleTypes.IssueDate.ExampleIssueDate
+          validFromDate: $simpleTypes.ValidFromDate.ExampleValidFromDate
+          validUntilDate: $simpleTypes.ValidUntilDate.ExampleValidUntilDate
+          accumulated: $LoyaltyPointEntriesAccumulated.ExampleMembershipPointsSummary
+          transactions:
+            - $LoyaltyPointEntriesTransactions.ExampleLoyaltyPointEntriesTransactionsSale
+            - $LoyaltyPointEntriesTransactions.ExampleLoyaltyPointEntriesTransactionsCapture
+            - $LoyaltyPointEntriesTransactions.ExampleLoyaltyPointEntriesTransactionsRefund
+
+  LoyaltyReceiptPDFDTO:
+    docs:
+      This DTO is used when retrieving data from LoyaltyReceiptPDF endpoint.
+    properties:
+      response: simpleTypes.ReceiptPDF
+    examples:
+      - name: ExampleLoyaltyReceiptPDFDTO
+        value:
+          response: $simpleTypes.ReceiptPDF.ExampleReceiptPDF
+
+  LoyaltyReceiptListDTO:
+    docs:
+      This DTO is used when retrieving data from LoyaltyReceiptList endpoint. 
+    properties:
+      status: LoyaltyGetStatusResponse
+      membership: LoyaltyGetMembershipResponse
+      receipts: list<optional<LoyaltyGetReceiptsResponse>>
+    examples:
+      - name: ExampleLoyaltyReceiptListDTO
+        value:
+          status: $LoyaltyGetStatusResponse.ExampleLoyaltyGetStatusResponse
+          membership: $LoyaltyGetMembershipResponse.ExampleLoyaltyGetMembershipResponse
+          receipts: 
+            - $LoyaltyGetReceiptsResponse.ExampleLoyaltyGetReceiptsResponse1
+            - $LoyaltyGetReceiptsResponse.ExampleLoyaltyGetReceiptsResponse2
+
+  LoyaltyConfigurationDTO:
+    docs:
+      This DTO is used when retrieving data from LoyaltyConfiguration endpoint. 
+    properties:
+      responseCode: simpleTypes.ResponseCode
+      responseMessage: simpleTypes.ResponseMessage
+      configuration: LoyaltyConfigurationResponse
+    examples:
+      - name: ExampleLoyaltyConfigurationDTO
+        value:
+          responseCode: $simpleTypes.ResponseCode.ExampleResponseCodeOK
+          responseMessage: $simpleTypes.ResponseMessage.ExampleResponseMessageOK
+          configuration: $LoyaltyConfigurationResponse.ExampleLoyaltyConfigurationResponse
+
+  LoyaltyCouponEligibilityDTO:
+    docs:
+      This DTO is used when retrieving data from LoyaltyCouponEligibility endpoint. 
+    properties:
+      status: LoyaltyGetStatusResponse
+      membership: LoyaltyGetMembershipResponse
+      coupons: list<optional<LoyaltyGetCouponsResponse>>
+    examples:
+      - name: ExampleLoyaltyCouponEligibilityDTO
+        value:
+          status: $LoyaltyGetStatusResponse.ExampleLoyaltyGetStatusResponse
+          membership: $LoyaltyGetMembershipResponse.ExampleLoyaltyGetMembershipResponse
+          coupons: 
+            - $LoyaltyGetCouponsResponse.ExampleLoyaltyGetCouponsResponse
+
+  LoyaltyCouponListDTO:
+    docs:
+      This DTO is used when retrieving data from LoyaltyCouponList endpoint. 
+    properties:
+      status: LoyaltyGetStatusResponse
+      membership: LoyaltyGetMembershipShortResponse
+      availableCoupons: list<optional<LoyaltyGetCouponListResponse>>
+    examples:
+      - name: ExampleLoyaltyCouponListDTO
+        value:
+          status: $LoyaltyGetStatusResponse.ExampleLoyaltyGetStatusResponse
+          membership: $LoyaltyGetMembershipShortResponse.ExampleLoyaltyGetMembershipShortResponse
+          availableCoupons: 
+            - $LoyaltyGetCouponListResponse.ExampleLoyaltyGetCouponListResponse
+
+  DeleteCouponDTO:
+    docs:
+      This DTO is used as a response when deleting a coupon.
+    properties:
+      status: LoyaltyGetStatusResponse
+    examples:
+      - name : ExampleDeleteCouponDTO
+        value:
+          status: $LoyaltyGetStatusResponse.ExampleLoyaltyGetStatusResponse
+
+  ReservePointsRequestDTO:
+    docs:
+      This DTO is used as a request for ReservePoints endpoint.
+    properties:
+      "type": simpleTypes.TypeInteger
+      description: simpleTypes.Description
+      currencyCode: simpleTypes.CurrencyCode
+      amount: simpleTypes.Amount
+      points: simpleTypes.Points
+    examples:
+      - name : ExampleReservePointsRequestDTO
+        value:
+          "type": $simpleTypes.TypeInteger.ExampleTypeInteger1
+          description: $simpleTypes.Description.ExampleDescription
+          currencyCode: $simpleTypes.CurrencyCode.ExampleCurrency
+          amount: $simpleTypes.Amount.ExampleAmount100
+          points: $simpleTypes.Points.ExamplePoints50
+
+  ReservePointsResponseDTO:
+    docs:
+      This DTO is used as a response for ReservePoints endpoint.
+    properties:
+      status: LoyaltyGetStatusResponse
+      points: LoyaltyReservePointsResponse
+    examples:
+      - name : ExampleReservePointsResponseDTO
+        value:
+          status: $LoyaltyGetStatusResponse.ExampleLoyaltyGetStatusResponse
+          points: $LoyaltyReservePointsResponse.ExampleLoyaltyReservePointsResponse
+
+  RegisterSaleRequestSalesDTO:
+    docs:
+      This DTO is used as part of request for RegisterSale endpoint.
+    properties:
+      "type": simpleTypes.TypeInteger
+      itemNumber: simpleTypes.ItemNo
+      variantCode: simpleTypes.VariantCode
+      quantity: simpleTypes.Quantity
+      description: simpleTypes.Description
+      currencyCode: simpleTypes.CurrencyCode
+      amount: simpleTypes.Amount
+      points: simpleTypes.Points
+      "id": simpleTypes.Id
+    examples:
+      - name : ExampleRegisterSaleRequestSalesDTO
+        value:
+          "type": $simpleTypes.TypeInteger.ExampleTypeInteger1
+          itemNumber: $simpleTypes.ItemNo.ExampleItemNo
+          variantCode: $simpleTypes.VariantCode.ExampleVariantCode
+          quantity: $simpleTypes.Quantity.ExampleQuantity
+          description: $simpleTypes.Description.ExampleDescription
+          currencyCode: $simpleTypes.CurrencyCode.ExampleCurrency
+          amount: $simpleTypes.Amount.ExampleAmount100
+          points: $simpleTypes.Points.ExamplePoints50
+          "id": $simpleTypes.Id.ExampleId
+
+  RegisterSaleRequestPaymentsDTO:
+    docs:
+      This DTO is used as part of request for RegisterSale endpoint.
+    properties:
+      "type": simpleTypes.TypeInteger
+      description: simpleTypes.Description
+      currencyCode: simpleTypes.CurrencyCode
+      amount: simpleTypes.Amount
+      points: simpleTypes.Points
+      authorizationCode: simpleTypes.AuthorizationNumber
+      "id": simpleTypes.Id
+    examples:
+      - name : ExampleRegisterSaleRequestPaymentsDTO
+        value:
+          "type": $simpleTypes.TypeInteger.ExampleTypeInteger1
+          description: $simpleTypes.Description.ExampleDescription
+          currencyCode: $simpleTypes.CurrencyCode.ExampleCurrency
+          amount: $simpleTypes.Amount.ExampleAmount100
+          points: $simpleTypes.Points.ExamplePoints50
+          authorizationCode: $simpleTypes.AuthorizationNumber.ExampleAuthorizationNumber
+          "id": $simpleTypes.Id.ExampleId
+
+  RegisterSaleResponseDTO:
+    docs:
+      This DTO is used as a response for RegisterSale endpoint.
+    properties:
+      status: LoyaltyGetStatusResponse
+      points: LoyaltyRegisterSaleResponse
+    examples:
+      - name : ExampleRegisterSaleResponseDTO
+        value:
+          status: $LoyaltyGetStatusResponse.ExampleLoyaltyGetStatusResponse
+          points: $LoyaltyRegisterSaleResponse.ExampleLoyaltyRegisterSaleResponse
+
+  CancelReservePointsRequestDTO:
+    docs:
+      This DTO is used as part of request for CancelReservePoints endpoint.
+    properties:
+      "type": simpleTypes.TypeInteger
+      authorizationCode: simpleTypes.AuthorizationNumber
+    examples:
+      - name : ExampleCancelReservePointsRequestDTO
+        value:
+          "type": $simpleTypes.TypeInteger.ExampleTypeInteger1
+          authorizationCode: $simpleTypes.AuthorizationNumber.ExampleAuthorizationNumber
+
+  CancelReservePointsResponseDTO:
+    docs:
+      This DTO is used as part of response for CancelReservePoints endpoint.
+    properties:
+      status: LoyaltyGetStatusResponse
+      points: LoyaltyReservePointsResponse
+    examples:
+      - name : ExampleCancelReservePointsResponseDTO
+        value:
+          status: $LoyaltyGetStatusResponse.ExampleLoyaltyGetStatusResponse
+          points: $LoyaltyReservePointsResponse.ExampleLoyaltyReservePointsResponse
+
+  CaptureReservePointsRequestDTO:
+    docs:
+      This DTO is used as part of request for CaptureReservePoints endpoint.
+    properties:
+      "type": simpleTypes.TypeInteger
+      authorizationCode: simpleTypes.AuthorizationNumber
+    examples:
+      - name : ExampleCaptureReservePointsRequestDTO
+        value:
+          "type": $simpleTypes.TypeInteger.ExampleTypeInteger1
+          authorizationCode: $simpleTypes.AuthorizationNumber.ExampleAuthorizationNumber
+
+  CaptureReservePointsResponseDTO:
+    docs:
+      This DTO is used as part of response for CaptureReservePoints endpoint.
+    properties:
+      status: LoyaltyGetStatusResponse
+      points: LoyaltyReservePointsResponse
+    examples:
+      - name : ExampleCaptureReservePointsResponseDTO
+        value:
+          status: $LoyaltyGetStatusResponse.ExampleLoyaltyGetStatusResponse
+          points: $LoyaltyReservePointsResponse.ExampleLoyaltyReservePointsResponse         
+
+
+  ##Functions
+  MembershipPointsSummary:
+    docs:
+      Summary of points for membership
+    properties:
+      awarded: MembershipPointsSummaryAwarded
+      redeemed: MembershipPointsSummaryRedeemed
+      expired: simpleTypes.Expired
+      remaining: simpleTypes.Remaining
+    examples:
+      - name: ExampleMembershipPointsSummary
+        value:
+          awarded: $MembershipPointsSummaryAwarded.ExampleMembershipPointsSummaryAwarded
+          redeemed: $MembershipPointsSummaryRedeemed.ExampleMembershipPointsSummaryRedeemed
+          expired: $simpleTypes.Expired.ExampleExpired
+          remaining: $simpleTypes.Remaining.ExampleRemaining
+
+  MembershipPointsSummaryAwarded:
+    docs:
+      Summary of points awarded for membership
+    properties:
+      sales: simpleTypes.Sales
+      refund: simpleTypes.Refund
+    examples: 
+      - name: ExampleMembershipPointsSummaryAwarded
+        value:
+          sales: $simpleTypes.Sales.ExampleSales
+          refund: $simpleTypes.Refund.ExampleRefund
+
+  MembershipPointsSummaryRedeemed:
+    docs:
+      Summary of points redeemed for membership
+    properties:
+      withdrawal: simpleTypes.Sales
+      deposit: simpleTypes.Refund
+    examples: 
+      - name: ExampleMembershipPointsSummaryRedeemed
+        value:
+          withdrawal: $simpleTypes.Withdrawal.ExampleWithdrawal
+          deposit: $simpleTypes.Deposit.ExampleDeposit
+
+  MembershipPreviousPeriod:
+    docs:
+      Points for previous period for membership
+    properties:
+      spendPeriodStart: simpleTypes.SpendPeriodStart
+      spendPeriodEnd: simpleTypes.SpendPeriodEnd
+      pointsEarned: MembershipPreviousPeriodPointsEarned
+      pointsRemaining: MembershipPreviousPeriodPointsRemaining
+    examples:
+      - name: ExampleMembershipPreviousPeriod
+        value:
+          spendPeriodStart: $simpleTypes.SpendPeriodStart.ExampleSpendPeriodStart
+          spendPeriodEnd: $simpleTypes.SpendPeriodEnd.ExampleSpendPeriodEnd
+          pointsEarned: $MembershipPreviousPeriodPointsEarned.ExampleMembershipPreviousPeriodPointsEarned
+          pointsRemaining: $MembershipPreviousPeriodPointsRemaining.ExampleMembershipPreviousPeriodPointsRemaining
+
+  MembershipPreviousPeriodPointsEarned:
+    docs:
+      Points earned for previous period for membership
+    properties:
+      "value": simpleTypes.Value
+      currencyCode: simpleTypes.CurrencyCode
+    examples: 
+      - name: ExampleMembershipPreviousPeriodPointsEarned
+        value:
+          "value": $simpleTypes.Value.ExampleValueEarned
+          currencyCode: $simpleTypes.CurrencyCode.ExampleCurrencyCodeEarned
+
+  MembershipPreviousPeriodPointsRemaining:
+    docs:
+      Points remaining for previous period for membership
+    properties:
+      "value": simpleTypes.Value
+      currencyCode: simpleTypes.CurrencyCode
+    examples: 
+      - name: ExampleMembershipPreviousPeriodPointsRemaining
+        value:
+          "value": $simpleTypes.Value.ExampleValueRemaining
+          currencyCode: $simpleTypes.CurrencyCode.ExampleCurrencyCodeRemaining
+
+  MembershipLoyaltyTiers:
+    docs:
+      Loyalty tiers
+    properties:
+      upgrade: MembershipLoyaltyTiersUpgrade
+      downgrade: MembershipLoyaltyTiersDowngrade
+    examples:
+      - name: ExampleMembershipLoyaltyTiers
+        value:
+          upgrade: $MembershipLoyaltyTiersUpgrade.ExampleMembershipLoyaltyTiersUpgrade
+          downgrade: $MembershipLoyaltyTiersDowngrade.ExampleMembershipLoyaltyTiersDowngrade
+
+  MembershipLoyaltyTiersUpgrade:
+    docs:
+      Loyalty tiers upgrade
+    properties:
+      toLevel: simpleTypes.ToLevel
+      threshold: simpleTypes.Threshold
+      toName: simpleTypes.ToName
+    examples: 
+      - name: ExampleMembershipLoyaltyTiersUpgrade
+        value:
+          toLevel: $simpleTypes.ToLevel.ExampleToLevelUpgrade
+          threshold: $simpleTypes.Threshold.ExampleThresholdUpgrade
+          toName: $simpleTypes.ToName.ExampleToNameUpgrade
+
+  MembershipLoyaltyTiersDowngrade:
+    docs:
+      Loyalty tiers downgrade
+    properties:
+      toLevel: simpleTypes.ToLevel
+      threshold: simpleTypes.Threshold
+      toName: simpleTypes.ToName
+    examples: 
+      - name: ExampleMembershipLoyaltyTiersDowngrade
+        value:
+          toLevel: $simpleTypes.ToLevel.ExampleToLevelDowngrade
+          threshold: $simpleTypes.Threshold.ExampleThresholdDowngrade
+          toName: $simpleTypes.ToName.ExampleToNameDowngrade
+
+  MembershipPointsByPeriods:
+    docs:
+      Points overview for period for membership 
+    properties:
+      relativePeriod: simpleTypes.RelativePeriod
+      earnPeriodStart: simpleTypes.EarnPeriodStart
+      earnPeriodEnd: simpleTypes.EarnPeriodEnd
+      burnPeriodStart: simpleTypes.BurnPeriodStart
+      burnPeriodEnd: simpleTypes.BurnPeriodEnd
+      pointsEarned: simpleTypes.PointsEarned
+      pointsRedeemed: simpleTypes.PointsRedeemed
+      pointsRemaining: simpleTypes.PointsRemaining
+      pointsExpired: simpleTypes.PointsExpired
+      amountLcyEarned: simpleTypes.AmountLCYEarned
+      amountLcyRedeemed: simpleTypes.AmountLcyRedeemed
+      amountLcyRemaining: simpleTypes.AmountLcyRemaining
+    examples:
+      - name: ExampleMembershipPointsByPeriodsPrevious
+        value:
+          relativePeriod: $simpleTypes.RelativePeriod.ExampleRelativePeriodPrevious
+          earnPeriodStart: $simpleTypes.EarnPeriodStart.ExampleEarnPeriodStart
+          earnPeriodEnd: $simpleTypes.EarnPeriodEnd.ExampleEarnPeriodEnd
+          burnPeriodStart: $simpleTypes.BurnPeriodStart.ExampleBurnPeriodStart
+          burnPeriodEnd: $simpleTypes.BurnPeriodEnd.ExampleBurnPeriodEnd
+          pointsEarned: $simpleTypes.PointsEarned.ExamplePointsEarnedPrevious
+          pointsRedeemed: $simpleTypes.PointsRedeemed.ExamplePointsRedeemedPrevious
+          pointsRemaining: $simpleTypes.PointsRemaining.ExamplePointsRemainingPrevious
+          pointsExpired: $simpleTypes.PointsExpired.ExamplePointsExpiredPrevious
+          amountLcyEarned: $simpleTypes.AmountLCYEarned.ExampleAmountLCYEarned
+          amountLcyRedeemed: $simpleTypes.AmountLcyRedeemed.ExampleAmountLcyRedeemed
+          amountLcyRemaining: $simpleTypes.AmountLcyRemaining.ExampleAmountLcyRemaining
+      - name: ExampleMembershipPointsByPeriodsCurrent
+        value:
+          relativePeriod: $simpleTypes.RelativePeriod.ExampleRelativePeriodCurrent
+          earnPeriodStart: $simpleTypes.EarnPeriodStart.ExampleEarnPeriodStart
+          earnPeriodEnd: $simpleTypes.EarnPeriodEnd.ExampleEarnPeriodEnd
+          burnPeriodStart: $simpleTypes.BurnPeriodStart.ExampleBurnPeriodStart
+          burnPeriodEnd: $simpleTypes.BurnPeriodEnd.ExampleBurnPeriodEnd
+          pointsEarned: $simpleTypes.PointsEarned.ExamplePointsEarnedCurrent
+          pointsRedeemed: $simpleTypes.PointsRedeemed.ExamplePointsRedeemedCurrent
+          pointsRemaining: $simpleTypes.PointsRemaining.ExamplePointsRemainingCurrent
+          pointsExpired: $simpleTypes.PointsExpired.ExamplePointsExpiredCurrent
+          amountLcyEarned: $simpleTypes.AmountLCYEarned.ExampleAmountLCYEarned
+          amountLcyRedeemed: $simpleTypes.AmountLcyRedeemed.ExampleAmountLcyRedeemed
+          amountLcyRemaining: $simpleTypes.AmountLcyRemaining.ExampleAmountLcyRemaining
+
+  LoyaltyPointEntriesAccumulated:
+    docs:
+      This is used as a part of response for Membership, which shows additional data for points
+    properties:
+      untilDate: simpleTypes.UntilDate
+      awarded: MembershipPointsSummaryAwarded
+      redeemed: MembershipPointsSummaryRedeemed
+      remaining: simpleTypes.Remaining
+      expired: simpleTypes.Expired
+    examples:
+      - name: ExampleMembershipPointsSummary
+        value:
+          untilDate: $simpleTypes.UntilDate.ExampleUntilDate
+          awarded: $MembershipPointsSummaryAwarded.ExampleMembershipPointsSummaryAwarded
+          redeemed: $MembershipPointsSummaryRedeemed.ExampleMembershipPointsSummaryRedeemed
+          remaining: $simpleTypes.Remaining.ExampleRemaining
+          expired: $simpleTypes.Expired.ExampleExpired
+
+  LoyaltyPointEntriesTransactions:
+    docs:
+      This is used as a part of response which shows information about transactions for membership.
+    properties:
+      date: simpleTypes.Date
+      type: simpleTypes.Type
+      reference: simpleTypes.Reference
+      storeCode: simpleTypes.StoreCode
+      points: simpleTypes.Points
+      itemNo: simpleTypes.ItemNo
+      description: simpleTypes.Description
+    examples:
+      - name: ExampleLoyaltyPointEntriesTransactionsSale
+        value:
+          date: $simpleTypes.Date.ExampleDate
+          type: $simpleTypes.Type.ExampleTypeSale
+          reference: $simpleTypes.Reference.ExampleReference
+          storeCode: $simpleTypes.StoreCode.ExampleStoreCode
+          points: $simpleTypes.Points.ExamplePointsSale
+          itemNo: $simpleTypes.ItemNo.ExampleItemNo
+          description: $simpleTypes.Description.ExampleDescription
+      - name: ExampleLoyaltyPointEntriesTransactionsCapture
+        value:
+          date: $simpleTypes.Date.ExampleDate
+          type: $simpleTypes.Type.ExampleTypeCapture
+          reference: $simpleTypes.Reference.ExampleReference
+          storeCode: $simpleTypes.StoreCode.ExampleStoreCode
+          points: $simpleTypes.Points.ExamplePointsCapture
+          itemNo: $simpleTypes.ItemNo.ExampleItemNo
+          description: $simpleTypes.Description.ExampleDescription
+      - name: ExampleLoyaltyPointEntriesTransactionsRefund
+        value:
+          date: $simpleTypes.Date.ExampleDate
+          type: $simpleTypes.Type.ExampleTypeRefund
+          reference: $simpleTypes.Reference.ExampleReference
+          storeCode: $simpleTypes.StoreCode.ExampleStoreCode
+          points: $simpleTypes.Points.ExamplePointsRefund
+          itemNo: $simpleTypes.ItemNo.ExampleItemNo
+          description: $simpleTypes.Description.ExampleDescription
+
+  LoyaltyGetStatusResponse:
+    docs:
+      This is used as a partial response which shows Status of initial response.
+    properties:
+      responseCode: simpleTypes.ResponseCode
+      responseMessage: simpleTypes.ResponseMessage
+    examples: 
+      - name: ExampleLoyaltyGetStatusResponse
+        value:
+          responseCode: $simpleTypes.ResponseCode.ExampleResponseCodeOK
+          responseMessage: $simpleTypes.ResponseMessage.ExampleResponseMessageOK
+
+  LoyaltyGetMembershipResponse:
+    docs:
+      This is used as as an extension of Membership attributes, which shows accumulated points for membership.
+    extends:
+      LoyaltyMembershipPointEntryEntity
+    properties:
+      accumulated: LoyaltyPointEntriesAccumulated
+    examples:
+      - name: ExampleLoyaltyGetMembershipResponse
+        value:
+          membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
+          communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
+          membershipCode: $simpleTypes.MembershipCode.PLATINUM
+          issueDate: $simpleTypes.IssueDate.ExampleIssueDate
+          validFromDate: $simpleTypes.ValidFromDate.ExampleValidFromDate
+          validUntilDate: $simpleTypes.ValidUntilDate.ExampleValidUntilDate
+          accumulated: $LoyaltyPointEntriesAccumulated.ExampleMembershipPointsSummary
+
+  LoyaltyGetReceiptsResponse:
+    docs:
+      This is used as a response for GetReceiptList endpoint.
+    properties:
+      entryNo: simpleTypes.EntryNo
+      posUnit: simpleTypes.PosUnit
+      receiptNumber: simpleTypes.ReceiptNumber
+      salesType: simpleTypes.SalesType
+      date: simpleTypes.Date
+      time: simpleTypes.Time
+      amount: simpleTypes.Amount
+      currencyCode: simpleTypes.CurrencyCode
+      vatAmount: simpleTypes.VatAmount
+      storeAddress: LoyaltyReceiptsResponseStoreAddress
+    examples: 
+      - name: ExampleLoyaltyGetReceiptsResponse1
+        value:
+          entryNo: $simpleTypes.EntryNo.ExampleEntryNo1
+          posUnit: $simpleTypes.PosUnit.ExamplePosUnit1
+          receiptNumber: $simpleTypes.ReceiptNumber.ExampleReceiptNumber1
+          salesType: $simpleTypes.SalesType.ExampleSalesType1
+          date: $simpleTypes.Date.ExampleDate
+          time: $simpleTypes.Time.ExampleTime1
+          amount: $simpleTypes.Amount.ExampleAmount1
+          currencyCode: $simpleTypes.CurrencyCode.ExampleCurrency
+          vatAmount: $simpleTypes.VatAmount.ExampleVATAmount1
+          storeAddress: $LoyaltyReceiptsResponseStoreAddress.ExampleStoreAddress
+      - name: ExampleLoyaltyGetReceiptsResponse2
+        value:
+          entryNo: $simpleTypes.EntryNo.ExampleEntryNo2
+          posUnit: $simpleTypes.PosUnit.ExamplePosUnit2
+          receiptNumber: $simpleTypes.ReceiptNumber.ExampleReceiptNumber2
+          salesType: $simpleTypes.SalesType.ExampleSalesType2
+          date: $simpleTypes.Date.ExampleDate
+          time: $simpleTypes.Time.ExampleTime2
+          amount: $simpleTypes.Amount.ExampleAmountZero
+          currencyCode: $simpleTypes.CurrencyCode.ExampleCurrency
+          vatAmount: $simpleTypes.VatAmount.ExampleVATAmount2
+          storeAddress: $LoyaltyReceiptsResponseStoreAddress.ExampleStoreAddress
+
+  LoyaltyReceiptsResponseStoreAddress:
+    docs:
+      This is used as part of a response for GetReceiptList endpoint.
+    properties:
+      storeCode: simpleTypes.StoreCode
+      name: simpleTypes.Name
+      name2: simpleTypes.Name2
+      address: simpleTypes.Address
+      address2: simpleTypes.Address2
+      postcode: simpleTypes.PostCode
+      city: simpleTypes.City
+      contact: simpleTypes.Contact
+      county: simpleTypes.County
+      country: simpleTypes.Country
+      vatRegistrationNo: simpleTypes.VatRegistrationNo
+      registrationNo: simpleTypes.RegistrationNo
+    examples:
+      - name: ExampleStoreAddress
+        value:
+          storeCode: $simpleTypes.StoreCode.ExampleStoreCode
+          name: $simpleTypes.Name.ExampleName
+          name2: $simpleTypes.Name2.ExampleName2
+          address: $simpleTypes.Address.ExampleAddress
+          address2: $simpleTypes.Address2.ExampleAddress2
+          postcode: $simpleTypes.PostCode.ExamplePostCode
+          city: $simpleTypes.City.ExampleCity
+          contact: $simpleTypes.Contact.ExampleContact
+          county: $simpleTypes.County.ExampleCounty
+          country: $simpleTypes.Country.ExampleCountry
+          vatRegistrationNo: $simpleTypes.VatRegistrationNo.ExampleVatRegistrationNo
+          registrationNo: $simpleTypes.RegistrationNo.ExampleRegistrationNo   
+
+  LoyaltyConfigurationResponse:
+    docs:
+      This is used as a response for GetConfiguration endpoint.
+    properties:
+      "code": simpleTypes.Code
+      earnRatio: simpleTypes.EarnRatio
+      burnRatio: simpleTypes.BurnRatio
+    examples:
+      - name: ExampleLoyaltyConfigurationResponse
+        value:
+          "code": $simpleTypes.Code.ExampleCode
+          earnRatio: $simpleTypes.EarnRatio.ExampleEarnRatio
+          burnRatio: $simpleTypes.BurnRatio.ExampleBurnRatio
+  
+  LoyaltyGetCouponsResponse:
+    docs:
+      This is used as a response for GetCoupons endpoint.
+    properties:
+      "code": simpleTypes.Code
+      line: simpleTypes.Line
+      description: simpleTypes.Description
+      points: simpleTypes.Points
+      amount: simpleTypes.Amount
+      discountPercent: simpleTypes.DiscountPercent
+      discountAmount: simpleTypes.Amount
+    examples: 
+      - name: ExampleLoyaltyGetCouponsResponse
+        value:
+          "code": $simpleTypes.Code.ExampleCode
+          line: $simpleTypes.Line.ExampleLine
+          description: $simpleTypes.Description.ExampleDescription
+          points: $simpleTypes.Points.ExamplePointsSale
+          amount: $simpleTypes.Amount.ExampleAmount100
+          discountPercent: $simpleTypes.DiscountPercent.ExampleDiscountPercent
+          discountAmount: $simpleTypes.Amount.ExampleAmountZero
+
+
+  LoyaltyCreateCouponsResponse:
+    docs:
+      This is used as a response for CreateCoupon endpoint.
+    properties:
+      reference: simpleTypes.Code
+      description: simpleTypes.Description
+      discountType: simpleTypes.DiscountTypeInteger
+      discountPercent: simpleTypes.DiscountPercent
+      discountAmount: simpleTypes.Amount
+    examples: 
+      - name: ExampleLoyaltyCreateCouponsResponse
+        value:
+          reference: $simpleTypes.Reference.ExampleReference
+          description: $simpleTypes.Description.ExampleDescription
+          discountType: $simpleTypes.DiscountTypeInteger.ExampleDiscountType1
+          discountPercent: $simpleTypes.DiscountPercent.ExampleDiscountPercent
+          discountAmount: $simpleTypes.Amount.ExampleAmountZero
+
+  LoyaltyGetMembershipShortResponse:
+    docs:
+      This is used as a short response for endpoints.
+    extends:
+      LoyaltyMembershipPointEntryEntity
+    examples:
+      - name: ExampleLoyaltyGetMembershipShortResponse
+        value:
+          membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
+          communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
+          membershipCode: $simpleTypes.MembershipCode.PLATINUM
+          issueDate: $simpleTypes.IssueDate.ExampleIssueDate
+          validFromDate: $simpleTypes.ValidFromDate.ExampleValidFromDate
+          validUntilDate: $simpleTypes.ValidUntilDate.ExampleValidUntilDate
+
+  LoyaltyGetCouponListResponse:
+    docs:
+      This is used as a response for CouponList endpoint.
+    properties:
+      reference: simpleTypes.Reference
+      description: simpleTypes.Description
+      discountType: simpleTypes.DiscountType
+      discountAmount: simpleTypes.Amount
+      currencyCode: simpleTypes.CurrencyCode
+      discountPercent: simpleTypes.DiscountPercent
+    examples:
+      - name: ExampleLoyaltyGetCouponListResponse
+        value:
+          reference: $simpleTypes.Reference.ExampleReference
+          description: $simpleTypes.Description.ExampleDescription
+          discountType: $simpleTypes.DiscountType.ExampleDiscountTypeAmount
+          discountAmount: $simpleTypes.Amount.ExampleAmountZero
+          currencyCode: $simpleTypes.CurrencyCode.ExampleCurrency
+          discountPercent: $simpleTypes.DiscountPercent.ExampleDiscountPercent
+
+  LoyaltyReservePointsResponse:
+    docs:
+      This is used as a response for ReservePoints endpoint.
+    properties:
+      referenceNumber: simpleTypes.ReferenceNumber
+      authorizationNumber: simpleTypes.AuthorizationNumber
+      newPointBalance: simpleTypes.NewPointBalance
+    examples:
+      - name : ExampleLoyaltyReservePointsResponse
+        value:
+          referenceNumber: $simpleTypes.ReferenceNumber.ExampleReferenceNumber
+          authorizationNumber: $simpleTypes.AuthorizationNumber.ExampleAuthorizationNumber
+          newPointBalance: $simpleTypes.NewPointBalance.ExampleNewPointBalance
+  
+  LoyaltyRegisterSaleResponse:
+    docs:
+      This is used as a response for RegisterSale endpoint.
+    properties:
+      referenceNumber: simpleTypes.ReferenceNumber
+      authorizationNumber: simpleTypes.AuthorizationNumber
+      pointsEarned: simpleTypes.PointsEarned
+      pointsSpent: simpleTypes.PointsSpent
+      newPointBalance: simpleTypes.NewPointBalance
+    examples:
+      - name : ExampleLoyaltyRegisterSaleResponse
+        value:
+          referenceNumber: $simpleTypes.ReferenceNumber.ExampleReferenceNumber
+          authorizationNumber: $simpleTypes.AuthorizationNumber.ExampleAuthorizationNumber
+          pointsEarned: $simpleTypes.PointsEarned.ExamplePointsEarnedCurrent
+          pointsSpent: $simpleTypes.PointsSpent.ExamplePointsSpent
+          newPointBalance: $simpleTypes.NewPointBalance.ExampleNewPointBalance
+  
+  CreateCouponRequestDTO:
+    docs:
+      This DTO is used as a request for CreateCoupon endpoint.
+    properties:
+      "code": simpleTypes.Code
+      line: simpleTypes.Line
+    examples:
+      - name : ExampleCreateCouponRequestDTO
+        value:
+          "code": $simpleTypes.Code.ExampleCode
+          line: $simpleTypes.Line.ExampleLine
+
+  CreateCouponResponseDTO:
+    docs:
+      This DTO is used as a response for CreateCoupon endpoint.
+    properties:
+      status: LoyaltyGetStatusResponse
+      membership: LoyaltyGetMembershipResponse
+      coupons: list<optional<LoyaltyCreateCouponsResponse>>
+    examples:
+      - name : ExampleCreateCouponResponseDTO
+        value:
+          status: $LoyaltyGetStatusResponse.ExampleLoyaltyGetStatusResponse
+          membership: $LoyaltyGetMembershipResponse.ExampleLoyaltyGetMembershipResponse
+          coupons: 
+            - $LoyaltyCreateCouponsResponse.ExampleLoyaltyCreateCouponsResponse
+
+  ### Entities
+  LoyaltyMembershipEntity:
+    docs:
+      The LoyaltyMembershipEntity describes Membership attributes with extended Loyalty attributes for Membership. 
+    properties:
+      membershipNumber: simpleTypes.MembershipNumber
+      communityCode: simpleTypes.CommunityCode
+      membershipCode: simpleTypes.MembershipCode
+      communityName: simpleTypes.CommunityName
+      membershipName: simpleTypes.MembershipName
+      issueDate: simpleTypes.IssueDate
+      validFromDate: optional<simpleTypes.ValidFromDate>
+      validUntilDate: optional<simpleTypes.ValidUntilDate>
+      customerNumber: optional<simpleTypes.CustomerNumber>
+      loyaltyCode: simpleTypes.LoyaltyCode
+      loyaltyProgram: simpleTypes.LoyaltyProgram
+      loyaltyCollectionPeriod: simpleTypes.LoyaltyCollectionPeriod
+      loyaltyCollectionPeriodName: simpleTypes.LoyaltyCollectionPeriodName
+      loyaltyPointSource: simpleTypes.LoyaltyPointSource
+      loyaltyPointSourceName: simpleTypes.LoyaltyPointSourceName
+    examples:
+      - name: ExampleLoyaltyMembershipPoints
+        value:
+          membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
+          communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
+          membershipCode: $simpleTypes.MembershipCode.PLATINUM
+          communityName: $simpleTypes.CommunityName.ExampleCommunityName
+          membershipName: $simpleTypes.MembershipName.ExampleMembershipName
+          issueDate: $simpleTypes.IssueDate.ExampleIssueDate
+          validFromDate: $simpleTypes.ValidFromDate.ExampleValidFromDate
+          validUntilDate: $simpleTypes.ValidUntilDate.ExampleValidUntilDate
+          customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
+          loyaltyCode: $simpleTypes.LoyaltyCode.ExampleLoyaltyCode
+          loyaltyProgram: $simpleTypes.LoyaltyProgram.ExampleLoyaltyProgram
+          loyaltyCollectionPeriod: $simpleTypes.LoyaltyCollectionPeriod.FIXED
+          loyaltyCollectionPeriodName: $simpleTypes.LoyaltyCollectionPeriodName.FIXED
+          loyaltyPointSource: $simpleTypes.LoyaltyPointSource.PREVIOUS_PERIOD
+          loyaltyPointSourceName: $simpleTypes.LoyaltyPointSourceName.PREVIOUS_PERIOD
+
+  LoyaltyMembershipPointEntryEntity:
+    docs:
+      The LoyaltyMembershipPointEntryEntity describes the basic attributes of a Membership. 
+    properties:
+      membershipNumber: simpleTypes.MembershipNumber
+      communityCode: simpleTypes.CommunityCode
+      membershipCode: simpleTypes.MembershipCode
+      issueDate: simpleTypes.IssueDate
+      validFromDate: optional<simpleTypes.ValidFromDate>
+      validUntilDate: optional<simpleTypes.ValidUntilDate>
+    examples:
+      - name: ExampleLoyaltyMembershipPointEntryEntity
+        value:
+          membershipNumber: $simpleTypes.MembershipNumber.ExampleMembershipNumber
+          communityCode: $simpleTypes.CommunityCode.ExampleCommunityCode
+          membershipCode: $simpleTypes.MembershipCode.PLATINUM
+          issueDate: $simpleTypes.IssueDate.ExampleIssueDate
+          validFromDate: $simpleTypes.ValidFromDate.ExampleValidFromDate
+          validUntilDate: $simpleTypes.ValidUntilDate.ExampleValidUntilDate

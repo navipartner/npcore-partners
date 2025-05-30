@@ -223,6 +223,14 @@ navigation:
             - memberships.webhooks:
                 title: Webhooks
 
+        - section: Loyalty
+          summary: ./docs/pages/loyalty/overview.mdx
+          contents:
+            - loyalty.service-loyalty:
+                title: Loyalty
+                contents:
+                  - endpoint: loyalty.service-loyalty.getLoyaltyPoints
+
         - section: Speedgate
           summary: ./docs/pages/speedgate/overview.mdx
           contents:
