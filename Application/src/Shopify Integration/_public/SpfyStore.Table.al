@@ -194,6 +194,12 @@ table 6150810 "NPR Spfy Store"
             DataClassification = CustomerContent;
             InitValue = true;
         }
+        field(83; "Default Ec Store Code"; Code[20])
+        {
+            Caption = 'Default E-commerce Store Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NpEc Store".Code;
+        }
         field(85; "Get Payment Lines from Shopify"; Option)
         {
             Caption = 'Get Payment Lines from Shopify';
