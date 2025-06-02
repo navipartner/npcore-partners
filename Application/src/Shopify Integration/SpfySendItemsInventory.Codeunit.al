@@ -500,10 +500,9 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             NcTask.Type::Insert:
                 begin
                     Clear(VarietyValueDic);
-                    if GenerateItemVariantCollection(NcTask, Item, NcTask.Type = NcTask.Type::Insert, ProductVariantsJArray, VarietyValueDic) then
-                        ProductJObject.Add('productOptions', GenerateListOfProductOptions(Item, VarietyValueDic))
-                    else
+                    if not GenerateItemVariantCollection(NcTask, Item, NcTask.Type = NcTask.Type::Insert, ProductVariantsJArray, VarietyValueDic) then
                         AddDefaultVariant(NcTask, Item, ProductVariantsJArray);
+                    ProductJObject.Add('productOptions', GenerateListOfProductOptions(Item, VarietyValueDic));
                     ProductJObject.Add('variants', ProductVariantsJArray);
 
                     Request.Add('query', ProductInsert_QueryTok);
@@ -939,8 +938,8 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         InventoryItemJObject: JsonObject;
         VariantOptionValues: JsonArray;
         Barcode: Text;
-        Title: Text;
         ShopifyOptionNo: Integer;
+        VariantVarietyValuesMissingErr: Label 'The item variant %1 of item %2 does not have any variety values selected. Each variant must have a unique combination of values selected on the item variant card, because Shopify uses these to distinguish between variants.', Comment = '%1 - Item Variant Code, %2 - Item No.';
     begin
         VariantJObject.ReadFrom('{}');
         SpfyStoreItemVariantLink.Type := SpfyStoreItemVariantLink.Type::"Variant";
@@ -984,12 +983,12 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                     AddVariety(3, ItemVariant."NPR Variety 3", ItemVariant."NPR Variety 3 Table", ItemVariant."NPR Variety 3 Value", ShopifyOptionNo, VariantOptionValues, VarietyValueDic);
                 if ItemVariant."NPR Variety 4 Value" <> '' then
                     AddVariety(4, ItemVariant."NPR Variety 4", ItemVariant."NPR Variety 4 Table", ItemVariant."NPR Variety 4 Value", ShopifyOptionNo, VariantOptionValues, VarietyValueDic);
-                VariantJObject.Add('optionValues', VariantOptionValues);
             end else begin
-                Title := GetItemVariantTitle(ItemVariant, NcTask."Store Code");
-                if Title <> '' then
-                    VariantJObject.Add('title', Title);
+                if ItemVariant.Code <> '' then
+                    Error(VariantVarietyValuesMissingErr, ItemVariant.Code, ItemVariant."Item No.");
+                AddDefaultProductOptionValue(VariantOptionValues);  //Default variant for an item without variants
             end;
+            VariantJObject.Add('optionValues', VariantOptionValues);
         end;
         SpfyIntegrationEvents.OnAfterGenerateVariantJObject(ItemVariant, VariantJObject);
 
@@ -1012,6 +1011,15 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             VariantOptionValues.Add(VarietyOption);
             AddToVarietyValueDic(VarietyNo, VarietyValueDic, VarietyDescription);
         end;
+    end;
+
+    local procedure AddDefaultProductOptionValue(var VariantOptionValues: JsonArray)
+    var
+        VarietyOption: JsonObject;
+    begin
+        VarietyOption.Add('optionName', 'Title');
+        VarietyOption.Add('name', 'Default Title');
+        VariantOptionValues.Add(VarietyOption);
     end;
 
     procedure GetVarietyDescription(Variety: Code[20]; VarietyTable: Code[40]; VarietyValue: Code[50]; var VarietyName: Text; var VarietyDescription: Text): Boolean
@@ -1060,6 +1068,11 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         VarietyValueList: List of [Text];
         ShopifyOptionNo: Integer;
     begin
+        if VarietyValueDic.Count() = 0 then begin
+            ProductOptions.ReadFrom('[{"name":"Title","values":[{"name":"Default Title"}]}]');
+            exit;
+        end;
+
         GetVarietyValueList(1, VarietyValueDic, VarietyValueList);
         if GenerateProductOption(Item."NPR Variety 1", Item."NPR Variety 1 Table", VarietyValueList, ShopifyOptionNo, ProductVarietyJObject) then
             ProductOptions.Add(ProductVarietyJObject);
@@ -1174,27 +1187,6 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             if Vendor.Get(Item."Vendor No.") then
                 exit(Vendor.Name);
         exit('');
-    end;
-
-    local procedure GetItemVariantTitle(ItemVariant: Record "Item Variant"; ShopifyStoreCode: Code[20]): Text
-    var
-        ItemTranslation: Record "Item Translation";
-        ShopifyStore: Record "NPR Spfy Store";
-    begin
-        if not ShopifyStore.Get(ShopifyStoreCode) then
-            ShopifyStore."Language Code" := '';
-        if ShopifyStore."Language Code" <> '' then
-            if ItemTranslation.Get(ItemVariant."Item No.", ItemVariant.Code, ShopifyStore."Language Code") then
-                if ItemTranslation.Description + ' ' + ItemTranslation."Description 2" <> '' then
-                    exit(ItemTranslation.Description + ' ' + ItemTranslation."Description 2");
-
-        case true of
-            ItemVariant.Description <> '':
-                exit(ItemVariant.Description);
-            ItemVariant."Description 2" <> '':
-                exit(ItemVariant."Description 2");
-        end;
-        exit(ItemVariant.Code);
     end;
 
     local procedure GetInventoryPolicy(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"): Text
