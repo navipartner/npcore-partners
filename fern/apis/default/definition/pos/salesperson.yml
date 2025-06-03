@@ -34,6 +34,51 @@ types:
           code: "12345"
           name: "Salesperson Name"
 
+  ListSalesperson:
+    docs: Information about a salesperson
+    properties:
+      id: salespersonId
+      code:
+        type: string
+        docs: The code of the Salesperson
+      name: 
+        type: string
+        docs: The name of the Salesperson
+      blocked:
+        type: boolean
+        docs: Indicates if the salesperson is blocked from using the system
+      rowVersion: optional<string>
+    examples:
+      - name: ExampleSalespersonJohnDoe
+        value:
+          id: 7c42dfde-1f7c-4afa-bd94-1bcc94d96d72
+          code: "JOHN"
+          name: "John Doe"
+          blocked: false
+      - name: ExampleSalespersonJaneDoe
+        value:
+          id: fdbd5bd1-77b4-4224-9267-eaef153b41e9
+          code: "JANE"
+          name: "Jane Doe"
+          blocked: true
+
+  PaginatedSalesPersonResponse:
+    docs: A paginated response containing multiple salespersons
+    properties:
+      morePages: boolean
+      nextPageKey: string
+      nextPageURL: string
+      data: list<ListSalesperson>
+    examples:
+      - name: ExamplePaginatedSalespersons
+        value:
+          morePages: true
+          nextPageKey: "c29tZSBiYXNlNjQgc3RyaW5n"
+          nextPageURL: "https://api.npretail.app/tenant/env/company/pos/salesperson?pageKey=c29tZSBiYXNlNjQgc3RyaW5n&lastRowVersion=12345678901234567890"
+          data:
+            - $ListSalesperson.ExampleSalespersonJohnDoe
+            - $ListSalesperson.ExampleSalespersonJaneDoe
+
   BlockSalesPerson:
     docs: Blocks a specific salesperson
     properties:
@@ -95,6 +140,9 @@ types:
       isSupervisor:
         type: boolean
         docs: Specifies if it is a Supervisor
+      blocked:
+        type: boolean
+        docs: Specifies if the salesperson is blocked from using the system
       posUnitGroup:
         type: string
         docs: The POS Unit Group of the Salesperson
@@ -107,12 +155,12 @@ types:
           email: "john.doe@yahoo.com"
           phoneNo: "+45521535353"
           isSupervisor: true
+          blocked: false
           posUnitGroup: "1"
 
   CreateSalesPersonRequest:
     docs: Creates a Salesperson
     properties:
-      id: salespersonId
       code: 
         type: string
         docs: The code of the Salesperson
@@ -131,19 +179,31 @@ types:
       isSupervisor:
         type: boolean
         docs: Specifies if it is a Supervisor
+      blocked:
+        type: optional<boolean>
+        docs: If the salesperson should be created as blocked with out access to the system
       posUnitGroup:
         type: string
         docs: The POS Unit Group of the Salesperson 
     examples:
       - name: ExampleCreateSalesPersonRequest
         value:
-          id: "12345678-1234-1234-1234-123456789012"
           code: "12345"
           name: "Salesperson Name"
           email: "john.doe@yahoo.com"
           phoneNo: "+45521535353"
           registerPassword : "12456"
           isSupervisor: true
+          posUnitGroup: "1"  
+      - name: ExampleCreateSalesPersonRequestAsBlocked
+        value:
+          code: "12345"
+          name: "Salesperson Name"
+          email: "john.doe@yahoo.com"
+          phoneNo: "+45521535353"
+          registerPassword : "12456"
+          isSupervisor: true
+          blocked: true
           posUnitGroup: "1"  
 
 service:
@@ -169,6 +229,30 @@ service:
             id: "12345678-1234-1234-1234-123456789012"
           response:
             body: $SalespersonInfo.ExampleSalespersonInfo
+
+    ListSalesperson:
+      display-name: List salespersons
+      docs: List all salespersons in the system
+      method: GET
+      path: "/salesperson"
+      request:
+        name: getSalespersonsRequest
+        query-parameters:
+          itemCode: optional<string>
+          pageSize: optional<integer>
+          pageKey: optional<string>
+          lastRowVersion: optional<string>
+          sync: optional<boolean>
+      response: PaginatedSalesPersonResponse
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            pageSize: 50
+          response:
+            body: $PaginatedSalesPersonResponse.ExamplePaginatedSalespersons
 
     login:
       display-name: Login

@@ -21,6 +21,18 @@ codeunit 6150690 "NPR API POS Salesperson"
 
     end;
 
+    internal procedure ListSalesperson(Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        FieldList: Dictionary of [Integer, Text];
+        Salesperson: Record "Salesperson/Purchaser";
+    begin
+        FieldList.Add(Salesperson.FieldNo(SystemId), 'id');
+        FieldList.Add(Salesperson.FieldNo(Code), 'code');
+        FieldList.Add(Salesperson.FieldNo(Name), 'name');
+        FieldList.Add(Salesperson.FieldNo(Blocked), 'blocked');
+        exit(Response.RespondOK(Request.GetData(Database::"Salesperson/Purchaser", FieldList)));
+    end;
+
     procedure GetSalesperson(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         SalespersonPurchaser: Record "Salesperson/Purchaser";
@@ -104,7 +116,7 @@ codeunit 6150690 "NPR API POS Salesperson"
         Email: Text[80];
         PhoneNo: Text[30];
         RegisterPassword: Code[20];
-        SupervisorPOS: Boolean;
+        SupervisorPOS, Blocked : Boolean;
         POSUnitGroup: Code[20];
         Body: JsonToken;
     begin
@@ -121,9 +133,10 @@ codeunit 6150690 "NPR API POS Salesperson"
         PhoneNo := CopyStr(JsonHelper.GetJText(Body, 'phoneNo', false), 1, MaxStrLen(PhoneNo));
         RegisterPassword := CopyStr(JsonHelper.GetJText(Body, 'registerPassword', false), 1, MaxStrLen(RegisterPassword));
         SupervisorPOS := JsonHelper.GetJBoolean(Body, 'isSupervisor', false);
+        Blocked := JsonHelper.GetJBoolean(Body, 'blocked', false);
         POSUnitGroup := Copystr(JsonHelper.GetJText(Body, 'posUnitGroup', false), 1, MaxStrLen(POSUnitGroup));
 
-        CreateSalespersonPurchaser(SalespersonPurchaser, SalesPersonCode, SalesPersonName, Email, PhoneNo, RegisterPassword, SupervisorPOS, POSUnitGroup);
+        CreateSalespersonPurchaser(SalespersonPurchaser, SalesPersonCode, SalesPersonName, Email, PhoneNo, RegisterPassword, SupervisorPOS, Blocked, POSUnitGroup);
         exit(Response.RespondOK(CreateSalespersonAsJson(SalespersonPurchaser)));
     end;
 
@@ -140,12 +153,13 @@ codeunit 6150690 "NPR API POS Salesperson"
     local procedure CreateSalespersonAsJson(SalespersonPurchaser: Record "Salesperson/Purchaser") JsonBuilder: Codeunit "NPR Json Builder"
     begin
         JsonBuilder.StartObject('')
-            .AddProperty('id', SalespersonPurchaser.SystemId)
+            .AddProperty('id', Format(SalespersonPurchaser.SystemId, 0, 4).ToLower())
             .AddProperty('code', SalespersonPurchaser.Code)
             .AddProperty('name', SalespersonPurchaser.Name)
             .AddProperty('email', SalespersonPurchaser."E-Mail")
             .AddProperty('phoneNo', SalespersonPurchaser."Phone No.")
             .AddProperty('isSupervisor', SalespersonPurchaser."NPR Supervisor POS")
+            .AddProperty('blocked', SalespersonPurchaser.Blocked)
             .AddProperty('posUnitGroup', SalespersonPurchaser."NPR POS Unit Group")
         .EndObject();
     end;
@@ -155,7 +169,7 @@ codeunit 6150690 "NPR API POS Salesperson"
         TableIds.Add(Database::"Salesperson/Purchaser");
     end;
 
-    local procedure CreateSalespersonPurchaser(var SalespersonPurchaser: Record "Salesperson/Purchaser"; SalesPersonCode: Code[20]; SalesPersonName: Text[50]; Email: Text[80]; PhoneNo: Text[30]; RegisterPassword: Code[20]; SupervisorPOS: Boolean; POSUnitGroup: Code[20])
+    local procedure CreateSalespersonPurchaser(var SalespersonPurchaser: Record "Salesperson/Purchaser"; SalesPersonCode: Code[20]; SalesPersonName: Text[50]; Email: Text[80]; PhoneNo: Text[30]; RegisterPassword: Code[20]; SupervisorPOS: Boolean; Blocked: Boolean; POSUnitGroup: Code[20])
     begin
         SalespersonPurchaser.Init();
         SalespersonPurchaser.Validate(Code, SalesPersonCode);
@@ -164,6 +178,7 @@ codeunit 6150690 "NPR API POS Salesperson"
         SalespersonPurchaser.Validate("Phone No.", PhoneNo);
         SalespersonPurchaser.Validate("NPR Register Password", RegisterPassword);
         SalespersonPurchaser.Validate("NPR Supervisor POS", SupervisorPOS);
+        SalespersonPurchaser.Blocked := Blocked;
         SalespersonPurchaser.Validate("NPR POS Unit Group", POSUnitGroup);
         SalespersonPurchaser.Insert(true);
     end;
