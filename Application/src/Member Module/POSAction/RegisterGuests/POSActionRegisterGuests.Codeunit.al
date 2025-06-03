@@ -7,7 +7,8 @@ codeunit 6248457 "NPR POS Action RegisterGuests" implements "NPR IPOS Workflow"
         ActionDescLbl: Label 'This action allows you to register member guests based on the last speedgate scan';
         NoGuestsToAddLbl: Label 'There''s no guests to add for this membership';
         RegisterGuestsLbl: Label 'Register Guests';
-        AlreadyRegisteredTodayLbl: Label 'guests already registered today', Comment = 'will be prefixed in the javascript with the number of guests already registerd';
+        AlreadyRegisteredTodayLbl: Label 'guests already registered today', Comment = 'will be prefixed in the javascript with the number of guests already registered';
+        GuestsRegisteredLbl: Label 'guests registered!', Comment = 'Used for toaster. Will be prefix in the javascirpt with the total number of guests registered';
         RestrictTodayNameLbl: Label 'Restrict Guests on Today';
         RestrictTodayDescLbl: Label 'Specifies if the code should restrict guest admissions per day.';
     begin
@@ -15,6 +16,7 @@ codeunit 6248457 "NPR POS Action RegisterGuests" implements "NPR IPOS Workflow"
         WorkflowConfig.AddLabel('noGuestsToAdd', NoGuestsToAddLbl);
         WorkflowConfig.AddLabel('registerGuests', RegisterGuestsLbl);
         WorkflowConfig.AddLabel('alreadyRegistered', AlreadyRegisteredTodayLbl);
+        WorkflowConfig.AddLabel('guestsRegistered', GuestsRegisteredLbl);
         WorkflowConfig.AddBooleanParameter('restrictToday', false, RestrictTodayNameLbl, RestrictTodayDescLbl);
         WorkflowConfig.AddJavascript(GetActionScript());
     end;
@@ -43,7 +45,7 @@ codeunit 6248457 "NPR POS Action RegisterGuests" implements "NPR IPOS Workflow"
     begin
         exit(
             //###NPR_INJECT_FROM_FILE:POSActionRegisterGuests.js###
-            'const main=async({workflow:o,popup:i,captions:n,parameters:c})=>{const s=await o.respond("GetConfiguration");if(!s||!s.success){await i.error(s.errorMessage);return}if(!s.guests||s.guests.length<=0){await i.message(n.noGuestsToAdd);return}const r=[];s.guests.forEach(e=>{const t={type:"plusminus",id:e.token,minValue:0,value:0,caption:e.description};e.maxNumberOfGuests>-1&&(t.maxValue=e.maxNumberOfGuests,c.restrictToday&&e.guestsAdmittedToday>0&&(t.maxValue=e.maxNumberOfGuests-e.guestsAdmittedToday,t.caption=`${t.caption} (${String(e.guestsAdmittedToday)} ${n.alreadyRegistered})`,t.maxValue===0&&(t.maxValue=-1))),r.push(t)});const a=await i.configuration({title:n.registerGuests,settings:r});if(console.log(a),!a)return;const u=[];Object.keys(a).forEach(e=>{u.push({token:e,quantity:Number(a[e])})}),await o.respond("AdmitTokens",{admitTokens:u})};'
+            'const main=async({workflow:r,popup:o,toast:m,captions:n,parameters:f})=>{const s=await r.respond("GetConfiguration");if(!s||!s.success){await o.error(s.errorMessage);return}if(!s.guests||s.guests.length<=0){await o.message(n.noGuestsToAdd);return}const u=[];s.guests.forEach(e=>{const t={type:"plusminus",id:e.token,minValue:0,value:0,caption:e.description};e.maxNumberOfGuests>-1&&(t.maxValue=e.maxNumberOfGuests,f.restrictToday&&e.guestsAdmittedToday>0&&(t.maxValue=e.maxNumberOfGuests-e.guestsAdmittedToday,t.caption=`${t.caption} (${String(e.guestsAdmittedToday)} ${n.alreadyRegistered})`,t.maxValue===0&&(t.maxValue=-1))),u.push(t)});const a=await o.configuration({title:n.registerGuests,settings:u});if(console.log(a),!a)return;const d=[];Object.keys(a).forEach(e=>{d.push({token:e,quantity:Number(a[e])})}),await r.respond("AdmitTokens",{admitTokens:d});debugger;let i="",c=0;if(s.guests.forEach(e=>{const t=a[e.token];t>0&&(c+=t,i!==""&&(i+=", "),i+=`${e.description}: ${t}`)}),i!==""){const e=`${c} ${n.guestsRegistered}`;await m.success(i,{title:e})}};'
         );
     end;
 }

@@ -1,4 +1,4 @@
-const main = async ({ workflow, popup, captions, parameters }) => {
+const main = async ({ workflow, popup, toast, captions, parameters }) => {
   const configuration = await workflow.respond("GetConfiguration");
 
   if (!configuration || !configuration.success) {
@@ -70,4 +70,25 @@ const main = async ({ workflow, popup, captions, parameters }) => {
   });
 
   await workflow.respond("AdmitTokens", { admitTokens });
+
+  debugger;
+
+  let message = "";
+  let totalAdmittedCount = 0;
+
+  configuration.guests.forEach((config) => {
+    const admittedCount = selection[config.token];
+    if (admittedCount > 0) {
+      totalAdmittedCount += admittedCount;
+      if (message !== "") {
+        message += ", ";
+      }
+      message += `${config.description}: ${admittedCount}`;
+    }
+  });
+
+  if (message !== "") {
+    const title = `${totalAdmittedCount} ${captions.guestsRegistered}`;
+    await toast.success(message, { title });
+  }
 };
