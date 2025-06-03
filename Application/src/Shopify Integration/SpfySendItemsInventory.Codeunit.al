@@ -475,6 +475,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         ProductDelete_QueryTok: Label 'mutation DeleteProduct($productSet: ProductDeleteInput!) {productDelete(input: $productSet) {deletedProductId userErrors{field message}}}', Locked = true;
         ProductInsert_QueryTok: Label 'mutation CreateProduct($productSet: ProductSetInput!, $synchronous: Boolean!) {productSet(synchronous: $synchronous, input: $productSet) {product{id} userErrors{field message}}}', Locked = true;
         ProductUpdate_QueryTok: Label 'mutation UpdateProduct($productSet: ProductUpdateInput!) {productUpdate(product: $productSet) {product{id} userErrors{field message}}}', Locked = true;
+        ProductWithDefaultVariantUpdate_QueryTok: Label 'mutation UpdateProductWithDefaultVariant($productSet: ProductUpdateInput!, $productId: ID!, $variants: [ProductVariantsBulkInput!]!) {productUpdate(product: $productSet) {product{id} userErrors{field message}} productVariantsBulkUpdate(productId: $productId, variants: $variants) {productVariants{id inventoryItem{id}} userErrors{field message}}}', Locked = true;
     begin
         RecRef.Get(NcTask."Record ID");
         RecRef.SetTable(Item);
@@ -496,21 +497,27 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                 NcTask.Type := NcTask.Type::Modify;
 
         AddItemInfo(SpfyStoreItemLink, Item, NcTask.Type, ShopifyProductID, ProductJObject);
+        Clear(VarietyValueDic);
         case NcTask.Type of
             NcTask.Type::Insert:
                 begin
-                    Clear(VarietyValueDic);
                     if not GenerateItemVariantCollection(NcTask, Item, NcTask.Type = NcTask.Type::Insert, ProductVariantsJArray, VarietyValueDic) then
-                        AddDefaultVariant(NcTask, Item, ProductVariantsJArray);
+                        AddDefaultVariant(NcTask, Item, true, ProductVariantsJArray);
                     ProductJObject.Add('productOptions', GenerateListOfProductOptions(Item, VarietyValueDic));
                     ProductJObject.Add('variants', ProductVariantsJArray);
-
                     Request.Add('query', ProductInsert_QueryTok);
                     Variables.Add('synchronous', true);
                 end;
 
             NcTask.Type::Modify:
-                Request.Add('query', ProductUpdate_QueryTok);
+                begin
+                    if AddDefaultVariant(NcTask, Item, false, ProductVariantsJArray) then begin
+                        Variables.Add('productId', 'gid://shopify/Product/' + ShopifyProductID);
+                        Variables.Add('variants', ProductVariantsJArray);
+                        Request.Add('query', ProductWithDefaultVariantUpdate_QueryTok);
+                    end else
+                        Request.Add('query', ProductUpdate_QueryTok);
+                end;
 
             NcTask.Type::Delete:
                 Request.Add('query', ProductDelete_QueryTok);
@@ -900,25 +907,27 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         exit(ProductVariantsJArray.Count() > 0);
     end;
 
-    local procedure AddDefaultVariant(NcTask: Record "NPR Nc Task"; Item: Record Item; var ProductVariantsJArray: JsonArray)
+    local procedure AddDefaultVariant(NcTask: Record "NPR Nc Task"; Item: Record Item; NewProduct: Boolean; var ProductVariantsJArray: JsonArray): Boolean
     var
         ItemVariant: Record "Item Variant";
         VarietyValueDic: Dictionary of [Integer, List of [Text]];
     begin
         Clear(ItemVariant);
         ItemVariant."Item No." := Item."No.";
-        AddVariant(NcTask, Item, ItemVariant, true, ProductVariantsJArray, VarietyValueDic);
+        exit(AddVariant(NcTask, Item, ItemVariant, NewProduct, ProductVariantsJArray, VarietyValueDic));
     end;
 
-    local procedure AddVariant(NcTask: Record "NPR Nc Task"; Item: Record Item; ItemVariant: Record "Item Variant"; NewProduct: Boolean; var ProductVariantsJArray: JsonArray; var VarietyValueDic: Dictionary of [Integer, List of [Text]])
+    local procedure AddVariant(NcTask: Record "NPR Nc Task"; Item: Record Item; ItemVariant: Record "Item Variant"; NewProduct: Boolean; var ProductVariantsJArray: JsonArray; var VarietyValueDic: Dictionary of [Integer, List of [Text]]): Boolean
     var
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
         VariantJObject: JsonObject;
         ShopifyVariantID: Text[30];
     begin
         SpfyItemMgt.CheckVarieties(Item, ItemVariant);
-        if GenerateVariantJObject(NcTask, Item, ItemVariant, NewProduct, ShopifyVariantID, VariantJObject, VarietyValueDic) then
-            ProductVariantsJArray.Add(VariantJObject);
+        if not GenerateVariantJObject(NcTask, Item, ItemVariant, NewProduct, ShopifyVariantID, VariantJObject, VarietyValueDic) then
+            exit(false);
+        ProductVariantsJArray.Add(VariantJObject);
+        exit(true);
     end;
 
     local procedure GenerateVariantJObject(NcTask: Record "NPR Nc Task"; Item: Record Item; ItemVariant: Record "Item Variant"; ProcessNewVariants: Boolean; var ShopifyVariantID: Text[30]; var VariantJObject: JsonObject): Boolean
@@ -983,12 +992,15 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                     AddVariety(3, ItemVariant."NPR Variety 3", ItemVariant."NPR Variety 3 Table", ItemVariant."NPR Variety 3 Value", ShopifyOptionNo, VariantOptionValues, VarietyValueDic);
                 if ItemVariant."NPR Variety 4 Value" <> '' then
                     AddVariety(4, ItemVariant."NPR Variety 4", ItemVariant."NPR Variety 4 Table", ItemVariant."NPR Variety 4 Value", ShopifyOptionNo, VariantOptionValues, VarietyValueDic);
+                VariantJObject.Add('optionValues', VariantOptionValues);
             end else begin
                 if ItemVariant.Code <> '' then
                     Error(VariantVarietyValuesMissingErr, ItemVariant.Code, ItemVariant."Item No.");
-                AddDefaultProductOptionValue(VariantOptionValues);  //Default variant for an item without variants
+                if ShopifyVariantID = '' then begin
+                    AddDefaultProductOptionValue(VariantOptionValues);  //Default variant for an item without variants
+                    VariantJObject.Add('optionValues', VariantOptionValues);
+                end;
             end;
-            VariantJObject.Add('optionValues', VariantOptionValues);
         end;
         SpfyIntegrationEvents.OnAfterGenerateVariantJObject(ItemVariant, VariantJObject);
 
