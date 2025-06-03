@@ -238,7 +238,6 @@ service:
       request:
         name: getSalespersonsRequest
         query-parameters:
-          itemCode: optional<string>
           pageSize: optional<integer>
           pageKey: optional<string>
           lastRowVersion: optional<string>
