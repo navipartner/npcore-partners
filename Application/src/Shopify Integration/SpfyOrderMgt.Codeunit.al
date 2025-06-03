@@ -466,13 +466,18 @@ codeunit 6184814 "NPR Spfy Order Mgt."
     local procedure FindNpEcStore(ShopifyStoreCode: Code[20]; Order: JsonToken; var NpEcStoreOut: Record "NPR NpEc Store")
     var
         NpEcStore: Record "NPR NpEc Store";
+        DefaultECStoreCode: Code[20];
         StoreSourceName: Text;
     begin
         StoreSourceName := JsonHelper.GetJText(Order, 'source_name', true);
         NpEcStore.SetCurrentKey("Shopify Store Code", "Shopify Source Name");
         NpEcStore.SetRange("Shopify Store Code", ShopifyStoreCode);
         NpEcStore.SetRange("Shopify Source Name", CopyStr(StoreSourceName, 1, MaxStrLen(NpEcStore."Shopify Source Name")));
-        NpEcStore.FindFirst();
+        if not NpEcStore.FindFirst() then begin
+            DefaultECStoreCode := SpfyIntegrationMgt.DefaultECStoreCode(ShopifyStoreCode);
+            if not ((DefaultECStoreCode <> '') and NpEcStore.Get(DefaultECStoreCode)) then
+                NpEcStore.FindFirst();  //raise error
+        end;
         NpEcStoreOut := NpEcStore;
     end;
 

@@ -142,6 +142,12 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         exit(_ShopifyStore."New Product Status");
     end;
 
+    procedure DefaultECStoreCode(ShopifyStoreCode: Code[20]): Code[20]
+    begin
+        GetStore(ShopifyStoreCode);
+        exit(_ShopifyStore."Default Ec Store Code");
+    end;
+
     procedure IsAllowedFinancialStatus(FinancialStatus: Text; ShopifyStoreCode: Code[20]): Boolean
     var
         SpfyAllowedFinStatus: Record "NPR Spfy Allowed Fin. Status";

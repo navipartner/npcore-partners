@@ -194,6 +194,12 @@ page 6184704 "NPR Spfy Store Card"
                         UpdateControlVisibility();
                     end;
                 }
+                field("Default Ec Store Code"; Rec."Default Ec Store Code")
+                {
+                    ToolTip = 'Specifies the default e-commerce store code that will be used when creating sales orders from Shopify orders. This is used when the Shopify order does not specify a source name, or when the specified source name is not linked to an e-commerce store in Business Central.';
+                    ApplicationArea = NPRShopify;
+                    Enabled = _SalesOrderIntegrationIsEnabled;
+                }
                 field("Sales Price on Order Lines"; Rec."Sales Price on Order Lines")
                 {
                     ToolTip = 'Specifies whether the system should use the actual sales price or the "compare at price" when creating sales order lines from incoming Shopify orders. If the latter option is selected, the difference between the "compare at price" and the actual sales price will be recorded as a discount amount on the sales order line.';
