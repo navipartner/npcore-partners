@@ -173,6 +173,7 @@
         CoinType: JsonObject;
         POSPaymentBinCheckPoint: Record "NPR POS Payment Bin Checkp.";
         PaymentMethodDenom: Record "NPR Payment Method Denom";
+        PaymentMethodProcessingTypeIsCash: Boolean;
         CoinTypeDescLbl: Label '%1 %2', Locked = true;
     begin
         POSPaymentBinCheckpoint.SetCurrentKey("Workshift Checkpoint Entry No.");
@@ -206,9 +207,11 @@
                             end;
                     end;
                     CountingType.Add('disableDifferenceField', EndOfDayProfile.DisableDifferenceField);
-                    CountingType.Add('requireCountedAmtDenominations', EndOfDayProfile."Require Denomin.(Counted Amt.)");
-                    CountingType.Add('requireBankDepositAmtDenominations', EndOfDayProfile."Require Denomin.(Bank Deposit)");
-                    CountingType.Add('requireMoveToBinAmtDenominations', EndOfDayProfile."Require Denomin. (Move to Bin)");
+
+                    PaymentMethodProcessingTypeIsCash := (PaymentMethod."Processing Type" = PaymentMethod."Processing Type"::CASH);
+                    CountingType.Add('requireCountedAmtDenominations', (EndOfDayProfile."Require Denomin.(Counted Amt.)" and PaymentMethodProcessingTypeIsCash));
+                    CountingType.Add('requireBankDepositAmtDenominations', (EndOfDayProfile."Require Denomin.(Bank Deposit)" and PaymentMethodProcessingTypeIsCash));
+                    CountingType.Add('requireMoveToBinAmtDenominations', (EndOfDayProfile."Require Denomin. (Move to Bin)" and PaymentMethodProcessingTypeIsCash));
                     CountingType.Add('bankDepositRef', GetReferenceNo(Enum::"NPR Reference No. Target"::EOD_BankDeposit, EndOfDayProfile, POSUnitNo, PaymentMethod.Code, _POSWorkShiftCheckpoint."Entry No."));
                     CountingType.Add('moveToBinRef', GetReferenceNo(Enum::"NPR Reference No. Target"::EOD_MoveToBin, EndOfDayProfile, POSUnitNo, PaymentMethod.Code, _POSWorkShiftCheckpoint."Entry No."));
 
