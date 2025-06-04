@@ -1,7 +1,5 @@
 ﻿page 6060141 "NPR MM Membership Alter."
 {
-    Extensible = False;
-
     Caption = 'Membership Alteration';
     PageType = List;
     SourceTable = "NPR MM Members. Alter. Setup";

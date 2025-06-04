@@ -156,12 +156,10 @@
             Caption = 'Membership Duration';
             DataClassification = CustomerContent;
         }
-        field(60; "Price Calculation"; Option)
+        field(60; "Price Calculation"; Enum "NPR MemberAlterPriceFunction")
         {
             Caption = 'Price Calculation';
             DataClassification = CustomerContent;
-            OptionCaption = 'Unit Price,Price Difference,Time Difference';
-            OptionMembers = UNIT_PRICE,PRICE_DIFFERENCE,TIME_DIFFERENCE;
         }
         field(70; "Stacking Allowed"; Boolean)
         {

@@ -152,7 +152,7 @@
     end;
 
 
-    procedure CreateCancelSetup(FromMembershipCode: Code[20]; SalesItemNo: Code[20]; Description: Text[100]; ActivateFrom: Option; ActivationFromDateFormula: Text[30]; UseGracePeriod: Boolean; GracePeriodRelatesTo: Option; GracePeriodBefore: Text[30]; GracePeriodAfter: Text[30]; PriceCalculation: Option);
+    procedure CreateCancelSetup(FromMembershipCode: Code[20]; SalesItemNo: Code[20]; Description: Text[100]; ActivateFrom: Option; ActivationFromDateFormula: Text[30]; UseGracePeriod: Boolean; GracePeriodRelatesTo: Option; GracePeriodBefore: Text[30]; GracePeriodAfter: Text[30]; PriceCalculation: Enum "NPR MemberAlterPriceFunction");
     var
         AlterationSetup: Record "NPR MM Members. Alter. Setup";
     begin
@@ -205,7 +205,7 @@
         CreateAttributeTableLink(CreateAttribute('MM', 10, 'Membership Only'), DATABASE::"NPR MM Membership", 10);
     end;
 
-    procedure CreateExtendSetup(FromMembershipCode: Code[20]; SalesItemNo: Code[20]; Description: Text[100]; ToMembershipCode: Code[20]; ActivateFrom: Option; ActivationFromDateFormula: Text[30]; UseGracePeriod: Boolean; GracePeriodRelatesTo: Option; GracePeriodBefore: Text[30]; GracePeriodAfter: Text[30]; MembershipDuration: Text[30]; PriceCalculation: Option; AllowStacking: Boolean);
+    procedure CreateExtendSetup(FromMembershipCode: Code[20]; SalesItemNo: Code[20]; Description: Text[100]; ToMembershipCode: Code[20]; ActivateFrom: Option; ActivationFromDateFormula: Text[30]; UseGracePeriod: Boolean; GracePeriodRelatesTo: Option; GracePeriodBefore: Text[30]; GracePeriodAfter: Text[30]; MembershipDuration: Text[30]; PriceCalculation: Enum "NPR MemberAlterPriceFunction"; AllowStacking: Boolean);
     var
         AlterationSetup: Record "NPR MM Members. Alter. Setup";
     begin
@@ -284,7 +284,7 @@
         MembershipSalesSetup.Modify();
     end;
 
-    procedure CreateRenewSetup(FromMembershipCode: Code[20]; SalesItemNo: Code[20]; Description: Text[100]; ToMembershipCode: Code[20]; ActivateFrom: Option; ActivationFromDateFormula: Text[30]; UseGracePeriod: Boolean; GracePeriodRelatesTo: Option; GracePeriodBefore: Text[30]; GracePeriodAfter: Text[30]; MembershipDuration: Text[30]; PriceCalculation: Option; AllowStacking: Boolean);
+    procedure CreateRenewSetup(FromMembershipCode: Code[20]; SalesItemNo: Code[20]; Description: Text[100]; ToMembershipCode: Code[20]; ActivateFrom: Option; ActivationFromDateFormula: Text[30]; UseGracePeriod: Boolean; GracePeriodRelatesTo: Option; GracePeriodBefore: Text[30]; GracePeriodAfter: Text[30]; MembershipDuration: Text[30]; PriceCalculation: Enum "NPR MemberAlterPriceFunction"; AllowStacking: Boolean);
     var
         AlterationSetup: Record "NPR MM Members. Alter. Setup";
     begin
@@ -311,7 +311,7 @@
         AlterationSetup.Modify(true);
     end;
 
-    procedure CreateUpgradeSetup(FromMembershipCode: Code[20]; SalesItemNo: Code[20]; Description: Text[100]; ToMembershipCode: Code[20]; ActivateFrom: Option; ActivationFromDateFormula: Text[30]; UseGracePeriod: Boolean; GracePeriodRelatesTo: Option; GracePeriodBefore: Text[30]; GracePeriodAfter: Text[30]; MembershipDuration: Text[30]; PriceCalculation: Option; AllowStacking: Boolean);
+    procedure CreateUpgradeSetup(FromMembershipCode: Code[20]; SalesItemNo: Code[20]; Description: Text[100]; ToMembershipCode: Code[20]; ActivateFrom: Option; ActivationFromDateFormula: Text[30]; UseGracePeriod: Boolean; GracePeriodRelatesTo: Option; GracePeriodBefore: Text[30]; GracePeriodAfter: Text[30]; MembershipDuration: Text[30]; PriceCalculation: Enum "NPR MemberAlterPriceFunction"; AllowStacking: Boolean);
     var
         AlterationSetup: Record "NPR MM Members. Alter. Setup";
     begin
