@@ -155,13 +155,13 @@ page 6184531 "NPR Adyen Setup"
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Pay By Link Account Type field.';
-                    Caption = 'Account Type';
+                    Caption = 'Default Account Type';
                 }
                 field("Account No."; Rec."Pay By Link Account No.")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Pay By Link Account No. field.';
-                    Caption = 'Account No.';
+                    Caption = 'Default Account No.';
                 }
                 field("PayByLink Enable Auto Posting"; Rec."PayByLink Enable Auto Posting")
                 {

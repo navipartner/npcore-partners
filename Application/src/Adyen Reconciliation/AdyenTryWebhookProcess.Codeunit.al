@@ -122,6 +122,7 @@ codeunit 6248332 "NPR Adyen Try Webhook Process"
         AmountTxt: Text;
         TransactionId: Text;
         Success: Boolean;
+        PaymentMethod: Text;
     begin
         TransactionId := JsonHelper.GetJText(JsonObjectToken, 'pspReference', false);
         if TransactionId = '' then
@@ -142,10 +143,15 @@ codeunit 6248332 "NPR Adyen Try Webhook Process"
         if Amount <> MagentoPaymentLine."Requested Amount" then
             exit;
 
+        PaymentMethod := JsonHelper.GetJText(JsonObjectToken, 'paymentMethod', false);
+
+        GetPaymentMethod(MagentoPaymentLine, PaymentMethod);
+
         MagentoPaymentLine.Validate("Transaction ID", TransactionId);
         MagentoPaymentLine."No." := CopyStr(MagentoPaymentLine."Transaction ID", 1, MaxStrLen(MagentoPaymentLine."No."));
         MagentoPaymentLine."Date Authorized" := Today;
         MagentoPaymentLine.Amount := MagentoPaymentLine."Requested Amount";
+        MagentoPaymentLine.Brand := CopyStr(PaymentMethod, 1, MaxStrLen(MagentoPaymentLine.Brand));
         MagentoPaymentLine.Modify();
 
         Processed := true;
@@ -219,5 +225,22 @@ codeunit 6248332 "NPR Adyen Try Webhook Process"
         SuccessProcessedLbl: Label 'Adyen Webhook Request was successfully processed.';
     begin
         AdyenManagement.CreateGeneralLog(Enum::"NPR Adyen Webhook Log Type"::Process, true, SuccessProcessedLbl, AdyenWebhook."Entry No.")
+    end;
+
+    local procedure GetPaymentMethod(var MagentoPaymentLine: Record "NPR Magento Payment Line"; PaymentMethod: Text)
+    var
+        PaymentMapping: Record "NPR Magento Payment Mapping";
+        PaymentMethodRec: Record "Payment Method";
+        NpPaySetup: Record "NPR Adyen Setup";
+    begin
+        if PaymentMapping.Get('', PaymentMethod) then begin
+            PaymentMethodRec.Get(PaymentMapping."Payment Method Code");
+            MagentoPaymentLine."Account Type" := PaymentMethodRec."Bal. Account Type";
+            MagentoPaymentLine."Account No." := PaymentMethodRec."Bal. Account No."
+        end else begin
+            NpPaySetup.Get();
+            MagentoPaymentLine."Account Type" := NpPaySetup."Pay By Link Account Type";
+            MagentoPaymentLine."Account No." := NpPaySetup."Pay By Link Account No.";
+        end;
     end;
 }

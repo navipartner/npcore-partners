@@ -773,8 +773,6 @@
         MagentoPaymentLine.Description := PaymentLinkLbl;
         MagentoPaymentLine."Line No." := LineNo;
         MagentoPaymentLine."Requested Amount" := Request."Request Amount";
-        MagentoPaymentLine."Account Type" := AdyenPayByLinkSetup."Pay By Link Account Type";
-        MagentoPaymentLine."Account No." := AdyenPayByLinkSetup."Pay By Link Account No.";
         MagentoPaymentLine."Payment Gateway Code" := AdyenPayByLinkSetup."Pay By Link Gateaway Code";
         MagentoPaymentLine."Payment Type" := MagentoPaymentLine."Payment Type"::"Payment Method";
 
