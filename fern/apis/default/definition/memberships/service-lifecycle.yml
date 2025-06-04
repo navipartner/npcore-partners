@@ -311,6 +311,9 @@ types:
     properties:
       optionId: simpleTypes.LifecycleOptionId
       documentNo: optional<simpleTypes.DocumentNo>
+      documentDate:
+        type: optional<date>
+        docs: Specifies the date by which to base the cancel calculation on. This is NOT the date by which the cancel will actually take effect, and therefore you should not provide the `periodEnd` date from [Get Cancel Options](/api-reference/memberships/service-lifecycle/get-cancel-options). If left empty, the system will assume today.
     examples:
       - name: Example
         value:
@@ -372,6 +375,9 @@ types:
     properties:
       optionId: simpleTypes.LifecycleOptionId
       documentNo: optional<simpleTypes.DocumentNo>
+      documentDate:
+        type: optional<date>
+        docs: Specifies the date by which to base the upgrade calculation on. This is NOT the date by which the upgrade will actually take effect, and therefore you should not provide the `periodEnd` date from [Get Upgrade Options](/api-reference/memberships/service-lifecycle/get-upgrade-options). If left empty, the system will assume today.
     examples:
       - name: Example
         value:
@@ -402,6 +408,9 @@ types:
     properties:
       optionId: simpleTypes.LifecycleOptionId
       documentNo: optional<simpleTypes.DocumentNo>
+      documentDate:
+        type: optional<date>
+        docs: Specifies the date by which to base the extend calculation on. This is NOT the date by which the extend will actually take effect, and therefore you should not provide the `periodEnd` date from [Get Upgrade Options](/api-reference/memberships/service-lifecycle/get-upgrade-options). If left empty, the system will assume today.
     examples:
       - name: Example
         value:

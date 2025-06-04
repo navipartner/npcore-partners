@@ -132,6 +132,7 @@ codeunit 6248225 "NPR MembershipPhasesApiAgent"
 
         Body: JsonObject;
         JToken: JsonToken;
+        JValue: JsonValue;
         MembershipStartDate: Date;
         MembershipUntilDate: Date;
         UnitPrice: Decimal;
@@ -152,6 +153,12 @@ codeunit 6248225 "NPR MembershipPhasesApiAgent"
 
         if (Body.Get('documentNo', JToken)) then
             MemberInfoCapture."Document No." := JToken.AsValue().AsText();
+
+        if (Body.Get('documentDate', JToken)) then begin
+            JValue := JToken.AsValue();
+            if (not JValue.IsNull()) then
+                MemberInfoCapture."Document Date" := JValue.AsDate();
+        end;
 
         MemberInfoCapture."Import Entry Document ID" := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
 #pragma warning restore AA0139
