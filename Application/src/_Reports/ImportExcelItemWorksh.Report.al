@@ -238,9 +238,6 @@
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Vend Item No."), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
                                 ItemWorksheetLine.Validate("Vend Item No.", CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
-                        if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo(Description), MappedColumnNo, FieldLength) then
-                            if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
-                                ItemWorksheetLine.Validate(Description, CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Direct Unit Cost"), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
                                 if Evaluate(TempDec, ExcelBuf2."Cell Value as Text") then
@@ -290,6 +287,9 @@
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
                                 if Evaluate(TempDec, ExcelBuf2."Cell Value as Text") then
                                     ItemWorksheetLine.Validate("Gross Weight", TempDec);
+                        if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo(Description), MappedColumnNo, FieldLength) then
+                            if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
+                                ItemWorksheetLine.Validate(Description, CopyStr(ExcelBuf2."Cell Value as Text", 1, FieldLength));
                         if GetColumnMapping(DATABASE::"NPR Item Worksheet Line", ItemWorksheetLine.FieldNo("Sales Price"), MappedColumnNo, FieldLength) then
                             if ExcelBuf2.Get(ExcelBuf."Row No.", MappedColumnNo) then
                                 if Evaluate(TempDec, ExcelBuf2."Cell Value as Text") then
