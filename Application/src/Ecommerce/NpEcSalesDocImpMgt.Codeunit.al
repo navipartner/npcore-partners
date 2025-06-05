@@ -551,7 +551,7 @@
     begin
         if not Element.SelectSingleNode('.//shipment_fee', Node) then
             exit;
-        if not Evaluate(ShipmentFee, Node.AsXmlElement().InnerText()) then
+        if not Evaluate(ShipmentFee, Node.AsXmlElement().InnerText(), 9) then
             exit;
         if ShipmentFee = 0 then
             exit;
