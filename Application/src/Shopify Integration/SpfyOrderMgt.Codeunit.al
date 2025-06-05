@@ -1603,5 +1603,22 @@ codeunit 6184814 "NPR Spfy Order Mgt."
     begin
         SalesLine.Validate("Purchasing Code", Item."NPR Purchasing Code");
     end;
+
+#if not (BC17 or BC18 or BC19)
+#if BC20 or BC21
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnBeforeUpdateSellToEmail', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", OnBeforeUpdateSellToEmail, '', false, false)]
+#endif
+    local procedure SupressConfirmEmptyEmailQst(var SalesHeader: Record "Sales Header"; Contact: Record Contact; var IsHandled: Boolean)
+    var
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+    begin
+        if not (SpfyAssignedIDMgt.GetAssignedShopifyID(SalesHeader.RecordId(), "NPR Spfy ID Type"::"Entry ID") = '') then begin
+            SalesHeader.Validate("Sell-to E-Mail", Contact."E-Mail");
+            IsHandled := true;
+        end;
+    end;
+#endif
 }
 #endif
