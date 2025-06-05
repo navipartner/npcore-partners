@@ -19,7 +19,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Type field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     trigger OnValidate()
                     begin
                         Rec."No." := '';
@@ -29,7 +29,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         Item: Record Item;
@@ -86,7 +86,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Sales Type field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     trigger OnValidate()
                     begin
                         Rec."Sales Code" := '';
@@ -96,7 +96,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Sales Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         Customer: Record Customer;
@@ -138,31 +138,31 @@
                 {
 
                     ToolTip = 'Specifies the value of the Is Visible field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Starting Date"; Rec."Starting Date")
                 {
 
                     ToolTip = 'Specifies the value of the Starting Date field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Starting Time"; Rec."Starting Time")
                 {
 
                     ToolTip = 'Specifies the value of the Starting Time field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Ending Date"; Rec."Ending Date")
                 {
 
                     ToolTip = 'Specifies the value of the Ending Date field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Ending Time"; Rec."Ending Time")
                 {
 
                     ToolTip = 'Specifies the value of the Ending Time field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }

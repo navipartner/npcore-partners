@@ -20,7 +20,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Value field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Text Field"; Format(Rec."Text Field".HasValue))
                 {
@@ -29,7 +29,7 @@
                     Caption = 'Text Field';
                     Visible = TextFieldVisible;
                     ToolTip = 'Specifies the value of the Text Field field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnAssistEdit()
                     var
@@ -56,7 +56,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Sorting field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }

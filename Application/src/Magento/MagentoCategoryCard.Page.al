@@ -22,13 +22,13 @@
                     {
 
                         ToolTip = 'Specifies the value of the Id field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field(Name; Rec.Name)
                     {
 
                         ToolTip = 'Specifies the value of the Name field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                         trigger OnValidate()
                         begin
@@ -44,7 +44,7 @@
                         AssistEdit = true;
                         Caption = 'Description';
                         ToolTip = 'Specifies the value of the Description field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                         trigger OnAssistEdit()
                         var
@@ -72,7 +72,7 @@
 
                         Caption = 'Short Description';
                         ToolTip = 'Specifies the value of the Short Description field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                         trigger OnAssistEdit()
                         var
@@ -99,7 +99,7 @@
                     {
 
                         ToolTip = 'Specifies the value of the Picture field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
                 group(Control6150620)
@@ -110,55 +110,55 @@
                     {
 
                         ToolTip = 'Specifies the value of the Is Active field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Is Anchor"; Rec."Is Anchor")
                     {
 
                         ToolTip = 'Specifies the value of the Is Anchor field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Show In Navigation Menu"; Rec."Show In Navigation Menu")
                     {
 
                         ToolTip = 'Specifies the value of the Show In Navigation Menu field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Seo Link"; Rec."Seo Link")
                     {
 
                         ToolTip = 'Specifies the value of the Seo Link field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Meta Title"; Rec."Meta Title")
                     {
 
                         ToolTip = 'Specifies the value of the Meta Title field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Meta Keywords"; Rec."Meta Keywords")
                     {
 
                         ToolTip = 'Specifies the value of the Meta Keywords field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Meta Description"; Rec."Meta Description")
                     {
 
                         ToolTip = 'Specifies the value of the Meta Description field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Sorting"; Rec.Sorting)
                     {
 
                         ToolTip = 'Specifies the value of the Sorting field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field(Icon; Rec.Icon)
                     {
 
                         ToolTip = 'Specifies the value of the Icon field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
             }
@@ -168,7 +168,7 @@
                 ShowFilter = false;
                 SubPageLink = "Parent Category Id" = FIELD(FILTER(Id));
                 Visible = MagentoItemGroupSubformVisible;
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
             }
         }
@@ -179,7 +179,7 @@
                 SubPageLink = Type = CONST("Item Group"),
                               Name = FIELD(Picture);
                 Visible = (NOT HasSetupCategories);
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
             }
             part(IconPictureDragDropAddin; "NPR Magento DragDropPic. Addin")
@@ -190,7 +190,7 @@
                 SubPageLink = Type = CONST("Item Group"),
                               Name = FIELD(Icon);
                 Visible = (NOT HasSetupCategories);
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
             }
         }
@@ -207,7 +207,7 @@
                 Visible = DisplayConfigVisible;
 
                 ToolTip = 'Executes the Display Config action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
                 trigger OnAction()
                 var

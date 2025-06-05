@@ -18,43 +18,43 @@
                 {
 
                     ToolTip = 'Specifies the value of the Item No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Custom Option No."; Rec."Custom Option No.")
                 {
 
                     ToolTip = 'Specifies the value of the Custom Option No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Custom Option Value Line No."; Rec."Custom Option Value Line No.")
                 {
 
                     ToolTip = 'Specifies the value of the Custom Option Value Line No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Enabled; Rec.Enabled)
                 {
 
                     ToolTip = 'Specifies the value of the Enabled field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Description; Rec.Description)
                 {
 
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Price; Rec.Price)
                 {
 
                     ToolTip = 'Specifies the value of the Price field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Price Type"; Rec."Price Type")
                 {
 
                     ToolTip = 'Specifies the value of the Price Type field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }

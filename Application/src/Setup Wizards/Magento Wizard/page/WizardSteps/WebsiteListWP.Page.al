@@ -18,25 +18,25 @@
                 {
 
                     ToolTip = 'Specifies the value of the Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Name; Rec.Name)
                 {
 
                     ToolTip = 'Specifies the value of the Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Default Website"; Rec."Default Website")
                 {
 
                     ToolTip = 'Specifies the value of the Std. Website field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
 
                     ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         GlobalDimension1: Record "Dimension Value";
@@ -62,7 +62,7 @@
 
                     Visible = false;
                     ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var

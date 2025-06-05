@@ -21,7 +21,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Selected field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnValidate()
                     var
@@ -45,7 +45,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Value field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }

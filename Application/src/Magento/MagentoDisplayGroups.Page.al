@@ -5,7 +5,7 @@
     PageType = List;
     SourceTable = "NPR Magento Display Group";
     UsageCategory = Lists;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMagento;
 
 
     layout
@@ -18,13 +18,13 @@
                 {
 
                     ToolTip = 'Specifies the value of the Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Description; Rec.Description)
                 {
 
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }

@@ -32,7 +32,7 @@
 
                         Visible = MagentoEnabled;
                         ToolTip = 'Specifies the value of the Magento Category Id field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
                 group(Control6014410)

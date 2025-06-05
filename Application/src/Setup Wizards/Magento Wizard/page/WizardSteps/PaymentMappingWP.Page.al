@@ -19,19 +19,19 @@
 
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the External Payment Method Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("External Payment Type"; Rec."External Payment Type")
                 {
 
                     ToolTip = 'Specifies the value of the External Payment Type field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Payment Method Code"; Rec."Payment Method Code")
                 {
 
                     ToolTip = 'Specifies the value of the Payment Method Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         PaymentMethod: Record "Payment Method";
@@ -53,13 +53,13 @@
                 {
 
                     ToolTip = 'Specifies the value of the Allow Adjust Payment Amount field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Payment Gateway Code"; Rec."Payment Gateway Code")
                 {
 
                     ToolTip = 'Specifies the value of the Payment Gateway Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         PaymentGateways: Page "NPR Pmt. Gateways Select";
@@ -83,7 +83,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Captured Externally field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }

@@ -401,7 +401,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     {
                         Importance = Promoted;
                         ToolTip = 'Specifies if the item will also be used as a Magento Item.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                         trigger OnValidate()
                         begin
                             NPR_SetMagentoEnabled();
@@ -411,18 +411,18 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     {
                         Importance = Promoted;
                         ToolTip = 'Specifies if the item is active or not as a Magento Item.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("NPR Visibility"; Rec."NPR Visibility")
                     {
                         Importance = Promoted;
                         ToolTip = 'Specifies if the item is visible on Magento side.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("NPR Magento Name"; Rec."NPR Magento Name")
                     {
                         ToolTip = 'Specifies the item Magento Name.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                         trigger OnValidate()
                         begin
                             NPR_ValidateSEOLink();
@@ -432,7 +432,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     {
                         Caption = 'Magento Description';
                         ToolTip = 'Specifies the item Magento Description.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                         trigger OnAssistEdit()
                         var
@@ -457,7 +457,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     {
                         Caption = 'Magento Short Description';
                         ToolTip = 'Specifies the item Magento Short Description.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                         trigger OnAssistEdit()
                         var
@@ -482,58 +482,58 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     {
                         Visible = MagentoEnabledBrand;
                         ToolTip = 'Specifies the item Magento Brand.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("NPR MagentoUnitPrice"; Rec."Unit Price")
                     {
                         Importance = Promoted;
                         ToolTip = 'Specifies the Magento''s item Unit Price.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("NPR Product New From"; Rec."NPR Product New From")
                     {
                         ToolTip = 'Specifies the start date for the item to be tagged as New Product.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("NPR Product New To"; Rec."NPR Product New To")
                     {
                         ToolTip = 'Specifies the end date for the item to be tagged as New Product.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("NPR Featured From"; Rec."NPR Featured From")
                     {
                         ToolTip = 'Specifies the start date for the item to be tagged as Featured.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("NPR Featured To"; Rec."NPR Featured To")
                     {
                         ToolTip = 'Specifies the end date for the item to be tagged as Featured.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("NPR Special Price"; Rec."NPR Special Price")
                     {
                         Visible = MagentoEnabledSpecialPrices;
                         ToolTip = 'Specifies the Special Price for the Item to be displayed on the Webshop.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("NPR Special Price From"; Rec."NPR Special Price From")
                     {
                         Visible = MagentoEnabledSpecialPrices;
                         ToolTip = 'Specifies the start date for the item to apply the special price.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("NPR Special Price To"; Rec."NPR Special Price To")
                     {
                         Visible = MagentoEnabledSpecialPrices;
                         ToolTip = 'Specifies the end date for the item to apply the special price.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("NPR Custom Options"; Rec."NPR Custom Options")
                     {
                         Caption = 'Custom Options';
                         Visible = MagentoEnabledCustomOptions;
                         ToolTip = 'Shows custom options when Magento is enabled.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                         trigger OnAssistEdit()
                         var
                             MagentoItemCustomOptions: Page "NPR Magento Item Cstm Options";
@@ -546,37 +546,37 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     field("NPR Backorder"; Rec."NPR Backorder")
                     {
                         ToolTip = 'Specifies whether to allow back order when processing sales order.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("NPR Display Only"; Rec."NPR Display Only")
                     {
                         ToolTip = 'Specifies if the item is for Display Only.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("NPR Display only Text"; Rec."NPR Display only Text")
                     {
                         ToolTip = 'Specifies the Display Only Text.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("NPR Seo Link"; Rec."NPR Seo Link")
                     {
                         ToolTip = 'Specifies the value of the Seo Link field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("NPR Meta Title"; Rec."NPR Meta Title")
                     {
                         ToolTip = 'Specifies the value of the Meta Title field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("NPR Meta Description"; Rec."NPR Meta Description")
                     {
                         ToolTip = 'Specifies the value of the Meta Description field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("NPR Meta Keywords"; Rec."NPR Meta Keywords")
                     {
                         ToolTip = 'Specifies the value of the Meta Keywords field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("NPR Attribute Set ID"; Rec."NPR Attribute Set ID")
                     {
@@ -584,7 +584,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         Editable = not Rec."NPR Magento Item";
                         Visible = MagentoEnabledAttributeSet;
                         ToolTip = 'Specifies the attribute to be assigned to the Magento item.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                         trigger OnAssistEdit()
                         var
                             MagentoAttributeSetMgt: Codeunit "NPR Magento Attr. Set Mgt.";
@@ -603,7 +603,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     field("NPR Magento Picture Variety Type"; Rec."NPR Magento Pict. Variety Type")
                     {
                         ToolTip = 'Specifies how the Magento picture is related to the variety e.g. color, size.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
                 part("NPR Magento Category Links"; "NPR Magento Category Links")
@@ -611,14 +611,14 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     Caption = 'Category Links';
                     SubPageLink = "Item No." = field("No.");
                     Visible = not MagentoEnabledMultistore;
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 part("NPR Product Relations"; "NPR Magento Product Relations")
                 {
                     Caption = 'Product Relations';
                     SubPageLink = "From Item No." = field("No.");
                     Visible = MagentoEnabledProductRelations;
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
 
@@ -768,7 +768,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
             part(NPRMagentoPictureDragDropAddin; "NPR Magento DragDropPic. Addin")
             {
                 Visible = MagentoEnabled;
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
             }
             part(NPRPicture; "NPR Magento Item Pict. Factbox")
             {
@@ -776,13 +776,13 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 ShowFilter = false;
                 SubPageLink = "No." = field("No.");
                 Visible = MagentoEnabled;
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
             }
             part("NPR Discount FactBox"; "NPR Discount FactBox")
             {
                 Caption = 'Discounts';
                 SubPageLink = "No." = field("No.");
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
             }
         }
 
@@ -1200,7 +1200,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     Visible = MagentoEnabled;
                     Image = Picture;
                     ToolTip = 'Allows you to assign a picture to the item. You can either take a picture or import it.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnAction()
                     var
@@ -1225,7 +1225,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     RunObject = page "NPR Magento Video Links";
                     RunPageLink = "Item No." = field("No.");
                     ToolTip = 'Executes the Videos action';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
 
                 action("NPR Webshops")
@@ -1237,7 +1237,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     Visible = MagentoEnabled and MagentoEnabledMultistore;
                     Image = Web;
                     ToolTip = 'Executes the Webshops action';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnAction()
                     var
@@ -1260,7 +1260,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     Visible = MagentoEnabled and MagentoEnabledDisplayConfig;
                     Image = ViewPage;
                     ToolTip = 'Executes the Display Config action';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnAction()
                     var

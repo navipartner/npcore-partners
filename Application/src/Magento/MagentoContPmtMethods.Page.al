@@ -7,7 +7,7 @@
     UsageCategory = Administration;
 
     SourceTable = "NPR Magento Contact Pmt.Meth.";
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMagento;
 
     layout
     {
@@ -19,13 +19,13 @@
                 {
 
                     ToolTip = 'Specifies the value of the External Payment Method Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Payment Method Code"; Rec."Payment Method Code")
                 {
 
                     ToolTip = 'Specifies the value of the Payment Method Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }

@@ -50,7 +50,7 @@
                     Caption = 'Attributes';
                     Image = List;
                     RunObject = page "NPR Magento Attributes";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Magento Attributes';
                 }
                 action("Attribute Sets")
@@ -58,7 +58,7 @@
                     Caption = 'Attribute Sets';
                     Image = List;
                     RunObject = page "NPR Magento Attribute Sets";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Magento Attribute Sets';
                 }
                 action("Attribute Groups")
@@ -66,26 +66,23 @@
                     Caption = 'Attribute Groups';
                     Image = List;
                     RunObject = page "NPR Magento Attr. Group List";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Magento Attribute Groups';
                 }
-
                 action(Categories)
                 {
                     Caption = 'Categories';
                     Image = List;
                     RunObject = page "NPR Magento Categories";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Magento Categories';
                 }
-
-
                 action(Brands)
                 {
                     Caption = 'Brands';
                     Image = List;
                     RunObject = page "NPR Magento Brands";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Magento Brands';
                 }
                 action("Magento Setup")
@@ -93,7 +90,7 @@
                     Caption = 'Magento Setup';
                     Image = List;
                     RunObject = page "NPR Magento Setup";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Magento Setup';
                 }
 
@@ -107,7 +104,7 @@
                     Caption = 'Customers';
                     Image = List;
                     RunObject = page "Customer List";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Customers';
                 }
                 action(Contact)
@@ -115,7 +112,7 @@
                     Caption = 'Contacts';
                     Image = List;
                     RunObject = page "Contact List";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Contacts';
                 }
 
@@ -124,7 +121,7 @@
                     Caption = 'Sales Orders';
                     Image = List;
                     RunObject = page "Sales Order List";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Sales Orders';
                 }
                 action("Sales Return Orders")
@@ -132,7 +129,7 @@
                     Caption = 'Sales Return Orders';
                     Image = List;
                     RunObject = page "Sales Return Order List";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Sales Return Orders';
                 }
                 action("Posted Sales Invoices")
@@ -140,7 +137,7 @@
                     Caption = 'Posted Sales Invoices';
                     Image = List;
                     RunObject = page "Posted Sales Invoices";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Sales Invoices';
                 }
 
@@ -149,7 +146,7 @@
                     Caption = 'Posted Sales Credit Memos';
                     Image = List;
                     RunObject = page "Posted Sales Credit Memos";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Sales Credit Memos';
                 }
             }

@@ -15,12 +15,12 @@
                 field(Id; Rec.Id)
                 {
                     ToolTip = 'Specifies the value of the Id field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Name; Rec.Name)
                 {
                     ToolTip = 'Specifies the value of the Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnValidate()
                     begin
@@ -36,7 +36,7 @@
                     Caption = 'Description';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnAssistEdit()
                     var
@@ -64,7 +64,7 @@
                     Caption = 'Short Description';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Short Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnAssistEdit()
                     var
@@ -90,33 +90,33 @@
                 field("Seo Link"; Rec."Seo Link")
                 {
                     ToolTip = 'Specifies the value of the Seo Link field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Meta Title"; Rec."Meta Title")
                 {
                     ToolTip = 'Specifies the value of the Meta Title field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Meta Description"; Rec."Meta Description")
                 {
                     ToolTip = 'Specifies the value of the Meta Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Picture; Rec.Picture)
                 {
 
                     ToolTip = 'Specifies the value of the Picture field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Logo Picture"; Rec."Logo Picture")
                 {
                     ToolTip = 'Specifies the value of the Logo field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Sorting"; Rec.Sorting)
                 {
                     ToolTip = 'Specifies the value of the Sorting field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }
@@ -129,7 +129,7 @@
                 ShowFilter = false;
                 SubPageLink = Type = CONST(Brand),
                               Name = FIELD(Picture);
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
             }
             part(LogoPictureDragDropAddin; "NPR Magento DragDropPic. Addin")
             {
@@ -138,7 +138,7 @@
                 ShowFilter = false;
                 SubPageLink = Type = CONST(Brand),
                               Name = FIELD("Logo Picture");
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
             }
         }
     }
@@ -155,7 +155,7 @@
                 ShortCutKey = 'F5';
 
                 ToolTip = 'Executes the List action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
             }
             action("Display Config")
             {
@@ -164,7 +164,7 @@
                 Visible = DisplayConfigVisible;
 
                 ToolTip = 'Executes the Display Config action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
                 trigger OnAction()
                 var

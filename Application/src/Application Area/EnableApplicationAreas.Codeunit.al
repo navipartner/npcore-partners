@@ -21,6 +21,7 @@ codeunit 6151349 "NPR Enable Application Areas"
         EnableInternalPOSScenariosAndHideOldRelatedPages(TempApplicationAreaSetup);
         EnableOnlyNewPOSEditorAndHideOldRelatedPages(TempApplicationAreaSetup);
         EnableNPEmail(TempApplicationAreaSetup);
+        EnableMagentoApplicationAreas(TempApplicationAreaSetup);
     end;
 
     local procedure EnableRetailApplicationAreas(var TempApplicationAreaSetup: Record "Application Area Setup" temporary)
@@ -58,6 +59,10 @@ codeunit 6151349 "NPR Enable Application Areas"
         TempApplicationAreaSetup."NPR Shopify" := IsFeatureEnabled(Feature::Shopify);
     end;
 #endif
+    local procedure EnableMagentoApplicationAreas(var TempApplicationAreaSetup: Record "Application Area Setup" temporary)
+    begin
+        TempApplicationAreaSetup."NPR Magento" := IsFeatureEnabled(Feature::Magento);
+    end;
 
     local procedure EnableLocalizationApplicationAreas(var TempApplicationAreaSetup: Record "Application Area Setup" temporary)
     begin

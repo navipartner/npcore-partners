@@ -105,4 +105,9 @@ enum 6014577 "NPR Feature" implements "NPR Feature Management"
         Caption = 'New EFT Receipt Experience';
         Implementation = "NPR Feature Management" = "NPR New EFT Receipt Exp";
     }
+    value(170; Magento)
+    {
+        Caption = 'Magento Integration', Locked = true, MaxLength = 50;
+        Implementation = "NPR Feature Management" = "NPR Magento Feature";
+    }
 }

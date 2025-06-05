@@ -19,7 +19,7 @@
 
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnValidate()
                     begin
@@ -30,7 +30,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }

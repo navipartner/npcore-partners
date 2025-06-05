@@ -6,7 +6,7 @@
     PageType = List;
     SourceTable = "NPR Magento VAT Prod. Group";
     UsageCategory = Administration;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMagento;
 
 
     layout
@@ -19,19 +19,19 @@
                 {
 
                     ToolTip = 'Specifies the value of the VAT Product Posting Group field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Description; Rec.Description)
                 {
 
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Magento Tax Class"; Rec."Magento Tax Class")
                 {
 
                     ToolTip = 'Specifies the value of the Magento Tax Class field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }
@@ -51,7 +51,7 @@
                 PromotedIsBig = true;
 
                 ToolTip = 'Executes the Setup VAT Product Posting Groups action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
                 trigger OnAction()
                 begin

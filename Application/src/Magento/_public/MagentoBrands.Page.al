@@ -6,7 +6,7 @@
     PageType = List;
     SourceTable = "NPR Magento Brand";
     UsageCategory = Lists;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMagento;
 
 
     layout
@@ -20,25 +20,25 @@
                 {
 
                     ToolTip = 'Specifies the value of the Id field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Name; Rec.Name)
                 {
 
                     ToolTip = 'Specifies the value of the Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Picture; Rec.Picture)
                 {
 
                     ToolTip = 'Specifies the value of the Picture field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Sorting"; Rec.Sorting)
                 {
 
                     ToolTip = 'Specifies the value of the Sorting field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }
@@ -59,7 +59,7 @@
                 Visible = HasSetupBrands;
 
                 ToolTip = 'Executes the Setup Brands action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
                 trigger OnAction()
                 var
@@ -82,7 +82,7 @@
                 ShortCutKey = 'Shift+F5';
 
                 ToolTip = 'Executes the Card action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
             }
             action("Display Config")
             {
@@ -91,7 +91,7 @@
                 Visible = DisplayConfigVisible;
 
                 ToolTip = 'Executes the Display Config action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
                 trigger OnAction()
                 var

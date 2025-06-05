@@ -17,18 +17,18 @@
                 {
 
                     ToolTip = 'Specifies the value of the Company Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Location Filter"; Rec."Location Filter")
                 {
 
                     ToolTip = 'Specifies the value of the Location Filter field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
 
                 field(AuthType; Rec.AuthType)
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     Tooltip = 'Specifies the Authorization Type.';
 
                     trigger OnValidate()
@@ -40,14 +40,14 @@
                 {
 
                     ToolTip = 'Specifies the value of the Api Username field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     Visible = IsBasicAuthVisible;
                 }
                 field("API Password"; pw)
                 {
 
                     ToolTip = 'Specifies the value of the User Password field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     Caption = 'API Password';
                     ExtendedDatatype = Masked;
                     Visible = IsBasicAuthVisible;
@@ -64,7 +64,7 @@
 
                 field("OAuth2 Setup Code"; Rec."OAuth2 Setup Code")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'Specifies the OAuth2.0 Setup Code.';
                     Visible = IsOAuth2Visible;
                 }
@@ -72,7 +72,7 @@
                 {
                     Visible = false;
                     ToolTip = 'Specifies the value of the Api Url field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }
@@ -87,7 +87,7 @@
                 Caption = 'Test Api Url';
                 Image = TestFile;
                 ToolTip = 'Executes the Test Api Url action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
                 trigger OnAction()
                 begin

@@ -38,7 +38,7 @@ pageextension 6014460 "NPR Location Card" extends "Location Card"
                 field("NPR Magento 2 Source"; Rec."NPR Magento 2 Source")
                 {
                     ToolTip = 'Specifies the Magento 2 Source that this Location maps to';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
 #endif

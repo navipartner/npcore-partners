@@ -21,13 +21,13 @@
                 {
 
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Used by Items"; Rec."Used by Items")
                 {
 
                     ToolTip = 'Specifies the value of the Used by Items field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }

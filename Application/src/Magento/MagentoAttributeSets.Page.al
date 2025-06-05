@@ -7,7 +7,7 @@
     MultipleNewLines = false;
     PageType = List;
     SourceTable = "NPR Magento Attribute Set";
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMagento;
 
     layout
     {
@@ -22,12 +22,12 @@
                     field(Description; Rec.Description)
                     {
                         ToolTip = 'Specifies the value of the Description field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Used by Items"; Rec."Used by Items")
                     {
                         ToolTip = 'Specifies the value of the Used by Items field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                         trigger OnDrillDown()
                         begin
@@ -42,7 +42,7 @@
                 part(Control6151401; "NPR Magento Attribute Group")
                 {
                     SubPageLink = "Attribute Set ID" = FIELD("Attribute Set ID");
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
             group(Control6150619)
@@ -54,7 +54,7 @@
                     Provider = Control6151401;
                     SubPageLink = "Attribute Set ID" = FIELD("Attribute Set ID"),
                                       "Attribute Group ID" = FIELD("Attribute Group ID");
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }

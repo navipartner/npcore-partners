@@ -8,7 +8,7 @@
     SourceTable = "NPR M2 Contact Buffer";
     Editable = False;
     SourceTableTemporary = True;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMagento;
 
     layout
     {
@@ -22,36 +22,36 @@
 
                     Editable = false;
                     Visible = false;
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Customer No."; Rec."Customer No.")
                 {
                     ToolTip = 'Specifies the value of the Customer No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                 }
                 field("Customer Name"; Rec."Customer Name")
                 {
                     ToolTip = 'Specifies the value of the Customer Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                 }
                 field("Contact No."; Rec."Contact No.")
                 {
                     ToolTip = 'Specifies the value of the Contact No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                 }
                 field("Contact Name"; Rec."Contact Name")
                 {
                     ToolTip = 'Specifies the value of the Contact Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                 }
                 field("Contact Email"; Rec."Contact Email")
                 {
                     ToolTip = 'Specifies the value of the Contact Email field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                 }
                 field("Magento Store Code"; Rec."Magento Store Code")
@@ -60,7 +60,7 @@
 
                     Editable = false;
                     Visible = false;
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Magento Contact"; Rec."Magento Contact")
                 {
@@ -68,14 +68,14 @@
 
                     Editable = false;
                     Visible = false;
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Password Reset"; Rec."Password Reset")
                 {
                     ToolTip = 'Specifies the value of the Password Reset field';
 
                     Editable = false;
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Error Message"; Rec."Error Message")
                 {
@@ -84,7 +84,7 @@
                     Editable = false;
                     Style = Attention;
                     StyleExpr = true;
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }
@@ -100,7 +100,7 @@
                 Image = Email;
                 Caption = 'Reset Password Of Contacts';
                 ToolTip = 'Reset Passwords of the Contacts';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
                 trigger OnAction()
                 begin

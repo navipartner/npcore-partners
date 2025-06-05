@@ -19,27 +19,27 @@
                 {
 
                     ToolTip = 'Specifies the value of the Webshop field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Store Code"; Rec."Store Code")
                 {
 
                     Editable = false;
                     ToolTip = 'Specifies the value of the Store Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Website Code"; Rec."Website Code")
                 {
 
                     Editable = false;
                     ToolTip = 'Specifies the value of the Website Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Enabled; Rec.Enabled)
                 {
 
                     ToolTip = 'Specifies the value of the Enabled field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnValidate()
                     begin
@@ -52,7 +52,7 @@
                     Caption = 'Fields Enabled';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Fields Enabled field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
 
             }
@@ -66,14 +66,14 @@
                     {
 
                         ToolTip = 'Specifies the value of the Unit Price field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Unit Price Enabled"; Rec."Unit Price Enabled")
                     {
 
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the Unit Price Enabled field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
                 group(ProductNewGroup)
@@ -85,14 +85,14 @@
                         {
 
                             ToolTip = 'Specifies the value of the Product New From field';
-                            ApplicationArea = NPRRetail;
+                            ApplicationArea = NPRMagento;
                         }
                         field("Product New From Enabled"; Rec."Product New From Enabled")
                         {
 
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Product New From Enabled field';
-                            ApplicationArea = NPRRetail;
+                            ApplicationArea = NPRMagento;
                         }
                     }
                     grid(ProductNewToGrid)
@@ -101,14 +101,14 @@
                         {
 
                             ToolTip = 'Specifies the value of the Product New To field';
-                            ApplicationArea = NPRRetail;
+                            ApplicationArea = NPRMagento;
                         }
                         field("Product New To Enabled"; Rec."Product New To Enabled")
                         {
 
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Product New To Enabled field';
-                            ApplicationArea = NPRRetail;
+                            ApplicationArea = NPRMagento;
                         }
                     }
                 }
@@ -122,14 +122,14 @@
                         {
 
                             ToolTip = 'Specifies the value of the Special Price field';
-                            ApplicationArea = NPRRetail;
+                            ApplicationArea = NPRMagento;
                         }
                         field("Special Price Enabled"; Rec."Special Price Enabled")
                         {
 
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Special Price Enabled field';
-                            ApplicationArea = NPRRetail;
+                            ApplicationArea = NPRMagento;
                         }
                     }
                     grid(SpecialPriceFromGrid)
@@ -138,14 +138,14 @@
                         {
 
                             ToolTip = 'Specifies the value of the Special Price From field';
-                            ApplicationArea = NPRRetail;
+                            ApplicationArea = NPRMagento;
                         }
                         field("Special Price From Enabled"; Rec."Special Price From Enabled")
                         {
 
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Special Price From Enabled field';
-                            ApplicationArea = NPRRetail;
+                            ApplicationArea = NPRMagento;
                         }
                     }
                     grid(SpecialPriceToGrid)
@@ -154,14 +154,14 @@
                         {
 
                             ToolTip = 'Specifies the value of the Special Price To field';
-                            ApplicationArea = NPRRetail;
+                            ApplicationArea = NPRMagento;
                         }
                         field("Special Price To Enabled"; Rec."Special Price To Enabled")
                         {
 
                             ShowCaption = false;
                             ToolTip = 'Specifies the value of the Special Price To Enabled field';
-                            ApplicationArea = NPRRetail;
+                            ApplicationArea = NPRMagento;
                         }
                     }
                 }
@@ -177,14 +177,14 @@
 
                         Caption = 'Name';
                         ToolTip = 'Specifies the value of the Name field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Webshop Name Enabled"; Rec."Webshop Name Enabled")
                     {
 
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the Webshop Name Enabled field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
                 grid(WebshopDescriptionGrid)
@@ -194,7 +194,7 @@
 
                         Caption = 'Description';
                         ToolTip = 'Specifies the value of the Description field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                         trigger OnAssistEdit()
                         var
@@ -224,7 +224,7 @@
 
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the Webshop Description Enabled field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
 
@@ -235,7 +235,7 @@
 
                         Caption = 'Short Description';
                         ToolTip = 'Specifies the value of the Short Description field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                         trigger OnAssistEdit()
                         var
@@ -264,14 +264,14 @@
 
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the Webshop Short Description Enabled field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
                 field(Visibility; Rec.Visibility)
                 {
 
                     ToolTip = 'Specifies the value of the Visibility field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 grid(DisplayOnlyGrid)
                 {
@@ -279,14 +279,14 @@
                     {
 
                         ToolTip = 'Specifies the value of the Display Only field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Display Only Enabled"; Rec."Display Only Enabled")
                     {
 
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the Display Only Enabled field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
                 grid(DisplayOnlyTextGrid)
@@ -295,7 +295,7 @@
                     {
 
                         ToolTip = 'Specifies the value of the Display Only Text field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
                 grid(SeoLinkGrid)
@@ -304,14 +304,14 @@
                     {
 
                         ToolTip = 'Specifies the value of the Seo Link field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Seo Link Enabled"; Rec."Seo Link Enabled")
                     {
 
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the Seo Link Enabled field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
                 grid(MetaTitleGrid)
@@ -320,14 +320,14 @@
                     {
 
                         ToolTip = 'Specifies the value of the Meta Title field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Meta Title Enabled"; Rec."Meta Title Enabled")
                     {
 
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the Meta Title Enabled field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
                 grid(MetaDescriptionGrid)
@@ -336,14 +336,14 @@
                     {
 
                         ToolTip = 'Specifies the value of the Meta Description field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Meta Description Enabled"; Rec."Meta Description Enabled")
                     {
 
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the Meta Description Enabled field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
                 grid(MetaKeywordsGrid)
@@ -351,13 +351,13 @@
                     field("Meta Keywords"; Rec."Meta Keywords")
                     {
                         ToolTip = 'Specifies the value of the Meta Keywords field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Meta Keywords Enabled"; Rec."Meta Keywords Enabled")
                     {
                         ShowCaption = false;
                         ToolTip = 'Specifies the value of the Meta Keywords Enabled field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
             }
@@ -367,7 +367,7 @@
                 part(MagentoItemGroupLinks; "NPR Magento Category Links")
                 {
                     SubPageLink = "Item No." = FIELD("Item No.");
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                 }
             }

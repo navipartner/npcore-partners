@@ -9,7 +9,7 @@
     SourceTable = "NPR Magento Category";
     SourceTableView = SORTING(Path);
     UsageCategory = Lists;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMagento;
 
 
     layout
@@ -25,33 +25,33 @@
                 {
 
                     ToolTip = 'Specifies the value of the Id field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Name; Rec.Name)
                 {
 
                     ToolTip = 'Specifies the value of the Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Parent Category Id"; Rec."Parent Category Id")
                 {
 
                     Visible = false;
                     ToolTip = 'Specifies the value of the Parent Category Id field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Picture; Rec.Picture)
                 {
 
                     ToolTip = 'Specifies the value of the Picture field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Sorting"; Rec.Sorting)
                 {
 
                     Visible = false;
                     ToolTip = 'Specifies the value of the Sorting field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }
@@ -72,7 +72,7 @@
                 Visible = HasSetupCategories;
 
                 ToolTip = 'Executes the Setup Categories action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
                 trigger OnAction()
                 var
@@ -94,7 +94,7 @@
                 Visible = DisplayConfigVisible;
 
                 ToolTip = 'Executes the Display Config action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
                 trigger OnAction()
                 var
@@ -112,7 +112,7 @@
                 Image = Item;
 
                 ToolTip = 'Executes the Items action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
                 trigger OnAction()
                 var

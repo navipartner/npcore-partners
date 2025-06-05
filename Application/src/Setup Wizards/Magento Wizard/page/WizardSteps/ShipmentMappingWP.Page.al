@@ -19,13 +19,13 @@
 
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the External Shipment Method Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Shipment Method Code"; Rec."Shipment Method Code")
                 {
 
                     ToolTip = 'Specifies the value of the Shipment Method Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         ShipmentMethod: Record "Shipment Method";
@@ -47,7 +47,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Shipping Agent Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         ShippingAgent: Record "Shipping Agent";
@@ -69,7 +69,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Shipping Agent Service Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         ShippingAgentServices: Record "Shipping Agent Services";
@@ -93,7 +93,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Shipment Fee Type field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     trigger OnValidate()
                     begin
                         Rec."Shipment Fee No." := '';
@@ -103,7 +103,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Shipment Fee No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         GLAccount: Record "G/L Account";

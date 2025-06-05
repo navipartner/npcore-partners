@@ -6,7 +6,7 @@
     PageType = List;
     SourceTable = "NPR Magento Customer Mapping";
     UsageCategory = Administration;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMagento;
 
 
     layout
@@ -20,43 +20,43 @@
                 {
 
                     ToolTip = 'Specifies the value of the Country/Region Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Post Code"; Rec."Post Code")
                 {
 
                     ToolTip = 'Specifies the value of the Post Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Country/Region Name"; Rec."Country/Region Name")
                 {
 
                     ToolTip = 'Specifies the value of the Country/Region Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(City; Rec.City)
                 {
 
                     ToolTip = 'Specifies the value of the City field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Customer Template Code"; Rec."Customer Template Code")
                 {
 
                     ToolTip = 'Specifies the value of the Customer Template Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Config. Template Code"; Rec."Config. Template Code")
                 {
 
                     ToolTip = 'Specifies the value of the Config. Template Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Fixed Customer No."; Rec."Fixed Customer No.")
                 {
 
                     ToolTip = 'Specifies the value of the Fixed Customer No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }

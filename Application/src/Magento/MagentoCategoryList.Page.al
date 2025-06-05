@@ -10,7 +10,7 @@
 
     SourceTable = "NPR Magento Category";
     SourceTableView = SORTING(Path);
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMagento;
 
     layout
     {
@@ -25,19 +25,19 @@
                 {
 
                     ToolTip = 'Specifies the value of the Id field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Name; Rec.Name)
                 {
 
                     ToolTip = 'Specifies the value of the Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Sorting"; Rec.Sorting)
                 {
 
                     ToolTip = 'Specifies the value of the Sorting field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }
@@ -58,7 +58,7 @@
                 Visible = HasSetupCategories;
 
                 ToolTip = 'Executes the Setup Categories action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
                 trigger OnAction()
                 var

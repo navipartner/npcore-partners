@@ -21,14 +21,14 @@
                 {
 
                     ToolTip = 'Specifies the value of the Attribute field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Value; GetValue())
                 {
 
                     Caption = 'Value';
                     ToolTip = 'Specifies the value of the Value field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
             part(Control6150617; "NPR Magento Item Attr. Values")
@@ -36,7 +36,7 @@
                 SubPageLink = "Attribute ID" = FIELD("Attribute ID"),
                               "Item No." = FIELD("Item No."),
                               "Variant Code" = FIELD("Variant Code");
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
             }
         }

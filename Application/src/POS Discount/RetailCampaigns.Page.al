@@ -34,7 +34,7 @@
 
                     Visible = MagentoEnabled;
                     ToolTip = 'Specifies the Magento Category ID of the retail campaign.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }

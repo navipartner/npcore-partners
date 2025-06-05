@@ -20,7 +20,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Category Id field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -40,13 +40,13 @@
                 {
 
                     ToolTip = 'Specifies the value of the Category Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Position; Rec.Position)
                 {
 
                     ToolTip = 'Specifies the value of the Position field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }

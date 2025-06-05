@@ -21,25 +21,25 @@
 
                     TableRelation = "NPR Magento Attribute Group" WHERE("Attribute Set ID" = FIELD("Attribute Set ID"));
                     ToolTip = 'Specifies the value of the Attribute Group ID field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Description; Rec.Description)
                 {
 
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Attribute Set ID"; Rec."Attribute Set ID")
                 {
 
                     ToolTip = 'Specifies the value of the Attribute Set ID field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Sort Order"; Rec."Sort Order")
                 {
 
                     ToolTip = 'Specifies the value of the Sort Order field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }

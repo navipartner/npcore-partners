@@ -147,7 +147,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Magento Item field.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Status; Rec.Status)
                 {

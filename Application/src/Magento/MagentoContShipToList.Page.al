@@ -8,7 +8,7 @@
     UsageCategory = Administration;
 
     SourceTable = "NPR Magento Contact ShipToAdr.";
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMagento;
 
     layout
     {
@@ -21,32 +21,32 @@
 
                     Editable = false;
                     ToolTip = 'Specifies the value of the Customer No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Created By Contact No."; Rec."Created By Contact No.")
                 {
 
                     Editable = false;
                     ToolTip = 'Specifies the value of the Created By Contact No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Ship-to Code"; Rec."Ship-to Code")
                 {
 
                     ToolTip = 'Specifies the value of the Ship-to Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Created At"; Rec."Created At")
                 {
 
                     ToolTip = 'Specifies the value of the Created At field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Visibility; Rec.Visibility)
                 {
 
                     ToolTip = 'Specifies the value of the Visibility field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }

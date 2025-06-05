@@ -18,7 +18,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Country/Region Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         CountryRegion: Record "Country/Region";
@@ -45,7 +45,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Post Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         PostCode: Record "Post Code";
@@ -75,7 +75,7 @@
                     Caption = 'Country/Region';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Country/Region field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(CityName; CityName)
                 {
@@ -83,13 +83,13 @@
                     Caption = 'City';
                     Editable = false;
                     ToolTip = 'Specifies the value of the City field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Customer Template Code"; Rec."Customer Template Code")
                 {
 
                     ToolTip = 'Specifies the value of the Customer Template Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         CustomerTemplate: Record "Customer Templ.";
@@ -111,7 +111,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Config. Template Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         ConfigTemplateHdr: Record "Config. Template Header";

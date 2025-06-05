@@ -65,6 +65,8 @@ codeunit 6151434 "NPR Feature Management Install"
         AddFeature(Feature::"POS Webservice Sessions");
         AddFeature(Feature::"New Sales Receipt Experience");
         AddFeature(Feature::"New EFT Receipt Experience");
+        AddFeature(Feature::Magento);
+        AddMagentoUpgradeTag();
 
         if ExistingFeature.FindSet() then
             repeat
@@ -107,5 +109,17 @@ codeunit 6151434 "NPR Feature Management Install"
         ApplicationAreaMgmtFacade: Codeunit "Application Area Mgmt. Facade";
     begin
         ApplicationAreaMgmtFacade.RefreshExperienceTierCurrentCompany();
+    end;
+
+    local procedure AddMagentoUpgradeTag()
+    var
+        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeStep: Text;
+    begin
+        UpgradeStep := 'EnableMagentoFeature';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Magento Upgrade", UpgradeStep)) then
+            exit;
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Magento Upgrade", UpgradeStep));
     end;
 }

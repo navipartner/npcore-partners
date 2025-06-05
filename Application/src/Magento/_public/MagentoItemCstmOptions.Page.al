@@ -17,7 +17,7 @@
 
                 Caption = 'Item No.';
                 ToolTip = 'Specifies the value of the Item No. field';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
             }
             group("Custom Options")
             {
@@ -28,55 +28,55 @@
                     {
 
                         ToolTip = 'Specifies the value of the Enabled field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Custom Option No."; Rec."Custom Option No.")
                     {
 
                         ToolTip = 'Specifies the value of the Custom Option No. field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field(Description; Rec.Description)
                     {
 
                         ToolTip = 'Specifies the value of the Description field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field(Type; Rec.Type)
                     {
 
                         ToolTip = 'Specifies the value of the Type field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field(Required; Rec.Required)
                     {
 
                         ToolTip = 'Specifies the value of the Required field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Max Length"; Rec."Max Length")
                     {
 
                         ToolTip = 'Specifies the value of the Max Length field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field(Position; Rec.Position)
                     {
 
                         ToolTip = 'Specifies the value of the Position field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field(Price; Rec.Price)
                     {
 
                         ToolTip = 'Specifies the value of the Price field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Price Type"; Rec."Price Type")
                     {
 
                         ToolTip = 'Specifies the value of the Price Type field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
             }
@@ -85,7 +85,7 @@
                 Caption = 'Values';
                 SubPageLink = "Item No." = FIELD("Item No."),
                               "Custom Option No." = FIELD("Custom Option No.");
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
             }
         }

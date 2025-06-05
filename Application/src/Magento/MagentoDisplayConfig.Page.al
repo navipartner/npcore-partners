@@ -6,7 +6,7 @@
     PageType = List;
     SourceTable = "NPR Magento Display Config";
     UsageCategory = Lists;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMagento;
 
 
     layout
@@ -21,7 +21,7 @@
 
                     Caption = 'Type Filter';
                     ToolTip = 'Specifies the value of the Type Filter field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnValidate()
                     begin
@@ -37,7 +37,7 @@
                     Editable = NumberFilterCtrlEnabled;
                     Enabled = NumberFilterCtrlEnabled;
                     ToolTip = 'Specifies the value of the Code Filter field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -89,55 +89,55 @@
                 {
 
                     ToolTip = 'Specifies the value of the No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Type; Rec.Type)
                 {
 
                     ToolTip = 'Specifies the value of the Type field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Sales Type"; Rec."Sales Type")
                 {
 
                     ToolTip = 'Specifies the value of the Sales Type field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Sales Code"; Rec."Sales Code")
                 {
 
                     ToolTip = 'Specifies the value of the Sales Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Is Visible"; Rec."Is Visible")
                 {
 
                     ToolTip = 'Specifies the value of the Is Visible field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Starting Date"; Rec."Starting Date")
                 {
 
                     ToolTip = 'Specifies the value of the Starting Date field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Starting Time"; Rec."Starting Time")
                 {
 
                     ToolTip = 'Specifies the value of the Starting Time field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Ending Date"; Rec."Ending Date")
                 {
 
                     ToolTip = 'Specifies the value of the Ending Date field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Ending Time"; Rec."Ending Time")
                 {
 
                     ToolTip = 'Specifies the value of the Ending Time field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }

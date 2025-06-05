@@ -43,7 +43,7 @@ page 6184714 "NPR Store Ship. Profile Card"
         {
             action(CreateShipmentSeesFromMagento)
             {
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
                 Caption = 'Create Shipment Fees from Webshop';
                 Image = CreateWhseLoc;
                 Promoted = true;

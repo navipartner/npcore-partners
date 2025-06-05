@@ -6,7 +6,7 @@
     UsageCategory = Administration;
 
     SourceTable = "NPR Magento Customer Group";
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMagento;
 
     layout
     {
@@ -18,13 +18,13 @@
                 {
 
                     ToolTip = 'Specifies the value of the Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Magento Tax Class"; Rec."Magento Tax Class")
                 {
 
                     ToolTip = 'Specifies the value of the Magento Tax Class field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }
@@ -44,7 +44,7 @@
                 PromotedIsBig = true;
 
                 ToolTip = 'Executes the Setup Customer Groups action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
                 trigger OnAction()
                 begin

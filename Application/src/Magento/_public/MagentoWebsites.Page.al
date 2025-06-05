@@ -5,7 +5,7 @@
     PageType = List;
     SourceTable = "NPR Magento Website";
     UsageCategory = Administration;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMagento;
 
     layout
     {
@@ -22,55 +22,55 @@
                     {
 
                         ToolTip = 'Specifies the value of the Code field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field(Name; Rec.Name)
                     {
 
                         ToolTip = 'Specifies the value of the Name field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Default Website"; Rec."Default Website")
                     {
 
                         ToolTip = 'Specifies the value of the Std. Website field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                     {
 
                         ToolTip = 'Specifies the value of the Global Dimension 1 Code field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                     {
 
                         ToolTip = 'Specifies the value of the Global Dimension 2 Code field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Location Code"; Rec."Location Code")
                     {
 
                         ToolTip = 'Specifies the value of the Location Code field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Responsibility Center"; Rec."Responsibility Center")
                     {
 
                         ToolTip = 'Specifies the code of the responsibility center, such as a distribution hub, that is associated with the involved user, company, customer, or vendor. When webshop order is created and imported to Business Central, if Code of this Website is named, then value from this field will be passed to the Sales Header.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Sales Order No. Series"; Rec."Sales Order No. Series")
                     {
 
                         ToolTip = 'Specifies the value of the Sales Order No. Series field';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Customer No. Series"; Rec."Customer No. Series")
                     {
 
                         ToolTip = 'Specify a different number series to be used when creating customer during order import';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
             }
@@ -81,7 +81,7 @@
                 {
                     Caption = 'Stores';
                     SubPageLink = "Website Code" = FIELD(Code);
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                 }
             }
@@ -102,7 +102,7 @@
                 PromotedIsBig = true;
 
                 ToolTip = 'Executes the Setup Websites action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
                 trigger OnAction()
                 begin

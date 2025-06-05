@@ -17,20 +17,20 @@
                 {
 
                     ToolTip = 'Specifies the value of the Type field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("No."; Rec."No.")
                 {
 
                     ToolTip = 'Specifies the value of the No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Description; Rec.Description)
                 {
 
                     Editable = false;
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }

@@ -18,19 +18,19 @@
                 {
 
                     ToolTip = 'Specifies the value of the Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Desctiption; Rec.Description)
                 {
 
                     ToolTip = 'Specifies description';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Integration Type"; Rec."Integration Type")
                 {
 
                     ToolTip = 'Specifies the payment gateway integration type';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }

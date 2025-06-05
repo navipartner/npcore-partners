@@ -24,7 +24,7 @@
 
                         Image = TileNew;
                         ToolTip = 'Executes the New Sales Order action';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     action("New Sales Quote")
                     {
@@ -34,7 +34,7 @@
 
                         Image = TileBrickNew;
                         ToolTip = 'Executes the New Sales Quote action';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     action("New Sales Return Order")
                     {
@@ -44,7 +44,7 @@
 
                         Image = TileBrickNearBy;
                         ToolTip = 'Executes the New Sales Return Order action';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
             }
@@ -62,7 +62,7 @@
 
                             DrillDownPageID = "Sales Order List";
                             ToolTip = 'Specifies the value of the Sales Orders field';
-                            ApplicationArea = NPRRetail;
+                            ApplicationArea = NPRMagento;
                         }
                         field("Sales Quotes"; Rec."Sales Quotes")
                         {
@@ -70,14 +70,14 @@
                             DrillDownPageID = "Sales Quotes";
                             Visible = false;
                             ToolTip = 'Specifies the value of the Sales Quotes field';
-                            ApplicationArea = NPRRetail;
+                            ApplicationArea = NPRMagento;
                         }
                         field("Sales Return Orders"; Rec."Sales Return Orders")
                         {
 
                             DrillDownPageID = "Sales Return Order List";
                             ToolTip = 'Specifies the value of the Sales Return Orders field';
-                            ApplicationArea = NPRRetail;
+                            ApplicationArea = NPRMagento;
                         }
                     }
                 }
@@ -97,7 +97,7 @@
                             DrillDownPageID = "Sales Order List";
                             Visible = false;
                             ToolTip = 'Specifies the value of the Magento Orders field';
-                            ApplicationArea = NPRRetail;
+                            ApplicationArea = NPRMagento;
                         }
                         field("Daily Sales Invoices"; Rec."Daily Sales Invoices")
                         {
@@ -106,7 +106,7 @@
                             DrillDownPageID = "Posted Sales Invoices";
                             Visible = false;
                             ToolTip = 'Specifies the value of the Daily Sales Invoices field';
-                            ApplicationArea = NPRRetail;
+                            ApplicationArea = NPRMagento;
                         }
                     }
                 }
@@ -125,7 +125,7 @@
 
                             DrillDownPageID = "NPR Nc Import List";
                             ToolTip = 'Specifies the value of the Import Unprocessed field';
-                            ApplicationArea = NPRRetail;
+                            ApplicationArea = NPRMagento;
                         }
                         field("Tasks Unprocessed"; Rec."Tasks Unprocessed")
                         {
@@ -133,14 +133,14 @@
                             DrillDownPageID = "NPR Nc Task List";
                             Visible = false;
                             ToolTip = 'Specifies the value of the Tasks Unprocessed field';
-                            ApplicationArea = NPRRetail;
+                            ApplicationArea = NPRMagento;
                         }
                         field("Daily Sales Orders"; Rec."Daily Sales Orders")
                         {
 
                             DrillDownPageID = "Sales Order List";
                             ToolTip = 'Specifies the value of the Daily Sales Orders field';
-                            ApplicationArea = NPRRetail;
+                            ApplicationArea = NPRMagento;
                         }
                     }
                 }

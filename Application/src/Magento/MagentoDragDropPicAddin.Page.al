@@ -15,7 +15,7 @@
         {
             usercontrol(DragDropAddin; "NPR DragDrop")
             {
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
                 trigger AddInReady();
                 begin

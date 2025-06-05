@@ -4,7 +4,7 @@
     Caption = 'NP Magento Wizard';
     PageType = NavigatePage;
     UsageCategory = Administration;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMagento;
 
 
     layout
@@ -22,7 +22,7 @@
                     Editable = false;
                     ShowCaption = false;
                     ToolTip = 'Specifies the value of the MediaResourcesStandard.Media Reference field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
             group(FinishedBanner)
@@ -36,7 +36,7 @@
                     Editable = false;
                     ShowCaption = false;
                     ToolTip = 'Specifies the value of the MediaResourcesDone.Media Reference field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
 
@@ -73,7 +73,7 @@
                     Caption = 'Magento Website';
                     part(MagentoWebsites; "NPR Website List WP")
                     {
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                     }
                 }
@@ -88,7 +88,7 @@
                     Caption = 'Magento Store';
                     part(MagentoStores; "NPR Stores WP")
                     {
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                     }
                 }
@@ -103,7 +103,7 @@
                     Caption = 'Magento Customer Mapping';
                     part(MagentCustMappings; "NPR Customer Mapping WP")
                     {
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                     }
                 }
@@ -118,7 +118,7 @@
                     Caption = 'Magento Payment Gateway';
                     part(MagentoPaymentGateways; "NPR Payment Gateways WP")
                     {
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                     }
                 }
@@ -133,7 +133,7 @@
                     Caption = 'Magento Payment Mapping';
                     part(MagentoPaymentMappings; "NPR Payment Mapping WP")
                     {
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                     }
                 }
@@ -148,7 +148,7 @@
                     Caption = 'Magento Shippment Mapping';
                     part(MagentoShippingMappings; "NPR Shipment Mapping WP")
                     {
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                     }
                 }
@@ -163,7 +163,7 @@
                     Caption = 'Magento Brand';
                     part(MagentoBrands; "NPR Brands WP")
                     {
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                     }
                 }
@@ -178,7 +178,7 @@
                     Caption = 'Magento Display Group';
                     part(MagentoDisplayGroups; "NPR Display Groups WP")
                     {
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                     }
                 }
@@ -193,7 +193,7 @@
                     Caption = 'Magento Display Config';
                     part(MagentoDisplayConfigs; "NPR Display Config WP")
                     {
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                     }
                 }
@@ -221,7 +221,7 @@
                             Visible = not MagentoStoreDataFilledIn;
                             label(MagentoStoreLabel)
                             {
-                                ApplicationArea = NPRRetail;
+                                ApplicationArea = NPRMagento;
                                 Caption = '- Magento Store';
                                 ToolTip = 'Specifies the value of the MagentoStoreLabel field';
                             }
@@ -232,7 +232,7 @@
                             Visible = not MagentoWebsiteDataFilledIn;
                             label(MagentoWebsiteLabel)
                             {
-                                ApplicationArea = NPRRetail;
+                                ApplicationArea = NPRMagento;
                                 Caption = '- Magento Website';
                                 ToolTip = 'Specifies the value of the MagentoWebsiteLabel field';
                             }
@@ -243,7 +243,7 @@
                             Visible = not MagentoCustomerMappingDataFilledIn;
                             label(MagentoCustomerMappingLabel)
                             {
-                                ApplicationArea = NPRRetail;
+                                ApplicationArea = NPRMagento;
                                 Caption = '- Magento Customer Mapping';
                                 ToolTip = 'Specifies the value of the MagentoCustomerMappingLabel field';
                             }
@@ -254,7 +254,7 @@
                             Visible = not MagentoPaymentGatewayDataFilledIn;
                             label(MagentoPaymentGatewayLabel)
                             {
-                                ApplicationArea = NPRRetail;
+                                ApplicationArea = NPRMagento;
                                 Caption = '- Magento Payment Gateway';
                                 ToolTip = 'Specifies the value of the MagentoPaymentGatewayLabel field';
                             }
@@ -265,7 +265,7 @@
                             Visible = not MagentoPaymentMappingDataFilledIn;
                             label(MagentoPaymentMappingLabel)
                             {
-                                ApplicationArea = NPRRetail;
+                                ApplicationArea = NPRMagento;
                                 Caption = '- Magento Payment Mapping';
                                 ToolTip = 'Specifies the value of the MagentoPaymentMappingLabel field';
                             }
@@ -276,7 +276,7 @@
                             Visible = not MagentoShippmentMappingDataFilledIn;
                             label(MagentoShippmentMappingLabel)
                             {
-                                ApplicationArea = NPRRetail;
+                                ApplicationArea = NPRMagento;
                                 Caption = '- Magento Shippment Mapping';
                                 ToolTip = 'Specifies the value of the MagentoShippmentMappingLabel field';
                             }
@@ -287,7 +287,7 @@
                             Visible = not MagentoBrandDataFilledIn;
                             label(MagentoBrandsLabel)
                             {
-                                ApplicationArea = NPRRetail;
+                                ApplicationArea = NPRMagento;
                                 Caption = '- Magento Brand';
                                 ToolTip = 'Specifies the value of the MagentoBrandLabel field';
                             }
@@ -298,7 +298,7 @@
                             Visible = not MagentoDisplayGroupDataFilledIn;
                             label(MagentoDisplayGroupLabel)
                             {
-                                ApplicationArea = NPRRetail;
+                                ApplicationArea = NPRMagento;
                                 Caption = '- Magento Display Group';
                                 ToolTip = 'Specifies the value of the MagentoDisplayGroupLabel field';
                             }
@@ -309,7 +309,7 @@
                             Visible = not MagentoDisplayConfigDataFilledIn;
                             label(MagentoDisplayConfigLabel)
                             {
-                                ApplicationArea = NPRRetail;
+                                ApplicationArea = NPRMagento;
                                 Caption = '- Magento Display Config';
                                 ToolTip = 'Specifies the value of the MagentoDisplayConfigLabel field';
                             }
@@ -335,7 +335,7 @@
                             Visible = MagentoStoreDataFilledIn;
                             label(MagentoStoreLabel1)
                             {
-                                ApplicationArea = NPRRetail;
+                                ApplicationArea = NPRMagento;
                                 Caption = '- Magento Store';
                                 ToolTip = 'Specifies the value of the MagentoStoreLabel field';
                             }
@@ -346,7 +346,7 @@
                             Visible = MagentoWebsiteDataFilledIn;
                             label(MagentoWebsiteLabel1)
                             {
-                                ApplicationArea = NPRRetail;
+                                ApplicationArea = NPRMagento;
                                 Caption = '- Magento Website';
                                 ToolTip = 'Specifies the value of the MagentoWebsiteLabel field';
                             }
@@ -357,7 +357,7 @@
                             Visible = MagentoCustomerMappingDataFilledIn;
                             label(MagentoCustomerMappingLabel1)
                             {
-                                ApplicationArea = NPRRetail;
+                                ApplicationArea = NPRMagento;
                                 Caption = '- Magento Customer Mapping';
                                 ToolTip = 'Specifies the value of the MagentoCustomerMappingLabel field';
                             }
@@ -368,7 +368,7 @@
                             Visible = MagentoPaymentGatewayDataFilledIn;
                             label(MagentoPaymentGatewayLabel1)
                             {
-                                ApplicationArea = NPRRetail;
+                                ApplicationArea = NPRMagento;
                                 Caption = '- Magento Payment Gateway';
                                 ToolTip = 'Specifies the value of the MagentoPaymentGatewayLabel field';
                             }
@@ -379,7 +379,7 @@
                             Visible = MagentoPaymentMappingDataFilledIn;
                             label(MagentoPaymentMappingLabel1)
                             {
-                                ApplicationArea = NPRRetail;
+                                ApplicationArea = NPRMagento;
                                 Caption = '- Magento Payment Mapping';
                                 ToolTip = 'Specifies the value of the MagentoPaymentMappingLabel field';
                             }
@@ -390,7 +390,7 @@
                             Visible = MagentoShippmentMappingDataFilledIn;
                             label(MagentoShippmentMappingLabel1)
                             {
-                                ApplicationArea = NPRRetail;
+                                ApplicationArea = NPRMagento;
                                 Caption = '- Magento Shippment Mapping';
                                 ToolTip = 'Specifies the value of the MagentoShippmentMappingLabel field';
                             }
@@ -401,7 +401,7 @@
                             Visible = MagentoBrandDataFilledIn;
                             label(MagentoBrandsLabel1)
                             {
-                                ApplicationArea = NPRRetail;
+                                ApplicationArea = NPRMagento;
                                 Caption = '- Magento Brand';
                                 ToolTip = 'Specifies the value of the MagentoBrandLabel field';
                             }
@@ -412,7 +412,7 @@
                             Visible = MagentoDisplayGroupDataFilledIn;
                             label(MagentoDisplayGroupLabel1)
                             {
-                                ApplicationArea = NPRRetail;
+                                ApplicationArea = NPRMagento;
                                 Caption = '- Magento Display Group';
                                 ToolTip = 'Specifies the value of the MagentoDisplayGroupLabel field';
                             }
@@ -423,7 +423,7 @@
                             Visible = MagentoDisplayConfigDataFilledIn;
                             label(MagentoDisplayConfigLabel1)
                             {
-                                ApplicationArea = NPRRetail;
+                                ApplicationArea = NPRMagento;
                                 Caption = '- Magento Display Config';
                                 ToolTip = 'Specifies the value of the MagentoDisplayConfigLabel field';
                             }
@@ -451,7 +451,7 @@
                 Image = PreviousRecord;
                 InFooterBar = true;
                 ToolTip = 'Executes the Back action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
                 trigger OnAction();
                 begin
@@ -466,7 +466,7 @@
                 Image = NextRecord;
                 InFooterBar = true;
                 ToolTip = 'Executes the Next action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
                 trigger OnAction();
                 begin
@@ -481,7 +481,7 @@
                 Image = Approve;
                 InFooterBar = true;
                 ToolTip = 'Executes the Finish action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
                 trigger OnAction();
                 begin

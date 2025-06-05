@@ -21,27 +21,27 @@
 
                     Editable = false;
                     ToolTip = 'Specifies the value of the Webshop field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Store Code"; Rec."Store Code")
                 {
 
                     Editable = false;
                     ToolTip = 'Specifies the value of the Store Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Website Code"; Rec."Website Code")
                 {
 
                     Editable = false;
                     ToolTip = 'Specifies the value of the Website Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Enabled; Rec.Enabled)
                 {
 
                     ToolTip = 'Specifies the value of the Enabled field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnValidate()
                     begin
@@ -54,7 +54,7 @@
                     Caption = 'Fields Enabled';
                     Editable = false;
                     ToolTip = 'Specifies the value of the Fields Enabled field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }

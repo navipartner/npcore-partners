@@ -5,7 +5,7 @@
     PageType = List;
     SourceTable = "NPR Magento Tax Class";
     UsageCategory = Administration;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMagento;
 
 
     layout
@@ -18,20 +18,20 @@
                 {
 
                     ToolTip = 'Specifies the value of the Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Type; Rec.Type)
                 {
 
                     ToolTip = 'Specifies the value of the Type field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Customer Config. Template Code"; Rec."Customer Config. Template Code")
                 {
 
                     Enabled = Rec."Type" = Rec."Type"::Customer;
                     ToolTip = 'Specifies the value of the Customer Config. Template Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }
@@ -51,7 +51,7 @@
                 PromotedIsBig = true;
 
                 ToolTip = 'Executes the Setup Tax Classes action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
                 trigger OnAction()
                 begin

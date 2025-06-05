@@ -19,25 +19,25 @@
                 {
 
                     ToolTip = 'Specifies the value of the Attribute ID field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Description; Rec.Description)
                 {
 
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Position; Rec.Position)
                 {
 
                     ToolTip = 'Specifies the value of the Position field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Attribute Group ID"; Rec."Attribute Group ID")
                 {
 
                     ToolTip = 'Specifies the value of the Attribute Group ID field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }

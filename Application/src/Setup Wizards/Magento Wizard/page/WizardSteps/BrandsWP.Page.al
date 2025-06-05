@@ -20,7 +20,7 @@
 
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the Id field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnValidate()
                     begin
@@ -31,19 +31,19 @@
                 {
 
                     ToolTip = 'Specifies the value of the Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Picture; Rec.Picture)
                 {
 
                     ToolTip = 'Specifies the value of the Picture field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Sorting"; Rec.Sorting)
                 {
 
                     ToolTip = 'Specifies the value of the Sorting field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }

@@ -18,7 +18,7 @@
                 Style = Strong;
                 StyleExpr = TRUE;
                 ToolTip = 'Specifies the value of the StatusText field';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
             }
 #IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
             usercontrol(chart; BusinessChart)
@@ -26,7 +26,7 @@
             usercontrol(chart; "Microsoft.Dynamics.Nav.Client.BusinessChart")
 #ENDIF
             {
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
                 trigger AddInReady()
                 begin
@@ -51,7 +51,7 @@
 
                     ToolTip = 'Executes the Day action';
                     Image = Calendar;
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnAction()
                     begin
@@ -66,7 +66,7 @@
 
                     ToolTip = 'Executes the Week action';
                     Image = Calendar;
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnAction()
                     begin
@@ -81,7 +81,7 @@
 
                     ToolTip = 'Executes the Month action';
                     Image = Calendar;
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnAction()
                     begin
@@ -96,7 +96,7 @@
 
                     ToolTip = 'Executes the Quarter action';
                     Image = Calendar;
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnAction()
                     begin
@@ -111,7 +111,7 @@
 
                     ToolTip = 'Executes the Year action';
                     Image = Calendar;
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnAction()
                     begin
@@ -127,7 +127,7 @@
                 Image = PreviousRecord;
 
                 ToolTip = 'Executes the Previous action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
                 trigger OnAction()
                 begin
@@ -141,7 +141,7 @@
                 Image = NextRecord;
 
                 ToolTip = 'Executes the Next action';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
                 trigger OnAction()
                 begin

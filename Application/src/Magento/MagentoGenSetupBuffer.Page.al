@@ -10,7 +10,7 @@
 
     SourceTable = "NPR Magento Gen. Setup Buffer";
     SourceTableTemporary = true;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMagento;
 
     layout
     {
@@ -28,21 +28,21 @@
                     Style = Strong;
                     StyleExpr = Rec.Container;
                     ToolTip = 'Specifies the value of the Field Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Value; Rec.Value)
                 {
 
                     Enabled = NOT Rec.Container;
                     ToolTip = 'Specifies the value of the Value field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Data Type"; Rec."Data Type")
                 {
 
                     Enabled = false;
                     ToolTip = 'Specifies the value of the Data Type field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }

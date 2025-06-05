@@ -21,37 +21,37 @@ pageextension 6014452 "NPR Contact Card" extends "Contact Card"
                 {
 
                     ToolTip = 'Specifies if the contact will be a Magento Contact.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("NPR Magento Customer Group"; Rec."NPR Magento Customer Group")
                 {
 
                     ToolTip = 'Specifies the Customer Group for the Magento Contact.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("NPR Magento Payment Methods"; Rec."NPR Magento Payment Methods")
                 {
 
                     ToolTip = 'Specifies the payment method information of the Magento Contact.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("NPR Magento Shipment Methods"; Rec."NPR Magento Shipment Methods")
                 {
 
                     ToolTip = 'Specifies the Magento contact''s shipment method information.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("NPR Magento Account Status"; Rec."NPR Magento Account Status")
                 {
 
                     ToolTip = 'Allows you to activate or block a Magento Contact';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("NPR Magento Price Visibility"; Rec."NPR Magento Price Visibility")
                 {
 
                     ToolTip = 'Specifies whether Magento Prices will be visible for the contact';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 group("NPR First And Last Name")
                 {
@@ -62,13 +62,13 @@ pageextension 6014452 "NPR Contact Card" extends "Contact Card"
                     {
                         Importance = Additional;
                         ToolTip = 'Specifies the First Name of the contact and allows additional name details.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("NPR Surname"; Rec.Surname)
                     {
                         Importance = Additional;
                         ToolTip = 'Specifies the Surname of the contact and allows additional name details.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
             }
@@ -130,7 +130,7 @@ pageextension 6014452 "NPR Contact Card" extends "Contact Card"
                     Image = UserCertificate;
 
                     ToolTip = 'Resets the password for Magento.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnAction()
                     var

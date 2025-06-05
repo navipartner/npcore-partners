@@ -17,37 +17,37 @@
                 {
 
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Price; Rec.Price)
                 {
 
                     ToolTip = 'Specifies the value of the Price field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Price Type"; Rec."Price Type")
                 {
 
                     ToolTip = 'Specifies the value of the Price Type field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Sales Type"; Rec."Sales Type")
                 {
 
                     ToolTip = 'Specifies the value of the Sales Type field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Sales No."; Rec."Sales No.")
                 {
 
                     ToolTip = 'Specifies the value of the Sales No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Price Includes VAT"; Rec."Price Includes VAT")
                 {
 
                     ToolTip = 'Specifies the value of the Price Includes VAT field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }

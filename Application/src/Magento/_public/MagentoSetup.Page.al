@@ -6,7 +6,7 @@
     RefreshOnActivate = true;
     SourceTable = "NPR Magento Setup";
     UsageCategory = Administration;
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMagento;
     layout
     {
         area(content)
@@ -19,13 +19,13 @@
                 {
 
                     ToolTip = 'Specifies if Magento is enabled or not.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Magento Version"; Rec."Magento Version")
                 {
 
                     ToolTip = 'Specifies the Magento version.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnValidate()
                     begin
@@ -36,7 +36,7 @@
                 {
 
                     ToolTip = 'Specifies the Magento URL.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 group("Magento Api")
                 {
@@ -47,12 +47,12 @@
 
                         Importance = Additional;
                         ToolTip = 'Specifies the API URL.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
 
                     field(AuthType; Rec.AuthType)
                     {
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                         Tooltip = 'Specifies the Authorization Type.';
 
                         trigger OnValidate()
@@ -69,19 +69,19 @@
                         field("Automatic Username"; Rec."Automatic Username")
                         {
                             ToolTip = 'Specifies if the Basic Username is automatically generated';
-                            ApplicationArea = NPRRetail;
+                            ApplicationArea = NPRMagento;
                         }
                         field("Api Username"; Rec."Api Username")
                         {
                             Enabled = not Rec."Automatic Username";
                             ToolTip = 'Specifies the API Username.';
-                            ApplicationArea = NPRRetail;
+                            ApplicationArea = NPRMagento;
                         }
                         field(Password; Password)
                         {
                             Caption = 'API Password';
                             ToolTip = 'Specifies the API Password.';
-                            ApplicationArea = NPRRetail;
+                            ApplicationArea = NPRMagento;
 
                             trigger OnValidate()
                             begin
@@ -102,7 +102,7 @@
                         Visible = IsOAuth2Visible;
                         field("OAuth2 Setup Code"; Rec."OAuth2 Setup Code")
                         {
-                            ApplicationArea = NPRRetail;
+                            ApplicationArea = NPRMagento;
                             ToolTip = 'Specifies the OAuth2.0 Setup Code.';
                         }
                     }
@@ -114,7 +114,7 @@
                         field("Api Authorization"; Rec."Api Authorization")
                         {
                             ToolTip = 'Specifies the API Authorization.';
-                            ApplicationArea = NPRRetail;
+                            ApplicationArea = NPRMagento;
                         }
                     }
                 }
@@ -123,47 +123,47 @@
             {
                 field("Products Xml Templates Enabled"; Rec."Products XmlTemplates Enabled")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'Downloads XML Templates for products from Azure Blob Storage.';
                 }
                 field("Stock Updat. XmlTempl. Enabled"; Rec."Stock Updat. XmlTempl. Enabled")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'Downloads XML Templates for Stock updates from Azure Blob Storage.';
                 }
                 field("Product Att. XmlTempl. Enabled"; Rec."Product Att. XmlTempl. Enabled")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'Downloads XML Templates for Product Attributes from Azure Blob Storage.';
                 }
                 field("Prod. Attr. Sets XmlTem. Enab."; Rec."Prod. Attr. Sets XmlTem. Enab.")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'Downloads XML Templates for Product Attribute Sets from Azure Blob Storage.';
                 }
                 field("Order Updat. XmlTempl. Enabled"; Rec."Order Updat. XmlTempl. Enabled")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'Downloads XML Templates for Order Updates from Azure Blob Storage.';
                 }
                 field("Multi Store XmlTempl. Enabled"; Rec."Multi Store XmlTempl. Enabled")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'Downloads XML Templates for Multi Stores from Azure Blob Storage.';
                 }
                 field("Ticket Adm. XmlTempl. Enabled"; Rec."Ticket Adm. XmlTempl. Enabled")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'Downloads XML Templates for Ticket Admission from Azure Blob Storage.';
                 }
                 field("Coll. Stores XmlTempl. Enabled"; Rec."Coll. Stores XmlTempl. Enabled")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'Downloads XML Templates for Collect Stores from Azure Blob Storage.';
                 }
                 field("Delete Cust. XmlTempl. Enabled"; Rec."Delete Cust. XmlTempl. Enabled")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'Downloads XML Templates for Delete Customer from Azure Blob Storage.';
                 }
             }
@@ -175,7 +175,7 @@
 
                 field("MSI Integration Area Enabled"; Rec."MSI Integration Area Enabled")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'Specifies if the Multi Source Integration integration is enabled';
 
                     trigger OnValidate()
@@ -197,7 +197,7 @@
                 {
 
                     ToolTip = 'Specifies the Variant System.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnValidate()
                     begin
@@ -212,7 +212,7 @@
                     {
 
                         ToolTip = 'Specifies the picture variety.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
                 group(Control6151446)
@@ -223,27 +223,27 @@
                     {
 
                         ToolTip = 'This setup enables differentiation of variant pictures.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
                 field("Miniature Picture"; Rec."Miniature Picture")
                 {
 
                     ToolTip = 'Specifies the miniature version of the picture.Note that Line Picture might affect performance on the Picture List.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Max. Picture Size"; Rec."Max. Picture Size")
                 {
 
                     ToolTip = 'Specifies the maximum picture size in kilobates.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Auto Seo Link Disabled"; Rec."Auto Seo Link Disabled")
                 {
 
                     Importance = Additional;
                     ToolTip = 'Specifies if the Auto SEO Link is disabled or not.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 group("B2C Modules")
                 {
@@ -252,55 +252,55 @@
                     {
 
                         ToolTip = 'Specifies if the multistore feature is enabled or not.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Brands Enabled"; Rec."Brands Enabled")
                     {
 
                         ToolTip = 'Specifies if the brands feature is enabled or not';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Attributes Enabled"; Rec."Attributes Enabled")
                     {
 
                         ToolTip = 'Specifies if the attributes feature is enabled or not.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Product Relations Enabled"; Rec."Product Relations Enabled")
                     {
 
                         ToolTip = 'Specifies if the product relations are enabled or not.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Special Prices Enabled"; Rec."Special Prices Enabled")
                     {
 
                         ToolTip = 'Specifies if the special prices feature is enabled or not.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Tier Prices Enabled"; Rec."Tier Prices Enabled")
                     {
 
                         ToolTip = 'Specifies if the tier prices feature is enabled or not.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Customer Group Prices Enabled"; Rec."Customer Group Prices Enabled")
                     {
 
                         ToolTip = 'Specifies if the customer group prices feature is enabled or not.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Gift Voucher Enabled"; Rec."Gift Voucher Enabled")
                     {
 
                         ToolTip = 'Specifies if gift vouchers are enabled or not.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Custom Options Enabled"; Rec."Custom Options Enabled")
                     {
 
                         ToolTip = 'Specifies if custom options are enabled or not.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                         trigger OnValidate()
                         var
@@ -314,7 +314,7 @@
                     {
 
                         ToolTip = 'Specifies if the bundled products are enabled or not.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     group(Control6150658)
                     {
@@ -324,14 +324,14 @@
                         {
 
                             ToolTip = 'Specifies if custom options numbers are enabled or not.';
-                            ApplicationArea = NPRRetail;
+                            ApplicationArea = NPRMagento;
                         }
                     }
                     field("Tickets Enabled"; Rec."Tickets Enabled")
                     {
 
                         ToolTip = 'Specifies if the tickets feature is enabled or not.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     group(Control6151449)
                     {
@@ -341,7 +341,7 @@
                         {
 
                             ToolTip = 'Specifies if the collect in store feature is enabled or not.';
-                            ApplicationArea = NPRRetail;
+                            ApplicationArea = NPRMagento;
                         }
                     }
                 }
@@ -353,25 +353,25 @@
                     {
 
                         ToolTip = 'Specifies if the customers are enabled or not.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Sales Prices Enabled"; Rec."Sales Prices Enabled")
                     {
 
                         ToolTip = 'Specifies if the sales prices feature is enabled or not.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Sales Line Discounts Enabled"; Rec."Sales Line Discounts Enabled")
                     {
 
                         ToolTip = 'Specifies if the sales line discounts are enabled or not.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Item Disc. Group Enabled"; Rec."Item Disc. Group Enabled")
                     {
 
                         ToolTip = 'Specifies if the item discount group feature is enabled or not.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
             }
@@ -384,14 +384,14 @@
 
                     ShowMandatory = true;
                     ToolTip = 'Specifies the from collect store code.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("NpCs Workflow Code"; Rec."NpCs Workflow Code")
                 {
 
                     ShowMandatory = true;
                     ToolTip = 'Specifies the collect in store workflow code.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
             part(NpCsStoreCardWorkflows; "NPR NpCs Store Card Workflows")
@@ -400,7 +400,7 @@
                 Editable = (Rec."NpCs Workflow Code" <> '');
                 SubPageLink = "Workflow Code" = FIELD("NpCs Workflow Code");
                 Visible = Rec."Collect in Store Enabled";
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
             }
             group(GiftVoucher)
@@ -411,43 +411,43 @@
                 {
 
                     ToolTip = 'Enable the gift voucher.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Gift Voucher Item No."; Rec."Gift Voucher Item No.")
                 {
 
                     ToolTip = 'Specifies the gift voucher item number.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Gift Voucher Account No."; Rec."Gift Voucher Account No.")
                 {
 
                     ToolTip = 'Specifies the gift voucher account number.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Gift Voucher Report"; Rec."Gift Voucher Report")
                 {
 
                     ToolTip = 'Specifies the gift voucher report.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Gift Voucher Language Code"; Rec."Gift Voucher Language Code")
                 {
 
                     ToolTip = 'Specifies the gift voucher language code.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Gift Voucher Valid Period"; Rec."Gift Voucher Valid Period")
                 {
 
                     ToolTip = 'Specifies the gift voucher validity period.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Gift Voucher Code Pattern"; Rec."Gift Voucher Code Pattern")
                 {
 
                     ToolTip = 'Specifies the gift voucher code pattern.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
             group(CreditVoucher)
@@ -458,31 +458,31 @@
                 {
 
                     ToolTip = 'Specifies the credit voucher account number.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Credit Voucher Report"; Rec."Credit Voucher Report")
                 {
 
                     ToolTip = 'Specifies the credit voucher report';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Credit Voucher Language Code"; Rec."Credit Voucher Language Code")
                 {
 
                     ToolTip = 'Specifies the credit voucher language code.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Credit Voucher Valid Period"; Rec."Credit Voucher Valid Period")
                 {
 
                     ToolTip = 'Specifies the credit voucher validity period.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Credit Voucher Code Pattern"; Rec."Credit Voucher Code Pattern")
                 {
 
                     ToolTip = 'Specifies the credit voucher code pattern.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
             group("Replicate Special Price")
@@ -493,7 +493,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Replicate to Sales Prices field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 group(Control6151429)
                 {
@@ -503,7 +503,7 @@
                     {
 
                         ToolTip = 'Specifies the replication to sales prices.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     group(Control6151427)
                     {
@@ -514,7 +514,7 @@
 
                             ShowMandatory = true;
                             ToolTip = 'Specifies the replication to sales code.';
-                            ApplicationArea = NPRRetail;
+                            ApplicationArea = NPRMagento;
                         }
                     }
                 }
@@ -526,7 +526,7 @@
                 {
 
                     ToolTip = 'Specifies the Stock calculation method.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnValidate()
                     begin
@@ -542,7 +542,7 @@
 
                         ShowMandatory = true;
                         ToolTip = 'Specifies the stock function name.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                         trigger OnValidate()
                         begin
@@ -554,20 +554,20 @@
 
                         Editable = false;
                         ToolTip = 'Specifies the stock codeunit ID.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Stock Codeunit Name"; Rec."Stock Codeunit Name")
                     {
 
                         ToolTip = 'Specifies the stock codeunit name.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
                 field("Stock NpXml Template"; Rec."Stock NpXml Template")
                 {
 
                     ToolTip = 'Specifies the stock npXml template.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnValidate()
                     begin
@@ -582,27 +582,27 @@
                     {
 
                         ToolTip = 'Specifies the inventory location filter.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
                 field("Intercompany Inventory Enabled"; Rec."Intercompany Inventory Enabled")
                 {
 
                     ToolTip = 'Specifies if the intercompany inventory is enabled or not.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 part("Inventory Companies"; "NPR Magento Inv. Companies")
                 {
                     Caption = 'Inventory Companies';
                     ShowFilter = false;
                     Visible = Rec."Intercompany Inventory Enabled";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                 }
                 field("Auto Transfer Order Enabled"; Rec."Auto Transfer Order Enabled")
                 {
                     ToolTip = 'Specifies if Transfer orders will be automatically created when ordered quantity of Item is greater than available quantity of that Item in Location which is configured on Magento Website. If you enable this, you should go to page "Replenishment Transfer Mapping" and configure it.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 group(AutoTransfer)
                 {
@@ -611,7 +611,7 @@
                     field("Auto Create Req. Lines"; Rec."Auto Create Req. Lines")
                     {
                         ToolTip = 'Specifies if Requisiton lines will be automatically created when needed quantity of Item is was not found in Locations from "Replenishment Transfer Mapping". If you enable this, you should go configure "Req. Worsheet Template Code".';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
                 group(RequisitionLines)
@@ -621,12 +621,12 @@
                     field("Req. Worsheet Template Code"; Rec."Req. Worsheet Template Code")
                     {
                         ToolTip = 'Specifies Req. Worsheet Template Code in which requisition lines will be created, for Items and Quantities which were not found in Locations from "Replenishment Transfer Mapping".';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Req. Worsheet Jnl. Batch Name"; Rec."Req. Worsheet Jnl. Batch Name")
                     {
                         ToolTip = 'Specifies Req. Worsheet Template Code in which requisition lines will be created, for Items and Quantities which were not found in Locations from "Replenishment Transfer Mapping".';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
                 group(IncomingQuantites)
@@ -636,7 +636,7 @@
                     field("Include Projected quantities"; Rec."Include Projected Quantities")
                     {
                         ToolTip = 'Specifies if "Incoming" quantities (from Purchase Orders, Transfer Orders, Requision Lines...) will be included in the availability calculation. If this field is disabled it will consider actual stocks only.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
                 group(IncomingQuantitiesPeriod)
@@ -646,7 +646,7 @@
                     field("Projected. Qty. within period"; Rec."Projected. Qty. Within Period")
                     {
                         ToolTip = 'Specifies the incoming period (DateTime formula) used for culation of available quantity in the future (from Purchase Orders, Transfer Orders, Requision Lines...).';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
             }
@@ -656,7 +656,7 @@
                 {
 
                     ToolTip = 'Specifies the customer update mode.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 group(Control6151460)
                 {
@@ -667,14 +667,14 @@
 
                         ShowMandatory = true;
                         ToolTip = 'Specifies the fixed customer number.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
                 field("Customer Mapping"; Rec."Customer Mapping")
                 {
 
                     ToolTip = 'Specifies the customer mapping.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 group(Control6151428)
                 {
@@ -686,7 +686,7 @@
                     field("Customer Posting Group"; Rec."Customer Posting Group")
                     {
                         ToolTip = 'Specifies the customer posting group.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                         ObsoleteState = Pending;
                         ObsoleteTag = '2023-06-28';
                         ObsoleteReason = 'Not in use anymore.';
@@ -695,7 +695,7 @@
                     field("Payment Terms Code"; Rec."Payment Terms Code")
                     {
                         ToolTip = 'Specifies the payment terms code.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                         ObsoleteState = Pending;
                         ObsoleteTag = '2023-06-28';
                         ObsoleteReason = 'Not in use anymore.';
@@ -707,13 +707,13 @@
                 {
 
                     ToolTip = 'Specifies the customer template code.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Customer Config. Template Code"; Rec."Customer Config. Template Code")
                 {
 
                     ToolTip = 'Specifies the customer configuration template.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
             group("Order Import")
@@ -724,44 +724,44 @@
 
                     ToolTip = 'Specifies the payment fee account number.';
 
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
 
                     ToolTip = 'Specifies the salesperson code.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Release Order on Import"; Rec."Release Order on Import")
                 {
 
                     ToolTip = 'Specifies if the release order on import is enabled or not.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Send Order Confirmation"; Rec."Send Order Confirmation")
                 {
 
                     ToolTip = 'Specifies if the send order confirmation is enabled or not.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("E-mail Template (Order Conf.)"; Rec."E-mail Template (Order Conf.)")
                 {
 
                     ToolTip = 'Specifies the E-mail template of order confirmation.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Use Blank Code for LCY"; Rec."Use Blank Code for LCY")
                 {
 
                     ToolTip = 'Specifies if the use blank code for the local currency is enabled or not.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("E-mail Retail Vouchers to"; Rec."E-mail Retail Vouchers to")
                 {
 
                     ToolTip = 'Specifies the E-mail retail vouchers.';
 
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 group("Post On Import")
                 {
@@ -770,24 +770,24 @@
                     {
 
                         ToolTip = 'Immediately post Sales Order Lines for new Retail Vouchers';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Post Tickets on Import"; Rec."Post Tickets on Import")
                     {
 
                         ToolTip = 'Specifies if the post tickets on import is enabled or not.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Post Memberships on Import"; Rec."Post Memberships on Import")
                     {
 
                         ToolTip = 'Specifies if the post memberships on import is enabled or not.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                     field("Prevent posting if commented"; Rec."Prevent posting if commented")
                     {
                         ToolTip = 'Specifies if automatic Post On Import will be skipped if WEB Order has comments (Record links)';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
                     }
                 }
             }
@@ -797,7 +797,7 @@
 
                 part(Control6151459; "NPR Magento Setup PostOnImport")
                 {
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }
@@ -821,7 +821,7 @@
                         Image = Setup;
 
                         ToolTip = 'Opens the page to setup Magento API credentials.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                         trigger OnAction()
                         var
@@ -837,7 +837,7 @@
                         Image = Setup;
 
                         ToolTip = 'Opens the page to setup magento websites.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                         trigger OnAction()
                         var
@@ -853,7 +853,7 @@
                         Image = Setup;
 
                         ToolTip = 'Opens the page to setup Magento customer groups.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                         trigger OnAction()
                         var
@@ -874,7 +874,7 @@
                         Visible = HasSetupCategories;
 
                         ToolTip = 'Opens the page to setup categories.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                         trigger OnAction()
                         var
@@ -895,7 +895,7 @@
                         Visible = HasSetupBrands;
 
                         ToolTip = 'Opens the page to setup brands.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                         trigger OnAction()
                         var
@@ -916,7 +916,7 @@
                         Image = Setup;
 
                         ToolTip = 'Opens the page to setup Magento tax classes.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                         trigger OnAction()
                         var
@@ -932,7 +932,7 @@
                         Image = Setup;
 
                         ToolTip = 'Opens the page to setup VAT Business Posting Groups.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                         trigger OnAction()
                         var
@@ -949,7 +949,7 @@
                         Image = Setup;
 
                         ToolTip = 'Opens the page to setup VAT Product Posting Groups.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                         trigger OnAction()
                         var
@@ -971,7 +971,7 @@
                         Image = Setup;
 
                         ToolTip = 'Opens the page to setup Payment Method Mapping.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                         trigger OnAction()
                         var
@@ -988,7 +988,7 @@
                         Image = Setup;
 
                         ToolTip = 'Opens the page to setup Shipment Method Mapping.';
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                         trigger OnAction()
                         var
@@ -1011,7 +1011,7 @@
                         Caption = 'Create Entra ID App';
                         ToolTip = 'Running this action will create a Microsoft Entra ID App and an accompanying client secret.';
                         Image = Setup;
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                         trigger OnAction()
                         var
@@ -1025,7 +1025,7 @@
                         Caption = 'Create Entra ID App Secret';
                         ToolTip = 'Running this action will create a client secret for an existing Microsoft Entra ID App.';
                         Image = Setup;
-                        ApplicationArea = NPRRetail;
+                        ApplicationArea = NPRMagento;
 
                         trigger OnAction()
                         var
@@ -1063,7 +1063,7 @@
                 PromotedIsBig = true;
 
                 ToolTip = 'Opens the page to setup Import Types.';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
                 trigger OnAction()
                 var
@@ -1082,7 +1082,7 @@
                     Visible = Rec."Magento Enabled";
 
                     ToolTip = 'Performs the resynchronization of internet items.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnAction()
                     var
@@ -1102,7 +1102,7 @@
                     Image = SuggestSalesPrice;
                     Visible = Rec."Replicate to Sales Prices" AND ((Rec."Replicate to Price Source Type" = Rec."Replicate to Price Source Type"::"All Customers") OR (Rec."Replicate to Sales Code" <> ''));
                     ToolTip = 'Replicates special prices to sales prices.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnAction()
                     var
@@ -1121,7 +1121,7 @@
                     Image = ListPage;
 
                     ToolTip = 'Shows a list of all Magento Contacts';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnAction()
                     var
@@ -1141,7 +1141,7 @@
                 RunObject = Page "NPR Magento Setup Event Subs.";
 
                 ToolTip = 'Opens the Event Subscriptions page.';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
             }
             action("NPR Update Description")
             {
@@ -1149,7 +1149,7 @@
                 Promoted = true;
                 PromotedCategory = Process;
                 Image = Import;
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
                 ToolTip = 'Executes the Update Magento Description action. You will be asked for .CSV file from which data will be imported. File should have 3 columns/fields sorted as: Item No, Magento Description, Magento Short Description. Field separator is pipe (|) while field Delimiter, or somewhere called qualificator is quotation marks symbol ("). For example: "1000"|"Magento Description"|"Magento Short Description". Also, if the file contians special characters and you see them like this: Æ,æ,Ø,ø,Å,å,ß you should do replace command because they should be HTML encoded (including ; at the end): Æ is &AElig;  æ is &aelig;  Ø is &Oslash;  ø is &oslash;  Å is &Aring;  å is &aring;  ß is &szlig; ';
 
                 trigger OnAction()

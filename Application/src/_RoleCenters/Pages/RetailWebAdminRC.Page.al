@@ -46,7 +46,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Caption = 'Magento Setup';
                     Image = List;
                     RunObject = page "NPR Magento Setup";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Magento Setup';
                 }
                 action("Magento Websites Setup")
@@ -54,7 +54,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Caption = 'Magento Websites Setup';
                     Image = List;
                     RunObject = page "NPR Magento Websites";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Magento Websites Setup';
                 }
                 action("Magento Stores")
@@ -62,7 +62,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Caption = 'Magento Stores';
                     Image = List;
                     RunObject = page "NPR Magento Store List";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Magento Stores';
                 }
                 action("Magento Tax Classes")
@@ -70,7 +70,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Caption = 'Magento Tax Classes';
                     Image = List;
                     RunObject = page "NPR Magento Tax Classes";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Magento Tax Classes';
                 }
                 action("VAT Business Posting Groups Mapping")
@@ -78,7 +78,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Caption = 'VAT Business Posting Groups Mapping';
                     Image = List;
                     RunObject = page "NPR Magento VAT Bus. Groups";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the VAT Business Posting Groups Mapping';
                 }
                 action("VAT Product Posting Groups Mapping")
@@ -86,7 +86,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Caption = 'VAT Product Posting Groups Mapping';
                     Image = List;
                     RunObject = page "NPR Magento VAT Prod. Groups";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the VAT Product Posting Groups Mapping';
                 }
                 action("Magento Shipment Method Mapping")
@@ -94,7 +94,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Caption = 'Magento Shipment Method Mapping';
                     Image = List;
                     RunObject = page "NPR Magento Shipment Mapping";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Magento Shipment Method Mapping';
                 }
                 action("Magento Payment Method Mapping")
@@ -102,7 +102,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Caption = 'Magento Payment Method Mapping';
                     Image = List;
                     RunObject = page "NPR Magento Payment Mapping";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Magento Payment Method Mapping';
                 }
                 action("Magento Payment Gateway Setup")
@@ -110,7 +110,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Caption = 'Magento Payment Gateway Setup';
                     Image = List;
                     RunObject = page "NPR Magento Payment Gateways";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Payment Gateway Setup';
                 }
             }
@@ -122,7 +122,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Caption = 'Items/Product list';
                     Image = List;
                     RunObject = page "Item List";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Item List';
                 }
                 action("Magento Attributes")
@@ -130,7 +130,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Caption = 'Magento Attributes';
                     Image = List;
                     RunObject = page "NPR Magento Attributes";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Magento Attributes';
                 }
                 action("Magento Attribute Sets")
@@ -138,7 +138,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Caption = 'Magento Attribute Sets';
                     Image = List;
                     RunObject = page "NPR Magento Attribute Sets";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Magento Attribute Sets';
                 }
                 action("Magento Attribute Groups")
@@ -146,26 +146,23 @@ page 6059871 "NPR Retail Web Admin RC"
                     Caption = 'Magento Attribute Groups';
                     Image = List;
                     RunObject = page "NPR Magento Attr. Group List";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Magento Attribute Groups';
                 }
-
                 action("Magento Categories")
                 {
                     Caption = 'Magento Categories';
                     Image = List;
                     RunObject = page "NPR Magento Categories";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Magento Categories';
                 }
-
-
                 action("Magento Brands")
                 {
                     Caption = 'Magento Brands';
                     Image = List;
                     RunObject = page "NPR Magento Brands";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Magento Brands';
                 }
                 action("Magento Custom Options")
@@ -173,7 +170,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Caption = 'Magento Custom Options';
                     Image = List;
                     RunObject = page "NPR Magento Custom Option List";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Custom Options';
                 }
                 action("Magento Pictures")
@@ -181,7 +178,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Caption = 'Magento Pictures';
                     Image = Picture;
                     RunObject = page "NPR Magento Pictures";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Pictures';
                 }
             }
@@ -193,7 +190,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Caption = 'Customers';
                     Image = List;
                     RunObject = page "Customer List";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Customers';
                 }
                 action(Contact)
@@ -201,7 +198,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Caption = 'Contacts';
                     Image = List;
                     RunObject = page "Contact List";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Contacts';
                 }
                 action("Magento Customer Mapping")
@@ -209,7 +206,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Caption = 'Magento Customer Mapping';
                     Image = List;
                     RunObject = page "NPR Magento Customer Mapping";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Customer Mapping';
                 }
                 action("Customer Config. Templates")
@@ -218,7 +215,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Image = List;
                     RunObject = page "Config. Template List";
                     RunPageLink = "Table ID" = const(18);
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Customer Config. Templates';
                 }
                 action("Post Code")
@@ -226,7 +223,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Caption = 'Post Code';
                     Image = List;
                     RunObject = page "Post Codes";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Post Code';
                 }
                 action("Customer GDPR")
@@ -234,7 +231,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Caption = 'Customer GDPR';
                     Image = List;
                     RunObject = page "NPR Customer GDPR Setup";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Customer GDPR';
                 }
             }
@@ -246,7 +243,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Caption = 'Sales Orders';
                     Image = Document;
                     RunObject = page "Sales Order List";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Sales Orders';
                 }
 
@@ -255,7 +252,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Caption = 'Sales Invoices';
                     Image = Document;
                     RunObject = page "Sales Invoice List";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Sales Invoices';
                 }
                 action("Sales Shipment")
@@ -263,7 +260,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Caption = 'Sales Shipment';
                     Image = List;
                     RunObject = page "Posted Sales Shipments";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Sales Shipments';
                 }
                 action("Sales Credit Memos")
@@ -271,7 +268,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Caption = 'Sales Credit Memos';
                     Image = Document;
                     RunObject = page "Sales Credit Memos";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Sales Credit Memos';
                 }
                 action("Payment Lines")
@@ -279,7 +276,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Caption = 'Payment Lines';
                     Image = Document;
                     RunObject = page "NPR Magento Payment Line List";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Payment Lines';
                 }
                 action("Sales Return Orders")
@@ -287,7 +284,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Caption = 'Sales Return Orders';
                     Image = List;
                     RunObject = page "Sales Return Order List";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Sales Return Orders';
                 }
                 action("Posted Sales Invoices")
@@ -295,7 +292,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Caption = 'Posted Sales Invoices';
                     Image = List;
                     RunObject = page "Posted Sales Invoices";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Posted Sales Invoices';
                 }
                 action("Posted Sales Credit Memos")
@@ -303,7 +300,7 @@ page 6059871 "NPR Retail Web Admin RC"
                     Caption = 'Posted Sales Credit Memos';
                     Image = List;
                     RunObject = page "Posted Sales Credit Memos";
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     ToolTip = 'View or edit the Sales Credit Memos';
                 }
             }

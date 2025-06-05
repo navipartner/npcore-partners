@@ -19,7 +19,7 @@
 
                     ShowMandatory = true;
                     ToolTip = 'Specifies the value of the Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnValidate()
                     begin
@@ -30,7 +30,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Website Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         MagentoWebsites: Page "NPR Websites Select";
@@ -54,13 +54,13 @@
                 {
 
                     ToolTip = 'Specifies the value of the Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Language Code"; Rec."Language Code")
                 {
 
                     ToolTip = 'Specifies the value of the Language Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         Language: Record "Language";

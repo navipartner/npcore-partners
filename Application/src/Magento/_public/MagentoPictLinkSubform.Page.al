@@ -19,27 +19,27 @@
                 field("Picture Name"; Rec."Picture Name")
                 {
                     ToolTip = 'Specifies the value of the Picture Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Base Image"; Rec."Base Image")
                 {
                     ToolTip = 'Specifies the value of the Base Image field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Small Image"; Rec."Small Image")
                 {
                     ToolTip = 'Specifies the value of the Small Image field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Thumbnail; Rec.Thumbnail)
                 {
                     ToolTip = 'Specifies the value of the Thumbnail field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Short Text"; Rec."Short Text")
                 {
                     ToolTip = 'Specifies the value of the Short Text field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnValidate()
                     begin
@@ -49,7 +49,7 @@
                 field("Sorting"; Rec.Sorting)
                 {
                     ToolTip = 'Specifies the value of the Sorting field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }

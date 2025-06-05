@@ -6,7 +6,7 @@
     UsageCategory = Administration;
 
     SourceTable = "NPR Magento Video Link";
-    ApplicationArea = NPRRetail;
+    ApplicationArea = NPRMagento;
 
     layout
     {
@@ -18,7 +18,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Video Url field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnValidate()
                     begin
@@ -32,13 +32,13 @@
                 {
 
                     ToolTip = 'Specifies the value of the Sorting field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Short Text"; Rec."Short Text")
                 {
 
                     ToolTip = 'Specifies the value of the Short Text field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }

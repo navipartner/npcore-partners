@@ -12,7 +12,7 @@
         {
             usercontrol("Image Viewer"; "NPR Image Viewer")
             {
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
                 trigger ControlAddInReady()
                 begin

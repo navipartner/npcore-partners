@@ -61,28 +61,28 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
                 {
 
                     ToolTip = 'Specifies how the item on the Magento webstore will be grouped and displayed.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("NPR Magento Store Code"; Rec."NPR Magento Store Code")
                 {
 
                     Visible = (MagentoVersion >= 2);
                     ToolTip = 'View of the Magento store codes on webstore e.g Default,DK, EN.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("NPR Magento Shipping Group"; Rec."NPR Magento Shipping Group")
                 {
 
                     Visible = (MagentoVersion >= 2);
                     ToolTip = 'Specifies the shipping configuration group e.g GLS, Free shipping.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("NPR Magento Payment Group"; Rec."NPR Magento Payment Group")
                 {
 
                     Visible = (MagentoVersion >= 2);
                     ToolTip = 'Specifies the payment method for the item.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }

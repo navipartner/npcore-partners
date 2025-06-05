@@ -21,7 +21,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnDrillDown()
                     begin
@@ -33,7 +33,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Sales (Qty.)"; Rec."Sales (Qty.)")
                 {
@@ -41,7 +41,7 @@
                     BlankZero = true;
                     Caption = 'Sales (Qty.)';
                     ToolTip = 'Specifies the value of the Sales (Qty.) field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }
@@ -62,7 +62,7 @@
 
                     ToolTip = 'Filters by day';
                     Image = Filter;
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                     trigger OnAction()
                     begin
                         PeriodType := PeriodType::Day;
@@ -75,7 +75,7 @@
 
                     ToolTip = 'Filters by week';
                     Image = Filter;
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnAction()
                     begin
@@ -89,7 +89,7 @@
 
                     ToolTip = 'Filters by month';
                     Image = Filter;
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnAction()
                     begin
@@ -103,7 +103,7 @@
 
                     ToolTip = 'Filters by quarter';
                     Image = Filter;
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnAction()
                     begin
@@ -117,7 +117,7 @@
 
                     ToolTip = 'Filters by year';
                     Image = Filter;
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnAction()
                     begin

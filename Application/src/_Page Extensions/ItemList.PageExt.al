@@ -61,14 +61,14 @@ pageextension 6014433 "NPR Item List" extends "Item List"
             {
 
                 ToolTip = 'Specifies if the item will also be used as a Magento Item.';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
             }
 
             field("NPR Item Status"; Rec."NPR Item Status")
             {
 
                 ToolTip = 'Specifies if the item is active or not as a Magento Item.';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
             }
         }
 
@@ -196,7 +196,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                 Promoted = true;
                 PromotedCategory = Process;
                 Image = Import;
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
                 ToolTip = 'Executes the Update Magento Description action.';
                 ObsoleteState = Pending;
                 ObsoleteTag = '2023-06-28';
@@ -246,7 +246,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     Visible = MagentoEnabled;
 
                     ToolTip = 'Assign a picture to the item. You can either take a picture or import it.';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnAction()
                     var
@@ -270,7 +270,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     Visible = MagentoEnabled AND MagentoEnabledMultistore;
 
                     ToolTip = 'Executes the Webshops action';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnAction()
                     var
@@ -294,7 +294,7 @@ pageextension 6014433 "NPR Item List" extends "Item List"
                     Visible = MagentoEnabled AND MagentoEnabledDisplayConfig;
 
                     ToolTip = 'Executes the Display Config action';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnAction()
                     var

@@ -20,13 +20,13 @@
                 {
 
                     ToolTip = 'Specifies the value of the Website Code field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Website Name"; Rec."Website Name")
                 {
 
                     ToolTip = 'Specifies the value of the Website Name field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
         }

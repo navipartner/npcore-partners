@@ -26,13 +26,13 @@
                         {
                             Editable = false;
                             ToolTip = 'Specifies the value of the Item No. field';
-                            ApplicationArea = NPRRetail;
+                            ApplicationArea = NPRMagento;
                         }
                         field(Description; Rec.Value)
                         {
                             Editable = false;
                             ToolTip = 'Specifies the value of the Description field';
-                            ApplicationArea = NPRRetail;
+                            ApplicationArea = NPRMagento;
                         }
                     }
                 }
@@ -40,7 +40,7 @@
                 {
                     Caption = 'Pictures';
                     ShowFilter = false;
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
             part(MagentoPictureLinkSubform2; "NPR Magento Pict. Link Subform")
@@ -48,7 +48,7 @@
                 Caption = 'Pictures';
                 ShowFilter = false;
                 Visible = (NOT HasVariants);
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
             }
         }
         area(factboxes)
@@ -56,7 +56,7 @@
             part(MagentoPictureDragDropAddin; "NPR Magento DragDropPic. Addin")
             {
                 Caption = 'Magento Picture';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
                 Visible = HasVariants;
                 Provider = MagentoPictureLinkSubform;
                 SubPageLink = Type = const(Item),
@@ -66,7 +66,7 @@
             part(MagentoPictureDragDropAddin2; "NPR Magento DragDropPic. Addin")
             {
                 Caption = 'Magento Picture';
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
                 Visible = (not HasVariants);
                 Provider = MagentoPictureLinkSubform2;
                 SubPageLink = Type = const(Item),

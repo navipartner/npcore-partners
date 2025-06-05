@@ -15,7 +15,7 @@
                 {
 
                     ToolTip = 'Specifies the value of the No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnAssistEdit()
                     begin
@@ -26,13 +26,13 @@
                 {
 
                     ToolTip = 'Specifies the value of the Description field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Type; Rec.Type)
                 {
 
                     ToolTip = 'Specifies the value of the Type field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
 
                     trigger OnValidate()
                     begin
@@ -43,20 +43,20 @@
                 {
 
                     ToolTip = 'Specifies the value of the Required field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Position; Rec.Position)
                 {
 
                     ToolTip = 'Specifies the value of the Position field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Max Length"; Rec."Max Length")
                 {
 
                     Editable = MaxLengthEditable;
                     ToolTip = 'Specifies the value of the Max Length field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field(Price; Rec.Price)
                 {
@@ -64,40 +64,40 @@
                     Caption = 'Price';
                     Editable = PriceEditable;
                     ToolTip = 'Specifies the value of the Price field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Price Type"; Rec."Price Type")
                 {
 
                     Editable = PriceTypeEditable;
                     ToolTip = 'Specifies the value of the Price Type field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Sales Type"; Rec."Sales Type")
                 {
 
                     Editable = SalesTypeEditable;
                     ToolTip = 'Specifies the value of the Sales Type field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Sales No."; Rec."Sales No.")
                 {
 
                     Editable = SalesNoEditable;
                     ToolTip = 'Specifies the value of the Sales No. field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Item Count"; Rec."Item Count")
                 {
 
                     ToolTip = 'Specifies the value of the Item Count field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
                 field("Price Includes VAT"; Rec."Price Includes VAT")
                 {
 
                     ToolTip = 'Specifies the value of the Price Includes VAT field';
-                    ApplicationArea = NPRRetail;
+                    ApplicationArea = NPRMagento;
                 }
             }
             part(Control6150628; "NPR Magento Custom Opt.Subform")
@@ -105,7 +105,7 @@
                 ShowFilter = false;
                 SubPageLink = "Custom Option No." = FIELD("No.");
                 Visible = CustomOptionValuesVisible;
-                ApplicationArea = NPRRetail;
+                ApplicationArea = NPRMagento;
 
             }
         }
