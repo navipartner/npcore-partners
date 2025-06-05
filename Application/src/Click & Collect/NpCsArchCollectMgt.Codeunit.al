@@ -45,6 +45,8 @@
     end;
 
     local procedure InsertArchCollectDocument(NpCsDocument: Record "NPR NpCs Document"; var NpCsArchDocument: Record "NPR NpCs Arch. Document")
+    var
+        ClickCollect: Codeunit "NPR Click & Collect";
     begin
         NpCsArchDocument.Init();
         NpCsArchDocument."Entry No." := 0;
@@ -104,6 +106,7 @@
         NpCsArchDocument."Delivery Print Template (POS)" := NpCsDocument."Delivery Print Template (POS)";
         NpCsArchDocument."Delivery Print Template (S.)" := NpCsDocument."Delivery Print Template (S.)";
         NpCsArchDocument."Salesperson Code" := NpCsDocument."Salesperson Code";
+        ClickCollect.InsertArchCollectDocumentOnBeforeInsert(NpCsDocument, NpCsArchDocument);
         NpCsArchDocument.Insert(true);
     end;
 
