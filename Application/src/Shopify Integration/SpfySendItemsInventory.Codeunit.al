@@ -1246,8 +1246,8 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         QueryStream: OutStream;
         Request: JsonObject;
         Variables: JsonObject;
-        FirstPageQueryTok: Label 'query GetProduct($productID: ID!) {product(id: $productID) {id title status descriptionHtml vendor hasOnlyDefaultVariant variants(first:25){pageInfo{hasNextPage} edges{cursor node{id sku barcode selectedOptions{name value optionValue{id name}} inventoryPolicy inventoryItem{id tracked}}}}}}', Locked = true;
-        SubsequentPageQueryTok: Label 'query GetProduct($productID: ID!, $afterCursor: String!) {product(id: $productID) {id title status descriptionHtml vendor hasOnlyDefaultVariant variants(first:25, after: $afterCursor){pageInfo{hasNextPage} edges{cursor node{id sku barcode selectedOptions{name value optionValue{id name}} inventoryPolicy inventoryItem{id tracked}}}}}}', Locked = true;
+        FirstPageQueryTok: Label 'query GetProduct($productID: ID!) {product(id: $productID) {id title status descriptionHtml vendor hasOnlyDefaultVariant variants(first:25){pageInfo{hasNextPage} edges{cursor node{id sku barcode selectedOptions{name value optionValue{id name}} inventoryPolicy inventoryItem{id tracked measurement{id weight{unit value}}}}}}}}', Locked = true;
+        SubsequentPageQueryTok: Label 'query GetProduct($productID: ID!, $afterCursor: String!) {product(id: $productID) {id title status descriptionHtml vendor hasOnlyDefaultVariant variants(first:25, after: $afterCursor){pageInfo{hasNextPage} edges{cursor node{id sku barcode selectedOptions{name value optionValue{id name}} inventoryPolicy inventoryItem{id tracked measurement{id weight{unit value}}}}}}}}', Locked = true;
     begin
         NcTask."Store Code" := ShopifyStoreCode;
         Variables.Add('productID', 'gid://shopify/Product/' + ShopifyProductID);
