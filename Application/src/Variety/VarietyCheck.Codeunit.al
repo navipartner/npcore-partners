@@ -202,7 +202,13 @@
         Variety: Record "NPR Variety";
         VarietyTable: Record "NPR Variety Table";
         VarietyValue: Record "NPR Variety Value";
+        VarietyWrapper: Codeunit "NPR Variety Wrapper";
+        IsAllowed, IsHandled : Boolean;
     begin
+        VarietyWrapper.OnBeforeCheckModifyAllowedHandler(Item, XRecItem, IsAllowed, IsHandled);
+        if IsHandled then
+            exit(IsAllowed);
+
         if (Item."NPR Variety 1" <> '') and (xRecItem."NPR Variety 1" = '') then
             exit(false);
         if (Item."NPR Variety 2" <> '') and (xRecItem."NPR Variety 2" = '') then

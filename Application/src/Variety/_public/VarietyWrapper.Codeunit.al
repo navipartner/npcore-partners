@@ -284,6 +284,11 @@
         VRTShowTable.ShowVarietyMatrix(RecRef, Item, ShowFieldNo);
     end;
 
+    internal procedure OnBeforeCheckModifyAllowedHandler(Item: Record Item; xItem: Record Item; var IsAllowed: Boolean; var IsHandled: Boolean)
+    begin
+        OnBeforeCheckModifyAllowed(Item, xItem, IsAllowed, IsHandled);
+    end;
+
     [EventSubscriber(ObjectType::Table, Page::"Item Variants", 'OnAfterInsertEvent', '', false, false)]
     local procedure ItemVariantsOnAfterInsertEvent(var Rec: Record "Item Variant"; RunTrigger: Boolean)
     var
@@ -651,6 +656,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdateItemVariantReferenceDescriptions(var ItemReference: Record "Item Reference"; Item: Record Item; ItemVariant: Record "Item Variant"; ChangedFieldNo: Integer; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckModifyAllowed(Item: Record Item; xItem: Record Item; var IsAllowed: Boolean; var IsHandled: Boolean)
     begin
     end;
 }
