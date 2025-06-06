@@ -1809,6 +1809,7 @@
         Membership: Record "NPR MM Membership";
         MembershipEntry: Record "NPR MM Membership Entry";
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
+        Subscription: Record "NPR MM Subscription";
         SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
         IPriceHandler: Interface "NPR IMemberAlterationPriceHandler";
         Item: Record Item;
@@ -1862,6 +1863,13 @@
             end;
 
         end;
+
+        if (SubscriptionMgtImpl.GetSubscriptionFromMembership(MemberInfoCapture."Membership Entry No.", Subscription)) then
+            if (
+                (Subscription."Auto-Renew" = Subscription."Auto-Renew"::YES_INTERNAL) and
+                (Subscription."Committed Until" > EndDateNew)
+            ) then
+                EndDateNew := Subscription."Committed Until";
 
         if (MembershipEntry."Valid Until Date" <= EndDateNew) then begin
             ReasonText := StrSubstNo(NO_TIMEFRAME, EndDateNew, MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date");

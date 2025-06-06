@@ -93,6 +93,18 @@
             DataClassification = CustomerContent;
             InitValue = 5;
         }
+        field(3; SubscriptionCommitmentPeriod; DateFormula)
+        {
+            Caption = 'Subscription Commitment Period';
+            DataClassification = CustomerContent;
+        }
+        field(4; SubscriptionCommitStartDate; Option)
+        {
+            Caption = 'Subscription Commitment Start Date';
+            DataClassification = CustomerContent;
+            OptionMembers = WORK_DATE,SUBS_VALID_FROM;
+            OptionCaption = 'Work Date,Subscription Valid From';
+        }
     }
 
     keys

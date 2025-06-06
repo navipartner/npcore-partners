@@ -47,6 +47,11 @@ table 6150918 "NPR MM Subscription"
             Caption = 'Valid Until Date';
             DataClassification = CustomerContent;
         }
+        field(111; "Committed Until"; Date)
+        {
+            Caption = 'Committed Until';
+            DataClassification = CustomerContent;
+        }
         field(120; "Postpone Renewal Attempt Until"; Date)
         {
             Caption = 'Postpone Renewal Attempt Until';

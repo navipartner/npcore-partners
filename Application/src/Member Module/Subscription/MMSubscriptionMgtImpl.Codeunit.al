@@ -2,6 +2,14 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
 {
     Access = Internal;
 
+    internal procedure GetSubscriptionFromMembership(MembershipEntryNo: Integer; var Subscription: Record "NPR MM Subscription"): Boolean
+    begin
+        Subscription.Reset();
+        Subscription.SetCurrentKey("Membership Entry No.");
+        Subscription.SetRange("Membership Entry No.", MembershipEntryNo);
+        exit(Subscription.FindFirst());
+    end;
+
     internal procedure UpdateMembershipSubscriptionDetails(MembershipLedger: Record "NPR MM Membership Entry")
     var
         Membership: Record "NPR MM Membership";
@@ -246,8 +254,34 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
         if Subscription."Auto-Renew" = Membership."Auto-Renew" then
             exit;
 
+        if (Membership."Auto-Renew" = Membership."Auto-Renew"::YES_INTERNAL) then
+            // We have put the subscription into an internal state, calculate commitment period.
+            SetCommitmentPeriod(Membership, Subscription);
+
         Subscription."Auto-Renew" := Membership."Auto-Renew";
         Subscription.Modify(true);
+    end;
+
+    local procedure SetCommitmentPeriod(Membership: Record "NPR MM Membership"; var Subscription: Record "NPR MM Subscription")
+    var
+        MembershipSetup: Record "NPR MM Membership Setup";
+        RecurPaymtSetup: Record "NPR MM Recur. Paym. Setup";
+        CommittedUntil: Date;
+    begin
+        MembershipSetup.Get(Membership."Membership Code");
+        if (not RecurPaymtSetup.Get(MembershipSetup."Recurring Payment Code")) then
+            exit;
+        if (Format(RecurPaymtSetup.SubscriptionCommitmentPeriod) = '') then
+            exit;
+
+        case RecurPaymtSetup.SubscriptionCommitStartDate of
+            RecurPaymtSetup.SubscriptionCommitStartDate::WORK_DATE:
+                CommittedUntil := CalcDate(RecurPaymtSetup.SubscriptionCommitmentPeriod, WorkDate());
+            RecurPaymtSetup.SubscriptionCommitStartDate::SUBS_VALID_FROM:
+                CommittedUntil := CalcDate(RecurPaymtSetup.SubscriptionCommitmentPeriod, Subscription."Valid From Date");
+        end;
+
+        Subscription."Committed Until" := CommittedUntil;
     end;
 
     procedure CheckIfPendingSubscriptionRequestExist(MembershipEntryNo: Integer; var SubscriptionRequest: Record "NPR MM Subscr. Request"): Boolean

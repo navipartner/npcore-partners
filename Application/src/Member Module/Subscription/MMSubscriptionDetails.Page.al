@@ -45,6 +45,11 @@ page 6184834 "NPR MM Subscription Details"
                     ToolTip = 'Specifies the value of the Valid Until Date field.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field("Committed Until"; Rec."Committed Until")
+                {
+                    ToolTip = 'Specifies the date until which the subscription is committed.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
                 field("Auto-Renew"; Rec."Auto-Renew")
                 {
                     ToolTip = 'Specifies the value of the Auto-Renew field.';

@@ -60,6 +60,21 @@
                     ToolTip = 'Specifies the maximum number of attempts the system will make to process the recurring payment.';
                 }
             }
+            group(Commitment)
+            {
+                Caption = 'Commitment';
+
+                field(SubscriptionCommitStartDate; Rec.SubscriptionCommitStartDate)
+                {
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ToolTip = 'Specifies the base date for calculating the subscription commit when the subscription is entered.';
+                }
+                field(SubscriptionCommitmentPeriod; Rec.SubscriptionCommitmentPeriod)
+                {
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ToolTip = 'Specifies the formula used for calculating the subscription commitment.';
+                }
+            }
             group(Posting)
             {
                 field("Gen. Journal Template Name"; Rec."Gen. Journal Template Name")
