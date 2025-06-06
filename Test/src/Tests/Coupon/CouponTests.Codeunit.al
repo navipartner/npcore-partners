@@ -6056,6 +6056,7 @@ codeunit 85074 "NPR Coupon Tests"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         LibraryInventory: Codeunit "Library - Inventory";
+        OIOUBLUoMTestDisabler: Codeunit "NPR OIOUBLUoMTestDisabler";
         CouponQty: Integer;
         ApplyDiscountOption: Option "Priority","Highest price","Lowest price";
     begin
@@ -6069,8 +6070,10 @@ codeunit 85074 "NPR Coupon Tests"
 
         // [GIVEN] Item with 2 UOMs
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        BindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
         LibraryInventory.CreateUnitOfMeasureCode(SecondUnitOfMeasure);
+        UnbindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
         LibraryInventory.CreateItemUnitOfMeasure(SecondItemUnitOfMeasure, Item."No.", SecondUnitOfMeasure.Code, 5);
         Item."Base Unit of Measure" := UnitOfMeasure.Code;
@@ -6135,6 +6138,7 @@ codeunit 85074 "NPR Coupon Tests"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         LibraryInventory: Codeunit "Library - Inventory";
+        OIOUBLUoMTestDisabler: Codeunit "NPR OIOUBLUoMTestDisabler";
         CouponQty: Integer;
         ApplyDiscountOption: Option "Priority","Highest price","Lowest price";
     begin
@@ -6148,8 +6152,10 @@ codeunit 85074 "NPR Coupon Tests"
 
         // [GIVEN] Item with 2 UOMs
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, _POSUnit, _POSStore);
+        BindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
         LibraryInventory.CreateUnitOfMeasureCode(SecondUnitOfMeasure);
+        UnbindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
         LibraryInventory.CreateItemUnitOfMeasure(SecondItemUnitOfMeasure, Item."No.", SecondUnitOfMeasure.Code, 5);
         Item."Base Unit of Measure" := UnitOfMeasure.Code;

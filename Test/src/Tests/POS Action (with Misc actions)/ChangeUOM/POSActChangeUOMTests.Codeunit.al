@@ -24,6 +24,7 @@ codeunit 85072 "NPR POS Act. Change UOM Tests"
         POSActionChangeUOMB: Codeunit "NPR POS Action: Change UOM-B";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
+        OIOUBLUoMTestDisabler: Codeunit "NPR OIOUBLUoMTestDisabler";
         Quantity: Decimal;
     begin
         // [Given] POS & Payment setup
@@ -36,7 +37,9 @@ codeunit 85072 "NPR POS Act. Change UOM Tests"
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
         Quantity := 1;
         // Create Unit Of Measure and use it as parameter
+        BindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        UnbindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Quantity);
         POSSession.GetSale(POSSale);
@@ -64,6 +67,7 @@ codeunit 85072 "NPR POS Act. Change UOM Tests"
         POSActionChangeUOMB: Codeunit "NPR POS Action: Change UOM-B";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
+        OIOUBLUoMTestDisabler: Codeunit "NPR OIOUBLUoMTestDisabler";
         Quantity: Decimal;
     begin
         // [Given] POS & Payment setup
@@ -74,7 +78,9 @@ codeunit 85072 "NPR POS Act. Change UOM Tests"
         NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
         Quantity := 1;
         // Create Unit Of Measure
+        BindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        UnbindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
         LibraryPOSMock.CreateItemLine(POSSession, Item."No.", Quantity);
         POSSession.GetSale(POSSale);

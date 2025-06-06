@@ -5564,6 +5564,7 @@ codeunit 85148 "NPR POS Total Disc. and Tax"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
+        OIOUBLUoMTestDisabler: Codeunit "NPR OIOUBLUoMTestDisabler";
         DiscountFilter: Text;
         ExpectedTotalAmountIncludingVAT: Decimal;
         ExpectedTotalDiscountAmount: Decimal;
@@ -5592,7 +5593,9 @@ codeunit 85148 "NPR POS Total Disc. and Tax"
                    VATPostingSetup."VAT Prod. Posting Group",
                    '',
                    false);
+        BindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        UnbindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
         Item."Unit Price" := 2000;
         Item."Base Unit of Measure" := UnitOfMeasure.Code;
@@ -5686,6 +5689,7 @@ codeunit 85148 "NPR POS Total Disc. and Tax"
         LibraryPOSMock: Codeunit "NPR Library - POS Mock";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
+        OIOUBLUoMTestDisabler: Codeunit "NPR OIOUBLUoMTestDisabler";
         DiscountFilter: Text;
         DifferentUOMCode: Code[10];
         ExpectedTotalAmountIncludingVAT: Decimal;
@@ -5715,7 +5719,9 @@ codeunit 85148 "NPR POS Total Disc. and Tax"
                    VATPostingSetup."VAT Prod. Posting Group",
                    '',
                    false);
+        BindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        UnbindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, 1);
         Item."Unit Price" := 2000;
         Item."Base Unit of Measure" := UnitOfMeasure.Code;
@@ -5733,7 +5739,9 @@ codeunit 85148 "NPR POS Total Disc. and Tax"
                                 Item."No.",
                                 '',
                                 NPRTotalDiscountLine);
+        BindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateUnitOfMeasureCode(SecondUnitOfMeasure);
+        UnbindSubscription(OIOUBLUoMTestDisabler);
         LibraryInventory.CreateItemUnitOfMeasure(SecondItemUnitOfMeasure, Item."No.", SecondUnitOfMeasure.Code, 1);
         NPRTotalDiscountLine."Unit Of Measure Code" := SecondUnitOfMeasure.Code;
         NPRTotalDiscountLine.Modify();

@@ -378,8 +378,11 @@ codeunit 85200 "NPR Library RS E-Invoice"
     internal procedure CreateUnitOfMeasure() UnitOfMeasureCode: Code[10]
     var
         UnitofMeasure: Record "Unit of Measure";
+        OIOUBLUoMTestDisabler: Codeunit "NPR OIOUBLUoMTestDisabler";
     begin
+        BindSubscription(OIOUBLUoMTestDisabler);
         _LibraryInventory.CreateUnitOfMeasureCode(UnitofMeasure);
+        UnbindSubscription(OIOUBLUoMTestDisabler);
         exit(UnitofMeasure.Code)
     end;
 
