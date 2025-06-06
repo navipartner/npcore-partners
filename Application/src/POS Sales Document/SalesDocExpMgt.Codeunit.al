@@ -527,6 +527,7 @@
                 end;
                 SalesLine."Line No." := SaleLinePOS."Line No.";
                 SalesPriceRecalculated := SaleLinePOS.TransferToSalesLine(SalesLine, TransferPostingSetup);
+                SalesLine.Validate("Location Code", SalesHeader."Location Code");
                 SalesLine.Insert(true);
                 if SalesLine.Type <> SalesLine.Type::" " then begin
                     if SalesHeader.IsCreditDocType() or (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::"Out payment") then
@@ -557,7 +558,7 @@
                     ReservationEntry."Creation Date" := Today();
                     ReservationEntry."Created By" := CopyStr(UserId, 1, MaxStrLen(ReservationEntry."Created By"));
                     ReservationEntry."Item No." := SaleLinePOS."No.";
-                    ReservationEntry."Location Code" := SaleLinePOS."Location Code";
+                    ReservationEntry."Location Code" := SalesLine."Location Code";
                     ReservationEntry."Quantity (Base)" := -SalesLine."Quantity (Base)";
                     ReservationEntry."Reservation Status" := ReservationEntry."Reservation Status"::Surplus;
                     ReservationEntry."Source Type" := 37;
