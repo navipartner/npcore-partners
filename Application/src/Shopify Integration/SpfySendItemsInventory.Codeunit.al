@@ -179,10 +179,9 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
     var
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
-        MetafieldsSet: JsonToken;
-        MetafieldsSetErrors: JsonToken;
         ShopifyResponse: JsonToken;
         ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type";
+        ShopifyOwnerID: Text[30];
         SendToShopify: Boolean;
         Success: Boolean;
     begin
@@ -191,23 +190,20 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         Clear(SpfyMetafieldMgt);
         ClearLastError();
 
-        Success := PrepareMetafieldUpdateRequest(NcTask, SpfyMetafieldMgt, ShopifyOwnerType, SendToShopify);
-        if SendToShopify then begin
+        Success := PrepareMetafieldUpdateRequest(NcTask, SpfyMetafieldMgt, ShopifyOwnerType, ShopifyOwnerID, SendToShopify);
+        if SendToShopify then
             Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse);
-            if Success then
-                if ShopifyResponse.SelectToken('data.metafieldsSet.metafields', MetafieldsSet) then
-                    SpfyMetafieldMgt.UpdateBCMetafieldData(NcTask."Record ID", ShopifyOwnerType, MetafieldsSet);
-        end;
 
         NcTask.Modify();
         Commit();
 
         if not Success then
             Error(GetLastErrorText());
-        if ShopifyResponse.SelectToken('data.metafieldsSet.userErrors', MetafieldsSetErrors) then
-            if MetafieldsSetErrors.IsArray() then
-                if MetafieldsSetErrors.AsArray().Count() > 0 then
-                    Error('');
+        if not SendToShopify then
+            exit;
+        if SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse) then
+            Error('');
+        SpfyMetafieldMgt.RequestMetafieldValuesFromShopifyAndUpdateBCData(NcTask."Record ID", ShopifyOwnerType, ShopifyOwnerID, NcTask."Store Code");
     end;
 
     local procedure SendShopifyInventoryUpdate(var NcTask: Record "NPR Nc Task")
@@ -695,13 +691,12 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
     end;
 
     [TryFunction]
-    local procedure PrepareMetafieldUpdateRequest(var NcTask: Record "NPR Nc Task"; var SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt."; var ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type"; var SendToShopify: Boolean)
+    local procedure PrepareMetafieldUpdateRequest(var NcTask: Record "NPR Nc Task"; var SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt."; var ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type"; var ShopifyOwnerID: Text[30]; var SendToShopify: Boolean)
     var
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         RecRef: RecordRef;
         QueryStream: OutStream;
-        ShopifyOwnerID: Text[30];
     begin
         RecRef := NcTask."Record ID".GetRecord();
         RecRef.SetTable(SpfyStoreItemLink);

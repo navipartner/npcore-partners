@@ -123,7 +123,7 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
     var
         MetafieldsSet: JsonObject;
         RequestJson: JsonObject;
-        QueryTok: Label 'mutation MetafieldsSet($metafields: [MetafieldsSetInput!]!) { metafieldsSet(metafields: $metafields) { metafields { id key namespace value compareDigest definition { id }} userErrors { field message code }}}', Locked = true;
+        QueryTok: Label 'mutation UpdateObjectMetafields($updateMetafields: [MetafieldsSetInput!]!, $deleteMetafields: [MetafieldIdentifierInput!]!) {metafieldsSet(metafields: $updateMetafields) {metafields {id key namespace value compareDigest definition {id}} userErrors {field message code}} metafieldsDelete(metafields: $deleteMetafields) {deletedMetafields {key namespace ownerId} userErrors {field message}}}', Locked = true;
     begin
         GetShopifyMetafieldDefinitions(ShopifyStoreCode, ShopifyOwnerType, false);
         SendToShopify := GenerateMetafieldsSet(EntityRecID, ShopifyOwnerType, ShopifyOwnerID, ShopifyStoreCode, MetafieldsSet);
@@ -161,20 +161,19 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
         ShopifyEntityMetafieldsSetRequestQuery(ShopifyOwnerType, ShopifyOwnerID, OwnerTypeTxt, QueryStream);
         if SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse) then
             if ShopifyResponse.SelectToken(StrSubstNo('data.%1.metafields.edges', SpfyIntegrationMgt.LowerFirstLetter(OwnerTypeTxt)), MetafieldsSet) then
-                UpdateBCMetafieldData(EntityRecID, ShopifyOwnerType, MetafieldsSet);
+                UpdateBCMetafieldData(EntityRecID, ShopifyOwnerType, ShopifyStoreCode, MetafieldsSet);
     end;
 
-    internal procedure UpdateBCMetafieldData(EntityRecID: RecordId; ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type"; MetafieldsSet: JsonToken)
+    internal procedure UpdateBCMetafieldData(EntityRecID: RecordId; ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type"; ShopifyStoreCode: Code[20]; MetafieldsSet: JsonToken)
     var
-        ItemAttribute: Record "Item Attribute";
         SpfyEntityMetafieldParam: Record "NPR Spfy Entity Metafield";
         SpfyMetafieldMapping: Record "NPR Spfy Metafield Mapping";
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         JsonHelper: Codeunit "NPR Json Helper";
-        MappedToRecRef: RecordRef;
         RecRef: RecordRef;
         Metafield: JsonToken;
+        ProcessedMetafields: List of [BigInteger];
         ItemNo: Code[20];
     begin
         if not MetafieldsSet.IsArray() then
@@ -184,41 +183,96 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
             Database::"NPR Spfy Store-Item Link":
                 begin
                     RecRef.SetTable(SpfyStoreItemLink);
-                    SpfyMetafieldMapping.SetRange("Shopify Store Code", SpfyStoreItemLink."Shopify Store Code");
                     ItemNo := SpfyStoreItemLink."Item No.";
                 end;
             else
                 exit;
         end;
+        SpfyMetafieldMapping.SetRange("Shopify Store Code", ShopifyStoreCode);
+        SpfyMetafieldMapping.SetRange("Owner Type", ShopifyOwnerType);
 
         SpfyEntityMetafieldParam."BC Record ID" := EntityRecID;
         SpfyEntityMetafieldParam."Owner Type" := ShopifyOwnerType;
 
-        foreach Metafield in MetafieldsSet.AsArray() do begin
-            if Metafield.AsObject().Contains('node') then
-                Metafield.SelectToken('node', Metafield);
+        foreach Metafield in MetafieldsSet.AsArray() do
+            if Metafield.IsObject() then begin
+                if Metafield.AsObject().Contains('node') then
+                    Metafield.SelectToken('node', Metafield);
+                SpfyEntityMetafieldParam."Metafield Key" := CopyStr(JsonHelper.GetJText(Metafield, 'key', false), 1, MaxStrLen(SpfyEntityMetafieldParam."Metafield Key"));
+                SpfyEntityMetafieldParam."Metafield Value" := CopyStr(JsonHelper.GetJText(Metafield, 'value', false), 1, MaxStrLen(SpfyEntityMetafieldParam."Metafield Value"));
+                SpfyEntityMetafieldParam."Metafield Value Version ID" := CopyStr(JsonHelper.GetJText(Metafield, 'compareDigest', false), 1, MaxStrLen(SpfyEntityMetafieldParam."Metafield Value Version ID"));
 #pragma warning disable AA0139
-            SpfyEntityMetafieldParam."Metafield ID" := SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(Metafield, 'definition.id', true), '/');
+                SpfyEntityMetafieldParam."Metafield ID" := SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(Metafield, 'definition.id', false), '/');
 #pragma warning restore AA0139
-            SpfyEntityMetafieldParam."Metafield Key" := CopyStr(JsonHelper.GetJText(Metafield, 'key', false), 1, MaxStrLen(SpfyEntityMetafieldParam."Metafield Key"));
-            SpfyEntityMetafieldParam."Metafield Value" := CopyStr(JsonHelper.GetJText(Metafield, 'value', false), 1, MaxStrLen(SpfyEntityMetafieldParam."Metafield Value"));
-            SpfyEntityMetafieldParam."Metafield Value Version ID" := CopyStr(JsonHelper.GetJText(Metafield, 'compareDigest', false), 1, MaxStrLen(SpfyEntityMetafieldParam."Metafield Value Version ID"));
+                if SpfyEntityMetafieldParam."Metafield ID" = '' then
+                    SpfyEntityMetafieldParam."Metafield ID" := GetMetafiledIDFromMetafieldDefinitions(
+                        ShopifyStoreCode, ShopifyOwnerType, SpfyEntityMetafieldParam."Metafield Key",
+                        CopyStr(JsonHelper.GetJText(Metafield, 'namespace', false), 1, MaxStrLen(_TempSpfyMetafieldDef.Namespace)));
 
-            SpfyMetafieldMapping.SetRange("Owner Type", SpfyEntityMetafieldParam."Owner Type");
-            SpfyMetafieldMapping.SetRange("Metafield ID", SpfyEntityMetafieldParam."Metafield ID");
-            if SpfyMetafieldMapping.FindFirst() then begin
-                case SpfyMetafieldMapping."Table No." of
-                    Database::"Item Attribute":
-                        if MappedToRecRef.Get(SpfyMetafieldMapping."BC Record ID") then begin
-                            MappedToRecRef.SetTable(ItemAttribute);
-                            if ItemNo <> '' then begin
-                                SetEntityMetafieldValue(SpfyEntityMetafieldParam, true, true);
-                                SetItemAttributeValue(ItemAttribute, ItemNo, SpfyIntegrationMgt.GetLanguageCode(SpfyMetafieldMapping."Shopify Store Code"), SpfyEntityMetafieldParam."Metafield Value");
-                            end;
-                        end;
+                if SpfyEntityMetafieldParam."Metafield ID" <> '' then begin
+                    SpfyMetafieldMapping.SetRange("Metafield ID", SpfyEntityMetafieldParam."Metafield ID");
+                    if SpfyMetafieldMapping.FindFirst() then
+                        if DoBCMetafieldUpdate(SpfyMetafieldMapping, SpfyEntityMetafieldParam, ItemNo) then
+                            if not ProcessedMetafields.Contains(SpfyMetafieldMapping."Entry No.") then
+                                ProcessedMetafields.Add(SpfyMetafieldMapping."Entry No.");
                 end;
             end;
+
+        // Remove entity metafields and item attributes for which no Shopify metafield was returned
+        Clear(SpfyEntityMetafieldParam);
+        SpfyEntityMetafieldParam."BC Record ID" := EntityRecID;
+        SpfyEntityMetafieldParam."Owner Type" := ShopifyOwnerType;
+
+        SpfyMetafieldMapping.SetFilter("Metafield ID", '<>%1', '');
+        SpfyMetafieldMapping.SetRange("Table No.", Database::"Item Attribute");
+        if SpfyMetafieldMapping.FindSet() then
+            repeat
+                if not ProcessedMetafields.Contains(SpfyMetafieldMapping."Entry No.") then begin
+                    SpfyEntityMetafieldParam."Metafield ID" := SpfyMetafieldMapping."Metafield ID";
+                    SpfyEntityMetafieldParam."Metafield Key" := GetMetafiledKeyFromMetafieldDefinitions(ShopifyStoreCode, ShopifyOwnerType, SpfyEntityMetafieldParam."Metafield ID");
+                    if SpfyEntityMetafieldParam."Metafield Key" <> '' then
+                        DoBCMetafieldUpdate(SpfyMetafieldMapping, SpfyEntityMetafieldParam, ItemNo);
+                end;
+            until SpfyMetafieldMapping.Next() = 0;
+    end;
+
+    local procedure DoBCMetafieldUpdate(SpfyMetafieldMapping: Record "NPR Spfy Metafield Mapping"; SpfyEntityMetafieldParam: Record "NPR Spfy Entity Metafield"; OwnerNo: Code[20]): Boolean
+    var
+        ItemAttribute: Record "Item Attribute";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+    begin
+        case SpfyMetafieldMapping."Table No." of
+            Database::"Item Attribute":
+                begin
+                    if OwnerNo = '' then
+                        exit;
+                    if not ItemAttribute.Get(SpfyMetafieldMapping."BC Record ID") then
+                        exit;
+                    SetEntityMetafieldValue(SpfyEntityMetafieldParam, true, true);
+                    SetItemAttributeValue(ItemAttribute, OwnerNo, SpfyIntegrationMgt.GetLanguageCode(SpfyMetafieldMapping."Shopify Store Code"), SpfyEntityMetafieldParam."Metafield Value");
+                    exit(true);
+                end;
         end;
+    end;
+
+    local procedure GetMetafiledIDFromMetafieldDefinitions(ShopifyStoreCode: Code[20]; ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type"; MetafieldKey: Text[80]; MetafieldNamespace: Text[255]) MetafieldID: Text[30]
+    begin
+        if _TempSpfyMetafieldDef.IsEmpty() then
+            GetShopifyMetafieldDefinitions(ShopifyStoreCode, ShopifyOwnerType, false);
+        _TempSpfyMetafieldDef.SetRange("Owner Type", ShopifyOwnerType);
+        _TempSpfyMetafieldDef.SetRange("Key", MetafieldKey);
+        _TempSpfyMetafieldDef.SetRange("Namespace", MetafieldNamespace);
+        if _TempSpfyMetafieldDef.FindFirst() then
+            MetafieldID := _TempSpfyMetafieldDef.ID;
+        _TempSpfyMetafieldDef.Reset();
+    end;
+
+    local procedure GetMetafiledKeyFromMetafieldDefinitions(ShopifyStoreCode: Code[20]; ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type"; MetafieldID: Text[30]) MetafieldKey: Text[80]
+    begin
+        if _TempSpfyMetafieldDef.IsEmpty() then
+            GetShopifyMetafieldDefinitions(ShopifyStoreCode, ShopifyOwnerType, false);
+        if _TempSpfyMetafieldDef.Get(MetafieldID) then
+            MetafieldKey := _TempSpfyMetafieldDef."Key";
     end;
 
     local procedure GetShopifyMetafieldDefinitions(ShopifyStoreCode: Code[20]; ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type"; WithDialog: Boolean)
@@ -232,6 +286,7 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
         QueryingShopifyLbl: Label 'Querying Shopify...';
         CouldNotGetMetafieldDefinitionsErr: Label 'Could not get metafield definitions from Shopify. The following error occured: %1', Comment = '%1 - Shopify returned error text.';
     begin
+        _TempSpfyMetafieldDef.Reset();
         _TempSpfyMetafieldDef.DeleteAll();
         if WithDialog then
             WithDialog := GuiAllowed;
@@ -280,12 +335,13 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
     local procedure GenerateMetafieldsSet(EntityRecID: RecordId; ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type"; ShopifyOwnerID: Text[30]; ShopifyStoreCode: Code[20]; var MetafieldsSet: JsonObject): Boolean
     var
         SpfyEntityMetafield: Record "NPR Spfy Entity Metafield";
+        RemoveMetafields: JsonArray;
+        UpdateMetafields: JsonArray;
         Metafield: JsonObject;
-        Metafields: JsonArray;
-        NullJsonValue: JsonValue;
+    //NullJsonValue: JsonValue;
     begin
         Clear(MetafieldsSet);
-        NullJsonValue.SetValueToNull();
+        //NullJsonValue.SetValueToNull();
         if _TempSpfyMetafieldDef.IsEmpty() then
             GetShopifyMetafieldDefinitions(ShopifyStoreCode, ShopifyOwnerType, false);
 
@@ -298,19 +354,23 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
                     Metafield.Add('key', _TempSpfyMetafieldDef."Key");
                     Metafield.Add('namespace', _TempSpfyMetafieldDef.Namespace);
                     Metafield.Add('ownerId', StrSubstNo('gid://shopify/%1/%2', GetOwnerTypeAsText(ShopifyOwnerType), ShopifyOwnerID));
-                    Metafield.Add('type', _TempSpfyMetafieldDef.Type);
-                    Metafield.Add('value', SpfyEntityMetafield."Metafield Value");
-                    //TODO: doesn't seem to work when the field is included. will be handled in Linear issue ISV2-515
-                    /*if SpfyEntityMetafield."Metafield Value Version ID" <> '' then
-                        Metafield.Add('compareDigest', SpfyEntityMetafield."Metafield Value Version ID")
-                    else
-                        Metafield.Add('compareDigest', NullJsonValue);*/
-                    Metafields.Add(Metafield);
+                    if SpfyEntityMetafield."Metafield Value" <> '' then begin
+                        Metafield.Add('type', _TempSpfyMetafieldDef.Type);
+                        Metafield.Add('value', SpfyEntityMetafield."Metafield Value");
+                        //Disabling compareDigest (version check), as it does not seem to be really useful and only adds unnecessary complexity and errors.
+                        /*if SpfyEntityMetafield."Metafield Value Version ID" <> '' then
+                            Metafield.Add('compareDigest', SpfyEntityMetafield."Metafield Value Version ID")
+                        else
+                            Metafield.Add('compareDigest', NullJsonValue);*/
+                        UpdateMetafields.Add(Metafield);
+                    end else
+                        RemoveMetafields.Add(Metafield);
                 end;
             until SpfyEntityMetafield.Next() = 0;
 
-        MetafieldsSet.Add('metafields', Metafields);
-        exit(Metafields.Count() > 0);
+        MetafieldsSet.Add('updateMetafields', UpdateMetafields);
+        MetafieldsSet.Add('deleteMetafields', RemoveMetafields);
+        exit(UpdateMetafields.Count() + RemoveMetafields.Count() > 0);
     end;
 
     local procedure ProcessItemAttributeMappingChange(ItemAttributeValueMapping: Record "Item Attribute Value Mapping"; ShopifyStoreCode: Code[20]; Removed: Boolean)
@@ -510,6 +570,8 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
             if not TempItemAttributeValueSelection.FindAttributeValue(ItemAttributeValue) then
                 TempItemAttributeValueSelection.InsertItemAttributeValue(ItemAttributeValue, TempItemAttributeValueSelection);
         end;
+        if ItemAttribValueMappingExists and (ItemAttributeValueMapping."Item Attribute Value ID" = ItemAttributeValue.ID) then
+            exit;
         ItemAttributeValueMapping."Item Attribute Value ID" := ItemAttributeValue.ID;
         if not ItemAttribValueMappingExists then
             ItemAttributeValueMapping.Insert()
