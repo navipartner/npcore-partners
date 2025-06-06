@@ -26,7 +26,7 @@ const main = async ({ workflow, popup, parameters, context, captions }) => {
     mmPaymentMethodAssigned,
     collectReturnInformation,
   } = await workflow.respond("preparePaymentWorkflow");
-
+  
   if (mmPaymentMethodAssigned) {
     if (!(await popup.confirm(captions.paymentMethodAssignedCaption)))
       return {};
@@ -53,6 +53,9 @@ const main = async ({ workflow, popup, parameters, context, captions }) => {
       }
     }
   }
+  
+  let {postWorkflows} = await workflow.respond("preparePostWorkflows", {paymentAmount: suggestedAmount});  
+  await processWorkflows(postWorkflows);
 
   if (suggestedAmount === 0 && remainingAmount === 0 && !forceAmount) {
     await workflow.run("END_SALE", {
@@ -63,7 +66,7 @@ const main = async ({ workflow, popup, parameters, context, captions }) => {
     });
     return {};
   }
-
+  
   const paymentResult = await workflow.run(dispatchToWorkflow, {
     context: {
       paymentType: paymentType,
@@ -71,7 +74,7 @@ const main = async ({ workflow, popup, parameters, context, captions }) => {
       remainingAmount: remainingAmount,
     },
   });
-
+  
   if (paymentResult.legacy) {
     context.fallbackAmount = suggestedAmount;
     await workflow.respond("doLegacyPaymentWorkflow");
@@ -86,3 +89,17 @@ const main = async ({ workflow, popup, parameters, context, captions }) => {
 
   return { success: paymentResult.success };
 };
+
+async function processWorkflows(workflows) {
+  if (!workflows) return;
+
+  for (const [
+    workflowName,
+    { mainParameters, customParameters },
+  ] of Object.entries(workflows)) {
+    await workflow.run(workflowName, {
+      context: { customParameters },
+      parameters: mainParameters,
+    });
+  }
+}

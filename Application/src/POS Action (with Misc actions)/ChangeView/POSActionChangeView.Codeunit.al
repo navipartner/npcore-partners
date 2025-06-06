@@ -29,6 +29,8 @@ codeunit 6150724 "NPR POS Action - Change View" implements "NPR IPOS Workflow"
         case Step of
             'ChangeView':
                 ChangeView(Context);
+            'AddPostWorkflowsToRun':
+                FrontEnd.WorkflowResponse(AddPostWorkflowsToRun(Context, Sale));
         end;
     end;
 
@@ -44,11 +46,20 @@ codeunit 6150724 "NPR POS Action - Change View" implements "NPR IPOS Workflow"
         POSActionChangeViewB.ChangeView(ViewType, ViewCode);
     end;
 
+    local procedure AddPostWorkflowsToRun(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale") Response: JsonObject
+    var
+        POSActionPublishers: Codeunit "NPR POS Action Publishers";
+        PostWorkflows: JsonObject;
+    begin
+        POSActionPublishers.OnAddPostWorkflowsToRunOnChangeView(Context, Sale, PostWorkflows);
+        Response.Add('postWorkflows', PostWorkflows);
+    end;
+
     local procedure GetActionScript(): Text
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionChangeView.js###
-'let main=async({})=>{await workflow.respond("ChangeView")};'
+        'let main = async ({ }) => { await workflow.respond("ChangeView"); let { postWorkflows} = await workflow.respond("AddPostWorkflowsToRun"); await processWorkflows(postWorkflows); }; async function processWorkflows(workflows) { if (!workflows) return; for (const [ workflowName, { mainParameters, customParameters }, ] of Object.entries(workflows)) { await workflow.run(workflowName, { context: { customParameters }, parameters: mainParameters, }); } }'
         )
     end;
 }

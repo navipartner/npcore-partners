@@ -105,7 +105,19 @@
                 FrontEnd.WorkflowResponse(OnActionAddDimensionValue(Context));
             'ProcessRequest':
                 FrontEnd.WorkflowResponse(ProcessRequest(Context, Sale, SaleLine));
+            'PreparePostWorkflows':
+                FrontEnd.WorkflowResponse(PreparePostWorkflows(Context, Sale, SaleLine));
         end;
+    end;
+
+    local procedure PreparePostWorkflows(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line") Response: JsonObject
+    var
+        POSActionPublishers: Codeunit "NPR POS Action Publishers";
+        PostWorkflows: JsonObject;
+    begin
+        PostWorkflows.ReadFrom('{}');
+        POSActionPublishers.OnAddPostWorkflowsToRunOnDiscount(Context, Sale, SaleLine, PostWorkflows);
+        Response.Add('postWorkflows', PostWorkflows);
     end;
 
     local procedure ProcessRequest(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"): JsonObject
@@ -160,7 +172,7 @@
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionDiscount.js###
-'let main=async({workflow:d,captions:i,parameters:s,popup:n})=>{debugger;let a,e,t,u={discountReason:s.FixedReasonCode};u.discountReason==""&&(s.LookupReasonCode||s.ReasonCodeMandatory)&&(u=await d.respond("LookupReasonCode")),t=s.DimensionCode;let b={dimensionValue:s.DimensionValue};switch(t!=""&&b.dimensionValue==""&&(b=await d.respond("AddDimensionValue")),a=s.FixedDiscountNumber,s._parameters.DiscountType){case 0:e=i.DiscountLabel0,a==0&&(a=await n.numpad(e));break;case 1:e=i.DiscountLabel1,a==0&&(a=await n.numpad(e));break;case 2:e=i.DiscountLabel2,a==0&&(a=await n.numpad(e));break;case 3:e=i.DiscountLabel3,a==0&&(a=await n.numpad(e));break;case 4:e=i.DiscountLabel4,a==0&&(a=await n.numpad(e));break;case 5:e=i.DiscountLabel5,a==0&&(a=await n.numpad(e));break;case 6:e=i.DiscountLabel6,a==0&&(a=await n.numpad(e));break;case 7:e=i.DiscountLabel7,a==0&&(a=await n.numpad(e));break;case 8:e=i.DiscountLabel8,a==0&&(a=await n.numpad(e));break;case 9:break;case 10:break;case 11:e=i.DiscountLabel11,a==0&&(a=await n.numpad(e));break;case 12:e=i.DiscountLabel12,a==0&&(a=await n.numpad(e));break}if(a!==null)return await d.respond("ProcessRequest",{discountNumber:a,discountReason:u,dimensionValue:b})};'
+'let main=async({workflow:a,captions:e,parameters:s,popup:o})=>{let n,t,i,r={discountReason:s.FixedReasonCode};""==r.discountReason&&(s.LookupReasonCode||s.ReasonCodeMandatory)&&(r=await a.respond("LookupReasonCode")),i=s.DimensionCode;let u={dimensionValue:s.DimensionValue};switch(""!=i&&""==u.dimensionValue&&(u=await a.respond("AddDimensionValue")),n=s.FixedDiscountNumber,s._parameters.DiscountType){case 0:t=e.DiscountLabel0,0==n&&(n=await o.numpad(t));break;case 1:t=e.DiscountLabel1,0==n&&(n=await o.numpad(t));break;case 2:t=e.DiscountLabel2,0==n&&(n=await o.numpad(t));break;case 3:t=e.DiscountLabel3,0==n&&(n=await o.numpad(t));break;case 4:t=e.DiscountLabel4,0==n&&(n=await o.numpad(t));break;case 5:t=e.DiscountLabel5,0==n&&(n=await o.numpad(t));break;case 6:t=e.DiscountLabel6,0==n&&(n=await o.numpad(t));break;case 7:t=e.DiscountLabel7,0==n&&(n=await o.numpad(t));break;case 8:t=e.DiscountLabel8,0==n&&(n=await o.numpad(t));break;case 9:case 10:break;case 11:t=e.DiscountLabel11,0==n&&(n=await o.numpad(t));break;case 12:t=e.DiscountLabel12,0==n&&(n=await o.numpad(t))}if(null===n)return;await a.respond("ProcessRequest",{discountNumber:n,discountReason:r,dimensionValue:u});let{postWorkflows:c}=await a.respond("PreparePostWorkflows");await processWorkflows(c)};async function processWorkflows(a){if(a)for(const[e,{mainParameters:s,customParameters:o}]of Object.entries(a))await workflow.run(e,{context:{customParameters:o},parameters:s})}'
         )
     end;
 

@@ -37,6 +37,8 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
                 Frontend.WorkflowResponse(AttemptEndSale(Context));
             'doLegacyPaymentWorkflow':
                 Frontend.WorkflowResponse(DoLegacyPayment(Context, FrontEnd));
+            'preparePostWorkflows':
+                Frontend.WorkflowResponse(PreparePostWorkflows(Context, Sale, PaymentLine));
         end;
     end;
 
@@ -94,6 +96,16 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         POSSale.GetCurrentSale(SalePOS);
         AddSaleDimensionWorkflow(SalePOS, PreWorkflows);
         PmtProcessingEvents.OnAddPreWorkflowsToRun(Context, SalePOS, PreWorkflows);
+    end;
+
+    local procedure PreparePostWorkflows(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; PaymentLine: Codeunit "NPR POS Payment Line") Response: JsonObject
+    var
+        PmtProcessingEvents: Codeunit "NPR Payment Processing Events";
+        PostWorkflows: JsonObject;
+    begin
+        PostWorkflows.ReadFrom('{}');
+        PmtProcessingEvents.OnAddPostWorkflowsToRun(Context, Sale, PaymentLine, PostWorkflows);
+        Response.Add('postWorkflows', PostWorkflows);
     end;
 
     local procedure SwitchToPaymentView(Context: Codeunit "NPR POS JSON Helper")
@@ -176,7 +188,7 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionPaymentWF2.Codeunit.js###
-'const main=async({workflow:e,popup:r,parameters:a,context:c,captions:u})=>{const{HideAmountDialog:l,HideZeroAmountDialog:p}=a,{preWorkflows:i}=await e.respond("preparePreWorkflows");if(i)for(const s of Object.entries(i)){const[m,E]=s;m&&await e.run(m,{parameters:E})}const{dispatchToWorkflow:f,paymentType:d,remainingAmount:t,paymentDescription:y,amountPrompt:A,forceAmount:g,mmPaymentMethodAssigned:N,collectReturnInformation:W}=await e.respond("preparePaymentWorkflow");if(N&&!await r.confirm(u.paymentMethodAssignedCaption))return{};let n=t;if(!l&&(!p||t>0)){if(n=await r.numpad({title:y,caption:A,value:t}),n===null)return{};if(n===0&&t>0)return{}}if(W&&t===n&&!(await e.run("DATA_COLLECTION",{parameters:{requestCollectInformation:"ReturnInformation"}})).success)return{};if(n===0&&t===0&&!g)return await e.run("END_SALE",{parameters:{calledFromWorkflow:"PAYMENT_2",paymentNo:a.paymentNo}}),{};const o=await e.run(f,{context:{paymentType:d,suggestedAmount:n,remainingAmount:t}});return o.legacy?(c.fallbackAmount=n,await e.respond("doLegacyPaymentWorkflow")):o.tryEndSale&&a.tryEndSale&&await e.run("END_SALE",{parameters:{calledFromWorkflow:"PAYMENT_2",paymentNo:a.paymentNo}}),{success:o.success}};'
+'const main=async({workflow:t,popup:e,parameters:o,context:a,captions:r})=>{const{HideAmountDialog:n,HideZeroAmountDialog:s}=o,{preWorkflows:i}=await t.respond("preparePreWorkflows");if(i)for(const e of Object.entries(i)){const[o,a]=e;o&&await t.run(o,{parameters:a})}const{dispatchToWorkflow:m,paymentType:p,remainingAmount:c,paymentDescription:u,amountPrompt:l,forceAmount:f,mmPaymentMethodAssigned:w,collectReturnInformation:y}=await t.respond("preparePaymentWorkflow");if(w&&!await e.confirm(r.paymentMethodAssignedCaption))return{};let d=c;if(!n&&(!s||c>0)){if(d=await e.numpad({title:u,caption:l,value:c}),null===d)return{};if(0===d&&c>0)return{}}if(y&&c===d){if(!(await t.run("DATA_COLLECTION",{parameters:{requestCollectInformation:"ReturnInformation"}})).success)return{}}let{postWorkflows:A}=await t.respond("preparePostWorkflows",{paymentAmount:d});if(await processWorkflows(A),0===d&&0===c&&!f)return await t.run("END_SALE",{parameters:{calledFromWorkflow:"PAYMENT_2",paymentNo:o.paymentNo}}),{};const k=await t.run(m,{context:{paymentType:p,suggestedAmount:d,remainingAmount:c}});return k.legacy?(a.fallbackAmount=d,await t.respond("doLegacyPaymentWorkflow")):k.tryEndSale&&o.tryEndSale&&await t.run("END_SALE",{parameters:{calledFromWorkflow:"PAYMENT_2",paymentNo:o.paymentNo}}),{success:k.success}};async function processWorkflows(t){if(t)for(const[e,{mainParameters:o,customParameters:a}]of Object.entries(t))await workflow.run(e,{context:{customParameters:a},parameters:o})}'
         );
     end;
 }

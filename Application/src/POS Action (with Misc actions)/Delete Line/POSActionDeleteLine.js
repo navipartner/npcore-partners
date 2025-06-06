@@ -18,5 +18,17 @@ let main = async ({ workflow, parameters, captions }) => {
             return;
         };
     };
-    await workflow.respond();
+    
+    let {preWorkflows} = await workflow.respond("preparePreWorkflows");
+
+    await processWorkflows(preWorkflows);
+    await workflow.respond("deleteLine");
 };
+
+async function processWorkflows(workflows) {
+  if (!workflows) return;
+
+  for (const [workflowName, { mainParameters, customParameters },] of Object.entries(workflows)) {
+    await workflow.run(workflowName, {context: { customParameters },parameters: mainParameters,});
+  }
+}

@@ -22,15 +22,30 @@ codeunit 6150796 "NPR POSAction: Delete POS Line" implements "NPR IPOS Workflow"
     var
         POSSession: Codeunit "NPR POS Session";
     begin
-        DeletePosLine(POSSession, Context);
+        case Step of
+            'preparePreWorkflows':
+                FrontEnd.WorkflowResponse(PreparePreWorkflows(Context, Sale, POSSession, SaleLine, PaymentLine));
+            'deleteLine':
+                DeletePosLine(POSSession, Context);
+        end;
     end;
 
     local procedure GetActionScript(): Text
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionDeleteLine.js###
-'let main=async({workflow:a,parameters:i,captions:e})=>{debugger;switch(a.scope.view){case"payment":var t=runtime.getData("BUILTIN_PAYMENTLINE");break;default:var t=runtime.getData("BUILTIN_SALELINE")}if(!t.length||t._invalid){await popup.error(e.notallowed);return}i.ConfirmDialog&&!await popup.confirm({title:e.title,caption:e.Prompt.substitute(t._current[10])})||await a.respond()};'
+        'let main=async({workflow:e,parameters:t,captions:r})=>{if("payment"===e.scope.view)var a=runtime.getData("BUILTIN_PAYMENTLINE");else a=runtime.getData("BUILTIN_SALELINE");if(!a.length||a._invalid)return void await popup.error(r.notallowed);if(t.ConfirmDialog&&!await popup.confirm({title:r.title,caption:r.Prompt.substitute(a._current[10])}))return;let{preWorkflows:o}=await e.respond("preparePreWorkflows");await processWorkflows(o),await e.respond("deleteLine")};async function processWorkflows(e){if(e)for(const[t,{mainParameters:r,customParameters:a}]of Object.entries(e))await workflow.run(t,{context:{customParameters:a},parameters:r})}'
         )
+    end;
+
+    local procedure PreparePreWorkflows(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; POSSession: Codeunit "NPR POS Session"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line") Response: JsonObject
+    var
+        POSActionPublishers: Codeunit "NPR POS Action Publishers";
+        PreWorkflows: JsonObject;
+    begin
+        PreWorkflows.ReadFrom('{}');
+        POSActionPublishers.OnAddPreWorkflowsToRunOnDeletePOSLine(Context, Sale, POSSession, SaleLine, PaymentLine, PreWorkflows);
+        Response.Add('preWorkflows', PreWorkflows);
     end;
 
     local procedure DeletePosLine(POSSession: Codeunit "NPR POS Session"; Context: Codeunit "NPR POS JSON Helper")

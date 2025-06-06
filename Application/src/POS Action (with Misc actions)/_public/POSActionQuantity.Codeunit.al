@@ -69,9 +69,7 @@ codeunit 6150808 "NPR POS Action: Quantity" implements "NPR IPOS Workflow"
         WorkflowConfig.AddBooleanParameter(TakePhotoParLbl, false, TakePhotoLbl, TakePhotoDesc);
     end;
 
-
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
-    var
     begin
         case Step of
             'AddPresetValuesToContext':
@@ -80,11 +78,14 @@ codeunit 6150808 "NPR POS Action: Quantity" implements "NPR IPOS Workflow"
                 FrontEnd.WorkflowResponse(SelectReturnReason());
             'ChangeQty':
                 ChangeQty(Context, SaleLine, Sale);
+            'PreparePostWorkflows':
+                FrontEnd.WorkflowResponse(PreparePostWorkflows(Context, SaleLine));
         end;
     end;
 
     local procedure ChangeQty(Context: Codeunit "NPR POS JSON Helper"; SaleLine: Codeunit "NPR POS Sale Line"; Sale: codeunit "NPR POS Sale")
     var
+        SaleLinePOS: Record "NPR POS Sale Line";
         POSActQuantityB: Codeunit "NPR POS Action: Quantity B";
         POSActionTakePhotoB: Codeunit "NPR POS Action Take Photo B";
         Quantity: Decimal;
@@ -114,6 +115,8 @@ codeunit 6150808 "NPR POS Action: Quantity" implements "NPR IPOS Workflow"
         if TakePhotoEnabled then
             POSActionTakePhotoB.CheckIfPhotoIsTaken(Sale);
         POSActQuantityB.ChangeQuantity(ReturnReasonCode, Quantity, UnitPrice, ConstraintOption, NegativeInput, SkipItemAvailabilityCheck, SaleLine);
+
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
     end;
 
     local procedure GetQty(Context: Codeunit "NPR POS JSON Helper"): Decimal
@@ -157,6 +160,16 @@ codeunit 6150808 "NPR POS Action: Quantity" implements "NPR IPOS Workflow"
         POSSetup.GetPOSUnit(POSUnit);
         if POSUnit.GetProfile(POSAuditProfile) then
             Response.Add('PromptForReason', POSAuditProfile."Require Item Return Reason");
+    end;
+
+    local procedure PreparePostWorkflows(Context: Codeunit "NPR POS JSON Helper"; SaleLine: Codeunit "NPR POS Sale Line") Response: JsonObject
+    var
+        POSActionPublishers: Codeunit "NPR POS Action Publishers";
+        PostWorkflows: JsonObject;
+    begin
+        PostWorkflows.ReadFrom('{}');
+        POSActionPublishers.OnAddPostWorkflowsToRunOnQuantity(Context, SaleLine, PostWorkflows);
+        Response.Add('postWorkflows', PostWorkflows);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnValidateValue', '', true, false)]
@@ -255,7 +268,7 @@ codeunit 6150808 "NPR POS Action: Quantity" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionQuantity.Codeunit.js###
-'let main=async({workflow:a,context:n,popup:i,parameters:t,captions:e})=>{let r,o=runtime.getData("BUILTIN_SALELINE"),u=parseFloat(o._current[12]);if(t.Constraint==t.Constraint["Positive Quantity Only"]&&u<0){i.error(e.MustBePositive);return}if(t.Constraint==t.Constraint["Negative Quantity Only"]&&u>0){i.error(e.MustBeNegative);return}if(n.PromptQuantity=t.InputType==0?await i.numpad({caption:e.QtyCaption,value:u}):t.InputType==1?t.ChangeToQuantity:t.InputType==2?u+t.IncrementQuantity:null,!n.PromptQuantity)return;if(t.MaxQuantityAllowed&&t.MaxQuantityAllowed!=0&&Math.abs(n.PromptQuantity)>t.MaxQuantityAllowed){i.error(e.CannotExceedMaxQty+" "+t.MaxQuantityAllowed);return}let y=await a.respond("AddPresetValuesToContext");t.PromptUnitPriceOnNegativeInput&&(t.NegativeInput?n.PromptQuantity>0:n.PromptQuantity<0)&&(n.PromptUnitPrice=await i.numpad({caption:e.PriceCaption,value:o._current[15]}),!n.PromptUnitPrice)||(y.PromptForReason?(r=await a.respond("AskForReturnReason"),n.PromptForReason=!0):(n.PromptForReason=!1,r=""),await a.respond("ChangeQty",r))};'
+'let main=async({workflow:t,context:a,popup:e,parameters:r,captions:n})=>{let o,i=runtime.getData("BUILTIN_SALELINE"),s=parseFloat(i._current[12]);if(r.Constraint==r.Constraint["Positive Quantity Only"]&&s<0)return void e.error(n.MustBePositive);if(r.Constraint==r.Constraint["Negative Quantity Only"]&&s>0)return void e.error(n.MustBeNegative);if(a.PromptQuantity=0==r.InputType?await e.numpad({caption:n.QtyCaption,value:s}):1==r.InputType?r.ChangeToQuantity:2==r.InputType?s+r.IncrementQuantity:null,!a.PromptQuantity)return;if(r.MaxQuantityAllowed&&0!=r.MaxQuantityAllowed&&Math.abs(a.PromptQuantity)>r.MaxQuantityAllowed)return void e.error(n.CannotExceedMaxQty+" "+r.MaxQuantityAllowed);let p=await t.respond("AddPresetValuesToContext");if(r.PromptUnitPriceOnNegativeInput&&(r.NegativeInput?a.PromptQuantity>0:a.PromptQuantity<0)&&(a.PromptUnitPrice=await e.numpad({caption:n.PriceCaption,value:i._current[15]}),!a.PromptUnitPrice))return;p.PromptForReason?(o=await t.respond("AskForReturnReason"),a.PromptForReason=!0):(a.PromptForReason=!1,o=""),await t.respond("ChangeQty",o);let{postWorkflows:u}=await t.respond("PreparePostWorkflows");await processWorkflows(u)};async function processWorkflows(t){if(t)for(const[a,{mainParameters:e,customParameters:r}]of Object.entries(t))await workflow.run(a,{context:{customParameters:r},parameters:e})}'
           );
     end;
 

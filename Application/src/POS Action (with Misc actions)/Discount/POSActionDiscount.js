@@ -94,6 +94,17 @@ let main = async ({ workflow, captions, parameters, popup }) => {
 
     if (discountNumber === null) return;
 
-    return await workflow.respond("ProcessRequest", { discountNumber: discountNumber, discountReason, dimensionValue });
-}
+    await workflow.respond("ProcessRequest", { discountNumber: discountNumber, discountReason, dimensionValue });
+    
+    let {postWorkflows} = await workflow.respond("PreparePostWorkflows");
+    await processWorkflows(postWorkflows);
+    return;
+};
 
+async function processWorkflows(workflows) {
+  if (!workflows) return;
+
+  for (const [workflowName, { mainParameters, customParameters },] of Object.entries(workflows)) {
+    await workflow.run(workflowName, {context: { customParameters },parameters: mainParameters,});
+  }
+}

@@ -38,4 +38,32 @@ codeunit 6151068 "NPR POS Action Publishers"
     begin
     end;
     #endregion
+
+    #region QUANTITY
+    [IntegrationEvent(false, false)]
+    internal procedure OnAddPostWorkflowsToRunOnQuantity(Context: Codeunit "NPR POS JSON Helper"; SaleLine: Codeunit "NPR POS Sale Line"; var PostWorkflows: JsonObject)
+    begin
+    end;
+    #endregion
+
+    #region DELETE_POS_LINE
+    [IntegrationEvent(false, false)]
+    internal procedure OnAddPreWorkflowsToRunOnDeletePOSLine(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; POSSession: Codeunit "NPR POS Session"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; var PreWorkflows: JsonObject)
+    begin
+    end;
+    #endregion
+
+    #region CHANGE_VIEW
+    [IntegrationEvent(false, false)]
+    internal procedure OnAddPostWorkflowsToRunOnChangeView(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; var PostWorkflows: JsonObject)
+    begin
+    end;
+    #endregion
+
+    #region DISCOUNT
+    [IntegrationEvent(false, false)]
+    internal procedure OnAddPostWorkflowsToRunOnDiscount(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; var PostWorkflows: JsonObject)
+    begin
+    end;
+    #endregion
 }

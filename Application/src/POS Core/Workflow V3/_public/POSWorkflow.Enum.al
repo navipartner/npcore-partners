@@ -1106,6 +1106,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'HUL_INS_REF_SALE', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: HUL InsRefSale";
     }
+    value(374; "HUL_FP_DISPLAY")
+    {
+        Caption = 'HUL_FP_DISPLAY', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: HUL FP Display";
+    }
     value(375; "NO_PRINT_COPY")
     {
         Caption = 'NO_PRINT_COPY', Locked = true, MaxLength = 20;

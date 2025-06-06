@@ -2,6 +2,7 @@ codeunit 6185037 "NPR HU L Audit Mgt."
 {
     Access = Internal;
     Permissions = TableData "Tenant Media" = rd;
+
     var
         CustomerInfoMandatoryErr: Label 'You must input customer information for this sale.';
         SameSignErr: Label 'Cannot have sale and return in the same transaction.';
@@ -209,6 +210,207 @@ codeunit 6185037 "NPR HU L Audit Mgt."
         ActionParameters.Add('customParameters', CustomParameters);
 
         PostWorkflows.Add(Format(Enum::"NPR POS Workflow"::"HUL_RECEIPT_MGT"), ActionParameters);
+    end;
+
+    [Eventsubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Act. Insert Item Event", 'OnAddPostWorkflowsToRun', '', false, false)]
+    local procedure HandleOnAddPostWorkflowsToRunOnInsertItem(Context: Codeunit "NPR POS JSON Helper"; SaleLinePOS: Record "NPR POS Sale Line"; var PostWorkflows: JsonObject)
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSActionHULFPDisplay: Codeunit "NPR POS Action: HUL FP Display";
+        ActionParameters: JsonObject;
+    begin
+        if not POSUnit.Get(SaleLinePOS."Register No.") then
+            exit;
+        if not IsHULaurelAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        ActionParameters.Add(POSActionHULFPDisplay.RowOneMessageParameterName(), SaleLinePOS."Description");
+        ActionParameters.Add(POSActionHULFPDisplay.RowTwoMessageParameterName(), FormatTwoColumnCustDisplayText(FormatDecimalValue(SaleLinePOS.Quantity) + 'x', FormatDecimalValue(SaleLinePOS."Unit Price")));
+        PostWorkflows.Add(Format(Enum::"NPR POS Workflow"::HUL_FP_DISPLAY), ActionParameters);
+    end;
+
+    [Eventsubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action Publishers", 'OnAddPostWorkflowsToRunOnQuantity', '', false, false)]
+    local procedure HandleOnAddPostWorkflowsToRunOnQuantity(Context: Codeunit "NPR POS JSON Helper"; SaleLine: Codeunit "NPR POS Sale Line"; var PostWorkflows: JsonObject)
+    var
+        SaleLinePOS: Record "NPR POS Sale Line";
+        POSUnit: Record "NPR POS Unit";
+        POSActionHULFPDisplay: Codeunit "NPR POS Action: HUL FP Display";
+        ActionParameters: JsonObject;
+        MainParameters: JsonObject;
+    begin
+        SaleLine.GetCurrentSaleLine(SaleLinePOS);
+        if not POSUnit.Get(SaleLinePOS."Register No.") then
+            exit;
+        if not IsHULaurelAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        MainParameters.Add(POSActionHULFPDisplay.RowOneMessageParameterName(), SaleLinePOS."Description");
+        MainParameters.Add(POSActionHULFPDisplay.RowTwoMessageParameterName(), FormatTwoColumnCustDisplayText(FormatDecimalValue(SaleLinePOS.Quantity) + 'x', FormatDecimalValue(SaleLinePOS."Unit Price")));
+        ActionParameters.Add('mainParameters', MainParameters);
+        PostWorkflows.Add(Format(Enum::"NPR POS Workflow"::HUL_FP_DISPLAY), ActionParameters);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action Publishers", 'OnAddPostWorkflowsToRunOnDiscount', '', false, false)]
+    local procedure OnAddPostWorkflowsToRunOnDiscount(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; var PostWorkflows: JsonObject)
+    var
+        POSSale: Record "NPR POS Sale";
+        POSUnit: Record "NPR POS Unit";
+        POSActionHULFPDisplay: Codeunit "NPR POS Action: HUL FP Display";
+        ActionParameters: JsonObject;
+        MainParameters: JsonObject;
+        DiscountLbl: Label 'KEDVEZMÉNY', Locked = true;
+    begin
+        Sale.GetCurrentSale(POSSale);
+        if not POSUnit.Get(POSSale."Register No.") then
+            exit;
+        if not IsHULaurelAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        MainParameters.Add(POSActionHULFPDisplay.RowOneMessageParameterName(), DiscountLbl);
+        MainParameters.Add(POSActionHULFPDisplay.RowTwoMessageParameterName(), FormatDiscountMessageBasedOnDiscountType(Context, POSSale, SaleLine));
+        ActionParameters.Add('mainParameters', MainParameters);
+        PostWorkflows.Add(Format(Enum::"NPR POS Workflow"::HUL_FP_DISPLAY), ActionParameters);
+    end;
+
+    [Eventsubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action Publishers", 'OnAddPreWorkflowsToRunOnDeletePOSLine', '', false, false)]
+    local procedure HandleOnAddPreWorkflowsToRunOnDeletePOSLine(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; POSSession: Codeunit "NPR POS Session"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; var PreWorkflows: JsonObject)
+    var
+        POSSale: Record "NPR POS Sale";
+        POSUnit: Record "NPR POS Unit";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        CurrentView: Codeunit "NPR POS View";
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        POSActionHULFPDisplay: Codeunit "NPR POS Action: HUL FP Display";
+        ViewType: Enum "NPR View Type";
+        ActionParameters: JsonObject;
+        MainParameters: JsonObject;
+        DisplayMessageList: List of [Text];
+    begin
+        Sale.GetCurrentSale(POSSale);
+        if not POSUnit.Get(POSSale."Register No.") then
+            exit;
+        if not IsHULaurelAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        POSSession.GetCurrentView(CurrentView);
+        ViewType := CurrentView.GetType();
+        case ViewType of
+            ViewType::Sale:
+                begin
+                    POSSession.GetSaleLine(POSSaleLine);
+                    POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+                    DisplayMessageList.Add(SaleLinePOS.Description);
+                    DisplayMessageList.Add(FormatTwoColumnCustDisplayText(FormatDecimalValue(-SaleLinePOS.Quantity) + 'x', FormatDecimalValue(SaleLinePOS."Unit Price")));
+                end;
+            ViewType::Payment:
+                begin
+                    POSSession.GetPaymentLine(POSPaymentLine);
+                    POSPaymentLine.GetCurrentPaymentLine(SaleLinePOS);
+                    DisplayMessageList.Add(SaleLinePOS.Description);
+                    DisplayMessageList.Add(FormatDecimalValue(-SaleLinePOS."Amount Including VAT"));
+                end;
+            else
+                exit;
+        end;
+
+        MainParameters.Add(POSActionHULFPDisplay.RowOneMessageParameterName(), DisplayMessageList.Get(1));
+        MainParameters.Add(POSActionHULFPDisplay.RowTwoMessageParameterName(), DisplayMessageList.Get(2));
+        ActionParameters.Add('mainParameters', MainParameters);
+        PreWorkflows.Add(Format(Enum::"NPR POS Workflow"::HUL_FP_DISPLAY), ActionParameters);
+    end;
+
+    [Eventsubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action Publishers", 'OnAddPostWorkflowsToRunOnChangeView', '', false, false)]
+    local procedure HandleOnAddPostWorkflowsToRunOnChangeView(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; var PostWorkflows: JsonObject)
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSSale: Record "NPR POS Sale";
+        POSActionHULFPDisplay: Codeunit "NPR POS Action: HUL FP Display";
+        POSSession: Codeunit "NPR POS Session";
+        CurrentView: Codeunit "NPR POS View";
+        ViewType: Enum "NPR View Type";
+        ActionParameters: JsonObject;
+        MainParameters: JsonObject;
+        TotalAmountLbl: Label 'ÖSSZESEN', Locked = true;
+    begin
+        Sale.GetCurrentSale(POSSale);
+        if not POSUnit.Get(POSSale."Register No.") then
+            exit;
+        if not IsHULaurelAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        POSSession.GetCurrentView(CurrentView);
+        ViewType := CurrentView.GetType();
+        if ViewType <> ViewType::Payment then
+            exit;
+
+        POSSale.CalcFields("Amount Including VAT");
+        MainParameters.Add(POSActionHULFPDisplay.RowOneMessageParameterName(), TotalAmountLbl);
+        MainParameters.Add(POSActionHULFPDisplay.RowTwoMessageParameterName(), FormatTwoColumnCustDisplayText(' ', FormatDecimalValue(POSSale."Amount Including VAT")));
+        ActionParameters.Add('mainParameters', MainParameters);
+        PostWorkflows.Add(Format(Enum::"NPR POS Workflow"::HUL_FP_DISPLAY), ActionParameters);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Payment Processing Events", 'OnAddPostWorkflowsToRun', '', false, false)]
+    local procedure OnAddPostWorkflowsToRun(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; PaymentLine: Codeunit "NPR POS Payment Line"; var PostWorkflows: JsonObject)
+    var
+        POSUnit: Record "NPR POS Unit";
+        POSSale: Record "NPR POS Sale";
+        POSActionHULFPDisplay: Codeunit "NPR POS Action: HUL FP Display";
+        ActionParameters: JsonObject;
+        MainParameters: JsonObject;
+        PaymentAmount: Decimal;
+        PaymentAmountText: Text;
+    begin
+        Sale.GetCurrentSale(POSSale);
+        if not POSUnit.Get(POSSale."Register No.") then
+            exit;
+        if not IsHULaurelAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        if Evaluate(PaymentAmount, Context.GetString('paymentAmount'), 9) then begin
+            if PaymentAmount = 0 then
+                exit;
+            PaymentAmountText := FormatDecimalValue(PaymentAmount)
+        end else
+            PaymentAmountText := Context.GetString('paymentAmount');
+
+        MainParameters.Add(POSActionHULFPDisplay.RowOneMessageParameterName(), GetPOSPaymentMethodDesc(Context.GetStringParameter('paymentNo')));
+        MainParameters.Add(POSActionHULFPDisplay.RowTwoMessageParameterName(), FormatTwoColumnCustDisplayText(' ', PaymentAmountText));
+        ActionParameters.Add('mainParameters', MainParameters);
+        PostWorkflows.Add(Format(Enum::"NPR POS Workflow"::HUL_FP_DISPLAY), ActionParameters);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR End Sale Events", 'OnAddPostWorkflowsToRun', '', false, false)]
+    local procedure HandleOnAddPostWorkflowsToRunOnEndSaleInternal2(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup"; EndSaleSuccess: Boolean; var PostWorkflows: JsonObject)
+    var
+        POSSale: Record "NPR POS Sale";
+        POSEntry: Record "NPR POS Entry";
+        POSUnit: Record "NPR POS Unit";
+        POSActionHULFPDisplay: Codeunit "NPR POS Action: HUL FP Display";
+        ActionParameters: JsonObject;
+        MainParameters: JsonObject;
+        ChangeAmountLbl: Label 'VISSZAJÁRÓ', Locked = true;
+        ChangeAmount: Decimal;
+    begin
+        if not EndSaleSuccess then
+            exit;
+        Sale.GetCurrentSale(POSSale);
+        if not POSUnit.Get(POSSale."Register No.") then
+            exit;
+        if not IsHULaurelAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+        POSEntry.SetCurrentKey("Document No.");
+        POSEntry.SetRange("Document No.", POSSale."Sales Ticket No.");
+        if not POSEntry.FindFirst() then
+            exit;
+        ChangeAmount := CalculateChangeAmount(POSEntry);
+        if ChangeAmount = 0 then
+            exit;
+        MainParameters.Add(POSActionHULFPDisplay.RowOneMessageParameterName(), ChangeAmountLbl);
+        MainParameters.Add(POSActionHULFPDisplay.RowTwoMessageParameterName(), FormatTwoColumnCustDisplayText(' ', FormatDecimalValue(ChangeAmount)));
+        ActionParameters.Add('mainParameters', MainParameters);
+        PostWorkflows.Add(Format(Enum::"NPR POS Workflow"::HUL_FP_DISPLAY), ActionParameters);
     end;
     #endregion
 
@@ -765,6 +967,77 @@ codeunit 6185037 "NPR HU L Audit Mgt."
         if not POSEntrySalesLine.FindFirst() then
             exit(false);
         exit(HULPOSAuditLogAux.FindAuditLog(POSEntrySalesLine."POS Entry No."));
+    end;
+
+    local procedure FormatDiscountMessageBasedOnDiscountType(Context: Codeunit "NPR POS JSON Helper"; POSSale: Record "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"): Text
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+        DiscountType: Option TotalAmount,TotalDiscountAmount,DiscountPercentABS,DiscountPercentREL,LineAmount,LineDiscountAmount,LineDiscountPercentABS,LineDiscountPercentREL,LineUnitPrice,ClearLineDiscount,ClearTotalDiscount,DiscountPercentExtra,LineDiscountPercentExtra;
+    begin
+        DiscountType := Context.GetIntegerParameter('DiscountType');
+        if DiscountType in
+          [DiscountType::TotalAmount,
+           DiscountType::TotalDiscountAmount,
+           DiscountType::DiscountPercentABS,
+           DiscountType::DiscountPercentREL,
+           DiscountType::DiscountPercentExtra,
+           DiscountType::ClearTotalDiscount]
+        then begin
+            POSSale.CalcFields("Amount Including VAT");
+            exit(FormatTwoColumnCustDisplayText(FormatDecimalValue(-CalculateTotalSaleDiscount(POSSale)), FormatDecimalValue(POSSale."Amount Including VAT")));
+        end else begin
+            SaleLine.GetCurrentSaleLine(POSSaleLine);
+            exit(FormatTwoColumnCustDisplayText(FormatDecimalValue(-POSSaleLine."Discount Amount"), FormatDecimalValue(POSSaleLine."Line Amount")));
+        end;
+    end;
+
+    local procedure CalculateTotalSaleDiscount(POSSale: Record "NPR POS Sale"): Decimal
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+    begin
+        POSSaleLine.SetLoadFields("Discount Amount");
+        POSSaleLine.SetRange("Sales Ticket No.", POSSale."Sales Ticket No.");
+        POSSaleLine.SetFilter("Line Type", '%1|%2', POSSaleLine."Line Type"::Item, POSSaleLine."Line Type"::"Issue Voucher");
+        POSSaleLine.CalcSums("Discount Amount");
+        exit(POSSaleLine."Discount Amount");
+    end;
+
+    local procedure GetPOSPaymentMethodDesc(PaymentNoParameter: Text): Text
+    var
+        POSPaymentMethod: Record "NPR POS Payment Method";
+        CashPaymentLbl: Label 'KÉSZPÉNZ', Locked = true;
+        VoucherPaymentLbl: Label 'UTALVÁNY', Locked = true;
+        CheckPaymentLbl: Label 'CSEKK', Locked = true;
+        CardPaymentLbl: Label 'BANKKÁRTYA', Locked = true;
+        PayoutPaymentLbl: Label 'VISSZAFIZETÉS', Locked = true;
+        ForeignVoucherPaymentLbl: Label 'KÜLFÖLDI UTALVÁNY', Locked = true;
+    begin
+        POSPaymentMethod.Get(PaymentNoParameter);
+        case POSPaymentMethod."Processing Type" of
+            POSPaymentMethod."Processing Type"::CASH:
+                exit(CashPaymentLbl);
+            POSPaymentMethod."Processing Type"::VOUCHER:
+                exit(VoucherPaymentLbl);
+            POSPaymentMethod."Processing Type"::CHECK:
+                exit(CheckPaymentLbl);
+            POSPaymentMethod."Processing Type"::EFT:
+                exit(CardPaymentLbl);
+            POSPaymentMethod."Processing Type"::PAYOUT:
+                exit(PayoutPaymentLbl);
+            POSPaymentMethod."Processing Type"::"FOREIGN VOUCHER":
+                exit(ForeignVoucherPaymentLbl);
+        end;
+    end;
+
+    local procedure FormatDecimalValue(Value: Decimal): Text
+    begin
+        exit(Format(Value, 0, '<Precision,2:2><Sign><Integer><Decimals><Comma,.>'))
+    end;
+
+    local procedure FormatTwoColumnCustDisplayText(Col1: Text; Col2: Text) FormattedValue: Text
+    begin
+        FormattedValue := Col1;
+        FormattedValue += Col2.PadLeft(20 - StrLen(FormattedValue));
     end;
     #endregion
 }

@@ -8,6 +8,11 @@ codeunit 6151042 "NPR Payment Processing Events"
     end;
 
     [IntegrationEvent(false, false)]
+    internal procedure OnAddPostWorkflowsToRun(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; PaymentLine: Codeunit "NPR POS Payment Line"; var PostWorkflows: JsonObject)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     internal procedure OnAfterCalculateSuggestionPaymentAmount(SalesTicketNo: Code[20]; SalesAmount: Decimal; PaidAmount: Decimal; POSPaymentMethod: Record "NPR POS Payment Method"; ReturnPOSPaymentMethod: Record "NPR POS Payment Method"; var SuggestPaymentAmount: Decimal; var CollectReturnInformation: Boolean)
     begin
     end;

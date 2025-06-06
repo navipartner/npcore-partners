@@ -1,5 +1,4 @@
 let main = async ({workflow, context, popup, parameters, captions}) => {
-
     let ReturnReasonCode;    
     let saleLines = runtime.getData("BUILTIN_SALELINE");
     let currentQty = parseFloat(saleLines._current[12]);
@@ -66,4 +65,21 @@ let main = async ({workflow, context, popup, parameters, captions}) => {
     }
 
     await workflow.respond("ChangeQty",ReturnReasonCode);
+
+    let {postWorkflows} = await workflow.respond("PreparePostWorkflows");  
+    await processWorkflows(postWorkflows);
 };
+
+async function processWorkflows(workflows) {
+  if (!workflows) return;
+
+  for (const [
+    workflowName,
+    { mainParameters, customParameters },
+  ] of Object.entries(workflows)) {
+    await workflow.run(workflowName, {
+      context: { customParameters },
+      parameters: mainParameters,
+    });
+  }
+}
