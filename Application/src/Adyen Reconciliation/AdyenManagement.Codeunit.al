@@ -339,7 +339,11 @@ codeunit 6184796 "NPR Adyen Management"
     local procedure CreateWebhookHttpRequestObject(WebhookSetup: Record "NPR Adyen Webhook Setup") RequestText: Text;
     var
         RequestObject: JsonObject;
+        EnvironmentInformation: Codeunit "Environment Information";
+        UntrustedCertAllowed: Boolean;
     begin
+        UntrustedCertAllowed := EnvironmentInformation.IsSandbox();
+
         RequestObject.Add('type', Format(WebhookSetup.Type));
         RequestObject.Add('url', WebhookSetup."Web Service URL");
         RequestObject.Add('username', WebhookSetup."Web Service User");
@@ -349,8 +353,8 @@ codeunit 6184796 "NPR Adyen Management"
         RequestObject.Add('active', WebhookSetup.Active);
         RequestObject.Add('communicationFormat', 'json');
         RequestObject.Add('acceptsExpiredCertificate', false);
-        RequestObject.Add('acceptsSelfSignedCertificate', true);
-        RequestObject.Add('acceptsUntrustedRootCertificate', true);
+        RequestObject.Add('acceptsSelfSignedCertificate', UntrustedCertAllowed);
+        RequestObject.Add('acceptsUntrustedRootCertificate', UntrustedCertAllowed);
         RequestObject.Add('populateSoapActionHeader', false);
         RequestObject.WriteTo(RequestText);
     end;
