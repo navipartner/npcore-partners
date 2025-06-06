@@ -626,9 +626,16 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         VATBusPostingGroup: Code[20];
         VATPostingSetup: Record "VAT Posting Setup";
         POSSale: Record "NPR POS Sale";
-        TicketPrice: Decimal;
+        TicketPrice, WalletPrice : Decimal;
         TicketDynamicPrice: Codeunit "NPR TM Dynamic Price";
+        WalletTemplate: Record "NPR NpIa Item AddOn";
+        AttractionWallet: Codeunit "NPR AttractionWallet";
     begin
+        if (Item."NPR Item AddOn No." <> '') then
+            if (WalletTemplate.Get(Item."NPR Item AddOn No.") and (WalletTemplate.WalletTemplate)) then
+                if (AttractionWallet.CalculateWalletPrice(WalletTemplate, WalletPrice)) then
+                    exit(WalletPrice);
+
         if (Item."NPR Ticket Type" <> '') then
             if (TicketDynamicPrice.CalculateRequiredTicketUnitPrice(Item."No.", ItemReference."Variant Code", TicketPrice)) then
                 exit(TicketPrice);

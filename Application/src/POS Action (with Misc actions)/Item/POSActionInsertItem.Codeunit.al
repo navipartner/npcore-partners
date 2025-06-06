@@ -652,7 +652,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         if (ItemIdentifierType < 0) then
             ItemIdentifierType := 0;
 
-        Item.SetLoadFields("No.", "VAT Bus. Posting Gr. (Price)", "Unit Price", "NPR Ticket Type");
+        Item.SetLoadFields("No.", "VAT Bus. Posting Gr. (Price)", "Unit Price", "NPR Ticket Type", "NPR Item AddOn No.");
         if (not POSActionInsertItemB.TryGetItem(Item, ItemReference, ItemIdentifier, ItemIdentifierType)) then
             exit;
 
