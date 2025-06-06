@@ -261,7 +261,9 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG NP Pay POSPaymentSetup", 'UpgradeNPPayPOSPaymentSetupApiKey'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Magento Upgrade", 'EnableMagentoFeature'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Adyen Warning Days", 'UpdateAdyenSetup'));
-
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG No Series Experience", 'UpgradeImplementationFieldOnNoSeries'));
+#ENDIF
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -1007,6 +1009,13 @@
                     'UpdateAdyenSetup':
                         exit('NPR-UpdateAdyenSetup-20250523');
                 end;
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            Codeunit::"NPR UPG No Series Experience":
+                case UpgradeStep of
+                    'UpgradeImplementationFieldOnNoSeries':
+                        exit('NPR-UpgradeImplementationFieldOnNoSeries-20250608');
+                end;
+#ENDIF
         end;
     end;
 }
