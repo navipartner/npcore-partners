@@ -207,6 +207,8 @@ codeunit 6248233 "NPR Ext. POS Sale Processing"
     begin
         if (BarcodeLookupMgt.TranslateBarcodeToItemVariant(ExternalPOSSaleLine."Barcode Reference", ItemNo, ItemVariantCode, ResolvingTable, False)) then begin
             ExternalPOSSaleLine.Validate("No.", ItemNo);
+            if ItemVariantCode <> '' then
+                ExternalPOSSaleLine.Validate("Variant Code", ItemVariantCode);
         end;
     end;
 
