@@ -61,6 +61,11 @@ table 6059870 "NPR Job Queue Refresh Setup"
                 ExternalJQRefresherMgt.RequestJQRefresherUser("Default Refresher User");
             end;
         }
+        field(60; "Create Missing Custom JQs"; Boolean)
+        {
+            Caption = 'Create Missing Custom JQs';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -76,6 +81,7 @@ table 6059870 "NPR Job Queue Refresh Setup"
         if not Get() then begin
             Init();
             Insert();
+            Commit();
         end;
     end;
 }

@@ -11,7 +11,7 @@ codeunit 6151058 "NPR Job Queue User Handler"
     var
         JobQueueManagement: Codeunit "NPR Job Queue Management";
     begin
-        JobQueueManagement.RefreshNPRJobQueueList(true, false);
+        JobQueueManagement.RefreshNPRJobQueueList(true);
     end;
 
 #if BC17 or BC18 or BC19
