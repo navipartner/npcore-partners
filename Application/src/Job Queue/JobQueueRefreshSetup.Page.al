@@ -27,6 +27,11 @@ page 6150891 "NPR Job Queue Refresh Setup"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies whether refreshing the list of NP Retail related job queue entries should be performed by an external Job Queue Refresher Worker regardless of user activity.';
                 }
+                field("Create Missing Custom JQs"; Rec."Create Missing Custom JQs")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies whether the job queue refresher is allowed to automatically recreate missing job queue entries. This only affects custom jobs. Missing NP-protected job queue entries are always recreated.';
+                }
                 group(DefaultRefresherUser)
                 {
                     ShowCaption = false;

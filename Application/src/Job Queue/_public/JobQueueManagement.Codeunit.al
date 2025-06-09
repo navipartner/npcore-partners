@@ -352,6 +352,8 @@
         if Parameters."Job Timeout" <> 0 then
             JobQueueEntry."Job Timeout" := Parameters."Job Timeout";
 #ENDIF
+        if (Parameters."User ID" <> '') and (JobQueueEntry."User ID" <> Parameters."User ID") then
+            JobQueueEntry."User ID" := Parameters."User ID";
     end;
 
     procedure JobQueueEntryExists(Parameters: Record "Job Queue Entry"; var JobQueueEntryOut: Record "Job Queue Entry"): Boolean
@@ -359,18 +361,26 @@
         JobQueueEntry: Record "Job Queue Entry";
     begin
         SelectLatestVersion();
-        JobQueueEntry.LockTable(true);
-        JobQueueEntry.SetRange("Object Type to Run", Parameters."Object Type to Run");
-        JobQueueEntry.SetRange("Object ID to Run", Parameters."Object ID to Run");
-        JobQueueEntry.SetRange("Parameter String", Parameters."Parameter String");
-        JobQueueEntry.SetRange("Job Queue Category Code", Parameters."Job Queue Category Code");
-        if Format(Parameters."Record ID to Process") <> '' then
-            JobQueueEntry.SetFilter("Record ID to Process", Format(Parameters."Record ID to Process"));
-        if JobQueueEntry.IsEmpty() then begin
-            JobQueueEntry.SetRange("Job Queue Category Code");
-            if JobQueueEntry.IsEmpty() then
-                exit(false);
+        if not IsNullGuid(Parameters.ID) then
+            JobQueueEntry.SetRange(ID, Parameters.ID)
+        else begin
+            JobQueueEntry.SetRange("Object Type to Run", Parameters."Object Type to Run");
+            JobQueueEntry.SetRange("Object ID to Run", Parameters."Object ID to Run");
+            JobQueueEntry.SetRange("Parameter String", Parameters."Parameter String");
+            JobQueueEntry.SetRange("Job Queue Category Code", Parameters."Job Queue Category Code");
+            if Format(Parameters."Record ID to Process") <> '' then
+                JobQueueEntry.SetFilter("Record ID to Process", Format(Parameters."Record ID to Process"));
+            if JobQueueEntry.IsEmpty() then begin
+                JobQueueEntry.SetRange("Job Queue Category Code");
+                if JobQueueEntry.IsEmpty() then
+                    exit(false);
+            end;
         end;
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        JobQueueEntry.ReadIsolation := IsolationLevel::UpdLock;
+#else
+        JobQueueEntry.LockTable(true);
+#endif
         JobQueueEntry.Find('-');
         repeat
             if not JobQueueEntry.IsExpired(Parameters."Earliest Start Date/Time") then begin
@@ -692,7 +702,7 @@
         FeatureFlagsManagement.ScheduleGetFeatureFlagsIntegration();
     end;
 
-    internal procedure RefreshNPRJobQueueList(CallRefreshProcedure: Boolean; SetUserFilter: Boolean)
+    internal procedure RefreshNPRJobQueueList(CallRefreshProcedure: Boolean)
     var
         MonitoredJobQueueMgt: Codeunit "NPR Monitored Job Queue Mgt.";
     begin
@@ -702,7 +712,7 @@
             if UnBindSubscription(MonitoredJobQueueMgt) then;
         end;
         if CallRefreshProcedure then
-            RefreshJobQueues(SetUserFilter);  //loop through monitored jobs and create job queue entries if needed
+            RefreshJobQueues();  //loop through monitored jobs and create job queue entries if needed
     end;
 
     internal procedure SkipUpdateNPManagedMonitoredJobs() Skip: Boolean
@@ -1091,11 +1101,11 @@
         IsInMonitoredJobUpdate(Result, Handled);
     end;
 
-    local procedure RefreshJobQueues(SetUserFilter: Boolean)
+    local procedure RefreshJobQueues()
     var
         MonitoredJobQueueMgt: Codeunit "NPR Monitored Job Queue Mgt.";
     begin
-        MonitoredJobQueueMgt.RefreshJobQueueEntries(SetUserFilter);
+        MonitoredJobQueueMgt.RefreshJobQueueEntries();
     end;
 
 #if BC17 or BC18 or BC19 or BC20 or BC21

@@ -11,7 +11,8 @@ codeunit 6248230 "NPR External JQ Refresher WS"
     begin
         JobQueueRefreshSetup.GetSetup();
         if JobQueueRefreshSetup."Use External JQ Refresher" and JobQueueRefreshSetup.Enabled then begin
-            JobQueueMgt.RefreshNPRJobQueueList(true, true);
+            JobQueueMgt.RefreshNPRJobQueueList(true);
+            JobQueueRefreshSetup.Find();
             JobQueueRefreshSetup."Last Refreshed" := CurrentDateTime();
             JobQueueRefreshSetup.Modify();
             Result := SuccessLbl;
