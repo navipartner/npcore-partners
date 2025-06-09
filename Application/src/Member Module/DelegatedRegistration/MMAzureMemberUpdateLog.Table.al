@@ -46,6 +46,26 @@ table 6060015 "NPR MM AzureMemberUpdateLog"
             Caption = 'Token';
             DataClassification = CustomerContent;
         }
+        field(100; HaveImage; Boolean)
+        {
+            Caption = 'Have Image';
+            DataClassification = CustomerContent;
+        }
+        field(101; ImageLength; Integer)
+        {
+            Caption = 'Image Length';
+            DataClassification = CustomerContent;
+        }
+        field(102; ImageB64Taste; Text[50])
+        {
+            Caption = 'Image B64 Taste';
+            DataClassification = CustomerContent;
+        }
+        field(105; ImageResponseMessage; Text[250])
+        {
+            Caption = 'Image Response Message';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

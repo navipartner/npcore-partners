@@ -40,6 +40,7 @@ codeunit 6151383 "NPR MM AzureMemberRegistration"
         ImageB64: Text;
         VisibilityTimeout: Integer;
         HaveImage: Boolean;
+        ResponseReason: Text;
     begin
         if (not AzureRegistrationSetup.Get(AzureRegistrationSetupCode)) then
             exit;
@@ -59,13 +60,18 @@ codeunit 6151383 "NPR MM AzureMemberRegistration"
 
         foreach Message in Messages do begin
             if (DecodeMessage(Message.AsXmlElement(), MessageId, PopReceipt, DataSubjectId, MemberJson)) then begin
+                ClearLastError();
                 HaveImage := GetMemberImage(AzureRegistrationSetup.AzureStorageAccountName, DataSubjectId, ImageB64);
+                if (not HaveImage) then
+                    ResponseReason := GetLastErrorText();
+
                 if (MembershipManagement.UpdateMember(DataSubjectId, MemberJson, ImageB64)) then begin
                     if (HaveImage) then
                         if (DeleteMemberImage(AzureRegistrationSetup.AzureStorageAccountName, DataSubjectId)) then; // not fatal to not delete the image
+
                     DeleteQueuedMessage(AzureRegistrationSetup.AzureStorageAccountName, AzureRegistrationSetup.QueueName, MessageId, PopReceipt);
                 end;
-                UpdateReceiveAzureLog(DataSubjectId, MemberJson);
+                UpdateReceiveAzureLog(DataSubjectId, MemberJson, HaveImage, ImageB64, ResponseReason);
                 Commit();
                 ProcessCount += 1;
             end else begin
@@ -74,7 +80,8 @@ codeunit 6151383 "NPR MM AzureMemberRegistration"
         end;
     end;
 
-    local procedure UpdateReceiveAzureLog(DataSubjectId: Text[64]; MemberJson: JsonObject)
+#pragma warning disable AA0150 // Suppress warning about not changing the var declared parameter
+    local procedure UpdateReceiveAzureLog(DataSubjectId: Text[64]; MemberJson: JsonObject; HaveImage: Boolean; var ImageB64: Text; ResponseReason: Text)
     var
         JToken: JsonToken;
         SignUpJson: JsonObject;
@@ -116,9 +123,16 @@ codeunit 6151383 "NPR MM AzureMemberRegistration"
             end;
         end;
 
+        AzureLog.HaveImage := HaveImage;
+        AzureLog.ImageLength := StrLen(ImageB64);
+        AzureLog.ImageB64Taste := CopyStr(ImageB64, 1, MaxStrLen(AzureLog.ImageB64Taste));
+        AzureLog.ImageResponseMessage := CopyStr(ResponseReason, 1, MaxStrLen(AzureLog.ImageResponseMessage));
+
         AzureLog.ResponseReceived := CurrentDateTime();
         AzureLog.Modify();
     end;
+#pragma warning restore AA0150
+
 
 #pragma warning disable AA0139
     [TryFunction]
