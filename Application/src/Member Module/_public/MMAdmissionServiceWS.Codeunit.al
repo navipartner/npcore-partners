@@ -340,6 +340,8 @@
         DataError: Boolean;
         MMMemberWebService: Codeunit "NPR MM Member WebService";
         MessageText: Text;
+        AdmissionCode: Code[20];
+        MMAdmissionScannerStations: Record "NPR MM Admis. Scanner Stations";
     begin
         SelectLatestVersion();
 
@@ -418,7 +420,11 @@
                     end;
                 MMAdmissionServiceEntry.Type::Membership:
                     begin
-                        if MMMemberWebService.MemberCardRegisterArrival(MMAdmissionServiceEntry."External Card No.", '', '', MessageText) then begin
+                        AdmissionCode := '';
+                        if MMAdmissionScannerStations.Get(ScannerStationId) then
+                            AdmissionCode := MMAdmissionScannerStations."Admission Code";
+
+                        if MMMemberWebService.MemberCardRegisterArrival(MMAdmissionServiceEntry."External Card No.", AdmissionCode, '', MessageText) then begin
                             MMMemberWebService.GetMemberImage(MMAdmissionServiceEntry.Key, PictureBase64, ScannerStationId);
                             if PictureBase64 = '' then
                                 GetAvatarImageV2(MMAdmissionServiceSetup, PictureBase64, MMAdmissionServiceEntry."Scanner Station Id", '');
