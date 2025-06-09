@@ -34,6 +34,7 @@ codeunit 6185082 "NPR TicketingApiHandler"
         Ticket: Codeunit "NPR TicketingTicketAgent";
         Catalog: Codeunit "NPR TicketingCatalogAgent";
         Reservation: Codeunit "NPR TicketingReservationAgent";
+        Import: Codeunit "NPR TicketingImportAgent";
         Reports: Codeunit "NPR TicketingReportAgent";
     begin
         case _ApiFunction of
@@ -84,6 +85,10 @@ codeunit 6185082 "NPR TicketingApiHandler"
                 _Response := Reservation.ConfirmReservation(_Request);
             _ApiFunction::GET_RESERVATION_TICKETS:
                 _Response := Reservation.GetReservationTickets(_Request);
+
+            // Import
+            _ApiFunction::IMPORT_TICKET:
+                _Response := Import.ImportTickets(_Request);
 
             // Reports
             _ApiFunction::DYNAMIC_PRICE_PROFILE_LIST:

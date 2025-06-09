@@ -39,6 +39,9 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
         #endregion
 
         #region POST
+        if (Request.Match('POST', '/ticket/import')) then
+            exit(Handle(_ApiFunction::IMPORT_TICKET, Request));
+
         if (Request.Match('POST', '/ticket/:ticketId/requestRevoke')) then
             exit(Handle(_ApiFunction::REQUEST_REVOKE_TICKET, Request));
 

@@ -75,6 +75,9 @@ types:
     docs: 
       A reference to the payment transaction. Unless provided, the reservation is not considered paid. 
       A confirmed unpaid reservation must be paid on site before the tickets are valid for usage.
+    examples:
+      - name: ExamplePaymentReference
+        value: "PAY123456789"
 
   ReservationStatusEnum:
     enum:

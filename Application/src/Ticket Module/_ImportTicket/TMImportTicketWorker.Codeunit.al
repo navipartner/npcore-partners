@@ -139,6 +139,7 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
         TicketRequest.Quantity := 1;
         TicketRequest."External Member No." := TempTicketImportLine.MemberNumber;
         TicketRequest."Notification Address" := TempTicketImportLine.TicketHolderEMail;
+        TicketRequest.TicketHolderName := TempTicketImportLine.TicketHolderName;
 
         if (not TicketRequestManager.TranslateBarcodeToItemVariant(TicketRequest."External Item Code", TicketRequest."Item No.", TicketRequest."Variant Code", ResolvingTable)) then
             Error(INVALID_ITEM_REFERENCE, TicketRequest."External Item Code");

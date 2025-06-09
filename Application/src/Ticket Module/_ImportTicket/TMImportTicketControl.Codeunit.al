@@ -171,8 +171,8 @@ codeunit 6184689 "NPR TM ImportTicketControl"
                 TempTicketImportLine.TicketRequestTokenLine := GetAsInteger(Ticket, 'orderLineNumber', false);
                 TempTicketImportLine.PreAssignedTicketNumber := Format(GetAsText(Ticket, 'preAssignedTicketNumber', MaxStrLen(TempTicketImportLine.PreAssignedTicketNumber), false));
 
-                if TempTicketImportLine.PreAssignedTicketNumber = '' then begin
-                    if TMTicketSetup."Imp. Def. Ext. Ticket Pattern" = '' then
+                if (TempTicketImportLine.PreAssignedTicketNumber = '') then begin
+                    if (TMTicketSetup."Imp. Def. Ext. Ticket Pattern" = '') then
                         TMTicketSetup.FieldError("Imp. Def. Ext. Ticket Pattern", ErrEmptyExtTicketPattern);
 
                     TempTicketImportLine.PreAssignedTicketNumber := TMTicketManagement.GenerateNumberPattern(TMTicketSetup."Imp. Def. Ext. Ticket Pattern", '');
@@ -182,7 +182,7 @@ codeunit 6184689 "NPR TM ImportTicketControl"
                             GenerateNumberCount += 1;
                         until ((TMTicket.CheckIsUnique(TempTicketImportLine.PreAssignedTicketNumber)) or (GenerateNumberCount >= 10));
 
-                        if GenerateNumberCount > 10 then
+                        if (GenerateNumberCount > 10) then
                             Error(ErrUnableToGenerateUniqueNumber);
                     end;
                 end;

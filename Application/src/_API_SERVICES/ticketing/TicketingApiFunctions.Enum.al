@@ -104,11 +104,21 @@ enum 6059815 "NPR TicketingApiFunctions"
 
     #endregion
 
+    #region Import/Export
+    value(800; IMPORT_TICKET)
+    {
+        Caption = 'Import ticket';
+    }
+    #endregion
+
     #region Reports
     value(900; DYNAMIC_PRICE_PROFILE_LIST)
     {
         Caption = 'Get dynamic price profile list';
     }
     #endregion
+
+
+
 }
 #endif

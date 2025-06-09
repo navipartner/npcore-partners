@@ -128,9 +128,12 @@ navigation:
                   - endpoint: ticketing.service-ticket.exchangeForCoupon
                   - endpoint: ticketing.service-ticket.confirmPrint
                   - endpoint: ticketing.service-ticket.clearConfirmPrint
+                  - endpoint: ticketing.service-import.importTickets
+                    hidden: true
+
             - ticketing.service-reservations:
                 title: Reservations
-                summary: ./docs/pages/ticketing/reservation-summary.mdx              
+                summary: ./docs/pages/ticketing/reservation-summary.mdx
                 contents:
                   - endpoint: ticketing.service-reservations.createReservation
                   - endpoint: ticketing.service-reservations.updateReservation
@@ -144,6 +147,7 @@ navigation:
                 summary: ./docs/pages/ticketing/schedule-summary.mdx
                 contents:
                   - endpoint: ticketing.service-schedule.getSchedule
+
         - section: Memberships
           summary: ./docs/pages/memberships/overview.mdx
           contents:
