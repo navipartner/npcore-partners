@@ -307,17 +307,30 @@
     end;
 
     local procedure UpdateJobQueueEntry(Parameters: Record "Job Queue Entry"; var JobQueueEntry: Record "Job Queue Entry"): Boolean
-    var
-        xJobQueueEntry: Record "Job Queue Entry";
     begin
-        xJobQueueEntry := JobQueueEntry;
-        SetJobQueueEntryParams(Parameters, JobQueueEntry);
-        OnBeforeModifyUpdatedJobQueueEntry(JobQueueEntry);
-        if Format(xJobQueueEntry) = Format(JobQueueEntry) then
+        if not UpdateIsRequired(Parameters, JobQueueEntry) then
             exit(false);
+
+        JobQueueEntry.RefreshLocked();
+        DoUpdateJobQueueEntry(Parameters, JobQueueEntry);
         JobQueueEntry.Status := JobQueueEntry.Status::"On Hold";
         JobQueueEntry.Modify(true);
         exit(true);
+    end;
+
+    local procedure DoUpdateJobQueueEntry(Parameters: Record "Job Queue Entry"; var JobQueueEntry: Record "Job Queue Entry")
+    begin
+        SetJobQueueEntryParams(Parameters, JobQueueEntry);
+        OnBeforeModifyUpdatedJobQueueEntry(JobQueueEntry);
+    end;
+
+    local procedure UpdateIsRequired(Parameters: Record "Job Queue Entry"; JobQueueEntry: Record "Job Queue Entry"): Boolean
+    var
+        TempJobQueueEntry: Record "Job Queue Entry" temporary;
+    begin
+        TempJobQueueEntry := JobQueueEntry;
+        DoUpdateJobQueueEntry(Parameters, TempJobQueueEntry);
+        exit(Format(TempJobQueueEntry) <> Format(JobQueueEntry));
     end;
 
     local procedure SetJobQueueEntryParams(Parameters: Record "Job Queue Entry"; var JobQueueEntry: Record "Job Queue Entry")
@@ -361,6 +374,10 @@
         JobQueueEntry: Record "Job Queue Entry";
     begin
         SelectLatestVersion();
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        JobQueueEntry.ReadIsolation := IsolationLevel::ReadUncommitted;
+#endif
+
         if not IsNullGuid(Parameters.ID) then
             JobQueueEntry.SetRange(ID, Parameters.ID)
         else begin
@@ -376,11 +393,6 @@
                     exit(false);
             end;
         end;
-#if not (BC17 or BC18 or BC19 or BC20 or BC21)
-        JobQueueEntry.ReadIsolation := IsolationLevel::UpdLock;
-#else
-        JobQueueEntry.LockTable(true);
-#endif
         JobQueueEntry.Find('-');
         repeat
             if not JobQueueEntry.IsExpired(Parameters."Earliest Start Date/Time") then begin
@@ -438,9 +450,8 @@
             if not IsStale(JobQueueEntry) then
                 exit;
 
+        JobQueueEntry.RefreshLocked();  // Allow up to three lock time-outs = 90 seconds, in order to reduce lock timeouts
         if not ValidStartDT then begin
-            JobQueueEntry.LockTable();
-            JobQueueEntry.Get(JobQueueEntry.ID);
             JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold");
             JobQueueEntry."Earliest Start Date/Time" := NotBeforeDateTime;
             JobQueueEntry.Modify();
@@ -710,6 +721,7 @@
             BindSubscription(MonitoredJobQueueMgt);
             OnRefreshNPRJobQueueList();  //update monitored jobs
             if UnBindSubscription(MonitoredJobQueueMgt) then;
+            Commit();
         end;
         if CallRefreshProcedure then
             RefreshJobQueues();  //loop through monitored jobs and create job queue entries if needed
@@ -909,7 +921,6 @@
         RerunDelaySec := DelaySec;
     end;
 
-    [TryFunction]
     internal procedure SendHeartbeat(JobQueueEntry: Record "Job Queue Entry")
     var
         HttpClient: HttpClient;
