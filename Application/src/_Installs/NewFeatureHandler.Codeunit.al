@@ -119,6 +119,18 @@ codeunit 6150632 "NPR New Feature Handler"
     end;
 #endif
 
+    internal procedure HandleNewMagentoFeature()
+    var
+        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeStep: Text;
+    begin
+        UpgradeStep := 'EnableMagentoFeature';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Magento Upgrade", UpgradeStep)) then
+            exit;
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Magento Upgrade", UpgradeStep));
+    end;
+
     local procedure POSEditorFeatureHandle()
     var
         Feature: Record "NPR Feature";

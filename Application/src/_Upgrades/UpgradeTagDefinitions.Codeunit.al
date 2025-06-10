@@ -1002,7 +1002,7 @@
             Codeunit::"NPR Magento Upgrade":
                 case UpgradeStep of
                     'EnableMagentoFeature':
-                        exit('NPR-EnableMagentoFeature-20250603');
+                        exit('NPR-EnableMagentoFeature-20250610');
                 end;
             Codeunit::"NPR UPG Adyen Warning Days":
                 case UpgradeStep of
