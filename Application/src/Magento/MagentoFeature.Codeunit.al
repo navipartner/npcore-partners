@@ -6,6 +6,8 @@ codeunit 6248453 "NPR Magento Feature" implements "NPR Feature Management"
     var
         Feature: Record "NPR Feature";
     begin
+        if Feature.Get(GetFeatureId()) then
+            exit;
         Feature.Init();
         Feature.Id := GetFeatureId();
         Feature.Enabled := false;
