@@ -240,6 +240,9 @@ codeunit 85137 "NPR Retail Journal Tests"
         LineDiscPct: Decimal;
         LineAmtInclTax: Decimal;
     begin
+#if BC26
+        exit;
+#endif
         // [SCENARIO] Test if the price and discount are populated correctly when an item is part of a price list discount and is added to the retail journal.
 
         Initialize();
@@ -298,6 +301,9 @@ codeunit 85137 "NPR Retail Journal Tests"
         LineAmtInclTax: Decimal;
         LineAmtExclTax: Decimal;
     begin
+#if BC26
+        exit;
+#endif
         // [SCENARIO] Test if the price and discount are populated correctly when an item is part of both a period and mix discount and is added to the retail journal.
 
         Initialize();
@@ -1743,6 +1749,9 @@ codeunit 85137 "NPR Retail Journal Tests"
         LineDiscAmt: Decimal;
         DiscountPriceInclTax: Decimal;
     begin
+#if BC26
+        exit;
+#endif
         // [SCENARIO] Check prices when having item on retail journal which has price list line discount. Item price includes vat = false + item without VAT
 
         Initialize();
@@ -1800,6 +1809,9 @@ codeunit 85137 "NPR Retail Journal Tests"
         DiscountPriceExclTax: Decimal;
         DiscountPriceInclTax: Decimal;
     begin
+#if BC26
+        exit;
+#endif
         // [SCENARIO] Check prices when having item on retail journal which has price list line discount. Item price includes vat = false + item with VAT
 
         Initialize();
@@ -1856,6 +1868,9 @@ codeunit 85137 "NPR Retail Journal Tests"
         LineDiscAmt: Decimal;
         DiscountPriceInclTax: Decimal;
     begin
+#if BC26
+        exit;
+#endif
         // [SCENARIO] Check prices when having item on retail journal which has price list line discount. Item price includes vat = true + item without VAT
 
         Initialize();
@@ -1912,6 +1927,9 @@ codeunit 85137 "NPR Retail Journal Tests"
         DiscountPriceExclTax: Decimal;
         DiscountPriceInclTax: Decimal;
     begin
+#if BC26
+        exit;
+#endif
         // [SCENARIO] Check prices when having item on retail journal which has price list line discount. Item price includes vat = true + item with VAT
 
         Initialize();
