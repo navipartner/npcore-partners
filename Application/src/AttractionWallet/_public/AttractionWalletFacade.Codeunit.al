@@ -42,6 +42,13 @@ codeunit 6185061 "NPR AttractionWalletFacade"
         WalletManagement.AddMemberCardsToWallet(WalletEntryNo, MemberCardIds);
     end;
 
+    procedure AddCouponsToWallets(WalletEntryNo: Integer; CouponIds: List of [Guid]; ItemNo: Code[20]; DocumentNumber: Code[20])
+    var
+        WalletManagement: Codeunit "NPR AttractionWallet";
+    begin
+        WalletManagement.AddCouponsToWallet(WalletEntryNo, CouponIds, ItemNo, DocumentNumber);
+    end;
+
     procedure SetWalletReferenceNumber(WalletEntryNo: Integer; TableId: Integer; SystemId: Guid; Reference: Text[100])
     var
         WalletManagement: Codeunit "NPR AttractionWallet";
