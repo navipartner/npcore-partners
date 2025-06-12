@@ -1,9 +1,9 @@
 page 6184856 "NPR WalletTemplate"
 {
     Extensible = False;
-    Caption = 'Attraction Wallet Template';
+    Caption = 'Attraction Package Template';
     //ContextSensitiveHelpPage = 'docs/retail/pos_processes/reference/item_addon_ref/';
-    CardPageID = "NPR WalletTEmplateCard";
+    CardPageID = "NPR WalletTemplateCard";
     Editable = false;
     PageType = List;
     SourceTable = "NPR NpIa Item AddOn";

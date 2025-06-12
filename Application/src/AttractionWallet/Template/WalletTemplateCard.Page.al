@@ -2,7 +2,7 @@ page 6184857 "NPR WalletTemplateCard"
 {
     Extensible = False;
     UsageCategory = None;
-    Caption = 'Wallet Template Card';
+    Caption = 'Package Template Card';
     PageType = Card;
     SourceTable = "NPR NpIa Item AddOn";
 

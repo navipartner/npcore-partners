@@ -317,16 +317,9 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         Editable = false;
                     }
                 }
-
                 group("NPR Group1")
                 {
                     ShowCaption = false;
-                    field("NPR CreateAttractionWallet"; Rec."NPR CreateAttractionWallet")
-                    {
-                        ToolTip = 'Specifies if the item will be used to create an Attraction Wallet.';
-                        ApplicationArea = NPRRetail;
-                    }
-
                     field("NPR Item AddOn No."; Rec."NPR Item AddOn No.")
                     {
                         ToolTip = 'Allows the user to link additional items.';
@@ -338,7 +331,6 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                         ApplicationArea = NPRRetail;
                     }
                 }
-
                 group("NPR Group2")
                 {
                     ShowCaption = false;
@@ -352,16 +344,7 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     {
                         ToolTip = 'Specifies if the No is printed on the receipt.';
                         ApplicationArea = NPRRetail;
-                    }
-                    field("NPR Ticket Type"; Rec."NPR Ticket Type")
-                    {
-                        ToolTip = 'Specifies the ticket type that will be used with the item.';
-                        ApplicationArea = NPRRetail;
-                    }
-                    field("NPR POS Admit Action"; Rec."NPR POS Admit Action")
-                    {
-                        ToolTip = 'Specifies how tickets on this item will be printed and admitted.';
-                        ApplicationArea = NPRRetail;
+
                     }
                     field("NPR Print Tags"; Rec."NPR Print Tags")
                     {
@@ -387,7 +370,6 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                     }
                 }
             }
-
             group("NPR MagentoEnabled")
             {
                 Caption = 'Magento';
@@ -762,7 +744,36 @@ pageextension 6014430 "NPR Item Card" extends "Item Card"
                 }
             }
         }
-
+        addafter("NPR Properties")
+        {
+            group("NPR NP Attraction")
+            {
+                Caption = 'NP Attraction';
+                field("NPR CreateAttractionWallet"; Rec."NPR CreateAttractionWallet")
+                {
+                    ToolTip = 'Specifies if the item will be used to create an Attraction Wallet.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("NPR AP Item AddOn No."; Rec."NPR Item AddOn No.")
+                {
+                    Caption = 'Package Template (Item AddOn No.)';
+                    ToolTip = 'Allows the user to link additional items (Attraction Package Template).';
+                    ApplicationArea = NPRRetail;
+                    DrillDownPageId = "NPR WalletTemplate";
+                    LookupPageID = "NPR WalletTemplate";
+                }
+                field("NPR Ticket Type"; Rec."NPR Ticket Type")
+                {
+                    ToolTip = 'Specifies the ticket type that will be used with the item.';
+                    ApplicationArea = NPRRetail;
+                }
+                field("NPR POS Admit Action"; Rec."NPR POS Admit Action")
+                {
+                    ToolTip = 'Specifies how tickets on this item will be printed and admitted.';
+                    ApplicationArea = NPRRetail;
+                }
+            }
+        }
         addafter(ItemAttributesFactbox)
         {
             part(NPRMagentoPictureDragDropAddin; "NPR Magento DragDropPic. Addin")

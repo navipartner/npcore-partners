@@ -31,7 +31,7 @@
         }
         field(20; WalletTemplate; Boolean)
         {
-            Caption = 'Wallet Template';
+            Caption = 'Package Template';
             DataClassification = CustomerContent;
         }
     }
