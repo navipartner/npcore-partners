@@ -85,6 +85,11 @@ codeunit 6185076 "NPR AttractionWalletCreate"
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnBeforeSetQuantity', '', true, true)]
     local procedure OnBeforeSetQuantityPOSSaleLine(SaleLinePOS: Record "NPR POS Sale Line"; var NewQuantity: Decimal)
+    begin
+        SetQuantityPOSSaleLineWorker(SaleLinePOS, NewQuantity);
+    end;
+
+    internal procedure SetQuantityPOSSaleLineWorker(SaleLinePOS: Record "NPR POS Sale Line"; NewQuantity: Decimal)
     var
         POSSale: Record "NPR POS Sale";
         IntermediaryWalletLine: Record "NPR AttractionWalletSaleLine";

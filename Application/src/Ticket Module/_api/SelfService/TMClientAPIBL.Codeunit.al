@@ -408,6 +408,7 @@ codeunit 6151543 "NPR TM Client API BL"
         SaleLinePOS: Record "NPR POS Sale Line";
         TicketRequest: Record "NPR TM Ticket Reservation Req.";
         TicketRetailManager: Codeunit "NPR TM Ticket Retail Mgt.";
+        WalletManager: Codeunit "NPR AttractionWalletCreate";
     begin
         if (SalesReceiptNumber = '') then
             exit;
@@ -426,6 +427,9 @@ codeunit 6151543 "NPR TM Client API BL"
         TicketRetailManager.AdjustPriceOnSalesLine(SaleLinePOS, TicketRequest.Quantity, Token, TicketRequest."Ext. Line Reference No.");
         SaleLinePOS."Description 2" := TicketRequest."Scheduled Time Description";
         SaleLinePOS.Modify();
+
+        WalletManager.SetQuantityPOSSaleLineWorker(SaleLinePOS, TicketRequest.Quantity);
+
     end;
 
     local procedure CheckScheduleId(AdmissionCode: Text; ExternalScheduleId: Integer; var ValidationErrorList: List of [Text])
