@@ -39,6 +39,25 @@ codeunit 6248404 "NPR UserAccountMgtImpl"
         end;
     end;
 
+    internal procedure UpdateAccountEmail(FromEmail: Text[80]; ToEmail: Text[80])
+    var
+        UserAccount: Record "NPR UserAccount";
+        TempUserAccount: Record "NPR UserAccount" temporary;
+    begin
+#pragma warning disable AA0139
+        if (not FindAccountByEmail(FromEmail.ToLower().Trim(), UserAccount)) then
+#pragma warning restore AA0139
+            exit;
+
+        TempUserAccount := UserAccount;
+#pragma warning disable AA0139
+        TempUserAccount.EmailAddress := ToEmail.ToLower().Trim();
+#pragma warning restore AA0139
+
+        if (UpdateAccount(UserAccount, TempUserAccount)) then
+            UserAccount.Modify();
+    end;
+
     internal procedure FindAccountByEmail(EmailAddress: Text[80]; var UserAccount: Record "NPR UserAccount") Found: Boolean
     begin
         UserAccount.Reset();
