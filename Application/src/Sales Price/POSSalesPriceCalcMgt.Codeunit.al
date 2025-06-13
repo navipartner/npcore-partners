@@ -401,7 +401,7 @@
 
     local procedure GetPublisherCodeunitId(): Integer
     begin
-        exit(CODEUNIT::"NPR POS Sales Price Calc. Mgt.");
+        exit(CODEUNIT::"NPR POS Pricing Profile");
     end;
 
     local procedure GetPublisherFunction(): Text
