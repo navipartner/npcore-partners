@@ -55,7 +55,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine.FindFirst();
 
         // [THEN] Check if price is calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Unit Price", Item."Unit Price", 'Unit Price not calculated according to scenario');
     end;
 
     [Test]
@@ -103,11 +103,11 @@ codeunit 85137 "NPR Retail Journal Tests"
         LineAmtInclTax := Item."Unit Price" - PeriodDiscountLine."Discount Amount";
 
         // [THEN] Check if discount and price are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Campaign, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" = PeriodDiscountLine.Code, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Pct." = PeriodDiscountLine."Discount %", 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Price Incl. Vat" = LineAmtInclTax, 'Unit price after discount application not calculated according to scenario.');
+        Assert.AreEqual(RetailJournalLine."Unit Price", Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Campaign, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Code", PeriodDiscountLine.Code, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Pct.", PeriodDiscountLine."Discount %", 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Price Incl. Vat", LineAmtInclTax, 'Unit price after discount application not calculated according to scenario.');
     end;
 
     [Test]
@@ -163,11 +163,11 @@ codeunit 85137 "NPR Retail Journal Tests"
         LineAmtInclTax := QtyForDiscCalc * Item."Unit Price" - LineDiscAmt;
 
         // [THEN] Check if discount and price are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Quantity, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" = QuantityDiscountLine."Main no.", 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Pct." = LineDiscPct, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Price Incl. Vat" = LineAmtInclTax, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Unit Price", Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Quantity, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Code", QuantityDiscountLine."Main no.", 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Pct.", LineDiscPct, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Price Incl. Vat", LineAmtInclTax, 'Discount not calculated according to scenario');
     end;
 
     [Test]
@@ -219,11 +219,11 @@ codeunit 85137 "NPR Retail Journal Tests"
         LineAmtExclTax := LineAmtInclTax / (1 + RetailJournalLine."VAT %" / 100);
 
         // [THEN] Check if discount and price are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Pct." = LineDiscPct, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Price Excl. VAT" = LineAmtExclTax, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Unit Price", Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.AreNotEqual(RetailJournalLine."Discount Code", '', 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Pct.", LineDiscPct, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Price Excl. VAT", LineAmtExclTax, 'Discount not calculated according to scenario');
     end;
 
     [Test]
@@ -240,9 +240,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         LineDiscPct: Decimal;
         LineAmtInclTax: Decimal;
     begin
-#if BC26
-        exit;
-#endif
         // [SCENARIO] Test if the price and discount are populated correctly when an item is part of a price list discount and is added to the retail journal.
 
         Initialize();
@@ -276,9 +273,9 @@ codeunit 85137 "NPR Retail Journal Tests"
         LineAmtInclTax := Item."Unit Price" - LineDiscAmt;
 
         // [THEN] Check if discount and price are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Customer, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Pct." = LineDiscPct, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Unit Price", Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Customer, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Pct.", LineDiscPct, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. Vat", LineAmtInclTax, 0.1, 'Discount not calculated according to scenario');
     end;
 
@@ -301,9 +298,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         LineAmtInclTax: Decimal;
         LineAmtExclTax: Decimal;
     begin
-#if BC26
-        exit;
-#endif
         // [SCENARIO] Test if the price and discount are populated correctly when an item is part of both a period and mix discount and is added to the retail journal.
 
         Initialize();
@@ -341,11 +335,11 @@ codeunit 85137 "NPR Retail Journal Tests"
         LineAmtExclTax := LineAmtInclTax / (1 + RetailJournalLine."VAT %" / 100);
 
         // [THEN] Check if discount and price are calculated correctly
-        Assert.IsTrue(RetailJournalLine."Unit Price" = Item."Unit Price", 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Pct." = LineMixDiscPct, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Price Excl. VAT" = LineAmtExclTax, 'Unit price after discount application not calculated according to scenario.');
+        Assert.AreEqual(RetailJournalLine."Unit Price", Item."Unit Price", 'Unit Price not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.AreNotEqual(RetailJournalLine."Discount Code", '', 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Pct.", LineMixDiscPct, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Price Excl. VAT", LineAmtExclTax, 'Unit price after discount application not calculated according to scenario.');
     end;
 
     [Test]
@@ -392,8 +386,8 @@ codeunit 85137 "NPR Retail Journal Tests"
 
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.AreNotEqual(RetailJournalLine."Discount Code", '', 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", TotalAmount, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", TotalAmount, 0.1, 'Discount not calculated according to scenario');
     end;
@@ -449,8 +443,8 @@ codeunit 85137 "NPR Retail Journal Tests"
 
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", UnitPriceInclTax, 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.AreNotEqual(RetailJournalLine."Discount Code", '', 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", TotalAmount, 0.1, 'Discount not calculated according to scenario');
     end;
@@ -499,8 +493,8 @@ codeunit 85137 "NPR Retail Journal Tests"
 
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.AreNotEqual(RetailJournalLine."Discount Code", '', 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", TotalAmount, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", TotalAmount, 0.1, 'Discount not calculated according to scenario');
     end;
@@ -554,8 +548,8 @@ codeunit 85137 "NPR Retail Journal Tests"
 
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.AreNotEqual(RetailJournalLine."Discount Code", '', 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", TotalAmount, 0.1, 'Discount not calculated according to scenario');
     end;
@@ -604,8 +598,8 @@ codeunit 85137 "NPR Retail Journal Tests"
 
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.AreNotEqual(RetailJournalLine."Discount Code", '', 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" - DiscountAmount, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" - DiscountAmount, 0.1, 'Discount not calculated according to scenario');
     end;
@@ -661,8 +655,8 @@ codeunit 85137 "NPR Retail Journal Tests"
 
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", UnitPriceInclTax, 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.AreNotEqual(RetailJournalLine."Discount Code", '', 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountAmountExclTax, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", UnitPriceInclTax - DiscountAmount, 0.1, 'Discount not calculated according to scenario');
     end;
@@ -711,8 +705,8 @@ codeunit 85137 "NPR Retail Journal Tests"
 
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.AreNotEqual(RetailJournalLine."Discount Code", '', 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" - DiscountAmount, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" - DiscountAmount, 0.1, 'Discount not calculated according to scenario');
     end;
@@ -766,8 +760,8 @@ codeunit 85137 "NPR Retail Journal Tests"
 
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.AreNotEqual(RetailJournalLine."Discount Code", '', 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" - DiscountAmount, 0.1, 'Discount not calculated according to scenario');
     end;
@@ -816,9 +810,9 @@ codeunit 85137 "NPR Retail Journal Tests"
 
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Pct." = DiscountPct, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.AreNotEqual(RetailJournalLine."Discount Code", '', 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Pct.", DiscountPct, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" * (1 - DiscountPct / 100), 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" * (1 - DiscountPct / 100), 0.1, 'Discount not calculated according to scenario');
     end;
@@ -872,9 +866,9 @@ codeunit 85137 "NPR Retail Journal Tests"
 
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", UnitPriceInclTax, 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Pct." = DiscountPct, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.AreNotEqual(RetailJournalLine."Discount Code", '', 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Pct.", DiscountPct, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" * (1 - DiscountPct / 100), 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", UnitPriceInclTax * (1 - DiscountPct / 100), 0.1, 'Discount not calculated according to scenario');
     end;
@@ -923,9 +917,9 @@ codeunit 85137 "NPR Retail Journal Tests"
 
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Pct." = DiscountPct, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.AreNotEqual(RetailJournalLine."Discount Code", '', 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Pct.", DiscountPct, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" * (1 - DiscountPct / 100), 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" * (1 - DiscountPct / 100), 0.1, 'Discount not calculated according to scenario');
     end;
@@ -979,9 +973,9 @@ codeunit 85137 "NPR Retail Journal Tests"
 
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" <> '', 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Pct." = DiscountPct, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.AreNotEqual(RetailJournalLine."Discount Code", '', 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Pct.", DiscountPct, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" * (1 - DiscountPct / 100), 0.1, 'Discount not calculated according to scenario');
     end;
@@ -1039,8 +1033,8 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine.Validate("Quantity for Discount Calc", FirstLevelQty);
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" = DiscountCode, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Code", DiscountCode, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" * FirstLevelQty - FirstLevelAmount, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" * FirstLevelQty - FirstLevelAmount, 0.1, 'Discount not calculated according to scenario');
 
@@ -1048,8 +1042,8 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine.Validate("Quantity for Discount Calc", SecondLevelQty);
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" = DiscountCode, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Code", DiscountCode, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" * SecondLevelQty - SecondLevelAmount, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" * SecondLevelQty - SecondLevelAmount, 0.1, 'Discount not calculated according to scenario');
     end;
@@ -1116,8 +1110,8 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine.Validate("Quantity for Discount Calc", FirstLevelQty);
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", UnitPriceInclTax, 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" = DiscountCode, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Code", DiscountCode, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", FirstDiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", UnitPriceInclTax * FirstLevelQty - FirstLevelAmount, 0.1, 'Discount not calculated according to scenario');
 
@@ -1125,8 +1119,8 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine.Validate("Quantity for Discount Calc", SecondLevelQty);
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", UnitPriceInclTax, 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" = DiscountCode, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Code", DiscountCode, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", SecondDiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", UnitPriceInclTax * SecondLevelQty - SecondLevelAmount, 0.1, 'Discount not calculated according to scenario');
     end;
@@ -1184,8 +1178,8 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine.Validate("Quantity for Discount Calc", FirstLevelQty);
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" = DiscountCode, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Code", DiscountCode, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" * FirstLevelQty - FirstLevelAmount, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" * FirstLevelQty - FirstLevelAmount, 0.1, 'Discount not calculated according to scenario');
 
@@ -1193,8 +1187,8 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine.Validate("Quantity for Discount Calc", SecondLevelQty);
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" = DiscountCode, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Code", DiscountCode, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" * SecondLevelQty - SecondLevelAmount, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" * SecondLevelQty - SecondLevelAmount, 0.1, 'Discount not calculated according to scenario');
     end;
@@ -1262,8 +1256,8 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine.Validate("Quantity for Discount Calc", FirstLevelQty);
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" = DiscountCode, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Code", DiscountCode, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", FirstDiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" * FirstLevelQty - FirstLevelAmount, 0.1, 'Discount not calculated according to scenario');
 
@@ -1271,8 +1265,8 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine.Validate("Quantity for Discount Calc", SecondLevelQty);
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" = DiscountCode, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Mix, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Code", DiscountCode, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", SecondDiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" * SecondLevelQty - SecondLevelAmount, 0.1, 'Discount not calculated according to scenario');
     end;
@@ -1321,8 +1315,8 @@ codeunit 85137 "NPR Retail Journal Tests"
 
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Campaign, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" = PeriodDiscountLine.Code, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Campaign, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Code", PeriodDiscountLine.Code, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" - PeriodDiscountLine."Discount Amount", 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" - PeriodDiscountLine."Discount Amount", 0.1, 'Discount not calculated according to scenario');
     end;
@@ -1376,8 +1370,8 @@ codeunit 85137 "NPR Retail Journal Tests"
 
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", UnitPriceInclTax, 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Campaign, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" = PeriodDiscountLine.Code, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Campaign, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Code", PeriodDiscountLine.Code, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" - PeriodDiscountLine."Discount Amount", 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", UnitPriceInclTax * (1 - PeriodDiscountLine."Discount %" / 100), 0.1, 'Discount not calculated according to scenario');
     end;
@@ -1426,8 +1420,8 @@ codeunit 85137 "NPR Retail Journal Tests"
 
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Campaign, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" = PeriodDiscountLine.Code, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Campaign, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Code", PeriodDiscountLine.Code, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", Item."Unit Price" - PeriodDiscountLine."Discount Amount", 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" - PeriodDiscountLine."Discount Amount", 0.1, 'Discount not calculated according to scenario');
     end;
@@ -1481,8 +1475,8 @@ codeunit 85137 "NPR Retail Journal Tests"
 
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Campaign, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" = PeriodDiscountLine.Code, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Campaign, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Code", PeriodDiscountLine.Code, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", Item."Unit Price" - PeriodDiscountLine."Discount Amount", 0.1, 'Discount not calculated according to scenario');
     end;
@@ -1540,8 +1534,8 @@ codeunit 85137 "NPR Retail Journal Tests"
 
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Quantity, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" = QuantityDiscountLine."Main no.", 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Quantity, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Code", QuantityDiscountLine."Main no.", 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
     end;
@@ -1606,8 +1600,8 @@ codeunit 85137 "NPR Retail Journal Tests"
 
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", UnitPriceInclTax, 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Quantity, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" = QuantityDiscountLine."Main no.", 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Quantity, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Code", QuantityDiscountLine."Main no.", 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", DiscountPriceInclTax, 0.1, 'Discount not calculated according to scenario');
     end;
@@ -1665,8 +1659,8 @@ codeunit 85137 "NPR Retail Journal Tests"
 
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Quantity, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" = QuantityDiscountLine."Main no.", 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Quantity, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Code", QuantityDiscountLine."Main no.", 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceInclTax, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", DiscountPriceInclTax, 0.1, 'Discount not calculated according to scenario');
     end;
@@ -1729,8 +1723,8 @@ codeunit 85137 "NPR Retail Journal Tests"
 
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Quantity, 'Discount not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Code" = QuantityDiscountLine."Main no.", 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Quantity, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Code", QuantityDiscountLine."Main no.", 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", DiscountPriceInclTax, 0.1, 'Discount not calculated according to scenario');
     end;
@@ -1749,9 +1743,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         LineDiscAmt: Decimal;
         DiscountPriceInclTax: Decimal;
     begin
-#if BC26
-        exit;
-#endif
         // [SCENARIO] Check prices when having item on retail journal which has price list line discount. Item price includes vat = false + item without VAT
 
         Initialize();
@@ -1786,7 +1777,7 @@ codeunit 85137 "NPR Retail Journal Tests"
 
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Customer, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Customer, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceInclTax, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", DiscountPriceInclTax, 0.1, 'Discount not calculated according to scenario');
     end;
@@ -1809,9 +1800,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         DiscountPriceExclTax: Decimal;
         DiscountPriceInclTax: Decimal;
     begin
-#if BC26
-        exit;
-#endif
         // [SCENARIO] Check prices when having item on retail journal which has price list line discount. Item price includes vat = false + item with VAT
 
         Initialize();
@@ -1849,7 +1837,7 @@ codeunit 85137 "NPR Retail Journal Tests"
 
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", UnitPriceInclTax, 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Customer, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Customer, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", DiscountPriceInclTax, 0.1, 'Discount not calculated according to scenario');
     end;
@@ -1868,9 +1856,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         LineDiscAmt: Decimal;
         DiscountPriceInclTax: Decimal;
     begin
-#if BC26
-        exit;
-#endif
         // [SCENARIO] Check prices when having item on retail journal which has price list line discount. Item price includes vat = true + item without VAT
 
         Initialize();
@@ -1905,7 +1890,7 @@ codeunit 85137 "NPR Retail Journal Tests"
 
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Customer, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Customer, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceInclTax, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", DiscountPriceInclTax, 0.1, 'Discount not calculated according to scenario');
     end;
@@ -1927,9 +1912,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         DiscountPriceExclTax: Decimal;
         DiscountPriceInclTax: Decimal;
     begin
-#if BC26
-        exit;
-#endif
         // [SCENARIO] Check prices when having item on retail journal which has price list line discount. Item price includes vat = true + item with VAT
 
         Initialize();
@@ -1966,7 +1948,7 @@ codeunit 85137 "NPR Retail Journal Tests"
 
         // [THEN] Check if discount and prices are calculated correctly
         Assert.AreNearlyEqual(RetailJournalLine."Unit Price", Item."Unit Price", 0.1, 'Unit Price not calculated according to scenario');
-        Assert.IsTrue(RetailJournalLine."Discount Type" = RetailJournalLine."Discount Type"::Customer, 'Discount not calculated according to scenario');
+        Assert.AreEqual(RetailJournalLine."Discount Type", RetailJournalLine."Discount Type"::Customer, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Excl. VAT", DiscountPriceExclTax, 0.1, 'Discount not calculated according to scenario');
         Assert.AreNearlyEqual(RetailJournalLine."Discount Price Incl. VAT", DiscountPriceInclTax, 0.1, 'Discount not calculated according to scenario');
     end;
@@ -1982,6 +1964,8 @@ codeunit 85137 "NPR Retail Journal Tests"
         Clear(POSSession);
 
         if not Initialized then begin
+            WorkDate(Today);
+
             LibraryERM.CreateVATBusinessPostingGroup(VATBusinessPostingGroup);
             NPRLibraryPOSMasterData.CreatePOSSetup(POSSetup);
             NPRLibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
