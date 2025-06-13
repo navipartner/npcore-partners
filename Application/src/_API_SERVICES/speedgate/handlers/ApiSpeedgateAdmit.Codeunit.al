@@ -644,6 +644,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             .AddProperty('ticketId', Format(Ticket.SystemId, 0, 4).ToLower())
             .AddProperty('ticketNumber', Ticket."External Ticket No.")
             .AddProperty('itemNo', Ticket."Item No.")
+            .AddObject(AddItemCategory(ResponseJson, Ticket."Item No.", false))
             .AddProperty('admissionCode', AccessEntry."Admission Code")
             .AddProperty('admitCount', AdmitCount);
 
@@ -660,6 +661,57 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         exit(ResponseJson);
     end;
 
+    local procedure AddItemCategory(var ResponseJson: Codeunit "NPR JSON Builder"; ItemNo: Code[20]; WithAttributes: Boolean): Codeunit "NPR JSON Builder"
+    var
+        Item: Record Item;
+        ItemAttribute: Record "Item Attribute";
+        ItemAttributes: Record "Item Attribute Value Mapping";
+        ItemAttributeValue: Record "Item Attribute Value";
+    begin
+
+        Item.SetLoadFields("Item Category Code");
+        if (not Item.Get(ItemNo)) then
+            exit(ResponseJson);
+
+        if (Item."Item Category Code" = '') then
+            exit(ResponseJson);
+
+        ResponseJson.AddProperty('itemCategoryCode', Item."Item Category Code");
+
+        if (WithAttributes) then begin
+            ItemAttributes.SetFilter("Table ID", '=%1', Database::Item);
+            ItemAttributes.SetFilter("No.", '=%1', ItemNo);
+            if (ItemAttributes.FindSet()) then begin
+                ResponseJson.StartArray('itemAttributes');
+                repeat
+                    if (ItemAttribute.Get(ItemAttributes."Item Attribute ID")) then begin
+                        if (ItemAttributeValue.Get(ItemAttributes."Item Attribute ID", ItemAttributes."Item Attribute Value ID")) then begin
+
+                            ResponseJson
+                                .StartObject()
+                                .AddProperty('code', ItemAttribute.Name)
+                                .AddProperty('type', Format(ItemAttribute."Type", 0, 1));
+                            case ItemAttribute."Type" of
+                                ItemAttribute."Type"::Text:
+                                    ResponseJson.AddProperty('value', ItemAttributeValue."Value");
+                                ItemAttribute."Type"::Integer,
+                                ItemAttribute."Type"::Decimal:
+                                    ResponseJson.AddProperty('value', Format(ItemAttributeValue."Numeric Value", 0, 9));
+                                ItemAttribute."Type"::Date:
+                                    ResponseJson.AddProperty('value', Format(ItemAttributeValue."Date Value", 0, 9));
+                                ItemAttribute."Type"::Option:
+                                    ResponseJson.AddProperty('value', ItemAttributeValue."Value")
+                            end;
+                            ResponseJson.EndObject();
+                        end;
+                    end;
+                until (ItemAttributes.Next() = 0);
+                ResponseJson.EndArray();
+            end;
+        end;
+
+        exit(ResponseJson);
+    end;
 
     local procedure AddPrintedTicketDetails(var ResponseJson: Codeunit "NPR JSON Builder"; Ticket: Record "NPR TM Ticket"): Codeunit "NPR JSON Builder"
     begin

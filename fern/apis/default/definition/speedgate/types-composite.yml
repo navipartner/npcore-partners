@@ -41,6 +41,7 @@ types:
         ticketId: simpleTypes.TicketId
         ticketNumber: simpleTypes.TicketNumber
         itemNo: simpleTypes.ItemNo
+        itemCategoryCode: optional<simpleTypes.ItemCategoryCode>
         admissionCode: simpleTypes.AdmissionCode
         admitCount: simpleTypes.AdmitCount
         admittedAt: optional<simpleTypes.AdmittedAt>
@@ -54,6 +55,7 @@ types:
           ticketId: $simpleTypes.TicketId.ExampleTicketId
           ticketNumber: $simpleTypes.TicketNumber.ExampleTicketNumber
           itemNo: $simpleTypes.ItemNo.ExampleItemNo
+          itemCategoryCode: $simpleTypes.ItemCategoryCode.ExampleCategoryCode
           admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
           admitCount: 0
           printedAt: $simpleTypes.PrintedAt.ExamplePrintedAt
@@ -63,6 +65,7 @@ types:
           ticketId: $simpleTypes.TicketId.ExampleTicketId2
           ticketNumber: $simpleTypes.TicketNumber.ExampleTicketNumber2
           itemNo: $simpleTypes.ItemNo.ExampleItemNo
+          itemCategoryCode: $simpleTypes.ItemCategoryCode.ExampleCategoryCode
           admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
           admitCount: 0
           printedAt: $simpleTypes.PrintedAt.ExamplePrintedAt

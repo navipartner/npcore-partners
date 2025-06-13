@@ -110,6 +110,15 @@ types:
       - name: ExampleAdmissionDungeon
         value: DUNGEON
   
+  ItemCategoryCode:
+    type: string
+    docs: A code that identifies the category of the item.
+    examples:
+      - name: ExampleCategoryCode
+        value: "ADULT"
+      - name: ExampleCategoryCode2
+        value: "CHILD"
+
   AdmitCount:
     type: integer
     docs: The number of times the ticket has been admitted.
