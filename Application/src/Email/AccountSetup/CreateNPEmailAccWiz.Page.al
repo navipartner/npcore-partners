@@ -140,7 +140,7 @@ page 6184994 "NPR CreateNPEmailAccWiz"
         Rec.Username := SendGridClient.GetEnvironmentIdentifier();
 #pragma warning restore AA0139
         Rec.CompanyName := CompanyInformation.Name;
-        Rec.AccountRegion := "NPR SendGridAccountRegion"::EU; // For now, all will be created in EU
+        Rec.AccountRegion := "NPR SendGridAccountRegion"::GLOBAL;
         Rec.Insert();
     end;
 
