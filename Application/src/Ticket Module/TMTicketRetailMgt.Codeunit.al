@@ -189,8 +189,6 @@
         ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
         xSaleLinePOS: Record "NPR POS Sale Line";
         POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
-        TicketPrice: Codeunit "NPR TM Dynamic Price";
-        TicketUnitPrice: Decimal;
         DiscountAmount: Decimal;
         DiscountPercent: Decimal;
         ForceItemAddOnUnitPrice: Boolean;
@@ -238,24 +236,18 @@
             SaleLinePOS."Unit Price" := ItemAddOnLine."Unit Price";
 
         end else begin
-
-            SaleLinePOS."Unit Price" := SaleLinePOS.FindItemSalesPrice(); // --> OnAfterFindSalesLinePrice() will not do GetTicketUnitPrice() when "Eksp. Salgspris" or "Custom Price" is set   
-
-            if ((SaleLinePOS."Eksp. Salgspris") or (SaleLinePOS."Custom Price")) then begin
-                if (TicketPrice.GetTicketUnitPrice(Token, TokenLineNumber, SaleLinePOS."Unit Price", SaleLinePOS."Price Includes VAT", SaleLinePOS."VAT %", TicketUnitPrice)) then
-                    SaleLinePOS."Unit Price" := TicketUnitPrice;
-            end;
+            SaleLinePOS.Validate(Quantity, NewQuantity);
+            SaleLinePOS."Eksp. Salgspris" := false;
+            SaleLinePOS."Custom Price" := false;
         end;
 
         if (DiscountAmount <> 0) then
-            SaleLinePOS.Validate("Discount Amount", DiscountAmount); // Discount % is recalculated relative to new price
+            SaleLinePOS.Validate("Discount Amount", DiscountAmount);
 
         if (DiscountPercent <> 0) then
             SaleLinePOS.Validate("Discount %", DiscountPercent);
 
         SaleLinePOS.UpdateAmounts(SaleLinePOS);
-        SaleLinePOS."Eksp. Salgspris" := false;
-        SaleLinePOS."Custom Price" := false;
         SaleLinePOS.Modify();
     end;
 
@@ -784,50 +776,6 @@
             // when there is a return sales ticket number, there should be a revoke request
             TicketRequestManager.POS_OnModifyQuantity(SaleLinePOS);
             exit;
-        end;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sales Price Calc.Mgt.W", 'OnAfterFindSalesLinePrice', '', true, true)]
-    local procedure OnAfterFindSalesLinePrice(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
-    var
-        TicketPrice: Codeunit "NPR TM Dynamic Price";
-        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
-        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
-        TicketUnitPrice: Decimal;
-        Token: Text[100];
-        TokenLineNumber: Integer;
-        ForceItemAddOnUnitPrice: Boolean;
-    begin
-        if ((SaleLinePOS."Eksp. Salgspris") or (SaleLinePOS."Custom Price")) then
-            exit;
-
-        if (not IsTicketSalesLine(SaleLinePOS)) then
-            exit;
-
-        if (GetRequestToken(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token, TokenLineNumber)) then begin
-
-            if (SaleLinePOS.Indentation > 0) then begin
-                SaleLinePOSAddOn.SetCurrentKey("Register No.", "Sales Ticket No.", "Sale Type", "Sale Date", "Sale Line No.", "Line No.");
-                SaleLinePOSAddOn.SetFilter("Register No.", '=%1', SaleLinePOS."Register No.");
-                SaleLinePOSAddOn.SetFilter("Sales Ticket No.", '=%1', SaleLinePOS."Sales Ticket No.");
-                SaleLinePOSAddOn.SetFilter("Sale Date", '=%1', SaleLinePOS.Date);
-                SaleLinePOSAddOn.SetFilter("Sale Line No.", '=%1', SaleLinePOS."Line No.");
-                if (SaleLinePOSAddOn.FindFirst()) then begin
-                    if (ItemAddOnLine.Get(SaleLinePOSAddOn."AddOn No.", SaleLinePOSAddOn."AddOn Line No.")) then
-                        ForceItemAddOnUnitPrice := ((ItemAddOnLine."Use Unit Price" = ItemAddOnLine."Use Unit Price"::Always) or
-                                                    ((ItemAddOnLine."Use Unit Price" = ItemAddOnLine."Use Unit Price"::"Non-Zero") and (ItemAddOnLine."Unit Price" <> 0)));
-                end;
-            end;
-
-            if (ForceItemAddOnUnitPrice) then begin
-                SaleLinePOS."Unit Price" := ItemAddOnLine."Unit Price";
-
-            end else begin
-                if (TicketPrice.GetTicketUnitPrice(Token, TokenLineNumber, SaleLinePOS."Unit Price", SaleLinePOS."Price Includes VAT", SaleLinePOS."VAT %", TicketUnitPrice)) then
-                    if (SaleLinePOS."Unit Price" <> TicketUnitPrice) then
-                        SaleLinePOS."Unit Price" := TicketUnitPrice;
-            end;
-
         end;
     end;
 

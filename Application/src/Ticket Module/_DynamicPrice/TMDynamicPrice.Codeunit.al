@@ -1,6 +1,64 @@
 codeunit 6014559 "NPR TM Dynamic Price"
 {
     Access = Internal;
+
+    internal procedure CalculatedTicketPriceAfterErpPrice(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
+        ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
+        TicketUnitPrice: Decimal;
+        Token: Text[100];
+        TokenLineNumber: Integer;
+        ForceItemAddOnUnitPrice: Boolean;
+        DiscountAmount: Decimal;
+        DiscountPercent: Decimal;
+    begin
+
+        if (not IsTicketSalesLine(SaleLinePOS)) then
+            exit;
+
+        if (GetRequestToken(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token, TokenLineNumber)) then begin
+            if (SaleLinePOS.Indentation > 0) then begin
+                // Addon price should might override ticket dynamic price
+                SaleLinePOSAddOn.SetCurrentKey("Register No.", "Sales Ticket No.", "Sale Type", "Sale Date", "Sale Line No.", "Line No.");
+                SaleLinePOSAddOn.SetFilter("Register No.", '=%1', SaleLinePOS."Register No.");
+                SaleLinePOSAddOn.SetFilter("Sales Ticket No.", '=%1', SaleLinePOS."Sales Ticket No.");
+                SaleLinePOSAddOn.SetFilter("Sale Date", '=%1', SaleLinePOS.Date);
+                SaleLinePOSAddOn.SetFilter("Sale Line No.", '=%1', SaleLinePOS."Line No.");
+                if (SaleLinePOSAddOn.FindFirst()) then begin
+                    if (SaleLinePOS."Discount %" <> 0) then begin
+                        if (SaleLinePOSAddOn.DiscountAmount <> 0) then
+                            DiscountAmount := SaleLinePOS."Discount Amount";
+                        if (SaleLinePOSAddOn.DiscountPercent <> 0) then
+                            DiscountPercent := saleLinePOS."Discount %";
+                    end;
+
+                    if (ItemAddOnLine.Get(SaleLinePOSAddOn."AddOn No.", SaleLinePOSAddOn."AddOn Line No.")) then
+                        ForceItemAddOnUnitPrice := ((ItemAddOnLine."Use Unit Price" = ItemAddOnLine."Use Unit Price"::Always) or
+                                                    ((ItemAddOnLine."Use Unit Price" = ItemAddOnLine."Use Unit Price"::"Non-Zero") and (ItemAddOnLine."Unit Price" <> 0)));
+                end;
+            end;
+
+            if (ForceItemAddOnUnitPrice) then begin
+                SaleLinePOS."Unit Price" := ItemAddOnLine."Unit Price";
+
+            end else begin
+                if (GetTicketUnitPrice(Token, TokenLineNumber, SaleLinePOS."Unit Price", SaleLinePOS."Price Includes VAT", SaleLinePOS."VAT %", TicketUnitPrice)) then
+                    if (SaleLinePOS."Unit Price" <> TicketUnitPrice) then
+                        SaleLinePOS."Unit Price" := TicketUnitPrice;
+            end;
+
+            if (not SaleLinePOS.IsTemporary) then begin
+                if (DiscountAmount <> 0) then
+                    SaleLinePOS.Validate("Discount Amount", DiscountAmount);
+
+                if (DiscountPercent <> 0) then
+                    SaleLinePOS.Validate("Discount %", DiscountPercent);
+            end;
+
+        end;
+    end;
+
     [TryFunction]
     internal procedure CalculateErpUnitPrice(
         ItemNo: Code[20];
@@ -657,6 +715,48 @@ codeunit 6014559 "NPR TM Dynamic Price"
             else
                 Weight := 365; // Failsafe
         end;
+    end;
+
+    local procedure GetRequestToken(ReceiptNo: Code[20]; LineNumber: Integer; var Token: Text[100]; var TokenLineNumber: Integer): Boolean
+    var
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+    begin
+        Token := '';
+
+        if (ReceiptNo = '') then
+            exit(false);
+
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
+        TicketReservationRequest.ReadIsolation(IsolationLevel::ReadUncommitted);
+#ENDIF
+        TicketReservationRequest.SetCurrentKey("Receipt No.");
+        TicketReservationRequest.SetFilter("Receipt No.", '=%1', ReceiptNo);
+        TicketReservationRequest.SetFilter("Line No.", '=%1', LineNumber);
+        TicketReservationRequest.SetLoadFields("Session Token ID", "Ext. Line Reference No.");
+        if (TicketReservationRequest.FindFirst()) then begin
+            Token := TicketReservationRequest."Session Token ID";
+            TokenLineNumber := TicketReservationRequest."Ext. Line Reference No.";
+        end;
+
+        exit(Token <> '');
+    end;
+
+
+    local procedure IsTicketSalesLine(SaleLinePOS: Record "NPR POS Sale Line"): Boolean
+    var
+        TicketType: Record "NPR TM Ticket Type";
+        Item: Record Item;
+    begin
+        if (not Item.Get(SaleLinePOS."No.")) then
+            exit(false);
+
+        if (Item."NPR Ticket Type" = '') then
+            exit(false);
+
+        if (not TicketType.Get(Item."NPR Ticket Type")) then
+            exit(false);
+
+        exit(true);
     end;
 
 }

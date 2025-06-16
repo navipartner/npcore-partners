@@ -86,6 +86,8 @@
     end;
 
     local procedure FindSalesLinePrice(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        TicketPrice: Codeunit "NPR TM Dynamic Price";
     begin
         if SaleLinePOS."Line Type" <> SaleLinePOS."Line Type"::Item then
             exit;
@@ -126,6 +128,8 @@
         SaleLinePOS."Allow Line Discount" := TempSalesPriceListLine."Allow Line Disc.";
         if not SaleLinePOS."Allow Line Discount" then
             SaleLinePOS."Discount %" := 0;
+
+        TicketPrice.CalculatedTicketPriceAfterErpPrice(SalePOS, SaleLinePOS);
     end;
 
     procedure FindSalesLineLineDisc(SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line")
