@@ -437,7 +437,7 @@
 
         VoucherQty := SalesLine."Qty. to Invoice";
         VoucherUnitPrice := SalesLine."Unit Price";
-        if SalesHeader.Get(SalesHeader."Document Type", SalesLine."Document No.") and not SalesHeader."Prices Including VAT" then
+        if SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.") and not SalesHeader."Prices Including VAT" then
             VoucherUnitPrice := VoucherUnitPrice * (1 + SalesLine."VAT %" / 100);
 
         exit(true);
