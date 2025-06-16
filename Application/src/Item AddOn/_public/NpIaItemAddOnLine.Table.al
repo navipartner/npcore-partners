@@ -51,6 +51,9 @@
                 Item.Get("Item No.");
 
                 "Unit Price" := Item."Unit Price";
+                if (Item."NPR Ticket Type" <> '') then
+                    "Unit Price" := 0;// force ERP pricing as default (when unit price is zero, it will calculate the ERP price runtime)
+
                 Description := Item.Description;
                 Validate("Variant Code");
 

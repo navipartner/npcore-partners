@@ -70,7 +70,7 @@ page 6184855 "NPR WalletTemplateLines"
                 }
                 field("Use Unit Price"; Rec."Use Unit Price")
                 {
-                    ToolTip = 'Specifies if the price of one unit of the item should be used for sold item.';
+                    ToolTip = 'Specifies which price to use. Option Always acts as a fixed price and applies Unit Price as a hard price (including zero). Option Non-Zero will use the specified Unit Price if it is not zero; otherwise, it will calculate the price using ERP logic.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Discount %"; Rec."Discount %")
