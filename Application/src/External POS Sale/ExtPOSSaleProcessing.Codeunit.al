@@ -156,11 +156,36 @@ codeunit 6248233 "NPR Ext. POS Sale Processing"
     var
         ExternalPOSSaleLine: Record "NPR External POS Sale Line";
         NoNumberSpecifiedinSaleLineErrLbl: Label 'There was no ''No.'' specified for one or more sale lines, sale is not valid!';
+#IF NOT (BC17 or BC18 or BC19 or BC20)
+        InventorySetup: Record "Inventory Setup";
+        Item: Record Item;
+        ItemVariantMandatoryErrLbl: Label 'Item Variant is mandatory for Item in Line No. %1.', Comment = '%1 = Line No.';
+#ENDIF
     begin
         ExternalPOSSaleLine.SetRange("External POS Sale Entry No.", ExternalPOSSale."Entry No.");
         ExternalPOSSaleLine.SetRange("No.", '');
         if (not ExternalPOSSaleLine.IsEmpty()) then
             Error(NoNumberSpecifiedinSaleLineErrLbl);
+
+        // Variant Mandatory if exist
+#IF NOT (BC17 or BC18 or BC19 or BC20)
+        if InventorySetup.Get() then begin
+            if InventorySetup."Variant Mandatory if Exists" then begin
+                ExternalPOSSaleLine.Reset();
+                ExternalPOSSaleLine.SetRange("External POS Sale Entry No.", ExternalPOSSale."Entry No.");
+                ExternalPOSSaleLine.SetRange("Line Type", ExternalPOSSaleLine."Line Type"::Item);
+                ExternalPOSSaleLine.SetRange("Variant Code", '');
+                if ExternalPOSSaleLine.FindSet() then
+                    repeat
+                        if Item.Get(ExternalPOSSaleLine."No.") then begin
+                            Item.CalcFields("NPR Has Variants");
+                            if Item."NPR Has Variants" then
+                                Error(ItemVariantMandatoryErrLbl, ExternalPOSSaleLine."Line No.");
+                        end;
+                    until ExternalPOSSaleLine.Next() = 0;
+            end;
+        end;
+#ENDIF
     end;
 
     local procedure ValidateBalance(ExternalPOSSale: Record "NPR External POS Sale")
