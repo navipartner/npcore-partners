@@ -225,6 +225,7 @@ codeunit 6248233 "NPR Ext. POS Sale Processing"
 
     local procedure TryFindItemFromBarcode(var ExternalPOSSaleLine: Record "NPR External POS Sale Line")
     var
+        ItemReference: Record "Item Reference";
         BarcodeLookupMgt: Codeunit "NPR Barcode Lookup Mgt.";
         ItemNo: Code[20];
         ItemVariantCode: Code[10];
@@ -235,6 +236,16 @@ codeunit 6248233 "NPR Ext. POS Sale Processing"
             if ItemVariantCode <> '' then
                 ExternalPOSSaleLine.Validate("Variant Code", ItemVariantCode);
         end;
+
+        // Validate and set proper UoM
+        ItemReference.Reset();
+        ItemReference.SetCurrentKey("Reference Type", "Reference No.", "Item No.");
+        ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
+        ItemReference.SetRange("Reference No.", ExternalPOSSaleLine."Barcode Reference");
+        ItemReference.SetRange("Item No.", ExternalPOSSaleLine."No.");
+        if ItemReference.FindFirst() then
+            if ItemReference."Unit of Measure" <> ExternalPOSSaleLine."Unit of Measure Code" then
+                ExternalPOSSaleLine.Validate("Unit of Measure Code", ItemReference."Unit of Measure");
     end;
 
     procedure AddConversionError(var ExternalPOSSale: Record "NPR External POS Sale"; ErrorTxt: Text)
