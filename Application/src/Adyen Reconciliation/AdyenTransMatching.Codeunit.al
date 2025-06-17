@@ -629,7 +629,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         MagentoPaymentLine.Reset();
         MagentoPaymentLine.SetRange("Transaction ID", ReconciliationLine."PSP Reference");
         MagentoPaymentLine.SetFilter("Payment Gateway Code", FilterPGCodes);
-        MagentoPaymentLine.SetFilter(Amount, '=%1', Abs(ReconciliationLine."Amount (LCY)"));
+        MagentoPaymentLine.SetFilter(Amount, '=%1', Abs(ReconciliationLine."Amount (TCY)"));
 
         if not (ReconciliationLine."Transaction Type" in
             [ReconciliationLine."Transaction Type"::Chargeback,
