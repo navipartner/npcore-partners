@@ -90,6 +90,8 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
     var
         ShopifyStore: Record "NPR Spfy Store";
     begin
+        if _ShopifySetup.IsEmpty() then
+            exit(false);
         _ShopifySetup.GetRecordOnce(false);
         if not _ShopifySetup."Enable Integration" then
             exit(false);

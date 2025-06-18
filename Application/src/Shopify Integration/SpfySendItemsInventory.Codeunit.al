@@ -850,7 +850,10 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
     var
         NcTask: Record "NPR Nc Task";
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
+        SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
         TypeHelper: Codeunit "Type Helper";
+        RemoveMetafields: JsonArray;
+        UpdateMetafields: JsonArray;
         IStream: InStream;
         LongDescription: Text;
     begin
@@ -882,6 +885,9 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                 begin
                     ProductJObject.Add('productType', 'new');
                     ProductJObject.Add('status', ProductStatusEnumValueName(_SpfyIntegrationMgt.DefaultNewProductStatus(SpfyStoreItemLink."Shopify Store Code")));
+                    SpfyMetafieldMgt.GenerateMetafieldUpdateArrays(SpfyStoreItemLink.RecordId(), "NPR Spfy Metafield Owner Type"::PRODUCT, ShopifyProductID, SpfyStoreItemLink."Shopify Store Code", UpdateMetafields, RemoveMetafields);
+                    if UpdateMetafields.Count() > 0 then
+                        ProductJObject.Add('metafields', UpdateMetafields);
                 end;
             NcTask.Type::Modify:
                 if not SpfyItemMgt.TestRequiredFields(Item, false) or not SpfyStoreItemLink."Sync. to this Store" then
