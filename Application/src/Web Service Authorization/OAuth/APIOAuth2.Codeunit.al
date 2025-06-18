@@ -15,7 +15,7 @@ codeunit 6014618 "NPR API OAuth2" implements "NPR API IAuthorization"
         BearerTokenTxt: Label 'Bearer %1', Locked = true;
     begin
         NPROAuthSetup.Get(AuthParamBuff."OAuth Setup Code");
-        AccessToken := NPROAuthSetup.GetOauthToken();
+        AccessToken := NPROAuthSetup.GetOauthToken(false);
         AuthText := StrSubstNo(BearerTokenTxt, AccessToken);
     end;
 

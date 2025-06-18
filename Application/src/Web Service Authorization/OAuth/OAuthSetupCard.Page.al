@@ -184,7 +184,10 @@
     trigger OnAfterGetRecord()
     begin
         ClientIdGlobal := CopyStr(Rec.GetSecret(Rec.FieldNo("Client Id")), 1, MaxStrLen(ClientIdGlobal));
-        ClientSecretGlobal := CopyStr(Rec.GetSecret(Rec.FieldNo("Client Secret")), 1, MaxStrLen(ClientSecretGlobal));
+        if Rec.HasSecret(Rec.FieldNo("Client Secret")) then
+            ClientSecretGlobal := 'HasValue'
+        else
+            ClientSecretGlobal := '';
     end;
 
 }

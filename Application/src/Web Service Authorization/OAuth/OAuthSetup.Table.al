@@ -174,7 +174,7 @@
 
     end;
 
-    procedure GetOauthToken(): Text
+    procedure GetOauthToken(ForceRefresh: Boolean): Text
     var
         TypeHelper: Codeunit "Type Helper";
         APIOAuth2Token: Codeunit "NPR API OAuth2 Token";
@@ -194,8 +194,9 @@
         ClientSecret := GetSecret(FieldNo("Client Secret"));
         LocScope := GetScope();
 
-        if APIOAuth2Token.CheckExistingTokenIsValid(ClientId, ClientSecret) then
-            exit(APIOAuth2Token.GetOAuthToken(ClientId));
+        if not ForceRefresh then
+            if APIOAuth2Token.CheckExistingTokenIsValid(ClientId, ClientSecret) then
+                exit(APIOAuth2Token.GetOAuthToken(ClientId));
 
         Client.SetBaseAddress(GetTokenBaseAddress());
         RequestMessage.Method('POST');
@@ -250,6 +251,6 @@
 
     internal procedure ValidateConnection(): Boolean
     begin
-        exit(GetOauthToken() <> '');
+        exit(GetOauthToken(true) <> '');
     end;
 }
