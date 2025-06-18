@@ -334,14 +334,29 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
 
     local procedure GenerateMetafieldsSet(EntityRecID: RecordId; ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type"; ShopifyOwnerID: Text[30]; ShopifyStoreCode: Code[20]; var MetafieldsSet: JsonObject): Boolean
     var
-        SpfyEntityMetafield: Record "NPR Spfy Entity Metafield";
         RemoveMetafields: JsonArray;
         UpdateMetafields: JsonArray;
-        Metafield: JsonObject;
-    //NullJsonValue: JsonValue;
     begin
         Clear(MetafieldsSet);
-        //NullJsonValue.SetValueToNull();
+        GenerateMetafieldUpdateArrays(EntityRecID, ShopifyOwnerType, ShopifyOwnerID, ShopifyStoreCode, UpdateMetafields, RemoveMetafields);
+
+        MetafieldsSet.Add('updateMetafields', UpdateMetafields);
+        MetafieldsSet.Add('deleteMetafields', RemoveMetafields);
+        exit(UpdateMetafields.Count() + RemoveMetafields.Count() > 0);
+    end;
+
+    internal procedure GenerateMetafieldUpdateArrays(EntityRecID: RecordId; ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type"; ShopifyOwnerID: Text[30]; ShopifyStoreCode: Code[20]; var UpdateMetafields: JsonArray; var RemoveMetafields: JsonArray)
+    var
+        SpfyEntityMetafield: Record "NPR Spfy Entity Metafield";
+        Metafield: JsonObject;
+        NullJsonValue: JsonValue;
+        MetafieldVersionCheck: Boolean;
+    begin
+        Clear(UpdateMetafields);
+        Clear(RemoveMetafields);
+        MetafieldVersionCheck := IsMetafieldVersionCheckEnabled();
+        if MetafieldVersionCheck then
+            NullJsonValue.SetValueToNull();
         if _TempSpfyMetafieldDef.IsEmpty() then
             GetShopifyMetafieldDefinitions(ShopifyStoreCode, ShopifyOwnerType, false);
 
@@ -353,24 +368,28 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
                     Clear(Metafield);
                     Metafield.Add('key', _TempSpfyMetafieldDef."Key");
                     Metafield.Add('namespace', _TempSpfyMetafieldDef.Namespace);
-                    Metafield.Add('ownerId', StrSubstNo('gid://shopify/%1/%2', GetOwnerTypeAsText(ShopifyOwnerType), ShopifyOwnerID));
+                    if ShopifyOwnerID <> '' then
+                        Metafield.Add('ownerId', StrSubstNo('gid://shopify/%1/%2', GetOwnerTypeAsText(ShopifyOwnerType), ShopifyOwnerID));
                     if SpfyEntityMetafield."Metafield Value" <> '' then begin
                         Metafield.Add('type', _TempSpfyMetafieldDef.Type);
                         Metafield.Add('value', SpfyEntityMetafield."Metafield Value");
-                        //Disabling compareDigest (version check), as it does not seem to be really useful and only adds unnecessary complexity and errors.
-                        /*if SpfyEntityMetafield."Metafield Value Version ID" <> '' then
-                            Metafield.Add('compareDigest', SpfyEntityMetafield."Metafield Value Version ID")
-                        else
-                            Metafield.Add('compareDigest', NullJsonValue);*/
+                        if MetafieldVersionCheck then begin
+                            if SpfyEntityMetafield."Metafield Value Version ID" <> '' then
+                                Metafield.Add('compareDigest', SpfyEntityMetafield."Metafield Value Version ID")
+                            else
+                                Metafield.Add('compareDigest', NullJsonValue);
+                        end;
                         UpdateMetafields.Add(Metafield);
                     end else
                         RemoveMetafields.Add(Metafield);
                 end;
             until SpfyEntityMetafield.Next() = 0;
+    end;
 
-        MetafieldsSet.Add('updateMetafields', UpdateMetafields);
-        MetafieldsSet.Add('deleteMetafields', RemoveMetafields);
-        exit(UpdateMetafields.Count() + RemoveMetafields.Count() > 0);
+    local procedure IsMetafieldVersionCheckEnabled(): Boolean
+    begin
+        //Disabling compareDigest (version check), as it does not seem to be really useful and only adds unnecessary complexity and errors.
+        exit(false);
     end;
 
     local procedure ProcessItemAttributeMappingChange(ItemAttributeValueMapping: Record "Item Attribute Value Mapping"; ShopifyStoreCode: Code[20]; Removed: Boolean)
