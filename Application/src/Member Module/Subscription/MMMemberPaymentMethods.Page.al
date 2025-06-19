@@ -18,10 +18,12 @@ page 6184835 "NPR MM Member Payment Methods"
                     ToolTip = 'Specifies the status of the payment method.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
-                field(Default; Rec.Default)
+                field(Default; _IsDefault)
                 {
+                    Caption = 'Default';
                     ToolTip = 'Specifies whether the payment method has been set up as default.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Visible = (_DefaultFieldVisible);
                 }
                 field("Payment Method Alias"; Rec."Payment Method Alias")
                 {
@@ -66,4 +68,25 @@ page 6184835 "NPR MM Member Payment Methods"
             }
         }
     }
+
+    var
+        _DefaultFieldVisible: Boolean;
+        _MembershipId: Guid;
+        _IsDefault: Boolean;
+
+    trigger OnAfterGetRecord()
+    var
+        MembershipPmtMethodMap: Record "NPR MM MembershipPmtMethodMap";
+    begin
+        Clear(_IsDefault);
+        if (MembershipPmtMethodMap.Get(Rec.SystemId, _MembershipId)) then
+            _IsDefault := MembershipPmtMethodMap.Default;
+    end;
+
+    internal procedure SetMembershipId(MembershipId: Guid)
+    begin
+        _MembershipId := MembershipId;
+        if (not IsNullGuid(MembershipId)) then
+            _DefaultFieldVisible := true;
+    end;
 }

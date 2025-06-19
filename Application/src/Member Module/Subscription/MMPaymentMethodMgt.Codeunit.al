@@ -2,46 +2,6 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
 {
     Access = Internal;
 
-    internal procedure AddMemberPaymentMethod(RecID: RecordId; MemberPmtMethodEntryNo: Integer)
-    var
-        MemberPaymentMethod: Record "NPR MM Member Payment Method";
-        MemberPaymentMethod2: Record "NPR MM Member Payment Method";
-        MemberPaymentMethod3: Record "NPR MM Member Payment Method";
-        Unassigned: Boolean;
-    begin
-        if (RecID.TableNo() = 0) or (MemberPmtMethodEntryNo = 0) then
-            exit;
-        if not MemberPaymentMethod.Get(MemberPmtMethodEntryNo) then
-            exit;
-
-        if (MemberPaymentMethod."Table No." = RecID.TableNo()) and (MemberPaymentMethod."BC Record ID" = RecID) then
-            exit;  //Already assigned to the entity that we need to assign the payment method to
-
-        Unassigned := MemberPaymentMethod."Table No." = 0;
-        MemberPaymentMethod."Table No." := RecID.TableNo();
-        MemberPaymentMethod."BC Record ID" := RecID;
-        if Unassigned then begin
-            MemberPaymentMethod2.Modify(true);
-            exit;
-        end;
-
-        MemberPaymentMethod2 := MemberPaymentMethod;
-        MemberPaymentMethod2.SetRange("Table No.", MemberPaymentMethod2."Table No.");
-        MemberPaymentMethod2.SetRange("BC Record ID", MemberPaymentMethod2."BC Record ID");
-        MemberPaymentMethod2.SetRange(PSP, MemberPaymentMethod2.PSP);
-        MemberPaymentMethod2.SetRange(Status, MemberPaymentMethod2.Status);
-        MemberPaymentMethod2.SetRange("Payment Token", MemberPaymentMethod2."Payment Token");
-        if not MemberPaymentMethod2.FindFirst() then begin
-            MemberPaymentMethod2."Entry No." := 0;
-            MemberPaymentMethod2.Insert(true);
-            exit;
-        end;
-        MemberPaymentMethod3 := MemberPaymentMethod2;
-        MemberPaymentMethod2.TransferFields(MemberPaymentMethod, false);
-        if Format(MemberPaymentMethod2) <> Format(MemberPaymentMethod3) then
-            MemberPaymentMethod2.Modify(true);
-    end;
-
     internal procedure SetMemberPaymentMethodDefaultBeforeEndSale(SalePOS: Record "NPR POS Sale")
     var
         Membership: Record "NPR MM Membership";
@@ -63,73 +23,54 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
             exit;
 
         repeat
-            MemberPaymentMethod.Reset();
-            MemberPaymentMethod.SetCurrentKey("Created from System Id");
-            MemberPaymentMethod.SetRange("Created from System Id", EFTTransactionRequest.SystemId);
-            if MemberPaymentMethod.FindFirst() then
-                SetMembePaymentMethodAsDefault(MemberPaymentMethod)
-            else begin
-                Customer.SetLoadFields("No.");
-                if Customer.Get(SalePOS."Customer No.") then begin
-                    Membership.Reset();
-                    Membership.SetCurrentKey("Customer No.");
-                    Membership.SetRange("Customer No.", Customer."No.");
-                    Membership.SetLoadFields("Entry No.");
-                    if Membership.FindFirst() then
-                        if FindMemberPaymentMethod(EFTTransactionRequest, Membership, MemberPaymentMethod) then
-                            SetMembePaymentMethodAsDefault(MemberPaymentMethod);
-                end;
+            // TODO: Check if this refactor is correct
+            Customer.SetLoadFields("No.");
+            if Customer.Get(SalePOS."Customer No.") then begin
+                Membership.Reset();
+                Membership.SetCurrentKey("Customer No.");
+                Membership.SetRange("Customer No.", Customer."No.");
+                Membership.SetLoadFields("Entry No.");
+                if Membership.FindFirst() then
+                    if FindMemberPaymentMethod(EFTTransactionRequest, MemberPaymentMethod) then
+                        SetMemberPaymentMethodAsDefault(Membership, MemberPaymentMethod);
             end;
         until EFTTransactionRequest.Next() = 0;
     end;
 
-    internal procedure SetMembePaymentMethodAsDefault(var MemberPaymentMethod: Record "NPR MM Member Payment Method")
+    internal procedure SetMemberPaymentMethodAsDefault(Membership: Record "NPR MM Membership"; MemberPaymentMethodEntryNo: Integer)
     var
-        Membership: Record "NPR MM Membership";
-        Modi: Boolean;
-        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+        MemberPaymentMethod: Record "NPR MM Member Payment Method";
     begin
-        if not MemberPaymentMethod.Default then begin
-            MemberPaymentMethod.Validate(Default, true);
-            Modi := true;
-        end;
-        if MemberPaymentMethod.Status <> MemberPaymentMethod.Status::Active then begin
-            MemberPaymentMethod.Validate(Status, MemberPaymentMethod.Status::Active);
-            Modi := true;
-        end;
-
-        if Modi then
-            MemberPaymentMethod.Modify(true);
-
-        if MemberPaymentMethod."Table No." = Database::"NPR MM Membership" then
-            if Membership.Get(MemberPaymentMethod."BC Record ID") then
-                MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, true, false);
+        MemberPaymentMethod.Get(MemberPaymentMethodEntryNo);
+        SetMemberPaymentMethodAsDefault(Membership, MemberPaymentMethod);
     end;
 
-    internal procedure SetMembePaymentMethodAsDefault(PaymentLine: Record "NPR Magento Payment Line"; var MemberPaymentMethod: Record "NPR MM Member Payment Method")
+    internal procedure SetMemberPaymentMethodAsDefault(Membership: Record "NPR MM Membership"; var MemberPaymentMethod: Record "NPR MM Member Payment Method")
     var
-        Membership: Record "NPR MM Membership";
-        Modi: Boolean;
         MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+        MembershipPmtMethodMap: Record "NPR MM MembershipPmtMethodMap";
     begin
-        if not MemberPaymentMethod.Default then begin
-            MemberPaymentMethod.Validate(Default, true);
-            Modi := true;
+        if (not MembershipPmtMethodMap.Get(MemberPaymentMethod.SystemId, Membership.SystemId)) then begin
+            MembershipPmtMethodMap.Init();
+            MembershipPmtMethodMap.PaymentMethodId := MemberPaymentMethod.SystemId;
+            MembershipPmtMethodMap.MembershipId := Membership.SystemId;
+            MembershipPmtMethodMap.Insert(true);
         end;
+
+        if not MembershipPmtMethodMap.Default then begin
+            MembershipPmtMethodMap.Validate(Default, true);
+            MembershipPmtMethodMap.Modify(true);
+        end;
+
         if MemberPaymentMethod.Status <> MemberPaymentMethod.Status::Active then begin
             MemberPaymentMethod.Validate(Status, MemberPaymentMethod.Status::Active);
-            Modi := true;
+            MemberPaymentMethod.Modify(true);
         end;
 
-        if Modi then
-            MemberPaymentMethod.Modify(true);
-
-        if MemberPaymentMethod."Table No." = Database::"NPR MM Membership" then
-            if Membership.Get(MemberPaymentMethod."BC Record ID") then
-                MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, true, false);
+        MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, true, false);
     end;
 
-    internal procedure FindMemberPaymentMethod(EftTransactionRequest: Record "NPR EFT Transaction Request"; Membership: Record "NPR MM Membership"; var MemberPaymentMethod: Record "NPR MM Member Payment Method") Found: Boolean
+    internal procedure FindMemberPaymentMethod(EftTransactionRequest: Record "NPR EFT Transaction Request"; var MemberPaymentMethod: Record "NPR MM Member Payment Method") Found: Boolean
     var
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
         SubscriptionPSP: Enum "NPR MM Subscription PSP";
@@ -143,10 +84,10 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
                 SubscriptionPSP := SubscriptionPSP::Adyen;
         end;
 
-        Found := FindMemberPaymentMethod(EftTransactionRequest."Recurring Detail Reference", EftTransactionRequest."Internal Customer ID", SubscriptionPSP, Membership, MemberPaymentMethod);
+        Found := FindMemberPaymentMethod(EftTransactionRequest."Recurring Detail Reference", EftTransactionRequest."Internal Customer ID", SubscriptionPSP, MemberPaymentMethod);
     end;
 
-    internal procedure FindMemberPaymentMethod(PaymentLine: Record "NPR Magento Payment Line"; Membership: Record "NPR MM Membership"; var MemberPaymentMethod: Record "NPR MM Member Payment Method") Found: Boolean
+    internal procedure FindMemberPaymentMethod(PaymentLine: Record "NPR Magento Payment Line"; var MemberPaymentMethod: Record "NPR MM Member Payment Method") Found: Boolean
     var
         PaymentGateway: Record "NPR Magento Payment Gateway";
         SubscriptionPSP: Enum "NPR MM Subscription PSP";
@@ -162,18 +103,16 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
                 SubscriptionPSP := SubscriptionPSP::Adyen;
         end;
 
-        Found := FindMemberPaymentMethod(PaymentLine."Payment Token", PaymentLine."Payment Gateway Shopper Ref.", SubscriptionPSP, Membership, MemberPaymentMethod);
+        Found := FindMemberPaymentMethod(PaymentLine."Payment Token", PaymentLine."Payment Gateway Shopper Ref.", SubscriptionPSP, MemberPaymentMethod);
     end;
 
-    internal procedure FindMemberPaymentMethod(PaymentToken: Text[64]; ShopperReference: Text[50]; SubscriptionPSP: Enum "NPR MM Subscription PSP"; Membership: Record "NPR MM Membership"; var MemberPaymentMethod: Record "NPR MM Member Payment Method") Found: Boolean
+    internal procedure FindMemberPaymentMethod(PaymentToken: Text[64]; ShopperReference: Text[50]; SubscriptionPSP: Enum "NPR MM Subscription PSP"; var MemberPaymentMethod: Record "NPR MM Member Payment Method") Found: Boolean
     begin
-        if PaymentToken = '' then
+        if (PaymentToken = '') then
             exit;
 
         MemberPaymentMethod.Reset();
-        MemberPaymentMethod.SetCurrentKey("Table No.", "BC Record ID", PSP, "Payment Token", "Shopper Reference");
-        MemberPaymentMethod.SetRange("BC Record ID", Membership.RecordId);
-        MemberPaymentMethod.SetRange("Table No.", Membership.RecordId.TableNo);
+        MemberPaymentMethod.SetCurrentKey(PSP, "Payment Token", "Shopper Reference");
         MemberPaymentMethod.SetRange("Payment Token", PaymentToken);
         MemberPaymentMethod.SetRange("Shopper Reference", ShopperReference);
         MemberPaymentMethod.SetRange(PSP, SubscriptionPSP);
@@ -247,21 +186,22 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
 
     internal procedure GetMemberPaymentMethod(MembershipEntryNo: Integer; var MemberPaymentMethod: Record "NPR MM Member Payment Method") Found: Boolean;
     var
+        MembershipPmtMethodMap: Record "NPR MM MembershipPmtMethodMap";
         Membership: Record "NPR MM Membership";
     begin
         Membership.SetLoadFields("Entry No.", "Customer No.");
         if not Membership.Get(MembershipEntryNo) then
             exit;
 
-        MemberPaymentMethod.SetCurrentKey("Table No.", "BC Record ID", Status, Default);
-        MemberPaymentMethod.SetRange("Table No.", Database::"NPR MM Membership");
-        MemberPaymentMethod.SetRange("BC Record ID", Membership.RecordId);
-        MemberPaymentMethod.SetRange(Status, MemberPaymentMethod.Status::Active);
-        MemberPaymentMethod.SetRange(Default, true);
-        Found := MemberPaymentMethod.FindFirst();
+        MembershipPmtMethodMap.SetRange(MembershipId, Membership.SystemId);
+        MembershipPmtMethodMap.SetRange(Default, true);
+        if (not MembershipPmtMethodMap.FindFirst()) then
+            exit;
+
+        Found := MemberPaymentMethod.GetBySystemId(MembershipPmtMethodMap.PaymentMethodId);
     end;
 
-    internal procedure AddMemberPaymentMethod(PaymentLine: Record "NPR Magento Payment Line"; Default: boolean; var MemberPaymentMethod: Record "NPR MM Member Payment Method"; Membership: Record "NPR MM Membership")
+    internal procedure AddMemberPaymentMethod(UserAccount: Record "NPR UserAccount"; PaymentLine: Record "NPR Magento Payment Line"; var MemberPaymentMethod: Record "NPR MM Member Payment Method")
     var
         PaymentGateway: Record "NPR Magento Payment Gateway";
     begin
@@ -269,8 +209,8 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
 
         Clear(MemberPaymentMethod);
         MemberPaymentMethod.Init();
-        MemberPaymentMethod."BC Record ID" := Membership.RecordId;
-        MemberPaymentMethod."Table No." := Database::"NPR MM Membership";
+        MemberPaymentMethod."BC Record ID" := UserAccount.RecordId();
+        MemberPaymentMethod."Table No." := UserAccount.RecordId().TableNo();
         MemberPaymentMethod.Insert(true);
         MemberPaymentMethod."Payment Token" := PaymentLine."Payment Token";
         MemberPaymentMethod."Shopper Reference" := PaymentLine."Payment Gateway Shopper Ref.";
@@ -281,11 +221,56 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
                 MemberPaymentMethod.PSP := MemberPaymentMethod.PSP::Adyen;
         end;
         MemberPaymentMethod.Validate(Status, MemberPaymentMethod.Status::Active);
-        MemberPaymentMethod.Validate(Default, Default);
         MemberPaymentMethod."Payment Instrument Type" := PaymentLine."Payment Instrument Type";
         MemberPaymentMethod."Payment Brand" := PaymentLine.Brand;
         MemberPaymentMethod."Created from System Id" := PaymentLine.SystemId;
         MemberPaymentMethod.Modify(true);
+    end;
+
+    internal procedure AddMemberPaymentMethod(UserAccount: Record "NPR UserAccount"; EFTTransactionRequest: Record "NPR EFT Transaction Request"; var MemberPaymentMethod: Record "NPR MM Member Payment Method")
+    var
+        EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
+        SubscriptionPSP: Enum "NPR MM Subscription PSP";
+    begin
+        Clear(MemberPaymentMethod);
+
+        case EFTTransactionRequest."Integration Type" of
+            EFTAdyenIntegration.CloudIntegrationType(),
+            EFTAdyenIntegration.HWCIntegrationType():
+                SubscriptionPSP := SubscriptionPSP::Adyen;
+            else
+                exit;
+        end;
+
+        MemberPaymentMethod.Init();
+        MemberPaymentMethod."BC Record ID" := UserAccount.RecordId();
+        MemberPaymentMethod."Table No." := UserAccount.RecordId().TableNo();
+        MemberPaymentMethod.Insert(true);
+        MemberPaymentMethod."Payment Token" := EFTTransactionRequest."Recurring Detail Reference";
+        MemberPaymentMethod."Shopper Reference" := EFTTransactionRequest."Internal Customer ID";
+        MemberPaymentMethod."Masked PAN" := EftTransactionRequest."Card Number";
+        MemberPaymentMethod."PAN Last 4 Digits" := CopyStr(DELSTR(EFTTransactionRequest."Card Number", 1, STRLEN(EFTTransactionRequest."Card Number") - 4), 1, MaxStrLen(MemberPaymentMethod."PAN Last 4 Digits"));
+        MemberPaymentMethod."Expiry Date" := GetLastDayOfMonth(EFTTransactionRequest."Card Expiry Year", EFTTransactionRequest."Card Expiry Month");
+        MemberPaymentMethod.PSP := MemberPaymentMethod.PSP::Adyen;
+        MemberPaymentMethod.Validate(Status, MemberPaymentMethod.Status::Active);
+        MemberPaymentMethod."Payment Instrument Type" := EFTTransactionRequest."Payment Instrument Type";
+        MemberPaymentMethod."Payment Brand" := EFTTransactionRequest."Payment Brand";
+        MemberPaymentMethod."Created from System Id" := EFTTransactionRequest.SystemId;
+        MemberPaymentMethod.Modify(true);
+    end;
+
+    local procedure GetLastDayOfMonth(ParamYear: Text[4]; ParamMonth: Text[2]): Date
+    var
+        FirstDayOfMonth: Date;
+        Year: integer;
+        Month: integer;
+    begin
+        Evaluate(Year, ParamYear);
+        Evaluate(Month, ParamMonth);
+
+        FirstDayOfMonth := DMY2Date(1, Month, Year);
+
+        exit(CalcDate('<1M>', FirstDayOfMonth) - 1);
     end;
 
     local procedure GetLastDateOfMonth(DateText: Text) LastDate: Date

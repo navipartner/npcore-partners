@@ -1,3 +1,7 @@
+imports:
+  memberTypes: ./../memberships/types/types-composite.yml
+  simpleMemberTypes: ./../memberships/types/types-simple.yml
+
 types:
   
   UserAccount:
@@ -18,6 +22,7 @@ types:
         type: string
       phoneNumber: string
       emailAddress: string
+      paymentMethods: list<UserAccountPaymentMethodDTO>
     examples:
       - name: ExampleUserAccount
         value:
@@ -27,6 +32,7 @@ types:
           displayName: "Jane Doe"
           phoneNumber: "12345678"
           emailAddress: "jane@example.com"
+          paymentMethods: []
       - name: ExampleUserAccountJohn
         value:
           id: e2cfea9f-385e-4d83-8b50-42256885b03a
@@ -35,6 +41,7 @@ types:
           displayName: "John Doe"
           phoneNumber: "87654321"
           emailAddress: "john@example.com"
+          paymentMethods: []
 
   CreateUserAccount:
     docs:
@@ -67,3 +74,78 @@ types:
           lastName: "Doe"
           phoneNumber: "87654321"
           emailAddress: "john@example.com"
+
+  UserAccountPaymentMethodDTO:
+    properties:
+      id: simpleMemberTypes.PaymentMethodId
+      PSP: simpleMemberTypes.PaymentMethodPSP
+      status: simpleMemberTypes.PaymentMethodStatus
+      paymentInstrument: simpleMemberTypes.PaymentInstrument
+      paymentBrand: simpleMemberTypes.PaymentBrand
+      maskedPAN: simpleMemberTypes.PaymentMethodMaskedPAN
+      PANLastDigits: simpleMemberTypes.PaymentMethodPANLastDigits
+      expiryDate: optional<simpleMemberTypes.ExpiryDate>
+      alias: simpleMemberTypes.PaymentMethodAlias
+      memberships: list<UserAccountPaymentMethodMapDTO>
+    examples:
+      - name: ExampleAccountPaymentMethod
+        value:
+          id: $simpleMemberTypes.PaymentMethodId.ExamplePaymentMethodId
+          PSP: $simpleMemberTypes.PaymentMethodPSP.ExamplePaymentMethodPSPAdyen
+          status: $simpleMemberTypes.PaymentMethodStatus.ExamplePaymentMethodStatusActive
+          paymentInstrument: $simpleMemberTypes.PaymentInstrument.ExamplePaymentInstrument
+          paymentBrand: $simpleMemberTypes.PaymentBrand.ExamplePaymentBrand
+          maskedPAN: $simpleMemberTypes.PaymentMethodMaskedPAN.ExamplePaymentMethodMaskedPAN
+          PANLastDigits: $simpleMemberTypes.PaymentMethodPANLastDigits.ExamplePaymentMethodPANLastDigits
+          expiryDate: $simpleMemberTypes.ExpiryDate.ExampleExpiryDateEOM
+          alias: $simpleMemberTypes.PaymentMethodAlias.ExamplePaymentMethodAliasEmpty
+          memberships:
+            - $UserAccountPaymentMethodMapDTO.ExamplePaymentMethod
+
+  UserAccountPaymentMethodMapDTO:
+    docs:
+      Defines the mapping relation between a payment method and a membership.
+    properties:
+      membershipId:
+        type: uuid
+        docs: The ID of the membership that the payment method is applied to.
+      status: simpleMemberTypes.PaymentMethodStatus
+      default: boolean
+    examples:
+      - name: ExamplePaymentMethod
+        value:
+          membershipId: "4296c7dd-dfb9-47bc-b446-5f23d51900ab"
+          status: $simpleMemberTypes.PaymentMethodStatus.ExamplePaymentMethodStatusActive
+          default: true
+
+  AccountPaymentMethodCreateRequestDTO:
+    docs:
+      Defines the contents of the request used for creating a new payment method for an account.
+    properties:
+      PSP: simpleMemberTypes.PaymentMethodPSP
+      paymentInstrument: optional<simpleMemberTypes.PaymentInstrument>
+      paymentBrand: optional<simpleMemberTypes.PaymentBrand>
+      maskedPAN: simpleMemberTypes.PaymentMethodMaskedPAN
+      PANLastDigits: simpleMemberTypes.PaymentMethodPANLastDigits
+      expiryDate: optional<simpleMemberTypes.ExpiryDate>
+      alias: optional<simpleMemberTypes.PaymentMethodAlias>
+      shopperReference: optional<simpleMemberTypes.ShopperReference>
+      paymentToken: simpleMemberTypes.PaymentToken
+      membershipIds:
+        docs: Specifies which membership IDs the payment method should be applied to. 
+        type: optional<list<uuid>>
+    examples:
+      - name: ExampleAccountPaymentMethodCreateRequestDTO
+        value:
+          PSP: $simpleMemberTypes.PaymentMethodPSP.ExamplePaymentMethodPSPAdyen
+          paymentInstrument: $simpleMemberTypes.PaymentInstrument.ExamplePaymentInstrument
+          paymentBrand: $simpleMemberTypes.PaymentBrand.ExamplePaymentBrand
+          maskedPAN: $simpleMemberTypes.PaymentMethodMaskedPAN.ExamplePaymentMethodMaskedPAN
+          PANLastDigits: $simpleMemberTypes.PaymentMethodPANLastDigits.ExamplePaymentMethodPANLastDigits
+          expiryDate: $simpleMemberTypes.ExpiryDate.ExampleExpiryDateEOM
+          alias: $simpleMemberTypes.PaymentMethodAlias.ExamplePaymentMethodAliasEmpty
+          shopperReference: $simpleMemberTypes.ShopperReference.ExampleShopperReference
+          paymentToken: $simpleMemberTypes.PaymentToken.ExamplePaymentToken
+          membershipIds:
+            - "4296c7dd-dfb9-47bc-b446-5f23d51900ab"
+            - "14b4c9fd-4f91-42c2-a251-9ae8bed91a62"

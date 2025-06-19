@@ -204,7 +204,7 @@
         OriginalCustomerNo: Code[20];
         MembershipTimeFrameEntries: Boolean;
         AnonymizeResponseCode: Integer;
-        MMMemberPaymentMethod: Record "NPR MM Member Payment Method";
+        MembershipPmtMethodmap: Record "NPR MM MembershipPmtMethodMap";
     begin
 
         if (MembershipEntryNo = 0) then
@@ -266,10 +266,9 @@
                 if (GdprAnonymizeRequestWS.CanCustomerBeAnonymized(OriginalCustomerNo, '', AnonymizeResponseCode)) then
                     GdprManagement.AnonymizeCustomer(OriginalCustomerNo);
 
-            MMMemberPaymentMethod.SetRange("Table No.", Database::"NPR MM Membership");
-            MMMemberPaymentMethod.SetRange("BC Record ID", Membership.RecordId);
-            if not MMMemberPaymentMethod.IsEmpty() then
-                MMMemberPaymentMethod.DeleteAll(true);
+            MembershipPmtMethodmap.SetRange(MembershipId, Membership.SystemId);
+            if not MembershipPmtMethodMap.IsEmpty() then
+                MembershipPmtMethodMap.DeleteAll(true);
 
         end;
 
@@ -3305,6 +3304,40 @@
         exit(true);
     end;
 
+    internal procedure GetFirstAdminMember(MembershipEntryNo: Integer; var Member: Record "NPR MM Member"): Boolean
+    var
+        MembershipRole: Record "NPR MM Membership Role";
+    begin
+        MembershipRole.SetRange("Membership Entry No.", MembershipEntryNo);
+        MembershipRole.SetRange("Member Role", MembershipRole."Member Role"::ADMIN);
+        if (not MembershipRole.FindFirst()) then
+            exit(false);
+        exit(Member.Get(MembershipRole."Member Entry No."));
+    end;
+
+    internal procedure GetUserAccountFromMember(Member: Record "NPR MM Member"; var UserAccount: Record "NPR UserAccount") AccountFound: Boolean
+    var
+        UserAccountMgtImpl: Codeunit "NPR UserAccountMgtImpl";
+    begin
+        AccountFound := UserAccountMgtImpl.FindAccountByEmail(Member."E-Mail Address".ToLower(), UserAccount);
+    end;
+
+    internal procedure CreateUserAccountFromMember(Member: Record "NPR MM Member"; var UserAccount: Record "NPR UserAccount")
+    var
+        UserAccountMgt: Codeunit "NPR UserAccountMgtImpl";
+    begin
+        UserAccount.Init();
+        UserAccount.AccountNo := 0;
+        UserAccount.Validate(FirstName, Member."First Name");
+        if (Member."Middle Name" <> '') then
+            UserAccount.Validate(FirstName, UserAccount.FirstName + ' ' + Member."Middle Name");
+        UserAccount.Validate(LastName, Member."Last Name");
+        UserAccount.EmailAddress := Member."E-Mail Address".ToLower();
+        UserAccount.PhoneNo := Member."Phone No.";
+
+        UserAccountMgt.CreateAccount(UserAccount);
+    end;
+
     internal procedure GetMemberCount(MembershipEntryNo: Integer; var AdminMemberCount: Integer; var MemberMemberCount: Integer; var AnonymousMemberCount: Integer)
     var
         MembershipRole: Record "NPR MM Membership Role";
@@ -4373,7 +4406,7 @@
         if MemberInfoCapture."Member Payment Method" <> 0 then begin
             if Membership."Customer No." = '' then
                 Error(MissingCustomerNoErr);
-            MMPaymentMethodMgt.AddMemberPaymentMethod(Membership.RecordId(), MemberInfoCapture."Member Payment Method");
+            MMPaymentMethodMgt.SetMemberPaymentMethodAsDefault(Membership, MemberInfoCapture."Member Payment Method");
         end;
 
         TransferInfoCaptureAttributes(MemberInfoCapture."Entry No.", Database::"NPR MM Membership", Membership."Entry No.");

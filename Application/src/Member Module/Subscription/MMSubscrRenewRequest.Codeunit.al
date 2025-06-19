@@ -150,18 +150,20 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
     local procedure GetMemberPaymentMethod(Subscription: Record "NPR MM Subscription"; var MemberPaymentMethod: Record "NPR MM Member Payment Method")
     var
         Membership: Record "NPR MM Membership";
+        MembershipPmtMethodMap: Record "NPR MM MembershipPmtMethodMap";
     begin
-        Membership.SetLoadFields("Entry No.");
+        Membership.SetLoadFields("Entry No.", SystemId);
         Membership.Get(Subscription."Membership Entry No.");
 
         Clear(MemberPaymentMethod);
-        MemberPaymentMethod.SetRange("Table No.", Database::"NPR MM Membership");
-        MemberPaymentMethod.SetRange("BC Record ID", Membership.RecordId());
-        MemberPaymentMethod.SetRange(Status, MemberPaymentMethod.Status::Active);
-        MemberPaymentMethod.SetRange(Default, true);
-        if MemberPaymentMethod.IsEmpty() then
-            MemberPaymentMethod.SetRange(Default);
-        MemberPaymentMethod.FindFirst();
+
+        MembershipPmtMethodMap.SetRange(MembershipId, Membership.SystemId);
+        MembershipPmtMethodMap.SetRange(Default, true);
+        if (MembershipPmtMethodMap.IsEmpty()) then
+            MembershipPmtMethodMap.SetRange(Default);
+        MembershipPmtMethodMap.FindFirst();
+
+        MemberPaymentMethod.GetBySystemId(MembershipPmtMethodMap.PaymentMethodId);
         MemberPaymentMethod.TestField(PSP);
         MemberPaymentMethod.TestField("Payment Token");
     end;
@@ -307,6 +309,7 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
         if Subscription."Postpone Renewal Attempt Until" > Today() then
             Error(PostponedRenewalErrorLbl, Subscription."Entry No.", Subscription."Postpone Renewal Attempt Until");
 
+        Subscription.SetFilter("Subscr. Request Type Filter", '<>%1', Subscription."Subscr. Request Type Filter"::"Payment Method Collection");
         Subscription.CalcFields("Outst. Subscr. Requests Exist");
         if Subscription."Outst. Subscr. Requests Exist" then
             Error(SubscriptionRequestExistsErrorLbl, Subscription."Entry No.");

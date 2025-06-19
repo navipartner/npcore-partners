@@ -127,17 +127,10 @@
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     OptionCaption = 'Yes,No';
                     Editable = false;
+
                     trigger OnDrillDown()
-                    var
-                        MemberPaymentMethod: Record "NPR MM Member Payment Method";
                     begin
-                        MemberPaymentMethod.FilterGroup(2);
-                        MemberPaymentMethod.SetRange("Table No.", Database::"NPR MM Membership");
-                        MemberPaymentMethod.SetRange("BC Record ID", Rec.RecordId());
-                        MemberPaymentMethod.SetRange(Default, true);
-                        MemberPaymentMethod.SetRange(Status, MemberPaymentMethod.Status::Active);
-                        MemberPaymentMethod.FilterGroup(0);
-                        Page.Run(0, MemberPaymentMethod);
+                        ShowPaymentMethods();
                     end;
                 }
                 field("Document ID"; Rec."Document ID")
@@ -809,14 +802,8 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 trigger OnAction()
-                var
-                    MemberPaymentMethod: Record "NPR MM Member Payment Method";
                 begin
-                    MemberPaymentMethod.FilterGroup(2);
-                    MemberPaymentMethod.SetRange("Table No.", Database::"NPR MM Membership");
-                    MemberPaymentMethod.SetRange("BC Record ID", Rec.RecordId());
-                    MemberPaymentMethod.FilterGroup(0);
-                    Page.Run(0, MemberPaymentMethod);
+                    ShowPaymentMethods();
                 end;
             }
             action(Subscription)
@@ -1114,15 +1101,14 @@
 
     local procedure GetAutoRenewPaymentMethod()
     var
-        MemberPaymentMethod: Record "NPR MM Member Payment Method";
+        MembershipPmtMethodMap: Record "NPR MM MembershipPmtMethodMap";
     begin
         HasAutoRenewalPaymentMethod := HasAutoRenewalPaymentMethod::No;
-        MemberPaymentMethod.SetRange("Table No.", Database::"NPR MM Membership");
-        MemberPaymentMethod.SetRange("BC Record ID", Rec.RecordId);
-        MemberPaymentMethod.SetRange(Status, MemberPaymentMethod.Status::Active);
-        MemberPaymentMethod.SetRange(Default, true);
 
-        if MemberPaymentMethod.FindFirst() then
+        MembershipPmtMethodMap.SetRange(MembershipId, Rec.SystemId);
+        MembershipPmtMethodMap.SetRange(Status, MembershipPmtMethodMap.Status::Active);
+        MembershipPmtMethodMap.SetRange(Default, true);
+        if (MembershipPmtMethodMap.FindFirst()) then
             HasAutoRenewalPaymentMethod := HasAutoRenewalPaymentMethod::Yes;
     end;
 
@@ -1320,6 +1306,11 @@
     begin
         if (not SponsorshipTicketMgmt.IssueAdHocTicket(MembershipEntryNo, ResponseMessage)) then
             Error(ResponseMessage);
+    end;
+
+    local procedure ShowPaymentMethods()
+    begin
+        Rec.ShowPaymentMethods();
     end;
 }
 

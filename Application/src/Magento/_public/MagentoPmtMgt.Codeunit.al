@@ -1234,7 +1234,7 @@
         if not GetRelatedMembershipsBuffer(SalesInvoiceHeader, TempMembership) then
             exit;
 
-        CreatePaymentMethodsFromSalesDocumentBuffers(TempPaymentLine, TempMembership);
+        CreatePaymentMethodsFromSalesDocumentBuffers(SalesInvoiceHeader, TempPaymentLine, TempMembership);
     end;
 
     local procedure GetRelatedMembershipsBuffer(SalesInvoiceHeader: Record "Sales Invoice Header"; var TempMemebrship: Record "NPR MM Membership" temporary) Found: Boolean
@@ -1306,24 +1306,51 @@
         Found := true;
     end;
 
-    local procedure CreatePaymentMethodsFromSalesDocumentBuffers(var TempPaymentLine: Record "NPR Magento Payment Line" temporary; var TempMembership: Record "NPR MM Membership" temporary)
+    local procedure CreatePaymentMethodsFromSalesDocumentBuffers(SalesInvoiceHeader: Record "Sales Invoice Header"; var TempPaymentLine: Record "NPR Magento Payment Line" temporary; var TempMembership: Record "NPR MM Membership" temporary)
     var
         MemberPaymentMethod: Record "NPR MM Member Payment Method";
         PaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
+        UserAccountMgt: Codeunit "NPR UserAccountMgtImpl";
+        UserAccount: Record "NPR UserAccount";
+        NameParts: List of [Text];
     begin
         TempMembership.Reset();
         if not TempMembership.FindSet() then
             exit;
-        repeat
-            TempPaymentLine.Reset();
-            if TempPaymentLine.FindSet() then
-                repeat
-                    if not PaymentMethodMgt.FindMemberPaymentMethod(TempPaymentLine, TempMembership, MemberPaymentMethod) then
-                        PaymentMethodMgt.AddMemberPaymentMethod(TempPaymentLine, true, MemberPaymentMethod, TempMembership);
 
-                    PaymentMethodMgt.SetMembePaymentMethodAsDefault(TempPaymentLine, MemberPaymentMethod);
-                until TempPaymentLine.Next() = 0;
-        until TempMembership.Next() = 0;
+        if (SalesInvoiceHeader."Sell-to E-Mail" = '') then
+            exit;
+
+        TempPaymentLine.Reset();
+        if TempPaymentLine.FindSet() then
+            repeat
+                if not PaymentMethodMgt.FindMemberPaymentMethod(TempPaymentLine, MemberPaymentMethod) then begin
+#pragma warning disable AA0139
+                    if (not UserAccountMgt.FindAccountByEmail(SalesInvoiceHeader."Sell-to E-Mail".Trim().ToLower(), UserAccount)) then begin
+#pragma warning restore AA0139
+                        UserAccount.Init();
+                        UserAccount.EmailAddress := SalesInvoiceHeader."Sell-to E-Mail";
+
+                        if (SalesInvoiceHeader."Sell-to Customer Name" <> '') then begin
+                            NameParts := SalesInvoiceHeader."Sell-to Customer Name".Trim().Split(' ');
+#pragma warning disable AA0139
+                            if not (NameParts.Get(1, UserAccount.FirstName)) then;
+                            if not (NameParts.Get(2, UserAccount.LastName)) then;
+#pragma warning restore AA0139
+                        end;
+
+                        UserAccount.PhoneNo := SalesInvoiceHeader."Sell-to Phone No.";
+
+                        UserAccountMgt.CreateAccount(UserAccount);
+                    end;
+
+                    PaymentMethodMgt.AddMemberPaymentMethod(UserAccount, TempPaymentLine, MemberPaymentMethod);
+                end;
+
+                repeat
+                    PaymentMethodMgt.SetMemberPaymentMethodAsDefault(TempMembership, MemberPaymentMethod);
+                until TempMembership.Next() = 0;
+            until TempPaymentLine.Next() = 0;
     end;
 
     [IntegrationEvent(false, false)]

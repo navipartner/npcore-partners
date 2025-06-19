@@ -312,6 +312,33 @@
             Error(SubscriptionPendingErr, Rec."Entry No.");
     end;
 
+    internal procedure ShowPaymentMethods()
+    var
+        MemberPaymentMethod: Record "NPR MM Member Payment Method";
+        MemberPaymentMethods: Page "NPR MM Member Payment Methods";
+        PmtMethodMap: Record "NPR MM MembershipPmtMethodMap";
+        FilterString: Text;
+    begin
+        if (IsNullGuid(Rec.SystemId)) then
+            exit;
+
+        PmtMethodMap.SetRange(MembershipId, Rec.SystemId);
+        if (PmtMethodMap.FindSet()) then
+            repeat
+                if (FilterString <> '') then
+                    FilterString += '|';
+                FilterString += Format(PmtMethodMap.PaymentMethodId, 0, 9);
+            until PmtMethodMap.Next() = 0;
+
+        MemberPaymentMethod.FilterGroup(2);
+        MemberPaymentMethod.SetFilter(SystemId, FilterString);
+        MemberPaymentMethod.FilterGroup(0);
+
+        MemberPaymentMethods.SetMembershipId(Rec.SystemId);
+        MemberPaymentMethods.SetTableView(MemberPaymentMethod);
+        MemberPaymentMethods.Run();
+    end;
+
     var
         RELINK_MEMBERSHIP: Label 'Are you sure you want to link %1 %2 with %3 %4?';
         DUPLICATE_CUSTOMERNO: Label 'When %1 is activated, memberships must have unique customer numbers. Membership %2 and %3 can not have the same %4 %5.';

@@ -360,21 +360,6 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         until MMMemberInfoCapture.Next() = 0;
 
     end;
-
-    local procedure GetLastDayOfMonth(ParamYear: Text[4]; ParamMonth: Text[2]): Date
-    var
-        FirstDayOfMonth: Date;
-        Year: integer;
-        Month: integer;
-    begin
-        Evaluate(Year, ParamYear);
-        Evaluate(Month, ParamMonth);
-
-        FirstDayOfMonth := DMY2Date(1, Month, Year);
-
-        exit(CalcDate('<1M>', FirstDayOfMonth) - 1);
-    end;
-
     #endregion
 
     #region Aux
@@ -962,8 +947,10 @@ codeunit 6184639 "NPR EFT Adyen Integration"
     var
         MemberPaymentMethod: Record "NPR MM Member Payment Method";
         Membership: Record "NPR MM Membership";
+        Member: Record "NPR MM Member";
         MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
         MMPaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
+        UserAccount: Record "NPR UserAccount";
     begin
         if not Membership.Get(MMMemberInfoCapture."Membership Entry No.") then
             exit;
@@ -971,16 +958,20 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         if MemberPaymentMethod.Get(MMMemberInfoCapture."Member Payment Method") then
             MemberPaymentMethod.Delete();
 
-        if MMPaymentMethodMgt.FindMemberPaymentMethod(EftTransactionRequest, Membership, MemberPaymentMethod) then
-            MMPaymentMethodMgt.SetMembePaymentMethodAsDefault(MemberPaymentMethod)
+        if MMPaymentMethodMgt.FindMemberPaymentMethod(EftTransactionRequest, MemberPaymentMethod) then
+            MMPaymentMethodMgt.SetMemberPaymentMethodAsDefault(Membership, MemberPaymentMethod)
         else begin
-            AddMemberPaymentMethod(EftTransactionRequest, true, MemberPaymentMethod, Membership);
+            Member.Get(MMMemberInfoCapture."Member Entry No");
+
+            if (not MembershipMgtInternal.GetUserAccountFromMember(Member, UserAccount)) then
+                MembershipMgtInternal.CreateUserAccountFromMember(Member, UserAccount);
+
+            MMPaymentMethodMgt.AddMemberPaymentMethod(UserAccount, EftTransactionRequest, MemberPaymentMethod);
+            MMPaymentMethodMgt.SetMemberPaymentMethodAsDefault(Membership, MemberPaymentMethod);
 
             MMMemberInfoCapture."Enable Auto-Renew" := true;
             MMMemberInfoCapture."Member Payment Method" := MemberPaymentMethod."Entry No.";
             MMMemberInfoCapture.Modify();
-
-            MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, true, false);
         end;
     end;
 
@@ -991,6 +982,9 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         POSSession: Codeunit "NPR POS Session";
         MMPaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
         Membership: Record "NPR MM Membership";
+        UserAccount: Record "NPR UserAccount";
+        MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
+        Member: Record "NPR MM Member";
     begin
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
@@ -1003,29 +997,17 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         if not Membership.FindFirst() then
             exit;
 
-        if not MMPaymentMethodMgt.FindMemberPaymentMethod(EftTransactionRequest, Membership, MemberPaymentMethod) then
-            AddMemberPaymentMethod(EftTransactionRequest, false, MemberPaymentMethod, Membership);
-    end;
+        if (not MembershipMgt.GetFirstAdminMember(Membership."Entry No.", Member)) then
+            exit;
 
-    local procedure AddMemberPaymentMethod(EftTransactionRequest: Record "NPR EFT Transaction Request"; Default: boolean; var MemberPaymentMethod: Record "NPR MM Member Payment Method"; Membership: Record "NPR MM Membership")
-    begin
-        Clear(MemberPaymentMethod);
-        MemberPaymentMethod.Init();
-        MemberPaymentMethod."BC Record ID" := Membership.RecordId;
-        MemberPaymentMethod."Table No." := Database::"NPR MM Membership";
-        MemberPaymentMethod.Insert(true);
-        MemberPaymentMethod."Payment Token" := EFTTransactionRequest."Recurring Detail Reference";
-        MemberPaymentMethod."Shopper Reference" := EFTTransactionRequest."Internal Customer ID";
-        MemberPaymentMethod."Masked PAN" := EftTransactionRequest."Card Number";
-        MemberPaymentMethod."PAN Last 4 Digits" := CopyStr(DELSTR(EFTTransactionRequest."Card Number", 1, STRLEN(EFTTransactionRequest."Card Number") - 4), 1, MaxStrLen(MemberPaymentMethod."PAN Last 4 Digits"));
-        MemberPaymentMethod."Expiry Date" := GetLastDayOfMonth(EFTTransactionRequest."Card Expiry Year", EFTTransactionRequest."Card Expiry Month");
-        MemberPaymentMethod.PSP := MemberPaymentMethod.PSP::Adyen;
-        MemberPaymentMethod.Validate(Status, MemberPaymentMethod.Status::Active);
-        MemberPaymentMethod.Validate(Default, Default);
-        MemberPaymentMethod."Payment Instrument Type" := EFTTransactionRequest."Payment Instrument Type";
-        MemberPaymentMethod."Payment Brand" := EFTTransactionRequest."Payment Brand";
-        MemberPaymentMethod."Created from System Id" := EFTTransactionRequest.SystemId;
-        MemberPaymentMethod.Modify(true);
+        if (not MembershipMgt.GetUserAccountFromMember(Member, UserAccount)) then
+            MembershipMgt.CreateUserAccountFromMember(Member, UserAccount);
+
+        if not MMPaymentMethodMgt.FindMemberPaymentMethod(EftTransactionRequest, MemberPaymentMethod) then
+            MMPaymentMethodMgt.AddMemberPaymentMethod(UserAccount, EftTransactionRequest, MemberPaymentMethod);
+
+        // NOTE: Previously this would not add it as default, but that should be safe to do now.
+        MMPaymentMethodMgt.SetMemberPaymentMethodAsDefault(Membership, MemberPaymentMethod);
     end;
 
     local procedure DeleteMemberPaymentMethods(CurrEftTransactionRequest: Record "NPR EFT Transaction Request")

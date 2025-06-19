@@ -10,7 +10,6 @@ codeunit 6248418 "NPR UserAccountPaymMethodAPI"
         AccountId: Guid;
         Json: Codeunit "NPR Json Builder";
         MemberPaymentMethod: Record "NPR MM Member Payment Method";
-        PmtMethodAPI: Codeunit "NPR API SubscriptionPmtMethods";
     begin
         Request.SkipCacheIfNonStickyRequest(GetTableIds());
 
@@ -32,7 +31,7 @@ codeunit 6248418 "NPR UserAccountPaymMethodAPI"
         Json.StartArray();
         if (MemberPaymentMethod.FindSet()) then
             repeat
-                PmtMethodAPI.PaymentMethodAsJson(MemberPaymentMethod, '', false, Json);
+                UserAccountPaymentMethodDTO(MemberPaymentMethod, false, Json);
             until MemberPaymentMethod.Next() = 0;
         Json.EndArray();
 
@@ -44,7 +43,6 @@ codeunit 6248418 "NPR UserAccountPaymMethodAPI"
         UserAccount: Record "NPR UserAccount";
         AccountIdTxt: Text;
         AccountId: Guid;
-        PmtMethodAPI: Codeunit "NPR API SubscriptionPmtMethods";
         PSPAsString: Text;
         JHelper: Codeunit "NPR Json Helper";
         RequestBody: JsonToken;
@@ -86,7 +84,6 @@ codeunit 6248418 "NPR UserAccountPaymMethodAPI"
         TempMemberPaymentMethod."Masked PAN" := CopyStr(JHelper.GetJText(RequestBody, 'maskedPAN', false), 1, MaxStrLen(TempMemberPaymentMethod."Masked PAN"));
         TempMemberPaymentMethod."PAN Last 4 Digits" := CopyStr(JHelper.GetJText(RequestBody, 'PANLastDigits', false), 1, MaxStrLen(TempMemberPaymentMethod."PAN Last 4 Digits"));
         TempMemberPaymentMethod."Expiry Date" := JHelper.GetJDate(RequestBody, 'expiryDate', false);
-        TempMemberPaymentMethod.Default := JHelper.GetJBoolean(RequestBody, 'default', false);
         TempMemberPaymentMethod."Payment Method Alias" := CopyStr(JHelper.GetJText(RequestBody, 'alias', false), 1, MaxStrLen(TempMemberPaymentMethod."Payment Method Alias"));
         TempMemberPaymentMethod."Shopper Reference" := CopyStr(JHelper.GetJText(RequestBody, 'shopperReference', false), 1, MaxStrLen(TempMemberPaymentMethod."Shopper Reference"));
         TempMemberPaymentMethod."Payment Token" := CopyStr(JHelper.GetJText(RequestBody, 'paymentToken', false), 1, MaxStrLen(TempMemberPaymentMethod."Payment Token"));
@@ -104,11 +101,6 @@ codeunit 6248418 "NPR UserAccountPaymMethodAPI"
 
             if (MemberPaymentMethod."Expiry Date" <> TempMemberPaymentMethod."Expiry Date") then begin
                 MemberPaymentMethod."Expiry Date" := TempMemberPaymentMethod."Expiry Date";
-                IsModified := true;
-            end;
-
-            if MemberPaymentMethod.Default <> TempMemberPaymentMethod.Default then begin
-                MemberPaymentMethod.Validate(Default, TempMemberPaymentMethod.Default);
                 IsModified := true;
             end;
 
@@ -131,7 +123,6 @@ codeunit 6248418 "NPR UserAccountPaymMethodAPI"
             MemberPaymentMethod."Masked PAN" := TempMemberPaymentMethod."Masked PAN";
             MemberPaymentMethod."PAN Last 4 Digits" := TempMemberPaymentMethod."PAN Last 4 Digits";
             MemberPaymentMethod."Expiry Date" := TempMemberPaymentMethod."Expiry Date";
-            MemberPaymentMethod.Validate(Default, TempMemberPaymentMethod.Default);
             MemberPaymentMethod."Payment Method Alias" := TempMemberPaymentMethod."Payment Method Alias";
             MemberPaymentMethod."Shopper Reference" := TempMemberPaymentMethod."Shopper Reference";
             MemberPaymentMethod."Payment Token" := TempMemberPaymentMethod."Payment Token";
@@ -144,28 +135,68 @@ codeunit 6248418 "NPR UserAccountPaymMethodAPI"
             foreach MembershipIdTok in MembershipArrayTok.AsArray() do begin
                 Evaluate(MembershipId, MembershipIdTok.AsValue().AsText());
                 Membership.GetBySystemId(MembershipId); // ensure that membership exists
-                if (not MembershipPmtMethodMap.Get(MemberPaymentMethod.SystemId, MembershipIdTok.AsValue().AsText())) then begin
+                if (not MembershipPmtMethodMap.Get(MemberPaymentMethod.SystemId, MembershipId)) then begin
                     MembershipPmtMethodMap.Init();
                     MembershipPmtMethodMap.MembershipId := MembershipId;
                     MembershipPmtMethodMap.PaymentMethodId := MemberPaymentMethod.SystemId;
                     MembershipPmtMethodMap.Status := "NPR MM Payment Method Status"::Active;
+                    MembershipPmtMethodMap.Validate(Default, true);
                     MembershipPmtMethodMap.Insert();
                 end else begin
                     MembershipPmtMethodMap.Status := "NPR MM Payment Method Status"::Active;
+                    MembershipPmtMethodMap.Validate(Default, true);
                     MembershipPmtMethodMap.Modify();
                 end;
             end;
         end;
 
-        PmtMethodAPI.PaymentMethodAsJson(MemberPaymentMethod, '', true, Json);
+        exit(Response.RespondCreated(UserAccountPaymentMethodDTO(MemberPaymentMethod, true, Json)));
+    end;
 
-        exit(Response.RespondCreated(Json));
+    internal procedure UserAccountPaymentMethodDTO(PaymentMethod: Record "NPR MM Member Payment Method"; WithToken: Boolean; var Json: Codeunit "NPR Json Builder"): Codeunit "NPR Json Builder"
+    var
+        PmtMethodMap: Record "NPR MM MembershipPmtMethodMap";
+    begin
+        Json.StartObject()
+            .AddProperty('id', Format(PaymentMethod.SystemId, 0, 4).ToLower())
+            .AddProperty('maskedPAN', PaymentMethod."Masked PAN")
+            .AddProperty('PANLastDigits', PaymentMethod."PAN Last 4 Digits")
+            .AddProperty('PSP', "NPR MM Subscription PSP".Names().Get("NPR MM Subscription PSP".Ordinals().IndexOf(PaymentMethod.PSP.AsInteger())))
+            .AddProperty('alias', PaymentMethod."Payment Method Alias");
+
+        if (PaymentMethod."Expiry Date" <> 0D) then
+            Json.AddProperty('expiryDate', PaymentMethod."Expiry Date");
+
+        Json.AddProperty('paymentBrand', PaymentMethod."Payment Brand")
+            .AddProperty('paymentInstrument', PaymentMethod."Payment Instrument Type")
+            .AddProperty('status', "NPR MM Payment Method Status".Names().Get("NPR MM Payment Method Status".Ordinals().IndexOf(PaymentMethod.Status.AsInteger())));
+        if WithToken then
+            Json
+                .AddProperty('paymentToken', PaymentMethod."Payment Token")
+                .AddProperty('shopperReference', PaymentMethod."Shopper Reference");
+
+        Json.StartArray('memberships');
+
+        PmtMethodMap.ReadIsolation := IsolationLevel::ReadCommitted;
+        PmtMethodMap.SetRange(PaymentMethodId, PaymentMethod.SystemId);
+        if (PmtMethodMap.FindSet()) then
+            repeat
+                Json.StartObject()
+                        .AddProperty('membershipId', Format(PmtMethodMap.MembershipId, 0, 4).ToLower())
+                        .AddProperty('status', "NPR MM Payment Method Status".Names().Get("NPR MM Payment Method Status".Ordinals().IndexOf(PmtMethodMap.Status.AsInteger())))
+                        .AddProperty('default', PmtMethodMap.Default)
+                    .EndObject();
+            until PmtMethodMap.Next() = 0;
+
+        Json.EndArray().EndObject();
+        exit(Json);
     end;
 
     local procedure GetTableIds() TableIds: List of [Integer]
     begin
         TableIds.Add(Database::"NPR UserAccount");
         TableIds.Add(Database::"NPR MM Member Payment Method");
+        TableIds.Add(Database::"NPR MM MembershipPmtMethodMap");
     end;
 }
 #endif

@@ -62,7 +62,7 @@ codeunit 6248404 "NPR UserAccountMgtImpl"
     begin
         UserAccount.Reset();
         UserAccount.SetFilter(EmailAddress, '=%1', EmailAddress.ToLower());
-        Found := UserAccount.FindSet();
+        Found := UserAccount.FindFirst();
     end;
 
     internal procedure FindAccountByPhoneNo(PhoneNo: Text[80]; var UserAccount: Record "NPR UserAccount") Found: Boolean

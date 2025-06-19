@@ -35,9 +35,19 @@ table 6150920 "NPR MM Member Payment Method"
             DataClassification = CustomerContent;
 
             trigger OnValidate()
+            var
+                MembershipPmtMethodMap: Record "NPR MM MembershipPmtMethodMap";
             begin
                 if (Status = Status::Archived) and Default then
                     Default := false;
+
+                MembershipPmtMethodMap.SetRange(PaymentMethodId, Rec.SystemId);
+                MembershipPmtMethodMap.SetFilter(Status, '<>%1', Rec.Status);
+                if (MembershipPmtMethodMap.FindSet(true)) then
+                    repeat
+                        MembershipPmtMethodMap.Validate(Status, Rec.Status);
+                        MembershipPmtMethodMap.Modify();
+                    until MembershipPmtMethodMap.Next() = 0;
             end;
         }
         field(30; "Payment Instrument Type"; Text[30])
@@ -74,6 +84,9 @@ table 6150920 "NPR MM Member Payment Method"
         {
             Caption = 'Default';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-05-13';
+            ObsoleteReason = 'Obsoleted in favor of default field on MembershipPmtMethodMap';
 
             trigger OnValidate()
             var

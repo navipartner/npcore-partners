@@ -21,6 +21,29 @@ table 6151174 "NPR MM MembershipPmtMethodMap"
         {
             Caption = 'Status';
             DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                if (Rec.Status = Rec.Status::Archived) and (Rec.Default) then
+                    Rec.Default := false;
+            end;
+        }
+        field(4; Default; Boolean)
+        {
+            Caption = 'Default';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                MembershipPmtMethodMap: Record "NPR MM MembershipPmtMethodMap";
+            begin
+                if (not Rec.Default) then
+                    exit;
+
+                MembershipPmtMethodMap.SetRange(MembershipId, Rec.MembershipId);
+                MembershipPmtMethodMap.SetFilter(PaymentMethodId, '<>%1', Rec.PaymentMethodId); // Don't include self
+                MembershipPmtMethodMap.ModifyAll(Default, false);
+            end;
         }
     }
 

@@ -1257,6 +1257,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         PaymentTokenExist := TryGetPaymentMethodData(JsonAddDataToken, TempMemberPaymentMethod);
         if PaymentTokenExist then begin
             GetMembership(MMSubscrPaymentRequest, Membership);
+
             InsertNewMMPaymentMethod(AdyenWebhook, Membership, TempMemberPaymentMethod);
             Status := Status::Captured;
             ProcessingStatus := ProcessingStatus::Success;
@@ -2028,39 +2029,42 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
 
     procedure InsertNewMMPaymentMethod(var AdyenWebhook: Record "NPR Adyen Webhook"; var Membership: Record "NPR MM Membership"; var TempMemberPaymentMethod: Record "NPR MM Member Payment Method" temporary)
     var
-        MMMemberPaymentMethod: Record "NPR MM Member Payment Method";
+        MemberPaymentMethod: Record "NPR MM Member Payment Method";
+        Member: Record "NPR MM Member";
+        UserAccount: Record "NPR UserAccount";
         CardInstrumentTypeLbl: Label 'Card', Locked = true;
+        PaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
+        MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
     begin
-        MMMemberPaymentMethod.SetRange("Payment Token", TempMemberPaymentMethod."Payment Token");
-        MMMemberPaymentMethod.SetRange("Shopper Reference", TempMemberPaymentMethod."Shopper Reference");
-        MMMemberPaymentMethod.SetRange("BC Record ID", Membership.RecordId);
-        if MMMemberPaymentMethod.FindFirst() then begin //MMPayment Method already exist
-            if not MMMemberPaymentMethod.Default then begin
-                MMMemberPaymentMethod.Validate(Default, true);
-                MMMemberPaymentMethod.Validate(Status, MMMemberPaymentMethod.Status::Active);
-                MMMemberPaymentMethod.Modify();
-            end;
-
+        if (PaymentMethodMgt.FindMemberPaymentMethod(TempMemberPaymentMethod."Payment Token", TempMemberPaymentMethod."Shopper Reference", Enum::"NPR MM Subscription PSP"::Adyen, MemberPaymentMethod)) then begin
+            PaymentMethodMgt.SetMemberPaymentMethodAsDefault(Membership, MemberPaymentMethod);
             exit;
         end;
 
-        MMMemberPaymentMethod.Init();
-        MMMemberPaymentMethod."BC Record ID" := Membership.RecordId;
-        MMMemberPaymentMethod."Table No." := Database::"NPR MM Membership";
-        MMMemberPaymentMethod.Insert(true);
+        if (not MembershipMgt.GetFirstAdminMember(Membership."Entry No.", Member)) then
+            Error('Needs an admin member');
 
-        MMMemberPaymentMethod."Payment Token" := TempMemberPaymentMethod."Payment Token";
-        MMMemberPaymentMethod."Payment Instrument Type" := CardInstrumentTypeLbl;
-        MMMemberPaymentMethod."Shopper Reference" := TempMemberPaymentMethod."Shopper Reference";
-        MMMemberPaymentMethod."Masked PAN" := TempMemberPaymentMethod."Masked PAN";
-        MMMemberPaymentMethod."PAN Last 4 Digits" := TempMemberPaymentMethod."PAN Last 4 Digits";
-        MMMemberPaymentMethod."Expiry Date" := TempMemberPaymentMethod."Expiry Date";
-        MMMemberPaymentMethod."Payment Brand" := TempMemberPaymentMethod."Payment Brand";
-        MMMemberPaymentMethod.PSP := MMMemberPaymentMethod.PSP::Adyen;
-        MMMemberPaymentMethod."Created from System Id" := AdyenWebhook.SystemId;
-        MMMemberPaymentMethod.Validate(Default, true);
-        MMMemberPaymentMethod.Validate(Status, MMMemberPaymentMethod.Status::Active);
-        MMMemberPaymentMethod.Modify(true);
+        if (not MembershipMgt.GetUserAccountFromMember(Member, UserAccount)) then
+            MembershipMgt.CreateUserAccountFromMember(Member, UserAccount);
+
+        MemberPaymentMethod.Init();
+        MemberPaymentMethod."BC Record ID" := UserAccount.RecordId();
+        MemberPaymentMethod."Table No." := UserAccount.RecordId().TableNo();
+        MemberPaymentMethod.Insert(true);
+
+        MemberPaymentMethod."Payment Token" := TempMemberPaymentMethod."Payment Token";
+        MemberPaymentMethod."Payment Instrument Type" := CardInstrumentTypeLbl;
+        MemberPaymentMethod."Shopper Reference" := TempMemberPaymentMethod."Shopper Reference";
+        MemberPaymentMethod."Masked PAN" := TempMemberPaymentMethod."Masked PAN";
+        MemberPaymentMethod."PAN Last 4 Digits" := TempMemberPaymentMethod."PAN Last 4 Digits";
+        MemberPaymentMethod."Expiry Date" := TempMemberPaymentMethod."Expiry Date";
+        MemberPaymentMethod."Payment Brand" := TempMemberPaymentMethod."Payment Brand";
+        MemberPaymentMethod.PSP := MemberPaymentMethod.PSP::Adyen;
+        MemberPaymentMethod."Created from System Id" := AdyenWebhook.SystemId;
+        MemberPaymentMethod.Validate(Status, MemberPaymentMethod.Status::Active);
+        MemberPaymentMethod.Modify(true);
+
+        PaymentMethodMgt.SetMemberPaymentMethodAsDefault(Membership, MemberPaymentMethod);
     end;
 
     procedure GetLastDayOfExpiryMonth(expiryDateStr: Text): Date

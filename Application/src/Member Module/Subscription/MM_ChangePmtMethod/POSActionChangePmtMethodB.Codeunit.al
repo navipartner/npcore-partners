@@ -5,8 +5,11 @@ codeunit 6185072 "NPR POSAction:ChangePmtMethodB"
     var
         SalesLinePOS: Record "NPR POS Sale Line";
         Membership: Record "NPR MM Membership";
+        MembershipPmtMethodMap: Record "NPR MM MembershipPmtMethodMap";
         MMMemberPaymentMethod: Record "NPR MM Member Payment Method";
         MemberPaymentMethodChangeLbl: Label 'The default membership payment method for membership %1 was changed to %2.', Comment = '%1 - memberhsip no., mm payment method';
+        MembershipHasNoPaymentMethodsAssociatedErr: Label 'The selected membership has no existing payment methods associated.';
+        FilterString: Text;
     begin
         SalePOS.TestField("Customer No.");
 
@@ -15,15 +18,27 @@ codeunit 6185072 "NPR POSAction:ChangePmtMethodB"
         if not Membership.FindFirst() then
             exit;
 
-        MMMemberPaymentMethod.SetRange("Table No.", Database::"NPR MM Membership");
-        MMMemberPaymentMethod.SetRange("BC Record ID", Membership.RecordId());
+        MembershipPmtMethodMap.SetRange(MembershipId, Membership.SystemId);
+        if (not MembershipPmtMethodMap.FindSet()) then
+            Error(MembershipHasNoPaymentMethodsAssociatedErr);
+
+        repeat
+            if (FilterString <> '') then
+                FilterString += '|';
+            FilterString += MembershipPmtMethodMap.PaymentMethodId;
+        until MembershipPmtMethodMap.Next() = 0;
+
+        MMMemberPaymentMethod.SetFilter(SystemId, FilterString);
 
         if Page.RunModal(0, MMMemberPaymentMethod) <> Action::LookupOK then
             exit;
 
-        MMMemberPaymentMethod.Validate(Default, true);
         MMMemberPaymentMethod.Validate(Status, MMMemberPaymentMethod.Status::Active);
         MMMemberPaymentMethod.Modify();
+
+        MembershipPmtMethodMap.Get(MMMemberPaymentMethod.SystemId, Membership.SystemId);
+        MembershipPmtMethodMap.Validate(Default, true);
+        MembershipPmtMethodMap.Modify();
 
         if InsertCommentLine then begin
             SaleLineMgr.GetNewSaleLine(SalesLinePOS);

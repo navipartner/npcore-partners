@@ -1012,6 +1012,11 @@
                     'UpdateAdyenSetup':
                         exit('NPR-UpdateAdyenSetup-20250523');
                 end;
+            Codeunit::"NPR UPGUserAccounts":
+                case UpgradeStep of
+                    'UpgradeSubscriptionsToAccounts':
+                        exit('NPR-UpgradeSubscriptionsToAccounts-20250613');
+                end;
 #IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
             Codeunit::"NPR UPG No Series Experience":
                 case UpgradeStep of

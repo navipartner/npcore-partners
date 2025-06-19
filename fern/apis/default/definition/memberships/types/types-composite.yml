@@ -2,6 +2,7 @@
 
 imports:
   simpleTypes: ./types-simple.yml
+  accountTypes: ./../../account/types-account.yml
   commonApiTypes: ./../../common-api-types.yml
   globalApiTypes: ./../../global-api-types.yml
 
@@ -254,10 +255,12 @@ types:
       PaymentMethodDTO
     properties:
       id: simpleTypes.PaymentMethodId
+      accountId: uuid
     examples:
       - name : ExamplePaymentMethodRetrieve
         value:
           id: $simpleTypes.PaymentMethodId.ExamplePaymentMethodId
+          accountId: e2cfea9f-385e-4d83-8b50-42256885b03a
           PSP: $simpleTypes.PaymentMethodPSP.ExamplePaymentMethodPSPAdyen
           status: $simpleTypes.PaymentMethodStatus.ExamplePaymentMethodStatusActive
           paymentInstrument: $simpleTypes.PaymentInstrument.ExamplePaymentInstrument
@@ -270,6 +273,7 @@ types:
       - name : ExamplePaymentMethodRetrieveVipss
         value:
           id: $simpleTypes.PaymentMethodId.ExamplePaymentMethodId2
+          accountId: e2cfea9f-385e-4d83-8b50-42256885b03a
           PSP: $simpleTypes.PaymentMethodPSP.ExamplePaymentMethodPSPVipps
           status: $simpleTypes.PaymentMethodStatus.ExamplePaymentMethodStatusActive
           paymentInstrument: $simpleTypes.PaymentInstrument.ExamplePaymentInstrument
@@ -282,6 +286,7 @@ types:
       - name : ExamplePaymentMethodRetrieveArchived
         value:
           id: $simpleTypes.PaymentMethodId.ExamplePaymentMethodId3
+          accountId: e2cfea9f-385e-4d83-8b50-42256885b03a
           PSP: $simpleTypes.PaymentMethodPSP.ExamplePaymentMethodPSPAdyen
           status: $simpleTypes.PaymentMethodStatus.ExamplePaymentMethodStatusArchived
           paymentInstrument: $simpleTypes.PaymentInstrument.ExamplePaymentInstrument

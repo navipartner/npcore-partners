@@ -454,14 +454,8 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 trigger OnAction()
-                var
-                    MemberPaymentMethod: Record "NPR MM Member Payment Method";
                 begin
-                    MemberPaymentMethod.FilterGroup(2);
-                    MemberPaymentMethod.SetRange("Table No.", Database::"NPR MM Membership");
-                    MemberPaymentMethod.SetRange("BC Record ID", Rec.RecordId());
-                    MemberPaymentMethod.FilterGroup(0);
-                    Page.Run(0, MemberPaymentMethod);
+                    ShowPaymentMethods();
                 end;
             }
             action(Subscription)
@@ -733,6 +727,11 @@
         PlaceHolderLbl: Label '6014555,%1,%2,2', Locked = true;
     begin
         exit(StrSubstNo(PlaceHolderLbl, GetAttributeTableId(), AttributeNumber));
+    end;
+
+    local procedure ShowPaymentMethods()
+    begin
+        Rec.ShowPaymentMethods();
     end;
 
 }

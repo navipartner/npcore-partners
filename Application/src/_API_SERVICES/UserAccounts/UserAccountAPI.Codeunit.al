@@ -3,15 +3,16 @@ codeunit 6248416 "NPR UserAccountAPI" implements "NPR API Request Handler"
 {
     Access = Internal;
 
-    procedure Handle(var Request: Codeunit "NPR API Request"): Codeunit "NPR API Response"
     var
-        UserAccountPmtMethodAPI: Codeunit "NPR UserAccountPaymMethodAPI";
+        _UserAccountPmtMethodAPI: Codeunit "NPR UserAccountPaymMethodAPI";
+
+    procedure Handle(var Request: Codeunit "NPR API Request"): Codeunit "NPR API Response"
     begin
         case true of
             Request.Match('GET', '/account/:accountId/paymentMethod'):
-                exit(UserAccountPmtMethodAPI.GetPaymentMethodsFromAccount(Request));
+                exit(_UserAccountPmtMethodAPI.GetPaymentMethodsFromAccount(Request));
             Request.Match('POST', '/account/:accountId/paymentMethod'):
-                exit(UserAccountPmtMethodAPI.CreatePaymentMethodForAccount(Request));
+                exit(_UserAccountPmtMethodAPI.CreatePaymentMethodForAccount(Request));
             Request.Match('GET', '/account'):
                 exit(FindAccount(Request));
             Request.Match('GET', '/account/:accountId'):
@@ -186,6 +187,8 @@ codeunit 6248416 "NPR UserAccountAPI" implements "NPR API Request Handler"
     end;
 
     local procedure UserAccountDTO(UserAccount: Record "NPR UserAccount"; var Json: Codeunit "NPR Json Builder"): Codeunit "NPR Json Builder"
+    var
+        MemberPaymentMethod: Record "NPR MM Member Payment Method";
     begin
         Json.StartObject()
                 .AddProperty('id', Format(UserAccount.SystemId, 0, 4).ToLower())
@@ -194,8 +197,17 @@ codeunit 6248416 "NPR UserAccountAPI" implements "NPR API Request Handler"
                 .AddProperty('displayName', UserAccount.DisplayName)
                 .AddProperty('phoneNumber', UserAccount.PhoneNo)
                 .AddProperty('emailAddress', UserAccount.EmailAddress)
-            .EndObject();
+                .StartArray('paymentMethods');
 
+        MemberPaymentMethod.ReadIsolation := IsolationLevel::ReadCommitted;
+        MemberPaymentMethod.SetRange("Table No.", UserAccount.RecordId().TableNo());
+        MemberPaymentMethod.SetRange("BC Record ID", UserAccount.RecordId());
+        if (MemberPaymentMethod.FindSet()) then
+            repeat
+                Json.AddObject(_UserAccountPmtMethodAPI.UserAccountPaymentMethodDTO(MemberPaymentMethod, false, Json));
+            until MemberPaymentMethod.Next() = 0;
+
+        Json.EndArray().EndObject();
         exit(Json);
     end;
 
@@ -207,6 +219,8 @@ codeunit 6248416 "NPR UserAccountAPI" implements "NPR API Request Handler"
     local procedure GetTableIds() TableIds: List of [Integer]
     begin
         TableIds.Add(Database::"NPR UserAccount");
+        TableIds.Add(Database::"NPR MM Member Payment Method");
+        TableIds.Add(Database::"NPR MM MembershipPmtMethodMap");
     end;
 }
 #endif
