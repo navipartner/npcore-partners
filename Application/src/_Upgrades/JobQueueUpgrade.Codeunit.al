@@ -15,6 +15,8 @@
     begin
         JobQueueInstall.AddJobQueues();
         RemoveObsoleteEntraApp();
+        UpdateRefresherUserAssignment();
+        UpdateRefresherUserSettings();
     end;
 
     local procedure RemoveObsoleteEntraApp()
@@ -41,6 +43,49 @@
             if User.Get(UserID) then
                 User.Delete();
         end;
+
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Upgrade", UpgradeStep));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure UpdateRefresherUserAssignment()
+    var
+        JQRefreshSetup: Record "NPR Job Queue Refresh Setup";
+        MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
+    begin
+        UpgradeStep := 'UpdateRefresherUserAssignment';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Upgrade", UpgradeStep)) then
+            exit;
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Job Queue Upgrade', UpgradeStep);
+
+        if JQRefreshSetup.Get() and (JQRefreshSetup."Default Refresher User" <> '') then begin
+            JQRefreshSetup."Default Refresher User Name" := CopyStr(JQRefreshSetup."Default Refresher User", 1, MaxStrLen(JQRefreshSetup."Default Refresher User Name"));
+            JQRefreshSetup.Modify();
+        end;
+
+        if MonitoredJQEntry.FindSet(true) then
+            repeat
+                if MonitoredJQEntry."NPR Entra App User Name" <> '' then begin
+                    MonitoredJQEntry."JQ Runner User Name" := CopyStr(MonitoredJQEntry."NPR Entra App User Name", 1, MaxStrLen(MonitoredJQEntry."JQ Runner User Name"));
+                    MonitoredJQEntry.Modify();
+                end;
+            until MonitoredJQEntry.Next() = 0;
+
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Upgrade", UpgradeStep));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure UpdateRefresherUserSettings()
+    var
+        JQRefreshSetup: Record "NPR Job Queue Refresh Setup";
+    begin
+        UpgradeStep := 'UpdateRefresherUserSettings';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Upgrade", UpgradeStep)) then
+            exit;
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Job Queue Upgrade', UpgradeStep);
+
+        if JQRefreshSetup.Get() then
+            JQRefreshSetup.UpdateRefresherUsers();
 
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();

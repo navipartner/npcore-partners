@@ -8,6 +8,7 @@
         tabledata "Job Queue Entry" = rimd;
 
     var
+        _JQRefresherSetup: Record "NPR Job Queue Refresh Setup";
         JQParamStrMgt: Codeunit "NPR Job Queue Param. Str. Mgt.";
         NcSetupMgt: Codeunit "NPR Nc Setup Mgt.";
         JobTimeout: Duration;
@@ -17,6 +18,7 @@
         MaxNoOfAttemptsToRun: Integer;
         RerunDelaySec: Integer;
         AutoRescheduleOnError: Boolean;
+        JQRefreshSetupRetrieved: Boolean;
         ShowAutoCreatedClause: Boolean;
         ParamNameAndValueLbl: Label '%1=%2', Locked = true;
 
@@ -289,6 +291,10 @@
         JobQueueEntry."Record ID to Process" := Parameters."Record ID to Process";
         JobQueueEntry."Earliest Start Date/Time" := Parameters."Earliest Start Date/Time";
         SetJobQueueEntryParams(Parameters, JobQueueEntry);
+        if MonitoredJobRefreshActive and ((JobQueueEntry."Starting Time" <> 0T) or (JobQueueEntry."Ending Time" <> 0T)) then begin
+            GetJQRefresherSetup();
+            JobQueueEntry."NPR Time Zone" := _JQRefresherSetup."Default Job Time Zone";
+        end;
         JobQueueEntry."Notify On Success" := Parameters."Notify On Success";
         JobQueueEntry.Status := JobQueueEntry.Status::"On Hold";
         if Parameters.Description <> '' then
@@ -350,8 +356,10 @@
         if JobQueueEntry."Recurring Job" then begin
             if (Parameters."Starting Time" <> 0T) and (JobQueueEntry."Starting Time" <> Parameters."Starting Time") then
                 JobQueueEntry.Validate("Starting Time", Parameters."Starting Time");
+            if (Parameters."Reference Starting Time" <> 0DT) and (JobQueueEntry."Reference Starting Time" <> Parameters."Reference Starting Time") then
+                JobQueueEntry."Reference Starting Time" := Parameters."Reference Starting Time";
             if (Parameters."Ending Time" <> 0T) and (JobQueueEntry."Ending Time" <> Parameters."Ending Time") then
-                JobQueueEntry."Ending Time" := Parameters."Ending Time";
+                JobQueueEntry.Validate("Ending Time", Parameters."Ending Time");
         end;
         JobQueueEntry."Maximum No. of Attempts to Run" := Parameters."Maximum No. of Attempts to Run";
         if JobQueueEntry."Maximum No. of Attempts to Run" <= 0 then
@@ -450,7 +458,7 @@
             if not IsStale(JobQueueEntry) then
                 exit;
 
-        JobQueueEntry.RefreshLocked();  // Allow up to three lock time-outs = 90 seconds, in order to reduce lock timeouts
+        JobQueueEntry.RefreshLocked();
         if not ValidStartDT then begin
             JobQueueEntry.SetStatus(JobQueueEntry.Status::"On Hold");
             JobQueueEntry."Earliest Start Date/Time" := NotBeforeDateTime;
@@ -494,9 +502,16 @@
 
     local procedure HasValidStartDT(JobQueueEntry: Record "Job Queue Entry"; NotBeforeDateTime: DateTime): Boolean
     var
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24)
+        JobQueueDispatcher: Codeunit "Job Queue Dispatcher";
+#endif
         NextRunDateTimeIfFinishedNow: DateTime;
     begin
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24
         NextRunDateTimeIfFinishedNow := RoundDateTime(CalcNextRunDateTimeForNPRecurringJob(JobQueueEntry, CurrentDateTime(), false), 60000, '>');
+#else
+        NextRunDateTimeIfFinishedNow := RoundDateTime(JobQueueDispatcher.CalcNextRunTimeForRecurringJob(JobQueueEntry, CurrentDateTime()), 60000, '>');
+#endif
         if NotBeforeDateTime > NextRunDateTimeIfFinishedNow then
             NextRunDateTimeIfFinishedNow := RoundDateTime(NotBeforeDateTime, 60000, '>');
 
@@ -504,6 +519,15 @@
             (JobQueueEntry."Earliest Start Date/Time" <> 0DT) and
             (JobQueueEntry."Earliest Start Date/Time" <= NextRunDateTimeIfFinishedNow) and
             (JobQueueEntry."Earliest Start Date/Time" >= RoundDateTime(NotBeforeDateTime, 60000, '<')));
+    end;
+
+    local procedure GetJQRefresherSetup()
+    begin
+        if JQRefreshSetupRetrieved then
+            exit;
+        if not _JQRefresherSetup.Get() then
+            Clear(_JQRefresherSetup);
+        JQRefreshSetupRetrieved := true;
     end;
 
     local procedure CheckRequiredPermissions()
@@ -718,8 +742,10 @@
         MonitoredJobQueueMgt: Codeunit "NPR Monitored Job Queue Mgt.";
     begin
         if not SkipUpdateNPManagedMonitoredJobs() then begin
+            GetJQRefresherSetup();
+            _JQRefresherSetup.TestField("Default Job Time Zone");
             BindSubscription(MonitoredJobQueueMgt);
-            OnRefreshNPRJobQueueList();  //update monitored jobs
+            OnRefreshNPRJobQueueList();  //renew NaviPartner protected monitored jobs
             if UnBindSubscription(MonitoredJobQueueMgt) then;
             Commit();
         end;
@@ -972,6 +998,8 @@
         exit(HasNeverBeenRunDT());
     end;
 
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24
+    [Obsolete('Replaced by the standard Job Queue Dispatcher functionality, which also supports overnight jobs and run windows (from BC25 onwards).', '2025-06-19')]
     local procedure CalcNextRunDateTimeForNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"; StartingDateTime: DateTime; AdjustForRunWindowOnly: Boolean) NewRunDateTime: DateTime
     var
         RunWindowDate: Date;
@@ -1031,6 +1059,7 @@
         NewRunDateTime := CalcRunTimeForRecurringJob(JobQueueEntry, NewRunDateTime);
     end;
 
+    [Obsolete('Replaced by the standard Job Queue Dispatcher functionality, which also supports overnight jobs and run windows (from BC25 onwards).', '2025-06-19')]
     local procedure CalcRunTimeForRecurringJob(JobQueueEntry: Record "Job Queue Entry"; StartingDateTime: DateTime) NewRunDateTime: DateTime
     var
         RunOnDate: array[7] of Boolean;
@@ -1058,6 +1087,7 @@
         if Found then
             NewRunDateTime := NewRunDateTime + DaysToDuration(NoOfDays);
     end;
+#endif
 
     internal procedure IsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"): Boolean
     var
@@ -1119,11 +1149,27 @@
         MonitoredJobQueueMgt.RefreshJobQueueEntries();
     end;
 
-#if BC17 or BC18 or BC19 or BC20 or BC21
+    local procedure SetTimeZone(var JobQueueEntry: Record "Job Queue Entry")
+    var
+        UserPersonalization: Record "User Personalization";
+        ClientTypeManagement: Codeunit "Client Type Management";
+        SessionSettings: SessionSettings;
+    begin
+        if ClientTypeManagement.GetCurrentClientType() = ClientType::ODataV4 then begin  //External JQ refresher running in UTC
+            JobQueueEntry."NPR Time Zone" := 'UTC';
+            exit;
+        end;
+        if not UserPersonalization.Get(UserSecurityId()) then
+            Clear(UserPersonalization);
+        if UserPersonalization."Time Zone" = '' then begin
+            SessionSettings.Init();
+            UserPersonalization."Time Zone" := CopyStr(SessionSettings.TimeZone(), 1, MaxStrLen(UserPersonalization."Time Zone"));
+        end;
+        JobQueueEntry."NPR Time Zone" := UserPersonalization."Time Zone";
+    end;
+
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue Dispatcher", 'OnBeforeCalcNextRunTimeForRecurringJob', '', true, false)]
-#else
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue Dispatcher", OnBeforeCalcNextRunTimeForRecurringJob, '', true, false)]
-#endif
     local procedure NPCalcNextRunDateTimeForRecurringJob(JobQueueEntry: Record "Job Queue Entry"; StartingDateTime: DateTime; var NewRunDateTime: DateTime; var IsHandled: Boolean)
     begin
         if IsHandled then
@@ -1134,11 +1180,7 @@
         NewRunDateTime := CalcNextRunDateTimeForNPRecurringJob(JobQueueEntry, StartingDateTime, false);
     end;
 
-#if BC17 or BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue Dispatcher", 'OnCalcInitialRunTimeOnAfterCalcEarliestPossibleRunTime', '', true, false)]
-#else
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue Dispatcher", OnCalcInitialRunTimeOnAfterCalcEarliestPossibleRunTime, '', true, false)]
-#endif
     local procedure NPCalcInitialRunTimeOnAfterCalcEarliestPossibleRunTime(var JobQueueEntry: Record "Job Queue Entry"; var EarliestPossibleRunTime: DateTime; var IsHandled: Boolean)
     begin
         if IsHandled then
@@ -1148,6 +1190,17 @@
         IsHandled := true;
         EarliestPossibleRunTime := CalcNextRunDateTimeForNPRecurringJob(JobQueueEntry, EarliestPossibleRunTime, true);
     end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue - Enqueue", 'OnBeforeEnqueueJobQueueEntry', '', true, false)]
+    local procedure CheckScheduledStartDateTimeIsNotOutsideOfAllowedRunWindow(var JobQueueEntry: Record "Job Queue Entry")
+    begin
+        if not JobQueueEntry."Recurring Job" then
+            exit;
+        If not IsNPRecurringJob(JobQueueEntry) then
+            exit;
+        JobQueueEntry."Earliest Start Date/Time" := CalcNextRunDateTimeForNPRecurringJob(JobQueueEntry, JobQueueEntry."Earliest Start Date/Time", true);
+    end;
+#endif
 
 #if BC17 or BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue - Enqueue", 'OnBeforeEnqueueJobQueueEntry', '', true, false)]
@@ -1199,24 +1252,14 @@
             JobQueueSendNotif.SendNotifications(JobQueueEntry, JobQueueSendNotif);
 
         if JobQueueEntry."NPR Auto-Resched. after Error" then begin
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24
             JobQueueEntry."Earliest Start Date/Time" := CalcNextRunDateTimeForNPRecurringJob(JobQueueEntry, NowWithDelayInSeconds(JobQueueEntry."NPR Auto-Resched. Delay (sec.)"), true);
+#else
+            JobQueueEntry."Earliest Start Date/Time" := NowWithDelayInSeconds(JobQueueEntry."NPR Auto-Resched. Delay (sec.)");
+#endif
             JobQueueEntry.Modify();
             JobQueueEntry.Restart();
         end;
-    end;
-
-#if BC17 or BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue - Enqueue", 'OnBeforeEnqueueJobQueueEntry', '', true, false)]
-#else
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue - Enqueue", OnBeforeEnqueueJobQueueEntry, '', true, false)]
-#endif
-    local procedure CheckScheduledStartDateTimeIsNotOutsideOfAllowedRunWindow(var JobQueueEntry: Record "Job Queue Entry")
-    begin
-        if not JobQueueEntry."Recurring Job" then
-            exit;
-        If not IsNPRecurringJob(JobQueueEntry) then
-            exit;
-        JobQueueEntry."Earliest Start Date/Time" := CalcNextRunDateTimeForNPRecurringJob(JobQueueEntry, JobQueueEntry."Earliest Start Date/Time", true);
     end;
 
 #if BC17 or BC18 or BC19 or BC20 or BC21
@@ -1278,7 +1321,7 @@
     begin
         AddEventBillingSenderJobQueue();
     end;
-#endif    
+#endif
 
 #if BC17 or BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnRefreshNPRJobQueueList', '', false, false)]
@@ -1363,6 +1406,28 @@
             SendHeartbeat(JobQueueEntry);
     end;
 
+#if BC17 or BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnAfterValidateEvent', 'Starting Time', false, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", OnAfterValidateEvent, "Starting Time", false, false)]
+#endif
+    local procedure UpdateTimeZoneOnAfterStartingTimeValidate(var Rec: Record "Job Queue Entry")
+    begin
+        SetTimeZone(Rec);
+    end;
+
+#if BC17 or BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnAfterValidateEvent', 'Ending Time', false, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", OnAfterValidateEvent, "Ending Time", false, false)]
+#endif
+    local procedure SetStartingTimeOnEndingTimeValidate(var Rec: Record "Job Queue Entry")
+    begin
+        if Rec."Ending Time" = 0T then
+            exit;
+        if Rec."Starting Time" = 0T then
+            Rec.Validate("Starting Time", 000000T);
+    end;
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeScheduleNcTaskProcessing(var JobQueueEntry: Record "Job Queue Entry"; TaskProcessorCode: Code[20]; var EnableTaskListUpdate: Boolean; var JobQueueCatagoryCode: Code[10]; var Handled: Boolean)
@@ -1425,6 +1490,16 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdateNPMonitoredJobs(var Skip: Boolean; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnRefreshserCheckIfCreateMissingCustomJobs(var Create: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeRenewMonitoredJobQueueEntry(xMonitoredJQEntry: Record "NPR Monitored Job Queue Entry"; var MonitoredJQEntry: Record "NPR Monitored Job Queue Entry")
     begin
     end;
 }

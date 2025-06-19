@@ -50,7 +50,7 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
             end;
         end else begin
 #if not BC17
-            PermissionSets.Add('NPR Ext JQ Refresher');
+            PermissionSets.Add(ExtJQRefresherRoleID());
 #else
             PermissionSets.Add('D365 AUTOMATION');
             PermissionSets.Add('SUPER (DATA)');
@@ -135,7 +135,7 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
         PermissionSets: List of [Code[20]];
     begin
 #if not BC17
-        PermissionSets.Add('NPR Ext JQ Refresher');
+        PermissionSets.Add(ExtJQRefresherRoleID());
 #else
         PermissionSets.Add('D365 AUTOMATION');
         PermissionSets.Add('SUPER (DATA)');
@@ -167,34 +167,46 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
         CreateCloudflareHttpRequest(RequestText, RequestUrl, Enum::"Http Request Type"::POST, HttpResponseMessage);
     end;
 
-    internal procedure RequestJQRefresherUser(var DefaultRefresherUser: Text[250])
+    internal procedure LookupJQRefresherUserName(var Text: Text): Boolean
     var
         AADApplication: Record "AAD Application";
-        AccessControl: Record "Access Control";
         User: Record User;
         AADApplicationPage: Page "AAD Application List";
-        PermissionSetLbl: Label 'NPR EXT JQ REFRESHER', Locked = true;
     begin
-        if AADApplication.FindSet() then
-            repeat
-                if AccessControl.Get(AADApplication."User ID", PermissionSetLbl, '', AccessControl.Scope::System, AADApplication."App ID") then
-                    AADApplication.Mark(true);
-            until AADApplication.Next() = 0;
-
-        AADApplication.MarkedOnly(true);
+        FilterJQRefresherAADApps(AADApplication);
         AADApplicationPage.SetTableView(AADApplication);
         AADApplicationPage.LookupMode := true;
         if AADApplicationPage.RunModal() <> Action::LookupOK then
-            exit;
+            exit(false);
         AADApplicationPage.GetRecord(AADApplication);
-        if User.Get(AADApplication."User ID") then
-            DefaultRefresherUser := User."User Name";
+        User.Get(AADApplication."User ID");
+        Text := User."User Name";
+        exit(true);
     end;
 
-    internal procedure CreateExternalJQRefresherUser(Rec: Record "NPR Job Queue Refresh Setup")
+    internal procedure FilterJQRefresherAADApps(var AADApplication: Record "AAD Application")
+    var
+        AccessControl: Record "Access Control";
+    begin
+        AADApplication.Reset();
+        if AADApplication.FindSet() then
+            repeat
+                if AccessControl.Get(AADApplication."User ID", ExtJQRefresherRoleID(), '', AccessControl.Scope::System, AADApplication."App ID") then
+                    AADApplication.Mark(true);
+            until AADApplication.Next() = 0;
+        AADApplication.MarkedOnly(true);
+    end;
+
+    internal procedure ExtJQRefresherRoleID(): Code[20]
+    var
+        PermissionSetLbl: Label 'NPR EXT JQ REFRESHER', MaxLength = 20, Locked = true;
+    begin
+        exit(PermissionSetLbl);
+    end;
+
+    internal procedure CreateExternalJQRefresherUser(var JQRefreshSetup: Record "NPR Job Queue Refresh Setup")
     var
         AADApplication: Record "AAD Application";
-        JQRefreshSetup: Record "NPR Job Queue Refresh Setup";
         User: Record User;
         ExternalJQRefresherMgt: Codeunit "NPR External JQ Refresher Mgt.";
         ExtJQRefresherEntraApp: Report "NPR Ext JQ Refresher Entra App";
@@ -220,10 +232,9 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
             exit;
         end;
 
-        JQRefreshSetup.GetSetup();
-        if JQRefreshSetup."Default Refresher User" = '' then
+        if JQRefreshSetup."Default Refresher User Name" = '' then
             if User.Get(AADApplication."User ID") then begin
-                JQRefreshSetup."Default Refresher User" := User."User Name";
+                JQRefreshSetup.Validate("Default Refresher User Name", User."User Name");
                 JQRefreshSetup.Modify();
             end;
 
@@ -273,6 +284,32 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
         HttpRequestMessage.Method := Method.Names().Get(Method.Ordinals().IndexOf(Method.AsInteger()));
 
         HttpClient.Send(HttpRequestMessage, HttpResponseMessage);
+    end;
+
+    internal procedure CheckBaseAppVerion(ShowError: Boolean): Boolean
+    var
+        BaseAppID: Codeunit "BaseApp ID";
+        Info: ModuleInfo;
+    begin
+        NavApp.GetModuleInfo(BaseAppID.Get(), Info);
+        if Info.DataVersion.Major >= 22 then
+            exit(true);
+        if ShowError then
+            ThrowIncompatibleBaseVersion();
+        exit(false)
+    end;
+
+    [TryFunction]
+    internal procedure TryThrowIncompatibleBaseVersion()
+    begin
+        ThrowIncompatibleBaseVersion();
+    end;
+
+    local procedure ThrowIncompatibleBaseVersion()
+    var
+        NotCompatibleWithThisVersionErr: Label 'The External Job Queue Refresher requires a minimum BC version of 22.';
+    begin
+        Error(NotCompatibleWithThisVersionErr);
     end;
 
     local procedure ExtJQRefresherEnumValueName(RefresherOption: Enum "NPR Ext. JQ Refresher Options") Result: Text

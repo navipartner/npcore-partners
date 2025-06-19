@@ -2,6 +2,7 @@ page 6150891 "NPR Job Queue Refresh Setup"
 {
     ApplicationArea = NPRRetail;
     Caption = 'Job Queue Refresh Setup';
+    AdditionalSearchTerms = 'JQ Refresher';
     DeleteAllowed = false;
     InsertAllowed = false;
     Extensible = false;
@@ -27,20 +28,57 @@ page 6150891 "NPR Job Queue Refresh Setup"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies whether refreshing the list of NP Retail related job queue entries should be performed by an external Job Queue Refresher Worker regardless of user activity.';
                 }
-                field("Create Missing Custom JQs"; Rec."Create Missing Custom JQs")
+                field("Create Missing Custom JQs"; Rec.CreateMissingCustomJQs())
                 {
+                    Caption = 'Create Missing Custom JQs';
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies whether the job queue refresher is allowed to automatically recreate missing job queue entries. This only affects custom jobs. Missing NP-protected job queue entries are always recreated.';
+                    ToolTip = 'Specifies whether the job queue refresher is allowed to automatically recreate missing job queue entries. This only affects custom jobs. Missing NP-protected job queue entries are always recreated. The setting can only be changed from a PTE by subscribing to the OnRefreshserCheckIfCreateMissingCustomJobs() event of codeunit 6014663 "NPR Job Queue Management".';
+                    Editable = false;
+                    Importance = Additional;
                 }
                 group(DefaultRefresherUser)
                 {
                     ShowCaption = false;
                     Visible = _ExternalJQRefresherIsEnabled;
-                    field("Default Refresher User"; Rec."Default Refresher User")
+                    field("Default Refresher User Name"; Rec."Default Refresher User Name")
                     {
                         ApplicationArea = NPRRetail;
                         Tooltip = 'Specifies the default Job Queue runner user which will be used for refreshing job queue entries if no Job Queue runner is specified.';
+
+                        trigger OnLookup(var Text: Text): Boolean
+                        var
+                            ExternalJQRefresherMgt: Codeunit "NPR External JQ Refresher Mgt.";
+                        begin
+                            exit(ExternalJQRefresherMgt.LookupJQRefresherUserName(Text));
+                        end;
                     }
+                }
+                field("Time Zone Name"; Rec.GetTimeZoneName())
+                {
+                    Caption = 'Default Job Time Zone';
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the time zone in which your job queues are usually set up and expected to run. This only applies to jobs with a defined "Starting Time" or "Ending Time". If the external job queue refresher is enabled, the system will adjust the starting and ending times of jobs from the time zone in which the job was originally created to the time zone in which the refresher user operates (in Business Central SaaS environment, this is UTC).';
+#if not (BC17 or BC18)
+                    trigger OnAssistEdit()
+                    var
+                        TimeZoneSelection: Codeunit "Time Zone Selection";
+                        TimeZoneChangedMsg: Label 'You have changed the time zone. Please note that this change will take effect on the next job queue refresher run.';
+                    begin
+                        TimeZoneSelection.LookupTimeZone(Rec."Default Job Time Zone");
+                        if xRec."Default Job Time Zone" <> Rec."Default Job Time Zone" then begin
+                            Rec.Validate("Default Job Time Zone");
+                            Rec.Modify();
+                            Message(TimeZoneChangedMsg);
+                        end;
+                    end;
+#endif
+                }
+                field("Language ID"; Rec."Language ID")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the language code for job queue runner users.';
+                    Importance = Additional;
+                    Visible = false;
                 }
                 field("Last Refreshed"; Rec."Last Refreshed")
                 {
@@ -69,19 +107,29 @@ page 6150891 "NPR Job Queue Refresh Setup"
                     ApplicationArea = NPRRetail;
                     Caption = 'Refresh Now';
                     Image = Refresh;
-                    Tooltip = 'Trigger an immediate refresh of job queues for the current company by the external job queue refresher.';
+                    Tooltip = 'Request an immediate refresh of job queues for the current company by the external job queue refresher.';
                     Enabled = _ExternalJQRefresherIsEnabled;
 
                     trigger OnAction()
                     var
                         HttpResponseMessage: HttpResponseMessage;
+                        Window: Dialog;
                         ResponseText: Text;
+                        RequestingRefreshTxt: Label 'Requesting job queue refresh...';
+                        NotEnoughTimePassedErr: Label 'Please wait at least one minute after enabling the external refresher before requesting an immediate refresh.';
                     begin
                         CurrPage.SaveRecord();
+                        if Rec."Ext. JQ Refresher Enabled at" <> 0DT then
+                            if CurrentDateTime() - Rec."Ext. JQ Refresher Enabled at" < 60000 then
+                                Error(NotEnoughTimePassedErr);
+                        Window.Open(RequestingRefreshTxt);
                         _ExternalJQRefresherMgt.SendRefreshRequest(HttpResponseMessage);
                         HttpResponseMessage.Content().ReadAs(ResponseText);
-                        Message(ResponseText);
+                        Sleep(2000);
+                        Window.Close();
                         CurrPage.Update(false);
+                        if ResponseText <> '' then
+                            Message(ResponseText);
                     end;
                 }
 
@@ -141,27 +189,37 @@ page 6150891 "NPR Job Queue Refresh Setup"
     trigger OnOpenPage()
     var
         ConfigurationsValidationNotification: Notification;
+        HttpResponseMessage: HttpResponseMessage;
         DisablingExternalJQWorkerLbl: Label 'Disabling External JQ Refresher.';
     begin
         Rec.GetSetup();
         if Rec."Use External JQ Refresher" then begin
             ClearLastError();
-            if not _ExternalJQRefresherMgt.ValidateExternalJQRefresherTenantManager() then begin
-                Rec."Use External JQ Refresher" := false;
+            if not _ExternalJQRefresherMgt.ValidateExternalJQRefresherTenantManager() then
+                Rec."Use External JQ Refresher" := false
+            else
+                if not _ExternalJQRefresherMgt.CheckBaseAppVerion(false) then begin
+                    Rec."Use External JQ Refresher" := false;
+                    _ExternalJQRefresherMgt.ManageExternalJQRefresherTenants("NPR Ext. JQ Refresher Options"::delete, HttpResponseMessage);
+                    _ExternalJQRefresherMgt.TryThrowIncompatibleBaseVersion();
+                end;
+            if not Rec."Use External JQ Refresher" then begin
                 Rec.Modify();
                 ConfigurationsValidationNotification.Message(GetLastErrorText() + ' ' + DisablingExternalJQWorkerLbl);
                 ConfigurationsValidationNotification.Scope := NotificationScope::LocalScope;
                 ConfigurationsValidationNotification.Send();
             end;
         end;
+    end;
+
+    trigger OnAfterGetCurrRecord()
+    begin
         _ExternalJQRefresherIsEnabled := Rec."Use External JQ Refresher";
     end;
 
     local procedure ToggleExtJQRefresher(Enable: Boolean)
     begin
         Rec.Validate("Use External JQ Refresher", Enable);
-        Rec.Modify();
-        _ExternalJQRefresherIsEnabled := Enable;
     end;
 
     var

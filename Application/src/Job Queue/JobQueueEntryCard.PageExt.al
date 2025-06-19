@@ -2,6 +2,20 @@ pageextension 6014424 "NPR Job Queue Entry Card" extends "Job Queue Entry Card"
 {
     layout
     {
+        modify("Starting Time")
+        {
+            trigger OnAfterValidate()
+            begin
+                SetShowTimeZone();
+            end;
+        }
+        modify("Ending Time")
+        {
+            trigger OnAfterValidate()
+            begin
+                SetShowTimeZone();
+            end;
+        }
         addlast(General)
         {
             field("NPR Notif. Profile on Error"; Rec."NPR Notif. Profile on Error")
@@ -37,19 +51,37 @@ pageextension 6014424 "NPR Job Queue Entry Card" extends "Job Queue Entry Card"
                     ManagedByAppJobQueue: Record "NPR Managed By App Job Queue";
                     MonitoredJQMgt: Codeunit "NPR Monitored Job Queue Mgt.";
                 begin
+                    CurrPage.SaveRecord();
+                    Commit();
                     if not _ManagedByApp then begin
                         if ManagedByAppJobQueue.Get(Rec.ID) then
                             ManagedByAppJobQueue.Delete();
                         MonitoredJQMgt.RemoveMonitoredJobQueueEntry(Rec);
-                        CurrPage.Update(false);
                     end else
                         MonitoredJQMgt.AssignJobQueueEntryToManagedAndMonitored(true, true, Rec);
+                    CurrPage.Update(false);
                 end;
             }
             field("NPR Heartbeat URL"; Rec."NPR Heartbeat URL")
             {
                 ApplicationArea = NPRRetail;
                 ToolTip = 'Specifies the URL of where to send a heartbeat on Job Queue''s successful execution.';
+            }
+        }
+        addafter("Ending Time")
+        {
+            group("NPR TimeZone")
+            {
+                ShowCaption = false;
+                Visible = _ShowTimeZone;
+
+                field("NPR Time Zone"; Rec.GetTimeZoneName())
+                {
+                    Caption = 'Time Zone';
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the time zone in which the job queue entry run window has been set up. The "Starting Time" and "Ending Time" fields are displayed in this time zone.';
+                    Editable = false;
+                }
             }
         }
     }
@@ -111,6 +143,12 @@ pageextension 6014424 "NPR Job Queue Entry Card" extends "Job Queue Entry Card"
         JobQueueManagement: Codeunit "NPR Job Queue Management";
     begin
         _ManagedByApp := JobQueueManagement.JobQueueIsManagedByApp(Rec, _RefreshingCanBeToggled);
+        SetShowTimeZone();
+    end;
+
+    local procedure SetShowTimeZone()
+    begin
+        _ShowTimeZone := (Rec."Starting Time" <> 0T) or (Rec."Ending Time" <> 0T);
     end;
 
     local procedure RecallModifyOnlyWhenReadOnlyNotification()
@@ -134,4 +172,5 @@ pageextension 6014424 "NPR Job Queue Entry Card" extends "Job Queue Entry Card"
         _NPRRetailAppAreaEnabled: Boolean;
         _ManagedByApp: Boolean;
         _RefreshingCanBeToggled: Boolean;
+        _ShowTimeZone: Boolean;
 }
