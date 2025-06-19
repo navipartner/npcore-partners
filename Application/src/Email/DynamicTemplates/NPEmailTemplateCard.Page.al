@@ -27,6 +27,11 @@ page 6185027 "NPR NPEmailTemplateCard"
                     ApplicationArea = NPRNPEmailTempl;
                     ToolTip = 'Specifies the value of the Description field.';
                 }
+                field(EmailScenario; Rec.EmailScenario)
+                {
+                    ApplicationArea = NPRNPEmailTempl;
+                    ToolTip = 'Specifies the value of the E-mail Scenario field.';
+                }
             }
             group(DefaultRecipients)
             {
