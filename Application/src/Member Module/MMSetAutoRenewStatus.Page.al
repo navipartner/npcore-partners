@@ -74,6 +74,7 @@ page 6184909 "NPR MM Set Auto-Renew Status"
     var
         MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
         PaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
+        MemberNotification: Codeunit "NPR MM Member Notification";
         MemberPaymentMethod: Record "NPR MM Member Payment Method";
         MembershipAutoRenewalWithoutPaymentMethodErr: Label 'You must specify a membership default payment method before enabling auto-renewal.';
     begin
@@ -93,5 +94,7 @@ page 6184909 "NPR MM Set Auto-Renew Status"
                     MembershipMgtInternal.EnableMembershipInternalAutoRenewal(Membership, CreateMemberNotification, true);
                 end;
         end;
+
+        MemberNotification.CreateUpdateWalletNotification_Membership(Membership."Entry No.");
     end;
 }

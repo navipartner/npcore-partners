@@ -152,8 +152,15 @@
             Caption = 'Auto-Renew';
             DataClassification = CustomerContent;
             trigger OnValidate()
+            var
+                MemberNotification: Codeunit "NPR MM Member Notification";
             begin
                 TestField("Customer No.");
+
+                if (Rec.IsTemporary()) then
+                    exit;
+
+                MemberNotification.CreateUpdateWalletNotification_Membership("Entry No.");
             end;
         }
         field(35; "Auto-Renew Payment Method Code"; Code[10])

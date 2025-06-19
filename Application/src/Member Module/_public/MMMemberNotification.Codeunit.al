@@ -1742,6 +1742,27 @@
 
     end;
 
+    internal procedure CreateUpdateWalletNotification_Membership(MembershipEntryNo: Integer) EntryNo: Integer
+    var
+        MembershipRole: Record "NPR MM Membership Role";
+        MemberCard: Record "NPR MM Member Card";
+    begin
+        MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
+        if (not MembershipRole.FindSet()) then
+            exit(0);
+        repeat
+            MemberCard.SetCurrentKey("Membership Entry No.", "Member Entry No.");
+            MemberCard.SetFilter("Membership Entry No.", '=%1', MembershipRole."Membership Entry No.");
+            MemberCard.SetFilter("Member Entry No.", '=%1', MembershipRole."Member Entry No.");
+            MemberCard.SetFilter(Blocked, '=%1', false);
+            MemberCard.Setfilter("Card Is Temporary", '=%1', false);
+            MemberCard.SetFilter("Valid Until", '>=%1', Today);
+            if (MemberCard.FindLast()) then
+                CreateUpdateWalletNotification(MembershipRole."Membership Entry No.", MembershipRole."Member Entry No.", MemberCard."Entry No.", Today());
+
+        until (MembershipRole.Next() = 0);
+    end;
+
     internal procedure CreateUpdateWalletNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer; DateToSendNotification: Date) EntryNo: Integer
     var
         NotificationSetup: Record "NPR MM Member Notific. Setup";
