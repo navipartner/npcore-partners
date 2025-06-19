@@ -134,6 +134,7 @@ page 6185042 "NPR Monitored JQ Entry Card"
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies if the job queue entry is recurring. If the Recurring Job check box is selected, then the job queue entry is recurring. If the check box is cleared, the job queue entry is not recurring. After you specify that a job queue entry is a recurring one, you must specify on which days of the week the job queue entry is to run. Optionally, you can also specify a time of day for the job to run and how many minutes should elapse between runs.';
+                    Editable = false;
                 }
                 field("Run on Mondays"; Rec."Run on Mondays")
                 {
@@ -181,18 +182,52 @@ page 6185042 "NPR Monitored JQ Entry Card"
                     ApplicationArea = NPRRetail;
                     Importance = Promoted;
                     ToolTip = 'Specifies the earliest time of the day that the recurring job queue entry is to be run.';
+                    Editable = Rec."Recurring Job";
+
+                    trigger OnValidate()
+                    begin
+                        SetShowTimeZone();
+                    end;
                 }
                 field("Ending Time"; Rec."Ending Time")
                 {
                     ApplicationArea = NPRRetail;
                     Importance = Promoted;
                     ToolTip = 'Specifies the latest time of the day that the recurring job queue entry is to be run.';
+                    Editable = Rec."Recurring Job";
+
+                    trigger OnValidate()
+                    begin
+                        SetShowTimeZone();
+                    end;
+                }
+                group(TimeZone)
+                {
+                    ShowCaption = false;
+                    Visible = _ShowTimeZone;
+
+                    field("Time Zone"; Rec.GetTimeZoneName())
+                    {
+                        Caption = 'Time Zone';
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the time zone in which the job queue entry run window has been set up. The "Starting Time" and "Ending Time" fields are displayed in this time zone.';
+                        Editable = false;
+#if not (BC17 or BC18)
+                        trigger OnAssistEdit()
+                        var
+                            TimeZoneSelection: Codeunit "Time Zone Selection";
+                        begin
+                            TimeZoneSelection.LookupTimeZone(Rec."NPR Time Zone");
+                        end;
+#endif
+                    }
                 }
                 field("No. of Minutes between Runs"; Rec."No. of Minutes between Runs")
                 {
                     ApplicationArea = NPRRetail;
                     Importance = Promoted;
                     ToolTip = 'Specifies the minimum number of minutes that are to elapse between runs of a job queue entry. The value cannot be less than one minute. This field only has meaning if the job queue entry is set to be a recurring job. If you use a no. of minutes between runs, the date formula setting is cleared.';
+                    Editable = Rec."Recurring Job";
                 }
                 field("Inactivity Timeout Period"; Rec."Inactivity Timeout Period")
                 {
@@ -242,8 +277,23 @@ page 6185042 "NPR Monitored JQ Entry Card"
         _IsProtectedJob := MonitoredJQMgt.IsNPProtectedJob(Rec);
         if _IsProtectedJob then
             ShowModifyIsNotAllowedNotification();
+        SetShowTimeZone();
     end;
 
+    trigger OnQueryClosePage(CloseAction: Action): Boolean
+    var
+        OnlyRecurringJobsSupportedErr: Label 'Only recurring jobs queue entries can be set up as monitored jobs.';
+    begin
+        if CloseAction in [Action::LookupOK, Action::OK, Action::Yes] then
+            If not Rec."Recurring Job" then
+                Error(OnlyRecurringJobsSupportedErr);
+        exit(true);
+    end;
+
+    local procedure SetShowTimeZone()
+    begin
+        _ShowTimeZone := (Rec."Starting Time" <> 0T) or (Rec."Ending Time" <> 0T);
+    end;
 
     local procedure ShowModifyIsNotAllowedNotification()
     var
@@ -259,4 +309,5 @@ page 6185042 "NPR Monitored JQ Entry Card"
 
     var
         _IsProtectedJob: Boolean;
+        _ShowTimeZone: Boolean;
 }

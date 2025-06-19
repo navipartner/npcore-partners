@@ -106,11 +106,21 @@ pageextension 6014413 "NPR Job Queue Entries" extends "Job Queue Entries"
 
                 trigger OnAction()
                 var
+                    JQRefreshSetup: Record "NPR Job Queue Refresh Setup";
+                    UserPersonalization: Record "User Personalization";
                     JobQueueMgt: Codeunit "NPR Job Queue Management";
                     ConfirmQst: Label 'The action is going to refresh the list of NP Retail related job queue entries. As a result, some of currently existing job queue entries may be deleted or modified, and new entries may be added.\Are you absolutely sure you want to proceed with the action?';
+                    WrongTimeZoneErr: Label 'Before running this function, please change your time zone to "%1". This must match the time zone selected on the Job Queue Refresh Setup page.';
                 begin
                     if not Confirm(ConfirmQst, false) then
                         exit;
+                    if not JQRefreshSetup.Get() then
+                        Clear(JQRefreshSetup);
+                    JQRefreshSetup.TestField("Default Job Time Zone");
+                    if not UserPersonalization.Get(UserSecurityId()) then
+                        Clear(UserPersonalization);
+                    if UserPersonalization."Time Zone" <> JQRefreshSetup."Default Job Time Zone" then
+                        Error(WrongTimeZoneErr, JQRefreshSetup.GetTimeZoneName());
                     JobQueueMgt.RefreshNPRJobQueueList(true);
                 end;
             }

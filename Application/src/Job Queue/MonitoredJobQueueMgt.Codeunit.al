@@ -22,86 +22,27 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
     begin
         JQRefreshSetup.GetSetup();
         if JQRefreshSetup."Use External JQ Refresher" then begin
-            if (JQRefreshSetup."Default Refresher User" <> '') and (JQRefreshSetup."Default Refresher User" = UserID) then
-                JQMonitorEntry.SetFilter("NPR Entra App User Name", '%1|%2', UserID, '')
+            if (JQRefreshSetup."Default Refresher User Name" <> '') and (JQRefreshSetup."Default Refresher User Name" = UserID) then
+                JQMonitorEntry.SetFilter("JQ Runner User Name", '%1|%2', UserID, '')
             else
-                JQMonitorEntry.SetRange("NPR Entra App User Name", UserID);
+                JQMonitorEntry.SetRange("JQ Runner User Name", UserID);
         end;
 
         if JQMonitorEntry.FindSet() then
             repeat
-                RefreshJobQueueEntry(JQMonitorEntry, JQRefreshSetup);
+                RefreshOneJobQueueEntry(JQMonitorEntry);
             until JQMonitorEntry.Next() = 0;
     end;
 
-    local procedure RefreshJobQueueEntry(JQMonitorEntry: Record "NPR Monitored Job Queue Entry"; JQRefreshSetup: Record "NPR Job Queue Refresh Setup")
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-        JQMonitorEntry2: Record "NPR Monitored Job Queue Entry";
-        xJQMonitorEntry: Record "NPR Monitored Job Queue Entry";
-        JobQueueMgt: Codeunit "NPR Job Queue Management";
-        NotProtectedJob: Boolean;
-        ProcessMonitoredJob: Boolean;
+    local procedure RefreshOneJobQueueEntry(JQMonitorEntry: Record "NPR Monitored Job Queue Entry")
     begin
-#if not (BC17 or BC18 or BC19 or BC20 or BC21)
-        JQMonitorEntry.ReadIsolation := IsolationLevel::UpdLock;
-#else
-        JQMonitorEntry.LockTable();
-#endif
-        JQMonitorEntry.Find();
-        xJQMonitorEntry := JQMonitorEntry;
-
-        if not IsNullGuid(JQMonitorEntry."Job Queue Entry ID") then
-            ProcessMonitoredJob := JobQueueEntry.Get(JQMonitorEntry."Job Queue Entry ID");
-        if not ProcessMonitoredJob then begin
-            Clear(JQMonitorEntry."Job Queue Entry ID");
-            JobQueueEntry.TransferFields(JQMonitorEntry, false);
-        end;
-        JobQueueMgt.JobQueueIsManagedByApp(JobQueueEntry, NotProtectedJob);
-        if not ProcessMonitoredJob then
-            ProcessMonitoredJob := not NotProtectedJob or JQRefreshSetup."Create Missing Custom JQs";
-        if ProcessMonitoredJob then begin
-            JQMonitorEntry2 := JQMonitorEntry;
-            if not JQRefreshSetup."Use External JQ Refresher" then
-                JQMonitorEntry2."NPR Entra App User Name" := ''
-            else
-                if JQMonitorEntry2."NPR Entra App User Name" = '' then
-                    JQMonitorEntry2."NPR Entra App User Name" := JQRefreshSetup."Default Refresher User";
-            JQMonitorEntry."Job Queue Entry ID" := RefreshJobQueueEntry(JQMonitorEntry2, NotProtectedJob);
-        end;
-
-        if JQMonitorEntry."Job Queue Entry ID" <> xJQMonitorEntry."Job Queue Entry ID" then
+        if Codeunit.Run(Codeunit::"NPR Refresh Job Queue Entry", JQMonitorEntry) then
+            exit;
+        if JQMonitorEntry.Find() then begin
+            JQMonitorEntry.SetErrorMessage(GetLastErrorText());
+            JQMonitorEntry."Last Refresh Status" := JQMonitorEntry."Last Refresh Status"::Error;
             JQMonitorEntry.Modify();
-        Commit();
-    end;
-
-    local procedure RefreshJobQueueEntry(JQMonitorEntry: Record "NPR Monitored Job Queue Entry"; NotProtectedJob: Boolean): Guid
-    var
-        Parameters: Record "Job Queue Entry";
-        JobQueueEntry: Record "Job Queue Entry";
-        ManagedByApp: Record "NPR Managed By App Job Queue";
-        JobQueueMgt: Codeunit "NPR Job Queue Management";
-    begin
-        clear(Parameters);
-        Parameters.TransferFields(JQMonitorEntry, false);
-        Parameters.ID := JQMonitorEntry."Job Queue Entry ID";
-        Parameters."User ID" := CopyStr(JQMonitorEntry."NPR Entra App User Name", 1, MaxStrLen(Parameters."User ID"));
-        if JobQueueMgt.InitRecurringJobQueueEntry(Parameters, JobQueueEntry) then begin
-            if NotProtectedJob then begin
-                if ManagedByApp.Get(JobQueueEntry.ID) then begin
-                    if not ManagedByApp."Managed by App" then begin
-                        ManagedByApp."Managed by App" := true;
-                        ManagedByApp.Modify();
-                    end;
-                end else begin
-                    ManagedByApp.Init();
-                    ManagedByApp.ID := JobQueueEntry.ID;
-                    ManagedByApp."Managed by App" := true;
-                    ManagedByApp.Insert();
-                end;
-            end;
-            JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
-            exit(JobQueueEntry.ID);
+            Commit();
         end;
     end;
 
@@ -109,6 +50,7 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
     var
         MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
         xMonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
+        JobQueueMgt: Codeunit "NPR Job Queue Management";
     begin
         SelectLatestVersion();
         if not IsNullGuid(JobQueueEntry.ID) then
@@ -133,6 +75,7 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
         JobQueueEntry.CalcFields(XML);
         MonitoredJQEntry.TransferFields(JobQueueEntry, false);
         MonitoredJQEntry."Job Queue Entry ID" := JobQueueEntry.ID;
+        JobQueueMgt.OnBeforeRenewMonitoredJobQueueEntry(xMonitoredJQEntry, MonitoredJQEntry);
         if Format(xMonitoredJQEntry) <> Format(MonitoredJQEntry) then
             MonitoredJQEntry.Modify(true);
     end;
@@ -241,11 +184,14 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
 
     internal procedure ManuallyCreateNewMonitoredJQEntry()
     var
+        JQRefreshSetup: Record "NPR Job Queue Refresh Setup";
         MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
         TempJQEntry: Record "Job Queue Entry" temporary;
         JobQueueMgt: Codeunit "NPR Job Queue Management";
+        RefreshJobQueueEntry: Codeunit "NPR Refresh Job Queue Entry";
         NotProtectedJob: Boolean;
     begin
+        JQRefreshSetup.GetSetup();
         TempJQEntry.Init();
         TempJQEntry.Status := TempJQEntry.Status::"On Hold";
         TempJQEntry.Insert(true);
@@ -259,7 +205,7 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
             MonitoredJQEntry.TransferFields(TempJQEntry);
             MonitoredJQEntry.Insert();
 
-            MonitoredJQEntry."Job Queue Entry ID" := RefreshJobQueueEntry(MonitoredJQEntry, NotProtectedJob);
+            RefreshJobQueueEntry.RefreshJobQueueEntry(MonitoredJQEntry, NotProtectedJob);
             MonitoredJQEntry.Modify();
         end;
     end;

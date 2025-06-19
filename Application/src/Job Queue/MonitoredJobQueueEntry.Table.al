@@ -234,32 +234,9 @@ table 6151148 "NPR Monitored Job Queue Entry"
         {
             Caption = 'JQ Runner User Name';
             DataClassification = CustomerContent;
-            TableRelation = "AAD Application";
-
-            trigger OnLookup()
-            var
-                AADApplication: Record "AAD Application";
-                AccessControl: Record "Access Control";
-                User: Record User;
-                AADApplicationPage: Page "AAD Application List";
-                PermissionSetLbl: Label 'NPR EXT JQ REFRESHER', Locked = true;
-            begin
-                if AADApplication.FindSet() then
-                    repeat
-                        if AccessControl.Get(AADApplication."User ID", PermissionSetLbl, '', AccessControl.Scope::System, AADApplication."App ID") then
-                            AADApplication.Mark(true);
-                    until AADApplication.Next() = 0;
-
-                AADApplication.MarkedOnly(true);
-                AADApplicationPage.SetTableView(AADApplication);
-                AADApplicationPage.LookupMode := true;
-                if AADApplicationPage.RunModal() <> Action::LookupOK then
-                    exit;
-                AADApplicationPage.GetRecord(AADApplication);
-
-                if User.Get(AADApplication."User ID") then
-                    "NPR Entra App User Name" := User."User Name";
-            end;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-06-14';
+            ObsoleteReason = 'Replaced by field "JQ Runner User Name"';
         }
         field(6014407; "NP Managed Job"; Boolean)
         {
@@ -269,9 +246,38 @@ table 6151148 "NPR Monitored Job Queue Entry"
             ObsoleteTag = '2025-05-12';
             ObsoleteReason = 'Not used anymore.';
         }
+        field(6014408; "JQ Runner User Name"; Code[50])
+        {
+            Caption = 'JQ Runner User Name';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                JQRefresherSetup: Record "NPR Job Queue Refresh Setup";
+            begin
+                JQRefresherSetup.UpdateRefresherUser("JQ Runner User Name");
+            end;
+        }
         field(6014409; "NPR Heartbeat URL"; Text[150])
         {
             Caption = 'Heartbeat URL';
+            DataClassification = CustomerContent;
+        }
+        field(6014410; "Last Refresh Status"; Option)
+        {
+            Caption = 'Last Refresh Status';
+            DataClassification = CustomerContent;
+            OptionMembers = " ",Error,Success;
+            OptionCaption = ' ,Error,Success';
+        }
+        field(6014411; "Last Error Message"; Blob)
+        {
+            Caption = 'Last Error Message';
+            DataClassification = CustomerContent;
+        }
+        field(6014412; "Time Zone"; Text[180])
+        {
+            Caption = 'Time Zone';
             DataClassification = CustomerContent;
         }
     }
@@ -296,5 +302,99 @@ table 6151148 "NPR Monitored Job Queue Entry"
         if not isNullGuid(Rec."Job Queue Entry ID") then
             if ManagedByApp.Get(Rec."Job Queue Entry ID") then
                 ManagedByApp.Delete();
+    end;
+
+    internal procedure ChangeJobTimeZoneToWebserviceTimezone(JQRefreshSetup: Record "NPR Job Queue Refresh Setup")
+    var
+        TempJobQueueEntry: Record "Job Queue Entry" temporary;
+        TimeOffset: Duration;
+    begin
+        if ("Starting Time" = 0T) and ("Ending Time" = 0T) then begin
+            "Reference Starting Time" := 0DT;
+            "Time Zone" := '';
+            exit;
+        end;
+
+        TimeOffset := CalculateTimeOffset(JQRefreshSetup);
+        "Starting Time" := "Starting Time" + TimeOffset;
+        "Ending Time" := "Ending Time" + TimeOffset;
+        "Time Zone" := JQRefreshSetup."Webservice Time Zone";
+
+        TempJobQueueEntry."Recurring Job" := true;
+        TempJobQueueEntry.Validate("Starting Time", "Starting Time");
+        "Reference Starting Time" := TempJobQueueEntry."Reference Starting Time";
+    end;
+
+    local procedure CalculateTimeOffset(JQRefreshSetup: Record "NPR Job Queue Refresh Setup"): Duration
+    var
+        DT: DateTime;
+        NewDT: DateTime;
+    begin
+        DT := CurrentDateTime();
+        NewDT := DT +
+            JQRefreshSetup.GetWebserviceUserTimeZoneOffset() + DaylightSavingTimeOffset(DT, JQRefreshSetup."Webservice Time Zone") -
+            GetJobTimeZoneOffset() - DaylightSavingTimeOffset(DT, "Time Zone");
+        exit(NewDT - DT);
+    end;
+
+    local procedure DaylightSavingTimeOffset(DateTimeToCheck: DateTime; TimeZoneID: Text) TimeOffset: Duration
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+    var
+        TimeZone: Codeunit "Time Zone";
+#endif
+    begin
+        TimeOffset := 0;
+        if (DateTimeToCheck = 0DT) or (TimeZoneID in ['', 'UTC']) then
+            exit;
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        if TimeZone.TimeZoneSupportsDaylightSavingTime(TimeZoneID) then
+            if TimeZone.IsDaylightSavingTime(DateTimeToCheck, TimeZoneID) then
+                TimeOffset := 1 * 60 * 60 * 1000;  //1 hour
+#endif
+    end;
+
+    local procedure GetJobTimeZoneOffset() TimeZoneOffset: Duration
+    var
+        JQRefreshSetup: Record "NPR Job Queue Refresh Setup";
+        TypeHelper: Codeunit "Type Helper";
+        TimeZoneID: Text;
+    begin
+        TimeZoneID := "Time Zone";
+        if TimeZoneID = '' then begin
+            if not JQRefreshSetup.Get() then
+                Clear(JQRefreshSetup);
+            JQRefreshSetup.TestField("Default Job Time Zone");
+            TimeZoneID := JQRefreshSetup."Default Job Time Zone";
+        end;
+        TypeHelper.GetTimezoneOffset(TimeZoneOffset, TimeZoneID);
+    end;
+
+    internal procedure SetErrorMessage(NewErrorText: Text)
+    var
+        OutStr: OutStream;
+    begin
+        Clear("Last Error Message");
+        if NewErrorText = '' then
+            exit;
+        "Last Error Message".CreateOutStream(OutStr, TextEncoding::UTF8);
+        OutStr.WriteText(NewErrorText);
+    end;
+
+    procedure GetErrorMessage(ShowDefaultMsg: Boolean): Text
+    var
+        TypeHelper: Codeunit "Type Helper";
+        InStream: InStream;
+        ErrorText: Text;
+        NoErrorMessageTxt: Label 'No error message was registered for the entry.';
+    begin
+        ErrorText := '';
+        if "Last Error Message".HasValue() then begin
+            CalcFields("Last Error Message");
+            "Last Error Message".CreateInStream(InStream, TextEncoding::UTF8);
+            ErrorText := TypeHelper.ReadAsTextWithSeparator(InStream, TypeHelper.LFSeparator());
+        end;
+        if (ErrorText = '') and ShowDefaultMsg then
+            ErrorText := NoErrorMessageTxt;
+        exit(ErrorText);
     end;
 }

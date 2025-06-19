@@ -39,11 +39,18 @@ page 6185041 "NPR Monitored JQ Entries"
                     ToolTip = 'Specifies the Description.';
                     Editable = false;
                 }
-                field("NPR Entra App User Name"; Rec."NPR Entra App User Name")
+                field("JQ Runner User Name"; Rec."JQ Runner User Name")
                 {
                     ApplicationArea = NPRRetail;
                     Visible = _ExternalJQRefresherIsEnabled;
                     ToolTip = 'Specifies the JQ Runner User Name.';
+
+                    trigger OnLookup(var Text: Text): Boolean
+                    var
+                        ExternalJQRefresherMgt: Codeunit "NPR External JQ Refresher Mgt.";
+                    begin
+                        exit(ExternalJQRefresherMgt.LookupJQRefresherUserName(Text));
+                    end;
                 }
                 field("NP Managed Job"; _IsProtectedJob)
                 {
@@ -58,23 +65,58 @@ page 6185041 "NPR Monitored JQ Entries"
                     ToolTip = 'Specifies the Parameter String.';
                     Editable = false;
                 }
-                field("No. of Minutes between Runs"; Rec."No. of Minutes between Runs")
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the No. of Minutes between Runs.';
-                    Editable = false;
-                }
                 field("Job Queue Category Code"; Rec."Job Queue Category Code")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Category Code.';
                     Editable = false;
+                    Visible = false;
+                }
+                field("Starting Time"; Rec."Starting Time")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the Starting Time.';
+                    Editable = false;
+                    Visible = false;
+                }
+                field("Ending Time"; Rec."Ending Time")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the Ending Time.';
+                    Editable = false;
+                    Visible = false;
+                }
+                field("No. of Minutes between Runs"; Rec."No. of Minutes between Runs")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the No. of Minutes between Runs.';
+                    Editable = false;
+                    Visible = false;
                 }
                 field("Maximum No. of Attempts to Run"; Rec."Maximum No. of Attempts to Run")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Maximum No. of Attempts to Run.';
                     Editable = false;
+                    Visible = false;
+                }
+                field("Last Refresh Status"; Rec."Last Refresh Status")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the status of the last refresh attempt of the monitored job.';
+                    Editable = false;
+                }
+                field("Last Error Message"; Rec.GetErrorMessage(false))
+                {
+                    Caption = 'Last Error Message';
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the error message, if the last refresh attempt failed.';
+                    Editable = false;
+
+                    trigger OnDrillDown()
+                    begin
+                        Message(Rec.GetErrorMessage(true));
+                    end;
                 }
                 field("Entry No."; Rec."Entry No.")
                 {
@@ -84,7 +126,6 @@ page 6185041 "NPR Monitored JQ Entries"
                 }
             }
         }
-
     }
     actions
     {
@@ -173,8 +214,8 @@ page 6185041 "NPR Monitored JQ Entries"
     var
         JQRefresherSetup: Record "NPR Job Queue Refresh Setup";
     begin
-        if JQRefresherSetup.Get() then
-            _ExternalJQRefresherIsEnabled := JQRefresherSetup."Use External JQ Refresher";
+        JQRefresherSetup.GetSetup();
+        _ExternalJQRefresherIsEnabled := JQRefresherSetup."Use External JQ Refresher";
     end;
 
     trigger OnAfterGetRecord()

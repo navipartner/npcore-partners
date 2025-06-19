@@ -29,6 +29,12 @@ tableextension 6014472 "NPR Job Queue Entry" extends "Job Queue Entry"
             Caption = 'Heartbeat URL';
             DataClassification = CustomerContent;
         }
+        field(6014412; "NPR Time Zone"; Text[180])
+        {
+            Caption = 'Time Zone';
+            DataClassification = CustomerContent;
+        }
+        //DO NOT CREATE FIELDS WITH IDS: 6014404..6014408|6014410|6014411 (The IDs are reserved in table 6151148 "NPR Monitored Job Queue Entry")
     }
 
     trigger OnDelete()
@@ -37,5 +43,20 @@ tableextension 6014472 "NPR Job Queue Entry" extends "Job Queue Entry"
     begin
         if ManagedByApp.Get(Rec.ID) then
             ManagedByApp.Delete();
+    end;
+
+    internal procedure GetTimeZoneName(): Text
+#if not (BC17 or BC18)
+    var
+        TimeZoneSelection: Codeunit "Time Zone Selection";
+#endif
+    begin
+#if not (BC17 or BC18)
+        if Rec."NPR Time Zone" = '' then
+            exit('');
+        exit(TimeZoneSelection.GetTimeZoneDisplayName(Rec."NPR Time Zone"));
+#else
+        exit(Rec."NPR Time Zone");
+#endif
     end;
 }
