@@ -122,6 +122,16 @@
             Editable = false;
             FieldClass = FlowField;
         }
+        field(77; "Reserved Amount"; Decimal)
+        {
+            CalcFormula = Sum("NPR NpRv Sales Line".Amount WHERE("Voucher No." = FIELD("No."),
+                                                                Type = FILTER(Payment),
+                                                                "Reservation Line Id" = field("Reservation Line Id Filter"),
+                                                                Posted = const(false)));
+            Caption = 'Reserved Amount';
+            Editable = false;
+            FieldClass = FlowField;
+        }
         field(80; "In-use Quantity"; Integer)
         {
             CalcFormula = Count("NPR NpRv Sales Line" WHERE(Type = CONST(Payment),
@@ -345,6 +355,18 @@
             ObsoleteState = Pending;
             ObsoleteTag = '2023-06-28';
             ObsoleteReason = 'We don''t need to store barcode image.';
+        }
+        field(400; "Reservation Line Id Filter"; Guid)
+        {
+            Caption = 'Reservation Line Id Filter';
+            FieldClass = FlowFilter;
+        }
+        field(405; "Document Source Filter"; Option)
+        {
+            Caption = 'Document Source Filter';
+            OptionCaption = 'POS,Sales Document,Payment Line,POS Quote';
+            OptionMembers = POS,"Sales Document","Payment Line","POS Quote";
+            FieldClass = FlowFilter;
         }
 #if not BC17
         field(460; "Spfy Send from Shopify"; Boolean)
@@ -642,5 +664,29 @@
         CalcFields("In-use Quantity");
         exit("In-use Quantity");
     end;
-}
 
+    procedure CalcAvailableAmount(): Decimal
+    var
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";
+    begin
+        if NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then begin
+            CalcFields("Validate Voucher Module");
+            if "Validate Voucher Module" = ModuleCode() then
+                exit(NpRvModuleValidGlobal.CalcAvailableVoucherAmount("Reference No.", "Voucher Type"));
+        end;
+
+        if NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then begin
+            CalcFields(Amount, "Reserved Amount");
+            exit(Amount - "Reserved Amount");
+        end else begin
+            CalcFields(Amount);
+            exit(Amount);
+        end;
+    end;
+
+    local procedure ModuleCode(): Code[20]
+    begin
+        exit('GLOBAL');
+    end;
+}

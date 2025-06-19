@@ -131,6 +131,7 @@ codeunit 6151443 "NPR POSAction SS CreateAndPay" implements "NPR IPOS Workflow"
     var
         VoucherToken, VouchersToken : JsonToken;
         VoucherHandler2: Codeunit "NPR POS Action Scan Voucher2B";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         Voucher: Record "NPR NpRv Voucher";
         VoucherReservation: Record "NPR NpRv Sales Line";
         ReferenceNo: Text[50];
@@ -139,6 +140,7 @@ codeunit 6151443 "NPR POSAction SS CreateAndPay" implements "NPR IPOS Workflow"
         PaidAmount: Decimal;
         ReturnAmount: Decimal;
         AmountToRedeem: Decimal;
+        AvailableAmount: Decimal;
     begin
         foreach VouchersToken in Vouchers do begin
             ReferenceNo := '';
@@ -150,7 +152,6 @@ codeunit 6151443 "NPR POSAction SS CreateAndPay" implements "NPR IPOS Workflow"
                 ReferenceNo := CopyStr(VouchersToken.AsValue().AsText(), 1, MaxStrLen(ReferenceNo));
 
             if (ReferenceNo <> '') then begin
-                Voucher.SetAutoCalcFields(Amount);
                 Voucher.SetFilter("Reference No.", '=%1', ReferenceNo);
                 Voucher.FindFirst(); // Blow up if voucher does not exist
 
@@ -164,18 +165,25 @@ codeunit 6151443 "NPR POSAction SS CreateAndPay" implements "NPR IPOS Workflow"
 
                 // Redeem amount selection is greedy, it will redeem as much as possible
                 PaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, AmountToRedeem);
-                if (AmountToRedeem > Voucher.Amount) then
-                    AmountToRedeem := Voucher.Amount;
+
+                if NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then begin
+                    if not NpRvVoucherMgt.ValidateAmount(Voucher, AmountToRedeem, AvailableAmount) then
+                        AmountToRedeem := AvailableAmount;
+                end else begin
+                    Voucher.SetAutoCalcFields(Amount);
+                    if (AmountToRedeem > Voucher.Amount) then
+                        AmountToRedeem := Voucher.Amount;
+                end;
 
                 VoucherHandler2.ProcessPayment(
-                        Voucher."Voucher Type",
-                        ReferenceNo,
-                        AmountToRedeem,
-                        Sale,
-                        PaymentLine,
-                        SaleLine,
-                        false,
-                        ActionContext);
+                    Voucher."Voucher Type",
+                    ReferenceNo,
+                    AmountToRedeem,
+                    Sale,
+                    PaymentLine,
+                    SaleLine,
+                    false,
+                    ActionContext);
             end;
         end;
     end;

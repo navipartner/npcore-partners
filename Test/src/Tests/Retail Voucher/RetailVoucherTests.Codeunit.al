@@ -5758,6 +5758,48 @@ codeunit 85024 "NPR Retail Voucher Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure RedeemVoucherWithReservations()
+    var
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+        PaymentLinePOS: Record "NPR POS Sale Line";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        POSSale: Codeunit "NPR POS Sale";
+        Assert: Codeunit "Assert";
+        SalePOS: Record "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        ItemTransactionAmount: Decimal;
+        VoucherAmount: Decimal;
+        ReservationAmount: Decimal;
+    begin
+        if not NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then
+            exit;
+        //[Scenario] Pay with Voucher Reserved on other transactions
+        Initialize();
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        // [GIVEN]
+        POSSale.GetCurrentSale(SalePOS);
+        ItemTransactionAmount := 200;
+        VoucherAmount := 100;
+        ReservationAmount := 10;
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, _VoucherTypePartial.Code);
+        // [WHEN]
+
+        CreateReservationLine(_VoucherTypePartial, NpRvVoucher, ReservationAmount, '1234', NpRvSalesLine);
+        CreateItemTransaction(ItemTransactionAmount);
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+
+        LibraryPOSMock.PayWithVoucherAndTryEndSaleAndStartNew(_POSSession, _VoucherTypePartial.Code, NpRvVoucher."Reference No.");
+        // [THEN]
+        _POSSession.GetPaymentLine(POSPaymentLine);
+        POSPaymentLine.GetCurrentPaymentLine(PaymentLinePOS);
+
+        Assert.AreEqual(PaymentLinePOS."Amount Including VAT", VoucherAmount - ReservationAmount, 'Voucher Payment Amount not according to test scenario, it should be 90');
+        //
+    end;
+
     procedure IssueReturnVoucherForItemPresentOnPOSSale()
     // [SCENARIO] Add an item on POS sale for return. Issure return voucher and end transaction. Check if transaction ended correctly
     var
@@ -5830,6 +5872,195 @@ codeunit 85024 "NPR Retail Voucher Tests"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure RedeemVoucherWithReservationsVoucherNotArchived()
+    var
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvArchVoucher: record "NPR NpRv Arch. Voucher";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        POSSale: Codeunit "NPR POS Sale";
+        Assert: Codeunit "Assert";
+        SalePOS: Record "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        ItemTransactionAmount: Decimal;
+        VoucherAmount: Decimal;
+        ReservationAmount: Decimal;
+        TransactionEnded: boolean;
+    begin
+        if not NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then
+            exit;
+        //[Scenario] Pay with Voucher with reservation, voucher should not be archived on sale end.
+        Initialize();
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        // [GIVEN]
+        POSSale.GetCurrentSale(SalePOS);
+        ItemTransactionAmount := 50;
+        VoucherAmount := 100;
+        ReservationAmount := 30;
+
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, _VoucherTypePartial.Code);
+        CreateReservationLine(_VoucherTypePartial, NpRvVoucher, ReservationAmount, '1234', NpRvSalesLine);
+        // [WHEN]
+        CreateItemTransaction(ItemTransactionAmount);
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+
+        // [THEN]
+        TransactionEnded := LibraryPOSMock.PayWithVoucherAndTryEndSaleAndStartNew(_POSSession, _VoucherTypePartial.Code, NpRvVoucher."Reference No.");
+        Assert.AreEqual(true, TransactionEnded, 'Transaction end not according to test scenario.');
+
+        NpRvArchVoucher.SetRange("Reference No.", NpRvVoucher."Reference No.");
+        Assert.IsFalse(NpRvArchVoucher.FindFirst(), 'Voucher should not be archived.');
+        Assert.AreEqual(true, NpRvVoucher.Get(NpRvVoucher."No."), 'Voucher record not according to test scenario.');
+    end;
+
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ReserveAmountLargerthanVoucherAmount()
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        RetailVoucherAgent: Codeunit "NPR RetailVoucherAgent";
+        POSSale: Codeunit "NPR POS Sale";
+        Assert: Codeunit "Assert";
+        SalePOS: Record "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        Response: Codeunit "NPR API Response";
+        VoucherAmount: Decimal;
+        ReservationSuccessful: boolean;
+        JsonText: Text;
+        JsonObject: JsonObject;
+        JsonToken: JsonToken;
+    begin
+        //[Scenario] Reserve Amount Larger than Voucher Amount
+        Initialize();
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        // [GIVEN]
+        POSSale.GetCurrentSale(SalePOS);
+        VoucherAmount := 100;
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, _VoucherTypePartial.Code);
+
+        // [WHEN]
+        JsonText := '{"documentNo": "12345", "amount": 150.0 }';
+        if JsonObject.ReadFrom(JsonText) then
+            JsonToken := JsonObject.AsToken();
+
+        // [THEN]
+        ReservationSuccessful := RetailVoucherAgent.DoRequest(NpRvVoucher, JsonToken, Response, true);
+        Assert.AreEqual(false, ReservationSuccessful, 'Reservation should not have been successful');
+    end;
+#endif
+
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure ReserveVoucherWithDifferentAmounts()
+    var
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        RetailVoucherAgent: Codeunit "NPR RetailVoucherAgent";
+        POSSale: Codeunit "NPR POS Sale";
+        Assert: Codeunit "Assert";
+        SalePOS: Record "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        Response: Codeunit "NPR API Response";
+        VoucherAmount: Decimal;
+        ReservationSuccessful: boolean;
+        JsonText: Text;
+        JsonObject: JsonObject;
+        JsonToken: JsonToken;
+    begin
+        if not NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then
+            exit;
+        //[Scenario] Double Reservation on voucher amount.
+        Initialize();
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        // [GIVEN]
+        POSSale.GetCurrentSale(SalePOS);
+        VoucherAmount := 100;
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, _VoucherTypePartial.Code);
+
+        // [WHEN]
+        JsonText := '{"documentNo": "12345", "amount": 75.0 }';
+        if JsonObject.ReadFrom(JsonText) then
+            JsonToken := JsonObject.AsToken();
+
+        // [THEN]
+        ReservationSuccessful := RetailVoucherAgent.DoRequest(NpRvVoucher, JsonToken, Response, true);
+        Assert.AreEqual(true, ReservationSuccessful, 'Reservation should have been successful');
+
+        CreateReservationLine(_VoucherTypePartial, NpRvVoucher, 75, '1234', NpRvSalesLine);
+
+        JsonText := '{"documentNo": "123456", "amount": 75.0 }';
+        if JsonObject.ReadFrom(JsonText) then
+            JsonToken := JsonObject.AsToken();
+
+        ReservationSuccessful := RetailVoucherAgent.DoRequest(NpRvVoucher, JsonToken, Response, true);
+        Assert.AreEqual(false, ReservationSuccessful, 'Reservation should not have been successful');
+
+    end;
+#endif
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RedeemVoucherWithCancelReservations()
+    var
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        POSSale: Codeunit "NPR POS Sale";
+        Assert: Codeunit "Assert";
+        SalePOS: Record "NPR POS Sale";
+        LibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        ItemTransactionAmount: Decimal;
+        VoucherAmount: Decimal;
+        ReservationAmount: Decimal;
+        TransactionEnded: boolean;
+    begin
+        if not NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then
+            exit;
+        //[Scenario] Pay with Voucher with cancelled reservation
+        Initialize();
+        LibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        // [GIVEN]
+        POSSale.GetCurrentSale(SalePOS);
+        ItemTransactionAmount := 100;
+        VoucherAmount := 100;
+        ReservationAmount := 60;
+
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, _VoucherTypePartial.Code);
+        CreateReservationLine(_VoucherTypePartial, NpRvVoucher, ReservationAmount, '1234', NpRvSalesLine);
+        // [WHEN]
+        CreateItemTransaction(ItemTransactionAmount);
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+
+        // [THEN]
+        TransactionEnded := LibraryPOSMock.PayWithVoucherAndTryEndSaleAndStartNew(_POSSession, _VoucherTypePartial.Code, NpRvVoucher."Reference No.");
+        Assert.AreEqual(false, TransactionEnded, 'Transaction end not according to test scenario.');
+
+        //Cancel Reservation
+        NpRvSalesLine.Delete(true);
+        TransactionEnded := LibraryPOSMock.PayWithVoucherAndTryEndSaleAndStartNew(_POSSession, _VoucherTypePartial.Code, NpRvVoucher."Reference No.");
+        Assert.AreEqual(true, TransactionEnded, 'Transaction end not according to test scenario.');
+    end;
+
+    local procedure CreateReservationLine(NpRvVoucherType: Record "NPR NpRv Voucher Type"; NpRvVoucher: Record "NPR NpRv Voucher"; Amount: Decimal; DocumentNo: Text[50]; var NpRvSalesLine: Record "NPR NpRv Sales Line")
+    begin
+        NpRvSalesLine.Init();
+        NpRvSalesLine.Id := CreateGuid();
+        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
+        NpRvSalesLine."External Document No." := DocumentNo;
+        NpRvSalesLine.Type := NpRvSalesLine.Type::Payment;
+        NpRvSalesLine."Voucher Type" := NpRvVoucherType.Code;
+        NpRvSalesLine."Voucher No." := NpRvVoucher."No.";
+        NpRvSalesLine."Reference No." := NpRvVoucher."Reference No.";
+        NpRvSalesLine.Description := NpRvVoucher.Description;
+        NpRvSalesLine.Amount := Amount;
+        NpRvSalesLine.Insert();
+    end;
+
     procedure ScanVoucherWithItemAddedToVoucherItemsOnPOSSale()
     // [SCENARIO] Add an item to POS sale which is added to payment method linked to voucher. Scan the voucher with amount lesser than one on POS sale. Check if voucher redeemed correctly
     var

@@ -301,6 +301,15 @@ navigation:
           - inventory.itemtranslation:
               title: Item Translations
               summary: ./docs/pages/inventory/itemtranslation.mdx
+        
+        - section: Vouchers
+          summary: ./docs/pages/vouchers/overview.mdx
+          contents:
+          - vouchers.voucher:
+              title: Vouchers
+              summary: ./docs/pages/vouchers/vouchers.mdx
+          - vouchers.voucherwebhooks:
+              title: Webhooks
 
 navbar-links:
   - type: secondary

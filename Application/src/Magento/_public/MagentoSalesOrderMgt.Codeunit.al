@@ -25,7 +25,7 @@
         Text000: Label 'Invalid Voucher Reference No. %1';
         Text001: Label 'Voucher %1 is already in use';
         Text002: Label 'Customer Create is not allowed when Customer Update Mode is %1';
-        Text003: Label 'Voucher Payment Amount %1 exceeds Voucher Amount %2';
+        Text003: Label 'Voucher Payment Amount %1 exceeds available Voucher Amount %2';
 
     internal procedure RunProcessImportEntry(ImportEntry: Record "NPR Nc Import Entry")
     var
@@ -406,9 +406,11 @@
         NpRvVoucher: Record "NPR NpRv Voucher";
         PaymentLine: Record "NPR Magento Payment Line";
         NpRvGlobalVoucherWebservice: Codeunit "NPR NpRv Global Voucher WS";
+        NpRvVoucherMngt: Codeunit "NPR NpRv Voucher Mgt.";
         NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
         ExternalReferenceNo: Text;
         Amount: Decimal;
+        AvailableAmount: Decimal;
     begin
         ExternalReferenceNo := NpXmlDomMgt.GetXmlText(XmlElement, 'transaction_id', MaxStrLen(NpRvVoucher."Reference No."), true);
         Evaluate(Amount, NpXmlDomMgt.GetXmlText(XmlElement, 'payment_amount', 0, true), 9);
@@ -416,18 +418,16 @@
         if not NpRvGlobalVoucherWebservice.FindVoucher('', CopyStr(ExternalReferenceNo, 1, 50), NpRvVoucher) then
             Error(Text000, ExternalReferenceNo);
 
-        NpRvVoucher.CalcFields(Amount);
-        if NpRvVoucher.Amount < Amount then
-            Error(Text003, Amount, NpRvVoucher.Amount);
-
         NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Sales Document");
         NpRvSalesLine.SetRange("External Document No.", SalesHeader."NPR External Order No.");
         NpRvSalesLine.SetRange("Voucher Type", NpRvVoucher."Voucher Type");
         NpRvSalesLine.SetRange("Voucher No.", NpRvVoucher."No.");
         NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::Payment);
         if not NpRvSalesLine.FindFirst() then begin
-            if NpRvVoucher.CalcInUseQty() > 0 then
-                Error(Text001, NpRvVoucher."Reference No.");
+            if not NpRvVoucherMngt.VoucherReservationByAmountFeatureEnabled() then begin
+                if NpRvVoucher.CalcInUseQty() > 0 then
+                    Error(Text001, NpRvVoucher."Reference No.");
+            end;
 
             NpRvSalesLine.Init();
             NpRvSalesLine.Id := CreateGuid();
@@ -464,7 +464,12 @@
         NpRvSalesLine."Document Type" := SalesHeader."Document Type"::Order;
         NpRvSalesLine."Document No." := SalesHeader."No.";
         NpRvSalesLine."Document Line No." := PaymentLine."Line No.";
+        NpRvSalesLine.Amount := PaymentLine.Amount;
+        NpRvSalesLine."Reservation Line Id" := PaymentLine.SystemId;
         NpRvSalesLine.Modify(true);
+
+        if not NpRvVoucherMngt.ValidateAmount(NpRvVoucher, PaymentLine.SystemId, Amount, AvailableAmount) then
+            Error(Text003, Amount, AvailableAmount);
 
         NpRvSalesDocMgt.ApplyPayment(SalesHeader, NpRvSalesLine);
 

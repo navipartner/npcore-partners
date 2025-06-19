@@ -449,6 +449,8 @@ codeunit 6184804 "NPR Spfy Capture Payment"
 
         NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Payment Line";
         NpRvSalesLine."Document Line No." := PaymentLine."Line No.";
+        NpRvSalesLine.Amount := PaymentLine.Amount;
+        NpRvSalesLine."Reservation Line Id" := PaymentLine.SystemId;
         NpRvSalesLine.Modify(true);
 
         SpfyIntegrationEvents.OnAfterAddGiftCardPaymentLine(PaymentLine, NpRvSalesLine, ShopifyTransactionJToken);

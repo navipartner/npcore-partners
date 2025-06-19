@@ -37,7 +37,6 @@ enum 6059812 "NPR API Module" implements "NPR API Module Resolver"
     {
         Implementation = "NPR API Module Resolver" = "NPR TicketingModuleResolver";
     }
-
     value(6185106; memberships)
     {
         Implementation = "NPR API Module Resolver" = "NPR MembershipsModuleResolver";
@@ -49,12 +48,14 @@ enum 6059812 "NPR API Module" implements "NPR API Module Resolver"
     {
         Implementation = "NPR API Module Resolver" = "NPR MembershipsModuleResolver";
     }
-
     value(6185116; speedgate)
     {
         Implementation = "NPR API Module Resolver" = "NPR ApiSpeedgateResolver";
     }
-
+    value(6185120; voucher)
+    {
+        Implementation = "NPR API Module Resolver" = "NPR RetailVModuleResolver";
+    }
     value(6248328; attractionWallet)
     {
         Implementation = "NPR API Module Resolver" = "NPR AttrWalletModuleResolver";

@@ -77,6 +77,7 @@
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         PmtMethodItemMgt: Codeunit "NPR POS Pmt. Method Item Mgt.";
         NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
+        AvailableAmount: Decimal;
         ReturnAmount: Decimal;
         SalesAmount: Decimal;
         PaidAmount: Decimal;
@@ -92,10 +93,12 @@
         MagentoPaymentLine.Get(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", NpRvSalesLine."Document Line No.");
         NpRvVoucher.Get(NpRvSalesLine."Voucher No.");
 
-        NpRvVoucher.CalcFields(Amount);
-        if MagentoPaymentLine.Amount < NpRvVoucher.Amount then begin
-            MagentoPaymentLine.Amount := NpRvVoucher.Amount;
+        if NpRvVoucherMgt.ValidateAmount(NpRvVoucher, MagentoPaymentLine.SystemId, MagentoPaymentLine.Amount, AvailableAmount) then begin
+            MagentoPaymentLine.Amount := AvailableAmount;
             MagentoPaymentLine.Modify(true);
+
+            NpRvSalesLine.Amount := MagentoPaymentLine.Amount;
+            NpRvSalesLine.Modify();
         end;
 
         SalesHeader.CalcFields("NPR Magento Payment Amount");

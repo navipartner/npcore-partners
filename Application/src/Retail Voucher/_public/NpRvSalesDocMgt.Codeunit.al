@@ -4,7 +4,7 @@
         Text002: Label 'Retail Voucher Payment Amount %1 is higher than Remaining Amount %2 on Retail Voucher %3';
         Text003: Label 'Order Amount %1 is lower than Payment Amount %2.\Issue Return Voucher on remaining amount.';
         Text004: Label 'Voucher %1 issued on new Sales Line';
-        Text005: Label 'Voucher Payment Amount %1 exceeds Voucher Amount %2';
+        Text005: Label 'Voucher Payment Amount %1 exceeds available Voucher Amount %2';
         Text006: Label 'Voucher %1 is already in use';
         VoucherNotFoundErr: Label 'A voucher with reference no. "%1" could not be found', Comment = '%1 = Retail voucher number';
         VoucherInUseErr: Label 'The voucher is already in use.';
@@ -58,11 +58,18 @@
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         MagentoPaymentLine: Record "NPR Magento Payment Line";
+        NpRvVoucherMngt: codeunit "NPR NpRv Voucher Mgt.";
+        AvailableAmount: Decimal;
         LineNo: Integer;
     begin
-        NpRvVoucher.CalcFields(Amount);
-        if NpRvVoucher.Amount < Amount then
-            Error(Text005, Amount, NpRvVoucher.Amount);
+        if NpRvVoucherMngt.VoucherReservationByAmountFeatureEnabled() then begin
+            if not NpRvVoucherMngt.ValidateAmount(NpRvVoucher, Amount, AvailableAmount) then
+                Error(Text005, Amount, AvailableAmount);
+        end else begin
+            NpRvVoucher.CalcFields(Amount);
+            if NpRvVoucher.Amount < Amount then
+                Error(Text005, Amount, NpRvVoucher.Amount);
+        end;
 
         NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Sales Document");
         NpRvSalesLine.SetRange("External Document No.", SalesHeader."NPR External Order No.");
@@ -70,8 +77,10 @@
         NpRvSalesLine.SetRange("Voucher No.", NpRvVoucher."No.");
         NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::Payment);
         if not NpRvSalesLine.FindFirst() then begin
-            if NpRvVoucher.CalcInUseQty() > 0 then
-                Error(Text006, NpRvVoucher."Reference No.");
+            if not NpRvVoucherMngt.VoucherReservationByAmountFeatureEnabled() then begin
+                if NpRvVoucher.CalcInUseQty() > 0 then
+                    Error(Text006, NpRvVoucher."Reference No.");
+            end;
 
             NpRvSalesLine.Init();
             NpRvSalesLine.Id := CreateGuid();
@@ -114,6 +123,8 @@
         NpRvSalesLine."Document Type" := SalesHeader."Document Type"::Order;
         NpRvSalesLine."Document No." := SalesHeader."No.";
         NpRvSalesLine."Document Line No." := MagentoPaymentLine."Line No.";
+        NpRvSalesLine.Amount := MagentoPaymentLine.Amount;
+        NpRvSalesLine."Reservation Line Id" := MagentoPaymentLine.SystemId;
         NpRvSalesLine.Modify(true);
 
         ApplyPayment(SalesHeader, NpRvSalesLine);
@@ -332,12 +343,13 @@
         NpRvVoucher: Record "NPR NpRv Voucher";
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+        AvailableAmount: Decimal;
         TotalAmtInclVat: Decimal;
         VoucherQty: Decimal;
         VoucherUnitPrice: Decimal;
         SalesHeaderMagentoPaymentAmount: Decimal;
         AlreadyArchivedErr: Label 'Retail voucher %1 has already been redeemed and archived.\You must cancel all the redeem transactions for the voucher prior to posting this document.', Comment = '%1 = Retail voucher number';
-        InsufficientVouchAmtErr: Label 'Retail voucher %1 remaining amount %2 is not sufficient to post the corrective amount %3.', Comment = '%1 = Retail voucher number, %2 = voucher remaining amount, %3 = document amount';
+        InsufficientVouchAmtErr: Label 'Retail voucher %1 available amount %2 is not sufficient to post the corrective amount %3.', Comment = '%1 = Retail voucher number, %2 = voucher remaining amount, %3 = document amount';
     begin
         if not SalesHeader.Invoice then
             exit;
@@ -360,9 +372,15 @@
                             Error(VoucherNotFoundErr, MagentoPaymentLine."Source No.");
                     end;
                     NpRvVoucher.TestField("Reference No.", MagentoPaymentLine."No.");
-                    NpRvVoucher.CalcFields(Amount);
-                    if NpRvVoucher.Amount < -MagentoPaymentLine.Amount then
-                        Error(InsufficientVouchAmtErr, NpRvVoucher."Reference No.", NpRvVoucher.Amount, MagentoPaymentLine.Amount);
+
+                    if NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then begin
+                        if not NpRvVoucherMgt.ValidateAmount(NpRvVoucher, -MagentoPaymentLine.Amount, AvailableAmount) then
+                            Error(InsufficientVouchAmtErr, NpRvVoucher."Reference No.", AvailableAmount, MagentoPaymentLine.Amount);
+                    end else begin
+                        NpRvVoucher.CalcFields(Amount);
+                        if NpRvVoucher.Amount < -MagentoPaymentLine.Amount then
+                            Error(InsufficientVouchAmtErr, NpRvVoucher."Reference No.", NpRvVoucher.Amount, MagentoPaymentLine.Amount);
+                    end;
                 until MagentoPaymentLine.Next() = 0;
             end;
         end;
@@ -396,9 +414,15 @@
                                         Error(VoucherNotFoundErr, NpRvSalesLineReference."Voucher No.");
                                 end;
                                 NpRvVoucher.TestField("Reference No.", NpRvSalesLineReference."Reference No.");
-                                NpRvVoucher.CalcFields(Amount);
-                                if NpRvVoucher.Amount < VoucherUnitPrice then
-                                    Error(InsufficientVouchAmtErr, NpRvSalesLineReference."Reference No.", NpRvVoucher.Amount, VoucherUnitPrice);
+                                if NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then begin
+                                    if not NpRvVoucherMgt.ValidateAmount(NpRvVoucher, VoucherUnitPrice, AvailableAmount) then
+                                        Error(InsufficientVouchAmtErr, NpRvSalesLineReference."Reference No.", AvailableAmount, VoucherUnitPrice);
+                                end else begin
+                                    NpRvVoucher.CalcFields(Amount);
+                                    if NpRvVoucher.Amount < VoucherUnitPrice then
+                                        Error(InsufficientVouchAmtErr, NpRvSalesLineReference."Reference No.", NpRvVoucher.Amount, VoucherUnitPrice);
+                                end;
+
                             end;
                         until NpRvSalesLineReference.Next() = 0;
                     end;
@@ -429,9 +453,9 @@
             MagentoPaymentLine.Get(Database::"Sales Header", NpRvSalesLine."Document Type", NpRvSalesLine."Document No.", NpRvSalesLine."Document Line No.");
             NpRvVoucher.Get(NpRvSalesLine."Voucher No.");
             NpRvVoucher.TestField("Reference No.", NpRvSalesLine."Reference No.");
-            NpRvVoucher.CalcFields(Amount);
-            if NpRvVoucher.Amount < MagentoPaymentLine.Amount then
-                Error(Text002, MagentoPaymentLine.Amount, NpRvVoucher.Amount, NpRvVoucher."Reference No.");
+
+            if not NpRvVoucherMgt.ValidateAmount(NpRvVoucher, MagentoPaymentLine.SystemId, MagentoPaymentLine.Amount, AvailableAmount) then
+                Error(Text002, MagentoPaymentLine.Amount, AvailableAmount, NpRvVoucher."Reference No.");
         until NpRvSalesLine.Next() = 0;
 
         TotalAmtInclVat := GetTotalAmtInclVat(SalesHeader);
@@ -720,13 +744,16 @@
         VoucherType: Record "NPR NpRv Voucher Type";
         MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
         PmtMethodItemMgt: Codeunit "NPR POS Pmt. Method Item Mgt.";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         Amount: Decimal;
+        AvailableAmount: Decimal;
         TotalAmountToPay: Decimal;
         SalesAmount: Decimal;
         PaidAmount: Decimal;
         VoucherCanBeUsed: Boolean;
         HasPOSPaymentMethodItemFilter: Boolean;
         AmountNotGtZero: Label 'The remaining amount to be paid on the Sales Header is not greater than 0';
+        AvailableAmountZeroErr: Label 'The amount available on the voucher is 0';
         VoucherCannotBeUsedWithItemsErr: Label 'Voucher cannot be used with items currently present on Sales Order.';
     begin
         Voucher.SetCurrentKey("Reference No.");
@@ -734,9 +761,11 @@
         if not Voucher.FindFirst() then
             Error(VoucherNotFoundErr, ReferenceNo);
 
-        Voucher.CalcFields("In-use Quantity", Amount);
-        if Voucher."In-use Quantity" > 0 then
-            Error(VoucherInUseErr);
+        if not NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then begin
+            Voucher.CalcFields("In-use Quantity");
+            if Voucher."In-use Quantity" > 0 then
+                Error(VoucherInUseErr);
+        end;
 
         if not VoucherType.Get(Voucher."Voucher Type") then
             Clear(VoucherType);
@@ -761,12 +790,16 @@
             // Default to the remaining amount to be paid
             Amount := TotalAmountToPay;
 
-        if Amount <= 0 then
+        if Amount = 0 then
             Error(AmountNotGtZero);
 
+        AvailableAmount := Voucher.CalcAvailableAmount();
+        if AvailableAmount = 0 then
+            Error(AvailableAmountZeroErr);
+
         // Set to voucher's full amount if the total amount isn't available
-        if Amount > Voucher.Amount then
-            Amount := Voucher.Amount;
+        if Amount > AvailableAmount then
+            Amount := AvailableAmount;
 
         NpRvSalesLine.Init();
         NpRvSalesLine.Id := CreateGuid();
@@ -1274,6 +1307,8 @@
         NpRvSalesLine."Document Type" := SalesHeader."Document Type"::Order;
         NpRvSalesLine."Document No." := SalesHeader."No.";
         NpRvSalesLine."Document Line No." := MagentoPaymentLine."Line No.";
+        NpRvSalesLine.Amount := MagentoPaymentLine.Amount;
+        NpRvSalesLine."Reservation Line Id" := MagentoPaymentLine.SystemId;
         NpRvSalesLine.Modify(true);
 
         // Lastly run ApplyPayment() so we leave the lines in the correct state.
@@ -1352,6 +1387,8 @@
         CurrVoucherSalesLine."Document Type" := SalesHeader."Document Type"::Order;
         CurrVoucherSalesLine."Document No." := SalesHeader."No.";
         CurrVoucherSalesLine."Document Line No." := MagentoPaymentLine."Line No.";
+        CurrVoucherSalesLine.Amount := MagentoPaymentLine.Amount;
+        CurrVoucherSalesLine."Reservation Line Id" := MagentoPaymentLine.SystemId;
         CurrVoucherSalesLine.Modify(true);
     end;
 

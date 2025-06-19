@@ -1,0 +1,88 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+imports:
+  globalApiTypes: ./../global-api-types.yml
+  commonApiTypes: ./../common-api-types.yml
+
+types:
+  VoucherCreatedEvent:
+    extends: commonApiTypes.WebhookEvent
+    properties:
+      payload: VoucherCreatedEventPayload
+    examples:
+      - name: ExampleEvent
+        value:
+          initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
+          timestamp: "2024-06-28T12:00:00Z"
+          companyName: $globalApiTypes.Company.ExampleCompanyCronusFull
+          companyId: "b56a418d-8205-4d3a-bdbb-25d94e42abbd"
+          appId: "992c2309-cca4-43cb-9e41-911f482ec088"
+          clientState: "secret_value_from_subscription_creation_mirrored" 
+          eventName: "voucher_created"
+          eventVersion: "1.0"
+          payload: $VoucherCreatedEventPayload.ExamplePayload
+
+  VoucherCreatedEventPayload:
+    properties:
+      voucherId: string
+      voucherType: string
+      initialamount: double
+      customerNo: string
+    examples:
+      - name: ExamplePayload
+        value:
+          voucherId: "e20d09ad-ab74-4f31-912f-ea58d3c9e653"
+          voucherType: "GIFTVOUCHER"
+          initialamount: 1000.00
+          customerNo: "C12345678"
+
+  VoucherPaymentEvent:
+      extends: commonApiTypes.WebhookEvent
+      properties:
+        payload: VoucherPaymentEventPayload
+      examples:
+        - name: ExampleEvent
+          value:
+            initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
+            timestamp: "2024-06-28T12:00:00Z"
+            companyName: $globalApiTypes.Company.ExampleCompanyCronusFull
+            companyId: "b56a418d-8205-4d3a-bdbb-25d94e42abbd"
+            appId: "992c2309-cca4-43cb-9e41-911f482ec088"
+            clientState: "secret_value_from_subscription_creation_mirrored" 
+            eventName: "voucher_created"
+            eventVersion: "1.0"
+            payload: $VoucherPaymentEventPayload.ExamplePayload
+
+  VoucherPaymentEventPayload:
+    properties:
+      voucherId: string
+      voucherType: string
+      initialamount: double
+      amount: double
+      customerNo: string
+    examples:
+      - name: ExamplePayload
+        value:
+          voucherId: "e20d09ad-ab74-4f31-912f-ea58d3c9e653"
+          voucherType: "GIFTVOUCHER"
+          initialamount: 1000
+          amount: 1000
+          customerNo: "C12345678"
+
+
+webhooks:   
+  voucherCreated: 
+    display-name: Voucher Created    
+    docs: 
+      Event `voucher_created`. Triggered when voucher is created. Your endpoint will receive this POST request.
+    method: POST 
+    payload: VoucherCreatedEvent
+    examples: 
+      - payload: $VoucherCreatedEvent.ExampleEvent
+  voucherPayment: 
+      display-name: Voucher Payment
+      docs: 
+        Event `voucher_payment`. Triggered when voucher is used for payment. Your endpoint will receive this POST request.
+      method: POST 
+      payload: VoucherPaymentEvent
+      examples: 
+        - payload: $VoucherPaymentEvent.ExampleEvent

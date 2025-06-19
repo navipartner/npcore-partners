@@ -94,6 +94,11 @@
 
     #region V3
     [IntegrationEvent(false, false)]
+    internal procedure OnAfterApplyPaymentV3(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary; SaleLinePOSVoucher: Record "NPR NpRv Sales Line"; POSLine: Record "NPR POS Sale Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     internal procedure OnRunApplyPaymentV3(POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line"; EndSale: Boolean; var Handled: Boolean; var ActionContext: JsonObject)
     begin
     end;

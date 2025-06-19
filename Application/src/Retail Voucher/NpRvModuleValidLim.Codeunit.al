@@ -13,13 +13,14 @@
         POSSession: Codeunit "NPR POS Session";
         POSSale: Codeunit "NPR POS Sale";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
+        AvailableAmount: Decimal;
         SalesAmount: Decimal;
         PaidAmount: Decimal;
         ReturnAmount: Decimal;
         SubTotal: Decimal;
         VoucherType: Record "NPR NpRv Voucher Type";
         POSPaymentMethod: Record "NPR POS Payment Method";
-        VoucherAmtErr: Label 'Voucher amount %1 is higher than the Subtotal %2.', Comment = '%1 = Voucher.Amount;%2=Subtotal';
+        VoucherAmtErr: Label 'Available Voucher amount %1 is higher than the Subtotal %2.', Comment = '%1 = Voucher.Amount;%2=Subtotal';
         VourcherRedeemedErr: Label 'The voucher with Reference No. %1 has already been redeemed in another transaction on %2.', Comment = '%1 - voucher reference number, 2% - date';
         InvalidReferenceErr: Label 'Invalid Reference No. %1', Comment = '%1 - Reference Number value';
     begin
@@ -33,24 +34,29 @@
                 Error(InvalidReferenceErr, TempNpRvVoucherBuffer."Reference No.");
         end;
         CheckVoucher(Voucher);
-        Voucher.CalcFields(Amount);
         POSSession.GetSale(POSSale);
         POSSession.GetPaymentLine(POSPaymentLine);
-
 
         VoucherType.Get(Voucher."Voucher Type");
         POSPaymentMethod.Get(VoucherType."Payment Type");
 
         POSPaymentLine.CalculateBalance(POSPaymentMethod, SalesAmount, PaidAmount, ReturnAmount, SubTotal);
 
-        if Voucher.Amount > ABS(SubTotal) then
-            Error(VoucherAmtErr, FORMAT(Voucher.Amount), Format(SubTotal));
+        if NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then begin
+            if not NpRvVoucherMgt.ValidateAmount(Voucher, ABS(SubTotal), AvailableAmount) then
+                Error(VoucherAmtErr, FORMAT(AvailableAmount), Format(SubTotal));
+        end else begin
+            Voucher.CalcFields(Amount);
+            if Voucher.Amount > ABS(SubTotal) then
+                Error(VoucherAmtErr, FORMAT(Voucher.Amount), Format(SubTotal));
+        end;
 
         NpRvVoucherMgt.Voucher2Buffer(Voucher, TempNpRvVoucherBuffer);
     end;
 
     local procedure CheckVoucher(var Voucher: Record "NPR NpRv Voucher")
     var
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         IsHandled: Boolean;
         Timestamp: DateTime;
         VoucherAlreadyUsedErr: Label 'The voucher has already been used. No amount remains on the voucher.';
@@ -74,8 +80,10 @@
             Error(VoucherAlreadyUsedErr);
 
         TestVoucherType(Voucher."Voucher Type");
-        if Voucher.CalcInUseQty() > 0 then
-            Error(VoucherBeingUsedErr);
+        if not NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then begin
+            if Voucher.CalcInUseQty() > 0 then
+                Error(VoucherBeingUsedErr);
+        end;
     end;
 
     local procedure TestVoucherType(VoucherTypeCode: Code[20])

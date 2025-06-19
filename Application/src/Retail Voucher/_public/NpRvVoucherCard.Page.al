@@ -111,6 +111,12 @@
                         ToolTip = 'Specifies the value of the Amount field';
                         ApplicationArea = NPRRetail;
                     }
+                    field("Reserved Amount"; Rec."Reserved Amount")
+                    {
+                        Visible = ReservedAmountVisible;
+                        ToolTip = 'Specifies the value of the Reserved Amount field';
+                        ApplicationArea = NPRRetail;
+                    }
                     field("In-use Quantity"; Rec."In-use Quantity")
                     {
                         ToolTip = 'Specifies the value of the In-use Quantity field';
@@ -405,6 +411,7 @@
             {
                 Caption = 'Reset Vouchers In-use';
                 Image = RefreshVoucher;
+                Visible = PageActionResetQuantityVisible;
                 ToolTip = 'Executes the Reset Vouchers In-use action';
                 ApplicationArea = NPRRetail;
 
@@ -474,26 +481,40 @@
 
     var
         PrintUsingTemplate: Boolean;
+
+        ReservedAmountVisible: Boolean;
+        PageActionResetQuantityVisible: Boolean;
 #if not BC17
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         SpfyRetailVoucherMgt: Codeunit "NPR Spfy Retail Voucher Mgt.";
         ShopifyGiftCardID: Text[30];
         ShopifyIntegrationIsEnabled: Boolean;
         VourcherTypeShopifyIntegrationIsEnabled: Boolean;
+#endif
 
     trigger OnOpenPage()
     var
+#if not BC17
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+#endif
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
     begin
+#if not BC17
         ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Retail Vouchers");
+#endif
+        ReservedAmountVisible := NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled();
+        PageActionResetQuantityVisible := not ReservedAmountVisible;
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
+#if not BC17
         ShopifyGiftCardID := '';
         VourcherTypeShopifyIntegrationIsEnabled := false;
-    end;
 #endif
+
+    end;
+
 
     trigger OnAfterGetCurrRecord()
     begin

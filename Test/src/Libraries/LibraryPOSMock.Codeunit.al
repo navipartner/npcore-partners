@@ -308,7 +308,7 @@ codeunit 85003 "NPR Library - POS Mock"
         POSSession.RequestRefreshData();
     end;
 
-    internal procedure PayWithVoucherAndTryEndSaleAndStartNew(POSSession: Codeunit "NPR POS Session"; VoucherType: Code[20]; VoucherReferenceNo: Text[30]): Boolean
+    internal procedure PayWithVoucherAndTryEndSaleAndStartNew(POSSession: Codeunit "NPR POS Session"; VoucherType: Code[20]; VoucherReferenceNo: Text[50]): Boolean
     var
         SalePOS: Record "NPR POS Sale";
         POSSale: Codeunit "NPR POS Sale";
@@ -328,7 +328,7 @@ codeunit 85003 "NPR Library - POS Mock"
     end;
 
 
-    local procedure VoucherPayment(POSSession: Codeunit "NPR POS Session"; VoucherReferenceNo: Text[30]; VoucherTypeCode: Code[20])
+    local procedure VoucherPayment(POSSession: Codeunit "NPR POS Session"; VoucherReferenceNo: Text[50]; VoucherTypeCode: Code[20])
     var
         SalePOS: Record "NPR POS Sale";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
@@ -406,7 +406,7 @@ codeunit 85003 "NPR Library - POS Mock"
     begin
         POSSession.GetPaymentLine(POSPaymentLine);
         POSPaymentLine.CalculateBalance(SaleAmount, PaidAmount, ReturnAmount, Subtotal);
-        if ReturnAmount = 0 then
+        if ReturnAmount > 0 then
             exit;
         ReturnAmount := ReturnAmount * (-1);
         if not ReturnVoucherType.Get(VoucherTypeCode) then

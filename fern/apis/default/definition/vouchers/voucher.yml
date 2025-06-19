@@ -1,0 +1,363 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+  simpleTypes: ./types-simple.yml
+
+types:
+  VoucherDTO:
+    properties:
+      referenceNo: simpleTypes.ReferenceNo
+      voucherType: simpleTypes.VoucherType
+      name: simpleTypes.Name
+      name2: simpleTypes.Name2
+      address: simpleTypes.Address
+      address2: simpleTypes.Address2
+      postCode: simpleTypes.PostCode
+      city: simpleTypes.City
+      county: simpleTypes.County
+      countryCode: simpleTypes.CountryCode
+      email: simpleTypes.Email
+      phoneNo: simpleTypes.PhoneNo
+      voucherMessage: simpleTypes.VoucherMessage
+    examples:
+      - name: ExampleVoucherDTO
+        value:
+          referenceNo: $simpleTypes.ReferenceNo.ExampleReferenceNo
+          voucherType: $simpleTypes.VoucherType.ExampleVoucherType
+          name: $simpleTypes.Name.ExampleName
+          name2: $simpleTypes.Name2.ExampleName2
+          address: $simpleTypes.Address.ExampleAddress
+          address2: $simpleTypes.Address2.ExampleAddress2
+          postCode: $simpleTypes.PostCode.ExamplePostCode
+          city: $simpleTypes.City.ExampleCity
+          county: $simpleTypes.County.ExampleCounty
+          countryCode: $simpleTypes.CountryCode.ExampleCountryCode
+          email: $simpleTypes.Email.ExampleEmail
+          phoneNo: $simpleTypes.PhoneNo.ExamplePhoneNo
+          voucherMessage: $simpleTypes.VoucherMessage.ExampleVoucherMessage
+
+  FindVouchersDTO:
+    extends:
+      VoucherDTO
+    properties:
+      voucherId: simpleTypes.VoucherId
+      description: simpleTypes.Description
+      startingDate: simpleTypes.StartingDate
+      endingDate: simpleTypes.EndingDate     
+      initialAmount: simpleTypes.InitialAmount
+      amount: simpleTypes.Amount
+      reservedAmount: simpleTypes.ReservedAmount
+      open: simpleTypes.Open
+      items: optional<list<VoucherPOSPaymentMethodItemsDTO>>
+    examples:
+      - name: ExampleFindVouchersDTO
+        value:
+          voucherId: $simpleTypes.VoucherId.ExampleVoucherId     
+          referenceNo: $simpleTypes.ReferenceNo.ExampleReferenceNo
+          voucherType: $simpleTypes.VoucherType.ExampleVoucherType
+          description: $simpleTypes.Description.ExampleDescription
+          startingDate: $simpleTypes.StartingDate.ExampleStartingDate
+          endingDate: $simpleTypes.EndingDate.ExampleEndingDate
+          initialAmount: $simpleTypes.InitialAmount.ExampleInitialAmount
+          amount: $simpleTypes.Amount.ExampleAmount
+          reservedAmount: $simpleTypes.ReservedAmount.ExampleReservedAmount
+          open: $simpleTypes.Open.ExampleOpen
+          name: $simpleTypes.Name.ExampleName
+          name2: $simpleTypes.Name2.ExampleName2
+          address: $simpleTypes.Address.ExampleAddress
+          address2: $simpleTypes.Address2.ExampleAddress2
+          postCode: $simpleTypes.PostCode.ExamplePostCode
+          city: $simpleTypes.City.ExampleCity
+          county: $simpleTypes.County.ExampleCounty
+          countryCode: $simpleTypes.CountryCode.ExampleCountryCode
+          email: $simpleTypes.Email.ExampleEmail
+          phoneNo: $simpleTypes.PhoneNo.ExamplePhoneNo
+          voucherMessage: $simpleTypes.VoucherMessage.ExampleVoucherMessage
+          items:
+            - $VoucherPOSPaymentMethodItemsDTO.ExampleVoucherPOSPaymentMethodItemsDTO
+
+  VoucherPOSPaymentMethodItemsDTO:
+    docs: List of POS Payment Method Items linked to payment type of Voucher
+    properties:
+      Type: simpleTypes.POSPaymentmethodItemType
+      Number: simpleTypes.POSPaymentmethodItemNumber
+      Description: simpleTypes.POSPaymentMethodItemDescription
+    examples:
+      - name: ExampleVoucherPOSPaymentMethodItemsDTO
+        value:
+          Type: $simpleTypes.POSPaymentmethodItemType.ExampleTypeItem
+          Number: $simpleTypes.POSPaymentmethodItemNumber.ExampleItemNumber
+          Description: $simpleTypes.POSPaymentMethodItemDescription.ExampleItemDescription
+
+
+  CreateVoucherDTO:
+    extends:
+      VoucherDTO
+    properties:
+      documentNo: simpleTypes.ExternalDocNo
+    examples:
+      - name: ExampleCreateVoucher
+        value:
+          documentNo: $simpleTypes.ExternalDocNo.ExampleExternalDocNo
+          referenceNo: $simpleTypes.ReferenceNo.ExampleReferenceNo
+          voucherType: $simpleTypes.VoucherType.ExampleVoucherType
+          name: $simpleTypes.Name.ExampleName
+          name2: $simpleTypes.Name2.ExampleName2
+          address: $simpleTypes.Address.ExampleAddress
+          address2: $simpleTypes.Address2.ExampleAddress2
+          postCode: $simpleTypes.PostCode.ExamplePostCode
+          city: $simpleTypes.City.ExampleCity
+          county: $simpleTypes.County.ExampleCounty
+          countryCode: $simpleTypes.CountryCode.ExampleCountryCode
+          email: $simpleTypes.Email.ExampleEmail
+          phoneNo: $simpleTypes.PhoneNo.ExamplePhoneNo
+          voucherMessage: $simpleTypes.VoucherMessage.ExampleVoucherMessage
+
+
+  ReservationVoucherDTO:
+    docs: Information about reservation
+    properties:
+      voucherId : simpleTypes.VoucherId
+      referenceNo : simpleTypes.ReferenceNo
+      StartingDate : simpleTypes.StartingDate
+      EndingDate : simpleTypes.EndingDate
+      initialAmount : simpleTypes.InitialAmount
+      amount : simpleTypes.Amount
+      reservedAmount : simpleTypes.AmountAfterCancelReservation
+    examples:
+      - name: ExampleReservationVoucherResponse
+        value:
+          voucherId : $simpleTypes.VoucherId.ExampleVoucherId
+          referenceNo : $simpleTypes.ReferenceNo.ExampleReferenceNo
+          StartingDate : $simpleTypes.StartingDate.ExampleStartingDate
+          EndingDate : $simpleTypes.EndingDate.ExampleEndingDate
+          initialAmount : $simpleTypes.InitialAmount.ExampleInitialAmount
+          amount : $simpleTypes.Amount.ExampleAmount
+          reservedAmount : $simpleTypes.AmountAfterCancelReservation.ExampleAmountAfterCancelReservation
+
+  
+  ReserveVoucherResponseDTO:
+    docs: Information about reservation
+    extends:
+      ReservationVoucherDTO
+    properties:
+      reservationId : simpleTypes.ReservationId
+      reservationDocNo : simpleTypes.ReservationDocNo
+    examples:
+      - name: ExampleReserveVoucherResponse
+        value:
+          voucherId : $simpleTypes.VoucherId.ExampleVoucherId
+          referenceNo : $simpleTypes.ReferenceNo.ExampleReferenceNo
+          StartingDate : $simpleTypes.StartingDate.ExampleStartingDate
+          EndingDate : $simpleTypes.EndingDate.ExampleEndingDate
+          initialAmount : $simpleTypes.InitialAmount.ExampleInitialAmount
+          amount : $simpleTypes.Amount.ExampleAmount
+          reservedAmount : $simpleTypes.ReservedAmount.ExampleReservedAmount
+          reservationId : $simpleTypes.ReservationId.ExampleReservationId
+          reservationDocNo : $simpleTypes.ReservationDocNo.ExampleReservationDocNo
+
+  FindVouchersResponse:
+    docs: Response to retrieving and checking vouchers
+    properties:
+      vouchers: list<FindVouchersDTO>
+    examples:
+      - name: ExampleFindVouchers
+        value:
+          vouchers:
+            - $FindVouchersDTO.ExampleFindVouchersDTO
+
+
+  CreateVoucher:
+    docs: Request to create a new voucher
+    properties:
+      documentNo: simpleTypes.ExternalDocNo
+      referenceNo: simpleTypes.ReferenceNo
+      voucherType: simpleTypes.VoucherType
+      name: simpleTypes.Name
+      name2: simpleTypes.Name2
+      address: simpleTypes.Address
+      address2: simpleTypes.Address2
+      postCode: simpleTypes.PostCode
+      city: simpleTypes.City
+      county: simpleTypes.County
+      countryCode: simpleTypes.CountryCode
+      email: simpleTypes.Email
+      phoneNo: simpleTypes.PhoneNo
+      voucherMessage: simpleTypes.VoucherMessage
+    examples:
+      - name: ExampleCreateVoucher
+        value:
+          documentNo: $simpleTypes.ExternalDocNo.ExampleExternalDocNo
+          referenceNo: $simpleTypes.ReferenceNo.ExampleReferenceNo
+          voucherType: $simpleTypes.VoucherType.ExampleVoucherType
+          name: $simpleTypes.Name.ExampleName
+          name2: $simpleTypes.Name2.ExampleName2
+          address: $simpleTypes.Address.ExampleAddress
+          address2: $simpleTypes.Address2.ExampleAddress2
+          postCode: $simpleTypes.PostCode.ExamplePostCode
+          city: $simpleTypes.City.ExampleCity
+          county: $simpleTypes.County.ExampleCounty
+          countryCode: $simpleTypes.CountryCode.ExampleCountryCode
+          email: $simpleTypes.Email.ExampleEmail
+          phoneNo: $simpleTypes.PhoneNo.ExamplePhoneNo
+          voucherMessage: $simpleTypes.VoucherMessage.ExampleVoucherMessage
+
+  GetVoucherResponse:
+    docs: Response to retrieving and checking voucher
+    properties: 
+      voucher:
+        FindVouchersDTO
+    examples:
+      - name: ExampleGetVoucher
+        value:
+          voucher: $FindVouchersDTO.ExampleFindVouchersDTO
+
+  ReserveVoucherRequest:
+    docs: Request to reserve amount on voucher
+    properties:
+      documentNo: simpleTypes.ReservationDocNo
+      amount: simpleTypes.AmounttoReserve
+    examples:
+      - name : ExampleReserveVoucherRequest
+        value:
+          documentNo: $simpleTypes.ReservationDocNo.ExampleReservationDocNo
+          amount: $simpleTypes.AmounttoReserve.ExampleAmounttoReserve
+
+  ReserveVoucherResponse:
+    docs: Response to reserving a voucher
+    properties:
+      reservation: ReserveVoucherResponseDTO
+    examples:
+      - name: ExampleReserveVoucherResponse
+        value:
+          reservation: $ReserveVoucherResponseDTO.ExampleReserveVoucherResponse
+  
+  CancelReserveVoucherResponse:
+    docs: Response to cancelling a reservation on a voucher
+    properties:
+      reservation: ReservationVoucherDTO
+    examples:
+      - name: ExampleCancelReserveVoucherResponse
+        value:
+          reservation: $ReservationVoucherDTO.ExampleReservationVoucherResponse
+
+service:
+  auth: true
+  base-path: /voucher
+  endpoints: 
+    findVouchers:
+      display-name: Find Vouchers
+      docs: Search for vouchers based on customer number,email address or reference number.
+      method: GET
+      path: ""
+      request:
+        name: findVouchers
+        query-parameters:
+          customerNumber: optional<simpleTypes.CustomerNumber>
+          email: optional<simpleTypes.Email>
+          referenceNo : optional<simpleTypes.ReferenceNo>
+      response: FindVouchersResponse
+      examples:
+        - name: Example list of Vouchers
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
+            email: $simpleTypes.Email.ExampleEmail
+            referenceNo: $simpleTypes.ReferenceNo.ExampleReferenceNo
+          response:
+            body: $FindVouchersResponse.ExampleFindVouchers
+
+    getVoucher:
+      display-name: Get Voucher
+      docs: Retrieve voucher details for a specific voucher based on voucher id.
+      method: GET
+      path: /{voucherId}
+      path-parameters:
+        voucherId: simpleTypes.VoucherId
+      request:
+        name: getVoucher
+      response: GetVoucherResponse
+      examples:
+        - name: Example Check Voucher
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            voucherId: $simpleTypes.VoucherId.ExampleVoucherId
+          response:
+            body: $GetVoucherResponse.ExampleGetVoucher
+
+    createVoucher:
+      display-name: Create Voucher
+      docs: Use this endpoint to create a new voucher.
+            If Reference No is blank, a new Reference No will be generated. 
+      method: POST
+      path: ""
+      request:
+        name: createVoucher
+        body: CreateVoucher
+      response: 
+        type: CreateVoucher
+      examples:
+        - name: Example Create Voucher
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          request: $CreateVoucher.ExampleCreateVoucher
+          response:
+            body: $CreateVoucher.ExampleCreateVoucher
+
+    reserveVoucher:
+      display-name: Reserve Voucher
+      docs: Use this endpoint to reserve amount on voucher.
+      method: POST
+      path: /{voucherId}/reservation
+      request:
+        name: reserveVoucher
+        path-parameters:
+          voucherId: simpleTypes.VoucherId
+        body: ReserveVoucherRequest
+      response:
+        type: ReserveVoucherResponse
+      examples:
+        - name: Example Reserve Voucher
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            voucherId: $simpleTypes.VoucherId.ExampleVoucherId
+          request: $ReserveVoucherRequest.ExampleReserveVoucherRequest
+          response:
+            body: $ReserveVoucherResponse.ExampleReserveVoucherResponse
+    
+    cancelreserveVoucher:
+      display-name: Cancel Voucher Reservation
+      docs: Use this endpoint to cancel a reservation on a voucher.
+      method: POST
+      path: /reservation/{reservationId}
+      path-parameters:
+          reservationId: simpleTypes.ReservationId
+      request:
+        name: cancelreserveVoucher       
+      response:
+        type: CancelReserveVoucherResponse
+      examples:
+        - name: Example Cancel Reserve Voucher
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            reservationId: $simpleTypes.ReservationId.ExampleReservationId
+          response:
+            body: $CancelReserveVoucherResponse.ExampleCancelReserveVoucherResponse
+
+
+
+
+
+

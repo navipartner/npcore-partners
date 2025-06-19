@@ -1841,6 +1841,11 @@
             Caption = 'Prepayment Manual Line Control';
             DataClassification = CustomerContent;
         }
+        field(10026; "Global Voucher SystemId"; Guid)
+        {
+            Caption = 'Global Voucher SystemId';
+            DataClassification = CustomerContent;
+        }
         field(6014511; "Label No."; Code[8])
         {
             Caption = 'Label Number';

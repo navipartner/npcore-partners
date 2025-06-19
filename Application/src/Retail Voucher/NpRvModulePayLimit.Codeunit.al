@@ -53,7 +53,10 @@
 
         case true of
             Subtotal < 0:
-                Error(VoucherAmtErr, Format(POSSaleLine."Amount Including VAT"), Format((POSSaleLine."Amount Including VAT" + Subtotal)));
+                begin
+                    CancelGlobalReservation(SaleLinePOSVoucher);
+                    Error(VoucherAmtErr, Format(POSSaleLine."Amount Including VAT"), Format((POSSaleLine."Amount Including VAT" + Subtotal)));
+                end;
             Subtotal = 0:
                 if EndSale then
                     ActionContext.Add('stopEndSaleExecution', not DoEndSale(POSSession, VoucherType))
@@ -185,5 +188,13 @@
         NotSupportedErr: Label 'Voucher Type %1 doesnot support this bussiness process.';
     begin
         Error(NotSupportedErr, VoucherType);
+    end;
+
+    local procedure CancelGlobalReservation(NpRvSaleLinePOSVoucher: Record "NPR NpRv Sales Line")
+    var
+        NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";
+    begin
+        if not IsNullGuid(NpRvSaleLinePOSVoucher."Reservation Line Id") then
+            NpRvModuleValidGlobal.TryCancelReservation(NpRvSaleLinePOSVoucher);
     end;
 }

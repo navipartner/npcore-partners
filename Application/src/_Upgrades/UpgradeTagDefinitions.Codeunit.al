@@ -254,6 +254,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Dragonglass Service", 'PublishDragonglassWebService'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Global Sales", 'SetIsReturnOnGlobalPOSSalesLine'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Adyen Refund", 'CreateAdyenRefundjobs'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR VoucherAmtReserve Upgrade"));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Adyen Api Key", 'UpgradeEFTAdyenPaymentTypeApiKey'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Adyen Api Key", 'UpgradeAdyenManagmentApiKey'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Adyen Api Key", 'UpgradeAdyenDownloadReportApiKey'));
@@ -965,6 +966,8 @@
                     'CreateAdyenRefundJobs':
                         exit('NPR-CreateAdyenRefundJobs-20250128')
                 end;
+            Codeunit::"NPR VoucherAmtReserve Upgrade":
+                exit('NPRVoucherAmtReserveUpgrade-20250327');
             Codeunit::"NPR UPG Adyen Api Key":
                 case UpgradeStep of
                     'UpgradeEFTAdyenPaymentTypeApiKey':

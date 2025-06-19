@@ -6,6 +6,7 @@ permissionset 6014416 "NPR All Webhooks"
 
     Assignable = false;
     Permissions =
+        codeunit "NPR Retail Voucher Webhooks" = X,
         codeunit "NPR POS Webhooks" = X,
         codeunit "NPR MM MembershipWebHooks" = X;
 }

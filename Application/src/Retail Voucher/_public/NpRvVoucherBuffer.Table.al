@@ -52,6 +52,38 @@
             DecimalPlaces = 2 : 2;
             Editable = false;
         }
+        field(76; "Reserved Amount"; Decimal)
+        {
+            Caption = 'Reserved Amount';
+            DataClassification = CustomerContent;
+            DecimalPlaces = 2 : 2;
+            Editable = false;
+        }
+        field(77; "Amount to Reserve"; Decimal)
+        {
+            Caption = 'Amount to Reserve';
+            DataClassification = CustomerContent;
+            DecimalPlaces = 2 : 2;
+            Editable = false;
+        }
+        field(78; "Reservation Line Id"; Guid)
+        {
+            Caption = 'Reservation Line Id';
+            DataClassification = CustomerContent;
+        }
+
+        field(79; "Global Voucher Amt Available"; Decimal)
+        {
+            Caption = 'Global Voucher Amt Available';
+            DataClassification = CustomerContent;
+        }
+        field(80; "Global Reservation Id"; Guid)
+        {
+            Caption = 'Reservation Id';
+            DataClassification = CustomerContent;
+        }
+
+
         field(110; "Validate Voucher Module"; Code[20])
         {
             Caption = 'Validate Voucher Module';

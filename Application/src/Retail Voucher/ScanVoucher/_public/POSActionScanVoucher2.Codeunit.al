@@ -69,9 +69,11 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
         ReferenceNo: Text[50];
         VoucherType: Text[20];
         VoucherNo: Text[20];
+        AvailableAmount: Decimal;
         SuggestedAmount: Decimal;
         VoucherListEnabled: Boolean;
         VoucherHasItemLimitation: Boolean;
+        InsufficientBalanceErr: Label 'Available balance on Voucher is 0';
     begin
 #pragma warning disable AA0139
         if Context.GetString('VoucherRefNo', ReferenceNo) then;
@@ -104,14 +106,24 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
         if not NPRNpRvVoucherModule.Get(NPRNpRvVoucherModule.Type::"Apply Payment", NPRNpRvVoucherType."Apply Payment Module") then
             Clear(NPRNpRvVoucherModule);
 
-        NPRNpRvVoucher.CalcFields(Amount);
 
         NPRPOSActionScanVoucher2B.CalculateRemainingAmount(PaymentLine,
                                                            NPRNpRvVoucherType."Payment Type",
                                                            NPRPOSPaymentMethod,
                                                            SuggestedAmount);
-        if SuggestedAmount > NPRNpRvVoucher.Amount then
-            SuggestedAmount := NPRNpRvVoucher.Amount;
+
+        if NPRNpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then begin
+            if not NPRNpRvVoucherMgt.ValidateAmount(NPRNpRvVoucher, SuggestedAmount, AvailableAmount) then
+                SuggestedAmount := AvailableAmount;
+
+            if SuggestedAmount = 0 then
+                Error(InsufficientBalanceErr);
+        end else begin
+            NPRNpRvVoucher.CalcFields(Amount);
+            if SuggestedAmount > NPRNpRvVoucher.Amount then
+                SuggestedAmount := NPRNpRvVoucher.Amount;
+        end;
+
         VoucherHasItemLimitation := NPRPOSActionScanVoucher2B.VoucherHasItemFilterLimitation(NPRNpRvVoucher);
 
         Response.Add('voucherType', VoucherType);

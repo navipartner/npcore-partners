@@ -110,6 +110,17 @@
             Editable = false;
             FieldClass = FlowField;
         }
+
+        field(78; "Remaining Amount"; Decimal)
+        {
+            CalcFormula = Sum("NPR NpRv Arch. Voucher Entry".Amount WHERE("Arch. Voucher No." = FIELD("No."),
+                                                        "Entry Type" = FILTER(<> "Manual Archive")));
+            Caption = 'Remaining Amount';
+            DecimalPlaces = 2 : 2;
+            Editable = false;
+            FieldClass = FlowField;
+        }
+
         field(90; "E-mail Template Code"; Code[20])
         {
             Caption = 'E-mail Template Code';

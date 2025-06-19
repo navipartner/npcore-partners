@@ -1,0 +1,301 @@
+types:
+
+  ## Simple types
+  DocumentNo:
+    type: uuid
+    docs: A unique response identifier
+    examples:
+      - name: ExampleDocumentNo
+        value: "A559C8D9-6E5F-45E6-9503-0539A5319052"
+
+  ExternalDocNo:
+    type: string
+    docs: DocumentNo for which voucher is issued.
+    examples:
+      - name: ExampleExternalDocNo
+        value: "DocNo1"
+
+  VoucherId:
+    type: uuid
+    docs: A unique identifier for the voucher
+    examples:
+      - name: ExampleVoucherId
+        value: "59adfec5-eca9-47b5-b6bf-6f4222db8de8"
+
+  ReferenceNo:
+    type: string
+    docs: A unique reference number for the voucher
+    examples:
+      - name: ExampleReferenceNo
+        value: "2802000002460"
+
+  VoucherType:
+    type: string
+    docs: The type of the voucher
+    examples:
+      - name: ExampleVoucherType
+        value: "CREDITVOUCHER"     
+
+  Description:
+    type: string
+    docs: A description of the voucher, usually includes Voucher Type and Voucher Number
+    examples:
+      - name: ExampleDescription
+        value: "Credit Voucher 000002"
+
+  StartingDate:
+    type: datetime
+    docs: The datetime as from which the voucher is valid
+    examples:
+      - name: ExampleStartingDate
+        value: "2024-09-17T00:00:00"
+
+  EndingDate:
+    type: datetime
+    docs: The datetime as from which the voucher is no longer valid
+    examples:
+      - name: ExampleEndingDate
+        value: "2024-09-17T00:00:00"
+
+  AccountNo:
+    type: string
+    docs: unique identifier of the financial account used for the voucher
+    examples:
+      - name: ExampleAccountNo
+        value: "5325"
+
+  AllowTopUp:
+    type: boolean
+    docs: indicates if value of a voucher can be increased after the initial purchase by the amount provided by the customer
+    examples:
+      - name: ExampleAllowTopUp
+        value: true
+
+  Open:
+    type: boolean
+    docs: indicates if the voucher has a remaining amount to be used
+    examples:
+      - name: ExampleOpen
+        value: true
+
+  InitialAmount:
+    type: double
+    docs: The initial amount of the voucher
+    examples:
+      - name: ExampleInitialAmount
+        value: 1000.0
+
+  Amount:
+    type: double
+    docs: The amount remaining on the voucher
+    examples:
+      - name: ExampleAmount
+        value: 850.0
+
+  InUseQuantity:
+    type: integer
+    docs: indicates the number of transactions on which voucher is being used
+    examples:
+      - name: ExampleInUseQuantity
+        value: 1
+
+  Name:
+    type: string
+    docs: The name of the customer who purchased the voucher
+    examples:
+      - name: ExampleName
+        value: "Spotsmeyer's Furnishings"
+
+  Name2:
+    type: string
+    docs: Other name of the buying customer
+    examples:
+      - name: ExampleName2
+        value: "Spotsmeyer's Furnishings"
+
+  Address:
+    type: string
+    docs: The address of the buying customer
+    examples:
+      - name: ExampleAddress
+        value: "Main Building, 1st Floor"
+        
+  Address2:
+    type: string
+    docs: The address of the buying customer
+    examples:
+      - name: ExampleAddress2
+        value: "1234 Main Street"
+        
+  PostCode:
+    type: string
+    docs: The postal code of the buying customer
+    examples:
+      - name: ExamplePostCode
+        value: "0011"     
+
+  City:
+    type: string
+    docs: The city of the buying customer
+    examples:
+      - name: ExampleCity
+        value: "New York"
+
+  County:
+    type: string
+    docs: The county of the buying customer
+    examples:
+      - name: ExampleCounty
+        value: "Manhattan"
+  
+  CountryCode:
+    type: string
+    docs: The country where the buying customer resides.
+    examples:
+      - name: ExampleCountryCode
+        value: "US"
+
+  SendViaPrint:
+    type: boolean
+    docs: indicates if the voucher is to be printed on purchase
+    examples:
+      - name: ExampleSendViaPrint
+        value: false
+
+  Email:
+    type: string
+    docs: the email address of the buying customer
+    examples:
+      - name: ExampleEmail
+        value: "john.doe@acme.com"
+
+  SendViaEmail:
+    type: boolean
+    docs: indicates if the voucher is to be emailed on purchase
+    examples:
+      - name: ExampleSendViaEmail
+        value: false
+
+  PhoneNo:
+    type: string
+    docs: The phone number of the buying customer.
+    examples:
+      - name: ExamplePhoneNo
+        value: "+1234567890"
+
+  SendViaSMS:
+    type: boolean
+    docs: indicates if the voucher is to be sent via SMS on purchase
+    examples:
+      - name: ExampleSendViaSMS
+        value: false
+
+  VoucherMessage:
+    type: string
+    docs: indicates message on voucher
+    examples:
+      - name: ExampleVoucherMessage
+        value: "This is a voucher message"
+
+  IssueDate:
+    type: date
+    docs: The date on which the voucher was issued
+    examples:
+      - name: ExampleIssueDate
+        value: "2018-01-15"
+
+  IssueRegisterNo:
+    type: string
+    docs: The pos unit from which voucher was issued
+    examples:
+      - name: ExampleIssueRegisterNo
+        value: "01"
+
+  IssueSalesTicketNo:
+    type: string
+    docs: The sales document no from which voucher was issued
+    examples:
+      - name: ExampleIssueSalesTicketNo
+        value: "1000000"
+
+  IssueUserId:
+    type: string
+    docs: The user id who issued the voucher
+    examples:
+      - name: ExampleIssueUserId
+        value: "USER01"
+
+  CustomerNumber:
+    type: string
+    docs: Customer number associated with the voucher.
+    examples:
+      - name: ExampleCustomerNumber
+        value: "D000188"
+
+  POSPaymentmethodItemType:
+    type: string
+    docs: The type of the POS Payment Method Item, can be Item or Category
+    examples:
+      - name: ExampleTypeItem
+        value: "Item"
+
+      - name: ExampleTypeCategory
+        value: "Item Categories"
+  
+  POSPaymentmethodItemNumber:
+    type: string
+    docs: The number of the POS Payment Method Item
+    examples:
+      - name: ExampleItemNumber
+        value: "1000"
+
+      - name: ExampleItemCategoriesNumber
+        value: "CHAIR"
+
+  POSPaymentMethodItemDescription:
+    type: string
+    docs: The description of the POS Payment Method Item
+    examples:
+      - name: ExampleItemDescription
+        value: "Bicyle"
+
+      - name: ExampleItemCategoriesDescription
+        value: "Office Chair"
+
+  ReservationId:
+    type: uuid
+    docs: The unique identifier of the reservation
+    examples:
+      - name: ExampleReservationId
+        value: "123e4567-e89b-12d3-a456-426614174000"
+
+  ReservationDocNo:
+    type: string
+    docs: The document number for which reservation has been done
+    examples:
+      - name: ExampleReservationDocNo
+        value: "1000000"
+
+  AmounttoReserve:
+    type: double
+    docs: The amount to reserve on voucher
+    examples:
+      - name: ExampleAmounttoReserve
+        value: 100.0
+
+  ReservedAmount:
+    type: double
+    docs: The amount reserved in the voucher
+    examples:
+      - name: ExampleReservedAmount
+        value: 200.0
+
+  AmountAfterCancelReservation:
+    type: double
+    docs: The amount after reservation is cancelled
+    examples:
+      - name: ExampleAmountAfterCancelReservation
+        value: 100.0
+
+
+  

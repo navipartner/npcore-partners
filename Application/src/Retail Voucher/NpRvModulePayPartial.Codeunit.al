@@ -107,13 +107,19 @@
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnPreApplyPaymentV3', '', true, true)]
     local procedure OnPreApplyPaymentV3(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary; var SalePOS: Record "NPR POS Sale"; VoucherType: Record "NPR NpRv Voucher Type"; ReferenceNo: Text; SuggestedAmount: Decimal)
+    var
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
     begin
         if not IsSubscriber(VoucherType) then
             exit;
 
-        IF (TempNpRvVoucherBuffer.Amount > SuggestedAmount) AND (SuggestedAmount <> 0) THEN
-            TempNpRvVoucherBuffer.Amount := SuggestedAmount;
-
+        if NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then begin
+            if ((TempNpRvVoucherBuffer.Amount - TempNpRvVoucherBuffer."Reserved Amount") >= SuggestedAmount) and (SuggestedAmount <> 0) then
+                TempNpRvVoucherBuffer.Amount := SuggestedAmount;
+        end else begin
+            if ((TempNpRvVoucherBuffer.Amount) > SuggestedAmount) and (SuggestedAmount <> 0) then
+                TempNpRvVoucherBuffer.Amount := SuggestedAmount;
+        end;
     end;
 
     local procedure CurrCodeunitId(): Integer
@@ -157,7 +163,7 @@
         ApplyPayment(POSSession, VoucherType, SaleLinePOSVoucher, ActionContext);
     end;
 
-    procedure ApplyPayment(POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; SaleLinePOSVoucher: Record "NPR NpRv Sales Line"; var ActionContext: JsonObject)
+    procedure ApplyPayment(POSSession: Codeunit "NPR POS Session"; VoucherType: Record "NPR NpRv Voucher Type"; var SaleLinePOSVoucher: Record "NPR NpRv Sales Line"; var ActionContext: JsonObject)
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
@@ -180,6 +186,9 @@
         SaleLinePOS."Currency Amount" := SaleLinePOS."Amount Including VAT";
         POSPaymentLine.ReverseUnrealizedSalesVAT(SaleLinePOS);
         SaleLinePOS.Modify();
+
+        SaleLinePOSVoucher.Amount := SaleLinePOS."Amount Including VAT";
+        SaleLinePOSVoucher.Modify(true);
     end;
     #endRegion
 }

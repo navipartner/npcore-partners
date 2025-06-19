@@ -143,6 +143,12 @@
             TableRelation = Company;
             ValidateTableRelation = false;
         }
+
+        field(101; "Reservation Line Id"; Guid)
+        {
+            Caption = 'Reservation Line Id';
+            DataClassification = CustomerContent;
+        }
 #if not BC17
         field(110; "Spfy Initiated in Shopify"; Boolean)
         {

@@ -41,6 +41,11 @@
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRRetail;
                 }
+                field(Amount; Rec.Amount)
+                {
+                    ToolTip = 'Specifies value of the amount field';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Document Source"; Rec."Document Source")
                 {
                     ToolTip = 'Specifies the value of the Document Source field';
@@ -48,43 +53,36 @@
                 }
                 field("Register No."; Rec."Register No.")
                 {
-                    Visible = false;
                     ToolTip = 'Specifies the value of the POS Unit No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Sales Ticket No."; Rec."Sales Ticket No.")
                 {
-                    Visible = false;
                     ToolTip = 'Specifies the value of the Sales Ticket No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Sale Date"; Rec."Sale Date")
                 {
-                    Visible = false;
                     ToolTip = 'Specifies the value of the Sale Date field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Sale Line No."; Rec."Sale Line No.")
                 {
-                    Visible = false;
                     ToolTip = 'Specifies the value of the Sale Line No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Document Type"; Rec."Document Type")
                 {
-                    Visible = false;
                     ToolTip = 'Specifies the value of the Document Type field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Document No."; Rec."Document No.")
                 {
-                    Visible = false;
                     ToolTip = 'Specifies the value of the Document No. field';
                     ApplicationArea = NPRRetail;
                 }
                 field("Document Line No."; Rec."Document Line No.")
                 {
-                    Visible = false;
                     ToolTip = 'Specifies the value of the Document Line No. field';
                     ApplicationArea = NPRRetail;
                 }
@@ -161,4 +159,3 @@
 #endif
     }
 }
-

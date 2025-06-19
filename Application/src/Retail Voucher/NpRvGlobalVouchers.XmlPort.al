@@ -43,6 +43,10 @@ xmlport 6151010 "NPR NpRv Global Vouchers"
                 {
                     MinOccurs = Zero;
                 }
+                fieldelement(reserved_amount; NpRvVoucherBuffer."Reserved Amount")
+                {
+                    MinOccurs = Zero;
+                }
                 fieldelement(name; NpRvVoucherBuffer.Name)
                 {
                     MinOccurs = Zero;
@@ -127,6 +131,23 @@ xmlport 6151010 "NPR NpRv Global Vouchers"
                 {
                     MinOccurs = Zero;
                 }
+                fieldelement(amount_to_reserve; NpRvVoucherBuffer."Amount to Reserve")
+                {
+                    MinOccurs = Zero;
+                }
+                fieldelement(reservation_line_id; NpRvVoucherBuffer."Reservation Line ID")
+                {
+                    MinOccurs = Zero;
+                }
+                fieldelement(global_reservation_id; NprvVoucherBuffer."Global Reservation Id")
+                {
+                    MinOccurs = Zero;
+                }
+
+                fieldelement(global_voucher_amt_available; NpRvVoucherBuffer."Global Voucher Amt Available")
+                {
+                    MinOccurs = Zero;
+                }
                 fieldelement(issue_posstore_code; NpRvVoucherBuffer."POS Store Code")
                 {
                     MinOccurs = Zero;
@@ -139,9 +160,51 @@ xmlport 6151010 "NPR NpRv Global Vouchers"
                 {
                     MinOccurs = Zero;
                 }
+                textelement(reservation_lines)
+                {
+                    MinOccurs = Zero;
+
+                    tableelement(tempNpRvSalesLine; "NPR NpRv Sales Line Buffer")
+                    {
+                        MinOccurs = Zero;
+                        XmlName = 'reservation_line';
+                        UseTemporary = true;
+
+                        fieldelement(id_; tempNpRvSalesLine.Id)
+                        {
+                            MinOccurs = Zero;
+                        }
+                        fieldelement(reservation_line_id; tempNpRvSalesLine."Reservation Line Id")
+                        {
+                            MinOccurs = Zero;
+                        }
+                        fieldelement(voucher_type; tempNpRvSalesLine."Voucher Type")
+                        {
+                            MinOccurs = Zero;
+                        }
+                        fieldelement(voucher_no; tempNpRvSalesLine."Voucher No.")
+                        {
+                            MinOccurs = Zero;
+                        }
+                        fieldelement(reference_no; tempNpRvSalesLine."Reference No.")
+                        {
+                            MinOccurs = Zero;
+                        }
+                        fieldelement(amount_; tempNpRvSalesLine.Amount)
+                        {
+                            MinOccurs = Zero;
+                        }
+                    }
+                }
             }
         }
     }
+
+    procedure GetSourceTables(var TempNpRvVoucherBuffer2: Record "NPR NpRv Voucher Buffer" temporary; var TempNpRvSalesLineBuffer: Record "NPR NpRv Sales Line Buffer" temporary)
+    begin
+        TempNpRvVoucherBuffer2.Copy(NpRvVoucherBuffer, true);
+        TempNpRvSalesLineBuffer.Copy(tempNpRvSalesLine, true);
+    end;
 
     procedure GetSourceTable(var TempNpRvVoucherBuffer2: Record "NPR NpRv Voucher Buffer" temporary)
     begin
@@ -153,4 +216,3 @@ xmlport 6151010 "NPR NpRv Global Vouchers"
         NpRvVoucherBuffer.Copy(TempNpRvVoucherBuffer2, true);
     end;
 }
-

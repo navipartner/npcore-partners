@@ -629,6 +629,7 @@
                 NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"POS Quote");
                 if NpRvSalesLine.FindFirst() then begin
                     NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::POS;
+                    NpRvSalesLine."Reservation Line Id" := SaleLinePOS.SystemId;
                     NpRvSalesLine.Modify(true);
 
                 end else begin
@@ -639,6 +640,8 @@
                     Xml2RecRef(RetailVoucherNode.AsXmlElement(), TempNpRvSalesLineFieldBuffer, RecRef);
                     RecRef.SetTable(NpRvSalesLine);
 
+                    NpRvSalesLine."Reservation Line Id" := SaleLinePOS.SystemId;
+                    NpRvSalesLine.Amount := SaleLinePOS."Amount Including VAT";
                     NpRvSalesLine."Retail ID" := SaleLinePOS.SystemId;
                     NpRvSalesLine."Register No." := SalePOS."Register No.";
                     NpRvSalesLine."Sales Ticket No." := SalePOS."Sales Ticket No.";

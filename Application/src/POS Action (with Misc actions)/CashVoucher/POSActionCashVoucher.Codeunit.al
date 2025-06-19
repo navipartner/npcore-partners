@@ -174,15 +174,21 @@ codeunit 6184633 "NPR POS Action: Cash Voucher" implements "NPR IPOS Workflow"
     var
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         NpRvVoucher: Record "NPR NpRv Voucher";
+        AvailableAmount: Decimal;
         InvalidCommisionAmountLbl: Label 'Commision Amount is higher than Voucher Amount.';
         VoucherNotFoundErrorLbl: Label 'Voucher with Reference %1 and Voucher Type %2 is not found.', Comment = '%1 - specifies Reference No., %2 - specifies Voucher Type Code';
     begin
-        NpRvVoucher.SetAutoCalcFields(Amount);
         if not NpRvVoucherMgt.FindVoucher(VoucherType, ReferenceNo, NpRvVoucher) then
             Error(VoucherNotFoundErrorLbl, ReferenceNo, VoucherType);
 
-        if CommisionAmt > NpRvVoucher.Amount then
-            Error(InvalidCommisionAmountLbl);
+        if NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then begin
+            if not NpRvVoucherMgt.ValidateAmount(NpRvVoucher, CommisionAmt, AvailableAmount) then
+                Error(InvalidCommisionAmountLbl);
+        end else begin
+            NpRvVoucher.SetAutoCalcFields(Amount);
+            if CommisionAmt > NpRvVoucher.Amount then
+                Error(InvalidCommisionAmountLbl);
+        end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Parameter Value", 'OnValidateValue', '', true, false)]

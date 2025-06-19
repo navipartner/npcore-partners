@@ -1,9 +1,8 @@
-﻿table 6151015 "NPR NpRv Sales Line"
+table 6151182 "NPR NpRv Sales Line Buffer"
 {
-    Caption = 'Retail Voucher Sales Line';
+    Caption = 'Sales Line Buffer';
     DataClassification = CustomerContent;
-    DrillDownPageID = "NPR NpRv Sales Lines";
-    LookupPageID = "NPR NpRv Sales Lines";
+    TableType = Temporary;
 
     fields
     {
@@ -342,12 +341,6 @@
             Caption = 'Reservation Line Id';
             DataClassification = CustomerContent;
         }
-        field(1040; "Global Reservation Id"; Guid)
-        {
-            Caption = 'Global Reservation Id';
-            DataClassification = CustomerContent;
-        }
-
     }
 
     keys

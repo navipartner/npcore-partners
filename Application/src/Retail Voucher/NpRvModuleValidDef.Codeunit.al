@@ -27,6 +27,7 @@
 
     local procedure CheckVoucher(var Voucher: Record "NPR NpRv Voucher")
     var
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         IsHandled: Boolean;
         Timestamp: DateTime;
         VoucherAlreadyUsedErr: Label 'The voucher has already been used. No amount remains on the voucher.';
@@ -50,8 +51,10 @@
             Error(VoucherAlreadyUsedErr);
 
         TestVoucherType(Voucher."Voucher Type");
-        if Voucher.CalcInUseQty() > 0 then
-            Error(VoucherBeingUsedErr);
+        if not NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then begin
+            if Voucher.CalcInUseQty() > 0 then
+                Error(VoucherBeingUsedErr);
+        end;
     end;
 
     local procedure TestVoucherType(VoucherTypeCode: Code[20])
