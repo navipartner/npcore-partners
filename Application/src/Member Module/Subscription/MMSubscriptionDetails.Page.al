@@ -35,6 +35,11 @@ page 6184834 "NPR MM Subscription Details"
                     ToolTip = 'Specifies the value of the Blocked field.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field("Started At"; Rec."Started At")
+                {
+                    ToolTip = 'Specifies the value of the Started At field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
                 field("Valid From Date"; Rec."Valid From Date")
                 {
                     ToolTip = 'Specifies the value of the Valid From Date field.';
@@ -53,6 +58,21 @@ page 6184834 "NPR MM Subscription Details"
                 field("Auto-Renew"; Rec."Auto-Renew")
                 {
                     ToolTip = 'Specifies the value of the Auto-Renew field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field("Terminate At"; Rec."Terminate At")
+                {
+                    ToolTip = 'Specifies the value of the Terminate At field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field("Termination Requested At"; Rec."Termination Requested At")
+                {
+                    ToolTip = 'Specifies the value of the Termination Requested At field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field("Termination Reason"; Rec."Termination Reason")
+                {
+                    ToolTip = 'Specifies the value of the Termination Reason field.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field("Postpone Renewal Attempt Until"; Rec."Postpone Renewal Attempt Until")
@@ -156,6 +176,31 @@ page 6184834 "NPR MM Subscription Details"
                     SubscriptionMgtImpl.BlockSubscriptionWithConfirmation(Rec);
                 end;
             }
+            action(TerminateSubscription)
+            {
+                Caption = 'Terminate Subscription';
+                ToolTip = 'Terminate the selected subscription';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Image = TerminationDescription;
+                Enabled = (Rec."Auto-Renew" <> Rec."Auto-Renew"::TERMINATION_REQUESTED);
+#if BC17 or BC18 or BC19 or BC20
+                Promoted = true;
+                PromotedIsBig = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+#endif
+
+                trigger OnAction()
+                var
+                    Membership: Record "NPR MM Membership";
+                    RequestTermination: Page "NPR MM SubsRequestTermination";
+                begin
+                    Membership.Get(Rec."Membership Entry No.");
+                    RequestTermination.SetMembership(Membership);
+                    RequestTermination.RunModal();
+                    CurrPage.Update(false);
+                end;
+            }
         }
 #if not (BC17 or BC18 or BC19 or BC20)
         area(Promoted)
@@ -164,6 +209,7 @@ page 6184834 "NPR MM Subscription Details"
             actionref(NewSubscriptionRequest_Promoted; CreateSubscriptionRequest) { }
             actionref(UnblockSubscription_Promoted; UnblockSubscription) { }
             actionref(BlockSubscription_Promoted; BlockSubscription) { }
+            actionref(TerminateSubscription_Promoted; TerminateSubscription) { }
         }
 #endif
     }

@@ -38,6 +38,10 @@ page 6185073 "NPR APIV1 PBI Subscription"
                 {
                     Caption = 'Blocked', Locked = true;
                 }
+                field(startedAt; Rec."Started At")
+                {
+                    Caption = 'Started At', Locked = true;
+                }
                 field(validFromDate; Rec."Valid From Date")
                 {
                     Caption = 'Valid From Date', Locked = true;
@@ -49,6 +53,18 @@ page 6185073 "NPR APIV1 PBI Subscription"
                 field(committedUntil; Rec."Committed Until")
                 {
                     Caption = 'Committed Until', Locked = true;
+                }
+                field(terminateAt; Rec."Terminate At")
+                {
+                    Caption = 'Terminate At', Locked = true;
+                }
+                field(terminationRequestedAt; Rec."Termination Requested At")
+                {
+                    Caption = 'Termination Requested At', Locked = true;
+                }
+                field(terminationReason; Rec."Termination Reason")
+                {
+                    Caption = 'Termination Reason', Locked = true;
                 }
 #if not (BC17 or BC18 or BC19 or BC20)
                 field(systemRowVersion; Rec.SystemRowVersion)

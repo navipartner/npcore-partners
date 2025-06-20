@@ -205,5 +205,17 @@ enum 6059827 "NPR MembershipApiFunctions"
     {
         Caption = 'Resolve identifier';
     }
+    value(500; GET_SUBSCRIPTION)
+    {
+        Caption = 'Get Subscription';
+    }
+    value(501; ENTER_SUBSCRIPTION)
+    {
+        Caption = 'Enter Subscription';
+    }
+    value(502; TERMINATE_SUBSCRIPTION)
+    {
+        Caption = 'Terminate Subscription';
+    }
 }
 #endif

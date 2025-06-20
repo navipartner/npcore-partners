@@ -10,6 +10,29 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
         exit(Subscription.FindFirst());
     end;
 
+    internal procedure GetEarliestTerminationDate(Membership: Record "NPR MM Membership"; var EarliestDate: Date): Boolean
+    var
+        Subscription: Record "NPR MM Subscription";
+    begin
+        if (not GetSubscriptionFromMembership(Membership."Entry No.", Subscription)) then
+            exit(false);
+        EarliestDate := CalculateEarliestTerminationDate(Membership);
+        if (EarliestDate < Subscription."Committed Until") then
+            EarliestDate := Subscription."Committed Until";
+        exit(true);
+    end;
+
+    local procedure CalculateEarliestTerminationDate(Membership: Record "NPR MM Membership") TerminationDate: Date
+    var
+        RecurPaymtSetup: Record "NPR MM Recur. Paym. Setup";
+    begin
+        if (not TryGetRecurPaymentSetup(Membership, RecurPaymtSetup)) then
+            exit;
+        if (Format(RecurPaymtSetup.TerminationPeriod) = '') then
+            exit;
+        TerminationDate := CalcDate(RecurPaymtSetup.TerminationPeriod, WorkDate());
+    end;
+
     internal procedure UpdateMembershipSubscriptionDetails(MembershipLedger: Record "NPR MM Membership Entry")
     var
         Membership: Record "NPR MM Membership";
@@ -17,6 +40,20 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
         if not Membership.Get(MembershipLedger."Membership Entry No.") then
             Clear(Membership);
         UpdateMembershipSubscriptionDetails(Membership, MembershipLedger);
+    end;
+
+    internal procedure UpdateMembershipSubscriptionDetails(Membership: Record "NPR MM Membership")
+    var
+        MembershipEntry: Record "NPR MM Membership Entry";
+        NeedsAtLeastOnePeriodErr: Label 'The membership must have at least one unblocked period to update subscription details.';
+    begin
+        MembershipEntry.SetRange("Membership Entry No.", Membership."Entry No.");
+        MembershipEntry.SetRange(Blocked, false);
+        MembershipEntry.SetFilter(Context, '<>%1', MembershipEntry.Context::REGRET);
+        if (not MembershipEntry.FindLast()) then
+            Error(NeedsAtLeastOnePeriodErr);
+
+        UpdateMembershipSubscriptionDetails(Membership, MembershipEntry);
     end;
 
     internal procedure UpdateMembershipSubscriptionDetails(Membership: Record "NPR MM Membership"; MembershipLedger: Record "NPR MM Membership Entry")
@@ -84,6 +121,7 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
         SubscrRequestUtils.ScheduleSubscriptionRequestCreationJobQueueEntry();
         SubsPayRequestUtils.ScheduleSubscriptionPaymentRequestProcessingJobQueueEntryScheduled();
         SubscrRequestUtils.ScheduleSubscriptionRequestProcessingJobQueueEntry();
+        SubscrRequestUtils.ScheduleSubscriptionTerminationProcessingJobQueueEntry();
     end;
 
     internal procedure BlockSubscriptionWithConfirmation(var Subscription: Record "NPR MM Subscription")
@@ -119,6 +157,27 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
     begin
         Subscription.Blocked := false;
         Subscription.Modify(true);
+    end;
+
+    internal procedure RequestTermination(var Membership: Record "NPR MM Membership"; RequestedDate: Date; Reason: Enum "NPR MM Subs Termination Reason"): Boolean
+    var
+        Subscription: Record "NPR MM Subscription";
+    begin
+        if (not GetSubscriptionFromMembership(Membership."Entry No.", Subscription)) then
+            exit(false);
+        if (Subscription."Auto-Renew" <> Subscription."Auto-Renew"::YES_INTERNAL) then
+            exit(false);
+
+        CheckTerminationPeriod(Membership, Subscription, RequestedDate);
+
+        SetTerminationFields(Subscription, RequestedDate, Reason);
+        Subscription."Auto-Renew" := Subscription."Auto-Renew"::TERMINATION_REQUESTED;
+        Subscription.Modify(true);
+
+        Membership.Validate("Auto-Renew", Membership."Auto-Renew"::TERMINATION_REQUESTED);
+        Membership.Modify();
+
+        exit(true);
     end;
 
     local procedure CheckIfUnprocessedSubscriptionRequestExists(var Subscription: Record "NPR MM Subscription")
@@ -169,7 +228,7 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
         if Handled then
             exit;
         if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
-           (JobQueueEntry."Object ID to Run" in [Codeunit::"NPR MM Subscr. Renew Req. JQ", Codeunit::"NPR MM Subscr. Pay Req Proc JQ", Codeunit::"NPR MM Subscr. Renew Proc. JQ"])
+           (JobQueueEntry."Object ID to Run" in [Codeunit::"NPR MM Subscr. Renew Req. JQ", Codeunit::"NPR MM Subscr. Pay Req Proc JQ", Codeunit::"NPR MM Subscr. Renew Proc. JQ", Codeunit::"NPR MM Subscr Termination JQ"])
         then begin
             IsNpJob := true;
             Handled := true;
@@ -254,9 +313,21 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
         if Subscription."Auto-Renew" = Membership."Auto-Renew" then
             exit;
 
-        if (Membership."Auto-Renew" = Membership."Auto-Renew"::YES_INTERNAL) then
-            // We have put the subscription into an internal state, calculate commitment period.
-            SetCommitmentPeriod(Membership, Subscription);
+        case Membership."Auto-Renew" of
+            "NPR MM MembershipAutoRenew"::YES_INTERNAL:
+                begin
+                    // We have put the subscription into an internal state, calculate commitment period if the subscription was not pending termination.
+                    if (Subscription."Auto-Renew" <> Subscription."Auto-Renew"::TERMINATION_REQUESTED) then begin
+                        Subscription."Started At" := CurrentDateTime();
+                        SetCommitmentPeriod(Membership, Subscription);
+                    end;
+
+                    ResetTerminationFields(Subscription);
+                end;
+            "NPR MM MembershipAutoRenew"::TERMINATION_REQUESTED:
+                // This is a catch all if somebody sets it directly on the membership. We make some assumptions here.
+                SetTerminationFields(Subscription, Today(), "NPR MM Subs Termination Reason"::CUSTOMER_INITIATED);
+        end;
 
         Subscription."Auto-Renew" := Membership."Auto-Renew";
         Subscription.Modify(true);
@@ -264,12 +335,10 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
 
     local procedure SetCommitmentPeriod(Membership: Record "NPR MM Membership"; var Subscription: Record "NPR MM Subscription")
     var
-        MembershipSetup: Record "NPR MM Membership Setup";
         RecurPaymtSetup: Record "NPR MM Recur. Paym. Setup";
         CommittedUntil: Date;
     begin
-        MembershipSetup.Get(Membership."Membership Code");
-        if (not RecurPaymtSetup.Get(MembershipSetup."Recurring Payment Code")) then
+        if (not TryGetRecurPaymentSetup(Membership, RecurPaymtSetup)) then
             exit;
         if (Format(RecurPaymtSetup.SubscriptionCommitmentPeriod) = '') then
             exit;
@@ -282,6 +351,49 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
         end;
 
         Subscription."Committed Until" := CommittedUntil;
+    end;
+
+    local procedure SetTerminationFields(var Subscription: Record "NPR MM Subscription"; RequestedDate: Date; Reason: Enum "NPR MM Subs Termination Reason")
+    begin
+        Subscription."Terminate At" := RequestedDate;
+        Subscription."Termination Reason" := Reason;
+        Subscription."Termination Requested At" := CurrentDateTime();
+    end;
+
+    local procedure ResetTerminationFields(var Subscription: Record "NPR MM Subscription")
+    begin
+        Subscription."Terminate At" := 0D;
+        Subscription."Termination Reason" := Subscription."Termination Reason"::NOT_TERMINATED;
+        Subscription."Termination Requested At" := 0DT;
+    end;
+
+    local procedure CheckTerminationPeriod(Membership: Record "NPR MM Membership"; Subscription: Record "NPR MM Subscription"; RequestedDate: Date)
+    var
+        ConfirmMgt: Codeunit "Confirm Management";
+        RecurPaymtSetup: Record "NPR MM Recur. Paym. Setup";
+        EarliestTerminationDate: Date;
+        SubsCantBeTerminatedDueToTerminationPeriodErr: Label 'The subscription cannot be terminated due to the termination period. The earliest termination date is %1', Comment = '%1 = the latest termination day';
+        AllowBreakOfTerminationPeriodQst: Label 'Terminating subscription would violate the termination period. Do you want to allow breaking the termination period?\The earliest termination date is %1', Comment = '%1 = the latest termiantion day';
+        SubsCantBeTerminatedDueToCommitmentPeriodErr: Label 'The subscription cannot be terminated due to the commitment period. The subscription is committed until %1', Comment = '%1 = the committed until date';
+        AllowBreakOfCommitmentPeriodQst: Label 'Terminating subscription would violate the commitment period. Do you want to allow breaking the commitment period?\The subscription is committed until %1', Comment = '%1 = the last day of the commitment period';
+    begin
+        if (not TryGetRecurPaymentSetup(Membership, RecurPaymtSetup)) then
+            exit;
+        if (Format(RecurPaymtSetup.TerminationPeriod) = '') then
+            exit;
+        if (not RecurPaymtSetup.EnforceTerminationPeriod) then
+            exit;
+
+        if (Subscription."Committed Until" <> 0D) then
+            if (Subscription."Committed Until" > RequestedDate) then
+                if (not ConfirmMgt.GetResponseOrDefault(StrSubstNo(AllowBreakOfCommitmentPeriodQst, Subscription."Committed Until"), false)) then
+                    Error(SubsCantBeTerminatedDueToCommitmentPeriodErr, Subscription."Committed Until");
+
+        EarliestTerminationDate := CalculateEarliestTerminationDate(Membership);
+
+        if (EarliestTerminationDate > Subscription."Valid Until Date") or (EarliestTerminationDate > RequestedDate) then
+            if (not ConfirmMgt.GetResponseOrDefault(StrSubstNo(AllowBreakOfTerminationPeriodQst, EarliestTerminationDate), false)) then
+                Error(SubsCantBeTerminatedDueToTerminationPeriodErr, EarliestTerminationDate);
     end;
 
     procedure CheckIfPendingSubscriptionRequestExist(MembershipEntryNo: Integer; var SubscriptionRequest: Record "NPR MM Subscr. Request"): Boolean
@@ -308,5 +420,15 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
         Clear(MMPaymentMethodCollection);
         MMPaymentMethodCollection.SetMembership(Membership);
         MMPaymentMethodCollection.RunModal();
+    end;
+
+    [TryFunction]
+    local procedure TryGetRecurPaymentSetup(Membership: Record "NPR MM Membership"; var RecurPaymentSetup: Record "NPR MM Recur. Paym. Setup")
+    var
+        MembershipSetup: Record "NPR MM Membership Setup";
+    begin
+        Clear(RecurPaymentSetup);
+        MembershipSetup.Get(Membership."Membership Code");
+        RecurPaymentSetup.Get(MembershipSetup."Recurring Payment Code");
     end;
 }

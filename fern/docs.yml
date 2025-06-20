@@ -201,6 +201,13 @@ navigation:
                   - endpoint: memberships.service-paymentmethod.updatePaymentMethod
                   - endpoint: memberships.service-paymentmethod.deletePaymentMethod
 
+            - memberships.service-subscription:
+                title: Subscription
+                contents:
+                  - endpoint: memberships.service-subscription.getSubscription
+                  - endpoint: memberships.service-subscription.startSubscription
+                  - endpoint: memberships.service-subscription.terminateSubscription
+
             - memberships.service-lifecycle:
                 title: Lifecycle
                 summary: ./docs/pages/memberships/lifecycle-introduction.mdx

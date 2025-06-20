@@ -29,6 +29,7 @@ page 6184909 "NPR MM Set Auto-Renew Status"
                 Caption = 'Auto-Renew';
                 ToolTip = 'Specify the auto-renew status for the membership';
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                ValuesAllowed = NO, YES_INTERNAL, YES_EXTERNAL;
             }
             field(NotifyMember; _NotifyMember)
             {
@@ -83,7 +84,6 @@ page 6184909 "NPR MM Set Auto-Renew Status"
                 begin
                     MembershipMgtInternal.DisableMembershipAutoRenewal(Membership, CreateMemberNotification, true);
                     MembershipMgtInternal.RegretSubscription(Membership);
-
                 end;
             AutoRenewStatus::YES_EXTERNAL:
                 MembershipMgtInternal.EnableMembershipExternalAutoRenewal(Membership, CreateMemberNotification, true);

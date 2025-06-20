@@ -50,6 +50,9 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
         PaymentLinkUrl: Text[2048];
     begin
         Subscription.Get(SubscriptionRequest."Subscription Entry No.");
+        Subscription."Termination Reason" := Subscription."Termination Reason"::FORCED_TERMINATION;
+        Subscription.Modify(true);
+
         Membership.Get(Subscription."Membership Entry No.");
         Membership."Auto-Renew" := Membership."Auto-Renew"::NO;
         Membership.Modify(true);

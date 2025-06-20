@@ -42,6 +42,11 @@ table 6150918 "NPR MM Subscription"
             Caption = 'Valid From Date';
             DataClassification = CustomerContent;
         }
+        field(101; "Started At"; DateTime)
+        {
+            Caption = 'Started At';
+            DataClassification = CustomerContent;
+        }
         field(110; "Valid Until Date"; Date)
         {
             Caption = 'Valid Until Date';
@@ -74,6 +79,21 @@ table 6150918 "NPR MM Subscription"
             Caption = 'Auto-Renew';
             DataClassification = CustomerContent;
         }
+        field(250; "Terminate At"; Date)
+        {
+            Caption = 'Terminate At';
+            DataClassification = CustomerContent;
+        }
+        field(251; "Termination Reason"; Enum "NPR MM Subs Termination Reason")
+        {
+            Caption = 'Termination Reason';
+            DataClassification = CustomerContent;
+        }
+        field(252; "Termination Requested At"; DateTime)
+        {
+            Caption = 'Termination Requested At';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -84,6 +104,7 @@ table 6150918 "NPR MM Subscription"
         }
         key(FromMembership; "Membership Entry No.") { }
         key(Renewal; "Membership Code", Blocked, "Valid Until Date", "Postpone Renewal Attempt Until") { }
+        key(Termination; "Terminate At", "Auto-Renew", "Valid Until Date") { }
     }
 
     trigger OnDelete()

@@ -63,6 +63,12 @@ types:
       - name: ExampleMembershipId
         value: cdef7890-abcd-0123-1234-567890abcdef
 
+      - name: ExampleMembershipId2
+        value: 9f6ccdd4-b5d7-4c22-ba41-51dbb95353ca
+
+      - name: ExampleMembershipId3
+        value: 1800f420-5c87-4c51-8140-414b02cbf989
+
   MembershipNumber:
     type: string
     docs: Unique membership number.
@@ -164,6 +170,14 @@ types:
         value: 52349999-eeee-ffff-aaaa-5234567890ef
       - name: Cancel
         value: 62349999-ffff-aaaa-bbbb-6234567890ff
+
+  AutoRenew:
+    docs: Indicates the auto-renewal state
+    enum:
+      - NO
+      - YES_INTERNAL
+      - YES_EXTERNAL
+      - TERMINATION_REQUESTED
  
   AutoRenewalActivated:
     type: boolean

@@ -1,0 +1,173 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+  membershipSimpleTypes: ./types/types-simple.yml
+
+types:
+  SubscriptionDto:
+    docs: Represents a subscription
+    properties:
+      id: SubscriptionId
+      blocked:
+        docs: Defines if the subscription is blocked and therefore not useable for renewing the membership.
+        type: boolean
+      startedAt:
+        docs: Defines the date the subscription was started.
+        type: optional<datetime>
+      committedUntil:
+        docs: Defines the date that the subscription is committed until. It's not possible to terminate the subscription before this date.
+        type: optional<date>
+      terminateAt:
+        docs: Defines the date the membership will be terminated if it has been requested to terminate.
+        type: optional<date>
+      terminationRequestedAt:
+        docs: Defines the date and time termination was requested.
+        type: optional<datetime>
+      terminationReason:
+        docs: Defines the reason for a termination.
+        type: optional<TerminationReason>
+      autoRenew: membershipSimpleTypes.AutoRenew
+    examples:
+      - name: SubscriptionActive
+        value:
+          id: $SubscriptionId.ExampleSubscriptionIdSubscriptionActive
+          blocked: false
+          startedAt: "2025-06-17T16:34:00.000Z"
+          committedUntil: "2025-12-17"
+          autoRenew: YES_INTERNAL
+
+      - name: SubscriptionPendingTermination
+        value:
+          id: $SubscriptionId.ExampleSubscriptionIdSubscriptionPendingTermination
+          blocked: false
+          startedAt: "2025-06-17T16:34:00.000Z"
+          committedUntil: "2025-12-17"
+          terminateAt: "2025-12-17"
+          terminationRequestedAt: "2025-06-17T15:47:00Z"
+          terminationReason: CUSTOMER_INITIATED
+          autoRenew: TERMINATION_REQUESTED
+
+      - name: SubscriptionTerminated
+        value:
+          id: $SubscriptionId.ExampleSubscriptionIdSubscriptionTerminated
+          blocked: false
+          startedAt: "2024-05-27"
+          terminateAt: "2025-04-30"
+          terminationRequestedAt: "2025-03-15"
+          terminationReason: CUSTOMER_INITIATED
+          autoRenew: NO
+  
+  SubscriptionId:
+    docs: Unique identifier for a subscription.
+    type: uuid
+    examples:
+      - name: ExampleSubscriptionIdSubscriptionActive
+        value: 7322dddf-af86-42ea-8d85-f0d377e2a3b2
+      
+      - name: ExampleSubscriptionIdSubscriptionPendingTermination
+        value: 7b6e8265-70f2-4429-a536-4a455f07c296
+
+      - name: ExampleSubscriptionIdSubscriptionTerminated
+        value: cc2221d9-eb28-4db9-9c8e-146230688615
+
+  SubscriptionTerminationRequest:
+    docs: Request to terminate a subscription
+    properties:
+      terminationDate:
+        docs: The date to terminate the subscription by. If not included, the system will assume today
+        type: optional<date>
+    examples:
+      - name: ExampleWithTerminationDate
+        value:
+          terminationDate: "2025-12-17"
+  
+  TerminationReason:
+    enum:
+      - CUSTOMER_INITIATED
+      - FORCED_TERMINATION
+
+service:
+  display-name: Subscriptions
+  auth: true
+  base-path: /membership/{membershipId}/subscription
+  path-parameters:
+    membershipId: membershipSimpleTypes.MembershipId
+
+  endpoints:
+    getSubscription:
+      docs: Use this endpoint to get the subscription information about a membership.
+      display-name: Get Subscription
+      method: GET
+      path: '/'
+      request:
+        name: getSubscriptionRequest
+      response:
+        type: SubscriptionDto
+      examples:
+        - name: SubscriptionActive
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $membershipSimpleTypes.MembershipId.ExampleMembershipId
+          response:
+            body: $SubscriptionDto.SubscriptionActive
+
+        - name: SubscriptionPendingTermination
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $membershipSimpleTypes.MembershipId.ExampleMembershipId2
+          response:
+            body: $SubscriptionDto.SubscriptionPendingTermination
+
+        - name: SubscriptionTerminated
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $membershipSimpleTypes.MembershipId.ExampleMembershipId3
+          response:
+            body: $SubscriptionDto.SubscriptionTerminated
+
+    startSubscription:
+      docs: Use this endpoint to enable subscription for the membership. This requires that a payment method is active and selected for the membership.
+      display-name: Start Subscription
+      method: POST
+      path: '/start'
+      request:
+        name: startSubscriptionRequest
+      response:
+        type: SubscriptionDto
+      examples:
+        - name: SubscriptionStarted
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $membershipSimpleTypes.MembershipId.ExampleMembershipId
+          response:
+            body: $SubscriptionDto.SubscriptionActive
+
+    terminateSubscription:
+      docs: Use this endpoint to terminate the subscription for the memebrship.
+      display-name: Terminate Subscription
+      method: POST
+      path: '/terminate'
+      request:
+        name: terminateSubscriptionRequest
+        body: SubscriptionTerminationRequest
+      response:
+        type: SubscriptionDto
+      examples:
+        - name: SubscriptionTerminationRequested
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $membershipSimpleTypes.MembershipId.ExampleMembershipId2
+          request: $SubscriptionTerminationRequest.ExampleWithTerminationDate
+          response:
+            body: $SubscriptionDto.SubscriptionPendingTermination

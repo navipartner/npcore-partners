@@ -105,6 +105,16 @@
             OptionMembers = WORK_DATE,SUBS_VALID_FROM;
             OptionCaption = 'Work Date,Subscription Valid From';
         }
+        field(5; TerminationPeriod; DateFormula)
+        {
+            Caption = 'Termination Period';
+            DataClassification = CustomerContent;
+        }
+        field(7; EnforceTerminationPeriod; Boolean)
+        {
+            Caption = 'Enforce Termination Period';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

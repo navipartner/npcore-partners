@@ -36,6 +36,7 @@ codeunit 6185122 "NPR MembershipApiHandler"
         MembershipCatalogAgent: Codeunit "NPR MembershipCatalogAgent";
         MembershipPhasesApiAgent: Codeunit "NPR MembershipPhasesApiAgent";
         MembershipMiscApiAgent: Codeunit "NPR MembershipMiscApiAgent";
+        MembershipSubscrApiAgent: Codeunit "NPR MembershipSubscrAgent";
         PaymentMethodApiAgent: Codeunit "NPR API SubscriptionPmtMethods";
     begin
         case _ApiFunction of
@@ -169,6 +170,15 @@ codeunit 6185122 "NPR MembershipApiHandler"
 
             _ApiFunction::RESOLVE_IDENTIFIER:
                 _Response := MembershipMiscApiAgent.ResolveIdentifier(_Request);
+
+            _ApiFunction::GET_SUBSCRIPTION:
+                _Response := MembershipSubscrApiAgent.GetSubscription(_Request);
+
+            _ApiFunction::ENTER_SUBSCRIPTION:
+                _Response := MembershipSubscrApiAgent.EnterSubscription(_Request);
+
+            _ApiFunction::TERMINATE_SUBSCRIPTION:
+                _Response := MembershipSubscrApiAgent.TerminateSubscription(_Request);
 
         end;
     end;

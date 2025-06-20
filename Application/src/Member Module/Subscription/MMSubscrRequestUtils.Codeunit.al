@@ -200,6 +200,45 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
             JobQueueManagement.StartJobQueueEntry(JobQueueEntry);
     end;
 
+    local procedure CreateSubscriptionRequestTerminationJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry"): Boolean
+    var
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
+        JobQueueManagement: Codeunit "NPR Job Queue Management";
+        SubscriptionsJobQueueCategoryCode: Code[10];
+        DescriptionLbl: Label 'Process subscriptions pending termination.';
+        StartDateTime: DateTime;
+    begin
+        StartDateTime := CreateDateTime(Today, 230000T);
+        if CurrentDateTime > StartDateTime then
+            StartDateTime := CreateDateTime(CalcDate('<+1D>', Today), 230000T);
+        SubscriptionsJobQueueCategoryCode := SubscriptionMgtImpl.GetSubscriptionsJobQueueCategoryCode();
+
+        JobQueueManagement.SetMaxNoOfAttemptsToRun(999999999);
+        JobQueueManagement.SetRerunDelay(10);
+        JobQueueManagement.SetAutoRescheduleAndNotifyOnError(true, 20, '');
+        exit(
+            JobQueueManagement.InitRecurringJobQueueEntry(
+                JobQueueEntry."Object Type to Run"::Codeunit,
+                Codeunit::"NPR MM Subscr Termination JQ",
+                '',
+                DescriptionLbl,
+                StartDateTime,
+                230000T,
+                060000T,
+                1440,
+                SubscriptionsJobQueueCategoryCode,
+                JobQueueEntry));
+    end;
+
+    internal procedure ScheduleSubscriptionTerminationProcessingJobQueueEntry()
+    var
+        JobQueueEntry: Record "Job Queue Entry";
+        JobQueueManagement: Codeunit "NPR Job Queue Management";
+    begin
+        if (CreateSubscriptionRequestTerminationJobQueueEntry(JobQueueEntry)) then
+            JobQueueManagement.StartJobQueueEntry(JobQueueEntry);
+    end;
+
     internal procedure OpenLogEntries(SubscrRequest: Record "NPR MM Subscr. Request")
     var
         SubsReqLogEntry: Record "NPR MM Subs Req Log Entry";

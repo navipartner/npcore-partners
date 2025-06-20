@@ -15,4 +15,8 @@ enum 6059875 "NPR MM MembershipAutoRenew"
     {
         Caption = 'Yes (external)';
     }
+    value(3; TERMINATION_REQUESTED)
+    {
+        Caption = 'Termination Requested';
+    }
 }

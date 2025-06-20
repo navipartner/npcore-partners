@@ -146,6 +146,14 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
         if (Request.Match('DELETE', '/membership/paymentMethods/:paymentMethodId')) then
             exit(Handle(_ApiFunction::DELETE_PAYMENT_METHOD, Request));
 
+        if (Request.Match('GET', '/membership/:membershipId/subscription')) then
+            exit(Handle(_ApiFunction::GET_SUBSCRIPTION, Request));
+
+        if (Request.Match('POST', '/membership/:membershipId/subscription/start')) then
+            exit(Handle(_ApiFunction::ENTER_SUBSCRIPTION, Request));
+
+        if (Request.Match('POST', '/membership/:membershipId/subscription/terminate')) then
+            exit(Handle(_ApiFunction::TERMINATE_SUBSCRIPTION, Request));
     end;
 
     local procedure Handle(ApiFunction: Enum "NPR MembershipApiFunctions"; var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"

@@ -75,6 +75,21 @@
                     ToolTip = 'Specifies the formula used for calculating the subscription commitment.';
                 }
             }
+            group(Termination)
+            {
+                Caption = 'Termination';
+
+                field(TerminationPeriod; Rec.TerminationPeriod)
+                {
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ToolTip = 'Specifies the value of the Termination Period field.';
+                }
+                field(EnforceTerminationPeriod; Rec.EnforceTerminationPeriod)
+                {
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ToolTip = 'Specifies the value of the Enforce Termination Period field.';
+                }
+            }
             group(Posting)
             {
                 field("Gen. Journal Template Name"; Rec."Gen. Journal Template Name")
