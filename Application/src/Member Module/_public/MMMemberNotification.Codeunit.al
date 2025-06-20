@@ -70,6 +70,21 @@
         Commit();
     end;
 
+    internal procedure ForceHandleMembershipNotification(MembershipNotification: Record "NPR MM Membership Notific.")
+    begin
+
+        CreateRecipients(MembershipNotification);
+        NotifyRecipients(MembershipNotification);
+        CreateNextNotification(MembershipNotification);
+        MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::PROCESSED;
+
+        MembershipNotification."Notification Processed At" := CurrentDateTime;
+        MembershipNotification."Notification Processed By User" := CopyStr(UserId, 1, MaxStrLen(MembershipNotification."Notification Processed By User"));
+        MembershipNotification.Modify();
+
+        Commit();
+    end;
+
     local procedure NotificationIsValid(MembershipNotification: Record "NPR MM Membership Notific."): Integer
     var
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
@@ -367,7 +382,7 @@
             MemberNotificationEntry."Card Valid Until" := MemberNotificationEntry."Membership Valid Until";
 
         // figure out if this is a renewal notification if the membership code will change due to age constraints
-        if (MembershipNotification."Notification Trigger" = MembershipNotification."Notification Trigger"::RENEWAL) then begin
+        if (MembershipNotification."Notification Trigger" in [MembershipNotification."Notification Trigger"::RENEWAL, MembershipNotification."Notification Trigger"::MEMBERSHIP_CHANGE_ON_AGE_CONSTRAINT]) then begin
             if (MembershipManagement.SelectAutoRenewRule(MembershipEntry, RenewToItemNo, AlterationSystemId, ReasonText)) then begin
                 if (MembershipAlterationSetup.GetBySystemId(AlterationSystemId)) then begin
                     MemberNotificationEntry.NextMembershipCode := MembershipAlterationSetup."From Membership Code";
@@ -512,6 +527,10 @@
                 FoundAddress := MembershipManagement.GetCommunicationMethod_AutoRenewalDisabled(MemberEntryNo, MembershipEntryNo, Method, NotificationAddress, NotificationEngine);
             MembershipNotification."Notification Trigger"::PAYMENT_METHOD_COLLECTION:
                 FoundAddress := MembershipManagement.GetCommunicationMethod_PaymentMethodCollect(MemberEntryNo, MembershipEntryNo, Method, NotificationAddress, NotificationEngine);
+            MembershipNotification."Notification Trigger"::MEMBERSHIP_CHANGE_ON_AGE_CONSTRAINT:
+                FoundAddress := MembershipManagement.GetCommunicationMethod_Renew(MemberEntryNo, MembershipEntryNo, Method, NotificationAddress, NotificationEngine);
+            else
+                Error(NOT_IMPLEMENTED, MembershipNotification.FieldCaption("Notification Trigger"), MembershipNotification."Notification Trigger");
         end;
 
         case Method of
@@ -893,6 +912,11 @@
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
         CommunitySetup: Record "NPR MM Member Community";
+        MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+        RenewToItemNo: Code[20];
+        AlterationSystemId: Guid;
+        ReasonText: Text;
     begin
 
         Membership.Get(MembershipLedgerEntry."Membership Entry No.");
@@ -901,7 +925,105 @@
 
         AddMembershipRenewalNotificationWorker(MembershipLedgerEntry, MembershipSetup, CommunitySetup);
 
+        // Check if we need to add a membership change notification  due to age constraints
+        if (not MembershipManagement.SelectAutoRenewRule(MembershipLedgerEntry, RenewToItemNo, AlterationSystemId, ReasonText)) then
+            exit;
+
+        if (not MembershipAlterationSetup.GetBySystemId(AlterationSystemId)) then
+            exit;
+
+        if (MembershipAlterationSetup."From Membership Code" = Membership."Membership Code") then
+            exit; // No change in membership code
+
+        AddMembershipChangeNotificationWorker(MembershipLedgerEntry, MembershipSetup, CommunitySetup);
     end;
+
+
+    local procedure CancelPendingNotification(MembershipEntryNo: Integer; NotificationTrigger: Enum "NPR MM NotificationTrigger")
+    var
+        MembershipNotification: Record "NPR MM Membership Notific.";
+    begin
+        MembershipNotification.SetCurrentKey("Membership Entry No.");
+        MembershipNotification.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
+        MembershipNotification.SetFilter("Notification Trigger", '=%1', NotificationTrigger);
+        MembershipNotification.SetFilter("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);
+        if (MembershipNotification.FindSet(true)) then begin
+            repeat
+                MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::CANCELED;
+                MembershipNotification."Notification Processed At" := CurrentDateTime();
+                MembershipNotification."Notification Processed By User" := CopyStr(UserId, 1, MaxStrLen(MembershipNotification."Notification Processed By User"));
+                MembershipNotification.Modify();
+            until (MembershipNotification.Next() = 0);
+        end;
+    end;
+
+    local procedure GetDaysBeforeNotificationSetupByTrigger(Membership: Record "NPR MM Membership"; NotificationTrigger: Enum "NPR MM NotificationTrigger"; NumberOfDaysInAdvance: Integer; var NotificationSetup: Record "NPR MM Member Notific. Setup"): Boolean
+    begin
+        NotificationSetup.SetCurrentKey(Type, "Community Code", "Membership Code", "Days Before");
+        NotificationSetup.SetFilter(Type, '=%1', NotificationTrigger);
+        NotificationSetup.SetFilter("Community Code", '=%1', Membership."Community Code");
+        NotificationSetup.SetFilter("Membership Code", '=%1', Membership."Membership Code");
+        NotificationSetup.SetFilter("Days Before", '1..%1', NumberOfDaysInAdvance);
+        if (not NotificationSetup.FindLast()) then begin
+            NotificationSetup.SetFilter("Membership Code", '=%1', '');
+            if (not NotificationSetup.FindLast()) then begin
+                NotificationSetup.SetFilter("Community Code", '=%1', '');
+                if (not NotificationSetup.FindLast()) then
+                    exit(false);
+            end;
+        end;
+        exit(true);
+    end;
+
+    local procedure GetNotificationSetupByTrigger(CommunityCode: Code[20]; MembershipCode: Code[20]; NotificationTrigger: Enum "NPR MM NotificationTrigger"; var NotificationSetup: Record "NPR MM Member Notific. Setup"): Boolean
+    begin
+        NotificationSetup.SetCurrentKey(Type, "Community Code", "Membership Code", "Days Before");
+        NotificationSetup.SetFilter(Type, '=%1', NotificationTrigger);
+        NotificationSetup.SetFilter("Community Code", '=%1', CommunityCode);
+        NotificationSetup.SetFilter("Membership Code", '=%1', MembershipCode);
+        if (not NotificationSetup.FindLast()) then begin
+            NotificationSetup.SetFilter("Membership Code", '=%1', '');
+            if (not NotificationSetup.FindLast()) then begin
+                NotificationSetup.SetFilter("Community Code", '=%1', '');
+                if (not NotificationSetup.FindLast()) then
+                    exit(false);
+            end;
+        end;
+        exit(true);
+    end;
+
+    local procedure AddMembershipChangeNotificationWorker(MembershipLedgerEntry: Record "NPR MM Membership Entry"; MembershipSetup: Record "NPR MM Membership Setup"; CommunitySetup: Record "NPR MM Member Community")
+    var
+        Membership: Record "NPR MM Membership";
+        NotificationSetup: Record "NPR MM Member Notific. Setup";
+        MembershipNotification: Record "NPR MM Membership Notific.";
+        DaysToRenewal: Integer;
+    begin
+
+        Membership.Get(MembershipLedgerEntry."Membership Entry No.");
+        CancelPendingNotification(MembershipLedgerEntry."Membership Entry No.", MembershipNotification."Notification Trigger"::MEMBERSHIP_CHANGE_ON_AGE_CONSTRAINT);
+
+        if (not ((MembershipSetup."Create Renewal Notifications") or (CommunitySetup."Create Renewal Notifications"))) then
+            exit;
+
+        DaysToRenewal := MembershipLedgerEntry."Valid Until Date" - Today();
+        if (not GetDaysBeforeNotificationSetupByTrigger(Membership, MembershipNotification."Notification Trigger"::MEMBERSHIP_CHANGE_ON_AGE_CONSTRAINT, DaysToRenewal, NotificationSetup)) then
+            exit;
+
+        MembershipNotification.Reset();
+        MembershipNotification.Init();
+        MembershipNotification."Entry No." := 0;
+        MembershipNotification."Membership Entry No." := MembershipLedgerEntry."Membership Entry No.";
+        MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::PENDING;
+        MembershipNotification."Notification Code" := NotificationSetup.Code;
+        MembershipNotification."Date To Notify" := MembershipLedgerEntry."Valid Until Date" - NotificationSetup."Days Before";
+        MembershipNotification."Notification Trigger" := MembershipNotification."Notification Trigger"::MEMBERSHIP_CHANGE_ON_AGE_CONSTRAINT;
+        MembershipNotification."Template Filter Value" := NotificationSetup."Template Filter Value";
+        MembershipNotification."Target Member Role" := NotificationSetup."Target Member Role";
+
+        MembershipNotification.Insert();
+    end;
+
 
     local procedure AddMembershipRenewalNotificationWorker(MembershipLedgerEntry: Record "NPR MM Membership Entry"; MembershipSetup: Record "NPR MM Membership Setup"; CommunitySetup: Record "NPR MM Member Community")
     var
@@ -912,38 +1034,14 @@
     begin
 
         Membership.Get(MembershipLedgerEntry."Membership Entry No.");
-
-        MembershipNotification.SetCurrentKey("Membership Entry No.");
-        MembershipNotification.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
-        MembershipNotification.SetFilter("Notification Trigger", '=%1', MembershipNotification."Notification Trigger"::RENEWAL);
-        MembershipNotification.SetFilter("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);
-        if (MembershipNotification.FindSet(true)) then begin
-            repeat
-                MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::CANCELED;
-                MembershipNotification."Notification Processed At" := CurrentDateTime();
-                MembershipNotification."Notification Processed By User" := CopyStr(UserId, 1, MaxStrLen(MembershipNotification."Notification Processed By User"));
-                MembershipNotification.Modify();
-            until (MembershipNotification.Next() = 0);
-        end;
+        CancelPendingNotification(MembershipLedgerEntry."Membership Entry No.", MembershipNotification."Notification Trigger"::RENEWAL);
 
         if (not ((MembershipSetup."Create Renewal Notifications") or (CommunitySetup."Create Renewal Notifications"))) then
             exit;
 
         DaysToRenewal := MembershipLedgerEntry."Valid Until Date" - Today();
-
-        NotificationSetup.SetCurrentKey(Type, "Community Code", "Membership Code", "Days Before");
-        NotificationSetup.SetFilter(Type, '=%1', NotificationSetup.Type::RENEWAL);
-        NotificationSetup.SetFilter("Community Code", '=%1', Membership."Community Code");
-        NotificationSetup.SetFilter("Membership Code", '=%1', Membership."Membership Code");
-        NotificationSetup.SetFilter("Days Before", '1..%1', DaysToRenewal);
-        if (not NotificationSetup.FindLast()) then begin
-            NotificationSetup.SetFilter("Membership Code", '=%1', '');
-            if (not NotificationSetup.FindLast()) then begin
-                NotificationSetup.SetFilter("Community Code", '=%1', '');
-                if (not NotificationSetup.FindLast()) then
-                    exit;
-            end;
-        end;
+        if (not GetDaysBeforeNotificationSetupByTrigger(Membership, MembershipNotification."Notification Trigger"::RENEWAL, DaysToRenewal, NotificationSetup)) then
+            exit;
 
         MembershipNotification.Reset();
         MembershipNotification.Init();
@@ -981,35 +1079,13 @@
     begin
 
         Membership.Get(MembershipLedgerEntry."Membership Entry No.");
-
-        MembershipNotification.SetCurrentKey("Membership Entry No.");
-        MembershipNotification.SetFilter("Membership Entry No.", '=%1', Membership."Entry No.");
-        MembershipNotification.SetFilter("Notification Trigger", '=%1', MembershipNotification."Notification Trigger"::RENEWAL_SUCCESS);
-        MembershipNotification.SetFilter("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);
-        if (MembershipNotification.FindSet(true)) then begin
-            repeat
-                MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::CANCELED;
-                MembershipNotification."Notification Processed At" := CurrentDateTime();
-                MembershipNotification."Notification Processed By User" := CopyStr(UserId, 1, MaxStrLen(MembershipNotification."Notification Processed By User"));
-                MembershipNotification.Modify();
-            until (MembershipNotification.Next() = 0);
-        end;
+        CancelPendingNotification(MembershipLedgerEntry."Membership Entry No.", MembershipNotification."Notification Trigger"::RENEWAL_SUCCESS);
 
         if (not ((MembershipSetup."Create Renewal Success Notif") or (CommunitySetup."Create Renewal Success Notif"))) then
             exit;
 
-        NotificationSetup.SetCurrentKey(Type, "Community Code", "Membership Code", "Days Before");
-        NotificationSetup.SetFilter(Type, '=%1', NotificationSetup.Type::RENEWAL_SUCCESS);
-        NotificationSetup.SetFilter("Community Code", '=%1', Membership."Community Code");
-        NotificationSetup.SetFilter("Membership Code", '=%1', Membership."Membership Code");
-        if (not NotificationSetup.FindLast()) then begin
-            NotificationSetup.SetFilter("Membership Code", '=%1', '');
-            if (not NotificationSetup.FindLast()) then begin
-                NotificationSetup.SetFilter("Community Code", '=%1', '');
-                if (not NotificationSetup.FindLast()) then
-                    exit;
-            end;
-        end;
+        if (not GetNotificationSetupByTrigger(Membership."Community Code", Membership."Membership Code", MembershipNotification."Notification Trigger"::RENEWAL_SUCCESS, NotificationSetup)) then
+            exit;
 
         MembershipNotification.Reset();
         MembershipNotification.Init();
@@ -1046,34 +1122,13 @@
         NotificationSetup: Record "NPR MM Member Notific. Setup";
         MembershipNotification: Record "NPR MM Membership Notific.";
     begin
-        MembershipNotification.SetCurrentKey("Membership Entry No.");
-        MembershipNotification.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
-        MembershipNotification.SetFilter("Notification Trigger", '=%1', MembershipNotification."Notification Trigger"::RENEWAL_FAILURE);
-        MembershipNotification.SetFilter("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);
-        if (MembershipNotification.FindSet(true)) then begin
-            repeat
-                MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::CANCELED;
-                MembershipNotification."Notification Processed At" := CurrentDateTime();
-                MembershipNotification."Notification Processed By User" := CopyStr(UserId, 1, MaxStrLen(MembershipNotification."Notification Processed By User"));
-                MembershipNotification.Modify();
-            until (MembershipNotification.Next() = 0);
-        end;
 
+        CancelPendingNotification(MembershipEntryNo, MembershipNotification."Notification Trigger"::RENEWAL_FAILURE);
         if (not ((MembershipSetup."Create Renewal Failure Notif") or (CommunitySetup."Create Renewal Failure Notif"))) then
             exit;
 
-        NotificationSetup.SetCurrentKey(Type, "Community Code", "Membership Code", "Days Before");
-        NotificationSetup.SetFilter(Type, '=%1', NotificationSetup.Type::RENEWAL_FAILURE);
-        NotificationSetup.SetFilter("Community Code", '=%1', CommunitySetup.Code);
-        NotificationSetup.SetFilter("Membership Code", '=%1', MembershipSetup.Code);
-        if (not NotificationSetup.FindLast()) then begin
-            NotificationSetup.SetFilter("Membership Code", '=%1', '');
-            if (not NotificationSetup.FindLast()) then begin
-                NotificationSetup.SetFilter("Community Code", '=%1', '');
-                if (not NotificationSetup.FindLast()) then
-                    exit;
-            end;
-        end;
+        if (not GetNotificationSetupByTrigger(CommunitySetup.Code, MembershipSetup.Code, MembershipNotification."Notification Trigger"::RENEWAL_FAILURE, NotificationSetup)) then
+            exit;
 
         MembershipNotification.Reset();
         MembershipNotification.Init();
@@ -1108,31 +1163,9 @@
         NotificationSetup: Record "NPR MM Member Notific. Setup";
         MembershipNotification: Record "NPR MM Membership Notific.";
     begin
-        MembershipNotification.SetCurrentKey("Membership Entry No.");
-        MembershipNotification.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
-        MembershipNotification.SetFilter("Notification Trigger", '=%1', MembershipNotification."Notification Trigger"::PAYMENT_METHOD_COLLECTION);
-        MembershipNotification.SetFilter("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);
-        if (MembershipNotification.FindSet(true)) then begin
-            repeat
-                MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::CANCELED;
-                MembershipNotification."Notification Processed At" := CurrentDateTime();
-                MembershipNotification."Notification Processed By User" := CopyStr(UserId, 1, MaxStrLen(MembershipNotification."Notification Processed By User"));
-                MembershipNotification.Modify();
-            until (MembershipNotification.Next() = 0);
-        end;
-
-        NotificationSetup.SetCurrentKey(Type, "Community Code", "Membership Code", "Days Before");
-        NotificationSetup.SetFilter(Type, '=%1', NotificationSetup.Type::PAYMENT_METHOD_COLLECTION);
-        NotificationSetup.SetFilter("Community Code", '=%1', CommunitySetup.Code);
-        NotificationSetup.SetFilter("Membership Code", '=%1', MembershipSetup.Code);
-        if (not NotificationSetup.FindLast()) then begin
-            NotificationSetup.SetFilter("Membership Code", '=%1', '');
-            if (not NotificationSetup.FindLast()) then begin
-                NotificationSetup.SetFilter("Community Code", '=%1', '');
-                if (not NotificationSetup.FindLast()) then
-                    exit;
-            end;
-        end;
+        CancelPendingNotification(MembershipEntryNo, MembershipNotification."Notification Trigger"::PAYMENT_METHOD_COLLECTION);
+        if (not GetNotificationSetupByTrigger(CommunitySetup.Code, MembershipSetup.Code, MembershipNotification."Notification Trigger"::PAYMENT_METHOD_COLLECTION, NotificationSetup)) then
+            exit;
 
         MembershipNotification.Reset();
         MembershipNotification.Init();
@@ -1165,34 +1198,13 @@
         NotificationSetup: Record "NPR MM Member Notific. Setup";
         MembershipNotification: Record "NPR MM Membership Notific.";
     begin
-        MembershipNotification.SetCurrentKey("Membership Entry No.");
-        MembershipNotification.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
-        MembershipNotification.SetFilter("Notification Trigger", '=%1|%2', MembershipNotification."Notification Trigger"::AUTORENEWAL_ENABLED, MembershipNotification."Notification Trigger"::AUTORENEWAL_DISABLED);
-        MembershipNotification.SetFilter("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);
-        if (MembershipNotification.FindSet(true)) then begin
-            repeat
-                MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::CANCELED;
-                MembershipNotification."Notification Processed At" := CurrentDateTime();
-                MembershipNotification."Notification Processed By User" := CopyStr(UserId, 1, MaxStrLen(MembershipNotification."Notification Processed By User"));
-                MembershipNotification.Modify();
-            until (MembershipNotification.Next() = 0);
-        end;
+        CancelPendingNotification(MembershipEntryNo, MembershipNotification."Notification Trigger"::AUTORENEWAL_ENABLED);
 
         if (not ((MembershipSetup."Create AutoRenewal Enabl Notif") or (CommunitySetup."Create AutoRenewal Enabl Notif"))) then
             exit;
 
-        NotificationSetup.SetCurrentKey(Type, "Community Code", "Membership Code", "Days Before");
-        NotificationSetup.SetFilter(Type, '=%1', NotificationSetup.Type::AUTORENEWAL_ENABLED);
-        NotificationSetup.SetFilter("Community Code", '=%1', CommunitySetup.Code);
-        NotificationSetup.SetFilter("Membership Code", '=%1', MembershipSetup.Code);
-        if (not NotificationSetup.FindLast()) then begin
-            NotificationSetup.SetFilter("Membership Code", '=%1', '');
-            if (not NotificationSetup.FindLast()) then begin
-                NotificationSetup.SetFilter("Community Code", '=%1', '');
-                if (not NotificationSetup.FindLast()) then
-                    exit;
-            end;
-        end;
+        if (not GetNotificationSetupByTrigger(CommunitySetup.Code, MembershipSetup.Code, MembershipNotification."Notification Trigger"::AUTORENEWAL_ENABLED, NotificationSetup)) then
+            exit;
 
         //Skip notificaiton if there is an unprocessed welcome notificaiton
         MembershipNotification.Reset();
@@ -1233,34 +1245,12 @@
         NotificationSetup: Record "NPR MM Member Notific. Setup";
         MembershipNotification: Record "NPR MM Membership Notific.";
     begin
-        MembershipNotification.SetCurrentKey("Membership Entry No.");
-        MembershipNotification.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
-        MembershipNotification.SetFilter("Notification Trigger", '=%1|%2', MembershipNotification."Notification Trigger"::AUTORENEWAL_DISABLED, MembershipNotification."Notification Trigger"::AUTORENEWAL_ENABLED);
-        MembershipNotification.SetFilter("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);
-        if (MembershipNotification.FindSet(true)) then begin
-            repeat
-                MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::CANCELED;
-                MembershipNotification."Notification Processed At" := CurrentDateTime();
-                MembershipNotification."Notification Processed By User" := CopyStr(UserId, 1, MaxStrLen(MembershipNotification."Notification Processed By User"));
-                MembershipNotification.Modify();
-            until (MembershipNotification.Next() = 0);
-        end;
-
+        CancelPendingNotification(MembershipEntryNo, MembershipNotification."Notification Trigger"::AUTORENEWAL_DISABLED);
         if (not ((MembershipSetup."Create AutoRenewal Enabl Notif") or (CommunitySetup."Create AutoRenewal Enabl Notif"))) then
             exit;
 
-        NotificationSetup.SetCurrentKey(Type, "Community Code", "Membership Code", "Days Before");
-        NotificationSetup.SetFilter(Type, '=%1', NotificationSetup.Type::AUTORENEWAL_DISABLED);
-        NotificationSetup.SetFilter("Community Code", '=%1', CommunitySetup.Code);
-        NotificationSetup.SetFilter("Membership Code", '=%1', MembershipSetup.Code);
-        if (not NotificationSetup.FindLast()) then begin
-            NotificationSetup.SetFilter("Membership Code", '=%1', '');
-            if (not NotificationSetup.FindLast()) then begin
-                NotificationSetup.SetFilter("Community Code", '=%1', '');
-                if (not NotificationSetup.FindLast()) then
-                    exit;
-            end;
-        end;
+        if (not GetNotificationSetupByTrigger(CommunitySetup.Code, MembershipSetup.Code, MembershipNotification."Notification Trigger"::AUTORENEWAL_DISABLED, NotificationSetup)) then
+            exit;
 
         //Skip notificaiton if there is an unprocessed welcome notificaiton
         MembershipNotification.Reset();
@@ -1784,7 +1774,7 @@
         NotificationSetup: Record "NPR MM Member Notific. Setup";
         MembershipRole: Record "NPR MM Membership Role";
         MembershipNotification: Record "NPR MM Membership Notific.";
-        NotificationTriggerType: Option;
+        NotificationTriggerType: Enum "NPR MM NotificationTrigger";
     begin
 
         NotificationTriggerType := NotificationSetup.Type::WALLET_CREATE;
@@ -1797,7 +1787,7 @@
 
     end;
 
-    local procedure CreateWalletNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer; NotificationTriggerType: Option; NotificationSource: Option; DateToSendNotification: Date): Integer
+    local procedure CreateWalletNotification(MembershipEntryNo: Integer; MemberEntryNo: Integer; MemberCardEntryNo: Integer; NotificationTriggerType: Enum "NPR MM NotificationTrigger"; NotificationSource: Option; DateToSendNotification: Date): Integer
     var
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";

@@ -3482,34 +3482,27 @@
     var
         MemberCommunication: Record "NPR MM Member Communication";
     begin
-
         exit(GetCommunicationMethodWorker(MemberEntryNo, MembershipEntryNo, MemberCommunication."Message Type"::WELCOME, Method, Address, Engine));
-
     end;
 
     internal procedure GetCommunicationMethod_Renew(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
     var
         MemberCommunication: Record "NPR MM Member Communication";
     begin
-
         exit(GetCommunicationMethodWorker(MemberEntryNo, MembershipEntryNo, MemberCommunication."Message Type"::RENEW, Method, Address, Engine));
-
     end;
 
     internal procedure GetCommunicationMethod_MemberCard(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
     var
         MemberCommunication: Record "NPR MM Member Communication";
     begin
-
         exit(GetCommunicationMethodWorker(MemberEntryNo, MembershipEntryNo, MemberCommunication."Message Type"::MEMBERCARD, Method, Address, Engine));
-
     end;
 
     internal procedure GetCommunicationMethod_Ticket(MemberEntryNo: Integer; MembershipEntryNo: Integer; var Method: Code[10]; var Address: Text[100]; var Engine: Option): Boolean
     var
         MemberCommunication: Record "NPR MM Member Communication";
     begin
-
         exit(GetCommunicationMethodWorker(MemberEntryNo, MembershipEntryNo, MemberCommunication."Message Type"::TICKETS, Method, Address, Engine));
     end;
 
@@ -3517,7 +3510,6 @@
     var
         MemberCommunication: Record "NPR MM Member Communication";
     begin
-
         exit(GetCommunicationMethodWorker(MemberEntryNo, MembershipEntryNo, MemberCommunication."Message Type"::COUPONS, Method, Address, Engine));
     end;
 
@@ -3525,7 +3517,6 @@
     var
         MemberCommunication: Record "NPR MM Member Communication";
     begin
-
         exit(GetCommunicationMethodWorker(MemberEntryNo, MembershipEntryNo, MemberCommunication."Message Type"::RENEWAL_SUCCESS, Method, Address, Engine));
     end;
 
@@ -3533,7 +3524,6 @@
     var
         MemberCommunication: Record "NPR MM Member Communication";
     begin
-
         exit(GetCommunicationMethodWorker(MemberEntryNo, MembershipEntryNo, MemberCommunication."Message Type"::RENEWAL_FAILURE, Method, Address, Engine));
     end;
 
@@ -3556,7 +3546,6 @@
     var
         MemberCommunication: Record "NPR MM Member Communication";
     begin
-
         exit(GetCommunicationMethodWorker(MemberEntryNo, MembershipEntryNo, MemberCommunication."Message Type"::AUTORENEWAL_DISABLED, Method, Address, Engine));
     end;
 

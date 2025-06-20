@@ -76,12 +76,12 @@
             Caption = 'Blocked By User';
             DataClassification = CustomerContent;
         }
-        field(50; "Notification Trigger"; Option)
+        field(50; "Notification Trigger"; Enum "NPR MM NotificationTrigger")
         {
             Caption = 'Notification Trigger';
             DataClassification = CustomerContent;
-            OptionCaption = 'Welcome,For Renewal,Wallet Update,Wallet Create,Coupon,Achievement,Renewal Success,Renewal Failure,Auto-Renewal Enabled,Auto-Renewal Disabled,Payment Method Collection';
-            OptionMembers = WELCOME,RENEWAL,WALLET_UPDATE,WALLET_CREATE,COUPON,ACHIEVEMENT,RENEWAL_SUCCESS,RENEWAL_FAILURE,AUTORENEWAL_ENABLED,AUTORENEWAL_DISABLED,PAYMENT_METHOD_COLLECTION;
+            // OptionCaption = 'Welcome,For Renewal,Wallet Update,Wallet Create,Coupon,Achievement,Renewal Success,Renewal Failure,Auto-Renewal Enabled,Auto-Renewal Disabled,Payment Method Collection,Membership Change (Age Constraint)';
+            // OptionMembers = WELCOME,RENEWAL,WALLET_UPDATE,WALLET_CREATE,COUPON,ACHIEVEMENT,RENEWAL_SUCCESS,RENEWAL_FAILURE,AUTORENEWAL_ENABLED,AUTORENEWAL_DISABLED,PAYMENT_METHOD_COLLECTION,MEMBERSHIP_CHANGE_ON_AGE_CONSTRAINT;
         }
         field(51; "Template Filter Value"; Code[20])
         {

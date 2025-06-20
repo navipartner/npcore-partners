@@ -19,12 +19,12 @@
             Caption = 'Description';
             DataClassification = CustomerContent;
         }
-        field(20; Type; Option)
+        field(20; Type; Enum "NPR MM NotificationTrigger")
         {
             Caption = 'Type';
             DataClassification = CustomerContent;
-            OptionCaption = 'Welcome,For Renewal,Wallet Update,Wallet Create,Coupon,Achievement,Renewal Success,Renewal Failure,Auto-Renewal Enabled,Auto-Renewal Disabled,Payment Method Collection';
-            OptionMembers = WELCOME,RENEWAL,WALLET_UPDATE,WALLET_CREATE,COUPON,ACHIEVEMENT,RENEWAL_SUCCESS,RENEWAL_FAILURE,AUTORENEWAL_ENABLED,AUTORENEWAL_DISABLED,PAYMENT_METHOD_COLLECTION;
+            //OptionCaption = 'Welcome,For Renewal,Wallet Update,Wallet Create,Coupon,Achievement,Renewal Success,Renewal Failure,Auto-Renewal Enabled,Auto-Renewal Disabled,Payment Method Collection,Membership Change (Age Constraint)';
+            //OptionMembers = WELCOME,RENEWAL,WALLET_UPDATE,WALLET_CREATE,COUPON,ACHIEVEMENT,RENEWAL_SUCCESS,RENEWAL_FAILURE,AUTORENEWAL_ENABLED,AUTORENEWAL_DISABLED,PAYMENT_METHOD_COLLECTION,MEMBERSHIP_CHANGE_ON_AGE_CONSTRAINT;
         }
         field(30; "Days Before"; Integer)
         {

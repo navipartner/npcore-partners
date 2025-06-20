@@ -196,6 +196,22 @@
                     SendNotification(Rec);
                 end;
             }
+
+            action("Send Notifications (Force)")
+            {
+                Caption = 'Force Send Notification';
+                Image = SendToMultiple;
+                Promoted = false;
+
+                ToolTip = 'Executes the Force Send Notification action for selected record which does not consider send constraint rules.';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+
+                trigger OnAction()
+                begin
+                    ForceSendNotification(Rec);
+                end;
+            }
+
             action(SendSms)
             {
                 Caption = 'Send Pending SMS''s Now';
@@ -226,6 +242,15 @@
     begin
 
         MemberNotification.HandleMembershipNotification(MembershipNotification);
+        CurrPage.Update(false);
+    end;
+
+    local procedure ForceSendNotification(MembershipNotification: Record "NPR MM Membership Notific.")
+    var
+        MemberNotification: Codeunit "NPR MM Member Notification";
+    begin
+
+        MemberNotification.ForceHandleMembershipNotification(MembershipNotification);
         CurrPage.Update(false);
     end;
 }
