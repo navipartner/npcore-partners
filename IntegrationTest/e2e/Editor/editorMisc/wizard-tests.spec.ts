@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
-import { login } from "../fixtures/editorLogin";
-import { removeLayout } from "../fixtures/removeLayout";
+import { login } from "../../fixtures/editorLogin";
+import { removeLayout } from "../../fixtures/removeLayout";
 
 test.describe("Wizard modal tests", () => {
   test("testing wizard modal render", async ({ page }, workerInfo) => {
