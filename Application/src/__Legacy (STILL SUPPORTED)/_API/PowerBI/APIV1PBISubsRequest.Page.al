@@ -9,7 +9,7 @@ page 6185074 "NPR APIV1 PBI SubsRequest"
     APIGroup = 'powerBI';
     APIVersion = 'v1.0';
     EntitySetName = 'subscriptionRequests';
-    EntityName = 'susbcriptionRequest';
+    EntityName = 'subscriptionRequest';
     SourceTable = "NPR MM Subscr. Request";
 
     layout
