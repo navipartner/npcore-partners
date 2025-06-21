@@ -566,19 +566,27 @@ codeunit 6248367 "NPR HU L Communication Mgt."
 
     local procedure AddPOSEntryPaymentLines(var JsonTextWriter: Codeunit "Json Text Reader/Writer"; POSEntry: Record "NPR POS Entry"; HULPOSAuditLogAux: Record "NPR HU L POS Audit Log Aux.")
     var
-        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
         POSEntryPaymentLineDict: Dictionary of [Code[10], Decimal];
         POSEntryPaymentLineDictKey: Code[10];
+        PaymentLineCount: Integer;
+        ChangeLineCount: Integer;
     begin
-        POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        POSEntryPaymentLine.SetFilter(Amount, '<>%1', 0);
-        if POSEntryPaymentLine.FindSet() then
-            repeat
-                if not POSEntryPaymentLineDict.Add(POSEntryPaymentLine."POS Payment Method Code", POSEntryPaymentLine.Amount) then
-                    POSEntryPaymentLineDict.Set(POSEntryPaymentLine."POS Payment Method Code", POSEntryPaymentLineDict.Get(POSEntryPaymentLine."POS Payment Method Code") + POSEntryPaymentLine.Amount);
-            until POSEntryPaymentLine.Next() = 0;
+        if HULPOSAuditLogAux."Transaction Type" in [HULPOSAuditLogAux."Transaction Type"::"Standard Receipt", HULPOSAuditLogAux."Transaction Type"::"Simple Invoice"] then begin
+            CreateNormalSalePaymentLinesDict(POSEntryPaymentLineDict, POSEntry);
+            ChangeLineCount := CountChangeInNormalSale(POSEntry);
+            PaymentLineCount := POSEntryPaymentLineDict.Count() + ChangeLineCount;
+        end else begin
+            CreateReturnSalePaymentLinesDict(POSEntryPaymentLineDict, POSEntry);
+            PaymentLineCount := POSEntryPaymentLineDict.Count();
+        end;
 
-        AddPaymentCountProperty(JsonTextWriter, POSEntryPaymentLineDict.Count(), HULPOSAuditLogAux."Rounding Amount" <> 0);
+        if HULPOSAuditLogAux."Rounding Amount" <> 0 then
+            PaymentLineCount += 1;
+
+        if PaymentLineCount = 0 then
+            PaymentLineCount := 1;
+
+        JsonTextWriter.WriteStringProperty('iPaymentCnt', PaymentLineCount);
 
         if POSEntryPaymentLineDict.Count() = 0 then begin
             JsonTextWriter.WriteStartArray('payments');
@@ -592,11 +600,12 @@ codeunit 6248367 "NPR HU L Communication Mgt."
         end else
             JsonTextWriter.WriteStartArray('payments');
 
-        foreach POSEntryPaymentLineDictKey in POSEntryPaymentLineDict.Keys do begin
-            JsonTextWriter.WriteStartObject('');
+        foreach POSEntryPaymentLineDictKey in POSEntryPaymentLineDict.Keys() do begin
             AddPaymentLineInformation(JsonTextWriter, POSEntryPaymentLineDictKey, POSEntryPaymentLineDict.Get(POSEntryPaymentLineDictKey), HULPOSAuditLogAux."Original Document No." <> 0);
-            JsonTextWriter.WriteEndObject();
         end;
+
+        if ChangeLineCount <> 0 then
+            AddPaymentChangeObj(JsonTextWriter, POSEntry);
 
         if HULPOSAuditLogAux."Rounding Amount" <> 0 then
             AddPaymentRoundingObj(JsonTextWriter, HULPOSAuditLogAux);
@@ -604,18 +613,39 @@ codeunit 6248367 "NPR HU L Communication Mgt."
         JsonTextWriter.WriteEndArray(); // payments
     end;
 
-    local procedure AddPaymentCountProperty(var JsonTextWriter: Codeunit "Json Text Reader/Writer"; POSEntryPaymentLineDictCount: Integer; RoundingExists: Boolean)
+    local procedure CreateNormalSalePaymentLinesDict(var POSEntryPaymentLineDict: Dictionary of [Code[10], Decimal]; POSEntry: Record "NPR POS Entry")
     var
-        PaymentLineCount: Integer;
+        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
     begin
-        PaymentLineCount := POSEntryPaymentLineDictCount;
+        POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntryPaymentLine.SetFilter(Amount, '>%1', 0);
+        if POSEntryPaymentLine.FindSet() then
+            repeat
+                if not POSEntryPaymentLineDict.Add(POSEntryPaymentLine."POS Payment Method Code", POSEntryPaymentLine.Amount) then
+                    POSEntryPaymentLineDict.Set(POSEntryPaymentLine."POS Payment Method Code", POSEntryPaymentLineDict.Get(POSEntryPaymentLine."POS Payment Method Code") + POSEntryPaymentLine.Amount);
+            until POSEntryPaymentLine.Next() = 0;
+    end;
 
-        if PaymentLineCount = 0 then
-            PaymentLineCount := 1;
-        if RoundingExists then
-            PaymentLineCount += 1;
+    local procedure CountChangeInNormalSale(POSEntry: Record "NPR POS Entry"): Integer
+    var
+        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
+    begin
+        POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntryPaymentLine.SetFilter(Amount, '<%1', 0);
+        exit(POSEntryPaymentLine.Count());
+    end;
 
-        JsonTextWriter.WriteStringProperty('iPaymentCnt', PaymentLineCount);
+    local procedure CreateReturnSalePaymentLinesDict(var POSEntryPaymentLineDict: Dictionary of [Code[10], Decimal]; POSEntry: Record "NPR POS Entry")
+    var
+        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
+    begin
+        POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntryPaymentLine.SetFilter(Amount, '<>%1', 0);
+        if POSEntryPaymentLine.FindSet() then
+            repeat
+                if not POSEntryPaymentLineDict.Add(POSEntryPaymentLine."POS Payment Method Code", POSEntryPaymentLine.Amount) then
+                    POSEntryPaymentLineDict.Set(POSEntryPaymentLine."POS Payment Method Code", POSEntryPaymentLineDict.Get(POSEntryPaymentLine."POS Payment Method Code") + POSEntryPaymentLine.Amount);
+            until POSEntryPaymentLine.Next() = 0;
     end;
 
     local procedure AddPaymentRoundingObj(var JsonTextWriter: Codeunit "Json Text Reader/Writer"; HULPOSAuditLogAux: Record "NPR HU L POS Audit Log Aux.")
@@ -631,6 +661,24 @@ codeunit 6248367 "NPR HU L Communication Mgt."
         JsonTextWriter.WriteEndObject();
     end;
 
+    local procedure AddPaymentChangeObj(var JsonTextWriter: Codeunit "Json Text Reader/Writer"; POSEntry: Record "NPR POS Entry")
+    var
+        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
+    begin
+        POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntryPaymentLine.SetFilter(Amount, '<%1', 0);
+        if POSEntryPaymentLine.FindSet() then
+            repeat
+                JsonTextWriter.WriteStartObject('');
+                JsonTextWriter.WriteStartObject('stPayment');
+                JsonTextWriter.WriteStringProperty('sName', POSEntryPaymentLine.Description);
+                JsonTextWriter.WriteStringProperty('fAmount', FormatDecimalValue(POSEntryPaymentLine.Amount));
+                JsonTextWriter.WriteStringProperty('iFiscalType', Enum::"NPR HU L Payment Fiscal Type"::CHANGE.AsInteger());
+                JsonTextWriter.WriteEndObject(); // stPayment
+                JsonTextWriter.WriteEndObject();
+            until POSEntryPaymentLine.Next() = 0;
+    end;
+
     local procedure AddPaymentLineInformation(var JsonTextWriter: Codeunit "Json Text Reader/Writer"; PaymentMethodCode: Code[10]; Amount: Decimal; ReturnSale: Boolean)
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
@@ -638,6 +686,7 @@ codeunit 6248367 "NPR HU L Communication Mgt."
     begin
         POSPaymentMethod.Get(PaymentMethodCode);
 
+        JsonTextWriter.WriteStartObject('');
         JsonTextWriter.WriteStartObject('stPayment');
         JsonTextWriter.WriteStringProperty('sName', POSPaymentMethod.Description);
 
@@ -646,22 +695,19 @@ codeunit 6248367 "NPR HU L Communication Mgt."
         else
             JsonTextWriter.WriteStringProperty('fAmount', FormatDecimalValue(Round(Amount, 1, '=')));
 
-        if (not ReturnSale) and (Amount < 0) then
-            JsonTextWriter.WriteStringProperty('iFiscalType', Enum::"NPR HU L Payment Fiscal Type"::CHANGE.AsInteger())
-        else begin
-            HULPOSPaymMethMapp.Get(PaymentMethodCode);
-            JsonTextWriter.WriteStringProperty('iFiscalType', HULPOSPaymMethMapp."Payment Fiscal Type".AsInteger());
-            if HULPOSPaymMethMapp."Payment Fiscal Type" = HULPOSPaymMethMapp."Payment Fiscal Type"::OTHER then
-                JsonTextWriter.WriteStringProperty('iFiscalSubType', HULPOSPaymMethMapp."Payment Fiscal Subtype".AsInteger());
-            if HULPOSPaymMethMapp."Payment Currency Type" <> HULPOSPaymMethMapp."Payment Currency Type"::"Ft." then
-                JsonTextWriter.WriteStringProperty('iType', HULPOSPaymMethMapp."Payment Currency Type".AsInteger());
-            if HULPOSPaymMethMapp."Payment Fiscal Type" = HULPOSPaymMethMapp."Payment Fiscal Type"::FOREIGN then
-                AddForeignCurrencyExchRate(JsonTextWriter, POSPaymentMethod."Currency Code");
-            if HULPOSPaymMethMapp."Payment Currency Type" = HULPOSPaymMethMapp."Payment Currency Type"::Foreign then
-                AddForeignCurrencyInformation(JsonTextWriter, POSPaymentMethod."Currency Code");
-        end;
+        HULPOSPaymMethMapp.Get(PaymentMethodCode);
+        JsonTextWriter.WriteStringProperty('iFiscalType', HULPOSPaymMethMapp."Payment Fiscal Type".AsInteger());
+        if HULPOSPaymMethMapp."Payment Fiscal Type" = HULPOSPaymMethMapp."Payment Fiscal Type"::OTHER then
+            JsonTextWriter.WriteStringProperty('iFiscalSubType', HULPOSPaymMethMapp."Payment Fiscal Subtype".AsInteger());
+        if HULPOSPaymMethMapp."Payment Currency Type" <> HULPOSPaymMethMapp."Payment Currency Type"::"Ft." then
+            JsonTextWriter.WriteStringProperty('iType', HULPOSPaymMethMapp."Payment Currency Type".AsInteger());
+        if HULPOSPaymMethMapp."Payment Fiscal Type" = HULPOSPaymMethMapp."Payment Fiscal Type"::FOREIGN then
+            AddForeignCurrencyExchRate(JsonTextWriter, POSPaymentMethod."Currency Code");
+        if HULPOSPaymMethMapp."Payment Currency Type" = HULPOSPaymMethMapp."Payment Currency Type"::Foreign then
+            AddForeignCurrencyInformation(JsonTextWriter, POSPaymentMethod."Currency Code");
 
         JsonTextWriter.WriteEndObject(); // stPayment
+        JsonTextWriter.WriteEndObject();
     end;
 
     internal procedure AddForeignCurrencyInformation(var JsonTextWriter: Codeunit "Json Text Reader/Writer"; CurrencyCode: Code[10])
@@ -729,9 +775,7 @@ codeunit 6248367 "NPR HU L Communication Mgt."
         JsonTextWriter.WriteStartArray('payments');
         if POSPaymentBinCheckp.FindSet() then
             repeat
-                JsonTextWriter.WriteStartObject('');
                 AddPaymentLineInformation(JsonTextWriter, POSPaymentBinCheckp."Payment Method No.", POSPaymentBinCheckp."Counted Amount Incl. Float", false);
-                JsonTextWriter.WriteEndObject();
             until POSPaymentBinCheckp.Next() = 0;
 
         JsonTextWriter.WriteEndArray(); // payments
