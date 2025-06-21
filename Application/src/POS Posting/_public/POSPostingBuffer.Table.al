@@ -262,11 +262,22 @@
             Caption = 'External Document No.';
             DataClassification = CustomerContent;
         }
+        field(9080; "Deferral Code"; Code[10])
+        {
+            Caption = 'Deferral Code';
+            TableRelation = "Deferral Template"."Deferral Code";
+            DataClassification = CustomerContent;
+        }
+        field(9090; "Deferral Line No."; Integer)
+        {
+            Caption = 'Deferral Line No.';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
     {
-        key(Key1; "Posting Date", "POS Entry No.", "Line Type", "Document No.", "Line No.", Type, "No.", "Gen. Bus. Posting Group", "Gen. Prod. Posting Group", "VAT Bus. Posting Group", "VAT Prod. Posting Group", "Currency Code", "POS Payment Bin Code", "Dimension Set ID", "Tax Area Code", "Applies-to Doc. No.")
+        key(Key1; "Posting Date", "POS Entry No.", "Line Type", "Document No.", "Line No.", Type, "No.", "Gen. Bus. Posting Group", "Gen. Prod. Posting Group", "VAT Bus. Posting Group", "VAT Prod. Posting Group", "Currency Code", "POS Payment Bin Code", "Dimension Set ID", "Tax Area Code", "Applies-to Doc. No.", "Deferral Line No.")
         {
         }
     }

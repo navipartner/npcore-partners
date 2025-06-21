@@ -213,7 +213,18 @@
                 ToolTip = 'Executes the Bundle References action';
                 ApplicationArea = NPRRetail;
             }
+            action("Show Deferral Schedule")
+            {
+                Caption = 'Show Deferral Schedule';
+                Image = ShowList;
+                ToolTip = 'Shows deferral schedule in a not editable mode.';
+                ApplicationArea = NPRRetail;
 
+                trigger OnAction()
+                begin
+                    Rec.ShowDeferrals();
+                end;
+            }
         }
     }
 

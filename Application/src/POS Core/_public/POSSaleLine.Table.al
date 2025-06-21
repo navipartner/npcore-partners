@@ -1867,6 +1867,12 @@
             Editable = false;
             DataClassification = CustomerContent;
         }
+        field(9080; "Deferral Code"; Code[10])
+        {
+            Caption = 'Deferral Code';
+            TableRelation = "Deferral Template"."Deferral Code";
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

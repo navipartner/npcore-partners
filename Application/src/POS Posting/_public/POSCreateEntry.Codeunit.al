@@ -371,6 +371,7 @@
         POSEntrySalesLine."NPRE Seating Code" := POSSaleLine."NPRE Seating Code";
         POSEntrySalesLine."Orig.POS Entry S.Line SystemId" := POSSaleLine."Orig.POS Entry S.Line SystemId";
         POSEntrySalesLine."Copy Description" := POSSaleLine."Copy Description";
+        POSEntrySalesLine."Deferral Code" := POSSaleLine."Deferral Code";
 
         CreateRMAEntry(POSEntry, POSSale, POSSaleLine);
         if POSSaleLine."Sales Document No." <> '' then

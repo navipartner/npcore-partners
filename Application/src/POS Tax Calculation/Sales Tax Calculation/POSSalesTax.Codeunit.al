@@ -348,6 +348,8 @@
                     POSPostingBuffer."POS Payment Bin Code" := '';
                     POSPostingBuffer."Dimension Set ID" := POSSalesLineToBeCompressed."Dimension Set ID";
                     POSPostingBuffer."Tax Area Code" := POSSalesLineToBeCompressed."Tax Area Code";
+                    POSPostingBuffer."Deferral Code" := POSSalesLineToBeCompressed."Deferral Code";
+                    POSPostingBuffer."Deferral Line No." := POSSalesLineToBeCompressed."Deferral Line No.";
 
                     POSPostingBuffer."Applies-to Doc. Type" := POSSalesLineToBeCompressed."Applies-to Doc. Type";
                     POSPostingBuffer."Applies-to Doc. No." := POSSalesLineToBeCompressed."Applies-to Doc. No.";

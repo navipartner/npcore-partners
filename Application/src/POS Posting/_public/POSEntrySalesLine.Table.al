@@ -655,6 +655,17 @@
             Caption = 'Shipment Fee';
             DataClassification = CustomerContent;
         }
+        field(9080; "Deferral Code"; Code[10])
+        {
+            Caption = 'Deferral Code';
+            TableRelation = "Deferral Template"."Deferral Code";
+            DataClassification = CustomerContent;
+        }
+        field(9090; "Deferral Line No."; Integer)
+        {
+            Caption = 'Deferral Line No.';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -731,5 +742,12 @@
     begin
         TestField("No.");
         Item.Get("No.");
+    end;
+
+    internal procedure ShowDeferrals()
+    var
+        DeferralUtilities: Codeunit "Deferral Utilities";
+    begin
+        DeferralUtilities.OpenLineScheduleView("Deferral Code", Enum::"Deferral Document Type"::"G/L".AsInteger(), '', '', Database::"NPR POS Entry Sales Line", Format("POS Entry No."), "Line No.");
     end;
 }
