@@ -27,6 +27,18 @@ page 6184826 "NPR HU L Fiscalization Setup"
                     end;
                 }
             }
+            group(FiscalSettings)
+            {
+                Caption = 'Fiscal Settings';
+                Visible = Rec."HU Laurel Fiscal Enabled";
+
+                field("HU Laurel Print EFT Information"; Rec."HU L Print EFT Information")
+                {
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Print EFT Information';
+                    ToolTip = 'Specifies whether the EFT information should be printed on the fiscal receipt at the end of sale if there is any EFT information.';
+                }
+            }
         }
     }
     trigger OnOpenPage()

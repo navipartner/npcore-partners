@@ -380,6 +380,8 @@ codeunit 6248367 "NPR HU L Communication Mgt."
 
         AddSalesTicketNoBarcode(JsonTextWriter, POSEntry);
 
+        AddEftReceiptInfo(JsonTextWriter, POSEntry);
+
         JsonTextWriter.WriteEndObject(); // data
         JsonTextWriter.WriteEndObject();
 
@@ -405,6 +407,8 @@ codeunit 6248367 "NPR HU L Communication Mgt."
         AddPOSEntryPaymentLines(JsonTextWriter, POSEntry, HULPOSAuditLogAux);
 
         AddSalesTicketNoBarcode(JsonTextWriter, POSEntry);
+
+        AddEftReceiptInfo(JsonTextWriter, POSEntry);
 
         JsonTextWriter.WriteEndObject(); // data
         JsonTextWriter.WriteEndObject();
@@ -744,6 +748,51 @@ codeunit 6248367 "NPR HU L Communication Mgt."
         JsonTextWriter.WriteEndObject(); // stBarcode
         JsonTextWriter.WriteEndObject();
         JsonTextWriter.WriteEndArray(); // barcodes
+    end;
+
+    local procedure AddEftReceiptInfo(var JsonTextWriter: Codeunit "Json Text Reader/Writer"; POSEntry: Record "NPR POS Entry")
+    var
+        HULFiscalizationSetup: Record "NPR HU L Fiscalization Setup";
+        EFTReceipt: Record "NPR EFT Receipt";
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        MaxCharactersAllowed: Integer;
+        EFTReceiptText: Text;
+        TextList: List of [Text];
+    begin
+        HULFiscalizationSetup.Get();
+        if not HULFiscalizationSetup."HU L Print EFT Information" then
+            exit;
+        MaxCharactersAllowed := 48; // Max length of a free print line in the printer
+        EFTTransactionRequest.SetRange("Sales Ticket No.", POSEntry."Document No.");
+        EFTTransactionRequest.SetRange(Successful, true);
+        if not EFTTransactionRequest.FindSet() then
+            exit;
+
+        EFTReceipt.SetCurrentKey("EFT Trans. Request Entry No.", "Receipt No.");
+        repeat
+            EFTReceipt.SetRange("EFT Trans. Request Entry No.", EFTTransactionRequest."Entry No.");
+            if EFTReceipt.FindSet() then
+                repeat
+                    EFTReceiptText := CopyStr(EFTReceipt.Text.Trim(), 1, MaxStrLen(EFTReceipt.Text));
+                    TextList.Add(CopyStr(EFTReceiptText, 1, MaxCharactersAllowed));
+
+                    if StrLen(EFTReceiptText) > MaxCharactersAllowed then begin
+                        TextList.Add(CopyStr(EFTReceiptText, MaxCharactersAllowed + 1, MaxStrLen(EFTReceiptText)));
+                    end;
+                until EFTReceipt.Next() = 0;
+        until EFTTransactionRequest.Next() = 0;
+
+        if TextList.Count() = 0 then
+            exit;
+
+        JsonTextWriter.WriteStringProperty('iTextCnt', TextList.Count());
+        JsonTextWriter.WriteStartArray('texts');
+
+        foreach EFTReceiptText in TextList do begin
+            AddFreePrintLine(JsonTextWriter, EFTReceiptText, 0, 0);
+        end;
+
+        JsonTextWriter.WriteEndArray(); // texts
     end;
 
     local procedure AddFreePrintLine(var JsonTextWriter: Codeunit "Json Text Reader/Writer"; PrintLineText: Text; Format: Integer; Alignment: Integer)

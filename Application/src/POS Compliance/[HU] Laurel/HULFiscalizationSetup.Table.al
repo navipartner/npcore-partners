@@ -18,6 +18,11 @@ table 6150922 "NPR HU L Fiscalization Setup"
             Caption = 'HU Laurel Fiscalization Enabled';
             DataClassification = CustomerContent;
         }
+        field(15; "HU L Print EFT Information"; Boolean)
+        {
+            Caption = 'HU Laurel Print EFT Information';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
