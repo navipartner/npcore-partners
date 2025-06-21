@@ -61,7 +61,6 @@ codeunit 6059817 "NPR BE Audit Mgt."
 
     local procedure CheckAreDataSetAndAccordingToCompliance(FrontEnd: Codeunit "NPR POS Front End Management")
     var
-        POSAuditProfile: Record "NPR POS Audit Profile";
         POSStore: Record "NPR POS Store";
         POSUnit: Record "NPR POS Unit";
         POSSession: Codeunit "NPR POS Session";
@@ -75,9 +74,6 @@ codeunit 6059817 "NPR BE Audit Mgt."
         POSSetup.GetPOSUnit(POSUnit);
         if not IsEnabled(POSUnit."POS Audit Profile") then
             exit;
-
-        POSUnit.GetProfile(POSAuditProfile);
-        POSAuditProfile.TestField("Do Not Print Receipt on Sale", false);
 
         if not Evaluate(DummyInteger, POSUnit."No.") then
             Error(CannotEvaluateErr, POSUnit."No.", POSUnit.FieldCaption("No."), POSUnit.TableCaption());
