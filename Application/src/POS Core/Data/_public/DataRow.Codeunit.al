@@ -6,7 +6,7 @@
         _position: JsonToken;
         _fields: JsonObject;
         _negative: JsonToken;
-        _class: JsonToken;
+        _globalClass: JsonToken;
         _style: JsonToken;
         _deleted: JsonToken;
 
@@ -56,14 +56,14 @@
     procedure Class(): Text;
     begin
         MakeSureIsConstructed();
-        exit(_class.AsValue().AsText());
+        exit(_globalClass.AsValue().AsText());
     end;
 
     procedure SetClass(NewClass: Text);
     begin
         MakeSureIsConstructed();
         _json.Replace(LabelClass, NewClass);
-        _json.Get(LabelClass, _class);
+        _json.Get(LabelClass, _globalClass);
     end;
 
     procedure Style(): Text;
@@ -169,7 +169,7 @@
         _json.Get(LabelNegative, _negative);
 
         _json.Add(LabelClass, '');
-        _json.Get(LabelClass, _class);
+        _json.Get(LabelClass, _globalClass);
 
         _json.Add(LabelStyle, '');
         _json.Get(LabelStyle, _style);
@@ -189,7 +189,7 @@
         _json := FromJson.Clone().AsObject();
         _json.Get(LabelPosition, _position);
         _json.Get(LabelNegative, _negative);
-        _json.Get(LabelClass, _class);
+        _json.Get(LabelClass, _globalClass);
         _json.Get(LabelStyle, _style);
         _json.Get(LabelDeleted, _deleted);
         _json.Get(LabelFields, Token);

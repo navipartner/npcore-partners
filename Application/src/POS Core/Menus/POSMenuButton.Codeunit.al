@@ -12,7 +12,7 @@
         _backgroundColor: Text;
         _color: Text;
         _iconClass: Text;
-        _class: Text;
+        _globalClass: Text;
         _row: Integer;
         _column: Integer;
         _enabledState: Enum "NPR Button Enabled State";
@@ -84,12 +84,12 @@
 
     procedure Class(): Text;
     begin
-        exit(_class);
+        exit(_globalClass);
     end;
 
     procedure SetClass(NewClass: Text);
     begin
-        _class := NewClass;
+        _globalClass := NewClass;
     end;
 
     procedure Row(): Integer;
@@ -142,7 +142,7 @@
         Json.Add('BackgroundColor', _backgroundColor);
         Json.Add('Color', _color);
         Json.Add('IconClass', _iconClass);
-        Json.Add('Class', _class);
+        Json.Add('Class', _globalClass);
         Json.Add('Row', _row);
         Json.Add('Column', _column);
         Json.Add('Enabled', _enabledState.AsInteger());

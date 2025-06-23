@@ -6,7 +6,7 @@
         _id: Text;
         _caption: Text;
         _tooltip: Text;
-        _class: Text;
+        _globalClass: Text;
         _menuButtons: JsonArray;
 
     procedure Id(): Text;
@@ -41,12 +41,12 @@
 
     procedure Class(): Text;
     begin
-        exit(_class);
+        exit(_globalClass);
     end;
 
     procedure SetClass(NewClass: Text);
     begin
-        _class := NewClass;
+        _globalClass := NewClass;
     end;
 
     procedure AddMenuButton(MenuButton: Codeunit "NPR POS Menu Button");
@@ -59,7 +59,7 @@
         Json.Add('Id', _id);
         Json.Add('Caption', _caption);
         Json.Add('Tooltip', _tooltip);
-        Json.Add('Class', _class);
+        Json.Add('Class', _globalClass);
         Json.Add('MenuButtons', _menuButtons);
     end;
 }
