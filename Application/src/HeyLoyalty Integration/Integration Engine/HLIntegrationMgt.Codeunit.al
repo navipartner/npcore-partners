@@ -473,6 +473,12 @@ codeunit 6059993 "NPR HL Integration Mgt."
         exit(_HLSetup."Send Heybooking Err. to E-Mail");
     end;
 
+    procedure SendHeybookingFireEventsTrigger(): Boolean
+    begin
+        _HLSetup.GetRecordOnce(false);
+        exit(_HLSetup."Send Heybooking Fire Events");
+    end;
+
     procedure DataProcessingHandlerID(AutoCreate: Boolean): Code[20]
     begin
         if not AutoCreate then

@@ -129,6 +129,12 @@ page 6150720 "NPR HL Integration Setup"
                         Enabled = HeybookingIntegrationIsEnabled;
                         ToolTip = 'Specifies the email address notifications are sent to in case of errors while importing data to HeyLoyalty Heycommerce/Booking database.';
                     }
+                    field("Send Heybooking Fire Events"; Rec."Send Heybooking Fire Events")
+                    {
+                        ApplicationArea = NPRHeyLoyalty;
+                        Enabled = HeybookingIntegrationIsEnabled;
+                        ToolTip = 'By enabeling this option, the system will send Heybooking fire_events trigger to HeyLoyalty. This is used to trigger events in HeyLoyalty when a booking is made or modified.';
+                    }
                 }
             }
             group(Connection)

@@ -319,6 +319,14 @@ codeunit 6151489 "NPR HL Heybooking Send Ticket"
         ContentString.AppendLine();
         ContentString.AppendLine('update');
 
+        //fire_events
+        if HLIntegrationMgt.SendHeybookingFireEventsTrigger() then begin
+            ContentString.AppendLine('--' + NcTask."Record Value");
+            ContentString.AppendLine(StrSubstNo(ContentDispositionLbl, 'fire_events'));
+            ContentString.AppendLine();
+            ContentString.AppendLine('true');
+        end;
+
         //fields
         foreach FieldName in CSVFieldList do begin
             ContentString.AppendLine('--' + NcTask."Record Value");

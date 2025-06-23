@@ -150,6 +150,11 @@ table 6059800 "NPR HL Integration Setup"
                     MailManagement.CheckValidEmailAddresses("Send Heybooking Err. to E-Mail");
             end;
         }
+        field(135; "Send Heybooking Fire Events"; Boolean)
+        {
+            Caption = 'Send Heybooking Fire Events';
+            DataClassification = CustomerContent;
+        }
         field(140; "Data Processing Handler ID"; Code[20])
         {
             Caption = 'Data Processing Handler ID';
