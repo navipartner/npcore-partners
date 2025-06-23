@@ -2,6 +2,9 @@
 codeunit 6185114 "NPR LoyaltyAPI" implements "NPR API Request Handler"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-06-13';
+    ObsoleteReason = 'This API is being phased out';
 
     var
         _ApiFunction: Enum "NPR LoyaltyApiFunctions";

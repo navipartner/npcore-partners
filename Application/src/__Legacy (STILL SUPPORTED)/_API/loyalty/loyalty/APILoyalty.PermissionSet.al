@@ -5,5 +5,8 @@ permissionset 6014428 "NPR API Loyalty"
     Assignable = true;
     Caption = 'NPR API - Loyalty';
     IncludedPermissionSets = "NPR API Core";
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-06-13';
+    ObsoleteReason = 'This API is being phased out';
 }
 #endif

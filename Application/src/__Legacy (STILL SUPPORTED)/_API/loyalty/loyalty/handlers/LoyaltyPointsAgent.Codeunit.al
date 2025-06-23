@@ -2,6 +2,9 @@
 codeunit 6248430 "NPR LoyaltyPointsAgent"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-06-13';
+    ObsoleteReason = 'This API is being phased out';
 
     var
         HelperFunctions: Codeunit "NPR Loyalty Helper Functions";

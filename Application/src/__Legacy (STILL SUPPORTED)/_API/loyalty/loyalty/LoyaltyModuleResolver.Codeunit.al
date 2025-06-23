@@ -2,6 +2,9 @@
 codeunit 6248429 "NPR LoyaltyModuleResolver" implements "NPR API Module Resolver"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-06-13';
+    ObsoleteReason = 'This API is being phased out';
 
     procedure Resolve(var Request: Codeunit "NPR API Request"): Interface "NPR API Request Handler"
     var

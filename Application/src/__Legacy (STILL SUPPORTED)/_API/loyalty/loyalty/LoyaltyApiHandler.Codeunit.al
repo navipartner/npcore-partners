@@ -2,6 +2,9 @@
 codeunit 6248428 "NPR LoyaltyApiHandler"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-06-13';
+    ObsoleteReason = 'This API is being phased out';
 
     var
         _Response: Codeunit "NPR API Response";

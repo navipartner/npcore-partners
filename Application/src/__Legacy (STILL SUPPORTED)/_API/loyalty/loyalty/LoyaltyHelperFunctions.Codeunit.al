@@ -2,6 +2,9 @@
 codeunit 6248450 "NPR Loyalty Helper Functions"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-06-13';
+    ObsoleteReason = 'This API is being phased out';
 
     var
         Temp_LoyaltySetup: Record "NPR MM Loyalty Setup" temporary;

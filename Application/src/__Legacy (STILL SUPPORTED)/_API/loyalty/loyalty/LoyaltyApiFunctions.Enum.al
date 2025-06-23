@@ -3,6 +3,10 @@ enum 6059894 "NPR LoyaltyApiFunctions"
 {
     Extensible = false;
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-06-13';
+    ObsoleteReason = 'This API is being phased out';
+
     value(0; NOOP)
     {
         Caption = 'No operation';

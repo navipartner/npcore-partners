@@ -2,6 +2,9 @@
 codeunit 6248431 "NPR LoyaltyCouponAgent"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-06-13';
+    ObsoleteReason = 'This API is being phased out';
 
     trigger OnRun()
     begin
