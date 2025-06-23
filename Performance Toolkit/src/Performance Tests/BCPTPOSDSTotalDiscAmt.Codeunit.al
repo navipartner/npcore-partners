@@ -31,6 +31,10 @@ codeunit 88008 "NPR BCPT POS DS Total Disc Amt" implements "BCPT Test Param. Pro
 
     local procedure InitTest();
     var
+#if not (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+        MayProduceGaps: Boolean;
+#endif
         NoSeriesLine: Record "No. Series Line";
         POSAuditProfile: Record "NPR POS Audit Profile";
         POSUnit: Record "NPR POS Unit";
@@ -61,8 +65,17 @@ codeunit 88008 "NPR BCPT POS DS Total Disc Amt" implements "BCPT Test Param. Pro
         NoSeriesLine.SetRange("Series Code", POSAuditProfile."Sale Fiscal No. Series");
         NoSeriesLine.FindSet(true);
         repeat
+#if not (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            MayProduceGaps := NoSeriesManagement.MayProduceGaps(NoSeriesLine);
+            if AllowGapsInSaleFiscalNoSeries <> MayProduceGaps then begin
+                if MayProduceGaps then
+                    NoSeriesLine.Validate(Implementation, NoSeriesLine.Implementation::Sequence)
+                else
+                    NoSeriesLine.Validate(Implementation, NoSeriesLine.Implementation::Normal);
+#else
             if AllowGapsInSaleFiscalNoSeries <> NoSeriesLine."Allow Gaps in Nos." then begin
                 NoSeriesLine.Validate("Allow Gaps in Nos.", AllowGapsInSaleFiscalNoSeries);
+#endif
                 NoSeriesLine.Modify(true);
             end;
         until NoSeriesLine.Next() = 0;

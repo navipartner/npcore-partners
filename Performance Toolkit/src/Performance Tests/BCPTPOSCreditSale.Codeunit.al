@@ -33,6 +33,10 @@ codeunit 88002 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
     var
         SalesSetup: Record "Sales & Receivables Setup";
         Salesperson: Record "Salesperson/Purchaser";
+#if not (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesManagement: Codeunit "No. Series";
+        MayProduceGaps: Boolean;
+#endif
         NoSeriesLine: Record "No. Series Line";
         POSUnit: Record "NPR POS Unit";
         POSAuditProfile: Record "NPR POS Audit Profile";
@@ -62,8 +66,17 @@ codeunit 88002 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
         NoSeriesLine.SetRange("Series Code", POSAuditProfile."Sale Fiscal No. Series");
         NoSeriesLine.FindSet(true);
         repeat
+#if not (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            MayProduceGaps := NoSeriesManagement.MayProduceGaps(NoSeriesLine);
+            if AllowGapsInSaleFiscalNoSeries <> MayProduceGaps then begin
+                if MayProduceGaps then
+                    NoSeriesLine.Validate(Implementation, NoSeriesLine.Implementation::Sequence)
+                else
+                    NoSeriesLine.Validate(Implementation, NoSeriesLine.Implementation::Normal);
+#else
             if AllowGapsInSaleFiscalNoSeries <> NoSeriesLine."Allow Gaps in Nos." then begin
                 NoSeriesLine.Validate("Allow Gaps in Nos.", AllowGapsInSaleFiscalNoSeries);
+#endif
                 NoSeriesLine.Modify(true);
             end;
         until NoSeriesLine.Next() = 0;
@@ -75,7 +88,11 @@ codeunit 88002 "NPR BCPT POS Credit Sale" implements "BCPT Test Param. Provider"
         repeat
             if NoSeriesLine."Ending No." <> '' then begin
                 NoSeriesLine."Ending No." := '';
+#if not (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+                NoSeriesLine.Validate(Implementation, NoSeriesLine.Implementation::Sequence);
+#else
                 NoSeriesLine.Validate("Allow Gaps in Nos.", true);
+#endif
                 NoSeriesLine.Modify(true);
             end;
         until NoSeriesLine.Next() = 0;
