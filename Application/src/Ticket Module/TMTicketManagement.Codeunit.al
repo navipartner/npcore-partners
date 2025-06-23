@@ -358,15 +358,35 @@
             Ticket2.SetFilter("No.", '=%1', Ticket."No.");
             Ticket2.Get(Ticket."No.");
             if (PrintSingleTicket(Ticket2)) then begin
-                Ticket2.Get(Ticket."No.");
-                Ticket2."Printed Date" := Today();
-                Ticket2.PrintCount += 1;
-                Ticket2.PrintedDateTime := CurrentDateTime();
-                Ticket2.Modify();
+                IncrementPrintCount(Ticket."No.");
                 Commit();
             end
         end;
 
+    end;
+
+    internal procedure IncrementPrintCount(TicketNo: Code[20])
+    var
+        Ticket: Record "NPR TM Ticket";
+    begin
+        if (Ticket.Get(TicketNo)) then begin
+            Ticket."Printed Date" := Today();
+            Ticket.PrintCount += 1;
+            Ticket.PrintedDateTime := CurrentDateTime();
+            Ticket.Modify();
+        end;
+    end;
+
+    internal procedure IncrementPrintCount(TicketId: Guid)
+    var
+        Ticket: Record "NPR TM Ticket";
+    begin
+        if (Ticket.GetBySystemId(TicketId)) then begin
+            Ticket."Printed Date" := Today();
+            Ticket.PrintCount += 1;
+            Ticket.PrintedDateTime := CurrentDateTime();
+            Ticket.Modify();
+        end;
     end;
 
     local procedure PrintTicketUsingFormatter(var Ticket: Record "NPR TM Ticket"; PrintObjectType: Option; PrintObjectId: Integer; PrintTemplateCode: Code[20]): Boolean

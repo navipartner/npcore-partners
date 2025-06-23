@@ -8,6 +8,12 @@ codeunit 6185061 "NPR AttractionWalletFacade"
         Wallet.PrintWallets(WalletEntryNoList, PrintContext);
     end;
 
+    procedure IncrementPrintCount(WalletEntryNo: Integer)
+    var
+        Wallet: Codeunit "NPR AttractionWallet";
+    begin
+        Wallet.IncrementPrintCount(WalletEntryNo);
+    end;
 
     // This event allows PTE to control the printing of the wallet - set Handled to true to prevent the wallet from being printed by the standard code
     [IntegrationEvent(false, false)]

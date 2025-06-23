@@ -827,17 +827,22 @@ codeunit 6185062 "NPR AttractionWallet"
     local procedure PrintWalletsWorker(WalletEntryNoList: List of [Integer]; PrintHandled: Boolean; PrintContext: Enum "NPR WalletPrintType")
     var
         EntryNo: Integer;
-        Wallet: Record "NPR AttractionWallet";
     begin
         foreach EntryNo in WalletEntryNoList do begin
             if (not PrintHandled) then
                 PrintWalletWorker(EntryNo, PrintContext);
+            IncrementPrintCount(EntryNo);
+        end;
+    end;
 
-            if (Wallet.Get(EntryNo)) then begin
-                Wallet.PrintCount += 1;
-                Wallet.LastPrintAt := CurrentDateTime;
-                Wallet.Modify();
-            end;
+    internal procedure IncrementPrintCount(WalletEntryNo: Integer)
+    var
+        Wallet: Record "NPR AttractionWallet";
+    begin
+        if (Wallet.Get(WalletEntryNo)) then begin
+            Wallet.PrintCount += 1;
+            Wallet.LastPrintAt := CurrentDateTime;
+            Wallet.Modify();
         end;
     end;
 

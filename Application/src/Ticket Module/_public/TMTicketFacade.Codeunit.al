@@ -13,4 +13,18 @@ codeunit 6248436 "NPR TM Ticket Facade"
     begin
         NotifyParticipant.SetTicketHolderInfo(TicketHolder);
     end;
+
+    procedure IncrementPrintCount(TicketId: Guid)
+    var
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+    begin
+        TicketManagement.IncrementPrintCount(TicketId);
+    end;
+
+    procedure IncrementPrintCount(TicketNo: Code[20])
+    var
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+    begin
+        TicketManagement.IncrementPrintCount(TicketNo);
+    end;
 }
