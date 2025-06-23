@@ -137,7 +137,11 @@ codeunit 85225 "NPR Library HU L Fiscal"
         NoSeriesLine.SetRange("Series Code", NoSeriesCode);
         NoSeriesLine.SetRange(Open, true);
         NoSeriesLine.FindLast();
+#if not (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        NoSeriesLine.Validate(Implementation, NoSeriesLine.Implementation::Sequence);
+#else
         NoSeriesLine.Validate("Allow Gaps in Nos.", true);
+#endif
         NoSeriesLine.Modify();
     end;
     #endregion Helper Procedures
