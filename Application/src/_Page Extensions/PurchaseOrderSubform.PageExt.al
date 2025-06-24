@@ -136,17 +136,17 @@ pageextension 6014457 "NPR Purchase Order Subform" extends "Purchase Order Subfo
                 end;
             }
         }
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
 
         addafter(OrderTracking)
         {
             action("NPR Nonstockitems")
             {
                 AccessByPermission = TableData "Nonstock Item" = R;
-                Caption = 'Nonstoc&k Items';
-                Image = NonStockItem;
-
-                ToolTip = 'View the list of non stock items.';
+                Caption = 'Nonstock Items';
                 ApplicationArea = NPRRetail;
+                Image = NonStockItem;
+                ToolTip = 'View the list of catalog items that exist in the system.';
 
                 trigger OnAction()
                 var
@@ -156,6 +156,7 @@ pageextension 6014457 "NPR Purchase Order Subform" extends "Purchase Order Subfo
                 end;
             }
         }
+#endif
     }
 
     trigger OnAfterGetRecord()

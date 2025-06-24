@@ -1,75 +1,69 @@
-﻿codeunit 6060064 "NPR Nonstock Purchase Mgt."
+﻿#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+codeunit 6060064 "NPR Nonstock Purchase Mgt."
 {
     Access = Internal;
-
-    var
-        ItemUnitofMeasure: Record "Item Unit of Measure";
-        UnitofMeasure: Record "Unit of Measure";
-        ItemVend: Record "Item Vendor";
-        NewItem: Record Item;
-        NonStock: Record "Nonstock Item";
-        Text002: Label 'You cannot enter a nonstock item on %1.';
-        Text003: Label 'Creating item card for nonstock item\';
-        Text004: Label 'Manufacturer Code    #1####\';
-        Text005: Label 'Vendor               #2##################\';
-        Text006: Label 'Vendor Item          #3##################\';
-        Text007: Label 'Item No.             #4##################';
-        ProgWindow: Dialog;
-
 
     procedure ShowNonstock(var PurchaseLine: Record "Purchase Line"; ItemRef: Code[50])
     var
         NonstockItem: Record "Nonstock Item";
+        SelectNonstockItemErr: Label 'You can only select a catalog item for an empty line.';
         Execute: Boolean;
     begin
         PurchaseLine.TestField(Type, PurchaseLine.Type::Item);
-        PurchaseLine.TestField("No.", '');
+        if PurchaseLine."No." <> '' then
+            Error(SelectNonstockItemErr);
 
-        if ItemRef = '' then begin
-            if PAGE.RunModal(PAGE::"Catalog Item List", NonstockItem) = ACTION::LookupOK then
-                Execute := true;
-        end else begin
-            NonstockItem.SetRange("Vendor Item No.", ItemRef);
-            if not NonstockItem.FindFirst() then begin
-                NonstockItem.SetRange("Vendor Item No.");
-                if StrLen(ItemRef) <= MaxStrLen(NonstockItem."Bar Code") then begin
-                    NonstockItem.SetRange("Bar Code", ItemRef);
-                    if not NonstockItem.FindFirst() then
-                        exit;
-                end
-                else
-                    exit;
+        if ItemRef <> '' then
+            Execute := FindNonstockItemReference(NonstockItem, ItemRef)
+        else
+            Execute := Page.RunModal(Page::"Catalog Item List", NonstockItem) = Action::LookupOK;
 
-            end;
-            Execute := true;
-        end;
         if Execute then begin
-#if BC17
-            NonstockItem.TestField("Item Template Code");
-#else
-            NonstockItem.TestField("Item Templ. Code");
-#endif               
+            CheckNonstockItemTemplate(NonstockItem);
             PurchaseLine."No." := NonstockItem."Entry No.";
+
             NonStockPurchase(PurchaseLine);
             PurchaseLine.Validate("No.", PurchaseLine."No.");
+
             PurchaseLine."Item Reference Type" := "Item Reference Type"::"Bar Code";
             PurchaseLine."Item Reference No." := NonstockItem."Bar Code";
         end;
     end;
 
-    procedure NonStockPurchase(var PurchaseLine2: Record "Purchase Line")
-    var
-        InvtSetup: Record "Inventory Setup";
-#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
-        NoSeriesMgt: Codeunit "No. Series";
-#ELSE
-        NoSeriesMgt: Codeunit NoSeriesManagement;
-#ENDIF
+    local procedure FindNonstockItemReference(var NonstockItem: Record "Nonstock Item"; ItemRef: Code[50]): Boolean
     begin
-        if (PurchaseLine2."Document Type" in
-            [PurchaseLine2."Document Type"::"Return Order", PurchaseLine2."Document Type"::"Credit Memo"])
-        then
-            Error(Text002, PurchaseLine2."Document Type");
+        NonstockItem.SetRange("Vendor Item No.", ItemRef);
+        if NonstockItem.FindFirst() then
+            exit(true);
+
+        NonstockItem.SetRange("Vendor Item No.");
+        if StrLen(ItemRef) <= MaxStrLen(NonstockItem."Bar Code") then begin
+            NonstockItem.SetRange("Bar Code", ItemRef);
+            exit(NonstockItem.FindFirst());
+        end;
+
+        exit(false);
+    end;
+
+    local procedure CheckNonstockItemTemplate(NonstockItem: Record "Nonstock Item")
+    var
+        ItemTempl: Record "Item Templ.";
+    begin
+        ItemTempl.Get(NonstockItem."Item Templ. Code");
+        ItemTempl.TestField("Gen. Prod. Posting Group");
+        if ItemTempl.Type = ItemTempl.Type::Inventory then
+            ItemTempl.TestField("Inventory Posting Group");
+    end;
+
+    local procedure NonStockPurchase(var PurchaseLine2: Record "Purchase Line")
+    var
+        NonStock: Record "Nonstock Item";
+        NewItem: Record Item;
+        CatalogItemMgt: Codeunit "Catalog Item Management";
+        InvalidDocTypeErr: Label 'You cannot enter a nonstock item on %1.';
+    begin
+        if PurchaseLine2.IsCreditDocType() then
+            Error(InvalidDocTypeErr, PurchaseLine2."Document Type");
 
         NonStock.Get(PurchaseLine2."No.");
         if NonStock."Item No." <> '' then begin
@@ -77,136 +71,27 @@
             exit;
         end;
 
-        if not UnitofMeasure.Get(NonStock."Unit of Measure") then begin
-            UnitofMeasure.Code := NonStock."Unit of Measure";
-            UnitofMeasure.Insert();
-        end;
-
-        NewItem.SetRange("Vendor Item No.", NonStock."Vendor Item No.");
-        if NewItem.FindFirst() then begin
-            NonStock."Item No." := NewItem."No.";
-            NonStock.Modify();
-            PurchaseLine2."No." := NewItem."No.";
-            exit;
-        end;
-        ProgWindow.Open(Text003 +
-          Text004 +
-          Text005 +
-          Text006 +
-          Text007);
-        ProgWindow.Update(1, NonStock."Manufacturer Code");
-        ProgWindow.Update(2, NonStock."Vendor No.");
-        ProgWindow.Update(3, NonStock."Vendor Item No.");
-        ProgWindow.Update(4, PurchaseLine2."No.");
-        InvtSetup.Get();
-        InvtSetup.TestField("Item Nos.");
-#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
-        NewItem."No. Series" := InvtSetup."Item Nos.";
-        NewItem."No." := NoSeriesMgt.GetNextNo(NewItem."No. Series");
-#ELSE
-        NoSeriesMgt.InitSeries(InvtSetup."Item Nos.", NewItem."No. Series", 0D, NewItem."No.", NewItem."No. Series");
-#ENDIF
-        NewItem.Description := NonStock.Description;
-        NewItem.Validate(Description, NewItem.Description);
-        if not ItemUnitofMeasure.Get(NewItem."No.", NonStock."Unit of Measure") then begin
-            ItemUnitofMeasure."Item No." := NewItem."No.";
-            ItemUnitofMeasure.Code := NonStock."Unit of Measure";
-            ItemUnitofMeasure."Qty. per Unit of Measure" := 1;
-            ItemUnitofMeasure.Insert();
-        end;
-        NewItem.Validate("Base Unit of Measure", NonStock."Unit of Measure");
-        NewItem."Unit Price" := NonStock."Unit Price";
-        if NonStock."Negotiated Cost" <> 0 then
-            NewItem."Last Direct Cost" := NonStock."Negotiated Cost"
-        else
-            NewItem."Last Direct Cost" := NonStock."Published Cost";
-        NewItem."Automatic Ext. Texts" := false;
-        if NewItem."Costing Method" = NewItem."Costing Method"::Standard then
-            NewItem."Standard Cost" := NonStock."Negotiated Cost";
-        NewItem."Vendor No." := NonStock."Vendor No.";
-        NewItem."Vendor Item No." := NonStock."Vendor Item No.";
-        NewItem."Net Weight" := NonStock."Net Weight";
-        NewItem."Gross Weight" := NonStock."Gross Weight";
-        NewItem."Manufacturer Code" := NonStock."Manufacturer Code";
-#if BC17
-        NewItem."Item Category Code" := NonStock."Item Template Code";
-#else
-        NewItem."Item Category Code" := NonStock."Item Templ. Code";
-#endif        
-        NewItem."Created From Nonstock Item" := true;
-        NewItem."Unit Price" := NonStock."Unit Price";
-        NewItem.Insert();
-
-        PurchaseLine2."No." := NewItem."No.";
-
-        NonStock."Item No." := NewItem."No.";
+        CatalogItemMgt.DetermineItemNoAndItemNoSeries(NonStock);
         NonStock.Modify();
+        PurchaseLine2."No." := NonStock."Item No.";
+        CatalogItemMgt.InsertItemUnitOfMeasure(NonStock."Unit of Measure", PurchaseLine2."No.");
 
-        if CheckLicensePermission(DATABASE::"Item Vendor") then
-            NonstockItemVend(NonStock);
-        if CheckLicensePermission(DATABASE::"Item Reference") then
-            NonstockItemRef(NonStock);
-
-        ProgWindow.Close();
-
-    end;
-
-    local procedure CheckLicensePermission(TableID: Integer): Boolean
-    var
-        LicensePermission: Record "License Permission";
-    begin
-        LicensePermission.SetRange("Object Type", LicensePermission."Object Type"::TableData);
-        LicensePermission.SetRange("Object Number", TableID);
-        LicensePermission.SetFilter("Insert Permission", '<>%1', LicensePermission."Insert Permission"::" ");
-        exit(LicensePermission.FindFirst());
-    end;
-
-    local procedure NonstockItemVend(NonStock2: Record "Nonstock Item")
-    begin
-        ItemVend.SetRange("Item No.", NonStock2."Item No.");
-        ItemVend.SetRange("Vendor No.", NonStock2."Vendor No.");
-        if ItemVend.FindFirst() then
+        NewItem.SetRange("No.", PurchaseLine2."No.");
+        if NewItem.FindFirst() then
             exit;
 
-        ItemVend."Item No." := NonStock2."Item No.";
-        ItemVend."Vendor No." := NonStock2."Vendor No.";
-        ItemVend."Vendor Item No." := NonStock2."Vendor Item No.";
-        ItemVend.Insert(true);
-    end;
+        if GuiAllowed() then
+            CatalogItemMgt.OpenProgressDialog(NonStock, PurchaseLine2."No.");
 
-    local procedure NonstockItemRef(var NonStock2: Record "Nonstock Item")
-    var
-        ItemReference: Record "Item Reference";
-    begin
-        ItemReference.SetRange("Item No.", NonStock2."Item No.");
-        ItemReference.SetRange("Unit of Measure", NonStock2."Unit of Measure");
-        ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::Vendor);
-        ItemReference.SetRange("Reference Type No.", NonStock2."Vendor No.");
-        ItemReference.SetRange("Reference No.", NonStock2."Vendor Item No.");
-        if not ItemReference.FindFirst() then begin
-            ItemReference.Init();
-            ItemReference.Validate("Item No.", NonStock2."Item No.");
-            ItemReference.Validate("Unit of Measure", NonStock2."Unit of Measure");
-            ItemReference.Validate("Reference Type", ItemReference."Reference Type"::Vendor);
-            ItemReference.Validate("Reference Type No.", NonStock2."Vendor No.");
-            ItemReference.Validate("Reference No.", NonStock2."Vendor Item No.");
-            ItemReference.Insert();
-        end;
-        if NonStock2."Bar Code" <> '' then begin
-            ItemReference.Reset();
-            ItemReference.SetRange("Item No.", NonStock2."Item No.");
-            ItemReference.SetRange("Unit of Measure", NonStock2."Unit of Measure");
-            ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
-            ItemReference.SetRange("Reference No.", NonStock2."Bar Code");
-            if not ItemReference.FindFirst() then begin
-                ItemReference.Init();
-                ItemReference.Validate("Item No.", NonStock2."Item No.");
-                ItemReference.Validate("Unit of Measure", NonStock2."Unit of Measure");
-                ItemReference.Validate("Reference Type", ItemReference."Reference Type"::"Bar Code");
-                ItemReference.Validate("Reference No.", NonStock2."Bar Code");
-                ItemReference.Insert();
-            end;
-        end;
+        CatalogItemMgt.CreateNewItem(NonStock);
+
+        if CatalogItemMgt.CheckLicensePermission(Database::"Item Vendor") then
+            CatalogItemMgt.NonstockItemVend(NonStock);
+        if CatalogItemMgt.CheckLicensePermission(Database::"Item Reference") then
+            CatalogItemMgt.NonstockItemReference(NonStock);
+
+        if GuiAllowed() then
+            CatalogItemMgt.CloseProgressDialog();
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Purchase Line", 'OnBeforeValidateEvent', 'Item Reference No.', false, false)]
@@ -230,4 +115,4 @@
         end;
     end;
 }
-
+#endif
