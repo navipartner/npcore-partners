@@ -240,6 +240,7 @@
 
                     POSPaymentLine.Reset();
                     POSPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+                    POSPaymentLine.SetFilter(Amount, '<>0');
                     if POSPaymentLine.FindSet() then
                         repeat
                             POSPaymentLineToPost := POSPaymentLine;
