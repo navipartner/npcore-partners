@@ -1962,5 +1962,41 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         _InventoryIntegrIsEnabled := _SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels", ShopifyStoreCode);
         _ItemPriceIntegrIsEnabled := _SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Item Prices", ShopifyStoreCode);
     end;
+
+#if BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Task Mgt.", 'RunSourceCardEvent', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Task Mgt.", RunSourceCardEvent, '', false, false)]
+#endif
+    local procedure OpenRelatedPage(var RecRef: RecordRef; var RunCardExecuted: Boolean)
+    var
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+    begin
+        if RunCardExecuted or (RecRef.Number() <> Database::"NPR Spfy Store-Item Link") then
+            exit;
+        RunCardExecuted := true;
+
+        RecRef.SetTable(SpfyStoreItemLink);
+        case SpfyStoreItemLink.Type of
+            SpfyStoreItemLink.Type::Item:
+                begin
+                    Item.Get(SpfyStoreItemLink."Item No.");
+                    Item.SetRecFilter();
+                    Page.Run(Page::"Item Card", Item);
+                end;
+            SpfyStoreItemLink.Type::Variant:
+                begin
+                    ItemVariant.Get(SpfyStoreItemLink."Item No.", SpfyStoreItemLink."Variant Code");
+                    ItemVariant.SetRecFilter();
+#if BC18 or BC19 or BC20 or BC21 or BC22
+                    Page.Run(Page::"Item Variants", ItemVariant);
+#else
+                    Page.Run(Page::"Item Variant Card", ItemVariant);
+#endif
+                end;
+        end;
+    end;
 }
 #endif

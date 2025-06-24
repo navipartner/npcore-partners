@@ -536,6 +536,9 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
             TempItemAttributeValueSelection."Inherited-From Table ID" := Database::Item;
             TempItemAttributeValueSelection."Inherited-From Key Value" := ItemNo;
 
+#if not (BC18 or BC19 or BC20 or BC21)
+            ItemAttributeValue.ReadIsolation := IsolationLevel::ReadUncommitted;
+#endif
             case ItemAttribute.Type of
                 ItemAttribute.Type::Date:
                     if Evaluate(DateValue, NewAttributeValueTxt, 9) then begin
@@ -562,14 +565,21 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
                     end else
                         NewAttributeValueTxt := '';
                 else begin
+#if not (BC18 or BC19 or BC20 or BC21)
+                    ItemAttrValueTranslation.ReadIsolation := IsolationLevel::ReadUncommitted;
+#endif
                     ItemAttrValueTranslation.SetRange("Attribute ID", ItemAttribute.ID);
                     ItemAttrValueTranslation.SetRange("Language Code", LanguageCode);
-                    ItemAttrValueTranslation.SetFilter(Name, StrSubstNo('@%1', NewAttributeValueTxt));
+                    ItemAttrValueTranslation.SetFilter(Name, StrSubstNo('%1', NewAttributeValueTxt));
+                    if ItemAttrValueTranslation.IsEmpty() then
+                        ItemAttrValueTranslation.SetFilter(Name, StrSubstNo('@%1', NewAttributeValueTxt));
                     if ItemAttrValueTranslation.FindFirst() then
                         ItemAttribValueFound := ItemAttributeValue.Get(ItemAttrValueTranslation."Attribute ID", ItemAttrValueTranslation.ID)
                     else begin
                         ItemAttributeValue.SetRange("Attribute ID", ItemAttribute.ID);
-                        ItemAttributeValue.SetFilter(Value, StrSubstNo('@%1', NewAttributeValueTxt));
+                        ItemAttributeValue.SetFilter(Value, StrSubstNo('%1', NewAttributeValueTxt));
+                        if ItemAttributeValue.IsEmpty() then
+                            ItemAttributeValue.SetFilter(Value, StrSubstNo('@%1', NewAttributeValueTxt));
                         ItemAttribValueFound := ItemAttributeValue.FindFirst();
                     end;
                 end;

@@ -617,9 +617,13 @@
         RunCardExecuted: Boolean;
         Position: Text;
     begin
-        RecRef.Open(NaviConnectTask."Table No.");
-        Position := GetRecordPosition(NaviConnectTask);
-        RecRef.SetPosition(Position);
+        if Format(NaviConnectTask."Record ID") <> '' then
+            RecRef := NaviConnectTask."Record ID".GetRecord()
+        else begin
+            RecRef.Open(NaviConnectTask."Table No.");
+            Position := GetRecordPosition(NaviConnectTask);
+            RecRef.SetPosition(Position);
+        end;
         RecRef.SetRecFilter();
 
         RunSourceCardEvent(RecRef, RunCardExecuted);
