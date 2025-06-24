@@ -776,8 +776,16 @@ codeunit 6151546 "NPR SI Audit Mgt."
     var
         StartPosition: Integer;
         CertificateSubject: Text;
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        PasswordSecretText: SecretText;
+#ENDIF
     begin
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        PasswordSecretText := SIFiscalSetup."Signing Certificate Password";
+        X509Certificate2.GetCertificateSubject(Base64Cert, PasswordSecretText, CertificateSubject);
+#ELSE
         X509Certificate2.GetCertificateSubject(Base64Cert, SIFiscalSetup."Signing Certificate Password", CertificateSubject);
+#ENDIF
         StartPosition := StrPos(CertificateSubject, 'OU=');
         CertificateSubject := CopyStr(CertificateSubject, StartPosition, 11);
         CertificateSubject := DelChr(CertificateSubject, '=', 'OU=');
@@ -928,6 +936,9 @@ codeunit 6151546 "NPR SI Audit Mgt."
         Base64Cert2: Text;
         CertificateThumbprint: Text;
         FileName: Text;
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        PasswordSecretText: SecretText;
+#ENDIF
     begin
         SIFiscalSetup.Get();
         if SIFiscalSetup."Signing Certificate".HasValue() then begin
@@ -944,9 +955,15 @@ codeunit 6151546 "NPR SI Audit Mgt."
         Base64Cert := Base64Convert.ToBase64(IStream);
         Base64Cert2 := Base64Cert;
 
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        PasswordSecretText := SIFiscalSetup."Signing Certificate Password";
+        X509Certificate2.VerifyCertificate(Base64Cert2, PasswordSecretText, Enum::"X509 Content Type"::Cert);
+        if (not X509Certificate2.HasPrivateKey(Base64Cert, PasswordSecretText)) then
+#ELSE
         X509Certificate2.VerifyCertificate(Base64Cert2, SIFiscalSetup."Signing Certificate Password", Enum::"X509 Content Type"::Cert);
         if (not X509Certificate2.HasPrivateKey(Base64Cert, SIFiscalSetup."Signing Certificate Password")) then
-            Error(ERROR_MISSING_KEY);
+#ENDIF
+        Error(ERROR_MISSING_KEY);
 
         SIFiscalSetup."Signing Certificate".CreateOutStream(OStream, TextEncoding::UTF8);
         OStream.Write(Base64Cert);
@@ -954,7 +971,11 @@ codeunit 6151546 "NPR SI Audit Mgt."
         SIFiscalSetup."Certificate Subject Ident." := CopyStr(FormatCertificateSubjectInfo(X509Certificate2, Base64Cert), 1, MaxStrLen(SIFiscalSetup."Certificate Subject Ident."));
 
         CertificateThumbprint := SIFiscalSetup."Signing Certificate Thumbprint";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        X509Certificate2.GetCertificateThumbprint(Base64Cert, PasswordSecretText, CertificateThumbprint);
+#ELSE
         X509Certificate2.GetCertificateThumbprint(Base64Cert, SIFiscalSetup."Signing Certificate Password", CertificateThumbprint);
+#ENDIF
 #pragma warning disable AA0139
         SIFiscalSetup."Signing Certificate Thumbprint" := CertificateThumbprint;
 #pragma warning restore AA0139

@@ -179,11 +179,19 @@ codeunit 6059993 "NPR HL Integration Mgt."
         TextEnc: TextEncoding;
         AuthSignature: Text;
         Hash: Text;
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        ApiSecretSecretText: SecretText;
+#ENDIF
     begin
         _HLSetup.GetRecordOnce(false);
         DateString := Format(CurrentDateTime, 0, 9);
 
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        ApiSecretSecretText := _HLSetup."HeyLoyalty Api Secret";
+        Hash := CryptoMgt.GenerateHash(DateString, ApiSecretSecretText, HashAlgorithmType::SHA256);
+#ELSE
         Hash := CryptoMgt.GenerateHash(DateString, _HLSetup."HeyLoyalty Api Secret", HashAlgorithmType::SHA256);
+#ENDIF
         Hash := Base64Convert.ToBase64(LowerCase(DelChr(Hash, '=', '-')), TextEnc::UTF8);
         AuthSignature := Base64Convert.ToBase64(StrSubstNo('%1:%2', _HLSetup."HeyLoyalty Api Key", Hash), TextEnc::UTF8);
         exit(AuthSignature);

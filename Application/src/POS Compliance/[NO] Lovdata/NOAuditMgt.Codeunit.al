@@ -468,6 +468,9 @@ codeunit 6151548 "NPR NO Audit Mgt."
         InStr: InStream;
         Base64Cert: Text;
         Base64Cert2: Text;
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        PasswordSecretText: SecretText;
+#ENDIF
     begin
         if not _CertificateLoaded then begin
             _NOFiscalizationSetup.SetAutoCalcFields("Signing Certificate");
@@ -477,10 +480,17 @@ codeunit 6151548 "NPR NO Audit Mgt."
             _NOFiscalizationSetup."Signing Certificate".CreateInStream(InStr, TextEncoding::UTF8);
             InStr.ReadText(Base64Cert);
             Base64Cert2 := Base64Cert; //Prevent below VAR from messing up the cert
+
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            PasswordSecretText := _NOFiscalizationSetup."Signing Certificate Password";
+            if not X509Certificate2.VerifyCertificate(Base64Cert, PasswordSecretText, "X509 Content Type"::Cert) then
+                exit;
+            _SignatureKey.FromBase64String(Base64Cert2, PasswordSecretText, true);
+#ELSE
             if not X509Certificate2.VerifyCertificate(Base64Cert, _NOFiscalizationSetup."Signing Certificate Password", "X509 Content Type"::Cert) then
                 exit;
-
             _SignatureKey.FromBase64String(Base64Cert2, _NOFiscalizationSetup."Signing Certificate Password", true);
+#ENDIF
             _CertificateLoaded := true;
         end;
     end;
@@ -536,6 +546,9 @@ codeunit 6151548 "NPR NO Audit Mgt."
         Base64Cert2: Text;
         CertificateThumbprint: Text;
         FileName: Text;
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        PasswordSecretText: SecretText;
+#ENDIF
     begin
         _NOFiscalizationSetup.Get();
         if _NOFiscalizationSetup."Signing Certificate".HasValue() then begin
@@ -552,15 +565,25 @@ codeunit 6151548 "NPR NO Audit Mgt."
         Base64Cert := Base64Convert.ToBase64(IStream);
         Base64Cert2 := Base64Cert;
 
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        PasswordSecretText := _NOFiscalizationSetup."Signing Certificate Password";
+        X509Certificate2.VerifyCertificate(Base64Cert2, PasswordSecretText, Enum::"X509 Content Type"::Cert);
+        if (not X509Certificate2.HasPrivateKey(Base64Cert, PasswordSecretText)) then
+#ELSE
         X509Certificate2.VerifyCertificate(Base64Cert2, _NOFiscalizationSetup."Signing Certificate Password", Enum::"X509 Content Type"::Cert);
         if (not X509Certificate2.HasPrivateKey(Base64Cert, _NOFiscalizationSetup."Signing Certificate Password")) then
-            Error(ERROR_MISSING_KEY);
+#ENDIF
+        Error(ERROR_MISSING_KEY);
 
         _NOFiscalizationSetup."Signing Certificate".CreateOutStream(OStream, TextEncoding::UTF8);
         OStream.Write(Base64Cert);
 
         CertificateThumbprint := _NOFiscalizationSetup."Signing Certificate Thumbprint";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        X509Certificate2.GetCertificateThumbprint(Base64Cert, PasswordSecretText, CertificateThumbprint);
+#ELSE
         X509Certificate2.GetCertificateThumbprint(Base64Cert, _NOFiscalizationSetup."Signing Certificate Password", CertificateThumbprint);
+#ENDIF
 #pragma warning disable AA0139
         _NOFiscalizationSetup."Signing Certificate Thumbprint" := CertificateThumbprint;
 #pragma warning restore AA0139

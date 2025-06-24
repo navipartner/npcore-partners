@@ -9,9 +9,16 @@
     var
         Scopes: List of [Text];
 #IF NOT BC17
-        PromptInteraction: Enum "Prompt Interaction";
         OAuth2: Codeunit OAuth2;
+        AzureADTenant: Codeunit "Azure AD Tenant";
         RedirectURL: Text;
+        NPROAuthControlAddIn: Page "NPR OAuth ControlAddIn";
+        TypeHelper: Codeunit "Type Helper";
+        URLText: Text;
+        AuthCode: Text;
+        Scope: Text;
+        EncodedScope: Text;
+        State: Integer;
 #ENDIF
         AccessToken, TokenCache, AuthCodeError : Text;
         AccesTokenMsg: Label 'Access token acquired.';
@@ -22,7 +29,15 @@
         GetTestGraphAPISetup();
 #IF NOT BC17
         OAuth2.GetDefaultRedirectURL(RedirectURL);
-        OAuth2.AcquireTokenAndTokenCacheByAuthorizationCode(_GraphApiSetup."Client Id", _GraphApiSetup."Client Secret", _GraphApiSetup."OAuth Authority Url", RedirectURL, Scopes, PromptInteraction::Login, AccessToken, TokenCache, AuthCodeError);
+        State := Random(10000);
+        Scope := 'https://graph.microsoft.com/User.Read Calendars.ReadWrite offline_access';
+        EncodedScope := TypeHelper.UrlEncode(Scope);
+        URLText := StrSubstNo('https://login.microsoftonline.com/%1/oauth2/v2.0/authorize?client_id=%2&redirect_uri=%3&state=%4&response_type=code&scope=%5&actor=application', AzureADTenant.GetAadTenantId(), _GraphApiSetup."Client Id", RedirectURL, State, EncodedScope);
+        NPROAuthControlAddIn.SetRequestProps(URLText);
+        NPROAuthControlAddIn.RunModal();
+        AuthCode := NPROAuthControlAddIn.GetAuthCode();
+        AuthCodeError := NPROAuthControlAddIn.GetAuthError();
+        NPROAuthControlAddIn.RequestToken(AuthCode, RedirectURL, _GraphApiSetup."Client Id", _GraphApiSetup."Client Secret", AccessToken);
 #ENDIF
         if (AccessToken = '') or (AuthCodeError <> '') then
             Error(FailErr, AuthCodeError);

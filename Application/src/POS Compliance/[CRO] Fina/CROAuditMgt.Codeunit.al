@@ -967,6 +967,9 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         CertificateSubject: Text;
         CertificateThumbprint: Text;
         FileName: Text;
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        PasswordSecretText: SecretText;
+#ENDIF
     begin
         CROFiscalSetup.Get();
         if CROFiscalSetup."Signing Certificate".HasValue() then begin
@@ -983,21 +986,35 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         Base64Cert := Base64Convert.ToBase64(IStream);
         Base64Cert2 := Base64Cert;
 
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        PasswordSecretText := CROFiscalSetup."Signing Certificate Password";
+        X509Certificate2.VerifyCertificate(Base64Cert2, PasswordSecretText, Enum::"X509 Content Type"::Cert);
+        if (not X509Certificate2.HasPrivateKey(Base64Cert, PasswordSecretText)) then
+#ELSE
         X509Certificate2.VerifyCertificate(Base64Cert2, CROFiscalSetup."Signing Certificate Password", Enum::"X509 Content Type"::Cert);
         if (not X509Certificate2.HasPrivateKey(Base64Cert, CROFiscalSetup."Signing Certificate Password")) then
-            Error(ERROR_MISSING_KEY);
+#ENDIF
+        Error(ERROR_MISSING_KEY);
 
         CROFiscalSetup."Signing Certificate".CreateOutStream(OStream, TextEncoding::UTF8);
         OStream.Write(Base64Cert);
 
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        X509Certificate2.GetCertificateSubject(Base64Cert, PasswordSecretText, CertificateSubject);
+#ELSE
         X509Certificate2.GetCertificateSubject(Base64Cert, CROFiscalSetup."Signing Certificate Password", CertificateSubject);
+#ENDIF
         StartPosition := StrPos(CertificateSubject, 'HR');
         CertificateSubject := CopyStr(CertificateSubject, StartPosition, 100);
         CertificateSubject := DelChr(CertificateSubject, '=', 'HR, C=');
 
         CROFiscalSetup."Certificate Subject OIB" := CopyStr(CertificateSubject, 1, MaxStrLen(CROFiscalSetup."Certificate Subject OIB"));
         CertificateThumbprint := CROFiscalSetup."Signing Certificate Thumbprint";
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        X509Certificate2.GetCertificateThumbprint(Base64Cert, PasswordSecretText, CertificateThumbprint);
+#ELSE
         X509Certificate2.GetCertificateThumbprint(Base64Cert, CROFiscalSetup."Signing Certificate Password", CertificateThumbprint);
+#ENDIF
 #pragma warning disable AA0139
         CROFiscalSetup."Signing Certificate Thumbprint" := CertificateThumbprint;
 #pragma warning restore AA0139

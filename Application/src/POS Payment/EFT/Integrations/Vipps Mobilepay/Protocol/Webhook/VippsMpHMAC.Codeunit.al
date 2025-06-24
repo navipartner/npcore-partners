@@ -49,6 +49,9 @@ codeunit 6184730 "NPR Vipps Mp HMAC"
         ExpectedSignature: Text;
         ExpectedAuthorization: Text;
         ActualAuthorization: Text;
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        ParamSecretText: SecretText;
+#ENDIF
         SignatureMismatchLbl: Label 'The hash signature was expected to be %1 but had value %2';
     begin
         //CRLF[1] := 13;
@@ -78,7 +81,12 @@ codeunit 6184730 "NPR Vipps Mp HMAC"
         X_Ms_Content_Sha256 := JToken.AsValue().AsText();
 
         ExpectedSignedString := StrSubstNo('%1%2%3%4%5%6;%7;%8', HttpMethod, CRLF, Path, Query, CRLF, X_Ms_Date, Host, X_Ms_Content_Sha256);
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+        ParamSecretText := Secret;
+        ExpectedSignature := _Crypto.GenerateHashAsBase64String(ExpectedSignedString, ParamSecretText, _HashAlgorithm::SHA256);
+#ELSE
         ExpectedSignature := _Crypto.GenerateHashAsBase64String(ExpectedSignedString, Secret, _HashAlgorithm::SHA256);
+#ENDIF
         ExpectedAuthorization := 'HMAC-SHA256 SignedHeaders=x-ms-date;host;x-ms-content-sha256&Signature=' + ExpectedSignature;
         Headers.Get('Authorization', JToken);
         JToken.AsArray().Get(0, JToken);
