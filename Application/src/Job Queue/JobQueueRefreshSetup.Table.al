@@ -148,7 +148,7 @@ table 6059870 "NPR Job Queue Refresh Setup"
         InitWebserviceTimeZone();
     end;
 
-    local procedure InitWebserviceTimeZone()
+    internal procedure InitWebserviceTimeZone()
     begin
         if "Webservice Time Zone" = '' then
             "Webservice Time Zone" := 'UTC';  //For online Business Central environments, the Services Default Time Zone setting is always set to UTC

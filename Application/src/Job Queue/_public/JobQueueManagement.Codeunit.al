@@ -1156,7 +1156,9 @@
         SessionSettings: SessionSettings;
     begin
         if ClientTypeManagement.GetCurrentClientType() = ClientType::ODataV4 then begin  //External JQ refresher running in UTC
-            JobQueueEntry."NPR Time Zone" := 'UTC';
+            GetJQRefresherSetup();
+            _JQRefresherSetup.InitWebserviceTimeZone();
+            JobQueueEntry."NPR Time Zone" := _JQRefresherSetup."Webservice Time Zone";
             exit;
         end;
         if not UserPersonalization.Get(UserSecurityId()) then
