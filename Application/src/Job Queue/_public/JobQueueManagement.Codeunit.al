@@ -1350,6 +1350,9 @@
                 Codeunit::"NPR POS Post GL Entries JQ",
                 Codeunit::"NPR Get Feature Flags JQ",
                 Codeunit::"NPR Post Sales Documents JQ",
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+                Codeunit::"NPR Billing Data Sender JQ",
+#endif
                 3997  //3997 = Codeunit::"Retention Policy JQ"
                ])
         then begin
@@ -1357,14 +1360,6 @@
             Handled := true;
         end;
     end;
-
-#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnRefreshNPRJobQueueList, '', false, false)]
-    local procedure RunScheduleEventBillingSenderJQ()
-    begin
-        AddEventBillingSenderJobQueue();
-    end;
-#endif
 
 #if BC17 or BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Company-Initialize", 'OnCompanyInitialize', '', true, false)]

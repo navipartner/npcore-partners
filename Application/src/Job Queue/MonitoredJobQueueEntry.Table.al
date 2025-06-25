@@ -316,8 +316,10 @@ table 6151148 "NPR Monitored Job Queue Entry"
         end;
 
         TimeOffset := CalculateTimeOffset(JQRefreshSetup);
-        "Starting Time" := "Starting Time" + TimeOffset;
-        "Ending Time" := "Ending Time" + TimeOffset;
+        if "Starting Time" <> 0T then
+            "Starting Time" := "Starting Time" + TimeOffset;
+        if "Ending Time" <> 0T then
+            "Ending Time" := "Ending Time" + TimeOffset;
         "Time Zone" := JQRefreshSetup."Webservice Time Zone";
 
         TempJobQueueEntry."Recurring Job" := true;

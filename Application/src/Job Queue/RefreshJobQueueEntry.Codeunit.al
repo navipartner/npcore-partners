@@ -13,6 +13,7 @@ codeunit 6248478 "NPR Refresh Job Queue Entry"
         JobQueueMgt: Codeunit "NPR Job Queue Management";
         NotProtectedJob: Boolean;
         ProcessMonitoredJob: Boolean;
+        RelatedJobQueueEntryNotFoundErr: Label 'Related job queue entry could not be found, and missing custom job recreation is not enabled.';
     begin
         JQMonitorEntry := Rec;
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
@@ -34,20 +35,20 @@ codeunit 6248478 "NPR Refresh Job Queue Entry"
         JobQueueMgt.JobQueueIsManagedByApp(JobQueueEntry, NotProtectedJob);
         if not ProcessMonitoredJob then
             ProcessMonitoredJob := not NotProtectedJob or JQRefreshSetup.CreateMissingCustomJQs();
-        if ProcessMonitoredJob then begin
-            JQMonitorEntry2 := JQMonitorEntry;
-            JQMonitorEntry2.ChangeJobTimeZoneToWebserviceTimezone(JQRefreshSetup);
-            if not JQRefreshSetup."Use External JQ Refresher" then
-                JQMonitorEntry2."JQ Runner User Name" := ''
-            else
-                if JQMonitorEntry2."JQ Runner User Name" = '' then
-                    JQMonitorEntry2."JQ Runner User Name" := JQRefreshSetup."Default Refresher User Name";
-            RefreshJobQueueEntry(JQMonitorEntry2, NotProtectedJob);
-            JQMonitorEntry."Earliest Start Date/Time" := JQMonitorEntry2."Earliest Start Date/Time";
-            JQMonitorEntry."Job Queue Entry ID" := JQMonitorEntry2."Job Queue Entry ID";
-            JQMonitorEntry."Last Refresh Status" := JQMonitorEntry."Last Refresh Status"::Success
-        end else
-            JQMonitorEntry."Last Refresh Status" := JQMonitorEntry."Last Refresh Status"::" ";
+        if not ProcessMonitoredJob then
+            Error(RelatedJobQueueEntryNotFoundErr);
+
+        JQMonitorEntry2 := JQMonitorEntry;
+        JQMonitorEntry2.ChangeJobTimeZoneToWebserviceTimezone(JQRefreshSetup);
+        if not JQRefreshSetup."Use External JQ Refresher" then
+            JQMonitorEntry2."JQ Runner User Name" := ''
+        else
+            if JQMonitorEntry2."JQ Runner User Name" = '' then
+                JQMonitorEntry2."JQ Runner User Name" := JQRefreshSetup."Default Refresher User Name";
+        RefreshJobQueueEntry(JQMonitorEntry2, NotProtectedJob);
+        JQMonitorEntry."Earliest Start Date/Time" := JQMonitorEntry2."Earliest Start Date/Time";
+        JQMonitorEntry."Job Queue Entry ID" := JQMonitorEntry2."Job Queue Entry ID";
+        JQMonitorEntry."Last Refresh Status" := JQMonitorEntry."Last Refresh Status"::Success;
 
         if Format(JQMonitorEntry) <> Format(xJQMonitorEntry) then
             JQMonitorEntry.Modify();

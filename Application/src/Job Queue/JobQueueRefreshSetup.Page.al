@@ -118,7 +118,8 @@ page 6150891 "NPR Job Queue Refresh Setup"
                         RequestingRefreshTxt: Label 'Requesting job queue refresh...';
                         NotEnoughTimePassedErr: Label 'Please wait at least one minute after enabling the external refresher before requesting an immediate refresh.';
                     begin
-                        CurrPage.SaveRecord();
+                        if Format(Rec) <> Format(xRec) then
+                            CurrPage.SaveRecord();
                         if Rec."Ext. JQ Refresher Enabled at" <> 0DT then
                             if CurrentDateTime() - Rec."Ext. JQ Refresher Enabled at" < 60000 then
                                 Error(NotEnoughTimePassedErr);
