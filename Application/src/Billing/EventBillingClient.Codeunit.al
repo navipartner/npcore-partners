@@ -212,7 +212,8 @@ codeunit 6248217 "NPR Event Billing Client"
 
     local procedure GetMaxNumberOfEntriesToSend(): BigInteger
     begin
-        exit(1000);
+        // 100 corresponds to max_batch_size of the Cloudflare Queue sendBatch() function.
+        exit(100);
     end;
     #endregion
 
