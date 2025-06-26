@@ -551,27 +551,36 @@
         until Job.Next() = 0;
     end;
 
-    local procedure PopulateCustToAnonymise()
+    internal procedure PopulateCustToAnonymise()
     var
+        Customer: Record Customer;
         GDPRSetup: Record "NPR Customer GDPR SetUp";
+        CustToAnonymize: Record "NPR Customers to Anonymize";
         DateFormulaTxt: Text[250];
         VarPeriod: DateFormula;
-        VarEntryNo: Integer;
-        Customer: Record Customer;
-        CLE: Record "Cust. Ledger Entry";
-        CustToAnonymize: Record "NPR Customers to Anonymize";
-        ILE: Record "Item Ledger Entry";
-        NoCLE: Boolean;
-        NoILE: Boolean;
-        NoTrans: Boolean;
+        Window: Dialog;
+        VarEntryNo, CalculatedVarPeriod : Integer;
+        NoTrans, NoTransPeriod : Boolean;
+        Text000: Label 'Existing Customers will be lost, do you want to continue?';
     begin
         CustToAnonymize.Reset();
+        if GuiAllowed then begin
+            if (CustToAnonymize.FindFirst()) then
+                if (not Confirm(Text000, false)) then
+                    exit;
+        end;
+
         CustToAnonymize.DeleteAll();
+
         if GDPRSetup.Get() then;
 
         DateFormulaTxt := '-' + Format(GDPRSetup."Anonymize After");
         Evaluate(VarPeriod, DateFormulaTxt);
 
+        CalculatedVarPeriod := Today - CalcDate(VarPeriod, Today);
+
+        if GuiAllowed then
+            Window.Open('Customer #1##################');
 
         VarEntryNo := 0;
         Customer.SetRange(Customer."NPR Anonymized", false);
@@ -580,56 +589,59 @@
         Customer.SetFilter("Last Date Modified", '<>%1', 0D);
         if Customer.FindSet() then
             repeat
-                NoTrans := true;
+                if GuiAllowed then
+                    Window.Update(1, Customer."No.");
 
-                CLE.Reset();
-                CLE.SetCurrentKey("Customer No.", "Posting Date", "Currency Code");
-                CLE.SetRange("Customer No.", Customer."No.");
-                NoTrans := not CLE.IsEmpty();
-
+                NoTrans := CheckNoTransactions(Customer."No.", false, 0D);
                 if NoTrans then begin
-                    ILE.Reset();
-                    ILE.SetCurrentKey("Source Type", "Source No.", "Item No.", "Variant Code", "Posting Date");
-                    ILE.SetRange(ILE."Source Type", ILE."Source Type"::Customer);
-                    ILE.SetRange(ILE."Source No.", Customer."No.");
-                    NoTrans := not ILE.IsEmpty();
-                end;
-
-                if NoTrans then begin
-                    if (Today - Customer."Last Date Modified") >= (Today - CalcDate(VarPeriod, Today)) then begin
-                        CustToAnonymize.Init();
-                        CustToAnonymize."Entry No" := VarEntryNo;
-                        CustToAnonymize."Customer No" := Customer."No.";
-                        CustToAnonymize."Customer Name" := Customer.Name;
-                        CustToAnonymize.Insert();
-                        VarEntryNo += 1;
-                    end;
+                    if (Today - Customer."Last Date Modified") >= CalculatedVarPeriod then
+                        InsertCustomerToAnonymize(VarEntryNo, Customer."No.", Customer.Name);
                 end else begin
-                    NoCLE := false;
-                    NoILE := false;
-                    CLE.Reset();
-                    CLE.SetCurrentKey("Customer No.", "Posting Date", "Currency Code");
-                    CLE.SetRange("Customer No.", Customer."No.");
-                    CLE.SetFilter("Posting Date", '>%1', CalcDate(VarPeriod, Today));
-                    NoCLE := CLE.IsEmpty();
+                    NoTransPeriod := CheckNoTransactions(Customer."No.", true, CalcDate(VarPeriod, Today()));
 
-                    ILE.Reset();
-                    ILE.SetCurrentKey("Source Type", "Source No.", "Item No.", "Variant Code", "Posting Date");
-                    ILE.SetRange(ILE."Source Type", ILE."Source Type"::Customer);
-                    ILE.SetRange(ILE."Source No.", Customer."No.");
-                    ILE.SetFilter("Posting Date", '>%1', CalcDate(VarPeriod, Today()));
-                    NoILE := ILE.IsEmpty();
-
-                    if NoILE and NoCLE then begin
-                        CustToAnonymize.Init();
-                        CustToAnonymize."Entry No" := VarEntryNo;
-                        CustToAnonymize."Customer No" := Customer."No.";
-                        CustToAnonymize."Customer Name" := Customer.Name;
-                        CustToAnonymize.Insert();
-                        VarEntryNo += 1;
-                    end;
+                    if NoTransPeriod then
+                        InsertCustomerToAnonymize(VarEntryNo, Customer."No.", Customer.Name);
                 end;
             until Customer.Next() = 0;
+        if GuiAllowed then begin
+            Window.Close();
+            Message('Completed');
+        end;
+    end;
+
+    local procedure CheckNoTransactions(CustomerNo: Code[20]; CheckForPeriod: Boolean; PeriodCalcDate: Date): Boolean
+    var
+        CustLedgerEntry: Record "Cust. Ledger Entry";
+        ItemLedgerEntry: Record "Item Ledger Entry";
+    begin
+        CustLedgerEntry.SetCurrentKey("Customer No.", "Posting Date", "Currency Code");
+        CustLedgerEntry.SetRange("Customer No.", CustomerNo);
+        if CheckForPeriod then
+            CustLedgerEntry.SetFilter("Posting Date", '>%1', PeriodCalcDate);
+
+        if CustLedgerEntry.IsEmpty() then begin
+            ItemLedgerEntry.SetCurrentKey("Source Type", "Source No.", "Item No.", "Variant Code", "Posting Date");
+            ItemLedgerEntry.SetRange(ItemLedgerEntry."Source Type", ItemLedgerEntry."Source Type"::Customer);
+            ItemLedgerEntry.SetRange(ItemLedgerEntry."Source No.", CustomerNo);
+            if CheckForPeriod then
+                ItemLedgerEntry.SetFilter("Posting Date", '>%1', PeriodCalcDate);
+
+            exit(CustLedgerEntry.IsEmpty() and ItemLedgerEntry.IsEmpty());
+        end;
+
+        exit(false);
+    end;
+
+    local procedure InsertCustomerToAnonymize(var _EntryNo: Integer; CustomerNo: Code[20]; CustomerName: Text[100])
+    var
+        CustToAnonymize: Record "NPR Customers to Anonymize";
+    begin
+        CustToAnonymize.Init();
+        CustToAnonymize."Entry No" := _EntryNo;
+        CustToAnonymize."Customer No" := CustomerNo;
+        CustToAnonymize."Customer Name" := CustomerName;
+        CustToAnonymize.Insert();
+        _EntryNo += 1;
     end;
 
     local procedure AnonymizeIssuedReminders(VarCustNo: Code[20])
