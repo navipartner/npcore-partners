@@ -1663,24 +1663,10 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
 
     local procedure MagentoMatchingAllowed(MagentoPaymentLine: Record "NPR Magento Payment Line"; ReconciliationLine: Record "NPR Adyen Recon. Line"; ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"; Silent: Boolean) Success: Boolean
     var
-        GLSetup: Record "General Ledger Setup";
         MatchValidationPassed: Boolean;
         ManualMatchTransactionError02: Label 'Failed to match with Magento Payment Line (Document Type: %1, Document No.: %2, Document Line No.: %3) because Amounts aren''t equal.';
     begin
-        /*
-        if ReconciliationLine."Transaction Type" in
-            [ReconciliationLine."Transaction Type"::Chargeback,
-            ReconciliationLine."Transaction Type"::SecondChargeback,
-            ReconciliationLine."Transaction Type"::RefundedReversed,
-            ReconciliationLine."Transaction Type"::ChargebackReversed,
-            ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo]
-        then
-            MatchValidationPassed := Abs(MagentoPaymentLine.Amount) = Abs(ReconciliationLine."Amount (TCY)")
-        else
-            MatchValidationPassed := MagentoPaymentLine.Amount = ReconciliationLine."Amount (TCY)";
-        */
-        MatchValidationPassed := Abs(MagentoPaymentLine.Amount) = Abs(ReconciliationLine."Amount (LCY)"); // "Magento Payment Line" Amount seems to be always positive which causes refunds to fail during matching.
-        MatchValidationPassed := MatchValidationPassed and GLSetup.Get() and (GLSetup."LCY Code" = ReconciliationLine."Transaction Currency Code");
+        MatchValidationPassed := Abs(MagentoPaymentLine.Amount) = Abs(ReconciliationLine."Amount (TCY)"); // "Magento Payment Line" Amount seems to be always positive which causes refunds to fail during matching.
 
         if MatchValidationPassed then
             Success := true
