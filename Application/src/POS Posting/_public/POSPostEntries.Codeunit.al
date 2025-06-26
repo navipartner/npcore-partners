@@ -1910,7 +1910,7 @@
             LineAmountExclVATLCY := POSSalesLineToPost."Amount Excl. VAT (LCY)";
             DeferralTemplate.Get(POSSalesLineToPost."Deferral Code");
             DeferralUtilities.CreateDeferralSchedule(DeferralTemplate."Deferral Code", Enum::"Deferral Document Type"::"G/L".AsInteger(), '', '', Database::"NPR POS Entry Sales Line", Format(POSSalesLineToPost."POS Entry No."), POSSalesLineToPost."Line No.", LineAmountExclVATLCY, DeferralTemplate."Calc. Method",
-                Today(), DeferralTemplate."No. of Periods", false, DeferralTemplate.Description, false, POSSalesLineToPost."Currency Code");
+                GetDeferralStartingDate(POSSalesLineToPost, POSEntry), DeferralTemplate."No. of Periods", false, DeferralTemplate.Description, false, POSSalesLineToPost."Currency Code");
             POSSalesLineToPost."Deferral Line No." := POSSalesLineToPost."Line No.";
 
             if DeferralHeader.Get(Enum::"Deferral Document Type"::"G/L", '', '', Database::"NPR POS Entry Sales Line", Format(POSSalesLineToPost."POS Entry No."), POSSalesLineToPost."Line No.") then begin
@@ -2072,5 +2072,22 @@
         DeferralPostingBuffer."Deferral Doc. Type" := Enum::"Deferral Document Type"::Sales;
         DeferralPostingBuffer."Document No." := Format(POSSalesLineToPost."Document No.");
         DeferralPostingBuffer."Deferral Line No." := POSSalesLineToPost."Deferral Line No.";
+    end;
+
+    local procedure GetDeferralStartingDate(POSSalesLineToPost: Record "NPR POS Entry Sales Line"; POSEntry: Record "NPR POS Entry") StartDate: Date
+    var
+        MembershipEntry: Record "NPR MM Membership Entry";
+    begin
+        StartDate := POSEntry."Posting Date";
+        if POSSalesLineToPost.Type <> POSSalesLineToPost.Type::Item then
+            exit;
+        MembershipEntry.SetCurrentKey("Receipt No.", "Line No.");
+        MembershipEntry.SetLoadFields("Valid From Date");
+        MembershipEntry.SetRange("Receipt No.", POSSalesLineToPost."Document No.");
+        MembershipEntry.SetRange("Line No.", POSSalesLineToPost."Line No.");
+        if not MembershipEntry.FindFirst() then
+            exit;
+        if MembershipEntry."Valid From Date" <> 0D then
+            StartDate := MembershipEntry."Valid From Date";
     end;
 }
