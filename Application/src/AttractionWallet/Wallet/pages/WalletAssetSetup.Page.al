@@ -39,7 +39,12 @@ page 6184844 "NPR WalletAssetSetup"
                 field(EnableEndOfSalePrint; Rec.EnableEndOfSalePrint)
                 {
                     ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Enable End Of Sale Print field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Enable End Of Sale Print field.';
+                }
+                field(UpdateAssetPrintedInformation; Rec.UpdateAssetPrintedInformation)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies whether asset printed information will be updated when wallet print information is updated.';
                 }
             }
         }

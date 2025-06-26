@@ -32,6 +32,11 @@ table 6150936 "NPR WalletAssetSetup"
             Caption = 'Enable End Of Sale Print';
             DataClassification = CustomerContent;
         }
+        field(41; UpdateAssetPrintedInformation; Boolean)
+        {
+            Caption = 'Increment Asset Print Information';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

@@ -818,24 +818,31 @@ codeunit 6185062 "NPR AttractionWallet"
     local procedure PrintWalletsInternal(WalletEntryNoList: List of [Integer]; PrintContext: Enum "NPR WalletPrintType")
     var
         WalletFacade: Codeunit "NPR AttractionWalletFacade";
+        Setup: Record "NPR WalletAssetSetup";
         Handled: Boolean;
     begin
+
         WalletFacade.OnPrint(WalletEntryNoList, PrintContext, Handled);
-        PrintWalletsWorker(WalletEntryNoList, Handled, PrintContext);
+        if (Handled) then
+            exit;
+
+        if (not Setup.Get()) then
+            Setup.Init();
+
+        PrintWalletsWorker(WalletEntryNoList, PrintContext, Setup.UpdateAssetPrintedInformation);
     end;
 
-    local procedure PrintWalletsWorker(WalletEntryNoList: List of [Integer]; PrintHandled: Boolean; PrintContext: Enum "NPR WalletPrintType")
+    local procedure PrintWalletsWorker(WalletEntryNoList: List of [Integer]; PrintContext: Enum "NPR WalletPrintType"; CascadeUpdateAssets: Boolean)
     var
         EntryNo: Integer;
     begin
         foreach EntryNo in WalletEntryNoList do begin
-            if (not PrintHandled) then
-                PrintWalletWorker(EntryNo, PrintContext);
-            IncrementPrintCount(EntryNo);
+            PrintWalletWorker(EntryNo, PrintContext);
+            IncrementPrintCount(EntryNo, CascadeUpdateAssets);
         end;
     end;
 
-    internal procedure IncrementPrintCount(WalletEntryNo: Integer)
+    internal procedure IncrementPrintCount(WalletEntryNo: Integer; CascadeUpdateAssets: Boolean)
     var
         Wallet: Record "NPR AttractionWallet";
     begin
@@ -843,6 +850,23 @@ codeunit 6185062 "NPR AttractionWallet"
             Wallet.PrintCount += 1;
             Wallet.LastPrintAt := CurrentDateTime;
             Wallet.Modify();
+
+            if (CascadeUpdateAssets) then
+                UpdateWalletAssetsPrintCount(WalletEntryNo);
+        end;
+    end;
+
+    local procedure UpdateWalletAssetsPrintCount(WalletEntryNo: Integer)
+    var
+        WalletAssets: Query "NPR AttractionWalletAssets";
+        TicketManagement: Codeunit "NPR TM Ticket Management";
+    begin
+        WalletAssets.SetFilter(WalletAssets.WalletEntryNo, '=%1', WalletEntryNo);
+        WalletAssets.Open();
+        while (WalletAssets.Read()) do begin
+            if (WalletAssets.AssetType = WalletAssets.AssetType::TICKET) then
+                TicketManagement.IncrementPrintCount(WalletAssets.AssetSystemId);
+
         end;
     end;
 
