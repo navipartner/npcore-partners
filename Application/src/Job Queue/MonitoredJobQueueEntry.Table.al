@@ -359,16 +359,14 @@ table 6151148 "NPR Monitored Job Queue Entry"
     var
         JQRefreshSetup: Record "NPR Job Queue Refresh Setup";
         TypeHelper: Codeunit "Type Helper";
-        TimeZoneID: Text;
     begin
-        TimeZoneID := "Time Zone";
-        if TimeZoneID = '' then begin
+        if "Time Zone" = '' then begin
             if not JQRefreshSetup.Get() then
                 Clear(JQRefreshSetup);
             JQRefreshSetup.TestField("Default Job Time Zone");
-            TimeZoneID := JQRefreshSetup."Default Job Time Zone";
+            "Time Zone" := JQRefreshSetup."Default Job Time Zone";
         end;
-        TypeHelper.GetTimezoneOffset(TimeZoneOffset, TimeZoneID);
+        TypeHelper.GetTimezoneOffset(TimeZoneOffset, "Time Zone");
     end;
 
     internal procedure SetErrorMessage(NewErrorText: Text)
