@@ -212,23 +212,6 @@ codeunit 6185037 "NPR HU L Audit Mgt."
         PostWorkflows.Add(Format(Enum::"NPR POS Workflow"::"HUL_RECEIPT_MGT"), ActionParameters);
     end;
 
-    [Eventsubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Act. Insert Item Event", 'OnAddPostWorkflowsToRun', '', false, false)]
-    local procedure HandleOnAddPostWorkflowsToRunOnInsertItem(Context: Codeunit "NPR POS JSON Helper"; SaleLinePOS: Record "NPR POS Sale Line"; var PostWorkflows: JsonObject)
-    var
-        POSUnit: Record "NPR POS Unit";
-        POSActionHULFPDisplay: Codeunit "NPR POS Action: HUL FP Display";
-        ActionParameters: JsonObject;
-    begin
-        if not POSUnit.Get(SaleLinePOS."Register No.") then
-            exit;
-        if not IsHULaurelAuditEnabled(POSUnit."POS Audit Profile") then
-            exit;
-
-        ActionParameters.Add(POSActionHULFPDisplay.RowOneMessageParameterName(), SaleLinePOS."Description");
-        ActionParameters.Add(POSActionHULFPDisplay.RowTwoMessageParameterName(), FormatTwoColumnCustDisplayText(FormatDecimalValue(SaleLinePOS.Quantity) + 'x', FormatDecimalValue(SaleLinePOS."Unit Price")));
-        PostWorkflows.Add(Format(Enum::"NPR POS Workflow"::HUL_FP_DISPLAY), ActionParameters);
-    end;
-
     [Eventsubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action Publishers", 'OnAddPostWorkflowsToRunOnQuantity', '', false, false)]
     local procedure HandleOnAddPostWorkflowsToRunOnQuantity(Context: Codeunit "NPR POS JSON Helper"; SaleLine: Codeunit "NPR POS Sale Line"; var PostWorkflows: JsonObject)
     var

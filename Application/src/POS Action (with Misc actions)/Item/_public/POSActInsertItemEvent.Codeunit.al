@@ -3,6 +3,7 @@ codeunit 6151518 "NPR POS Act. Insert Item Event"
     [IntegrationEvent(false, false)]
     internal procedure OnAddPostWorkflowsToRun(Context: Codeunit "NPR POS JSON Helper"; SaleLinePOS: Record "NPR POS Sale Line"; var PostWorkflows: JsonObject)
     begin
+        // Internally you should not subscribe to this event. It will affect performance of fast insert Item with barcode scan.
     end;
 
     [IntegrationEvent(false, false)]
