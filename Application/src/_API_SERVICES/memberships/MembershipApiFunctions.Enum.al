@@ -205,6 +205,41 @@ enum 6059827 "NPR MembershipApiFunctions"
     {
         Caption = 'Resolve identifier';
     }
+
+    value(460; LIST_MEMBERSHIP_ATTRIBUTES)
+    {
+        Caption = 'List membership attributes';
+    }
+    value(461; GET_MEMBERSHIP_ATTRIBUTE_VALUES)
+    {
+        Caption = 'Get membership attribute values';
+    }
+    value(462; SET_MEMBERSHIP_ATTRIBUTE_VALUES)
+    {
+        Caption = 'Set membership attribute values';
+    }
+    value(463; DELETE_MEMBERSHIP_ATTRIBUTE_VALUES)
+    {
+        Caption = 'Delete membership attribute values';
+    }
+
+    value(470; LIST_MEMBER_ATTRIBUTES)
+    {
+        Caption = 'List member attributes';
+    }
+    value(471; GET_MEMBER_ATTRIBUTE_VALUES)
+    {
+        Caption = 'Get member attribute values';
+    }
+    value(472; SET_MEMBER_ATTRIBUTE_VALUES)
+    {
+        Caption = 'Set member attribute values';
+    }
+    value(473; DELETE_MEMBER_ATTRIBUTE_VALUES)
+    {
+        Caption = 'Delete member attribute values';
+    }
+
     value(500; GET_SUBSCRIPTION)
     {
         Caption = 'Get Subscription';

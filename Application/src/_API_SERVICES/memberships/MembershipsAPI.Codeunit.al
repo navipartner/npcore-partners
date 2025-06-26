@@ -13,6 +13,9 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
             exit(Handle(_ApiFunction::GET_MEMBERSHIP_USING_NUMBER, Request));
 
 
+        if (Request.Match('GET', '/membership/attributes')) then
+            exit(Handle(_ApiFunction::LIST_MEMBERSHIP_ATTRIBUTES, Request));
+
         if (Request.Match('GET', '/membership/catalog')) then
             exit(Handle(_ApiFunction::GET_CATALOG, Request));
 
@@ -35,6 +38,9 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
         if (Request.Match('GET', '/membership/card/:cardId')) then
             exit(Handle(_ApiFunction::GET_CARD_USING_ID, Request));
 
+        if (Request.Match('GET', '/membership/member/attributes')) then
+            exit(Handle(_ApiFunction::LIST_MEMBER_ATTRIBUTES, Request));
+
         if (Request.Match('GET', '/membership/member/:memberId')) then
             exit(Handle(_ApiFunction::GET_MEMBER_USING_ID, Request));
 
@@ -43,6 +49,9 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
 
         if (Request.Match('GET', '/membership/:membershipId/members')) then
             exit(Handle(_ApiFunction::GET_MEMBERSHIP_MEMBERS, Request));
+
+        if (Request.Match('GET', '/membership/:membershipId/attributes')) then
+            exit(Handle(_ApiFunction::GET_MEMBERSHIP_ATTRIBUTE_VALUES, Request));
 
         if (Request.Match('GET', '/membership/:membershipId/paymentMethods')) then
             exit(Handle(_ApiFunction::GET_ALL_PAYMENT_METHODS, Request));
@@ -68,6 +77,13 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
         if (Request.Match('POST', '/membership/:membershipId/activate')) then
             exit(Handle(_ApiFunction::ACTIVATE_MEMBERSHIP, Request));
 
+        if (Request.Match('GET', '/membership/:membershipId/subscription')) then
+            exit(Handle(_ApiFunction::GET_SUBSCRIPTION, Request));
+
+
+        if (Request.Match('GET', '/membership/member/:memberId/attributes')) then
+            exit(Handle(_ApiFunction::GET_MEMBER_ATTRIBUTE_VALUES, Request));
+
         if (Request.Match('GET', '/membership/member/:memberId/image')) then
             exit(Handle(_ApiFunction::GET_MEMBER_IMAGE, Request));
 
@@ -84,6 +100,9 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
 
         if (Request.Match('POST', '/membership/:membershipId/unblock')) then
             exit(Handle(_ApiFunction::UNBLOCK_MEMBERSHIP, Request));
+
+        if (Request.Match('POST', '/membership/:membershipId/attributes')) then
+            exit(Handle(_ApiFunction::SET_MEMBERSHIP_ATTRIBUTE_VALUES, Request));
 
         if (Request.Match('POST', '/membership/:membershipId/paymentMethods')) then
             exit(Handle(_ApiFunction::CREATE_PAYMENT_METHOD, Request));
@@ -116,6 +135,10 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
         if (Request.Match('POST', '/membership/member/:memberId/note')) then
             exit(Handle(_ApiFunction::ADD_MEMBER_NOTE, Request));
 
+        if (Request.Match('POST', '/membership/member/:memberId/attributes')) then
+            exit(Handle(_ApiFunction::SET_MEMBER_ATTRIBUTE_VALUES, Request));
+
+
         if (Request.Match('POST', '/membership/card/:cardId/block')) then
             exit(Handle(_ApiFunction::BLOCK_CARD, Request));
 
@@ -128,9 +151,16 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
         if (Request.Match('POST', '/membership/card/:cardId/sendToWallet')) then
             exit(Handle(_ApiFunction::SEND_TO_WALLET, Request));
 
+        if (Request.Match('POST', '/membership/:membershipId/subscription/start')) then
+            exit(Handle(_ApiFunction::ENTER_SUBSCRIPTION, Request));
+
+        if (Request.Match('POST', '/membership/:membershipId/subscription/terminate')) then
+            exit(Handle(_ApiFunction::TERMINATE_SUBSCRIPTION, Request));
+
+
         if (Request.Match('POST', '/membership/:membershipId/member/:memberId/addCard')) then
             exit(Handle(_ApiFunction::ADD_CARD, Request));
-
+        // ************************************************************
 
         if (Request.Match('PUT', '/membership/member/:memberId/image')) then
             exit(Handle(_ApiFunction::SET_MEMBER_IMAGE, Request));
@@ -141,19 +171,20 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
 
         if (Request.Match('PATCH', '/membership/member/:memberId')) then
             exit(Handle(_ApiFunction::UPDATE_MEMBER, Request));
-
+        // ************************************************************
 
         if (Request.Match('DELETE', '/membership/paymentMethods/:paymentMethodId')) then
             exit(Handle(_ApiFunction::DELETE_PAYMENT_METHOD, Request));
 
-        if (Request.Match('GET', '/membership/:membershipId/subscription')) then
-            exit(Handle(_ApiFunction::GET_SUBSCRIPTION, Request));
+        if (Request.Match('DELETE', '/membership/:membershipId/attributes')) then
+            exit(Handle(_ApiFunction::DELETE_MEMBERSHIP_ATTRIBUTE_VALUES, Request));
 
-        if (Request.Match('POST', '/membership/:membershipId/subscription/start')) then
-            exit(Handle(_ApiFunction::ENTER_SUBSCRIPTION, Request));
+        if (Request.Match('DELETE', '/membership/member/:memberId/attributes')) then
+            exit(Handle(_ApiFunction::DELETE_MEMBER_ATTRIBUTE_VALUES, Request));
 
-        if (Request.Match('POST', '/membership/:membershipId/subscription/terminate')) then
-            exit(Handle(_ApiFunction::TERMINATE_SUBSCRIPTION, Request));
+        // ************************************************************
+
+
     end;
 
     local procedure Handle(ApiFunction: Enum "NPR MembershipApiFunctions"; var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"

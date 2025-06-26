@@ -38,6 +38,7 @@ codeunit 6185122 "NPR MembershipApiHandler"
         MembershipMiscApiAgent: Codeunit "NPR MembershipMiscApiAgent";
         MembershipSubscrApiAgent: Codeunit "NPR MembershipSubscrAgent";
         PaymentMethodApiAgent: Codeunit "NPR API SubscriptionPmtMethods";
+        MembershipAttributesAgent: Codeunit "NPR MembershipAttributesAgent";
     begin
         case _ApiFunction of
 
@@ -67,6 +68,15 @@ codeunit 6185122 "NPR MembershipApiHandler"
             _ApiFunction::GET_MEMBERSHIP_RENEWAL_INFO:
                 _Response := MembershipApiAgent.GetMembershipRenewalInfo(_Request);
 
+
+            _ApiFunction::LIST_MEMBERSHIP_ATTRIBUTES:
+                _Response := MembershipAttributesAgent.ListMembershipAttributes(_Request);
+            _ApiFunction::GET_MEMBERSHIP_ATTRIBUTE_VALUES:
+                _Response := MembershipAttributesAgent.GetMembershipAttributeValues(_Request);
+            _ApiFunction::SET_MEMBERSHIP_ATTRIBUTE_VALUES:
+                _Response := MembershipAttributesAgent.SetMembershipAttributeValues(_Request);
+            _ApiFunction::DELETE_MEMBERSHIP_ATTRIBUTE_VALUES:
+                _Response := MembershipAttributesAgent.DeleteMembershipAttributeValues(_Request);
 
 
             _ApiFunction::FIND_MEMBER:
@@ -99,6 +109,14 @@ codeunit 6185122 "NPR MembershipApiHandler"
             _ApiFunction::ADD_MEMBER_NOTE:
                 _Response := MemberApiAgent.AddMemberNote(_Request);
 
+            _ApiFunction::LIST_MEMBER_ATTRIBUTES:
+                _Response := MembershipAttributesAgent.ListMemberAttributes(_Request);
+            _ApiFunction::GET_MEMBER_ATTRIBUTE_VALUES:
+                _Response := MembershipAttributesAgent.GetMemberAttributeValues(_Request);
+            _ApiFunction::SET_MEMBER_ATTRIBUTE_VALUES:
+                _Response := MembershipAttributesAgent.SetMemberAttributeValues(_Request);
+            _ApiFunction::DELETE_MEMBER_ATTRIBUTE_VALUES:
+                _Response := MembershipAttributesAgent.DeleteMemberAttributeValues(_Request);
 
             _ApiFunction::GET_CARD_USING_ID:
                 _Response := MemberCardApiAgent.GetMemberCardById(_Request);

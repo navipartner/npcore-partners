@@ -266,14 +266,14 @@ types:
     docs: 
       List of configured and enabled scanners.
     properties:
-      requireScannerId: simpleTypes.RequireScannerId
-      permitTickets: simpleTypes.PermitTickets
-      permitMemberCards: simpleTypes.PermitMemberCards
-      permitWallets: simpleTypes.PermitWallets
-      imageProfileCode: simpleTypes.ImageProfileCode
-      ticketProfileCode: simpleTypes.TicketProfileCode
-      memberCardProfileCode: simpleTypes.MemberCardProfileCode
-      items: list<ScannerItemProfileLine>
+      requireScannerId: optional<simpleTypes.RequireScannerId>
+      permitTickets: optional<simpleTypes.PermitTickets>
+      permitMemberCards: optional<simpleTypes.PermitMemberCards>
+      permitWallets: optional<simpleTypes.PermitWallets>
+      imageProfileCode: optional<simpleTypes.ImageProfileCode>
+      ticketProfileCode: optional<simpleTypes.TicketProfileCode>
+      memberCardProfileCode: optional<simpleTypes.MemberCardProfileCode>
+      items: optional<list<ScannerItemProfileLine>>
       scanners: list<ScannerIdSetupResponseList>
     examples:
       - name: ExampleScannerIdSetupResponseShort

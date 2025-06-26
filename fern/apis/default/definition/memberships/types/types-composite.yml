@@ -2,6 +2,7 @@
 
 imports:
   simpleTypes: ./types-simple.yml
+  attributeTypes: ./types-attributes.yml
   accountTypes: ./../../account/types-account.yml
   commonApiTypes: ./../../common-api-types.yml
   globalApiTypes: ./../../global-api-types.yml
@@ -30,6 +31,7 @@ types:
           customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
           blocked: $simpleTypes.Blocked.ExampleBlocked
           autoRenewalActivated: false
+          attributes: []
           members:
             - $MemberDTOWithinMembership.ExampleMembershipToMember
 
@@ -98,7 +100,7 @@ types:
           phoneNo: $simpleTypes.PhoneNo.ExamplePhoneNo
           email: $simpleTypes.Email.ExampleEmail
           blocked: $simpleTypes.Blocked.ExampleBlocked
-
+          attributes: []
           memberships:
             - $MembershipDTOWithinMember.ExampleMembershipDTOWithinMember
 
@@ -162,6 +164,7 @@ types:
           newsletter: $simpleTypes.Newsletter.ExampleNewsletter
           phoneNo: $simpleTypes.PhoneNo.ExamplePhoneNo
           email: $simpleTypes.Email.ExampleEmail
+          attributes: []
           card: 
             $MemberCardEntity.ExampleMemberCardCreate
 
@@ -192,6 +195,7 @@ types:
           phoneNo: $simpleTypes.PhoneNo.ExamplePhoneNo
           email: $simpleTypes.Email.ExampleEmail
           blocked: $simpleTypes.Blocked.ExampleBlocked
+          attributes: []
           cards: 
             - $MemberCardEntity.ExampleMemberCard
    
@@ -217,6 +221,7 @@ types:
           customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
           blocked: $simpleTypes.Blocked.ExampleBlocked
           autoRenewalActivated: false
+          attributes: []
           cards: 
             - $MemberCardEntity.ExampleMemberCard
 
@@ -391,6 +396,7 @@ types:
       documentId: optional<simpleTypes.DocumentId>
       blocked: simpleTypes.Blocked
       autoRenewalActivated: simpleTypes.AutoRenewalActivated
+      attributes: optional<list<attributeTypes.AttributeValueListResponse>>
     examples:
       - name: ExampleMembership
         value:
@@ -404,6 +410,7 @@ types:
           customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
           blocked: $simpleTypes.Blocked.ExampleBlocked
           autoRenewalActivated: true
+          attributes: []
       - name: ExampleMembershipBlocked
         value:
           membershipId: $simpleTypes.MembershipId.ExampleMembershipId
@@ -416,6 +423,7 @@ types:
           customerNumber: $simpleTypes.CustomerNumber.ExampleCustomerNumber
           blocked: $simpleTypes.Blocked.ExampleBlockedTrue
           autoRenewalActivated: false
+          attributes: []
 
   MemberEntityRequest:
     docs:
@@ -438,6 +446,7 @@ types:
       gdprConsent: optional<simpleTypes.GDPRConsent>
       preassignedContactNumber: optional<simpleTypes.PreassignedContactNumber>
       storeCode: optional<simpleTypes.StoreCode>
+      attributes: optional<list<attributeTypes.AttributeValueListResponse>>
     examples:
       - name : ExampleMember
         value:
@@ -453,6 +462,7 @@ types:
           newsletter: $simpleTypes.Newsletter.ExampleNewsletter
           phoneNo: $simpleTypes.PhoneNo.ExamplePhoneNo
           email: $simpleTypes.Email.ExampleEmail
+          attributes: []
 
   MemberEntityResponse:
     docs:

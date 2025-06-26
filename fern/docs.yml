@@ -166,6 +166,14 @@ navigation:
                   - endpoint: memberships.service-membership.blockMembership
                   - endpoint: memberships.service-membership.unblockMembership
                   - endpoint: memberships.service-membership.getMembers
+                  - memberships.service-membership-attributes:
+                      title: Attributes
+                      summary: ./docs/pages/memberships/attributes-introduction.mdx
+                      contents:
+                        - endpoint: memberships.service-membership-attributes.listMembershipAttributes
+                        - endpoint: memberships.service-membership-attributes.getMembershipAttributeValues
+                        - endpoint: memberships.service-membership-attributes.setMembershipAttributeValues
+                        - endpoint: memberships.service-membership-attributes.deleteMembershipAttributeValues
             - memberships.service-member:
                 title: Member
                 summary: ./docs/pages/memberships/member-introduction.mdx
@@ -180,6 +188,12 @@ navigation:
                   - endpoint: memberships.service-member.unblockMember
                   - endpoint: memberships.service-member.getMemberNotes
                   - endpoint: memberships.service-member.addMemberNote
+                  - memberships.service-member-attributes:
+                      title: Attributes
+                      summary: ./docs/pages/memberships/attributes-introduction.mdx
+                      contents:
+                        - endpoint: memberships.service-member-attributes.listMemberAttributes
+                        - endpoint: memberships.service-member-attributes.getMemberAttributeValues
             - memberships.service-card:
                 title: Card
                 summary: ./docs/pages/memberships/card-introduction.mdx

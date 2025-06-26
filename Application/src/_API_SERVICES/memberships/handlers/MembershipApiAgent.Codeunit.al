@@ -42,12 +42,14 @@ codeunit 6185123 "NPR MembershipApiAgent"
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         Membership: Record "NPR MM Membership";
         ResponseJson: Codeunit "NPR JSON Builder";
+        AttributeAgent: Codeunit "NPR MembershipAttributesAgent";
     begin
         MemberInfoCapture.Init();
         MemberInfoCapture."Entry No." := 0;
         DeserializeCreateMembershipRequest(Request, MemberInfoCapture);
-        // TransferAttributes(CreateMembershipRequest, MemberInfoCapture);
         MemberInfoCapture.Insert();
+
+        AttributeAgent.ApplyInboundMembershipAttributesToMemberInfoCapture(Request, MemberInfoCapture."Entry No.");
 
         if (CreateMembershipWorker(MemberInfoCapture)) then begin
             Membership.Get(MemberInfoCapture."Membership Entry No.");
@@ -230,6 +232,7 @@ codeunit 6185123 "NPR MembershipApiAgent"
     internal procedure MembershipDTO(ResponseJson: Codeunit "NPR JSON Builder"; Membership: Record "NPR MM Membership"): Codeunit "NPR JSON Builder"
     var
         MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
+        AttributeAgent: Codeunit "NPR MembershipAttributesAgent";
         ValidFrom, ValidUntil : Date;
     begin
         MembershipMgt.GetConsecutiveTimeFrame(Membership."Entry No.", Today(), ValidFrom, ValidUntil);
@@ -244,8 +247,8 @@ codeunit 6185123 "NPR MembershipApiAgent"
             .AddObject(AddRequiredProperty(ResponseJson, 'validFromDate', ValidFrom))
             .AddObject(AddRequiredProperty(ResponseJson, 'validUntilDate', ValidUntil))
             .AddProperty('customerNumber', Membership."Customer No.")
-            .AddProperty('autoRenewalActivated', Membership."Auto-Renew" <> Membership."Auto-Renew"::NO);
-
+            .AddProperty('autoRenewalActivated', Membership."Auto-Renew" <> Membership."Auto-Renew"::NO)
+            .AddArray(AttributeAgent.MembershipAttributesDTO(ResponseJson, Membership."Entry No."));
         exit(ResponseJson);
     end;
 
@@ -429,6 +432,7 @@ codeunit 6185123 "NPR MembershipApiAgent"
         MemberInfoCapture.TestField("Item No.");
 
     end;
+
     #endregion Private Methods
 
 #pragma warning restore AA0139

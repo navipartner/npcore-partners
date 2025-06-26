@@ -176,6 +176,7 @@ codeunit 6248220 "NPR MemberApiAgent"
 
         ResponseJson: Codeunit "NPR JSON Builder";
         MembershipAgent: Codeunit "NPR MembershipApiAgent";
+        AttributeAgent: Codeunit "NPR MembershipAttributesAgent";
     begin
         if (not MembershipAgent.GetMembershipById(Request, 2, Membership)) then
             exit(Response.RespondBadRequest('Invalid Membership - Membership Id not valid.'));
@@ -184,8 +185,9 @@ codeunit 6248220 "NPR MemberApiAgent"
         MemberInfoCapture."Entry No." := 0;
         InitializeMemberInfoCapture(Membership, MemberInfoCapture);
         DeserializeMemberRequest(Request, MemberInfoCapture);
-        // TransferAttributes(CreateMembershipRequest, MemberInfoCapture);
         MemberInfoCapture.Insert();
+
+        AttributeAgent.ApplyInboundMemberAttributesToMemberInfoCapture(Request, MemberInfoCapture."Entry No.");
 
         if (CreateMemberWorker(MemberInfoCapture)) then begin
             Member.Get(MemberInfoCapture."Member Entry No");
@@ -209,6 +211,7 @@ codeunit 6248220 "NPR MemberApiAgent"
         MemberInfoCapture: Record "NPR MM Member Info Capture";
 
         ResponseJson: Codeunit "NPR JSON Builder";
+        AttributeAgent: Codeunit "NPR MembershipAttributesAgent";
     begin
         if (not GetMemberById(Request, 3, Member)) then
             exit(InvalidMemberIdResponse());
@@ -225,8 +228,9 @@ codeunit 6248220 "NPR MemberApiAgent"
         InitializeMemberInfoCapture(Member, MemberInfoCapture);
 
         DeserializeMemberRequest(Request, MemberInfoCapture);
-        // TransferAttributes(CreateMembershipRequest, MemberInfoCapture);
         MemberInfoCapture.Insert();
+
+        AttributeAgent.ApplyInboundMemberAttributesToMemberInfoCapture(Request, MemberInfoCapture."Entry No.");
 
         if (UpdateMemberWorker(MemberInfoCapture)) then begin
             Member.Get(MemberInfoCapture."Member Entry No");
@@ -585,8 +589,8 @@ codeunit 6248220 "NPR MemberApiAgent"
     local procedure StartMemberDTO(var ResponseJson: Codeunit "NPR JSON Builder"; MembershipEntryNo: Integer; var Member: Record "NPR MM Member"; IncludeMembership: Boolean; IncludeCards: Boolean): Codeunit "NPR JSON Builder"
     begin
         ResponseJson.StartObject('member')
-            .AddObject(MemberDTO(ResponseJson, Member))
             .AddArray(MembershipsDTO(ResponseJson, Member."Entry No.", IncludeMembership))
+            .AddObject(MemberDTO(ResponseJson, Member))
             .AddArray(MemberCardsDTO(ResponseJson, MembershipEntryNo, Member."Entry No.", IncludeCards))
             .EndObject();
     end;
@@ -602,6 +606,7 @@ codeunit 6248220 "NPR MemberApiAgent"
     internal procedure MemberDTO(var ResponseJson: Codeunit "NPR JSON Builder"; Member: Record "NPR MM Member"): Codeunit "NPR JSON Builder"
     var
         Encode: Codeunit "NPR MembershipApiTranslation";
+        MemberAttributes: Codeunit "NPR MembershipAttributesAgent";
     begin
         ResponseJson
             .AddProperty('memberId', Format(Member.SystemId, 0, 4).ToLower())
@@ -620,7 +625,8 @@ codeunit 6248220 "NPR MemberApiAgent"
             .AddProperty('phoneNo', Member."Phone No.")
             .AddObject(AddRequiredProperty(ResponseJson, 'birthday', Member.Birthday))
             .AddProperty('hasPicture', Member.Image.HasValue())
-            .AddProperty('hasNotes', Member.HasLinks());
+            .AddProperty('hasNotes', Member.HasLinks())
+            .AddArray(MemberAttributes.MemberAttributesDTO(ResponseJson, Member."Entry No."));
         exit(ResponseJson);
     end;
 

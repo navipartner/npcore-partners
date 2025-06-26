@@ -1,0 +1,227 @@
+types:
+
+  AttributeListResponse:
+    docs: 
+      This response contains a list of attributes that can be associated with the entity.
+    properties:
+      code: ClientAttributeCode
+      name: ClientAttributeName
+      description: optional<AttributeDescription>
+      caption: ClientAttributeCaption
+      blocked: ClientAttributeBlocked
+      datatype: ClientAttributeDatatype
+      validateAs: ClientAttributeValidateAs
+      formatAs: ClientAttributeFormatAs
+      lookupTable: optional<ClientAttributeLookupTable>
+      lookupTableId: optional<ClientAttributeLookupTableId>
+      lookupFieldId: optional<ClientAttributeLookupFieldId>
+    examples:
+        - name: ExampleMembership
+          value:
+            code: $ClientAttributeCode.ExampleMembership
+            name: $ClientAttributeName.ExampleMembership
+            description: $AttributeDescription.ExampleMembership
+            caption: $ClientAttributeCaption.ExampleSong
+            blocked: $ClientAttributeBlocked.ExampleAttributeBlocked
+            datatype: $ClientAttributeDatatype.ExampleText
+            validateAs: $ClientAttributeValidateAs.ExampleAttributeValidateAs
+            formatAs: $ClientAttributeFormatAs.ExampleAttributeFormatAs
+        - name: ExampleMember
+          value:
+            code: $ClientAttributeCode.ExampleMember
+            name: $ClientAttributeName.ExampleMember
+            description: $AttributeDescription.ExampleMember
+            caption: $ClientAttributeCaption.ExampleColor
+            blocked: $ClientAttributeBlocked.ExampleAttributeBlocked
+            datatype: $ClientAttributeDatatype.ExampleText
+            validateAs: $ClientAttributeValidateAs.ExampleAttributeValidateAs
+            formatAs: $ClientAttributeFormatAs.ExampleAttributeFormatAs
+
+  AttributeValueListResponse:
+    docs: This response contains a list of attribute values associated with a specific membership entity.
+    properties:
+      id: uuid
+      code: ClientAttributeCode
+      type: ClientAttributeDatatype
+      caption: ClientAttributeCaption
+      value: ClientAttributeValue
+    examples:
+      - name: ExampleMembership
+        value:
+          id: 123e4567-e89b-12d3-a456-426614174000
+          code: $ClientAttributeCode.ExampleMembership
+          type: $ClientAttributeDatatype.ExampleText
+          caption: $ClientAttributeCaption.ExampleSong
+          value: $ClientAttributeValue.ExampleSong1
+      - name: ExampleMembership2
+        value:
+          id: 123e4567-f89b-12d3-a456-426614174001
+          code: $ClientAttributeCode.ExampleMembership
+          type: $ClientAttributeDatatype.ExampleText
+          caption: $ClientAttributeCaption.ExampleSong
+          value: $ClientAttributeValue.ExampleSong2
+      - name: ExampleMember
+        value:
+          id: 123e4567-e89b-12d3-a456-426614174000
+          code: $ClientAttributeCode.ExampleMember
+          type: $ClientAttributeDatatype.ExampleText
+          caption: $ClientAttributeCaption.ExampleColor
+          value: $ClientAttributeValue.ExampleColor1
+      - name: ExampleMember2
+        value:
+          id: 123e4567-f89b-12d3-a456-426614174001
+          code: $ClientAttributeCode.ExampleMember
+          type: $ClientAttributeDatatype.ExampleText
+          caption: $ClientAttributeCaption.ExampleColor
+          value: $ClientAttributeValue.ExampleColor2
+
+  SetAttributeValue:
+    docs: This request is used to set the value of an attribute for a specific membership entity.
+    properties:
+      code: ClientAttributeCode
+      value: ClientAttributeValue
+    examples:
+      - name: ExampleMembership
+        value:
+          code: $ClientAttributeCode.ExampleMembership
+          value: $ClientAttributeValue.ExampleSong1
+      - name: ExampleMembership2
+        value:
+          code: $ClientAttributeCode.ExampleMembership
+          value: $ClientAttributeValue.ExampleSong2
+      - name: ExampleMember
+        value:
+          code: $ClientAttributeCode.ExampleMember
+          value: $ClientAttributeValue.ExampleColor1
+      - name: ExampleMember2
+        value:
+          code: $ClientAttributeCode.ExampleMember
+          value: $ClientAttributeValue.ExampleColor2
+
+  ClientAttributeCode:
+    type: string
+    docs: The key code for the attribute. This is a unique identifier for the attribute.
+    examples: 
+      - name: ExampleMembership
+        value: SONG-1
+
+      - name: ExampleMember
+        value: COLOR-1
+
+  ClientAttributeValue:
+    type: string
+    docs: The value of the attribute. This is the actual data associated with the attribute.
+    examples:
+      - name: ExampleSong1
+        value: "Islands in the Stream"
+      - name: ExampleSong2
+        value: "Country Roads, Take Me Home"
+      - name: ExampleColor1
+        value: "Blue"
+      - name: ExampleColor2
+        value: "Red"
+
+  ClientAttributeName:
+    docs: The common name of the attribute.
+    type: string
+    examples:
+      - name: ExampleMembership
+        value: Membership theme song
+      - name: ExampleMember
+        value: Member favorite color
+
+  AttributeDescription:
+    docs: The description of the attribute.
+    type: string
+    examples:
+      - name: ExampleMembership
+        value: All memberships have a theme song. This is the theme song for this membership.
+      - name: ExampleMember
+        value: All members have a favorite color. This is the favorite color for this member.
+
+  ClientAttributeCaption:
+    docs: The caption of the attribute.
+    type: string
+    examples:
+      - name: ExampleSong
+        value: Song Name
+      - name: ExampleColor
+        value: Favorite Color
+
+  ClientAttributeBlocked:
+    docs: Indicates if the attribute is blocked.
+    type: boolean
+    examples:
+      - name: ExampleAttributeBlocked
+        value: false
+
+  ClientAttributeDatatypeEnum:
+    docs: The datatype of the attribute, represented as an enum.
+    enum:
+      - text
+      - code
+      - date
+      - datetime
+      - decimal
+      - integer
+      - boolean
+      - unknown
+
+  ClientAttributeDatatype:
+    docs: The datatype of the attribute.
+    type: ClientAttributeDatatypeEnum
+    examples:
+      - name: ExampleText
+        value: text
+
+  ClientAttributeValidateAsEnum:
+    docs: The validation type for the attribute, represented as an enum.
+    enum:
+      - datatype
+      - lookup
+      - unknown
+
+  ClientAttributeValidateAs:
+    docs: The validation type for the attribute.
+    type: ClientAttributeValidateAsEnum
+    examples:
+      - name: ExampleAttributeValidateAs
+        value: datatype
+
+  ClientAttributeFormatAsEnum:
+    docs: The format type for the attribute, represented as an enum.
+    enum:
+      - custom
+      - native
+      - userCulture
+      - unknown
+
+  ClientAttributeFormatAs:
+    docs: The format type for the attribute.
+    type: ClientAttributeFormatAsEnum
+    examples:
+      - name: ExampleAttributeFormatAs
+        value: native
+
+  ClientAttributeLookupTable:
+    docs: Indicates if the attribute uses a lookup table.
+    type: boolean
+    examples:
+      - name: ExampleClientAttributeLookupTable
+        value: false
+
+  ClientAttributeLookupTableId:
+    docs: The ID of the lookup table.
+    type: integer
+    examples:
+      - name: ExampleClientAttributeLookupTableId
+        value: 0
+
+  ClientAttributeLookupFieldId:
+    docs: The ID of the lookup field.
+    type: integer
+    examples:
+      - name: ExampleClientAttributeLookupFieldId
+        value: 0
+
+

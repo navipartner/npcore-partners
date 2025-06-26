@@ -3,6 +3,7 @@
 imports:
   globalApiTypes: ./../global-api-types.yml
   simpleTypes: ./types/types-simple.yml
+  attributeTypes: ./types/types-attributes.yml
   compositeTypes: ./types/types-composite.yml
 
 service:
@@ -165,11 +166,13 @@ types:
       companyName: optional<simpleTypes.CompanyName>
       preassignedCustomerNumber: optional<simpleTypes.PreassignedCustomerNumber>
       documentNo: optional<simpleTypes.DocumentNo>
+      attributes: optional<list<attributeTypes.SetAttributeValue>>
     examples:
       - name: ExampleCreateMembership
         value:
           itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
           activationDate: $simpleTypes.ActivationDate.ExampleActivationDate
+          attributes: []
           #companyName: $simpleTypes.CompanyName.ExampleCompanyName
           #preassignedCustomerNumber: $simpleTypes.PreassignedCustomerNumber.ExamplePreassignedCustomerNumber
 

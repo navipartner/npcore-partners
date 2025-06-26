@@ -112,6 +112,12 @@
                     Visible = false;
                     ToolTip = 'Specifies the value of the Printed Date field';
                 }
+                field("Printed DateTime"; Rec."PrintedDateTime")
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Visible = false;
+                    ToolTip = 'Specifies the value of the Printed DateTime field';
+                }
                 field("Salesperson Code"; Rec."Salesperson Code")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;

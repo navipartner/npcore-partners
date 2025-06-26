@@ -284,11 +284,11 @@ types:
   AddMemberResponse:
     docs: Response to adding a member to a membership
     properties:
-      member: compositeTypes.MemberDTO
+      member: compositeTypes.MemberWithCardDTOResponse
     examples:
       - name: ExampleAddMember
         value:
-          member: $compositeTypes.MemberDTO.ExampleMembershipDTO
+          member: $compositeTypes.MemberWithCardDTOResponse.ExampleMember
 
   # Get Member Service
   GetMemberResponse:

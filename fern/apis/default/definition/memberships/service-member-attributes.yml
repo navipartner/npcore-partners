@@ -1,0 +1,142 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  attributeTypes: ./types/types-attributes.yml
+  globalApiTypes: ./../global-api-types.yml
+
+service:
+  display-name: Attributes
+  auth: true
+  base-path: /membership
+
+  endpoints:
+
+    # The following endpoints are for managing attributes associated with members.
+    listMemberAttributes:
+      docs: This endpoint retrieves a list of attributes that can be associated with a member entity.
+      display-name: List Attributes
+      method: GET
+      path: /member/attributes
+      response: list<attributeTypes.AttributeListResponse>
+      examples:
+        - name: List Member Attributes Example
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          response:
+            body: 
+              - $attributeTypes.AttributeListResponse.ExampleMember
+
+    getMemberAttributeValues:
+      docs: This endpoint retrieves a list of attributes associated with a specific member entity.
+      display-name: Get Values
+      method: GET
+      path: /member/{memberId}/attributes
+      path-parameters:
+        memberId: MemberId
+      response: MemberAttributeValueListResponse
+      examples:
+        - name: Get Member Attribute Example
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            memberId: $MemberId.ExampleMemberId
+          response:
+            body: $MemberAttributeValueListResponse.ExampleMemberAttributeValueListResponse
+
+    setMemberAttributeValues:
+      docs: This endpoint sets the attribute values for a specific member entity.
+      display-name: Set Values
+      method: POST  
+      path: /member/{memberId}/attributes
+      path-parameters:
+        memberId: MemberId
+      request:
+        name: "Set Member Attribute Value" 
+        body: SetMemberAttributeValueRequest
+      response: MemberAttributeValueListResponse
+      examples:
+        - name: Set Member Attribute Example
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            memberId: $MemberId.ExampleMemberId
+          request: $SetMemberAttributeValueRequest.ExampleSetAttributeValueRequest2
+          response:
+            body: $MemberAttributeValueListResponse.ExampleMemberAttributeValueListResponse2
+
+    deleteMemberAttributeValues:
+      docs: This endpoint removes the specified attribute values for a specific member entity.
+      display-name: Remove Values
+      method: DELETE
+      path: /member/{memberId}/attributes
+      path-parameters:
+        memberId: MemberId
+      request:
+        name: "Remove Member Attribute Value" 
+        body: RemoveMemberAttributeValueRequest
+      response: MemberAttributeValueListResponse
+      examples:
+        - name: Set Member Attribute Example
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            memberId: $MemberId.ExampleMemberId
+          request: $RemoveMemberAttributeValueRequest.ExampleRemoveAttributeValueRequest
+          response:
+            body: $MemberAttributeValueListResponse.ExampleMemberAttributeValueListResponse3
+
+types:
+  MemberId:
+    type: uuid
+    docs: The unique identifier for member.
+    examples:
+      - name: ExampleMemberId
+        value: abcdabcd-e89b-12d3-a456-42661417400a
+
+  MemberAttributeValueListResponse:
+    properties:
+      memberId: MemberId
+      attributes: list<attributeTypes.AttributeValueListResponse>
+    examples:
+      - name: ExampleMemberAttributeValueListResponse
+        value:
+          memberId: $MemberId.ExampleMemberId
+          attributes:
+            - $attributeTypes.AttributeValueListResponse.ExampleMember
+      - name: ExampleMemberAttributeValueListResponse2
+        value:
+          memberId: $MemberId.ExampleMemberId
+          attributes:
+            - $attributeTypes.AttributeValueListResponse.ExampleMember2
+      - name: ExampleMemberAttributeValueListResponse3
+        value:
+          memberId: $MemberId.ExampleMemberId
+          attributes: []
+
+
+  SetMemberAttributeValueRequest:
+    properties:
+      attributes: list<attributeTypes.SetAttributeValue>
+    examples:
+      - name: ExampleSetAttributeValueRequest
+        value:
+          attributes:
+            - $attributeTypes.SetAttributeValue.ExampleMember
+      - name: ExampleSetAttributeValueRequest2
+        value:
+          attributes:
+            - $attributeTypes.SetAttributeValue.ExampleMember2
+
+  RemoveMemberAttributeValueRequest:
+    properties:
+      attributeIds: list<uuid>
+    examples:
+      - name: ExampleRemoveAttributeValueRequest
+        value:
+          attributeIds:
+            - "123e4567-e89b-12d3-a456-426614174000"

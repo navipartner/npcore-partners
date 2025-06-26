@@ -53,6 +53,12 @@ page 6151294 "NPR TM Ticket Card"
                     ApplicationArea = NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Printed Date field';
                 }
+                field("Printed DateTime"; Rec."PrintedDateTime")
+                {
+                    ApplicationArea = NPRTicketAdvanced;
+                    Visible = false;
+                    ToolTip = 'Specifies the value of the Printed DateTime field';
+                }
                 group(ValidFrom)
                 {
                     Editable = true;
