@@ -13,11 +13,17 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
     end;
 
     procedure GetItem(var Item: Record Item; var ItemReference: Record "Item Reference"; ItemIdentifier: Text; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin)
+    begin
+        GetItem(Item, ItemReference, ItemIdentifier, ItemIdentifierType, false);
+    end;
+
+    procedure GetItem(var Item: Record Item; var ItemReference: Record "Item Reference"; ItemIdentifier: Text; ItemIdentifierType: Option ItemNo,ItemCrossReference,ItemSearch,SerialNoItemCrossReference,ItemGtin; SimpleItem: Boolean) Success: Boolean
     var
         ItemSearchErrLbl: Label 'Could not find a matching item for input %1';
         SentryScope: Codeunit "NPR Sentry Scope";
         SentryActionSpan: Codeunit "NPR Sentry Span";
         SentryGetItemSpan: Codeunit "NPR Sentry Span";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         SentryScope.TryGetActiveSpan(SentryActionSpan);
         SentryActionSpan.StartChildSpan('bc.workflow.ITEM.get', 'bc.workflow.ITEM.get', SentryGetItemSpan);
@@ -35,18 +41,27 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
                     ItemReference.SetRange("Reference No.", CopyStr(ItemIdentifier, 1, MaxStrLen(ItemReference."Reference No.")));
                     ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
                     ItemReference.SetLoadFields("Item No.", "Variant Code", "Unit of Measure", "Reference No.", "Reference Type");
-                    if not (ItemReference.Find('-') and (ItemReference.Next() = 0)) then
+                    if not (ItemReference.Find('-') and (ItemReference.Next() = 0)) then begin
+                        if FeatureFlagsManagement.IsEnabled('skipDoubleLookUpOnItemInsert') then
+                            if SimpleItem then
+                                exit;
+
                         if PAGE.RunModal(0, ItemReference) <> ACTION::LookupOK then
                             Error('');
-
+                    end;
                     Item.Get(ItemReference."Item No.");
                 end;
 
             ItemIdentifierType::ItemSearch:
-                if GetItemFromItemSearch(ItemIdentifier) then
+                if GetItemFromItemSearch(SimpleItem, ItemIdentifier) then
                     Item.Get(ItemIdentifier)
-                else
+                else begin
+                    if FeatureFlagsManagement.IsEnabled('skipDoubleLookUpOnItemInsert') then
+                        if SimpleItem then
+                            exit;
+
                     Error(ItemSearchErrLbl, ItemIdentifier);
+                end;
 
             ItemIdentifierType::SerialNoItemCrossReference:
                 begin
@@ -54,10 +69,14 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
                     ItemReference.SetRange("Reference No.", CopyStr(ItemIdentifier, 1, MaxStrLen(ItemReference."Reference No.")));
                     ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"NPR Retail Serial No.");
                     ItemReference.SetLoadFields("Item No.", "Variant Code", "Unit of Measure", "Reference No.", "Reference Type");
-                    if not (ItemReference.Find('-') and (ItemReference.Next() = 0)) then
+                    if not (ItemReference.Find('-') and (ItemReference.Next() = 0)) then begin
+                        if FeatureFlagsManagement.IsEnabled('skipDoubleLookUpOnItemInsert') then
+                            if SimpleItem then
+                                exit;
+
                         if PAGE.RunModal(0, ItemReference) <> ACTION::LookupOK then
                             Error('');
-
+                    end;
                     Item.Get(ItemReference."Item No.");
                 end;
             ItemIdentifierType::ItemGtin:
@@ -67,7 +86,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
                 end;
         end;
         ItemReference."Item No." := Item."No.";
-
+        Success := true;
         SentryGetItemSpan.Finish();
     end;
 
@@ -436,12 +455,13 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         end;
     end;
 
-    procedure GetItemFromItemSearch(var ItemIdentifierString: Text): Boolean
+    procedure GetItemFromItemSearch(SimpleItem: Boolean; var ItemIdentifierString: Text): Boolean
     var
         Item: Record Item;
         ItemList: Page "Item List";
         LookupOk: Boolean;
         POSActionPublishers: Codeunit "NPR POS Action Publishers";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         ItemFound: Boolean;
         Handled: Boolean;
     begin
@@ -458,6 +478,10 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
         Item.FindLast();
         if ItemIdentifierString = Item."No." then
             exit(true);
+
+        if FeatureFlagsManagement.IsEnabled('skipDoubleLookUpOnItemInsert') then
+            if SimpleItem then
+                exit;
 
         ItemList.Editable(true);
         ItemList.LookupMode(true);

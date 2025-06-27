@@ -16,7 +16,7 @@ let main = async ({ workflow, context, popup, parameters, captions }) => {
         if (context.desc2 === null) return;
     }
 
-    var { bomComponentLinesWithoutSerialLotNo, requiresUnitPriceInputPrompt, requiresSerialNoInputPrompt,requiresLotNoInputPrompt, requiresAdditionalInformationCollection, addItemAddOn, baseLineNo, postAddWorkflows, ticketToken } = await workflow.respond("addSalesLine");
+    var { bomComponentLinesWithoutSerialLotNo, requiresUnitPriceInputPrompt, requiresSerialNoInputPrompt,requiresLotNoInputPrompt, requiresAdditionalInformationCollection, addItemAddOn, baseLineNo, postAddWorkflows, ticketToken, itemNoId, itemReferenceId } = await workflow.respond("addSalesLine");
 
     if (ticketToken) {
         const scheduleSelection = await workflow.run('TM_SCHEDULE_SELECT', {
@@ -48,6 +48,8 @@ let main = async ({ workflow, context, popup, parameters, captions }) => {
         }
 
         context.additionalInformationCollected = true;
+        context.itemNoId = itemNoId;
+        context.itemReferenceId = itemReferenceId;
         var { bomComponentLinesWithoutSerialLotNo, addItemAddOn, baseLineNo, postAddWorkflows } = await workflow.respond("addSalesLine");
         
     }
