@@ -1,0 +1,197 @@
+# fern/apis/default/definition/memberships/types/types-points.yml
+
+types:
+  TransactionId:
+    type: uuid
+    docs: A unique identifier for a points transaction.
+    examples:
+      - name: ExampleTransactionId
+        value: "a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6"
+
+  PointsBalance:
+    docs: Represents the current loyalty points balance for a membership.
+    properties:
+      balance: integer
+    examples:
+      - name: ExamplePointsBalance
+        value:
+          balance: 1500
+  
+  ExternalReferenceNo:
+    type: string
+    docs: Your external reference number, such as a POS Receipt number, invoice number etc.
+    examples:
+      - name: ExternalReferenceNoExample
+        value: "a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6"
+
+  ExternalSystemIdentifier:
+    type: string
+    docs: An identifier of your external system. This together with the entra app name identifies the external system that is making the operation.
+    examples:
+      - name: ExternalSystemIdentifierExample
+        value: "SHOPIFY_B2C_CHANNEL"
+
+  ExternalSystemUserIdentifier:
+    type: string
+    docs: An identifier for the user in the external system, e.g. a salesperson code in an external POS or a user ID in a customer support tool.
+    examples:
+      - name: ExternalSystemUserIdentifierExample
+        value: "JOHN_DOE"
+
+  PointTransactionState:
+    enum:
+      - AUTHORIZED
+      - FINALIZED
+      - CANCELLED
+
+  AuthorizePointsRequest:
+    docs: Request to reserve or issue points that will be finalized later.
+    properties:
+      requestId:
+        type: uuid
+        docs: A unique identifier for the request. If you send the same requestId twice, it will be guaranteed to only trigger once.
+      pointsAdjustment:
+        type: integer
+        docs: The number of points to adjust. Use a negative value for deductions.
+      reason:
+        type: string
+        docs: A description of why the points are being adjusted.
+      timeoutPeriod:
+        type: integer
+        docs: The duration in seconds for which the authorization is valid.
+      externalReferenceNo: ExternalReferenceNo
+      externalSystemIdentifier: ExternalSystemIdentifier
+      externalSystemUserIdentifier: ExternalSystemUserIdentifier
+      customerNo:
+        type: optional<string>
+        docs: An optional customer no. if using reconciliation in the point master node.
+      AutoFinalize:
+        type: boolean
+        docs: if set to true, you don't need to finalize manually. Relevant when assigning points for completed sales with no natural two step transaction required.
+    examples:
+      - name: ExampleAuthorizePointsRequest
+        value:
+          requestId: "11aa22bb-33cc-44dd-55ee-66ff77aa88bb"
+          pointsAdjustment: -200
+          reason: "Payment in POS sale"
+          timeoutPeriod: 300
+          externalReferenceNo: "RCPT-582399102"
+          externalSystemIdentifier: "BCTenant-POSStore"
+          externalSystemUserIdentifier: "SalespersonCode"
+          AutoFinalize: false
+      - name: ExampleAuthorizePointsAssignmentRequest
+        value:
+          requestId: "11aa22bb-33cc-44dd-55ee-66ff77aa88bb"
+          pointsAdjustment: 100
+          reason: "Assigned points as apology for order delay"
+          timeoutPeriod: 300
+          externalReferenceNo: "TICKET-8245924"
+          externalSystemIdentifier: "Shopify-Gorgias"
+          externalSystemUserIdentifier: "550e8400-e29b-41d4-a716-446655440000"
+          AutoFinalize: true
+
+  AuthorizePointsResponse:
+    docs: Response containing the details of a successful point authorization.
+    properties:
+      transactionId: TransactionId
+      status: PointTransactionState
+      expiresAt: datetime
+    examples:
+      - name: ExampleAuthPointsResponse
+        value:
+          transactionId: $TransactionId.ExampleTransactionId
+          status: AUTHORIZED
+          expiresAt: "2025-06-23T12:05:00Z"
+
+  CancelAuthorizationRequest:
+    docs: Request to cancel point authorization instead of finalizing it.
+    properties:
+      transactionId: TransactionId
+    examples:
+      - name: ExampleCancelAuthorizationRequest
+        value:
+          transactionId: "550e8400-e29b-41d4-a716-446655440000"
+
+  FinalizePointsRequest:
+    docs: Request to finalize a previously reserved points transaction.
+    properties:
+      transactionId: TransactionId
+
+  FinalizePointsResponse:
+    docs: Response from a successful points finalization.
+    properties:
+      status: PointTransactionState
+      newBalance:
+        type: integer
+        docs: The new points balance after the finalization.
+    examples:
+      - name: ExampleFinalizePointsResponse
+        value:
+          status: FINALIZED
+          newBalance: 1300
+
+  PointTransactionType:
+    docs: The type of the point transaction entry.
+    enum:
+      - SALE
+      - REFUND
+      - WITHDRAWAL
+      - DEPOSIT
+      - EXPIRED
+      - SYNCHRONIZATION
+      - RESERVE
+      - CAPTURE
+      - RESERVATION_CANCELLED
+
+  PointTransaction:
+    docs: Represents a single transaction in the points history of a membership.
+    properties:
+      entryNo:
+        type: integer
+        docs: The unique, sequential number for the points ledger entry.
+      postingDate:
+        type: date
+        docs: The date the transaction was posted.
+      type:
+        type: PointTransactionType
+        docs: The type of transaction that occurred.
+      description:
+        type: string
+        docs: A description of the transaction.
+      externalReferenceNo:
+        type: string
+        docs: The document number associated with this transaction (e.g., receipt number).
+      externalSystemIdentifier:
+        type: string
+      externalSystemUserIdentifier:
+        type: string
+      points:
+        type: integer
+        docs: The net change in points for this transaction. A positive value indicates points were added; a negative value indicates points were spent.
+      transactionId:
+        type: TransactionId
+      externalRequestId:
+        type: string
+    examples:
+      - name: ExampleSaleTransaction
+        value:
+          entryNo: 54321
+          postingDate: "2025-06-23"
+          type: SALE
+          description: "Purchase of items in a POS sale"
+          externalReferenceNo: "POS-585298329"
+          externalSystemIdentifier: "TenantName-CompanyName-POSStoreID"
+          externalSystemUserIdentifier: "JACK_BAUER"
+          points: 150
+          transactionId: "550e8400-e29b-41d4-a716-446655440000"
+          externalRequestId: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+
+  PointsHistoryResponse:
+    docs: A list of point transactions for a membership.
+    properties:
+      history: list<PointTransaction>
+    examples:
+      - name: ExamplePointsHistory
+        value:
+          history:
+            - $PointTransaction.ExampleSaleTransaction

@@ -1,0 +1,69 @@
+# fern/apis/default/definition/coupon/service-coupon.yml
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+  couponTypes: ./types-coupon.yml
+
+service:
+  display-name: Coupon
+  auth: true
+  base-path: /coupon
+
+  endpoints:
+    getCoupon:
+      display-name: Get Coupon
+      docs: Retrieves the details of a specific coupon by its system ID.
+      method: GET
+      path: /{id}
+      path-parameters:
+        id: couponTypes.CouponId
+      response: couponTypes.Coupon
+      availability: in-development
+      examples:
+        - name: "Get a coupon"
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            id: $couponTypes.CouponId.ExampleCouponId
+          response:
+            body: $couponTypes.Coupon.ExampleCoupon
+
+    createCoupon:
+      display-name: Create Coupon
+      docs: Creates a new coupon.
+      method: POST
+      path: ""
+      request: couponTypes.CreateCouponRequest
+      response:
+        type: couponTypes.Coupon
+        status-code: 201
+      availability: in-development
+      examples:
+        - name: "Create a new coupon"
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          request: $couponTypes.CreateCouponRequest.ExampleCreateCoupon
+          response:
+            body: $couponTypes.Coupon.ExampleCoupon
+
+    voidCoupon:
+      display-name: Void Coupon
+      docs: Voids a coupon.
+      method: DELETE
+      path: /{id}
+      path-parameters:
+        id: couponTypes.CouponId
+      request: couponTypes.VoidCouponRequest
+      availability: in-development
+      examples:
+        - name: "Delete a coupon"
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            id: $couponTypes.CouponId.ExampleCouponId
+          request:
+            reason: "Voided to refund points"

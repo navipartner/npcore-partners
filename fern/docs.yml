@@ -244,6 +244,16 @@ navigation:
                 summary: ./docs/pages/memberships/misc-introduction.mdx
                 contents:
                   - endpoint: memberships.service-misc.resolveIdentifier
+
+            - memberships.service-points:
+                title: Points
+                summary: ./docs/pages/memberships/points-introduction.mdx
+                contents:
+                  - endpoint: memberships.service-points.getPointsBalance
+                  - endpoint: memberships.service-points.authorizePoints
+                  - endpoint: memberships.service-points.finalizePoints
+                  - endpoint: memberships.service-points.cancelAuthorizationPoints
+                  - endpoint: memberships.service-points.getPointsHistory
             
             - memberships.webhooks:
                 title: Webhooks
@@ -314,6 +324,12 @@ navigation:
           - inventory.itemtranslation:
               title: Item Translations
               summary: ./docs/pages/inventory/itemtranslation.mdx
+
+        - section: Coupon
+          summary: ./docs/pages/coupon/overview.mdx
+          contents:
+          - coupon.service-coupon:
+              title: Coupon
         
         - section: Vouchers
           summary: ./docs/pages/vouchers/overview.mdx
@@ -323,6 +339,19 @@ navigation:
               summary: ./docs/pages/vouchers/vouchers.mdx
           - vouchers.voucherwebhooks:
               title: Webhooks
+
+        - section: Finance
+          summary: ./docs/pages/finance/overview.mdx
+          contents:
+          - finance.glaccount:
+              title: General Ledger Account
+              summary: ./docs/pages/finance/glaccount.mdx
+          - finance.glentry:
+              title: General Ledger Entries
+              summary: ./docs/pages/finance/glentry.mdx
+          - finance.gljournal:
+              title: General Ledger Journal
+              summary: ./docs/pages/finance/gljournal.mdx          
 
 navbar-links:
   - type: secondary

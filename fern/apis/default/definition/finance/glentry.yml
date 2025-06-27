@@ -1,0 +1,168 @@
+imports:
+  globalApiTypes: ./../global-api-types.yml
+
+types:
+  DocumentTypeEnum:
+    docs: The type of the document that created the G/L entry.
+    enum:
+      - name: BLANK
+        value: " "
+      - name: PAYMENT
+        value: Payment
+      - name: INVOICE
+        value: Invoice
+      - name: CREDIT_MEMO
+        value: "Credit Memo"
+      - name: FINANCE_CHARGE_MEMO
+        value: "Finance Charge Memo"
+      - name: REMINDER
+        value: Reminder
+      - name: REFUND
+        value: Refund
+
+  GLEntry:
+    docs: Represents a General Ledger Entry, which is a record of a financial transaction.
+    properties:
+      id:
+        docs: The unique identifier for the G/L Entry (SystemId).
+        type: uuid
+      entryNumber:
+        docs: The unique sequential number of the G/L entry.
+        type: integer
+      postingDate:
+        docs: The date the entry was posted to the general ledger.
+        type: date
+      documentNumber:
+        docs: The number of the document that the entry belongs to.
+        type: string
+      documentType:
+        docs: The type of the document that the entry belongs to.
+        type: DocumentTypeEnum
+      accountId:
+        docs: The unique identifier of the G/L account.
+        type: uuid
+      accountNumber:
+        docs: The G/L account number that the entry was posted to.
+        type: string
+      description:
+        docs: A description of the transaction.
+        type: string
+      debitAmount:
+        docs: The debit amount of the entry.
+        type: double
+      creditAmount:
+        docs: The credit amount of the entry.
+        type: double
+      additionalCurrencyDebitAmount:
+        docs: The debit amount in the additional reporting currency.
+        type: double
+      additionalCurrencyCreditAmount:
+        docs: The credit amount in the additional reporting currency.
+        type: double
+      lastModifiedDateTime:
+        docs: The date and time the G/L entry was last modified.
+        type: datetime
+      rowVersion:
+        docs: The row version for data synchronization, required for the 'sync' parameter.
+        type: optional<string>
+    examples:
+      - name: ExampleGLEntry
+        value:
+          id: "f0a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5"
+          entryNumber: 10523
+          postingDate: "2025-06-23"
+          documentNumber: "INV-102030"
+          documentType: Invoice
+          accountId: "a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6"
+          accountNumber: "10100"
+          description: "Sale of goods"
+          debitAmount: 1250.00
+          creditAmount: 0.00
+          additionalCurrencyDebitAmount: 0.00
+          additionalCurrencyCreditAmount: 0.00
+          lastModifiedDateTime: "2025-06-23T11:45:10Z"
+          rowVersion: "0x0000000001D8F9A1"
+
+  PaginatedGLEntries:
+    docs: A paginated response containing multiple G/L entries.
+    properties:
+      morePages: boolean
+      nextPageKey: string
+      nextPageURL: string
+      data: list<GLEntry>
+    examples:
+      - name: ExamplePaginatedGLEntries
+        value:
+          morePages: true
+          nextPageKey: "cGFnZWsZXlBhZ2luYXRpb25LZXk="
+          nextPageURL: "https://api.npretail.app/tenant/env/company/generalledger/entry?pageKey=cGFnZWsZXlBhZ2luYXRpb25LZXk="
+          data:
+            - $GLEntry.ExampleGLEntry
+
+service:
+  auth: true
+  display-name: G/L Entry Service
+  base-path: /generalledger
+  endpoints:
+    getEntries:
+      display-name: Get G/L Entries
+      docs: Get a list of G/L entries with pagination. Supports filtering and replication.
+      method: GET
+      path: "/entry"
+      request:
+        name: getGLEntriesRequest
+        query-parameters:
+          accountNumber:
+            docs: Filter by G/L Account number. Supports Business Central filter syntax.
+            type: optional<string>
+          postingDate:
+            docs: Filter by posting date. Supports Business Central filter syntax (e.g., '2025-01-01..2025-01-31').
+            type: optional<string>
+          documentNumber:
+            docs: Filter by document number.
+            type: optional<string>
+          pageSize:
+            docs: The maximum number of entries to return per page.
+            type: optional<integer>
+          pageKey:
+            docs: The key for the next page of results, obtained from a previous response.
+            type: optional<string>
+          lastRowVersion:
+            docs: The last row version received, used for synchronization.
+            type: optional<string>
+          sync:
+            docs: Enables synchronization mode, which sorts by rowVersion.
+            type: optional<boolean>
+      response: PaginatedGLEntries
+      availability: in-development
+      examples:
+        - name: "List GL Entries"
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            pageSize: 1
+          response:
+            body: $PaginatedGLEntries.ExamplePaginatedGLEntries
+
+    getEntryById:
+      display-name: Get G/L Entry by ID
+      docs: Retrieves a single G/L entry by its system ID.
+      method: GET
+      path: "/entry/{id}"
+      path-parameters:
+        id:
+          docs: The UUID of the G/L Entry.
+          type: uuid
+      response: GLEntry
+      availability: in-development
+      examples:
+        - name: "Get a single GL Entry"
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            id: "f0a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5"
+          response:
+            body: $GLEntry.ExampleGLEntry

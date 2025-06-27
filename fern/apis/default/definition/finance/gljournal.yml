@@ -1,0 +1,284 @@
+# fern/apis/default/definition/financials/general-journal.yml
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+
+types:
+  GeneralJournalId:
+    type: uuid
+    docs: The unique identifier for a General Journal.
+
+  GeneralJournalAccountType:
+    docs: The type of account used in a general journal line.
+    enum:
+      - name: GL_ACCOUNT
+        value: 'G/L Account'
+      - name: BANK_ACCOUNT
+        value: 'Bank Account'
+
+  GeneralJournalLine:
+    docs: Represents a single line within a general journal.
+    properties:
+      id:
+        type: uuid
+        docs: The unique identifier for the journal line.
+      journalId:
+        type: uuid
+        docs: The unique identifier of the journal this line belongs to.
+      journalDisplayName:
+        type: optional<string>
+        docs: The display name of the journal.
+      lineNumber:
+        type: integer
+        docs: The line number within the journal.
+      accountType:
+        type: GeneralJournalAccountType
+        docs: The type of the main account.
+      accountId:
+        type: optional<uuid>
+        docs: The unique identifier of the main account.
+      accountNumber:
+        type: string
+        docs: The number of the main account.
+      postingDate:
+        type: date
+        docs: The date the transaction will be posted.
+      documentNumber:
+        type: string
+        docs: A number for the document.
+      externalDocumentNumber:
+        type: optional<string>
+        docs: An external number for the document.
+      amount:
+        type: double
+        docs: The transaction amount.
+      description:
+        type: optional<string>
+        docs: A description for the transaction.
+      comment:
+        type: optional<string>
+        docs: A comment for the line.
+      taxCode:
+        type: optional<string>
+        docs: The tax code for the line.
+      balanceAccountType:
+        type: optional<GeneralJournalAccountType>
+        docs: The type of the balancing account.
+      balancingAccountId:
+        type: optional<uuid>
+        docs: The unique identifier of the balancing account.
+      balancingAccountNumber:
+        type: optional<string>
+        docs: The number of the balancing account.
+      lastModifiedDateTime:
+        type: datetime
+        docs: The date and time the line was last modified.
+    examples:
+      - name: ExampleJournalLine
+        value:
+          id: "d2d7fb2a-6091-4e4c-a4c3-633d1354b2a3"
+          journalId: "e9f5e5e0-8f6a-4f2b-8a1a-1e1e1e1e1e1e"
+          journalDisplayName: "Daily Journal"
+          lineNumber: 10000
+          accountType: "G/L Account"
+          accountId: "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d"
+          accountNumber: "10100"
+          postingDate: "2025-06-20"
+          documentNumber: "INV-2025-001"
+          externalDocumentNumber: "EXT-INV-001"
+          amount: 1250.75
+          description: "Office Supplies Purchase"
+          comment: "Approved by manager"
+          taxCode: "VAT25"
+          balanceAccountType: "Bank Account"
+          balancingAccountId: "f1e2d3c4-b5a6-4f7e-8d9c-0a1b2c3d4e5f"
+          balancingAccountNumber: "BANK-US"
+          lastModifiedDateTime: "2025-06-20T14:30:00Z"
+
+  GeneralJournal:
+    docs: Represents a general journal, which is a collection of journal lines.
+    properties:
+      id:
+        type: GeneralJournalId
+        docs: The unique identifier for the journal.
+      code:
+        type: string
+        docs: The code for the journal batch.
+      displayName:
+        type: optional<string>
+        docs: The display name (description) of the journal batch.
+      templateDisplayName:
+        type: optional<string>
+        docs: The name of the journal template this journal is based on.
+      lastModifiedDateTime:
+        type: datetime
+        docs: The date and time the journal was last modified.
+      balancingAccountId:
+        type: optional<uuid>
+        docs: The default balancing account ID for the journal lines.
+      balancingAccountNumber:
+        type: optional<string>
+        docs: The default balancing account number for the journal lines.
+      lines:
+        type: list<GeneralJournalLine>
+        docs: A list of the lines within this journal.
+    examples:
+      - name: ExampleGeneralJournal
+        value:
+          id: "e9f5e5e0-8f6a-4f2b-8a1a-1e1e1e1e1e1e"
+          code: "DAILY"
+          displayName: "Daily Journal"
+          templateDisplayName: "GENERAL"
+          lastModifiedDateTime: "2025-06-20T14:30:00Z"
+          balancingAccountId: "f1e2d3c4-b5a6-4f7e-8d9c-0a1b2c3d4e5f"
+          balancingAccountNumber: "BANK-US"
+          lines:
+            - $GeneralJournalLine.ExampleJournalLine
+
+  GeneralJournalLinePost:
+    docs: Defines the data needed to create a new general journal line.
+    properties:
+      accountNumber:
+        type: optional<string>
+        docs: The number of the main account for this line. Either this or accountId must be provided.
+      accountId:
+        type: optional<uuid>
+        docs: The ID of the main account for this line. Either this or accountNumber must be provided.
+      postingDate:
+        type: date
+        docs: The posting date for the transaction.
+      documentNumber:
+        type: string
+        docs: The document number for the transaction.
+      amount:
+        type: double
+        docs: The amount of the transaction.
+      description:
+        type: optional<string>
+        docs: A description of the transaction.
+      accountType:
+        type: optional<GeneralJournalAccountType>
+        docs: The type of the main account. Defaults to 'G/L Account'.
+      externalDocumentNumber:
+        type: optional<string>
+        docs: An external document number, if applicable.
+      comment:
+        type: optional<string>
+        docs: A comment for the line.
+      taxCode:
+        type: optional<string>
+        docs: The tax code to apply.
+      balancingAccountNumber:
+        type: optional<string>
+        docs: The balancing account number for this line.
+
+  GeneralJournalPost:
+    docs: Defines the data needed to create a new general journal with its lines.
+    properties:
+      code:
+        type: string
+        docs: The code for the new journal batch.
+      description:
+        type: optional<string>
+        docs: The display name (description) for the new journal batch.
+      lines:
+        type: list<GeneralJournalLinePost>
+        docs: A list of lines to create within the new journal.
+    examples:
+      - name: ExampleCreateJournal
+        value:
+          code: "DAILY"
+          description: "Daily Journal Entries"
+          lines:
+            - accountNumber: "10100"
+              postingDate: "2025-06-20"
+              documentNumber: "INV-2025-001"
+              amount: 1250.75
+              description: "Office Supplies"
+              balancingAccountNumber: "BANK-US"
+            - accountNumber: "60200"
+              postingDate: "2025-06-20"
+              documentNumber: "INV-2025-002"
+              amount: 500.00
+              description: "Catering for meeting"
+              balancingAccountNumber: "BANK-US"
+
+  PaginatedGeneralJournals:
+    docs: A paginated list of general journals.
+    properties:
+      morePages: boolean
+      nextPageKey: optional<string>
+      nextPageURL: optional<string>
+      data: list<GeneralJournal>
+    examples:
+      - name: ExamplePaginatedJournals
+        value:
+          morePages: false
+          nextPageKey: null
+          nextPageURL: null
+          data:
+            - $GeneralJournal.ExampleGeneralJournal
+
+service:
+  auth: true
+  display-name: General Journal
+  base-path: /finance
+  endpoints:
+    createGeneralJournal:
+      display-name: Create General Journal
+      availability: in-development
+      docs: Creates a new general journal with header and lines in a single request.
+      method: POST
+      path: /generaljournal
+      request:
+        body: GeneralJournalPost
+      response: GeneralJournal
+      examples:
+        - name: Create Daily Journal
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          request: $GeneralJournalPost.ExampleCreateJournal
+          response:
+            body: $GeneralJournal.ExampleGeneralJournal
+
+    listGeneralJournals:
+      display-name: List General Journals
+      availability: in-development
+      docs: Retrieves a list of general journals.
+      method: GET
+      path: /generaljournal
+      request:
+        name: ListGeneralJournalsRequest
+        query-parameters:
+          pageSize: optional<integer>
+          pageKey: optional<string>
+      response: PaginatedGeneralJournals
+      examples:
+        - name: List All Journals
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          response:
+            body: $PaginatedGeneralJournals.ExamplePaginatedJournals
+
+    getGeneralJournal:
+      display-name: Get General Journal      
+      availability: in-development
+      docs: Retrieves a specific general journal by its unique identifier, including all its lines.
+      method: GET
+      path: /generaljournal/{journalId}
+      path-parameters:
+        journalId: GeneralJournalId
+      response: GeneralJournal
+      examples:
+        - name: Get Single Journal
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            journalId: "e9f5e5e0-8f6a-4f2b-8a1a-1e1e1e1e1e1e"
+          response:
+            body: $GeneralJournal.ExampleGeneralJournal

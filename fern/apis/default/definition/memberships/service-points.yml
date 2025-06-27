@@ -1,0 +1,104 @@
+# fern/apis/default/definition/memberships/service-points.yml
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+  simpleMemberTypes: ./types/types-simple.yml
+  pointTypes: ./types/types-points.yml
+
+service:
+  display-name: Membership Points
+  auth: true
+  base-path: /membership/{membershipId}/points
+
+  path-parameters:
+    membershipId: simpleMemberTypes.MembershipId
+
+  endpoints:
+    getPointsBalance:
+      display-name: Get Points Balance
+      docs: Retrieves the current loyalty point balance for a specific membership.
+      method: GET
+      path: ""
+      response: pointTypes.PointsBalance
+      availability: in-development
+      examples:
+        - name: "Get current points"
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $simpleMemberTypes.MembershipId.ExampleMembershipId
+          response:
+            body: $pointTypes.PointsBalance.ExamplePointsBalance
+
+    authorizePoints:
+      display-name: Authorize Points Transaction
+      docs: Creates an authorization for a points adjustment. This reserves the points for a specified period and must be finalized.
+      method: POST
+      path: /auth
+      request: pointTypes.AuthorizePointsRequest
+      response: pointTypes.AuthorizePointsResponse
+      availability: in-development
+      examples:
+        - name: "Authorize a point deduction"
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $simpleMemberTypes.MembershipId.ExampleMembershipId
+          request: $pointTypes.AuthorizePointsRequest.ExampleAuthorizePointsRequest
+          response:
+            body: $pointTypes.AuthorizePointsResponse.ExampleAuthPointsResponse
+
+    cancelAuthorizationPoints:
+      display-name: Cancel Point authorization
+      docs: Cancels a pending point reservation. Only possible before it has been finalized.
+      method: POST
+      path: /cancel
+      request: pointTypes.CancelAuthorizationRequest
+      availability: in-development
+      examples:
+        - name: "Cancel a point reservation"
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $simpleMemberTypes.MembershipId.ExampleMembershipId
+          request: $pointTypes.CancelAuthorizationRequest.ExampleCancelAuthorizationRequest
+
+    finalizePoints:
+      display-name: Finalize Points Transaction
+      docs: Finalizes an authorized points transaction using the transaction ID.
+      method: POST
+      path: /finalize
+      request: pointTypes.FinalizePointsRequest
+      response: pointTypes.FinalizePointsResponse
+      availability: in-development
+      examples:
+        - name: "Finalizes a point transaction"
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $simpleMemberTypes.MembershipId.ExampleMembershipId
+          request:
+            transactionId: $pointTypes.TransactionId.ExampleTransactionId
+          response:
+            body: $pointTypes.FinalizePointsResponse.ExampleFinalizePointsResponse
+
+    getPointsHistory:
+      display-name: Get Points History
+      docs: Retrieves the transaction history for a membership's loyalty points.
+      method: GET
+      path: /history
+      response: pointTypes.PointsHistoryResponse
+      availability: in-development
+      examples:
+        - name: "Get points history"
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            membershipId: $simpleMemberTypes.MembershipId.ExampleMembershipId
+          response:
+            body: $pointTypes.PointsHistoryResponse.ExamplePointsHistory

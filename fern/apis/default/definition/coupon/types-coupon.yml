@@ -1,0 +1,146 @@
+# fern/apis/default/definition/coupon/types-coupon.yml
+
+types:
+  CouponId:
+    type: uuid
+    docs: The unique system identifier for the coupon.
+    examples:
+      - name: ExampleCouponId
+        value: "77a1b3c2-d5e6-f7a8-b9c0-d1e2f3a4b5c6"
+
+  CouponStatus:
+    docs: The current status of the coupon.
+    enum:
+      - ACTIVE
+      - CONSUMED
+
+  CouponDiscountType:
+    docs: The type of discount the coupon provides.
+    enum:
+      - AMOUNT
+      - PERCENTAGE
+
+  Coupon:
+    docs: Represents a coupon with a specific value and type.
+    properties:
+      id: CouponId
+      number:
+        type: string
+        docs: The internal coupon number from the number series.
+      type:
+        type: string
+        docs: The type of voucher, which carries the setup in NP Retail.
+      description:
+        type: string
+        docs: A short description of the coupon.
+      barcode:
+        type: string
+        docs: A unique, human-readable reference number, often used for barcodes.
+      status:
+        type: CouponStatus
+        docs: The current status of the coupon.
+      discountType: CouponDiscountType
+      discountAmount:
+        type: optional<double>
+        docs: The fixed discount amount, if applicable.
+      discountPercent:
+        type: optional<double>
+        docs: The discount as a percentage, if applicable.
+      maxDiscountAmount:
+        type: optional<double>
+        docs: The maximum discount amount that can be applied.
+      validFrom:
+        type: datetime
+        docs: The date and time from which the coupon is valid.
+      validUntil:
+        type: optional<datetime>
+        docs: The date and time when the coupon expires.
+      customerNo:
+        type: optional<string>
+        docs: The customer number this coupon is assigned to, if any.
+      maxUsesPerSale:
+        type: integer
+        docs: The maximum number of times this coupon can be used in a single sale.
+      remainingQuantity:
+        type: optional<double>
+        docs: The remaining times the coupon can be used, if applicable.
+      issueDate:
+        type: date
+        docs: The date the coupon was first issued.
+    examples:
+      - name: ExampleCoupon
+        value:
+          id: $CouponId.ExampleCouponId
+          number: "COUP00123"
+          type: "WELCOME"
+          description: "Welcome Discount"
+          barcode: "9876543210987"
+          status: ACTIVE
+          discountType: PERCENTAGE
+          discountAmount: null
+          discountPercent: 10.0
+          maxDiscountAmount: 100.00
+          validFrom: "2025-06-01T00:00:00Z"
+          validUntil: "2025-08-31T23:59:59Z"
+          customerNo: "C00120"
+          maxUsesPerSale: 1
+          remainingQuantity: 1
+          issueDate: "2025-06-01"
+
+  CreateCouponRequest:
+    docs: The request body for creating a new coupon.
+    properties:
+      requestId:
+        type: uuid
+        docs: A unique identifier for the request to ensure idempotency.
+      couponType:
+        type: string
+        docs: The type of coupon, which links to a template defining its behavior.
+      description:
+        type: string
+        docs: A short description for the coupon.
+      barcode:
+        type: optional<string>
+        docs: The barcode or external reference number. If omitted, a number may be generated from a number series.
+      discountType: CouponDiscountType
+      discountAmount:
+        type: optional<double>
+        docs: The fixed discount amount. Required if discountType is 'AMOUNT'.
+      discountPercent:
+        type: optional<double>
+        docs: The discount percentage. Required if discountType is 'PERCENTAGE'.
+      maxDiscountAmount:
+        type: optional<double>
+        docs: The maximum discount amount that can be applied from this coupon.
+      customerNo:
+        type: optional<string>
+        docs: Optionally assign the coupon to a specific customer.
+      expiresAt:
+        type: optional<datetime>
+        docs: The date and time when the coupon expires. If omitted, the expiration is determined by the coupon type settings.
+    examples:
+      - name: ExampleCreateCoupon
+        value:
+          requestId: "c1d2e3f4-a5b6-c7d8-e9f0-a1b2c3d4e5f6"
+          couponType: "WELCOME"
+          description: "Welcome Discount"
+          barcode: "9876543210987"
+          discountType: PERCENTAGE
+          discountPercent: 10.0
+          maxDiscountAmount: 100.00
+          customerNo: "C00120"
+          expiresAt: "2025-08-31T23:59:59Z"
+
+  CreateCouponResponse:
+    docs: The response body when creating a new coupon
+    properties:
+      barcode:
+        type: string
+        docs: The barcode of the created voucher
+
+  VoidCouponRequest:
+    docs: The request body for voiding a coupon.
+    properties:
+      reason:
+        type: string
+        docs: The reason for voiding.

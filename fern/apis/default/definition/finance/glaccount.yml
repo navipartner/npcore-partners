@@ -1,0 +1,151 @@
+imports:
+  globalApiTypes: ./../global-api-types.yml
+
+types:
+  GLAccount:
+    docs: Represents a General Ledger Account in the system.
+    properties:
+      id:
+        docs: The unique identifier for the G/L Account (SystemId).
+        type: uuid
+      number:
+        docs: The G/L account number.
+        type: string
+      displayName:
+        docs: The display name of the G/L account.
+        type: string
+      category:
+        docs: "The category of the G/L account (e.g., Assets, Liabilities, Equity, Income, Cost of Goods Sold, Expense)."
+        type: string
+      subCategory:
+        docs: The descriptive subcategory of the G/L account.
+        type: string
+      blocked:
+        docs: Specifies if the G/L account is blocked from posting.
+        type: boolean
+      accountType:
+        docs: "The type of account (e.g., Posting, Heading, Total, Begin-Total, End-Total)."
+        type: string
+      directPosting:
+        docs: Specifies if direct posting is allowed to this G/L account.
+        type: boolean
+      netChange:
+        docs: The net change in the G/L account balance. This is a calculated flowfield.
+        type: double
+      consolidationTranslationMethod:
+        docs: "The consolidation translation method (e.g., Average Rate (Manual), Closing Rate, Historical Rate)."
+        type: string
+      consolidationDebitAccount:
+        docs: The consolidation debit account number.
+        type: string
+      consolidationCreditAccount:
+        docs: The consolidation credit account number.
+        type: string
+      excludeFromConsolidation:
+        docs: Specifies if this G/L account should be excluded from consolidation.
+        type: boolean
+      lastModifiedDateTime:
+        docs: The date and time the G/L account was last modified.
+        type: datetime
+      rowVersion:
+        docs: The row version for data synchronization, required for the 'sync' parameter.
+        type: optional<string>
+    examples:
+      - name: ExampleGLAccount
+        value:
+          id: "a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6"
+          number: "10100"
+          displayName: "Cash"
+          category: "Assets"
+          subCategory: "Cash and Cash Equivalents"
+          blocked: false
+          accountType: "Posting"
+          directPosting: true
+          netChange: 150250.75
+          consolidationTranslationMethod: "Average Rate (Manual)"
+          consolidationDebitAccount: ""
+          consolidationCreditAccount: ""
+          excludeFromConsolidation: false
+          lastModifiedDateTime: "2025-06-23T10:30:00Z"
+          rowVersion: "0x0000000001D8E7C4"
+
+  PaginatedGLAccounts:
+    docs: A paginated response containing multiple G/L accounts.
+    properties:
+      morePages: boolean
+      nextPageKey: string
+      nextPageURL: string
+      data: list<GLAccount>
+    examples:
+      - name: ExamplePaginatedGLAccounts
+        value:
+          morePages: true
+          nextPageKey: "cGFnZWsZXlBhZ2luYXRpb25LZXk="
+          nextPageURL: "https://api.npretail.app/tenant/env/company/generalledger/account?pageKey=cGFnZWsZXlBhZ2luYXRpb25LZXk="
+          data:
+            - $GLAccount.ExampleGLAccount
+
+service:
+  auth: true
+  display-name: G/L Account Service
+  base-path: /generalledger
+  endpoints:
+    getAccounts:
+      display-name: Get G/L Accounts
+      docs: Get a list of G/L accounts with pagination. Supports filtering and replication.
+      method: GET
+      path: "/account"
+      request:
+        name: getAccountsRequest
+        query-parameters:
+          number:
+            docs: Filter by G/L Account number. Supports Business Central filter syntax.
+            type: optional<string>
+          category:
+            docs: Filter by G/L Account category.
+            type: optional<string>
+          pageSize:
+            docs: The maximum number of accounts to return per page.
+            type: optional<integer>
+          pageKey:
+            docs: The key for the next page of results, obtained from a previous response.
+            type: optional<string>
+          lastRowVersion:
+            docs: The last row version received, used for synchronization.
+            type: optional<string>
+          sync:
+            docs: Enables synchronization mode, which sorts by rowVersion.
+            type: optional<boolean>
+      response: PaginatedGLAccounts
+      availability: in-development
+      examples:
+        - name: "List GL Accounts"
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            pageSize: 1
+          response:
+            body: $PaginatedGLAccounts.ExamplePaginatedGLAccounts
+
+    getAccountById:
+      display-name: Get G/L Account by ID
+      docs: Retrieves a single G/L account by its system ID.
+      method: GET
+      path: "/account/{id}"
+      path-parameters:
+        id:
+          docs: The UUID of the G/L Account.
+          type: uuid
+      response: GLAccount
+      availability: in-development
+      examples:
+        - name: "Get a single GL Account"
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            id: "a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6"
+          response:
+            body: $GLAccount.ExampleGLAccount
