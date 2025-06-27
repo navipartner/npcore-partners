@@ -586,6 +586,7 @@ table 6150874 "NPR Adyen Recon. Line"
         }
         key(Key2; "PSP Reference") { }
         key(Key3; "Document No.", Status) { }
+        key(Key4; "Matching Table Name", "Matching Entry System ID", "Transaction Type") { }
     }
 
     trigger OnInsert()

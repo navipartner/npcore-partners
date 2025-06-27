@@ -611,9 +611,11 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
 
     local procedure TryMatchingPaymentWithMagento(var ReconciliationLine: Record "NPR Adyen Recon. Line"; var MatchedEntries: Integer; ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"): Boolean
     var
+        ReconciliationLine2: Record "NPR Adyen Recon. Line";
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         PaymentGateway: Record "NPR Magento Payment Gateway";
         FilterPGCodes: Text;
+        MatchingFound: Boolean;
     begin
         PaymentGateway.Reset();
         PaymentGateway.SetRange("Integration Type", Enum::"NPR PG Integrations"::Adyen);
@@ -642,20 +644,57 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         else
             MagentoPaymentLine.SetRange(Reversed, false);
 
-        if not MagentoPaymentLine.FindFirst() then
+        if not MagentoPaymentLine.Find('-') then
             exit;
 
-        ReconciliationLine."Matching Table Name" := ReconciliationLine."Matching Table Name"::"Magento Payment Line";
-        ReconciliationLine."Matching Entry System ID" := MagentoPaymentLine.SystemId;
+        MatchingFound := false;
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        ReconciliationLine2.ReadIsolation := IsolationLevel::ReadUncommitted;
+#endif
+        repeat
+            ReconciliationLine2.SetFilter(SystemId, '<>%1', ReconciliationLine.SystemId);
+            ReconciliationLine2.SetRange("Matching Table Name", ReconciliationLine2."Matching Table Name"::"Magento Payment Line");
+            ReconciliationLine2.SetRange("Matching Entry System ID", MagentoPaymentLine.SystemId);
+            FilterReconciliationLineTransactionType(ReconciliationLine2, ReconciliationLine);
+            MatchingFound := ReconciliationLine2.IsEmpty();
 
-        if MagentoMatchingAllowed(MagentoPaymentLine, ReconciliationLine, ReconciliationHeader, true) then begin
-            ReconciliationLine.Status := ReconciliationLine.Status::Matched;
-            // TODO Calculate Realized Gains or Losses
-            MatchedEntries += 1;
-        end else
-            ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Match";
+            if MatchingFound then begin
+                ReconciliationLine."Matching Table Name" := ReconciliationLine."Matching Table Name"::"Magento Payment Line";
+                ReconciliationLine."Matching Entry System ID" := MagentoPaymentLine.SystemId;
+                if MagentoMatchingAllowed(MagentoPaymentLine, ReconciliationLine, ReconciliationHeader, true) then begin
+                    ReconciliationLine.Status := ReconciliationLine.Status::Matched;
+                    // TODO Calculate Realized Gains or Losses
+                    MatchedEntries += 1;
+                end else
+                    ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Match";
+            end;
+        until MatchingFound or (MagentoPaymentLine.Next() = 0);
 
-        exit(true);
+        exit(MatchingFound);
+    end;
+
+    local procedure FilterReconciliationLineTransactionType(var ReconciliationLine2: Record "NPR Adyen Recon. Line"; ReconciliationLine: Record "NPR Adyen Recon. Line")
+    begin
+        case ReconciliationLine."Transaction Type" of
+            ReconciliationLine."Transaction Type"::Chargeback,
+            ReconciliationLine."Transaction Type"::SecondChargeback,
+            ReconciliationLine."Transaction Type"::RefundedReversed:
+                ReconciliationLine2.SetRange("Transaction Type", ReconciliationLine."Transaction Type");
+
+            ReconciliationLine."Transaction Type"::ChargebackReversed,
+            ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo:
+                ReconciliationLine2.SetFilter("Transaction Type", '%1|%2',
+                    ReconciliationLine."Transaction Type"::ChargebackReversed,
+                    ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo)
+
+            else
+                ReconciliationLine2.SetFilter("Transaction Type", '<>%1&<>%2&<>%3&<>%4&<>%5',
+                    ReconciliationLine."Transaction Type"::Chargeback,
+                    ReconciliationLine."Transaction Type"::SecondChargeback,
+                    ReconciliationLine."Transaction Type"::RefundedReversed,
+                    ReconciliationLine."Transaction Type"::ChargebackReversed,
+                    ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo);
+        end;
     end;
 
     local procedure TryMatchingAdjustments(var ReconciliationLine: Record "NPR Adyen Recon. Line"; ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr") MatchedEntries: Integer
