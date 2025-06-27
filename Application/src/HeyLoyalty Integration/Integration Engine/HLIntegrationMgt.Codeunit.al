@@ -382,6 +382,7 @@ codeunit 6059993 "NPR HL Integration Mgt."
                         [Database::"NPR MM Member",
                          Database::"NPR MM Membership",
                          Database::"NPR MM Membership Role",
+                         Database::"NPR MM Membership Entry",
                          Database::"NPR GDPR Consent Log",
                          Database::"NPR HL Selected MCF Option"];
             IntegrationArea::Heybooking:
@@ -443,6 +444,30 @@ codeunit 6059993 "NPR HL Integration Mgt."
     begin
         _HLSetup.GetRecordOnce(false);
         exit(_HLSetup."Membership HL Field ID");
+    end;
+
+    procedure HLExternalMembershipNoFieldID(): Text[50]
+    begin
+        _HLSetup.GetRecordOnce(false);
+        exit(_HLSetup."External Membership No. HLF ID");
+    end;
+
+    procedure HLMembershipIssuedOnFieldID(): Text[50]
+    begin
+        _HLSetup.GetRecordOnce(false);
+        exit(_HLSetup."Membership Issued On HLF ID");
+    end;
+
+    procedure HLMembershipValidUntilFieldID(): Text[50]
+    begin
+        _HLSetup.GetRecordOnce(false);
+        exit(_HLSetup."Membership Valid Until HLF ID");
+    end;
+
+    procedure HLMembershipItemNoFieldID(): Text[50]
+    begin
+        _HLSetup.GetRecordOnce(false);
+        exit(_HLSetup."Membership Item No. HLF ID");
     end;
 
     procedure ReadWebhookPayloadEnabled(): Boolean

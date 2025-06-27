@@ -563,10 +563,18 @@
                 }
                 field("News Letter"; Rec."News Letter")
                 {
-
                     Importance = Additional;
                     ToolTip = 'Specifies the value of the News Letter field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Visible = not MCF_MemberOfVisible;
+                }
+                field("News Letter (HeyLoyalty)"; Rec."News Letter")
+                {
+                    Caption = 'Subscribe to HeyLoyalty Newsletter';
+                    ToolTip = 'Specifies if the new member wants to subscribe to HeyLoyalty newsletter.';
+                    Importance = Standard;
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Visible = MCF_MemberOfVisible;
                 }
                 field(PreferredLanguage; Rec.PreferredLanguageCode)
                 {
@@ -997,6 +1005,7 @@
         NPRAttrVisible10 := NPRAttrVisibleArray[10];
         NPRAttrEditable := CurrPage.Editable();
         AuxiliaryPhoneNoField := Rec."Phone No.";
+        MCF_MemberOfVisible := HLMCFSubscriptionMgt.GetMCFMemberOfVisible();
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -1078,8 +1087,9 @@
         _MembershipValidUntilDate: Date;
         _BlockDetails: Text;
         AuxiliaryPhoneNoField: Text[100];
-
         _ReUseExistingMember: Boolean;
+        HLMCFSubscriptionMgt: Codeunit "NPR HL MCF Subscription Mgt.";
+        MCF_MemberOfVisible: Boolean;
 
     local procedure UpdateMemberInfoOnReuse(var InfoCapture: Record "NPR MM Member Info Capture"; FromFieldId: Integer): Boolean
     var

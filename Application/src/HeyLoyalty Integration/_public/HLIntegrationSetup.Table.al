@@ -84,6 +84,26 @@ table 6059800 "NPR HL Integration Setup"
             Caption = 'Membership HL Field ID';
             DataClassification = CustomerContent;
         }
+        field(51; "External Membership No. HLF ID"; Text[50])
+        {
+            Caption = 'External Membership No. HL Field ID';
+            DataClassification = CustomerContent;
+        }
+        field(52; "Membership Issued On HLF ID"; Text[50])
+        {
+            Caption = 'Membership Issued On HL Field ID';
+            DataClassification = CustomerContent;
+        }
+        field(53; "Membership Valid Until HLF ID"; Text[50])
+        {
+            Caption = 'Membership Valid Until HL Field ID';
+            DataClassification = CustomerContent;
+        }
+        field(54; "Membership Item No. HLF ID"; Text[50])
+        {
+            Caption = 'Membership Item No. HL Field ID';
+            DataClassification = CustomerContent;
+        }
         field(60; "Read Member Data from Webhook"; Boolean)
         {
             Caption = 'Read Member Data from Webhook';
@@ -170,6 +190,26 @@ table 6059800 "NPR HL Integration Setup"
                     if not Confirm(ConfirmDataProcessingHandlerChangeQst, false, FieldCaption("Data Processing Handler ID")) then
                         "Data Processing Handler ID" := xRec."Data Processing Handler ID";
             end;
+        }
+        field(200; "Enable MC Subscription"; Boolean)
+        {
+            Caption = 'Enable MultiChoice Subscription';
+            DataClassification = CustomerContent;
+        }
+        field(201; "Member of MCF Code"; Code[20])
+        {
+            Caption = 'Member of MCF Code';
+            DataClassification = CustomerContent;
+        }
+        field(202; "Notification List Opt. ID"; Integer)
+        {
+            Caption = 'Notification List Option ID';
+            DataClassification = CustomerContent;
+        }
+        field(203; "Newsletter List Opt. ID"; Integer)
+        {
+            Caption = 'Newsletter List Option ID';
+            DataClassification = CustomerContent;
         }
     }
 

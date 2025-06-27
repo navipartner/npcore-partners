@@ -82,6 +82,27 @@ page 6150753 "NPR HL HeyLoyalty Members"
                     ApplicationArea = NPRHeyLoyalty;
                     Visible = false;
                 }
+                field("External Membership No."; Rec."External Membership No.")
+                {
+                    ApplicationArea = NPRHeyLoyalty;
+                    ToolTip = 'Specifies the external number assigned to the member memberhip.';
+                }
+                field("Membership Item No."; Rec."Membership Item No.")
+                {
+                    ApplicationArea = NPRHeyLoyalty;
+                    ToolTip = 'Specifies the item number used for the last membership period.';
+                    Visible = false;
+                }
+                field("Membership Issued On"; Rec."Membership Issued On")
+                {
+                    ApplicationArea = NPRHeyLoyalty;
+                    ToolTip = 'Specifies the date when the member membership was first activated on.';
+                }
+                field("Membership Valid Until"; Rec."Membership Valid Until")
+                {
+                    ApplicationArea = NPRHeyLoyalty;
+                    ToolTip = 'Specifies the member membership expiration date.';
+                }
                 field("No. of Attributes"; Rec."No. of Attributes")
                 {
                     ToolTip = 'Specifies number of additional attributes assigned to the HeyLoyalty member record.';

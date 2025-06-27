@@ -23,6 +23,8 @@ codeunit 6059989 "NPR HL DLog Subscr. Mgt. Impl."
                     AddDataLogSetupEntity(
                         IntegrationArea, Database::"NPR MM Membership Role", DataLogSetup."Log Insertion"::Simple, DataLogSetup."Log Modification"::Changes, DataLogSetup."Log Deletion"::Detailed, JobQueueMgt.DaysToDuration(7));
                     AddDataLogSetupEntity(
+                        IntegrationArea, Database::"NPR MM Membership Entry", DataLogSetup."Log Insertion"::Simple, DataLogSetup."Log Modification"::Changes, DataLogSetup."Log Deletion"::Detailed, JobQueueMgt.DaysToDuration(7));
+                    AddDataLogSetupEntity(
                         IntegrationArea, Database::"NPR GDPR Consent Log", DataLogSetup."Log Insertion"::Detailed, DataLogSetup."Log Modification"::" ", DataLogSetup."Log Deletion"::" ", JobQueueMgt.DaysToDuration(7));
                     AddDataLogSetupEntity(
                         IntegrationArea, Database::"NPR HL Selected MCF Option", DataLogSetup."Log Insertion"::Simple, DataLogSetup."Log Modification"::Changes, DataLogSetup."Log Deletion"::Detailed, JobQueueMgt.DaysToDuration(7));

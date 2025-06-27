@@ -132,9 +132,44 @@
                 }
                 field("E-Mail News Letter"; Rec."E-Mail News Letter")
                 {
-
                     ToolTip = 'Specifies the value of the E-Mail News Letter field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Visible = not MCF_MemberOfVisible;
+                }
+
+                field("E-Mail News Letter (HeyLoyalty)"; Rec."E-Mail News Letter")
+                {
+                    Caption = 'Sync. with HeyLoyalty';
+                    ToolTip = 'Specifies if the member is eligible for HeyLoyalty integration.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Visible = MCF_MemberOfVisible;
+                    Editable = false;
+
+                    trigger OnValidate()
+                    begin
+                        CurrPage.SaveRecord();
+                        if Rec."E-Mail News Letter" = Rec."E-Mail News Letter"::YES then begin
+                            Commit();
+                            HLMultiChoiceFieldMgt.ShowAssignedHLMultiChoiceFieldOptionValues(Rec.RecordId(), HLIntegrationSetup."Member of MCF Code", CurrPage.Editable());
+                        end;
+                        CurrPage.Update(false);
+                    end;
+                }
+                field("NPR MCF_MemberOf"; MCF_MemberOf)
+                {
+                    Caption = 'HeyLoyalty: Member of';
+                    ToolTip = 'Specifies which HeyLoyalty lists the member is part of.';
+                    ApplicationArea = NPRHeyLoyalty;
+                    Visible = MCF_MemberOfVisible;
+                    Editable = false;
+                    AssistEdit = true;
+
+                    trigger OnAssistEdit()
+                    begin
+                        CurrPage.SaveRecord();
+                        HLMultiChoiceFieldMgt.ShowAssignedHLMultiChoiceFieldOptionValues(Rec.RecordId(), HLIntegrationSetup."Member of MCF Code", CurrPage.Editable());
+                        CurrPage.Update(false);
+                    end;
                 }
                 field(PreferredLanguage; Rec.PreferredLanguageCode)
                 {
@@ -977,6 +1012,10 @@
             _EmailEditable := not (Community."Member Unique Identity" in [Community."Member Unique Identity"::EMAIL_AND_FIRST_NAME, Community."Member Unique Identity"::EMAIL]);
             _PhoneNumberEditable := not (Community."Member Unique Identity" in [Community."Member Unique Identity"::EMAIL_AND_PHONE, Community."Member Unique Identity"::EMAIL_OR_PHONE, Community."Member Unique Identity"::PHONENO]);
         end;
+
+        if MCF_MemberOfVisible then
+            MCF_MemberOf :=
+                HLMultiChoiceFieldMgt.GetAssignedHLMultiChoiceFieldOptionValuesAsString(Rec.RecordId(), HLIntegrationSetup."Member of MCF Code", 1);
     end;
 
     trigger OnOpenPage()
@@ -999,10 +1038,18 @@
         NPRAttrEditable := CurrPage.Editable();
 
         RaptorEnabled := (RaptorSetup.Get() and RaptorSetup."Enable Raptor Functions");
+        MCF_MemberOfVisible := HLMCFSubscriptionMgt.GetMCFMemberOfVisible();
+    end;
 
+    trigger OnNewRecord(BelowxRec: Boolean)
+    begin
+        MCF_MemberOf := '';
     end;
 
     var
+        HLIntegrationSetup: Record "NPR HL Integration Setup";
+        HLMultiChoiceFieldMgt: Codeunit "NPR HL MultiChoice Field Mgt.";
+        HLMCFSubscriptionMgt: Codeunit "NPR HL MCF Subscription Mgt.";
         _FirstNameEditable: Boolean;
         _EmailEditable: Boolean;
         _PhoneNumberEditable: Boolean;
@@ -1026,6 +1073,8 @@
         NPRAttrVisible09: Boolean;
         NPRAttrVisible10: Boolean;
         RaptorEnabled: Boolean;
+        MCF_MemberOf: Text;
+        MCF_MemberOfVisible: Boolean;
         NO_ENTRIES: Label 'No entries found for member %1.';
 
     local procedure SetMasterDataAttributeValue(AttributeNumber: Integer)

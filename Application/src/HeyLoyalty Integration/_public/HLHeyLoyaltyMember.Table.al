@@ -215,6 +215,26 @@ table 6059801 "NPR HL HeyLoyalty Member"
             Caption = 'HeyLoyalty Store Name';
             DataClassification = CustomerContent;
         }
+        field(120; "External Membership No."; Code[20])
+        {
+            Caption = 'External Membership No.';
+            DataClassification = CustomerContent;
+        }
+        field(121; "Membership Issued On"; Date)
+        {
+            Caption = 'Membership Issued On';
+            DataClassification = CustomerContent;
+        }
+        field(122; "Membership Valid Until"; Date)
+        {
+            Caption = 'Membership Valid Until Date';
+            DataClassification = CustomerContent;
+        }
+        field(123; "Membership Item No."; Code[20])
+        {
+            Caption = 'Membership Item No.';
+            DataClassification = CustomerContent;
+        }
         field(200; "Update from HL Error"; Boolean)
         {
             Caption = 'Update from HL Error';

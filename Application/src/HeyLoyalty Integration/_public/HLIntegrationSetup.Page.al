@@ -64,12 +64,6 @@ page 6150720 "NPR HL Integration Setup"
                         Enabled = MemberListIntegrationIsEnabled;
                         ToolTip = 'Specifies the HeyLoyalty member list Id integration is coupled with.';
                     }
-                    field("Membership HL Field ID"; Rec."Membership HL Field ID")
-                    {
-                        ApplicationArea = NPRHeyLoyalty;
-                        Enabled = MemberListIntegrationIsEnabled;
-                        ToolTip = 'Specifies the field ID at HeyLoyalty for storing information about membership code.';
-                    }
                     field("Required Contact Info"; Rec."Required Contact Info")
                     {
                         ApplicationArea = NPRHeyLoyalty;
@@ -134,6 +128,88 @@ page 6150720 "NPR HL Integration Setup"
                         ApplicationArea = NPRHeyLoyalty;
                         Enabled = HeybookingIntegrationIsEnabled;
                         ToolTip = 'By enabeling this option, the system will send Heybooking fire_events trigger to HeyLoyalty. This is used to trigger events in HeyLoyalty when a booking is made or modified.';
+                    }
+                }
+            }
+            group(HLFields_MemberList)
+            {
+                Caption = 'HeyLoyalty Fields (Member List)';
+                Enabled = MemberListIntegrationIsEnabled;
+
+                group(HLFieldIDs)
+                {
+                    Caption = 'HeyLoyalty Field IDs';
+
+                    field("Membership HL Field ID"; Rec."Membership HL Field ID")
+                    {
+                        ApplicationArea = NPRHeyLoyalty;
+                        ToolTip = 'Specifies the field ID at HeyLoyalty for storing information about membership code. The ID mostly used is "membership_code".';
+                    }
+                    field("External Membership No. HLF ID"; Rec."External Membership No. HLF ID")
+                    {
+                        ApplicationArea = NPRHeyLoyalty;
+                        ToolTip = 'Specifies the field ID at HeyLoyalty for storing information about external membership number. The ID mostly used is "medlemsnummer".';
+                    }
+                    field("Membership Issued On HLF ID"; Rec."Membership Issued On HLF ID")
+                    {
+                        ApplicationArea = NPRHeyLoyalty;
+                        ToolTip = 'Specifies the field ID at HeyLoyalty for storing information about membership issued on date. The ID mostly used is "medlemskab_aktiveringsdato".';
+                    }
+                    field("Membership Valid Until HLF ID"; Rec."Membership Valid Until HLF ID")
+                    {
+                        ApplicationArea = NPRHeyLoyalty;
+                        ToolTip = 'Specifies the field ID at HeyLoyalty for storing information about membership valid until date. The ID mostly used is "medlemskab_slutdato".';
+                    }
+                    field("Membership Item No. HLF ID"; Rec."Membership Item No. HLF ID")
+                    {
+                        ApplicationArea = NPRHeyLoyalty;
+                        ToolTip = 'Specifies the field ID at HeyLoyalty for storing information about membership item number. The ID mostly used is "item_no".';
+                    }
+                }
+                group("MultiChoice Subscription")
+                {
+                    Caption = 'MultiChoice Subscription';
+
+                    field("Enable MC Subscription"; Rec."Enable MC Subscription")
+                    {
+                        ApplicationArea = NPRHeyLoyalty;
+                        ToolTip = 'Specifies whether the HeyLoyalty multiple choice field subscription is enabled. If enabled, system will use HeyLoyalty multiple choice fields to store information about which HeyLoyalty lists the member is subscribed to.';
+                    }
+
+                    field("Member of MCF Code"; Rec."Member of MCF Code")
+                    {
+                        ApplicationArea = NPRHeyLoyalty;
+                        ToolTip = 'Specifies the multiple choice field code to be used to store which HeyLoyalty lists synchronized entity (member) is going to be part of.';
+                        trigger OnLookup(var Text: Text): Boolean
+                        var
+                            HLMultiChoiceFieldMgt: Codeunit "NPR HL MultiChoice Field Mgt.";
+                        begin
+                            exit(HLMultiChoiceFieldMgt.LookupMultiChoiceFieldCode(Text));
+                        end;
+                    }
+                    field("Notification List Opt. ID"; Rec."Notification List Opt. ID")
+                    {
+                        ApplicationArea = NPRHeyLoyalty;
+                        ToolTip = 'Specifies the option id of the multiple choice field for members of HeyLoyalty notification list.';
+                        trigger OnLookup(var Text: Text): Boolean
+                        var
+                            HLMultiChoiceFieldMgt: Codeunit "NPR HL MultiChoice Field Mgt.";
+                        begin
+                            Rec.TestField("Member of MCF Code");
+                            exit(HLMultiChoiceFieldMgt.LookupMultiChoiceFieldOption(Rec."Member of MCF Code", Text));
+                        end;
+                    }
+                    field("Newsletter List Opt. ID"; Rec."Newsletter List Opt. ID")
+                    {
+                        ApplicationArea = NPRHeyLoyalty;
+                        ToolTip = 'Specifies the option id of the multiple choice field for members of HeyLoyalty newsletter list.';
+                        trigger OnLookup(var Text: Text): Boolean
+                        var
+                            HLMultiChoiceFieldMgt: Codeunit "NPR HL MultiChoice Field Mgt.";
+                        begin
+                            Rec.TestField("Member of MCF Code");
+                            exit(HLMultiChoiceFieldMgt.LookupMultiChoiceFieldOption(Rec."Member of MCF Code", Text));
+                        end;
                     }
                 }
             }
@@ -239,6 +315,41 @@ page 6150720 "NPR HL Integration Setup"
                     PromotedOnly = true;
                     PromotedCategory = Process;
                     RunObject = page "NPR HL MultiChoice Fields";
+                }
+                action(UpdateMembersForMCFSubscription)
+                {
+                    Caption = 'Update Members for MCF Subscription';
+                    ToolTip = 'Updates HeyLoyalty members with multiple choice field subscription information.';
+                    ApplicationArea = NPRHeyLoyalty;
+                    Image = Action;
+                    Promoted = true;
+                    PromotedIsBig = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Process;
+
+                    trigger OnAction()
+                    var
+                        HLMCFSubscriptionMgt: Codeunit "NPR HL MCF Subscription Mgt.";
+                        MCSubNotEnabledLbl: Label 'HeyLoyalty multiple choice field subscription is not enabled.\\Please enable it in the HeyLoyalty integration setup first.';
+                        MembersUpdatedLbl: Label 'HeyLoyalty members have been updated to use multiple choice field subscription.\\Total members updated: %1', Comment = '%1 - count of updated members';
+                        NoMembersUpdatedLbl: Label 'No HeyLoyalty members were updated.';
+                        Count: Integer;
+                    begin
+                        CurrPage.SaveRecord();
+                        if not Rec."Enable MC Subscription" then begin
+                            Message(MCSubNotEnabledLbl);
+                            exit;
+                        end;
+
+                        Rec.TestField("Member of MCF Code");
+
+                        HLMCFSubscriptionMgt.UpgradeMembersToUseMCFSubscription(Count);
+
+                        if Count > 0 then
+                            Message(MembersUpdatedLbl, Count)
+                        else
+                            Message(NoMembersUpdatedLbl);
+                    end;
                 }
                 action(SyncMembersToHL)
                 {

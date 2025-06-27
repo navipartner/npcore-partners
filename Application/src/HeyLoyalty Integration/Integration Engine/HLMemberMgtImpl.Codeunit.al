@@ -145,6 +145,7 @@ codeunit 6059995 "NPR HL Member Mgt. Impl."
         Membership: Record "NPR MM Membership";
         MembershipRole: Record "NPR MM Membership Role";
         MembershipRole2: Record "NPR MM Membership Role";
+        MembershipEntry: Record "NPR MM Membership Entry";
         DataLogSubscriberMgt: Codeunit "NPR Data Log Sub. Mgt.";
         RecRef: RecordRef;
         Handled: Boolean;
@@ -174,6 +175,16 @@ codeunit 6059995 "NPR HL Member Mgt. Impl."
                         RecRef.SetTable(MembershipRole);
                         if MembershipRole.Find() then
                             TouchMember(MembershipRole, TempMembershipRole);
+                    end;
+                Database::"NPR MM Membership Entry":
+                    begin
+                        RecRef := DataLogEntry."Record ID".GetRecord();
+                        RecRef.SetTable(MembershipEntry);
+                        if MembershipEntry.Find() then begin
+                            MembershipRole.SetRange("Membership Entry No.", MembershipEntry."Membership Entry No.");
+                            if FindMembershipRole(MembershipRole, MembershipRole2) then
+                                TouchMember(MembershipRole2, TempMembershipRole);
+                        end;
                     end;
                 Database::"NPR GDPR Consent Log":
                     if DataLogSubscriberMgt.RestoreRecordToRecRef(DataLogEntry."Entry No.", false, RecRef) then begin
@@ -340,6 +351,8 @@ codeunit 6059995 "NPR HL Member Mgt. Impl."
     procedure UpdateHLMember(Member: Record "NPR MM Member"; MembershipRole: Record "NPR MM Membership Role"; MemberDeleted: Boolean; AutoInsert: Enum "NPR HL Auto Create HL Member"; var HLMember: Record "NPR HL HeyLoyalty Member"): Boolean
     var
         Membership: Record "NPR MM Membership";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        MembershipSetup: Record "NPR MM Membership Setup";
         xHLMember: Record "NPR HL HeyLoyalty Member";
         AttributeMgt: Codeunit "NPR HL Attribute Mgt.";
         HLMultiChoiceFieldMgt: Codeunit "NPR HL MultiChoice Field Mgt.";
@@ -374,6 +387,25 @@ codeunit 6059995 "NPR HL Member Mgt. Impl."
         HLMember."Membership Entry No." := Membership."Entry No.";
         HLMember."Membership Code" := Membership."Membership Code";
         HLMember."HL Membership Name" := GetMembershipHLName(HLMember."Membership Code");
+        HLMember."External Membership No." := Membership."External Membership No.";
+        HLMember."Membership Issued On" := Membership."Issued Date";
+
+        if Membership."Entry No." <> 0 then begin
+            MembershipEntry.SetRange("Membership Entry No.", Membership."Entry No.");
+            MembershipEntry.SetRange(Blocked, false);
+            MembershipEntry.SetFilter(Context, '<>%1', MembershipEntry.Context::REGRET);
+            if MembershipEntry.IsEmpty() then
+                MembershipEntry.SetRange(Blocked);
+            MembershipEntry.SetCurrentKey("Membership Entry No.");
+            if MembershipEntry.FindLast() then
+                if MembershipSetup.Get(Membership."Entry No.") then
+                    if MembershipSetup.Perpetual then
+                        MembershipEntry."Valid Until Date" := 99991231D;
+        end else
+            Clear(MembershipEntry);
+
+        HLMember."Membership Valid Until" := MembershipEntry."Valid Until Date";
+        HLMember."Membership Item No." := MembershipEntry."Item No.";
 
         if HLMember."Unsubscribed at" = 0DT then
             if HLMember.Deleted or HLMember.Anonymized or not MemberIsEligibleForHLSync(Member, MembershipRole, HLMember, false) or

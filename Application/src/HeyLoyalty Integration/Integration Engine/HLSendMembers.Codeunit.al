@@ -113,6 +113,22 @@ codeunit 6059997 "NPR HL Send Members"
             UrlParametersJObject.Add(HLFieldID, HLMember."HL Membership Name");
         end;
 
+        HLFieldID := HLIntegrationMgt.HLExternalMembershipNoFieldID();
+        if HLFieldID <> '' then
+            UrlParametersJObject.Add(HLFieldID, HLMember."External Membership No.");
+
+        HLFieldID := HLIntegrationMgt.HLMembershipIssuedOnFieldID();
+        if HLFieldID <> '' then
+            UrlParametersJObject.Add(HLFieldID, Format(HLMember."Membership Issued On", 0, 9));
+
+        HLFieldID := HLIntegrationMgt.HLMembershipValidUntilFieldID();
+        if HLFieldID <> '' then
+            UrlParametersJObject.Add(HLFieldID, Format(HLMember."Membership Valid Until", 0, 9));
+
+        HLFieldID := HLIntegrationMgt.HLMembershipItemNoFieldID();
+        if HLFieldID <> '' then
+            UrlParametersJObject.Add(HLFieldID, HLMember."Membership Item No.");
+
         AddAttributes(HLMember, NewMember, UrlParametersJObject);
         AddMultiChoiceFields(HLMember, NewMember, UrlParametersJObject);
 
