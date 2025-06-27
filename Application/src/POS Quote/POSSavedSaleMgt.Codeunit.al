@@ -439,6 +439,7 @@
         SaleLinePOS: Record "NPR POS Sale Line";
         POSSaleTax: Record "NPR POS Sale Tax";
         POSSaleTaxLine: Record "NPR POS Sale Tax Line";
+        POSActionPublisher: Codeunit "NPR POS Action Publishers";
         TempNpDcSaleLinePOSNewCouponFieldBuffer: Record "Field" temporary;
         TempNpDcSaleLinePOSCouponFieldBuffer: Record "Field" temporary;
         TempNpIaSaleLinePOSAddOnFieldBuffer: Record "Field" temporary;
@@ -577,6 +578,7 @@
             SaleLinePOS."Location Code" := SalePOS."Location Code";
             if UpdateDim then
                 SaleLinePOS.CreateDimFromDefaultDim(SaleLinePOS.FieldNo("No."));
+            POSActionPublisher.OnBeforeInsertSaleLinePOSXml2POSSale(SaleLinePOS);
             SaleLinePOS.Insert(true, true);
 
             Element.SelectNodes('pos_sale_tax_summary_lines/pos_sale_tax_summary_line', POSSaleTaxNodes);

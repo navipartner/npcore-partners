@@ -10,6 +10,13 @@ codeunit 6151068 "NPR POS Action Publishers"
     procedure OnBeforeAddCustomertoSales(SaleHeader: Record "NPR POS Sale"; Customer: Record Customer)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnBeforeInsertSaleLinePOSXml2POSSale(var SaleLinePOS: Record "NPR POS Sale Line")
+    begin
+    end;
+
+
     #region CUSTOMER_DEPOSIT
     procedure CreateCustomerDeposit(DepositType: Option ApplyCustomerEntries,InvoiceNoPrompt,AmountPrompt,MatchCustomerBalance,CrMemoNoPrompt;
                             CustomerEntryView: Text;
