@@ -1689,9 +1689,11 @@
             Found := Page.RunModal(0, Voucher) = Action::LookupOK;
             exit;
         end;
-
         if VoucherNumber = '' then
-            Error(BlankVoucherNumberErr);
+            if VoucherReservationByAmountFeatureEnabled() then
+                Error(BlankVoucherNumberErr)
+            else
+                exit;
 
         NpRvVoucherType.Reset();
         NpRvVoucherType.SetFilter(Code, VoucherType);
@@ -1714,8 +1716,10 @@
             exit;
 
         if Voucher.IsEmpty then
-            Error(InvalidReferenceNumberErr, VoucherNumber, VoucherType);
-
+            if VoucherReservationByAmountFeatureEnabled() then
+                Error(InvalidReferenceNumberErr, VoucherNumber, VoucherType)
+            else
+                exit;
         Found := Page.RunModal(0, Voucher) = Action::LookupOK;
     end;
 

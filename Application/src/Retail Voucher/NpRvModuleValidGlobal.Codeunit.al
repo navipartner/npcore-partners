@@ -161,10 +161,14 @@
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnAfterApplyPaymentV3', '', true, true)]
     local procedure OnAfterApplyPaymentV3(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary; SaleLinePOSVoucher: Record "NPR NpRv Sales Line"; POSLine: Record "NPR POS Sale Line")
+    var
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
     begin
+
         if TempNpRvVoucherBuffer."Validate Voucher Module" <> ModuleCode() then
             exit;
-        SendVoucherReservation(TempNpRvVoucherBuffer, SaleLinePOSVoucher, POSLine);
+        if NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then
+            SendVoucherReservation(TempNpRvVoucherBuffer, SaleLinePOSVoucher, POSLine);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnRunFindVoucher', '', true, true)]
@@ -542,14 +546,16 @@
         Voucher.Modify(true);
         Commit();
 
-        UpdateReservationEntries(Node.AsXmlElement(), Voucher);
+        if NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then begin
+            UpdateReservationEntries(Node.AsXmlElement(), Voucher);
 
-        Commit();
+            Commit();
 
-        Voucher.CalcFields(Amount);
-        AvailableAmount := Voucher.Amount;
-        if AvailableAmount <> VoucherAmount then
-            PostSyncEntry(Voucher, VoucherAmount - AvailableAmount, Node);
+            Voucher.CalcFields(Amount);
+            AvailableAmount := Voucher.Amount;
+            if AvailableAmount <> VoucherAmount then
+                PostSyncEntry(Voucher, VoucherAmount - AvailableAmount, Node);
+        end;
     end;
 
     local procedure UpdateReservationEntries(XmlElement: XmlElement; NpRvVoucher: Record "NPR NpRv Voucher")
@@ -1117,6 +1123,7 @@
     internal procedure UpdateVoucherAmount(NpRvVoucher: Record "NPR NpRv Voucher")
     var
         NpRvVoucherType: Record "NPR NpRv Voucher Type";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         AvailableAmount: Decimal;
         VoucherAmount: Decimal;
         Node: XmlNode;
@@ -1127,7 +1134,8 @@
         if NpRvVoucherType."Validate Voucher Module" <> ModuleCode() then
             exit;
         if FindVoucherAmount(NpRvVoucher."Reference No.", NpRvVoucherType, VoucherAmount, Node) then begin
-            UpdateReservationEntries(Node.AsXmlElement(), NpRvVoucher);
+            if NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then
+                UpdateReservationEntries(Node.AsXmlElement(), NpRvVoucher);
             NpRvVoucher.CalcFields(Amount);
             AvailableAmount := NpRvVoucher.Amount;
             if (VoucherAmount <> 0) and (AvailableAmount <> VoucherAmount) then
