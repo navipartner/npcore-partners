@@ -24,12 +24,12 @@ codeunit 6248352 "NPR Static EFT Receipt"
         B21FontLbl: Label 'B21', Locked = true;
         Caption_Copy: Label '*** Copy ***';
     begin
+        Printer.SetFont(B21FontLbl);
         if EFTTransactionRequest.Get(EFTReceipt."EFT Trans. Request Entry No.") and (EFTTransactionRequest."No. of Reprints" > 0) then
             Printer.AddLine(Caption_Copy, 0);
 
         if EFTReceipt.FindSet() then
             repeat
-                Printer.SetFont(B21FontLbl);
                 Printer.AddLine(EFTReceipt.Text, 0);
             until EFTReceipt.Next() = 0;
 
