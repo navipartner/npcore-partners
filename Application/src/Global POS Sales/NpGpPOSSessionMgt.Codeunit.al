@@ -26,6 +26,11 @@
             exit;
         if not NpGpPOSSalesSetup.Get(POSUnit."Global POS Sales Setup") then
             exit;
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+        if NpGpPOSSalesSetup."Use api" then
+            exit;
+#endif
+
         if not FindPosEntry(SalePOS, POSEntry) then
             exit;
 
@@ -52,6 +57,11 @@
 
         if not NpGpPOSSalesSetup.Get(POSUnit."Global POS Sales Setup") then
             exit;
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+        if NpGpPOSSalesSetup."Use api" then
+            exit;
+#endif
+
         if not FindPosEntry(SalePOS, POSEntry) then
             exit;
 
