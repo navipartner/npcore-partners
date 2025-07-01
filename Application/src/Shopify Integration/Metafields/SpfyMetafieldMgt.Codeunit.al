@@ -570,16 +570,16 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
 #endif
                     ItemAttrValueTranslation.SetRange("Attribute ID", ItemAttribute.ID);
                     ItemAttrValueTranslation.SetRange("Language Code", LanguageCode);
-                    ItemAttrValueTranslation.SetFilter(Name, StrSubstNo('%1', NewAttributeValueTxt));
+                    ItemAttrValueTranslation.SetFilter(Name, StrSubstNo('''%1''', NewAttributeValueTxt));
                     if ItemAttrValueTranslation.IsEmpty() then
-                        ItemAttrValueTranslation.SetFilter(Name, StrSubstNo('@%1', NewAttributeValueTxt));
+                        ItemAttrValueTranslation.SetFilter(Name, StrSubstNo('''@%1''', NewAttributeValueTxt));
                     if ItemAttrValueTranslation.FindFirst() then
                         ItemAttribValueFound := ItemAttributeValue.Get(ItemAttrValueTranslation."Attribute ID", ItemAttrValueTranslation.ID)
                     else begin
                         ItemAttributeValue.SetRange("Attribute ID", ItemAttribute.ID);
-                        ItemAttributeValue.SetFilter(Value, StrSubstNo('%1', NewAttributeValueTxt));
+                        ItemAttributeValue.SetFilter(Value, StrSubstNo('''%1''', NewAttributeValueTxt));
                         if ItemAttributeValue.IsEmpty() then
-                            ItemAttributeValue.SetFilter(Value, StrSubstNo('@%1', NewAttributeValueTxt));
+                            ItemAttributeValue.SetFilter(Value, StrSubstNo('''@%1''', NewAttributeValueTxt));
                         ItemAttribValueFound := ItemAttributeValue.FindFirst();
                     end;
                 end;
