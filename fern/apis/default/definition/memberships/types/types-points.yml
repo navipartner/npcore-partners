@@ -32,7 +32,7 @@ types:
         value: "SHOPIFY_B2C_CHANNEL"
 
   ExternalSystemUserIdentifier:
-    type: string
+    type: optional<string>
     docs: An identifier for the user in the external system, e.g. a salesperson code in an external POS or a user ID in a customer support tool.
     examples:
       - name: ExternalSystemUserIdentifierExample
@@ -62,10 +62,7 @@ types:
       externalReferenceNo: ExternalReferenceNo
       externalSystemIdentifier: ExternalSystemIdentifier
       externalSystemUserIdentifier: ExternalSystemUserIdentifier
-      customerNo:
-        type: optional<string>
-        docs: An optional customer no. if using reconciliation in the point master node.
-      AutoFinalize:
+      autoFinalize:
         type: boolean
         docs: if set to true, you don't need to finalize manually. Relevant when assigning points for completed sales with no natural two step transaction required.
     examples:
@@ -78,7 +75,7 @@ types:
           externalReferenceNo: "RCPT-582399102"
           externalSystemIdentifier: "BCTenant-POSStore"
           externalSystemUserIdentifier: "SalespersonCode"
-          AutoFinalize: false
+          autoFinalize: false
       - name: ExampleAuthorizePointsAssignmentRequest
         value:
           requestId: "11aa22bb-33cc-44dd-55ee-66ff77aa88bb"
@@ -88,12 +85,14 @@ types:
           externalReferenceNo: "TICKET-8245924"
           externalSystemIdentifier: "Shopify-Gorgias"
           externalSystemUserIdentifier: "550e8400-e29b-41d4-a716-446655440000"
-          AutoFinalize: true
+          autoFinalize: true
 
   AuthorizePointsResponse:
     docs: Response containing the details of a successful point authorization.
     properties:
-      transactionId: TransactionId
+      transactionId: 
+          type: uuid
+          docs: A unique identifier for a points transaction to be used for Finalize or Cancel the points transaction. Will not be returned if autoFinalize is set to true.
       status: PointTransactionState
       expiresAt: datetime
     examples:
@@ -111,6 +110,19 @@ types:
       - name: ExampleCancelAuthorizationRequest
         value:
           transactionId: "550e8400-e29b-41d4-a716-446655440000"
+
+  CancelPointsResponse:
+    docs: Response from a successful points cancellation.
+    properties:
+      status: PointTransactionState
+      newBalance:
+        type: integer
+        docs: The new points balance after the finalization.
+    examples:
+      - name: ExampleCancelPointsResponse
+        value:
+          status: CANCELLED
+          newBalance: 1300
 
   FinalizePointsRequest:
     docs: Request to finalize a previously reserved points transaction.

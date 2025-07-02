@@ -56,6 +56,7 @@ service:
       method: POST
       path: /cancel
       request: pointTypes.CancelAuthorizationRequest
+      response: pointTypes.CancelPointsResponse
       availability: in-development
       examples:
         - name: "Cancel a point reservation"
@@ -65,6 +66,8 @@ service:
             company: $globalApiTypes.Company.ExampleCompanyCronus
             membershipId: $simpleMemberTypes.MembershipId.ExampleMembershipId
           request: $pointTypes.CancelAuthorizationRequest.ExampleCancelAuthorizationRequest
+          response:
+            body: $pointTypes.CancelPointsResponse.ExampleCancelPointsResponse
 
     finalizePoints:
       display-name: Finalize Points Transaction
