@@ -111,7 +111,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         if not HasReadyState(ShopifyStore, Order, OrderStatus) then
             exit;
 
-        if DocExists(ImportType, DocName) then
+        if DocExists(ImportType, ShopifyStore.Code, DocName) then
             exit;
 
         ImportEntry.Init();
@@ -258,7 +258,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         end;
     end;
 
-    local procedure DocExists(ImportType: Record "NPR Nc Import Type"; DocName: Text[100]): Boolean
+    local procedure DocExists(ImportType: Record "NPR Nc Import Type"; ShopifyStoreCode: Code[20]; DocName: Text[100]): Boolean
     var
         ImportEntry: Record "NPR Nc Import Entry";
     begin
@@ -266,6 +266,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
             exit(false);
 
         ImportEntry.SetRange("Import Type", ImportType.Code);
+        ImportEntry.SetRange("Store Code", ShopifyStoreCode);
         ImportEntry.SetRange("Document Name", DocName);
         exit(ImportEntry.FindFirst());
     end;
