@@ -1,4 +1,4 @@
-﻿#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+﻿#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24)
 codeunit 6060064 "NPR Nonstock Purchase Mgt."
 {
     Access = Internal;
