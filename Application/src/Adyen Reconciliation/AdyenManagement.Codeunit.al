@@ -1428,6 +1428,50 @@ codeunit 6184796 "NPR Adyen Management"
         end;
     end;
 
+    internal procedure DownloadExcelFromWebhookRequest(AdyenWebhook: Record "NPR Adyen Webhook")
+    var
+        HttpClient: HttpClient;
+        HttpResponseMessage: HttpResponseMessage;
+        HttpContent: HttpContent;
+        JsonToken: JsonToken;
+        JsonObjectToken: JsonToken;
+        JsonValueToken: JsonToken;
+        JsonObject: JsonObject;
+        InS: InStream;
+        FileInStream: InStream;
+        FileDownloadURL: Text;
+        FileName: Text;
+    begin
+        _AdyenSetup.Get();
+        if (AdyenWebhook."Event Code" = AdyenWebhook."Event Code"::REPORT_AVAILABLE) and (AdyenWebhook."PSP Reference".Contains('.xls')) then begin
+            AdyenWebhook.CalcFields("Webhook Data");
+            AdyenWebhook."Webhook Data".CreateInStream(InS, TextEncoding::UTF8);
+
+            if (JsonToken.ReadFrom(InS)) then
+                JsonObject := JsonToken.AsObject();
+            if (JsonObject.Get('notificationItems', JsonToken)) then
+                if JsonToken.IsArray() then
+                    foreach JsonObjectToken in JsonToken.AsArray() do
+                        if JsonObjectToken.IsObject() then
+                            if JsonObjectToken.AsObject().Get('NotificationRequestItem', JsonObjectToken) then
+                                if JsonObjectToken.IsObject() then
+                                    if (JsonObjectToken.AsObject().Get('reason', JsonValueToken)) then begin
+                                        FileDownloadURL := JsonValueToken.AsValue().AsText();
+                                        HttpClient.DefaultRequestHeaders.Add('x-api-key', _AdyenSetup.GetDownloadReportApiKey());
+                                        HttpClient.Get(FileDownloadURL, HttpResponseMessage);
+                                        if (HttpResponseMessage.IsSuccessStatusCode()) then begin
+                                            HttpContent := HttpResponseMessage.Content();
+                                            HttpContent.ReadAs(FileInStream);
+                                            FileName := AdyenWebhook."PSP Reference";
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+                                            if FileInStream.Length() > 0 then
+#endif
+                                                DownloadFromStream(FileInStream, '', '', '', FileName);
+                                        end;
+                                    end;
+        end;
+    end;
+
     local procedure CreateDefaultDimPriority(SourceCode: Code[10]; TableID: Integer; Priority: Integer)
     var
         DimensionPriority: Record "Default Dimension Priority";

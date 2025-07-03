@@ -203,6 +203,24 @@ page 6184665 "NPR Adyen Webhooks"
                     CurrPage.Update(false);
                 end;
             }
+            action("Download Excel")
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Download Excel';
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+                Image = Excel;
+                ToolTip = 'Running this action will try to download and open file from Webhook Reference in Excel.';
+
+                trigger OnAction()
+                var
+                    AdyenManagement: Codeunit "NPR Adyen Management";
+                begin
+                    AdyenManagement.DownloadExcelFromWebhookRequest(Rec);
+                end;
+            }
             action("Show Logs")
             {
                 ApplicationArea = NPRRetail;
