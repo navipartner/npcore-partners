@@ -60,19 +60,24 @@ codeunit 6151383 "NPR MM AzureMemberRegistration"
 
         foreach Message in Messages do begin
             if (DecodeMessage(Message.AsXmlElement(), MessageId, PopReceipt, DataSubjectId, MemberJson)) then begin
+
                 ClearLastError();
+                ResponseReason := '';
                 HaveImage := GetMemberImage(AzureRegistrationSetup.AzureStorageAccountName, DataSubjectId, ImageB64);
                 if (not HaveImage) then
                     ResponseReason := GetLastErrorText();
 
                 if (MembershipManagement.UpdateMember(DataSubjectId, MemberJson, ImageB64)) then begin
                     if (HaveImage) then
-                        if (DeleteMemberImage(AzureRegistrationSetup.AzureStorageAccountName, DataSubjectId)) then; // not fatal to not delete the image
+                        if (not DeleteMemberImage(AzureRegistrationSetup.AzureStorageAccountName, DataSubjectId)) then
+                            ResponseReason := GetLastErrorText(); // not fatal to not delete the image
 
                     DeleteQueuedMessage(AzureRegistrationSetup.AzureStorageAccountName, AzureRegistrationSetup.QueueName, MessageId, PopReceipt);
                 end;
+
                 UpdateReceiveAzureLog(DataSubjectId, MemberJson, HaveImage, ImageB64, ResponseReason);
                 Commit();
+
                 ProcessCount += 1;
             end else begin
                 FailCount += 1;
@@ -189,10 +194,10 @@ codeunit 6151383 "NPR MM AzureMemberRegistration"
         Request.Method('GET');
         Request.SetRequestUri(StrSubstNo(GetBlobUrl, StorageAccountName, DataSubjectId, SharedAccessSignature));
         if (not Client.Send(Request, Response)) then
-            Error(GetLastErrorText());
+            Error('Client.Send() [GET] URL:%1 - %2', StrSubstNo(GetBlobUrl, StorageAccountName, DataSubjectId, '<redacted>'), GetLastErrorText());
 
         if (not Response.IsSuccessStatusCode()) then
-            Error(GetLastErrorText());
+            Error('%1 [GET] URL:%2 - %3', Response.HttpStatusCode, StrSubstNo(GetBlobUrl, StorageAccountName, DataSubjectId, '<redacted>'), GetLastErrorText());
 
         Response.Content().ReadAs(ImageB64);
     end;
@@ -211,10 +216,10 @@ codeunit 6151383 "NPR MM AzureMemberRegistration"
         Request.Method('DELETE');
         Request.SetRequestUri(StrSubstNo(GetBlobUrl, StorageAccountName, DataSubjectId, SharedAccessSignature));
         if (not Client.Send(Request, Response)) then
-            Error(GetLastErrorText());
+            Error('Client.Send() [DELETE] URL:%1 - %2', StrSubstNo(GetBlobUrl, StorageAccountName, DataSubjectId, '<redacted>'), GetLastErrorText());
 
         if (not Response.IsSuccessStatusCode()) then
-            Error(GetLastErrorText());
+            Error('%1 [DELETE] URL:%2 - %3', Response.HttpStatusCode, StrSubstNo(GetBlobUrl, StorageAccountName, DataSubjectId, '<redacted>'), GetLastErrorText());
     end;
 
     [TryFunction]
