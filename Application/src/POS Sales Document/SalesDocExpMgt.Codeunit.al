@@ -527,7 +527,8 @@
                 end;
                 SalesLine."Line No." := SaleLinePOS."Line No.";
                 SalesPriceRecalculated := SaleLinePOS.TransferToSalesLine(SalesLine, TransferPostingSetup);
-                SalesLine.Validate("Location Code", SalesHeader."Location Code");
+                if UseLocationFrom <> UseLocationFrom::"POS Sale" then
+                    SalesLine.Validate("Location Code", SalesHeader."Location Code");
                 SalesLine.Insert(true);
                 if SalesLine.Type <> SalesLine.Type::" " then begin
                     if SalesHeader.IsCreditDocType() or (SaleLinePOS."Sale Type" = SaleLinePOS."Sale Type"::"Out payment") then
