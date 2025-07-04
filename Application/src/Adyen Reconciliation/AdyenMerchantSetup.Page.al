@@ -2,7 +2,7 @@ page 6184582 "NPR Adyen Merchant Setup"
 {
     Extensible = false;
     UsageCategory = none;
-    Caption = 'NP Pay Merchant Account Setup';
+    Caption = 'NP Pay Merchant Account Default Setup';
     PageType = Card;
     SourceTable = "NPR Adyen Merchant Setup";
     InsertAllowed = false;
@@ -106,6 +106,26 @@ page 6184582 "NPR Adyen Merchant Setup"
                         ToolTip = 'Specifies the Account No. of Missing Transactions.';
                     }
                 }
+            }
+        }
+    }
+
+    actions
+    {
+        area(Processing)
+        {
+            action("Open Merchant Currency Setup")
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Open Merchant Currency Setup';
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+                Image = Setup;
+                ToolTip = 'Running this action will open the merchant currency setup.';
+                RunObject = page "NPR Merchant Currency Setup";
+                RunPageLink = "Merchant Account Name" = field("Merchant Account");
             }
         }
     }

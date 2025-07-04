@@ -1469,6 +1469,23 @@ codeunit 6184796 "NPR Adyen Management"
         end;
     end;
 
+    internal procedure ValidateAdyenCurrencyCode(var CurrencyCode: Code[10]; GLSetup: Record "General Ledger Setup")
+    var
+        Currency: Record Currency;
+    begin
+        if CurrencyCode = GLSetup."LCY Code" then
+            CurrencyCode := '';
+        if CurrencyCode <> '' then begin
+            if not Currency.Get(CurrencyCode) then begin
+                Currency.SetRange("ISO Code", CurrencyCode);
+                Currency.FindFirst();
+                CurrencyCode := Currency.Code;
+            end;
+            if CurrencyCode = GLSetup."LCY Code" then
+                CurrencyCode := '';
+        end;
+    end;
+
     internal procedure DownloadExcelFromWebhookRequest(AdyenWebhook: Record "NPR Adyen Webhook")
     var
         HttpClient: HttpClient;
