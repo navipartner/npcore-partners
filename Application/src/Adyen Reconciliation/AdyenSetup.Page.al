@@ -45,16 +45,20 @@ page 6184531 "NPR Adyen Setup"
                     ApplicationArea = NPRRetail;
                     ExtendedDatatype = Masked;
                     trigger OnValidate()
-                    var
-                        AdyenManagement: Codeunit "NPR Adyen Management";
                     begin
                         if (_APIManagementSecretKey = '') then
                             Rec.DeleteManagementAPIKey()
                         else begin
                             Rec.SetManagementAPIKey(_APIManagementSecretKey);
                             Rec.Modify();
-                            if Rec.HasManagementAPIKey() then
-                                AdyenManagement.TestApiKey(Rec."Environment Type");
+                            if Rec.HasManagementAPIKey() then begin
+                                if not _AdyenManagement.TestApiKey(Rec."Environment Type") then
+                                    ShowError(GetLastErrorText())
+                                else begin
+                                    if not IsNullGuid(_ManagementAPIKeyNotValidNotification.Id) then
+                                        _ManagementAPIKeyNotValidNotification.Recall();
+                                end;
+                            end;
                         end;
                     end;
                 }
@@ -335,19 +339,28 @@ page 6184531 "NPR Adyen Setup"
         Rec.CalcFields("Active Webhooks");
         _IsSaaS := not EnvironmentInformation.IsOnPrem();
 
-        if (Rec.HasManagementAPIKey()) then
-            _APIManagementSecretKey := '***';
-
         if (Rec.HasDownloadReportAPIKey()) then
             _APIDownloadReportSecretKey := '***';
 
-        if Rec.HasManagementAPIKey() then
-            _AdyenManagement.TestApiKey(Rec."Environment Type");
+        if Rec.HasManagementAPIKey() then begin
+            _APIManagementSecretKey := '***';
+            if not _AdyenManagement.TestApiKey(Rec."Environment Type") then
+                ShowError(GetLastErrorText());
+        end;
+    end;
+
+    local procedure ShowError(ErrorText: Text)
+    begin
+        _ManagementAPIKeyNotValidNotification.Id := CreateGuid();
+        _ManagementAPIKeyNotValidNotification.Message := ErrorText;
+        _ManagementAPIKeyNotValidNotification.Scope := NotificationScope::LocalScope;
+        _ManagementAPIKeyNotValidNotification.Send();
     end;
 
     var
         _AdyenGenericSetup: Record "NPR Adyen Setup";
         _AdyenManagement: Codeunit "NPR Adyen Management";
+        _ManagementAPIKeyNotValidNotification: Notification;
         _IsSaaS: Boolean;
         _APIManagementSecretKey: Text;
         _APIDownloadReportSecretKey: Text;

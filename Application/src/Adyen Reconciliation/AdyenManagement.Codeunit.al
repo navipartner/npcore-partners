@@ -68,7 +68,6 @@ codeunit 6184796 "NPR Adyen Management"
     internal procedure CreateWebhook(var WebhookSetup: Record "NPR Adyen Webhook Setup"): Boolean
     var
         CreateWebhookEndpoint: Label '/merchants/%1/webhooks', Locked = true;
-        AFWebServiceURL: Label 'https://nppaywebhook.azurewebsites.net/api/NPPayCloud', Locked = true;
         RequestText: Text;
         ResponseText: Text;
         RequestUrl: Text;
@@ -93,12 +92,13 @@ codeunit 6184796 "NPR Adyen Management"
         if not ResponseObject.Get('id', JsonToken) then
             exit;
         WebhookSetup.ID := CopyStr(JsonToken.AsValue().AsCode(), 1, MaxStrLen(WebhookSetup.ID));
+        if WebhookSetup.ID <> '' then
+            WebhookSetup."Web Service URL" += '&webhookRef=' + WebhookSetup.ID;
+
         if ResponseObject.Get('description', JsonToken) then
             WebhookSetup.Description := CopyStr(JsonToken.AsValue().AsText(), 1, MaxStrLen(WebhookSetup.Description));
         WebhookSetup.Modify(false);
         ModifyWebhook(WebhookSetup);
-        if (WebhookSetup."Web Service URL" <> '') and (WebhookSetup."Web Service URL".Contains(AFWebServiceURL)) then
-            SuggestAFWebServiceURL(WebhookSetup);
         exit(true);
     end;
 
@@ -630,26 +630,67 @@ codeunit 6184796 "NPR Adyen Management"
     var
         EnvironmentInformation: Codeunit "Environment Information";
         AzureADTenant: Codeunit "Azure AD Tenant";
-        AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
-        WebhookBaseurl: Label 'https://nppaywebhook.azurewebsites.net/api', Locked = true;
-        KeyLbl: Label 'NPPayAFCode', Locked = True;
-        OnPremLbl: Label 'NP Pay BC Integration is supported only on Cloud environment.\Current environment - ''OnPrem''.';
         TypeHelper: Codeunit "Type Helper";
-        CompanyName: Text;
+        BaseUrl: Text;
+        ModeTxt: Text;
+        PasswordInput: Text[100];
+        QueryString: Text;
+        URLEncodedCompanyName: Text;
+        UserNameInput: Text[100];
+        WebhookBaseURLProd: Label 'https://nppay-webhook.npretail.app', Locked = true;
+        WebhookBaseURLPrelive: Label 'https://nppay-webhook-prelive.navipartner-prelive.workers.dev', Locked = true;
     begin
-        if EnvironmentInformation.IsOnPrem() then
-            Error(OnPremLbl);
+        URLEncodedCompanyName := CompanyName();
+        TypeHelper.UrlEncode(URLEncodedCompanyName);
 
-        CompanyName := CompanyName();
-        TypeHelper.UrlEncode(CompanyName);
-        Rec."Web Service URL" := (StrSubstNo('%1/NPPayCloud/%2/%3/%4?code=%5&CompanyName=%6',
-        WebhookBaseurl,
-        AzureADTenant.GetAadTenantId(),
-        EnvironmentInformation.GetEnvironmentName(),
-        Rec.ID,
-        AzureKeyVaultMgt.GetAzureKeyVaultSecret(KeyLbl),
-        CompanyName));
+        if EnvironmentInformation.IsOnPrem() then begin
+            ModeTxt := 'onprem';
+
+            if not PromptOnPremWebhookInput(UserNameInput, PasswordInput, BaseUrl) then
+                exit;
+
+            TypeHelper.UrlEncode(BaseUrl);
+
+            QueryString := StrSubstNo(
+                '?mode=%1&username=%2&password=%3&bcBaseUrl=%4&companyName=%5',
+                ModeTxt,
+                UserNameInput,
+                PasswordInput,
+                BaseUrl,
+                URLEncodedCompanyName);
+        end else begin
+            ModeTxt := 'cloud';
+
+            QueryString := StrSubstNo(
+                '?mode=%1&tenant=%2&environment=%3&companyName=%4',
+                ModeTxt,
+                AzureADTenant.GetAadTenantId(),
+                EnvironmentInformation.GetEnvironmentName(),
+                URLEncodedCompanyName);
+        end;
+        if EnvironmentInformation.IsProduction() then
+            Rec."Web Service URL" := WebhookBaseURLProd + QueryString
+        else
+            Rec."Web Service URL" := WebhookBaseURLPrelive + QueryString;
         Rec.Modify(Rec.ID <> '');
+    end;
+
+
+    local procedure PromptOnPremWebhookInput(var UserName: Text[100]; var Password: Text[100]; var BaseURL: Text): Boolean
+    var
+        ReportParameters: Text;
+        ReportObject: Report "NPR Adyen OnPrem Webhook Input";
+    begin
+        ReportParameters := ReportObject.RunRequestPage();
+
+        if ReportParameters = '' then
+            exit(false);
+
+        UserName := ReportObject.GetUserName();
+        Password := ReportObject.GetPassword();
+        BaseURL := ReportObject.GetBCBaseURL();
+
+        exit(true);
     end;
     #endregion
 
@@ -775,6 +816,7 @@ codeunit 6184796 "NPR Adyen Management"
             Page.Run(Page::"NPR Adyen Reconciliation Logs", Logs);
     end;
 
+    [TryFunction]
     [NonDebuggable]
     internal procedure TestApiKey(EnvironmentType: Enum "NPR Adyen Environment Type")
     var
@@ -788,8 +830,7 @@ codeunit 6184796 "NPR Adyen Management"
         ManagementKeyIsNotValidLbl: Label 'Management API key is not valid. Please update the Management API key.';
         NPPaySetup: Record "NPR Adyen Setup";
     begin
-        if not NPPaySetup.Get() then
-            exit;
+        NPPaySetup.Get();
 
         RequestURL := GetManagementAPIURL(EnvironmentType) + GetCompaniesEndpoint;
 

@@ -47,6 +47,7 @@ table 6150801 "NPR Adyen Setup"
                 WebhookSetup: Record "NPR Adyen Webhook Setup";
                 AdyenManagement: Codeunit "NPR Adyen Management";
                 AdyenTrMatchingSession: Codeunit "NPR Adyen Tr. Matching Session";
+                EnvironmentInformation: Codeunit "Environment Information";
                 ReportReadyEventFilter: Label 'REPORT_AVAILABLE', Locked = true;
                 AdyenWebhookType: Enum "NPR Adyen Webhook Type";
                 ManagmentApiKeyErr: Label 'Management API Key must have a value in NP Pay Setup';
@@ -57,11 +58,12 @@ table 6150801 "NPR Adyen Setup"
                         Error(ManagmentApiKeyErr);
                     AdyenManagement.UpdateMerchantList(0);
 
-                    if MerchantAccount.FindSet() and WebhookSetup.IsEmpty() then
-                        repeat
-                            AdyenManagement.InitWebhookSetup(WebhookSetup, ReportReadyEventFilter, MerchantAccount.Name, AdyenWebhookType::standard);
-                            AdyenManagement.CreateWebhook(WebhookSetup);
-                        until MerchantAccount.Next() = 0;
+                    if not EnvironmentInformation.IsOnPrem() then
+                        if MerchantAccount.FindSet() and WebhookSetup.IsEmpty() then
+                            repeat
+                                AdyenManagement.InitWebhookSetup(WebhookSetup, ReportReadyEventFilter, MerchantAccount.Name, AdyenWebhookType::standard);
+                                AdyenManagement.CreateWebhook(WebhookSetup);
+                            until MerchantAccount.Next() = 0;
                 end;
             end;
         }

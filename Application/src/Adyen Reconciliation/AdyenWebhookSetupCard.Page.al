@@ -130,12 +130,11 @@ page 6184550 "NPR Adyen Webhook Setup Card"
 
                 trigger OnAction()
                 var
-                    AdyenManagement: Codeunit "NPR Adyen Management";
                     WebhookSetUpSuccess: Label 'Successfully configured Webhook %1.';
                     WebhookSetUpError: Label 'Could not configure current Webhook. Please contact your Administrator.';
                 begin
                     if Rec.ID = '' then begin
-                        if AdyenManagement.CreateWebhook(Rec) then begin
+                        if _AdyenManagement.CreateWebhook(Rec) then begin
                             CurrPage.Update(false);
                             Message(StrSubstNo(WebhookSetUpSuccess, Format(Rec.ID)));
                         end else
@@ -155,10 +154,8 @@ page 6184550 "NPR Adyen Webhook Setup Card"
                 ToolTip = 'Running this action will suggest a Web Service URL to an Azure Function.';
 
                 trigger OnAction()
-                var
-                    AdyenManagement: Codeunit "NPR Adyen Management";
                 begin
-                    AdyenManagement.SuggestAFWebServiceURL(Rec);
+                    _AdyenManagement.SuggestAFWebServiceURL(Rec);
                     CurrPage.Update(false);
                 end;
             }
@@ -179,10 +176,9 @@ page 6184550 "NPR Adyen Webhook Setup Card"
                     RefreshingLbl: Label 'Refreshing...';
                     UpdatedLbl: Label 'Configurations were Updated.';
                     UpToDateLbl: Label 'Webhook Setup is already Up to Date.';
-                    AdyenManagement: Codeunit "NPR Adyen Management";
                 begin
                     Window.Open(RefreshingLbl);
-                    if AdyenManagement.RefreshWebhook(Rec) then begin
+                    if _AdyenManagement.RefreshWebhook(Rec) then begin
                         CurrPage.Update(false);
                         Message(UpdatedLbl);
                     end else
@@ -200,10 +196,14 @@ page 6184550 "NPR Adyen Webhook Setup Card"
 
     trigger OnOpenPage()
     var
-        AdyenManagement: Codeunit "NPR Adyen Management";
+        AdyenSetup: Record "NPR Adyen Setup";
+        WebhookCanNotBeSyncLbl: Label 'Failed to synchronize Webhook setup with NP Pay.\Please ensure your API Management Key is configured and valid.';
     begin
-        if Rec.ID <> '' then
-            AdyenManagement.RefreshWebhook(Rec);
+        if Rec.ID <> '' then begin
+            if (not AdyenSetup.Get()) or (not _AdyenManagement.TestApiKey(AdyenSetup."Environment Type")) then
+                Message(WebhookCanNotBeSyncLbl);
+            _AdyenManagement.RefreshWebhook(Rec);
+        end;
     end;
 
     trigger OnAfterGetRecord()
@@ -213,5 +213,6 @@ page 6184550 "NPR Adyen Webhook Setup Card"
     end;
 
     var
+        _AdyenManagement: Codeunit "NPR Adyen Management";
         _WebhookCreated: Boolean;
 }
