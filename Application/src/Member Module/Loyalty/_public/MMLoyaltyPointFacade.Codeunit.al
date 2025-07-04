@@ -23,4 +23,18 @@ codeunit 6184727 "NPR MM Loyalty Point Facade"
     begin
         exit(MMLoyPointPSPClient.IntegrationName());
     end;
+
+    procedure ExpirePointsPerPeriod(LoyaltySetup: Record "NPR MM Loyalty Setup"; Membership: Record "NPR MM Membership")
+    var
+        LoyaltyPointMgt: Codeunit "NPR MM Loyalty Point Mgt.";
+    begin
+        LoyaltyPointMgt.ExpirePointsPerPeriodWorker(LoyaltySetup, Membership);
+    end;
+
+    procedure ValidateFixedPeriodCalculation(LoyaltySetup: Record "NPR MM Loyalty Setup"; var ReasonText: Text) PeriodCalculationIssue: Boolean
+    var
+        LoyaltyPointMgt: Codeunit "NPR MM Loyalty Point Mgt.";
+    begin
+        exit(LoyaltyPointMgt.ValidateFixedPeriodCalculation(LoyaltySetup, ReasonText));
+    end;
 }
