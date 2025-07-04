@@ -3025,7 +3025,6 @@
         ItemLedgerEntry.SetRange("Location Code", "Location Code");
         if "Variant Code" <> '' then
             ItemLedgerEntry.SetRange("Variant Code", "Variant Code");
-        ItemLedgerEntry.SetRange("Global Dimension 1 Code", "Shortcut Dimension 1 Code");
         if ItemLedgerEntry.Find('-') then
             repeat
                 ItemLedgerEntry.SetRange("Serial No.", ItemLedgerEntry."Serial No.");
@@ -3073,7 +3072,6 @@
         ItemLedgerEntry.SetRange("Location Code", "Location Code");
         if "Variant Code" <> '' then
             ItemLedgerEntry.SetRange("Variant Code", "Variant Code");
-        ItemLedgerEntry.SetRange("Global Dimension 1 Code", "Shortcut Dimension 1 Code");
         if ItemLedgerEntry.FindFirst() then
             repeat
                 ItemLedgerEntry.SetRange("Lot No.", ItemLedgerEntry."Lot No.");
