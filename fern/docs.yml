@@ -244,6 +244,7 @@ navigation:
                 summary: ./docs/pages/memberships/misc-introduction.mdx
                 contents:
                   - endpoint: memberships.service-misc.resolveIdentifier
+                  - endpoint: memberships.service-misc.listMemberships
 
             - memberships.service-points:
                 title: Points

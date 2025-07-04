@@ -9,6 +9,24 @@ imports:
 
 types:
 
+  PaginatedMembershipsDTO: 
+    docs:
+      Use this DTO to retrieve a paginated list of memberships.
+    properties:
+      morePages: boolean
+      nextPageKey: optional<string>
+      nextPageURL: optional<string>
+      data: list<MembershipEntity>
+    examples:
+      - name: ExamplePaginatedMemberships
+        value:
+          morePages: true
+          nextPageKey: "c29tZSBiYXNlNjQgc3RyaW5n"
+          nextPageURL: "https://api.npretail.app/tenant/env/company/membership/list?pageKey=c29tZSBiYXNlNjQgc3RyaW5n"
+          data:
+            - $MembershipEntity.ExampleMembership
+
+
   MembershipDTO:
     docs:
       # Use this DTO to retrieve membership details along with the members associated with it. 

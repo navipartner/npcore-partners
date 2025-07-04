@@ -19,6 +19,9 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
         if (Request.Match('GET', '/membership/catalog')) then
             exit(Handle(_ApiFunction::GET_CATALOG, Request));
 
+        if (Request.Match('GET', '/membership/list')) then
+            exit(Handle(_ApiFunction::LIST_MEMBERSHIPS, Request));
+
         if (Request.Match('GET', '/membership/member')) then
             exit(Handle(_ApiFunction::FIND_MEMBER, Request));
 

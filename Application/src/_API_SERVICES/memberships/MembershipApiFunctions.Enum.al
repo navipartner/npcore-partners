@@ -34,7 +34,10 @@ enum 6059827 "NPR MembershipApiFunctions"
     {
         Caption = 'Get membership members';
     }
-
+    value(105; LIST_MEMBERSHIPS)
+    {
+        Caption = 'List memberships';
+    }
 
     value(110; CREATE_MEMBERSHIP)
     {

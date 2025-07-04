@@ -52,6 +52,40 @@ service:
           response:
             body: $ResolveMemberIdentifierResponse.ExampleMembershipNumber
 
+    # LISTS and REPORTS
+    listMemberships:
+      docs: 
+        Retrieve a list of memberships.
+        This endpoint supports pagination and filtering. 
+        Page size default is 100, maximum is 1000.
+      display-name: List Memberships
+      method: GET
+      path: /list
+      request:
+        name: List Memberships
+        query-parameters:
+          pageSize: optional<integer>
+          pageKey: optional<string>
+          communityCode: optional<string>
+          membershipCode: optional<string>
+          customerNumber: optional<string>
+          blocked: optional<boolean>
+          issueDate: optional<datetime>
+          issuedFromDate: optional<datetime>
+          issuedUntilDate: optional<datetime>
+      response: compositeTypes.PaginatedMembershipsDTO
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            pageSize: 1
+            membershipCode: $simpleTypes.MembershipCode.GOLD
+          response:
+            body: $compositeTypes.PaginatedMembershipsDTO.ExamplePaginatedMemberships
+
+
     # generateNotificationToken:
     #   docs: Generate a notification token for a member
     #   display-name: Generate Notification Token
