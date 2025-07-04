@@ -1,6 +1,13 @@
 # fern/apis/default/definition/memberships/types/types-points.yml
 
 types:
+  AuthorizationCode:
+    type: string
+    docs: A unique identifier for the authorize points transaction.
+    examples:
+      - name: ExampleAuthorizationCode
+        value: "362FB68C444E41D691FF19EE470B30A1"
+
   TransactionId:
     type: uuid
     docs: A unique identifier for a points transaction.
@@ -33,10 +40,17 @@ types:
 
   ExternalSystemUserIdentifier:
     type: optional<string>
-    docs: An identifier for the user in the external system, e.g. a salesperson code in an external POS or a user ID in a customer support tool.
+    docs: An identifier for the user in the external system, e.g. a POS UnitId, a salesperson code in an external POS or a user ID in a customer support tool.
     examples:
       - name: ExternalSystemUserIdentifierExample
         value: "JOHN_DOE"
+
+  ExternalBusinessUnitIdentifier:
+    type: optional<string>
+    docs: An identifier for the business unit of the external system.
+    examples:
+      - name: ExternalExternalBusinessUnitIdentifier
+        value: "My businesss unit"
 
   PointTransactionState:
     enum:
@@ -58,10 +72,11 @@ types:
         docs: A description of why the points are being adjusted.
       timeoutPeriod:
         type: integer
-        docs: The duration in seconds for which the authorization is valid.
+        docs: The duration in minutes for which the authorization is valid.
       externalReferenceNo: ExternalReferenceNo
       externalSystemIdentifier: ExternalSystemIdentifier
       externalSystemUserIdentifier: ExternalSystemUserIdentifier
+      externalBusinessUnitIdentifier: ExternalBusinessUnitIdentifier
       autoFinalize:
         type: boolean
         docs: if set to true, you don't need to finalize manually. Relevant when assigning points for completed sales with no natural two step transaction required.
@@ -75,6 +90,7 @@ types:
           externalReferenceNo: "RCPT-582399102"
           externalSystemIdentifier: "BCTenant-POSStore"
           externalSystemUserIdentifier: "SalespersonCode"
+          externalBusinessUnitIdentifier: $ExternalBusinessUnitIdentifier.ExternalExternalBusinessUnitIdentifier
           autoFinalize: false
       - name: ExampleAuthorizePointsAssignmentRequest
         value:
@@ -84,32 +100,33 @@ types:
           timeoutPeriod: 300
           externalReferenceNo: "TICKET-8245924"
           externalSystemIdentifier: "Shopify-Gorgias"
+          externalBusinessUnitIdentifier: $ExternalBusinessUnitIdentifier.ExternalExternalBusinessUnitIdentifier
           externalSystemUserIdentifier: "550e8400-e29b-41d4-a716-446655440000"
           autoFinalize: true
 
   AuthorizePointsResponse:
     docs: Response containing the details of a successful point authorization.
     properties:
-      transactionId: 
-          type: uuid
+      authorizationCode: 
+          type: string
           docs: A unique identifier for a points transaction to be used for Finalize or Cancel the points transaction. Will not be returned if autoFinalize is set to true.
       status: PointTransactionState
       expiresAt: datetime
     examples:
       - name: ExampleAuthPointsResponse
         value:
-          transactionId: $TransactionId.ExampleTransactionId
+          authorizationCode: $AuthorizationCode.ExampleAuthorizationCode
           status: AUTHORIZED
           expiresAt: "2025-06-23T12:05:00Z"
 
   CancelAuthorizationRequest:
     docs: Request to cancel point authorization instead of finalizing it.
     properties:
-      transactionId: TransactionId
+      authorizationCode: AuthorizationCode
     examples:
       - name: ExampleCancelAuthorizationRequest
         value:
-          transactionId: "550e8400-e29b-41d4-a716-446655440000"
+          authorizationCode: $AuthorizationCode.ExampleAuthorizationCode
 
   CancelPointsResponse:
     docs: Response from a successful points cancellation.
@@ -122,12 +139,16 @@ types:
       - name: ExampleCancelPointsResponse
         value:
           status: CANCELLED
-          newBalance: 1300
+          newBalance: 1500
 
   FinalizePointsRequest:
     docs: Request to finalize a previously reserved points transaction.
     properties:
-      transactionId: TransactionId
+      authorizationCode: AuthorizationCode
+    examples:
+      - name: ExampleFinalizePointsRequest
+        value:
+          authorizationCode: $AuthorizationCode.ExampleAuthorizationCode
 
   FinalizePointsResponse:
     docs: Response from a successful points finalization.

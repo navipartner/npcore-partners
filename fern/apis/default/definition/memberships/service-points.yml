@@ -84,8 +84,7 @@ service:
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             membershipId: $simpleMemberTypes.MembershipId.ExampleMembershipId
-          request:
-            transactionId: $pointTypes.TransactionId.ExampleTransactionId
+          request: $pointTypes.FinalizePointsRequest.ExampleFinalizePointsRequest
           response:
             body: $pointTypes.FinalizePointsResponse.ExampleFinalizePointsResponse
 
