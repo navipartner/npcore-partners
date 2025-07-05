@@ -1074,13 +1074,15 @@ codeunit 6184812 "NPR Spfy Item Mgt."
 #endif
     local procedure CheckItemTypeAndSetDoNotTrack(var Rec: Record Item; var xRec: Record Item)
     var
+        SpfyStore: Record "NPR Spfy Store";
         SpfyItemVariantModifMgt: Codeunit "NPR Spfy ItemVariantModif Mgt.";
     begin
         if Rec.IsTemporary() then
             exit;
-        if xRec.Find() then;
-        if (Rec.Type <> Rec.Type::Inventory) and (xRec.Type <> Rec.Type) then
-            SpfyItemVariantModifMgt.SetDoNotTrackInventory(Rec."No.", true);
+        // no need to re-read xRec, as this change can only be triggered by a user via the UI
+        if (Rec.Type <> Rec.Type::Inventory) and (xRec.Type = xRec.Type::Inventory) then
+            if not SpfyStore.IsEmpty() then
+                SpfyItemVariantModifMgt.SetDoNotTrackInventory(Rec."No.", true);
     end;
 }
 #endif
