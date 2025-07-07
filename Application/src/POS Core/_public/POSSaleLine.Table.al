@@ -61,6 +61,8 @@
             trigger OnValidate()
             var
                 POSSaleTranslation: Codeunit "NPR POS Sale Translation";
+                POSInfoManagement: Codeunit "NPR POS Info Management";
+                FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
             begin
                 InitFromSalePOS();
 
@@ -106,6 +108,9 @@
                 end;
 
                 CreateDimFromDefaultDim(FieldNo("No."));
+                if FeatureFlagsManagement.IsEnabled('CopyPOSInfoOnReverseSale') then
+                    if not SkipPOSInfo then
+                        POSInfoManagement.InsertPOSInfo(Rec, xRec, Rec.FieldNo("No."));
             end;
         }
         field(7; "Location Code"; Code[10])
@@ -2036,6 +2041,7 @@
         Text002: Label '%1 %2 is used more than once. Adjust the inventory first, and then continue the transaction';
         Text004: Label '%1 %2 is already used.';
         SkipDependantQuantityUpdate: Boolean;
+        SkipPOSInfo: Boolean;
         ERR_EFT_DELETE: Label 'Cannot delete externally approved electronic funds transfer. Please attempt refund or void of the original transaction instead.';
 
     local procedure GetPOSHeader()
@@ -2995,6 +3001,11 @@
     procedure SetSkipUpdateDependantQuantity(Skip: Boolean)
     begin
         SkipDependantQuantityUpdate := Skip;
+    end;
+
+    procedure SetSkipPOSInfo(Skip: Boolean)
+    begin
+        SkipPOSInfo := Skip;
     end;
 
     procedure SerialNoLookup()

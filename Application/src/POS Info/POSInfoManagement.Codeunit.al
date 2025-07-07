@@ -8,6 +8,16 @@
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale Line", 'OnAfterValidateEvent', 'No.', false, false)]
     local procedure OnAfterValidateSalesLineNoSaleLinePos(var Rec: Record "NPR POS Sale Line"; var xRec: Record "NPR POS Sale Line"; CurrFieldNo: Integer)
     var
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+    begin
+        if not FeatureFlagsManagement.IsEnabled('CopyPOSInfoOnReverseSale') then
+            InsertPOSInfo(Rec, xRec, CurrFieldNo);
+
+    end;
+
+
+    procedure InsertPOSInfo(var Rec: Record "NPR POS Sale Line"; var xRec: Record "NPR POS Sale Line"; CurrFieldNo: Integer)
+    var
         POSInfoLinkTable: Record "NPR POS Info Link Table";
         POSInfoTransaction: Record "NPR POS Info Transaction";
     begin
@@ -222,6 +232,7 @@
                                 POSInfoRequestText.SetRecord(POSInfo);
                                 if POSInfoRequestText.RunModal() = Action::OK then
                                     Info := POSInfoRequestText.GetUserInput();
+
                             end;
                             if (Info = '') and POSInfo."Input Mandatory" then
                                 Error('');
@@ -488,6 +499,40 @@
         until POSInfoTransaction_Hdr.Next() = 0;
         POSInfoTransaction.Reset();
         exit(Updated);
+    end;
+
+    procedure CopyPOSInfo(var SaleLinePOS: Record "NPR POS Sale Line"; POSSaleLine: Record "NPR POS Entry Sales Line"; SaleLineNo: Integer)
+    var
+        POSInfoTransaction: Record "NPR POS Info Transaction";
+        POSInfoPOSEntry: Record "NPR POS Info POS Entry";
+        POSInfo: Record "NPR POS Info";
+    begin
+        POSInfo.SetLoadFields(Type, "Once per Transaction");
+        POSInfoPOSEntry.SetLoadFields("POS Info Code", "POS Info");
+
+        POSInfoPOSEntry.SetRange("POS Entry No.", POSSaleLine."POS Entry No.");
+        POSInfoPOSEntry.SetRange("Document No.", POSSaleLine."Document No.");
+        POSInfoPOSEntry.SetRange("Sales Line No.", SaleLineNo);
+        if POSInfoPOSEntry.FindSet(false) then
+            repeat
+                POSInfo.Get(POSInfoPOSEntry."POS Info Code");
+
+                POSInfoTransaction.Init();
+                POSInfoTransaction."Register No." := SaleLinePOS."Register No.";
+                POSInfoTransaction."Sales Ticket No." := SaleLinePOS."Sales Ticket No.";
+                if SaleLineNo <> 0 then
+                    POSInfoTransaction."Sales Line No." := SaleLinePOS."Line No."
+                else
+                    POSInfoTransaction."Sales Line No." := SaleLineNo;
+                POSInfoTransaction."Sale Date" := SaleLinePOS.Date;
+                POSInfoTransaction."Line Type" := SaleLinePOS."Line Type";
+                POSInfoTransaction."Entry No." := 0;
+                POSInfoTransaction."POS Info Code" := POSInfoPOSEntry."POS Info Code";
+                POSInfoTransaction."POS Info" := POSInfoPOSEntry."POS Info";
+                POSInfoTransaction."POS Info Type" := POSInfo.Type;
+                POSInfoTransaction."Once per Transaction" := POSInfo."Once per Transaction";
+                POSInfoTransaction.Insert(true);
+            until POSInfoPOSEntry.Next() = 0;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Ext.: Line Format.", 'OnGetLineStyle', '', false, false)]
