@@ -537,7 +537,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             if StrLen(ResponseText) > 0 then
                 FillAllowedTaxRates(ResponseText, false)
             else
-                Message(FileEmptyLbl); 
+                Message(FileEmptyLbl);
         end else
             Message(CancelledLbl);
     end;
@@ -702,7 +702,7 @@ codeunit 6150982 "NPR RS Tax Communication Mgt."
             SalesHeader.CalcFields("Amount Including VAT");
             JObjectLines.Add('amount', SalesHeader."Amount Including VAT")
         end;
-        if not IsCopy and not RSFiscalizationSetup.Training and (SalesHeader."Payment Method Code" <> '') then begin
+        if not IsCopy and (SalesHeader."Payment Method Code" <> '') then begin
             if RSPaymentMethodMapping.Get(SalesHeader."Payment Method Code") then
                 JObjectLines.Add('paymentType', GetEnumValueName(RSPaymentMethodMapping."RS Payment Method"))
             else
