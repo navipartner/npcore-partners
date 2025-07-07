@@ -49,6 +49,16 @@ page 6184846 "NPR AttractionWallet"
                         ToolTip = 'Specifies the value of the Description field.';
                         Editable = true;
                     }
+                    field(LastPrintAt; Rec.LastPrintAt)
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Last Print Date field.';
+                    }
+                    field(PrintCount; Rec.PrintCount)
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Print Count field.';
+                    }
                     field(ExpirationDate; Rec.ExpirationDate)
                     {
                         ApplicationArea = NPRRetail;
