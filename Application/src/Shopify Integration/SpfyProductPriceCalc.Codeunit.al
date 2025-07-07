@@ -15,14 +15,17 @@ codeunit 6185050 "NPR Spfy Product Price Calc."
         _SpfyStoreCode: Code[20];
         _SpfyIntegrationEvents: Codeunit "NPR Spfy Integration Events";
 
-    internal procedure CalcCompareAtPrice(ShopifyStoreCode: Code[20]; ItemNo: Code[20]; VariantCode: Code[10]; ItemPriceDate: Date): Decimal
+    internal procedure CalcCompareAtPrice(ShopifyStoreCode: Code[20]; CurrencyCode: Code[10]; ItemNo: Code[20]; VariantCode: Code[10]; ItemPriceDate: Date): Decimal
     var
         Item: Record Item;
+        ShopifyStore: Record "NPR Spfy Store";
         Price: Decimal;
         ComparePrice: Decimal;
     begin
         Item.Get(ItemNo);
-        Initialize(ShopifyStoreCode, ItemPriceDate);
+        ShopifyStore.Get(ShopifyStoreCode);
+        ShopifyStore."Currency Code" := CurrencyCode;
+        Initialize(ShopifyStore, ItemPriceDate);
         CalcPrice(Item, VariantCode, Item."Sales Unit of Measure", Price, ComparePrice);
         exit(ComparePrice);
     end;
@@ -30,6 +33,7 @@ codeunit 6185050 "NPR Spfy Product Price Calc."
     [TryFunction]
     internal procedure CalcPrice(Item: Record Item; VariantCode: Code[10]; UnitOfMeasureCode: Code[10]; var Price: Decimal; var ComparePrice: Decimal)
     var
+        Currency: Record Currency;
         ItemUnitofMeasure: Record "Item Unit of Measure";
         TempSalesLine: Record "Sales Line" temporary;
         IsHandled: Boolean;
@@ -43,15 +47,19 @@ codeunit 6185050 "NPR Spfy Product Price Calc."
                 TempSalesLine."Document No." := TempSalesHeader."No.";
                 TempSalesLine."System-Created Entry" := true;
                 TempSalesLine.SetSalesHeader(TempSalesHeader);
-                TempSalesLine.Validate(Type, TempSalesLine.Type::Item);
+                TempSalesLine.Type := TempSalesLine.Type::Item;
                 TempSalesLine.Validate("No.", Item."No.");
-                TempSalesLine.Validate("Variant Code", VariantCode);
-                TempSalesLine."Currency Code" := TempSalesHeader."Currency Code";
-                TempSalesLine.Validate(Quantity, 1);
-                if TempSalesLine."Unit of Measure Code" <> '' then
+                if TempSalesLine."Variant Code" <> VariantCode then
+                    TempSalesLine.Validate("Variant Code", VariantCode);
+                if (TempSalesLine."Unit of Measure Code" <> UnitOfMeasureCode) and (UnitOfMeasureCode <> '') then
                     TempSalesLine.Validate("Unit of Measure Code", UnitOfMeasureCode);
-                ComparePrice := TempSalesLine."Unit Price";
-                Price := TempSalesLine."Line Amount";
+                TempSalesLine.Validate(Quantity, 1);
+                GetCurrency(TempSalesLine, Currency);
+                ComparePrice := Round(TempSalesLine."Unit Price", Currency."Amount Rounding Precision");
+                if TempSalesLine."Line Discount Amount" = 0 then
+                    Price := ComparePrice
+                else
+                    Price := TempSalesLine."Line Amount";
             end else begin
                 Price := Item."Unit Price";
                 if (UnitOfMeasureCode <> '') and ItemUnitofMeasure.Get(Item."No.", UnitOfMeasureCode) then begin
@@ -65,7 +73,15 @@ codeunit 6185050 "NPR Spfy Product Price Calc."
         _SpfyIntegrationEvents.OnAfterCalculateUnitPrice(Item, VariantCode, UnitOfMeasureCode, _SpfyStoreCode, TempSalesHeader."Currency Code", Price, ComparePrice);
     end;
 
-    local procedure CreateTempSalesHeader(var ShopifyStore: Record "NPR Spfy Store"; ItemPriceDate: Date)
+    local procedure GetCurrency(var SalesLine: Record "Sales Line"; var Currency: Record Currency)
+    var
+        SalesHeader: Record "Sales Header";
+    begin
+        Clear(Currency);
+        SalesLine.GetSalesHeader(SalesHeader, Currency);
+    end;
+
+    local procedure CreateTempSalesHeader(ShopifyStore: Record "NPR Spfy Store"; ItemPriceDate: Date)
     var
         Customer: Record Customer;
     begin
@@ -95,11 +111,8 @@ codeunit 6185050 "NPR Spfy Product Price Calc."
     end;
 
     [TryFunction]
-    internal procedure Initialize(ShopifyStoreCode: Code[20]; ItemPriceDate: Date)
-    var
-        ShopifyStore: Record "NPR Spfy Store";
+    internal procedure Initialize(ShopifyStore: Record "NPR Spfy Store"; ItemPriceDate: Date)
     begin
-        ShopifyStore.Get(ShopifyStoreCode);
         Clear(TempSalesHeader);
         TempSalesHeader.DeleteAll();
         CreateTempSalesHeader(ShopifyStore, ItemPriceDate);

@@ -6,10 +6,12 @@ codeunit 6184804 "NPR Spfy Capture Payment"
     TableNo = "NPR Nc Task";
 
     var
-        PaymentMapping: Record "NPR Magento Payment Mapping";
+        Currency: Record Currency;
         JsonHelper: Codeunit "NPR Json Helper";
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         SpfyIntegrationEvents: Codeunit "NPR Spfy Integration Events";
+        SpfyPaymentGatewayHdlr: Codeunit "NPR Spfy Payment Gateway Hdlr";
+        CurrencyRetrieved: Boolean;
 
     trigger OnRun()
     var
@@ -42,6 +44,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         PaymentLine: Record "NPR Magento Payment Line";
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         RecRef: RecordRef;
+        ShopifyResponse: JsonToken;
         SendToShopify: Boolean;
     begin
         Clear(NcTask."Data Output");
@@ -49,14 +52,19 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         ClearLastError();
         Success := false;
 
-        SendToShopify := PrepareShopifyTransactionRequest(NcTask, 0);
+        SendToShopify := PrepareShopifyPaymentCaptureRequest(NcTask);
         if SendToShopify then
-            Success := SpfyCommunicationHandler.SendTransactionRequest(NcTask);
+            Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse);
 
         if SaveToDb then begin
             NcTask.Modify();
             Commit();
             if Success then begin
+                if SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse) then
+                    Error('');
+                if JsonHelper.GetJText(ShopifyResponse, 'data.orderCapture.transaction.status', true).ToUpper() <> 'SUCCESS' then
+                    Error('');
+
                 RecRef.Get(NcTask."Record ID");
                 RecRef.SetTable(PaymentLine);
                 if PaymentLine.Find() then begin
@@ -67,7 +75,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
                     if not PaymentLine.Posted then begin
                         Commit();
                         ClearLastError();
-                        if not Codeunit.Run(Codeunit::"NPR Spfy Post Payment Line", PaymentLine) then
+                        if not Codeunit.Run(Codeunit::"NPR Magento Post Payment Line", PaymentLine) then
                             AddPostingErrorMessageToNcTask(NcTask);
                     end;
                 end;
@@ -75,55 +83,65 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         end;
 
         if SendToShopify and not Success then
-            Error(GetLastErrorText);
+            Error(GetLastErrorText());
         ClearLastError();
+        if SaveToDb then
+            exit;
+
+        if SendToShopify and Success then begin
+            Success := not SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse);
+            if Success then
+                Success := JsonHelper.GetJText(ShopifyResponse, 'data.orderCapture.transaction.status', true).ToUpper() = 'SUCCESS';
+        end;
     end;
 
     internal procedure RefundShopifyPayment(var NcTask: Record "NPR Nc Task"; SaveToDb: Boolean) Success: Boolean
     var
-        PaymentLine: Record "NPR Magento Payment Line";
-        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
-        RecRef: RecordRef;
-        SendToShopify: Boolean;
+        RefundNotSupportedErr: Label 'Refunding Shopify payments from Business Central is not supported yet. Please use the Shopify admin interface to process refunds.';
     begin
-        Clear(NcTask."Data Output");
-        Clear(NcTask.Response);
+        //TODO: Implement refunding of Shopify payments
+        Error(RefundNotSupportedErr);
+    end;
+
+    [TryFunction]
+    local procedure TryGetShopifyOrderTransactions(var NcTask: Record "NPR Nc Task"; var ShopifyResponse: JsonToken)
+    begin
+        GetShopifyOrderTransactions(NcTask, ShopifyResponse);
+    end;
+
+    local procedure GetShopifyOrderTransactions(var NcTask: Record "NPR Nc Task"; var ShopifyResponse: JsonToken): Boolean
+    var
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+        OStream: OutStream;
+        Request: JsonObject;
+        Variables: JsonObject;
+        QueryTok: Label 'query OrderTransactions($orderId: ID!) {order(id: $orderId){currencyCode presentmentCurrencyCode transactions(first: 250){id kind amountSet{presentmentMoney{amount currencyCode} shopMoney{amount currencyCode}} amountRoundingSet{presentmentMoney{amount currencyCode} shopMoney{amount currencyCode}} authorizationCode authorizationExpiresAt createdAt formattedGateway gateway multiCapturable parentTransaction{id kind} paymentId processedAt settlementCurrency settlementCurrencyRate status test totalUnsettledSet{presentmentMoney{amount currencyCode} shopMoney{amount currencyCode}} paymentDetails {... on CardPaymentDetails{avsResultCode bin company expirationMonth expirationYear name number paymentMethodName wallet} ... on LocalPaymentMethodsPaymentDetails{paymentDescriptor paymentMethodName}} receiptJson}}}', Locked = true;
+    begin
+        Variables.Add('orderId', 'gid://shopify/Order/' + NcTask."Record Value");
+        Request.Add('query', QueryTok);
+        Request.Add('variables', Variables);
+
+        NcTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
+        Request.WriteTo(OStream);
         ClearLastError();
-        Success := false;
-
-        SendToShopify := PrepareShopifyTransactionRequest(NcTask, 1);
-        if SendToShopify then
-            Success := SpfyCommunicationHandler.SendTransactionRequest(NcTask);
-
-        if SaveToDb then begin
-            if Success then begin
-                RecRef.Get(NcTask."Record ID");
-                RecRef.SetTable(PaymentLine);
-                if PaymentLine.Find() then begin
-                    PaymentLine."Date Refunded" := Today();
-                    PaymentLine.Modify();
-                end;
-            end;
-            NcTask.Modify();
-            Commit();
-        end;
-
-        if SendToShopify and not Success then
+        if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ShopifyResponse) then
             Error(GetLastErrorText);
     end;
 
-    local procedure PrepareShopifyTransactionRequest(var NcTask: Record "NPR Nc Task"; RequestType: Option Capture,Refund) SendToShopify: Boolean
+    local procedure PrepareShopifyPaymentCaptureRequest(var NcTask: Record "NPR Nc Task") SendToShopify: Boolean
     var
         PaymentLine: Record "NPR Magento Payment Line";
         SpfyPaymentGateway: Record "NPR Spfy Payment Gateway";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         RecRef: RecordRef;
-        JObject: JsonObject;
-        JChildObject: JsonObject;
-        OutStr: OutStream;
+        Request: JsonObject;
+        Variables: JsonObject;
+        Transaction: JsonObject;
+        QueryStream: OutStream;
         TransactionID: Text[30];
         AlreadyCapturedErr: Label 'The payment transaction has already been marked as captured in Shopify.';
         IsNotShopifyPmtLineErr: Label '%1 does not seem to be a Shopify related payment transaction', Comment = '%1 - Payment Line record Id';
+        QueryTok: Label 'mutation TransactionCreate($input: OrderCaptureInput!) {orderCapture(input: $input) {transaction {id kind status parentTransaction{id} amountSet{presentmentMoney{amount currencyCode} shopMoney{amount currencyCode}} paymentId receiptJson settlementCurrency settlementCurrencyRate test} userErrors {message}}}', Locked = true;
     begin
         if NcTask."Table No." <> Database::"NPR Magento Payment Line" then
             SpfyIntegrationMgt.UnsupportedIntegrationTable(NcTask, StrSubstNo('CU%1.%2', Format(Codeunit::"NPR Spfy Capture Payment"), 'PrepareCaptureRequest'));
@@ -135,56 +153,70 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         TransactionID := SpfyAssignedIDMgt.GetAssignedShopifyID(PaymentLine.RecordId(), "NPR Spfy ID Type"::"Entry ID");
         if TransactionID = '' then
             Error(IsNotShopifyPmtLineErr, PaymentLine.RecordId());
-        case RequestType of
-            RequestType::Capture:
-                begin
-                    PaymentLine.TestField("Date Captured", 0D);
-                    if TransactionAlreadyCaptured(NcTask, TransactionID, PaymentLine) then begin
-                        SpfyIntegrationMgt.SetResponse(NcTask, AlreadyCapturedErr);
-                        exit;
-                    end;
-                end;
-            RequestType::Refund:
-                begin
-                    PaymentLine.TestField("Date Refunded", 0D);
-                    //TODO: Check if the payment line is already refunded
-                end;
+
+        PaymentLine.TestField("Date Captured", 0D);
+        if TransactionAlreadyCaptured(NcTask, TransactionID, PaymentLine) then begin
+            SpfyIntegrationMgt.SetResponse(NcTask, AlreadyCapturedErr);
+            exit;
         end;
+        PaymentLine.TestField(Amount);
         PaymentLine.TestField("Payment Gateway Code");
         if not SpfyPaymentGateway.Get(PaymentLine."Payment Gateway Code") then
             SpfyPaymentGateway.Init();
 
-        JChildObject.Add('currency', SpfyPaymentGateway."Currency Code");
-        JChildObject.Add('amount', PaymentLine.Amount);
-        JChildObject.Add('kind', Format(RequestType, 0, 1));
-        JChildObject.Add('parent_id', TransactionID);
-        JObject.Add('transaction', JChildObject);
-        NcTask."Data Output".CreateOutStream(OutStr, TextEncoding::UTF8);
-        JObject.WriteTo(OutStr);
+        Transaction.Add('amount', PaymentLine.Amount);
+        Transaction.Add('currency', SpfyPaymentGatewayHdlr.CurrencyISOCode(PaymentLine.TransactionCurrencyCode(true)));
+        if SpfyPaymentGateway."Identify Final Capture" then
+            Transaction.Add('finalCapture', IsFinalCapture(PaymentLine, TransactionID));
+        Transaction.Add('id', 'gid://shopify/Order/' + NcTask."Record Value");
+        Transaction.Add('parentTransactionId', 'gid://shopify/OrderTransaction/' + TransactionID);
+
+        Variables.Add('input', Transaction);
+        Request.Add('query', QueryTok);
+        Request.Add('variables', Variables);
+
+        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
+        Request.WriteTo(QueryStream);
         SendToShopify := true;
     end;
 
     local procedure TransactionAlreadyCaptured(NcTask: Record "NPR Nc Task"; TransactionID: Text[30]; var PaymentLine: Record "NPR Magento Payment Line"): Boolean
     var
-        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
-        ShopifyResponse: JsonObject;
+        ShopifyResponse: JsonToken;
         Transaction: JsonToken;
         Transactions: JsonToken;
     begin
-        SpfyCommunicationHandler.GetShopifyOrderTransactions(NcTask, ShopifyResponse);
-        ShopifyResponse.SelectToken('transactions', Transactions);
+        GetShopifyOrderTransactions(NcTask, ShopifyResponse);
+        ShopifyResponse.SelectToken('data.order.transactions', Transactions);
         if Transactions.IsArray() then
             foreach Transaction in Transactions.AsArray() do
-                if TransactionID = JsonHelper.GetJText(Transaction, 'id', true) then begin
+                if TransactionID = SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(Transaction, 'id', true), '/') then begin
                     SetDateAuthorized(Transaction, PaymentLine);
+                    SetPaymentCardDetails(Transaction, PaymentLine);
                     if PaymentLine."Transaction ID" = '' then
 #pragma warning disable AA0139
-                        PaymentLine."Transaction ID" := JsonHelper.GetJText(Transaction, 'payment_id', false);
+                        PaymentLine."Transaction ID" := JsonHelper.GetJText(Transaction, 'paymentId', false);
 #pragma warning restore AA0139
                     if PaymentLine."Posting Date" = 0D then
                         PaymentLine."Posting Date" := Today();
                     exit(SetPmtLineAsCaptured(Transaction, Transactions.AsArray(), '', TransactionID, PaymentLine));
                 end;
+    end;
+
+    local procedure IsFinalCapture(PaymentLine: Record "NPR Magento Payment Line"; TransactionID: Text[30]): Boolean
+    var
+        PaymentLine2: Record "NPR Magento Payment Line";
+        ShopifyAssignedID: Record "NPR Spfy Assigned ID";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+    begin
+        SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"NPR Magento Payment Line", "NPR Spfy ID Type"::"Entry ID", TransactionID, ShopifyAssignedID);
+        if ShopifyAssignedID.FindSet() then
+            repeat
+                if PaymentLine2.Get(ShopifyAssignedID."BC Record ID") then
+                    if (PaymentLine2."Date Captured" = 0D) and (PaymentLine2.SystemId <> PaymentLine.SystemId) and (PaymentLine2.Amount <> 0) then
+                        exit(false);
+            until ShopifyAssignedID.Next() = 0;
+        exit(true);
     end;
 
     internal procedure UpdatePmtLinesAndScheduleCapture(var NcTask: Record "NPR Nc Task"; ScheduleCapture: Boolean; StopOnRequestError: Boolean) Success: Boolean
@@ -196,9 +228,8 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         SalesInvHeader: Record "Sales Invoice Header";
         ShopifyAssignedID: Record "NPR Spfy Assigned ID";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
-        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         RecRef: RecordRef;
-        ShopifyResponse: JsonObject;
+        ShopifyResponse: JsonToken;
         Transaction: JsonToken;
         Transactions: JsonToken;
         ShopifyOrderID: Text[30];
@@ -244,22 +275,23 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         if NcTask."Store Code" = '' then
             NcTask."Store Code" :=
                 CopyStr(SpfyAssignedIDMgt.GetAssignedShopifyID(NcTask."Record ID", "NPR Spfy ID Type"::"Store Code"), 1, MaxStrLen(NcTask."Store Code"));
+        PaymentLineParam."Source No." := NcTask."Store Code";
 
         ClearLastError();
         if StopOnRequestError then begin
-            SpfyCommunicationHandler.GetShopifyOrderTransactions(NcTask, ShopifyResponse);
+            GetShopifyOrderTransactions(NcTask, ShopifyResponse);
             Success := true;
         end else
-            Success := SpfyCommunicationHandler.TryGetShopifyOrderTransactions(NcTask, ShopifyResponse);
+            Success := TryGetShopifyOrderTransactions(NcTask, ShopifyResponse);
         if Success then begin
-            ShopifyResponse.SelectToken('transactions', Transactions);
+            ShopifyResponse.SelectToken('data.order.transactions', Transactions);
             if Transactions.IsArray() then
                 foreach Transaction in Transactions.AsArray() do begin
-                    ShopifyTransactionKind := JsonHelper.GetJText(Transaction, 'kind', false).ToLower();
-                    if ShopifyTransactionKind in ['authorization', 'sale'] then
-                        if JsonHelper.GetJText(Transaction, 'status', false) = 'success' then begin
+                    ShopifyTransactionKind := JsonHelper.GetJText(Transaction, 'kind', false).ToUpper();
+                    if ShopifyTransactionKind in ['AUTHORIZATION', 'SALE'] then
+                        if JsonHelper.GetJText(Transaction, 'status', false).ToUpper() = 'SUCCESS' then begin
 #pragma warning disable AA0139
-                            ShopifyTransactionID := JsonHelper.GetJText(Transaction, 'id', MaxStrLen(ShopifyTransactionID), true);
+                            ShopifyTransactionID := SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(Transaction, 'id', true), '/');
 #pragma warning restore AA0139
 
                             AlreadyAssigned := false;
@@ -282,10 +314,10 @@ codeunit 6184804 "NPR Spfy Capture Payment"
                                     PaymentLine."Line No." := 0;
 
                                 GiftCardTransaction := false;
-                                if ShopifyTransactionKind = 'sale' then
+                                if ShopifyTransactionKind = 'SALE' then
                                     GiftCardTransaction := AddGiftCardPaymentLine(Transaction, PaymentLineParam, PaymentLine);
                                 if not GiftCardTransaction then begin
-                                    InitCreditCardPaymentLine(Transaction, NcTask."Store Code", PaymentLineParam, PaymentLine);
+                                    InitCreditCardPaymentLine(Transaction, PaymentLineParam, PaymentLine);
                                     PaymentLine."No." := ShopifyTransactionID;
                                     PaymentLine.Insert(true);
                                 end;
@@ -295,7 +327,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
                                 PaymentLine."Posting Date" := PaymentLineParam."Posting Date";
                             SetPmtLineAsCaptured(Transaction, Transactions.AsArray(), ShopifyTransactionKind, ShopifyTransactionID, PaymentLine);
 
-                            if ScheduleCapture and (ShopifyTransactionKind = 'authorization') and (PaymentLine."Date Captured" = 0D) then
+                            if ScheduleCapture and (ShopifyTransactionKind = 'AUTHORIZATION') and (PaymentLine."Date Captured" = 0D) then
                                 SchedulePmtLineProcessing(NcTask."Store Code", PaymentLine, ShopifyOrderID, NcTask.Type::Insert);
 
                             PaymentLineParam.Amount := PaymentLineParam.Amount - PaymentLine.Amount;
@@ -306,12 +338,12 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         end;
     end;
 
-    local procedure InitCreditCardPaymentLine(Transaction: JsonToken; ShopifyStoreCode: Code[20]; PaymentLineParam: Record "NPR Magento Payment Line"; var PaymentLine: Record "NPR Magento Payment Line")
+    local procedure InitCreditCardPaymentLine(Transaction: JsonToken; PaymentLineParam: Record "NPR Magento Payment Line"; var PaymentLine: Record "NPR Magento Payment Line")
     var
+        PaymentMapping: Record "NPR Magento Payment Mapping";
         PaymentMethod: Record "Payment Method";
-        SpfyOrderMgt: Codeunit "NPR Spfy Order Mgt.";
     begin
-        SpfyOrderMgt.GetPaymentMapping(Transaction, ShopifyStoreCode, PaymentMapping);
+        GetPaymentMapping(Transaction, PaymentLineParam."Source No.", PaymentMapping);
         PaymentMapping.TestField("Payment Method Code");
         PaymentMethod.Get(PaymentMapping."Payment Method Code");
 
@@ -324,24 +356,83 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         PaymentLine."Posting Date" := PaymentLineParam."Posting Date";
         PaymentLine."Source Table No." := Database::"Payment Method";
         PaymentLine."Source No." := PaymentMethod.Code;
-        PaymentLine.Amount := JsonHelper.GetJDecimal(Transaction, 'amount', true);
-        If PaymentLine.Amount > PaymentLineParam.Amount then
-            PaymentLine.Amount := PaymentLineParam.Amount;
+        SetPaymentAmounts(Transaction, PaymentLine);
+        AdjustAmounts(PaymentLineParam.Amount, PaymentLine);
         PaymentLine."Allow Adjust Amount" := PaymentMapping."Allow Adjust Payment Amount";
-        PaymentLine."Payment Gateway Code" := ShopifyPaymentGateway(JsonHelper.GetJText(Transaction, 'currency', false));
+        PaymentLine."Payment Gateway Code" := ShopifyPaymentGateway(PaymentLine."Store Currency Code");
 #pragma warning disable AA0139
-        PaymentLine."Transaction ID" := JsonHelper.GetJText(Transaction, 'payment_id', false);
+        PaymentLine."Transaction ID" := JsonHelper.GetJText(Transaction, 'paymentId', false);
 #pragma warning restore AA0139
         SetDateAuthorized(Transaction, PaymentLine);
+        SetPaymentCardDetails(Transaction, PaymentLine);
 
         SpfyIntegrationEvents.OnAfterInitCreditCardPaymentLine(PaymentLine, PaymentMapping, Transaction);
     end;
 
+    local procedure GetPaymentMapping(Transaction: JsonToken; ShopifyStoreCode: Code[20]; var PaymentMapping: Record "NPR Magento Payment Mapping")
+    var
+        ExternalPaymentTypeID: Record "NPR External Payment Type ID";
+        CreditCardCompany: Text;
+        ShopifyPmtGateway: Text;
+        ExternalPmtTypeFormatTok: Label '%1_%2', Locked = true;
+        MappingNotFoundErr: Label 'There is no payment mapping set for Shopify store %1, payment gateway "%2" and credit card company "%3".', Comment = '%1 - Shopify store code, %2 - payment gateway, %3 - credit card company';
+    begin
+        Clear(PaymentMapping);
+        ShopifyPmtGateway := JsonHelper.GetJText(Transaction, 'gateway', false);
+        CreditCardCompany := JsonHelper.GetJText(Transaction, 'paymentDetails.company', false);
+
+        ExternalPaymentTypeID.SetCurrentKey("Store Code", "Payment Gateway", "Credit Card Company");
+        ExternalPaymentTypeID.SetRange("Store Code", ShopifyStoreCode);
+        ExternalPaymentTypeID.SetRange("Payment Gateway", CopyStr(ShopifyPmtGateway, 1, MaxStrLen(ExternalPaymentTypeID."Payment Gateway")));
+        ExternalPaymentTypeID.SetRange("Credit Card Company", CopyStr(CreditCardCompany, 1, MaxStrLen(ExternalPaymentTypeID."Credit Card Company")));
+        if ExternalPaymentTypeID.FindFirst() then
+            if PaymentMapping.Get('Shopify', ExternalPaymentTypeID."External Payment Type ID") then
+                exit;
+
+        if not PaymentMapping.Get('Shopify', LowerCase(StrSubstNo(ExternalPmtTypeFormatTok, ShopifyStoreCode, ShopifyPmtGateway))) then
+            Error(MappingNotFoundErr, ShopifyStoreCode, ShopifyPmtGateway, CreditCardCompany);
+    end;
+
     local procedure SetDateAuthorized(Transaction: JsonToken; var PaymentLine: Record "NPR Magento Payment Line")
     begin
-        PaymentLine."Date Authorized" := DT2Date(JsonHelper.GetJDT(Transaction, 'processed_at', false));
+        PaymentLine."Date Authorized" := DT2Date(JsonHelper.GetJDT(Transaction, 'processedAt', false));
         if PaymentLine."Date Authorized" = 0D then
-            PaymentLine."Date Authorized" := DT2Date(JsonHelper.GetJDT(Transaction, 'created_at', false));
+            PaymentLine."Date Authorized" := DT2Date(JsonHelper.GetJDT(Transaction, 'createdAt', false));
+        PaymentLine."Expires At" := JsonHelper.GetJDT(Transaction, 'authorizationExpiresAt', false);
+    end;
+
+    local procedure SetPaymentAmounts(Transaction: JsonToken; var PaymentLine: Record "NPR Magento Payment Line")
+    begin
+        PaymentLine.Amount := JsonHelper.GetJDecimal(Transaction, 'amountSet.presentmentMoney.amount', false);
+        PaymentLine."Amount (Store Currency)" := JsonHelper.GetJDecimal(Transaction, 'amountSet.shopMoney.amount', true);
+        PaymentLine."Store Currency Code" := SpfyPaymentGatewayHdlr.TranslateCurrencyCode(JsonHelper.GetJText(Transaction, 'amountSet.shopMoney.currencyCode', false));
+    end;
+
+    local procedure AdjustAmounts(PaymentAmount: Decimal; var PaymentLine: Record "NPR Magento Payment Line")
+    begin
+        If PaymentLine.Amount <= PaymentAmount then
+            exit;
+
+        GetCurrency(PaymentLine."Store Currency Code");
+        PaymentLine."Amount (Store Currency)" := Round(PaymentLine."Amount (Store Currency)" * PaymentAmount / PaymentLine.Amount, Currency."Amount Rounding Precision");
+        PaymentLine.Amount := PaymentAmount;
+    end;
+
+    local procedure SetPaymentCardDetails(Transaction: JsonToken; var PaymentLine: Record "NPR Magento Payment Line")
+    var
+        CardNumber: Text;
+    begin
+        CardNumber := JsonHelper.GetJText(Transaction, 'paymentDetails.number', false);
+        if StrLen(CardNumber) <= 4 then
+#pragma warning disable AA0139
+            PaymentLine."Card Summary" := CardNumber
+#pragma warning restore AA0139
+        else
+            PaymentLine."Card Summary" := CopyStr(CardNumber, StrLen(CardNumber) - 3, 4);
+#pragma warning disable AA0139
+        PaymentLine.Brand := JsonHelper.GetJText(Transaction, 'paymentDetails.company', MaxStrLen(PaymentLine.Brand), false);
+        PaymentLine."Expiry Date Text" := StrSubstNo('%1/%2', JsonHelper.GetJText(Transaction, 'paymentDetails.expirationMonth', false).PadLeft(2, '0'), JsonHelper.GetJText(Transaction, 'paymentDetails.expirationYear', false));
+#pragma warning restore AA0139
     end;
 
     local procedure SetPmtLineAsCaptured(CurrentTransaction: JsonToken; Transactions: JsonArray; ShopifyTransactionKind: Text; CurrentTransactionID: Text[30]; var PaymentLine: Record "NPR Magento Payment Line"): Boolean
@@ -354,25 +445,25 @@ codeunit 6184804 "NPR Spfy Capture Payment"
             exit;
 
         if ShopifyTransactionKind = '' then
-            ShopifyTransactionKind := JsonHelper.GetJText(CurrentTransaction, 'kind', false).ToLower();
+            ShopifyTransactionKind := JsonHelper.GetJText(CurrentTransaction, 'kind', false).ToUpper();
         case ShopifyTransactionKind of
-            'sale':
+            'SALE':
                 begin
                     PaymentLine."Date Captured" := PaymentLine."Date Authorized";
                     if PaymentLine."Date Captured" = 0D then
                         PaymentLine."Date Captured" := PaymentLine."Posting Date";
                 end;
 
-            'authorization':
-                if JsonHelper.GetJDecimal(CurrentTransaction, 'total_unsettled_set.presentment_money.amount', true) = 0 then begin
+            'AUTHORIZATION':
+                if JsonHelper.GetJDecimal(CurrentTransaction, 'totalUnsettledSet.presentmentMoney.amount', true) = 0 then begin
                     ShopifyOrderTransactionsAsArray := Transactions.Clone().AsArray();
                     foreach ShopifyOrderTransaction in ShopifyOrderTransactionsAsArray do
-                        if JsonHelper.GetJText(ShopifyOrderTransaction, 'kind', false) = 'capture' then
-                            if JsonHelper.GetJText(ShopifyOrderTransaction, 'status', false) = 'success' then
-                                if JsonHelper.GetJText(ShopifyOrderTransaction, 'parent_id', false) = CurrentTransactionID then begin
-                                    DateCaptured := DT2Date(JsonHelper.GetJDT(ShopifyOrderTransaction, 'processed_at', false));
+                        if JsonHelper.GetJText(ShopifyOrderTransaction, 'kind', false).ToUpper() = 'CAPTURE' then
+                            if JsonHelper.GetJText(ShopifyOrderTransaction, 'status', false).ToUpper() = 'SUCCESS' then
+                                if SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(ShopifyOrderTransaction, 'parentTransaction.id', false), '/') = CurrentTransactionID then begin
+                                    DateCaptured := DT2Date(JsonHelper.GetJDT(ShopifyOrderTransaction, 'processedAt', false));
                                     if DateCaptured = 0D then
-                                        DateCaptured := DT2Date(JsonHelper.GetJDT(ShopifyOrderTransaction, 'created_at', false));
+                                        DateCaptured := DT2Date(JsonHelper.GetJDT(ShopifyOrderTransaction, 'createdAt', false));
                                     if (DateCaptured <> 0D) and (DateCaptured > PaymentLine."Date Captured") then
                                         PaymentLine."Date Captured" := DateCaptured;
                                 end;
@@ -390,7 +481,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         exit(true);
     end;
 
-    local procedure AddGiftCardPaymentLine(ShopifyTransactionJToken: JsonToken; PaymentLineParam: Record "NPR Magento Payment Line"; var PaymentLine: Record "NPR Magento Payment Line"): Boolean
+    local procedure AddGiftCardPaymentLine(Transaction: JsonToken; PaymentLineParam: Record "NPR Magento Payment Line"; var PaymentLine: Record "NPR Magento Payment Line"): Boolean
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         NpRvVoucher: Record "NPR NpRv Voucher";
@@ -401,7 +492,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         VoucherNotFoundErr: Label 'System could not find a retail voucher with Shopify gift card ID %1';
     begin
 #pragma warning disable AA0139
-        ShopifyGiftCardID := JsonHelper.GetJText(ShopifyTransactionJToken, 'receipt.gift_card_id', MaxStrLen(ShopifyGiftCardID), false);
+        ShopifyGiftCardID := SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(Transaction, 'receiptJson.gift_card_id', false), '/');
 #pragma warning restore AA0139
         if ShopifyGiftCardID = '' then
             exit(false);
@@ -442,9 +533,8 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         PaymentLine."Source Table No." := Database::"NPR NpRv Voucher";
         PaymentLine."Source No." := NpRvVoucher."No.";
         PaymentLine."External Reference No." := PaymentLineParam."External Reference No.";
-        PaymentLine.Amount := JsonHelper.GetJDecimal(ShopifyTransactionJToken, 'amount', true);
-        If PaymentLine.Amount > PaymentLineParam.Amount then
-            PaymentLine.Amount := PaymentLineParam.Amount;
+        SetPaymentAmounts(Transaction, PaymentLine);
+        AdjustAmounts(PaymentLineParam.Amount, PaymentLine);
         PaymentLine.Insert(true);
 
         NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Payment Line";
@@ -453,7 +543,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         NpRvSalesLine."Reservation Line Id" := PaymentLine.SystemId;
         NpRvSalesLine.Modify(true);
 
-        SpfyIntegrationEvents.OnAfterAddGiftCardPaymentLine(PaymentLine, NpRvSalesLine, ShopifyTransactionJToken);
+        SpfyIntegrationEvents.OnAfterAddGiftCardPaymentLine(PaymentLine, NpRvSalesLine, Transaction);
 
         exit(true);
     end;
@@ -468,13 +558,13 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         SpfyScheduleSend.InitNcTask(ShopifyStoreCode, RecRef, OrderID, TaskType, NcTask);
     end;
 
-    local procedure ShopifyPaymentGateway(CurrencyCode: Text): Code[10]
+    local procedure ShopifyPaymentGateway(StoreCurrencyCode: Text): Code[10]
     var
         PaymentGateway: Record "NPR Magento Payment Gateway";
         SpfyPaymentGateway: Record "NPR Spfy Payment Gateway";
         ShopifyPmtGatewayCode: Label 'SPFY', Locked = true;
     begin
-        PaymentGateway.Code := CopyStr(StrSubstNo('%1-%2', ShopifyPmtGatewayCode, UpperCase(CurrencyCode)), 1, MaxStrLen(PaymentGateway.Code));
+        PaymentGateway.Code := CopyStr(StrSubstNo('%1-%2', ShopifyPmtGatewayCode, UpperCase(StoreCurrencyCode)), 1, MaxStrLen(PaymentGateway.Code));
         if not PaymentGateway.Find() then begin
             PaymentGateway.Init();
             PaymentGateway."Integration Type" := PaymentGateway."Integration Type"::Shopify;
@@ -483,7 +573,8 @@ codeunit 6184804 "NPR Spfy Capture Payment"
 
             SpfyPaymentGateway.Init();
             SpfyPaymentGateway.Code := PaymentGateway.Code;
-            SpfyPaymentGateway."Currency Code" := CopyStr(UpperCase(CurrencyCode), 1, MaxStrLen(SpfyPaymentGateway."Currency Code"));
+            SpfyPaymentGateway."Currency Code" := CopyStr(UpperCase(StoreCurrencyCode), 1, MaxStrLen(SpfyPaymentGateway."Currency Code"));
+            SpfyPaymentGateway."Identify Final Capture" := true;
             SpfyPaymentGateway.Insert();
         end else begin
             PaymentGateway.TestField("Integration Type", PaymentGateway."Integration Type"::Shopify);
@@ -521,6 +612,20 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         OStream.WriteText(Tb.ToText());
         NcTask.Modify();
         Commit();
+    end;
+
+    local procedure GetCurrency(CurrencyCode: Code[10])
+    begin
+        if CurrencyRetrieved and (Currency.Code = CurrencyCode) then
+            exit;
+
+        if CurrencyCode <> '' then
+            Currency.Get(CurrencyCode)
+        else begin
+            Clear(Currency);
+            Currency.InitRoundingPrecision();
+        end;
+        CurrencyRetrieved := true;
     end;
 
 #if BC18 or BC19 or BC20 or BC21

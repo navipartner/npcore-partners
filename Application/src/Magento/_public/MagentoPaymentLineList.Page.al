@@ -57,7 +57,7 @@
                 }
                 field(Amount; Rec.Amount)
                 {
-                    ToolTip = 'Specifies the value of the Amount field';
+                    ToolTip = 'Specifies the payment amount in the order currency.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Allow Adjust Amount"; Rec."Allow Adjust Amount")

@@ -122,9 +122,11 @@ codeunit 6185048 "NPR Spfy Item Price Mgt."
         TempItemPrice.SetCurrentKey("Shopify Store Code", "Item No.", "Variant Code");
         if TempItemPrice.FindSet() then
             repeat
+                If ShopifyStore.Code <> TempItemPrice."Shopify Store Code" then
+                    ShopifyStore.Get(TempItemPrice."Shopify Store Code");
                 ItemPrice.Reset();
                 TempItemPrice.SetRange("Shopify Store Code", TempItemPrice."Shopify Store Code");
-                if SpfyProductPriceCalc.Initialize(TempItemPrice."Shopify Store Code", ItemPricesCalculationDate) then begin
+                if SpfyProductPriceCalc.Initialize(ShopifyStore, ItemPricesCalculationDate) then begin
 
                     if FullRecalculation then
                         MarkObsoleteItemPrices(TempItemPrice."Shopify Store Code", ItemPrice);

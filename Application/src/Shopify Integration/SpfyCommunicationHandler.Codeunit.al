@@ -88,33 +88,6 @@ codeunit 6184924 "NPR Spfy Communication Handler"
     end;
 
     [TryFunction]
-    procedure SendTransactionRequest(var NcTask: Record "NPR Nc Task")
-    var
-        Url: Text;
-    begin
-        CheckRequestContent(NcTask);
-
-        Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('orders/%1/transactions.json', NcTask."Record Value");
-        SendShopifyRequest(NcTask, Enum::"Http Request Type"::POST, Url);
-    end;
-
-    [TryFunction]
-    procedure TryGetShopifyOrderTransactions(var NcTask: Record "NPR Nc Task"; var SpfyOrderTransactions: JsonObject)
-    begin
-        GetShopifyOrderTransactions(NcTask, SpfyOrderTransactions);
-    end;
-
-    procedure GetShopifyOrderTransactions(var NcTask: Record "NPR Nc Task"; var SpfyOrderTransactions: JsonObject)
-    var
-        ResponseText: Text;
-        Url: Text;
-    begin
-        Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('orders/%1/transactions.json', NcTask."Record Value");
-        ResponseText := SendShopifyRequest(NcTask, Enum::"Http Request Type"::GET, Url);
-        SpfyOrderTransactions.ReadFrom(ResponseText);
-    end;
-
-    [TryFunction]
     procedure ExecuteShopifyGraphQLRequest(var NcTask: Record "NPR Nc Task"; CheckIntegrationIsEnabled: Boolean; var ShopifyResponse: JsonToken)
     var
         ResponseText: Text;

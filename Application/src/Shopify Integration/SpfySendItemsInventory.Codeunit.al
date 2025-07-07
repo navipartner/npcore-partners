@@ -560,7 +560,6 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         SkipEntry: Boolean;
         ItemDoesNotExistErr: Label 'Item %1 has been removed from the system. The variant request is no longer applicable.', Comment = '%1 - Item No.';
         ItemVariantDoesNotExistErr: Label 'The item %1 variant %2 has been removed from the system. The request is no longer applicable.', Comment = '%1 - Item No., %2 - Variant Code';
-        ItemVariantIsBlockedOrNotAvailableErr: Label 'The item variant is blocked or set as not available in Shopify.';
         ShopifyProductIdEmptyErr: Label 'The item has not yet been synced with Shopify. The variant will be sent with the item.';
         ShopifyVariantIdEmptyErr: Label 'The variant does not exist in Shopify. No need to send a removal request.';
     begin
@@ -606,6 +605,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                 NcTaskOut.Processed := SetBatchProcessed;
                 NcTaskOut."Process Error" := SetBatchError;
             end else begin
+                ClearLastError();
                 SkipEntry := false;
 
                 RecRef := NcTaskOut."Record ID".GetRecord();
@@ -626,7 +626,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
 
                 if not SkipEntry then
                     if not GenerateVariantJObject(NcTaskOut, Item, ItemVariant, NcTaskOut.Type <> NcTaskOut.Type::Delete, ShopifyVariantID, VariantJObject) then begin
-                        _SpfyIntegrationMgt.SetResponse(NcTaskOut, ItemVariantIsBlockedOrNotAvailableErr);
+                        _SpfyIntegrationMgt.SetResponse(NcTaskOut, GetLastErrorText());
                         NcTaskOut.Processed := true;
                         SkipEntry := true;
                     end;
@@ -938,7 +938,8 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         exit(GenerateVariantJObject(NcTask, Item, ItemVariant, ProcessNewVariants, ShopifyVariantID, VariantJObject, VarietyValueDic));
     end;
 
-    local procedure GenerateVariantJObject(NcTask: Record "NPR Nc Task"; Item: Record Item; ItemVariant: Record "Item Variant"; ProcessNewVariants: Boolean; var ShopifyVariantID: Text[30]; var VariantJObject: JsonObject; var VarietyValueDic: Dictionary of [Integer, List of [Text]]): Boolean
+    [TryFunction]
+    local procedure GenerateVariantJObject(NcTask: Record "NPR Nc Task"; Item: Record Item; ItemVariant: Record "Item Variant"; ProcessNewVariants: Boolean; var ShopifyVariantID: Text[30]; var VariantJObject: JsonObject; var VarietyValueDic: Dictionary of [Integer, List of [Text]])
     var
         SpfyStoreItemVariantLink: Record "NPR Spfy Store-Item Link";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
@@ -949,7 +950,8 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         VariantOptionValues: JsonArray;
         Barcode: Text;
         ShopifyOptionNo: Integer;
-        VariantVarietyValuesMissingErr: Label 'The item variant %1 of item %2 does not have any variety values selected. Each variant must have a unique combination of values selected on the item variant card, because Shopify uses these to distinguish between variants.', Comment = '%1 - Item Variant Code, %2 - Item No.';
+        ItemVariantIsBlockedOrNotAvailableErr: Label 'The item variant %1 of item %2 is blocked or set as not available in Shopify.';
+        ItemVariantIsNotSyncedErr: Label 'The item variant %1 of item %2 is not synced with Shopify.';
     begin
         VariantJObject.ReadFrom('{}');
         SpfyStoreItemVariantLink.Type := SpfyStoreItemVariantLink.Type::"Variant";
@@ -961,11 +963,11 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         if ShopifyVariantID = '' then begin
             ShopifyVariantID := GetShopifyVariantID(SpfyStoreItemVariantLink, false);
             if (ShopifyVariantID = '') and (not ProcessNewVariants or (NcTask.Type = NcTask.Type::Delete)) then
-                exit(false);
+                Error(ItemVariantIsNotSyncedErr, ItemVariant.Code, ItemVariant."Item No.");
         end;
         if not ((ShopifyVariantID <> '') and (NcTask.Type = NcTask.Type::Delete)) then
             if SpfyItemVariantModifMgt.ItemVariantNotAvailableInShopify(SpfyStoreItemVariantLink) or SpfyItemMgt.ItemVariantIsBlocked(ItemVariant) then
-                exit(false);
+                Error(ItemVariantIsBlockedOrNotAvailableErr, ItemVariant.Code, ItemVariant."Item No.");
 
         if ShopifyVariantID <> '' then
             VariantJObject.Add('id', 'gid://shopify/ProductVariant/' + ShopifyVariantID);
@@ -995,8 +997,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                     AddVariety(4, ItemVariant."NPR Variety 4", ItemVariant."NPR Variety 4 Table", ItemVariant."NPR Variety 4 Value", ShopifyOptionNo, VariantOptionValues, VarietyValueDic);
                 VariantJObject.Add('optionValues', VariantOptionValues);
             end else begin
-                if ItemVariant.Code <> '' then
-                    Error(VariantVarietyValuesMissingErr, ItemVariant.Code, ItemVariant."Item No.");
+                SpfyItemMgt.CheckItemVariantHasVarieties(ItemVariant);
                 if ShopifyVariantID = '' then begin
                     AddDefaultProductOptionValue(VariantOptionValues);  //Default variant for an item without variants
                     VariantJObject.Add('optionValues', VariantOptionValues);
@@ -1004,8 +1005,6 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             end;
         end;
         SpfyIntegrationEvents.OnAfterGenerateVariantJObject(ItemVariant, VariantJObject);
-
-        exit(true);
     end;
 
     procedure AddVariety(VarietyNo: Integer; Variety: Code[20]; VarietyTable: Code[40]; VarietyValue: Code[50]; var ShopifyOptionNo: Integer; var VariantOptionValues: JsonArray; var VarietyValueDic: Dictionary of [Integer, List of [Text]])

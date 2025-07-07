@@ -243,8 +243,7 @@ codeunit 6184816 "NPR Spfy Retail Voucher Mgt."
         ShopifyAssignedID: Record "NPR Spfy Assigned ID";
         RecRef: RecordRef;
     begin
-        SpfyAssignedIDMgt.FilterWhereUsed("NPR Spfy ID Type"::"Entry ID", ShopifyVoucherId, false, ShopifyAssignedID);
-        ShopifyAssignedID.SetRange("Table No.", Database::"NPR NpRv Voucher");
+        SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"NPR NpRv Voucher", "NPR Spfy ID Type"::"Entry ID", ShopifyVoucherId, ShopifyAssignedID);
         if ShopifyAssignedID.FindFirst() then
             if RecRef.Get(ShopifyAssignedID."BC Record ID") then
                 RecRef.SetTable(NpRvVoucher);

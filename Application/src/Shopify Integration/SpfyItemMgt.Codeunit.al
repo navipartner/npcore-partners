@@ -845,6 +845,8 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         if ItemVariant.Code = '' then
             exit;
 
+        CheckItemVariantHasVarieties(ItemVariant);
+
         if ItemVariant."NPR Variety 1" <> '' then begin
             ItemVariant.TestField("NPR Variety 1", Item."NPR Variety 1");
             Item.TestField("NPR Variety 1 Table");
@@ -869,6 +871,20 @@ codeunit 6184812 "NPR Spfy Item Mgt."
             ItemVariant.TestField("NPR Variety 4 Table", Item."NPR Variety 4 Table");
             ItemVariant.TestField("NPR Variety 4 Value");
         end;
+    end;
+
+    procedure CheckItemVariantHasVarieties(ItemVariant: Record "Item Variant")
+    var
+        VariantVarietyValuesMissingErr: Label 'The item variant %1 of item %2 does not have any variety values selected. Each variant must have a unique combination of values selected on the item variant card, because Shopify uses these to distinguish between variants.', Comment = '%1 - Item Variant Code, %2 - Item No.';
+    begin
+        If ItemVariant.Code = '' then
+            exit;
+        if (ItemVariant."NPR Variety 1 Value" = '') and
+           (ItemVariant."NPR Variety 2 Value" = '') and
+           (ItemVariant."NPR Variety 3 Value" = '') and
+           (ItemVariant."NPR Variety 4 Value" = '')
+        then
+            Error(VariantVarietyValuesMissingErr, ItemVariant.Code, ItemVariant."Item No.");
     end;
 
     local procedure IsValidItemReference(ItemReference: Record "Item Reference"): Boolean

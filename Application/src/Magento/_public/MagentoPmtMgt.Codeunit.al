@@ -196,13 +196,7 @@
     begin
         if Rec.IsTemporary then
             exit;
-        if not HasMagentoPayment(Database::"Sales Header", Rec."Document Type", Rec."No.") then
-            exit;
-
-        PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
-        PaymentLine.SetRange("Document Type", Rec."Document Type");
-        PaymentLine.SetRange("Document No.", Rec."No.");
-        if PaymentLine.IsEmpty then
+        if not HasMagentoPayment(Database::"Sales Header", Rec."Document Type", Rec."No.", PaymentLine) then
             exit;
 
         if RunTrigger then
@@ -227,9 +221,6 @@
         PaymentAmt: Decimal;
         TotalAmountInclVAT: Decimal;
     begin
-        if not HasMagentoPayment(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.") then
-            exit;
-
         if HasAllowAdjustAmount(SalesHeader) then
             exit;
 
@@ -245,13 +236,11 @@
 
         PaymentLine.SetRange(Amount);
         PaymentLine.SetFilter("Last Amount", '<>%1', 0);
-        if not PaymentLine.IsEmpty then begin
-            PaymentLine.FindSet();
+        if PaymentLine.FindSet() then
             repeat
                 if not LastPostingDocExists(PaymentLine) then
                     PaymentAmt += PaymentLine."Last Amount";
             until PaymentLine.Next() = 0;
-        end;
         if PaymentAmt < TotalAmountInclVAT then
             Error(Text004, PaymentAmt);
 
@@ -296,6 +285,11 @@
     local procedure HasMagentoPayment(DocTableNo: Integer; DocType: Enum "Sales Document Type"; DocNo: Code[20]): Boolean
     var
         PaymentLine: Record "NPR Magento Payment Line";
+    begin
+        exit(HasMagentoPayment(DocTableNo, DocType, DocNo, PaymentLine));
+    end;
+
+    internal procedure HasMagentoPayment(DocTableNo: Integer; DocType: Enum "Sales Document Type"; DocNo: Code[20]; var PaymentLine: Record "NPR Magento Payment Line"): Boolean
     begin
         PaymentLine.Reset();
         PaymentLine.SetRange("Document Table No.", DocTableNo);
@@ -422,10 +416,6 @@
 
         AdjustmentAmt := TotalAmountInclVAT - PaymentLine.Amount;
 
-        Clear(PaymentLine);
-        PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
-        PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
-        PaymentLine.SetRange("Document No.", SalesHeader."No.");
         PaymentLine.SetRange("Allow Adjust Amount", true);
         PaymentLine.FindFirst();
         PaymentLine.Amount += AdjustmentAmt;
@@ -456,8 +446,6 @@
             exit;
         if (not SalesHeader.Invoice) and (SalesHeader."Document Type" = SalesHeader."Document Type"::"Return Order") then
             exit;
-        if not HasMagentoPayment(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.") then
-            exit;
 
         InsertRefundPaymentLines(SalesHeader);
     end;
@@ -480,7 +468,7 @@
         TotalAmountInclVAT: Decimal;
         DocNo: Code[20];
     begin
-        if not HasMagentoPayment(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.") then
+        if not HasMagentoPayment(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", PaymentLine) then
             exit;
 
         TotalAmountInclVAT := GetTotalAmountInclVat(SalesHeader);
@@ -496,10 +484,6 @@
         end;
 
         RefundAmt := 0;
-        PaymentLine.Reset();
-        PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
-        PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
-        PaymentLine.SetRange("Document No.", SalesHeader."No.");
         PaymentLine.SetRange(Posted, false);
         PaymentLine.SetFilter(Amount, '<>%1', 0);
         if PaymentLine.FindSet(true) then
@@ -546,9 +530,6 @@
         if (not SalesHeader.Invoice) and (SalesHeader."Document Type" = SalesHeader."Document Type"::Order) then
             exit;
         AdjustPaymentAmount(SalesHeader);
-        if not HasMagentoPayment(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.") then
-            exit;
-
         InsertPaymentLines(SalesHeader);
     end;
 
@@ -572,7 +553,7 @@
         HasVouchers: Boolean;
         HasPaymentsAndRefunds: Boolean;
     begin
-        if not HasMagentoPayment(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.") then
+        if not HasMagentoPayment(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", PaymentLine) then
             exit;
 
         HasVouchers := HasMagentoPaymentVouchers(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
@@ -591,10 +572,6 @@
         end;
 
         PaymentAmt := 0;
-        PaymentLine.Reset();
-        PaymentLine.SetRange("Document Table No.", Database::"Sales Header");
-        PaymentLine.SetRange("Document Type", SalesHeader."Document Type");
-        PaymentLine.SetRange("Document No.", SalesHeader."No.");
         PaymentLine.SetFilter(Amount, '<>%1', 0);
         if PaymentLine.FindSet(true) then
             repeat
@@ -612,18 +589,30 @@
                 PaymentLine2."Document No." := DocNo;
                 PaymentLine2."Posting Date" := SalesHeader."Posting Date";
                 PaymentLine2.Insert();
-#IF NOT BC17
+#if not BC17
                 SpfyAssignedIDMgt.CopyAssignedShopifyID(PaymentLine.RecordId(), PaymentLine2.RecordId(), "NPR Spfy ID Type"::"Entry ID");
-#ENDIF
+#endif
 
                 OutstandingAmt := TotalAmountInclVAT - PaymentAmt;
                 if (PaymentLine."Payment Type" = PaymentLine."Payment Type"::"Payment Method") and (PaymentLine.Amount > OutstandingAmt) then begin
                     PaymentLine2.Amount := OutstandingAmt;
+#if not BC17
+                    PaymentLine2."Amount (Store Currency)" := Round(PaymentLine."Amount (Store Currency)" / PaymentLine.Amount * PaymentLine2.Amount, 0.01);
+                    if PaymentLine2."Amount (Store Currency)" > PaymentLine."Amount (Store Currency)" then
+                        PaymentLine2."Amount (Store Currency)" := PaymentLine."Amount (Store Currency)";
+#endif
                     PaymentLine2.Modify();
 
                     PaymentLine.Amount := PaymentLine.Amount - OutstandingAmt;
-                end else
+#if not BC17
+                    PaymentLine."Amount (Store Currency)" := PaymentLine."Amount (Store Currency)" - PaymentLine2."Amount (Store Currency)";
+#endif
+                end else begin
                     PaymentLine.Amount := 0;
+#if not BC17
+                    PaymentLine."Amount (Store Currency)" := 0;
+#endif
+                end;
                 PaymentLine."Last Amount" := PaymentLine2.Amount;
                 PaymentLine."Last Posting No." := DocNo;
                 PaymentLine.Modify();

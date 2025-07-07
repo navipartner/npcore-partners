@@ -426,6 +426,19 @@ page 6184704 "NPR Spfy Store Card"
                 RunPageLink = "Shopify Store Code" = field(Code);
             }
         }
+        area(Reporting)
+        {
+            action(EventLogEntries)
+            {
+                Caption = 'Event Log';
+                ToolTip = 'View the list of registered Shopify events for this store.';
+                ApplicationArea = NPRShopify;
+                Image = ImportLog;
+                RunObject = Page "NPR Spfy Event Log Entries";
+                RunPageView = sorting("Store Code", "Event Date-Time", Type);
+                RunPageLink = "Store Code" = field(Code);
+            }
+        }
     }
 
     trigger OnOpenPage()

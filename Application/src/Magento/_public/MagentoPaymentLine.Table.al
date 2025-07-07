@@ -112,6 +112,21 @@
             Caption = 'Date Refunded';
             DataClassification = CustomerContent;
         }
+#if not BC17  //Shopify integration
+        field(150; "Store Currency Code"; Code[10])
+        {
+            Caption = 'Store Currency Code';
+            DataClassification = CustomerContent;
+            TableRelation = Currency.Code;
+        }
+        field(160; "Amount (Store Currency)"; Decimal)
+        {
+            Caption = 'Amount (Store Currency)';
+            DataClassification = CustomerContent;
+            AutoFormatExpression = "Store Currency Code";
+            AutoFormatType = 1;
+        }
+#endif
         field(200; "Last Amount"; Decimal)
         {
             Caption = 'Last Amount';
@@ -302,5 +317,60 @@
         end;
 
         Request."Last Operation Id" := Rec."Charge ID";
+    end;
+
+    internal procedure TransactionCurrencyCode(BlankForLCY: Boolean): Code[10]
+    var
+        CustLedgerEntry: Record "Cust. Ledger Entry";
+        GLSetup: Record "General Ledger Setup";
+        SalesHeader: Record "Sales Header";
+        SalesInvHeader: Record "Sales Invoice Header";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        CurrencyCode: Code[10];
+        DocumentFound: Boolean;
+    begin
+        case "Document Table No." of
+            Database::"Sales Header":
+                begin
+                    SalesHeader.SetLoadFields("Currency Code");
+                    DocumentFound := SalesHeader.Get("Document Type", "Document No.");
+                    if DocumentFound then
+                        CurrencyCode := SalesHeader."Currency Code";
+                end;
+            Database::"Sales Invoice Header":
+                begin
+                    SalesInvHeader.SetLoadFields("Currency Code");
+                    DocumentFound := SalesInvHeader.Get("Document No.");
+                    if DocumentFound then
+                        CurrencyCode := SalesInvHeader."Currency Code";
+                end;
+            Database::"Sales Cr.Memo Header":
+                begin
+                    SalesCrMemoHeader.SetLoadFields("Currency Code");
+                    DocumentFound := SalesCrMemoHeader.Get("Document No.");
+                    if DocumentFound then
+                        CurrencyCode := SalesCrMemoHeader."Currency Code";
+                end;
+        end;
+
+        if not DocumentFound and ("Document Table No." in [Database::"Sales Invoice Header", Database::"Sales Cr.Memo Header"]) then begin
+            CustLedgerEntry.SetCurrentKey("Document No.");
+            case "Document Table No." of
+                Database::"Sales Invoice Header":
+                    CustLedgerEntry.SetRange("Document Type", CustLedgerEntry."Document Type"::Invoice);
+                Database::"Sales Cr.Memo Header":
+                    CustLedgerEntry.SetRange("Document Type", CustLedgerEntry."Document Type"::"Credit Memo");
+            end;
+            CustLedgerEntry.SetRange("Document No.", "Document No.");
+            CustLedgerEntry.SetLoadFields("Currency Code");
+            if CustLedgerEntry.FindFirst() then
+                CurrencyCode := CustLedgerEntry."Currency Code";
+        end;
+
+        if (CurrencyCode = '') and not BlankForLCY then
+            if GLSetup.Get() then
+                CurrencyCode := GLSetup."LCY Code";
+
+        exit(CurrencyCode);
     end;
 }

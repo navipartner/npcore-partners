@@ -322,20 +322,11 @@ codeunit 6184814 "NPR Spfy Order Mgt."
     var
         NpEcDocument: Record "NPR NpEc Document";
         NpEcStore: Record "NPR NpEc Store";
-        ShopifyAssignedID: Record "NPR Spfy Assigned ID";
-        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
-        RecRef: RecordRef;
         OrderNo: Text[50];
     begin
         SelectLatestVersion();
-        Clear(SalesHeader);
-        SpfyAssignedIDMgt.FilterWhereUsed("NPR Spfy ID Type"::"Entry ID", GetOrderID(Order), false, ShopifyAssignedID);
-        ShopifyAssignedID.SetRange("Table No.", Database::"Sales Header");
-        if ShopifyAssignedID.FindFirst() then
-            if RecRef.Get(ShopifyAssignedID."BC Record ID") then begin
-                RecRef.SetTable(SalesHeader);
-                exit(true);
-            end;
+        if FindSalesOrder(ShopifyStoreCode, GetOrderID(Order), SalesHeader) then
+            exit(true);
 
         FindNpEcStore(ShopifyStoreCode, Order, NpEcStore);
         OrderNo := GetOrderNo(Order);
@@ -351,33 +342,29 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         exit(SalesHeader.Get(SalesHeader."Document Type"::Order, NpEcDocument."Document No."));
     end;
 
+    procedure FindSalesOrder(ShopifyStoreCode: Code[20]; ShopifyOrderID: Text[30]; var SalesHeader: Record "Sales Header"): Boolean
+    var
+        ShopifyAssignedID: Record "NPR Spfy Assigned ID";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        RecRef: RecordRef;
+    begin
+        Clear(SalesHeader);
+        SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"Sales Header", "NPR Spfy ID Type"::"Entry ID", ShopifyOrderID, ShopifyAssignedID);
+        if ShopifyAssignedID.FindFirst() then
+            if RecRef.Get(ShopifyAssignedID."BC Record ID") then begin
+                RecRef.SetTable(SalesHeader);
+                exit(true);
+            end;
+    end;
+
     procedure FindSalesInvoices(ShopifyStoreCode: Code[20]; Order: JsonToken; var TempSalesInvHeader: Record "Sales Invoice Header"): Boolean
     var
         NpEcDocument: Record "NPR NpEc Document";
         NpEcStore: Record "NPR NpEc Store";
         SalesInvHeader: Record "Sales Invoice Header";
-        ShopifyAssignedID: Record "NPR Spfy Assigned ID";
-        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
-        RecRef: RecordRef;
         OrderNo: Text[50];
     begin
-        if not TempSalesInvHeader.IsTemporary() then
-            FunctionCallOnNonTempVarErr('FindSalesInvoices()');
-
-        Clear(TempSalesInvHeader);
-        TempSalesInvHeader.DeleteAll();
-
-        SpfyAssignedIDMgt.FilterWhereUsed("NPR Spfy ID Type"::"Entry ID", GetOrderID(Order), false, ShopifyAssignedID);
-        ShopifyAssignedID.SetRange("Table No.", Database::"Sales Invoice Header");
-        if ShopifyAssignedID.FindSet() then
-            repeat
-                if RecRef.Get(ShopifyAssignedID."BC Record ID") then begin
-                    RecRef.SetTable(SalesInvHeader);
-                    TempSalesInvHeader := SalesInvHeader;
-                    if TempSalesInvHeader.Insert() then;
-                end;
-            until ShopifyAssignedID.Next() = 0;
-        if not TempSalesInvHeader.IsEmpty() then
+        if FindSalesInvoices(ShopifyStoreCode, GetOrderID(Order), TempSalesInvHeader) then
             exit(true);
 
         FindNpEcStore(ShopifyStoreCode, Order, NpEcStore);
@@ -399,6 +386,32 @@ codeunit 6184814 "NPR Spfy Order Mgt."
             end;
         until NpEcDocument.Next() = 0;
         exit(TempSalesInvHeader.FindFirst());
+    end;
+
+    procedure FindSalesInvoices(ShopifyStoreCode: Code[20]; ShopifyOrderID: Text[30]; var TempSalesInvHeader: Record "Sales Invoice Header"): Boolean
+    var
+        SalesInvHeader: Record "Sales Invoice Header";
+        ShopifyAssignedID: Record "NPR Spfy Assigned ID";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        RecRef: RecordRef;
+    begin
+        if not TempSalesInvHeader.IsTemporary() then
+            FunctionCallOnNonTempVarErr('FindSalesInvoices()');
+
+        Clear(TempSalesInvHeader);
+        TempSalesInvHeader.DeleteAll();
+
+        SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"Sales Invoice Header", "NPR Spfy ID Type"::"Entry ID", ShopifyOrderID, ShopifyAssignedID);
+        if ShopifyAssignedID.FindSet() then
+            repeat
+                if RecRef.Get(ShopifyAssignedID."BC Record ID") then begin
+                    RecRef.SetTable(SalesInvHeader);
+                    TempSalesInvHeader := SalesInvHeader;
+                    if TempSalesInvHeader.Insert() then;
+                end;
+            until ShopifyAssignedID.Next() = 0;
+        if not TempSalesInvHeader.IsEmpty() then
+            exit(true);
     end;
 
     procedure FindShipmentMapping(ShippingLine: JsonToken; var ShipmentMapping: Record "NPR Magento Shipment Mapping"): Boolean
@@ -438,30 +451,6 @@ codeunit 6184814 "NPR Spfy Order Mgt."
             end;
 
         exit(Found);
-    end;
-
-    procedure GetPaymentMapping(Transaction: JsonToken; ShopifyStoreCode: Code[20]; var PaymentMapping: Record "NPR Magento Payment Mapping")
-    var
-        ExternalPaymentTypeID: Record "NPR External Payment Type ID";
-        CreditCardCompany: Text;
-        ShopifyPmtGateway: Text;
-        ExternalPmtTypeFormatTok: Label '%1_%2', Locked = true;
-        MappingNotFoundErr: Label 'There is no payment mapping set for Shopify store %1, payment gateway "%2" and credit card company "%3".', Comment = '%1 - Shopify store code, %2 - payment gateway, %3 - credit card company';
-    begin
-        Clear(PaymentMapping);
-        ShopifyPmtGateway := JsonHelper.GetJText(Transaction, 'gateway', false);
-        CreditCardCompany := JsonHelper.GetJText(Transaction, 'payment_details.credit_card_company', false);
-
-        ExternalPaymentTypeID.SetCurrentKey("Store Code", "Payment Gateway", "Credit Card Company");
-        ExternalPaymentTypeID.SetRange("Store Code", ShopifyStoreCode);
-        ExternalPaymentTypeID.SetRange("Payment Gateway", CopyStr(ShopifyPmtGateway, 1, MaxStrLen(ExternalPaymentTypeID."Payment Gateway")));
-        ExternalPaymentTypeID.SetRange("Credit Card Company", CopyStr(CreditCardCompany, 1, MaxStrLen(ExternalPaymentTypeID."Credit Card Company")));
-        if ExternalPaymentTypeID.FindFirst() then
-            if PaymentMapping.Get('Shopify', ExternalPaymentTypeID."External Payment Type ID") then
-                exit;
-
-        if not PaymentMapping.Get('Shopify', LowerCase(StrSubstNo(ExternalPmtTypeFormatTok, ShopifyStoreCode, ShopifyPmtGateway))) then
-            Error(MappingNotFoundErr, ShopifyStoreCode, ShopifyPmtGateway, CreditCardCompany);
     end;
 
     local procedure FindNpEcStore(ShopifyStoreCode: Code[20]; Order: JsonToken; var NpEcStoreOut: Record "NPR NpEc Store")
@@ -519,6 +508,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         NpEcDocument: Record "NPR NpEc Document";
         NpEcStore: Record "NPR NpEc Store";
         LocationMapping: Record "NPR Spfy Location Mapping";
+        SpfyEventLogEntry: Record "NPR Spfy Event Log Entry";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         ClosedAt: Date;
         OrderNo: Text[50];
@@ -546,7 +536,13 @@ codeunit 6184814 "NPR Spfy Order Mgt."
             NpEcDocument.Modify();
         end;
 
-        SpfyAssignedIDMgt.AssignShopifyID(SalesHeader.RecordId(), "NPR Spfy ID Type"::"Entry ID", GetOrderID(Order), false);
+        SpfyEventLogEntry.Init();
+        SpfyEventLogEntry.Type := SpfyEventLogEntry.Type::"Incoming Sales Order";
+        SpfyEventLogEntry."Store Code" := ShopifyStoreCode;
+        SpfyEventLogEntry."Shopify ID" := GetOrderID(Order);
+        SpfyEventLogEntry."Event Date-Time" := JsonHelper.GetJDT(Order, 'created_at', true);
+
+        SpfyAssignedIDMgt.AssignShopifyID(SalesHeader.RecordId(), "NPR Spfy ID Type"::"Entry ID", SpfyEventLogEntry."Shopify ID", false);
         SpfyAssignedIDMgt.AssignShopifyID(SalesHeader.RecordId(), "NPR Spfy ID Type"::"Store Code", ShopifyStoreCode, false);
 
         SetSellToCustomer(NpEcStore, Order, SalesHeader);
@@ -554,23 +550,24 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         SalesHeader."External Document No." := CopyStr(ShopifyStoreCode + '-' + OrderNo, 1, MaxStrLen(SalesHeader."External Document No."));
         SalesHeader."NPR External Order No." := CopyStr(SalesHeader."External Document No.", 1, MaxStrLen(SalesHeader."NPR External Order No."));
         SalesHeader."Prices Including VAT" := true;
-        SalesHeader.Validate("Currency Code", GetCurrCode(Order));
 
-        SetShipmentMethod(Order, SalesHeader, IsShpmtMappingLocation, IsShpmtMappingShipAgent);
-
-        SalesHeader.Validate("Posting Date", DT2Date(JsonHelper.GetJDT(Order, 'created_at', true)));
+        SalesHeader.Validate("Posting Date", DT2Date(SpfyEventLogEntry."Event Date-Time"));
         SalesHeader.Validate("Document Date", SalesHeader."Posting Date");
         SalesHeader.Validate("Order Date", SalesHeader."Posting Date");
         ClosedAt := DT2Date(JsonHelper.GetJDT(Order, 'closed_at', false));
         if ClosedAt > SalesHeader."Posting Date" then
             SalesHeader.Validate("Posting Date", ClosedAt);
+        SetCurrencyCode(Order, SalesHeader, SpfyEventLogEntry);
 
-        FindLocationMapping(Order, NpEcStore, LocationMapping);
-        if (LocationMapping."Location Code" <> '') and not IsShpmtMappingLocation then
-            SalesHeader.Validate("Location Code", LocationMapping."Location Code");
-        if (LocationMapping."Shipping Agent Code" <> '') and not IsShpmtMappingShipAgent then begin
-            SalesHeader.Validate("Shipping Agent Code", LocationMapping."Shipping Agent Code");
-            SalesHeader.Validate("Shipping Agent Service Code", LocationMapping."Shipping Agent Service Code");
+        SetShipmentMethod(Order, SalesHeader, IsShpmtMappingLocation, IsShpmtMappingShipAgent);
+        if not (IsShpmtMappingLocation and IsShpmtMappingShipAgent) then begin
+            FindLocationMapping(Order, NpEcStore, LocationMapping);
+            if (LocationMapping."Location Code" <> '') and not IsShpmtMappingLocation then
+                SalesHeader.Validate("Location Code", LocationMapping."Location Code");
+            if (LocationMapping."Shipping Agent Code" <> '') and not IsShpmtMappingShipAgent then begin
+                SalesHeader.Validate("Shipping Agent Code", LocationMapping."Shipping Agent Code");
+                SalesHeader.Validate("Shipping Agent Service Code", LocationMapping."Shipping Agent Service Code");
+            end;
         end;
 
         if NpEcStore."Salesperson/Purchaser Code" <> '' then
@@ -583,6 +580,67 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         InsertComments(Order, SalesHeader);
         SpfyIntegrationEvents.OnUpdateSalesHeader(Order, SalesHeader);
         SalesHeader.Modify(true);
+
+        SpfyEventLogEntry.RegisterShopifyEvent(SpfyEventLogEntry);
+    end;
+
+    local procedure SetCurrencyCode(Order: JsonToken; var SalesHeader: Record "Sales Header"; var SpfyEventLogEntry: Record "NPR Spfy Event Log Entry")
+    var
+        Currency: Record Currency;
+        CurrExchRate: Record "Currency Exchange Rate";
+        PaymentLine: Record "NPR Magento Payment Line";
+        SpfyPaymentGatewayHdlr: Codeunit "NPR Spfy Payment Gateway Hdlr";
+        PaymentMgt: Codeunit "NPR Magento Pmt. Mgt.";
+        CurrencyFactor: Decimal;
+        PresentmentCurrencyCodeIsLCY: Boolean;
+        StoreCurrencyCodeIsLCY: Boolean;
+    begin
+        SpfyEventLogEntry."Amount (PCY)" := JsonHelper.GetJDecimal(Order, 'total_price_set.presentment_money.amount', true);
+        SpfyEventLogEntry."Presentment Currency Code" := SpfyPaymentGatewayHdlr.TranslateCurrencyCode(JsonHelper.GetJCode(Order, 'presentment_currency', false), false, PresentmentCurrencyCodeIsLCY);
+        SpfyEventLogEntry."Amount (SCY)" := JsonHelper.GetJDecimal(Order, 'total_price_set.shop_money.amount', true);
+        SpfyEventLogEntry."Store Currency Code" := SpfyPaymentGatewayHdlr.TranslateCurrencyCode(JsonHelper.GetJCode(Order, 'currency', false), false, StoreCurrencyCodeIsLCY);
+
+        if SalesHeader."Currency Code" <> SpfyEventLogEntry."Presentment Currency Code" then begin
+            TestCurrencyCodeChangePossible(SalesHeader);
+            if PaymentMgt.HasMagentoPayment(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.", PaymentLine) then
+                PaymentLine.DeleteAll();
+        end;
+        SalesHeader.Validate("Currency Code", SpfyEventLogEntry."Presentment Currency Code");
+        if StoreCurrencyCodeIsLCY and not PresentmentCurrencyCodeIsLCY and
+           (SpfyEventLogEntry."Amount (PCY)" <> 0) and (SpfyEventLogEntry."Amount (SCY)" <> 0)
+        then begin
+            if SpfyEventLogEntry."Amount (SCY)" = SpfyEventLogEntry."Amount (PCY)" then
+                CurrencyFactor := 1
+            else
+                CurrencyFactor := SpfyEventLogEntry."Amount (PCY)" / SpfyEventLogEntry."Amount (SCY)";
+            if CurrencyFactor <> SalesHeader."Currency Factor" then
+                SalesHeader.Validate("Currency Factor", CurrencyFactor);
+        end;
+
+        Currency.InitRoundingPrecision();
+        case true of
+            StoreCurrencyCodeIsLCY:
+                SpfyEventLogEntry."Amount (LCY)" := SpfyEventLogEntry."Amount (SCY)";
+            PresentmentCurrencyCodeIsLCY:
+                SpfyEventLogEntry."Amount (LCY)" := SpfyEventLogEntry."Amount (PCY)";
+            else
+                SpfyEventLogEntry."Amount (LCY)" :=
+                    CurrExchRate.ExchangeAmtFCYToLCY(
+                        SalesHeader."Posting Date", SalesHeader."Currency Code", SpfyEventLogEntry."Amount (PCY)", SalesHeader."Currency Factor");
+        end;
+        SpfyEventLogEntry."Amount (LCY)" := Round(SpfyEventLogEntry."Amount (LCY)", Currency."Amount Rounding Precision");
+    end;
+
+    local procedure TestCurrencyCodeChangePossible(SalesHeader: Record "Sales Header")
+    var
+        SalesLine: Record "Sales Line";
+        PartiallyPostedErr: Label 'It seems that the sales order %1 was created in the Shopify store currency and it has already been partially posted. It is not possible to change the document currency to the Shopify order presentment currency. You will need to finish posting of the document manually.', Comment = '%1 - BC sales order number';
+    begin
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.SetFilter("Quantity Invoiced", '<>%1', 0);
+        if not SalesLine.IsEmpty() then
+            Error(PartiallyPostedErr, SalesHeader."No.");
     end;
 
     local procedure SetShipmentMethod(Order: JsonToken; var SalesHeader: Record "Sales Header"; var IsShpmtMappingLocation: Boolean; var IsShpmtMappingShipAgent: Boolean)
@@ -921,26 +979,6 @@ codeunit 6184814 "NPR Spfy Order Mgt."
             CountryCode := NpEcStore."Spfy Country/Region Code";
     end;
 
-    local procedure GetCurrCode(Order: JsonToken): Code[10]
-    var
-        Currency: Record Currency;
-        GLSetup: Record "General Ledger Setup";
-        CurrCode: Code[10];
-    begin
-#pragma warning disable AA0139
-        CurrCode := JsonHelper.GetJCode(Order, 'currency', MaxStrLen(CurrCode), false);
-#pragma warning restore AA0139
-        if CurrCode <> '' then begin
-            GLSetup.Get();
-            if CurrCode <> GLSetup."LCY Code" then
-                Currency.Get(CurrCode)
-            else
-                if not Currency.Get(CurrCode) then
-                    CurrCode := '';
-        end;
-        exit(CurrCode);
-    end;
-
     procedure DeleteSalesLines(SalesHeader: Record "Sales Header")
     var
         SalesLine: Record "Sales Line";
@@ -1064,7 +1102,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
             if not SpfyItemMgt.ParseItem(OrderLine, ItemVariant, Sku) then
                 Error(UnknownIdErr, 'sku', Sku, StrSubstNo(' (line ID: %1, name: %2)', OrderLineID, JsonHelper.GetJText(OrderLine, 'name', false)));
 
-        UnitPrice := JsonHelper.GetJDecimal(OrderLine, 'price', true);
+        UnitPrice := JsonHelper.GetJDecimal(OrderLine, 'price_set.presentment_money.amount', true);
 
         Clear(NpEcStore);
         NpEcDocument.SetCurrentKey("Document Type", "Document No.");
@@ -1158,7 +1196,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
     begin
         if SalesLine.Type = SalesLine.Type::Item then begin
             if SpfyIntegrationMgt.OrderLineSalesPriceType(ShopifyStoreCode) = Enum::"NPR Spfy Order Line Price Type"::"Compare-at-Price" then
-                LineUnitPrice := SpfyProductPriceCalc.CalcCompareAtPrice(ShopifyStoreCode, SalesLine."No.", SalesLine."Variant Code", SalesHeader."Posting Date");
+                LineUnitPrice := SpfyProductPriceCalc.CalcCompareAtPrice(ShopifyStoreCode, SalesHeader."Currency Code", SalesLine."No.", SalesLine."Variant Code", SalesHeader."Posting Date");
             if LineUnitPrice < ActualUnitPrice then
                 LineUnitPrice := ActualUnitPrice;
             if LineUnitPrice > ActualUnitPrice then
@@ -1318,7 +1356,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         ShipmentFeeTitle: Text;
         ExistingLineFound: Boolean;
     begin
-        ShipmentFee := JsonHelper.GetJDecimal(ShippingLine, 'price', false);
+        ShipmentFee := JsonHelper.GetJDecimal(ShippingLine, 'price_set.presentment_money.amount', false);
         if ShipmentFee <= 0 then
             exit;
 
@@ -1413,7 +1451,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         LineDiscountAmount := 0;
         if OrderLine.SelectToken('discount_allocations', Discounts) and Discounts.IsArray() then
             foreach Discount in Discounts.AsArray() do
-                LineDiscountAmount += JsonHelper.GetJDecimal(Discount, 'amount', false);
+                LineDiscountAmount += JsonHelper.GetJDecimal(Discount, 'amount_set.presentment_money.amount', false);
 
         if LineDiscountAmount = 0 then
             exit;
@@ -1605,7 +1643,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         SalesLine.Validate("Purchasing Code", Item."NPR Purchasing Code");
     end;
 
-#if not (BC17 or BC18 or BC19)
+#if not (BC18 or BC19)
 #if BC20 or BC21
     [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnBeforeUpdateSellToEmail', '', false, false)]
 #else

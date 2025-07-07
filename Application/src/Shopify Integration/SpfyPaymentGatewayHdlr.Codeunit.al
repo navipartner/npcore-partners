@@ -3,6 +3,10 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
 {
     Access = Internal;
 
+    var
+        _GLSetup: Record "General Ledger Setup";
+        _GLSetupRetrieved: Boolean;
+
     procedure Capture(var Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response")
     var
         TempNcTask: Record "NPR Nc Task" temporary;
@@ -120,6 +124,63 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
         Response."Response Success" := Success;
         Response."Response Body".CreateOutStream(OStream, TextEncoding::UTF8);
         OStream.WriteText(ResponseMsg);
+    end;
+
+    internal procedure TranslateCurrencyCode(ShopifyCurrencyCode: Text): Code[10]
+    var
+        IsLCY: Boolean;
+    begin
+        exit(TranslateCurrencyCode(ShopifyCurrencyCode, false, IsLCY));
+    end;
+
+    internal procedure TranslateCurrencyCode(ShopifyCurrencyCode: Text; BlankIfLCY: Boolean; var IsLCY: Boolean): Code[10]
+    var
+        Currency: Record Currency;
+    begin
+        GetGLSetup();
+        if ShopifyCurrencyCode = '' then
+            Currency.Code := _GLSetup."LCY Code"
+        else begin
+            ShopifyCurrencyCode := ShopifyCurrencyCode.ToUpper();
+            Currency.SetLoadFields(Code);
+            Currency.SetRange("ISO Code", CopyStr(ShopifyCurrencyCode, 1, MaxStrLen(Currency."ISO Code")));
+            if not Currency.FindFirst() then
+                if not Currency.Get(CopyStr(ShopifyCurrencyCode, 1, MaxStrLen(Currency.Code))) then begin
+                    if CopyStr(ShopifyCurrencyCode, 1, MaxStrLen(_GLSetup."LCY Code")) = _GLSetup."LCY Code" then
+                        Currency.Code := _GLSetup."LCY Code"
+                    else
+                        Currency.FindFirst();  //raise error
+                end;
+        end;
+        IsLCY := Currency.Code = _GLSetup."LCY Code";
+        if IsLCY and BlankIfLCY then
+            exit('');
+        exit(Currency.Code);
+    end;
+
+    internal procedure CurrencyISOCode(CurrencyCode: Code[10]): Code[3]
+    var
+        Currency: Record Currency;
+    begin
+        if CurrencyCode = '' then begin
+            GetGLSetup();
+            CurrencyCode := _GLSetup."LCY Code";
+        end;
+
+        if Currency.Get(CurrencyCode) then
+            if Currency."ISO Code" <> '' then
+                exit(Currency."ISO Code");
+
+        exit(CopyStr(CurrencyCode, 1, 3));
+    end;
+
+    local procedure GetGLSetup()
+    begin
+        if _GLSetupRetrieved then
+            exit;
+        _GLSetupRetrieved := true;
+        if not _GLSetup.Get() then
+            _GLSetup.Init();
     end;
 
 #if BC18 or BC19 or BC20 or BC21

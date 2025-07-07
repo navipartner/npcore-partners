@@ -17,9 +17,15 @@ table 6150817 "NPR Spfy Payment Gateway"
         }
         field(22; "Currency Code"; Code[10])
         {
-            Caption = 'Currency Code';
+            Caption = 'Store Currency Code';
             DataClassification = CustomerContent;
             TableRelation = Currency;
+        }
+        field(30; "Identify Final Capture"; Boolean)
+        {
+            Caption = 'Identify Final Capture';
+            DataClassification = CustomerContent;
+            InitValue = true;
         }
     }
 

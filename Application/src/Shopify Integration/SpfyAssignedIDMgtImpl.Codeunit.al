@@ -59,6 +59,39 @@ codeunit 6184803 "NPR Spfy Assigned ID Mgt Impl."
             AssignShopifyID(ToBCRecID, ShopifyIDType, ShopifyAssignedID."Shopify ID", false);
     end;
 
+    procedure TempStoreAssignedShopifyIDs(FromBCRecID: RecordId; ToBCRecID: RecordId; ToTemp: Boolean)
+    var
+        ShopifyAssignedID: Record "NPR Spfy Assigned ID";
+        TempShopifyAssignedID: Record "NPR Spfy Assigned ID" temporary;
+        SpfyAssignedIDTemp: Codeunit "NPR Spfy Assigned ID Temp";
+    begin
+        SpfyAssignedIDTemp.GetTempRecordSet(TempShopifyAssignedID);
+        if ToTemp then begin
+            //To temp
+            FilterRecordset(FromBCRecID, ShopifyAssignedID);
+            if not ShopifyAssignedID.FindSet() then
+                exit;
+            repeat
+                TempShopifyAssignedID := ShopifyAssignedID;
+                TempShopifyAssignedID."Table No." := ToBCRecID.TableNo();
+                TempShopifyAssignedID."BC Record ID" := ToBCRecID;
+                if not TempShopifyAssignedID.Insert() then
+                    TempShopifyAssignedID.Modify();
+            until ShopifyAssignedID.Next() = 0;
+        end else begin
+            //From temp
+            FilterRecordset(FromBCRecID, TempShopifyAssignedID);
+            if not TempShopifyAssignedID.FindSet() then
+                exit;
+            repeat
+                AssignShopifyID(ToBCRecID, TempShopifyAssignedID."Shopify ID Type", TempShopifyAssignedID."Shopify ID", false);
+            until ShopifyAssignedID.Next() = 0;
+            TempShopifyAssignedID.DeleteAll();
+            TempShopifyAssignedID.Reset();
+        end;
+        SpfyAssignedIDTemp.SetTempRecordSet(TempShopifyAssignedID);
+    end;
+
     procedure FilterWhereUsed(ShopifyIDType: Enum "NPR Spfy ID Type"; ShopifyID: Text[30]; ForUpdate: Boolean; var ShopifyAssignedID: Record "NPR Spfy Assigned ID")
     begin
         ShopifyAssignedID.Reset();
@@ -85,9 +118,17 @@ codeunit 6184803 "NPR Spfy Assigned ID Mgt Impl."
     local procedure FilterRecordset(BCRecID: RecordId; ShopifyIDType: Enum "NPR Spfy ID Type"; var ShopifyAssignedID: Record "NPR Spfy Assigned ID")
     begin
         ShopifyAssignedID.Reset();
-        ShopifyAssignedID.SetCurrentKey("Table No.", "Shopify ID Type", "BC Record ID");
+        ShopifyAssignedID.SetCurrentKey("Table No.", "BC Record ID", "Shopify ID Type");
         ShopifyAssignedID.SetRange("Table No.", BCRecID.TableNo());
         ShopifyAssignedID.SetRange("Shopify ID Type", ShopifyIDType);
+        ShopifyAssignedID.SetRange("BC Record ID", BCRecID);
+    end;
+
+    local procedure FilterRecordset(BCRecID: RecordId; var ShopifyAssignedID: Record "NPR Spfy Assigned ID")
+    begin
+        ShopifyAssignedID.Reset();
+        ShopifyAssignedID.SetCurrentKey("Table No.", "BC Record ID", "Shopify ID Type");
+        ShopifyAssignedID.SetRange("Table No.", BCRecID.TableNo());
         ShopifyAssignedID.SetRange("BC Record ID", BCRecID);
     end;
 
@@ -358,6 +399,26 @@ codeunit 6184803 "NPR Spfy Assigned ID Mgt Impl."
     local procedure SalesCrMemoLineCopyAssignedShopifyID(SalesLine: Record "Sales Line"; var SalesCrMemoLine: Record "Sales Cr.Memo Line")
     begin
         CopyAssignedShopifyID(SalesLine.RecordId(), SalesCrMemoLine.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+    end;
+
+#if BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterInsertTempSalesLine', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", OnAfterInsertTempSalesLine, '', false, false)]
+#endif
+    local procedure RecreateSalesLine_StoreAssignedIDsToTemp(SalesLine: Record "Sales Line"; var TempSalesLine: Record "Sales Line" temporary)
+    begin
+        TempStoreAssignedShopifyIDs(SalesLine.RecordId(), TempSalesLine.RecordId(), true);
+    end;
+
+#if BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnAfterCreateSalesLine', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", OnAfterCreateSalesLine, '', false, false)]
+#endif
+    local procedure RecreateSalesLine_RestoreAssignedIDsFromTemp(var SalesLine: Record "Sales Line"; var TempSalesLine: Record "Sales Line" temporary)
+    begin
+        TempStoreAssignedShopifyIDs(TempSalesLine.RecordId(), SalesLine.RecordId(), false);
     end;
     //#endregion
 }
