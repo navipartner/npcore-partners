@@ -12,14 +12,14 @@ GET {{baseUrl}}/Company?tenant={{tenant}}
 Authorization: Basic {{username}} {{password}}
 
 ###
-@companyId = {{companies.response.body.$.value[2].Id}}
+@companyId = {{companies.response.body.$.value[1].Id}}
 
 @ticketToken = 3A3800F28C884BF795895C80BE7EB04D
 @scheduleId=0
-@itemNumber = 31005
-@referenceDate = 2025-01-24
+@itemNumber = 31041
+@referenceDate = 2025-07-08
 @quantity = 1
-@admissionCode = DUNGEON
+@admissionCode = TOUR01
 ###
 
 POST {{baseUrl}}/{{serviceName}}_{{functionName}}?tenant={{tenant}}
@@ -176,6 +176,29 @@ Company: {{companyId}}
     "lastServerId": ""
 }
 
+###
+
+ # @name MakeTicketRequest_31042
+POST {{baseUrl}}/{{serviceName}}_{{functionName}}?tenant={{tenant}}
+Authorization: Basic {{username}} {{password}}
+Content-Type: application/json
+Company: {{companyId}}
+
+{
+    "method": "NPRetail.TM.MakeTicketReservation",
+    "parameters": "{
+        \"_dragonglassResponseContext\":{\"invocationId\":\"{{$guid}}\",\"method\":\"NPRetail.TM.MakeTicketReservation\"},
+        \"NPRetail.TM.MakeTicketReservation\":[
+            {
+                \"token\":\"{{ticketToken}}\",
+                \"lines\":[
+                    {\"itemReference\":\"31043\",\"admissionCode\":\"CASTLE\",\"quantity\":2,\"scheduleId\":1636,\"memberNumber\":\"\",\"notificationAddress\":\"\"},
+                    {\"itemReference\":\"31043\",\"admissionCode\":\"TOUR03\",\"quantity\":2,\"scheduleId\":3195,\"memberNumber\":\"\",\"notificationAddress\":\"\"}
+                ]}
+            ]
+        }",
+    "lastServerId": ""
+}
 
 ###
 POST {{baseUrl}}/{{serviceName}}_{{functionName}}?tenant={{tenant}}

@@ -789,30 +789,35 @@ codeunit 6151543 "NPR TM Client API BL"
         ExternalId.Add(TicketRequest."Ext. Line Reference No.");
         TicketWebRequestManager.FinalizeTicketReservation(Token, ExternalId);
 
+        // there is only one token primary line, so only one response
+        TicketResponse.SetFilter("Session Token ID", '=%1', Token);
+        if (TicketResponse.FindFirst()) then
+            Success := TicketResponse.Status;
+
+        ResponseMessage := TicketResponse."Response Message";
+        if (not Success) then
+            exit;
+
         Ticket.Reset();
         TicketRequest.SetCurrentKey("Session Token ID");
         TicketRequest.SetFilter("Session Token ID", '=%1', Token);
         TicketRequest.FindSet();
-
         repeat
             if (TicketRequest."Admission Created") then begin
-                TicketResponse.SetFilter("Session Token ID", '=%1', Token);
-                if (TicketResponse.FindFirst()) then begin
-                    Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketResponse."Request Entry No.");
-                    if (Ticket.FindFirst()) then begin
-                        AccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
-                        AccessEntry.SetFilter("Admission Code", '=%1', TicketRequest."Admission Code");
-                        if (AccessEntry.FindFirst()) then begin
-                            DetailedEntry.SetFilter("Ticket Access Entry No.", '=%1', AccessEntry."Entry No.");
-                            DetailedEntry.SetFilter(Quantity, '>%1', 0);
-                            DetailedEntry.SetFilter(Type, '=%1', DetailedEntry.Type::RESERVATION);
-                            if (not DetailedEntry.FindLast()) then
-                                DetailedEntry.SetFilter(Type, '=%1', DetailedEntry.Type::INITIAL_ENTRY);
-                            if (not DetailedEntry.FindLast()) then
-                                DetailedEntry.init();
-                            if (DetailedEntry."External Adm. Sch. Entry No." <> 0) then
-                                TicketRequest."External Adm. Sch. Entry No." := DetailedEntry."External Adm. Sch. Entry No.";
-                        end;
+                Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketResponse."Request Entry No.");
+                if (Ticket.FindFirst()) then begin
+                    AccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+                    AccessEntry.SetFilter("Admission Code", '=%1', TicketRequest."Admission Code");
+                    if (AccessEntry.FindFirst()) then begin
+                        DetailedEntry.SetFilter("Ticket Access Entry No.", '=%1', AccessEntry."Entry No.");
+                        DetailedEntry.SetFilter(Quantity, '>%1', 0);
+                        DetailedEntry.SetFilter(Type, '=%1', DetailedEntry.Type::RESERVATION);
+                        if (not DetailedEntry.FindLast()) then
+                            DetailedEntry.SetFilter(Type, '=%1', DetailedEntry.Type::INITIAL_ENTRY);
+                        if (not DetailedEntry.FindLast()) then
+                            DetailedEntry.init();
+                        if (DetailedEntry."External Adm. Sch. Entry No." <> 0) then
+                            TicketRequest."External Adm. Sch. Entry No." := DetailedEntry."External Adm. Sch. Entry No.";
                     end;
                 end;
 
@@ -828,9 +833,9 @@ codeunit 6151543 "NPR TM Client API BL"
 
         until (TicketRequest.Next() = 0);
 
-        // there is only one token, so only one response
-        Success := TicketResponse.Status;
-        ResponseMessage := TicketResponse."Response Message";
+        // Success = true;
+        // ResponseMessage := 'Reservation created successfully.';
+
     end;
 
     local procedure GenerateAdmissionSchedules(var JBuilder: Codeunit "Json Text Reader/Writer"; RequestId: Text; ItemReference: Text; ScheduleId: Integer; AdmissionCode: Text; ReferenceDate: Date; CustomerNumber: Text; Quantity: Integer)
