@@ -12,6 +12,9 @@
         TryCapturePayment: Codeunit "NPR PG Try Capture Payment";
         TryRefundPayment: Codeunit "NPR PG Try Refund Payment";
         TryCancelPayment: Codeunit "NPR PG Try Cancel Payment";
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        IncEcomSalesDocProcess: Codeunit "NPR IncEcomSalesDocProcess";
+#endif
         Success: Boolean;
         PrevRec: Text;
         PaymentLine: Record "NPR Magento Payment Line";
@@ -72,6 +75,9 @@
                             PaymentLine."Charge ID" := Response."Response Operation Id";
 #pragma warning restore AA0139
                         PaymentLine."Date Captured" := Today();
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+                        IncEcomSalesDocProcess.UpdateSalesDocPaymentLineCaptureInformation(PaymentLine);
+#endif
                     end;
                 _PaymentEventType::Refund:
                     PaymentLine."Date Refunded" := Today();
@@ -717,6 +723,9 @@
     var
         GenJnlLine: Record "Gen. Journal Line";
         SalesInvHeader: Record "Sales Invoice Header";
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        IncEcomSalesDocProcess: Codeunit "NPR IncEcomSalesDocProcess";
+#endif
     begin
         if PaymentLine.Posted then
             exit;
@@ -724,6 +733,9 @@
         if PaymentLine.Amount = 0 then begin
             PaymentLine.Posted := true;
             PaymentLine.Modify(true);
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+            IncEcomSalesDocProcess.UpdateSalesDocPaymentLinePostingInformation(PaymentLine);
+#endif
             exit;
         end;
 
@@ -731,6 +743,9 @@
         if not HasOpenEntry(PaymentLine) then begin
             PaymentLine.Posted := true;
             PaymentLine.Modify();
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+            IncEcomSalesDocProcess.UpdateSalesDocPaymentLinePostingInformation(PaymentLine);
+#endif
             exit;
         end;
 
@@ -748,6 +763,9 @@
         GenJnlPostLine.RunWithCheck(GenJnlLine);
         PaymentLine.Posted := true;
         PaymentLine.Modify();
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        IncEcomSalesDocProcess.UpdateSalesDocPaymentLinePostingInformation(PaymentLine);
+#endif
         InsertPostingLog(PaymentLine, true);
     end;
 

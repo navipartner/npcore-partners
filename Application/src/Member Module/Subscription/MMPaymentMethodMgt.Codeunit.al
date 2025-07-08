@@ -223,6 +223,10 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
         MemberPaymentMethod.Validate(Status, MemberPaymentMethod.Status::Active);
         MemberPaymentMethod."Payment Instrument Type" := PaymentLine."Payment Instrument Type";
         MemberPaymentMethod."Payment Brand" := PaymentLine.Brand;
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        MemberPaymentMethod."Payment Method Alias" := PaymentLine."Card Alias Token";
+        MemberPaymentMethod."Masked PAN" := PaymentLine."Masked PAN";
+#endif
         MemberPaymentMethod."Created from System Id" := PaymentLine.SystemId;
         MemberPaymentMethod.Modify(true);
     end;

@@ -1,0 +1,606 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+  posApiTypes: ./../pos/pos-api-types.yml
+
+types:
+  salesDocumentId:
+    type: uuid
+  salesDocumentPaymentId:
+    type: uuid
+  salesDocumentCommentId:
+    type: uuid
+  salesDocumentLineId:
+    type: uuid
+
+  salesDocumentLineTypeDTO:
+    enum:
+      - name: item
+        value: 'item'
+      - name: comment
+        value: 'comment'
+      - name: shipmentFee
+        value: 'shipmentFee'
+      - name: paymentFee
+        value: 'paymentFee'
+  
+  salesDocumentLineTypeRequest:
+    enum:
+      - name: item
+        value: 'item'
+      - name: comment
+        value: 'comment'
+      - name: shipmentFee
+        value: 'shipmentFee'
+
+  salesDocumentPaymentMethodType:
+    enum:
+      - name: paymentGateway
+        value: 'paymentGateway'
+  
+  salesDocumentCreationStatus:
+    enum:
+      - name: created
+        value: 'created'
+      - name: error
+        value: 'error'
+      - name: cancelled
+        value: 'cancelled'
+      - name: pending
+        value: 'pending'
+
+  salesDocumentPostingStatus:
+    enum:
+      - name: partiallyInvoiced
+        value: 'partiallyInvoiced'
+      - name: invoiced
+        value: 'invoiced'
+      - name: pending
+        value: 'pending'
+
+  salesDocumentType:
+    enum:
+      - name: order
+        value: 'order'
+      - name: returnOrder
+        value: 'returnOrder'
+   
+  CreateSalesDocumentDTO:
+    properties:
+      id: salesDocumentId
+    examples:
+      - name: ExampleCreateSalesDocumentDTO
+        value:
+          id: "4ca28ccc-e84b-4788-973c-c8ce5a59383b"
+
+  SalesDocumentDTO:
+    properties:
+      externalNo: string
+      id: salesDocumentId
+      documentType: salesDocumentType
+      creationStatus: salesDocumentCreationStatus
+      postingStatus: salesDocumentPostingStatus
+      currencyCode: string
+      currencyExchangeRate: double
+      externalDocumentNo: string
+      locationCode: string
+      yourReference: string
+      pricesExcludingVat: boolean 
+      sellToCustomer: SalesDocumentSellToCustomerDTO
+      shipToCustomer: SalesDocumentShipToCustomerDTO
+      shipment: SalesDocumentShipmentDTO
+      payments: list<SalesDocumentPaymentsDTO>
+      comments: list<SalesDocumentCommentsDTO>
+      salesDocumentLines: list<SalesDocumentLinesDTO>
+    examples:
+      - name: ExampleSalesDocumentDTO
+        value:
+          externalNo: "WEBP000000001"
+          id: "4ca28ccc-e84b-4788-973c-c8ce5a59383b"
+          documentType: order
+          creationStatus: created
+          postingStatus: invoiced
+          currencyCode: "DKK"
+          currencyExchangeRate: 1.0
+          externalDocumentNo: "WEBORD-123"
+          locationCode: ""
+          yourReference: "REF-789"
+          pricesExcludingVat: false
+          sellToCustomer: $SalesDocumentSellToCustomerDTO.ExampleSellToCustomerDTO
+          shipToCustomer: $SalesDocumentShipToCustomerDTO.ExampleShipToCustomerDTO
+          shipment: $SalesDocumentShipmentDTO.ExampleShipmentDTO
+          payments: 
+           - $SalesDocumentPaymentsDTO.ExamplePaymentsDTO
+          comments:
+            - $SalesDocumentCommentsDTO.ExampleCommentsDTO
+          salesDocumentLines: 
+            - $SalesDocumentLinesDTO.ExampleSalesDocumentLinesDTO
+
+  SalesDocumentSellToCustomerDTO:
+    properties:
+      no: string
+      type: string
+      name: string
+      name2: string
+      address: string
+      address2: string
+      postCode: string
+      county: string
+      city: string
+      countryCode: string
+      contact: string
+      email: string
+      phone: string
+      ean: string
+      vatRegistrationNo: string
+      invoiceEmail: string
+    examples:
+      - name: ExampleSellToCustomerDTO
+        value:
+          no: "CUST-10001"
+          type: "Retail Customer"
+          name: "Acme Corporation"
+          name2: "Corporation"
+          address: "123 Main Street"
+          address2: "Suite 400"
+          postCode: "10001"
+          county: "New York"
+          city: "New York"
+          countryCode: "US"
+          contact: "Jane Doe"
+          email: "jane.doe@acme.com"
+          phone: "+1-555-123-4567"
+          ean: "1234567890123"
+          vatRegistrationNo: "US123456789"
+          invoiceEmail: "invoices@acme.com"
+
+  SalesDocumentShipToCustomerDTO:
+    properties:
+      name: string
+      name2: string
+      address: string
+      address2: string
+      postCode: string
+      county: string
+      city: string
+      countryCode: string
+      contact: string
+    examples:
+      - name: ExampleShipToCustomerDTO
+        value:
+          name: "John Smith"
+          name2: "Smith Enterprises"
+          address: "456 Shipping Avenue"
+          address2: "Floor 2"
+          postCode: "10002"
+          county: "New York"
+          city: "New York City"
+          countryCode: "US"
+          contact: "John Smith"
+
+  SalesDocumentShipmentDTO:
+    properties:
+      shipmentMethod: string
+      shipmentService: string
+    examples:
+      - name: ExampleShipmentDTO
+        value:
+          shipmentMethod: ''
+          shipmentService: ''
+
+  SalesDocumentPaymentsDTO:
+    properties:
+      id: salesDocumentPaymentId
+      paymentMethodType: salesDocumentPaymentMethodType
+      externalPaymentMethodCode: string
+      externalPaymentType: string
+      paymentReference: string
+      paymentAmount: double
+      parToken: string
+      pspToken: string
+      cardBrand: string
+      maskedCardNumber: string
+      cardExpiryDate: string
+      cardAliasToken:
+        type: string
+        docs: Max. length 80 symbols.
+      capturedPaymentAmount: double
+    examples:
+      - name: ExamplePaymentsDTO
+        value:
+          id: "3c4543d0-d43e-f011-a8fe-b571460f09c4"
+          paymentMethodType: paymentGateway
+          externalPaymentMethodCode: adyen_cc
+          externalPaymentType: mc
+          paymentReference: Z3ZR6HT5BNVPZQT5
+          paymentAmount: 2500.00
+          parToken: ''
+          pspToken: ''
+          cardBrand: ''
+          maskedCardNumber: ''
+          cardExpiryDate: ''
+          cardAliasToken: ''
+          capturedPaymentAmount: 0
+
+  SalesDocumentCommentsDTO:
+    properties:
+      id: salesDocumentCommentId
+      comment: string
+    examples:
+      - name: ExampleCommentsDTO
+        value:
+          id: "59a2cbc4-503d-f011-a8fe-b571460f09c4"
+          comment: "This is a comment."
+
+  SalesDocumentLinesDTO:
+    properties:
+      id: salesDocumentLineId
+      type: salesDocumentLineTypeDTO
+      no: string
+      variantCode: string
+      barcodeNo: string
+      description: string
+      unitPrice: double
+      quantity: double
+      unitOfMeasure: string
+      vatPercent: double
+      lineAmount: double
+      requestedDeliveryDate: date
+      invoicedQuantity: double
+      invoicedAmount: double
+    examples:
+      - name: ExampleSalesDocumentLinesDTO
+        value:
+          id: "241e349d-2a3e-f011-a8fe-b571460f09c4"
+          type: item
+          no: "1100"
+          variantCode: ""
+          barcodeNo: ""
+          description: "test item"
+          unitPrice: 2000
+          quantity: 2
+          unitOfMeasure: ""
+          vatPercent: 25
+          lineAmount: 2000
+          requestedDeliveryDate: "2025-06-01"
+          invoicedQuantity: 0
+          invoicedAmount: 0
+############################################
+
+  SalesDocumentSellToCustomerRequest:
+    properties:
+      no: 
+        type: optional<string>
+        docs: Max. length 10 symbols.
+      type: 
+        type: string
+        docs: Max. length 250 symbols.
+      name: 
+        type: string
+        docs: Max. length 150 symbols.
+      address: 
+        type: string
+        docs: Max. length 100 symbols.
+      address2: 
+        type: optional<string>
+        docs: Max. length 50 symbols.
+      postCode: 
+        type: string
+        docs: Max. length 20 symbols. 
+      county: 
+        type: optional<string>
+        docs: Max. length 30 symbols.
+      city: 
+        type: string
+        docs: Max. length 30 symbols.
+      countryCode: 
+        type: optional<string>
+        docs: Max. length 10 symbols.
+      contact: 
+        type: optional<string>
+        docs: Max. length 100 symbols.
+      email: 
+        type: string
+        docs: Max. length 80 symbols.
+      phone: 
+        type: optional<string>
+        docs: Max. length 20 symbols.
+      ean: 
+        type: optional<string>
+        docs: Max. length 13 symbols.
+      vatRegistrationNo: 
+        type: optional<string>
+        docs: Max. length 20 symbols.
+      invoiceEmail: 
+        type: optional<string>
+        docs: Max. length 80 symbols.
+    examples:
+      - name: ExampleSellToCustomerRequest
+        value:
+          no: "CUST-10001"
+          type: "Retail Customer"
+          name: "Acme Corporation"
+          address: "123 Main Street"
+          address2: "Suite 400"
+          postCode: "10001"
+          county: "New York"
+          city: "New York"
+          countryCode: "US"
+          contact: "Jane Doe"
+          email: "jane.doe@acme.com"
+          phone: "+1-555-123-4567"
+          ean: "1234567890123"
+          vatRegistrationNo: "US123456789"
+          invoiceEmail: "invoices@acme.com"
+
+  SalesDocumentShipToCustomerRequest:
+    properties:
+      name: 
+        type: string
+        docs: Max. length 150 symbols.
+      address: 
+        type: string
+        docs: Max. length 100 symbols.
+      address2: 
+        type: optional<string>
+        docs: Max. length 50 symbols.
+      postCode: 
+        type: string
+        docs: Max. length 20 symbols.
+      county: 
+        type: optional<string>
+        docs: Max. length 30 symbols.
+      city: 
+        type: string
+        docs: Max. length 30 symbols.
+      countryCode: 
+        type: optional<string>
+        docs: Max. length 10 symbols.
+      contact: 
+        type: optional<string>
+        docs: Max. length 100 symbols.
+    examples:
+      - name: ExampleShipToCustomerRequest
+        value:
+          name: "John Smith"
+          address: "456 Shipping Avenue"
+          address2: "Floor 2"
+          postCode: "10002"
+          county: "New York"
+          city: "New York City"
+          countryCode: "US"
+          contact: "John Smith"
+
+  SalesDocumentShipmentRequest:
+    properties:
+      shipmentMethod: 
+        type: string
+        docs: Max. length 50 symbols.
+      shipmentService: 
+        type: optional<string>
+        docs: Max. length 50 symbols.
+    examples:
+      - name: ExampleShipmentRequest
+        value:
+          shipmentMethod: flatrate_flatrate
+          shipmentService: string
+      
+  SalesDocumentCustomFieldsRequest:
+    properties:
+      myCustomField1: string
+      myCustomField2: string
+    examples:
+      - name: ExampleSalesDocumentCustomFieldsRequest
+        value:
+          myCustomField1: myCustomField1Value
+          myCustomField2: myCustomField2Value
+
+  SalesDocumentPaymentsRequest:
+    properties:
+      paymentMethodType: salesDocumentPaymentMethodType
+      externalPaymentMethodCode: 
+        type: string
+        docs: Max. length 50 symbols.
+      externalPaymentType:
+        type: string
+        docs: Max. length 50 symbols.
+      paymentReference: 
+        type: optional<string>
+        docs: Max. length 250 symbols.
+      paymentAmount: double
+      parToken:
+        type: optional<string>
+        docs: Max. length 50 symbols.
+      pspToken: 
+        type: optional<string>
+        docs: Max. length 64 symbols.
+      cardBrand: 
+        type: optional<string>
+        docs: Max. length 30 symbols.
+      maskedCardNumber: 
+        type: optional<string>
+        docs: Max. length 30 symbols.
+      cardExpiryDate:
+        type: optional<string>
+        docs: Max. length 50 symbols.
+      cardAliasToken:
+        type: optional<string>
+        docs: Max. length 80 symbols.
+      customFields: 
+        type: optional<SalesDocumentPaymentsCustomFieldsRequest>
+        docs: This section allows you to add custom fields as key-value pairs. You can handle these fields by subscribing to our extension publishers and implementing custom deserialization logic.
+    examples:
+      - name: ExamplePaymentsRequest
+        value:
+          paymentMethodType: paymentGateway
+          externalPaymentMethodCode: adyen_cc
+          externalPaymentType: mc
+          paymentReference: Z3ZR6HT5BNVPZQT5
+          paymentAmount: 2500.00
+          customFields: $SalesDocumentPaymentsCustomFieldsRequest.ExampleSalesDocumentPaymentsCustomFieldsRequest
+
+  SalesDocumentPaymentsCustomFieldsRequest:
+    properties:
+      myCustomField1: string
+      myCustomField2: string
+    examples:
+      - name: ExampleSalesDocumentPaymentsCustomFieldsRequest
+        value:
+          myCustomField1: myCustomField1Value
+          myCustomField2: myCustomField2Value
+    
+  SalesDocumentCommentsRequest:
+    properties:
+      comment: 
+        type: string
+        docs: These are internal comments that are going to appear on the record links of the document. Max. length 1024 symbols.
+    examples:
+      - name: ExampleCommentsRequest
+        value:
+          comment: "This is a comment."
+
+  SalesDocumentLinesRequest:
+    properties:
+      type: 
+        type: salesDocumentLineTypeRequest
+        docs: When type comment is selected, the api will create comments that are going to be visible on the sales order lines.
+      no: 
+        type: optional<string>
+        docs: Max. length 20 symbols. The no field or the barcodeNo field has to be populated.
+      variantCode: 
+        type: optional<string>
+        docs: Max. length 10 symbols.
+      barcodeNo: 
+        type: optional<string>
+        docs: Max. length 50 symbols. The item no and the variant code are going to be populated based on the barcodeNo field.  The no field or the barcodeNo field has to be populated.
+      description:
+        type: optional<string>
+        docs: Max. length 150 symbols.
+      unitPrice: double
+      quantity: double
+      unitOfMeasure: optional<string>
+      vatPercent: double
+      lineAmount: double
+      requestedDeliveryDate: optional<date>
+      customFields: 
+        type: optional<SalesDocumentLinesCustomFieldsRequest>
+        docs: This section allows you to add custom fields as key-value pairs. You can handle these fields by subscribing to our extension publishers and implementing custom deserialization logic.
+    examples:
+      - name: ExampleSalesDocumentLinesRequest
+        value:
+          type: item
+          no: "1100"
+          variantCode: ""
+          barcodeNo: ""
+          description: "test item"
+          unitPrice: 2000
+          quantity: 2
+          unitOfMeasure: ""
+          vatPercent: 25
+          lineAmount: 2000
+          customFields: $SalesDocumentLinesCustomFieldsRequest.ExampleSalesDocumentLinesCustomFieldsRequest
+
+  SalesDocumentLinesCustomFieldsRequest:
+    properties:
+      myCustomField1: string
+      myCustomField2: string
+    examples:
+      - name: ExampleSalesDocumentLinesCustomFieldsRequest
+        value:
+          myCustomField1: myCustomField1Value
+          myCustomField2: myCustomField2Value
+
+  CreateSalesDocumentRequest:
+    properties:
+      externalNo: 
+        type: string
+        docs: Max. length 20 symbols.
+      documentType: salesDocumentType
+      currencyCode: 
+        type: optional<string>
+        docs: Max. length 10 symbols.
+      currencyExchangeRate: optional<double>
+      externalDocumentNo: 
+        type: optional<string>
+        docs: Max. length 35 symbols.
+      locationCode: 
+        type: optional<string>
+        docs: Max. length 10 symbols.
+      yourReference: optional<string>
+      pricesExcludingVat: optional<boolean>
+      customFields: 
+        type: optional<SalesDocumentCustomFieldsRequest>
+        docs: This section allows you to add custom fields as key-value pairs. You can handle these fields by subscribing to our extension publishers and implementing custom deserialization logic.
+      sellToCustomer: SalesDocumentSellToCustomerRequest
+      shipToCustomer: optional<SalesDocumentShipToCustomerRequest>
+      shipment: optional<SalesDocumentShipmentRequest>
+      payments: list<SalesDocumentPaymentsRequest>
+      comments: optional<list<SalesDocumentCommentsRequest>>
+      salesDocumentLines: list<SalesDocumentLinesRequest>
+    examples:
+      - name: ExampleCreateSalesDocumentRequest
+        value:
+          externalNo: "WEBP000000001"
+          documentType: order
+          currencyCode: "DKK"
+          currencyExchangeRate: 1.0
+          externalDocumentNo: "WEBORD-123"
+          yourReference: "REF-789"
+          pricesExcludingVat: false
+          customFields: $SalesDocumentCustomFieldsRequest.ExampleSalesDocumentCustomFieldsRequest
+          sellToCustomer: $SalesDocumentSellToCustomerRequest.ExampleSellToCustomerRequest
+          shipToCustomer: $SalesDocumentShipToCustomerRequest.ExampleShipToCustomerRequest
+          payments: 
+            - $SalesDocumentPaymentsRequest.ExamplePaymentsRequest
+          comments:
+            - $SalesDocumentCommentsRequest.ExampleCommentsRequest
+          salesDocumentLines: 
+            - $SalesDocumentLinesRequest.ExampleSalesDocumentLinesRequest
+
+service:
+  auth: true
+  base-path: /ecommerce
+  endpoints:
+    createSalesDocument:
+      display-name: Create Sales Document
+      method: POST
+      path: "/documents"
+      availability: 
+        status: pre-release
+      request: CreateSalesDocumentRequest
+      response:
+        type: CreateSalesDocumentDTO
+        status-code: 201
+      examples:
+        - name: Example Sales Document Response
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          response:
+            body: $CreateSalesDocumentDTO.ExampleCreateSalesDocumentDTO
+          request: $CreateSalesDocumentRequest.ExampleCreateSalesDocumentRequest
+
+    getSalesDocument:
+      display-name: Get Sales Document
+      method: GET
+      path: /documents/{documentId}
+      availability: 
+        status: pre-release
+      request:
+        name: getSalesDocument
+        path-parameters:
+          documentId: uuid
+      response:
+        type: SalesDocumentDTO
+      examples:
+        - name: Example Sales Document Response
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            documentId: e2cfea9f-385e-4d83-8b50-42256885b03a
+          response:
+            body: $SalesDocumentDTO.ExampleSalesDocumentDTO
+

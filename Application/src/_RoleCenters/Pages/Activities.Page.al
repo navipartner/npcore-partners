@@ -76,6 +76,23 @@
                         CurrPage.Update(false);
                     end;
                 }
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+                field("Failed Inc Ecom Sales Orders"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Failed Inc Ecom Sales Orders"))))
+                {
+                    Caption = 'Failed Incoming Ecommerce Sales Orders';
+
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
+                    ToolTip = 'Specifies the value of the Failed Incoming Ecommerce Sales Orders field.';
+                    ApplicationArea = NPRRetail;
+                    trigger OnDrillDown()
+                    var
+                        IncEcomSalesDocUtils: Codeunit "NPR Inc Ecom Sales Doc Utils";
+                    begin
+                        IncEcomSalesDocUtils.OpenFailedSalesOrders();
+                    end;
+                }
+#endif
 
             }
             cuegroup(Control6150624)
@@ -96,6 +113,22 @@
                         DrillDownSalesOrderList(Rec.FieldNo("Daily Sales Orders"));
                     end;
                 }
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+                field(TodaysIncEcomSalesOrders; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Daily Inc Ecom Sales Orders"))))
+                {
+                    Caption = 'Daily Incoming Ecommerce Sales Orders';
+                    ToolTip = 'Specifies the number of the daily incoming ecomerce sales orders that have been registered on today''s date.';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
+                    ApplicationArea = NPRRetail;
+                    trigger OnDrillDown()
+                    var
+                        IncEcomSalesDocUtils: Codeunit "NPR Inc Ecom Sales Doc Utils";
+                    begin
+                        IncEcomSalesDocUtils.OpenSalesOrders(Format(Today));
+                    end;
+                }
+#endif
                 field(TotalSalesOrders; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Sales Orders"))))
                 {
                     Caption = 'Sales Orders';

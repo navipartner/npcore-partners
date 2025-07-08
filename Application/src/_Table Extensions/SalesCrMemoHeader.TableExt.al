@@ -120,6 +120,11 @@ tableextension 6014407 "NPR Sales Cr.Memo Header" extends "Sales Cr.Memo Header"
             DataClassification = CustomerContent;
             TableRelation = "NPR MM Loyalty Sales Channel".Code;
         }
+        field(6151446; "NPR Inc Ecom Sale Id"; Guid)
+        {
+            Caption = 'Incoming Ecommerce Sale Id';
+            DataClassification = CustomerContent;
+        }
     }
 
     internal procedure OpenMagentPaymentLines() LookUpOk: Boolean

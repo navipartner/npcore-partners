@@ -207,6 +207,11 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
             DataClassification = CustomerContent;
 
         }
+        field(6059981; "NPR Inc Ecom Sales Line Id"; Guid)
+        {
+            Caption = 'Incoming Ecommerce Sales Line Id';
+            DataClassification = CustomerContent;
+        }
         modify("Location Code")
         {
             trigger OnAfterValidate()

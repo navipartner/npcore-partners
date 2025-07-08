@@ -192,6 +192,11 @@ tableextension 6014405 "NPR Sales Invoice Header" extends "Sales Invoice Header"
             DataClassification = CustomerContent;
             TableRelation = "NPR MM Loyalty Sales Channel".Code;
         }
+        field(6151446; "NPR Inc Ecom Sale Id"; Guid)
+        {
+            Caption = 'Incoming Ecommerce Sale Id';
+            DataClassification = CustomerContent;
+        }
     }
 }
 

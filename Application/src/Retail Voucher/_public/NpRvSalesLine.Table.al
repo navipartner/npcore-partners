@@ -337,6 +337,17 @@
             Caption = 'Parent Id';
             DataClassification = CustomerContent;
         }
+        field(6059981; "NPR Inc Ecom Sales Line Id"; Guid)
+        {
+            Caption = 'Incoming Ecommerce Sales Line Id';
+            DataClassification = CustomerContent;
+        }
+
+        field(6059982; "NPR Inc Ecom Sales Pmt Line Id"; Guid)
+        {
+            Caption = 'Incoming Ecommerce Sales Payment Line Id';
+            DataClassification = CustomerContent;
+        }
         field(1030; "Reservation Line Id"; Guid)
         {
             Caption = 'Reservation Line Id';

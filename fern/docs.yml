@@ -341,6 +341,12 @@ navigation:
           - vouchers.voucherwebhooks:
               title: Webhooks
 
+        - section: Ecommerce
+          summary: ./docs/pages/ecommerce/overview.mdx
+          contents:
+          - ecommerce.salesdocuments:
+              title: Sales Documents
+              summary: ./docs/pages/ecommerce/salesdocuments.mdx
         - section: Finance
           summary: ./docs/pages/finance/overview.mdx
           contents:

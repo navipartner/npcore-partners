@@ -265,6 +265,9 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG NP Pay POSPaymentSetup", 'UpgradeNPPayPOSPaymentSetupApiKey'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Magento Upgrade", 'EnableMagentoFeature'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Adyen Warning Days", 'UpdateAdyenSetup'));
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Inc Ecom Sales Docs", 'CreateIncEcomSalesDocSetup'));
+#endif
 #IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG No Series Experience", 'UpgradeImplementationFieldOnNoSeries'));
 #ENDIF
@@ -1021,6 +1024,14 @@
                     'UpdateAdyenSetup':
                         exit('NPR-UpdateAdyenSetup-20250523');
                 end;
+
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+            Codeunit::"NPR UPG Inc Ecom Sales Docs":
+                case UpgradeStep of
+                    'CreateIncEcomSalesDocSetup':
+                        exit('NPR-CreateIncEcomSalesDocSetup-20250608');
+                end;
+#endif
             Codeunit::"NPR UPGUserAccounts":
                 case UpgradeStep of
                     'UpgradeSubscriptionsToAccounts':

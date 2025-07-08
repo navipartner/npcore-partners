@@ -255,6 +255,31 @@
             Caption = 'Expiry Date Text';
             DataClassification = CustomerContent;
         }
+        field(440; "External Payment Type"; Text[50])
+        {
+            Caption = 'External Payment Type';
+            DataClassification = CustomerContent;
+        }
+        field(450; "External Payment Method Code"; Text[50])
+        {
+            Caption = 'External Payment Method Code';
+            DataClassification = CustomerContent;
+        }
+        field(460; "Card Alias Token"; Text[80])
+        {
+            Caption = 'Card Alias Token';
+            DataClassification = CustomerContent;
+        }
+        field(470; "Masked PAN"; Text[30])
+        {
+            Caption = 'Masked PAN';
+            DataClassification = CustomerContent;
+        }
+        field(6059982; "NPR Inc Ecom Sales Pmt Line Id"; Guid)
+        {
+            Caption = 'Incoming Ecommerce Sales Payment Line Id';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

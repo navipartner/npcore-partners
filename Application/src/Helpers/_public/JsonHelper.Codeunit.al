@@ -18,6 +18,16 @@ codeunit 6059994 "NPR Json Helper"
     end;
 
     procedure GetJText(Token: JsonToken; Path: Text; MaxLength: Integer; Required: Boolean; DefaultValue: Text): Text
+    begin
+        exit(GetJText(Token, Path, MaxLength, false, Required, DefaultValue));
+    end;
+
+    procedure GetJText(Token: JsonToken; Path: Text; MaxLength: Integer; TextMaxLength: Boolean; Required: Boolean): Text
+    begin
+        exit(GetJText(Token, Path, MaxLength, TextMaxLength, Required, ''));
+    end;
+
+    procedure GetJText(Token: JsonToken; Path: Text; MaxLength: Integer; TestMaxLength: Boolean; Required: Boolean; DefaultValue: Text): Text
     var
         JValue: JsonValue;
         Value: Text;
@@ -25,11 +35,16 @@ codeunit 6059994 "NPR Json Helper"
         if GetJValue(Token, Path, JValue) then begin
             Value := JValue.AsText();
             if MaxLength > 0 then
-                Value := CopyStr(Value, 1, MaxLength);
+                if TestMaxLength then
+                    TestMaxValueLength(Value, Path, MaxLength)
+                else
+                    Value := CopyStr(Value, 1, MaxLength);
         end;
         if Value = '' then begin
             if Required then
                 RequiredValueMissingError(Token, Path);
+            if TestMaxLength then
+                TestMaxValueLength(DefaultValue, Path, MaxLength);
             exit(DefaultValue);
         end;
         exit(Value);
@@ -223,12 +238,12 @@ codeunit 6059994 "NPR Json Helper"
 
     local procedure RequiredValueMissingError(Token: JsonToken; Path: Text)
     var
-        ValueMissingErr: Label 'Required value missing: %1';
+        ValueMissingErr: Label 'Required value missing: %1', Locked = true;
     begin
         Error(ValueMissingErr, GetAbsolutePath(Token, Path));
     end;
 
-    local procedure GetAbsolutePath(Token: JsonToken; Path: Text) AbsolutePath: Text
+    internal procedure GetAbsolutePath(Token: JsonToken; Path: Text) AbsolutePath: Text
     begin
         AbsolutePath := Token.Path();
         if (AbsolutePath <> '') and (Path <> '') then
@@ -255,7 +270,7 @@ codeunit 6059994 "NPR Json Helper"
         JField: JsonObject;
         JRecord: JsonObject;
         i: Integer;
-        RecNotFoundErr: Label 'Database record could not be found for %1.', Comment = '%1 - record identifier';
+        RecNotFoundErr: Label 'Database record could not be found for %1.', Comment = '%1 - record identifier', Locked = true;
     begin
         if not DataTypeManagement.GetRecordRef(RecRelatedVariant, RecRef) then
             Error(RecNotFoundErr, RecRelatedVariant);
@@ -417,5 +432,15 @@ codeunit 6059994 "NPR Json Helper"
                 end;
         end;
         exit('<Not Handled>');
+    end;
+
+    local procedure TestMaxValueLength(Value: Text; Path: Text; MaxLength: Integer)
+    var
+        ValueLength: Integer;
+        MaxLengthErr: Label 'The value: %1 of property: %2 is too long. Maximum length: %3. Current length: %4.', Comment = '%1 - value, %2 - path, %3 - max. length, %4 - current length', Locked = true;
+    begin
+        ValueLength := StrLen(Value);
+        if MaxLength < ValueLength then
+            Error(MaxLengthErr, Value, Path, MaxLength, ValueLength);
     end;
 }

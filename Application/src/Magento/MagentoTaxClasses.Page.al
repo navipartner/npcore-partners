@@ -5,8 +5,7 @@
     PageType = List;
     SourceTable = "NPR Magento Tax Class";
     UsageCategory = Administration;
-    ApplicationArea = NPRMagento;
-
+    ApplicationArea = NPRRetail;
 
     layout
     {

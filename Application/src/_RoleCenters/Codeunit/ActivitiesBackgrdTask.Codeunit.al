@@ -16,10 +16,15 @@
 
         RetailSalesCue.SetRange("Date Filter", Today());
         RetailSalesCue.SetActionableImportEntryTypeFilter();
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        RetailSalesCue.CalcFields("Import Pending", "Task List", "Daily Sales Orders", "Sales Orders", "Shipped Sales Orders", "Sales Return Orders",
+                                    "Pending Inc. Documents", "Processed Error Tasks", "Failed Webshop Payments", "Sales Quotes", "Magento Orders",
+                                    "Daily Sales Invoices", "Tasks Unprocessed", "Posted Sales Invoices", "Failed imports", "Purchase Order List", "Failed Inc Ecom Sales Orders", "Daily Inc Ecom Sales Orders");
+#else
         RetailSalesCue.CalcFields("Import Pending", "Task List", "Daily Sales Orders", "Sales Orders", "Shipped Sales Orders", "Sales Return Orders",
                                     "Pending Inc. Documents", "Processed Error Tasks", "Failed Webshop Payments", "Sales Quotes", "Magento Orders",
                                     "Daily Sales Invoices", "Tasks Unprocessed", "Posted Sales Invoices", "Failed imports", "Purchase Order List");
-
+#endif
         Result.Add(Format(RetailSalesCue.FieldNo("Import Pending")), Format(RetailSalesCue."Import Pending", 0, 9));
         Result.Add(Format(RetailSalesCue.FieldNo("Task List")), Format(RetailSalesCue."Task List", 0, 9));
         Result.Add(Format(RetailSalesCue.FieldNo("Daily Sales Orders")), Format(RetailSalesCue."Daily Sales Orders", 0, 9));
@@ -36,7 +41,10 @@
         Result.Add(Format(RetailSalesCue.FieldNo("Posted Sales Invoices")), Format(RetailSalesCue."Posted Sales Invoices", 0, 9));
         Result.Add(Format(RetailSalesCue.FieldNo("Failed imports")), Format(RetailSalesCue."Failed imports", 0, 9));
         Result.Add(Format(RetailSalesCue.FieldNo("Purchase Order List")), Format(RetailSalesCue."Purchase Order List", 0, 9));
-
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        Result.Add(Format(RetailSalesCue.FieldNo("Failed Inc Ecom Sales Orders")), Format(RetailSalesCue."Failed Inc Ecom Sales Orders", 0, 9));
+        Result.Add(Format(RetailSalesCue.FieldNo("Daily Inc Ecom Sales Orders")), Format(RetailSalesCue."Daily Inc Ecom Sales Orders", 0, 9));
+#endif
         Page.SetBackgroundTaskResult(Result);
     end;
 }

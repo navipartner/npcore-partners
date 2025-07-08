@@ -162,7 +162,11 @@ tableextension 6014432 "NPR Sales Header" extends "Sales Header"
             DataClassification = CustomerContent;
             TableRelation = "NPR Retail Type";
         }
-
+        field(6151446; "NPR Inc Ecom Sale Id"; Guid)
+        {
+            Caption = 'Incoming Ecommerce Sale Id';
+            DataClassification = CustomerContent;
+        }
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         modify("Sell-to Customer No.")
         {
