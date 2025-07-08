@@ -175,6 +175,14 @@
                         ToolTip = 'Specifies the value of the Open / Due Amount. field';
                         ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     }
+                    field(AutoRenewal; _AutoRenewal)
+                    {
+                        Caption = 'Auto Renewal';
+                        Editable = false;
+                        ToolTip = 'Specifies the value of the Auto Renewal field';
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    }
+
                 }
             }
             group(points)
@@ -535,6 +543,7 @@
         MembershipRole.SetFilter(Blocked, '=%1', false);
         if (MembershipRole.FindFirst()) then begin
             Membership.Get(MembershipRole."Membership Entry No.");
+            _AutoRenewal := (Membership."Auto-Renew" <> Membership."Auto-Renew"::No);
 
             Membership.CalcFields("Remaining Points");
             RemainingPoints := Membership."Remaining Points";
@@ -618,6 +627,7 @@
         MemberRetailIntegration: Codeunit "NPR MM Member Retail Integr.";
         NO_ENTRIES: Label 'No entries found for member %1.';
         RaptorEnabled: Boolean;
+        _AutoRenewal: Boolean;
 
     internal procedure SetMembershipEntryNo(MembershipEntryNo: Integer)
     begin
