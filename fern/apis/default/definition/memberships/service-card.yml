@@ -163,7 +163,7 @@ service:
         This is typically used in scenarios where a member's access needs to be temporarily or permanently disabled. 
       display-name: Block Card
       method: POST
-      path: /member/{cardId}/block
+      path: /card/{cardId}/block
       path-parameters:
         cardId: simpleTypes.CardId
       request:
@@ -185,7 +185,7 @@ service:
         This is typically used in scenarios where a member's access needs to be reinstated after being blocked. 
       display-name: Unblock Card
       method: POST
-      path: /member/{cardId}/unblock
+      path: /card/{cardId}/unblock
       path-parameters:
         cardId: simpleTypes.CardId
       request:
