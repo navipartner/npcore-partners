@@ -309,6 +309,19 @@ codeunit 6184816 "NPR Spfy Retail Voucher Mgt."
         CheckIfShopifyVoucherAndThrowError(Rec.RecordId(), Rec."Voucher Type", 0, true);
     end;
 
+#if BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Voucher Mgt.", 'OnBeforeProcessScannedVoucherReferenceNo', '', true, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Voucher Mgt.", OnBeforeProcessScannedVoucherReferenceNo, '', true, false)]
+#endif
+    local procedure ProcessPossibleShopifyPrefix(var ReferenceNo: Text)
+    var
+        ShopifyPrefixLbl: Label 'shopify-giftcard-v1-', Locked = true;
+    begin
+        if ReferenceNo.ToLower().StartsWith(ShopifyPrefixLbl) then
+            ReferenceNo := ReferenceNo.Substring(StrLen(ShopifyPrefixLbl) + 1);
+    end;
+
     local procedure CheckIfShopifyVoucherAndThrowError(VoucherRecId: RecordId; VoucherTypeCode: Code[20]; ActionType: Option Rename,Delete; OnlySynced: Boolean)
     var
         ChangeDisallowed: Boolean;

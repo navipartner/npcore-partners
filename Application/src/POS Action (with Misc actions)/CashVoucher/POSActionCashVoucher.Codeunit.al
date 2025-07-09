@@ -107,18 +107,22 @@ codeunit 6184633 "NPR POS Action: Cash Voucher" implements "NPR IPOS Workflow"
     local procedure ProcessVoucher(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"; PaymentLine: Codeunit "NPR POS Payment Line"; SaleLine: Codeunit "NPR POS Sale Line") Response: JsonObject
     var
         VoucherType: Code[20];
+        RawReferenceNo: Text;
         ReferenceNo: Text[50];
         CashVoucherB: Codeunit "NPR Cashout Voucher B";
         POSSession: Codeunit "NPR POS Session";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         Success: Boolean;
         VoucherListEnabled: Boolean;
         CommisionType: Option Percentage,Amount;
         CommisionAmt: Decimal;
     begin
         Context.GetBooleanParameter('EnableVoucherList', VoucherListEnabled);
+        RawReferenceNo := Context.GetString('VoucherRefNo');
+        NpRvVoucherMgt.OnBeforeProcessScannedVoucherReferenceNo(RawReferenceNo);
 # pragma warning disable AA0139
+        ReferenceNo := RawReferenceNo;
         VoucherType := Context.GetString('voucherType');
-        ReferenceNo := Context.GetString('VoucherRefNo');//is it scanned
         CommisionAmt := Context.GetDecimalParameter('CommisionAmount');
         CommisionType := Context.GetIntegerParameter('CommisionType');
 # pragma warning restore

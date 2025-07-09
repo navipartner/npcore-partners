@@ -1949,6 +1949,7 @@
     var
         TooLongErr: Label '%1 cannot have more than %2 characters.';
     begin
+        OnBeforeProcessScannedVoucherReferenceNo(ReferenceNo);
         if StrLen(ReferenceNo) > MaxStrLen(VoucherReferenceNumber) then
             Error(TooLongErr, 'ReferenceNo', MaxStrLen(VoucherReferenceNumber));
         VoucherReferenceNumber := CopyStr(ReferenceNo, 1, MaxStrLen(VoucherReferenceNumber));
@@ -2210,4 +2211,8 @@
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeProcessScannedVoucherReferenceNo(var ReferenceNo: Text)
+    begin
+    end;
 }

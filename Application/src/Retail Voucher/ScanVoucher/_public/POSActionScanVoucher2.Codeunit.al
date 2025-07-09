@@ -66,6 +66,7 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
         NPRNpRvVoucher: Record "NPR NpRv Voucher";
         NPRNpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         NPRPOSActionScanVoucher2B: Codeunit "NPR POS Action Scan Voucher2B";
+        RawReferenceNo: Text;
         ReferenceNo: Text[50];
         VoucherType: Text[20];
         VoucherNo: Text[20];
@@ -75,12 +76,13 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
         VoucherHasItemLimitation: Boolean;
         InsufficientBalanceErr: Label 'Available balance on Voucher is 0';
     begin
+        if Context.GetString('VoucherRefNo', RawReferenceNo) then;
+        NPRNpRvVoucherMgt.OnBeforeProcessScannedVoucherReferenceNo(RawReferenceNo);
 #pragma warning disable AA0139
-        if Context.GetString('VoucherRefNo', ReferenceNo) then;
+        ReferenceNo := RawReferenceNo;
         if Context.GetString('voucherType', VoucherType) then;
 #pragma warning restore AA0139
         if Context.GetBooleanParameter('EnableVoucherList', VoucherListEnabled) then;
-
 
         if NPRNpRvVoucherMgt.GetVoucher(ReferenceNo, VoucherType, VoucherListEnabled, NPRNpRvVoucher) then begin
             VoucherType := NPRNpRvVoucher."Voucher Type";

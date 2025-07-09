@@ -23,11 +23,13 @@ codeunit 6184645 "NPR POS Action Set Vch Ref No" implements "NPR IPOS Workflow"
     var
         SaleLinePOS: Record "NPR POS Sale Line";
         POSActionSetVchRefNoB: Codeunit "NPR POS Action Set Vch Ref NoB";
+        NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         ReferenceNo: Text;
     begin
         Context.GetString('referenceNo', ReferenceNo);
         SaleLine.GetCurrentSaleLine(SaleLinePOS);
 
+        NpRvVoucherMgt.OnBeforeProcessScannedVoucherReferenceNo(ReferenceNo);
 #pragma warning disable AA0139
         POSActionSetVchRefNoB.AssignReferenceNo(SaleLinePOS, '', ReferenceNo);
 #pragma warning restore AA0139
