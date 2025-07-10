@@ -295,14 +295,7 @@
             GetJQRefresherSetup();
             JobQueueEntry."NPR Time Zone" := _JQRefresherSetup."Default Job Time Zone";
         end;
-        JobQueueEntry."Notify On Success" := Parameters."Notify On Success";
         JobQueueEntry.Status := JobQueueEntry.Status::"On Hold";
-        if Parameters.Description <> '' then
-            JobQueueEntry.Description := Parameters.Description;
-        JobQueueEntry."Job Queue Category Code" := Parameters."Job Queue Category Code";
-        JobQueueEntry."NPR Auto-Resched. after Error" := Parameters."NPR Auto-Resched. after Error";
-        JobQueueEntry."NPR Auto-Resched. Delay (sec.)" := Parameters."NPR Auto-Resched. Delay (sec.)";
-        JobQueueEntry."NPR Notif. Profile on Error" := Parameters."NPR Notif. Profile on Error";
 
         OnBeforeInsertRecurringJobQueueEntry(JobQueueEntry);
         if not MonitoredJobRefreshActive then
@@ -375,6 +368,19 @@
 #ENDIF
         if (Parameters."User ID" <> '') and (JobQueueEntry."User ID" <> Parameters."User ID") then
             JobQueueEntry."User ID" := Parameters."User ID";
+
+        JobQueueEntry."NPR Notif. Profile on Error" := Parameters."NPR Notif. Profile on Error";
+        JobQueueEntry."Job Queue Category Code" := Parameters."Job Queue Category Code";
+        JobQueueEntry.Description := Parameters.Description;
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24)
+        JobQueueEntry."Priority Within Category" := Parameters."Priority Within Category";
+#endif
+        if Parameters."Expiration Date/Time" <> 0DT then
+            JobQueueEntry."Expiration Date/Time" := Parameters."Expiration Date/Time";
+        JobQueueEntry."NPR Auto-Resched. after Error" := Parameters."NPR Auto-Resched. after Error";
+        JobQueueEntry."NPR Auto-Resched. Delay (sec.)" := Parameters."NPR Auto-Resched. Delay (sec.)";
+        JobQueueEntry."NPR Heartbeat URL" := Parameters."NPR Heartbeat URL";
+        JobQueueEntry."Notify On Success" := Parameters."Notify On Success";
     end;
 
     procedure JobQueueEntryExists(Parameters: Record "Job Queue Entry"; var JobQueueEntryOut: Record "Job Queue Entry"): Boolean

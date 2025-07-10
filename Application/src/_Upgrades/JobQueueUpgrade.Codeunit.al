@@ -17,6 +17,7 @@
         RemoveObsoleteEntraApp();
         UpdateRefresherUserAssignment();
         UpdateRefresherUserSettings();
+        UpdateJobQueueFieldsFromMonitoredEntry();
     end;
 
     local procedure RemoveObsoleteEntraApp()
@@ -86,6 +87,42 @@
 
         if JQRefreshSetup.Get() then
             JQRefreshSetup.UpdateRefresherUsers();
+
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Upgrade", UpgradeStep));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure UpdateJobQueueFieldsFromMonitoredEntry()
+    var
+        MonitoredJobQueueEntry: Record "NPR Monitored Job Queue Entry";
+        xMonitoredJobQueueEntry: Record "NPR Monitored Job Queue Entry";
+        JobQueueEntry: Record "Job Queue Entry";
+    begin
+        UpgradeStep := 'UpdateJobQueueFieldsFromMonitoredEntry';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Upgrade", UpgradeStep)) then
+            exit;
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Job Queue Upgrade', UpgradeStep);
+
+        if MonitoredJobQueueEntry.FindSet() then
+            repeat
+                if JobQueueEntry.Get(MonitoredJobQueueEntry."Job Queue Entry ID") then begin
+                    xMonitoredJobQueueEntry := MonitoredJobQueueEntry;
+                    MonitoredJobQueueEntry."Notif. Profile on Error" := JobQueueEntry."NPR Notif. Profile on Error";
+                    MonitoredJobQueueEntry."Job Queue Category Code" := JobQueueEntry."Job Queue Category Code";
+                    MonitoredJobQueueEntry.Description := JobQueueEntry.Description;
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24)
+                    MonitoredJobQueueEntry."Priority Within Category" := JobQueueEntry."Priority Within Category";
+#endif
+                    if JobQueueEntry."Expiration Date/Time" <> 0DT then
+                        MonitoredJobQueueEntry."Expiration Date/Time" := JobQueueEntry."Expiration Date/Time";
+                    MonitoredJobQueueEntry."NPR Auto-Resched. after Error" := JobQueueEntry."NPR Auto-Resched. after Error";
+                    MonitoredJobQueueEntry."NPR Auto-Resched. Delay (sec.)" := JobQueueEntry."NPR Auto-Resched. Delay (sec.)";
+                    MonitoredJobQueueEntry."NPR Heartbeat URL" := JobQueueEntry."NPR Heartbeat URL";
+                    MonitoredJobQueueEntry."Notify On Success" := JobQueueEntry."Notify On Success";
+                    if Format(MonitoredJobQueueEntry) <> Format(xMonitoredJobQueueEntry) then
+                        MonitoredJobQueueEntry.Modify();
+                end;
+            until MonitoredJobQueueEntry.Next() = 0;
 
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();

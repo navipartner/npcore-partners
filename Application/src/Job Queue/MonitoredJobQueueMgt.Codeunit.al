@@ -49,7 +49,6 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
     internal procedure AddMonitoredJobQueueEntry(JobQueueEntry: Record "Job Queue Entry")
     var
         MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
-        xJobQueueEntry: Record "Job Queue Entry";
         xMonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
         JobQueueMgt: Codeunit "NPR Job Queue Management";
     begin
@@ -77,10 +76,10 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
         end;
         JobQueueEntry.CalcFields(XML);
         MonitoredJQEntry.TransferFields(JobQueueEntry, false);
-        if not IsNullGuid(xMonitoredJQEntry."Job Queue Entry ID") then
-            if xJobQueueEntry.Get(xMonitoredJQEntry."Job Queue Entry ID") then begin
-                MonitoredJQEntry."Notif. Profile on Error" := xJobQueueEntry."NPR Notif. Profile on Error";
-            end;
+        // if not IsNullGuid(xMonitoredJQEntry."Job Queue Entry ID") then
+        //     if xJobQueueEntry.Get(xMonitoredJQEntry."Job Queue Entry ID") then begin
+        //         MonitoredJQEntry."Notif. Profile on Error" := xJobQueueEntry."NPR Notif. Profile on Error";
+        //     end;
         if not IsNullGuid(JobQueueEntry.ID) then
             MonitoredJQEntry."Job Queue Entry ID" := JobQueueEntry.ID;
         JobQueueMgt.OnBeforeRenewMonitoredJobQueueEntry(xMonitoredJQEntry, MonitoredJQEntry);

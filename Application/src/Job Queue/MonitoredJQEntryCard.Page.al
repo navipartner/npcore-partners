@@ -17,22 +17,24 @@ page 6185042 "NPR Monitored JQ Entry Card"
             group(General)
             {
                 Caption = 'General';
-                Editable = not _IsProtectedJob;
                 field("Object Type to Run"; Rec."Object Type to Run")
                 {
                     ApplicationArea = NPRRetail;
                     Importance = Promoted;
+                    Editable = not _IsProtectedJob;
                     ToolTip = 'Specifies the type of the object, report or codeunit, that is to be run for the job queue entry. After you specify a type, you then select an object ID of that type in the Object ID to Run field.';
                 }
                 field("Object ID to Run"; Rec."Object ID to Run")
                 {
                     ApplicationArea = NPRRetail;
                     Importance = Promoted;
+                    Editable = not _IsProtectedJob;
                     ToolTip = 'Specifies the ID of the object that is to be run for this job. You can select an ID that is of the object type that you have specified in the Object Type to Run field.';
                 }
                 field("Object Caption to Run"; Rec."Object Caption to Run")
                 {
                     ApplicationArea = NPRRetail;
+                    Editable = not _IsProtectedJob;
                     ToolTip = 'Specifies the name of the object that is selected in the Object ID to Run field.';
                 }
                 field(Description; Rec.Description)
@@ -44,6 +46,7 @@ page 6185042 "NPR Monitored JQ Entry Card"
                 field("Parameter String"; Rec."Parameter String")
                 {
                     ApplicationArea = NPRRetail;
+                    Editable = not _IsProtectedJob;
                     Importance = Additional;
                     ToolTip = 'Specifies a text string that is used as a parameter by the job queue when it is run.';
                 }
@@ -65,12 +68,14 @@ page 6185042 "NPR Monitored JQ Entry Card"
                 field("Maximum No. of Attempts to Run"; Rec."Maximum No. of Attempts to Run")
                 {
                     ApplicationArea = NPRRetail;
+                    Editable = not _IsProtectedJob;
                     Importance = Additional;
                     ToolTip = 'Specifies how many times a job queue task should be rerun after a job queue fails to run. This is useful for situations in which a task might be unresponsive. For example, a task might be unresponsive because it depends on an external resource that is not always available.';
                 }
                 field("Rerun Delay (sec.)"; Rec."Rerun Delay (sec.)")
                 {
                     ApplicationArea = NPRRetail;
+                    Editable = not _IsProtectedJob;
                     Importance = Additional;
                     ToolTip = 'Specifies how many seconds to wait before re-running this job queue task in the event of a failure.';
                 }
@@ -78,6 +83,7 @@ page 6185042 "NPR Monitored JQ Entry Card"
                 field(Timeout; Rec."Job Timeout")
                 {
                     ApplicationArea = NPRRetail;
+                    Editable = not _IsProtectedJob;
                     ToolTip = 'Specifies the maximum time that the job queue entry is allowed to run.';
                 }
 #endif
@@ -94,7 +100,6 @@ page 6185042 "NPR Monitored JQ Entry Card"
                 field("NPR Auto-Resched. Delay (sec.)"; Rec."NPR Auto-Resched. Delay (sec.)")
                 {
                     Enabled = Rec."NPR Auto-Resched. after Error";
-
                     ToolTip = 'Specifies how many seconds to wait before re-running this job queue entry, in cases when you want the job to be automatically rescheduled after status "Error"';
                     ApplicationArea = NPRRetail;
                 }
@@ -298,7 +303,7 @@ page 6185042 "NPR Monitored JQ Entry Card"
     local procedure ShowModifyIsNotAllowedNotification()
     var
         ModifyIsNotAllowedNotification: Notification;
-        ModifyIsNotAllowedLbl: Label 'This monitored job cannot be edited because it is a NaviPartner protected job.';
+        ModifyIsNotAllowedLbl: Label 'Some fields of this monitored job cannot be edited because it is a NaviPartner protected job.';
     begin
         ModifyIsNotAllowedNotification.Id := CreateGuid();
         ModifyIsNotAllowedNotification.Message := ModifyIsNotAllowedLbl;
