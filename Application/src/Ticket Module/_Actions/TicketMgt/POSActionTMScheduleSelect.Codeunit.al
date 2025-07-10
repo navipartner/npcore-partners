@@ -159,6 +159,8 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
     var
         TicketRetailManagement: Codeunit "NPR TM Ticket Retail Mgt.";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        HTMLDisplay: Codeunit "NPR POS HTML Disp. Prof.";
+        POSProxyDisplay: Codeunit "NPR POS Proxy - Display";
         SaleLinePOS: Record "NPR POS Sale Line";
         Token: Text[100];
         ResponseMessage: Text;
@@ -227,6 +229,9 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
                     SaleLinePOS."Description 2" := TicketReservationRequest."Scheduled Time Description";
                     SaleLinePOS.Modify();
                 end;
+
+                HTMLDisplay.UpdateHTMLDisplay();
+                POSProxyDisplay.UpdateDisplay(SaleLinePOS);
             end;
         end else begin
             Response.Add('CancelScheduleSelection', true);

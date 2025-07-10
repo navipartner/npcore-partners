@@ -292,7 +292,7 @@ codeunit 6060083 "NPR POS Html Disp. Req"
                                 SaleLine.Add('AmountIncTax', SaleLinePOS."Amount Including VAT");
                                 SaleLine.Add('AmountExTax', SaleLinePOS.Amount);
                                 SaleLine.Add('Quantity', SaleLinePOS.Quantity);
-                                SaleLine.Add('DiscountPercent', SaleLinePOS."Discount %");
+                                SaleLine.Add('DiscountPercent', Round(SaleLinePOS."Discount %", 0.01, '='));
                                 SaleLines.Add(SaleLine.Clone().AsObject());
                                 SaleLine.Remove('Description');
                                 SaleLine.Remove('AmountIncTax');

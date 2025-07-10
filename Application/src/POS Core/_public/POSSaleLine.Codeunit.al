@@ -700,11 +700,13 @@
         OnAfterInsertPOSSaleLineBeforeWorkflows(Rec);
 
         POSIssueOnSale.AddNewSaleCoupons(Rec);
-        HTMLDisplay.UpdateHTMLDisplay();
-        POSProxyDisplay.UpdateDisplay(Rec);
+
         WalletCreate.CreateIntermediateWallet(Rec);
         TicketRetailMgt.UpdateTicketOnSaleLineInsert(Rec);
         POSActMemberMgt.UpdateMembershipOnSaleLineInsert(Rec);
+
+        HTMLDisplay.UpdateHTMLDisplay();
+        POSProxyDisplay.UpdateDisplay(Rec);
         InvokeOnAfterInsertSaleLineWorkflow(Rec);
 
         RefreshCurrent();
