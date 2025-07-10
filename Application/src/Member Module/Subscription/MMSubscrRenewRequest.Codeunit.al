@@ -124,6 +124,7 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
         SubscrPaymentRequest.Type := SubscrPaymentRequest.Type::Payment;
         SubscrPaymentRequest.Status := SubscrPaymentRequest.Status::New;
         SubscrPaymentRequest.PSP := MemberPaymentMethod.PSP;
+        SubscrPaymentRequest."Payment Method Entry No." := MemberPaymentMethod."Entry No.";
         SubscrPaymentRequest."Payment Token" := MemberPaymentMethod."Payment Token";
         SubscrPaymentRequest.Amount := SubscriptionRequest.Amount;
         SubscrPaymentRequest."Currency Code" := SubscriptionRequest."Currency Code";

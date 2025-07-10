@@ -38,6 +38,10 @@ page 6185075 "NPR APIV1 PBI SubsPaymRequest"
                 {
                     Caption = 'Subscription Request Entry No.', Locked = true;
                 }
+                field(paymentMethodEntryNo; Rec."Payment Method Entry No.")
+                {
+                    Caption = 'Payment Method Entry No.', Locked = true;
+                }
                 field(psp; Rec.PSP)
                 {
                     Caption = 'PSP', Locked = true;
@@ -65,6 +69,10 @@ page 6185075 "NPR APIV1 PBI SubsPaymRequest"
                 field(rejectedReasonDescription; Rec."Rejected Reason Description")
                 {
                     Caption = 'Rejected Reason Description', Locked = true;
+                }
+                field(createdAt; Rec.SystemCreatedAt)
+                {
+                    Caption = 'Created At', Locked = true;
                 }
 #if not (BC17 or BC18 or BC19 or BC20)
                 field(systemRowVersion; Rec.SystemRowVersion)

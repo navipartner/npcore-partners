@@ -51,6 +51,12 @@ table 6150921 "NPR MM Subscr. Payment Request"
             Caption = 'Payment Token';
             DataClassification = CustomerContent;
         }
+        field(51; "Payment Method Entry No."; Integer)
+        {
+            Caption = 'Payment Method Entry No.';
+            DataClassification = SystemMetadata;
+            TableRelation = "NPR MM Member Payment Method"."Entry No.";
+        }
         field(60; Amount; Decimal)
         {
             Caption = 'Amount';
