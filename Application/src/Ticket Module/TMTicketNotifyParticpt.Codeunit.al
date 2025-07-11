@@ -38,7 +38,7 @@
         NO_SMS_TEMPLATE: Label 'Template for table %1 not found among SMS Templates.';
         StakeholderNotificationGroupType: Option SALES,SELLOUT,WAITINGLIST;
 
-    procedure NotifyRecipients(var TicketParticipantWks: Record "NPR TM Ticket Particpt. Wks.")
+    internal procedure NotifyRecipients(var TicketParticipantWks: Record "NPR TM Ticket Particpt. Wks.")
     var
         TicketParticipantWks2: Record "NPR TM Ticket Particpt. Wks.";
         ResponseMessage: Text;
@@ -333,14 +333,14 @@
         until TicketHolder.Next() = 0;
     end;
 
-    procedure AcquireTicketParticipant(Token: Text[100]; SuggestNotificationMethod: Enum "NPR TM NotificationMethod"; SuggestNotificationAddress: Text[100]; SuggestTicketHolderName: Text[100]): Boolean
+    internal procedure AcquireTicketParticipant(Token: Text[100]; SuggestNotificationMethod: Enum "NPR TM NotificationMethod"; SuggestNotificationAddress: Text[100]; SuggestTicketHolderName: Text[100]): Boolean
     begin
 
         exit(AcquireTicketParticipantWorker(Token, SuggestNotificationMethod, SuggestNotificationAddress, SuggestTicketHolderName, false));
 
     end;
 
-    procedure AcquireTicketParticipantForce(Token: Text[100]; SuggestNotificationMethod: Enum "NPR TM NotificationMethod"; SuggestNotificationAddress: Text[100]; SuggestTicketHolderName: Text[100]; ForceDialog: Boolean): Boolean
+    internal procedure AcquireTicketParticipantForce(Token: Text[100]; SuggestNotificationMethod: Enum "NPR TM NotificationMethod"; SuggestNotificationAddress: Text[100]; SuggestTicketHolderName: Text[100]; ForceDialog: Boolean): Boolean
     begin
 
         exit(AcquireTicketParticipantWorker(Token, SuggestNotificationMethod, SuggestNotificationAddress, SuggestTicketHolderName, ForceDialog));
@@ -609,7 +609,7 @@
 
     end;
 
-    procedure CreateDiyPrintNotification(TicketNo: Code[20]) NotificationEntryNo: Integer
+    internal procedure CreateDiyPrintNotification(TicketNo: Code[20]) NotificationEntryNo: Integer
     var
         NotificationEntry: Record "NPR TM Ticket Notif. Entry";
         TicketSetup: Record "NPR TM Ticket Setup";
@@ -723,7 +723,7 @@
 
     end;
 
-    procedure CreateTicketReservationReminder(Ticket: Record "NPR TM Ticket")
+    internal procedure CreateTicketReservationReminder(Ticket: Record "NPR TM Ticket")
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
     begin
@@ -736,7 +736,7 @@
         end;
     end;
 
-    procedure CreateAdmissionReservationReminder(TicketAccessEntry: Record "NPR TM Ticket Access Entry"; MemberNumber: Code[20]) NotificationEntryNo: Integer
+    internal procedure CreateAdmissionReservationReminder(TicketAccessEntry: Record "NPR TM Ticket Access Entry"; MemberNumber: Code[20]) NotificationEntryNo: Integer
     var
         Ticket: Record "NPR TM Ticket";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
@@ -786,7 +786,7 @@
         until (ProfileLine.Next() = 0);
     end;
 
-    procedure CreateAdmissionWelcomeReminder(TicketAccessEntry: Record "NPR TM Ticket Access Entry"; MemberNumber: Code[20]) NotificationEntryNo: Integer
+    internal procedure CreateAdmissionWelcomeReminder(TicketAccessEntry: Record "NPR TM Ticket Access Entry"; MemberNumber: Code[20]) NotificationEntryNo: Integer
     var
         Ticket: Record "NPR TM Ticket";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
@@ -851,7 +851,7 @@
         until (ProfileLine.Next() = 0);
     end;
 
-    procedure CreateOnAdmissionNotification(TicketAccessEntry: Record "NPR TM Ticket Access Entry"; DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry"; FirstAdmission: Boolean) NotificationEntryNo: Integer
+    internal procedure CreateOnAdmissionNotification(TicketAccessEntry: Record "NPR TM Ticket Access Entry"; DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry"; FirstAdmission: Boolean) NotificationEntryNo: Integer
     var
         Ticket: Record "NPR TM Ticket";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
@@ -890,7 +890,7 @@
         until (ProfileLine.Next() = 0);
     end;
 
-    procedure CreateRevokeNotification(TicketAccessEntry: Record "NPR TM Ticket Access Entry") NotificationEntryNo: Integer
+    internal procedure CreateRevokeNotification(TicketAccessEntry: Record "NPR TM Ticket Access Entry") NotificationEntryNo: Integer
     var
         Ticket: Record "NPR TM Ticket";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
@@ -1008,6 +1008,13 @@
             // Schedule after NOW
             AddUsingProfileTimeOffset(TicketNotProfileLine, NotificationEntry, Today(), Time());
         end;
+
+        if (TicketNotProfileLine."Notification Trigger" = TicketNotProfileLine."Notification Trigger"::RESERVATION) then
+            if (CreateDateTime(NotificationEntry."Date To Notify", NotificationEntry."Time To Notify") < CurrentDateTime()) then
+                if (CreateDateTime(AdmSchEntry."Admission Start Date", AdmSchEntry."Admission Start Time") > CurrentDateTime()) then begin
+                    NotificationEntry."Date To Notify" := Today();
+                    NotificationEntry."Time To Notify" := Time();
+                end;
 
         if (NotificationEntry."Date To Notify" < Today()) then
             exit(0);
@@ -1164,7 +1171,7 @@
     end;
 
 
-    procedure SendGeneralNotification(var TicketNotificationEntryFilters: Record "NPR TM Ticket Notif. Entry")
+    internal procedure SendGeneralNotification(var TicketNotificationEntryFilters: Record "NPR TM Ticket Notif. Entry")
     var
         TicketNotificationEntry: Record "NPR TM Ticket Notif. Entry";
         TicketNotificationEntry2: Record "NPR TM Ticket Notif. Entry";

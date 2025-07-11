@@ -376,10 +376,31 @@
                 var
                     TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
                 begin
-
                     Message('%1', TicketRequestManager.GetETicketPassData(Rec));
                 end;
             }
+            Action("RecreateWelcomeNotification")
+            {
+                ToolTip = 'Recreate welcome notification for ticket holder.';
+                ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                Caption = 'Recreate Welcome Notification';
+                Image = SendElectronicDocument;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                Scope = Repeater;
+
+                trigger OnAction()
+                var
+                    TicketFacade: Codeunit "NPR TM Ticket Facade";
+                    Ticket: Record "NPR TM Ticket";
+                begin
+                    Ticket.Get(Rec."Ticket No.");
+                    TicketFacade.CreateTicketWelcomeNotifications(Ticket);
+                    CurrPage.Update(false);
+                end;
+            }
+
             Action("Send Notification")
             {
                 ToolTip = 'Send notification to ticket holder.';
