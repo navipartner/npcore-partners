@@ -2742,7 +2742,6 @@
         Membership: Record "NPR MM Membership";
         MembershipEntry: Record "NPR MM Membership Entry";
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
-        IPriceHandler: Interface "NPR IMemberAlterationPriceHandler";
         Item: Record Item;
         StartDateNew: Date;
         EndDateNew: Date;
@@ -2806,13 +2805,7 @@
                 if (EntryNo <> MembershipEntry."Entry No.") then
                     exit(ExitFalseOrWithError(false, StrSubstNo(STACKING_NOT_ALLOWED, Membership."Entry No.", RenewalDate)));
 
-        if (_FeatureFlag.IsEnabled(PriceCalcInterfaceTok)) then begin
-            IPriceHandler := MembershipAlterationSetup."Price Calculation";
-            SuggestedUnitPrice := IPriceHandler.CalculateAutoRenewAlterationPrice(MembershipAlterationSetup, MemberInfoCapture, MembershipEntry);
-        end else begin
-            SuggestedUnitPrice := Item."Unit Price";
-            SuggestedUnitPrice += MembershipAlterationSetup."Member Unit Price" * GetMembershipMemberCountForAlteration(Membership."Entry No.", MembershipAlterationSetup);
-        end;
+        SuggestedUnitPrice := CalculateAutoRenewPrice(Membership."Entry No.", MembershipAlterationSetup, MemberInfoCapture, MembershipEntry);
 
         if (not CheckExtendMemberCards(false, MemberInfoCapture."Membership Entry No.", MembershipAlterationSetup."Card Expired Action", EndDateNew, MemberInfoCapture."External Card No.", MemberInfoCapture."Card Entry No.", ReasonText)) then
             exit(false);
@@ -2826,6 +2819,22 @@
         OutStartDate := StartDateNew;
         OutUntilDate := EndDateNew;
         exit(true);
+    end;
+
+    internal procedure CalculateAutoRenewPrice(MembershipEntryNo: Integer; MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; MemberInfoCapture: Record "NPR MM Member Info Capture"; MembershipEntry: Record "NPR MM Membership Entry") SuggestedUnitPrice: Decimal
+    var
+        Item: Record Item;
+        IPriceHandler: Interface "NPR IMemberAlterationPriceHandler";
+    begin
+        if (_FeatureFlag.IsEnabled(PriceCalcInterfaceTok)) then begin
+            IPriceHandler := MembershipAlterationSetup."Price Calculation";
+            SuggestedUnitPrice := IPriceHandler.CalculateAutoRenewAlterationPrice(MembershipAlterationSetup, MemberInfoCapture, MembershipEntry);
+        end else begin
+            Item.SetLoadFields("Unit Price");
+            Item.Get(MemberInfoCapture."Item No.");
+            SuggestedUnitPrice := Item."Unit Price";
+            SuggestedUnitPrice += MembershipAlterationSetup."Member Unit Price" * GetMembershipMemberCountForAlteration(MembershipEntryNo, MembershipAlterationSetup);
+        end;
     end;
 
     internal procedure CarryOutMembershipRenewal(var MemberInfoCapture: Record "NPR MM Member Info Capture"; MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; StartDateNew: Date; EndDateNew: Date; var EntryNo: Integer; var ReasonText: Text): Boolean

@@ -121,30 +121,110 @@ codeunit 6185084 "NPR EFT Adyen Subs Conf Task" implements "NPR POS Background T
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         TempProcessedLineBuffer: Record "NPR MM Member Info Capture" temporary;
         SalesLinePOS: Record "NPR POS Sale Line";
+        TempRenewalPrice: Decimal;
     begin
         MemberInfoCapture.Reset();
         MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
         MemberInfoCapture.SetRange("Receipt No.", EFTTransactionRequest."Sales Ticket No.");
-        MemberInfoCapture.SetLoadFields("Entry No.", "Receipt No.", "Line No.");
         if not MemberInfoCapture.FindSet() then
             exit;
 
         repeat
-            TempProcessedLineBuffer.Reset();
-            TempProcessedLineBuffer.SetRange("Receipt No.", MemberInfoCapture."Receipt No.");
-            TempProcessedLineBuffer.SetRange("Line No.", MemberInfoCapture."Line No.");
-            if TempProcessedLineBuffer.IsEmpty then begin
-                SalesLinePOS.Reset();
-                SalesLinePOS.SetRange("Register No.", EFTTransactionRequest."Register No.");
-                SalesLinePOS.SetRange("Sales Ticket No.", EFTTransactionRequest."Sales Ticket No.");
-                SalesLinePOS.SetRange("Line No.", MemberInfoCapture."Line No.");
-                SalesLinePOS.CalcSums("Amount Including VAT");
-                SubscriptionAmountIncludingVAT += SalesLinePOS."Amount Including VAT";
+            if (CalcSubscriptionRenewalPrice(MemberInfoCapture, TempRenewalPrice)) then begin
+                SubscriptionAmountIncludingVAT += TempRenewalPrice;
+            end else begin
+                TempProcessedLineBuffer.Reset();
+                TempProcessedLineBuffer.SetRange("Receipt No.", MemberInfoCapture."Receipt No.");
+                TempProcessedLineBuffer.SetRange("Line No.", MemberInfoCapture."Line No.");
+                if TempProcessedLineBuffer.IsEmpty then begin
+                    SalesLinePOS.Reset();
+                    SalesLinePOS.SetRange("Register No.", EFTTransactionRequest."Register No.");
+                    SalesLinePOS.SetRange("Sales Ticket No.", EFTTransactionRequest."Sales Ticket No.");
+                    SalesLinePOS.SetRange("Line No.", MemberInfoCapture."Line No.");
+                    SalesLinePOS.CalcSums("Amount Including VAT");
+                    SubscriptionAmountIncludingVAT += SalesLinePOS."Amount Including VAT";
 
-                TempProcessedLineBuffer.Init();
-                TempProcessedLineBuffer := MemberInfoCapture;
-                TempProcessedLineBuffer.Insert();
+                    TempProcessedLineBuffer.Init();
+                    TempProcessedLineBuffer := MemberInfoCapture;
+                    TempProcessedLineBuffer.Insert();
+                end;
             end;
         until MemberInfoCapture.Next() = 0;
+    end;
+
+    local procedure CalcSubscriptionRenewalPrice(MemberInfoCapture: Record "NPR MM Member Info Capture"; var RenewalPrice: Decimal): Boolean
+    var
+        TempMembershipEntry: Record "NPR MM Membership Entry" temporary;
+        TempAutoRenewInfoCapture: Record "NPR MM Member Info Capture" temporary;
+        MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
+        MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
+        RenewWithItemNo: Code[20];
+        AlterationSystemId: Guid;
+        ReasonText: Text;
+        OutStartDate, OutEndDate : Date;
+        TempPrice: Decimal;
+    begin
+        TempMembershipEntry.Init();
+
+        TempMembershipEntry."Membership Entry No." := MemberInfoCapture."Membership Entry No.";
+        TempMembershipEntry."Membership Code" := MemberInfoCapture."Membership Code";
+        TempMembershipEntry."Item No." := MemberInfoCapture."Item No.";
+
+        case MemberInfoCapture."Information Context" of
+            MemberInfoCapture."Information Context"::NEW:
+                begin
+                    TempMembershipEntry.Context := TempMembershipEntry.Context::NEW;
+                    TempMembershipEntry."Valid Until Date" := MemberInfoCapture."Valid Until";
+                end;
+            MemberInfoCapture."Information Context"::UPGRADE:
+                begin
+                    if (not MembershipMgt.UpgradeMembership(MemberInfoCapture, false, false, OutStartDate, OutEndDate, TempPrice)) then
+                        exit(false);
+
+                    TempMembershipEntry.Context := TempMembershipEntry.Context::UPGRADE;
+                    TempMembershipEntry."Valid From Date" := OutStartDate;
+                    TempMembershipEntry."Valid Until Date" := OutEndDate;
+                end;
+            MemberInfoCapture."Information Context"::RENEW:
+                begin
+                    if (not MembershipMgt.RenewMembership(MemberInfoCapture, false, false, OutStartDate, OutEndDate, TempPrice)) then
+                        exit(false);
+
+                    TempMembershipEntry.Context := TempMembershipEntry.Context::RENEW;
+                    TempMembershipEntry."Valid From Date" := OutStartDate;
+                    TempMembershipEntry."Valid Until Date" := OutEndDate;
+                end;
+            MemberInfoCapture."Information Context"::EXTEND:
+                begin
+                    if (not MembershipMgt.ExtendMembership(MemberInfoCapture, false, false, OutStartDate, OutEndDate, TempPrice)) then
+                        exit(false);
+
+                    TempMembershipEntry.Context := TempMembershipEntry.Context::EXTEND;
+                    TempMembershipEntry."Valid From Date" := OutStartDate;
+                    TempMembershipEntry."Valid Until Date" := OutEndDate;
+                end;
+            else
+                exit(false);
+        end;
+
+        if (not MembershipMgt.SelectAutoRenewRule(TempMembershipEntry, RenewWithItemNo, AlterationSystemId, ReasonText)) then
+            exit(false);
+
+        if (not MembershipAlterationSetup.GetBySystemId(AlterationSystemId)) then
+            exit(false);
+
+        TempAutoRenewInfoCapture.Init();
+        TempAutoRenewInfoCapture."Entry No." := 0;
+
+        TempAutoRenewInfoCapture."Membership Entry No." := MemberInfoCapture."Membership Entry No.";
+        TempAutoRenewInfoCapture."Membership Code" := MembershipAlterationSetup."From Membership Code";
+        TempAutoRenewInfoCapture."External Membership No." := MemberInfoCapture."External Membership No.";
+        TempAutoRenewInfoCapture."Item No." := RenewWithItemNo;
+        TempAutoRenewInfoCapture."Information Context" := TempAutoRenewInfoCapture."Information Context"::AUTORENEW;
+        TempAutoRenewInfoCapture."Document Date" := Today(); // Active
+        TempAutoRenewInfoCapture.Description := MembershipAlterationSetup.Description;
+
+        RenewalPrice := MembershipMgt.CalculateAutoRenewPrice(TempAutoRenewInfoCapture."Membership Entry No.", MembershipAlterationSetup, TempAutoRenewInfoCapture, TempMembershipEntry);
+        exit(true);
     end;
 }
