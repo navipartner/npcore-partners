@@ -934,6 +934,8 @@
         Item: Record Item;
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         WalletManager: Codeunit "NPR AttractionWalletCreate";
+        HTMLDisplay: Codeunit "NPR POS HTML Disp. Prof.";
+        POSProxyDisplay: Codeunit "NPR POS Proxy - Display";
     begin
         Sender.GetxRec(xSaleLinePOS);
         if xSaleLinePOS."Quantity (Base)" = 0 then
@@ -941,7 +943,7 @@
 
         FilterAttachedItemAddonLines(SaleLinePOS, SaleLinePOS."Line No.", SaleLinePOSAddOn);
         SaleLinePOSAddOn.SetRange("Per Unit", true);
-        if SaleLinePOSAddOn.FindSet() then
+        if SaleLinePOSAddOn.FindSet() then begin
             repeat
                 if SaleLinePOS2.Get(
                     SaleLinePOSAddOn."Register No.",
@@ -961,9 +963,13 @@
                         if (Item."NPR CreateAttractionWallet") or (SaleLinePOSAddOn.AddToWallet) then
                             WalletManager.OnAfterSetQuantityPOSSaleLine(SaleLinePOS2, SaleLinePOS2.Quantity);
                     end;
+                    POSProxyDisplay.UpdateDisplay(SaleLinePOS2);
 
                 end;
             until SaleLinePOSAddOn.Next() = 0;
+
+            HTMLDisplay.UpdateHTMLDisplay();
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Ext.: Line Format.", 'OnGetLineStyle', '', false, false)]
