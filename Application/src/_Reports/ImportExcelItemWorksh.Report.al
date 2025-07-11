@@ -367,6 +367,8 @@
                     else
                         ItemWorksheetVariantLine.Action := ItemWorksheetVariantLine.Action::CreateNew;
                     ItemWorksheetVariantLine.Validate("Item No.", ItemWorksheetLine."Item No.");
+                    if ItemWorksheetLine."Existing Item No." <> '' then
+                        ItemWorksheetVariantLine.Validate("Existing Item No.", ItemWorksheetLine."Existing Item No.");
                     ItemWorksheetVariantLine.Validate("Sales Price", ItemWorksheetLine."Sales Price");
                     ItemWorksheetVariantLine.Validate("Direct Unit Cost", ItemWorksheetLine."Direct Unit Cost");
                     if MappingFound then begin
