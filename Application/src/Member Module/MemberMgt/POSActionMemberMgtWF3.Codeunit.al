@@ -295,13 +295,18 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
     local procedure GetMembershipEntryLookupDataToJson(var TmpMembershipEntry: Record "NPR MM Membership Entry" temporary) ChangeOption: JsonObject
     begin
         ChangeOption.Add('itemno', TmpMembershipEntry."Item No.");
-        ChangeOption.Add('fromdate', TmpMembershipEntry."Valid From Date");
-        ChangeOption.Add('untildate', TmpMembershipEntry."Valid Until Date");
-        ChangeOption.Add('unitprice', Format(TmpMembershipEntry."Unit Price", 0, '<Sign><Integer><Decimals,3>'));
+        ChangeOption.Add('fromdate', Format(TmpMembershipEntry."Valid From Date"));
+        ChangeOption.Add('untildate', Format(TmpMembershipEntry."Valid Until Date"));
+        ChangeOption.Add('unitprice', Format(TmpMembershipEntry."Unit Price"));
         ChangeOption.Add('description', TmpMembershipEntry.Description);
-        ChangeOption.Add('amount', Format(TmpMembershipEntry."Amount Incl VAT", 0, '<Sign><Integer><Decimals,3>'));
+        ChangeOption.Add('amount', Format(TmpMembershipEntry."Amount Incl VAT"));
         ChangeOption.Add('context', Format(TmpMembershipEntry.Context));
         ChangeOption.Add('originalcontext', Format(TmpMembershipEntry."Original Context"));
+
+        ChangeOption.Add('fromdate_date', TmpMembershipEntry."Valid From Date");
+        ChangeOption.Add('untildate_date', TmpMembershipEntry."Valid Until Date");
+        ChangeOption.Add('unitprice_decimal', TmpMembershipEntry."Unit Price");
+        ChangeOption.Add('amount_decimal', TmpMembershipEntry."Amount Incl VAT");
 
         exit(ChangeOption);
     end;
