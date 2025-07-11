@@ -20,4 +20,9 @@ codeunit 6060021 "NPR EFT Transaction Pub. Mgt."
     begin
         exit(EFTTransactionMgt.GetEFTExternalCustomerId(SalesTicketNo, RegisterNo, Started, DTDifference, ExternalCustomerIdProvider));
     end;
+
+    procedure GetEFTExternalTransactionId(SalesTicketNo: Code[20]): Text[50]
+    begin
+        exit(EFTTransactionMgt.GetEFTExternalTransactionId(SalesTicketNo));
+    end;
 }

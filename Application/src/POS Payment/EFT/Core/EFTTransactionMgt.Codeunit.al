@@ -225,6 +225,16 @@
         exit(EFTReceiptText);
     end;
 
+    procedure GetEFTExternalTransactionId(SalesTicketNo: Code[20]): Text[50]
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+    begin
+        EFTTransactionRequest.SetRange("Sales Ticket No.", SalesTicketNo);
+        EFTTransactionRequest.SetRange(Successful, true);
+
+        if EFTTransactionRequest.FindFirst() then
+            exit(EFTTransactionRequest."External Transaction ID");
+    end;
     procedure GetEFTExternalCustomerId(SalesTicketNo: Code[20]; RegisterNo: Code[10]; Started: DateTime; DTDifference: Integer; ExternalCustomerIdProvider: Text[50]): Text[50]
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
