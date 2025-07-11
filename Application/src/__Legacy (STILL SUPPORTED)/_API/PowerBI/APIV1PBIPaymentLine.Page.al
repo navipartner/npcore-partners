@@ -62,6 +62,10 @@ page 6185076 "NPR APIV1 PBI Payment Line"
                 {
                     Caption = 'Canceled At', Locked = true;
                 }
+                field(maskedPAN; Rec."Masked PAN")
+                {
+                    Caption = 'Masked PAN', Locked = true;
+                }
 #if not (BC17 or BC18 or BC19 or BC20)
                 field(systemRowVersion; Rec.SystemRowVersion)
                 {
