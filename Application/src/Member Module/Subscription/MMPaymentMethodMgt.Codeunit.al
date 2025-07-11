@@ -2,6 +2,22 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
 {
     Access = Internal;
 
+#if (BC17 or BC18 or BC19 or BC20 or BC21)
+    [EventSubscriber(ObjectType::Table, Database::"NPR MM Member Payment Method", 'OnAfterDeleteEvent', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::"NPR MM Member Payment Method", OnAfterDeleteEvent, '', false, false)]
+#endif
+    local procedure OnAfterDeleteMemberPaymentMethod(var Rec: Record "NPR MM Member Payment Method")
+    var
+        MembershipPmtMethodMap: Record "NPR MM MembershipPmtMethodMap";
+    begin
+        if (Rec.IsTemporary()) then
+            exit;
+
+        MembershipPmtMethodMap.SetRange(PaymentMethodId, Rec.SystemId);
+        MembershipPmtMethodMap.DeleteAll();
+    end;
+
     internal procedure SetMemberPaymentMethodDefaultBeforeEndSale(SalePOS: Record "NPR POS Sale")
     var
         Membership: Record "NPR MM Membership";
