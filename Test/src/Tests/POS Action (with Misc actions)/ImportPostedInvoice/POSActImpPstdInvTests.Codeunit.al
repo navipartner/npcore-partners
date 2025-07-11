@@ -37,10 +37,8 @@ codeunit 85067 "NPR POS Act. ImpPstdInv Tests"
 
         SalesInvHdr.Get(PostedInvoiceNo);
 
-        // [GIVEN] Tax Posting Setup
-        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
-        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+        // [GIVEN] Posting Setup for Posted Invoice Lines
+        CreatePostingSetup(PostedInvoiceNo);
 
         NPRLibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
 
@@ -100,10 +98,8 @@ codeunit 85067 "NPR POS Act. ImpPstdInv Tests"
 
         SalesInvHdr.Get(PostedInvoiceNo);
 
-        // [GIVEN] Tax Posting Setup
-        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
-        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+        // [GIVEN] Posting Setup for Posted Invoice Lines
+        CreatePostingSetup(PostedInvoiceNo);
 
         NPRLibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
 
@@ -188,10 +184,8 @@ codeunit 85067 "NPR POS Act. ImpPstdInv Tests"
 
         SalesInvHdr.Get(PostedInvoiceNo);
 
-        // [GIVEN] Tax Posting Setup
-        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
-        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+        // [GIVEN] Posting Setup for Posted Invoice Lines
+        CreatePostingSetup(PostedInvoiceNo);
 
         NPRLibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
 
@@ -211,30 +205,19 @@ codeunit 85067 "NPR POS Act. ImpPstdInv Tests"
         Assert.IsTrue(Msg = StrSubstNo(DOCUMENT_IMPORTED, PostedInvoiceNo), Msg);
     end;
 
-    local procedure CreateVATPostingSetup(var VATPostingSetup: Record "VAT Posting Setup"; TaxCaclType: Enum "NPR POS Tax Calc. Type")
+    local procedure CreatePostingSetup(PostedInvoiceNo: Code[20])
     var
-        VATProductPostingGroup: Record "VAT Product Posting Group";
-        LibraryTaxCalc2: codeunit "NPR POS Lib. - Tax Calc.";
-        LibraryERM: Codeunit "Library - ERM";
-    begin
-        LibraryERM.CreateVATProductPostingGroup(VATProductPostingGroup);
-        if TaxCaclType = TaxCaclType::"Sales Tax" then
-            LibraryTaxCalc2.CreateSalesTaxPostingSetup(VATPostingSetup, VATBusinessPostingGroup.Code, VATProductPostingGroup.Code, TaxCaclType)
-        else
-            LibraryTaxCalc2.CreateTaxPostingSetup(VATPostingSetup, VATBusinessPostingGroup.Code, VATProductPostingGroup.Code, TaxCaclType);
-    end;
-
-    local procedure AssignVATBusPostGroupToPOSPostingProfile(VATBusPostingGroupCode: Code[20])
-    var
+        SalesInvoiceLine: Record "Sales Invoice Line";
+        Item: Record Item;
         LibraryPOSMasterData: codeunit "NPR Library - POS Master Data";
     begin
-        LibraryPOSMasterData.AssignVATBusPostGroupToPOSPostingProfile(POSStore, VATBusPostingGroupCode);
-    end;
-
-    local procedure AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup: Record "VAT Posting Setup")
-    var
-        LibraryPOSMasterData: codeunit "NPR Library - POS Master Data";
-    begin
-        LibraryPOSMasterData.AssignVATPostGroupToPOSSalesRoundingAcc(POSStore, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group");
+        SalesInvoiceLine.SetRange("Document No.", PostedInvoiceNo);
+        SalesInvoiceLine.SetRange(Type, "Sales Line Type"::Item);
+        SalesInvoiceLine.SetLoadFields("No.");
+        if SalesInvoiceLine.FindSet() then
+            repeat
+                Item.Get(SalesInvoiceLine."No.");
+                LibraryPOSMasterData.CreatePostingSetupForSaleItem(Item, POSUnit, POSStore);
+            until SalesInvoiceLine.Next() = 0;
     end;
 }

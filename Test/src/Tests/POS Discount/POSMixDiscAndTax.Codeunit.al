@@ -7740,7 +7740,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
-
+        LibraryApplicationArea.EnableVATSetup();
         // [GIVEN] Enable discount
         EnableDiscount();
 
@@ -7867,6 +7867,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+        LibraryApplicationArea.EnableVATSetup();
 
         // [GIVEN] Enable discount
         EnableDiscount();
@@ -8028,6 +8029,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+        LibraryApplicationArea.EnableVATSetup();
 
         // [GIVEN] Enable discount
         EnableDiscount();
@@ -8869,6 +8871,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+        LibraryApplicationArea.EnableVATSetup();
 
         // [GIVEN] Enable discount
         EnableDiscount();
@@ -8923,6 +8926,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+        LibraryApplicationArea.EnableVATSetup();
 
         // [GIVEN] Enable discount
         EnableDiscount();
@@ -8995,6 +8999,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [GIVEN] POS, Payment & Tax Setup
         InitializeData();
+        LibraryApplicationArea.EnableVATSetup();
 
         // [GIVEN] Enable discount
         EnableDiscount();

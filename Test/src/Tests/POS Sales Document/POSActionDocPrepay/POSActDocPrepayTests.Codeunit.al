@@ -162,12 +162,12 @@ codeunit 85079 "NPR POS Act. Doc. Prepay Tests"
         end;
 
         if not Initialized then begin
-            NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
             NPRLibraryPOSMasterData.CreatePOSSetup(POSSetup);
             NPRLibraryPOSMasterData.CreateDefaultPostingSetup(POSPostingProfile);
             NPRLibraryPOSMasterData.CreatePOSStore(POSStore, POSPostingProfile.Code);
             NPRLibraryPOSMasterData.CreatePOSUnit(POSUnit, POSStore.Code, POSPostingProfile.Code);
             NPRLibraryPOSMasterData.CreatePOSPaymentMethod(POSPaymentMethodCash, POSPaymentMethodCash."Processing Type"::CASH, '', false);
+            NPRLibraryPOSMasterData.CreateItemForPOSSaleUsage(Item, POSUnit, POSStore);
             LibrarySales.CreateCustomer(Customer);
             CheckSalesReceivableSetup();
             CheckPrepmtAccNo();
@@ -251,8 +251,6 @@ codeunit 85079 "NPR POS Act. Doc. Prepay Tests"
                 if GLAccount."VAT Prod. Posting Group" = '' then
                     GLAccount.Validate("VAT Prod. Posting Group", Item."VAT Prod. Posting Group");
                 GLAccount.Modify();
-                IF not VATPostSetup.Get(Customer."VAT Bus. Posting Group", Item."VAT Prod. Posting Group") then
-                    LibraryERM.CreateVATPostingSetup(VATPostSetup, Customer."VAT Bus. Posting Group", Item."VAT Prod. Posting Group");
                 GeneralPostingSetup.Validate("Sales Prepayments Account", GLAccount."No.");
                 GeneralPostingSetup.Modify();
             end else begin
@@ -266,5 +264,7 @@ codeunit 85079 "NPR POS Act. Doc. Prepay Tests"
                     GLAccount.Modify();
                 end;
             end;
+        if not VATPostSetup.Get(Customer."VAT Bus. Posting Group", GLAccount."VAT Prod. Posting Group") then
+            LibraryERM.CreateVATPostingSetup(VATPostSetup, Customer."VAT Bus. Posting Group", GLAccount."VAT Prod. Posting Group");
     end;
 }

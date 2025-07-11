@@ -53,10 +53,8 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
         SaleLine.SetRange("Document Type", SalesHeader."Document Type");
         SaleLine.FindFirst();
 
-        // [GIVEN] Tax Posting Setup
-        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
-        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+        // [GIVEN] Posting Setup
+        CreatePostingSetup(SalesHeader);
 
         SetPosSaleCustomer(POSSale, Customer."No.");
 
@@ -118,10 +116,8 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
         SaleLine.SetRange("Document Type", SalesHeader."Document Type");
         SaleLine.FindFirst();
 
-        // [GIVEN] Tax Posting Setup
-        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
-        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+        // [GIVEN] Posting Setup
+        CreatePostingSetup(SalesHeader);
 
         SetPosSaleCustomer(POSSale, SalesHeader."Bill-to Customer No.");
 
@@ -193,12 +189,8 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
         SaleLine.SetRange("Document Type", SalesHeader."Document Type");
         SaleLine.FindFirst();
 
-        // [GIVEN] Tax Posting Setup
-        CreateVATPostingSetup(VATPostingSetup,
-                              "NPR POS Tax Calc. Type"::"Normal VAT");
-
-        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+        // [GIVEN] Posting Setup
+        CreatePostingSetup(SalesHeader);
 
         SetPosSaleCustomer(POSSale,
                            SalesHeader."Bill-to Customer No.");
@@ -287,12 +279,9 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
         SaleLine.SetRange("Document Type", SalesHeader."Document Type");
         SaleLine.FindFirst();
 
-        // [GIVEN] Tax Posting Setup
-        CreateVATPostingSetup(VATPostingSetup,
-                              "NPR POS Tax Calc. Type"::"Normal VAT");
+        // [GIVEN] Posting Setup
+        CreatePostingSetup(SalesHeader);
 
-        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
         SetPosSaleCustomer(POSSale,
                            SalesHeader."Bill-to Customer No.");
 
@@ -391,12 +380,9 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
         SaleLine.SetRange("Document Type", SalesHeader."Document Type");
         SaleLine.FindFirst();
 
-        // [GIVEN] Tax Posting Setup
-        CreateVATPostingSetup(VATPostingSetup,
-                              "NPR POS Tax Calc. Type"::"Normal VAT");
+        // [GIVEN] Posting Setup
+        CreatePostingSetup(SalesHeader);
 
-        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
         SetPosSaleCustomer(POSSale,
                            SalesHeader."Bill-to Customer No.");
 
@@ -494,12 +480,9 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
         SaleLine.SetRange("Document Type", SalesHeader."Document Type");
         SaleLine.FindFirst();
 
-        // [GIVEN] Tax Posting Setup
-        CreateVATPostingSetup(VATPostingSetup,
-                              "NPR POS Tax Calc. Type"::"Normal VAT");
+        // [GIVEN] Posting Setup
+        CreatePostingSetup(SalesHeader);
 
-        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
         SetPosSaleCustomer(POSSale,
                            SalesHeader."Bill-to Customer No.");
 
@@ -591,12 +574,9 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
         SaleLine.SetRange("Document Type", SalesHeader."Document Type");
         SaleLine.FindFirst();
 
-        // [GIVEN] Tax Posting Setup
-        CreateVATPostingSetup(VATPostingSetup,
-                              "NPR POS Tax Calc. Type"::"Normal VAT");
+        // [GIVEN] Posting Setup
+        CreatePostingSetup(SalesHeader);
 
-        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
         SetPosSaleCustomer(POSSale,
                            SalesHeader."Bill-to Customer No.");
 
@@ -690,12 +670,9 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
         SaleLine.SetRange("Document Type", SalesHeader."Document Type");
         SaleLine.FindFirst();
 
-        // [GIVEN] Tax Posting Setup
-        CreateVATPostingSetup(VATPostingSetup,
-                              "NPR POS Tax Calc. Type"::"Normal VAT");
+        // [GIVEN] Posting Setup
+        CreatePostingSetup(SalesHeader);
 
-        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
         SetPosSaleCustomer(POSSale,
                            SalesHeader."Bill-to Customer No.");
 
@@ -770,10 +747,8 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
         SaleLine.SetRange("Document Type", SalesHeader."Document Type");
         SaleLine.FindFirst();
 
-        // [GIVEN] Tax Posting Setup
-        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
-        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+        // [GIVEN] Posting Setup
+        CreatePostingSetup(SalesHeader);
 
         SetPosSaleCustomer(POSSale, Customer."No.");
 
@@ -830,10 +805,8 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
         SaleLine.SetRange("Document Type", SalesHeader."Document Type");
         SaleLine.FindFirst();
 
-        // [GIVEN] Tax Posting Setup
-        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
-        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+        // [GIVEN] Posting Setup
+        CreatePostingSetup(SalesHeader);
 
         SetPosSaleCustomer(POSSale, SalesHeader."Bill-to Customer No.");
 
@@ -897,10 +870,8 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
 
         InsertSalesPersonToSalesHeader(SalespersonPurchaser, SalesHeader);
 
-        // [GIVEN] Tax Posting Setup
-        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
-        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+        // [GIVEN] Posting Setup
+        CreatePostingSetup(SalesHeader);
 
         SetPosSaleCustomer(POSSale, Customer."No.");
 
@@ -963,10 +934,8 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
 
         InsertSalesPersonToSalesHeader(SalespersonPurchaser, SalesHeader);
 
-        // [GIVEN] Tax Posting Setup
-        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
-        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+        // [GIVEN] Posting Setup
+        CreatePostingSetup(SalesHeader);
 
         SetPosSaleCustomer(POSSale, SalesHeader."Bill-to Customer No.");
 
@@ -1031,10 +1000,8 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
 
         InsertSalesPersonToSalesHeader(SalespersonPurchaser, SalesHeader);
 
-        // [GIVEN] Tax Posting Setup
-        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
-        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+        // [GIVEN] Posting Setup
+        CreatePostingSetup(SalesHeader);
 
         SetPosSaleCustomer(POSSale, Customer."No.");
 
@@ -1097,10 +1064,8 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
 
         InsertSalesPersonToSalesHeader(SalespersonPurchaser, SalesHeader);
 
-        // [GIVEN] Tax Posting Setup
-        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
-        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+        // [GIVEN] Posting Setup
+        CreatePostingSetup(SalesHeader);
 
         SetPosSaleCustomer(POSSale, SalesHeader."Bill-to Customer No.");
 
@@ -1160,10 +1125,8 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
         SaleLine.SetRange("Document Type", SalesHeader."Document Type");
         SaleLine.FindFirst();
 
-        // [GIVEN] Tax Posting Setup
-        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
-        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+        // [GIVEN] Posting Setup
+        CreatePostingSetup(SalesHeader);
 
         SetPosSaleCustomer(POSSale, SalesHeader."Bill-to Customer No.");
 
@@ -1223,10 +1186,8 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
         SaleLine.SetRange("Document Type", SalesHeader."Document Type");
         SaleLine.FindFirst();
 
-        // [GIVEN] Tax Posting Setup
-        CreateVATPostingSetup(VATPostingSetup, "NPR POS Tax Calc. Type"::"Normal VAT");
-        AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
-        AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup);
+        // [GIVEN] Posting Setup
+        CreatePostingSetup(SalesHeader);
 
         SetPosSaleCustomer(POSSale, SalesHeader."Bill-to Customer No.");
 
@@ -1333,32 +1294,23 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
     #endregion NPRGroupCodesSelectExistingGroupCodePageHandler
 
 
-    local procedure CreateVATPostingSetup(var VATPostingSetup: Record "VAT Posting Setup"; TaxCaclType: Enum "NPR POS Tax Calc. Type")
+    local procedure CreatePostingSetup(SalesHeader: Record "Sales Header")
     var
-        VATProductPostingGroup: Record "VAT Product Posting Group";
-        LibraryTaxCalc2: codeunit "NPR POS Lib. - Tax Calc.";
-        LibraryERM: Codeunit "Library - ERM";
-    begin
-        LibraryERM.CreateVATProductPostingGroup(VATProductPostingGroup);
-        if TaxCaclType = TaxCaclType::"Sales Tax" then
-            LibraryTaxCalc2.CreateSalesTaxPostingSetup(VATPostingSetup, VATBusinessPostingGroup.Code, VATProductPostingGroup.Code, TaxCaclType)
-        else
-            LibraryTaxCalc2.CreateTaxPostingSetup(VATPostingSetup, VATBusinessPostingGroup.Code, VATProductPostingGroup.Code, TaxCaclType);
-    end;
-
-    local procedure AssignVATBusPostGroupToPOSPostingProfile(VATBusPostingGroupCode: Code[20])
-    var
+        SalesLine: Record "Sales Line";
+        Item: Record Item;
         LibraryPOSMasterData: codeunit "NPR Library - POS Master Data";
     begin
-        LibraryPOSMasterData.AssignVATBusPostGroupToPOSPostingProfile(POSStore, VATBusPostingGroupCode);
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.SetRange(Type, "Sales Line Type"::Item);
+        SalesLine.SetLoadFields("No.");
+        if SalesLine.FindSet() then
+            repeat
+                Item.Get(SalesLine."No.");
+                LibraryPOSMasterData.CreatePostingSetupForSaleItem(Item, POSUnit, POSStore);
+            until SalesLine.Next() = 0;
     end;
 
-    local procedure AssignVATPostGroupToPOSSalesRoundingAcc(VATPostingSetup: Record "VAT Posting Setup")
-    var
-        LibraryPOSMasterData: codeunit "NPR Library - POS Master Data";
-    begin
-        LibraryPOSMasterData.AssignVATPostGroupToPOSSalesRoundingAcc(POSStore, VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group");
-    end;
 
     local procedure InsertSalesPersonToSalesHeader(SalespersonPurchaser: Record "Salesperson/Purchaser"; var SalesHeader: Record "Sales Header")
     begin
