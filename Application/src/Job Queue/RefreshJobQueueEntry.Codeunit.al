@@ -46,7 +46,8 @@ codeunit 6248478 "NPR Refresh Job Queue Entry"
             if JQMonitorEntry2."JQ Runner User Name" = '' then
                 JQMonitorEntry2."JQ Runner User Name" := JQRefreshSetup."Default Refresher User Name";
         RefreshJobQueueEntry(JQMonitorEntry2, NotProtectedJob);
-        JQMonitorEntry."Earliest Start Date/Time" := JQMonitorEntry2."Earliest Start Date/Time";
+        if JQMonitorEntry."Earliest Start Date/Time" = 0DT then
+            JQMonitorEntry."Earliest Start Date/Time" := JQMonitorEntry2."Earliest Start Date/Time";
         JQMonitorEntry."Job Queue Entry ID" := JQMonitorEntry2."Job Queue Entry ID";
         JQMonitorEntry."Last Refresh Status" := JQMonitorEntry."Last Refresh Status"::Success;
 
@@ -79,7 +80,7 @@ codeunit 6248478 "NPR Refresh Job Queue Entry"
                     ManagedByApp.Insert();
                 end;
             end;
-            JobQueueMgt.StartJobQueueEntry(JobQueueEntry);
+            JobQueueMgt.StartJobQueueEntry(JobQueueEntry, JobQueueMgt.NextDueRunDateTime(JobQueueEntry, JQMonitorEntry."Earliest Start Date/Time"));
             JQMonitorEntry."Earliest Start Date/Time" := JobQueueEntry."Earliest Start Date/Time";
             JQMonitorEntry."Job Queue Entry ID" := JobQueueEntry.ID;
             exit(true);

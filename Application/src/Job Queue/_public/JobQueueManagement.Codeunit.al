@@ -375,8 +375,7 @@
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24)
         JobQueueEntry."Priority Within Category" := Parameters."Priority Within Category";
 #endif
-        if Parameters."Expiration Date/Time" <> 0DT then
-            JobQueueEntry."Expiration Date/Time" := Parameters."Expiration Date/Time";
+        JobQueueEntry."Expiration Date/Time" := Parameters."Expiration Date/Time";
         JobQueueEntry."NPR Auto-Resched. after Error" := Parameters."NPR Auto-Resched. after Error";
         JobQueueEntry."NPR Auto-Resched. Delay (sec.)" := Parameters."NPR Auto-Resched. Delay (sec.)";
         JobQueueEntry."NPR Heartbeat URL" := Parameters."NPR Heartbeat URL";
@@ -507,24 +506,8 @@
     end;
 
     local procedure HasValidStartDT(JobQueueEntry: Record "Job Queue Entry"; NotBeforeDateTime: DateTime): Boolean
-    var
-#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24)
-        JobQueueDispatcher: Codeunit "Job Queue Dispatcher";
-#endif
-        NextRunDateTimeIfFinishedNow: DateTime;
     begin
-#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24
-        NextRunDateTimeIfFinishedNow := RoundDateTime(CalcNextRunDateTimeForNPRecurringJob(JobQueueEntry, CurrentDateTime(), false), 60000, '>');
-#else
-        NextRunDateTimeIfFinishedNow := RoundDateTime(JobQueueDispatcher.CalcNextRunTimeForRecurringJob(JobQueueEntry, CurrentDateTime()), 60000, '>');
-#endif
-        if NotBeforeDateTime > NextRunDateTimeIfFinishedNow then
-            NextRunDateTimeIfFinishedNow := RoundDateTime(NotBeforeDateTime, 60000, '>');
-
-        exit(
-            (JobQueueEntry."Earliest Start Date/Time" <> 0DT) and
-            (JobQueueEntry."Earliest Start Date/Time" <= NextRunDateTimeIfFinishedNow) and
-            (JobQueueEntry."Earliest Start Date/Time" >= RoundDateTime(NotBeforeDateTime, 60000, '<')));
+        exit(JobQueueEntry."Earliest Start Date/Time" in [RoundDateTime(NotBeforeDateTime, MinutesToDuration(3), '<') .. RoundDateTime(NotBeforeDateTime, MinutesToDuration(3), '>')]);
     end;
 
     local procedure GetJQRefresherSetup()
@@ -975,19 +958,47 @@
         Clear(RerunDelaySec);
     end;
 
-    local procedure NextDueRunDateTime(JobQueueEntry: Record "Job Queue Entry"): DateTime
-    var
-        JobQueueDispatcher: Codeunit "Job Queue Dispatcher";
+    internal procedure NextDueRunDateTime(JobQueueEntry: Record "Job Queue Entry"; NotBeforeDateTime: DateTime): DateTime
     begin
-        if not JobQueueEntry."Recurring Job" then begin
-            if JobQueueEntry."Earliest Start Date/Time" <> 0DT then
-                exit(JobQueueEntry."Earliest Start Date/Time");
-            exit(CurrentDateTime());
-        end;
-        exit(JobQueueDispatcher.CalcNextRunTimeForRecurringJob(JobQueueEntry, LastSuccessfulRunDateTime(JobQueueEntry)));
+        JobQueueEntry."Earliest Start Date/Time" := NotBeforeDateTime;
+        exit(NextDueRunDateTime(JobQueueEntry));
     end;
 
-    local procedure LastSuccessfulRunDateTime(JobQueueEntry: Record "Job Queue Entry"): DateTime
+    internal procedure NextDueRunDateTime(JobQueueEntry: Record "Job Queue Entry"): DateTime
+    var
+        JobQueueDispatcher: Codeunit "Job Queue Dispatcher";
+        LastSuccessfulRunDateTime: DateTime;
+    begin
+        if (JobQueueEntry."Earliest Start Date/Time" = 0DT) or (JobQueueEntry."Earliest Start Date/Time" < CurrentDateTime()) then
+            JobQueueEntry."Earliest Start Date/Time" := NowWithDelayInSeconds(1);
+
+        if not JobQueueEntry."Recurring Job" then
+            exit(JobQueueEntry."Earliest Start Date/Time");
+
+        LastSuccessfulRunDateTime := GetLastSuccessfulRunDateTime(JobQueueEntry);
+        if LastSuccessfulRunDateTime = 0DT then begin
+            AdjustForRunWindow(JobQueueEntry);
+            exit(JobQueueDispatcher.CalcInitialRunTime(JobQueueEntry, 0DT));
+        end;
+        exit(JobQueueDispatcher.CalcNextRunTimeForRecurringJob(JobQueueEntry, LastSuccessfulRunDateTime));
+    end;
+
+    local procedure AdjustForRunWindow(var JobQueueEntry: Record "Job Queue Entry")
+    begin
+        if JobQueueEntry."Earliest Start Date/Time" < CurrentDateTime() then
+            JobQueueEntry."Earliest Start Date/Time" := NowWithDelayInSeconds(1);
+        if JobQueueEntry."Starting Time" <> 0T then
+            JobQueueEntry."Earliest Start Date/Time" := CreateDateTime(DT2Date(JobQueueEntry."Earliest Start Date/Time"), JobQueueEntry."Starting Time");
+        if JobQueueEntry."Ending Time" = 0T then
+            exit;
+        if (DT2Date(JobQueueEntry."Earliest Start Date/Time") = Today()) and
+           (JobQueueEntry."Earliest Start Date/Time" > CreateDateTime(Today(), JobQueueEntry."Ending Time")) and
+           (JobQueueEntry."Starting Time" <= JobQueueEntry."Ending Time")
+        then
+            JobQueueEntry."Earliest Start Date/Time" := CreateDateTime(Today() + 1, JobQueueEntry."Starting Time");
+    end;
+
+    local procedure GetLastSuccessfulRunDateTime(JobQueueEntry: Record "Job Queue Entry"): DateTime
     var
         JobQueueLogEntry: Record "Job Queue Log Entry";
     begin
@@ -1001,7 +1012,7 @@
             else
                 exit(JobQueueLogEntry."Start Date/Time");
 
-        exit(HasNeverBeenRunDT());
+        exit(0DT);
     end;
 
 #if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24
@@ -1093,6 +1104,11 @@
         if Found then
             NewRunDateTime := NewRunDateTime + DaysToDuration(NoOfDays);
     end;
+
+    local procedure HasNeverBeenRunDT(): DateTime
+    begin
+        exit(CreateDateTime(DMY2Date(1, 1, 2000), 0T));
+    end;
 #endif
 
     internal procedure IsNPRecurringJob(JobQueueEntry: Record "Job Queue Entry"): Boolean
@@ -1102,11 +1118,6 @@
     begin
         OnCheckIfIsNPRecurringJob(JobQueueEntry, IsNpJob, Handled);
         exit(IsNpJob);
-    end;
-
-    local procedure HasNeverBeenRunDT(): DateTime
-    begin
-        exit(CreateDateTime(DMY2Date(1, 1, 2000), 0T));
     end;
 
     local procedure IsStale(JobQueueEntry: Record "Job Queue Entry"): Boolean

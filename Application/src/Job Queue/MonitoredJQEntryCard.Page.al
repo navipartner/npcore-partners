@@ -79,6 +79,19 @@ page 6185042 "NPR Monitored JQ Entry Card"
                     Importance = Additional;
                     ToolTip = 'Specifies how many seconds to wait before re-running this job queue task in the event of a failure.';
                 }
+                field("Earliest Start Date/Time"; Rec."Earliest Start Date/Time")
+                {
+                    Caption = 'First Run Date/Time';
+                    ApplicationArea = NPRRetail;
+                    Importance = Additional;
+                    ToolTip = 'Specifies the date and time when the job queue entry should be run for the first time.';
+                }
+                field("Expiration Date/Time"; Rec."Expiration Date/Time")
+                {
+                    ApplicationArea = NPRRetail;
+                    Importance = Additional;
+                    ToolTip = 'Specifies the date and time when the job queue entry is to expire, after which the job queue entry will not be run.';
+                }
 #if not BC17
                 field(Timeout; Rec."Job Timeout")
                 {
