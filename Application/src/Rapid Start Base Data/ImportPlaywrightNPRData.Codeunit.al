@@ -27,6 +27,8 @@
     procedure ImportPosUnitsAndUsers()
     var
         UserPosUnitMapping: Dictionary of [Code[50], Code[10]];
+        AllowHttpCalls, BufBoolean : Boolean;
+        GetFeatureFlags: Codeunit "NPR Get Feature Flags JQ";
     begin
         // User to PosUnit mapping
         UserPosUnitMapping.Add('OLDRESTUSER', '04');
@@ -40,6 +42,10 @@
 
         // Run mapping
         AssignPosUnitsToUsers(UserPosUnitMapping, '01');
+
+        CheckAndSetAllowHttpCalls(true, AllowHttpCalls);
+        GetFeatureFlags.Run();
+        CheckAndSetAllowHttpCalls(AllowHttpCalls, BufBoolean);
     end;
 
     [NonDebuggable]
@@ -166,6 +172,44 @@
             TempCode := CopyStr(TempText, 1, 10);
             exit(TempCode);
         end;
+    end;
+
+    local procedure CheckAndSetAllowHttpCalls(NewValue: Boolean; var OriginalValue: Boolean)
+    var
+        NAVAppSetting: Record "NAV App Setting";
+#if not BC1700
+        EnvironmentInfo: Codeunit "Environment Information";
+#endif
+        AppInfo: ModuleInfo;
+    begin
+        if (GuiAllowed) then
+            exit;
+
+        // For good reason we don't want to enable outbound HTTP calls for the SaaS infrastructure without a human interaction.
+#if not BC1700
+        if (EnvironmentInfo.IsSaaSInfrastructure()) then
+            exit;
+#endif
+
+        NavApp.GetCurrentModuleInfo(AppInfo);
+
+        // Let's exit silently and avoid permission errors here.
+        if ((not NAVAppSetting.ReadPermission) and (not NAVAppSetting.WritePermission)) then
+            exit;
+
+        if not NAVAppSetting.Get(AppInfo.Id) then begin
+            NAVAppSetting.Init();
+            NAVAppSetting."App ID" := AppInfo.Id;
+            if not NAVAppSetting.Insert() then
+                exit;
+        end;
+
+        OriginalValue := NAVAppSetting."Allow HttpClient Requests";
+        if (NewValue = OriginalValue) then
+            exit;
+
+        NAVAppSetting."Allow HttpClient Requests" := NewValue;
+        if not NavAppSetting.Modify(true) then;
     end;
 
 }

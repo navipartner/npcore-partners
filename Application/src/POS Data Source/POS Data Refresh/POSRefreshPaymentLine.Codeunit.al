@@ -7,6 +7,7 @@ codeunit 6150784 "NPR POS Refresh Payment Line"
     var
         _rows: Dictionary of [Text, Text]; //Rec.SystemId, SerializedRowJsonObject
         _rowsNewInsert: Dictionary of [Text, Boolean]; //Rec.SystemId, InsertedInThisStack
+        UseLanguageAgnosticDataKeysFeatureTok: Label 'useLanguageAgnosticDataKeys', Locked = true;
 
     procedure GetDeltaData() Data: JsonObject
     var
@@ -22,6 +23,8 @@ codeunit 6150784 "NPR POS Refresh Payment Line"
         RowObjectText: Text;
         RowObject: JsonObject;
         POSDataManagement: Codeunit "NPR POS Data Management";
+        UseLanguageAgnosticDataKeys, PositionWithNames : Boolean;
+        FeatureFlag: Codeunit "NPR Feature Flags Management";
     begin
         //TODO: Fix frontend to support keyed SystemId objects instead of keyless array, so we can delete the restructuring below.
         //TODO: Fix frontend to support leaving out the legacy fields from the refresh JSON.
@@ -30,6 +33,9 @@ codeunit 6150784 "NPR POS Refresh Payment Line"
         Data.Add('Content', EmptyObject);
         Data.Add('isDelta', true);
         Data.Add('dataSource', POSDataManagement.POSDataSource_BuiltInPaymentLine());
+
+        UseLanguageAgnosticDataKeys := FeatureFlag.IsEnabled(UseLanguageAgnosticDataKeysFeatureTok);
+        PositionWithNames := (not UseLanguageAgnosticDataKeys);
 
         foreach RowObjectText in _rows.Values do begin
             RowObject.ReadFrom(RowObjectText);
@@ -44,7 +50,7 @@ codeunit 6150784 "NPR POS Refresh Payment Line"
         TotalsObject.Add('ReturnAmount', ReturnAmount);
         TotalsObject.Add('Subtotal', Subtotal);
         Data.Add('totals', TotalsObject);
-        Data.Add('currentPosition', POSPaymentLine.GetPosition(true));
+        Data.Add('currentPosition', POSPaymentLine.GetPosition(PositionWithNames));
 
         exit(Data);
     end;
@@ -153,7 +159,12 @@ codeunit 6150784 "NPR POS Refresh Payment Line"
         Handled: Boolean;
         MissingSubscriberErr: Label 'Extension "%1" for data source "%2" did not respond to %3 event.';
         DataRowLbl: Label '%1.%2', Locked = true;
+        UseLanguageAgnosticDataKeys, PositionWithNames : Boolean;
+        FeatureFlag: Codeunit "NPR Feature Flags Management";
     begin
+        UseLanguageAgnosticDataKeys := FeatureFlag.IsEnabled(UseLanguageAgnosticDataKeysFeatureTok);
+        PositionWithNames := (not UseLanguageAgnosticDataKeys);
+
         if not SkipContent then begin
             FieldsObject.Add(Format(Rec.FieldNo(Description)), Rec.Description);
             FieldsObject.Add(Format(Rec.FieldNo("Currency Amount")), Rec."Currency Amount");
@@ -178,7 +189,7 @@ codeunit 6150784 "NPR POS Refresh Payment Line"
             end;
         end;
 
-        RowObject.Add('position', Rec.GetPosition(true));
+        RowObject.Add('position', Rec.GetPosition(PositionWithNames));
         RowObject.Add('index', Rec."Line No.");
         RowObject.Add('negative', false);
         RowObject.Add('class', '');
