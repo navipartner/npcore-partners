@@ -148,6 +148,11 @@
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterReplaceMemberCard(OldMemberCardEntryNo: Integer; NewMemberCardEntryNo: Integer)
+    begin
+    end;
+
     #endregion
 
     #region SmartSearch

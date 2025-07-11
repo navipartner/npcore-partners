@@ -128,11 +128,13 @@
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
         MemberNotification: Codeunit "NPR MM Member Notification";
         MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
+        MembershipEvents: Codeunit "NPR MM Membership Events";
         MembershipStartDate: Date;
         MembershipUntilDate: Date;
         ResponseMessage: Text;
         MSG_1101: Label 'Quantity must be 1, when selling memberships.';
         RemoteMembership: Boolean;
+        MemberCardEntryNo: Integer;
     begin
 
         // MemberInfoCapture has a filter - refresh to first record of that filter
@@ -183,9 +185,13 @@
                     end;
 
                     if (MembershipSalesSetup."Business Flow Type" = MembershipSalesSetup."Business Flow Type"::REPLACE_CARD) then begin
-                        MemberManagement.BlockMemberCard(MemberManagement.GetCardEntryNoFromExtCardNo(MemberInfoCapture."Replace External Card No."), true);
+                        MemberCardEntryNo := MemberManagement.GetCardEntryNoFromExtCardNo(MemberInfoCapture."Replace External Card No.");
+                        MemberManagement.BlockMemberCard(MemberCardEntryNo, true);
                         MemberManagement.IssueMemberCard(MemberInfoCapture, MemberInfoCapture."Card Entry No.", ResponseMessage);
                         MemberInfoCapture.Modify();
+
+                        MembershipEvents.OnAfterReplaceMemberCard(MemberCardEntryNo, MemberInfoCapture."Card Entry No.");
+
                         if (MembershipSalesSetup."Member Card Type" in [MembershipSalesSetup."Member Card Type"::CARD_PASSSERVER, MembershipSalesSetup."Member Card Type"::PASSSERVER]) then
                             MemberNotification.CreateWalletSendNotification(MemberInfoCapture."Membership Entry No.", MemberInfoCapture."Member Entry No", MemberInfoCapture."Card Entry No.", TODAY);
                     end;
