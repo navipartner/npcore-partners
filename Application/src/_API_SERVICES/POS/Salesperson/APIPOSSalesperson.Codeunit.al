@@ -13,12 +13,14 @@ codeunit 6150690 "NPR API POS Salesperson"
         Body := Request.BodyJson();
         Pin := JsonHelper.GetJText(Body, 'pin', false);
         if (Pin <> '') and (StrLen(Pin) <= MaxStrLen(SalespersonPurchaser."NPR Register Password")) then begin
+            SalespersonPurchaser.ReadIsolation := IsolationLevel::ReadCommitted;
+            SalespersonSetLoadFields(SalespersonPurchaser);
             SalespersonPurchaser.SetRange("NPR Register Password", Pin);
             if SalespersonPurchaser.FindFirst() then
-                exit(Response.RespondOK(SalespersonAsJson(SalespersonPurchaser)));
+                exit(Response.RespondOK(SalespersonDto(SalespersonPurchaser)));
         end;
-        Response.CreateErrorResponse(Enum::"NPR API Error Code"::generic_error, 'Invalid pin', "NPR API HTTP Status Code"::Unauthorized);
 
+        exit(Response.CreateErrorResponse(Enum::"NPR API Error Code"::generic_error, 'Invalid pin', "NPR API HTTP Status Code"::Unauthorized));
     end;
 
     internal procedure ListSalesperson(Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
@@ -29,7 +31,11 @@ codeunit 6150690 "NPR API POS Salesperson"
         FieldList.Add(Salesperson.FieldNo(SystemId), 'id');
         FieldList.Add(Salesperson.FieldNo(Code), 'code');
         FieldList.Add(Salesperson.FieldNo(Name), 'name');
+        FieldList.Add(Salesperson.FieldNo("E-Mail"), 'email');
+        FieldList.Add(Salesperson.FieldNo("Phone No."), 'phoneNo');
+        FieldList.Add(Salesperson.FieldNo("NPR Supervisor POS"), 'isSupervisor');
         FieldList.Add(Salesperson.FieldNo(Blocked), 'blocked');
+        FieldList.Add(Salesperson.FieldNo("NPR POS Unit Group"), 'posUnitGroup');
         exit(Response.RespondOK(Request.GetData(Database::"Salesperson/Purchaser", FieldList)));
     end;
 
@@ -46,19 +52,10 @@ codeunit 6150690 "NPR API POS Salesperson"
             exit(Response.RespondBadRequest('Invalid value for path parameter: id'));
         Request.SkipCacheIfNonStickyRequest(GetTableIds());
         SalespersonPurchaser.ReadIsolation := IsolationLevel::ReadCommitted;
-        SalespersonPurchaser.SetLoadFields(SystemId, Code, Name);
+        SalespersonSetLoadFields(SalespersonPurchaser);
         if not SalespersonPurchaser.GetBySystemId(Id) then
             exit(Response.RespondResourceNotFound());
-        exit(Response.RespondOK(SalespersonAsJson(SalespersonPurchaser)));
-    end;
-
-    local procedure SalespersonAsJson(SalespersonPurchaser: Record "Salesperson/Purchaser") JsonBuilder: Codeunit "NPR Json Builder"
-    begin
-        JsonBuilder.StartObject('')
-            .AddProperty('id', Format(SalespersonPurchaser.SystemId, 0, 4).ToLower())
-            .AddProperty('code', SalespersonPurchaser.Code)
-            .AddProperty('name', SalespersonPurchaser.Name)
-        .EndObject();
+        exit(Response.RespondOK(SalespersonDto(SalespersonPurchaser)));
     end;
 
     procedure BlockSalesperson(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
@@ -72,16 +69,18 @@ codeunit 6150690 "NPR API POS Salesperson"
             exit(Response.RespondBadRequest('Missing required path parameter: id'));
         if not Evaluate(TestGuid, Id) then
             exit(Response.RespondBadRequest('Invalid value for path parameter: id'));
+
         Request.SkipCacheIfNonStickyRequest(GetTableIds());
+
         SalespersonPurchaser.ReadIsolation := IsolationLevel::ReadCommitted;
-        SalespersonPurchaser.SetLoadFields(SystemId, Code, Name, Blocked);
+        SalespersonSetLoadFields(SalespersonPurchaser);
 
         if not SalespersonPurchaser.GetBySystemId(Id) then
             exit(Response.RespondResourceNotFound());
 
         SalespersonPurchaser.Blocked := true;
         SalespersonPurchaser.Modify();
-        exit(Response.RespondOK(SalespersonBlockedAsJson(SalespersonPurchaser)));
+        exit(Response.RespondOK(SalespersonDto(SalespersonPurchaser)));
     end;
 
     procedure UnblockSalesperson(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
@@ -95,16 +94,18 @@ codeunit 6150690 "NPR API POS Salesperson"
             exit(Response.RespondBadRequest('Missing required path parameter: id'));
         if not Evaluate(TestGuid, Id) then
             exit(Response.RespondBadRequest('Invalid value for path parameter: id'));
+
         Request.SkipCacheIfNonStickyRequest(GetTableIds());
+
         SalespersonPurchaser.ReadIsolation := IsolationLevel::ReadCommitted;
-        SalespersonPurchaser.SetLoadFields(SystemId, Code, Name, Blocked);
+        SalespersonSetLoadFields(SalespersonPurchaser);
 
         if not SalespersonPurchaser.GetBySystemId(Id) then
             exit(Response.RespondResourceNotFound());
 
         SalespersonPurchaser.Blocked := false;
         SalespersonPurchaser.Modify();
-        exit(Response.RespondOK(SalespersonBlockedAsJson(SalespersonPurchaser)));
+        exit(Response.RespondOK(SalespersonDto(SalespersonPurchaser)));
     end;
 
     procedure CreateSalesperson(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
@@ -137,36 +138,78 @@ codeunit 6150690 "NPR API POS Salesperson"
         POSUnitGroup := Copystr(JsonHelper.GetJText(Body, 'posUnitGroup', false), 1, MaxStrLen(POSUnitGroup));
 
         CreateSalespersonPurchaser(SalespersonPurchaser, SalesPersonCode, SalesPersonName, Email, PhoneNo, RegisterPassword, SupervisorPOS, Blocked, POSUnitGroup);
-        exit(Response.RespondOK(CreateSalespersonAsJson(SalespersonPurchaser)));
+        exit(Response.RespondOK(SalespersonDto(SalespersonPurchaser)));
     end;
 
-    local procedure SalespersonBlockedAsJson(SalespersonPurchaser: Record "Salesperson/Purchaser") JsonBuilder: Codeunit "NPR Json Builder"
+    internal procedure UpdateSalesperson(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        Salesperson: Record "Salesperson/Purchaser";
+        SalespersonId: Guid;
+        Body, BufToken : JsonToken;
+        Id: Text;
+        JHelper: Codeunit "NPR Json Helper";
     begin
-        JsonBuilder.StartObject('')
-            .AddProperty('id', Format(SalespersonPurchaser.SystemId, 0, 4).ToLower())
-            .AddProperty('code', SalespersonPurchaser.Code)
-            .AddProperty('name', SalespersonPurchaser.Name)
-            .AddProperty('blocked', SalespersonPurchaser.Blocked)
-        .EndObject();
+        Id := Request.Paths().Get(3);
+        if Id = '' then
+            exit(Response.RespondBadRequest('Missing required path parameter: id'));
+        if not Evaluate(SalespersonId, Id) then
+            exit(Response.RespondBadRequest('Invalid value for path parameter: id'));
+
+        Salesperson.ReadIsolation := IsolationLevel::UpdLock;
+        if (not Salesperson.GetBySystemId(SalespersonId)) then
+            exit(Response.RespondResourceNotFound());
+
+        Body := Request.BodyJson();
+
+#pragma warning disable AA0139
+        if (Body.SelectToken('name', BufToken)) then
+            Salesperson.Name := JHelper.GetJText(Body, 'name', false);
+        if (Body.SelectToken('email', BufToken)) then
+            Salesperson."E-Mail" := JHelper.GetJText(Body, 'email', false);
+        if (Body.SelectToken('phoneNo', BufToken)) then
+            Salesperson."Phone No." := JHelper.GetJText(Body, 'phoneNo', false);
+        if (Body.SelectToken('isSupervisor', BufToken)) then
+            Salesperson."NPR Supervisor POS" := JHelper.GetJBoolean(Body, 'isSupervisor', false);
+        if (Body.SelectToken('posUnitGroup', BufToken)) then
+            Salesperson."NPR POS Unit Group" := JHelper.GetJText(Body, 'posUnitGroup', false);
+#pragma warning restore AA0139
+
+        Salesperson.Modify(true);
+        exit(Response.RespondOK(SalespersonDto(Salesperson)));
     end;
 
-    local procedure CreateSalespersonAsJson(SalespersonPurchaser: Record "Salesperson/Purchaser") JsonBuilder: Codeunit "NPR Json Builder"
+    local procedure SalespersonDto(Salesperson: Record "Salesperson/Purchaser") Json: Codeunit "NPR Json Builder"
     begin
-        JsonBuilder.StartObject('')
-            .AddProperty('id', Format(SalespersonPurchaser.SystemId, 0, 4).ToLower())
-            .AddProperty('code', SalespersonPurchaser.Code)
-            .AddProperty('name', SalespersonPurchaser.Name)
-            .AddProperty('email', SalespersonPurchaser."E-Mail")
-            .AddProperty('phoneNo', SalespersonPurchaser."Phone No.")
-            .AddProperty('isSupervisor', SalespersonPurchaser."NPR Supervisor POS")
-            .AddProperty('blocked', SalespersonPurchaser.Blocked)
-            .AddProperty('posUnitGroup', SalespersonPurchaser."NPR POS Unit Group")
-        .EndObject();
+        Json
+            .StartObject()
+                .AddProperty('id', Format(Salesperson.SystemId, 0, 4).ToLower())
+                .AddProperty('code', Salesperson.Code)
+                .AddProperty('name', Salesperson.Name)
+                .AddProperty('email', Salesperson."E-Mail")
+                .AddProperty('phoneNo', Salesperson."Phone No.")
+                .AddProperty('isSupervisor', Salesperson."NPR Supervisor POS")
+                .AddProperty('blocked', Salesperson.Blocked)
+                .AddProperty('posUnitGroup', Salesperson."NPR POS Unit Group")
+            .EndObject();
     end;
 
     local procedure GetTableIds() TableIds: List of [Integer]
     begin
         TableIds.Add(Database::"Salesperson/Purchaser");
+    end;
+
+    local procedure SalespersonSetLoadFields(var Salesperson: Record "Salesperson/Purchaser")
+    begin
+        Salesperson.SetLoadFields(
+            SystemId,
+            Code,
+            Name,
+            "E-Mail",
+            "Phone No.",
+            "NPR Supervisor POS",
+            Blocked,
+            "NPR POS Unit Group"
+        );
     end;
 
     local procedure CreateSalespersonPurchaser(var SalespersonPurchaser: Record "Salesperson/Purchaser"; SalesPersonCode: Code[20]; SalesPersonName: Text[50]; Email: Text[80]; PhoneNo: Text[30]; RegisterPassword: Code[20]; SupervisorPOS: Boolean; Blocked: Boolean; POSUnitGroup: Code[20])
@@ -182,7 +225,5 @@ codeunit 6150690 "NPR API POS Salesperson"
         SalespersonPurchaser.Validate("NPR POS Unit Group", POSUnitGroup);
         SalespersonPurchaser.Insert(true);
     end;
-
-
 }
 #endif

@@ -33,6 +33,8 @@ codeunit 6185056 "NPR API POS Handler" implements "NPR API Request Handler"
                 exit(APIPOSSalesperson.BlockSalesperson(Request));
             Request.Match('POST', 'pos/salesperson/:id/unblock'):
                 exit(APIPOSSalesperson.UnblockSalesperson(Request));
+            Request.Match('PATCH', '/pos/salesperson/:id'):
+                exit(APIPOSSalesperson.UpdateSalesperson(Request));
             Request.Match('POST', 'pos/salesperson'):
                 exit(APIPOSSalesperson.CreateSalesperson(Request));
             Request.Match('GET', '/pos/salesperson'):

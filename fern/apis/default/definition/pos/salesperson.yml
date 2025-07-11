@@ -7,6 +7,9 @@ types:
   salespersonId: 
     type: uuid
     docs: The id of a salesperson.
+    examples:
+      - name: ExampleSalespersonId
+        value: fafbee38-fae3-4eec-bbb1-97fed79cac41
 
   SalespersonLogin:
     docs: A request to login a salesperson
@@ -17,36 +20,10 @@ types:
         value:
           pin: "1234"
   
-  SalespersonInfo:
-    docs: Information about a salesperson
-    properties:
-      id: salespersonId
-      code: 
-        type: string
-        docs: The code of the Salesperson
-      name: 
-        type: string
-        docs: The name of the Salesperson
-    examples:
-      - name: ExampleSalespersonInfo
-        value:
-          id: "12345678-1234-1234-1234-123456789012"
-          code: "12345"
-          name: "Salesperson Name"
-
   ListSalesperson:
     docs: Information about a salesperson
+    extends: SalespersonDto
     properties:
-      id: salespersonId
-      code:
-        type: string
-        docs: The code of the Salesperson
-      name: 
-        type: string
-        docs: The name of the Salesperson
-      blocked:
-        type: boolean
-        docs: Indicates if the salesperson is blocked from using the system
       rowVersion: optional<string>
     examples:
       - name: ExampleSalespersonJohnDoe
@@ -54,13 +31,21 @@ types:
           id: 7c42dfde-1f7c-4afa-bd94-1bcc94d96d72
           code: "JOHN"
           name: "John Doe"
+          email: "john.doe@yahoo.com"
+          phoneNo: "+45521535353"
+          isSupervisor: true
           blocked: false
+          posUnitGroup: "1"
       - name: ExampleSalespersonJaneDoe
         value:
           id: fdbd5bd1-77b4-4224-9267-eaef153b41e9
           code: "JANE"
           name: "Jane Doe"
+          email: "jane.doe@yahoo.com"
+          phoneNo: "+45521535353"
+          isSupervisor: true
           blocked: true
+          posUnitGroup: "1"
 
   PaginatedSalesPersonResponse:
     docs: A paginated response containing multiple salespersons
@@ -78,85 +63,6 @@ types:
           data:
             - $ListSalesperson.ExampleSalespersonJohnDoe
             - $ListSalesperson.ExampleSalespersonJaneDoe
-
-  BlockSalesPerson:
-    docs: Blocks a specific salesperson
-    properties:
-      id: salespersonId
-      code: 
-        type: string
-        docs: The code of the Salesperson
-      name: 
-        type: string
-        docs: The name of the Salesperson
-      blocked:
-        type: boolean
-        docs: Specifies if the Salesperson is blocked
-    examples:
-      - name: ExampleBlockSalesPerson
-        value:
-          id: "12345678-1234-1234-1234-123456789012"
-          code: "12345"
-          name: "Salesperson Name"
-          blocked: true
-
-  UnblockSalesPerson:
-    docs: Unblocks a specific salesperson
-    properties:
-      id: salespersonId
-      code: 
-        type: string
-        docs: The code of the Salesperson
-      name: 
-        type: string
-        docs: The name of the Salesperson
-      blocked:
-        type: boolean
-        docs: Specifies if the Salesperson is blocked
-    examples:
-      - name: ExampleUnblockSalesPerson
-        value:
-          id: "12345678-1234-1234-1234-123456789012"
-          code: "12345"
-          name: "Salesperson Name"
-          blocked: true
-
-  CreateSalesPersonResponse:
-     docs: Creates a Salesperson
-     properties:
-      id: salespersonId
-      code: 
-        type: string
-        docs: The code of the Salesperson
-      name: 
-        type: string
-        docs: The name of the Salesperson
-      email:
-        type: string
-        docs: The email of the Salesperson
-      phoneNo:
-        type: string
-        docs: The Phone no. of the Salesperson
-      isSupervisor:
-        type: boolean
-        docs: Specifies if it is a Supervisor
-      blocked:
-        type: boolean
-        docs: Specifies if the salesperson is blocked from using the system
-      posUnitGroup:
-        type: string
-        docs: The POS Unit Group of the Salesperson
-     examples:
-      - name: ExampleCreateSalesPerson
-        value:
-          id: "12345678-1234-1234-1234-123456789012"
-          code: "12345"
-          name: "Salesperson Name"
-          email: "john.doe@yahoo.com"
-          phoneNo: "+45521535353"
-          isSupervisor: true
-          blocked: false
-          posUnitGroup: "1"
 
   CreateSalesPersonRequest:
     docs: Creates a Salesperson
@@ -206,6 +112,70 @@ types:
           blocked: true
           posUnitGroup: "1"  
 
+  UpdateSalespersonRequest:
+    docs: Request to update an existing salesperson
+    properties:
+      name: optional<string>
+      email: optional<string>
+      phoneNo: optional<string>
+      isSupervisor: optional<boolean>
+      posUnitGroup: optional<string>
+    examples:
+      - name: ExampleUpdateJohnDoe
+        value:
+          name: "John Doe"
+          email: "john.doe@yahoo.com"
+          phoneNo: "+4512345678"
+          isSupervisor: false
+          posUnitGroup: "2"
+
+  SalespersonDto:
+    docs: Information about a salesperson
+    properties:
+      id: salespersonId
+      code: 
+        type: string
+        docs: The code of the Salesperson
+      name: 
+        type: string
+        docs: The name of the Salesperson
+      email:
+        type: string
+        docs: The email of the Salesperson
+      phoneNo:
+        type: string
+        docs: The Phone no. of the Salesperson
+      isSupervisor:
+        type: boolean
+        docs: Specifies if it is a Supervisor
+      blocked:
+        type: boolean
+        docs: Specifies if the salesperson is blocked from using the system
+      posUnitGroup:
+        type: string
+        docs: The POS Unit Group of the Salesperson
+    examples:
+      - name: ExampleSalesperson
+        value:
+          id: $salespersonId.ExampleSalespersonId
+          code: "12345"
+          name: "Salesperson Name"
+          email: "john.doe@yahoo.com"
+          phoneNo: "+45521535353"
+          isSupervisor: true
+          blocked: true
+          posUnitGroup: "1"  
+      - name: ExampleSalespersonUpdated
+        value:
+          id: $salespersonId.ExampleSalespersonId
+          code: "12345"
+          name: "John Doe"
+          email: "john.doe@yahoo.com"
+          phoneNo: "+4512345678"
+          isSupervisor: false
+          blocked: true
+          posUnitGroup: "2"
+
 service:
   auth: true
   base-path: /pos
@@ -219,7 +189,7 @@ service:
         id: salespersonId
       request:
         name: getSalespersonRequest
-      response: SalespersonInfo
+      response: SalespersonDto
       examples:
         - name: Example successful login
           path-parameters:
@@ -228,7 +198,7 @@ service:
             company: $globalApiTypes.Company.ExampleCompanyCronus
             id: "12345678-1234-1234-1234-123456789012"
           response:
-            body: $SalespersonInfo.ExampleSalespersonInfo
+            body: $SalespersonDto.ExampleSalesperson
 
     ListSalesperson:
       display-name: List salespersons
@@ -259,7 +229,7 @@ service:
       method: POST
       path: "/salesperson/login"
       request: SalespersonLogin
-      response: SalespersonInfo
+      response: SalespersonDto
       examples:
         - name: Example successful login
           path-parameters:
@@ -268,7 +238,7 @@ service:
             company: $globalApiTypes.Company.ExampleCompanyCronus
           request: $SalespersonLogin.ExampleSalespersonLogin
           response:
-            body: $SalespersonInfo.ExampleSalespersonInfo
+            body: $SalespersonDto.ExampleSalesperson
 
     BlockSalespersonPurchaser:
       display-name: Block Salesperson
@@ -279,7 +249,7 @@ service:
         id: salespersonId
       request:
         name: BlockSalesPersonPurchaser
-      response: BlockSalesPerson
+      response: SalespersonDto
       examples:
         - name: Example successful block
           path-parameters:
@@ -288,7 +258,7 @@ service:
             company: $globalApiTypes.Company.ExampleCompanyCronus
             id: "12345678-1234-1234-1234-123456789012"
           response:
-            body: $BlockSalesPerson.ExampleBlockSalesPerson
+            body: $SalespersonDto.ExampleSalesperson
 
     UnblockSalespersonPurchaser:
       display-name: Unblock Salesperson
@@ -299,7 +269,7 @@ service:
         id: salespersonId
       request:
         name: UnblockSalesPersonPurchaser
-      response: UnblockSalesPerson
+      response: SalespersonDto
       examples:
         - name: Example successful unblock
           path-parameters:
@@ -308,7 +278,7 @@ service:
             company: $globalApiTypes.Company.ExampleCompanyCronus
             id: "12345678-1234-1234-1234-123456789012"
           response:
-            body: $UnblockSalesPerson.ExampleUnblockSalesPerson
+            body: $SalespersonDto.ExampleSalesperson
 
     CreateSalesPersonPurchaser:
       display-name: Create Salesperson
@@ -318,7 +288,7 @@ service:
       request:
         name: CreateSalesPersonPurchaser
         body: CreateSalesPersonRequest
-      response: CreateSalesPersonResponse
+      response: SalespersonDto
       examples:
         - name: Example successful create Salesperson
           path-parameters:
@@ -327,5 +297,28 @@ service:
             company: $globalApiTypes.Company.ExampleCompanyCronus
           request: $CreateSalesPersonRequest.ExampleCreateSalesPersonRequest
           response:
-            body: $CreateSalesPersonResponse.ExampleCreateSalesPerson
+            body: $SalespersonDto.ExampleSalesperson
+    
+    UpdateSalesperson:
+      display-name: Update Salesperson
+      docs: Updates an existing Salesperson
+      method: PATCH
+      path: "/salesperson/{id}"
+      request:
+        name: UpdateSalesperson
+        body: UpdateSalespersonRequest
+      path-parameters:
+        id: salespersonId
+      response: SalespersonDto
+      examples:
+        - name: Example successful update salesperson
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            id: $salespersonId.ExampleSalespersonId
+          request: $UpdateSalespersonRequest.ExampleUpdateJohnDoe
+          response:
+            body: $SalespersonDto.ExampleSalespersonUpdated
+
           
