@@ -43,9 +43,12 @@ table 6059870 "NPR Job Queue Refresh Setup"
                 ResponseText: Text;
                 OnPremLbl: Label 'NP Retail External JQ Refresher integration is supported only on Cloud environment.\Current environment - ''OnPrem''.';
             begin
-                if "Use External JQ Refresher" and EnvironmentInformation.IsOnPrem() then
-                    Error(OnPremLbl);
-                ExternalJQRefresherMgt.CheckBaseAppVerion(true);
+                if "Use External JQ Refresher" then begin
+                    if EnvironmentInformation.IsOnPrem() then
+                        Error(OnPremLbl);
+                    ExternalJQRefresherMgt.CheckBaseAppVerion(true);
+                end;
+                ExternalJQRefresherMgt.PromptOnHttpCallsIfSandbox();
                 if "Use External JQ Refresher" then begin
                     "Ext. JQ Refresher Enabled at" := CurrentDateTime();
                     InitWebserviceTimeZone();

@@ -286,6 +286,56 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
         HttpClient.Send(HttpRequestMessage, HttpResponseMessage);
     end;
 
+#if not (BC17 or BC18)
+    local procedure HttpCallsAllowed(): Boolean
+    var
+        NavAppSettings: Record "NAV App Setting";
+        EnvironmentInformation: Codeunit "Environment Information";
+        CurrentModuleInfo: ModuleInfo;
+    begin
+        if not EnvironmentInformation.IsSandbox() then
+            exit(true);
+        NavApp.GetCurrentModuleInfo(CurrentModuleInfo);
+        exit(NavAppSettings.Get(CurrentModuleInfo.Id()) and NavAppSettings."Allow HttpClient Requests");
+    end;
+#endif
+
+    internal procedure PromptOnHttpCallsIfSandbox()
+    var
+        NavAppSettings: Record "NAV App Setting";
+        [SecurityFiltering(SecurityFilter::Ignored)]
+        NavAppSettings2: Record "NAV App Setting";
+        EnvironmentInformation: Codeunit "Environment Information";
+        CurrentModuleInfo: ModuleInfo;
+        AppSettingExists: Boolean;
+        ShowFailedMessage: Boolean;
+        EnableHttpCallsQst: Label 'This feature only works if you allow the "%1" extension from %2 to communicate with external services. This is turned off by default in Sandbox environments.\\Do you want to allow the "%1" extension to communicate with external services? You can always change this setting on the Extension Management page.', Comment = '%1 - The name of the extension, for example "NP Retail"; %2 - the publisher of the extension, for example "NaviPartner".';
+        CouldNotEnableHttpCallsMsg: Label 'The system could not enable external calls in this scenario. You may not have the necessary permissions to perform this operation.';
+    begin
+        if not EnvironmentInformation.IsSandbox() then
+            exit;
+        if not NavAppSettings2.WritePermission() then
+            exit;
+
+        NavApp.GetCurrentModuleInfo(CurrentModuleInfo);
+        AppSettingExists := NavAppSettings.Get(CurrentModuleInfo.Id());
+        if AppSettingExists and NavAppSettings."Allow HttpClient Requests" then
+            exit;
+
+        if Confirm(EnableHttpCallsQst, false, CurrentModuleInfo.Name, CurrentModuleInfo.Publisher) then begin
+            if not AppSettingExists then begin
+                NavAppSettings."App ID" := CurrentModuleInfo.Id();
+                NavAppSettings."Allow HttpClient Requests" := true;
+                ShowFailedMessage := not NavAppSettings.Insert(true);
+            end else begin
+                NavAppSettings."Allow HttpClient Requests" := true;
+                ShowFailedMessage := not NavAppSettings.Modify(true);
+            end;
+            if ShowFailedMessage then
+                Message(CouldNotEnableHttpCallsMsg);
+        end;
+    end;
+
     internal procedure CheckBaseAppVerion(ShowError: Boolean): Boolean
     var
         BaseAppID: Codeunit "BaseApp ID";
@@ -325,10 +375,11 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
     begin
         if (NewCompanyName <> '') and (NewCompanyName <> CompanyName()) then
             JQRefresherSetup.ChangeCompany(NewCompanyName);
-        if JQRefresherSetup.Get() and JQRefresherSetup."Use External JQ Refresher" then begin
-            JQRefresherSetup."Use External JQ Refresher" := false;
-            JQRefresherSetup.Modify();
-        end;
+        if not (JQRefresherSetup.Get() and JQRefresherSetup."Use External JQ Refresher") then
+            exit;
+        JQRefresherSetup."Ext. JQ Refresher Enabled at" := 0DT;
+        JQRefresherSetup."Use External JQ Refresher" := false;
+        JQRefresherSetup.Modify();
     end;
 
 #if BC19 or BC20 or BC21
@@ -340,8 +391,13 @@ codeunit 6248231 "NPR External JQ Refresher Mgt."
     var
         JQRefresherSetup: Record "NPR Job Queue Refresh Setup";
     begin
-        if JQRefresherSetup.Get() and JQRefresherSetup."Use External JQ Refresher" then begin
-            JQRefresherSetup.Validate("Use External JQ Refresher", false);
+        if not (JQRefresherSetup.Get() and JQRefresherSetup."Use External JQ Refresher") then
+            exit;
+        if HttpCallsAllowed() then
+            JQRefresherSetup.Validate("Use External JQ Refresher", false)
+        else begin
+            JQRefresherSetup."Ext. JQ Refresher Enabled at" := 0DT;
+            JQRefresherSetup."Use External JQ Refresher" := false;
             JQRefresherSetup.Modify();
         end;
     end;
