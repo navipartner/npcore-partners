@@ -65,11 +65,13 @@
     begin
     end;
 
+    [Obsolete('Please use event in codeunit "NPR NpRv Module Mgt." OnAfterSendVoucherSelection instead.', '2025-07-13')]
     [IntegrationEvent(false, false)]
     procedure OnAfterSendVoucherSelection(var VoucherEntry: Record "NPR NpRv Voucher Entry"; SalePOS: Record "NPR POS Sale")
     begin
     end;
 
+    [Obsolete('Please use event in codeunit "NPR NpRv Module Mgt." OnAfterSendSalesDocVoucherSelection instead.', '2025-07-13')]
     [IntegrationEvent(false, false)]
     procedure OnAfterSendSalesDocVoucherSelection(var VoucherEntry: Record "NPR NpRv Voucher Entry"; var SalesHeader: Record "Sales Header"; SalesInvHdrNo: Code[20]; SalesCrMemoNo: Code[20])
     begin

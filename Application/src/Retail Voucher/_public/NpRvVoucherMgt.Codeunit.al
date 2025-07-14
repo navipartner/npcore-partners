@@ -180,11 +180,13 @@
         Voucher: Record "NPR NpRv Voucher";
         VoucherEntry: Record "NPR NpRv Voucher Entry";
         NpDcCouponModuleMgt: Codeunit "NPR NpDc Coupon Module Mgt.";
+        NpRvModuleMgt: Codeunit "NPR NpRv Module Mgt.";
     begin
         VoucherEntry.SetFilter("Entry Type", '%1|%2|%3', VoucherEntry."Entry Type"::"Issue Voucher", VoucherEntry."Entry Type"::Payment, VoucherEntry."Entry Type"::"Top-up");
         VoucherEntry.SetRange("Register No.", SalePOS."Register No.");
         VoucherEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
         NpDcCouponModuleMgt.OnAfterSendVoucherSelection(VoucherEntry, SalePOS);
+        NpRvModuleMgt.OnAfterSendVoucherSelection(VoucherEntry, SalePOS);
 
         if VoucherEntry.IsEmpty() then
             exit;
