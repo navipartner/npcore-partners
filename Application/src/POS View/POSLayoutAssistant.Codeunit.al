@@ -491,12 +491,12 @@ codeunit 6059925 "NPR POS Layout Assistant"
         if FeatureEnabled then begin
             NaviPartnerFeature := Enum::"NPR Feature"::"POS Webservice Sessions";
             if NaviPartnerFeature.IsFeatureEnabled() then begin
-                if FeatureManagement.IsEnabled('posLayoutOAuthAccessToken') then begin
+                if FeatureManagement.IsEnabled('posLayoutOAuthAccessToken_v2') then begin
                     State := Random(10000);
                     RedirectURLText := RedirectURL;
-                    Scope := 'https://api.businesscentral.dynamics.com/user_impersonation Financials.ReadWrite.All';
+                    Scope := 'https://api.businesscentral.dynamics.com/user_impersonation https://api.businesscentral.dynamics.com/Financials.ReadWrite.All';
                     EncodedScope := TypeHelper.UrlEncode(Scope);
-                    URLText := StrSubstNo('https://login.microsoftonline.com/%1/oauth2/v2.0/authorize?client_id=%2&redirect_uri=%3&state=%4&response_type=code&scope=%5&actor=application', AzureADTenant.GetAadTenantId(), ClientId, TypeHelper.UrlEncode(RedirectURLText), State, EncodedScope);
+                    URLText := StrSubstNo('https://login.microsoftonline.com/%1/oauth2/v2.0/authorize?client_id=%2&redirect_uri=%3&state=%4&response_type=code&scope=%5', AzureADTenant.GetAadTenantId(), ClientId, TypeHelper.UrlEncode(RedirectURLText), State, EncodedScope);
                     NPROAuthControlAddIn.SetRequestProps(URLText);
                     NPROAuthControlAddIn.RunModal();
                     AuthCode := NPROAuthControlAddIn.GetAuthCode();
