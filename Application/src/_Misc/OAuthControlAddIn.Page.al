@@ -40,6 +40,7 @@ page 6059982 "NPR OAuth ControlAddIn"
         _ReturnedState: Integer;
         _AuthError: Text;
         _AuthErrorLbl: Label 'Error: %1, description: %2', Comment = '%1 = error code, %2 = error description';
+        _TenantId: Text;
 
     local procedure HandleAuthCodeResponse(Response: Text)
     var
@@ -84,9 +85,13 @@ page 6059982 "NPR OAuth ControlAddIn"
         exit(_ReturnedState);
     end;
 
+    internal procedure SetTenant(TenantId: Text)
+    begin
+        _TenantId := TenantId;
+    end;
+
     internal procedure RequestToken(AuthCode: Text; RedirectUrl: Text; ClientId: Text; ClientSecret: Text; var AccessToken: Text)
     var
-        AzureADTenant: Codeunit "Azure AD Tenant";
         TypeHelper: Codeunit "Type Helper";
         Client: HttpClient;
         Content: HttpContent;
@@ -108,7 +113,9 @@ page 6059982 "NPR OAuth ControlAddIn"
         Content.GetHeaders(ContentHeaders);
         SetHeader(ContentHeaders, 'Content-Type', 'application/x-www-form-urlencoded');
 
-        Client.Post(StrSubstNo('https://login.microsoftonline.com/%1/oauth2/v2.0/token', AzureADTenant.GetAadTenantId()), Content, ResponseMsg);
+        if _TenantId = '' then
+            _TenantId := 'common';
+        Client.Post(StrSubstNo('https://login.microsoftonline.com/%1/oauth2/v2.0/token', _TenantId), Content, ResponseMsg);
 
         ResponseJson := ParseResponseAsJson(ResponseMsg);
         if ResponseJson.SelectToken('access_token', TempToken) then

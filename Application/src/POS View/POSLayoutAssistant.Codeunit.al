@@ -501,6 +501,7 @@ codeunit 6059925 "NPR POS Layout Assistant"
                     NPROAuthControlAddIn.RunModal();
                     AuthCode := NPROAuthControlAddIn.GetAuthCode();
                     AuthCodeErr := NPROAuthControlAddIn.GetAuthError();
+                    NPROAuthControlAddIn.SetTenant(AzureADTenant.GetAadTenantId());
                     NPROAuthControlAddIn.RequestToken(AuthCode, RedirectURL, ClientId, ClientSecret, AccessToken);
                     if (AccessToken <> '') and (AuthCodeErr = '') then
                         Success := true;

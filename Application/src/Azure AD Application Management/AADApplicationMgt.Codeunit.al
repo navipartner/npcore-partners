@@ -381,7 +381,9 @@ codeunit 6060060 "NPR AAD Application Mgt."
     local procedure GetGraphAccessToken(): Text
     var
         i: Integer;
+        OAuth2: Codeunit OAuth2;
         RedirectURL: Text;
+        Scopes: List of [Text];
         AccessToken: Text;
         TokenParts: List of [Text];
         AuthCodeErr: Text;
@@ -391,8 +393,10 @@ codeunit 6060060 "NPR AAD Application Mgt."
         TxtBuffer: Text;
         Remainder: Integer;
         KeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         ClientId: Text;
         ClientSecret: Text;
+        OAuthAuthorityUrl: Text;
         AADTenantId: Text;
         Convert: Codeunit "Base64 Convert";
         TypeHelper: Codeunit "Type Helper";
@@ -413,18 +417,35 @@ codeunit 6060060 "NPR AAD Application Mgt."
 
         RedirectURL := GetRedirectUrl();
 
+        Scopes.Add('https://graph.microsoft.com/Application.ReadWrite.All');
+
+        OAuthAuthorityUrl := StrSubstNo('https://login.microsoftonline.com/%1/oauth2/v2.0/authorize', AADTenantId);
+
         ClientId := KeyVaultMgt.GetAzureKeyVaultSecret('AzureADAppMgtClientId');
         ClientSecret := KeyVaultMgt.GetAzureKeyVaultSecret('AzureADAppMgtClientSecret');
 
-        State := Random(10000);
-        Scope := 'https://graph.microsoft.com/Application.ReadWrite.All';
-        EncodedScope := TypeHelper.UrlEncode(Scope);
-        URLText := StrSubstNo('https://login.microsoftonline.com/%1/oauth2/v2.0/authorize?client_id=%2&redirect_uri=%3&state=%4&response_type=code&scope=%5&actor=application', AADTenantId, ClientId, RedirectURL, State, EncodedScope);
-        NPROAuthControlAddIn.SetRequestProps(URLText);
-        NPROAuthControlAddIn.RunModal();
-        AuthCode := NPROAuthControlAddIn.GetAuthCode();
-        AuthCodeErr := NPROAuthControlAddIn.GetAuthError();
-        NPROAuthControlAddIn.RequestToken(AuthCode, RedirectURL, ClientId, ClientSecret, AccessToken);
+        if FeatureFlagsManagement.IsEnabled('oauthControladdinHandler') then begin
+            State := Random(10000);
+            Scope := 'https://graph.microsoft.com/Application.ReadWrite.All';
+            EncodedScope := TypeHelper.UrlEncode(Scope);
+            URLText := StrSubstNo('https://login.microsoftonline.com/%1/oauth2/v2.0/authorize?client_id=%2&redirect_uri=%3&state=%4&response_type=code&scope=%5', AADTenantId, ClientId, RedirectURL, State, EncodedScope);
+            NPROAuthControlAddIn.SetRequestProps(URLText);
+            NPROAuthControlAddIn.RunModal();
+            AuthCode := NPROAuthControlAddIn.GetAuthCode();
+            AuthCodeErr := NPROAuthControlAddIn.GetAuthError();
+            NPROAuthControlAddIn.SetTenant(AADTenantId);
+            NPROAuthControlAddIn.RequestToken(AuthCode, RedirectURL, ClientId, ClientSecret, AccessToken);
+        end else
+            OAuth2.AcquireTokenByAuthorizationCode(
+                ClientId,
+                ClientSecret,
+                OAuthAuthorityUrl,
+                RedirectURL,
+                Scopes,
+                Enum::"Prompt Interaction"::None,
+                AccessToken,
+                AuthCodeErr
+            );
 
         if (AccessToken = '') or (AuthCodeErr <> '') then
             Error(CouldNotGetAccessTokenErr, AuthCodeErr);
