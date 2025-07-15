@@ -43,12 +43,10 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         if _MerchantCurrencySetup.IsEmpty() then
             _AdyenMerchantSetup.TestField("Other commissions G/L Account");
 
-        if (RecLine."Realized Gains or Losses" <> 0) and (RecLine."Transaction Currency Code" <> '') then begin
-            _Currency.Get(RecLine."Transaction Currency Code");
-            _Currency.TestField("Realized Gains Acc.");
-            _Currency.TestField("Realized Losses Acc.");
-        end;
+        _Currency.InitRoundingPrecision();
+
         _ReconciliationLine := RecLine;
+        _ReconciliationLine.CalcFields("Transaction Posted", "Markup Posted", "Commissions Posted", "Realized Gains Posted", "Realized Losses Posted");
         _ReconciliationHeader := RecHeader;
         GetOriginAccount();
     end;
@@ -166,14 +164,17 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
 
     local procedure PostEFT()
     var
-        DimensionSetID: Integer;
         POSEntry: Record "NPR POS Entry";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         ReverseEFTTransactionRequest: Record "NPR EFT Transaction Request";
         POSPaymentLine: Record "NPR POS Entry Payment Line";
+        DimensionSetID: Integer;
+        OriginalAmountLCY: Decimal;
         EFTReversed: Boolean;
     begin
         EFTTransactionRequest.GetBySystemId(_ReconciliationLine."Matching Entry System ID");
+        POSPaymentLine.GetBySystemId(EFTTransactionRequest."Sales Line ID");
+        OriginalAmountLCY := POSPaymentLine."Amount (LCY)";
         case _ReconciliationLine."Transaction Type" of
             _ReconciliationLine."Transaction Type"::Chargeback,
             _ReconciliationLine."Transaction Type"::SecondChargeback,
@@ -181,7 +182,6 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
             _ReconciliationLine."Transaction Type"::ChargebackReversed,
             _ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo:
                 begin
-                    POSPaymentLine.GetBySystemId(EFTTransactionRequest."Sales Line ID");
                     CreateReverseEFTTransactionRequest(EFTTransactionRequest, ReverseEFTTransactionRequest, EFTReversed);
 
                     //TODO PostReversePOSPaymentLine
@@ -204,7 +204,7 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
 
         SetDimensions(POSEntry, DimensionSetID);
 
-        PostEntryToGL(DimensionSetID);
+        PostEntryToGL(DimensionSetID, OriginalAmountLCY);
     end;
 
     internal procedure GetNewReversedSystemId(): Guid
@@ -212,14 +212,27 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         exit(_NewReversedSystemId);
     end;
 
+    internal procedure IsRealizedGLPosted(): Boolean
+    begin
+        exit(_RealizedGLPosted);
+    end;
+
+    internal procedure RealizedGLAmount(): Decimal
+    begin
+        exit(_RealizedGLAmount);
+    end;
+
     local procedure PostMagento()
     var
+        CustLedgerEntry: Record "Cust. Ledger Entry";
         SalesHeader: Record "Sales Header";
         SalesInvHeader: Record "Sales Invoice Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
-        DimensionSetID: Integer;
         MagentoPaymentLine: Record "NPR Magento Payment Line";
         ReverseMagentoPaymentLine: Record "NPR Magento Payment Line";
+        DimensionSetID: Integer;
+        OriginalAmountLCY: Decimal;
+        DocumentFound: Boolean;
         MagentoReversed: Boolean;
     begin
         MagentoPaymentLine.GetBySystemId(_ReconciliationLine."Matching Entry System ID");
@@ -244,27 +257,70 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
                 end;
         end;
 
-        SalesHeader.Reset();
-        SalesHeader.SetRange("No.", MagentoPaymentLine."Document No.");
-        SalesHeader.SetRange("Document Type", MagentoPaymentLine."Document Type");
-        if not SalesHeader.FindFirst() then begin
-            if not SalesInvHeader.Get(MagentoPaymentLine."Document No.") then begin
-                if not SalesCrMemoHeader.Get(MagentoPaymentLine."Document No.") then
-                    Error(NoOriginalSalesDocumentFound, MagentoPaymentLine."Document No.")
-                else
-                    SetDimensions(SalesCrMemoHeader, DimensionSetID);
+        OriginalAmountLCY := _ReconciliationLine."Amount (TCY)";
+        case MagentoPaymentLine."Document Table No." of
+            Database::"Sales Header":
+                begin
+                    SalesHeader.SetLoadFields("Currency Factor", "Dimension Set ID");
+                    DocumentFound := SalesHeader.Get(MagentoPaymentLine."Document No.", MagentoPaymentLine."Document Type");
+                    if DocumentFound then begin
+                        SetDimensions(SalesHeader, DimensionSetID);
+                        if SalesHeader."Currency Factor" <> 0 then
+                            OriginalAmountLCY := Round(_ReconciliationLine."Amount (TCY)" / SalesHeader."Currency Factor", _Currency."Amount Rounding Precision");
+                    end;
+                end;
+            Database::"Sales Invoice Header":
+                begin
+                    SalesInvHeader.SetLoadFields("Currency Factor", "Dimension Set ID");
+                    DocumentFound := SalesInvHeader.Get(MagentoPaymentLine."Document No.");
+                    if DocumentFound then begin
+                        SetDimensions(SalesInvHeader, DimensionSetID);
+                        if SalesInvHeader."Currency Factor" <> 0 then
+                            OriginalAmountLCY := Round(_ReconciliationLine."Amount (TCY)" / SalesInvHeader."Currency Factor", _Currency."Amount Rounding Precision");
+                    end;
+                end;
+            Database::"Sales Cr.Memo Header":
+                begin
+                    SalesCrMemoHeader.SetLoadFields("Currency Factor", "Dimension Set ID");
+                    DocumentFound := SalesCrMemoHeader.Get(MagentoPaymentLine."Document No.");
+                    if DocumentFound then begin
+                        SetDimensions(SalesCrMemoHeader, DimensionSetID);
+                        if SalesCrMemoHeader."Currency Factor" <> 0 then
+                            OriginalAmountLCY := Round(_ReconciliationLine."Amount (TCY)" / SalesCrMemoHeader."Currency Factor", _Currency."Amount Rounding Precision");
+                    end;
+                end;
+        end;
+
+        if not DocumentFound and (MagentoPaymentLine."Document Table No." in [Database::"Sales Invoice Header", Database::"Sales Cr.Memo Header"]) then begin
+            CustLedgerEntry.SetCurrentKey("Document No.");
+            case MagentoPaymentLine."Document Table No." of
+                Database::"Sales Invoice Header":
+                    CustLedgerEntry.SetRange("Document Type", CustLedgerEntry."Document Type"::Invoice);
+                Database::"Sales Cr.Memo Header":
+                    CustLedgerEntry.SetRange("Document Type", CustLedgerEntry."Document Type"::"Credit Memo");
+            end;
+            CustLedgerEntry.SetRange("Document No.", MagentoPaymentLine."Document No.");
+            CustLedgerEntry.SetLoadFields("Original Currency Factor", "Dimension Set ID");
+            if CustLedgerEntry.FindFirst() then begin
+                SetDimensions(CustLedgerEntry, DimensionSetID);
+                if CustLedgerEntry."Original Currency Factor" <> 0 then
+                    OriginalAmountLCY := Round(_ReconciliationLine."Amount (TCY)" / CustLedgerEntry."Original Currency Factor", _Currency."Amount Rounding Precision");
             end else
-                SetDimensions(SalesInvHeader, DimensionSetID);
-        end else
-            SetDimensions(SalesHeader, DimensionSetID);
-        PostEntryToGL(DimensionSetID);
+                Error(NoOriginalSalesDocumentFound, MagentoPaymentLine."Document No.");
+        end;
+
+        PostEntryToGL(DimensionSetID, OriginalAmountLCY);
     end;
 
     local procedure PostSubscription()
     var
+        CurrExchRate: Record "Currency Exchange Rate";
         SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
         ReverseSubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+        SubscrRequest: Record "NPR MM Subscr. Request";
+        OriginalAmountLCY: Decimal;
     begin
+        SubscrPaymentRequest.GetBySystemId(_ReconciliationLine."Matching Entry System ID");
         case _ReconciliationLine."Transaction Type" of
             _ReconciliationLine."Transaction Type"::Chargeback,
             _ReconciliationLine."Transaction Type"::SecondChargeback,
@@ -272,23 +328,54 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
             _ReconciliationLine."Transaction Type"::ChargebackReversed,
             _ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo:
                 begin
-                    SubscrPaymentRequest.GetBySystemId(_ReconciliationLine."Matching Entry System ID");
                     CreateReverseSubscrPaymentRequest(SubscrPaymentRequest, ReverseSubscrPaymentRequest, _ReconciliationLine."Transaction Type");
                     _NewReversedSystemId := ReverseSubscrPaymentRequest.SystemId;
                 end;
         end;
-        PostEntryToGL(0);
+        SubscrRequest.Get(SubscrPaymentRequest."Subscr. Request Entry No.");
+        OriginalAmountLCY := Round(CurrExchRate.ExchangeAmtFCYToLCY(SubscrRequest."Posting Date", _ReconciliationLine."Transaction Currency Code", _ReconciliationLine."Amount (TCY)", CurrExchRate.ExchangeRate(SubscrRequest."Posting Date", _ReconciliationLine."Transaction Currency Code")), _Currency."Amount Rounding Precision");
+        PostEntryToGL(0, OriginalAmountLCY);
     end;
 
-    local procedure PostEntryToGL(DimensionSetID: Integer)
+    local procedure PostEntryToGL(DimensionSetID: Integer; OriginalAmountLCY: Decimal)
     var
         AdyenManagement: Codeunit "NPR Adyen Management";
+        TransactionAmountToPost: Decimal;
         GLEntryNo: Integer;
     begin
-        if (_ReconciliationLine."Amount (TCY)" <> 0) and (not _ReconciliationLine."Transaction Posted") then begin
-            GLEntryNo := CreatePostGL(_ReconciliationLine."Amount (TCY)", _ReconciledPaymentAccountType, _ReconciledPaymentAccountNo, _PaymentAccountType, _PaymentAccountNo, DimensionSetID, _ReconciliationLine."Transaction Currency Code", StrSubstNo(AdyenTransactionLabel, _ReconciliationLine."PSP Reference"), true);
+        if (_ReconciliationLine."Transaction Currency Code" <> '') and (_ReconciliationLine."Adyen Acc. Currency Code" <> _ReconciliationLine."Transaction Currency Code") then begin
+            TransactionAmountToPost := OriginalAmountLCY;
+            _ReconciliationLine."Realized Gains or Losses" := Round(_ReconciliationLine."Exchange Rate" * _ReconciliationLine."Amount (TCY)", _Currency."Amount Rounding Precision") - TransactionAmountToPost;
+            _RealizedGLAmount := _ReconciliationLine."Realized Gains or Losses";
+        end else
+            TransactionAmountToPost := _ReconciliationLine."Amount (TCY)";
+        if (TransactionAmountToPost <> 0) and (not _ReconciliationLine."Transaction Posted") then begin
+            GLEntryNo := CreatePostGL(TransactionAmountToPost, _ReconciledPaymentAccountType, _ReconciledPaymentAccountNo, _PaymentAccountType, _PaymentAccountNo, DimensionSetID, _ReconciliationLine."Adyen Acc. Currency Code", StrSubstNo(AdyenTransactionLabel, _ReconciliationLine."PSP Reference"), true);
             AdyenManagement.CreateGLEntryReconciliationLineRelation(GLEntryNo, _ReconciliationLine."Document No.", _ReconciliationLine."Line No.", _AmountType::Transaction, _ReconciliationLine."Amount(AAC)", _ReconciliationLine."Posting Date", _ReconciliationLine."Posting No.");
         end;
+        if not (_ReconciliationLine."Realized Gains Posted" or _ReconciliationLine."Realized Losses Posted") then begin
+            if (_ReconciliationLine."Realized Gains or Losses" <> 0) and (_ReconciliationLine."Transaction Currency Code" <> '') then begin
+                _Currency.Get(_ReconciliationLine."Transaction Currency Code");
+                _Currency.TestField("Realized Gains Acc.");
+                _Currency.TestField("Realized Losses Acc.");
+            end;
+
+            case true of
+                _ReconciliationLine."Realized Gains or Losses" < 0:
+                    begin
+                        GLEntryNo := CreatePostGL(_ReconciliationLine."Realized Gains or Losses", _PaymentAccountType::"G/L Account", _Currency."Realized Gains Acc.", _ReconciledPaymentAccountType, _ReconciledPaymentAccountNo, DimensionSetID, _ReconciliationLine."Adyen Acc. Currency Code", AdyenRealizedGainsLabel, false);
+                        AdyenManagement.CreateGLEntryReconciliationLineRelation(GLEntryNo, _ReconciliationLine."Document No.", _ReconciliationLine."Line No.", _AmountType::"Realized Gains", _ReconciliationLine."Realized Gains or Losses", _ReconciliationLine."Posting Date", _ReconciliationLine."Posting No.");
+                    end;
+                _ReconciliationLine."Realized Gains or Losses" > 0:
+                    begin
+                        GLEntryNo := CreatePostGL(_ReconciliationLine."Realized Gains or Losses", _PaymentAccountType::"G/L Account", _Currency."Realized Losses Acc.", _ReconciledPaymentAccountType, _ReconciledPaymentAccountNo, DimensionSetID, _ReconciliationLine."Adyen Acc. Currency Code", AdyenRealizedLossesLabel, false);
+                        AdyenManagement.CreateGLEntryReconciliationLineRelation(GLEntryNo, _ReconciliationLine."Document No.", _ReconciliationLine."Line No.", _AmountType::"Realized Losses", _ReconciliationLine."Realized Gains or Losses", _ReconciliationLine."Posting Date", _ReconciliationLine."Posting No.");
+                    end;
+            end;
+            if _ReconciliationLine."Realized Gains or Losses" <> 0 then
+                _RealizedGLPosted := true;
+        end;
+
         if (_ReconciliationLine."Markup (LCY)" <> 0) and (not _ReconciliationLine."Markup Posted") then begin
             _MerchantCurrencySetup.SetRange("Reconciliation Account Type", _MerchantCurrencySetup."Reconciliation Account Type"::Markup);
             if _MerchantCurrencySetup.FindFirst() then
@@ -304,15 +391,6 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
             else
                 GLEntryNo := CreatePostGL(_ReconciliationLine."Other Commissions (LCY)", _PaymentAccountType::"G/L Account", _AdyenMerchantSetup."Other commissions G/L Account", _ReconciledPaymentAccountType, _ReconciledPaymentAccountNo, DimensionSetID, _ReconciliationLine."Adyen Acc. Currency Code", AdyenOtherCommissionsLabel, false);
             AdyenManagement.CreateGLEntryReconciliationLineRelation(GLEntryNo, _ReconciliationLine."Document No.", _ReconciliationLine."Line No.", _AmountType::"Other commissions", _ReconciliationLine."Other Commissions (LCY)", _ReconciliationLine."Posting Date", _ReconciliationLine."Posting No.");
-        end;
-        if (_ReconciliationLine."Realized Gains or Losses" <> 0) and (not (_ReconciliationLine."Realized Gains Posted" or _ReconciliationLine."Realized Losses Posted")) then begin
-            if _ReconciliationLine."Realized Gains or Losses" < 0 then begin
-                GLEntryNo := CreatePostGL(_ReconciliationLine."Realized Gains or Losses", _PaymentAccountType::"G/L Account", _Currency."Realized Gains Acc.", _ReconciledPaymentAccountType, _ReconciledPaymentAccountNo, DimensionSetID, _ReconciliationLine."Adyen Acc. Currency Code", AdyenRealizedGainsLabel, false);
-                AdyenManagement.CreateGLEntryReconciliationLineRelation(GLEntryNo, _ReconciliationLine."Document No.", _ReconciliationLine."Line No.", _AmountType::"Realized Gains", _ReconciliationLine."Realized Gains or Losses", _ReconciliationLine."Posting Date", _ReconciliationLine."Posting No.");
-            end else begin
-                GLEntryNo := CreatePostGL(_ReconciliationLine."Realized Gains or Losses", _PaymentAccountType::"G/L Account", _Currency."Realized Losses Acc.", _ReconciledPaymentAccountType, _ReconciledPaymentAccountNo, DimensionSetID, _ReconciliationLine."Adyen Acc. Currency Code", AdyenRealizedLossesLabel, false);
-                AdyenManagement.CreateGLEntryReconciliationLineRelation(GLEntryNo, _ReconciliationLine."Document No.", _ReconciliationLine."Line No.", _AmountType::"Realized Losses", _ReconciliationLine."Realized Gains or Losses", _ReconciliationLine."Posting Date", _ReconciliationLine."Posting No.");
-            end;
         end;
     end;
 
@@ -334,6 +412,11 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
     local procedure SetDimensions(SalesCreditMemo: Record "Sales Cr.Memo Header"; var DimensionSetID: Integer)
     begin
         DimensionSetID := SalesCreditMemo."Dimension Set ID";
+    end;
+
+    local procedure SetDimensions(CustLedgerEntry: Record "Cust. Ledger Entry"; var DimensionSetID: Integer)
+    begin
+        DimensionSetID := CustLedgerEntry."Dimension Set ID";
     end;
 
     local procedure CreateReverseEFTTransactionRequest(EFTTransactionRequest: Record "NPR EFT Transaction Request"; var ReverseEFTTransactionRequest: Record "NPR EFT Transaction Request"; var EFTReversed: Boolean)
@@ -484,7 +567,6 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
             ReverseSubscrPaymentRequest := ExistingReversedSubscrPaymentRequest;
             exit;
         end;
-
         SubscrPaymentRequest.TestField("Subscr. Request Entry No.");
 
         case ReconciliationTransactionType of
@@ -502,7 +584,7 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
 
         SubscrReversalMgt.InitReversalRequest(SubscriptionRequest, SubscrPaymentRequest, PaymentRequestType, SubscrReversalRequest, ReverseSubscrPaymentRequest);
         ReverseSubscrPaymentRequest.Status := ReverseSubscrPaymentRequest.Status::Captured;
-        ReverseSubscrPaymentRequest."Status Change Date" := Today;
+        ReverseSubscrPaymentRequest."Status Change Date" := Today();
         ReverseSubscrPaymentRequest.PSP := SubscrPaymentRequest.PSP;
         ReverseSubscrPaymentRequest."PSP Reference" := SubscrPaymentRequest."PSP Reference";
         ReverseSubscrPaymentRequest."External Transaction ID" := SubscrPaymentRequest."External Transaction ID";
@@ -525,6 +607,8 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         _PaymentAccountNo: Code[20];
         _ReconciledPaymentAccountNo: Code[20];
         _NewReversedSystemId: Guid;
+        _RealizedGLAmount: Decimal;
+        _RealizedGLPosted: Boolean;
         NoOriginalDocumentFound: Label 'No POS Entry was found with No. %1.';
         NoOriginalSalesDocumentFound: Label 'No Sales Document was found with No. %1.';
         AdyenTransactionLabel: Label 'NP Pay: Transaction %1', MaxLength = 100;

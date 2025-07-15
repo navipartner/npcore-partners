@@ -555,7 +555,6 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
 
         if SubscriptionMatchingAllowed(SubscrPaymentRequest, ReconciliationLine, ReconciliationHeader, false) then begin
             ReconciliationLine.Status := ReconciliationLine.Status::Matched;
-            // TODO Calculate Realized Gains or Losses
             MatchedEntries += 1;
         end else
             ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Match";
@@ -566,7 +565,6 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
     local procedure TryMatchingPaymentWithEFT(var ReconciliationLine: Record "NPR Adyen Recon. Line"; var MatchedEntries: Integer; ReconciliationHeader: Record "NPR Adyen Reconciliation Hdr"): Boolean
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        PaymentLine: Record "NPR POS Entry Payment Line";
     begin
         EFTTransactionRequest.Reset();
         EFTTransactionRequest.SetRange("PSP Reference", ReconciliationLine."PSP Reference");
@@ -590,18 +588,6 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
 
         if EFTMatchingAllowed(EFTTransactionRequest, ReconciliationLine, ReconciliationHeader, true) then begin
             ReconciliationLine.Status := ReconciliationLine.Status::Matched;
-            if PaymentLine.GetBySystemId(EFTTransactionRequest."Sales Line ID") and
-                (ReconciliationLine."Adyen Acc. Currency Code" <> ReconciliationLine."Transaction Currency Code") and
-                (ReconciliationLine."Transaction Type" in
-                    [ReconciliationLine."Transaction Type"::Settled,
-                    ReconciliationLine."Transaction Type"::Refunded,
-                    ReconciliationLine."Transaction Type"::Chargeback,
-                    ReconciliationLine."Transaction Type"::SecondChargeback,
-                    ReconciliationLine."Transaction Type"::SettledExternallyWithInfo,
-                    ReconciliationLine."Transaction Type"::RefundedExternallyWithInfo,
-                    ReconciliationLine."Transaction Type"::ChargebackExternallyWithInfo])
-            then
-                ReconciliationLine."Realized Gains or Losses" := CalculateRealizedGL(ReconciliationLine, PaymentLine);
             MatchedEntries += 1;
         end else
             ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Match";
@@ -663,7 +649,6 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                 ReconciliationLine."Matching Entry System ID" := MagentoPaymentLine.SystemId;
                 if MagentoMatchingAllowed(MagentoPaymentLine, ReconciliationLine, ReconciliationHeader, true) then begin
                     ReconciliationLine.Status := ReconciliationLine.Status::Matched;
-                    // TODO Calculate Realized Gains or Losses
                     MatchedEntries += 1;
                 end else
                     ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Match";
@@ -994,6 +979,9 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
                       ReconciliationLine."Transaction Type"::ChargebackReversedExternallyWithInfo])
                 then
                     ReconciliationLine."Matching Entry System ID" := PostEFTTransaction.GetNewReversedSystemId();
+
+                if PostEFTTransaction.IsRealizedGLPosted() then
+                    ReconciliationLine."Realized Gains or Losses" := PostEFTTransaction.RealizedGLAmount();
             end else begin
                 _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", false, GetLastErrorText(), ReconciliationHeader."Webhook Request ID");
                 UnPostedEntries += 1;
@@ -1357,27 +1345,6 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         if (Temp_ExcelBuffer.Get(RowNo, ColNo)) then
             exit(Temp_ExcelBuffer."Cell Value as Text");
         exit('');
-    end;
-
-    local procedure CalculateRealizedGL(var ReconciliationLine: Record "NPR Adyen Recon. Line"; PaymentLine: Record "NPR POS Entry Payment Line") RealizedGLAmount: Decimal
-    var
-        AmountLCY: Decimal;
-        GrossCreditAAC: Decimal;
-        GrossCreditLCY: Decimal;
-    begin
-        AmountLCY := PaymentLine."Amount (LCY)";
-
-        if AmountLCY = 0 then
-            AmountLCY := ReconciliationLine."Amount (TCY)";
-
-        GrossCreditAAC := ReconciliationLine."Gross Credit" * ReconciliationLine."Exchange Rate";
-
-        if (_GLSetup."LCY Code" <> ReconciliationLine."Adyen Acc. Currency Code") then
-            GrossCreditLCY := Round(_CurrExchRate.ExchangeAmtFCYToLCY(DT2Date(ReconciliationLine."Transaction Date"), ReconciliationLine."Adyen Acc. Currency Code", GrossCreditAAC, _CurrExchRate.ExchangeRate(DT2Date(ReconciliationLine."Transaction Date"), ReconciliationLine."Adyen Acc. Currency Code")))
-        else
-            GrossCreditLCY := GrossCreditAAC;
-
-        RealizedGLAmount := Round(AmountLCY - GrossCreditLCY, 0.01);
     end;
 
     local procedure GetReportData(var ReportWebhookRequest: Record "NPR AF Rec. Webhook Request"; RecreateDocument: Boolean): Boolean

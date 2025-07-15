@@ -21,6 +21,7 @@ codeunit 6184908 "NPR Adyen Recon. Upgrade"
         FixMagentoPaymentLines();
         UpgradeMerchantAccountSetups();
         FixUnreconciledMagentoRefundPaymentLines();
+        RecreateForeignCurrencyDocuments();
     end;
 
     local procedure UpdatePSPReferenceForEFTTrans()
@@ -306,5 +307,43 @@ codeunit 6184908 "NPR Adyen Recon. Upgrade"
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep));
         LogMessageStopwatch.LogFinish();
 
+    end;
+
+    local procedure RecreateForeignCurrencyDocuments()
+    var
+        ReconHeader: Record "NPR Adyen Reconciliation Hdr";
+        ReconHeader2: Record "NPR Adyen Reconciliation Hdr";
+        ReconLine: Record "NPR Adyen Recon. Line";
+        MerchantAccount: Record "NPR Adyen Merchant Account";
+        AdyenTransMatching: Codeunit "NPR Adyen Trans. Matching";
+        MerchantLocalCurrency: Code[10];
+    begin
+        UpgradeStep := 'RecreateForeignCurrencyDocuments';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep)) then
+            exit;
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR Adyen Recon. Upgrade', UpgradeStep);
+
+        if MerchantAccount.FindSet() then
+            repeat
+                ReconHeader.SetRange("Merchant Account", MerchantAccount.Name);
+                if ReconHeader.FindFirst() then begin
+                    MerchantLocalCurrency := ReconHeader."Adyen Acc. Currency Code";
+                    ReconLine.SetRange("Merchant Account", ReconHeader."Merchant Account");
+                    ReconLine.SetFilter("Transaction Currency Code", '<>%1&<>%2', MerchantLocalCurrency, '');
+                    ReconLine.SetFilter(Status, '<>%1', ReconLine.Status::Posted);
+                    if ReconLine.FindSet() then
+                        repeat
+                            if ReconHeader2."Document No." <> ReconLine."Document No." then
+                                if ReconHeader2.Get(ReconLine."Document No.") then begin
+                                    if AdyenTransMatching.RecreateDocumentEntries(ReconHeader2) > 0 then
+                                        if AdyenTransMatching.MatchEntries(ReconHeader2) > 0 then
+                                            AdyenTransMatching.ReconcileEntries(ReconHeader2);
+                                end;
+                        until ReconLine.Next() = 0;
+                end;
+            until MerchantAccount.Next() = 0;
+
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", UpgradeStep));
+        LogMessageStopwatch.LogFinish();
     end;
 }

@@ -96,7 +96,6 @@ table 6150874 "NPR Adyen Recon. Line"
         }
         field(110; "Amount (TCY)"; Decimal)
         {
-            AutoFormatExpression = "Transaction Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount (TCY)';
             DataClassification = CustomerContent;
@@ -606,7 +605,7 @@ table 6150874 "NPR Adyen Recon. Line"
     internal procedure IsPosted(RecalcFlowFields: Boolean): Boolean
     begin
         if RecalcFlowFields then
-            CalcFields("Transaction Posted", "Markup Posted", "Commissions Posted", "Realized Gains Posted");
+            CalcFields("Transaction Posted", "Markup Posted", "Commissions Posted", "Realized Gains Posted", "Realized Losses Posted");
         exit("Transaction Posted" and "Markup Posted" and "Commissions Posted");
     end;
 }
