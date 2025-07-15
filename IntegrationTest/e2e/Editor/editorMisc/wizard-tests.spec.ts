@@ -5,8 +5,6 @@ import { removeLayout } from "../../fixtures/removeLayout";
 
 test.describe("Wizard modal tests", () => {
   test("testing wizard modal render", async ({ page }, workerInfo) => {
-    // skipping this test for now, but in the future we need to fix it
-    test.skip();
     const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(
