@@ -33,6 +33,15 @@ page 6059844 "NPR MM Edit Membership Entries"
                     ToolTip = 'Specifies the value of the Membership Code field.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Editable = ListIsEditable;
+                    trigger OnValidate()
+                    var
+                        Subscription: Record "NPR MM Subscription";
+                    begin
+                        if xRec."Membership Code" = Rec."Membership Code" then
+                            exit;
+                        Subscription.SetRange("Membership Ledger Entry No.", Rec."Entry No.");
+                        Subscription.ModifyAll("Membership Code", Rec."Membership Code");
+                    end;
                 }
                 field("Activate On First Use"; Rec."Activate On First Use")
                 {
@@ -45,12 +54,30 @@ page 6059844 "NPR MM Edit Membership Entries"
                     ToolTip = 'Specifies the value of the Valid From Date field.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Editable = ListIsEditable;
+                    trigger OnValidate()
+                    var
+                        Subscription: Record "NPR MM Subscription";
+                    begin
+                        if xRec."Valid From Date" = Rec."Valid From Date" then
+                            exit;
+                        Subscription.SetRange("Membership Ledger Entry No.", Rec."Entry No.");
+                        Subscription.ModifyAll("Valid From Date", Rec."Valid From Date");
+                    end;
                 }
                 field("Valid Until Date"; Rec."Valid Until Date")
                 {
                     ToolTip = 'Specifies the value of the Valid Until Date field.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Editable = ListIsEditable;
+                    trigger OnValidate()
+                    var
+                        Subscription: Record "NPR MM Subscription";
+                    begin
+                        if xRec."Valid Until Date" = Rec."Valid Until Date" then
+                            exit;
+                        Subscription.SetRange("Membership Ledger Entry No.", Rec."Entry No.");
+                        Subscription.ModifyAll("Valid Until Date", Rec."Valid Until Date");
+                    end;
                 }
                 field("Created At"; Rec."Created At")
                 {
@@ -147,6 +174,15 @@ page 6059844 "NPR MM Edit Membership Entries"
                     ToolTip = 'Specifies the value of the Blocked field.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Editable = ListIsEditable;
+                    trigger OnValidate()
+                    var
+                        Subscription: Record "NPR MM Subscription";
+                    begin
+                        if xRec.Blocked = Rec.Blocked then
+                            exit;
+                        Subscription.SetRange("Membership Ledger Entry No.", Rec."Entry No.");
+                        Subscription.ModifyAll(Blocked, Rec.Blocked);
+                    end;
                 }
                 field("Blocked At"; Rec."Blocked At")
                 {
