@@ -1179,7 +1179,7 @@ codeunit 85024 "NPR Retail Voucher Tests"
         NPRLibraryPOSMasterData.OpenPOSUnit(_POSUnit);
     end;
 
-    local procedure GetRandomVoucherAmount(PaymentMethod: Code[20]): Decimal
+    internal procedure GetRandomVoucherAmount(PaymentMethod: Code[20]): Decimal
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
         LibraryRandom: Codeunit "Library - Random";

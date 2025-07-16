@@ -13,6 +13,7 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
         _Customer: Record "Customer";
         _Salesperson: Record "Salesperson/Purchaser";
         _NPRGroupCode: Record "NPR Group Code";
+        _VoucherTypeDefault: Record "NPR NpRv Voucher Type";
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
@@ -647,6 +648,71 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
         Assert.IsTrue(AssemblyHeader.Get(Enum::"Assembly Document Type"::Order, AssembleToOrderLink."Assembly Document No."), 'Assembly Order must be created.');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CheckVoucherAmountExportedToSalesInvoice()
+    var
+        SalePOS: Record "NPR POS Sale";
+        POSEntry: Record "NPR POS Entry";
+        SaleLinePOS: Record "NPR POS Sale Line";
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        POSSale: Codeunit "NPR POS Sale";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        Assert: Codeunit "Assert";
+        SelectCustomerAction: Codeunit "NPR POS Action: Cust. Select-B";
+        RetailVoucherTests: Codeunit "NPR Retail Voucher Tests";
+        POSIssueMgt: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        SalesDocumentExportMgt: Codeunit "NPR Sales Doc. Exp. Mgt.";
+        VoucherAmount: Decimal;
+    begin
+        // [Scenario] //Check if voucher amount is same on created voucher and amount on posted sales invoice generated from SALES_DOC_EXP workflow
+
+        // [Given] Initialization data
+        InitializeData();
+        VoucherAmount := RetailVoucherTests.GetRandomVoucherAmount(_VoucherTypeDefault."Payment Type");
+        ChangeGLAccount25VAT(_VoucherTypeDefault."Account No.");
+
+        // [Given] Active POS session & sale
+        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, _Salesperson, POSSale);
+
+        // [Given] Voucher Line
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSIssueMgt.IssueVoucherCreate(POSSaleLine, NpRvVoucher, _VoucherTypeDefault, '0', 1, VoucherAmount, 0, '');
+        POSIssueMgt.CreateNpRvSalesLine(POSSale, NpRvSalesLine, NpRvVoucher, _VoucherTypeDefault, POSSaleLine);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        POSSaleLine.SetFirst();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
+
+        // [Given] Customer applied to sale
+        POSSale.GetCurrentSale(SalePOS);
+        SelectCustomerAction.AttachCustomer(SalePOS, '', 0, _Customer."No.", false);
+
+        // [When] Exporting to sales invoice with posting                
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        SalesDocumentExportMgt.SetDocumentTypeInvoice();
+        SalesDocumentExportMgt.SetInvoice(true);
+        SalesDocumentExportMgt.SetShip(true);
+        SalesDocumentExportMgt.ProcessPOSSale(POSSale);
+
+        // [Then] POS entry created as credit sale, POS sale ended and sales document is created, open and linked to POS entry.
+        POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
+        Assert.IsTrue(POSEntry.FindFirst(), 'Related POS Entry not found.');
+        Assert.IsTrue(POSEntry."Entry Type" = POSEntry."Entry Type"::"Credit Sale", 'POS Entry not created as Credit Sale.');
+        Assert.IsFalse(SalePOS.Find(), 'Sale must end when exporting to sales order');
+
+        NpRvVoucher.CalcFields(Amount);
+        if not SalesInvoiceHeader.FindLast() then;
+        SalesInvoiceHeader.CalcFields("Amount Including VAT");
+        // [Then] Check if amount on voucher and voucher on posted sales invoice is correct
+        // We are checking amount on posted sales invoice since there is only one line(voucher line)
+        Assert.AreEqual(SalesInvoiceHeader."Amount Including VAT", NpRvVoucher.Amount, 'Voucher amount not equal to the amount on voucher line on posted sales invoice.');
+    end;
+
     procedure InitializeData()
     var
         POSPostingProfile: Record "NPR POS Posting Profile";
@@ -663,6 +729,7 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
             NPRLibraryPOSMasterData.CreatePOSStore(_POSStore, POSPostingProfile.Code);
             NPRLibraryPOSMasterData.CreatePOSUnit(_POSUnit, _POSStore.Code, POSPostingProfile.Code);
             NPRLibraryPOSMasterData.CreateSalespersonForPOSUsage(_Salesperson);
+            NPRLibraryPOSMasterData.CreateDefaultVoucherType(_VoucherTypeDefault, false);
             LibrarySales.CreateCustomerWithAddress(_Customer);
             _Initialized := true;
         end;
@@ -772,4 +839,19 @@ codeunit 85022 "NPR POS Sales Doc Exp Tests"
         BOMItem.Modify();
     end;
     #endregion ModifyItemWithBOMAndAssemblyPolicy
+
+    #region ChangeVATOnVoucher
+    internal procedure ChangeGLAccount25VAT(GLAccountNo: Code[20])
+    var
+        GLAccount: Record "G/L Account";
+        VATPostingSetup: Record "VAT Posting Setup";
+    begin
+        if not GLAccount.Get(GLAccountNo) then
+            exit;
+        if not VATPostingSetup.Get(GLAccount."VAT Bus. Posting Group", GLAccount."VAT Prod. Posting Group") then
+            exit;
+        VATPostingSetup.Validate("VAT %", 25);
+        VATPostingSetup.Modify(true);
+    end;
+    #endregion ChangeVATOnVoucher
 }
