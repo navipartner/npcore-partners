@@ -19,6 +19,7 @@
 
     local procedure MemberSearchWorker(SearchTerm: Text[100]; var Member: Record "NPR MM Member"; SearchContext: Integer)
     var
+        Member2: Record "NPR MM Member";
         Membership: Record "NPR MM Membership";
         MemberCard: Record "NPR MM Member Card";
         MembershipRole: Record "NPR MM Membership Role";
@@ -29,21 +30,21 @@
         if (not ValidateSearchTerm(SearchTerm, SearchContext)) then
             exit;
 
-        Member.FilterGroup := -1;
-        ApplyMemberFilter(SearchTerm, SearchContext, Member);
-        Member.SetLoadFields("Entry No.");
+        Member2.FilterGroup := -1;
+        ApplyMemberFilter(SearchTerm, SearchContext, Member2);
+        Member2.SetLoadFields("Entry No.");
 
-        if (Member.HasFilter()) then begin
-            MemberFound := Member.FindSet();
+        if (Member2.HasFilter()) then begin
+            MemberFound := Member2.FindSet();
             if (MemberFound) then
                 repeat
-                    Member.Mark(true);
-                until (Member.Next() = 0);
+                    if Member.Get(Member2."Entry No.") then
+                        Member.Mark(true);
+                until (Member2.Next() = 0);
         end;
-        Member.FilterGroup := 0;
+        Member2.FilterGroup := 0;
 
         if (not MemberFound) then begin
-            Member.FilterGroup := -1;
             if (StrLen(SearchTerm) <= MaxStrLen(Membership."External Membership No.")) then
                 Membership.SetFilter("External Membership No.", '%1', UpperCase(SearchTerm));
             Events.OnAfterSetMembershipSmartSearchFilter(SearchTerm, SearchContext, MemberShip);
@@ -65,7 +66,6 @@
                     until (Membership.Next() = 0);
                 end;
             end;
-            Member.FilterGroup := 0;
         end;
 
         if (not MemberFound) then begin
