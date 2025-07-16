@@ -488,11 +488,14 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         ShopifyAssignedID: Record "NPR Spfy Assigned ID";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         RecRef: RecordRef;
+        ReceiptJson: JsonToken;
         ShopifyGiftCardID: Text[30];
         VoucherNotFoundErr: Label 'System could not find a retail voucher with Shopify gift card ID %1';
     begin
+        if not ReceiptJson.ReadFrom(JsonHelper.GetJText(Transaction, 'receiptJson', false)) then
+            exit;
 #pragma warning disable AA0139
-        ShopifyGiftCardID := SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(Transaction, 'receiptJson.gift_card_id', false), '/');
+        ShopifyGiftCardID := SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(ReceiptJson, 'gift_card_id', false), '/');
 #pragma warning restore AA0139
         if ShopifyGiftCardID = '' then
             exit(false);
