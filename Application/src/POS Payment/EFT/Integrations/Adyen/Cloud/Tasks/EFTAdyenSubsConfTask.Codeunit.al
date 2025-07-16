@@ -127,7 +127,9 @@ codeunit 6185084 "NPR EFT Adyen Subs Conf Task" implements "NPR POS Background T
         MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
         MemberInfoCapture.SetRange("Receipt No.", EFTTransactionRequest."Sales Ticket No.");
         if not MemberInfoCapture.FindSet() then
-            exit;
+            // If we were asked to start a subscription, but don't have any member info capture,
+            // it's likely somebody starting subscription on an existing membership.
+            exit(CalcSubscriptionRenewalPriceOnSubsStart(EFTTransactionRequest."Sales ID"));
 
         repeat
             if (CalcSubscriptionRenewalPrice(MemberInfoCapture, TempRenewalPrice)) then begin
@@ -152,10 +154,47 @@ codeunit 6185084 "NPR EFT Adyen Subs Conf Task" implements "NPR POS Background T
         until MemberInfoCapture.Next() = 0;
     end;
 
+    local procedure CalcSubscriptionRenewalPriceOnSubsStart(SaleId: Guid): Decimal
+    var
+        POSSale: Record "NPR POS Sale";
+        Membership: Record "NPR MM Membership";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
+        MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
+        RenewWithItemNo: Code[20];
+        AlterationSystemId: Guid;
+        ReasonText: Text;
+    begin
+        POSSale.SetLoadFields("Customer No.");
+        if (not POSSale.GetBySystemId(SaleId)) then
+            exit;
+        if (POSSale."Customer No." = '') then
+            exit;
+
+        Membership.SetLoadFields("Entry No.", "External Membership No.");
+        Membership.SetCurrentKey("Customer No.");
+        Membership.SetRange("Customer No.", POSSale."Customer No.");
+        if (not Membership.FindFirst()) then
+            exit;
+
+        MembershipEntry.SetRange("Membership Entry No.", Membership."Entry No.");
+        MembershipEntry.SetRange(Blocked, false);
+        MembershipEntry.SetFilter(Context, '<>%1', MembershipEntry.Context::REGRET);
+        if (not MembershipEntry.FindLast()) then
+            exit;
+
+        if (not MembershipMgt.SelectAutoRenewRule(MembershipEntry, RenewWithItemNo, AlterationSystemId, ReasonText)) then
+            exit;
+
+        if (not MembershipAlterationSetup.GetBySystemId(AlterationSystemId)) then
+            exit;
+
+        exit(CalculateAutoRenewPrice(Membership."Entry No.", Membership."External Membership No.", MembershipAlterationSetup, MembershipEntry));
+    end;
+
     local procedure CalcSubscriptionRenewalPrice(MemberInfoCapture: Record "NPR MM Member Info Capture"; var RenewalPrice: Decimal): Boolean
     var
         TempMembershipEntry: Record "NPR MM Membership Entry" temporary;
-        TempAutoRenewInfoCapture: Record "NPR MM Member Info Capture" temporary;
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
         MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
         RenewWithItemNo: Code[20];
@@ -213,18 +252,26 @@ codeunit 6185084 "NPR EFT Adyen Subs Conf Task" implements "NPR POS Background T
         if (not MembershipAlterationSetup.GetBySystemId(AlterationSystemId)) then
             exit(false);
 
+        RenewalPrice := CalculateAutoRenewPrice(MemberInfoCapture."Membership Entry No.", MemberInfoCapture."External Membership No.", MembershipAlterationSetup, TempMembershipEntry);
+        exit(true);
+    end;
+
+    local procedure CalculateAutoRenewPrice(MembershipEntryNo: Integer; ExternalMembershipNo: Code[20]; MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup"; MembershipEntry: Record "NPR MM Membership Entry") RenewalPrice: Decimal
+    var
+        MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
+        TempAutoRenewInfoCapture: Record "NPR MM Member Info Capture" temporary;
+    begin
         TempAutoRenewInfoCapture.Init();
         TempAutoRenewInfoCapture."Entry No." := 0;
 
-        TempAutoRenewInfoCapture."Membership Entry No." := MemberInfoCapture."Membership Entry No.";
+        TempAutoRenewInfoCapture."Membership Entry No." := MembershipEntryNo;
         TempAutoRenewInfoCapture."Membership Code" := MembershipAlterationSetup."From Membership Code";
-        TempAutoRenewInfoCapture."External Membership No." := MemberInfoCapture."External Membership No.";
-        TempAutoRenewInfoCapture."Item No." := RenewWithItemNo;
+        TempAutoRenewInfoCapture."External Membership No." := ExternalMembershipNo;
+        TempAutoRenewInfoCapture."Item No." := MembershipAlterationSetup."Sales Item No.";
         TempAutoRenewInfoCapture."Information Context" := TempAutoRenewInfoCapture."Information Context"::AUTORENEW;
         TempAutoRenewInfoCapture."Document Date" := Today(); // Active
         TempAutoRenewInfoCapture.Description := MembershipAlterationSetup.Description;
 
-        RenewalPrice := MembershipMgt.CalculateAutoRenewPrice(TempAutoRenewInfoCapture."Membership Entry No.", MembershipAlterationSetup, TempAutoRenewInfoCapture, TempMembershipEntry);
-        exit(true);
+        RenewalPrice := MembershipMgt.CalculateAutoRenewPrice(TempAutoRenewInfoCapture."Membership Entry No.", MembershipAlterationSetup, TempAutoRenewInfoCapture, MembershipEntry);
     end;
 }
