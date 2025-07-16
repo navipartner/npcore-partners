@@ -29,6 +29,7 @@ codeunit 6151381 "NPR POS Post Sales Doc.Entries"
         if POSEntrySalesDocLink.FindSet() then
             repeat
                 Clear(POSPostSalesDocEntry);
+                ClearLastError();
                 if _ReplaceDates then
                     POSPostSalesDocEntry.SetPostingDate(_ReplacePostingDate, _ReplaceDocumentDate, _PostingDate);
                 if POSPostSalesDocEntry.Run(POSEntrySalesDocLink) then begin
@@ -36,7 +37,9 @@ codeunit 6151381 "NPR POS Post Sales Doc.Entries"
                         _PosEntryDescription := POSPostSalesDocEntry.GetPosEntryDescription();
                 end else begin
                     POSEntrySalesDocLink."Post Sales Document Status" := POSEntrySalesDocLink."Post Sales Document Status"::"Error while Posting";
+                    POSEntrySalesDocLink.SetErrorMessage(GetLastErrorText());
                     POSEntrySalesDocLink.Modify();
+                    _ErrorOccured := true;
                 end;
                 Commit();
             until POSEntrySalesDocLink.Next() = 0;
@@ -59,6 +62,11 @@ codeunit 6151381 "NPR POS Post Sales Doc.Entries"
     internal procedure GetPosEntryDescription(): Text
     begin
         exit(_PosEntryDescription);
+    end;
+
+    internal procedure ErrorOccured(): Boolean
+    begin
+        exit(_ErrorOccured);
     end;
 
     internal procedure SetPostingDate(NewReplacePostingDate: Boolean; NewReplaceDocumentDate: Boolean; NewPostingDate: Date)
@@ -99,6 +107,7 @@ codeunit 6151381 "NPR POS Post Sales Doc.Entries"
     var
         _PosEntryDescription: Text;
         _PostingDate: Date;
+        _ErrorOccured: Boolean;
         _ReplaceDates: Boolean;
         _ReplaceDocumentDate: Boolean;
         _ReplacePostingDate: Boolean;

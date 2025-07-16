@@ -1703,13 +1703,13 @@
                 POSEntry.Description := StrSubstNo(POSEntryDescLbl, POSEntrySalesDocLink."Sales Document Type", PostedDocumentNo);
         end;
 
-        if SalesHeader.Ship then begin
+        if SalesHeader.Ship and (SalesHeader."Last Shipping No." <> '') then begin
             POSEntrySalesDocLink."Sales Document Type" := POSEntrySalesDocLink."Sales Document Type"::SHIPMENT;
             PostedDocumentNo := SalesHeader."Last Shipping No.";
             POSEntrySalesDocLinkMgt.InsertPOSEntrySalesDocReference(POSEntry."Entry No.", POSEntrySalesDocLink."Sales Document Type", PostedDocumentNo);
         end;
 
-        if SalesHeader.Receive then begin
+        if SalesHeader.Receive and (SalesHeader."Last Return Receipt No." <> '') then begin
             POSEntrySalesDocLink."Sales Document Type" := POSEntrySalesDocLink."Sales Document Type"::RETURN_RECEIPT;
             PostedDocumentNo := SalesHeader."Last Return Receipt No.";
             POSEntrySalesDocLinkMgt.InsertPOSEntrySalesDocReference(POSEntry."Entry No.", POSEntrySalesDocLink."Sales Document Type", PostedDocumentNo);
@@ -1717,7 +1717,6 @@
 
         if POSEntry.Description = '' then
             POSEntry.Description := StrSubstNo(POSEntryDescLbl, POSEntrySalesDocLink."Sales Document Type", PostedDocumentNo);
-
     end;
 
     internal procedure ExcludeFromPosting(SaleLinePOS: Record "NPR POS Sale Line"): Boolean

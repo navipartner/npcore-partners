@@ -222,16 +222,12 @@ codeunit 6184928 "NPR POS Post Sales Doc.Entry"
 
                 SalesLine.TestField("No.", POSEntrySalesLine."No.");
                 case SalesHeaderIn."Document Type" of
-                    "Sales Document Type"::Order:
-                        begin
-                            SalesLine.TestField(Quantity, POSEntrySalesLine.Quantity);
-                            SalesLine.TestField("Amount Including VAT", POSEntrySalesLine."Amount Incl. VAT");
-                        end;
+                    "Sales Document Type"::Order,
                     "Sales Document Type"::"Credit Memo",
                     "Sales Document Type"::"Return Order":
                         begin
-                            SalesLine.TestField(Quantity, -POSEntrySalesLine.Quantity);
-                            SalesLine.TestField("Amount Including VAT", -POSEntrySalesLine."Amount Incl. VAT");
+                            SalesLine.TestField(Quantity, POSEntrySalesLine.Quantity);
+                            SalesLine.TestField("Amount Including VAT", POSEntrySalesLine."Amount Incl. VAT");
                         end;
                 end;
                 SalesLine.TestField("Variant Code", POSEntrySalesLine."Variant Code");
@@ -286,9 +282,9 @@ codeunit 6184928 "NPR POS Post Sales Doc.Entry"
             end;
         end;
 
-        if SalesHeader.Ship then
+        if SalesHeader.Ship and (SalesHeader."Last Shipping No." <> '') then
             POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSEntrySalesLine, POSSalesDocumentType::SHIPMENT, SalesHeader."Last Shipping No.", InvoiceType::" ");
-        if SalesHeader.Receive then
+        if SalesHeader.Receive and (SalesHeader."Last Return Receipt No." <> '') then
             POSEntrySalesDocLinkMgt.InsertPOSSalesLineSalesDocReference(POSEntrySalesLine, POSSalesDocumentType::RETURN_RECEIPT, SalesHeader."Last Return Receipt No.", InvoiceType::" ");
     end;
 

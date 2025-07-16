@@ -111,6 +111,11 @@
             Caption = 'Original Sales Document Type';
             DataClassification = CustomerContent;
         }
+        field(20; "Last Error Message"; Blob)
+        {
+            Caption = 'Last Error Message';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {
@@ -120,10 +125,6 @@
         key(Key2; "Sales Document Type", "Sales Document No")
         {
         }
-    }
-
-    fieldgroups
-    {
     }
 
     internal procedure GetCardpageID(): Integer
@@ -252,5 +253,35 @@
         Rec.Init();
         Rec.Insert();
     end;
-}
 
+    internal procedure SetErrorMessage(NewErrorText: Text)
+    var
+        OutStr: OutStream;
+    begin
+        Clear("Last Error Message");
+        if NewErrorText = '' then
+            exit;
+        "Last Error Message".CreateOutStream(OutStr, TextEncoding::UTF8);
+        OutStr.WriteText(NewErrorText);
+    end;
+
+    procedure GetErrorMessage(): Text
+    var
+        TypeHelper: Codeunit "Type Helper";
+        InStream: InStream;
+        ErrorText: Text;
+        NoErrorMessageTxt: Label 'No details were provided for the error.';
+    begin
+        if "Post Sales Document Status" <> "Post Sales Document Status"::"Error while Posting" then
+            exit('');
+        ErrorText := '';
+        if "Last Error Message".HasValue() then begin
+            CalcFields("Last Error Message");
+            "Last Error Message".CreateInStream(InStream, TextEncoding::UTF8);
+            ErrorText := TypeHelper.ReadAsTextWithSeparator(InStream, TypeHelper.LFSeparator());
+        end;
+        if ErrorText = '' then
+            ErrorText := NoErrorMessageTxt;
+        exit(ErrorText);
+    end;
+}

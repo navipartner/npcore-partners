@@ -70,6 +70,25 @@
 
     actions
     {
+        area(Processing)
+        {
+            action(ShowErrorMessage)
+            {
+                Caption = 'Show Error';
+                ToolTip = 'Shows the error message that occurred during the document posting routine.';
+                Image = PrevErrorMessage;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                begin
+                    Rec.TestField("Post Sales Document Status", Rec."Post Sales Document Status"::"Error while Posting");
+                    Message(Rec.GetErrorMessage());
+                end;
+            }
+        }
         area(navigation)
         {
             action("Related Sale Document Lines")

@@ -739,7 +739,6 @@
             POSEntry.Modify();
             _SalesDocPostingErrorEntries.Add(POSEntry."Entry No.");
             CreateErrorPOSPostingLogEntry(POSEntry, 0, GetLastErrorText(), true);
-            Commit();
         end;
     end;
 

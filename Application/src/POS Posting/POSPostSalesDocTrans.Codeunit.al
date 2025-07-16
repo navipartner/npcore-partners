@@ -17,17 +17,23 @@ codeunit 6151039 "NPR POS Post Sales Doc. Trans."
     local procedure "Code"(var POSEntry: Record "NPR POS Entry")
     var
         POSPostSalesDocEntries: Codeunit "NPR POS Post Sales Doc.Entries";
+        NewPostingDescription: Text;
+        PostingFailedErr: Label 'One or more errors occurred while posting related sales documents.';
     begin
         if _ReplaceDates then
             POSPostSalesDocEntries.SetPostingDate(_ReplacePostingDate, _ReplaceDocumentDate, _PostingDate);
 
         POSPostSalesDocEntries.Run(POSEntry);
+        if POSPostSalesDocEntries.ErrorOccured() then
+            Error(PostingFailedErr);
 
         POSEntry.LockTable();
         POSEntry.Find();
         if not (POSEntry."Post Sales Document Status" in [POSEntry."Post Sales Document Status"::Unposted, POSEntry."Post Sales Document Status"::"Error while Posting"]) then
             exit;
-        POSEntry.Description := CopyStr(POSPostSalesDocEntries.GetPosEntryDescription(), 1, MaxStrLen(POSEntry.Description));
+        NewPostingDescription := POSPostSalesDocEntries.GetPosEntryDescription();
+        if NewPostingDescription <> '' then
+            POSEntry.Description := CopyStr(NewPostingDescription, 1, MaxStrLen(POSEntry.Description));
         POSEntry.Validate("Post Sales Document Status", POSEntry."Post Sales Document Status"::Posted);
         POSEntry.Modify();
     end;
