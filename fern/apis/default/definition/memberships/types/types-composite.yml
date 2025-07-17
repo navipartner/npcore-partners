@@ -928,13 +928,23 @@ types:
           modifiedAt: $simpleTypes.ModifiedAt.ExampleModifiedAt
 
 ### WEB HOOKS
-
   MembershipCreatedEvent:
+    properties:
+      values: 
+        type: list<MembershipCreatedObject>
+        docs: An array of webhooks, be prepared to handle more than 1 in the same hook request.
+    examples:
+      - name: ExampleEvent
+        value:
+          values:
+            - $MembershipCreatedObject.ExampleObject
+
+  MembershipCreatedObject:
     extends: commonApiTypes.WebhookEvent
     properties:
       payload: MembershipCreatedEventPayload
     examples:
-      - name: ExampleEvent
+      - name: ExampleObject
         value:
           initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
           timestamp: "2024-06-28T12:00:00Z"
@@ -958,11 +968,22 @@ types:
 
 
   MemberAddedEvent:
+    properties:
+      values: 
+        type: list<MemberAddedObject>
+        docs: An array of webhooks, be prepared to handle more than 1 in the same hook request.
+    examples:
+      - name: ExampleEvent
+        value:
+          values:
+            - $MemberAddedObject.ExampleObject
+
+  MemberAddedObject:
     extends: commonApiTypes.WebhookEvent
     properties:
       payload: MemberAddedEventPayload
     examples:
-      - name: ExampleEvent
+      - name: ExampleObject
         value:
           initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
           timestamp: "2024-06-28T12:00:00Z"
@@ -987,11 +1008,42 @@ types:
           role: $simpleTypes.Role.ExampleRoleAdmin
 
   MembershipPeriodStaged:
+    properties:
+      values: 
+        type: list<MembershipPeriodStagedObject>
+        docs: An array of webhooks, be prepared to handle more than 1 in the same hook request.
+    examples:
+      - name: ExampleRenew
+        value:
+          values:
+            - $MembershipPeriodStagedObject.ExampleRenewObject
+      - name: ExampleUpgrade
+        value:
+          values:
+            - $MembershipPeriodStagedObject.ExampleUpgradeObject
+      - name: ExampleExtend
+        value:
+          values:
+            - $MembershipPeriodStagedObject.ExampleExtendObject
+      - name: ExampleAutoRenew
+        value:
+          values:
+            - $MembershipPeriodStagedObject.ExampleAutoRenewObject
+      - name: ExampleCancel
+        value:
+          values:
+            - $MembershipPeriodStagedObject.ExampleCancelObject
+      - name: ExampleRegret
+        value:
+          values:
+            - $MembershipPeriodStagedObject.ExampleRegretObject
+
+  MembershipPeriodStagedObject:
     extends: commonApiTypes.WebhookEvent
     properties:
       payload: MembershipPeriodStagedPayload
     examples:
-      - name: ExampleRenew
+      - name: ExampleRenewObject
         value:
           initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
           timestamp: "2024-06-28T12:00:00Z"
@@ -1002,7 +1054,7 @@ types:
           eventName: "membershipPeriodRenew_staged"
           eventVersion: "1.0"
           payload: $MembershipPeriodStagedPayload.ExampleRenew
-      - name: ExampleUpgrade
+      - name: ExampleUpgradeObject
         value:
           initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
           timestamp: "2024-06-28T12:00:00Z"
@@ -1013,7 +1065,7 @@ types:
           eventName: "membershipPeriodUpgrade_staged"
           eventVersion: "1.0"
           payload: $MembershipPeriodStagedPayload.ExampleUpgrade
-      - name: ExampleExtend
+      - name: ExampleExtendObject
         value:
           initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
           timestamp: "2024-06-28T12:00:00Z"
@@ -1024,7 +1076,7 @@ types:
           eventName: "membershipPeriodExtend_staged"
           eventVersion: "1.0"
           payload: $MembershipPeriodStagedPayload.ExampleExtend
-      - name: ExampleAutoRenew
+      - name: ExampleAutoRenewObject
         value:
           initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
           timestamp: "2024-06-28T12:00:00Z"
@@ -1035,7 +1087,7 @@ types:
           eventName: "membershipPeriodAutoRenew_staged"
           eventVersion: "1.0"
           payload: $MembershipPeriodStagedPayload.ExampleAutoRenew
-      - name: ExampleCancel      
+      - name: ExampleCancelObject
         value:
           initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
           timestamp: "2024-06-28T12:00:00Z"
@@ -1046,7 +1098,7 @@ types:
           eventName: "membershipPeriod_cancel"
           eventVersion: "1.0"
           payload: $MembershipPeriodStagedPayload.ExampleCancel
-      - name: ExampleRegret
+      - name: ExampleRegretObject
         value:
           initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
           timestamp: "2024-06-28T12:00:00Z"
@@ -1095,13 +1147,24 @@ types:
           membershipId: $simpleTypes.MembershipId.ExampleMembershipId
           entryId: $simpleTypes.TimeEntryId.Activate
           lifecycleAction : $simpleTypes.LifecycleAction.ExampleRegret
-  
+
   MembershipActivatedEvent:
+    properties:
+      values: 
+        type: list<MembershipActivatedObject>
+        docs: An array of webhooks, be prepared to handle more than 1 in the same hook request.
+    examples:
+      - name: ExampleEvent
+        value:
+          values:
+            - $MembershipActivatedObject.ExampleObject
+  
+  MembershipActivatedObject:
     extends: commonApiTypes.WebhookEvent
     properties:
       payload: MembershipActivatedPayload
     examples:
-      - name: ExampleEvent
+      - name: ExampleObject
         value:
           initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
           timestamp: "2024-06-28T12:00:00Z"

@@ -7,11 +7,22 @@ imports:
 
 types:
   POSSaleCompletedEvent:
+    properties:
+      values: 
+        type: list<POSSaleCompletedObject>
+        docs: An array of webhooks, be prepared to handle more than 1 in the same hook request.
+    examples:
+      - name: ExampleEvent
+        value:
+          values:
+            - $POSSaleCompletedObject.ExampleObject
+
+  POSSaleCompletedObject:
     extends: commonApiTypes.WebhookEvent
     properties:
       payload: POSSaleCompletedEventPayload
     examples:
-      - name: ExampleEvent
+      - name: ExampleObject
         value:
           initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
           timestamp: "2024-06-28T12:00:00Z"
@@ -40,11 +51,22 @@ types:
           customerNo: "C12345678"
 
   POSUnitBalancedEvent:
+    properties:
+      values: 
+        type: list<POSUnitBalancedObject>
+        docs: An array of webhooks, be prepared to handle more than 1 in the same hook request.
+    examples:
+      - name: ExampleEvent
+        value:
+          values:
+            - $POSUnitBalancedObject.ExampleObject
+
+  POSUnitBalancedObject:
     extends: commonApiTypes.WebhookEvent
     properties:
       payload: POSUnitBalancedEventPayload
     examples:
-      - name: ExampleEvent
+      - name: ExampleObject
         value:
           initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
           timestamp: "2024-06-28T12:00:00Z"

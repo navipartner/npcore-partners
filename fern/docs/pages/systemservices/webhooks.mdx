@@ -15,7 +15,7 @@ You can explore available webhooks in this portal.
   </Accordion>
 
   <Accordion title="2. Webhook notifications">
-    When a webhooks is triggered, you'll receive a POST request:
+    When a webhooks is triggered, you'll receive a POST request. Notice that the individual webhook events are inside an array, as they might be batched together in practice:
     ```json
     {
       "value": [
