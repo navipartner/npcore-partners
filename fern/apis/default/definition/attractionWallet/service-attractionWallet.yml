@@ -120,6 +120,46 @@ service:
           response:
             body: $compositeTypes.AssetHistory.ExampleAssetHistory
 
+    confirmWalletPrint:
+      docs: Confirm the print of a wallet.
+      display-name: Confirm Print
+      method: POST
+      path: /{walletId}/confirmPrint
+      path-parameters:
+        walletId: simpleTypes.WalletId
+      request:
+        name: ConfirmWalletPrintRequest
+      response: compositeTypes.WalletDetails
+      examples:
+        - name: ConfirmWalletPrintExample
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            walletId: $simpleTypes.WalletId.ExampleWalletId
+          response:
+            body: $compositeTypes.WalletDetails.ExampleWalletDetails
+
+    clearConfirmWalletPrint:
+      docs: Clears the lastPrintedAt field using the wallet id
+      display-name: Clear Confirm Print
+      method: POST
+      path: /{walletId}/clearConfirmPrint
+      path-parameters:
+        walletId: simpleTypes.WalletId
+      request:
+        name: ClearConfirmWalletPrintRequest
+      response: compositeTypes.WalletDetails
+      examples:
+        - name: ClearConfirmWalletPrintExample
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            walletId: $simpleTypes.WalletId.ExampleWalletId
+          response:
+            body: $compositeTypes.WalletDetails.ExampleWalletDetailsNoPrint
+
 types:
 
   CreateWalletRequest:

@@ -31,6 +31,18 @@ types:
           assets:
             - $AssetDetails.ExampleTicket1
             - $AssetDetails.ExampleMemberCard1
+      - name: ExampleWalletDetailsNoPrint
+        value:
+          walletId: $simpleTypes.WalletId.ExampleWalletId
+          referenceNumber: $simpleTypes.WalletReferenceNumber.ExampleWalletReferenceNumber
+          description: $simpleTypes.Description.ExampleDescription
+          expiryDatetime: $simpleTypes.ExpiryDatetime.ExampleExpiryDatetime
+          lastPrintedAt: $simpleTypes.LastPrintedAt.ExampleLastPrintedAtNoPrint
+          printCount: $simpleTypes.PrintCount.ExamplePrintCount
+          originatesFromItemNo: $simpleTypes.AssetItemNo.ExampleWalletNo
+          assets:
+            - $AssetDetails.ExampleTicket1
+            - $AssetDetails.ExampleMemberCard1
       - name: ExampleWalletDetailsWithDetails
         value:
           walletId: $simpleTypes.WalletId.ExampleWalletId

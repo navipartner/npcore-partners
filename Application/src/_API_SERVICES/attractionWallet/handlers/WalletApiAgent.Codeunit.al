@@ -149,6 +149,36 @@ codeunit 6248331 "NPR WalletApiAgent"
         exit(Response.RespondOk(ResponseJson.Build()));
     end;
 
+    internal procedure ConfirmPrintWallet(Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        Wallet: Record "NPR AttractionWallet";
+        WalletFacade: Codeunit "NPR AttractionWalletFacade";
+    begin
+        if (not GetWalletById(Request, 2, Wallet)) then
+            exit(Response.RespondBadRequest(_InvalidWalletId));
+
+        WalletFacade.IncrementPrintCount(Wallet.EntryNo);
+
+        // Refresh the record after incrementing print count
+        Wallet.Get(Wallet.EntryNo);
+
+        exit(GetAssetsResponse(Wallet, false));
+    end;
+
+    internal procedure ClearConfirmPrintWallet(Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        Wallet: Record "NPR AttractionWallet";
+    begin
+        Wallet.ReadIsolation := IsolationLevel::UpdLock;
+        if (not GetWalletById(Request, 2, Wallet)) then
+            exit(Response.RespondBadRequest(_InvalidWalletId));
+
+        Wallet.LastPrintAt := 0DT;
+        Wallet.Modify();
+
+        exit(GetAssetsResponse(Wallet, false));
+    end;
+
     #endregion
 
 

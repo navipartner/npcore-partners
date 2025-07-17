@@ -51,6 +51,11 @@ codeunit 6248330 "NPR AttrWalletAPIHandler"
             _ApiFunction::CREATE_WALLET:
                 _Response := WalletApiAgent.CreateWallet(_Request);
 
+            _ApiFunction::CONFIRM_PRINT_WALLET:
+                _Response := WalletApiAgent.ConfirmPrintWallet(_Request);
+
+            _ApiFunction::CLEAR_CONFIRM_PRINT_WALLET:
+                _Response := WalletApiAgent.ClearConfirmPrintWallet(_Request);
         end;
     end;
 }

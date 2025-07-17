@@ -21,6 +21,11 @@ codeunit 6248329 "NPR AttrWalletAPI" implements "NPR API Request Handler"
         if (Request.Match('PUT', '/attractionWallet/:walletId')) then
             exit(Handle(_ApiFunction::ADD_WALLET_ASSETS, Request));
 
+        if (Request.Match('POST', '/attractionWallet/:walletId/confirmPrint')) then
+            exit(Handle(_ApiFunction::CONFIRM_PRINT_WALLET, Request));
+
+        if (Request.Match('POST', '/attractionWallet/:walletId/clearConfirmPrint')) then
+            exit(Handle(_ApiFunction::CLEAR_CONFIRM_PRINT_WALLET, Request));
 
         if (Request.Match('POST', '/attractionWallet')) then
             exit(Handle(_ApiFunction::CREATE_WALLET, Request));

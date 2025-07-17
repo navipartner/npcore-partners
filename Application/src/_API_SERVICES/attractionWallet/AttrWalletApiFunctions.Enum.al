@@ -32,5 +32,14 @@ enum 6059842 "NPR AttrWalletApiFunctions"
     {
         Caption = 'Create wallet';
     }
+
+    value(309; CONFIRM_PRINT_WALLET)
+    {
+        Caption = 'Confirm print wallet';
+    }
+    value(310; CLEAR_CONFIRM_PRINT_WALLET)
+    {
+        Caption = 'Clear confirm print wallet';
+    }
 }
 #endif
