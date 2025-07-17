@@ -38,6 +38,10 @@ types:
       voucherType: string
       initialamount: double
       customerNo: string
+      referenceNo: string
+      issuingDocumentNo: string
+      issuingExternalDocumentNo: string
+
     examples:
       - name: ExamplePayload
         value:
@@ -45,6 +49,9 @@ types:
           voucherType: "GIFTVOUCHER"
           initialamount: 1000.00
           customerNo: "C12345678"
+          referenceNo: "102566RE332"
+          issuingDocumentNo: "SH-103006"
+          issuingExternalDocumentNo: "EXT-123456"
 
   VoucherPaymentEvent:
     properties:

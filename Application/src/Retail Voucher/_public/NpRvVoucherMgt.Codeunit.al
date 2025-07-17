@@ -347,8 +347,8 @@
             NpRvSalesLineReference.Modify();
         end;
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24)
-        Voucher.CalcFields("Initial Amount");
-        RetailVoucherWebhook.OnVoucherCreated(Voucher.SystemId, Voucher."Voucher Type", Voucher."Initial Amount", Voucher."Customer No.");
+        Voucher.CalcFields("Initial Amount", "Issue Document No.", "Issue External Document No.");
+        RetailVoucherWebhook.OnVoucherCreated(Voucher.SystemId, Voucher."Voucher Type", Voucher."Initial Amount", Voucher."Customer No.", Voucher."Reference No.", Voucher."Issue Document No.", Voucher."Issue External Document No.");
 #endif
     end;
 
