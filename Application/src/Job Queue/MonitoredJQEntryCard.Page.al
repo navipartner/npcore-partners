@@ -300,11 +300,10 @@ page 6185042 "NPR Monitored JQ Entry Card"
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     var
-        OnlyRecurringJobsSupportedErr: Label 'Only recurring jobs queue entries can be set up as monitored jobs.';
+        MonitoredJQMgt: Codeunit "NPR Monitored Job Queue Mgt.";
     begin
         if CloseAction in [Action::LookupOK, Action::OK, Action::Yes] then
-            If not Rec."Recurring Job" then
-                Error(OnlyRecurringJobsSupportedErr);
+            MonitoredJQMgt.CheckJobBeforeAddingToMonitored(Rec);
         exit(true);
     end;
 

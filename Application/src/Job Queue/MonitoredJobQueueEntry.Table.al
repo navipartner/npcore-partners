@@ -327,7 +327,7 @@ table 6151148 "NPR Monitored Job Queue Entry"
         "Reference Starting Time" := TempJobQueueEntry."Reference Starting Time";
     end;
 
-    local procedure CalculateTimeOffset(JQRefreshSetup: Record "NPR Job Queue Refresh Setup"): Duration
+    internal procedure CalculateTimeOffset(JQRefreshSetup: Record "NPR Job Queue Refresh Setup"): Duration
     var
         DT: DateTime;
         NewDT: DateTime;

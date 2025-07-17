@@ -57,8 +57,10 @@ pageextension 6014424 "NPR Job Queue Entry Card" extends "Job Queue Entry Card"
                         if ManagedByAppJobQueue.Get(Rec.ID) then
                             ManagedByAppJobQueue.Delete();
                         MonitoredJQMgt.RemoveMonitoredJobQueueEntry(Rec);
-                    end else
+                    end else begin
+                        MonitoredJQMgt.CheckJobBeforeAddingToMonitored(Rec);
                         MonitoredJQMgt.AssignJobQueueEntryToManagedAndMonitored(true, true, Rec);
+                    end;
                     CurrPage.Update(false);
                 end;
             }

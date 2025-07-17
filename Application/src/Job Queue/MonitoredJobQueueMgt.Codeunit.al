@@ -243,6 +243,59 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
         exit(not JobQueueMgt.SkipUpdateNPManagedMonitoredJobs() and JobQueueMgt.IsNPRecurringJob(JobQueueEntry));
     end;
 
+    internal procedure CheckJobBeforeAddingToMonitored(JobQueueEntry: Record "Job Queue Entry")
+    var
+        OnlyRecurringJobsSupportedErr: Label 'Only recurring jobs queue entries can be set up as monitored jobs.';
+    begin
+        If not JobQueueEntry."Recurring Job" then
+            Error(OnlyRecurringJobsSupportedErr);
+        if JobCanMoveAcrossDays(JobQueueEntry) then
+            ConfirmPossibleShiftBetweenDays();
+    end;
+
+    local procedure JobCanMoveAcrossDays(JobQueueEntry: Record "Job Queue Entry"): Boolean
+    var
+        JQRefreshSetup: Record "NPR Job Queue Refresh Setup";
+        MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
+        ReferenceDateTime: DateTime;
+        WSUserTimeZoneAdjustedDateTime: DateTime;
+    begin
+        if JobQueueEntry."Starting Time" = 0T then
+            exit;
+        if (JobQueueEntry."Run on Mondays" or
+            JobQueueEntry."Run on Tuesdays" or
+            JobQueueEntry."Run on Wednesdays" or
+            JobQueueEntry."Run on Tuesdays" or
+            JobQueueEntry."Run on Fridays" or
+            JobQueueEntry."Run on Saturdays" or
+            JobQueueEntry."Run on Sundays")
+           and not
+           (JobQueueEntry."Run on Mondays" and
+            JobQueueEntry."Run on Tuesdays" and
+            JobQueueEntry."Run on Wednesdays" and
+            JobQueueEntry."Run on Tuesdays" and
+            JobQueueEntry."Run on Fridays" and
+            JobQueueEntry."Run on Saturdays" and
+            JobQueueEntry."Run on Sundays")
+        then begin
+            if not (JQRefreshSetup.Get() and JQRefreshSetup."Use External JQ Refresher") then
+                exit;
+            MonitoredJQEntry."Starting Time" := JobQueueEntry."Starting Time";
+            MonitoredJQEntry."Time Zone" := JobQueueEntry."NPR Time Zone";
+            ReferenceDateTime := CreateDateTime(Today(), JobQueueEntry."Starting Time");
+            WSUserTimeZoneAdjustedDateTime := ReferenceDateTime + MonitoredJQEntry.CalculateTimeOffset(JQRefreshSetup);
+            exit(DT2Date(ReferenceDateTime) <> DT2Date(WSUserTimeZoneAdjustedDateTime));
+        end;
+    end;
+
+    local procedure ConfirmPossibleShiftBetweenDays()
+    var
+        RunDayShiftQst: Label 'You have configured a "day of the week" limit together with a time period that can move across days when converted to UTC0. Please ensure that the days you have selected match your expectations in the UTC0 time zone as well.\\Do you want to proceed with the current operation?';
+    begin
+        if not Confirm(RunDayShiftQst, true) then
+            Error('');
+    end;
+
     var
         _IsNPJobErr: Label 'Job Queue Entry ''%1 %2 %3'' is a NaviPartner protected job and cannot be added manually. It will be automatically added to the list of monitored jobs the next time the job queue refresher runs.';
 }
