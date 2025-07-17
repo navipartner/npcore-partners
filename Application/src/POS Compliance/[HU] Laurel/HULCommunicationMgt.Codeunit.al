@@ -817,6 +817,8 @@ codeunit 6248367 "NPR HU L Communication Mgt."
         CurrentZReport.FindLast();
 
         POSPaymentBinCheckp.SetRange("Workshift Checkpoint Entry No.", CurrentZReport."Entry No.");
+        POSPaymentBinCheckp.SetFilter("New Float Amount", '>%1', 0);
+        POSPaymentBinCheckp.SetLoadFields("Payment Method No.", "New Float Amount");
         if POSPaymentBinCheckp.Count() = 0 then
             exit;
         JsonTextWriter.WriteStartObject('data');
@@ -824,9 +826,8 @@ codeunit 6248367 "NPR HU L Communication Mgt."
         JsonTextWriter.WriteStartArray('payments');
         if POSPaymentBinCheckp.FindSet() then
             repeat
-                AddPaymentLineInformation(JsonTextWriter, POSPaymentBinCheckp."Payment Method No.", POSPaymentBinCheckp."Counted Amount Incl. Float", false);
+                AddPaymentLineInformation(JsonTextWriter, POSPaymentBinCheckp."Payment Method No.", POSPaymentBinCheckp."New Float Amount", false);
             until POSPaymentBinCheckp.Next() = 0;
-
         JsonTextWriter.WriteEndArray(); // payments
         JsonTextWriter.WriteEndObject(); // data
     end;
