@@ -212,15 +212,6 @@ tableextension 6014433 "NPR Sales Line" extends "Sales Line"
             Caption = 'Incoming Ecommerce Sales Line Id';
             DataClassification = CustomerContent;
         }
-        modify("Location Code")
-        {
-            trigger OnAfterValidate()
-            var
-                RSRetailLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
-            begin
-                RSRetailLocalizationMgt.GetPriceFromSalesPriceList(Rec);
-            end;
-        }
     }
 
     var

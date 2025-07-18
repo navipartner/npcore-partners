@@ -62,23 +62,24 @@ codeunit 6151490 "NPR RS R Localization Mgt."
     #endregion
 
     #region RS Retail Lcl. Mgt. - Sales Line Retail Price Mgt.
-    internal procedure GetPriceFromSalesPriceList(var SalesLine: Record "Sales Line")
+    internal procedure GetPriceFromSalesPriceList(var SalesLine: Record "Sales Line"): Boolean
     var
         SalesHeader: Record "Sales Header";
         PriceListHeader: Record "Price List Header";
         PriceListLine: Record "Price List Line";
     begin
         if not IsRSLocalizationActive() then
-            exit;
+            exit(false);
 
         if not IsRetailLocation(SalesLine."Location Code") then
-            exit;
+            exit(false);
 
         if SalesLine.Type = SalesLine.Type::Item then
             if IsServiceItem(SalesLine."No.") then
-                exit;
+                exit(false);
 
-        SalesHeader.Get("Sales Document Type"::Order, SalesLine."Document No.");
+        if not SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.") then
+            exit(false);
 
         GetPriceListLine(PriceListLine, SalesLine."No.", SalesLine."Location Code", SalesHeader."Posting Date");
         PriceListHeader.Get(PriceListLine."Price List Code");
@@ -95,8 +96,9 @@ codeunit 6151490 "NPR RS R Localization Mgt."
         end;
 
         if SalesLine.Quantity = 0 then
-            exit;
+            exit(true);
         SalesLine.Validate("Line Amount");
+        exit(true)
     end;
 
     local procedure CalculateSalesLineVATBreakDown(SalesLine: Record "Sales Line"): Decimal

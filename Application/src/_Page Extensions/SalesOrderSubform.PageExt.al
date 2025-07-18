@@ -73,8 +73,11 @@ pageextension 6014447 "NPR Sales Order Subform" extends "Sales Order Subform"
             trigger OnAfterValidate()
             var
                 RSEInvoiceMgt: Codeunit "NPR RS E-Invoice Mgt.";
+                RSRetailLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
             begin
                 if RSEInvoiceMgt.CheckIfDocumentShouldBeSentToSEFBasedOnLocationCodeOnSalesLines(xRec, Rec) then
+                    CurrPage.Update(true);
+                if RSRetailLocalizationMgt.GetPriceFromSalesPriceList(Rec) then
                     CurrPage.Update(true);
             end;
         }

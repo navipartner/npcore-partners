@@ -1,5 +1,18 @@
 pageextension 6014449 "NPR Sales Invoice Subform" extends "Sales Invoice Subform"
 {
+    layout
+    {
+        modify("Location Code")
+        {
+            trigger OnAfterValidate()
+            var
+                RSRetailLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
+            begin
+                if RSRetailLocalizationMgt.GetPriceFromSalesPriceList(Rec) then
+                    CurrPage.Update(true);
+            end;
+        }
+    }
     actions
     {
         addafter("Related Information")
