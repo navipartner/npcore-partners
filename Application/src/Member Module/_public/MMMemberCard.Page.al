@@ -1022,6 +1022,8 @@
     var
         RaptorSetup: Record "NPR Raptor Setup";
     begin
+        if not HLIntegrationSetup.Get() then
+            Clear(HLIntegrationSetup);
 
         NPRAttrManagement.GetAttributeVisibility(GetAttributeTableId(), NPRAttrVisibleArray);
         // Because NAV is stupid!
