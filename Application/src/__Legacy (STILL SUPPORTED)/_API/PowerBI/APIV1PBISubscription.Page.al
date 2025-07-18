@@ -8,8 +8,8 @@ page 6185073 "NPR APIV1 PBI Subscription"
     APIPublisher = 'navipartner';
     APIGroup = 'powerBI';
     APIVersion = 'v1.0';
-    EntitySetName = 'subscriptions';
-    EntityName = 'subscription';
+    EntitySetName = 'mmSubscriptions';
+    EntityName = 'mmSubscription';
     DataAccessIntent = ReadOnly;
 
     layout
