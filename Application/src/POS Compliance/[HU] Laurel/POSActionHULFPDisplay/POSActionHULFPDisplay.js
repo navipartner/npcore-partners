@@ -2,6 +2,9 @@ let main = async ({ workflow, hwc, popup, context, captions }) => {
     await workflow.respond("SetValuesToContext");
 
     const result1 = await handleHwcRequest(hwc, workflow, popup, captions, context.hwcRequest1);
+    if (!result1.Success)
+        return {sucess: false};
+
     const result2 = await handleHwcRequest(hwc, workflow, popup, captions, context.hwcRequest2);
 
     return {
@@ -17,7 +20,8 @@ async function handleHwcRequest(hwc, workflow, popup, captions, hwcRequest) {
         if (hwcResponse.Success) {
             try {
                 console.log("[Hungary Laurel HWC]", hwcResponse);
-
+                
+                hwcResponse.HwcInvokeCall = false;
                 _bcResponse = await workflow.respond("Process", { hwcResponse });
 
                 hwc.unregisterResponseHandler(_contextId);
@@ -35,7 +39,18 @@ async function handleHwcRequest(hwc, workflow, popup, captions, hwcRequest) {
         }
     });
 
-    await hwc.invoke(hwcRequest.HwcName, hwcRequest, _contextId);
+    try {
+        await hwc.invoke(hwcRequest.HwcName, hwcRequest, _contextId);
+    } catch (invokeErr) {
+        hwc.unregisterResponseHandler(_contextId);
+        return await workflow.respond("Process", {
+            hwcResponse:{
+                Success: false,
+                ErrorMessage: "HWC Invoke failed: " + invokeErr.message,
+                HwcInvokeCall: true
+            }
+        });
+    }
     await hwc.waitForContextCloseAsync(_contextId);
 
     return _bcResponse;

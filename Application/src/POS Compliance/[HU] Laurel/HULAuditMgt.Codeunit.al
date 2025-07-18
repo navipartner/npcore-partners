@@ -6,6 +6,7 @@ codeunit 6185037 "NPR HU L Audit Mgt."
     var
         CustomerInfoMandatoryErr: Label 'You must input customer information for this sale.';
         SameSignErr: Label 'Cannot have sale and return in the same transaction.';
+        DisplayCalledFrom: Option insertItem,changeQty,discount,deleteLine,changeView,payment,endSale;
         Enabled: Boolean;
         Initialized: Boolean;
 
@@ -229,6 +230,7 @@ codeunit 6185037 "NPR HU L Audit Mgt."
 
         MainParameters.Add(POSActionHULFPDisplay.RowOneMessageParameterName(), SaleLinePOS."Description");
         MainParameters.Add(POSActionHULFPDisplay.RowTwoMessageParameterName(), FormatTwoColumnCustDisplayText(FormatDecimalValue(SaleLinePOS.Quantity) + 'x', FormatDecimalValue(SaleLinePOS."Unit Price")));
+        MainParameters.Add(POSActionHULFPDisplay.CalledFromParameterName(), DisplayCalledFrom::changeQty);
         ActionParameters.Add('mainParameters', MainParameters);
         PostWorkflows.Add(Format(Enum::"NPR POS Workflow"::HUL_FP_DISPLAY), ActionParameters);
     end;
@@ -251,6 +253,7 @@ codeunit 6185037 "NPR HU L Audit Mgt."
 
         MainParameters.Add(POSActionHULFPDisplay.RowOneMessageParameterName(), DiscountLbl);
         MainParameters.Add(POSActionHULFPDisplay.RowTwoMessageParameterName(), FormatDiscountMessageBasedOnDiscountType(Context, POSSale, SaleLine));
+        MainParameters.Add(POSActionHULFPDisplay.CalledFromParameterName(), DisplayCalledFrom::discount);
         ActionParameters.Add('mainParameters', MainParameters);
         PostWorkflows.Add(Format(Enum::"NPR POS Workflow"::HUL_FP_DISPLAY), ActionParameters);
     end;
@@ -290,7 +293,7 @@ codeunit 6185037 "NPR HU L Audit Mgt."
                 begin
                     POSSession.GetPaymentLine(POSPaymentLine);
                     POSPaymentLine.GetCurrentPaymentLine(SaleLinePOS);
-                    DisplayMessageList.Add(SaleLinePOS.Description);
+                    DisplayMessageList.Add(GetPOSPaymentMethodDesc(SaleLinePOS."No."));
                     DisplayMessageList.Add(FormatDecimalValue(-SaleLinePOS."Amount Including VAT"));
                 end;
             else
@@ -299,6 +302,7 @@ codeunit 6185037 "NPR HU L Audit Mgt."
 
         MainParameters.Add(POSActionHULFPDisplay.RowOneMessageParameterName(), DisplayMessageList.Get(1));
         MainParameters.Add(POSActionHULFPDisplay.RowTwoMessageParameterName(), DisplayMessageList.Get(2));
+        MainParameters.Add(POSActionHULFPDisplay.CalledFromParameterName(), DisplayCalledFrom::deleteLine);
         ActionParameters.Add('mainParameters', MainParameters);
         PreWorkflows.Add(Format(Enum::"NPR POS Workflow"::HUL_FP_DISPLAY), ActionParameters);
     end;
@@ -330,6 +334,7 @@ codeunit 6185037 "NPR HU L Audit Mgt."
         POSSale.CalcFields("Amount Including VAT");
         MainParameters.Add(POSActionHULFPDisplay.RowOneMessageParameterName(), TotalAmountLbl);
         MainParameters.Add(POSActionHULFPDisplay.RowTwoMessageParameterName(), FormatTwoColumnCustDisplayText(' ', FormatDecimalValue(POSSale."Amount Including VAT")));
+        MainParameters.Add(POSActionHULFPDisplay.CalledFromParameterName(), DisplayCalledFrom::changeView);
         ActionParameters.Add('mainParameters', MainParameters);
         PostWorkflows.Add(Format(Enum::"NPR POS Workflow"::HUL_FP_DISPLAY), ActionParameters);
     end;
@@ -360,6 +365,7 @@ codeunit 6185037 "NPR HU L Audit Mgt."
 
         MainParameters.Add(POSActionHULFPDisplay.RowOneMessageParameterName(), GetPOSPaymentMethodDesc(Context.GetStringParameter('paymentNo')));
         MainParameters.Add(POSActionHULFPDisplay.RowTwoMessageParameterName(), FormatTwoColumnCustDisplayText(' ', PaymentAmountText));
+        MainParameters.Add(POSActionHULFPDisplay.CalledFromParameterName(), DisplayCalledFrom::payment);
         ActionParameters.Add('mainParameters', MainParameters);
         PostWorkflows.Add(Format(Enum::"NPR POS Workflow"::HUL_FP_DISPLAY), ActionParameters);
     end;
@@ -392,6 +398,7 @@ codeunit 6185037 "NPR HU L Audit Mgt."
             exit;
         MainParameters.Add(POSActionHULFPDisplay.RowOneMessageParameterName(), ChangeAmountLbl);
         MainParameters.Add(POSActionHULFPDisplay.RowTwoMessageParameterName(), FormatTwoColumnCustDisplayText(' ', FormatDecimalValue(ChangeAmount)));
+        MainParameters.Add(POSActionHULFPDisplay.CalledFromParameterName(), DisplayCalledFrom::endSale);
         ActionParameters.Add('mainParameters', MainParameters);
         PostWorkflows.Add(Format(Enum::"NPR POS Workflow"::HUL_FP_DISPLAY), ActionParameters);
     end;
