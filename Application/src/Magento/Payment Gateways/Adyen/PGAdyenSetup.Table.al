@@ -46,6 +46,9 @@ table 6151466 "NPR PG Adyen Setup"
             Caption = 'Payment Authorization Expiration Formula';
             DataClassification = CustomerContent;
             InitValue = '28D';
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-07-20';
+            ObsoleteReason = 'Field not used anymore. Hardcoded to 28D.';
         }
     }
 

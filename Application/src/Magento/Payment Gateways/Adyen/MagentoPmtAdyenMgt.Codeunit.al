@@ -1045,7 +1045,6 @@
     var
         PaymentLine: Record "NPR Magento Payment Line";
         TempExpiredPaymentLine: Record "NPR Magento Payment Line" temporary;
-        PGAdyenSetup: Record "NPR PG Adyen Setup";
         ConfirmManagement: Codeunit "Confirm Management";
         AuthorizationExpiredLinesFound: Boolean;
         AuthorizationExpirationDurationDays: Integer;
@@ -1053,14 +1052,7 @@
         PaymentPostimgWarningSingleLbl: Label 'The authorization of payment line no.: %1 for document no.: %2, payment gateway code: %3 is older than %4 day. Do you want to continue?', Comment = '%1 - line no. %2 - document no., %3 - payment gateway code, %4 - authorization expiration in days';
         WarningText: Text;
     begin
-        PGAdyenSetup.SetLoadFields("Authorization Expiry Formula");
-        if not PGAdyenSetup.Get(PaymentGateway.Code) then
-            exit;
-
-        if Format(PGAdyenSetup."Authorization Expiry Formula") = '' then
-            exit;
-
-        AuthorizationExpirationDurationDays := GetAuthorizationExpirationDurationInDays(PGAdyenSetup);
+        AuthorizationExpirationDurationDays := GetAuthorizationExpirationDurationInDays();
 
         PaymentLine.Reset();
         PaymentLine.SetRange("Document Table No.", SalesHeader.RecordId.TableNo);
@@ -1111,12 +1103,9 @@
         AuthorizationExpired := CurrAuthorizationDuration > AuthorizationExpirationDurationDays;
     end;
 
-    local procedure GetAuthorizationExpirationDurationInDays(PGAdyenSetup: Record "NPR PG Adyen Setup") AuthorizationExpirationDays: Integer
+    local procedure GetAuthorizationExpirationDurationInDays() AuthorizationExpirationDays: Integer
     begin
-        if Format(PGAdyenSetup."Authorization Expiry Formula") = '' then
-            exit;
-
-        AuthorizationExpirationDays := CalcDate(PGAdyenSetup."Authorization Expiry Formula", Today) - Today;
+        AuthorizationExpirationDays := CalcDate('<28D>', Today) - Today;
     end;
 
     #endregion
