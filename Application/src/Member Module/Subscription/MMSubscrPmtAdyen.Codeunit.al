@@ -1500,7 +1500,11 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         HttpRequest: HttpRequestMessage;
         HttpResponse: HttpResponseMessage;
         ErrorInvokeLbl: Label 'Error: Service endpoint %1 responded with HTTP status %2';
+        Handled: Boolean;
     begin
+        OnBeforeInvokeAPI(Request, Response, Handled);
+        if Handled then
+            exit;
 
         HttpRequest.SetRequestUri(URL);
         HttpRequest.Method := Method;
@@ -2400,5 +2404,10 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         AdyenWebhookType: Enum "NPR Adyen Webhook Type";
     begin
         AdyenManagement.EnsureAdyenWebhookSetup(RefundEventFilter, MerchantName, AdyenWebhookType::standard);
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnBeforeInvokeAPI(var Request: Text; var Response: Text; var Handled: Boolean)
+    begin
     end;
 }

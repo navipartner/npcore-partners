@@ -52,4 +52,8 @@ enumextension 88000 "NPR BCPT Test Param. Enum" extends "BCPT Test Param. Enum"
     {
         Implementation = "BCPT Test Param. Provider" = "NPR BCPT Init Voucher Usage";
     }
+    value(88014; "NPR BCPT Membership Renew")
+    {
+        Implementation = "BCPT Test Param. Provider" = "NPR BCPT Membership Renew";
+    }
 }
