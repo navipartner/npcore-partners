@@ -105,6 +105,9 @@ codeunit 6150862 "NPR POS Action: Doc. Pay&Post" implements "NPR IPOS Workflow"
             exit;
         if not POSActionDocPayPostB.SelectDocument(SalePOS, SalesHeader) then
             exit;
+
+        SalePOS.ConfirmPostingDate(SalesHeader);
+
         POSActionDocPayPostB.SetLinesToPost(SalesHeader, AutoQtyToInvoice, AutoQtyToShip, AutoQtyToReceive); //Commits
 
         if not POSActionDocPayPostB.ConfirmDocument(SalesHeader, OpenDocument) then

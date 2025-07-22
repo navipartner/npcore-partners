@@ -1114,6 +1114,28 @@
                 Error(CustomerExistLbl);
         end;
     end;
+
+    internal procedure CheckPostingDatePermitted(PostingDate: Date)
+    var
+        InvalidPostingDateErr: Label 'You are not allowed to select documents where posting date is greater than the date of payment';
+    begin
+        if PostingDate > Rec.Date then
+            Error(InvalidPostingDateErr);
+    end;
+
+    internal procedure ConfirmPostingDate(var SalesHeader: Record "Sales Header")
+    var
+        InvalidPostingDateQst: Label 'You are not allowed to select documents where posting date is greater than the date of payment. Would you like to change the date on the document to the date of payment?';
+        DocumentNotSelectedErr: Label 'Document was not selected.';
+    begin
+        if SalesHeader."Posting Date" > Rec.Date then
+            if Confirm(InvalidPostingDateQst) then begin
+                SalesHeader.Validate("Posting Date", Rec.Date);
+                SalesHeader.Modify();
+            end else
+                Error(DocumentNotSelectedErr);
+    end;
+
 #IF BC17 or BC18 or BC19
 
     [Obsolete('Replaced by CreateDimFromDefaultDim(POSSale.FieldNo("Salesperson Code")) starting from BC 20.0', '2023-06-28')]

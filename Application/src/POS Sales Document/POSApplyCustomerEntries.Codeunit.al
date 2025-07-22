@@ -61,6 +61,8 @@
 
         Confirmed := SelectCustLedgerEntry(SalePOS, SaleLinePOS, SaleLinePOS.FieldNo("Buffer ID"), CustLedgEntry);
 
+        SalePOS.CheckPostingDatePermitted(CustLedgEntry."Posting Date");
+
         CustLedgEntry.Reset();
         CustLedgEntry.SetCurrentKey("Customer No.", "Applies-to ID", Open);
         CustLedgEntry.SetAutoCalcFields("Remaining Amount");
@@ -105,6 +107,9 @@
             CustLedgEntry.SetRange("Customer No.", SalePOS."Customer No.");
         CustLedgEntry.FindFirst();
         CustLedgEntry.TestField(Open);
+
+        if DocumentType = DocumentType::Invoice then
+            SalePOS.CheckPostingDatePermitted(CustLedgEntry."Posting Date");
 
         if not Silent then
             if not Confirm(StrSubstNo(CONFIRM_BALANCE, CustLedgEntry."Document Type", CustLedgEntry."Document No.", CustLedgEntry."Customer No."), true) then

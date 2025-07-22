@@ -35,7 +35,7 @@ codeunit 6059961 "NPR POS Action: Doc. Import B"
                             POSSale: Codeunit "NPR POS Sale")
     var
         SalesHeader: Record "Sales Header";
-        SalesDocImpMgt: codeunit "NPR Sales Doc. Imp. Mgt.";
+        SalesDocImpMgt: Codeunit "NPR Sales Doc. Imp. Mgt.";
         POSSession: Codeunit "NPR POS Session";
     begin
         if not CheckCustomer(POSSale, SelectCustomer) then
@@ -56,8 +56,6 @@ codeunit 6059961 "NPR POS Action: Doc. Import B"
             exit;
 
         SalesHeader.TestField("Bill-to Customer No.");
-
-
 
         if ConfirmInvDiscAmt then
             ConfirmInvDiscAmount(SalesHeader);
