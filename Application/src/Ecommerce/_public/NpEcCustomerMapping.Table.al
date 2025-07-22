@@ -28,12 +28,21 @@
             IF ("Country/Region Code" = FILTER(<> '')) "Post Code" WHERE("Country/Region Code" = FIELD("Country/Region Code"));
             ValidateTableRelation = false;
         }
+#if BC17
         field(30; "Config. Template Code"; Code[10])
         {
             Caption = 'Config. Template Code';
             DataClassification = CustomerContent;
             TableRelation = "Config. Template Header".Code WHERE("Table ID" = CONST(18));
         }
+#else
+        field(30; "Config. Template Code"; Code[20])
+        {
+            Caption = 'Customer Template Code';
+            DataClassification = CustomerContent;
+            TableRelation = "Customer Templ.";
+        }
+#endif
         field(40; "Country/Region Name"; Text[50])
         {
             CalcFormula = Lookup("Country/Region".Name WHERE(Code = FIELD("Country/Region Code")));

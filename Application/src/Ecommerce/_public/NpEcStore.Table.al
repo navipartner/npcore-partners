@@ -52,12 +52,21 @@
             OptionCaption = 'E-mail,Phone No.,E-mail AND Phone No.,E-mail OR Phone No.,Customer No.';
             OptionMembers = "E-mail","Phone No.","E-mail AND Phone No.","E-mail OR Phone No.","Customer No.";
         }
+#if BC17
         field(150; "Customer Config. Template Code"; Code[10])
         {
             Caption = 'Customer Config. Template Code';
             DataClassification = CustomerContent;
             TableRelation = "Config. Template Header".Code WHERE("Table ID" = CONST(18));
         }
+#else
+        field(150; "Customer Config. Template Code"; Code[20])
+        {
+            Caption = 'Customer Template Code';
+            DataClassification = CustomerContent;
+            TableRelation = "Customer Templ.";
+        }
+#endif
         field(160; "Allow Create Customers"; Boolean)
         {
             Caption = 'Allow Create Customers';

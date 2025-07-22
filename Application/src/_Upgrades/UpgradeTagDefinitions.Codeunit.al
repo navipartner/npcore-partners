@@ -1050,6 +1050,10 @@
                         exit('NPR-UpgradeImplementationFieldOnNoSeries-20250608');
                 end;
 #ENDIF
+#if not BC17
+            Codeunit::"NPR UPG NpEc Config. Templates":
+                Exit('NPREcTransferConfigTemplToCustTempl');
+#endif
         end;
     end;
 }

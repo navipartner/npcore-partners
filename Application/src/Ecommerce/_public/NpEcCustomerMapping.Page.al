@@ -32,7 +32,7 @@
                 }
                 field("Config. Template Code"; Rec."Config. Template Code")
                 {
-                    ToolTip = 'Specifies Configuration Template Code.';
+                    ToolTip = 'Specifies Customer Template Code.';
                     ApplicationArea = NPRRetail;
                 }
 #if not BC17

@@ -46,13 +46,18 @@
 
     local procedure UpsertCustomer(Element: XmlElement; var Customer: Record Customer): Boolean
     var
+#if BC17
         ConfigTemplateHeader: Record "Config. Template Header";
+        ConfigTemplateMgt: Codeunit "Config. Template Management";
+#else
+        CustomerTemplate: Record "Customer Templ.";
+        CustomerTemplMgt: Codeunit "Customer Templ. Mgt.";
+#endif
         NpEcCustomerMapping: Record "NPR NpEc Customer Mapping";
         NpEcStore: Record "NPR NpEc Store";
         TempCust: Record Customer temporary;
         Element2: XmlElement;
         Node: XmlNode;
-        ConfigTemplateMgt: Codeunit "Config. Template Management";
         UpdateContFromCust: Codeunit "CustCont-Update";
         RecRef: RecordRef;
         PrevCust: Text;
@@ -73,6 +78,7 @@
 
         FindCustomerMapping(Element, NpEcCustomerMapping);
 
+#if BC17
         if (NpEcCustomerMapping."Config. Template Code" <> '') and ConfigTemplateHeader.Get(NpEcCustomerMapping."Config. Template Code") then begin
             if NpEcStore."Update Customers from S. Order" or NewCustomer then
                 RecRef.GetTable(Customer)
@@ -86,6 +92,19 @@
             ConfigTemplateMgt.UpdateRecord(ConfigTemplateHeader, RecRef);
             RecRef.SetTable(Customer);
         end;
+#else
+        if (NpEcCustomerMapping."Config. Template Code" <> '') and CustomerTemplate.Get(NpEcCustomerMapping."Config. Template Code") then begin
+            if NpEcStore."Update Customers from S. Order" or NewCustomer then
+                CustomerTemplMgt.ApplyCustomerTemplate(Customer, CustomerTemplate)
+            else begin
+                TempCust.Init();
+                TempCust := Customer;
+                TempCust.Insert();
+                CustomerTemplMgt.ApplyCustomerTemplate(TempCust, CustomerTemplate);
+                Customer := TempCust;
+            end;
+        end;
+#endif
 
         if not Element.SelectSingleNode('.//sell_to_customer', Node) then
             Error(XmlElementIsMissingErr, Element.Name() + '/' + 'sell_to_customer');

@@ -61,7 +61,7 @@
                 field("Customer Config. Template Code"; Rec."Customer Config. Template Code")
                 {
 
-                    ToolTip = 'Specifies the code of the customer configuration template.';
+                    ToolTip = 'Specifies the code of the customer template.';
                     ApplicationArea = NPRRetail;
                 }
                 field("Responsibility Center"; Rec."Responsibility Center")
