@@ -189,7 +189,7 @@ codeunit 6184633 "NPR POS Action: Cash Voucher" implements "NPR IPOS Workflow"
             if not NpRvVoucherMgt.ValidateAmount(NpRvVoucher, CommisionAmt, AvailableAmount) then
                 Error(InvalidCommisionAmountLbl);
         end else begin
-            NpRvVoucher.SetAutoCalcFields(Amount);
+            NpRvVoucher.CalcFields(Amount);
             if CommisionAmt > NpRvVoucher.Amount then
                 Error(InvalidCommisionAmountLbl);
         end;
