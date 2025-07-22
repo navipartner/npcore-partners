@@ -247,6 +247,16 @@
             Caption = 'Prepaid Amount';
             DataClassification = CustomerContent;
         }
+        field(216; Amount; Decimal)
+        {
+            Caption = 'Amount';
+            DataClassification = CustomerContent;
+        }
+        field(217; "Amount Including VAT"; Decimal)
+        {
+            Caption = 'Amount Including VAT';
+            DataClassification = CustomerContent;
+        }
         field(220; "Prepayment Account No."; Code[20])
         {
             Caption = 'Prepayment Account No.';

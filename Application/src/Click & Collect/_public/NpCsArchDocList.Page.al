@@ -170,6 +170,16 @@
                     ToolTip = 'Specifies the value of the Store Stock field';
                     ApplicationArea = NPRRetail;
                 }
+                field(Amount; Rec.Amount)
+                {
+                    ToolTip = 'Specifies the value of the Amount field';
+                    ApplicationArea = NPRRetail;
+                }
+                field("Amount Including VAT"; Rec."Amount Including VAT")
+                {
+                    ToolTip = 'Specifies the value of the Amount Including VAT field';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Prepaid Amount"; Rec."Prepaid Amount")
                 {
 

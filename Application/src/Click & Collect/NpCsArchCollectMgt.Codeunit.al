@@ -15,8 +15,11 @@
         NpCsWorkflowModule: Record "NPR NpCs Workflow Module";
         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
         Success: Boolean;
+        Amount: Decimal;
+        AmountInclVAT: Decimal;
     begin
         PrevNpCsDocument := NpCsDocument;
+        GetOrderAmounts(NpCsDocument, Amount, AmountInclVAT);
 
         if DeleteSalesDocument then begin
             ClearLastError();
@@ -29,7 +32,7 @@
                 exit(false);
         end;
 
-        InsertArchCollectDocument(NpCsDocument, NpCsArchDocument);
+        InsertArchCollectDocument(NpCsDocument, NpCsArchDocument, Amount, AmountInclVAT);
 
         NpCsDocumentLogEntry.SetRange("Document Entry No.", NpCsDocument."Entry No.");
         if NpCsDocumentLogEntry.FindSet() then
@@ -44,7 +47,7 @@
         exit(true);
     end;
 
-    local procedure InsertArchCollectDocument(NpCsDocument: Record "NPR NpCs Document"; var NpCsArchDocument: Record "NPR NpCs Arch. Document")
+    local procedure InsertArchCollectDocument(NpCsDocument: Record "NPR NpCs Document"; var NpCsArchDocument: Record "NPR NpCs Arch. Document"; Amount: Decimal; AmountInclVAT: Decimal)
     var
         ClickCollect: Codeunit "NPR Click & Collect";
     begin
@@ -94,6 +97,8 @@
         NpCsArchDocument."Delivery expires at" := NpCsDocument."Delivery expires at";
         NpCsArchDocument."Store Stock" := NpCsDocument."Store Stock";
         NpCsArchDocument."Prepaid Amount" := NpCsDocument."Prepaid Amount";
+        NpCsArchDocument.Amount := Amount;
+        NpCsArchDocument."Amount Including VAT" := AmountInclVAT;
         NpCsArchDocument."Prepayment Account No." := NpCsDocument."Prepayment Account No.";
         NpCsArchDocument."Delivery Document Type" := NpCsDocument."Delivery Document Type";
         NpCsArchDocument."Delivery Document No." := NpCsDocument."Delivery Document No.";
@@ -128,5 +133,17 @@
         NpCsArchDocumentLogEntry."Document Entry No." := NpCsArchDocument."Entry No.";
         NpCsArchDocumentLogEntry."Original Entry No." := NpCsDocumentLogEntry."Entry No.";
         NpCsArchDocumentLogEntry.Insert(true);
+    end;
+
+    local procedure GetOrderAmounts(NpCsDocument: Record "NPR NpCs Document"; var Amount: Decimal; var AmountInclVAT: Decimal)
+    var
+        SalesHeader: Record "Sales Header";
+    begin
+        if not SalesHeader.Get(NpCsDocument."Document Type", NpCsDocument."Document No.") then
+            exit;
+
+        SalesHeader.CalcFields(Amount, "Amount Including VAT");
+        Amount := SalesHeader.Amount;
+        AmountInclVAT := SalesHeader."Amount Including VAT";
     end;
 }
