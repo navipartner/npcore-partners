@@ -234,7 +234,10 @@ codeunit 6248264 "NPR SendGrid Client"
     var
         APIClient: Codeunit "NPR SendGrid API Client";
         EmailObject: JsonObject;
+        BodyMustHaveValueErr: Label 'When sending an e-mail with NP Email the body must have some content.';
     begin
+        if (StrLen(EmailMessage.GetBody().Trim()) <= 0) then
+            Error(BodyMustHaveValueErr);
         EmailObject := ConvertRegularEmailMessageToJson(EmailMessage, Account);
         APIClient.SendEmail(Account.NPEmailAccountId, EmailObject);
     end;
