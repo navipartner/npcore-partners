@@ -49,6 +49,7 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
         PrintandAdmitPublic: Codeunit "NPR Print and Admit Public";
         ReferenceNo: Text;
         AdmissionCode: Code[20];
+        ShowDataPrintAdmit: Boolean;
         NoDataFoundErr: Label 'No data found for the reference';
     begin
 #pragma warning disable AA0139
@@ -60,26 +61,25 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
         PrintandAdmitPublic.OnGetDataForReference(ReferenceNo, PrintandAdmitBuffer);
         if PrintandAdmitBuffer.IsEmpty then
             error(NoDataFoundErr);
-        exit(BufferTableToJson(PrintandAdmitBuffer));
-    end;
-
-    local procedure HandleTryAdmit(Context: Codeunit "NPR POS JSON Helper"; POSUnitNo: Code[10]) Response: JsonObject
-    var
-        PrintandAdmitBuffer: Record "NPR Print and Admit Buffer";
-        PrintandAdmitPublic: Codeunit "NPR Print and Admit Public";
-        JArray: JsonArray;
-        TryAdmitArray: JsonArray;
-        UnconfirmedGroup, ShowDataPrintAdmit : Boolean;
-        DefaultQtyGroupUnconfirmedArray: JsonArray;
-    begin
-        JArray := Context.GetJToken('buffer_data').AsArray();
-        JsonToBufferTable(JArray, PrintandAdmitBuffer);
         ShowDataPrintAdmit := Context.GetBooleanParameter('ShowData');
         if ShowDataPrintAdmit then
             ShowData(PrintandAdmitBuffer);
         if PrintandAdmitBuffer.IsEmpty then
             exit;
         PrintandAdmitPublic.OnBeforeHandleBuffer(PrintandAdmitBuffer);
+        exit(BufferTableToJson(PrintandAdmitBuffer));
+    end;
+
+    local procedure HandleTryAdmit(Context: Codeunit "NPR POS JSON Helper"; POSUnitNo: Code[10]) Response: JsonObject
+    var
+        PrintandAdmitBuffer: Record "NPR Print and Admit Buffer";
+        JArray: JsonArray;
+        TryAdmitArray: JsonArray;
+        UnconfirmedGroup: Boolean;
+        DefaultQtyGroupUnconfirmedArray: JsonArray;
+    begin
+        JArray := Context.GetJToken('buffer_data').AsArray();
+        JsonToBufferTable(JArray, PrintandAdmitBuffer);
 
         TryAdmit(PrintandAdmitBuffer, Context, POSUnitNo, UnconfirmedGroup, DefaultQtyGroupUnconfirmedArray, TryAdmitArray);
 
@@ -702,7 +702,7 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionPrintandAdmit.js###
-        'const main=async({workflow:n,parameters:d,popup:r,context:i,captions:t,toast:u,i:o})=>{if(d.reference_input)i.reference_input=d.reference_input;else if(i.reference_input=await r.input({title:t.ReferenceTitle,caption:t.ReferenceCaption}),i.reference_input===null)return;const l=await n.respond("fill_data"),m=await n.respond("try_admit",{buffer_data:l});if(m.unconfirmedGroup){const e=m.defaultQuantityUnconfirmed;i.quantityToAdmUnconfirmedGroup=[];for(const s of e){const f=await r.numpad({caption:t.QuantityAdmitLbl,title:t.QuantityAdmitLbl,value:s.defaultQuantity});i.quantityToAdmUnconfirmedGroup.push({token:s.token,qtytoAdmit:f})}}else i.quantityToAdmUnconfirmedGroup=[];const a=await n.respond("handle_admit_print",{admit_data:m,buffer_data:l});a.admittedReferences&&a.admittedReferences.forEach(e=>{switch(e.type){case 1:{e.memberDetails&&u.memberScanned({memberImg:e.memberDetails.MemberScanned.ImageDataUrl,memberName:e.memberDetails.MemberScanned.Name,validForAdmission:e.memberDetails.MemberScanned.Valid,memberExpiry:e.memberDetails.MemberScanned.ExpiryDate});break}default:{u.success(`${t.welcomeMsg} ${e.tableCaption} ${e.referenceId}`,{title:t.welcomeMsg});break}}}),a.printSuccessful||await r.error(`${t.printingFailed} ${a.printErrorMsg}`)};'
+        'const main=async({workflow:r,parameters:u,popup:m,context:i,captions:t,toast:l})=>{if(u.reference_input)i.reference_input=u.reference_input;else if(i.reference_input=await m.input({title:t.ReferenceTitle,caption:t.ReferenceCaption}),i.reference_input===null)return;const a=await r.respond("fill_data");if(!a||a.length===0)return;const d=await r.respond("try_admit",{buffer_data:a});if(d.unconfirmedGroup){const e=d.defaultQuantityUnconfirmed;i.quantityToAdmUnconfirmedGroup=[];for(const f of e){const s=await m.numpad({caption:t.QuantityAdmitLbl,title:t.QuantityAdmitLbl,value:f.defaultQuantity});i.quantityToAdmUnconfirmedGroup.push({token:f.token,qtytoAdmit:s})}}else i.quantityToAdmUnconfirmedGroup=[];const n=await r.respond("handle_admit_print",{admit_data:d,buffer_data:a});n.admittedReferences&&n.admittedReferences.forEach(e=>{switch(e.type){case 1:{e.memberDetails&&l.memberScanned({memberImg:e.memberDetails.MemberScanned.ImageDataUrl,memberName:e.memberDetails.MemberScanned.Name,validForAdmission:e.memberDetails.MemberScanned.Valid,memberExpiry:e.memberDetails.MemberScanned.ExpiryDate});break}default:{l.success(`${t.welcomeMsg} ${e.tableCaption} ${e.referenceId}`,{title:t.welcomeMsg});break}}}),n.printSuccessful||await m.error(`${t.printingFailed} ${n.printErrorMsg}`)};'
         );
     end;
 }
