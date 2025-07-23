@@ -498,9 +498,7 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
     var
         RSEIAuxSalesHeader: Record "NPR RS EI Aux Sales Header";
         RSEIAuxSalesInvHeader: Record "NPR RS EI Aux Sales Inv. Hdr.";
-        RSEIAuxSalesCrMemoHdr: Record "NPR RSEI Aux Sales Cr.Memo Hdr";
         RSEIOutSalesInvMgt: Codeunit "NPR RS EI Out Sales Inv. Mgt.";
-        RSEIOutSalesCrMemoMgt: Codeunit "NPR RSEI Out SalesCr.Memo Mgt.";
     begin
         if PreviewMode then
             exit;
@@ -518,15 +516,6 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
             RSEIAuxSalesInvHeader.SaveRSEIAuxSalesInvHdrFields();
             RSEIOutSalesInvMgt.CreateRequestAndSendSalesInvoice(SalesInvHeader);
         end;
-
-        if SalesCrMemoHeader."No." <> '' then begin
-            RSEIAuxSalesCrMemoHdr.ReadRSEIAuxSalesCrMemoHdrFields(SalesCrMemoHeader);
-            RSEIAuxSalesCrMemoHdr.TransferFields(RSEIAuxSalesHeader, false);
-            RSEIAuxSalesCrMemoHdr."NPR RS EI Tax Liability Method" := RSEIAuxSalesCrMemoHdr."NPR RS EI Tax Liability Method"::" ";
-            RSEIAuxSalesCrMemoHdr."NPR RS EI Reference Number" := SalesCrMemoHeader."No.";
-            RSEIAuxSalesCrMemoHdr.SaveRSEIAuxSalesCrMemoHdrFields();
-            RSEIOutSalesCrMemoMgt.CreateRequestAndSendSalesCrMemo(SalesCrMemoHeader);
-        end
     end;
 
     #endregion RS E-Invoice Sales Subscribers

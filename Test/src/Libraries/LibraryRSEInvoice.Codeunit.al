@@ -278,6 +278,7 @@ codeunit 85200 "NPR Library RS E-Invoice"
         GLAccount.Validate("Gen. Bus. Posting Group", GenPostingSetup."Gen. Bus. Posting Group");
         GLAccount.Validate("Gen. Prod. Posting Group", GenPostingSetup."Gen. Prod. Posting Group");
         GLAccount.Validate("Gen. Posting Type", GeneralPostingType);
+        GLAccount.Validate("Account Type", GLAccount."Account Type"::Posting);
         GLAccount.Modify(true);
 
         exit(GLAccount."No.");
@@ -342,13 +343,16 @@ codeunit 85200 "NPR Library RS E-Invoice"
     internal procedure CreateCustomer(var Customer: Record Customer; GenBusinessPostingGroup: Code[20]; VATBusinessPostingGroup: Code[20])
     var
         RSEIAuxCustomer: Record "NPR RS EI Aux Customer";
+        CustomerPostingGroup: Record "Customer Posting Group";
     begin
         _LibrarySales.CreateCustomer(Customer);
+        _LibrarySales.CreateCustomerPostingGroup(CustomerPostingGroup);
 
         Customer."Gen. Bus. Posting Group" := GenBusinessPostingGroup;
         Customer."VAT Bus. Posting Group" := VATBusinessPostingGroup;
         Customer."Registration Number" := GetTestRegistrationNo();
         Customer."VAT Registration No." := GetTestVATRegistrationNo();
+        Customer."Customer Posting Group" := CustomerPostingGroup.Code;
         Customer.Address := GetTestAddress();
         Customer.City := GetTestCity();
         Customer."Post Code" := GetTestPostCode();

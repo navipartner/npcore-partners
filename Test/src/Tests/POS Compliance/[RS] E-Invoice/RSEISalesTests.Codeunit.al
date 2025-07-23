@@ -68,7 +68,6 @@ codeunit 85199 "NPR RS EI Sales Tests"
         _PostedDocumentNo := LibraryRSEInvoice.PeekNextPostingNo(SalesHeader."Prepayment No. Series");
         PrepaymentDocNo := _LibrarySales.PostSalesPrepaymentInvoice(SalesHeader);
 
-        _PostedDocumentCrMemoNo := LibraryRSEInvoice.PeekNextPostingNo(SalesHeader."Prepmt. Cr. Memo No. Series");
         _PostedDocumentNo := LibraryRSEInvoice.PeekNextPostingNo(SalesHeader."Posting No. Series");
         PostedDocumentNo := _LibrarySales.PostSalesDocument(SalesHeader, true, true);
 
@@ -106,7 +105,6 @@ codeunit 85199 "NPR RS EI Sales Tests"
         PostedDocumentNo := _LibrarySales.PostSalesDocument(SalesHeader, true, true);
 
         LibraryRSEInvoice.CreateSalesCreditMemo(SalesHeader2, SalesLine, _GeneralPostingSetup, _VATPostingSetup, PostedDocumentNo, 'EISCRM2');
-        _PostedDocumentCrMemoNo := LibraryRSEInvoice.PeekNextPostingNo(SalesHeader2."Posting No. Series");
         PostedCreditMemoNo := _LibrarySales.PostSalesDocument(SalesHeader2, true, true);
 
         // [Then] For Normal Sale RS E-Invoice Document is created and filled

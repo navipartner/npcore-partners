@@ -29,11 +29,15 @@ codeunit 6184793 "NPR RS EI Out Sales Inv. Mgt."
 
         RSEInvoiceMgt.CheckIsDataSetOnSalesInvHeader(SalesInvoiceHeader);
 
-        RSEInvoiceDocument.SetRange("Document No.", SalesInvoiceHeader."No.");
-        if not RSEInvoiceDocument.IsEmpty() then
+        if RSEInvoiceDocumentExists(SalesInvoiceHeader."No.") then
             exit;
+
         SalesInvoiceHeader.CalcFields(Amount, "Amount Including VAT", "Invoice Discount Amount");
-        CreateInvoiceXMLDocument(RequestText, SalesInvoiceHeader, RSEIAuxSalesInvHdr);
+
+        if SalesInvoiceHeader."Prepayment Invoice" then
+            CreatePrepaymentInvoiceXMLDocument(RequestText, SalesInvoiceHeader, RSEIAuxSalesInvHdr)
+        else
+            CreateSalesInvoiceXMLDocument(RequestText, SalesInvoiceHeader, RSEIAuxSalesInvHdr);
         InsertInvoiceDocumentRec(RSEInvoiceDocument, SalesInvoiceHeader, RSEIAuxSalesInvHdr, RequestText);
         RSEICommunicationMgt.SendSalesDocument(RSEInvoiceDocument);
         InsertDataToSalesInvAuxTable(RSEIAuxSalesInvHdr, RSEInvoiceDocument);
@@ -51,9 +55,7 @@ codeunit 6184793 "NPR RS EI Out Sales Inv. Mgt."
         RSEInvoiceDocument."Creation Date" := SalesInvoiceHeader."Posting Date";
         RSEInvoiceDocument."Sending Date" := Today();
         RSEInvoiceDocument.Amount := SalesInvoiceHeader."Amount Including VAT";
-#pragma warning disable AA0139
-        RSEInvoiceDocument."Supplier Name" := CompanyName();
-#pragma warning restore
+        RSEInvoiceDocument."Supplier Name" := CopyStr(CompanyName(), 1, MaxStrLen(RSEInvoiceDocument."Supplier Name"));
         RSEInvoiceDocument."Customer No." := SalesInvoiceHeader."Sell-to Customer No.";
         RSEInvoiceDocument."Customer Name" := SalesInvoiceHeader."Sell-to Customer Name";
         RSEInvoiceDocument."Created" := true;
@@ -81,10 +83,65 @@ codeunit 6184793 "NPR RS EI Out Sales Inv. Mgt."
         RSEIAuxSalesInvHdr.SaveRSEIAuxSalesInvHdrFields();
     end;
 
-    local procedure CreateInvoiceXMLDocument(var DocumentText: Text; SalesInvoiceHeader: Record "Sales Invoice Header"; RSEIAuxSalesInvHdr: Record "NPR RS EI Aux Sales Inv. Hdr.")
+    local procedure CreateSalesInvoiceXMLDocument(var DocumentText: Text; SalesInvoiceHeader: Record "Sales Invoice Header"; RSEIAuxSalesInvHdr: Record "NPR RS EI Aux Sales Inv. Hdr.")
     var
-        Customer: Record Customer;
-        RSEIAuxCustomer: Record "NPR RS EI Aux Customer";
+        SalesInvoiceLine: Record "Sales Invoice Line";
+        PrepaymentSalesInvHdr: Record "Sales Invoice Header";
+        PrepaymentInvoiceFound: Boolean;
+        Document: XmlDocument;
+        InvoiceElement: XmlElement;
+    begin
+        SalesInvoiceLine.SetLoadFields(Type, "Line No.", Description, "Unit of Measure", "Line Discount Amount", "VAT Bus. Posting Group", "VAT Prod. Posting Group", "VAT %", "Unit Price", "Line Discount %", "Line Discount Amount");
+        SalesInvoiceLine.SetRange("Document No.", SalesInvoiceHeader."No.");
+        SalesInvoiceLine.SetFilter(Type, '<>%1|<>%2|<>%3', SalesInvoiceLine.Type::" ", SalesInvoiceLine.Type::"Allocation Account", SalesInvoiceLine.Type::"G/L Account");
+        if SalesInvoiceLine.IsEmpty() then
+            exit;
+
+        SetCurrencyId(SalesInvoiceHeader."Currency Code");
+
+        CreateXmlDocument(Document);
+
+        InvoiceElement := RSEInvoiceMgt.CreateXmlElement('Invoice', XmlnsUrnNamespaceLbl, '');
+        AddNamespaceDeclaration(InvoiceElement);
+
+        PrepaymentInvoiceFound := FindPrepaymentInvoice(PrepaymentSalesInvHdr, SalesInvoiceHeader);
+        if PrepaymentInvoiceFound then
+            AddPrepaymentDocInfo(InvoiceElement, SalesInvoiceHeader, PrepaymentSalesInvHdr);
+
+        AddMainHeaderSalesInvoiceInfo(InvoiceElement, SalesInvoiceHeader);
+
+        AddInvoicePeriodInformation(InvoiceElement, RSEIAuxSalesInvHdr);
+
+        if PrepaymentInvoiceFound then
+            AddBillingReferenceInformation(InvoiceElement, PrepaymentSalesInvHdr);
+
+        AddContractInformation(InvoiceElement, SalesInvoiceHeader);
+
+        AddCompanyInformation(InvoiceElement);
+
+        AddCustomerInformation(InvoiceElement, SalesInvoiceHeader);
+
+        AddDeliveryInformation(InvoiceElement);
+
+        AddPaymentMeansInformation(InvoiceElement, SalesInvoiceHeader, RSEIAuxSalesInvHdr);
+
+        AddAllowanceChargeInformation(InvoiceElement, SalesInvoiceHeader);
+
+        SalesInvoiceCalculateAndAddTaxSubtotals(InvoiceElement, SalesInvoiceHeader);
+        AddTaxTotals(InvoiceElement, SalesInvoiceHeader);
+
+        SalesInvoiceLine.FindSet();
+        repeat
+            AddSalesInvoiceLineInformation(InvoiceElement, SalesInvoiceLine);
+        until SalesInvoiceLine.Next() = 0;
+
+        Document.Add(InvoiceElement);
+
+        Document.WriteTo(DocumentText);
+    end;
+
+    local procedure CreatePrepaymentInvoiceXMLDocument(var DocumentText: Text; SalesInvoiceHeader: Record "Sales Invoice Header"; RSEIAuxSalesInvHdr: Record "NPR RS EI Aux Sales Inv. Hdr.")
+    var
         SalesInvoiceLine: Record "Sales Invoice Line";
         Document: XmlDocument;
         InvoiceElement: XmlElement;
@@ -95,15 +152,14 @@ codeunit 6184793 "NPR RS EI Out Sales Inv. Mgt."
         if SalesInvoiceLine.IsEmpty() then
             exit;
 
-        Customer.Get(SalesInvoiceHeader."Sell-to Customer No.");
-        RSEIAuxCustomer.ReadRSEIAuxCustomerFields(Customer);
+        SetCurrencyId(SalesInvoiceHeader."Currency Code");
 
         CreateXmlDocument(Document);
 
         InvoiceElement := RSEInvoiceMgt.CreateXmlElement('Invoice', XmlnsUrnNamespaceLbl, '');
         AddNamespaceDeclaration(InvoiceElement);
 
-        AddMainHeaderInfo(InvoiceElement, SalesInvoiceHeader);
+        AddMainHeaderPrepaymentInvoiceInfo(InvoiceElement, SalesInvoiceHeader);
 
         AddInvoicePeriodInformation(InvoiceElement, RSEIAuxSalesInvHdr);
 
@@ -111,16 +167,14 @@ codeunit 6184793 "NPR RS EI Out Sales Inv. Mgt."
 
         AddCompanyInformation(InvoiceElement);
 
-        AddCustomerInformation(InvoiceElement, Customer, RSEIAuxCustomer);
-
-        if not SalesInvoiceHeader."Prepayment Invoice" then
-            AddDeliveryInformation(InvoiceElement, SalesInvoiceHeader);
+        AddCustomerInformation(InvoiceElement, SalesInvoiceHeader);
 
         AddPaymentMeansInformation(InvoiceElement, SalesInvoiceHeader, RSEIAuxSalesInvHdr);
 
         AddAllowanceChargeInformation(InvoiceElement, SalesInvoiceHeader);
 
-        AddTaxInformation(InvoiceElement, SalesInvoiceHeader);
+        PrepaymentInvoiceCalculateAndAddTaxSubtotals(InvoiceElement, SalesInvoiceHeader);
+        AddTaxTotals(InvoiceElement, SalesInvoiceHeader);
 
         SalesInvoiceLine.FindSet();
         repeat
@@ -151,42 +205,108 @@ codeunit 6184793 "NPR RS EI Out Sales Inv. Mgt."
         InvoiceElement.Add(XmlAttribute.CreateNamespaceDeclaration('sbt', SbtUrlNamespaceLbl));
     end;
 
-    local procedure AddMainHeaderInfo(var InvoiceElement: XmlElement; SalesInvoiceHeader: Record "Sales Invoice Header")
+    local procedure AddPrepaymentDocInfo(var InvoiceElement: XmlElement; SalesInvoiceHeader: Record "Sales Invoice Header"; PrepaymentSalesInvHdr: Record "Sales Invoice Header")
     var
-        GeneralLedgerSetup: Record "General Ledger Setup";
+        UBLExtensionsElement: XmlElement;
+        UBLExtensionElement: XmlElement;
+        ExtensionContentElement: XmlElement;
+        SbtElement: XmlElement;
+        InvoicedPrepaymentAmtElement: XmlElement;
+        ReducedTotalsElement: XmlElement;
+    begin
+        UBLExtensionsElement := RSEInvoiceMgt.CreateXmlElement('UBLExtensions', RSEInvoiceMgt.GetCecNamespace(), '');
+        UBLExtensionElement := RSEInvoiceMgt.CreateXmlElement('UBLExtension', RSEInvoiceMgt.GetCecNamespace(), '');
+        ExtensionContentElement := RSEInvoiceMgt.CreateXmlElement('ExtensionContent', RSEInvoiceMgt.GetCecNamespace(), '');
+        SbtElement := RSEInvoiceMgt.CreateXmlElement('SrbDtExt', SbtUrlNamespaceLbl, '');
+        InvoicedPrepaymentAmtElement := RSEInvoiceMgt.CreateXmlElement('InvoicedPrepaymentAmount', XsdUrlNamespaceLbl, '');
+        InvoicedPrepaymentAmtElement.Add(RSEInvoiceMgt.CreateXmlElement('ID', RSEInvoiceMgt.GetCbcNamespace(), PrepaymentSalesInvHdr."No."));
+        PrepaymentInvoiceCalculateAndAddTaxSubtotals(InvoicedPrepaymentAmtElement, PrepaymentSalesInvHdr);
+        SbtElement.Add(InvoicedPrepaymentAmtElement);
+
+        ReducedTotalsElement := RSEInvoiceMgt.CreateXmlElement('ReducedTotals', XsdUrlNamespaceLbl, '');
+        AddReducedTaxTotalsInformation(ReducedTotalsElement, SalesInvoiceHeader, PrepaymentSalesInvHdr);
+        SbtElement.Add(ReducedTotalsElement);
+
+        ExtensionContentElement.Add(SbtElement);
+        UBLExtensionElement.Add(ExtensionContentElement);
+        UBLExtensionsElement.Add(UBLExtensionElement);
+        InvoiceElement.Add(UBLExtensionsElement);
+    end;
+
+    local procedure AddReducedTaxTotalsInformation(var InvoiceElement: XmlElement; SalesInvoiceHeader: Record "Sales Invoice Header"; PrepaymentSalesInvHdr: Record "Sales Invoice Header")
+    var
+        SalesInvoiceTotalTaxAmountDict: Dictionary of [Enum "NPR RS EI Allowed Tax Categ.", Decimal];
+        SalesInvoiceTotalTaxableAmountDict: Dictionary of [Enum "NPR RS EI Allowed Tax Categ.", Decimal];
+        SalesInvoiceTaxPercentagesDict: Dictionary of [Enum "NPR RS EI Allowed Tax Categ.", Decimal];
+        SalesInvoiceTaxCategoriesList: List of [Enum "NPR RS EI Allowed Tax Categ."];
+        PrepaymentSalesInvTotalTaxAmountDict: Dictionary of [Enum "NPR RS EI Allowed Tax Categ.", Decimal];
+        PrepaymentSalesInvTotalTaxableAmountDict: Dictionary of [Enum "NPR RS EI Allowed Tax Categ.", Decimal];
+        PrepaymentSalesInvTaxPercentagesDict: Dictionary of [Enum "NPR RS EI Allowed Tax Categ.", Decimal];
+        ReducedTotalTaxAmountDict: Dictionary of [Enum "NPR RS EI Allowed Tax Categ.", Decimal];
+        ReducedTotalTaxableAmountDict: Dictionary of [Enum "NPR RS EI Allowed Tax Categ.", Decimal];
+        ReducedTaxPercentagesDict: Dictionary of [Enum "NPR RS EI Allowed Tax Categ.", Decimal];
+        RSEIAllowedVATCateg: Enum "NPR RS EI Allowed Tax Categ.";
+        TotalTaxAmount: Decimal;
+    begin
+        RSEInvoiceMgt.CalculateTotalVATAmounts(SalesInvoiceTotalTaxAmountDict, SalesInvoiceTotalTaxableAmountDict, SalesInvoiceTaxPercentagesDict, SalesInvoiceHeader."No.");
+        RSEInvoiceMgt.CalculateTotalVATAmounts(PrepaymentSalesInvTotalTaxAmountDict, PrepaymentSalesInvTotalTaxableAmountDict, PrepaymentSalesInvTaxPercentagesDict, PrepaymentSalesInvHdr."No.");
+
+        SalesInvoiceTaxCategoriesList := SalesInvoiceTotalTaxAmountDict.Keys();
+        foreach RSEIAllowedVATCateg in SalesInvoiceTaxCategoriesList do begin
+            if not ReducedTotalTaxAmountDict.Add(RSEIAllowedVATCateg, Abs(SalesInvoiceTotalTaxAmountDict.Get(RSEIAllowedVATCateg)) - Abs(PrepaymentSalesInvTotalTaxAmountDict.Get(RSEIAllowedVATCateg))) then begin
+                ReducedTotalTaxAmountDict.Set(RSEIAllowedVATCateg, Abs(ReducedTotalTaxAmountDict.Get(RSEIAllowedVATCateg)) - Abs(PrepaymentSalesInvTotalTaxAmountDict.Get(RSEIAllowedVATCateg)));
+                TotalTaxAmount += Abs(ReducedTotalTaxAmountDict.Get(RSEIAllowedVATCateg)) - Abs(PrepaymentSalesInvTotalTaxAmountDict.Get(RSEIAllowedVATCateg));
+            end else
+                TotalTaxAmount += Abs(SalesInvoiceTotalTaxAmountDict.Get(RSEIAllowedVATCateg)) - Abs(PrepaymentSalesInvTotalTaxAmountDict.Get(RSEIAllowedVATCateg));
+            if not ReducedTotalTaxableAmountDict.Add(RSEIAllowedVATCateg, Abs(SalesInvoiceTotalTaxableAmountDict.Get(RSEIAllowedVATCateg)) - Abs(PrepaymentSalesInvTotalTaxableAmountDict.Get(RSEIAllowedVATCateg))) then
+                ReducedTotalTaxableAmountDict.Set(RSEIAllowedVATCateg, Abs(ReducedTotalTaxableAmountDict.Get(RSEIAllowedVATCateg)) - Abs(PrepaymentSalesInvTotalTaxableAmountDict.Get(RSEIAllowedVATCateg)));
+            if ReducedTaxPercentagesDict.Add(RSEIAllowedVATCateg, SalesInvoiceTaxPercentagesDict.Get(RSEIAllowedVATCateg)) then;
+        end;
+
+        AddTaxSubtotals(InvoiceElement, TotalTaxAmount, PrepaymentSalesInvHdr."Prepayment Order No.", ReducedTotalTaxAmountDict, ReducedTotalTaxableAmountDict, ReducedTaxPercentagesDict);
+        AddReducedTaxTotals(InvoiceElement, SalesInvoiceHeader, PrepaymentSalesInvHdr);
+    end;
+
+    local procedure AddReducedTaxTotals(var InvoiceElement: XmlElement; SalesInvoiceHeader: Record "Sales Invoice Header"; PrepaymentSalesInvHdr: Record "Sales Invoice Header")
+    var
+        LegalMonetaryTotalElement: XmlElement;
+    begin
+        LegalMonetaryTotalElement := RSEInvoiceMgt.CreateXmlElement('LegalMonetaryTotal', RSEInvoiceMgt.GetCacNamespace(), '');
+        LegalMonetaryTotalElement.Add(RSEInvoiceMgt.CreateXmlElementWAttribute('LineExtensionAmount', RSEInvoiceMgt.GetCbcNamespace(), RSEInvoiceMgt.FormatTwoDecimals(SalesInvoiceHeader.Amount - PrepaymentSalesInvHdr.Amount), 'currencyID', CurrencyId));
+        LegalMonetaryTotalElement.Add(RSEInvoiceMgt.CreateXmlElementWAttribute('TaxExclusiveAmount', RSEInvoiceMgt.GetCbcNamespace(), RSEInvoiceMgt.FormatTwoDecimals(SalesInvoiceHeader.Amount - PrepaymentSalesInvHdr.Amount), 'currencyID', CurrencyId));
+        LegalMonetaryTotalElement.Add(RSEInvoiceMgt.CreateXmlElementWAttribute('TaxInclusiveAmount', RSEInvoiceMgt.GetCbcNamespace(), RSEInvoiceMgt.FormatTwoDecimals(SalesInvoiceHeader."Amount Including VAT" - PrepaymentSalesInvHdr."Amount Including VAT"), 'currencyID', CurrencyId));
+        LegalMonetaryTotalElement.Add(RSEInvoiceMgt.CreateXmlElementWAttribute('PayableAmount', RSEInvoiceMgt.GetCbcNamespace(), RSEInvoiceMgt.FormatTwoDecimals(SalesInvoiceHeader."Amount Including VAT" - PrepaymentSalesInvHdr."Amount Including VAT"), 'currencyID', CurrencyId));
+        InvoiceElement.Add(LegalMonetaryTotalElement);
+    end;
+
+    local procedure AddMainHeaderSalesInvoiceInfo(var InvoiceElement: XmlElement; SalesInvoiceHeader: Record "Sales Invoice Header")
+    var
+        CustomizationIDLbl: Label 'urn:cen.eu:en16931:2017#compliant#urn:mfin.gov.rs:srbdt:2022', Locked = true;
+    begin
+        InvoiceElement.Add(RSEInvoiceMgt.CreateXmlElement('CustomizationID', RSEInvoiceMgt.GetCbcNamespace(), CustomizationIDLbl));
+        InvoiceElement.Add(RSEInvoiceMgt.CreateXmlElement('ID', RSEInvoiceMgt.GetCbcNamespace(), SalesInvoiceHeader."No."));
+        InvoiceElement.Add(RSEInvoiceMgt.CreateXmlElement('IssueDate', RSEInvoiceMgt.GetCbcNamespace(), Format(Today(), 10, '<Year4>-<Month,2>-<Day,2>')));
+        InvoiceElement.Add(RSEInvoiceMgt.CreateXmlElement('DueDate', RSEInvoiceMgt.GetCbcNamespace(), Format(SalesInvoiceHeader."Due Date", 10, '<Year4>-<Month,2>-<Day,2>')));
+        InvoiceElement.Add(RSEInvoiceMgt.CreateXmlElement('InvoiceTypeCode', RSEInvoiceMgt.GetCbcNamespace(), '380'));
+        InvoiceElement.Add(RSEInvoiceMgt.CreateXmlElement('DocumentCurrencyCode', RSEInvoiceMgt.GetCbcNamespace(), CurrencyId));
+    end;
+
+    local procedure AddMainHeaderPrepaymentInvoiceInfo(var InvoiceElement: XmlElement; SalesInvoiceHeader: Record "Sales Invoice Header")
+    var
+        PrepaidSalesHeader: Record "Sales Header";
         CustomizationIDLbl: Label 'urn:cen.eu:en16931:2017#compliant#urn:mfin.gov.rs:srbdt:2022', Locked = true;
     begin
         InvoiceElement.Add(RSEInvoiceMgt.CreateXmlElement('CustomizationID', RSEInvoiceMgt.GetCbcNamespace(), CustomizationIDLbl));
         InvoiceElement.Add(RSEInvoiceMgt.CreateXmlElement('ID', RSEInvoiceMgt.GetCbcNamespace(), SalesInvoiceHeader."No."));
         InvoiceElement.Add(RSEInvoiceMgt.CreateXmlElement('IssueDate', RSEInvoiceMgt.GetCbcNamespace(), Format(Today(), 10, '<Year4>-<Month,2>-<Day,2>')));
 
-        if SalesInvoiceHeader."Prepayment Invoice" then begin
-            AddHeaderInfoForPrepaymentInvoice(InvoiceElement, SalesInvoiceHeader);
-        end else begin
-            InvoiceElement.Add(RSEInvoiceMgt.CreateXmlElement('DueDate', RSEInvoiceMgt.GetCbcNamespace(), Format(SalesInvoiceHeader."Due Date", 10, '<Year4>-<Month,2>-<Day,2>')));
-            InvoiceElement.Add(RSEInvoiceMgt.CreateXmlElement('InvoiceTypeCode', RSEInvoiceMgt.GetCbcNamespace(), '380'));
-            CurrencyId := SalesInvoiceHeader."Currency Code";
-        end;
-
-        if CurrencyId = '' then begin
-            GeneralLedgerSetup.Get();
-            GeneralLedgerSetup.TestField("LCY Code");
-            CurrencyId := GeneralLedgerSetup."LCY Code";
-        end;
-
-        InvoiceElement.Add(RSEInvoiceMgt.CreateXmlElement('DocumentCurrencyCode', RSEInvoiceMgt.GetCbcNamespace(), CurrencyId));
-    end;
-
-    local procedure AddHeaderInfoForPrepaymentInvoice(var InvoiceElement: XmlElement; SalesInvoiceHeader: Record "Sales Invoice Header")
-    var
-        PrepaidSalesHeader: Record "Sales Header";
-    begin
         PrepaidSalesHeader.Get(PrepaidSalesHeader."Document Type"::Order, SalesInvoiceHeader."Prepayment Order No.");
         if not AddDateOfPaymentForPrepaymentInvoice(InvoiceElement, PrepaidSalesHeader) then
             InvoiceElement.Add(RSEInvoiceMgt.CreateXmlElement('DueDate', RSEInvoiceMgt.GetCbcNamespace(), Format(SalesInvoiceHeader."Due Date", 10, '<Year4>-<Month,2>-<Day,2>')));
 
         InvoiceElement.Add(RSEInvoiceMgt.CreateXmlElement('InvoiceTypeCode', RSEInvoiceMgt.GetCbcNamespace(), '386'));
-        CurrencyId := PrepaidSalesHeader."Currency Code";
+        SetCurrencyId(PrepaidSalesHeader."Currency Code");
+        InvoiceElement.Add(RSEInvoiceMgt.CreateXmlElement('DocumentCurrencyCode', RSEInvoiceMgt.GetCbcNamespace(), CurrencyId));
     end;
 
     local procedure AddInvoicePeriodInformation(var InvoiceElement: XmlElement; RSEIAuxSalesInvHdr: Record "NPR RS EI Aux Sales Inv. Hdr.")
@@ -198,13 +318,32 @@ codeunit 6184793 "NPR RS EI Out Sales Inv. Mgt."
             exit;
 
         InvoicePeriodElement := RSEInvoiceMgt.CreateXmlElement('InvoicePeriod', RSEInvoiceMgt.GetCacNamespace(), '');
-
         DescriptionCodeElement := RSEInvoiceMgt.CreateXmlElement('DescriptionCode', RSEInvoiceMgt.GetCbcNamespace(),
         RSEITaxLiabilityCode.Names().Get(RSEITaxLiabilityCode.Ordinals().IndexOf(RSEIAuxSalesInvHdr."NPR RS EI Tax Liability Method".AsInteger())));
-
         InvoicePeriodElement.Add(DescriptionCodeElement);
-
         InvoiceElement.Add(InvoicePeriodElement);
+    end;
+
+    local procedure AddBillingReferenceInformation(var InvoiceElement: XmlElement; PrepaymentSalesInvHdr: Record "Sales Invoice Header")
+    var
+        BillingRefElement: XmlElement;
+        InvoiceDocumentRefElement: XmlElement;
+    begin
+        BillingRefElement := RSEInvoiceMgt.CreateXmlElement('BillingReference', RSEInvoiceMgt.GetCacNamespace(), '');
+        InvoiceDocumentRefElement := RSEInvoiceMgt.CreateXmlElement('InvoiceDocumentReference', RSEInvoiceMgt.GetCacNamespace(), '');
+        InvoiceDocumentRefElement.Add(RSEInvoiceMgt.CreateXmlElement('ID', RSEInvoiceMgt.GetCbcNamespace(), PrepaymentSalesInvHdr."No."));
+        InvoiceDocumentRefElement.Add(RSEInvoiceMgt.CreateXmlElement('IssueDate', RSEInvoiceMgt.GetCbcNamespace(), Format(FindRSEInvoiceDocumentSendingDate(PrepaymentSalesInvHdr."No."), 10, '<Year4>-<Month,2>-<Day,2>')));
+        BillingRefElement.Add(InvoiceDocumentRefElement);
+        InvoiceElement.Add(BillingRefElement);
+    end;
+
+    local procedure FindRSEInvoiceDocumentSendingDate(DocumentNo: Code[20]): Date
+    var
+        RSEInvoiceDocument: Record "NPR RS E-Invoice Document";
+    begin
+        RSEInvoiceDocument.SetRange("Document No.", DocumentNo);
+        RSEInvoiceDocument.FindFirst();
+        exit(RSEInvoiceDocument."Sending Date");
     end;
 
     local procedure AddContractInformation(var InvoiceElement: XmlElement; SalesInvoiceHeader: Record "Sales Invoice Header")
@@ -290,8 +429,10 @@ codeunit 6184793 "NPR RS EI Out Sales Inv. Mgt."
         InvoiceElement.Add(AccSupplierElement);
     end;
 
-    local procedure AddCustomerInformation(var InvoiceElement: XmlElement; Customer: Record Customer; RSEIAuxCustomer: Record "NPR RS EI Aux Customer")
+    local procedure AddCustomerInformation(var InvoiceElement: XmlElement; SalesInvoiceHeader: Record "Sales Invoice Header")
     var
+        Customer: Record Customer;
+        RSEIAuxCustomer: Record "NPR RS EI Aux Customer";
         AccCustomerElement: XmlElement;
         PartyElement: XmlElement;
         PartyIdentificationElement: XmlElement;
@@ -303,6 +444,9 @@ codeunit 6184793 "NPR RS EI Out Sales Inv. Mgt."
         PartyLegalEntElement: XmlElement;
         ContactElement: XmlElement;
     begin
+        Customer.Get(SalesInvoiceHeader."Sell-to Customer No.");
+        RSEIAuxCustomer.ReadRSEIAuxCustomerFields(Customer);
+
         AccCustomerElement := RSEInvoiceMgt.CreateXmlElement('AccountingCustomerParty', RSEInvoiceMgt.GetCacNamespace(), '');
 
         PartyElement := RSEInvoiceMgt.CreateXmlElement('Party', RSEInvoiceMgt.GetCacNamespace(), '');
@@ -362,13 +506,13 @@ codeunit 6184793 "NPR RS EI Out Sales Inv. Mgt."
         InvoiceElement.Add(AccCustomerElement);
     end;
 
-    local procedure AddDeliveryInformation(var InvoiceElement: XmlElement; SalesInvoiceHeader: Record "Sales Invoice Header")
+    local procedure AddDeliveryInformation(var InvoiceElement: XmlElement)
     var
         DeliveryElement: XmlElement;
         ActDeliveryDateElement: XmlElement;
     begin
         DeliveryElement := RSEInvoiceMgt.CreateXmlElement('Delivery', RSEInvoiceMgt.GetCacNamespace(), '');
-        ActDeliveryDateElement := RSEInvoiceMgt.CreateXmlElement('ActualDeliveryDate', RSEInvoiceMgt.GetCbcNamespace(), Format(SalesInvoiceHeader."Shipment Date", 10, '<Year4>-<Month,2>-<Day,2>'));
+        ActDeliveryDateElement := RSEInvoiceMgt.CreateXmlElement('ActualDeliveryDate', RSEInvoiceMgt.GetCbcNamespace(), Format(Today(), 10, '<Year4>-<Month,2>-<Day,2>'));
         DeliveryElement.Add(ActDeliveryDateElement);
 
         InvoiceElement.Add(DeliveryElement);
@@ -436,45 +580,52 @@ codeunit 6184793 "NPR RS EI Out Sales Inv. Mgt."
         end;
     end;
 
-    local procedure AddTaxInformation(var InvoiceElement: XmlElement; SalesInvoiceHeader: Record "Sales Invoice Header")
+    local procedure SalesInvoiceCalculateAndAddTaxSubtotals(var InvoiceElement: XmlElement; SalesInvoiceHeader: Record "Sales Invoice Header")
     var
-        SalesInvoiceLine: Record "Sales Invoice Line";
-        TotalsSalesInvoiceLine: Record "Sales Invoice Line";
-        RSEIDocTaxExemption: Record "NPR RS EI Doc. Tax Exemption";
+        TotalTaxAmountDict: Dictionary of [Enum "NPR RS EI Allowed Tax Categ.", Decimal];
+        TotalTaxableAmountDict: Dictionary of [Enum "NPR RS EI Allowed Tax Categ.", Decimal];
+        TaxPercentagesDict: Dictionary of [Enum "NPR RS EI Allowed Tax Categ.", Decimal];
+    begin
+        RSEInvoiceMgt.CalculateTotalVATAmounts(TotalTaxAmountDict, TotalTaxableAmountDict, TaxPercentagesDict, SalesInvoiceHeader."No.");
+        AddTaxSubtotals(InvoiceElement, SalesInvoiceHeader."Amount Including VAT" - SalesInvoiceHeader.Amount, SalesInvoiceHeader."Order No.", TotalTaxAmountDict, TotalTaxableAmountDict, TaxPercentagesDict);
+    end;
+
+    local procedure PrepaymentInvoiceCalculateAndAddTaxSubtotals(var InvoiceElement: XmlElement; SalesInvoiceHeader: Record "Sales Invoice Header")
+    var
+        TotalTaxAmountDict: Dictionary of [Enum "NPR RS EI Allowed Tax Categ.", Decimal];
+        TotalTaxableAmountDict: Dictionary of [Enum "NPR RS EI Allowed Tax Categ.", Decimal];
+        TaxPercentagesDict: Dictionary of [Enum "NPR RS EI Allowed Tax Categ.", Decimal];
+    begin
+        RSEInvoiceMgt.CalculateTotalVATAmounts(TotalTaxAmountDict, TotalTaxableAmountDict, TaxPercentagesDict, SalesInvoiceHeader."No.");
+        AddTaxSubtotals(InvoiceElement, SalesInvoiceHeader."Amount Including VAT" - SalesInvoiceHeader.Amount, SalesInvoiceHeader."Prepayment Order No.", TotalTaxAmountDict, TotalTaxableAmountDict, TaxPercentagesDict);
+    end;
+
+    local procedure AddTaxSubtotals(var InvoiceElement: XmlElement; TotalTaxAmount: Decimal; OrderNo: Code[20];
+                                    TotalTax: Dictionary of [Enum "NPR RS EI Allowed Tax Categ.", Decimal]; TotalTaxable: Dictionary of [Enum "NPR RS EI Allowed Tax Categ.", Decimal]; TaxPercentage: Dictionary of [Enum "NPR RS EI Allowed Tax Categ.", Decimal])
+    var
         TaxTotalElement: XmlElement;
         TaxSubtotalElement: XmlElement;
         TaxCategoryElement: XmlElement;
         TaxCatTaxSchElement: XmlElement;
-        LegalMonetaryTotalElement: XmlElement;
-        TotalPrepaymentAmount: Decimal;
-        TotalTaxAmountDict: Dictionary of [Enum "NPR RS EI Allowed Tax Categ.", Decimal];
-        TotalTaxableAmountDict: Dictionary of [Enum "NPR RS EI Allowed Tax Categ.", Decimal];
-        TaxPercentagesDict: Dictionary of [Enum "NPR RS EI Allowed Tax Categ.", Decimal];
         TaxCategoriesList: List of [Enum "NPR RS EI Allowed Tax Categ."];
         RSEIAllowedVATCateg: Enum "NPR RS EI Allowed Tax Categ.";
     begin
-        RSEInvoiceMgt.CalculateTotalVATAmounts(TotalTaxAmountDict, TotalTaxableAmountDict, TaxPercentagesDict, SalesInvoiceHeader."No.");
-
-        TaxCategoriesList := TotalTaxAmountDict.Keys();
+        TaxCategoriesList := TotalTax.Keys();
 
         TaxTotalElement := RSEInvoiceMgt.CreateXmlElement('TaxTotal', RSEInvoiceMgt.GetCacNamespace(), '');
-        SalesInvoiceLine.SetLoadFields("VAT Bus. Posting Group", "VAT Prod. Posting Group", "Amount Including VAT", "VAT Base Amount", "VAT %", "Line Discount Amount", Type);
-        SalesInvoiceLine.SetRange("Document No.", SalesInvoiceHeader."No.");
-        TaxTotalElement.Add(RSEInvoiceMgt.CreateXmlElementWAttribute('TaxAmount', RSEInvoiceMgt.GetCbcNamespace(), RSEInvoiceMgt.FormatTwoDecimals(SalesInvoiceHeader."Amount Including VAT" - SalesInvoiceHeader.Amount), 'currencyID', CurrencyId));
+        TaxTotalElement.Add(RSEInvoiceMgt.CreateXmlElementWAttribute('TaxAmount', RSEInvoiceMgt.GetCbcNamespace(), RSEInvoiceMgt.FormatTwoDecimals(TotalTaxAmount), 'currencyID', CurrencyId));
 
         foreach RSEIAllowedVATCateg in TaxCategoriesList do begin
             TaxSubtotalElement := RSEInvoiceMgt.CreateXmlElement('TaxSubtotal', RSEInvoiceMgt.GetCacNamespace(), '');
-            TaxSubtotalElement.Add(RSEInvoiceMgt.CreateXmlElementWAttribute('TaxableAmount', RSEInvoiceMgt.GetCbcNamespace(), RSEInvoiceMgt.FormatTwoDecimals(Abs(TotalTaxableAmountDict.Get(RSEIAllowedVATCateg))), 'currencyID', CurrencyId));
-            TaxSubtotalElement.Add(RSEInvoiceMgt.CreateXmlElementWAttribute('TaxAmount', RSEInvoiceMgt.GetCbcNamespace(), RSEInvoiceMgt.FormatTwoDecimals(Abs(TotalTaxAmountDict.Get(RSEIAllowedVATCateg))), 'currencyID', CurrencyId));
+            TaxSubtotalElement.Add(RSEInvoiceMgt.CreateXmlElementWAttribute('TaxableAmount', RSEInvoiceMgt.GetCbcNamespace(), RSEInvoiceMgt.FormatTwoDecimals(Abs(TotalTaxable.Get(RSEIAllowedVATCateg))), 'currencyID', CurrencyId));
+            TaxSubtotalElement.Add(RSEInvoiceMgt.CreateXmlElementWAttribute('TaxAmount', RSEInvoiceMgt.GetCbcNamespace(), RSEInvoiceMgt.FormatTwoDecimals(Abs(TotalTax.Get(RSEIAllowedVATCateg))), 'currencyID', CurrencyId));
             TaxCategoryElement := RSEInvoiceMgt.CreateXmlElement('TaxCategory', RSEInvoiceMgt.GetCacNamespace(), '');
 
             TaxCategoryElement.Add(RSEInvoiceMgt.CreateXmlElement('ID', RSEInvoiceMgt.GetCbcNamespace(), RSEInvoiceMgt.GetAllowedTaxCategoryName(RSEIAllowedVATCateg.AsInteger())));
-            TaxCategoryElement.Add(RSEInvoiceMgt.CreateXmlElement('Percent', RSEInvoiceMgt.GetCbcNamespace(), RSEInvoiceMgt.FormatDecimal(TaxPercentagesDict.Get(RSEIAllowedVATCateg))));
+            TaxCategoryElement.Add(RSEInvoiceMgt.CreateXmlElement('Percent', RSEInvoiceMgt.GetCbcNamespace(), RSEInvoiceMgt.FormatDecimal(TaxPercentage.Get(RSEIAllowedVATCateg))));
 
-            if TaxPercentagesDict.Get(RSEIAllowedVATCateg) = 0 then begin
-                RSEIDocTaxExemption.Get(SalesInvoiceHeader."Order No.", RSEIAllowedVATCateg);
-                TaxCategoryElement.Add(RSEInvoiceMgt.CreateXmlElement('TaxExemptionReasonCode', RSEInvoiceMgt.GetCbcNamespace(), RSEIDocTaxExemption."Tax Exemption Reason Code"));
-            end;
+            if TaxPercentage.Get(RSEIAllowedVATCateg) = 0 then
+                TaxCategoryElement.Add(RSEInvoiceMgt.CreateXmlElement('TaxExemptionReasonCode', RSEInvoiceMgt.GetCbcNamespace(), GetTaxExemptionReasonCode(OrderNo, RSEIAllowedVATCateg)));
 
             TaxCatTaxSchElement := RSEInvoiceMgt.CreateXmlElement('TaxScheme', RSEInvoiceMgt.GetCacNamespace(), '');
             TaxCatTaxSchElement.Add(RSEInvoiceMgt.CreateXmlElement('ID', RSEInvoiceMgt.GetCbcNamespace(), 'VAT'));
@@ -484,13 +635,19 @@ codeunit 6184793 "NPR RS EI Out Sales Inv. Mgt."
         end;
 
         InvoiceElement.Add(TaxTotalElement);
-        CalculateSalesInvoiceLineTotals(TotalsSalesInvoiceLine, SalesInvoiceHeader);
+    end;
+
+    local procedure AddTaxTotals(var InvoiceElement: XmlElement; SalesInvoiceHeader: Record "Sales Invoice Header")
+    var
+        LegalMonetaryTotalElement: XmlElement;
+        TotalPrepaymentAmount: Decimal;
+    begin
         LegalMonetaryTotalElement := RSEInvoiceMgt.CreateXmlElement('LegalMonetaryTotal', RSEInvoiceMgt.GetCacNamespace(), '');
-        LegalMonetaryTotalElement.Add(RSEInvoiceMgt.CreateXmlElementWAttribute('LineExtensionAmount', RSEInvoiceMgt.GetCbcNamespace(), RSEInvoiceMgt.FormatTwoDecimals(TotalsSalesInvoiceLine."Line Amount"), 'currencyID', CurrencyId));
-        LegalMonetaryTotalElement.Add(RSEInvoiceMgt.CreateXmlElementWAttribute('TaxExclusiveAmount', RSEInvoiceMgt.GetCbcNamespace(), RSEInvoiceMgt.FormatTwoDecimals(TotalsSalesInvoiceLine.Amount), 'currencyID', CurrencyId));
-        LegalMonetaryTotalElement.Add(RSEInvoiceMgt.CreateXmlElementWAttribute('TaxInclusiveAmount', RSEInvoiceMgt.GetCbcNamespace(), RSEInvoiceMgt.FormatTwoDecimals(TotalsSalesInvoiceLine."Amount Including VAT"), 'currencyID', CurrencyId));
+        LegalMonetaryTotalElement.Add(RSEInvoiceMgt.CreateXmlElementWAttribute('LineExtensionAmount', RSEInvoiceMgt.GetCbcNamespace(), RSEInvoiceMgt.FormatTwoDecimals(SalesInvoiceHeader.Amount), 'currencyID', CurrencyId));
+        LegalMonetaryTotalElement.Add(RSEInvoiceMgt.CreateXmlElementWAttribute('TaxExclusiveAmount', RSEInvoiceMgt.GetCbcNamespace(), RSEInvoiceMgt.FormatTwoDecimals(SalesInvoiceHeader.Amount), 'currencyID', CurrencyId));
+        LegalMonetaryTotalElement.Add(RSEInvoiceMgt.CreateXmlElementWAttribute('TaxInclusiveAmount', RSEInvoiceMgt.GetCbcNamespace(), RSEInvoiceMgt.FormatTwoDecimals(SalesInvoiceHeader."Amount Including VAT"), 'currencyID', CurrencyId));
         LegalMonetaryTotalElement.Add(RSEInvoiceMgt.CreateXmlElementWAttribute('AllowanceTotalAmount', RSEInvoiceMgt.GetCbcNamespace(), RSEInvoiceMgt.FormatTwoDecimals(SalesInvoiceHeader."Invoice Discount Amount"), 'currencyID', CurrencyId));
-        GetTotalPrepaymentAmount(TotalPrepaymentAmount, SalesInvoiceHeader);
+        TotalPrepaymentAmount := GetTotalPrepaymentAmount(SalesInvoiceHeader);
         LegalMonetaryTotalElement.Add(RSEInvoiceMgt.CreateXmlElementWAttribute('PrepaidAmount', RSEInvoiceMgt.GetCbcNamespace(), RSEInvoiceMgt.FormatTwoDecimals(TotalPrepaymentAmount), 'currencyID', CurrencyId));
         LegalMonetaryTotalElement.Add(RSEInvoiceMgt.CreateXmlElementWAttribute('PayableAmount', RSEInvoiceMgt.GetCbcNamespace(), RSEInvoiceMgt.FormatTwoDecimals(RSEInvoiceMgt.GetPayableAmount(SalesInvoiceHeader."Amount Including VAT", TotalPrepaymentAmount, SalesInvoiceHeader."Invoice Discount Amount")), 'currencyID', CurrencyId));
         InvoiceElement.Add(LegalMonetaryTotalElement);
@@ -508,9 +665,6 @@ codeunit 6184793 "NPR RS EI Out Sales Inv. Mgt."
         TaxSchemeElement: XmlElement;
         PriceElement: XmlElement;
     begin
-        if not (SalesInvoiceLine.Type in [SalesInvoiceLine.Type::Item, SalesInvoiceLine.Type::"Charge (Item)", SalesInvoiceLine.Type::"G/L Account"]) then
-            exit;
-
         if SalesInvoiceLine."Unit of Measure Code" <> '' then
             UOMMapping.Get(SalesInvoiceLine."Unit of Measure Code")
         else begin
@@ -521,13 +675,12 @@ codeunit 6184793 "NPR RS EI Out Sales Inv. Mgt."
         InvoiceLineElement := RSEInvoiceMgt.CreateXmlElement('InvoiceLine', RSEInvoiceMgt.GetCacNamespace(), '');
         InvoiceLineElement.Add(RSEInvoiceMgt.CreateXmlElement('ID', RSEInvoiceMgt.GetCbcNamespace(), Format(SalesInvoiceLine."Line No.")));
         InvoiceLineElement.Add(RSEInvoiceMgt.CreateXmlElementWAttribute('InvoicedQuantity', RSEInvoiceMgt.GetCbcNamespace(), Format(SalesInvoiceLine.Quantity), 'unitCode', UOMMapping."RS EI UOM Code"));
-        InvoiceLineElement.Add(RSEInvoiceMgt.CreateXmlElementWAttribute('LineExtensionAmount', RSEInvoiceMgt.GetCbcNamespace(), RSEInvoiceMgt.FormatDecimal(SalesInvoiceLine.GetLineAmountExclVAT()), 'currencyID', CurrencyId));
+        InvoiceLineElement.Add(RSEInvoiceMgt.CreateXmlElementWAttribute('LineExtensionAmount', RSEInvoiceMgt.GetCbcNamespace(), RSEInvoiceMgt.FormatTwoDecimals(SalesInvoiceLine.GetLineAmountExclVAT()), 'currencyID', CurrencyId));
 
         if SalesInvoiceLine."Line Discount Amount" > 0 then
             AddDiscountSectionToInvLine(InvoiceLineElement, SalesInvoiceLine);
 
         ItemElement := RSEInvoiceMgt.CreateXmlElement('Item', RSEInvoiceMgt.GetCacNamespace(), '');
-
         ItemElement.Add(RSEInvoiceMgt.CreateXmlElement('Name', RSEInvoiceMgt.GetCbcNamespace(), SalesInvoiceLine.Description));
 
         SellersItemIdElement := RSEInvoiceMgt.CreateXmlElement('SellersItemIdentification', RSEInvoiceMgt.GetCacNamespace(), '');
@@ -547,7 +700,7 @@ codeunit 6184793 "NPR RS EI Out Sales Inv. Mgt."
         InvoiceLineElement.Add(ItemElement);
 
         PriceElement := RSEInvoiceMgt.CreateXmlElement('Price', RSEInvoiceMgt.GetCacNamespace(), '');
-        PriceElement.Add(RSEInvoiceMgt.CreateXmlElementWAttribute('PriceAmount', RSEInvoiceMgt.GetCbcNamespace(), RSEInvoiceMgt.FormatDecimal(SalesInvoiceLine."Unit Price"), 'currencyID', CurrencyId));
+        PriceElement.Add(RSEInvoiceMgt.CreateXmlElementWAttribute('PriceAmount', RSEInvoiceMgt.GetCbcNamespace(), RSEInvoiceMgt.FormatTwoDecimals(SalesInvoiceLine."Unit Price"), 'currencyID', CurrencyId));
 
         InvoiceLineElement.Add(PriceElement);
 
@@ -580,34 +733,57 @@ codeunit 6184793 "NPR RS EI Out Sales Inv. Mgt."
     end;
 
     #region RS EI - Helper procedures
-    local procedure GetTotalPrepaymentAmount(var Amount: Decimal; SalesInvoiceHeader: Record "Sales Invoice Header")
+
+    local procedure RSEInvoiceDocumentExists(DocumentNo: Code[20]): Boolean
     var
-        SalesInvoiceLine: Record "Sales Invoice Line";
-        SalesInvoiceHeader2: Record "Sales Invoice Header";
-        SalesInvoiceLine2: Record "Sales Invoice Line";
+        RSEInvoiceDocument: Record "NPR RS E-Invoice Document";
     begin
-        SalesInvoiceLine.SetLoadFields(Type, "Line No.", "Unit of Measure");
-        SalesInvoiceLine.SetRange("Document No.", SalesInvoiceHeader."No.");
-        if SalesInvoiceLine.IsEmpty() then
-            exit;
-        SalesInvoiceHeader2.SetRange("Prepayment Order No.", SalesInvoiceHeader."No.");
-        if SalesInvoiceHeader2.IsEmpty() then
-            exit;
-        SalesInvoiceLine.FindSet();
-        repeat
-            if (SalesInvoiceLine.Type in [SalesInvoiceLine.Type::Item, SalesInvoiceLine.Type::"Charge (Item)", SalesInvoiceLine.Type::"G/L Account"]) then begin
-                repeat
-                    if SalesInvoiceLine2.Get(SalesInvoiceHeader2."No.", SalesInvoiceLine."Line No.") then
-                        Amount += SalesInvoiceLine2."Amount Including VAT";
-                until SalesInvoiceHeader2.Next() = 0;
-            end;
-        until SalesInvoiceLine.Next() = 0;
+        RSEInvoiceDocument.SetRange("Document No.", DocumentNo);
+        exit(not RSEInvoiceDocument.IsEmpty());
     end;
 
-    local procedure CalculateSalesInvoiceLineTotals(var TotalsSalesInvoiceLine: Record "Sales Invoice Line"; SalesInvoiceHeader: Record "Sales Invoice Header")
+    local procedure SetCurrencyId(CurrencyCode: Code[10])
+    var
+        GLSetup: Record "General Ledger Setup";
     begin
-        TotalsSalesInvoiceLine.SetRange("Document No.", SalesInvoiceHeader."No.");
-        TotalsSalesInvoiceLine.CalcSums("Line Amount", Amount, "Amount Including VAT");
+        if CurrencyCode <> '' then
+            CurrencyId := CurrencyCode
+        else begin
+            GLSetup.Get();
+            GLSetup.TestField("LCY Code");
+            CurrencyId := GLSetup."LCY Code";
+        end;
+    end;
+
+    local procedure GetTaxExemptionReasonCode(OrderNo: Code[20]; RSEIAllowedVATCateg: Enum "NPR RS EI Allowed Tax Categ."): Code[20]
+    var
+        RSEIDocTaxExemption: Record "NPR RS EI Doc. Tax Exemption";
+    begin
+        RSEIDocTaxExemption.Get(OrderNo, RSEIAllowedVATCateg);
+        exit(RSEIDocTaxExemption."Tax Exemption Reason Code");
+    end;
+
+    local procedure GetTotalPrepaymentAmount(SalesInvoiceHeader: Record "Sales Invoice Header"): Decimal
+    var
+        PrepaymentSalesInvHdr: Record "Sales Invoice Header";
+    begin
+        if SalesInvoiceHeader."Order No." = '' then
+            exit;
+        PrepaymentSalesInvHdr.SetRange("Prepayment Order No.", SalesInvoiceHeader."Order No.");
+        if not PrepaymentSalesInvHdr.FindFirst() then
+            exit;
+        PrepaymentSalesInvHdr.CalcFields("Amount Including VAT");
+        exit(PrepaymentSalesInvHdr."Amount Including VAT");
+    end;
+
+    local procedure FindPrepaymentInvoice(var PrepaymentSalesInvHdr: Record "Sales Invoice Header"; SalesInvoiceHeader: Record "Sales Invoice Header"): Boolean
+    begin
+        PrepaymentSalesInvHdr.SetRange("Prepayment Invoice", true);
+        PrepaymentSalesInvHdr.SetRange("Prepayment Order No.", SalesInvoiceHeader."Order No.");
+        if PrepaymentSalesInvHdr.FindFirst() then begin
+            exit(PrepaymentSalesInvHdr.CalcFields(Amount, "Amount Including VAT"))
+        end else
+            exit(false);
     end;
     #endregion
 #endif

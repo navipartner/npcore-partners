@@ -112,6 +112,8 @@ codeunit 6184888 "NPR RSEI Out SalesCr.Memo Mgt."
 
         AddCustomerInformation(CreditNoteElement, Customer, RSEIAuxCustomer);
 
+        AddDeliveryInformation(CreditNoteElement);
+
         AddPaymentMeansInformation(CreditNoteElement, SalesCrMemoHeader, RSEIAuxSalesCrMemoHdr);
 
         AddTaxInformation(CreditNoteElement, SalesCrMemoHeader);
@@ -356,6 +358,18 @@ codeunit 6184888 "NPR RSEI Out SalesCr.Memo Mgt."
         CreditNoteElement.Add(AccCustomerElement);
     end;
 
+    local procedure AddDeliveryInformation(var CreditNoteElement: XmlElement)
+    var
+        DeliveryElement: XmlElement;
+        ActDeliveryDateElement: XmlElement;
+    begin
+        DeliveryElement := RSEInvoiceMgt.CreateXmlElement('Delivery', RSEInvoiceMgt.GetCacNamespace(), '');
+        ActDeliveryDateElement := RSEInvoiceMgt.CreateXmlElement('ActualDeliveryDate', RSEInvoiceMgt.GetCbcNamespace(), Format(Today(), 10, '<Year4>-<Month,2>-<Day,2>'));
+        DeliveryElement.Add(ActDeliveryDateElement);
+
+        CreditNoteElement.Add(DeliveryElement);
+    end;
+
     local procedure AddPaymentMeansInformation(var CreditNoteElement: XmlElement; SalesCrMemoHeader: Record "Sales Cr.Memo Header"; RSEIAuxSalesCrMemoHdr: Record "NPR RSEI Aux Sales Cr.Memo Hdr")
     var
         CompanyInfo: Record "Company Information";
@@ -477,7 +491,6 @@ codeunit 6184888 "NPR RSEI Out SalesCr.Memo Mgt."
             AddDiscountSectionToInvLine(CreditNoteLineElement, SalesCrMemoHeader, SalesCrMemoLine);
 
         ItemElement := RSEInvoiceMgt.CreateXmlElement('Item', RSEInvoiceMgt.GetCacNamespace(), '');
-
         ItemElement.Add(RSEInvoiceMgt.CreateXmlElement('Name', RSEInvoiceMgt.GetCbcNamespace(), SalesCrMemoLine.Description));
 
         SellersItemIdElement := RSEInvoiceMgt.CreateXmlElement('SellersItemIdentification', RSEInvoiceMgt.GetCacNamespace(), '');
