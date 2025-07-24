@@ -20,6 +20,16 @@ table 6151034 "NPR NPEmailWebSMTPEmailAccount"
         {
             Caption = 'From E-mail Address';
             ExtendedDatatype = EMail;
+
+            trigger OnValidate()
+            var
+                MailManagement: Codeunit "Mail Management";
+            begin
+#pragma warning disable AA0139
+                Rec.FromEmailAddress := Rec.FromEmailAddress.Trim().ToLower();
+#pragma warning restore AA0139
+                MailManagement.CheckValidEmailAddress(Rec.FromEmailAddress);
+            end;
         }
         field(5; ReplyToName; Text[250])
         {
@@ -29,6 +39,16 @@ table 6151034 "NPR NPEmailWebSMTPEmailAccount"
         {
             Caption = 'Reply-to E-mail Address';
             ExtendedDatatype = EMail;
+
+            trigger OnValidate()
+            var
+                MailManagement: Codeunit "Mail Management";
+            begin
+#pragma warning disable AA0139
+                Rec.ReplyToEmailAddress := Rec.ReplyToEmailAddress.Trim().ToLower();
+#pragma warning restore AA0139
+                MailManagement.CheckValidEmailAddress(Rec.ReplyToEmailAddress);
+            end;
         }
         field(2; NPEmailAccountId; Integer)
         {
