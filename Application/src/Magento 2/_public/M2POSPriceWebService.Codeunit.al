@@ -33,6 +33,7 @@
         POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
         TotalDiscountManagement: Codeunit "NPR Total Discount Management";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
+        VATAmountsCalculated: Boolean;
         CurrencyDiscCalcNotSupported: Label 'Discount module "%1" does not support discount calculations when exchange rates apply (%2 -> %3).';
     begin
         // Prepare Lines for VAT
@@ -112,9 +113,30 @@
         TempSaleLinePOS2.Reset();
         if (TempSaleLinePOS2.FindSet()) then begin
             repeat
-                TmpSaleLinePOS.Get(TempSaleLinePOS2."Register No.", TempSaleLinePOS2."Sales Ticket No.", TempSaleLinePOS2.Date, TempSaleLinePOS2."Sale Type", TempSaleLinePOS2."Line No.");
-                TmpSaleLinePOS.TransferFields(TempSaleLinePOS2, false);
-                if (TmpSaleLinePOS."Discount Type" = TmpSaleLinePOS."Discount Type"::Mix) and (TmpSaleLinePOS."Price Includes VAT") then begin
+                VATAmountsCalculated := false;
+                if TmpSaleLinePOS.Get(TempSaleLinePOS2."Register No.", TempSaleLinePOS2."Sales Ticket No.", TempSaleLinePOS2.Date, TempSaleLinePOS2."Sale Type", TempSaleLinePOS2."Line No.") then
+                    TmpSaleLinePOS.TransferFields(TempSaleLinePOS2, false)
+                else begin
+                    // mock merge similar lines
+                    if (TmpSaleLinePOS."No." = TempSaleLinePOS2."No.") and
+                        (TmpSaleLinePOS."Variant Code" = TempSaleLinePOS2."Variant Code") and
+                        (TmpSaleLinePOS."Unit of Measure Code" = TempSaleLinePOS2."Unit of Measure Code") and
+                        (TmpSaleLinePOS."Discount %" = TempSaleLinePOS2."Discount %") then begin
+                        TmpSaleLinePOS.Quantity += TempSaleLinePOS2.Quantity;
+                        TmpSaleLinePOS.Validate(Quantity);
+                    end else begin
+                        Clear(TmpSaleLinePOS);
+                        TmpSaleLinePOS.Init();
+                        TmpSaleLinePOS.TransferFields(TempSaleLinePOS2);
+                        TmpSaleLinePOS.Insert();
+                    end;
+                    if TmpSaleLinePOS."Price Includes VAT" then begin
+                        TmpSaleLinePOS."Unit Price" := POSSaleTaxCalc.CalcAmountWithVAT(TmpSaleLinePOS."Unit Price", TmpSaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+                        TmpSaleLinePOS.Amount := POSSaleTaxCalc.CalcAmountWithVAT(TmpSaleLinePOS.Amount, TempSaleLinePOS2."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
+                        VATAmountsCalculated := true;
+                    end;
+                end;
+                if (TmpSaleLinePOS."Discount Type" = TmpSaleLinePOS."Discount Type"::Mix) and (TmpSaleLinePOS."Price Includes VAT") and not VATAmountsCalculated then begin
                     TmpSaleLinePOS."Unit Price" := POSSaleTaxCalc.CalcAmountWithVAT(TmpSaleLinePOS."Unit Price", TmpSaleLinePOS."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
                     TmpSaleLinePOS.Amount := POSSaleTaxCalc.CalcAmountWithVAT(TmpSaleLinePOS.Amount, TempSaleLinePOS2."VAT %", GeneralLedgerSetup."Amount Rounding Precision");
                 end;

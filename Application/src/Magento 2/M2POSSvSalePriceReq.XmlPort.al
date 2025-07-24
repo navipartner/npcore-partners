@@ -47,7 +47,8 @@ xmlport 6151145 "NPR M2 POS Sv. Sale Price Req."
 
                             TmpSaleLinePOSRequest."Sales Ticket No." := TicketNumber;
                             TmpSaleLinePOSRequest."Line Type" := TmpSaleLinePOSRequest."Line Type"::Item;
-                            TmpSaleLinePOSRequest.Date := TmpSalePOSRequest.Date
+                            TmpSaleLinePOSRequest.Date := TmpSalePOSRequest.Date;
+                            TmpSaleLinePOSRequest."Register No." := POSUnitNo;
                         end;
                     }
 
@@ -180,13 +181,18 @@ xmlport 6151145 "NPR M2 POS Sv. Sale Price Req."
     }
 
     trigger OnInitXmlPort()
+    var
+        POSUnit: Record "NPR POS Unit";
     begin
         TicketNumber := CopyStr(DelChr(Format(CurrentDateTime(), 0, 9), '<=>', DelChr(Format(CurrentDateTime(), 0, 9), '<=>', '0123456789')),
          1, MaxStrLen(TicketNumber));
+        if POSUnit.FindFirst() then
+            POSUnitNo := POSUnit."No.";
     end;
 
     var
         TicketNumber: Code[20];
+        POSUnitNo: Code[10];
         StartTime: Time;
         ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
