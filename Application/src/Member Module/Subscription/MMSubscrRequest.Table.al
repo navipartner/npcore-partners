@@ -70,6 +70,11 @@ table 6150923 "NPR MM Subscr. Request"
             Caption = 'New Valid Until Date';
             DataClassification = CustomerContent;
         }
+        field(71; "Terminate At"; Date)
+        {
+            Caption = 'Terminate At';
+            DataClassification = CustomerContent;
+        }
         field(80; Amount; Decimal)
         {
             Caption = 'Amount';
@@ -96,6 +101,12 @@ table 6150923 "NPR MM Subscr. Request"
         field(115; "Posted M/ship Ledg. Entry No."; Integer)
         {
             Caption = 'Posted M/ship Ledg. Entry No.';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM Membership Entry"."Entry No.";
+        }
+        field(116; "Membership Entry To Cancel"; Integer)
+        {
+            Caption = 'Membership Entry To Cancel';
             DataClassification = CustomerContent;
             TableRelation = "NPR MM Membership Entry"."Entry No.";
         }

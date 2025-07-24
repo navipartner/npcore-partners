@@ -196,7 +196,7 @@ page 6184834 "NPR MM Subscription Details"
                     RequestTermination: Page "NPR MM SubsRequestTermination";
                 begin
                     Membership.Get(Rec."Membership Entry No.");
-                    RequestTermination.SetMembership(Membership);
+                    RequestTermination.SetMembership(Membership, Rec);
                     RequestTermination.RunModal();
                     CurrPage.Update(false);
                 end;

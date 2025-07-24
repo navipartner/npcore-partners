@@ -82,6 +82,9 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
 
             SubscriptionRequest.Type::Regret:
                 RegretMembershipAction(SubscriptionRequest);
+
+            SubscriptionRequest.Type::"Partial Regret":
+                CancelMembership(SubscriptionRequest);
         end;
     end;
 
@@ -90,6 +93,7 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         Subscription: Record "NPR MM Subscription";
+        SubsRenewPost: Codeunit "NPR MM Subscr. Renew: Post";
         MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
         NewMembershipLedgerEntryNo: Integer;
         ReasonText: Text;
@@ -107,6 +111,10 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
         MemberInfoCapture."Item No." := SubscriptionRequest."Item No.";
         MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::AUTORENEW;
         MemberInfoCapture."Duration Formula" := MembershipAlterationSetup."Membership Duration";
+        MemberInfoCapture."Unit Price" := SubscriptionRequest.Amount;
+        MemberInfoCapture."Amount Incl VAT" := SubscriptionRequest.Amount;
+        MemberInfoCapture.Amount := (SubscriptionRequest.Amount / (1 + SubsRenewPost.CalcRevenueVAT(Subscription."Membership Entry No.") / 100));
+
         if not MembershipMgt.CarryOutMembershipRenewal(SubscriptionRequest, MemberInfoCapture, MembershipAlterationSetup, NewMembershipLedgerEntryNo, ReasonText) then
             Error(ReasonText);
 
@@ -158,6 +166,32 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
         SubscrReversalRequest.Modify(true);
     end;
 
+    local procedure CancelMembership(var SubscriptionReversalRequest: Record "NPR MM Subscr. Request")
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        MembershipEntry: Record "NPR MM Membership Entry";
+        Subscription: Record "NPR MM Subscription";
+        SubscrRenewPost: Codeunit "NPR MM Subscr. Renew: Post";
+        MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+        SubscriptionReversalRequest.TestField(Type, SubscriptionReversalRequest.Type::"Partial Regret");
+
+        Subscription.Get(SubscriptionReversalRequest."Subscription Entry No.");
+        Membership.Get(Subscription."Membership Entry No.");
+        MembershipSetup.Get(Membership."Membership Code");
+        MembershipEntry.Get(SubscriptionReversalRequest."Membership Entry To Cancel");
+
+        MembershipMgt.CarryOutMembershipCancel(Membership, MembershipEntry, SubscriptionReversalRequest."New Valid Until Date");
+
+        SubscrRenewPost.PostInvoiceToGL(SubscriptionReversalRequest, Membership, MembershipSetup);
+        if (SubscriptionReversalRequest.Posted) then
+            SubscrRenewPost.PostPaymentsToGL(SubscriptionReversalRequest, '');
+
+        SubscriptionReversalRequest.Validate("Processing Status", SubscriptionReversalRequest."Processing Status"::Success);
+        SubscriptionReversalRequest.Modify(true);
+    end;
+
     local procedure ProcessRequestedErrorStatus(var SubscriptionRequest: Record "NPR MM Subscr. Request")
     var
         SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
@@ -191,23 +225,42 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
     var
         SubscriptionRequest2: Record "NPR MM Subscr. Request";
         RequestSubscrRenewal: Codeunit "NPR MM Subscr. Renew: Request";
-        MMMembership: Record "NPR MM Membership";
+        Membership: Record "NPR MM Membership";
+        MembershipEntry: Record "NPR MM Membership Entry";
         PeriodDoesNotMatchErr: Label 'Renewal period does not match for membership entry No. %1. The membership validity period may have been changed after the automatic subscription renewal request was created.', Comment = '%1 - membership entry number';
         PriceDoesNotMatchErr: Label 'The renewal amount does not match for membership entry No. %1. The membership type may have been changed after the automatic subscription renewal request was created.', Comment = '%1 - membership entry number';
         MembershipBlockedErr: Label 'Membership entry No. %1 is blocked. The renewal process cannot continue.', Comment = '%1 - membership entry number';
+        MembershipEntryDoesNotMatchErr: Label 'The membership entry planned to be canceled does not match the latest membership entry of the membership. Changes to the membership has probably happened, and therefore the cancel cannot be processed';
     begin
-        SubscriptionRequest2 := SubscriptionRequest;
-        RequestSubscrRenewal.CalculateSubscriptionRenewal(Subscription, SubscriptionRequest2);
-        If (SubscriptionRequest."New Valid From Date" <> SubscriptionRequest2."New Valid From Date") or
-           (SubscriptionRequest."New Valid Until Date" <> SubscriptionRequest2."New Valid Until Date")
-        then
-            Error(PeriodDoesNotMatchErr, Subscription."Membership Entry No.");
-        If SubscriptionRequest.Amount <> SubscriptionRequest2.Amount then
-            Error(PriceDoesNotMatchErr, Subscription."Membership Entry No.");
+        case SubscriptionRequest.Type of
+            "NPR MM Subscr. Request Type"::"Partial Regret":
+                begin
+                    Membership.Get(Subscription."Membership Entry No.");
+                    SubscriptionRequest.TestField("Membership Entry To Cancel");
 
-        If MMMembership.Get(Subscription."Membership Entry No.") then
-            if MMMembership.Blocked then
-                Error(MembershipBlockedErr, Subscription."Membership Entry No.");
+                    MembershipEntry.SetRange("Membership Entry No.", Membership."Entry No.");
+                    MembershipEntry.SetRange(Blocked, false);
+                    MembershipEntry.SetFilter(Context, '<>%1', MembershipEntry.Context::REGRET);
+                    MembershipEntry.FindLast();
+
+                    if (MembershipEntry."Entry No." <> SubscriptionRequest."Membership Entry To Cancel") then
+                        Error(MembershipEntryDoesNotMatchErr);
+                end;
+            else begin
+                SubscriptionRequest2 := SubscriptionRequest;
+                RequestSubscrRenewal.CalculateSubscriptionRenewal(Subscription, SubscriptionRequest2);
+                If (SubscriptionRequest."New Valid From Date" <> SubscriptionRequest2."New Valid From Date") or
+                   (SubscriptionRequest."New Valid Until Date" <> SubscriptionRequest2."New Valid Until Date")
+                then
+                    Error(PeriodDoesNotMatchErr, Subscription."Membership Entry No.");
+                If SubscriptionRequest.Amount <> SubscriptionRequest2.Amount then
+                    Error(PriceDoesNotMatchErr, Subscription."Membership Entry No.");
+
+                If Membership.Get(Subscription."Membership Entry No.") then
+                    if Membership.Blocked then
+                        Error(MembershipBlockedErr, Subscription."Membership Entry No.");
+            end;
+        end;
     end;
 
     local procedure CloseSubscriptionRequestChain(SubscriptionRequest: Record "NPR MM Subscr. Request")

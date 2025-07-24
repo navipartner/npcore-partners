@@ -50,6 +50,11 @@ page 6184833 "NPR MM Subscr. Requests"
                     ToolTip = 'Specifies the value of the New Valid Until Date field.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field("Terminate At"; Rec."Terminate At")
+                {
+                    ToolTip = 'Specifies the value of the Terminate At field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
                 field("Item No."; Rec."Item No.")
                 {
                     ToolTip = 'Specifies the value of the Item No. field.';

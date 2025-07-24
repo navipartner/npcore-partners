@@ -114,8 +114,11 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
     Internal procedure CreateSubscriptionPaymentRequest(Subscription: Record "NPR MM Subscription"; SubscriptionRequest: Record "NPR MM Subscr. Request"; var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request")
     var
         MemberPaymentMethod: Record "NPR MM Member Payment Method";
+        PaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
     begin
-        GetMemberPaymentMethod(Subscription, MemberPaymentMethod);
+        PaymentMethodMgt.TryGetMemberPaymentMethod(Subscription, true, MemberPaymentMethod);
+        MemberPaymentMethod.TestField(PSP);
+        MemberPaymentMethod.TestField("Payment Token");
 
         SubscrPaymentRequest.Init();
         SubscrPaymentRequest."Entry No." := 0;
@@ -146,27 +149,6 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
         SubscrPaymentRequest.Description := SubscriptionRequest.Description;
         SubscrPaymentRequest."Set Membership Auto-Renew" := AutoRenew;
         SubscrPaymentRequest.Insert();
-    end;
-
-    local procedure GetMemberPaymentMethod(Subscription: Record "NPR MM Subscription"; var MemberPaymentMethod: Record "NPR MM Member Payment Method")
-    var
-        Membership: Record "NPR MM Membership";
-        MembershipPmtMethodMap: Record "NPR MM MembershipPmtMethodMap";
-    begin
-        Membership.SetLoadFields("Entry No.", SystemId);
-        Membership.Get(Subscription."Membership Entry No.");
-
-        Clear(MemberPaymentMethod);
-
-        MembershipPmtMethodMap.SetRange(MembershipId, Membership.SystemId);
-        MembershipPmtMethodMap.SetRange(Default, true);
-        if (MembershipPmtMethodMap.IsEmpty()) then
-            MembershipPmtMethodMap.SetRange(Default);
-        MembershipPmtMethodMap.FindFirst();
-
-        MemberPaymentMethod.GetBySystemId(MembershipPmtMethodMap.PaymentMethodId);
-        MemberPaymentMethod.TestField(PSP);
-        MemberPaymentMethod.TestField("Payment Token");
     end;
 
     internal procedure GetBatchNo(): Integer

@@ -34,6 +34,9 @@ codeunit 6185103 "NPR MM Subs Pay Request Utils"
     internal procedure SetSubscrPaymentRequestStatus(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; NewStatus: Enum "NPR MM Payment Request Status"; LogChange: Boolean)
     var
         SubsPayReqLogEntry: Record "NPR MM Subs Pay Req Log Entry";
+        Membership: Record "NPR MM Membership";
+        Subscription: Record "NPR MM Subscription";
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
         SubsPayReqLogUtils: Codeunit "NPR MM Subs Pay Req Log Utils";
         SubscrReversalMgt: Codeunit "NPR MM Subscr. Reversal Mgt.";
     begin
@@ -41,8 +44,26 @@ codeunit 6185103 "NPR MM Subs Pay Request Utils"
             exit;
         SubscrPaymentRequest.Validate(Status, NewStatus);
         SubscrPaymentRequest.Modify(true);
-        if NewStatus = NewStatus::Cancelled then
+        if NewStatus = NewStatus::Cancelled then begin
             SubscrReversalMgt.CancelReversal(SubscrPaymentRequest);
+
+            SubscriptionRequest.SetLoadFields("Subscription Entry No.");
+            SubscriptionRequest.Get(SubscrPaymentRequest."Subscr. Request Entry No.");
+            Subscription.SetLoadFields("Membership Entry No.");
+            Subscription.Get(SubscriptionRequest."Subscription Entry No.");
+
+#if (BC17 or BC18 or BC19 or BC20 or BC21)
+            Membership.LockTable();
+#else
+            Membership.ReadIsolation := IsolationLevel::UpdLock;
+#endif
+            Membership.SetRange("Entry No.", Subscription."Membership Entry No.");
+            Membership.SetRange("Auto-Renew", Membership."Auto-Renew"::TERMINATION_REQUESTED);
+            if (Membership.FindFirst()) then begin
+                Membership.Validate("Auto-Renew", Membership."Auto-Renew"::YES_INTERNAL);
+                Membership.Modify();
+            end;
+        end;
 
         if LogChange then
             SubsPayReqLogUtils.LogEntry(SubscrPaymentRequest, '', '', true, SubsPayReqLogEntry);

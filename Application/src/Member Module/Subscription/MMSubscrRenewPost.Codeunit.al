@@ -32,7 +32,9 @@ codeunit 6185121 "NPR MM Subscr. Renew: Post"
         else
             SubscriptionRequest."Posting Document Type" := SubscriptionRequest."Posting Document Type"::"Credit Memo";
         SubscriptionRequest."Posting Date" := Today();
-        SetAppliesToDoc(SubscriptionRequest, AppliesToDocType, AppliesToDocNo);
+
+        if (SubscriptionRequest.Type <> SubscriptionRequest.Type::"Partial Regret") then
+            SetAppliesToDoc(SubscriptionRequest, AppliesToDocType, AppliesToDocNo);
 
         //Revenue account
         InitGenJnlLine(GenJnlLine,
@@ -183,6 +185,33 @@ codeunit 6185121 "NPR MM Subscr. Renew: Post"
 #else
         exit(NoSeries.GetNextNo(RecurringPaymentSetup."Document No. Series", Today()));
 #endif
+    end;
+
+    internal procedure CalcRevenueVAT(MembershipEntryNo: Integer): Decimal
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        RecurringPaymentSetup: Record "NPR MM Recur. Paym. Setup";
+        GLAccount: Record "G/L Account";
+        VATPostingSetup: Record "VAT Posting Setup";
+    begin
+        Membership.SetLoadFields("Membership Code");
+        Membership.Get(MembershipEntryNo);
+
+        MembershipSetup.SetLoadFields("Recurring Payment Code");
+        MembershipSetup.Get(Membership."Membership Code");
+        MembershipSetup.TestField("Recurring Payment Code");
+
+        RecurringPaymentSetup.SetLoadFields("Revenue Account");
+        RecurringPaymentSetup.Get(MembershipSetup."Recurring Payment Code");
+        RecurringPaymentSetup.TestField("Revenue Account");
+
+        GLAccount.SetLoadFields("VAT Bus. Posting Group", "VAT Prod. Posting Group");
+        GLAccount.Get(RecurringPaymentSetup."Revenue Account");
+
+        VATPostingSetup.SetLoadFields("VAT %");
+        VATPostingSetup.Get(GLAccount."VAT Bus. Posting Group", GLAccount."VAT Prod. Posting Group");
+        exit(VATPostingSetup."VAT %");
     end;
 
     local procedure SetAppliesToDoc(SubscriptionRequest: Record "NPR MM Subscr. Request"; var AppliesToDocType: Enum "Gen. Journal Document Type"; var AppliesToDocNo: Code[20])

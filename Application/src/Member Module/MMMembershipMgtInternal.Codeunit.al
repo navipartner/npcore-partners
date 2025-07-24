@@ -1884,9 +1884,6 @@
             if (not Confirm(CONFIRM_CANCEL, false, MembershipAlterationSetup.Description, MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date", EndDateNew)) then
                 exit(false);
 
-        if WithUpdate then
-            RegretSubscription(Membership);
-
         if (_FeatureFlag.IsEnabled(PriceCalcInterfaceTok)) then begin
             IPriceHandler := MembershipAlterationSetup."Price Calculation";
             SuggestedUnitPrice := IPriceHandler.CalculateCancelAlterationPrice(MembershipAlterationSetup, MemberInfoCapture, MembershipEntry, EndDateNew);
@@ -1905,21 +1902,29 @@
         ReasonText := StrSubstNo(PlaceHolderLbl, MemberInfoCapture."Information Context", MembershipEntry.Context, MembershipEntry."Valid From Date", MembershipEntry."Valid Until Date");
 
         if (WithUpdate) then begin
-            MembershipEntry."Valid Until Date" := EndDateNew;
-            MembershipEntry.Modify();
-
-            DisableMembershipAutoRenewal(Membership, true, false);
-            SubscriptionMgtImpl.UpdateSubscriptionValidUntilDateFromMembershipEntry(MembershipEntry);
-
-            MembershipEvents.OnAfterInsertMembershipEntry(MembershipEntry);
-
-            OnMembershipChangeEvent(MembershipEntry."Membership Entry No.");
+            RegretSubscription(Membership);
+            CarryOutMembershipCancel(Membership, MembershipEntry, EndDateNew);
         end;
 
         OutStartDate := MembershipEntry."Valid From Date";
         OutUntilDate := EndDateNew;
 
         exit(true);
+    end;
+
+    internal procedure CarryOutMembershipCancel(var Membership: Record "NPR MM Membership"; var MembershipEntry: Record "NPR MM Membership Entry"; EndDateNew: Date)
+    var
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
+    begin
+        MembershipEntry."Valid Until Date" := EndDateNew;
+        MembershipEntry.Modify();
+
+        DisableMembershipAutoRenewal(Membership, true, false);
+        SubscriptionMgtImpl.UpdateSubscriptionValidUntilDateFromMembershipEntry(MembershipEntry);
+
+        MembershipEvents.OnAfterInsertMembershipEntry(MembershipEntry);
+
+        OnMembershipChangeEvent(MembershipEntry."Membership Entry No.");
     end;
 
     internal procedure CreateRenewMemberInfoRequest(ExternalMemberCardNo: Text[100]; RenewWithItemNo: Code[20]): Integer
@@ -6337,13 +6342,18 @@
         exit(MMMembersAlterLine.Get(AlterationGroup, MembershipAlterationSetup.SystemId));
     end;
 
-    procedure RegretSubscription(Membership: Record "NPR MM Membership")
+    procedure RegretSubscription(var Membership: Record "NPR MM Membership")
     var
         SubscriptionRequest: Record "NPR MM Subscr. Request";
         SubscriptionMgtIml: Codeunit "NPR MM Subscription Mgt. Impl.";
     begin
-        if SubscriptionMgtIml.CheckIfPendingSubscriptionRequestExist(Membership."Entry No.", SubscriptionRequest) then
-            CancelSubscription(SubscriptionRequest);
+        if (not SubscriptionMgtIml.CheckIfPendingSubscriptionRequestExist(Membership."Entry No.", SubscriptionRequest)) then
+            exit;
+
+        CancelSubscription(SubscriptionRequest);
+
+        // Refresh record as subscription module might have made changes to the membership
+        Membership.Get(Membership.RecordId());
     end;
 
     local procedure CancelSubscription(var Rec: Record "NPR MM Subscr. Request")
@@ -6351,18 +6361,17 @@
         SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
         SubscrReversalMgt: Codeunit "NPR MM Subscr. Reversal Mgt.";
         SubscrPmtReversalRequest: Record "NPR MM Subscr. Payment Request";
+        SubsPayRequestUtils: Codeunit "NPR MM Subs Pay Request Utils";
     begin
         SubscrPaymentRequest.SetRange("Subscr. Request Entry No.", Rec."Entry No.");
-        if SubscrPaymentRequest.IsEmpty then
+        if (not SubscrPaymentRequest.FindLast()) then
             exit;
-        SubscrPaymentRequest.FindLast();
+
         if SubscrPaymentRequest.Status in [SubscrPaymentRequest.Status::New, SubscrPaymentRequest.Status::Requested] then
             if SubscrPaymentRequest.Type = SubscrPaymentRequest.Type::PayByLink then
                 SubscrReversalMgt.RequestRefund(Rec, SubscrPaymentRequest, true, SubscrPmtReversalRequest)
-            else begin
-                SubscrPaymentRequest.Validate(Status, SubscrPaymentRequest.Status::Cancelled);
-                SubscrPaymentRequest.Modify(true);
-            end
+            else
+                SubsPayRequestUtils.SetSubscrPaymentRequestStatus(SubscrPaymentRequest, Enum::"NPR MM Payment Request Status"::Cancelled, false)
         else
             SubscrReversalMgt.RequestRefund(Rec, SubscrPaymentRequest, true, SubscrPmtReversalRequest);
     end;

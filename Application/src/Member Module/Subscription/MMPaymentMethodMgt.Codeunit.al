@@ -200,21 +200,50 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
         DeleteMemberPaymentMethod(EFTTransactionRequest);
     end;
 
+    /// <summary>
+    /// Try to get payment method for a subscription
+    /// </summary>
+    /// <param name="Subscription">The subscription record to get payment method for</param>
+    /// <param name="IncludeNonDefault">Determines if the code should fetch non-default payment methods in case it can't find a default.</param>
+    /// <param name="MemberPaymentMethod">The record to be filled out with the found method.</param>
+    /// <returns></returns>
+    [TryFunction]
+    internal procedure TryGetMemberPaymentMethod(Subscription: Record "NPR MM Subscription"; IncludeNonDefault: Boolean; var MemberPaymentMethod: Record "NPR MM Member Payment Method")
+    begin
+        Subscription.TestField("Membership Entry No.");
+        TryGetMemberPaymentMethod(Subscription."Membership Entry No.", IncludeNonDefault, MemberPaymentMethod);
+    end;
+
     internal procedure GetMemberPaymentMethod(MembershipEntryNo: Integer; var MemberPaymentMethod: Record "NPR MM Member Payment Method") Found: Boolean;
+    begin
+        Found := TryGetMemberPaymentMethod(MembershipEntryNo, false, MemberPaymentMethod);
+    end;
+
+    [TryFunction]
+    internal procedure TryGetMemberPaymentMethod(MembershipEntryNo: Integer; IncludeNonDefault: Boolean; var MemberPaymentMethod: Record "NPR MM Member Payment Method")
     var
         MembershipPmtMethodMap: Record "NPR MM MembershipPmtMethodMap";
         Membership: Record "NPR MM Membership";
+        FailedToFindMembershipErr: Label 'The system could not find membership %1', Comment = '%1 = membership entry no.';
+        FailedToFindDefaultPaymentMethodForMembershipErr: Label 'The system could not find a default payment method for membership %1', Comment = '%1 = membership entry no.';
+        FailedToFindPaymentMethodForMembershipErr: Label 'The system could not find a payment method for membership %1', Comment = '%1 = membership entry no.';
     begin
-        Membership.SetLoadFields("Entry No.", "Customer No.");
+        Membership.SetLoadFields(SystemId);
         if not Membership.Get(MembershipEntryNo) then
-            exit;
+            Error(FailedToFindMembershipErr, MembershipEntryNo);
 
         MembershipPmtMethodMap.SetRange(MembershipId, Membership.SystemId);
         MembershipPmtMethodMap.SetRange(Default, true);
-        if (not MembershipPmtMethodMap.FindFirst()) then
-            exit;
+        if (not MembershipPmtMethodMap.FindFirst()) then begin
+            if (not IncludeNonDefault) then
+                Error(FailedToFindDefaultPaymentMethodForMembershipErr, MembershipEntryNo);
 
-        Found := MemberPaymentMethod.GetBySystemId(MembershipPmtMethodMap.PaymentMethodId);
+            MembershipPmtMethodMap.SetRange(Default);
+            if (not MembershipPmtMethodMap.FindFirst()) then
+                Error(FailedToFindPaymentMethodForMembershipErr, MembershipEntryNo);
+        end;
+
+        MemberPaymentMethod.GetBySystemId(MembershipPmtMethodMap.PaymentMethodId);
     end;
 
     internal procedure AddMemberPaymentMethod(UserAccount: Record "NPR UserAccount"; PaymentLine: Record "NPR Magento Payment Line"; var MemberPaymentMethod: Record "NPR MM Member Payment Method")
