@@ -54,6 +54,10 @@ page 6185075 "NPR APIV1 PBI SubsPaymRequest"
                 {
                     Caption = 'Currency Code', Locked = true;
                 }
+                field(pspReference; Rec."PSP Reference")
+                {
+                    Caption = 'PSP Reference', Locked = true;
+                }
                 field(externalTransactionId; Rec."External Transaction ID")
                 {
                     Caption = 'External Transaction Id', Locked = true;

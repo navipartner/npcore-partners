@@ -26,6 +26,10 @@ page 6185074 "NPR APIV1 PBI SubsRequest"
                 {
                     Caption = 'Entry No.', Locked = true;
                 }
+                field(type; Rec.Type)
+                {
+                    Caption = 'Type', Locked = true;
+                }
                 field(status; Rec.Status)
                 {
                     Caption = 'Status', Locked = true;
