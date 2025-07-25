@@ -645,7 +645,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         exit(PaymentGateway.Code);
     end;
 
-    local procedure IsShopifyPaymentLine(PaymentLine: Record "NPR Magento Payment Line"): Boolean
+    internal procedure IsShopifyPaymentLine(PaymentLine: Record "NPR Magento Payment Line"): Boolean
     var
         PaymentGateway: Record "NPR Magento Payment Gateway";
     begin

@@ -12,5 +12,17 @@ enum 6059854 "NPR Billing Event Type"
     {
         Caption = 'POS Login', Locked = true;
     }
+    value(2; ECOM_SHOPIFY_ORDERS_COUNT)
+    {
+        Caption = 'Ecommerce Shopify Orders Count', Locked = true;
+    }
+    value(3; ECOM_SHOPIFY_ORDERS_AMOUNT_PRESENTMENT)
+    {
+        Caption = 'Ecommerce Shopify Orders Amount Presentment', Locked = true;
+    }
+    value(4; ECOM_SHOPIFY_ORDERS_AMOUNT_SHOP)
+    {
+        Caption = 'Ecommerce Shopify Orders Amount Shop', Locked = true;
+    }
 }
 #endif

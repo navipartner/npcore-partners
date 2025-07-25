@@ -280,6 +280,11 @@
             Caption = 'Incoming Ecommerce Sales Payment Line Id';
             DataClassification = CustomerContent;
         }
+        field(6059983; "NPR Ecom Spfy.Ord.Amt.Event Id"; Guid)
+        {
+            Caption = 'Ecommerce Shopify Orders Amount Event Id';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

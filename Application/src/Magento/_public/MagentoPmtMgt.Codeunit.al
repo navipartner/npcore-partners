@@ -725,6 +725,7 @@
         SalesInvHeader: Record "Sales Invoice Header";
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
         IncEcomSalesDocProcess: Codeunit "NPR IncEcomSalesDocProcess";
+        SpfyCapturePayment: Codeunit "NPR Spfy Capture Payment";
 #endif
     begin
         if PaymentLine.Posted then
@@ -762,7 +763,12 @@
         end;
         GenJnlPostLine.RunWithCheck(GenJnlLine);
         PaymentLine.Posted := true;
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+        if SpfyCapturePayment.IsShopifyPaymentLine(PaymentLine) then
+            RegisterBillingEvents(PaymentLine);
+#endif
         PaymentLine.Modify();
+
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
         IncEcomSalesDocProcess.UpdateSalesDocPaymentLinePostingInformation(PaymentLine);
 #endif
@@ -1359,6 +1365,24 @@
                 until TempMembership.Next() = 0;
             until TempPaymentLine.Next() = 0;
     end;
+
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+    local procedure RegisterBillingEvents(var PaymentLine: Record "NPR Magento Payment Line")
+    var
+        EventBillingClient: Codeunit "NPR Event Billing Client";
+        JsonCurrencyObject: JsonObject;
+    begin
+        JsonCurrencyObject.Add('currency', PaymentLine.TransactionCurrencyCode(false));
+        EventBillingClient.RegisterEvent(PaymentLine.SystemId, Enum::"NPR Billing Event Type"::ECOM_SHOPIFY_ORDERS_AMOUNT_PRESENTMENT, PaymentLine.Amount, JsonCurrencyObject.AsToken());
+
+        if PaymentLine."Amount (Store Currency)" <> 0 then begin
+            Clear(JsonCurrencyObject);
+            JsonCurrencyObject.Add('currency', PaymentLine."Store Currency Code");
+            PaymentLine."NPR Ecom Spfy.Ord.Amt.Event Id" := CreateGuid();
+            EventBillingClient.RegisterEvent(PaymentLine."NPR Ecom Spfy.Ord.Amt.Event Id", Enum::"NPR Billing Event Type"::ECOM_SHOPIFY_ORDERS_AMOUNT_SHOP, PaymentLine."Amount (Store Currency)", JsonCurrencyObject.AsToken());
+        end;
+    end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnCheckPayment(SalesHeader: Record "Sales Header")

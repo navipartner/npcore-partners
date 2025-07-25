@@ -96,6 +96,10 @@ table 6150989 "NPR Spfy Event Log Entry"
     end;
 
     internal procedure RegisterShopifyEvent(SpfyEventLogEntryParam: Record "NPR Spfy Event Log Entry")
+#if not (BC18 or BC19 or BC20 or BC21 or BC22)
+    var
+        EventBillingClient: Codeunit "NPR Event Billing Client";
+#endif
     begin
         if ShopifyEventLogExists(SpfyEventLogEntryParam.Type, SpfyEventLogEntryParam."Store Code", SpfyEventLogEntryParam."Shopify ID") then
             exit;
@@ -103,6 +107,10 @@ table 6150989 "NPR Spfy Event Log Entry"
         Rec := SpfyEventLogEntryParam;
         Rec."Entry No." := 0;
         Rec.Insert(true);
+
+#if not (BC18 or BC19 or BC20 or BC21 or BC22)
+        EventBillingClient.RegisterEvent(Rec.SystemId, Enum::"NPR Billing Event Type"::ECOM_SHOPIFY_ORDERS_COUNT, 1);
+#endif
     end;
 
     internal procedure ShowRelatedEntities()
