@@ -617,7 +617,7 @@
             Caption = 'Customer Input';
             Editable = false;
             FieldClass = FlowField;
-            CalcFormula = exist("NPR POS Costumer Input" WHERE("POS Entry No." = FIELD("Entry No.")));
+            CalcFormula = exist("NPR POS Customer Input Entry" WHERE("POS Entry No." = FIELD("Entry No.")));
         }
         field(6002; "POS Info Exist"; Boolean)
         {
@@ -722,7 +722,7 @@
         POSBalancingLine: Record "NPR POS Balancing Line";
         POSEntryCommentLine: Record "NPR POS Entry Comm. Line";
         POSEntryTaxCalc: Codeunit "NPR POS Entry Tax Calc.";
-        POSCostumerInput: Record "NPR POS Costumer Input";
+        POSCustomerInputEntry: Record "NPR POS Customer Input Entry";
         POSEntryMediaInfo: Record "NPR POS Entry Media Info";
         POSSaleDigitalReceiptEntry: Record "NPR POSSaleDigitalReceiptEntry";
     begin
@@ -744,9 +744,9 @@
 
         POSEntryTaxCalc.DeleteAllLines(Rec."Entry No.");
 
-        POSCostumerInput.SetRange("POS Entry No.", "Entry No.");
-        if not POSCostumerInput.IsEmpty() then
-            POSCostumerInput.DeleteAll();
+        POSCustomerInputEntry.SetRange("POS Entry No.", "Entry No.");
+        if not POSCustomerInputEntry.IsEmpty() then
+            POSCustomerInputEntry.DeleteAll();
 
         POSEntryMediaInfo.SetRange("POS Entry No.", "Entry No.");
         if not POSEntryMediaInfo.IsEmpty() then

@@ -171,11 +171,9 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
     var
         POSSession: Codeunit "NPR POS Session";
         POSUnit: Record "NPR POS Unit";
-        CostumerInput: Record "NPR POS Costumer Input";
         Setup: Codeunit "NPR POS Setup";
         PhoneObj: JsonToken;
         SignObj: JsonToken;
-        SignStream: OutStream;
     begin
         POSSession.GetSetup(Setup);
         POSUnit.Get(Setup.GetPOSUnitNo());
@@ -187,14 +185,33 @@ codeunit 6060082 "NPR POS HTML Disp. Prof."
             exit;
         if (POSEntry."Entry No." = 0) then
             exit;
-        CostumerInput.Init();
-        CostumerInput.Context := "NPR POS Costumer Input Context"::MONEY_BACK;
-        CostumerInput."Phone Number" := CopyStr(PhoneObj.AsValue().AsText(), 1, 50);
-        CostumerInput.Signature.CreateOutStream(SignStream);
-        CostumerInput."Date & Time" := CurrentDateTime();
-        SignStream.WriteText(SignObj.AsValue().AsText());
-        CostumerInput."POS Entry No." := POSEntry."Entry No.";
-        CostumerInput.Insert();
+
+        InsertPOSCustomerInputEntry(POSEntry."Entry No.", SignObj, PhoneObj);
+    end;
+
+    local procedure InsertPOSCustomerInputEntry(POSEntryNo: Integer; SignObj: JsonToken; PhoneObj: JsonToken)
+    var
+        POSCustomerInputEntry: Record "NPR POS Customer Input Entry";
+    begin
+        if SignObj.AsValue().AsText() <> '' then begin
+            POSCustomerInputEntry.Init();
+            POSCustomerInputEntry."POS Entry No." := POSEntryNo;
+            POSCustomerInputEntry."Date & Time" := CurrentDateTime();
+            POSCustomerInputEntry.Context := "NPR POS Costumer Input Context"::MONEY_BACK;
+            POSCustomerInputEntry."Information Collected" := POSCustomerInputEntry."Information Collected"::Signature;
+            POSCustomerInputEntry.WriteSignatureData(SignObj.AsValue().AsText());
+            POSCustomerInputEntry.Insert();
+        end;
+        if PhoneObj.AsValue().AsText() <> '' then begin
+            Clear(POSCustomerInputEntry);
+            POSCustomerInputEntry.Init();
+            POSCustomerInputEntry."POS Entry No." := POSEntryNo;
+            POSCustomerInputEntry."Date & Time" := CurrentDateTime();
+            POSCustomerInputEntry.Context := "NPR POS Costumer Input Context"::MONEY_BACK;
+            POSCustomerInputEntry."Information Collected" := POSCustomerInputEntry."Information Collected"::"Phone No.";
+            POSCustomerInputEntry."Information Value" := CopyStr(PhoneObj.AsValue().AsText(), 1, 50);
+            POSCustomerInputEntry.Insert();
+        end;
     end;
 
     local procedure SendInputSignalToHWC(TicketNo: Code[20])

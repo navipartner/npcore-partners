@@ -33,6 +33,8 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
                 FrontEnd.WorkflowResponse(PollResponse(Context.GetInteger('EntryNo')));
             'signatureDecline':
                 FrontEnd.WorkflowResponse(SignatureDecline(Context.GetInteger('EntryNo')));
+            'signatureApprove':
+                FrontEnd.WorkflowResponse(SignatureApprove(Context.GetInteger('EntryNo')));
             'requestAbort':
                 RequestTrxAbort(Context.GetInteger('EntryNo'));
         end;
@@ -338,6 +340,18 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
         exit(Response);
     end;
 
+    local procedure SignatureApprove(EntryNo: Integer): JsonObject
+    var
+        POSActionDataCollectionB: Codeunit "NPR POS Action DataCollectionB";
+        Response: JsonObject;
+    begin
+        POSActionDataCollectionB.PopualteDataAfterSignatureApprove(EntryNo, Enum::"NPR POS Costumer Input Context"::SALES_CARDHOLDER_VERIFICATION, _trxStatus);
+
+        Response.Add('done', true);
+        Response.Add('success', true);
+        exit(Response);
+    end;
+
     local procedure StartLookup(EntryNo: Integer): JsonObject
     var
         Parameters: Dictionary of [Text, Text];
@@ -477,7 +491,7 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionEFTAdyenCloud.js###
-'let main=async({workflow:r,context:e,popup:i,captions:s})=>{e.EntryNo=e.request.EntryNo;let t=await i.simplePayment({title:e.request.TypeCaption,initialStatus:s.initialStatus,showStatus:!0,amount:e.request.formattedAmount,onAbort:async()=>{await r.respond("requestAbort")}});try{let n=await r.respond("startTransaction");n.newEntryNo&&(e.EntryNo=n.newEntryNo),n.selfService?t&&t.updateStatus(s.activeStatusSS):t&&t.updateStatus(s.activeStatus),t&&t.enableAbort(!0),await trxPromise(e,s,i,r)}finally{t&&t.close()}return{success:e.success,tryEndSale:e.success}};function trxPromise(r,e,i,s){return new Promise((t,n)=>{let u=async()=>{try{let a=await s.respond("poll");if(a.newEntryNo){debugger;r.EntryNo=a.newEntryNo,setTimeout(u,1e3);return}if(a.signatureRequired){let l=!1;if(!r.request.unattended&&a.signatureType==="Receipt"&&(l=await i.confirm(e.approveSignature)),!r.request.unattended&&a.signatureType==="Bitmap"){debugger;let o=JSON.parse(a.signatureBitmap),d=await i.signatureValidation({signature:o.SignaturePoint});debugger;l=await d.completeAsync()}if(!l){let o=await s.respond("signatureDecline");r.EntryNo=o.newEntryNo,setTimeout(u,1e3);return}}if(a.done){debugger;r.success=a.success,t();return}}catch(a){debugger;try{await s.respond("requestAbort")}catch{}n(a);return}setTimeout(u,1e3)};setTimeout(u,1e3)})}'
+'let main=async({workflow:r,context:e,popup:i,captions:s})=>{e.EntryNo=e.request.EntryNo;let t=await i.simplePayment({title:e.request.TypeCaption,initialStatus:s.initialStatus,showStatus:!0,amount:e.request.formattedAmount,onAbort:async()=>{await r.respond("requestAbort")}});try{let n=await r.respond("startTransaction");n.newEntryNo&&(e.EntryNo=n.newEntryNo),n.selfService?t&&t.updateStatus(s.activeStatusSS):t&&t.updateStatus(s.activeStatus),t&&t.enableAbort(!0),await trxPromise(e,s,i,r)}finally{t&&t.close()}return{success:e.success,tryEndSale:e.success}};function trxPromise(r,e,i,s){return new Promise((t,n)=>{let u=async()=>{try{let a=await s.respond("poll");if(a.newEntryNo){debugger;r.EntryNo=a.newEntryNo,setTimeout(u,1e3);return}if(a.signatureRequired){let l=!1;if(!r.request.unattended&&a.signatureType==="Receipt"&&(l=await i.confirm(e.approveSignature)),!r.request.unattended&&a.signatureType==="Bitmap"){debugger;let o=JSON.parse(a.signatureBitmap),d=await i.signatureValidation({signature:o.SignaturePoint});debugger;l=await d.completeAsync()}if(l)await s.respond("signatureApprove");else{let o=await s.respond("signatureDecline");r.EntryNo=o.newEntryNo,setTimeout(u,1e3);return}}if(a.done){debugger;r.success=a.success,t();return}}catch(a){debugger;try{await s.respond("requestAbort")}catch{}n(a);return}setTimeout(u,1e3)};setTimeout(u,1e3)})}'
         );
     end;
 }

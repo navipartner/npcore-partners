@@ -1,11 +1,13 @@
 page 6150774 "NPR POS Costumer Input"
 {
     PageType = Card;
-    UsageCategory = Administration;
+    UsageCategory = None;
     SourceTable = "NPR POS Costumer Input";
     Extensible = false;
-    ApplicationArea = NPRRetail;
     Caption = 'Customer Input';
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-06-15';
+    ObsoleteReason = 'Transferred to new POS Customer Input Entry table instead.';
 #IF NOT BC17
     AboutTitle = 'Customer Input';
     AboutText = 'Customer input defines the input given by a customer, for a given context.';

@@ -14,4 +14,9 @@ enum 6014519 "NPR POS Costumer Input Context"
         Caption = 'Return Information', Locked = true,
         Comment = 'This value is used for return sales.';
     }
+    value(2; "SALES_CARDHOLDER_VERIFICATION")
+    {
+        Caption = 'Sales Cardholder Verification', Locked = true,
+        Comment = 'This value is used for sales cardholder verification.';
+    }
 }

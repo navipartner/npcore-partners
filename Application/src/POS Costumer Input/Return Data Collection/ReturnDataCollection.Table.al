@@ -3,6 +3,9 @@ table 6059881 "NPR Return Data Collection"
     Access = Internal;
     Caption = 'Return Data Collection';
     DataClassification = CustomerContent;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-06-15';
+    ObsoleteReason = 'Obsolete due to primary key changes. Use new Data Collection Buffer table instead.';
 
     fields
     {

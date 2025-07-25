@@ -1,13 +1,15 @@
 page 6150775 "NPR POS Costumer Input List"
 {
     PageType = List;
-    ApplicationArea = NPRRetail;
-    UsageCategory = Administration;
+    UsageCategory = None;
     SourceTable = "NPR POS Costumer Input";
     CardPageId = "NPR POS Costumer Input";
     Extensible = false;
     Editable = false;
     Caption = 'Customer Input List';
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-06-15';
+    ObsoleteReason = 'Transferred to new POS Customer Input Line table instead.';
 #IF NOT BC17
     AboutTitle = 'Customer Input List';
     AboutText = 'Shows the list of customer inputs and context they belong too.';

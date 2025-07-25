@@ -4,6 +4,8 @@ controladdin "NPR HTML Display Input"
 
     VerticalStretch = true;
     HorizontalStretch = true;
+    RequestedWidth = 300;
+    RequestedHeight = 1000;
 
 #if not BC17
     [Obsolete('Use SendInputDataAndLabelV2(Input: JsonObject; ShowControl: Boolean; ApproveLabel: Text; RedoLabel: Text; PhoneNo: Text) instead.', '2023-06-28')]

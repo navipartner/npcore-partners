@@ -273,6 +273,8 @@
 #IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG No Series Experience", 'UpgradeImplementationFieldOnNoSeries'));
 #ENDIF
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Customer Input", 'UpgradePOSCustomerInputEntryInputTransfer'));
+
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -1054,6 +1056,11 @@
             Codeunit::"NPR UPG NpEc Config. Templates":
                 Exit('NPREcTransferConfigTemplToCustTempl');
 #endif
+            Codeunit::"NPR UPG POS Customer Input":
+                case UpgradeStep of
+                    'UpgradePOSCustomerInputEntryInputTransfer':
+                        exit('NPR-UpgradePOSCustomerInputEntryInputTransfer-20250713');
+                end;
         end;
     end;
 }

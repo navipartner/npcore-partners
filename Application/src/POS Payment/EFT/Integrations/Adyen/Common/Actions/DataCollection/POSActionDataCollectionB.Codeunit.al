@@ -412,9 +412,8 @@ codeunit 6150804 "NPR POS Action DataCollectionB"
         EFTTransactionRequest."Auto Voidable" := true;
     end;
 
-    internal procedure PopulateCollectedInformation(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; var ReturnDataCollection: Record "NPR Return Data Collection")
+    local procedure PopulateCollectedInformation(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; var DataCollectionBuffer: Record "NPR Data Collection Buffer")
     var
-        OutStr: OutStream;
         InStr: InStream;
         SignatureText: Text;
     begin
@@ -424,25 +423,17 @@ codeunit 6150804 "NPR POS Action DataCollectionB"
                     EFTTransactionRequest.CalcFields("Signature Data");
                     EFTTransactionRequest."Signature Data".CreateInStream(InStr);
                     InStr.ReadText(SignatureText);
-                    if SignatureText <> '""' then begin
-                        ReturnDataCollection."Signature Data".CreateOutStream(OutStr);
-                        OutStr.WriteText(SignatureText);
-                    end;
+                    if SignatureText <> '""' then
+                        DataCollectionBuffer.WriteSignatureData(SignatureText);
                 end;
             Enum::"NPR EFT Adyen Aux Operation"::ACQUIRE_PHONE_NO.AsInteger():
-                begin
-                    ReturnDataCollection."Phone No." := EFTTransactionRequest."Result Description";
-                    PopulatePhoneNo(EFTTransactionRequest);
-                end;
+                DataCollectionBuffer."Phone No." := EFTTransactionRequest."Result Description";
             Enum::"NPR EFT Adyen Aux Operation"::ACQUIRE_EMAIL.AsInteger():
-                begin
-                    ReturnDataCollection."E-Mail" := EFTTransactionRequest."Result Description";
-                    PopulateEMail(EFTTransactionRequest);
-                end;
+                DataCollectionBuffer."E-Mail" := EFTTransactionRequest."Result Description";
         end;
     end;
 
-    local procedure PopulatePhoneNo(EftTransactionRequest: Record "NPR EFT Transaction Request")
+    local procedure PopulatePhoneNo(RegisterNo: Code[10]; SalesTicketNo: Code[20]; DataCollectionBuffer: Record "NPR Data Collection Buffer")
     var
         SalePOS: Record "NPR POS Sale";
         Customer: Record Customer;
@@ -450,20 +441,16 @@ codeunit 6150804 "NPR POS Action DataCollectionB"
         Membership: Record "NPR MM Membership";
         MembershipRole: Record "NPR MM Membership Role";
     begin
-        if not ((EftTransactionRequest."Processing Type" = EftTransactionRequest."Processing Type"::AUXILIARY) and (EftTransactionRequest."Auxiliary Operation ID" = Enum::"NPR EFT Adyen Aux Operation"::ACQUIRE_PHONE_NO.AsInteger())) then
-            exit;
-
         SalePOS.SetLoadFields("Customer No.");
-        if not SalePOS.Get(EftTransactionRequest."Register No.", EftTransactionRequest."Sales Ticket No.") then
+        if not SalePOS.Get(RegisterNo, SalesTicketNo) then
             exit;
 
         if SalePOS."Customer No." = '' then
             exit;
 
-        Customer.SetLoadFields("Phone No.");
         if Customer.Get(SalePOS."Customer No.") then
             if Customer."Phone No." = '' then begin
-                Customer."Phone No." := CopyStr(EftTransactionRequest."Result Description".TrimStart('"').TrimEnd('"'), 1, MaxStrLen(Customer."Phone No."));
+                Customer."Phone No." := CopyStr(DataCollectionBuffer."Phone No.", 1, MaxStrLen(Customer."Phone No."));
                 Customer.Modify();
             end;
 
@@ -477,11 +464,11 @@ codeunit 6150804 "NPR POS Action DataCollectionB"
         if MembershipRole.FindSet() then
             repeat
                 Member.SetRange("Entry No.", MembershipRole."Member Entry No.");
-                Member.ModifyAll("Phone No.", CopyStr(EftTransactionRequest."Result Description".TrimStart('"').TrimEnd('"'), 1, MaxStrLen(Customer."Phone No.")));
+                Member.ModifyAll("Phone No.", DataCollectionBuffer."Phone No.")
             until MembershipRole.Next() = 0;
     end;
 
-    local procedure PopulateEMail(EftTransactionRequest: Record "NPR EFT Transaction Request")
+    local procedure PopulateEMail(RegisterNo: Code[10]; SalesTicketNo: Code[20]; DataCollectionBuffer: Record "NPR Data Collection Buffer")
     var
         SalePOS: Record "NPR POS Sale";
         Customer: Record Customer;
@@ -489,20 +476,16 @@ codeunit 6150804 "NPR POS Action DataCollectionB"
         Membership: Record "NPR MM Membership";
         MembershipRole: Record "NPR MM Membership Role";
     begin
-        if not ((EftTransactionRequest."Processing Type" = EftTransactionRequest."Processing Type"::AUXILIARY) and (EftTransactionRequest."Auxiliary Operation ID" = Enum::"NPR EFT Adyen Aux Operation"::ACQUIRE_EMAIL.AsInteger())) then
-            exit;
-
         SalePOS.SetLoadFields("Customer No.");
-        if not SalePOS.Get(EftTransactionRequest."Register No.", EftTransactionRequest."Sales Ticket No.") then
+        if not SalePOS.Get(RegisterNo, SalesTicketNo) then
             exit;
 
         if SalePOS."Customer No." = '' then
             exit;
 
-        Customer.SetLoadFields("E-Mail");
         if Customer.Get(SalePOS."Customer No.") then
             if Customer."E-Mail" = '' then begin
-                Customer."E-Mail" := CopyStr(EftTransactionRequest."Result Description".TrimStart('"').TrimEnd('"'), 1, MaxStrLen(Customer."E-Mail"));
+                Customer."E-Mail" := DataCollectionBuffer."E-Mail";
                 Customer.Modify();
             end;
 
@@ -516,7 +499,7 @@ codeunit 6150804 "NPR POS Action DataCollectionB"
         if MembershipRole.FindSet() then
             repeat
                 Member.SetRange("Entry No.", MembershipRole."Member Entry No.");
-                Member.ModifyAll("E-Mail Address", CopyStr(EftTransactionRequest."Result Description".TrimStart('"').TrimEnd('"'), 1, MaxStrLen(Customer."E-Mail")));
+                Member.ModifyAll("E-Mail Address", DataCollectionBuffer."E-Mail");
             until MembershipRole.Next() = 0;
     end;
 
@@ -616,44 +599,164 @@ codeunit 6150804 "NPR POS Action DataCollectionB"
         CollectReturnInformation := true;
     end;
 
+    internal procedure PopualteDataAfterSignatureApprove(EntryNo: Integer; POSCustomerInputContext: Enum "NPR POS Costumer Input Context"; trxStatus: Dictionary of [Integer, Integer])
+    var
+        EFTTransactionRequest: Record "NPR EFT Transaction Request";
+        DataCollectionBuffer: Record "NPR Data Collection Buffer";
+        EFTTransactionNo: Integer;
+        LineNo: Integer;
+        Found: Boolean;
+    begin
+        EFTTransactionRequest.Get(EntryNo);
+
+        LineNo := 10000;
+        DataCollectionBuffer.SetRange("Sales Ticket No.", EFTTransactionRequest."Sales Ticket No.");
+        if DataCollectionBuffer.FindLast() then
+            LineNo := DataCollectionBuffer."Line No." + 10000;
+        DataCollectionBuffer.Reset();
+
+
+        DataCollectionBuffer.SetRange("Sales Ticket No.", EFTTransactionRequest."Sales Ticket No.");
+        DataCollectionBuffer.SetRange(Context, POSCustomerInputContext);
+        Found := DataCollectionBuffer.FindFirst();
+        if not Found then begin
+            DataCollectionBuffer.Init();
+            DataCollectionBuffer."Sales Ticket No." := EFTTransactionRequest."Sales Ticket No.";
+            DataCollectionBuffer."Line No." := LineNo;
+            DataCollectionBuffer.Context := POSCustomerInputContext;
+        end;
+
+        foreach EFTTransactionNo in trxStatus.Keys do begin
+            if EFTTransactionNo <> 0 then begin
+                EFTTransactionRequest.Get(EFTTransactionNo);
+                case POSCustomerInputContext of
+                    POSCustomerInputContext::RETURN_INFORMATION:
+                        PopulateCollectedInformation(EFTTransactionRequest, DataCollectionBuffer);
+                    POSCustomerInputContext::SALES_CARDHOLDER_VERIFICATION:
+                        PopulateSignatureData(EFTTransactionRequest, DataCollectionBuffer);
+                end;
+            end;
+        end;
+        if Found then
+            DataCollectionBuffer.Modify()
+        else begin
+            case POSCustomerInputContext of
+                POSCustomerInputContext::RETURN_INFORMATION:
+                    if (DataCollectionBuffer."Signature Data".Length <> 0) or (DataCollectionBuffer."Phone No." <> '') or (DataCollectionBuffer."E-Mail" <> '') then
+                        DataCollectionBuffer.Insert();
+                POSCustomerInputContext::SALES_CARDHOLDER_VERIFICATION:
+                    if DataCollectionBuffer."Signature Data".Length <> 0 then
+                        DataCollectionBuffer.Insert();
+            end;
+        end;
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Create Entry", 'OnAfterInsertPOSEntry', '', false, false)]
     local procedure POSCreateEntryOnAfterInsertPOSEntry(var POSEntry: Record "NPR POS Entry")
     var
-        ReturnDataCollection: Record "NPR Return Data Collection";
-        POSCostumerInput: Record "NPR POS Costumer Input";
-        SignatureText: Text;
-        OutStr: OutStream;
-        InStr: InStream;
+        DataCollectionBuffer: Record "NPR Data Collection Buffer";
     begin
-        ReturnDataCollection.SetRange("Sales Ticket No.", POSEntry."Document No.");
-        if ReturnDataCollection.IsEmpty() then
+        DataCollectionBuffer.SetRange("Sales Ticket No.", POSEntry."Document No.");
+        if DataCollectionBuffer.IsEmpty() then
             exit;
-        ReturnDataCollection.FindFirst();
-        POSCostumerInput.Init();
-        POSCostumerInput."POS Entry No." := POSEntry."Entry No.";
-        POSCostumerInput."Date & Time" := CurrentDateTime;
-        POSCostumerInput.Context := POSCostumerInput.Context::RETURN_INFORMATION;
+        DataCollectionBuffer.FindSet();
+        repeat
+            InsertPOSCustomerInputEntryForDataColletionBuffer(POSEntry."Entry No.", POSEntry."POS Unit No.", POSEntry."Document No.", DataCollectionBuffer);
+        until DataCollectionBuffer.Next() = 0;
+        DataCollectionBuffer.DeleteAll();
+    end;
 
-        POSCostumerInput.Signature := ReturnDataCollection."Signature Data";
-        ReturnDataCollection.CalcFields("Signature Data");
-        ReturnDataCollection."Signature Data".CreateInStream(InStr);
+    local procedure InsertPOSCustomerInputEntryForDataColletionBuffer(POSEntryNo: Integer; RegisterNo: Code[10]; SalesTicketNo: Code[20]; var DataCollectionBuffer: Record "NPR Data Collection Buffer")
+    var
+        InformationCollectedToPopulate: Option "Phone No.","E-Mail";
+    begin
+        if DataCollectionBuffer."Signature Data".HasValue() then
+            InsertPOSCustomerInputEntrySignature(POSEntryNo, DataCollectionBuffer);
+
+        if DataCollectionBuffer."Phone No." <> '' then begin
+            InsertPOSCustomerInputEntryByContext(POSEntryNo, DataCollectionBuffer, InformationCollectedToPopulate::"Phone No.");
+            PopulatePhoneNo(RegisterNo, SalesTicketNo, DataCollectionBuffer);
+        end;
+
+        if DataCollectionBuffer."E-Mail" <> '' then begin
+            InsertPOSCustomerInputEntryByContext(POSEntryNo, DataCollectionBuffer, InformationCollectedToPopulate::"E-Mail");
+            PopulateEMail(RegisterNo, SalesTicketNo, DataCollectionBuffer);
+        end
+    end;
+
+    local procedure InsertPOSCustomerInputEntrySignature(POSEntryNo: Integer; var DataCollectionBuffer: Record "NPR Data Collection Buffer")
+    var
+        POSCustomerInputEntry: Record "NPR POS Customer Input Entry";
+        SignatureText: Text;
+    begin
+        POSCustomerInputEntry.Init();
+        POSCustomerInputEntry."POS Entry No." := POSEntryNo;
+        POSCustomerInputEntry."Date & Time" := CurrentDateTime();
+        case DataCollectionBuffer.Context of
+            DataCollectionBuffer.Context::MONEY_BACK:
+                POSCustomerInputEntry.Context := POSCustomerInputEntry.Context::MONEY_BACK;
+            DataCollectionBuffer.Context::RETURN_INFORMATION:
+                POSCustomerInputEntry.Context := POSCustomerInputEntry.Context::RETURN_INFORMATION;
+            DataCollectionBuffer.Context::"SALES_CARDHOLDER_VERIFICATION":
+                POSCustomerInputEntry.Context := POSCustomerInputEntry.Context::"SALES_CARDHOLDER_VERIFICATION";
+        end;
+        POSCustomerInputEntry."Information Collected" := POSCustomerInputEntry."Information Collected"::Signature;
+        SignatureText := DataCollectionBuffer.ReadSignatureData();
+        POSCustomerInputEntry.WriteSignatureData(SignatureText);
+        POSCustomerInputEntry.Insert();
+    end;
+
+    local procedure PopulateSignatureData(var EFTTransactionRequest: Record "NPR EFT Transaction Request"; var DataCollectionBuffer: Record "NPR Data Collection Buffer")
+    var
+        InStr: InStream;
+        SignatureText: Text;
+    begin
+        if not (EFTTransactionRequest."Authentication Method" = EFTTransactionRequest."Authentication Method"::Signature) then
+            exit;
+        EFTTransactionRequest.CalcFields("Signature Data");
+        EFTTransactionRequest."Signature Data".CreateInStream(InStr);
         InStr.ReadText(SignatureText);
-        POSCostumerInput.Signature.CreateOutStream(OutStr);
-        OutStr.WriteText(SignatureText);
+        if SignatureText <> '""' then
+            DataCollectionBuffer.WriteSignatureData(SignatureText);
+    end;
 
-        POSCostumerInput."Phone Number" := ReturnDataCollection."Phone No.";
-        POSCostumerInput."E-Mail" := CopyStr(ReturnDataCollection."E-Mail", 1, MaxStrLen(POSCostumerInput."E-Mail"));
-        POSCostumerInput.Insert();
-        ReturnDataCollection.Delete();
+    local procedure InsertPOSCustomerInputEntryByContext(POSEntryNo: Integer; var DataCollectionBuffer: Record "NPR Data Collection Buffer"; InformationCollectedToPopulate: Option "Phone No.","E-Mail")
+    var
+        POSCustomerInputEntry: Record "NPR POS Customer Input Entry";
+    begin
+        POSCustomerInputEntry.Init();
+        POSCustomerInputEntry."POS Entry No." := POSEntryNo;
+        POSCustomerInputEntry."Date & Time" := CurrentDateTime();
+        case DataCollectionBuffer.Context of
+            DataCollectionBuffer.Context::MONEY_BACK:
+                POSCustomerInputEntry.Context := POSCustomerInputEntry.Context::MONEY_BACK;
+            DataCollectionBuffer.Context::RETURN_INFORMATION:
+                POSCustomerInputEntry.Context := POSCustomerInputEntry.Context::RETURN_INFORMATION;
+            DataCollectionBuffer.Context::"SALES_CARDHOLDER_VERIFICATION":
+                POSCustomerInputEntry.Context := POSCustomerInputEntry.Context::"SALES_CARDHOLDER_VERIFICATION";
+        end;
+        case InformationCollectedToPopulate of
+            InformationCollectedToPopulate::"Phone No.":
+                begin
+                    POSCustomerInputEntry."Information Collected" := POSCustomerInputEntry."Information Collected"::"Phone No.";
+                    POSCustomerInputEntry."Information Value" := DataCollectionBuffer."Phone No.";
+                end;
+            InformationCollectedToPopulate::"E-Mail":
+                begin
+                    POSCustomerInputEntry."Information Collected" := POSCustomerInputEntry."Information Collected"::"E-Mail";
+                    POSCustomerInputEntry."Information Value" := DataCollectionBuffer."E-Mail";
+                end;
+        end;
+        POSCustomerInputEntry.Insert();
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Entry", 'OnAfterDeleteEvent', '', false, false)]
     local procedure POSEntryOnAfterDeleteEvent(var Rec: Record "NPR POS Entry")
     var
-        POSCostumerInput: Record "NPR POS Costumer Input";
+        POSCustomerInputEntry: Record "NPR POS Customer Input Entry";
     begin
-        if not POSCostumerInput.Get(Rec."Entry No.") then
-            exit;
-        POSCostumerInput.Delete();
+        POSCustomerInputEntry.SetRange("POS Entry No.", Rec."Entry No.");
+        if not POSCustomerInputEntry.IsEmpty() then
+            POSCustomerInputEntry.DeleteAll();
     end;
 }

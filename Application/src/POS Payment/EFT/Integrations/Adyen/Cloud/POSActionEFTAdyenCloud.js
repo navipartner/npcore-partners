@@ -59,6 +59,8 @@ function trxPromise(context, captions, popup, workflow) {
                         //starts a void transaction and keeps polling
                         setTimeout(pollFunction, 1000);
                         return;
+                    } else {
+                        await workflow.respond("signatureApprove");
                     }
                 };
                 if (pollResponse.done) {

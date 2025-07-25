@@ -5,6 +5,9 @@ table 6059810 "NPR POS Costumer Input"
     Extensible = False;
     LookupPageId = "NPR POS Costumer Input";
     DrillDownPageId = "NPR POS Costumer Input";
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-06-15';
+    ObsoleteReason = 'Transferred to new POS Customer Input Entry table instead.';
 
     fields
     {

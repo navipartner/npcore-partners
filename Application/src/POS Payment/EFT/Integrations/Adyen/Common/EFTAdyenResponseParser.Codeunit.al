@@ -314,6 +314,8 @@
         JValue: JsonValue;
         DCCObject: JsonObject;
         EFTAdyenSignatureBuffer: Codeunit "NPR EFT Adyen Signature Buffer";
+        SignatureBitmap: Text;
+        OutStr: OutStream;
     begin
         TrySelectToken(JObject, 'Response', JToken, true);
         ParseResponse(JToken.AsObject(), EFTTransactionRequest);
@@ -352,6 +354,13 @@
             if TrySelectToken(JObject, 'PaymentResult.CapturedSignature', JToken, false) then begin
                 EFTTransactionRequest."Signature Type" := EFTTransactionRequest."Signature Type"::"On Terminal";
                 EFTAdyenSignatureBuffer.SetSignatureData(Format(JToken), EFTTransactionRequest."Entry No.");
+
+                if TrySelectToken(Jobject, 'PaymentResult.CapturedSignature.SignaturePoint', JToken, false) then
+                    JToken.WriteTo(SignatureBitmap)
+                else
+                    SignatureBitmap := '[{"x":"FFFF","y":"FFFF"}]';
+                EFTTransactionRequest."Signature Data".CreateOutStream(OutStr);
+                OutStr.Write(SignatureBitmap);
             end;
 
             if TrySelectToken(JObject, 'PaymentResult.AuthenticationMethod', JToken, false) then

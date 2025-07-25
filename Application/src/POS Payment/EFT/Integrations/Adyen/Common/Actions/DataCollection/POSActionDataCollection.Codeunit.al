@@ -413,33 +413,10 @@ codeunit 6248387 "NPR POS Action Data Collection" implements "NPR IPOS Workflow"
 
     local procedure SignatureApprove(EntryNo: Integer): JsonObject
     var
-        EFTTransactionRequest: Record "NPR EFT Transaction Request";
-        ReturnDataCollection: Record "NPR Return Data Collection";
         POSActionDataCollectionB: Codeunit "NPR POS Action DataCollectionB";
-        EFTTransactionNo: Integer;
-        Found: Boolean;
         Response: JsonObject;
     begin
-        EFTTransactionRequest.Get(EntryNo);
-
-        ReturnDataCollection.SetRange("Sales Ticket No.", EFTTransactionRequest."Sales Ticket No.");
-        Found := ReturnDataCollection.FindFirst();
-        if not Found then begin
-            ReturnDataCollection.Init();
-            ReturnDataCollection."Sales Ticket No." := EFTTransactionRequest."Sales Ticket No.";
-        end;
-
-        foreach EFTTransactionNo in _trxStatus.Keys do begin
-            if EFTTransactionNo <> 0 then begin
-                EFTTransactionRequest.Get(EFTTransactionNo);
-                POSActionDataCollectionB.PopulateCollectedInformation(EFTTransactionRequest, ReturnDataCollection);
-            end;
-        end;
-        if Found then
-            ReturnDataCollection.Modify()
-        else if (ReturnDataCollection."Signature Data".Length <> 0) or (ReturnDataCollection."Phone No." <> '') or (ReturnDataCollection."E-Mail" <> '') then
-            ReturnDataCollection.Insert();
-
+        POSActionDataCollectionB.PopualteDataAfterSignatureApprove(EntryNo, Enum::"NPR POS Costumer Input Context"::RETURN_INFORMATION, _trxStatus);
         Response.Add('done', true);
         Response.Add('success', true);
         exit(Response);
