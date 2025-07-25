@@ -414,7 +414,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
             exit(true);
     end;
 
-    procedure FindShipmentMapping(ShippingLine: JsonToken; var ShipmentMapping: Record "NPR Magento Shipment Mapping"): Boolean
+    procedure FindShipmentMapping(ShippingLine: JsonToken; var ShipmentMapping: Record "NPR Magento Shipment Mapping"; var DeliveryLocationId: Code[50]): Boolean
     var
         ShipmentMapping2: Record "NPR Magento Shipment Mapping";
         TempShipmentMapping: Record "NPR Magento Shipment Mapping" temporary;
@@ -427,11 +427,12 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         ShippingLineCode := DelChr(JsonHelper.GetJText(ShippingLine, 'code', false), '=', '\');
         if ShippingLineCode = '' then
             exit;
-        if ShippingLineCodeJToken.ReadFrom(ShippingLineCode) and ShippingLineCodeJToken.IsObject() then
+        if ShippingLineCodeJToken.ReadFrom(ShippingLineCode) and ShippingLineCodeJToken.IsObject() then begin
 #pragma warning disable AA0139
-            ShippingMethodId := JsonHelper.GetJText(ShippingLineCodeJToken, 'shipping_rate_id', MaxStrLen(ShipmentMapping."External Shipment Method Code"), false)
+            ShippingMethodId := JsonHelper.GetJText(ShippingLineCodeJToken, 'shipping_rate_id', MaxStrLen(ShipmentMapping."External Shipment Method Code"), false);
+            DeliveryLocationId := JsonHelper.GetJText(ShippingLineCodeJToken, 'drop_point.drop_point_id', MaxStrLen(DeliveryLocationId), false);
 #pragma warning restore AA0139
-        else
+        end else
             ShippingMethodId := CopyStr(ShippingLineCode, 1, MaxStrLen(ShipmentMapping."External Shipment Method Code"));
         if ShippingMethodId = '' then
             exit;
@@ -449,7 +450,8 @@ codeunit 6184814 "NPR Spfy Order Mgt."
                         ShipmentMapping := ShipmentMapping2;
                 until (ShipmentMapping2.Next() = 0) or Found;
             end;
-
+        if DeliveryLocationId = '' then
+            DeliveryLocationId := GetDeliveryLocationID(ShipmentMapping."External Shipment Method Code", ShippingMethodId);
         exit(Found);
     end;
 
@@ -649,12 +651,15 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         ShippingLines: JsonToken;
         ShippingLine: JsonToken;
         FoundShipmentMapping: Boolean;
+        DeliveryLocationId: Code[50];
     begin
         if Order.SelectToken('shipping_lines', ShippingLines) and ShippingLines.IsArray() then
             foreach ShippingLine in ShippingLines.AsArray() do begin
-                FoundShipmentMapping := FindShipmentMapping(ShippingLine, ShipmentMapping);
+                FoundShipmentMapping := FindShipmentMapping(ShippingLine, ShipmentMapping, DeliveryLocationId);
                 if FoundShipmentMapping then begin
                     SalesHeader.Validate("Shipment Method Code", ShipmentMapping."Shipment Method Code");
+                    if DeliveryLocationId <> '' then
+                        SalesHeader.Validate("NPR Delivery Location", DeliveryLocationId);
                     IsShpmtMappingShipAgent := ShipmentMapping."Shipping Agent Code" <> '';
                     if IsShpmtMappingShipAgent then begin
                         SalesHeader.Validate("Shipping Agent Code", ShipmentMapping."Shipping Agent Code");
@@ -1355,12 +1360,13 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         ShippingLineID: Text[30];
         ShipmentFeeTitle: Text;
         ExistingLineFound: Boolean;
+        DeliveryLocationId: Code[50];
     begin
         ShipmentFee := JsonHelper.GetJDecimal(ShippingLine, 'price_set.presentment_money.amount', false);
         if ShipmentFee <= 0 then
             exit;
 
-        FindShipmentMapping(ShippingLine, ShipmentMapping);
+        FindShipmentMapping(ShippingLine, ShipmentMapping, DeliveryLocationId);
         ShipmentMapping.TestField("Shipment Fee No.");
         ShipmentFeeTitle := JsonHelper.GetJText(ShippingLine, 'title', false);
 
@@ -1623,6 +1629,20 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         SalesLine.LockTable();
     end;
 
+    local procedure GetDeliveryLocationID(ShippingLineCode: Code[50]; ShippingMethodId: Text[50]) DeliveryLocationID: Code[50]
+    var
+        ReplaceCharacterPosition: Integer;
+    begin
+        if (ShippingLineCode = '') or (ShippingLineCode = '') then
+            exit;
+        ReplaceCharacterPosition := StrPos(ShippingLineCode, '*');
+        if ReplaceCharacterPosition = 0 then
+            exit;
+#pragma warning disable AA0139
+        DeliveryLocationID := CopyStr(ShippingMethodId, ReplaceCharacterPosition);
+#pragma warning restore AA0139
+    end;
+
     local procedure FunctionCallOnNonTempVarErr(ProcedureName: Text)
     begin
         SpfyIntegrationMgt.FunctionCallOnNonTempVarErr(StrSubstNo('[Codeunit::NPR Spfy Order Mgt.(%1)].%2', CurrCodeunitID(), ProcedureName));
@@ -1632,6 +1652,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
     begin
         exit(Codeunit::"NPR Spfy Order Mgt.");
     end;
+
 
 #if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterCopyFromItem', '', true, false)]
