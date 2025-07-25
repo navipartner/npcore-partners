@@ -656,13 +656,11 @@
     local procedure OnBeforeSetQuantity(var SaleLinePOS: Record "NPR POS Sale Line")
     var
         SalePOS: Record "NPR POS Sale";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
-        if FeatureFlagsManagement.IsEnabled('removeCouponDiscountAfterChangeQuantity') then
-            if SalePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.") then begin
-                RemoveDiscount(SalePOS);
-                if not SaleLinePOS.Get(SaleLinePOS.RecordId) then;
-            end;
+        if SalePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.") then begin
+            RemoveDiscount(SalePOS);
+            if not SaleLinePOS.Get(SaleLinePOS.RecordId) then;
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnAfterSetQuantity', '', true, true)]

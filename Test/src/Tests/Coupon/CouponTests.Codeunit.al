@@ -76,7 +76,7 @@ codeunit 85074 "NPR Coupon Tests"
         POSSaleLineUnit.GetCurrentSaleLine(POSSaleLine);
         Assert.AreEqual(POSSaleLine.Quantity, CouponQty, 'Discount line quantity not according test scenario.');
         // finish transaction
-        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, 0, '');
+        TransactionEnded := LibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, POSSaleLine."Amount Including VAT", '');
         Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
     end;
 
@@ -5970,12 +5970,8 @@ codeunit 85074 "NPR Coupon Tests"
         POSSaleLine: Codeunit "NPR POS Sale Line";
         NPRLibraryPOSMasterData: Codeunit "NPR Library - POS Master Data";
         POSActDeletePOSLineB: Codeunit "NPR POSAct:Delete POS Line-B";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         CouponQty: Integer;
     begin
-        if not FeatureFlagsManagement.IsEnabled('removeCouponDiscountAfterChangeQuantity') then
-            exit;
-
         Initialize();
 
         // [GIVEN] POS Transaction
