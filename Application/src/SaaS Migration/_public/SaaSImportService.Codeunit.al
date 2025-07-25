@@ -166,4 +166,12 @@ codeunit 6150926 "NPR SaaS Import Service"
         JOResponse.Add('tableList', JAResponse);
         JOResponse.WriteTo(Response);
     end;
+
+    procedure DisableEventSubscribers(): Boolean
+    var
+        SaaSImportSetup: Record "NPR SaaS Import Setup";
+    begin
+        SaaSImportSetup.Get();
+        exit(SaaSImportSetup."Disable Event Subscribers");
+    end;
 }

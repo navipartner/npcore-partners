@@ -25,6 +25,11 @@ page 6150805 "NPR SaaS Import Setup"
                     ToolTip = 'Specifies the value of the Disable StopSession on Prepare Import field.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Disable Event Subscribers"; Rec."Disable Event Subscribers")
+                {
+                    ToolTip = 'Specifies the value of the Disable Event Subscribers field';
+                    ApplicationArea = NPRRetail;
+                }
             }
             group(Debug)
             {
