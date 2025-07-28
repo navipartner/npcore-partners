@@ -851,7 +851,7 @@
                     'UpgradeMerchantAccountSetups':
                         exit('NPR-UpgradeMerchantAccountSetups-20250408');
                     'FixUnreconciledMagentoRefundPaymentLines':
-                        exit('NPR-FixUnreconciledMagentoRefundPaymentLines-20250626');
+                        exit('NPR-FixUnreconciledMagentoRefundPaymentLines-20250716');
                     'RecreateForeignCurrencyDocuments':
                         exit('NPR-RecreateForeignCurrencyDocuments-20250710');
                 end;
