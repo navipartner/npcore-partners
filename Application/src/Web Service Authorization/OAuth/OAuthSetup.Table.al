@@ -103,18 +103,18 @@
     [NonDebuggable]
     procedure SetSecret(FieldNo: Integer; NewSecretValue: Text)
     begin
+        if HasSecret(FieldNo) then
+            RemoveSecret(FieldNo);
         Case FieldNo of
             Rec.FieldNo("Client ID"):
                 begin
-                    if IsNullGuid("Client ID") then
-                        Rec."Client ID" := CreateGuid();
+                    Rec."Client ID" := CreateGuid();
                     SetSecret("Client ID", NewSecretValue);
                 end;
 
             Rec.FieldNo("Client Secret"):
                 begin
-                    if IsNullGuid("Client Secret") then
-                        Rec."Client Secret" := CreateGuid();
+                    Rec."Client Secret" := CreateGuid();
                     SetSecret("Client Secret", NewSecretValue);
                 end;
         End;
@@ -189,16 +189,21 @@
         ClientId: Text;
         ClientSecret: Text;
         LocScope: Text;
+        TokenBaseAddress: Text;
+        CacheKey: Text;
+        CacheKeyLbl: Label '%1_%2_%3_%4', Locked = true;
     begin
         ClientId := GetSecret(FieldNo("Client ID"));
         ClientSecret := GetSecret(FieldNo("Client Secret"));
         LocScope := GetScope();
+        TokenBaseAddress := GetTokenBaseAddress();
+        CacheKey := StrSubstNo(CacheKeyLbl, "Client ID", "Client Secret", TokenBaseAddress, LocScope);
 
         if not ForceRefresh then
-            if APIOAuth2Token.CheckExistingTokenIsValid(ClientId, ClientSecret) then
-                exit(APIOAuth2Token.GetOAuthToken(ClientId));
+            if APIOAuth2Token.CheckExistingTokenIsValid(CacheKey, ClientSecret) then
+                exit(APIOAuth2Token.GetOAuthToken(CacheKey));
 
-        Client.SetBaseAddress(GetTokenBaseAddress());
+        Client.SetBaseAddress(TokenBaseAddress);
         RequestMessage.Method('POST');
 
         RequestBody := StrSubstNo('grant_type=client_credentials&client_id=%1&client_secret=%2&scope=%3',
@@ -216,8 +221,8 @@
             Error(ErrorTxt);
 
         ResponseMessage.Content().ReadAs(APIResult);
-        APIOAuth2Token.CacheNewToken(APIResult, ClientId);
-        exit(APIOAuth2Token.GetOAuthToken(ClientId));
+        APIOAuth2Token.CacheNewToken(APIResult, CacheKey);
+        exit(APIOAuth2Token.GetOAuthToken(CacheKey));
     end;
 
     internal procedure GetTokenBaseAddress(): text
