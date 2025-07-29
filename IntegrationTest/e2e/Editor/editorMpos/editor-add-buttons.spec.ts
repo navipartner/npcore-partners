@@ -175,7 +175,7 @@ test.describe("Mobile add and remove editable buttons", () => {
   });
   test("should be able to add new button to sale item, asign it an item action and execute action on sale item", async ({
     page,
-  }, workerInfo) => {  
+  }, workerInfo) => {
     const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
     const salePersonCode = (workerInfo.parallelIndex + 1).toString();
     await login(
@@ -233,36 +233,59 @@ test.describe("Mobile add and remove editable buttons", () => {
       .getByText("Other", { exact: true })
       .click();
     await page.waitForTimeout(3000);
-      const searchText = await page.getByRole("textbox", { name: "Search POS Actions" }).isVisible()
-      const searchLabel = await page.getByLabel('Search POS Actions').isVisible();
-      if(searchText) {
-        await page.getByRole("textbox", { name: "Search POS Actions" }).click();
-        await page
+    const searchText = await page
+      .getByRole("textbox", { name: "Search POS Actions" })
+      .isVisible();
+    const searchLabel = await page.getByLabel("Search POS Actions").isVisible();
+    if (searchText) {
+      await page.getByRole("textbox", { name: "Search POS Actions" }).click();
+      await page
         .getByRole("textbox", { name: "Search POS Actions" })
         .fill("discount");
-        await page.getByTitle('Select record "DISCOUNT"').click();
-      } else if(searchLabel) {
-        await page.getByLabel('Search POS Actions').click();
-        await page.getByLabel('Search POS Actions').fill("discount")
-        await page.getByRole('gridcell', { name: 'Code, DISCOUNT' }).click();
-      } else {
-        await page.getByLabel('Untitled field').click();
-        await page.getByLabel('Untitled field').fill("discount")
-        await page.getByRole('gridcell', { name: 'Open menu for Code DISCOUNT' }).click();
-      }
+      await page.getByTitle('Select record "DISCOUNT"').click();
+    } else if (searchLabel) {
+      await page.getByLabel("Search POS Actions").click();
+      await page.getByLabel("Search POS Actions").fill("discount");
+      await page.getByRole("gridcell", { name: "Code, DISCOUNT" }).click();
+    } else {
+      await page.getByLabel("Untitled field").click();
+      await page.getByLabel("Untitled field").fill("discount");
+      await page
+        .getByRole("gridcell", { name: "Open menu for Code DISCOUNT" })
+        .click();
+    }
     await page
       .frameLocator("iframe")
       .getByRole("heading", { name: "Variables" })
       .locator("path")
       .click();
-    await page.frameLocator('iframe').locator('div').filter({ hasText: /^Discount TypeDiscount TypeOption\.\.\.$/ }).getByRole('button').click();
-    await page.frameLocator('iframe').getByRole('button', { name: '... TotalAmount' }).click();
-    await page.frameLocator('iframe').locator('button.ui-button.ui-button--medium.ui-button--primary:has-text("Save")').click();
+    await page
+      .frameLocator("iframe")
+      .locator("div")
+      .filter({ hasText: /^Discount TypeDiscount TypeOption\.\.\.$/ })
+      .getByRole("button")
+      .click();
+    await page
+      .frameLocator("iframe")
+      .getByRole("button", { name: "... TotalAmount" })
+      .click();
+    await page
+      .frameLocator("iframe")
+      .locator(
+        'button.ui-button.ui-button--medium.ui-button--primary:has-text("Save")'
+      )
+      .click();
     await page.frameLocator("iframe").getByText("Icon").click();
     await page.frameLocator("iframe").locator(".select__indicator").click();
     await page
-      .frameLocator("iframe").locator('#react-select-12-option-0').click();
-    await page.frameLocator('iframe').locator('.custom-color-picker__palette-color').first().click();
+      .frameLocator("iframe")
+      .locator("#react-select-12-option-0")
+      .click();
+    await page
+      .frameLocator("iframe")
+      .locator(".custom-color-picker__palette-color")
+      .first()
+      .click();
     await page.frameLocator("iframe").getByText("Icon").click();
     await page.waitForTimeout(1000);
     await page
@@ -310,9 +333,9 @@ test.describe("Mobile add and remove editable buttons", () => {
     }
     await page
       .frameLocator("iframe")
-      .locator("div")
-      .filter({ hasText: /^Small Draft Beer1Quantity35totalTotal35$/ })
-      .getByRole("button")
+      .locator(
+        ".data-grid__hidden-menu > div > .editable-button-grid > div > .editable-button__content > .editable-button__button"
+      )
       .first()
       .click();
     await page.waitForTimeout(1000);
