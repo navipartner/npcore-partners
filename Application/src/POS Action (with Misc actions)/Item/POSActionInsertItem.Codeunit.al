@@ -152,7 +152,6 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         NPRPOSTrackingUtils: Codeunit "NPR POS Tracking Utils";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketRetailManager: Codeunit "NPR TM Ticket Retail Mgt.";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         EditDesc: Boolean;
         EditDesc2: Boolean;
         SerialSelectionFromList: Boolean;
@@ -197,21 +196,18 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         Item.SetLoadFields("NPR Explode BOM auto", "Assembly BOM", "NPR Group sale", "Item Category Code", "Price Includes VAT", "VAT Bus. Posting Gr. (Price)", "VAT Prod. Posting Group", "NPR Item Addon No.");
         Item.SetAutoCalcFields("Assembly BOM");
 
-        if FeatureFlagsManagement.IsEnabled('skipDoubleLookUpOnItemInsert') then begin
-            ExecuteGetItem := (not AdditionalInformationCollected) or (not Context.GetString('itemNoId', itemNoId)) or (itemNoId = '');
-            if not ExecuteGetItem then
-                ExecuteGetItem := (not Item.GetBySystemId(itemNoId));
+        ExecuteGetItem := (not AdditionalInformationCollected) or (not Context.GetString('itemNoId', itemNoId)) or (itemNoId = '');
+        if not ExecuteGetItem then
+            ExecuteGetItem := (not Item.GetBySystemId(itemNoId));
 
-            if ExecuteGetItem then
-                POSActionInsertItemB.GetItem(Item, ItemReference, ItemIdentifier, ItemIdentifierType)
-            else begin
-                ItemReference."Item No." := Item."No.";
-                if Context.GetString('itemReferenceId', itemReferenceId) then
-                    if not ItemReference.GetBySystemId(itemReferenceId) then
-                        ItemReference."Item No." := Item."No."
-            end;
-        end else
-            POSActionInsertItemB.GetItem(Item, ItemReference, ItemIdentifier, ItemIdentifierType);
+        if ExecuteGetItem then
+            POSActionInsertItemB.GetItem(Item, ItemReference, ItemIdentifier, ItemIdentifierType)
+        else begin
+            ItemReference."Item No." := Item."No.";
+            if Context.GetString('itemReferenceId', itemReferenceId) then
+                if not ItemReference.GetBySystemId(itemReferenceId) then
+                    ItemReference."Item No." := Item."No."
+        end;
 
         LogStartTelem();
 
@@ -548,7 +544,6 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         POSTrackingUtils: Codeunit "NPR POS Tracking Utils";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         ItemProcessingEvents: Codeunit "NPR POS Act. Insert Item Event";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         PosInventoryProfile: Record "NPR POS Inventory Profile";
         RequiresSerialNoInput: Boolean;
         RequiresUnitPriceInput: Boolean;
@@ -572,11 +567,8 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
         Item.SetAutoCalcFields("Assembly BOM");
-        if FeatureFlagsManagement.IsEnabled('skipDoubleLookUpOnItemInsert') then begin
-            if not POSActionInsertItemB.GetItem(Item, ItemReference, ItemIdentifier, ItemIdentifierType, true) then
-                exit;
-        end else
-            POSActionInsertItemB.GetItem(Item, ItemReference, ItemIdentifier, ItemIdentifierType);
+        if not POSActionInsertItemB.GetItem(Item, ItemReference, ItemIdentifier, ItemIdentifierType, true) then
+            exit;
 
         PostworkflowSubscriptionExists := CheckPostworkflowSubscriptionExists();
         ItemProcessingEvents.OnAfterCheckPostworkflowSubscriptionExists(Item, PostworkflowSubscriptionExists);
