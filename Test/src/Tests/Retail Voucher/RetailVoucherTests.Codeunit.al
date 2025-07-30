@@ -6046,6 +6046,166 @@ codeunit 85024 "NPR Retail Voucher Tests"
         Assert.AreEqual(true, TransactionEnded, 'Transaction end not according to test scenario.');
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CashoutVoucher()
+    // [SCENARIO] Create voucher. Check if successfully cashed out.
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        POSEntry: Record "NPR POS Entry";
+        SalePOS: Record "NPR POS Sale";
+        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
+        POSSale: Codeunit "NPR POS Sale";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        Assert: Codeunit "Assert";
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        CashoutVoucherB: Codeunit "NPR Cashout Voucher B";
+        ReferenceNo: Text[50];
+        VoucherAmount: Decimal;
+        TransactionEnded: Boolean;
+    begin
+        Initialize();
+
+        // [GIVEN] Voucher created in POS Transaction
+        VoucherAmount := 1000;
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, _VoucherTypeDefault.Code);
+        ReferenceNo := NpRvVoucher."Reference No.";
+
+        //Create new transaction and cashout voucher
+        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        _POSSession.GetPaymentLine(POSPaymentLine);
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        CashoutVoucherB.ApplyVoucherPayment(_VoucherTypeDefault.Code, NpRvVoucher."Reference No.", POSSale, POSPaymentLine, POSSaleLine);
+
+        // [THEN] End sale and check if voucher successfuly cashed out
+        TransactionEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, 0, '');
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+        Clear(NpRvVoucher);
+        NpRvVoucher.SetRange("Reference No.", ReferenceNo);
+        asserterror NpRvVoucher.FindFirst();
+        POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
+        if POSEntry.FindFirst() then;
+        POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntryPaymentLine.SetRange("POS Payment Method Code", _POSPaymentMethodCash.Code);
+        if POSEntryPaymentLine.FindFirst() then;
+        Assert.AreEqual(POSEntryPaymentLine.Amount, -VoucherAmount, 'Voucher amount not according to test scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CashoutVoucherWithCommissionPercentage()
+    // [SCENARIO] Create voucher. Check if successfully cashed out with % commission.
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        POSEntry: Record "NPR POS Entry";
+        SalePOS: Record "NPR POS Sale";
+        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
+        POSSale: Codeunit "NPR POS Sale";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        Assert: Codeunit "Assert";
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        CashoutVoucherB: Codeunit "NPR Cashout Voucher B";
+        ReferenceNo: Text[50];
+        VoucherAmount: Decimal;
+        Commision: Decimal;
+        CommisionAmount: Decimal;
+        TransactionEnded: Boolean;
+        InsertCommissionSuccess: Boolean;
+        CommisionType: Option Percentage,Amount;
+    begin
+        Initialize();
+
+        // [GIVEN] Voucher created in POS Transaction
+        VoucherAmount := 1000;
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, _VoucherTypeDefault.Code);
+        ReferenceNo := NpRvVoucher."Reference No.";
+
+        //Create new transaction and cashout voucher with % commission
+        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        _POSSession.GetPaymentLine(POSPaymentLine);
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        CashoutVoucherB.ApplyVoucherPayment(_VoucherTypeDefault.Code, NpRvVoucher."Reference No.", POSSale, POSPaymentLine, POSSaleLine);
+        Commision := 10;
+        InsertCommissionSuccess := CashoutVoucherB.InsertCommision(_VoucherTypeDefault."Account No.", _VoucherTypeDefault.Code, CommisionType::Percentage, Commision, POSPaymentLine, POSSaleLine);
+        Assert.IsTrue(InsertCommissionSuccess, 'Commission % insert not according to scenario.');
+
+        // [THEN] End sale and check if voucher successfuly cashed out
+        TransactionEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, 0, '');
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+        Clear(NpRvVoucher);
+        NpRvVoucher.SetRange("Reference No.", ReferenceNo);
+        asserterror NpRvVoucher.FindFirst();
+        POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
+        if POSEntry.FindFirst() then;
+        POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntryPaymentLine.SetRange("POS Payment Method Code", _POSPaymentMethodCash.Code);
+        if POSEntryPaymentLine.FindFirst() then;
+        CommisionAmount := VoucherAmount * Commision / 100;
+        // [THEN] Check if commission applied correctly
+        Assert.AreEqual(POSEntryPaymentLine.Amount, -VoucherAmount + CommisionAmount, 'Voucher amount not according to test scenario.');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure CashoutVoucherWithCommissionAmount()
+    // [SCENARIO] Create voucher. Check if successfully cashed out with amount commission.
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        POSEntry: Record "NPR POS Entry";
+        SalePOS: Record "NPR POS Sale";
+        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
+        POSSale: Codeunit "NPR POS Sale";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        Assert: Codeunit "Assert";
+        POSPaymentLine: Codeunit "NPR POS Payment Line";
+        POSSaleLine: Codeunit "NPR POS Sale Line";
+        CashoutVoucherB: Codeunit "NPR Cashout Voucher B";
+        ReferenceNo: Text[50];
+        VoucherAmount: Decimal;
+        CommisionAmount: Decimal;
+        TransactionEnded: Boolean;
+        InsertCommissionSuccess: Boolean;
+        CommisionType: Option Percentage,Amount;
+    begin
+        Initialize();
+
+        // [GIVEN] Voucher created in POS Transaction
+        VoucherAmount := 1000;
+        CreateVoucherInPOSTransaction(NpRvVoucher, VoucherAmount, _VoucherTypeDefault.Code);
+        ReferenceNo := NpRvVoucher."Reference No.";
+
+        //Create new transaction and cashout voucher with amount commission
+        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(_POSSession, _POSUnit, POSSale);
+        _POSSession.GetPaymentLine(POSPaymentLine);
+        _POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+        _POSSession.GetSaleLine(POSSaleLine);
+        CashoutVoucherB.ApplyVoucherPayment(_VoucherTypeDefault.Code, NpRvVoucher."Reference No.", POSSale, POSPaymentLine, POSSaleLine);
+        CommisionAmount := 200;
+        InsertCommissionSuccess := CashoutVoucherB.InsertCommision(_VoucherTypeDefault."Account No.", _VoucherTypeDefault.Code, CommisionType::Amount, CommisionAmount, POSPaymentLine, POSSaleLine);
+        Assert.IsTrue(InsertCommissionSuccess, 'Commission % insert not according to scenario.');
+
+        // [THEN] End sale and check if voucher successfuly cashed out
+        TransactionEnded := NPRLibraryPOSMock.PayAndTryEndSaleAndStartNew(_POSSession, _POSPaymentMethodCash.Code, 0, '');
+        Assert.IsTrue(TransactionEnded, 'Transaction end not according to test scenario.');
+        Clear(NpRvVoucher);
+        NpRvVoucher.SetRange("Reference No.", ReferenceNo);
+        asserterror NpRvVoucher.FindFirst();
+        POSEntry.SetRange("Document No.", SalePOS."Sales Ticket No.");
+        if POSEntry.FindFirst() then;
+        POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
+        POSEntryPaymentLine.SetRange("POS Payment Method Code", _POSPaymentMethodCash.Code);
+        if POSEntryPaymentLine.FindFirst() then;
+        // [THEN] Check if commission applied correctly
+        Assert.AreEqual(POSEntryPaymentLine.Amount, -VoucherAmount + CommisionAmount, 'Voucher amount not according to test scenario.');
+    end;
+
     local procedure CreateReservationLine(NpRvVoucherType: Record "NPR NpRv Voucher Type"; NpRvVoucher: Record "NPR NpRv Voucher"; Amount: Decimal; DocumentNo: Text[50]; var NpRvSalesLine: Record "NPR NpRv Sales Line")
     begin
         NpRvSalesLine.Init();
