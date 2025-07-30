@@ -8,19 +8,15 @@ codeunit 6059770 "NPR POS Post Item Entries JQ"
         POSEntry2: Record "NPR POS Entry";
         Hashset: Codeunit "NPR HashSet of [Integer]";
         POSPostEntries: Codeunit "NPR POS Post Entries";
-        SentryCron: Codeunit "NPR Sentry Cron";
         ErrorCount: Integer;
         ErrMessage: Label '%1 POS entries failed to post.';
-        MonitorSlugLbl: Label 'pos_post_item_entries', Locked = true;
         ErrorEntries: List of [Integer];
         POSItemEntryStatus: Option;
-        CheckInId: Text;
     begin
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
         RunBillingJQRunnerCheck();
 #endif
 
-        CheckInId := SentryCron.CreateCheckIn(SentryCron.GetOrganizationSlug(), MonitorSlugLbl, 'in_progress', '* * * * *', 0, 30, 240, '');
         POSPostEntries.SetPostCompressed(true);
         POSPostEntries.SetStopOnError(false);
         POSPostEntries.SetPostPOSEntries(false);
@@ -49,9 +45,6 @@ codeunit 6059770 "NPR POS Post Item Entries JQ"
 
         if ErrorCount > 0 then
             Message(ErrMessage, ErrorCount);
-
-        if CheckInId <> '' then
-            SentryCron.UpdateCheckIn(SentryCron.GetOrganizationSlug(), MonitorSlugLbl, 'ok', CheckInId);
     end;
 
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22

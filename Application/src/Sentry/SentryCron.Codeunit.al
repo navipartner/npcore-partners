@@ -1,6 +1,9 @@
 codeunit 6151089 "NPR Sentry Cron"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-08-03';
+    ObsoleteReason = 'We are not using Sentry monitor functionality to track our job queue anymore.';
 
     internal procedure CreateCheckIn(OrganizationSlug: Text; MonitorSlug: Text; Status: Text; Schedule: Text; ScheduleType: Option Crontab,Interval; CheckinMarginInMinutes: Integer; MaxRuntimeInMinutes: Integer; Timezone: Text) CheckInId: Text
     var
