@@ -228,6 +228,7 @@ page 6184704 "NPR Spfy Store Card"
                     ToolTip = 'Specifies when the system should retrieve order payment information from Shopify and create sales order payment lines in Business Central. This can be when the order is first imported or just before the payment capture requests are sent to Shopify.';
                     ApplicationArea = NPRShopify;
                     Enabled = _SalesOrderIntegrationIsEnabled;
+                    Editable = Rec."Send Payment Capture Requests";
                     Importance = Additional;
                 }
                 field("Post on Completion"; Rec."Post on Completion")

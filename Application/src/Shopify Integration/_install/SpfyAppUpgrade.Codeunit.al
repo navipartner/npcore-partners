@@ -26,6 +26,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         UpdateMetafieldDataLogSetup();
         SetDefaultProductStatus();
         RemoveOrphanShopifyAssignedIDs();
+        UpdateGetPaymentLinesFromShopifyOption();
     end;
 
     internal procedure UpdateShopifySetup()
@@ -319,7 +320,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
             exit;
         LogStart();
 
-        if ShopifyStore.FindSet() then
+        if ShopifyStore.FindSet(true) then
             repeat
                 if not (ShopifyStore."New Product Status" in [ShopifyStore."New Product Status"::DRAFT, ShopifyStore."New Product Status"::ACTIVE]) then begin
                     ShopifyStore."New Product Status" := ShopifyStore."New Product Status"::DRAFT;
@@ -347,6 +348,27 @@ codeunit 6184802 "NPR Spfy App Upgrade"
                 if not RecRef.Get(ShopifyAssignedID."BC Record ID") then
                     ShopifyAssignedID.Delete();
             until ShopifyAssignedID.Next() = 0;
+
+        SetUpgradeTag();
+        LogFinish();
+    end;
+
+    local procedure UpdateGetPaymentLinesFromShopifyOption()
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+    begin
+        _UpgradeStep := 'UpdateGetPaymentLinesFromShopifyOption';
+        if HasUpgradeTag() then
+            exit;
+        LogStart();
+
+        if ShopifyStore.FindSet(true) then
+            repeat
+                if not ShopifyStore."Send Payment Capture Requests" and (ShopifyStore."Get Payment Lines from Shopify" = ShopifyStore."Get Payment Lines from Shopify"::ON_CAPTURE) then begin
+                    ShopifyStore."Get Payment Lines from Shopify" := ShopifyStore."Get Payment Lines from Shopify"::ON_ORDER_IMPORT;
+                    ShopifyStore.Modify();
+                end;
+            until ShopifyStore.Next() = 0;
 
         SetUpgradeTag();
         LogFinish();

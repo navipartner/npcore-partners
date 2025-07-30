@@ -206,6 +206,13 @@ table 6150810 "NPR Spfy Store"
             DataClassification = CustomerContent;
             OptionMembers = ON_CAPTURE,ON_ORDER_IMPORT;
             OptionCaption = 'Before Capture,On Order Import';
+            InitValue = ON_ORDER_IMPORT;
+
+            trigger OnValidate()
+            begin
+                if "Get Payment Lines from Shopify" = "Get Payment Lines from Shopify"::ON_CAPTURE then
+                    TestField("Send Payment Capture Requests");
+            end;
         }
         field(90; "Send Order Fulfillments"; Boolean)
         {
@@ -226,7 +233,10 @@ table 6150810 "NPR Spfy Store"
             trigger OnValidate()
             begin
                 if "Send Payment Capture Requests" then
-                    TestField("Sales Order Integration");
+                    TestField("Sales Order Integration")
+                else
+                    if "Get Payment Lines from Shopify" = "Get Payment Lines from Shopify"::ON_CAPTURE then
+                        "Get Payment Lines from Shopify" := "Get Payment Lines from Shopify"::ON_ORDER_IMPORT;
             end;
         }
         field(110; "Send Close Order Requets"; Boolean)
