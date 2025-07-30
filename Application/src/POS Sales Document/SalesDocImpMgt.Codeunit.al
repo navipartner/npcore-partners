@@ -55,7 +55,7 @@
                     begin
                         Item.Get(SalesLine."No.");
                         if SpecificItemTrackingExist(Item) then
-                            InsertItemWithTrackingLine(SalesLine, POSSaleLine)
+                            InsertItemWithTrackingLine(SalesLine, POSSaleLine, SalesHeader)
                         else
                             InsertLine(SalesLine, POSSaleLine, SalesHeader);
                     end;
@@ -132,7 +132,7 @@
         SalesDocImptMgtPublic.OnAfterTransferFromSaleLineToSaleLinePOS(SaleLinePOS, SalesLine);
     end;
 
-    local procedure InsertItemWithTrackingLine(SalesLine: Record "Sales Line"; var POSSaleLine: Codeunit "NPR POS Sale Line")
+    local procedure InsertItemWithTrackingLine(SalesLine: Record "Sales Line"; var POSSaleLine: Codeunit "NPR POS Sale Line"; SalesHeader: Record "Sales Header")
     var
         ReservationEntry: Record "Reservation Entry";
         SaleLinePOS: Record "NPR POS Sale Line";
@@ -158,7 +158,9 @@
                 POSSaleLine.InsertLineRaw(SaleLinePOS, false);
                 SaleLinePOS.SetSkipCalcDiscount(false);
 
-            until ReservationEntry.Next() = 0;
+            until ReservationEntry.Next() = 0
+        else
+            InsertLine(SalesLine, POSSaleLine, SalesHeader);
     end;
 
     local procedure InsertLine(SalesLine: Record "Sales Line"; POSSaleLine: Codeunit "NPR POS Sale Line"; SalesHeader: Record "Sales Header")
