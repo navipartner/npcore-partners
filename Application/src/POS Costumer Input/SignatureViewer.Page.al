@@ -56,6 +56,7 @@ page 6150862 "NPR Signature Viewer"
             Rec.Context::MONEY_BACK:
                 ShowReturnDataCollectionAddin := false;
             Rec.Context::RETURN_INFORMATION,
+            Rec.Context::ACQUIRE_SIGNATURE,
             Rec.Context::"SALES_CARDHOLDER_VERIFICATION":
                 ShowReturnDataCollectionAddin := true;
         end;

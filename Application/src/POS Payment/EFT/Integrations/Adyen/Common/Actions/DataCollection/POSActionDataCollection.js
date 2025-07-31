@@ -1,31 +1,45 @@
-let main = async ({ workflow, context, popup, captions }) => {
+let main = async ({ workflow, context, popup, captions, parameters }) => {
 
-  let _dialogRef = await popup.simplePayment({
-    title: captions.dataCollectionTitle,
-    abortEnabled: true,
-    amount: " ",
-    amountStyle: {"fontSize": "0px"},
-    initialStatus: captions.initialStatus,
-    showStatus: true,
-    onAbort: async () => {
-      await workflow.respond("requestAbort");
-    }
-  });
+  debugger;
+  switch(parameters.requestCollectInformation.toInt())
+  {
+    case parameters.requestCollectInformation["ReturnInformation"]:
+      let _dialogRef = await popup.simplePayment({
+        title: captions.dataCollectionTitle,
+        abortEnabled: true,
+        amount: " ",
+        amountStyle: {"fontSize": "0px"},
+        initialStatus: captions.initialStatus,
+        showStatus: true,
+        onAbort: async () => {
+          await workflow.respond("requestAbort");
+        }
+      });
 
-  try {
-    let startTrxResponse = await workflow.respond("collectData");
-    if (startTrxResponse.newEntryNo) {
-        context.EntryNo = startTrxResponse.newEntryNo;
-    }
-    _dialogRef && _dialogRef.updateStatus(captions.collectingDataStatus);
-    _dialogRef && _dialogRef.enableAbort(true);
-    await trxPromise(context, popup, workflow);
+      try {
+        let startTrxResponse = await workflow.respond("collectData");
+        if (startTrxResponse.newEntryNo) {
+            context.EntryNo = startTrxResponse.newEntryNo;
+        }
+        _dialogRef && _dialogRef.updateStatus(captions.collectingDataStatus);
+        _dialogRef && _dialogRef.enableAbort(true);
+        await trxPromise(context, popup, workflow);
+      }
+      finally {
+        _dialogRef && _dialogRef.close();
+      }
+      
+      return ({ "success": context.success, "tryEndSale": context.success });
+    case parameters.requestCollectInformation["AcquireSignature"]:
+      const signaturePoints = await popup.inputSignature({
+        title: "Insert Signature",
+      });
+      if (signaturePoints !== null) {
+        await workflow.respond("collectSignature", {
+          signaturePoints: signaturePoints,
+        });
+      }
   }
-  finally {
-    _dialogRef && _dialogRef.close();
-  }
-
-  return ({ "success": context.success, "tryEndSale": context.success });
 };
 
 function trxPromise(context, popup, workflow) {

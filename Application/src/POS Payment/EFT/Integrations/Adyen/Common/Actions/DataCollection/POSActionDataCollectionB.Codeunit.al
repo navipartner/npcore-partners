@@ -599,7 +599,7 @@ codeunit 6150804 "NPR POS Action DataCollectionB"
         CollectReturnInformation := true;
     end;
 
-    internal procedure PopualteDataAfterSignatureApprove(EntryNo: Integer; POSCustomerInputContext: Enum "NPR POS Costumer Input Context"; trxStatus: Dictionary of [Integer, Integer])
+    internal procedure PopualteDataAfterSignatureApprove(EntryNo: Integer; POSCustomerInputContext: Enum "NPR POS Costumer Input Context"; trxStatus: Dictionary of [Integer, Integer]; InformationContext: Text[250])
     var
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         DataCollectionBuffer: Record "NPR Data Collection Buffer";
@@ -618,12 +618,15 @@ codeunit 6150804 "NPR POS Action DataCollectionB"
 
         DataCollectionBuffer.SetRange("Sales Ticket No.", EFTTransactionRequest."Sales Ticket No.");
         DataCollectionBuffer.SetRange(Context, POSCustomerInputContext);
+        if InformationContext <> '' then
+            DataCollectionBuffer.SetRange("Information Context", InformationContext);
         Found := DataCollectionBuffer.FindFirst();
         if not Found then begin
             DataCollectionBuffer.Init();
             DataCollectionBuffer."Sales Ticket No." := EFTTransactionRequest."Sales Ticket No.";
             DataCollectionBuffer."Line No." := LineNo;
             DataCollectionBuffer.Context := POSCustomerInputContext;
+            DataCollectionBuffer."Information Context" := InformationContext;
         end;
 
         foreach EFTTransactionNo in trxStatus.Keys do begin
@@ -692,6 +695,7 @@ codeunit 6150804 "NPR POS Action DataCollectionB"
         POSCustomerInputEntry.Init();
         POSCustomerInputEntry."POS Entry No." := POSEntryNo;
         POSCustomerInputEntry."Date & Time" := CurrentDateTime();
+        POSCustomerInputEntry."Information Context" := DataCollectionBuffer."Information Context";
         case DataCollectionBuffer.Context of
             DataCollectionBuffer.Context::MONEY_BACK:
                 POSCustomerInputEntry.Context := POSCustomerInputEntry.Context::MONEY_BACK;
@@ -699,6 +703,8 @@ codeunit 6150804 "NPR POS Action DataCollectionB"
                 POSCustomerInputEntry.Context := POSCustomerInputEntry.Context::RETURN_INFORMATION;
             DataCollectionBuffer.Context::"SALES_CARDHOLDER_VERIFICATION":
                 POSCustomerInputEntry.Context := POSCustomerInputEntry.Context::"SALES_CARDHOLDER_VERIFICATION";
+            DataCollectionBuffer.Context::ACQUIRE_SIGNATURE:
+                POSCustomerInputEntry.Context := POSCustomerInputEntry.Context::ACQUIRE_SIGNATURE;
         end;
         POSCustomerInputEntry."Information Collected" := POSCustomerInputEntry."Information Collected"::Signature;
         SignatureText := DataCollectionBuffer.ReadSignatureData();
@@ -727,6 +733,7 @@ codeunit 6150804 "NPR POS Action DataCollectionB"
         POSCustomerInputEntry.Init();
         POSCustomerInputEntry."POS Entry No." := POSEntryNo;
         POSCustomerInputEntry."Date & Time" := CurrentDateTime();
+        POSCustomerInputEntry."Information Context" := DataCollectionBuffer."Information Context";
         case DataCollectionBuffer.Context of
             DataCollectionBuffer.Context::MONEY_BACK:
                 POSCustomerInputEntry.Context := POSCustomerInputEntry.Context::MONEY_BACK;

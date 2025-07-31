@@ -44,6 +44,12 @@ page 6185082 "NPR POS Customer Input Entries"
                     ToolTip = 'Specifies the value of the Information Value field.';
                     ApplicationArea = NPRRetail;
                 }
+                field("Information Context"; Rec."Information Context")
+                {
+                    Caption = 'Information Context';
+                    ToolTip = 'Specifies the value of the Information Context field.';
+                    ApplicationArea = NPRRetail;
+                }
             }
         }
         area(FactBoxes)

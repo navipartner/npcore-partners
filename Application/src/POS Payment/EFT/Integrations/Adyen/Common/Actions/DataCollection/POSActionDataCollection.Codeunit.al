@@ -13,8 +13,10 @@ codeunit 6248387 "NPR POS Action Data Collection" implements "NPR IPOS Workflow"
         ActionDescription: Label 'This action collects data from the customer in terms of signature, phone number and e-mail.';
         DataCollectionTitle: Label 'Data Collection';
         CaptionRequestCollectInformation: Label 'Request Collect Information';
-        RequestCollectionInformationOption: Label 'ReturnInformation', Locked = true;
-        RequestCollectionInformationOptionCaption: Label 'Return Information';
+        RequestCollectionInformationOption: Label 'ReturnInformation,AcquireSignature', Locked = true;
+        RequestCollectionInformationOptionCaption: Label 'Return Information,Acquire Signature';
+        InformationCollectedContextLbl: Label 'Information Context';
+        InformationCollectedContextDescLbl: Label 'Defines the context(reason) of the information collected from the customer.';
         InitialStatusLbl: Label 'Initializing';
         CollectingDataStatusLbl: Label 'Collecting Data';
     begin
@@ -32,29 +34,33 @@ codeunit 6248387 "NPR POS Action Data Collection" implements "NPR IPOS Workflow"
             CaptionRequestCollectInformation,
             RequestCollectionInformationOptionCaption,
             RequestCollectionInformationOptionCaption);
+        WorkflowConfig.AddTextParameter('informationContext', '', InformationCollectedContextLbl, InformationCollectedContextDescLbl);
     end;
 
     procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; SaleMgr: Codeunit "NPR POS Sale"; SaleLineMgr: codeunit "NPR POS Sale Line"; PaymentLineMgr: codeunit "NPR POS Payment Line"; SetupMgr: codeunit "NPR POS Setup");
     var
-        RequestCollectInformationOption: Integer;
+        RequestCollectInformationOption: Option ReturnInformation,AcquireSignature;
     begin
         RequestCollectInformationOption := Context.GetIntegerParameter('requestCollectInformation');
         case RequestCollectInformationOption of
-            0:
+            RequestCollectInformationOption::ReturnInformation:
                 //Return Information Collection
-                begin
-                    case Step of
-                        'collectData':
-                            FrontEnd.WorkflowResponse(CollectData(SaleMgr));
-                        'poll':
-                            FrontEnd.WorkflowResponse(PollResponse(Context.GetInteger('EntryNo')));
-                        'signatureDecline':
-                            FrontEnd.WorkflowResponse(SignatureDecline(Context.GetInteger('EntryNo')));
-                        'signatureApprove':
-                            FrontEnd.WorkflowResponse(SignatureApprove(Context.GetInteger('EntryNo')));
-                        'requestAbort':
-                            RequestTrxAbort(Context.GetInteger('EntryNo'));
-                    end;
+                case Step of
+                    'collectData':
+                        FrontEnd.WorkflowResponse(CollectData(SaleMgr));
+                    'poll':
+                        FrontEnd.WorkflowResponse(PollResponse(Context.GetInteger('EntryNo')));
+                    'signatureDecline':
+                        FrontEnd.WorkflowResponse(SignatureDecline(Context.GetInteger('EntryNo')));
+                    'signatureApprove':
+                        FrontEnd.WorkflowResponse(SignatureApprove(Context));
+                    'requestAbort':
+                        RequestTrxAbort(Context.GetInteger('EntryNo'));
+                end;
+            RequestCollectInformationOption::AcquireSignature:
+                case Step of
+                    'collectSignature':
+                        FrontEnd.WorkflowResponse(CollectInsertedSignature(Context, SaleMgr));
                 end;
         end;
     end;
@@ -411,12 +417,18 @@ codeunit 6248387 "NPR POS Action Data Collection" implements "NPR IPOS Workflow"
         RequestTrxAbort(EntryNoToAbort);
     end;
 
-    local procedure SignatureApprove(EntryNo: Integer): JsonObject
+    local procedure SignatureApprove(Context: Codeunit "NPR POS JSON Helper"): JsonObject
     var
         POSActionDataCollectionB: Codeunit "NPR POS Action DataCollectionB";
+        InformationContextParameterValue: Text;
+        InformationContext: Text[250];
+        EntryNo: Integer;
         Response: JsonObject;
     begin
-        POSActionDataCollectionB.PopualteDataAfterSignatureApprove(EntryNo, Enum::"NPR POS Costumer Input Context"::RETURN_INFORMATION, _trxStatus);
+        EntryNo := Context.GetInteger('EntryNo');
+        if Context.GetStringParameter('informationContext', InformationContextParameterValue) then
+            InformationContext := CopyStr(InformationContextParameterValue, 1, MaxStrLen(InformationContext));
+        POSActionDataCollectionB.PopualteDataAfterSignatureApprove(EntryNo, Enum::"NPR POS Costumer Input Context"::RETURN_INFORMATION, _trxStatus, InformationContext);
         Response.Add('done', true);
         Response.Add('success', true);
         exit(Response);
@@ -558,6 +570,51 @@ codeunit 6248387 "NPR POS Action Data Collection" implements "NPR IPOS Workflow"
         POSBackgroundTaskAPI.EnqueuePOSBackgroundTask(TaskId, Enum::"NPR POS Background Task"::EFT_ADYEN_CLOUD_ABORT, Parameters, 1000 * 10);
     end;
 
+    local procedure CollectInsertedSignature(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale"): JsonObject
+    var
+        SalePOS: Record "NPR POS Sale";
+        DataCollectionBuffer: Record "NPR Data Collection Buffer";
+        SignatureText: Text;
+        InformationContextParameter: Text[250];
+        LineNo: Integer;
+        Found: Boolean;
+        SignaturePoints: JsonObject;
+        SignatureToken: JsonToken;
+    begin
+        if not Context.GetJsonObject('signaturePoints', SignaturePoints) then
+            exit;
+        if not SignaturePoints.Get('signature', SignatureToken) then
+            exit;
+        InformationContextParameter := CopyStr(Context.GetStringParameter('informationContext'), 1, MaxStrLen(InformationContextParameter));
+
+        SignatureToken.WriteTo(SignatureText);
+
+        Sale.GetCurrentSale(SalePOS);
+
+        DataCollectionBuffer.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        if DataCollectionBuffer.FindLast() then
+            LineNo := DataCollectionBuffer."Line No." + 10000;
+        DataCollectionBuffer.Reset();
+
+        DataCollectionBuffer.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        DataCollectionBuffer.SetRange("Information Context", InformationContextParameter);
+        Found := DataCollectionBuffer.FindFirst();
+        if not Found then begin
+            DataCollectionBuffer.Init();
+            DataCollectionBuffer."Line No." := LineNo;
+            DataCollectionBuffer."Sales Ticket No." := SalePOS."Sales Ticket No.";
+            DataCollectionBuffer.Context := DataCollectionBuffer.Context::"ACQUIRE_SIGNATURE";
+            DataCollectionBuffer.WriteSignatureData(SignatureText);
+            DataCollectionBuffer."Information Context" := InformationContextParameter;
+            DataCollectionBuffer.Insert();
+        end else begin
+            DataCollectionBuffer.CalcFields("Signature Data");
+            Clear(DataCollectionBuffer."Signature Data");
+            DataCollectionBuffer.WriteSignatureData(SignatureText);
+            DataCollectionBuffer.Modify();
+        end;
+    end;
+
     local procedure ClearGlobalState()
     begin
         clear(_trxStatus);
@@ -589,7 +646,7 @@ codeunit 6248387 "NPR POS Action Data Collection" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionDataCollection.js###
-'let main=async({workflow:a,context:n,popup:s,captions:i})=>{let t=await s.simplePayment({title:i.dataCollectionTitle,abortEnabled:!0,amount:" ",amountStyle:{fontSize:"0px"},initialStatus:i.initialStatus,showStatus:!0,onAbort:async()=>{await a.respond("requestAbort")}});try{let r=await a.respond("collectData");r.newEntryNo&&(n.EntryNo=r.newEntryNo),t&&t.updateStatus(i.collectingDataStatus),t&&t.enableAbort(!0),await trxPromise(n,s,a)}finally{t&&t.close()}return{success:n.success,tryEndSale:n.success}};function trxPromise(a,n,s){return new Promise((i,t)=>{let r=async()=>{try{debugger;let e=await s.respond("poll");if(e.newEntryNo){a.EntryNo=e.newEntryNo,setTimeout(r,1e3);return}if(e.dataVerificationRequired){debugger;let u=!1,l=JSON.parse(e.signatureBitmap||"{}"),o=await n.signatureValidation();if(setTimeout(()=>{o.updateSignature(l,{phoneNoData:e.phoneNoData,emailData:e.emailData,showSignature:e.showSignature,showPhoneNo:e.showPhoneNo,showEmail:e.showEmail})},1e3),u=await o.completeAsync(),u)await s.respond("signatureApprove");else{let c=await s.respond("signatureDecline");a.success=c.success,i();return}}if(e.done){debugger;a.success=e.success,i();return}}catch(e){debugger;try{await s.respond("requestAbort")}catch{}t(e);return}setTimeout(r,1e3)};setTimeout(r,1e3)})}'
+'let main=async({workflow:a,context:i,popup:n,captions:s,parameters:r})=>{debugger;switch(r.requestCollectInformation.toInt()){case r.requestCollectInformation.ReturnInformation:let t=await n.simplePayment({title:s.dataCollectionTitle,abortEnabled:!0,amount:" ",amountStyle:{fontSize:"0px"},initialStatus:s.initialStatus,showStatus:!0,onAbort:async()=>{await a.respond("requestAbort")}});try{let u=await a.respond("collectData");u.newEntryNo&&(i.EntryNo=u.newEntryNo),t&&t.updateStatus(s.collectingDataStatus),t&&t.enableAbort(!0),await trxPromise(i,n,a)}finally{t&&t.close()}return{success:i.success,tryEndSale:i.success};case r.requestCollectInformation.AcquireSignature:const e=await n.inputSignature({title:"Insert Signature"});e!==null&&await a.respond("collectSignature",{signaturePoints:e})}};function trxPromise(a,i,n){return new Promise((s,r)=>{let t=async()=>{try{debugger;let e=await n.respond("poll");if(e.newEntryNo){a.EntryNo=e.newEntryNo,setTimeout(t,1e3);return}if(e.dataVerificationRequired){debugger;let u=!1,l=JSON.parse(e.signatureBitmap||"{}"),o=await i.signatureValidation();if(setTimeout(()=>{o.updateSignature(l,{phoneNoData:e.phoneNoData,emailData:e.emailData,showSignature:e.showSignature,showPhoneNo:e.showPhoneNo,showEmail:e.showEmail})},1e3),u=await o.completeAsync(),u)await n.respond("signatureApprove");else{let c=await n.respond("signatureDecline");a.success=c.success,s();return}}if(e.done){debugger;a.success=e.success,s();return}}catch(e){debugger;try{await n.respond("requestAbort")}catch{}r(e);return}setTimeout(t,1e3)};setTimeout(t,1e3)})}'
         );
     end;
 }

@@ -38,6 +38,10 @@ table 6151193 "NPR POS Customer Input Entry"
         {
             DataClassification = CustomerContent;
         }
+        field(60; "Information Context"; Text[250])
+        {
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {

@@ -345,7 +345,7 @@ codeunit 6184608 "NPR POS Action EFT Adyen Cloud" implements "NPR IPOS Workflow"
         POSActionDataCollectionB: Codeunit "NPR POS Action DataCollectionB";
         Response: JsonObject;
     begin
-        POSActionDataCollectionB.PopualteDataAfterSignatureApprove(EntryNo, Enum::"NPR POS Costumer Input Context"::SALES_CARDHOLDER_VERIFICATION, _trxStatus);
+        POSActionDataCollectionB.PopualteDataAfterSignatureApprove(EntryNo, Enum::"NPR POS Costumer Input Context"::SALES_CARDHOLDER_VERIFICATION, _trxStatus, '');
 
         Response.Add('done', true);
         Response.Add('success', true);

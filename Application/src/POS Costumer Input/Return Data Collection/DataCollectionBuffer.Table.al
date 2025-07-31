@@ -36,6 +36,11 @@ table 6059885 "NPR Data Collection Buffer"
             Caption = 'Context';
             DataClassification = CustomerContent;
         }
+        field(60; "Information Context"; Text[250])
+        {
+            Caption = 'Information Context';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {
