@@ -17,7 +17,8 @@ export const loginAndCreateLayout = async (
   }
 
   await page.waitForLoadState('networkidle');
-  await page.waitForSelector('.spinner', { state: 'hidden' });
+  await page.waitForSelector('.spinner', { state: 'hidden', timeout: 10000 });
+
   const popupLocator = page.locator('[id=b3]');
   if ((await popupLocator.count()) > 0) {
     await page.getByRole('button', { name: 'OK' }).click();

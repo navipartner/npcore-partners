@@ -4,7 +4,7 @@ import {
   createAndRunNestedMenu,
   expectButtonVisible,
   populateGlobalSettingsModal,
-} from '../../fixtures/nestedMenusHelpers';
+} from '../../fixtures/helperFunctions';
 
 test.beforeEach(async ({ page }, workerInfo) => {
   const uniqueLayoutKey = `${Date.now()}-WORKER${workerInfo.parallelIndex}`;

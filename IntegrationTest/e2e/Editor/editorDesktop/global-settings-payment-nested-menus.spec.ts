@@ -4,7 +4,7 @@ import {
   expectButtonVisible,
   goToPaymentPage,
   populateGlobalSettingsModal,
-} from '../../fixtures/nestedMenusHelpers';
+} from '../../fixtures/helperFunctions';
 import { login } from '../../fixtures/editorLogin';
 
 test.beforeEach(async ({ page }, workerInfo) => {
