@@ -6258,6 +6258,23 @@
         DisableMembershipAutoRenewal(Membership, true, false);
     end;
 
+    internal procedure CheckMembershipAutoRenewStatusYesInternal(CustomerNo: Code[20]): Boolean
+    var
+        Membership: Record "NPR MM Membership";
+    begin
+        if (CustomerNo = '') then
+            exit(false);
+        Membership.Reset();
+        Membership.SetCurrentKey("Customer No.");
+        Membership.SetRange("Customer No.", CustomerNo);
+        Membership.SetLoadFields("Auto-Renew");
+        if not Membership.FindFirst() then
+            exit(false);
+        if Membership."Auto-Renew" <> Membership."Auto-Renew"::YES_INTERNAL then
+            exit(false);
+        exit(true);
+    end;
+
     internal procedure EnableMembershipInternalAutoRenewal(var Membership: Record "NPR MM Membership"; CreateMemberNotification: Boolean; ForceMemberNotification: Boolean)
     var
         MemberNotification: Codeunit "NPR MM Member Notification";

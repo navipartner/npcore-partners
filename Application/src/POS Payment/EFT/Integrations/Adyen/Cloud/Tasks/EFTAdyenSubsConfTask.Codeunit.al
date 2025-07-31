@@ -8,9 +8,11 @@ codeunit 6185084 "NPR EFT Adyen Subs Conf Task" implements "NPR POS Background T
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         EFTSetup: Record "NPR EFT Setup";
         GLSetup: Record "General Ledger Setup";
+        SalePOS: Record "NPR POS Sale";
         EFTAdyenCloudProtocol: Codeunit "NPR EFT Adyen Cloud Protocol";
         EFTAdyenCloudIntegrat: Codeunit "NPR EFT Adyen Cloud Integrat.";
         EFTAdyenConfInputReq: Codeunit "NPR EFT Adyen ConfInput Req";
+        MMMembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
         Request: Text;
         Response: Text;
         URL: Text;
@@ -18,6 +20,7 @@ codeunit 6185084 "NPR EFT Adyen Subs Conf Task" implements "NPR POS Background T
         ConfirmationDialogText: Text;
         ConfirmationDialogTitleLbl: Label 'Subscription';
         ConfirmationDialogTextLbl: Label 'Start subscription %1 %2/year on card?';
+        AutoRenewYesInternalConfirmationDialogTextLbl: Label 'Do you want to add the following card as the primary payment method?';
         SubscriptionAmountIncludingVAT: Decimal;
         StatusCode: Integer;
         Started: Boolean;
@@ -34,7 +37,12 @@ codeunit 6185084 "NPR EFT Adyen Subs Conf Task" implements "NPR POS Background T
         ConfirmationDialogText := StrSubstNo(ConfirmationDialogTextLbl, SubscriptionAmountIncludingVAT, GLSetup."LCY Code");
 
         EFTAdyenConfInputReq.SetTitle(ConfirmationDialogTitleLbl);
-        EFTAdyenConfInputReq.SetTextQst(ConfirmationDialogText);
+        SalePOS.Get(EFTTransactionRequest."Register No.", EFTTransactionRequest."Sales Ticket No.");
+        if MMMembershipMgtInternal.CheckMembershipAutoRenewStatusYesInternal(SalePOS."Customer No.") then
+            EFTAdyenConfInputReq.SetTextQst(AutoRenewYesInternalConfirmationDialogTextLbl)
+        else
+            EFTAdyenConfInputReq.SetTextQst(ConfirmationDialogText);
+
         Request := EFTAdyenConfInputReq.GetRequestJson(EFTTransactionRequest, EFTSetup);
         URL := EFTAdyenCloudProtocol.GetTerminalURL(EFTTransactionRequest);
 
