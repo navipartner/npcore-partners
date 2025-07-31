@@ -1257,7 +1257,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         PaymentTokenExist := TryGetPaymentMethodData(JsonAddDataToken, TempMemberPaymentMethod);
         if PaymentTokenExist then begin
             GetMembership(MMSubscrPaymentRequest, Membership);
-
+            GetPaymentMethod(JsonObjectToken, TempMemberPaymentMethod);
             InsertNewMMPaymentMethod(AdyenWebhook, Membership, TempMemberPaymentMethod);
             Status := Status::Captured;
             ProcessingStatus := ProcessingStatus::Success;
@@ -2395,6 +2395,18 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         MemberInfoCapture.SetFilter("Receipt No.", '<>%1', '');
         MemberInfoCapture.SetFilter("Line No.", '<>%1', 0);
         LineExist := not MemberInfoCapture.IsEmpty();
+    end;
+
+    local procedure GetPaymentMethod(JsonObjectToken: JsonToken; var TempMemberPaymentMethod: Record "NPR MM Member Payment Method" temporary)
+    var
+        JsonValueToken: JsonToken;
+    begin
+        if TempMemberPaymentMethod."Payment Brand" <> '' then
+            exit;
+        if JsonObjectToken.AsObject().Get('paymentMethod', JsonValueToken) then begin
+            TempMemberPaymentMethod."Payment Brand" := CopyStr(JsonValueToken.AsValue().AsText(), 1, MaxStrLen(TempMemberPaymentMethod."Payment Brand"));
+            TempMemberPaymentMethod.Modify();
+        end
     end;
 
     internal procedure CreateRefundWebhook(MerchantName: Text[50])
