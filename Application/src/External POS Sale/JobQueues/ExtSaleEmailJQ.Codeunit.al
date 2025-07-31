@@ -22,7 +22,7 @@ codeunit 6248239 "NPR Ext. Sale Email JQ"
         ExternalPOSSale: Record "NPR External POS Sale";
         EmailManagement: Codeunit "NPR E-mail Management";
         EmailTemplateHeader: Record "NPR E-mail Template Header";
-        POSSaleDigitalReceiptEntry: Record "NPR POSSaleDigitalReceiptEntry";
+        POSSaleDigitalReceiptEntry: Record "NPR POSSale Dig. Receipt Entry";
         POSActionIssueDigRcptB: Codeunit "NPR POS Action: IssueDigRcpt B";
         RecRef: RecordRef;
         MailErrorMessage: Text;

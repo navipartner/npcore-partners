@@ -3,7 +3,7 @@ page 6151320 "NPR PDF Digital Receipt Viewer"
     UsageCategory = None;
     Caption = 'PDF Digital Receipt Preview';
     PageType = CardPart;
-    SourceTable = "NPR POSSaleDigitalReceiptEntry";
+    SourceTable = "NPR POSSale Dig. Receipt Entry";
     InsertAllowed = false;
     ModifyAllowed = false;
     Editable = false;

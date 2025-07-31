@@ -4,7 +4,7 @@ page 6151322 "NPR POSSaleDigitalRcptEntries"
     Editable = false;
     Caption = 'POS Sale Digital Receipt Entries';
     PageType = List;
-    SourceTable = "NPR POSSaleDigitalReceiptEntry";
+    SourceTable = "NPR POSSale Dig. Receipt Entry";
     SourceTableView = sorting("POS Entry No.")
                       ORDER(Descending);
     UsageCategory = None;

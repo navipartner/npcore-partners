@@ -6,7 +6,7 @@ codeunit 6060074 "NPR POS Action: IssueDigRcpt B"
     var
         POSEntry: Record "NPR POS Entry";
         DigitalReceiptSetup: Record "NPR Digital Rcpt. Setup";
-        TempPOSSaleDigitalReceiptEntry: Record "NPR POSSaleDigitalReceiptEntry" temporary;
+        TempPOSSaleDigitalReceiptEntry: Record "NPR POSSale Dig. Receipt Entry" temporary;
         FiskalyAPI: Codeunit "NPR Fiskaly API";
         SendAuthRequest: Boolean;
         BearerTokenValue: Text;

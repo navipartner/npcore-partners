@@ -274,6 +274,7 @@
 #IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG No Series Experience", 'UpgradeImplementationFieldOnNoSeries'));
 #ENDIF
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POSSalDigRcpEntrTransf", 'UpgradePOSSaleDigitalReceiptEntryTransfer'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Customer Input", 'UpgradePOSCustomerInputEntryInputTransfer'));
 
     end;
@@ -1063,6 +1064,11 @@
                 case UpgradeStep of
                     'UpgradePOSCustomerInputEntryInputTransfer':
                         exit('NPR-UpgradePOSCustomerInputEntryInputTransfer-20250713');
+                end;
+            Codeunit::"NPR UPG POSSalDigRcpEntrTransf":
+                case UpgradeStep of
+                    'UpgradePOSSaleDigitalReceiptEntryTransfer':
+                        exit('NPR-UpgradePOSSaleDigitalReceiptEntryTransfer-20250720');
                 end;
         end;
     end;

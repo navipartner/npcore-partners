@@ -5,7 +5,7 @@ codeunit 6150654 "NPR POS Action: Send Rcpt.-B"
     procedure SendReceipt(EmailTemplateCode: Code[20]; ReceiptEmail: text[80]; POSEntryNo: Integer; SelectReceiptToSend: Integer): Text
     var
         POSEntry: Record "NPR POS Entry";
-        POSSaleDigitalReceiptEntry: Record "NPR POSSaleDigitalReceiptEntry";
+        POSSaleDigitalReceiptEntry: Record "NPR POSSale Dig. Receipt Entry";
         RecRef: RecordRef;
         EmailManagement: Codeunit "NPR E-mail Management";
         POSActionIssueDigRcptB: Codeunit "NPR POS Action: IssueDigRcpt B";

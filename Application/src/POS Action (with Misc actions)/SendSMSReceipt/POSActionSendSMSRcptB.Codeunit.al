@@ -8,7 +8,7 @@ codeunit 6184927 "NPR POS Action: Send SMS RcptB"
         SMSManagement: Codeunit "NPR SMS Management";
         POSActionIssueDigRcptB: Codeunit "NPR POS Action: IssueDigRcpt B";
         SmsBody: Text;
-        POSSaleDigitalReceiptEntry: Record "NPR POSSaleDigitalReceiptEntry";
+        POSSaleDigitalReceiptEntry: Record "NPR POSSale Dig. Receipt Entry";
         Sender: Text;
         DigitalReceiptLink: Text;
         FooterText: Text;

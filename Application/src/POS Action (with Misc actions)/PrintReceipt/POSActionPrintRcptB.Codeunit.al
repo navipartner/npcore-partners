@@ -4,7 +4,7 @@ codeunit 6060086 "NPR POS Action: Print Rcpt.-B"
 
     internal procedure GetDigitalReceiptQRCodeLink(SalesTicketNo: Code[20]) DigitalReceiptQRCodeLink: Text;
     var
-        POSSaleDigitalReceiptEntry: Record "NPR POSSaleDigitalReceiptEntry";
+        POSSaleDigitalReceiptEntry: Record "NPR POSSale Dig. Receipt Entry";
         POSActionIssueDigRcptB: Codeunit "NPR POS Action: IssueDigRcpt B";
         FooterText: Text;
     begin

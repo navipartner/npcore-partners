@@ -501,7 +501,7 @@ POSEntrySalesLine: Record "NPR POS Entry Sales Line"; var
         CustomElementsJsonArray.Add(CustomElementsJsonObject);
     end;
 
-    internal procedure GetResponseAsBuffer(var POSEntry: Record "NPR POS Entry"; var TempPOSSaleDigitalReceiptEntry: Record "NPR POSSaleDigitalReceiptEntry" temporary)
+    internal procedure GetResponseAsBuffer(var POSEntry: Record "NPR POS Entry"; var TempPOSSaleDigitalReceiptEntry: Record "NPR POSSale Dig. Receipt Entry" temporary)
     var
         ResponseText: Text;
     begin
@@ -509,7 +509,7 @@ POSEntrySalesLine: Record "NPR POS Entry Sales Line"; var
         ParseResponseToSaleDigitalReceiptEntryTemp(ResponseText, POSEntry, TempPOSSaleDigitalReceiptEntry);
     end;
 
-    local procedure ParseResponseToSaleDigitalReceiptEntryTemp(ResponseText: Text; var POSEntry: Record "NPR POS Entry"; var TempPOSSaleDigitalReceiptEntry: Record "NPR POSSaleDigitalReceiptEntry" temporary)
+    local procedure ParseResponseToSaleDigitalReceiptEntryTemp(ResponseText: Text; var POSEntry: Record "NPR POS Entry"; var TempPOSSaleDigitalReceiptEntry: Record "NPR POSSale Dig. Receipt Entry" temporary)
     var
         JsonResponse: Codeunit "JSON Management";
         JsonPdfLinkPropertyObject: Codeunit "JSON Management";
@@ -551,9 +551,9 @@ POSEntrySalesLine: Record "NPR POS Entry Sales Line"; var
         TempPOSSaleDigitalReceiptEntry.Insert()
     end;
 
-    internal procedure CreatePOSSaleDigitalReceiptEntry(var TempPOSSaleDigitalReceiptEntry: Record "NPR POSSaleDigitalReceiptEntry" temporary)
+    internal procedure CreatePOSSaleDigitalReceiptEntry(var TempPOSSaleDigitalReceiptEntry: Record "NPR POSSale Dig. Receipt Entry" temporary)
     var
-        POSSaleDigitalReceiptEntry: Record "NPR POSSaleDigitalReceiptEntry";
+        POSSaleDigitalReceiptEntry: Record "NPR POSSale Dig. Receipt Entry";
     begin
         TempPOSSaleDigitalReceiptEntry.Reset();
         if not TempPOSSaleDigitalReceiptEntry.FindFirst() then

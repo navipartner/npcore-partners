@@ -634,7 +634,7 @@
         }
         field(6011; "POS Sales Digital Receipts"; Integer)
         {
-            CalcFormula = count("NPR POSSaleDigitalReceiptEntry" where("POS Entry No." = field("Entry No."),
+            CalcFormula = count("NPR POSSale Dig. Receipt Entry" where("POS Entry No." = field("Entry No."),
                                                                         "POS Unit No." = field("POS Unit No.")));
             Caption = 'POS Sales Digital Receipts';
             Editable = false;
@@ -724,7 +724,7 @@
         POSEntryTaxCalc: Codeunit "NPR POS Entry Tax Calc.";
         POSCustomerInputEntry: Record "NPR POS Customer Input Entry";
         POSEntryMediaInfo: Record "NPR POS Entry Media Info";
-        POSSaleDigitalReceiptEntry: Record "NPR POSSaleDigitalReceiptEntry";
+        POSSaleDigitalReceiptEntry: Record "NPR POSSale Dig. Receipt Entry";
     begin
         POSSalesLine.SetRange("POS Entry No.", "Entry No.");
         if not POSSalesLine.IsEmpty() then
