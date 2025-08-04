@@ -725,10 +725,9 @@ codeunit 6059942 "NPR RS Audit Mgt."
     var
         RSFiscalizationSetup: Record "NPR RS Fiscalisation Setup";
     begin
-        if not RSFiscalizationSetup.Get() then begin
-            RSFiscalizationSetup.Init();
-            RSFiscalizationSetup.Insert();
-        end;
+        if not RSFiscalizationSetup.Get() then
+            exit(false);
+
         exit(RSFiscalizationSetup."Enable RS Fiscal");
     end;
 

@@ -3,14 +3,18 @@ codeunit 6151490 "NPR RS R Localization Mgt."
     Access = Internal;
     Permissions = tabledata "G/L Register" = rimd;
 
+    var
+        HasRSLocalizationSetup: Boolean;
+
     internal procedure IsRSLocalizationActive(): Boolean
     var
         RSRetLocalizationSetup: Record "NPR RS R Localization Setup";
     begin
-        if not RSRetLocalizationSetup.Get() then begin
-            RSRetLocalizationSetup.Init();
-            RSRetLocalizationSetup.Insert();
-        end;
+        if not HasRSLocalizationSetup then
+            if not RSRetLocalizationSetup.Get() then
+                exit(false);
+
+        HasRSLocalizationSetup := true;
         exit(RSRetLocalizationSetup."Enable RS Retail Localization");
     end;
 

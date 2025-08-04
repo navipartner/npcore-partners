@@ -654,10 +654,9 @@ codeunit 6151546 "NPR SI Audit Mgt."
 
     internal procedure IsSIFiscalActive(): Boolean
     begin
-        if not SIFiscalSetup.Get() then begin
-            SIFiscalSetup.Init();
-            SIFiscalSetup.Insert();
-        end;
+        if not SIFiscalSetup.Get() then
+            exit(false);
+
         exit(SIFiscalSetup."Enable SI Fiscal");
     end;
 

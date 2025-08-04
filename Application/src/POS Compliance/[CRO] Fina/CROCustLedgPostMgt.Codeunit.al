@@ -29,10 +29,8 @@ codeunit 6185071 "NPR CRO Cust. Ledg. Post. Mgt."
 
     local procedure IsCROFiscalizationEnabled(var CROFiscalizationSetup: Record "NPR CRO Fiscalization Setup"): Boolean
     begin
-        if not CROFiscalizationSetup.Get() then begin
-            CROFiscalizationSetup.Init();
-            CROFiscalizationSetup.Insert();
-        end;
+        if not CROFiscalizationSetup.Get() then
+            exit(false);
 
         exit(CROFiscalizationSetup."Enable CRO Fiscal");
     end;
