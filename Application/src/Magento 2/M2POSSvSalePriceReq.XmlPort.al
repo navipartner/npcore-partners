@@ -48,7 +48,6 @@ xmlport 6151145 "NPR M2 POS Sv. Sale Price Req."
                             TmpSaleLinePOSRequest."Sales Ticket No." := TicketNumber;
                             TmpSaleLinePOSRequest."Line Type" := TmpSaleLinePOSRequest."Line Type"::Item;
                             TmpSaleLinePOSRequest.Date := TmpSalePOSRequest.Date;
-                            TmpSaleLinePOSRequest."Register No." := POSUnitNo;
                         end;
                     }
 
@@ -181,18 +180,13 @@ xmlport 6151145 "NPR M2 POS Sv. Sale Price Req."
     }
 
     trigger OnInitXmlPort()
-    var
-        POSUnit: Record "NPR POS Unit";
     begin
         TicketNumber := CopyStr(DelChr(Format(CurrentDateTime(), 0, 9), '<=>', DelChr(Format(CurrentDateTime(), 0, 9), '<=>', '0123456789')),
          1, MaxStrLen(TicketNumber));
-        if POSUnit.FindFirst() then
-            POSUnitNo := POSUnit."No.";
     end;
 
     var
         TicketNumber: Code[20];
-        POSUnitNo: Code[10];
         StartTime: Time;
         ExecutionTimeLbl: Label '%1 (ms)', Locked = true;
 
@@ -207,6 +201,7 @@ xmlport 6151145 "NPR M2 POS Sv. Sale Price Req."
         if (TmpSaleLinePOSRequest.FindSet()) then begin
             repeat
                 TmpSalesLine.TransferFields(TmpSaleLinePOSRequest, true);
+                SetPOSUnitNo(TmpSalesLine);
                 TmpSalesLine.Insert();
             until (TmpSaleLinePOSRequest.Next() = 0);
         end;
@@ -214,6 +209,19 @@ xmlport 6151145 "NPR M2 POS Sv. Sale Price Req."
         ResponseCode := 'ERROR';
         ResponseDescription := 'No Response';
         StartTime := Time;
+    end;
+
+    [TryFunction]
+    local procedure SetPOSUnitNo(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary)
+    var
+        POSUnit: Record "NPR POS Unit";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+    begin
+        if not FeatureFlagsManagement.IsEnabled('m2pospricewebserviceassignposunitno') then
+            exit;
+        if not POSUnit.FindFirst() then
+            exit;
+        TempSaleLinePOS."Register No." := POSUnit."No.";
     end;
 
     internal procedure SetResponse(var TmpSalePOS: Record "NPR POS Sale" temporary; var TmpSaleLinePOS: Record "NPR POS Sale Line" temporary; var TempNPRTotalDiscBenItemBuffer: Record "NPR Total Disc Ben Item Buffer" temporary)
