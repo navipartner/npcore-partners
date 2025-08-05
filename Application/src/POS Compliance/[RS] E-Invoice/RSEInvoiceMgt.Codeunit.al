@@ -31,10 +31,9 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
     var
         RSEInvoiceSetup: Record "NPR RS E-Invoice Setup";
     begin
-        if not RSEInvoiceSetup.Get() then begin
-            RSEInvoiceSetup.Init();
-            RSEInvoiceSetup.Insert();
-        end;
+        if not RSEInvoiceSetup.Get() then
+            exit(false);
+
         exit(RSEInvoiceSetup."Enable RS E-Invoice");
     end;
 

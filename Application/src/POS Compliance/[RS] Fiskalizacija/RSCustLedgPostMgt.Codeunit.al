@@ -29,10 +29,8 @@ codeunit 6185069 "NPR RS Cust. Ledg. Post. Mgt."
 
     local procedure IsRSFiscalizationEnabled(var RSFiscalisationSetup: Record "NPR RS Fiscalisation Setup"): Boolean
     begin
-        if not RSFiscalisationSetup.Get() then begin
-            RSFiscalisationSetup.Init();
-            RSFiscalisationSetup.Insert();
-        end;
+        if not RSFiscalisationSetup.Get() then
+            exit(false);
 
         exit(RSFiscalisationSetup."Enable RS Fiscal");
     end;

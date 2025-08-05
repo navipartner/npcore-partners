@@ -747,10 +747,9 @@ codeunit 6151547 "NPR CRO Audit Mgt."
     #region CRO Fiscal - Procedures/Helper Functions
     internal procedure IsCROFiscalActive(): Boolean
     begin
-        if not CROFiscalSetup.Get() then begin
-            CROFiscalSetup.Init();
-            CROFiscalSetup.Insert();
-        end;
+        if not CROFiscalSetup.Get() then
+            exit(false);
+
         exit(CROFiscalSetup."Enable CRO Fiscal");
     end;
 

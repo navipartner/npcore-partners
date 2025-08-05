@@ -52,10 +52,9 @@ codeunit 6184844 "NPR SE CC Cash Reg. Audit Mgt."
     var
         SEFiscalizationSetup: Record "NPR SE Fiscalization Setup.";
     begin
-        if not SEFiscalizationSetup.Get() then begin
-            SEFiscalizationSetup.Init();
-            SEFiscalizationSetup.Insert();
-        end;
+        if not SEFiscalizationSetup.Get() then
+            exit(false);
+
         exit(SEFiscalizationSetup."Enable SE Fiscal");
     end;
 
