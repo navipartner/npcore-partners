@@ -25,6 +25,18 @@ table 6151154 "NPR TM TicketRequestMutex"
             Clustered = true;
         }
     }
+
+    internal procedure IsLocked(Token: Text[100]): Boolean
+    var
+        Mutex: Record "NPR TM TicketRequestMutex";
+    begin
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        Mutex.ReadIsolation := ReadIsolation::ReadUncommitted;
+#endif
+        Mutex.SetFilter(SessionTokenId, '%1', Token);
+        exit(not (Mutex.IsEmpty()));
+    end;
+
     internal procedure Acquire(Token: Text[100]; BCSessionId: Integer): Boolean
     var
         Mutex: Record "NPR TM TicketRequestMutex";

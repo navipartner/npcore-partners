@@ -116,7 +116,10 @@
         IsCheckedBySubscriber: Boolean;
         IsValid: Boolean;
     begin
+
+#if (BC17 or BC18 or BC19 or BC20 or BC21)
         TicketRequestManager.LockResources('IssueTicketsFromToken');
+#endif
 
         if (TicketRequestManager.IsChangeRequest(Token)) then begin
             TicketRequestManager.ConfirmReservationRequestWithValidate(Token, TokenLineNumber);

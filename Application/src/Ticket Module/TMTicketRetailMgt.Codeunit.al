@@ -647,7 +647,9 @@
             exit;
 
         // This is a ticket event
+#if (BC17 or BC18 or BC19 or BC20 or BC21)
         TicketRequestManager.LockResources('UpdateTicketOnSaleLineInsert');
+#endif
         TicketRequestManager.ExpireReservationRequests();
 
         if (SaleLinePOS.Quantity > 0) then
@@ -928,12 +930,15 @@
     var
         Ticket: Record "NPR TM Ticket";
         OriginalSaleLine: Record "NPR POS Entry Sales Line";
+        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        NoRemainingTickets: Label 'No remaining tickets to refund for line %1.';
         UnitPrice: Decimal;
         Token: Text[100];
         TicketCount: Integer;
         RevokeQuantity: Integer;
-
+        Refundable: Boolean;
     begin
         if (ReturnSaleLinePOS."Return Sale Sales Ticket No." = '') then
             exit;
@@ -952,10 +957,23 @@
             Token := '';
 
             repeat
-                UnitPrice := ReturnSaleLinePOS."Unit Price";
-                if (TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", ReturnSaleLinePOS."Sales Ticket No.", ReturnSaleLinePOS."Line No.", UnitPrice, RevokeQuantity)) then
-                    TicketCount -= RevokeQuantity;
+                TicketReservationRequest.SetCurrentKey("External Ticket Number");
+                TicketReservationRequest.SetFilter("Entry Type", '=%1', TicketReservationRequest."Entry Type"::REVOKE);
+                TicketReservationRequest.SetFilter("External Ticket Number", '=%1', Ticket."External Ticket No.");
+                TicketReservationRequest.SetFilter("Revoke Ticket Request", '=%1', true);
+                TicketReservationRequest.SetFilter("Request Status", '<>%1', TicketReservationRequest."Request Status"::CANCELED); // in progress
+                Refundable := TicketReservationRequest.IsEmpty();
+
+                if (Refundable) then begin
+                    UnitPrice := ReturnSaleLinePOS."Unit Price";
+                    if (TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", ReturnSaleLinePOS."Sales Ticket No.", ReturnSaleLinePOS."Line No.", UnitPrice, RevokeQuantity)) then
+                        TicketCount -= RevokeQuantity;
+                end;
+
             until (Ticket.Next() = 0);
+
+            if (TicketCount = 0) then
+                Message(NoRemainingTickets, OriginalSaleLine."Line No.");
 
             // on partial refunds unit price will become altered and qty should be one.
             if (UnitPrice <> ReturnSaleLinePOS."Unit Price") then begin

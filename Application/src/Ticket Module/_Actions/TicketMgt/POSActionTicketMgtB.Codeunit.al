@@ -63,15 +63,22 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
         PosEntrySalesLine: Record "NPR POS Entry Sales Line";
         ResponseMessage: Text;
         ResponseCode: Integer;
+        RequestMutex: Record "NPR TM TicketRequestMutex";
+        TICKET_BLOCKED: Label 'Ticket %1 is blocked.';
     begin
         if (ExternalTicketNumber = '') then
             Error(ILLEGAL_VALUE, ExternalTicketNumber, TICKET_NUMBER);
 
-        POSSession.GetSaleLine(POSSaleLine);
-
         TicketManagement.ValidateTicketReference("NPR TM TicketIdentifierType"::EXTERNAL_TICKET_NO, ExternalTicketNumber, '', TicketAccessEntryNo);
         TicketAccessEntry.Get(TicketAccessEntryNo);
         Ticket.Get(TicketAccessEntry."Ticket No.");
+
+        if (Ticket.Blocked) then
+            Error(TICKET_BLOCKED, ExternalTicketNumber);
+
+        if (RequestMutex.IsLocked(Ticket."No.")) then
+            Error(REVOKE_IN_PROGRESS, Ticket."External Ticket No.");
+        RequestMutex.Acquire(Ticket."No.", SessionId());
 
         TicketReservationRequest.SetCurrentKey("External Ticket Number");
         TicketReservationRequest.SetFilter("External Ticket Number", '=%1', Ticket."External Ticket No.");
@@ -79,8 +86,8 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
         TicketReservationRequest.SetFilter("Request Status", '<>%1', TicketReservationRequest."Request Status"::CANCELED); // in progress
         if (TicketReservationRequest.FindFirst()) then
             Error(REVOKE_IN_PROGRESS, Ticket."External Ticket No.");
-        TicketReservationRequest.Reset();
 
+        TicketReservationRequest.Reset();
         TicketReservationRequest.Get(Ticket."Ticket Reservation Entry No.");
 
         SaleLinePOS."Line Type" := SaleLinePOS."Line Type"::Item;
@@ -92,6 +99,7 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
 
         SaleLinePOS."Return Sale Sales Ticket No." := Ticket."Sales Receipt No.";
 
+        POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.InsertLine(SaleLinePOS);
         POSSaleLine.RefreshCurrent();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
@@ -133,6 +141,8 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
         end;
 
         ResponseCode := TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", UnitPrice, RevokeQuantity, ResponseMessage);
+        RequestMutex.Release(Ticket."No.");
+
         if (ResponseCode <= 0) then begin
             POSSaleLine.DeleteLine();
             POSSaleLine.RefreshCurrent();

@@ -33,8 +33,8 @@
         WAITINGLIST_REQUIRED_1202: Label 'Waiting list reference code is required to book a ticket for this time schedule.';
         UNCONFIRMED_TOKEN_NOT_FOUND_1203: Label 'An unconfirmed ticket-token with value %1 was not found.';
         TOKEN_EXPIRED_1204: Label 'The ticket-token %1 has expired. Use PreConfirm to re-reserve tickets.';
-#if not (BC17 or BC18 or BC19 or BC20 or BC21)
         TOKEN_PROCESSING_CONFLICT_1205: Label 'Another request is currently processing this token. Please retry shortly.';
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
         TOKEN_ALREADY_CONFIRMED_1206: Label 'The ticket-token %1 has already been confirmed and can not be confirmed again.';
         _FeatureFlagManagement: Codeunit "NPR Feature Flags Management";
 #endif  
@@ -1486,6 +1486,7 @@
 
     end;
 
+    [CommitBehavior(CommitBehavior::Error)]
     procedure UpdateReservationQuantity(Token: Text[100]; Quantity: Integer)
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
@@ -1985,7 +1986,9 @@
             Token := GetNewToken();
         PrimaryRequestLine := true;
 
+#if (BC17 or BC18 or BC19 or BC20 or BC21)
         LockResources('POS_CreateRevokeRequest');
+#endif
 
         TicketBOM.SetFilter("Item No.", '=%1', Ticket."Item No.");
         TicketBOM.SetFilter("Variant Code", '=%1', Ticket."Variant Code");
@@ -2541,23 +2544,28 @@
         exit(ExternalNo);
     end;
 
+    [CommitBehavior(CommitBehavior::Error)]
     procedure POS_OnModifyQuantity(SaleLinePOS: Record "NPR POS Sale Line")
     var
         Token: Text[100];
         ReservationRequest: Record "NPR TM Ticket Reservation Req.";
         OriginalSaleLine: Record "NPR POS Entry Sales Line";
-        ResponseMessage: Text;
-        ResponseCode: Integer;
         Ticket: Record "NPR TM Ticket";
         TicketCount: Integer;
         RevokeQuantity: Integer;
         ChangeQuantityNotPossible: Label 'Quantity for configurable tickets must be changed in the edit ticket reservation page.';
+        RequestMutex: Record "NPR TM TicketRequestMutex";
     begin
 
         if (not (GetTokenFromReceipt(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token))) then
             exit;
 
+        if (not RequestMutex.Acquire(Token, SessionId())) then
+            Error('[-1205] %1', TOKEN_PROCESSING_CONFLICT_1205);
+
+#if (BC17 or BC18 or BC19 or BC20 or BC21)
         LockResources('POS_OnModifyQuantity');
+#endif
 
         ReservationRequest.SetCurrentKey("Session Token ID");
         ReservationRequest.SetFilter("Session Token ID", '=%1', Token);
@@ -2566,8 +2574,10 @@
         if (ReservationRequest.FindFirst()) then begin
 
             if (SaleLinePOS.Quantity > 0) then begin
-                if (ReservationRequest.Quantity = SaleLinePOS.Quantity) then
+                if (ReservationRequest.Quantity = SaleLinePOS.Quantity) then begin
+                    RequestMutex.Release(Token);
                     exit;
+                end;
 
                 if (ReservationRequest."Admission Inclusion" <> ReservationRequest."Admission Inclusion"::REQUIRED) then
                     Error(ChangeQuantityNotPossible);
@@ -2577,6 +2587,7 @@
                         Error(EXTERNAL_ITEM_CHANGE);
 
                     ReservationRequest.DeleteAll();
+                    RequestMutex.Release(Token);
                     exit;
                 end;
 
@@ -2585,9 +2596,7 @@
 
                 DeleteReservationRequest(Token, false);
                 UpdateReservationQuantity(Token, SaleLinePOS.Quantity);
-                ResponseCode := IssueTicketFromReservationToken(Token, false, ResponseMessage);
-                if (ResponseCode <> 0) then
-                    Error(ResponseMessage);
+                DoIssueTicketFromReservationToken(Token);
             end;
 
             // Return sales
@@ -2620,6 +2629,8 @@
                 end;
             end;
         end;
+
+        RequestMutex.Release(Token);
 
     end;
 
