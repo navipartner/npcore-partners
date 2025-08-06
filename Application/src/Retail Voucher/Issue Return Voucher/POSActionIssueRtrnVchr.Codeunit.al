@@ -13,6 +13,9 @@ codeunit 6150623 "NPR POSAction: Issue Rtrn Vchr" implements "NPR IPOS Workflow"
         Text003: Label 'Enter Amount';
         EndSaleDescLbl: Label 'End Sale';
         EndSaleNameLbl: Label 'End Sale';
+        CustomReferenceNoCaptionLbl: Label 'Reference No.';
+        CustomReferenceNoTitleLbl: Label 'Please scan a reference no.';
+        ScanReferenceNoErrorLbl: Label 'Please scan a reference no. Do you want to continue?';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
@@ -27,17 +30,22 @@ codeunit 6150623 "NPR POSAction: Issue Rtrn Vchr" implements "NPR IPOS Workflow"
         WorkflowConfig.AddLabel('Email', NpRvVoucher.FieldCaption("E-mail"));
         WorkflowConfig.AddLabel('SendViaSMS', NpRvVoucher.FieldCaption("Send via SMS"));
         WorkflowConfig.AddLabel('Phone', NpRvVoucher.FieldCaption("Phone No."));
+        WorkflowConfig.AddLabel('CustomReferenceNoCaption', CustomReferenceNoCaptionLbl);
+        WorkflowConfig.AddLabel('CustomReferenceNoTitle', CustomReferenceNoTitleLbl);
+        WorkflowConfig.AddLabel('ScanReferenceNoError', ScanReferenceNoErrorLbl);
     end;
 
     local procedure GetActionScript(): Text
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionIssueRtrnVchr.js###
-'const main=async({context:e,workflow:n,parameters:t,popup:r,captions:a})=>{let u;await n.respond("validateRequest");const i={returnVoucherAmt:0};if(t.VoucherTypeCode?e.voucherType=t.VoucherTypeCode:e.voucherType=await n.respond("setVoucherType"),e.voucherType==null||e.voucherType=="")return i;if(!e.IsUnattendedPOS&&!e.issueReturnVoucherSilent){if(u=await r.numpad({title:a.IssueReturnVoucherTitle,caption:a.Amount,value:e.voucher_amount}),u===0||u===null)return i}else u=e.voucher_amount;const s=await n.respond("validateAmount",{amountInput:u});if(s==0)return i;const o=await n.respond("select_send_method");o.SendMethodEmail&&(o.SendToEmail=await r.input({title:a.SendViaEmail,caption:a.Email})),o.SendMethodSMS&&(o.SendToPhoneNo=await r.input({title:a.SendViaSMS,caption:a.Phone})),e=Object.assign(e,o);const{paymentNo:d,collectReturnInformation:c}=await n.respond("issueReturnVoucher",{ReturnVoucherAmount:s});return i.returnVoucherAmt=s,t.ContactInfo&&await n.respond("contactInfo"),t.ScanReferenceNos&&await n.respond("scanReference"),t.EndSale&&c&&!(await n.run("DATA_COLLECTION",{parameters:{requestCollectInformation:"ReturnInformation"}})).success?{}:(t.EndSale&&await n.run("END_SALE",{parameters:{calledFromWorkflow:"ISSUE_RETURN_VCHR_2",paymentNo:d}}),i)};'
+'const main=async({context:n,workflow:t,parameters:i,popup:o,captions:e})=>{let a;await t.respond("validateRequest");const c={returnVoucherAmt:0};if(i.VoucherTypeCode?n.voucherType=i.VoucherTypeCode:n.voucherType=await t.respond("setVoucherType"),n.voucherType==null||n.voucherType=="")return c;if(!n.IsUnattendedPOS&&!n.issueReturnVoucherSilent){if(a=await o.numpad({title:e.IssueReturnVoucherTitle,caption:e.Amount,value:n.voucher_amount}),a===0||a===null)return c}else a=n.voucher_amount;const s=await t.respond("validateAmount",{amountInput:a});if(s==0)return c;const l=await t.respond("select_send_method");l.SendMethodEmail&&(l.SendToEmail=await o.input({title:e.SendViaEmail,caption:e.Email})),l.SendMethodSMS&&(l.SendToPhoneNo=await o.input({title:e.SendViaSMS,caption:e.Phone})),n=Object.assign(n,l);debugger;let r;if(i.ScanReferenceNos){let d=!0;for(;d;){let u=!0;for(;u;){if(r=await o.input({title:e.CustomReferenceNoTitle,caption:e.CustomReferenceNoCaption}),r===null)return{};if(u=r==="",r!==null&&u&&(u=await o.confirm({title:e.CustomReferenceNoTitle,caption:e.ScanReferenceNoError}),!u))return{};const{ReferenceNoAlreadyUsed:R,ReferenceNoAlreadyUsedMessage:h}=await t.respond("check_reference_no_already_used",{CustomReferenceNo:r});if(R&&(r="",u=await o.confirm({title:e.CustomReferenceNoCaption,caption:h}),!u))return{}}d=r===null}}const{paymentNo:f,collectReturnInformation:m}=await t.respond("issueReturnVoucher",{ReturnVoucherAmount:s,CustomReferenceNo:r});return c.returnVoucherAmt=s,i.ContactInfo&&await t.respond("contactInfo"),i.EndSale&&m&&!(await t.run("DATA_COLLECTION",{parameters:{requestCollectInformation:"ReturnInformation"}})).success?{}:(i.EndSale&&await t.run("END_SALE",{parameters:{calledFromWorkflow:"ISSUE_RETURN_VCHR_2",paymentNo:f}}),c)};'
         );
     end;
 
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup");
+    var
+        NpRvIssuePOSActionMgt: Codeunit "NPR NpRv Issue POSAction Mgt.";
     begin
         case Step of
             'validateRequest':
@@ -52,8 +60,10 @@ codeunit 6150623 "NPR POSAction: Issue Rtrn Vchr" implements "NPR IPOS Workflow"
                 FrontEnd.WorkflowResponse(IssueReturnVoucher(Context));
             'contactInfo':
                 ShowContactInfo(PaymentLine);
-            'scanReference':
-                ScanReference(PaymentLine);
+            'check_reference_no_already_used':
+                FrontEnd.WorkflowResponse(CheckReferenceNoAlreadyUsed(Context));
+            'issue_voucher':
+                NpRvIssuePOSActionMgt.IssueVoucher(Context, Sale, SaleLine);
             'endSale':
                 FrontEnd.WorkflowResponse(TryEndSale(Context, Sale, PaymentLine, SaleLine, Setup));
         end;
@@ -69,15 +79,6 @@ codeunit 6150623 "NPR POSAction: Issue Rtrn Vchr" implements "NPR IPOS Workflow"
         POSActIssueReturnVchrB.ContactInfo(SaleLinePOS);
     end;
 
-    local procedure ScanReference(POSPaymentLine: Codeunit "NPR POS Payment Line")
-    var
-        SaleLinePOS: Record "NPR POS Sale Line";
-        POSActIssueReturnVchrB: Codeunit "NPR POS Act.Issue Return VchrB";
-    begin
-        POSPaymentLine.GetCurrentPaymentLine(SaleLinePOS);
-        POSActIssueReturnVchrB.ScanReferenceNos(SaleLinePOS, SaleLinePOS.Quantity);
-    end;
-
     local procedure IssueReturnVoucher(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
     var
         VoucherType: Record "NPR NpRv Voucher Type";
@@ -89,6 +90,7 @@ codeunit 6150623 "NPR POSAction: Issue Rtrn Vchr" implements "NPR IPOS Workflow"
         Amount: Decimal;
         Email: Text[80];
         PhoneNo: Text[30];
+        CustomReferenceNo: Text[50];
         VoucherSalesLineParentIdText: Text;
         VoucherSalesLineParentId: Guid;
         SendMethodPrint: Boolean;
@@ -102,6 +104,7 @@ codeunit 6150623 "NPR POSAction: Issue Rtrn Vchr" implements "NPR IPOS Workflow"
         GetParameterValues(Context, VoucherTypeCode, EndSalePar);
         VoucherType.Get(VoucherTypeCode);
         Amount := Context.GetDecimal('ReturnVoucherAmount');
+        CustomReferenceNo := CopyStr(Context.GetString('CustomReferenceNo'), 1, MaxStrLen(CustomReferenceNo));
 
         SendMethodPrint := Context.GetBoolean('SendMethodPrint');
         SendMethodEmail := Context.GetBoolean('SendMethodEmail');
@@ -119,7 +122,7 @@ codeunit 6150623 "NPR POSAction: Issue Rtrn Vchr" implements "NPR IPOS Workflow"
         if not Evaluate(VoucherSalesLineParentId, VoucherSalesLineParentIdText) then
             Clear(VoucherSalesLineParentId);
 
-        NpRvVoucherMgt.IssueReturnVoucher(POSSession, VoucherTypeCode, Amount, Email, PhoneNo, SendMethodPrint, SendMethodEmail, SendMethodSMS, VoucherSalesLineParentId);
+        NpRvVoucherMgt.IssueReturnVoucher(POSSession, VoucherTypeCode, Amount, Email, PhoneNo, SendMethodPrint, SendMethodEmail, SendMethodSMS, VoucherSalesLineParentId, CustomReferenceNo);
 #pragma warning restore AA0139
 
         POSSession.GetSale(Sale);
@@ -210,6 +213,26 @@ codeunit 6150623 "NPR POSAction: Issue Rtrn Vchr" implements "NPR IPOS Workflow"
         Response.Add('SendMethodEmail', Selection = VoucherType."Send Method via POS"::"E-mail");
         Response.Add('SendMethodSMS', Selection = VoucherType."Send Method via POS"::SMS);
         exit(Response);
+    end;
+
+    local procedure CheckReferenceNoAlreadyUsed(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject;
+    var
+        IssuePOSActionMgtB: Codeunit "NPR NpRv Issue POSAction Mgt-B";
+        CustomReferenceNo: Text;
+        ReferenceNoAlreadyUsed: Boolean;
+        ReferenceNoAlreadyUsedLbl: Label 'Reference No. %1 already used.Do you want to scan the reference no. again?';
+        ReferenceNoResponseText: Text;
+    begin
+        if not Context.GetString('CustomReferenceNo', CustomReferenceNo) then
+            CustomReferenceNo := '';
+#pragma warning disable AA0139
+        ReferenceNoAlreadyUsed := IssuePOSActionMgtB.CheckReferenceNoAlreadyUsed('', CustomReferenceNo);
+        if ReferenceNoAlreadyUsed then
+            ReferenceNoResponseText := StrSubstNo(ReferenceNoAlreadyUsedLbl, CustomReferenceNo);
+
+        Response.Add('ReferenceNoAlreadyUsed', ReferenceNoAlreadyUsed);
+        Response.Add('ReferenceNoAlreadyUsedMessage', ReferenceNoResponseText);
+#pragma warning restore AA0139
     end;
 
     [Obsolete('Use the new END_SALE workflow instead', '2023-11-28')]

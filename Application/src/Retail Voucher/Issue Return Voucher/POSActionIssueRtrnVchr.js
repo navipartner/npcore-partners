@@ -45,10 +45,49 @@ const main = async ({ context, workflow, parameters, popup, captions }) => {
 
   context = Object.assign(context, send);
 
+  debugger;
+  let CustomReferenceNo;
+  if (parameters.ScanReferenceNos) {
+    let GetCustomReferences = true;
+    while (GetCustomReferences) {
+      let ScanCustomReferenceNo = true;
+      while (ScanCustomReferenceNo) {
+        CustomReferenceNo = await popup.input({
+          title: captions.CustomReferenceNoTitle,
+          caption: captions.CustomReferenceNoCaption,
+        });
+        if (CustomReferenceNo === null) return {};
+        ScanCustomReferenceNo = CustomReferenceNo === "";
+        if (CustomReferenceNo !== null) {
+          if (ScanCustomReferenceNo) {
+            ScanCustomReferenceNo = await popup.confirm({
+              title: captions.CustomReferenceNoTitle,
+              caption: captions.ScanReferenceNoError,
+            });
+            if (!ScanCustomReferenceNo) return {};
+          }
+        }
+        const { ReferenceNoAlreadyUsed, ReferenceNoAlreadyUsedMessage } =
+          await workflow.respond("check_reference_no_already_used", {
+            CustomReferenceNo: CustomReferenceNo,
+          });
+        if (ReferenceNoAlreadyUsed) {
+          CustomReferenceNo = "";
+          ScanCustomReferenceNo = await popup.confirm({
+            title: captions.CustomReferenceNoCaption,
+            caption: ReferenceNoAlreadyUsedMessage,
+          });
+          if (!ScanCustomReferenceNo) return {};
+        }
+      }
+      GetCustomReferences = CustomReferenceNo === null;
+    }
+  }
   const { paymentNo, collectReturnInformation } = await workflow.respond(
     "issueReturnVoucher",
     {
       ReturnVoucherAmount: ReturnVoucherAmount,
+      CustomReferenceNo: CustomReferenceNo,
     }
   );
 
@@ -56,9 +95,6 @@ const main = async ({ context, workflow, parameters, popup, captions }) => {
 
   if (parameters.ContactInfo) {
     await workflow.respond("contactInfo");
-  }
-  if (parameters.ScanReferenceNos) {
-    await workflow.respond("scanReference");
   }
 
   if (parameters.EndSale && collectReturnInformation) {

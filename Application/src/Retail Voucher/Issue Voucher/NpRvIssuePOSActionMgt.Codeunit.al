@@ -93,7 +93,7 @@ codeunit 6151012 "NPR NpRv Issue POSAction Mgt." implements "NPR IPOS Workflow"
         end;
     end;
 
-    local procedure IssueVoucher(Context: Codeunit "NPR POS JSON Helper"; POSSale: Codeunit "NPR POS Sale"; POSSaleLine: Codeunit "NPR POS Sale Line")
+    internal procedure IssueVoucher(Context: Codeunit "NPR POS JSON Helper"; POSSale: Codeunit "NPR POS Sale"; POSSaleLine: Codeunit "NPR POS Sale Line")
     var
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         TempVoucher: Record "NPR NpRv Voucher" temporary;

@@ -1744,7 +1744,7 @@
             Error(MaxCountErr, VoucherType.FieldCaption("Max Voucher Count"), VoucherType.TableCaption, VoucherType.Code);
     end;
 
-    internal procedure IssueReturnVoucher(var POSSession: Codeunit "NPR POS Session"; VoucherTypeCode: Text; Amount: Decimal; Email: Text[80]; PhoneNo: Text[30]; SendMethodPrint: Boolean; SendMethodEmail: Boolean; SendMethodSMS: Boolean; VoucherSalesLineParentID: Guid)
+    internal procedure IssueReturnVoucher(var POSSession: Codeunit "NPR POS Session"; VoucherTypeCode: Text; Amount: Decimal; Email: Text[80]; PhoneNo: Text[30]; SendMethodPrint: Boolean; SendMethodEmail: Boolean; SendMethodSMS: Boolean; VoucherSalesLineParentID: Guid; CustomReferenceNo: Text[50])
     var
         VoucherType: Record "NPR NpRv Voucher Type";
         SalePOS: Record "NPR POS Sale";
@@ -1783,7 +1783,10 @@
         if Amount > ReturnAmount then
             Error(MaximumReturnAmountErr, ReturnAmount);
 
-        GenerateTempVoucher(VoucherType, TempVoucher);
+        if CustomReferenceNo <> '' then
+            GenerateTempVoucher(VoucherType, TempVoucher, CustomReferenceNo)
+        else
+            GenerateTempVoucher(VoucherType, TempVoucher);
 
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.GetNewSaleLine(SaleLinePOS);
@@ -1843,7 +1846,7 @@
     var
         DummyGuid: Guid;
     begin
-        IssueReturnVoucher(POSSession, VoucherTypeCode, Amount, Email, PhoneNo, SendMethodPrint, SendMethodEmail, SendMethodSMS, DummyGuid);
+        IssueReturnVoucher(POSSession, VoucherTypeCode, Amount, Email, PhoneNo, SendMethodPrint, SendMethodEmail, SendMethodSMS, DummyGuid, '');
     end;
 
     internal procedure TopUpVoucher(var POSSession: Codeunit "NPR POS Session"; VoucherNo: Text; DiscountType: Text; AmtInput: Decimal; DiscountAmount: Decimal; DiscountPct: Decimal)
