@@ -460,6 +460,7 @@
         CaptionConfirmation: Label 'We need your confirmation...';
         CaptionError: Label 'Something is wrong...';
         CaptionNumpad: Label 'We need more information...';
+        CaptionPasswordRequired: Label 'Password required';
         CaptionLockedRegisterLocked: Label 'This register is locked';
         CaptionTabletButtonItems: Label 'Items';
         CaptionTabletButtonMore: Label 'More...';
@@ -833,6 +834,9 @@
         StatisticsAvgSalePerCustomerTitleTbl: Label 'Avg. Sale Per Customer';
         StatisticsAvgSalePricePerItemTitleTbl: Label 'Avg. Sale Price Per Item';
         LastSaleDateLbl: Label 'Last Sale date';
+        DialogSecureMethodPasswordProtected: Label 'This operation is password-protected. Please enter your password to continue.';
+        SecureMethodInvalidPassword: Label 'The password you provided is not valid. You may not execute this operation.';
+        SecureMethodNoServerResponse: Label 'The server did not respond to the password validation request.';
     begin
         Captions.Add('Sale_ReceiptNo', CaptionLabelReceiptNo);
         Captions.Add('Sale_EANHeader', CaptionLabelEANHeader);
@@ -1044,6 +1048,7 @@
         Captions.Add('DialogCaption_Confirmation', CaptionConfirmation);
         Captions.Add('DialogCaption_Error', CaptionError);
         Captions.Add('DialogCaption_Numpad', CaptionNumpad);
+        Captions.Add('DialogCaption_PasswordRequired', CaptionPasswordRequired);
         Captions.Add('Locked_RegisterLocked', CaptionLockedRegisterLocked);
         Captions.Add('CaptionTablet_ButtonItems', CaptionTabletButtonItems);
         Captions.Add('CaptionTablet_ButtonMore', CaptionTabletButtonMore);
@@ -1398,6 +1403,9 @@
         Captions.Add('Statistics_AvgSalePerCustomerTitle', StatisticsAvgSalePerCustomerTitleTbl);
         Captions.Add('Statistics_AvgSalePricePerItemTitle', StatisticsAvgSalePricePerItemTitleTbl);
         Captions.Add('LastSale_Date', LastSaleDateLbl);
+        Captions.Add('Dialog_SecureMethod_PasswordProtected', DialogSecureMethodPasswordProtected);
+        Captions.Add('SecureMethod_InvalidPassword', SecureMethodInvalidPassword);
+        Captions.Add('SecureMethod_NoServerResponse', SecureMethodNoServerResponse);
 
         RecRef.Open(DATABASE::"NPR POS Sale Line");
         for i := 1 to RecRef.FieldCount do begin
