@@ -802,6 +802,7 @@
         EFTPayReservSetupUtils: Codeunit "NPR EFT Pay Reserv Setup Utils";
         EFTTransactionRequest: Record "NPR EFT Transaction Request";
         MagentoPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
+        POSPostingSetupAccountNo: Code[20];
         LineNo: Integer;
         DescriptionLbl: Label '%1 %2';
     begin
@@ -835,12 +836,40 @@
         MagentoPaymentLine.Amount := POSPaymentLine."Amount Including VAT";
         MagentoPaymentLine."Date Authorized" := Today;
         MagentoPaymentLine."Account Type" := AdyenSetup."EFT Res. Account Type";
-        MagentoPaymentLine."Account No." := AdyenSetup."EFT Res. Account No.";
+        if GetPostingSetup(POSPaymentLine."No.", POSPostingSetupAccountNo, POSPaymentLine."Sales Ticket No.", POSPaymentLine."Register No.") then
+            MagentoPaymentLine."Account No." := POSPostingSetupAccountNo
+        else
+            MagentoPaymentLine."Account No." := AdyenSetup."EFT Res. Account No.";
         MagentoPaymentLine."Payment Gateway Code" := AdyenSetup."EFT Res. Payment Gateway Code";
         MagentoPaymentLine."Transaction ID" := EFTTransactionRequest."PSP Reference";
         MagentoPaymentLine.Insert(true);
 
         LineCreated := true;
+    end;
+
+    local procedure GetPostingSetup(POSPaymentMethodCode: Code[20]; var POSPostingSetupAccountNo: Code[20]; SalesTicketNo: Code[20]; RegisterNo: Code[10]): Boolean
+    var
+        SalePOS: Record "NPR POS Sale";
+        POSPostingSetup: Record "NPR POS Posting Setup";
+    begin
+        SalePOS.SetLoadFields("POS Store Code");
+        if not SalePOS.Get(RegisterNo, SalesTicketNo) then
+            exit(false);
+
+        POSPostingSetup.SetLoadFields("Account No.");
+        if POSPostingSetup.Get(SalePOS."POS Store Code", POSPaymentMethodCode, '') and (POSPostingSetup."Account No." <> '') then begin
+            POSPostingSetupAccountNo := POSPostingSetup."Account No.";
+            exit(true);
+        end;
+        if POSPostingSetup.Get(SalePOS."POS Store Code", '', '') and (POSPostingSetup."Account No." <> '') then begin
+            POSPostingSetupAccountNo := POSPostingSetup."Account No.";
+            exit(true);
+        end;
+        if POSPostingSetup.Get('', POSPaymentMethodCode, '') and (POSPostingSetup."Account No." <> '') then begin
+            POSPostingSetupAccountNo := POSPostingSetup."Account No.";
+            exit(true);
+        end;
+        exit(false);
     end;
 
     local procedure UpdatePaymentMagentoLine(var MagentoPaymentLine: Record "NPR Magento Payment Line"; var Response: Record "NPR PG Payment Response" temporary; Cancelation: Boolean)
