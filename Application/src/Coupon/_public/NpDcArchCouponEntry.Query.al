@@ -22,10 +22,12 @@ query 6014496 "NPR NpDc Arch.Coupon Entry"
             {
                 Method = Sum;
             }
+            column(PostingDate; "Posting Date")
+            {
+            }
             filter(Posting_Date; "Posting Date")
             {
             }
-
             filter(Register_No_; "Register No.")
             {
             }
@@ -37,6 +39,12 @@ query 6014496 "NPR NpDc Arch.Coupon Entry"
             }
             filter(Entry_Type; "Entry Type")
             {
+            }
+            dataitem(ArchCoupon; "NPR NpDc Arch. Coupon")
+            {
+                Dataitemlink = "No." = NpDcArchCouponEntry."Arch. Coupon No.";
+                column(Reference_No_; "Reference No.")
+                { }
             }
         }
     }

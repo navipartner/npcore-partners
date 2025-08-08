@@ -39,6 +39,13 @@
       "to": 86000
     }
   ],
+  "internalsVisibleTo": [
+  {
+    "id": "11eea1d7-1a25-47ed-a07e-09b7bf8a1339",
+    "name": "PTE Tests",
+    "publisher": "NaviPartner"
+  }
+],
   "contextSensitiveHelpUrl": "https://Test.com/help/",
   "showMyCode": true,
   "runtime": "6.0",
