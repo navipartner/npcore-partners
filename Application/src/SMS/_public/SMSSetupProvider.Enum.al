@@ -1,8 +1,8 @@
 ﻿enum 6014458 "NPR SMS Setup Provider" implements "NPR Send SMS"
 {
-    #IF NOT BC17  
-    Access = Internal;       
-    #ENDIF
+#IF NOT BC17
+    Access = Public;
+#ENDIF
     Extensible = true;
 
     value(0; NaviPartner)
