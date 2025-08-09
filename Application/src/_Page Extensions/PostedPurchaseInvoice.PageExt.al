@@ -117,10 +117,9 @@ pageextension 6014514 "NPR Posted Purchase Invoice" extends "Posted Purchase Inv
                 Enabled = RetailLocationCodeExists;
                 trigger OnAction()
                 var
-                    RetailPurchPriceCalc: Report "NPR RS Ret. Purch. Price Calc.";
+                    RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
                 begin
-                    RetailPurchPriceCalc.SetFilters(Rec."No.", Rec."Posting Date");
-                    RetailPurchPriceCalc.RunModal();
+                    RSRLocalizationMgt.RunPostedPurchaseInvoiceCalcReport(Rec."No.", Rec."Posting Date");
                 end;
             }
         }

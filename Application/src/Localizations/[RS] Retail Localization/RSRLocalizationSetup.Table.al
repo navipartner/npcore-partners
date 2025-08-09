@@ -54,6 +54,11 @@ table 6060007 "NPR RS R Localization Setup"
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
         }
+        field(9; "RS Ret. Localization Country"; Enum "NPR RS R Localization Country")
+        {
+            Caption = 'RS Ret. Localization Country';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

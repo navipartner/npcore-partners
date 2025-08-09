@@ -1,34 +1,30 @@
-report 6014523 "NPR RS Nivelation Document"
+report 6014565 "NPR CRO Nivelation Document"
 {
 #if not BC17
     Extensible = false;
 #endif
     UsageCategory = None;
-    Caption = 'RS Nivelation Document';
+    Caption = 'CRO Nivelation Document';
     DefaultLayout = Word;
-    WordLayout = './src/Localizations/[RS] Retail Localization/Calculation Documents/RSNivelation.docx';
+    WordLayout = './src/Localizations/[CRO] Retail Localization/Calculation Reports/CRONivelation.docx';
     dataset
     {
         dataitem(RSPostedNivelationHdr; "NPR RS Posted Nivelation Hdr")
         {
             PrintOnlyIfDetail = true;
             RequestFilterFields = "No.", "Posting Date";
-            dataitem(CompanyInfo; "Company Information")
-            {
-                MaxIteration = 1;
-                column(CompanyInfoName; CompanyInfo.Name) { }
-                column(CompanyInfoAddress; CompanyInfo.Address) { }
-                column(CompanyInfoCity; CompanyInfo.City) { }
-                column(CompanyInfoRegistrationNo; CompanyInfo."Registration No.") { }
-                column(CompanyInfoVATRegNo; CompanyInfo."VAT Registration No.") { }
-            }
+            column(CompanyInfoName; CompanyInfo.Name) { }
+            column(CompanyInfoAddress; CompanyInfo.Address) { }
+            column(CompanyInfoCity; CompanyInfo.City) { }
+            column(CompanyInfoRegistrationNo; CompanyInfo."Registration No.") { }
+            column(CompanyInfoVATRegNo; CompanyInfo."VAT Registration No.") { }
+            column(CompanyInfoLocation; CompanyInfo."Location Code") { }
             column(Header_No; "No.") { }
             column(Posting_Date; Format("Posting Date", 11, '<Day,2>.<Month,2>.<Year4>.')) { }
             column(PrintDate; Format(WorkDate(), 11, '<Day,2>.<Month,2>.<Year4>.')) { }
             column(CustomerName; CustomerName) { }
             column(CustomerAddress; CustomerAddress) { }
             column(CustomerCity; CustomerCity) { }
-            column(HeaderText; HeaderText) { }
             dataitem(NivelationLines; "NPR RS Posted Nivelation Lines")
             {
                 DataItemLink = "Document No." = field("No.");
@@ -47,11 +43,10 @@ report 6014523 "NPR RS Nivelation Document"
 
                 trigger OnAfterGetRecord()
                 begin
-                    if CheckIfNotRetailLocation() then
-                        CurrReport.Skip();
                     CalcTotals();
                 end;
             }
+
             trigger OnPreDataItem()
             begin
                 if (FilterNo <> '') then
@@ -63,8 +58,7 @@ report 6014523 "NPR RS Nivelation Document"
 
             trigger OnAfterGetRecord()
             begin
-                FindCustomerDetails();
-                HeaderText := DocumentNoLbl + ' ' + "No." + ' ' + PostingDateLbl + ' ' + Format("Posting Date");
+                GetCustomerDetails();
             end;
         }
 
@@ -76,6 +70,7 @@ report 6014523 "NPR RS Nivelation Document"
             column(TotalPriceDifference; TotalPriceDifference) { }
         }
     }
+
     requestpage
     {
         SaveValues = true;
@@ -105,28 +100,30 @@ report 6014523 "NPR RS Nivelation Document"
     }
     labels
     {
-        NoLbl = 'Бр. артикла', Locked = true;
-        ItemDescLbl = 'Назив артикла', Locked = true;
-        CodeLocationLbl = 'Локација', Locked = true;
-        QuantityLbl = 'Кол', Locked = true;
-        UnitOfMeasureCodeLbl = 'Јединица мере', Locked = true;
-        OldPriceLbl = 'Стара цена', Locked = true;
-        OldValueLbl = 'Стара вредност', Locked = true;
-        NewPriceLbl = 'Нова цена', Locked = true;
-        NewValueLbl = 'Нова вредност', Locked = true;
-        PriceDifferenceLbl = 'Разлика у цени', Locked = true;
-        ValueDifferenceLbl = 'Разлика у вредности', Locked = true;
-        NivelationLbl = 'Нивелација', Locked = true;
-        CompanyRegNoLbl = 'ПИБ', Locked = true;
-        CompanyNameLbl = 'Обвезник', Locked = true;
-        CompanyAddressLbl = 'Фирма-радње', Locked = true;
-        CompanyOfficeAddressLbl = 'Седиште', Locked = true;
-        CompanyVATRegNoLbl = 'Шифра пореског обвезника', Locked = true;
-        ReportTitle = 'НИВЕЛАЦИЈА ПРОДАЈНЕ ЦЕНЕ ', Locked = true;
-        FooterDateLbl = 'Датум', Locked = true;
-        CreatedByUserIDLbl = 'Саставио', Locked = true;
-        PersonResponsibleLbl = 'Одговорно лице', Locked = true;
-        SumLbl = 'Укупно', Locked = true;
+        NoLbl = 'Br. artikla', Locked = true;
+        ItemDescLbl = 'Naziv artikla', Locked = true;
+        CodeLocationLbl = 'Lokacija', Locked = true;
+        QuantityLbl = 'Kol.', Locked = true;
+        UnitOfMeasureCodeLbl = 'Jedinica mjere', Locked = true;
+        OldPriceLbl = 'Stara cijena', Locked = true;
+        OldValueLbl = 'Stara vrijednost', Locked = true;
+        NewPriceLbl = 'Nova cijena', Locked = true;
+        NewValueLbl = 'Nova vrijednost', Locked = true;
+        PriceDifferenceLbl = 'Razlika u cijeni', Locked = true;
+        ValueDifferenceLbl = 'Razlika u vrijednosti', Locked = true;
+        NivelationLbl = 'Nivelacija', Locked = true;
+        CompanyRegNoLbl = 'OIB', Locked = true;
+        CompanyNameLbl = 'Obveznik', Locked = true;
+        CompanyAddressLbl = 'Firma - poslovnica', Locked = true;
+        CompanyOfficeAddressLbl = 'Sjedište', Locked = true;
+        CompanyVATRegNoLbl = 'Šifra poreznog obveznika', Locked = true;
+        ReportTitle = 'NIVELACIJA PRODAJNE CIJENE', Locked = true;
+        FooterDateLbl = 'Datum', Locked = true;
+        CreatedByUserIDLbl = 'Sastavio', Locked = true;
+        PersonResponsibleLbl = 'Odgovorna osoba', Locked = true;
+        SumLbl = 'Ukupno', Locked = true;
+        DocumentNoLbl = 'po dokumentu', Locked = true;
+        PostingDateLbl = 'od', Locked = true;
     }
 
     trigger OnInitReport()
@@ -135,34 +132,21 @@ report 6014523 "NPR RS Nivelation Document"
     end;
 
     var
+        CompanyInfo: Record "Company Information";
         TotalNewValue: Decimal;
         TotalOldValue: Decimal;
         TotalPriceDifference: Decimal;
-        DocumentNoLbl: Label 'по документу', Locked = true;
-        PostingDateLbl: Label 'од', Locked = true;
         CustomerAddress: Text;
         CustomerCity: Text;
-        CustomerName: Text;
         FilterNo: Code[20];
         FilterPostingDate: Date;
-        HeaderText: Text;
+        CustomerName: Text;
 
 
-    internal procedure SetFilters(FilterHeaderNo: Code[20]; PostingDate: Date)
+    internal procedure SetFilters(HeaderNo: Code[20]; PostingDate: Date)
     begin
-        FilterNo := FilterHeaderNo;
+        FilterNo := HeaderNo;
         FilterPostingDate := PostingDate;
-    end;
-
-    local procedure CheckIfNotRetailLocation(): Boolean
-    var
-        Location: Record Location;
-    begin
-        if not Location.Get(NivelationLines."Location Code") then
-            exit(true);
-        if not Location."NPR Retail Location" then
-            exit(true);
-        exit(false);
     end;
 
     local procedure CalcTotals()
@@ -172,35 +156,48 @@ report 6014523 "NPR RS Nivelation Document"
         TotalPriceDifference += NivelationLines."Price Difference";
     end;
 
-    local procedure FindCustomerDetails()
-    var
-        POSEntry: Record "NPR POS Entry";
-        SalesCreditMemo: Record "Sales Cr.Memo Header";
-        SalesInvoiceHeader: Record "Sales Invoice Header";
+    local procedure GetCustomerDetails()
     begin
         case RSPostedNivelationHdr."Source Type" of
             RSPostedNivelationHdr."Source Type"::"Posted Sales Invoice":
-                if SalesInvoiceHeader.Get(RSPostedNivelationHdr."Referring Document Code") then
-                    GetCustomerDetails(SalesInvoiceHeader."Sell-to Customer No.");
+                GetSalesInvoiceCustomerDetails(RSPostedNivelationHdr."Referring Document Code");
             RSPostedNivelationHdr."Source Type"::"POS Entry":
-                begin
-                    POSEntry.SetRange("Document No.", RSPostedNivelationHdr."Referring Document Code");
-                    POSEntry.SetFilter("Customer No.", '<>%1', '');
-                    if POSEntry.FindFirst() then
-                        GetCustomerDetails(POSEntry."Customer No.");
-                end;
+                GetPOSEntryCustomerDetails(RSPostedNivelationHdr."Referring Document Code");
             RSPostedNivelationHdr."Source Type"::"Posted Sales Credit Memo":
-                if SalesCreditMemo.Get(RSPostedNivelationHdr."Referring Document Code") then
-                    GetCustomerDetails(SalesCreditMemo."Sell-to Customer No.");
+                GetSalesCrMemoCustomerDetails(RSPostedNivelationHdr."Referring Document Code");
         end;
     end;
 
-    local procedure GetCustomerDetails(CustomerNo: Code[20])
+    local procedure GetSalesInvoiceCustomerDetails(DocumentNo: Code[20])
+    var
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+    begin
+        if SalesInvoiceHeader.Get(DocumentNo) then
+            SetCustomerDetails(SalesInvoiceHeader."Sell-to Customer No.");
+    end;
+
+    local procedure GetPOSEntryCustomerDetails(DocumentNo: Code[20])
+    var
+        POSEntry: Record "NPR POS Entry";
+    begin
+        POSEntry.SetRange("Document No.", DocumentNo);
+        POSEntry.SetFilter("Customer No.", '<>%1', '');
+        if POSEntry.FindFirst() then
+            SetCustomerDetails(POSEntry."Customer No.");
+    end;
+
+    local procedure GetSalesCrMemoCustomerDetails(DocumentNo: Code[20])
+    var
+        SalesCreditMemo: Record "Sales Cr.Memo Header";
+    begin
+        if SalesCreditMemo.Get(DocumentNo) then
+            SetCustomerDetails(SalesCreditMemo."Sell-to Customer No.");
+    end;
+
+    local procedure SetCustomerDetails(CustomerNo: Code[20])
     var
         Customer: Record Customer;
     begin
-        if CustomerNo = '' then
-            exit;
         if not Customer.Get(CustomerNo) then
             exit;
         CustomerName := Customer.Name;

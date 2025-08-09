@@ -53,10 +53,9 @@ pageextension 6014466 "NPR Posted Transfer Receipt" extends "Posted Transfer Rec
 
                 trigger OnAction()
                 var
-                    TransRecPurchPriceCalc: Report "NPR RS Ret. Trans. Rec. Calc.";
+                    RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
                 begin
-                    TransRecPurchPriceCalc.SetFilters(Rec."No.", Rec."Posting Date");
-                    TransRecPurchPriceCalc.RunModal();
+                    RSRLocalizationMgt.RunPostedTransferReceiptCalcReport(Rec."No.", Rec."Posting Date");
                 end;
             }
         }

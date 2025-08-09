@@ -396,4 +396,75 @@ codeunit 6151490 "NPR RS R Localization Mgt."
         Error(PriceNotFoundErr, ItemNo, LocationCode);
     end;
     #endregion RS Retail Localization Helper Procedures
+
+    #region RS Retail Localization Report Run
+    internal procedure RunPostedTransferReceiptCalcReport(TransRcptNo: Code[20]; TransRcptPostingDate: Date)
+    var
+        RSRLocalizationSetup: Record "NPR RS R Localization Setup";
+        RSTransRecPurchPriceCalc: Report "NPR RS Ret. Trans. Rec. Calc.";
+        CROTransRecPurchPriceCalc: Report "NPR CRO Ret. Trans. Rec. Calc";
+    begin
+        if not RSRLocalizationSetup.Get() then
+            exit;
+
+        case RSRLocalizationSetup."RS Ret. Localization Country" of
+            RSRLocalizationSetup."RS Ret. Localization Country"::Serbia:
+                begin
+                    RSTransRecPurchPriceCalc.SetFilters(TransRcptNo, TransRcptPostingDate);
+                    RSTransRecPurchPriceCalc.RunModal();
+                end;
+            RSRLocalizationSetup."RS Ret. Localization Country"::Croatia:
+                begin
+                    CROTransRecPurchPriceCalc.SetFilters(TransRcptNo, TransRcptPostingDate);
+                    CROTransRecPurchPriceCalc.RunModal();
+                end;
+        end
+    end;
+
+    internal procedure RunPostedPurchaseInvoiceCalcReport(PurchInvNo: Code[20]; PurchInvPostingDate: Date)
+    var
+        RSRLocalizationSetup: Record "NPR RS R Localization Setup";
+        RSRetailPurchPriceCalc: Report "NPR RS Ret. Purch. Price Calc.";
+        CRORetailPurchPriceCalc: Report "NPR CRO Ret. Purch. Price Calc";
+    begin
+        if not RSRLocalizationSetup.Get() then
+            exit;
+
+        case RSRLocalizationSetup."RS Ret. Localization Country" of
+            RSRLocalizationSetup."RS Ret. Localization Country"::Serbia:
+                begin
+                    RSRetailPurchPriceCalc.SetFilters(PurchInvNo, PurchInvPostingDate);
+                    RSRetailPurchPriceCalc.RunModal();
+                end;
+            RSRLocalizationSetup."RS Ret. Localization Country"::Croatia:
+                begin
+                    CRORetailPurchPriceCalc.SetFilters(PurchInvNo, PurchInvPostingDate);
+                    CRORetailPurchPriceCalc.RunModal();
+                end;
+        end
+    end;
+
+    internal procedure RunPostedNivelationReport(PostedNivHdrNo: Code[20]; PostedNivPostingDate: Date)
+    var
+        RSRLocalizationSetup: Record "NPR RS R Localization Setup";
+        RSNivelationDocument: Report "NPR RS Nivelation Document";
+        CRONivelationDocument: Report "NPR CRO Nivelation Document";
+    begin
+        if not RSRLocalizationSetup.Get() then
+            exit;
+
+        case RSRLocalizationSetup."RS Ret. Localization Country" of
+            RSRLocalizationSetup."RS Ret. Localization Country"::Serbia:
+                begin
+                    RSNivelationDocument.SetFilters(PostedNivHdrNo, PostedNivPostingDate);
+                    RSNivelationDocument.RunModal();
+                end;
+            RSRLocalizationSetup."RS Ret. Localization Country"::Croatia:
+                begin
+                    CRONivelationDocument.SetFilters(PostedNivHdrNo, PostedNivPostingDate);
+                    CRONivelationDocument.RunModal();
+                end;
+        end
+    end;
+    #endregion RS Retail Localization Report Run
 }

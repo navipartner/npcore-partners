@@ -91,11 +91,9 @@ page 6151096 "NPR RS Posted Nivelation Doc"
 
                 trigger OnAction()
                 var
-                    Nivelation: Record "NPR RS Posted Nivelation Hdr";
+                    RSRLocalizationMgt: Codeunit "NPR RS R Localization Mgt.";
                 begin
-                    Nivelation.SetRange("Posting Date", Rec."Posting Date");
-                    Nivelation.SetRange("No.", Rec."No.");
-                    Report.RunModal(Report::"NPR RS Nivelation Document", true, false, Nivelation);
+                    RSRLocalizationMgt.RunPostedNivelationReport(Rec."No.", Rec."Posting Date");
                 end;
             }
             action(Navigate)

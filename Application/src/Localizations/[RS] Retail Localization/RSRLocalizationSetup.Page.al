@@ -26,6 +26,11 @@ page 6151098 "NPR RS R Localization Setup"
                             EnabledValueChanged := true;
                     end;
                 }
+                field("RS Ret. Localization Country"; Rec."RS Ret. Localization Country")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies in which country is Retail Localization enabled.';
+                }
             }
             group(Accounts)
             {

@@ -1,12 +1,12 @@
-report 6014483 "NPR RS Ret. Purch. Price Calc."
+report 6014563 "NPR CRO Ret. Purch. Price Calc"
 {
 #if not BC17
     Extensible = false;
 #endif
     UsageCategory = None;
-    Caption = 'Retail Purchase Price Calculation';
+    Caption = 'CRO Retail Purchase Price Calculation';
     DefaultLayout = Word;
-    WordLayout = './src/Localizations/[RS] Retail Localization/Calculation Documents/RetailPriceCalculation.docx';
+    WordLayout = './src/Localizations/[CRO] Retail Localization/Calculation Reports/CRORetailPriceCalculation.docx';
     dataset
     {
         dataitem(PurchInvHeader; "Purch. Inv. Header")
@@ -110,36 +110,34 @@ report 6014483 "NPR RS Ret. Purch. Price Calc."
     }
     labels
     {
-        InvoiceLineNoLbl = 'Р. бр.', Locked = true;
-        ItemDescLbl = 'Назив робе', Locked = true;
-        UnitOfMeasureLbl = 'Јединица мере', Locked = true;
-        AccordingToInvLbl = 'По фактури добављача¹', Locked = true;
-        LineQuantityLbl = 'количина', Locked = true;
-        UnitPriceLbl = 'цена по јединици мере', Locked = true;
-        LineValueLbl = 'вредност робе (4х5)', Locked = true;
-        LineChargeLbl = 'Зависни трошкови²', Locked = true;
-        MarginLbl = 'Разлика у цени', Locked = true;
-        LineValueExclVATLbl = 'Продајна вредност робе без ПДВ (6+7+8)', Locked = true;
-        VATLbl = 'ПДВ', Locked = true;
-        VATPercLbl = 'Стопа', Locked = true;
-        CalculatedVATLbl = 'Обрачунати износ', Locked = true;
-        LineValueInclVATLbl = 'Продајна вредност робе са обрачунатим ПДВ (9+11)', Locked = true;
-        LineValueForQuantityLbl = 'Продајна цена по јединици мере (12:4)', Locked = true;
-        CommentLbl = 'Напомена', Locked = true;
-        CompanyRegNoLbl = 'ПИБ', Locked = true;
-        CompanyNameLbl = 'Обвезник', Locked = true;
-        CompanyAddressLbl = 'Фирма-радње', Locked = true;
-        CompanyAddress2Lbl = 'Седиште', Locked = true;
-        CompanyVATRegNoLbl = 'Шифра пореског обвезника', Locked = true;
-        ReportTitle = 'КАЛКУЛАЦИЈА ПРОДАЈНЕ ЦЕНЕ БРОЈ', Locked = true;
-        ReportTitle2 = 'КЛ', Locked = true;
-        DocumentNoLbl = 'по документу', Locked = true;
-        PostingDateLbl = 'од', Locked = true;
-        FooterDateLbl = 'Датум', Locked = true;
-        UserIDLbl = 'Саставио', Locked = true;
-        PersonResponsibleLbl = 'Одговорно лице', Locked = true;
-        Superscript1InformationLbl = '1 предузетници - обвезници ПДВ, уносе набавну вредност робе без обрачунатог ПДВ у фактури добављача а предузетници који нису обвезници ПДВ као набавну вредност робе уносе бруто износ из фактуре добављача са обрачунатим ПДВ. ', Locked = true;
-        Superscript2InformationLbl = '2 предузетници - обвезници ПДВ, уносе вредност зависних трошкова без обрачунатог ПДВ из фактуре, а предузетници ПДВ као вредност зависних трошкова уносе бруто износ са обрачунатим ПДВ', Locked = true;
+        InvoiceLineNoLbl = 'R. br.', Locked = true;
+        ItemDescLbl = 'Naziv robe', Locked = true;
+        UnitOfMeasureLbl = 'Jedinica mjere', Locked = true;
+        AccordingToInvLbl = 'Prema fakturi dobavljača¹', Locked = true;
+        LineQuantityLbl = 'Količina', Locked = true;
+        UnitPriceLbl = 'Cijena po jedinici mjere', Locked = true;
+        LineValueLbl = 'Vrijednost robe (4x5)', Locked = true;
+        LineChargeLbl = 'Zavisni troškovi²', Locked = true;
+        MarginLbl = 'Razlika u cijeni', Locked = true;
+        LineValueExclVATLbl = 'Prodajna vrijednost robe bez PDV-a (6+7+8)', Locked = true;
+        VATLbl = 'PDV', Locked = true;
+        VATPercLbl = 'Stopa', Locked = true;
+        CalculatedVATLbl = 'Obračunati iznos', Locked = true;
+        LineValueInclVATLbl = 'Prodajna vrijednost robe s obračunatim PDV-om (9+11)', Locked = true;
+        LineValueForQuantityLbl = 'Prodajna cijena po jedinici mjere (12:4)', Locked = true;
+        CommentLbl = 'Napomena', Locked = true;
+        CompanyRegNoLbl = 'OIB', Locked = true;
+        CompanyNameLbl = 'Obveznik', Locked = true;
+        CompanyAddressLbl = 'Firma - poslovnica', Locked = true;
+        CompanyAddress2Lbl = 'Sjedište', Locked = true;
+        CompanyVATRegNoLbl = 'Šifra poreznog obveznika', Locked = true;
+        ReportTitle = 'KALKULACIJA PRODAJNE CIJENE BROJ', Locked = true;
+        ReportTitle2 = 'KL', Locked = true;
+        DocumentNoLbl = 'po dokumentu', Locked = true;
+        PostingDateLbl = 'od', Locked = true;
+        FooterDateLbl = 'Datum', Locked = true;
+        UserIDLbl = 'Sastavio', Locked = true;
+        PersonResponsibleLbl = 'Odgovorna osoba', Locked = true;
     }
 
     trigger OnInitReport()
