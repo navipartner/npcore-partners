@@ -328,6 +328,7 @@
         PostingDescription: Text;
         Compressionmethod: Option Uncompressed,"Per POS Entry","Per POS Period Register";
         PostingDescriptionLbl: Label '%1: %2';
+        FeatureFlagManagement: Codeunit "NPR Feature Flags Management";
     begin
         POSSalesLineToBeCompressed.SetRange(Type, POSSalesLineToBeCompressed.Type::Item);
         if POSSalesLineToBeCompressed.FindSet() then begin
@@ -398,7 +399,10 @@
                     POSPostingBuffer."POS Entry No." := POSEntry."Entry No.";
                     POSPostingBuffer."Document No." := POSSalesLineToBeCompressed."Document No.";
                     POSPostingBuffer."Line No." := 0;
-                    POSPostingBuffer.Type := POSSalesLineToBeCompressed.Type::Item;
+                    if FeatureFlagManagement.IsEnabled('pospostingbuffertypefix') then
+                        POSPostingBuffer.Type := POSSalesLineToBeCompressed.Type
+                    else
+                        POSPostingBuffer.Type := POSSalesLineToBeCompressed.Type::Item;
                     case POSSalesLineToBeCompressed.Type of
                         POSSalesLineToBeCompressed.Type::Rounding:
                             begin
