@@ -15,7 +15,7 @@ export const loginAndCreateLayout = async (
     await page.getByLabel('Password:').fill(password ?? '');
     await page.getByRole('button', { name: 'Sign In' }).click();
   }
-
+  
   await page.waitForLoadState('networkidle');
   await page.waitForSelector('.spinner', { state: 'hidden', timeout: 10000 });
 
@@ -25,10 +25,10 @@ export const loginAndCreateLayout = async (
   }
 
   await page
-    .frameLocator('iframe')
-    .getByRole('contentinfo')
-    .locator('svg[data-icon="gear"]')
-    .click();
+  .frameLocator('iframe')
+  .getByRole('contentinfo')
+  .locator('svg[data-icon="gear"]')
+  .click();
   await page
     .frameLocator('iframe')
     .getByRole('button', { name: 'New Layout' })
