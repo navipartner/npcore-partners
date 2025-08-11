@@ -932,10 +932,12 @@
         SaleLinePOS2: Record "NPR POS Sale Line";
         xSaleLinePOS: Record "NPR POS Sale Line";
         Item: Record Item;
-        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketRetailMgt: Codeunit "NPR TM Ticket Retail Mgt.";
         WalletManager: Codeunit "NPR AttractionWalletCreate";
         HTMLDisplay: Codeunit "NPR POS HTML Disp. Prof.";
         POSProxyDisplay: Codeunit "NPR POS Proxy - Display";
+        ItemFound: Boolean;
+        NewQty: Decimal;
     begin
         Sender.GetxRec(xSaleLinePOS);
         if xSaleLinePOS."Quantity (Base)" = 0 then
@@ -952,20 +954,23 @@
                     SaleLinePOSAddOn."Sale Type",
                     SaleLinePOSAddOn."Sale Line No.")
                 then begin
-                    SaleLinePOS2.Validate(Quantity, Round(SaleLinePOS2.Quantity * SaleLinePOS."Quantity (Base)" / xSaleLinePOS."Quantity (Base)", 0.00001));
+                    ItemFound := Item.Get(SaleLinePOS2."No.");
+                    NewQty := Round(SaleLinePOS2.Quantity * SaleLinePOS."Quantity (Base)" / xSaleLinePOS."Quantity (Base)", 0.00001);
+
+                    if (ItemFound) and (Item."NPR Ticket Type" <> '') then
+                        TicketRetailMgt.ValidateChangeTicketQuantity(SaleLinePOS2, NewQty);
+
+                    SaleLinePOS2.Validate(Quantity, NewQty);
                     SaleLinePOS2.Modify();
 
-                    // Ticket Item needs to be updated with the new quantity, normally this is triggered by OnBeforeSetQuantity - but this is not triggered for dependent addon lines
-                    if (Item.Get(SaleLinePOS2."No.")) then begin
-                        if (Item."NPR Ticket Type" <> '') then
-                            TicketRequestManager.POS_OnModifyQuantity(SaleLinePOS2);
+                    if (ItemFound) and (Item."NPR Ticket Type" <> '') then
+                        TicketRetailMgt.POS_SetTicketQuantity(SaleLinePOS2);
 
-                        if (Item."NPR CreateAttractionWallet") or (SaleLinePOSAddOn.AddToWallet) then
-                            WalletManager.OnAfterSetQuantityPOSSaleLine(SaleLinePOS2, SaleLinePOS2.Quantity);
-                    end;
-                    POSProxyDisplay.UpdateDisplay(SaleLinePOS2);
-
+                    if (ItemFound) and ((Item."NPR CreateAttractionWallet") or (SaleLinePOSAddOn.AddToWallet)) then
+                        WalletManager.OnAfterSetQuantityPOSSaleLine(SaleLinePOS2, SaleLinePOS2.Quantity);
                 end;
+
+                POSProxyDisplay.UpdateDisplay(SaleLinePOS2);
             until SaleLinePOSAddOn.Next() = 0;
 
             HTMLDisplay.UpdateHTMLDisplay();

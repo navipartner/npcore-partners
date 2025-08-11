@@ -729,39 +729,30 @@
     local procedure OnBeforeSetQuantity(SaleLinePOS: Record "NPR POS Sale Line"; var NewQuantity: Decimal)
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
-        POSUnit: Record "NPR POS Unit";
         Token: Text[100];
-        INVALID_QTY: Label 'Invalid quantity. Old quantity %1, new quantity %2.';
-        QuantityChangeNotAllowedLabel: Label 'You cannot change quantity when revoking a specific ticket.';
     begin
         if (not (TicketRequestManager.GetTokenFromReceipt(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token))) then
             exit;
 
-        if ((SaleLinePOS.Quantity > 0) and (NewQuantity < 0)) or
-           ((SaleLinePOS.Quantity < 0) and (NewQuantity > 0)) then
-            Error(INVALID_QTY, SaleLinePOS.Quantity, NewQuantity);
+        ValidateChangeTicketQuantity(NewQuantity, SaleLinePOS.Quantity, SaleLinePOS."Register No.");
+    end;
 
-        // Dont do what I dont mean!
-        if (StrLen(Format(Abs(NewQuantity))) > 14) then
-            Error('Is that a serial number?');
-        if (StrLen(Format(Abs(NewQuantity))) in [12, 13, 14]) then
-            Error('Oopsy woopsy, it looks like you scanned a barcode! Its a bit large to use as a quantity.');
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sale Line", 'OnAfterSetQuantityBeforeCommit', '', true, true)]
+    local procedure OnAfterSetQuantityBeforeCommit(var SaleLinePOS: Record "NPR POS Sale Line"; xSaleLinePOS: Record "NPR POS Sale Line")
+    begin
+        POS_SetTicketQuantity(SaleLinePOS);
+    end;
 
-        if (NewQuantity > SaleLinePOS.Quantity) then begin
-            if (Abs(NewQuantity) > 20000) then
-                Error('%1 is a ridiculous number of tickets! Create them in batches of 20000, if you really want that many.', NewQuantity);
 
-            if (Abs(NewQuantity) > 100) then begin
-                if (POSUnit.Get(SaleLinePOS."Register No.")) then
-                    if (POSUnit."POS Type" = POSUnit."POS Type"::UNATTENDED) then
-                        exit;
+    internal procedure POS_SetTicketQuantity(SaleLinePOS: Record "NPR POS Sale Line")
+    var
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        QuantityChangeNotAllowedLabel: Label 'You cannot change quantity when revoking a specific ticket.';
+        Token: Text[100];
+    begin
 
-                if (not Confirm('Do you really want to create %1 tickets?', true, NewQuantity)) then
-                    Error('');
-            end;
-        end;
-
-        SaleLinePOS.Quantity := NewQuantity;
+        if (not (TicketRequestManager.GetTokenFromReceipt(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token))) then
+            exit;
 
         if (SaleLinePOS.Quantity > 0) then begin
             TicketRequestManager.POS_OnModifyQuantity(SaleLinePOS);
@@ -781,28 +772,59 @@
         end;
     end;
 
+    internal procedure ValidateChangeTicketQuantity(SaleLinePOS: Record "NPR POS Sale Line"; OldQuantity: Decimal)
+    var
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        Token: Text[100];
+    begin
+        if (not (TicketRequestManager.GetTokenFromReceipt(SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", Token))) then
+            exit;
+
+        ValidateChangeTicketQuantity(SaleLinePOS.Quantity, OldQuantity, SaleLinePOS."Register No.");
+    end;
+
+    local procedure ValidateChangeTicketQuantity(NewQuantity: Decimal; OldQuantity: Decimal; PosUnitCode: Code[10])
+    var
+        POSUnit: Record "NPR POS Unit";
+        INVALID_QTY: Label 'Invalid quantity. Old quantity %1, new quantity %2.';
+        IsSerialNumber: Label 'Is that a serial number?';
+        QuantityError: Label 'Oopsy woopsy, it looks like you scanned a barcode! Its a bit large to use as a quantity.';
+        ExcessiveQuantity: Label '%1 is a ridiculous number of tickets! Create them in batches of 20000, if you really want that many.';
+        ConfirmCreateQty: Label 'Do you really want to create %1 tickets?';
+    begin
+
+        if ((OldQuantity > 0) and (NewQuantity < 0)) or
+           ((OldQuantity < 0) and (NewQuantity > 0)) then
+            Error(INVALID_QTY, OldQuantity, NewQuantity);
+
+        // Don't do what I don't mean!
+        if (StrLen(Format(Abs(NewQuantity))) > 14) then
+            Error(IsSerialNumber);
+
+        if (StrLen(Format(Abs(NewQuantity))) in [12, 13, 14]) then
+            Error(QuantityError);
+
+        if (NewQuantity > OldQuantity) then begin
+            if (Abs(NewQuantity) > 20000) then
+                Error(ExcessiveQuantity, NewQuantity);
+
+            if (Abs(NewQuantity) > 100) then begin
+                if (PosUnitCode <> '') then
+                    if (POSUnit.Get(PosUnitCode)) then
+                        if (POSUnit."POS Type" = POSUnit."POS Type"::UNATTENDED) then
+                            exit;
+
+                if (not Confirm(ConfirmCreateQty, true, NewQuantity)) then
+                    Error('');
+            end;
+        end;
+    end;
+
     local procedure GetRequestToken(ReceiptNo: Code[20]; LineNumber: Integer; var Token: Text[100]; var TokenLineNumber: Integer): Boolean
     var
-        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
     begin
-        Token := '';
-
-        if (ReceiptNo = '') then
-            exit(false);
-
-#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
-        TicketReservationRequest.ReadIsolation(IsolationLevel::ReadUncommitted);
-#ENDIF
-        TicketReservationRequest.SetCurrentKey("Receipt No.");
-        TicketReservationRequest.SetFilter("Receipt No.", '=%1', ReceiptNo);
-        TicketReservationRequest.SetFilter("Line No.", '=%1', LineNumber);
-        TicketReservationRequest.SetLoadFields("Session Token ID", "Ext. Line Reference No.");
-        if (TicketReservationRequest.FindFirst()) then begin
-            Token := TicketReservationRequest."Session Token ID";
-            TokenLineNumber := TicketReservationRequest."Ext. Line Reference No.";
-        end;
-
-        exit(Token <> '');
+        exit(TicketRequestManager.GetTokenFromReceipt(ReceiptNo, LineNumber, Token, TokenLineNumber));
     end;
 
     local procedure IsTicketSalesLine(SaleLinePOS: Record "NPR POS Sale Line"): Boolean

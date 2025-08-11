@@ -424,7 +424,8 @@
         POSEntrySalesLine."Return Sale Sales Ticket No." := POSSaleLine."Return Sale Sales Ticket No.";
         OnBeforeInsertPOSSalesLine(POSSale, POSSaleLine, POSEntry, POSEntrySalesLine);
         POSEntrySalesLine.Insert(false, true);
-        ManageAddOns(POSSaleLine, POSEntrySalesLine);
+        if POSSaleLine."Line Type" <> POSSaleLine."Line Type"::Comment then
+            ManageAddOns(POSSaleLine, POSEntrySalesLine);
         OnAfterInsertPOSSalesLine(POSSale, POSSaleLine, POSEntry, POSEntrySalesLine);
     end;
 
@@ -1418,7 +1419,6 @@
         AddOnSaleLine: Record "NPR NpIa SaleLinePOS AddOn";
         AddOnPOSEntrySaleLine: Record "NPR NpIa POSEntrySaleLineAddOn";
         MasterPosSaleLine: Record "NPR POS Sale Line";
-        BundleReference: Record "NPR NpIa POSEntryLineBundleId";
         AppliesToId: Guid;
     begin
         AddOnSaleLine.SetRange("Register No.", POSSaleLine."Register No.");
@@ -1426,6 +1426,7 @@
         AddOnSaleLine.SetRange("Sale Type", POSSaleLine."Sale Type");
         AddOnSaleLine.SetRange("Sale Date", POSSaleLine.Date);
         AddOnSaleLine.SetRange("Sale Line No.", POSSaleLine."Line No.");
+        AddOnSaleLine.SetRange(AddToWallet, true);
         if (not AddOnSaleLine.FindFirst()) then
             exit;
 
@@ -1438,10 +1439,6 @@
         if (not MasterPosSaleLine.FindFirst()) then
             exit;
 
-        BundleReference.SetFilter(POSEntrySaleLineId, '=%1', MasterPosSaleLine.SystemId);
-        if (BundleReference.IsEmpty()) then
-            exit;
-
         AddOnPOSEntrySaleLine.Init();
         AddOnPOSEntrySaleLine.POSEntrySaleLineId := POSEntrySaleLine.SystemId;
         AddOnPOSEntrySaleLine.PosEntrySaleLineNo := POSSaleLine."Line No.";
@@ -1452,7 +1449,6 @@
         AddOnPOSEntrySaleLine.AddToWallet := AddOnSaleLine.AddToWallet;
         AddOnPOSEntrySaleLine.AddOnItemNo := AddOnSaleLine.AddOnItemNo;
         AddOnPOSEntrySaleLine.Insert();
-
     end;
 
     local procedure AssignTicketsToBundle(POSSaleLine: Record "NPR POS Sale Line"; POSEntrySaleLine: Record "NPR POS Entry Sales Line")

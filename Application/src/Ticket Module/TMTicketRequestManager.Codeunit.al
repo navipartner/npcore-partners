@@ -2431,18 +2431,35 @@
 
     end;
 
-    procedure GetTokenFromReceipt(ReceiptNo: Code[20]; LineNumber: Integer; var Token: Text[100]): Boolean
+    internal procedure GetTokenFromReceipt(ReceiptNo: Code[20]; LineNumber: Integer; var Token: Text[100]): Boolean
+    var
+        TokenLineNumber: Integer;
+    begin
+        exit(GetTokenFromReceipt(ReceiptNo, LineNumber, Token, TokenLineNumber));
+    end;
+
+    internal procedure GetTokenFromReceipt(ReceiptNo: Code[20]; LineNumber: Integer; var Token: Text[100]; var TokenLineNumber: Integer): Boolean
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
     begin
         Token := '';
+        TokenLineNumber := 0;
+        if (ReceiptNo = '') then
+            exit(false);
+
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
+        TicketReservationRequest.ReadIsolation(IsolationLevel::ReadUncommitted);
+#ENDIF
 
         TicketReservationRequest.SetCurrentKey("Receipt No.");
         TicketReservationRequest.SetFilter("Receipt No.", '=%1', ReceiptNo);
         TicketReservationRequest.SetFilter("Line No.", '=%1', LineNumber);
 
-        if (TicketReservationRequest.FindFirst()) then
+        TicketReservationRequest.SetLoadFields("Session Token ID", "Ext. Line Reference No.");
+        if (TicketReservationRequest.FindFirst()) then begin
             Token := TicketReservationRequest."Session Token ID";
+            TokenLineNumber := TicketReservationRequest."Ext. Line Reference No.";
+        end;
 
         exit(Token <> '');
     end;
