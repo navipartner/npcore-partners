@@ -20,5 +20,8 @@ enum 6014619 "NPR CRO Payment Method"
     value(3; Check)
     {
         Caption = 'Ček', Locked = true;
+        ObsoleteState = Pending;
+        ObsoleteTag = '2025-08-17';
+        ObsoleteReason = 'Check is no longer used.';
     }
 }

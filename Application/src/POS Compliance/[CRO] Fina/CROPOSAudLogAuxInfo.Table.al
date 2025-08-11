@@ -104,7 +104,7 @@ table 6060059 "NPR CRO POS Aud. Log Aux. Info"
         {
             Caption = 'Payment Method';
             DataClassification = CustomerContent;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2023-11-28';
             ObsoleteReason = 'Replaced by Payment Method field.';
         }

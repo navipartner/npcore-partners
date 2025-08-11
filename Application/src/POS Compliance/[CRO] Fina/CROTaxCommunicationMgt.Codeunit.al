@@ -215,8 +215,6 @@ codeunit 6151497 "NPR CRO Tax Communication Mgt."
                 Content.Add(CreateXmlElement('NacinPlac', 'K'));
             "NPR CRO Payment Method"::Cash:
                 Content.Add(CreateXmlElement('NacinPlac', 'G'));
-            "NPR CRO Payment Method"::Check:
-                Content.Add(CreateXmlElement('NacinPlac', 'C'));
             "NPR CRO Payment Method"::Other:
                 Content.Add(CreateXmlElement('NacinPlac', 'O'));
         end;
