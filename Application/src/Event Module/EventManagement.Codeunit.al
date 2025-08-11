@@ -525,6 +525,9 @@
             exit;
         if POSEntry."Event No." = '' then
             exit;
+        if POSEntry."Event Task No." = '' then
+            exit;
+
         POSEntry2.Copy(POSEntry);
         POSEntry2.SetRange("Post Item Entry Status", POSEntry2."Post Item Entry Status"::Posted);
         if POSEntry2.FindSet() then
