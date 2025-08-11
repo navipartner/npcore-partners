@@ -61,7 +61,7 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
         SetMemberPaymentMethodAsDefault(Membership, MemberPaymentMethod);
     end;
 
-    internal procedure SetMemberPaymentMethodAsDefault(Membership: Record "NPR MM Membership"; var MemberPaymentMethod: Record "NPR MM Member Payment Method")
+    internal procedure SetMemberPaymentMethodAsDefault(var Membership: Record "NPR MM Membership"; var MemberPaymentMethod: Record "NPR MM Member Payment Method")
     var
         MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
         MembershipPmtMethodMap: Record "NPR MM MembershipPmtMethodMap";
