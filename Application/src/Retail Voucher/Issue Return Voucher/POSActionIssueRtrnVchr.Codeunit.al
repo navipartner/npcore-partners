@@ -90,7 +90,7 @@ codeunit 6150623 "NPR POSAction: Issue Rtrn Vchr" implements "NPR IPOS Workflow"
         Amount: Decimal;
         Email: Text[80];
         PhoneNo: Text[30];
-        CustomReferenceNo: Text[50];
+        CustomReferenceNo: Text;
         VoucherSalesLineParentIdText: Text;
         VoucherSalesLineParentId: Guid;
         SendMethodPrint: Boolean;
@@ -100,11 +100,18 @@ codeunit 6150623 "NPR POSAction: Issue Rtrn Vchr" implements "NPR IPOS Workflow"
         VoucherTypeCode: Code[20];
         EndSalePar: Boolean;
         CollectReturnInformation: Boolean;
+        ScanReferenceNo: Boolean;
     begin
         GetParameterValues(Context, VoucherTypeCode, EndSalePar);
         VoucherType.Get(VoucherTypeCode);
         Amount := Context.GetDecimal('ReturnVoucherAmount');
-        CustomReferenceNo := CopyStr(Context.GetString('CustomReferenceNo'), 1, MaxStrLen(CustomReferenceNo));
+
+        if not Context.GetBooleanParameter('ScanReferenceNos', ScanReferenceNo) then
+            ScanReferenceNo := false;
+
+        if ScanReferenceNo then
+            if not Context.GetString('CustomReferenceNo', CustomReferenceNo) then
+                CustomReferenceNo := '';
 
         SendMethodPrint := Context.GetBoolean('SendMethodPrint');
         SendMethodEmail := Context.GetBoolean('SendMethodEmail');
