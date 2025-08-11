@@ -1325,6 +1325,7 @@
         PaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
         UserAccountMgt: Codeunit "NPR UserAccountMgtImpl";
         UserAccount: Record "NPR UserAccount";
+        Membership: Record "NPR MM Membership";
         NameParts: List of [Text];
     begin
         TempMembership.Reset();
@@ -1361,7 +1362,8 @@
                 end;
 
                 repeat
-                    PaymentMethodMgt.SetMemberPaymentMethodAsDefault(TempMembership, MemberPaymentMethod);
+                    Membership.Get(TempMembership."Entry No.");
+                    PaymentMethodMgt.SetMemberPaymentMethodAsDefault(Membership, MemberPaymentMethod);
                 until TempMembership.Next() = 0;
             until TempPaymentLine.Next() = 0;
     end;
