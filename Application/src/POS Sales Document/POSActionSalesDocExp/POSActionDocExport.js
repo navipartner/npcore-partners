@@ -12,8 +12,16 @@ const main = async ({ workflow, parameters, captions }) => {
     if (extDocNo === null) return;
   }
   if (parameters.AskAttention) {
-    attention = await popup.input(captions.Attention);
-    if (attention === null) return;
+    if (parameters.AttentionMandatory) {
+      while (attention === null || attention === undefined || attention === '') {
+        attention = await popup.input(captions.Attention);
+        if (attention === '') await popup.message("Attention is mandatory.");
+        if (attention === null) return;
+      }
+    } else {
+      attention = await popup.input(captions.Attention);
+      if (attention === null) return;
+    }
   }
   if (parameters.AskYourRef) {
     yourref = await popup.input(captions.YourRef);

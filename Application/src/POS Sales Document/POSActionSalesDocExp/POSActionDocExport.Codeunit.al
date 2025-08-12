@@ -13,6 +13,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         TextScanVoucherRequestLbl: Label 'Do you want to scan a vocuher? Remaining amount: %1.';
         CaptionAskExtDocNo: Label 'Prompt External Doc. No.';
         CaptionAskAttention: Label 'Prompt Attention';
+        CaptionAttentionMandatory: Label 'Attention Mandatory';
         CaptionAskYourRef: Label 'Prompt Your Reference';
         CaptionConfirm: Label 'Confirm Export';
         CaptionAskOperation: Label 'Ask Doc. Operation';
@@ -37,6 +38,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         CaptionWarningCustCredit: Label 'Check Customer Credit Warning';
         DescAskExtDocNo: Label 'Ask user to input external document number';
         DescAskAttention: Label 'Ask user to input attention';
+        DescAttentionMandatory: Label 'Attention is mandatory';
         DescAskYourRef: Label 'Ask user to input ''Your Reference''';
         DescConfirm: Label 'Ask user to confirm before any export is performed';
         DescAskOperation: Label 'Ask user to select posting type';
@@ -162,6 +164,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
         WorkflowConfig.AddBooleanParameter('SetSendPdf2Nav', false, CaptionSendPdf2Nav, DescSendPdf2Nav);
         WorkflowConfig.AddBooleanParameter('AskExtDocNo', false, CaptionAskExtDocNo, DescAskExtDocNo);
         WorkflowConfig.AddBooleanParameter('AskAttention', false, CaptionAskAttention, DescAskAttention);
+        WorkflowConfig.AddBooleanParameter('AttentionMandatory', false, CaptionAttentionMandatory, DescAttentionMandatory);
         WorkflowConfig.AddBooleanParameter('AskYourRef', false, CaptionAskYourRef, DescAskYourRef);
         WorkflowConfig.AddBooleanParameter('SetTransferSalesperson', true, CaptionTransferSalesperson, DescTransferSalesperson);
         WorkflowConfig.AddBooleanParameter('SetTransferDimensions', true, CaptionTransferDim, DescTransferDim);
@@ -250,7 +253,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionDocExport.js###
-'const main=async({workflow:n,parameters:e,captions:t})=>{let s,u,p;if(e.ConfirmExport&&!await popup.confirm(t.confirmLead,t.confirmTitle)||e.AskExtDocNo&&(u=await popup.input(t.ExtDocNo),u===null)||e.AskAttention&&(s=await popup.input(t.Attention),s===null)||e.AskYourRef&&(p=await popup.input(t.YourRef),p===null))return;const{preWorkflows:l,additionalParameters:r}=await n.respond("preparePreWorkflows");if(l)for(const a of Object.entries(l)){const[o,i]=a;if(o){const d=await n.run(o,{parameters:i});if((await processPreWorkflowsResponse(o,d)).stopExecution)return}}if(r.pos_payment_reservation){let{remainingAmount:a}=await n.respond("validateSaleBeforeReservation",{extDocNo:u,attention:s,yourref:p,additionalParameters:r});if(e.AskForVouchers&&a!==0){let o=!0,i;for(;o;)o=await popup.confirm(t.ScanVoucherRequestCaption.replace("%1",a)),o&&(i=await n.run("SCAN_VOUCHER_2",{parameters:{AskForVoucherType:e.AskForVoucherType,VoucherTypeCode:e.VoucherTypeCode,EnableVoucherList:e.EnableVoucherList,EndSale:!1}}),i.success&&(o=i.remainingSalesBalanceAmount>0,a=i.remainingSalesBalanceAmount))}if(a>0&&!(await n.run("PAYMENT_2",{parameters:{paymentNo:e.POSPaymentMethodCode,HideAmountDialog:!0,tryEndSale:!1}})).success)return}const{createdSalesHeader:f,createdSalesHeaderDocumentType:m}=await n.respond("exportDocument",{extDocNo:u,attention:s,yourref:p,additionalParameters:r});let c;r.prompt_prepayment?r.prepayment_is_amount?c=await popup.numpad(t.prepaymentAmountLead,t.prepaymentDialogTitle):c=await popup.numpad(t.prepaymentPctLead,t.prepaymentDialogTitle):c=e.FixedPrepaymentValue,await n.respond("endSaleAndDocumentPayment",{additionalParameters:r,createdSalesHeader:f,createdSalesHeaderDocumentType:m,prepaymentAmt:c})};async function processPreWorkflowsResponse(n,e){const t={stopExecution:!1};if(!n)return{};if(!e)return{};switch(n){case"CUSTOMER_SELECT":t.stopExecution=!e.success;break;case"SELECT_SHIP_METHOD":t.stopExecution=!e.success;break}return t}'
+'const main=async({workflow:n,parameters:e,captions:t})=>{let o,s,p;if(e.ConfirmExport&&!await popup.confirm(t.confirmLead,t.confirmTitle)||e.AskExtDocNo&&(s=await popup.input(t.ExtDocNo),s===null))return;if(e.AskAttention){if(e.AttentionMandatory){for(;o==null||o==="";)if(o=await popup.input(t.Attention),o===""&&await popup.message("Attention is mandatory."),o===null)return}else if(o=await popup.input(t.Attention),o===null)return}if(e.AskYourRef&&(p=await popup.input(t.YourRef),p===null))return;const{preWorkflows:l,additionalParameters:i}=await n.respond("preparePreWorkflows");if(l)for(const r of Object.entries(l)){const[a,u]=r;if(a){const d=await n.run(a,{parameters:u});if((await processPreWorkflowsResponse(a,d)).stopExecution)return}}if(i.pos_payment_reservation){let{remainingAmount:r}=await n.respond("validateSaleBeforeReservation",{extDocNo:s,attention:o,yourref:p,additionalParameters:i});if(e.AskForVouchers&&r!==0){let a=!0,u;for(;a;)a=await popup.confirm(t.ScanVoucherRequestCaption.replace("%1",r)),a&&(u=await n.run("SCAN_VOUCHER_2",{parameters:{AskForVoucherType:e.AskForVoucherType,VoucherTypeCode:e.VoucherTypeCode,EnableVoucherList:e.EnableVoucherList,EndSale:!1}}),u.success&&(a=u.remainingSalesBalanceAmount>0,r=u.remainingSalesBalanceAmount))}if(r>0&&!(await n.run("PAYMENT_2",{parameters:{paymentNo:e.POSPaymentMethodCode,HideAmountDialog:!0,tryEndSale:!1}})).success)return}const{createdSalesHeader:f,createdSalesHeaderDocumentType:m}=await n.respond("exportDocument",{extDocNo:s,attention:o,yourref:p,additionalParameters:i});let c;i.prompt_prepayment?i.prepayment_is_amount?c=await popup.numpad(t.prepaymentAmountLead,t.prepaymentDialogTitle):c=await popup.numpad(t.prepaymentPctLead,t.prepaymentDialogTitle):c=e.FixedPrepaymentValue,await n.respond("endSaleAndDocumentPayment",{additionalParameters:i,createdSalesHeader:f,createdSalesHeaderDocumentType:m,prepaymentAmt:c})};async function processPreWorkflowsResponse(n,e){const t={stopExecution:!1};if(!n)return{};if(!e)return{};switch(n){case"CUSTOMER_SELECT":t.stopExecution=!e.success;break;case"SELECT_SHIP_METHOD":t.stopExecution=!e.success;break}return t}'
         )
     end;
 
