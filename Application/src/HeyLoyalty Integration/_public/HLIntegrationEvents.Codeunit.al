@@ -116,4 +116,24 @@ codeunit 6059992 "NPR HL Integration Events"
     begin
         exit('TicketScanned');
     end;
+
+    procedure "HeyBookingDBFieldKey.AdmEventDescription"(): Text
+    begin
+        exit('AdmEventDescription');
+    end;
+
+    procedure "HeyBookingDBFieldKey.TicketTimeSlot"(): Text
+    begin
+        exit('TicketTimeSlot');
+    end;
+
+    procedure "HeyBookingDBFieldKey.TicketValidToDate"(): Text
+    begin
+        exit('TicketValidToDate');
+    end;
+
+    procedure "HeyBookingDBFieldKey.TicketTypeDescription"(): Text
+    begin
+        exit('TicketTypeDescription');
+    end;
 }

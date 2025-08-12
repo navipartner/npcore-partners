@@ -197,6 +197,8 @@ codeunit 6151489 "NPR HL Heybooking Send Ticket"
         AdmissionScheduleEntry: Record "NPR TM Admis. Schedule Entry";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";
+        Ticket: Record "NPR TM Ticket";
+        TicketType: Record "NPR TM Ticket Type";
         AdmissionDataFieldNames: Dictionary of [Text, Text];
         FieldName: Text;
         FieldValue: Text;
@@ -244,6 +246,51 @@ codeunit 6151489 "NPR HL Heybooking Send Ticket"
                         FieldValue := StrSubstNo('%1 %2', Format(TicketAccessEntry."Access Date", 0, 9), CopyStr(Format(TicketAccessEntry."Access Time", 0, 9), 1, 5))
                     else
                         FieldValue := '';
+                    FieldNameValueList.Add(FieldName, FieldValue);
+                end;
+            end;
+        end;
+
+        if AdmissionDataFieldNames.ContainsKey(HLIntegrationEvents."HeyBookingDBFieldKey.AdmEventDescription"()) then begin
+            FieldName := AdmissionDataFieldNames.Get(HLIntegrationEvents."HeyBookingDBFieldKey.AdmEventDescription"());
+            if FieldName <> '' then
+                FieldNameValueList.Add(FieldName, TicketNotifEntry."Adm. Event Description");
+        end;
+
+        if AdmissionDataFieldNames.ContainsKey(HLIntegrationEvents."HeyBookingDBFieldKey.TicketTimeSlot"()) then begin
+            FieldName := AdmissionDataFieldNames.Get(HLIntegrationEvents."HeyBookingDBFieldKey.TicketTimeSlot"());
+            if FieldName <> '' then begin
+                FieldValue := '';
+                if TicketNotifEntry."Relevant Date" <> 0D then
+                    FieldValue := StrSubstNo('%1 %2', Format(TicketNotifEntry."Relevant Date", 0, 9), CopyStr(Format(TicketNotifEntry."Relevant Time", 0, 9), 1, 5));
+                FieldNameValueList.Add(FieldName, FieldValue);
+            end;
+        end;
+
+        if AdmissionDataFieldNames.ContainsKey(HLIntegrationEvents."HeyBookingDBFieldKey.TicketValidToDate"()) or
+            AdmissionDataFieldNames.ContainsKey(HLIntegrationEvents."HeyBookingDBFieldKey.TicketTypeDescription"()) then begin
+
+            Ticket.Get(TicketNotifEntry."Ticket No.");
+
+            if AdmissionDataFieldNames.ContainsKey(HLIntegrationEvents."HeyBookingDBFieldKey.TicketValidToDate"()) then begin
+                FieldName := AdmissionDataFieldNames.Get(HLIntegrationEvents."HeyBookingDBFieldKey.TicketValidToDate"());
+                if FieldName <> '' then begin
+                    FieldValue := '';
+                    if Ticket."Valid To Date" <> 0D then
+                        FieldValue := Format(Ticket."Valid To Date", 0, 9);
+                    FieldNameValueList.Add(FieldName, FieldValue);
+                end;
+            end;
+
+            if AdmissionDataFieldNames.ContainsKey(HLIntegrationEvents."HeyBookingDBFieldKey.TicketTypeDescription"()) then begin
+                FieldName := AdmissionDataFieldNames.Get(HLIntegrationEvents."HeyBookingDBFieldKey.TicketTypeDescription"());
+                if FieldName <> '' then begin
+                    FieldValue := '';
+                    if not TicketType.Get(Ticket."Ticket Type Code") then
+                        Clear(TicketType);
+                    if TicketType.Description = '' then
+                        TicketType.Description := Ticket."Ticket Type Code";
+                    FieldValue := TicketType.Description;
                     FieldNameValueList.Add(FieldName, FieldValue);
                 end;
             end;
