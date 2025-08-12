@@ -68,7 +68,13 @@
                         field("Last exported POS Entry"; Rec."Last exported POS Entry")
                         {
                             ApplicationArea = NPRRetail;
-                            ToolTip = 'Specifies the Entry No. of the last exported POS Entry.';
+                            ToolTip = 'Specifies the Entry No. of the last exported POS Entry. Use the assist edit action to update the value when using api is initialized.';
+                            trigger OnAssistEdit()
+                            var
+                                NpGpExporttoAPI: Codeunit "NPR NpGp Export to API";
+                            begin
+                                NpGpExporttoAPI.ChangeExportControl(Rec.Code);
+                            end;
                         }
                         field("Last exported"; Rec."Last exported")
                         {
@@ -151,9 +157,6 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
-#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
-                Visible = not Rec."Use api";
-#endif
                 ToolTip = 'Executes the Validate Global POS Sales Setup action';
                 ApplicationArea = NPRRetail;
 

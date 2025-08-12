@@ -22,6 +22,26 @@ codeunit 6248268 "NPR NpGp Export to API"
         NpGpExportControl.Insert(true);
     end;
 
+    procedure ChangeExportControl(POSSalesSetupCode: Code[10])
+    var
+        NpGpExportControl: Record "NPR NpGp Export Control";
+        POSEntry: Record "NPR POS Entry";
+        POSEntryList: Page "NPR POS Entry List";
+        ChangeExportControlMsg: Label 'Changing the value for last exported POS Entry can result in data loss. Do you want to continue?';
+    begin
+        InitExportControl(POSSalesSetupCode);
+        NpGpExportControl.Get(POSSalesSetupCode);
+        if NpGpExportControl."Last Entry No. Exported" > 0 then
+            if not Confirm(ChangeExportControlMsg, false) then
+                exit;
+        POSEntryList.LookupMode := true;
+        if POSEntryList.RunModal() <> Action::LookupOK then
+            exit;
+        POSEntryList.GetRecord(POSEntry);
+        NpGpExportControl."Last Entry No. Exported" := POSEntry."Entry No.";
+        NpGpExportControl.Modify(true);
+    end;
+
     procedure ExportLogEntry(EntryNo: Integer)
     var
         NpGpPOSSalesSetup: Record "NPR NpGp POS Sales Setup";
@@ -60,6 +80,14 @@ codeunit 6248268 "NPR NpGp Export to API"
                 15,
                 JobQueueCategoryCode,
                 JobQueueEntry));
+    end;
+
+    procedure TestEndpointConnection(NpGpPOSSalesSetup: Record "NPR NpGp POS Sales Setup")
+    var
+        EndpointErr: Label 'Received from Endpoint:\%1\\Error:\%2', Comment = '%1 = Endpoint Url, %2 = Error Message';
+    begin
+        if not PingEndpoint(NpGpPOSSalesSetup) then
+            Error(EndpointErr, NpGpPOSSalesSetup."OData Base Url".TrimEnd('/') + '/pos/globalentry', GetLastErrorText());
     end;
 
     local procedure ExportNpGpPOSSalesSetup(NpGpPOSSalesSetup: Record "NPR NpGp POS Sales Setup")
@@ -212,6 +240,41 @@ codeunit 6248268 "NPR NpGp Export to API"
             end else
                 Error('%1 %2', ResponseMessage.HttpStatusCode, ResponseMessage.ReasonPhrase);
         end;
+    end;
+
+    [TryFunction]
+    local procedure PingEndpoint(NpGpPOSSalesSetup: Record "NPR NpGp POS Sales Setup")
+    var
+        RequestMessage: HttpRequestMessage;
+        ResponseMessage: HttpResponseMessage;
+        Client: HttpClient;
+        [NonDebuggable]
+        RequestHeaders: HttpHeaders;
+        //ContentHeaders: HttpHeaders;
+        Response: Text;
+    begin
+        RequestMessage.GetHeaders(RequestHeaders);
+        if NpGpPOSSalesSetup."Environment Type" = NpGpPOSSalesSetup."Environment Type"::Crane then
+            RequestHeaders.Add('x-npr-api-remote-type', 'crane');
+        RequestHeaders.Add('x-api-version', Format(20250201D, 0, 9));
+
+        NpGpPOSSalesSetup.SetRequestHeadersAuthorization(RequestHeaders);
+
+        RequestMessage.SetRequestUri(NpGpPOSSalesSetup."OData Base Url".TrimEnd('/') + '/pos/globalentry/00000000-0000-0000-0000-000000000000');
+        RequestMessage.Method := 'GET';
+
+        //Trying to get Global Sale Entry with systemId = nullguid. Expect a 404 response with resource_not_found and the guid of the requested entry.
+        Client.Send(RequestMessage, ResponseMessage);
+        if ResponseMessage.IsSuccessStatusCode then
+            exit;
+        if not ResponseMessage.Content.ReadAs(Response) then
+            Error('%1 %2', ResponseMessage.HttpStatusCode, ResponseMessage.ReasonPhrase);
+
+        if ResponseMessage.HttpStatusCode = 404 then
+            if Response.Contains('resource_not_found') and Response.Contains('00000000-0000-0000-0000-000000000000') then
+                exit;
+
+        Error('%1 %2\%3', ResponseMessage.HttpStatusCode, ResponseMessage.ReasonPhrase, Response);
     end;
 
     local procedure InitODataReqBody(POSEntry: Record "NPR POS Entry"): JsonObject
