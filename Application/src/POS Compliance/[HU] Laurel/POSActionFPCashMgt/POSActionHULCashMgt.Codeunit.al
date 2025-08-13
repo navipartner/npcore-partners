@@ -5,6 +5,7 @@ codeunit 6248274 "NPR POS Action: HUL Cash Mgt" implements "NPR IPOS Workflow"
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config");
     var
         ActionDescriptionLbl: Label 'This is a built-in action for fiscal printer cash management.';
+        WorkflowTitleLbl: Label 'HU Laurel Cash Management';
         ParamMethodCaptionLbl: Label 'Method';
         ParamMethodDescrLbl: Label 'Specifies the Method used.';
         ParamMethodOptionsCaptionLbl: Label 'Money In,Money Out';
@@ -12,6 +13,7 @@ codeunit 6248274 "NPR POS Action: HUL Cash Mgt" implements "NPR IPOS Workflow"
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescriptionLbl);
+        WorkflowConfig.AddLabel('workflowTitle', WorkflowTitleLbl);
         WorkflowConfig.AddOptionParameter('Method', ParamMethodOptionsLbl, '', ParamMethodCaptionLbl, ParamMethodDescrLbl, ParamMethodOptionsCaptionLbl);
     end;
 
@@ -38,8 +40,8 @@ codeunit 6248274 "NPR POS Action: HUL Cash Mgt" implements "NPR IPOS Workflow"
     local procedure GetActionScript(): Text
     begin
         exit(
-//###NPR_INJECT_FROM_FILE:POSActionHULCashMgt.js###
-'let main=async({workflow:o,hwc:a,popup:n,context:r,captions:t})=>{let e,i,s={Success:!1};await o.respond("SetValuesToContext"),r.showSpinner&&(e=await n.spinner({caption:t.workflowTitle,abortEnabled:!1}));try{return i=a.registerResponseHandler(async l=>{if(l.Success)try{console.log("[Hungary Laurel HWC] ",l),e&&e.updateCaption(t.statusProcessing),s=await o.respond("Process",{hwcResponse:l}),a.unregisterResponseHandler(i),s.Success?s.ShowSuccessMessage&&n.message({caption:s.Message,title:t.workflowTitle}):n.error({caption:s.Message,title:t.workflowTitle})}catch(c){a.unregisterResponseHandler(i,c)}}),e&&e.updateCaption(t.statusExecuting),await a.invoke(r.hwcRequest.HwcName,r.hwcRequest,i),await a.waitForContextCloseAsync(i),{success:s.Success}}finally{e&&e.close(),e=null}};'
+        //###NPR_INJECT_FROM_FILE:POSActionHULCashMgt.js###
+        'let main=async({workflow:e,hwc:s,popup:o,context:n,captions:t})=>{let r,a,c,l={Success:!1};await e.respond("SetValuesToContext"),n.showSpinner&&(r=await o.spinner({caption:t.workflowTitle,abortEnabled:!1}));try{return a=s.registerResponseHandler((async n=>{if(l=n,l.Success)try{console.log("[Hungary Laurel HWC] ",l),r&&r.updateCaption(t.statusProcessing),c=await e.respond("Process",{hwcResponse:l}),s.unregisterResponseHandler(a),c.Success?c.ShowSuccessMessage&&o.message({caption:c.Message,title:t.workflowTitle}):o.error({caption:c.Message,title:t.workflowTitle})}catch(e){s.unregisterResponseHandler(a,e)}})),r&&r.updateCaption(t.statusExecuting),await s.invoke(n.hwcRequest.HwcName,n.hwcRequest,a),await s.waitForContextCloseAsync(a),{success:c.Success}}finally{r&&r.close(),r=null,await processResponseIfErrorAndCallResetWorkflow(e,l)}};async function processResponseIfErrorAndCallResetWorkflow(e,s){if(!s||!s.Success)return;let o=null;try{o=JSON.parse(s.ResponseMessage).result.iErrCode}catch(e){return void console.error("Invalid JSON in hwcResponse.ResponseMessage:",e)}o&&!["0","531","586","598","599"].includes(o)&&await processWorkflow(e,"HUL_RESET_PRINTER")}async function processWorkflow(e,s){s&&await e.run(s,{})}'
         );
     end;
 

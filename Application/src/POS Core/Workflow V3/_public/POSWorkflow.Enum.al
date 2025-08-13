@@ -1116,6 +1116,11 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'NO_PRINT_COPY', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action: NO Print Copy";
     }
+    value(376; "HUL_RESET_PRINTER")
+    {
+        Caption = 'HUL_RESET_PRINTER', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POS Action: HU L Reset FP";
+    }
     value(6184573; SS_EFT_RECONCILE)
     {
         Caption = 'SS_EFT_RECONSILE', Locked = true, MaxLength = 20;
