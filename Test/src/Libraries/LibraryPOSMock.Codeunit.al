@@ -57,6 +57,13 @@ codeunit 85003 "NPR Library - POS Mock"
         POSSession.GetSale(POSSale);
     end;
 
+    procedure InitializePOSSessionAndResumeSale(var POSSession: Codeunit "NPR POS Session"; POSUnit: Record "NPR POS Unit"; SalePOS: Record "NPR POS Sale"; var POSSale: Codeunit "NPR POS Sale")
+    begin
+        InitializePOSSession(POSSession, POSUnit);
+        POSSession.ResumeTransaction(SalePOS);
+        POSSession.GetSale(POSSale);
+    end;
+
     procedure InitializePOSSessionAndStartSaleWithoutActions(var POSSession: Codeunit "NPR POS Session"; POSUnit: Record "NPR POS Unit"; var POSSale: Codeunit "NPR POS Sale")
     var
         UserSetup: record "User Setup";
