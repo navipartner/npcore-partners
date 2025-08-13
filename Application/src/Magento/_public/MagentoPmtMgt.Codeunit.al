@@ -552,9 +552,11 @@
 #IF NOT BC17
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
 #ENDIF
+        FeatureFlagMgmt: Codeunit "NPR Feature Flags Management";
         OutstandingAmt: Decimal;
         PaymentAmt: Decimal;
         TotalAmountInclVAT: Decimal;
+        RefundPaymentsAmount: Decimal;
         DocNo: Code[20];
         HasVouchers: Boolean;
         HasPaymentsAndRefunds: Boolean;
@@ -566,6 +568,8 @@
         HasPaymentsAndRefunds := HasMagentoPaymentsAndRefunds(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
 
         TotalAmountInclVAT := GetTotalAmountInclVat(SalesHeader);
+        if HasPaymentsAndRefunds and FeatureFlagMgmt.IsEnabled('calculateRefundPaymentsAmount') then
+            RefundPaymentsAmount := GetRefundPaymentsAmount(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
         DocNo := SalesHeader."Posting No.";
         if DocNo = '' then begin
 #IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
@@ -600,8 +604,8 @@
 #endif
 
                 OutstandingAmt := TotalAmountInclVAT - PaymentAmt;
-                if (PaymentLine."Payment Type" = PaymentLine."Payment Type"::"Payment Method") and (PaymentLine.Amount > OutstandingAmt) then begin
-                    PaymentLine2.Amount := OutstandingAmt;
+                if (PaymentLine."Payment Type" = PaymentLine."Payment Type"::"Payment Method") and (PaymentLine.Amount > OutstandingAmt + RefundPaymentsAmount) then begin
+                    PaymentLine2.Amount := OutstandingAmt + RefundPaymentsAmount;
 #if not BC17
                     PaymentLine2."Amount (Store Currency)" := Round(PaymentLine."Amount (Store Currency)" / PaymentLine.Amount * PaymentLine2.Amount, 0.01);
                     if PaymentLine2."Amount (Store Currency)" > PaymentLine."Amount (Store Currency)" then
@@ -1203,6 +1207,19 @@
         MagentoPaymentLine.SetRange("Payment Type", MagentoPaymentLine."Payment Type"::Voucher);
         MagentoPaymentLine.CalcSums(Amount);
         PaidAmount += MagentoPaymentLine.Amount;
+    end;
+
+    internal procedure GetRefundPaymentsAmount(DocumentTableNo: Integer; SalesDocumentType: Enum "Sales Document Type"; DocumentNo: Code[20]): Decimal
+    var
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+    begin
+        MagentoPaymentLine.Reset();
+        MagentoPaymentLine.SetRange("Document No.", DocumentNo);
+        MagentoPaymentLine.SetRange("Document Type", SalesDocumentType);
+        MagentoPaymentLine.SetRange("Document Table No.", DocumentTableNo);
+        MagentoPaymentLine.SetFilter(Amount, '<%1', 0);
+        MagentoPaymentLine.CalcSums(Amount);
+        exit(-MagentoPaymentLine.Amount);
     end;
 
     local procedure HasMagentoPaymentVouchers(DocTableNo: Integer; DocType: Enum "Sales Document Type"; DocNo: Code[20]) HasVouchers: Boolean
