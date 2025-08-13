@@ -8,14 +8,14 @@ codeunit 6060024 "NPR Nemhandel"
         OIOUBLSetup: Record "NPR OIOUBL Setup";
         Client: HttpClient;
         ResponseMessage: HttpResponseMessage;
-        Document: XmlDocument;
-        Node: XmlNode;
+        ResponseBody: JsonObject;
+        JToken: JsonToken;
         Uri: Text;
-        ResponseXML: Text;
-        InvalidResponseMsg: Label 'Response from NemHandel:\\%1', Comment = '%1 - response';
+        Response: Text;
         ValidGLNLbl: Label 'Response from Nemhandel\\%1 is found and registered for %2', Comment = '%1 - VAT RegNo, %2 - Name of owner';
+        GLNNotFoundLbl: Label 'Response from Nemhandel\\%1 is not found', Comment = '%1 - GLN';
         MixedVATGLNIdsLbl: Label 'Response from Nemhandel\\%1 %2 is registered for %3 %4: %5.\\Not same %4 as on document (%6 %7).', Comment = '%1 %2  %3 %4 %5 %6 %7';
-        NemHandelUrlLbl: Label 'https://registration.nemhandel.dk/NemHandelRegisterWeb/public/participant/info?keytype=GLN&asXML=true&key=%1', Locked = true;
+        NemHandelUrlLbl: Label 'https://api-demo.nemhandel.dk/nemhandel-api/search/networkLookup?receiverId=0088:%1', Locked = true;
         NameOfVATRegNo: Text;
         GLNName: Text;
         GLNVATRegNo: Text;
@@ -31,17 +31,21 @@ codeunit 6060024 "NPR Nemhandel"
             VATRegNoLookupNemHandel(VATRegNo, CountryCode, NameOfVATRegNo);
         end;
         Uri := StrSubstNo(NemHandelUrlLbl, GLN);
-        Client.Get(Uri, ResponseMessage);
-        ResponseMessage.Content.ReadAs(ResponseXML);
-        if not XmlDocument.ReadFrom(ResponseXML, Document) then begin
-            Message(InvalidResponseMsg, ResponseXML);
+        if not Client.Get(Uri, ResponseMessage) then
+            exit;
+        if not ResponseMessage.IsSuccessStatusCode() then
+            exit;
+        ResponseMessage.Content.ReadAs(Response);
+        if not ResponseBody.ReadFrom(Response) then
+            exit;
+        if not ResponseBody.SelectToken('modtagere[0].participant', JToken) then begin
+            Message(GLNNotFoundLbl, GLN);
             exit;
         end;
-        if Document.SelectSingleNode('ParticipantInfoDTO/Participant/UnitName', Node) then
-            GLNName := Node.AsXmlElement().InnerText();
-
-        if Document.SelectSingleNode('ParticipantInfoDTO/Participant/UnitCVR', Node) then
-            GLNVATRegNo := Node.AsXmlElement().InnerText();
+        if ResponseBody.SelectToken('modtagere[0].participant.UnitName', JToken) then
+            GLNName := JToken.AsValue().AsText();
+        if ResponseBody.SelectToken('modtagere[0].participant.UnitCVR', JToken) then
+            GLNVATRegNo := JToken.AsValue().AsText();
         if (VATRegNo <> '') and (GLNVATRegNo <> VATRegNo) then
             Message(MixedVATGLNIdsLbl, Customer.FieldCaption(GLN), GLN, GLNName, Customer.FieldCaption("VAT Registration No."), GLNVATRegNo, VATRegNo, NameOfVATRegNo)
         else
@@ -53,26 +57,26 @@ codeunit 6060024 "NPR Nemhandel"
     var
         Client: HttpClient;
         ResponseMessage: HttpResponseMessage;
-        Document: XmlDocument;
-        Node: XmlNode;
         Uri: Text;
-        ResponseXML: Text;
-        NemHandelUrlLbl: Label 'https://registration.nemhandel.dk/NemHandelRegisterWeb/public/participant/info?keytype=DK%3ACVR&asXML=true&key=%1', Locked = true;
+        Response: Text;
+        Body: JsonObject;
+        JToken: JsonToken;
+        NemHandelUrlLbl: Label 'https://api-demo.nemhandel.dk/nemhandel-api/search/lookup/%1', Locked = true;
     begin
         VATRegNo := RemoveCountryFromVATRegNo(VATRegNo, CountryCode);
         if VATRegNo = '' then
             exit(false);
 
-#pragma warning disable AA0131
         Uri := StrSubstNo(NemHandelUrlLbl, VATRegNo);
-#pragma warning restore
         if not Client.Get(Uri, ResponseMessage) then
             exit(false);
-        ResponseMessage.Content.ReadAs(ResponseXML);
-        if not XmlDocument.ReadFrom(ResponseXML, Document) then
+        if not ResponseMessage.IsSuccessStatusCode() then
             exit(false);
-        if Document.SelectSingleNode('ParticipantInfoDTO/Participant/UnitName', Node) then
-            NameOfOwner := Node.AsXmlElement().InnerText();
+        ResponseMessage.Content.ReadAs(Response);
+        if not Body.ReadFrom(Response) then
+            exit(false);
+        if Body.SelectToken('virksomhedsNavnFormel', JToken) then
+            NameOfOwner := JToken.AsValue().AsText();
         exit(true);
     end;
 
@@ -86,6 +90,8 @@ codeunit 6060024 "NPR Nemhandel"
         ValidVATRegNoLbl: Label 'Response from Nemhandel\\%1 is found and registered for %2', Comment = '%1 - VAT RegNo, %2 - Name of owner';
         InvalidVATRegNoLbl: Label 'Response from Nemhandel\\%1 is not found', Comment = '%1 - VAT RegNo';
     begin
+        if VATRegNo = '' then
+            exit;
         if VATRegNoSrvConfig.VATRegNoSrvIsEnabled() then
             exit;
         if not OIOUBLSetup.Get() then
