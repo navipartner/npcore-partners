@@ -269,7 +269,7 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         repeat
             Clear(AppliedEntryCostPerUnit);
             Clear(TransitCostPerUnit);
-            CalculateTransferFromAppliedItemLedgerEntriesCostPerUnit(AppliedEntryCostPerUnit, TempTransferFromILEAppliedItemLedgerEntries);
+            CalculateTransferFromAppliedItemLedgerEntriesCostPerUnit(AppliedEntryCostPerUnit, TransitLocationItemLedgerEntries, TempTransferFromILEAppliedItemLedgerEntries);
             CalculateTransitLocationItemLedgerEntryCostPerUnit(TransitCostPerUnit, TransitLocationItemLedgerEntries);
             if AppliedEntryCostPerUnit <> TransitCostPerUnit then
                 InsertCorrectionalValueEntryForTransitLocation(TransitLocationItemLedgerEntries, AppliedEntryCostPerUnit, TransitCostPerUnit);
@@ -316,26 +316,21 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         RSRLocalizationMgt.InsertGLItemLedgerRelations(CorrectionValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::"Transit Adjustment"));
     end;
 
-    local procedure CalculateTransferFromAppliedItemLedgerEntriesCostPerUnit(var CostPerUnit: Decimal; TempTransferFromILEAppliedItemLedgerEntry: Record "Item Ledger Entry" temporary)
+    local procedure CalculateTransferFromAppliedItemLedgerEntriesCostPerUnit(var CostPerUnit: Decimal; TransitLocationItemLedgerEntries: Record "Item Ledger Entry"; TempTransferFromILEAppliedItemLedgerEntry: Record "Item Ledger Entry" temporary)
     var
         ValueEntry: Record "Value Entry";
         RSRetValueEntryMapp: Record "NPR RS Ret. Value Entry Mapp.";
     begin
         ValueEntry.SetLoadFields("Cost per Unit", "Invoiced Quantity");
         ValueEntry.SetRange("Item Ledger Entry No.", TempTransferFromILEAppliedItemLedgerEntry."Entry No.");
-        if ValueEntry.IsEmpty() then
-            exit;
-        ValueEntry.FindSet();
-        repeat
-            if (RSRetValueEntryMapp.Get(ValueEntry."Entry No.")) then begin
-                if (RSRetValueEntryMapp."Standard Correction") or (RSRetValueEntryMapp."COGS Correction") then begin
+        if ValueEntry.FindSet() then
+            repeat
+                if (RSRetValueEntryMapp.Get(ValueEntry."Entry No.")) and (RSRetValueEntryMapp."Standard Correction" or RSRetValueEntryMapp."COGS Correction") then begin
                     CostPerUnit += ValueEntry."Cost per Unit";
-                    RSRLocalizationMgt.SubRetValueEntryMappingRemainingQty(RSRetValueEntryMapp, Abs(ValueEntry."Invoiced Quantity"));
-                end;
-            end
-            else
-                CostPerUnit += ValueEntry."Cost per Unit";
-        until ValueEntry.Next() = 0;
+                    RSRLocalizationMgt.SubRetValueEntryMappingRemainingQty(RSRetValueEntryMapp, Abs(TransitLocationItemLedgerEntries."Invoiced Quantity"));
+                end else
+                    CostPerUnit += ValueEntry."Cost per Unit";
+            until ValueEntry.Next() = 0;
     end;
 
     local procedure CalculateTransitLocationItemLedgerEntryCostPerUnit(var CostPerUnit: Decimal; TransitLocationItemLedgerEntry: Record "Item Ledger Entry")
