@@ -1,4 +1,5 @@
 import { test } from "@playwright/test";
+import assert from "assert";
 
 import { mobileLogin } from "../fixtures/mobileLogin";
 
@@ -67,51 +68,50 @@ test.describe("Mobile add and remove item, search, payment test", () => {
       .locator(".hidden-menu-button")
       .first()
       .click();
-    // await page.waitForTimeout(2000);
-    // await page
-    //   .frameLocator("iframe")
-    //   .getByRole("button", { name: "Items" })
-    //   .click();
-    //    await page
-    //   .frameLocator("iframe")
-    //   .locator("#page-sale")
-    //   .getByTestId("hamburger")
-    //   .click();
-    // await page.waitForTimeout(1000);
-    // await page
-    //   .frameLocator("iframe")
-    //   .locator("div")
-    //   .filter({ hasText: /^Insert Customer$/ })
-    //   .nth(2)
-    //   .click();
-    // await page.waitForTimeout(5000);
-    // const customerText = await page
-    //   .getByRole("gridcell", { name: "Open menu for No. 01121212" })
-    //   .isVisible();
+    await page.waitForTimeout(2000);
+    await page
+      .frameLocator("iframe")
+      .getByRole("button", { name: "Items" })
+      .click();
+    await page
+      .frameLocator("iframe")
+      .locator("#page-sale")
+      .getByTestId("hamburger")
+      .click();
+    await page
+      .frameLocator("iframe")
+      .locator("div")
+      .filter({ hasText: /^Insert Customer$/ })
+      .nth(2)
+      .click();
+    await page.waitForTimeout(2000);
+    const customerText = await page
+      .getByRole("gridcell", { name: "Open menu for No. 01121212" })
+      .isVisible();
 
-    // if (customerText) {
-    //   await page
-    //     .getByRole("gridcell", { name: "Open menu for No. 01121212" })
-    //     .click();
-    // } else {
-    //   await page.locator("td").filter({ hasText: "01121212" }).click();
-    // }
-    // const elementExists =
-    //   page
-    //     .frameLocator("iframe")
-    //     .getByText("Customer:Spotsmeyer's Furnishings") !== null;
-    // assert.ok(elementExists);
-    //  await page
-    //   .frameLocator("iframe")
-    //   .locator("#page-sale")
-    //   .getByTestId("hamburger")
-    //   .click();
-    // await page
-    //   .frameLocator("iframe")
-    //   .locator("div")
-    //   .filter({ hasText: /^Remove Customer$/ })
-    //   .nth(2)
-    //   .click();
+    if (customerText) {
+      await page
+        .getByRole("gridcell", { name: "Open menu for No. 01121212" })
+        .click();
+    } else {
+      await page.locator("td").filter({ hasText: "01121212" }).click();
+    }
+    const elementExists =
+      page
+        .frameLocator("iframe")
+        .getByText("Customer:Spotsmeyer's Furnishings") !== null;
+    assert.ok(elementExists);
+    await page
+      .frameLocator("iframe")
+      .locator("#page-sale")
+      .getByTestId("hamburger")
+      .click();
+    await page
+      .frameLocator("iframe")
+      .locator("div")
+      .filter({ hasText: /^Remove Customer$/ })
+      .nth(2)
+      .click();
     await page.waitForTimeout(2000);
     await page
       .frameLocator("iframe")
