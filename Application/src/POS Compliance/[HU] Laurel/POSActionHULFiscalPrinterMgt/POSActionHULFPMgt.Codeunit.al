@@ -8,8 +8,8 @@ codeunit 6248368 "NPR POS Action: HU L FP Mgt." implements "NPR IPOS Workflow"
         WorkflowTitleLbl: Label 'HU Laurel Fiscal Printer Management';
         ParamMethodCaptionLbl: Label 'Method';
         ParamMethodDescrLbl: Label 'Specifies the Method used.';
-        ParamMethodOptionsCaptionLbl: Label 'Open Fiscal Day,Close Fiscal Day,Log In,Cashier FCU Report,Open Cash Drawer,Get FCU Daily Total,Print Receipt Copy,Refiscalize Sale from Audit Log,Void Current Sale';
-        ParamMethodOptionsLbl: Label 'openFiscalDay,closeFiscalDay,cashierFCUReport,getDailyTotal,resetPrinter,setEuroRate,printReceiptCopy,refiscalizeAuditLog,voidCurrentSale', Locked = true;
+        ParamMethodOptionsCaptionLbl: Label 'Open Fiscal Day,Close Fiscal Day,Log In,Cashier FCU Report,Open Cash Drawer,Get FCU Daily Total,Print Receipt Copy,Refiscalize Sale from Audit Log,Void Current Sale,Refiscalize Existing Request';
+        ParamMethodOptionsLbl: Label 'openFiscalDay,closeFiscalDay,cashierFCUReport,getDailyTotal,resetPrinter,setEuroRate,printReceiptCopy,refiscalizeAuditLog,voidCurrentSale,refiscalizeExistingRequest', Locked = true;
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescriptionLbl);

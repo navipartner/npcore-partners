@@ -7,7 +7,7 @@ page 6184912 "NPR HU L POS Audit Log Aux."
     PageType = List;
     SourceTable = "NPR HU L POS Audit Log Aux.";
     SourceTableView = sorting("Audit Entry No.") order(descending);
-    PromotedActionCategories = 'New,Process,Report,Process Receipt,Receipt Print,Download,Related';
+    PromotedActionCategories = 'New,Process,Report,Process Receipt,Receipt Print,Download,Related,Import';
     UsageCategory = History;
 
     layout
@@ -169,6 +169,34 @@ page 6184912 "NPR HU L POS Audit Log Aux."
                 begin
                     POSEntry.Get(Rec."POS Entry No.");
                     Page.RunModal(Page::"NPR POS Entry Card", POSEntry);
+                end;
+            }
+            action(ImportRequestContent)
+            {
+                ApplicationArea = NPRHULaurelFiscal;
+                Caption = 'Import Request Content';
+                Image = Import;
+                Promoted = true;
+                PromotedCategory = Category8;
+                PromotedIsBig = true;
+                PromotedOnly = true;
+                ToolTip = 'Imports request content related to the selected entry.';
+
+                trigger OnAction()
+                var
+                    IStream: InStream;
+                    ImportLbl: Label 'Import';
+                    JsonFileTypeDesciptionLbl: Label 'Json File %1', Comment = '%1 - json file mask';
+                    JsonFileTypeMaskLbl: Label '(*.json)|*.json', Locked = true;
+                    ReplaceRequestContentQst: Label 'The existing Request Content will be replaced. Do you want to continue?';
+                    FileName: Text;
+                begin
+                    if Rec."Request Content".HasValue() then
+                        if not Confirm(ReplaceRequestContentQst, true) then exit;
+                    if UploadIntoStream(ImportLbl, '', StrSubstNo(JsonFileTypeDesciptionLbl, JsonFileTypeMaskLbl), FileName, IStream) then begin
+                        Rec."Request Content".ImportStream(IStream, FileName);
+                        Rec.Modify();
+                    end;
                 end;
             }
         }

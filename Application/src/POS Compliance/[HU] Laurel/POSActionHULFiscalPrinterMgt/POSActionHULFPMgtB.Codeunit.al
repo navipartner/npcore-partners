@@ -17,7 +17,7 @@ codeunit 6248366 "NPR POS Action: HU L FP Mgt. B"
     local procedure PrepareHwcRequest(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale") HwcRequest: JsonObject
     var
         POSSale: Record "NPR POS Sale";
-        Method: Option openFiscalDay,closeFiscalDay,cashierFCUReport,getDailyTotal,resetPrinter,setEuroRate,printReceiptCopy,refiscalizeAuditLog,voidCurrentSale;
+        Method: Option openFiscalDay,closeFiscalDay,cashierFCUReport,getDailyTotal,resetPrinter,setEuroRate,printReceiptCopy,refiscalizeAuditLog,voidCurrentSale,refiscalizeExistingRequest;
     begin
         ClearGlobalVars();
         Sale.GetCurrentSale(POSSale);
@@ -43,6 +43,8 @@ codeunit 6248366 "NPR POS Action: HU L FP Mgt. B"
                 HwcRequest.Add('Payload', PrepareRefiscalizeAuditLog());
             Method::voidCurrentSale:
                 HwcRequest.Add('Payload', PrepareVoidCurrentSale(POSSale));
+            Method::refiscalizeExistingRequest:
+                HwcRequest.Add('Payload', PrepareRefiscalizeExistingRequest());
         end;
     end;
 
@@ -56,7 +58,7 @@ codeunit 6248366 "NPR POS Action: HU L FP Mgt. B"
         ProcessLaurelMiniPOSResponse(Response, Setup.GetPOSUnitNo(), Method);
     end;
 
-    internal procedure ProcessLaurelMiniPOSResponse(Response: JsonObject; POSUnitNo: Code[10]; Method: Option openFiscalDay,closeFiscalDay,cashierFCUReport,getDailyTotal,resetPrinter,setEuroRate,printReceiptCopy,refiscalizeAuditLog,voidCurrentSale)
+    internal procedure ProcessLaurelMiniPOSResponse(Response: JsonObject; POSUnitNo: Code[10]; Method: Option openFiscalDay,closeFiscalDay,cashierFCUReport,getDailyTotal,resetPrinter,setEuroRate,printReceiptCopy,refiscalizeAuditLog,voidCurrentSale,refiscalizeExistingRequest)
     var
         ResponseMessage: JsonObject;
         ResponseMsgToken: JsonToken;
@@ -79,6 +81,8 @@ codeunit 6248366 "NPR POS Action: HU L FP Mgt. B"
                 HandleRefiscalizeAuditLog(ResponseMessage);
             Method::voidCurrentSale:
                 HandleVoidCurrentTransaction(ResponseMessage);
+            Method::refiscalizeExistingRequest:
+                HandleRefiscalizeExistingRequest(ResponseMessage);
         end;
     end;
 
@@ -150,6 +154,11 @@ codeunit 6248366 "NPR POS Action: HU L FP Mgt. B"
     begin
         exit(HULCommunicationMgt.VoidCurrentSale(VoidAuditEntryNo, POSSale));
     end;
+
+    local procedure PrepareRefiscalizeExistingRequest(): Text
+    begin
+        exit(HULCommunicationMgt.RefiscalizeExistingRequest(RefiscalizeAuditEntryNo));
+    end;
     #endregion POS Action: HU L FP Mgt - Requests
 
     #region POS Action: HU L FP Mgt - Responses
@@ -184,6 +193,17 @@ codeunit 6248366 "NPR POS Action: HU L FP Mgt. B"
         HULAuditMgt: Codeunit "NPR HU L Audit Mgt.";
     begin
         HULAuditMgt.InsertHULPOSAuditLogAuxResponseData(VoidAuditEntryNo, Response);
+    end;
+
+    local procedure HandleRefiscalizeExistingRequest(Response: JsonObject): Text
+    var
+        POSEntry: Record "NPR POS Entry";
+        HULPOSAuditLogAux: Record "NPR HU L POS Audit Log Aux.";
+        HULAuditMgt: Codeunit "NPR HU L Audit Mgt.";
+    begin
+        HULPOSAuditLogAux.Get(HULPOSAuditLogAux."Audit Entry Type"::"POS Entry", RefiscalizeAuditEntryNo);
+        POSEntry.Get(HULPOSAuditLogAux."POS Entry No.");
+        HULAuditMgt.InsertHULPOSAuditLogAuxResponseData(POSEntry, Response);
     end;
     #endregion POS Action: HU L FP Mgt - Responses
 

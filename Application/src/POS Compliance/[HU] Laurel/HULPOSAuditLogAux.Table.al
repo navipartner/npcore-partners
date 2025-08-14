@@ -195,6 +195,28 @@ table 6150995 "NPR HU L POS Audit Log Aux."
         exit(FindLast());
     end;
 
+    internal procedure GetRequestText() RequestText: Text;
+    var
+        JSONManagement: Codeunit "JSON Management";
+        TempBlob: Codeunit "Temp Blob";
+        InStream: InStream;
+        OutStream: OutStream;
+        RequestTextLine: Text;
+    begin
+        TempBlob.CreateOutStream(OutStream, TextEncoding::UTF8);
+        "Request Content".ExportStream(OutStream);
+        TempBlob.CreateInStream(InStream, TextEncoding::UTF8);
+        while not InStream.EOS do begin
+            InStream.ReadText(RequestTextLine);
+            RequestText += RequestTextLine;
+        end;
+
+        if RequestText <> '' then begin
+            JSONManagement.InitializeFromString(RequestText);
+            RequestText := JSONManagement.WriteObjectToString();
+        end;
+    end;
+
     internal procedure SetRequestText(RequestText: Text)
     var
         TempBlob: Codeunit "Temp Blob";

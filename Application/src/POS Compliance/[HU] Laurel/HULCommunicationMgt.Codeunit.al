@@ -305,6 +305,22 @@ codeunit 6248367 "NPR HU L Communication Mgt."
         end;
     end;
 
+    internal procedure RefiscalizeExistingRequest(var AuditLogEntryNo: Integer): Text
+    var
+        HULPOSAuditLogAux: Record "NPR HU L POS Audit Log Aux.";
+        POSEntry: Record "NPR POS Entry";
+    begin
+        Commit();
+        HULPOSAuditLogAux.SetFilter("POS Entry No.", '<>%1', 0);
+        HULPOSAuditLogAux.SetRange("FCU Document No.", 0);
+        if Page.RunModal(0, HULPOSAuditLogAux) <> Action::LookupOK then
+            Error('');
+        AuditLogEntryNo := HULPOSAuditLogAux."Audit Entry No.";
+        POSEntry.Get(HULPOSAuditLogAux."POS Entry No.");
+
+        exit(HULPOSAuditLogAux.GetRequestText());
+    end;
+
     internal procedure MoneyTransaction(HULCashMgtReason: Record "NPR HU L Cash Mgt. Reason"; HULPOSPaymMethMapp: Record "NPR HU L POS Paym. Meth. Mapp."; Method: Option moneyIn,moneyOut; Amount: Decimal; RoundingAmount: Decimal): Text
     var
         POSPaymentMethod: Record "NPR POS Payment Method";
