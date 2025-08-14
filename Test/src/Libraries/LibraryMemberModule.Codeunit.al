@@ -1060,6 +1060,14 @@ codeunit 85014 "NPR Library - Member Module"
         Txt := Plain;
     end;
 
+    procedure InvokeAttemptCreateMembership(var MemberInfoCapture: Record "NPR MM Member Info Capture")
+    var
+        AttemptCreateMembership: Codeunit "NPR Membership Attempt Create";
+    begin
+        AttemptCreateMembership.SetCreateMembership();
+        AttemptCreateMembership.Run(MemberInfoCapture);
+    end;
+
     procedure SetRandomMemberInfoData(VAR InfoCapture: Record "NPR MM Member Info Capture")
     begin
         Clear(InfoCapture);
