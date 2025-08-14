@@ -7,7 +7,7 @@ import {
 import { login } from '../../fixtures/editorLogin';
 
 // Skipping this test for now, it fails in some environments, we need to publish new version of the app, but will create case for fixing it
-test.skip();
+test.skip()
 
 test.beforeEach(async ({ page }, workerInfo) => {
   const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
