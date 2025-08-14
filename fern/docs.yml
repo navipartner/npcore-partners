@@ -252,9 +252,10 @@ navigation:
                 contents:
                   - endpoint: memberships.service-points.getPointsBalance
                   - endpoint: memberships.service-points.authorizePoints
-                  - endpoint: memberships.service-points.finalizePoints
+                  # - endpoint: memberships.service-points.finalizePoints
                   - endpoint: memberships.service-points.cancelAuthorizationPoints
-                  - endpoint: memberships.service-points.getPointsHistory
+                  - endpoint: memberships.service-points.registerSale
+                  # - endpoint: memberships.service-points.getPointsHistory
             
             - memberships.webhooks:
                 title: Webhooks

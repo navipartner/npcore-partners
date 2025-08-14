@@ -255,5 +255,22 @@ enum 6059827 "NPR MembershipApiFunctions"
     {
         Caption = 'Terminate Subscription';
     }
+    value(600; POINTS_GET_BALANCE)
+    {
+        Caption = 'Get Point Balance';
+    }
+    value(601; POINTS_RESERVE)
+    {
+        Caption = 'Reserve Points';
+    }
+    value(602; POINTS_CANCEL_RESERVATION)
+    {
+        Caption = 'Cancel Points reservation';
+    }
+    value(603; POINTS_REGISTER_SALE)
+    {
+        Caption = 'Register a sale with points';
+    }
+
 }
 #endif

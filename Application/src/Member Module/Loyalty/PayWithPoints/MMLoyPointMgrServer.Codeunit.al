@@ -20,6 +20,7 @@
         MEMBERSHIP_1: Label 'Incorrect membership entry no. referenced from card number %1.';
         MEMBERSHIP_2: Label 'Incorrect setup for membership code %1.';
         MEMBERSHIP_3: Label 'No loyalty program is setup for membership code %1.';
+        MEMBERSHIP_4: Label 'Incorrect membership entry no. referenced from membershipId %1.';
         RESERVE_1: Label 'The authorization code %1 is not valid (%2).';
         RESERVE_2: Label 'The number of points to reserve must be greater than zero.';
         RESERVE_3: Label 'The number of points to refund must be less than zero.';
@@ -37,8 +38,13 @@
 
         _MembershipEvents: Codeunit "NPR MM Membership Events";
 
-    [CommitBehavior(CommitBehavior::Error)]
     procedure RegisterSales(var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpSaleLinesIn: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPaymentLinesIn: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPointsOut: Record "NPR MM Loy. LedgerEntry (Srvr)"; var ResponseMessage: Text; var ResponseMessageId: Text): Boolean
+    begin
+        exit(RegisterSales(TmpAuthorizationIn, TmpSaleLinesIn, TmpPaymentLinesIn, TmpPointsOut, ResponseMessage, ResponseMessageId, NullGuid(), 0));
+    end;
+
+    [CommitBehavior(CommitBehavior::Error)]
+    procedure RegisterSales(var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpSaleLinesIn: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPaymentLinesIn: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPointsOut: Record "NPR MM Loy. LedgerEntry (Srvr)"; var ResponseMessage: Text; var ResponseMessageId: Text; MembershipSystemId: Guid; TestUniqnessOn: Option REFERENCENO,TRANSACTIONID): Boolean
     var
         LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)";
         LoyaltySetup: Record "NPR MM Loyalty Setup";
@@ -50,7 +56,7 @@
         TotalBurnAmount: Decimal;
     begin
 
-        if (not ValidateAuthorization(false, TmpAuthorizationIn, MembershipEntryNo, ResponseMessage, ResponseMessageId)) then
+        if (not ValidateAuthorization(false, TmpAuthorizationIn, MembershipEntryNo, ResponseMessage, ResponseMessageId, MembershipSystemId, TestUniqnessOn)) then
             exit(false);
 
         if (not ValidateRegisterSales(TmpSaleLinesIn, TmpPaymentLinesIn, ResponseMessage, ResponseMessageId)) then
@@ -103,8 +109,13 @@
         exit(true);
     end;
 
-    [CommitBehavior(CommitBehavior::Error)]
     procedure ReservePoints(var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpReserveLinesIn: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPointsOut: Record "NPR MM Loy. LedgerEntry (Srvr)"; var ResponseMessage: Text; var ResponseMessageId: Text): Boolean
+    begin
+        exit(ReservePoints(TmpAuthorizationIn, TmpReserveLinesIn, TmpPointsOut, ResponseMessage, ResponseMessageId, NullGuid(), 0));
+    end;
+
+    [CommitBehavior(CommitBehavior::Error)]
+    procedure ReservePoints(var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpReserveLinesIn: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPointsOut: Record "NPR MM Loy. LedgerEntry (Srvr)"; var ResponseMessage: Text; var ResponseMessageId: Text; MembershipSystemId: Guid; TestUniqnessOn: Option REFERENCENO,TRANSACTIONID): Boolean
     var
         LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)";
         Membership: Record "NPR MM Membership";
@@ -114,7 +125,7 @@
         MembershipEntryNo: Integer;
     begin
 
-        if (not ValidateAuthorization(false, TmpAuthorizationIn, MembershipEntryNo, ResponseMessage, ResponseMessageId)) then
+        if (not ValidateAuthorization(false, TmpAuthorizationIn, MembershipEntryNo, ResponseMessage, ResponseMessageId, MembershipSystemId, TestUniqnessOn)) then
             exit(false);
 
         if (not ValidateReservePoints(TmpReserveLinesIn, MembershipEntryNo, ResponseMessage, ResponseMessageId)) then
@@ -156,8 +167,13 @@
         exit(true);
     end;
 
-    [CommitBehavior(CommitBehavior::Error)]
     procedure CancelReservation(var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpCancelLinesIn: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPointsOut: Record "NPR MM Loy. LedgerEntry (Srvr)"; var ResponseMessage: Text; var ResponseMessageId: Text): Boolean
+    begin
+        exit(CancelReservation(TmpAuthorizationIn, TmpCancelLinesIn, TmpPointsOut, ResponseMessage, ResponseMessageId, NullGuid(), 0));
+    end;
+
+    [CommitBehavior(CommitBehavior::Error)]
+    procedure CancelReservation(var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpCancelLinesIn: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPointsOut: Record "NPR MM Loy. LedgerEntry (Srvr)"; var ResponseMessage: Text; var ResponseMessageId: Text; MembershipSystemId: Guid; TestUniqnessOn: Option REFERENCENO,TRANSACTIONID): Boolean
     var
         LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)";
         ReservationLedgerEntry: Record "NPR MM Loy. LedgerEntry (Srvr)";
@@ -166,7 +182,7 @@
         MembershipEntryNo: Integer;
     begin
 
-        if (not ValidateAuthorization(true, TmpAuthorizationIn, MembershipEntryNo, ResponseMessage, ResponseMessageId)) then
+        if (not ValidateAuthorization(true, TmpAuthorizationIn, MembershipEntryNo, ResponseMessage, ResponseMessageId, MembershipSystemId, TestUniqnessOn)) then
             exit(false);
 
         TmpCancelLinesIn.Reset();
@@ -243,7 +259,7 @@
         MembershipEntryNo: Integer;
     begin
 
-        if (not ValidateAuthorization(true, TmpAuthorizationIn, MembershipEntryNo, ResponseMessage, ResponseMessageId)) then
+        if (not ValidateAuthorization(true, TmpAuthorizationIn, MembershipEntryNo, ResponseMessage, ResponseMessageId, NullGuid(), 0)) then
             exit(false);
 
         TmpCaptureLinesIn.Reset();
@@ -320,7 +336,7 @@
         MembershipEntryNo: Integer;
     begin
 
-        if (not ValidateAuthorization(true, TmpAuthorizationIn, MembershipEntryNo, ResponseMessage, ResponseMessageId)) then
+        if (not ValidateAuthorization(true, TmpAuthorizationIn, MembershipEntryNo, ResponseMessage, ResponseMessageId, NullGuid(), 0)) then
             exit(false);
 
         // validations are done in the validate functions
@@ -339,7 +355,7 @@
 
     end;
 
-    local procedure ValidateAuthorization(BasicCheck: Boolean; var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var MembershipEntryNo: Integer; var ResponseMessage: Text; var ResponseMessageId: Text): Boolean
+    local procedure ValidateAuthorization(BasicCheck: Boolean; var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var MembershipEntryNo: Integer; var ResponseMessage: Text; var ResponseMessageId: Text; MembershipSystemId: Guid; TestUniqnessOn: Option REFERENCENO,TRANSACTIONID): Boolean
     var
         LoyaltyServerStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)";
         StoreSetup: Record "NPR MM Loyalty Store Setup";
@@ -369,39 +385,46 @@
             ResponseMessageId := '-1110';
             exit(false);
         end;
+        if not IsNullGuid(MembershipSystemId) then begin
+            // MemebershipId is used in api. No Authorization Code when coming from api
+            if not Membership.GetBySystemId(MembershipSystemId) then begin
+                ResponseMessage := StrSubstNo(MEMBERSHIP_4, MembershipSystemId);
+                ResponseMessageId := '-1106';
+                exit(false);
+            end;
+            MembershipEntryNo := Membership."Entry No.";
+        end else begin
+            if (StoreSetup."Authorization Code" <> TmpAuthorizationIn."Authorization Code") then begin
+                ResponseMessage := E1102_AUTHORIZATION_INCORRECT;
+                ResponseMessageId := '-1102';
+                exit(false);
+            end;
 
-        if (StoreSetup."Authorization Code" <> TmpAuthorizationIn."Authorization Code") then begin
-            ResponseMessage := E1102_AUTHORIZATION_INCORRECT;
-            ResponseMessageId := '-1102';
-            exit(false);
+            if ((BasicCheck) and (TmpAuthorizationIn."Card Number" = '')) then
+                exit(true);
+
+            if ((BasicCheck) and (TmpAuthorizationIn."Transaction Date" = 0D)) then
+                TmpAuthorizationIn."Transaction Date" := Today();
+
+            //IF ((TmpAuthorizationIn."Transaction Date" = 0D) OR (TmpAuthorizationIn."Transaction Date" >  Today())) THEN BEGIN
+            if (TmpAuthorizationIn."Transaction Date" = 0D) then begin
+                ResponseMessage := E1104_DATE_INCORRECT;
+                ResponseMessageId := '-1104';
+                exit(false);
+            end;
+            MembershipEntryNo := MembershipManagement.GetMembershipFromExtCardNo(TmpAuthorizationIn."Card Number", TmpAuthorizationIn."Transaction Date", ResponseMessage);
+            if (MembershipEntryNo = 0) then begin
+                ResponseMessage := StrSubstNo(MEMBERSHIP_1, TmpAuthorizationIn."Card Number");
+                ResponseMessageId := '-1106';
+                exit(false);
+            end;
+
+            if (not Membership.Get(MembershipEntryNo)) then begin
+                ResponseMessage := StrSubstNo(MEMBERSHIP_1, TmpAuthorizationIn."Card Number");
+                ResponseMessageId := '-1107';
+                exit(false);
+            end;
         end;
-
-        if ((BasicCheck) and (TmpAuthorizationIn."Card Number" = '')) then
-            exit(true);
-
-        if ((BasicCheck) and (TmpAuthorizationIn."Transaction Date" = 0D)) then
-            TmpAuthorizationIn."Transaction Date" := Today();
-
-        //IF ((TmpAuthorizationIn."Transaction Date" = 0D) OR (TmpAuthorizationIn."Transaction Date" >  Today())) THEN BEGIN
-        if (TmpAuthorizationIn."Transaction Date" = 0D) then begin
-            ResponseMessage := E1104_DATE_INCORRECT;
-            ResponseMessageId := '-1104';
-            exit(false);
-        end;
-
-        MembershipEntryNo := MembershipManagement.GetMembershipFromExtCardNo(TmpAuthorizationIn."Card Number", TmpAuthorizationIn."Transaction Date", ResponseMessage);
-        if (MembershipEntryNo = 0) then begin
-            ResponseMessage := StrSubstNo(MEMBERSHIP_1, TmpAuthorizationIn."Card Number");
-            ResponseMessageId := '-1106';
-            exit(false);
-        end;
-
-        if (not Membership.Get(MembershipEntryNo)) then begin
-            ResponseMessage := StrSubstNo(MEMBERSHIP_1, TmpAuthorizationIn."Card Number");
-            ResponseMessageId := '-1107';
-            exit(false);
-        end;
-
         if (not MembershipSetup.Get(Membership."Membership Code")) then begin
             ResponseMessage := StrSubstNo(MEMBERSHIP_2, Membership."Membership Code");
             ResponseMessageId := '-1111';
@@ -443,18 +466,29 @@
 
         if (TmpAuthorizationIn."Entry Type" = TmpAuthorizationIn."Entry Type"::CANCEL_RESERVE) then
             exit(true);
-
-        LoyaltyServerStoreLedger.SetFilter("Entry Type", '=%1', LoyaltyServerStoreLedger."Entry Type"::RECEIPT);
-        LoyaltyServerStoreLedger.SetFilter("Reference Number", '=%1', TmpAuthorizationIn."Reference Number");
-        LoyaltyServerStoreLedger.SetFilter("Company Name", '=%1', TmpAuthorizationIn."Company Name");
-        LoyaltyServerStoreLedger.SetFilter("POS Store Code", '=%1', TmpAuthorizationIn."POS Store Code");
-        LoyaltyServerStoreLedger.SetFilter("POS Unit Code", '=%1', TmpAuthorizationIn."POS Unit Code");
-        if (not LoyaltyServerStoreLedger.IsEmpty()) then begin
-            ResponseMessage := E1109_REF_NUM;
-            ResponseMessageId := '-1109';
-            exit(false);
+        if TestUniqnessOn = TestUniqnessOn::TRANSACTIONID then begin
+            LoyaltyServerStoreLedger.SetFilter("Entry Type", '=%1', TmpAuthorizationIn."Entry Type");
+            LoyaltyServerStoreLedger.SetFilter("Foreign Transaction Id", '=%1', TmpAuthorizationIn."Foreign Transaction Id");
+            LoyaltyServerStoreLedger.SetFilter("Company Name", '=%1', TmpAuthorizationIn."Company Name");
+            LoyaltyServerStoreLedger.SetFilter("POS Store Code", '=%1', TmpAuthorizationIn."POS Store Code");
+            LoyaltyServerStoreLedger.SetFilter("POS Unit Code", '=%1', TmpAuthorizationIn."POS Unit Code");
+            if (not LoyaltyServerStoreLedger.IsEmpty()) then begin
+                ResponseMessage := 'requestId must be unique';
+                ResponseMessageId := '-1109';
+                exit(false);
+            end;
+        end else begin
+            LoyaltyServerStoreLedger.SetFilter("Entry Type", '=%1', LoyaltyServerStoreLedger."Entry Type"::RECEIPT);
+            LoyaltyServerStoreLedger.SetFilter("Reference Number", '=%1', TmpAuthorizationIn."Reference Number");
+            LoyaltyServerStoreLedger.SetFilter("Company Name", '=%1', TmpAuthorizationIn."Company Name");
+            LoyaltyServerStoreLedger.SetFilter("POS Store Code", '=%1', TmpAuthorizationIn."POS Store Code");
+            LoyaltyServerStoreLedger.SetFilter("POS Unit Code", '=%1', TmpAuthorizationIn."POS Unit Code");
+            if (not LoyaltyServerStoreLedger.IsEmpty()) then begin
+                ResponseMessage := E1109_REF_NUM;
+                ResponseMessageId := '-1109';
+                exit(false);
+            end;
         end;
-
         TmpAuthorizationIn."Authorization Code" := '';
         TmpAuthorizationIn.Modify();
         exit(true);
@@ -1183,5 +1217,11 @@
         exit(UpperCase(DelChr(Format(CreateGuid()), '=', '{}-')));
     end;
 #pragma warning restore
+    local procedure NullGuid(): Guid
+    var
+        NullGuidValue: Guid;
+    begin
+        exit(NullGuidValue);
+    end;
 }
 

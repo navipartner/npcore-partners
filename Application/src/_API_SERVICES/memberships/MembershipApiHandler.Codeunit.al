@@ -39,6 +39,7 @@ codeunit 6185122 "NPR MembershipApiHandler"
         MembershipSubscrApiAgent: Codeunit "NPR MembershipSubscrAgent";
         PaymentMethodApiAgent: Codeunit "NPR API SubscriptionPmtMethods";
         MembershipAttributesAgent: Codeunit "NPR MembershipAttributesAgent";
+        LoyaltyApiAgent: Codeunit "NPR LoyaltyApiAgent";
         MembershipListAgent: Codeunit "NPR MembershipListAgent";
     begin
         case _ApiFunction of
@@ -202,6 +203,14 @@ codeunit 6185122 "NPR MembershipApiHandler"
             _ApiFunction::TERMINATE_SUBSCRIPTION:
                 _Response := MembershipSubscrApiAgent.TerminateSubscription(_Request);
 
+            _ApiFunction::POINTS_GET_BALANCE:
+                _Response := LoyaltyApiAgent.GetMembershipPoints(_Request);
+            _ApiFunction::POINTS_RESERVE:
+                _Response := LoyaltyApiAgent.CreateReservationTransaction(_Request);
+            _ApiFunction::POINTS_CANCEL_RESERVATION:
+                _Response := LoyaltyApiAgent.CancelReservationTransaction(_Request);
+            _ApiFunction::POINTS_REGISTER_SALE:
+                _Response := LoyaltyApiAgent.RegisterSaleTransaction(_Request);
         end;
     end;
 

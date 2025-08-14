@@ -3,7 +3,7 @@
 types:
   AuthorizationCode:
     type: string
-    docs: A unique identifier for the authorize points transaction.
+    docs: A unique identifier for the authorized points transaction.
     examples:
       - name: ExampleAuthorizationCode
         value: "362FB68C444E41D691FF19EE470B30A1"
@@ -19,11 +19,15 @@ types:
     docs: Represents the current loyalty points balance for a membership.
     properties:
       balance: integer
+      valueAsCurrency: integer
+      currencyCode: string
     examples:
       - name: ExamplePointsBalance
         value:
           balance: 1500
-  
+          valueAsCurrency: 150
+          currencyCode: "DKK"
+
   ExternalReferenceNo:
     type: string
     docs: Your external reference number, such as a POS Receipt number, invoice number etc.
@@ -58,51 +62,56 @@ types:
       - FINALIZED
       - CANCELLED
 
+  AuthorizePointsType:
+    enum:
+      - DEPOSIT
+      - WITHDRAW
+
   AuthorizePointsRequest:
-    docs: Request to reserve or issue points that will be finalized later.
+    docs: Request to reserve a withdrawal or deposit of points that will be finalized later.
     properties:
       requestId:
         type: uuid
         docs: A unique identifier for the request. If you send the same requestId twice, it will be guaranteed to only trigger once.
-      pointsAdjustment:
+      type:
+        type: AuthorizePointsType
+        docs: The type of the request.
+      pointsToReserve:
         type: integer
-        docs: The number of points to adjust. Use a negative value for deductions.
+        docs: The positive number of points to reserve. Set type to withdrawal to deduct points.
       reason:
         type: string
-        docs: A description of why the points are being adjusted.
+        docs: A description of why the points are being reserved.
       timeoutPeriod:
-        type: integer
+        type: optional<integer>
         docs: The duration in minutes for which the authorization is valid.
       externalReferenceNo: ExternalReferenceNo
       externalSystemIdentifier: ExternalSystemIdentifier
       externalSystemUserIdentifier: ExternalSystemUserIdentifier
       externalBusinessUnitIdentifier: ExternalBusinessUnitIdentifier
-      autoFinalize:
-        type: boolean
-        docs: if set to true, you don't need to finalize manually. Relevant when assigning points for completed sales with no natural two step transaction required.
     examples:
       - name: ExampleAuthorizePointsRequest
         value:
           requestId: "11aa22bb-33cc-44dd-55ee-66ff77aa88bb"
-          pointsAdjustment: -200
+          type: WITHDRAW
+          pointsToReserve: 200
           reason: "Payment in POS sale"
           timeoutPeriod: 300
           externalReferenceNo: "RCPT-582399102"
           externalSystemIdentifier: "BCTenant-POSStore"
           externalSystemUserIdentifier: "SalespersonCode"
           externalBusinessUnitIdentifier: $ExternalBusinessUnitIdentifier.ExternalExternalBusinessUnitIdentifier
-          autoFinalize: false
       - name: ExampleAuthorizePointsAssignmentRequest
         value:
           requestId: "11aa22bb-33cc-44dd-55ee-66ff77aa88bb"
-          pointsAdjustment: 100
+          type: DEPOSIT
+          pointsToReserve: 100
           reason: "Assigned points as apology for order delay"
           timeoutPeriod: 300
           externalReferenceNo: "TICKET-8245924"
           externalSystemIdentifier: "Shopify-Gorgias"
           externalBusinessUnitIdentifier: $ExternalBusinessUnitIdentifier.ExternalExternalBusinessUnitIdentifier
           externalSystemUserIdentifier: "550e8400-e29b-41d4-a716-446655440000"
-          autoFinalize: true
 
   AuthorizePointsResponse:
     docs: Response containing the details of a successful point authorization.
@@ -110,13 +119,13 @@ types:
       authorizationCode: 
           type: string
           docs: A unique identifier for a points transaction to be used for Finalize or Cancel the points transaction. Will not be returned if autoFinalize is set to true.
-      status: PointTransactionState
-      expiresAt: datetime
+      expiresAt: 
+          type: datetime
+          docs: The date and time when the authorization expires if a timeoutPeriod is specified in the request.
     examples:
       - name: ExampleAuthPointsResponse
         value:
           authorizationCode: $AuthorizationCode.ExampleAuthorizationCode
-          status: AUTHORIZED
           expiresAt: "2025-06-23T12:05:00Z"
 
   CancelAuthorizationRequest:
@@ -131,14 +140,12 @@ types:
   CancelPointsResponse:
     docs: Response from a successful points cancellation.
     properties:
-      status: PointTransactionState
       newBalance:
         type: integer
         docs: The new points balance after the finalization.
     examples:
       - name: ExampleCancelPointsResponse
         value:
-          status: CANCELLED
           newBalance: 1500
 
   FinalizePointsRequest:
@@ -228,3 +235,84 @@ types:
         value:
           history:
             - $PointTransaction.ExampleSaleTransaction
+
+  RegisterSaleRequest:
+    docs: A sale transaction for a membership.
+    properties:
+      requestId:
+        type: uuid
+        docs: A unique identifier for the request. If you send the same requestId twice, it will be guaranteed to only trigger once.
+      externalReferenceNo: ExternalReferenceNo
+      externalSystemIdentifier: ExternalSystemIdentifier
+      externalSystemUserIdentifier: ExternalSystemUserIdentifier
+      externalBusinessUnitIdentifier: ExternalBusinessUnitIdentifier
+      items: optional<list<RegisterSalesItem>>
+      reservations: optional<list<RegisterSalesReservation>>
+    examples:
+      - name: ExampleRegisterSale
+        value:
+          requestId: "4939d553-5b7d-434c-9c64-2f1b8620ece5"
+          externalReferenceNo: "8969718092"
+          externalSystemIdentifier: "BCTenant-POSStore"
+          externalSystemUserIdentifier: "SalespersonCode"
+          externalBusinessUnitIdentifier: $ExternalBusinessUnitIdentifier.ExternalExternalBusinessUnitIdentifier
+          items: 
+          - $RegisterSalesItem.ExampleRegisterSalesItems 
+          reservations: 
+          - $RegisterSalesReservation.ExampleRegisterSalesReservation
+
+
+  RegisterSalesItem:
+    docs: A sale line in a sale being registered to earn points.
+    properties:
+      itemCode: 
+        type: string
+        docs: An ideniftication of the item
+      pointsEarned: 
+        type: integer
+        docs: Points earned by the sold item. For deduction of points use a negative value
+      variantCode: optional<string>
+      quantity: optional<double>
+      description: optional<string>
+      amountInclVAT: 
+        type: optional<double>
+        docs: The amount including VAT in system currency
+    examples:
+      - name : ExampleRegisterSalesItems
+        value:
+          itemCode: "I52892"
+          variantCode: "V9529"
+          pointsEarned: 12
+          quantity: 2.00
+          description: "Item Description"
+          amountInclVAT: 120.00
+
+  RegisterSalesReservation:
+    docs: A reservation to finalize.
+    properties:
+      authorizationCode: 
+        type: string
+        docs: A authorization code of a previously authorized reservation
+    examples:
+      - name : ExampleRegisterSalesReservation
+        value:
+          authorizationCode: $AuthorizationCode.ExampleAuthorizationCode
+
+  RegisterSaleResponse:
+    docs: A response for a successful post of a sale with points
+    properties:
+      pointsEarned: 
+        type: integer
+        docs: The total points earned by the transaction
+      pointsCaptured: 
+        type: integer
+        docs: the total amount of points captured by the transaction
+      newBalance: 
+        type: integer
+        docs: The points balance on the membership after the transaction
+    examples:
+      - name: ExampleRegisterSaleResponse
+        value:
+          pointsEarned: 12
+          pointsCaptured: 200
+          newBalance: 1312

@@ -33,9 +33,9 @@ service:
 
     authorizePoints:
       display-name: Authorize Points Transaction
-      docs: Creates an authorization for a points adjustment. This reserves the points for a specified period and must be finalized.
+      docs: Creates an authorization for a points withdrawal or deposit. This reserves the points for a specified period and must be finalized.
       method: POST
-      path: /auth
+      path: /reserve
       request: pointTypes.AuthorizePointsRequest
       response: pointTypes.AuthorizePointsResponse
       availability: in-development
@@ -53,8 +53,8 @@ service:
     cancelAuthorizationPoints:
       display-name: Cancel Point authorization
       docs: Cancels a pending point reservation. Only possible before it has been finalized.
-      method: POST
-      path: /cancel
+      method: DELETE
+      path: /reserve
       request: pointTypes.CancelAuthorizationRequest
       response: pointTypes.CancelPointsResponse
       availability: in-development
@@ -69,38 +69,57 @@ service:
           response:
             body: $pointTypes.CancelPointsResponse.ExampleCancelPointsResponse
 
-    finalizePoints:
-      display-name: Finalize Points Transaction
-      docs: Finalizes an authorized points transaction using the transaction ID.
-      method: POST
-      path: /finalize
-      request: pointTypes.FinalizePointsRequest
-      response: pointTypes.FinalizePointsResponse
-      availability: in-development
-      examples:
-        - name: "Finalizes a point transaction"
-          path-parameters:
-            tenant: $globalApiTypes.tenant.Exampletenant
-            environment: $globalApiTypes.environment.ExampleenvironmentProduction
-            company: $globalApiTypes.Company.ExampleCompanyCronus
-            membershipId: $simpleMemberTypes.MembershipId.ExampleMembershipId
-          request: $pointTypes.FinalizePointsRequest.ExampleFinalizePointsRequest
-          response:
-            body: $pointTypes.FinalizePointsResponse.ExampleFinalizePointsResponse
+    # finalizePoints:
+    #   display-name: Finalize Points Transaction
+    #   docs: Finalizes an authorized points transaction using the transaction ID.
+    #   method: POST
+    #   path: /finalize
+    #   request: pointTypes.FinalizePointsRequest
+    #   response: pointTypes.FinalizePointsResponse
+    #   availability: in-development
+    #   examples:
+    #     - name: "Finalizes a point transaction"
+    #       path-parameters:
+    #         tenant: $globalApiTypes.tenant.Exampletenant
+    #         environment: $globalApiTypes.environment.ExampleenvironmentProduction
+    #         company: $globalApiTypes.Company.ExampleCompanyCronus
+    #         membershipId: $simpleMemberTypes.MembershipId.ExampleMembershipId
+    #       request: $pointTypes.FinalizePointsRequest.ExampleFinalizePointsRequest
+    #       response:
+    #         body: $pointTypes.FinalizePointsResponse.ExampleFinalizePointsResponse
 
-    getPointsHistory:
-      display-name: Get Points History
-      docs: Retrieves the transaction history for a membership's loyalty points.
-      method: GET
-      path: /history
-      response: pointTypes.PointsHistoryResponse
+    registerSale:
+      display-name: Register Sale
+      docs: Registers a sale, with points being added to membership based on the contents of it. Reservations on the membership can be finalized.
+      method: POST
+      path: ''
+      request: pointTypes.RegisterSaleRequest
+      response: pointTypes.RegisterSaleResponse
       availability: in-development
       examples:
-        - name: "Get points history"
+        - name: "Register a sale"
           path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             membershipId: $simpleMemberTypes.MembershipId.ExampleMembershipId
-          response:
-            body: $pointTypes.PointsHistoryResponse.ExamplePointsHistory
+          request: $pointTypes.RegisterSaleRequest.ExampleRegisterSale
+          response: 
+            body: $pointTypes.RegisterSaleResponse.ExampleRegisterSaleResponse
+
+    # getPointsHistory:
+    #   display-name: Get Points History
+    #   docs: Retrieves the transaction history for a membership's loyalty points.
+    #   method: GET
+    #   path: /history
+    #   response: pointTypes.PointsHistoryResponse
+    #   availability: in-development
+    #   examples:
+    #     - name: "Get points history"
+    #       path-parameters:
+    #         tenant: $globalApiTypes.tenant.Exampletenant
+    #         environment: $globalApiTypes.environment.ExampleenvironmentProduction
+    #         company: $globalApiTypes.Company.ExampleCompanyCronus
+    #         membershipId: $simpleMemberTypes.MembershipId.ExampleMembershipId
+    #       response:
+    #         body: $pointTypes.PointsHistoryResponse.ExamplePointsHistory

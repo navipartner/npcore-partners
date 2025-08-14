@@ -208,13 +208,8 @@
                 trigger OnAction()
                 var
                     ExpireReservation: Codeunit "NPR MMLoyaltyExpireReservation";
-                    ConfirmExpire: Label 'Expire all open reservations from %1 until %2?';
-                    UntilDate: Date;
                 begin
-                    Rec.TestField(ReservationMaxAge);
-                    UntilDate := Today() - Abs(Today() - CalcDate(Rec.ReservationMaxAge));
-                    if (Confirm(ConfirmExpire, true, Rec.CancelReservationFromDate, UntilDate)) then
-                        ExpireReservation.ExpireReservationStore(Rec);
+                    ExpireReservation.Run();
                 end;
             }
             action(ExpireReservationSelectedStore)

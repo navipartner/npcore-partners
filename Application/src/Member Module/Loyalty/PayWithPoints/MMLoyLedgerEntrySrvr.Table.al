@@ -85,6 +85,11 @@
             Caption = 'Retail Id';
             DataClassification = CustomerContent;
         }
+        field(180; "Expires At"; DateTime)
+        {
+            Caption = 'Expires At';
+            DataClassification = CustomerContent;
+        }
         field(1000; "Reservation is Captured"; Boolean)
         {
             CalcFormula = Exist("NPR MM Members. Points Entry" WHERE("Authorization Code" = FIELD("Authorization Code"),

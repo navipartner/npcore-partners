@@ -115,6 +115,11 @@
             Caption = 'Cancel Reservation From Date';
             DataClassification = CustomerContent;
         }
+        field(71; LastExpireUpdate; DateTime)
+        {
+            Caption = 'Last Expire At Update';
+            DataClassification = CustomerContent;
+        }
         field(75; ReservationMaxAge; DateFormula)
         {
             Caption = 'Reservation Max Age';
