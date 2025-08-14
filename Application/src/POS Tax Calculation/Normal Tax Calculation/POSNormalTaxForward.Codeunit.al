@@ -101,6 +101,7 @@
         Rec."Line Amount" := POSSaleTax."Calculated Line Amount";
         if Rec.Amount = 0 then
             Rec."Amount Including VAT" := 0;
+        OnAfterUpdateSourceAfterCalculateTax(POSSaleTax, Rec);
     end;
 
     [IntegrationEvent(false, false)]
@@ -120,6 +121,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterRoundActiveTaxAmountLine(var POSSaleTaxLine: record "NPR POS Sale Tax Line"; Rec: Record "NPR POS Sale Line"; POSSaleTax: Record "NPR POS Sale Tax"; Currency: Record Currency; TaxType: Enum "NPR POS Tax Type")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterUpdateSourceAfterCalculateTax(POSSaleTax: Record "NPR POS Sale Tax"; var Rec: Record "NPR POS Sale Line")
     begin
     end;
 }

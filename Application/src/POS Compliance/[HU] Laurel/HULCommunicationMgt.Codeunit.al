@@ -153,7 +153,7 @@ codeunit 6248367 "NPR HU L Communication Mgt."
 
         AddPOSStoreInfoHeader(JsonTextWriter, POSSale."Register No.", POSSale."Sales Ticket No.");
 
-        AddPOSEntrySalesLines(JsonTextWriter, ReturnPOSEntry, true);
+        AddPOSEntrySalesLines(JsonTextWriter, ReturnPOSEntry);
 
         Change := CalculateChangeAmount(ReturnPOSEntry);
         Rounding := RoundRoundingAmount(CalculateRoundingAmount(ReturnPOSEntry));
@@ -374,7 +374,7 @@ codeunit 6248367 "NPR HU L Communication Mgt."
 
         AddPOSStoreInfoHeader(JsonTextWriter, POSEntry."POS Unit No.", POSEntry."Document No.");
 
-        AddPOSEntrySalesLines(JsonTextWriter, POSEntry, HULPOSAuditLogAux."Original Document No." <> 0);
+        AddPOSEntrySalesLines(JsonTextWriter, POSEntry);
 
         AddPOSEntryPaymentLines(JsonTextWriter, POSEntry, HULPOSAuditLogAux);
 
@@ -402,7 +402,7 @@ codeunit 6248367 "NPR HU L Communication Mgt."
 
         AddPOSStoreInfoHeader(JsonTextWriter, POSEntry."POS Unit No.", POSEntry."Document No.");
 
-        AddPOSEntrySalesLines(JsonTextWriter, POSEntry, HULPOSAuditLogAux."Original Document No." <> 0);
+        AddPOSEntrySalesLines(JsonTextWriter, POSEntry);
 
         AddPOSEntryPaymentLines(JsonTextWriter, POSEntry, HULPOSAuditLogAux);
 
@@ -438,7 +438,7 @@ codeunit 6248367 "NPR HU L Communication Mgt."
 
         AddPOSStoreInfoHeader(JsonTextWriter, POSEntry."POS Unit No.", POSEntry."Document No.");
 
-        AddPOSEntrySalesLines(JsonTextWriter, POSEntry, HULPOSAuditLogAux."Original Document No." <> 0);
+        AddPOSEntrySalesLines(JsonTextWriter, POSEntry);
 
         AddPOSEntryPaymentLines(JsonTextWriter, POSEntry, HULPOSAuditLogAux);
 
@@ -470,7 +470,7 @@ codeunit 6248367 "NPR HU L Communication Mgt."
 
         AddPOSStoreInfoHeader(JsonTextWriter, POSEntry."POS Unit No.", POSEntry."Document No.");
 
-        AddPOSEntrySalesLines(JsonTextWriter, POSEntry, HULPOSAuditLogAux."Original Document No." <> 0);
+        AddPOSEntrySalesLines(JsonTextWriter, POSEntry);
 
         AddPOSEntryPaymentLines(JsonTextWriter, POSEntry, HULPOSAuditLogAux);
 
@@ -521,7 +521,7 @@ codeunit 6248367 "NPR HU L Communication Mgt."
         JsonTextWriter.WriteEndArray();
     end;
 
-    local procedure AddPOSEntrySalesLines(var JsonTextWriter: Codeunit "Json Text Reader/Writer"; POSEntry: Record "NPR POS Entry"; ReturnSale: Boolean)
+    local procedure AddPOSEntrySalesLines(var JsonTextWriter: Codeunit "Json Text Reader/Writer"; POSEntry: Record "NPR POS Entry")
     var
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
     begin
@@ -537,13 +537,12 @@ codeunit 6248367 "NPR HU L Communication Mgt."
                 JsonTextWriter.WriteStringProperty('iVATIndex', GetVATPostSetupMappingIndex(POSEntrySalesLine."VAT Bus. Posting Group", POSEntrySalesLine."VAT Prod. Posting Group"));
                 JsonTextWriter.WriteStringProperty('sArtNr', POSEntrySalesLine."No.");
 
-                if ReturnSale then begin
-                    JsonTextWriter.WriteStringProperty('fPrice', FormatDecimalValue((Abs(POSEntrySalesLine."Amount Incl. VAT") + Abs(POSEntrySalesLine."Line Discount Amount Incl. VAT")) / Abs(POSEntrySalesLine.Quantity)));
-                    JsonTextWriter.WriteStringProperty('fQuantity', FormatQuantityValue(Abs(POSEntrySalesLine.Quantity)));
-                end else begin
-                    JsonTextWriter.WriteStringProperty('fPrice', FormatDecimalValue((POSEntrySalesLine."Amount Incl. VAT" + POSEntrySalesLine."Line Discount Amount Incl. VAT") / POSEntrySalesLine.Quantity));
-                    JsonTextWriter.WriteStringProperty('fQuantity', FormatQuantityValue(POSEntrySalesLine.Quantity));
-                end;
+                if POSEntry."Prices Including VAT" then
+                    JsonTextWriter.WriteStringProperty('fPrice', FormatDecimalValue(Round(POSEntrySalesLine."Unit Price", 1)))
+                else
+                    JsonTextWriter.WriteStringProperty('fPrice', FormatDecimalValue(Round(POSEntrySalesLine."Unit Price" * (1 + POSEntrySalesLine."VAT %" / 100), 1)));
+
+                JsonTextWriter.WriteStringProperty('fQuantity', FormatQuantityValue(Abs(POSEntrySalesLine.Quantity)));
 
                 if POSEntrySalesLine."Line Discount %" <> 0 then
                     AddItemDiscountArray(JsonTextWriter, POSEntrySalesLine);
@@ -604,9 +603,8 @@ codeunit 6248367 "NPR HU L Communication Mgt."
         end else
             JsonTextWriter.WriteStartArray('payments');
 
-        foreach POSEntryPaymentLineDictKey in POSEntryPaymentLineDict.Keys() do begin
+        foreach POSEntryPaymentLineDictKey in POSEntryPaymentLineDict.Keys() do
             AddPaymentLineInformation(JsonTextWriter, POSEntryPaymentLineDictKey, POSEntryPaymentLineDict.Get(POSEntryPaymentLineDictKey), HULPOSAuditLogAux."Original Document No." <> 0);
-        end;
 
         if ChangeLineCount <> 0 then
             AddPaymentChangeObj(JsonTextWriter, POSEntry);
@@ -659,7 +657,7 @@ codeunit 6248367 "NPR HU L Communication Mgt."
         JsonTextWriter.WriteStartObject('');
         JsonTextWriter.WriteStartObject('stPayment');
         JsonTextWriter.WriteStringProperty('sName', RoundingDescLbl);
-        JsonTextWriter.WriteStringProperty('fAmount', FormatDecimalValue(-1 * HULPOSAuditLogAux."Rounding Amount"));
+        JsonTextWriter.WriteStringProperty('fAmount', FormatDecimalValue(HULPOSAuditLogAux."Rounding Amount"));
         JsonTextWriter.WriteStringProperty('iFiscalType', Enum::"NPR HU L Payment Fiscal Type"::ROUNDING.AsInteger());
         JsonTextWriter.WriteEndObject(); // stPayment
         JsonTextWriter.WriteEndObject();
@@ -776,9 +774,8 @@ codeunit 6248367 "NPR HU L Communication Mgt."
                     EFTReceiptText := CopyStr(EFTReceipt.Text.Trim(), 1, MaxStrLen(EFTReceipt.Text));
                     TextList.Add(CopyStr(EFTReceiptText, 1, MaxCharactersAllowed));
 
-                    if StrLen(EFTReceiptText) > MaxCharactersAllowed then begin
+                    if StrLen(EFTReceiptText) > MaxCharactersAllowed then
                         TextList.Add(CopyStr(EFTReceiptText, MaxCharactersAllowed + 1, MaxStrLen(EFTReceiptText)));
-                    end;
                 until EFTReceipt.Next() = 0;
         until EFTTransactionRequest.Next() = 0;
 
@@ -788,9 +785,8 @@ codeunit 6248367 "NPR HU L Communication Mgt."
         JsonTextWriter.WriteStringProperty('iTextCnt', TextList.Count());
         JsonTextWriter.WriteStartArray('texts');
 
-        foreach EFTReceiptText in TextList do begin
+        foreach EFTReceiptText in TextList do
             AddFreePrintLine(JsonTextWriter, EFTReceiptText, 0, 0);
-        end;
 
         JsonTextWriter.WriteEndArray(); // texts
     end;

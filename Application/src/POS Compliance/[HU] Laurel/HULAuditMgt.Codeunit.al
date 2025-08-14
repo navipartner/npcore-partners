@@ -87,6 +87,104 @@ codeunit 6185037 "NPR HU L Audit Mgt."
     end;
     #endregion
 
+    #region HU Laurel Fiscal - Rounding on POS
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Normal Tax Forward", 'OnAfterRoundActiveTaxAmountLine', '', false, false)]
+    local procedure OnAfterRoundActiveTaxAmountLine(var POSSaleTaxLine: record "NPR POS Sale Tax Line"; Rec: Record "NPR POS Sale Line"; POSSaleTax: Record "NPR POS Sale Tax"; Currency: Record Currency; TaxType: Enum "NPR POS Tax Type")
+    var
+        POSUnit: Record "NPR POS Unit";
+    begin
+        if not IsHULFiscalizationEnabled() then
+            exit;
+        if not POSUnit.Get(Rec."Register No.") then
+            exit;
+        if not IsHULaurelAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        POSSaleTaxLine."Discount Amount" := Round(POSSaleTaxLine."Discount Amount", 1);
+        POSSaleTaxLine."Amount Excl. Tax" := POSSaleTaxLine."Unit Price Excl. Tax" * POSSaleTaxLine.Quantity - POSSaleTaxLine."Discount Amount" - POSSaleTaxLine."Invoice Disc. Amount";
+        POSSaleTaxLine."Line Amount" := POSSaleTaxLine."Unit Price Excl. Tax" * POSSaleTaxLine.Quantity - POSSaleTaxLine."Discount Amount";
+        POSSaleTaxLine."Amount Incl. Tax" := POSSaleTaxLine."Amount Excl. Tax" * (1 + POSSaleTaxLine."Tax %" / 100);
+        POSSaleTaxLine."Unit Price Incl. Tax" := POSSaleTaxLine."Unit Price Excl. Tax" * (1 + POSSaleTaxLine."Tax %" / 100);
+        POSSaleTaxLine."Unit Tax" := POSSaleTaxLine."Unit Price Incl. Tax" - POSSaleTaxLine."Unit Price Excl. Tax";
+        POSSaleTaxLine."Tax Amount" := POSSaleTaxLine."Amount Incl. Tax" - POSSaleTaxLine."Amount Excl. Tax";
+        POSSaleTaxLine."Line Amount" := Round(POSSaleTaxLine."Line Amount", 1);
+        POSSaleTaxLine."Amount Incl. Tax" := Round(POSSaleTaxLine."Amount Incl. Tax", 1);
+        POSSaleTaxLine."Amount Excl. Tax" := Round(POSSaleTaxLine."Amount Excl. Tax", 0.01);
+        POSSaleTaxLine."Tax Amount" := POSSaleTaxLine."Amount Incl. Tax" - POSSaleTaxLine."Amount Excl. Tax";
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Normal Tax Backward", 'OnAfterRoundActiveTaxAmountLine', '', false, false)]
+    local procedure OnAfterRoundActiveTaxAmountLineB(var POSSaleTaxLine: record "NPR POS Sale Tax Line"; Rec: Record "NPR POS Sale Line"; POSSaleTax: Record "NPR POS Sale Tax"; Currency: Record Currency; TaxType: Enum "NPR POS Tax Type")
+    var
+        POSUnit: Record "NPR POS Unit";
+    begin
+        if not IsHULFiscalizationEnabled() then
+            exit;
+        if not POSUnit.Get(Rec."Register No.") then
+            exit;
+        if not IsHULaurelAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        POSSaleTaxLine."Discount Amount" := Round(POSSaleTaxLine."Discount Amount", 1);
+        POSSaleTaxLine."Amount Excl. Tax" := POSSaleTaxLine."Amount Incl. Tax" / (1 + POSSaleTaxLine."Tax %" / 100);
+        POSSaleTaxLine."Amount Incl. Tax" := POSSaleTaxLine."Unit Price Incl. Tax" * POSSaleTaxLine.Quantity - POSSaleTaxLine."Discount Amount" - POSSaleTaxLine."Invoice Disc. Amount";
+        POSSaleTaxLine."Line Amount" := POSSaleTaxLine."Unit Price Incl. Tax" * POSSaleTaxLine.Quantity - POSSaleTaxLine."Discount Amount";
+        POSSaleTaxLine."Unit Price Excl. Tax" := POSSaleTaxLine."Unit Price Incl. Tax" / (1 + POSSaleTaxLine."Tax %" / 100);
+        POSSaleTaxLine."Unit Tax" := POSSaleTaxLine."Unit Price Incl. Tax" - POSSaleTaxLine."Unit Price Excl. Tax";
+        POSSaleTaxLine."Tax Amount" := POSSaleTaxLine."Amount Incl. Tax" - POSSaleTaxLine."Amount Excl. Tax";
+        POSSaleTaxLine."Line Amount" := Round(POSSaleTaxLine."Line Amount", 1);
+        POSSaleTaxLine."Amount Incl. Tax" := Round(POSSaleTaxLine."Amount Incl. Tax", 1);
+        POSSaleTaxLine."Amount Excl. Tax" := Round(POSSaleTaxLine."Amount Excl. Tax", 0.01);
+        POSSaleTaxLine."Tax Amount" := POSSaleTaxLine."Amount Incl. Tax" - POSSaleTaxLine."Amount Excl. Tax";
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Normal Tax Forward", 'OnAfterUpdateSourceAfterCalculateTax', '', false, false)]
+    local procedure OnAfterUpdateSourceAfterCalculateTaxOnNormalTaxForward(POSSaleTax: Record "NPR POS Sale Tax"; var Rec: Record "NPR POS Sale Line")
+    var
+        POSUnit: Record "NPR POS Unit";
+    begin
+        if not IsHULFiscalizationEnabled() then
+            exit;
+        if not POSUnit.Get(Rec."Register No.") then
+            exit;
+        if not IsHULaurelAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        Rec."Line Amount" += POSSaleTax."Calculated Discount Amount";
+        POSSaleTax."Calculated Discount Amount" := Round(POSSaleTax."Calculated Discount Amount", 1);
+        Rec."Line Amount" -= POSSaleTax."Calculated Discount Amount";
+        Rec."Amount Including VAT" := Round(POSSaleTax."Calculated Amount Excl. Tax", 1) * (1 + Rec."VAT %" / 100);
+        Rec."Line Amount" := Round(POSSaleTax."Calculated Line Amount", 1);
+        Rec."Discount Amount" := Round(POSSaleTax."Calculated Discount Amount", 1);
+        Rec."Amount Including VAT" := Round(POSSaleTax."Calculated Amount Incl. Tax", 1);
+        if Rec.Amount = 0 then
+            Rec."Amount Including VAT" := 0;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Normal Tax Backward", 'OnAfterUpdateSourceAfterCalculateTax', '', false, false)]
+    local procedure OnAfterUpdateSourceAfterCalculateTaxOnNormalTaxBackward(POSSaleTax: Record "NPR POS Sale Tax"; var Rec: Record "NPR POS Sale Line")
+    var
+        POSUnit: Record "NPR POS Unit";
+    begin
+        if not IsHULFiscalizationEnabled() then
+            exit;
+        if not POSUnit.Get(Rec."Register No.") then
+            exit;
+        if not IsHULaurelAuditEnabled(POSUnit."POS Audit Profile") then
+            exit;
+
+        Rec."Line Amount" += POSSaleTax."Calculated Discount Amount";
+        POSSaleTax."Calculated Discount Amount" := Round(POSSaleTax."Calculated Discount Amount", 1);
+        Rec."Line Amount" -= POSSaleTax."Calculated Discount Amount";
+        Rec."Amount Including VAT" := Round(POSSaleTax."Calculated Amount Excl. Tax", 1) * (1 + Rec."VAT %" / 100);
+        Rec."Line Amount" := Round(POSSaleTax."Calculated Line Amount", 1);
+        Rec."Discount Amount" := Round(POSSaleTax."Calculated Discount Amount", 1);
+        Rec."Amount Including VAT" := Round(POSSaleTax."Calculated Amount Incl. Tax", 1);
+        if Rec.Amount = 0 then
+            Rec."Amount Including VAT" := 0;
+    end;
+    #endregion HU Laurel Fiscal - Rounding on POS
+
     #region HU Laurel Fiscal - Audit Profile Mgt
     local procedure AddHULaurelAuditHandler(var tmpRetailList: Record "NPR Retail List")
     begin
@@ -420,7 +518,7 @@ codeunit 6185037 "NPR HU L Audit Mgt."
         HULPOSAuditLogAux."Amount Incl. Tax" := POSEntry."Amount Incl. Tax";
         HULPOSAuditLogAux."Change Amount" := CalculateChangeAmount(POSEntry);
         HULPOSAuditLogAux."Salesperson Code" := POSEntry."Salesperson Code";
-        HULPOSAuditLogAux."Rounding Amount" := RoundRoundingAmount(CalculateRounding(POSEntry));
+        HULPOSAuditLogAux."Rounding Amount" := FindRoundingAmount(POSEntry);
 
         HULPOSAuditLogAux.Insert();
     end;
@@ -674,37 +772,15 @@ codeunit 6185037 "NPR HU L Audit Mgt."
         exit(POSSaleLine.Modify(true));
     end;
 
-    local procedure RoundRoundingAmount(Amount: Decimal): Decimal
-    begin
-        if (Round(Amount, 1, '=') > 2) or (Round(Amount, 1, '=') < -2) then
-            exit(Round(Amount, 1, '<'))
-        else
-            exit(Round(Amount, 1, '='));
-    end;
-
-    local procedure CalculateRounding(POSEntry: Record "NPR POS Entry"): Decimal
+    local procedure FindRoundingAmount(POSEntry: Record "NPR POS Entry"): Decimal
     var
         POSEntrySalesLine: Record "NPR POS Entry Sales Line";
-        POSEntryPaymentLine: Record "NPR POS Entry Payment Line";
-        TotalSale: Decimal;
-        TotalPaid: Decimal;
-        TotalDiscountAmount: Decimal;
     begin
-        POSEntrySalesLine.SetLoadFields("Amount Incl. VAT", "Line Discount Amount Incl. VAT", "VAT %");
+        POSEntrySalesLine.SetLoadFields("Amount Incl. VAT");
         POSEntrySalesLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        POSEntrySalesLine.SetFilter(Type, '%1|%2', POSEntrySalesLine.Type::Item, POSEntrySalesLine.Type::Voucher);
-        if POSEntrySalesLine.FindSet() then
-            repeat
-                TotalDiscountAmount += Round(POSEntrySalesLine."Line Discount Amount Incl. VAT", 1, '=');
-                TotalSale += Round(POSEntrySalesLine."Amount Incl. VAT" + POSEntrySalesLine."Line Discount Amount Incl. VAT", 1, '=');
-            until POSEntrySalesLine.Next() = 0;
-
-        TotalSale -= TotalDiscountAmount;
-        POSEntryPaymentLine.SetRange("POS Entry No.", POSEntry."Entry No.");
-        POSEntryPaymentLine.CalcSums("Amount (LCY)");
-        TotalPaid := Round(POSEntryPaymentLine."Amount (LCY)", 1, '=');
-
-        exit(TotalSale - TotalPaid);
+        POSEntrySalesLine.SetRange(Type, POSEntrySalesLine.Type::Rounding);
+        if POSEntrySalesLine.FindFirst() then
+            exit(POSEntrySalesLine."Amount Incl. VAT");
     end;
 
     local procedure CalculateChangeAmount(POSEntry: Record "NPR POS Entry"): Decimal
