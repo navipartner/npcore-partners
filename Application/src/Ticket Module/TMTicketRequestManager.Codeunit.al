@@ -997,7 +997,7 @@
     [CommitBehavior(CommitBehavior::Error)]
     local procedure ConfirmReservationRequestV2(Token: Text[100]; TokenLineNumber: Integer; var ResponseCode: Code[10]; var ResponseMessage: Text) FinalizeReservation: Boolean
     var
-        TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
+        TicketReservationRequest, TicketReservationRequestRead : Record "NPR TM Ticket Reservation Req.";
         TicketReservationResponse: Record "NPR TM Ticket Reserv. Resp.";
         Now: DateTime;
         RequestMutex: Record "NPR TM TicketRequestMutex";
@@ -1008,25 +1008,25 @@
         ResponseMessage := '';
 
         // Check if expired
-        TicketReservationRequest.ReadIsolation := IsolationLevel::ReadUncommitted;
-        TicketReservationRequest.SetLoadFields("Session Token ID", "Ext. Line Reference No.", "Request Status", "Admission Inclusion");
-        TicketReservationRequest.SetCurrentKey("Session Token ID");
-        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
-        TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::EXPIRED);
-        if (TokenLineNumber <> 0) then
-            TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', TokenLineNumber);
-        if (TicketReservationRequest.FindFirst()) then begin
-            ResponseMessage := StrSubstNo(TOKEN_EXPIRED_1204, Token);
-            ResponseCode := '-1204';
-            FinalizeReservation := false;
+        if (FinalizeReservation) then begin
+            TicketReservationRequestRead.ReadIsolation := IsolationLevel::ReadUncommitted;
+            TicketReservationRequestRead.SetLoadFields("Session Token ID", "Ext. Line Reference No.", "Request Status", "Admission Inclusion");
+            TicketReservationRequestRead.SetCurrentKey("Session Token ID");
+            TicketReservationRequestRead.SetFilter("Session Token ID", '=%1', Token);
+            TicketReservationRequestRead.SetFilter("Request Status", '=%1', TicketReservationRequestRead."Request Status"::EXPIRED);
+            if (TokenLineNumber <> 0) then
+                TicketReservationRequestRead.SetFilter("Ext. Line Reference No.", '=%1', TokenLineNumber);
+            if (TicketReservationRequestRead.FindFirst()) then begin
+                ResponseMessage := StrSubstNo(TOKEN_EXPIRED_1204, Token);
+                ResponseCode := '-1204';
+                FinalizeReservation := false;
+            end;
         end;
 
         // Check if REGISTERED or RESERVED exists
         if (FinalizeReservation) then begin
-            TicketReservationRequest.SetFilter("Request Status", '=%1|=%2',
-                TicketReservationRequest."Request Status"::REGISTERED,
-                TicketReservationRequest."Request Status"::RESERVED);
-            if (not TicketReservationRequest.FindFirst()) then begin
+            TicketReservationRequestRead.SetFilter("Request Status", '=%1|=%2', TicketReservationRequestRead."Request Status"::REGISTERED, TicketReservationRequestRead."Request Status"::RESERVED);
+            if (not TicketReservationRequestRead.FindFirst()) then begin
                 ResponseMessage := StrSubstNo(UNCONFIRMED_TOKEN_NOT_FOUND_1203, Token);
                 ResponseCode := '-1203';
                 FinalizeReservation := false;
@@ -1035,12 +1035,82 @@
 
         // Check if already CONFIRMED
         if (not FinalizeReservation) then begin
-            TicketReservationRequest.SetFilter("Request Status", '<>%1', TicketReservationRequest."Request Status"::CONFIRMED);
-            TicketReservationRequest.SetFilter("Admission Inclusion", '=%1|=%2', TicketReservationRequest."Admission Inclusion"::REQUIRED, TicketReservationRequest."Admission Inclusion"::SELECTED);
-            if (not TicketReservationRequest.FindFirst()) then begin
+            TicketReservationRequestRead.SetFilter("Request Status", '<>%1', TicketReservationRequestRead."Request Status"::CONFIRMED);
+            TicketReservationRequestRead.SetFilter("Admission Inclusion", '=%1|=%2', TicketReservationRequestRead."Admission Inclusion"::REQUIRED, TicketReservationRequestRead."Admission Inclusion"::SELECTED);
+            if (not TicketReservationRequestRead.FindFirst()) then begin
                 ResponseMessage := StrSubstNo(TOKEN_ALREADY_CONFIRMED_1206, Token);
                 ResponseCode := '-1206';
                 exit(true);
+            end;
+        end;
+
+        if (FinalizeReservation) then begin
+            // ##### Success path #####
+
+            MutexKey := StrSubstNo('%1:%2', Token, TokenLineNumber);
+            if (not RequestMutex.Acquire(MutexKey, SessionId())) then begin
+                ResponseMessage := StrSubstNo(TOKEN_PROCESSING_CONFLICT_1205);
+                ResponseCode := '-1205';
+                FinalizeReservation := false;
+            end;
+
+            if (FinalizeReservation) then begin
+                TicketReservationRequest.Reset();
+                TicketReservationRequest.ReadIsolation := IsolationLevel::UpdLock;
+                TicketReservationRequest.SetCurrentKey("Session Token ID");
+                TicketReservationRequest.SetLoadFields("Session Token ID", "Ext. Line Reference No.", "Request Status", "Admission Inclusion", "Payment Option");
+                TicketReservationRequest.SetCurrentKey("Session Token ID");
+                TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+                if (TokenLineNumber <> 0) then
+                    TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', TokenLineNumber);
+                TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::RESERVED);
+                if (TicketReservationRequest.FindSet()) then
+                    repeat
+                        TicketReservationRequest."Payment Option" := TicketReservationRequest."Payment Option"::DIRECT;
+                        TicketReservationRequest.Modify();
+                    until (TicketReservationRequest.Next()) = 0;
+
+                // Confirm required and selected admissions
+                TicketReservationRequest.Reset();
+                TicketReservationRequest.ReadIsolation := IsolationLevel::UpdLock;
+                TicketReservationRequest.SetCurrentKey("Session Token ID");
+                TicketReservationRequest.SetLoadFields("Session Token ID", "Ext. Line Reference No.", "Request Status", "Admission Inclusion", "Request Status Date Time", "Expires Date Time");
+                TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+                if (TokenLineNumber <> 0) then
+                    TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', TokenLineNumber);
+                TicketReservationRequest.SetFilter("Request Status", '=%1|=%2', TicketReservationRequest."Request Status"::REGISTERED, TicketReservationRequest."Request Status"::RESERVED);
+                TicketReservationRequest.SetFilter("Admission Inclusion", '=%1|=%2', TicketReservationRequest."Admission Inclusion"::REQUIRED, TicketReservationRequest."Admission Inclusion"::SELECTED);
+                if (TicketReservationRequest.FindSet()) then
+                    repeat
+                        TicketReservationRequest."Request Status" := TicketReservationRequest."Request Status"::CONFIRMED;
+                        TicketReservationRequest."Request Status Date Time" := Now;
+                        TicketReservationRequest."Expires Date Time" := CreateDateTime(0D, 0T);
+                        TicketReservationRequest.Modify();
+                    until (TicketReservationRequest.Next()) = 0;
+
+                // Set OPTIONAL for not selected
+                TicketReservationRequest.Reset();
+                TicketReservationRequest.ReadIsolation := IsolationLevel::UpdLock;
+                TicketReservationRequest.SetCurrentKey("Session Token ID");
+                TicketReservationRequest.SetLoadFields("Session Token ID", "Ext. Line Reference No.", "Request Status", "Admission Inclusion", "Request Status Date Time", "Expires Date Time");
+                TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
+                if (TokenLineNumber <> 0) then
+                    TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', TokenLineNumber);
+                TicketReservationRequest.SetFilter("Request Status", '=%1|=%2', TicketReservationRequest."Request Status"::REGISTERED, TicketReservationRequest."Request Status"::RESERVED);
+                TicketReservationRequest.SetFilter("Admission Inclusion", '=%1', TicketReservationRequest."Admission Inclusion"::NOT_SELECTED);
+                if (TicketReservationRequest.FindSet()) then
+                    repeat
+                        TicketReservationRequest."Request Status" := TicketReservationRequest."Request Status"::OPTIONAL;
+                        TicketReservationRequest."Request Status Date Time" := Now;
+                        TicketReservationRequest."Expires Date Time" := CreateDateTime(0D, 0T);
+                        TicketReservationRequest.Modify();
+                    until (TicketReservationRequest.Next() = 0);
+
+                FinalizePayment(Token, TokenLineNumber);
+                RequestMutex.Release(MutexKey);
+
+                ResponseCode := '';
+                ResponseMessage := 'OK';
             end;
         end;
 
@@ -1059,82 +1129,10 @@
                 TicketReservationResponse.Modify();
             until (TicketReservationResponse.Next()) = 0;
 
-        MutexKey := StrSubstNo('%1:%2', Token, TokenLineNumber);
-        if (not RequestMutex.Acquire(MutexKey, SessionId())) then begin
-            ResponseMessage := StrSubstNo(TOKEN_PROCESSING_CONFLICT_1205);
-            ResponseCode := '-1205';
-            FinalizeReservation := false;
-        end;
-
-        if (not FinalizeReservation) then begin
+        if (not FinalizeReservation) then
             EmitMessageToTelemetry(ResponseMessage);
-            exit(false);
-        end;
 
-        // ##### Success path #####
-        TicketReservationRequest.Reset();
-        TicketReservationRequest.ReadIsolation := IsolationLevel::UpdLock;
-        TicketReservationRequest.SetCurrentKey("Session Token ID");
-        TicketReservationRequest.SetLoadFields("Session Token ID", "Ext. Line Reference No.", "Request Status", "Admission Inclusion", "Payment Option");
-        TicketReservationRequest.SetCurrentKey("Session Token ID");
-        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
-        if (TokenLineNumber <> 0) then
-            TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', TokenLineNumber);
-        TicketReservationRequest.SetFilter("Request Status", '=%1', TicketReservationRequest."Request Status"::RESERVED);
-        if (TicketReservationRequest.FindSet()) then
-            repeat
-                TicketReservationRequest."Payment Option" := TicketReservationRequest."Payment Option"::DIRECT;
-                TicketReservationRequest.Modify();
-            until (TicketReservationRequest.Next()) = 0;
-
-        // Confirm required and selected admissions
-        TicketReservationRequest.Reset();
-        TicketReservationRequest.ReadIsolation := IsolationLevel::UpdLock;
-        TicketReservationRequest.SetCurrentKey("Session Token ID");
-        TicketReservationRequest.SetLoadFields("Session Token ID", "Ext. Line Reference No.", "Request Status", "Admission Inclusion", "Request Status Date Time", "Expires Date Time");
-        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
-        if (TokenLineNumber <> 0) then
-            TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', TokenLineNumber);
-        TicketReservationRequest.SetFilter("Request Status", '=%1|=%2',
-            TicketReservationRequest."Request Status"::REGISTERED,
-            TicketReservationRequest."Request Status"::RESERVED);
-        TicketReservationRequest.SetFilter("Admission Inclusion", '=%1|=%2',
-            TicketReservationRequest."Admission Inclusion"::REQUIRED,
-            TicketReservationRequest."Admission Inclusion"::SELECTED);
-        if (TicketReservationRequest.FindSet()) then
-            repeat
-                TicketReservationRequest."Request Status" := TicketReservationRequest."Request Status"::CONFIRMED;
-                TicketReservationRequest."Request Status Date Time" := Now;
-                TicketReservationRequest."Expires Date Time" := CreateDateTime(0D, 0T);
-                TicketReservationRequest.Modify();
-            until (TicketReservationRequest.Next()) = 0;
-
-        // Set OPTIONAL for not selected
-        TicketReservationRequest.Reset();
-        TicketReservationRequest.ReadIsolation := IsolationLevel::UpdLock;
-        TicketReservationRequest.SetCurrentKey("Session Token ID");
-        TicketReservationRequest.SetLoadFields("Session Token ID", "Ext. Line Reference No.", "Request Status", "Admission Inclusion", "Request Status Date Time", "Expires Date Time");
-        TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
-        if (TokenLineNumber <> 0) then
-            TicketReservationRequest.SetFilter("Ext. Line Reference No.", '=%1', TokenLineNumber);
-        TicketReservationRequest.SetFilter("Request Status", '=%1|=%2',
-            TicketReservationRequest."Request Status"::REGISTERED,
-            TicketReservationRequest."Request Status"::RESERVED);
-        TicketReservationRequest.SetFilter("Admission Inclusion", '=%1', TicketReservationRequest."Admission Inclusion"::NOT_SELECTED);
-        if TicketReservationRequest.FindSet() then
-            repeat
-                TicketReservationRequest."Request Status" := TicketReservationRequest."Request Status"::OPTIONAL;
-                TicketReservationRequest."Request Status Date Time" := Now;
-                TicketReservationRequest."Expires Date Time" := CreateDateTime(0D, 0T);
-                TicketReservationRequest.Modify();
-            until (TicketReservationRequest.Next() = 0);
-
-        FinalizePayment(Token, TokenLineNumber);
-        RequestMutex.Release(MutexKey);
-
-        ResponseCode := '';
-        ResponseMessage := 'OK';
-        exit(true);
+        exit(FinalizeReservation);
     end;
 #endif
 
