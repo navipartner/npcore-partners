@@ -663,6 +663,8 @@
         GlobalSettingsHIDSettingsLabelLbl: Label 'HID Settings';
         GlobalSettingsCaptionBoxDisplaySettingLbl: Label 'Caption Box Display Setting';
         CaptionBoxDisplaySettingDescriptionLbl: Label 'Please choose caption box display data :';
+        CaptionBoxLastSaleFontSizeLbl: Label 'Please choose Last Sale (Change) font size :';
+        CaptionBoxLastSaleFontWeightLbl: Label 'Please choose Last Sale (Change) font weight :';
         GlobalShortcutsErrorShortcutAlreadyExistsLbl: Label 'Shortcut already exists';
         GlobalShortcutsErrorShortcutIsPredefinedLbl: Label 'Shortcut is predefined';
         GlobalShortcutsWarningMessageLbl: Label 'Be aware, entering only numbers, only one letter, or just special key like shift, ctrl, space, enter, backspace, delete, insert, F keys, meta  or alt, may activate your shortcut in the middle of typing or scanning items. Consider using combination of special keys, numbers/letters like ctrl+t, ctrl+1, ctrl+shift+p etc.';
@@ -1249,6 +1251,8 @@
         Captions.Add('Global_Settings_HID_SettingsLabel', GlobalSettingsHIDSettingsLabelLbl);
         Captions.Add('Global_Settings_CaptionBoxDisplaySetting', GlobalSettingsCaptionBoxDisplaySettingLbl);
         Captions.Add('Global_Settings_CaptionBoxDisplaySettingDescription', CaptionBoxDisplaySettingDescriptionLbl);
+        Captions.Add('Global_Settings_CaptionBoxFontSizeSelection', CaptionBoxLastSaleFontSizeLbl);
+        Captions.Add('Global_Settings_CaptionBoxFontWeightSelection', CaptionBoxLastSaleFontWeightLbl);
         Captions.Add('Global_Shortcuts_Error_ShortcutAlreadyExists', GlobalShortcutsErrorShortcutAlreadyExistsLbl);
         Captions.Add('Global_Shortcuts_Error_ShortcutIsPredefined', GlobalShortcutsErrorShortcutIsPredefinedLbl);
         Captions.Add('Global_Shortcuts_WarningMessage', GlobalShortcutsWarningMessageLbl);
