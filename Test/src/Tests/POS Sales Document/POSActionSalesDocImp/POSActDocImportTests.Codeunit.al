@@ -1208,6 +1208,90 @@ codeunit 85092 "NPR POS Act. Doc. Import Tests"
         CheckValues(SalePOS, SaleLine, SalesHeader, true, false);
     end;
 
+    #region ImportOrderItemsWithTracking
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    [HandlerFunctions('SelectDocumentPageHandler,MessageHandler')]
+    procedure ImportOrderWithSalesLineItemWithTracking()
+    // [SCENARIO] Import Sales Order with Sales Line Item with Tracking 
+    var
+        SaleLine: Record "Sales Line";
+        SalePOS: Record "NPR POS Sale";
+        SalesHeader: Record "Sales Header";
+        Item: Record Item;
+        ItemTracking: Record "Item Tracking Code";
+        POSSession: Codeunit "NPR POS Session";
+        NPRLibraryPOSMock: Codeunit "NPR Library - POS Mock";
+        LibrarySales: Codeunit "Library - Sales";
+        LibraryInventory: Codeunit "Library - Inventory";
+        POSActionDocImpB: Codeunit "NPR POS Action: Doc. Import B";
+        POSSale: Codeunit "NPR POS Sale";
+        SelectCustomer, ConfirmInvDiscAmt, SalesPersonFromOrder : Boolean;
+        DocumentType: Integer;
+        LocationSource: Option "POS Store","Location Filter Parameter";
+        LocationFilter: Text;
+        SalesDocViewString: Text;
+    begin
+        SelectCustomer := false;
+        ConfirmInvDiscAmt := false;
+        SalesPersonFromOrder := false;
+        DocumentType := 1;
+        LocationSource := LocationSource::"Location Filter Parameter";
+        LocationFilter := '';
+
+        NPRLibraryPOSMock.InitializeData(Initialized, POSUnit, POSStore, POSPaymentMethod);
+        NPRLibraryPOSMock.InitializePOSSessionAndStartSale(POSSession, POSUnit, POSSale);
+
+        // [GIVEN] Item with tracking
+        LibraryInventory.CreateItem(Item);
+        CreateItemTrackingAndAssignToItem(Item, ItemTracking);
+        LibrarySales.CreateSalesDocumentWithItem(SalesHeader, SaleLine, Enum::"Sales Document Type"::Order, '', Item."No.", 1, '', Today + 7);
+
+        SaleLine.SetRange("Document No.", SalesHeader."No.");
+        SaleLine.SetRange("Document Type", SalesHeader."Document Type");
+        SaleLine.FindFirst();
+
+        // [GIVEN] Posting Setup
+        CreatePostingSetup(SalesHeader);
+
+        SetPosSaleCustomer(POSSale, SalesHeader."Bill-to Customer No.");
+
+        SalesDocViewString := StrSubstNo('Sorting(No.) Order(Ascending) Where(No.=Const(%1))', SalesHeader."No.");
+
+        POSSession.GetSale(POSSale);
+        POSSale.GetCurrentSale(SalePOS);
+
+        POSActionDocImpB.ImportDocument(SelectCustomer,
+                                ConfirmInvDiscAmt,
+                                DocumentType,
+                                LocationSource,
+                                LocationFilter,
+                                SalesDocViewString,
+                                SalesPersonFromOrder,
+                                POSSale);
+
+        CheckValues(SalePOS, SaleLine, SalesHeader, false, false);
+    end;
+
+    internal procedure CreateItemTrackingAndAssignToItem(var Item: Record Item; var ItemTrackingCode: Record "Item Tracking Code")
+    var
+        LibraryUtility: Codeunit "Library - Utility";
+        TrackingCode: Code[10];
+    begin
+        TrackingCode := LibraryUtility.GenerateRandomCode(ItemTrackingCode.FieldNo(Code), Database::"Item Tracking Code");
+        if ItemTrackingCode.Get(TrackingCode) then
+            ItemTrackingCode.Delete();
+        ItemTrackingCode.Init();
+        ItemTrackingCode.Code := TrackingCode;
+        ItemTrackingCode."SN Specific Tracking" := true;
+        ItemTrackingCode."SN Sales Inbound Tracking" := true;
+        ItemTrackingCode."SN Sales Outbound Tracking" := true;
+        ItemTrackingCode.Insert();
+        Item."Item Tracking Code" := ItemTrackingCode.Code;
+        Item.Modify();
+    end;
+    #endregion ImportOrderItemsWithTracking
+
     local procedure CheckValues(SalePOS: Record "NPR POS Sale"; SaleLine: Record "Sales Line"; SalesHeader: Record "Sales Header"; NegativeQty: Boolean; SalesPerson: Boolean)
     var
         SaleLinePOS: Record "NPR POS Sale Line";
