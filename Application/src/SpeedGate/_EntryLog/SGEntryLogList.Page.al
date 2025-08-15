@@ -20,117 +20,146 @@ page 6184906 "NPR SG EntryLogList"
 
                 field(EntryNo; Rec.EntryNo)
                 {
-                    ToolTip = 'Specifies the value of the EntryNo field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the EntryNo field.';
                     ApplicationArea = NPRRetail;
                     Visible = false;
                 }
                 field(Token; Rec.Token)
                 {
-                    ToolTip = 'Specifies the value of the Token field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Token field.';
                     ApplicationArea = NPRRetail;
                     Visible = false;
                 }
                 field(ReferenceNo; Rec.ReferenceNo)
                 {
-                    ToolTip = 'Specifies the value of the Reference No field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Reference No field.';
                     ApplicationArea = NPRRetail;
                 }
 
                 field(ReferenceNumberType; Rec.ReferenceNumberType)
                 {
-                    ToolTip = 'Specifies the value of the Entry Type field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Entry Type field.';
                     ApplicationArea = NPRRetail;
                 }
                 field(SubType; _SubType)
                 {
-                    ToolTip = 'Specifies the value of the Subtype field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Subtype field.';
                     ApplicationArea = NPRRetail;
                     Caption = 'Subtype';
                 }
                 field(EntryStatus; Rec.EntryStatus)
                 {
-                    ToolTip = 'Specifies the value of the Entry Status field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Entry Status field.';
                     ApplicationArea = NPRRetail;
                 }
                 field(SystemCreatedAt; Rec.SystemCreatedAt)
                 {
-                    ToolTip = 'Specifies the value of the SystemCreatedAt field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the SystemCreatedAt field.';
                     ApplicationArea = NPRRetail;
                     Caption = 'Attempted At';
                 }
                 field(AdmittedAt; Rec.AdmittedAt)
                 {
-                    ToolTip = 'Specifies the value of the Admitted At field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Admitted At field.';
                     ApplicationArea = NPRRetail;
                 }
                 field(AdmittedReferenceNo; Rec.AdmittedReferenceNo)
                 {
-                    ToolTip = 'Specifies the value of the Admitted Reference No field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Admitted Reference No field.';
                     ApplicationArea = NPRRetail;
                 }
                 field(ScannerId; Rec.ScannerId)
                 {
-                    ToolTip = 'Specifies the value of the Scanner Id field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Scanner Id field.';
                     ApplicationArea = NPRRetail;
                 }
                 field(ScannerDescription; Rec.ScannerDescription)
                 {
-                    ToolTip = 'Specifies the value of the Scanner Description field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Scanner Description field.';
                     ApplicationArea = NPRRetail;
                 }
                 field(AdmissionCode; Rec.AdmissionCode)
                 {
-                    ToolTip = 'Specifies the value of the Admission Code field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Admission Code field.';
                     ApplicationArea = NPRRetail;
                 }
                 field(ErrorMessage; _ErrorMessage)
                 {
                     Caption = 'Error Message';
-                    ToolTip = 'Specifies the value of the Api Error Number field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Api Error Number field.';
                     ApplicationArea = NPRRetail;
                 }
                 field(ApiErrorNumber; Rec.ApiErrorNumber)
                 {
-                    ToolTip = 'Specifies the value of the Api Error Number field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Api Error Number field.';
                     ApplicationArea = NPRRetail;
                     Visible = false;
                 }
                 field(EntityId; Rec.EntityId)
                 {
-                    ToolTip = 'Specifies the value of the Entity Id field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Entity Id field.';
                     ApplicationArea = NPRRetail;
                     Visible = false;
                 }
                 field(ExtraEntityId; Rec.ExtraEntityId)
                 {
-                    ToolTip = 'Specifies the value of the Extra Entity Id field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Extra Entity Id field.';
                     ApplicationArea = NPRRetail;
                     Visible = false;
                 }
                 field(ExtraEntityTableId; Rec.ExtraEntityTableId)
                 {
-                    ToolTip = 'Specifies the value of the Extra Entity Table Id field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Extra Entity Table Id field.';
                     ApplicationArea = NPRRetail;
                     Visible = false;
                 }
                 field(ApiErrorMessage; Rec.ApiErrorMessage)
                 {
-                    ToolTip = 'Specifies the value of the Api Error Message field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Api Error Message field.';
                     ApplicationArea = NPRRetail;
                     Visible = false;
                 }
                 field(MemberCardLogEntryNo; Rec.MemberCardLogEntryNo)
                 {
-                    ToolTip = 'Specifies the value of the Member Card Log Entry No field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Member Card Log Entry No field.';
                     ApplicationArea = NPRRetail;
                     Visible = false;
                 }
                 field(ProfileLineId; Rec.ProfileLineId)
                 {
-                    ToolTip = 'Specifies the value of the Profile Line Id field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Profile Line Id field.';
                     ApplicationArea = NPRRetail;
                     Visible = false;
                 }
+
+                field(SystemCreatedByName; _UserName)
+                {
+                    ToolTip = 'Specifies the value of the System Created By Name field.';
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Created By';
+                    Editable = false;
+                }
+                field(SystemCreatedBy; Rec.SystemCreatedBy)
+                {
+                    ToolTip = 'Specifies the value of the SystemCreatedBy field.';
+                    ApplicationArea = NPRRetail;
+                    Caption = 'Created By Security ID';
+                    Editable = false;
+                }
+
+                field(AdmittedQuantity; Rec.AdmittedQuantity)
+                {
+                    ToolTip = 'Specifies the value of the Admitted Quantity field.';
+                    ApplicationArea = NPRRetail;
+                    Visible = false;
+                }
+                field(SuggestedQuantity; Rec.SuggestedQuantity)
+                {
+                    ToolTip = 'Specifies the value of the Suggested Quantity field.';
+                    ApplicationArea = NPRRetail;
+                    Visible = false;
+                }
+
             }
         }
     }
@@ -227,13 +256,36 @@ page 6184906 "NPR SG EntryLogList"
                 end;
             }
         }
+        area(Processing)
+        {
+            action(FilterToMe)
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Filter to Me';
+                ToolTip = 'Filter to My Entries';
+                Image = Filter;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedIsBig = true;
+                PromotedCategory = Process;
+
+                trigger OnAction()
+                begin
+                    Rec.SetFilter("SystemCreatedBy", '=%1', UserSecurityId());
+                    CurrPage.Update(false);
+                end;
+            }
+        }
     }
+
     var
         _ErrorMessage: Text;
         _SubType: Text;
+        _UserName: Text;
 
     trigger OnAfterGetRecord()
     var
+        User: Record User;
         ApiError: Enum "NPR API Error Code";
         GuestLbl: Label 'Guest';
         MemberLbl: Label 'Member Card';
@@ -243,6 +295,9 @@ page 6184906 "NPR SG EntryLogList"
         TicketGroupLbl: Label 'Group';
     begin
         _ErrorMessage := Rec.ApiErrorMessage;
+        _UserName := Rec.SystemCreatedBy;
+        if (User.Get(_UserName)) then
+            _UserName := User."User Name";
 
         if (_ErrorMessage = '') then
             if (Rec.ApiErrorNumber <> 0) then begin
