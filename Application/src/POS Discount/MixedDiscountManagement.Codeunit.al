@@ -1236,6 +1236,8 @@
         if TempSaleLinePOSApply.IsEmpty() then
             exit;
 
+        TempSaleLinePOS.SetSkipUpdateDependantQuantity(true);
+
         TempSaleLinePOSApply.FindSet();
         repeat
             if not TempSaleLinePOS.Get(TempSaleLinePOSApply."Register No.", TempSaleLinePOSApply."Sales Ticket No.", TempSaleLinePOSApply.Date, TempSaleLinePOSApply."Sale Type", TempSaleLinePOSApply."Line No.")

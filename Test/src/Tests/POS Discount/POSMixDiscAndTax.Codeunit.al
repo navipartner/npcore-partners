@@ -24,6 +24,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         LibraryApplicationArea: Codeunit "Library - Application Area";
         LibraryRandom: Codeunit "Library - Random";
         LibraryTaxCalc: Codeunit "NPR POS Lib. - Tax Calc.";
+        LibraryPOSDiscount: Codeunit "NPR Library - POS Discount";
         Initialized: Boolean;
         DayDirection: Option Today,Future,Past;
 
@@ -44,7 +45,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         DiscountPriorityList.Close();
 
         // [THEN] Verify discount is enabled
-        Assert.IsTrue(DiscountPriority.Get(DiscSourceTableId()), 'Discount not created');
+        Assert.IsTrue(DiscountPriority.Get(LibraryPOSDiscount.MixDiscountSourceTableId()), 'Discount not created');
         Assert.IsFalse(DiscountPriority.Disabled, 'Discount is disabled');
     end;
 
@@ -81,7 +82,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountPct(Item, LibraryRandom.RandDecInRange(1, 100, 5), false);
+        LibraryPOSDiscount.CreateTotalDiscountPct(Item, LibraryRandom.RandDecInRange(1, 100, 5), false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -94,7 +95,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         SalesDiscCalcMgt.OnFindActiveSaleLineDiscounts(TempDiscountPriority, POSSale, POSSaleLine, xPOSSaleLine, 0);
 
         // [THEN] Verify Discount Priority enabled
-        Assert.IsTrue(TempDiscountPriority.Get(DiscSourceTableId()), 'Discount not created');
+        Assert.IsTrue(TempDiscountPriority.Get(LibraryPOSDiscount.MixDiscountSourceTableId()), 'Discount not created');
         Assert.IsFalse(TempDiscountPriority.Disabled, 'Discount is disabled');
     end;
 
@@ -135,7 +136,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 9, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 9, false);
 
         CalculateExpectedAmountsNormalTaxBackward(Item."Unit Price", 1, VATPostingSetup."VAT %", LineDiscPct, LineDiscAmt, LineAmtExclTax, LineAmtInclTax);
 
@@ -196,7 +197,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 9, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 9, false);
 
         Qty := Round(1 + 2 / 3, 0.00001);
         CalculateExpectedAmountsNormalTaxBackward(Item."Unit Price", Qty, VATPostingSetup."VAT %", LineDiscPct, LineDiscAmt, LineAmtExclTax, LineAmtInclTax);
@@ -264,7 +265,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         // TransferAppliedDiscountToSale
         CalculateExpectedAmountsNormalTaxForward(Item."Unit Price", 1, VATPostingSetup."VAT %", LineDiscPct, LineDiscAmt, LineAmtExclTax, LineAmtInclTax);
@@ -337,7 +338,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         // TransferAppliedDiscountToSale
         Qty := Round(1 + 1 / 3, 0.00001);
@@ -410,7 +411,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         CalculateExpectedAmountsNormalTaxBackward(Item."Unit Price", 1, VATPostingSetup."VAT %", LineDiscPct, LineDiscAmt, LineAmtExclTax, LineAmtInclTax);
 
@@ -483,7 +484,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         Qty := 1 + 1 / 2;
         CalculateExpectedAmountsNormalTaxBackward(Item."Unit Price", Qty, VATPostingSetup."VAT %", LineDiscPct, LineDiscAmt, LineAmtExclTax, LineAmtInclTax);
@@ -556,7 +557,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 9, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 9, false);
 
         CalculateExpectedAmountsNormalTaxBackward(Item."Unit Price", 1, VATPostingSetup."VAT %", LineDiscPct, LineDiscAmt, LineAmtExclTax, LineAmtInclTax);
 
@@ -651,7 +652,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 9, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 9, false);
 
         Qty := Round(1 + 2 / 3, 0.00001);
         CalculateExpectedAmountsNormalTaxBackward(Item."Unit Price", Qty, VATPostingSetup."VAT %", LineDiscPct, LineDiscAmt, LineAmtExclTax, LineAmtInclTax);
@@ -756,7 +757,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         LineDiscAmt := Item."Unit Price" * LineDiscPct / 100;
 
@@ -857,7 +858,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         Qty := Round(1 + 1 / 3, 0.00001);
         LineDiscAmt := Round(Qty * Item."Unit Price" * LineDiscPct / 100);
@@ -958,7 +959,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         LineDiscAmt := Item."Unit Price" * LineDiscPct / 100;
 
@@ -1059,7 +1060,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         Qty := Round(1 + 2 / 3, 0.00001);
         LineDiscAmt := Round(Qty * Item."Unit Price" * LineDiscPct / 100);
@@ -1149,7 +1150,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 9, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 9, false);
 
         LineDiscAmt := Item."Unit Price" * LineDiscPct / 100;
         LineAmtInclTax := Item."Unit Price" - LineDiscAmt;
@@ -1212,7 +1213,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 9, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 9, false);
 
         Qty := Round(1 + 2 / 3, 0.00001);
         LineDiscAmt := Round(Qty * Item."Unit Price" * LineDiscPct / 100);
@@ -1283,7 +1284,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         UnitPrice := Item."Unit Price" / (1 + VATPostingSetup."VAT %" / 100);
         LineDiscAmt := (Item."Unit Price" * LineDiscPct / 100) / (1 + VATPostingSetup."VAT %" / 100);
@@ -1360,7 +1361,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         Qty := Round(1 + 1 / 3, 0.00001);
         UnitPrice := Item."Unit Price" / (1 + VATPostingSetup."VAT %" / 100);
@@ -1436,7 +1437,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         LineDiscAmt := Item."Unit Price" * LineDiscPct / 100;
         LineAmtInclTax := Item."Unit Price" - LineDiscAmt;
@@ -1511,7 +1512,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         Qty := Round(1 + 1 / 3, 0.00001);
         LineDiscAmt := Round(Qty * Item."Unit Price" * LineDiscPct / 100);
@@ -1586,7 +1587,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 9, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 9, false);
 
         LineDiscAmt := Item."Unit Price" * LineDiscPct / 100;
         LineAmtInclTax := Item."Unit Price" - LineDiscAmt;
@@ -1683,7 +1684,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 9, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 9, false);
 
         Qty := Round(1 + 2 / 3, 0.00001);
         LineDiscAmt := Round(Qty * Item."Unit Price" * LineDiscPct / 100);
@@ -1786,7 +1787,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         LineDiscAmt := Item."Unit Price" * LineDiscPct / 100;
         LineAmtExclTax := Item."Unit Price" - LineDiscAmt;
@@ -1894,7 +1895,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         Qty := Round(1 + 1 / 3, 0.00001);
         LineDiscAmt := Round(Qty * Item."Unit Price" * LineDiscPct / 100);
@@ -2002,7 +2003,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         LineDiscAmt := Item."Unit Price" * LineDiscPct / 100;
         LineAmtInclTax := Item."Unit Price" - LineDiscAmt;
@@ -2110,7 +2111,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         Qty := Round(1 + 1 / 3, 0.00001);
         LineDiscAmt := Round(Qty * Item."Unit Price" * LineDiscPct / 100);
@@ -2220,7 +2221,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 9, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 9, false);
 
         Qty := 1;
         LineDiscAmt := Qty * Item."Unit Price" * LineDiscPct / 100;
@@ -2305,7 +2306,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 9, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 9, false);
 
         Qty := Round(1 + 1 / 3, 0.00001);
         LineDiscAmt := Round(Qty * Item."Unit Price" * LineDiscPct / 100);
@@ -2403,7 +2404,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         Qty := 1;
         UnitPriceTaxable := Item."Unit Price" * (1 - LineDiscPct / 100);
@@ -2506,7 +2507,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         Qty := Round(1 + 1 / 3, 0.00001);
         UnitPriceTaxable := Item."Unit Price" * (1 - LineDiscPct / 100);
@@ -2609,7 +2610,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 9, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 9, false);
 
         Qty := 1;
         UnitPriceTaxable := Item."Unit Price" * (1 - LineDiscPct / 100);
@@ -2727,7 +2728,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 9, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 9, false);
 
         Qty := Round(1 + 2 / 3, 0.00001);
         UnitPriceTaxable := Item."Unit Price" * (1 - LineDiscPct / 100);
@@ -2855,7 +2856,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         Qty := 1;
         UnitPriceTaxable := Item."Unit Price" * (1 - LineDiscPct / 100);
@@ -2984,7 +2985,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         Qty := Round(1 + 1 / 3, 0.00001);
         UnitPriceTaxable := Item."Unit Price" * (1 - LineDiscPct / 100);
@@ -3068,7 +3069,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountPct(Item, LibraryRandom.RandDecInRange(1, 100, 5), false);
+        LibraryPOSDiscount.CreateTotalDiscountPct(Item, LibraryRandom.RandDecInRange(1, 100, 5), false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -3081,7 +3082,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         SalesDiscCalcMgt.OnFindActiveSaleLineDiscounts(TempDiscountPriority, POSSale, POSSaleLine, xPOSSaleLine, 1);
 
         // [THEN] Verify Discount Priority enabled
-        Assert.IsTrue(TempDiscountPriority.Get(DiscSourceTableId()), 'Discount not created');
+        Assert.IsTrue(TempDiscountPriority.Get(LibraryPOSDiscount.MixDiscountSourceTableId()), 'Discount not created');
         Assert.IsFalse(TempDiscountPriority.Disabled, 'Discount is disabled');
     end;
 
@@ -3123,7 +3124,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 9, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 9, false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -3200,7 +3201,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -3282,7 +3283,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -3364,7 +3365,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -3474,7 +3475,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -3589,7 +3590,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -3688,7 +3689,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 9, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 9, false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -3766,7 +3767,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -3849,7 +3850,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -3931,7 +3932,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 9, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 9, false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -4041,7 +4042,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -4156,7 +4157,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -4271,7 +4272,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 9, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 9, false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -4373,7 +4374,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -4480,7 +4481,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 9, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 9, false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -4612,7 +4613,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        LineDiscPct := CreateTotalDiscountPct(Item, 7, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -4701,7 +4702,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountPct(Item, LibraryRandom.RandDecInRange(1, 100, 5), false);
+        LibraryPOSDiscount.CreateTotalDiscountPct(Item, LibraryRandom.RandDecInRange(1, 100, 5), false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -4714,7 +4715,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         SalesDiscCalcMgt.OnFindActiveSaleLineDiscounts(TempDiscountPriority, POSSale, POSSaleLine, xPOSSaleLine, 2);
 
         // [THEN] Verify Discount Priority enabled
-        Assert.IsTrue(TempDiscountPriority.Get(DiscSourceTableId()), 'Discount not created');
+        Assert.IsTrue(TempDiscountPriority.Get(LibraryPOSDiscount.MixDiscountSourceTableId()), 'Discount not created');
         Assert.IsFalse(TempDiscountPriority.Disabled, 'Discount is disabled');
     end;
 
@@ -4752,7 +4753,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountPct(Item, 9, false);
+        LibraryPOSDiscount.CreateTotalDiscountPct(Item, 9, false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -4819,7 +4820,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountPct(Item, 7, false);
+        LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -4891,7 +4892,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountPct(Item, 7, false);
+        LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -4956,7 +4957,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountPct(Item, 9, false);
+        LibraryPOSDiscount.CreateTotalDiscountPct(Item, 9, false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -5023,7 +5024,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountPct(Item, 7, false);
+        LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -5095,7 +5096,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountPct(Item, 7, false);
+        LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -5174,7 +5175,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountPct(Item, 9, false);
+        LibraryPOSDiscount.CreateTotalDiscountPct(Item, 9, false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -5260,7 +5261,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountPct(Item, 7, false);
+        LibraryPOSDiscount.CreateTotalDiscountPct(Item, 7, false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -5325,7 +5326,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountTotalDiscountAmtPerMinQty(Item, 2000, false);
+        LibraryPOSDiscount.CreateTotalDiscountAmountTotalDiscountAmtPerMinQty(Item, 2000, false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -5388,7 +5389,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountTotalDiscountAmtPerMinQty(Item, 2000, false);
+        LibraryPOSDiscount.CreateTotalDiscountAmountTotalDiscountAmtPerMinQty(Item, 2000, false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -5448,7 +5449,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountTotalAmtPerMinQty(Item, 2000, false);
+        LibraryPOSDiscount.CreateTotalDiscountAmountTotalAmtPerMinQty(Item, 2000, false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -5510,7 +5511,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountTotalAmtPerMinQty(Item, 2000, false);
+        LibraryPOSDiscount.CreateTotalDiscountAmountTotalAmtPerMinQty(Item, 2000, false);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -5570,10 +5571,10 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
         MixedDiscount.Status := MixedDiscount.Status::Pending;
         MixedDiscount.Modify(true);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -5631,10 +5632,10 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
         MixedDiscount."Starting date" := Today() + 2;
         MixedDiscount.Modify(true);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -5692,11 +5693,11 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
         MixedDiscount.Status := MixedDiscount.Status::Pending;
         MixedDiscount."Starting date" := Today() + 2;
         MixedDiscount.Modify(true);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -5754,11 +5755,11 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
         MixedDiscount.Status := MixedDiscount.Status::Pending;
         MixedDiscount."Ending date" := Today() - 2;
         MixedDiscount.Modify(true);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -5816,10 +5817,10 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
         MixedDiscount."Ending date" := Today() - 2;
         MixedDiscount.Modify(true);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -5878,9 +5879,9 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
-        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() + 3600000, Time() + 7200000);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() + 3600000, Time() + 7200000);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -5939,11 +5940,11 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
         MixedDiscount.Status := MixedDiscount.Status::Pending;
-        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() + 3600000, Time() + 7200000);
+        LibraryPOSDiscount.CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() + 3600000, Time() + 7200000);
         MixedDiscount.Modify(true);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -6002,9 +6003,9 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
-        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 7200000, Time() - 3600000);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 7200000, Time() - 3600000);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -6063,11 +6064,11 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
         MixedDiscount.Status := MixedDiscount.Status::Pending;
-        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 7200000, Time() - 3600000);
+        LibraryPOSDiscount.CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 7200000, Time() - 3600000);
         MixedDiscount.Modify(true);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -6126,9 +6127,9 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
-        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 3600000, Time() + 3600000);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 3600000, Time() + 3600000);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -6187,11 +6188,11 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
         MixedDiscount.Status := MixedDiscount.Status::Pending;
         MixedDiscount.Modify(true);
-        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 3600000, Time() + 3600000);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 3600000, Time() + 3600000);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -6250,10 +6251,10 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
-        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 3600000, Time() + 3600000);
-        GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Future);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 3600000, Time() + 3600000);
+        LibraryPOSDiscount.GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Future);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -6312,10 +6313,10 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
-        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, 0T, 0T);
-        GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Future);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, 0T, 0T);
+        LibraryPOSDiscount.GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Future);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -6374,12 +6375,12 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
         MixedDiscount.Status := MixedDiscount.Status::Pending;
-        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 3600000, Time() + 3600000);
-        GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Future);
+        LibraryPOSDiscount.CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 3600000, Time() + 3600000);
+        LibraryPOSDiscount.GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Future);
         MixedDiscount.Modify(true);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -6438,12 +6439,12 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
         MixedDiscount.Status := MixedDiscount.Status::Pending;
-        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, 0T, 0T);
-        GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Future);
+        LibraryPOSDiscount.CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, 0T, 0T);
+        LibraryPOSDiscount.GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Future);
         MixedDiscount.Modify(true);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -6502,10 +6503,10 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
-        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 3600000, Time() + 3600000);
-        GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Past);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 3600000, Time() + 3600000);
+        LibraryPOSDiscount.GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Past);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -6564,10 +6565,10 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
-        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, 0T, 0T);
-        GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Past);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, 0T, 0T);
+        LibraryPOSDiscount.GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Past);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -6626,12 +6627,12 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
         MixedDiscount.Status := MixedDiscount.Status::Pending;
-        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 3600000, Time() + 3600000);
-        GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Past);
+        LibraryPOSDiscount.CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 3600000, Time() + 3600000);
+        LibraryPOSDiscount.GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Past);
         MixedDiscount.Modify(true);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -6690,12 +6691,12 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
         MixedDiscount.Status := MixedDiscount.Status::Pending;
-        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, 0T, 0T);
-        GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Past);
+        LibraryPOSDiscount.CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, 0T, 0T);
+        LibraryPOSDiscount.GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Past);
         MixedDiscount.Modify(true);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -6754,10 +6755,10 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
-        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 3600000, Time() + 3600000);
-        GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Today);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 3600000, Time() + 3600000);
+        LibraryPOSDiscount.GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Today);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -6816,10 +6817,10 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
-        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, 0T, 0T);
-        GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Today);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, 0T, 0T);
+        LibraryPOSDiscount.GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Today);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -6878,12 +6879,12 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
         MixedDiscount.Status := MixedDiscount.Status::Pending;
-        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 3600000, Time() + 3600000);
-        GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Today);
+        LibraryPOSDiscount.CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, Time() - 3600000, Time() + 3600000);
+        LibraryPOSDiscount.GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Today);
         MixedDiscount.Modify(true);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -6942,12 +6943,12 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
         MixedDiscount.Status := MixedDiscount.Status::Pending;
-        CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, 0T, 0T);
-        GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Today);
+        LibraryPOSDiscount.CreateMixDiscountTimeInterval(MixedDiscount, MixedDiscTimeInterv, 0T, 0T);
+        LibraryPOSDiscount.GetDayAndSetToMixedDiscTimeInterval(MixedDiscTimeInterv, DayDirection::Today);
         MixedDiscount.Modify(true);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -7014,10 +7015,10 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [GIVEN] Discount with Customer Discount Group 
         CustomerDiscountGroupCode := CreateDiscountGroup();
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
         MixedDiscount."Customer Disc. Group Filter" := CustomerDiscountGroupCode;
         MixedDiscount.Modify(true);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Customer with same customer group that set on discount
         Customer."Customer Disc. Group" := CustomerDiscountGroupCode;
@@ -7086,10 +7087,10 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [GIVEN] Discount with Customer Discount Group 
         CustomerDiscountGroupCode := CreateDiscountGroup();
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
         MixedDiscount."Customer Disc. Group Filter" := CustomerDiscountGroupCode;
         MixedDiscount.Modify(true);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -7154,10 +7155,10 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount with Customer Discount Group 
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
         MixedDiscount."Customer Disc. Group Filter" := CreateDiscountGroup();
         MixedDiscount.Modify(true);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Customer with different customer group that set on discount
         Customer."Customer Disc. Group" := CreateDiscountGroup();
@@ -7231,10 +7232,10 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [GIVEN] Discount with Customer Discount Group 
         CustomerDiscountGroupCode := CreateDiscountGroup();
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
         MixedDiscount."Customer Disc. Group Filter" := CustomerDiscountGroupCode + '|' + CreateDiscountGroup();
         MixedDiscount.Modify(true);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Customer with same customer group that set on discount
         Customer."Customer Disc. Group" := CustomerDiscountGroupCode;
@@ -7308,10 +7309,10 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [GIVEN] Discount with Customer Discount Group 
         CustomerDiscountGroupCode := CreateDiscountGroup();
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
         MixedDiscount."Customer Disc. Group Filter" := CustomerDiscountGroupCode + '|' + CreateDiscountGroup();
         MixedDiscount.Modify(true);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Customer with different customer group that set on discount
         Customer."Customer Disc. Group" := CreateDiscountGroup();
@@ -7385,11 +7386,11 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [GIVEN] Discount with Customer Discount Group 
         CustomerDiscountGroupCode := CreateDiscountGroup();
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
         MixedDiscount."Customer Disc. Group Filter" := CustomerDiscountGroupCode;
         MixedDiscount.Status := MixedDiscount.Status::Pending;
         MixedDiscount.Modify(true);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Customer with same customer group that set on discount
         Customer."Customer Disc. Group" := CustomerDiscountGroupCode;
@@ -7458,11 +7459,11 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [GIVEN] Discount with Customer Discount Group 
         CustomerDiscountGroupCode := CreateDiscountGroup();
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
         MixedDiscount."Customer Disc. Group Filter" := CustomerDiscountGroupCode;
         MixedDiscount.Status := MixedDiscount.Status::Pending;
         MixedDiscount.Modify(true);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -7529,11 +7530,11 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [GIVEN] Discount with Customer Discount Group 
         CustomerDiscountGroupCode := CreateDiscountGroup();
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
         MixedDiscount."Customer Disc. Group Filter" := CustomerDiscountGroupCode;
         MixedDiscount.Status := MixedDiscount.Status::Pending;
         MixedDiscount.Modify(true);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Customer with different customer group that set on discount
         Customer."Customer Disc. Group" := CreateDiscountGroup();
@@ -7607,11 +7608,11 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
 
         // [GIVEN] Discount with Customer Discount Group 
         CustomeDiscountGroup := CreateDiscountGroup();
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
         MixedDiscount.Status := MixedDiscount.Status::Pending;
         MixedDiscount."Customer Disc. Group Filter" := CustomeDiscountGroup + '|' + CreateDiscountGroup();
         MixedDiscount.Modify(true);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Customer with same customer group that set on discount
         Customer."Customer Disc. Group" := CustomeDiscountGroup;
@@ -7683,11 +7684,11 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount with Customer Discount Group 
-        CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
+        LibraryPOSDiscount.CreateTotalDiscountAmountHeader(MixedDiscount, 2000, false);
         MixedDiscount.Status := MixedDiscount.Status::Pending;
         MixedDiscount."Customer Disc. Group Filter" := CreateDiscountGroup() + '|' + CreateDiscountGroup();
         MixedDiscount.Modify(true);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
+        LibraryPOSDiscount.CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
 
         // [GIVEN] Customer with same customer group that set on discount
         Customer."Customer Disc. Group" := CreateDiscountGroup();
@@ -7755,7 +7756,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount with item and UOM
-        TotalAmount := CreateTotalDiscountAmountTotalAmtPerMinQtyWithUOM(Item, 500, false, UnitOfMeasure.Code, DiscountCode);
+        TotalAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalAmtPerMinQtyWithUOM(Item, 500, false, UnitOfMeasure.Code, DiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -7819,7 +7820,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount with item and UOM
-        CreateTotalDiscountAmountTotalAmtPerMinQtyWithUOM(Item, 500, false, SecondUnitOfMeasure.Code, DiscountCode);
+        LibraryPOSDiscount.CreateTotalDiscountAmountTotalAmtPerMinQtyWithUOM(Item, 500, false, SecondUnitOfMeasure.Code, DiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -7887,7 +7888,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         SecondItem.Modify();
 
         // [GIVEN] Discount with item and UOM
-        TotalAmount := CreateTotalDiscountAmountTotalAmtPerMinQtyWithUOM(Item, 500, false, UnitOfMeasure.Code, DiscountCode);
+        TotalAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalAmtPerMinQtyWithUOM(Item, 500, false, UnitOfMeasure.Code, DiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -7969,7 +7970,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         SecondItem.Modify();
 
         // [GIVEN] Discount with item and UOM
-        TotalAmount := CreateTotalDiscountAmountTotalAmtPerMinQtyWithUOMTwoItems(Item, SecondItem, 500, false, UnitOfMeasure.Code, SecondUnitOfMeasure.Code, DiscountCode);
+        TotalAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalAmtPerMinQtyWithUOMTwoItems(Item, SecondItem, 500, false, UnitOfMeasure.Code, SecondUnitOfMeasure.Code, DiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -8053,8 +8054,8 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         SecondItem.Modify();
 
         // [GIVEN] Discount with item and UOM
-        FirstTotalAmount := CreateTotalDiscountAmountTotalAmtPerMinQtyWithUOM(Item, 500, false, UnitOfMeasure.Code, FirstDiscountCode);
-        SecondTotalAmount := CreateTotalDiscountAmountTotalAmtPerMinQtyWithUOM(SecondItem, 1000, false, SecondUnitOfMeasure.Code, SecondDiscountCode);
+        FirstTotalAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalAmtPerMinQtyWithUOM(Item, 500, false, UnitOfMeasure.Code, FirstDiscountCode);
+        SecondTotalAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalAmtPerMinQtyWithUOM(SecondItem, 1000, false, SecondUnitOfMeasure.Code, SecondDiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -8128,7 +8129,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount with item and UOM
-        TotalDiscountAmount := CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyWithUOM(Item, 500, false, UnitOfMeasure.Code, DiscountCode);
+        TotalDiscountAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyWithUOM(Item, 500, false, UnitOfMeasure.Code, DiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -8197,7 +8198,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount with item and UOM
-        CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyWithUOM(Item, 500, false, SecondUnitOfMeasure.Code, DiscountCode);
+        LibraryPOSDiscount.CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyWithUOM(Item, 500, false, SecondUnitOfMeasure.Code, DiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -8267,7 +8268,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         SecondItem.Modify();
 
         // [GIVEN] Discount with item and UOM
-        TotalDiscountAmount := CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyWithUOM(Item, 500, false, UnitOfMeasure.Code, DiscountCode);
+        TotalDiscountAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyWithUOM(Item, 500, false, UnitOfMeasure.Code, DiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -8355,7 +8356,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         SecondItem.Modify();
 
         // [GIVEN] Discount with item and UOM
-        TotalDiscountAmount := CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyWithUOMTwoItems(Item, SecondItem, 500, false, UnitOfMeasure.Code, SecondUnitOfMeasure.Code, DiscountCode);
+        TotalDiscountAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyWithUOMTwoItems(Item, SecondItem, 500, false, UnitOfMeasure.Code, SecondUnitOfMeasure.Code, DiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -8445,8 +8446,8 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         SecondItem.Modify();
 
         // [GIVEN] Discounts with items and UOMs
-        FirstTotalDiscountAmount := CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyWithUOM(Item, 500, false, UnitOfMeasure.Code, FirstDiscountCode);
-        SecondTotalDiscountAmount := CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyWithUOM(SecondItem, 1000, false, SecondUnitOfMeasure.Code, SecondDiscountCode);
+        FirstTotalDiscountAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyWithUOM(Item, 500, false, UnitOfMeasure.Code, FirstDiscountCode);
+        SecondTotalDiscountAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyWithUOM(SecondItem, 1000, false, SecondUnitOfMeasure.Code, SecondDiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -8524,7 +8525,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount with item and UOM
-        DiscountPct := CreateTotalDiscountPctWithUOM(Item, 50, false, UnitOfMeasure.Code, DiscountCode);
+        DiscountPct := LibraryPOSDiscount.CreateTotalDiscountPctWithUOM(Item, 50, false, UnitOfMeasure.Code, DiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -8590,7 +8591,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount with item and UOM
-        CreateTotalDiscountPctWithUOM(Item, 50, false, SecondUnitOfMeasure.Code, DiscountCode);
+        LibraryPOSDiscount.CreateTotalDiscountPctWithUOM(Item, 50, false, SecondUnitOfMeasure.Code, DiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -8657,7 +8658,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         SecondItem.Modify();
 
         // [GIVEN] Discount with item and UOM
-        DiscountPct := CreateTotalDiscountPctWithUOM(Item, 50, false, UnitOfMeasure.Code, DiscountCode);
+        DiscountPct := LibraryPOSDiscount.CreateTotalDiscountPctWithUOM(Item, 50, false, UnitOfMeasure.Code, DiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -8737,7 +8738,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         SecondItem.Modify();
 
         // [GIVEN] Discount with item and UOM
-        DiscountPct := CreateTotalDiscountPctWithUOMTwoItems(Item, SecondItem, 50, false, UnitOfMeasure.Code, SecondUnitOfMeasure.Code, DiscountCode);
+        DiscountPct := LibraryPOSDiscount.CreateTotalDiscountPctWithUOMTwoItems(Item, SecondItem, 50, false, UnitOfMeasure.Code, SecondUnitOfMeasure.Code, DiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -8819,8 +8820,8 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         SecondItem.Modify();
 
         // [GIVEN] Discounts with items and UOMs
-        FirstDiscountPct := CreateTotalDiscountPctWithUOM(Item, 50, false, UnitOfMeasure.Code, FirstDiscountCode);
-        SecondDiscountPct := CreateTotalDiscountPctWithUOM(SecondItem, 60, false, SecondUnitOfMeasure.Code, SecondDiscountCode);
+        FirstDiscountPct := LibraryPOSDiscount.CreateTotalDiscountPctWithUOM(Item, 50, false, UnitOfMeasure.Code, FirstDiscountCode);
+        SecondDiscountPct := LibraryPOSDiscount.CreateTotalDiscountPctWithUOM(SecondItem, 60, false, SecondUnitOfMeasure.Code, SecondDiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -8882,7 +8883,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        TotalAmount := CreateTotalDiscountAmountTotalAmtPerMinQtyLotEnabled(Item, 500, false, 1, DiscountCode);
+        TotalAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalAmtPerMinQtyLotEnabled(Item, 500, false, 1, DiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -8940,7 +8941,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         SecondItem.Modify();
 
         // [GIVEN] Discount with item quantity
-        TotalAmount := CreateTotalDiscountAmountTotalAmtPerMinQtyLotEnabledTwoItems(Item, SecondItem, 500, false, 1, 1, DiscountCode);
+        TotalAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalAmtPerMinQtyLotEnabledTwoItems(Item, SecondItem, 500, false, 1, 1, DiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -9013,7 +9014,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         SecondItem.Modify();
 
         // [GIVEN] Discount with item quantity
-        TotalAmount := CreateTotalDiscountAmountTotalAmtPerMinQtyLotEnabledTwoItems(Item, SecondItem, 500, false, 2, 2, DiscountCode);
+        TotalAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalAmtPerMinQtyLotEnabledTwoItems(Item, SecondItem, 500, false, 2, 2, DiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -9087,8 +9088,8 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         SecondItem.Modify();
 
         // [GIVEN] Discount with item quantity
-        FirstDiscountTotalAmount := CreateTotalDiscountAmountTotalAmtPerMinQtyLotEnabled(Item, 500, false, 1, FirstDiscountCode);
-        SecondDiscountTotalAmount := CreateTotalDiscountAmountTotalAmtPerMinQtyLotEnabledTwoItems(Item, SecondItem, 1000, false, 1, 1, SecondDiscountCode);
+        FirstDiscountTotalAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalAmtPerMinQtyLotEnabled(Item, 500, false, 1, FirstDiscountCode);
+        SecondDiscountTotalAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalAmtPerMinQtyLotEnabledTwoItems(Item, SecondItem, 1000, false, 1, 1, SecondDiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -9159,7 +9160,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        TotalDiscountAmount := CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyLotEnabled(Item, 500, false, 1, DiscountCode);
+        TotalDiscountAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyLotEnabled(Item, 500, false, 1, DiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -9224,7 +9225,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         SecondItem.Modify();
 
         // [GIVEN] Discount
-        TotalDiscountAmount := CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyLotEnabledTwoItems(Item, SecondItem, 500, false, 1, 1, DiscountCode);
+        TotalDiscountAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyLotEnabledTwoItems(Item, SecondItem, 500, false, 1, 1, DiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -9304,7 +9305,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         SecondItem.Modify();
 
         // [GIVEN] Discount
-        TotalDiscountAmount := CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyLotEnabledTwoItems(Item, SecondItem, 500, false, 2, 2, DiscountCode);
+        TotalDiscountAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyLotEnabledTwoItems(Item, SecondItem, 500, false, 2, 2, DiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -9387,8 +9388,8 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         SecondItem.Modify();
 
         // [GIVEN] Discount
-        FirstTotalDiscountAmount := CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyLotEnabled(Item, 500, false, 1, FirstDiscountCode);
-        SecondTotalDiscountAmount := CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyLotEnabledTwoItems(Item, SecondItem, 1000, false, 1, 1, SecondDiscountCode);
+        FirstTotalDiscountAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyLotEnabled(Item, 500, false, 1, FirstDiscountCode);
+        SecondTotalDiscountAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyLotEnabledTwoItems(Item, SecondItem, 1000, false, 1, 1, SecondDiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -9464,7 +9465,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        DiscountPct := CreateTotalDiscountPctLotEnabled(Item, 50, false, 1, DiscountCode);
+        DiscountPct := LibraryPOSDiscount.CreateTotalDiscountPctLotEnabled(Item, 50, false, 1, DiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -9521,7 +9522,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         SecondItem.Modify();
 
         // [GIVEN] Discount with item quantity
-        DiscountPct := CreateTotalDiscountAmountTotalDiscountPctLotEnabledTwoItems(Item, SecondItem, 50, false, 1, 1, DiscountCode);
+        DiscountPct := LibraryPOSDiscount.CreateTotalDiscountAmountTotalDiscountPctLotEnabledTwoItems(Item, SecondItem, 50, false, 1, 1, DiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -9594,7 +9595,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         SecondItem.Modify();
 
         // [GIVEN] Discount with item quantity
-        DiscountPct := CreateTotalDiscountAmountTotalDiscountPctLotEnabledTwoItems(Item, SecondItem, 50, false, 2, 2, DiscountCode);
+        DiscountPct := LibraryPOSDiscount.CreateTotalDiscountAmountTotalDiscountPctLotEnabledTwoItems(Item, SecondItem, 50, false, 2, 2, DiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -9669,8 +9670,8 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         SecondItem.Modify();
 
         // [GIVEN] Discount with item quantity
-        FirstDiscountPct := CreateTotalDiscountPctLotEnabled(Item, 50, false, 1, FirstDiscountCode);
-        SecondDiscountPct := CreateTotalDiscountAmountTotalDiscountPctLotEnabledTwoItems(Item, SecondItem, 60, false, 1, 1, SecondDiscountCode);
+        FirstDiscountPct := LibraryPOSDiscount.CreateTotalDiscountPctLotEnabled(Item, 50, false, 1, FirstDiscountCode);
+        SecondDiscountPct := LibraryPOSDiscount.CreateTotalDiscountAmountTotalDiscountPctLotEnabledTwoItems(Item, SecondItem, 60, false, 1, 1, SecondDiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -9739,7 +9740,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        TotalAmount := CreateTotalDiscountAmountTotalAmtPerMinQtyLotEnabled(Item, 500, false, 2, DiscountCode);
+        TotalAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalAmtPerMinQtyLotEnabled(Item, 500, false, 2, DiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -9796,7 +9797,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         SecondItem.Modify();
 
         // [GIVEN] Discount with item quantity
-        TotalAmount := CreateTotalDiscountAmountTotalAmtPerMinQtyLotEnabledTwoItems(Item, SecondItem, 500, false, 2, 2, DiscountCode);
+        TotalAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalAmtPerMinQtyLotEnabledTwoItems(Item, SecondItem, 500, false, 2, 2, DiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -9863,8 +9864,8 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         SecondItem.Modify();
 
         // [GIVEN] Discount with item quantity
-        FirstDiscountTotalAmount := CreateTotalDiscountAmountTotalAmtPerMinQtyLotEnabled(Item, 500, false, 2, FirstDiscountCode);
-        SecondDiscountTotalAmount := CreateTotalDiscountAmountTotalAmtPerMinQtyLotEnabledTwoItems(Item, SecondItem, 1000, false, 2, 2, SecondDiscountCode);
+        FirstDiscountTotalAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalAmtPerMinQtyLotEnabled(Item, 500, false, 2, FirstDiscountCode);
+        SecondDiscountTotalAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalAmtPerMinQtyLotEnabledTwoItems(Item, SecondItem, 1000, false, 2, 2, SecondDiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -9923,7 +9924,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyLotEnabled(Item, 500, false, 2, DiscountCode);
+        LibraryPOSDiscount.CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyLotEnabled(Item, 500, false, 2, DiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -9979,7 +9980,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         SecondItem.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyLotEnabledTwoItems(Item, SecondItem, 500, false, 2, 2, DiscountCode);
+        LibraryPOSDiscount.CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyLotEnabledTwoItems(Item, SecondItem, 500, false, 2, 2, DiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -10044,8 +10045,8 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         SecondItem.Modify();
 
         // [GIVEN] Discount
-        CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyLotEnabled(Item, 500, false, 2, FirstDiscountCode);
-        CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyLotEnabledTwoItems(Item, SecondItem, 1000, false, 2, 2, SecondDiscountCode);
+        LibraryPOSDiscount.CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyLotEnabled(Item, 500, false, 2, FirstDiscountCode);
+        LibraryPOSDiscount.CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyLotEnabledTwoItems(Item, SecondItem, 1000, false, 2, 2, SecondDiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -10105,7 +10106,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         Item.Modify();
 
         // [GIVEN] Discount
-        DiscountPct := CreateTotalDiscountPctLotEnabled(Item, 50, false, 2, DiscountCode);
+        DiscountPct := LibraryPOSDiscount.CreateTotalDiscountPctLotEnabled(Item, 50, false, 2, DiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -10162,7 +10163,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         SecondItem.Modify();
 
         // [GIVEN] Discount with item quantity
-        DiscountPct := CreateTotalDiscountAmountTotalDiscountPctLotEnabledTwoItems(Item, SecondItem, 50, false, 2, 2, DiscountCode);
+        DiscountPct := LibraryPOSDiscount.CreateTotalDiscountAmountTotalDiscountPctLotEnabledTwoItems(Item, SecondItem, 50, false, 2, 2, DiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -10230,8 +10231,8 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         SecondItem.Modify();
 
         // [GIVEN] Discount with item quantity
-        FirstDiscountPct := CreateTotalDiscountPctLotEnabled(Item, 50, false, 2, FirstDiscountCode);
-        SecondDiscountPct := CreateTotalDiscountAmountTotalDiscountPctLotEnabledTwoItems(Item, SecondItem, 60, false, 2, 2, SecondDiscountCode);
+        FirstDiscountPct := LibraryPOSDiscount.CreateTotalDiscountPctLotEnabled(Item, 50, false, 2, FirstDiscountCode);
+        SecondDiscountPct := LibraryPOSDiscount.CreateTotalDiscountAmountTotalDiscountPctLotEnabledTwoItems(Item, SecondItem, 60, false, 2, 2, SecondDiscountCode);
 
         // [GIVEN] Active POS session & sale
         LibraryPOSMock.InitializePOSSessionAndStartSaleWithoutActions(POSSession, POSUnit, POSSaleUnit);
@@ -10454,7 +10455,7 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
         DiscountPriorityList.OpenView();
         DiscountPriorityList.Close();
 
-        DiscountPriority.SetFilter("Table ID", '<>%1', DiscSourceTableId());
+        DiscountPriority.SetFilter("Table ID", '<>%1', LibraryPOSDiscount.MixDiscountSourceTableId());
         DiscountPriority.ModifyAll(Disabled, true);
     end;
 
@@ -10462,372 +10463,8 @@ codeunit 85032 "NPR POS Mix. Disc. and Tax"
     var
         RecRef: RecordRef;
     begin
-        RecRef.Open(DiscSourceTableId());
+        RecRef.Open(LibraryPOSDiscount.MixDiscountSourceTableId());
         RecRef.DeleteAll(true);
-    end;
-
-    local procedure DiscSourceTableId(): Integer
-    begin
-        exit(DATABASE::"NPR Mixed Discount");
-    end;
-
-    internal procedure CreateTotalDiscountPct(Item: Record Item; TotalDiscPct: Decimal; TotalAmtExclTax: Boolean): Decimal
-    var
-        MixedDiscount: Record "NPR Mixed Discount";
-        DiscPct: Decimal;
-    begin
-        DiscPct := CreateTotalDiscountPctHeader(MixedDiscount, TotalDiscPct, TotalAmtExclTax);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
-        exit(DiscPct);
-    end;
-
-    local procedure CreateTotalDiscountPctWithUOM(Item: Record Item; TotalDiscPct: Decimal; TotalAmtExclTax: Boolean; UOM: Code[10]; var DiscountCode: Code[20]): Decimal
-    var
-        MixedDiscount: Record "NPR Mixed Discount";
-        DiscPct: Decimal;
-    begin
-        DiscPct := CreateTotalDiscountPctHeader(MixedDiscount, TotalDiscPct, TotalAmtExclTax);
-        CreateDiscountLineWithUOM(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item, UOM);
-        DiscountCode := MixedDiscount.Code;
-        MixedDiscount.Modify();
-        exit(DiscPct);
-    end;
-
-    local procedure CreateTotalDiscountPctWithUOMTwoItems(Item: Record Item; SecondItem: Record Item; TotalDiscPct: Decimal; TotalAmtExclTax: Boolean; FirstUOM: Code[10]; SecondUOM: Code[10]; var DiscountCode: Code[20]): Decimal
-    var
-        MixedDiscount: Record "NPR Mixed Discount";
-        DiscPct: Decimal;
-    begin
-        DiscPct := CreateTotalDiscountPctHeader(MixedDiscount, TotalDiscPct, TotalAmtExclTax);
-        CreateDiscountLineWithUOM(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item, FirstUOM);
-        CreateDiscountLineWithUOM(MixedDiscount, SecondItem, "NPR Disc. Grouping Type"::Item, SecondUOM);
-        DiscountCode := MixedDiscount.Code;
-        MixedDiscount.Modify();
-        exit(DiscPct);
-    end;
-
-    internal procedure CreateTotalDiscountAmountTotalDiscountAmtPerMinQty(Item: Record Item; TotalDiscountAmount: Decimal; TotalAmountExclTax: Boolean): Decimal
-    var
-        MixedDiscount: Record "NPR Mixed Discount";
-        DiscountAmount: Decimal;
-    begin
-        DiscountAmount := CreateTotalDiscountAmountHeader(MixedDiscount, TotalDiscountAmount, TotalAmountExclTax);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
-        exit(DiscountAmount);
-    end;
-
-    internal procedure CreateTotalDiscountAmountTotalAmtPerMinQty(Item: Record Item; TotalDiscountAmount: Decimal; TotalAmountExclTax: Boolean): Decimal
-    var
-        MixedDiscount: Record "NPR Mixed Discount";
-        DiscountAmount: Decimal;
-    begin
-        DiscountAmount := CreateTotalAmountHeader(MixedDiscount, TotalDiscountAmount, TotalAmountExclTax);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
-        exit(DiscountAmount);
-    end;
-
-    internal procedure CreateMultipleDiscountLevels(Item: Record Item; FirstLevelQty: Integer; SecondLevelQty: Integer; FirstLevelAmount: Decimal; SecondLevelAmount: Decimal; TotalAmountExclTax: Boolean): Code[20]
-    var
-        MixedDiscount: Record "NPR Mixed Discount";
-    begin
-        CreateMultipleDiscountLevelsHeader(MixedDiscount, TotalAmountExclTax);
-        CreateDiscountLine(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item);
-        CreateMixDiscountLevels(MixedDiscount, FirstLevelQty, SecondLevelQty, FirstLevelAmount, SecondLevelAmount);
-        exit(MixedDiscount.Code);
-    end;
-
-    local procedure CreateTotalDiscountAmountTotalAmtPerMinQtyWithUOM(Item: Record Item; TotalDiscountAmount: Decimal; TotalAmountExclTax: Boolean; UOM: Code[10]; var DiscountCode: Code[20]): Decimal
-    var
-        MixedDiscount: Record "NPR Mixed Discount";
-        DiscountAmount: Decimal;
-    begin
-        DiscountAmount := CreateTotalAmountHeader(MixedDiscount, TotalDiscountAmount, TotalAmountExclTax);
-        CreateDiscountLineWithUOM(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item, UOM);
-        DiscountCode := MixedDiscount.Code;
-        exit(DiscountAmount);
-    end;
-
-    local procedure CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyWithUOM(Item: Record Item; TotalDiscountAmount: Decimal; TotalAmountExclTax: Boolean; UOM: Code[10]; var DiscountCode: Code[20]): Decimal
-    var
-        MixedDiscount: Record "NPR Mixed Discount";
-        DiscountAmount: Decimal;
-    begin
-        DiscountAmount := CreateTotalDiscountAmountHeader(MixedDiscount, TotalDiscountAmount, TotalAmountExclTax);
-        CreateDiscountLineWithUOM(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item, UOM);
-        DiscountCode := MixedDiscount.Code;
-        exit(DiscountAmount);
-    end;
-
-    local procedure CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyWithUOMTwoItems(Item: Record Item; SecondItem: Record Item; TotalDiscountAmount: Decimal; TotalAmountExclTax: Boolean; FirstUOM: Code[10]; SecondUOM: Code[10]; var DiscountCode: Code[20]): Decimal
-    var
-        MixedDiscount: Record "NPR Mixed Discount";
-        DiscountAmount: Decimal;
-    begin
-        DiscountAmount := CreateTotalDiscountAmountHeader(MixedDiscount, TotalDiscountAmount, TotalAmountExclTax);
-        CreateDiscountLineWithUOM(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item, FirstUOM);
-        CreateDiscountLineWithUOM(MixedDiscount, SecondItem, "NPR Disc. Grouping Type"::Item, SecondUOM);
-        DiscountCode := MixedDiscount.Code;
-        exit(DiscountAmount);
-    end;
-
-    local procedure CreateTotalDiscountAmountTotalAmtPerMinQtyWithUOMTwoItems(Item: Record Item; SecondItem: Record Item; TotalDiscountAmount: Decimal; TotalAmountExclTax: Boolean; FirstUOM: Code[10]; SecondUOM: Code[10]; var DiscountCode: Code[20]): Decimal
-    var
-        MixedDiscount: Record "NPR Mixed Discount";
-        DiscountAmount: Decimal;
-    begin
-        DiscountAmount := CreateTotalAmountHeader(MixedDiscount, TotalDiscountAmount, TotalAmountExclTax);
-        CreateDiscountLineWithUOM(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item, FirstUOM);
-        CreateDiscountLineWithUOM(MixedDiscount, SecondItem, "NPR Disc. Grouping Type"::Item, SecondUOM);
-        DiscountCode := MixedDiscount.Code;
-        exit(DiscountAmount);
-    end;
-
-    local procedure CreateTotalDiscountPctHeader(var MixedDiscount: Record "NPR Mixed Discount"; TotalDiscPct: Decimal; TotalAmtExclTax: Boolean): Decimal
-    var
-        LibraryUtility: Codeunit "Library - Utility";
-    begin
-        MixedDiscount.Code := LibraryUtility.GenerateRandomCode(MixedDiscount.FieldNo(Code), DiscSourceTableId());
-        MixedDiscount.Init();
-        MixedDiscount.Status := MixedDiscount.Status::Active;
-        MixedDiscount."Starting date" := Today() - 7;
-        MixedDiscount."Ending date" := Today() + 7;
-        MixedDiscount."Discount Type" := MixedDiscount."Discount Type"::"Total Discount %";
-        MixedDiscount."Total Discount %" := TotalDiscPct;
-        MixedDiscount."Total Amount Excl. VAT" := TotalAmtExclTax;
-        MixedDiscount."Min. Quantity" := 1;
-        MixedDiscount.Insert();
-        exit(MixedDiscount."Total Discount %");
-    end;
-
-    local procedure CreateTotalDiscountAmountHeader(var MixedDiscount: Record "NPR Mixed Discount"; TotalDiscountAmount: Decimal; TotalAmtExclTax: Boolean): Decimal
-    var
-        LibraryUtility: Codeunit "Library - Utility";
-    begin
-        MixedDiscount.Code := LibraryUtility.GenerateRandomCode(MixedDiscount.FieldNo(Code), DiscSourceTableId());
-        MixedDiscount.Init();
-        MixedDiscount.Status := MixedDiscount.Status::Active;
-        MixedDiscount."Starting date" := Today() - 7;
-        MixedDiscount."Ending date" := Today() + 7;
-        MixedDiscount."Discount Type" := MixedDiscount."Discount Type"::"Total Discount Amt. per Min. Qty.";
-        MixedDiscount."Total Discount Amount" := TotalDiscountAmount;
-        MixedDiscount."Total Amount Excl. VAT" := TotalAmtExclTax;
-        MixedDiscount."Min. Quantity" := 1;
-        MixedDiscount.Insert();
-        exit(MixedDiscount."Total Discount Amount");
-    end;
-
-    local procedure CreateTotalAmountHeader(var MixedDiscount: Record "NPR Mixed Discount"; TotalDiscountAmount: Decimal; TotalAmtExclTax: Boolean): Decimal
-    var
-        LibraryUtility: Codeunit "Library - Utility";
-    begin
-        MixedDiscount.Code := LibraryUtility.GenerateRandomCode(MixedDiscount.FieldNo(Code), DiscSourceTableId());
-        MixedDiscount.Init();
-        MixedDiscount.Status := MixedDiscount.Status::Active;
-        MixedDiscount."Starting date" := Today() - 7;
-        MixedDiscount."Ending date" := Today() + 7;
-        MixedDiscount."Discount Type" := MixedDiscount."Discount Type"::"Total Amount per Min. Qty.";
-        MixedDiscount."Total Amount" := TotalDiscountAmount;
-        MixedDiscount."Total Amount Excl. VAT" := TotalAmtExclTax;
-        MixedDiscount."Min. Quantity" := 1;
-        MixedDiscount.Insert();
-        exit(MixedDiscount."Total Amount");
-    end;
-
-    local procedure CreateMultipleDiscountLevelsHeader(var MixedDiscount: Record "NPR Mixed Discount"; TotalAmtExclTax: Boolean)
-    var
-        LibraryUtility: Codeunit "Library - Utility";
-    begin
-        MixedDiscount.Code := LibraryUtility.GenerateRandomCode(MixedDiscount.FieldNo(Code), DiscSourceTableId());
-        MixedDiscount.Init();
-        MixedDiscount.Status := MixedDiscount.Status::Active;
-        MixedDiscount."Starting date" := Today() - 7;
-        MixedDiscount."Ending date" := Today() + 7;
-        MixedDiscount."Discount Type" := MixedDiscount."Discount Type"::"Multiple Discount Levels";
-        MixedDiscount."Total Amount Excl. VAT" := TotalAmtExclTax;
-        MixedDiscount."Min. Quantity" := 1;
-        MixedDiscount.Insert();
-    end;
-
-    local procedure CreateMixDiscountLevels(MixedDiscount: Record "NPR Mixed Discount"; FirstLevelQty: Integer; SecondLevelQty: Integer; FirstLevelAmount: Decimal; SecondLevelAmount: Decimal)
-    var
-        MixedDiscountLevel: Record "NPR Mixed Discount Level";
-    begin
-        MixedDiscountLevel.Init();
-        MixedDiscountLevel."Mixed Discount Code" := MixedDiscount.Code;
-        MixedDiscountLevel.Quantity := FirstLevelQty;
-        MixedDiscountLevel."Discount Amount" := FirstLevelAmount;
-        MixedDiscountLevel.Insert();
-
-        MixedDiscountLevel.Init();
-        MixedDiscountLevel."Mixed Discount Code" := MixedDiscount.Code;
-        MixedDiscountLevel.Quantity := SecondLevelQty;
-        MixedDiscountLevel."Discount Amount" := SecondLevelAmount;
-        MixedDiscountLevel.Insert();
-    end;
-
-    local procedure CreateDiscountLine(MixedDiscount: Record "NPR Mixed Discount"; Item: Record Item; DiscGroupType: Enum "NPR Disc. Grouping Type")
-    var
-        MixedDiscountLine: Record "NPR Mixed Discount Line";
-    begin
-        MixedDiscountLine.Code := MixedDiscount.Code;
-        MixedDiscountLine."Disc. Grouping Type" := DiscGroupType;
-        MixedDiscountLine."No." := Item."No.";
-        MixedDiscountLine."Variant Code" := '';
-        MixedDiscountLine.Init();
-        MixedDiscountLine.Status := MixedDiscount.Status;
-        MixedDiscountLine."Starting date" := MixedDiscount."Starting date";
-        MixedDiscountLine."Ending Date" := MixedDiscount."Ending date";
-        MixedDiscountLine.Insert();
-    end;
-
-    local procedure CreateDiscountLineWithUOM(MixedDiscount: Record "NPR Mixed Discount"; Item: Record Item; DiscGroupType: Enum "NPR Disc. Grouping Type"; UOM: Code[10])
-    var
-        MixedDiscountLine: Record "NPR Mixed Discount Line";
-    begin
-        MixedDiscountLine.Code := MixedDiscount.Code;
-        MixedDiscountLine."Disc. Grouping Type" := DiscGroupType;
-        MixedDiscountLine."No." := Item."No.";
-        MixedDiscountLine."Variant Code" := '';
-        MixedDiscountLine.Init();
-        MixedDiscountLine.Status := MixedDiscount.Status;
-        MixedDiscountLine."Unit of Measure Code" := UOM;
-        MixedDiscountLine."Starting date" := MixedDiscount."Starting date";
-        MixedDiscountLine."Ending Date" := MixedDiscount."Ending date";
-        MixedDiscountLine.Insert();
-    end;
-
-    local procedure CreateTotalDiscountPctLotEnabled(Item: Record Item; TotalDiscPct: Decimal; TotalAmtExclTax: Boolean; ItemQty: Integer; var DiscountCode: Code[20]): Decimal
-    var
-        MixedDiscount: Record "NPR Mixed Discount";
-        DiscPct: Decimal;
-    begin
-        DiscPct := CreateTotalDiscountPctHeader(MixedDiscount, TotalDiscPct, TotalAmtExclTax);
-        CreateDiscountLineWithQty(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item, ItemQty);
-        MixedDiscount.Lot := true;
-        DiscountCode := MixedDiscount.Code;
-        MixedDiscount.Modify();
-        exit(DiscPct);
-    end;
-
-    local procedure CreateTotalDiscountAmountTotalDiscountPctLotEnabledTwoItems(Item: Record Item; Item2: Record Item; TotalDiscountAmount: Decimal; TotalAmountExclTax: Boolean; FirstItemQty: Integer; SecondItemQty: Integer; var DiscountCode: Code[20]) DiscountAmount: Decimal
-    var
-        MixedDiscount: Record "NPR Mixed Discount";
-    begin
-        DiscountAmount := CreateTotalDiscountPctHeader(MixedDiscount, TotalDiscountAmount, TotalAmountExclTax);
-        MixedDiscount.Lot := true;
-        CreateDiscountLineWithQty(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item, FirstItemQty);
-        CreateDiscountLineWithQty(MixedDiscount, Item2, "NPR Disc. Grouping Type"::Item, SecondItemQty);
-        DiscountCode := MixedDiscount.Code;
-        MixedDiscount.Modify();
-    end;
-
-    local procedure CreateTotalDiscountAmountTotalAmtPerMinQtyLotEnabled(Item: Record Item; TotalDiscountAmount: Decimal; TotalAmountExclTax: Boolean; ItemQty: Integer; var DiscountCode: Code[20]) DiscountAmount: Decimal
-    var
-        MixedDiscount: Record "NPR Mixed Discount";
-    begin
-        DiscountAmount := CreateTotalAmountHeader(MixedDiscount, TotalDiscountAmount, TotalAmountExclTax);
-        CreateDiscountLineWithQty(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item, ItemQty);
-        MixedDiscount.Lot := true;
-        DiscountCode := MixedDiscount.Code;
-        MixedDiscount.Modify();
-    end;
-
-    local procedure CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyLotEnabled(Item: Record Item; TotalDiscountAmount: Decimal; TotalAmountExclTax: Boolean; ItemQty: Integer; var DiscountCode: Code[20]) DiscountAmount: Decimal
-    var
-        MixedDiscount: Record "NPR Mixed Discount";
-    begin
-        CreateTotalDiscountAmountHeader(MixedDiscount, TotalDiscountAmount, TotalAmountExclTax);
-        CreateDiscountLineWithQty(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item, ItemQty);
-        MixedDiscount.Lot := true;
-        DiscountCode := MixedDiscount.Code;
-        MixedDiscount.Modify();
-        DiscountAmount := MixedDiscount."Total Discount Amount";
-    end;
-
-    local procedure CreateTotalDiscountAmountTotalAmtPerMinQtyLotEnabledTwoItems(Item: Record Item; Item2: Record Item; TotalDiscountAmount: Decimal; TotalAmountExclTax: Boolean; FirstItemQty: Integer; SecondItemQty: Integer; var DiscountCode: Code[20]) DiscountAmount: Decimal
-    var
-        MixedDiscount: Record "NPR Mixed Discount";
-    begin
-        DiscountAmount := CreateTotalAmountHeader(MixedDiscount, TotalDiscountAmount, TotalAmountExclTax);
-        MixedDiscount.Lot := true;
-        CreateDiscountLineWithQty(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item, FirstItemQty);
-        CreateDiscountLineWithQty(MixedDiscount, Item2, "NPR Disc. Grouping Type"::Item, SecondItemQty);
-        DiscountCode := MixedDiscount.Code;
-        MixedDiscount.Modify();
-    end;
-
-    local procedure CreateTotalDiscountAmountTotalDiscountAmtPerMinQtyLotEnabledTwoItems(Item: Record Item; Item2: Record Item; TotalDiscountAmount: Decimal; TotalAmountExclTax: Boolean; FirstItemQty: Integer; SecondItemQty: Integer; var DiscountCode: Code[20]) DiscountAmount: Decimal
-    var
-        MixedDiscount: Record "NPR Mixed Discount";
-    begin
-        CreateTotalDiscountAmountHeader(MixedDiscount, TotalDiscountAmount, TotalAmountExclTax);
-        MixedDiscount.Lot := true;
-        CreateDiscountLineWithQty(MixedDiscount, Item, "NPR Disc. Grouping Type"::Item, FirstItemQty);
-        CreateDiscountLineWithQty(MixedDiscount, Item2, "NPR Disc. Grouping Type"::Item, SecondItemQty);
-        DiscountCode := MixedDiscount.Code;
-        MixedDiscount.Modify();
-        DiscountAmount := MixedDiscount."Total Discount Amount";
-    end;
-
-    local procedure CreateDiscountLineWithQty(MixedDiscount: Record "NPR Mixed Discount"; Item: Record Item; DiscGroupType: Enum "NPR Disc. Grouping Type"; Quantity: Integer)
-    var
-        MixedDiscountLine: Record "NPR Mixed Discount Line";
-    begin
-        MixedDiscountLine.Code := MixedDiscount.Code;
-        MixedDiscountLine."Disc. Grouping Type" := DiscGroupType;
-        MixedDiscountLine."No." := Item."No.";
-        MixedDiscountLine."Variant Code" := '';
-        MixedDiscountLine.Init();
-        MixedDiscountLine.Status := MixedDiscount.Status;
-        MixedDiscountLine."Starting date" := MixedDiscount."Starting date";
-        MixedDiscountLine.Quantity := Quantity;
-        MixedDiscountLine."Ending Date" := MixedDiscount."Ending date";
-        MixedDiscountLine.Insert();
-    end;
-
-    local procedure CreateMixDiscountTimeInterval(MixedDiscount: Record "NPR Mixed Discount"; var MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv."; StartTime: Time; EndTime: Time)
-    begin
-        MixedDiscTimeInterv.Init();
-        MixedDiscTimeInterv."Mix Code" := MixedDiscount.Code;
-        MixedDiscTimeInterv."Line No." := 10000;
-        MixedDiscTimeInterv."Start Time" := StartTime;
-        MixedDiscTimeInterv."End Time" := EndTime;
-        MixedDiscTimeInterv."Period Type" := MixedDiscTimeInterv."Period Type"::"Every Day";
-        MixedDiscTimeInterv.Insert();
-    end;
-
-    local procedure GetDayAndSetToMixedDiscTimeInterval(var MixedDiscTimeInterv: Record "NPR Mixed Disc. Time Interv."; DayDirection: Option Today,Future,Past)
-    var
-        DayInteger: Integer;
-        DaysOfWeek: Option Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday;
-    begin
-        MixedDiscTimeInterv."Period Type" := MixedDiscTimeInterv."Period Type"::Weekly;
-        DayInteger := Date2DWY(Today(), 1) - 1;
-        case DayDirection of
-            DayDirection::Future:
-                DayInteger := (DayInteger + 1) mod 7;
-            DayDirection::Past:
-                DayInteger := ((DayInteger + 6) mod 7);
-        end;
-
-        DaysOfWeek := DayInteger;
-        case DaysOfWeek of
-            DaysOfWeek::Monday:
-                MixedDiscTimeInterv.Monday := true;
-            DaysOfWeek::Tuesday:
-                MixedDiscTimeInterv.Tuesday := true;
-            DaysOfWeek::Wednesday:
-                MixedDiscTimeInterv.Wednesday := true;
-            DaysOfWeek::Thursday:
-                MixedDiscTimeInterv.Thursday := true;
-            DaysOfWeek::Friday:
-                MixedDiscTimeInterv.Friday := true;
-            DaysOfWeek::Saturday:
-                MixedDiscTimeInterv.Saturday := true;
-            DaysOfWeek::Sunday:
-                MixedDiscTimeInterv.Sunday := true;
-        end;
-        MixedDiscTimeInterv.Modify(true);
     end;
 
     local procedure VerifyVATforGLEntry(POSEntry: Record "NPR POS Entry"; TaxArea: Record "Tax Area")

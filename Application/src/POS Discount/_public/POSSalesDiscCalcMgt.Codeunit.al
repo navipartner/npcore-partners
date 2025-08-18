@@ -25,6 +25,10 @@
     //    and discount is removed on physical record.
     //    Since all other lines in the sale has "Discount Calculated" = false, the module immediately skips comparison for these.
 
+    var
+        _FeatureFlag: Codeunit "NPR Feature Flags Management";
+        _RefreshRecFeatureTok: Label 'discountModuleRefreshRec', Locked = true;
+
     internal procedure RecalculateAllSaleLinePOS(SalePOS: Record "NPR POS Sale")
     var
         TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
@@ -84,8 +88,14 @@
 
         NpDcCouponMgt.ApplyDiscount(SalePOS);
 
-        if TempSaleLinePOS.Get(Rec."Register No.", Rec."Sales Ticket No.", Rec.Date, Rec."Sale Type", Rec."Line No.") then
-            Rec.TransferFields(TempSaleLinePOS, false);
+        if (_FeatureFlag.IsEnabled(_RefreshRecFeatureTok)) then begin
+            // The individual discuont modules can change Rec with out using this particular instance.
+            // Refresh the record to get latest data.
+            if (not Rec.Get(Rec.RecordId())) then;
+        end else begin
+            if TempSaleLinePOS.Get(Rec."Register No.", Rec."Sales Ticket No.", Rec.Date, Rec."Sale Type", Rec."Line No.") then
+                Rec.TransferFields(TempSaleLinePOS, false);
+        end;
 
         if DiscountCalculated then
             LogStopwatch('DISCOUNT_ON_INSERT', CurrentDateTime - StartTime);
@@ -121,8 +131,14 @@
 
         NpDcCouponMgt.ApplyDiscount(SalePOS);
 
-        if TempSaleLinePOS.Get(Rec."Register No.", Rec."Sales Ticket No.", Rec.Date, Rec."Sale Type", Rec."Line No.") then
-            Rec.TransferFields(TempSaleLinePOS, false);
+        if (_FeatureFlag.IsEnabled(_RefreshRecFeatureTok)) then begin
+            // The individual discuont modules can change Rec with out using this particular instance.
+            // Refresh the record to get latest data.
+            if (not Rec.Get(Rec.RecordId())) then;
+        end else begin
+            if TempSaleLinePOS.Get(Rec."Register No.", Rec."Sales Ticket No.", Rec.Date, Rec."Sale Type", Rec."Line No.") then
+                Rec.TransferFields(TempSaleLinePOS, false);
+        end;
 
         if DiscountCalculated then
             LogStopwatch('DISCOUNT_ON_MODIFY', CurrentDateTime - StartTime);

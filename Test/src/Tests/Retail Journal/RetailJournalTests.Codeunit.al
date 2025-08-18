@@ -11,6 +11,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         VATBusinessPostingGroup: Record "VAT Business Posting Group";
         POSSession: Codeunit "NPR POS Session";
         Initialized: Boolean;
+        LibraryPOSDiscount: Codeunit "NPR Library - POS Discount";
 
     trigger OnRun()
     begin
@@ -202,7 +203,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         Item.Modify();
 
         // [GIVEN] Mixed discount
-        LineDiscPct := POSMixDiscandTax.CreateTotalDiscountPct(Item, 60, false);
+        LineDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 60, false);
 
         // [GIVEN] Item added to retail journal
         RetailJournalNo := Format(CreateGuid());
@@ -289,7 +290,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         VATPostingSetup: Record "VAT Posting Setup";
         TempDiscountPriority: Record "NPR Discount Priority" temporary;
         POSPeriodDiscandTax: Codeunit "NPR POS Period Disc. and Tax";
-        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         Assert: Codeunit Assert;
         POSSalesDiscountCalcMgt: Codeunit "NPR POS Sales Disc. Calc. Mgt.";
         RetailJournalNo: Text;
@@ -318,7 +318,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         // [GIVEN] Discount priority, period and mix discount
         POSSalesDiscountCalcMgt.InitDiscountPriority(TempDiscountPriority);
         POSPeriodDiscandTax.CreateDiscount(Item, 60, PeriodDiscountLine);
-        LineMixDiscPct := POSMixDiscandTax.CreateTotalDiscountPct(Item, 40, false);
+        LineMixDiscPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 40, false);
 
         // [GIVEN] Item added to retail journal
         RetailJournalNo := Format(CreateGuid());
@@ -349,7 +349,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine: Record "NPR Retail Journal Line";
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
-        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         Assert: Codeunit Assert;
         RetailJournalNo: Text;
         TotalAmount: Decimal;
@@ -371,7 +370,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         Item.Modify();
 
         // [GIVEN] Mixed discount total amount per min qty.
-        TotalAmount := POSMixDiscandTax.CreateTotalDiscountAmountTotalAmtPerMinQty(Item, 500, false);
+        TotalAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalAmtPerMinQty(Item, 500, false);
 
         // [GIVEN] Item added to retail journal
         RetailJournalNo := Format(CreateGuid());
@@ -400,7 +399,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
         GeneralLedgerSetup: Record "General Ledger Setup";
-        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit Assert;
         RetailJournalNo: Text;
@@ -423,7 +421,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         Item.Modify();
 
         // [GIVEN] Mixed discount total amount per min qty.
-        TotalAmount := POSMixDiscandTax.CreateTotalDiscountAmountTotalAmtPerMinQty(Item, 500, false);
+        TotalAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalAmtPerMinQty(Item, 500, false);
 
         // [GIVEN] Item added to retail journal
         RetailJournalNo := Format(CreateGuid());
@@ -456,7 +454,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine: Record "NPR Retail Journal Line";
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
-        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         Assert: Codeunit Assert;
         RetailJournalNo: Text;
         TotalAmount: Decimal;
@@ -478,7 +475,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         Item.Modify();
 
         // [GIVEN] Mixed discount total amount per min qty.
-        TotalAmount := POSMixDiscandTax.CreateTotalDiscountAmountTotalAmtPerMinQty(Item, 500, false);
+        TotalAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalAmtPerMinQty(Item, 500, false);
 
         // [GIVEN] Item added to retail journal
         RetailJournalNo := Format(CreateGuid());
@@ -507,7 +504,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
         GeneralLedgerSetup: Record "General Ledger Setup";
-        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit Assert;
         RetailJournalNo: Text;
@@ -529,7 +525,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         Item.Modify();
 
         // [GIVEN] Mixed discount total amount per min qty.
-        TotalAmount := POSMixDiscandTax.CreateTotalDiscountAmountTotalAmtPerMinQty(Item, 500, false);
+        TotalAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalAmtPerMinQty(Item, 500, false);
 
         // [GIVEN] Item added to retail journal
         RetailJournalNo := Format(CreateGuid());
@@ -561,7 +557,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine: Record "NPR Retail Journal Line";
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
-        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         Assert: Codeunit Assert;
         RetailJournalNo: Text;
         DiscountAmount: Decimal;
@@ -583,7 +578,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         Item.Modify();
 
         // [GIVEN] Mixed discount total discount amount per min qty.
-        DiscountAmount := POSMixDiscandTax.CreateTotalDiscountAmountTotalDiscountAmtPerMinQty(Item, 500, false);
+        DiscountAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalDiscountAmtPerMinQty(Item, 500, false);
 
         // [GIVEN] Item added to retail journal
         RetailJournalNo := Format(CreateGuid());
@@ -612,7 +607,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
         GeneralLedgerSetup: Record "General Ledger Setup";
-        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit Assert;
         RetailJournalNo: Text;
@@ -635,7 +629,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         Item.Modify();
 
         // [GIVEN] Mixed discount total discount amount per min qty.
-        DiscountAmount := POSMixDiscandTax.CreateTotalDiscountAmountTotalDiscountAmtPerMinQty(Item, 500, false);
+        DiscountAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalDiscountAmtPerMinQty(Item, 500, false);
 
         // [GIVEN] Item added to retail journal
         RetailJournalNo := Format(CreateGuid());
@@ -668,7 +662,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine: Record "NPR Retail Journal Line";
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
-        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         Assert: Codeunit Assert;
         RetailJournalNo: Text;
         DiscountAmount: Decimal;
@@ -690,7 +683,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         Item.Modify();
 
         // [GIVEN] Mixed discount total discount amount per min qty.
-        DiscountAmount := POSMixDiscandTax.CreateTotalDiscountAmountTotalDiscountAmtPerMinQty(Item, 500, false);
+        DiscountAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalDiscountAmtPerMinQty(Item, 500, false);
 
         // [GIVEN] Item added to retail journal
         RetailJournalNo := Format(CreateGuid());
@@ -719,7 +712,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
         GeneralLedgerSetup: Record "General Ledger Setup";
-        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit Assert;
         RetailJournalNo: Text;
@@ -741,7 +733,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         Item.Modify();
 
         // [GIVEN] Mixed discount total discount amount per min qty.
-        DiscountAmount := POSMixDiscandTax.CreateTotalDiscountAmountTotalDiscountAmtPerMinQty(Item, 500, false);
+        DiscountAmount := LibraryPOSDiscount.CreateTotalDiscountAmountTotalDiscountAmtPerMinQty(Item, 500, false);
 
         // [GIVEN] Item added to retail journal
         RetailJournalNo := Format(CreateGuid());
@@ -773,7 +765,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine: Record "NPR Retail Journal Line";
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
-        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         Assert: Codeunit Assert;
         RetailJournalNo: Text;
         DiscountPct: Decimal;
@@ -795,7 +786,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         Item.Modify();
 
         // [GIVEN] Mixed discount total discount %
-        DiscountPct := POSMixDiscandTax.CreateTotalDiscountPct(Item, 20, false);
+        DiscountPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 20, false);
 
         // [GIVEN] Item added to retail journal
         RetailJournalNo := Format(CreateGuid());
@@ -825,7 +816,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
         GeneralLedgerSetup: Record "General Ledger Setup";
-        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit Assert;
         RetailJournalNo: Text;
@@ -847,7 +837,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         Item.Modify();
 
         // [GIVEN] Mixed discount total discount %
-        DiscountPct := POSMixDiscandTax.CreateTotalDiscountPct(Item, 20, false);
+        DiscountPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 20, false);
 
         // [GIVEN] Item added to retail journal
         RetailJournalNo := Format(CreateGuid());
@@ -880,7 +870,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine: Record "NPR Retail Journal Line";
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
-        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         Assert: Codeunit Assert;
         RetailJournalNo: Text;
         DiscountPct: Decimal;
@@ -902,7 +891,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         Item.Modify();
 
         // [GIVEN] Mixed discount total discount %
-        DiscountPct := POSMixDiscandTax.CreateTotalDiscountPct(Item, 20, false);
+        DiscountPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 20, false);
 
         // [GIVEN] Item added to retail journal
         RetailJournalNo := Format(CreateGuid());
@@ -932,7 +921,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
         GeneralLedgerSetup: Record "General Ledger Setup";
-        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit Assert;
         RetailJournalNo: Text;
@@ -954,7 +942,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         Item.Modify();
 
         // [GIVEN] Mixed discount total discount %
-        DiscountPct := POSMixDiscandTax.CreateTotalDiscountPct(Item, 20, false);
+        DiscountPct := LibraryPOSDiscount.CreateTotalDiscountPct(Item, 20, false);
 
         // [GIVEN] Item added to retail journal
         RetailJournalNo := Format(CreateGuid());
@@ -987,7 +975,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine: Record "NPR Retail Journal Line";
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
-        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         Assert: Codeunit Assert;
         RetailJournalNo: Text;
         DiscountCode: Code[20];
@@ -1017,7 +1004,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         FirstLevelAmount := 100;
         SecondLevelQty := 3;
         SecondLevelAmount := 400;
-        DiscountCode := POSMixDiscandTax.CreateMultipleDiscountLevels(Item, FirstLevelQty, SecondLevelQty, FirstLevelAmount, SecondLevelAmount, false);
+        DiscountCode := LibraryPOSDiscount.CreateMultipleDiscountLevels(Item, FirstLevelQty, SecondLevelQty, FirstLevelAmount, SecondLevelAmount, false);
 
         // [GIVEN] Item added to retail journal
         RetailJournalNo := Format(CreateGuid());
@@ -1056,7 +1043,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
         GeneralLedgerSetup: Record "General Ledger Setup";
-        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit Assert;
         RetailJournalNo: Text;
@@ -1088,7 +1074,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         FirstLevelAmount := 100;
         SecondLevelQty := 3;
         SecondLevelAmount := 400;
-        DiscountCode := POSMixDiscandTax.CreateMultipleDiscountLevels(Item, FirstLevelQty, SecondLevelQty, FirstLevelAmount, SecondLevelAmount, false);
+        DiscountCode := LibraryPOSDiscount.CreateMultipleDiscountLevels(Item, FirstLevelQty, SecondLevelQty, FirstLevelAmount, SecondLevelAmount, false);
 
         // [GIVEN] Item added to retail journal
         RetailJournalNo := Format(CreateGuid());
@@ -1132,7 +1118,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         RetailJournalLine: Record "NPR Retail Journal Line";
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
-        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         Assert: Codeunit Assert;
         RetailJournalNo: Text;
         DiscountCode: Code[20];
@@ -1162,7 +1147,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         FirstLevelAmount := 100;
         SecondLevelQty := 3;
         SecondLevelAmount := 400;
-        DiscountCode := POSMixDiscandTax.CreateMultipleDiscountLevels(Item, FirstLevelQty, SecondLevelQty, FirstLevelAmount, SecondLevelAmount, false);
+        DiscountCode := LibraryPOSDiscount.CreateMultipleDiscountLevels(Item, FirstLevelQty, SecondLevelQty, FirstLevelAmount, SecondLevelAmount, false);
 
         // [GIVEN] Item added to retail journal
         RetailJournalNo := Format(CreateGuid());
@@ -1201,7 +1186,6 @@ codeunit 85137 "NPR Retail Journal Tests"
         Item: Record Item;
         VATPostingSetup: Record "VAT Posting Setup";
         GeneralLedgerSetup: Record "General Ledger Setup";
-        POSMixDiscandTax: Codeunit "NPR POS Mix. Disc. and Tax";
         POSSaleTaxCalc: Codeunit "NPR POS Sale Tax Calc.";
         Assert: Codeunit Assert;
         RetailJournalNo: Text;
@@ -1232,7 +1216,7 @@ codeunit 85137 "NPR Retail Journal Tests"
         FirstLevelAmount := 100;
         SecondLevelQty := 3;
         SecondLevelAmount := 400;
-        DiscountCode := POSMixDiscandTax.CreateMultipleDiscountLevels(Item, FirstLevelQty, SecondLevelQty, FirstLevelAmount, SecondLevelAmount, false);
+        DiscountCode := LibraryPOSDiscount.CreateMultipleDiscountLevels(Item, FirstLevelQty, SecondLevelQty, FirstLevelAmount, SecondLevelAmount, false);
 
         // [GIVEN] Item added to retail journal
         RetailJournalNo := Format(CreateGuid());
