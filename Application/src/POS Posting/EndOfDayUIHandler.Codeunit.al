@@ -371,7 +371,6 @@
     var
         POSPeriodRegister: Record "NPR POS Period Register";
         POSCreateEntry: Codeunit "NPR POS Create Entry";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         POSSession: Codeunit "NPR POS Session";
         CheckpointEntryNo: Integer;
     begin
@@ -379,15 +378,13 @@
         _POSWorkShiftCheckpoint.Get(CheckpointEntryNo);
         _POSUnit.Get(_POSWorkShiftCheckpoint."POS Unit No.");
 
-        if FeatureFlagsManagement.IsEnabled('uiBalancingWindowClose') then begin
-            if not POSCreateEntry.GetPOSPeriodRegisterForPOSUnit(_POSUnit."No.", POSPeriodRegister, false) then begin
-                //first time accessing POS, no POS Period Register exists yet
-                _POSUnit.Validate(Status, _POSUnit.Status::OPEN);
-                _POSUnit.Modify(true);
-                Commit();
-                POSSession.ChangeViewLogin();
-                exit;
-            end;
+        if not POSCreateEntry.GetPOSPeriodRegisterForPOSUnit(_POSUnit."No.", POSPeriodRegister, false) then begin
+            //first time accessing POS, no POS Period Register exists yet
+            _POSUnit.Validate(Status, _POSUnit.Status::OPEN);
+            _POSUnit.Modify(true);
+            Commit();
+            POSSession.ChangeViewLogin();
+            exit;
         end;
 
         if (not GetValueAsBoolean(Context, 'confirmed')) then begin
