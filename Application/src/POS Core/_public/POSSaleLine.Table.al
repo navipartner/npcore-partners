@@ -62,7 +62,6 @@
             var
                 POSSaleTranslation: Codeunit "NPR POS Sale Translation";
                 POSInfoManagement: Codeunit "NPR POS Info Management";
-                FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
             begin
                 InitFromSalePOS();
 
@@ -107,12 +106,9 @@
                         exit;
                 end;
 
-                if FeatureFlagsManagement.IsEnabled('CopyPOSInfoOnReverseSale') then begin
-                    if not SkipPOSInfo then
-                        POSInfoManagement.InsertPOSInfo(Rec, xRec, Rec.FieldNo("No."));
-                    CreateDimFromDefaultDim(FieldNo("No."));
-                end else
-                    CreateDimFromDefaultDim(FieldNo("No."));
+                if not SkipPOSInfo then
+                    POSInfoManagement.InsertPOSInfo(Rec, xRec, Rec.FieldNo("No."));
+                CreateDimFromDefaultDim(FieldNo("No."));
             end;
         }
         field(7; "Location Code"; Code[10])

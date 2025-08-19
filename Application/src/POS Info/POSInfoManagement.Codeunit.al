@@ -5,17 +5,6 @@
     var
         ApplicScope: Option " ","Current Line","All Lines","New Lines",Ask;
 
-    [EventSubscriber(ObjectType::Table, Database::"NPR POS Sale Line", 'OnAfterValidateEvent', 'No.', false, false)]
-    local procedure OnAfterValidateSalesLineNoSaleLinePos(var Rec: Record "NPR POS Sale Line"; var xRec: Record "NPR POS Sale Line"; CurrFieldNo: Integer)
-    var
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
-    begin
-        if not FeatureFlagsManagement.IsEnabled('CopyPOSInfoOnReverseSale') then
-            InsertPOSInfo(Rec, xRec, CurrFieldNo);
-
-    end;
-
-
     procedure InsertPOSInfo(var Rec: Record "NPR POS Sale Line"; var xRec: Record "NPR POS Sale Line"; CurrFieldNo: Integer)
     var
         POSInfoLinkTable: Record "NPR POS Info Link Table";

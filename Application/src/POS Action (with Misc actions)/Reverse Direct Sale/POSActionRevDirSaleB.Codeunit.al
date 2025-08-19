@@ -81,7 +81,6 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
         TicketManagement: Codeunit "NPR TM Ticket Retail Mgt.";
         SaleLinePOSLineNo: Integer;
         POSInfoManagement: Codeunit "NPR POS Info Management";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         POSSalesLine.SetRange("Document No.", SalesTicketNo);
         POSSalesLine.SetRange(Type, POSSalesLine.Type::Item);
@@ -112,24 +111,20 @@ codeunit 6059878 "NPR POS Action: Rev.Dir.Sale B"
                 SaleLinePOS."Return Sale Sales Ticket No." := SalesTicketNo;
                 CallOnReverseSalesTicketOnBeforeModifySalesLinePOS(SaleLinePOS, SalePOS);
                 SaleLinePOS.Modify(true);
-                if FeatureFlagsManagement.IsEnabled('CopyPOSInfoOnReverseSale') then
-                    POSInfoManagement.CopyPOSInfo(SaleLinePOS, POSSalesLine, POSSalesLine."Line No.");
+                POSInfoManagement.CopyPOSInfo(SaleLinePOS, POSSalesLine, POSSalesLine."Line No.");
                 TicketManagement.UpdateTicketOnSaleLineInsert(SaleLinePOS);
             until POSSalesLine.Next() = 0;
-        if FeatureFlagsManagement.IsEnabled('CopyPOSInfoOnReverseSale') then
-            POSInfoManagement.CopyPOSInfo(SaleLinePOS, POSSalesLine, 0);
+        POSInfoManagement.CopyPOSInfo(SaleLinePOS, POSSalesLine, 0);
     end;
 
     procedure ReverseAuditInfoToSalesLine(var SaleLinePOS: Record "NPR POS Sale Line"; POSSalesLine: Record "NPR POS Entry Sales Line"; CopyLineDimensions: Boolean)
     var
         POSEntry: Record "NPR POS Entry";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         POSEntry.Get(POSSalesLine."POS Entry No.");
 
         SaleLinePOS.SetSkipUpdateDependantQuantity(true);
-        if FeatureFlagsManagement.IsEnabled('CopyPOSInfoOnReverseSale') then
-            SaleLinePOS.SetSkipPOSInfo(true);
+        SaleLinePOS.SetSkipPOSInfo(true);
         SaleLinePOS.Validate("No.", POSSalesLine."No.");
         SaleLinePOS.Description := POSSalesLine.Description;
         SaleLinePOS."Description 2" := POSSalesLine."Description 2";
