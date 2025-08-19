@@ -466,15 +466,11 @@ codeunit 6059925 "NPR POS Layout Assistant"
         FeatureEnabled: Boolean;
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23)
         AuthCodeErr: Text;
-        OAuth2: Codeunit OAuth2;
-        Scopes: List of [Text];
         Scope: Text;
         EncodedScope: Text;
         NaviPartnerFeature: Interface "NPR Feature Management";
         ClientId: Label '68cf603a-ec34-4946-afe6-c43930b274c7', Locked = true;
-        OAuthAuthorityUrl: Label 'https://login.microsoftonline.com/%1/oauth2/v2.0/authorize', Locked = true;
         RedirectURL: Label 'https://businesscentral.dynamics.com/OAuthLanding.htm', Locked = true;
-        FeatureManagement: Codeunit "NPR Feature Flags Management";
         AzureKeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         AzureADTenant: Codeunit "Azure AD Tenant";
         TypeHelper: Codeunit "Type Helper";
@@ -491,35 +487,19 @@ codeunit 6059925 "NPR POS Layout Assistant"
         if FeatureEnabled then begin
             NaviPartnerFeature := Enum::"NPR Feature"::"POS Webservice Sessions";
             if NaviPartnerFeature.IsFeatureEnabled() then begin
-                if FeatureManagement.IsEnabled('posLayoutOAuthAccessToken_v2') then begin
-                    State := Random(10000);
-                    RedirectURLText := RedirectURL;
-                    Scope := 'https://api.businesscentral.dynamics.com/user_impersonation https://api.businesscentral.dynamics.com/Financials.ReadWrite.All';
-                    EncodedScope := TypeHelper.UrlEncode(Scope);
-                    URLText := StrSubstNo('https://login.microsoftonline.com/%1/oauth2/v2.0/authorize?client_id=%2&redirect_uri=%3&state=%4&response_type=code&scope=%5', AzureADTenant.GetAadTenantId(), ClientId, TypeHelper.UrlEncode(RedirectURLText), State, EncodedScope);
-                    NPROAuthControlAddIn.SetRequestProps(URLText);
-                    NPROAuthControlAddIn.RunModal();
-                    AuthCode := NPROAuthControlAddIn.GetAuthCode();
-                    AuthCodeErr := NPROAuthControlAddIn.GetAuthError();
-                    NPROAuthControlAddIn.SetTenant(AzureADTenant.GetAadTenantId());
-                    NPROAuthControlAddIn.RequestToken(AuthCode, RedirectURL, ClientId, ClientSecret, AccessToken);
-                    if (AccessToken <> '') and (AuthCodeErr = '') then
-                        Success := true;
-                end
-                else begin
-                    Scopes.Add('https://api.businesscentral.dynamics.com/Financials.ReadWrite.All');
-                    Scopes.Add('https://api.businesscentral.dynamics.com/user_impersonation');
-                    if Oauth2.AcquireAuthorizationCodeTokenFromCache(ClientId, ClientSecret, RedirectURL, StrSubstNo(OAuthAuthorityUrl, AzureADTenant.GetAadTenantId()), Scopes, AccessToken) and (AccessToken <> '') then begin
-                        Success := true;
-                    end else begin
-                        if GuiAllowed then begin
-                            if Oauth2.AcquireTokenByAuthorizationCode(ClientId, ClientSecret, StrSubstNo(OAuthAuthorityUrl, AzureADTenant.GetAadTenantId()), RedirectURL, Scopes, Enum::"Prompt Interaction"::None, AccessToken, AuthCodeErr) and (AccessToken <> '') then begin
-                                Success := true;
-                            end;
-                        end
-                    end;
-                end;
-
+                State := Random(10000);
+                RedirectURLText := RedirectURL;
+                Scope := 'https://api.businesscentral.dynamics.com/user_impersonation https://api.businesscentral.dynamics.com/Financials.ReadWrite.All';
+                EncodedScope := TypeHelper.UrlEncode(Scope);
+                URLText := StrSubstNo('https://login.microsoftonline.com/%1/oauth2/v2.0/authorize?client_id=%2&redirect_uri=%3&state=%4&response_type=code&scope=%5', AzureADTenant.GetAadTenantId(), ClientId, TypeHelper.UrlEncode(RedirectURLText), State, EncodedScope);
+                NPROAuthControlAddIn.SetRequestProps(URLText);
+                NPROAuthControlAddIn.RunModal();
+                AuthCode := NPROAuthControlAddIn.GetAuthCode();
+                AuthCodeErr := NPROAuthControlAddIn.GetAuthError();
+                NPROAuthControlAddIn.SetTenant(AzureADTenant.GetAadTenantId());
+                NPROAuthControlAddIn.RequestToken(AuthCode, RedirectURL, ClientId, ClientSecret, AccessToken);
+                if (AccessToken <> '') and (AuthCodeErr = '') then
+                    Success := true;
             end;
         end;
 #endif
