@@ -67,6 +67,11 @@
     end;
 
     [IntegrationEvent(false, false)]
+    internal procedure OnRunCalcAvailableVoucherAmount(ReferenceNo: Text[50]; VoucherType: Code[20]; var AvailableAmount: Decimal; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     internal procedure OnHasApplyPaymentSetup(VoucherType: Record "NPR NpRv Voucher Type"; var HasApplySetup: Boolean)
     begin
     end;

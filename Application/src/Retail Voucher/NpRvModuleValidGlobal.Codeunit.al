@@ -271,6 +271,24 @@
         TryValidateGlobalVoucherSetup(NpRvGlobalVoucherSetup);
     end;
 
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnRunCalcAvailableVoucherAmount', '', true, true)]
+    local procedure OnRunCalcAvailableVoucherAmount(ReferenceNo: Text[50]; VoucherType: Code[20]; var AvailableAmount: Decimal; var Handled: Boolean)
+    var
+        NpRvVoucherType: Record "NPR NpRv Voucher Type";
+    begin
+        if Handled then
+            exit;
+
+        if not NpRvVoucherType.Get(VoucherType) then
+            exit;
+        if NpRvVoucherType."Validate Voucher Module" <> ModuleCode() then
+            exit;
+
+        Handled := true;
+
+        AvailableAmount := CalcAvailableVoucherAmount(ReferenceNo, VoucherType);
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"NPR NpRv Sales Line", 'OnBeforeDeleteEvent', '', true, true)]
     local procedure OnBeforeDeletePOSVoucher(var Rec: Record "NPR NpRv Sales Line"; RunTrigger: Boolean)
     begin
@@ -605,8 +623,6 @@
                 if not TempNpRvSalesLineBuffer.Get(NpRvSalesLine.id) then
                     NpRvSalesLine.Delete();
             until NpRvSalesLine.Next() = 0;
-
-
     end;
 
     procedure ReserveVoucher(var TempNpRvVoucherBuffer: Record "NPR NpRv Voucher Buffer" temporary)
@@ -631,7 +647,6 @@
         ResponseText: Text;
         AvailableAmount: Decimal;
         VoucherAmount: Decimal;
-        GlobalReservationId: Guid;
     begin
         ReferenceNo := TempNpRvVoucherBuffer."Reference No.";
         VoucherType.Get(TempNpRvVoucherBuffer."Voucher Type");
@@ -697,7 +712,6 @@
             Error(Text005, ReferenceNo);
 
         if Evaluate(VoucherAmount, NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'amount', 0, false), 9) then;
-        if Evaluate(GlobalReservationId, NpXmlDomMgt.GetXmlText(Node.AsXmlElement(), 'global_reservation_id', 0, false), 9) then;
         Clear(Voucher);
         Voucher.SetRange("Reference No.", ReferenceNo);
         Voucher.SetRange("Voucher Type", VoucherType.Code);
@@ -1205,7 +1219,7 @@
             Found := true;
     end;
 
-    procedure CalcAvailableVoucherAmount(ReferenceNo: Text; VoucherType: Code[20]) AvailableAmount: Decimal;
+    local procedure CalcAvailableVoucherAmount(ReferenceNo: Text[50]; VoucherType: Code[20]): Decimal;
     var
         NpRvGlobalVoucherSetup: Record "NPR NpRv Global Vouch. Setup";
         NpRvVoucherType: Record "NPR NpRv Voucher Type";

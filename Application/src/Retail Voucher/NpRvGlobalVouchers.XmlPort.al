@@ -143,7 +143,6 @@ xmlport 6151010 "NPR NpRv Global Vouchers"
                 {
                     MinOccurs = Zero;
                 }
-
                 fieldelement(global_voucher_amt_available; NpRvVoucherBuffer."Global Voucher Amt Available")
                 {
                     MinOccurs = Zero;

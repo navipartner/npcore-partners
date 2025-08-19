@@ -668,12 +668,14 @@
     procedure CalcAvailableAmount(): Decimal
     var
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
-        NpRvModuleValidGlobal: Codeunit "NPR NpRv Module Valid.: Global";
+        NpRvModuleMgt: Codeunit "NPR NpRv Module Mgt.";
+        AvailableAmount: Decimal;
+        Handled: Boolean;
     begin
         if NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then begin
-            CalcFields("Validate Voucher Module");
-            if "Validate Voucher Module" = ModuleCode() then
-                exit(NpRvModuleValidGlobal.CalcAvailableVoucherAmount("Reference No.", "Voucher Type"));
+            NpRvModuleMgt.OnRunCalcAvailableVoucherAmount("Reference No.", "Voucher Type", AvailableAmount, Handled);
+            if Handled then
+                exit(AvailableAmount);
         end;
 
         if NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then begin
@@ -683,10 +685,5 @@
             CalcFields(Amount);
             exit(Amount);
         end;
-    end;
-
-    local procedure ModuleCode(): Code[20]
-    begin
-        exit('GLOBAL');
     end;
 }
