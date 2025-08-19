@@ -9,9 +9,7 @@
     var
         Scopes: List of [Text];
 #IF NOT BC17
-        PromptInteraction: Enum "Prompt Interaction";
         OAuth2: Codeunit OAuth2;
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         RedirectURL: Text;
         NPROAuthControlAddIn: Page "NPR OAuth ControlAddIn";
         TypeHelper: Codeunit "Type Helper";
@@ -30,19 +28,16 @@
         GetTestGraphAPISetup();
 #IF NOT BC17
         OAuth2.GetDefaultRedirectURL(RedirectURL);
-        if FeatureFlagsManagement.IsEnabled('oauthControladdinHandler') then begin
-            State := Random(10000);
-            Scope := 'User.Read Calendars.ReadWrite offline_access';
-            EncodedScope := TypeHelper.UrlEncode(Scope);
-            URLText := StrSubstNo('%1?client_id=%2&redirect_uri=%3&state=%4&response_type=code&scope=%5&prompt=login', _GraphApiSetup."OAuth Authority Url", _GraphApiSetup."Client Id", RedirectURL, State, EncodedScope);
-            NPROAuthControlAddIn.SetRequestProps(URLText);
-            NPROAuthControlAddIn.RunModal();
-            AuthCode := NPROAuthControlAddIn.GetAuthCode();
-            AuthCodeError := NPROAuthControlAddIn.GetAuthError();
-            NPROAuthControlAddIn.SetTenant('common');
-            NPROAuthControlAddIn.RequestToken(AuthCode, RedirectURL, _GraphApiSetup."Client Id", _GraphApiSetup."Client Secret", AccessToken);
-        end else
-            OAuth2.AcquireTokenAndTokenCacheByAuthorizationCode(_GraphApiSetup."Client Id", _GraphApiSetup."Client Secret", _GraphApiSetup."OAuth Authority Url", RedirectURL, Scopes, PromptInteraction::Login, AccessToken, TokenCache, AuthCodeError);
+        State := Random(10000);
+        Scope := 'User.Read Calendars.ReadWrite offline_access';
+        EncodedScope := TypeHelper.UrlEncode(Scope);
+        URLText := StrSubstNo('%1?client_id=%2&redirect_uri=%3&state=%4&response_type=code&scope=%5&prompt=login', _GraphApiSetup."OAuth Authority Url", _GraphApiSetup."Client Id", RedirectURL, State, EncodedScope);
+        NPROAuthControlAddIn.SetRequestProps(URLText);
+        NPROAuthControlAddIn.RunModal();
+        AuthCode := NPROAuthControlAddIn.GetAuthCode();
+        AuthCodeError := NPROAuthControlAddIn.GetAuthError();
+        NPROAuthControlAddIn.SetTenant('common');
+        NPROAuthControlAddIn.RequestToken(AuthCode, RedirectURL, _GraphApiSetup."Client Id", _GraphApiSetup."Client Secret", AccessToken);
 #ENDIF
         if (AccessToken = '') or (AuthCodeError <> '') then
             Error(FailErr, AuthCodeError);
