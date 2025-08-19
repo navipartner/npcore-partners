@@ -273,9 +273,22 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
         Output += StrSubstNo(QueryParams3Lbl, ReceiverAddress1);
         if ReceiverAddress2 <> '' then
             Output += StrSubstNo(QueryParams4Lbl, ReceiverAddress2);
-        Output += StrSubstNo(QueryParams5Lbl, PakkelabelsShipment."Post Code");
-        Output += StrSubstNo(QueryParams6Lbl, PakkelabelsShipment.City);
-        Output += StrSubstNo(QueryParams7Lbl, PakkelabelsShipment."Country/Region Code");
+
+        if PakkelabelsShipment."Ship-to Post Code" <> '' then
+            Output += StrSubstNo(QueryParams5Lbl, PakkelabelsShipment."Ship-to Post Code")
+        else
+            Output += StrSubstNo(QueryParams5Lbl, PakkelabelsShipment."Post Code");
+
+        if PakkelabelsShipment."Ship-to City" <> '' then
+            Output += StrSubstNo(QueryParams6Lbl, PakkelabelsShipment."Ship-to City")
+        else
+            Output += StrSubstNo(QueryParams6Lbl, PakkelabelsShipment.City);
+
+        if PakkelabelsShipment."Ship-to Country/Region Code" <> '' then
+            Output += StrSubstNo(QueryParams7Lbl, PakkelabelsShipment."Ship-to Country/Region Code")
+        else
+            Output += StrSubstNo(QueryParams7Lbl, PakkelabelsShipment."Country/Region Code");
+
         Output += StrSubstNo(QueryParams8Lbl, PakkelabelsShipment."E-Mail");
         Output += StrSubstNo(QueryParams9Lbl, PakkelabelsShipment."SMS No.");
         Output += StrSubstNo(QueryParams10Lbl, PakkelabelsShipment."SMS No.");
