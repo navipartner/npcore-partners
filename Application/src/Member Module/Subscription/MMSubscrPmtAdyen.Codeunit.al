@@ -645,7 +645,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         ErrorMessage: Text;
         PSPReference: Text[16];
         PaymentPSPReference: Text[16];
-        PayByLinkID: Code[20];
+        PayByLinkID: Code[50];
         PayByLinkUrl: Text[2048];
         PayByLinkExpiresAt: DateTime;
     begin
@@ -1567,7 +1567,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                                                            ResultCode: Text[50];
                                                            SkipTryCountUpdate: Boolean;
                                                            PaymentPSPReference: Text[16];
-                                                           PayByLinkId: Code[20];
+                                                           PayByLinkId: Code[50];
                                                            PayByLinkURL: Text[2048];
                                                            PayByLinkExpiresAt: DateTime)
     var
@@ -1968,7 +1968,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
     end;
 
     [TryFunction]
-    local procedure TryGetPayByLinkIdFromResponse(Response: Text; var PayByLinkId: Code[20])
+    local procedure TryGetPayByLinkIdFromResponse(Response: Text; var PayByLinkId: Code[50])
     var
         JObject: JsonObject;
         JToken: JsonToken;
@@ -2145,7 +2145,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                                     SkipTryCountUpdate: Boolean;
                                     PSPReference: Text[16];
                                     PaymentPSPReference: Text[16];
-                                    PayByLinkId: Code[20];
+                                    PayByLinkId: Code[50];
                                     PayByLinkURL: Text[2048];
                                     PayByLinkExpiresAt: DateTime;
                                     WebhookEntryNo: Integer)

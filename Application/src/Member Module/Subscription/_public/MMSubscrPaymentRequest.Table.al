@@ -95,7 +95,7 @@ table 6150921 "NPR MM Subscr. Payment Request"
             Caption = 'Pay by Link URL';
             DataClassification = CustomerContent;
         }
-        field(140; "Pay by Link ID"; Code[20])
+        field(140; "Pay by Link ID"; Code[50])
         {
             Caption = 'Pay by Link ID';
             DataClassification = CustomerContent;

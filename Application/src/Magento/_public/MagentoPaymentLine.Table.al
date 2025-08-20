@@ -185,7 +185,7 @@
             Caption = 'Pay by Link URL';
             DataClassification = CustomerContent;
         }
-        field(300; "Payment ID"; Code[20])
+        field(300; "Payment ID"; Code[50])
         {
             Caption = 'Payment ID';
             DataClassification = CustomerContent;

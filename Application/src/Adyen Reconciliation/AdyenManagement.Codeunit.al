@@ -1330,7 +1330,7 @@ codeunit 6184796 "NPR Adyen Management"
         EventDate: DateTime;
         MerchantAccountName: Text[80];
         PSPReference: Text[100];
-        PaymentLinkId: Code[20];
+        PaymentLinkId: Code[50];
     begin
         JsonRequest.Get('WebhookReference', Token);
         WebhookReference := CopyStr(Token.AsValue().AsText(), 1, 80);
@@ -1367,7 +1367,7 @@ codeunit 6184796 "NPR Adyen Management"
         GetAdyenWebhookReqType(AdyenWebhook, PaymentLinkId, PSPReference)
     end;
 
-    local procedure GetAdyenWebhookReqType(var AdyenWebhook: Record "NPR Adyen Webhook"; PaymentLinkId: Code[20]; PSPReference: Text[100])
+    local procedure GetAdyenWebhookReqType(var AdyenWebhook: Record "NPR Adyen Webhook"; PaymentLinkId: Code[50]; PSPReference: Text[100])
     var
         SettlementDetailsLbl: Label 'settlement_details', Locked = true;
         SettlementExtDetailsLbl: Label 'external_settlement_details', Locked = true;
@@ -1389,7 +1389,7 @@ codeunit 6184796 "NPR Adyen Management"
         end;
     end;
 
-    local procedure GetPaymentLinkID(JsonContent: JsonObject) PaymentLinkId: Code[20]
+    local procedure GetPaymentLinkID(JsonContent: JsonObject) PaymentLinkId: Code[50]
     var
         ContentToken: JsonToken;
         JsonValueToken: JsonToken;
