@@ -52,7 +52,40 @@
         exit(CouponEntry.FindFirst());
     end;
 
+    local procedure InsertInitialEntry(var CouponEntry: Record "NPR NpDc Coupon Entry"; Coupon: Record "NPR NpDc Coupon"): Boolean
+    var
+        CouponType: Record "NPR NpDc Coupon Type";
+    begin
+        if InitialEntryExists(Coupon) then
+            exit(false);
+
+        CouponType.Get(Coupon."Coupon Type");
+
+        CouponEntry.Init();
+        CouponEntry."Entry No." := 0;
+        CouponEntry."Coupon No." := Coupon."No.";
+        CouponEntry."Entry Type" := CouponEntry."Entry Type"::"Issue Coupon";
+        CouponEntry."Coupon Type" := Coupon."Coupon Type";
+        CouponEntry."Amount per Qty." := CouponType."Discount Amount";
+        CouponEntry.Quantity := 1;
+        if CouponType."Multi-Use Coupon" and (CouponType."Multi-Use Qty." > 0) then
+            CouponEntry.Quantity := CouponType."Multi-Use Qty.";
+        CouponEntry."Remaining Quantity" := CouponEntry.Quantity;
+        CouponEntry.Amount := CouponEntry."Amount per Qty." * CouponEntry.Quantity;
+        CouponEntry.Positive := CouponEntry.Quantity > 0;
+        CouponEntry."Posting Date" := Today();
+        CouponEntry.Open := true;
+        CouponEntry."Register No." := '';
+        CouponEntry."Document Type" := CouponEntry."Document Type"::" ";
+        CouponEntry."Document No." := '';
+        CouponEntry."User ID" := CopyStr(UserId, 1, MaxStrLen(CouponEntry."User ID"));
+        CouponEntry."Closed by Entry No." := 0;
+        CouponEntry.Insert();
+
+        exit(true);
+    end;
     #endregion Issue Coupon
+
     #region Validate Coupon
 
     internal procedure ValidateCoupon(POSSession: Codeunit "NPR POS Session"; ReferenceNo: Text; var Coupon: Record "NPR NpDc Coupon")
@@ -315,60 +348,34 @@
     procedure PostIssueCoupon(Coupon: Record "NPR NpDc Coupon")
     var
         CouponEntry: Record "NPR NpDc Coupon Entry";
-        CouponType: Record "NPR NpDc Coupon Type";
     begin
-        if InitialEntryExists(Coupon) then
-            exit;
-
-        CouponType.Get(Coupon."Coupon Type");
-
-        CouponEntry.Init();
-        CouponEntry."Entry No." := 0;
-        CouponEntry."Coupon No." := Coupon."No.";
-        CouponEntry."Entry Type" := CouponEntry."Entry Type"::"Issue Coupon";
-        CouponEntry."Coupon Type" := Coupon."Coupon Type";
-        CouponEntry."Amount per Qty." := CouponType."Discount Amount";
-        CouponEntry.Quantity := 1;
-        if CouponType."Multi-Use Coupon" and (CouponType."Multi-Use Qty." > 0) then
-            CouponEntry.Quantity := CouponType."Multi-Use Qty.";
-        CouponEntry."Remaining Quantity" := CouponEntry.Quantity;
-        CouponEntry.Amount := CouponEntry."Amount per Qty." * CouponEntry.Quantity;
-        CouponEntry.Positive := CouponEntry.Quantity > 0;
-        CouponEntry."Posting Date" := Today();
-        CouponEntry.Open := true;
-        CouponEntry."Register No." := '';
-        CouponEntry."Document Type" := CouponEntry."Document Type"::" ";
-        CouponEntry."Document No." := '';
-        CouponEntry."User ID" := CopyStr(UserId, 1, MaxStrLen(CouponEntry."User ID"));
-        CouponEntry."Closed by Entry No." := 0;
-        CouponEntry.Insert();
+        InsertInitialEntry(CouponEntry, Coupon);
     end;
 
     internal procedure PostIssueCoupon2(Coupon: Record "NPR NpDc Coupon"; Quantity: Decimal; AmountPerQty: Decimal)
     var
         CouponEntry: Record "NPR NpDc Coupon Entry";
     begin
-        if InitialEntryExists(Coupon) then
+        if not InsertInitialEntry(CouponEntry, Coupon) then
             exit;
 
-        CouponEntry.Init();
-        CouponEntry."Entry No." := 0;
-        CouponEntry."Coupon No." := Coupon."No.";
-        CouponEntry."Entry Type" := CouponEntry."Entry Type"::"Issue Coupon";
-        CouponEntry."Coupon Type" := Coupon."Coupon Type";
         CouponEntry."Amount per Qty." := AmountPerQty;
         CouponEntry.Quantity := Quantity;
         CouponEntry."Remaining Quantity" := CouponEntry.Quantity;
         CouponEntry.Amount := CouponEntry."Amount per Qty." * CouponEntry.Quantity;
         CouponEntry.Positive := CouponEntry.Quantity > 0;
-        CouponEntry."Posting Date" := Today();
-        CouponEntry.Open := true;
-        CouponEntry."Register No." := '';
-        CouponEntry."Document Type" := CouponEntry."Document Type"::" ";
-        CouponEntry."Document No." := '';
-        CouponEntry."User ID" := CopyStr(UserId, 1, MaxStrLen(CouponEntry."User ID"));
-        CouponEntry."Closed by Entry No." := 0;
-        CouponEntry.Insert();
+        CouponEntry.Modify();
+    end;
+
+    procedure PostIssueCoupon(Coupon: Record "NPR NpDc Coupon"; ExternalDocumentNo: Code[50])
+    var
+        CouponEntry: Record "NPR NpDc Coupon Entry";
+    begin
+        if not InsertInitialEntry(CouponEntry, Coupon) then
+            exit;
+
+        CouponEntry."External Document No." := ExternalDocumentNo;
+        CouponEntry.Modify();
     end;
 
     internal procedure PostDiscountApplication(SaleLinePOSCoupon: Record "NPR NpDc SaleLinePOS Coupon"; Quantity: Decimal)
@@ -647,6 +654,7 @@
         ArchCouponEntry."Register No." := CouponEntry."Register No.";
         ArchCouponEntry."Document Type" := CouponEntry."Document Type";
         ArchCouponEntry."Document No." := CouponEntry."Document No.";
+        ArchCouponEntry."External Document No." := CouponEntry."External Document No.";
         ArchCouponEntry."User ID" := CouponEntry."User ID";
         ArchCouponEntry."Closed by Entry No." := CouponEntry."Closed by Entry No.";
         ArchCouponEntry.Insert();

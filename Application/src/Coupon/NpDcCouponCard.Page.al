@@ -134,6 +134,12 @@
                         ToolTip = 'Specifies the reference no. of the coupon.';
                         ApplicationArea = NPRRetail;
                     }
+                    field("Issue External Document No."; Rec."Issue External Document No.")
+                    {
+                        Editable = false;
+                        ToolTip = 'Specifies the Issue External Document No. of the coupon.';
+                        ApplicationArea = NPRRetail;
+                    }
                     field("Customer No."; Rec."Customer No.")
                     {
 

@@ -70,6 +70,11 @@
                     ToolTip = 'Specifies the value of the Document No. field';
                     ApplicationArea = NPRRetail;
                 }
+                field("External Document No."; Rec."External Document No.")
+                {
+                    ToolTip = 'Specifies the value of the External Document No. field';
+                    ApplicationArea = NPRRetail;
+                }
                 field("Register No."; Rec."Register No.")
                 {
 

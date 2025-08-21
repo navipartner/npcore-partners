@@ -190,6 +190,14 @@
             IF ("Print Object Type" = CONST(Report)) AllObjWithCaption."Object ID" WHERE("Object Type" = CONST(Report));
             BlankZero = true;
         }
+        field(1013; "Issue External Document No."; Code[50])
+        {
+            CalcFormula = max("NPR NpDc Coupon Entry"."External Document No." where("Coupon No." = field("No."),
+                                                                                  "Entry Type" = filter("Issue Coupon")));
+            Caption = 'Issue External Document No.';
+            Editable = false;
+            FieldClass = FlowField;
+        }
     }
 
     keys

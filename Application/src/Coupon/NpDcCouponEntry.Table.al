@@ -120,6 +120,11 @@
             OptionCaption = ' ,POS Entry,Sales Order,Sales Invoice,Posted Sales Invoice,Sales Return Order,Sales Credit Memo,Posted Sales Credit Memo';
             OptionMembers = " ","POS Entry","Sales Order","Sales Invoice","Posted Sales Invoice","Sales Return Order","Sales Credit Memo","Posted Sales Credit Memo";
         }
+        field(80; "External Document No."; Code[50])
+        {
+            Caption = 'External Document No.';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
