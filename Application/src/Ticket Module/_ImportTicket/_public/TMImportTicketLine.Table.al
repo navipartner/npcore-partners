@@ -46,6 +46,11 @@ table 6150756 "NPR TM ImportTicketLine"
             DataClassification = CustomerContent;
             Caption = 'Holder Name';
         }
+        field(33; TicketHolderPreferredLang; Code[10])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Holder Preferred Language';
+        }
         field(40; MembershipNumber; Code[20])
         {
             DataClassification = CustomerContent;

@@ -116,6 +116,7 @@ service:
           request:
             revokeId: $simpleTypes.Token.ExampleRevokeId
             ticketHolder: $simpleTypes.TicketHolder.ExampleTicketHolder
+            ticketHolderLanguage: $simpleTypes.TicketHolderLanguage.ExampleAmericanEnglish
             notificationAddress: $simpleTypes.NotificationAddress.ExampleEmail
             paymentReference: "R-1234"
           response:
@@ -349,6 +350,7 @@ types:
     properties:
       revokeId: simpleTypes.Token
       ticketHolder: optional<simpleTypes.TicketHolder>
+      ticketHolderLanguage: optional<simpleTypes.TicketHolderLanguage>
       notificationAddress: optional<simpleTypes.NotificationAddress>
       paymentReference: optional<simpleTypes.PaymentReference>
 

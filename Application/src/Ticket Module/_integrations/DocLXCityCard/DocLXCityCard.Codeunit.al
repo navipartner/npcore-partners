@@ -183,7 +183,7 @@ codeunit 6184830 "NPR DocLXCityCard"
         ArchiveCoupon(CouponNo);
 
         Token := TicketRequestManager.CreateReservationRequest(ItemNo, '', 1, '');
-        TicketRequestManager.SetReservationRequestExtraInfo(Token, '', CouponNo, '');
+        TicketRequestManager.SetReservationRequestExtraInfo(Token, '', CouponNo, '', '');
         TicketRequestManager.IssueTicketFromReservationToken(Token, true, ResponseMessage);
         TicketRequestManager.ConfirmReservationRequestWithValidate(Token);
         if (not TicketRequestManager.GetTokenTicket(Token, TicketNo)) then

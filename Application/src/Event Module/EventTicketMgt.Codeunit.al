@@ -300,6 +300,7 @@
         SuggestMethod: Enum "NPR TM NotificationMethod";
         SuggestAddress: Text[100];
         SuggestName: Text[100];
+        SuggestLanguage: Code[10];
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
     begin
         if Token = '' then
@@ -309,6 +310,7 @@
         if TicketReservationRequest.FindFirst() then begin
             SuggestAddress := TicketReservationRequest."Notification Address";
             SuggestName := TicketReservationRequest.TicketHolderName;
+            SuggestLanguage := TicketReservationRequest.TicketHolderPreferredLanguage;
             case TicketReservationRequest."Notification Method" of
                 TicketReservationRequest."Notification Method"::EMAIL:
                     SuggestMethod := SuggestMethod::EMAIL;
@@ -322,6 +324,7 @@
         if ExternalMemberNo <> '' then
             if Member.Get(MemberManagement.GetMemberFromExtMemberNo(ExternalMemberNo)) then begin
                 SuggestName := Member."Display Name";
+                SuggestLanguage := Member.PreferredLanguageCode;
                 case Member."Notification Method" of
                     Member."Notification Method"::EMAIL:
                         begin
@@ -331,7 +334,7 @@
                 end;
             end;
 
-        exit(TicketNotifyParticipant.AcquireTicketParticipant(Token, SuggestMethod, SuggestAddress, SuggestName));
+        exit(TicketNotifyParticipant.AcquireTicketParticipant(Token, SuggestMethod, SuggestAddress, SuggestName, SuggestLanguage));
     end;
 
     procedure RevokeTicketWithLog(var JobPlanningLine: Record "Job Planning Line")

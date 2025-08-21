@@ -42,6 +42,11 @@ page 6151358 "NPR TM ImportTicketHeaderCard"
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Holder Name field.';
                 }
+                field(TicketHolderPreferredLang; Rec.TicketHolderPreferredLang)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Holder Preferred Language field.';
+                }
                 group(OrderAmounts)
                 {
                     Caption = 'Order Amount';

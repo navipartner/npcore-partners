@@ -31,6 +31,11 @@ table 6150753 "NPR TM ImportTicketHeader"
             DataClassification = CustomerContent;
             Caption = 'Holder Name';
         }
+        field(33; TicketHolderPreferredLang; Code[10])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Holder Preferred Language';
+        }
         field(100; TotalAmount; Decimal)
         {
             DataClassification = CustomerContent;

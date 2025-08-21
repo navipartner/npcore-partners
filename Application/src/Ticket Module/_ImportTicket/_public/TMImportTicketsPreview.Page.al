@@ -66,6 +66,11 @@ page 6151354 "NPR TM ImportTicketsPreview"
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Holder Name field.';
                 }
+                field(TicketHolderPreferredLang; Rec.TicketHolderPreferredLang)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Holder Preferred Language field.';
+                }
                 field(TicketRequestToken; Rec.TicketRequestToken)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;

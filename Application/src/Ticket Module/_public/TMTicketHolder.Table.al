@@ -26,6 +26,12 @@ table 6151179 "NPR TM TicketHolder"
             Caption = 'Notification Address';
             DataClassification = CustomerContent;
         }
+        field(5; TicketHolderPreferredLanguage; Code[10])
+        {
+            Caption = 'Ticket Holder Preferred Language';
+            DataClassification = CustomerContent;
+            TableRelation = Language.Code;
+        }
     }
 
     keys
@@ -42,5 +48,6 @@ table 6151179 "NPR TM TicketHolder"
         Rec.TicketHolderName := TicketReservationReq.TicketHolderName;
         Rec.NotificationMethod := TicketReservationReq."Notification Method";
         Rec.NotificationAddress := TicketReservationReq."Notification Address";
+        Rec.TicketHolderPreferredLanguage := TicketReservationReq.TicketHolderPreferredLanguage;
     end;
 }

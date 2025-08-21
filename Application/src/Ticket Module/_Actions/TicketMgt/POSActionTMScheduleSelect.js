@@ -1,4 +1,4 @@
-const main = async ({ workflow, context, popup }) => {
+const main = async ({ workflow, context, popup, toast, captions }) => {
   debugger;
 
   const wfAssign = await workflow.respond("AssignSameSchedule", context);
@@ -8,7 +8,8 @@ const main = async ({ workflow, context, popup }) => {
     return { cancel: true };
   }
 
-  if (!wfAssign.EditSchedule) return { cancel: false };
+  if (!wfAssign.EditSchedule && !context.EditTicketHolder)
+    return { cancel: false };
 
   const wfConfig = await workflow.respond("ConfigureWorkflow", context);
 
@@ -20,33 +21,41 @@ const main = async ({ workflow, context, popup }) => {
   }
 
   if (wfConfig.CaptureTicketHolder || context.EditTicketHolder)
-    await captureTicketHolderInfo(workflow, wfConfig);
+    await captureTicketHolderInfo(workflow, wfConfig, captions);
 
   return { cancel: false };
 };
 
-async function captureTicketHolderInfo(workflow, wfConfig) {
+async function captureTicketHolderInfo(workflow, wfConfig, captions) {
   const ticketHolder = await popup.configuration({
-    title: wfConfig.ticketHolderTitle,
-    caption: wfConfig.ticketHolderCaption,
+    title: captions.ticketHolderTitle,
+    caption: captions.ticketHolderCaption,
     settings: [
       {
         id: "ticketHolderName",
         type: "text",
-        caption: wfConfig.ticketHolderNameLabel,
+        caption: captions.ticketHolderNameLabel,
         value: wfConfig.ticketHolderName,
       },
       {
         id: "ticketHolderEmail",
         type: "text",
-        caption: wfConfig.ticketHolderEmailLabel,
+        caption: captions.ticketHolderEmailLabel,
         value: wfConfig.ticketHolderEmail,
       },
       {
         id: "ticketHolderPhone",
         type: "phoneNumber",
-        caption: wfConfig.ticketHolderPhoneLabel,
+        caption: captions.ticketHolderPhoneLabel,
         value: wfConfig.ticketHolderPhone,
+      },
+      {
+        id: "ticketHolderLanguage",
+        type: "radio",
+        caption: captions.ticketHolderLanguageLabel,
+        options: wfConfig.availableLanguages,
+        value: wfConfig.ticketHolderLanguage,
+        vertical: false,
       },
     ],
   });

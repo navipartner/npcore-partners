@@ -1777,7 +1777,7 @@
         exit(true);
     end;
 
-    procedure SetReservationRequestExtraInfo(Token: Text[100]; NotificationAddress: Text[100]; ExternalOrderNo: Code[20]; TicketHolderName: Text[100]): Boolean
+    procedure SetReservationRequestExtraInfo(Token: Text[100]; NotificationAddress: Text[100]; ExternalOrderNo: Code[20]; TicketHolderName: Text[100]; TicketHolderLanguage: Code[10]): Boolean
     var
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
     begin
@@ -1788,7 +1788,7 @@
 #endif
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
-        TicketReservationRequest.SetLoadFields("Request Status", "Receipt No.", "Notification Method", "Notification Address", "Payment Option", "External Order No.", "TicketHolderName");
+        TicketReservationRequest.SetLoadFields("Request Status", "Receipt No.", "Notification Method", "Notification Address", "Payment Option", "External Order No.", "TicketHolderName", TicketHolderPreferredLanguage);
         if (not TicketReservationRequest.FindSet()) then
             exit(false);
 
@@ -1813,6 +1813,9 @@
 
             if (TicketHolderName <> '') then
                 TicketReservationRequest.TicketHolderName := TicketHolderName;
+
+            if (TicketHolderLanguage <> '') then
+                TicketReservationRequest.Validate(TicketHolderPreferredLanguage, TicketHolderLanguage);
 
             TicketReservationRequest.Modify();
         until (TicketReservationRequest.Next() = 0);
@@ -2409,6 +2412,7 @@
         SuggestNotificationMethod: Enum "NPR TM NotificationMethod";
         SuggestNotificationAddress: Text[100];
         SuggestTicketHolderName: Text[100];
+        SuggestTicketHolderLanguage: Code[10];
     begin
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
@@ -2416,7 +2420,7 @@
         if (not TicketReservationRequest.IsEmpty()) then
             exit(true); // dynamic contents requires attention
 
-        RequireParticipantInformation := NotifyParticipant.RequireParticipantInfo(Token, AdmissionCode, SuggestNotificationMethod, SuggestNotificationAddress, SuggestTicketHolderName);
+        RequireParticipantInformation := NotifyParticipant.RequireParticipantInfo(Token, AdmissionCode, SuggestNotificationMethod, SuggestNotificationAddress, SuggestTicketHolderName, SuggestTicketHolderLanguage);
         if (RequireParticipantInformation <> RequireParticipantInformation::NOT_REQUIRED) then
             exit(true); // notifying participant requires attention
 
@@ -3061,6 +3065,8 @@
             TicketNotificationEntry."Notification Address" := TicketReservationRequest."Notification Address";
             if (SendTo <> '') then
                 TicketNotificationEntry."Notification Address" := SendTo;
+
+            TicketNotificationEntry."Ticket Holder Preferred Lang" := TicketReservationRequest.TicketHolderPreferredLanguage;
 
             TicketNotificationEntry."Notification Method" := TicketNotificationEntry."Notification Method"::SMS;
             if (StrPos(TicketNotificationEntry."Notification Address", '@') > 0) then

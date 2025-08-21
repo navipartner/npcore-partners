@@ -110,6 +110,7 @@ types:
     properties:
       name: optional<Name>
       eMail: optional<EMail>
+      languageCode: optional<LanguageCode>
       memberNumber: optional<simpleTypes.MemberNumber>
     examples:
       - name: ExampleTicketHolder
@@ -117,6 +118,7 @@ types:
           name: $Name.ExampleName
           eMail: $EMail.ExampleEMail
           memberNumber: $simpleTypes.MemberNumber.ExampleMemberNumber
+          languageCode: $LanguageCode.ExampleENU
 
   ImportTicketBatchResponse:
     docs: 
@@ -272,6 +274,15 @@ types:
     examples:
       - name: ExampleEMail
         value: "john.doe@example.com"
+
+  LanguageCode:
+    type: string
+    docs: The language code of the customer.
+    examples:
+      - name: ExampleENU
+        value: "ENU"
+      - name: ExampleDAN
+        value: "DAN"
 
   MembershipNumber:
     type: string

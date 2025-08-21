@@ -160,6 +160,7 @@ codeunit 6184689 "NPR TM ImportTicketControl"
             TempTicketImport.PaymentReference := Format(GetAsText(TicketOrder, 'paymentReference', MaxStrLen(TempTicketImport.PaymentReference), false));
             TempTicketImport.TicketHolderEMail := LowerCase(GetAsText(TicketOrder, 'eMail', MaxStrLen(TempTicketImport.TicketHolderEMail), false));
             TempTicketImport.TicketHolderName := GetAsText(TicketOrder, 'name', MaxStrLen(TempTicketImport.TicketHolderName), false);
+            TempTicketImport.TicketHolderPreferredLang := GetAsText(TicketOrder, 'languageCode', MaxStrLen(TempTicketImport.TicketHolderPreferredLang), false);
 
             TicketOrder.Get('tickets', JToken);
             Tickets := JToken.AsArray();
@@ -202,6 +203,7 @@ codeunit 6184689 "NPR TM ImportTicketControl"
                     TicketHolder := JToken.AsObject();
                     TempTicketImportLine.TicketHolderEMail := LowerCase(GetAsText(TicketHolder, 'eMail', MaxStrLen(TempTicketImportLine.TicketHolderEMail), false));
                     TempTicketImportLine.TicketHolderName := GetAsText(TicketHolder, 'name', MaxStrLen(TempTicketImportLine.TicketHolderName), false);
+                    TempTicketImportLine.TicketHolderPreferredLang := GetAsText(TicketHolder, 'languageCode', MaxStrLen(TempTicketImportLine.TicketHolderPreferredLang), false);
                     TempTicketImportLine.MembershipNumber := Format(GetAsText(TicketHolder, 'membershipNumber', MaxStrLen(TempTicketImportLine.MembershipNumber), false));
                     TempTicketImportLine.MemberNumber := Format(GetAsText(TicketHolder, 'memberNumber', MaxStrLen(TempTicketImportLine.MemberNumber), false));
                 end;
@@ -209,6 +211,7 @@ codeunit 6184689 "NPR TM ImportTicketControl"
                 if (TempTicketImport.TicketHolderEMail = '') then begin
                     TempTicketImport.TicketHolderEMail := TempTicketImportLine.TicketHolderEMail;
                     TempTicketImport.TicketHolderName := TempTicketImportLine.TicketHolderName;
+                    TempTicketImport.TicketHolderPreferredLang := TempTicketImportLine.TicketHolderPreferredLang;
                 end;
 
                 TempTicketImportLine.Insert();

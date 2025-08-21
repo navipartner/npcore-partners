@@ -191,6 +191,12 @@
             Caption = 'Ticket Holder Name';
             DataClassification = CustomerContent;
         }
+        field(86; TicketHolderPreferredLanguage; Code[10])
+        {
+            Caption = 'Ticket Holder Preferred Language';
+            DataClassification = CustomerContent;
+            TableRelation = Language.Code;
+        }
         field(90; "DIY Print Order Requested"; Boolean)
         {
             Caption = 'DIY Print Order Requested';

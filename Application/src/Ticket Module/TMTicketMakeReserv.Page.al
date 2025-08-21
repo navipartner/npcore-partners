@@ -316,6 +316,19 @@
                     ToolTip = 'Specifies the value of the Ticket Holder Name field';
                 }
             }
+            group(TicketHolderLangGrp)
+            {
+                ShowCaption = false;
+                Visible = gShowDeliverTo;
+
+                field(TicketHolderLang; _TicketHolderLang)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Caption = 'Ticket Holder Preferred Language';
+                    ToolTip = 'Specifies the value of the Ticket Holder Preferred Language field';
+                    TableRelation = Language.Code;
+                }
+            }
             group(Control6014407)
             {
                 ShowCaption = false;
@@ -478,6 +491,7 @@
         gConfirmStatusText: Text;
         gDeliverTicketTo: Text[100];
         gTicketHolderName: Text[100];
+        _TicketHolderLang: Code[10];
         _UnitPriceDisplay: Text;
         _UnitPrice: Decimal;
         _DiscountPct: Decimal;
@@ -641,6 +655,7 @@
         if (TicketReservationRequest.FindSet()) then begin
             gDeliverTicketTo := TicketReservationRequest."Notification Address";
             gTicketHolderName := TicketReservationRequest."TicketHolderName";
+            _TicketHolderLang := TicketReservationRequest.TicketHolderPreferredLanguage;
 
             repeat
                 Rec.TransferFields(TicketReservationRequest, true);
@@ -733,6 +748,7 @@
 
                 TicketReservationRequest."Notification Address" := gDeliverTicketTo;
                 TicketReservationRequest.TicketHolderName := gTicketHolderName;
+                TicketReservationRequest.TicketHolderPreferredLanguage := _TicketHolderLang;
                 if (StrPos(gDeliverTicketTo, '@') > 0) then
                     TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::EMAIL
                 else
@@ -826,6 +842,7 @@
                 TicketReservationRequest.Get(Rec."Entry No.");
                 TicketReservationRequest."Notification Address" := gDeliverTicketTo;
                 TicketReservationRequest.TicketHolderName := gTicketHolderName;
+                TicketReservationRequest.TicketHolderPreferredLanguage := _TicketHolderLang;
                 if (STRPOS(gDeliverTicketTo, '@') > 0) then
                     TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::EMAIL
                 else
@@ -899,6 +916,7 @@
                 TicketReservationRequest.Get(Rec."Entry No.");
                 TicketReservationRequest."Notification Address" := gDeliverTicketTo;
                 TicketReservationRequest.TicketHolderName := gTicketHolderName;
+                TicketReservationRequest.TicketHolderPreferredLanguage := _TicketHolderLang;
                 if (STRPOS(gDeliverTicketTo, '@') > 0) then
                     TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::EMAIL
                 else

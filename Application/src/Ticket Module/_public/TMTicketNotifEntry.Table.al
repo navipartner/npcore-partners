@@ -226,6 +226,12 @@
             Caption = 'Ticket Holder Name';
             DataClassification = CustomerContent;
         }
+        field(166; "Ticket Holder Preferred Lang"; Code[10])
+        {
+            Caption = 'Ticket Holder Preferred Language';
+            DataClassification = CustomerContent;
+            TableRelation = Language.Code;
+        }
         field(170; "Ticket BOM Adm. Description"; Text[80])
         {
             Caption = 'Ticket Item Description';

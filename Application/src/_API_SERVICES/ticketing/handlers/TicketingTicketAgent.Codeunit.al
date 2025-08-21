@@ -79,6 +79,7 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         NotificationAddress: Text[100];
         PaymentReference: Code[20];
         TicketHolder: Text[100];
+        TicketHolderLanguage: Code[10];
         Token: JsonToken;
     begin
 
@@ -99,7 +100,10 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         if (Body.Get('paymentReference', Token)) then
             TicketHolder := CopyStr(Token.AsValue().AsText(), 1, MaxStrLen(TicketHolder));
 
-        exit(ConfirmRevokeTicket(RevokeId, NotificationAddress, PaymentReference, TicketHolder));
+        if (Body.Get('ticketHolderLanguage', Token)) then
+            TicketHolderLanguage := CopyStr(Token.AsValue().AsText(), 1, MaxStrLen(TicketHolderLanguage));
+
+        exit(ConfirmRevokeTicket(RevokeId, NotificationAddress, PaymentReference, TicketHolder, TicketHolderLanguage));
     end;
 
     internal procedure ValidateArrival(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
@@ -236,7 +240,7 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         exit(Response.RespondOk(ResponseJson.Build()));
     end;
 
-    internal procedure ConfirmRevokeTicket(DocumentId: Text[100]; SendNotificationTo: Text[100]; ExternalDocumentNo: Code[20]; TicketHolderName: Text[100]) Response: Codeunit "NPR API Response"
+    internal procedure ConfirmRevokeTicket(DocumentId: Text[100]; SendNotificationTo: Text[100]; ExternalDocumentNo: Code[20]; TicketHolderName: Text[100]; TicketHolderLanguage: Code[10]) Response: Codeunit "NPR API Response"
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         ResponseJson: Codeunit "NPR JSON Builder";
@@ -244,7 +248,8 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         TicketRequestManager.SetReservationRequestExtraInfo(DocumentID,
               SendNotificationTo,
               ExternalDocumentNo,
-              TicketHolderName);
+              TicketHolderName,
+              TicketHolderLanguage);
 
         TicketRequestManager.RevokeReservationTokenRequest(DocumentID, false);
 
@@ -589,6 +594,7 @@ codeunit 6185080 "NPR TicketingTicketAgent"
             .AddProperty('unitPriceInclVat', Ticket.AmountInclVat)
             .AddProperty('currencyCode', CurrencyCode)
             .AddProperty('ticketHolder', ReservationRequest.TicketHolderName)
+            .AddProperty('ticketHolderLanguage', ReservationRequest.TicketHolderPreferredLanguage)
             .AddProperty('notificationAddress', ReservationRequest."Notification Address")
             .AddObject(AddPrintedTicketDetails(ResponseJson, Ticket))
         .EndObject();

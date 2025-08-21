@@ -110,7 +110,7 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
     begin
-        TicketRequestManager.SetReservationRequestExtraInfo(TempTicketImport.TicketRequestToken, TempTicketImport.TicketHolderEMail, TempTicketImport.PaymentReference, TempTicketImport.TicketHolderName);
+        TicketRequestManager.SetReservationRequestExtraInfo(TempTicketImport.TicketRequestToken, TempTicketImport.TicketHolderEMail, TempTicketImport.PaymentReference, TempTicketImport.TicketHolderName, TempTicketImport.TicketHolderPreferredLang);
         Success := TicketRequestManager.ConfirmReservationRequest(Token, ErrorMessage);
     end;
 
@@ -140,6 +140,7 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
         TicketRequest."External Member No." := TempTicketImportLine.MemberNumber;
         TicketRequest."Notification Address" := TempTicketImportLine.TicketHolderEMail;
         TicketRequest.TicketHolderName := TempTicketImportLine.TicketHolderName;
+        TicketRequest.TicketHolderPreferredLanguage := TempTicketImportLine.TicketHolderPreferredLang;
 
         if (not TicketRequestManager.TranslateBarcodeToItemVariant(TicketRequest."External Item Code", TicketRequest."Item No.", TicketRequest."Variant Code", ResolvingTable)) then
             Error(INVALID_ITEM_REFERENCE, TicketRequest."External Item Code");

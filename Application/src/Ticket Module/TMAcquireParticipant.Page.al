@@ -42,6 +42,11 @@
                             CheckEmail();
                         end;
                     }
+                    field(TicketHolderPreferredLang; Rec.TicketHolderPreferredLanguage)
+                    {
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                        ToolTip = 'Specifies the value of the Ticket Holder Preferred Language field.';
+                    }
                 }
             }
             group(Attributes)
@@ -210,6 +215,9 @@
 
         if (Rec.TicketHolderName <> '') then
             Rec.TicketHolderName := SuggestTicketHolderName;
+
+        if (Rec.TicketHolderPreferredLanguage <> '') then
+            Rec.TicketHolderPreferredLanguage := SuggestTicketHolderLanguage;
     end;
 
     trigger OnOpenPage()
@@ -252,6 +260,7 @@
         SuggestNotificationMethod: Enum "NPR TM NotificationMethod";
         SuggestNotificationAddress: Text[100];
         SuggestTicketHolderName: Text[100];
+        SuggestTicketHolderLanguage: Code[10];
         NPRAttrTextArray: array[40] of Text[250];
         NPRAttrManagement: Codeunit "NPR Attribute Management";
         NPRAttrEditable: Boolean;
@@ -292,12 +301,13 @@
         RequireNotificationAddress := (Admission."Ticketholder Notification Type" = Admission."Ticketholder Notification Type"::REQUIRED);
     end;
 
-    internal procedure SetDefaultNotification(Method: Enum "NPR TM NotificationMethod"; Address: Text[100]; Name: Text[100])
+    internal procedure SetDefaultNotification(Method: Enum "NPR TM NotificationMethod"; Address: Text[100]; Name: Text[100]; Language: Code[10])
     begin
 
         SuggestNotificationMethod := Method;
         SuggestNotificationAddress := Address;
         SuggestTicketHolderName := Name;
+        SuggestTicketHolderLanguage := Language;
     end;
 }
 

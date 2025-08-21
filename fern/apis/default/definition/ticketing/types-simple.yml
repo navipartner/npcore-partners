@@ -61,6 +61,13 @@ types:
       - name: ExampleTicketHolder
         value: "John Doe"
 
+  TicketHolderLanguage:
+    type: string
+    docs: The language code the ticket holder wants to receive notifications in.
+    examples:
+      - name: ExampleAmericanEnglish
+        value: "ENU"
+
   NotificationAddress:
     type: string
     docs: The email address or mobile phone number to send tickets and notifications to

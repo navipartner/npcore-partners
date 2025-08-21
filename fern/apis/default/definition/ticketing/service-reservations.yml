@@ -164,6 +164,7 @@ service:
             token: $simpleTypes.Token.ExampleToken
           request:
             ticketHolder: $simpleTypes.TicketHolder.ExampleTicketHolder
+            ticketHolderLanguage: $simpleTypes.TicketHolderLanguage.ExampleAmericanEnglish
             notificationAddress: $simpleTypes.NotificationAddress.ExampleEmail
             paymentReference: PAY123456
           response:
@@ -272,6 +273,7 @@ types:
       and a paymentReference to link the reservation to a payment transaction.
     properties:
       ticketHolder: optional<simpleTypes.TicketHolder>
+      ticketHolderLanguage: optional<simpleTypes.TicketHolderLanguage>
       notificationAddress: optional<simpleTypes.NotificationAddress>
       paymentReference: optional<simpleTypes.PaymentReference>
 

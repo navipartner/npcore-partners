@@ -51,6 +51,7 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         TicketHolderName: Text[100];
         NotificationAddress: Text[80];
         PaymentReference: Code[20];
+        Language: Code[10];
         ErrorCode: Code[10];
         ErrorMessage: Text;
     begin
@@ -66,7 +67,10 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         if (Body.Get('paymentReference', JValueToken)) then
             PaymentReference := CopyStr(JValueToken.AsValue().AsText(), 1, MaxStrLen(PaymentReference));
 
-        if (not ConfirmReservation(ReservationId, TicketHolderName, NotificationAddress, PaymentReference, ErrorCode, ErrorMessage)) then
+        if (Body.Get('ticketHolderLanguage', JValueToken)) then
+            Language := CopyStr(JValueToken.AsValue().AsText(), 1, MaxStrLen(Language));
+
+        if (not ConfirmReservation(ReservationId, TicketHolderName, NotificationAddress, PaymentReference, Language, ErrorCode, ErrorMessage)) then
             exit(Response.RespondBadRequest('Error confirming reservation: ' + ErrorMessage));
 
         exit(GetReservation(ReservationId, ErrorCode = '-1206'));
@@ -503,11 +507,11 @@ codeunit 6185083 "NPR TicketingReservationAgent"
 
 
 
-    local procedure ConfirmReservation(Token: Code[100]; TicketHolderName: Text[100]; NotificationAddress: Text[80]; PaymentReference: Code[20]; var ErrorCode: Code[10]; var ErrorMessage: Text): Boolean
+    local procedure ConfirmReservation(Token: Code[100]; TicketHolderName: Text[100]; NotificationAddress: Text[80]; PaymentReference: Code[20]; Language: Code[10]; var ErrorCode: Code[10]; var ErrorMessage: Text): Boolean
     var
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
     begin
-        TicketRequestManager.SetReservationRequestExtraInfo(Token, NotificationAddress, PaymentReference, TicketHolderName);
+        TicketRequestManager.SetReservationRequestExtraInfo(Token, NotificationAddress, PaymentReference, TicketHolderName, Language);
         if (not (TicketRequestManager.ConfirmReservationRequest(Token, 0, ErrorCode, ErrorMessage))) then
             exit(false);
 

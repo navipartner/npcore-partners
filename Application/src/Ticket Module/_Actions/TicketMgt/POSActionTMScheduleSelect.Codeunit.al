@@ -6,7 +6,20 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
         ActionDescription: Label 'This workflow drives the ticket schedule and ticket holder selection process for front-end UX.', MaxLength = 250;
 
     procedure Register(WorkflowConfig: Codeunit "NPR POS Workflow Config")
+    var
+        TicketHolderLbl: Label 'Ticket Holder';
+        TicketHolderCaptionLbl: Label 'Please provide ticket holder information.';
+        NameLbl: Label 'Name';
+        PhoneLbl: Label 'Phone';
+        EmailLbl: Label 'Email';
+        LanguageLbl: Label 'Language';
     begin
+        WorkflowConfig.AddLabel('ticketHolderTitle', TicketHolderLbl);
+        WorkflowConfig.AddLabel('ticketHolderCaption', TicketHolderCaptionLbl);
+        WorkflowConfig.AddLabel('ticketHolderNameLabel', NameLbl);
+        WorkflowConfig.AddLabel('ticketHolderEmailLabel', EmailLbl);
+        WorkflowConfig.AddLabel('ticketHolderPhoneLabel', PhoneLbl);
+        WorkflowConfig.AddLabel('ticketHolderLanguageLabel', LanguageLbl);
         WorkflowConfig.AddActionDescription(ActionDescription);
         WorkflowConfig.AddJavascript(GetActionScript());
     end;
@@ -27,12 +40,12 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
     local procedure ConfigureWorkflow(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject
     var
         NotifyParticipant: Codeunit "NPR TM Ticket Notify Particpt.";
-
         RequireParticipantInformation: Option NOT_REQUIRED,OPTIONAL,REQUIRED;
         AdmissionCode: Code[20];
         SuggestNotificationMethod: Enum "NPR TM NotificationMethod";
         SuggestNotificationAddress: Text[100];
         SuggestTicketHolderName: Text[100];
+        SuggestTicketHolderLanguage: Code[10];
         Token: Text[100];
         NewToken: Text[100];
         ForceEditTicketHolder: Boolean;
@@ -42,6 +55,10 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
         POSFunction: Codeunit "NPR POS Action - Ticket Mgt B.";
         POSSession: Codeunit "NPR POS Session";
         TicketReference: Code[50];
+        Language: Record Language;
+        JArray: JsonArray;
+        JObject: JsonObject;
+        NoSpecificLanguageLbl: Label 'No specific language';
     begin
         Token := CopyStr(Context.GetString('TicketToken'), 1, MaxStrLen(Token));
         Context.GetInteger('FunctionId', FunctionId);
@@ -65,19 +82,19 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
         if NewToken <> '' then
             Context.SetContext('TicketToken', NewToken);
 
-        Response.Add('ticketHolderTitle', 'Ticket Holder');
-        Response.Add('ticketHolderCaption', 'Please provide ticket holder information.');
-        Response.Add('ticketHolderNameLabel', 'Name');
-        Response.Add('ticketHolderEmailLabel', 'Email');
-        Response.Add('ticketHolderPhoneLabel', 'Phone');
-
-        RequireParticipantInformation := NotifyParticipant.RequireParticipantInfo(Token, AdmissionCode, SuggestNotificationMethod, SuggestNotificationAddress, SuggestTicketHolderName);
+        RequireParticipantInformation := NotifyParticipant.RequireParticipantInfo(Token, AdmissionCode, SuggestNotificationMethod, SuggestNotificationAddress, SuggestTicketHolderName, SuggestTicketHolderLanguage);
         if (RequireParticipantInformation = RequireParticipantInformation::NOT_REQUIRED) then
             if (Context.GetBoolean('EditTicketHolder', ForceEditTicketHolder)) then
                 if (ForceEditTicketHolder) then
                     RequireParticipantInformation := RequireParticipantInformation::OPTIONAL;
 
+
         Response.Add('ticketHolderName', SuggestTicketHolderName);
+
+        if (SuggestTicketHolderLanguage = '') then
+            Response.Add('ticketHolderLanguage', 'NO_LANGUAGE_SELECTED')
+        else
+            Response.Add('ticketHolderLanguage', SuggestTicketHolderLanguage);
 
         if (StrPos(SuggestNotificationAddress, '@') > 0) then begin
             Response.Add('ticketHolderEmail', SuggestNotificationAddress);
@@ -87,9 +104,21 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
             Response.Add('ticketHolderEmail', '');
         end;
 
-        Response.Add('CaptureTicketHolder', RequireParticipantInformation in [RequireParticipantInformation::OPTIONAL, RequireParticipantInformation::REQUIRED]);
+        if (Language.FindSet()) then begin
+            JObject.Add('value', 'NO_LANGUAGE_SELECTED');
+            JObject.Add('caption', StrSubstNo('(%1)', NoSpecificLanguageLbl));
+            JArray.Add(JObject);
+            repeat
+                Clear(JObject);
+                JObject.Add('value', Language.Code);
+                JObject.Add('caption', Language.Name);
+                JArray.Add(JObject);
+            until (Language.Next() = 0);
+        end;
 
-        exit;
+        Response.Add('availableLanguages', JArray);
+
+        Response.Add('CaptureTicketHolder', RequireParticipantInformation in [RequireParticipantInformation::OPTIONAL, RequireParticipantInformation::REQUIRED]);
     end;
 
     local procedure GetNewTicketToken(TicketReference: Code[100]) Token: Text[100]
@@ -120,6 +149,7 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
         Name: Text;
         Email: Text;
         Phone: Text;
+        Language: Text;
     begin
         Token := CopyStr(Context.GetString('TicketToken'), 1, MaxStrLen(Token));
 
@@ -129,6 +159,10 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
             Email := '';
         if (not Context.GetString('ticketHolderPhone', Phone)) then
             Phone := '';
+        if (not Context.GetString('ticketHolderLanguage', Language)) then
+            Language := '';
+        if (Language = 'NO_LANGUAGE_SELECTED') then
+            Language := '';
 
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
@@ -145,6 +179,7 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
                     TicketReservationRequest."Notification Address" := CopyStr(Phone, 1, MaxStrLen(TicketReservationRequest."Notification Address"));
                 end;
                 TicketReservationRequest.TicketHolderName := CopyStr(Name, 1, MaxStrLen(TicketReservationRequest.TicketHolderName));
+                TicketReservationRequest.Validate(TicketHolderPreferredLanguage, Language.ToUpper());
                 TicketReservationRequest.Modify();
 
             until (TicketReservationRequest.Next() = 0);
@@ -249,7 +284,7 @@ codeunit 6184879 "NPR POSAction TMScheduleSelect" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionTMScheduleSelect.js###
-'const main=async({workflow:t,context:e,popup:i})=>{debugger;const a=await t.respond("AssignSameSchedule",e);if(a.CancelScheduleSelection)return toast.error(a.Message),{cancel:!0};if(!a.EditSchedule)return{cancel:!1};const l=await t.respond("ConfigureWorkflow",e);return e.EditSchedule&&await i.entertainment.scheduleSelection({token:e.TicketToken})===null?{cancel:!0}:((l.CaptureTicketHolder||e.EditTicketHolder)&&await captureTicketHolderInfo(t,l),{cancel:!1})};async function captureTicketHolderInfo(t,e){const i=await popup.configuration({title:e.ticketHolderTitle,caption:e.ticketHolderCaption,settings:[{id:"ticketHolderName",type:"text",caption:e.ticketHolderNameLabel,value:e.ticketHolderName},{id:"ticketHolderEmail",type:"text",caption:e.ticketHolderEmailLabel,value:e.ticketHolderEmail},{id:"ticketHolderPhone",type:"phoneNumber",caption:e.ticketHolderPhoneLabel,value:e.ticketHolderPhone}]});i!==null&&await t.respond("SetTicketHolder",i)}'
+'const main=async({workflow:i,context:e,popup:t,toast:a,captions:c})=>{debugger;const l=await i.respond("AssignSameSchedule",e);if(l.CancelScheduleSelection)return a.error(l.Message),{cancel:!0};if(!l.EditSchedule&&!e.EditTicketHolder)return{cancel:!1};const r=await i.respond("ConfigureWorkflow",e);return e.EditSchedule&&await t.entertainment.scheduleSelection({token:e.TicketToken})===null?{cancel:!0}:((r.CaptureTicketHolder||e.EditTicketHolder)&&await captureTicketHolderInfo(i,r,c),{cancel:!1})};async function captureTicketHolderInfo(i,e,t){const a=await popup.configuration({title:t.ticketHolderTitle,caption:t.ticketHolderCaption,settings:[{id:"ticketHolderName",type:"text",caption:t.ticketHolderNameLabel,value:e.ticketHolderName},{id:"ticketHolderEmail",type:"text",caption:t.ticketHolderEmailLabel,value:e.ticketHolderEmail},{id:"ticketHolderPhone",type:"phoneNumber",caption:t.ticketHolderPhoneLabel,value:e.ticketHolderPhone},{id:"ticketHolderLanguage",type:"radio",caption:t.ticketHolderLanguageLabel,options:e.availableLanguages,value:e.ticketHolderLanguage,vertical:!1}]});a!==null&&await i.respond("SetTicketHolder",a)}'
     );
     end;
 }

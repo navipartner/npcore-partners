@@ -265,10 +265,13 @@
                 if (TicketReservationResponse.Confirmed) then
                     Error(ALREADY_CONFIRMED, Token);
 
-            TicketRequestManager.SetReservationRequestExtraInfo(Token,
+            TicketRequestManager.SetReservationRequestExtraInfo(
+                Token,
                 GetXmlText80(Reservation, 'send_notification_to', 80, false),
                 GetXmlText20(Reservation, 'external_order_no', 20, false),
-                GetXmlText100(Reservation, 'ticket_holder_name', 100, false));
+                GetXmlText100(Reservation, 'ticket_holder_name', 100, false),
+                ''
+            );
 
             // Response is updated with a soft fail message if confirm fails.
             TicketRequestManager.ConfirmReservationRequest(Token, ResponseMessage);
@@ -668,10 +671,13 @@
 
             Token := GetXmlText100(Element, 'ticket_token', MaxStrLen(Token), false);
 
-            TicketRequestManager.SetReservationRequestExtraInfo(Token,
-              GetXmlText80(Element, 'send_notification_to', 80, false),
-              GetXmlText20(Element, 'external_order_no', 20, false),
-              GetXmlText100(Element, 'ticket_holder_name', 100, false));
+            TicketRequestManager.SetReservationRequestExtraInfo(
+                Token,
+                GetXmlText80(Element, 'send_notification_to', 80, false),
+                GetXmlText20(Element, 'external_order_no', 20, false),
+                GetXmlText100(Element, 'ticket_holder_name', 100, false),
+                ''
+            );
 
             // Response is updated with a soft fail message if confirm fails.
             TicketRequestManager.RevokeReservationTokenRequest(Token, false);

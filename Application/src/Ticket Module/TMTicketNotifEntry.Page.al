@@ -170,6 +170,11 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Ticket Holder Name field';
                 }
+                field("Ticket Holder Preferred Lang"; Rec."Ticket Holder Preferred Lang")
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Ticket Holder Preferred Language field';
+                }
                 field("Ticket BOM Adm. Description"; Rec."Ticket BOM Adm. Description")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;

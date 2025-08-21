@@ -502,11 +502,13 @@ codeunit 6151543 "NPR TM Client API BL"
                 Request := RequestToken.AsObject();
                 Token := CopyStr(GetAsText(Request, 'token', ''), 1, MaxStrLen(Token));
 
-                TicketRequestManager.SetReservationRequestExtraInfo(Token,
+                TicketRequestManager.SetReservationRequestExtraInfo(
+                    Token,
                     CopyStr(GetAsText(Request, 'notificationAddress', ''), 1, 80),
                     CopyStr(GetAsText(Request, 'paymentReference', ''), 1, 20),
-                    CopyStr(GetAsText(Request, 'ticketHolderName', ''), 1, 100)
-                    );
+                    CopyStr(GetAsText(Request, 'ticketHolderName', ''), 1, 100),
+                    CopyStr(GetAsText(Request, 'ticketHolderLanguage', ''), 1, 10)
+                );
 
                 if not (TicketRequestManager.ConfirmReservationRequest(Token, ErrorMessage)) then
                     ValidationErrorList.Add(ErrorMessage);

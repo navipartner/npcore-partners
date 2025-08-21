@@ -163,6 +163,49 @@ page 6151184 "NPR TM TicketMakeReservePhone"
                     Editable = false;
                 }
             }
+            group(TicketHolderGrp)
+            {
+                ShowCaption = false;
+                Visible = gShowDeliverTo;
+
+                group(Control6014406)
+                {
+                    ShowCaption = false;
+                    Visible = gShowDeliverTo;
+
+                    field(gTicketHolderName; _TicketHolderName)
+                    {
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                        Caption = 'Ticket Holder Name';
+                        ToolTip = 'Specifies the value of the Ticket Holder Name field';
+                    }
+                }
+                group(TicketHolderLangGrp)
+                {
+                    ShowCaption = false;
+                    Visible = gShowDeliverTo;
+
+                    field(TicketHolderLang; _TicketHolderLang)
+                    {
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                        Caption = 'Ticket Holder Preferred Language';
+                        ToolTip = 'Specifies the value of the Ticket Holder Preferred Language field';
+                        TableRelation = Language.Code;
+                    }
+                }
+                group(Control6014407)
+                {
+                    ShowCaption = false;
+                    Visible = gShowDeliverTo;
+
+                    field(gDeliverTicketTo; gDeliverTicketTo)
+                    {
+                        ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                        Caption = 'Deliver Ticket To';
+                        ToolTip = 'Specifies the value of the Deliver Ticket To field';
+                    }
+                }
+            }
         }
     }
 
@@ -276,6 +319,8 @@ page 6151184 "NPR TM TicketMakeReservePhone"
         gConfirmStatusText: Text;
         gDeliverTicketTo: Text[100];
         _UnitPrice: Text;
+        _TicketHolderName: Text[100];
+        _TicketHolderLang: Code[10];
 
     local procedure ChangeQuantity(NewQuantity: Integer)
     var
@@ -433,6 +478,8 @@ page 6151184 "NPR TM TicketMakeReservePhone"
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         if (TicketReservationRequest.FindSet()) then begin
             gDeliverTicketTo := TicketReservationRequest."Notification Address";
+            _TicketHolderName := TicketReservationRequest.TicketHolderName;
+            _TicketHolderLang := TicketReservationRequest.TicketHolderPreferredLanguage;
 
             repeat
                 Rec.TransferFields(TicketReservationRequest, true);
@@ -525,6 +572,9 @@ page 6151184 "NPR TM TicketMakeReservePhone"
                 TicketReservationRequest.Get(Rec."Entry No.");
 
                 TicketReservationRequest."Notification Address" := gDeliverTicketTo;
+                TicketReservationRequest.TicketHolderName := _TicketHolderName;
+                TicketReservationRequest.TicketHolderPreferredLanguage := _TicketHolderLang;
+
                 if (StrPos(gDeliverTicketTo, '@') > 0) then
                     TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::EMAIL
                 else
@@ -617,6 +667,8 @@ page 6151184 "NPR TM TicketMakeReservePhone"
             repeat
                 TicketReservationRequest.Get(Rec."Entry No.");
                 TicketReservationRequest."Notification Address" := gDeliverTicketTo;
+                TicketReservationRequest.TicketHolderName := _TicketHolderName;
+                TicketReservationRequest.TicketHolderPreferredLanguage := _TicketHolderLang;
                 if (STRPOS(gDeliverTicketTo, '@') > 0) then
                     TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::EMAIL
                 else
@@ -689,6 +741,8 @@ page 6151184 "NPR TM TicketMakeReservePhone"
             repeat
                 TicketReservationRequest.Get(Rec."Entry No.");
                 TicketReservationRequest."Notification Address" := gDeliverTicketTo;
+                TicketReservationRequest.TicketHolderName := _TicketHolderName;
+                TicketReservationRequest.TicketHolderPreferredLanguage := _TicketHolderLang;
                 if (STRPOS(gDeliverTicketTo, '@') > 0) then
                     TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::EMAIL
                 else

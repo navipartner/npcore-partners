@@ -165,7 +165,7 @@
 
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         if (NewEmailExpFeature.IsFeatureEnabled()) then begin
-            if (not NPEmail.TrySendEmail(TicketNotificationEntry."Template Code", TicketNotificationEntry, TicketNotificationEntry."Notification Address")) then begin
+            if (not NPEmail.TrySendEmail(TicketNotificationEntry."Template Code", TicketNotificationEntry, TicketNotificationEntry."Notification Address", TicketNotificationEntry."Ticket Holder Preferred Lang")) then begin
                 ResponseMessage := GetLastErrorText();
                 exit(false);
             end;
@@ -206,7 +206,7 @@
 
     end;
 
-    internal procedure RequireParticipantInfo(Token: Text[100]; var AdmissionCode: Code[20]; var SuggestNotificationMethod: Enum "NPR TM NotificationMethod"; var SuggestNotificationAddress: Text[100]; var SuggestTicketHolderName: Text[100]) RequireParticipantInformation: Option NOT_REQUIRED,OPTIONAL,REQUIRED;
+    internal procedure RequireParticipantInfo(Token: Text[100]; var AdmissionCode: Code[20]; var SuggestNotificationMethod: Enum "NPR TM NotificationMethod"; var SuggestNotificationAddress: Text[100]; var SuggestTicketHolderName: Text[100]; var SuggestTicketHolderLanguage: Code[10]) RequireParticipantInformation: Option NOT_REQUIRED,OPTIONAL,REQUIRED;
     var
         Ticket: Record "NPR TM Ticket";
         Admission: Record "NPR TM Admission";
@@ -224,10 +224,12 @@
             if (TicketReservationRequest."Primary Request Line") then begin
                 SuggestNotificationAddress := TicketReservationRequest."Notification Address";
                 SuggestTicketHolderName := TicketReservationRequest.TicketHolderName;
+                SuggestTicketHolderLanguage := TicketReservationRequest.TicketHolderPreferredLanguage;
                 AdmissionCode := TicketReservationRequest."Admission Code";
 
                 if (GetMember(Ticket."External Member Card No.", Member)) then begin
                     SuggestTicketHolderName := Member."Display Name";
+                    SuggestTicketHolderLanguage := Member.PreferredLanguageCode;
                     case (Member."Notification Method") of
                         Member."Notification Method"::EMAIL:
                             begin
@@ -328,26 +330,27 @@
                 TicketReservationReq."Notification Method" := TicketHolder.NotificationMethod;
                 TicketReservationReq."Notification Address" := TicketHolder.NotificationAddress;
                 TicketReservationReq.TicketHolderName := TicketHolder.TicketHolderName;
+                TicketReservationReq.TicketHolderPreferredLanguage := TicketHolder.TicketHolderPreferredLanguage;
                 TicketReservationReq.Modify();
             until TicketReservationReq.Next() = 0;
         until TicketHolder.Next() = 0;
     end;
 
-    internal procedure AcquireTicketParticipant(Token: Text[100]; SuggestNotificationMethod: Enum "NPR TM NotificationMethod"; SuggestNotificationAddress: Text[100]; SuggestTicketHolderName: Text[100]): Boolean
+    internal procedure AcquireTicketParticipant(Token: Text[100]; SuggestNotificationMethod: Enum "NPR TM NotificationMethod"; SuggestNotificationAddress: Text[100]; SuggestTicketHolderName: Text[100]; SuggestTicketHolderLanguage: Code[10]): Boolean
     begin
 
-        exit(AcquireTicketParticipantWorker(Token, SuggestNotificationMethod, SuggestNotificationAddress, SuggestTicketHolderName, false));
+        exit(AcquireTicketParticipantWorker(Token, SuggestNotificationMethod, SuggestNotificationAddress, SuggestTicketHolderName, SuggestTicketHolderLanguage, false));
 
     end;
 
-    internal procedure AcquireTicketParticipantForce(Token: Text[100]; SuggestNotificationMethod: Enum "NPR TM NotificationMethod"; SuggestNotificationAddress: Text[100]; SuggestTicketHolderName: Text[100]; ForceDialog: Boolean): Boolean
+    internal procedure AcquireTicketParticipantForce(Token: Text[100]; SuggestNotificationMethod: Enum "NPR TM NotificationMethod"; SuggestNotificationAddress: Text[100]; SuggestTicketHolderName: Text[100]; SuggestTicketHolderLanguage: Code[10]; ForceDialog: Boolean): Boolean
     begin
 
-        exit(AcquireTicketParticipantWorker(Token, SuggestNotificationMethod, SuggestNotificationAddress, SuggestTicketHolderName, ForceDialog));
+        exit(AcquireTicketParticipantWorker(Token, SuggestNotificationMethod, SuggestNotificationAddress, SuggestTicketHolderName, SuggestTicketHolderLanguage, ForceDialog));
 
     end;
 
-    local procedure AcquireTicketParticipantWorker(Token: Text[100]; SuggestNotificationMethod: Enum "NPR TM NotificationMethod"; SuggestNotificationAddress: Text[100]; SuggestTicketHolderName: Text[100]; ForceDialog: Boolean): Boolean
+    local procedure AcquireTicketParticipantWorker(Token: Text[100]; SuggestNotificationMethod: Enum "NPR TM NotificationMethod"; SuggestNotificationAddress: Text[100]; SuggestTicketHolderName: Text[100]; SuggestTicketHolderLanguage: Code[10]; ForceDialog: Boolean): Boolean
     var
         PageAction: Action;
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
@@ -361,7 +364,7 @@
         if (not GuiAllowed()) then
             exit(false);
 
-        TicketHolderInformation := RequireParticipantInfo(Token, AdmissionCode, SuggestNotificationMethod, SuggestNotificationAddress, SuggestTicketHolderName);
+        TicketHolderInformation := RequireParticipantInfo(Token, AdmissionCode, SuggestNotificationMethod, SuggestNotificationAddress, SuggestTicketHolderName, SuggestTicketHolderLanguage);
         if (not ForceDialog) then
             if (TicketHolderInformation = TicketHolderInformation::NOT_REQUIRED) then
                 exit(false);
@@ -379,7 +382,7 @@
         DisplayTicketParticipant.Editable(true);
 
         DisplayTicketParticipant.SetAdmissionCode(AdmissionCode);
-        DisplayTicketParticipant.SetDefaultNotification(SuggestNotificationMethod, SuggestNotificationAddress, SuggestTicketHolderName);
+        DisplayTicketParticipant.SetDefaultNotification(SuggestNotificationMethod, SuggestNotificationAddress, SuggestTicketHolderName, SuggestTicketHolderLanguage);
 
         // 2 contains the original
         TicketReservationRequest2.Get(TicketReservationRequest."Entry No.");
@@ -394,6 +397,7 @@
             TicketReservationRequest."Notification Method" := TicketReservationRequest2."Notification Method";
             TicketReservationRequest."Notification Address" := TicketReservationRequest2."Notification Address";
             TicketReservationRequest.TicketHolderName := TicketReservationRequest2.TicketHolderName;
+            TicketReservationRequest.TicketHolderPreferredLanguage := TicketReservationRequest2.TicketHolderPreferredLanguage;
             TicketReservationRequest.Modify();
 
             AttributeManagement.CopyEntryAttributeValue(Database::"NPR TM Ticket Reservation Req.", TicketReservationRequest2."Entry No.", TicketReservationRequest."Entry No.");
@@ -976,6 +980,7 @@
         NotificationEntry."Entry No." := 0;
         NotificationEntry."Notification Trigger" := NotificationEntry."Notification Trigger"::REMINDER;
         NotificationEntry."Notification Address" := TicketReservationRequest."Notification Address";
+        NotificationEntry."Ticket Holder Preferred Lang" := TicketReservationRequest.TicketHolderPreferredLanguage;
         if (NotificationEntry."Notification Address" = '') then
             exit(0);
 

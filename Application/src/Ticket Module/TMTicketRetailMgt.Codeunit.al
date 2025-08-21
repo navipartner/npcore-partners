@@ -273,6 +273,7 @@
         SuggestMethod: Enum "NPR TM NotificationMethod";
         SuggestAddress: Text[100];
         SuggestName: Text[100];
+        SuggestLanguage: Code[10];
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
     begin
 
@@ -283,6 +284,7 @@
         if (TicketReservationRequest.FindFirst()) then begin
             SuggestAddress := TicketReservationRequest."Notification Address";
             SuggestName := TicketReservationRequest.TicketHolderName;
+            SuggestLanguage := TicketReservationRequest.TicketHolderPreferredLanguage;
             case TicketReservationRequest."Notification Method" of
                 TicketReservationRequest."Notification Method"::EMAIL:
                     SuggestMethod := SuggestMethod::EMAIL;
@@ -296,6 +298,7 @@
         if (ExternalMemberNo <> '') then begin
             if (Member.Get(MemberManagement.GetMemberFromExtMemberNo(ExternalMemberNo))) then begin
                 SuggestName := Member."Display Name";
+                SuggestLanguage := Member.PreferredLanguageCode;
                 case Member."Notification Method" of
                     Member."Notification Method"::EMAIL:
                         begin
@@ -306,7 +309,7 @@
             end;
         end;
 
-        exit(TicketNotifyParticipant.AcquireTicketParticipantForce(Token, SuggestMethod, SuggestAddress, SuggestName, ForceDialog));
+        exit(TicketNotifyParticipant.AcquireTicketParticipantForce(Token, SuggestMethod, SuggestAddress, SuggestName, SuggestLanguage, ForceDialog));
     end;
 
     procedure AssignSameSchedule(Token: Text[100]; ExploreSameScheduleCode: Boolean)
@@ -444,6 +447,7 @@
                     TicketReservationRequest."Notification Method" := TicketReservationRequest2."Notification Method";
                     TicketReservationRequest."Notification Address" := TicketReservationRequest2."Notification Address";
                     TicketReservationRequest.TicketHolderName := TicketReservationRequest2.TicketHolderName;
+                    TicketReservationRequest.TicketHolderPreferredLanguage := TicketReservationRequest2.TicketHolderPreferredLanguage;
                     TicketReservationRequest.Modify();
                 end;
             until (TicketReservationRequest.Next() = 0);

@@ -136,6 +136,7 @@ types:
       unitPriceInclVat: optional<double>
       currencyCode: optional<string>
       ticketHolder: optional<simpleTypes.TicketHolder>
+      ticketHolderLanguage: optional<simpleTypes.TicketHolderLanguage>
       notificationAddress: optional<simpleTypes.NotificationAddress>
       printCount: optional<integer>
       printedAt: optional<datetime>
@@ -157,6 +158,7 @@ types:
           unitPriceInclVat: 100.00
           currencyCode: DKK
           ticketHolder: $simpleTypes.TicketHolder.ExampleTicketHolder
+          ticketHolderLanguage: $simpleTypes.TicketHolderLanguage.ExampleAmericanEnglish
           notificationAddress: $simpleTypes.NotificationAddress.ExampleEmail
           printCount: 1
           printedAt: $simpleTypes.ReferenceDateTime.ExamplePrintedAt
@@ -175,6 +177,7 @@ types:
           blocked: false
           pinCode: 12-34
           ticketHolder: $simpleTypes.TicketHolder.ExampleTicketHolder
+          ticketHolderLanguage: $simpleTypes.TicketHolderLanguage.ExampleAmericanEnglish
           content: 
             - $TicketContent.ExampleTicketContent2
           description: $Descriptions.ExampleTicket31001

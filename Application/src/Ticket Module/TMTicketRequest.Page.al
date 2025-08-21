@@ -129,6 +129,11 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Notification Address field';
                 }
+                field(TicketHolderPreferredLanguage; Rec.TicketHolderPreferredLanguage)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Ticket Holder Preferred Language field';
+                }
                 field("External Member No."; Rec."External Member No.")
                 {
                     ApplicationArea = NPRTicketAdvanced;
