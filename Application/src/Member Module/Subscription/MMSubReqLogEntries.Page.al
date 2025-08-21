@@ -87,14 +87,14 @@ page 6184892 "NPR MM Sub Req Log Entries"
             }
         }
     }
-    local procedure GetCreatedByUserName() CreatedByUserName: Text;
+    local procedure GetCreatedByUserName() CreatedByUserNameOut: Text;
     var
         User: Record User;
     begin
         User.SetLoadFields("User Name");
         if not User.Get(Rec.SystemCreatedBy) then
             exit;
-        CreatedByUserName := User."User Name";
+        CreatedByUserNameOut := User."User Name";
     end;
 
     local procedure GetModifiedByUserName() ModifiedByUserName: Text;

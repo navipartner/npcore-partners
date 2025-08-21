@@ -22,7 +22,7 @@ codeunit 6059836 "NPR POS Action: Adjust Inv. B"
         Message(Text005, Quantity);
     end;
 
-    local procedure ConfirmAdjustInventory(SaleLinePOS: Record "NPR POS Sale Line"; UnitOfMeasureCode: Code[10]; Quantity: Decimal) PerformAdjustInventory: Boolean
+    local procedure ConfirmAdjustInventory(SaleLinePOS: Record "NPR POS Sale Line"; UnitOfMeasureCode: Code[10]; Quantity: Decimal) PerformAdjustInv: Boolean
     var
         Item: Record Item;
         ItemVariant: Record "Item Variant";
@@ -36,8 +36,8 @@ codeunit 6059836 "NPR POS Action: Adjust Inv. B"
         Item.SetFilter("Location Filter", SaleLinePOS."Location Code");
         Item.CalcFields(Inventory);
 
-        PerformAdjustInventory := Confirm(Text002, true, Item."No.", Item.Description, ItemVariant.Description, Item.Inventory, UnitOfMeasureCode, Quantity, Item.Inventory + Quantity);
-        exit(PerformAdjustInventory);
+        PerformAdjustInv := Confirm(Text002, true, Item."No.", Item.Description, ItemVariant.Description, Item.Inventory, UnitOfMeasureCode, Quantity, Item.Inventory + Quantity);
+        exit(PerformAdjustInv);
     end;
 
     local procedure CreateItemJnlLine(SalePOS: Record "NPR POS Sale"; SaleLinePOS: Record "NPR POS Sale Line"; Quantity: Decimal; UnitOfMeasureCode: Code[10]; ReturnReasonCode: Code[10]; var TempItemJnlLine: Record "Item Journal Line" temporary; CustomDescription: Text[100])

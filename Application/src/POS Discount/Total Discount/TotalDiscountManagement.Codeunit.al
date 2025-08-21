@@ -678,12 +678,12 @@ codeunit 6151077 "NPR Total Discount Management"
                                              "Customer Disc. Group Filter");
     end;
 
-    internal procedure ActiveTotalDiscountsExist(CalculationDate: Date) ActiveTotalDiscountsExist: Boolean;
+    internal procedure ActiveTotalDiscountsExist(CalculationDate: Date) ActiveTotalDiscountsExistOut: Boolean;
     var
         NPRTotalDiscountHeader: Record "NPR Total Discount Header";
     begin
         FilterActiveTotalDiscountHeaders(NPRTotalDiscountHeader, CalculationDate);
-        ActiveTotalDiscountsExist := not NPRTotalDiscountHeader.IsEmpty;
+        ActiveTotalDiscountsExistOut := not NPRTotalDiscountHeader.IsEmpty;
     end;
 
     local procedure CheckDiscountPriority(CurrNPRDiscountPriority: Record "NPR Discount Priority")
@@ -1162,11 +1162,11 @@ codeunit 6151077 "NPR Total Discount Management"
         ToSaleLinePOS.Insert();
     end;
 
-    local procedure DiscountApplied(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary) DiscountApplied: Boolean
+    local procedure DiscountApplied(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary) DiscountAppliedOut: Boolean
     begin
         TempSaleLinePOS.Reset();
         TempSaleLinePOS.SetFilter("Total Discount Code", '<>%1', '');
-        DiscountApplied := not TempSaleLinePOS.IsEmpty;
+        DiscountAppliedOut := not TempSaleLinePOS.IsEmpty;
 
         TempSaleLinePOS.Reset();
     end;

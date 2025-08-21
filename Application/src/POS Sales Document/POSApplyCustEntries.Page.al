@@ -956,22 +956,22 @@
             until CustLedgerEntry.Next() = 0;
     end;
 
-    local procedure GetAppliesToID() AppliesToID: Code[50]
+    local procedure GetAppliesToID() AppliesToIDOut: Code[50]
     begin
         case CalcType of
             CalcType::GenJnlLine:
-                AppliesToID := GenJnlLine."Applies-to ID";
+                AppliesToIDOut := GenJnlLine."Applies-to ID";
             CalcType::SalesHeader:
-                AppliesToID := SalesHeader."Applies-to ID";
+                AppliesToIDOut := SalesHeader."Applies-to ID";
             CalcType::ServHeader:
-                AppliesToID := ServHeader."Applies-to ID";
+                AppliesToIDOut := ServHeader."Applies-to ID";
             CalcType::POSLine:
                 begin
                     case ApplnType of
                         ApplnType::"Applies-to Doc. No.":
-                            AppliesToID := SaleLinePOS."Buffer Document No.";
+                            AppliesToIDOut := SaleLinePOS."Buffer Document No.";
                         ApplnType::"Applies-to ID":
-                            AppliesToID := SaleLinePOS."Buffer ID";
+                            AppliesToIDOut := SaleLinePOS."Buffer ID";
                     end;
                 end;
         end;

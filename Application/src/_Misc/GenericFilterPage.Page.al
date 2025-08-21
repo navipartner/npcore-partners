@@ -369,15 +369,15 @@ page 6059845 "NPR Generic Filter Page"
             CompleteFilterText := DelStr(CompleteFilterText, StrLen(WhereKeyWord + ','), 1);
     end;
 
-    internal procedure ReturnRawFilter() "Filter": Text
+    internal procedure ReturnRawFilter() RawFilter: Text
     begin
-        filter := CompleteFilterText;
+        RawFilter := CompleteFilterText;
         if (CompleteFilterText <> '') and (StrPos(CompleteFilterText, WhereKeyWord) = 0) then
-            filter := WhereKeyWord + CompleteFilterText;
+            RawFilter := WhereKeyWord + CompleteFilterText;
         if Descending then
-            filter := CopyStr(DescendingKeyWord, 2) + filter;
-        filter := SortingKeyWord + SortingKey + ')' + filter;
-        exit(filter);
+            RawFilter := CopyStr(DescendingKeyWord, 2) + RawFilter;
+        RawFilter := SortingKeyWord + SortingKey + ')' + RawFilter;
+        exit(RawFilter);
     end;
 
     local procedure FilterOnValidate()

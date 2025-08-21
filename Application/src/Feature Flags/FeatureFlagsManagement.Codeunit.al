@@ -19,13 +19,13 @@ codeunit 6151495 "NPR Feature Flags Management"
         end
     end;
 
-    local procedure IsCraneEnvironment() IsCraneEnvironment: Boolean;
+    local procedure IsCraneEnvironment() IsCraneEnv: Boolean;
     var
         Url: Text;
     begin
         Url := GetUrl(ClientType::Web);
 
-        IsCraneEnvironment := Url.Contains('dynamics-retail.net');
+        IsCraneEnv := Url.Contains('dynamics-retail.net');
     end;
 
     internal procedure IsEnabled(FeatureFlagName: Text[50]) Enabled: Boolean;

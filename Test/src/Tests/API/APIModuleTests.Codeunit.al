@@ -97,7 +97,11 @@ codeunit 85139 "NPR API Module Tests"
 
         // [WHEN] When the page key is requested
 
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23 OR BC24 OR BC25 OR BC26)
+        SalesHeader.SetCurrentKey("Document Type", "Combine Shipments", "Sell-to Customer No.", "Bill-to Customer No.", "Currency Code", "EU 3-Party Trade", "Dimension Set ID", "Journal Templ. Name");
+#ELSE
         SalesHeader.SetCurrentKey("Document Type", "Combine Shipments", "Bill-to Customer No.", "Currency Code", "EU 3-Party Trade", "Dimension Set ID", "Journal Templ. Name");
+#ENDIF
         SalesHeader.SetFilter(SalesHeader."Document Type", '=%1', SalesHeader."Document Type"::Order);
         SalesHeader.FindSet();
         SalesHeader.SetFilter("Customer Price Group", '=%1', SalesHeader."Customer Price Group");
@@ -133,7 +137,11 @@ codeunit 85139 "NPR API Module Tests"
         InitializeData();
 
         // [WHEN] When the page key is requested
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23 OR BC24 OR BC25 OR BC26)
+        SalesHeader.SetCurrentKey("Document Type", "Combine Shipments", "Sell-to Customer No.", "Bill-to Customer No.", "Currency Code", "EU 3-Party Trade", "Dimension Set ID", "Journal Templ. Name");
+#ELSE
         SalesHeader.SetCurrentKey("Document Type", "Combine Shipments", "Bill-to Customer No.", "Currency Code", "EU 3-Party Trade", "Dimension Set ID", "Journal Templ. Name");
+#ENDIF
         SalesHeader.SetFilter(SalesHeader."Document Type", '=%1', SalesHeader."Document Type"::Order);
         SalesHeader.Ascending(false);
         SalesHeader.FindSet();

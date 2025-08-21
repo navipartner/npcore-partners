@@ -943,10 +943,10 @@ codeunit 6151131 "NPR TM Seating UI"
           CRLF());
     end;
 
-    local procedure CRLF() CRLF: Text[2]
+    local procedure CRLF() CRLFOut: Text[2]
     begin
-        CRLF[1] := 13;
-        CRLF[2] := 10;
+        CRLFOut[1] := 13;
+        CRLFOut[2] := 10;
     end;
 
 }

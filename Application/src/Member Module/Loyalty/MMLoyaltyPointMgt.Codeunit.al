@@ -168,7 +168,7 @@
         EntryCreated := CreatePointEntryFromValueEntry(ValueEntry, LoyaltyPostingSourceEnum::MEMBERSHIP_ENTRY, PosUnitNo, SalesChannel);
     end;
 
-    internal procedure CalculatePointsForTransactions(MembershipEntryNo: Integer; ReferenceDate: Date; ItemNo: Code[20]; VariantCode: Code[10]; Quantity: Decimal; AmountBase: Decimal; AmountIsDiscounted: Boolean; SalesChannel: Code[20]; var AwardedAmount: Decimal; var AwardedPoints: Integer; var PointsEarned: Integer; RuleReference: Integer) RuleType: Integer
+    internal procedure CalculatePointsForTransactions(MembershipEntryNo: Integer; ReferenceDate: Date; ItemNo: Code[20]; VariantCode: Code[10]; Quantity: Decimal; AmountBase: Decimal; AmountIsDiscounted: Boolean; SalesChannel: Code[20]; var AwardedAmount: Decimal; var AwardedPoints: Integer; var PointsEarned: Integer; RuleReference: Integer) RuleTypeOut: Integer
     var
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
@@ -179,10 +179,10 @@
         MembershipSetup.Get(Membership."Membership Code");
         LoyaltySetup.Get(MembershipSetup."Loyalty Code");
 
-        RuleType := CalculateAwardedPoints(LoyaltySetup, ReferenceDate, ItemNo, VariantCode, AmountBase, AmountIsDiscounted, SalesChannel, AwardedAmount, AwardedPoints, RuleReference);
+        RuleTypeOut := CalculateAwardedPoints(LoyaltySetup, ReferenceDate, ItemNo, VariantCode, AmountBase, AmountIsDiscounted, SalesChannel, AwardedAmount, AwardedPoints, RuleReference);
         PointsEarned := Round(AwardedAmount, 1) + Round(AwardedPoints * Quantity, 1);
 
-        exit(RuleType);
+        exit(RuleTypeOut);
 
     end;
 

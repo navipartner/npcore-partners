@@ -407,7 +407,7 @@ page 6059893 "NPR MM MembershipLoyaltyJnl"
         AmountBase := ParamAmountInclVat / ((100 + VatPostingSetup."VAT %") / 100.0);
     end;
 
-    local procedure IncludeVat(AmountBase: Decimal; ParamItemNo: Code[20]) AmountInclVat: Decimal
+    local procedure IncludeVat(AmountBase: Decimal; ParamItemNo: Code[20]) AmountIncludingVat: Decimal
     var
         Item: Record "Item";
         VatPostingSetup: Record "VAT Posting Setup";
@@ -418,7 +418,7 @@ page 6059893 "NPR MM MembershipLoyaltyJnl"
         VatPostingSetup.SetFilter("VAT Prod. Posting Group", '=%1', Item."VAT Prod. Posting Group");
         VatPostingSetup.FindFirst();
 
-        AmountInclVat := AmountBase * ((100 + VatPostingSetup."VAT %") / 100.0);
+        AmountIncludingVat := AmountBase * ((100 + VatPostingSetup."VAT %") / 100.0);
     end;
 
     local procedure MembershipLookup(var ParamExternalMembershipNo: Text): Boolean

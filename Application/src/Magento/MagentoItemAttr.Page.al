@@ -23,7 +23,7 @@
                     ToolTip = 'Specifies the value of the Attribute field';
                     ApplicationArea = NPRMagento;
                 }
-                field(Value; GetValue())
+                field(AttrValue; GetValue())
                 {
 
                     Caption = 'Value';
