@@ -15,6 +15,14 @@ types:
       - name: ExampleWalletReferenceNumber
         value: "141234529930210327"
 
+  WalletExternalReferenceNumber:
+    type: string
+    docs: The visual reference number associated with the wallet.
+    examples: 
+      - name: ExampleWalletExternalReferenceNumber
+        value: "151234529930210327"
+  
+
   Description:
     type: string
     docs: A human-readable description of the wallet.

@@ -741,6 +741,24 @@ codeunit 6185062 "NPR AttractionWallet"
         exit(WalletAssetHeader.TransactionId);
     end;
 
+    internal procedure getWalletExternalReferenceNumber(WalletEntryNo: Integer; var _ExternalReferenceNo: Text[100]): Boolean
+    var
+        WalletExternalReference: Record "NPR AttractionWalletExtRef";
+    begin
+        WalletExternalReference.SetLoadFields(ExternalReference);
+        WalletExternalReference.SetCurrentKey(WalletEntryNo);
+        WalletExternalReference.SetFilter(WalletEntryNo, '=%1', WalletEntryNo);
+        WalletExternalReference.SetFilter(BlockedAt, '=%1', 0DT);
+        WalletExternalReference.SetFilter(ExpiresAt, '>%1|=%2', CurrentDateTime(), 0DT);
+        if (not WalletExternalReference.FindFirst()) then begin
+            _ExternalReferenceNo := '';
+            exit(false);
+        end;
+
+        _ExternalReferenceNo := WalletExternalReference.ExternalReference;
+        exit(_ExternalReferenceNo <> '');
+    end;
+
     local procedure AddAssetToWallet(AssetEntryNo: Integer; WalletEntryNo: Integer): Integer
     var
         AttractionWallet: Record "NPR AttractionWallet";

@@ -184,7 +184,12 @@ codeunit 6248331 "NPR WalletApiAgent"
 
     #region Helper methods
     local procedure WalletContentDTO(ResponseJson: Codeunit "NPR Json Builder"; Wallet: Record "NPR AttractionWallet"): Codeunit "NPR Json Builder"
+    var
+        AttractionWallet: Codeunit "NPR AttractionWallet";
+        ExternalReference: Text[100];
     begin
+
+
         ResponseJson
             .AddProperty('walletId', Format(Wallet.SystemId, 0, 4).ToLower())
             .AddProperty('referenceNumber', Wallet.ReferenceNumber)
@@ -193,6 +198,12 @@ codeunit 6248331 "NPR WalletApiAgent"
             .AddProperty('expiryDatetime', Wallet.ExpirationDate)
             .AddProperty('lastPrintedAt', Wallet.LastPrintAt)
             .AddProperty('printCount', Wallet.PrintCount);
+
+        if (AttractionWallet.getWalletExternalReferenceNumber(Wallet.EntryNo, ExternalReference)) then
+            ResponseJson.AddProperty('externalReferenceNumber', ExternalReference)
+        else
+            ResponseJson.AddProperty('externalReferenceNumber');
+
         exit(ResponseJson);
     end;
 
