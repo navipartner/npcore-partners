@@ -48,8 +48,9 @@ page 6184865 "NPR Spfy Entity Metafields"
                     ToolTip = 'Specifies the user-defined unique identifier of the Shopify metafield within its namespace.';
                     ApplicationArea = NPRShopify;
                 }
-                field("Metafield Value"; Rec."Metafield Value")
+                field("Metafield Value"; Rec.GetMetafieldValue(true))
                 {
+                    Caption = 'Metafield Value';
                     ToolTip = 'Specifies the data stored in the metafield.';
                     ApplicationArea = NPRShopify;
                 }

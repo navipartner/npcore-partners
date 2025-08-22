@@ -27,6 +27,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         SetDefaultProductStatus();
         RemoveOrphanShopifyAssignedIDs();
         UpdateGetPaymentLinesFromShopifyOption();
+        MoveMetafieldValueToBlobField();
     end;
 
     internal procedure UpdateShopifySetup()
@@ -369,6 +370,31 @@ codeunit 6184802 "NPR Spfy App Upgrade"
                     ShopifyStore.Modify();
                 end;
             until ShopifyStore.Next() = 0;
+
+        SetUpgradeTag();
+        LogFinish();
+    end;
+
+    local procedure MoveMetafieldValueToBlobField()
+    var
+        SpfyEntityMetafield: Record "NPR Spfy Entity Metafield";
+        DataLogMgt: Codeunit "NPR Data Log Management";
+    begin
+        _UpgradeStep := 'MoveMetafieldValueToBlobField';
+        if HasUpgradeTag() then
+            exit;
+        LogStart();
+
+        if not SpfyEntityMetafield.IsEmpty() then begin
+            DataLogMgt.DisableDataLog(true);
+            if SpfyEntityMetafield.FindSet(true) then
+                repeat
+                    SpfyEntityMetafield.SetMetafieldValue(SpfyEntityMetafield."Metafield Value");
+                    SpfyEntityMetafield."Metafield Value" := '';
+                    SpfyEntityMetafield.Modify();
+                until SpfyEntityMetafield.Next() = 0;
+            DataLogMgt.DisableDataLog(false);
+        end;
 
         SetUpgradeTag();
         LogFinish();

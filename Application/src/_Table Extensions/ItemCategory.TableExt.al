@@ -221,6 +221,13 @@ tableextension 6014400 "NPR Item Category" extends "Item Category"
             FieldClass = FlowFilter;
             TableRelation = Item;
         }
+#if not BC17
+        field(6151550; "NPR Spfy Handle"; Text[20])
+        {
+            Caption = 'Shopify Handle';
+            DataClassification = CustomerContent;
+        }
+#endif
     }
 
     keys
@@ -239,6 +246,68 @@ tableextension 6014400 "NPR Item Category" extends "Item Category"
 #ENDIF
     }
 
+#if not BC17
+    trigger OnDelete()
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+        SpfyStoreItemCatLink: Record "NPR Spfy Store-Item Cat. Link";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+    begin
+        ShopifyStore.SetLoadFields(Code);
+        if ShopifyStore.FindSet() then
+            repeat
+                SpfyStoreItemCatLink."Item Category Code" := Rec.Code;
+                SpfyStoreItemCatLink."Shopify Store Code" := ShopifyStore.Code;
+                SpfyAssignedIDMgt.RemoveAssignedShopifyID(SpfyStoreItemCatLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+            until ShopifyStore.Next() = 0;
+    end;
+
+    trigger OnRename()
+    var
+        CannotRenameErr: Label 'Item category cannot be renamed if it has already been synchronized with Shopify.';
+    begin
+        if NPRSpfyMetafieldMappingExists() then
+            Error(CannotRenameErr);
+    end;
+
+    internal procedure NPRSpfyMetafieldMappingExists(): Boolean
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+    begin
+        ShopifyStore.SetLoadFields(Code);
+        if ShopifyStore.Find('-') then
+            repeat
+                if NPRGetSpfyGID(ShopifyStore.Code) <> '' then
+                    exit(true);
+            until ShopifyStore.Next() = 0;
+    end;
+
+    internal procedure NPRGetSpfyGID(ShopifyStoreCode: Code[20]): Text
+    begin
+        exit(NPRGetItemCategorySpfyGID(Rec.Code, ShopifyStoreCode));
+    end;
+
+    internal procedure NPRGetSpfyParentGID(ShopifyStoreCode: Code[20]): Text
+    begin
+        exit(NPRGetItemCategorySpfyGID(Rec."Parent Category", ShopifyStoreCode));
+    end;
+
+    local procedure NPRGetItemCategorySpfyGID(ItemCategoryCode: Code[20]; ShopifyStoreCode: Code[20]): Text
+    var
+        SpfyStoreItemCatLink: Record "NPR Spfy Store-Item Cat. Link";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        ShopifyID: Text[30];
+    begin
+        if (ItemCategoryCode = '') or (ShopifyStoreCode = '') then
+            exit('');
+        SpfyStoreItemCatLink."Item Category Code" := ItemCategoryCode;
+        SpfyStoreItemCatLink."Shopify Store Code" := ShopifyStoreCode;
+        ShopifyID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemCatLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+        if ShopifyID = '' then
+            exit('');
+        exit(StrSubstNo('gid://shopify/Metaobject/%1', ShopifyID));
+    end;
+#endif
     internal procedure NPRValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
     var
         DimMgt: Codeunit DimensionManagement;

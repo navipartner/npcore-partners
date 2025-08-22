@@ -4,43 +4,50 @@ pageextension 6014400 "NPR Item Category Card" extends "Item Category Card"
     {
         addlast(General)
         {
-
             field("NPR Item Template Code"; Rec."NPR Item Template Code")
             {
-
                 ToolTip = 'Specifies the value of the NPR Item Template Code field';
                 ApplicationArea = NPRRetail;
             }
             field("NPR Global Dimension 1 Code"; Rec."NPR Global Dimension 1 Code")
             {
-
                 ToolTip = 'Specifies the value of the NPR Global Dimension 1 Code field';
                 ApplicationArea = NPRRetail;
             }
             field("NPR Global Dimension 2 Code"; Rec."NPR Global Dimension 2 Code")
             {
-
                 ToolTip = 'Specifies the value of the NPR Global Dimension 2 Code field';
                 ApplicationArea = NPRRetail;
             }
             field("NPR Blocked"; Rec."NPR Blocked")
             {
-
                 ToolTip = 'Specifies the value of the NPR Blocked field';
                 ApplicationArea = NPRRetail;
             }
             field("NPR Main Category"; Rec."NPR Main Category")
             {
-
                 ToolTip = 'Specifies the value of the NPR Main Category field';
                 ApplicationArea = NPRRetail;
             }
             field("NPR Main Category Code"; Rec."NPR Main Category Code")
             {
-
                 ToolTip = 'Specifies the value of the NPR Main Category Code field';
                 ApplicationArea = NPRRetail;
             }
+#if not BC17
+            group("NPR Shopify")
+            {
+                ShowCaption = false;
+                Visible = ShopifyItemCatIntegrationIsEnabled;
+                field("NPR Synced with Shopify"; Rec.NPRSpfyMetafieldMappingExists())
+                {
+                    Caption = 'Synced with Shopify';
+                    ToolTip = 'Specifies whether the item category has been synchronised with a Shopify store';
+                    ApplicationArea = NPRShopify;
+                    Editable = false;
+                }
+            }
+#endif
         }
     }
 
@@ -59,18 +66,15 @@ pageextension 6014400 "NPR Item Category Card" extends "Item Category Card"
                     RunObject = Page "Default Dimensions";
                     RunPageLink = "Table ID" = Const(5722), "No." = Field(Code);
                     ShortCutKey = 'Shift+Ctrl+D';
-
                     ToolTip = 'Executes the Dimensions action';
                     ApplicationArea = NPRRetail;
                 }
             }
-
             group("NPR Function")
             {
                 Caption = '&Functions';
                 action("NPR Create Item Template")
                 {
-
                     Caption = 'Create Item Template';
                     Image = Template;
                     ToolTip = 'Executes the Create Item Template action';
@@ -95,7 +99,6 @@ pageextension 6014400 "NPR Item Category Card" extends "Item Category Card"
                 {
                     Caption = 'Create Item(s) From Item Category';
                     Image = ItemGroup;
-
                     ToolTip = 'Executes the Create Item(s) From Item Category action';
                     ApplicationArea = NPRRetail;
 
@@ -114,7 +117,6 @@ pageextension 6014400 "NPR Item Category Card" extends "Item Category Card"
                 {
                     Caption = 'Copy Item Category Setup to SubCategories';
                     Image = ProdBOMMatrixPerVersion;
-
                     ToolTip = 'Executes the Copy Item Category Setup to SubCategories';
                     ApplicationArea = NPRRetail;
 
@@ -140,7 +142,6 @@ pageextension 6014400 "NPR Item Category Card" extends "Item Category Card"
                     RunObject = Page "Item Ledger Entries";
                     RunPageLink = "Item Category Code" = FIELD(Code);
                     ShortCutKey = 'Shift+Ctrl+N';
-
                     ToolTip = 'Executes the Item Ledger Entries action';
                     ApplicationArea = NPRRetail;
                 }
@@ -148,7 +149,6 @@ pageextension 6014400 "NPR Item Category Card" extends "Item Category Card"
                 {
                     Caption = '&VAT Posting Grups';
                     Image = Form;
-
                     ToolTip = 'Executes the &VAT Posting Grups action';
                     ApplicationArea = NPRRetail;
 
@@ -170,11 +170,43 @@ pageextension 6014400 "NPR Item Category Card" extends "Item Category Card"
                     Image = ItemWorksheet;
                     RunObject = Page "Item List";
                     RunPageLink = "Item Category Code" = FIELD(Code);
-
                     ToolTip = 'Executes the &Item List action';
                     ApplicationArea = NPRRetail;
                 }
             }
+#if not BC17
+            group("NPR Shopify Actions")
+            {
+                Caption = 'Shopify';
+                Visible = ShopifyItemCatIntegrationIsEnabled;
+                action("NPR SpfyStoreLinks")
+                {
+                    Caption = 'Metaobject IDs';
+                    ToolTip = 'Specifies the list of Shopify stores and metaobject IDs assigned by Shopify for the item category';
+                    ApplicationArea = NPRShopify;
+                    Image = LinkAccount;
+                    trigger OnAction()
+                    var
+                        SpfyStoreItemCatLinks: Page "NPR Spfy Store-Item Cat. Links";
+                    begin
+                        SpfyStoreItemCatLinks.SetItemCategory(Rec.Code);
+                        SpfyStoreItemCatLinks.Run();
+                    end;
+                }
+            }
+#endif
         }
     }
+
+#if not BC17
+    trigger OnOpenPage()
+    var
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+    begin
+        ShopifyItemCatIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Item Categories");
+    end;
+
+    var
+        ShopifyItemCatIntegrationIsEnabled: Boolean;
+#endif
 }

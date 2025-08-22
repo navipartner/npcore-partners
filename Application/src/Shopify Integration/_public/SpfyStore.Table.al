@@ -126,6 +126,11 @@ table 6150810 "NPR Spfy Store"
             ValuesAllowed = DRAFT, ACTIVE;
             InitValue = DRAFT;
         }
+        field(64; "Item Category as Metafield"; Boolean)
+        {
+            Caption = 'Item Category as Metafield';
+            DataClassification = CustomerContent;
+        }
         field(70; "Send Inventory Updates"; Boolean)
         {
             Caption = 'Send Inventory Updates';
@@ -444,6 +449,38 @@ table 6150810 "NPR Spfy Store"
         SpfyAllowedFinStatus."Order Financial Status" := OrderFinancialStatus;
         if not SpfyAllowedFinStatus.Find() then
             SpfyAllowedFinStatus.Insert();
+    end;
+
+    internal procedure SetItemCategoryMetafieldID(var MetafieldID: Text[30])
+    var
+        SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
+    begin
+        TestField(Code);
+        TestField("Item Category as Metafield");
+        if MetafieldID = '' then
+            MetafieldID := ItemCategoryMetafieldID();
+        SpfyMetafieldMgt.GetItemCategoryMetafieldDefinitionID(Code, true, MetafieldID);
+        if MetafieldID <> '' then
+            SaveItemCategoryMetafieldID(MetafieldID);
+    end;
+
+    internal procedure ItemCategoryMetafieldID(): Text[30]
+    var
+        SpfyMetafieldMapping: Record "NPR Spfy Metafield Mapping";
+        SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
+    begin
+        SpfyMetafieldMgt.FilterMetafieldMapping(RecordId(), FieldNo("Item Category as Metafield"), Code, Enum::"NPR Spfy Metafield Owner Type"::PRODUCT, SpfyMetafieldMapping);
+        if SpfyMetafieldMapping.IsEmpty() then
+            exit('');
+        SpfyMetafieldMapping.FindFirst();
+        exit(SpfyMetafieldMapping."Metafield ID");
+    end;
+
+    internal procedure SaveItemCategoryMetafieldID(MetafieldID: Text[30])
+    var
+        SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
+    begin
+        SpfyMetafieldMgt.SaveMetafieldMapping(RecordId(), FieldNo("Item Category as Metafield"), Code, Enum::"NPR Spfy Metafield Owner Type"::PRODUCT, MetafieldID);
     end;
 }
 #endif

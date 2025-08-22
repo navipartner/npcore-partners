@@ -45,6 +45,14 @@ table 6150951 "NPR Spfy Entity Metafield"
         {
             Caption = 'Metafield Value';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-08-03';
+            ObsoleteReason = 'Replaced with a blob field "Metafield Raw Value" to support complex metafield values.';
+        }
+        field(81; "Metafield Raw Value"; Blob)
+        {
+            Caption = 'Metafield Value';
+            DataClassification = CustomerContent;
         }
         field(90; "Metafield Value Version ID"; Text[80])
         {
@@ -61,5 +69,29 @@ table 6150951 "NPR Spfy Entity Metafield"
         key(Key2; "Table No.", "BC Record ID", "Owner Type", "Metafield ID") { }
         key(Key3; "Owner Type", "Metafield ID", "Table No.") { }
     }
+
+    internal procedure SetMetafieldValue(NewMetafieldValue: Text)
+    var
+        OutStr: OutStream;
+    begin
+        Clear("Metafield Raw Value");
+        if NewMetafieldValue = '' then
+            exit;
+        "Metafield Raw Value".CreateOutStream(OutStr, TextEncoding::UTF8);
+        OutStr.WriteText(NewMetafieldValue);
+    end;
+
+    procedure GetMetafieldValue(RunCalcFields: Boolean): Text
+    var
+        TypeHelper: Codeunit "Type Helper";
+        InStream: InStream;
+    begin
+        if not "Metafield Raw Value".HasValue() then
+            exit('');
+        if RunCalcFields then
+            CalcFields("Metafield Raw Value");
+        "Metafield Raw Value".CreateInStream(InStream, TextEncoding::UTF8);
+        exit(TypeHelper.ReadAsTextWithSeparator(InStream, TypeHelper.LFSeparator()));
+    end;
 }
 #endif

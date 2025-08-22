@@ -66,23 +66,70 @@ page 6184704 "NPR Spfy Store Card"
                     ApplicationArea = NPRShopify;
                     Enabled = _ItemListIntegrationIsEnabled;
                 }
-                field("Do Not Sync. Sales Prices"; Rec."Do Not Sync. Sales Prices")
+                field("Item Category as Metafield"; Rec."Item Category as Metafield")
                 {
-                    ToolTip = 'Specifies whether you want to disable sending the item sales prices to Shopify.';
+                    ToolTip = 'Specifies whether the item category should be sent to Shopify as a product metafield. If enabled, the system will create a metaobject definition in Shopify to store the BC item category metafield entries. Please note that enabling this option will deactivate sending the item categories as Shopify product tags.';
                     ApplicationArea = NPRShopify;
                     Enabled = _ItemListIntegrationIsEnabled;
+
+                    trigger OnValidate()
+                    var
+                        ConfirmManagement: Codeunit "Confirm Management";
+                        ConfirmMetafieldCreationQst: Label 'This option requires a Shopify product metafield linked to a metaobject. Would you like the system to create the new entities now? If a metafield and metaobject definitions of the same type already exist, the system will use those instead.';
+                    begin
+                        if Rec."Item Category as Metafield" then
+                            if ConfirmManagement.GetResponseOrDefault(ConfirmMetafieldCreationQst, true) then begin
+                                Rec.SetItemCategoryMetafieldID(_ItemCategoryMetafieldID);
+                                CurrPage.Update(true);
+                            end;
+                    end;
                 }
-                field("Customer No. (Price)"; Rec."Customer No. (Price)")
+                group(ItemCategoryMetafield)
                 {
-                    ToolTip = 'Specifies the customer that will be used to calculate the prices of Shopify synchronisable items.';
-                    ApplicationArea = NPRShopify;
-                    Enabled = _ItemListIntegrationIsEnabled;
+                    ShowCaption = false;
+                    Visible = Rec."Item Category as Metafield";
+                    field("Item Category Metafield ID"; _ItemCategoryMetafieldID)
+                    {
+                        Caption = 'Item Category Metafield ID';
+                        ToolTip = 'Specifies the ID of the metafield that will be used to store the BC item category in Shopify.';
+                        ApplicationArea = NPRShopify;
+                        Editable = false;
+                        Enabled = _ItemListIntegrationIsEnabled;
+
+                        trigger OnAssistEdit()
+                        var
+                            SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
+                        begin
+                            Rec.TestField("Code");
+                            if SpfyMetafieldMgt.SelectShopifyMetafield(Rec."Code", Enum::"NPR Spfy Metafield Owner Type"::PRODUCT, SpfyMetafieldMgt.MetaobjectReferenceShopifyMetafieldType(), _ItemCategoryMetafieldID) then begin
+                                CurrPage.SaveRecord();
+                                Rec.SaveItemCategoryMetafieldID(_ItemCategoryMetafieldID);
+                                CurrPage.Update(false);
+                            end;
+                        end;
+                    }
                 }
-                field("No. of Prices per Request"; Rec."No. of Prices per Request")
+                group(SalesPrices)
                 {
-                    ToolTip = 'Specifies the number of item prices that can be sent to Shopify in a single batch price update request. The default value is 100, which will be used by the system if you set the field value to zero.';
-                    ApplicationArea = NPRShopify;
-                    Enabled = _ItemListIntegrationIsEnabled;
+                    Caption = 'Sales Prices';
+                    field("Do Not Sync. Sales Prices"; Rec."Do Not Sync. Sales Prices")
+                    {
+                        ToolTip = 'Specifies whether you want to disable sending the item sales prices to Shopify.';
+                        ApplicationArea = NPRShopify;
+                        Enabled = _ItemListIntegrationIsEnabled;
+                    }
+                    field("Customer No. (Price)"; Rec."Customer No. (Price)")
+                    {
+                        ToolTip = 'Specifies the customer that will be used to calculate the prices of Shopify synchronisable items.';
+                        ApplicationArea = NPRShopify;
+                        Enabled = _ItemListIntegrationIsEnabled;
+                    }
+                    field("No. of Prices per Request"; Rec."No. of Prices per Request")
+                    {
+                        ToolTip = 'Specifies the number of item prices that can be sent to Shopify in a single batch price update request. The default value is 100, which will be used by the system if you set the field value to zero.';
+                        ApplicationArea = NPRShopify;
+                        Enabled = _ItemListIntegrationIsEnabled;
+                    }
                 }
                 group(ItemWebhooks)
                 {
@@ -400,6 +447,26 @@ page 6184704 "NPR Spfy Store Card"
                         Report.Run(Report::"NPR Spfy Initial Voucher Sync", true, false, ShopifyStore);
                     end;
                 }
+                action(SyncItemCategories)
+                {
+                    Caption = 'Sync. Item Categories';
+                    ToolTip = 'Executes the initial migration of item categories from Business Central to Shopify. The system will iterate through the item categories in Business Central and create any that do not already exist in your selected Shopify store.';
+                    ApplicationArea = NPRShopify;
+                    Image = LinkAccount;
+                    Promoted = true;
+                    PromotedIsBig = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category4;
+
+                    trigger OnAction()
+                    var
+                        ShopifyStore: Record "NPR Spfy Store";
+                    begin
+                        CurrPage.SaveRecord();
+                        ShopifyStore.SetRange(Code, Rec.Code);
+                        Report.Run(Report::"NPR Spfy Item Category Sync", true, false, ShopifyStore);
+                    end;
+                }
             }
         }
         area(Navigation)
@@ -456,6 +523,8 @@ page 6184704 "NPR Spfy Store Card"
     begin
         UpdateControlVisibility();
         CheckCurrencyCode();
+
+        _ItemCategoryMetafieldID := Rec.ItemCategoryMetafieldID();
 
         if _SpfyIntegrationMgt.IsEnabled(Enum::"NPR Spfy Integration Area"::" ", Rec.Code) then begin
             Parameters.Add('StoreCode', Rec.Code);
@@ -569,6 +638,7 @@ page 6184704 "NPR Spfy Store Card"
         TempxShopifyStore: Record "NPR Spfy Store" temporary;
         _SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         _SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        _ItemCategoryMetafieldID: Text[30];
         _BackgroundTaskId: Integer;
         _AutoSetAsShopifyItem: Boolean;
         _AutoSyncItemChanges: Boolean;

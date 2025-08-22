@@ -885,14 +885,14 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                 begin
                     ProductJObject.Add('productType', 'new');
                     ProductJObject.Add('status', ProductStatusEnumValueName(_SpfyIntegrationMgt.DefaultNewProductStatus(SpfyStoreItemLink."Shopify Store Code")));
-                    SpfyMetafieldMgt.GenerateMetafieldUpdateArrays(SpfyStoreItemLink.RecordId(), "NPR Spfy Metafield Owner Type"::PRODUCT, ShopifyProductID, SpfyStoreItemLink."Shopify Store Code", UpdateMetafields, RemoveMetafields);
-                    if UpdateMetafields.Count() > 0 then
-                        ProductJObject.Add('metafields', UpdateMetafields);
                 end;
             NcTask.Type::Modify:
                 if not SpfyItemMgt.TestRequiredFields(Item, false) or not SpfyStoreItemLink."Sync. to this Store" then
                     ProductJObject.Add('status', 'ARCHIVED');
         end;
+        SpfyMetafieldMgt.GenerateMetafieldUpdateArrays(SpfyStoreItemLink.RecordId(), "NPR Spfy Metafield Owner Type"::PRODUCT, '', SpfyStoreItemLink."Shopify Store Code", UpdateMetafields, RemoveMetafields);
+        if UpdateMetafields.Count() > 0 then
+            ProductJObject.Add('metafields', UpdateMetafields);
     end;
 
     local procedure GenerateItemVariantCollection(NcTask: Record "NPR Nc Task"; Item: Record Item; NewProduct: Boolean; var ProductVariantsJArray: JsonArray; var VarietyValueDic: Dictionary of [Integer, List of [Text]]): Boolean
@@ -1678,7 +1678,8 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         if not DisableDataLog then begin
             SpfyItemMgt.ScheduleMissingVariantSync(SpfyStoreItemLink, ItemIntegrIsEnabled, _InventoryIntegrIsEnabled, _ItemPriceIntegrIsEnabled);
             if ItemIntegrIsEnabled then
-                SpfyItemMgt.ScheduleTagsSync(SpfyStoreItemLink, Item."Item Category Code", '');
+                if not _SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Item Categories", SpfyStoreItemLink."Shopify Store Code") then
+                    SpfyItemMgt.ScheduleTagsSync(SpfyStoreItemLink, Item."Item Category Code", '');
         end;
     end;
 

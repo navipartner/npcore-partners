@@ -82,7 +82,7 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         ProcessRec: Boolean;
         xRecRestored: Boolean;
         Updated_Cost: Boolean;
-        Updated_Tags: Boolean;
+        Updated_ItemCat: Boolean;
     begin
         if ((DataLogEntry."Table ID" = Database::Item) and
             (DataLogEntry."Type of Change" in [DataLogEntry."Type of Change"::Insert, DataLogEntry."Type of Change"::Delete])) or
@@ -127,15 +127,16 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         if ItemIntegrIsEnabled then begin
             if (DataLogEntry."Table ID" = Database::Item) and (DataLogEntry."Type of Change" = DataLogEntry."Type of Change"::Modify) then begin
                 Updated_Cost := Item."Last Direct Cost" <> xItem."Last Direct Cost";
-                Updated_Tags := Item."Item Category Code" <> xItem."Item Category Code";
+                Updated_ItemCat := Item."Item Category Code" <> xItem."Item Category Code";
             end;
-            if (DataLogEntry."Table ID" = Database::"Item Reference") or Updated_Cost or Updated_Tags then
+            if (DataLogEntry."Table ID" = Database::"Item Reference") or Updated_Cost or Updated_ItemCat then
                 repeat
                     if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items, SpfyStoreItemLink."Shopify Store Code") then begin
                         if DataLogEntry."Table ID" = Database::"Item Reference" then
                             TaskCreated := ScheduleItemSync(DataLogEntry, Item, SpfyStoreItemLink) or TaskCreated;
-                        if Updated_Tags then
-                            TaskCreated := ScheduleTagsSync(SpfyStoreItemLink, Item."Item Category Code", xItem."Item Category Code") or TaskCreated;
+                        if Updated_ItemCat then
+                            if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Item Categories", SpfyStoreItemLink."Shopify Store Code") then
+                                TaskCreated := ScheduleTagsSync(SpfyStoreItemLink, Item."Item Category Code", xItem."Item Category Code") or TaskCreated;
                         if Updated_Cost then
                             TaskCreated := ScheduleCostSync(SpfyStoreItemLink."Shopify Store Code", Item) or TaskCreated;
                     end;
@@ -417,10 +418,11 @@ codeunit 6184812 "NPR Spfy Item Mgt."
 
         if ItemIntegrIsEnabled then begin
             DataLogEntry."Type of Change" := DataLogEntry."Type of Change"::Modify;
-            TaskCreated := ScheduleItemSync(DataLogEntry, Item, SpfyStoreItemLink);
+            TaskCreated := ScheduleItemSync(DataLogEntry, Item, SpfyStoreItemLink) or TaskCreated;
             if NewItem then begin
                 TaskCreated := ScheduleCostSync(SpfyStoreItemLink."Shopify Store Code", Item) or TaskCreated;
-                TaskCreated := ScheduleTagsSync(SpfyStoreItemLink, Item."Item Category Code", '') or TaskCreated;
+                if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Item Categories", SpfyStoreItemLink."Shopify Store Code") then
+                    TaskCreated := ScheduleTagsSync(SpfyStoreItemLink, Item."Item Category Code", '') or TaskCreated;
             end;
         end;
 

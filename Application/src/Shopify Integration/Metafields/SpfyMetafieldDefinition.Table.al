@@ -45,6 +45,11 @@ table 6150938 "NPR Spfy Metafield Definition"
             Caption = 'Type';
             DataClassification = CustomerContent;
         }
+        field(9; "Validation Definition GID"; Text[80])
+        {
+            Caption = 'Validation Definition GID';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

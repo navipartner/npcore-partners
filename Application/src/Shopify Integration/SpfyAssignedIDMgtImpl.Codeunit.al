@@ -420,6 +420,29 @@ codeunit 6184803 "NPR Spfy Assigned ID Mgt Impl."
     begin
         TempStoreAssignedShopifyIDs(TempSalesLine.RecordId(), SalesLine.RecordId(), false);
     end;
+
+#if BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Table, Database::"Item Category", 'OnBeforeModifyEvent', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::"Item Category", OnBeforeModifyEvent, '', false, false)]
+#endif
+    local procedure ItemCategory_BlockChangingOfSyncedValues(var Rec: Record "Item Category"; var xRec: Record "Item Category"; RunTrigger: Boolean)
+    var
+        ItemCategory: Record "Item Category";
+        CannotChangeErr: Label 'cannot be changed if the item category has already been synchronized with Shopify.';
+    begin
+        if Rec.IsTemporary() then
+            exit;
+#if not (BC18 or BC19 or BC20 or BC21)
+        ItemCategory.ReadIsolation := IsolationLevel::ReadUncommitted;
+#endif
+        ItemCategory.Code := Rec.Code;
+        if not ItemCategory.Find() then
+            exit;
+        if ItemCategory.Description <> Rec.Description then
+            if ItemCategory.NPRSpfyMetafieldMappingExists() then
+                Rec.FieldError(Description, CannotChangeErr);
+    end;
     //#endregion
 }
 #endif

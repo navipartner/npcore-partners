@@ -67,6 +67,8 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
                 exit(ShopifyStore."Send Inventory Updates");
             IntegrationArea::"Item Prices":
                 exit(not ShopifyStore."Do Not Sync. Sales Prices");
+            IntegrationArea::"Item Categories":
+                exit(ShopifyStore."Item Category as Metafield");
             IntegrationArea::"Sales Orders":
                 exit(ShopifyStore."Sales Order Integration");
             IntegrationArea::"Order Fulfillments":
