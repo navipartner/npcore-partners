@@ -1,13 +1,18 @@
-page 6184846 "NPR AttractionWallet"
+page 6185089 "NPR AttractionWallets"
 {
     Extensible = False;
     PageType = List;
+    Editable = true;
     ApplicationArea = NPRRetail;
     UsageCategory = Lists;
     SourceTable = "NPR AttractionWallet";
-    Caption = 'Attraction Wallet (will be obsoleted)';
-    InsertAllowed = false;
+    SourceTableView = order(descending);
+    CardPageId = "NPR AttractionWalletCard";
+    Caption = 'Issued Attraction Wallets';
+    AdditionalSearchTerms = 'Issued Wallets';
     DeleteAllowed = false;
+    InsertAllowed = false;
+    ShowFilter = false;
 
     layout
     {
@@ -21,84 +26,82 @@ page 6184846 "NPR AttractionWallet"
                 ToolTip = 'Search for Wallet Reference';
                 trigger OnValidate()
                 begin
-                    TempSelectedWallets.Reset();
-                    if (TempSelectedWallets.IsTemporary) then
-                        TempSelectedWallets.DeleteAll();
+                    Rec.Reset();
+                    Rec.ClearMarks();
+                    Rec.MarkedOnly(false);
+                    if (_WalletReference = '') then begin
+                        CurrPage.Update(false);
+                        exit;
+                    end;
 
                     FindWalletAssets(_WalletReference);
                     ShowSelectedWallets();
                 end;
             }
-            group(WalletResults)
-            {
-                Caption = 'Results';
 
-                repeater(GroupName)
+            repeater(GroupName)
+            {
+                Editable = false;
+                field(ReferenceNumber; Rec.ReferenceNumber)
                 {
-
-                    field(ReferenceNumber; Rec.ReferenceNumber)
-                    {
-                        Caption = 'Wallet Reference Number';
-                        ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the Reference Number field.';
-                        Editable = false;
-                    }
-                    field(Description; Rec.Description)
-                    {
-                        ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the Description field.';
-                        Editable = true;
-                    }
-                    field(LastPrintAt; Rec.LastPrintAt)
-                    {
-                        ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the Last Print Date field.';
-                    }
-                    field(PrintCount; Rec.PrintCount)
-                    {
-                        ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the Print Count field.';
-                    }
-                    field(ExpirationDate; Rec.ExpirationDate)
-                    {
-                        ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the Expiration Date field.';
-                        Editable = true;
-                    }
-                    field(OriginatesFromItemNo; Rec.OriginatesFromItemNo)
-                    {
-                        ApplicationArea = NPRRetail;
-                        ToolTip = 'Specifies the value of the Originates From Item No. field.';
-                        Editable = true;
-                    }
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Reference Number field.';
                 }
-            }
-
-            part(Assets; "NPR AttractionWalletAssets")
-            {
-                ApplicationArea = NPRRetail;
-                Caption = 'Assets';
-                UpdatePropagation = Both;
-            }
-
-            part(ExternalReferences; "NPR AttractionWalletExtRefs")
-            {
-                ApplicationArea = NPRRetail;
-                Caption = 'External References';
-                UpdatePropagation = Both;
+                field(Description; Rec.Description)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Description field.';
+                }
+                field(OriginatesFromItemNo; Rec.OriginatesFromItemNo)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Originates From Item No. field.';
+                }
+                field(PrintCount; Rec.PrintCount)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Print Count field.';
+                }
+                field(LastPrintAt; Rec.LastPrintAt)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Last Print Date field.';
+                }
+                field(ExpirationDate; Rec.ExpirationDate)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Expiration Date field.';
+                }
+                field(EntryNo; Rec.EntryNo)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Entry No. field.';
+                    Visible = false;
+                }
+                field(SystemId; Rec.SystemId)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the System ID field.';
+                    Visible = false;
+                }
+                field(SystemCreatedAt; Rec.SystemCreatedAt)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the SystemCreatedAt field.';
+                }
             }
         }
     }
-
     actions
     {
         area(Processing)
         {
+
             action(NewWallet)
             {
                 ApplicationArea = NPRRetail;
                 Caption = 'New Wallet';
-                ToolTip = 'Create a new Wallet';
+                ToolTip = 'Create a new empty Wallet';
                 Image = New;
                 Promoted = true;
                 PromotedCategory = Process;
@@ -110,46 +113,14 @@ page 6184846 "NPR AttractionWallet"
                     WalletManager: Codeunit "NPR AttractionWallet";
                     NewWallet: Record "NPR AttractionWallet";
                 begin
-                    if (not (NewWallet.Get(WalletManager.AddNewWalletAsLineAsset(Rec)))) then
+                    if (not (NewWallet.Get(WalletManager.CreateWalletFromFacade('', '', _WalletReference)))) then
                         exit;
 
-                    TempSelectedWallets.TransferFields(NewWallet, true);
-                    TempSelectedWallets.SystemId := NewWallet.SystemId;
-                    TempSelectedWallets.Insert();
+                    FindWalletAssets(_WalletReference);
                     ShowSelectedWallets();
                 end;
             }
 
-            action(AddWallet)
-            {
-                ApplicationArea = NPRRetail;
-                Caption = 'Add Wallet';
-                ToolTip = 'Add Existing Wallet';
-                Image = Add;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                PromotedOnly = true;
-                Scope = Page;
-                trigger OnAction()
-                var
-                    Wallet: Record "NPR AttractionWallet";
-                    WalletListPage: Page "NPR AttractionWalletList";
-                    PageAction: Action;
-                begin
-                    WalletListPage.LookupMode(true);
-                    WalletListPage.Editable(false);
-                    PageAction := WalletListPage.RunModal();
-                    if (PageAction = Action::LookupOK) then begin
-                        WalletListPage.GetRecord(Wallet);
-                        TempSelectedWallets.TransferFields(Wallet, true);
-                        TempSelectedWallets.SystemId := Wallet.SystemId;
-                        TempSelectedWallets.Insert();
-                        ShowSelectedWallets();
-                    end;
-
-                end;
-            }
             action(PrintWallet)
             {
                 ApplicationArea = NPRRetail;
@@ -167,48 +138,10 @@ page 6184846 "NPR AttractionWallet"
                     WalletMgr.PrintWallet(Rec.EntryNo, Enum::"NPR WalletPrintType"::WALLET);
                 end;
             }
-            action(CreateNewExternalRef)
-            {
-                ApplicationArea = NPRRetail;
-                Caption = 'Create New External Reference';
-                ToolTip = 'Running this action will create a new external reference';
-                Image = Line;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
-                Scope = Repeater;
-
-                trigger OnAction()
-                var
-                    WalletMgr: Codeunit "NPR AttractionWallet";
-                begin
-                    WalletMgr.CreateNewExternalReference(Rec.EntryNo);
-                    ShowSelectedWallets();
-                end;
-            }
         }
+
         area(Navigation)
         {
-
-            action(NavigateToAsset)
-            {
-                ApplicationArea = NPRRetail;
-                ToolTip = 'Navigate to Asset';
-                Caption = 'Navigate';
-                Image = Navigate;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
-                Scope = Repeater;
-                trigger OnAction()
-                var
-                    WalletPage: Page "NPR AttractionWallet";
-                begin
-                    WalletPage.SetSearch(Rec.ReferenceNumber);
-                    WalletPage.Editable(false);
-                    WalletPage.Run();
-                end;
-            }
             action(Header)
             {
                 Caption = 'Headers';
@@ -216,6 +149,7 @@ page 6184846 "NPR AttractionWallet"
                 ApplicationArea = NPRRetail;
                 RunObject = Page "NPR TMP-AssetHeader";
                 ToolTip = 'Show All Headers';
+                Visible = false;
             }
 
             action(HeaderRef)
@@ -225,6 +159,7 @@ page 6184846 "NPR AttractionWallet"
                 ApplicationArea = NPRRetail;
                 RunObject = Page "NPR TMP-AssetHeaderRef";
                 ToolTip = 'Show All Headers Reference';
+                Visible = false;
             }
 
             action(Line)
@@ -234,6 +169,7 @@ page 6184846 "NPR AttractionWallet"
                 ApplicationArea = NPRRetail;
                 RunObject = Page "NPR TMP-AssetLine";
                 ToolTip = 'Show All Lines';
+                Visible = false;
             }
             action(LineRef)
             {
@@ -242,6 +178,7 @@ page 6184846 "NPR AttractionWallet"
                 ApplicationArea = NPRRetail;
                 RunObject = Page "NPR TMP-AssetLineRef";
                 ToolTip = 'Show All Lines Reference';
+                Visible = false;
             }
             action(ShowWallet)
             {
@@ -250,26 +187,14 @@ page 6184846 "NPR AttractionWallet"
                 ApplicationArea = NPRRetail;
                 RunObject = Page "NPR TMP-Wallet";
                 ToolTip = 'Show Wallet Raw';
+                Visible = false;
             }
         }
+
     }
-    trigger OnOpenPage()
-    begin
-        Rec.MarkedOnly(true);
-        if (_WalletReference <> '') then begin
-            FindWalletAssets(_WalletReference);
-            ShowSelectedWallets();
-        end;
-    end;
-
     var
-        _WalletReference: Text[100];
+        _WalletReference: Text[50];
         TempSelectedWallets: Record "NPR AttractionWallet" temporary;
-
-    internal procedure SetSearch(WalletReference: Text[100]);
-    begin
-        _WalletReference := WalletReference;
-    end;
 
     local procedure ShowSelectedWallets()
     begin
@@ -285,13 +210,10 @@ page 6184846 "NPR AttractionWallet"
 
         Rec.Copy(TempSelectedWallets);
         Rec.MarkedOnly(true);
-
-        CurrPage.Assets.Page.ShowSelectedAssets(TempSelectedWallets);
-        CurrPage.ExternalReferences.Page.ShowSelectedWallets(TempSelectedWallets);
         CurrPage.Update(false);
     end;
 
-    local procedure FindWalletAssets(WalletReference: Text[100])
+    local procedure FindWalletAssets(WalletReference: Text[50])
     var
         Wallet: Record "NPR AttractionWallet";
         WalletAssetHeaderRef: Record "NPR WalletAssetHeaderReference";
@@ -299,6 +221,10 @@ page 6184846 "NPR AttractionWallet"
         AssetLine: Record "NPR WalletAssetLine";
         AssetHeader: Record "NPR WalletAssetHeader";
     begin
+        TempSelectedWallets.Reset();
+        if (TempSelectedWallets.IsTemporary) then
+            TempSelectedWallets.DeleteAll();
+
         if (WalletReference <> '') then begin
 
             // Assets Owned

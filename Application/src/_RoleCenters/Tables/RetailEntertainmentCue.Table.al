@@ -149,6 +149,20 @@
             FieldClass = FlowField;
             CalcFormula = count("NPR NpRv Voucher");
         }
+
+        field(100; IssuedAttractionWalletsCount; Integer)
+        {
+            Caption = 'Issued Attraction Wallets';
+            FieldClass = FlowField;
+            CalcFormula = Count("NPR AttractionWallet");
+        }
+        field(110; AttractionPackageTemplateCount; Integer)
+        {
+            Caption = 'Attraction Package Templates';
+            FieldClass = FlowField;
+            CalcFormula = Count("NPR NpIa Item AddOn" where(WalletTemplate = const(true)));
+        }
+
         field(1000; "Subs. Date Filter"; Date)
         {
             Caption = 'Subscriptions Date Filter';

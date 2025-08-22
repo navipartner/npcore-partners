@@ -4,10 +4,10 @@ page 6184847 "NPR AttractionWalletAssets"
     PageType = ListPart;
     UsageCategory = None;
     SourceTable = "NPR WalletAssetLine";
-    //SourceTableView = sorting(LinkToTableId, LinkToSystemId);
     SourceTableTemporary = true;
     InsertAllowed = false;
     DeleteAllowed = false;
+    Caption = 'Assets';
 
     layout
     {

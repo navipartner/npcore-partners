@@ -17,7 +17,7 @@
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the list of issued tickets.';
-                    Caption = 'Issued Tickets';
+                    Caption = 'Issued';
                     AutoFormatType = 11;
                     AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
@@ -30,7 +30,7 @@
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the list of ticket requests.';
-                    Caption = 'Ticket Requests';
+                    Caption = 'Requests';
                     AutoFormatType = 11;
                     AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
@@ -43,7 +43,7 @@
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the list of ticket types.';
-                    Caption = 'Ticket Types';
+                    Caption = 'Types';
                     AutoFormatType = 11;
                     AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
@@ -56,7 +56,7 @@
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the list of ticket items.';
-                    Caption = 'Ticket Items';
+                    Caption = 'Items';
                     AutoFormatType = 11;
                     AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
@@ -82,7 +82,7 @@
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the Ticket Schedules.';
-                    Caption = 'Ticket Schedules';
+                    Caption = 'Schedules';
                     AutoFormatType = 11;
                     AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
@@ -96,7 +96,7 @@
                     ApplicationArea = NPRRetail;
                     DrillDownPageID = "NPR TM Ticket Admissions";
                     ToolTip = 'Specifies the list of Ticket Admissions.';
-                    Caption = 'Ticket Admissions';
+                    Caption = 'Admissions';
                     AutoFormatType = 11;
                     AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
 
@@ -228,6 +228,37 @@
                     trigger OnDrillDown()
                     begin
                         Page.Run(Page::"NPR NpRv Vouchers");
+                    end;
+                }
+            }
+
+            cuegroup(AttractionWallets)
+            {
+                Caption = 'Attraction Wallets';
+                field(IssuedAttractionWallets; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo(IssuedAttractionWalletsCount))))
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the list of issued Attraction Wallets.';
+                    Caption = 'Issued';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
+
+                    trigger OnDrillDown()
+                    begin
+                        Page.Run(Page::"NPR AttractionWallets");
+                    end;
+                }
+                field(AttractionPackageTemplates; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo(AttractionPackageTemplateCount))))
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the list of Attraction Package Templates.';
+                    Caption = 'Templates';
+                    AutoFormatType = 11;
+                    AutoFormatExpression = '<Precision,0:0><Standard Format,0>';
+
+                    trigger OnDrillDown()
+                    begin
+                        Page.Run(Page::"NPR WalletTemplate");
                     end;
                 }
             }

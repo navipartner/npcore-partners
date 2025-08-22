@@ -450,6 +450,22 @@
                         ShowTicketSalesTransaction(Rec);
                     end;
                 }
+                Action(NavigateToWallet)
+                {
+                    ToolTip = 'Finds wallets where ticket is asset.';
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    Caption = 'Find Attraction Wallet';
+                    Image = Navigate;
+                    Promoted = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category4;
+                    Scope = Repeater;
+
+                    trigger OnAction()
+                    begin
+                        ShowWalletForAsset(Rec);
+                    end;
+                }
             }
             Action(TicketBom)
             {
@@ -805,6 +821,33 @@
         end;
     end;
 
+    local procedure ShowWalletForAsset(Ticket: Record "NPR TM Ticket")
+    var
+        WalletAssetLine: Record "NPR WalletAssetLine";
+        WalletAssetLineRef: Record "NPR WalletAssetLineReference";
+        Wallet: Record "NPR AttractionWallet";
+        NoAssetLine: Label 'No wallet asset line found for ticket %1';
+        NoAssetLineRef: Label 'No wallet asset line reference found for ticket %1';
+        NoWallet: Label 'No wallet found for ticket %1';
+    begin
+        WalletAssetLine.SetCurrentKey(Type, LineTypeSystemId);
+        WalletAssetLine.SetFilter(Type, '%1', Enum::"NPR WalletLineType"::TICKET);
+        WalletAssetLine.SetFilter(LineTypeSystemId, '%1', Ticket.SystemId);
+        if (not (WalletAssetLine.FindFirst())) then
+            Error(NoAssetLine, Ticket."No.");
+
+        WalletAssetLineRef.SetCurrentKey(WalletAssetLineEntryNo, SupersededBy);
+        WalletAssetLineRef.SetFilter(WalletAssetLineEntryNo, '%1', WalletAssetLine.EntryNo);
+        WalletAssetLineRef.SetFilter(SupersededBy, '%1', 0);
+        if (not (WalletAssetLineRef.FindFirst())) then
+            Error(NoAssetLineRef, Ticket."No.");
+
+        if (not Wallet.Get(WalletAssetLineRef.WalletEntryNo)) then
+            Error(NoWallet, Ticket."No.");
+
+        Page.Run(Page::"NPR AttractionWalletCard", Wallet);
+
+    end;
 
 }
 

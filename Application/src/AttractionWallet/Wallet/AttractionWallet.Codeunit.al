@@ -386,16 +386,20 @@ codeunit 6185062 "NPR AttractionWallet"
     internal procedure AddMemberCardToWallet(WalletEntryNo: Integer; MemberCardId: Guid)
     var
         MembershipCard: Record "NPR MM Member Card";
+        Member: Record "NPR MM Member";
         WalletAssetLine: Record "NPR WalletAssetLine";
         MembershipEntry: Record "NPR MM Membership Entry";
     begin
 
         MembershipCard.GetBySystemId(MemberCardId);
+        if (not Member.Get(MembershipCard."Member Entry No.")) then
+            Member.Init();
 
         MembershipEntry.SetCurrentKey("Membership Entry No.");
         MembershipEntry.SetFilter("Membership Entry No.", '=%1', MembershipCard."Membership Entry No.");
         MembershipEntry.SetFilter(Context, '=%1', MembershipEntry.Context::NEW);
-        MembershipEntry.FindFirst();
+        if (not MembershipEntry.FindFirst()) then
+            MembershipEntry.Init(); // The wallet create timing is before the membership entry is created when in POS. This is a workaround to ensure the wallet asset line is created.
 
         WalletAssetLine.SetCurrentKey(Type, LineTypeSystemId);
         WalletAssetLine.SetFilter(Type, '=%1', ENUM::"NPR WalletLineType"::MEMBERSHIP);
@@ -404,7 +408,7 @@ codeunit 6185062 "NPR AttractionWallet"
             WalletAssetLine.Init();
             WalletAssetLine.TransactionId := GetWalletTransactionId(WalletEntryNo);
             WalletAssetLine.ItemNo := MembershipEntry."Item No.";
-            WalletAssetLine.Description := MembershipEntry.Description;
+            WalletAssetLine.Description := Member."Display Name";
             WalletAssetLine.TransferControlledBy := ENUM::"NPR WalletRole"::Holder;
             WalletAssetLine.Type := ENUM::"NPR WalletLineType"::MEMBERSHIP;
             WalletAssetLine.DocumentNumber := MembershipEntry."Receipt No.";
@@ -570,9 +574,14 @@ codeunit 6185062 "NPR AttractionWallet"
     internal procedure CreateNewExternalReference(Wallet: Record "NPR AttractionWallet")
     var
         WalletExternalReference: Record "NPR AttractionWalletExtRef";
+        WalletSequenceNumber: Text[30];
     begin
+        WalletSequenceNumber := Format(Wallet."EntryNo", 0, 9);
+
         WalletExternalReference.Init();
-        WalletExternalReference.ExternalReference := GenerateWalletExternalReference(CopyStr(Wallet.ReferenceNumber, 1, 20));
+#pragma warning disable AA0139 // PadLeft returns a Text, not a Code[20]
+        WalletExternalReference.ExternalReference := GenerateWalletExternalReference(WalletSequenceNumber.PadLeft(10, '0'));
+#pragma warning restore AA0139
         WalletExternalReference.WalletEntryNo := Wallet.EntryNo;
         WalletExternalReference.Insert(true);
     end;
