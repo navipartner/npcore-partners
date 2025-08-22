@@ -669,7 +669,7 @@ types:
 
   Blocked:
     type: boolean
-    docs: Indicates whether the membership period is blocked.
+    docs: Indicates whether the entity is blocked.
     examples:
       - name: ExampleBlocked
         value: false

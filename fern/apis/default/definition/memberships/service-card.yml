@@ -91,7 +91,7 @@ service:
       docs: 
         Retrieve details of a specific card using its card number. 
         This endpoint allows access to card information when the card number is known, 
-        providing key details such as the card's status and associated member.
+        providing key details such as the card's status and cardId for further exploration.
       display-name: Get using Number
       method: GET
       path: /card
@@ -99,7 +99,7 @@ service:
         name: getCardNumber
         query-parameters:
           cardNumber: simpleTypes.CardNumber
-      response: GetCardResponse
+      response: compositeTypes.MemberCardEntity
       examples:
         - name: ExampleGetCard
           path-parameters:
@@ -109,7 +109,7 @@ service:
           query-parameters:
             cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
           response: 
-            body: $GetCardResponse.ExampleGetCard
+            body: $compositeTypes.MemberCardEntity.ExampleMemberCardBlocked
 
 
     # registerArrival:
