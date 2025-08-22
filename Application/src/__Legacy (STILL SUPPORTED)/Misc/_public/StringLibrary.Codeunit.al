@@ -48,6 +48,31 @@ codeunit 6014465 "NPR String Library"
             exit(String);
     end;
 
+    internal procedure SelectStringSepWithEmptyIfNotFound(Index: Integer; Sep: Text): Text
+    var
+        Int1: Integer;
+        Int2: Integer;
+        Itt: Integer;
+        String: Text;
+    begin
+        String := _String;
+        Itt := 1;
+        Int1 := 1;
+        while Itt < Index do begin
+            Int1 := StrPos(String, Sep) + StrLen(Sep);
+            String := CopyStr(String, Int1);
+            Itt += 1;
+        end;
+        Int2 := StrPos(String, Sep);
+        if Int2 > 0 then
+            exit(CopyStr(String, 1, Int2 - 1))
+        else
+            if index = 1 then
+                exit(String)
+            else
+                exit('');
+    end;
+
     procedure PadStrLeft(String: Text[60]; TotalStrLen: Integer; PadChar: Text[30]; After: Boolean) OutStr: Text
     var
         i: Integer;

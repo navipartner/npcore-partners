@@ -36,6 +36,8 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib." implements "NPR IMatrix Printer"
                 case DeviceSettings.Name of
                     'PRINT_RATE':
                         Setup('PR', DeviceSettings.Value);
+                    'PRINT_QUANTITY':
+                        Setup('PQ', DeviceSettings.Value);
                     'PRINT_WIDTH':
                         Setup('PW', DeviceSettings.Value);
                     'SET_DARKNESS':
@@ -548,6 +550,31 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib." implements "NPR IMatrix Printer"
         AddStringToBuffer(StrSubstNo('^PO%1', Orientation));
     end;
 
+    // ^PQ syntax: ^PQq,p,r,o (only q mandatory; others optional)
+    local procedure PrintQuantity(QuantityTxt: Text; PauseTxt: Text; ReplicatesTxt: Text; OverrideTxt: Text)
+    var
+        Cmd: Text;
+        QtyInt: Integer;
+    begin
+        // Validate mandatory quantity (q)
+        if (QuantityTxt = '') or (not Evaluate(QtyInt, QuantityTxt)) then
+            exit;
+
+        Cmd := '^PQ' + QuantityTxt;
+
+        // Append pause if provided.
+        if PauseTxt <> '' then begin
+            Cmd += ',' + PauseTxt;
+            if ReplicatesTxt <> '' then begin
+                Cmd += ',' + ReplicatesTxt;
+                if OverrideTxt <> '' then
+                    Cmd += ',' + OverrideTxt;
+            end;
+        end;
+
+        AddStringToBuffer(Cmd);
+    end;
+
     procedure ScaleText(ScaleSize: Code[10]; Align: Integer; Rotate: Integer; X: Integer; Y: Integer; TextIn: Text[100])
     var
         HeightText: Code[10];
@@ -656,6 +683,8 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib." implements "NPR IMatrix Printer"
         StringLib.Construct(Value);
 
         case Setting of
+            'PQ':
+                PrintQuantity(StringLib.SelectStringSepWithEmptyIfNotFound(1, ','), StringLib.SelectStringSepWithEmptyIfNotFound(2, ','), StringLib.SelectStringSepWithEmptyIfNotFound(3, ','), StringLib.SelectStringSepWithEmptyIfNotFound(4, ','));
             'PR':
                 PrintRate(StringLib.SelectStringSep(1, ','), StringLib.SelectStringSep(2, ','), StringLib.SelectStringSep(3, ','));
             'PW':
