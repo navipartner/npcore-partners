@@ -73,6 +73,7 @@
 
         NpCsDocument.Validate("Processing Status", NewStatus);
         NpCsExpirationMgt.SetExpiresAt(NpCsDocument);
+        OnUpdateProcessingStatusOnBeforeModifyNpCsDocument(NpCsDocument);
         NpCsDocument.Modify(true);
 
         LogMessage := StrSubstNo(Text001, NpCsDocument."Processing Status");
@@ -483,6 +484,11 @@
 
     [IntegrationEvent(false, false)]
     procedure OnBeforeCreateTenantWebservice(ObjectType: Option; ObjectId: Integer; ServiceName: Text; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnUpdateProcessingStatusOnBeforeModifyNpCsDocument(var NpCsDocument: Record "NPR NpCs Document")
     begin
     end;
 
