@@ -12,7 +12,6 @@ codeunit 6184615 "NPR EFT Adyen Abort Trx Task" implements "NPR POS Background T
         Response: Text;
         EFTAdyenCloudProtocol: Codeunit "NPR EFT Adyen Cloud Protocol";
         EFTAdyenCloudIntegrat: Codeunit "NPR EFT Adyen Cloud Integrat.";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         Request: Text;
         EFTSetup: Record "NPR EFT Setup";
         ApiKey: Text;
@@ -27,10 +26,8 @@ codeunit 6184615 "NPR EFT Adyen Abort Trx Task" implements "NPR POS Background T
         if Parameters.ContainsKey('CalledFromActionWF') then
             Evaluate(CalledFromActionWF, Parameters.Get('CalledFromActionWF'));
 
-        if FeatureFlagsManagement.IsEnabled('refreshcacheadyenaborttrx') then
-            SelectLatestVersion();
+        GetEftTransactionRequest(EntryNo, EFTTransactionRequest);
 
-        EFTTransactionRequest.Get(EntryNo);
         if CalledFromActionWF <> DataCollectionLbl then
             EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
 
@@ -67,17 +64,14 @@ codeunit 6184615 "NPR EFT Adyen Abort Trx Task" implements "NPR POS Background T
         POSActionEFTAdyenCloud: Codeunit "NPR POS Action EFT Adyen Cloud";
         POSActionDataCollection: Codeunit "NPR POS Action Data Collection";
         EFTAdyenResponseHandler: Codeunit "NPR EFT Adyen Response Handler";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         //Trx done, either complete (success/failure) or handled error 
         Evaluate(EntryNo, Parameters.Get('EntryNo'));
         if Parameters.ContainsKey('CalledFromActionWF') then
             Evaluate(CalledFromActionWF, Parameters.Get('CalledFromActionWF'));
 
-        if FeatureFlagsManagement.IsEnabled('refreshcacheadyenaborttrx') then
-            SelectLatestVersion();
+        GetEftTransactionRequest(EntryNo, EFTTransactionRequest);
 
-        EFTTransactionRequest.Get(EntryNo);
         Evaluate(Completed, Results.Get('Completed'), 9);
         Logs := Results.Get('Logs');
 
@@ -111,17 +105,14 @@ codeunit 6184615 "NPR EFT Adyen Abort Trx Task" implements "NPR POS Background T
         POSActionEFTAdyenCloud: Codeunit "NPR POS Action EFT Adyen Cloud";
         EFTAdyenResponseHandler: Codeunit "NPR EFT Adyen Response Handler";
         POSActionDataCollection: Codeunit "NPR POS Action Data Collection";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         //Trx result unknown - log error and start lookup        
         Evaluate(EntryNo, Parameters.Get('EntryNo'));
         if Parameters.ContainsKey('CalledFromActionWF') then
             Evaluate(CalledFromActionWF, Parameters.Get('CalledFromActionWF'));
 
-        if FeatureFlagsManagement.IsEnabled('refreshcacheadyenaborttrx') then
-            SelectLatestVersion();
+        GetEftTransactionRequest(EntryNo, EFTTransactionRequest);
 
-        EFTTransactionRequest.Get(EntryNo);
         if CalledFromActionWF = DataCollectionLbl then
             EFTAdyenIntegration.WriteGenericDataCollectionLogEntry(EFTTransactionRequest."Entry No.", 'AbortTrxTaskError', StrSubstNo('Error: %1 \\Callstack: %2', ErrorText, ErrorCallStack))
         else
@@ -141,7 +132,6 @@ codeunit 6184615 "NPR EFT Adyen Abort Trx Task" implements "NPR POS Background T
         POSActionDataCollection: Codeunit "NPR POS Action Data Collection";
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
         EFTAdyenResponseHandler: Codeunit "NPR EFT Adyen Response Handler";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
         CalledFromActionWF: Text;
     begin
         //Trx result unknown - log error and start lookup        
@@ -149,10 +139,8 @@ codeunit 6184615 "NPR EFT Adyen Abort Trx Task" implements "NPR POS Background T
         if Parameters.ContainsKey('CalledFromActionWF') then
             Evaluate(CalledFromActionWF, Parameters.Get('CalledFromActionWF'));
 
-        if FeatureFlagsManagement.IsEnabled('refreshcacheadyenaborttrx') then
-            SelectLatestVersion();
+        GetEftTransactionRequest(EntryNo, EFTTransactionRequest);
 
-        EFTTransactionRequest.Get(EntryNo);
         if CalledFromActionWF = DataCollectionLbl then
             EFTAdyenIntegration.WriteGenericDataCollectionLogEntry(EFTTransactionRequest."Entry No.", 'AbortTrxTaskCancelled', '')
         else
@@ -162,5 +150,20 @@ codeunit 6184615 "NPR EFT Adyen Abort Trx Task" implements "NPR POS Background T
         else
             POSActionEFTAdyenCloud.SetAbortStatus(EFTTransactionRequest."Processed Entry No.", false);
         EFTAdyenResponseHandler.ProcessResponse(EntryNo, '', false, false, '');
+    end;
+
+    //For some reason the NST is not seeing a previously committed record and 
+    //we're trying to force a cache refresh with this function.
+    //SelectLatestVersion didn't help
+    local procedure GetEftTransactionRequest(EntryNo: Integer; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
+    begin
+        Clear(EFTTransactionRequest);
+#if (BC17 or BC18 or BC19 or BC20 or BC21)
+        EFTTransactionRequest.LockTable();
+#else
+        EFTTransactionRequest.ReadIsolation := IsolationLevel::UpdLock;
+#endif
+        EFTTransactionRequest.Get(EntryNo);
+        Commit();
     end;
 }
