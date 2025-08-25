@@ -487,6 +487,7 @@
     begin
     end;
 
+    [Obsolete('Event is not used and will be removed in a future version.', '2025-08-31')]
     [IntegrationEvent(false, false)]
     procedure OnUpdateProcessingStatusOnBeforeModifyNpCsDocument(var NpCsDocument: Record "NPR NpCs Document")
     begin
