@@ -171,7 +171,8 @@ codeunit 6150926 "NPR SaaS Import Service"
     var
         SaaSImportSetup: Record "NPR SaaS Import Setup";
     begin
-        SaaSImportSetup.Get();
+        if not SaaSImportSetup.Get() then
+            exit(false);
         exit(SaaSImportSetup."Disable Event Subscribers");
     end;
 }
