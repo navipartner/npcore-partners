@@ -938,22 +938,27 @@
         AddMembershipChangeNotificationWorker(MembershipLedgerEntry, MembershipSetup, CommunitySetup);
     end;
 
-
     local procedure CancelPendingNotification(MembershipEntryNo: Integer; NotificationTrigger: Enum "NPR MM NotificationTrigger")
     var
+        MembershipNotificationRead: Record "NPR MM Membership Notific.";
         MembershipNotification: Record "NPR MM Membership Notific.";
     begin
-        MembershipNotification.SetCurrentKey("Membership Entry No.");
-        MembershipNotification.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
-        MembershipNotification.SetFilter("Notification Trigger", '=%1', NotificationTrigger);
-        MembershipNotification.SetFilter("Notification Status", '=%1', MembershipNotification."Notification Status"::PENDING);
-        if (MembershipNotification.FindSet(true)) then begin
+        MembershipNotificationRead.SetLoadFields("Entry No.");
+        MembershipNotificationRead.SetCurrentKey("Membership Entry No.");
+        MembershipNotificationRead.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
+        MembershipNotificationRead.SetFilter("Notification Trigger", '=%1', NotificationTrigger);
+        MembershipNotificationRead.SetFilter("Notification Status", '=%1', MembershipNotificationRead."Notification Status"::PENDING);
+
+        if (MembershipNotificationRead.FindSet()) then begin
+            MembershipNotification.SetLoadFields("Entry No.", "Notification Status", "Notification Processed At", "Notification Processed By User");// BC cop is an idiot for not allowing checking meta data length (AA0242)
             repeat
-                MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::CANCELED;
-                MembershipNotification."Notification Processed At" := CurrentDateTime();
-                MembershipNotification."Notification Processed By User" := CopyStr(UserId, 1, MaxStrLen(MembershipNotification."Notification Processed By User"));
-                MembershipNotification.Modify();
-            until (MembershipNotification.Next() = 0);
+                if (MembershipNotification.Get(MembershipNotificationRead."Entry No.")) then begin
+                    MembershipNotification."Notification Status" := MembershipNotification."Notification Status"::CANCELED;
+                    MembershipNotification."Notification Processed At" := CurrentDateTime();
+                    MembershipNotification."Notification Processed By User" := CopyStr(UserId(), 1, MaxStrLen(MembershipNotification."Notification Processed By User"));
+                    MembershipNotification.Modify();
+                end;
+            until (MembershipNotificationRead.Next() = 0);
         end;
     end;
 

@@ -75,6 +75,7 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
         if MaxValidUntilDate > ValidUntilDate then
             ValidUntilDate := MaxValidUntilDate;
 
+        Subscription.SetCurrentKey("Membership Entry No.");
         Subscription.SetRange("Membership Entry No.", Membership."Entry No.");
         if not Subscription.FindFirst() then begin
             Subscription.Init();
