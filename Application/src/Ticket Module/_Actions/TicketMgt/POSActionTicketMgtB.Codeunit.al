@@ -97,10 +97,13 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
         SaleLinePOS.Description := ExternalTicketNumber;
         SaleLinePOS."Description 2" := TicketReservationRequest."Scheduled Time Description";
 
-        SaleLinePOS."Return Sale Sales Ticket No." := Ticket."Sales Receipt No.";
-
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.InsertLine(SaleLinePOS);
+
+        // All fields are not transferred by InsertLine
+        SaleLinePOS."Return Sale Sales Ticket No." := Ticket."Sales Receipt No.";
+        SaleLinePOS.Modify();
+
         POSSaleLine.RefreshCurrent();
         POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
