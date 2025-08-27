@@ -339,13 +339,38 @@ codeunit 6184816 "NPR Spfy Retail Voucher Mgt."
 
     local procedure CheckReferenceNo(Voucher: Record "NPR NpRv Voucher")
     var
-        IncorrectRefNoLengthErr: Label 'Shopify integrated vouchers must have reference number string lenght between 8 and 20 characters.';
+        IncorrectRefNoFormatErr: Label 'Shopify integrated voucher reference numbers must be 8-20 characers long and contain only unaccented alphabetical letters (a-z) and numbers (0-9).';
     begin
         if Voucher."Reference No." = '' then
             exit;
+
         if IsShopifyIntegratedVoucherType(Voucher."Voucher Type") then
-            if not (StrLen(Voucher."Reference No.") in [8 .. 20]) then
-                Error(IncorrectRefNoLengthErr);
+            if not IsValidShopifyVoucherReferenceNo(Voucher."Reference No.") then
+                Error(IncorrectRefNoFormatErr);
+    end;
+
+    local procedure IsValidShopifyVoucherReferenceNo(ReferenceNo: Text[50]): Boolean
+    var
+        StringConversionManagement: Codeunit StringConversionManagement;
+    begin
+        if StrLen(ReferenceNo) in [8 .. 20] then
+            exit(ReferenceNo = StringConversionManagement.RemoveNonAlphaNumericCharacters(ReferenceNo));
+
+        exit(false);
+    end;
+
+    internal procedure CheckShopifyVoucherTypeReferenceNos(VoucherType: Code[20])
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        IncorrectRefNosFormatErr: Label 'Some of the vouchers of this type do not contain a permitted Reference No. Shopify integrated voucher reference numbers must be 8-20 characers long and contain only unaccented alphabetical letters (a-z) and numbers (0-9).';
+    begin
+        NpRvVoucher.SetLoadFields("Reference No.");
+        NpRvVoucher.SetFilter("Voucher Type", VoucherType);
+        if NpRvVoucher.FindSet() then
+            repeat
+                if not IsValidShopifyVoucherReferenceNo(NpRvVoucher."Reference No.") then
+                    Error(IncorrectRefNosFormatErr);
+            until NpRvVoucher.Next() = 0;
     end;
 
     procedure InitialSync(var ShopifyStore: Record "NPR Spfy Store"; var VoucherTypeIn: Record "NPR NpRv Voucher Type"; var VoucherIn: Record "NPR NpRv Voucher"; WithDialog: Boolean)

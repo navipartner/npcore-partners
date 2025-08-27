@@ -194,8 +194,10 @@
             trigger OnValidate()
             var
                 PaymentModuleShopify: Codeunit "NPR NpRv Module Pay. - Shopify";
+                SpfyRetailVoucherMgt: Codeunit "NPR Spfy Retail Voucher Mgt.";
             begin
                 if "Integrate with Shopify" then begin
+                    SpfyRetailVoucherMgt.CheckShopifyVoucherTypeReferenceNos(Rec.Code);
                     CheckStoreIsAssigned();
                     PaymentModuleShopify.CreateShopifyRetailVoucherModule();
                     Validate("Apply Payment Module", PaymentModuleShopify.ModuleCode());
