@@ -583,21 +583,21 @@ codeunit 6184796 "NPR Adyen Management"
                 RequestURL := GetManagementAPIURL(_AdyenSetup."Environment Type") + StrSubstNo(GetWebhooksEndpoint, MerchantAccount.Name);
                 ResponseText := CreateAdyenHttpRequest('', RequestURL, Enum::"Http Request Type"::GET);
 
-                if ResponseText = '' then
-                    exit;
+                if ResponseText <> '' then begin
 
-                JsonObject.ReadFrom(ResponseText);
-                if not JsonObject.Get('data', JsonToken) then
-                    exit;
+                    Clear(JsonObject);
+                    JsonObject.ReadFrom(ResponseText);
+                    if JsonObject.Get('data', JsonToken) then begin
 
-                RequestObject.ReadFrom(json);
-                if not RequestObject.Get('WebhookReference', RequestToken) then
-                    exit;
-
-                foreach JsonWebhookToken in JsonToken.AsArray() do begin
-                    if JsonWebhookToken.AsObject().Get('id', JsonWebhookToken) then
-                        if JsonWebhookToken.AsValue().AsCode() = RequestToken.AsValue().AsCode() then
-                            exit(true);
+                        Clear(RequestObject);
+                        RequestObject.ReadFrom(json);
+                        if RequestObject.Get('WebhookReference', RequestToken) then
+                            foreach JsonWebhookToken in JsonToken.AsArray() do begin
+                                if JsonWebhookToken.AsObject().Get('id', JsonWebhookToken) then
+                                    if JsonWebhookToken.AsValue().AsCode() = RequestToken.AsValue().AsCode() then
+                                        exit(true);
+                            end;
+                    end;
                 end;
             until MerchantAccount.Next() = 0;
     end;
