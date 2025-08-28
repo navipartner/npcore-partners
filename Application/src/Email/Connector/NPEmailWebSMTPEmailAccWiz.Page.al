@@ -35,6 +35,8 @@ page 6184947 "NPR NPEmailWebSMTPEmailAccWiz"
 
                     trigger OnValidate()
                     begin
+                        Rec.FromEmailAddress := Rec.FromEmailAddress.ToLower();
+                        _MailManagement.CheckValidEmailAddress(Rec.FromEmailAddress);
                         UpdateHasSenderIdentity();
                     end;
                 }
@@ -60,6 +62,12 @@ page 6184947 "NPR NPEmailWebSMTPEmailAccWiz"
                     ExtendedDatatype = EMail;
                     ShowMandatory = true;
                     NotBlank = true;
+
+                    trigger OnValidate()
+                    begin
+                        _ReplyToEmail := _ReplyToEmail.ToLower();
+                        _MailManagement.CheckValidEmailAddress(_ReplyToEmail);
+                    end;
                 }
                 field(_Address; _Address)
                 {
@@ -166,6 +174,7 @@ page 6184947 "NPR NPEmailWebSMTPEmailAccWiz"
         _City: Text[100];
         _Country: Text[100];
         _NPEmailAccount: Record "NPR NP Email Account";
+        _MailManagement: Codeunit "Mail Management";
 
     trigger OnOpenPage()
     begin

@@ -1,12 +1,9 @@
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
-page 6184994 "NPR CreateNPEmailAccWiz"
+page 6185093 "NPR NPEmailAddDomainWiz"
 {
     Extensible = false;
-    Caption = 'Create NP Email Account Wizard';
+    Caption = 'NP Email Add Domain Wizard';
     PageType = NavigatePage;
-    SourceTable = "NPR NP Email Account";
-    SourceTableTemporary = true;
-    Permissions = tabledata "NPR NP Email Account" = rimd;
     UsageCategory = None;
     Editable = true;
 
@@ -17,30 +14,8 @@ page 6184994 "NPR CreateNPEmailAccWiz"
             group(IntroStep)
             {
                 Visible = (_CurrentStep = _CurrentStep::Intro);
-                Caption = 'Welcome to NP Email';
-                InstructionalText = 'This guide will help you set up an NP Email Account. This account will hold all setup related and the individual accounts, you''ll be sending from will be associated with it.';
-            }
-
-            group(AccountDetailsStep)
-            {
-                Visible = (_CurrentStep = _CurrentStep::AccountDetail);
-
-                field(Username; Rec.Username)
-                {
-                    ApplicationArea = NPRNPEmail;
-                    ToolTip = 'Specifies the username for the NP Email Account.';
-                    Editable = false;
-                }
-                field(CompanyName; Rec.CompanyName)
-                {
-                    ApplicationArea = NPRNPEmail;
-                    ToolTip = 'Specifies the Company Name for the NP Email Account.';
-                }
-                field(BillingEmail; Rec.BillingEmail)
-                {
-                    ApplicationArea = NPRNPEmail;
-                    ToolTip = 'Specifies the Billing E-mail for the NP Email Account.';
-                }
+                Caption = 'Add a new domain';
+                InstructionalText = 'This guide will help you add a domain to your NP Email account. When the domain is added and authenticated, you will be able to use it to send e-mails.';
             }
             group(DomainStep)
             {
@@ -58,6 +33,9 @@ page 6184994 "NPR CreateNPEmailAccWiz"
                     var
                         Client: Codeunit "NPR SendGrid Client";
                     begin
+#pragma warning disable AA0139
+                        _Domain := _Domain.Trim().ToLower();
+#pragma warning restore AA0139
                         Client.ValidateDomain(_Domain);
                     end;
                 }
@@ -123,56 +101,38 @@ page 6184994 "NPR CreateNPEmailAccWiz"
     }
 
     var
-        _CurrentStep: Option Intro,AccountDetail,Domain,DNSSetup;
+        _CurrentStep: Option Intro,Domain,DNSSetup;
+        _Domain: Text[300];
         _DomainDNSRecord: Record "NPR NPEmailDomainDNSRecord";
-        _Domain: Text[255];
         _NPEmailAccount: Record "NPR NP Email Account";
+        _Initialized: Boolean;
 
     trigger OnOpenPage()
-    var
-        CompanyInformation: Record "Company Information";
-        SendGridClient: Codeunit "NPR SendGrid Client";
     begin
-        if (_NPEmailAccount.FindFirst()) then begin
-            Rec := _NPEmailAccount;
-            Rec.Insert();
-            _CurrentStep := _CurrentStep::Domain;
-            exit;
-        end;
+        if (not _Initialized) then
+            Error('The wizard was not properly initialized. This is a programming bug. Contact system vendor!');
+    end;
 
-        if (not CompanyInformation.Get()) then;
-
-        Rec.Init();
-#pragma warning disable AA0139
-        Rec.Username := SendGridClient.GetEnvironmentIdentifier();
-#pragma warning restore AA0139
-        Rec.CompanyName := CompanyInformation.Name;
-        Rec.AccountRegion := "NPR SendGridAccountRegion"::GLOBAL;
-        Rec.Insert();
+    internal procedure Initialize(NPEmailAccount: Record "NPR NP Email Account")
+    begin
+        _NPEmailAccount := NPEmailAccount;
+        _Initialized := true;
     end;
 
     local procedure NextStep()
     var
         SendGridClient: Codeunit "NPR SendGrid Client";
-        NPEmailDomain: Record "NPR NP Email Domain";
+        TempNPEmailDomain: Record "NPR NP Email Domain" temporary;
         DomainMustBeFilledErr: Label 'The domain field must be filled before proceeding.';
     begin
         case _CurrentStep of
             _CurrentStep::Intro:
-                begin
-                    _CurrentStep := _CurrentStep::AccountDetail;
-                end;
-            _CurrentStep::AccountDetail:
-                begin
-                    _NPEmailAccount := Rec;
-                    SendGridClient.CreateSubuser(SendGridClient.GetEnvironmentIdentifier(), _NPEmailAccount);
-                    _CurrentStep := _CurrentStep::Domain;
-                end;
+                _CurrentStep := _CurrentStep::Domain;
             _CurrentStep::Domain:
                 begin
                     if (_Domain = '') then
                         Error(DomainMustBeFilledErr);
-                    SendGridClient.CreateDomain(_NPEmailAccount, _Domain, NPEmailDomain, _DomainDNSRecord);
+                    SendGridClient.CreateDomain(_NPEmailAccount, _Domain, TempNPEmailDomain, _DomainDNSRecord);
                     CurrPage.DNSRecords.Page.SetTempRecord(_DomainDNSRecord);
                     _CurrentStep := _CurrentStep::DNSSetup;
                 end;

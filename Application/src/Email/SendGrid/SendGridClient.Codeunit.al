@@ -473,6 +473,15 @@ codeunit 6248264 "NPR SendGrid Client"
             exit(StrSubstNo('%1-test', UserId()));
         Error(UnsupportedEnvErr);
     end;
+
+    internal procedure ValidateDomain(Domain: Text[300])
+    var
+        Regex: Codeunit Regex;
+        InvalidDomainErr: Label 'Invalid domain entered.';
+    begin
+        if (not Regex.IsMatch(Domain, '^(?!-)([A-Za-z0-9-]{1,63}(?<!-)\.)+[A-Za-z]{2,}$')) then
+            Error(InvalidDomainErr);
+    end;
     #endregion
 }
 #endif

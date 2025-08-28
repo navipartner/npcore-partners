@@ -50,10 +50,27 @@ page 6184997 "NPR NP Email Domains"
                     CurrPage.Update(false);
                 end;
             }
+            action(AddDomain)
+            {
+                Caption = 'Add Domain';
+                ToolTip = 'Running this action will create a new domain to be authenticated.';
+                ApplicationArea = NPRNPEmail;
+                Image = New;
+
+                trigger OnAction()
+                var
+                    AddDomainWizard: Page "NPR NPEmailAddDomainWiz";
+                begin
+                    AddDomainWizard.Initialize(_NPEmailAccount);
+                    AddDomainWizard.RunModal();
+                    GetDomains();
+                end;
+            }
         }
         area(Promoted)
         {
             actionref(Promoted_CheckVerification; CheckVerification) { }
+            actionref(Promoted_AddDomain; AddDomain) { }
         }
     }
 
