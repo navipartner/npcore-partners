@@ -465,12 +465,13 @@ codeunit 6248264 "NPR SendGrid Client"
     var
         AzureAdTenant: Codeunit "Azure AD Tenant";
         EnvInfo: Codeunit "Environment Information";
+        UnsupportedEnvErr: Label 'Cannot get environment identifier in an unsupported environment.';
     begin
         if (EnvInfo.IsSaaSInfrastructure()) then
             exit(AzureAdTenant.GetAadTenantId());
         if (GetUrl(ClientType::Web).Contains('dynamics-retail.net')) then
             exit(StrSubstNo('%1-test', UserId()));
-        exit(TenantId());
+        Error(UnsupportedEnvErr);
     end;
     #endregion
 }

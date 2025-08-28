@@ -13,9 +13,7 @@ codeunit 6248262 "NPR NP Email Connector" implements "Email Connector"
         Client: Codeunit "NPR SendGrid Client";
         JToken: JsonToken;
     begin
-        NPEmailAccount.SetAutoCalcFields(SenderIdentityVerified);
         NPEmailAccount.Get(AccountId);
-        NPEmailAccount.TestField(SenderIdentityVerified);
 
         if (JToken.ReadFrom(EmailMessage.GetBody())) and (JToken.SelectToken('npemail_dynamic_template_data', JToken)) then
             Client.SendDynamicEmail(EmailMessage, NPEmailAccount)

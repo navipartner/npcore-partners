@@ -1073,6 +1073,13 @@
                     'UpgradePOSSaleDigitalReceiptEntryTransfer':
                         exit('NPR-UpgradePOSSaleDigitalReceiptEntryTransfer-20250720');
                 end;
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+            Codeunit::"NPR UPG NP Email":
+                case UpgradeStep of
+                    'RemoveSenderIdentityUpdateJQ':
+                        exit('NPR-RemoveSenderIdentityUpdateJQ-20250827')
+                end;
+#endif
         end;
     end;
 }

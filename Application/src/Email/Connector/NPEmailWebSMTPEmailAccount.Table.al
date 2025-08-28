@@ -60,6 +60,9 @@ table 6151034 "NPR NPEmailWebSMTPEmailAccount"
             Caption = 'Sender Identity Verified';
             FieldClass = FlowField;
             CalcFormula = exist("NPR SendGrid Sender Identity" where(FromEmailAddress = field(FromEmailAddress), Verified = const(true)));
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-08-27';
+            ObsoleteReason = 'We stopped verifying sender identity locally in the database and just rely on upstream providers to perform the check.';
         }
     }
 
