@@ -21,12 +21,16 @@ codeunit 6184615 "NPR EFT Adyen Abort Trx Task" implements "NPR POS Background T
         CalledFromActionWF: Text;
         StatusCode: Integer;
         EFTAdyenAbortTrxReq: Codeunit "NPR EFT Adyen AbortTrx Req";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         Evaluate(EntryNo, Parameters.Get('EntryNo'));
         if Parameters.ContainsKey('CalledFromActionWF') then
             Evaluate(CalledFromActionWF, Parameters.Get('CalledFromActionWF'));
 
-        GetEftTransactionRequest(EntryNo, EFTTransactionRequest);
+        if FeatureFlagsManagement.IsEnabled('retryAdyenEftTransactionRequestGet') then
+            GetEftTransactionRequestAndLogError(EntryNo, 10, 100, 'ExecuteBackgroundTask', EFTTransactionRequest)
+        else
+            EFTTransactionRequest.Get(EntryNo);
 
         if CalledFromActionWF <> DataCollectionLbl then
             EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
@@ -64,13 +68,17 @@ codeunit 6184615 "NPR EFT Adyen Abort Trx Task" implements "NPR POS Background T
         POSActionEFTAdyenCloud: Codeunit "NPR POS Action EFT Adyen Cloud";
         POSActionDataCollection: Codeunit "NPR POS Action Data Collection";
         EFTAdyenResponseHandler: Codeunit "NPR EFT Adyen Response Handler";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         //Trx done, either complete (success/failure) or handled error 
         Evaluate(EntryNo, Parameters.Get('EntryNo'));
         if Parameters.ContainsKey('CalledFromActionWF') then
             Evaluate(CalledFromActionWF, Parameters.Get('CalledFromActionWF'));
 
-        GetEftTransactionRequest(EntryNo, EFTTransactionRequest);
+        if FeatureFlagsManagement.IsEnabled('retryAdyenEftTransactionRequestGet') then
+            GetEftTransactionRequestAndLogError(EntryNo, 10, 100, 'BackgroundTaskSuccessContinuation', EFTTransactionRequest)
+        else
+            EFTTransactionRequest.Get(EntryNo);
 
         Evaluate(Completed, Results.Get('Completed'), 9);
         Logs := Results.Get('Logs');
@@ -105,13 +113,17 @@ codeunit 6184615 "NPR EFT Adyen Abort Trx Task" implements "NPR POS Background T
         POSActionEFTAdyenCloud: Codeunit "NPR POS Action EFT Adyen Cloud";
         EFTAdyenResponseHandler: Codeunit "NPR EFT Adyen Response Handler";
         POSActionDataCollection: Codeunit "NPR POS Action Data Collection";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         //Trx result unknown - log error and start lookup        
         Evaluate(EntryNo, Parameters.Get('EntryNo'));
         if Parameters.ContainsKey('CalledFromActionWF') then
             Evaluate(CalledFromActionWF, Parameters.Get('CalledFromActionWF'));
 
-        GetEftTransactionRequest(EntryNo, EFTTransactionRequest);
+        if FeatureFlagsManagement.IsEnabled('retryAdyenEftTransactionRequestGet') then
+            GetEftTransactionRequestAndLogError(EntryNo, 10, 100, 'BackgroundTaskErrorContinuation', EFTTransactionRequest)
+        else
+            EFTTransactionRequest.Get(EntryNo);
 
         if CalledFromActionWF = DataCollectionLbl then
             EFTAdyenIntegration.WriteGenericDataCollectionLogEntry(EFTTransactionRequest."Entry No.", 'AbortTrxTaskError', StrSubstNo('Error: %1 \\Callstack: %2', ErrorText, ErrorCallStack))
@@ -133,13 +145,17 @@ codeunit 6184615 "NPR EFT Adyen Abort Trx Task" implements "NPR POS Background T
         EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
         EFTAdyenResponseHandler: Codeunit "NPR EFT Adyen Response Handler";
         CalledFromActionWF: Text;
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
         //Trx result unknown - log error and start lookup        
         Evaluate(EntryNo, Parameters.Get('EntryNo'));
         if Parameters.ContainsKey('CalledFromActionWF') then
             Evaluate(CalledFromActionWF, Parameters.Get('CalledFromActionWF'));
 
-        GetEftTransactionRequest(EntryNo, EFTTransactionRequest);
+        if FeatureFlagsManagement.IsEnabled('retryAdyenEftTransactionRequestGet') then
+            GetEftTransactionRequestAndLogError(EntryNo, 10, 100, 'BackgroundTaskCancelled', EFTTransactionRequest)
+        else
+            EFTTransactionRequest.Get(EntryNo);
 
         if CalledFromActionWF = DataCollectionLbl then
             EFTAdyenIntegration.WriteGenericDataCollectionLogEntry(EFTTransactionRequest."Entry No.", 'AbortTrxTaskCancelled', '')
@@ -152,18 +168,74 @@ codeunit 6184615 "NPR EFT Adyen Abort Trx Task" implements "NPR POS Background T
         EFTAdyenResponseHandler.ProcessResponse(EntryNo, '', false, false, '');
     end;
 
-    //For some reason the NST is not seeing a previously committed record and 
-    //we're trying to force a cache refresh with this function.
-    //SelectLatestVersion didn't help
-    local procedure GetEftTransactionRequest(EntryNo: Integer; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
+    //When read scale out is configured in the database
+    //the record is not always immediately available in the read only replica database
+    //so you need to retry some time to get the record 
+    local procedure GetEftTransactionRequest(EntryNo: Integer; MaxRetryCount: Integer; SleepDuration: Integer; var EFTTransactionRequest: Record "NPR EFT Transaction Request") Found: Boolean;
+    var
+        RetryCount: Integer;
+        EndLoop: Boolean;
+        CurrentSleepDuration: Integer;
     begin
-        Clear(EFTTransactionRequest);
-#if (BC17 or BC18 or BC19 or BC20 or BC21)
-        EFTTransactionRequest.LockTable();
-#else
-        EFTTransactionRequest.ReadIsolation := IsolationLevel::UpdLock;
-#endif
-        EFTTransactionRequest.Get(EntryNo);
-        Commit();
+        repeat
+            Clear(EFTTransactionRequest);
+            SelectLatestVersion();
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21)
+            EFTTransactionRequest.ReadIsolation := IsolationLevel::ReadUncommitted;
+#ENDIF
+            Found := EFTTransactionRequest.Get(EntryNo);
+            RetryCount += 1;
+            EndLoop := Found or (RetryCount >= MaxRetryCount);
+
+            if not Found and not EndLoop and (SleepDuration <> 0) then begin
+                CurrentSleepDuration := SleepDuration * Power(2, RetryCount - 1);
+                if CurrentSleepDuration > 2000 then
+                    CurrentSleepDuration := 2000;
+                Sleep(CurrentSleepDuration);
+            end;
+        until EndLoop;
+    end;
+
+    local procedure GetEftTransactionRequestAndLogError(EntryNo: Integer; MaxRetryCount: Integer; SleepDuration: Integer; FunctionName: Text; var EFTTransactionRequest: Record "NPR EFT Transaction Request")
+    var
+        StartTime: Time;
+        EndTime: Time;
+        Duration: Decimal;
+        ErrorMessageText: Text;
+        NotFoundEftTransactionRequestErrorLbl: Label 'EFT Transaction Request with entry no. %1 was not found.', Comment = '%1 - entryNo';
+    begin
+        StartTime := Time;
+
+        if GetEftTransactionRequest(EntryNo, MaxRetryCount, SleepDuration, EFTTransactionRequest) then
+            exit;
+
+        EndTime := Time;
+        Duration := EndTime - StartTime;
+        ErrorMessageText := StrSubstNo(NotFoundEftTransactionRequestErrorLbl, EntryNo);
+
+        EmitTelemetry(FunctionName, Duration, ErrorMessageText);
+        Error(NotFoundEftTransactionRequestErrorLbl, EntryNo);
+    end;
+
+    local procedure EmitTelemetry(FunctionName: Text; Duration: Duration; ErrorMessageText: Text)
+    var
+        ActiveSession: Record "Active Session";
+        CustomDimensions: Dictionary of [Text, Text];
+    begin
+        if not ActiveSession.Get(Database.ServiceInstanceId(), Database.SessionId()) then
+            Clear(ActiveSession);
+
+
+        CustomDimensions.Add('NPR_FunctionName', FunctionName);
+        CustomDimensions.Add('NPR_DurationMs', Format(Duration, 0, 9));
+        CustomDimensions.Add('NPR_Server', ActiveSession."Server Computer Name");
+        CustomDimensions.Add('NPR_Instance', ActiveSession."Server Instance Name");
+        CustomDimensions.Add('NPR_TenantId', Database.TenantId());
+        CustomDimensions.Add('NPR_CompanyName', CompanyName());
+        CustomDimensions.Add('NPR_UserID', ActiveSession."User ID");
+        CustomDimensions.Add('NPR_SessionId', Format(Database.SessionId(), 0, 9));
+        CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
+
+        Session.LogMessage('NPR_AdyenAbortTrx', ErrorMessageText, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
     end;
 }
