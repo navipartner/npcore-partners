@@ -231,6 +231,12 @@
             Caption = 'Top-up Extends Ending Date';
             DataClassification = CustomerContent;
         }
+        field(400; "Default Unit of Measure"; Code[10])
+        {
+            Caption = 'Default Unit of Measure';
+            DataClassification = CustomerContent;
+            TableRelation = "Unit of Measure";
+        }
         field(630; "Voucher Category"; Enum "NPR Voucher Category")
         {
             Caption = 'Voucher Category';

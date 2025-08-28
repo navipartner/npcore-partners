@@ -497,6 +497,7 @@
         ItemTrackingSetup: Record "Item Tracking Setup";
         ItemTrackingManagement: Codeunit "Item Tracking Management";
         LotNoInfo: Record "Lot No. Information";
+        VoucherType: Record "NPR NpRv Voucher Type";
 #IF NOT (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
         ManulBoundEventSubMgt: Codeunit "NPR Manul Bound Event Sub. Mgt";
 #ENDIF
@@ -616,7 +617,7 @@
                 NpRvSalesLine.SetCurrentKey("Retail ID", "Document Source");
                 NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::POS);
                 NpRvSalesLine.SetRange("Retail ID", SaleLinePOS.SystemId);
-                NpRvSalesLine.SetLoadFields("Document Source", "Document Type", "Document No.", "Document Line No.");
+                NpRvSalesLine.SetLoadFields("Document Source", "Document Type", "Document No.", "Document Line No.", "Voucher Type");
                 if NpRvSalesLine.FindSet(true) then
                     repeat
                         NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
@@ -624,6 +625,11 @@
                         NpRvSalesLine."Document No." := SalesLine."Document No.";
                         NpRvSalesLine."Document Line No." := SalesLine."Line No.";
                         NpRvSalesLine.Modify(true);
+                        if VoucherType.Get(NpRvSalesLine."Voucher Type") then
+                            if VoucherType."Default Unit of Measure" <> '' then begin
+                                SalesLine.Validate("Unit of Measure Code", VoucherType."Default Unit of Measure");
+                                SalesLine.Modify();
+                            end;
                     until NpRvSalesLine.Next() = 0;
 
 

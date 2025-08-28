@@ -46,7 +46,7 @@
 
         OnAfterGenerateTempVoucher(NpRvVoucherType, TempNpRvVoucher);
 
-        InsertSalesLine(SalesHeader, SalesLine, TempNpRvVoucher);
+        InsertSalesLine(SalesHeader, SalesLine, TempNpRvVoucher, NpRvVoucherType."Default Unit of Measure");
 
         InsertNpRvSalesLine(SalesHeader, SalesLine, NpRvSalesLine, TempNpRvVoucher);
         InsertNpRVSalesLineReference(NpRvSalesLine, TempNpRvVoucher);
@@ -1468,7 +1468,7 @@
             Error(AlreadyUsedLbl, ReferenceNumber);
     end;
 
-    local procedure InsertSalesLine(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var TempNpRvVoucher: Record "NPR NpRv Voucher" temporary)
+    local procedure InsertSalesLine(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var TempNpRvVoucher: Record "NPR NpRv Voucher" temporary; DefaultUnitofMeasure: Code[10])
     var
         LineNo: Integer;
     begin
@@ -1486,6 +1486,8 @@
         SalesLine.Validate(Type, SalesLine.Type::"G/L Account");
         SalesLine.Validate("No.", TempNpRvVoucher."Account No.");
         SalesLine.Description := TempNpRvVoucher.Description;
+        if DefaultUnitofMeasure <> '' then
+            SalesLine.Validate("Unit of Measure Code", DefaultUnitofMeasure);
         SalesLine.Validate(Quantity, 1);
         SalesLine.Modify(true);
     end;

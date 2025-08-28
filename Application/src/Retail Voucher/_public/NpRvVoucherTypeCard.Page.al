@@ -193,6 +193,7 @@
                 group(OutputMethod)
                 {
                     ShowCaption = false;
+
                     field("Print Object Type"; Rec."Print Object Type")
                     {
                         ToolTip = 'Specifies the print object type for the voucher type';
@@ -239,6 +240,11 @@
                         MultiLine = true;
                         ToolTip = 'Specifies the value of the Voucher Message field';
                         ApplicationArea = NPRRetail;
+                    }
+                    field("Default Unit of Measure"; Rec."Default Unit of Measure")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Default Unit of Measure field which is used in Sales Order.';
                     }
                 }
             }
