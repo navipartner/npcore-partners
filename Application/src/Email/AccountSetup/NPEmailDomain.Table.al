@@ -3,8 +3,6 @@ table 6151108 "NPR NP Email Domain"
 {
     Access = Internal;
     Caption = 'NP Email Domain';
-    LookupPageId = "NPR NP Email Domains";
-    DrillDownPageId = "NPR NP Email Domains";
 
     fields
     {
@@ -30,5 +28,17 @@ table 6151108 "NPR NP Email Domain"
             DataClassification = SystemMetadata;
         }
     }
+
+    internal procedure FromJson(JToken: JsonToken)
+    var
+        JHelper: Codeunit "NPR Json Helper";
+    begin
+        Rec.Id := JHelper.GetJInteger(JToken, 'id', true);
+        Rec.AccountId := JHelper.GetJInteger(JToken, 'user_id', true);
+#pragma warning disable AA0139
+        Rec.Domain := JHelper.GetJText(JToken, 'domain', true);
+#pragma warning restore AA0139
+        Rec.Valid := JHelper.GetJBoolean(JToken, 'valid', true);
+    end;
 }
 #endif

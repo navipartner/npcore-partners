@@ -170,6 +170,30 @@ codeunit 6248263 "NPR SendGrid API Client"
 
     /**
      * SendGrid documentation:
+     * https://www.twilio.com/docs/sendgrid/api-reference/domain-authentication/list-all-authenticated-domains#operation-overview
+     */
+    internal procedure GetDomains(AccountId: Integer): JsonArray
+    var
+        Client: HttpClient;
+        ResponseMsg: HttpResponseMessage;
+        ResponseTxt: Text;
+        JArray: JsonArray;
+        FailedToFetchDomainsErr: Label 'Failed to fetch domains.\Status code. %1\Body: %2', Comment = '%1 = http status code, %2 = response body';
+    begin
+        Client := GenerateClient(AccountId);
+
+        Client.Get('/v3/whitelabel/domains', ResponseMsg);
+        ResponseMsg.Content.ReadAs(ResponseTxt);
+
+        if (not ResponseMsg.IsSuccessStatusCode()) then
+            Error(FailedToFetchDomainsErr, ResponseMsg.HttpStatusCode(), ResponseTxt);
+
+        JArray.ReadFrom(ResponseTxt);
+        exit(JArray);
+    end;
+
+    /**
+     * SendGrid documentation:
      * https://www.twilio.com/docs/sendgrid/api-reference/domain-authentication/validate-a-domain-authentication
      */
     internal procedure ValidateDomain(AccountId: Integer; DomainId: Integer): JsonObject

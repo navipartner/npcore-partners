@@ -8,6 +8,7 @@ page 6184997 "NPR NP Email Domains"
     ApplicationArea = NPRNPEmail;
     UsageCategory = None;
     SourceTable = "NPR NP Email Domain";
+    SourceTableTemporary = true;
 
     layout
     {
@@ -55,5 +56,31 @@ page 6184997 "NPR NP Email Domains"
             actionref(Promoted_CheckVerification; CheckVerification) { }
         }
     }
+
+    var
+        _Initialized: Boolean;
+        _NPEmailAccount: Record "NPR NP Email Account";
+
+    trigger OnOpenPage()
+    begin
+        if (not _Initialized) then
+            Error('The page was not properly initialized. This is a programming bug. Contact system vendor!');
+
+        GetDomains();
+    end;
+
+    internal procedure Initialize(AccountId: BigInteger)
+    begin
+        _NPEmailAccount.Get(AccountId);
+        Rec.SetRange(AccountId, _NPEmailAccount.AccountId);
+        _Initialized := true;
+    end;
+
+    local procedure GetDomains()
+    var
+        Client: Codeunit "NPR SendGrid Client";
+    begin
+        Client.GetDomains(_NPEmailAccount.AccountId, Rec);
+    end;
 }
 #endif

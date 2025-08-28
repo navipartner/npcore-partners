@@ -101,10 +101,10 @@ page 6184950 "NPR NP Email Account Setup"
 
                 trigger OnAction()
                 var
-                    NPEmailDomain: Record "NPR NP Email Domain";
+                    NPEmailDomains: Page "NPR NP Email Domains";
                 begin
-                    NPEmailDomain.SetRange(AccountId, _AccountId);
-                    Page.Run(0, NPEmailDomain);
+                    NPEmailDomains.Initialize(_AccountId);
+                    NPEmailDomains.Run();
                 end;
             }
         }

@@ -217,6 +217,27 @@ codeunit 6248264 "NPR SendGrid Client"
 #pragma warning restore AA0139
     end;
 
+    internal procedure GetDomains(AccountId: BigInteger; var TempNPEmailDomain: Record "NPR NP Email Domain" temporary)
+    var
+        APIClient: Codeunit "NPR SendGrid API Client";
+        DomainsArray: JsonArray;
+        DomainToken: JsonToken;
+    begin
+        if (not TempNPEmailDomain.IsTemporary()) then
+            Error('"TempNPEmailDomain" must be temporary. This is a programming bug. Contact system vendor!');
+
+        TempNPEmailDomain.Reset();
+        TempNPEmailDomain.DeleteAll();
+
+        DomainsArray := APIClient.GetDomains(AccountId);
+
+        foreach DomainToken in DomainsArray do begin
+            TempNPEmailDomain.Init();
+            TempNPEmailDomain.FromJson(DomainToken);
+            TempNPEmailDomain.Insert();
+        end;
+    end;
+
     internal procedure VerifyDomain(var NPEmailAccountDomain: Record "NPR NP Email Domain")
     var
         APIClient: Codeunit "NPR SendGrid API Client";
