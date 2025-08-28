@@ -35,6 +35,11 @@
                     ToolTip = 'Specifies the value of the TSS ID on Fiskaly';
                     ApplicationArea = NPRDEFiscal;
                 }
+                field("TSS Serial Number"; Rec."TSS Serial Number")
+                {
+                    ToolTip = 'Specifies the value of the TSS Serial Number on Fiskaly';
+                    ApplicationArea = NPRDEFiscal;
+                }
                 field("Client ID"; Rec."Client ID")
                 {
                     ToolTip = 'Specifies the value of the Client ID on Fiskaly';

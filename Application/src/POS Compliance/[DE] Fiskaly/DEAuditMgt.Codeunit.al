@@ -302,6 +302,9 @@
         if DETSS.GetBySystemId(DeAuditAux."TSS ID") then
             DeAuditAux."TSS Code" := DETSS.Code;
 
+        ResponseJson.SelectToken('tss_serial_number', Token);
+        DeAuditAux."TSS Serial Number" := CopyStr(Token.AsValue().AsText(), 1, MaxStrLen(DeAuditAux."TSS Serial Number"));
+
         ResponseJson.SelectToken('client_id', Token);
         DeAuditAux.Validate("Client ID", Token.AsValue().AsText());
 

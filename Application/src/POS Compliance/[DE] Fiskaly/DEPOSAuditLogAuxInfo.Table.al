@@ -38,6 +38,11 @@
             Caption = 'TSS ID';
             DataClassification = CustomerContent;
         }
+        field(35; "TSS Serial Number"; Text[100])
+        {
+            Caption = 'TSS Serial Number';
+            DataClassification = CustomerContent;
+        }
         field(40; "Client ID"; Guid)
         {
             Caption = 'Client ID';
