@@ -104,39 +104,6 @@ codeunit 6248263 "NPR SendGrid API Client"
 
     /**
      * SendGrid documentation:
-     * https://www.twilio.com/docs/sendgrid/api-reference/sender-identities-api/get-all-sender-identities#operation-overview
-     */
-    internal procedure CreateSenderIdentity(AccountId: Integer; Identity: JsonObject): JsonObject
-    var
-        Client: HttpClient;
-        Content: HttpContent;
-        ContentHeaders: HttpHeaders;
-        RequestTxt: Text;
-        ResponseMsg: HttpResponseMessage;
-        ResponseTxt: Text;
-        JObject: JsonObject;
-        FailedToCreateSenderErr: Label 'Failed to create sender identity.\Status code: %1\Body: %2', Comment = '%1 = http status code, %2 = response body';
-    begin
-        Client := GenerateClient(AccountId);
-
-        Identity.WriteTo(RequestTxt);
-        Content.WriteFrom(RequestTxt);
-        Content.GetHeaders(ContentHeaders);
-
-        SetHeader(ContentHeaders, 'Content-Type', 'application/json');
-
-        Client.Post('/v3/senders', Content, ResponseMsg);
-        ResponseMsg.Content.ReadAs(ResponseTxt);
-
-        if (not ResponseMsg.IsSuccessStatusCode()) then
-            Error(FailedToCreateSenderErr, ResponseMsg.HttpStatusCode(), ResponseTxt);
-
-        JObject.ReadFrom(ResponseTxt);
-        exit(JObject);
-    end;
-
-    /**
-     * SendGrid documentation:
      * https://www.twilio.com/docs/sendgrid/api-reference/domain-authentication/authenticate-a-domain
      */
     internal procedure CreateDomain(AccountId: Integer; DomainRequest: JsonObject): JsonObject

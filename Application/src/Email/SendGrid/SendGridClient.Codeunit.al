@@ -134,16 +134,6 @@ codeunit 6248264 "NPR SendGrid Client"
                 SenderIdentity.UpdateFromIdentities(TempSenderIdentity);
             until NPEmailAccount.Next() = 0;
     end;
-
-    internal procedure CreateSenderIdentity(AccountId: Integer; var Identity: Record "NPR SendGrid Sender Identity")
-    var
-        APIClient: Codeunit "NPR SendGrid API Client";
-        JObject: JsonObject;
-    begin
-        JObject := APIClient.CreateSenderIdentity(AccountId, Identity.ToRequestJson());
-        Identity.FromJson(AccountId, JObject.AsToken());
-        Identity.Insert();
-    end;
     #endregion
 
     #region Subuser
