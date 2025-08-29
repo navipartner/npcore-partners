@@ -10417,6 +10417,12 @@ End Function
         <Field Name="ClosingDate_">
           <DataField>ClosingDate_</DataField>
         </Field>
+        <Field Name="FiscalNo">
+          <DataField>FiscalNo</DataField>
+        </Field>
+        <Field Name="FiscalNolbl_">
+          <DataField>FiscalNolbl_</DataField>
+        </Field>
         <Field Name="UserFullName_">
           <DataField>UserFullName_</DataField>
         </Field>

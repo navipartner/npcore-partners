@@ -156,6 +156,8 @@
             column(StartingTime_; POSEntry."Starting Time") { }
             column(EndingTime_; POSEntry."Ending Time") { }
             column(ClosingDate_; POSEntry."Entry Date") { }
+            column(FiscalNo; POSEntry."Fiscal No.") { }
+            column(FiscalNolbl_; POSEntry.FieldCaption("Fiscal No.")) { }
             column(UserFullName_; User."Full Name") { }
             column(SalespersonName_; Salesperson.Name) { }
             column(StoreLbl_; StoreLbl) { }
@@ -344,6 +346,14 @@
                 if Salesperson.Get(POSEntry."Salesperson Code") then;
                 IF User.GET(USERSECURITYID()) THEN;
 
+                if FiscalNoFilter <> '' then begin
+                    POSEntry.SetRange("Fiscal No.", FiscalNoFilter);
+                    if POSEntry.IsEmpty() then
+                        CurrReport.Skip()
+                    else
+                        POSEntry.FindFirst();
+                end;
+
                 VarBalancedBy := '';
                 VarBalancedBy := BalancedByLbl + ' ' + Salesperson.Name + ' ' + WithLbl;
 
@@ -452,6 +462,17 @@
                         ApplicationArea = NPRRetail;
                     }
                 }
+                group(FilterOptions)
+                {
+                    Caption = 'Filter Options';
+
+                    field("Fiscal No. Filter"; FiscalNoFilter)
+                    {
+                        Caption = 'Fiscal No.';
+                        ToolTip = 'Specifies the value of the Fiscal No. filter field';
+                        ApplicationArea = NPRRetail;
+                    }
+                }
             }
         }
     }
@@ -551,4 +572,5 @@
         OtherPaymentslbl: Label 'Other Payments (LCY)';
         ifCountingDenominExists: Boolean;
         CountedAmountInclFloatlbl_: Label 'Counted Amount Incl. Float';
+        FiscalNoFilter: Text;
 }
