@@ -9,21 +9,14 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
     internal procedure GetMembershipPoints(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         Membership: Record "NPR MM Membership";
-        MembershipSetup: Record "NPR MM Membership Setup";
-        LoyaltySetup: Record "NPR MM Loyalty Setup";
         MembershipApiAgent: Codeunit "NPR MembershipApiAgent";
         PointsValue: Decimal;
     begin
         if (not MembershipApiAgent.GetMembershipById(Request, 2, Membership)) then
             exit(Response.RespondBadRequest('Invalid Membership - Membership Id not valid.'));
         Membership.CalcFields("Remaining Points");
-        MembershipSetup.SetLoadFields("Loyalty Code");
-        MembershipSetup.Get(Membership."Membership Code");
-        LoyaltySetup.SetLoadFields("Point Rate");
-        LoyaltySetup.Get(MembershipSetup."Loyalty Code");
-        PointsValue := Membership."Remaining Points" * LoyaltySetup."Point Rate";
+        PointsValue := Membership."Remaining Points" * LoyaltyBurnRate(Membership.SystemId);
         Response.RespondOK(PointBalance(Membership."Remaining Points", PointsValue));
-
     end;
 
     internal procedure CreateReservationTransaction(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
@@ -36,7 +29,7 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
         if (not MembershipApiAgent.GetMembershipById(Request, 2, Membership)) then
             exit(Response.RespondBadRequest('Invalid Membership - Membership Id not valid.'));
 
-        ValidateReservePointsRequest(Request, TempAuthorization, TempRegSalesBuffer);
+        ValidateReservePointsRequest(Membership.SystemId, Request, TempAuthorization, TempRegSalesBuffer);
         TempAuthorization.Modify(false);
         exit(ProcessReservePointsRequest(Membership.SystemId, TempAuthorization, TempRegSalesBuffer));
     end;
@@ -85,7 +78,7 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
         if (not MembershipApiAgent.GetMembershipById(Request, 2, Membership)) then
             exit(Response.RespondBadRequest('Invalid Membership - Membership Id not valid.'));
 
-        ValidateRegisterSaleRequest(Request, TempAuthorization, TempSaleLineBuffer, TempPaymentLineBuffer);
+        ValidateRegisterSaleRequest(Membership.SystemId, Request, TempAuthorization, TempSaleLineBuffer, TempPaymentLineBuffer);
         TempAuthorization.Modify(false);
         exit(ProcessRegisterSaleRequest(Membership.SystemId, TempAuthorization, TempSaleLineBuffer, TempPaymentLineBuffer));
     end;
@@ -136,7 +129,7 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
         exit(JsonBuilder);
     end;
 
-    local procedure ValidateReservePointsRequest(var Request: Codeunit "NPR API Request"; var TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TempRegSalesBuffer: Record "NPR MM Reg. Sales Buffer" temporary)
+    local procedure ValidateReservePointsRequest(MembershipSystemId: Guid; var Request: Codeunit "NPR API Request"; var TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TempRegSalesBuffer: Record "NPR MM Reg. Sales Buffer" temporary)
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
         JsonHelper: Codeunit "NPR Json Helper";
@@ -176,6 +169,8 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
             TempRegSalesBuffer.Type := TempRegSalesBuffer.Type::REFUND;
             TempRegSalesBuffer."Total Points" := -TempRegSalesBuffer."Total Points";
         end;
+        TempRegSalesBuffer."Total Amount" := TempRegSalesBuffer."Total Points" * LoyaltyBurnRate(MembershipSystemId);
+
         GeneralLedgerSetup.SetLoadFields("LCY Code");
         GeneralLedgerSetup.Get();
         TempRegSalesBuffer."Currency Code" := GeneralLedgerSetup."LCY Code";
@@ -183,7 +178,7 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
 
     end;
 
-    local procedure ValidateRegisterSaleRequest(var Request: Codeunit "NPR API Request"; var TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TempSaleLineBuffer: Record "NPR MM Reg. Sales Buffer" temporary; var TempPaymentLineBuffer: Record "NPR MM Reg. Sales Buffer" temporary)
+    local procedure ValidateRegisterSaleRequest(MembershipSystemId: Guid; var Request: Codeunit "NPR API Request"; var TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TempSaleLineBuffer: Record "NPR MM Reg. Sales Buffer" temporary; var TempPaymentLineBuffer: Record "NPR MM Reg. Sales Buffer" temporary)
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
         ReservationLedgerEntry: Record "NPR MM Loy. LedgerEntry (Srvr)";
@@ -241,10 +236,14 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
                 TempPaymentLineBuffer."Authorization Code" := CopyStr(AuthorizationCode, 1, MaxStrLen(TempPaymentLineBuffer."Authorization Code"));
                 TempPaymentLineBuffer."Currency Code" := GeneralLedgerSetup."LCY Code";
                 TempPaymentLineBuffer."Total Points" := -ReservationLedgerEntry."Burned Points";
-                if TempPaymentLineBuffer."Total Points" >= 0 then
-                    TempPaymentLineBuffer.Type := TempPaymentLineBuffer.Type::PAYMENT
+                if TempSaleLineBuffer.IsEmpty then
+                    TempPaymentLineBuffer.Type := TempPaymentLineBuffer.Type::CAPTURE
                 else
-                    TempPaymentLineBuffer.Type := TempPaymentLineBuffer.Type::REFUND;
+                    if TempPaymentLineBuffer."Total Points" >= 0 then
+                        TempPaymentLineBuffer.Type := TempPaymentLineBuffer.Type::PAYMENT
+                    else
+                        TempPaymentLineBuffer.Type := TempPaymentLineBuffer.Type::REFUND;
+                TempPaymentLineBuffer."Total Amount" := TempPaymentLineBuffer."Total Points" * LoyaltyBurnRate(MembershipSystemId);
                 TempPaymentLineBuffer.Insert();
             end;
 
@@ -256,8 +255,13 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
         LoyaltyPointsMgrServer: Codeunit "NPR MM Loy. Point Mgr (Server)";
         ResponseMessage: Text;
         ResponseMessageId: Text;
+        Success: Boolean;
     begin
-        if (LoyaltyPointsMgrServer.RegisterSales(TempAuthorization, TempSalesLineBuffer, TempPaymentLineBuffer, TempPointsResponse, ResponseMessage, ResponseMessageId, MembershipSystemId, 1)) then
+        if TempSalesLineBuffer.IsEmpty then
+            Success := LoyaltyPointsMgrServer.CaptureReservation(TempAuthorization, TempPaymentLineBuffer, TempPointsResponse, ResponseMessage, ResponseMessageId, MembershipSystemId, 1)
+        else
+            Success := LoyaltyPointsMgrServer.RegisterSales(TempAuthorization, TempSalesLineBuffer, TempPaymentLineBuffer, TempPointsResponse, ResponseMessage, ResponseMessageId, MembershipSystemId, 1);
+        if Success then
             exit(Response.RespondOK(RegisterSaleResponse(TempPointsResponse."Earned Points", -TempPointsResponse."Burned Points", TempPointsResponse.Balance)))
         else
             exit(Response.RespondBadRequest(StrSubstNo('%1 %2', ResponseMessageId, ResponseMessage)));
@@ -309,6 +313,25 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
             .AddProperty('newBalance', Balance)
             .EndObject();
         exit(JsonBuilder);
+    end;
+
+    local procedure LoyaltyBurnRate(MembershipSystemId: Guid): Decimal
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        LoyaltySetup: Record "NPR MM Loyalty Setup";
+
+    begin
+        Membership.SetLoadFields("Membership Code");
+        if not Membership.GetBySystemId(MembershipSystemId) then
+            exit(0);
+        MembershipSetup.SetLoadFields("Loyalty Code");
+        if not MembershipSetup.Get(Membership."Membership Code") then
+            exit(0);
+        LoyaltySetup.SetLoadFields("Point Rate");
+        if not LoyaltySetup.Get(MembershipSetup."Loyalty Code") then
+            exit(0);
+        exit(LoyaltySetup."Point Rate");
     end;
 
 }

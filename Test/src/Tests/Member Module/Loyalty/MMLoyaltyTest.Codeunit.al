@@ -642,6 +642,341 @@ codeunit 85107 "NPR MM Loyalty Test"
 
     end;
 
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RemoteMaster_AsYouGo_Rest_GetPointBalance()
+    var
+        TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        TempSalesLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempPaymentLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
+        PointsEntry: Record "NPR MM Members. Points Entry";
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        JsonHelper: Codeunit "NPR Json Helper";
+        QueryParameters: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        Response: JsonObject;
+        Body: JsonObject;
+        Points: Integer;
+        ErrorResponse: Text;
+    begin
+        SetScenario_100(TempAuthorization, TempSalesLinesRequest, TempPaymentLinesRequest);
+        LibraryNPRetailAPI.CreateAPIPermission(UserSecurityId(), CompanyName(), 'NPR API Membership');
+        PointsEntry.Init();
+        PointsEntry."Entry Type" := PointsEntry."Entry Type"::SYNCHRONIZATION;
+        PointsEntry."Membership Entry No." := _LastMembership."Entry No.";
+        PointsEntry.Points := Random(1000) + 1;
+        PointsEntry."Awarded Points" := PointsEntry.Points;
+        PointsEntry.Insert(false);
+
+        Headers.Add('x-api-version', Format(Today, 0, 9));
+        Response := LibraryNPRetailAPI.CallApi('GET', StrSubstNo('membership/%1/points', Format(_LastMembership.SystemId, 0, 4)), Body, QueryParameters, Headers);
+        Body := LibraryNPRetailAPI.GetResponseBody(Response);
+        if not LibraryNPRetailAPI.IsSuccessStatusCode(Response) then begin
+            Body.WriteTo(ErrorResponse);
+            Error('Api call failed. Response: %1', ErrorResponse);
+        end;
+        _LastMembership.CalcFields("Remaining Points");
+        Points := JsonHelper.GetJInteger(Body.AsToken(), 'balance', true);
+        _Assert.AreEqual(_LastMembership."Remaining Points", Points, StrsubstNo('Get Point Balance API call returned unexpected value. Received %1 expected %2.', Points, _LastMembership."Remaining Points"));
+    end;
+#endif
+
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RemoteMaster_AsYouGo_Rest_Earn()
+    var
+        TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        TempSalesLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempPaymentLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        JsonHelper: Codeunit "NPR Json Helper";
+        QueryParameters: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        Response: JsonObject;
+        Body: JsonObject;
+        ResponseBody: JsonObject;
+        Points, PointsEarned : Integer;
+        ErrorResponse: Text;
+        TransactionId: Guid;
+    begin
+        SetScenario_100(TempAuthorization, TempSalesLinesRequest, TempPaymentLinesRequest);
+        LibraryNPRetailAPI.CreateAPIPermission(UserSecurityId(), CompanyName(), 'NPR API Membership');
+        TransactionId := CreateGuid();
+        Body := AuthorizationToJObject(TempAuthorization, TransactionId);
+        Body.Add('items', SalesLinesToJArray(TempSalesLinesRequest));
+        Headers.Add('x-api-version', Format(Today, 0, 9));
+        Response := LibraryNPRetailAPI.CallApi('POST', StrSubstNo('membership/%1/points', Format(_LastMembership.SystemId, 0, 4)), Body, QueryParameters, Headers);
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+        if not LibraryNPRetailAPI.IsSuccessStatusCode(Response) then begin
+            ResponseBody.WriteTo(ErrorResponse);
+            Error('Api call failed. Response: %1', ErrorResponse);
+        end;
+        _LastMembership.CalcFields("Remaining Points");
+        TempSalesLinesRequest.CalcSums("Total Points");
+        Points := TempSalesLinesRequest."Total Points";
+        _Assert.AreEqual(_LastMembership."Remaining Points", Points, StrsubstNo('POST Points didn''t add the requested points. Found points balance: %1 expected: %2.', _LastMembership."Remaining Points", Points));
+        PointsEarned := JsonHelper.GetJInteger(ResponseBody.AsToken(), 'pointsEarned', true);
+        _Assert.AreEqual(_LastMembership."Remaining Points", PointsEarned, StrsubstNo('POST Points returned unexpected value for pointsEarned. Received %1 expected %2.', PointsEarned, Points));
+
+        // Test that we can't earn points for same sale twice
+        Response := LibraryNPRetailAPI.CallApi('POST', StrSubstNo('membership/%1/points', Format(_LastMembership.SystemId, 0, 4)), Body, QueryParameters, Headers);
+        ResponseBody := LibraryNPRetailAPI.GetResponseBody(Response);
+        if LibraryNPRetailAPI.IsSuccessStatusCode(Response) then begin
+            ResponseBody.WriteTo(ErrorResponse);
+            Error('2nd points assignment with same requestId was successful - expected an error. Response: %1', ErrorResponse);
+        end;
+
+    end;
+#endif
+
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RemoteMaster_AsYouGo_Rest_ReserveCapture()
+    var
+        TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        TempSalesLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempPaymentLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
+        PointsEntry: Record "NPR MM Members. Points Entry";
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        JsonHelper: Codeunit "NPR Json Helper";
+        QueryParameters: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        Response: JsonObject;
+        Body: JsonObject;
+        PointsBalance: Integer;
+        TranssctionID: Guid;
+        ResponseText: Text;
+        AuthorizationCodes: List of [Text];
+    begin
+        SetScenario_100(TempAuthorization, TempSalesLinesRequest, TempPaymentLinesRequest);
+        LibraryNPRetailAPI.CreateAPIPermission(UserSecurityId(), CompanyName(), 'NPR API Membership');
+
+        // Reserve more points than available - expects an error
+        _LastMembership.CalcFields("Remaining Points");
+        Body := AuthorizationToJObject(TempAuthorization, CreateGuid());
+        Body.Add('pointsToReserve', _LastMembership."Remaining Points" + 10);
+        Body.Add('type', 'WITHDRAW');
+
+        Headers.Add('x-api-version', Format(Today, 0, 9));
+        Response := LibraryNPRetailAPI.CallApi('POST', StrSubstNo('membership/%1/points/reserve', Format(_LastMembership.SystemId, 0, 4)), Body, QueryParameters, Headers);
+        Body := LibraryNPRetailAPI.GetResponseBody(Response);
+        if LibraryNPRetailAPI.IsSuccessStatusCode(Response) then begin
+            Body.WriteTo(ResponseText);
+            Error('Reserve too many points was successful. Response: %1', ResponseText);
+        end;
+
+        //Add points to membership to be able to reserve
+        PointsEntry.Init();
+        PointsEntry."Entry No." := 0;
+        PointsEntry."Entry Type" := PointsEntry."Entry Type"::SYNCHRONIZATION;
+        PointsEntry."Membership Entry No." := _LastMembership."Entry No.";
+        PointsEntry.Points := Random(1000) + 10;
+        PointsEntry."Awarded Points" := PointsEntry.Points;
+        PointsEntry.Insert(false);
+
+        _LastMembership.CalcFields("Remaining Points");
+        TranssctionID := CreateGuid();
+        Body := AuthorizationToJObject(TempAuthorization, TranssctionID);
+        Body.Add('pointsToReserve', _LastMembership."Remaining Points");
+        Body.Add('type', 'WITHDRAW');
+        Body.Add('reason', 'test RemoteMaster_AsYouGo_Rest_ReserveCapture');
+
+        Response := LibraryNPRetailAPI.CallApi('POST', StrSubstNo('membership/%1/points/reserve', Format(_LastMembership.SystemId, 0, 4)), Body, QueryParameters, Headers);
+        Body := LibraryNPRetailAPI.GetResponseBody(Response);
+        if not LibraryNPRetailAPI.IsSuccessStatusCode(Response) then begin
+            Body.WriteTo(ResponseText);
+            Error('Reserve api call failed. Response: %1', ResponseText);
+        end;
+        AuthorizationCodes.Add(JsonHelper.GetJText(Body.AsToken(), 'authorizationCode', true));
+
+        _LastMembership.CalcFields("Remaining Points");
+        _Assert.AreEqual(_LastMembership."Remaining Points", 0, StrsubstNo('POST Reserve Points didn''t reserve the expected points. Found points balance: %1 expected: 0', _LastMembership."Remaining Points"));
+
+
+        // Second reserve with the same transaction ID - expects an error
+        //Add points to membership to be able to reserve.  Don't want error for not enough points
+        PointsEntry.Init();
+        PointsEntry."Entry No." := 0;
+        PointsEntry."Entry Type" := PointsEntry."Entry Type"::SYNCHRONIZATION;
+        PointsEntry."Membership Entry No." := _LastMembership."Entry No.";
+        PointsEntry.Points := Random(1000) + 10;
+        PointsEntry."Awarded Points" := PointsEntry.Points;
+        PointsEntry.Insert(false);
+
+        Body := AuthorizationToJObject(TempAuthorization, TranssctionID);
+        Body.Add('pointsToReserve', _LastMembership."Remaining Points");
+        Body.Add('type', 'WITHDRAW');
+        Body.Add('reason', 'test RemoteMaster_AsYouGo_Rest_ReserveCapture');
+
+        Response := LibraryNPRetailAPI.CallApi('POST', StrSubstNo('membership/%1/points/reserve', Format(_LastMembership.SystemId, 0, 4)), Body, QueryParameters, Headers);
+        Body := LibraryNPRetailAPI.GetResponseBody(Response);
+        if LibraryNPRetailAPI.IsSuccessStatusCode(Response) then begin
+            Body.WriteTo(ResponseText);
+            Error('Second Reservation api call with same requestId was successful. Response: %1', ResponseText);
+        end;
+
+        // Capture reservation
+        _LastMembership.CalcFields("Remaining Points");
+        PointsBalance := _lastMembership."Remaining Points";
+        Body := AuthorizationToJObject(TempAuthorization, CreateGuid());
+        Body.Add('reservations', MakeReservationJArray(AuthorizationCodes));
+        Response := LibraryNPRetailAPI.CallApi('POST', StrSubstNo('membership/%1/points', Format(_LastMembership.SystemId, 0, 4)), Body, QueryParameters, Headers);
+        Body := LibraryNPRetailAPI.GetResponseBody(Response);
+        if not LibraryNPRetailAPI.IsSuccessStatusCode(Response) then begin
+            Body.WriteTo(ResponseText);
+            Error('Finalize reservation call failed. Response: %1', ResponseText);
+        end;
+        _LastMembership.CalcFields("Remaining Points");
+        _Assert.AreEqual(PointsBalance, _LastMembership."Remaining Points", StrsubstNo('POST Finalize Reservation Points changed the points balance. Found points balance: %1 expected: %2', _LastMembership."Remaining Points", PointsBalance));
+    end;
+#endif
+
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RemoteMaster_AsYouGo_Rest_ReserveCancel()
+    var
+        TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        TempSalesLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempPaymentLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
+        PointsEntry: Record "NPR MM Members. Points Entry";
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        JsonHelper: Codeunit "NPR Json Helper";
+        QueryParameters: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        Response: JsonObject;
+        Body: JsonObject;
+        Points: Integer;
+        ResponseText: Text;
+        AuthorizationCode: Text;
+    begin
+        SetScenario_100(TempAuthorization, TempSalesLinesRequest, TempPaymentLinesRequest);
+        LibraryNPRetailAPI.CreateAPIPermission(UserSecurityId(), CompanyName(), 'NPR API Membership');
+
+        // Cancel reservation that does not exist - expects an error
+        Body.Add('authorizationCode', Format(CreateGuid(), 0, 3));
+
+        Headers.Add('x-api-version', Format(Today, 0, 9));
+        Response := LibraryNPRetailAPI.CallApi('DELETE', StrSubstNo('membership/%1/points/reserve', Format(_LastMembership.SystemId, 0, 4)), Body, QueryParameters, Headers);
+        Body := LibraryNPRetailAPI.GetResponseBody(Response);
+        if LibraryNPRetailAPI.IsSuccessStatusCode(Response) then begin
+            Body.WriteTo(ResponseText);
+            Error('Cancel non-existing reservation was successful. Response: %1', ResponseText);
+        end;
+
+        //Add points to membership to be able to reserve
+        PointsEntry.Init();
+        PointsEntry."Entry Type" := PointsEntry."Entry Type"::SYNCHRONIZATION;
+        PointsEntry."Membership Entry No." := _LastMembership."Entry No.";
+        PointsEntry.Points := Random(1000) + 10;
+        PointsEntry."Awarded Points" := PointsEntry.Points;
+        PointsEntry.Insert(false);
+
+        _LastMembership.CalcFields("Remaining Points");
+        Points := _LastMembership."Remaining Points";
+        Body := AuthorizationToJObject(TempAuthorization, CreateGuid());
+        Body.Add('pointsToReserve', Points);
+        Body.Add('type', 'WITHDRAW');
+        Body.Add('reason', 'test RemoteMaster_AsYouGo_Rest_ReserveCancel');
+
+        Response := LibraryNPRetailAPI.CallApi('POST', StrSubstNo('membership/%1/points/reserve', Format(_LastMembership.SystemId, 0, 4)), Body, QueryParameters, Headers);
+        if not LibraryNPRetailAPI.IsSuccessStatusCode(Response) then
+            Error('POST points/reserve api call failed.');
+        _LastMembership.CalcFields("Remaining Points");
+        _Assert.AreEqual(_LastMembership."Remaining Points", 0, StrsubstNo('POST Reserve Points didn''t reserve the expected points. Found points balance: %1 expected: 0', _LastMembership."Remaining Points"));
+
+        Body := LibraryNPRetailAPI.GetResponseBody(Response);
+        AuthorizationCode := JsonHelper.GetJText(Body.AsToken(), 'authorizationCode', true);
+        Clear(Body);
+        Body.Add('authorizationCode', AuthorizationCode);
+
+        Response := LibraryNPRetailAPI.CallApi('DELETE', StrSubstNo('membership/%1/points/reserve', Format(_LastMembership.SystemId, 0, 4)), Body, QueryParameters, Headers);
+        Body := LibraryNPRetailAPI.GetResponseBody(Response);
+        if not LibraryNPRetailAPI.IsSuccessStatusCode(Response) then begin
+            Body.WriteTo(ResponseText);
+            Error('DELETE points/reserve api call failed. Response: %1', ResponseText);
+        end;
+
+        _LastMembership.CalcFields("Remaining Points");
+        _Assert.AreEqual(_LastMembership."Remaining Points", Points, StrsubstNo('DELETE Reserve Points didn''t restore the points balance. Found points balance: %1 expected: %2', _LastMembership."Remaining Points", Points));
+
+    end;
+#endif
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure RemoteMaster_AsYouGo_Rest_EarnAndBurn()
+    var
+        TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary;
+        TempSalesLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
+        TempPaymentLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary;
+        PointsEntry: Record "NPR MM Members. Points Entry";
+        JsonHelper: Codeunit "NPR Json Helper";
+        LibraryNPRetailAPI: Codeunit "NPR Library - NPRetail API";
+        QueryParameters: Dictionary of [Text, Text];
+        Headers: Dictionary of [Text, Text];
+        Response: JsonObject;
+        Body: JsonObject;
+        ReservedPoints: Integer;
+        ResponseText: Text;
+        AuthorizationCodes: List of [Text];
+    begin
+        _LoyaltySetup.Get(SetScenario_100(TempAuthorization, TempSalesLinesRequest, TempPaymentLinesRequest));
+        LibraryNPRetailAPI.CreateAPIPermission(UserSecurityId(), CompanyName(), 'NPR API Membership');
+        _IsMembershipInitialized := true;
+
+        //Add points to membership to be able to reserve
+        PointsEntry.Init();
+        PointsEntry."Entry Type" := PointsEntry."Entry Type"::SYNCHRONIZATION;
+        PointsEntry."Membership Entry No." := _LastMembership."Entry No.";
+        PointsEntry.Points := 100;
+        PointsEntry."Awarded Points" := PointsEntry.Points;
+        PointsEntry.Insert(false);
+
+        //Reserve all points
+        _LastMembership.CalcFields("Remaining Points");
+        ReservedPoints := _LastMembership."Remaining Points";
+        Body := AuthorizationToJObject(TempAuthorization, CreateGuid());
+        Body.Add('pointsToReserve', ReservedPoints);
+        Body.Add('type', 'WITHDRAW');
+        Body.Add('reason', 'test RemoteMaster_AsYouGo_Rest_ReserveCancel');
+
+        Headers.Add('x-api-version', Format(Today, 0, 9));
+        Response := LibraryNPRetailAPI.CallApi('POST', StrSubstNo('membership/%1/points/reserve', Format(_LastMembership.SystemId, 0, 4)), Body, QueryParameters, Headers);
+        if not LibraryNPRetailAPI.IsSuccessStatusCode(Response) then
+            Error('POST reserve api call failed.');
+        _LastMembership.CalcFields("Remaining Points");
+        _Assert.AreEqual(_LastMembership."Remaining Points", 0, StrsubstNo('POST Reserve Points didn''t reserve the expected points. Found points balance: %1 expected: %2', _LastMembership."Remaining Points", 0));
+
+        Body := LibraryNPRetailAPI.GetResponseBody(Response);
+        AuthorizationCodes.Add(JsonHelper.GetJText(Body.AsToken(), 'authorizationCode', true));
+
+        Clear(Body);
+
+        // Make sale fully paied by points
+        Body := AuthorizationToJObject(TempAuthorization, CreateGuid());
+        TempSalesLinesRequest.FindFirst();
+        TempSalesLinesRequest.Quantity := 1;
+        TempSalesLinesRequest."Total Amount" := Round(ReservedPoints * _LoyaltySetup."Point Rate", 0.01);
+        TempSalesLinesRequest."Total Points" := CalculateEarnPointsFromAmount(TempSalesLinesRequest."Total Amount", _LoyaltySetup."Amount Factor", TempSalesLinesRequest.Quantity);
+        TempSalesLinesRequest.Modify(false);
+
+        Body.Add('items', SalesLinesToJArray(TempSalesLinesRequest));
+        Body.Add('reservations', MakeReservationJArray(AuthorizationCodes));
+
+        Response := LibraryNPRetailAPI.CallApi('POST', StrSubstNo('membership/%1/points', Format(_LastMembership.SystemId, 0, 4)), Body, QueryParameters, Headers);
+        Body := LibraryNPRetailAPI.GetResponseBody(Response);
+        if not LibraryNPRetailAPI.IsSuccessStatusCode(Response) then begin
+            Body.WriteTo(ResponseText);
+            Error('POST points api call failed. Response: %1', ResponseText);
+        end;
+        _LastMembership.CalcFields("Remaining Points");
+        _Assert.AreEqual(_LastMembership."Remaining Points", 0, StrsubstNo('POST Earn and Burn Points didn''t burn the expected points. Found points balance: %1 expected: %2', _LastMembership."Remaining Points", 0));
+    end;
+#endif
 
     local procedure InitializeSales()
     var
@@ -802,6 +1137,53 @@ codeunit 85107 "NPR MM Loyalty Test"
     end;
 
 
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    local procedure AuthorizationToJObject(TempAuthorization: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; TransactionId: Guid): JsonObject
+    var
+        Body: JsonObject;
+    begin
+        Body.Add('requestId', TransactionId);
+        Body.Add('externalReferenceNo', TempAuthorization."Reference Number");
+        Body.Add('externalSystemIdentifier', TempAuthorization."POS Store Code");
+        Body.Add('externalSystemUserIdentifier', TempAuthorization."POS Unit Code");
+        Body.Add('externalBusinessUnitIdentifier', TempAuthorization."Company Name");
+        exit(Body);
+    end;
+#endif
+
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    local procedure SalesLinesToJArray(var TempSalesLinesRequest: Record "NPR MM Reg. Sales Buffer" temporary) items: JsonArray
+    var
+        JObject: JsonObject;
+    begin
+        if TempSalesLinesRequest.FindSet() then
+            repeat
+                JObject.Add('itemCode', TempSalesLinesRequest."Item No.");
+                JObject.Add('pointsEarned', TempSalesLinesRequest."Total Points");
+                JObject.Add('variantCode', TempSalesLinesRequest."Variant Code");
+                JObject.Add('quantity', TempSalesLinesRequest.Quantity);
+                JObject.Add('description', TempSalesLinesRequest.Description);
+                JObject.Add('amountInclVAT', Format(TempSalesLinesRequest."Total Amount", 0, 9));
+                items.Add(JObject);
+            until TempSalesLinesRequest.Next() = 0;
+    end;
+#endif
+
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    local procedure MakeReservationJArray(AuthorizationCodes: List of [Text]): JsonArray
+    var
+        Reservations: JsonArray;
+        JObject: JsonObject;
+        AuthorizationCode: Text;
+    begin
+        foreach AuthorizationCode in AuthorizationCodes do begin
+            Clear(JObject);
+            JObject.Add('authorizationCode', AuthorizationCode);
+            Reservations.Add(JObject);
+        end;
+        exit(Reservations);
+    end;
+#endif
 
     [ConfirmHandler]
     procedure ConfirmYesHandler(Question: Text[1024]; var Reply: Boolean)

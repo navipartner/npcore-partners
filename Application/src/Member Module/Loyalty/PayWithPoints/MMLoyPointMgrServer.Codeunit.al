@@ -251,6 +251,11 @@
     end;
 
     procedure CaptureReservation(var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpCaptureLinesIn: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPointsOut: Record "NPR MM Loy. LedgerEntry (Srvr)"; var ResponseMessage: Text; var ResponseMessageId: Text): Boolean
+    begin
+        exit(CaptureReservation(TmpAuthorizationIn, TmpCaptureLinesIn, TmpPointsOut, ResponseMessage, ResponseMessageId, NullGuid(), 0));
+    end;
+
+    procedure CaptureReservation(var TmpAuthorizationIn: Record "NPR MM Loy. LedgerEntry (Srvr)" temporary; var TmpCaptureLinesIn: Record "NPR MM Reg. Sales Buffer" temporary; var TmpPointsOut: Record "NPR MM Loy. LedgerEntry (Srvr)"; var ResponseMessage: Text; var ResponseMessageId: Text; MembershipSystemId: Guid; TestUniqnessOn: Option REFERENCENO,TRANSACTIONID): Boolean
     var
         LoyaltyStoreLedger: Record "NPR MM Loy. LedgerEntry (Srvr)";
         ReservationLedgerEntry: Record "NPR MM Loy. LedgerEntry (Srvr)";
@@ -259,7 +264,7 @@
         MembershipEntryNo: Integer;
     begin
 
-        if (not ValidateAuthorization(true, TmpAuthorizationIn, MembershipEntryNo, ResponseMessage, ResponseMessageId, NullGuid(), 0)) then
+        if (not ValidateAuthorization(true, TmpAuthorizationIn, MembershipEntryNo, ResponseMessage, ResponseMessageId, MembershipSystemId, TestUniqnessOn)) then
             exit(false);
 
         TmpCaptureLinesIn.Reset();
