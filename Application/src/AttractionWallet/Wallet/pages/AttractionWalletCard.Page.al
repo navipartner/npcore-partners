@@ -27,10 +27,26 @@ page 6185090 "NPR AttractionWalletCard"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Description field.';
                 }
-                field(OriginatesFromItemNo; Rec.OriginatesFromItemNo)
+                group(SourceItem)
                 {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Originates From Item No. field.';
+                    Caption = 'Originates From';
+                    field(OriginatesFromItemNo; Rec.OriginatesFromItemNo)
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Originates From Item No. field.';
+                        Caption = 'Item No.';
+                        trigger OnValidate()
+                        begin
+                            CurrPage.Update(false);
+                        end;
+                    }
+                    field(OriginatesFromItemDesc; _OriginatesFromItemDesc)
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Originates From Item Description field.';
+                        Editable = false;
+                        Caption = 'Item Description';
+                    }
                 }
                 field(PrintCount; Rec.PrintCount)
                 {
@@ -123,10 +139,13 @@ page 6185090 "NPR AttractionWalletCard"
         }
     }
 
+    var
+        _OriginatesFromItemDesc: Text[100];
 
     trigger OnAfterGetRecord()
     var
         TempSelectedWallets: Record "NPR AttractionWallet" temporary;
+        Item: Record Item;
     begin
         TempSelectedWallets.TransferFields(Rec, true);
         TempSelectedWallets.SystemId := Rec.SystemId;
@@ -134,5 +153,15 @@ page 6185090 "NPR AttractionWalletCard"
 
         CurrPage.Assets.Page.ShowSelectedAssets(TempSelectedWallets);
         CurrPage.ExternalReferences.Page.ShowSelectedWallets(TempSelectedWallets);
+
+        _OriginatesFromItemDesc := '';
+        if (Rec.OriginatesFromItemNo <> '') then begin
+            if (Item.Get(Rec.OriginatesFromItemNo)) then
+                _OriginatesFromItemDesc := Item.Description;
+        end;
+
     end;
+
+
+
 }

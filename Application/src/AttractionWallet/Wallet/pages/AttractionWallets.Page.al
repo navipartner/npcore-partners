@@ -57,6 +57,12 @@ page 6185089 "NPR AttractionWallets"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Originates From Item No. field.';
                 }
+                field(OriginatesFromItemDesc; _OriginatesFromItemDesc)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Originates From Item Description field.';
+                    Caption = 'Originates From Item Description';
+                }
                 field(PrintCount; Rec.PrintCount)
                 {
                     ApplicationArea = NPRRetail;
@@ -194,7 +200,19 @@ page 6185089 "NPR AttractionWallets"
     }
     var
         _WalletReference: Text[50];
+        _OriginatesFromItemDesc: Text[100];
         TempSelectedWallets: Record "NPR AttractionWallet" temporary;
+
+    trigger OnAfterGetRecord()
+    var
+        Item: Record Item;
+    begin
+        _OriginatesFromItemDesc := '';
+        if (Rec.OriginatesFromItemNo <> '') then begin
+            if (Item.Get(Rec.OriginatesFromItemNo)) then
+                _OriginatesFromItemDesc := Item.Description;
+        end;
+    end;
 
     local procedure ShowSelectedWallets()
     begin
