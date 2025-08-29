@@ -100,8 +100,11 @@ page 6185077 "NPR MM SubsRequestTermination"
                         if (AlterationSetupPage.RunModal() <> Action::LookupOK) then
                             exit;
 
-                        AlterationSetupPage.GetRecord(_AlterationSetup);
-                        _RefundItemNo := _AlterationSetup."Sales Item No.";
+                        AlterationSetupPage.GetRecord(AlterationSetup);
+                        _RefundItemNo := AlterationSetup."Sales Item No.";
+
+                        // OnValidate() trigger is not triggered after a lookup.
+                        CalculateRefundPrice();
                     end;
 
                     trigger OnValidate()
@@ -134,7 +137,6 @@ page 6185077 "NPR MM SubsRequestTermination"
         _MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
         _TerminationDate: Date;
         _TerminationReason: Enum "NPR MM Subs Termination Reason";
-        _AlterationSetup: Record "NPR MM Members. Alter. Setup";
         _RefundAvailable, _RefundRemaining : Boolean;
         _RefundItemNo: Code[20];
         _RefundPrice: Decimal;
@@ -155,7 +157,7 @@ page 6185077 "NPR MM SubsRequestTermination"
         if (not SubscriptionMgtImpl.GetEarliestTerminationDate(_Membership, _TerminationDate)) then
             Clear(_TerminationDate);
 
-        CheckRefundAvailable();
+        SelectSuggestedItemNo();
 
         SubscriptionRequest.SetRange("Subscription Entry No.", _Subscription."Entry No.");
         SubscriptionRequest.SetRange(Type, SubscriptionRequest.Type::Renew);
@@ -199,22 +201,33 @@ page 6185077 "NPR MM SubsRequestTermination"
         end;
     end;
 
+    local procedure SelectSuggestedItemNo()
+    var
+        AlterationSetup: Record "NPR MM Members. Alter. Setup";
+        RefundAvailable: Boolean;
+    begin
+        AlterationSetup.SetRange("Alteration Type", AlterationSetup."Alteration Type"::CANCEL);
+        AlterationSetup.SetRange("From Membership Code", _Membership."Membership Code");
+        AlterationSetup.SetRange("Alteration Activate From", AlterationSetup."Alteration Activate From"::ASAP);
+        if (AlterationSetup.FindSet()) then
+            repeat
+                _RefundItemNo := AlterationSetup."Sales Item No.";
+                RefundAvailable := CheckRefundAvailable();
+            until (AlterationSetup.Next() = 0) or (RefundAvailable);
+
+        if (not RefundAvailable) then
+            Clear(_RefundItemNo);
+
+        _RefundAvailable := RefundAvailable;
+    end;
+
     local procedure CheckRefundAvailable() RefundAvailable: Boolean
     var
         TempMemberInfoCapture: Record "NPR MM Member Info Capture" temporary;
         StartDateNew, EndDateNew : Date;
     begin
-        _AlterationSetup.SetRange("Alteration Type", _AlterationSetup."Alteration Type"::CANCEL);
-        _AlterationSetup.SetRange("From Membership Code", _Membership."Membership Code");
-        _AlterationSetup.SetRange("Alteration Activate From", _AlterationSetup."Alteration Activate From"::ASAP);
-        if (_AlterationSetup.FindSet()) then
-            repeat
-                Clear(TempMemberInfoCapture);
-                InitMemberInfoCapture(TempMemberInfoCapture);
-                RefundAvailable := _MembershipMgt.CancelMembership(TempMemberInfoCapture, false, false, StartDateNew, EndDateNew, _RefundPrice);
-            until (_AlterationSetup.Next() = 0) or (RefundAvailable);
-        _RefundAvailable := RefundAvailable;
-        _RefundItemNo := _AlterationSetup."Sales Item No.";
+        InitMemberInfoCapture(TempMemberInfoCapture);
+        RefundAvailable := _MembershipMgt.CancelMembership(TempMemberInfoCapture, false, false, StartDateNew, EndDateNew, _RefundPrice);
     end;
 
     local procedure CalculateRefundPrice()
@@ -239,7 +252,7 @@ page 6185077 "NPR MM SubsRequestTermination"
     begin
         TempMemberInfoCapture.Init();
         TempMemberInfoCapture."Membership Entry No." := _Membership."Entry No.";
-        TempMemberInfoCapture."Item No." := _AlterationSetup."Sales Item No.";
+        TempMemberInfoCapture."Item No." := _RefundItemNo;
         TempMemberInfoCapture."Information Context" := TempMemberInfoCapture."Information Context"::CANCEL;
         TempMemberInfoCapture."Document Date" := _TerminationDate;
     end;
