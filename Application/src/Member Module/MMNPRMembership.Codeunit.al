@@ -1227,17 +1227,17 @@ codeunit 6060147 "NPR MM NPR Membership"
         '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:mem="urn:microsoft-dynamics-schemas/codeunit/member_services" xmlns:x61="urn:microsoft-dynamics-nav/xmlports/x6151185">' +
         '<soapenv:Header/>' +
         '<soapenv:Body>' +
-            '<mem:AddReplaceCard>' +
+            '<mem:AddOrReplaceCard>' +
                 '<mem:addReplaceCard>' +
                     '<x61:addreplacecard>' +
                     CreateAddReplaceCardRequest(MemberInfoCapture, ReplaceCard) +
                     '</x61:addreplacecard>' +
                 '</mem:addReplaceCard>' +
-            '</mem:AddReplaceCard>' +
+            '</mem:AddOrReplaceCard>' +
         '</soapenv:Body>' +
         '</soapenv:Envelope>';
 
-        SoapAction := 'AddReplaceCard';
+        SoapAction := 'AddOrReplaceCard';
 
         XmlDocument.ReadFrom(XmlText, XmlDoc);
         XmlDoc.SetDeclaration(XmlDeclaration.Create('1.0', 'UTF-8', 'no'));
@@ -1313,7 +1313,7 @@ codeunit 6060147 "NPR MM NPR Membership"
             exit(false);
         end;
 
-        ElementPath := '//AddReplaceCard_Result/addReplaceCard/addreplacecard/response/';
+        ElementPath := '//AddOrReplaceCard_Result/addReplaceCard/addreplacecard/response/';
         TextOk := NpXmlDomMgt.GetXmlText(Element, ElementPath + 'status', 5, true);
         NotValidReason := StrSubstNo(ServerResponseLbl, NpXmlDomMgt.GetXmlText(Element, ElementPath + 'errordescription', 1000, true));
         if (TextOk = 'ERROR') then
@@ -1335,8 +1335,6 @@ codeunit 6060147 "NPR MM NPR Membership"
             if (not Evaluate(TmpMemberInfoCapture."Temporary Member Card", BoolText, 9)) then
                 TmpMemberInfoCapture."Temporary Member Card" := false;
 
-            TmpMemberInfoCapture."Entry No." := 1;
-            TmpMemberInfoCapture.Insert();
         end;
 
         NotValidReason := '';
