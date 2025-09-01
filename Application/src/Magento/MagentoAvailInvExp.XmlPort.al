@@ -59,7 +59,7 @@
                     begin
                         MagentoInventoryCompany."Location Filter" := CopyStr(LocationFilter, 1, MaxStrLen(MagentoInventoryCompany."Location Filter"));
                         RetailInventoryBuffer."Qty. on Sales Return" := MagentoItemMgt.CalcQtyOnSalesReturn(TempItemVariant."Item No.", TempItemVariant.Code, MagentoInventoryCompany."Location Filter");
-                        qtyOnSalesOrder := Format(RetailInventoryBuffer."Qty. on Sales Return", 0, 9);
+                        qtyOnSalesReturn := Format(RetailInventoryBuffer."Qty. on Sales Return", 0, 9);
                     end;
                 }
                 textelement(qtyOnPurchOrder)
