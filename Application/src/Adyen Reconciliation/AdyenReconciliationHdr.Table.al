@@ -151,7 +151,7 @@ table 6150788 "NPR Adyen Reconciliation Hdr"
 
         RecLine.Reset();
         RecLine.SetRange("Document No.", Rec."Document No.");
-        RecLine.SetRange(Status, RecLine.Status::Posted);
+        RecLine.SetFilter(Status, '%1|%2', RecLine.Status::Posted, RecLine.Status::"Posted Failed to Match");
         if not RecLine.IsEmpty() then
             Error(DocumentIsPartiallyPostedLbl, Rec."Document No.");
         RecLine.SetRange(Status, RecLine.Status::Reconciled);

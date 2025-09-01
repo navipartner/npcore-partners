@@ -80,7 +80,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
 
         RecLine.Reset();
         RecLine.SetRange("Document No.", RecHeader."Document No.");
-        RecLine.SetFilter(Status, '<>%1', RecLine.Status::Posted);
+        RecLine.SetFilter(Status, '<>%1&<>%2', RecLine.Status::Posted, RecLine.Status::"Posted Failed to Match");
         if RecLine.IsEmpty() then
             Error(NoUnpostedEntriesLbl, RecHeader."Document No.");
 
@@ -749,7 +749,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             Window.Update(2, TotalEntries);
         end;
 
-        ReconciliationLine.SetFilter(Status, '<>%1&<>%2&<>%3&<>%4', ReconciliationLine.Status::Reconciled, ReconciliationLine.Status::"Not to be Reconciled", ReconciliationLine.Status::Posted, ReconciliationLine.Status::"Not to be Posted");
+        ReconciliationLine.SetFilter(Status, '<>%1&<>%2&<>%3&<>%4&<>%5', ReconciliationLine.Status::Reconciled, ReconciliationLine.Status::"Not to be Reconciled", ReconciliationLine.Status::Posted, ReconciliationLine.Status::"Not to be Posted", ReconciliationLine.Status::"Posted Failed to Match");
         ReconciliationLine.FindSet();
         repeat
             ReconcileAllowed := true;
@@ -872,7 +872,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         end;
 
         _AdyenSetup.GetRecordOnce();
-        ReconciliationLine.SetFilter(Status, '<>%1&<>%2', ReconciliationLine.Status::Posted, ReconciliationLine.Status::"Not to be Posted");
+        ReconciliationLine.SetFilter(Status, '<>%1&<>%2&<>%3', ReconciliationLine.Status::Posted, ReconciliationLine.Status::"Not to be Posted", ReconciliationLine.Status::"Posted Failed to Match");
         ReconciliationLine.SetAutoCalcFields("Transaction Posted", "Markup Posted", "Commissions Posted", "Realized Gains Posted", "Realized Losses Posted");
         ReconciliationLine.FindSet();
         repeat
@@ -1070,8 +1070,10 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         end;
         if _AdyenSetup."Post with Transaction Date" then
             ReconLine."Posting Date" := DT2Date(ReconLine."Transaction Date")
-        else
+        else begin
+            ReconHeader.TestField("Posting Date");
             ReconLine."Posting Date" := ReconHeader."Posting Date";
+        end;
         if (xReconLine."Posting No." = ReconLine."Document No.") and (xReconLine."Posting Date" = ReconLine."Posting Date") then
             exit;
         ReconLine.Modify();
@@ -1210,7 +1212,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
     begin
         ReversedPostings := 0;
         ReconciliationLine.SetRange("Document No.", ReconciliationHeader."Document No.");
-        ReconciliationLine.SetRange(Status, ReconciliationLine.Status::Posted);
+        ReconciliationLine.SetFilter(Status, '%1|%2', ReconciliationLine.Status::Posted, ReconciliationLine.Status::"Posted Failed to Match");
         if ReconciliationLine.FindSet() then begin
             Window.Open(ReverseProcessingLbl);
             Window.Update(2, Format(ReconciliationLine.Count()));
@@ -1282,7 +1284,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         if RecLine.IsEmpty() then
             exit;
 
-        RecLine.SetFilter(Status, '<>%1', RecLine.Status::Posted);
+        RecLine.SetFilter(Status, '<>%1&<>%2&<>%3', RecLine.Status::Posted, RecLine.Status::"Posted Failed to Match", RecLine.Status::"Not to be Posted");
         if not RecLine.IsEmpty() then
             exit;
 
@@ -1323,10 +1325,11 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             AssignPostingDateAndNo(ReconLine, RecHeader);
 
             Clear(PostMissingTransaction);
-            if PostMissingTransaction.Run(ReconLine) then begin
+            PostMissingTransaction.PrepareRecords(ReconLine);
+            if PostMissingTransaction.Run() then begin
                 ReconLine."Matching Table Name" := ReconLine."Matching Table Name"::"G/L Entry";
                 ReconLine."Matching Entry System ID" := PostMissingTransaction.GetGLSystemID();
-                ReconLine.Status := ReconLine.Status::Posted;
+                ReconLine.Status := ReconLine.Status::"Posted Failed to Match";
                 ReconLine.Modify();
                 PostedEntries += 1;
             end;
@@ -1558,7 +1561,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         ReconRelation.LockTable();
 #endif
         ReconciliationLine.Find();
-        if ReconciliationLine.Status = ReconciliationLine.Status::Posted then begin
+        if ReconciliationLine.Status in [ReconciliationLine.Status::Posted, ReconciliationLine.Status::"Posted Failed to Match"] then begin
             ReconRelation.SetRange("Document No.", ReconciliationLine."Document No.");
             ReconRelation.SetRange("Document Line No.", ReconciliationLine."Line No.");
             ReconRelation.SetRange(Reversed, false);
@@ -1582,7 +1585,12 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
 
             ReconciliationLine."Posting No." := '';
             ReconciliationLine."Posting Date" := 0D;
-            ReconciliationLine.Status := ReconciliationLine.Status::Matched;
+            case ReconciliationLine.Status of
+                ReconciliationLine.Status::Posted:
+                    ReconciliationLine.Status := ReconciliationLine.Status::Matched;
+                ReconciliationLine.Status::"Posted Failed to Match":
+                    ReconciliationLine.Status := ReconciliationLine.Status::"Failed to Match";
+            end;
             ReconciliationLine.Modify();
             if ReconciliationLine."Matching Table Name" in [ReconciliationLine."Matching Table Name"::"EFT Transaction", ReconciliationLine."Matching Table Name"::"Magento Payment Line", ReconciliationLine."Matching Table Name"::"Subscription Payment"] then
                 RevertPaymentReconciliation(ReconciliationLine, ReconciliationLine."Matching Table Name");
@@ -1749,7 +1757,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         case AdyenRecLineStatus of
             AdyenRecLineStatus::Posted:
                 begin
-                    ReconciliationLine.SetFilter(Status, '<>%1&<>%2', ReconciliationLine.Status::Posted, ReconciliationLine.Status::"Not to be Posted");
+                    ReconciliationLine.SetFilter(Status, '<>%1&<>%2&<>%3', ReconciliationLine.Status::Posted, ReconciliationLine.Status::"Not to be Posted", ReconciliationLine.Status::"Posted Failed to Match");
                     if ReconciliationLine.IsEmpty() then begin
                         _AdyenManagement.CreateReconciliationLog(_LogType::"Post Transactions", true, StrSubstNo(PostTransactionsSuccess01, ReconciliationHeader."Document No."), ReconciliationHeader."Webhook Request ID");
                         ReconciliationHeader.Status := ReconciliationHeader.Status::Posted;

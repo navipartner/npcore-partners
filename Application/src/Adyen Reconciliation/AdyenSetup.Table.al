@@ -310,7 +310,8 @@ table 6150801 "NPR Adyen Setup"
     begin
         if _RecordHasBeenRead then
             exit;
-        Get();
+        if not Get() then
+            exit;
         _RecordHasBeenRead := true;
     end;
 

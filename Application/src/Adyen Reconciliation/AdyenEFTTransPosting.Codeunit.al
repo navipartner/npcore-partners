@@ -33,9 +33,6 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
             _ReconciledPaymentAccountType := _AdyenMerchantSetup."Reconciled Payment Acc. Type";
         end;
         _MerchantCurrencySetup.SetRange("NP Pay Currency Code", RecLine."Adyen Acc. Currency Code");
-        _MerchantCurrencySetup.SetRange("Reconciliation Account Type", _MerchantCurrencySetup."Reconciliation Account Type"::Fee);
-        if _MerchantCurrencySetup.IsEmpty() then
-            _AdyenMerchantSetup.TestField("Fee G/L Account");
         _MerchantCurrencySetup.SetRange("Reconciliation Account Type", _MerchantCurrencySetup."Reconciliation Account Type"::Markup);
         if _MerchantCurrencySetup.IsEmpty() then
             _AdyenMerchantSetup.TestField("Markup G/L Account");
@@ -377,6 +374,7 @@ codeunit 6184865 "NPR Adyen EFT Trans. Posting"
         end;
 
         if (_ReconciliationLine."Markup (LCY)" <> 0) and (not _ReconciliationLine."Markup Posted") then begin
+            _MerchantCurrencySetup.SetRange("NP Pay Currency Code", _ReconciliationLine."Adyen Acc. Currency Code");
             _MerchantCurrencySetup.SetRange("Reconciliation Account Type", _MerchantCurrencySetup."Reconciliation Account Type"::Markup);
             if _MerchantCurrencySetup.FindFirst() then
                 GLEntryNo := CreatePostGL(_ReconciliationLine."Markup (LCY)", _MerchantCurrencySetup."Account Type", _MerchantCurrencySetup."Account No.", _ReconciledPaymentAccountType, _ReconciledPaymentAccountNo, DimensionSetID, _ReconciliationLine."Adyen Acc. Currency Code", AdyenMarkupLabel, false)

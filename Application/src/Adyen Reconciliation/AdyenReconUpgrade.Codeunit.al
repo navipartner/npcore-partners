@@ -116,7 +116,7 @@ codeunit 6184908 "NPR Adyen Recon. Upgrade"
                     ReconHeader2.Status := ReconHeader2.Status::Matched;
                     ReconHeader2.Modify();
                 end else begin
-                    ReconLine.SetFilter(Status, '<>%1&<>%2', ReconLine.Status::Posted, ReconLine.Status::"Not to be Posted");
+                    ReconLine.SetFilter(Status, '<>%1&<>%2&<>%3', ReconLine.Status::Posted, ReconLine.Status::"Not to be Posted", ReconLine.Status::"Posted Failed to Match");
                     if ReconLine.IsEmpty() then begin
                         ReconHeader2.Status := ReconHeader2.Status::Posted;
                         ReconHeader2.Modify();
@@ -219,7 +219,7 @@ codeunit 6184908 "NPR Adyen Recon. Upgrade"
 
         // Mark all Magento Payments included in the already imported Reconciliaiton documents as not reconciled 
         ReconLine.Reset();
-        ReconLine.SetFilter(Status, '<>%1&<>%2', ReconLine.Status::"Not to be Posted", ReconLine.Status::Posted);
+        ReconLine.SetFilter(Status, '<>%1&<>%2&<>%3', ReconLine.Status::"Not to be Posted", ReconLine.Status::Posted, ReconLine.Status::"Posted Failed to Match");
         ReconLine.SetFilter("Merchant Account", '%1', '*Ecom*');
         if ReconLine.FindSet(true) then
             repeat
@@ -349,7 +349,7 @@ codeunit 6184908 "NPR Adyen Recon. Upgrade"
                     MerchantLocalCurrency := ReconHeader."Adyen Acc. Currency Code";
                     ReconLine.SetRange("Merchant Account", ReconHeader."Merchant Account");
                     ReconLine.SetFilter("Transaction Currency Code", '<>%1&<>%2', MerchantLocalCurrency, '');
-                    ReconLine.SetFilter(Status, '<>%1', ReconLine.Status::Posted);
+                    ReconLine.SetFilter(Status, '<>%1&<>%2', ReconLine.Status::Posted, ReconLine.Status::"Posted Failed to Match");
                     if ReconLine.FindSet() then
                         repeat
                             if ReconHeader2."Document No." <> ReconLine."Document No." then
