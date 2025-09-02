@@ -210,6 +210,11 @@
             Caption = 'Auto-Fulfill';
             DataClassification = CustomerContent;
         }
+        field(260; "Spfy Send from Shopify"; Boolean)
+        {
+            Caption = 'Send from Shopify';
+            DataClassification = CustomerContent;
+        }
 #endif
         field(300; "Voucher Message"; Text[250])
         {

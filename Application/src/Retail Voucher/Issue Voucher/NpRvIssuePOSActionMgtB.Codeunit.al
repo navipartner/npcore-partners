@@ -41,6 +41,9 @@ codeunit 6059981 "NPR NpRv Issue POSAction Mgt-B"
         NpRvSalesLine."Starting Date" := CurrentDateTime;
         POSSale.GetCurrentSale(SalePOS);
         NpRvSalesLine.Validate("Customer No.", SalePOS."Customer No.");
+#if not BC17
+        NpRvSalesLine."Spfy Send from Shopify" := VoucherType."Spfy Send from Shopify";
+#endif
         NpRvSalesLine.Insert();
     end;
 

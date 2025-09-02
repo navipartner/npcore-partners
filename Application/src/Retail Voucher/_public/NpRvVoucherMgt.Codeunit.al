@@ -1827,6 +1827,9 @@
         POSSession.GetSale(POSSale);
         POSSale.GetCurrentSale(SalePOS);
         NpRvSalesLine.Validate("Customer No.", SalePOS."Customer No.");
+#if not BC17
+        NpRvSalesLine."Spfy Send from Shopify" := VoucherType."Spfy Send from Shopify";
+#endif
 
         NpRvSalesLine."Voucher No." := TempVoucher."No.";
         NpRvSalesLine."Reference No." := TempVoucher."Reference No.";
