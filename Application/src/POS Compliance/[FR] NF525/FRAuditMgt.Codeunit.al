@@ -1048,18 +1048,19 @@ codeunit 6184850 "NPR FR Audit Mgt."
 
     procedure ValidateAuditLogIntegrity(var POSAuditLog: Record "NPR POS Audit Log")
     var
-        First: Boolean;
+        LastPOSAuditLog: Record "NPR POS Audit Log";
         InStream: InStream;
         BaseValue: Text;
         BaseValueChunk: Text;
-        PreviousSignature: Text;
-        PreviousSignatureChunk: Text;
+        LastPreviousSignature, PreviousSignature : Text;
+        LastPreviousSignatureChunk, PreviousSignatureChunk : Text;
         Signature: Text;
         SignatureChunk: Text;
     begin
         POSAuditLog.SetAutoCalcFields("Electronic Signature", "Previous Electronic Signature", "Signature Base Value");
         POSAuditLog.SetCurrentKey("Entry No.");
         POSAuditLog.SetAscending("Entry No.", true);
+        POSAuditLog.SetRange("Handled by External Impl.", true);
         POSAuditLog.LockTable();
 
         if POSAuditLog.FindSet() then
@@ -1071,7 +1072,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
         //Check signatures against fresh data strings/hash.
         //Perfoms actual data modifications on locked records that are ALWAYS rolled back at the end.
         if POSAuditLog.FindSet() then begin
-            First := true;
             repeat
                 Clear(PreviousSignature);
                 POSAuditLog."Previous Electronic Signature".CreateInStream(InStream, TextEncoding::UTF8);
@@ -1081,8 +1081,20 @@ codeunit 6184850 "NPR FR Audit Mgt."
                 end;
                 Clear(InStream);
 
-                if not First then
-                    if PreviousSignature <> Signature then
+                Clear(LastPreviousSignature);
+                LastPOSAuditLog.SetRange("External Type", POSAuditLog."External Type");
+                LastPOSAuditLog.SetFilter("Log Timestamp", '<%1', POSAuditLog."Log Timestamp");
+                if LastPOSAuditLog.FindLast() then begin
+                    LastPOSAuditLog."Electronic Signature".CreateInStream(InStream, TextEncoding::UTF8);
+                    while (not InStream.EOS) do begin
+                        InStream.ReadText(LastPreviousSignatureChunk);
+                        LastPreviousSignature += LastPreviousSignatureChunk;
+                    end;
+                    Clear(InStream);
+                end;
+
+                if LastPreviousSignature <> '' then
+                    if PreviousSignature <> LastPreviousSignature then
                         Error(ERROR_SIGNATURE_CHAIN, POSAuditLog.TableCaption, POSAuditLog."Entry No.");
 
                 Clear(Signature);
@@ -1108,8 +1120,6 @@ codeunit 6184850 "NPR FR Audit Mgt."
                 if not VerifySignature(BaseValue, 'SHA256', DecodeBase64URL(Signature)) then
                     Error(ERROR_SIGNATURE_VALUE, POSAuditLog.TableCaption, POSAuditLog."Entry No.");
 #endif
-
-                First := false;
             until POSAuditLog.Next() = 0;
         end;
 
