@@ -67,8 +67,10 @@ codeunit 6248422 "NPR POSAction TicketAdmitOnEoS" implements "NPR IPOS Workflow"
     var
         TicketReservation: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
+        Item: Record Item;
         TicketManagement: Codeunit "NPR TM Ticket Management";
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
+        TicketDetails: JsonObject;
     begin
         TicketReservation.SetCurrentKey("Session Token ID");
         TicketReservation.SetFilter("Session Token ID", '=%1', Token);
@@ -83,13 +85,23 @@ codeunit 6248422 "NPR POSAction TicketAdmitOnEoS" implements "NPR IPOS Workflow"
                 Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketReservation."Entry No.");
                 if (Ticket.FindSet()) then
                     repeat
+                        if (Item."No." <> Ticket."Item No.") then
+                            if (not Item.Get(Ticket."Item No.")) then
+                                Item.Init();
+
+                        Clear(TicketDetails);
+                        TicketDetails.Add('itemNo', Ticket."Item No.");
+                        TicketDetails.Add('description', Item.Description);
+                        TicketDetails.Add('ticketNo', Ticket."No.");
+                        TicketDetails.Add('externalTicketNo', Ticket."External Ticket No.");
+
                         if (TicketReservation.EndOfSaleAdmitMode = TicketReservation.EndOfSaleAdmitMode::SALE) then
                             if (TicketManagement.AdmitTicketFromEndOfSale(Token, Ticket, PosUnitNo)) then
-                                TicketsArray.Add(Ticket."External Ticket No.");
+                                TicketsArray.Add(TicketDetails);
 
                         if (TicketReservation.EndOfSaleAdmitMode = TicketReservation.EndOfSaleAdmitMode::SCAN) then
                             if (TicketManagement.RegisterTicketBomAdmissionArrival(Ticket, PosUnitNo, '', 1)) then
-                                TicketsArray.Add(Ticket."External Ticket No.");
+                                TicketsArray.Add(TicketDetails);
 
                     until (Ticket.Next() = 0);
             end;
@@ -102,9 +114,11 @@ codeunit 6248422 "NPR POSAction TicketAdmitOnEoS" implements "NPR IPOS Workflow"
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         TicketReservation: Record "NPR TM Ticket Reservation Req.";
         Ticket: Record "NPR TM Ticket";
+        Item: Record Item;
         SpeedGate: Codeunit "NPR SG SpeedGate";
         AdmitToken: Guid;
         AdmitToCodes: List of [Code[20]];
+        TicketDetails: JsonObject;
         IsCheckedBySubscriber, IsValid : Boolean;
         ResponseCode: Integer;
         ResponseMessage: Text;
@@ -134,8 +148,20 @@ codeunit 6248422 "NPR POSAction TicketAdmitOnEoS" implements "NPR IPOS Workflow"
                             TicketManagement.OnAfterPosTicketArrival(IsCheckedBySubscriber, IsValid, Ticket."No.", Ticket."External Member Card No.", Token, ResponseMessage);
                             if ((IsCheckedBySubscriber) and (not IsValid)) then
                                 TicketsRejectedList.Add(ResponseMessage)
-                            else
-                                TicketsAdmittedList.Add(Ticket."External Ticket No.");
+                            else begin
+                                // [{itemNo, description, ticketNo, externalTicketNo}]
+                                if (Item."No." <> Ticket."Item No.") then
+                                    if (not Item.Get(Ticket."Item No.")) then
+                                        Item.Init();
+
+                                Clear(TicketDetails);
+                                TicketDetails.Add('itemNo', Ticket."Item No.");
+                                TicketDetails.Add('description', Item.Description);
+                                TicketDetails.Add('ticketNo', Ticket."No.");
+                                TicketDetails.Add('externalTicketNo', Ticket."External Ticket No.");
+
+                                TicketsAdmittedList.Add(TicketDetails);
+                            end;
 
                         end else begin
                             if (ResponseCode > 0) then
@@ -194,7 +220,7 @@ codeunit 6248422 "NPR POSAction TicketAdmitOnEoS" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionTicketAdmitOnEoS.Codeunit.js### 
-'const main=async({workflow:a,context:n,popup:r,captions:t})=>{let s=null;n.customParameters.showSpinner&&(s=await r.spinner({caption:"Checking and admitting tickets...",abortEnabled:!1}));try{const{ticketsAdmitted:e,ticketsRejected:o}=await a.respond("HandleTicketAdmitOnEoS");if(e.length>0)for(const i of e)toast.success(`${t.ToastBody.substitute(i)}`,{title:t.ToastTitle});if(o.length>0)for(const i of o)toast.error(`${i}`,{title:t.ToastTitle})}catch(e){toast.error(e.message,{title:t.ToastTitle})}finally{s&&s.close()}};'
+'const main=async({workflow:a,context:r,popup:l,captions:t})=>{let s=null;r.customParameters.showSpinner&&(s=await l.spinner({caption:"Checking and admitting tickets...",abortEnabled:!1}));try{const o=await a.respond("HandleTicketAdmitOnEoS"),{ticketsAdmitted:i=[],ticketsRejected:n=[]}=o;if(i.length>0&&i.forEach(e=>{e&&typeof e=="object"&&e.externalTicketNo&&e.itemNo&&e.description?toast.success(`${e.externalTicketNo}`,{title:`${e.itemNo} - ${e.description}`}):(console.warn("Invalid ticket structure in ticketsAdmitted:",e),toast.success(`${t.ToastBody.substitute("OK")}`,{title:t.ToastTitle}))}),n.length>0)for(const e of n)toast.error(`${e}`,{title:t.ToastTitle})}catch(o){toast.error(o.message,{title:t.ToastTitle})}finally{s&&s.close()}};'
         )
     end;
 

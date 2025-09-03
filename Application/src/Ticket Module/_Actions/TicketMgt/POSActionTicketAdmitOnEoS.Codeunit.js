@@ -9,16 +9,28 @@ const main = async ({ workflow, context, popup, captions }) => {
   }
 
   try {
-    const { ticketsAdmitted, ticketsRejected } = await workflow.respond(
-      "HandleTicketAdmitOnEoS"
-    );
+    const response = await workflow.respond("HandleTicketAdmitOnEoS");
+    const { ticketsAdmitted = [], ticketsRejected = [] } = response;
 
     if (ticketsAdmitted.length > 0) {
-      for (const ticketNo of ticketsAdmitted) {
-        toast.success(`${captions.ToastBody.substitute(ticketNo)}`, {
-          title: captions.ToastTitle,
-        });
-      }
+      ticketsAdmitted.forEach((ticket) => {
+        if (
+          ticket &&
+          typeof ticket === "object" &&
+          ticket.externalTicketNo &&
+          ticket.itemNo &&
+          ticket.description
+        ) {
+          toast.success(`${ticket.externalTicketNo}`, {
+            title: `${ticket.itemNo} - ${ticket.description}`,
+          });
+        } else {
+          console.warn("Invalid ticket structure in ticketsAdmitted:", ticket);
+          toast.success(`${captions.ToastBody.substitute("OK")}`, {
+            title: captions.ToastTitle,
+          });
+        }
+      });
     }
 
     if (ticketsRejected.length > 0) {
