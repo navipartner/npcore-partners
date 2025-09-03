@@ -119,6 +119,9 @@ codeunit 6150815 "NPR POS Action: MM Member ArrB"
         MemberScanned.Add('Name', Member."Display Name");
         MemberScanned.Add('ExpiryDate', ValidUntilDate);
         MemberScanned.Add('ImageDataUrl', GetMemberImageDataUrl(MemberEntryNo));
+        MemberScanned.Add('MembershipCode', Membership."Membership Code");
+        MemberScanned.Add('MembershipCodeCaption', Membership.FieldCaption("Membership Code"));
+        MemberScanned.Add('MembershipCodeDescription', MembershipSetup."Description");
 
         if (MemberCardEntryNo > 0) then
             if (MemberCard.Get(MemberCardEntryNo)) then

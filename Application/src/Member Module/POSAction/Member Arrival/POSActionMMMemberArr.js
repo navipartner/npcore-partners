@@ -13,8 +13,7 @@ const main = async ({ workflow, popup, captions, parameters }) => {
       memberCardDetails != null &&
       memberCardDetails.MemberScanned != null &&
       memberCardDetails.MemberScanned.CardNumber !== "" &&
-      (tempCardNumber === null ||
-      tempCardNumber === "")
+      (tempCardNumber === null || tempCardNumber === "")
     ) {
       tempCardNumber = memberCardDetails.MemberScanned.CardNumber;
     }
@@ -47,6 +46,12 @@ const main = async ({ workflow, popup, captions, parameters }) => {
       validForAdmission: memberCardDetails.MemberScanned.Valid,
       hideAfter: hideAfter,
       memberExpiry: memberCardDetails.MemberScanned.ExpiryDate,
+      content: [
+        {
+          caption: memberCardDetails.MemberScanned.MembershipCodeCaption,
+          value: memberCardDetails.MemberScanned.MembershipCodeDescription,
+        },
+      ],
     });
   }
 };

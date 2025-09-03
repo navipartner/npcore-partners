@@ -64,6 +64,15 @@ const main = async ({
               memberName: reference.memberDetails.MemberScanned.Name,
               validForAdmission: reference.memberDetails.MemberScanned.Valid,
               memberExpiry: reference.memberDetails.MemberScanned.ExpiryDate,
+              content: [
+                {
+                  caption:
+                    reference.memberDetails.MemberScanned.MembershipCodeCaption,
+                  value:
+                    reference.memberDetails.MemberScanned
+                      .MembershipCodeDescription,
+                },
+              ],
             });
           }
           break;
