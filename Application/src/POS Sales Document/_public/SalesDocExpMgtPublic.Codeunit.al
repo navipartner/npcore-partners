@@ -5,4 +5,9 @@ codeunit 6060005 "NPR Sales Doc. Exp. Mgt Public"
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    internal procedure CreateSalesHeaderOnBeforeSalesHeaderModify(var SalesHeader: Record "Sales Header"; var SalePOS: Record "NPR POS Sale")
+    begin
+    end;
+
 }

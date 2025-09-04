@@ -97,8 +97,8 @@ codeunit 6059942 "NPR RS Audit Mgt."
         RSPTFPITryPrint.PrintReceipt(RSPOSAuditLogAuxInfo);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Sales Doc. Exp. Mgt.", 'OnAfterDebitSalePostEvent', '', false, false)]
-    local procedure OnAfterDebitSalePostEvent(var Sender: Codeunit "NPR Sales Doc. Exp. Mgt."; SalePOS: Record "NPR POS Sale"; SalesHeader: Record "Sales Header"; Posted: Boolean);
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Sales Doc. Exp. Mgt Public", 'OnAfterDebitSalePostEvent', '', false, false)]
+    local procedure OnAfterDebitSalePostEvent(var Sender: Codeunit "NPR Sales Doc. Exp. Mgt Public"; SalePOS: Record "NPR POS Sale"; SalesHeader: Record "Sales Header"; Posted: Boolean);
     var
         POSEntry: Record "NPR POS Entry";
         POSUnit: Record "NPR POS Unit";
@@ -172,7 +172,7 @@ codeunit 6059942 "NPR RS Audit Mgt."
         OnActionShowSetup();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Sales Doc. Exp. Mgt.", 'CreateSalesHeaderOnBeforeSalesHeaderModify', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Sales Doc. Exp. Mgt Public", 'CreateSalesHeaderOnBeforeSalesHeaderModify', '', false, false)]
     local procedure CreateSalesHeaderOnBeforeSalesHeaderModify(var SalesHeader: Record "Sales Header"; var SalePOS: Record "NPR POS Sale");
     var
         RSAuxSalesHeader: Record "NPR RS Aux Sales Header";

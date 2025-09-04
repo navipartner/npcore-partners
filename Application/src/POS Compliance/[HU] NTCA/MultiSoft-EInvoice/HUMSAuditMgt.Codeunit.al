@@ -45,7 +45,7 @@ codeunit 6184708 "NPR HU MS Audit Mgt."
         ModifySalesHaderPaymentMethod(HUMSPaymentMethodMap, POSEntrySalesDocLink);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Sales Doc. Exp. Mgt.", 'CreateSalesHeaderOnBeforeSalesHeaderModify', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Sales Doc. Exp. Mgt Public", 'CreateSalesHeaderOnBeforeSalesHeaderModify', '', false, false)]
     local procedure SalesDocExpMgtCreateSalesHeaderOnBeforeSalesHeaderModify(var SalesHeader: Record "Sales Header"; var SalePOS: Record "NPR POS Sale")
     var
         POSUnit: Record "NPR POS Unit";

@@ -331,7 +331,6 @@
         InvokeOnFinishCreditSaleWorkflow(SalePOS);
         InvokeOnAfterFinishCreditSale(SalePOS);
 
-        OnAfterDebitSalePostEvent(SalePOS, SalesHeader, Posted);
         SalesDocExpMgtPublic.OnAfterDebitSalePostEvent(SalePOS, SalesHeader, Posted);
 
         Commit();
@@ -394,6 +393,7 @@
         Customer: Record Customer;
         GLSetup: Record "General Ledger Setup";
         DimHandlingModifier: Codeunit "NPR Dim. Handling Modifier";
+        SalesDocExpMgtPublic: Codeunit "NPR Sales Doc. Exp. Mgt Public";
     begin
         BindSubscription(DimHandlingModifier);
 
@@ -418,7 +418,7 @@
         SalesHeader."Ship-to Post Code" := SalePOS."Post Code";
         SalesHeader."Ship-to Country/Region Code" := SalePOS."Country Code";
 
-        CreateSalesHeaderOnBeforeSalesHeaderModify(SalesHeader, SalePOS);
+        SalesDocExpMgtPublic.CreateSalesHeaderOnBeforeSalesHeaderModify(SalesHeader, SalePOS);
 
         SalesHeader.Modify(true);
 
@@ -1466,15 +1466,5 @@ then
         if NpCsDocument.FindFirst() then
             if NpCsDocument."Next Workflow Step" = NpCsDocument."Next Workflow Step"::"Send Order" then
                 NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure CreateSalesHeaderOnBeforeSalesHeaderModify(var SalesHeader: Record "Sales Header"; var SalePOS: Record "NPR POS Sale")
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnAfterDebitSalePostEvent(SalePOS: Record "NPR POS Sale"; SalesHeader: Record "Sales Header"; Posted: Boolean)
-    begin
     end;
 }

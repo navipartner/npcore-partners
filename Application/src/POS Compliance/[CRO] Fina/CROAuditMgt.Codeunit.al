@@ -207,7 +207,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
             FiscalizeSalesCrMemo(SalesCrMemoHdrNo);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Sales Doc. Exp. Mgt.", 'CreateSalesHeaderOnBeforeSalesHeaderModify', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Sales Doc. Exp. Mgt Public", 'CreateSalesHeaderOnBeforeSalesHeaderModify', '', false, false)]
     local procedure CreateSalesHeaderOnBeforeSalesHeaderModify(var SalesHeader: Record "Sales Header"; var SalePOS: Record "NPR POS Sale");
     var
         CROAuxSalesHeader: Record "NPR CRO Aux Sales Header";
