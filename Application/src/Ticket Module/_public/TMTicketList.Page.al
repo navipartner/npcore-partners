@@ -826,10 +826,17 @@
         WalletAssetLine: Record "NPR WalletAssetLine";
         WalletAssetLineRef: Record "NPR WalletAssetLineReference";
         Wallet: Record "NPR AttractionWallet";
+        Ticket2: Record "NPR TM Ticket";
         NoAssetLine: Label 'No wallet asset line found for ticket %1';
         NoAssetLineRef: Label 'No wallet asset line reference found for ticket %1';
         NoWallet: Label 'No wallet found for ticket %1';
     begin
+
+        // Ticket is a temp table record, populated with transfer fields
+        if (IsNullGuid(Ticket.SystemId)) then
+            if (Ticket2.Get(Ticket."No.")) then
+                Ticket.Copy(Ticket2);
+
         WalletAssetLine.SetCurrentKey(Type, LineTypeSystemId);
         WalletAssetLine.SetFilter(Type, '%1', Enum::"NPR WalletLineType"::TICKET);
         WalletAssetLine.SetFilter(LineTypeSystemId, '%1', Ticket.SystemId);
