@@ -73,6 +73,14 @@ codeunit 6248331 "NPR WalletApiAgent"
             if (JToken.IsArray()) then
                 StoreMemberCards(Wallet, JToken.AsArray());
 
+        if (Body.Get('coupons', JToken)) then
+            if (JToken.IsArray()) then
+                StoreCoupons(Wallet, JToken.AsArray());
+
+        if (Body.Get('vouchers', JToken)) then
+            if (JToken.IsArray()) then
+                StoreVouchers(Wallet, JToken.AsArray());
+
         exit(GetAssetsResponse(Wallet, false));
     end;
 
@@ -104,6 +112,14 @@ codeunit 6248331 "NPR WalletApiAgent"
         if (Body.Get('memberCards', JToken)) then
             if (JToken.IsArray()) then
                 StoreMemberCards(Wallet, JToken.AsArray());
+
+        if (Body.Get('coupons', JToken)) then
+            if (JToken.IsArray()) then
+                StoreCoupons(Wallet, JToken.AsArray());
+
+        if (Body.Get('vouchers', JToken)) then
+            if (JToken.IsArray()) then
+                StoreVouchers(Wallet, JToken.AsArray());
 
         if (Body.Get('externalReferenceNumbers', JToken)) then
             if (JToken.IsArray()) then
@@ -278,18 +294,27 @@ codeunit 6248331 "NPR WalletApiAgent"
 
     local procedure StoreTickets(Wallet: Record "NPR AttractionWallet"; Tickets: JsonArray)
     var
-        Ticket: Record "NPR TM Ticket";
+        Ticket, Ticket2 : Record "NPR TM Ticket";
         TicketToken: JsonToken;
         TicketId: Guid;
         AttractionWallet: Codeunit "NPR AttractionWalletFacade";
         TicketIds: List of [Guid];
     begin
 
+        Ticket.SetLoadFields(SystemId);
+        Ticket2.SetLoadFields("External Ticket No.", SystemId);
+        Ticket2.SetCurrentKey("External Ticket No.");
+
         foreach TicketToken in Tickets do
             if (TicketToken.IsValue()) then begin
-                Evaluate(TicketId, TicketToken.AsValue().AsText());
-                Ticket.GetBySystemId(TicketId);
-                TicketIds.Add(TicketId);
+                if (Evaluate(TicketId, TicketToken.AsValue().AsText())) then begin
+                    Ticket.GetBySystemId(TicketId);
+                    TicketIds.Add(TicketId);
+                end else begin
+                    Ticket2.SetFilter("External Ticket No.", '=%1', CopyStr(TicketToken.AsValue().AsText(), 1, MaxStrLen(Ticket2."External Ticket No.")));
+                    if (Ticket2.FindFirst()) then
+                        TicketIds.Add(Ticket2.SystemId);
+                end;
             end;
 
         AttractionWallet.AddTicketsToWallet(Wallet.EntryNo, TicketIds);
@@ -298,22 +323,88 @@ codeunit 6248331 "NPR WalletApiAgent"
 
     local procedure StoreMemberCards(Wallet: Record "NPR AttractionWallet"; MemberCards: JsonArray)
     var
-        MemberCard: Record "NPR MM Member Card";
+        MemberCard, MemberCard2 : Record "NPR MM Member Card";
         MemberCardToken: JsonToken;
         MemberCardId: Guid;
         AttractionWallet: Codeunit "NPR AttractionWalletFacade";
         MemberCardIds: List of [Guid];
     begin
 
+        MemberCard.SetLoadFields(SystemId);
+        MemberCard2.SetLoadFields("External Card No.", SystemId);
+        MemberCard2.SetCurrentKey("External Card No.");
+
         foreach MemberCardToken in MemberCards do
             if (MemberCardToken.IsValue()) then begin
-                Evaluate(MemberCardId, MemberCardToken.AsValue().AsText());
-                MemberCard.GetBySystemId(MemberCardId);
-                MemberCardIds.Add(MemberCardId);
+                if (Evaluate(MemberCardId, MemberCardToken.AsValue().AsText())) then begin
+                    MemberCard.GetBySystemId(MemberCardId);
+                    MemberCardIds.Add(MemberCardId);
+                end else begin
+                    MemberCard2.SetFilter("External Card No.", '=%1', CopyStr(MemberCardToken.AsValue().AsText(), 1, MaxStrLen(MemberCard2."External Card No.")));
+                    if (MemberCard2.FindFirst()) then
+                        MemberCardIds.Add(MemberCard2.SystemId);
+                end;
             end;
 
         AttractionWallet.AddMemberCardsToWallet(Wallet.EntryNo, MemberCardIds);
     end;
+
+    local procedure StoreCoupons(Wallet: Record "NPR AttractionWallet"; Coupons: JsonArray)
+    var
+        Coupon, Coupon2 : Record "NPR NpDc Coupon";
+        CouponToken: JsonToken;
+        CouponId: Guid;
+        AttractionWallet: Codeunit "NPR AttractionWalletFacade";
+        CouponIds: List of [Guid];
+    begin
+
+        Coupon.SetLoadFields(SystemId);
+        Coupon2.SetLoadFields("Reference No.", SystemId);
+        Coupon2.SetCurrentKey("Reference No.");
+
+        foreach CouponToken in Coupons do
+            if (CouponToken.IsValue()) then begin
+                if (Evaluate(CouponId, CouponToken.AsValue().AsText())) then begin
+                    Coupon.GetBySystemId(CouponId);
+                    CouponIds.Add(CouponId);
+                end else begin
+                    Coupon2.SetFilter("Reference No.", '=%1', CopyStr(CouponToken.AsValue().AsText(), 1, MaxStrLen(Coupon2."Reference No.")));
+                    if (Coupon2.FindFirst()) then
+                        CouponIds.Add(Coupon2.SystemId);
+                end;
+            end;
+
+        AttractionWallet.AddCouponsToWallets(Wallet.EntryNo, CouponIds, '', '');
+    end;
+
+    local procedure StoreVouchers(Wallet: Record "NPR AttractionWallet"; Vouchers: JsonArray)
+    var
+        Voucher, Voucher2 : Record "NPR NpRv Voucher";
+        VoucherToken: JsonToken;
+        VoucherId: Guid;
+        AttractionWallet: Codeunit "NPR AttractionWalletFacade";
+        VoucherIds: List of [Guid];
+    begin
+
+        Voucher.SetLoadFields("Reference No.", SystemId);
+        Voucher2.SetLoadFields("Reference No.", SystemId);
+        Voucher2.SetCurrentKey("Reference No.");
+
+        foreach VoucherToken in Vouchers do
+            if (VoucherToken.IsValue()) then begin
+                if (Evaluate(VoucherId, VoucherToken.AsValue().AsText())) then begin
+                    Voucher.GetBySystemId(VoucherId);
+                    VoucherIds.Add(VoucherId);
+                end else begin
+                    Voucher2.SetFilter("Reference No.", '=%1', CopyStr(VoucherToken.AsValue().AsText(), 1, MaxStrLen(Voucher2."Reference No.")));
+                    if (Voucher2.FindFirst()) then
+                        VoucherIds.Add(Voucher2.SystemId);
+                end;
+            end;
+
+        AttractionWallet.AddVouchersToWallets(Wallet.EntryNo, VoucherIds, '', '');
+    end;
+
 
     local procedure AddWalletExternalReferences(Wallet: Record "NPR AttractionWallet"; References: JsonArray)
     var

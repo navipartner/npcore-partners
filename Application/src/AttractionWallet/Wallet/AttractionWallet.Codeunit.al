@@ -340,6 +340,43 @@ codeunit 6185062 "NPR AttractionWallet"
         AddAssetToWallet(WalletAssetLine.EntryNo, WalletEntryNo);
     end;
 
+    internal procedure AddVouchersToWallet(WalletEntryNo: Integer; VoucherIds: List of [Guid]; ItemNo: Code[20]; DocumentNumber: Code[20])
+    var
+        VoucherId: Guid;
+    begin
+        foreach VoucherId in VoucherIds do
+            AddVoucherToWallet(WalletEntryNo, VoucherId, ItemNo, DocumentNumber);
+    end;
+
+    local procedure AddVoucherToWallet(WalletEntryNo: Integer; VoucherId: Guid; ItemNo: Code[20]; DocumentNumber: Code[20])
+    var
+        Voucher: Record "NPR NpRv Voucher";
+        WalletAssetLine: Record "NPR WalletAssetLine";
+    begin
+        Voucher.GetBySystemId(VoucherId);
+
+        WalletAssetLine.SetCurrentKey(Type, LineTypeSystemId);
+        WalletAssetLine.SetFilter(Type, '=%1', ENUM::"NPR WalletLineType"::COUPON);
+        WalletAssetLine.SetFilter(LineTypeSystemId, '=%1', Voucher.SystemId);
+        if (not WalletAssetLine.FindFirst()) then begin
+            WalletAssetLine.Init();
+            WalletAssetLine.TransactionId := GetWalletTransactionId(WalletEntryNo);
+            WalletAssetLine.ItemNo := ItemNo;
+            WalletAssetLine.Description := Voucher.Description;
+            WalletAssetLine.TransferControlledBy := ENUM::"NPR WalletRole"::Holder;
+            WalletAssetLine.Type := ENUM::"NPR WalletLineType"::VOUCHER;
+            WalletAssetLine.DocumentNumber := DocumentNumber;
+
+            WalletAssetLine.EntryNo := 0;
+            WalletAssetLine.LineTypeSystemId := Voucher.SystemId;
+            WalletAssetLine.LineTypeReference := Voucher."Reference No.";
+            WalletAssetLine.Insert();
+        end;
+
+        AddAssetToWallet(WalletAssetLine.EntryNo, WalletEntryNo);
+    end;
+
+
     local procedure AddCouponAssets(WalletEntryNoList: List of [Integer]; CouponType: Code[20]; ItemNo: Code[20]; Description: Text[100]; SalesQuantity: Decimal; DocumentNumber: Code[20])
     var
         WalletAssetLine: Record "NPR WalletAssetLine";

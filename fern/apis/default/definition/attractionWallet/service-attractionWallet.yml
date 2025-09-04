@@ -13,7 +13,10 @@ service:
   endpoints:
 
     createWallet:
-      docs: Create a new wallet.
+      docs: 
+        Create a new wallet.
+        Note that in the `Create Wallet` and `Add to Wallet`, API calls, the assets may also be identified by their visual reference numbers. 
+        If the assetId does not interpret as a UUID, the system will attempt to resolve it as a visual reference number.
       display-name: Create Wallet
       method: POST
       path: ""
@@ -33,7 +36,10 @@ service:
 
 
     addToWallet:
-      docs: Add assets to a wallet.
+      docs: 
+        Add assets to an existing wallet.
+        Note that in the `Create Wallet` and `Add to Wallet`, API calls, the assets may also be identified by their visual reference numbers. 
+        If the assetId does not interpret as a UUID, the system will attempt to resolve it as a visual reference number.
       display-name: Add to Wallet
       method: POST
       path: /{walletId}
@@ -164,9 +170,11 @@ types:
 
   CreateWalletRequest:
     properties:
-      name: simpleTypes.Description
-      tickets: list<simpleTypes.AssetId>
-      memberCards: list<simpleTypes.AssetId>
+      name: optional<simpleTypes.Description>
+      tickets: optional<list<simpleTypes.AssetId>>
+      memberCards: optional<list<simpleTypes.AssetId>>
+      coupons: optional<list<simpleTypes.AssetId>>
+      vouchers: optional<list<simpleTypes.AssetId>>
       externalReferenceNumbers: optional<list<simpleTypes.ExternalWalletReferenceNumber>>
       originatesFromItemNo: optional<simpleTypes.OriginatesFromItemNo>
     examples:
@@ -177,6 +185,10 @@ types:
             - $simpleTypes.AssetId.ExampleTicketId1
           memberCards: 
             - $simpleTypes.AssetId.ExampleMemberCardId1
+          coupons:
+            - $simpleTypes.AssetId.ExampleCouponId1
+          vouchers:
+            - $simpleTypes.AssetId.ExampleVoucherId1
           externalReferenceNumbers: 
             - $simpleTypes.ExternalWalletReferenceNumber.ExampleExternalWalletReferenceNumber
           originatesFromItemNo: $simpleTypes.OriginatesFromItemNo.ExampleWalletNo
@@ -184,12 +196,18 @@ types:
 
   AddToWalletRequest:
     properties:
-      tickets: list<simpleTypes.AssetId>
-      memberCards: list<simpleTypes.AssetId>
+      tickets: optional<list<simpleTypes.AssetId>>
+      memberCards: optional<list<simpleTypes.AssetId>>
+      coupons: optional<list<simpleTypes.AssetId>>
+      vouchers: optional<list<simpleTypes.AssetId>>
     examples:
       - name: AddToWalletRequest
         value:
           tickets: 
-            - $simpleTypes.AssetId.ExampleTicketId1
+            - $simpleTypes.AssetId.ExampleTicketId2
           memberCards: 
-            - $simpleTypes.AssetId.ExampleMemberCardId1
+            - $simpleTypes.AssetId.ExampleMemberCardId2
+          coupons:
+            - $simpleTypes.AssetId.ExampleCouponId2
+          vouchers:
+            - $simpleTypes.AssetId.ExampleVoucherId2

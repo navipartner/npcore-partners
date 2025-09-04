@@ -90,7 +90,8 @@ types:
 
   AssetId:
     type: uuid
-    docs: A globally unique identifier for the asset being referenced (e.g., a ticketId, couponId, voucherId, or memberCardId).
+    docs: 
+      A globally unique identifier for the asset being referenced (e.g., a ticketId, couponId, voucherId, or memberCardId). 
     examples: 
       - name: ExampleAssetId
         value: "2c3a84c7-059f-41d3-8033-0d94e08d4b13"
@@ -102,6 +103,14 @@ types:
         value: "5f6d17fa-38a2-64a6-bd4c-3f17a20f7e16"
       - name: ExampleMemberCardId2
         value: "6a7b8c9d-7e8f-90ab-cdef-1234567890ab"
+      - name: ExampleCouponId1
+        value: "7b8c9d0e-8f90-1abc-def1-234567890abc"
+      - name: ExampleCouponId2
+        value: "8c9d0e1f-901a-2bcd-ef12-34567890abcd"
+      - name: ExampleVoucherId1
+        value: "9d0e1f2a-012b-3cde-f123-4567890abcde"
+      - name: ExampleVoucherId2
+        value: "0e1f2a3b-123c-4def-0123-567890abcdef"
 
   AssetTypeEnum:
     enum:

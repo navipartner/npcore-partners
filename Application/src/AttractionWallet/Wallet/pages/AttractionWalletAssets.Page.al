@@ -129,6 +129,7 @@ page 6184847 "NPR AttractionWalletAssets"
                     Ticket: Record "NPR TM Ticket";
                     Coupon: Record "NPR NpDc Coupon";
                     MembershipCard: Record "NPR MM Member Card";
+                    Voucher: Record "NPR NpRv Voucher";
                 begin
                     case Rec.Type of
                         Rec.Type::TICKET:
@@ -148,6 +149,12 @@ page 6184847 "NPR AttractionWalletAssets"
                                 MembershipCard.GetBySystemId(Rec.LineTypeSystemId);
                                 MembershipCard.SetRecFilter();
                                 Page.Run(Page::"NPR MM Member Card List", MembershipCard);
+                            end;
+                        Rec.Type::VOUCHER:
+                            begin
+                                Voucher.GetBySystemId(Rec.LineTypeSystemId);
+                                Voucher.SetRecFilter();
+                                Page.Run(Page::"NPR NpRv Vouchers", Voucher);
                             end;
                     end;
                 end;
