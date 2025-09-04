@@ -188,7 +188,7 @@ types:
     properties:
       walletId: simpleTypes.WalletId
       referenceNumber: simpleTypes.ReferenceNumber
-      originatesFromItemNo: simpleTypes.AssetItemNo
+      originatesFromItemNo: simpleTypes.OriginatesFromItemNo
       printedAt: optional<simpleTypes.PrintedAt>
       printCount: optional<simpleTypes.PrintCount>
       validToAdmit: simpleTypes.ValidToAdmit

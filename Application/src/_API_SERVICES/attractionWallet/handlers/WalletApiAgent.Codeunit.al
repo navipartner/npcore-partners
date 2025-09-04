@@ -81,6 +81,7 @@ codeunit 6248331 "NPR WalletApiAgent"
         Wallet: Record "NPR AttractionWallet";
         WalletReferenceNumber: Text[50];
         WalletName: Text[100];
+        OriginatesFromItemNo: Code[20];
         Body: JsonObject;
         JToken: JsonToken;
         AttractionWallet: Codeunit "NPR AttractionWalletFacade";
@@ -91,7 +92,10 @@ codeunit 6248331 "NPR WalletApiAgent"
         if (Body.Get('name', JToken)) then
             WalletName := CopyStr(JToken.AsValue().AsText(), 1, MaxStrLen(WalletName));
 
-        Wallet.Get(AttractionWallet.CreateWallet(WalletName, WalletReferenceNumber));
+        if (Body.Get('originatesFromItemNo', JToken)) then
+            OriginatesFromItemNo := CopyStr(JToken.AsValue().AsText(), 1, MaxStrLen(OriginatesFromItemNo));
+
+        Wallet.Get(AttractionWallet.CreateWallet(OriginatesFromItemNo, WalletName, WalletReferenceNumber));
 
         if (Body.Get('tickets', JToken)) then
             if (JToken.IsArray()) then

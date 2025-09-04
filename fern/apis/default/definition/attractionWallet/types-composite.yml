@@ -16,7 +16,7 @@ types:
       expiryDatetime: simpleTypes.ExpiryDatetime
       lastPrintedAt: simpleTypes.LastPrintedAt
       printCount: simpleTypes.PrintCount
-      originatesFromItemNo: optional<simpleTypes.AssetItemNo>
+      originatesFromItemNo: optional<simpleTypes.OriginatesFromItemNo>
       externalReferenceNumber: optional<simpleTypes.WalletExternalReferenceNumber>
       assets: optional<list<AssetDetails>>
     examples:
@@ -28,7 +28,7 @@ types:
           expiryDatetime: $simpleTypes.ExpiryDatetime.ExampleExpiryDatetime
           lastPrintedAt: $simpleTypes.LastPrintedAt.ExampleLastPrintedAt
           printCount: $simpleTypes.PrintCount.ExamplePrintCount
-          originatesFromItemNo: $simpleTypes.AssetItemNo.ExampleWalletNo
+          originatesFromItemNo: $simpleTypes.OriginatesFromItemNo.ExampleWalletNo
           externalReferenceNumber: $simpleTypes.WalletExternalReferenceNumber.ExampleWalletExternalReferenceNumber
           assets:
             - $AssetDetails.ExampleTicket1
@@ -41,7 +41,7 @@ types:
           expiryDatetime: $simpleTypes.ExpiryDatetime.ExampleExpiryDatetime
           lastPrintedAt: $simpleTypes.LastPrintedAt.ExampleLastPrintedAtNoPrint
           printCount: $simpleTypes.PrintCount.ExamplePrintCount
-          originatesFromItemNo: $simpleTypes.AssetItemNo.ExampleWalletNo
+          originatesFromItemNo: $simpleTypes.OriginatesFromItemNo.ExampleWalletNo
           externalReferenceNumber: $simpleTypes.WalletExternalReferenceNumber.ExampleWalletExternalReferenceNumber
           assets:
             - $AssetDetails.ExampleTicket1
@@ -54,7 +54,7 @@ types:
           expiryDatetime: $simpleTypes.ExpiryDatetime.ExampleExpiryDatetime
           lastPrintedAt: $simpleTypes.LastPrintedAt.ExampleLastPrintedAt
           printCount: $simpleTypes.PrintCount.ExamplePrintCount
-          originatesFromItemNo: $simpleTypes.AssetItemNo.ExampleWalletNo
+          originatesFromItemNo: $simpleTypes.OriginatesFromItemNo.ExampleWalletNo
           externalReferenceNumber: $simpleTypes.WalletExternalReferenceNumber.ExampleWalletExternalReferenceNumber
           assets:
             - $AssetDetails.ExampleTicket1WithDetails

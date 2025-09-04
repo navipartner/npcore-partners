@@ -56,7 +56,14 @@ types:
         value: "31005"
       - name: ExampleItemNo2
         value: "320100"
-        
+
+  OriginatesFromItemNo:
+    type: string
+    docs: The item number from which the wallet originates.
+    examples:
+      - name: ExampleWalletNo
+        value: "70009"
+
   Quantity: 
     type: integer
     docs: The number of tickets
