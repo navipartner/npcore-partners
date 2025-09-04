@@ -181,7 +181,7 @@
         Receipt.Add(CleanCashXCCSPProtocol.AddElement('Date',
             StrSubstNo(DateTimeLbl,
                 Format(DT2Date(CleanCashTransactionRequest."Receipt DateTime"), 0, '<Filler Character,0><Year4><Month,2><Day,2>'),
-                Format(DT2Time(CleanCashTransactionRequest."Receipt DateTime"), 0, '<Filler Character,0><Hours24,2><Minutes,2>')), XmlNs));
+                Format(DT2Time(CleanCashTransactionRequest."Receipt DateTime"), 0, '<Hours24,2><Filler Character,0><Minutes,2>')), XmlNs));
 
         Receipt.Add(CleanCashXCCSPProtocol.AddElement('ReceiptId', CleanCashTransactionRequest."Receipt Id", XmlNs));
         Receipt.Add(CleanCashXCCSPProtocol.AddElement('PosId', CleanCashTransactionRequest."Pos Id", XmlNs));
