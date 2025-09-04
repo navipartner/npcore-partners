@@ -684,6 +684,28 @@ codeunit 6184850 "NPR FR Audit Mgt."
         SignRecord(POSAuditLog);
     end;
 
+    local procedure SignCompanyInfoChange(var POSAuditLog: Record "NPR POS Audit Log")
+    begin
+        POSAuditLog."External Code" := '410';
+        POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
+        POSAuditLog."External Type" := 'JET';
+        POSAuditLog."External Description" := 'Company Information Change';
+
+        FillSignatureBaseValues(POSAuditLog, true);
+        SignRecord(POSAuditLog);
+    end;
+
+    local procedure SignVATRegChange(var POSAuditLog: Record "NPR POS Audit Log")
+    begin
+        POSAuditLog."External Code" := '128';
+        POSAuditLog."External ID" := GetNextEventNoSeries(0, POSAuditLog."Active POS Unit No.");
+        POSAuditLog."External Type" := 'JET';
+        POSAuditLog."External Description" := 'VAT Registration Change';
+
+        FillSignatureBaseValues(POSAuditLog, true);
+        SignRecord(POSAuditLog);
+    end;
+
     local procedure SignWorkshift(var POSAuditLog: Record "NPR POS Audit Log")
     var
         POSEntry: Record "NPR POS Entry";
@@ -766,8 +788,11 @@ codeunit 6184850 "NPR FR Audit Mgt."
                 SignLogOut(POSAuditLog); //Will not fire unless explicit logout, so not 100% reliable in a browser world.
             POSAuditLog."Action Type"::ITEM_RMA:
                 SignItemRMA(POSAuditLog); //Fired for each RMA line with reference to original sale for full traceability.
+            POSAuditLog."Action Type"::COMPANY_INFO_CHANGE:
+                SignCompanyInfoChange(POSAuditLog);
+            POSAuditLog."Action Type"::VAT_REG_CHANGE:
+                SignVATRegChange(POSAuditLog);
             POSAuditLog."Action Type"::CUSTOM:
-
                 case POSAuditLog."Action Custom Subtype" of
                     'NON_ITEM_AMOUNT':
                         SignNonItemAmount(POSAuditLog); //Diff between item amounts and everything else in a sale (prepayment, deposit, outpayment, vouchers)
@@ -1294,6 +1319,124 @@ codeunit 6184850 "NPR FR Audit Mgt."
             exit(VATPostingSetup.GetFilter("VAT Identifier"));
         end;
     end;
+
+    #region JET Events for Company Information Changes
+
+    procedure LogCompanyDataChange(CompanyInformation: Record "Company Information"; xCompanyInformation: Record "Company Information")
+    var
+        POSAuditLog: Record "NPR POS Audit Log";
+        POSAuditProfile: Record "NPR POS Audit Profile";
+        POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
+        FieldsChanged: List of [Text];
+        ChangedFieldsText: Text;
+        POSUnit: Record "NPR POS Unit";
+        ChangeOfDataRegardingIssuerLbl: Label 'Change of Data Regarding Issuer';
+    begin
+        POSAuditProfile.SetRange("Audit Handler", HandlerCode());
+        if not POSAuditProfile.FindFirst() then
+            exit;
+
+        POSUnit.SetRange("POS Audit Profile", POSAuditProfile.Code);
+        if not POSUnit.FindFirst() then
+            exit;
+
+        if not HasRelevantCompanyDataChanges(CompanyInformation, xCompanyInformation, FieldsChanged) then
+            exit;
+
+        if IsEnabled(POSUnit."POS Audit Profile") then begin
+            ChangedFieldsText := JoinList(FieldsChanged, ',');
+            POSAuditLogMgt.CreateEntryExtended(
+                CompanyInformation.RecordId,
+                POSAuditLog."Action Type"::COMPANY_INFO_CHANGE,
+                0,
+                '',
+                POSUnit."No.",
+                ChangeOfDataRegardingIssuerLbl,
+                ChangedFieldsText);
+        end;
+    end;
+
+    procedure LogVATRegistrationChange(CompanyInformation: Record "Company Information"; xCompanyInformation: Record "Company Information")
+    var
+        POSAuditLog: Record "NPR POS Audit Log";
+        POSAuditProfile: Record "NPR POS Audit Profile";
+        POSAuditLogMgt: Codeunit "NPR POS Audit Log Mgt.";
+        POSUnit: Record "NPR POS Unit";
+        ChangeInfo: Text;
+        OldNewLbl: Label '%1:%2 to %3', Comment = '%1 - Field Name, %2 - Old Value, %3 - New Value';
+        ChangeOfTaxableEntityLbl: Label 'Change of Taxable Entity Using the Software';
+    begin
+        POSAuditProfile.SetRange("Audit Handler", HandlerCode());
+        if not POSAuditProfile.FindFirst() then
+            exit;
+
+        POSUnit.SetRange("POS Audit Profile", POSAuditProfile.Code);
+        if not POSUnit.FindFirst() then
+            exit;
+
+        if CompanyInformation."VAT Registration No." = xCompanyInformation."VAT Registration No." then
+            exit;
+
+        if IsEnabled(POSUnit."POS Audit Profile") then begin
+            ChangeInfo := StrSubstNo(OldNewLbl,
+                CompanyInformation.FieldCaption("VAT Registration No."),
+                xCompanyInformation."VAT Registration No.",
+                CompanyInformation."VAT Registration No.");
+            POSAuditLogMgt.CreateEntryExtended(
+                CompanyInformation.RecordId,
+                POSAuditLog."Action Type"::VAT_REG_CHANGE,
+                0,
+                '',
+                POSUnit."No.",
+                ChangeOfTaxableEntityLbl,
+                ChangeInfo);
+        end;
+    end;
+
+    local procedure HasRelevantCompanyDataChanges(CompanyInformation: Record "Company Information"; xCompanyInformation: Record "Company Information"; var FieldsChanged: List of [Text]): Boolean
+    var
+        ChangeLbl: Label '%1:%2 to %3', Comment = '%1 - Field Name, %2 - Old Value, %3 - New Value';
+    begin
+        Clear(FieldsChanged);
+        // Check relevant company identification fields (excluding VAT Registration No. as it's handled by JET 128)
+        if CompanyInformation.Name <> xCompanyInformation.Name then
+            FieldsChanged.Add(StrSubstNo(ChangeLbl, CompanyInformation.FieldCaption(Name), xCompanyInformation.Name, CompanyInformation.Name));
+        if CompanyInformation."Name 2" <> xCompanyInformation."Name 2" then
+            FieldsChanged.Add(StrSubstNo(ChangeLbl, CompanyInformation.FieldCaption("Name 2"), xCompanyInformation."Name 2", CompanyInformation."Name 2"));
+        if CompanyInformation.Address <> xCompanyInformation.Address then
+            FieldsChanged.Add(StrSubstNo(ChangeLbl, CompanyInformation.FieldCaption(Address), xCompanyInformation.Address, CompanyInformation.Address));
+        if CompanyInformation."Address 2" <> xCompanyInformation."Address 2" then
+            FieldsChanged.Add(StrSubstNo(ChangeLbl, CompanyInformation.FieldCaption("Address 2"), xCompanyInformation."Address 2", CompanyInformation."Address 2"));
+        if CompanyInformation.City <> xCompanyInformation.City then
+            FieldsChanged.Add(StrSubstNo(ChangeLbl, CompanyInformation.FieldCaption(City), xCompanyInformation.City, CompanyInformation.City));
+        if CompanyInformation."Post Code" <> xCompanyInformation."Post Code" then
+            FieldsChanged.Add(StrSubstNo(ChangeLbl, CompanyInformation.FieldCaption("Post Code"), xCompanyInformation."Post Code", CompanyInformation."Post Code"));
+        if CompanyInformation.County <> xCompanyInformation.County then
+            FieldsChanged.Add(StrSubstNo(ChangeLbl, CompanyInformation.FieldCaption(County), xCompanyInformation.County, CompanyInformation.County));
+        if CompanyInformation."Country/Region Code" <> xCompanyInformation."Country/Region Code" then
+            FieldsChanged.Add(StrSubstNo(ChangeLbl, CompanyInformation.FieldCaption("Country/Region Code"), xCompanyInformation."Country/Region Code", CompanyInformation."Country/Region Code"));
+        if CompanyInformation."Phone No." <> xCompanyInformation."Phone No." then
+            FieldsChanged.Add(StrSubstNo(ChangeLbl, CompanyInformation.FieldCaption("Phone No."), xCompanyInformation."Phone No.", CompanyInformation."Phone No."));
+        if CompanyInformation."E-Mail" <> xCompanyInformation."E-Mail" then
+            FieldsChanged.Add(StrSubstNo(ChangeLbl, CompanyInformation.FieldCaption("E-Mail"), xCompanyInformation."E-Mail", CompanyInformation."E-Mail"));
+        if CompanyInformation."Registration No." <> xCompanyInformation."Registration No." then
+            FieldsChanged.Add(StrSubstNo(ChangeLbl, CompanyInformation.FieldCaption("Registration No."), xCompanyInformation."Registration No.", CompanyInformation."Registration No."));
+        exit(FieldsChanged.Count > 0);
+    end;
+
+    local procedure JoinList(FieldsList: List of [Text]; Delimiter: Text): Text
+    var
+        Result: Text;
+        FieldName: Text;
+    begin
+        foreach FieldName in FieldsList do begin
+            if Result <> '' then
+                Result += Delimiter;
+            Result += FieldName;
+        end;
+        exit(Result);
+    end;
+    #endregion
 
     procedure Destruct()
     begin

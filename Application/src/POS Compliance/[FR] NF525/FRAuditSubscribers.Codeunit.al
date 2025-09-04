@@ -291,4 +291,22 @@ codeunit 6184890 "NPR FR Audit Subscribers"
         else
             ProcessingValue := Format(POSEntryOutputLog2.Count() - 1);
     end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Company Information", 'OnAfterModifyEvent', '', false, false)]
+    local procedure OnAfterModifyCompanyInformation(var Rec: Record "Company Information"; var xRec: Record "Company Information"; RunTrigger: Boolean)
+    var
+        FRAuditMgt: Codeunit "NPR FR Audit Mgt.";
+    begin
+        if not RunTrigger then
+            exit;
+
+        if Rec.IsTemporary() then
+            exit;
+
+        // Log JET Event 128 for VAT Registration Number changes
+        FRAuditMgt.LogVATRegistrationChange(Rec, xRec);
+
+        // Log JET Event 410 for other company data changes
+        FRAuditMgt.LogCompanyDataChange(Rec, xRec);
+    end;
 }
