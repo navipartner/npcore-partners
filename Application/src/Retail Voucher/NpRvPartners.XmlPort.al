@@ -25,10 +25,16 @@ xmlport 6151013 "NPR NpRv Partners"
                 fieldelement(service_url; TempNpRvPartner."Service Url")
                 {
                 }
+                textelement(auth_type)
+                {
+                }
                 fieldelement(service_username; TempNpRvPartner."Service Username")
                 {
                 }
                 textelement(service_password)
+                {
+                }
+                fieldelement(oauth_setup_code; TempNpRvPartner."OAuth2 Setup Code")
                 {
                 }
                 textelement(relations)
@@ -52,6 +58,14 @@ xmlport 6151013 "NPR NpRv Partners"
                         end;
                     }
                 }
+
+                trigger OnAfterInsertRecord()
+                var
+                    AuthType: Enum "NPR API Auth. Type";
+                begin
+                    if auth_type <> '' then
+                        TempNpRvPartner.AuthType := Enum::"NPR API Auth. Type".FromInteger(AuthType.Ordinals.Get(AuthType.Names.IndexOf(auth_type)));
+                end;
             }
         }
     }

@@ -66,8 +66,10 @@
                    '<retail_voucher_partner partner_code="' + NpRvPartner.Code + '">' +
                      '<name>' + '<![CDATA[' + NpRvPartner.Name + ']]>' + '</name>' +
                      '<service_url>' + '<![CDATA[' + NpRvPartner."Service Url" + ']]>' + '</service_url>' +
+                     '<auth_type>' + '<![CDATA[' + NpRvPartner.AuthType.Names().Get(NpRvPartner.AuthType.Ordinals().IndexOf(NpRvPartner.AuthType.AsInteger())) + ']]>' + '</auth_type>' +
                      '<service_username>' + '<![CDATA[' + NpRvPartner."Service Username" + ']]>' + '</service_username>' +
                      '<service_password>' + '<![CDATA[' + WebServiceAuthHelper.GetApiPassword(NpRvPartner."API Password Key") + ']]>' + '</service_password>' +
+                     '<oauth_setup_code>' + '<![CDATA[' + NpRvPartner."OAuth2 Setup Code" + ']]>' + '</oauth_setup_code>' +
                      '<relations>' +
                        '<relation voucher_type="' + NpRvGlobalVoucherSetup."Voucher Type" + '" />' +
                      '</relations>' +

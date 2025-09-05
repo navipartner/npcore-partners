@@ -33,17 +33,26 @@
         NpRvPartnerRelation: Record "NPR NpRv Partner Relation";
         WebServiceAuthHelper: Codeunit "NPR Web Service Auth. Helper";
         PrevRec: Text;
+        PrevAPIPasswordKey: Guid;
     begin
         if not NpRvPartner.Get(TempNpRvPartner.Code) then begin
             NpRvPartner.Init();
             NpRvPartner := TempNpRvPartner;
             NpRvPartner.Insert(true);
-            WebServiceAuthHelper.SetApiPassword(ServicePassword, NpRvPartner."API Password Key");
-            NpRvPartner.Modify();
         end;
 
+        PrevAPIPasswordKey := NpRvPartner."API Password Key";
         PrevRec := Format(NpRvPartner);
         NpRvPartner.TransferFields(TempNpRvPartner, false);
+
+        //handle isolated storage password key
+        NpRvPartner."API Password Key" := PrevAPIPasswordKey;
+        if ServicePassword <> '' then
+            WebServiceAuthHelper.SetApiPassword(ServicePassword, NpRvPartner."API Password Key")
+        else
+            if WebServiceAuthHelper.HasApiPassword(NpRvPartner."API Password Key") then
+                WebServiceAuthHelper.RemoveApiPassword(NpRvPartner."API Password Key");
+
         if PrevRec <> Format(NpRvPartner) then
             NpRvPartner.Modify(true);
 

@@ -87,6 +87,7 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR OAuth Setup";
             Caption = 'OAuth2.0 Setup Code';
+            ValidateTableRelation = false;
         }
 
     }
