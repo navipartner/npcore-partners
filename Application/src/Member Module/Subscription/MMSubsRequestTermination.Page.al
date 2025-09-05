@@ -102,6 +102,7 @@ page 6185077 "NPR MM SubsRequestTermination"
 
                         AlterationSetupPage.GetRecord(AlterationSetup);
                         _RefundItemNo := AlterationSetup."Sales Item No.";
+                        _RefundItemDescription := AlterationSetup.Description;
 
                         // OnValidate() trigger is not triggered after a lookup.
                         CalculateRefundPrice();
@@ -120,10 +121,45 @@ page 6185077 "NPR MM SubsRequestTermination"
                         CalculateRefundPrice();
                     end;
                 }
+                field(RefundItemDescription; _RefundItemDescription)
+                {
+                    Caption = 'Refund Item Description';
+                    ToolTip = 'Specifies the description of the item that will be used to cancel the membership.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Editable = false;
+                }
                 field(RefundPriceFld; _RefundPrice)
                 {
                     Caption = 'Refund Price';
                     ToolTip = 'Specifies the price that will be refunded to the associated card.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Editable = false;
+                }
+                field(MemberPaymentMethodPSP; _MemberPaymentMethod.PSP)
+                {
+                    Caption = 'PSP';
+                    ToolTip = 'Specifies the payment service provider of the member payment method.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Editable = false;
+                }
+                field(MemberPaymentMethodBrand; _MemberPaymentMethod."Payment Brand")
+                {
+                    Caption = 'Payment Brand';
+                    ToolTip = 'Specifies the payment method brand of the member payment method.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Editable = false;
+                }
+                field(MemberPaymentMethodMaskedPAN; _MemberPaymentMethod."Masked PAN")
+                {
+                    Caption = 'Masked PAN';
+                    ToolTip = 'Specifies the masked PAN of the member payment method.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Editable = false;
+                }
+                field(MemberPaymentMethodExpiryDate; _MemberPaymentMethod."Expiry Date")
+                {
+                    Caption = 'Expiry Date';
+                    ToolTip = 'Specifies the expiry date of the member payment method.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     Editable = false;
                 }
@@ -134,22 +170,25 @@ page 6185077 "NPR MM SubsRequestTermination"
     var
         _Subscription: Record "NPR MM Subscription";
         _Membership: Record "NPR MM Membership";
+        _MemberPaymentMethod: Record "NPR MM Member Payment Method";
         _MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
         _TerminationDate: Date;
         _TerminationReason: Enum "NPR MM Subs Termination Reason";
         _RefundAvailable, _RefundRemaining : Boolean;
         _RefundItemNo: Code[20];
+        _RefundItemDescription: Text[100];
         _RefundPrice: Decimal;
         _RefundNotAvailable: Text;
         _NoPaymentRequest: Text;
 
     trigger OnOpenPage()
     var
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+        PaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
         MembershipNotSelectedLbl: Label 'A membership must be selected.';
         RefundNotAvailableLbl: Label 'The required configuration to cancel the membership is not present and therefore a refund cannot be executed automatically.';
         NoPaymentRequestRefundMayNotWorkLbl: Label 'This subscription is yet to be renewed automatically or all existing payments has previously been refunded. Some payment service providers do not allow unreferenced refunds and therefore the refund will fail later on.';
-        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
-        SubscriptionRequest: Record "NPR MM Subscr. Request";
     begin
         if _Membership."Entry No." = 0 then
             Error(MembershipNotSelectedLbl);
@@ -169,6 +208,8 @@ page 6185077 "NPR MM SubsRequestTermination"
         _RefundNotAvailable := RefundNotAvailableLbl;
 
         _TerminationReason := _TerminationReason::CUSTOMER_INITIATED;
+
+        if PaymentMethodMgt.TryGetMemberPaymentMethod(_Subscription, false, _MemberPaymentMethod) then;
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -212,11 +253,14 @@ page 6185077 "NPR MM SubsRequestTermination"
         if (AlterationSetup.FindSet()) then
             repeat
                 _RefundItemNo := AlterationSetup."Sales Item No.";
+                _RefundItemDescription := AlterationSetup.Description;
                 RefundAvailable := CheckRefundAvailable();
             until (AlterationSetup.Next() = 0) or (RefundAvailable);
 
-        if (not RefundAvailable) then
+        if (not RefundAvailable) then begin
             Clear(_RefundItemNo);
+            Clear(_RefundItemDescription);
+        end;
 
         _RefundAvailable := RefundAvailable;
     end;
