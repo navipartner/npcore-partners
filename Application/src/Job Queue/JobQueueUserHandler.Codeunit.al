@@ -38,7 +38,7 @@ codeunit 6151058 "NPR Job Queue User Handler"
         if not IsRefreshJobQueueEntriesEnabled(JobQueueRefreshSetup) then
             exit;
 
-        if not ShouldRefreshJobQueueEntries(JobQueueRefreshSetup) then
+        if not ShouldRefreshJobQueueEntries() then
             exit;
 
         if not CanUserRefreshJobQueueEntries() then
@@ -47,7 +47,7 @@ codeunit 6151058 "NPR Job Queue User Handler"
         if IsTaskAlreadyScheduled() then
             exit;
 
-        UpdateLastRefreshed(JobQueueRefreshSetup);
+        UpdateLastRefreshed();
 
         TaskScheduler.CreateTask(Codeunit::"NPR Job Queue User Handler", 0, true, CompanyName(), CurrentDateTime() + 2000); // Add 2s
     end;
@@ -58,13 +58,17 @@ codeunit 6151058 "NPR Job Queue User Handler"
         exit(JobQueueRefreshSetup.Enabled and not JobQueueRefreshSetup."Use External JQ Refresher");
     end;
 
-    local procedure ShouldRefreshJobQueueEntries(JobQueueRefreshSetup: Record "NPR Job Queue Refresh Setup") ShouldRefresh: Boolean
+    local procedure ShouldRefreshJobQueueEntries() ShouldRefresh: Boolean
     var
+        JobQueueRefreshLog: Record "NPR Job Queue Refresh Log";
         JobQueueManagement: Codeunit "NPR Job Queue Management";
     begin
         ShouldRefresh := true;
-        if JobQueueRefreshSetup."Last Refreshed" <> 0DT then
-            ShouldRefresh := JobQueueRefreshSetup."Last Refreshed" + JobQueueManagement.MinutesToDuration(60) < CurrentDateTime();  //Refresh every hour
+        JobQueueRefreshLog.SetCurrentKey("Last Refreshed");
+        JobQueueRefreshLog.SetAscending("Last Refreshed", false);
+        if JobQueueRefreshLog.FindFirst() then
+            if JobQueueRefreshLog."Last Refreshed" <> 0DT then
+                ShouldRefresh := JobQueueRefreshLog."Last Refreshed" + JobQueueManagement.MinutesToDuration(60) < CurrentDateTime();  //Refresh every hour
     end;
 
     procedure CanUserRefreshJobQueueEntries(): Boolean
@@ -176,9 +180,14 @@ codeunit 6151058 "NPR Job Queue User Handler"
         exit(false);
     end;
 
-    local procedure UpdateLastRefreshed(var JobQueueRefreshSetup: Record "NPR Job Queue Refresh Setup")
+    internal procedure UpdateLastRefreshed()
+    var
+        JobQueueRefreshLog: Record "NPR Job Queue Refresh Log";
     begin
-        JobQueueRefreshSetup."Last Refreshed" := CurrentDateTime();
-        JobQueueRefreshSetup.Modify();
+        JobQueueRefreshLog."JQ Runner User Name" := CopyStr(UserId(), 1, MaxStrLen(JobQueueRefreshLog."JQ Runner User Name"));
+        if not JobQueueRefreshLog.Find() then
+            JobQueueRefreshLog.Insert();
+        JobQueueRefreshLog."Last Refreshed" := CurrentDateTime();
+        JobQueueRefreshLog.Modify();
     end;
 }

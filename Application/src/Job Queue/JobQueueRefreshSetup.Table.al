@@ -27,6 +27,15 @@ table 6059870 "NPR Job Queue Refresh Setup"
         {
             Caption = 'Last Refreshed';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-09-04';
+            ObsoleteReason = 'Moved to "NPR Job Queue Refresh Log".';
+        }
+        field(31; "Last Refreshed FF"; DateTime)
+        {
+            Caption = 'Last Refreshed';
+            FieldClass = FlowField;
+            CalcFormula = max("NPR Job Queue Refresh Log"."Last Refreshed");
         }
         field(40; "Use External JQ Refresher"; Boolean)
         {

@@ -80,10 +80,17 @@ page 6150891 "NPR Job Queue Refresh Setup"
                     Importance = Additional;
                     Visible = false;
                 }
-                field("Last Refreshed"; Rec."Last Refreshed")
+                field("Last Refreshed"; Rec."Last Refreshed FF")
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the date and time when the list of NP Retail related job queue entries was refreshed the last time.';
+                    DrillDown = true;
+                    Editable = false;
+
+                    trigger OnDrillDown()
+                    begin
+                        Page.Run(Page::"NPR Job Queue Refresh Logs");
+                    end;
                 }
             }
             part("Monitored Job Queues"; "NPR Monitored JQ Entries")
