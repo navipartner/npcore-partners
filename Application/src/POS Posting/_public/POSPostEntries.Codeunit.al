@@ -1017,19 +1017,13 @@
                                 POSPostingBuffer."POS Entry No." := POSSalesLineToBeCompressed."POS Entry No.";
                                 POSPostingBuffer."Line No." := POSSalesLineToBeCompressed."Line No.";
                                 POSPostingBuffer."No." := POSSalesLineToBeCompressed."No.";
-                                if POSPeriodRegister."Document No." = '' then
-                                    POSPostingBuffer."Document No." := POSSalesLineToBeCompressed."Document No."
-                                else
-                                    POSPostingBuffer."Document No." := POSPeriodRegister."Document No.";
+                                POSPostingBuffer."Document No." := POSSalesLineToBeCompressed."Document No.";
                                 PostingDescription := POSSalesLineToBeCompressed.Description;
                             end;
                         Compressionmethod::"Per POS Entry":
                             begin
                                 POSPostingBuffer."POS Entry No." := POSSalesLineToBeCompressed."POS Entry No.";
-                                if POSPeriodRegister."Document No." = '' then
-                                    POSPostingBuffer."Document No." := POSSalesLineToBeCompressed."Document No."
-                                else
-                                    POSPostingBuffer."Document No." := POSPeriodRegister."Document No.";
+                                POSPostingBuffer."Document No." := POSSalesLineToBeCompressed."Document No.";
                                 if POSSalesLineToBeCompressed."Copy Description" then
                                     PostingDescription := POSSalesLineToBeCompressed.Description
                                 else
@@ -1166,18 +1160,12 @@
                                 POSPostingBuffer."POS Payment Bin Code" := POSPaymentLineToBeCompressed."POS Payment Bin Code";
                                 POSPostingBuffer."POS Entry No." := POSPaymentLineToBeCompressed."POS Entry No.";
                                 POSPostingBuffer."Line No." := POSPaymentLineToBeCompressed."Line No.";
-                                if POSPeriodRegister."Document No." = '' then
-                                    POSPostingBuffer."Document No." := POSPaymentLineToBeCompressed."Document No."
-                                else
-                                    POSPostingBuffer."Document No." := POSPeriodRegister."Document No.";
+                                POSPostingBuffer."Document No." := POSPaymentLineToBeCompressed."Document No.";
                             end;
                         Compressionmethod::"Per POS Entry":
                             begin
                                 POSPostingBuffer."POS Entry No." := POSPaymentLineToBeCompressed."POS Entry No.";
-                                if POSPeriodRegister."Document No." = '' then
-                                    POSPostingBuffer."Document No." := POSPaymentLineToBeCompressed."Document No."
-                                else
-                                    POSPostingBuffer."Document No." := POSPeriodRegister."Document No.";
+                                POSPostingBuffer."Document No." := POSPaymentLineToBeCompressed."Document No.";
                             end;
                         Compressionmethod::"Per POS Period Register":
                             begin
