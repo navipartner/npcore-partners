@@ -36,5 +36,10 @@ enum 6059826 "NPR ApiSpeedgateFunctions"
     {
         Caption = 'Mark as denied';
     }
+
+    value(230; FAILED_BY_APP)
+    {
+        Caption = 'Failed by app';
+    }
 }
 #endif

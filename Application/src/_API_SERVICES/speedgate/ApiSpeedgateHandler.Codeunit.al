@@ -65,6 +65,9 @@ codeunit 6185117 "NPR ApiSpeedgateHandler"
 
             _ApiFunction::MARK_AS_DENIED:
                 _Response := Speedgate.MarkAsDenied(_Request, _ErrorCode, _ErrorMessage);
+
+            _ApiFunction::FAILED_BY_APP:
+                _Response := Speedgate.FailedByApp(_Request);
         end;
     end;
 

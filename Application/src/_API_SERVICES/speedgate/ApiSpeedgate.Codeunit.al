@@ -21,13 +21,112 @@ codeunit 6185116 "NPR ApiSpeedgate" implements "NPR API Request Handler"
             exit(Handle(_Functions::GET_SPEEDGATE_SETUP, Request));
 
 
-
         if (Request.Match('POST', '/speedgate/try')) then
             exit(Handle(_Functions::TRY_ADMIT, Request));
+
+        if (Request.Match('POST', '/speedgate/tryAndAttemptAdmit')) then
+            exit(TryAndAttemptAdmit(Request));
 
         if (Request.Match('POST', '/speedgate/admit')) then
             exit(Handle(_Functions::ADMIT, Request));
 
+        if (Request.Match('PUT', '/speedgate/failAdmitToken')) then
+            exit(Handle(_Functions::FAILED_BY_APP, Request));
+    end;
+
+    local procedure TryAndAttemptAdmit(Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        AdmitRequest: Codeunit "NPR API Request";
+        TryResponse, AdmitResponse : Codeunit "NPR API Response";
+        TokensToAdmit, EmptyJsonArray : JsonArray;
+        JsonBody, AdmitRequestJson : JsonObject;
+        TryResponseToken, AdmitResponseTokens : JsonToken;
+    begin
+
+        TryResponse := Handle(_Functions::TRY_ADMIT, Request);
+
+        if (not (TryResponse.GetStatusCode() in [200 .. 299])) then
+            exit(TryResponse);
+
+        if (not TryResponse.GetJson().Get('token', TryResponseToken)) then
+            exit(TryResponse);
+
+        Commit(); // Persist the try before doing the admit
+
+        // build new request body for admit, only main token supported
+        AdmitRequestJson.Add('token', TryResponseToken.AsValue().AsText());
+        TokensToAdmit.Add(AdmitRequestJson);
+
+        // Remove tokens that are not valid for admit with intent
+        TokensToAdmit := ValidateTokensForAdmitWithIntent(TokensToAdmit);
+
+        if (TokensToAdmit.Count() > 0) then begin
+            Clear(JsonBody);
+            JsonBody.Add('tokens', TokensToAdmit);
+            AdmitRequest.Init(ENUM::"Http Method"::POST, '/speedgate/admit', Request.Paths(), Request.QueryParams(), Request.Headers(), JsonBody.AsToken());
+            AdmitResponse := Handle(_Functions::ADMIT, AdmitRequest);
+
+            if (not (AdmitResponse.GetStatusCode() in [200 .. 299])) then
+                exit(AdmitResponse);
+
+            if (not AdmitResponse.GetJson().Get('admittedTokens', AdmitResponseTokens)) then
+                AdmitResponseTokens := EmptyJsonArray.AsToken();
+
+        end else begin
+            // no tokens to admit, return try response with empty admittedTokens array
+            AdmitResponseTokens := EmptyJsonArray.AsToken();
+        end;
+
+        // combine responses
+        JsonBody := TryResponse.GetJson();
+        JsonBody.Add('admittedTokens', AdmitResponseTokens.AsArray());
+
+        exit(Response.RespondOK(JsonBody));
+    end;
+
+    local procedure ValidateTokensForAdmitWithIntent(TokensWithIntent: JsonArray) TokensToAdmit: JsonArray
+    var
+        JToken, GetToken : JsonToken;
+        JObject: JsonObject;
+        TokeGuid: Guid;
+        ValidationRequest: Record "NPR SGEntryLog";
+        AttemptAdmit: Boolean;
+    begin
+        foreach JToken in TokensWithIntent do begin
+            AttemptAdmit := true;
+
+            // {"token": "guid"}
+            if (not JToken.IsObject()) then
+                AttemptAdmit := false;
+
+            JObject := JToken.AsObject();
+            if (not JObject.Get('token', GetToken)) then
+                AttemptAdmit := false;
+
+            if (not Evaluate(TokeGuid, GetToken.AsValue().AsText())) then
+                AttemptAdmit := false;
+
+            ValidationRequest.SetCurrentKey("Token");
+            ValidationRequest.SetFilter("Token", '=%1', TokeGuid);
+            if (not ValidationRequest.FindSet()) then
+                AttemptAdmit := false;
+
+            // Group tickets are not supported with admit intent
+            if (ValidationRequest.SuggestedQuantity > 1) then
+                AttemptAdmit := false;
+
+            // Wallet reference numbers are only supported for specific tables and must have an entity linked
+            if (ValidationRequest.ReferenceNumberType = ValidationRequest.ReferenceNumberType::WALLET) then begin
+                if (ValidationRequest.ExtraEntityTableId = 0) then
+                    AttemptAdmit := false;
+
+                if (not (ValidationRequest.ExtraEntityTableId in [Database::"NPR TM Ticket", Database::"NPR MM Member Card"])) then
+                    AttemptAdmit := false;
+            end;
+
+            if (AttemptAdmit) then
+                TokensToAdmit.Add(JToken);
+        end;
     end;
 
     local procedure Handle(Function: Enum "NPR ApiSpeedgateFunctions"; Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"

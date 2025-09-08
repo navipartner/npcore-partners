@@ -408,6 +408,33 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         Response.RespondNoContent();
     end;
 
+
+    internal procedure FailedByApp(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        SpeedGateMgr: Codeunit "NPR SG SpeedGate";
+        ErrorCode: Enum "NPR API Error Code";
+        ErrorMessage: Text[250];
+        Token: Guid;
+
+        Body: JsonObject;
+        JTokens: JsonToken;
+        TokenText: Text[100];
+    begin
+
+        Body := Request.BodyJson().AsObject();
+        if (not Body.Get('token', JTokens)) then
+            exit;
+        TokenText := CopyStr(JTokens.AsValue().AsText(), 1, MaxStrLen(TokenText));
+
+        if (Body.Get('errorMessage', JTokens)) then
+            ErrorMessage := CopyStr(JTokens.AsValue().AsText(), 1, MaxStrLen(ErrorMessage));
+
+        if (Evaluate(Token, TokenText)) then
+            SpeedGateMgr.MarkAsDenied(Token, ErrorCode::admit_token_failed_by_app, ErrorMessage);
+
+        Response.RespondOK('token marked as failed by app');
+    end;
+
     // **********************
     internal procedure TryAdmit(LogEntryNo: Integer) Response: Codeunit "NPR API Response"
     var

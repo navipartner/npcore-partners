@@ -160,6 +160,10 @@ enum 6059810 "NPR API Error Code"
     {
         Caption = 'The city card is not valid.', Locked = true;
     }
+    value(6060044; admit_token_failed_by_app)
+    {
+        Caption = 'The admit token was marked as failed by API consumer.', Locked = true;
+    }
     value(6060133; member_blocked)
     {
         Caption = 'Member is blocked.', Locked = true;
