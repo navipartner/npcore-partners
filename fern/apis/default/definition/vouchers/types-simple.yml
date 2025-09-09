@@ -66,14 +66,14 @@ types:
 
   AllowTopUp:
     type: boolean
-    docs: indicates if value of a voucher can be increased after the initial purchase by the amount provided by the customer
+    docs: Indicates if value of a voucher can be increased after the initial purchase by the amount provided by the customer
     examples:
       - name: ExampleAllowTopUp
         value: true
 
   Open:
     type: boolean
-    docs: indicates if the voucher has a remaining amount to be used
+    docs: Indicates if the voucher has a remaining amount to be used
     examples:
       - name: ExampleOpen
         value: true

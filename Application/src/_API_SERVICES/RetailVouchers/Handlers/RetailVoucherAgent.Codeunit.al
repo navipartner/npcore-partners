@@ -262,6 +262,7 @@ codeunit 6248253 "NPR RetailVoucherAgent"
             .AddProperty('startingDate', NpRvVoucher."Starting Date")
             .AddProperty('endingDate', NpRvVoucher."Ending Date")
             .AddProperty('initialAmount', NpRvVoucher."Initial Amount")
+            .AddProperty('allowTopUp', NpRvVoucher."Allow Top-up")
             .AddProperty('amount', NpRvVoucher.Amount)
             .AddProperty('reservedAmount', NpRvVoucher."Reserved Amount")
             .AddProperty('open', NpRvVoucher.Open)

@@ -46,6 +46,7 @@ types:
       startingDate: simpleTypes.StartingDate
       endingDate: simpleTypes.EndingDate     
       initialAmount: simpleTypes.InitialAmount
+      allowTopUp: simpleTypes.AllowTopUp
       amount: simpleTypes.Amount
       reservedAmount: simpleTypes.ReservedAmount
       open: simpleTypes.Open
@@ -60,6 +61,7 @@ types:
           startingDate: $simpleTypes.StartingDate.ExampleStartingDate
           endingDate: $simpleTypes.EndingDate.ExampleEndingDate
           initialAmount: $simpleTypes.InitialAmount.ExampleInitialAmount
+          allowTopUp: $simpleTypes.AllowTopUp.ExampleAllowTopUp
           amount: $simpleTypes.Amount.ExampleAmount
           reservedAmount: $simpleTypes.ReservedAmount.ExampleReservedAmount
           open: $simpleTypes.Open.ExampleOpen
