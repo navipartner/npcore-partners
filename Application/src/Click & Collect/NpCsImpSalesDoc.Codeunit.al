@@ -305,6 +305,7 @@
     local procedure InsertSalesHeader(Element: XmlElement; Customer: Record Customer; var SalesHeader: Record "Sales Header")
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
+        InclVATElement: XmlElement;
         DocNo: Text;
         BillToCustNo: Code[20];
     begin
@@ -329,6 +330,8 @@
         SalesHeader.Validate("Payment Method Code", NpXmlDomMgt.GetElementCode(Element, 'payment_method_code', MaxStrLen(SalesHeader."Payment Method Code"), true));
         SalesHeader.Validate("Shipment Method Code", NpXmlDomMgt.GetElementCode(Element, 'shipment_method_code', MaxStrLen(SalesHeader."Shipment Method Code"), true));
         SalesHeader."Ship-to Contact" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'ship_to_contact', MaxStrLen(SalesHeader."Ship-to Contact"), false), 1, MaxStrLen(SalesHeader."Ship-to Contact"));
+        if NpXmlDomMgt.FindElement(Element, 'prices_including_vat', false, InclVATElement) then
+            if Evaluate(SalesHeader."Prices Including VAT", InclVATElement.InnerText, 9) then;
         SalesHeader.Modify(true);
     end;
 
