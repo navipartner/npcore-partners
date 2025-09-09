@@ -77,6 +77,7 @@ types:
     properties:
       memberCardId: simpleTypes.MemberCardId
       membershipId: simpleTypes.MembershipId
+      membershipCode: simpleTypes.MembershipCode
       member: MemberDetails
       previousScan: PreviousScan
       guests: list<MemberGuestOptions>
@@ -85,6 +86,7 @@ types:
         value:
           memberCardId: $simpleTypes.MemberCardId.ExampleMemberCardId
           membershipId: $simpleTypes.MembershipId.ExampleMembershipId
+          membershipCode: $simpleTypes.MembershipCode.GOLD
           member: $MemberDetails.ExampleMemberDetails
           previousScan: $PreviousScan.ExamplePreviousScan
           guests:

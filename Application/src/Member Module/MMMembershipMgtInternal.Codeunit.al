@@ -789,6 +789,41 @@
         exit(true);
     end;
 
+    internal procedure GetMemberImageThumbnail(MemberEntryNo: Integer; var Base64StringImage: Text; Width: Integer) Success: Boolean
+    var
+        Member: Record "NPR MM Member";
+        MediaThumbnail: Record "Tenant Media Thumbnails";
+        Base64Convert: Codeunit "Base64 Convert";
+        InStr: InStream;
+        Embedded: Boolean;
+    begin
+
+        if (not Member.Get(MemberEntryNo)) then
+            exit(false);
+
+        if (not Member.Image.HasValue()) then
+            exit(false);
+
+        if (not (Width in [70, 240, 360])) then
+            Embedded := true;
+
+        MediaThumbnail.SetFilter("Media ID", '=%1', Member.Image.MediaId());
+        MediaThumbnail.SetFilter(Embedded, '=%1', Embedded);
+        if (not Embedded) then
+            MediaThumbnail.SetFilter(Width, '=%1', Width);
+
+        if (not MediaThumbnail.FindFirst()) then
+            exit(false);
+
+        MediaThumbnail.CalcFields(Content);
+        if (not MediaThumbnail.Content.HasValue()) then
+            exit(false);
+
+        MediaThumbnail.Content.CreateInStream(InStr);
+        Base64StringImage := Base64Convert.ToBase64(InStr);
+        exit(true);
+    end;
+
     internal procedure UpdateMember(MembershipEntryNo: Integer; MemberEntryNo: Integer; MembershipInfoCapture: Record "NPR MM Member Info Capture") Success: Boolean
     var
         Member: Record "NPR MM Member";

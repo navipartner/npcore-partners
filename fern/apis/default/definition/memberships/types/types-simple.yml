@@ -414,6 +414,28 @@ types:
       - name: ExampleBase64Image
         value: SGVsbG8gV29ybGQ=
 
+  MemberImageSizeEnum:
+    enum:
+      - small
+      - medium
+      - large
+      - embedded
+      - original
+  
+  MemberImageSize:
+    type: MemberImageSizeEnum
+    docs: 
+      The size of the member image thumbnail to retrieve. Small images are not upscaled, and some image types may compress better at different sizes.
+      Defaults to `large` (360px) when unspecified, with fallback to `medium` (240px) and then `original`. 
+      `small` (70px) are suitable for lists. 
+      `original` returns the original image as uploaded, which may be very large.
+      `embedded` returns a smaller embedded version of the original image, suitable for use in documents
+    examples:
+      - name: Large
+        value: large
+      - name: Original
+        value: original
+
   GDPRConsentEnum:
     enum:
       - pending

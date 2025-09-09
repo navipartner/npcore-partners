@@ -801,7 +801,13 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         Base64StringImage: Text;
         TimeZoneHelper: Codeunit "NPR TM TimeHelper";
+        HaveImage: Boolean;
     begin
+        MemberCard.SetLoadFields("Membership Entry No.", "Member Entry No.");
+        Membership.SetLoadFields("External Membership No.", "Membership Code");
+        Member.SetLoadFields("External Member No.", "First Name", "Last Name", Image);
+        MemberCardSwipe.SetLoadFields("Created At", "Admission Code", "Scanner Station Id", "Response Type");
+
         if (not MemberCard.GetBySystemId(ValidationRequest.EntityId)) then
             exit(ResponseJson.AddProperty('memberCard', 'not found'));
 
@@ -828,6 +834,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             .StartObject('memberCard')
             .AddProperty('memberCardId', Format(MemberCard.SystemId, 0, 4).ToLower())
             .AddProperty('membershipId', Format(Membership.SystemId, 0, 4).ToLower())
+            .AddProperty('membershipCode', Membership."Membership Code")
             .StartObject('previousScan')
                 .AddObject(AddRequiredProperty(ResponseJson, 'scannedAt', TimeZoneHelper.FormatDateTimeWithAdmissionTimeZone(MemberCardSwipe."Admission Code", TimeZoneHelper.AdjustZuluToAdmissionLocalDateTime(MemberCardSwipe."Admission Code", MemberCardSwipe."Created At"))))
                 .AddProperty('scannerId', MemberCardSwipe."Scanner Station Id")
@@ -844,11 +851,18 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
                 .AddProperty('hasPicture', Member.Image.HasValue())
                 .AddProperty('hasNotes', Member.HasLinks());
 
-        if (MemberCardProfileLine.IncludeMemberPhoto) then
-            if (MembershipManagement.GetMemberImage(Member."Entry No.", Base64StringImage)) then
+        if (MemberCardProfileLine.IncludeMemberPhoto) then begin
+            HaveImage := MembershipManagement.GetMemberImageThumbnail(Member."Entry No.", Base64StringImage, 360);
+            if (not HaveImage) then
+                HaveImage := MembershipManagement.GetMemberImageThumbnail(Member."Entry No.", Base64StringImage, 240);
+            if (not HaveImage) then
+                HaveImage := MembershipManagement.GetMemberImage(Member."Entry No.", Base64StringImage);
+
+            if (HaveImage) then
                 ResponseJson.AddProperty('picture', Base64StringImage)
             else
                 ResponseJson.AddProperty('picture');
+        end;
 
         ResponseJson.EndObject()
             .AddArray(AddMembershipGuestDetails(ResponseJson, Membership."Membership Code", ValidationRequest))

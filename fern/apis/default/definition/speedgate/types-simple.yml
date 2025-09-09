@@ -477,7 +477,7 @@ types:
   # ScannerId setup
   Base64Image:
     type: base64
-    docs: Base64 encoded image of the member.
+    docs: Base64 encoded image of the member. Prioritizes thumbnail size `large`.
     examples:
       - name: ExampleBase64Image
         value: SGVsbG8gV29ybGQ=

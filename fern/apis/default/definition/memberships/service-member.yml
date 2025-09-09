@@ -149,6 +149,8 @@ service:
         memberId: simpleTypes.MemberId
       request:
         name: getMemberImage
+        query-parameters:
+          size: optional<simpleTypes.MemberImageSize>
       response: GetMemberImageResponse
       examples:
         - name: Example Get Member Image
@@ -157,6 +159,8 @@ service:
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             memberId: $simpleTypes.MemberId.ExampleMemberId
+          query-parameters:
+            size: $simpleTypes.MemberImageSize.Original
           response:
             body: $GetMemberImageResponse.ExampleGetMemberImage
 

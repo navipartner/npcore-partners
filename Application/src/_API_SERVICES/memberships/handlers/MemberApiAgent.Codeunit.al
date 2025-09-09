@@ -125,15 +125,41 @@ codeunit 6248220 "NPR MemberApiAgent"
         ResponseJson: Codeunit "NPR JSON Builder";
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         Base64StringImage: Text;
+        ImageSize: text[20];
+        HaveImage: Boolean;
     begin
+        Member.SetLoadFields("Entry No.", Image);
+
         if (not GetMemberById(Request, 3, Member)) then
             exit(InvalidMemberIdResponse());
 
         if (not Member.Image.HasValue()) then
             exit(Response.RespondBadRequest('Member has no image'));
 
-        if (not MembershipManagement.GetMemberImage(Member."Entry No.", Base64StringImage)) then
-            exit(Response.RespondBadRequest('There was an error retrieving the image'));
+        if (Request.QueryParams().ContainsKey('size')) then
+            ImageSize := CopyStr(Request.QueryParams().Get('size'), 1, MaxStrLen(ImageSize));
+
+        case LowerCase(ImageSize) of
+            'small':
+                HaveImage := MembershipManagement.GetMemberImageThumbnail(Member."Entry No.", Base64StringImage, 70);
+            'medium':
+                HaveImage := MembershipManagement.GetMemberImageThumbnail(Member."Entry No.", Base64StringImage, 240);
+            'large':
+                HaveImage := MembershipManagement.GetMemberImageThumbnail(Member."Entry No.", Base64StringImage, 360);
+            'embedded':
+                HaveImage := MembershipManagement.GetMemberImageThumbnail(Member."Entry No.", Base64StringImage, 0);
+            'original':
+                HaveImage := MembershipManagement.GetMemberImage(Member."Entry No.", Base64StringImage);
+            else
+                HaveImage := MembershipManagement.GetMemberImageThumbnail(Member."Entry No.", Base64StringImage, 360);
+                if (not HaveImage) then
+                    HaveImage := MembershipManagement.GetMemberImageThumbnail(Member."Entry No.", Base64StringImage, 240);
+                if (not HaveImage) then
+                    HaveImage := MembershipManagement.GetMemberImage(Member."Entry No.", Base64StringImage);
+        end;
+
+        if (not HaveImage) then
+            exit(Response.RespondBadRequest('There was an error retrieving the image with that size, try one of these: small, medium, large, embedded, original'));
 
         ResponseJson.StartObject()
             .AddProperty('image', Base64StringImage)
