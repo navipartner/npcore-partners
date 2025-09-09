@@ -69,9 +69,9 @@ codeunit 6248358 "NPR POSAction TMRebookForToday" implements "NPR IPOS Workflow"
             WalletFacade.GetWalletAssets(Wallet.WalletReferenceNumber, WalletAssets);
             while (WalletAssets.Read()) do begin
                 IsWallet := true;
-                RevokeCount := 1;
                 if (WalletAssets.AssetType = WalletAssets.AssetType::TICKET) then
-                    RebookOneTicket(WalletAssets.AssetReferenceNumber, ReferenceNumber, WalletAssets.WalletEntryNo, AmountRevoked);
+                    if (RebookOneTicket(WalletAssets.AssetReferenceNumber, ReferenceNumber, WalletAssets.WalletEntryNo, AmountRevoked) <> 0) then
+                        RevokeCount := 1; // Just indicate that we did something
             end;
 
             GobbleNegativeAmount(AdditionalItemNo, RevokeCount, AmountRevoked);
