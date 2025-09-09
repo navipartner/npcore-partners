@@ -545,8 +545,7 @@ codeunit 6059818 "NPR POS Statistics Mgt."
                     repeat
                         Clear(CashSummary);
                         CashSummary.SetRange(PaymentMethodCode, POSPaymentMethod."Code");
-                        FirstEntry := 0;
-                        FirstEntry := FindLastFloat(POSUnit."Default POS Payment Bin", POSPaymentMethod.Code);
+                        FirstEntry := FindLastFloat(POSUnit."No.", POSUnit."Default POS Payment Bin", POSPaymentMethod.Code);
                         if FirstEntry <> 0 then
                             CashSummary.SetFilter(EntryNo, '>=%1', FirstEntry);
                         CashSummary.SetRange(POSUnitNo, POSUnit."No.");
@@ -580,8 +579,7 @@ codeunit 6059818 "NPR POS Statistics Mgt."
                     repeat
                         Clear(CashSummary);
                         CashSummary.SetRange(PaymentMethodCode, POSPaymentMethod."Code");
-                        FirstEntry := 0;
-                        FirstEntry := FindLastFloat(POSUnit."Default POS Payment Bin", POSPaymentMethod.Code);
+                        FirstEntry := FindLastFloat(POSUnit."No.", POSUnit."Default POS Payment Bin", POSPaymentMethod.Code);
                         if FirstEntry <> 0 then
                             CashSummary.SetFilter(EntryNo, '>=%1', FirstEntry);
                         CashSummary.SetRange(POSUnitNo, POSUnit."No.");
@@ -611,12 +609,13 @@ codeunit 6059818 "NPR POS Statistics Mgt."
         CashSummaryBuffer.Insert();
     end;
 
-    local procedure FindLastFloat(BinNo: Code[10]; PaymentMethod: Code[10]): Integer
+    local procedure FindLastFloat(PosUnitNo: Code[10]; BinNo: Code[10]; PaymentMethod: Code[10]): Integer
     var
         BinEntry: Record "NPR POS Bin Entry";
     begin
-        BinEntry.SetCurrentKey("Entry No.");
+        BinEntry.SetCurrentKey("Payment Bin No.", "POS Unit No.", "Payment Method Code", "Type", "Entry No.");
         BinEntry.SetRange("Payment Bin No.", BinNo);
+        BinEntry.SetRange("POS Unit No.", PosUnitNo);
         BinEntry.SetRange("Payment Method Code", PaymentMethod);
         BinEntry.SetRange(Type, BinEntry.Type::FLOAT);
         if BinEntry.FindLast() then
