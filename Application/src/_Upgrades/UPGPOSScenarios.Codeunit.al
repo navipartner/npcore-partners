@@ -33,6 +33,7 @@ codeunit 6150945 "NPR UPG POS Scenarios"
 
         //PAYMENT_VIEW scenario
         PopupDimension();
+        TestItemInventory();
 
         //FINISH_CREDIT_SALE scenario
         DimPopupEvery();
@@ -290,6 +291,27 @@ codeunit 6150945 "NPR UPG POS Scenarios"
         end;
 
         LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure TestItemInventory()
+    var
+        POSAuditProfile: Record "NPR POS Audit Profile";
+        POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step";
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Scenarios', 'TestItemInventory');
+
+        if not UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'TestItemInventory')) then begin
+            POSSalesWorkflowStep.SetRange("Workflow Code", 'PAYMENT_VIEW');
+            POSSalesWorkflowStep.SetRange("Subscriber Codeunit ID", Codeunit::"NPR POS View Change WF Mgt.");
+            POSSalesWorkflowStep.SetRange("Subscriber Function", 'TestItemInventory');
+            POSSalesWorkflowStep.SetRange(Enabled, true);
+            if not POSSalesWorkflowStep.IsEmpty() then
+                if not POSAuditProfile.IsEmpty() then
+                    POSAuditProfile.ModifyAll("Test Item Inventory", true);
+
+            UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'TestItemInventory'));
+        end;
     end;
 
     local procedure CurrCodeunitId(): Integer

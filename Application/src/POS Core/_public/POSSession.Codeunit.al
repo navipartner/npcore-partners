@@ -732,9 +732,15 @@
     procedure ChangeViewPayment()
     var
         POSViewChangeWorkflowMgt: Codeunit "NPR POS View Change WF Mgt.";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        PaymentProcessingEvents: Codeunit "NPR Payment Processing Events";
+        Sale: Codeunit "NPR POS Sale";
     begin
         ErrorIfNotInitialized();
-        POSViewChangeWorkflowMgt.InvokeOnPaymentViewWorkflow();
+        if not FeatureFlagsManagement.IsEnabled('removeviewswitchscenarios') then
+            POSViewChangeWorkflowMgt.InvokeOnPaymentViewWorkflow()
+        else
+            PaymentProcessingEvents.InvokeOnPaymentView(Sale);
         _FrontEnd.PaymentView(_Setup);
     end;
 

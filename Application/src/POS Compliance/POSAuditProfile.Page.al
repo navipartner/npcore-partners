@@ -84,6 +84,12 @@
                     ToolTip = 'Prompts for return reason when returning items in POS';
                 }
 
+                field("Test Item Inventory"; Rec."Test Item Inventory")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Block payment if Sale contains Items with insufficient Inventory';
+                }
+
                 group(TransactionsSetup)
                 {
                     Enabled = false;

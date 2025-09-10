@@ -19,7 +19,7 @@
         SessionNotInitializedErrorMessageLbl: Label 'Session is not initialized.';
 
     // Discovery
-
+    [Obsolete('Remove after POS Scenario is removed', '2025-09-14')]
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow", 'OnDiscoverPOSSalesWorkflows', '', true, true)]
     local procedure OnDiscoverPOSWorkflows(var Sender: Record "NPR POS Sales Workflow")
     begin
@@ -39,6 +39,7 @@
         exit('PAYMENT_VIEW');
     end;
 
+    [Obsolete('Remove after POS Scenario is removed; use InvokeOnPaymentView in cdu 6151042 "NPR Payment Processing Events" ', '2025-09-14')]
     internal procedure InvokeOnPaymentViewWorkflow()
     var
         POSSalesWorkflowSetEntry: Record "NPR POS Sales WF Set Entry";
@@ -69,6 +70,7 @@
         POSSession.AddServerStopwatch('PAYMENT_VIEW_WORKFLOWS', CurrentDateTime - StartTime);
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', '2025-09-14')]
     [IntegrationEvent(false, false)]
     local procedure OnPaymentView(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var POSSession: Codeunit "NPR POS Session")
     begin
@@ -126,7 +128,7 @@
     end;
 
     // Test Item Inventory
-
+    [Obsolete('Remove after POS Scenario is removed', '2025-09-14')]
     [EventSubscriber(ObjectType::Table, Database::"NPR POS Sales Workflow Step", 'OnBeforeInsertEvent', '', true, true)]
     local procedure OnBeforeInsertWorkflowStep(var Rec: Record "NPR POS Sales Workflow Step"; RunTrigger: Boolean)
     begin
@@ -143,12 +145,18 @@
         end;
     end;
 
+    [Obsolete('Remove after POS Scenario is removed', '2025-09-14')]
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS View Change WF Mgt.", 'OnPaymentView', '', true, true)]
     local procedure TestItemInventory(POSSalesWorkflowStep: Record "NPR POS Sales Workflow Step"; var POSSession: Codeunit "NPR POS Session")
     var
         TempSaleLinePOS: Record "NPR POS Sale Line" temporary;
         TempErrorMessage: Record "Error Message" temporary;
+        POSSale: Record "NPR POS Sale";
+        SalePOS: Codeunit "NPR POS Sale";
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
+        if FeatureFlagsManagement.IsEnabled('removeviewswitchscenarios') then
+            exit;
         if POSSalesWorkflowStep."Subscriber Codeunit ID" <> CurrCodeunitId() then
             exit;
         if POSSalesWorkflowStep."Subscriber Function" <> 'TestItemInventory' then
@@ -162,6 +170,7 @@
             TempErrorMessage.ShowErrorMessages(true);
     end;
 
+    [Obsolete('Remove after POS Scenario is removed, moved to cdu 6248494 "NPR POS Test Item Inventory"', '2025-09-14')]
     local procedure FindNotInStockLines(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var ErrorMessage: Record "Error Message")
     begin
         if not TempSaleLinePOS.FindSet() then
@@ -173,6 +182,8 @@
                 LogErrorMessage(TempSaleLinePOS, ErrorMessage);
         until TempSaleLinePOS.Next() = 0;
     end;
+
+    [Obsolete('Remove after POS Scenario is removed, moved to cdu 6248494 "NPR POS Test Item Inventory"', '2025-09-14')]
 
     local procedure CalcInventory(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary): Decimal
     var
@@ -196,6 +207,7 @@
         exit(Item.Inventory);
     end;
 
+    [Obsolete('Remove after POS Scenario is removed, moved to cdu 6248494 "NPR POS Test Item Inventory"', '2025-09-14')]
     local procedure SetupSalesItems(var POSSession: Codeunit "NPR POS Session"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary): Boolean
     var
         SalePOS: Record "NPR POS Sale";
@@ -226,6 +238,7 @@
         exit(TempSaleLinePOS.FindFirst());
     end;
 
+    [Obsolete('Remove after POS Scenario is removed, moved to cdu 6248494 "NPR POS Test Item Inventory"', '2025-09-14')]
     local procedure SetupSalesItem(SaleLinePOS: Record "NPR POS Sale Line"; var TempSaleLinePOS: Record "NPR POS Sale Line" temporary)
     var
         Item: Record Item;
@@ -257,6 +270,7 @@
         end;
     end;
 
+    [Obsolete('Remove after POS Scenario is removed, moved to cdu 6248494 "NPR POS Test Item Inventory"', '2025-09-14')]
     local procedure SpecificItemTrackingExist(Item: Record Item): Boolean
     var
         ItemTrackingCode: Record "Item Tracking Code";
@@ -272,6 +286,7 @@
         exit(false);
     end;
 
+    [Obsolete('Remove after POS Scenario is removed, moved to cdu 6248494 "NPR POS Test Item Inventory"', '2025-09-14')]
     local procedure CheckBinContent(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary): Decimal
     var
         BinContent: Record "Bin Content";
@@ -283,6 +298,7 @@
         exit(BinContent.Quantity);
     end;
 
+    [Obsolete('Remove after POS Scenario is removed, moved to cdu 6248494 "NPR POS Test Item Inventory"', '2025-09-14')]
     local procedure LogErrorMessage(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary; var ErrorMessage: Record "Error Message")
     var
         Msg: Text;

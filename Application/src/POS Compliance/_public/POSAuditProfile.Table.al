@@ -155,6 +155,11 @@
             Caption = 'Bin Eject After Sale';
             DataClassification = CustomerContent;
         }
+        field(160; "Test Item Inventory"; Boolean)
+        {
+            Caption = 'Test Item Inventory';
+            DataClassification = CustomerContent;
+        }
 
     }
 

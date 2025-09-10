@@ -154,6 +154,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'UpgradeTicketProfile'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'DeleteFinishSaleWorkflowSteps'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'DeleteFinishCreditSaleWorkflowSteps'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Scenarios", 'TestItemInventory'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG BalanceV4"));
 #if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24 or BC25
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG ItemRef. Disc Barcodes", 'UpgradeDiscBarcodes'));
@@ -656,6 +657,8 @@
                         exit('NPR-DeleteFinishSaleWorkflowSteps-20240507');
                     'DeleteFinishCreditSaleWorkflowSteps':
                         exit('NPR-DeleteFinishCreditSaleWorkflowSteps-20240507');
+                    'TestItemInventory':
+                        exit('NPR-TestItemInventory-20251409');
                 end;
             Codeunit::"NPR Upgrade Variety Setup":
                 case UpgradeStep of
