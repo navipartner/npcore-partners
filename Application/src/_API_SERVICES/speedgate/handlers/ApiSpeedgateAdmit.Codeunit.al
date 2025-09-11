@@ -417,6 +417,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         Token: Guid;
 
         Body: JsonObject;
+        Empty: JsonObject;
         JTokens: JsonToken;
         TokenText: Text[100];
     begin
@@ -432,7 +433,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         if (Evaluate(Token, TokenText)) then
             SpeedGateMgr.MarkAsDenied(Token, ErrorCode::admit_token_failed_by_app, ErrorMessage);
 
-        Response.RespondOK('token marked as failed by app');
+        Response.RespondOK(Empty);
     end;
 
     // **********************

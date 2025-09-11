@@ -229,6 +229,33 @@ service:
               admittedTokens:
                 - $compositeTypes.AdmitResponse.ExampleAdmitMemberCardResponse
   
+    failAdmitToken:
+      docs: 
+        This endpoint marks a token as invalid, preventing its future use for admission. 
+        It can also fail an already admitted token, effectively revoking the speedgate admission. 
+        Note, however, that the actual admission cannot be undone in the system; only the speedgate token can be marked as failed.
+        This is useful for handling situations where scanner personnel override the business rules of an admission attempt.
+      path: /failAdmitToken
+      method: POST  
+      request: 
+        name: failAdmitToken
+        body: compositeTypes.FailAdmitTokenRequest
+      response:
+        type: FailAdmitTokenResponse
+      examples: 
+        - name: "Fail Admit Token"
+          docs: Example of a successful failure of an admit token.
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          request:
+            token: $simpleTypes.Token.ExampleAdmitToken
+            reason: $simpleTypes.FailAdmitReason.Reason_1
+          response:
+            body: {}
+
+
     referenceNumberLookup:
       docs: 
         This endpoint retrieves the details of a reference number, including its type and status. 
@@ -261,3 +288,5 @@ types:
     properties:
       admittedTokens: list<compositeTypes.AdmitResponse>
 
+  FailAdmitTokenResponse:
+    properties: {}

@@ -635,3 +635,9 @@ types:
       - name: ExampleCategoryDescriptionEntrance
         value: "Entrance Scanners"
 
+  FailAdmitReason:
+    type: string
+    docs: The reason for failing to admit the token.
+    examples:
+      - name: Reason_1
+        value: "Guest was dismissed due to disorderly conduct."

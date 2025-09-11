@@ -263,7 +263,19 @@ types:
           printCount: 1
           memberCardId: $simpleTypes.MemberCardId.ExampleMemberCardId
           ticketNumber: $simpleTypes.ReferenceNumber.ExampleTicketNumber
-          
+
+############################
+  FailAdmitTokenRequest:
+    docs: 
+      Request to mark an admit token as failed.
+    properties:
+      token: simpleTypes.Token
+      reason: simpleTypes.FailAdmitReason
+    examples:
+      - name: ExampleFailAdmitRequest
+        value:
+          token: $simpleTypes.Token.ExampleAdmitToken
+          reason: $simpleTypes.FailAdmitReason.Reason_1
 
 ############################
   ScannerIdSetupResponseShort:
