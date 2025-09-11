@@ -106,7 +106,7 @@ codeunit 6184888 "NPR RSEI Out SalesCr.Memo Mgt."
 
         AddBillingReferenceInformation(CreditNoteElement, SalesCrMemoHeader);
 
-        AddContractInformation(CreditNoteElement, SalesCrMemoHeader);
+        AddOrderInformation(CreditNoteElement, SalesCrMemoHeader);
 
         AddCompanyInformation(CreditNoteElement);
 
@@ -203,12 +203,12 @@ codeunit 6184888 "NPR RSEI Out SalesCr.Memo Mgt."
         CreditNoteElement.Add(BillingRefElement);
     end;
 
-    local procedure AddContractInformation(var CreditNoteElement: XmlElement; var SalesCrMemoHeader: Record "Sales Cr.Memo Header")
+    local procedure AddOrderInformation(var CreditNoteElement: XmlElement; var SalesCrMemoHeader: Record "Sales Cr.Memo Header")
     var
         ContractDocRefElement: XmlElement;
         ContractIDElement: XmlElement;
     begin
-        ContractDocRefElement := RSEInvoiceMgt.CreateXmlElement('ContractDocumentReference', RSEInvoiceMgt.GetCacNamespace(), '');
+        ContractDocRefElement := RSEInvoiceMgt.CreateXmlElement('OrderReference', RSEInvoiceMgt.GetCacNamespace(), '');
         ContractIDElement := RSEInvoiceMgt.CreateXmlElement('ID', RSEInvoiceMgt.GetCbcNamespace(), SalesCrMemoHeader."No.");
         ContractDocRefElement.Add(ContractIDElement);
 

@@ -115,7 +115,7 @@ codeunit 6184793 "NPR RS EI Out Sales Inv. Mgt."
         if PrepaymentInvoiceFound then
             AddBillingReferenceInformation(InvoiceElement, PrepaymentSalesInvHdr);
 
-        AddContractInformation(InvoiceElement, SalesInvoiceHeader);
+        AddOrderInformation(InvoiceElement, SalesInvoiceHeader);
 
         AddCompanyInformation(InvoiceElement);
 
@@ -163,7 +163,7 @@ codeunit 6184793 "NPR RS EI Out Sales Inv. Mgt."
 
         AddInvoicePeriodInformation(InvoiceElement, RSEIAuxSalesInvHdr);
 
-        AddContractInformation(InvoiceElement, SalesInvoiceHeader);
+        AddOrderInformation(InvoiceElement, SalesInvoiceHeader);
 
         AddCompanyInformation(InvoiceElement);
 
@@ -346,12 +346,12 @@ codeunit 6184793 "NPR RS EI Out Sales Inv. Mgt."
         exit(RSEInvoiceDocument."Sending Date");
     end;
 
-    local procedure AddContractInformation(var InvoiceElement: XmlElement; SalesInvoiceHeader: Record "Sales Invoice Header")
+    local procedure AddOrderInformation(var InvoiceElement: XmlElement; SalesInvoiceHeader: Record "Sales Invoice Header")
     var
         ContractDocRefElement: XmlElement;
         ContractIDElement: XmlElement;
     begin
-        ContractDocRefElement := RSEInvoiceMgt.CreateXmlElement('ContractDocumentReference', RSEInvoiceMgt.GetCacNamespace(), '');
+        ContractDocRefElement := RSEInvoiceMgt.CreateXmlElement('OrderReference', RSEInvoiceMgt.GetCacNamespace(), '');
         ContractIDElement := RSEInvoiceMgt.CreateXmlElement('ID', RSEInvoiceMgt.GetCbcNamespace(), SalesInvoiceHeader."No.");
         ContractDocRefElement.Add(ContractIDElement);
 
