@@ -144,6 +144,7 @@
         }
         key(Key2; "Payment Bin No.", "POS Unit No.", "Payment Method Code", "Type")
         {
+            SumIndexFields = "Transaction Amount", "Transaction Amount (LCY)";
         }
         key(Key3; "Payment Bin No.", "POS Unit No.", "Payment Type Code")
         {
@@ -153,9 +154,4 @@
         {
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-
