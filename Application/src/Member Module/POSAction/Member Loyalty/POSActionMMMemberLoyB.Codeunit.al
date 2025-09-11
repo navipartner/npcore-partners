@@ -89,9 +89,10 @@ codeunit 6150955 "NPR POSAction: MM Member Loy.B"
 
                 EanBoxEventHandler.ResolveEanBoxActionForValue(Coupon."Reference No.", POSSession, FrontEnd, POSAction);
 
-                if POSAction.Code <> '' then
-                    SetActionContent(ActionContext, POSAction);
             until (TempLoyaltyPointsSetup.Next() = 0);
+
+            if (POSAction.Code <> '') then
+                SetActionContent(ActionContext, POSAction);
         end;
     end;
 
