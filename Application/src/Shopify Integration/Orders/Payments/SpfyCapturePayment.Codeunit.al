@@ -191,6 +191,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         if Transactions.IsArray() then
             foreach Transaction in Transactions.AsArray() do
                 if TransactionID = SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(Transaction, 'id', true), '/') then begin
+                    PaymentLine."External Payment Gateway" := CopyStr(JsonHelper.GetJText(Transaction, 'gateway', false), 1, MaxStrLen(PaymentLine."External Payment Gateway"));
                     SetDateAuthorized(Transaction, PaymentLine);
                     SetPaymentCardDetails(Transaction, PaymentLine);
                     if PaymentLine."Transaction ID" = '' then
@@ -423,6 +424,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
 #pragma warning disable AA0139
         PaymentLine."Transaction ID" := JsonHelper.GetJText(Transaction, 'paymentId', false);
 #pragma warning restore AA0139
+        PaymentLine."External Payment Gateway" := CopyStr(JsonHelper.GetJText(Transaction, 'gateway', false), 1, MaxStrLen(PaymentLine."External Payment Gateway"));
         SetDateAuthorized(Transaction, PaymentLine);
         SetPaymentCardDetails(Transaction, PaymentLine);
 
@@ -493,6 +495,8 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         PaymentLine.Brand := JsonHelper.GetJText(Transaction, 'paymentDetails.company', MaxStrLen(PaymentLine.Brand), false);
         PaymentLine."Expiry Date Text" := StrSubstNo('%1/%2', JsonHelper.GetJText(Transaction, 'paymentDetails.expirationMonth', false).PadLeft(2, '0'), JsonHelper.GetJText(Transaction, 'paymentDetails.expirationYear', false));
 #pragma warning restore AA0139
+
+        SpfyIntegrationEvents.OnAfterSetPaymentCardDetails(Transaction, PaymentLine);
     end;
 
     local procedure SetPmtLineAsCaptured(CurrentTransaction: JsonToken; Transactions: JsonArray; ShopifyTransactionKind: Text; CurrentTransactionID: Text[30]; var PaymentLine: Record "NPR Magento Payment Line"): Boolean

@@ -99,6 +99,34 @@ table 6150880 "NPR Adyen Webhook"
         }
     }
 
+    trigger OnInsert()
+    var
+#if not BC17
+        ShopifyAssignedID: Record "NPR Spfy Assigned ID";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        SpfyUpdateAdyenTrInfo: Codeunit "NPR Spfy Update Adyen Tr. Info";
+        MerchantReference: Text[80];
+        TransactionIsShopifyRelated: Boolean;
+#endif    
+    begin
+#if not BC17
+        if "Event Code" = "Event Code"::AUTHORISATION then begin
+            SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"NPR Spfy Store", "NPR Spfy ID Type"::"Entry ID", '', ShopifyAssignedID);
+            ShopifyAssignedID.SetFilter("Shopify ID", '<>%1', '');
+            if ShopifyAssignedID.Find('-') then begin
+                MerchantReference := GetMerchantReferenceFromWebhook();
+                if MerchantReference <> '' then begin
+                    repeat
+                        TransactionIsShopifyRelated := MerchantReference.Contains(ShopifyAssignedID."Shopify ID");
+                    until TransactionIsShopifyRelated or (ShopifyAssignedID.Next() = 0);
+                    if TransactionIsShopifyRelated then
+                        SpfyUpdateAdyenTrInfo.SyncShopifyTransactionsWithPSPData(Rec);
+                end;
+            end;
+        end;
+#endif
+    end;
+
     procedure GetAdyenData(): Text
     var
         TypeHelper: Codeunit "Type Helper";
@@ -124,5 +152,24 @@ table 6150880 "NPR Adyen Webhook"
             CalcFields("Webhook Data");
             "Webhook Data".CreateInStream(InStr, TextEncoding::UTF8);
         end;
+    end;
+
+    internal procedure GetMerchantReferenceFromWebhook() MerchantReference: Text[80]
+    var
+        JsonHelper: Codeunit "NPR Json Helper";
+        InStr: InStream;
+        WebhookDataToken: JsonToken;
+        NotificationRequestItem: JsonToken;
+        AdyenWebhookData: Text;
+    begin
+        Rec."Webhook Data".CreateInStream(InStr, TextEncoding::UTF8);
+        InStr.ReadText(AdyenWebhookData);
+
+        WebhookDataToken.ReadFrom(AdyenWebhookData);
+
+        WebhookDataToken.AsObject().Get('notificationItems', WebhookDataToken);
+        WebhookDataToken.AsArray().Get(0, NotificationRequestItem);
+        if NotificationRequestItem.IsObject() then
+            MerchantReference := CopyStr(JsonHelper.GetJText(NotificationRequestItem, 'NotificationRequestItem.merchantReference', false), 1, MaxStrLen(MerchantReference));
     end;
 }

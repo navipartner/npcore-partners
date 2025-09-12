@@ -1267,7 +1267,7 @@ codeunit 6184796 "NPR Adyen Management"
         end;
         // TODO ValidateHMAC
         // TODO Retention Policy
-        AdyenWebhook.Insert();
+        AdyenWebhook.Insert(true);
 
         if AdyenWebhook.Success then begin
             CreateGeneralLog(LogType::Register, true, SuccessfullyReceivedAndLoggedLbl, AdyenWebhook."Entry No.");

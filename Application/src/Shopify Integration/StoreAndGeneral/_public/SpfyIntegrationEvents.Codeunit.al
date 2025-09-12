@@ -164,5 +164,10 @@ codeunit 6184824 "NPR Spfy Integration Events"
     internal procedure OnGetTrackingUrl(SalesShipmentHeader: Record "Sales Shipment Header"; var TrackingUrl: Text; var Handled: Boolean)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterSetPaymentCardDetails(Transaction: JsonToken; var PaymentLine: Record "NPR Magento Payment Line")
+    begin
+    end;
 }
 #endif

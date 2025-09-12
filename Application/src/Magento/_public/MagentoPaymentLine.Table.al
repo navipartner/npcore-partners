@@ -275,6 +275,11 @@
             Caption = 'Masked PAN';
             DataClassification = CustomerContent;
         }
+        field(480; "External Payment Gateway"; Text[100])
+        {
+            Caption = 'External Payment Gateway';
+            DataClassification = CustomerContent;
+        }
         field(6059982; "NPR Inc Ecom Sales Pmt Line Id"; Guid)
         {
             Caption = 'Incoming Ecommerce Sales Payment Line Id';
@@ -293,6 +298,9 @@
         {
         }
         key(Key2; "Payment Type", "No.", Amount)
+        {
+        }
+        key(Key3; "Transaction ID", Posted, "Date Captured")
         {
         }
     }
