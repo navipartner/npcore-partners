@@ -610,6 +610,7 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
     var
         POSActionDocExportB: Codeunit "NPR POS Action: Doc. ExportB";
         POSAsyncPosting: Codeunit "NPR POS Async. Posting Mgt.";
+        POSActionDocExpEvents: Codeunit "NPR POS Action Doc Exp Events";
         AmountExclVAT: Decimal;
         VATAmount: Decimal;
         AmountInclVAT: Decimal;
@@ -655,9 +656,9 @@ codeunit 6150859 "NPR POS Action: Doc. Export" implements "NPR IPOS Workflow"
 
         RetailType := CopyStr(Context.GetStringParameter('RetailType'), 1, MaxStrLen(RetailType));
         RetailSalesDocMgt.SetRetailType(RetailType);
-
         DocumentTypePozitive := Context.GetIntegerParameter('SetDocumentType');
         DocumentTypeNegative := Context.GetIntegerParameter('SetNegBalDocumentType');
+        POSActionDocExpEvents.OnBeforeSetDocumentTypeFromBalanceAmount(Context, AmountInclVAT);
         POSActionDocExportB.SetDocumentType(AmountInclVAT, RetailSalesDocMgt, DocumentTypePozitive, DocumentTypeNegative);
 
         LocationSource := Context.GetIntegerParameter('UseLocationFrom');

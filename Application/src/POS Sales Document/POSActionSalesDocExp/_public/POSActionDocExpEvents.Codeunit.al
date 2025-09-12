@@ -14,4 +14,11 @@ codeunit 6151367 "NPR POS Action Doc Exp Events"
     internal procedure OnAddAttentionLabel(var AttentionText: Text)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeSetDocumentTypeFromBalanceAmount(Context: Codeunit "NPR POS JSON Helper"; var BalanceInclVAT: Decimal)
+    begin
+    end;
+
+
 }
