@@ -968,6 +968,7 @@
 
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         NoRemainingTickets: Label 'No remaining tickets to refund for line %1.';
+        PartialRefundQtyChange: Label 'Line %1 has been partially refunded, and the quantity has been adjusted from %2 to %3.';
         UnitPrice: Decimal;
         Token: Text[100];
         TicketCount: Integer;
@@ -1016,6 +1017,9 @@
             end;
 
             if (TicketCount <> ReturnSaleLinePOS.Quantity) then begin
+                if (TicketCount <> 0) then
+                    Message(PartialRefundQtyChange, OriginalSaleLine."Line No.", Abs(ReturnSaleLinePOS.Quantity), Abs(TicketCount));
+
                 ReturnSaleLinePOS.Quantity := TicketCount;
                 ReturnSaleLinePOS.UpdateAmounts(ReturnSaleLinePOS);
                 ReturnSaleLinePOS.Modify();
