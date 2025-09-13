@@ -140,7 +140,7 @@ codeunit 6150815 "NPR POS Action: MM Member ArrB"
         MemberImageBase64: Text;
         DataUrl: Label 'data:image/jpeg;base64,%1', locked = true;
     begin
-        if (MemberManagement.GetMemberImage(MemberEntryNo, MemberImageBase64)) then
+        if (MemberManagement.GetMemberImageThumbnail(MemberEntryNo, MemberImageBase64)) then
             exit(StrSubstNo(DataUrl, MemberImageBase64));
 
         exit(NoPictureAvailableImage());

@@ -789,6 +789,17 @@
         exit(true);
     end;
 
+    internal procedure GetMemberImageThumbnail(MemberEntryNo: Integer; var Base64StringImage: Text) Success: Boolean
+    begin
+        if (GetMemberImageThumbnail(MemberEntryNo, Base64StringImage, 360)) then
+            exit(true);
+
+        if (GetMemberImageThumbnail(MemberEntryNo, Base64StringImage, 240)) then
+            exit(true);
+
+        exit(GetMemberImage(MemberEntryNo, Base64StringImage));
+    end;
+
     internal procedure GetMemberImageThumbnail(MemberEntryNo: Integer; var Base64StringImage: Text; Width: Integer) Success: Boolean
     var
         Member: Record "NPR MM Member";

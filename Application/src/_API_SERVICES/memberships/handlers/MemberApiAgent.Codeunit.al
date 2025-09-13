@@ -151,11 +151,7 @@ codeunit 6248220 "NPR MemberApiAgent"
             'original':
                 HaveImage := MembershipManagement.GetMemberImage(Member."Entry No.", Base64StringImage);
             else
-                HaveImage := MembershipManagement.GetMemberImageThumbnail(Member."Entry No.", Base64StringImage, 360);
-                if (not HaveImage) then
-                    HaveImage := MembershipManagement.GetMemberImageThumbnail(Member."Entry No.", Base64StringImage, 240);
-                if (not HaveImage) then
-                    HaveImage := MembershipManagement.GetMemberImage(Member."Entry No.", Base64StringImage);
+                HaveImage := MembershipManagement.GetMemberImageThumbnail(Member."Entry No.", Base64StringImage);
         end;
 
         if (not HaveImage) then

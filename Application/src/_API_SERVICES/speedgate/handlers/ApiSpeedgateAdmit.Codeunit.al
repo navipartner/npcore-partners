@@ -802,7 +802,6 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
         Base64StringImage: Text;
         TimeZoneHelper: Codeunit "NPR TM TimeHelper";
-        HaveImage: Boolean;
     begin
         MemberCard.SetLoadFields("Membership Entry No.", "Member Entry No.");
         Membership.SetLoadFields("External Membership No.", "Membership Code");
@@ -853,13 +852,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
                 .AddProperty('hasNotes', Member.HasLinks());
 
         if (MemberCardProfileLine.IncludeMemberPhoto) then begin
-            HaveImage := MembershipManagement.GetMemberImageThumbnail(Member."Entry No.", Base64StringImage, 360);
-            if (not HaveImage) then
-                HaveImage := MembershipManagement.GetMemberImageThumbnail(Member."Entry No.", Base64StringImage, 240);
-            if (not HaveImage) then
-                HaveImage := MembershipManagement.GetMemberImage(Member."Entry No.", Base64StringImage);
-
-            if (HaveImage) then
+            if (MembershipManagement.GetMemberImageThumbnail(Member."Entry No.", Base64StringImage)) then
                 ResponseJson.AddProperty('picture', Base64StringImage)
             else
                 ResponseJson.AddProperty('picture');
