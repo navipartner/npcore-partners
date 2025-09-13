@@ -823,26 +823,26 @@
         MemberInfoCapture: Record "NPR MM Member Info Capture";
     begin
 
-        if (POSSalesLine.Quantity > 0) then begin
-
-            MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
-            MemberInfoCapture.SetFilter("Receipt No.", '=%1', POSEntry."Document No.");
-            MemberInfoCapture.SetFilter("Line No.", '=%1', POSSalesLine."Line No.");
-            if (not MemberInfoCapture.FindSet()) then
-                exit;
-
-            if (POSSalesLine."No." <> MemberInfoCapture."Item No.") then
-                exit;
-
-            IssueMembershipFromEndOfSaleWorker(POSEntry."Document No.",
-                POSSalesLine."Line No.", POSEntry."Document Date",
-                POSSalesLine."Unit Price", POSSalesLine."Amount Excl. VAT", POSSalesLine."Amount Incl. VAT", POSSalesLine.Description, POSSalesLine.Quantity);
-        end;
-
         if (POSSalesLine.Quantity < 0) then
-            // If the line is a cancel/regret line, remove any member info capture lines
-            if (POSSalesLine."Return Sale Sales Ticket No." <> '') then
+            // When in refund by receipt number, we regret the membership entry (item number would represent the original membership item)
+            if (POSSalesLine."Return Sale Sales Ticket No." <> '') then begin
                 BlockMembershipEntryFromEndOfSaleWorker(POSSalesLine."Return Sale Sales Ticket No.", POSSalesLine."Line No.");
+                exit;
+            end;
+
+        // This is an specific alteration item - membership action determined by the item no
+        MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
+        MemberInfoCapture.SetFilter("Receipt No.", '=%1', POSEntry."Document No.");
+        MemberInfoCapture.SetFilter("Line No.", '=%1', POSSalesLine."Line No.");
+        if (not MemberInfoCapture.FindSet()) then
+            exit;
+
+        if (POSSalesLine."No." <> MemberInfoCapture."Item No.") then
+            exit;
+
+        ProcessMembershipFromEndOfSaleWorker(POSEntry."Document No.",
+            POSSalesLine."Line No.", POSEntry."Document Date",
+            POSSalesLine."Unit Price", POSSalesLine."Amount Excl. VAT", POSSalesLine."Amount Incl. VAT", POSSalesLine.Description, POSSalesLine.Quantity);
 
     end;
 
@@ -895,8 +895,12 @@
 
     end;
 
-
     internal procedure IssueMembershipFromEndOfSaleWorker(ReceiptNo: Code[20]; ReceiptLine: Integer; SalesDate: Date; UnitPrice: Decimal; Amount_LCY: Decimal; AmountInclVat_LCY: Decimal; Description: Text; Quantity: Decimal)
+    begin
+        ProcessMembershipFromEndOfSaleWorker(ReceiptNo, ReceiptLine, SalesDate, UnitPrice, Amount_LCY, AmountInclVat_LCY, Description, Quantity);
+    end;
+
+    local procedure ProcessMembershipFromEndOfSaleWorker(ReceiptNo: Code[20]; ReceiptLine: Integer; SalesDate: Date; UnitPrice: Decimal; Amount_LCY: Decimal; AmountInclVat_LCY: Decimal; Description: Text; Quantity: Decimal)
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         CreateMembership: Codeunit "NPR Membership Attempt Create";
