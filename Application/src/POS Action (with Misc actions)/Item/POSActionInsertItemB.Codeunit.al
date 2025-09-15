@@ -525,7 +525,7 @@ codeunit 6059854 "NPR POS Action: Insert Item B"
     var
         POSTrackingUtils: Codeunit "NPR POS Tracking Utils";
     begin
-        POSTrackingUtils.ValidateSerialNo(SaleLinePOS."No.", SaleLinePOS."Variant Code", SerialNoInput, SerialSelectionFromList, POSStore);
+        POSTrackingUtils.ValidateSerialNo(SaleLinePOS."No.", SaleLinePOS."Variant Code", SerialNoInput, SerialSelectionFromList, POSStore, '');
 
         SaleLinePOS.Validate("Serial No.", SerialNoInput);
         SaleLinePOS.Modify(true);

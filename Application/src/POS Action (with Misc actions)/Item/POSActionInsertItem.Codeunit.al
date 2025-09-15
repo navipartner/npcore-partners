@@ -248,7 +248,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         ValidateSerialSelectionFromList := (SelectSerialNoListEmptyInput and SerialSelectionFromList and (InputSerial = '')) or (SerialSelectionFromList and not SelectSerialNoListEmptyInput);
         if RequiresSerialNoInput then begin
             Setup.GetPOSStore(NPRPOSStore);
-            NPRPOSTrackingUtils.ValidateSerialNo(ItemReference."Item No.", ItemReference."Variant Code", InputSerial, ValidateSerialSelectionFromList, NPRPOSStore);
+            NPRPOSTrackingUtils.ValidateSerialNo(ItemReference."Item No.", ItemReference."Variant Code", InputSerial, ValidateSerialSelectionFromList, NPRPOSStore, '');
         end;
 
         LotSelectionFromList := (LotSelectionFromListOption = 1) or ((LotSelectionFromListOption = 2) and (InputLotNo = ''));
@@ -601,7 +601,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
 
         if RequiresSerialNoInput and not RequiresUnitPriceInputPrompt then begin
             Setup.GetPOSStore(POSStore);
-            POSTrackingUtils.ValidateSerialNo(ItemReference."Item No.", ItemReference."Variant Code", InputSerial, SerialSelectionFromList, POSStore);
+            POSTrackingUtils.ValidateSerialNo(ItemReference."Item No.", ItemReference."Variant Code", InputSerial, SerialSelectionFromList, POSStore, '');
         end;
 
         if RequiresLotNoInput and not RequiresUnitPriceInputPrompt then begin

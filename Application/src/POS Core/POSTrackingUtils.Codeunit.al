@@ -128,7 +128,7 @@ codeunit 6151032 "NPR POS Tracking Utils"
     end;
 
     #region ValidateSerialNo
-    internal procedure ValidateSerialNo(ItemNo: Code[20]; var VariantCode: Code[10]; var SerialNumberInput: Text[50]; SerialSelectionFromList: Boolean; POSStore: Record "NPR POS Store")
+    internal procedure ValidateSerialNo(ItemNo: Code[20]; var VariantCode: Code[10]; var SerialNumberInput: Text[50]; SerialSelectionFromList: Boolean; POSStore: Record "NPR POS Store"; LocationCode: Code[10])
     var
         AskForSerialNoContinuously: Boolean;
         RequiresSerialNo: Boolean;
@@ -143,7 +143,11 @@ codeunit 6151032 "NPR POS Tracking Utils"
             SerialNumberInput := '';
 
         AskForSerialNoContinuously := true;
-        while (not SerialNumberCanBeUsedByItem(ItemNo, VariantCode, SerialNumberInput, UserInformationErrorWarning, SerialSelectionFromList, POSStore."Location Code")) and AskForSerialNoContinuously do begin
+
+        if LocationCode = '' then
+            LocationCode := POSStore."Location Code";
+
+        while (not SerialNumberCanBeUsedByItem(ItemNo, VariantCode, SerialNumberInput, UserInformationErrorWarning, SerialSelectionFromList, LocationCode)) and AskForSerialNoContinuously do begin
 
             AskForSerialNoContinuously := SerialSelectionFromList;
             if SerialSelectionFromList then begin
@@ -153,7 +157,7 @@ codeunit 6151032 "NPR POS Tracking Utils"
 
                 SerialNumberInput := '';
 
-                SelectSerialNoFromList(ItemNo, VariantCode, POSStore."Location Code", SerialNumberInput);
+                SelectSerialNoFromList(ItemNo, VariantCode, LocationCode, SerialNumberInput);
 
                 if SerialNumberInput = '' then
                     Error('');

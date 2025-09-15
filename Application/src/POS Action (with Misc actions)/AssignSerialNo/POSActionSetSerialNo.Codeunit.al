@@ -11,6 +11,12 @@ codeunit 6151031 "NPR POS Action Set Serial No" implements "NPR IPOS Workflow"
         ParamSelectSerialNo_DescLbl: Label 'Enable/Disable select Serial No. from the list';
         ParamSelectSerialNoListEmptyInput_CaptionLbl: Label 'Select Serial No. List/Input';
         ParamSelectSerialNoListEmptyInput_DescLbl: Label 'Enable/Disable select Serial No. from the list after empty input.';
+        OptionNameUseLocationFrom: Label 'POS Store,All Locations,SpecificLocation', Locked = true;
+        CaptionUseLocationFrom: Label 'Location Code';
+        DescUseLocationFrom: Label 'Select source to get location code from for serial no. selection.';
+        OptionUseLocationFrom: Label 'POS Store,All Locations,Specific Location';
+        CaptionUseSpecLocationCode: Label 'Use Specific Location Code';
+        DescUseSpecLocationCode: Label 'Select location code to be used for serial no. selection, if parameter ''Use Location From'' is set to ''Specific Location''';
     begin
         WorkflowConfig.SetNonBlockingUI();
         WorkflowConfig.AddActionDescription(ActionDescription);
@@ -20,6 +26,15 @@ codeunit 6151031 "NPR POS Action Set Serial No" implements "NPR IPOS Workflow"
         WorkflowConfig.AddLabel('itemTracking_instructions', ItemTracking_InstrLbl);
         WorkflowConfig.AddBooleanParameter('SelectSerialNo', false, ParamSelectSerialNo_CaptionLbl, ParamSelectSerialNo_DescLbl);
         WorkflowConfig.AddBooleanParameter('SelectSerialNoListEmptyInput', false, ParamSelectSerialNoListEmptyInput_CaptionLbl, ParamSelectSerialNoListEmptyInput_DescLbl);
+        WorkflowConfig.AddOptionParameter('UseLocationFrom',
+                        OptionNameUseLocationFrom,
+#pragma warning disable AA0139
+                        SelectStr(1, OptionNameUseLocationFrom),
+# pragma warning restore
+                        CaptionUseLocationFrom,
+                        DescUseLocationFrom,
+                        OptionUseLocationFrom);
+        WorkflowConfig.AddTextParameter('UseSpecLocationCode', '', CaptionUseSpecLocationCode, DescUseSpecLocationCode);
     end;
 
     procedure RunWorkflow(Step: Text;
@@ -81,6 +96,8 @@ codeunit 6151031 "NPR POS Action Set Serial No" implements "NPR IPOS Workflow"
         SerialSelectionFromList: Boolean;
         ValidateSerialSelectionFromList: Boolean;
         SelectSerialNoListEmptyInput: Boolean;
+        SpecificLocationCode: Code[10];
+        LocationSource: Option "POS Store","All Locations",SpecificLocation;
     begin
         if Context.GetBooleanParameter('SelectSerialNo', SerialSelectionFromList) then;
         if Context.GetBooleanParameter('SelectSerialNoListEmptyInput', SelectSerialNoListEmptyInput) then;
@@ -88,6 +105,8 @@ codeunit 6151031 "NPR POS Action Set Serial No" implements "NPR IPOS Workflow"
         if Context.HasProperty('SerialNoInput') then
             SerialNoInput := Context.GetString('SerialNoInput');
 #pragma warning restore AA0139
+        LocationSource := Context.GetIntegerParameter('UseLocationFrom');
+        SpecificLocationCode := CopyStr(Context.GetStringParameter('UseSpecLocationCode'), 1, MaxStrLen(SpecificLocationCode));
 
         SaleLine.GetCurrentSaleLine(SaleLinePOS);
 
@@ -95,7 +114,9 @@ codeunit 6151031 "NPR POS Action Set Serial No" implements "NPR IPOS Workflow"
         NPRPOSActionSetSerialNoB.AssignSerialNo(SalelinePOS,
                                                 SerialNoInput,
                                                 ValidateSerialSelectionFromList,
-                                                Setup);
+                                                Setup,
+                                                LocationSource,
+                                                SpecificLocationCode);
     end;
     // #endregion AssignSerialNo
 
