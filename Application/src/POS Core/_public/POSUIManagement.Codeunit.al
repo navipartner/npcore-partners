@@ -716,6 +716,7 @@
         ColorSettingsSelectSystemColorLbl: Label 'Select color to be used as system color : ';
         ColorSettingsNoColorSelectedLbl: Label 'No Color Selected';
         ColorSettingsSelectPrimaryTextColorLbl: Label 'Select color to be used as a primary text color : ';
+        ColorSettingsSelectSecondaryTextColorLbl: Label 'Select color to be used as a secondary text color : ';
         ColorSettingsChangeColorLbl: Label 'Change Color';
         ColorPickerDeleteColorLbl: Label 'Delete Color';
         ColorPickerSaveColorLbl: Label 'Save Color';
@@ -1267,6 +1268,7 @@
         Captions.Add('Color_Settings_SelectSystemColor', ColorSettingsSelectSystemColorLbl);
         Captions.Add('Color_Settings_NoColorSelected', ColorSettingsNoColorSelectedLbl);
         Captions.Add('Color_Settings_SelectPrimaryTextColor', ColorSettingsSelectPrimaryTextColorLbl);
+        Captions.Add('Color_Settings_SelectSecondaryTextColor', ColorSettingsSelectSecondaryTextColorLbl);
         Captions.Add('Dialog_ItemSelection_QuantityOutOf', DialogItemSelectionQuantityOutOfLbl);
         Captions.Add('Dialog_ItemSelection_OutOf', DialogItemSelectionOutOfLbl);
         Captions.Add('Dialog_ItemSelection_EnterTheNumber', DialogItemSelectionEnterTheNumberLbl);
