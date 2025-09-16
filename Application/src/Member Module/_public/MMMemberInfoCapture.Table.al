@@ -276,6 +276,21 @@
             Caption = 'External Membership No.';
             DataClassification = CustomerContent;
         }
+        field(215; ExternalMembershipSystemId; Guid)
+        {
+            Caption = 'External Membership System Id';
+            DataClassification = SystemMetadata;
+        }
+        field(216; ExternalMemberSystemId; Guid)
+        {
+            Caption = 'External Member System Id';
+            DataClassification = SystemMetadata;
+        }
+        field(217; ExternalCardSystemId; Guid)
+        {
+            Caption = 'External Card System Id';
+            DataClassification = SystemMetadata;
+        }
         field(220; "GDPR Approval"; Option)
         {
             Caption = 'GDPR Approval';

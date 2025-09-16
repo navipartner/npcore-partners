@@ -570,7 +570,7 @@ codeunit 85015 "NPR Library - Member XML API"
         TmpBLOBbuffer: Record "NPR BLOB buffer" temporary;
         MemberWebService: Codeunit "NPR MM Member WebService";
         XmlDomMgt: Codeunit "XML DOM Management";
-        RemoteMemberMgt: Codeunit "NPR MM NPR Membership";
+        MembershipSoapApi: Codeunit "NPR MMMembershipSoapApi";
         IStream: InStream;
         OStream: OutStream;
         XmlAsText: Text;
@@ -605,7 +605,7 @@ codeunit 85015 "NPR Library - Member XML API"
         if (not RootElement.AsXmlNode().SelectSingleNode('descendant::response', ResponseNode)) then
             Error(XmlAsText);
 
-        exit(RemoteMemberMgt.EvaluateSearchMemberSoapXmlResponse(TempResponseMemberInfoCapture, ResponseMessage, ResponseNode));
+        exit(MembershipSoapApi.EvaluateSearchMemberSoapXmlResponse(TempResponseMemberInfoCapture, ResponseMessage, ResponseNode));
     end;
 
     procedure UpdateMemberImageAPI(MemberNo: Code[20]; Base64Image: Text; ScannerStation: Code[20]): Boolean

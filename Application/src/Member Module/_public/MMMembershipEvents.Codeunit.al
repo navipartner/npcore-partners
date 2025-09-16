@@ -211,6 +211,11 @@
     end;
 
     [IntegrationEvent(false, false)]
+    procedure OnAfterCreateMemberRestRequest(var MemberInfoCapture: Record "NPR MM Member Info Capture"; var Request: JsonObject)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     internal procedure OnGetMembershipMembers_OnBeforeTempMemberInfoResponseInsert(var TempMemberInfoResponse: Record "NPR MM Member Info Capture")
     begin
     end;

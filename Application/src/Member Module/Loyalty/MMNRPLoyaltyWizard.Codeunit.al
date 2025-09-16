@@ -221,7 +221,7 @@
                     NPRRemoteEndpointSetup."Endpoint URI" := StrSubstNo(CreateEndpoints3Lbl, BaseUrl, 'member_services', TenantName)
             end;
         end;
-
+        NPRRemoteEndpointSetup."Rest Api Endpoint URI" := NPRRemoteEndpointSetup.SoapUriToRestUri(NPRRemoteEndpointSetup."Endpoint URI");
         NPRRemoteEndpointSetup."Connection Timeout (ms)" := 8000;
         NPRRemoteEndpointSetup.Modify();
     end;

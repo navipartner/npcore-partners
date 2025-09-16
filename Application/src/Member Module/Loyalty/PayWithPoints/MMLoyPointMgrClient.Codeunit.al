@@ -48,7 +48,7 @@
     var
         LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup";
         LoyaltyEndpointClient: Record "NPR MM NPR Remote Endp. Setup";
-        ForeignMembership: Codeunit "NPR MM NPR Membership";
+        MMMembershipSoapApi: Codeunit "NPR MMMembershipSoapApi";
         RetryRequest: Codeunit "NPR MM LoyaltyRetryQueueMgr";
         loyaltyReceiptRegistrationError: Label 'There was a problem registering the loyalty receipt. The transaction will be automatically reattempted.';
         SoapAction: Text;
@@ -65,7 +65,7 @@
 
         if (TransformToSoapAction(EFTTransactionRequest, SoapAction, XmlRequest, ResponseMessage)) then begin
             XmlDocument.ReadFrom(XmlRequest, XmlRequestDoc);
-            Success := ForeignMembership.WebServiceApi(LoyaltyEndpointClient, SoapAction, ResponseMessage, XmlRequestDoc, XmlResponseDoc);
+            Success := MMMembershipSoapApi.WebServiceApi(LoyaltyEndpointClient, SoapAction, ResponseMessage, XmlRequestDoc, XmlResponseDoc);
             HandleWebServiceResult(EFTTransactionRequest, Success, ResponseMessage, XmlResponseDoc);
             if (not Success) then begin
                 if (RetryRequest.AddToQueue(EFTTransactionRequest, SoapAction, XmlRequest, ResponseMessage)) then begin

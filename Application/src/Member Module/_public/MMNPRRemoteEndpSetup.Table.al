@@ -70,6 +70,11 @@
             Caption = 'Endpoint URI';
             DataClassification = CustomerContent;
         }
+        field(32; "Rest Api Endpoint URI"; Text[200])
+        {
+            Caption = 'Rest Api Endpoint URI';
+            DataClassification = CustomerContent;
+        }
         field(40; Disabled; Boolean)
         {
             Caption = 'Disabled';
@@ -126,5 +131,36 @@
         iAuth.CheckMandatoryValues(AuthParamsBuff);
         iAuth.SetAuthorizationValue(RequestHeaders, AuthParamsBuff);
     end;
+
+    procedure SoapUriToRestUri(SoapEndpointURI: Text[200]): Text[200]
+    var
+        UriParts: List of [Text];
+        Position: Integer;
+        SoapApiLbl: Label 'api.businesscentral.dynamics.com/v2.0', Locked = true;
+        RestApiLbl: Label 'https://api.npretail.app/%1/%2/%3', Locked = true;
+        Tenant: Text;
+        Environment: Text;
+        Company: Text;
+        GuidValue: Guid;
+    begin
+        SoapEndpointURI := SoapEndpointURI.ToLower();
+        Position := StrPos(SoapEndpointURI, SoapApiLbl);
+        if Position = 0 then
+            exit('');
+#pragma warning disable AA0139
+        SoapEndpointURI := CopyStr(SoapEndpointURI, Position + StrLen(SoapApiLbl) + 1);
+#pragma warning restore AA0139
+        UriParts := SoapEndpointURI.Split('/');
+        if not UriParts.Get(1, Tenant) then
+            exit('');
+        if not Evaluate(GuidValue, Tenant) then
+            exit('');
+        if not UriParts.Get(2, Environment) then
+            exit('');
+        if not UriParts.Get(4, Company) then
+            exit('');
+        exit(StrSubstNo(RestApiLbl, Tenant, Environment, Company));
+    end;
+
 }
 

@@ -84,6 +84,16 @@
 
                     ToolTip = 'Specifies the value of the Endpoint URI field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    trigger OnValidate()
+                    begin
+                        if Rec."Rest Api Endpoint URI" = '' then
+                            Rec."Rest Api Endpoint URI" := Rec.SoapUriToRestUri(Rec."Endpoint URI");
+                    end;
+                }
+                field("Rest Api Endpoint URI"; Rec."Rest Api Endpoint URI")
+                {
+                    ToolTip = 'Specifies the rest api uri for the endpoint. Value can be found in page "Navipartner API Url" in receiving BC environment';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Disabled; Rec.Disabled)
                 {

@@ -48,7 +48,7 @@ codeunit 6184975 "NPR MM LoyaltyRetryQueueMgr"
         LoyaltyStoreSetup: Record "NPR MM Loyalty Store Setup";
         LoyaltyEndpointClient: Record "NPR MM NPR Remote Endp. Setup";
         LoyaltyClientMgr: Codeunit "NPR MM Loy. Point Mgr (Client)";
-        ForeignMembership: Codeunit "NPR MM NPR Membership";
+        MMMembershipSoapApi: Codeunit "NPR MMMembershipSoapApi";
         ResponseMessage: Text;
         Success: Boolean;
         Stream: InStream;
@@ -68,7 +68,7 @@ codeunit 6184975 "NPR MM LoyaltyRetryQueueMgr"
         Stream.Read(XmlRequestText);
         XmlDocument.ReadFrom(XmlRequestText, XmlRequestDoc);
 
-        Success := ForeignMembership.WebServiceApi(LoyaltyEndpointClient, RetryQueue.SoapAction, ResponseMessage, XmlRequestDoc, XmlResponseDoc);
+        Success := MMMembershipSoapApi.WebServiceApi(LoyaltyEndpointClient, RetryQueue.SoapAction, ResponseMessage, XmlRequestDoc, XmlResponseDoc);
         LoyaltyClientMgr.HandleWebServiceResult(EFTTransactionRequest, Success, ResponseMessage, XmlResponseDoc);
 
         if (not Success) then begin
