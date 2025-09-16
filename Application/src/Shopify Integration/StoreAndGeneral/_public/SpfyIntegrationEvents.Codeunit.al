@@ -169,5 +169,10 @@ codeunit 6184824 "NPR Spfy Integration Events"
     internal procedure OnAfterSetPaymentCardDetails(Transaction: JsonToken; var PaymentLine: Record "NPR Magento Payment Line")
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnCheckIfShopifyVoucherReferenceNoValidationSuspended(var Suspended: Boolean)
+    begin
+    end;
 }
 #endif

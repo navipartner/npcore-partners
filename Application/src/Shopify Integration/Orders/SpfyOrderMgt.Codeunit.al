@@ -1224,6 +1224,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         ShopifyAssignedID: Record "NPR Spfy Assigned ID";
         NpRvSalesDocMgt: Codeunit "NPR NpRv Sales Doc. Mgt.";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        SpfySuspendVouchRefVal: Codeunit "NPR Spfy Suspend Vouch.Ref.Val";
         VoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
     begin
         NpRvSalesLine.SetRange("Document Type", SalesLine."Document Type");
@@ -1260,7 +1261,9 @@ codeunit 6184814 "NPR Spfy Order Mgt."
             if ShopifyAssignedID.FindLast() then
                 Voucher.Get(ShopifyAssignedID."BC Record ID")
             else begin
+                BindSubscription(SpfySuspendVouchRefVal);
                 VoucherMgt.InitVoucher(VoucherType, '', FulfillmEntryDetailBuffer."Gift Card Reference No.", 0DT, true, Voucher);
+                UnbindSubscription(SpfySuspendVouchRefVal);
                 SpfyAssignedIDMgt.AssignShopifyID(Voucher.RecordId(), "NPR Spfy ID Type"::"Entry ID", FulfillmEntryDetailBuffer."Gift Card ID", false);
             end;
 

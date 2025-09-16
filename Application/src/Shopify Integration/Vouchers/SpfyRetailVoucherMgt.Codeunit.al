@@ -353,6 +353,8 @@ codeunit 6184816 "NPR Spfy Retail Voucher Mgt."
     var
         StringConversionManagement: Codeunit StringConversionManagement;
     begin
+        if IsReferenceNoValidationSuspended() then
+            exit(true);
         if StrLen(ReferenceNo) in [8 .. 20] then
             exit(ReferenceNo = StringConversionManagement.RemoveNonAlphaNumericCharacters(ReferenceNo));
 
@@ -371,6 +373,15 @@ codeunit 6184816 "NPR Spfy Retail Voucher Mgt."
                 if not IsValidShopifyVoucherReferenceNo(NpRvVoucher."Reference No.") then
                     Error(IncorrectRefNosFormatErr);
             until NpRvVoucher.Next() = 0;
+    end;
+
+    local procedure IsReferenceNoValidationSuspended(): Boolean
+    var
+        SpfyIntegrationEvents: Codeunit "NPR Spfy Integration Events";
+        Suspended: Boolean;
+    begin
+        SpfyIntegrationEvents.OnCheckIfShopifyVoucherReferenceNoValidationSuspended(Suspended);
+        exit(Suspended);
     end;
 
     procedure InitialSync(var ShopifyStore: Record "NPR Spfy Store"; var VoucherTypeIn: Record "NPR NpRv Voucher Type"; var VoucherIn: Record "NPR NpRv Voucher"; WithDialog: Boolean)
