@@ -68,7 +68,7 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
     var
         NcTaskSetup: Record "NPR Nc Task Setup";
     begin
-        NcTaskSetup.SetCurrentKey("Table No.");
+        NcTaskSetup.SetCurrentKey("Task Processor Code", "Table No.");
         NcTaskSetup.SetRange("Table No.", TableId);
         NcTaskSetup.SetRange("Task Processor Code", TaskProcessorCode);
         if not NcTaskSetup.IsEmpty() then
@@ -149,7 +149,9 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
 
     local procedure ProcessAndEnqueueDataLogRecord(DataLogRecord: Record "NPR Data Log Record") NewTasksInserted: Boolean
     var
+        SpfyCustomerMgt: Codeunit "NPR Spfy Customer Mgt.";
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
+        SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
         SpfyRetailVoucherMgt: Codeunit "NPR Spfy Retail Voucher Mgt.";
     begin
         NewTasksInserted := false;
@@ -160,10 +162,15 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
             Database::"Item Reference",
             Database::"NPR Spfy Store-Item Link",
             Database::"NPR Spfy Item Variant Modif.",
-            Database::"NPR Spfy Entity Metafield",
             Database::"NPR Spfy Item Price",
             Database::"NPR Spfy Inventory Level":
                 NewTasksInserted := SpfyItemMgt.ProcessDataLogRecord(DataLogRecord);
+
+            Database::"NPR Spfy Store-Customer Link":
+                NewTasksInserted := SpfyCustomerMgt.ProcessDataLogRecord(DataLogRecord);
+
+            Database::"NPR Spfy Entity Metafield":
+                NewTasksInserted := SpfyMetafieldMgt.ProcessDataLogRecord(DataLogRecord);
 
             Database::"Sales Line",
             Database::"Transfer Line",
@@ -207,10 +214,15 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
             Database::"Item Reference",
             Database::"Inventory Buffer",
             Database::"NPR Spfy Tag Update Request",
-            Database::"NPR Spfy Entity Metafield",
             Database::"NPR Spfy Inventory Level",
             Database::"NPR Spfy Item Price":
                 CreateTaskSetupEntry(Task."Task Processor Code", Task."Table No.", Codeunit::"NPR Spfy Send Items&Inventory");
+
+            Database::"NPR Spfy Entity Metafield":
+                CreateTaskSetupEntry(Task."Task Processor Code", Task."Table No.", Codeunit::"NPR Spfy Send Metafields");
+
+            Database::Customer:
+                CreateTaskSetupEntry(Task."Task Processor Code", Task."Table No.", Codeunit::"NPR Spfy Send Customers");
 
             Database::"NPR NpRv Voucher",
             Database::"NPR NpRv Arch. Voucher",
@@ -260,9 +272,15 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
 
             Database::"Item Variant",
             Database::"Item Reference",
-            Database::"NPR Spfy Item Variant Modif.",
-            Database::"NPR Spfy Entity Metafield":
+            Database::"NPR Spfy Item Variant Modif.":
                 IsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::Items);
+
+            Database::"NPR Spfy Entity Metafield":
+                begin
+                    IsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::Items);
+                    if not IsEnabled then
+                        IsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Orders");
+                end;
 
             Database::"Stockkeeping Unit",
             Database::"NPR Spfy Inventory Level",
@@ -273,6 +291,9 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
 
             Database::"NPR Spfy Item Price":
                 IsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Item Prices");
+
+            Database::"NPR Spfy Store-Customer Link":
+                IsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Sales Orders");
 
             Database::"NPR NpRv Voucher",
             Database::"NPR NpRv Arch. Voucher",

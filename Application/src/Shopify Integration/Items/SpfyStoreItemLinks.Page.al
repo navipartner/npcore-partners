@@ -39,7 +39,7 @@ page 6184567 "NPR Spfy Store-Item Links"
                 }
                 field("Integrate with This Store"; Rec."Sync. to this Store")
                 {
-                    ToolTip = 'Specifies whether the item is integrated with the Shopify store.';
+                    ToolTip = 'Specifies whether the item has been requested to be integrated with the Shopify store.';
                     ApplicationArea = NPRShopify;
                 }
                 field("Shopify Product ID"; SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID"))

@@ -7,6 +7,7 @@ page 6184854 "NPR Spfy Metafield Mappings"
     SourceTable = "NPR Spfy Metafield Mapping";
     UsageCategory = None;
     PopulateAllFields = true;
+    DelayedInsert = true;
 
     layout
     {

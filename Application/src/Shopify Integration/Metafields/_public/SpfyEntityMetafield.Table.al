@@ -1,7 +1,7 @@
 #if not BC17
 table 6150951 "NPR Spfy Entity Metafield"
 {
-    Access = Internal;
+    Access = Public;
     Extensible = false;
     Caption = 'Shopify Entity Metafield';
     DataClassification = CustomerContent;
@@ -45,7 +45,7 @@ table 6150951 "NPR Spfy Entity Metafield"
         {
             Caption = 'Metafield Value';
             DataClassification = CustomerContent;
-            ObsoleteState = Pending;
+            ObsoleteState = Removed;
             ObsoleteTag = '2025-08-03';
             ObsoleteReason = 'Replaced with a blob field "Metafield Raw Value" to support complex metafield values.';
         }
@@ -70,7 +70,7 @@ table 6150951 "NPR Spfy Entity Metafield"
         key(Key3; "Owner Type", "Metafield ID", "Table No.") { }
     }
 
-    internal procedure SetMetafieldValue(NewMetafieldValue: Text)
+    procedure SetMetafieldValue(NewMetafieldValue: Text)
     var
         OutStr: OutStream;
     begin

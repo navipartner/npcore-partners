@@ -9,6 +9,8 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         SpfyStoreLinkMgt: Codeunit "NPR Spfy Store Link Mgt.";
 
     procedure ProcessDataLogRecord(DataLogEntry: Record "NPR Data Log Record") TaskCreated: Boolean
+    var
+        SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
     begin
         case DataLogEntry."Table ID" of
             Database::Item:
@@ -41,7 +43,7 @@ codeunit 6184812 "NPR Spfy Item Mgt."
 
             Database::"NPR Spfy Entity Metafield":
                 begin
-                    TaskCreated := ProcessMetafield(DataLogEntry);
+                    TaskCreated := SpfyMetafieldMgt.ProcessMetafield(DataLogEntry);
                 end;
 
             Database::"NPR Spfy Inventory Level":
@@ -435,48 +437,33 @@ codeunit 6184812 "NPR Spfy Item Mgt."
             UpdateItemPrices(SpfyStoreItemLink);
     end;
 
-    local procedure ProcessMetafield(DataLogEntry: Record "NPR Data Log Record") TaskCreated: Boolean
+    internal procedure ProcessMetafield(SpfyEntityMetafield: Record "NPR Spfy Entity Metafield"; var ShopifyStoreCode: Code[20]; var TaskRecordValue: Text): Boolean
     var
         Item: Record Item;
-        NcTask: Record "NPR Nc Task";
-        SpfyEntityMetafield: Record "NPR Spfy Entity Metafield";
-        SpfyScheduleSend: Codeunit "NPR Spfy Schedule Send Tasks";
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         RecRef: RecordRef;
-        RecRef2: RecordRef;
     begin
-        if DataLogEntry."Type of Change" <> DataLogEntry."Type of Change"::Modify then
+        if SpfyEntityMetafield."Table No." <> Database::"NPR Spfy Store-Item Link" then
             exit;
 
-        RecRef := DataLogEntry."Record ID".GetRecord();
-        RecRef.SetTable(SpfyEntityMetafield);
-        if not SpfyEntityMetafield.Find() then
-            exit;
-        case SpfyEntityMetafield."Table No." of
-            Database::"NPR Spfy Store-Item Link":
-                begin
-                    RecRef2 := SpfyEntityMetafield."BC Record ID".GetRecord();
-                    RecRef2.SetTable(SpfyStoreItemLink);
-                    if SpfyStoreItemLink.Type = SpfyStoreItemLink.Type::Variant then begin
-                        SpfyStoreItemLink.Type := SpfyStoreItemLink.Type::Item;
-                        SpfyStoreItemLink."Variant Code" := '';
-                    end;
-                    if not Item.Get(SpfyStoreItemLink."Item No.") then
-                        exit;
-                    if not (SpfyStoreItemLink.Find() and (SpfyStoreItemLink."Sync. to this Store" or SpfyStoreItemLink."Synchronization Is Enabled")) then
-                        exit;
-                    if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items, SpfyStoreItemLink."Shopify Store Code") then
-                        exit;
-                    if not TestRequiredFields(Item, false) then
-                        exit;
-                end;
-            else
-                exit;
+        RecRef := SpfyEntityMetafield."BC Record ID".GetRecord();
+        RecRef.SetTable(SpfyStoreItemLink);
+        if SpfyStoreItemLink.Type = SpfyStoreItemLink.Type::Variant then begin
+            SpfyStoreItemLink.Type := SpfyStoreItemLink.Type::Item;
+            SpfyStoreItemLink."Variant Code" := '';
         end;
+        if not Item.Get(SpfyStoreItemLink."Item No.") then
+            exit;
+        if not (SpfyStoreItemLink.Find() and (SpfyStoreItemLink."Sync. to this Store" or SpfyStoreItemLink."Synchronization Is Enabled")) then
+            exit;
+        if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::Items, SpfyStoreItemLink."Shopify Store Code") then
+            exit;
+        if not TestRequiredFields(Item, false) then
+            exit;
 
-        clear(NcTask);
-        NcTask.Type := NcTask.Type::Modify;
-        TaskCreated := SpfyScheduleSend.InitNcTask(SpfyStoreItemLink."Shopify Store Code", RecRef, SpfyEntityMetafield."BC Record ID", GetProductVariantSku(SpfyStoreItemLink."Item No.", SpfyStoreItemLink."Variant Code"), NcTask.Type, 0DT, 0DT, NcTask);
+        ShopifyStoreCode := SpfyStoreItemLink."Shopify Store Code";
+        TaskRecordValue := GetProductVariantSku(SpfyStoreItemLink."Item No.", SpfyStoreItemLink."Variant Code");
+        exit(true);
     end;
 
     local procedure ProcessStockkeepingUnit(DataLogEntry: Record "NPR Data Log Record")
@@ -941,7 +928,7 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         exit(false);
     end;
 
-    procedure FindItemByShopifyProductID(ProductId: Text[30]; var SpfyStoreItemLink: Record "NPR Spfy Store-Item Link") Found: Boolean
+    procedure FindItemByShopifyProductID(ShopifyStoreCode: Code[20]; ProductId: Text[30]; var SpfyStoreItemLink: Record "NPR Spfy Store-Item Link") Found: Boolean
     var
         ShopifyAssignedID: Record "NPR Spfy Assigned ID";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
@@ -954,7 +941,7 @@ codeunit 6184812 "NPR Spfy Item Mgt."
             repeat
                 if RecRef.Get(ShopifyAssignedID."BC Record ID") then begin
                     RecRef.SetTable(SpfyStoreItemLink);
-                    SpfyStoreItemLink.Mark(SpfyStoreItemLink."Item No." <> '');
+                    SpfyStoreItemLink.Mark((SpfyStoreItemLink."Item No." <> '') and (SpfyStoreItemLink."Shopify Store Code" = ShopifyStoreCode));
                 end;
             until ShopifyAssignedID.Next() = 0;
         SpfyStoreItemLink.MarkedOnly(true);

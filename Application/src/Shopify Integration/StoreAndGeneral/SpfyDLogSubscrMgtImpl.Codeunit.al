@@ -30,6 +30,7 @@ codeunit 6184799 "NPR Spfy DLog Subscr.Mgt.Impl."
                     AddDataLogSetupEntity(
                         IntegrationArea, Database::"NPR Spfy Entity Metafield", DataLogSetup."Log Insertion"::" ", DataLogSetup."Log Modification"::Simple, DataLogSetup."Log Deletion"::" ", JobQueueMgt.DaysToDuration(7));
                 end;
+
             "NPR Spfy Integration Area"::"Inventory Levels":
                 begin
                     AddDataLogSetupEntity(
@@ -44,11 +45,13 @@ codeunit 6184799 "NPR Spfy DLog Subscr.Mgt.Impl."
                         AddDataLogSetupEntity(
                             IntegrationArea, Database::"Transfer Line", DataLogSetup."Log Insertion"::Simple, DataLogSetup."Log Modification"::Changes, DataLogSetup."Log Deletion"::Detailed, JobQueueMgt.DaysToDuration(7));
                 end;
+
             "NPR Spfy Integration Area"::"Item Prices":
                 begin
                     AddDataLogSetupEntity(
                         IntegrationArea, Database::"NPR Spfy Item Price", DataLogSetup."Log Insertion"::Simple, DataLogSetup."Log Modification"::Changes, DataLogSetup."Log Deletion"::Detailed, JobQueueMgt.DaysToDuration(7));
                 end;
+
             "NPR Spfy Integration Area"::"Retail Vouchers":
                 begin
                     AddDataLogSetupEntity(
@@ -57,6 +60,14 @@ codeunit 6184799 "NPR Spfy DLog Subscr.Mgt.Impl."
                         IntegrationArea, Database::"NPR NpRv Arch. Voucher", DataLogSetup."Log Insertion"::Simple, DataLogSetup."Log Modification"::" ", DataLogSetup."Log Deletion"::" ", JobQueueMgt.DaysToDuration(7));
                     AddDataLogSetupEntity(
                         IntegrationArea, Database::"NPR NpRv Voucher Entry", DataLogSetup."Log Insertion"::Detailed, DataLogSetup."Log Modification"::" ", DataLogSetup."Log Deletion"::" ", JobQueueMgt.DaysToDuration(7));
+                end;
+
+            "NPR Spfy Integration Area"::"Sales Orders":
+                begin
+                    AddDataLogSetupEntity(
+                        IntegrationArea, Database::"NPR Spfy Store-Customer Link", DataLogSetup."Log Insertion"::Simple, DataLogSetup."Log Modification"::Changes, DataLogSetup."Log Deletion"::Detailed, JobQueueMgt.DaysToDuration(7));
+                    AddDataLogSetupEntity(
+                        IntegrationArea, Database::"NPR Spfy Entity Metafield", DataLogSetup."Log Insertion"::" ", DataLogSetup."Log Modification"::Simple, DataLogSetup."Log Deletion"::" ", JobQueueMgt.DaysToDuration(7));
                 end;
         end;
         SpfyIntegrationEvents.OnAfterCreateDataLogSetup(IntegrationArea);
@@ -99,6 +110,7 @@ codeunit 6184799 "NPR Spfy DLog Subscr.Mgt.Impl."
                 Database::"Item Variant",
                 Database::"Item Reference",
                 Database::"NPR Spfy Store-Item Link",
+                Database::"NPR Spfy Store-Customer Link",
                 Database::"NPR Spfy Item Variant Modif.",
                 Database::"NPR Spfy Entity Metafield",
                 Database::"NPR Spfy Inventory Level",

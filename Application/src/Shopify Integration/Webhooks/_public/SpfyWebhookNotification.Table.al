@@ -178,5 +178,16 @@ table 6150883 "NPR Spfy Webhook Notification"
             ErrorText := NoErrorMessageTxt;
         exit(ErrorText);
     end;
+
+    internal procedure GetStoreCode(): Code[20]
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+    begin
+        TestField("Shop Domain");
+        ShopifyStore.SetFilter("Shopify Url", StrSubstNo('@*%1*', "Shop Domain"));
+        ShopifyStore.SetRange(Enabled, true);
+        ShopifyStore.FindFirst();
+        exit(ShopifyStore.Code);
+    end;
 }
 #endif

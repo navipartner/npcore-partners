@@ -6,7 +6,6 @@ codeunit 6184951 "NPR Spfy Item Webhook Handler" implements "NPR Spfy Webhook No
     procedure ProcessWebhookNotification(var SpfyWebhookNotification: Record "NPR Spfy Webhook Notification")
     var
         NcTask: Record "NPR Nc Task";
-        ShopifyStore: Record "NPR Spfy Store";
         JsonHelper: Codeunit "NPR Json Helper";
         SendItemAndInventory: Codeunit "NPR Spfy Send Items&Inventory";
         ShopifyPayload: JsonToken;
@@ -20,10 +19,7 @@ codeunit 6184951 "NPR Spfy Item Webhook Handler" implements "NPR Spfy Webhook No
             SpfyWebhookNotification.Topic::"products/update":
                 NcTask.Type := NcTask.Type::Modify;
         end;
-        ShopifyStore.SetFilter("Shopify Url", StrSubstNo('@*%1*', SpfyWebhookNotification."Shop Domain"));
-        ShopifyStore.SetRange(Enabled, true);
-        ShopifyStore.FindFirst();
-        NcTask."Store Code" := ShopifyStore.Code;
+        NcTask."Store Code" := SpfyWebhookNotification.GetStoreCode();
 
         ShopifyPayload.ReadFrom(SpfyWebhookNotification.GetPayloadStream());
 #pragma warning disable AA0139        
@@ -52,7 +48,7 @@ codeunit 6184951 "NPR Spfy Item Webhook Handler" implements "NPR Spfy Webhook No
             exit;
 
         SpfyWebhookNotification.TestField("Triggered for Source ID");
-        if not SpfyItemMgt.FindItemByShopifyProductID(SpfyWebhookNotification."Triggered for Source ID", SpfyStoreItemLink) then
+        if not SpfyItemMgt.FindItemByShopifyProductID(SpfyWebhookNotification.GetStoreCode(), SpfyWebhookNotification."Triggered for Source ID", SpfyStoreItemLink) then
             Error(ItemNotFoundErr, SpfyWebhookNotification."Triggered for Source ID");
         SpfyStoreItemLink.FindSet();
         repeat

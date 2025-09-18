@@ -80,12 +80,14 @@ page 6184563 "NPR Spfy Change Assigned ID"
 
     internal procedure GetIdFromShopify()
     var
+        SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         SpfyStoreLocationLink: Record "NPR Spfy Store-Location Link";
         SendItemAndInventory: Codeunit "NPR Spfy Send Items&Inventory";
+        SpfySendCustomers: Codeunit "NPR Spfy Send Customers";
         RecRef: RecordRef;
     begin
-        case BCRecID.TableNo of
+        case BCRecID.TableNo() of
             Database::"NPR Spfy Store-Item Link":
                 begin
                     RecRef := BCRecID.GetRecord();
@@ -104,6 +106,18 @@ page 6184563 "NPR Spfy Change Assigned ID"
                             end;
                         "NPR Spfy ID Type"::"Inventory Item ID":
                             NewShopifyID := SendItemAndInventory.GetShopifyInventoryItemID(SpfyStoreItemLink, true);
+                    end;
+                end;
+            Database::"NPR Spfy Store-Customer Link":
+                begin
+                    RecRef := BCRecID.GetRecord();
+                    RecRef.SetTable(SpfyStoreCustomerLink);
+                    SpfyStoreCustomerLink.TestField("No.");
+                    SpfyStoreCustomerLink.TestField("Shopify Store Code");
+                    case IDType of
+                        "NPR Spfy ID Type"::"Entry ID":
+                            if SpfyStoreCustomerLink.Type = SpfyStoreCustomerLink.Type::Customer then
+                                NewShopifyID := SpfySendCustomers.GetShopifyCustomerID(SpfyStoreCustomerLink, true);
                     end;
                 end;
             Database::"NPR Spfy Store-Location Link":

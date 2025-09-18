@@ -5,28 +5,16 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
 #if not BC17
         addafter("No.")
         {
-            field("NPR Spfy Customer ID"; SpfyAssignedIDMgt.GetAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID"))
+            field("NPR Spfy Customer ID"; '<Deprecated>')
             {
                 Caption = 'Shopify Customer ID';
                 Editable = false;
-                Visible = ShopifyIntegrationIsEnabled;
-                AssistEdit = true;
+                Visible = false;
                 ApplicationArea = NPRShopify;
-                ToolTip = 'Specifies the Shopify ID assigned to the customer.';
-
-                trigger OnAssistEdit()
-                var
-                    ChangeShopifyID: Page "NPR Spfy Change Assigned ID";
-                begin
-                    CurrPage.SaveRecord();
-                    Commit();
-
-                    Clear(ChangeShopifyID);
-                    ChangeShopifyID.SetOptions(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID");
-                    ChangeShopifyID.RunModal();
-
-                    CurrPage.Update(false);
-                end;
+                ToolTip = 'The field is deprecated and will be removed in future versions. Use the Shopify Integration part to manage Shopify customer IDs.';
+                ObsoleteState = Pending;
+                ObsoleteTag = '2025-09-20';
+                ObsoleteReason = 'Replaced by the Shopify Integration part.';
             }
         }
 #endif
@@ -191,6 +179,41 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
             }
         }
 
+#if not BC17
+        addlast(Content)
+        {
+            group("NPR Shopify")
+            {
+                Caption = 'Shopify';
+                Visible = ShopifyIntegrationIsEnabled and not ShopifyStoreListGenerated;
+
+                field("NPR SetupShopifyIntegration"; SetupShopifyIntegrationLbl)
+                {
+                    ApplicationArea = NPRShopify;
+                    DrillDown = true;
+                    Editable = false;
+                    ShowCaption = false;
+                    Style = StrongAccent;
+                    StyleExpr = true;
+
+                    trigger OnDrillDown()
+                    var
+                        SpfyStoreLinkMgt: Codeunit "NPR Spfy Store Link Mgt.";
+                    begin
+                        SpfyStoreLinkMgt.UpdateStoreCustomerLinks(Rec);
+                        NPR_UpdateShopifyStoreListGenerated();
+                    end;
+                }
+            }
+            part("NPR ShopifyStores"; "NPR Spfy Store-Cust.Links Subp")
+            {
+                ApplicationArea = NPRShopify;
+                Caption = 'Shopify Integration';
+                Visible = ShopifyStoreListGenerated;
+                SubPageLink = Type = const(Customer), "No." = field("No.");
+            }
+        }
+#endif
     }
     actions
     {
@@ -359,11 +382,12 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         RSEIAuxCustomer: Record "NPR RS EI Aux Customer";
 #endif
-#if not BC17
-        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
-        ShopifyIntegrationIsEnabled: Boolean;
-#endif
         AddInfoRequestVisible: Boolean;
+#if not BC17
+        ShopifyIntegrationIsEnabled: Boolean;
+        ShopifyStoreListGenerated: Boolean;
+        SetupShopifyIntegrationLbl: Label 'Setup Shopify Integration';
+#endif
 
     trigger OnAfterGetCurrRecord()
     var
@@ -379,6 +403,9 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
         ITAuxCustomer.ReadITAuxCustomerFields(Rec);
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
         RSEIAuxCustomer.ReadRSEIAuxCustomerFields(Rec);
+#endif
+#if not BC17
+        NPR_UpdateShopifyStoreListGenerated();
 #endif
     end;
 
@@ -441,4 +468,19 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
         AddInfoReqMgt.SetCustAdditionalInfo(Rec, TempAddInfoResponse);
     end;
     #endregion Membership Module Integrations
+
+#if not BC17
+    local procedure NPR_UpdateShopifyStoreListGenerated()
+    var
+        SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
+        SpfyStoreLinkMgt: Codeunit "NPR Spfy Store Link Mgt.";
+    begin
+        if not ShopifyIntegrationIsEnabled then begin
+            ShopifyStoreListGenerated := false;
+            exit;
+        end;
+        SpfyStoreLinkMgt.FilterStoreCustomerLinks(Rec.RecordId(), SpfyStoreCustomerLink);
+        ShopifyStoreListGenerated := not SpfyStoreCustomerLink.IsEmpty();
+    end;
+#endif
 }

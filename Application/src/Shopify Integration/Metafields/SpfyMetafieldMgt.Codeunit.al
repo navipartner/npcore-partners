@@ -2,11 +2,64 @@
 codeunit 6185065 "NPR Spfy Metafield Mgt."
 {
     Access = Internal;
+    TableNo = "NPR Data Log Record";
 
     var
         _TempSpfyMetafieldDef: Record "NPR Spfy Metafield Definition";
-        _QueryingShopifyLbl: Label 'Querying Shopify...';
         _UnexpectedResponseErr: Label '%1. Shopify returned the following response:\%2', Comment = '%1 - Error descrition, %2 - Shopify returned response.';
+
+    procedure ProcessDataLogRecord(DataLogEntry: Record "NPR Data Log Record") TaskCreated: Boolean
+    begin
+        case DataLogEntry."Table ID" of
+            Database::"NPR Spfy Entity Metafield":
+                begin
+                    TaskCreated := ProcessMetafield(DataLogEntry);
+                end;
+            else
+                exit;
+        end;
+        Commit();
+    end;
+
+    internal procedure ProcessMetafield(DataLogEntry: Record "NPR Data Log Record"): Boolean
+    var
+        NcTask: Record "NPR Nc Task";
+        SpfyEntityMetafield: Record "NPR Spfy Entity Metafield";
+        SpfyCustomerMgt: Codeunit "NPR Spfy Customer Mgt.";
+        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
+        SpfyMetafieldMgtPublic: Codeunit "NPR Spfy Metafield Mgt. Public";
+        SpfyScheduleSend: Codeunit "NPR Spfy Schedule Send Tasks";
+        RecRef: RecordRef;
+        ShopifyStoreCode: Code[20];
+        TaskRecordValue: Text;
+        ProcessRecord: Boolean;
+    begin
+        if DataLogEntry."Type of Change" <> DataLogEntry."Type of Change"::Modify then
+            exit;
+
+        RecRef := DataLogEntry."Record ID".GetRecord();
+        RecRef.SetTable(SpfyEntityMetafield);
+        if not SpfyEntityMetafield.Find() then
+            exit;
+
+        SpfyMetafieldMgtPublic.OnProcessMetafieldEntityDataLogEntry(SpfyEntityMetafield, ShopifyStoreCode, TaskRecordValue, ProcessRecord);
+        if not ProcessRecord then
+            case SpfyEntityMetafield."Table No." of
+                Database::"NPR Spfy Store-Item Link":
+                    ProcessRecord := SpfyItemMgt.ProcessMetafield(SpfyEntityMetafield, ShopifyStoreCode, TaskRecordValue);
+                Database::"NPR Spfy Store-Customer Link":
+                    ProcessRecord := SpfyCustomerMgt.ProcessMetafield(SpfyEntityMetafield, ShopifyStoreCode, TaskRecordValue);
+            end;
+
+        if not ProcessRecord or (ShopifyStoreCode = '') then
+            exit;
+        if TaskRecordValue = '' then
+            TaskRecordValue := Format(SpfyEntityMetafield."BC Record ID");
+
+        clear(NcTask);
+        NcTask.Type := NcTask.Type::Modify;
+        exit(SpfyScheduleSend.InitNcTask(ShopifyStoreCode, RecRef, SpfyEntityMetafield."BC Record ID", TaskRecordValue, NcTask.Type, 0DT, 0DT, NcTask));
+    end;
 
     internal procedure SelectShopifyMetafield(ShopifyStoreCode: Code[20]; ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type"; var SelectedMetafieldID: Text[30]): Boolean
     begin
@@ -55,10 +108,11 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
 
     internal procedure InitStoreItemLinkMetafields(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link")
     var
-        Item: Record Item;
-        ItemAttributeValueMapping: Record "Item Attribute Value Mapping";
         SpfyEntityMetafield: Record "NPR Spfy Entity Metafield";
         DataLogMgt: Codeunit "NPR Data Log Management";
+        SpfyMetafieldMgtPublic: Codeunit "NPR Spfy Metafield Mgt. Public";
+        SpfyMFHdlItemAttrib: Codeunit "NPR Spfy M/F Hdl.-Item Attrib.";
+        SpfyMFHdlItemCateg: Codeunit "NPR Spfy M/F Hdl.-Item Categ.";
     begin
 #if not (BC18 or BC19 or BC20 or BC21)
         SpfyEntityMetafield.ReadIsolation := IsolationLevel::UpdLock;
@@ -73,52 +127,98 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
             DataLogMgt.DisableDataLog(false);
         end;
 
-        //TODO: replace with an interface
-        ItemAttributeValueMapping.SetRange("Table ID", Database::Item);
-        ItemAttributeValueMapping.SetRange("No.", SpfyStoreItemLink."Item No.");
-        if ItemAttributeValueMapping.FindSet() then
-            repeat
-                ProcessItemAttributeValueChange(ItemAttributeValueMapping, SpfyStoreItemLink."Shopify Store Code", false);
-            until ItemAttributeValueMapping.Next() = 0;
+        SpfyMFHdlItemAttrib.InitStoreItemLinkMetafields(SpfyStoreItemLink);
+        SpfyMFHdlItemCateg.InitStoreItemLinkMetafields(SpfyStoreItemLink);
+        SpfyMetafieldMgtPublic.OnInitStoreItemLinkMetafields(SpfyStoreItemLink);
+    end;
 
-        if SpfyStoreItemLink.Type = SpfyStoreItemLink.Type::Item then begin
-            Item.SetLoadFields("Item Category Code");
-            if Item.Get(SpfyStoreItemLink."Item No.") then
-                ProcessItemCategoryChange(Item, SpfyStoreItemLink."Shopify Store Code", false);
+    internal procedure InitStoreCustomerLinkMetafields(SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link")
+    var
+        SpfyEntityMetafield: Record "NPR Spfy Entity Metafield";
+        DataLogMgt: Codeunit "NPR Data Log Management";
+        SpfyMetafieldMgtPublic: Codeunit "NPR Spfy Metafield Mgt. Public";
+        SpfyMFHdlClntAttrib: Codeunit "NPR Spfy M/F Hdl.-Clnt Attrib.";
+        SpfyMFHdlLoyaltyPts: Codeunit "NPR Spfy M/F Hdl.-Loyalty Pts";
+    begin
+#if not (BC18 or BC19 or BC20 or BC21)
+        SpfyEntityMetafield.ReadIsolation := IsolationLevel::UpdLock;
+#else
+        SpfyEntityMetafield.LockTable();
+#endif
+        SpfyEntityMetafield.SetRange("Table No.", Database::"NPR Spfy Store-Customer Link");
+        SpfyEntityMetafield.SetRange("BC Record ID", SpfyStoreCustomerLink.RecordId());
+        if not SpfyEntityMetafield.IsEmpty() then begin
+            DataLogMgt.DisableDataLog(true);
+            SpfyEntityMetafield.DeleteAll();
+            DataLogMgt.DisableDataLog(false);
         end;
+
+        SpfyMFHdlClntAttrib.InitStoreCustomerLinkMetafields(SpfyStoreCustomerLink);
+        SpfyMFHdlLoyaltyPts.InitStoreCustomerLinkMetafields(SpfyStoreCustomerLink);
+        SpfyMetafieldMgtPublic.OnInitStoreCustomerLinkMetafields(SpfyStoreCustomerLink);
     end;
 
     internal procedure ProcessMetafieldMappingChange(var SpfyMetafieldMapping: Record "NPR Spfy Metafield Mapping"; xMetafieldID: Text[30]; Removed: Boolean; Silent: Boolean)
     var
         SpfyEntityMetafield: Record "NPR Spfy Entity Metafield";
+        SpfyMetafieldMgtPublic: Codeunit "NPR Spfy Metafield Mgt. Public";
+        SpfyMFHdlClntAttrib: Codeunit "NPR Spfy M/F Hdl.-Clnt Attrib.";
+        SpfyMFHdlItemAttrib: Codeunit "NPR Spfy M/F Hdl.-Item Attrib.";
+        SpfyMFHdlItemCateg: Codeunit "NPR Spfy M/F Hdl.-Item Categ.";
+        SpfyMFHdlLoyaltyPts: Codeunit "NPR Spfy M/F Hdl.-Loyalty Pts";
+        Window: Dialog;
+        LinkRegenerationCnf: Label 'Changing the Shopify metafield ID may take a significant amount of time, as the system may need to resend information about the metafield to Shopify for all affected Business Central entities. Are you sure you want to continue?';
+        ProcessingLbl: Label 'Processing metafield mapping change...';
     begin
         if (SpfyMetafieldMapping."Metafield ID" = '') and (xMetafieldID = '') then
             exit;
         if (SpfyMetafieldMapping."Metafield ID" = xMetafieldID) and not Removed then
             exit;
-        if not (SpfyMetafieldMapping."BC Record ID".TableNo() in [Database::"NPR Spfy Store", Database::"Item Attribute"]) then
-            exit;
         if (SpfyMetafieldMapping."Metafield ID" = '') and not Removed then
             Removed := true;
+        if not GuiAllowed() then
+            Silent := true;
 
+        if not Silent then begin
+            if not Confirm(LinkRegenerationCnf, true) then
+                Error('');
+            Window.Open(ProcessingLbl);
+        end;
+
+        SpfyMetafieldMapping.Modify(true);
+
+        //Metafield mapping removed. Clear all stored entity metafield values
         SpfyEntityMetafield.SetRange("Owner Type", SpfyMetafieldMapping."Owner Type");
         SpfyEntityMetafield.SetRange("Metafield ID", xMetafieldID);
-        SpfyEntityMetafield.SetRange("Table No.", Database::"NPR Spfy Store-Item Link");
         if Removed then begin
             if xMetafieldID <> '' then
                 if not SpfyEntityMetafield.IsEmpty() then
                     SpfyEntityMetafield.DeleteAll();
+            if not Silent then
+                Window.Close();
             exit;
         end;
 
-        //TODO: replace with an interface
-        case SpfyMetafieldMapping."BC Record ID".TableNo() of
-            Database::"NPR Spfy Store":
-                ProcessItemCategoryMetafieldMappingChange(SpfyMetafieldMapping, SpfyEntityMetafield, xMetafieldID, Removed, Silent);
+        SpfyMFHdlItemAttrib.ProcessMetafieldMappingChange(SpfyMetafieldMapping, SpfyEntityMetafield, xMetafieldID, Removed);
+        SpfyMFHdlItemCateg.ProcessMetafieldMappingChange(SpfyMetafieldMapping, SpfyEntityMetafield, xMetafieldID, Removed);
+        SpfyMFHdlClntAttrib.ProcessMetafieldMappingChange(SpfyMetafieldMapping, SpfyEntityMetafield, xMetafieldID, Removed);
+        SpfyMFHdlLoyaltyPts.ProcessMetafieldMappingChange(SpfyMetafieldMapping, SpfyEntityMetafield, xMetafieldID, Removed);
+        SpfyMetafieldMgtPublic.OnProcessMetafieldMappingChange(SpfyMetafieldMapping, SpfyEntityMetafield, xMetafieldID, Removed, Silent);
+        if not Silent then
+            Window.Close();
+    end;
 
-            Database::"Item Attribute":
-                ProcessItemAttributeMetafieldMappingChange(SpfyMetafieldMapping, SpfyEntityMetafield, xMetafieldID, Removed, Silent);
-        end;
+    internal procedure UpdateMetafieldIDInExistingSpfyEntityMetafieldEntries(var SpfyEntityMetafield: Record "NPR Spfy Entity Metafield"; NewMetafieldID: Text[30])
+    var
+        DataLogMgt: Codeunit "NPR Data Log Management";
+    begin
+        if SpfyEntityMetafield.IsEmpty() then
+            exit;
+        DataLogMgt.DisableDataLog(true);
+        SpfyEntityMetafield.ModifyAll("Metafield Key", '');
+        SpfyEntityMetafield.ModifyAll("Metafield Value Version ID", '');
+        DataLogMgt.DisableDataLog(false);
+        SpfyEntityMetafield.ModifyAll("Metafield ID", NewMetafieldID);
     end;
 
     internal procedure ShopifyEntityMetafieldValueUpdateQuery(EntityRecID: RecordId; ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type"; ShopifyOwnerID: Text[30]; ShopifyStoreCode: Code[20]; var QueryStream: OutStream) SendToShopify: Boolean
@@ -139,10 +239,14 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
     var
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         RequestJson: JsonObject;
-        QueryTok: Label 'query GetMetafieldsSet { %1(id: "gid://shopify/%2/%3") { id title metafields(first: 250) { edges { node { id namespace key value compareDigest type definition { id }}}}}}', Locked = true;
+        VariablesJson: JsonObject;
+        QueryTok: Label 'query GetMetafieldsSet($ownerID: ID!) {%1(id: $ownerID) {id metafields(first: 250){edges{node{id namespace key value compareDigest type definition{id}}}}}}', Locked = true;
     begin
         OwnerTypeTxt := GetOwnerTypeAsText(ShopifyOwnerType);
-        RequestJson.Add('query', StrSubstNo(QueryTok, SpfyIntegrationMgt.LowerFirstLetter(OwnerTypeTxt), OwnerTypeTxt, ShopifyOwnerID));
+        VariablesJson.Add('ownerID', StrSubstNo('gid://shopify/%1/%2', OwnerTypeTxt, ShopifyOwnerID));
+
+        RequestJson.Add('query', StrSubstNo(QueryTok, SpfyIntegrationMgt.LowerFirstLetter(OwnerTypeTxt)));
+        RequestJson.Add('variables', VariablesJson);
         RequestJson.WriteTo(QueryStream);
     end;
 
@@ -170,6 +274,7 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
     var
         SpfyEntityMetafieldParam: Record "NPR Spfy Entity Metafield";
         SpfyMetafieldMapping: Record "NPR Spfy Metafield Mapping";
+        SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         JsonHelper: Codeunit "NPR Json Helper";
@@ -186,6 +291,12 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
                 begin
                     RecRef.SetTable(SpfyStoreItemLink);
                     OwnerNo := SpfyStoreItemLink."Item No.";
+                end;
+            Database::"NPR Spfy Store-Customer Link":
+                begin
+                    RecRef.SetTable(SpfyStoreCustomerLink);
+                    if SpfyStoreCustomerLink.Type = SpfyStoreCustomerLink.Type::Customer then
+                        OwnerNo := SpfyStoreCustomerLink."No.";
                 end;
             else
                 exit;
@@ -220,13 +331,12 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
                 end;
             end;
 
-        // Remove entity metafields and item attributes for which no Shopify metafield was returned
+        // Remove entity metafields and related BC records for which no Shopify metafield was returned
         Clear(SpfyEntityMetafieldParam);
         SpfyEntityMetafieldParam."BC Record ID" := EntityRecID;
         SpfyEntityMetafieldParam."Owner Type" := ShopifyOwnerType;
 
         SpfyMetafieldMapping.SetFilter("Metafield ID", '<>%1', '');
-        SpfyMetafieldMapping.SetFilter("Table No.", '%1|%2', Database::"Item Attribute", Database::"NPR Spfy Store");
         if SpfyMetafieldMapping.FindSet() then
             repeat
                 if not ProcessedMetafields.Contains(SpfyMetafieldMapping."Entry No.") then begin
@@ -238,31 +348,18 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
             until SpfyMetafieldMapping.Next() = 0;
     end;
 
-    local procedure DoBCMetafieldUpdate(SpfyMetafieldMapping: Record "NPR Spfy Metafield Mapping"; SpfyEntityMetafieldParam: Record "NPR Spfy Entity Metafield"; OwnerNo: Code[20]): Boolean
+    local procedure DoBCMetafieldUpdate(SpfyMetafieldMapping: Record "NPR Spfy Metafield Mapping"; SpfyEntityMetafieldParam: Record "NPR Spfy Entity Metafield"; OwnerNo: Code[20]) Updated: Boolean
     var
-        ItemAttribute: Record "Item Attribute";
-        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+        SpfyMetafieldMgtPublic: Codeunit "NPR Spfy Metafield Mgt. Public";
+        SpfyMFHdlClntAttrib: Codeunit "NPR Spfy M/F Hdl.-Clnt Attrib.";
+        SpfyMFHdlItemAttrib: Codeunit "NPR Spfy M/F Hdl.-Item Attrib.";
+        SpfyMFHdlItemCateg: Codeunit "NPR Spfy M/F Hdl.-Item Categ.";
     begin
-        //TODO: replace with an interface
-        case SpfyMetafieldMapping."Table No." of
-            Database::"NPR Spfy Store":
-                begin
-                    SetEntityMetafieldValue(SpfyEntityMetafieldParam, true, true);
-                    //TODO: Do we need to update the item category on the item card?
-                    exit(true);
-                end;
-
-            Database::"Item Attribute":
-                begin
-                    if OwnerNo = '' then
-                        exit;
-                    if not ItemAttribute.Get(SpfyMetafieldMapping."BC Record ID") then
-                        exit;
-                    SetEntityMetafieldValue(SpfyEntityMetafieldParam, true, true);
-                    SetItemAttributeValue(ItemAttribute, OwnerNo, SpfyIntegrationMgt.GetLanguageCode(SpfyMetafieldMapping."Shopify Store Code"), SpfyEntityMetafieldParam.GetMetafieldValue(false));
-                    exit(true);
-                end;
-        end;
+        SpfyMFHdlItemAttrib.DoBCMetafieldUpdate(SpfyMetafieldMapping, SpfyEntityMetafieldParam, OwnerNo, Updated);
+        SpfyMFHdlItemCateg.DoBCMetafieldUpdate(SpfyMetafieldMapping, SpfyEntityMetafieldParam, OwnerNo, Updated);
+        SpfyMFHdlClntAttrib.DoBCMetafieldUpdate(SpfyMetafieldMapping, SpfyEntityMetafieldParam, OwnerNo, Updated);
+        SpfyMetafieldMgtPublic.OnDoBCMetafieldUpdate(SpfyMetafieldMapping, SpfyEntityMetafieldParam, OwnerNo, Updated);
+        exit(Updated);
     end;
 
     local procedure GetMetafiledIDFromMetafieldDefinitions(ShopifyStoreCode: Code[20]; ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type"; MetafieldKey: Text[80]; MetafieldNamespace: Text[255]) MetafieldID: Text[30]
@@ -306,7 +403,7 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
         if WithDialog then
             WithDialog := GuiAllowed();
         if WithDialog then
-            Window.Open(_QueryingShopifyLbl);
+            Window.Open(QueryingShopifyLbl());
 
         ClearTempSpfyMetafieldDefinitions();
         ClearLastError();
@@ -434,199 +531,22 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
         exit(false);
     end;
 
-    internal procedure GetItemCategoryMetafieldDefinitionID(ShopifyStoreCode: Code[20]; WithDialog: Boolean; var ItemCategoryMetafieldID: Text[30])
-    var
-        Window: Dialog;
-        MetaobjectDefinitionGID: Text;
+    internal procedure GetMetaobjectRelatedMetafieldDefinitionID(ShopifyStoreCode: Code[20]; MetaobjectDefinitionGID: Text; var MetafieldID: Text[30])
     begin
-        if WithDialog then
-            WithDialog := GuiAllowed();
-        if WithDialog then
-            Window.Open(_QueryingShopifyLbl);
-
-        MetaobjectDefinitionGID := GetMetaobjectDefinitionGID(ShopifyStoreCode);
         GetShopifyMetafieldDefinitions(ShopifyStoreCode, Enum::"NPR Spfy Metafield Owner Type"::PRODUCT, StrSubstNo('type:%1', MetaobjectReferenceShopifyMetafieldType()), false);
         _TempSpfyMetafieldDef.SetRange("Validation Definition GID", MetaobjectDefinitionGID);
-        if ItemCategoryMetafieldID <> '' then begin
-            _TempSpfyMetafieldDef.ID := ItemCategoryMetafieldID;
+        if MetafieldID <> '' then begin
+            _TempSpfyMetafieldDef.ID := MetafieldID;
             if not _TempSpfyMetafieldDef.Find() then
-                ItemCategoryMetafieldID := '';
+                MetafieldID := '';
         end;
-        if ItemCategoryMetafieldID = '' then
+        if MetafieldID = '' then
             if _TempSpfyMetafieldDef.FindFirst() then
-                ItemCategoryMetafieldID := _TempSpfyMetafieldDef.ID;
+                MetafieldID := _TempSpfyMetafieldDef.ID;
         ClearTempSpfyMetafieldDefinitions();
-
-        if ItemCategoryMetafieldID = '' then
-            ItemCategoryMetafieldID := CreateItemCategoryMetafieldDefinition(ShopifyStoreCode, MetaobjectDefinitionGID);
-        if WithDialog then
-            Window.Close();
     end;
 
-    local procedure GetMetaobjectDefinitionGID(ShopifyStoreCode: Code[20]): Text
-    var
-        NcTask: Record "NPR Nc Task";
-        JsonHelper: Codeunit "NPR Json Helper";
-        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
-        MetaobjectDefinition: JsonToken;
-        ShopifyResponse: JsonToken;
-        QueryStream: OutStream;
-        MetaobjectDefinitionGID: Text;
-        CouldNotGetMetaobjectDefinitionErr: Label 'Could not obtain metaobject definition from Shopify.';
-        CouldNotCreateMetaobjectDefinitionErr: Label 'Could not create metaobject definition in Shopify.';
-        CouldNotUpdateMetaobjectDefinitionErr: Label 'Could not update metaobject definition in Shopify.';
-    begin
-        ClearLastError();
-        NcTask."Store Code" := ShopifyStoreCode;
-        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
-        ItemCategoryShopifyMetaobjectDefinitionGetByTypeQuery(QueryStream);
-        if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ShopifyResponse) then
-            Error(_UnexpectedResponseErr, CouldNotGetMetaobjectDefinitionErr, GetLastErrorText());
-        if ShopifyResponse.SelectToken('data.metaobjectDefinitionByType', MetaobjectDefinition) and MetaobjectDefinition.IsObject() then
-            exit(JsonHelper.GetJText(MetaobjectDefinition, 'id', true));
-
-        Clear(NcTask);
-        NcTask."Store Code" := ShopifyStoreCode;
-        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
-        ItemCategoryShopifyMetaobjectDefinitionCreateQuery(QueryStream);
-        if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ShopifyResponse) then
-            Error(_UnexpectedResponseErr, CouldNotCreateMetaobjectDefinitionErr, GetLastErrorText());
-        if SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse) then
-            Error(_UnexpectedResponseErr, CouldNotCreateMetaobjectDefinitionErr, ShopifyResponse);
-        if ShopifyResponse.SelectToken('data.metaobjectDefinitionCreate.metaobjectDefinition', MetaobjectDefinition) and MetaobjectDefinition.IsObject() then
-            MetaobjectDefinitionGID := JsonHelper.GetJText(MetaobjectDefinition, 'id', true);
-        if MetaobjectDefinitionGID = '' then
-            Error(_UnexpectedResponseErr, CouldNotCreateMetaobjectDefinitionErr, ShopifyResponse);
-
-        Clear(NcTask);
-        NcTask."Store Code" := ShopifyStoreCode;
-        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
-        ItemCategoryShopifyMetaobjectDefinitionUpdateQuery(MetaobjectDefinitionGID, QueryStream);
-        if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ShopifyResponse) then
-            Error(_UnexpectedResponseErr, CouldNotUpdateMetaobjectDefinitionErr, GetLastErrorText());
-        if SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse) then
-            Error(_UnexpectedResponseErr, CouldNotUpdateMetaobjectDefinitionErr, ShopifyResponse);
-        exit(MetaobjectDefinitionGID);
-    end;
-
-    local procedure ItemCategoryShopifyMetaobjectDefinitionGetByTypeQuery(var QueryStream: OutStream)
-    var
-        JsonBuilder: Codeunit "NPR Json Builder";
-        QueryTok: Label 'query GetMetaobjectDefinition($type: String!){metaobjectDefinitionByType(type: $type){id}}', Locked = true;
-    begin
-        JsonBuilder.StartObject()
-            .AddProperty('query', QueryTok)
-            .StartObject('variables')
-                .AddProperty('type', ItemCategoryShopifyMetaobjectType())
-            .EndObject()
-        .EndObject();
-
-        JsonBuilder.Build().WriteTo(QueryStream);
-    end;
-
-    local procedure ItemCategoryShopifyMetaobjectDefinitionCreateQuery(var QueryStream: OutStream)
-    var
-        JsonBuilder: Codeunit "NPR Json Builder";
-        QueryTok: Label 'mutation CreateMetaobjectDefinition($definition: MetaobjectDefinitionCreateInput!) {metaobjectDefinitionCreate(definition: $definition) {metaobjectDefinition{id} userErrors {field message code}}}', Locked = true;
-    begin
-        JsonBuilder.StartObject()
-            .AddProperty('query', QueryTok)
-            .StartObject('variables')
-                .StartObject('definition')
-                    .AddProperty('name', 'BC Item Category')
-                    .AddProperty('description', 'The item category from Business Central')
-                    .AddProperty('type', ItemCategoryShopifyMetaobjectType())
-                    .AddProperty('displayNameKey', 'name')
-                    .StartObject('access')
-                        .AddProperty('admin', 'MERCHANT_READ_WRITE')
-                        .AddProperty('storefront', 'PUBLIC_READ')
-                    .EndObject()
-                    .StartObject('capabilities')
-                        .StartObject('publishable')
-                            .AddProperty('enabled', true)
-                        .EndObject()
-                        .StartObject('translatable')
-                            .AddProperty('enabled', true)
-                        .EndObject()
-                    .EndObject()
-                    .StartArray('fieldDefinitions')
-                        .StartObject()
-                            .AddProperty('key', 'category_id')
-                            .AddProperty('name', 'UID')
-                            .AddProperty('description', 'BC item category unique ID')
-                            .AddProperty('type', 'single_line_text_field')
-                            .AddProperty('required', true)
-                        .EndObject()
-                        .StartObject()
-                            .AddProperty('key', 'name')
-                            .AddProperty('name', 'Name')
-                            .AddProperty('description', 'BC item category name')
-                            .AddProperty('type', 'single_line_text_field')
-                            .AddProperty('required', true)
-                        .EndObject()
-                        .StartObject()
-                            .AddProperty('key', 'description')
-                            .AddProperty('name', 'Description')
-                            .AddProperty('description', 'BC item category detailed description')
-                            .AddProperty('type', 'multi_line_text_field')
-                            .AddProperty('required', false)
-                        .EndObject()
-                        .StartObject()
-                            .AddProperty('key', 'position')
-                            .AddProperty('name', 'Position')
-                            .AddProperty('description', 'Position of the BC item category in the list')
-                            .AddProperty('type', 'number_integer')
-                            .AddProperty('required', true)
-                            .StartArray('validations')
-                                .StartObject()
-                                    .AddProperty('name', 'min')
-                                    .AddProperty('value', '1')
-                                .EndObject()
-                            .EndArray()
-                        .EndObject()
-                    .EndArray()
-                .EndObject()
-            .EndObject()
-        .EndObject();
-
-        JsonBuilder.Build().WriteTo(QueryStream);
-    end;
-
-    local procedure ItemCategoryShopifyMetaobjectDefinitionUpdateQuery(MetaobjectDefinitionGID: Text; var QueryStream: OutStream)
-    var
-        JsonBuilder: Codeunit "NPR Json Builder";
-        QueryTok: Label 'mutation UpdateMetaobjectDefinition($id: ID!, $definition: MetaobjectDefinitionUpdateInput!) {metaobjectDefinitionUpdate(id: $id, definition : $definition) {metaobjectDefinition{id} userErrors {field message code}}}', Locked = true;
-    begin
-        JsonBuilder.StartObject()
-            .AddProperty('query', QueryTok)
-            .StartObject('variables')
-                .AddProperty('id', MetaobjectDefinitionGID)
-                .StartObject('definition')
-                    .StartArray('fieldDefinitions')
-                        .StartObject()
-                            .StartObject('create')
-                                .AddProperty('key', 'parent_id')
-                                .AddProperty('name', 'Parent ID')
-                                .AddProperty('description', 'ID of the parent BC item category')
-                                .AddProperty('type', 'metaobject_reference')
-                                .AddProperty('required', false)
-                                .StartArray('validations')
-                                    .StartObject()
-                                        .AddProperty('name', 'metaobject_definition_id')
-                                        .AddProperty('value', MetaobjectDefinitionGID)
-                                    .EndObject()
-                                .EndArray()
-                            .EndObject()
-                        .EndObject()
-                    .EndArray()
-                .EndObject()
-            .EndObject()
-        .EndObject();
-
-        JsonBuilder.Build().WriteTo(QueryStream);
-    end;
-
-    local procedure CreateItemCategoryMetafieldDefinition(ShopifyStoreCode: Code[20]; MetaobjectDefinitionGID: Text) NewMetafieldID: Text[30]
+    internal procedure CreateMetafieldDefinition(ShopifyStoreCode: Code[20]; ShopifyMetafieldDefinitionCreateQuery: JsonObject) NewMetafieldID: Text[30]
     var
         NcTask: Record "NPR Nc Task";
         JsonHelper: Codeunit "NPR Json Helper";
@@ -639,7 +559,7 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
     begin
         NcTask."Store Code" := ShopifyStoreCode;
         NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
-        ItemCategoryShopifyMetafieldDefinitionCreateQuery(MetaobjectDefinitionGID, QueryStream);
+        ShopifyMetafieldDefinitionCreateQuery.WriteTo(QueryStream);
         if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ShopifyResponse) then
             Error(_UnexpectedResponseErr, CouldNotCreateMetafieldDefinitionErr, GetLastErrorText());
         if SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse) then
@@ -652,229 +572,94 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
             Error(_UnexpectedResponseErr, CouldNotCreateMetafieldDefinitionErr, ShopifyResponse);
     end;
 
-    local procedure ItemCategoryShopifyMetafieldDefinitionCreateQuery(MetaobjectDefinitionGID: Text; var QueryStream: OutStream)
-    var
-        JsonBuilder: Codeunit "NPR Json Builder";
-        QueryTok: Label 'mutation CreateMetafieldDefinition($definition: MetafieldDefinitionInput!) {metafieldDefinitionCreate(definition: $definition) {createdDefinition {id name} userErrors {field message code}}}', Locked = true;
-    begin
-        JsonBuilder.StartObject()
-            .AddProperty('query', QueryTok)
-            .StartObject('variables')
-                .StartObject('definition')
-                    .AddProperty('name', 'BC Item Category')
-                    .AddProperty('description', 'Item categories from Business Central')
-                    .AddProperty('namespace', '$app')
-                    .AddProperty('key', 'bc_item_category')
-                    .AddProperty('type', MetaobjectReferenceShopifyMetafieldType())
-                    .AddProperty('ownerType', OwnerTypeEnumValueName(Enum::"NPR Spfy Metafield Owner Type"::PRODUCT))
-                    .AddProperty('pin', true)
-                    .StartArray('validations')
-                        .StartObject()
-                            .AddProperty('name', 'metaobject_definition_id')
-                            .AddProperty('value', MetaobjectDefinitionGID)
-                        .EndObject()
-                    .EndArray()
-                    .StartObject('access')
-                        .AddProperty('admin', 'MERCHANT_READ_WRITE')
-                        .AddProperty('storefront', 'PUBLIC_READ')
-                        .AddProperty('customerAccount', 'READ')
-                    .EndObject()
-                    .StartObject('capabilities')
-                        .StartObject('smartCollectionCondition')
-                            .AddProperty('enabled', true)
-                        .EndObject()
-                        .StartObject('adminFilterable')
-                            .AddProperty('enabled', true)
-                        .EndObject()
-                    .EndObject()
-                .EndObject()
-            .EndObject()
-        .EndObject();
-
-        JsonBuilder.Build().WriteTo(QueryStream);
-    end;
-
-    internal procedure SyncItemCategories(var ItemCategory: Record "Item Category"; var ShopifyStore: Record "NPR Spfy Store"; ResyncExisting: Boolean; Silent: Boolean)
-    var
-        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
-        SyncedCategories: List of [Code[20]];
-        Window: Dialog;
-        RecNo: Integer;
-        TotalRecNo: Integer;
-        IntegrationNotEnabledMsg: Label 'Item category integration has not been enabled for Shopify store "%1". The sync process has been skipped for this store.', Comment = '%1 - Shopify store code';
-        NothingToDoErr: Label 'The supplied filters do not include any item categories or Shopify stores.\Shopify store filters: %1.\Item category filters: %2.', Comment = '%1 - Shopify store table filters, %2 - Item category table filters';
-        SuccessMsg: Label 'Item category synchronization completed successfully.\Shopify store filters: %1.\Item category filters: %2.', Comment = '%1 - Shopify store table filters, %2 - Item category table filters';
-        WindowTxt01: Label 'Sending item categories to Shopify...\\';
-        WindowTxt02: Label 'Shopify Store #1#######\';
-        WindowTxt03: Label 'Progress      @2@@@@@@@';
-    begin
-        if ItemCategory.IsEmpty() or ShopifyStore.IsEmpty() then
-            Error(NothingToDoErr, ShopifyStore.GetFilters(), ItemCategory.GetFilters());
-        if not Silent then begin
-            Window.Open(WindowTxt01 + WindowTxt02 + WindowTxt03);
-            TotalRecNo := ItemCategory.Count();
-        end;
-
-        ShopifyStore.SetLoadFields(Code);
-        ShopifyStore.FindSet();
-        repeat
-            if not Silent then begin
-                Window.Update(1, ShopifyStore.Code);
-                Window.Update(2, 0);
-                RecNo := 0;
-            end;
-
-            if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Item Categories", ShopifyStore.Code) then begin
-                Clear(SyncedCategories);
-                ItemCategory.FindSet();
-                repeat
-                    SyncItemCategory(ItemCategory, ShopifyStore.Code, ResyncExisting, 1, SyncedCategories);
-                    Commit();
-                    if not Silent then begin
-                        RecNo += 1;
-                        Window.Update(2, Round(RecNo / TotalRecNo * 10000, 1));
-                    end;
-                until ItemCategory.Next() = 0;
-            end else
-                if not Silent then
-                    Message(IntegrationNotEnabledMsg, ShopifyStore.Code);
-        until ShopifyStore.Next() = 0;
-
-        if not Silent then begin
-            Window.Close();
-            Message(SuccessMsg, ShopifyStore.GetFilters(), ItemCategory.GetFilters());
-        end;
-    end;
-
-    local procedure SyncItemCategory(ItemCategory: Record "Item Category"; ShopifyStoreCode: Code[20]; ResyncExisting: Boolean; CallLevel: Integer; var SyncedCategories: List of [Code[20]])
-    var
-        ParentItemCategory: Record "Item Category";
-        SpfyStoreItemCatLink: Record "NPR Spfy Store-Item Cat. Link";
-        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
-        SyncRec: Boolean;
-        PossibleCircularReferenceErr: Label 'The number of parent category levels reached 50 at the item category "%1". Further processing has been stopped due to a possible circular reference.', Comment = '%1 - Item category code';
-    begin
-        if SyncedCategories.Contains(ItemCategory.Code) then
-            exit;
-        SyncedCategories.Add(ItemCategory.Code);
-
-        if ItemCategory."Parent Category" <> '' then begin
-            if CallLevel >= 50 then
-                Error(PossibleCircularReferenceErr, ItemCategory.Code);
-            ParentItemCategory.Get(ItemCategory."Parent Category");
-            SyncItemCategory(ParentItemCategory, ShopifyStoreCode, ResyncExisting, CallLevel + 1, SyncedCategories);
-        end;
-
-        SpfyStoreItemCatLink."Item Category Code" := ItemCategory.Code;
-        SpfyStoreItemCatLink."Shopify Store Code" := ShopifyStoreCode;
-        if not ResyncExisting then
-            SyncRec := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemCatLink.RecordId(), "NPR Spfy ID Type"::"Entry ID") = '';
-        if SyncRec or ResyncExisting then
-            UpsertItemCategoryMetaobject(ItemCategory, ShopifyStoreCode);
-    end;
-
-    local procedure UpsertItemCategoryMetaobject(ItemCategory: Record "Item Category"; ShopifyStoreCode: Code[20]) MetaobjectValueID: Text[30]
+    internal procedure GetMetaobjectDefinitionGID(ShopifyStoreCode: Code[20]; ShopifyMetaobjectDefinitionGetByTypeQuery: JsonObject): Text
     var
         NcTask: Record "NPR Nc Task";
-        SpfyStoreItemCatLink: Record "NPR Spfy Store-Item Cat. Link";
         JsonHelper: Codeunit "NPR Json Helper";
-        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+        MetaobjectDefinition: JsonToken;
+        ShopifyResponse: JsonToken;
+        QueryStream: OutStream;
+        CouldNotGetMetaobjectDefinitionErr: Label 'Could not obtain metaobject definition from Shopify.';
+    begin
+        ClearLastError();
+        NcTask."Store Code" := ShopifyStoreCode;
+        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
+        ShopifyMetaobjectDefinitionGetByTypeQuery.WriteTo(QueryStream);
+        if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ShopifyResponse) then
+            Error(_UnexpectedResponseErr, CouldNotGetMetaobjectDefinitionErr, GetLastErrorText());
+        if ShopifyResponse.SelectToken('data.metaobjectDefinitionByType', MetaobjectDefinition) and MetaobjectDefinition.IsObject() then
+            exit(JsonHelper.GetJText(MetaobjectDefinition, 'id', true));
+    end;
+
+    internal procedure CreateMetaobjectDefinition(ShopifyStoreCode: Code[20]; ShopifyMetaobjectDefinitionCreateQuery: JsonObject): Text
+    var
+        NcTask: Record "NPR Nc Task";
+        JsonHelper: Codeunit "NPR Json Helper";
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+        MetaobjectDefinition: JsonToken;
+        ShopifyResponse: JsonToken;
+        QueryStream: OutStream;
+        MetaobjectDefinitionGID: Text;
+        CouldNotCreateMetaobjectDefinitionErr: Label 'Could not create metaobject definition in Shopify.';
+    begin
+        ClearLastError();
+        NcTask."Store Code" := ShopifyStoreCode;
+        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
+        ShopifyMetaobjectDefinitionCreateQuery.WriteTo(QueryStream);
+        if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ShopifyResponse) then
+            Error(_UnexpectedResponseErr, CouldNotCreateMetaobjectDefinitionErr, GetLastErrorText());
+        if SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse) then
+            Error(_UnexpectedResponseErr, CouldNotCreateMetaobjectDefinitionErr, ShopifyResponse);
+        if ShopifyResponse.SelectToken('data.metaobjectDefinitionCreate.metaobjectDefinition', MetaobjectDefinition) and MetaobjectDefinition.IsObject() then
+            MetaobjectDefinitionGID := JsonHelper.GetJText(MetaobjectDefinition, 'id', true);
+        if MetaobjectDefinitionGID = '' then
+            Error(_UnexpectedResponseErr, CouldNotCreateMetaobjectDefinitionErr, ShopifyResponse);
+        exit(MetaobjectDefinitionGID);
+    end;
+
+    internal procedure UpdateMetaobjectDefinition(ShopifyStoreCode: Code[20]; ShopifyMetaobjectDefinitionUpdateQuery: JsonObject)
+    var
+        NcTask: Record "NPR Nc Task";
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+        ShopifyResponse: JsonToken;
+        QueryStream: OutStream;
+        CouldNotUpdateMetaobjectDefinitionErr: Label 'Could not update metaobject definition in Shopify.';
+    begin
+        ClearLastError();
+        NcTask."Store Code" := ShopifyStoreCode;
+        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
+        ShopifyMetaobjectDefinitionUpdateQuery.WriteTo(QueryStream);
+        if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ShopifyResponse) then
+            Error(_UnexpectedResponseErr, CouldNotUpdateMetaobjectDefinitionErr, GetLastErrorText());
+        if SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse) then
+            Error(_UnexpectedResponseErr, CouldNotUpdateMetaobjectDefinitionErr, ShopifyResponse);
+    end;
+
+    internal procedure UpsertMetaobject(ShopifyStoreCode: Code[20]; MetaobjectBCEntity: Text; ShopifyMetaobjectUpsertQuery: JsonObject) MetaobjectValueID: Text[30]
+    var
+        NcTask: Record "NPR Nc Task";
+        JsonHelper: Codeunit "NPR Json Helper";
         SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         QueryStream: OutStream;
         MetafieldDefinition: JsonToken;
         ShopifyResponse: JsonToken;
-        CouldNotUpsertMetaobjectErr: Label 'Could not upsert item category "%1" metaobject in Shopify store "%2".', Comment = '%1 - Item category code, %2 - Shopify store code';
+        CouldNotUpsertMetaobjectErr: Label 'Could not upsert %1 metaobject in Shopify store "%2".', Comment = '%1 - BC entity mapped to the metaobject, %2 - Shopify store code';
     begin
         NcTask."Store Code" := ShopifyStoreCode;
         NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
-        ItemCategoryShopifyMetaobjectUpsertQuery(ItemCategory, ShopifyStoreCode, QueryStream);
+        ShopifyMetaobjectUpsertQuery.WriteTo(QueryStream);
         if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ShopifyResponse) then
-            Error(_UnexpectedResponseErr, StrSubstNo(CouldNotUpsertMetaobjectErr, ItemCategory.Code, ShopifyStoreCode), GetLastErrorText());
+            Error(_UnexpectedResponseErr, StrSubstNo(CouldNotUpsertMetaobjectErr, MetaobjectBCEntity, ShopifyStoreCode), GetLastErrorText());
         if SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse) then
-            Error(_UnexpectedResponseErr, StrSubstNo(CouldNotUpsertMetaobjectErr, ItemCategory.Code, ShopifyStoreCode), ShopifyResponse);
+            Error(_UnexpectedResponseErr, StrSubstNo(CouldNotUpsertMetaobjectErr, MetaobjectBCEntity, ShopifyStoreCode), ShopifyResponse);
         if ShopifyResponse.SelectToken('data.metaobjectUpsert.metaobject', MetafieldDefinition) and MetafieldDefinition.IsObject() then
 #pragma warning disable AA0139
             MetaobjectValueID := SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(MetafieldDefinition, 'id', true), '/');
 #pragma warning restore AA0139
         if MetaobjectValueID = '' then
-            Error(_UnexpectedResponseErr, StrSubstNo(CouldNotUpsertMetaobjectErr, ItemCategory.Code, ShopifyStoreCode), ShopifyResponse);
-
-        SpfyStoreItemCatLink."Item Category Code" := ItemCategory.Code;
-        SpfyStoreItemCatLink."Shopify Store Code" := ShopifyStoreCode;
-        SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreItemCatLink.RecordId(), "NPR Spfy ID Type"::"Entry ID", MetaobjectValueID, false);
-    end;
-
-    local procedure ItemCategoryShopifyMetaobjectUpsertQuery(ItemCategory: Record "Item Category"; ShopifyStoreCode: Code[20]; var QueryStream: OutStream)
-    var
-        JsonBuilder: Codeunit "NPR Json Builder";
-        QueryTok: Label 'mutation metaobjectUpsert($handle: MetaobjectHandleInput!, $metaobject: MetaobjectUpsertInput!) {metaobjectUpsert(handle: $handle, metaobject: $metaobject) {metaobject {id handle} userErrors {field message code}}}', Locked = true;
-    begin
-        if ItemCategory."Presentation Order" < 1 then
-            ItemCategory."Presentation Order" := 1;
-
-        JsonBuilder.StartObject()
-            .AddProperty('query', QueryTok)
-            .StartObject('variables')
-                .StartObject('handle')
-                    .AddProperty('type', ItemCategoryShopifyMetaobjectType())
-                    .AddProperty('handle', CalculateItemCategoryHandle(ItemCategory))
-                .EndObject()
-                .StartObject('metaobject')
-                    .StartArray('fields')
-                        .StartObject()
-                            .AddProperty('key', 'category_id')
-                            .AddProperty('value', ItemCategory.Code)
-                        .EndObject()
-                        .StartObject()
-                            .AddProperty('key', 'name')
-                            .AddProperty('value', StrSubstNo('%1:%2', ItemCategory.Code, ItemCategory.Description))
-                        .EndObject()
-                        .StartObject()
-                            .AddProperty('key', 'description')
-                            .AddProperty('value', ItemCategory.Description)
-                        .EndObject()
-                        .StartObject()
-                            .AddProperty('key', 'position')
-                            .AddProperty('value', Format(ItemCategory."Presentation Order", 0, 9))
-                        .EndObject()
-                        .StartObject()
-                            .AddProperty('key', 'parent_id')
-                            .AddProperty('value', ItemCategory.NPRGetSpfyParentGID(ShopifyStoreCode))
-                        .EndObject()
-                    .EndArray()
-                    .StartObject('capabilities')
-                        .StartObject('publishable')
-                            .AddProperty('status', 'ACTIVE')
-                        .EndObject()
-                    .EndObject()
-                .EndObject()
-            .EndObject()
-        .EndObject();
-
-        JsonBuilder.Build().WriteTo(QueryStream);
-    end;
-
-    local procedure CalculateItemCategoryHandle(ItemCategory: Record "Item Category") Handle: Text
-    begin
-        Handle := '';
-        if ItemCategory.Code = '' then
-            exit;
-        repeat
-            if ItemCategory."NPR Spfy Handle" = '' then begin
-                ItemCategory."NPR Spfy Handle" := LowerCase(ItemCategory.Code);
-                ItemCategory.Modify(true);
-            end;
-            if Handle <> '' then
-                Handle := '-' + Handle;
-            Handle := ItemCategory."NPR Spfy Handle" + Handle;
-            ItemCategory.Mark(true);  //prevent infinite loop
-        until not ItemCategory.Get(ItemCategory."Parent Category") or ItemCategory.Mark();
-    end;
-
-    local procedure ItemCategoryShopifyMetaobjectType(): Text
-    begin
-        exit('$app:bc-item-category');
+            Error(_UnexpectedResponseErr, StrSubstNo(CouldNotUpsertMetaobjectErr, MetaobjectBCEntity, ShopifyStoreCode), ShopifyResponse);
     end;
 
     internal procedure MetaobjectReferenceShopifyMetafieldType(): Text
@@ -888,202 +673,7 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
         _TempSpfyMetafieldDef.DeleteAll();
     end;
 
-    local procedure ProcessItemAttributeMetafieldMappingChange(var SpfyMetafieldMapping: Record "NPR Spfy Metafield Mapping"; var SpfyEntityMetafield: Record "NPR Spfy Entity Metafield"; xMetafieldID: Text[30]; Removed: Boolean; Silent: Boolean)
-    var
-        ItemAttribute: Record "Item Attribute";
-        ItemAttributeValueMapping: Record "Item Attribute Value Mapping";
-        LinkRegenerationCnf: Label 'The item attribute has already been mapped to one or more items. Changing the Shopify metafield ID may require recreating the links between BC item attributes and Shopify product metafields. This can take a significant amount of time. Are you sure you want to continue?';
-    begin
-        ItemAttribute.Get(SpfyMetafieldMapping."BC Record ID");
-        ItemAttributeValueMapping.SetRange("Table ID", Database::Item);
-        ItemAttributeValueMapping.SetRange("Item Attribute ID", ItemAttribute.ID);
-        if ItemAttributeValueMapping.IsEmpty() then begin
-            if xMetafieldID <> '' then
-                if not SpfyEntityMetafield.IsEmpty() then
-                    SpfyEntityMetafield.DeleteAll();
-            exit;
-        end;
-
-        if not Silent then
-            if not Confirm(LinkRegenerationCnf, true) then
-                Error('');
-
-        SpfyMetafieldMapping.Modify(true);
-
-        if xMetafieldID <> '' then
-            if not SpfyEntityMetafield.IsEmpty() then begin
-                SpfyEntityMetafield.ModifyAll("Metafield Key", '');
-                SpfyEntityMetafield.ModifyAll("Metafield Value Version ID", '');
-                SpfyEntityMetafield.ModifyAll("Metafield ID", SpfyMetafieldMapping."Metafield ID");
-            end;
-
-        ItemAttributeValueMapping.FindSet();
-        repeat
-            ProcessItemAttributeValueChange(ItemAttributeValueMapping, '', Removed);
-        until ItemAttributeValueMapping.Next() = 0;
-    end;
-
-    local procedure ProcessItemAttributeValueChange(ItemAttributeValueMapping: Record "Item Attribute Value Mapping"; ShopifyStoreCode: Code[20]; Removed: Boolean)
-    var
-        ItemAttribute: Record "Item Attribute";
-        ItemAttributeValue: Record "Item Attribute Value";
-        SpfyEntityMetafieldParam: Record "NPR Spfy Entity Metafield";
-        SpfyMetafieldMapping: Record "NPR Spfy Metafield Mapping";
-        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
-        SendItemAndInventory: Codeunit "NPR Spfy Send Items&Inventory";
-        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
-        ShopifyMetafieldValue: Text;
-        ValueAsInteger: Integer;
-    begin
-        if not (ItemAttributeValueMapping."Table ID" in [Database::Item]) then
-            exit;
-        ItemAttribute.ID := ItemAttributeValueMapping."Item Attribute ID";
-        FilterMetafieldMapping(ItemAttribute.RecordId(), 0, ShopifyStoreCode, SpfyMetafieldMapping."Owner Type"::" ", SpfyMetafieldMapping);
-        if SpfyMetafieldMapping.IsEmpty() then
-            exit;
-        ItemAttribute.Find();
-        SpfyMetafieldMapping.FindSet();
-        repeat
-            if SendItemAndInventory.GetStoreItemLink(ItemAttributeValueMapping."No.", SpfyMetafieldMapping."Shopify Store Code", false, SpfyStoreItemLink) then begin
-                if Removed then
-                    ShopifyMetafieldValue := ''
-                else
-                    if ItemAttributeValueMapping."Item Attribute Value ID" <> 0 then begin
-                        ItemAttributeValue.Get(ItemAttributeValueMapping."Item Attribute ID", ItemAttributeValueMapping."Item Attribute Value ID");
-                        case ItemAttribute.Type of
-                            ItemAttribute.Type::Date:
-                                ShopifyMetafieldValue := Format(ItemAttributeValue."Date Value", 0, 9);
-                            ItemAttribute.Type::Decimal:
-                                if ItemAttributeValue.Value <> '' then
-                                    ShopifyMetafieldValue := Format(ItemAttributeValue."Numeric Value", 0, 9);
-                            ItemAttribute.Type::Integer:
-                                if ItemAttributeValue.Value <> '' then
-                                    if Evaluate(ValueAsInteger, ItemAttributeValue.Value) then
-                                        ShopifyMetafieldValue := Format(ValueAsInteger, 0, 9);
-                            else
-                                ShopifyMetafieldValue := ItemAttributeValue.GetTranslatedNameByLanguageCode(SpfyIntegrationMgt.GetLanguageCode(SpfyStoreItemLink."Shopify Store Code"));
-                        end;
-                        if ShopifyMetafieldValue = '' then
-                            ShopifyMetafieldValue := ItemAttributeValue.Value;
-                    end else
-                        ShopifyMetafieldValue := '';
-
-                SpfyEntityMetafieldParam."BC Record ID" := SpfyStoreItemLink.RecordId();
-                SpfyEntityMetafieldParam."Owner Type" := SpfyMetafieldMapping."Owner Type";
-                SpfyEntityMetafieldParam."Metafield ID" := SpfyMetafieldMapping."Metafield ID";
-                SpfyEntityMetafieldParam.SetMetafieldValue(ShopifyMetafieldValue);
-                SetEntityMetafieldValue(SpfyEntityMetafieldParam, false, false);
-            end;
-        until SpfyMetafieldMapping.Next() = 0;
-    end;
-
-    local procedure ProcessItemCategoryMetafieldMappingChange(var SpfyMetafieldMapping: Record "NPR Spfy Metafield Mapping"; var SpfyEntityMetafield: Record "NPR Spfy Entity Metafield"; xMetafieldID: Text[30]; Removed: Boolean; Silent: Boolean)
-    var
-        Item: Record Item;
-        ItemCategory: Record "Item Category";
-        ShopifyAssignedID: Record "NPR Spfy Assigned ID";
-        SpfyStoreItemCatLink: Record "NPR Spfy Store-Item Cat. Link";
-        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
-        LinkRegenerationCnf: Label 'Changing the Shopify metafield ID may require recreating the links between BC item categories and Shopify product metafields. This can take a significant amount of time. Are you sure you want to continue?';
-    begin
-        if not Silent then
-            if not Confirm(LinkRegenerationCnf, true) then
-                Error('');
-
-        ShopifyAssignedID.SetRange("Table No.", Database::"NPR Spfy Store-Item Cat. Link");
-        ShopifyAssignedID.SetRange("Shopify ID Type", "NPR Spfy ID Type"::"Entry ID");
-        if not ShopifyAssignedID.IsEmpty() then begin
-            ItemCategory.SetLoadFields(Code);
-            if ItemCategory.FindSet() then
-                repeat
-                    SpfyStoreItemCatLink."Item Category Code" := ItemCategory.Code;
-                    SpfyStoreItemCatLink."Shopify Store Code" := SpfyMetafieldMapping."Shopify Store Code";
-                    SpfyAssignedIDMgt.RemoveAssignedShopifyID(SpfyStoreItemCatLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
-                until ItemCategory.Next() = 0;
-        end;
-
-        Item.SetFilter("Item Category Code", '<>%1', '');
-        if Item.IsEmpty() then begin
-            if xMetafieldID <> '' then
-                if not SpfyEntityMetafield.IsEmpty() then
-                    SpfyEntityMetafield.DeleteAll();
-            exit;
-        end;
-
-        SpfyMetafieldMapping.Modify(true);
-
-        if xMetafieldID <> '' then
-            if not SpfyEntityMetafield.IsEmpty() then begin
-                SpfyEntityMetafield.ModifyAll("Metafield Key", '');
-                SpfyEntityMetafield.ModifyAll("Metafield Value Version ID", '');
-                SpfyEntityMetafield.ModifyAll("Metafield ID", SpfyMetafieldMapping."Metafield ID");
-            end;
-
-        Item.FindSet();
-        repeat
-            ProcessItemCategoryChange(Item, '', Removed);
-        until Item.Next() = 0;
-    end;
-
-    local procedure ProcessItemCategoryChange(Item: Record Item; ShopifyStoreCode: Code[20]; Removed: Boolean)
-    var
-        SpfyEntityMetafieldParam: Record "NPR Spfy Entity Metafield";
-        SpfyMetafieldMapping: Record "NPR Spfy Metafield Mapping";
-        SpfyStore: Record "NPR Spfy Store";
-        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
-        SendItemAndInventory: Codeunit "NPR Spfy Send Items&Inventory";
-        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
-        ShopifyMetafieldValue: Text;
-    begin
-        FilterMetafieldMapping(Database::"NPR Spfy Store", SpfyStore.FieldNo("Item Category as Metafield"), ShopifyStoreCode, SpfyMetafieldMapping."Owner Type"::PRODUCT, SpfyMetafieldMapping);
-        if SpfyMetafieldMapping.IsEmpty() then
-            exit;
-        SpfyMetafieldMapping.FindSet();
-        repeat
-            if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Item Categories", SpfyMetafieldMapping."Shopify Store Code") then begin
-                if SendItemAndInventory.GetStoreItemLink(Item."No.", SpfyMetafieldMapping."Shopify Store Code", false, SpfyStoreItemLink) then begin
-                    if Removed then
-                        ShopifyMetafieldValue := ''
-                    else
-                        GenerateItemCategoryMetafieldValueArray(Item."Item Category Code", SpfyMetafieldMapping."Shopify Store Code").WriteTo(ShopifyMetafieldValue);
-
-                    SpfyEntityMetafieldParam."BC Record ID" := SpfyStoreItemLink.RecordId();
-                    SpfyEntityMetafieldParam."Owner Type" := SpfyMetafieldMapping."Owner Type";
-                    SpfyEntityMetafieldParam."Metafield ID" := SpfyMetafieldMapping."Metafield ID";
-                    SpfyEntityMetafieldParam.SetMetafieldValue(ShopifyMetafieldValue);
-                    SetEntityMetafieldValue(SpfyEntityMetafieldParam, false, false);
-                end;
-            end;
-        until SpfyMetafieldMapping.Next() = 0;
-    end;
-
-    local procedure GenerateItemCategoryMetafieldValueArray(ItemCategoryCode: Code[20]; ShopifyStoreCode: Code[20]) ItemCategories: JsonArray
-    var
-        ItemCategory: Record "Item Category";
-        SpfyStoreItemCatLink: Record "NPR Spfy Store-Item Cat. Link";
-        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
-        AssignedID: Text[30];
-        NoIDAssignedErr: Label 'No Shopify metaobject ID has been assigned to the item category %1 from Shopify store %2. Please ensure that the item category has been synchronized with the Shopify store.', Comment = '%1 - item category code, %2 - Shopify store code';
-    begin
-        ItemCategories.ReadFrom('[]');
-        if ItemCategoryCode = '' then
-            exit;
-        if not ItemCategory.Get(ItemCategoryCode) then
-            exit;
-        repeat
-            SpfyStoreItemCatLink."Item Category Code" := ItemCategory.Code;
-            SpfyStoreItemCatLink."Shopify Store Code" := ShopifyStoreCode;
-            AssignedID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemCatLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
-            If AssignedID = '' then
-                AssignedID := UpsertItemCategoryMetaobject(ItemCategory, ShopifyStoreCode);
-            If AssignedID = '' then
-                Error(NoIDAssignedErr, ItemCategory.Code, ShopifyStoreCode);
-            ItemCategories.Add(StrSubstNo('gid://shopify/Metaobject/%1', AssignedID));
-            ItemCategory.Mark(true);  //prevent infinite loop
-        until not ItemCategory.Get(ItemCategory."Parent Category") or ItemCategory.Mark();
-    end;
-
-    local procedure SetEntityMetafieldValue(Params: Record "NPR Spfy Entity Metafield"; DeleteEmpty: Boolean; DisableDataLog: Boolean)
+    internal procedure SetEntityMetafieldValue(Params: Record "NPR Spfy Entity Metafield"; DeleteEmpty: Boolean; DisableDataLog: Boolean)
     var
         SpfyEntityMetafield: Record "NPR Spfy Entity Metafield";
         DataLogMgt: Codeunit "NPR Data Log Management";
@@ -1138,114 +728,6 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
         SpfyEntityMetafield.Modify(true);
         if DisableDataLog then
             DataLogMgt.DisableDataLog(false);
-    end;
-
-    internal procedure SetItemAttributeValue(ItemAttribute: Record "Item Attribute"; ItemNo: Code[20]; LanguageCode: Code[10]; NewAttributeValueTxt: Text)
-    var
-        ItemAttributeValue: Record "Item Attribute Value";
-        xItemAttributeValue: Record "Item Attribute Value";
-        ItemAttributeValueMapping: Record "Item Attribute Value Mapping";
-        ItemAttrValueTranslation: Record "Item Attr. Value Translation";
-        TempItemAttributeValueSelection: Record "Item Attribute Value Selection" temporary;
-        IntegerValue: Integer;
-        DecimalValue: Decimal;
-        DateValue: Date;
-        NewAttributeValueFilter: Text;
-        ItemAttribValueFound: Boolean;
-        xItemAttribValueFound: Boolean;
-        ItemAttribValueMappingExists: Boolean;
-    begin
-        ItemAttributeValueMapping."Table ID" := Database::Item;
-        ItemAttributeValueMapping."No." := ItemNo;
-        ItemAttributeValueMapping."Item Attribute ID" := ItemAttribute.ID;
-        ItemAttribValueMappingExists := ItemAttributeValueMapping.Find();
-        if ItemAttribValueMappingExists then begin
-            xItemAttribValueFound := xItemAttributeValue.Get(ItemAttributeValueMapping."Item Attribute ID", ItemAttributeValueMapping."Item Attribute Value ID");
-        end else begin
-            if NewAttributeValueTxt = '' then
-                exit;
-            ItemAttributeValueMapping.Init();
-        end;
-
-        if NewAttributeValueTxt <> '' then begin
-            TempItemAttributeValueSelection."Attribute ID" := ItemAttribute.ID;
-            TempItemAttributeValueSelection."Attribute Name" := ItemAttribute.Name;
-            TempItemAttributeValueSelection."Attribute Type" := ItemAttribute.Type;
-            TempItemAttributeValueSelection."Unit of Measure" := ItemAttribute."Unit of Measure";
-            TempItemAttributeValueSelection."Inherited-From Table ID" := Database::Item;
-            TempItemAttributeValueSelection."Inherited-From Key Value" := ItemNo;
-
-#if not (BC18 or BC19 or BC20 or BC21)
-            ItemAttributeValue.ReadIsolation := IsolationLevel::ReadUncommitted;
-#endif
-            case ItemAttribute.Type of
-                ItemAttribute.Type::Date:
-                    if Evaluate(DateValue, NewAttributeValueTxt, 9) then begin
-                        NewAttributeValueTxt := Format(DateValue);
-                        ItemAttributeValue.SetRange("Attribute ID", ItemAttribute.ID);
-                        ItemAttributeValue.SetRange("Date Value", DateValue);
-                        ItemAttribValueFound := ItemAttributeValue.FindFirst();
-                    end else
-                        NewAttributeValueTxt := '';
-                ItemAttribute.Type::Decimal:
-                    if Evaluate(DecimalValue, NewAttributeValueTxt, 9) then begin
-                        NewAttributeValueTxt := Format(DecimalValue);
-                        ItemAttributeValue.SetRange("Attribute ID", ItemAttribute.ID);
-                        ItemAttributeValue.SetRange("Numeric Value", DecimalValue);
-                        ItemAttribValueFound := ItemAttributeValue.FindFirst();
-                    end else
-                        NewAttributeValueTxt := '';
-                ItemAttribute.Type::Integer:
-                    if Evaluate(IntegerValue, NewAttributeValueTxt, 9) then begin
-                        NewAttributeValueTxt := Format(IntegerValue);
-                        ItemAttributeValue.SetRange("Attribute ID", ItemAttribute.ID);
-                        ItemAttributeValue.SetRange("Numeric Value", DecimalValue);
-                        ItemAttribValueFound := ItemAttributeValue.FindFirst();
-                    end else
-                        NewAttributeValueTxt := '';
-                else begin
-                    NewAttributeValueFilter := NewAttributeValueTxt.Replace('''', '?');
-#if not (BC18 or BC19 or BC20 or BC21)
-                    ItemAttrValueTranslation.ReadIsolation := IsolationLevel::ReadUncommitted;
-#endif
-                    ItemAttrValueTranslation.SetRange("Attribute ID", ItemAttribute.ID);
-                    ItemAttrValueTranslation.SetRange("Language Code", LanguageCode);
-                    ItemAttrValueTranslation.SetFilter(Name, StrSubstNo('''%1''', NewAttributeValueFilter));
-                    if ItemAttrValueTranslation.IsEmpty() then
-                        ItemAttrValueTranslation.SetFilter(Name, StrSubstNo('''@%1''', NewAttributeValueFilter));
-                    if ItemAttrValueTranslation.FindFirst() then
-                        ItemAttribValueFound := ItemAttributeValue.Get(ItemAttrValueTranslation."Attribute ID", ItemAttrValueTranslation.ID)
-                    else begin
-                        ItemAttributeValue.SetRange("Attribute ID", ItemAttribute.ID);
-                        ItemAttributeValue.SetFilter(Value, StrSubstNo('''%1''', NewAttributeValueFilter));
-                        if ItemAttributeValue.IsEmpty() then
-                            ItemAttributeValue.SetFilter(Value, StrSubstNo('''@%1''', NewAttributeValueFilter));
-                        ItemAttribValueFound := ItemAttributeValue.FindFirst();
-                    end;
-                end;
-            end;
-        end;
-        if not ItemAttribValueFound then begin
-            if NewAttributeValueTxt = '' then begin
-                if ItemAttribValueMappingExists then begin
-                    ItemAttributeValueMapping.Delete();
-                    if xItemAttribValueFound then
-                        if not xItemAttributeValue.HasBeenUsed() then
-                            xItemAttributeValue.Delete();
-                end;
-                exit;
-            end;
-            TempItemAttributeValueSelection.Value := CopyStr(NewAttributeValueTxt, 1, MaxStrLen(TempItemAttributeValueSelection.Value));
-            if not TempItemAttributeValueSelection.FindAttributeValue(ItemAttributeValue) then
-                TempItemAttributeValueSelection.InsertItemAttributeValue(ItemAttributeValue, TempItemAttributeValueSelection);
-        end;
-        if ItemAttribValueMappingExists and (ItemAttributeValueMapping."Item Attribute Value ID" = ItemAttributeValue.ID) then
-            exit;
-        ItemAttributeValueMapping."Item Attribute Value ID" := ItemAttributeValue.ID;
-        if not ItemAttribValueMappingExists then
-            ItemAttributeValueMapping.Insert()
-        else
-            ItemAttributeValueMapping.Modify();
     end;
 
     local procedure MetafieldMappingExist(ShopifyStoreCode: Code[20]; ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type"): Boolean
@@ -1325,113 +807,28 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
     var
         SpfyMetafieldMgtPublic: Codeunit "NPR Spfy Metafield Mgt. Public";
         Handled: Boolean;
-        ShopifyOwnerTypesTxt: Label 'Product,ProductVariant', Locked = true;
+        ShopifyOwnerTypesTxt: Label 'Product,ProductVariant,Customer', Locked = true;
         UndefinedOwnerTypeErr: Label 'Shopify metafield owner type was not set or is not supported (owner type = "%1"). This is a programming bug, not a user error. Please contact system vendor.';
     begin
         SpfyMetafieldMgtPublic.OnGetOwnerTypeAsText(ShopifyOwnerType, Result, Handled);
         if Handled then
             exit;
-        if not (ShopifyOwnerType in [ShopifyOwnerType::PRODUCT, ShopifyOwnerType::PRODUCTVARIANT]) then
+        if not (ShopifyOwnerType in [ShopifyOwnerType::PRODUCT, ShopifyOwnerType::PRODUCTVARIANT, ShopifyOwnerType::CUSTOMER]) then
             Error(UndefinedOwnerTypeErr, ShopifyOwnerType);
         Result := SelectStr(ShopifyOwnerType.AsInteger(), ShopifyOwnerTypesTxt);
     end;
 
-    local procedure OwnerTypeEnumValueName(OwnerType: Enum "NPR Spfy Metafield Owner Type") Result: Text
+    internal procedure OwnerTypeEnumValueName(OwnerType: Enum "NPR Spfy Metafield Owner Type") Result: Text
     begin
         OwnerType.Names().Get(OwnerType.Ordinals().IndexOf(OwnerType.AsInteger()), Result);
     end;
 
-#if BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Table, Database::"Item Attribute Value Mapping", 'OnAfterInsertEvent', '', false, false)]
-#else
-    [EventSubscriber(ObjectType::Table, Database::"Item Attribute Value Mapping", OnAfterInsertEvent, '', false, false)]
-#endif
-    local procedure ShopifyMatafieldSyncOnItemAttributeMappingAssign(var Rec: Record "Item Attribute Value Mapping"; RunTrigger: Boolean)
-    begin
-        if Rec.IsTemporary() then
-            exit;
-        ProcessItemAttributeValueChange(Rec, '', false);
-    end;
-
-#if BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Table, Database::"Item Attribute Value Mapping", 'OnAfterModifyEvent', '', false, false)]
-#else
-    [EventSubscriber(ObjectType::Table, Database::"Item Attribute Value Mapping", OnAfterModifyEvent, '', false, false)]
-#endif
-    local procedure ShopifyMatafieldSyncOnItemAttributeMappingChange(var Rec: Record "Item Attribute Value Mapping"; RunTrigger: Boolean)
-    begin
-        if Rec.IsTemporary() then
-            exit;
-        ProcessItemAttributeValueChange(Rec, '', false);
-    end;
-
-#if BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Table, Database::"Item Attribute Value Mapping", 'OnAfterDeleteEvent', '', false, false)]
-#else
-    [EventSubscriber(ObjectType::Table, Database::"Item Attribute Value Mapping", OnAfterDeleteEvent, '', false, false)]
-#endif
-    local procedure ShopifyMatafieldSyncOnItemAttributeMappingRemove(var Rec: Record "Item Attribute Value Mapping"; RunTrigger: Boolean)
-    begin
-        if Rec.IsTemporary() then
-            exit;
-        ProcessItemAttributeValueChange(Rec, '', true);
-    end;
-
-#if BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Table, Database::"Item Attribute", 'OnAfterDeleteEvent', '', false, false)]
-#else
-    [EventSubscriber(ObjectType::Table, Database::"Item Attribute", OnAfterDeleteEvent, '', false, false)]
-#endif
-    local procedure DeleteMetafieldMappings(var Rec: Record "Item Attribute"; RunTrigger: Boolean)
+    internal procedure QueryingShopifyLbl(): Text
     var
-        SpfyMetafieldMapping: Record "NPR Spfy Metafield Mapping";
+        Lbl: Label 'Querying Shopify...';
     begin
-        if Rec.IsTemporary() or not RunTrigger then
-            exit;
-
-        SpfyMetafieldMapping.SetRange("Table No.", Database::"Item Attribute");
-        SpfyMetafieldMapping.SetRange("BC Record ID", Rec.RecordId());
-        if not SpfyMetafieldMapping.IsEmpty() then
-            SpfyMetafieldMapping.DeleteAll(true);
+        exit(Lbl);
     end;
 
-#if BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Table, Database::Item, 'OnBeforeModifyEvent', '', false, false)]
-#else
-    [EventSubscriber(ObjectType::Table, Database::Item, OnBeforeModifyEvent, '', false, false)]
-#endif
-    local procedure RefreshxRec(var Rec: Record Item; var xRec: Record Item)
-    begin
-        if Rec.IsTemporary() then
-            exit;
-
-#if not (BC18 or BC19 or BC20 or BC21)
-        xRec.ReadIsolation := IsolationLevel::ReadCommitted;
-#endif
-        if not xRec.Find() then
-            Clear(xRec);
-    end;
-
-#if BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterModifyEvent', '', false, false)]
-#else
-    [EventSubscriber(ObjectType::Table, Database::Item, OnAfterModifyEvent, '', false, false)]
-#endif
-    local procedure RecalcItemCategoryMetafieldValueOnItemModify(var Rec: Record Item; var xRec: Record Item; RunTrigger: Boolean)
-    var
-        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
-    begin
-        if Rec.IsTemporary() then
-            exit;
-        if Rec."Item Category Code" = xRec."Item Category Code" then
-            exit;
-        SpfyStoreItemLink.SetRange(Type, SpfyStoreItemLink.Type::Item);
-        SpfyStoreItemLink.SetRange("Item No.", Rec."No.");
-        if not SpfyStoreItemLink.FindSet() then
-            exit;
-        repeat
-            ProcessItemCategoryChange(Rec, SpfyStoreItemLink."Shopify Store Code", Rec."Item Category Code" = '');
-        until SpfyStoreItemLink.Next() = 0;
-    end;
 }
 #endif

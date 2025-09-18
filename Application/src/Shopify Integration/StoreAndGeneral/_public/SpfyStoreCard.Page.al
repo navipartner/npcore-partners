@@ -329,6 +329,47 @@ page 6184704 "NPR Spfy Store Card"
                     ApplicationArea = NPRShopify;
                     Importance = Additional;
                 }
+                group(CustomerIntegration)
+                {
+                    Caption = 'Customer Integration';
+                    field("Auto Sync New Customers"; Rec."Auto Sync New Customers")
+                    {
+                        ToolTip = 'Specifies whether new customers created in Business Central should be automatically created as customers in Shopify.';
+                        ApplicationArea = NPRShopify;
+                        Enabled = _SalesOrderIntegrationIsEnabled;
+                    }
+                    field("Loyalty Points as Metafield"; Rec."Loyalty Points as Metafield")
+                    {
+                        ToolTip = 'Specifies whether the membership loyalty points should be sent to Shopify as a customer metafield.';
+                        ApplicationArea = NPRShopify;
+                        Enabled = _SalesOrderIntegrationIsEnabled;
+                    }
+                    group(MMPointsMetafield)
+                    {
+                        ShowCaption = false;
+                        Visible = Rec."Loyalty Points as Metafield";
+                        field("Loyalty Points Metafield ID"; _LoyaltyPointsMetafieldID)
+                        {
+                            Caption = 'Loyalty Points Metafield ID';
+                            ToolTip = 'Specifies the ID of the metafield that will be used to store the BC membership loyalty points in Shopify.';
+                            ApplicationArea = NPRShopify;
+                            Editable = false;
+                            Enabled = _SalesOrderIntegrationIsEnabled;
+
+                            trigger OnAssistEdit()
+                            var
+                                SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
+                            begin
+                                Rec.TestField("Code");
+                                if SpfyMetafieldMgt.SelectShopifyMetafield(Rec."Code", Enum::"NPR Spfy Metafield Owner Type"::CUSTOMER, _LoyaltyPointsMetafieldID) then begin
+                                    CurrPage.SaveRecord();
+                                    Rec.SaveLoyaltyPointsMetafieldID(_LoyaltyPointsMetafieldID);
+                                    CurrPage.Update(false);
+                                end;
+                            end;
+                        }
+                    }
+                }
             }
             group(Connection)
             {
@@ -425,6 +466,25 @@ page 6184704 "NPR Spfy Store Card"
                     begin
                         CurrPage.SaveRecord();
                         SendItemAndInventory.EnableIntegrationForItemsAlreadyOnShopify(Rec.Code, true);
+                    end;
+                }
+                action(SyncCustomers)
+                {
+                    Caption = 'Sync. Customers';
+                    ToolTip = 'Executes initial customer synchronization between Business Central and Shopify. The system will iterate through customers in Business Central and identify those that already exist in Shopify. The system will also update customer information from Shopify.';
+                    ApplicationArea = NPRShopify;
+                    Image = CheckList;
+                    Promoted = true;
+                    PromotedIsBig = true;
+                    PromotedOnly = true;
+                    PromotedCategory = Category4;
+
+                    trigger OnAction()
+                    var
+                        SpfySendCustomers: Codeunit "NPR Spfy Send Customers";
+                    begin
+                        CurrPage.SaveRecord();
+                        SpfySendCustomers.EnableIntegrationForCustomersAlreadyOnShopify(Rec.Code, true);
                     end;
                 }
                 action(SyncRetailVouchers)
@@ -525,6 +585,7 @@ page 6184704 "NPR Spfy Store Card"
         CheckCurrencyCode();
 
         _ItemCategoryMetafieldID := Rec.ItemCategoryMetafieldID();
+        _LoyaltyPointsMetafieldID := Rec.LoyaltyPointsMetafieldID();
 
         if _SpfyIntegrationMgt.IsEnabled(Enum::"NPR Spfy Integration Area"::" ", Rec.Code) then begin
             Parameters.Add('StoreCode', Rec.Code);
@@ -639,6 +700,7 @@ page 6184704 "NPR Spfy Store Card"
         _SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         _SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         _ItemCategoryMetafieldID: Text[30];
+        _LoyaltyPointsMetafieldID: Text[30];
         _BackgroundTaskId: Integer;
         _AutoSetAsShopifyItem: Boolean;
         _AutoSyncItemChanges: Boolean;

@@ -40,5 +40,9 @@ enum 6014656 "NPR Spfy Integration Area"
     {
         Caption = 'Retail Vouchers';
     }
+    value(40; "Loyalty Points")
+    {
+        Caption = 'Loyalty Points';
+    }
 }
 #endif

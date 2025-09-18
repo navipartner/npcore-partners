@@ -238,6 +238,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         Customer: Record Customer;
         JobQueueMgt: Codeunit "NPR Job Queue Management";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        SpfySendCustomers: Codeunit "NPR Spfy Send Customers";
         RecipientAttributesJson: JsonObject;
         RequestJson: JsonObject;
         VariablesJson: JsonObject;
@@ -272,7 +273,7 @@ codeunit 6184820 "NPR Spfy Send Voucher"
                         If Customer."E-Mail" = '' then
                             Customer."E-Mail" := Voucher."E-mail";
                         If Customer."E-Mail" <> '' then
-                            ShopifyBillToCustGID := GetCustomerGIDFromShopify(Customer, ShopifyStoreCode);
+                            ShopifyBillToCustGID := SpfySendCustomers.GetCustomerGIDFromShopify(Customer, ShopifyStoreCode, true);
                     end;
                     if ShopifyBillToCustGID <> '' then
                         VoucherJson.Add('customerId', ShopifyBillToCustGID);
@@ -284,12 +285,12 @@ codeunit 6184820 "NPR Spfy Send Voucher"
                 Customer.Name := CopyStr(Voucher."Spfy Recipient Name", 1, MaxStrLen(Customer.Name));
                 Customer."Name 2" := CopyStr(Voucher."Spfy Recipient Name", MaxStrLen(Customer.Name) + 1, MaxStrLen(Customer."Name 2"));
 
-                ShopifyShipToCustGID := GetCustomerGIDFromShopify(Customer, ShopifyStoreCode);
+                ShopifyShipToCustGID := SpfySendCustomers.GetCustomerGIDFromShopify(Customer, ShopifyStoreCode, true);
 
                 RecipientAttributesJson.Add('id', ShopifyShipToCustGID);
                 if Voucher."Voucher Message" <> '' then
                     RecipientAttributesJson.Add('message', Voucher."Voucher Message");
-                RecipientAttributesJson.Add('preferredName', GetFullName(Customer.Name, Customer."Name 2"));
+                RecipientAttributesJson.Add('preferredName', SpfySendCustomers.GetFullName(Customer.Name, Customer."Name 2"));
                 if Voucher."Spfy Send on" <> 0DT then
                     if Voucher."Spfy Send on" > JobQueueMgt.NowWithDelayInSeconds(60) then
                         RecipientAttributesJson.Add('sendNotificationAt', Voucher."Spfy Send on");
@@ -300,97 +301,6 @@ codeunit 6184820 "NPR Spfy Send Voucher"
         VariablesJson.Add('input', VoucherJson);
         RequestJson.Add('variables', VariablesJson);
         RequestJson.WriteTo(QueryStream);
-    end;
-
-    local procedure GetCustomerGIDFromShopify(Customer: Record Customer; ShopifyStoreCode: Code[20]) ShopifyCustomerGID: Text
-    var
-        ShopifyResponse: JsonToken;
-        CustomerCreateQueryErr: Label 'The system was unable to create a customer with email %1 in Shopify. The following error occurred:\%2', Comment = '%1 - customer email address, %2 - Shopify API call error details';
-        CustomerSearchQueryErr: Label 'The system was unable to retrieve information from Shopify about the customer with email %1. The following error occurred:\%2', Comment = '%1 - customer email address, %2 - Shopify API call error details';
-    begin
-        //Find Shopify customer by email
-        ClearLastError();
-        if not FindShopifyCustomerByEmail(Customer."E-Mail", ShopifyStoreCode, ShopifyResponse) then
-            Error(CustomerSearchQueryErr, Customer."E-Mail", GetLastErrorText());
-        if ShopifyResponse.SelectToken('data.customers.edges', ShopifyResponse) and ShopifyResponse.IsArray() then
-            if ShopifyResponse.AsArray().Count() > 0 then begin
-                ShopifyResponse.AsArray().Get(0, ShopifyResponse);
-                ShopifyCustomerGID := _JsonHelper.GetJText(ShopifyResponse, 'node.id', false);
-                if ShopifyCustomerGID <> '' then
-                    exit;
-            end;
-
-        //Create Shopify customer
-        Clear(ShopifyResponse);
-        if not CreateShopifyCustomer(Customer, ShopifyStoreCode, ShopifyResponse) then
-            Error(CustomerCreateQueryErr, Customer."E-Mail", GetLastErrorText());
-        ShopifyCustomerGID := _JsonHelper.GetJText(ShopifyResponse, 'data.customerCreate.customer.id', true);
-    end;
-
-    local procedure FindShopifyCustomerByEmail(Email: Text; ShopifyStoreCode: Code[20]; var ShopifyResponse: JsonToken): Boolean
-    var
-        NcTask: Record "NPR Nc Task";
-        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
-        QueryStream: OutStream;
-        RequestJson: JsonObject;
-        VariablesJson: JsonObject;
-        QueryTok: Label 'query FindCustomerByEmail($searchCriteria: String!) {customers(first: 1, query: $searchCriteria) {edges{node{id email verifiedEmail}}}}', Locked = true;
-    begin
-        VariablesJson.Add('searchCriteria', 'email:' + Email);
-        RequestJson.Add('query', QueryTok);
-        RequestJson.Add('variables', VariablesJson);
-
-        NcTask."Store Code" := ShopifyStoreCode;
-        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
-        RequestJson.WriteTo(QueryStream);
-        exit(SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse));
-    end;
-
-    local procedure CreateShopifyCustomer(Customer: Record Customer; ShopifyStoreCode: Code[20]; var ShopifyResponse: JsonToken): Boolean
-    var
-        NcTask: Record "NPR Nc Task";
-        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
-        QueryStream: OutStream;
-        CustomerJson: JsonObject;
-        RequestJson: JsonObject;
-        VariablesJson: JsonObject;
-        QueryTok: Label 'mutation CreateCustomer($input: CustomerInput!) {customerCreate(input: $input) {customer {id email firstName lastName} userErrors {message field}}}', Locked = true;
-    begin
-        CustomerJson.Add('email', Customer."E-Mail");
-        AddCustomerName(Customer, CustomerJson);
-        VariablesJson.Add('input', CustomerJson);
-        RequestJson.Add('query', QueryTok);
-        RequestJson.Add('variables', VariablesJson);
-
-        NcTask."Store Code" := ShopifyStoreCode;
-        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
-        RequestJson.WriteTo(QueryStream);
-        exit(SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse));
-    end;
-
-    local procedure AddCustomerName(Customer: Record Customer; var CustomerJson: JsonObject)
-    var
-        FullName: Text;
-        LastSpacePosition: Integer;
-    begin
-        FullName := GetFullName(Customer.Name, Customer."Name 2");
-        FullName := FullName.Trim();
-        LastSpacePosition := FullName.LastIndexOf(' ');
-        if LastSpacePosition > 1 then begin
-            CustomerJson.Add('firstName', FullName.Substring(1, LastSpacePosition - 1));
-            CustomerJson.Add('lastName', FullName.Substring(LastSpacePosition + 1));
-        end else
-            CustomerJson.Add('firstName', FullName);
-    end;
-
-    local procedure GetFullName(Name: Text; Name2: Text) FullName: Text
-    begin
-        FullName := Name;
-        if Name2 = '' then
-            exit;
-        if Name2.StartsWith(Name2.Substring(1, 1).ToUpper()) then
-            FullName += ' ';
-        FullName += Name2;
     end;
 
     local procedure UpdateVoucherWithDataFromShopify(NcTask: Record "NPR Nc Task"; ShopifyResponse: JsonToken)

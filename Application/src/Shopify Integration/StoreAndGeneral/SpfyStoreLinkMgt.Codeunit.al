@@ -5,6 +5,7 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
 
     procedure GetFirstAssignedShopifyID(BCRecID: RecordId; ShopifyIDType: Enum "NPR Spfy ID Type"): Text[30]
     var
+        SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         SpfyStoreLocationLink: Record "NPR Spfy Store-Location Link";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
@@ -16,6 +17,11 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
                     if SpfyStoreItemLink.FindFirst() then
                         exit(SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemLink.RecordId(), ShopifyIDType));
 
+            Database::Customer:
+                if FilterStoreCustomerLinks(BCRecID, SpfyStoreCustomerLink) then
+                    if SpfyStoreCustomerLink.FindFirst() then
+                        exit(SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreCustomerLink.RecordId(), ShopifyIDType));
+
             Database::Location:
                 if FilterStoreLocationLinks(BCRecID, SpfyStoreLocationLink) then
                     if SpfyStoreLocationLink.FindFirst() then
@@ -26,6 +32,7 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
 
     procedure OpenStoreLinks(BCRecID: RecordId)
     var
+        SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         SpfyStoreLocationLink: Record "NPR Spfy Store-Location Link";
     begin
@@ -34,6 +41,10 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
             Database::"Item Variant":
                 if FilterStoreItemLinks(BCRecID, SpfyStoreItemLink) then
                     Page.RunModal(0, SpfyStoreItemLink);
+
+            Database::Customer:
+                if FilterStoreCustomerLinks(BCRecID, SpfyStoreCustomerLink) then
+                    Page.RunModal(0, SpfyStoreCustomerLink);
 
             Database::Location:
                 if FilterStoreLocationLinks(BCRecID, SpfyStoreLocationLink) then
@@ -105,6 +116,25 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
         exit(false);
     end;
 
+    procedure FilterStoreCustomerLinks(BCRecID: RecordId; var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"): Boolean
+    var
+        Customer: Record Customer;
+        RecRef: RecordRef;
+    begin
+        case BCRecID.TableNo of
+            Database::Customer:
+                begin
+                    RecRef := BCRecID.GetRecord();
+                    RecRef.SetTable(Customer);
+                    SpfyStoreCustomerLink.Reset();
+                    SpfyStoreCustomerLink.SetRange(Type, SpfyStoreCustomerLink.Type::Customer);
+                    SpfyStoreCustomerLink.SetRange("No.", Customer."No.");
+                    exit(true);
+                end;
+        end;
+        exit(false);
+    end;
+
     procedure UpdateStoreItemLinks(Item: Record Item)
     var
         ShopifyStore: Record "NPR Spfy Store";
@@ -129,6 +159,26 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
             until ShopifyStore.Next() = 0;
     end;
 
+    procedure UpdateStoreCustomerLinks(Customer: Record Customer)
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+        SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
+    begin
+        if Customer."No." = '' then
+            exit;
+
+        if ShopifyStore.FindSet() then
+            repeat
+                SpfyStoreCustomerLink.Type := SpfyStoreCustomerLink.Type::Customer;
+                SpfyStoreCustomerLink."No." := Customer."No.";
+                SpfyStoreCustomerLink."Shopify Store Code" := ShopifyStore.Code;
+                if not SpfyStoreCustomerLink.Find() then begin
+                    SpfyStoreCustomerLink.Init();
+                    SpfyStoreCustomerLink.Insert();
+                end;
+            until ShopifyStore.Next() = 0;
+    end;
+
     #region Subscribers
 #if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Table, Database::Location, 'OnAfterDeleteEvent', '', false, false)]
@@ -148,6 +198,24 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
     end;
 
 #if BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterDeleteEvent', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::Customer, OnAfterDeleteEvent, '', false, false)]
+#endif
+    local procedure Customer_RemoveStoreLinks(var Rec: Record Customer; RunTrigger: Boolean)
+    var
+        SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
+    begin
+        if Rec.IsTemporary() or not RunTrigger then
+            exit;
+
+        SpfyStoreCustomerLink.SetRange(Type, SpfyStoreCustomerLink.Type::Customer);
+        SpfyStoreCustomerLink.SetRange("No.", Rec."No.");
+        if not SpfyStoreCustomerLink.IsEmpty() then
+            SpfyStoreCustomerLink.DeleteAll(true);
+    end;
+
+#if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Table, Database::Item, 'OnAfterDeleteEvent', '', false, false)]
 #else
     [EventSubscriber(ObjectType::Table, Database::Item, OnAfterDeleteEvent, '', false, false)]
@@ -159,6 +227,7 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
         if Rec.IsTemporary() or not RunTrigger then
             exit;
 
+        SpfyStoreItemLink.SetRange(Type, SpfyStoreItemLink.Type::Item);
         SpfyStoreItemLink.SetRange("Item No.", Rec."No.");
         SpfyStoreItemLink.SetRange("Variant Code", '');
         if not SpfyStoreItemLink.IsEmpty() then

@@ -15,7 +15,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             Database::"Inventory Buffer":
                 SendItemCost(Rec);
             Database::"NPR Spfy Entity Metafield":
-                SendMetafields(Rec);
+                SendMetafields();
             Database::"NPR Spfy Tag Update Request":
                 SendTags(Rec);
             Database::"NPR Spfy Inventory Level":
@@ -175,35 +175,11 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             Error(GetLastErrorText());
     end;
 
-    local procedure SendMetafields(var NcTask: Record "NPR Nc Task")
+    local procedure SendMetafields()
     var
-        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
-        SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
-        ShopifyResponse: JsonToken;
-        ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type";
-        ShopifyOwnerID: Text[30];
-        SendToShopify: Boolean;
-        Success: Boolean;
+        WrongCodeunitErr: Label 'The codeunit specified in the NaviConnect Task Setup for Metafield updates (table 6150951 "NPR Spfy Entity Metafield") is incorrect. Please change it from codeunit 6184819 "NPR Spfy Send Items&Inventory" to codeunit 6248554 "NPR Spfy Send Metafields".';
     begin
-        Clear(NcTask."Data Output");
-        Clear(NcTask.Response);
-        Clear(SpfyMetafieldMgt);
-        ClearLastError();
-
-        Success := PrepareMetafieldUpdateRequest(NcTask, SpfyMetafieldMgt, ShopifyOwnerType, ShopifyOwnerID, SendToShopify);
-        if SendToShopify then
-            Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse);
-
-        NcTask.Modify();
-        Commit();
-
-        if not Success then
-            Error(GetLastErrorText());
-        if not SendToShopify then
-            exit;
-        if SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse) then
-            Error('');
-        SpfyMetafieldMgt.RequestMetafieldValuesFromShopifyAndUpdateBCData(NcTask."Record ID", ShopifyOwnerType, ShopifyOwnerID, NcTask."Store Code");
+        Error(WrongCodeunitErr);
     end;
 
     local procedure SendShopifyInventoryUpdate(var NcTask: Record "NPR Nc Task")
@@ -688,25 +664,6 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
 
         NcTaskOutput.Data.CreateOutStream(OStream, TextEncoding::UTF8);
         RequestJObject.WriteTo(OStream);
-    end;
-
-    [TryFunction]
-    local procedure PrepareMetafieldUpdateRequest(var NcTask: Record "NPR Nc Task"; var SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt."; var ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type"; var ShopifyOwnerID: Text[30]; var SendToShopify: Boolean)
-    var
-        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
-        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
-        RecRef: RecordRef;
-        QueryStream: OutStream;
-    begin
-        RecRef := NcTask."Record ID".GetRecord();
-        RecRef.SetTable(SpfyStoreItemLink);
-        if SpfyStoreItemLink.Type = SpfyStoreItemLink.Type::Item then
-            ShopifyOwnerType := ShopifyOwnerType::PRODUCT
-        else
-            ShopifyOwnerType := ShopifyOwnerType::PRODUCTVARIANT;
-        ShopifyOwnerID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
-        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
-        SendToShopify := SpfyMetafieldMgt.ShopifyEntityMetafieldValueUpdateQuery(SpfyStoreItemLink.RecordId(), ShopifyOwnerType, ShopifyOwnerID, SpfyStoreItemLink."Shopify Store Code", QueryStream);
     end;
 
     local procedure PrepareInventoryLevelUpdateRequest(var NcTask: Record "NPR Nc Task"): Boolean
@@ -1294,7 +1251,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
 #pragma warning restore AA0139
         if not (ShopifyResponse.SelectToken('product.variants.edges', ShopifyVariants) and ShopifyVariants.IsArray()) then begin
             if NcTask.Type = NcTask.Type::Delete then begin
-                if SpfyItemMgt.FindItemByShopifyProductID(ShopifyProductID, SpfyStoreItemLink) then begin
+                if SpfyItemMgt.FindItemByShopifyProductID(NcTask."Store Code", ShopifyProductID, SpfyStoreItemLink) then begin
                     SpfyStoreItemLink.FindSet();
                     repeat
                         DisableIntegrationForItem(SpfyStoreItemLink);

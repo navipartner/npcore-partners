@@ -79,6 +79,8 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
                 exit(ShopifyStore."Send Close Order Requets");
             IntegrationArea::"Retail Vouchers":
                 exit(ShopifyStore."Retail Voucher Integration");
+            IntegrationArea::"Loyalty Points":
+                exit(ShopifyStore."Loyalty Points as Metafield");
             else begin
                 AreaIsEnabled := false;
                 SpfyIntegrationEvents.OnCheckIfStoreIntegrationAreaIsEnabled(IntegrationArea, ShopifyStore.Code, AreaIsEnabled, Handled);
@@ -368,23 +370,12 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
     var
         Position: Integer;
     begin
-        Position := LastIndexOf(Input, UntilChr);
+        Position := Input.LastIndexOf(UntilChr);
         if Position <= 0 then
             exit(Input);
 
         Output := DelStr(Input, 1, Position);
         exit(Output);
-    end;
-
-    local procedure LastIndexOf(Input: Text; UntilChr: Char): Integer
-    var
-        Position: Integer;
-    begin
-        Position := StrPos(Input, UntilChr);
-        if Position <= 0 then
-            exit(0)
-        else
-            exit(Position + LastIndexOf(CopyStr(Input, Position + 1), UntilChr));
     end;
 
     procedure LowerFirstLetter(TextStringIn: Text): Text

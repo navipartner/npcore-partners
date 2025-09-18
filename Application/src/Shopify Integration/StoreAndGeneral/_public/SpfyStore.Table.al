@@ -181,6 +181,7 @@ table 6150810 "NPR Spfy Store"
                 Modify();
                 OrderMgt.SetupJobQueues();
                 if "Sales Order Integration" then begin
+                    _SpfyDataLogSubscrMgt.CreateDataLogSetup("NPR Spfy Integration Area"::"Sales Orders");
                     SpfyAllowedFinStatus.SetRange("Shopify Store Code", Code);
                     if SpfyAllowedFinStatus.IsEmpty() then
                         AddAllowedOrderFinancialStatus(Enum::"NPR Spfy Order FinancialStatus"::Authorized);
@@ -309,6 +310,18 @@ table 6150810 "NPR Spfy Store"
         {
             Caption = 'Language Code';
             TableRelation = Language.Code;
+            DataClassification = CustomerContent;
+        }
+        field(210; "Auto Sync New Customers"; Option)
+        {
+            Caption = 'Auto Sync New Customers';
+            DataClassification = CustomerContent;
+            OptionMembers = No,MembershipOnly;
+            OptionCaption = 'No,Membership';
+        }
+        field(220; "Loyalty Points as Metafield"; Boolean)
+        {
+            Caption = 'Loyalty Points as Metafield';
             DataClassification = CustomerContent;
         }
         field(500; "Auto Set as Shopify Item"; Boolean)
@@ -453,13 +466,13 @@ table 6150810 "NPR Spfy Store"
 
     internal procedure SetItemCategoryMetafieldID(var MetafieldID: Text[30])
     var
-        SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
+        SpfyMFHdlItemCateg: Codeunit "NPR Spfy M/F Hdl.-Item Categ.";
     begin
         TestField(Code);
         TestField("Item Category as Metafield");
         if MetafieldID = '' then
             MetafieldID := ItemCategoryMetafieldID();
-        SpfyMetafieldMgt.GetItemCategoryMetafieldDefinitionID(Code, true, MetafieldID);
+        SpfyMFHdlItemCateg.GetItemCategoryMetafieldDefinitionID(Code, true, MetafieldID);
         if MetafieldID <> '' then
             SaveItemCategoryMetafieldID(MetafieldID);
     end;
@@ -476,11 +489,30 @@ table 6150810 "NPR Spfy Store"
         exit(SpfyMetafieldMapping."Metafield ID");
     end;
 
+    internal procedure LoyaltyPointsMetafieldID(): Text[30]
+    var
+        SpfyMetafieldMapping: Record "NPR Spfy Metafield Mapping";
+        SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
+    begin
+        SpfyMetafieldMgt.FilterMetafieldMapping(RecordId(), FieldNo("Loyalty Points as Metafield"), Code, Enum::"NPR Spfy Metafield Owner Type"::CUSTOMER, SpfyMetafieldMapping);
+        if SpfyMetafieldMapping.IsEmpty() then
+            exit('');
+        SpfyMetafieldMapping.FindFirst();
+        exit(SpfyMetafieldMapping."Metafield ID");
+    end;
+
     internal procedure SaveItemCategoryMetafieldID(MetafieldID: Text[30])
     var
         SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
     begin
         SpfyMetafieldMgt.SaveMetafieldMapping(RecordId(), FieldNo("Item Category as Metafield"), Code, Enum::"NPR Spfy Metafield Owner Type"::PRODUCT, MetafieldID);
+    end;
+
+    internal procedure SaveLoyaltyPointsMetafieldID(MetafieldID: Text[30])
+    var
+        SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
+    begin
+        SpfyMetafieldMgt.SaveMetafieldMapping(RecordId(), FieldNo("Loyalty Points as Metafield"), Code, Enum::"NPR Spfy Metafield Owner Type"::CUSTOMER, MetafieldID);
     end;
 }
 #endif

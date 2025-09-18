@@ -28,6 +28,9 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         RemoveOrphanShopifyAssignedIDs();
         UpdateGetPaymentLinesFromShopifyOption();
         MoveMetafieldValueToBlobField();
+        UpdateMetafieldTaskSetup();
+        CreateSOIntegrationRelatedDataLogSetups();
+        MoveCustomerAssignedIDs();
     end;
 
     internal procedure UpdateShopifySetup()
@@ -61,7 +64,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         LogFinish();
     end;
 
-    internal procedure SetDataProcessingHandlerID()
+    local procedure SetDataProcessingHandlerID()
     var
         ShopifySetup: Record "NPR Spfy Integration Setup";
     begin
@@ -80,7 +83,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         LogFinish();
     end;
 
-    internal procedure PhaseOutShopifyCCIntegration()
+    local procedure PhaseOutShopifyCCIntegration()
     var
         ShopifySetup: Record "NPR Spfy Integration Setup";
         WebServiceAggregate: Record "Web Service Aggregate";
@@ -122,7 +125,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
     end;
 #endif
 
-    internal procedure StoreSpecificIntegrationSetups()
+    local procedure StoreSpecificIntegrationSetups()
     var
         ShopifySetup: Record "NPR Spfy Integration Setup";
         ShopifyStore: Record "NPR Spfy Store";
@@ -157,7 +160,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         LogFinish();
     end;
 
-    internal procedure UpgradeAllowedFinancialStatuses()
+    local procedure UpgradeAllowedFinancialStatuses()
     var
         ShopifyStore: Record "NPR Spfy Store";
     begin
@@ -185,7 +188,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         LogFinish();
     end;
 
-    internal procedure UpdateShopifyPaymentModule()
+    local procedure UpdateShopifyPaymentModule()
     var
         VoucherType: Record "NPR NpRv Voucher Type";
         PaymentModuleShopify: Codeunit "NPR NpRv Module Pay. - Shopify";
@@ -208,7 +211,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         LogFinish();
     end;
 
-    internal procedure UpdateShopifyStoreDoNotSyncSalesPrices()
+    local procedure UpdateShopifyStoreDoNotSyncSalesPrices()
     var
         ShopifyStore: Record "NPR Spfy Store";
     begin
@@ -227,7 +230,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         LogFinish();
     end;
 
-    internal procedure EnableItemRelatedDataLogSubscribers()
+    local procedure EnableItemRelatedDataLogSubscribers()
     var
         ShopifyStore: Record "NPR Spfy Store";
     begin
@@ -262,7 +265,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         LogFinish();
     end;
 
-    internal procedure RescheduleInventorySyncTasks()
+    local procedure RescheduleInventorySyncTasks()
     var
         NcTask: Record "NPR Nc Task";
         NcTask2: Record "NPR Nc Task";
@@ -295,7 +298,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         LogFinish();
     end;
 
-    internal procedure UpdateMetafieldDataLogSetup()
+    local procedure UpdateMetafieldDataLogSetup()
     var
         DataLogSetupTable: Record "NPR Data Log Setup (Table)";
     begin
@@ -312,7 +315,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         LogFinish();
     end;
 
-    internal procedure SetDefaultProductStatus()
+    local procedure SetDefaultProductStatus()
     var
         ShopifyStore: Record "NPR Spfy Store";
     begin
@@ -394,6 +397,92 @@ codeunit 6184802 "NPR Spfy App Upgrade"
                     SpfyEntityMetafield.Modify();
                 until SpfyEntityMetafield.Next() = 0;
             DataLogMgt.DisableDataLog(false);
+        end;
+
+        SetUpgradeTag();
+        LogFinish();
+    end;
+
+    local procedure UpdateMetafieldTaskSetup()
+    var
+        NcTaskSetup: Record "NPR Nc Task Setup";
+        SpfyScheduleSendTasks: Codeunit "NPR Spfy Schedule Send Tasks";
+        ShopifyTaskProcessorCode: Code[20];
+    begin
+        _UpgradeStep := 'UpdateMetafieldTaskSetup';
+        if HasUpgradeTag() then
+            exit;
+        LogStart();
+
+        ShopifyTaskProcessorCode := SpfyScheduleSendTasks.GetShopifyTaskProcessorCode(false);
+        if ShopifyTaskProcessorCode <> '' then begin
+            NcTaskSetup.SetCurrentKey("Task Processor Code", "Table No.");
+            NcTaskSetup.SetRange("Table No.", Database::"NPR Spfy Entity Metafield");
+            NcTaskSetup.SetRange("Task Processor Code", ShopifyTaskProcessorCode);
+            if NcTaskSetup.FindFirst() then
+                if NcTaskSetup."Codeunit ID" = Codeunit::"NPR Spfy Send Items&Inventory" then begin
+                    NcTaskSetup."Codeunit ID" := Codeunit::"NPR Spfy Send Metafields";
+                    NcTaskSetup.Modify();
+                end;
+        end;
+
+        SetUpgradeTag();
+        LogFinish();
+    end;
+
+    local procedure CreateSOIntegrationRelatedDataLogSetups()
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+        SpfyDataLogSubscrMgt: Codeunit "NPR Spfy DLog Subscr.Mgt.Impl.";
+    begin
+        _UpgradeStep := 'CreateSOIntegrationRelatedDataLogSetups';
+        if HasUpgradeTag() then
+            exit;
+        LogStart();
+
+        if ShopifyStore.FindSet() then
+            repeat
+                if ShopifyStore."Sales Order Integration" then
+                    SpfyDataLogSubscrMgt.CreateDataLogSetup("NPR Spfy Integration Area"::"Sales Orders");
+            until ShopifyStore.Next() = 0;
+
+        SetUpgradeTag();
+        LogFinish();
+    end;
+
+    local procedure MoveCustomerAssignedIDs()
+    var
+        Customer: Record Customer;
+        SpfyAssignedID: Record "NPR Spfy Assigned ID";
+        ShopifyStore: Record "NPR Spfy Store";
+        SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        SpfyStoreLinkMgt: Codeunit "NPR Spfy Store Link Mgt.";
+    begin
+        _UpgradeStep := 'MoveCustomerAssignedIDs';
+        if HasUpgradeTag() then
+            exit;
+        LogStart();
+
+        ShopifyStore.SetRange(Enabled, true);
+        if ShopifyStore.Count() = 1 then begin
+            ShopifyStore.FindFirst();
+
+            SpfyAssignedID.SetCurrentKey("Table No.", "Shopify ID Type", "Shopify ID");
+            SpfyAssignedID.SetRange("Table No.", Database::Customer);
+            SpfyAssignedID.SetRange("Shopify ID Type", "NPR Spfy ID Type"::"Entry ID");
+            if SpfyAssignedID.FindSet(true) then
+                repeat
+                    if Customer.Get(SpfyAssignedID."BC Record ID") then begin
+                        SpfyStoreLinkMgt.UpdateStoreCustomerLinks(Customer);
+                        SpfyStoreCustomerLink.Type := SpfyStoreCustomerLink.Type::Customer;
+                        SpfyStoreCustomerLink."No." := Customer."No.";
+                        SpfyStoreCustomerLink."Shopify Store Code" := ShopifyStore.Code;
+                        if SpfyStoreCustomerLink.Find() then
+                            SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreCustomerLink.RecordId(), SpfyAssignedID."Shopify ID Type", SpfyAssignedID."Shopify ID", false);
+                    end;
+                    SpfyAssignedID.Delete();
+                until SpfyAssignedID.Next() = 0;
         end;
 
         SetUpgradeTag();

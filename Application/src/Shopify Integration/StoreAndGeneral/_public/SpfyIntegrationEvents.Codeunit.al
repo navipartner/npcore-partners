@@ -38,20 +38,8 @@ codeunit 6184824 "NPR Spfy Integration Events"
     begin
     end;
 
-    [Obsolete('Use the "OnAfterUpsertSalesLine" event instead', '2025-05-04')]
-    [IntegrationEvent(false, false)]
-    internal procedure OnAfterInsertSalesLine(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; var LastLineNo: Integer)
-    begin
-    end;
-
     [IntegrationEvent(false, false)]
     internal procedure OnAfterUpsertSalesLine(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; IsNewLine: Boolean; xSalesLine: Record "Sales Line"; var LastLineNo: Integer)
-    begin
-    end;
-
-    [Obsolete('Use the "OnAfterUpsertSalesLineShipmentFee" event instead', '2025-05-04')]
-    [IntegrationEvent(false, false)]
-    internal procedure OnAfterInsertSalesLineShipmentFee(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; var LastLineNo: Integer)
     begin
     end;
 
@@ -92,12 +80,6 @@ codeunit 6184824 "NPR Spfy Integration Events"
 
     [IntegrationEvent(false, false)]
     internal procedure OnAfterAddGiftCardPaymentLine(var PaymentLine: Record "NPR Magento Payment Line"; var NpRvSalesLine: Record "NPR NpRv Sales Line"; ShopifyTransactionJToken: JsonToken)
-    begin
-    end;
-
-    [Obsolete('Use isolated event "OnModifyPaymentLineAfterCaptureIsolated" instead', '2025-03-09')]
-    [IntegrationEvent(false, false)]
-    internal procedure OnModifyPaymentLineAfterCapture(var PaymentLine: Record "NPR Magento Payment Line"; var NcTask: Record "NPR Nc Task")
     begin
     end;
 

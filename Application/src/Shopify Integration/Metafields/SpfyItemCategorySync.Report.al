@@ -49,12 +49,12 @@ report 6014566 "NPR Spfy Item Category Sync"
 
     trigger OnPreReport()
     var
-        SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
+        SpfyMFHdlItemCateg: Codeunit "NPR Spfy M/F Hdl.-Item Categ.";
         ConfirmSyncQst: Label 'This batch job will perform synchronization of item categories from BC to Shopify. It will go through the item categories in BC and create any that do not already exist in your selected Shopify store(s).\Are you sure you want to continue?';
     begin
         if not Confirm(ConfirmSyncQst, true) then
             exit;
-        SpfyMetafieldMgt.SyncItemCategories(ItemCategory, ShopifyStore, ResyncExisting, false);
+        SpfyMFHdlItemCateg.SyncItemCategories(ItemCategory, ShopifyStore, ResyncExisting, false);
     end;
 
     var

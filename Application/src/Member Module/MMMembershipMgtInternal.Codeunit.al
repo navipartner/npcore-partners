@@ -4537,6 +4537,9 @@
         MarketingSetup: Record "Marketing Setup";
         MagentoSetup: Record "NPR Magento Setup";
         Community: Record "NPR MM Member Community";
+#if not BC17
+        SpfyCustomerMgt: Codeunit "NPR Spfy Customer Mgt.";
+#endif
     begin
         Member.Get(MemberEntryNo);
         MembershipRole.Get(Membership."Entry No.", MemberEntryNo);
@@ -4597,6 +4600,9 @@
             Customer.Validate(Blocked, Customer.Blocked::" ");
 
         Customer.Modify();
+#if not BC17
+        SpfyCustomerMgt.AutoEnableCustomerSync(Customer);
+#endif
 
         MarketingSetup.Get();
         if (MarketingSetup."Bus. Rel. Code for Customers" = '') then

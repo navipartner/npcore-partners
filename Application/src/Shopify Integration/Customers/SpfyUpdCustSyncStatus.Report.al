@@ -1,8 +1,8 @@
 #if not BC17
-report 6014528 "NPR Spfy Upd. Item Sync Status"
+report 6014569 "NPR Spfy Upd. Cust.Sync Status"
 {
     Extensible = false;
-    Caption = 'Update Shopify Item Sync Status';
+    Caption = 'Update Shopify Customer Sync Status';
     UsageCategory = Tasks;
     ApplicationArea = NPRShopify;
     ProcessingOnly = true;
@@ -28,10 +28,10 @@ report 6014528 "NPR Spfy Upd. Item Sync Status"
                 group(Options)
                 {
                     Caption = 'Options';
-                    field(CreateShopifyProducts; CreateAtShopify)
+                    field(CreateShopifyCustomers; CreateAtShopify)
                     {
-                        Caption = 'Create Products in Shopify';
-                        ToolTip = 'Specifies if you want to create products in Shopify.';
+                        Caption = 'Create Customers in Shopify';
+                        ToolTip = 'Specifies if you want to create customers in Shopify.';
                         ApplicationArea = NPRShopify;
                     }
                 }
@@ -52,7 +52,7 @@ report 6014528 "NPR Spfy Upd. Item Sync Status"
 
     local procedure AnalyzeData()
     var
-        Item: Record Item;
+        Customer: Record Customer;
         ShopifyStore: Record "NPR Spfy Store";
 #if not (BC18 or BC19)
         ErrorContextElement: Codeunit "Error Context Element";
@@ -61,7 +61,7 @@ report 6014528 "NPR Spfy Upd. Item Sync Status"
         ErrorMessageMgt: Codeunit "Error Message Management";
 #endif
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
-        SpfyUpdateItemIntState: Codeunit "NPR Spfy Update Item Int.State";
+        SpfyUpdateCustIntState: Codeunit "NPR Spfy Update Cust.Int.State";
         Window: Dialog;
         CounterReadRows: Integer;
         CounterProcessed: Integer;
@@ -73,18 +73,18 @@ report 6014528 "NPR Spfy Upd. Item Sync Status"
 #endif
         Success: Boolean;
 #if not (BC18 or BC19)
-        BatchProcessingTxt: Label 'Resyncing items from Excel worksheet.';
+        BatchProcessingTxt: Label 'Resyncing customers from Excel worksheet.';
         DefaultErrorMsg: Label 'An error occurred. No further information has been provided.';
 #endif
-        DialogTxt01Lbl: Label 'Updating Item Integration Status...\\';
+        DialogTxt01Lbl: Label 'Updating Customer Integration Status...\\';
         DialogTxt02Lbl: Label '@1@@@@@@@@@@@@@@@@@@@@@@@@@';
         DoneLbl: Label 'Update process completed successfully.';
 #if not (BC18 or BC19)
-        ItemNotFoundErr: Label 'Row No. %1: Item %2 not found.', Comment = '%1 - Excel row number, %2 - item number';
+        CustomerNotFoundErr: Label 'Row No. %1: customer %2 not found.', Comment = '%1 - Excel row number, %2 - customer number';
 #endif        
         NothingToImportErr: Label 'There is nothing to do.';
 #if not (BC18 or BC19)
-        ProcessingMsg: Label 'Processing item %1.', Comment = '%1 - item number';
+        ProcessingMsg: Label 'Processing customer %1.', Comment = '%1 - customer number';
 #endif
     begin
         TempExcelBuffer.SetRange("Column No.", 1);
@@ -105,23 +105,23 @@ report 6014528 "NPR Spfy Upd. Item Sync Status"
         TotalRecNo := TempExcelBuffer.Count();
         RecNo := 0;
 
-        Clear(SpfyUpdateItemIntState);
-        SpfyUpdateItemIntState.SetProcessingOptions(ShopifyStore, false, CreateAtShopify);
+        Clear(SpfyUpdateCustIntState);
+        SpfyUpdateCustIntState.SetProcessingOptions(ShopifyStore, false, CreateAtShopify);
 #if not (BC18 or BC19)
         if ErrorMessageMgt.Activate(ErrorMessageHandler) then
-            ErrorMessageMgt.PushContext(ErrorContextElement0, Database::Item, 0, BatchProcessingTxt);
+            ErrorMessageMgt.PushContext(ErrorContextElement0, Database::Customer, 0, BatchProcessingTxt);
 #endif
 
         repeat
             RecNo += 1;
-            if GetCellValueAsText(RecNo, 1, MaxStrLen(Item."No."), CellValueAsText) then begin
+            if GetCellValueAsText(RecNo, 1, MaxStrLen(Customer."No."), CellValueAsText) then begin
                 CounterReadRows += 1;
-                if Item.Get(CellValueAsText) then begin
+                if Customer.Get(CellValueAsText) then begin
 #if not (BC18 or BC19)
-                    ErrorMessageMgt.PushContext(ErrorContextElement, Item.RecordId(), 0, StrSubstNo(ProcessingMsg, Item."No."));
+                    ErrorMessageMgt.PushContext(ErrorContextElement, Customer.RecordId(), 0, StrSubstNo(ProcessingMsg, Customer."No."));
 #endif
 
-                    Success := SpfyUpdateItemIntState.Run(Item);
+                    Success := SpfyUpdateCustIntState.Run(Customer);
                     if Success then
                         CounterProcessed += 1
 #if (BC18 or BC19)
@@ -131,12 +131,12 @@ report 6014528 "NPR Spfy Upd. Item Sync Status"
                         ErrorMessage := GetLastErrorText();
                         if ErrorMessage = '' then
                             ErrorMessage := DefaultErrorMsg;
-                        ErrorMessageMgt.LogError(Item, ErrorMessage, '');
+                        ErrorMessageMgt.LogError(Customer, ErrorMessage, '');
                         ErrorMessageMgt.PopContext(ErrorContextElement);
                     end;
                     ClearLastError();
                 end else
-                    ErrorMessageMgt.LogError(CellValueAsText, StrSubstNo(ItemNotFoundErr, RecNo, CellValueAsText), '');
+                    ErrorMessageMgt.LogError(CellValueAsText, StrSubstNo(CustomerNotFoundErr, RecNo, CellValueAsText), '');
 #endif
             end;
             Window.Update(1, Round(RecNo / TotalRecNo * 10000, 1));

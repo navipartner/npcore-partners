@@ -77,6 +77,21 @@ page 6184553 "NPR Spfy Integration Setup"
                         SendItemAndInventory.EnableIntegrationForItemsAlreadyOnShopify(SelectShopifyStore(), true);
                     end;
                 }
+                action(SyncCustomers)
+                {
+                    Caption = 'Sync. Customers';
+                    ToolTip = 'Executes initial customer synchronization between BC and Shopify. The system will iterate through customers in BC and identify those that already exist in Shopify. The system will also update customer information from Shopify.';
+                    ApplicationArea = NPRShopify;
+                    Image = CheckList;
+
+                    trigger OnAction()
+                    var
+                        SpfySendCustomers: Codeunit "NPR Spfy Send Customers";
+                    begin
+                        CurrPage.SaveRecord();
+                        SpfySendCustomers.EnableIntegrationForCustomersAlreadyOnShopify(SelectShopifyStore(), true);
+                    end;
+                }
                 action(SyncRetailVouchers)
                 {
                     Caption = 'Sync. Vouchers';

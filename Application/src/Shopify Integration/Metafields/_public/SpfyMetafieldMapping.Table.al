@@ -1,7 +1,7 @@
 #if not BC17
 table 6150939 "NPR Spfy Metafield Mapping"
 {
-    Access = Internal;
+    Access = Public;
     Extensible = false;
     Caption = 'Shopify Metafield Mapping';
     DataClassification = CustomerContent;
@@ -20,6 +20,17 @@ table 6150939 "NPR Spfy Metafield Mapping"
         {
             DataClassification = CustomerContent;
             Caption = 'Table No.';
+
+            trigger OnValidate()
+            begin
+                case "Table No." of
+                    Database::"Item Attribute":
+                        if not ("Owner Type" in ["Owner Type"::PRODUCT, "Owner Type"::PRODUCTVARIANT]) then
+                            Validate("Owner Type", "Owner Type"::PRODUCT);
+                    Database::"NPR Attribute":
+                        Validate("Owner Type", "Owner Type"::CUSTOMER);
+                end;
+            end;
         }
         field(20; "Field No."; Integer)
         {
@@ -50,6 +61,15 @@ table 6150939 "NPR Spfy Metafield Mapping"
 
             trigger OnValidate()
             begin
+                if "Owner Type" <> "Owner Type"::" " then begin
+                    case "Table No." of
+                        Database::"Item Attribute":
+                            if not ("Owner Type" in ["Owner Type"::PRODUCT, "Owner Type"::PRODUCTVARIANT]) then
+                                FieldError("Owner Type");
+                        Database::"NPR Attribute":
+                            TestField("Owner Type", "Owner Type"::CUSTOMER);
+                    end;
+                end;
                 if "Owner Type" <> xRec."Owner Type" then
                     Validate("Metafield ID", '');
             end;

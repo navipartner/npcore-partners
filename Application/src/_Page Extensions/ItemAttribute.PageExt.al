@@ -10,7 +10,7 @@ pageextension 6014535 "NPR Item Attribute" extends "Item Attribute"
                 ApplicationArea = NPRShopify;
                 Caption = 'Shopify Metafield Mapping';
                 Image = LinkWeb;
-                ToolTip = 'Opens a window in which you can define the values for the selected item attribute.';
+                ToolTip = 'Opens a window in which you can map the selected item attribute to a Shopify metafield for each store.';
                 Visible = ShopifyIntegrationIsEnabled;
 
                 trigger OnAction()

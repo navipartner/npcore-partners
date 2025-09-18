@@ -252,6 +252,35 @@ tableextension 6014423 "NPR Customer" extends Customer
             ObsoleteTag = '2024-06-28';
             ObsoleteReason = 'It makes no sense to have a physical field that is only needed to show the sum of 2 other flowfields on the customer card.';
         }
+#if not BC17
+        field(6151552; "NPR Spfy Store Filter"; Code[20])
+        {
+            Caption = 'Shopify Store Filter';
+            FieldClass = FlowFilter;
+            TableRelation = "NPR Spfy Store".Code;
+        }
+        field(6151553; "NPR Spfy Synced Customer"; Boolean)
+        {
+            Caption = 'Shopify Customer';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = exist("NPR Spfy Store-Customer Link" where(Type = const(Customer),
+                                                                "No." = field("No."),
+                                                                "Shopify Store Code" = field("NPR Spfy Store Filter"),
+                                                                "Synchronization Is Enabled" = const(true)));
+        }
+        field(6151554; "NPR Spfy Synced Cust.(Planned)"; Boolean)
+        {
+            Caption = 'Shopify Customer (Planned)';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = exist("NPR Spfy Store-Customer Link" where(Type = const(Customer),
+                                                                "No." = field("No."),
+                                                                "Shopify Store Code" = field("NPR Spfy Store Filter"),
+                                                                "Synchronization Is Enabled" = const(false),
+                                                                "Sync. to this Store" = const(true)));
+        }
+#endif
         modify("Sales (LCY)")
         {
             Caption = 'Sales ERP (LCY)';
