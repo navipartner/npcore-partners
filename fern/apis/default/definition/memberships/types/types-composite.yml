@@ -154,6 +154,8 @@ types:
           cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
           expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDate
           temporary: false
+          createdAt: $simpleTypes.CreatedAt.ExampleCreatedAt
+          modifiedAt: $simpleTypes.ModifiedAt.ExampleModifiedAt
           member: $MemberEntityResponse.ExampleMember
           membership: $MembershipEntity.ExampleMembership
 
@@ -544,6 +546,8 @@ types:
       expiryDate: simpleTypes.ExpiryDate
       temporary: simpleTypes.TemporaryCard
       blocked: optional<simpleTypes.Blocked>
+      createdAt: simpleTypes.CreatedAt
+      modifiedAt: simpleTypes.ModifiedAt
     examples:
       - name: ExampleMemberCard
         value:
@@ -551,6 +555,8 @@ types:
           cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
           expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDate
           temporary: false
+          createdAt: $simpleTypes.CreatedAt.ExampleCreatedAt
+          modifiedAt: $simpleTypes.ModifiedAt.ExampleModifiedAt
       - name: ExampleMemberCardBlocked
         value:
           cardId: $simpleTypes.CardId.ExampleCardIdBlocked
@@ -558,11 +564,15 @@ types:
           expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDate
           temporary: false
           blocked: true
+          createdAt: $simpleTypes.CreatedAt.ExampleCreatedAt
+          modifiedAt: $simpleTypes.ModifiedAt.ExampleModifiedAt
       - name: ExampleMemberCardCreate
         value:
           cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
           expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDate
           temporary: false
+          createdAt: $simpleTypes.CreatedAt.ExampleCreatedAt
+          modifiedAt: $simpleTypes.ModifiedAt.ExampleModifiedAt
 
   MembershipLifecycleEntriesDTO:
     docs: 

@@ -726,6 +726,8 @@ codeunit 6248220 "NPR MemberApiAgent"
                     .AddProperty('expiryDate', MemberCard."Valid Until")
                     .AddProperty('temporary', MemberCard."Card Is Temporary")
                     .AddProperty('blocked', MemberCard.Blocked)
+                    .AddProperty('createdAt', MemberCard.SystemCreatedAt)
+                    .AddProperty('modifiedAt', MemberCard.SystemModifiedAt)
                     .EndObject();
             until (MemberCard.Next() = 0);
         end;
