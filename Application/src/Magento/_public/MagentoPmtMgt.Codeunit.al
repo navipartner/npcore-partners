@@ -1331,7 +1331,7 @@
                 TempPaymentLine.SystemId := PaymentLine.SystemId;
                 TempPaymentLine.Insert();
             end;
-        until TempPaymentLine.Next() = 0;
+        until PaymentLine.Next() = 0;
 
         Found := true;
     end;
