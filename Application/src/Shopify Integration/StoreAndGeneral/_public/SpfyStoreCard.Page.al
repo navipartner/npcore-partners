@@ -285,6 +285,13 @@ page 6184704 "NPR Spfy Store Card"
                     Enabled = _SalesOrderIntegrationIsEnabled;
                     Importance = Additional;
                 }
+                field("Delete After Final Post"; Rec."Delete After Final Post")
+                {
+                    ToolTip = 'Specifies whether the system should automatically delete the unposted part of the sales order in Business Central once the final posting process has been completed. This option is only available when the sales order is posted automatically based on information from Shopify indicating that the order has been closed. Therefore, the "Post on Completion" setup option must also be enabled.';
+                    ApplicationArea = NPRShopify;
+                    Enabled = _SalesOrderIntegrationIsEnabled and Rec."Post on Completion";
+                    Importance = Additional;
+                }
                 field("Delete on Cancellation"; Rec."Delete on Cancellation")
                 {
                     ToolTip = 'Specifies whether the system should automatically delete the sales order in Business Central when the associated Shopify order is cancelled in Shopify.';
@@ -309,6 +316,7 @@ page 6184704 "NPR Spfy Store Card"
                     ToolTip = 'Specifies whether to send close order requests from Business Central to Shopify. Close order requests are sent for sales orders that have been posted as invoiced.';
                     ApplicationArea = NPRShopify;
                     Enabled = _SalesOrderIntegrationIsEnabled;
+                    Importance = Additional;
                 }
                 field("Currency Code"; Rec."Currency Code")
                 {

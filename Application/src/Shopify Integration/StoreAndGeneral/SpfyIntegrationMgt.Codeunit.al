@@ -250,6 +250,12 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         exit(not ShopifyStore.IsEmpty());
     end;
 
+    procedure DeleteAfterFinalPosting(ShopifyStoreCode: Code[20]): Boolean
+    begin
+        GetStore(ShopifyStoreCode);
+        exit(_ShopifyStore."Delete After Final Post");
+    end;
+
     procedure GetLanguageCode(ShopifyStoreCode: Code[20]): Code[10]
     begin
         GetStore(ShopifyStoreCode);

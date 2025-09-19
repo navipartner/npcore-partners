@@ -193,6 +193,12 @@ table 6150810 "NPR Spfy Store"
             Caption = 'Post on Completion';
             DataClassification = CustomerContent;
             InitValue = true;
+
+            trigger OnValidate()
+            begin
+                if not "Post on Completion" then
+                    "Delete After Final Post" := false;
+            end;
         }
         field(82; "Delete on Cancellation"; Boolean)
         {
@@ -205,6 +211,12 @@ table 6150810 "NPR Spfy Store"
             Caption = 'Default E-commerce Store Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR NpEc Store".Code;
+        }
+        field(84; "Delete After Final Post"; Boolean)
+        {
+            Caption = 'Delete After Final Post';
+            DataClassification = CustomerContent;
+            InitValue = true;
         }
         field(85; "Get Payment Lines from Shopify"; Option)
         {

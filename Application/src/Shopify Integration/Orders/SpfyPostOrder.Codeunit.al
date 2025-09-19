@@ -28,6 +28,8 @@ codeunit 6184815 "NPR Spfy Post Order" implements "NPR Nc Import List IProcess"
         SalesHeader: Record "Sales Header";
         TempSalesInvHeader: Record "Sales Invoice Header" temporary;
         ReleaseSalesDoc: Codeunit "Release Sales Document";
+        SpfyDeleteOrder: Codeunit "NPR Spfy Delete Order";
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         AlreadyPostedMsg: Label 'The order has already been posted. Further processing has been skipped.';
     begin
         OrderMgt.LockTables();
@@ -48,7 +50,12 @@ codeunit 6184815 "NPR Spfy Post Order" implements "NPR Nc Import List IProcess"
         OrderMgt.InsertPaymentLines(ShopifyStoreCode, Order, SalesHeader);
         Commit();
 
-        OrderMgt.PostOrder(SalesHeader);
+        if OrderMgt.PostOrder(SalesHeader) then
+            if SalesHeader.Get(SalesHeader."Document Type", SalesHeader."No.") then
+                if SpfyIntegrationMgt.DeleteAfterFinalPosting(ShopifyStoreCode) then begin
+                    Commit();
+                    SpfyDeleteOrder.DeleteOrder(SalesHeader);
+                end;
     end;
 }
 #endif
