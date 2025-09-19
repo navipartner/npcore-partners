@@ -30,6 +30,13 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         ParamForeignCommunity_DescLbl: Label 'Specifies the Foreign Community Code';
         ToastMessageCaption: Label 'Toast Message Timer';
         ToastMessageDescription: Label 'Specifies the time in seconds the toast message is displayed.';
+        ToastSuccessMessageCaption: Label 'Success Toast Timer';
+        ToastSuccessMessageDescription: Label 'Specifies the time in seconds the success toast message is displayed.';
+        DefaultSuccessTitle: Label 'Success';
+        DefaultSuccessMessage: Label 'Member operation completed successfully';
+        MemberArrivalSuccessLbl: Label 'Member arrival registered successfully';
+        SelectMembershipSuccessLbl: Label 'Membership selected successfully';
+        CancelAutoRenewSuccessLbl: Label 'Auto-renew canceled successfully';
     begin
         WorkflowConfig.AddActionDescription(Action_Description);
         WorkflowConfig.AddJavascript(GetActionScript());
@@ -52,10 +59,16 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         WorkflowConfig.AddTextParameter('DefaultInputValue', '', ParamDefaultInput_CptLbl, ParamDefaultInput_DescLbl);
         WorkflowConfig.AddTextParameter('ForeignCommunityCode', '', ParamForeignCommunity_CptLbl, ParamForeignCommunity_DescLbl);
         WorkflowConfig.AddIntegerParameter('ToastMessageTimer', 15, ToastMessageCaption, ToastMessageDescription);
+        WorkflowConfig.AddIntegerParameter('ToastSuccessMessageTimer', 5, ToastSuccessMessageCaption, ToastSuccessMessageDescription);
         WorkflowConfig.AddLabel('MemberCardPrompt', MemberCardPromptLbl);
         WorkflowConfig.AddLabel('MemberNumberPrompt', MemberNumberPromptLbl);
         WorkflowConfig.AddLabel('MembershipNumberPrompt', MembershipNumberPromptLbl);
         WorkflowConfig.AddLabel('DialogTitle', DialogTitleLbl);
+        WorkflowConfig.AddLabel('SuccessTitle', DefaultSuccessTitle);
+        WorkflowConfig.AddLabel('SuccessMessage', DefaultSuccessMessage);
+        WorkflowConfig.AddLabel('MemberArrivalSuccess', MemberArrivalSuccessLbl);
+        WorkflowConfig.AddLabel('SelectMembershipSuccess', SelectMembershipSuccessLbl);
+        WorkflowConfig.AddLabel('CancelAutoRenewSuccess', CancelAutoRenewSuccessLbl);
         WorkflowConfig.AddOptionParameter('AutoAdmitMember',
                                         ParamAutoAdmit_OptLbl,
 #pragma warning disable AA0139
@@ -119,23 +132,35 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
             2:
                 Response := GetMembershipEntryLookupJson(FrontEndInputMethod, ExternalMemberCardNo);
             3:
-                ExecuteMembershipAlteration(Context, MembershipAlterationSetup."Alteration Type"::REGRET, ExternalMemberCardNo);
+                Response := ExecuteMembershipAlteration(Context, MembershipAlterationSetup."Alteration Type"::REGRET, ExternalMemberCardNo);
             4:
-                ExecuteMembershipAlteration(Context, MembershipAlterationSetup."Alteration Type"::RENEW, ExternalMemberCardNo);
+                Response := ExecuteMembershipAlteration(Context, MembershipAlterationSetup."Alteration Type"::RENEW, ExternalMemberCardNo);
             5:
-                ExecuteMembershipAlteration(Context, MembershipAlterationSetup."Alteration Type"::EXTEND, ExternalMemberCardNo);
+                Response := ExecuteMembershipAlteration(Context, MembershipAlterationSetup."Alteration Type"::EXTEND, ExternalMemberCardNo);
             6:
-                ExecuteMembershipAlteration(Context, MembershipAlterationSetup."Alteration Type"::UPGRADE, ExternalMemberCardNo);
+                Response := ExecuteMembershipAlteration(Context, MembershipAlterationSetup."Alteration Type"::UPGRADE, ExternalMemberCardNo);
             7:
-                ExecuteMembershipAlteration(Context, MembershipAlterationSetup."Alteration Type"::CANCEL, ExternalMemberCardNo);
+                Response := ExecuteMembershipAlteration(Context, MembershipAlterationSetup."Alteration Type"::CANCEL, ExternalMemberCardNo);
             8:
-                POSActionMemberMgtWF3B.EditMembership();
+                begin
+                    POSActionMemberMgtWF3B.EditMembership();
+                    Response.Add('success', true); // Add success flag
+                end;
             9:
-                POSActionMemberMgtWF3B.ShowMember(FrontEndInputMethod, ExternalMemberCardNo, ForeignCommunityCode);
+                begin
+                    POSActionMemberMgtWF3B.ShowMember(FrontEndInputMethod, ExternalMemberCardNo, ForeignCommunityCode);
+                    Response.Add('success', true); // Add success flag
+                end;
             10:
-                POSActionMemberMgtWF3B.EditActiveMembership();
+                begin
+                    POSActionMemberMgtWF3B.EditActiveMembership();
+                    Response.Add('success', true); // Add success flag
+                end;
             11:
-                POSActionMemberMgtWF3B.CancelAutoRenew(ExternalMemberCardNo);
+                begin
+                    POSActionMemberMgtWF3B.CancelAutoRenew(ExternalMemberCardNo);
+                    Response.Add('success', true); // Add success flag
+                end;
         end;
         exit(Response);
     end;
@@ -180,7 +205,7 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         LookupProperties.Add('layout', GetMembershipEntryLayout());
     end;
 
-    local procedure ExecuteMembershipAlteration(Context: Codeunit "NPR POS JSON Helper"; AlterationType: Option; ExternalMemberCardNo: Text[100])
+    local procedure ExecuteMembershipAlteration(Context: Codeunit "NPR POS JSON Helper"; AlterationType: Option; ExternalMemberCardNo: Text[100]) Result: JsonObject
     var
         POSActionMemberMgtWF3B: Codeunit "NPR POS Action Member MgtWF3-B";
         POSSession: Codeunit "NPR POS Session";
@@ -193,6 +218,9 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         if not Context.GetIntegerParameter('AutoAdmitMember', AutoAdmitMember) then
             AutoAdmitMember := 0;
         POSActionMemberMgtWF3B.ExecuteMembershipAlteration(POSSaleLine, AlterationType, ExternalMemberCardNo, ItemNo, AutoAdmitMember);
+
+        // Add success flag to the response
+        Result.Add('success', true);
     end;
 
     procedure GetMembershipAlterationLookupChoices(Context: Codeunit "NPR POS JSON Helper"; POSSession: Codeunit "NPR POS Session"; FrontEnd: Codeunit "NPR POS Front End Management") LookupProperties: JsonObject
@@ -417,12 +445,11 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         FrontEndInputMethod := MemberSelectionMethod::NO_PROMPT;
     end;
 
-
     local procedure GetActionScript(): Text
     begin
         exit(
-//###NPR_INJECT_FROM_FILE:POSActionMemberMgtWF3.js### 
-'let main=async({workflow:u,context:i,popup:l,captions:a,parameters:e})=>{e.Function<0&&(e.Function=e.Function["Member Arrival"]);debugger;let r=await u.respond("CheckMemberInitialized");r!=null&&r.memberExternalCardNo!=null&&r.memberExternalCardNo!==""&&(i.memberCardInput=r.memberExternalCardNo);let M=a.DialogTitle.substitute(e.Function);if(e.DefaultInputValue.length==0&&e.DialogPrompt<=e.DialogPrompt["Member Card Number"]&&(i.memberCardInput=await l.input({caption:a.MemberCardPrompt,title:a.windowTitle,value:i.memberCardInput}),i.memberCardInput===null))return;if(e.DefaultInputValue.length>0&&(i.memberCardInput=e.DefaultInputValue),e.Function>=e.Function["Regret Membership Entry"]&&e.Function<=e.Function["Cancel Membership"]){let n=await u.respond("GetMembershipAlterationLookup");if(i.memberCardInput=n.cardnumber,n.data?.length==0){await l.error({title:a.windowTitle,caption:n.notFoundMessage});return}let o=data.createArrayDriver(n.data),m=data.createDataSource(o);m.loadAll=!1;let d=await l.lookup({title:n.title,configuration:{className:"custom-lookup",styleSheet:"",layout:n.layout,result:c=>c?c.map(s=>s?s.itemno:null):null},source:m});if(d===null||d.length===0)return;i.itemNumber=d[0].itemno}let t=await u.respond("DoManageMembership");if(e.Function==e.Function["View Membership Entry"]){let n=data.createArrayDriver(t.data),o=data.createDataSource(n),m=await l.lookup({title:t.title,configuration:{className:"custom-lookup",styleSheet:"",layout:t.layout},source:o})}debugger;const b=e.ToastMessageTimer!==null&&e.ToastMessageTimer!==void 0&&e.ToastMessageTimer!==0?e.ToastMessageTimer:15;t.MemberScanned&&b>0&&toast.memberScanned({memberImg:t.MemberScanned.ImageDataUrl,memberName:t.MemberScanned.Name,validForAdmission:t.MemberScanned.Valid,hideAfter:b,memberExpiry:t.MemberScanned.ExpiryDate,content:[{caption:t.MemberScanned.MembershipCodeCaption,value:t.MemberScanned.MembershipCodeDescription}]})};'
+//###NPR_INJECT_FROM_FILE:POSActionMemberMgtWF3.js###
+'let main=async({workflow:u,context:n,popup:l,captions:a,parameters:e})=>{e.Function<0&&(e.Function=e.Function["Member Arrival"]);debugger;let r=await u.respond("CheckMemberInitialized");r!=null&&r.memberExternalCardNo!=null&&r.memberExternalCardNo!==""&&(n.memberCardInput=r.memberExternalCardNo);let g=a.DialogTitle.substitute(e.Function);if(e.DefaultInputValue.length==0&&e.DialogPrompt<=e.DialogPrompt["Member Card Number"]&&(n.memberCardInput=await l.input({caption:a.MemberCardPrompt,title:a.windowTitle,value:n.memberCardInput}),n.memberCardInput===null))return;if(e.DefaultInputValue.length>0&&(n.memberCardInput=e.DefaultInputValue),e.Function>=e.Function["Regret Membership Entry"]&&e.Function<=e.Function["Cancel Membership"]){let i=await u.respond("GetMembershipAlterationLookup");if(n.memberCardInput=i.cardnumber,i.data?.length==0){await l.error({title:a.windowTitle,caption:i.notFoundMessage});return}let o=data.createArrayDriver(i.data),m=data.createDataSource(o);m.loadAll=!1;let d=await l.lookup({title:i.title,configuration:{className:"custom-lookup",styleSheet:"",layout:i.layout,result:c=>c?c.map(s=>s?s.itemno:null):null},source:m});if(d===null||d.length===0)return;n.itemNumber=d[0].itemno}let t=await u.respond("DoManageMembership");if(e.Function==e.Function["View Membership Entry"]){let i=data.createArrayDriver(t.data),o=data.createDataSource(i);m=await l.lookup({title:t.title,configuration:{className:"custom-lookup",styleSheet:"",layout:t.layout},source:o})}debugger;const b=e.ToastMessageTimer!==null&&e.ToastMessageTimer!==void 0&&e.ToastMessageTimer!==0?e.ToastMessageTimer:15;t.MemberScanned&&b>0&&toast.memberScanned({memberImg:t.MemberScanned.ImageDataUrl,memberName:t.MemberScanned.Name,validForAdmission:t.MemberScanned.Valid,hideAfter:b,memberExpiry:t.MemberScanned.ExpiryDate,content:["Member Status","Member Balance","Member Points","Member Card"]});const h=(e.ToastSuccessMessageTimer??0)!==0?e.ToastSuccessMessageTimer:5;if(t&&(t.success===!0||!t.error)){let s=a.SuccessMessage;const p=Number(e.Function);switch(p){case 0:{s=a.MemberArrivalSuccess;break;}case 1:{s=a.SelectMembershipSuccess;break;}case 11:{s=a.CancelAutoRenewSuccess;break;}case 2:case 9:{return;}case 3:case 4:case 5:case 6:case 7:case 8:case 10:{return;}}toast.success(s,{title:a.SuccessTitle,hideAfter:h})}};'
         )
     end;
 

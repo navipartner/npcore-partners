@@ -111,4 +111,49 @@ let main = async ({ workflow, context, popup, captions, parameters }) => {
       ],
     });
   }
-};
+
+  // Configure success message timer (defaults to 5 seconds)
+  const hideSuccessAfter = (parameters.ToastSuccessMessageTimer ?? 0) !== 0 ? parameters.ToastSuccessMessageTimer : 5;
+  
+  // Handle success messages
+  if (membershipResponse && (membershipResponse.success === true || !membershipResponse.error)) {
+    let successMessage = captions.SuccessMessage;
+    
+    // Convert function type to number to ensure proper case matching
+    const FunctionNo = Number(parameters.Function);
+    
+    // Set appropriate success message based on function type
+    switch(FunctionNo){
+        case 0: {
+            successMessage = captions.MemberArrivalSuccess; // Member arrival
+            break;
+        }
+        case 1: {
+            successMessage = captions.SelectMembershipSuccess; // Select membership
+            break;
+        }
+        case 11: {
+            successMessage = captions.CancelAutoRenewSuccess; // Cancel auto-renew
+            break;
+        }
+        case 2:  // View Membership Entry - view operation so no toast needed
+        case 3:  // Regret Membership - requires payment
+        case 4:  // Renew Membership - requires payment
+        case 5:  // Extend Membership - requires payment
+        case 6:  // Upgrade Membership - requires payment
+        case 7:  // Cancel Membership - may have refund/fees
+        case 8:  // Edit Membership - may have cost difference
+        case 9:  // Show Member - view operation so no toast needed
+        case 10: // Edit Current Membership - may add cost difference to POS
+        {
+            return; // Don't show success toast - wait for payment completion
+        }
+    }
+    
+    // Display success toast notification
+    toast.success(successMessage, {
+        title: captions.SuccessTitle,
+        hideAfter: hideSuccessAfter
+    });
+  }
+}
