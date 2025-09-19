@@ -59,6 +59,9 @@ query 6014493 "NPR AttractionWalletAssetHist"
                     column(WalletSystemId; SystemId)
                     {
                     }
+                    column(WalletOriginatesFromItemNo; OriginatesFromItemNo)
+                    {
+                    }
                     column(WalletDescription; Description)
                     {
                     }

@@ -27,6 +27,9 @@ query 6014499 "NPR AttractionWalletExtRef"
                 column(ReferenceNumber; ReferenceNumber)
                 {
                 }
+                column(WalletOriginatesFromItemNo; OriginatesFromItemNo)
+                {
+                }
                 column(Description; Description)
                 {
                 }

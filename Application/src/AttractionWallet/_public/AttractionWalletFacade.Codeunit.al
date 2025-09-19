@@ -111,4 +111,17 @@ codeunit 6185061 "NPR AttractionWalletFacade"
         Wallets.Open();
     end;
 
+    procedure OpenWalletCardPage(ExternalReferenceNo: Text[100])
+    var
+        AttractionWalletExtRef: Record "NPR AttractionWalletExtRef";
+        Wallet: Record "NPR AttractionWallet";
+    begin
+        if not (AttractionWalletExtRef.Get(ExternalReferenceNo)) then
+            exit;
+
+        if not (Wallet.Get(AttractionWalletExtRef.WalletEntryNo)) then
+            exit;
+
+        Page.Run(Page::"NPR AttractionWalletCard", Wallet);
+    end;
 }

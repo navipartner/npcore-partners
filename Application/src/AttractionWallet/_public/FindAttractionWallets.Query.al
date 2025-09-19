@@ -44,6 +44,9 @@ query 6014491 "NPR FindAttractionWallets"
                         column(WalletSystemId; SystemId)
                         {
                         }
+                        column(WalletOriginatesFromItemNo; OriginatesFromItemNo)
+                        {
+                        }
                         column(WalletDescription; Description)
                         {
                         }
