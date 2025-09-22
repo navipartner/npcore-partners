@@ -120,6 +120,7 @@ types:
       phoneNo: optional<string>
       isSupervisor: optional<boolean>
       posUnitGroup: optional<string>
+      registerPassword: optional<string>
     examples:
       - name: ExampleUpdateJohnDoe
         value:
@@ -128,6 +129,7 @@ types:
           phoneNo: "+4512345678"
           isSupervisor: false
           posUnitGroup: "2"
+          registerPassword: "12456"
 
   SalespersonDto:
     docs: Information about a salesperson

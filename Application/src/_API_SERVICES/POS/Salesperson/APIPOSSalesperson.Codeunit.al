@@ -172,6 +172,8 @@ codeunit 6150690 "NPR API POS Salesperson"
             Salesperson."NPR Supervisor POS" := JHelper.GetJBoolean(Body, 'isSupervisor', false);
         if (Body.SelectToken('posUnitGroup', BufToken)) then
             Salesperson."NPR POS Unit Group" := JHelper.GetJText(Body, 'posUnitGroup', false);
+        if (Body.SelectToken('registerPassword', BufToken)) then
+            Salesperson."NPR Register Password" := JHelper.GetJText(Body, 'registerPassword', false);
 #pragma warning restore AA0139
 
         Salesperson.Modify(true);
