@@ -599,11 +599,11 @@ codeunit 6248367 "NPR HU L Communication Mgt."
             PaymentLineCount := POSEntryPaymentLineDict.Count();
         end;
 
-        if HULPOSAuditLogAux."Rounding Amount" <> 0 then
-            PaymentLineCount += 1;
-
         if PaymentLineCount = 0 then
             PaymentLineCount := 1;
+
+        if HULPOSAuditLogAux."Rounding Amount" <> 0 then
+            PaymentLineCount += 1;
 
         JsonTextWriter.WriteStringProperty('iPaymentCnt', PaymentLineCount);
 
