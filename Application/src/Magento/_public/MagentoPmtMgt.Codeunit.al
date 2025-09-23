@@ -727,30 +727,18 @@
     var
         GenJnlLine: Record "Gen. Journal Line";
         SalesInvHeader: Record "Sales Invoice Header";
-#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
-        IncEcomSalesDocProcess: Codeunit "NPR IncEcomSalesDocProcess";
-        SpfyCapturePayment: Codeunit "NPR Spfy Capture Payment";
-#endif
     begin
         if PaymentLine.Posted then
             exit;
 
         if PaymentLine.Amount = 0 then begin
-            PaymentLine.Posted := true;
-            PaymentLine.Modify(true);
-#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
-            IncEcomSalesDocProcess.UpdateSalesDocPaymentLinePostingInformation(PaymentLine);
-#endif
+            SetPaymentLineAsPosted(PaymentLine);
             exit;
         end;
 
         PaymentLine.TestField("Account No.");
         if not HasOpenEntry(PaymentLine) then begin
-            PaymentLine.Posted := true;
-            PaymentLine.Modify();
-#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
-            IncEcomSalesDocProcess.UpdateSalesDocPaymentLinePostingInformation(PaymentLine);
-#endif
+            SetPaymentLineAsPosted(PaymentLine);
             exit;
         end;
 
@@ -766,17 +754,26 @@
                 exit;
         end;
         GenJnlPostLine.RunWithCheck(GenJnlLine);
+        SetPaymentLineAsPosted(PaymentLine);
+
+        InsertPostingLog(PaymentLine, true);
+    end;
+
+    local procedure SetPaymentLineAsPosted(var PaymentLine: Record "NPR Magento Payment Line")
+    var
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+        IncEcomSalesDocProcess: Codeunit "NPR IncEcomSalesDocProcess";
+#endif
+    begin
         PaymentLine.Posted := true;
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
-        if SpfyCapturePayment.IsShopifyPaymentLine(PaymentLine) then
-            RegisterBillingEvents(PaymentLine);
+        RegisterBillingEvents(PaymentLine);
 #endif
         PaymentLine.Modify();
 
-#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
         IncEcomSalesDocProcess.UpdateSalesDocPaymentLinePostingInformation(PaymentLine);
 #endif
-        InsertPostingLog(PaymentLine, true);
     end;
 
     procedure InsertPostingLog(var MagentoPaymentLine: Record "NPR Magento Payment Line"; Success: Boolean)
@@ -1391,6 +1388,9 @@
         EventBillingClient: Codeunit "NPR Event Billing Client";
         JsonCurrencyObject: JsonObject;
     begin
+        if not PaymentLine.IsShopifyPaymentLine() then
+            exit;
+
         JsonCurrencyObject.Add('currency', PaymentLine.TransactionCurrencyCode(false));
         EventBillingClient.RegisterEvent(PaymentLine.SystemId, Enum::"NPR Billing Event Type"::ECOM_SHOPIFY_ORDERS_AMOUNT_PRESENTMENT, PaymentLine.Amount, JsonCurrencyObject.AsToken());
 
