@@ -107,6 +107,10 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib." implements "NPR IMatrix Printer"
                 begin
                     ParseRFIDParameters(POSPrintBuffer.Text, POSPrintBuffer.Font);
                 end;
+            (CopyStr(POSPrintBuffer.Font, 1, 6) = 'SIMSUN'):
+                begin
+                    ParseSimSunParameters(POSPrintBuffer.Font, POSPrintBuffer.Align, POSPrintBuffer.Rotation, POSPrintBuffer.X, POSPrintBuffer.Y, POSPrintBuffer.Text);
+                end;
             else
                 Error(FontErr, POSPrintBuffer.Font);
         end;
@@ -252,6 +256,32 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib." implements "NPR IMatrix Printer"
             else
                 Error(InvalidCommandErr, FontType);
         end;
+    end;
+
+    local procedure ParseSimSunParameters(FontType: Text; Align: Integer; Rotate: Integer; X: Integer; Y: Integer; TextIn: Text)
+    var
+        StringLibrary: Codeunit "NPR String Library";
+        FontSizeParam: Text;
+        HeightText: Code[10];
+        WidthText: Code[10];
+        Height: Integer;
+        Width: Integer;
+    begin
+        // Parse SIMSUN font with size parameters
+        // Format: "SIMSUN 100,100" where the second part contains height,width
+
+        StringLibrary.Construct(FontType);
+        FontSizeParam := StringLibrary.SelectStringSep(2, ' '); // Get "100,100" part
+
+        StringLibrary.Construct(FontSizeParam);
+        HeightText := StringLibrary.SelectStringSep(1, ',');
+        WidthText := StringLibrary.SelectStringSep(2, ',');
+
+        if not Evaluate(Height, HeightText) or not Evaluate(Width, WidthText) then
+            Error(FontErr, FontType);
+
+        // Use the SIMSUN font (font 1) with the specified dimensions
+        SimSunText(Align, Rotate, Height, Width, X, Y, TextIn);
     end;
 
     procedure IsBarcodeFont(FontCode: Text): Boolean
@@ -954,6 +984,9 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib." implements "NPR IMatrix Printer"
         AddOption(RetailList, 'Font T', '');
         AddOption(RetailList, 'Font U', '');
         AddOption(RetailList, 'Font V', '');
+        AddOption(RetailList, 'SIMSUN 15,15', '');
+        AddOption(RetailList, 'SIMSUN 25,25', '');
+        AddOption(RetailList, 'SIMSUN 45,45', '');
         AddOption(RetailList, 'Scale Font 19,15', '');
         AddOption(RetailList, 'Scale Font 21,18', '');
         AddOption(RetailList, 'Scale Font 25,18', '');
@@ -1011,6 +1044,71 @@ codeunit 6014542 "NPR RP Zebra ZPL Device Lib." implements "NPR IMatrix Printer"
         RetailList.Choice := Choice;
         RetailList.Value := Value;
         RetailList.Insert();
+    end;
+
+    local procedure SimSunText(Align: Integer; Rotate: Integer; Height: Integer; Width: Integer; X: Integer; Y: Integer; TextIn: Text)
+    var
+        Rotation: Text[1];
+        StrLength: Integer;
+        AdjustedX: Integer;
+        AdjustedY: Integer;
+    begin
+        // Similar to Text procedure but with custom font handling for SIMSUN
+        // This handles alignment and rotation for SIMSUN font
+
+        AdjustedX := X;
+        AdjustedY := Y;
+
+        // Manual alignment calculation for precise positioning
+        if Align > 0 then begin
+            StrLength := Width * StrLen(TextIn);
+
+            case Align of
+                1: // Center alignment
+                    case Rotate of
+                        0, 2: // Normal or Inverted (0° or 180°)
+                            AdjustedX := Round(X - (StrLength / 2), 1, '=') div 1;
+                        1, 3: // Rotated (90° or 270°)
+                            AdjustedY := Round(Y - (StrLength / 2), 1, '=') div 1;
+                    end;
+                2: // Right alignment
+                    case Rotate of
+                        0, 2: // Normal or Inverted (0° or 180°)
+                            AdjustedX := X - StrLength;
+                        1, 3: // Rotated (90° or 270°)
+                            AdjustedY := Y - StrLength;
+                    end;
+            end;
+
+            // Ensure we don't go into negative coordinates
+            if AdjustedX < 0 then
+                AdjustedX := 0;
+            if AdjustedY < 0 then
+                AdjustedY := 0;
+        end;
+
+        case Rotate of
+            0:
+                Rotation := 'N';
+            1:
+                Rotation := 'R';
+            2:
+                Rotation := 'I';
+            3:
+                Rotation := 'B';
+        end;
+
+        // ^FO - Field Origin with adjusted coordinates
+        FieldOrigin(AdjustedX, AdjustedY);
+
+        // ^A - Use scalable font with specific height and width for SIMSUN
+        AddStringToBuffer(StrSubstNo('^A%1%2,%3,%4,%5', '@', Rotation, Height, Width, 'E:SIM000.TTF'));
+
+        // ^FD - Field Data
+        FieldData(TextIn);
+
+        // ^FS - Field Separator
+        FieldSeparator();
     end;
 
     local procedure GetBarcodeFont(Barcode: Text): Text
