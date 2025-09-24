@@ -325,10 +325,9 @@
 
     procedure CreatePostingBufferLinesFromPOSSalesLines(var POSSalesLineToBeCompressed: Record "NPR POS Entry Sales Line"; var POSPostingBuffer: Record "NPR POS Posting Buffer"; POSEntry: Record "NPR POS Entry")
     var
-        PostingDescription: Text;
-        Compressionmethod: Option Uncompressed,"Per POS Entry","Per POS Period Register";
-        PostingDescriptionLbl: Label '%1: %2';
         FeatureFlagManagement: Codeunit "NPR Feature Flags Management";
+        PostingDescription: Text;
+        PostingDescriptionLbl: Label '%1: %2';
     begin
         POSSalesLineToBeCompressed.SetRange(Type, POSSalesLineToBeCompressed.Type::Item);
         if POSSalesLineToBeCompressed.FindSet() then begin
@@ -425,7 +424,6 @@
                         POSSalesLineToBeCompressed.Type::Voucher:
                             begin
                                 POSPostingBuffer."No." := POSSalesLineToBeCompressed."No.";
-                                Compressionmethod := Compressionmethod::Uncompressed;
                                 POSPostingBuffer."Gen. Bus. Posting Group" := POSSalesLineToBeCompressed."Gen. Bus. Posting Group";
                                 POSPostingBuffer."VAT Bus. Posting Group" := POSSalesLineToBeCompressed."VAT Bus. Posting Group";
                             end;
