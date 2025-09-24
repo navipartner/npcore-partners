@@ -948,6 +948,7 @@
         POSEntry: Record "NPR POS Entry";
         PostingDescription: Text;
         Compressionmethod: Option Uncompressed,"Per POS Entry","Per POS Period Register";
+        PostUncompressed: Boolean;
     begin
         if POSSalesLineToBeCompressed.FindSet() then
             repeat
@@ -980,15 +981,9 @@
                         POSPostingBuffer."Gen. Bus. Posting Group" := POSSalesLineToBeCompressed."Gen. Bus. Posting Group";
                         POSPostingBuffer."VAT Bus. Posting Group" := POSSalesLineToBeCompressed."VAT Bus. Posting Group";
                     end;
-                    if POSSalesLineToBeCompressed.Type = POSSalesLineToBeCompressed.Type::Payout then begin
-                        POSPostingBuffer."No." := POSSalesLineToBeCompressed."No.";
-                        Compressionmethod := Compressionmethod::Uncompressed;
-                    end;
 
-                    if POSSalesLineToBeCompressed.type = POSSalesLineToBeCompressed.Type::Voucher then begin
-                        POSPostingBuffer."No." := POSSalesLineToBeCompressed."No.";
-                        Compressionmethod := Compressionmethod::Uncompressed;
-                    end;
+                    PostUncompressed :=
+                        POSSalesLineToBeCompressed.Type in [POSSalesLineToBeCompressed.Type::Payout, POSSalesLineToBeCompressed.Type::Voucher];
 
                     POSPostingBuffer."Applies-to Doc. Type" := POSSalesLineToBeCompressed."Applies-to Doc. Type";
                     POSPostingBuffer."Applies-to Doc. No." := POSSalesLineToBeCompressed."Applies-to Doc. No.";
@@ -1011,12 +1006,15 @@
                     POSPostingBuffer."POS Period Register" := POSSalesLineToBeCompressed."POS Period Register No.";
                     POSPostingBuffer."Deferral Code" := POSSalesLineToBeCompressed."Deferral Code";
                     POSPostingBuffer."Deferral Line No." := POSSalesLineToBeCompressed."Deferral Line No.";
+
+                    if (Compressionmethod = Compressionmethod::Uncompressed) or PostUncompressed then begin
+                        POSPostingBuffer."POS Entry No." := POSSalesLineToBeCompressed."POS Entry No.";
+                        POSPostingBuffer."Line No." := POSSalesLineToBeCompressed."Line No.";
+                        POSPostingBuffer."No." := POSSalesLineToBeCompressed."No.";
+                    end;
                     case Compressionmethod of
                         Compressionmethod::Uncompressed:
                             begin
-                                POSPostingBuffer."POS Entry No." := POSSalesLineToBeCompressed."POS Entry No.";
-                                POSPostingBuffer."Line No." := POSSalesLineToBeCompressed."Line No.";
-                                POSPostingBuffer."No." := POSSalesLineToBeCompressed."No.";
                                 POSPostingBuffer."Document No." := POSSalesLineToBeCompressed."Document No.";
                                 PostingDescription := POSSalesLineToBeCompressed.Description;
                             end;
@@ -1024,7 +1022,7 @@
                             begin
                                 POSPostingBuffer."POS Entry No." := POSSalesLineToBeCompressed."POS Entry No.";
                                 POSPostingBuffer."Document No." := POSSalesLineToBeCompressed."Document No.";
-                                if POSSalesLineToBeCompressed."Copy Description" then
+                                if POSSalesLineToBeCompressed."Copy Description" or PostUncompressed then
                                     PostingDescription := POSSalesLineToBeCompressed.Description
                                 else
                                     PostingDescription := StrSubstNo(PostingDescriptionLbl, POSEntry.TableCaption, POSSalesLineToBeCompressed."POS Entry No.");
@@ -1033,7 +1031,7 @@
                             begin
                                 POSPeriodRegister.TestField("Document No.");
                                 POSPostingBuffer."Document No." := POSPeriodRegister."Document No.";
-                                if POSSalesLineToBeCompressed."Copy Description" then
+                                if POSSalesLineToBeCompressed."Copy Description" or PostUncompressed then
                                     PostingDescription := POSSalesLineToBeCompressed.Description
                                 else
                                     PostingDescription := StrSubstNo(PostingDescriptionLbl, POSPeriodRegister.TableCaption, POSSalesLineToBeCompressed."POS Period Register No.");
