@@ -363,7 +363,11 @@ table 6151148 "NPR Monitored Job Queue Entry"
         if "Time Zone" = '' then begin
             if not JQRefreshSetup.Get() then
                 Clear(JQRefreshSetup);
-            JQRefreshSetup.TestField("Default Job Time Zone");
+            if JQRefreshSetup."Use External JQ Refresher" then
+                JQRefreshSetup.TestField("Default Job Time Zone")
+            else
+                if JQRefreshSetup."Default Job Time Zone" = '' then
+                    exit(0);
             "Time Zone" := JQRefreshSetup."Default Job Time Zone";
         end;
         TypeHelper.GetTimezoneOffset(TimeZoneOffset, "Time Zone");

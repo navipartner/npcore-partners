@@ -732,7 +732,8 @@
     begin
         if not SkipUpdateNPManagedMonitoredJobs() then begin
             GetJQRefresherSetup();
-            _JQRefresherSetup.TestField("Default Job Time Zone");
+            if _JQRefresherSetup."Use External JQ Refresher" then
+                _JQRefresherSetup.TestField("Default Job Time Zone");
             BindSubscription(MonitoredJobQueueMgt);
             OnRefreshNPRJobQueueList();  //renew NaviPartner protected monitored jobs
             if UnBindSubscription(MonitoredJobQueueMgt) then;
