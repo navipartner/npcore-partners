@@ -411,13 +411,4 @@
 
         exit(CurrencyCode);
     end;
-
-#if not BC17
-    internal procedure IsShopifyPaymentLine(): Boolean
-    var
-        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
-    begin
-        exit(SpfyAssignedIDMgt.GetAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID") <> '');
-    end;
-#endif
 }

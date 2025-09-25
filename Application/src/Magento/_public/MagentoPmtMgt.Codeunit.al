@@ -1385,21 +1385,9 @@
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
     local procedure RegisterBillingEvents(var PaymentLine: Record "NPR Magento Payment Line")
     var
-        EventBillingClient: Codeunit "NPR Event Billing Client";
-        JsonCurrencyObject: JsonObject;
+        SpfyPaymentGatewayHdlr: Codeunit "NPR Spfy Payment Gateway Hdlr";
     begin
-        if not PaymentLine.IsShopifyPaymentLine() then
-            exit;
-
-        JsonCurrencyObject.Add('currency', PaymentLine.TransactionCurrencyCode(false));
-        EventBillingClient.RegisterEvent(PaymentLine.SystemId, Enum::"NPR Billing Event Type"::ECOM_SHOPIFY_ORDERS_AMOUNT_PRESENTMENT, PaymentLine.Amount, JsonCurrencyObject.AsToken());
-
-        if PaymentLine."Amount (Store Currency)" <> 0 then begin
-            Clear(JsonCurrencyObject);
-            JsonCurrencyObject.Add('currency', PaymentLine."Store Currency Code");
-            PaymentLine."NPR Ecom Spfy.Ord.Amt.Event Id" := CreateGuid();
-            EventBillingClient.RegisterEvent(PaymentLine."NPR Ecom Spfy.Ord.Amt.Event Id", Enum::"NPR Billing Event Type"::ECOM_SHOPIFY_ORDERS_AMOUNT_SHOP, PaymentLine."Amount (Store Currency)", JsonCurrencyObject.AsToken());
-        end;
+        SpfyPaymentGatewayHdlr.RegisterBillingEvents(PaymentLine);
     end;
 #endif
 

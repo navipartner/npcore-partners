@@ -126,6 +126,65 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
         OStream.WriteText(ResponseMsg);
     end;
 
+#if not (BC18 or BC19 or BC20 or BC21 or BC22)
+    internal procedure RegisterBillingEvents(var PaymentLine: Record "NPR Magento Payment Line")
+    var
+        EventBillingClient: Codeunit "NPR Event Billing Client";
+        MetadataJson: JsonObject;
+    begin
+        if not IsShopifyPaymentLine(PaymentLine.RecordId()) then
+            exit;
+
+        MetadataJson.Add('shopify_store_code', GetShopifyStoreCode(PaymentLine));
+        MetadataJson.Add('currency', PaymentLine.TransactionCurrencyCode(false));
+        EventBillingClient.RegisterEvent(
+            PaymentLine.SystemId, Enum::"NPR Billing Event Type"::ECOM_SHOPIFY_ORDERS_AMOUNT_PRESENTMENT, PaymentLine.Amount, MetadataJson.AsToken());
+
+        if PaymentLine."Amount (Store Currency)" <> 0 then begin
+            MetadataJson.Replace('currency', PaymentLine."Store Currency Code");
+            PaymentLine."NPR Ecom Spfy.Ord.Amt.Event Id" := CreateGuid();
+            EventBillingClient.RegisterEvent(
+                PaymentLine."NPR Ecom Spfy.Ord.Amt.Event Id", Enum::"NPR Billing Event Type"::ECOM_SHOPIFY_ORDERS_AMOUNT_SHOP, PaymentLine."Amount (Store Currency)", MetadataJson.AsToken());
+        end;
+    end;
+
+    local procedure IsShopifyPaymentLine(PaymentLineRecID: RecordId): Boolean
+    var
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+    begin
+        exit(SpfyAssignedIDMgt.GetAssignedShopifyID(PaymentLineRecID, "NPR Spfy ID Type"::"Entry ID") <> '');
+    end;
+
+    local procedure GetShopifyStoreCode(PaymentLine: Record "NPR Magento Payment Line"): Code[20]
+    var
+        SalesHeader: Record "Sales Header";
+        SalesInvHeader: Record "Sales Invoice Header";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        ShopifyStoreCode: Text;
+    begin
+        case PaymentLine."Document Table No." of
+            Database::"Sales Header":
+                begin
+                    SalesHeader."Document Type" := PaymentLine."Document Type";
+                    SalesHeader."No." := PaymentLine."Document No.";
+                    ShopifyStoreCode := SpfyAssignedIDMgt.GetAssignedShopifyID(SalesHeader.RecordId(), "NPR Spfy ID Type"::"Store Code");
+                end;
+            Database::"Sales Invoice Header":
+                begin
+                    SalesInvHeader."No." := PaymentLine."Document No.";
+                    ShopifyStoreCode := SpfyAssignedIDMgt.GetAssignedShopifyID(SalesInvHeader.RecordId(), "NPR Spfy ID Type"::"Store Code");
+                end;
+            Database::"Sales Cr.Memo Header":
+                begin
+                    SalesCrMemoHeader."No." := PaymentLine."Document No.";
+                    ShopifyStoreCode := SpfyAssignedIDMgt.GetAssignedShopifyID(SalesCrMemoHeader.RecordId(), "NPR Spfy ID Type"::"Store Code");
+                end;
+        end;
+        exit(CopyStr(ShopifyStoreCode, 1, 20));
+    end;
+#endif
+
     internal procedure TranslateCurrencyCode(ShopifyCurrencyCode: Text): Code[10]
     var
         IsLCY: Boolean;
