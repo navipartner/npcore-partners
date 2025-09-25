@@ -326,7 +326,9 @@
     procedure CreatePostingBufferLinesFromPOSSalesLines(var POSSalesLineToBeCompressed: Record "NPR POS Entry Sales Line"; var POSPostingBuffer: Record "NPR POS Posting Buffer"; POSEntry: Record "NPR POS Entry")
     var
         FeatureFlagManagement: Codeunit "NPR Feature Flags Management";
+        POSPostEntries: Codeunit "NPR POS Post Entries";
         PostingDescription: Text;
+        DeferralLineNo: Integer;
         PostingDescriptionLbl: Label '%1: %2';
     begin
         POSSalesLineToBeCompressed.SetRange(Type, POSSalesLineToBeCompressed.Type::Item);
@@ -349,7 +351,6 @@
                     POSPostingBuffer."Dimension Set ID" := POSSalesLineToBeCompressed."Dimension Set ID";
                     POSPostingBuffer."Tax Area Code" := POSSalesLineToBeCompressed."Tax Area Code";
                     POSPostingBuffer."Deferral Code" := POSSalesLineToBeCompressed."Deferral Code";
-                    POSPostingBuffer."Deferral Line No." := POSSalesLineToBeCompressed."Deferral Line No.";
 
                     POSPostingBuffer."Applies-to Doc. Type" := POSSalesLineToBeCompressed."Applies-to Doc. Type";
                     POSPostingBuffer."Applies-to Doc. No." := POSSalesLineToBeCompressed."Applies-to Doc. No.";
@@ -369,7 +370,10 @@
                         POSPostingBuffer.Description := CopyStr(PostingDescription, 1, MaxStrLen(POSPostingBuffer.Description));
                         POSPostingBuffer."Tax Liable" := POSSalesLineToBeCompressed."Tax Liable";
                         POSPostingBuffer."Tax Group Code" := POSSalesLineToBeCompressed."Tax Group Code";
-
+                        if POSPostingBuffer."Deferral Code" <> '' then begin
+                            DeferralLineNo := DeferralLineNo + 1;
+                            POSPostingBuffer."Deferral Line No." := DeferralLineNo;
+                        end;
                         POSPostingBuffer.Insert();
                     end;
 
@@ -387,6 +391,7 @@
 
                     POSPostingBuffer.Modify();
                 end;
+                POSPostEntries.CreateCompressedDeferralBuffer(POSEntry, POSSalesLineToBeCompressed, POSPostingBuffer."Deferral Line No.");
             until POSSalesLineToBeCompressed.Next() = 0;
         end;
         POSSalesLineToBeCompressed.SetFilter(Type, '<>%1', POSSalesLineToBeCompressed.Type::Item);
@@ -437,6 +442,7 @@
                     POSPostingBuffer."Tax Area Code" := POSSalesLineToBeCompressed."Tax Area Code";
                     POSPostingBuffer."Applies-to Doc. Type" := POSSalesLineToBeCompressed."Applies-to Doc. Type";
                     POSPostingBuffer."Applies-to Doc. No." := POSSalesLineToBeCompressed."Applies-to Doc. No.";
+                    POSPostingBuffer."Deferral Code" := POSSalesLineToBeCompressed."Deferral Code";
 
                     if not POSPostingBuffer.Find() then begin
                         POSPostingBuffer.Init();
@@ -455,7 +461,10 @@
                         POSPostingBuffer.Description := CopyStr(PostingDescription, 1, MaxStrLen(POSPostingBuffer.Description));
                         POSPostingBuffer."Tax Liable" := POSSalesLineToBeCompressed."Tax Liable";
                         POSPostingBuffer."Tax Group Code" := POSSalesLineToBeCompressed."Tax Group Code";
-
+                        if POSPostingBuffer."Deferral Code" <> '' then begin
+                            DeferralLineNo := DeferralLineNo + 1;
+                            POSPostingBuffer."Deferral Line No." := DeferralLineNo;
+                        end;
                         POSPostingBuffer.Insert();
                     end;
 
@@ -477,6 +486,7 @@
                     end;
 
                     POSPostingBuffer.Modify();
+                    POSPostEntries.CreateCompressedDeferralBuffer(POSEntry, POSSalesLineToBeCompressed, POSPostingBuffer."Deferral Line No.");
                 end;
             until POSSalesLineToBeCompressed.Next() = 0;
         POSPostingBuffer.Reset();

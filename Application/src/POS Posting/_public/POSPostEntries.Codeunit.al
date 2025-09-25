@@ -144,6 +144,7 @@
             UpdatePOSPostingLogEntry(_POSPostingLogEntryNo, true, ErrorText);
             MarkPOSEntries(1, _POSPostingLogEntryNo, POSEntry, TempPOSEntry);
         end else begin
+            MoveDeferralScheduleToPosted(TempPOSSalesLineToPost, POSEntry);
             UpdatePOSPostingLogEntry(_POSPostingLogEntryNo, false, '');
             MarkPOSEntries(0, _POSPostingLogEntryNo, POSEntry, TempPOSEntry);
         end;
@@ -948,6 +949,7 @@
         POSEntry: Record "NPR POS Entry";
         PostingDescription: Text;
         Compressionmethod: Option Uncompressed,"Per POS Entry","Per POS Period Register";
+        DeferralLineNo: Integer;
         PostUncompressed: Boolean;
     begin
         if POSSalesLineToBeCompressed.FindSet() then
@@ -1005,7 +1007,6 @@
                     POSPostingBuffer."POS Unit No." := POSSalesLineToBeCompressed."POS Unit No.";
                     POSPostingBuffer."POS Period Register" := POSSalesLineToBeCompressed."POS Period Register No.";
                     POSPostingBuffer."Deferral Code" := POSSalesLineToBeCompressed."Deferral Code";
-                    POSPostingBuffer."Deferral Line No." := POSSalesLineToBeCompressed."Deferral Line No.";
 
                     if (Compressionmethod = Compressionmethod::Uncompressed) or PostUncompressed then begin
                         POSPostingBuffer."POS Entry No." := POSSalesLineToBeCompressed."POS Entry No.";
@@ -1053,6 +1054,10 @@
                         POSPostingBuffer."Rounding Amount" := 0;
                         POSPostingBuffer."Rounding Amount (LCY)" := 0;
                         POSPostingBuffer.Description := CopyStr(PostingDescription, 1, MaxStrLen(POSPostingBuffer.Description));
+                        if POSPostingBuffer."Deferral Code" <> '' then begin
+                            DeferralLineNo := DeferralLineNo + 1;
+                            POSPostingBuffer."Deferral Line No." := DeferralLineNo;
+                        end;
                         POSPostingBuffer.Insert();
                     end;
                     POSPostingBuffer."VAT Base Amount" := POSPostingBuffer."VAT Base Amount" - POSSalesLineToBeCompressed."VAT Base Amount";
@@ -1076,6 +1081,7 @@
                     OnBeforeModifySalesPOSPostingBufferCreatedFromPOSSalesLines(POSSalesLineToBeCompressed, POSPostingBuffer);
 
                     POSPostingBuffer.Modify();
+                    CreateCompressedDeferralBuffer(POSEntry, POSSalesLineToBeCompressed, POSPostingBuffer."Deferral Line No.");
                 end;
             until POSSalesLineToBeCompressed.Next() = 0;
     end;
@@ -1435,6 +1441,7 @@
                                 end;
                                 if ProceedWithUpdate then begin
                                     POSEntry.Validate("Post Entry Status", POSEntry."Post Entry Status"::"Error while Posting");
+                                    TryRemoveDeferralPostingBuffer(POSEntry);
                                     _GLPostingErrorEntries.Add(POSEntry."Entry No.");
                                 end;
                             end;
@@ -1444,6 +1451,18 @@
                     OnAfterModifyPOSEntryOnMarkPOSEntries(OptStatus, POSEntry, POSEntryWithError, ShowProgressDialog);
                 end;
             until POSEntry.Next() = 0;
+    end;
+
+    local procedure TryRemoveDeferralPostingBuffer(POSEntry: Record "NPR POS Entry")
+    var
+        DeferralPostingBuffer: Record "Deferral Posting Buffer";
+    begin
+        if POSEntry."Post Entry Status" <> POSEntry."Post Entry Status"::"Error while Posting" then
+            exit;
+        DeferralPostingBuffer.SetRange("Document No.", Format(POSEntry."Entry No."));
+        if DeferralPostingBuffer.IsEmpty() then
+            exit;
+        DeferralPostingBuffer.DeleteAll();
     end;
 
     local procedure MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer: Record "NPR POS Posting Buffer"; AmountIn: Decimal; AmountInLCY: Decimal; PostingType: Enum "General Posting Type"; AccountType: Enum "Gen. Journal Account Type";
@@ -1869,17 +1888,16 @@
             until POSEntry2.Next() = 0;
     end;
 
-    local procedure AssignAndCalculateDeferralSchedule(var POSSalesLineToPost: Record "NPR POS Entry Sales Line"; POSEntry: Record "NPR POS Entry"): Integer
+    local procedure AssignAndCalculateDeferralSchedule(var POSSalesLineToPost: Record "NPR POS Entry Sales Line"; POSEntry: Record "NPR POS Entry")
     var
         DeferralHeader: Record "Deferral Header";
         DeferralTemplate: Record "Deferral Template";
         GLAccount: Record "G/L Account";
         Item: Record Item;
         DeferralUtilities: Codeunit "Deferral Utilities";
-        SalesAccount: Code[20];
-        LineAmountExclVAT: Decimal;
-        LineAmountExclVATLCY: Decimal;
     begin
+        if DeferralHeader.Get(Enum::"Deferral Document Type"::"G/L", '', '', Database::"NPR POS Entry Sales Line", Format(POSSalesLineToPost."POS Entry No."), POSSalesLineToPost."Line No.") then
+            exit;
         if POSSalesLineToPost."Deferral Code" = '' then
             case POSSalesLineToPost.Type of
                 POSSalesLineToPost.Type::Item:
@@ -1889,33 +1907,17 @@
                     if GLAccount.Get(POSSalesLineToPost."No.") then
                         POSSalesLineToPost."Deferral Code" := GLAccount."Default Deferral Template Code";
             end;
+        if POSSalesLineToPost."Deferral Code" = '' then
+            exit;
+        DeferralTemplate.Get(POSSalesLineToPost."Deferral Code");
+        DeferralUtilities.CreateDeferralSchedule(DeferralTemplate."Deferral Code", Enum::"Deferral Document Type"::"G/L".AsInteger(), '', '', Database::"NPR POS Entry Sales Line", Format(POSSalesLineToPost."POS Entry No."), POSSalesLineToPost."Line No.", POSSalesLineToPost."Amount Excl. VAT (LCY)", DeferralTemplate."Calc. Method",
+            GetDeferralStartingDate(POSSalesLineToPost, POSEntry), DeferralTemplate."No. of Periods", false, DeferralTemplate.Description, false, POSSalesLineToPost."Currency Code");
 
-        if POSSalesLineToPost."Deferral Code" <> '' then begin
-            LineAmountExclVAT := POSSalesLineToPost."Amount Excl. VAT";
-            LineAmountExclVATLCY := POSSalesLineToPost."Amount Excl. VAT (LCY)";
-            DeferralTemplate.Get(POSSalesLineToPost."Deferral Code");
-            DeferralUtilities.CreateDeferralSchedule(DeferralTemplate."Deferral Code", Enum::"Deferral Document Type"::"G/L".AsInteger(), '', '', Database::"NPR POS Entry Sales Line", Format(POSSalesLineToPost."POS Entry No."), POSSalesLineToPost."Line No.", LineAmountExclVATLCY, DeferralTemplate."Calc. Method",
-                GetDeferralStartingDate(POSSalesLineToPost, POSEntry), DeferralTemplate."No. of Periods", false, DeferralTemplate.Description, false, POSSalesLineToPost."Currency Code");
-            POSSalesLineToPost."Deferral Line No." := POSSalesLineToPost."Line No.";
-
-            if DeferralHeader.Get(Enum::"Deferral Document Type"::"G/L", '', '', Database::"NPR POS Entry Sales Line", Format(POSSalesLineToPost."POS Entry No."), POSSalesLineToPost."Line No.") then begin
-                DeferralUtilities.RoundDeferralAmount(DeferralHeader, POSSalesLineToPost."Currency Code", 1, POSEntry."Posting Date", LineAmountExclVAT, LineAmountExclVATLCY);
-            end;
-
-            SalesAccount := GetSalesAccount(POSSalesLineToPost);
-#if BC17 or BC18 or BC19 or BC21 or BC22 or BC23 or BC24
-            PrepareDeferralLine(POSEntry, POSSalesLineToPost, LineAmountExclVATLCY, LineAmountExclVAT, LineAmountExclVATLCY, LineAmountExclVAT, DeferralTemplate."Deferral Account", SalesAccount);
-#else
-            PrepareDeferralLine(POSEntry, POSSalesLineToPost, LineAmountExclVATLCY, LineAmountExclVAT,
-                LineAmountExclVATLCY, LineAmountExclVAT, DeferralTemplate."Deferral Account", SalesAccount, POSEntry."Discount Amount" + POSSalesLineToPost."Line Discount Amount Excl. VAT", POSEntry."Discount Amount" + POSSalesLineToPost."Line Discount Amount Excl. VAT");
-#endif
-            SavePOSSalesLineDeferralCode(POSSalesLineToPost);
-
-            CreatePostedDeferralSchedule(POSSalesLineToPost, POSEntry);
-        end;
+        if DeferralHeader.Get(Enum::"Deferral Document Type"::"G/L", '', '', Database::"NPR POS Entry Sales Line", Format(POSSalesLineToPost."POS Entry No."), POSSalesLineToPost."Line No.") then
+            DeferralUtilities.RoundDeferralAmount(DeferralHeader, POSSalesLineToPost."Currency Code", 1, POSEntry."Posting Date", POSSalesLineToPost."Amount Excl. VAT", POSSalesLineToPost."Amount Excl. VAT (LCY)");
     end;
 
-    local procedure CreatePostedDeferralSchedule(POSEntrySalesLine: Record "NPR POS Entry Sales Line"; POSEntry: Record "NPR POS Entry")
+    local procedure MoveDeferralScheduleToPosted(var POSEntrySalesLine: Record "NPR POS Entry Sales Line"; POSEntry: Record "NPR POS Entry")
     var
         DeferralTemplate: Record "Deferral Template";
         DeferralHeader: Record "Deferral Header";
@@ -1925,20 +1927,28 @@
         DeferralUtilities: Codeunit "Deferral Utilities";
         DeferralAccount: Code[20];
     begin
-        if DeferralTemplate.Get(POSEntrySalesLine."Deferral Code") then
-            DeferralAccount := DeferralTemplate."Deferral Account";
+        POSEntrySalesLine.Reset();
+        if not POSEntrySalesLine.FindSet() then
+            exit;
+        repeat
+            if POSEntrySalesLine."Deferral Code" <> '' then
+                if DeferralHeader.Get(Enum::"Deferral Document Type"::"G/L", '', '', Database::"NPR POS Entry Sales Line", Format(POSEntrySalesLine."POS Entry No."), POSEntrySalesLine."Line No.") then begin
+                    DeferralTemplate.Get(POSEntrySalesLine."Deferral Code");
+                    DeferralAccount := DeferralTemplate."Deferral Account";
+                    PostedDeferralHeader.InitFromDeferralHeader(
+                        DeferralHeader, '', '', Database::"NPR POS Entry Sales Line", Format(POSEntrySalesLine."POS Entry No."), POSEntrySalesLine."Line No.", DeferralAccount, POSEntry."Customer No.", POSEntry."Posting Date");
 
-        if DeferralHeader.Get(Enum::"Deferral Document Type"::"G/L", '', '', Database::"NPR POS Entry Sales Line", Format(POSEntrySalesLine."POS Entry No."), POSEntrySalesLine."Line No.") then begin
-            PostedDeferralHeader.InitFromDeferralHeader(DeferralHeader, '', '',
-                Database::"NPR POS Entry Sales Line", Format(POSEntrySalesLine."POS Entry No."), POSEntrySalesLine."Line No.", DeferralAccount, POSEntry."Customer No.", POSEntry."Posting Date");
-            DeferralUtilities.FilterDeferralLines(DeferralLine, Enum::"Deferral Document Type"::"G/L".AsInteger(), '', '',
-                Database::"NPR POS Entry Sales Line", Format(POSEntrySalesLine."POS Entry No."), POSEntrySalesLine."Line No.");
-            if DeferralLine.FindSet() then
-                repeat
-                    PostedDeferralLine.InitFromDeferralLine(
-                        DeferralLine, '', '', Database::"NPR POS Entry Sales Line", Format(POSEntrySalesLine."POS Entry No."), POSEntrySalesLine."Line No.", DeferralAccount);
-                until DeferralLine.Next() = 0;
-        end;
+                    DeferralUtilities.FilterDeferralLines(
+                        DeferralLine, Enum::"Deferral Document Type"::"G/L".AsInteger(), '', '', Database::"NPR POS Entry Sales Line", Format(POSEntrySalesLine."POS Entry No."), POSEntrySalesLine."Line No.");
+                    if DeferralLine.FindSet() then
+                        repeat
+                            PostedDeferralLine.InitFromDeferralLine(
+                                DeferralLine, '', '', Database::"NPR POS Entry Sales Line", Format(POSEntrySalesLine."POS Entry No."), POSEntrySalesLine."Line No.", DeferralAccount);
+                        until DeferralLine.Next() = 0;
+                    SavePOSSalesLineDeferralCode(POSEntrySalesLine);
+                    DeferralHeader.Delete(true);
+                end;
+        until POSEntrySalesLine.Next() = 0;
     end;
 
     local procedure SavePOSSalesLineDeferralCode(POSSalesLineToPost: Record "NPR POS Entry Sales Line")
@@ -1947,28 +1957,34 @@
     begin
         if not POSEntrySalesLine.Get(POSSalesLineToPost."POS Entry No.", POSSalesLineToPost."Line No.") then
             exit;
+        if POSEntrySalesLine."Deferral Code" = POSSalesLineToPost."Deferral Code" then
+            exit;
         POSEntrySalesLine."Deferral Code" := POSSalesLineToPost."Deferral Code";
         POSEntrySalesLine.Modify();
     end;
 
-    local procedure GetSalesAccount(POSSalesLine: Record "NPR POS Entry Sales Line"): Code[20]
+    local procedure GetSalesAccount(POSEntrySalesLine: Record "NPR POS Entry Sales Line"): Code[20]
     var
         GeneralPostingSetup: Record "General Posting Setup";
     begin
-        case POSSalesLine.Type of
-            POSSalesLine.Type::Item:
-                if GeneralPostingSetup.Get(POSSalesLine."Gen. Bus. Posting Group", POSSalesLine."Gen. Prod. Posting Group") then
+        case POSEntrySalesLine.Type of
+            POSEntrySalesLine.Type::Item:
+                begin
+                    GeneralPostingSetup.Get(POSEntrySalesLine."Gen. Bus. Posting Group", POSEntrySalesLine."Gen. Prod. Posting Group");
+                    GeneralPostingSetup.TestField("Sales Account");
                     exit(GeneralPostingSetup."Sales Account");
-            POSSalesLine.Type::"G/L Account":
-                exit(POSSalesLine."No.");
+                end;
+            POSEntrySalesLine.Type::"G/L Account":
+                begin
+                    POSEntrySalesLine.TestField("No.");
+                    exit(POSEntrySalesLine."No.");
+                end
+            else
+                POSEntrySalesLine.FieldError(Type);
         end;
     end;
 
-#if BC17 or BC18 or BC19 or BC21 or BC22 or BC23 or BC24
-    local procedure PrepareDeferralLine(POSEntry: Record "NPR POS Entry"; POSSalesLineToPost: Record "NPR POS Entry Sales Line"; AmountLCY: Decimal; AmountACY: Decimal; RemainAmtToDefer: Decimal; RemainAmtToDeferACY: Decimal; DeferralAccount: Code[20]; SalesAccount: Code[20])
-#else
-    local procedure PrepareDeferralLine(POSEntry: Record "NPR POS Entry"; POSSalesLineToPost: Record "NPR POS Entry Sales Line"; AmountLCY: Decimal; AmountACY: Decimal; RemainAmtToDefer: Decimal; RemainAmtToDeferACY: Decimal; DeferralAccount: Code[20]; SalesAccount: Code[20]; DiscountAmount: Decimal; DiscountAmountACY: Decimal)
-#endif
+    internal procedure CreateCompressedDeferralBuffer(POSEntry: Record "NPR POS Entry"; POSEntrySalesLine: Record "NPR POS Entry Sales Line"; InvDefLineNo: Integer)
     var
         DeferralTemplate: Record "Deferral Template";
         DeferralPostingBuffer: Record "Deferral Posting Buffer";
@@ -1978,85 +1994,94 @@
         TempInvoicePostingBuffer: Record "Invoice Post. Buffer" temporary;
 #endif
         DeferralUtilities: Codeunit "Deferral Utilities";
+        SalesAccount: Code[20];
         NoDeferralScheduleErr: Label 'You must create a deferral schedule because you have specified the deferral code %2 in line %1.', Comment = '%1=The item number of the POS entry sales transaction line, %2=The Deferral Template Code';
         ZeroDeferralAmtErr: Label 'Deferral amounts cannot be 0. Line: %1, Deferral Template: %2.', Comment = '%1=The item number of the POS entry sales transaction line, %2=The Deferral Template Code';
     begin
-        DeferralTemplate.Get(POSSalesLineToPost."Deferral Code");
+        if POSEntrySalesLine."Deferral Code" = '' then
+            exit;
+        DeferralTemplate.Get(POSEntrySalesLine."Deferral Code");
+        DeferralTemplate.TestField("Deferral Account");
 
-        if DeferralHeader.Get(
-            Enum::"Deferral Document Type"::"G/L", '', '', Database::"NPR POS Entry Sales Line", Format(POSSalesLineToPost."POS Entry No."), POSSalesLineToPost."Line No.")
-        then begin
-            if DeferralHeader."Amount to Defer" <> 0 then begin
-                DeferralUtilities.FilterDeferralLines(DeferralLine, Enum::"Deferral Document Type"::"G/L".AsInteger(), '', '',
-                    Database::"NPR POS Entry Sales Line", Format(POSSalesLineToPost."POS Entry No."), POSSalesLineToPost."Line No.");
+        if not DeferralHeader.Get(
+            Enum::"Deferral Document Type"::"G/L", '', '', Database::"NPR POS Entry Sales Line", Format(POSEntrySalesLine."POS Entry No."), POSEntrySalesLine."Line No.")
+           or (DeferralHeader."Amount to Defer" = 0)
+        then
+            Error(NoDeferralScheduleErr, POSEntrySalesLine."No.", POSEntrySalesLine."Deferral Code");
 
-                PrepareDeferralPOSSale(DeferralPostingBuffer, POSSalesLineToPost);
-                DeferralPostingBuffer."Posting Date" := POSEntry."Posting Date";
-                DeferralPostingBuffer.Description := POSEntry.Description;
-                DeferralPostingBuffer."Period Description" := DeferralTemplate."Period Description";
+        SalesAccount := GetSalesAccount(POSEntrySalesLine);
+        DeferralUtilities.FilterDeferralLines(
+            DeferralLine, Enum::"Deferral Document Type"::"G/L".AsInteger(), '', '',
+            Database::"NPR POS Entry Sales Line", Format(POSEntrySalesLine."POS Entry No."), POSEntrySalesLine."Line No.");
+
+        PrepareDeferralPOSSale(DeferralPostingBuffer, POSEntrySalesLine);
+        DeferralPostingBuffer."Posting Date" := POSEntry."Posting Date";
+        DeferralPostingBuffer.Description := POSEntry.Description;
+        DeferralPostingBuffer."Period Description" := DeferralTemplate."Period Description";
+        DeferralPostingBuffer."Deferral Line No." := InvDefLineNo;
 
 #if BC17 or BC18 or BC19 or BC21 or BC22 or BC23 or BC24
-                TempInvoicePostingBuffer.Amount := AmountLCY;
-                TempInvoicePostingBuffer."Amount (ACY)" := AmountACY;
-                TempInvoicePostingBuffer."Dimension Set ID" := POSSalesLineToPost."Dimension Set ID";
-                TempInvoicePostingBuffer."Global Dimension 1 Code" := POSSalesLineToPost."Shortcut Dimension 1 Code";
-                TempInvoicePostingBuffer."Global Dimension 2 Code" := POSSalesLineToPost."Shortcut Dimension 2 Code";
+        TempInvoicePostingBuffer.Amount := POSEntrySalesLine."Amount Excl. VAT (LCY)";
+        TempInvoicePostingBuffer."Amount (ACY)" := POSEntrySalesLine."Amount Excl. VAT";
+        TempInvoicePostingBuffer."Dimension Set ID" := POSEntrySalesLine."Dimension Set ID";
+        TempInvoicePostingBuffer."Global Dimension 1 Code" := POSEntrySalesLine."Shortcut Dimension 1 Code";
+        TempInvoicePostingBuffer."Global Dimension 2 Code" := POSEntrySalesLine."Shortcut Dimension 2 Code";
 
-                DeferralPostingBuffer.PrepareInitialPair(TempInvoicePostingBuffer, RemainAmtToDefer, RemainAmtToDeferACY, SalesAccount, DeferralAccount);
+        DeferralPostingBuffer.PrepareInitialPair(TempInvoicePostingBuffer, POSEntrySalesLine."Amount Excl. VAT (LCY)", POSEntrySalesLine."Amount Excl. VAT", SalesAccount,  DeferralTemplate."Deferral Account");
+        DeferralPostingBuffer.ReverseAmounts();
+        DeferralPostingBuffer.Update(DeferralPostingBuffer, TempInvoicePostingBuffer);
+#else
+        DeferralPostingBuffer.PrepareInitialAmounts(
+            POSEntrySalesLine."Amount Excl. VAT (LCY)", POSEntrySalesLine."Amount Excl. VAT", POSEntrySalesLine."Amount Excl. VAT (LCY)", POSEntrySalesLine."Amount Excl. VAT", SalesAccount, DeferralTemplate."Deferral Account", POSEntry."Discount Amount" + POSEntrySalesLine."Line Discount Amount Excl. VAT", POSEntry."Discount Amount" + POSEntrySalesLine."Line Discount Amount Excl. VAT");
+        DeferralPostingBuffer.ReverseAmounts();
+        DeferralPostingBuffer.Update(DeferralPostingBuffer);
+#endif
+        if not DeferralLine.FindSet() then
+            Error(NoDeferralScheduleErr, POSEntrySalesLine."No.", POSEntrySalesLine."Deferral Code");
+        repeat
+            if (DeferralLine."Amount (LCY)" <> 0) or (DeferralLine.Amount <> 0) then begin
+                PrepareDeferralPOSSale(DeferralPostingBuffer, POSEntrySalesLine);
+                DeferralPostingBuffer.InitFromDeferralLine(DeferralLine);
                 DeferralPostingBuffer.ReverseAmounts();
+                DeferralPostingBuffer."G/L Account" := SalesAccount;
+                DeferralPostingBuffer."Deferral Account" := DeferralTemplate."Deferral Account";
+                DeferralPostingBuffer."Period Description" := DeferralTemplate."Period Description";
+                DeferralPostingBuffer."Deferral Line No." := InvDefLineNo;
+#if BC17 or BC18 or BC19 or BC21 or BC22 or BC23 or BC24
                 DeferralPostingBuffer.Update(DeferralPostingBuffer, TempInvoicePostingBuffer);
 #else
-                DeferralPostingBuffer.PrepareInitialAmounts(
-                  AmountLCY, AmountACY, RemainAmtToDefer, RemainAmtToDeferACY, SalesAccount, DeferralAccount, DiscountAmount, DiscountAmountACY);
-                DeferralPostingBuffer.ReverseAmounts();
                 DeferralPostingBuffer.Update(DeferralPostingBuffer);
 #endif
-                if DeferralLine.FindSet() then
-                    repeat
-                        if (DeferralLine."Amount (LCY)" <> 0) or (DeferralLine.Amount <> 0) then begin
-                            PrepareDeferralPOSSale(DeferralPostingBuffer, POSSalesLineToPost);
-                            DeferralPostingBuffer.InitFromDeferralLine(DeferralLine);
-                            DeferralPostingBuffer.ReverseAmounts();
-                            DeferralPostingBuffer."G/L Account" := SalesAccount;
-                            DeferralPostingBuffer."Deferral Account" := DeferralAccount;
-                            DeferralPostingBuffer."Period Description" := DeferralTemplate."Period Description";
-#if BC17 or BC18 or BC19 or BC21 or BC22 or BC23 or BC24
-                            DeferralPostingBuffer.Update(DeferralPostingBuffer, TempInvoicePostingBuffer);
-#else
-                            DeferralPostingBuffer.Update(DeferralPostingBuffer);
-#endif
-                        end else
-                            Error(ZeroDeferralAmtErr, POSSalesLineToPost."No.", POSSalesLineToPost."Deferral Code");
-
-                    until DeferralLine.Next() = 0
-
-                else
-                    Error(NoDeferralScheduleErr, POSSalesLineToPost."No.", POSSalesLineToPost."Deferral Code");
             end else
-                Error(NoDeferralScheduleErr, POSSalesLineToPost."No.", POSSalesLineToPost."Deferral Code")
-        end else
-            Error(NoDeferralScheduleErr, POSSalesLineToPost."No.", POSSalesLineToPost."Deferral Code");
+                Error(ZeroDeferralAmtErr, POSEntrySalesLine."No.", POSEntrySalesLine."Deferral Code");
+        until DeferralLine.Next() = 0
     end;
 
-    local procedure PrepareDeferralPOSSale(var DeferralPostingBuffer: Record "Deferral Posting Buffer"; POSSalesLineToPost: Record "NPR POS Entry Sales Line")
+    local procedure PrepareDeferralPOSSale(var DeferralPostingBuffer: Record "Deferral Posting Buffer"; POSEntrySalesLine: Record "NPR POS Entry Sales Line")
     begin
         Clear(DeferralPostingBuffer);
-        DeferralPostingBuffer.Type := POSSalesLineToPost.Type;
+        case POSEntrySalesLine.Type of
+            POSEntrySalesLine.Type::Item:
+                DeferralPostingBuffer.Type := POSEntrySalesLine.Type::Item;
+            POSEntrySalesLine.Type::"G/L Account":
+                DeferralPostingBuffer.Type := POSEntrySalesLine.Type::"G/L Account";
+        end;
         DeferralPostingBuffer."System-Created Entry" := true;
-        DeferralPostingBuffer."Global Dimension 1 Code" := POSSalesLineToPost."Shortcut Dimension 1 Code";
-        DeferralPostingBuffer."Global Dimension 2 Code" := POSSalesLineToPost."Shortcut Dimension 2 Code";
-        DeferralPostingBuffer."Dimension Set ID" := POSSalesLineToPost."Dimension Set ID";
+        DeferralPostingBuffer."Global Dimension 1 Code" := POSEntrySalesLine."Shortcut Dimension 1 Code";
+        DeferralPostingBuffer."Global Dimension 2 Code" := POSEntrySalesLine."Shortcut Dimension 2 Code";
+        DeferralPostingBuffer."Dimension Set ID" := POSEntrySalesLine."Dimension Set ID";
 
-        if POSSalesLineToPost."VAT Calculation Type" = POSSalesLineToPost."VAT Calculation Type"::"Sales Tax" then begin
-            DeferralPostingBuffer."Tax Area Code" := POSSalesLineToPost."Tax Area Code";
-            DeferralPostingBuffer."Tax Group Code" := POSSalesLineToPost."Tax Group Code";
-            DeferralPostingBuffer."Tax Liable" := POSSalesLineToPost."Tax Liable";
+        if POSEntrySalesLine."VAT Calculation Type" = POSEntrySalesLine."VAT Calculation Type"::"Sales Tax" then begin
+            DeferralPostingBuffer."Tax Area Code" := POSEntrySalesLine."Tax Area Code";
+            DeferralPostingBuffer."Tax Group Code" := POSEntrySalesLine."Tax Group Code";
+            DeferralPostingBuffer."Tax Liable" := POSEntrySalesLine."Tax Liable";
             DeferralPostingBuffer."Use Tax" := false;
         end;
-        DeferralPostingBuffer."Deferral Code" := POSSalesLineToPost."Deferral Code";
+        DeferralPostingBuffer."Deferral Code" := POSEntrySalesLine."Deferral Code";
         DeferralPostingBuffer."Deferral Doc. Type" := Enum::"Deferral Document Type"::Sales;
-        DeferralPostingBuffer."Document No." := Format(POSSalesLineToPost."Document No.");
-        DeferralPostingBuffer."Deferral Line No." := POSSalesLineToPost."Deferral Line No.";
+        DeferralPostingBuffer."Document No." := POSEntrySalesLine."Document No.";
+        DeferralPostingBuffer.SetRange("Deferral Doc. Type", DeferralPostingBuffer."Deferral Doc. Type");
+        DeferralPostingBuffer.SetRange("Document No.", DeferralPostingBuffer."Document No.");
     end;
 
     local procedure GetDeferralStartingDate(POSSalesLineToPost: Record "NPR POS Entry Sales Line"; POSEntry: Record "NPR POS Entry") StartDate: Date

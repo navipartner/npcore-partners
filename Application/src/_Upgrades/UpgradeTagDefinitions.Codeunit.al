@@ -214,6 +214,8 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", 'UpgradeMerchantAccountSetups'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", 'FixUnreconciledMagentoRefundPaymentLines'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Adyen Recon. Upgrade", 'RecreateForeignCurrencyDocuments'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS Entry Posting", 'UpgradePOSEntryDeferralSchedule'));
+
 #if not BC17
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'SetDataProcessingHandlerID'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'PhaseOutShopifyCCIntegration'));
@@ -863,6 +865,11 @@
                         exit('NPR-FixUnreconciledMagentoRefundPaymentLines-20250716');
                     'RecreateForeignCurrencyDocuments':
                         exit('NPR-RecreateForeignCurrencyDocuments-20250710');
+                end;
+            Codeunit::"NPR UPG POS Entry Posting":
+                case UpgradeStep of
+                    'UpgradePOSEntryDeferralSchedule':
+                        exit('NPR-UpgradePOSEntryDeferralSchedule-20250924');
                 end;
 #if not BC17
             Codeunit::"NPR Spfy App Upgrade":
