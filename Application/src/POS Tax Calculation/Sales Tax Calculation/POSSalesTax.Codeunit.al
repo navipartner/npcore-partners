@@ -325,7 +325,6 @@
 
     procedure CreatePostingBufferLinesFromPOSSalesLines(var POSSalesLineToBeCompressed: Record "NPR POS Entry Sales Line"; var POSPostingBuffer: Record "NPR POS Posting Buffer"; POSEntry: Record "NPR POS Entry")
     var
-        FeatureFlagManagement: Codeunit "NPR Feature Flags Management";
         POSPostEntries: Codeunit "NPR POS Post Entries";
         PostingDescription: Text;
         DeferralLineNo: Integer;
@@ -403,10 +402,7 @@
                     POSPostingBuffer."POS Entry No." := POSEntry."Entry No.";
                     POSPostingBuffer."Document No." := POSSalesLineToBeCompressed."Document No.";
                     POSPostingBuffer."Line No." := 0;
-                    if FeatureFlagManagement.IsEnabled('pospostingbuffertypefix') then
-                        POSPostingBuffer.Type := POSSalesLineToBeCompressed.Type
-                    else
-                        POSPostingBuffer.Type := POSSalesLineToBeCompressed.Type::Item;
+                    POSPostingBuffer.Type := POSSalesLineToBeCompressed.Type;
                     case POSSalesLineToBeCompressed.Type of
                         POSSalesLineToBeCompressed.Type::Rounding:
                             begin
