@@ -264,5 +264,23 @@ codeunit 6185102 "NPR MM Subscr. Request Utils"
         ResetProcessTryCount(SubscrRequest);
     end;
 
+    internal procedure LastRenewSchedPeriod(SubscrRequest: Record "NPR MM Subscr. Request"; RecurPaymSetup: Record "NPR MM Recur. Paym. Setup") IsLastRenewSchedPeriod: Boolean
+    var
+        CurrRenewalSchedLine: Record "NPR MM Renewal Sched Line";
+        RenewalSchedLine: Record "NPR MM Renewal Sched Line";
+    begin
+        IsLastRenewSchedPeriod := RecurPaymSetup."Subscr. Auto-Renewal On" <> RecurPaymSetup."Subscr. Auto-Renewal On"::Schedule;
+        if IsLastRenewSchedPeriod then
+            exit;
+
+        CurrRenewalSchedLine.SetLoadFields("Date Formula Duration (Days)");
+        CurrRenewalSchedLine.GetBySystemId(SubscrRequest."Renew Schedule Id");
+
+        RenewalSchedLine.Reset();
+        RenewalSchedLine.SetRange("Schedule Code", RecurPaymSetup."Subscr Auto-Renewal Sched Code");
+        RenewalSchedLine.SetFilter("Date Formula Duration (Days)", '>%1', CurrRenewalSchedLine."Date Formula Duration (Days)");
+        IsLastRenewSchedPeriod := RenewalSchedLine.IsEmpty();
+    end;
+
 
 }

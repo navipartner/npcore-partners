@@ -841,7 +841,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                              ErrorMessage,
                              SubscrPaymentRequest.Status::Rejected,
                              SubsPayReqLogEntry."Processing Status"::Error,
-                             RecurPaymSetup."Max. Pay. Process Try Count",
+                             0,
                              SubscrPaymentRequest."Rejected Reason Code",
                              SubscrPaymentRequest."Rejected Reason Description",
                              SubscrPaymentRequest."Result Code",
@@ -863,57 +863,83 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
 
         Commit();
 
-        if not CreatePayByLinkSubscriptionRequest(SubscrPaymentRequest, PayByLinkSubscrPaymentRequest, PayByLinkSubscrRequest) then begin
+        if not TryGetRecurringPaymentSetup(SubscrPaymentRequest, RecurPaymSetup) then begin
             ErrorMessage := GetLastErrorText();
             ProcessResponse(SubscrPaymentRequest,
-                            SubsPayReqLogEntry,
-                            '',
-                            '',
-                            ErrorMessage,
-                            SubscrPaymentRequest.Status::Rejected,
-                            SubsPayReqLogEntry."Processing Status"::Error,
-                            RecurPaymSetup."Max. Pay. Process Try Count",
-                            SubscrPaymentRequest."Rejected Reason Code",
-                            SubscrPaymentRequest."Rejected Reason Description",
-                            SubscrPaymentRequest."Result Code",
-                            SubsAdyenPGSetup.Code,
-                            SkipTryCountUpdate,
-                            SubscrPaymentRequest."PSP Reference",
-                            SubscrPaymentRequest."Payment PSP Reference",
-                            SubscrPaymentRequest."Pay by Link ID",
-                            SubscrPaymentRequest."Pay by Link URL",
-                            SubscrPaymentRequest."Pay By Link Expires At",
-                            0);
+                             SubsPayReqLogEntry,
+                             '',
+                             '',
+                             ErrorMessage,
+                             SubscrPaymentRequest.Status::Rejected,
+                             SubsPayReqLogEntry."Processing Status"::Error,
+                             0,
+                             SubscrPaymentRequest."Rejected Reason Code",
+                             SubscrPaymentRequest."Rejected Reason Description",
+                             SubscrPaymentRequest."Result Code",
+                             SubsAdyenPGSetup.Code,
+                             SkipTryCountUpdate,
+                             SubscrPaymentRequest."PSP Reference",
+                             SubscrPaymentRequest."Payment PSP Reference",
+                             SubscrPaymentRequest."Pay by Link ID",
+                             SubscrPaymentRequest."Pay by Link URL",
+                             SubscrPaymentRequest."Pay By Link Expires At",
+                             0);
             exit;
         end;
 
-        Commit();
+        if ExecutePayByLinkFunctionality(SubscrPaymentRequest, RecurPaymSetup) then begin
+            if not CreatePayByLinkSubscriptionRequest(SubscrPaymentRequest, PayByLinkSubscrPaymentRequest, PayByLinkSubscrRequest) then begin
+                ErrorMessage := GetLastErrorText();
+                ProcessResponse(SubscrPaymentRequest,
+                                SubsPayReqLogEntry,
+                                '',
+                                '',
+                                ErrorMessage,
+                                SubscrPaymentRequest.Status::Rejected,
+                                SubsPayReqLogEntry."Processing Status"::Error,
+                                0,
+                                SubscrPaymentRequest."Rejected Reason Code",
+                                SubscrPaymentRequest."Rejected Reason Description",
+                                SubscrPaymentRequest."Result Code",
+                                SubsAdyenPGSetup.Code,
+                                SkipTryCountUpdate,
+                                SubscrPaymentRequest."PSP Reference",
+                                SubscrPaymentRequest."Payment PSP Reference",
+                                SubscrPaymentRequest."Pay by Link ID",
+                                SubscrPaymentRequest."Pay by Link URL",
+                                SubscrPaymentRequest."Pay By Link Expires At",
+                                0);
+                exit;
+            end;
 
-        if not ProcessPaymentRequest(PayByLinkSubscrPaymentRequest, SkipTryCountUpdate, Manual) then begin
-            PayByLinkSubscrPaymentRequest.Get(PayByLinkSubscrPaymentRequest.RecordId);
-            ErrorMessage := GetLastErrorText();
-            ProcessResponse(SubscrPaymentRequest,
-                            SubsPayReqLogEntry,
-                            '',
-                            '',
-                            ErrorMessage,
-                            SubscrPaymentRequest.Status::Rejected,
-                            SubsPayReqLogEntry."Processing Status"::Error,
-                            RecurPaymSetup."Max. Pay. Process Try Count",
-                            SubscrPaymentRequest."Rejected Reason Code",
-                            SubscrPaymentRequest."Rejected Reason Description",
-                            SubscrPaymentRequest."Result Code",
-                            SubsAdyenPGSetup.Code,
-                            SkipTryCountUpdate,
-                            SubscrPaymentRequest."PSP Reference",
-                            SubscrPaymentRequest."Payment PSP Reference",
-                            SubscrPaymentRequest."Pay by Link ID",
-                            SubscrPaymentRequest."Pay by Link URL",
-                            SubscrPaymentRequest."Pay By Link Expires At",
-                            0);
-            PayByLinkSubscrPaymentRequest.Validate(Status, PayByLinkSubscrPaymentRequest.Status::Cancelled);
-            PayByLinkSubscrPaymentRequest.Modify(true);
-            exit;
+            Commit();
+
+            if not ProcessPaymentRequest(PayByLinkSubscrPaymentRequest, SkipTryCountUpdate, Manual) then begin
+                PayByLinkSubscrPaymentRequest.Get(PayByLinkSubscrPaymentRequest.RecordId);
+                ErrorMessage := GetLastErrorText();
+                ProcessResponse(SubscrPaymentRequest,
+                                SubsPayReqLogEntry,
+                                '',
+                                '',
+                                ErrorMessage,
+                                SubscrPaymentRequest.Status::Rejected,
+                                SubsPayReqLogEntry."Processing Status"::Error,
+                                0,
+                                SubscrPaymentRequest."Rejected Reason Code",
+                                SubscrPaymentRequest."Rejected Reason Description",
+                                SubscrPaymentRequest."Result Code",
+                                SubsAdyenPGSetup.Code,
+                                SkipTryCountUpdate,
+                                SubscrPaymentRequest."PSP Reference",
+                                SubscrPaymentRequest."Payment PSP Reference",
+                                SubscrPaymentRequest."Pay by Link ID",
+                                SubscrPaymentRequest."Pay by Link URL",
+                                SubscrPaymentRequest."Pay By Link Expires At",
+                                0);
+                PayByLinkSubscrPaymentRequest.Validate(Status, PayByLinkSubscrPaymentRequest.Status::Cancelled);
+                PayByLinkSubscrPaymentRequest.Modify(true);
+                exit;
+            end;
         end;
 
         ErrorMessage := '';
@@ -924,7 +950,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
                         ErrorMessage,
                         Enum::"NPR MM Payment Request Status"::Rejected,
                         SubsPayReqLogEntry."Processing Status"::Success,
-                        RecurPaymSetup."Max. Pay. Process Try Count",
+                        0,
                         SubscrPaymentRequest."Rejected Reason Code",
                         SubscrPaymentRequest."Rejected Reason Description",
                         SubscrPaymentRequest."Result Code",
@@ -2211,6 +2237,21 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         SubsTryMethods.GetPayByLinkSubscriptionPaymentRequest(PayByLinkSubscrPaymentRequest);
     end;
 
+    local procedure ExecutePayByLinkFunctionality(SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; RecurPaymSetup: Record "NPR MM Recur. Paym. Setup") PayByLinkCanBeExecuted: Boolean
+    var
+        SubscrRequest: Record "NPR MM Subscr. Request";
+        SubscrRequestUtils: Codeunit "NPR MM Subscr. Request Utils";
+    begin
+        if RecurPaymSetup."Subscr. Auto-Renewal On" <> RecurPaymSetup."Subscr. Auto-Renewal On"::Schedule then begin
+            PayByLinkCanBeExecuted := true;
+            exit;
+        end;
+
+        SubscrRequest.SetLoadFields("Renew Schedule Id");
+        SubscrRequest.Get(SubscrPaymentRequest."Subscr. Request Entry No.");
+        PayByLinkCanBeExecuted := SubscrRequestUtils.LastRenewSchedPeriod(SubscrRequest, RecurPaymSetup);
+    end;
+
     [TryFunction]
     local procedure TryGetOriginalPaymentRequest(var SubscrPmtRefundRequest: Record "NPR MM Subscr. Payment Request"; var SubscrPmtOriginalRequest: Record "NPR MM Subscr. Payment Request")
     begin
@@ -2417,6 +2458,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
     begin
         AdyenManagement.EnsureAdyenWebhookSetup(RefundEventFilter, MerchantName, AdyenWebhookType::standard);
     end;
+
 
     [IntegrationEvent(false, false)]
     procedure OnBeforeInvokeAPI(var Request: Text; var Response: Text; var Handled: Boolean)

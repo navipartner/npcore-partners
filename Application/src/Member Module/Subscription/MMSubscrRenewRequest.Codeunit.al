@@ -5,6 +5,7 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
 
     var
         _RecurPaymentSetup: Record "NPR MM Recur. Paym. Setup";
+        _RenewalSchedLine: Record "NPR MM Renewal Sched Line";
         _BatchNo: Integer;
         _SkipProcessSubscriptionCheck: Boolean;
 
@@ -33,8 +34,8 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
         if _RecurPaymentSetup."Subscr. Auto-Renewal On" = _RecurPaymentSetup."Subscr. Auto-Renewal On"::Never then
             _RecurPaymentSetup.FieldError("Subscr. Auto-Renewal On");
 
-        CheckSubscriptionCanBeProcessed(Subscription, _RecurPaymentSetup);
-
+        CheckSubscriptionCanBeProcessed(Subscription);
+        GetRenewalScheduleLine(Subscription);
         CalculateSubscriptionRenewal(Subscription, SubscriptionRequest, RenewWithItemNo);
 
         if _RecurPaymentSetup."Subscr. Auto-Renewal On" = _RecurPaymentSetup."Subscr. Auto-Renewal On"::"Next Start Date" then
@@ -51,6 +52,9 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
         SubscriptionRequest.Status := SubscriptionRequest.Status::New;
         SubscriptionRequest.Description := CopyStr(StrSubstNo(RenewDescrTxt, Subscription."Membership Code", Format(SubscriptionRequest."New Valid From Date", 0, 7), Format(SubscriptionRequest."New Valid Until Date", 0, 7)), 1, MaxStrLen(SubscriptionRequest.Description));
         SubscriptionRequest."Entry No." := 0;
+        SubscriptionRequest."Renew Schedule Date" := WorkDate();
+        SubscriptionRequest."Renew Schedule Date Formula" := _RenewalSchedLine."Date Formula";
+        SubscriptionRequest."Renew Schedule Id" := _RenewalSchedLine.SystemId;
         SubscriptionRequest.Insert();
 
         CreateSubscriptionPaymentRequest(Subscription, SubscriptionRequest, SubscrPaymentRequest);
@@ -185,6 +189,11 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
         _RecurPaymentSetup := RecurPaymentSetupIn;
     end;
 
+    internal procedure SetRenewalSchedLine(RenewalSchedLine: Record "NPR MM Renewal Sched Line")
+    begin
+        _RenewalSchedLine := RenewalSchedLine;
+    end;
+
     internal procedure SetSkipProcessSubscriptionCheck(SkipProcessSubscriptionCheck: Boolean)
     begin
         _SkipProcessSubscriptionCheck := SkipProcessSubscriptionCheck
@@ -270,7 +279,7 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
         end;
     end;
 
-    local procedure CheckSubscriptionCanBeProcessed(Subscription: Record "NPR MM Subscription"; RecurPaymentSetup: Record "NPR MM Recur. Paym. Setup")
+    local procedure CheckSubscriptionCanBeProcessed(Subscription: Record "NPR MM Subscription")
     var
         ValidUntilDate: Date;
         SubscriptionBlockedErrorLbl: Label 'Subscription no. %1 is blocked.', Comment = '%1 - subscription no.';
@@ -285,10 +294,11 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
         if Subscription.Blocked then
             Error(SubscriptionBlockedErrorLbl, Subscription."Entry No.");
 
-        ValidUntilDate := Today() + RecurPaymentSetup."First Attempt Offset (Days)";
-        if Subscription."Valid Until Date" > ValidUntilDate then
-            Error(SubscriptionValidErrorLbl, Subscription."Entry No.", Subscription."Valid Until Date");
-
+        if _RecurPaymentSetup."Subscr. Auto-Renewal On" in [_RecurPaymentSetup."Subscr. Auto-Renewal On"::"Next Start Date", _RecurPaymentSetup."Subscr. Auto-Renewal On"::"Expiry Date"] then begin
+            ValidUntilDate := Today() + _RecurPaymentSetup."First Attempt Offset (Days)";
+            if Subscription."Valid Until Date" > ValidUntilDate then
+                Error(SubscriptionValidErrorLbl, Subscription."Entry No.", Subscription."Valid Until Date");
+        end;
         if Subscription."Postpone Renewal Attempt Until" > Today() then
             Error(PostponedRenewalErrorLbl, Subscription."Entry No.", Subscription."Postpone Renewal Attempt Until");
 
@@ -299,5 +309,35 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
 
         if Subscription."Auto-Renew" <> Subscription."Auto-Renew"::YES_INTERNAL then
             Error(MemberhsipNotSetForAutoRenewErrorLbl, Subscription."Membership Entry No.", Subscription."Entry No.");
+    end;
+
+    local procedure GetRenewalScheduleLine(Subscription: Record "NPR MM Subscription")
+    var
+        CurrRenewalSchedLine: Record "NPR MM Renewal Sched Line";
+        RenewalDate: Date;
+        RenewalDateValid: Boolean;
+        SubscriptionScheduleValidErrorLbl: Label 'Subscription no. %1 is outside of its renewal schedule.', Comment = '%1 - subscription no.';
+    begin
+        if _RenewalSchedLine."Schedule Code" <> '' then
+            exit;
+
+        if _RecurPaymentSetup."Subscr. Auto-Renewal On" <> _RecurPaymentSetup."Subscr. Auto-Renewal On"::Schedule then
+            exit;
+
+        _RecurPaymentSetup.TestField("Subscr Auto-Renewal Sched Code");
+
+        CurrRenewalSchedLine.Reset();
+        CurrRenewalSchedLine.SetRange("Schedule Code", _RecurPaymentSetup."Subscr Auto-Renewal Sched Code");
+        CurrRenewalSchedLine.SetCurrentKey("Schedule Code", "Date Formula Duration (Days)");
+        if CurrRenewalSchedLine.FindSet() then
+            repeat
+                RenewalDate := WorkDate() - CurrRenewalSchedLine."Date Formula Duration (Days)";
+                RenewalDateValid := RenewalDate = Subscription."Valid Until Date";
+                if RenewalDateValid then
+                    _RenewalSchedLine := CurrRenewalSchedLine;
+            until (CurrRenewalSchedLine.Next() = 0) or RenewalDateValid;
+
+        if not RenewalDateValid then
+            Error(SubscriptionScheduleValidErrorLbl, Subscription."Entry No.");
     end;
 }

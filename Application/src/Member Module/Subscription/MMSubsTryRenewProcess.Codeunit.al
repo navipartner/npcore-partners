@@ -45,7 +45,10 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
         Membership: Record "NPR MM Membership";
         Subscription: Record "NPR MM Subscription";
         SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request";
+        RecurPaymSetup: Record "NPR MM Recur. Paym. Setup";
+        MembershipSetup: Record "NPR MM Membership Setup";
         MemberNotification: Codeunit "NPR MM Member Notification";
+        SubscrRequestUtils: Codeunit "NPR MM Subscr. Request Utils";
         SubscrPaymentIHandler: Interface "NPR MM Subs Payment IHandler";
         PaymentLinkUrl: Text[2048];
     begin
@@ -54,8 +57,13 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
         Subscription.Modify(true);
 
         Membership.Get(Subscription."Membership Entry No.");
-        Membership."Auto-Renew" := Membership."Auto-Renew"::NO;
-        Membership.Modify(true);
+        MembershipSetup.Get(Membership."Membership Code");
+        RecurPaymSetup.Get(MembershipSetup."Recurring Payment Code");
+
+        if SubscrRequestUtils.LastRenewSchedPeriod(SubscriptionRequest, RecurPaymSetup) then begin
+            Membership."Auto-Renew" := Membership."Auto-Renew"::NO;
+            Membership.Modify(true);
+        end;
 
         SubscrPaymentRequest.Reset();
         SubscrPaymentRequest.SetCurrentKey("Subscr. Request Entry No.", Status);

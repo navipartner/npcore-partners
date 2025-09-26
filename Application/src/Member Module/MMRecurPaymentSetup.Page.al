@@ -47,11 +47,30 @@
                 {
                     ToolTip = 'Specifies when the system should automatically renew subscriptions.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    trigger OnValidate()
+                    begin
+                        CurrPage.Update();
+                    end;
                 }
-                field("First Attempt Offset (Days)"; Rec."First Attempt Offset (Days)")
+                group(RenewScheduleOpions)
                 {
-                    ToolTip = 'Specifies how many days before the auto-renewal date the system will first attempt to automatically renew the subscription. This helps to ensure continuity of service for subscribers.';
-                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ShowCaption = false;
+                    Visible = Rec."Subscr. Auto-Renewal On" = Rec."Subscr. Auto-Renewal On"::Schedule;
+                    field("Subscr Auto-Renewal Sched Code"; Rec."Subscr Auto-Renewal Sched Code")
+                    {
+                        ToolTip = 'Specifies the renewal schedule code used when auto-renewal is set to Schedule.';
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    }
+                }
+                group(RenewWithoutScheduleOpions)
+                {
+                    ShowCaption = false;
+                    Visible = Rec."Subscr. Auto-Renewal On" <> Rec."Subscr. Auto-Renewal On"::Schedule;
+                    field("First Attempt Offset (Days)"; Rec."First Attempt Offset (Days)")
+                    {
+                        ToolTip = 'Specifies how many days before the auto-renewal date the system will first attempt to automatically renew the subscription. This helps to ensure continuity of service for subscribers.';
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    }
                 }
                 field("Max. Process Error Retry Count"; Rec."Max. Pay. Process Try Count")
                 {

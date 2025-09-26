@@ -171,6 +171,22 @@ table 6150923 "NPR MM Subscr. Request"
             Caption = 'Created from Entry No.';
             DataClassification = CustomerContent;
         }
+        field(240; "Renew Schedule Id"; Guid)
+        {
+            Caption = 'Renew Schedule Id';
+            DataClassification = CustomerContent;
+        }
+
+        field(250; "Renew Schedule Date Formula"; DateFormula)
+        {
+            Caption = 'Renew Schedule Date Formula';
+            DataClassification = CustomerContent;
+        }
+        field(251; "Renew Schedule Date"; Date)
+        {
+            Caption = 'Renew Schedule Date';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -183,6 +199,8 @@ table 6150923 "NPR MM Subscr. Request"
         key(Key3; "Processing Status", Type, Status) { }
         key(Key4; "Subscription Entry No.", "Processing Status") { }
         key(Key5; "Reversed by Entry No.") { }
+        key(Key6; "Subscription Entry No.", "Renew Schedule Id", "Renew Schedule Date", Type, Status) { }
+        key(Key7; "Subscription Entry No.", Type, "Processing Status", Status) { }
     }
 
     trigger OnDelete()

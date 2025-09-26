@@ -115,6 +115,12 @@
             Caption = 'Enforce Termination Period';
             DataClassification = CustomerContent;
         }
+        field(9; "Subscr Auto-Renewal Sched Code"; Code[20])
+        {
+            Caption = 'Subscr. Auto-Renew Schedule Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR MM Renewal Sched Hdr".Code;
+        }
     }
 
     keys

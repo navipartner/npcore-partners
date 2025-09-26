@@ -94,6 +94,23 @@ table 6150918 "NPR MM Subscription"
             Caption = 'Termination Requested At';
             DataClassification = CustomerContent;
         }
+        field(253; "Subscr Renew Sched Date Filter"; Date)
+        {
+            Caption = 'Subscr. Renew Schedule Date Filter';
+            FieldClass = FlowFilter;
+        }
+        field(254; "Subscr Renew Sched Id Filter"; Guid)
+        {
+            Caption = 'Subscr Renew Sched Id Filter';
+            FieldClass = FlowFilter;
+        }
+        field(255; "Subscr Renew Sched Req Exist"; Boolean)
+        {
+            Caption = 'Subscr. Renew Schedule Requests Exist';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = exist("NPR MM Subscr. Request" where("Renew Schedule Date" = field("Subscr Renew Sched Date Filter"), "Renew Schedule Id" = field("Subscr Renew Sched Id Filter"), Type = Const(Renew), Status = filter(<> Cancelled), "Subscription Entry No." = field("Entry No.")));
+        }
     }
 
     keys
