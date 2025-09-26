@@ -1896,6 +1896,8 @@
         Item: Record Item;
         DeferralUtilities: Codeunit "Deferral Utilities";
     begin
+        if POSSalesLineToPost."Amount Excl. VAT (LCY)" = 0 then
+            exit;
         if DeferralHeader.Get(Enum::"Deferral Document Type"::"G/L", '', '', Database::"NPR POS Entry Sales Line", Format(POSSalesLineToPost."POS Entry No."), POSSalesLineToPost."Line No.") then
             exit;
         if POSSalesLineToPost."Deferral Code" = '' then
@@ -1911,7 +1913,7 @@
             exit;
         DeferralTemplate.Get(POSSalesLineToPost."Deferral Code");
         DeferralUtilities.CreateDeferralSchedule(DeferralTemplate."Deferral Code", Enum::"Deferral Document Type"::"G/L".AsInteger(), '', '', Database::"NPR POS Entry Sales Line", Format(POSSalesLineToPost."POS Entry No."), POSSalesLineToPost."Line No.", POSSalesLineToPost."Amount Excl. VAT (LCY)", DeferralTemplate."Calc. Method",
-            GetDeferralStartingDate(POSSalesLineToPost, POSEntry), DeferralTemplate."No. of Periods", false, DeferralTemplate.Description, false, POSSalesLineToPost."Currency Code");
+            GetDeferralStartingDate(POSSalesLineToPost, POSEntry), GetDeferralNoOfPeriods(POSSalesLineToPost, DeferralTemplate), false, DeferralTemplate.Description, false, POSSalesLineToPost."Currency Code");
 
         if DeferralHeader.Get(Enum::"Deferral Document Type"::"G/L", '', '', Database::"NPR POS Entry Sales Line", Format(POSSalesLineToPost."POS Entry No."), POSSalesLineToPost."Line No.") then
             DeferralUtilities.RoundDeferralAmount(DeferralHeader, POSSalesLineToPost."Currency Code", 1, POSEntry."Posting Date", POSSalesLineToPost."Amount Excl. VAT", POSSalesLineToPost."Amount Excl. VAT (LCY)");
@@ -2000,14 +2002,11 @@
     begin
         if POSEntrySalesLine."Deferral Code" = '' then
             exit;
+
+        if not DeferralHeader.Get(Enum::"Deferral Document Type"::"G/L", '', '', Database::"NPR POS Entry Sales Line", Format(POSEntrySalesLine."POS Entry No."), POSEntrySalesLine."Line No.") then
+            exit;
         DeferralTemplate.Get(POSEntrySalesLine."Deferral Code");
         DeferralTemplate.TestField("Deferral Account");
-
-        if not DeferralHeader.Get(
-            Enum::"Deferral Document Type"::"G/L", '', '', Database::"NPR POS Entry Sales Line", Format(POSEntrySalesLine."POS Entry No."), POSEntrySalesLine."Line No.")
-           or (DeferralHeader."Amount to Defer" = 0)
-        then
-            Error(NoDeferralScheduleErr, POSEntrySalesLine."No.", POSEntrySalesLine."Deferral Code");
 
         SalesAccount := GetSalesAccount(POSEntrySalesLine);
         DeferralUtilities.FilterDeferralLines(
@@ -2099,5 +2098,46 @@
             exit;
         if MembershipEntry."Valid From Date" <> 0D then
             StartDate := MembershipEntry."Valid From Date";
+    end;
+
+    local procedure GetDeferralNoOfPeriods(POSSalesLineToPost: Record "NPR POS Entry Sales Line"; DeferralTemplate: Record "Deferral Template") NoOfPeriods: Integer
+    var
+        MembershipEntry: Record "NPR MM Membership Entry";
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+        ValidUntilDate: Date;
+    begin
+        NoOfPeriods := DeferralTemplate."No. of Periods";
+        if POSSalesLineToPost.Type <> POSSalesLineToPost.Type::Item then
+            exit;
+        MembershipEntry.SetCurrentKey("Receipt No.", "Line No.");
+        MembershipEntry.SetRange("Receipt No.", POSSalesLineToPost."Document No.");
+        MembershipEntry.SetRange("Line No.", POSSalesLineToPost."Line No.");
+        MembershipEntry.SetLoadFields("Entry No.", Context, "Valid From Date");
+        if not MembershipEntry.FindFirst() then
+            exit;
+        case MembershipEntry.Context of
+            MembershipEntry.Context::UPGRADE:
+                begin
+                    ValidUntilDate := MembershipMgtInternal.GetUpgradeInitialValidUntilDate(MembershipEntry."Entry No.");
+                    if (MembershipEntry."Valid From Date" <> 0D) and (ValidUntilDate <> 0D) and (ValidUntilDate >= MembershipEntry."Valid From Date") then
+                        NoOfPeriods := CountDefNoOfPeriodsBetweenDates(MembershipEntry."Valid From Date", ValidUntilDate);
+                end;
+        end;
+    end;
+
+    local procedure CountDefNoOfPeriodsBetweenDates(StartDate: Date; EndDate: Date): Integer
+    var
+        StartYear: Integer;
+        StartMonth: Integer;
+        EndYear: Integer;
+        EndMonth: Integer;
+    begin
+        StartYear := Date2DMY(StartDate, 3);
+        StartMonth := Date2DMY(StartDate, 2);
+
+        EndYear := Date2DMY(EndDate, 3);
+        EndMonth := Date2DMY(EndDate, 2);
+
+        exit(((EndYear - StartYear) * 12) + (EndMonth - StartMonth) + 1);
     end;
 }

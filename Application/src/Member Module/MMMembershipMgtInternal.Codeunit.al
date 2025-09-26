@@ -2589,7 +2589,7 @@
             ValidFrom := GetUpgradeInitialValidFromDate(MembershipEntry."Entry No.");
     end;
 
-    local procedure GetUpgradeInitialValidUntilDate(EntryNo: Integer) ValidUntil: Date
+    internal procedure GetUpgradeInitialValidUntilDate(EntryNo: Integer) ValidUntil: Date
     var
         MembershipEntry: Record "NPR MM Membership Entry";
     begin
