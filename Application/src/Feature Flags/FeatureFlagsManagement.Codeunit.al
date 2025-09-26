@@ -234,9 +234,6 @@ codeunit 6151495 "NPR Feature Flags Management"
     var
         SessionId: Integer;
     begin
-        if IsProdutionEnvironment() then
-            exit;
-
         if not GuiAllowed then
             exit;
 
