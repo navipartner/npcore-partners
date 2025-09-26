@@ -1276,4 +1276,10 @@ enum 6014470 "NPR POS Workflow" implements "NPR IPOS Workflow"
         Caption = 'M_SHOPASSISTANT', Locked = true, MaxLength = 20;
         Implementation = "NPR IPOS Workflow" = "NPR POS Action MShopAssistant";
     }
+
+    value(6248424; MM_MEMBER_ADMIT_EOS)
+    {
+        Caption = 'MM_MEMBER_ADMIT_EOS', Locked = true, MaxLength = 20;
+        Implementation = "NPR IPOS Workflow" = "NPR POSAction MemberAdmitOnEoS";
+    }
 }

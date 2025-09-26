@@ -9,7 +9,6 @@ page 6184631 "NPR MM POS Member Profiles"
     SourceTable = "NPR MM POS Member Profile";
     CardPageID = "NPR MM POS Member Profile";
 
-
     layout
     {
         area(content)
@@ -37,6 +36,22 @@ page 6184631 "NPR MM POS Member Profiles"
                 {
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies if a membership is going to be printed after the end of the pos sale.';
+                }
+                field("Alteration Group"; Rec."Alteration Group")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies a Alteration Group code for limiting the alterations shown on the POS.';
+                }
+
+                field(EndOfSaleAdmitMethod; Rec.EndOfSaleAdmitMethod)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the End-Of-Sale Admit Method field.';
+                }
+                field(ScannerIdForUnitAdmitOnEndSale; Rec.ScannerIdForUnitAdmitOnEndSale)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Scanner ID For Unit Admit On End Of Sale field.';
                 }
             }
         }

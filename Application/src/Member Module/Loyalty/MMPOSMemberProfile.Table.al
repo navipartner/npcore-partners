@@ -34,6 +34,25 @@ table 6150851 "NPR MM POS Member Profile"
             DataClassification = CustomerContent;
             TableRelation = "NPR MM Members. Alter. Group";
         }
+
+        field(20; EndOfSaleAdmitMethod; Enum "NPR MM AdmitMemberOnEoSMethod")
+        {
+            Caption = 'End-Of-Sale Admit Method';
+            DataClassification = CustomerContent;
+            InitValue = LEGACY;
+        }
+        field(22; ScannerIdForUnitAdmitOnEndSale; Code[10])
+        {
+            Caption = 'Scanner ID For Unit Admit On End Of Sale';
+            FieldClass = FlowField;
+            CalcFormula = lookup("NPR SG SpeedGate".ScannerId where(Id = field(ScannerIdForUnitAdmitEoSId)));
+        }
+        field(23; ScannerIdForUnitAdmitEoSId; Guid)
+        {
+            Caption = 'Scanner GUID For Unit Admit On End Of Sale';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR SG SpeedGate".Id;
+        }
     }
 
     keys

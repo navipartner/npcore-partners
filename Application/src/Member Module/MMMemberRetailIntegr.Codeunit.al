@@ -1037,6 +1037,7 @@
     var
         MemberInfoCaptureSales: Record "NPR MM Member Info Capture";
         MemberInfoCaptureLine: Record "NPR MM Member Info Capture";
+        MemberAdmitOnEndOfSale: Codeunit "NPR POSAction MemberAdmitOnEoS";
         ReasonCode: Integer;
         ReasonText: Text;
         PreviousLineNo: Integer;
@@ -1044,9 +1045,12 @@
         MemberTicketAdmitError: Label 'When auto-admitting member %1, the following error occurred: %2';
         MemberTicketConfirm: Label '%1 member(s) automatically admitted.';
     begin
-
+        // Admit member if auto-admit on sale and the member info capture line is set to auto-admit
         if (SalePOS."Sales Ticket No." = '') then
             exit;
+
+        if (not (MemberAdmitOnEndOfSale.GetAdmitMethod(SalePOS."Register No.") = Enum::"NPR MM AdmitMemberOnEoSMethod"::LEGACY)) then
+            exit; // Admit is handled by adding a end-of-sale workflow in AddPostWorkflowsToRun()
 
         MemberInfoCaptureSales.SetCurrentKey("Receipt No.", "Line No.");
         MemberInfoCaptureSales.SetFilter("Receipt No.", '=%1', SalePOS."Sales Ticket No.");
@@ -1061,7 +1065,7 @@
                 MemberInfoCaptureLine.SetFilter("Receipt No.", '=%1', MemberInfoCaptureSales."Receipt No.");
                 MemberInfoCaptureLine.SetFilter("Line No.", '=%1', MemberInfoCaptureSales."Line No.");
 
-                if (not AdmitMembersOnEndOfSalesWorker(MemberInfoCaptureLine, AdmittedCount, SalePOS."Register No.", ReasonCode, ReasonText)) then
+                if (not MemberAdmitOnEndOfSale.AdmitMembersOnEndOfSalesWorkerLegacy(MemberInfoCaptureLine, AdmittedCount, SalePOS."Register No.", ReasonCode, ReasonText)) then
                     Message(MemberTicketAdmitError, MemberInfoCaptureLine."First Name" + ' ' + MemberInfoCaptureLine."Last Name", ReasonText);
             end;
             PreviousLineNo := MemberInfoCaptureSales."Line No.";
@@ -1072,46 +1076,6 @@
 
         if (AdmittedCount > 0) then
             Message(MemberTicketConfirm, AdmittedCount);
-
-    end;
-
-    local procedure AdmitMembersOnEndOfSalesWorker(var MemberInfoCapture: Record "NPR MM Member Info Capture"; var AdmittedCount: Integer; PosUnitNo: Code[10]; var ReasonCode: Integer; var ReasonText: Text) MemberArrivalOk: Boolean
-    var
-        MemberCard: Record "NPR MM Member Card";
-        AttemptArrival: Codeunit "NPR MM Attempt Member Arrival";
-        MemberLimitationMgr: Codeunit "NPR MM Member Lim. Mgr.";
-        LogEntryNo: Integer;
-    begin
-        MemberInfoCapture.FindSet();
-
-        if (not MemberInfoCapture."Auto-Admit Member") then
-            exit(true); // Is consistent for all members on the same sales line
-
-        if (not (MemberInfoCapture."Information Context" in [MemberInfoCapture."Information Context"::NEW,
-                                              MemberInfoCapture."Information Context"::RENEW,
-                                              MemberInfoCapture."Information Context"::UPGRADE,
-                                              MemberInfoCapture."Information Context"::EXTEND])) then
-            exit(true); // Nothing to do
-
-        // Check that member limitations allow arrival
-        repeat
-            MemberCard.Get(MemberInfoCapture."Card Entry No.");
-            MemberLimitationMgr.POS_CheckLimitMemberCardArrival(MemberCard."External Card No.", '', '<auto>', LogEntryNo, ReasonText, ReasonCode);
-            if (ReasonCode <> 0) then
-                exit(false);
-        until (MemberInfoCapture.Next() = 0);
-
-        // Batch register arrival creating tickets.
-        Commit();
-        AttemptArrival.AttemptMemberArrival(MemberInfoCapture, '', PosUnitNo, '<auto>');
-        MemberArrivalOk := AttemptArrival.Run();
-
-        // Log arrival message. 
-        ReasonCode := AttemptArrival.GetAttemptMemberArrivalResponse(ReasonText);
-        MemberLimitationMgr.UpdateLogEntry(LogEntryNo, ReasonCode, ReasonText); // TODO: Add LogEntryNo to InfoCapture and update all entries ... 
-
-        AdmittedCount += MemberInfoCapture.Count();
-        exit(MemberArrivalOk);
 
     end;
 

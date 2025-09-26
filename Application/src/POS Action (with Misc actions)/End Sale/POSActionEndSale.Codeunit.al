@@ -95,9 +95,11 @@ codeunit 6184623 "NPR POS Action End Sale" implements "NPR IPOS Workflow"
         EndSaleEvents: Codeunit "NPR End Sale Events";
         DrawerStatus: Codeunit "NPR POS Action: Drawer Status";
         TicketAdmitAfterEoS: Codeunit "NPR POSAction TicketAdmitOnEoS";
+        MemberAdmitAfterEOS: Codeunit "NPR POSAction MemberAdmitOnEoS";
     begin
         if EndSaleSuccess then begin
             TicketAdmitAfterEoS.AddPostEndOfSaleWorkflow(Sale, PostWorkflows);
+            MemberAdmitAfterEOS.AddPostEndOfSaleWorkflow(Sale, PostWorkflows);
             AddDigitalReceiptWorkflow(Sale, PostWorkflows);
             DrawerStatus.AddCashDrawerStatusWorkflow(PostWorkflows, Setup);
         end;

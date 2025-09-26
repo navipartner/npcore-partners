@@ -26,6 +26,7 @@ page 6184639 "NPR TM POS Ticket Profile"
             }
             group(Print)
             {
+                Caption = 'Print';
                 field("Print Ticket On Sale"; Rec."Print Ticket On Sale")
                 {
                     ApplicationArea = NPRRetail;
@@ -35,6 +36,7 @@ page 6184639 "NPR TM POS Ticket Profile"
 
             group(Admit)
             {
+                Caption = 'Admit';
                 field(EndOfSaleAdmitMethod; Rec."EndOfSaleAdmitMethod")
                 {
                     ApplicationArea = NPRRetail;
@@ -61,6 +63,9 @@ page 6184639 "NPR TM POS Ticket Profile"
                         PageAction := LookupPage.RunModal();
                         if (PageAction = Action::OK) then begin
                             LookupPage.GetRecord(SpeedGates);
+                            if (Rec.ScannerIdForUnitAdmitEoSId <> SpeedGates.Id) then
+                                if (not Confirm('Are you sure you want to change the SpeedGate ID for admission used during end of sale?', false)) then
+                                    Error('');
                             Rec.ScannerIdForUnitAdmitEoSId := SpeedGates.Id;
                             CurrPage.Update(true);
                         end;

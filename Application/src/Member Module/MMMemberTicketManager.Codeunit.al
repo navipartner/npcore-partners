@@ -589,7 +589,7 @@
 
     end;
 
-    local procedure PrintTicket(MembershipSetup: Record "NPR MM Membership Setup"; var Ticket: Record "NPR TM Ticket")
+    internal procedure PrintTicket(MembershipSetup: Record "NPR MM Membership Setup"; var Ticket: Record "NPR TM Ticket")
     var
         PrintTemplateMgt: Codeunit "NPR RP Template Mgt.";
     begin
