@@ -511,6 +511,7 @@
         ItemAddOn: Codeunit "NPR NpIa Item AddOn";
         LineNo: Integer;
         PrevRec: Text;
+        MasterLineQuantityBase: Decimal;
         BaseLineIndent: Integer;
     begin
         if not FindAddOnSaleLinePOS(SalePOS, AppliesToLineNo, ItemAddOnLine, SaleLinePOS) then begin
@@ -522,6 +523,7 @@
             if SaleLinePOS."Line No." <> AppliesToLineNo then
                 SaleLinePOS.Get(SaleLinePOS."Register No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS.Date, SaleLinePOS."Sale Type", AppliesToLineNo);
             BaseLineIndent := SaleLinePOS.Indentation;
+            MasterLineQuantityBase := SaleLinePOS."Quantity (Base)";
             FilterAttachedItemAddonLines(SaleLinePOS, AppliesToLineNo, SaleLinePOSAddOn);
             if SaleLinePOSAddOn.FindLast() then begin
                 SaleLinePOS.Get(
@@ -545,7 +547,10 @@
                 SaleLinePOS."Manual Item Sales Price" := true;
                 SaleLinePOS.Validate("Unit Price", ItemAddOnLine."Unit Price");
             end;
-            SaleLinePOS.Validate(Quantity, ItemAddOnLine.Quantity);
+            if (ItemAddOnLine."Per Unit" and ItemAddOnLine.Mandatory) and (not ItemAddOnLine."Fixed Quantity") then
+                SaleLinePOS.Validate(Quantity, ItemAddOnLine.Quantity * MasterLineQuantityBase)
+            else
+                SaleLinePOS.Validate(Quantity, ItemAddOnLine.Quantity);
             if (ItemAddOnLine."Discount %" <> 0) and (ItemAddOnLine.DiscountAmount = 0) then
                 SaleLinePOS.Validate("Discount %", ItemAddOnLine."Discount %");
             if (ItemAddOnLine."Discount %" = 0) and (ItemAddOnLine.DiscountAmount <> 0) then
