@@ -215,10 +215,7 @@ xmlport 6151145 "NPR M2 POS Sv. Sale Price Req."
     local procedure SetPOSUnitNo(var TempSaleLinePOS: Record "NPR POS Sale Line" temporary)
     var
         POSUnit: Record "NPR POS Unit";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
-        if not FeatureFlagsManagement.IsEnabled('m2pospricewebserviceassignposunitno') then
-            exit;
         if not POSUnit.FindFirst() then
             exit;
         TempSaleLinePOS."Register No." := POSUnit."No.";
