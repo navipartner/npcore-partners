@@ -552,7 +552,6 @@
 #IF NOT BC17
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
 #ENDIF
-        FeatureFlagMgmt: Codeunit "NPR Feature Flags Management";
         OutstandingAmt: Decimal;
         PaymentAmt: Decimal;
         TotalAmountInclVAT: Decimal;
@@ -568,7 +567,7 @@
         HasPaymentsAndRefunds := HasMagentoPaymentsAndRefunds(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
 
         TotalAmountInclVAT := GetTotalAmountInclVat(SalesHeader);
-        if HasPaymentsAndRefunds and FeatureFlagMgmt.IsEnabled('calculateRefundPaymentsAmount') then
+        if HasPaymentsAndRefunds then
             RefundPaymentsAmount := GetRefundPaymentsAmount(Database::"Sales Header", SalesHeader."Document Type", SalesHeader."No.");
         DocNo := SalesHeader."Posting No.";
         if DocNo = '' then begin
