@@ -439,7 +439,8 @@ codeunit 6184814 "NPR Spfy Order Mgt."
 
         ShipmentMapping."External Shipment Method Code" := ShippingMethodId;
         Found := ShipmentMapping.Find();
-        if not Found and (ShippingMethodId <> '') then
+        if not Found and (ShippingMethodId <> '') then begin
+            ShipmentMapping2.SetFilter("External Shipment Method Code", '<>%1', '');
             if ShipmentMapping2.FindSet() then begin
                 TempShipmentMapping."External Shipment Method Code" := ShippingMethodId;
                 TempShipmentMapping.Insert();
@@ -450,6 +451,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
                         ShipmentMapping := ShipmentMapping2;
                 until (ShipmentMapping2.Next() = 0) or Found;
             end;
+        end;
         if DeliveryLocationId = '' then
             DeliveryLocationId := GetDeliveryLocationID(ShipmentMapping."External Shipment Method Code", ShippingMethodId);
         exit(Found);
