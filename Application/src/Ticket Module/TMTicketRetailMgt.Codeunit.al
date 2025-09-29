@@ -185,7 +185,6 @@
 
     internal procedure AdjustPriceOnSalesLine(var SaleLinePOS: Record "NPR POS Sale Line"; NewQuantity: Integer; Token: Text[100]; TokenLineNumber: Integer)
     var
-        FeatureFlag: Codeunit "NPR Feature Flags Management";
         SaleLinePOSAddOn: Record "NPR NpIa SaleLinePOS AddOn";
         ItemAddOnLine: Record "NPR NpIa Item AddOn Line";
         xSaleLinePOS: Record "NPR POS Sale Line";
@@ -254,9 +253,6 @@
         SaleLinePOS.Modify();
 
         POSSalesDiscountCalcMgt.OnAfterModifySaleLinePOS(SaleLinePOS, xSaleLinePOS);
-
-        if (not FeatureFlag.IsEnabled('discountModuleRefreshRec')) then
-            if (not SaleLinePOS.Get(SaleLinePOS.RecordId())) then;
     end;
 
 
