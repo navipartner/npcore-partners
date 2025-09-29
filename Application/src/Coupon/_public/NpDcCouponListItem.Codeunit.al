@@ -106,11 +106,7 @@ codeunit 6248505 "NPR NpDc Coupon List Item"
     local procedure OnBeforeInsertRec(var CouponListItem: Record "NPR NpDc Coupon List Item"; RunTrigger: Boolean)
     var
         CouponListItemBuffer: Record "NPR NpDc Coupon List Item Buf";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
-        if not FeatureFlagsManagement.IsEnabled('couponListItemFacadeEvents') then
-            exit;
-
         PopulateBufferFromRec(CouponListItemBuffer, CouponListItem);
         OnBeforeInsertRecEvent(CouponListItemBuffer, RunTrigger);
         PopulateRecFromBuffer(CouponListItemBuffer, CouponListItem);
@@ -119,11 +115,7 @@ codeunit 6248505 "NPR NpDc Coupon List Item"
     local procedure OnAfterInsertRec(var CouponListItem: Record "NPR NpDc Coupon List Item"; RunTrigger: Boolean)
     var
         CouponListItemBuffer: Record "NPR NpDc Coupon List Item Buf";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
-        if not FeatureFlagsManagement.IsEnabled('couponListItemFacadeEvents') then
-            exit;
-
         PopulateBufferFromRec(CouponListItemBuffer, CouponListItem);
         OnAfterInsertRecEvent(CouponListItemBuffer, RunTrigger);
         PopulateRecFromBuffer(CouponListItemBuffer, CouponListItem);
@@ -132,11 +124,7 @@ codeunit 6248505 "NPR NpDc Coupon List Item"
     local procedure OnBeforeModifyRec(var CouponListItem: Record "NPR NpDc Coupon List Item"; RunTrigger: Boolean)
     var
         CouponListItemBuffer: Record "NPR NpDc Coupon List Item Buf";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
-        if not FeatureFlagsManagement.IsEnabled('couponListItemFacadeEvents') then
-            exit;
-
         PopulateBufferFromRec(CouponListItemBuffer, CouponListItem);
         OnBeforeModifyRecEvent(CouponListItemBuffer, RunTrigger);
         PopulateRecFromBuffer(CouponListItemBuffer, CouponListItem);
@@ -145,11 +133,7 @@ codeunit 6248505 "NPR NpDc Coupon List Item"
     local procedure OnAfterModifyRec(var CouponListItem: Record "NPR NpDc Coupon List Item"; RunTrigger: Boolean)
     var
         CouponListItemBuffer: Record "NPR NpDc Coupon List Item Buf";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
-        if not FeatureFlagsManagement.IsEnabled('couponListItemFacadeEvents') then
-            exit;
-
         PopulateBufferFromRec(CouponListItemBuffer, CouponListItem);
         OnAfterModifyRecEvent(CouponListItemBuffer, RunTrigger);
         PopulateRecFromBuffer(CouponListItemBuffer, CouponListItem);
@@ -158,11 +142,7 @@ codeunit 6248505 "NPR NpDc Coupon List Item"
     local procedure OnBeforeDeleteRec(var CouponListItem: Record "NPR NpDc Coupon List Item"; RunTrigger: Boolean)
     var
         CouponListItemBuffer: Record "NPR NpDc Coupon List Item Buf";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
-        if not FeatureFlagsManagement.IsEnabled('couponListItemFacadeEvents') then
-            exit;
-
         PopulateBufferFromRec(CouponListItemBuffer, CouponListItem);
         OnBeforeDeleteRecEvent(CouponListItemBuffer, RunTrigger);
         PopulateRecFromBuffer(CouponListItemBuffer, CouponListItem);
@@ -171,11 +151,7 @@ codeunit 6248505 "NPR NpDc Coupon List Item"
     local procedure OnAfterDeleteRec(var CouponListItem: Record "NPR NpDc Coupon List Item"; RunTrigger: Boolean)
     var
         CouponListItemBuffer: Record "NPR NpDc Coupon List Item Buf";
-        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
     begin
-        if not FeatureFlagsManagement.IsEnabled('couponListItemFacadeEvents') then
-            exit;
-
         PopulateBufferFromRec(CouponListItemBuffer, CouponListItem);
         OnAfterDeleteRecEvent(CouponListItemBuffer, RunTrigger);
         PopulateRecFromBuffer(CouponListItemBuffer, CouponListItem);
