@@ -275,6 +275,7 @@
     var
         MembershipRole: Record "NPR MM Membership Role";
         MemberNotificationEntry: Record "NPR MM Member Notific. Entry";
+        MemberNotificationEntryBuffer: Record "NPR MMMemberNotificEntryBuf";
         Membership: Record "NPR MM Membership";
         Member: Record "NPR MM Member";
         MemberCard: Record "NPR MM Member Card";
@@ -466,6 +467,11 @@
 
         if (not MemberNotificationEntry.Insert()) then
             exit(false);
+
+        MemberNotificationEntryBuffer.TransferFields(MemberNotificationEntry, true);
+        MemberNotificationEntryBuffer.SystemId := MemberNotificationEntry.SystemId;
+        MemberNotificationEntryBuffer.Insert();
+        OnAfterMemberNotificationEntryInsert(MemberNotificationEntryBuffer);
 
         exit(true);
     end;
@@ -2058,5 +2064,10 @@
             IsNpJob := true;
             Handled := true;
         end;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterMemberNotificationEntryInsert(var MemberNotificationEntryBuffer: Record "NPR MMMemberNotificEntryBuf")
+    begin
     end;
 }

@@ -3,10 +3,14 @@ codeunit 6248377 "NPR NPEmailMemberDataProvider" implements "NPR IDynamicTemplat
 {
     Access = Internal;
 
+    var
+        _DynTempDataProvSubs: Codeunit "NPR DynTempDataProvSubs";
+
     procedure GetContent(RecRef: RecordRef): JsonObject
     var
         Entry: Record "NPR MM Member Notific. Entry";
-        JObject: JsonObject;
+        EntryBuffer: Record "NPR MMMemberNotificEntryBuf";
+        JObject, CustomJObject : JsonObject;
         WrongRecordReceivedErr: Label 'The code received a record of an unknown type. Most likely a wrong data driver was used on the Dynamic Template.';
     begin
         if (RecRef.Number <> Database::"NPR MM Member Notific. Entry") then
@@ -48,12 +52,19 @@ codeunit 6248377 "NPR NPEmailMemberDataProvider" implements "NPR IDynamicTemplat
         JObject.Add('client_sign_up_url', Entry.ClientSignUpUrl);
         JObject.Add('wallet_pass_id', Entry."Wallet Pass Id");
         JObject.Add('wallet_url', Entry."Wallet Pass Landing URL");
+
+        EntryBuffer.TransferFields(Entry, true);
+        EntryBuffer.SystemId := Entry.SystemId;
+        EntryBuffer.Insert();
+        _DynTempDataProvSubs.OnAfterMemberGetContent(EntryBuffer, CustomJObject);
+        JObject.Add('custom_fields', CustomJObject);
+
         exit(JObject);
     end;
 
     procedure GenerateContentExample(): JsonObject
     var
-        JObject: JsonObject;
+        JObject, CustomJObject : JsonObject;
     begin
         JObject.Add('coupon_reference_no', 'COUPON1234');
         JObject.Add('coupon_starting_date', 20250101D);
@@ -89,6 +100,10 @@ codeunit 6248377 "NPR NPEmailMemberDataProvider" implements "NPR IDynamicTemplat
         JObject.Add('client_sign_up_url', 'https://signup.example.com/973d46f0-a08c-45e3-a9ac-0da53b28648a');
         JObject.Add('wallet_pass_id', 'ABCD1234');
         JObject.Add('wallet_url', 'https://passes.example.com');
+
+        _DynTempDataProvSubs.OnAfterMemberGenerateContentExample(CustomJObject);
+        JObject.Add('custom_fields', CustomJObject);
+
         exit(JObject);
     end;
 
