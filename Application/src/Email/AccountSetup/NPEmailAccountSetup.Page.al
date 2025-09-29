@@ -71,23 +71,26 @@ page 6184950 "NPR NP Email Account Setup"
                     UpdateHasAccount();
                 end;
             }
-#if DEV
             action(DeleteNPEmailAccountSetup)
             {
                 Caption = 'Delete NP Email Account Setup';
                 ApplicationArea = NPRNPEmail;
                 Image = RemoveContacts;
                 Enabled = (_HasAccount);
+                ToolTip = 'Warning: This action will permanently delete the NP Email Account Setup. This is IRREVERSIBLE and all information will be lost.';
 
                 trigger OnAction()
                 var
                     NPEmailAccount: Record "NPR NP Email Account";
+                    ConfirmManagement: Codeunit "Confirm Management";
+                    DeleteEmailAccountsLbl: Label 'Are you sure you want to delete the NP Email Account Setup? This is IRREVERSIBLE and the information will be lost.';
                 begin
-                    NPEmailAccount.DeleteAll(true);
-                    UpdateHasAccount();
+                    if ConfirmManagement.GetResponseOrDefault(DeleteEmailAccountsLbl, false) then begin
+                        NPEmailAccount.DeleteAll(true);
+                        UpdateHasAccount();
+                    end;
                 end;
             }
-#endif
         }
         area(Navigation)
         {
