@@ -152,7 +152,7 @@ codeunit 6185044 "NPR TicketingCapacityAgent"
 
             ResponseJson.StartObject()
                 .AddProperty('code', AdmCapacityPriceBuffer.AdmissionCode)
-                .AddProperty('default', AdmCapacityPriceBuffer.DefaultAdmissionCode)
+                .AddProperty('default', AdmCapacityPriceBuffer.DefaultAdmission)
                 .AddProperty('included', EnumEncoder.EncodeInclusion(TicketBom."Admission Inclusion"))
                 .AddProperty('capacityControl', EnumEncoder.EncodeCapacity(Admission."Capacity Control"))
                 .AddProperty('referenceDate', AdmCapacityPriceBuffer.ReferenceDate)

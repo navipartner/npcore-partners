@@ -236,7 +236,7 @@ service:
         Note, however, that the actual admission cannot be undone in the system; only the speedgate token can be marked as failed.
         This is useful for handling situations where scanner personnel override the business rules of an admission attempt.
       path: /failAdmitToken
-      method: POST  
+      method: PUT
       request: 
         name: failAdmitToken
         body: compositeTypes.FailAdmitTokenRequest
