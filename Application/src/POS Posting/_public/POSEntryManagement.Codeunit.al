@@ -23,12 +23,12 @@
         TextInconsistent: Label '%1 is set to %2 on %3 and to %4 on %5. %6 is inconsistent.';
         ReprintNotAllowedErrMsg: Label 'Additional reprints are not allowed for current sale (%1 %2).';
 
-    internal procedure SetFunctionToRun(FunctionToRunIn: Option " ",PrintEntry)
+    procedure SetFunctionToRun(FunctionToRunIn: Option " ",PrintEntry)
     begin
         FunctionToRun := FunctionToRunIn;
     end;
 
-    internal procedure SetLargePrint(Set: Boolean)
+    procedure SetLargePrint(Set: Boolean)
     begin
         LargePrint := Set;
     end;
