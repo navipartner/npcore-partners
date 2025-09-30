@@ -33,10 +33,13 @@ codeunit 6248478 "NPR Refresh Job Queue Entry"
             JobQueueEntry.TransferFields(JQMonitorEntry, false);
         end;
         JobQueueMgt.JobQueueIsManagedByApp(JobQueueEntry, NotProtectedJob);
-        if not ProcessMonitoredJob then
-            ProcessMonitoredJob := not NotProtectedJob or JQRefreshSetup.CreateMissingCustomJQs();
-        if not ProcessMonitoredJob then
-            Error(RelatedJobQueueEntryNotFoundErr);
+        if not ProcessMonitoredJob then begin
+            ProcessMonitoredJob := not NotProtectedJob or IsNprCustomizableJob(JQMonitorEntry);
+            if not ProcessMonitoredJob then
+                ProcessMonitoredJob := JQRefreshSetup.CreateMissingCustomJQs();
+            if not ProcessMonitoredJob then
+                Error(RelatedJobQueueEntryNotFoundErr);
+        end;
 
         JQMonitorEntry2 := JQMonitorEntry;
         JQMonitorEntry2.ChangeJobTimeZoneToWebserviceTimezone(JQRefreshSetup);
@@ -85,5 +88,12 @@ codeunit 6248478 "NPR Refresh Job Queue Entry"
             JQMonitorEntry."Job Queue Entry ID" := JobQueueEntry.ID;
             exit(true);
         end;
+    end;
+
+    internal procedure IsNprCustomizableJob(var JQMonitorEntry: Record "NPR Monitored Job Queue Entry"): Boolean
+    begin
+        exit(
+            (JQMonitorEntry."Object Type to Run" = JQMonitorEntry."Object Type to Run"::Codeunit) and
+            (JQMonitorEntry."Object ID to Run" in [3997]));  //Codeunit::"Retention Policy JQ"
     end;
 }

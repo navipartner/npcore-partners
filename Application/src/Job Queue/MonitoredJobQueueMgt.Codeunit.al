@@ -51,6 +51,7 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
         MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
         xMonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
         JobQueueMgt: Codeunit "NPR Job Queue Management";
+        RefreshJobQueueEntry: Codeunit "NPR Refresh Job Queue Entry";
     begin
         SelectLatestVersion();
         if not IsNullGuid(JobQueueEntry.ID) then
@@ -65,9 +66,11 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
             if MonitoredJQEntry.IsEmpty() then
                 MonitoredJQEntry.SetRange("Job Queue Category Code");
         end;
-        if MonitoredJQEntry.FindFirst() then
-            xMonitoredJQEntry := MonitoredJQEntry
-        else begin
+        if MonitoredJQEntry.FindFirst() then begin
+            if RefreshJobQueueEntry.IsNprCustomizableJob(MonitoredJQEntry) then
+                exit;
+            xMonitoredJQEntry := MonitoredJQEntry;
+        end else begin
             Clear(xMonitoredJQEntry);
             MonitoredJQEntry.Init();
             MonitoredJQEntry."Entry No." := 0;
@@ -76,10 +79,6 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
         end;
         JobQueueEntry.CalcFields(XML);
         MonitoredJQEntry.TransferFields(JobQueueEntry, false);
-        // if not IsNullGuid(xMonitoredJQEntry."Job Queue Entry ID") then
-        //     if xJobQueueEntry.Get(xMonitoredJQEntry."Job Queue Entry ID") then begin
-        //         MonitoredJQEntry."Notif. Profile on Error" := xJobQueueEntry."NPR Notif. Profile on Error";
-        //     end;
         if not IsNullGuid(JobQueueEntry.ID) then
             MonitoredJQEntry."Job Queue Entry ID" := JobQueueEntry.ID;
         JobQueueMgt.OnBeforeRenewMonitoredJobQueueEntry(xMonitoredJQEntry, MonitoredJQEntry);

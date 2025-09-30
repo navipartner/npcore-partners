@@ -76,11 +76,6 @@
         end;
 #endif
 
-        if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateRetentionJobQueue')) then begin
-            UpdateRetentionJobQueue();
-            UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateRetentionJobQueue'));
-        end;
-
         if not UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'TMRetentionJQCategory')) then begin
             AssignJoqCategoryToTMRetentionJQ();
             UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'TMRetentionJQCategory'));
@@ -354,25 +349,6 @@
             until JobQueueEntry.Next() = 0;
     end;
 #endif
-
-    local procedure UpdateRetentionJobQueue()
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-        xJobQueueEntry: Record "Job Queue Entry";
-        JobQueueMgt: Codeunit "NPR Job Queue Management";
-    begin
-        JobQueueEntry.SetRange("Object Type to Run", JobQueueEntry."Object Type to Run"::Codeunit);
-        JobQueueEntry.SetRange("Object ID to Run", 3997);  //Codeunit::"Retention Policy JQ"
-        if JobQueueEntry.FindSet(true) then
-            repeat
-                xJobQueueEntry := JobQueueEntry;
-                JobQueueEntry."NPR Auto-Resched. Delay (sec.)" := 0;
-                JobQueueMgt.AutoRestartRetentionPolicyJQ(JobQueueEntry);
-                JobQueueMgt.UpdateRetentionPolicyJQRecurrence(JobQueueEntry);
-                if Format(xJobQueueEntry) <> Format(JobQueueEntry) then
-                    JobQueueEntry.Modify();
-            until JobQueueEntry.Next() = 0;
-    end;
 
     local procedure SetAutoRescedulePOSPostGL()
     var

@@ -689,6 +689,8 @@
         Evaluate(NextRunDateFormula, '<1D>');
 #ENDIF
         SetJobTimeout(6, 0); // 6hr timeout
+        SetAutoRescheduleAndNotifyOnError(true, 60, '');
+        SetMaxNoOfAttemptsToRun(1000);
         if InitRecurringJobQueueEntry(
             JobQueueEntry."Object Type to Run"::Codeunit,
             3997,  //Codeunit::"Retention Policy JQ"
@@ -851,52 +853,6 @@
         CustomDimensions.Add('NPR_JQ_ExecutionStartedBy', JobQueueLogEntry."User ID");
 
         Session.LogMessage('NPR_JobQueue', 'Job Queue Error', Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
-    end;
-
-    internal procedure AutoRestartRetentionPolicyJQ(var JobQueueEntry: Record "Job Queue Entry")
-    begin
-        if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
-           (JobQueueEntry."Object ID to Run" = 3997)  //Codeunit::"Retention Policy JQ"
-        then begin
-            JobQueueEntry."NPR Auto-Resched. after Error" := true;
-            JobQueueEntry."Maximum No. of Attempts to Run" := 1000;
-            JobQueueEntry."Rerun Delay (sec.)" := 60;
-            if JobQueueEntry."NPR Auto-Resched. Delay (sec.)" < 60 then
-                JobQueueEntry."NPR Auto-Resched. Delay (sec.)" := 60;
-        end;
-    end;
-
-    internal procedure UpdateRetentionPolicyJQRecurrence(var JobQueueEntry: Record "Job Queue Entry")
-    var
-#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22)
-        NextRunDateFormula: DateFormula;
-#ENDIF
-    begin
-        if JobQueueEntry."Recurring Job" and
-           (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and (JobQueueEntry."Object ID to Run" = 3997)  //Codeunit::"Retention Policy JQ"
-        then begin
-#IF NOT BC17
-            JobQueueEntry."Job Timeout" := 6 * 60 * 60 * 1000;  //6 hours
-#ENDIF
-#IF BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22
-            Clear(JobQueueEntry."Next Run Date Formula");
-            JobQueueEntry."Run on Mondays" := true;
-            JobQueueEntry."Run on Tuesdays" := true;
-            JobQueueEntry."Run on Wednesdays" := true;
-            JobQueueEntry."Run on Thursdays" := true;
-            JobQueueEntry."Run on Fridays" := true;
-            JobQueueEntry."Run on Saturdays" := true;
-            JobQueueEntry."Run on Sundays" := true;
-            JobQueueEntry.Validate("No. of Minutes between Runs", 2);
-            JobQueueEntry.Validate("Starting Time", 000000T);
-            JobQueueEntry."Ending Time" := 060000T;
-#ELSE
-            Evaluate(NextRunDateFormula, '<1D>');
-            JobQueueEntry.Validate("Starting Time", 000000T);
-            JobQueueEntry."Ending Time" := 060000T;
-            JobQueueEntry.Validate("Next Run Date Formula", NextRunDateFormula);
-#ENDIF
-        end;
     end;
 
     local procedure GetEndingTime(StartTime: Time; EndTime: Time): Time
@@ -1223,33 +1179,6 @@
 #endif
 
 #if BC17 or BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue - Enqueue", 'OnBeforeEnqueueJobQueueEntry', '', true, false)]
-#else
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Job Queue - Enqueue", OnBeforeEnqueueJobQueueEntry, '', true, false)]
-#endif
-    local procedure SetDefaultValues(var JobQueueEntry: Record "Job Queue Entry")
-    begin
-        if JobQueueEntry."Maximum No. of Attempts to Run" = 3 then  //3 - default value in MS standard application
-            JobQueueEntry."Maximum No. of Attempts to Run" := 5;
-        if (JobQueueEntry."Rerun Delay (sec.)" <= 0) or (JobQueueEntry."Rerun Delay (sec.)" = 60) then  //60 - default value in MS standard application
-            JobQueueEntry."Rerun Delay (sec.)" := 180;
-
-        AutoRestartRetentionPolicyJQ(JobQueueEntry);
-        UpdateRetentionPolicyJQRecurrence(JobQueueEntry);
-    end;
-
-#if BC17 or BC18 or BC19 or BC20 or BC21
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", 'OnBeforeModifyUpdatedJobQueueEntry', '', true, false)]
-#else
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Job Queue Management", OnBeforeModifyUpdatedJobQueueEntry, '', true, false)]
-#endif
-    local procedure SetDefaultValuesOnBeforeModifyUpdatedJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry")
-    begin
-        AutoRestartRetentionPolicyJQ(JobQueueEntry);
-        UpdateRetentionPolicyJQRecurrence(JobQueueEntry);
-    end;
-
-#if BC17 or BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnAfterFinalizeRun', '', true, false)]
 #else
     [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", OnAfterFinalizeRun, '', true, false)]
@@ -1366,12 +1295,11 @@
            (JobQueueEntry."Object ID to Run" in
                [Codeunit::"NPR POS Post Item Entries JQ",
                 Codeunit::"NPR POS Post GL Entries JQ",
-                Codeunit::"NPR Get Feature Flags JQ",
                 Codeunit::"NPR Post Sales Documents JQ",
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
                 Codeunit::"NPR Billing Data Sender JQ",
 #endif
-                3997  //3997 = Codeunit::"Retention Policy JQ"
+                Codeunit::"NPR Get Feature Flags JQ"
                ])
         then begin
             IsNpJob := true;

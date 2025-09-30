@@ -61,7 +61,6 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetEndingTimeForPOSPostGLJQ'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetEndingTimeForAllWithStartingTime'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'SetManuallySetOnHold'));
-        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Install", 'UpdateRetentionJobQueue'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Upgrade", 'RemoveObsoleteEntraApp'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Upgrade", 'UpdateRefresherUserAssignment'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Job Queue Upgrade", 'UpdateRefresherUserSettings'));
@@ -422,8 +421,6 @@
                         exit('SetEndingTimeForAllWithStartingTime-20231010');
                     'SetManuallySetOnHold':
                         exit('SetManuallySetOnHold-20230818');
-                    'UpdateRetentionJobQueue':
-                        exit('UpdateRetentionJobQueue-20231108');
                 end;
             Codeunit::"NPR New Prices Install":
                 exit('NPRNewPriceTableInstall-20210920');
