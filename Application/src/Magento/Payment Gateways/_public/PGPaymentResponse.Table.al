@@ -7,15 +7,21 @@ table 6059836 "NPR PG Payment Response"
     fields
     {
         // Required field
-        //
-        // The value of this field should determine whether or not the operation
-        // was a success, i.e. if the operation is a capture the capture
-        // actually succeeded.
+        // The value of this field should indicate whether the requested operation has been accepted for processing.
+        // This does not mean that the operation itself was successful; it only indicates that the remote party
+        // has accepted the request and will process it.
         field(10; "Response Success"; Boolean)
         {
             DataClassification = SystemMetadata;
         }
-
+        // Optional field
+        // The value of this field should indicate the status of the requested operation.
+        // This field may be used in conjunction with the "Response Success" field to provide more detailed information
+        // about the status of the requested operation.
+        field(15; "Reported Operation Status"; Enum "NPR PG Operation Status")
+        {
+            DataClassification = SystemMetadata;
+        }
         // Required field
         field(20; "Response Body"; Blob)
         {
@@ -74,6 +80,7 @@ table 6059836 "NPR PG Payment Response"
         Out: Text;
     begin
         JObject.Add('response_success', Rec."Response Success");
+        JObject.Add('operation_status', OperationStatusEnumValueName(Rec."Reported Operation Status"));
         Rec."Response Body".CreateInStream(IStr);
         while (not IStr.EOS()) do begin
             IStr.ReadText(Buffer);
@@ -84,5 +91,10 @@ table 6059836 "NPR PG Payment Response"
 
         JObject.WriteTo(Out);
         exit(Out);
+    end;
+
+    local procedure OperationStatusEnumValueName(OperationStatus: Enum "NPR PG Operation Status") Result: Text
+    begin
+        OperationStatus.Names().Get(OperationStatus.Ordinals().IndexOf(OperationStatus.AsInteger()), Result);
     end;
 }

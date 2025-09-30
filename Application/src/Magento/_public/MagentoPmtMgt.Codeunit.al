@@ -4,20 +4,16 @@
 
     trigger OnRun()
     var
-        NotInitialized: Label 'Codeunit 6151416 wasn''t initialized properly. This is a programming bug, not a user error. Please contact system vendor.';
-        LogMgt: Codeunit "NPR PG Interactions Log Mgt.";
+        PaymentLine: Record "NPR Magento Payment Line";
         PGInteractionLog: Record "NPR PG Interaction Log Entry";
         Request: Record "NPR PG Payment Request";
         Response: Record "NPR PG Payment Response";
+        LogMgt: Codeunit "NPR PG Interactions Log Mgt.";
         TryCapturePayment: Codeunit "NPR PG Try Capture Payment";
         TryRefundPayment: Codeunit "NPR PG Try Refund Payment";
         TryCancelPayment: Codeunit "NPR PG Try Cancel Payment";
-#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
-        IncEcomSalesDocProcess: Codeunit "NPR IncEcomSalesDocProcess";
-#endif
         Success: Boolean;
-        PrevRec: Text;
-        PaymentLine: Record "NPR Magento Payment Line";
+        NotInitialized: Label 'Codeunit 6151416 wasn''t initialized properly. This is a programming bug, not a user error. Please contact system vendor.';
     begin
         if (not (_PaymentEventType in [_PaymentEventType::Capture, _PaymentEventType::Refund, _PaymentEventType::Cancel])) then
             Error(NotInitialized);
@@ -64,23 +60,53 @@
         Commit();
 
         PaymentLine.Find();
+        UpdatePaymentLineWithEventResponse(PaymentLine, _PaymentEventType, Response);
+        Rec := PaymentLine;
+
+        if (not Success) then
+            Error(ErrorDuringOperationErr, GetLastErrorText());
+    end;
+
+    internal procedure UpdatePaymentLineWithEventResponse(var PaymentLine: Record "NPR Magento Payment Line"; PaymentEventType: Option; Response: Record "NPR PG Payment Response")
+    var
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        IncEcomSalesDocProcess: Codeunit "NPR IncEcomSalesDocProcess";
+#endif
+        PrevRec: Text;
+    begin
         PrevRec := Format(PaymentLine);
 
         if (Response."Response Success") then
-            case _PaymentEventType of
+            case PaymentEventType of
                 _PaymentEventType::Capture:
                     begin
                         if (Response."Response Operation Id" <> '') then
 #pragma warning disable AA0139
                             PaymentLine."Charge ID" := Response."Response Operation Id";
 #pragma warning restore AA0139
-                        PaymentLine."Date Captured" := Today();
+                        case Response."Reported Operation Status" of
+                            Response."Reported Operation Status"::Unknown,   //for backwards compatibility
+                            Response."Reported Operation Status"::Success:
+                                begin
+                                    PaymentLine."Date Captured" := Today();
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
-                        IncEcomSalesDocProcess.UpdateSalesDocPaymentLineCaptureInformation(PaymentLine);
+                                    IncEcomSalesDocProcess.UpdateSalesDocPaymentLineCaptureInformation(PaymentLine);
 #endif
+                                end;
+                            Response."Reported Operation Status"::Pending:
+                                PaymentLine."Capture Requested" := true;
+                        end;
                     end;
+
                 _PaymentEventType::Refund:
-                    PaymentLine."Date Refunded" := Today();
+                    case Response."Reported Operation Status" of
+                        Response."Reported Operation Status"::Unknown,   //for backwards compatibility
+                        Response."Reported Operation Status"::Success:
+                            PaymentLine."Date Refunded" := Today();
+                        Response."Reported Operation Status"::Pending:
+                            PaymentLine."Refund Requested" := true;
+                    end;
+
                 _PaymentEventType::Cancel:
                     begin
                         PaymentLine."Date Canceled" := Today();
@@ -91,16 +117,11 @@
                     end;
             end;
 
-        OnAfterProcessingPaymentLine(PaymentLine, _PaymentEventType, Response);
+        OnAfterProcessingPaymentLine(PaymentLine, PaymentEventType, Response);
         if (PrevRec <> Format(PaymentLine)) then
             PaymentLine.Modify(true);
 
         Commit();
-
-        Rec := PaymentLine;
-
-        if (not Success) then
-            Error(ErrorDuringOperationErr, GetLastErrorText());
     end;
 
     var

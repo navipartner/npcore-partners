@@ -9,26 +9,26 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
 
     procedure Capture(var Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response")
     var
+        PaymentLine: Record "NPR Magento Payment Line";
         TempNcTask: Record "NPR Nc Task" temporary;
         SpfyCapturePayment: Codeunit "NPR Spfy Capture Payment";
-        Success: Boolean;
     begin
-        InitNcTaskFromPmtRequest(Request, TempNcTask);
+        InitNcTaskFromPmtRequest(Request, PaymentLine, TempNcTask);
         if not CheckPrerequisites(TempNcTask, Response) then
             exit;
-        Success := SpfyCapturePayment.CaptureShopifyPayment(TempNcTask, false);
-        SetResponse(TempNcTask, Response, Success);
+        if not SpfyCapturePayment.CaptureShopifyPayment(PaymentLine, TempNcTask, Response) then
+            Error(GetLastErrorText());
     end;
 
     procedure Refund(var Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response")
     var
+        PaymentLine: Record "NPR Magento Payment Line";
         TempNcTask: Record "NPR Nc Task" temporary;
         SpfyCapturePayment: Codeunit "NPR Spfy Capture Payment";
-        Success: Boolean;
     begin
-        InitNcTaskFromPmtRequest(Request, TempNcTask);
-        Success := SpfyCapturePayment.RefundShopifyPayment(TempNcTask, false);
-        SetResponse(TempNcTask, Response, Success);
+        InitNcTaskFromPmtRequest(Request, PaymentLine, TempNcTask);
+        if not SpfyCapturePayment.RefundShopifyPayment(PaymentLine, TempNcTask, Response) then
+            Error(GetLastErrorText());
     end;
 
     procedure Cancel(var Request: Record "NPR PG Payment Request"; var Response: Record "NPR PG Payment Response")
@@ -52,9 +52,8 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
         Page.Run(Page::"NPR Spfy Payment Gateway Card", SpfyPaymentGateway);
     end;
 
-    local procedure InitNcTaskFromPmtRequest(Request: Record "NPR PG Payment Request"; var NcTask: Record "NPR Nc Task")
+    local procedure InitNcTaskFromPmtRequest(Request: Record "NPR PG Payment Request"; var PaymentLine: Record "NPR Magento Payment Line"; var NcTask: Record "NPR Nc Task")
     var
-        PaymentLine: Record "NPR Magento Payment Line";
         SalesHeader: Record "Sales Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesInvHeader: Record "Sales Invoice Header";
@@ -85,6 +84,11 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
                 Error('');  //usupported request
         end;
 
+#if not (BC18 or BC19 or BC20 or BC21)
+        PaymentLine.ReadIsolation := IsolationLevel::UpdLock;
+#else
+        PaymentLine.LockTable();
+#endif
         PaymentLine.GetBySystemId(Request."Payment Line System Id");
         NcTask."Store Code" := CopyStr(SpfyAssignedIDMgt.GetAssignedShopifyID(NcTask."Record ID", "NPR Spfy ID Type"::"Store Code"), 1, MaxStrLen(NcTask."Store Code"));
         NcTask."Record Value" := CopyStr(SpfyAssignedIDMgt.GetAssignedShopifyID(NcTask."Record ID", "NPR Spfy ID Type"::"Entry ID"), 1, MaxStrLen(NcTask."Record Value"));
@@ -98,7 +102,7 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
         IntegrationNotEnabledMsg: Label 'Either sending capture requests is disabled, or Shopify integration is not enabled for store %1.';
     begin
         if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Payment Capture Requests", NcTask."Store Code") then begin
-            SetResponse(StrSubstNo(IntegrationNotEnabledMsg, NcTask."Store Code"), Response, false);
+            SetResponse(StrSubstNo(IntegrationNotEnabledMsg, NcTask."Store Code"), Response, false, Enum::"NPR PG Operation Status"::Failure);
             if UpdateLastErrorText(StrSubstNo(IntegrationNotEnabledMsg, NcTask."Store Code")) then;
             exit;
         end;
@@ -111,17 +115,12 @@ codeunit 6184821 "NPR Spfy Payment Gateway Hdlr" implements "NPR IPaymentGateway
         Error(ErrorMsg);
     end;
 
-    local procedure SetResponse(var NcTask: Record "NPR Nc Task"; var Response: Record "NPR PG Payment Response"; Success: Boolean)
-    begin
-        Response."Response Success" := Success;
-        Response."Response Body" := NcTask.Response;
-    end;
-
-    local procedure SetResponse(ResponseMsg: Text; var Response: Record "NPR PG Payment Response"; Success: Boolean)
+    local procedure SetResponse(ResponseMsg: Text; var Response: Record "NPR PG Payment Response"; Success: Boolean; OperationStatus: Enum "NPR PG Operation Status")
     var
         OStream: OutStream;
     begin
         Response."Response Success" := Success;
+        Response."Reported Operation Status" := OperationStatus;
         Response."Response Body".CreateOutStream(OStream, TextEncoding::UTF8);
         OStream.WriteText(ResponseMsg);
     end;

@@ -146,7 +146,7 @@ codeunit 6184803 "NPR Spfy Assigned ID Mgt Impl."
             Error(IDAlreadyAssigned, Format(ShopifyIDType), NewShopifyID, ShopifyAssignedID."BC Record ID");
     end;
 
-    //#region Subscribers
+    #region Subscribers
 #if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnAfterDeleteEvent', '', false, false)]
 #else
@@ -443,6 +443,6 @@ codeunit 6184803 "NPR Spfy Assigned ID Mgt Impl."
             if ItemCategory.NPRSpfyMetafieldMappingExists() then
                 Rec.FieldError(Description, CannotChangeErr);
     end;
-    //#endregion
+    #endregion
 }
 #endif

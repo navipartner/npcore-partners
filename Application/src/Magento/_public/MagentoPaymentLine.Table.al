@@ -102,9 +102,19 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR Magento Payment Gateway";
         }
+        field(104; "Capture Requested"; Boolean)
+        {
+            Caption = 'Capture Requested';
+            DataClassification = CustomerContent;
+        }
         field(105; "Date Captured"; Date)
         {
             Caption = 'Date Captured';
+            DataClassification = CustomerContent;
+        }
+        field(109; "Refund Requested"; Boolean)
+        {
+            Caption = 'Refund Requested';
             DataClassification = CustomerContent;
         }
         field(110; "Date Refunded"; Date)
