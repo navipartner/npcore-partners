@@ -25,6 +25,32 @@ codeunit 6014538 "NPR RP Aux - Line Misc Library"
         until TicketRcptText.Next() = 0;
     end;
 
+    local procedure PrintTextFromBlobField(var TemplateLine: Record "NPR RP Template Line"; RecordID: RecordID; var Skip: Boolean; LinePrintMgt: Codeunit "NPR RP Line Print Mgt.")
+    var
+        TempBlob: Codeunit "Temp Blob";
+        RecordRef: RecordRef;
+        FieldRef: FieldRef;
+        InStreamBlob: InStream;
+        TextLine: Text;
+    begin
+        RecordRef := RecordID.GetRecord();
+        if not RecordRef.Find() then
+            exit;
+
+        LinePrintMgt.SetFont(TemplateLine."Type Option");
+        FieldRef := RecordRef.Field(TemplateLine.Field);
+        FieldRef.CalcField();
+        TempBlob.FromRecord(RecordRef, FieldRef.Number);
+        TempBlob.CreateInStream(InStreamBlob);
+        while not InStreamBlob.EOS do begin
+            InStreamBlob.ReadText(TextLine);
+            if TextLine <> '' then begin
+                LinePrintMgt.AddTextField(1, TemplateLine.Align, TextLine);
+                Skip := true;
+            end;
+        end;
+    end;
+
     local procedure AddFunction(var tmpRetailList: Record "NPR Retail List" temporary; Choice: Text)
     begin
         tmpRetailList.Number += 1;
@@ -51,6 +77,7 @@ codeunit 6014538 "NPR RP Aux - Line Misc Library"
             exit;
 
         AddFunction(tmpRetailList, 'RECEIPT_TEXT');
+        AddFunction(tmpRetailList, 'PRINT_BLOB_TEXT');
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR RP Line Print Mgt.", 'OnBuildFunctionCodeunitList', '', false, false)]
@@ -70,6 +97,8 @@ codeunit 6014538 "NPR RP Aux - Line Misc Library"
         case FunctionName of
             'RECEIPT_TEXT':
                 PrintReceiptText(TemplateLine, RecID, sender);
+            'PRINT_BLOB_TEXT':
+                PrintTextFromBlobField(TemplateLine, RecID, skip, sender);
         end;
     end;
 }
