@@ -1781,6 +1781,303 @@
     end;
     #endregion
 
+    #region Data Export management
+    internal procedure TriggerExport(var DEDataExport: Record "NPR DE Data Export")
+    var
+        DETSS: Record "NPR DE TSS";
+        ConnectionParameters: Record "NPR DE Audit Setup";
+        RequestBody: JsonObject;
+        ResponseJson: JsonToken;
+        UrlFunction: Text;
+        TSSExportTriggerErr: Label 'Error while trying to trigger a data export at Fiskaly.\%1';
+    begin
+        CheckFieldValuesForTriggerExport(DEDataExport);
+        DETSS.Get(DEDataExport."TSS Code");
+        ConnectionParameters.Get(DETSS."Connection Parameter Set Code");
+
+        RequestBody := CreateJSONBodyForTriggerExport(DEDataExport);
+        UrlFunction := StrSubstNo('/tss/%1/export/%2', Format(DETSS.SystemId, 0, 4), Format(DEDataExport.SystemId, 0, 4));
+
+        if not SendRequest_signDE_V2(RequestBody, ResponseJson, ConnectionParameters, Enum::"Http Request Type"::PUT, UrlFunction) then
+            Error(TSSExportTriggerErr, GetLastErrorText());
+
+        PopulateDataExport(DEDataExport, ResponseJson);
+    end;
+
+    internal procedure RetrieveExport(var DEDataExport: Record "NPR DE Data Export")
+    var
+        DETSS: Record "NPR DE TSS";
+        ConnectionParameters: Record "NPR DE Audit Setup";
+        RequestBody: JsonObject;
+        ResponseJson: JsonToken;
+        UrlFunction: Text;
+        TSSExportRetrieveErr: Label 'Error while trying to retrieve a data export from Fiskaly.\%1';
+    begin
+        CheckGeneralFieldValuesOfDataExport(DEDataExport);
+        DETSS.Get(DEDataExport."TSS Code");
+        ConnectionParameters.Get(DETSS."Connection Parameter Set Code");
+
+        UrlFunction := StrSubstNo('/tss/%1/export/%2', Format(DETSS.SystemId, 0, 4), Format(DEDataExport.SystemId, 0, 4));
+
+        if not SendRequest_signDE_V2(RequestBody, ResponseJson, ConnectionParameters, Enum::"Http Request Type"::GET, UrlFunction) then
+            Error(TSSExportRetrieveErr, GetLastErrorText());
+
+        PopulateDataExport(DEDataExport, ResponseJson);
+    end;
+
+    internal procedure CancelExport(var DEDataExport: Record "NPR DE Data Export")
+    var
+        DETSS: Record "NPR DE TSS";
+        ConnectionParameters: Record "NPR DE Audit Setup";
+        RequestBody: JsonObject;
+        ResponseJson: JsonToken;
+        UrlFunction: Text;
+        TSSExportCancelErr: Label 'Error while trying to cancel a data export at Fiskaly.\%1';
+        ExportCancelConfirmQst: Label 'Are you sure you want to cancel this data export? This action cannot be undone if the export is in PENDING or WORKING state.';
+    begin
+        CheckFieldValuesForCancelExport(DEDataExport);
+        if not Confirm(ExportCancelConfirmQst) then
+            exit;
+
+        DETSS.Get(DEDataExport."TSS Code");
+        ConnectionParameters.Get(DETSS."Connection Parameter Set Code");
+
+        UrlFunction := StrSubstNo('/tss/%1/export/%2', Format(DETSS.SystemId, 0, 4), Format(DEDataExport.SystemId, 0, 4));
+
+        if not SendRequest_signDE_V2(RequestBody, ResponseJson, ConnectionParameters, Enum::"Http Request Type"::DELETE, UrlFunction) then
+            Error(TSSExportCancelErr, GetLastErrorText());
+
+        PopulateDataExport(DEDataExport, ResponseJson);
+    end;
+
+    internal procedure DownloadExportTARFile(DEDataExport: Record "NPR DE Data Export")
+    var
+        DETSS: Record "NPR DE TSS";
+        ConnectionParameters: Record "NPR DE Audit Setup";
+        Client: HttpClient;
+        Headers: HttpHeaders;
+        HttpWebRequest: HttpRequestMessage;
+        HttpWebResponse: HttpResponseMessage;
+        ResponseInStream: InStream;
+        UrlFunction: Text;
+        TSSExportDownloadErr: Label 'Error while trying to download TAR file from Fiskaly.\%1';
+    begin
+        CheckFieldValuesForDownloadExportTARFile(DEDataExport);
+        DETSS.Get(DEDataExport."TSS Code");
+        ConnectionParameters.Get(DETSS."Connection Parameter Set Code");
+
+        CheckHttpClientRequestsAllowed();
+        UrlFunction := StrSubstNo('/tss/%1/export/%2/file', Format(DETSS.SystemId, 0, 4), Format(DEDataExport.SystemId, 0, 4));
+
+        ConnectionParameters.TestField("Api URL");
+        HttpWebRequest.SetRequestUri(ConnectionParameters."Api URL" + UrlFunction);
+        SetHttpHeaders(Enum::"Http Request Type"::GET, HttpWebRequest, Headers);
+        Headers.Add('Authorization', StrSubstNo(BearerTokenLbl, Get_signDE_V2_JwtToken(ConnectionParameters)));
+
+        Client.Send(HttpWebRequest, HttpWebResponse);
+
+        if not HttpWebResponse.IsSuccessStatusCode then begin
+            HttpWebResponse.Content.ReadAs(ResponseInStream);
+            Error(TSSExportDownloadErr, Format(HttpWebResponse.HttpStatusCode) + ' ' + HttpWebResponse.ReasonPhrase);
+        end;
+
+        HttpWebResponse.Content.ReadAs(ResponseInStream);
+        DownloadExportTARFile(DEDataExport, ResponseInStream);
+    end;
+
+    internal procedure ListExports(TSSCode: Code[10])
+    var
+        DETSS: Record "NPR DE TSS";
+        ConnectionParameters: Record "NPR DE Audit Setup";
+        RequestBody: JsonObject;
+        ResponseJson: JsonToken;
+        UrlFunction: Text;
+        TSSExportListErr: Label 'Error while trying to retrieve list of data exports from Fiskaly.\%1';
+    begin
+        if TSSCode <> '' then begin
+            DETSS.Get(TSSCode);
+            DETSS.TestField("Connection Parameter Set Code");
+            ConnectionParameters.Get(DETSS."Connection Parameter Set Code");
+            UrlFunction := StrSubstNo('/tss/%1/export', Format(DETSS.SystemId, 0, 4));
+        end else begin
+            ConnectionParameters.FindFirst();
+            UrlFunction := '/export';
+        end;
+
+        if not SendRequest_signDE_V2(RequestBody, ResponseJson, ConnectionParameters, Enum::"Http Request Type"::GET, UrlFunction) then
+            Error(TSSExportListErr, GetLastErrorText());
+
+        PopulateDataExportsForListExports(ResponseJson, TSSCode);
+    end;
+
+    local procedure CheckFieldValuesForTriggerExport(DEDataExport: Record "NPR DE Data Export")
+    var
+        DETSS: Record "NPR DE TSS";
+    begin
+        CheckGeneralFieldValuesOfDataExport(DEDataExport);
+        DETSS.Get(DEDataExport."TSS Code");
+        CheckIsGUIDAccordingToUUIDv4Standard(DETSS.SystemId);
+    end;
+
+    local procedure CheckFieldValuesForCancelExport(DEDataExport: Record "NPR DE Data Export")
+    var
+        ExportStateErr: Label '%1 of %2 has to be %3 or %4 in order to be able to cancel the export.', Comment = '%1 - DE Data Export State field caption, %2 - DE Data Export table caption, %3 - DE Export State PENDING value, %4 - DE Export State WORKING value';
+    begin
+        CheckGeneralFieldValuesOfDataExport(DEDataExport);
+        if not (DEDataExport.State in [DEDataExport.State::PENDING, DEDataExport.State::WORKING]) then
+            Error(ExportStateErr, DEDataExport.FieldCaption(State), DEDataExport.TableCaption(), DEDataExport.State::PENDING, DEDataExport.State::WORKING);
+    end;
+
+    local procedure CheckFieldValuesForDownloadExportTARFile(DEDataExport: Record "NPR DE Data Export")
+    var
+        ExportStateErr: Label '%1 of %2 has to be %3 in order to be able to download the TAR file.', Comment = '%1 - DE Data Export State field caption, %2 - DE Data Export table caption, %3 - DE Export State COMPLETED value';
+    begin
+        CheckGeneralFieldValuesOfDataExport(DEDataExport);
+        if DEDataExport.State <> DEDataExport.State::COMPLETED then
+            Error(ExportStateErr, DEDataExport.FieldCaption(State), DEDataExport.TableCaption(), DEDataExport.State::COMPLETED);
+    end;
+
+    local procedure CheckGeneralFieldValuesOfDataExport(DEDataExport: Record "NPR DE Data Export")
+    begin
+        DEDataExport.TestField("TSS Code");
+        CheckIsGUIDAccordingToUUIDv4Standard(DEDataExport.SystemId);
+    end;
+
+    local procedure CreateJSONBodyForTriggerExport(DEDataExport: Record "NPR DE Data Export") RequestJson: JsonObject
+    begin
+        // Add query parameters as per API documentation
+        if DEDataExport."Client Id" <> '' then
+            RequestJson.Add('client_id', DEDataExport."Client Id");
+        if DEDataExport."Transaction Number" <> '' then
+            RequestJson.Add('transaction_number', DEDataExport."Transaction Number");
+        if DEDataExport."Start Transaction Number" <> '' then
+            RequestJson.Add('start_transaction_number', DEDataExport."Start Transaction Number");
+        if DEDataExport."End Transaction Number" <> '' then
+            RequestJson.Add('end_transaction_number', DEDataExport."End Transaction Number");
+        if DEDataExport."Start Date" <> 0 then
+            RequestJson.Add('start_date', DEDataExport."Start Date");
+        if DEDataExport."End Date" <> 0 then
+            RequestJson.Add('end_date', DEDataExport."End Date");
+        if DEDataExport."Maximum Number Records" <> 0 then
+            RequestJson.Add('maximum_number_records', DEDataExport."Maximum Number Records")
+        else
+            RequestJson.Add('maximum_number_records', '1000000'); // Default value
+        if DEDataExport."Start Signature Counter" <> '' then
+            RequestJson.Add('start_signature_counter', DEDataExport."Start Signature Counter");
+        if DEDataExport."End Signature Counter" <> '' then
+            RequestJson.Add('end_signature_counter', DEDataExport."End Signature Counter");
+    end;
+
+    local procedure PopulateDataExportsForListExports(ResponseJson: JsonToken; TSSCode: Code[10])
+    var
+        DEDataExport: Record "NPR DE Data Export";
+        ExportObject, ExportObjects : JsonToken;
+        PropertyValue: JsonToken;
+    begin
+        DEDataExport.DeleteAll();
+        if ResponseJson.SelectToken('data', ExportObjects) then begin
+            foreach ExportObject in ExportObjects.AsArray() do begin
+                if ExportObject.SelectToken('_id', PropertyValue) then begin
+                    if not DEDataExport.GetBySystemId(PropertyValue.AsValue().AsText()) then begin
+                        DEDataExport.Init();
+                        DEDataExport.SystemId := PropertyValue.AsValue().AsText();
+                        DEDataExport."TSS Code" := TSSCode;
+                        if ExportObject.SelectToken('tss_id', PropertyValue) then
+                            DEDataExport.Validate("TSS ID", PropertyValue.AsValue().AsText());
+                        DEDataExport.Insert(true);
+                    end;
+                    PopulateDataExport(DEDataExport, ExportObject);
+                end;
+            end;
+        end;
+    end;
+
+    internal procedure PopulateDataExport(var DEDataExport: Record "NPR DE Data Export"; ResponseJson: JsonToken)
+    var
+        PropertyValue: JsonToken;
+    begin
+        if ResponseJson.SelectToken('state', PropertyValue) then
+            DEDataExport.State := GetExportState(PropertyValue.AsValue().AsText());
+        if ResponseJson.SelectToken('exception', PropertyValue) then
+            DEDataExport.Exception := GetExportException(PropertyValue.AsValue().AsText());
+        if ResponseJson.SelectToken('time_request', PropertyValue) then
+            DEDataExport."Time Request" := PropertyValue.AsValue().AsBigInteger();
+        if ResponseJson.SelectToken('time_start', PropertyValue) then
+            DEDataExport."Time Start" := PropertyValue.AsValue().AsBigInteger();
+        if ResponseJson.SelectToken('time_end', PropertyValue) then
+            DEDataExport."Time End" := PropertyValue.AsValue().AsBigInteger();
+        if ResponseJson.SelectToken('time_expiration', PropertyValue) then
+            DEDataExport."Time Expiration" := PropertyValue.AsValue().AsBigInteger();
+        if ResponseJson.SelectToken('time_error', PropertyValue) then
+            DEDataExport."Time Error" := PropertyValue.AsValue().AsBigInteger();
+        if ResponseJson.SelectToken('estimated_time_of_completion', PropertyValue) then
+            DEDataExport."Estimated Time Of Completion" := PropertyValue.AsValue().AsBigInteger();
+        if ResponseJson.SelectToken('tss_id', PropertyValue) then
+            DEDataExport.Validate("TSS ID", PropertyValue.AsValue().AsText());
+        if ResponseJson.SelectToken('_env', PropertyValue) then
+            DEDataExport.Environment := CopyStr(PropertyValue.AsValue().AsText(), 1, MaxStrLen(DEDataExport.Environment));
+        if ResponseJson.SelectToken('_version', PropertyValue) then
+            DEDataExport.Version := CopyStr(PropertyValue.AsValue().AsText(), 1, MaxStrLen(DEDataExport.Version));
+
+        DEDataExport.Modify(true);
+    end;
+
+    local procedure GetExportState(ExportState: Text): Enum "NPR DE Export State"
+    begin
+        case ExportState of
+            'CANCELLED':
+                exit(Enum::"NPR DE Export State"::CANCELLED);
+            'PENDING':
+                exit(Enum::"NPR DE Export State"::PENDING);
+            'WORKING':
+                exit(Enum::"NPR DE Export State"::WORKING);
+            'COMPLETED':
+                exit(Enum::"NPR DE Export State"::COMPLETED);
+            'ERROR':
+                exit(Enum::"NPR DE Export State"::ERROR);
+        end;
+
+        exit(Enum::"NPR DE Export State"::" ");
+    end;
+
+    local procedure GetExportException(ExportException: Text): Enum "NPR DE Export Exception"
+    begin
+        case ExportException of
+            'E_UNEXPECTED':
+                exit(Enum::"NPR DE Export Exception"::E_UNEXPECTED);
+            'E_ID_NOT_FOUND':
+                exit(Enum::"NPR DE Export Exception"::E_ID_NOT_FOUND);
+            'E_BAD_REQUEST':
+                exit(Enum::"NPR DE Export Exception"::E_BAD_REQUEST);
+            'E_INTERNAL':
+                exit(Enum::"NPR DE Export Exception"::E_INTERNAL);
+            'E_TRANSACTION_ID_NOT_FOUND':
+                exit(Enum::"NPR DE Export Exception"::E_TRANSACTION_ID_NOT_FOUND);
+            'E_NO_DATA_AVAILABLE':
+                exit(Enum::"NPR DE Export Exception"::E_NO_DATA_AVAILABLE);
+            'E_TOO_MANY_RECORDS':
+                exit(Enum::"NPR DE Export Exception"::E_TOO_MANY_RECORDS);
+            'E_ALREADY_PROCESSING':
+                exit(Enum::"NPR DE Export Exception"::E_ALREADY_PROCESSING);
+            'E_LOGS_NOT_DELETED':
+                exit(Enum::"NPR DE Export Exception"::E_LOGS_NOT_DELETED);
+            'E_EXPORT_PROCESSING_TIMEOUT':
+                exit(Enum::"NPR DE Export Exception"::E_EXPORT_PROCESSING_TIMEOUT);
+        end;
+
+        exit(Enum::"NPR DE Export Exception"::" ");
+    end;
+
+    local procedure DownloadExportTARFile(DEDataExport: Record "NPR DE Data Export"; ResponseInStream: InStream)
+    var
+        FilenameLbl: Label 'Export-%1.tar', Locked = true;
+        Filename: Text;
+    begin
+        Filename := StrSubstNo(FilenameLbl, Format(DEDataExport.SystemId, 0, 4).ToLower());
+        DownloadFromStream(ResponseInStream, '', '', '', Filename);
+    end;
+    #endregion
+
     #region V2 (signDE) API request handling
     internal procedure SendRequest_signDE_V2(RequestBodyJsonIn: JsonObject; var ResponseJsonOut: JsonToken; ConnectionParameters: Record "NPR DE Audit Setup"; HttpRequestType: Enum "Http Request Type"; UrlFunction: Text): Boolean
     begin
