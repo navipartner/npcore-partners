@@ -30,6 +30,7 @@ codeunit 6060060 "NPR AAD Application Mgt."
         [NonDebuggable]
         _ClientSecret: Text;
         _Silent: Boolean;
+        _ApplicationObjectId: Guid;
 
     internal procedure CreateAzureADApplicationAndSecret(AppDisplayName: Text[50]; SecretDisplayName: Text; PermissionSets: List of [Code[20]])
     var
@@ -61,6 +62,7 @@ codeunit 6060060 "NPR AAD Application Mgt."
 
             AppJson.SelectToken('id', BufferToken);
             ApplicationObjectId := BufferToken.AsValue().AsText();
+            _ApplicationObjectId := ApplicationObjectId;
 
             if (Confirm(GrantConsentQst, true)) then begin
                 // Azure is really slow to actually recognize the new app,
@@ -91,6 +93,10 @@ codeunit 6060060 "NPR AAD Application Mgt."
             AppJson := ExistingAppToken.AsObject();
             ExistingAppToken.SelectToken('appId', BufferToken);
             ClientGuid := BufferToken.AsValue().AsText();
+
+            AppJson.SelectToken('id', BufferToken);
+            ApplicationObjectId := BufferToken.AsValue().AsText();
+            _ApplicationObjectId := ApplicationId;
 
             RegisterAzureADApplication(ClientGuid, AppDisplayName, PermissionSets);
 
@@ -515,5 +521,10 @@ codeunit 6060060 "NPR AAD Application Mgt."
         FutureDate := CalcDate(StrSubstNo('<+%1Y>', NumberOfYears), Today);
         FutureDateTime := CreateDateTime(FutureDate, 0T);
         Result := Format(FutureDateTime, 0, '<Standard Format,9>');
+    end;
+
+    internal procedure GetApplicationId(): Guid
+    begin
+        exit(_ApplicationObjectId);
     end;
 }

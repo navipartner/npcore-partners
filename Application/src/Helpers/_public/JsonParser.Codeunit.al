@@ -246,6 +246,35 @@ codeunit 6150648 "NPR Json Parser"
         exit(true);
     end;
 
+    procedure GetProperty(PropertyName: Text; var Value: BigInteger; var HasProperty: Boolean): Codeunit "NPR JSON Parser"
+    begin
+        InitcurrCodeunit();
+        HasProperty := TryGetProperty(PropertyName, Value);
+        exit(CurrCodeunit);
+    end;
+
+    procedure GetProperty(PropertyName: Text; var Value: BigInteger): Codeunit "NPR JSON Parser"
+    var
+        hasProperty: Boolean;
+    begin
+        exit(GetProperty(PropertyName, Value, hasProperty));
+    end;
+
+    procedure TryGetProperty(PropertyName: Text; var Value: BigInteger): Boolean
+    var
+        valueJsonToken: JsonToken;
+    begin
+        Clear(Value);
+        if not CurrentObject.Get(PropertyName, valueJsonToken) then
+            exit(false);
+
+        if not valueJsonToken.IsValue then
+            exit(false);
+
+        Value := valueJsonToken.AsValue().AsInteger();
+        exit(true);
+    end;
+
     procedure GetValues(var ValueList: List of [JsonValue]): Codeunit "NPR JSON Parser"
     var
         ArrayElement: JsonToken;
