@@ -1,5 +1,28 @@
 tableextension 6014525 "NPR AAD Application" extends "AAD Application"
 {
+    fields
+    {
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        field(6014400; "NPR NP API Key Id"; Guid)
+        {
+            Caption = 'NP API Key Id';
+            Editable = false;
+            TableRelation = "NPR NP API Key";
+            ToolTip = 'Specifies a link with NP API Key.';
+            DataClassification = CustomerContent;
+        }
+#endif
+    }
+
+    keys
+    {
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        key(NPRNPAPIKey; "NPR NP API Key Id")
+        {
+        }
+#endif
+    }
+
     trigger OnDelete()
     var
         AccessControl: Record "Access Control";
