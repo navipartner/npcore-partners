@@ -149,11 +149,12 @@
     var
         CostAmount: Decimal;
         SalesAmount: Decimal;
+        SalesAmountActual: Decimal;
         Quantity: Decimal;
     begin
         CalcCostAndSalesAmountFromVE(CostAmount, SalesAmount);
 
-        GetQuantityFromILEQuery(Quantity, '');
+        GetQuantityAndSalesAmountFromILEQuery(Quantity, '', SalesAmountActual, false);
 
         "Sale Quantity" := Quantity;
         "Sale Amount" := SalesAmount;
@@ -168,7 +169,7 @@
 
         CalcCostAndSalesAmountFromVE(CostAmount, SalesAmount);
 
-        GetQuantityFromILEQuery(Quantity, '');
+        GetQuantityAndSalesAmountFromILEQuery(Quantity, '', SalesAmountActual, false);
 
         "LastYear Sale Quantity" := Quantity;
         "LastYear Sale Amount" := SalesAmount;
@@ -181,7 +182,7 @@
         LastYear := false;
     end;
 
-    internal procedure GetQuantityFromILEQuery(var Quantity: Decimal; SalesPersonCodeFilter: Code[20])
+    internal procedure GetQuantityAndSalesAmountFromILEQuery(var Quantity: Decimal; SalesPersonCodeFilter: Code[20]; var SalesAmount: Decimal; CheckAmountOnValueEntry: Boolean)
     var
         SalesStatisticsByPerson: Query "NPR Sales Statistics By Person";
     begin
@@ -214,9 +215,15 @@
             SalesStatisticsByPerson.SetRange(Filter_Global_Dimension_2_Code, "Global Dimension 2 Filter")
         else
             SalesStatisticsByPerson.SetRange(Filter_Global_Dimension_2_Code);
+
+        if CheckAmountOnValueEntry then
+            SalesStatisticsByPerson.SetFilter(Sales_Amount__Actual_Filter, '<>%1', 0);
+
         SalesStatisticsByPerson.Open();
-        while SalesStatisticsByPerson.Read() do
+        while SalesStatisticsByPerson.Read() do begin
             Quantity := SalesStatisticsByPerson.Quantity;
+            SalesAmount := SalesStatisticsByPerson.Sales_Amount__Actual;
+        end;
     end;
 
     internal procedure SetValueEntryFilter(var ValueEntry: Record "Value Entry")
@@ -338,6 +345,7 @@
     var
         Current: Record "Salesperson/Purchaser";
         "Count": Integer;
+        SalesAmount: Decimal;
         Dlg: Dialog;
         SalesPerson: Record "Salesperson/Purchaser";
         txtDlg: Label 'Processing SalesPerson #1######## @2@@@@@@@@';
@@ -355,8 +363,8 @@
 
                     Dlg.Update(1, SalesPerson.Name);
                     Dlg.Update(2, Round(Count / SalesPerson.Count() * 10000, 1, '='));
-                    GetQuantityFromILEQuery(Quantity, SalesPerson.Code);
-                    if Quantity <> 0 then begin
+                    GetQuantityAndSalesAmountFromILEQuery(Quantity, SalesPerson.Code, SalesAmount, true);
+                    if (Quantity <> 0) or (SalesAmount <> 0) then begin
                         Rec.Get(SalesPerson.Code);
                         Rec.Mark(true);
                     end;

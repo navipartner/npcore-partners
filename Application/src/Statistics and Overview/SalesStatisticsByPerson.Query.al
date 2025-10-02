@@ -39,6 +39,13 @@ query 6014422 "NPR Sales Statistics By Person"
                 filter(Filter_SalesPers_Purch_Code; "Salespers./Purch. Code")
                 {
                 }
+                filter(Sales_Amount__Actual_Filter; "Sales Amount (Actual)")
+                {
+                }
+                column(Sales_Amount__Actual; "Sales Amount (Actual)")
+                {
+                    Method = Sum;
+                }
                 dataitem(Item; Item)
                 {
                     DataItemLink = "No." = Value_Entry."Item No.";
