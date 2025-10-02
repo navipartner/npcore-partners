@@ -6,6 +6,7 @@ tableextension 6014416 "NPR Salesperson/Purchaser" extends "Salesperson/Purchase
         {
             Caption = 'POS Unit Password';
             DataClassification = CustomerContent;
+            ExtendedDatatype = Masked;
             Description = 'NPR7.100.000';
 
             trigger OnValidate()
