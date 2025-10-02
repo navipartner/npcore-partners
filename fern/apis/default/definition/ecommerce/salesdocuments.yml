@@ -403,7 +403,7 @@ types:
         type: string
         docs: Max. length 50 symbols.
       externalPaymentType:
-        type: string
+        type: optional<string>
         docs: Max. length 50 symbols.
       paymentReference: 
         type: optional<string>
