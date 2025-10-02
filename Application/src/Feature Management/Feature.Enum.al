@@ -110,4 +110,11 @@ enum 6014577 "NPR Feature" implements "NPR Feature Management"
         Caption = 'Magento Integration', Locked = true, MaxLength = 50;
         Implementation = "NPR Feature Management" = "NPR Magento Feature";
     }
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    value(180; "POS License Billing Integration")
+    {
+        Caption = 'POS License Billing Integration', Locked = true, MaxLength = 50;
+        Implementation = "NPR Feature Management" = "NPR POS License Billing Feat.";
+    }
+#endif
 }

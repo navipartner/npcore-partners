@@ -39,6 +39,10 @@ pageextension 6014532 "NPR Company Information" extends "Company Information"
                 PromotedOnly = true;
                 ApplicationArea = NPRRetail;
                 ToolTip = 'Executes the Check NP Retail License action.';
+                ObsoleteState = Pending;
+                ObsoleteTag = '2025-09-03';
+                ObsoleteReason = 'Not used. Using POS Billing API integration to control licenses.';
+
                 trigger OnAction()
                 var
                     Company: Record Company;

@@ -131,6 +131,20 @@ codeunit 6150632 "NPR New Feature Handler"
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Magento Upgrade", UpgradeStep));
     end;
 
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    internal procedure HandleNewPOSLicenseBillingFeature()
+    var
+        UpgTagDef: Codeunit "NPR Upgrade Tag Definitions";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeStep: Text;
+    begin
+        UpgradeStep := 'AddPOSBillingFeature';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Magento Upgrade", UpgradeStep)) then
+            exit;
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR Magento Upgrade", UpgradeStep));
+    end;
+#endif
+
     local procedure POSEditorFeatureHandle()
     var
         Feature: Record "NPR Feature";

@@ -133,6 +133,9 @@
             CalcFormula = Count("NPR Stripe POS User");
             Caption = 'POS Users';
             FieldClass = FlowField;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-09-03';
+            ObsoleteReason = 'Not used. Using POS Billing API integration to control licenses.';
         }
     }
 

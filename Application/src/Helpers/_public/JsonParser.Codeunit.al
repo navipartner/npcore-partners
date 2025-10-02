@@ -286,6 +286,17 @@ codeunit 6150648 "NPR Json Parser"
         exit(CurrCodeunit);
     end;
 
+    procedure GetValues(var ObjectList: List of [JsonObject]): Codeunit "NPR JSON Parser"
+    var
+        ArrayElement: JsonToken;
+    begin
+        InitcurrCodeunit();
+        Clear(ObjectList);
+        foreach ArrayElement in CurrentArray do
+            ObjectList.Add(ArrayElement.AsObject());
+        exit(CurrCodeunit);
+    end;
+
     procedure GetProperty(PropertyName: Text; var Value: Boolean): Codeunit "NPR JSON Parser"
     var
         hasProperty: Boolean;
