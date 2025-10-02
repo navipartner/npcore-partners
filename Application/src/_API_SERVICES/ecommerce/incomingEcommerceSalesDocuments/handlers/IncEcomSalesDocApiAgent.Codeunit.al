@@ -365,7 +365,8 @@ codeunit 6248362 "NPR IncEcomSalesDocApiAgent"
         CommentsJsonToken: JsonToken;
         SalesLinesNoArrayErr: Label 'The comments property is not an array.', Locked = true;
     begin
-        CommentsJsonToken := JsonHelper.GetJsonToken(RequestBody, 'comments');
+        if not JsonHelper.GetJsonToken(RequestBody, 'comments', CommentsJsonToken) then
+            exit;
 
         if (not CommentsJsonToken.IsArray()) then
             Error(SalesLinesNoArrayErr);
