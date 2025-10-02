@@ -10,6 +10,7 @@ codeunit 6248364 "NPR Inc Ecom Sales Doc Impl"
     var
         SalesHeader: Record "Sales Header";
         IncEcomSalesDocImplEvents: Codeunit "NPR IncEcomSalesDocImplEvents";
+        IncEcomSalesWebhook: Codeunit "NPR Inc Ecom Sales Webhooks";
     begin
         if IncEcomSalesHeader."Creation Status" = IncEcomSalesHeader."Creation Status"::Created then
             exit;
@@ -21,6 +22,13 @@ codeunit 6248364 "NPR Inc Ecom Sales Doc Impl"
         Commit();
 
         Success := true;
+
+        case IncEcomSalesHeader."Document Type" of
+            IncEcomSalesHeader."Document Type"::Order:
+                IncEcomSalesWebhook.OnSalesOrderCreated(SalesHeader.SystemId, SalesHeader."External Document No.", SalesHeader."NPR External Order No.", SalesHeader."NPR Inc Ecom Sale Id");
+            IncEcomSalesHeader."Document Type"::"Return Order":
+                IncEcomSalesWebhook.OnSalesReturnOrderCreated(SalesHeader.SystemId, SalesHeader."External Document No.", SalesHeader."NPR External Order No.", SalesHeader."NPR Inc Ecom Sale Id");
+        end;
 
         IncEcomSalesDocImplEvents.OnAfterProcess(IncEcomSalesHeader, Success);
     end;
@@ -811,7 +819,10 @@ codeunit 6248364 "NPR Inc Ecom Sales Doc Impl"
                 IncEcomSalesHeader.Modify();
             end;
         end;
+
+        SendWebhookPostedStatus(SalesHeader, IncEcomSalesHeader);
         IncEcomSalesDocImplEvents.OnAfterUpdateSalesDocumentPostingStatusFromSalesHeader(SalesHeader, IncEcomSalesHeader);
+
     end;
 
     local procedure UpdateSalesDocumentLinePostingInformationSalesInvoice(SalesInvLine: Record "Sales Invoice Line")
@@ -897,8 +908,82 @@ codeunit 6248364 "NPR Inc Ecom Sales Doc Impl"
         UpdateSaleDocumentPostingStatusFromSalesHeader(SalesHeader)
     end;
 
+    local procedure SendWebhookPostedStatus(SalesHeader: Record "Sales Header"; IncEcomSalesHeader: Record "NPR Inc Ecom Sales Header")
+    var
+        IncEcomSalesWebhook: Codeunit "NPR Inc Ecom Sales Webhooks";
+        PostedStatusText: Text[50];
+    begin
+        // Only handle actual posting statuses, exclude pending
+        if not (IncEcomSalesHeader."Posting Status" in [
+            IncEcomSalesHeader."Posting Status"::"Partially Invoiced",
+            IncEcomSalesHeader."Posting Status"::Invoiced]) then
+            exit;
 
+        // Determine posted status text
+        if IncEcomSalesHeader."Posting Status" = IncEcomSalesHeader."Posting Status"::Invoiced then
+            PostedStatusText := 'fullyInvoiced'
+        else
+            PostedStatusText := 'partiallyInvoiced';
 
+        // Call appropriate webhook based on document type
+        case SalesHeader."Document Type" of
+            SalesHeader."Document Type"::Order:
+                IncEcomSalesWebhook.OnSalesOrderPosted(
+                    SalesHeader.SystemId,
+                    SalesHeader."External Document No.",
+                    SalesHeader."NPR External Order No.",
+                    SalesHeader."NPR Inc Ecom Sale Id",
+                    PostedStatusText);
+            SalesHeader."Document Type"::"Return Order":
+                IncEcomSalesWebhook.OnSalesReturnOrderPosted(
+                    SalesHeader.SystemId,
+                    SalesHeader."External Document No.",
+                    SalesHeader."NPR External Order No.",
+                    SalesHeader."NPR Inc Ecom Sale Id",
+                    PostedStatusText);
+        end;
+    end;
 
+    [EventSubscriber(ObjectType::Table, Database::"Sales Header", 'OnBeforeDeleteEvent', '', true, true)]
+    local procedure OnBeforeDeleteSalesHeader(var Rec: Record "Sales Header"; RunTrigger: Boolean)
+    var
+        SalesInvoice: Record "Sales Invoice Header";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        IncEcomSalesWebhook: Codeunit "NPR Inc Ecom Sales Webhooks";
+        IsPosted: Boolean;
+    begin
+        if Rec.IsTemporary() then
+            exit;
+
+        if IsNullGuid(Rec."NPR Inc Ecom Sale Id") then
+            exit;
+
+        // Check if the document was already posted to avoid triggering cancellation during posting
+        case Rec."Document Type" of
+            Rec."Document Type"::Order:
+                begin
+                    SalesInvoice.SetRange("NPR Inc Ecom Sale Id", Rec."NPR Inc Ecom Sale Id");
+                    SalesInvoice.SetRange("Order No.", Rec."No.");
+                    IsPosted := not SalesInvoice.IsEmpty();
+                end;
+            Rec."Document Type"::"Return Order":
+                begin
+                    SalesCrMemoHeader.SetRange("NPR Inc Ecom Sale Id", Rec."NPR Inc Ecom Sale Id");
+                    SalesCrMemoHeader.SetRange("Return Order No.", Rec."No.");
+                    IsPosted := not SalesCrMemoHeader.IsEmpty();
+                end;
+        end;
+
+        if IsPosted then
+            exit;
+
+        // Call appropriate webhook based on document type
+        case Rec."Document Type" of
+            Rec."Document Type"::Order:
+                IncEcomSalesWebhook.OnSalesOrderCancelled(Rec.SystemId, Rec."External Document No.", Rec."NPR External Order No.", Rec."NPR Inc Ecom Sale Id");
+            Rec."Document Type"::"Return Order":
+                IncEcomSalesWebhook.OnSalesReturnOrderCancelled(Rec.SystemId, Rec."External Document No.", Rec."NPR External Order No.", Rec."NPR Inc Ecom Sale Id");
+        end;
+    end;
 }
 #endif

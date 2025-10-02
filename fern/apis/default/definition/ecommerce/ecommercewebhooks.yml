@@ -1,0 +1,339 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+  commonApiTypes: ./../common-api-types.yml
+
+types:
+  # Define WebhookEvent locally since it might not exist in commonApiTypes
+  WebhookEvent:
+    properties:
+      initiatingUserAADObjectId: string
+      timestamp: datetime
+      companyName: string
+      companyId: uuid
+      appId: uuid
+      clientState: string
+      eventName: string
+      eventVersion: string
+
+  # Sales Order Events
+  SalesOrderCreatedEvent:
+    properties:
+      values: 
+        type: list<SalesOrderCreatedObject>
+        docs: An array of webhooks, be prepared to handle more than 1 in the same hook request.
+    examples:
+      - name: ExampleEvent
+        value:
+          values:
+            - $SalesOrderCreatedObject.ExampleObject
+
+  SalesOrderCreatedObject:
+    extends: WebhookEvent
+    properties:
+      payload: SalesOrderCreatedEventPayload
+    examples:
+      - name: ExampleObject
+        value:
+          initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
+          timestamp: "2024-06-28T12:00:00Z"
+          companyName: "CRONUS International Ltd."
+          companyId: "b56a418d-8205-4d3a-bdbb-25d94e42abbd"
+          appId: "992c2309-cca4-43cb-9e41-911f482ec088"
+          clientState: "secret_value_from_subscription_creation_mirrored" 
+          eventName: "salesOrder_created"
+          eventVersion: "1.0"
+          payload: $SalesOrderCreatedEventPayload.ExamplePayload
+
+  SalesOrderCreatedEventPayload:
+    properties:
+      salesOrderId: uuid
+      externalDocumentNo: string
+      nprExternalOrderNo: string
+      ecommerceDocumentId: uuid
+    examples:
+      - name: ExamplePayload
+        value:
+          salesOrderId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          externalDocumentNo: "WEB-ORDER-001"
+          nprExternalOrderNo: "NPR-20241201-001"
+          ecommerceDocumentId: "f9e8d7c6-b5a4-3210-9876-543210fedcba"
+
+  SalesOrderPostedEvent:
+    properties:
+      values: 
+        type: list<SalesOrderPostedObject>
+        docs: An array of webhooks, be prepared to handle more than 1 in the same hook request.
+    examples:
+      - name: ExampleEvent
+        value:
+          values:
+            - $SalesOrderPostedObject.ExampleObject
+
+  SalesOrderPostedObject:
+    extends: WebhookEvent
+    properties:
+      payload: SalesOrderPostedEventPayload
+    examples:
+      - name: ExampleObject
+        value:
+          initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
+          timestamp: "2024-06-28T12:30:00Z"
+          companyName: "CRONUS International Ltd."
+          companyId: "b56a418d-8205-4d3a-bdbb-25d94e42abbd"
+          appId: "992c2309-cca4-43cb-9e41-911f482ec088"
+          clientState: "secret_value_from_subscription_creation_mirrored" 
+          eventName: "salesOrder_posted"
+          eventVersion: "1.0"
+          payload: $SalesOrderPostedEventPayload.ExamplePayload
+
+  SalesOrderPostedEventPayload:
+    properties:
+      salesOrderId: uuid
+      externalDocumentNo: string
+      nprExternalOrderNo: string
+      ecommerceDocumentId: uuid
+      postedStatus: string
+    examples:
+      - name: ExamplePayload
+        value:
+          salesOrderId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          externalDocumentNo: "WEB-ORDER-001"
+          nprExternalOrderNo: "NPR-20241201-001"
+          ecommerceDocumentId: "f9e8d7c6-b5a4-3210-9876-543210fedcba"
+          postedStatus: "fullyInvoiced"
+
+  SalesOrderCancelledEvent:
+    properties:
+      values: 
+        type: list<SalesOrderCancelledObject>
+        docs: An array of webhooks, be prepared to handle more than 1 in the same hook request.
+    examples:
+      - name: ExampleEvent
+        value:
+          values:
+            - $SalesOrderCancelledObject.ExampleObject
+
+  SalesOrderCancelledObject:
+    extends: WebhookEvent
+    properties:
+      payload: SalesOrderCancelledEventPayload
+    examples:
+      - name: ExampleObject
+        value:
+          initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
+          timestamp: "2024-06-28T13:00:00Z"
+          companyName: "CRONUS International Ltd."
+          companyId: "b56a418d-8205-4d3a-bdbb-25d94e42abbd"
+          appId: "992c2309-cca4-43cb-9e41-911f482ec088"
+          clientState: "secret_value_from_subscription_creation_mirrored" 
+          eventName: "salesOrder_cancelled"
+          eventVersion: "1.0"
+          payload: $SalesOrderCancelledEventPayload.ExamplePayload
+
+  SalesOrderCancelledEventPayload:
+    properties:
+      salesOrderId: uuid
+      externalDocumentNo: string
+      nprExternalOrderNo: string
+      ecommerceDocumentId: uuid
+    examples:
+      - name: ExamplePayload
+        value:
+          salesOrderId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          externalDocumentNo: "WEB-ORDER-001"
+          nprExternalOrderNo: "NPR-20241201-001"
+          ecommerceDocumentId: "f9e8d7c6-b5a4-3210-9876-543210fedcba"
+
+  # Sales Return Order Events
+  SalesReturnOrderCreatedEvent:
+    properties:
+      values: 
+        type: list<SalesReturnOrderCreatedObject>
+        docs: An array of webhooks, be prepared to handle more than 1 in the same hook request.
+    examples:
+      - name: ExampleEvent
+        value:
+          values:
+            - $SalesReturnOrderCreatedObject.ExampleObject
+
+  SalesReturnOrderCreatedObject:
+    extends: WebhookEvent
+    properties:
+      payload: SalesReturnOrderCreatedEventPayload
+    examples:
+      - name: ExampleObject
+        value:
+          initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
+          timestamp: "2024-06-28T12:00:00Z"
+          companyName: "CRONUS International Ltd."
+          companyId: "b56a418d-8205-4d3a-bdbb-25d94e42abbd"
+          appId: "992c2309-cca4-43cb-9e41-911f482ec088"
+          clientState: "secret_value_from_subscription_creation_mirrored" 
+          eventName: "salesReturnOrder_created"
+          eventVersion: "1.0"
+          payload: $SalesReturnOrderCreatedEventPayload.ExamplePayload
+
+  SalesReturnOrderCreatedEventPayload:
+    properties:
+      salesReturnOrderId: uuid
+      externalDocumentNo: string
+      nprExternalOrderNo: string
+      ecommerceDocumentId: uuid
+    examples:
+      - name: ExamplePayload
+        value:
+          salesReturnOrderId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          externalDocumentNo: "WEB-RETURN-001"
+          nprExternalOrderNo: "NPR-20241201-RET-001"
+          ecommerceDocumentId: "f9e8d7c6-b5a4-3210-9876-543210fedcba"
+
+  SalesReturnOrderPostedEvent:
+    properties:
+      values: 
+        type: list<SalesReturnOrderPostedObject>
+        docs: An array of webhooks, be prepared to handle more than 1 in the same hook request.
+    examples:
+      - name: ExampleEvent
+        value:
+          values:
+            - $SalesReturnOrderPostedObject.ExampleObject
+
+  SalesReturnOrderPostedObject:
+    extends: WebhookEvent
+    properties:
+      payload: SalesReturnOrderPostedEventPayload
+    examples:
+      - name: ExampleObject
+        value:
+          initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
+          timestamp: "2024-06-28T12:30:00Z"
+          companyName: "CRONUS International Ltd."
+          companyId: "b56a418d-8205-4d3a-bdbb-25d94e42abbd"
+          appId: "992c2309-cca4-43cb-9e41-911f482ec088"
+          clientState: "secret_value_from_subscription_creation_mirrored" 
+          eventName: "salesReturnOrder_posted"
+          eventVersion: "1.0"
+          payload: $SalesReturnOrderPostedEventPayload.ExamplePayload
+
+  SalesReturnOrderPostedEventPayload:
+    properties:
+      salesReturnOrderId: uuid
+      externalDocumentNo: string
+      nprExternalOrderNo: string
+      ecommerceDocumentId: uuid
+      postedStatus: string
+    examples:
+      - name: ExamplePayload
+        value:
+          salesReturnOrderId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          externalDocumentNo: "WEB-RETURN-001"
+          nprExternalOrderNo: "NPR-20241201-RET-001"
+          ecommerceDocumentId: "f9e8d7c6-b5a4-3210-9876-543210fedcba"
+          postedStatus: "fullyInvoiced"
+
+  SalesReturnOrderCancelledEvent:
+    properties:
+      values: 
+        type: list<SalesReturnOrderCancelledObject>
+        docs: An array of webhooks, be prepared to handle more than 1 in the same hook request.
+    examples:
+      - name: ExampleEvent
+        value:
+          values:
+            - $SalesReturnOrderCancelledObject.ExampleObject
+
+  SalesReturnOrderCancelledObject:
+    extends: WebhookEvent
+    properties:
+      payload: SalesReturnOrderCancelledEventPayload
+    examples:
+      - name: ExampleObject
+        value:
+          initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
+          timestamp: "2024-06-28T13:00:00Z"
+          companyName: "CRONUS International Ltd."
+          companyId: "b56a418d-8205-4d3a-bdbb-25d94e42abbd"
+          appId: "992c2309-cca4-43cb-9e41-911f482ec088"
+          clientState: "secret_value_from_subscription_creation_mirrored" 
+          eventName: "salesReturnOrder_cancelled"
+          eventVersion: "1.0"
+          payload: $SalesReturnOrderCancelledEventPayload.ExamplePayload
+
+  SalesReturnOrderCancelledEventPayload:
+    properties:
+      salesReturnOrderId: uuid
+      externalDocumentNo: string
+      nprExternalOrderNo: string
+      ecommerceDocumentId: uuid
+    examples:
+      - name: ExamplePayload
+        value:
+          salesReturnOrderId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          externalDocumentNo: "WEB-RETURN-001"
+          nprExternalOrderNo: "NPR-20241201-RET-001"
+          ecommerceDocumentId: "f9e8d7c6-b5a4-3210-9876-543210fedcba"
+
+webhooks:   
+  # Sales Order Webhooks
+  salesOrderCreated: 
+    display-name: Sales Order Created    
+    docs: 
+      Event name `salesOrder_created`<br><br>
+      This webhook is triggered when an incoming ecommerce sales order is successfully created in the system. Your endpoint will receive this POST request.
+    method: POST 
+    payload: SalesOrderCreatedEvent
+    examples: 
+      - payload: $SalesOrderCreatedEvent.ExampleEvent
+
+  salesOrderPosted: 
+    display-name: Sales Order Posted
+    docs: 
+      Event name `salesOrder_posted`<br><br>
+      This webhook is triggered when a sales order created from ecommerce is posted (invoiced or shipped). Your endpoint will receive this POST request.
+    method: POST 
+    payload: SalesOrderPostedEvent
+    examples: 
+      - payload: $SalesOrderPostedEvent.ExampleEvent
+
+  salesOrderCancelled: 
+    display-name: Sales Order Cancelled
+    docs: 
+      Event name `salesOrder_cancelled`<br><br>
+      This webhook is triggered when a sales order created from ecommerce is cancelled. Your endpoint will receive this POST request.
+    method: POST 
+    payload: SalesOrderCancelledEvent
+    examples: 
+      - payload: $SalesOrderCancelledEvent.ExampleEvent
+
+  # Sales Return Order Webhooks
+  salesReturnOrderCreated: 
+    display-name: Sales Return Order Created    
+    docs: 
+      Event name `salesReturnOrder_created`<br><br>
+      This webhook is triggered when an incoming ecommerce sales return order is successfully created in the system. Your endpoint will receive this POST request.
+    method: POST 
+    payload: SalesReturnOrderCreatedEvent
+    examples: 
+      - payload: $SalesReturnOrderCreatedEvent.ExampleEvent
+
+  salesReturnOrderPosted: 
+    display-name: Sales Return Order Posted
+    docs: 
+      Event name `salesReturnOrder_posted`<br><br>
+      This webhook is triggered when a sales return order created from ecommerce is posted (invoiced or shipped). Your endpoint will receive this POST request.
+    method: POST 
+    payload: SalesReturnOrderPostedEvent
+    examples: 
+      - payload: $SalesReturnOrderPostedEvent.ExampleEvent
+
+  salesReturnOrderCancelled: 
+    display-name: Sales Return Order Cancelled
+    docs: 
+      Event name `salesReturnOrder_cancelled`<br><br>
+      This webhook is triggered when a sales return order created from ecommerce is cancelled. Your endpoint will receive this POST request.
+    method: POST 
+    payload: SalesReturnOrderCancelledEvent
+    examples: 
+      - payload: $SalesReturnOrderCancelledEvent.ExampleEvent

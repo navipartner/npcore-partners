@@ -133,5 +133,4 @@ codeunit 6248449 "NPR IncEcomSalesDocImplEvents"
     begin
     end;
 }
-
 #endif
