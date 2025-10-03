@@ -2193,7 +2193,10 @@
 
         POSSalesLine."POS Store Code" := ExtSalePOS."POS Store Code";
         POSSalesLine."POS Unit No." := ExtSaleLinePOS."Register No.";
-        POSSalesLine."Document No." := ExtSaleLinePOS."Sales Ticket No.";
+        if ExtSaleLinePOS."Sales Ticket No." <> '' then
+            POSSalesLine."Document No." := ExtSaleLinePOS."Sales Ticket No."
+        else
+            POSSalesLine."Document No." := ExtSalePOS."Sales Ticket No.";
         POSSalesLine."Customer No." := ExtSalePOS."Customer No.";
         POSSalesLine."Salesperson Code" := ExtSalePOS."Salesperson Code";
 
@@ -2327,7 +2330,10 @@
 
         POSPaymentLine."POS Store Code" := ExtSalePOS."POS Store Code";
         POSPaymentLine."POS Unit No." := ExtSaleLinePOS."Register No.";
-        POSPaymentLine."Document No." := ExtSaleLinePOS."Sales Ticket No.";
+        if ExtSaleLinePOS."Sales Ticket No." <> '' then
+            POSPaymentLine."Document No." := ExtSaleLinePOS."Sales Ticket No."
+        else
+            POSPaymentLine."Document No." := ExtSalePOS."Sales Ticket No.";
 
 #pragma warning disable AA0139
         if (not POSPaymentMethod.Get(ExtSaleLinePOS."No.")) then
