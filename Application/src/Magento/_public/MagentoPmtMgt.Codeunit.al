@@ -773,6 +773,9 @@
             else
                 exit;
         end;
+
+        OnAfterSetupGenJnlLine(PaymentLine, GenJnlLine);
+
         GenJnlPostLine.RunWithCheck(GenJnlLine);
         SetPaymentLineAsPosted(PaymentLine);
 
@@ -1434,6 +1437,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterProcessingPaymentLine(var PaymentLine: Record "NPR Magento Payment Line"; PaymentEventType: Option " ",Capture,Refund,Cancel; Response: Record "NPR PG Payment Response")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterSetupGenJnlLine(var PaymentLine: Record "NPR Magento Payment Line"; var GenJnlLine: Record "Gen. Journal Line")
     begin
     end;
 }
