@@ -750,6 +750,7 @@
         RestaurantSeatingComponentRemoveLbl: Label 'Remove';
         RestaurantSeatingComponentConfigureLbl: Label 'Configure';
         RestaurantSeatingComponentDuplicateLbl: Label 'Duplicate';
+        BinTransferPleaseCompleteTheBinTransferLbl: Label 'Please, complete the bin transfer';
         BinTransferNotCompletedConfirmationLbl: Label 'You have not reviewed and confirmed the counting. Are you sure you want to cancel bin transfer?';
         BinTransferCashCountFinalizedLbl: Label 'finalized';
         BinTransferCashCountTransferAmountTooMuchLbl: Label 'The amount you are attempting to transfer is higher than the counted amount. Please correct this before proceeding.';
@@ -1322,6 +1323,7 @@
         Captions.Add('Restaurant_SeatingComponent_Remove', RestaurantSeatingComponentRemoveLbl);
         Captions.Add('Restaurant_SeatingComponent_Configure', RestaurantSeatingComponentConfigureLbl);
         Captions.Add('Restaurant_SeatingComponent_Duplicate', RestaurantSeatingComponentDuplicateLbl);
+        Captions.Add('BinTransfer_PleaseCompleteTheBinTransfer', BinTransferPleaseCompleteTheBinTransferLbl);
         Captions.Add('BinTransfer_NotCompletedConfirmation', BinTransferNotCompletedConfirmationLbl);
         Captions.Add('BinTransfer_CashCountFinalized', BinTransferCashCountFinalizedLbl);
         Captions.Add('BinTransfer_CashCountTransferAmountTooMuch', BinTransferCashCountTransferAmountTooMuchLbl);
