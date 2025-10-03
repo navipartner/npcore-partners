@@ -111,10 +111,10 @@
         SalesHeader: Record "Sales Header";
         NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
     begin
-        if SalesHeader.Get(NpCsDocument."Document Type", NpCsDocument."Document No.") then
-            SalesHeader.Delete(true);
         UpdateProcessingStatus(NpCsDocument, NpCsDocument."Processing Status"::Rejected);
         NpCsWorkflowMgt.SendNotificationToCustomer(NpCsDocument);
+        if SalesHeader.Get(NpCsDocument."Document Type", NpCsDocument."Document No.") then
+            SalesHeader.Delete(true);
         Commit();
 
         NpCsWorkflowMgt.ScheduleRunWorkflowDelay(NpCsDocument, 10000);
