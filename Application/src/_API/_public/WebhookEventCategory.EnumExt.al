@@ -13,5 +13,9 @@ enumextension 6014420 "NPR Webhook Event Category" extends "EventCategory"
     {
         Caption = 'Membership';
     }
+    value(6014410; "NPR Sales Headers")
+    {
+        Caption = 'Sales Headers';
+    }
 }
 #endif

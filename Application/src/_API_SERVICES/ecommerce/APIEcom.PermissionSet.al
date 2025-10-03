@@ -5,5 +5,7 @@ permissionset 6014426 "NPR API Ecom"
     Assignable = true;
     Caption = 'NPR API - Ecommerce';
     IncludedPermissionSets = "NPR API Core";
+    Permissions =
+        Codeunit "NPR Inc Ecom Sales Webhooks" = X;
 }
 #endif

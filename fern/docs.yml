@@ -348,6 +348,9 @@ navigation:
           - ecommerce.salesdocuments:
               title: Sales Documents
               summary: ./docs/pages/ecommerce/salesdocuments.mdx
+          - ecommerce.ecommercewebhooks:
+              title: Webhooks
+
         - section: Finance
           summary: ./docs/pages/finance/overview.mdx
           contents:
