@@ -40,37 +40,29 @@ page 6184998 "NPR NPEmailDomainDNSRecords"
         Rec.Copy(NPEmailDomainDNSRecord, true);
     end;
 
-    internal procedure DownloadAsExcel()
+    internal procedure DownloadAsTxt()
     var
-        TempExcelBuffer: Record "Excel Buffer" temporary;
+        TxtBuilder: TextBuilder;
         TempBlob: Codeunit "Temp Blob";
+        FileName: Text;
         OutStr: OutStream;
         InStr: InStream;
-        FileMgt: Codeunit "File Management";
     begin
-        TempExcelBuffer.CreateNewBook('NPEmailDNSRecords');
-
-        TempExcelBuffer.NewRow();
-        TempExcelBuffer.AddColumn('Type', false, '', false, false, false, '', TempExcelBuffer."Cell Type"::Text);
-        TempExcelBuffer.AddColumn('Host', false, '', false, false, false, '', TempExcelBuffer."Cell Type"::Text);
-        TempExcelBuffer.AddColumn('Data', false, '', false, false, false, '', TempExcelBuffer."Cell Type"::Text);
-
-        if (Rec.FindSet()) then
+        FileName := 'NPEmailDNSRecords.txt';
+        TxtBuilder.AppendLine('Type    Host    Data');
+        if Rec.FindSet() then
             repeat
-                TempExcelBuffer.NewRow();
-                TempExcelBuffer.AddColumn(Rec.Type, false, '', false, false, false, '', TempExcelBuffer."Cell Type"::Text);
-                TempExcelBuffer.AddColumn(Rec.Host, false, '', false, false, false, '', TempExcelBuffer."Cell Type"::Text);
-                TempExcelBuffer.AddColumn(Rec.Data, false, '', false, false, false, '', TempExcelBuffer."Cell Type"::Text);
+                TxtBuilder.Append(Rec.Type);
+                TxtBuilder.Append('    ');
+                TxtBuilder.Append(Rec.Host);
+                TxtBuilder.Append('    ');
+                TxtBuilder.AppendLine(Rec.Data);
             until Rec.Next() = 0;
 
-        TempExcelBuffer.WriteSheet('DNS Records', CompanyName(), UserId());
-        TempExcelBuffer.CloseBook();
-
         TempBlob.CreateOutStream(OutStr);
-        TempExcelBuffer.SaveToStream(OutStr, true);
+        OutStr.WriteText(TxtBuilder.ToText());
         TempBlob.CreateInStream(InStr);
-
-        FileMgt.DownloadFromStreamHandler(InStr, 'Download DNS Records', '', '', 'NPEmailDNSRecords.xlsx');
+        DownloadFromStream(InStr, '', '', '', FileName);
     end;
 }
 #endif

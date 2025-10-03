@@ -83,18 +83,18 @@ page 6185093 "NPR NPEmailAddDomainWiz"
                     NextStep();
                 end;
             }
-            action(DownloadAsExcel)
+            action(DownloadAsTxt)
             {
                 ApplicationArea = NPRNPEmail;
                 Visible = (_CurrentStep = _CurrentStep::DNSSetup);
-                Caption = 'Download as Excel';
-                ToolTip = 'Download as Excel';
+                Caption = 'Download as TXT';
+                ToolTip = 'Download as TXT';
                 Image = Download;
                 InFooterBar = true;
 
                 trigger OnAction()
                 begin
-                    CurrPage.DNSRecords.Page.DownloadAsExcel();
+                    CurrPage.DNSRecords.Page.DownloadAsTxt();
                 end;
             }
         }
