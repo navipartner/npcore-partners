@@ -148,6 +148,11 @@ codeunit 6184824 "NPR Spfy Integration Events"
     end;
 
     [IntegrationEvent(false, false)]
+    internal procedure OnCheckIfShouldSkipOrderImport(ShopifyStoreCode: Code[20]; Order: JsonToken; var SkipImport: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     internal procedure OnAfterSetPaymentCardDetails(Transaction: JsonToken; var PaymentLine: Record "NPR Magento Payment Line")
     begin
     end;

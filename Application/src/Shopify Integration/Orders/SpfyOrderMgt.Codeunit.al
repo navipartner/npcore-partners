@@ -318,6 +318,11 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         exit(FindSalesInvoices(ShopifyStoreCode, Order, TempSalesInvHeader));
     end;
 
+    procedure SkipOrderImport(ShopifyStoreCode: Code[20]; Order: JsonToken) SkipImport: Boolean
+    begin
+        SpfyIntegrationEvents.OnCheckIfShouldSkipOrderImport(ShopifyStoreCode, Order, SkipImport);
+    end;
+
     procedure FindSalesOrder(ShopifyStoreCode: Code[20]; Order: JsonToken; var SalesHeader: Record "Sales Header"): Boolean
     var
         NpEcDocument: Record "NPR NpEc Document";

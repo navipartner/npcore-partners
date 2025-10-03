@@ -27,6 +27,9 @@ codeunit 6184808 "NPR Spfy Create Order" implements "NPR Nc Import List IProcess
         if OrderMgt.OrderExists(ShopifyStoreCode, Order) then
             exit;
 
+        if OrderMgt.SkipOrderImport(ShopifyStoreCode, Order) then
+            exit;
+
         OrderMgt.LockTables();
         OrderMgt.InsertSalesHeader(ShopifyStoreCode, Order, SalesHeader);
         OrderMgt.UpsertSalesLines(ShopifyStoreCode, Order, SalesHeader, false);
