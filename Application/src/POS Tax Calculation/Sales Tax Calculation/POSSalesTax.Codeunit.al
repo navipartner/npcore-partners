@@ -334,6 +334,7 @@
         if POSSalesLineToBeCompressed.FindSet() then begin
             repeat
                 if POSEntry."Post Entry Status" in [POSEntry."Post Entry Status"::Unposted, POSEntry."Post Entry Status"::"Error while Posting"] then begin
+                    POSPostingBuffer.Init();
                     POSPostingBuffer."Line Type" := POSPostingBuffer."Line Type"::Sales;
                     POSPostingBuffer."POS Entry No." := POSEntry."Entry No.";
                     POSPostingBuffer."Document No." := POSSalesLineToBeCompressed."Document No.";
@@ -350,12 +351,10 @@
                     POSPostingBuffer."Dimension Set ID" := POSSalesLineToBeCompressed."Dimension Set ID";
                     POSPostingBuffer."Tax Area Code" := POSSalesLineToBeCompressed."Tax Area Code";
                     POSPostingBuffer."Deferral Code" := POSSalesLineToBeCompressed."Deferral Code";
-
                     POSPostingBuffer."Applies-to Doc. Type" := POSSalesLineToBeCompressed."Applies-to Doc. Type";
                     POSPostingBuffer."Applies-to Doc. No." := POSSalesLineToBeCompressed."Applies-to Doc. No.";
-                    if not POSPostingBuffer.Find() then begin
-                        POSPostingBuffer.Init();
 
+                    if not POSPostingBuffer.Find() then begin
                         POSPostingBuffer."VAT Calculation Type" := POSSalesLineToBeCompressed."VAT Calculation Type"::"Sales Tax";
                         POSPostingBuffer."Use Tax" := POSSalesLineToBeCompressed."Use Tax";
                         POSPostingBuffer."Global Dimension 1 Code" := POSSalesLineToBeCompressed."Shortcut Dimension 1 Code";
@@ -441,8 +440,6 @@
                     POSPostingBuffer."Deferral Code" := POSSalesLineToBeCompressed."Deferral Code";
 
                     if not POSPostingBuffer.Find() then begin
-                        POSPostingBuffer.Init();
-
                         POSPostingBuffer."VAT Calculation Type" := POSSalesLineToBeCompressed."VAT Calculation Type"::"Sales Tax";
                         POSPostingBuffer."Use Tax" := POSSalesLineToBeCompressed."Use Tax";
                         POSPostingBuffer."Global Dimension 1 Code" := POSEntry."Shortcut Dimension 1 Code";

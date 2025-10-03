@@ -350,27 +350,10 @@
         TempSalesLine: Record "Sales Line" temporary;
         SalesLine: Record "Sales Line";
         TempVATAmountLine: Record "VAT Amount Line" temporary;
-        TotalSalesLine: Record "Sales Line";
-        TotalSalesLineLCY: Record "Sales Line";
-        VATAmount: Decimal;
-        ProfitLCY: Decimal;
-        ProfitPct: Decimal;
-        TotalAdjCostLCY: Decimal;
-        VATAmountText: Text[30];
     begin
         SalesPost.GetSalesLines(SalesHeader, TempSalesLine, 1);
-        Clear(SalesPost);
         SalesLine.CalcVATAmountLines(0, SalesHeader, TempSalesLine, TempVATAmountLine);
-
-        SalesPost.SumSalesLinesTemp(
-          SalesHeader, TempSalesLine, 1, TotalSalesLine, TotalSalesLineLCY,
-          VATAmount, VATAmountText, ProfitLCY, ProfitPct, TotalAdjCostLCY);
-
-        if SalesHeader."Prices Including VAT" then begin
-            exit(TotalSalesLine.Amount + VATAmount);
-        end else begin
-            exit(TotalSalesLine."Amount Including VAT");
-        end;
+        exit(TempVATAmountLine.GetTotalAmountInclVAT());
     end;
 
     procedure GetTotalAmountToBeInvoiced(SalesInvoiceHeader: Record "Sales Invoice Header"): Decimal
