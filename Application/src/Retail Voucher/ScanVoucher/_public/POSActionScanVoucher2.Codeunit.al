@@ -114,6 +114,8 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
                                                            NPRPOSPaymentMethod,
                                                            SuggestedAmount);
 
+        OnAfterCalculateSuggestedAmount(PaymentLine, NPRNpRvVoucherType, NPRPOSPaymentMethod, NPRNpRvVoucher, SuggestedAmount);
+
         if NPRNpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then begin
             if not NPRNpRvVoucherMgt.ValidateAmount(NPRNpRvVoucher, SuggestedAmount, AvailableAmount) then
                 SuggestedAmount := AvailableAmount;
@@ -125,6 +127,8 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
             if SuggestedAmount > NPRNpRvVoucher.Amount then
                 SuggestedAmount := NPRNpRvVoucher.Amount;
         end;
+
+        OnAfterValidateSuggestedAmount(PaymentLine, NPRNpRvVoucherType, NPRPOSPaymentMethod, NPRNpRvVoucher, SuggestedAmount);
 
         VoucherHasItemLimitation := NPRPOSActionScanVoucher2B.VoucherHasItemFilterLimitation(NPRNpRvVoucher);
 
@@ -430,5 +434,14 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCalculateSuggestedAmount(PaymentLine: Codeunit "NPR POS Payment Line"; NPRNpRvVoucherType: Record "NPR NpRv Voucher Type"; NPRPOSPaymentMethod: Record "NPR POS Payment Method"; Voucher: Record "NPR NpRv Voucher"; var SuggestedAmount: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterValidateSuggestedAmount(PaymentLine: Codeunit "NPR POS Payment Line"; NPRNpRvVoucherType: Record "NPR NpRv Voucher Type"; NPRPOSPaymentMethod: Record "NPR POS Payment Method"; Voucher: Record "NPR NpRv Voucher"; var SuggestedAmount: Decimal)
+    begin
+    end;
 
 }
