@@ -2,12 +2,28 @@
 {
     Access = Internal;
     EventSubscriberInstance = Manual;
+
+#if BC17 or BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Table, Database::"Config. Package Table", 'OnBeforeInsertEvent', '', false, false)]
+#else
+    [EventSubscriber(ObjectType::Table, Database::"Config. Package Table", OnBeforeInsertEvent, '', false, false)]
+#endif
     local procedure OnBeforeInsertConfigPackageTable(RunTrigger: Boolean; var Rec: Record "Config. Package Table")
     begin
         if (not TableObjectExists(Rec."Table ID")) then begin
             PreprocessNonExistingTable(Rec."Table ID", Rec."Package Code");
         end;
+    end;
+
+#if BC17 or BC18 or BC19 or BC20 or BC21
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Wrapper", 'OnBeforeCheckModifyAllowed', '', true, false)]
+#else
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Variety Wrapper", OnBeforeCheckModifyAllowed, '', true, false)]
+#endif
+    local procedure SkipVarietyCheckDuringConfigPackageImport(var IsAllowed: Boolean; var IsHandled: Boolean)
+    begin
+        IsAllowed := true;
+        IsHandled := true;
     end;
 
     local procedure TableObjectExists(TableID: Integer): Boolean

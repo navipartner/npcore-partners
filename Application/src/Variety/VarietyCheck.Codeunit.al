@@ -34,7 +34,8 @@
            (Item."NPR Variety 1 Table" = xRecItem."NPR Variety 1 Table") and
            (Item."NPR Variety 2 Table" = XRecItem."NPR Variety 2 Table") and
            (Item."NPR Variety 3 Table" = XRecItem."NPR Variety 3 Table") and
-           (Item."NPR Variety 4 Table" = XRecItem."NPR Variety 4 Table") then
+           (Item."NPR Variety 4 Table" = XRecItem."NPR Variety 4 Table")
+        then
             exit;
 
         //if we are here, an update of the variants is required.
@@ -42,7 +43,6 @@
             UpdateVariants(Item);
             exit;
         end;
-
 
         //if we are here, there is variants, and a structure change is requested.
         if not ConfirmMgt.GetResponseOrDefault(Text004, true) then

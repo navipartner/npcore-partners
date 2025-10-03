@@ -2,7 +2,6 @@
 {
     Extensible = False;
     PageType = NavigatePage;
-
     UsageCategory = Administration;
     ApplicationArea = NPRRetail;
     Caption = 'RapidStart Base Data Imp.';
@@ -18,7 +17,6 @@
 
             field("Package Name"; package)
             {
-
                 Caption = 'Package Name';
                 Lookup = true;
                 ToolTip = 'Specifies the value of the package field';
@@ -30,7 +28,6 @@
             }
             field("Adjust Table Names"; AdjustTableNames)
             {
-
                 Caption = 'Adjust Table Names';
                 ToolTip = 'Specifies whether table names in the package should be adjusted. The option should be enabled if the package contains NPRetail tables, and it was created in NAV/BC version prior to BC16';
                 ApplicationArea = NPRRetail;
@@ -44,7 +41,6 @@
         {
             action(ActionName)
             {
-
                 ToolTip = 'Executes the ActionName action';
                 Image = Action;
                 ApplicationArea = NPRRetail;
@@ -57,7 +53,6 @@
 
             action(ActionBack)
             {
-
                 Caption = 'Back';
                 InFooterBar = true;
                 ToolTip = 'Executes the Back action';
@@ -67,7 +62,6 @@
 
             action(ActionNext)
             {
-
                 Caption = 'Next';
                 InFooterBar = true;
                 ToolTip = 'Executes the Next action';
@@ -77,7 +71,6 @@
 
             action(ActionFinish)
             {
-
                 Caption = 'Finish';
                 InFooterBar = true;
                 ToolTip = 'Executes the Finish action';
