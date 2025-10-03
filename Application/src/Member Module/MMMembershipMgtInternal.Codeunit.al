@@ -1853,6 +1853,7 @@
     var
         Membership: Record "NPR MM Membership";
         MembershipEntry: Record "NPR MM Membership Entry";
+        MembershipEntryLink: Record "NPR MM Membership Entry Link";
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
         Subscription: Record "NPR MM Subscription";
         SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
@@ -1949,6 +1950,7 @@
 
         if (WithUpdate) then begin
             RegretSubscription(Membership);
+            MembershipEntryLink.CreateMembershipEntryLink(MembershipEntry, MemberInfoCapture, EndDateNew);
             CarryOutMembershipCancel(Membership, MembershipEntry, EndDateNew);
         end;
 

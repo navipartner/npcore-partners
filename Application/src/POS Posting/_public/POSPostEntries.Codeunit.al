@@ -2086,25 +2086,40 @@
     local procedure GetDeferralStartingDate(POSSalesLineToPost: Record "NPR POS Entry Sales Line"; POSEntry: Record "NPR POS Entry") StartDate: Date
     var
         MembershipEntry: Record "NPR MM Membership Entry";
+        MembershipEntryLink: Record "NPR MM Membership Entry Link";
     begin
         StartDate := POSEntry."Posting Date";
         if POSSalesLineToPost.Type <> POSSalesLineToPost.Type::Item then
             exit;
         MembershipEntry.SetCurrentKey("Receipt No.", "Line No.");
-        MembershipEntry.SetLoadFields("Valid From Date");
         MembershipEntry.SetRange("Receipt No.", POSSalesLineToPost."Document No.");
         MembershipEntry.SetRange("Line No.", POSSalesLineToPost."Line No.");
-        if not MembershipEntry.FindFirst() then
-            exit;
-        if MembershipEntry."Valid From Date" <> 0D then
-            StartDate := MembershipEntry."Valid From Date";
+        MembershipEntry.SetLoadFields("Valid From Date");
+        if MembershipEntry.FindFirst() then begin
+            if MembershipEntry."Valid From Date" <> 0D then
+                StartDate := MembershipEntry."Valid From Date";
+        end else begin
+            MembershipEntryLink.SetCurrentKey("Document Type", "Document No.", "Document Line No.");
+            MembershipEntryLink.SetRange("Document Type", Database::"NPR POS Entry Sales Line");
+            MembershipEntryLink.SetRange("Document No.", POSSalesLineToPost."Document No.");
+            MembershipEntryLink.SetRange("Document Line No.", POSSalesLineToPost."Line No.");
+            MembershipEntryLink.SetLoadFields(Context, "New Valid Until Date");
+            if not MembershipEntryLink.FindFirst() then
+                exit;
+            case MembershipEntryLink.Context of
+                MembershipEntryLink.Context::CANCEL:
+                    if MembershipEntryLink."New Valid Until Date" <> 0D then
+                        StartDate := MembershipEntryLink."New Valid Until Date";
+            end;
+        end;
     end;
 
     local procedure GetDeferralNoOfPeriods(POSSalesLineToPost: Record "NPR POS Entry Sales Line"; DeferralTemplate: Record "Deferral Template") NoOfPeriods: Integer
     var
         MembershipEntry: Record "NPR MM Membership Entry";
+        MembershipEntryLink: Record "NPR MM Membership Entry Link";
         MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
-        ValidUntilDate: Date;
+        InitialValidUntilDate: Date;
     begin
         NoOfPeriods := DeferralTemplate."No. of Periods";
         if POSSalesLineToPost.Type <> POSSalesLineToPost.Type::Item then
@@ -2113,15 +2128,30 @@
         MembershipEntry.SetRange("Receipt No.", POSSalesLineToPost."Document No.");
         MembershipEntry.SetRange("Line No.", POSSalesLineToPost."Line No.");
         MembershipEntry.SetLoadFields("Entry No.", Context, "Valid From Date");
-        if not MembershipEntry.FindFirst() then
-            exit;
-        case MembershipEntry.Context of
-            MembershipEntry.Context::UPGRADE:
-                begin
-                    ValidUntilDate := MembershipMgtInternal.GetUpgradeInitialValidUntilDate(MembershipEntry."Entry No.");
-                    if (MembershipEntry."Valid From Date" <> 0D) and (ValidUntilDate <> 0D) and (ValidUntilDate >= MembershipEntry."Valid From Date") then
-                        NoOfPeriods := CountDefNoOfPeriodsBetweenDates(MembershipEntry."Valid From Date", ValidUntilDate);
-                end;
+        if MembershipEntry.FindFirst() then begin
+            case MembershipEntry.Context of
+                MembershipEntry.Context::UPGRADE:
+                    begin
+                        InitialValidUntilDate := MembershipMgtInternal.GetUpgradeInitialValidUntilDate(MembershipEntry."Entry No.");
+                        if (MembershipEntry."Valid From Date" <> 0D) and (InitialValidUntilDate <> 0D) and (InitialValidUntilDate >= MembershipEntry."Valid From Date") then
+                            NoOfPeriods := CountDefNoOfPeriodsBetweenDates(MembershipEntry."Valid From Date", InitialValidUntilDate);
+                    end;
+            end;
+        end else begin
+            MembershipEntryLink.SetCurrentKey("Document Type", "Document No.", "Document Line No.");
+            MembershipEntryLink.SetRange("Document Type", Database::"NPR POS Entry Sales Line");
+            MembershipEntryLink.SetRange("Document No.", POSSalesLineToPost."Document No.");
+            MembershipEntryLink.SetRange("Document Line No.", POSSalesLineToPost."Line No.");
+            MembershipEntryLink.SetLoadFields(Context, "Initial Valid Until Date", "New Valid Until Date");
+            if not MembershipEntryLink.FindFirst() then
+                exit;
+            case MembershipEntryLink.Context of
+                MembershipEntryLink.Context::CANCEL:
+                    begin
+                        if (MembershipEntryLink."Initial Valid Until Date" <> 0D) and (MembershipEntryLink."New Valid Until Date" <> 0D) and (MembershipEntryLink."Initial Valid Until Date" >= MembershipEntryLink."New Valid Until Date") then
+                            NoOfPeriods := CountDefNoOfPeriodsBetweenDates(MembershipEntryLink."New Valid Until Date", MembershipEntryLink."Initial Valid Until Date")
+                    end;
+            end;
         end;
     end;
 
