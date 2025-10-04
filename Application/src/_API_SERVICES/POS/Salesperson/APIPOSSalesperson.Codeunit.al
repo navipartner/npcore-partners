@@ -27,7 +27,12 @@ codeunit 6150690 "NPR API POS Salesperson"
     var
         FieldList: Dictionary of [Integer, Text];
         Salesperson: Record "Salesperson/Purchaser";
+        Email: Text[80];
     begin
+#pragma warning disable AA0139
+        if (not Request.QueryParams().Get('email', Email)) then;
+#pragma warning restore AA0139
+
         FieldList.Add(Salesperson.FieldNo(SystemId), 'id');
         FieldList.Add(Salesperson.FieldNo(Code), 'code');
         FieldList.Add(Salesperson.FieldNo(Name), 'name');
@@ -36,7 +41,11 @@ codeunit 6150690 "NPR API POS Salesperson"
         FieldList.Add(Salesperson.FieldNo("NPR Supervisor POS"), 'isSupervisor');
         FieldList.Add(Salesperson.FieldNo(Blocked), 'blocked');
         FieldList.Add(Salesperson.FieldNo("NPR POS Unit Group"), 'posUnitGroup');
-        exit(Response.RespondOK(Request.GetData(Database::"Salesperson/Purchaser", FieldList)));
+
+        if (Email <> '') then
+            Salesperson.SetRange("E-mail", Email);
+
+        exit(Response.RespondOK(Request.GetData(Salesperson, FieldList)));
     end;
 
     procedure GetSalesperson(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"

@@ -63,6 +63,14 @@ types:
           data:
             - $ListSalesperson.ExampleSalespersonJohnDoe
             - $ListSalesperson.ExampleSalespersonJaneDoe
+      - name: ExamplePaginatedSalespersonsJohnDoe
+        value:
+          morePages: true
+          nextPageKey: "c29tZSBiYXNlNjQgc3RyaW5n"
+          nextPageURL: "https://api.npretail.app/tenant/env/company/pos/salesperson?pageKey=c29tZSBiYXNlNjQgc3RyaW5n&lastRowVersion=12345678901234567890"
+          data:
+            - $ListSalesperson.ExampleSalespersonJohnDoe
+  
 
   CreateSalesPersonRequest:
     docs: Creates a Salesperson
@@ -203,20 +211,22 @@ service:
             body: $SalespersonDto.ExampleSalesperson
 
     ListSalesperson:
-      display-name: List salespersons
-      docs: List all salespersons in the system
+      display-name: Find Salespersons
+      docs: Retrieval of salespersons in the system
       method: GET
       path: "/salesperson"
       request:
         name: getSalespersonsRequest
         query-parameters:
+          email: optional<string>
           pageSize: optional<integer>
           pageKey: optional<string>
           lastRowVersion: optional<string>
           sync: optional<boolean>
       response: PaginatedSalesPersonResponse
       examples:
-        - path-parameters:
+        - name: Paginated (All)
+          path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
@@ -224,6 +234,16 @@ service:
             pageSize: 50
           response:
             body: $PaginatedSalesPersonResponse.ExamplePaginatedSalespersons
+        - name: Paginated (By Email)
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            pageSize: 50
+            email: 'john.doe@yahoo.com'
+          response:
+            body: $PaginatedSalesPersonResponse.ExamplePaginatedSalespersonsJohnDoe
 
     login:
       display-name: Login
