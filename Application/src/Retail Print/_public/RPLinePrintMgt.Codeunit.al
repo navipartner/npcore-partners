@@ -50,6 +50,11 @@
         UpdateField(1, 0, BarcodeWidth, BarcodeType, BarcodeValue, HideHRI, BarcodeHeight);
     end;
 
+    internal procedure AddBarcode(BarcodeType: Text[30]; BarcodeValue: Text; Alignment: Integer; BarcodeWidth: Integer; HideHRI: Boolean; BarcodeHeight: Integer)
+    begin
+        UpdateField(1, Alignment, BarcodeWidth, BarcodeType, BarcodeValue, HideHRI, BarcodeHeight);
+    end;
+
     internal procedure AddLine(Text: Text; Alignment: Integer)
     begin
         UpdateField(1, Alignment, 0, '', CopyStr(Text, 1, 100), false, 0);

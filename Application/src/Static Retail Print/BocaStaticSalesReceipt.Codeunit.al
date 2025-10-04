@@ -1,4 +1,4 @@
-codeunit 6248348 "NPR Static Sales Receipt"
+codeunit 6248576 "NPR Boca Static Sales Receipt"
 {
     Access = Internal;
     TableNo = "NPR POS Entry";
@@ -15,12 +15,11 @@ codeunit 6248348 "NPR Static Sales Receipt"
 
         AddReceiptInformation(Rec);
 
-        Printer.ProcessBuffer(Codeunit::"NPR Static Sales Receipt", Enum::"NPR Line Printer Device"::Epson, TempPrinterDeviceSettings);
+        Printer.ProcessBuffer(Codeunit::"NPR Static Sales Receipt", Enum::"NPR Line Printer Device"::Boca, TempPrinterDeviceSettings);
     end;
 
-    internal procedure AddReceiptInformation(POSEntry: Record "NPR POS Entry")
+    local procedure AddReceiptInformation(POSEntry: Record "NPR POS Entry")
     var
-        RetailLogo: Record "NPR Retail Logo";
         POSUnit: Record "NPR POS Unit";
         POSStore: Record "NPR POS Store";
         POSEntryOutputLog: Record "NPR POS Entry Output Log";
@@ -36,16 +35,9 @@ codeunit 6248348 "NPR Static Sales Receipt"
         POSTicketRcptText: Record "NPR POS Ticket Rcpt. Text";
         POSUnitRcptTxtProfile: Record "NPR POS Unit Rcpt.Txt Profile";
         EntryTaxLineAdded: Boolean;
-        LogoFontLbl: Label 'Logo', Locked = true;
-        ReceiptLogoLbl: Label 'RECEIPT', Locked = true;
-        A11FontLbl: Label 'A11', Locked = true;
-        B21FontLbl: Label 'B21', Locked = true;
+        F8FontLbl: Label 'F8', Locked = true;
         Code128FontLbl: Label 'CODE128', Locked = true;
         QRFontLbl: Label 'QR', Locked = true;
-        PhoneNoLbl: Label 'Phone No.';
-        VATRegistrationNoLbl: Label 'VAT Registration No.';
-        EMailLbl: Label 'E-Mail: ';
-        HomePageLbl: Label 'Home Page: ';
         CopyLbl: Label '*** COPY ***';
         DescritptionLbl: Label 'Description';
         QuantityLbl: Label 'Quantity';
@@ -54,19 +46,7 @@ codeunit 6248348 "NPR Static Sales Receipt"
         IncludingVATLbl: Label 'Including VAT';
         TotalLbl: Label 'Total';
     begin
-        Printer.SetFont(A11FontLbl);
-
-        // Logo section
-        RetailLogo.SetRange("Register No.", POSUnit.GetCurrentPOSUnit());
-        if RetailLogo.IsEmpty() then
-            RetailLogo.SetRange("Register No.", '');
-        RetailLogo.SetFilter("Start Date", '<=%1|=%2', Today, 0D);
-        RetailLogo.SetFilter("End Date", '>=%1|=%2', Today, 0D);
-        if RetailLogo.FindFirst() then begin
-            Printer.SetFont(LogoFontLbl);
-            Printer.AddLine(ReceiptLogoLbl, 1);
-            Printer.SetFont(A11FontLbl);
-        end;
+        Printer.SetFont(F8FontLbl);
 
         // POS Store information
         if POSStore.Get(POSEntry."POS Store Code") then begin
@@ -87,26 +67,23 @@ codeunit 6248348 "NPR Static Sales Receipt"
                 Printer.AddLine(POSStore."Post Code" + ' ' + POSStore.City, 1);
 
             if POSStore."Phone No." <> '' then
-                Printer.AddLine(PhoneNoLbl + POSStore."Phone No.", 1);
+                Printer.AddLine(POSStore."Phone No.", 1);
 
             if POSStore."VAT Registration No." <> '' then
-                Printer.AddLine(VATRegistrationNoLbl + POSStore."VAT Registration No.", 1);
+                Printer.AddLine(POSStore."VAT Registration No.", 1);
 
             if POSStore."E-Mail" <> '' then
-                Printer.AddLine(EMailLbl + POSStore."E-Mail", 1);
+                Printer.AddLine(POSStore."E-Mail", 1);
 
             if POSStore."Home Page" <> '' then
-                Printer.AddLine(HomePageLbl + POSStore."Home Page", 1);
+                Printer.AddLine(POSStore."Home Page", 1);
         end;
 
         // Copy receipt label
         POSEntryOutputLog.SetRange("POS Entry No.", POSEntry."Entry No.");
         //POS Entry Output Log is inserted after printing receipt, therefore this check
-        if not POSEntryOutputLog.IsEmpty() then begin
-            Printer.SetFont(B21FontLbl);
+        if not POSEntryOutputLog.IsEmpty() then
             Printer.AddLine(CopyLbl, 1);
-            Printer.SetFont(A11FontLbl);
-        end;
 
         // Customer information
         if Customer.Get(POSEntry."Customer No.") then begin
@@ -248,13 +225,13 @@ codeunit 6248348 "NPR Static Sales Receipt"
         // Barcode line
         if POSUnit.Get(POSEntry."POS Unit No.") and POSReceiptProfile.Get(POSUnit."POS Receipt Profile") and POSReceiptProfile."Show Barcode as QR Code" then begin
             Printer.SetFont(QRFontLbl);
-            Printer.AddBarcode(QRFontLbl, POSEntry."Document No.", 15, false, 0);
+            Printer.AddBarcode(QRFontLbl, POSEntry."Document No.", 1, 15, false, 0);
         end else begin
             Printer.SetFont(Code128FontLbl);
-            Printer.AddBarcode(Code128FontLbl, POSEntry."Document No.", 3, false, 0);
+            Printer.AddBarcode(Code128FontLbl, POSEntry."Document No.", 1, 3, false, 0);
         end;
 
-        Printer.SetFont(A11FontLbl);
+        Printer.SetFont(F8FontLbl);
         Printer.AddLine('', 0);
 
         // Receipt footer text
