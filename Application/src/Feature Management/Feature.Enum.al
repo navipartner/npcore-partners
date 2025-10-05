@@ -117,4 +117,9 @@ enum 6014577 "NPR Feature" implements "NPR Feature Management"
         Implementation = "NPR Feature Management" = "NPR POS License Billing Feat.";
     }
 #endif
+    value(190; "New Attraction Print Exerience")
+    {
+        Caption = 'New Attraction Print Experience';
+        Implementation = "NPR Feature Management" = "NPR New Attraction Print Exp";
+    }
 }

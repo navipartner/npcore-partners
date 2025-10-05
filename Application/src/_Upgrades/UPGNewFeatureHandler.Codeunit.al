@@ -10,12 +10,14 @@ codeunit 6150638 "NPR UPG New Feature Handler"
         POSStatisticsDashboardFeatureHandleUpgradeStepLbl: Label 'POSStatisticsDashboardFeatureHandle', Locked = true;
         NewSalesReceiptExperienceHandleUpgradeStepLbl: Label 'NewSalesReceiptExperienceHandle', Locked = true;
         NewEFTReceiptExperienceHandleUpgradeStepLbl: Label 'NewEFTReceiptExperienceHandle', Locked = true;
+        NewAttractionPrintExperienceHandleUpgradeStepLbl: Label 'NewAttractionPrintExperienceHandle', Locked = true;
     begin
         AddUpgradeTagIfNotExist(CurrCodeunitId(), POSEditorFeatureHandleUpgradeStepLbl);
         AddUpgradeTagIfNotExist(CurrCodeunitId(), ScenarioObsoletedFeatureUpgradeStepLbl);
         AddUpgradeTagIfNotExist(CurrCodeunitId(), POSStatisticsDashboardFeatureHandleUpgradeStepLbl);
         AddUpgradeTagIfNotExist(CurrCodeunitId(), NewSalesReceiptExperienceHandleUpgradeStepLbl);
         AddUpgradeTagIfNotExist(CurrCodeunitId(), NewEFTReceiptExperienceHandleUpgradeStepLbl);
+        AddUpgradeTagIfNotExist(CurrCodeunitId(), NewAttractionPrintExperienceHandleUpgradeStepLbl);
     end;
 
     local procedure AddUpgradeTagIfNotExist(UpgradeCodeunitId: Integer; UpgradeStep: Text)

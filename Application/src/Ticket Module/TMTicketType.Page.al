@@ -51,6 +51,7 @@
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the RP Template Code used to print the ticket.';
+                    Editable = not TemplateCodeBlocked;
                 }
                 field("Print Object ID"; Rec."Print Object ID")
                 {
@@ -354,11 +355,18 @@
 
     var
         IMPORT_FILE: Label 'Import File';
+        TemplateCodeBlocked: Boolean;
 
     internal procedure HideTickets()
     begin
         Rec.SetRange("Is Ticket", false);
     end;
 
+    trigger OnAfterGetCurrRecord()
+    var
+        NewAttractionPrintExp: Codeunit "NPR New Attraction Print Exp";
+    begin
+        TemplateCodeBlocked := NewAttractionPrintExp.IsFeatureEnabled();
+    end;
 }
 

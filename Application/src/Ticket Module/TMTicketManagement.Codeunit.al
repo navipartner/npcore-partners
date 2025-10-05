@@ -4078,6 +4078,20 @@
         TMTicketCheck.RunModal();
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"NPR TM Ticket Type", 'OnBeforeValidateEvent', 'Print Object Type', false, false)]
+    local procedure TicketTypeOnBeforeValidateEventPrintObjectType(var Rec: Record "NPR TM Ticket Type"; var xRec: Record "NPR TM Ticket Type")
+    var
+        NewAttractionPrintExp: Codeunit "NPR New Attraction Print Exp";
+        TemplatePrintObjectTypeErr: Label 'For New Attraction Experience tickets, the Print Object Type must not be set to Template.';
+    begin
+        if Rec."Print Object Type" = xRec."Print Object Type" then
+            exit;
+        if Rec."Print Object Type" <> Rec."Print Object Type"::TEMPLATE then
+            exit;
+        if NewAttractionPrintExp.IsFeatureEnabled() then
+            Error(TemplatePrintObjectTypeErr);
+    end;
+
     procedure ShowTicketAccess(Ticket: Record "NPR TM Ticket")
     var
         DetTicketAccessEntry: Record "NPR TM Det. Ticket AccessEntry";

@@ -97,6 +97,25 @@ codeunit 6150632 "NPR New Feature Handler"
         LogMessageStopwatch.LogFinish();
     end;
 
+    internal procedure HandleNewAttractionPrintExperience()
+    var
+        LogMessageStopwatch: Codeunit "NPR LogMessage Stopwatch";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagsDef: Codeunit "NPR Upgrade Tag Definitions";
+    begin
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR New Feature Handler', 'NewAttractionPrintExperienceHandle');
+
+        if UpgradeTag.HasUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'NewAttractionPrintExperienceHandle')) then begin
+            LogMessageStopwatch.LogFinish();
+            exit;
+        end;
+
+        NewAttractionPrintExperienceHandle();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagsDef.GetUpgradeTag(CurrCodeunitId(), 'NewAttractionPrintExperienceHandle'));
+        LogMessageStopwatch.LogFinish();
+    end;
+
     internal procedure HandlePOSWebserviceSessionsFeature()
     var
         Feature: Record "NPR Feature";
@@ -216,6 +235,29 @@ codeunit 6150632 "NPR New Feature Handler"
 
         ReportSelectionRetail.SetRange("Report Type", ReportSelectionRetail."Report Type"::"Terminal Receipt");
         ReportSelectionRetail.ModifyAll("Print Template", '');
+    end;
+
+    local procedure NewAttractionPrintExperienceHandle()
+    var
+        TicketType: Record "NPR TM Ticket Type";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        Feature: Record "NPR Feature";
+        NewAttractionPrintExp: Codeunit "NPR New Attraction Print Exp";
+    begin
+        if not Feature.Get(NewAttractionPrintExp.GetFeatureId()) then
+            exit;
+        if Feature.Enabled then
+            exit;
+        Feature.Enabled := true;
+        Feature.Modify();
+
+        TicketType.SetRange("Print Object Type", TicketType."Print Object Type"::TEMPLATE);
+        TicketType.ModifyAll("RP Template Code", '');
+        TicketType.ModifyAll("Print Object Type", TicketType."Print Object Type"::CODEUNIT);
+
+        MembershipSetup.SetRange("Receipt Print Object Type", MembershipSetup."Receipt Print Object Type"::TEMPLATE);
+        MembershipSetup.ModifyAll("Receipt Print Template Code", '');
+        MembershipSetup.ModifyAll("Receipt Print Object Type", MembershipSetup."Receipt Print Object Type"::NO_PRINT);
     end;
 
     local procedure CurrCodeunitId(): Integer

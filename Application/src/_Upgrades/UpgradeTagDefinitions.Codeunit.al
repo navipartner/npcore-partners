@@ -242,11 +242,13 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Feature Handler", 'POSStatisticsDashboardFeatureHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Feature Handler", 'NewSalesReceiptExperienceHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Feature Handler", 'NewEFTReceiptExperienceHandle'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR New Feature Handler", 'NewAttractionPrintExperienceHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'POSEditorFeatureHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'ScenarioObsoletedFeatureHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'POSStatisticsDashboardFeatureHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'NewSalesReceiptExperienceHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'NewEFTReceiptExperienceHandle'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG New Feature Handler", 'NewAttractionPrintExperienceHandle'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Pay By Link Setup", 'UpdatePayByLinkSetup'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG POS EFT Pay Res. Setup", 'UpdatePOSEFTPayResSetup'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Update Wizards", 'UpdateWizardFiscalization'));
@@ -285,7 +287,6 @@
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR POS License Billing Upgrd.", 'AddPOSBillingFeature'));
 #endif
-
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -931,6 +932,8 @@
                         exit('NPR-NewSalesReceiptExperienceHandle-20250316');
                     'NewEFTReceiptExperienceHandle':
                         exit('NPR-NewEFTReceiptExperienceHandle-20250316');
+                    'NewAttractionPrintExperienceHandle':
+                        exit('NPR-NewAttractionPrintExperienceHandle-20250924');
                 end;
             Codeunit::"NPR UPG New Feature Handler":
                 case UpgradeStep of
@@ -944,6 +947,8 @@
                         exit('NPR-NewSalesReceiptExperienceHandle-20250316');
                     'NewEFTReceiptExperienceHandle':
                         exit('NPR-NewEFTReceiptExperienceHandle-20250316');
+                    'NewAttractionPrintExperienceHandle':
+                        exit('NPR-NewAttractionPrintExperienceHandle-20250924');
                 end;
             Codeunit::"NPR UPG Pay By Link Setup":
                 case UpgradeStep of

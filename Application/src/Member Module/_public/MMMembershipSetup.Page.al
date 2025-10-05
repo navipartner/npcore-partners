@@ -187,6 +187,7 @@
                 {
                     ToolTip = 'Specifies the value of the Receipt Print Template Code field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    Editable = not TemplateCodeBlocked;
                 }
                 field("Receipt Print Object ID"; Rec."Receipt Print Object ID")
                 {
@@ -507,6 +508,7 @@
 
     var
         HLMappedValueMgt: Codeunit "NPR HL Mapped Value Mgt.";
+        TemplateCodeBlocked: Boolean;
         HeyLoyaltyName: Text[100];
         PROCESSING: Label 'Processing: %1';
         PENDING: Label 'Pending: %1';
@@ -729,6 +731,13 @@
     local procedure JQCategoryCode(): Code[10]
     begin
         exit('MEMCUSTUPD');
+    end;
+
+    trigger OnAfterGetCurrRecord()
+    var
+        NewAttractionPrintExp: Codeunit "NPR New Attraction Print Exp";
+    begin
+        TemplateCodeBlocked := NewAttractionPrintExp.IsFeatureEnabled();
     end;
 }
 

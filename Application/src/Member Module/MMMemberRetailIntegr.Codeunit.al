@@ -1450,7 +1450,19 @@
 
     end;
 
-
+    [EventSubscriber(ObjectType::Table, Database::"NPR MM Membership Setup", 'OnBeforeValidateEvent', 'Receipt Print Object Type', false, false)]
+    local procedure TicketTypeOnBeforeValidateEventPrintObjectType(var Rec: Record "NPR MM Membership Setup"; var xRec: Record "NPR MM Membership Setup")
+    var
+        NewAttractionPrintExp: Codeunit "NPR New Attraction Print Exp";
+        TemplatePrintObjectTypeErr: Label 'For New Attraction Experience memberships, the Print Object Type must not be set to Template.';
+    begin
+        if Rec."Receipt Print Object Type" = xRec."Receipt Print Object Type" then
+            exit;
+        if Rec."Receipt Print Object Type" <> Rec."Receipt Print Object Type"::TEMPLATE then
+            exit;
+        if NewAttractionPrintExp.IsFeatureEnabled() then
+            Error(TemplatePrintObjectTypeErr);
+    end;
 }
 
 
