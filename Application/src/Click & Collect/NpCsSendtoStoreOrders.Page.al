@@ -257,7 +257,7 @@
                         CurrPage.SetSelectionFilter(NpCsDocument);
                         if NpCsDocument.FindSet() then
                             repeat
-                                NpCsWorkflowMgt.RunWorkflowSendOrder(NpCsDocument);
+                                NpCsWorkflowMgt.RunWorkflowSendOrder(NpCsDocument, false);
                             until NpCsDocument.Next() = 0;
                     end;
                 }
@@ -301,7 +301,7 @@
                         CurrPage.SetSelectionFilter(NpCsDocument);
                         if NpCsDocument.FindSet() then
                             repeat
-                                NpCsWorkflowMgt.RunWorkflowOrderStatus(NpCsDocument);
+                                NpCsWorkflowMgt.RunWorkflowOrderStatus(NpCsDocument, false);
                             until NpCsDocument.Next() = 0;
                     end;
                 }
@@ -347,7 +347,7 @@
                         CurrPage.SetSelectionFilter(NpCsDocument);
                         if NpCsDocument.FindSet() then
                             repeat
-                                NpCsWorkflowMgt.RunWorkflowPostProcessing(NpCsDocument);
+                                NpCsWorkflowMgt.RunWorkflowPostProcessing(NpCsDocument, false);
                             until NpCsDocument.Next() = 0;
                     end;
                 }

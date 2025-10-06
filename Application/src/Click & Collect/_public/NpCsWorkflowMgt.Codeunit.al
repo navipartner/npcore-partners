@@ -56,6 +56,11 @@
     end;
 
     procedure RunWorkflowSendOrder(var NpCsDocument: Record "NPR NpCs Document")
+    begin
+        RunWorkflowSendOrder(NpCsDocument, true);
+    end;
+
+    procedure RunWorkflowSendOrder(var NpCsDocument: Record "NPR NpCs Document"; PropagateError: Boolean)
     var
         NpCsWorkflowModule: Record "NPR NpCs Workflow Module";
     begin
@@ -66,8 +71,13 @@
         ClearLastError();
         Clear(RunWorkflowStep);
         RunWorkflowStep.SetWorkflowFunctionType(WorkflowFunctionType::"Send Order");
-        if not RunWorkflowStep.Run(NpCsDocument) then
+        if not RunWorkflowStep.Run(NpCsDocument) then begin
             InsertLogEntry(NpCsDocument, NpCsWorkflowModule, '', true, GetLastErrorText());
+            if PropagateError then begin
+                Commit();
+                Error(GetLastErrorText());
+            end;
+        end;
 
         Commit();
         if NpCsDocument."Next Workflow Step" = NpCsDocument."Next Workflow Step"::"Order Status" then
@@ -75,6 +85,11 @@
     end;
 
     procedure RunWorkflowOrderStatus(var NpCsDocument: Record "NPR NpCs Document")
+    begin
+        RunWorkflowOrderStatus(NpCsDocument, true);
+    end;
+
+    procedure RunWorkflowOrderStatus(var NpCsDocument: Record "NPR NpCs Document"; PropagateError: Boolean)
     var
         NpCsWorkflowModule: Record "NPR NpCs Workflow Module";
         PrevStatus: Integer;
@@ -87,8 +102,13 @@
         ClearLastError();
         Clear(RunWorkflowStep);
         RunWorkflowStep.SetWorkflowFunctionType(WorkflowFunctionType::"Order Status");
-        if not RunWorkflowStep.Run(NpCsDocument) then
+        if not RunWorkflowStep.Run(NpCsDocument) then begin
             InsertLogEntry(NpCsDocument, NpCsWorkflowModule, '', true, GetLastErrorText());
+            if PropagateError then begin
+                Commit();
+                Error(GetLastErrorText());
+            end;
+        end;
 
         Commit();
         if PrevStatus <> NpCsDocument."Processing Status" then begin
@@ -98,6 +118,11 @@
     end;
 
     internal procedure RunWorkflowPostProcessing(var NpCsDocument: Record "NPR NpCs Document")
+    begin
+        RunWorkflowPostProcessing(NpCsDocument, true);
+    end;
+
+    internal procedure RunWorkflowPostProcessing(var NpCsDocument: Record "NPR NpCs Document"; PropagateError: Boolean)
     var
         NpCsWorkflowModule: Record "NPR NpCs Workflow Module";
         LastErrorText: Text;
@@ -111,8 +136,13 @@
         RunWorkflowStep.SetWorkflowFunctionType(WorkflowFunctionType::"Post Processing");
         if not RunWorkflowStep.Run(NpCsDocument) then begin
             LastErrorText := GetLastErrorText();
-            if LastErrorText <> '' then
+            if LastErrorText <> '' then begin
                 InsertLogEntry(NpCsDocument, NpCsWorkflowModule, '', true, LastErrorText);
+                if PropagateError then begin
+                    Commit();
+                    Error(LastErrorText);
+                end;
+            end;
         end;
 
         Commit();
