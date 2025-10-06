@@ -6,6 +6,10 @@ codeunit 6150832 "NPR POS Action - Login-B"
         InvalidStatus: Label 'The register status states that the register cannot be opened at this time.';
         IsEoD: Label 'The %1 %2 indicates that this %1 is being balanced and it can''t be opened at this time.';
         ManagedPos: Label 'This POS is managed by POS Unit %1 [%2] and it is therefore required that %1 is opened prior to opening this POS.';
+#if not (BC17 or BC18 or BC19)
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        SalespersonBlockedErr: Label 'Salesperson %1 - %2 is blocked.', Comment = '%1 = Salesperson Code, %2 = Salesperson Name';
+#endif
 
     procedure OpenPosUnit(FrontEnd: Codeunit "NPR POS Front End Management"; Setup: Codeunit "NPR POS Setup"; POSSession: Codeunit "NPR POS Session"; var ActionContext: JsonObject)
     var
@@ -27,6 +31,11 @@ codeunit 6150832 "NPR POS Action - Login-B"
             POSUnit.FieldError(Status);
 
         Setup.GetSalespersonRecord(SalespersonPurchaser);
+#if not (BC17 or BC18 or BC19)
+        if FeatureFlagsManagement.IsEnabled('blocksalespersononposviabutton') then
+            if SalespersonPurchaser.Blocked then
+                Error(SalespersonBlockedErr, SalespersonPurchaser.Code, SalespersonPurchaser.Name);
+#endif
         CheckPosUnitGroup(SalespersonPurchaser, POSUnit."No.");
 
         BalanceAge := DaysSinceLastBalance(POSUnit);
@@ -181,6 +190,21 @@ codeunit 6150832 "NPR POS Action - Login-B"
         if POSUnitGroupLine.IsEmpty() then
             Error(SalesPersonNotAllowedErr, SalespersonPurchaser.Name, POSUnitNo);
     end;
+
+#if not (BC17 or BC18 or BC19)
+    internal procedure CheckSalespersonBlocked(SalespersonCode: Code[20])
+    var
+        SalespersonPurchaser: Record "Salesperson/Purchaser";
+    begin
+        if not FeatureFlagsManagement.IsEnabled('blocksalespersononposviabutton') then
+            exit;
+        SalespersonPurchaser.SetLoadFields(Blocked, Code, Name);
+        if not SalespersonPurchaser.Get(SalespersonCode) then
+            exit;
+        if SalespersonPurchaser.Blocked then
+            Error(SalespersonBlockedErr, SalespersonPurchaser.Code, SalesPersonPurchaser.Name);
+    end;
+#endif
 
     local procedure SetActionContent(var ActionContext: JsonObject; ActionName: Code[20]; ManagedEOD: Boolean)
     var

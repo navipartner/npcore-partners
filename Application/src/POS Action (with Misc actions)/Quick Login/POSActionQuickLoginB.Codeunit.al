@@ -24,7 +24,13 @@ codeunit 6150659 "NPR POS Action: Quick Login B."
     procedure ApplySalespersonCode(SalespersonCode: Code[20]; POSSale: Codeunit "NPR POS Sale")
     var
         SalePOS: Record "NPR POS Sale";
+#if not (BC17 or BC18 or BC19)
+        POSActionLoginB: Codeunit "NPR POS Action - Login-B";
+#endif
     begin
+#if not (BC17 or BC18 or BC19)
+        POSActionLoginB.CheckSalespersonBlocked(SalespersonCode);
+#endif
         POSSale.GetCurrentSale(SalePOS);
 
         SalePOS.Validate("Salesperson Code", SalespersonCode);
