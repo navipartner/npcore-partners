@@ -368,6 +368,7 @@
         POSSession: Codeunit "NPR POS Session";
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
+        NpDcCouponManualPost: Codeunit "NPR NpDc Coupon Manual Post";
     begin
         SalePOS.TestField("Sales Document No.");
         SalesHeader.Get(SalePOS."Sales Document Type", SalePOS."Sales Document No.");
@@ -375,7 +376,9 @@
         POSSession.GetSale(POSSale);
         POSSession.GetSaleLine(POSSaleLine);
 
+        BindSubscription(NpDcCouponManualPost);
         POSSaleLine.DeleteAll(true);
+        UnbindSubscription(NpDcCouponManualPost);
 
         POSSale.RefreshCurrent();
         POSSale.GetCurrentSale(SalePOS);
