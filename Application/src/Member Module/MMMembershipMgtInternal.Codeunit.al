@@ -3897,6 +3897,112 @@
 
     end;
 
+    internal procedure IsBirthdayMandatory(Member: Record "NPR MM Member"): Boolean
+    var
+        MembershipRole: Record "NPR MM Membership Role";
+        Membership: Record "NPR MM Membership";
+        MembershipSetup: Record "NPR MM Membership Setup";
+    begin
+        MembershipRole.SetFilter("Member Entry No.", '=%1', Member."Entry No.");
+        MembershipRole.SetFilter(Blocked, '=%1', false);
+        if (MembershipRole.FindSet()) then begin
+            repeat
+                if (Membership.Get(MembershipRole."Membership Entry No.")) then begin
+                    MembershipSetup.Get(Membership."Membership Code");
+                    if (MembershipSetup."Enable Age Verification") then
+                        exit(true);
+                end;
+            until (MembershipRole.Next() = 0);
+        end;
+
+        exit(false);
+    end;
+
+    internal procedure IsAgeValidForMember(Member: Record "NPR MM Member"; ReferenceDate: Date; var ReasonText: Text) AgeConstraintOk: Boolean
+    var
+        MembershipRole: Record "NPR MM Membership Role";
+    begin
+        ReasonText := '';
+
+        MembershipRole.SetFilter("Member Entry No.", '=%1', Member."Entry No.");
+        MembershipRole.SetFilter(Blocked, '=%1', false);
+        if (MembershipRole.FindSet()) then begin
+            repeat
+                AgeConstraintOk := IsAgeValidForMembershipMembers(MembershipRole."Membership Entry No.", ReferenceDate, ReasonText);
+                if (not AgeConstraintOk) then
+                    exit(false);
+
+            until (MembershipRole.Next() = 0);
+        end;
+
+        exit(true);
+    end;
+
+    local procedure IsAgeValidForMembershipMembers(MembershipEntryNo: Integer; ReferenceDate: Date; var ReasonText: Text) AgeConstraintOk: Boolean
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        MembershipLedgerEntry: Record "NPR MM Membership Entry";
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
+        LedgerEntryNo: Integer;
+        AlterationOptionType: Option;
+    begin
+        AgeConstraintOk := true;
+
+        if (not Membership.Get(MembershipEntryNo)) then
+            exit;
+
+        MembershipSetup.Get(Membership."Membership Code");
+        if (not MembershipSetup."Enable Age Verification") then
+            exit;
+
+        if (not GetLedgerEntryForDate(Membership."Entry No.", ReferenceDate, LedgerEntryNo)) then
+            exit;
+
+        if (not MembershipLedgerEntry.Get(LedgerEntryNo)) then
+            exit;
+
+        if (MembershipLedgerEntry.Blocked) then
+            exit;
+
+        if MembershipLedgerEntry.Context = MembershipLedgerEntry.Context::NEW then begin
+            // Sales setup lookup: Get(type, ItemNo)
+            if (MembershipSalesSetup.Get(MembershipSalesSetup.Type::ITEM, MembershipLedgerEntry."Item No.")) then
+                AgeConstraintOk := CheckMemberAgeConstraint(MembershipEntryNo, ReferenceDate,
+                    MembershipSetup."Validate Age Against",
+                    MembershipSalesSetup."Age Constraint Type",
+                    MembershipSalesSetup."Age Constraint (Years)",
+                    MembershipSalesSetup."Age Constraint Applies To", ReasonText);
+        end;
+
+        if MembershipLedgerEntry.Context in [MembershipLedgerEntry.Context::RENEW, MembershipLedgerEntry.Context::UPGRADE, MembershipLedgerEntry.Context::EXTEND] then begin
+            // Find alteration rule that maps to this membership (reset filters first)
+            case MembershipLedgerEntry.Context of
+                MembershipLedgerEntry.Context::RENEW:
+                    AlterationOptionType := MembershipAlterationSetup."Alteration Type"::RENEW;
+                MembershipLedgerEntry.Context::UPGRADE:
+                    AlterationOptionType := MembershipAlterationSetup."Alteration Type"::UPGRADE;
+                MembershipLedgerEntry.Context::EXTEND:
+                    AlterationOptionType := MembershipAlterationSetup."Alteration Type"::EXTEND;
+                else
+                    Error('Unhandled context in IsAgeValidForMembershipMembers');
+            end;
+            MembershipAlterationSetup.Reset();
+            MembershipAlterationSetup.SetFilter("Alteration Type", '=%1', AlterationOptionType);
+            MembershipAlterationSetup.SetFilter("To Membership Code", '=%1|=%2', '', Membership."Membership Code");
+            MembershipAlterationSetup.SetFilter("From Membership Code", '=%1|=%2', '', Membership."Membership Code");
+            MembershipAlterationSetup.SetFilter("Sales Item No.", '=%1', MembershipLedgerEntry."Item No.");
+            if (MembershipAlterationSetup.FindFirst()) then
+                AgeConstraintOk := CheckMemberAgeConstraint(MembershipEntryNo, ReferenceDate,
+                    MembershipSetup."Validate Age Against",
+                    MembershipAlterationSetup."Age Constraint Type",
+                    MembershipAlterationSetup."Age Constraint (Years)",
+                    MembershipAlterationSetup."Age Constraint Applies To", ReasonText);
+        end;
+
+    end;
+
     local procedure CheckMemberAgeConstraint(MembershipEntryNo: Integer; ReferenceDate: Date; ReferenceDateType: Option; ConstraintType: Option NA,"Less Than","Less Than or Equal To","Greater Then","Greater Than or Equal To","Equal To"; Constraint: Integer; AppliesTo: Option; var ReasonText: Text): Boolean
     var
         MembershipSalesSetup: Record "NPR MM Members. Sales Setup";

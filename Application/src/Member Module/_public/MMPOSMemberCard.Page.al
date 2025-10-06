@@ -108,7 +108,24 @@
                     StyleExpr = IsBirthday;
                     ToolTip = 'Specifies the value of the Birthday field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ShowMandatory = _IsBirthdayMandatory;
+
+                    trigger OnValidate()
+                    var
+                        FutureDoB: Label 'Date of birth is mandatory! Setting a date into the future will bypass essential features. Do you wish to keep the future date of birth?';
+                    begin
+                        Rec.Modify(); // To ensure that the ValidateAgeForMember procedure sees the new value
+                        ValidateAgeForMember(Rec);
+
+                        if (_IsBirthdayMandatory and (Rec.Birthday > Today())) then begin
+                            if (not Confirm(FutureDoB, true)) then
+                                Rec.Birthday := 0D;
+                        end;
+
+                        CurrPage.Update(false);
+                    end;
                 }
+
                 field("E-Mail News Letter"; Rec."E-Mail News Letter")
                 {
                     ToolTip = 'Specifies the value of the E-Mail News Letter field';
@@ -593,6 +610,11 @@
 
         end;
 
+        _IsBirthdayMandatory := CheckBirthdayMandatory(Rec);
+        _InitialBirthday := Rec.Birthday;
+        if (_IsBirthdayMandatory and (Rec.Birthday > Today())) then
+            Rec.Birthday := 0D;
+
         if (Rec.Birthday <> 0D) then
             IsBirthday := ((Date2DMY(Rec.Birthday, 1) = Date2DMY(Today, 1)) and (Date2DMY(Rec.Birthday, 2) = Date2DMY(Today, 2)));
 
@@ -603,9 +625,26 @@
     var
         RaptorSetup: Record "NPR Raptor Setup";
     begin
-
         RaptorEnabled := (RaptorSetup.Get() and RaptorSetup."Enable Raptor Functions");
+    end;
 
+
+    trigger OnQueryClosePage(CloseAction: Action): Boolean
+    begin
+        if (not (CloseAction in [Action::OK, Action::LookupOK, Action::Yes])) then begin
+            if (_IsBirthdayMandatory and (Rec.Birthday = 0D)) then begin
+                Rec.Birthday := _InitialBirthday;
+                Rec.Modify();
+            end;
+            exit(true);
+        end;
+
+        if (_IsBirthdayMandatory and (Rec.Birthday = 0D)) then begin
+            Message('Date of birth is mandatory. Please enter a valid date of birth before leaving the member card.');
+            exit(false);
+        end;
+
+        exit(true);
     end;
 
     var
@@ -614,11 +653,14 @@
         ValidUntilDate: Date;
         IsInvalid: Boolean;
         IsBirthday: Boolean;
+        _IsBirthdayMandatory: Boolean;
+        _InitialBirthday: Date;
+
         UntilDateAttentionAccent: Boolean;
         NeedsActivation: Boolean;
         GMembershipEntryNo: Integer;
         RemainingPoints: Integer;
-        NO_QUESTIONNAIR: Label 'The profile questionnair is not available right now.';
+        NO_QUESTIONNAIRE: Label 'The profile questionnair is not available right now.';
         MembershipRoleDisplay: Record "NPR MM Membership Role";
         RemainingAmountText: Text[50];
         AccentuateDueAmount: Boolean;
@@ -696,10 +738,10 @@
     begin
 
         if (not MembershipRole.Get(GMembershipEntryNo, Rec."Entry No.")) then
-            Error(NO_QUESTIONNAIR);
+            Error(NO_QUESTIONNAIRE);
 
         if (not Contact.Get(MembershipRole."Contact No.")) then
-            Error(NO_QUESTIONNAIR);
+            Error(NO_QUESTIONNAIRE);
 
         ProfileManagement.ShowContactQuestionnaireCard(Contact, '', 0);
     end;
@@ -716,6 +758,30 @@
         MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
     begin
         MemberManagement.ValidateMemberEmail(Member)
+    end;
+
+    local procedure CheckBirthdayMandatory(Member: Record "NPR MM Member"): Boolean
+    var
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+        exit(MembershipManagement.IsBirthdayMandatory(Member));
+    end;
+
+    local procedure ValidateAgeForMember(var Member: Record "NPR MM Member"): Boolean
+    var
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+        ReasonText: Text;
+    begin
+        if (CheckBirthdayMandatory(Member)) then begin
+            if (Member.Birthday = 0D) then
+                exit(false);
+
+            if (Member.Birthday > Today()) then
+                exit(true); // Allow future DoB, but warn user
+
+            if (not MembershipManagement.IsAgeValidForMember(Member, Today, ReasonText)) then
+                Error(ReasonText);
+        end;
     end;
 
 }
