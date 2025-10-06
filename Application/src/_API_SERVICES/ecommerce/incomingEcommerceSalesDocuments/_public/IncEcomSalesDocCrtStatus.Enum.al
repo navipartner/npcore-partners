@@ -5,10 +5,13 @@ enum 6059870 "NPR IncEcomSalesDocCrtStatus"
     {
         Caption = 'Pending';
     }
-
     value(1; "Created")
     {
         Caption = 'Created';
+    }
+    value(2; "Canceled")
+    {
+        Caption = 'Canceled';
     }
     value(4; "Error")
     {

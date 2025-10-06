@@ -977,6 +977,8 @@ codeunit 6248364 "NPR Inc Ecom Sales Doc Impl"
         if IsPosted then
             exit;
 
+        ChangeIncEcomSalesHeaderStatusCanceled(Rec);
+
         // Call appropriate webhook based on document type
         case Rec."Document Type" of
             Rec."Document Type"::Order:
@@ -984,6 +986,18 @@ codeunit 6248364 "NPR Inc Ecom Sales Doc Impl"
             Rec."Document Type"::"Return Order":
                 IncEcomSalesWebhook.OnSalesReturnOrderCancelled(Rec.SystemId, Rec."External Document No.", Rec."NPR External Order No.", Rec."NPR Inc Ecom Sale Id");
         end;
+    end;
+
+    local procedure ChangeIncEcomSalesHeaderStatusCanceled(SalesHeader: Record "Sales Header")
+    var
+        IncEcomSalesHeader: Record "NPR Inc Ecom Sales Header";
+    begin
+        if not (SalesHeader."Document Type" in [SalesHeader."Document Type"::Order, SalesHeader."Document Type"::"Return Order"]) then
+            exit;
+        if not IncEcomSalesHeader.GetBySystemId(SalesHeader."NPR Inc Ecom Sale Id") then
+            exit;
+        IncEcomSalesHeader."Creation Status" := IncEcomSalesHeader."Creation Status"::Canceled;
+        IncEcomSalesHeader.Modify(true);
     end;
 }
 #endif
