@@ -13,10 +13,10 @@
         ChangeLogSetupTable: Record "Change Log Setup (Table)";
         SaaSImportSetup: Record "NPR SaaS Import Setup";
     begin
-        if NavApp.IsInstalling() then
+        if not GuiAllowed then
             exit;
 
-        if not GuiAllowed then
+        if NavApp.IsInstalling() then
             exit;
 
         if not (ChangeLogSetup.WritePermission() and ChangeLogSetupTable.WritePermission()) then

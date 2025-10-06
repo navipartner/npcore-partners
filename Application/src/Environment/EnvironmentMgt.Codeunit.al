@@ -85,6 +85,9 @@ codeunit 6060025 "NPR Environment Mgt."
         EnvironmentInformation: Codeunit "Environment Information";
         Iterations: Integer;
     begin
+        if not GuiAllowed then
+            exit;
+
         if EnvironmentInformation.IsSaaS() then
             exit; //We use microsofts prod/sandbox terminology in saas instead of our own.
 

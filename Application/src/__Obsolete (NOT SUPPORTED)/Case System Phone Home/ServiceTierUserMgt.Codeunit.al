@@ -19,6 +19,9 @@
     var
         TempClientDiagnostic: Record "NPR Client Diagnostic v2" temporary;
     begin
+        if not GuiAllowed then
+            exit;
+
         TempClientDiagnostic."User Security ID" := UserSecurityId();
         TempClientDiagnostic."User Login Type" := TempClientDiagnostic."User Login Type"::BC;
         InitCaseSystemCallback(TempClientDiagnostic);
@@ -41,9 +44,6 @@
         SessionId: Integer;
     begin
         if NavApp.IsInstalling() then
-            exit;
-
-        if not GuiAllowed then //we only want to work on user sessions = GuiAllowed.
             exit;
 
         if EnvironmentInformation.IsSandbox() then

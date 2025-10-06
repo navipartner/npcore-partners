@@ -342,6 +342,9 @@
     var
         GuidedExperience: Codeunit "Guided Experience";
     begin
+        if not GuiAllowed then
+            exit;
+
         GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR GraphApi Setup Wizard");
         GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Magento Wizard");
         RetailSetups();
@@ -4338,6 +4341,7 @@
         GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup HUL Return Reason");
         GuidedExperience.Remove("Guided Experience Type"::"Assisted Setup", ObjectType::Page, Page::"NPR Setup HU L POS Unit");
     end;
+
     local procedure AddHULFiscalizationSetupsWizard()
     begin
         EnableHULFiscalSetupWizard();

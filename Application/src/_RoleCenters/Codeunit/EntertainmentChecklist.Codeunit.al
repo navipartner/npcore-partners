@@ -12,6 +12,9 @@ codeunit 6060003 "NPR Entertainment Checklist"
     var
         UpgradeTag: Codeunit "Upgrade Tag";
     begin
+        if not GuiAllowed then
+            exit;
+
         if not (Session.CurrentClientType() in [ClientType::Web, ClientType::Windows, ClientType::Desktop]) then
             exit;
         if UpgradeTag.HasUpgradeTag(GetUpgradeTag()) then
