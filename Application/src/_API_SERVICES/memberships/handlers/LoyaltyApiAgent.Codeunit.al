@@ -9,14 +9,28 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
     internal procedure GetMembershipPoints(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         Membership: Record "NPR MM Membership";
+        TempLoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup" temporary;
         MembershipApiAgent: Codeunit "NPR MembershipApiAgent";
+        LoyaltyPointManagement: Codeunit "NPR MM Loyalty Point Mgt.";
+        Redeemable: Integer;
         PointsValue: Decimal;
+        ReasonText: Text;
     begin
         if (not MembershipApiAgent.GetMembershipById(Request, 2, Membership)) then
             exit(Response.RespondBadRequest('Invalid Membership - Membership Id not valid.'));
         Membership.CalcFields("Remaining Points");
-        PointsValue := Membership."Remaining Points" * LoyaltyBurnRate(Membership.SystemId);
-        Response.RespondOK(PointBalance(Membership."Remaining Points", PointsValue));
+        Redeemable := Membership."Remaining Points";
+        if not IsLoyaltyCouponSetupActive(Membership.SystemId) then
+            PointsValue := Membership."Remaining Points" * LoyaltyBurnRate(Membership.SystemId)
+        else
+            if (LoyaltyPointManagement.GetCouponToRedeemWS(Membership."Entry No.", TempLoyaltyPointsSetup, 1000000000, ReasonText)) then begin
+                Redeemable := LoyaltyPointManagement.CalculateRedeemablePointsCurrentPeriod(Membership."Entry No.");
+                TempLoyaltyPointsSetup.Reset();
+                TempLoyaltyPointsSetup.SetCurrentKey(Code, "Amount LCY");
+                TempLoyaltyPointsSetup.FindLast();
+                PointsValue := Redeemable * TempLoyaltyPointsSetup."Point Rate";
+            end;
+        Response.RespondOK(PointBalance(Redeemable, PointsValue));
     end;
 
     internal procedure CreateReservationTransaction(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
@@ -332,6 +346,22 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
         if not LoyaltySetup.Get(MembershipSetup."Loyalty Code") then
             exit(0);
         exit(LoyaltySetup."Point Rate");
+    end;
+
+    local procedure IsLoyaltyCouponSetupActive(MembershipSystemId: Guid): Boolean
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        LoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup";
+    begin
+        Membership.SetLoadFields("Membership Code");
+        if not Membership.GetBySystemId(MembershipSystemId) then
+            exit(false);
+        MembershipSetup.SetLoadFields("Loyalty Code");
+        if not MembershipSetup.Get(Membership."Membership Code") then
+            exit(false);
+        LoyaltyPointsSetup.SetFilter(Code, '=%1', MembershipSetup."Loyalty Code");
+        exit(not LoyaltyPointsSetup.IsEmpty());
     end;
 
 }
