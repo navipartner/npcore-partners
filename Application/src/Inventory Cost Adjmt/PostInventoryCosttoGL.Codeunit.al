@@ -6,6 +6,10 @@ codeunit 6014683 "NPR Post Inventory Cost to G/L"
 
     trigger OnRun()
     var
+#if not (BC17 or BC18 or BC19)
+        GLSetup: Record "General Ledger Setup";
+        InventorySetup: Record "Inventory Setup";
+#endif
         ReportInbox: Record "Report Inbox";
         PostInvToGL: Report "Post Inventory Cost to G/L";
         JQParamStrMgt: Codeunit "NPR Job Queue Param. Str. Mgt.";
@@ -20,6 +24,14 @@ codeunit 6014683 "NPR Post Inventory Cost to G/L"
         ReportInbox."Report Output".CreateOutStream(OutStr);
 
         PostInvToGL.InitializeRequest(PostMethod::"per Entry", '', true);
+#if not (BC17 or BC18 or BC19)
+        if GLSetup.Get() and GLSetup."Journal Templ. Name Mandatory" then begin
+            InventorySetup.Get();
+            InventorySetup.TestField("Invt. Cost Jnl. Template Name");
+            InventorySetup.TestField("Invt. Cost Jnl. Batch Name");
+            PostInvToGL.SetGenJnlBatch(InventorySetup."Invt. Cost Jnl. Template Name", InventorySetup."Invt. Cost Jnl. Batch Name");
+        end;
+#endif
         PostInvToGL.UseRequestPage(false);
         PostInvToGL.SaveAs(GetReportParameters(), ReportFormat::Pdf, OutStr);
 
