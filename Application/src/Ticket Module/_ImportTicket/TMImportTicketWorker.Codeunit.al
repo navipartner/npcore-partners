@@ -34,6 +34,7 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
         AuthorizationCode: Code[10];
         ResponseMessage: Text;
         RequestSuccess: Boolean;
+        SalesDatetime: DateTime;
     begin
         if (not TicketSetup.Get()) then
             TicketSetup.Init();
@@ -55,12 +56,13 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
 
             Archive(Token, _TempTicketImport);
             AuthorizationCode := CopyStr(TicketManagement.GenerateNumberPattern(TicketSetup."Authorization Code Scheme", '-'), 1, MaxStrLen(AuthorizationCode));
+            SalesDatetime := CreateDateTime(_TempTicketImport.SalesDate, Time());
             repeat
                 if (_TempTicketImportLine.TicketRequestTokenLine <> 0) then
                     TokenLine := _TempTicketImportLine.TicketRequestTokenLine;
 
                 Archive(Token, TokenLine, _TempTicketImportLine);
-                CreateTicketRequest(_TempTicketImportLine, AuthorizationCode);
+                CreateTicketRequest(_TempTicketImportLine, SalesDatetime, AuthorizationCode);
                 TokenLine += 1;
             until (_TempTicketImportLine.Next() = 0);
 
@@ -114,7 +116,7 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
         Success := TicketRequestManager.ConfirmReservationRequest(Token, ErrorMessage);
     end;
 
-    local procedure CreateTicketRequest(TempTicketImportLine: Record "NPR TM ImportTicketLine" temporary; AuthorizationCode: Code[10])
+    local procedure CreateTicketRequest(TempTicketImportLine: Record "NPR TM ImportTicketLine" temporary; SalesDatetime: DateTime; AuthorizationCode: Code[10])
     var
         TicketRequest: Record "NPR TM Ticket Reservation Req.";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
@@ -124,10 +126,12 @@ codeunit 6184696 "NPR TM ImportTicketWorker"
         INVALID_ITEM_REFERENCE: Label 'Reference %1 does not resolve to neither an item reference nor an item number.';
     begin
         TicketRequest.Init();
+        if (SalesDatetime = 0DT) then
+            SalesDatetime := CurrentDateTime();
 
         TicketRequest."Session Token ID" := TempTicketImportLine.TicketRequestToken;
         TicketRequest."Request Status" := TicketRequest."Request Status"::WIP;
-        TicketRequest."Request Status Date Time" := CurrentDateTime;
+        TicketRequest."Request Status Date Time" := SalesDatetime;
         TicketRequest."Created Date Time" := CurrentDateTime();
         TicketRequest."Ext. Line Reference No." := TempTicketImportLine.TicketRequestTokenLine;
         TicketRequest."Primary Request Line" := true;

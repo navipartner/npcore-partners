@@ -3530,7 +3530,7 @@
         if (Ticket."Salesperson Code" = '') then
             Ticket."Salesperson Code" := CopyStr(UserId(), 1, MaxStrLen(Ticket."Salesperson Code"));
 
-        TicketManagement.SetTicketProperties(Ticket, Today);
+        TicketManagement.SetTicketProperties(Ticket, ReservationRequest."Request Status Date Time");
         Ticket.Insert(true);
     end;
 

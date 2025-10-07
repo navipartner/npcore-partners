@@ -522,11 +522,15 @@
 
     end;
 
-    procedure SetTicketProperties(var Ticket: Record "NPR TM Ticket"; ValidFromDate: Date)
+    internal procedure SetTicketProperties(var Ticket: Record "NPR TM Ticket"; RequestDatetime: DateTime)
     var
         TicketType: Record "NPR TM Ticket Type";
         TicketBom: Record "NPR TM Ticket Admission BOM";
+        ValidFromDate: Date;
     begin
+        ValidFromDate := DT2Date(RequestDatetime);
+        if (ValidFromDate = 0D) then
+            ValidFromDate := Today();
 
         TicketType.Get(Ticket."Ticket Type Code");
         Ticket."Valid From Date" := ValidFromDate;
@@ -536,7 +540,7 @@
         Ticket."Valid From Time" := 000000T;
         Ticket."Valid To Time" := 235959T;
         Ticket.Blocked := false;
-        Ticket."Document Date" := Today();
+        Ticket."Document Date" := ValidFromDate;
 
         if (TicketType."Ticket Configuration Source" = TicketType."Ticket Configuration Source"::TICKET_BOM) then begin
             TicketBom.SetFilter("Item No.", '=%1', Ticket."Item No.");
@@ -650,7 +654,6 @@
         Admission.Get(AdmissionCode);
         TicketType.Get(Ticket."Ticket Type Code");
 
-
         if (AdmissionSchEntry."Entry No." <= 0) then begin
             case GetAdmissionSchedule(Ticket."Item No.", Ticket."Variant Code", AdmissionCode) of
                 Admission."Default Schedule"::TODAY,
@@ -661,7 +664,7 @@
             end;
         end else begin
 
-            if (IsSelectedAdmissionSchEntryExpired(AdmissionSchEntry, Today, Time, ResponseMessage, ResponseCode)) then
+            if (IsSelectedAdmissionSchEntryExpired(AdmissionSchEntry, Today(), Time(), ResponseMessage, ResponseCode)) then
                 RaiseError(ResponseMessage, Format(ResponseCode, 0, 9));
 
         end;
