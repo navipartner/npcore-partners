@@ -2124,7 +2124,7 @@
     var
         Txt001: Label 'Deposit';
     begin
-        if ("No." = '*') or ("Line Type" = "Line Type"::Comment) then begin
+        if ("No." = '*') or ("Line Type" in ["Line Type"::Comment, "Line Type"::"BOM List"]) then begin
             SalesLine."No." := '';
             SalesLine.Description := Description;
             SalesLine."Description 2" := "Description 2";

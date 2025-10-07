@@ -523,6 +523,8 @@
                         SalesLine.Type := SalesLine.Type::"G/L Account";
                     SaleLinePOS."Line Type"::Comment:
                         SalesLine.Type := SalesLine.Type::" ";
+                    SaleLinePOS."Line Type"::"BOM List":
+                        SalesLine.Type := SalesLine.Type::" ";
                     else
                         SalesLine.Type := SalesLine.Type::Item;
                 end;
@@ -578,42 +580,43 @@
                     ReservationEntry."Qty. to Invoice (Base)" := -SalesLine.Quantity;
                     ReservationEntry.Insert();
                 end;
-                if Item.Get(SaleLinePOS."No.") then begin
-                    if Item."Item Tracking Code" <> '' then begin
-                        ItemTrackingCode.Get(Item."Item Tracking Code");
+                if SalesLine.Type = SalesLine.Type::Item then
+                    if Item.Get(SaleLinePOS."No.") then begin
+                        if Item."Item Tracking Code" <> '' then begin
+                            ItemTrackingCode.Get(Item."Item Tracking Code");
 #IF BC17
                         ItemTrackingManagement.GetItemTrackingSetup(ItemTrackingCode, 1, false, ItemTrackingSetup);
 #ELSE
-                        ItemTrackingManagement.GetItemTrackingSetup(ItemTrackingCode, "Item Ledger Entry Type"::Sale, false, ItemTrackingSetup);
+                            ItemTrackingManagement.GetItemTrackingSetup(ItemTrackingCode, "Item Ledger Entry Type"::Sale, false, ItemTrackingSetup);
 #endif
-                        if ItemTrackingSetup."Serial No. Required" then
-                            if SaleLinePOS."Serial No." = '' then
-                                if not ConfirmManagement.GetResponseOrDefault(StrSubstNo(Text000013, SaleLinePOS."No.", SaleLinePOS.Description) + ContinueQst, false) then
-                                    Error(Text000013, SaleLinePOS."No.", SaleLinePOS.Description);
+                            if ItemTrackingSetup."Serial No. Required" then
+                                if SaleLinePOS."Serial No." = '' then
+                                    if not ConfirmManagement.GetResponseOrDefault(StrSubstNo(Text000013, SaleLinePOS."No.", SaleLinePOS.Description) + ContinueQst, false) then
+                                        Error(Text000013, SaleLinePOS."No.", SaleLinePOS.Description);
 
-                        if ItemTrackingSetup."Serial No. Info Required" then
-                            if not SerialNoInfo.Get(SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Serial No.") then begin
-                                if not ConfirmManagement.GetResponseOrDefault(SerialNoInfoLbl + ContinueQst, false) then
-                                    Error(SerialNoInfoLbl);
-                            end else
+                            if ItemTrackingSetup."Serial No. Info Required" then
+                                if not SerialNoInfo.Get(SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Serial No.") then begin
+                                    if not ConfirmManagement.GetResponseOrDefault(SerialNoInfoLbl + ContinueQst, false) then
+                                        Error(SerialNoInfoLbl);
+                                end else
+                                    SerialNoInfo.TestField(Blocked, false);
+
+                            if ItemTrackingSetup."Lot No. Required" then
+                                if SaleLinePOS."Lot No." = '' then
+                                    if not ConfirmManagement.GetResponseOrDefault(StrSubstNo(Text000014, SaleLinePOS."No.", SaleLinePOS.Description) + ContinueQst, false) then
+                                        Error(Text000014, SaleLinePOS."No.", SaleLinePOS.Description);
+
+                            if ItemTrackingSetup."Lot No. Info Required" then
+                                if not LotNoInfo.Get(SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Lot No.") then begin
+                                    if not ConfirmManagement.GetResponseOrDefault(LotNoInfoLbl + ContinueQst, false) then
+                                        Error(LotNoInfoLbl);
+                                end else
+                                    LotNoInfo.TestField(Blocked, false);
+                        end else begin
+                            if SerialNoInfo.Get(SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Serial No.") then
                                 SerialNoInfo.TestField(Blocked, false);
-
-                        if ItemTrackingSetup."Lot No. Required" then
-                            if SaleLinePOS."Lot No." = '' then
-                                if not ConfirmManagement.GetResponseOrDefault(StrSubstNo(Text000014, SaleLinePOS."No.", SaleLinePOS.Description) + ContinueQst, false) then
-                                    Error(Text000014, SaleLinePOS."No.", SaleLinePOS.Description);
-
-                        if ItemTrackingSetup."Lot No. Info Required" then
-                            if not LotNoInfo.Get(SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Lot No.") then begin
-                                if not ConfirmManagement.GetResponseOrDefault(LotNoInfoLbl + ContinueQst, false) then
-                                    Error(LotNoInfoLbl);
-                            end else
-                                LotNoInfo.TestField(Blocked, false);
-                    end else begin
-                        if SerialNoInfo.Get(SaleLinePOS."No.", SaleLinePOS."Variant Code", SaleLinePOS."Serial No.") then
-                            SerialNoInfo.TestField(Blocked, false);
+                        end;
                     end;
-                end;
                 NpRvSalesLine.SetCurrentKey("Retail ID", "Document Source");
                 NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::POS);
                 NpRvSalesLine.SetRange("Retail ID", SaleLinePOS.SystemId);
