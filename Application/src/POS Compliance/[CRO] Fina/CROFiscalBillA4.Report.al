@@ -28,6 +28,7 @@ report 6014554 "NPR CRO Fiscal Bill A4"
             column(CustomerPostCity; CustomerPostCity) { }
             column(CustomerName; CustomerName) { }
             column(CustomerAddress; CustomerAddress) { }
+            column(CustomerVATRegNo; CustomerVATRegNo) { }
             column(CopyText; CopyText) { }
             dataitem("POS Entry Lines"; "NPR POS Entry Sales Line")
             {
@@ -142,6 +143,7 @@ report 6014554 "NPR CRO Fiscal Bill A4"
     }
     labels
     {
+        VatRegNoLbl = 'OIB:', Locked = true;
         ItemNameLbl = 'NAZIV', Locked = true;
         ItemCodeLbl = 'OZNAKA', Locked = true;
         BarcodeLbl = 'BARKOD', Locked = true;
@@ -207,6 +209,7 @@ report 6014554 "NPR CRO Fiscal Bill A4"
             CustomerAddress := Customer.Address;
             CustomerName := Customer.Name;
             CustomerPostCity := Customer."Post Code" + ' ' + Customer.City;
+            CustomerVATRegNo := Customer."VAT Registration No.";
         end;
 
         POSEntrySalesLine.SetRange("POS Entry No.", CROPOSAuditLogAuxInfo."POS Entry No.");
@@ -311,6 +314,7 @@ report 6014554 "NPR CRO Fiscal Bill A4"
         CustomerAddress := SalesCrMemoHeader."Sell-to Address";
         CustomerName := SalesCrMemoHeader."Sell-to Customer Name";
         CustomerPostCity := SalesCrMemoHeader."Sell-to Post Code" + ' ' + SalesCrMemoHeader."Sell-to City";
+        CustomerVATRegNo := SalesCrMemoHeader."VAT Registration No.";
 
         POSEntryPaymentLines.Init();
         POSEntryPaymentLines."POS Payment Method Code" := Format(CROPOSAuditLogAuxInfo."Payment Method");
@@ -366,6 +370,7 @@ report 6014554 "NPR CRO Fiscal Bill A4"
         CustomerAddress := SalesInvoiceHeader."Sell-to Address";
         CustomerName := SalesInvoiceHeader."Sell-to Customer Name";
         CustomerPostCity := SalesInvoiceHeader."Sell-to Post Code" + ' ' + SalesInvoiceHeader."Sell-to City";
+        CustomerVATRegNo := SalesInvoiceHeader."VAT Registration No.";
 
         POSEntryPaymentLines.Init();
         POSEntryPaymentLines."POS Payment Method Code" := Format(CROPOSAuditLogAuxInfo."Payment Method");
@@ -529,4 +534,5 @@ report 6014554 "NPR CRO Fiscal Bill A4"
         QRCode: Text;
         StoreDetailsLine: Text;
         AddrArray: array[2] of Text[100];
+        CustomerVATRegNo: Code[20];
 }
