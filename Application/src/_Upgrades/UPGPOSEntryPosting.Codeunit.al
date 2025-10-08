@@ -12,6 +12,7 @@ codeunit 6248569 "NPR UPG POS Entry Posting"
     trigger OnUpgradePerCompany()
     begin
         UpgradePOSEntryDeferralSchedule();
+        UpgradeMembershipEntryLinkDates();
     end;
 
     local procedure UpgradePOSEntryDeferralSchedule()
@@ -48,6 +49,35 @@ codeunit 6248569 "NPR UPG POS Entry Posting"
                 if not DeferralPostingBuffer.IsEmpty() then
                     DeferralPostingBuffer.DeleteAll();
             until POSEntry.Next() = 0;
+
+        UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG POS Entry Posting", UpgradeStep));
+        LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure UpgradeMembershipEntryLinkDates()
+    var
+        MembershipEntryLink: Record "NPR MM Membership Entry Link";
+        MembershipEntryLink2: Record "NPR MM Membership Entry Link";
+    begin
+        UpgradeStep := 'UpgradePOSEntryDeferralSchedule';
+        if UpgradeTag.HasUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG POS Entry Posting", UpgradeStep)) then
+            exit;
+        LogMessageStopwatch.LogStart(CompanyName(), 'NPR UPG POS Entry Posting', UpgradeStep);
+
+        MembershipEntryLink.SetRange(Context, MembershipEntryLink.Context::CANCEL); // We have correctly assinged dates only for Cancel
+        MembershipEntryLink.SetLoadFields("Initial Valid Until Date", "New Valid Until Date", "Context Period Starting Date", "Context Period Ending Date");
+        if MembershipEntryLink.FindSet() then
+            repeat
+                MembershipEntryLink2 := MembershipEntryLink;
+                if MembershipEntryLink."New Valid Until Date" <> 0D then
+                    MembershipEntryLink."Context Period Starting Date" := MembershipEntryLink."New Valid Until Date";
+                if MembershipEntryLink."Initial Valid Until Date" <> 0D then
+                    MembershipEntryLink."Context Period Ending Date" := MembershipEntryLink."Initial Valid Until Date";
+                MembershipEntryLink."New Valid Until Date" := 0D;
+                MembershipEntryLink."Initial Valid Until Date" := 0D;
+                if Format(MembershipEntryLink) <> Format(MembershipEntryLink2) then
+                    MembershipEntryLink.Modify();
+            until MembershipEntryLink.Next() = 0;
 
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG POS Entry Posting", UpgradeStep));
         LogMessageStopwatch.LogFinish();

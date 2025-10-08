@@ -1659,6 +1659,7 @@
     var
         Membership: Record "NPR MM Membership";
         MembershipEntry: Record "NPR MM Membership Entry";
+        MembershipEntryLink: Record "NPR MM Membership Entry Link";
         MembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
         PlaceHolderLbl: Label '%1: %2 {%3 .. %4}', Locked = true;
     begin
@@ -1714,6 +1715,7 @@
 
         if (WithUpdate) then begin
             RegretSubscription(Membership);
+            MembershipEntryLink.CreateMembershipEntryLink(MembershipEntry, MemberInfoCapture, 0D);
             CarryOutMembershipRegret(MembershipEntry);
         end;
 

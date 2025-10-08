@@ -2103,14 +2103,11 @@
             MembershipEntryLink.SetRange("Document Type", Database::"NPR POS Entry Sales Line");
             MembershipEntryLink.SetRange("Document No.", POSSalesLineToPost."Document No.");
             MembershipEntryLink.SetRange("Document Line No.", POSSalesLineToPost."Line No.");
-            MembershipEntryLink.SetLoadFields(Context, "New Valid Until Date");
+            MembershipEntryLink.SetLoadFields(Context, "Context Period Starting Date");
             if not MembershipEntryLink.FindFirst() then
                 exit;
-            case MembershipEntryLink.Context of
-                MembershipEntryLink.Context::CANCEL:
-                    if MembershipEntryLink."New Valid Until Date" <> 0D then
-                        StartDate := MembershipEntryLink."New Valid Until Date";
-            end;
+            if MembershipEntryLink."Context Period Starting Date" <> 0D then
+                StartDate := MembershipEntryLink."Context Period Starting Date";
         end;
     end;
 
@@ -2133,7 +2130,7 @@
                 MembershipEntry.Context::UPGRADE:
                     begin
                         InitialValidUntilDate := MembershipMgtInternal.GetUpgradeInitialValidUntilDate(MembershipEntry."Entry No.");
-                        if (MembershipEntry."Valid From Date" <> 0D) and (InitialValidUntilDate <> 0D) and (InitialValidUntilDate >= MembershipEntry."Valid From Date") then
+                        if (MembershipEntry."Valid From Date" <> 0D) and (InitialValidUntilDate >= MembershipEntry."Valid From Date") then
                             NoOfPeriods := CountDefNoOfPeriodsBetweenDates(MembershipEntry."Valid From Date", InitialValidUntilDate);
                     end;
             end;
@@ -2142,16 +2139,11 @@
             MembershipEntryLink.SetRange("Document Type", Database::"NPR POS Entry Sales Line");
             MembershipEntryLink.SetRange("Document No.", POSSalesLineToPost."Document No.");
             MembershipEntryLink.SetRange("Document Line No.", POSSalesLineToPost."Line No.");
-            MembershipEntryLink.SetLoadFields(Context, "Initial Valid Until Date", "New Valid Until Date");
+            MembershipEntryLink.SetLoadFields(Context, "Context Period Starting Date", "Context Period Ending Date");
             if not MembershipEntryLink.FindFirst() then
                 exit;
-            case MembershipEntryLink.Context of
-                MembershipEntryLink.Context::CANCEL:
-                    begin
-                        if (MembershipEntryLink."Initial Valid Until Date" <> 0D) and (MembershipEntryLink."New Valid Until Date" <> 0D) and (MembershipEntryLink."Initial Valid Until Date" >= MembershipEntryLink."New Valid Until Date") then
-                            NoOfPeriods := CountDefNoOfPeriodsBetweenDates(MembershipEntryLink."New Valid Until Date", MembershipEntryLink."Initial Valid Until Date")
-                    end;
-            end;
+            if (MembershipEntryLink."Context Period Starting Date" <> 0D) and (MembershipEntryLink."Context Period Ending Date" >= MembershipEntryLink."Context Period Starting Date") then
+                NoOfPeriods := CountDefNoOfPeriodsBetweenDates(MembershipEntryLink."Context Period Starting Date", MembershipEntryLink."Context Period Ending Date");
         end;
     end;
 
