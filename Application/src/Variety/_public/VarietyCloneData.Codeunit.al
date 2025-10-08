@@ -987,9 +987,9 @@
         if MasterLineMapMgt.IsMaster(Database::"Transfer Line", TransferLine2.SystemId) then
             LineNo := TransferLine2."Line No." + 10000
         else begin
-            LineNo := TransferLine2."Line No." + 1; // fallback
+            LineNo := TransferLine2."Line No." + 10000; // fallback
             if TransferLine2.GetBySystemId(MasterLineMapMgt.GetLastInLineSystemId(Database::"Transfer Line", MasterTransferLine.SystemId)) then
-                LineNo := TransferLine2."Line No." + 1;
+                LineNo := TransferLine2."Line No." + 10000;
         end;
 
         NewTransferLine := MasterTransferLine;
