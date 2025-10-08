@@ -134,6 +134,12 @@ page 6185027 "NPR NPEmailTemplateCard"
         TempDynamicTemplates: Record "NPR SendGridDynamicTemplate" temporary;
         _LayoutName: Text;
 
+    trigger OnNewRecord(BelowxRec: Boolean)
+    begin
+        if Rec.GetFilter(DataProvider) <> '' then
+            if Evaluate(Rec.DataProvider, Rec.GetFilter(DataProvider)) then;
+    end;
+
     trigger OnAfterGetCurrRecord()
     var
         APIClient: Codeunit "NPR SendGrid API Client";

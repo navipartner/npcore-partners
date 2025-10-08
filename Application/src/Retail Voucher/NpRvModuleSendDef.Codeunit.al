@@ -137,10 +137,23 @@
         NpRvSendingLog: Record "NPR NpRv Sending Log";
         EmailManagement: Codeunit "NPR E-mail Management";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        NPEmail: Codeunit "NPR NP Email";
+        NewEmailExperienceFeature: Codeunit "NPR NewEmailExpFeature";
+#endif
         RecRef: RecordRef;
         ErrorMessageTxt: Text;
     begin
         if Voucher.Find() then;
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        if (NewEmailExperienceFeature.IsFeatureEnabled()) then begin
+            Voucher.TestField(Voucher."E-mail");
+            if (not NPEmail.TrySendEmail(Voucher."E-mail Template Id", Voucher, Voucher."E-mail", Voucher."Language Code")) then
+                ErrorMessageTxt := GetLastErrorText();
+            NpRvVoucherMgt.LogSending(Voucher, NpRvSendingLog."Sending Type"::"E-mail", StrSubstNo(Text002, Voucher."E-mail Template Id"), Voucher."E-mail", ErrorMessageTxt);
+            exit;
+        end;
+#endif
         if Voucher."E-mail Template Code" <> '' then begin
             if EmailTemplateHeader.Get(Voucher."E-mail Template Code") then
                 EmailTemplateHeader.SetRecFilter();
@@ -148,6 +161,7 @@
 
         RecRef.GetTable(Voucher);
         RecRef.SetRecFilter();
+
         if EmailTemplateHeader."Report ID" > 0 then
             ErrorMessageTxt := EmailManagement.SendReportTemplate(EmailTemplateHeader."Report ID", RecRef, EmailTemplateHeader, Voucher."E-mail", true)
         else
@@ -242,9 +256,11 @@
                 end;
             VoucherType."Send Method via POS"::"E-mail":
                 begin
-                    VoucherType.TestField("E-mail Template Code");
-                    EmailTemplateHeader.Get(VoucherType."E-mail Template Code");
-                    PAGE.Run(PAGE::"NPR E-mail Template", EmailTemplateHeader);
+                    if not SetupNewEmailExperience(VoucherType) then begin
+                        VoucherType.TestField("E-mail Template Code");
+                        EmailTemplateHeader.Get(VoucherType."E-mail Template Code");
+                        PAGE.Run(PAGE::"NPR E-mail Template", EmailTemplateHeader);
+                    end;
                 end;
             VoucherType."Send Method via POS"::SMS:
                 begin
@@ -253,6 +269,25 @@
                     PAGE.Run(PAGE::"NPR SMS Template Card", SMSTemplateHeader);
                 end;
         end;
+    end;
+
+    local procedure SetupNewEmailExperience(var VoucherType: Record "NPR NpRv Voucher Type"): Boolean
+    var
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        EmailTemplate: Record "NPR NPEmailTemplate";
+        NewEmailExperienceFeature: Codeunit "NPR NewEmailExpFeature";
+#endif
+    begin
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        if NewEmailExperienceFeature.IsFeatureEnabled() then begin
+            VoucherType.TestField("E-mail Template Id");
+            EmailTemplate.Get(VoucherType."E-mail Template ID");
+            Page.Run(Page::"NPR NPEmailTemplateCard", EmailTemplate);
+            exit(true);
+        end;
+#endif
+        if VoucherType.Code = '' then;  //Added to avoid AA0137 error
+        exit(false);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR NpRv Module Mgt.", 'OnRunSendVoucher', '', true, true)]
@@ -299,6 +334,11 @@
     end;
 
     local procedure GetSendMethodSelectionStr(VoucherType: Record "NPR NpRv Voucher Type"; var Selection: Integer) SelectionStr: Text
+    var
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        NewEmailExperienceFeature: Codeunit "NPR NewEmailExpFeature";
+#endif
+
     begin
         Selection := 0;
         if VoucherType."Print Template Code" <> '' then begin
@@ -307,10 +347,18 @@
         end;
 
         SelectionStr += ',';
-        if VoucherType."E-mail Template Code" <> '' then begin
-            SelectionStr += Format(VoucherType."Send Method via POS"::"E-mail");
-            Selection := 2;
-        end;
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        if NewEmailExperienceFeature.IsFeatureEnabled() then begin
+            if VoucherType."E-mail Template Id" <> '' then begin
+                SelectionStr += Format(VoucherType."Send Method via POS"::"E-mail");
+                Selection := 2;
+            end;
+        end else
+#endif
+            if VoucherType."E-mail Template Code" <> '' then begin
+                SelectionStr += Format(VoucherType."Send Method via POS"::"E-mail");
+                Selection := 2;
+            end;
 
         SelectionStr += ',';
         if VoucherType."SMS Template Code" <> '' then begin

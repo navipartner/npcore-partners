@@ -7,6 +7,7 @@ page 6185030 "NPR NPEmailTemplates"
     ApplicationArea = NPRNPEmailTempl;
     UsageCategory = Lists;
     ModifyAllowed = false;
+    InsertAllowed = false;
     CardPageId = "NPR NPEmailTemplateCard";
     SourceTable = "NPR NPEmailTemplate";
 

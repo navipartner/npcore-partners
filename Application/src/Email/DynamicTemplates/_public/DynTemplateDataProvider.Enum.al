@@ -16,5 +16,10 @@ enum 6059867 "NPR DynTemplateDataProvider" implements "NPR IDynamicTemplateDataP
         Caption = 'Ticket Notification';
         Implementation = "NPR IDynamicTemplateDataProvider" = "NPR NPEmailTicketDataProvider";
     }
+    value(3; VOUCHER_EMAIL)
+    {
+        Caption = 'Voucher email';
+        Implementation = "NPR IDynamicTemplateDataProvider" = "NPR NPEmailVoucherDataProvider";
+    }
 }
 #endif

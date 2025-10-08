@@ -218,8 +218,14 @@
                     }
                     field("E-mail Template Code"; Rec."E-mail Template Code")
                     {
-
+                        Visible = not NewEmailExperience;
                         ToolTip = 'Specifies the value of the E-mail Template Code field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("E-mail Template Id"; Rec."E-mail Template Id")
+                    {
+                        Visible = NewEmailExperience;
+                        ToolTip = 'Specifies the E-mail Template Id used when sending the voucher';
                         ApplicationArea = NPRRetail;
                     }
                     field("SMS Template Code"; Rec."SMS Template Code")
@@ -500,8 +506,14 @@
     trigger OnOpenPage()
     var
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        NewEmailExperienceFeature: Codeunit "NPR NewEmailExpFeature";
+#endif
     begin
         ShopifyIntegrationIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"Retail Vouchers");
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        NewEmailExperience := NewEmailExperienceFeature.IsFeatureEnabled()
+#endif
     end;
 #endif
 
@@ -541,6 +553,7 @@
         ShopifyStoreCode: Code[20];
         ShopifyIntegrationIsEnabled: Boolean;
 #endif
+        NewEmailExperience: Boolean;
 
     local procedure SetHasSetup()
     var

@@ -164,6 +164,12 @@
                         ToolTip = 'Specifies the value of the E-mail Template Code field';
                         ApplicationArea = NPRRetail;
                     }
+                    field("E-mail Template Id"; Rec."E-mail Template Id")
+                    {
+                        Enabled = Rec."Send via E-mail";
+                        ToolTip = 'Specifies the the E-mail Template Id used for sending the voucher';
+                        ApplicationArea = NPRRetail;
+                    }
                     field("Send via SMS"; Rec."Send via SMS")
                     {
                         ToolTip = 'Specifies the value of the Send via SMS field';

@@ -935,6 +935,7 @@
         ArchVoucher."Phone No." := Voucher."Phone No.";
         ArchVoucher."Voucher Message" := Voucher."Voucher Message";
         ArchVoucher."E-mail Template Code" := Voucher."E-mail Template Code";
+        ArchVoucher."E-mail Template Id" := Voucher."E-mail Template Id";
         ArchVoucher."SMS Template Code" := Voucher."SMS Template Code";
         ArchVoucher."Send via Print" := Voucher."Send via Print";
         ArchVoucher."Send via E-mail" := Voucher."Send via E-mail";

@@ -184,8 +184,16 @@
                     }
                     field("E-mail Template Code"; Rec."E-mail Template Code")
                     {
+                        Visible = not NewEmailExperience;
                         Enabled = Rec."Send via E-mail";
                         ToolTip = 'Specifies the value of the E-mail Template Code field';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("E-mail Template Id"; Rec."E-mail Template Id")
+                    {
+                        Visible = NewEmailExperience;
+                        Enabled = Rec."Send via E-mail";
+                        ToolTip = 'Specifies the E-mail Template Id used when sending the voucher';
                         ApplicationArea = NPRRetail;
                     }
                     field("Send via SMS"; Rec."Send via SMS")
@@ -484,6 +492,7 @@
 
         ReservedAmountVisible: Boolean;
         PageActionResetQuantityVisible: Boolean;
+        NewEmailExperience: Boolean;
 #if not BC17
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         SpfyRetailVoucherMgt: Codeunit "NPR Spfy Retail Voucher Mgt.";
@@ -497,6 +506,9 @@
 #if not BC17
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
 #endif
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        NewEmailExperienceFeature: Codeunit "NPR NewEmailExpFeature";
+#endif
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
     begin
 #if not BC17
@@ -504,6 +516,9 @@
 #endif
         ReservedAmountVisible := NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled();
         PageActionResetQuantityVisible := not ReservedAmountVisible;
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        NewEmailExperience := NewEmailExperienceFeature.IsFeatureEnabled()
+#endif
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)

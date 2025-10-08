@@ -107,6 +107,15 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR E-mail Template Header" WHERE("Table No." = CONST(6151013));
         }
+        field(76; "E-mail Template Id"; Code[20])
+        {
+            Caption = 'E-mail Template Id';
+            DataClassification = CustomerContent;
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+            TableRelation = "NPR NPEmailTemplate" where(DataProvider = const("NPR DynTemplateDataProvider"::VOUCHER_EMAIL));
+#endif            
+        }
+
         field(80; "SMS Template Code"; Code[10])
         {
             Caption = 'SMS Template Code';

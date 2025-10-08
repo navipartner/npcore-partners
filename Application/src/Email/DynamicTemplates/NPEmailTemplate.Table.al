@@ -3,6 +3,8 @@ table 6151118 "NPR NPEmailTemplate"
 {
     Access = Internal;
     Caption = 'NP Email Template';
+    DrillDownPageID = "NPR NPEmailTemplates";
+    LookupPageID = "NPR NPEmailTemplates";
 
     fields
     {
