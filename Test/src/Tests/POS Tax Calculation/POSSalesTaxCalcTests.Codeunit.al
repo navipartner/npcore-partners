@@ -1820,6 +1820,7 @@ codeunit 85027 "NPR POS Sales Tax Calc. Tests"
         Customer."VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
         Customer.Modify();
         AssignVATBusPostGroupToPOSPostingProfile(VATPostingSetup."VAT Bus. Posting Group");
+        AssignTaxDetailToPOSPostingProfile(TaxArea.Code, false);
 
         // [GIVEN] POS View Profile
         CreatePOSViewProfile(POSViewProfile, false);
