@@ -1,6 +1,5 @@
 ﻿page 6151198 "NPR NpCs Workflow Card"
 {
-    Extensible = False;
     Caption = 'Collect Workflow Card';
     ContextSensitiveHelpPage = 'docs/retail/click_and_collect/how-to/setup/setup/';
     PageType = Card;
