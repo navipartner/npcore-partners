@@ -203,9 +203,11 @@ codeunit 6151444 "NPR POS Action Scan Voucher2" implements "NPR IPOS Workflow", 
 
     internal procedure GetParameterValues(Context: Codeunit "NPR POS JSON Helper"; var VoucherTypeCode: Code[20]; var ParamEndSale: Boolean; var ReferenceNo: Text; var VoucherListEnabled: Boolean; var SelectedAmount: Decimal)
     var
+        NPRNpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
         VoucherType: Text;
     begin
         ReferenceNo := Context.GetString('VoucherRefNo');
+        NPRNpRvVoucherMgt.OnBeforeProcessScannedVoucherReferenceNo(ReferenceNo);
         ParamEndSale := Context.GetBooleanParameter('EndSale');
         VoucherListEnabled := Context.GetBooleanParameter('EnableVoucherList');
         VoucherType := Context.GetString('voucherType');
