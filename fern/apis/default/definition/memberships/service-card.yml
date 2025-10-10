@@ -99,7 +99,7 @@ service:
         name: getCardNumber
         query-parameters:
           cardNumber: simpleTypes.CardNumber
-      response: compositeTypes.MemberCardEntity
+      response: GetCardNumberResponse
       examples:
         - name: ExampleGetCard
           path-parameters:
@@ -109,7 +109,7 @@ service:
           query-parameters:
             cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
           response: 
-            body: $compositeTypes.MemberCardEntity.ExampleMemberCardBlocked
+            body: $GetCardNumberResponse.ExampleGetCardNumber
 
 
     # registerArrival:
@@ -264,6 +264,16 @@ types:
       - name: ExampleGetCard
         value:
           card: $compositeTypes.MemberCardDTOResponse.ExampleMemberCardDTO
+
+  # Get Card Number Service
+  GetCardNumberResponse:
+    docs: Response to getting a card by card number
+    properties:
+      card: compositeTypes.MemberCardEntity
+    examples:
+      - name: ExampleGetCardNumber
+        value:
+          card: $compositeTypes.MemberCardEntity.ExampleMemberCardBlocked
 
   # Register Arrival Service
   AdmissionCode:
