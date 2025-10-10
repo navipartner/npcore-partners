@@ -61,12 +61,14 @@ types:
     properties:
       role: simpleTypes.Role
       contactNumber: simpleTypes.ContactNumber
+      gdprConsent: optional<simpleTypes.GDPRConsent>
       member: MemberWithCardDTOResponse
     examples:
       - name: ExampleMembershipToMember
         value:
           role: $simpleTypes.Role.ExampleRoleAdmin
           contactNumber: $simpleTypes.ContactNumber.ExampleContactNumber
+          gdprConsent: $simpleTypes.GDPRConsent.ExampleGDPRConsentPending
           member: $MemberWithCardDTOResponse.ExampleMember
 
   MembershipRenewalInfoDTO:
@@ -128,12 +130,14 @@ types:
     properties:
       role: simpleTypes.Role
       contactNumber: simpleTypes.ContactNumber
+      gdprConsent: optional<simpleTypes.GDPRConsent>
       membership: MembershipToCardDTO
     examples:
       - name: ExampleMembershipDTOWithinMember
         value:
           role: $simpleTypes.Role.ExampleRoleAdmin
           contactNumber: $simpleTypes.ContactNumber.ExampleContactNumber
+          gdprConsent: $simpleTypes.GDPRConsent.ExampleGDPRApproval
           membership: $MembershipToCardDTO.ExampleMembershipToCardDTO
   
   ##
@@ -445,10 +449,9 @@ types:
           autoRenewalActivated: false
           attributes: []
 
-  MemberEntityRequest:
-    docs:
-      # Use this DTO to create or update a member without including their associated memberships or cards.
-      The MemberEntityRequest defines the basic properties required to create or update a Member. 
+  MemberEntityBasic:
+    docs: 
+      The MemberEntityBasic defines the basic properties required on a Member. 
     properties:
       firstName: optional<simpleTypes.FirstName>
       middleName: optional<simpleTypes.MiddleName>
@@ -463,10 +466,18 @@ types:
       phoneNo: optional<simpleTypes.PhoneNo>
       email: optional<simpleTypes.Email>
       preferredLanguage: optional<simpleTypes.PreferredLanguage>
+      storeCode: optional<simpleTypes.StoreCode>
+      attributes: optional<list<attributeTypes.AttributeValueListResponse>>  
+  
+  MemberEntityRequest:
+    docs:
+      # Use this DTO to create or update a member without including their associated memberships or cards.
+      The MemberEntityRequest defines the basic properties required to create or update a Member. 
+    extends:
+      MemberEntityBasic
+    properties:
       gdprConsent: optional<simpleTypes.GDPRConsent>
       preassignedContactNumber: optional<simpleTypes.PreassignedContactNumber>
-      storeCode: optional<simpleTypes.StoreCode>
-      attributes: optional<list<attributeTypes.AttributeValueListResponse>>
     examples:
       - name : ExampleMember
         value:
@@ -489,7 +500,7 @@ types:
       The MemberEntityResponse extends the MemberEntityRequest and includes additional properties such as 
       the member's ID, membership number, and blocked status. This DTO is used when returning a member's details.
     extends: 
-      MemberEntityRequest
+      MemberEntityBasic
     properties:
       memberId: simpleTypes.MemberId
       memberNumber: simpleTypes.MemberNumber
@@ -516,6 +527,8 @@ types:
           blocked: $simpleTypes.Blocked.ExampleBlocked
           hasPicture: $simpleTypes.HasPicture.ExampleHasPicture
           hasNotes: $simpleTypes.HasNotes.ExampleHasNotes
+          preferredLanguage: $simpleTypes.PreferredLanguage.ExamplePreferredLanguage
+          storeCode: $simpleTypes.StoreCode.ExampleStoreCode
       - name : ExampleMemberBlocked
         value:
           memberId: $simpleTypes.MemberId.ExampleMemberId
@@ -535,6 +548,8 @@ types:
           blocked: $simpleTypes.Blocked.ExampleBlockedTrue
           hasPicture: $simpleTypes.HasPicture.ExampleHasPicture
           hasNotes: $simpleTypes.HasNotes.ExampleHasNotes
+          preferredLanguage: $simpleTypes.PreferredLanguage.ExamplePreferredLanguage
+          storeCode: $simpleTypes.StoreCode.ExampleStoreCode
 
   MemberCardEntity:
     docs:

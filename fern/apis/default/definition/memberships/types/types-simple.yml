@@ -442,6 +442,7 @@ types:
       - accepted
       - rejected
       - delegated
+      - notApplicable
 
   GDPRConsent:
     type: GDPRConsentEnum
@@ -449,6 +450,8 @@ types:
     examples:
       - name: ExampleGDPRApproval
         value: accepted
+      - name: ExampleGDPRConsentPending
+        value: pending
 
   NotificationMethod:
     type: string

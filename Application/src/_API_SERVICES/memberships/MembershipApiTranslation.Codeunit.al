@@ -81,5 +81,25 @@ codeunit 6248221 "NPR MembershipApiTranslation"
         end;
     end;
 
+    internal procedure GdprApprovalAsText(GdprApproval: Option): Text
+    var
+        MembershipRole: Record "NPR MM Membership Role";
+    begin
+
+        case GdprApproval of
+
+            MembershipRole."GDPR Approval"::PENDING:
+                exit('pending');
+            MembershipRole."GDPR Approval"::ACCEPTED:
+                exit('accepted');
+            MembershipRole."GDPR Approval"::REJECTED:
+                exit('rejected');
+            MembershipRole."GDPR Approval"::DELEGATED:
+                exit('delegated');
+            else
+                exit('notApplicable');
+        end;
+    end;
+
 }
 #endif

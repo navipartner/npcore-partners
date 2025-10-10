@@ -648,6 +648,8 @@ codeunit 6248220 "NPR MemberApiAgent"
             .AddObject(AddRequiredProperty(ResponseJson, 'birthday', Member.Birthday))
             .AddProperty('hasPicture', Member.Image.HasValue())
             .AddProperty('hasNotes', Member.HasLinks())
+            .AddProperty('preferredLanguage', Member.PreferredLanguageCode)
+            .AddProperty('storeCode', Member."Store Code")
             .AddArray(MemberAttributes.MemberAttributesDTO(ResponseJson, Member."Entry No."));
         exit(ResponseJson);
     end;
@@ -671,6 +673,7 @@ codeunit 6248220 "NPR MemberApiAgent"
         if (not IncludeMembership) then
             exit(ResponseJson);
 
+        MembershipRole.SetAutoCalcFields("GDPR Approval");
         MembershipRole.SetFilter("Member Entry No.", '=%1', MemberEntryNo);
         if (not MembershipRole.FindSet()) then begin
             ResponseJson.StartArray('memberships').EndArray();
@@ -683,6 +686,7 @@ codeunit 6248220 "NPR MemberApiAgent"
             ResponseJson.StartObject()
                 .AddProperty('role', Encode.MemberRoleToText(MembershipRole."Member Role"))
                 .AddProperty('contactNumber', MembershipRole."Contact No.")
+                .AddProperty('gdprConsent', Encode.GdprApprovalAsText(MembershipRole."GDPR Approval"))
                 .AddObject(MembershipDTO(ResponseJson, Membership, MemberEntryNo, true))
                 .EndObject();
         until (MembershipRole.Next() = 0);
