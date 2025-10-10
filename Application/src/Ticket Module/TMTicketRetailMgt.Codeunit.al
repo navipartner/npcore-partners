@@ -959,6 +959,7 @@
     local procedure RevokeTicketSales(var ReturnSaleLinePOS: Record "NPR POS Sale Line")
     var
         Ticket: Record "NPR TM Ticket";
+        TicketType: Record "NPR TM Ticket Type";
         OriginalSaleLine: Record "NPR POS Entry Sales Line";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
 
@@ -986,6 +987,7 @@
 
         if (Ticket.FindSet()) then begin
             Token := '';
+            TicketType.Get(Ticket."Ticket Type Code");
 
             repeat
                 TicketReservationRequest.SetCurrentKey("External Ticket Number");
@@ -1002,6 +1004,14 @@
                 end;
 
             until (Ticket.Next() = 0);
+
+            if (TicketCount <> 0) then begin
+                if (TicketType."Admission Registration" = TicketType."Admission Registration"::GROUP) then begin
+                    UnitPrice := UnitPrice / Abs(OriginalSaleLine.Quantity);
+                    // Partial refund of group tickets can not be done when refunding using receipt.
+                    TicketCount := -1 * RevokeQuantity * Abs(OriginalSaleLine.Quantity);
+                end;
+            end;
 
             if (TicketCount = 0) then
                 Message(NoRemainingTickets, OriginalSaleLine."Line No.");
