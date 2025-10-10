@@ -337,6 +337,11 @@ page 6184704 "NPR Spfy Store Card"
                     ApplicationArea = NPRShopify;
                     Importance = Additional;
                 }
+                field("Spfy C&C Order Workflow Code"; Rec."Spfy C&C Order Workflow Code")
+                {
+                    ApplicationArea = NPRShopify;
+                    ToolTip = 'Specifies the workflow code to be used for Click&Collect orders from this store.';
+                }
                 group(CustomerIntegration)
                 {
                     Caption = 'Customer Integration';

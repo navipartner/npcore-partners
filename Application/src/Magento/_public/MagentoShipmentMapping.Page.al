@@ -43,6 +43,11 @@
                     ApplicationArea = NPRShopify;
                     ToolTip = 'Shopify: specifies the location code, which will be used by default for imported Shopify orders. Alternatively, you can define location mapping for each e-commerce store.';
                 }
+                field("Spfy Collect Store"; Rec."Spfy Collect Store")
+                {
+                    ApplicationArea = NPRShopify;
+                    ToolTip = 'Shopify: specifies the collect store, which will be used for Click&Collect Orders from Shopify.';
+                }
 #endif
                 field("Shipment Fee Type"; Rec."Shipment Fee Type")
                 {

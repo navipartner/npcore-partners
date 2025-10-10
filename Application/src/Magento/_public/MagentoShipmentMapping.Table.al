@@ -61,6 +61,12 @@
             Caption = 'Location Code';
             TableRelation = Location where("Use As In-Transit" = const(false));
         }
+        field(210; "Spfy Collect Store"; Code[20])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Collect Store';
+            TableRelation = "NPR NpCs Store";
+        }
 #endif
     }
 

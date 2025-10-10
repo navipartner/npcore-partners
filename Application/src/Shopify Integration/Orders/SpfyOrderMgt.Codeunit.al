@@ -654,6 +654,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
 
     local procedure SetShipmentMethod(Order: JsonToken; var SalesHeader: Record "Sales Header"; var IsShpmtMappingLocation: Boolean; var IsShpmtMappingShipAgent: Boolean)
     var
+        CollectStore: Record "NPR NpCs Store";
         ShipmentMapping: Record "NPR Magento Shipment Mapping";
         ShippingLines: JsonToken;
         ShippingLine: JsonToken;
@@ -674,7 +675,13 @@ codeunit 6184814 "NPR Spfy Order Mgt."
                     end;
                     IsShpmtMappingLocation := ShipmentMapping."Spfy Location Code" <> '';
                     if IsShpmtMappingLocation then
-                        SalesHeader.Validate("Location Code", ShipmentMapping."Spfy Location Code");
+                        SalesHeader.Validate("Location Code", ShipmentMapping."Spfy Location Code")
+                    else
+                        if ShipmentMapping."Spfy Collect Store" <> '' then
+                            if CollectStore.Get(ShipmentMapping."Spfy Collect Store") and (CollectStore."Location Code" <> '') then
+                                SalesHeader.Validate("Location Code", CollectStore."Location Code");
+                    if ShipmentMapping."Spfy Collect Store" <> '' then
+                        SalesHeader.Validate("NPR Spfy Collect Store", ShipmentMapping."Spfy Collect Store");
                     exit;
                 end;
             end;

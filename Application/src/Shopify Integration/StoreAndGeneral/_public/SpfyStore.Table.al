@@ -403,6 +403,12 @@ table 6150810 "NPR Spfy Store"
             Caption = 'Sales Price on Order Lines';
             DataClassification = CustomerContent;
         }
+        field(630; "Spfy C&C Order Workflow Code"; Code[20])
+        {
+            Caption = 'C&C Order Workflow Code';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR NpCs Workflow";
+        }
     }
     keys
     {

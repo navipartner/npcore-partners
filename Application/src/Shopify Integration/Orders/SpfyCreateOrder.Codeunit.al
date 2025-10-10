@@ -23,6 +23,10 @@ codeunit 6184808 "NPR Spfy Create Order" implements "NPR Nc Import List IProcess
     local procedure ImportOrder(ShopifyStoreCode: Code[20]; Order: JsonToken)
     var
         SalesHeader: Record "Sales Header";
+        NpCsCollectMgt: Codeunit "NPR NpCs Collect Mgt.";
+        NpCsStore: Record "NPR NpCs Store";
+        NpCsWorkflow: Record "NPR NpCs Workflow";
+        NpCsDocument: Record "NPR NpCs Document";
     begin
         if OrderMgt.OrderExists(ShopifyStoreCode, Order) then
             exit;
@@ -34,6 +38,11 @@ codeunit 6184808 "NPR Spfy Create Order" implements "NPR Nc Import List IProcess
         OrderMgt.InsertSalesHeader(ShopifyStoreCode, Order, SalesHeader);
         OrderMgt.UpsertSalesLines(ShopifyStoreCode, Order, SalesHeader, false);
         OrderMgt.InsertPaymentLines(ShopifyStoreCode, Order, SalesHeader);
+
+        if CheckIfClickCollectOrder(ShopifyStoreCode, SalesHeader, NpCsStore, NpCsWorkflow) then begin
+            NpCsCollectMgt.InitSendToStoreDocument(SalesHeader, NpCsStore, NpCsWorkflow, NpCsDocument);
+            UpdateNotificationsAndRunWorkflow(SalesHeader, NpCsDocument);
+        end;
 
         if not OrderMgt.PostOrder(SalesHeader) then begin
             OrderMgt.SetMaxQtyToShipAndInvoice(SalesHeader);
@@ -60,6 +69,48 @@ codeunit 6184808 "NPR Spfy Create Order" implements "NPR Nc Import List IProcess
             SalesHeader.SetHideValidationDialog(true);
             if Codeunit.Run(Codeunit::"Release Sales Document", SalesHeader) then;  //no errors during the release process should result in a failed import
         end;
+    end;
+
+    local procedure CheckIfClickCollectOrder(ShopifyStoreCode: Code[20]; SalesHeader: Record "Sales Header"; var NpCsStore: Record "NPR NpCs Store"; var NpCsWorkflow: Record "NPR NpCs Workflow"): Boolean
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+    begin
+        if SalesHeader."NPR Spfy Collect Store" = '' then
+            exit(false);
+        if not NpCsStore.Get(SalesHeader."NPR Spfy Collect Store") then
+            exit(false);
+
+        ShopifyStore.Get(ShopifyStoreCode);
+        ShopifyStore.TestField("Spfy C&C Order Workflow Code");
+        NpCsWorkflow.Get(ShopifyStore."Spfy C&C Order Workflow Code");
+
+        exit(true);
+    end;
+
+    local procedure UpdateNotificationsAndRunWorkflow(SalesHeader: Record "Sales Header"; var NpCsDocument: Record "NPR NpCs Document")
+    var
+        NpCsWorkflowMgt: Codeunit "NPR NpCs Workflow Mgt.";
+        PaymentLines: Record "NPR Magento Payment Line";
+    begin
+        NpCsDocument."Customer No." := SalesHeader."Sell-to Customer No.";
+        NpCsDocument."Salesperson Code" := SalesHeader."Salesperson Code";
+        NpCsDocument."From Store Code" := NpCsDocument."To Store Code";
+        NpCsDocument."To Document Type" := NpCsDocument."To Document Type"::Order;
+        NpCsDocument."Customer E-mail" := SalesHeader."NPR Bill-to E-mail";
+        NpCsDocument."Notify Customer via E-mail" := NpCsDocument."Customer E-mail" <> '';
+        NpCsDocument."Customer Phone No." := SalesHeader."NPR Bill-to Phone No.";
+        NpCsDocument."Notify Customer via Sms" := SalesHeader."NPR Bill-to Phone No." <> '';
+        if not NpCsDocument."Notify Customer via Sms" then
+            NpCsDocument."Notify Customer via E-mail" := true;
+
+        PaymentLines.SetRange("Document No.", SalesHeader."No.");
+        PaymentLines.SetRange("Document Type", PaymentLines."Document Type"::Order);
+        PaymentLines.SetRange("Document Table No.", Database::"Sales Header");
+        PaymentLines.CalcSums(Amount);
+        NpCsDocument."Prepaid Amount" := PaymentLines.Amount;
+        NpCsDocument.Modify(true);
+
+        NpCsWorkflowMgt.ScheduleRunWorkflow(NpCsDocument);
     end;
 }
 #endif
