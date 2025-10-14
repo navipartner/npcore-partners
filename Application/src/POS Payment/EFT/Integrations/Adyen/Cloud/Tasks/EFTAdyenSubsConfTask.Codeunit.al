@@ -13,6 +13,7 @@ codeunit 6185084 "NPR EFT Adyen Subs Conf Task" implements "NPR POS Background T
         EFTAdyenCloudIntegrat: Codeunit "NPR EFT Adyen Cloud Integrat.";
         EFTAdyenConfInputReq: Codeunit "NPR EFT Adyen ConfInput Req";
         MMMembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+        EFTAdyenTaskEvents: Codeunit "NPR EFT Adyen Task Events";
         Request: Text;
         Response: Text;
         URL: Text;
@@ -35,6 +36,8 @@ codeunit 6185084 "NPR EFT Adyen Subs Conf Task" implements "NPR POS Background T
 
         SubscriptionAmountIncludingVAT := CalcSubscriptionAmountIncludingVAT(EFTTransactionRequest);
         ConfirmationDialogText := StrSubstNo(ConfirmationDialogTextLbl, SubscriptionAmountIncludingVAT, GLSetup."LCY Code");
+
+        EFTAdyenTaskEvents.OnBeforeEFTAdyenSubsConfirmationDialogTextSet(ConfirmationDialogText, SubscriptionAmountIncludingVAT, GLSetup."LCY Code");
 
         EFTAdyenConfInputReq.SetTitle(ConfirmationDialogTitleLbl);
         SalePOS.Get(EFTTransactionRequest."Register No.", EFTTransactionRequest."Sales Ticket No.");
