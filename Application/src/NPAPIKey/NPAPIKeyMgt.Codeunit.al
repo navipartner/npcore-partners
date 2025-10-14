@@ -2,6 +2,7 @@
 codeunit 6248565 "NPR NP API Key Mgt."
 {
     Access = Internal;
+    EventSubscriberInstance = StaticAutomatic;
 
     // For development and testing use NPAPIKEYAUTHDEV preprocessor directive to use hardcoded values for API key validation and API authentication.
     // These are or should be aligned with the relevant prelive workers and their configurations.
@@ -16,12 +17,14 @@ codeunit 6248565 "NPR NP API Key Mgt."
         FailedToRegisterEntraAppErr: Label 'Failed to register entra app. Status code: %1. Response: %2', Comment = '%1 = HTTP status code, %2 = response body';
         InvalidApiKeyFormatErr: Label 'Invalid API Key format.';
         InvalidApiKeySignatureErr: Label 'Invalid API Key signature.';
-        OnlySaaSSupportedErr: Label 'NP API Key feature is supported in SaaS only!';
+        OnlySaaSSupportedErr: Label 'NaviPartner API Key feature is supported in SaaS only!';
         ApiKeyValidationFailedErr: Label 'Error: %1\Details:%2', Comment = '%1 = error message, %2 = details';
+        AtLeastOnePermissionSetMustBeAssignedErr: Label 'At least one permission set must be assigned to the API key before registering an Entra ID application.';
+        AtLeastOnePermissionSetMustBeAssignedForSyncErr: Label 'At least one permission set must be assigned to the API key before synchronizing to Entra ID application.';
 
     procedure CreateNewApiKey(Description: Text[30]): Text
     var
-        NPAPIKey: Record "NPR NP API Key";
+        NPAPIKey: Record "NPR NaviPartner API Key";
         HttpContent: HttpContent;
         HttpHeaders: HttpHeaders;
         HttpContentHeaders: HttpHeaders;
@@ -81,17 +84,52 @@ codeunit 6248565 "NPR NP API Key Mgt."
         exit(ApiKey);
     end;
 
-    procedure RevokeApiKey(var NPAPIKey: Record "NPR NP API Key")
+    procedure RevokeApiKey(var NPAPIKey: Record "NPR NaviPartner API Key")
     begin
         ChangeStatus(NPAPIKey, "NPR NP API Key Status"::Revoked, FailedToRevokeApiKeyErr);
     end;
 
-    procedure ActivateApiKey(var NPAPIKey: Record "NPR NP API Key")
+    procedure ActivateApiKey(var NPAPIKey: Record "NPR NaviPartner API Key")
     begin
         ChangeStatus(NPAPIKey, "NPR NP API Key Status"::Active, FailedToActivateApiKeyErr);
     end;
 
-    local procedure ChangeStatus(var NPAPIKey: Record "NPR NP API Key"; NewStatus: Enum "NPR NP API Key Status"; ErrorMessage: Text)
+    procedure SynchronizeApiKeyPermissionsToEntraApps(NPAPIKeyId: Guid)
+    var
+        NPAPIKey: Record "NPR NaviPartner API Key";
+    begin
+        NPAPIKey.Get(NPAPIKeyId);
+        SynchronizeApiKeyPermissionsToEntraApps(NPAPIKey);
+    end;
+
+    procedure SynchronizeApiKeyPermissionsToEntraApps(NPAPIKey: Record "NPR NaviPartner API Key")
+    var
+        EntraApp: Record "AAD Application";
+        NPAPIKeyPermission: Record "NPR NaviPartner API Key Perm.";
+        EntraAppMgt: Codeunit "NPR AAD Application Mgt.";
+        PermissionSets: List of [Code[20]];
+    begin
+        EntraApp.Reset();
+        EntraApp.SetRange("NPR NaviPartner API Key Id", NPAPIKey.Id);
+        if (not EntraApp.FindFirst()) then
+            exit;
+
+        NPAPIKeyPermission.Reset();
+        NPAPIKeyPermission.SetRange("NPR NP API Key Id", NPAPIKey.Id);
+        if (not NPAPIKeyPermission.FindSet()) then
+            Error(AtLeastOnePermissionSetMustBeAssignedForSyncErr);
+
+        Clear(PermissionSets);
+        repeat
+            PermissionSets.Add(NPAPIKeyPermission."Permission Set ID");
+        until (NPAPIKeyPermission.Next() = 0);
+
+        repeat
+            EntraAppMgt.SynchronizeEntraAppPermissionSets(EntraApp, true, PermissionSets);
+        until (EntraApp.Next() = 0);
+    end;
+
+    local procedure ChangeStatus(var NPAPIKey: Record "NPR NaviPartner API Key"; NewStatus: Enum "NPR NP API Key Status"; ErrorMessage: Text)
     var
         HttpContent: HttpContent;
         HttpHeaders: HttpHeaders;
@@ -185,7 +223,7 @@ codeunit 6248565 "NPR NP API Key Mgt."
 
     end;
 
-    procedure RegisterEntraAppAndCredentials(NPAPIKey: Record "NPR NP API Key")
+    procedure RegisterEntraAppAndCredentials(NPAPIKey: Record "NPR NaviPartner API Key")
     var
         AADApplication: Record "AAD Application";
         JsonBuilder: Codeunit "NPR Json Builder";
@@ -201,6 +239,8 @@ codeunit 6248565 "NPR NP API Key Mgt."
         ClientSecret: Text;
         ResponseBody: Text;
     begin
+        TestValidPermissionSetsAssigned(NPAPIKey);
+
         CreateNewEntraAppInAzure(GetEntraAppName(NPAPIKey.Description), 'Primary', GetNPAPIKeyPermissions(NPAPIKey), ApplicationId, ClientID, ClientSecret);
 
         JsonBodyString := JsonBuilder
@@ -236,7 +276,7 @@ codeunit 6248565 "NPR NP API Key Mgt."
         end;
 
         AADApplication.Get(ClientID);
-        AADApplication.Validate("NPR NP API Key Id", NPAPIKey.Id);
+        AADApplication.Validate("NPR NaviPartner API Key Id", NPAPIKey.Id);
         AADApplication.Modify(true);
     end;
 
@@ -274,9 +314,9 @@ codeunit 6248565 "NPR NP API Key Mgt."
         exit(AzureEntraIDTenant.GetAadTenantId());
     end;
 
-    local procedure GetNPAPIKeyPermissions(NPAPIKey: Record "NPR NP API Key"): List of [Code[20]]
+    local procedure GetNPAPIKeyPermissions(NPAPIKey: Record "NPR NaviPartner API Key"): List of [Code[20]]
     var
-        NPAPIKeyPermission: Record "NPR NP API Key Permission";
+        NPAPIKeyPermission: Record "NPR NaviPartner API Key Perm.";
         PermissionSets: List of [Code[20]];
     begin
         NPAPIKeyPermission.SetRange("NPR NP API Key Id", NPAPIKey.Id);
@@ -296,6 +336,16 @@ codeunit 6248565 "NPR NP API Key Mgt."
         EntraAppMgt.CreateAzureADApplicationAndSecret(AppDisplayName, SecretDisplayName, PermissionSets);
         EntraAppMgt.GetApplicationIDAndSecret(ClientID, ClientSecret);
         ApplicationId := EntraAppMgt.GetApplicationId();
+    end;
+
+    local procedure TestValidPermissionSetsAssigned(NPAPIKey: Record "NPR NaviPartner API Key")
+    var
+        NPAPIKeyPermission: Record "NPR NaviPartner API Key Perm.";
+    begin
+        NPAPIKeyPermission.Reset();
+        NPAPIKeyPermission.SetRange("NPR NP API Key Id", NPAPIKey.Id);
+        if NPAPIKeyPermission.IsEmpty() then
+            Error(AtLeastOnePermissionSetMustBeAssignedErr);
     end;
 
     local procedure
@@ -331,5 +381,32 @@ codeunit 6248565 "NPR NP API Key Mgt."
         exit('https://bc-rest-api-proxy-auth.npretail.app');
     end;
 
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR NaviPartner API Key Perm.", OnAfterInsertEvent, '', false, false)]
+    local procedure NPRNPAPIKeyPermissionOnAfterInsertEvent(var Rec: Record "NPR NaviPartner API Key Perm.")
+    begin
+        if (Rec.IsTemporary()) then
+            exit;
+
+        SynchronizeApiKeyPermissionsToEntraApps(Rec."NPR NP API Key Id");
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR NaviPartner API Key Perm.", OnAfterDeleteEvent, '', false, false)]
+    local procedure NPRNPAPIKeyPermissionOnAfterDeleteEvent(var Rec: Record "NPR NaviPartner API Key Perm.")
+    begin
+        if (Rec.IsTemporary()) then
+            exit;
+
+        SynchronizeApiKeyPermissionsToEntraApps(Rec."NPR NP API Key Id");
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"NPR NaviPartner API Key Perm.", OnAfterRenameEvent, '', false, false)]
+    local procedure NPRNPAPIKeyPermissionOnAfterRenameEvent(var Rec: Record "NPR NaviPartner API Key Perm.")
+    begin
+        if (Rec.IsTemporary()) then
+            exit;
+
+        SynchronizeApiKeyPermissionsToEntraApps(Rec."NPR NP API Key Id");
+    end;
 }
 #endif

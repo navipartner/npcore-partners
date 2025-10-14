@@ -1,16 +1,17 @@
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
 page 6185107 "NPR NP API Key List"
 {
-    Caption = 'NP API Key List';
+    Caption = 'NaviPartner API Keys';
     PageType = List;
     ApplicationArea = NPRRetail;
     UsageCategory = Administration;
-    SourceTable = "NPR NP API Key";
+    SourceTable = "NPR NaviPartner API Key";
     Extensible = false;
     InsertAllowed = false;
     ModifyAllowed = true;
     DeleteAllowed = false;
     SourceTableView = sorting(Description);
+    AdditionalSearchTerms = 'NP API Keys';
 
     layout
     {
@@ -38,7 +39,7 @@ page 6185107 "NPR NP API Key List"
         {
             part(EntraApps; "NPR NP API Key Entra App List")
             {
-                SubPageLink = "NPR NP API Key Id" = field(Id);
+                SubPageLink = "NPR NaviPartner API Key Id" = field(Id);
             }
         }
     }
@@ -54,7 +55,7 @@ page 6185107 "NPR NP API Key List"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 Image = New;
-                ToolTip = 'Creates a new NP API Key with a provided description.';
+                ToolTip = 'Creates a new NaviPartner API Key with a provided description.';
 
                 trigger OnAction()
                 var
@@ -78,7 +79,7 @@ page 6185107 "NPR NP API Key List"
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 Image = New;
-                ToolTip = 'Registers a new Entra ID application and credentials for the selected NP API Key. This action must be performed by an administrator!!!';
+                ToolTip = 'Registers a new Entra ID application and credentials for the selected NaviPartner API Key. This action must be performed by an administrator!!!';
 
                 trigger OnAction()
                 var

@@ -1,8 +1,9 @@
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
 page 6185108 "NPR NP API Key Permission"
 {
+    Caption = 'NaviPartner API Key Permissions';
     PageType = ListPart;
-    SourceTable = "NPR NP API Key Permission";
+    SourceTable = "NPR NaviPartner API Key Perm.";
     Extensible = false;
     Editable = true;
     ApplicationArea = NPRRetail;

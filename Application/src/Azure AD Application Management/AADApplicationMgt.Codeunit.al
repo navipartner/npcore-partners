@@ -527,4 +527,23 @@ codeunit 6060060 "NPR AAD Application Mgt."
     begin
         exit(_ApplicationObjectId);
     end;
+
+    internal procedure SynchronizeEntraAppPermissionSets(var AADApplication: Record "AAD Application"; RemoveAllExistingFirst: Boolean; PermissionSets: List of [Code[20]])
+    var
+        PermSet: Code[20];
+    begin
+        if (RemoveAllExistingFirst) then
+            DeleteEntraAppPermissionSets(AADApplication);
+
+        foreach PermSet in PermissionSets do
+            AddPermissionSet(AADApplication."User ID", PermSet);
+    end;
+
+    local procedure DeleteEntraAppPermissionSets(var AADApplication: Record "AAD Application")
+    var
+        AccessControl: Record "Access Control";
+    begin
+        AccessControl.SetRange("User Security ID", AADApplication."User ID");
+        AccessControl.DeleteAll();
+    end;
 }

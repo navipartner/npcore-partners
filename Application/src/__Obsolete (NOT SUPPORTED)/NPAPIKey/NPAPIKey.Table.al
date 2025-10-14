@@ -2,8 +2,11 @@
 table 6151235 "NPR NP API Key"
 {
     Access = Internal;
-    Caption = 'NP API Key';
+    Caption = 'NaviPartner API Key';
     DataClassification = CustomerContent;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-10-13';
+    ObsoleteReason = 'Replaced by new table "NPR NaviPartner API Key" created with `DataPerCompany = false`.';
 
     fields
     {

@@ -5,10 +5,21 @@ tableextension 6014525 "NPR AAD Application" extends "AAD Application"
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
         field(6014400; "NPR NP API Key Id"; Guid)
         {
-            Caption = 'NP API Key Id';
+            Caption = 'NaviPartner API Key Id';
             Editable = false;
             TableRelation = "NPR NP API Key";
-            ToolTip = 'Specifies a link with NP API Key.';
+            ToolTip = 'Specifies a link with NaviPartner API Key.';
+            DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-10-13';
+            ObsoleteReason = 'Replaced by new field "NPR NaviPartner API Key Id" pointing to a new table created with `DataPerCompany = false`.';
+        }
+        field(6014401; "NPR NaviPartner API Key Id"; Guid)
+        {
+            Caption = 'NaviPartner API Key Id';
+            Editable = false;
+            TableRelation = "NPR NaviPartner API Key";
+            ToolTip = 'Specifies a link with NaviPartner API Key.';
             DataClassification = CustomerContent;
         }
 #endif
@@ -17,7 +28,7 @@ tableextension 6014525 "NPR AAD Application" extends "AAD Application"
     keys
     {
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
-        key(NPRNPAPIKey; "NPR NP API Key Id")
+        key(NPRNPAPIKey; "NPR NaviPartner API Key Id")
         {
         }
 #endif

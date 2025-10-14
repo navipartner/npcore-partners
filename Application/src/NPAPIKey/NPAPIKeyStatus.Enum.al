@@ -3,6 +3,7 @@ enum 6059924 "NPR NP API Key Status"
 {
     Access = Internal;
     Extensible = false;
+    Caption = 'NaviPartner API Key Status';
 
     value(0; _)
     {

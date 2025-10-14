@@ -1,20 +1,23 @@
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
 table 6151236 "NPR NP API Key Permission"
 {
-    Caption = 'NP API Key Permission';
+    Caption = 'NaviPartner API Key Permission';
     DataClassification = CustomerContent;
     Access = Internal;
     Extensible = False;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-10-13';
+    ObsoleteReason = 'Replaced by new table "NPR NaviPartner API Key Perm." created with `DataPerCompany = false`.';
 
     fields
     {
         field(1; "NPR NP API Key Id"; Guid)
         {
-            Caption = 'NP API Key Id';
+            Caption = 'NaviPartner API Key Id';
             Editable = false;
             NotBlank = true;
             TableRelation = "NPR NP API Key";
-            ToolTip = 'Specifies a link with NP API Key.';
+            ToolTip = 'Specifies a link with NaviPartner API Key.';
         }
         field(2; "Permission Set ID"; Code[20])
         {
