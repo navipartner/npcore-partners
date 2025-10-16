@@ -1,32 +1,32 @@
 ---
-title: API Key
+title: Authentication
 slug: auth
 ---
 
-You'll need two things to authorize against our APIs:
-- An Entra App for your integration with the proper permissions defined.
-- An Authorization library for your language of choice:  
-https://learn.microsoft.com/en-us/entra/identity-platform/msal-overview 
+In this article we will explain how to create an API Key and link it to one or more Entra ID Applications that can access your Business Central instance.
 
-## Create Entra App with permissions via our wizard
-<Warning>This wizard can only be used by a user that is an Entra ID Global Administrator. The wizard will create a single-tenant Entra app on your behalf and ask for the required admin consent</Warning>
-
-1. Search for page "Microsoft Entra Applications" in Business Central and open it.
-2. Click "Actions" -> "Entra App Management" -> "Create Entra App"
-3. Fill in "Application Name" based on the purpose and/or vendor that will be using the integration. 
-4. Select the permissions below that the API Key should have. You will typically find 1 permission per API group in our portal i.e. "POS", "Memberships", etc.
-5. Click on action "Create Microsoft Entra Application" 
-6. Approve the consent request.
-7. Write down the client_id and client_secret as you will not be able to retrieve the client_secret again afterwards.
-8. Develop your integration :)
-
-## OAuth Config
-When acquiring a token with Entra ID, you'll need a few parameters, along with your client_id and client_secret:
-- Scope should be "https://api.businesscentral.dynamics.com/.default" 
-- The URL to acquire a token is "https://login.microsoftonline.com/:tenantId/oauth2/v2.0/token"
-
-If you need to test in Postman, you can do so using their OAuth 2.0 authentication feature with the following parameters:
-- Authorization to OAuth 2.0
-- Grant type to "Client Credentials"
-- Scope to "https://api.businesscentral.dynamics.com/.default" 
-- Token URL to "https://login.microsoftonline.com/:tenantId/oauth2/v2.0/token"
+<Steps>
+    <Step title="1. Create the API Key">
+        1. From the **NaviPartner API Keys** page in your Business Central environment, select the **Create new API Key** action from the action bar.
+        2. Provide a descriptive **Name** for your key (e.g., "E-commerce Integration") in the dialog and click **OK**.
+        3. A new API key will be generated and displayed. **This is the only time the key will be shown.** Copy it immediately and store it in a secure location like a password manager or secrets vault.
+    </Step>
+    <Step title="2. Assign Permissions">
+        1. Select the newly created key in the main list.
+        2. In the **NaviPartner API Key Permissions** section at the bottom of the page, add the permission sets required for your integration. These define what endpoints the key is allowed to access.
+    </Step>
+    <Step title="3. Register one or more Entra ID Apps">
+        <Warning>
+            This step must be performed by a user with administrative privileges in Entra ID (Azure Active Directory), such as a **Global Administrator**. The wizard requires granting admin consent for the new application on behalf of the organization, and this cannot be done later.
+        </Warning>
+        Your API key needs at least one Entra ID application linked to it, before it can access Business Central.
+        1. With the new key selected, click the **Register new Entra App** action in the action bar.
+        2. A wizard will guide you through creating and linking a new Entra ID application. You will be prompted to grant consent during this process.
+        3. Once complete, the new Entra Application will appear in the **NaviPartner API Key Entra Application List** FactBox on the right.
+        4. For high-volume integrations, you can repeat this process to create and link multiple Entra Applications to your API key. Our gateway will automatically load-balance requests across them when you use your API key.
+    </Step>
+    <Step title="4. Use your API key">
+        Include the API key in the `x-np-api-key` header on your HTTP requests.  
+        If you ever encounter HTTP 429 or 503 in the wild, you can go back and create more Entra ID Applications on your existing API key to increase the throughput.
+    </Step>
+</Steps>
