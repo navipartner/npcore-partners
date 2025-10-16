@@ -28,6 +28,9 @@ page 6185107 "NPR NP API Key List"
                 field(Status; Rec.Status)
                 {
                 }
+                field("Key Secret Hint"; Rec."Key Secret Hint")
+                {
+                }
             }
             part(NPAPIKeyPermission; "NPR NP API Key Permission")
             {
@@ -40,6 +43,9 @@ page 6185107 "NPR NP API Key List"
             part(EntraApps; "NPR NP API Key Entra App List")
             {
                 SubPageLink = "NPR NaviPartner API Key Id" = field(Id);
+            }
+            systempart(NotesFactBox; Notes)
+            {
             }
         }
     }

@@ -79,6 +79,7 @@ codeunit 6248565 "NPR NP API Key Mgt."
         Evaluate(NPAPIKey.Id, CopyStr(Jti, 1, MaxStrLen(NPAPIKey.Id)));
         NPAPIKey.Description := Description;
         NPAPIKey.Status := "NPR NP API Key Status"::Active;
+        NPAPIKey."Key Secret Hint" := CopyStr(APIKey, 1, 4) + '******' + CopyStr(APIKey, StrLen(APIKey) - 3, 4);
         NPAPIKey.Insert(true);
 
         exit(ApiKey);
