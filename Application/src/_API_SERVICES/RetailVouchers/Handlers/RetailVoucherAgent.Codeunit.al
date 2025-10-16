@@ -12,10 +12,10 @@ codeunit 6248253 "NPR RetailVoucherAgent"
             NpRvVoucher.SetFilter("Customer No.", '=%1', CopyStr(UpperCase(Request.QueryParams().Get('customerNumber')), 1, MaxStrLen(NpRvVoucher."Customer No.")));
 
         if (Request.QueryParams().ContainsKey('email')) then
-            NpRvVoucher.SetFilter("E-mail", '=%1', CopyStr(LowerCase(Request.QueryParams().Get('email')), 1, MaxStrLen(NpRvVoucher."E-mail")));
+            NpRvVoucher.SetFilter("E-mail", '@' + CopyStr(Request.QueryParams().Get('email'), 1, MaxStrLen(NpRvVoucher."E-mail")));
 
         if (Request.QueryParams().ContainsKey('referenceNo')) then
-            NpRvVoucher.SetFilter("Reference No.", '=%1', CopyStr(LowerCase(Request.QueryParams().Get('referenceNo')), 1, MaxStrLen(NpRvVoucher."Reference No.")));
+            NpRvVoucher.SetFilter("Reference No.", '=%1', CopyStr(Request.QueryParams().Get('referenceNo'), 1, MaxStrLen(NpRvVoucher."Reference No.")));
 
         NpRvVoucher.SetRange("Disabled for Web Service", false);
         ResponseJson.StartObject('');
