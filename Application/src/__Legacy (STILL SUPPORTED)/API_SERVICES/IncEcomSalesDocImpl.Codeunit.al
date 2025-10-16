@@ -2,6 +2,9 @@
 codeunit 6248364 "NPR Inc Ecom Sales Doc Impl"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-10-19';
+    ObsoleteReason = 'Replaced with V2 of the API implementation: NPR Inc Ecom Sales Doc Impl V2';
 
     var
         CustomerModeCreationErrorLbl: Label 'Customer Create is not allowed when Customer Update Mode is %1';
@@ -369,7 +372,6 @@ codeunit 6248364 "NPR Inc Ecom Sales Doc Impl"
     local procedure GetCustomer(IncEcomSalesHeader: Record "NPR Inc Ecom Sales Header"; var Customer: Record Customer) Found: Boolean
     var
         IncEcomSalesDocSetup: Record "NPR Inc Ecom Sales Doc Setup";
-        CustNo: Code[20];
     begin
         if not IncEcomSalesDocSetup.Get() then
             IncEcomSalesDocSetup.Init();
@@ -408,7 +410,7 @@ codeunit 6248364 "NPR Inc Ecom Sales Doc Impl"
                 begin
                     if IncEcomSalesHeader."Sell-to Customer No." = '' then
                         exit;
-                    Found := Customer.Get(CustNo);
+                    Found := Customer.Get(IncEcomSalesHeader."Sell-to Customer No.");
                 end;
             IncEcomSalesDocSetup."Customer Mapping"::"Phone No. to Customer No.":
                 begin
@@ -457,7 +459,7 @@ codeunit 6248364 "NPR Inc Ecom Sales Doc Impl"
     end;
 
 
-    local procedure InsertSalesLines(IncomingSalesHeader: Record "NPR Inc Ecom Sales Header"; SalesHedaer: Record "Sales Header")
+    local procedure InsertSalesLines(IncomingSalesHeader: Record "NPR Inc Ecom Sales Header"; SalesHeader: Record "Sales Header")
     var
         IncEcomSalesLine: Record "NPR Inc Ecom Sales Line";
         SaleLine: Record "Sales Line";
@@ -472,11 +474,11 @@ codeunit 6248364 "NPR Inc Ecom Sales Doc Impl"
             Clear(SaleLine);
             case IncEcomSalesLine.Type of
                 IncEcomSalesLine.Type::Item:
-                    InsertSalesLineItem(IncomingSalesHeader, SalesHedaer, IncEcomSalesLine, SaleLine);
+                    InsertSalesLineItem(IncomingSalesHeader, SalesHeader, IncEcomSalesLine, SaleLine);
                 IncEcomSalesLine.Type::Comment:
-                    InsertSalesLineComment(IncomingSalesHeader, SalesHedaer, IncEcomSalesLine, SaleLine);
+                    InsertSalesLineComment(IncomingSalesHeader, SalesHeader, IncEcomSalesLine, SaleLine);
                 IncEcomSalesLine.Type::"Shipment Fee":
-                    InsertSalesLineShipmentFee(IncomingSalesHeader, SalesHedaer, IncEcomSalesLine, SaleLine);
+                    InsertSalesLineShipmentFee(IncomingSalesHeader, SalesHeader, IncEcomSalesLine, SaleLine);
             end;
         until IncEcomSalesLine.Next() = 0;
 
@@ -673,7 +675,7 @@ codeunit 6248364 "NPR Inc Ecom Sales Doc Impl"
         SalesCommentLine.Insert(true);
     end;
 
-    local procedure InsertPaymentLines(IncomingSalesHeader: Record "NPR Inc Ecom Sales Header"; SalesHedaer: Record "Sales Header")
+    local procedure InsertPaymentLines(IncomingSalesHeader: Record "NPR Inc Ecom Sales Header"; SalesHeader: Record "Sales Header")
     var
         IncEcomSalesPmtLine: Record "NPR Inc Ecom Sales Pmt. Line";
         PaymentLine: Record "NPR Magento Payment Line";
@@ -688,20 +690,20 @@ codeunit 6248364 "NPR Inc Ecom Sales Doc Impl"
             Clear(PaymentLine);
             case IncEcomSalesPmtLine."Payment Method Type" of
                 IncEcomSalesPmtLine."Payment Method Type"::"Payment Method":
-                    InsertPaymentLinePaymentMethod(IncomingSalesHeader, SalesHedaer, IncEcomSalesPmtLine, PaymentLine);
+                    InsertPaymentLinePaymentMethod(IncomingSalesHeader, SalesHeader, IncEcomSalesPmtLine, PaymentLine);
                 else
                     IncEcomSalesPmtLine.FieldError("Payment Method Type");
             end;
         until IncEcomSalesPmtLine.Next() = 0;
     end;
 
-    local procedure InsertCommentLines(IncomingSalesHeader: Record "NPR Inc Ecom Sales Header"; SalesHedaer: Record "Sales Header")
+    local procedure InsertCommentLines(IncomingSalesHeader: Record "NPR Inc Ecom Sales Header"; SalesHeader: Record "Sales Header")
     var
         RecordLinkManagement: Codeunit "Record Link Management";
         IncEcomSalesDocImplEvents: Codeunit "NPR IncEcomSalesDocImplEvents";
     begin
-        RecordLinkManagement.CopyLinks(IncomingSalesHeader, SalesHedaer);
-        IncEcomSalesDocImplEvents.OnAfterInsertCommentLines(IncomingSalesHeader, SalesHedaer);
+        RecordLinkManagement.CopyLinks(IncomingSalesHeader, SalesHeader);
+        IncEcomSalesDocImplEvents.OnAfterInsertCommentLines(IncomingSalesHeader, SalesHeader);
     end;
 
 
@@ -998,6 +1000,11 @@ codeunit 6248364 "NPR Inc Ecom Sales Doc Impl"
             exit;
         IncEcomSalesHeader."Creation Status" := IncEcomSalesHeader."Creation Status"::Canceled;
         IncEcomSalesHeader.Modify(true);
+    end;
+
+    internal procedure GetApiVersionV1(): Date
+    begin
+        exit(20250713D);
     end;
 }
 #endif

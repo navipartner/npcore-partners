@@ -5,7 +5,7 @@ page 6185067 "NPR Inc Ecom Sales Doc Setup"
     ApplicationArea = NPRRetail;
     UsageCategory = Administration;
     SourceTable = "NPR Inc Ecom Sales Doc Setup";
-    Caption = 'Incoming Ecommerce Sales Document Setup';
+    Caption = 'Ecommerce Setup';
     DeleteAllowed = false;
     InsertAllowed = false;
     Extensible = true;
@@ -16,25 +16,10 @@ page 6185067 "NPR Inc Ecom Sales Doc Setup"
         {
             group(General)
             {
-                Caption = 'General';
-                field("Max Doc Process Retry Count"; Rec."Max Doc Process Retry Count")
-                {
-                    ToolTip = 'Specifies the value of the Max. Document Process Retry Count field.';
-                    ApplicationArea = NPRRetail;
-                }
-                field("Def. Sales Location Code"; Rec."Def. Sales Location Code")
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Def. Sales Location Code field.';
-                }
+                ShowCaption = false;
             }
             group(Cusotmer)
             {
-                field("Customer Update Mode"; Rec."Customer Update Mode")
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Customer Update Mode field.';
-                }
                 field("Customer Mapping"; Rec."Customer Mapping")
                 {
                     ApplicationArea = NPRRetail;
@@ -51,42 +36,64 @@ page 6185067 "NPR Inc Ecom Sales Doc Setup"
                     ToolTip = 'Specifies the value of the Def. Customer Config. Template Code field.';
                 }
             }
-            group(SalesOrders)
+            group(Documents)
             {
-                Caption = 'Sales Orders';
-                field("Auto Proc Sales Order"; Rec."Auto Proc Sales Order")
+                group(DocumentsGeneral)
                 {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Auto Process Sales Order field.';
+                    Caption = 'General';
+                    field("Max Doc Process Retry Count"; Rec."Max Doc Process Retry Count")
+                    {
+                        ToolTip = 'Specifies the value of the Max. Document Process Retry Count field.';
+                        ApplicationArea = NPRRetail;
+                    }
+                    field("Def. Sales Location Code"; Rec."Def. Sales Location Code")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Def. Sales Location Code field.';
+                    }
+                    field("Customer Update Mode"; Rec."Customer Update Mode")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Customer Update Mode field.';
+                    }
                 }
-                field("Proc Sales Order On Receive"; Rec."Proc Sales Order On Receive")
+                group(SalesOrders)
                 {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Proc Sales Order On Receive field.';
+                    Caption = 'Sales Orders';
+                    field("Auto Proc Sales Order"; Rec."Auto Proc Sales Order")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Auto Process Sales Order field.';
+                    }
+                    field("Proc Sales Order On Receive"; Rec."Proc Sales Order On Receive")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Proc Sales Order On Receive field.';
+                    }
+                    field("Release Sale Ord After Prc"; Rec."Release Sale Ord After Prc")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Release Sales Order After Process field.';
+                    }
                 }
-                field("Release Sale Ord After Prc"; Rec."Release Sale Ord After Prc")
+                group(SalesReturnOrders)
                 {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Release Sales Order After Process field.';
-                }
-            }
-            group(SalesReturnOrders)
-            {
-                Caption = 'Sales Return Orders';
-                field("Auto Proc Sales Ret Order"; Rec."Auto Proc Sales Ret Order")
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Auto Process Sales Return Order field.';
-                }
-                field("Proc Sales Ret Ord On Receive"; Rec."Proc Sales Ret Ord On Receive")
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Process Sales Return Order On Receive field.';
-                }
-                field("Release Sale Ret Ord After Prc"; Rec."Release Sale Ret Ord After Prc")
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Release Sales Return Order After Process field.';
+                    Caption = 'Sales Return Orders';
+                    field("Auto Proc Sales Ret Order"; Rec."Auto Proc Sales Ret Order")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Auto Process Sales Return Order field.';
+                    }
+                    field("Proc Sales Ret Ord On Receive"; Rec."Proc Sales Ret Ord On Receive")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Process Sales Return Order On Receive field.';
+                    }
+                    field("Release Sale Ret Ord After Prc"; Rec."Release Sale Ret Ord After Prc")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Release Sales Return Order After Process field.';
+                    }
                 }
             }
         }

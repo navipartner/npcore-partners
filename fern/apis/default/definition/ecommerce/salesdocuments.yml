@@ -120,7 +120,6 @@ types:
   SalesDocumentSellToCustomerDTO:
     properties:
       no: string
-      type: string
       name: string
       name2: string
       address: string
@@ -135,11 +134,12 @@ types:
       ean: string
       vatRegistrationNo: string
       invoiceEmail: string
+      customerTemplate: string
+      configurationTemplate: string
     examples:
       - name: ExampleSellToCustomerDTO
         value:
           no: "CUST-10001"
-          type: "Retail Customer"
           name: "Acme Corporation"
           name2: "Corporation"
           address: "123 Main Street"
@@ -154,6 +154,8 @@ types:
           ean: "1234567890123"
           vatRegistrationNo: "US123456789"
           invoiceEmail: "invoices@acme.com"
+          customerTemplate: "DOMESTIC"
+          configurationTemplate: "CUST000001"
 
   SalesDocumentShipToCustomerDTO:
     properties:
@@ -273,9 +275,6 @@ types:
       no: 
         type: optional<string>
         docs: Max. length 10 symbols.
-      type: 
-        type: string
-        docs: Max. length 250 symbols.
       name: 
         type: string
         docs: Max. length 150 symbols.
@@ -315,11 +314,16 @@ types:
       invoiceEmail: 
         type: optional<string>
         docs: Max. length 80 symbols.
+      customerTemplate: 
+        type: optional<string>
+        docs: Max. length 20 symbols. Customer template code to apply customer-specific defaults. If both customerTemplate and configurationTemplate are provided, this takes priority.
+      configurationTemplate: 
+        type: optional<string>
+        docs: Max. length 10 symbols. Configuration template code to apply customer setup defaults. Ignored if customerTemplate is also provided.
     examples:
       - name: ExampleSellToCustomerRequest
         value:
           no: "CUST-10001"
-          type: "Retail Customer"
           name: "Acme Corporation"
           address: "123 Main Street"
           address2: "Suite 400"
@@ -333,6 +337,8 @@ types:
           ean: "1234567890123"
           vatRegistrationNo: "US123456789"
           invoiceEmail: "invoices@acme.com"
+          customerTemplate: "DOMESTIC"
+          configurationTemplate: "CUST000001"
 
   SalesDocumentShipToCustomerRequest:
     properties:

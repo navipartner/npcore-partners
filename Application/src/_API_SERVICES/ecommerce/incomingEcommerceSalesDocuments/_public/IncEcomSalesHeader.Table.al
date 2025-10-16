@@ -310,6 +310,26 @@ table 6151112 "NPR Inc Ecom Sales Header"
             Caption = 'Shipment Service';
             DataClassification = CustomerContent;
         }
+        field(4020; "Customer Template"; Code[20])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Customer Template';
+        }
+        field(4030; "Configuration Template"; Code[10])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Configuration Template';
+        }
+        field(4040; "API Version Date"; Date)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'API Version Date';
+        }
+        field(4050; "Requested API Version Date"; Date)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Requested API Version Date';
+        }
     }
 
     keys

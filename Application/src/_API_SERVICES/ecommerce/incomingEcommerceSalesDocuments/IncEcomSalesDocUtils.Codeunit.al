@@ -499,5 +499,38 @@ codeunit 6248399 "NPR Inc Ecom Sales Doc Utils"
 
         TemplateCode := IncEcomSalesDocSetup."Def. Customer Template Code";
     end;
+
+    internal procedure GetCustomerTemplateAndConfigCode(IncEcomSalesHeader: Record "NPR Inc Ecom Sales Header"; var CustTemplateCode: Code[20]; var ConfigTemplateCode: Code[10])
+    var
+        IncEcomSalesDocSetup: Record "NPR Inc Ecom Sales Doc Setup";
+    begin
+        if IncEcomSalesHeader."Customer Template" <> '' then begin
+            CustTemplateCode := IncEcomSalesHeader."Customer Template";
+            ConfigTemplateCode := ''; // Ignore config. template if customer template is set
+        end else begin
+            if IncEcomSalesHeader."Configuration Template" <> '' then begin
+                CustTemplateCode := '';
+                ConfigTemplateCode := IncEcomSalesHeader."Configuration Template";
+            end else begin
+                if not IncEcomSalesDocSetup.Get() then
+                    IncEcomSalesDocSetup.Init();
+                CustTemplateCode := IncEcomSalesDocSetup."Def. Customer Template Code";
+                ConfigTemplateCode := IncEcomSalesDocSetup."Def Cust Config Template Code";
+            end;
+        end;
+    end;
+
+    internal procedure GetApiVersionDateByRequest(RequestedApiVersion: Date): Date
+    var
+        IncEcomSalesDocImpl: Codeunit "NPR Inc Ecom Sales Doc Impl";
+        IncEcomSalesDocImplV2: Codeunit "NPR Inc Ecom Sales Doc Impl V2";
+    begin
+        case true of
+            RequestedApiVersion >= IncEcomSalesDocImplV2.GetApiVersionV2():
+                exit(IncEcomSalesDocImplV2.GetApiVersionV2());
+            else
+                exit(IncEcomSalesDocImpl.GetApiVersionV1());
+        end;
+    end;
 }
 #endif

@@ -49,6 +49,16 @@ page 6185035 "NPR Inc Ecom Doc FactBox"
                         ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies the value of the Creted By User Name field.';
                     }
+                    field("API Version Date"; Rec."API Version Date")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the API Version Date field.';
+                    }
+                    field("Requested API Version Date"; Rec."Requested API Version Date")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Requested API Version Date field.';
+                    }
                 }
                 group("Error")
                 {

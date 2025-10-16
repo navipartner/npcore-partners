@@ -2,6 +2,10 @@
 codeunit 6248362 "NPR IncEcomSalesDocApiAgent"
 {
     Access = Internal;
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-10-19';
+    ObsoleteReason = 'Replaced with V2 of the API agent: NPR IncEcomSalesDocApiAgentV2';
+
     internal procedure CreateIncomingEcomDocument(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         IncEcomSalesHeader: Record "NPR Inc Ecom Sales Header";
@@ -50,9 +54,11 @@ codeunit 6248362 "NPR IncEcomSalesDocApiAgent"
     local procedure InsertSalesDocument(var Request: Codeunit "NPR API Request"; var IncEcomSalesHeader: Record "NPR Inc Ecom Sales Header")
     var
         RequestBody: JsonToken;
+        RequestedApiVersion: Date;
     begin
         RequestBody := Request.BodyJson();
-        ProcessIncomingSalesHeader(RequestBody, IncEcomSalesHeader);
+        RequestedApiVersion := Request.ApiVersion();
+        ProcessIncomingSalesHeader(RequestBody, IncEcomSalesHeader, RequestedApiVersion);
         ProcessIncomingSalesLines(RequestBody, IncEcomSalesHeader);
         ProcessIncomingSalesPaymentLines(RequestBody, IncEcomSalesHeader);
         ProcessIncomingSalesDocumentComments(RequestBody, IncEcomSalesHeader);
@@ -84,7 +90,7 @@ codeunit 6248362 "NPR IncEcomSalesDocApiAgent"
 
         IncEcomSalesHeader."External Document No." := JsonHelper.GetJText(RequestBody, 'externalDocumentNo', MaxStrLen(IncEcomSalesHeader."External Document No."), true, false);
         IncEcomSalesHeader."Your Reference" := JsonHelper.GetJText(RequestBody, 'yourReference', MaxStrLen(IncEcomSalesHeader."Your Reference"), true, false);
-        IncEcomSalesHeader."Location Code." := JsonHelper.GetJText(RequestBody, 'locationCode', MaxStrLen(IncEcomSalesHeader."Your Reference"), true, false);
+        IncEcomSalesHeader."Location Code." := JsonHelper.GetJText(RequestBody, 'locationCode', MaxStrLen(IncEcomSalesHeader."Location Code."), true, false);
         IncEcomSalesHeader."Price Excl. VAT" := JsonHelper.GetJBoolean(RequestBody, 'pricesExcludingVat', false);
 
         //Sell-to
@@ -129,19 +135,22 @@ codeunit 6248362 "NPR IncEcomSalesDocApiAgent"
 #pragma warning restore AA0139
     end;
 
-    local procedure ProcessIncomingSalesHeader(Request: JsonToken; var IncEcomSalesHeader: Record "NPR Inc Ecom Sales Header");
+    local procedure ProcessIncomingSalesHeader(Request: JsonToken; var IncEcomSalesHeader: Record "NPR Inc Ecom Sales Header"; RequestedApiVersion: Date);
     begin
-        InsertIncomingSalesHeader(Request, IncEcomSalesHeader);
+        InsertIncomingSalesHeader(Request, IncEcomSalesHeader, RequestedApiVersion);
     end;
 
-    local procedure InsertIncomingSalesHeader(Request: JsonToken; var IncEcomSalesHeader: Record "NPR Inc Ecom Sales Header")
+    local procedure InsertIncomingSalesHeader(Request: JsonToken; var IncEcomSalesHeader: Record "NPR Inc Ecom Sales Header"; RequestedApiVersion: Date)
     var
         IncEcomSalesDocApiEvents: Codeunit "NPR IncEcomSalesDocApiEvents";
+        IncEcomSalesDocUtils: Codeunit "NPR Inc Ecom Sales Doc Utils";
     begin
         IncEcomSalesHeader.Init();
         DeserializeIncomingEcomSalesHeader(Request, IncEcomSalesHeader);
         IncEcomSalesHeader."Received Date" := Today;
         IncEcomSalesHeader."Received Time" := Time;
+        IncEcomSalesHeader."Requested API Version Date" := RequestedApiVersion;
+        IncEcomSalesHeader."API Version Date" := IncEcomSalesDocUtils.GetApiVersionDateByRequest(RequestedApiVersion);
         IncEcomSalesDocApiEvents.OnBeforeProcessIncomingSalesHeaderInsertIncSalesHeader(IncEcomSalesHeader, Request);
         IncEcomSalesHeader.Insert(true);
     end;

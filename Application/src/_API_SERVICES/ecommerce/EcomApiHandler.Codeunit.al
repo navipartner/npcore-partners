@@ -7,6 +7,9 @@ codeunit 6248361 "NPR EcomApiHandler"
         _Request: Codeunit "NPR API Request";
         _Response: Codeunit "NPR API Response";
         _ApiFunction: Enum "NPR EcomApiFunctions";
+        IncEcomSalesDocApiAgent: Codeunit "NPR IncEcomSalesDocApiAgent";
+        IncEcomSalesDocApiAgentV2: Codeunit "NPR IncEcomSalesDocApiAgentV2";
+        IncEcomSalesDocImplV2: Codeunit "NPR Inc Ecom Sales Doc Impl V2";
 
     trigger OnRun()
     begin
@@ -29,14 +32,34 @@ codeunit 6248361 "NPR EcomApiHandler"
     end;
 
     internal procedure HandleFunction()
-    var
-        IncEcomSalesDocApiAgent: Codeunit "NPR IncEcomSalesDocApiAgent";
     begin
         case _ApiFunction of
             _ApiFunction::CREATE_SALES_DOCUMENT:
-                _Response := IncEcomSalesDocApiAgent.CreateIncomingEcomDocument(_Request);
+                RunCreateDocAPIAgentBasedOnRequestHeaderVersion();
             _ApiFunction::GET_SALES_DOCUMENT:
+                RunGetDocAPIAgentBasedOnRequestHeaderVersion();
+        end;
+    end;
+
+    local procedure RunCreateDocAPIAgentBasedOnRequestHeaderVersion()
+    begin
+        case true of
+            _Request.ApiVersion() >= IncEcomSalesDocImplV2.GetApiVersionV2():
+                _Response := IncEcomSalesDocApiAgentV2.CreateIncomingEcomDocument(_Request);
+            else
+                _Response := IncEcomSalesDocApiAgent.CreateIncomingEcomDocument(_Request);
+        // Add new api-date-version cases here as needed
+        end;
+    end;
+
+    local procedure RunGetDocAPIAgentBasedOnRequestHeaderVersion()
+    begin
+        case true of
+            _Request.ApiVersion() >= IncEcomSalesDocImplV2.GetApiVersionV2():
+                _Response := IncEcomSalesDocApiAgentV2.GetIncomingEcomDocumentById(_Request);
+            else
                 _Response := IncEcomSalesDocApiAgent.GetIncomingEcomDocumentById(_Request);
+        // Add new api-date-version cases here as needed
         end;
     end;
 }

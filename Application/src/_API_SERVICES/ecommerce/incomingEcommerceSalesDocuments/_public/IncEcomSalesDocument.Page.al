@@ -25,23 +25,25 @@ page 6185060 "NPR Inc Ecom Sales Document"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Currency Code field.';
                 }
-                field("Currency Exchange Rate"; Rec."Currency Exchange Rate")
+                group(OrderVisibilityGroup)
                 {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Currency Exchange Rate field.';
+                    ShowCaption = false;
                     Visible = Rec."Document Type" = Rec."Document Type"::Order;
-                }
-                field("External Document No."; Rec."External Document No.")
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the External Document No. field.';
-                    Visible = Rec."Document Type" = Rec."Document Type"::Order;
-                }
-                field("Your Reference"; Rec."Your Reference")
-                {
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Your Reference field.';
-                    Visible = Rec."Document Type" = Rec."Document Type"::Order;
+                    field("Currency Exchange Rate"; Rec."Currency Exchange Rate")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Currency Exchange Rate field.';
+                    }
+                    field("External Document No."; Rec."External Document No.")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the External Document No. field.';
+                    }
+                    field("Your Reference"; Rec."Your Reference")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Your Reference field.';
+                    }
                 }
                 field("Location Code."; Rec."Location Code.")
                 {
@@ -117,12 +119,16 @@ page 6185060 "NPR Inc Ecom Sales Document"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Email field.';
                 }
-                field("Sell-to Invoice Email"; Rec."Sell-to Invoice Email")
+                group(SellToInvoiceEmailVisibilityGroup)
                 {
-                    Caption = 'Invoice Email';
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Invoice Email field.';
+                    ShowCaption = false;
                     Visible = Rec."Document Type" = Rec."Document Type"::Order;
+                    field("Sell-to Invoice Email"; Rec."Sell-to Invoice Email")
+                    {
+                        Caption = 'Invoice Email';
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Invoice Email field.';
+                    }
                 }
                 field("Sell-to Phone No."; Rec."Sell-to Phone No.")
                 {
@@ -136,11 +142,34 @@ page 6185060 "NPR Inc Ecom Sales Document"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the VAT Registration No. field.';
                 }
-                field("Sell-to Customer Type"; Rec."Sell-to Customer Type")
+                group(CustomerTypeVisibilityGroup)
                 {
-                    Caption = 'Type';
-                    ApplicationArea = NPRRetail;
-                    ToolTip = 'Specifies the value of the Type field.';
+                    ShowCaption = false;
+                    Visible = ShowCustomerTypeField;
+                    field("Sell-to Customer Type"; Rec."Sell-to Customer Type")
+                    {
+                        Caption = 'Type';
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Type field.';
+                    }
+                }
+                group(CustomerTemplatesVisibilityGroup)
+                {
+                    ShowCaption = false;
+                    Visible = ShowCustomerTemplateFields;
+                    field("Customer Template"; Rec."Customer Template")
+                    {
+                        Caption = 'Customer Template';
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Customer Template field.';
+                    }
+
+                    field("Configuration Template"; Rec."Configuration Template")
+                    {
+                        Caption = 'Configuration Template';
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Configuration Template field.';
+                    }
                 }
                 field("Sell-to EAN"; Rec."Sell-to EAN")
                 {
@@ -294,5 +323,32 @@ page 6185060 "NPR Inc Ecom Sales Document"
             }
         }
     }
+
+    var
+        IncEcomSalesDocImplV2: Codeunit "NPR Inc Ecom Sales Doc Impl V2";
+        ShowCustomerTypeField: Boolean;
+        ShowCustomerTemplateFields: Boolean;
+
+    trigger OnOpenPage()
+    begin
+        HandleCustomerTypeAndTemplatesVisiblityFields();
+
+    end;
+
+    trigger OnAfterGetRecord()
+    begin
+        HandleCustomerTypeAndTemplatesVisiblityFields();
+    end;
+
+    local procedure HandleCustomerTypeAndTemplatesVisiblityFields(): Boolean
+    begin
+        if Rec."API Version Date" = IncEcomSalesDocImplV2.GetApiVersionV2() then begin
+            ShowCustomerTypeField := false;
+            ShowCustomerTemplateFields := true;
+        end else begin
+            ShowCustomerTypeField := true;
+            ShowCustomerTemplateFields := false;
+        end;
+    end;
 }
 #endIf

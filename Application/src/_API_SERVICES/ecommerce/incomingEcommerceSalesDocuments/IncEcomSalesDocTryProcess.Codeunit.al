@@ -5,10 +5,22 @@ codeunit 6248365 "NPR IncEcomSalesDocTryProcess"
     TableNo = "NPR Inc Ecom Sales Header";
 
     trigger OnRun()
+    begin
+        RunAPIBasedOnVersion(Rec);
+    end;
+
+    local procedure RunAPIBasedOnVersion(var IncEcomSalesHeader: Record "NPR Inc Ecom Sales Header")
     var
         IncEcomSalesDocImpl: Codeunit "NPR Inc Ecom Sales Doc Impl";
+        IncEcomSalesDocImplV2: Codeunit "NPR Inc Ecom Sales Doc Impl V2";
     begin
-        IncEcomSalesDocImpl.Process(Rec);
+        case IncEcomSalesHeader."API Version Date" of
+            IncEcomSalesDocImplV2.GetApiVersionV2():
+                IncEcomSalesDocImplV2.Process(IncEcomSalesHeader);
+            else
+                IncEcomSalesDocImpl.Process(IncEcomSalesHeader);
+        // Add new api-date-version cases here as needed
+        end;
     end;
 }
 #endif
