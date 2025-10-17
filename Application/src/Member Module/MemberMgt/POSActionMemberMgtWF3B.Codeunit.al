@@ -555,7 +555,20 @@ codeunit 6151366 "NPR POS Action Member MgtWF3-B"
         MembershipMgtInternal.CancelAutoRenew(ExternalMemberCardNo);
     end;
 
+    internal procedure TerminateSubscription(ExternalMemberCardNo: Text[100]; FrontEndInputMethod: Option) Result: JsonObject
     var
+        MemberCard: Record "NPR MM Member Card";
+        Membership: Record "NPR MM Membership";
+        Subscription: Record "NPR MM Subscription";
+        RequestTermination: Page "NPR MM SubsRequestTermination";
+    begin
+        GetMembershipFromCardNumberWithUI(FrontEndInputMethod, ExternalMemberCardNo, Membership, MemberCard, false);
+        Subscription.SetRange("Membership Entry No.", Membership."Entry No.");
+        Subscription.FindFirst();
+        RequestTermination.SetMembership(Membership, Subscription);
+        if RequestTermination.RunModal() <> Action::Yes then
+            Result.Add('success', false)
+    end;
 
     var
         MemberSelectionMethod: Option CARD_SCAN,FACIAL_RECOGNITION,NO_PROMPT;

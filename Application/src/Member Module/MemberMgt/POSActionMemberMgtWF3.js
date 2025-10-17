@@ -136,6 +136,11 @@ let main = async ({ workflow, context, popup, captions, parameters }) => {
             successMessage = captions.CancelAutoRenewSuccess; // Cancel auto-renew
             break;
         }
+        case 12: {
+            if (membershipResponse.success === false) { return; }
+            successMessage = captions.TerminateSubscriptionSuccess; // Terminate subscription
+            break;
+        }
         case 2:  // View Membership Entry - view operation so no toast needed
         case 3:  // Regret Membership - requires payment
         case 4:  // Renew Membership - requires payment

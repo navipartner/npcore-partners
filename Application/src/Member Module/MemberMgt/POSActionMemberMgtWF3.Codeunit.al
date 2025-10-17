@@ -10,8 +10,8 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         Action_Description: Label 'This action handles member management functions for workflow 3.0.';
         ParamFunction_CptLbl: Label 'Function';
         ParamFunction_DescLbl: Label 'Specifies the Function used.';
-        ParamFunction_OptLbl: Label 'Member Arrival,Select Membership,View Membership Entry,Regret Membership Entry,Renew Membership,Extend Membership,Upgrade Membership,Cancel Membership,Edit Membership,Show Member,Edit Current Membership,Cancel Auto-Renew', Locked = true;
-        ParamFunction_OptCptLbl: Label 'Member Arrival,Select Membership,View Membership Entry,Regret Membership Entry,Renew Membership,Extend Membership,Upgrade Membership,Cancel Membership,Edit Membership,Show Member,Edit Current Membership,Cancel Auto-Renew';
+        ParamFunction_OptLbl: Label 'Member Arrival,Select Membership,View Membership Entry,Regret Membership Entry,Renew Membership,Extend Membership,Upgrade Membership,Cancel Membership,Edit Membership,Show Member,Edit Current Membership,Cancel Auto-Renew,Terminate Membership', Locked = true;
+        ParamFunction_OptCptLbl: Label 'Member Arrival,Select Membership,View Membership Entry,Regret Membership Entry,Renew Membership,Extend Membership,Upgrade Membership,Cancel Membership,Edit Membership,Show Member,Edit Current Membership,Cancel Auto-Renew,Terminate Membership';
         ParamDialogPrompt_CptLbl: Label 'Dialog Prompt';
         ParamDialogPrompt_DescLbl: Label 'Specifies the type of Dialog Prompt';
         ParamDialogPrompt_OptLbl: Label 'Member Card Number,Facial Recognition,No Dialog', Locked = true;
@@ -37,6 +37,7 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         MemberArrivalSuccessLbl: Label 'Member arrival registered successfully';
         SelectMembershipSuccessLbl: Label 'Membership selected successfully';
         CancelAutoRenewSuccessLbl: Label 'Auto-renew canceled successfully';
+        TerminateSubscriptionSuccessLbl: Label 'Subscription terminated successfully';
     begin
         WorkflowConfig.AddActionDescription(Action_Description);
         WorkflowConfig.AddJavascript(GetActionScript());
@@ -69,6 +70,7 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
         WorkflowConfig.AddLabel('MemberArrivalSuccess', MemberArrivalSuccessLbl);
         WorkflowConfig.AddLabel('SelectMembershipSuccess', SelectMembershipSuccessLbl);
         WorkflowConfig.AddLabel('CancelAutoRenewSuccess', CancelAutoRenewSuccessLbl);
+        WorkflowConfig.AddLabel('TerminateSubscriptionSuccess', TerminateSubscriptionSuccessLbl);
         WorkflowConfig.AddOptionParameter('AutoAdmitMember',
                                         ParamAutoAdmit_OptLbl,
 #pragma warning disable AA0139
@@ -160,6 +162,10 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
                 begin
                     POSActionMemberMgtWF3B.CancelAutoRenew(ExternalMemberCardNo);
                     Response.Add('success', true); // Add success flag
+                end;
+            12:
+                begin
+                    Response := POSActionMemberMgtWF3B.TerminateSubscription(ExternalMemberCardNo, FrontEndInputMethod);
                 end;
         end;
         exit(Response);
@@ -449,7 +455,7 @@ codeunit 6150947 "NPR POS Action Member Mgt WF3" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionMemberMgtWF3.js###
-'let main=async({workflow:u,context:n,popup:l,captions:a,parameters:e})=>{e.Function<0&&(e.Function=e.Function["Member Arrival"]);debugger;let r=await u.respond("CheckMemberInitialized");r!=null&&r.memberExternalCardNo!=null&&r.memberExternalCardNo!==""&&(n.memberCardInput=r.memberExternalCardNo);let g=a.DialogTitle.substitute(e.Function);if(e.DefaultInputValue.length==0&&e.DialogPrompt<=e.DialogPrompt["Member Card Number"]&&(n.memberCardInput=await l.input({caption:a.MemberCardPrompt,title:a.windowTitle,value:n.memberCardInput}),n.memberCardInput===null))return;if(e.DefaultInputValue.length>0&&(n.memberCardInput=e.DefaultInputValue),e.Function>=e.Function["Regret Membership Entry"]&&e.Function<=e.Function["Cancel Membership"]){let i=await u.respond("GetMembershipAlterationLookup");if(n.memberCardInput=i.cardnumber,i.data?.length==0){await l.error({title:a.windowTitle,caption:i.notFoundMessage});return}let o=data.createArrayDriver(i.data),m=data.createDataSource(o);m.loadAll=!1;let d=await l.lookup({title:i.title,configuration:{className:"custom-lookup",styleSheet:"",layout:i.layout,result:c=>c?c.map(s=>s?s.itemno:null):null},source:m});if(d===null||d.length===0)return;n.itemNumber=d[0].itemno}let t=await u.respond("DoManageMembership");if(e.Function==e.Function["View Membership Entry"]){let i=data.createArrayDriver(t.data),o=data.createDataSource(i);m=await l.lookup({title:t.title,configuration:{className:"custom-lookup",styleSheet:"",layout:t.layout},source:o})}debugger;const b=e.ToastMessageTimer!==null&&e.ToastMessageTimer!==void 0&&e.ToastMessageTimer!==0?e.ToastMessageTimer:15;t.MemberScanned&&b>0&&toast.memberScanned({memberImg:t.MemberScanned.ImageDataUrl,memberName:t.MemberScanned.Name,validForAdmission:t.MemberScanned.Valid,hideAfter:b,memberExpiry:t.MemberScanned.ExpiryDate,content:["Member Status","Member Balance","Member Points","Member Card"]});const h=(e.ToastSuccessMessageTimer??0)!==0?e.ToastSuccessMessageTimer:5;if(t&&(t.success===!0||!t.error)){let s=a.SuccessMessage;const p=Number(e.Function);switch(p){case 0:{s=a.MemberArrivalSuccess;break;}case 1:{s=a.SelectMembershipSuccess;break;}case 11:{s=a.CancelAutoRenewSuccess;break;}case 2:case 9:{return;}case 3:case 4:case 5:case 6:case 7:case 8:case 10:{return;}}toast.success(s,{title:a.SuccessTitle,hideAfter:h})}};'
+'let main=async({workflow:s,context:a,popup:r,captions:n,parameters:e})=>{e.Function<0&&(e.Function=e.Function["Member Arrival"]);debugger;let u=await s.respond("CheckMemberInitialized");u!=null&&u.memberExternalCardNo!=null&&u.memberExternalCardNo!==""&&(a.memberCardInput=u.memberExternalCardNo);let g=n.DialogTitle.substitute(e.Function);if(e.DefaultInputValue.length==0&&e.DialogPrompt<=e.DialogPrompt["Member Card Number"]&&(a.memberCardInput=await r.input({caption:n.MemberCardPrompt,title:n.windowTitle,value:a.memberCardInput}),a.memberCardInput===null))return;if(e.DefaultInputValue.length>0&&(a.memberCardInput=e.DefaultInputValue),e.Function>=e.Function["Regret Membership Entry"]&&e.Function<=e.Function["Cancel Membership"]){let i=await s.respond("GetMembershipAlterationLookup");if(a.memberCardInput=i.cardnumber,i.data?.length==0){await r.error({title:n.windowTitle,caption:i.notFoundMessage});return}let l=data.createArrayDriver(i.data),c=data.createDataSource(l);c.loadAll=!1;let o=await r.lookup({title:i.title,configuration:{className:"custom-lookup",styleSheet:"",layout:i.layout,result:d=>d?d.map(b=>b?b.itemno:null):null},source:c});if(o===null||o.length===0)return;a.itemNumber=o[0].itemno}let t=await s.respond("DoManageMembership");if(e.Function==e.Function["View Membership Entry"]){let i=data.createArrayDriver(t.data),l=data.createDataSource(i),c=await r.lookup({title:t.title,configuration:{className:"custom-lookup",styleSheet:"",layout:t.layout},source:l})}debugger;const m=e.ToastMessageTimer!==null&&e.ToastMessageTimer!==void 0&&e.ToastMessageTimer!==0?e.ToastMessageTimer:15;t.MemberScanned&&m>0&&toast.memberScanned({memberImg:t.MemberScanned.ImageDataUrl,memberName:t.MemberScanned.Name,validForAdmission:t.MemberScanned.Valid,hideAfter:m,memberExpiry:t.MemberScanned.ExpiryDate,content:[{caption:t.MemberScanned.MembershipCodeCaption,value:t.MemberScanned.MembershipCodeDescription}]});const M=(e.ToastSuccessMessageTimer??0)!==0?e.ToastSuccessMessageTimer:5;if(t&&(t.success===!0||!t.error)){let i=n.SuccessMessage;switch(Number(e.Function)){case 0:{i=n.MemberArrivalSuccess;break}case 1:{i=n.SelectMembershipSuccess;break}case 11:{i=n.CancelAutoRenewSuccess;break}case 12:{if(t.success===!1)return;i=n.TerminateSubscriptionSuccess;break}case 2:case 3:case 4:case 5:case 6:case 7:case 8:case 9:case 10:return}toast.success(i,{title:n.SuccessTitle,hideAfter:M})}};'
         )
     end;
 
