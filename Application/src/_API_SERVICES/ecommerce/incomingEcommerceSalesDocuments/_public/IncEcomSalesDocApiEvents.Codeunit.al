@@ -39,10 +39,17 @@ codeunit 6248446 "NPR IncEcomSalesDocApiEvents"
     end;
 
     [IntegrationEvent(false, false)]
+    internal procedure OnGetSalesDocumentCustomFieldsJsonObject(IncSalesHeader: Record "NPR Inc Ecom Sales Header"; var IncSalesDocumentCustomFieldsJsonObject: Codeunit "NPR Json Builder");
+    begin
+    end;
+
+    [Obsolete('Not used anymore', '2023-10-19')]
+    [IntegrationEvent(false, false)]
     internal procedure OnGetSalesDocumentJsonObjectAfterSalesHeaderInformation(IncSalesHeader: Record "NPR Inc Ecom Sales Header"; var IncSalesDocumentJsonObject: Codeunit "NPR Json Builder");
     begin
     end;
 
+    [Obsolete('Not used anymore', '2023-10-19')]
     [IntegrationEvent(false, false)]
     internal procedure OnGetSalesDocumentJsonObjectAfterSalesHeaderInformationBeforeEndObject(IncSalesHeader: Record "NPR Inc Ecom Sales Header"; var IncSalesDocumentJsonObject: Codeunit "NPR Json Builder");
     begin
@@ -53,8 +60,19 @@ codeunit 6248446 "NPR IncEcomSalesDocApiEvents"
     begin
     end;
 
+    [Obsolete('Not used anymore', '2023-10-19')]
     [IntegrationEvent(false, false)]
     internal procedure OnCreateAddSalesLineDetailsJsonObjectBeforeEndObject(IncEcomSalesLine: Record "NPR Inc Ecom Sales Line"; var SalesLineDetailsJsonObject: Codeunit "NPR Json Builder");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnCreateAddSalesLineDetailsCustomFieldsJsonObject(IncEcomSalesLine: Record "NPR Inc Ecom Sales Line"; var SalesLineDetailsCustomFieldsJsonObject: Codeunit "NPR Json Builder");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnGetPaymentDocumentDetailsCustomFieldsJsonObject(IncEcomSalesPmtLine: Record "NPR Inc Ecom Sales Pmt. Line"; var PaymentDocumentDetailsCustomFieldsJsonObject: Codeunit "NPR Json Builder");
     begin
     end;
 }

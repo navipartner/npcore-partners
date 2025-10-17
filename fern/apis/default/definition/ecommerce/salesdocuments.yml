@@ -93,6 +93,9 @@ types:
       payments: list<SalesDocumentPaymentsDTO>
       comments: list<SalesDocumentCommentsDTO>
       salesDocumentLines: list<SalesDocumentLinesDTO>
+      customFields: 
+        type: optional<SalesDocumentCustomFieldsRequest>
+        docs: This section allows you to add custom fields as key-value pairs. You can handle these fields by subscribing to our extension publishers and implementing custom serialization logic.
     examples:
       - name: ExampleSalesDocumentDTO
         value:
@@ -116,7 +119,7 @@ types:
             - $SalesDocumentCommentsDTO.ExampleCommentsDTO
           salesDocumentLines: 
             - $SalesDocumentLinesDTO.ExampleSalesDocumentLinesDTO
-
+          customFields: $SalesDocumentCustomFieldsRequest.ExampleSalesDocumentCustomFieldsRequest
   SalesDocumentSellToCustomerDTO:
     properties:
       no: string
@@ -208,6 +211,9 @@ types:
         type: string
         docs: Max. length 80 symbols.
       capturedPaymentAmount: double
+      customFields: 
+        type: optional<SalesDocumentCustomFieldsRequest>
+        docs: This section allows you to add custom fields as key-value pairs. You can handle these fields by subscribing to our extension publishers and implementing custom serialization logic.
     examples:
       - name: ExamplePaymentsDTO
         value:
@@ -224,7 +230,7 @@ types:
           cardExpiryDate: ''
           cardAliasToken: ''
           capturedPaymentAmount: 0
-
+          customFields: $SalesDocumentCustomFieldsRequest.ExampleSalesDocumentCustomFieldsRequest
   SalesDocumentCommentsDTO:
     properties:
       id: salesDocumentCommentId
@@ -251,6 +257,9 @@ types:
       requestedDeliveryDate: date
       invoicedQuantity: double
       invoicedAmount: double
+      customFields: 
+        type: optional<SalesDocumentCustomFieldsRequest>
+        docs: This section allows you to add custom fields as key-value pairs. You can handle these fields by subscribing to our extension publishers and implementing custom serialization logic.
     examples:
       - name: ExampleSalesDocumentLinesDTO
         value:
@@ -268,6 +277,7 @@ types:
           requestedDeliveryDate: "2025-06-01"
           invoicedQuantity: 0
           invoicedAmount: 0
+          customFields: $SalesDocumentCustomFieldsRequest.ExampleSalesDocumentCustomFieldsRequest
 ############################################
 
   SalesDocumentSellToCustomerRequest:

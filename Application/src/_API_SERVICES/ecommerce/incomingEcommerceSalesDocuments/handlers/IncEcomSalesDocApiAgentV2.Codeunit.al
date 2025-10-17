@@ -425,6 +425,7 @@ codeunit 6248594 "NPR IncEcomSalesDocApiAgentV2"
         PaymentLineJsonObject: Codeunit "NPR Json Builder";
         SalesLineJsonObject: Codeunit "NPR Json Builder";
         CommentJsonObject: Codeunit "NPR Json Builder";
+        IncEcomSalesHeaderCustomFieldsObject: Codeunit "NPR Json Builder";
     begin
         IncSalesDocumentJsonObject.StartObject('salesDocument')
                                  .AddProperty('externalNo', IncSalesHeader."External No.")
@@ -468,7 +469,10 @@ codeunit 6248594 "NPR IncEcomSalesDocApiAgentV2"
                                     .AddProperty('shipmentMethod', IncSalesHeader."Shipment Method Code")
                                     .AddProperty('shipmentService', IncSalesHeader."Shipment Service")
                                 .EndObject();
-        IncEcomSalesDocApiEvents.OnGetSalesDocumentJsonObjectAfterSalesHeaderInformation(IncSalesHeader, IncSalesDocumentJsonObject);
+
+        IncEcomSalesDocApiEvents.OnGetSalesDocumentCustomFieldsJsonObject(IncSalesHeader, IncEcomSalesHeaderCustomFieldsObject);
+        if IncEcomSalesHeaderCustomFieldsObject.IsInitialized() then
+            IncSalesDocumentJsonObject.AddNestedObject('customFields', IncEcomSalesHeaderCustomFieldsObject);
 
         RecordLink.Reset();
         RecordLink.SetRange("Record ID", IncSalesHeader.RecordId);
@@ -508,13 +512,14 @@ codeunit 6248594 "NPR IncEcomSalesDocApiAgentV2"
             IncSalesDocumentJsonObject.EndArray();
         end;
 
-        IncEcomSalesDocApiEvents.OnGetSalesDocumentJsonObjectAfterSalesHeaderInformationBeforeEndObject(IncSalesHeader, IncSalesDocumentJsonObject);
         IncSalesDocumentJsonObject.EndObject();
     end;
 
     internal procedure CreateAddPaymentDocumentDetailsJsonObject(IncEcomSalesPmtLine: Record "NPR Inc Ecom Sales Pmt. Line"; var PaymentDocumentDetailsJsonObject: Codeunit "NPR Json Builder"): Codeunit "NPR Json Builder"
     var
         IncEcomSalesLine: Record "NPR Inc Ecom Sales Line";
+        IncEcomSalesDocApiEvents: Codeunit "NPR IncEcomSalesDocApiEvents";
+        PaymentDocumentDetailsCustomFieldsJsonObject: Codeunit "NPR Json Builder";
     begin
         PaymentDocumentDetailsJsonObject.StartObject()
                                         .AddProperty('id', Format(IncEcomSalesPmtLine.SystemId, 0, 4).ToLower())
@@ -543,6 +548,9 @@ codeunit 6248594 "NPR IncEcomSalesDocApiAgentV2"
             PaymentDocumentDetailsJsonObject.EndArray();
         end;
 
+        IncEcomSalesDocApiEvents.OnGetPaymentDocumentDetailsCustomFieldsJsonObject(IncEcomSalesPmtLine, PaymentDocumentDetailsCustomFieldsJsonObject);
+        if PaymentDocumentDetailsCustomFieldsJsonObject.IsInitialized() then
+            PaymentDocumentDetailsJsonObject.AddNestedObject('customFields', PaymentDocumentDetailsCustomFieldsJsonObject);
         PaymentDocumentDetailsJsonObject.EndObject();
     end;
 
@@ -559,6 +567,7 @@ codeunit 6248594 "NPR IncEcomSalesDocApiAgentV2"
     internal procedure CreateAddSalesLineDetailsJsonObject(IncEcomSalesLine: Record "NPR Inc Ecom Sales Line"; var SalesLineDetailsJsonObject: Codeunit "NPR Json Builder"): Codeunit "NPR Json Builder"
     var
         IncEcomSalesDocApiEvents: Codeunit "NPR IncEcomSalesDocApiEvents";
+        SalesLineDetailsCustomFieldsJsonObject: Codeunit "NPR Json Builder";
     begin
         SalesLineDetailsJsonObject.StartObject()
                                   .AddProperty('id', Format(IncEcomSalesLine.SystemId, 0, 4).ToLower())
@@ -575,7 +584,9 @@ codeunit 6248594 "NPR IncEcomSalesDocApiAgentV2"
                                   .AddProperty('requestedDeliveryDate', Format(IncEcomSalesLine."Requested Delivery Date", 0, 9))
                                   .AddProperty('invoicedQuantity', Format(IncEcomSalesLine."Invoiced Qty.", 0, 9))
                                   .AddProperty('invoicedAmount', Format(IncEcomSalesLine."Invoiced Amount", 0, 9));
-        IncEcomSalesDocApiEvents.OnCreateAddSalesLineDetailsJsonObjectBeforeEndObject(IncEcomSalesLine, SalesLineDetailsJsonObject);
+        IncEcomSalesDocApiEvents.OnCreateAddSalesLineDetailsCustomFieldsJsonObject(IncEcomSalesLine, SalesLineDetailsCustomFieldsJsonObject);
+        if SalesLineDetailsCustomFieldsJsonObject.IsInitialized() then
+            SalesLineDetailsJsonObject.AddNestedObject('customFields', SalesLineDetailsCustomFieldsJsonObject);
         SalesLineDetailsJsonObject.EndObject();
     end;
 

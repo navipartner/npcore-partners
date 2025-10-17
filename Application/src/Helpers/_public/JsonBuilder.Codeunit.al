@@ -110,6 +110,50 @@ codeunit 6184982 "NPR Json Builder"
     end;
 
     /// <summary>
+    /// Add a pre-built JSON object from another JsonBuilder as a nested property.
+    /// This allows complex JSON structures to be built in separate functions and then combined.
+    /// </summary>
+    /// <param name="PropertyName">Name of the key/property under which the JSON object will be nested. Must not be empty.</param>
+    /// <param name="JsonBuilder">JsonBuilder instance containing the object to add. The builder will be finalized by calling Build().</param>
+    /// <example>
+    /// // Build address object separately
+    /// addressBuilder.Initialize()
+    ///     .StartObject()
+    ///     .AddProperty('street', '123 Main St')
+    ///     .AddProperty('city', 'New York')
+    ///     .AddProperty('zipCode', '10001')
+    ///     .EndObject();
+    /// 
+    /// // Add it to main customer object
+    /// customerBuilder.Initialize()
+    ///     .StartObject()
+    ///     .AddProperty('name', 'John Doe')
+    ///     .AddObject('address', addressBuilder)  // Nest the address object
+    ///     .EndObject();
+    /// 
+    /// // Result: { "name": "John Doe", "address": { "street": "123 Main St", "city": "New York", "zipCode": "10001" } }
+    /// </example>
+    /// <remarks>
+    /// This method is different from the single-parameter AddObject(JsonBuilder) which is a bypass method for fluent chaining.
+    /// The PropertyName parameter is required and will throw an error if empty.
+    /// </remarks>
+    /// <returns>Json Builder Codeunit itself for method chaining.</returns>
+    procedure AddNestedObject(PropertyName: Text; JsonBuilder: Codeunit "NPR Json Builder"): Codeunit "NPR Json Builder"
+    var
+        SourceObject: JsonObject;
+    begin
+        if PropertyName = '' then
+            Error(MissingPropertyNameErr);
+
+        InitcurrCodeunit();
+
+        SourceObject := JsonBuilder.Build();
+        AddTokenToParent(PropertyName, SourceObject.AsToken());
+
+        exit(currCodeunit);
+    end;
+
+    /// <summary>
     /// Create an empty JSON array. 
     /// </summary>
     /// <example>StartArray().EndArray(); => [ ] </example>
@@ -361,6 +405,20 @@ codeunit 6184982 "NPR Json Builder"
     begin
         JObject := Build();
         JObject.WriteTo(JsonText);
+    end;
+    /// <summary>
+    /// Check if the builder has been initialized and has a root token set.
+    /// Use this method to verify if any JSON structure has been started in the builder.
+    /// </summary>
+    /// <example>
+    /// builder.Initialize().StartObject().AddProperty('name', 'John').EndObject();
+    /// if builder.IsInitialized() then
+    ///     jsonText := builder.BuildAsText();
+    /// </example>
+    /// <returns>True if the builder has been initialized with a root token, false otherwise.</returns>
+    procedure IsInitialized(): Boolean
+    begin
+        exit(IsRootSet);
     end;
 
     local procedure AddTokenToParent(PropertyName: Text; NewToken: JsonToken)
