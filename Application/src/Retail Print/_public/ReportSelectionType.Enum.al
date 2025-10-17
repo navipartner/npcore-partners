@@ -1,8 +1,8 @@
 enum 6014493 "NPR Report Selection Type"
 {
-    Extensible = false;
+    Extensible = true;
 #if not BC17
-    Access = Internal;
+    Access = Public;
 #endif
 
     value(0; "Sales Receipt")
@@ -166,5 +166,5 @@ enum 6014493 "NPR Report Selection Type"
     value(40; "Bin Transfer")
     {
         Caption = 'Bin Transfer';
-    }    
+    }
 }
