@@ -138,7 +138,7 @@ codeunit 6151548 "NPR NO Audit Mgt."
         POSAuditLogMgt.CreateEntryExtended(SalePOS.RecordId, POSAuditLog."Action Type"::CANCEL_POS_SALE_LINE, 0, '', SalePOS."Register No.", AuditLogDescriptionTxt, Format(POSSaleLineRecord."Amount Including VAT", 0, 9));
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action - Discount B", 'OnBeforeSetDiscount', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Discount Events", 'OnBeforeSetDiscount', '', false, false)]
     local procedure NPRPOSActionDiscountB_OnBeforeSetDiscount(DiscountType: Option; var SalePOS: Record "NPR POS Sale"; var SaleLinePOS: Record "NPR POS Sale Line"; DiscountAmount: Decimal)
     var
         POSAuditLog: Record "NPR POS Audit Log";
