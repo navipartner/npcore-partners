@@ -215,7 +215,7 @@
         Member: Record "NPR MM Member";
     begin
 
-
+        TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         if (not TicketReservationRequest.FindSet()) then
             exit(RequireParticipantInformation::NOT_REQUIRED);
@@ -1184,6 +1184,7 @@
         if (MemberNumber = '') then
             exit(false);
 
+        Member.SetCurrentKey("External Member No.");
         Member.SetFilter("External Member No.", '=%1', MemberNumber);
         Member.SetFilter(Blocked, '=%1', false);
         if (not Member.FindFirst()) then

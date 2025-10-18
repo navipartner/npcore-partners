@@ -2424,13 +2424,11 @@
         if (RequireParticipantInformation <> RequireParticipantInformation::NOT_REQUIRED) then
             exit(true); // notifying participant requires attention
 
-        TicketReservationRequest.Reset();
         TicketReservationRequest.SetCurrentKey("Session Token ID");
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         TicketReservationRequest.SetFilter("Admission Inclusion", '=%1', TicketReservationRequest."Admission Inclusion"::REQUIRED);
         TicketReservationRequest.SetFilter("Admission Created", '=%1', false);
         exit(not TicketReservationRequest.IsEmpty());
-
     end;
 
     internal procedure GetTokenFromReceipt(ReceiptNo: Code[20]; LineNumber: Integer; var Token: Text[100]): Boolean
