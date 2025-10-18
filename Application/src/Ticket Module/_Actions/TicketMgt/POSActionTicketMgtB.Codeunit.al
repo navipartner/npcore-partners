@@ -52,15 +52,14 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
         TicketRequestManager: Codeunit "NPR TM Ticket Request Manager";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         SaleLinePOS: Record "NPR POS Sale Line";
+        OriginalSaleLine: Record "NPR POS Entry Sales Line";
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         Ticket: Record "NPR TM Ticket";
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketAccessEntryNo: Integer;
         Token: Text[100];
-        UnitPrice: Decimal;
+        UnitPriceToRevoke: Decimal;
         RevokeQuantity: Integer;
-        PosEntry: Record "NPR POS Entry";
-        PosEntrySalesLine: Record "NPR POS Entry Sales Line";
         ResponseMessage: Text;
         ResponseCode: Integer;
         RequestMutex: Record "NPR TM TicketRequestMutex";
@@ -100,50 +99,51 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
         POSSession.GetSaleLine(POSSaleLine);
         POSSaleLine.InsertLine(SaleLinePOS);
 
-        // All fields are not transferred by InsertLine
-        SaleLinePOS."Return Sale Sales Ticket No." := Ticket."Sales Receipt No.";
-        SaleLinePOS.Modify();
-
-        POSSaleLine.RefreshCurrent();
-        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
-
         // Default to actual sales price
-        UnitPrice := SaleLinePOS."Unit Price";
+        UnitPriceToRevoke := SaleLinePOS."Unit Price";
         if (SaleLinePOS."Price Includes VAT") then
             if (Ticket.AmountInclVat <> 0) then
-                UnitPrice := Ticket.AmountInclVat;
+                UnitPriceToRevoke := Ticket.AmountInclVat;
 
         if (not SaleLinePOS."Price Includes VAT") then
             if (Ticket.AmountExclVat <> 0) then
-                UnitPrice := Ticket.AmountExclVat;
+                UnitPriceToRevoke := Ticket.AmountExclVat;
 
-        if (TicketReservationRequest."Receipt No." <> '') then begin
-            PosEntry.SetFilter("Document No.", TicketReservationRequest."Receipt No.");
-            if (PosEntry.FindFirst()) then begin
-                PosEntrySalesLine.SetFilter("POS Entry No.", '=%1', PosEntry."Entry No.");
-                PosEntrySalesLine.SetFilter("Line No.", '=%1', TicketReservationRequest."Line No.");
-                if (PosEntrySalesLine.FindFirst()) then begin
-                    if (SaleLinePOS."Price Includes VAT") then
-                        UnitPrice := PosEntrySalesLine."Amount Incl. VAT" / PosEntrySalesLine.Quantity;
-                    if (not SaleLinePOS."Price Includes VAT") then
-                        UnitPrice := PosEntrySalesLine."Amount Excl. VAT" / PosEntrySalesLine.Quantity;
-                end;
-            end;
+
+        // All fields are not transferred by InsertLine
+        SaleLinePOS."Return Sale Sales Ticket No." := Ticket."Sales Receipt No.";
+
+        OriginalSaleLine.SetCurrentKey("Document No.", "Line No.");
+        OriginalSaleLine.SetLoadFields("Document No.", "Line No.", "No.", SystemId, "Amount Incl. VAT", "Amount Excl. VAT", Quantity);
+        OriginalSaleLine.SetFilter("Document No.", '=%1', Ticket."Sales Receipt No.");
+        OriginalSaleLine.SetFilter("Line No.", '=%1', Ticket."Line No.");
+        OriginalSaleLine.SetFilter("No.", '=%1', Ticket."Item No.");
+        if (OriginalSaleLine.FindFirst()) then begin
+            SaleLinePOS."Orig.POS Entry S.Line SystemId" := OriginalSaleLine.SystemId; // When revoking a ticket, we need to link back to the original POS entry sales line system id
+
+            if (SaleLinePOS."Price Includes VAT") then
+                UnitPriceToRevoke := OriginalSaleLine."Amount Incl. VAT" / OriginalSaleLine.Quantity;
+            if (not SaleLinePOS."Price Includes VAT") then
+                UnitPriceToRevoke := OriginalSaleLine."Amount Excl. VAT" / OriginalSaleLine.Quantity;
         end;
+
+        SaleLinePOS.Modify();
+        POSSaleLine.RefreshCurrent();
+        POSSaleLine.GetCurrentSaleLine(SaleLinePOS);
 
         // When intent is to automatically rebook, use the list price of the ticket. 
         // This will carry the value of original discount forward to new ticket (if any).
         if (UseTicketListPrice) then begin
             if (SaleLinePOS."Price Includes VAT") then
                 if (Ticket.ListPriceInclVat <> 0) then
-                    UnitPrice := Ticket.ListPriceInclVat;
+                    UnitPriceToRevoke := Ticket.ListPriceInclVat;
 
             if (not SaleLinePOS."Price Includes VAT") then
                 if (Ticket.ListPriceExclVat <> 0) then
-                    UnitPrice := Ticket.ListPriceExclVat;
+                    UnitPriceToRevoke := Ticket.ListPriceExclVat;
         end;
 
-        ResponseCode := TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", UnitPrice, RevokeQuantity, ResponseMessage);
+        ResponseCode := TicketRequestManager.POS_CreateRevokeRequest(Token, Ticket."No.", SaleLinePOS."Sales Ticket No.", SaleLinePOS."Line No.", UnitPriceToRevoke, RevokeQuantity, ResponseMessage);
         RequestMutex.Release(Ticket."No.");
 
         if (ResponseCode <= 0) then begin
@@ -154,7 +154,7 @@ codeunit 6151431 "NPR POS Action - Ticket Mgt B."
         end;
 
         POSSaleLine.SetQuantity(-1 * Abs(RevokeQuantity));
-        POSSaleLine.SetUnitPrice(UnitPrice);
+        POSSaleLine.SetUnitPrice(UnitPriceToRevoke);
         AddAdditionalExperienceRevokeLines(POSSession, Ticket, SaleLinePOS."Sales Ticket No.");
 
         exit(SaleLinePOS.SystemId);
