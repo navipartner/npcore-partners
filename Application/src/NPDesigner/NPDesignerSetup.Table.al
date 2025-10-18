@@ -35,6 +35,19 @@ table 6151022 "NPR NPDesignerSetup"
             DataClassification = CustomerContent;
             Caption = 'Public Order URL';
         }
+
+        field(50; EnableManifest; Boolean)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Enable Manifest';
+            InitValue = false;
+        }
+        field(55; AssetsUrl; Text[100])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Assets URL';
+            InitValue = 'https://assets.npretail.com/';
+        }
     }
 
     keys

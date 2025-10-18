@@ -2986,6 +2986,7 @@
         SeatingReservationEntry: Record "NPR TM Seating Reserv. Entry";
         SeatingTemplate: Record "NPR TM Seating Template";
         NPDesignerSetup: Record "NPR NPDesignerSetup";
+        NpDesignerImpl: Codeunit "NPR NPDesigner";
     begin
 
         TicketNotificationEntry.Init();
@@ -3091,9 +3092,18 @@
             TicketNotificationEntry.NPDesignerTemplateId := TicketAdmissionBOM.NPDesignerTemplateId;
             if (TicketNotificationEntry.NPDesignerTemplateId <> '') then begin
                 // https://tickets.npretail.app?reservation=%1&design=%2
-                if (NPDesignerSetup.Get('')) then
-                    if (NPDesignerSetup.PublicOrderURL <> '') then
+                if (NPDesignerSetup.Get('')) then begin
+                    if (NPDesignerSetup.EnableManifest) then begin
+                        if (IsNullGuid(TicketNotificationEntry.NPDesignerManifestId)) then begin
+                            TicketNotificationEntry.NPDesignerManifestId := NpDesignerImpl.CreateManifest();
+                            NPDesignerImpl.AddAssetToManifest(TicketNotificationEntry.NPDesignerManifestId, Database::"NPR TM Ticket Reservation Req.", TicketReservationRequest.SystemId, TicketReservationRequest."Session Token ID", TicketNotificationEntry.NPDesignerTemplateId);
+                        end;
+                        NPDesignerImpl.GetManifestUrl(TicketNotificationEntry.NPDesignerManifestId, TicketNotificationEntry."Published Ticket URL");
+                    end;
+
+                    if (not NPDesignerSetup.EnableManifest and (NPDesignerSetup.PublicOrderURL <> '')) then
                         TicketNotificationEntry."Published Ticket URL" := StrSubstNo(NPDesignerSetup.PublicOrderURL, TicketReservationRequest."Session Token ID", TicketNotificationEntry.NPDesignerTemplateId);
+                end;
             end;
 
             // Ticket Level data

@@ -1,0 +1,15 @@
+---
+title: "Introduction to the NP Designer API"
+---
+
+## General
+This set of endpoints is used by NP Designer to build content intended to be shipped to the customer. A manifest contains all assets bundled and is made accessible to the rendering tool as a batch.
+
+## WebHooks
+The following webhooks can be subscribed to; each is emitted when the described event occurs:
+
+- **designer_manifest_created** — Emitted when a new manifest is created.
+- **designer_manifest_content_added** — Emitted when one or more assets are added to an existing manifest.
+- **designer_manifest_content_removed** — Emitted when one or more assets are removed from a manifest.
+- **designer_manifest_content_changed** — Emitted when multiple assets are added to or removed from a manifest in a single batch. This consolidated event reduces webhook spam.
+- **designer_manifest_deleted** — Emitted when a manifest is deleted.

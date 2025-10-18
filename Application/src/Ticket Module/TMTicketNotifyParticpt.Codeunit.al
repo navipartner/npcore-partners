@@ -626,6 +626,7 @@
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
         UrlLbl: Label '%1%2', Locked = true;
         NPDesignerSetup: Record "NPR NPDesignerSetup";
+        Manifest: Codeunit "NPR NPDesignerManifestFacade";
     begin
 
         if (not TicketSetup.Get()) then
@@ -692,9 +693,16 @@
         if (NotificationEntry.NPDesignerTemplateId <> '') then begin
             NotificationEntry."Notification Trigger" := NotificationEntry."Notification Trigger"::NP_DESIGNER;
             if (NPDesignerSetup.Get('')) then
-                if (NPDesignerSetup.PublicOrderURL <> '') then
-                    // https://tickets.npretail.app?reservation=%1&design=%2
-                    NotificationEntry."Published Ticket URL" := StrSubstNo(NPDesignerSetup.PublicOrderURL, TicketReservationRequest."Session Token ID", NotificationEntry.NPDesignerTemplateId);
+                if (NPDesignerSetup.EnableManifest) then begin
+                    if (IsNullGuid(NotificationEntry.NPDesignerManifestId)) then begin
+                        NotificationEntry.NPDesignerManifestId := Manifest.CreateManifest();
+                        Manifest.AddAssetToManifest(NotificationEntry.NPDesignerManifestId, Database::"NPR TM Ticket Reservation Req.", TicketReservationRequest.SystemId, TicketReservationRequest."Session Token ID", NotificationEntry.NPDesignerTemplateId);
+                    end;
+                    Manifest.GetManifestUrl(NotificationEntry.NPDesignerManifestId, NotificationEntry."Published Ticket URL");
+                end;
+
+            if ((not NPDesignerSetup.EnableManifest) and (NPDesignerSetup.PublicOrderURL <> '')) then
+                NotificationEntry."Published Ticket URL" := StrSubstNo(NPDesignerSetup.PublicOrderURL, TicketReservationRequest."Session Token ID", NotificationEntry.NPDesignerTemplateId);
         end;
 
         NotificationEntry."Adm. Location Description" := Admission.Description;
@@ -956,6 +964,7 @@
         TicketBom: Record "NPR TM Ticket Admission BOM";
         Item: Record Item;
         NpDesignerSetup: Record "NPR NPDesignerSetup";
+        Manifest: Codeunit "NPR NPDesignerManifestFacade";
     begin
 #pragma warning disable AA0217
         Ticket.Get(DetTicketAccessEntry."Ticket No.");
@@ -1054,10 +1063,18 @@
         NotificationEntry."Relevant Datetime" := CreateDateTime(NotificationEntry."Relevant Date", NotificationEntry."Relevant Time");
 
         NotificationEntry.NPDesignerTemplateId := TicketBom.NPDesignerTemplateId;
-        if (NotificationEntry.NPDesignerTemplateId <> '') then
-            if (NpDesignerSetup.PublicTicketURL <> '') then
-                // https://tickets.npretail.app?reservation=%1&design=%2
+        if (NotificationEntry.NPDesignerTemplateId <> '') then begin
+            if (NPDesignerSetup.EnableManifest) then begin
+                if (IsNullGuid(NotificationEntry.NPDesignerManifestId)) then begin
+                    NotificationEntry.NPDesignerManifestId := Manifest.CreateManifest();
+                    Manifest.AddAssetToManifest(NotificationEntry.NPDesignerManifestId, Database::"NPR TM Ticket", Ticket.SystemId, Ticket."External Ticket No.", NotificationEntry.NPDesignerTemplateId);
+                end;
+                Manifest.GetManifestUrl(NotificationEntry.NPDesignerManifestId, NotificationEntry."Published Ticket URL");
+            end;
+
+            if (not NPDesignerSetup.EnableManifest and (NpDesignerSetup.PublicTicketURL <> '')) then
                 NotificationEntry."Published Ticket URL" := StrSubstNo(NpDesignerSetup.PublicTicketURL, Format(Ticket.SystemId, 0, 4).ToLower(), NotificationEntry.NPDesignerTemplateId);
+        end;
 
         NotificationEntry."Notification Method" := NotificationEntry."Notification Method"::NA;
         if (NotificationEntry."Notification Address" <> '') then begin

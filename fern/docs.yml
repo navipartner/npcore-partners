@@ -364,6 +364,23 @@ navigation:
               title: General Ledger Journal
               summary: ./docs/pages/finance/gljournal.mdx          
 
+        - section: NP Designer
+          #hidden: true
+          summary: ./docs/pages/np-designer/overview.mdx
+          contents:
+          - np-designer.service-np-designer:
+              title: Manifests
+              contents:
+                - endpoint: np-designer.service-np-designer.getManifest
+          - np-designer.service-np-designer:
+              title: Webhooks
+              contents:
+                - endpoint: designer_manifest_created
+                - endpoint: designer_manifest_deleted
+                - endpoint: designer_manifest_content_added
+                - endpoint: designer_manifest_content_removed
+                - endpoint: designer_manifest_content_changed
+
 navbar-links:
   - type: secondary
     text: Support

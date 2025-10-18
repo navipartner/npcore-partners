@@ -1,0 +1,374 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+  commonApiTypes: ./../common-api-types.yml
+
+service:
+  display-name: NPDesigner Manifests
+  auth: true
+  base-path: /npdesigner
+  
+  endpoints:
+
+    getManifest:
+      display-name: Get Manifest
+      docs: 
+        Retrieve a manifest by its ID.
+      method: GET
+      path: /manifest/{manifestId}
+      request:
+        name: getManifestRequest
+        path-parameters:
+          manifestId: uuid
+      response: GetManifestResponse
+      examples:
+        - name: Get Manifest
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            manifestId: ddcfea9f-385e-4d83-8b50-42256885b03a
+          response:
+            body:
+              $GetManifestResponse.Example
+
+webhooks:
+  
+  designer_manifest_created:
+    docs:
+      Notifies that Business Central (BC) has created or made a new and empty manifest available.
+      These webhooks communicate manifest lifecycle events produced by BC to external consumers. 
+    method: POST
+    payload: DesignerManifestCreatedEvent
+    examples:
+      - payload: $DesignerManifestCreatedEvent.Example
+
+  designer_manifest_content_added:
+    display-name: Manifest Content Added
+    docs:
+      Notifies that BC has added one asset to an existing manifest.
+      Use this event to inform external consumers that manifest content changed.
+    method: POST
+    payload: DesignerManifestContentAddEvent
+    examples:
+      - payload: $DesignerManifestContentAddEvent.Example
+
+  designer_manifest_content_removed:
+    display-name: Manifest Content Removed
+    docs:
+      Notifies that BC has removed one asset from an existing manifest.
+      This event is intended to inform external consumers that the manifest content has changed.
+    method: POST
+    payload: DesignerManifestContentRemoveEvent
+    examples:
+      - payload: $DesignerManifestContentRemoveEvent.Example
+
+  designer_manifest_content_changed:
+    display-name: Manifest Content Changed
+    docs:
+      Notifies that BC has updated content (added or removed a set of assets) within an existing manifest.
+      Use this event to keep external consumers in sync with the latest manifest state.
+    method: POST
+    payload: DesignerManifestContentChangeEvent
+    examples:
+      - payload: $DesignerManifestContentChangeEvent.Example
+
+  designer_manifest_deleted:
+    display-name: Manifest Deleted
+    docs:
+      Notifies that BC has deleted a manifest and that it is no longer available.
+      This webhook signals the manifest removal to external consumers.
+    method: POST
+    payload: DesignerManifestDeletedEvent
+    examples:
+      - payload: $DesignerManifestDeletedEvent.Example
+
+
+# TYPES
+types:
+  ManifestId:
+    type: uuid
+    docs: The unique identifier of the manifest.
+    examples:
+      - name: Example
+        value: ddcfea9f-385e-4d83-8b50-42256885b03a
+      
+  Id:
+    type: uuid
+    docs: The unique identifier of the asset line in Business Central.
+    examples:
+      - name: Example
+        value: 5ecfea9f-385e-4d83-8b50-42256885b03a
+
+  AssetTableNumber:
+    type: integer
+    docs: The table number of the asset in Business Central.
+    examples:
+      - name: Example
+        value: 6059785
+
+  AssetId:
+    type: uuid
+    docs: The unique identifier of the asset.
+    examples:
+      - name: Example
+        value: e2cfea9f-385e-4d83-8b50-42256885b03a
+
+  AssetPublicId:
+    type: optional<string>
+    docs: An optional external identifier for the asset.
+    examples:
+      - name: Example
+        value: TICKET-1001
+
+  RenderWithTemplateId:
+    type: optional<string>
+    docs: The template ID used for rendering the asset.
+    examples:
+      - name: Example
+        value: ddcfea9f385e4d838b5042256885b03a
+        
+  RenderGroup:
+    type: optional<integer>
+    docs: A simple grouping mechanism for assets.
+    examples:
+      - name: Example
+        value: 1
+
+  RenderGroupOrder:
+    type: optional<integer>
+    docs: The order of the asset within its group.
+    examples:
+      - name: Example
+        value: 1
+
+# RESPONSES
+  Assets:
+    properties:
+      id: Id
+      assetTableNumber: AssetTableNumber
+      assetId: AssetId
+      assetPublicId: AssetPublicId
+      renderWithTemplateId: RenderWithTemplateId
+      renderGroup: RenderGroup
+      renderGroupOrder: RenderGroupOrder
+
+  GetManifestResponse:
+    properties:
+      manifestId: ManifestId
+      assets: list<Assets>
+    examples:
+      - name: Example
+        value:
+          manifestId: $ManifestId.Example
+          assets:
+            - id: $Id.Example
+              assetTableNumber: $AssetTableNumber.Example
+              assetId: $AssetId.Example
+              assetPublicId: $AssetPublicId.Example
+              renderWithTemplateId: $RenderWithTemplateId.Example
+              renderGroup: $RenderGroup.Example
+              renderGroupOrder: $RenderGroupOrder.Example
+
+# WEBHOOKS
+  # designer_manifest_created
+  DesignerManifestCreatedEvent:
+    properties:
+      values: 
+        type: list<DesignerManifestCreateObject>
+        docs: An array of webhooks, be prepared to handle more than 1 in the same hook request.
+    examples:
+      - name: Example
+        value:
+          values:
+            - $DesignerManifestCreateObject.Example
+
+  DesignerManifestCreatePayload:
+    properties:
+      manifestId: ManifestId
+    examples:
+      - name: Example
+        value:
+          manifestId: $ManifestId.Example
+
+  DesignerManifestCreateObject:
+    extends: commonApiTypes.WebhookEvent
+    properties:
+      payload: DesignerManifestCreatePayload
+    examples:
+      - name: Example
+        value:
+          initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
+          timestamp: "2024-06-28T12:00:00Z"
+          companyName: $globalApiTypes.Company.ExampleCompanyCronusFull
+          companyId: "b56a418d-8205-4d3a-bdbb-25d94e42abbd"
+          appId: "992c2309-cca4-43cb-9e41-911f482ec088"
+          clientState: "secret_value_from_subscription_creation_mirrored" 
+          eventName: "designer_manifest_created"
+          eventVersion: "1.0"
+          payload: $DesignerManifestCreatePayload.Example
+
+  # designer_manifest_content_add
+  DesignerManifestContentAddEvent:
+    properties:
+      values:
+        type: list<DesignerManifestContentAddObject>
+        docs: An array of webhooks, be prepared to handle more than 1 in the same hook request.
+    examples:
+      - name: Example
+        value:
+          values:
+            - $DesignerManifestContentAddObject.Example
+
+  DesignerManifestContentAddPayload:
+    properties:
+      manifestId: ManifestId
+      id: Id
+      assetTableNumber: AssetTableNumber
+      assetId: AssetId
+      assetPublicId: AssetPublicId
+      renderWithTemplateId: RenderWithTemplateId
+    examples:
+      - name: Example
+        value:
+          manifestId: $ManifestId.Example
+          id: $Id.Example
+          assetTableNumber: $AssetTableNumber.Example
+          assetId: $AssetId.Example
+          assetPublicId: $AssetPublicId.Example 
+          renderWithTemplateId: $RenderWithTemplateId.Example
+
+  DesignerManifestContentAddObject:
+    extends: commonApiTypes.WebhookEvent
+    properties:
+      payload: DesignerManifestContentAddPayload
+    examples:
+      - name: Example
+        value:
+          initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
+          timestamp: "2024-06-28T12:00:00Z"
+          companyName: $globalApiTypes.Company.ExampleCompanyCronusFull
+          companyId: "b56a418d-8205-4d3a-bdbb-25d94e42abbd"
+          appId: "992c2309-cca4-43cb-9e41-911f482ec088"
+          clientState: "secret_value_from_subscription_creation_mirrored"
+          eventName: "designer_manifest_content_added"
+          eventVersion: "1.0"
+          payload: $DesignerManifestContentAddPayload.Example
+
+  # designer_manifest_content_remove
+  DesignerManifestContentRemoveEvent:
+    properties:
+      values:
+        type: list<DesignerManifestContentRemoveObject>
+        docs: An array of webhooks, be prepared to handle more than 1 in the same hook request.
+    examples:
+      - name: Example
+        value:
+          values:
+            - $DesignerManifestContentRemoveObject.Example
+
+  DesignerManifestContentRemovePayload:
+    properties:
+      manifestId: ManifestId
+      id: Id
+      assetTableNumber: AssetTableNumber
+      assetId: AssetId
+    examples:
+      - name: Example
+        value:
+          manifestId: $ManifestId.Example
+          id: $Id.Example
+          assetTableNumber: $AssetTableNumber.Example
+          assetId: $AssetId.Example
+
+  DesignerManifestContentRemoveObject:
+    extends: commonApiTypes.WebhookEvent
+    properties:
+      payload: DesignerManifestContentRemovePayload
+    examples:
+      - name: Example
+        value:
+          initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
+          timestamp: "2024-06-28T12:00:00Z"
+          companyName: $globalApiTypes.Company.ExampleCompanyCronusFull
+          companyId: "b56a418d-8205-4d3a-bdbb-25d94e42abbd"
+          appId: "992c2309-cca4-43cb-9e41-911f482ec088"
+          clientState: "secret_value_from_subscription_creation_mirrored"
+          eventName: "designer_manifest_content_removed"
+          eventVersion: "1.0"
+          payload: $DesignerManifestContentRemovePayload.Example
+
+  # designer_manifest_content_change
+  DesignerManifestContentChangeEvent:
+    properties:
+      values:
+        type: list<DesignerManifestContentChangeObject>
+        docs: An array of webhooks, be prepared to handle more than 1 in the same hook request.
+    examples:
+      - name: Example
+        value:
+          values:
+            - $DesignerManifestContentChangeObject.Example
+
+  DesignerManifestContentChangePayload:
+    properties:
+      manifestId: ManifestId
+    examples:
+      - name: Example
+        value:
+          manifestId: $ManifestId.Example
+
+  DesignerManifestContentChangeObject:
+    extends: commonApiTypes.WebhookEvent
+    properties:
+      payload: DesignerManifestContentChangePayload
+    examples:
+      - name: Example
+        value:
+          initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
+          timestamp: "2024-06-28T12:00:00Z"
+          companyName: $globalApiTypes.Company.ExampleCompanyCronusFull
+          companyId: "b56a418d-8205-4d3a-bdbb-25d94e42abbd"
+          appId: "992c2309-cca4-43cb-9e41-911f482ec088"
+          clientState: "secret_value_from_subscription_creation_mirrored"
+          eventName: "designer_manifest_content_changed"
+          eventVersion: "1.0"
+          payload: $DesignerManifestContentChangePayload.Example
+
+  # designer_manifest_deleted
+  DesignerManifestDeletedEvent:
+    properties:
+      values:
+        type: list<DesignerManifestDeleteObject>
+        docs: An array of webhooks, be prepared to handle more than 1 in the same hook request.
+    examples:
+      - name: Example
+        value:
+          values:
+            - $DesignerManifestDeleteObject.Example
+
+  DesignerManifestDeletePayload:
+    properties:
+      manifestId: ManifestId
+    examples:
+      - name: Example
+        value:
+          manifestId: $ManifestId.Example
+
+  DesignerManifestDeleteObject:
+    extends: commonApiTypes.WebhookEvent
+    properties:
+      payload: DesignerManifestDeletePayload
+    examples:
+      - name: Example
+        value:
+          initiatingUserAADObjectId: "ef546153-4168-4bd5-9365-a3161608da72"
+          timestamp: "2024-06-28T12:00:00Z"
+          companyName: $globalApiTypes.Company.ExampleCompanyCronusFull
+          companyId: "b56a418d-8205-4d3a-bdbb-25d94e42abbd"
+          appId: "992c2309-cca4-43cb-9e41-911f482ec088"
+          clientState: "secret_value_from_subscription_creation_mirrored"
+          eventName: "designer_manifest_deleted"
+          eventVersion: "1.0"
+          payload: $DesignerManifestDeletePayload.Example

@@ -7,7 +7,6 @@
         <DataProvider>SQL</DataProvider>
         <ConnectString />
       </ConnectionProperties>
-      <rd:SecurityType>None</rd:SecurityType>
       <rd:DataSourceID>6f7e4d0d-3b27-498d-9125-5d9876c6ba09</rd:DataSourceID>
     </DataSource>
   </DataSources>
@@ -19,22 +18,22 @@
             <TablixBody>
               <TablixColumns>
                 <TablixColumn>
-                  <Width>1.67708in</Width>
+                  <Width>1.69965in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>2.57292in</Width>
+                  <Width>2.59549in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>1.02257in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1in</Width>
+                  <Width>1.02257in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>0.47384in</Width>
+                  <Width>0.49641in</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>0.75508in</Width>
+                  <Width>18.03808in</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -195,7 +194,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value />
+                                  <Value>Url</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -500,21 +499,22 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox12">
-                          <CanGrow>true</CanGrow>
+                        <Textbox Name="OrderUrl">
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value />
-                                  <Style />
+                                  <Value>=Fields!OrderUrl.Value</Value>
+                                  <Style>
+                                    <FontSize>8pt</FontSize>
+                                  </Style>
                                 </TextRun>
                               </TextRuns>
                               <Style />
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox12</rd:DefaultName>
+                          <rd:DefaultName>OrderUrl</rd:DefaultName>
                           <Style>
                             <Border>
                               <Color>LightGrey</Color>
@@ -1965,7 +1965,6 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="TicketURL">
-                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -2253,7 +2252,7 @@
             </TablixRowHierarchy>
             <DataSetName>DataSet_Result</DataSetName>
             <Height>3in</Height>
-            <Width>7.47892in</Width>
+            <Width>24.87477in</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -2264,7 +2263,7 @@
         <Height>7.62cm</Height>
         <Style />
       </Body>
-      <Width>18.99647cm</Width>
+      <Width>63.18191cm</Width>
       <Page>
         <PageHeight>29.7cm</PageHeight>
         <PageWidth>21cm</PageWidth>
@@ -2474,6 +2473,9 @@ End Function
         </Field>
         <Field Name="Token">
           <DataField>Token</DataField>
+        </Field>
+        <Field Name="OrderUrl">
+          <DataField>OrderUrl</DataField>
         </Field>
         <Field Name="ItemNo">
           <DataField>ItemNo</DataField>

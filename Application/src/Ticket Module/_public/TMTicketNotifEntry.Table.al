@@ -307,7 +307,7 @@
             Caption = 'Wallet Pass Combine URL';
             DataClassification = CustomerContent;
         }
-        field(430; "Published Ticket URL"; Text[200])
+        field(430; "Published Ticket URL"; Text[250])
         {
             Caption = 'Published Ticket URL';
             DataClassification = CustomerContent;
@@ -315,6 +315,11 @@
         field(450; NPDesignerTemplateId; Text[40])
         {
             Caption = 'NPDesigner Template Id';
+            DataClassification = CustomerContent;
+        }
+        field(451; NPDesignerManifestId; Guid)
+        {
+            Caption = 'NPDesigner Manifest Id';
             DataClassification = CustomerContent;
         }
     }

@@ -450,6 +450,7 @@
         Token: Text[100];
         ResponseMessage: Text;
         ImportReferenceNo: Integer;
+        NpDesignerSetup: Record "NPR NpDesignerSetup";
     begin
 
         Token := TicketRequestManager.GetNewToken();
@@ -465,7 +466,10 @@
         end;
 
         if (ExportToTicketServer(PaymentType)) then begin
-            if (DIYTicketPrint.ValidateSetup()) then begin
+            if (not NpDesignerSetup.Get()) then
+                NpDesignerSetup.Init();
+
+            if (DIYTicketPrint.ValidateSetup() and (not NpDesignerSetup.EnableManifest)) then begin
                 TicketReservationRequest.Reset();
                 TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
                 TicketReservationRequest.SetFilter("Admission Created", '=%1', true);

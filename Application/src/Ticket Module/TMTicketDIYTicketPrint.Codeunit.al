@@ -158,14 +158,37 @@
         FailReason: Text;
         TicketOrderLbl: Label '%1%2', Locked = true;
         NpDesigner: Record "NPR NPDesignerSetup";
+        NpDesignerImpl: Codeunit "NPR NPDesigner";
         TicketBom: Record "NPR TM Ticket Admission BOM";
         OnlineTicketNotAvailableErr: Label 'Online ticket not available';
+        Url: Text[250];
     begin
 
         TicketReservationRequest.Get(RequestEntryNo);
         TicketSetup.Get();
 
         if (NpDesigner.Get()) then begin
+
+            if (NpDesigner.EnableManifest) then begin
+                if (not NpDesignerImpl.GetManifestUrlForAsset(Database::"NPR TM Ticket Reservation Req.", TicketReservationRequest.SystemId, Url)) then begin
+                    // Create a new manifest and add ticket order
+                    TicketBom.SetFilter("Item No.", '=%1', TicketReservationRequest."Item No.");
+                    TicketBom.SetFilter(Default, '=%1', true);
+                    TicketBom.SetFilter(NPDesignerTemplateId, '<>%1', '');
+                    if (not TicketBom.FindFirst()) then
+                        Error(OnlineTicketNotAvailableErr);
+
+                    if (not NpDesignerImpl.AddAssetToManifest(NpDesignerImpl.CreateManifest(), Database::"NPR TM Ticket Reservation Req.", TicketReservationRequest.SystemId, TicketReservationRequest."Session Token ID", TicketBom.NPDesignerTemplateId)) then
+                        Error(OnlineTicketNotAvailableErr);
+
+                    NpDesignerImpl.GetManifestUrlForAsset(Database::"NPR TM Ticket Reservation Req.", TicketReservationRequest.SystemId, Url);
+                end;
+                if (Url <> '') then
+                    Hyperlink(Url);
+                exit;
+            end;
+
+
             if (NpDesigner.PublicOrderURL <> '') then begin
                 TicketBom.SetFilter("Item No.", '=%1', TicketReservationRequest."Item No.");
                 TicketBom.SetFilter(Default, '=%1', true);
@@ -195,10 +218,12 @@
         TicketReservationRequest: Record "NPR TM Ticket Reservation Req.";
         TicketBom: Record "NPR TM Ticket Admission BOM";
         NpDesigner: Record "NPR NPDesignerSetup";
+        Manifest: Codeunit "NPR NPDesignerManifestFacade";
         FailReason: Text;
         HyperLinkLbl: Label '%1%2', Locked = true;
         HyperLink2Lbl: Label '%1%2-%3', Locked = true;
         OnlineTicketNotAvailableErr: Label 'Online ticket not available';
+        Url: Text[250];
     begin
 
         TicketSetup.Get();
@@ -206,6 +231,25 @@
         TicketReservationRequest.GET(Ticket."Ticket Reservation Entry No.");
 
         if (NpDesigner.Get()) then begin
+            if (NpDesigner.EnableManifest) then begin
+                if (not Manifest.GetManifestUrlForAsset(Database::"NPR TM Ticket", Ticket.SystemId, Url)) then begin
+                    // Create a new manifest and add ticket
+                    TicketBom.SetFilter("Item No.", '=%1', Ticket."Item No.");
+                    TicketBom.SetFilter(Default, '=%1', true);
+                    TicketBom.SetFilter(NPDesignerTemplateId, '<>%1', '');
+                    if (not TicketBom.FindFirst()) then
+                        Error(OnlineTicketNotAvailableErr);
+
+                    if (not Manifest.AddAssetToManifest(Manifest.CreateManifest(), Database::"NPR TM Ticket", Ticket.SystemId, Ticket."External Ticket No.", TicketBom.NPDesignerTemplateId)) then
+                        Error(OnlineTicketNotAvailableErr);
+
+                    Manifest.GetManifestUrlForAsset(Database::"NPR TM Ticket", Ticket.SystemId, Url);
+                end;
+                if (Url <> '') then
+                    Hyperlink(Url);
+                exit;
+            end;
+
             if (NpDesigner.PublicTicketURL <> '') then begin
                 TicketBom.SetFilter("Item No.", '=%1', Ticket."Item No.");
                 TicketBom.SetFilter(Default, '=%1', true);
