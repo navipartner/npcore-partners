@@ -267,6 +267,42 @@ codeunit 6184982 "NPR Json Builder"
         exit(AddPropertyInternal(PropertyName, JsonValue));
     end;
 
+    /// <summary>
+    /// Adds multiple properties to the current JSON object from a dictionary of [Text, Text].
+    /// </summary>
+    /// <param name="Dictionary">A dictionary containing the key-value pairs to be added as properties.</param>
+    /// <returns>Json Builder Codeunit itself.</returns>
+    internal procedure AddProperties(Dictionary: Dictionary of [Text, Text]): Codeunit "NPR Json Builder"
+    var
+        DictKey: Text;
+        DictValue: Text;
+    begin
+        InitcurrCodeunit();
+        foreach DictKey in Dictionary.Keys() do begin
+            DictValue := Dictionary.Get(DictKey);
+            AddProperty(DictKey, DictValue);
+        end;
+        exit(currCodeunit);
+    end;
+
+    /// <summary>
+    /// Adds multiple properties to the current JSON object from a dictionary of [Text, JsonValue].
+    /// </summary>
+    /// <param name="Dictionary">A dictionary containing the key-value pairs to be added as properties.</param>
+    /// <returns>Json Builder Codeunit itself.</returns>
+    internal procedure AddProperties(Dictionary: Dictionary of [Text, JsonValue]): Codeunit "NPR Json Builder"
+    var
+        DictKey: Text;
+        DictValue: JsonValue;
+    begin
+        InitcurrCodeunit();
+        foreach DictKey in Dictionary.Keys() do begin
+            DictValue := Dictionary.Get(DictKey);
+            AddProperty(DictKey, DictValue);
+        end;
+        exit(currCodeunit);
+    end;
+
     local procedure AddPropertyInternal(PropertyName: Text; PropertyValue: Variant): Codeunit "NPR Json Builder"
     var
         JValue: JsonValue;
@@ -443,7 +479,7 @@ codeunit 6184982 "NPR Json Builder"
         end;
     end;
 
-    local procedure CreateJsonValue(Value: Variant): JsonValue
+    procedure CreateJsonValue(Value: Variant): JsonValue
     var
         JValue: JsonValue;
         BooleanValue: Boolean;

@@ -8,6 +8,8 @@ codeunit 6185053 "NPR API Response"
         _HascurrCodeunit: Boolean;
         _StatusCode: Integer;
         _Headers: Dictionary of [Text, Text];
+        _SentryTags: Dictionary of [Text, Text];
+        _SentrySpanAttribs: Dictionary of [Text, JsonValue];
         _ResponseBody: JsonToken;
         _ResponseJsonStream: InStream;
         _StreamInitialized: Boolean;
@@ -156,6 +158,7 @@ codeunit 6185053 "NPR API Response"
         HeadersJson.Add('x-server-cache-id', ServiceInstanceId());
 
         ResponseJson.Add('headers', HeadersJson);
+        ResponseJson.Add('proxyMetadata', GetProxyResponseMetadata());
         ResponseJson.Add('frontmatter', true);
 
         if _StreamInitialized then begin
@@ -462,6 +465,60 @@ codeunit 6185053 "NPR API Response"
         EmptyJsonObject: JsonObject;
     begin
         exit(EmptyJsonObject);
+    end;
+
+    local procedure GetProxyResponseMetadata(): JsonObject
+    var
+        JsonBuilder: Codeunit "NPR JSON Builder";
+    begin
+        JsonBuilder.Initialize()
+            .StartObject()
+                .AddProperty('sentryTags', GetSentryTagsJsonObject())
+                .AddProperty('sentrySpanAttributes', GetSentrySpanAttributesJsonObject())
+            .EndObject();
+        exit(JsonBuilder.Build());
+    end;
+    #endregion
+
+    #region Sentry Tags
+    local procedure GetSentryTagsJsonObject(): JsonObject
+    var
+        JsonBuilder: Codeunit "NPR JSON Builder";
+    begin
+        JsonBuilder.Initialize()
+            .StartObject()
+                .AddProperties(_SentryTags)
+            .EndObject();
+        exit(JsonBuilder.Build());
+    end;
+
+    procedure AddSentryTag(TagKey: Text; TagValue: Text): Codeunit "NPR API Response"
+    begin
+        InitcurrCodeunit();
+        _SentryTags.Add(TagKey, TagValue);
+        exit(_CurrCodeunit);
+    end;
+    #endregion
+
+    #region Sentry Attributes
+    local procedure GetSentrySpanAttributesJsonObject(): JsonObject
+    var
+        JsonBuilder: Codeunit "NPR JSON Builder";
+    begin
+        JsonBuilder.Initialize()
+            .StartObject()
+                .AddProperties(_SentrySpanAttribs)
+            .EndObject();
+        exit(JsonBuilder.Build());
+    end;
+
+    procedure AddSentrySpanAttribute(AttrKey: Text; AttrValue: Variant): Codeunit "NPR API Response"
+    var
+        JsonBuilder: Codeunit "NPR Json Builder";
+    begin
+        InitcurrCodeunit();
+        _SentrySpanAttribs.Add(AttrKey, JsonBuilder.CreateJsonValue(AttrValue));
+        exit(_CurrCodeunit);
     end;
     #endregion
 
