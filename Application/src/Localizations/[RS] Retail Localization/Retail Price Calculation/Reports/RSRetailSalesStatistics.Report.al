@@ -34,11 +34,13 @@ report 6014546 "NPR RS Retail Sales Statistics"
                 column(Item_No; "No.") { }
                 column(Item_Description; Description) { }
                 column(Item_ItemCategory; "Item Category Code") { }
-                column(Item_SalesQty; Abs(ItemSalesQty)) { }
+                column(Item_SalesQty; ItemSalesQty) { }
                 column(Item_SalesLCY; ItemSalesLCY) { }
-                column(Item_InventoryQty; Abs(ItemInvQty)) { }
-                column(Item_Profit; ItemSalesLCY - Abs(ItemCOGSLCY)) { }
+                column(Item_InventoryQty; ItemInvQty) { }
+                column(Item_Profit; ItemProfit) { }
                 column(Item_COGSLCY; Abs(ItemCOGSLCY)) { }
+                column(UnitContribMargin; UnitContribMargin) { }
+                column(ProfitPct; ProfitPct) { }
 
                 trigger OnAfterGetRecord()
                 begin
@@ -46,6 +48,9 @@ report 6014546 "NPR RS Retail Sales Statistics"
                     Clear(ItemSalesQty);
                     Clear(ItemCOGSLCY);
                     Clear(ItemInvQty);
+                    Clear(ItemProfit);
+                    Clear(UnitContribMargin);
+                    Clear(ProfitPct);
 
                     CalculateSalesAmount(ItemSalesLCY, ItemSalesQty, Item);
                     if ItemSalesQty = 0 then
@@ -53,6 +58,13 @@ report 6014546 "NPR RS Retail Sales Statistics"
 
                     CalculateCOGSAmount(ItemCOGSLCY, Item);
                     CalculateInventoryQty(ItemInvQty, Item);
+
+                    ItemProfit := ItemSalesLCY + ItemCOGSLCY;
+
+                    if (ItemSalesLCY <> 0) and (ItemSalesQty <> 0) then begin
+                        UnitContribMargin := (ItemSalesLCY + ItemCOGSLCY) / ItemSalesQty;
+                        ProfitPct := ItemProfit / ItemSalesLCY;
+                    end;
                 end;
             }
         }
@@ -69,11 +81,13 @@ report 6014546 "NPR RS Retail Sales Statistics"
                 column(Item2_No; "No.") { }
                 column(Item2_Description; Description) { }
                 column(Item2_ItemCategory; "Item Category Code") { }
-                column(Item2_SalesQty; Abs(Item2SalesQty)) { }
+                column(Item2_SalesQty; Item2SalesQty) { }
                 column(Item2_SalesLCY; Item2SalesLCY) { }
-                column(Item2_InventoryQty; Abs(Item2InvQty)) { }
-                column(Item2_Profit; Item2SalesLCY - Abs(Item2COGSLCY)) { }
+                column(Item2_InventoryQty; Item2InvQty) { }
+                column(Item2_Profit; Item2Profit) { }
                 column(Item2_COGSLCY; Abs(Item2COGSLCY)) { }
+                column(UnitContribMargin2; UnitContribMargin2) { }
+                column(ProfitPct2; ProfitPct2) { }
 
                 trigger OnPreDataItem()
                 begin
@@ -93,6 +107,9 @@ report 6014546 "NPR RS Retail Sales Statistics"
                     Clear(Item2SalesQty);
                     Clear(Item2COGSLCY);
                     Clear(Item2InvQty);
+                    Clear(Item2Profit);
+                    Clear(UnitContribMargin2);
+                    Clear(ProfitPct2);
 
                     CalculateSalesAmount(Item2SalesLCY, Item2SalesQty, Item);
                     if Item2SalesQty = 0 then
@@ -100,6 +117,13 @@ report 6014546 "NPR RS Retail Sales Statistics"
 
                     CalculateCOGSAmount(Item2COGSLCY, Item);
                     CalculateInventoryQty(Item2InvQty, Item);
+
+                    Item2Profit := Item2SalesLCY + Item2COGSLCY;
+
+                    if (Item2SalesLCY <> 0) and (Item2SalesQty <> 0) then begin
+                        UnitContribMargin2 := (Item2SalesLCY + Item2COGSLCY) / Item2SalesQty;
+                        ProfitPct2 := Item2Profit / Item2SalesLCY;
+                    end;
                 end;
             }
         }
@@ -201,16 +225,27 @@ report 6014546 "NPR RS Retail Sales Statistics"
 
     var
         _ShowItems: Boolean;
-        Item2COGSLCY: Decimal;
-        Item2InvQty: Decimal;
-        Item2SalesLCY: Decimal;
-        Item2SalesQty: Decimal;
-        ItemCOGSLCY: Decimal;
-        ItemInvQty: Decimal;
-        ItemSalesLCY: Decimal;
-        ItemSalesQty: Decimal;
         _StartDate: Date;
         _EndDate: Date;
+        _LocationCode: Code[20];
+        _GlobalDim1Code: Code[20];
+        _GlobalDim2Code: Code[20];
+        _NumberofLevels: Integer;
+        _RequestPageFilters: Text;
+        ItemSalesLCY: Decimal;
+        ItemSalesQty: Decimal;
+        ItemCOGSLCY: Decimal;
+        ItemInvQty: Decimal;
+        ItemProfit: Decimal;
+        UnitContribMargin: Decimal;
+        ProfitPct: Decimal;
+        Item2SalesLCY: Decimal;
+        Item2SalesQty: Decimal;
+        Item2COGSLCY: Decimal;
+        Item2InvQty: Decimal;
+        Item2Profit: Decimal;
+        UnitContribMargin2: Decimal;
+        ProfitPct2: Decimal;
         _TxtShowItem: Label 'Show items';
         _FilterLocationTxt: Label 'Location Code: %1', Comment = '%1 = Location Code';
         _FilterGlobalDim1Txt: Label 'Global Dimension 1 Code: %1', Comment = '%1 = Global Dimension Code';
@@ -218,11 +253,6 @@ report 6014546 "NPR RS Retail Sales Statistics"
         _UncategorizedCategoryCodeLbl: Label '-', Locked = true;
         _UncategorizedCategoryDescLbl: Label 'Without category';
         _DateFilterLbl: Label '%1..%2', Locked = true, Comment = '%1 = Start Date, %2 = End Date';
-        _LocationCode: Code[20];
-        _GlobalDim1Code: Code[20];
-        _GlobalDim2Code: Code[20];
-        _NumberofLevels: Integer;
-        _RequestPageFilters: Text;
 
     local procedure CreateRequestPageFiltersTxt(): Text
     var
@@ -263,6 +293,8 @@ report 6014546 "NPR RS Retail Sales Statistics"
         ValueEntry: Record "Value Entry";
         RSValueEntryMapping: Query "NPR RS Value Entry Mapping";
     begin
+        Clear(CostAmountLCY);
+
         RSValueEntryMapping.SetRange(Filter_COGS_Correction, true);
         RSValueEntryMapping.SetFilter(Filter_Item_No, Item."No.");
 
@@ -297,6 +329,9 @@ report 6014546 "NPR RS Retail Sales Statistics"
         SalesAmountToSubtract: Decimal;
         SalesQtyToSubtract: Decimal;
     begin
+        Clear(SalesAmountLCY);
+        Clear(SalesQty);
+
         CalculateRetailValueEntrySalesAmount(SalesAmountToSubtract, SalesQtyToSubtract, Item);
 
         ValueEntry.SetRange("Item Ledger Entry Type", ValueEntry."Item Ledger Entry Type"::Sale);
@@ -317,7 +352,7 @@ report 6014546 "NPR RS Retail Sales Statistics"
         ValueEntry.CalcSums("Sales Amount (Actual)", "Invoiced Quantity");
 
         SalesAmountLCY := ValueEntry."Sales Amount (Actual)" - SalesAmountToSubtract;
-        SalesQty := ValueEntry."Invoiced Quantity" - SalesQtyToSubtract;
+        SalesQty := Abs(ValueEntry."Invoiced Quantity" - SalesQtyToSubtract);
     end;
 
     local procedure CalculateRetailValueEntrySalesAmount(var RetailValueEntryAmount: Decimal; var RetailValueEntryQty: Decimal; Item: Record Item)
@@ -350,6 +385,8 @@ report 6014546 "NPR RS Retail Sales Statistics"
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
     begin
+        Clear(InventoryQty);
+
         ItemLedgerEntry.SetRange("Item No.", Item."No.");
 
         if _EndDate <> 0D then
@@ -365,6 +402,6 @@ report 6014546 "NPR RS Retail Sales Statistics"
             ItemLedgerEntry.SetRange("Global Dimension 2 Code", _GlobalDim2Code);
 
         ItemLedgerEntry.CalcSums(Quantity);
-        InventoryQty := ItemLedgerEntry.Quantity;
+        InventoryQty := Abs(ItemLedgerEntry.Quantity);
     end;
 }

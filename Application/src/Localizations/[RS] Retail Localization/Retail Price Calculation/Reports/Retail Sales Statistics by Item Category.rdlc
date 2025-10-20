@@ -7,7 +7,6 @@
         <DataProvider>SQL</DataProvider>
         <ConnectString />
       </ConnectionProperties>
-      <rd:SecurityType>None</rd:SecurityType>
       <rd:DataSourceID>059290cb-10a3-4a5b-9012-de040660f0cd</rd:DataSourceID>
     </DataSource>
   </DataSources>
@@ -647,7 +646,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=(Sum(Fields!Item_SalesLCY.Value, "ItemCategory", Recursive) - Sum(Fields!Item_COGSLCY.Value, "ItemCategory", Recursive))/ Sum(Fields!Item_SalesQty.Value, "ItemCategory", Recursive)</Value>
+                                  <Value>=Sum(Fields!UnitContribMargin.Value, "ItemCategory", Recursive)</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>6.5pt</FontSize>
@@ -683,12 +682,12 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Sum(Fields!Item_Profit.Value, "ItemCategory", Recursive) / Sum(Fields!Item_SalesLCY.Value, "ItemCategory", Recursive)</Value>
+                                  <Value>=(Sum(Fields!Item_Profit.Value)/Sum(Fields!Item_SalesLCY.Value))</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>6.5pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
-                                    <Format>0%</Format>
+                                    <Format>0.00%</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -959,14 +958,14 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox38">
+                        <Textbox Name="UnitContribMargin">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=(Fields!Item_SalesLCY.Value - Fields!Item_COGSLCY.Value) / Fields!Item_SalesQty.Value</Value>
+                                  <Value>=Fields!UnitContribMargin.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>6.5pt</FontSize>
@@ -979,7 +978,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox38</rd:DefaultName>
+                          <rd:DefaultName>UnitContribMargin</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -994,18 +993,18 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox181">
+                        <Textbox Name="ProfitPercentage">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!Item_Profit.Value / Fields!Item_SalesLCY.Value</Value>
+                                  <Value>=Fields!ProfitPct.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>6.5pt</FontSize>
-                                    <Format>0%</Format>
+                                    <Format>0.00%</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -1014,7 +1013,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox181</rd:DefaultName>
+                          <rd:DefaultName>ProfitPercentage</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -1290,7 +1289,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=(Sum(Fields!Item2_SalesLCY.Value) - Sum(Fields!Item2_COGSLCY.Value)) / Sum(Fields!Item2_SalesQty.Value)</Value>
+                                  <Value>=Sum(Fields!UnitContribMargin2.Value)</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>6.5pt</FontSize>
@@ -1326,12 +1325,12 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Sum(Fields!Item2_Profit.Value) / Sum(Fields!Item2_SalesLCY.Value)</Value>
+                                  <Value>=(Sum(Fields!Item2_Profit.Value)/Sum(Fields!Item2_SalesLCY.Value))</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>6.5pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
-                                    <Format>0%</Format>
+                                    <Format>0.00%</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -1609,7 +1608,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=(Fields!Item2_SalesLCY.Value - Fields!Item2_COGSLCY.Value) / Fields!Item2_SalesQty.Value</Value>
+                                  <Value>=Fields!UnitContribMargin2.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>6.5pt</FontSize>
@@ -1644,11 +1643,11 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!Item2_Profit.Value / Fields!Item2_SalesLCY.Value</Value>
+                                  <Value>=Fields!ProfitPct2.Value</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>6.5pt</FontSize>
-                                    <Format>0%</Format>
+                                    <Format>0.00%</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -1953,7 +1952,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=((Sum(Fields!Item_SalesLCY.Value) + Sum(Fields!Item2_SalesLCY.Value)) - (Sum(Fields!Item_COGSLCY.Value) + Sum(Fields!Item2_COGSLCY.Value))) / (Sum(Fields!Item_SalesQty.Value) + Sum(Fields!Item2_SalesQty.Value))</Value>
+                                  <Value>=Sum(Fields!UnitContribMargin.Value)+Sum(Fields!UnitContribMargin2.Value)</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>7pt</FontSize>
@@ -1997,12 +1996,12 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=(Sum(Fields!Item_Profit.Value) + Sum(Fields!Item2_Profit.Value)) / (Sum(Fields!Item_SalesLCY.Value) + Sum(Fields!Item2_SalesLCY.Value))</Value>
+                                  <Value>=(Sum(Fields!Item_Profit.Value)/Sum(Fields!Item_SalesLCY.Value))+(Sum(Fields!Item2_Profit.Value)/Sum(Fields!Item2_SalesLCY.Value))</Value>
                                   <Style>
                                     <FontFamily>Segoe UI</FontFamily>
                                     <FontSize>7pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
-                                    <Format>0%</Format>
+                                    <Format>0.00%</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -2994,6 +2993,18 @@ End Function
         <Field Name="Item_COGSLCYFormat">
           <DataField>Item_COGSLCYFormat</DataField>
         </Field>
+        <Field Name="UnitContribMargin">
+          <DataField>UnitContribMargin</DataField>
+        </Field>
+        <Field Name="UnitContribMarginFormat">
+          <DataField>UnitContribMarginFormat</DataField>
+        </Field>
+        <Field Name="ProfitPct">
+          <DataField>ProfitPct</DataField>
+        </Field>
+        <Field Name="ProfitPctFormat">
+          <DataField>ProfitPctFormat</DataField>
+        </Field>
         <Field Name="ItemCategory2_Code">
           <DataField>ItemCategory2_Code</DataField>
         </Field>
@@ -3038,6 +3049,18 @@ End Function
         </Field>
         <Field Name="Item2_COGSLCYFormat">
           <DataField>Item2_COGSLCYFormat</DataField>
+        </Field>
+        <Field Name="UnitContribMargin2">
+          <DataField>UnitContribMargin2</DataField>
+        </Field>
+        <Field Name="UnitContribMargin2Format">
+          <DataField>UnitContribMargin2Format</DataField>
+        </Field>
+        <Field Name="ProfitPct2">
+          <DataField>ProfitPct2</DataField>
+        </Field>
+        <Field Name="ProfitPct2Format">
+          <DataField>ProfitPct2Format</DataField>
         </Field>
       </Fields>
       <Query>
