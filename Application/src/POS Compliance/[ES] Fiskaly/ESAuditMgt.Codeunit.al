@@ -2,6 +2,7 @@ codeunit 6184866 "NPR ES Audit Mgt."
 {
     Access = Internal;
     Permissions = TableData "Tenant Media" = rd;
+
     var
         Enabled: Boolean;
         Initialized: Boolean;
@@ -291,6 +292,7 @@ codeunit 6184866 "NPR ES Audit Mgt."
         POSEntry: Record "NPR POS Entry";
         POSUnit: Record "NPR POS Unit";
         ESFiskalyCommunication: Codeunit "NPR ES Fiskaly Communication";
+        ESFiscalThermalPrint: Codeunit "NPR ES Fiscal Thermal Print";
     begin
         if not POSUnit.Get(SalePOS."Register No.") then
             exit;
@@ -305,6 +307,9 @@ codeunit 6184866 "NPR ES Audit Mgt."
             exit;
 
         ESFiskalyCommunication.CreateInvoice(ESPOSAuditLogAuxInfo);
+
+        if IsPrintReceiptEnabled() then
+            ESFiscalThermalPrint.Run(POSEntry);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Action: Rev. Dir. Sale", 'OnBeforeHendleReverse', '', false, false)]
@@ -703,6 +708,15 @@ codeunit 6184866 "NPR ES Audit Mgt."
     begin
         if TenantMedia.Get(MediaId) then
             TenantMedia.Delete(true);
+    end;
+
+    local procedure IsPrintReceiptEnabled(): Boolean
+    var
+        ESFiscalizationSetup: Record "NPR ES Fiscalization Setup";
+    begin
+        if not ESFiscalizationSetup.Get() then
+            exit(false);
+        exit(ESFiscalizationSetup."Print Thermal Receipt On Sale");
     end;
     #endregion
 

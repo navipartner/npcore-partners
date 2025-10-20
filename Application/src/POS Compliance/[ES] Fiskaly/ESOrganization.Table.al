@@ -205,4 +205,13 @@
 
         exit('ESFiskalyAPISecret_' + SystemId);
     end;
+
+    internal procedure IsVerifactuCompliance(): Boolean
+    begin
+        exit(Rec."Taxpayer Territory" in [Rec."Taxpayer Territory"::NAVARRE,
+                                          Rec."Taxpayer Territory"::CANARY_ISLANDS,
+                                          Rec."Taxpayer Territory"::CEUTA,
+                                          Rec."Taxpayer Territory"::MELILLA,
+                                          Rec."Taxpayer Territory"::SPAIN_OTHER]);
+    end;
 }

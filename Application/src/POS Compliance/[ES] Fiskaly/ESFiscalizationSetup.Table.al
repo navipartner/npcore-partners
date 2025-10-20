@@ -52,6 +52,11 @@ table 6150838 "NPR ES Fiscalization Setup"
             Caption = 'Invoice Description';
             DataClassification = CustomerContent;
         }
+        field(70; "Print Thermal Receipt On Sale"; Boolean)
+        {
+            Caption = 'Print Thermal Receipt On Sale';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

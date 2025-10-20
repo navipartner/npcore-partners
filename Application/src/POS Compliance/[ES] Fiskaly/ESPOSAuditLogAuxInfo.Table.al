@@ -117,6 +117,11 @@ table 6150894 "NPR ES POS Audit Log Aux. Info"
             Caption = 'Validation URL';
             DataClassification = CustomerContent;
         }
+        field(161; "Validation Text"; Text[50])
+        {
+            Caption = 'Validation Text';
+            DataClassification = CustomerContent;
+        }
         field(170; "Invoice Registration State"; Enum "NPR ES Inv. Registration State")
         {
             Caption = 'Invoice Registration State';

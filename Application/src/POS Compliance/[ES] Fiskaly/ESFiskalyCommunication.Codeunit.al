@@ -1476,6 +1476,9 @@ codeunit 6184937 "NPR ES Fiskaly Communication"
         ResponseJson.SelectToken('$.content.compliance.url', PropertyValue);
         ESPOSAuditLogAuxInfo."Validation URL" := CopyStr(PropertyValue.AsValue().AsText(), 1, MaxStrLen(ESPOSAuditLogAuxInfo."Validation URL"));
 
+        if ResponseJson.SelectToken('$.content.compliance.tbai', PropertyValue) or ResponseJson.SelectToken('$.content.compliance.text', PropertyValue) then
+            ESPOSAuditLogAuxInfo."Validation Text" := CopyStr(PropertyValue.AsValue().AsText(), 1, MaxStrLen(ESPOSAuditLogAuxInfo."Validation Text"));
+
         ResponseJson.SelectToken('$.content.transmission.registration', PropertyValue);
         ESPOSAuditLogAuxInfo."Invoice Registration State" := GetInvoiceRegistrationState(PropertyValue.AsValue().AsText());
 

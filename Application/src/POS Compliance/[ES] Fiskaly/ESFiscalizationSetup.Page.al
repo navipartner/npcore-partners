@@ -65,6 +65,16 @@ page 6184588 "NPR ES Fiscalization Setup"
                     ToolTip = 'Specifies the general description of the transactions of the invoice.';
                 }
             }
+            group(ReceiptPrint)
+            {
+                Caption = 'Receipt Print';
+
+                field("Print Thermal Receipt On Sale"; Rec."Print Thermal Receipt On Sale")
+                {
+                    ApplicationArea = NPRRetail;
+                    Tooltip = 'Determines whether a thermal receipt is printed after the sale is completed.';
+                }
+            }
         }
     }
 
