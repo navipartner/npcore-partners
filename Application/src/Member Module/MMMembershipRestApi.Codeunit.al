@@ -442,7 +442,7 @@ codeunit 6150743 "NPR MMMembershipRestApi"
         exit(true);
     end;
 
-    local procedure ValidatePointBalanceResponse(Response: JsonObject; PointBalance: Integer): Boolean
+    local procedure ValidatePointBalanceResponse(Response: JsonObject; var PointBalance: Integer): Boolean
     var
         JsonHelper: Codeunit "NPR Json Helper";
         Token: JsonToken;
