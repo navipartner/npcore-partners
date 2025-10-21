@@ -202,7 +202,11 @@
 
                             PriceListLine.Init();
                             PriceListLine."Price List Code" := PriceListHeader.Code;
+#if not (BC17 or BC18 or BC19)
+                            PriceListLine.CopyFrom(PriceListHeader, true);
+#else
                             PriceListLine.CopyFrom(PriceListHeader);
+#endif
                             PriceListLine.Validate("Asset Type", PriceListLine."Asset Type"::Item);
                             PriceListLine.Validate("Asset No.", Item."No.");
                             PriceListLine.Validate("Price Type", PriceListLine."Price Type"::Sale);
