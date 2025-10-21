@@ -606,7 +606,6 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
         RSEIAuxSalesInvHdr: Record "NPR RS EI Aux Sales Inv. Hdr.";
         RSEIPaymentMethodMapp: Record "NPR RS EI Payment Method Mapp.";
         PaymMethMappingNotFoundErr: Label 'Payment Method Mapping for %1: %2 has not been found in %3.', Comment = '%1 = Payment Method Code Caption, %2 = Payment Method Code, %3 = Payment Mapping Table Caption';
-        TaxLiabilityCodeMustBeChosenErr: Label 'Tax Liability Code must not be empty.';
     begin
         if not IsRSEInvoiceEnabled() then
             exit;
@@ -616,8 +615,8 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
             exit;
 
         if not SalesInvoiceHeader."Prepayment Invoice" then
-            if (RSEIAuxSalesInvHdr."NPR RS EI Tax Liability Method" in [RSEIAuxSalesInvHdr."NPR RS EI Tax Liability Method"::" "]) and GuiAllowed() then
-                Error(TaxLiabilityCodeMustBeChosenErr);
+            CheckTaxLiabilityCode(SalesInvoiceHeader, RSEIAuxSalesInvHdr);
+
         CompanyInfo.Get();
         Customer.Get(SalesInvoiceHeader."Sell-to Customer No.");
 
@@ -725,6 +724,19 @@ codeunit 6184860 "NPR RS E-Invoice Mgt."
             RSEIVATPostSetupMap.TestField("NPR RS EI Tax Category");
             CheckForTaxExemptionReason(SalesInvoiceHeader."Order No.", RSEIVATPostSetupMap);
         until SalesCrMemoLine.Next() = 0;
+    end;
+
+    local procedure CheckTaxLiabilityCode(SalesInvoiceHeader: Record "Sales Invoice Header"; RSEIAuxSalesInvHdr: Record "NPR RS EI Aux Sales Inv. Hdr.")
+    var
+        SalesInvoiceLine: Record "Sales Invoice Line";
+        TaxLiabilityCodeMustBeChosenErr: Label 'Tax Liability Code must not be empty.';
+    begin
+        SalesInvoiceLine.SetRange("Document No.", SalesInvoiceHeader."No.");
+        SalesInvoiceLine.SetFilter("VAT %", '<>0');
+        if SalesInvoiceLine.IsEmpty() then
+            exit;
+        if (RSEIAuxSalesInvHdr."NPR RS EI Tax Liability Method" = RSEIAuxSalesInvHdr."NPR RS EI Tax Liability Method"::" ") and GuiAllowed() then
+            Error(TaxLiabilityCodeMustBeChosenErr);
     end;
 
     internal procedure CheckIsDocumentSetForSendingToSEF(RSEIAuxSalesHeader: Record "NPR RS EI Aux Sales Header"): Boolean
