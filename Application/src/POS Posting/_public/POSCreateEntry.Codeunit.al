@@ -1973,6 +1973,7 @@
         if not GetPOSPeriodRegisterExt(ExtPOSSale, POSPeriodRegister, true) then begin
             POSUnit.Get(ExtPOSSale."Register No.");
             POSUnitManager.OpenPOSUnit(POSUnit);
+            GetPOSPeriodRegisterExt(ExtPOSSale, POSPeriodRegister, true);
         end;
 
         ExtSaleCancelled := IsCancelledSaleExt(ExtPOSSale);
