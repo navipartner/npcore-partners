@@ -142,6 +142,18 @@
                     ToolTip = 'Specifies the value of the Fallback Magento PW URL field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field(NPDesignerTemplateLabel; Rec.NPDesignerTemplateLabel)
+                {
+                    ToolTip = 'Specifies the value of the Design Layout Label field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field(ManifestAsset; Rec.ManifestAsset)
+                {
+                    Caption = 'Manifest Asset';
+                    ToolTip = 'Specifies the type of asset used in the manifest.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+
             }
         }
     }

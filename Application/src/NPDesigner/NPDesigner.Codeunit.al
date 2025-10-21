@@ -1,7 +1,7 @@
 codeunit 6248190 "NPR NPDesigner"
 {
     Access = Internal;
-    internal procedure LookupDesignLayouts(var AdmissionBom: Record "NPR TM Ticket Admission BOM")
+    internal procedure LookupDesignLayouts(LookupCaption: Text; var NPDesignerTemplateId: Text[40]; var NPDesignerTemplateLabel: Text[80])
     var
         TemporaryNPDesignerTemplates: Record "NPR NPDesignerTemplates" temporary;
         SelectDesignLayouts: Page "NPR NPDesignerTemplateList";
@@ -9,36 +9,37 @@ codeunit 6248190 "NPR NPDesigner"
 
         GetDesignerTemplates(TemporaryNPDesignerTemplates);
         if (TemporaryNPDesignerTemplates.FindFirst()) then;
-        if (TemporaryNPDesignerTemplates.Get(AdmissionBom.NPDesignerTemplateId)) then;
+        if (TemporaryNPDesignerTemplates.Get(NPDesignerTemplateId)) then;
 
         SelectDesignLayouts.SetData(TemporaryNPDesignerTemplates);
-        SelectDesignLayouts.SetCaption(AdmissionBom.FieldCaption(NPDesignerTemplateLabel));
+        SelectDesignLayouts.SetCaption(LookupCaption);
         SelectDesignLayouts.LookupMode(true);
         if (SelectDesignLayouts.RunModal() <> Action::LookupOK) then
             exit;
 
         SelectDesignLayouts.GetRecord(TemporaryNPDesignerTemplates);
-        AdmissionBom.NPDesignerTemplateId := TemporaryNPDesignerTemplates.ExternalId;
-        AdmissionBom.NPDesignerTemplateLabel := CopyStr(TemporaryNPDesignerTemplates.Description, 1, MaxStrLen(AdmissionBom.NPDesignerTemplateLabel));
+        NPDesignerTemplateId := TemporaryNPDesignerTemplates.ExternalId;
+        NPDesignerTemplateLabel := CopyStr(TemporaryNPDesignerTemplates.Description, 1, MaxStrLen(NPDesignerTemplateLabel));
     end;
 
-    internal procedure ValidateDesignLayouts(var AdmissionBom: Record "NPR TM Ticket Admission BOM")
+    internal procedure ValidateDesignLayouts(var NPDesignerTemplateId: Text[40]; var NPDesignerTemplateLabel: Text[80])
     var
         TemporaryNPDesignerTemplates: Record "NPR NPDesignerTemplates" temporary;
+        NotFound: Label 'Design Layout %1 not found';
     begin
 
-        if (AdmissionBom.NPDesignerTemplateLabel = '') then begin
-            AdmissionBom.NPDesignerTemplateId := '';
+        if (NPDesignerTemplateLabel = '') then begin
+            NPDesignerTemplateId := '';
             exit;
         end;
 
         GetDesignerTemplates(TemporaryNPDesignerTemplates);
-        TemporaryNPDesignerTemplates.SetFilter(Description, '%1', '@' + AdmissionBom.NPDesignerTemplateLabel + '*');
+        TemporaryNPDesignerTemplates.SetFilter(Description, '%1', '@' + NPDesignerTemplateLabel + '*');
         if (not TemporaryNPDesignerTemplates.FindFirst()) then
-            Error('Design Layout %1 not found', AdmissionBom.NPDesignerTemplateLabel);
+            Error(NotFound, NPDesignerTemplateLabel);
 
-        AdmissionBom.NPDesignerTemplateId := TemporaryNPDesignerTemplates.ExternalId;
-        AdmissionBom.NPDesignerTemplateLabel := CopyStr(TemporaryNPDesignerTemplates.Description, 1, MaxStrLen(AdmissionBom.NPDesignerTemplateLabel));
+        NPDesignerTemplateId := TemporaryNPDesignerTemplates.ExternalId;
+        NPDesignerTemplateLabel := CopyStr(TemporaryNPDesignerTemplates.Description, 1, MaxStrLen(NPDesignerTemplateLabel));
     end;
 
     #region Manifest Management
@@ -259,7 +260,7 @@ codeunit 6248190 "NPR NPDesigner"
         if (not NpDesignerSetup.EnableManifest) then
             exit(false);
 
-        AssetsUrl := 'https://assets.npretail.com/'; // Default
+        AssetsUrl := 'https://assets.npretail.app/'; // Default
         if (NpDesignerSetup.AssetsUrl <> '') then
             AssetsUrl := NpDesignerSetup.AssetsUrl;
 

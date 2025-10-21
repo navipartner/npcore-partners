@@ -390,6 +390,32 @@
 
     actions
     {
+        area(Processing)
+        {
+            Action(ViewOnlineManifest)
+            {
+                ToolTip = 'Display the content online.';
+                ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
+                Caption = 'View Online';
+                Image = Web;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                Scope = Repeater;
+
+                trigger OnAction()
+                var
+                    NpDesignerManifestFacade: Codeunit "NPR NPDesignerManifestFacade";
+                    NoManifestFound: Label 'No manifest URL found for this entry.';
+                    ManifestUrl: Text[250];
+                begin
+                    if (NpDesignerManifestFacade.GetManifestUrl(Rec.ManifestId, ManifestUrl)) then
+                        Hyperlink(ManifestUrl)
+                    else
+                        Message(NoManifestFound);
+                end;
+            }
+        }
     }
 }
 

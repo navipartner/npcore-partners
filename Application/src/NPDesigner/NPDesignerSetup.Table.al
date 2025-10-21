@@ -46,7 +46,7 @@ table 6151022 "NPR NPDesignerSetup"
         {
             DataClassification = CustomerContent;
             Caption = 'Assets URL';
-            InitValue = 'https://assets.npretail.com/';
+            InitValue = 'https://assets.npretail.app/';
         }
     }
 

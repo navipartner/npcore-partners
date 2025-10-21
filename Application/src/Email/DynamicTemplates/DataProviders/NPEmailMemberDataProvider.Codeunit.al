@@ -52,6 +52,7 @@ codeunit 6248377 "NPR NPEmailMemberDataProvider" implements "NPR IDynamicTemplat
         JObject.Add('client_sign_up_url', Entry.ClientSignUpUrl);
         JObject.Add('wallet_pass_id', Entry."Wallet Pass Id");
         JObject.Add('wallet_url', Entry."Wallet Pass Landing URL");
+        JObject.Add('manifest_url', GetManifestUrl(Entry.ManifestId));
 
         EntryBuffer.TransferFields(Entry, true);
         EntryBuffer.SystemId := Entry.SystemId;
@@ -100,11 +101,22 @@ codeunit 6248377 "NPR NPEmailMemberDataProvider" implements "NPR IDynamicTemplat
         JObject.Add('client_sign_up_url', 'https://signup.example.com/973d46f0-a08c-45e3-a9ac-0da53b28648a');
         JObject.Add('wallet_pass_id', 'ABCD1234');
         JObject.Add('wallet_url', 'https://passes.example.com');
+        JObject.Add('manifest_url', 'https://designer.example.com/manifest/abcd1234-ef56-7890-ab12-cd34ef567890');
 
         _DynTempDataProvSubs.OnAfterMemberGenerateContentExample(CustomJObject);
         JObject.Add('custom_fields', CustomJObject);
 
         exit(JObject);
+    end;
+
+    local procedure GetManifestUrl(ManifestId: Guid) Url: Text[250]
+    var
+        NpDesignerManifestFacade: Codeunit "NPR NPDesignerManifestFacade";
+    begin
+        if (IsNullGuid(ManifestId)) then
+            exit;
+
+        NpDesignerManifestFacade.GetManifestUrl(ManifestId, Url);
     end;
 
     procedure AddAttachments(var EmailItem: Record "Email Item"; RecRef: RecordRef)

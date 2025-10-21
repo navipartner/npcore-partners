@@ -296,12 +296,16 @@
         RenewToItemNo: Code[20];
         AlterationSystemId: Guid;
         ReasonText: Text;
+        NpDesignerSetup: Record "NPR NPDesignerSetup";
+        NpDesignerFacade: Codeunit "NPR NPDesignerManifestFacade";
     begin
         NotificationSetup.Get(MembershipNotification."Notification Code");
 
         MembershipRole.Get(MembershipEntryNo, MemberEntryNo);
         Membership.Get(MembershipRole."Membership Entry No.");
         Member.Get(MembershipRole."Member Entry No.");
+        if (not NpDesignerSetup.Get()) then
+            NpDesignerSetup.Init();
 
         MembershipRole.CalcFields("Membership Code", "External Membership No.");
 
@@ -463,6 +467,25 @@
                 AzureLog.RequestCreated := CurrentDateTime();
                 AzureLog.Insert();
             end;
+        end;
+
+        if ((NpDesignerSetup.EnableManifest) and (NotificationSetup.ManifestAsset <> NotificationSetup.ManifestAsset::NONE)) then begin
+            if (MembershipNotification.NPDesignerTemplateId = '') then begin
+                MembershipNotification.NPDesignerTemplateId := NotificationSetup.NPDesignerTemplateId;
+                MembershipNotification.NPDesignerTemplateLabel := NotificationSetup.NPDesignerTemplateLabel;
+            end;
+
+            MemberNotificationEntry.ManifestId := NpDesignerFacade.CreateManifest();
+            if (not IsNullGuid(MemberNotificationEntry.ManifestId)) then
+                case NotificationSetup.ManifestAsset of
+                    NotificationSetup.ManifestAsset::MEMBERSHIP:
+                        NpDesignerFacade.AddAssetToManifest(MemberNotificationEntry.ManifestId, Database::"NPR MM Membership", Membership.SystemId, Membership."External Membership No.", MembershipNotification.NPDesignerTemplateId);
+                    NotificationSetup.ManifestAsset::MEMBER:
+                        NpDesignerFacade.AddAssetToManifest(MemberNotificationEntry.ManifestId, Database::"NPR MM Member", Member.SystemId, Member."External Member No.", MembershipNotification.NPDesignerTemplateId);
+                    NotificationSetup.ManifestAsset::MEMBERSHIP_CARD:
+                        if (MemberCard."Entry No." <> 0) then
+                            NpDesignerFacade.AddAssetToManifest(MemberNotificationEntry.ManifestId, Database::"NPR MM Member Card", MemberCard.SystemId, MemberCard."External Card No.", MembershipNotification.NPDesignerTemplateId);
+                end;
         end;
 
         if (not MemberNotificationEntry.Insert()) then

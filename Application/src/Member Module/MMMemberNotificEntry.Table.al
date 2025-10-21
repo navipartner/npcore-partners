@@ -345,6 +345,11 @@
             Caption = 'Failed With Message';
             DataClassification = CustomerContent;
         }
+        field(215; ManifestId; Guid)
+        {
+            Caption = 'Manifest Id';
+            DataClassification = CustomerContent;
+        }
         field(400; "Include NP Pass"; Boolean)
         {
             Caption = 'Include NP Pass';

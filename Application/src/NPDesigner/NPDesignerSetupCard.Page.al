@@ -36,7 +36,7 @@ page 6184929 "NPR NPDesignerSetupCard"
                 }
                 field(AssetsUrl; Rec.AssetsUrl)
                 {
-                    ToolTip = 'Specifies the base URL for assets. Default is https://assets.npretail.com/.';
+                    ToolTip = 'Specifies the base URL for assets. Default is https://assets.npretail.app/.';
                     ApplicationArea = NPRRetail;
                 }
             }

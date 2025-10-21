@@ -240,7 +240,7 @@
                 Designer: Codeunit "NPR NPDesigner";
             begin
                 Rec.TestField(Default, true);
-                Designer.LookupDesignLayouts(Rec);
+                Designer.LookupDesignLayouts(Rec.FieldCaption(NPDesignerTemplateLabel), Rec.NPDesignerTemplateId, Rec.NPDesignerTemplateLabel);
             end;
 
             trigger OnValidate()
@@ -248,7 +248,7 @@
                 Designer: Codeunit "NPR NPDesigner";
             begin
                 Rec.TestField(Default, true);
-                Designer.ValidateDesignLayouts(Rec);
+                Designer.ValidateDesignLayouts(Rec.NPDesignerTemplateId, Rec.NPDesignerTemplateLabel);
             end;
         }
 
