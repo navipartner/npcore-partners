@@ -4321,11 +4321,13 @@
 
         MembershipLedgerEntry."Auto-Renew Entry No." := MemberInfoCapture."Auto-Renew Entry No.";
         MembershipLedgerEntry.Insert();
+
         Membership.Get(MembershipEntryNo);
+        if (not MembershipSetup.Get(MembershipLedgerEntry."Membership Code")) then
+            MembershipSetup.Init();
 
         if (MembershipLedgerEntry.Context in [MembershipLedgerEntry.Context::UPGRADE, MembershipLedgerEntry.Context::RENEW, MembershipLedgerEntry.Context::AUTORENEW]) then begin
             if (Membership."Customer No." <> '') then begin
-                MembershipSetup.Get(MembershipLedgerEntry."Membership Code");
                 if (MembershipSetup."Customer Config. Template Code" <> '') then begin
                     ConfigTemplateHeader.Get(MembershipSetup."Customer Config. Template Code");
                     if (Customer.Get(Membership."Customer No.")) then
