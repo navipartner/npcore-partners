@@ -47,26 +47,48 @@ codeunit 6248363 "NPR IncEcomSalesDocProcess"
 
     internal procedure UpdateSalesDocPaymentLinePostingInformation(PaymentLine: Record "NPR Magento Payment Line")
     var
+        IncEcomSalesHeader: Record "NPR Inc Ecom Sales Header";
         IncEcomSalesPmtLine: Record "NPR Inc Ecom Sales Pmt. Line";
         IncEcomSalesDocImpl: Codeunit "NPR Inc Ecom Sales Doc Impl";
+        IncEcomSalesDocImplV2: Codeunit "NPR Inc Ecom Sales Doc Impl V2";
     begin
         IncEcomSalesPmtLine.SetLoadFields("Document Type");
         if not IncEcomSalesPmtLine.GetBySystemId(PaymentLine."NPR Inc Ecom Sales Pmt Line Id") then
             exit;
 
-        IncEcomSalesDocImpl.UpdateSalesDocumentPaymentLinePostingInformation(PaymentLine);
+        IncEcomSalesHeader.SetLoadFields("API Version Date");
+        if not IncEcomSalesHeader.Get(IncEcomSalesPmtLine."Document Type", IncEcomSalesPmtLine."External Document No.") then
+            exit;
+
+        case IncEcomSalesHeader."API Version Date" of
+            IncEcomSalesDocImplV2.GetApiVersionV2():
+                IncEcomSalesDocImplV2.UpdateSalesDocumentPaymentLinePostingInformation(PaymentLine);
+            else
+                IncEcomSalesDocImpl.UpdateSalesDocumentPaymentLinePostingInformation(PaymentLine);
+        end;
     end;
 
     internal procedure UpdateSalesDocPaymentLineCaptureInformation(PaymentLine: Record "NPR Magento Payment Line")
     var
+        IncEcomSalesHeader: Record "NPR Inc Ecom Sales Header";
         IncEcomSalesPmtLine: Record "NPR Inc Ecom Sales Pmt. Line";
         IncEcomSalesDocImpl: Codeunit "NPR Inc Ecom Sales Doc Impl";
+        IncEcomSalesDocImplV2: Codeunit "NPR Inc Ecom Sales Doc Impl V2";
     begin
         IncEcomSalesPmtLine.SetLoadFields("Document Type");
         if not IncEcomSalesPmtLine.GetBySystemId(PaymentLine."NPR Inc Ecom Sales Pmt Line Id") then
             exit;
 
-        IncEcomSalesDocImpl.UpdateSalesDocumentPaymentLineCaptureInformation(PaymentLine);
+        IncEcomSalesHeader.SetLoadFields("API Version Date");
+        if not IncEcomSalesHeader.Get(IncEcomSalesPmtLine."Document Type", IncEcomSalesPmtLine."External Document No.") then
+            exit;
+
+        case IncEcomSalesHeader."API Version Date" of
+            IncEcomSalesDocImplV2.GetApiVersionV2():
+                IncEcomSalesDocImplV2.UpdateSalesDocumentPaymentLineCaptureInformation(PaymentLine);
+            else
+                IncEcomSalesDocImpl.UpdateSalesDocumentPaymentLineCaptureInformation(PaymentLine);
+        end;
     end;
 
     local procedure HandleSalesOrderProcessJQSchedule(Schedule: Boolean)

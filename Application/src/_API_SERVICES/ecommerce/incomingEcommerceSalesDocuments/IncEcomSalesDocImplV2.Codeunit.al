@@ -781,6 +781,9 @@ codeunit 6248588 "NPR Inc Ecom Sales Doc Impl V2"
         if not IncEcomSalesHeader.GetBySystemId(SalesHeader."NPR Inc Ecom Sale Id") then
             exit;
 
+        if IncEcomSalesHeader."API Version Date" <> GetApiVersionV2() then
+            exit;
+
         SaleLine.Reset();
         SaleLine.SetRange("Document Type", SalesHeader."Document Type");
         SaleLine.SetRange("Document No.", SalesHeader."No.");
@@ -812,9 +815,12 @@ codeunit 6248588 "NPR Inc Ecom Sales Doc Impl V2"
         if not IncEcomSalesLine.GetBySystemId(SalesInvLine."NPR Inc Ecom Sales Line Id") then
             exit;
 
-        IncEcomSalesHeader.SetLoadFields("Price Excl. VAT");
+        IncEcomSalesHeader.SetLoadFields("Price Excl. VAT", "API Version Date");
         if not IncEcomSalesHeader.Get(IncEcomSalesLine."Document Type", IncEcomSalesLine."External Document No.") then
-            Clear(IncEcomSalesHeader);
+            exit;
+
+        if (IncEcomSalesHeader."API Version Date" <> GetApiVersionV2()) then
+            exit;
 
         IncEcomSalesLine."Invoiced Qty." += SalesInvLine.Quantity;
         if IncEcomSalesHeader."Price Excl. VAT" then
@@ -834,9 +840,12 @@ codeunit 6248588 "NPR Inc Ecom Sales Doc Impl V2"
         if not IncEcomSalesLine.GetBySystemId(SalesCrMemoLine."NPR Inc Ecom Sales Line Id") then
             exit;
 
-        IncEcomSalesHeader.SetLoadFields("Price Excl. VAT");
+        IncEcomSalesHeader.SetLoadFields("Price Excl. VAT", "API Version Date");
         if not IncEcomSalesHeader.Get(IncEcomSalesLine."Document Type", IncEcomSalesLine."External Document No.") then
-            Clear(IncEcomSalesHeader);
+            exit;
+
+        if (IncEcomSalesHeader."API Version Date" <> GetApiVersionV2()) then
+            exit;
 
         IncEcomSalesLine."Invoiced Qty." += SalesCrMemoLine.Quantity;
         if IncEcomSalesHeader."Price Excl. VAT" then
@@ -927,6 +936,7 @@ codeunit 6248588 "NPR Inc Ecom Sales Doc Impl V2"
     var
         SalesInvoice: Record "Sales Invoice Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        IncEcomSalesHeader: Record "NPR Inc Ecom Sales Header";
         IncEcomSalesWebhook: Codeunit "NPR Inc Ecom Sales Webhooks";
         IsPosted: Boolean;
     begin
@@ -934,6 +944,12 @@ codeunit 6248588 "NPR Inc Ecom Sales Doc Impl V2"
             exit;
 
         if IsNullGuid(Rec."NPR Inc Ecom Sale Id") then
+            exit;
+
+        if not IncEcomSalesHeader.GetBySystemId(Rec."NPR Inc Ecom Sale Id") then
+            exit;
+
+        if IncEcomSalesHeader."API Version Date" <> GetApiVersionV2() then
             exit;
 
         // Check if the document was already posted to avoid triggering cancellation during posting
@@ -955,7 +971,8 @@ codeunit 6248588 "NPR Inc Ecom Sales Doc Impl V2"
         if IsPosted then
             exit;
 
-        ChangeIncEcomSalesHeaderStatusCanceled(Rec);
+        IncEcomSalesHeader."Creation Status" := IncEcomSalesHeader."Creation Status"::Canceled;
+        IncEcomSalesHeader.Modify(true);
 
         // Call appropriate webhook based on document type
         case Rec."Document Type" of
@@ -966,17 +983,6 @@ codeunit 6248588 "NPR Inc Ecom Sales Doc Impl V2"
         end;
     end;
 
-    local procedure ChangeIncEcomSalesHeaderStatusCanceled(SalesHeader: Record "Sales Header")
-    var
-        IncEcomSalesHeader: Record "NPR Inc Ecom Sales Header";
-    begin
-        if not (SalesHeader."Document Type" in [SalesHeader."Document Type"::Order, SalesHeader."Document Type"::"Return Order"]) then
-            exit;
-        if not IncEcomSalesHeader.GetBySystemId(SalesHeader."NPR Inc Ecom Sale Id") then
-            exit;
-        IncEcomSalesHeader."Creation Status" := IncEcomSalesHeader."Creation Status"::Canceled;
-        IncEcomSalesHeader.Modify(true);
-    end;
 
     local procedure UpdateCustomerFromTemplates(var Customer: Record Customer; CustomerTemplateCode: Code[20]; ConfigTemplateCode: Code[10])
     var
