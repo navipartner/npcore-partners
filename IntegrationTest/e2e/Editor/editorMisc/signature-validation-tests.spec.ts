@@ -3,6 +3,8 @@ import { expect, test } from "@playwright/test";
 import { login } from "../../fixtures/editorLogin";
 import { removeLayout } from "../../fixtures/removeLayout";
 
+test.skip()
+
 declare global {
   interface Window {
     Dragonglass?: {

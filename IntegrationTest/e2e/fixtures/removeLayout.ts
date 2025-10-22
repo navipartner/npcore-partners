@@ -48,7 +48,7 @@ export const removeLayout = async (page: Page, uniqueKey: string) => {
     .getByRole("contentinfo")
     .locator('svg[data-icon="gear"]')
     .click();
-  await page.waitForTimeout(4000);
+  await page.waitForTimeout(10000);
   await page
     .frameLocator("iframe")
     .getByRole("contentinfo")

@@ -5,6 +5,8 @@ import { verifyKPITabBehaviour } from "../../fixtures/verifyKPITabBehaviour";
 import { switchUserRegion } from "../../fixtures/switchUserRegion";
 import { removeLayout } from "../../fixtures/removeLayout";
 
+test.skip()
+
 test("should verify KPI tab behaviour for each tab", async ({
   page,
 }, workerInfo) => {

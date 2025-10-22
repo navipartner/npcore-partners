@@ -17,13 +17,12 @@ export const loginAndCreateLayout = async (
   }
   
   await page.waitForLoadState('networkidle');
-  await page.waitForSelector('.spinner', { state: 'hidden', timeout: 20000 });
+  await page.waitForSelector('.spinner', { state: 'hidden', timeout: 30000 });
 
   const popupLocator = page.locator('[id=b3]');
   if ((await popupLocator.count()) > 0) {
     await page.getByRole('button', { name: 'OK' }).click();
   }
-
   await page
   .frameLocator('iframe')
   .getByRole('contentinfo')

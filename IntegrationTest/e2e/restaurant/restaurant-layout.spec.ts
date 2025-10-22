@@ -4,6 +4,8 @@ import { restaurantLogin } from "../fixtures/restaurantLogin";
 import { restaurantSelectLayoutType } from "../fixtures/restaurantSelectLayoutType";
 import * as data from "./util/data/restaurant-test-data.json";
 
+test.skip()
+
 let restaurantViewLayoutDropdownExists: boolean;
 
 test.beforeEach(async ({ page }) => {

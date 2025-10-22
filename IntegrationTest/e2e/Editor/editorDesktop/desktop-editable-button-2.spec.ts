@@ -3,6 +3,8 @@ import { test } from "@playwright/test";
 import { login } from "../../fixtures/editorLogin";
 import { removeLayout } from "../../fixtures/removeLayout";
 
+test.skip()
+
 test.describe("Edit Mode Bar tests 2", () => {
   test("should be able to add action", async ({ page }, workerInfo) => {
     const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;

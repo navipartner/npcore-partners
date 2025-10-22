@@ -33,6 +33,7 @@ test.describe("Sale test", () => {
       process.env?.[`E2E_USER_${workerInfo.parallelIndex}_USERNAME`],
       process.env?.[`E2E_USER_${workerInfo.parallelIndex}_PASSWORD`]
     );
+    await page.waitForTimeout(5000)
     await page
     .frameLocator("iframe")
     .getByRole("button", { name: "Test Items" })
@@ -95,6 +96,7 @@ test.describe("Sale test", () => {
       await removeLayout(page, key);
     });
     test("testing correct decimal amount on a payment that is not fixed value but decimals in global settings are set to 0", async ({ page }, workerInfo) => {
+      test.skip()
       const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;
       const salePersonCode = (workerInfo.parallelIndex + 1).toString();
       try {

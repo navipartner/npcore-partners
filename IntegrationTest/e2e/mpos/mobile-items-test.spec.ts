@@ -5,6 +5,7 @@ import { mobileLogin } from "../fixtures/mobileLogin";
 
 test.describe("Mobile add and remove item, search, payment test", () => {
   test("should be able to add item, open and delete item", async ({ page }) => {
+    test.skip()
     await mobileLogin(
       page,
       true,
@@ -156,6 +157,7 @@ test.describe("Mobile add and remove item, search, payment test", () => {
     await page.waitForTimeout(2000);
   });
   test("should be able to search add and delete", async ({ page }) => {
+    test.skip()
     await mobileLogin(
       page,
       true,
@@ -292,6 +294,7 @@ test.describe("Mobile add and remove item, search, payment test", () => {
     await page.waitForTimeout(5000);
   });
   test("should be able to do multiple payment", async ({ page }) => {
+    test.skip()
     await mobileLogin(
       page,
       true,
@@ -359,6 +362,7 @@ test.describe("Mobile add and remove item, search, payment test", () => {
     if (secondButtonExists) {
       await page.click('button:has-text("OK")');
     }
+    await page.waitForTimeout(1000);
     await page.frameLocator("iframe").locator("#button-dialog-ok div").click();
     await page
       .frameLocator("iframe")

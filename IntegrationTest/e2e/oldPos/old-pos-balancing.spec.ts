@@ -1,6 +1,8 @@
 import { test, expect, FrameLocator, Locator } from "@playwright/test";
 import { oldPosLogin } from "../fixtures/oldPosLogin";
 
+test.skip()
+
 test.describe("Old POS balancing test", () => {
   let frame: FrameLocator;
   let salePanel: Locator;

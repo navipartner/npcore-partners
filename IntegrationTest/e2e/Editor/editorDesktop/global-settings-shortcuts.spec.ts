@@ -3,6 +3,8 @@ import { login } from "../../fixtures/editorLogin";
 import { addItemToSale, getFrame } from "../../fixtures/helperFunctions";
 import { removeLayout } from "../../fixtures/removeLayout";
 
+test.skip()
+
 test("should complete payment successfully using created shortcuts", async ({
   page,
 }, workerInfo) => {

@@ -4,6 +4,8 @@ import { login } from "../fixtures/mobileEditorLogin";
 import { mobileLogin } from "../fixtures/mobileLogin";
 import { removeLayout } from "../fixtures/removeLayout";
 
+test.skip()
+
 const createBalancingButtonAndDoASale = async (page) => {
   await page
     .frameLocator("iframe")

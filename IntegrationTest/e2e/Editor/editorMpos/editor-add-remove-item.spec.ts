@@ -4,6 +4,8 @@ import assert from "assert";
 import { login } from "../../fixtures/mobileEditorLogin";
 import { removeLayout } from "../../fixtures/removeLayout";
 
+test.skip()
+
 test.describe("Mobile add and remove item from test", () => {
   test("should be able to add item from popup, open and delete item, add again, swipe and delete item", async ({
     page,

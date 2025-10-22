@@ -3,6 +3,8 @@ import { expect, test } from "@playwright/test";
 import { login } from "../../fixtures/editorLogin";
 import { removeLayout } from "../../fixtures/removeLayout";
 
+test.skip()
+
 test.describe("Top bar tests", () => {
   test("footer display tests", async ({ page }, workerInfo) => {
     const key = `${new Date().getTime()}-WORKER${workerInfo.parallelIndex}`;

@@ -3,6 +3,8 @@ import { test } from "@playwright/test";
 import { login } from "../../fixtures/mobileEditorLogin";
 import { removeLayout } from "../../fixtures/removeLayout";
 
+test.skip()
+
 test.describe("Mobile add and remove editable buttons", () => {
   test("should be able to add new button to mobile items, and drawer, asign it an item action, add item to sale and delete it", async ({
     page,

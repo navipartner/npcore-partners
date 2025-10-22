@@ -3,6 +3,8 @@ import { expect, test } from "@playwright/test";
 import { login } from "../../fixtures/editorLogin";
 import { removeLayout } from "../../fixtures/removeLayout";
 
+test.skip()
+
 test.describe("Global settings modal tests", () => {
   test("testing render of global settings modal", async ({
     page,

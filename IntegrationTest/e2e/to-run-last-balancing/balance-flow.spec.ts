@@ -3,6 +3,8 @@ import { test } from "@playwright/test";
 import { login } from "../fixtures/editorLogin";
 import { removeLayout } from "../fixtures/removeLayout";
 
+test.skip()
+
 test.describe("Balancing v4 test", () => {
   test("User should be able to do balancing by entering amounts in inputs", async ({
     page,

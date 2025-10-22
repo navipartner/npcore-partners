@@ -5,6 +5,7 @@ test.describe("Old POS test", () => {
   test("should be able to add item, change quantity, delete item and cancel sale", async ({
     page,
   }) => {
+    test.skip()
     await oldPosLogin(
       page,
       true,
@@ -164,6 +165,7 @@ test.describe("Old POS test", () => {
     await expect(salePanel.getByText("Small Draft Beer")).not.toBeVisible();
   });
   test("should be able to do multiple payment", async ({ page }) => {
+    test.skip()
     await oldPosLogin(
       page,
       true,

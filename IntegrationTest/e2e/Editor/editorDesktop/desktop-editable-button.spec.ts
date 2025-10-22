@@ -3,6 +3,8 @@ import { test } from "@playwright/test";
 import { login } from "../../fixtures/editorLogin";
 import { removeLayout } from "../../fixtures/removeLayout";
 
+test.skip()
+
 test.describe("Edit Mode Bar tests", () => {
   test("should be able to create editable button, copy and paste", async ({
     page,

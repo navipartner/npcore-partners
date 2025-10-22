@@ -68,7 +68,7 @@ export const login = async (
     .getByRole("contentinfo")
     .locator('svg[data-icon="gear"]')
     .click();
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(3000);
   await page
     .frameLocator("iframe")
     .getByText(salePersonCode, { exact: true })

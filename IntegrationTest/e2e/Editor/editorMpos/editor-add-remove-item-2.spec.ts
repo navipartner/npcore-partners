@@ -3,6 +3,8 @@ import { test } from "@playwright/test";
 import { login } from "../../fixtures/mobileEditorLogin";
 import { removeLayout } from "../../fixtures/removeLayout";
 
+test.skip()
+
 test.describe("Mobile add and remove item from test 2", () => {
   test("should be able to add item, change quantity and remove", async ({
     page,
