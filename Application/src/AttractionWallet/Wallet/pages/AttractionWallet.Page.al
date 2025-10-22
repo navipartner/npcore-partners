@@ -5,7 +5,7 @@ page 6184846 "NPR AttractionWallet"
     ApplicationArea = NPRRetail;
     UsageCategory = Lists;
     SourceTable = "NPR AttractionWallet";
-    Caption = 'Attraction Wallet (will be obsoleted)';
+    Caption = 'Attraction Wallet (will be obsoleted)'; // use page 6185089 "NPR AttractionWallets"
     InsertAllowed = false;
     DeleteAllowed = false;
 

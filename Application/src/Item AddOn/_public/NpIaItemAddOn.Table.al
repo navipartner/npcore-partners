@@ -34,6 +34,30 @@
             Caption = 'Package Template';
             DataClassification = CustomerContent;
         }
+
+        field(210; NPDesignerTemplateId; Text[40])
+        {
+            Caption = 'Design Layout Id';
+            DataClassification = CustomerContent;
+        }
+        field(211; NPDesignerTemplateLabel; Text[80])
+        {
+            Caption = 'Design Layout Label';
+            DataClassification = CustomerContent;
+            trigger OnLookup()
+            var
+                Designer: Codeunit "NPR NPDesigner";
+            begin
+                Designer.LookupDesignLayouts(Rec.FieldCaption(NPDesignerTemplateLabel), Rec.NPDesignerTemplateId, Rec.NPDesignerTemplateLabel);
+            end;
+
+            trigger OnValidate()
+            var
+                Designer: Codeunit "NPR NPDesigner";
+            begin
+                Designer.ValidateDesignLayouts(Rec.NPDesignerTemplateId, Rec.NPDesignerTemplateLabel);
+            end;
+        }
     }
 
     keys

@@ -38,6 +38,11 @@ page 6184857 "NPR WalletTemplateCard"
                     ToolTip = 'Specifies if the current item template is a wallet template.';
                     ApplicationArea = NPRRetail;
                 }
+                field(NPDesignerTemplateLabel; Rec.NPDesignerTemplateLabel)
+                {
+                    ToolTip = 'Specifies the value of the Design Layout Label field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
             }
             part(Control6014405; "NPR WalletTemplateLines")
             {

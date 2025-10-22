@@ -144,6 +144,41 @@ page 6185089 "NPR AttractionWallets"
                     WalletMgr.PrintWallet(Rec.EntryNo, Enum::"NPR WalletPrintType"::WALLET);
                 end;
             }
+            Action(ViewOnlineManifest)
+            {
+                ToolTip = 'Display the content online.';
+                ApplicationArea = NPRTicketWallet, NPRTicketAdvanced;
+                Caption = 'View Online';
+                Image = Web;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                Scope = Repeater;
+
+                trigger OnAction()
+                var
+                    NpDesignerManifestFacade: Codeunit "NPR NPDesignerManifestFacade";
+                    NPDesignerSetup: Record "NPR NPDesignerSetup";
+                    NoManifestFound: Label 'Manifest URL could not be created for this entry.';
+                    ManifestUrl: Text[250];
+                    ManifestId: Guid;
+                    Item: Record Item;
+                    WalletTemplate: Record "NPR NpIa Item AddOn";
+                begin
+                    NPDesignerSetup.Get();
+                    NPDesignerSetup.TestField(EnableManifest, true);
+                    Item.Get(Rec.OriginatesFromItemNo);
+                    WalletTemplate.Get(Item."NPR Item AddOn No.");
+                    WalletTemplate.TestField(WalletTemplate.NPDesignerTemplateLabel);
+
+                    ManifestId := NpDesignerManifestFacade.CreateManifest();
+                    NpDesignerManifestFacade.AddAssetToManifest(ManifestId, Database::"NPR AttractionWallet", Rec.SystemId, Rec.ReferenceNumber, WalletTemplate.NPDesignerTemplateId);
+                    if (NpDesignerManifestFacade.GetManifestUrl(ManifestId, ManifestUrl)) then
+                        Hyperlink(ManifestUrl)
+                    else
+                        Message(NoManifestFound);
+                end;
+            }
         }
 
         area(Navigation)
