@@ -208,11 +208,31 @@
             FieldClass = FlowField;
             CalcFormula = count("NPR Inc Ecom Sales Header" where("Creation Status" = const(Error), "Document Type" = const(Order)));
             Editable = false;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-10-26';
+            ObsoleteReason = 'Use Failed Ecom Sales Orders instead.';
         }
         field(301; "Daily Inc Ecom Sales Orders"; Integer)
         {
             Caption = 'Daily Incoming Ecommerce Sales Orders';
             CalcFormula = Count("NPR Inc Ecom Sales Header" WHERE("Document Type" = FILTER(Order),
+                                                      "Received Date" = FIELD("Date Filter")));
+            FieldClass = FlowField;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-10-26';
+            ObsoleteReason = 'Moved to a PTE as it was a customization for a specific customer.';
+        }
+        field(302; "Failed Ecom Sales Orders"; Integer)
+        {
+            Caption = 'Failed Ecom Sales Orders';
+            FieldClass = FlowField;
+            CalcFormula = count("NPR Ecom Sales Header" where("Creation Status" = const(Error), "Document Type" = const(Order)));
+            Editable = false;
+        }
+        field(303; "Daily Ecom Sales Orders"; Integer)
+        {
+            Caption = 'Daily Ecommerce Sales Orders';
+            CalcFormula = Count("NPR Ecom Sales Header" WHERE("Document Type" = FILTER(Order),
                                                       "Received Date" = FIELD("Date Filter")));
             FieldClass = FlowField;
         }

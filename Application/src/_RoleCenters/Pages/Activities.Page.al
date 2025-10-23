@@ -77,7 +77,7 @@
                     end;
                 }
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
-                field("Failed Inc Ecom Sales Orders"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Failed Inc Ecom Sales Orders"))))
+                field("Failed Inc Ecom Sales Orders"; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Failed Ecom Sales Orders"))))
                 {
                     Caption = 'Failed Incoming Ecommerce Sales Orders';
 
@@ -87,7 +87,7 @@
                     ApplicationArea = NPRRetail;
                     trigger OnDrillDown()
                     var
-                        IncEcomSalesDocUtils: Codeunit "NPR Inc Ecom Sales Doc Utils";
+                        IncEcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
                     begin
                         IncEcomSalesDocUtils.OpenFailedSalesOrders();
                     end;
@@ -114,7 +114,7 @@
                     end;
                 }
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
-                field(TodaysIncEcomSalesOrders; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Daily Inc Ecom Sales Orders"))))
+                field(TodaysIncEcomSalesOrders; GetFieldValueFromBackgroundTaskResultSet(Format(Rec.FieldNo("Daily Ecom Sales Orders"))))
                 {
                     Caption = 'Daily Incoming Ecommerce Sales Orders';
                     ToolTip = 'Specifies the number of the daily incoming ecomerce sales orders that have been registered on today''s date.';
@@ -123,7 +123,7 @@
                     ApplicationArea = NPRRetail;
                     trigger OnDrillDown()
                     var
-                        IncEcomSalesDocUtils: Codeunit "NPR Inc Ecom Sales Doc Utils";
+                        IncEcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
                     begin
                         IncEcomSalesDocUtils.OpenSalesOrders(Format(Today));
                     end;

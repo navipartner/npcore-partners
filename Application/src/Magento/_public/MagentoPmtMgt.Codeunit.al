@@ -70,7 +70,7 @@
     internal procedure UpdatePaymentLineWithEventResponse(var PaymentLine: Record "NPR Magento Payment Line"; PaymentEventType: Option; Response: Record "NPR PG Payment Response")
     var
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
-        IncEcomSalesDocProcess: Codeunit "NPR IncEcomSalesDocProcess";
+        EcomSalesDocProcess: Codeunit "NPR EcomSalesDocProcess";
 #endif
         PrevRec: Text;
     begin
@@ -90,7 +90,7 @@
                                 begin
                                     PaymentLine."Date Captured" := Today();
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
-                                    IncEcomSalesDocProcess.UpdateSalesDocPaymentLineCaptureInformation(PaymentLine);
+                                    EcomSalesDocProcess.UpdateSalesDocPaymentLineCaptureInformation(PaymentLine);
 #endif
                                 end;
                             Response."Reported Operation Status"::Pending:
@@ -785,7 +785,7 @@
     local procedure SetPaymentLineAsPosted(var PaymentLine: Record "NPR Magento Payment Line")
     var
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
-        IncEcomSalesDocProcess: Codeunit "NPR IncEcomSalesDocProcess";
+        EcomSalesDocProcess: Codeunit "NPR EcomSalesDocProcess";
 #endif
     begin
         PaymentLine.Posted := true;
@@ -795,7 +795,7 @@
         PaymentLine.Modify();
 
 #if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
-        IncEcomSalesDocProcess.UpdateSalesDocPaymentLinePostingInformation(PaymentLine);
+        EcomSalesDocProcess.UpdateSalesDocPaymentLinePostingInformation(PaymentLine);
 #endif
     end;
 

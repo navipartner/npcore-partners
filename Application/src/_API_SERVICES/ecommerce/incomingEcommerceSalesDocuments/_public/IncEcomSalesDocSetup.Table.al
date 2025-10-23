@@ -28,9 +28,9 @@ table 6151190 "NPR Inc Ecom Sales Doc Setup"
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
             trigger OnValidate()
             var
-                IncEcomSalesDocProcess: Codeunit "NPR IncEcomSalesDocProcess";
+                EcomSalesDocProcess: Codeunit "NPR EcomSalesDocProcess";
             begin
-                IncEcomSalesDocProcess.HandleSalesOrderProcessJQScheduleConfirmation(Rec."Auto Proc Sales Order");
+                EcomSalesDocProcess.HandleSalesOrderProcessJQScheduleConfirmation(Rec."Auto Proc Sales Order");
             end;
 #endif
         }
@@ -46,9 +46,9 @@ table 6151190 "NPR Inc Ecom Sales Doc Setup"
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
             trigger OnValidate()
             var
-                IncEcomSalesDocProcess: Codeunit "NPR IncEcomSalesDocProcess";
+                EcomSalesDocProcess: Codeunit "NPR EcomSalesDocProcess";
             begin
-                IncEcomSalesDocProcess.HandleSalesReturnOrderProcessJQScheduleConfirmation(Rec."Auto Proc Sales Ret Order");
+                EcomSalesDocProcess.HandleSalesReturnOrderProcessJQScheduleConfirmation(Rec."Auto Proc Sales Ret Order");
             end;
 #endif
         }

@@ -111,9 +111,9 @@ page 6185067 "NPR Inc Ecom Sales Doc Setup"
                 ToolTip = 'Executes the Payment Method Mapping action.';
                 trigger OnAction()
                 var
-                    IncEcomSalesDocUtils: Codeunit "NPR Inc Ecom Sales Doc Utils";
+                    EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
                 begin
-                    IncEcomSalesDocUtils.OpenPaymentMethodMapping();
+                    EcomSalesDocUtils.OpenPaymentMethodMapping();
                 end;
             }
             action(ShipmentMethodMapping)
@@ -124,9 +124,9 @@ page 6185067 "NPR Inc Ecom Sales Doc Setup"
                 ToolTip = 'Executes the Shipment Method Mapping action.';
                 trigger OnAction()
                 var
-                    IncEcomSalesDocUtils: Codeunit "NPR Inc Ecom Sales Doc Utils";
+                    EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
                 begin
-                    IncEcomSalesDocUtils.OpenShipmentMethodMapping();
+                    EcomSalesDocUtils.OpenShipmentMethodMapping();
                 end;
             }
 

@@ -279,6 +279,9 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Adyen Warning Days", 'UpdateAdyenSetup'));
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Inc Ecom Sales Docs", 'CreateIncEcomSalesDocSetup'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Inc Ecom Sales Docs", 'UpgradeDocumentsToNewTables'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Inc Ecom Sales Docs", 'UpgradeSalesOrderJQ'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Inc Ecom Sales Docs", 'UpgradeSalesReturnOrderJQ'));
 #endif
 #IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG No Series Experience", 'UpgradeImplementationFieldOnNoSeries'));
@@ -1072,6 +1075,12 @@
                 case UpgradeStep of
                     'CreateIncEcomSalesDocSetup':
                         exit('NPR-CreateIncEcomSalesDocSetup-20250608');
+                    'UpgradeDocumentsToNewTables':
+                        exit('NPR-UpgradeDocumentsToNewTables-20251022');
+                    'UpgradeSalesOrderJQ':
+                        exit('NPR-UpgradeSalesOrderJQ-20251022');
+                    'UpgradeSalesReturnOrderJQ':
+                        exit('NPR-UpgradeSalesReturnOrderJQ-20251022');
                 end;
 #endif
             Codeunit::"NPR UPGUserAccounts":

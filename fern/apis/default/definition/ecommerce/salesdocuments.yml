@@ -483,7 +483,7 @@ types:
         docs: When type comment is selected, the api will create comments that are going to be visible on the sales order lines.
       no: 
         type: optional<string>
-        docs: Max. length 20 symbols. The no field or the barcodeNo field has to be populated.
+        docs: Max. length 20 symbols, for lines with type shipmentFee 50 symbols. The no field or the barcodeNo field has to be populated.
       variantCode: 
         type: optional<string>
         docs: Max. length 10 symbols.

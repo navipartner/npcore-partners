@@ -7,9 +7,9 @@ codeunit 6248361 "NPR EcomApiHandler"
         _Request: Codeunit "NPR API Request";
         _Response: Codeunit "NPR API Response";
         _ApiFunction: Enum "NPR EcomApiFunctions";
-        IncEcomSalesDocApiAgent: Codeunit "NPR IncEcomSalesDocApiAgent";
-        IncEcomSalesDocApiAgentV2: Codeunit "NPR IncEcomSalesDocApiAgentV2";
-        IncEcomSalesDocImplV2: Codeunit "NPR Inc Ecom Sales Doc Impl V2";
+        EcomSalesDocApiAgent: Codeunit "NPR EcomSalesDocApiAgent";
+        EcomSalesDocImplV2: Codeunit "NPR Ecom Sales Doc Impl V2";
+        EcomSalesDocApiAgentV2: Codeunit "NPR EcomSalesDocApiAgentV2";
 
     trigger OnRun()
     begin
@@ -44,10 +44,10 @@ codeunit 6248361 "NPR EcomApiHandler"
     local procedure RunCreateDocAPIAgentBasedOnRequestHeaderVersion()
     begin
         case true of
-            _Request.ApiVersion() >= IncEcomSalesDocImplV2.GetApiVersionV2():
-                _Response := IncEcomSalesDocApiAgentV2.CreateIncomingEcomDocument(_Request);
+            _Request.ApiVersion() >= EcomSalesDocImplV2.GetApiVersion():
+                _Response := EcomSalesDocApiAgentV2.CreateIncomingEcomDocument(_Request);
             else
-                _Response := IncEcomSalesDocApiAgent.CreateIncomingEcomDocument(_Request);
+                _Response := EcomSalesDocApiAgent.CreateIncomingEcomDocument(_Request);
         // Add new api-date-version cases here as needed
         end;
     end;
@@ -55,10 +55,10 @@ codeunit 6248361 "NPR EcomApiHandler"
     local procedure RunGetDocAPIAgentBasedOnRequestHeaderVersion()
     begin
         case true of
-            _Request.ApiVersion() >= IncEcomSalesDocImplV2.GetApiVersionV2():
-                _Response := IncEcomSalesDocApiAgentV2.GetIncomingEcomDocumentById(_Request);
+            _Request.ApiVersion() >= EcomSalesDocImplV2.GetApiVersion():
+                _Response := EcomSalesDocApiAgentV2.GetIncomingEcomDocumentById(_Request);
             else
-                _Response := IncEcomSalesDocApiAgent.GetIncomingEcomDocumentById(_Request);
+                _Response := EcomSalesDocApiAgent.GetIncomingEcomDocumentById(_Request);
         // Add new api-date-version cases here as needed
         end;
     end;
