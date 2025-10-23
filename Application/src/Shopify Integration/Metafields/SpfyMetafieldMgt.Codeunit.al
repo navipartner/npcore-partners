@@ -677,11 +677,17 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
     var
         SpfyEntityMetafield: Record "NPR Spfy Entity Metafield";
         DataLogMgt: Codeunit "NPR Data Log Management";
+        NewValue: Text;
     begin
+        if Params."Metafield Raw Value".HasValue() then
+            NewValue := Params.GetMetafieldValue(false);
+
         FilterSpfyEntityMetafields(Params."BC Record ID", Params."Owner Type", SpfyEntityMetafield);
         SpfyEntityMetafield.SetRange("Metafield ID", Params."Metafield ID");
         if not SpfyEntityMetafield.FindFirst() then begin
             if not Params."Metafield Raw Value".HasValue() then
+                exit;
+            if IsEmptyMetafieldValue(NewValue) then
                 exit;
 
             SpfyEntityMetafield.Init();
@@ -703,16 +709,17 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
             exit;
         end;
 
-        if not Params."Metafield Raw Value".HasValue() and DeleteEmpty then begin
-            if DisableDataLog then
-                DataLogMgt.DisableDataLog(true);
-            SpfyEntityMetafield.Delete(true);
-            if DisableDataLog then
-                DataLogMgt.DisableDataLog(false);
-            exit;
-        end;
+        if DeleteEmpty then
+            if not Params."Metafield Raw Value".HasValue() or IsEmptyMetafieldValue(NewValue) then begin
+                if DisableDataLog then
+                    DataLogMgt.DisableDataLog(true);
+                SpfyEntityMetafield.Delete(true);
+                if DisableDataLog then
+                    DataLogMgt.DisableDataLog(false);
+                exit;
+            end;
 
-        if (Params.GetMetafieldValue(false) = SpfyEntityMetafield.GetMetafieldValue(true)) and
+        if (NewValue = SpfyEntityMetafield.GetMetafieldValue(true)) and
            (Params."Metafield Key" in ['', SpfyEntityMetafield."Metafield Key"]) and
            (Params."Metafield Value Version ID" in ['', SpfyEntityMetafield."Metafield Value Version ID"])
         then
@@ -816,6 +823,11 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
         if not (ShopifyOwnerType in [ShopifyOwnerType::PRODUCT, ShopifyOwnerType::PRODUCTVARIANT, ShopifyOwnerType::CUSTOMER]) then
             Error(UndefinedOwnerTypeErr, ShopifyOwnerType);
         Result := SelectStr(ShopifyOwnerType.AsInteger(), ShopifyOwnerTypesTxt);
+    end;
+
+    local procedure IsEmptyMetafieldValue(Value: Text): Boolean
+    begin
+        exit(Value in ['', '{}', '[]']);
     end;
 
     internal procedure OwnerTypeEnumValueName(OwnerType: Enum "NPR Spfy Metafield Owner Type") Result: Text

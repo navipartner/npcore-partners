@@ -79,34 +79,36 @@ codeunit 6248535 "NPR Spfy M/F Hdl.-Item Categ."
 
     local procedure ProcessItemCategoryChange(Item: Record Item; ShopifyStoreCode: Code[20]; Removed: Boolean)
     var
-        SpfyEntityMetafieldParam: Record "NPR Spfy Entity Metafield";
         SpfyMetafieldMapping: Record "NPR Spfy Metafield Mapping";
         SpfyStore: Record "NPR Spfy Store";
-        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
-        SendItemAndInventory: Codeunit "NPR Spfy Send Items&Inventory";
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
-        ShopifyMetafieldValue: Text;
     begin
         SpfyMetafieldMgt.FilterMetafieldMapping(Database::"NPR Spfy Store", SpfyStore.FieldNo("Item Category as Metafield"), ShopifyStoreCode, SpfyMetafieldMapping."Owner Type"::PRODUCT, SpfyMetafieldMapping);
-        if SpfyMetafieldMapping.IsEmpty() then
-            exit;
-        SpfyMetafieldMapping.FindSet();
-        repeat
-            if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Item Categories", SpfyMetafieldMapping."Shopify Store Code") then begin
-                if SendItemAndInventory.GetStoreItemLink(Item."No.", SpfyMetafieldMapping."Shopify Store Code", false, SpfyStoreItemLink) then begin
-                    if Removed then
-                        ShopifyMetafieldValue := ''
-                    else
-                        GenerateItemCategoryMetafieldValueArray(Item."Item Category Code", SpfyMetafieldMapping."Shopify Store Code").WriteTo(ShopifyMetafieldValue);
+        if SpfyMetafieldMapping.FindFirst() then
+            if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Item Categories", SpfyMetafieldMapping."Shopify Store Code") then
+                ProcessItemCategoryChange(Item, SpfyMetafieldMapping, Removed);
+    end;
 
-                    SpfyEntityMetafieldParam."BC Record ID" := SpfyStoreItemLink.RecordId();
-                    SpfyEntityMetafieldParam."Owner Type" := SpfyMetafieldMapping."Owner Type";
-                    SpfyEntityMetafieldParam."Metafield ID" := SpfyMetafieldMapping."Metafield ID";
-                    SpfyEntityMetafieldParam.SetMetafieldValue(ShopifyMetafieldValue);
-                    SpfyMetafieldMgt.SetEntityMetafieldValue(SpfyEntityMetafieldParam, false, false);
-                end;
-            end;
-        until SpfyMetafieldMapping.Next() = 0;
+    internal procedure ProcessItemCategoryChange(Item: Record Item; SpfyMetafieldMapping: Record "NPR Spfy Metafield Mapping"; Removed: Boolean)
+    var
+        SpfyEntityMetafieldParam: Record "NPR Spfy Entity Metafield";
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        SendItemAndInventory: Codeunit "NPR Spfy Send Items&Inventory";
+        ShopifyMetafieldValue: Text;
+    begin
+        if not SendItemAndInventory.GetStoreItemLink(Item."No.", SpfyMetafieldMapping."Shopify Store Code", false, SpfyStoreItemLink) then
+            exit;
+
+        if Removed then
+            ShopifyMetafieldValue := ''
+        else
+            GenerateItemCategoryMetafieldValueArray(Item."Item Category Code", SpfyMetafieldMapping."Shopify Store Code").WriteTo(ShopifyMetafieldValue);
+
+        SpfyEntityMetafieldParam."BC Record ID" := SpfyStoreItemLink.RecordId();
+        SpfyEntityMetafieldParam."Owner Type" := SpfyMetafieldMapping."Owner Type";
+        SpfyEntityMetafieldParam."Metafield ID" := SpfyMetafieldMapping."Metafield ID";
+        SpfyEntityMetafieldParam.SetMetafieldValue(ShopifyMetafieldValue);
+        SpfyMetafieldMgt.SetEntityMetafieldValue(SpfyEntityMetafieldParam, false, false);
     end;
 
     local procedure SetItemCategory(ItemNo: Code[20]; NewSetOfCategoriesTxt: Text)

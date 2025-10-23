@@ -6,7 +6,6 @@ page 6184704 "NPR Spfy Store Card"
     PageType = Card;
     SourceTable = "NPR Spfy Store";
     UsageCategory = None;
-    PromotedActionCategories = 'New,Process,Report,Initial Setup';
 
     layout
     {
@@ -468,10 +467,6 @@ page 6184704 "NPR Spfy Store Card"
                     ToolTip = 'Executes initial item synchronization between Business Central and Shopify. The system will iterate through items in Business Central and identify those that already exist in Shopify. The system will also update item statuses, names, descriptions and metafields from Shopify and create requests to assign product tags in Shopify based on the item categories selected for the items in Business Central.';
                     ApplicationArea = NPRShopify;
                     Image = CheckList;
-                    Promoted = true;
-                    PromotedIsBig = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Category4;
 
                     trigger OnAction()
                     var
@@ -487,10 +482,6 @@ page 6184704 "NPR Spfy Store Card"
                     ToolTip = 'Executes initial customer synchronization between Business Central and Shopify. The system will iterate through customers in Business Central and identify those that already exist in Shopify. The system will also update customer information from Shopify.';
                     ApplicationArea = NPRShopify;
                     Image = CheckList;
-                    Promoted = true;
-                    PromotedIsBig = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Category4;
 
                     trigger OnAction()
                     var
@@ -506,10 +497,6 @@ page 6184704 "NPR Spfy Store Card"
                     ToolTip = 'Executes initial retail voucher migration from Business Central to Shopify. The system will iterate through retail vouchers in Business Central and create those marked as synchronizable with your selected Shopify store as gift cards in the store. The system will also update gift card balances in Shopify as needed.';
                     ApplicationArea = NPRShopify;
                     Image = Migration;
-                    Promoted = true;
-                    PromotedIsBig = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Category4;
 
                     trigger OnAction()
                     var
@@ -520,25 +507,43 @@ page 6184704 "NPR Spfy Store Card"
                         Report.Run(Report::"NPR Spfy Initial Voucher Sync", true, false, ShopifyStore);
                     end;
                 }
-                action(SyncItemCategories)
+                group(ItemCategory)
                 {
-                    Caption = 'Sync. Item Categories';
-                    ToolTip = 'Executes the initial migration of item categories from Business Central to Shopify. The system will iterate through the item categories in Business Central and create any that do not already exist in your selected Shopify store.';
-                    ApplicationArea = NPRShopify;
-                    Image = LinkAccount;
-                    Promoted = true;
-                    PromotedIsBig = true;
-                    PromotedOnly = true;
-                    PromotedCategory = Category4;
+                    Caption = 'Item Categories';
+                    Image = ItemGroup;
 
-                    trigger OnAction()
-                    var
-                        ShopifyStore: Record "NPR Spfy Store";
-                    begin
-                        CurrPage.SaveRecord();
-                        ShopifyStore.SetRange(Code, Rec.Code);
-                        Report.Run(Report::"NPR Spfy Item Category Sync", true, false, ShopifyStore);
-                    end;
+                    action(SyncItemCategories)
+                    {
+                        Caption = 'Sync. Item Categories';
+                        ToolTip = 'Executes the initial migration of item categories from Business Central to Shopify. The system will iterate through the item categories in Business Central and create any that do not already exist in your selected Shopify store.';
+                        ApplicationArea = NPRShopify;
+                        Image = LinkAccount;
+
+                        trigger OnAction()
+                        var
+                            ShopifyStore: Record "NPR Spfy Store";
+                        begin
+                            CurrPage.SaveRecord();
+                            ShopifyStore.SetRange(Code, Rec.Code);
+                            Report.Run(Report::"NPR Spfy Item Category Sync", true, false, ShopifyStore);
+                        end;
+                    }
+                    action(InitItemCatMetafieldVals)
+                    {
+                        Caption = 'Init Item Metafield values';
+                        ToolTip = 'Updates item metafield values based on the item categories currently assigned to items in Business Central.';
+                        ApplicationArea = NPRShopify;
+                        Image = CalculateLines;
+
+                        trigger OnAction()
+                        var
+                            ShopifyStore: Record "NPR Spfy Store";
+                        begin
+                            CurrPage.SaveRecord();
+                            ShopifyStore.SetRange(Code, Rec.Code);
+                            Report.Run(Report::"NPR Spfy Init Item Cat.MF Vals", true, false, ShopifyStore);
+                        end;
+                    }
                 }
             }
         }
@@ -559,10 +564,6 @@ page 6184704 "NPR Spfy Store Card"
                 ToolTip = 'View the list of Shopify sales channels for your shop and select the ones you want to use when creating new products in Shopify.';
                 ApplicationArea = NPRShopify;
                 Image = List;
-                Promoted = true;
-                PromotedIsBig = true;
-                PromotedOnly = true;
-                PromotedCategory = Category4;
                 RunObject = Page "NPR Spfy Sales Channels";
                 RunPageLink = "Shopify Store Code" = field(Code);
             }
@@ -580,6 +581,46 @@ page 6184704 "NPR Spfy Store Card"
                 RunPageLink = "Store Code" = field(Code);
             }
         }
+#if not (BC17 or BC18 or BC19 or BC20)
+        area(Promoted)
+        {
+            actionref(SyncItems_Promoted; SyncItems)
+            {
+                Visible = false;
+                ObsoleteState = Pending;
+                ObsoleteTag = '2025-10-26';
+                ObsoleteReason = 'No need to have initial sync actions as promoted.';
+            }
+            actionref(SyncCustomers_Promoted; SyncCustomers)
+            {
+                Visible = false;
+                ObsoleteState = Pending;
+                ObsoleteTag = '2025-10-26';
+                ObsoleteReason = 'No need to have initial sync actions as promoted.';
+            }
+            actionref(SyncRetailVouchers_Promoted; SyncRetailVouchers)
+            {
+                Visible = false;
+                ObsoleteState = Pending;
+                ObsoleteTag = '2025-10-26';
+                ObsoleteReason = 'No need to have initial sync actions as promoted.';
+            }
+            actionref(SyncItemCategories_Promoted; SyncItemCategories)
+            {
+                Visible = false;
+                ObsoleteState = Pending;
+                ObsoleteTag = '2025-10-26';
+                ObsoleteReason = 'No need to have initial sync actions as promoted.';
+            }
+            actionref(SalesChannels_Promoted; SalesChannels)
+            {
+                Visible = false;
+                ObsoleteState = Pending;
+                ObsoleteTag = '2025-10-26';
+                ObsoleteReason = 'No need to have initial sync actions as promoted.';
+            }
+        }
+#endif
     }
 
     trigger OnOpenPage()

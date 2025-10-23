@@ -501,9 +501,8 @@ table 6150810 "NPR Spfy Store"
         SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
     begin
         SpfyMetafieldMgt.FilterMetafieldMapping(RecordId(), FieldNo("Item Category as Metafield"), Code, Enum::"NPR Spfy Metafield Owner Type"::PRODUCT, SpfyMetafieldMapping);
-        if SpfyMetafieldMapping.IsEmpty() then
+        if not SpfyMetafieldMapping.FindFirst() then
             exit('');
-        SpfyMetafieldMapping.FindFirst();
         exit(SpfyMetafieldMapping."Metafield ID");
     end;
 
@@ -513,9 +512,8 @@ table 6150810 "NPR Spfy Store"
         SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
     begin
         SpfyMetafieldMgt.FilterMetafieldMapping(RecordId(), FieldNo("Loyalty Points as Metafield"), Code, Enum::"NPR Spfy Metafield Owner Type"::CUSTOMER, SpfyMetafieldMapping);
-        if SpfyMetafieldMapping.IsEmpty() then
+        if not SpfyMetafieldMapping.FindFirst() then
             exit('');
-        SpfyMetafieldMapping.FindFirst();
         exit(SpfyMetafieldMapping."Metafield ID");
     end;
 

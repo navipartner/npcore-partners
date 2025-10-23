@@ -105,6 +105,38 @@ page 6184553 "NPR Spfy Integration Setup"
                         Report.Run(Report::"NPR Spfy Initial Voucher Sync", true);
                     end;
                 }
+                group(ItemCategory)
+                {
+                    Caption = 'Item Categories';
+                    Image = ItemGroup;
+
+                    action(SyncItemCategories)
+                    {
+                        Caption = 'Sync. Item Categories';
+                        ToolTip = 'Executes the initial migration of item categories from Business Central to Shopify. The system will iterate through the item categories in Business Central and create any that do not already exist in your selected Shopify store.';
+                        ApplicationArea = NPRShopify;
+                        Image = LinkAccount;
+
+                        trigger OnAction()
+                        begin
+                            CurrPage.SaveRecord();
+                            Report.Run(Report::"NPR Spfy Item Category Sync", true);
+                        end;
+                    }
+                    action(InitItemCatMetafieldVals)
+                    {
+                        Caption = 'Init Item Metafield values';
+                        ToolTip = 'Updates item metafield values based on the item categories currently assigned to items in Business Central.';
+                        ApplicationArea = NPRShopify;
+                        Image = CalculateLines;
+
+                        trigger OnAction()
+                        begin
+                            CurrPage.SaveRecord();
+                            Report.Run(Report::"NPR Spfy Init Item Cat.MF Vals", true);
+                        end;
+                    }
+                }
                 group("Azure Active Directory OAuth")
                 {
                     Caption = 'Microsoft Entra ID OAuth';
