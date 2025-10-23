@@ -335,7 +335,7 @@
 
             PriceListLine.SetPosition(ChangeLogEntry."Primary Key");
             if PriceListLine.Find() then;
-            if PriceListLine."Source Type" = PriceListLine."Source Type"::"All Customers" then begin
+            if ShouldCreateRetailPriceLogEntry(PriceListLine) then begin
                 TempRetailPriceLogEntry.Init();
                 TempRetailPriceLogEntry."Entry No." := i;
                 ChangeLogEnty2PriceLogEntry(ChangeLogEntry, TempRetailPriceLogEntry);
@@ -347,6 +347,14 @@
                 TempRetailPriceLogEntry.Insert();
             end;
         until ChangeLogEntry.Next() = 0;
+    end;
+
+    local procedure ShouldCreateRetailPriceLogEntry(PriceListLine: Record "Price List Line") ShouldCreate: Boolean
+    var
+        RetailPricePublicMgt: Codeunit "NPR Retail Price Public Mgt.";
+    begin
+        ShouldCreate := PriceListLine."Source Type" = PriceListLine."Source Type"::"All Customers";
+        RetailPricePublicMgt.OnAfterShouldCreateRetailPriceLogEntry(PriceListLine, ShouldCreate);
     end;
 
     local procedure FindNewSalesLineDiscountLogEntries(var TempRetailPriceLogEntry: Record "NPR Retail Price Log Entry" temporary)
@@ -373,7 +381,7 @@
             i += 1;
 
             PriceListLine.SetPosition(ChangeLogEntry."Primary Key");
-            if (PriceListLine."Asset Type" = PriceListLine."Asset Type"::Item) and (PriceListLine."Source Type" = PriceListLine."Source Type"::"All Customers") then begin
+            if (PriceListLine."Asset Type" = PriceListLine."Asset Type"::Item) and ShouldCreateRetailPriceLogEntry(PriceListLine) then begin
                 TempRetailPriceLogEntry.Init();
                 TempRetailPriceLogEntry."Entry No." := i;
                 ChangeLogEnty2PriceLogEntry(ChangeLogEntry, TempRetailPriceLogEntry);
