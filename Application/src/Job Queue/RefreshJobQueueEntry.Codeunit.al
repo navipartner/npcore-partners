@@ -93,7 +93,9 @@ codeunit 6248478 "NPR Refresh Job Queue Entry"
     internal procedure IsNprCustomizableJob(var JQMonitorEntry: Record "NPR Monitored Job Queue Entry"): Boolean
     begin
         exit(
-            (JQMonitorEntry."Object Type to Run" = JQMonitorEntry."Object Type to Run"::Codeunit) and
-            (JQMonitorEntry."Object ID to Run" in [3997]));  //Codeunit::"Retention Policy JQ"
+            //3997 - Codeunit::"Retention Policy JQ"
+            ((JQMonitorEntry."Object Type to Run" = JQMonitorEntry."Object Type to Run"::Codeunit) and (JQMonitorEntry."Object ID to Run" in [3997])) or
+            ((JQMonitorEntry."Object Type to Run" = JQMonitorEntry."Object Type to Run"::Report) and (JQMonitorEntry."Object ID to Run" in [Report::"Adjust Cost - Item Entries"]))
+        );
     end;
 }

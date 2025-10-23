@@ -230,7 +230,7 @@
         if Handled then
             exit;
         if ((JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Report) and
-            (JobQueueEntry."Object ID to Run" in [Report::"Adjust Cost - Item Entries", Report::"Post Inventory Cost to G/L"]))
+            (JobQueueEntry."Object ID to Run" = Report::"Post Inventory Cost to G/L"))
            or
            ((JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
             (JobQueueEntry."Object ID to Run" = Codeunit::"NPR Post Inventory Cost to G/L"))
