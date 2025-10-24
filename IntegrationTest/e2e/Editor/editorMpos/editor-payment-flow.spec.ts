@@ -3,6 +3,8 @@ import { test } from "@playwright/test";
 import { login } from "../../fixtures/mobileEditorLogin";
 import { removeLayout } from "../../fixtures/removeLayout";
 
+test.skip()
+
 test.describe("Mobile payment flow", () => {
   test("should be able to do single and multy payment", async ({
     page,

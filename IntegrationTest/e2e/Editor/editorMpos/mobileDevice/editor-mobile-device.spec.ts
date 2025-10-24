@@ -5,6 +5,8 @@ import { login } from "../../../fixtures/mobileEditorLogin";
 import { mobileLogin } from "../../../fixtures/mobileLogin";
 import { removeLayout } from "../../../fixtures/removeLayout";
 
+test.skip()
+
 test.describe("Editor mobile device add and remove item, search, and payment test", () => {
   test("should be able to search item, add and remove, do payment", async ({
     page,

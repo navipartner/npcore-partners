@@ -3,9 +3,10 @@ import assert from "assert";
 
 import { mobileLogin } from "../fixtures/mobileLogin";
 
+test.skip()
+
 test.describe("Mobile add and remove item, search, payment test", () => {
   test("should be able to add item, open and delete item", async ({ page }) => {
-    test.skip()
     await mobileLogin(
       page,
       true,
@@ -157,7 +158,6 @@ test.describe("Mobile add and remove item, search, payment test", () => {
     await page.waitForTimeout(2000);
   });
   test("should be able to search add and delete", async ({ page }) => {
-    test.skip()
     await mobileLogin(
       page,
       true,
@@ -294,7 +294,6 @@ test.describe("Mobile add and remove item, search, payment test", () => {
     await page.waitForTimeout(5000);
   });
   test("should be able to do multiple payment", async ({ page }) => {
-    test.skip()
     await mobileLogin(
       page,
       true,
