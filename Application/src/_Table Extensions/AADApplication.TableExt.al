@@ -34,19 +34,22 @@ tableextension 6014525 "NPR AAD Application" extends "AAD Application"
 #endif
     }
 
-    trigger OnDelete()
+    trigger OnBeforeDelete()
     var
         AccessControl: Record "Access Control";
         ExternalJQRefresherMgt: Codeunit "NPR External JQ Refresher Mgt.";
         HttpResponseMessage: HttpResponseMessage;
         ResponseText: Text;
+        CouldNotDeleteEntraAppLbl: Label 'The Entra application could not be removed because it is associated with the external job queue refresher, and updating the Entra app association database for the external job queue refresher has failed. Please contact system vendor to resolve this issue.\External response:\%1';
     begin
-        if AccessControl.Get(Rec."User ID", ExternalJQRefresherMgt.ExtJQRefresherRoleID(), '', AccessControl.Scope::System, Rec."App ID") then begin
+        AccessControl.SetRange("User Security ID", Rec."User ID");
+        AccessControl.SetRange("Role ID", ExternalJQRefresherMgt.ExtJQRefresherRoleID());
+        AccessControl.SetRange("App ID", Rec."App ID");
+        if not AccessControl.IsEmpty() then begin
             ExternalJQRefresherMgt.ManageJQRefresherUser(Rec."Client Id", '', Enum::"NPR Ext. JQ Refresher Options"::delete, HttpResponseMessage);
             if not HttpResponseMessage.IsSuccessStatusCode() then begin
                 HttpResponseMessage.Content().ReadAs(ResponseText);
-                Message(ResponseText);
-                exit;
+                Error(CouldNotDeleteEntraAppLbl, ResponseText);
             end;
         end;
     end;
