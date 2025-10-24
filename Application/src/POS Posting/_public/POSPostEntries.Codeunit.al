@@ -454,6 +454,7 @@
                               POSPostingSetup."Account No.",
                               POSPostingBuffer."VAT Amount",
                               POSPostingBuffer."VAT Amount (LCY)",
+                              true,
                               GenJournalLine);
                             if POSPostingBuffer."Applies-to Doc. No." <> '' then begin
                                 GenJournalLine.Validate("Applies-to Doc. Type", POSPostingBuffer."Applies-to Doc. Type");
@@ -882,6 +883,7 @@
               "Tax Calculation Type"::"Normal VAT",
               GenJournalLine."Deferral Code",
               GenJournalLine."Deferral Line No.",
+              false,
               GenJournalLine);
         end;
 
@@ -1465,10 +1467,24 @@
         DeferralPostingBuffer.DeleteAll();
     end;
 
-    local procedure MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer: Record "NPR POS Posting Buffer"; AmountIn: Decimal; AmountInLCY: Decimal; PostingType: Enum "General Posting Type"; AccountType: Enum "Gen. Journal Account Type";
-                                                                                                                                                                    AccountNo: Code[20];
-                                                                                                                                                                    VATAmountIn: Decimal;
-                                                                                                                                                                    VATAmountInLCY: Decimal; var GenJournalLine: Record "Gen. Journal Line")
+    local procedure MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer: Record "NPR POS Posting Buffer";
+                                                        AmountIn: Decimal; AmountInLCY: Decimal;
+                                                        PostingType: Enum "General Posting Type";
+                                                        AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20];
+                                                        VATAmountIn: Decimal; VATAmountInLCY: Decimal;
+                                                        var GenJournalLine: Record "Gen. Journal Line")
+    begin
+        MakeGenJournalFromPOSPostingBuffer(
+            POSPostingBuffer, AmountIn, AmountInLCY, PostingType, AccountType, AccountNo, VATAmountIn, VATAmountInLCY, false, GenJournalLine);
+    end;
+
+    local procedure MakeGenJournalFromPOSPostingBuffer(POSPostingBuffer: Record "NPR POS Posting Buffer";
+                                                        AmountIn: Decimal; AmountInLCY: Decimal;
+                                                        PostingType: Enum "General Posting Type";
+                                                        AccountType: Enum "Gen. Journal Account Type"; AccountNo: Code[20];
+                                                        VATAmountIn: Decimal; VATAmountInLCY: Decimal;
+                                                        IsPaymentSettlementAccount: Boolean;
+                                                        var GenJournalLine: Record "Gen. Journal Line")
     var
         POSStore: Record "NPR POS Store";
         POSPostingProfile: Record "NPR POS Posting Profile";
@@ -1508,6 +1524,7 @@
           POSPostingBuffer."VAT Calculation Type",
           POSPostingBuffer."Deferral Code",
           POSPostingBuffer."Deferral Line No.",
+          IsPaymentSettlementAccount,
           GenJournalLine);
 
         OnAfterInsertPOSPostingBufferToGenJnl(POSPostingBuffer, GenJournalLine, false);
@@ -1542,7 +1559,9 @@
                                                         POSPostingProfile: Record "NPR POS Posting Profile";
                                                         TaxCalcType: Enum "Tax Calculation Type";
                                                         DeferralCode: Code[10];
-                                                        DeferralLineNo: Integer; var GenJournalLine: Record "Gen. Journal Line")
+                                                        DeferralLineNo: Integer;
+                                                        IsPaymentSettlementAccount: Boolean;
+                                                        var GenJournalLine: Record "Gen. Journal Line")
     begin
         _LineNumber := _LineNumber + 10000;
         GenJournalLine.Init();
@@ -1551,7 +1570,7 @@
         GenJournalLine."Line No." := _LineNumber;
         GenJournalLine."System-Created Entry" := true;
         GenJournalLine."Account Type" := AccountType;
-        if GenJournalLine."Account Type" = GenJournalLine."Account Type"::Customer then
+        if (GenJournalLine."Account Type" = GenJournalLine."Account Type"::Customer) and not IsPaymentSettlementAccount then
             if PostingAmount <= 0 then
                 GenJournalLine."Document Type" := GenJournalLine."Document Type"::Payment
             else
@@ -2026,7 +2045,7 @@
         TempInvoicePostingBuffer."Global Dimension 1 Code" := POSEntrySalesLine."Shortcut Dimension 1 Code";
         TempInvoicePostingBuffer."Global Dimension 2 Code" := POSEntrySalesLine."Shortcut Dimension 2 Code";
 
-        DeferralPostingBuffer.PrepareInitialPair(TempInvoicePostingBuffer, POSEntrySalesLine."Amount Excl. VAT (LCY)", POSEntrySalesLine."Amount Excl. VAT", SalesAccount,  DeferralTemplate."Deferral Account");
+        DeferralPostingBuffer.PrepareInitialPair(TempInvoicePostingBuffer, POSEntrySalesLine."Amount Excl. VAT (LCY)", POSEntrySalesLine."Amount Excl. VAT", SalesAccount, DeferralTemplate."Deferral Account");
         DeferralPostingBuffer.ReverseAmounts();
         DeferralPostingBuffer.Update(DeferralPostingBuffer, TempInvoicePostingBuffer);
 #else
