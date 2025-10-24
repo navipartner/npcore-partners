@@ -9,7 +9,7 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
             Request.Match('GET', '/inventory/item/:id'):
                 exit(GetItem(Request));
             Request.Match('GET', '/inventory/item'):
-                exit(GetItem(Request));
+                exit(ListItems(Request));
             Request.Match('GET', '/inventory/itemledgerentry'):
                 exit(GetItemLedgerEntry(Request));
             Request.Match('GET', '/inventory/itemvariant'):
@@ -26,31 +26,165 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
     procedure GetItem(Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         Item: Record Item;
-        Fields: Dictionary of [Integer, Text];
-        Id: Text;
+        JsonBuilder: Codeunit "NPR Json Builder";
+        ItemId: Text;
+        WithAttributes: Boolean;
     begin
-        if Request.QueryParams().ContainsKey('itemCode') then begin
-            Item.SetFilter("No.", '=%1', Request.QueryParams().Get('itemCode'));
+        ItemId := Request.Paths().Get(3);
+        Item.ReadIsolation := IsolationLevel::ReadCommitted;
+        if not Item.GetBySystemId(ItemId) then
+            exit(Response.RespondResourceNotFound());
+
+        Item.CalcFields(Inventory);
+        if (Request.QueryParams().ContainsKey('withAttributes')) then
+            WithAttributes := (Request.QueryParams().Get('withAttributes').ToLower() = 'true');
+
+        exit(Response.RespondOK(ItemToJson(JsonBuilder, Item, WithAttributes, true).Build()));
+    end;
+
+    procedure ListItems(Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        Item: Record "Item";
+        RecRef: RecordRef;
+        JsonBuilder: Codeunit "NPR Json Builder";
+        Parameters: Dictionary of [Text, Text];
+        JsonObject: JsonObject;
+        PageKey: Text;
+        Limit: Integer;
+        EntryCount: Integer;
+        PageContinuation: Boolean;
+        DataFound: Boolean;
+        MoreRecords: Boolean;
+        WithAttributes: Boolean;
+        Sync: Boolean;
+    begin
+        Parameters := Request.QueryParams();
+
+        if (Parameters.ContainsKey('withAttributes')) then
+            WithAttributes := (Parameters.Get('withAttributes').ToLower() = 'true');
+
+        if Parameters.ContainsKey('itemCode') then
+            Item.SetRange("No.", Parameters.Get('itemCode'));
+
+        RecRef.GetTable(Item);
+
+        if (Parameters.ContainsKey('pageSize')) then
+            Evaluate(Limit, Parameters.Get('pageSize'));
+        if (Limit < 1) or (Limit > 20000) then
+            Limit := 20000;
+
+        if (Parameters.ContainsKey('pageKey')) then begin
+            Request.ApplyPageKey(Parameters.Get('pageKey'), RecRef);
+            PageContinuation := true;
         end;
 
-        Fields.Add(Item.FieldNo("No."), 'code');
-        Fields.Add(Item.FieldNo(Description), 'description');
-        Fields.Add(Item.FieldNo("Description 2"), 'description2');
-        Fields.Add(Item.FieldNo("Base Unit of Measure"), 'baseUnitOfMeasure');
-        Fields.Add(Item.FieldNo("Item Disc. Group"), 'itemDiscGroup');
-        Fields.Add(Item.FieldNo("Item Category Code"), 'itemCategoryCode');
-        Fields.Add(Item.FieldNo("VAT Prod. Posting Group"), 'vatProdPostingGroup');
+        if Parameters.ContainsKey('sync') then begin
+            Evaluate(Sync, Parameters.Get('sync'));
+            if Sync then begin
+                // Error if table is missing a key that starts with rowVersion for efficient data replication.
+                Request.SetKeyToRowVersion(RecRef);
+            end;
 
-        if Request.Paths().Count > 2 then begin
-            Id := Request.Paths().Get(3);
-
-            //only read flowfields when grabbing a single record
-            Fields.Add(Item.FieldNo(Inventory), 'inventory');
-            Fields.Add(Item.FieldNo("NPR Has Variants"), 'hasVariants');
-            exit(Response.RespondOK(Request.GetData(Item, Fields, Id)));
-        end else begin
-            exit(Response.RespondOK(Request.GetData(Item, Fields)));
+            if Parameters.ContainsKey('lastRowVersion') then begin
+                RecRef.Field(0).SetFilter('>%1', Parameters.Get('lastRowVersion'));
+            end;
         end;
+
+        RecRef.SetTable(Item);
+        Item.ReadIsolation := IsolationLevel::ReadCommitted;
+
+        JsonBuilder.StartArray();
+
+        if PageContinuation then
+            DataFound := Item.Find('>')
+        else
+            DataFound := Item.Find('-');
+
+        if DataFound then
+            repeat
+                JsonBuilder.AddObject(ItemToJson(JsonBuilder, Item, WithAttributes, false, Sync));
+                EntryCount += 1;
+                if (EntryCount = Limit) then begin
+                    RecRef.GetTable(Item);
+                    PageKey := Request.GetPageKey(RecRef);
+                end;
+                MoreRecords := Item.Next() <> 0;
+            until (not MoreRecords) or (EntryCount = Limit);
+
+        JsonBuilder.EndArray();
+
+        JsonObject.Add('morePages', MoreRecords);
+        JsonObject.Add('nextPageKey', PageKey);
+        JsonObject.Add('nextPageURL', Request.GetNextPageUrl(PageKey));
+        JsonObject.Add('data', JsonBuilder.BuildAsArray());
+
+        exit(Response.RespondOK(JsonObject));
+    end;
+
+    local procedure ItemToJson(var JsonBuilder: Codeunit "NPR Json Builder"; var Item: Record Item; WithAttributes: Boolean; SingleItem: Boolean): Codeunit "NPR Json Builder"
+    begin
+        exit(ItemToJson(JsonBuilder, Item, WithAttributes, SingleItem, true));
+    end;
+
+    local procedure ItemToJson(var JsonBuilder: Codeunit "NPR Json Builder"; var Item: Record Item; WithAttributes: Boolean; SingleItem: Boolean; Sync: Boolean): Codeunit "NPR Json Builder"
+    begin
+        JsonBuilder.StartObject().AddProperty('id', Format(Item.SystemId, 0, 4).ToLower())
+                                 .AddProperty('code', Item."No.")
+                                 .AddProperty('description', Item.Description)
+                                 .AddProperty('description2', Item."Description 2")
+                                 .AddProperty('baseUnitOfMeasure', Item."Base Unit of Measure")
+                                 .AddProperty('itemDiscGroup', Item."Item Disc. Group")
+                                 .AddProperty('itemCategoryCode', Item."Item Category Code")
+                                 .AddProperty('vatProdPostingGroup', Item."VAT Prod. Posting Group")
+                                 .AddProperty('unitPrice', Item."Unit Price");
+
+        if SingleItem then
+            JsonBuilder.AddProperty('inventory', Item.Inventory)
+                       .AddProperty('hasVariants', Item."NPR Has Variants");
+        if Sync then
+            JsonBuilder.AddProperty('rowVersion', Format(Item.SystemRowVersion, 0, 9));
+
+        if WithAttributes then begin
+            JsonBuilder.StartObject('attributes');
+            JsonBuilder.AddObject(AddItemAttributes(JsonBuilder, Item."No."));
+            JsonBuilder.EndObject();
+        end;
+
+        JsonBuilder.EndObject();
+        exit(JsonBuilder);
+    end;
+
+    local procedure AddItemAttributes(var JsonBuilder: Codeunit "NPR Json Builder"; ItemNo: Code[20]): Codeunit "NPR Json Builder"
+    var
+        ItemAttribute: Record "Item Attribute";
+        ItemAttributeValue: Record "Item Attribute Value";
+        ItemAttributeValueMapping: Record "Item Attribute Value Mapping";
+        IntegerValue: Integer;
+    begin
+        ItemAttributeValueMapping.SetRange("Table ID", Database::Item);
+        ItemAttributeValueMapping.SetRange("No.", ItemNo);
+        if ItemAttributeValueMapping.FindSet() then begin
+            repeat
+                if ItemAttribute.Get(ItemAttributeValueMapping."Item Attribute ID") then
+                    if ItemAttributeValue.Get(ItemAttributeValueMapping."Item Attribute ID", ItemAttributeValueMapping."Item Attribute Value ID") then begin
+                        case ItemAttribute."Type" of
+                            ItemAttribute."Type"::Text,
+                            ItemAttribute."Type"::Option:
+                                JsonBuilder.AddProperty(ItemAttribute.Name, ItemAttributeValue."Value");
+                            ItemAttribute."Type"::Decimal:
+                                JsonBuilder.AddProperty(ItemAttribute.Name, ItemAttributeValue."Numeric Value");
+                            ItemAttribute."Type"::Integer:
+                                begin
+                                    IntegerValue := ItemAttributeValue."Numeric Value";
+                                    JsonBuilder.AddProperty(ItemAttribute.Name, IntegerValue);
+                                end;
+                            ItemAttribute."Type"::Date:
+                                JsonBuilder.AddProperty(ItemAttribute.Name, ItemAttributeValue."Date Value");
+                        end;
+                    end;
+            until ItemAttributeValueMapping.Next() = 0;
+        end;
+        exit(JsonBuilder);
     end;
 
     procedure GetItemLedgerEntry(Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
