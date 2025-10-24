@@ -16,6 +16,7 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
                     trigger OnBeforePassVariable()
                     begin
                         sndid := PacsoftSetup."Sender QuickID";
+                        OnAfterBeforePassVariableSenderId(shipmentdocument, sndid);
                     end;
                 }
                 textelement(sendername)
@@ -1851,6 +1852,11 @@ xmlport 6014484 "NPR Pacsoft Shipment Document"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterBeforePassVariableWeight(var Weight: Text)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterBeforePassVariableSenderId(ShippingProviderDocument: Record "NPR Shipping Provider Document"; var SenderId: Text)
     begin
     end;
 }
