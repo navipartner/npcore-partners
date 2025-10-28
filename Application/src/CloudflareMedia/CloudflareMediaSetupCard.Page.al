@@ -27,7 +27,7 @@ page 6185123 "NPR CloudflareMediaSetupCard"
                         PageAction: Action;
                     begin
                         PageAction := Page.RunModal(Page::"NPR CloudflareMediaLicense");
-                        CurrPage.Update();
+                        UpdateLicenseInfo();
                     end;
                 }
             }
@@ -60,7 +60,12 @@ page 6185123 "NPR CloudflareMediaSetupCard"
         _ExpirationDate: DateTime;
         _BadLicense: Boolean;
 
-    trigger OnAfterGetRecord()
+    trigger OnOpenPage()
+    begin
+        UpdateLicenseInfo();
+    end;
+
+    local procedure UpdateLicenseInfo()
     var
         CloudFlareFacade: Codeunit "NPR CloudflareMediaFacade";
         KeyId: Text;
@@ -73,7 +78,6 @@ page 6185123 "NPR CloudflareMediaSetupCard"
             _LicenseInfo := StrSubstNo(ExpirationDate, Format(_ExpirationDate));
 
         _BadLicense := (_LicenseInfo = NoLicense) or (CurrentDateTime() > _ExpirationDate);
-
     end;
 
 }
