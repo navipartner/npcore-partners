@@ -44,6 +44,13 @@ codeunit 6185061 "NPR AttractionWalletFacade"
         WalletEntryNo := WalletManagement.CreateWalletFromFacade(OriginatesFromItemNo, Name, WalletReferenceNumber);
     end;
 
+    procedure CreateWallet(OriginatesFromItemNo: Code[20]; Name: Text[100]; var WalletReferenceNumber: Text[50]; ExternalReferenceNumber: Text[100]) WalletEntryNo: Integer
+    var
+        WalletManagement: Codeunit "NPR AttractionWallet";
+    begin
+        WalletEntryNo := WalletManagement.CreateWalletFromFacade(OriginatesFromItemNo, Name, WalletReferenceNumber, ExternalReferenceNumber);
+    end;
+
     procedure AddTicketsToWallet(WalletEntryNo: Integer; TicketIds: List of [Guid])
     var
         WalletManagement: Codeunit "NPR AttractionWallet";
@@ -77,6 +84,13 @@ codeunit 6185061 "NPR AttractionWalletFacade"
         WalletManagement: Codeunit "NPR AttractionWallet";
     begin
         WalletManagement.AddHeaderReference(WalletEntryNo, TableId, SystemId, Reference);
+    end;
+
+    procedure SetWalletExternalReference(WalletEntryNo: Integer; ExternalReference: Text[100]; BlockExisting: Boolean): Boolean
+    var
+        WalletManagement: Codeunit "NPR AttractionWallet";
+    begin
+        exit(WalletManagement.SetWalletExternalReference(WalletEntryNo, ExternalReference, BlockExisting));
     end;
 
     procedure UpdateEmailAddressOnAllWallets(FromEmail: Text[100]; ToEmail: Text[100])
