@@ -5,6 +5,7 @@ codeunit 6185083 "NPR TicketingReservationAgent"
 
     var
         _Translation: Codeunit "NPR TicketingApiTranslations";
+        _IncludeTicketNumbers: Boolean;
 
     internal procedure CreateReservation(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     begin
@@ -29,6 +30,8 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         ReservationId: Text[100];
     begin
         ReservationId := CopyStr(Request.Paths().Get(3), 1, MaxStrLen(ReservationId));
+        GetParameter_includeTicketNumbers(Request, _IncludeTicketNumbers);
+
         exit(GetReservation(ReservationId));
     end;
 
@@ -38,6 +41,8 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         TicketRequestManager: Codeunit "NPR TM Ticket WebService Mgr";
     begin
         ReservationId := CopyStr(Request.Paths().Get(3), 1, MaxStrLen(ReservationId));
+        GetParameter_includeTicketNumbers(Request, _IncludeTicketNumbers);
+
         TicketRequestManager.PreConfirmReservationRequest(ReservationId);
 
         exit(GetReservation(ReservationId));
@@ -167,6 +172,8 @@ codeunit 6185083 "NPR TicketingReservationAgent"
                 exit(Response.RespondResourceNotFound(StrSubstNo('The reservation with ID %1 was not found or has an invalid state.', ReservationId)));
             Token := TicketReservationRequest."Session Token ID";
         end;
+
+        GetParameter_includeTicketNumbers(Request, _IncludeTicketNumbers);
 
         Body := Request.BodyJson().AsObject();
         if (not Body.Get('reserve', JValueToken)) then
@@ -486,7 +493,8 @@ codeunit 6185083 "NPR TicketingReservationAgent"
     begin
         TicketReservationRequest.Get(PrimaryEntryNo);
         if (TicketReservationRequest."Request Status" <> TicketReservationRequest."Request Status"::Confirmed) then
-            exit(ResponseJson);
+            if (not _IncludeTicketNumbers) then
+                exit(ResponseJson);
 
         ResponseJson.StartArray(PropertyName);
 
@@ -505,7 +513,15 @@ codeunit 6185083 "NPR TicketingReservationAgent"
 
     end;
 
+    local procedure GetParameter_includeTicketNumbers(Request: Codeunit "NPR API Request"; var IncludeTicketNumbers: Boolean): Boolean
+    begin
+        IncludeTicketNumbers := false;
+        if (not Request.QueryParams().ContainsKey('includeTicketNumbers')) then
+            exit(false);
 
+        IncludeTicketNumbers := Request.QueryParams().Get('includeTicketNumbers').ToLower() = 'true';
+        exit(true);
+    end;
 
     local procedure ConfirmReservation(Token: Code[100]; TicketHolderName: Text[100]; NotificationAddress: Text[80]; PaymentReference: Code[20]; Language: Code[10]; var ErrorCode: Code[10]; var ErrorMessage: Text): Boolean
     var

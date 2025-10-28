@@ -23,6 +23,8 @@ service:
       request:
         name: createReservation 
         body: CreateReservationRequest
+        query-parameters:
+          includeTicketNumbers: optional<QP_IncludeTicketNumbers>
       response: 
         type: GetReservationDetails
       examples:
@@ -64,6 +66,8 @@ service:
       request:
         name: updateReservation 
         body: CreateReservationRequest
+        query-parameters:
+          includeTicketNumbers: optional<QP_IncludeTicketNumbers>
       response: GetReservationDetails
       examples:
         - path-parameters:
@@ -127,6 +131,8 @@ service:
         token: simpleTypes.Token
       request: 
         name: preConfirmReservation
+        query-parameters:
+          includeTicketNumbers: optional<QP_IncludeTicketNumbers>
       response: ReservationActionResponse
       examples:
         # Success response
@@ -189,6 +195,8 @@ service:
         token: simpleTypes.Token
       request: 
         name: getReservation
+        query-parameters:
+          includeTicketNumbers: optional<QP_IncludeTicketNumbers>
       response: GetReservationDetails
       examples:
         # Success response
@@ -376,3 +384,13 @@ types:
           unitPrice: 80.00
           unitPriceInclVat: 100.00
           currencyCode: DKK
+
+
+
+  QP_IncludeTicketNumbers:
+    docs:
+      Indicates whether ticket numbers should be included in reservation responses.
+      Tickets are normally included only when the reservation is confirmed.
+      If `true`, ticket numbers are returned regardless of reservation status.
+      When a reservation is updated, any previously disclosed ticket numbers are removed.
+    type: boolean
