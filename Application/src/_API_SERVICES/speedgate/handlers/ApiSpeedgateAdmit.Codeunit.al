@@ -1,7 +1,13 @@
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
 codeunit 6185119 "NPR ApiSpeedgateAdmit"
 {
+
     Access = Internal;
+
+    var
+        _XApiVersion: Date;
+
+
     internal procedure GetSetup(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         ScannerDefault: Record "NPR SG SpeedGateDefault";
@@ -138,6 +144,7 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         LogEntryNo := SpeedGateMgr.CreateInitialEntry(ReferenceNumber, AdmissionCode, ScannerId);
         Commit();
 
+        SetApiVersion(Request.ApiVersion());
         exit(TryAdmit(LogEntryNo));
 
     end;
@@ -799,13 +806,12 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
         Member: Record "NPR MM Member";
         MemberCardSwipe: Record "NPR MM Member Arr. Log Entry";
         MemberCardProfileLine: Record "NPR SG MemberCardProfileLine";
-        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
-        Base64StringImage: Text;
         TimeZoneHelper: Codeunit "NPR TM TimeHelper";
+        HavePicture: Boolean;
     begin
         MemberCard.SetLoadFields("Membership Entry No.", "Member Entry No.");
         Membership.SetLoadFields("External Membership No.", "Membership Code");
-        Member.SetLoadFields("External Member No.", "First Name", "Last Name", Image);
+        Member.SetLoadFields("Entry No.", SystemId, "External Member No.", "First Name", "Last Name", Image);
         MemberCardSwipe.SetLoadFields("Created At", "Admission Code", "Scanner Station Id", "Response Type");
 
         if (not MemberCard.GetBySystemId(ValidationRequest.EntityId)) then
@@ -844,16 +850,17 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             .StartObject('member')
                 .AddProperty('memberId', Format(Member.SystemId, 0, 4).ToLower());
 
+        HavePicture := MemberHasImage(Member);
         if (MemberCardProfileLine.IncludeMemberDetails) then
             ResponseJson
                 .AddProperty('firstName', Member."First Name")
                 .AddProperty('lastName', Member."Last Name")
-                .AddProperty('hasPicture', Member.Image.HasValue())
+                .AddProperty('hasPicture', HavePicture)
                 .AddProperty('hasNotes', Member.HasLinks());
 
         if (MemberCardProfileLine.IncludeMemberPhoto) then begin
-            if (MembershipManagement.GetMemberImageThumbnail(Member."Entry No.", Base64StringImage)) then
-                ResponseJson.AddProperty('picture', Base64StringImage)
+            if (HavePicture) then
+                ResponseJson.AddProperty('picture', GetThumbnail(Member))
             else
                 ResponseJson.AddProperty('picture');
         end;
@@ -863,6 +870,43 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             .EndObject();
 
         exit(ResponseJson);
+    end;
+
+    local procedure GetThumbnail(Member: record "NPR MM Member") Picture: Text
+    var
+        MemberMedia: Codeunit "NPR MMMemberImageMediaHandler";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+        DataUrl: Label 'data:image/jpeg;base64,%1', locked = true;
+    begin
+
+        if (MemberMedia.IsFeatureEnabled()) then begin
+            case GetApiVersion() of
+                0D .. DMY2Date(26, 10, 2025):
+                    begin
+                        MemberMedia.GetMemberImageB64(Member.SystemId, Enum::"NPR CloudflareMediaVariants"::LARGE, Picture); // Raw b64 string
+                        Picture := StrSubstNo(DataUrl, Picture);
+                    end;
+                else
+                    MemberMedia.GetMemberImageUrl(Member.SystemId, Enum::"NPR CloudflareMediaVariants"::LARGE, 300, Picture); // Http URL to image
+            end;
+
+        end else begin
+            // As it was before media handling
+            MembershipManagement.GetMemberImageThumbnail(Member."Entry No.", Picture); // Raw b64 string
+        end;
+
+
+        exit(Picture);
+    end;
+
+    local procedure MemberHasImage(Member: record "NPR MM Member"): Boolean
+    var
+        MemberMedia: Codeunit "NPR MMMemberImageMediaHandler";
+    begin
+        if (MemberMedia.IsFeatureEnabled()) then
+            exit(MemberMedia.HaveMemberImage(Member.SystemId));
+
+        exit(Member.Image.HasValue());
     end;
 
     local procedure SingleMembershipAnonymousDTO(var ResponseJson: Codeunit "NPR JSON Builder"; MemberCardId: Guid): Codeunit "NPR JSON Builder"
@@ -1039,5 +1083,16 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
     end;
 
 
+    local procedure SetApiVersion(VersionDate: Date)
+    begin
+        _XApiVersion := VersionDate;
+    end;
+
+    local procedure GetApiVersion(): Date
+    begin
+        if (_XApiVersion = 0D) then
+            exit(Today());
+        exit(_XApiVersion);
+    end;
 }
 #endif

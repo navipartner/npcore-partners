@@ -312,6 +312,7 @@
 #pragma warning disable AA0240
         DummyEMailAddressLbl: Label '%1@anon.%2.navipartner.com', Locked = true;
 #pragma warning restore
+        MemberMedia: Codeunit "NPR MMMemberImageMediaHandler";
     begin
 
         Member.Get(MemberEntryNo);
@@ -354,6 +355,9 @@
                 MemberCard.Modify();
             until (MemberCard.Next() = 0);
         end;
+
+        if (MemberMedia.IsFeatureEnabled()) then
+            MemberMedia.UnlinkMemberImage(Member.SystemId);
     end;
 
     local procedure DoAnonymizeRole(var MembershipRole: Record "NPR MM Membership Role")

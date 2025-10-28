@@ -452,17 +452,26 @@
         }
         area(factboxes)
         {
+            part(CloudflareMedia; "NPR MMMemberExtImageFactBox")
+            {
+                Caption = 'Picture';
+                ShowFilter = false;
+                SubPageLink = "Entry No." = field("Entry No.");
+                Visible = _CloudflareMediaVisible;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+            }
             part(MMMemberPicture; "NPR MM Member Picture")
             {
-
                 Caption = 'Picture';
+                ShowFilter = false;
                 SubPageLink = "Entry No." = field("Entry No.");
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Visible = not _CloudflareMediaVisible;
             }
             systempart(Control6150638; Notes)
             {
+                Caption = 'Notes';
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-
             }
         }
     }
@@ -610,6 +619,7 @@
                 PromotedOnly = true;
                 PromotedCategory = Process;
                 PromotedIsBig = true;
+                Visible = false;
 
                 ToolTip = 'Executes the Import Picture action';
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
@@ -1021,6 +1031,7 @@
     trigger OnOpenPage()
     var
         RaptorSetup: Record "NPR Raptor Setup";
+        CloudflareMediaFeature: Codeunit "NPR MemberImageMediaFeature";
     begin
         if not HLIntegrationSetup.Get() then
             Clear(HLIntegrationSetup);
@@ -1041,6 +1052,9 @@
 
         RaptorEnabled := (RaptorSetup.Get() and RaptorSetup."Enable Raptor Functions");
         MCF_MemberOfVisible := HLMCFSubscriptionMgt.GetMCFMemberOfVisible();
+
+        _CloudflareMediaVisible := CloudflareMediaFeature.IsFeatureEnabled();
+
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -1078,6 +1092,7 @@
         MCF_MemberOf: Text;
         MCF_MemberOfVisible: Boolean;
         NO_ENTRIES: Label 'No entries found for member %1.';
+        _CloudflareMediaVisible: Boolean;
 
     local procedure SetMasterDataAttributeValue(AttributeNumber: Integer)
     begin

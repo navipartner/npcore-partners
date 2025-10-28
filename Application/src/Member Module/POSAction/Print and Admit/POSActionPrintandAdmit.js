@@ -58,7 +58,7 @@ const main = async ({
       switch (reference.type) {
         // Member Card
         case 1: {
-          if (reference.memberDetails) {
+          if (reference.memberDetails.MemberScanned) {
             toast.memberScanned({
               memberImg: reference.memberDetails.MemberScanned.ImageDataUrl,
               memberName: reference.memberDetails.MemberScanned.Name,

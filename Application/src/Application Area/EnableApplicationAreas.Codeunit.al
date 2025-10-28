@@ -46,6 +46,7 @@ codeunit 6151349 "NPR Enable Application Areas"
     begin
         TempApplicationAreaSetup."NPR Membership Essential" := IsFeatureEnabled(Feature::"Membership Essential");
         TempApplicationAreaSetup."NPR Membership Advanced" := IsFeatureEnabled(Feature::"Membership Advanced");
+        TempApplicationAreaSetup."NPR MemberImagesInCloudflare" := IsFeatureEnabled(Feature::MemberMediaInCloudflare);
     end;
 
     local procedure EnableHeyLoyaltyApplicationAreas(var TempApplicationAreaSetup: Record "Application Area Setup" temporary)

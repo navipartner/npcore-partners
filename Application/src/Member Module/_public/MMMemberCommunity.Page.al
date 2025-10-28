@@ -361,6 +361,72 @@
                         end;
                     }
                 }
+
+                group(CloudflareMedia)
+                {
+                    Caption = 'Cloudflare Media';
+
+                    action(MigrateMemberPicturesToCFAsTask)
+                    {
+                        Caption = 'Migrate Member Pictures - Asynchronous Upload to Cloudflare R2';
+                        ToolTip = 'Executes the migration of member pictures to the cloud storage as a task.';
+                        Image = Action;
+                        ApplicationArea = NPRMembershipAdvanced;
+
+                        trigger OnAction()
+                        var
+                            MemberPictureMgt: Codeunit "NPR MemberImageMigrateToCFR2";
+                        begin
+                            MemberPictureMgt.StartMigrationAsync();
+                        end;
+                    }
+
+                    action(MigrateMemberPicturesCheckTaskStatus)
+                    {
+                        Caption = 'Check status on Task';
+                        ToolTip = 'Check the status of the member pictures migration task.';
+                        Image = Action;
+                        ApplicationArea = NPRMembershipAdvanced;
+
+                        trigger OnAction()
+                        var
+                            MemberPictureMgt: Codeunit "NPR MemberImageMigrateToCFR2";
+                        begin
+                            Message('%1', MemberPictureMgt.CheckMigrationStatus());
+                        end;
+                    }
+
+                    action(LoadJsonFileForMigration)
+                    {
+                        ApplicationArea = NPRRetail;
+                        Caption = 'Migrate Member Pictures - from External Storage';
+                        Image = Import;
+                        ToolTip = 'Load a JSON file containing media information for migration. Example: [{"public_id":"". "url":""}].';
+                        trigger OnAction()
+                        var
+                            CloudflareMedia: Codeunit "NPR CloudflareMediaFacade";
+                            Job: Record "NPR CloudflareMigrationJob";
+                        begin
+                            Job.Get(CloudflareMedia.CreateMigrationJobFromJsonFileArray(Enum::"NPR CloudflareMediaSelector"::MEMBER_PHOTO));
+                            Page.Run(Page::"NPR CloudflareMigrationJobCard", Job);
+                        end;
+                    }
+
+                    action(JobsList)
+                    {
+                        Caption = 'Jobs';
+                        Image = ImportDatabase;
+                        ToolTip = 'View and manage Cloudflare Media Migration Jobs.';
+                        ApplicationArea = NPRRetail;
+                        trigger OnAction()
+                        var
+                            Job: Record "NPR CloudflareMigrationJob";
+                        begin
+                            Job.SetFilter(MediaSelector, '%1', Enum::"NPR CloudflareMediaSelector"::MEMBER_PHOTO);
+                            Page.Run(Page::"NPR CloudflareMigrationJob", Job);
+                        end;
+                    }
+                }
             }
         }
     }

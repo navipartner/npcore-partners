@@ -66,6 +66,7 @@ codeunit 6151434 "NPR Feature Management Install"
         AddFeature(Feature::"New Sales Receipt Experience");
         AddFeature(Feature::"New EFT Receipt Experience");
         AddFeature(Feature::Magento);
+        AddFeature(Feature::MemberMediaInCloudflare);
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
         AddFeature(Feature::"POS License Billing Integration");
 #endif

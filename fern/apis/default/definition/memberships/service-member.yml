@@ -162,7 +162,7 @@ service:
           query-parameters:
             size: $simpleTypes.MemberImageSize.Original
           response:
-            body: $GetMemberImageResponse.ExampleGetMemberImage
+            body: $GetMemberImageResponse.ExampleGetMemberImageUrl
 
     setMemberImage:
       docs: 
@@ -316,23 +316,38 @@ types:
 
   # Get Member Image Service
   GetMemberImageResponse:
-    docs: Response to retrieving a member image
+    docs: |
+        Response to retrieving a member image.  
+
+        **Change effective from 2025-10-27:**  
+        The `image` property now contains a complete image source string instead of raw Base64 data.
+
+        Depending on tenant configuration:
+        - Tenants with Business Central natively hosted image storage receive a Base64-encoded Data URI, e.g. `data:image/jpeg;base64,<encoded data>`
+        - Tenants with hosted image storage receive an HTTPS URL, e.g. `https://image-service.example.com/<imagename>.jpg`. The URL is time-limited and secured.
+
+        Both formats can be used directly in an `<img src>` attribute.  
+        Clients that previously decoded the Base64 manually should update accordingly.
     properties:
       image: simpleTypes.Base64Image
     examples:
-      - name: ExampleGetMemberImage
+      - name: ExampleGetMemberImageUrl
+        value:
+          image: $simpleTypes.Base64Image.ExampleImageUrl 
+      - name: ExampleGetMemberImageB64
         value:
           image: $simpleTypes.Base64Image.ExampleBase64Image
+
 
   # Set Member Image Service
   SetMemberImageRequest:
     docs: Request to set a member image
     properties:
-      image: simpleTypes.Base64Image
+      image: simpleTypes.SetBase64Image
     examples:
       - name: ExampleSetMemberImage
         value:
-          image: $simpleTypes.Base64Image.ExampleBase64Image
+          image: $simpleTypes.SetBase64Image.ExampleBase64Image
         
   SetMemberImageResponse:
     docs: Response to setting a member image

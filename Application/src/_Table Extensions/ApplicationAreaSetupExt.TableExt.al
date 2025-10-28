@@ -177,5 +177,11 @@ tableextension 6014680 "NPR Application Area Setup Ext" extends "Application Are
             Caption = 'NaviPartner Magento Integration';
             DataClassification = CustomerContent;
         }
+
+        field(6060130; "NPR MemberImagesInCloudflare"; Boolean)
+        {
+            Caption = 'NaviPartner Member Images in Cloudflare R2 storage';
+            DataClassification = CustomerContent;
+        }
     }
 }

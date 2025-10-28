@@ -122,36 +122,120 @@ codeunit 6248220 "NPR MemberApiAgent"
     internal procedure GetMemberImage(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         Member: Record "NPR MM Member";
-        ResponseJson: Codeunit "NPR JSON Builder";
-        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
-        Base64StringImage: Text;
+        MemberMedia: Codeunit "NPR MMMemberImageMediaHandler";
         ImageSize: text[20];
-        HaveImage: Boolean;
     begin
-        Member.SetLoadFields("Entry No.", Image);
+        Member.SetLoadFields("Entry No.", SystemId, Image);
 
         if (not GetMemberById(Request, 3, Member)) then
             exit(InvalidMemberIdResponse());
 
-        if (not Member.Image.HasValue()) then
+        if (not MemberHasPicture(Member)) then
             exit(Response.RespondBadRequest('Member has no image'));
 
         if (Request.QueryParams().ContainsKey('size')) then
             ImageSize := CopyStr(Request.QueryParams().Get('size'), 1, MaxStrLen(ImageSize));
 
+        case Request.ApiVersion() of
+            0D .. DMY2DATE(26, 10, 2025):
+                exit("GetMemberImage_v20251026"(Member."Entry No.", ImageSize));
+        end;
+
+        if (not MemberMedia.IsFeatureEnabled()) then
+            exit("GetMemberImage_BC"(Member."Entry No.", ImageSize));
+
+        exit("GetMemberImage_CF"(Member.SystemId, ImageSize));
+    end;
+
+    local procedure "GetMemberImage_BC"(MemberEntryNo: Integer; ImageSize: text[20]) Response: Codeunit "NPR API Response"
+    var
+        Base64StringImage: Text;
+        ResponseJson: Codeunit "NPR JSON Builder";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+        DataUrl: Label 'data:image/jpeg;base64,%1', locked = true;
+        HaveImage: Boolean;
+    begin
+
+        // Still the old way - image is stored in BC, not Cloudflare. Payload is base64 string packed in data url (new).
         case LowerCase(ImageSize) of
             'small':
-                HaveImage := MembershipManagement.GetMemberImageThumbnail(Member."Entry No.", Base64StringImage, 70);
+                HaveImage := MembershipManagement.GetMemberImageThumbnail(MemberEntryNo, Base64StringImage, 70);
             'medium':
-                HaveImage := MembershipManagement.GetMemberImageThumbnail(Member."Entry No.", Base64StringImage, 240);
+                HaveImage := MembershipManagement.GetMemberImageThumbnail(MemberEntryNo, Base64StringImage, 240);
             'large':
-                HaveImage := MembershipManagement.GetMemberImageThumbnail(Member."Entry No.", Base64StringImage, 360);
+                HaveImage := MembershipManagement.GetMemberImageThumbnail(MemberEntryNo, Base64StringImage, 360);
             'embedded':
-                HaveImage := MembershipManagement.GetMemberImageThumbnail(Member."Entry No.", Base64StringImage, 0);
+                HaveImage := MembershipManagement.GetMemberImageThumbnail(MemberEntryNo, Base64StringImage, 0);
             'original':
-                HaveImage := MembershipManagement.GetMemberImage(Member."Entry No.", Base64StringImage);
+                HaveImage := MembershipManagement.GetMemberImage(MemberEntryNo, Base64StringImage);
             else
-                HaveImage := MembershipManagement.GetMemberImageThumbnail(Member."Entry No.", Base64StringImage);
+                HaveImage := MembershipManagement.GetMemberImageThumbnail(MemberEntryNo, Base64StringImage);
+        end;
+
+        if (not HaveImage) then
+            exit(Response.RespondBadRequest('There was an error retrieving the image with that size, try one of these: small, medium, large, embedded, original'));
+
+        ResponseJson.StartObject()
+            .AddProperty('image', StrSubstNo(DataUrl, Base64StringImage))
+            .EndObject();
+
+        exit(Response.RespondOK(ResponseJson.Build()));
+    end;
+
+    local procedure "GetMemberImage_CF"(MemberSystemId: Guid; ImageSize: text[20]) Response: Codeunit "NPR API Response"
+    var
+        ResponseJson: Codeunit "NPR JSON Builder";
+        MemberMedia: Codeunit "NPR MMMemberImageMediaHandler";
+        ImageUrl: Text;
+        HaveImage: Boolean;
+    begin
+        case LowerCase(ImageSize) of
+            'small':
+                HaveImage := MemberMedia.GetMemberImageUrl(MemberSystemId, Enum::"NPR CloudflareMediaVariants"::SMALL, 300, ImageUrl);
+            'medium':
+                HaveImage := MemberMedia.GetMemberImageUrl(MemberSystemId, Enum::"NPR CloudflareMediaVariants"::MEDIUM, 300, ImageUrl);
+            'large':
+                HaveImage := MemberMedia.GetMemberImageUrl(MemberSystemId, Enum::"NPR CloudflareMediaVariants"::LARGE, 300, ImageUrl);
+            'embedded':
+                HaveImage := MemberMedia.GetMemberImageUrl(MemberSystemId, Enum::"NPR CloudflareMediaVariants"::PREVIEW, 300, ImageUrl);
+            'original':
+                HaveImage := MemberMedia.GetMemberImageUrl(MemberSystemId, Enum::"NPR CloudflareMediaVariants"::ORIGINAL, 300, ImageUrl);
+            else
+                HaveImage := MemberMedia.GetMemberImageUrl(MemberSystemId, Enum::"NPR CloudflareMediaVariants"::THUMBNAIL, 300, ImageUrl);
+        end;
+
+
+        if (not HaveImage) then
+            exit(Response.RespondBadRequest('There was an error retrieving the image with that size, try one of these: small, medium, large, embedded, original'));
+
+        ResponseJson.StartObject()
+            .AddProperty('image', ImageUrl)
+            .EndObject();
+
+        exit(Response.RespondOK(ResponseJson.Build()));
+    end;
+
+
+    local procedure GetMemberImage_v20251026(MemberEntryNo: Integer; ImageSize: text[20]) Response: Codeunit "NPR API Response"
+    var
+        Base64StringImage: Text;
+        ResponseJson: Codeunit "NPR JSON Builder";
+        MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+        HaveImage: Boolean;
+    begin
+        case LowerCase(ImageSize) of
+            'small':
+                HaveImage := MembershipManagement.GetMemberImageThumbnail(MemberEntryNo, Base64StringImage, 70);
+            'medium':
+                HaveImage := MembershipManagement.GetMemberImageThumbnail(MemberEntryNo, Base64StringImage, 240);
+            'large':
+                HaveImage := MembershipManagement.GetMemberImageThumbnail(MemberEntryNo, Base64StringImage, 360);
+            'embedded':
+                HaveImage := MembershipManagement.GetMemberImageThumbnail(MemberEntryNo, Base64StringImage, 0);
+            'original':
+                HaveImage := MembershipManagement.GetMemberImage(MemberEntryNo, Base64StringImage);
+            else
+                HaveImage := MembershipManagement.GetMemberImageThumbnail(MemberEntryNo, Base64StringImage);
         end;
 
         if (not HaveImage) then
@@ -164,6 +248,7 @@ codeunit 6248220 "NPR MemberApiAgent"
         exit(Response.RespondOK(ResponseJson.Build()));
     end;
 
+
     internal procedure SetMemberImage(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         Member: Record "NPR MM Member";
@@ -171,6 +256,11 @@ codeunit 6248220 "NPR MemberApiAgent"
         JObject: JsonObject;
         JToken: JsonToken;
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+        MemberMedia: Codeunit "NPR MMMemberImageMediaHandler";
+        MediaId: Guid;
+        MediaKey: Text;
+        MediaResponse: JsonObject;
+        ImageUrl: Text;
     begin
         if (not GetMemberById(Request, 3, Member)) then
             exit(InvalidMemberIdResponse());
@@ -179,13 +269,32 @@ codeunit 6248220 "NPR MemberApiAgent"
         if (not JObject.Get('image', JToken)) then
             exit(Response.RespondBadRequest('Missing image property'));
 
-        if (not MembershipManagement.UpdateMemberImage(Member."Entry No.", JToken.AsValue().AsText())) then
-            exit(Response.RespondBadRequest('There was an error updating the image'));
+        if (MemberMedia.IsFeatureEnabled()) then begin
+            if (not MemberMedia.PutMemberImage(Member."External Member No.", '', JToken.AsValue().AsText(), MediaResponse)) then
+                exit(Response.RespondBadRequest('There was an error updating the image'));
 
-        Member.Get(Member."Entry No.");
-        ResponseJson.StartObject()
-            .AddProperty('mediaId', Format(Member.Image.MediaId(), 0, 4).ToLower())
-            .EndObject();
+            if (not MediaResponse.Get('url', JToken)) then
+                exit(Response.RespondBadRequest('Media response did not include url'));
+
+            ImageUrl := JToken.AsValue().AsText();
+
+            MemberMedia.GetMediaDetails(Member.SystemId, MediaId, MediaKey);
+            ResponseJson.StartObject()
+                .AddProperty('mediaId', Format(MediaId, 0, 4).ToLower())
+                .AddProperty('imageUrl', ImageUrl)
+                .EndObject();
+
+        end else begin
+            if (not MembershipManagement.UpdateMemberImage(Member."Entry No.", JToken.AsValue().AsText())) then
+                exit(Response.RespondBadRequest('There was an error updating the image'));
+
+            Member.SetLoadFields(Image);
+            Member.Get(Member."Entry No.");
+            ResponseJson.StartObject()
+                .AddProperty('mediaId', Format(Member.Image.MediaId(), 0, 4).ToLower())
+                .EndObject();
+
+        end;
 
         exit(Response.RespondOK(ResponseJson.Build()));
     end;
@@ -646,7 +755,7 @@ codeunit 6248220 "NPR MemberApiAgent"
             .AddProperty('email', Member."E-Mail Address")
             .AddProperty('phoneNo', Member."Phone No.")
             .AddObject(AddRequiredProperty(ResponseJson, 'birthday', Member.Birthday))
-            .AddProperty('hasPicture', Member.Image.HasValue())
+            .AddProperty('hasPicture', MemberHasPicture(Member))
             .AddProperty('hasNotes', Member.HasLinks())
             .AddProperty('preferredLanguage', Member.PreferredLanguageCode)
             .AddProperty('storeCode', Member."Store Code")
@@ -771,6 +880,17 @@ codeunit 6248220 "NPR MemberApiAgent"
 
         ResponseJson.EndArray();
         exit(ResponseJson);
+    end;
+
+
+    local procedure MemberHasPicture(Member: Record "NPR MM Member"): Boolean
+    var
+        MemberMedia: Codeunit "NPR MMMemberImageMediaHandler";
+    begin
+        if (MemberMedia.IsFeatureEnabled()) then
+            exit(MemberMedia.HaveMemberImage(Member.SystemId));
+
+        exit(Member.Image.HasValue());
     end;
 
 }

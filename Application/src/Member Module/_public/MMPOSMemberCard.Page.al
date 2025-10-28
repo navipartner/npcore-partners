@@ -89,11 +89,22 @@
                         ObsoleteState = Pending;
                         ObsoleteTag = '2023-06-28';
                         ObsoleteReason = 'Needs to be in a Card Part, but it is breaking change to delete.';
+                        Visible = false;
                     }
                     part(MemberPicture; "NPR MM Member Picture")
                     {
                         Caption = 'Picture';
+                        ShowFilter = false;
                         SubPageLink = "Entry No." = field("Entry No.");
+                        ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                        Visible = not _CloudflareMediaVisible;
+                    }
+                    part(CloudflareMedia; "NPR MMMemberExtImageFactBox")
+                    {
+                        Caption = 'Picture';
+                        ShowFilter = false;
+                        SubPageLink = "Entry No." = field("Entry No.");
+                        Visible = _CloudflareMediaVisible;
                         ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     }
                 }
@@ -232,7 +243,17 @@
             part(MMMemberPicture; "NPR MM Member Picture")
             {
                 Caption = 'Picture';
+                ShowFilter = false;
                 SubPageLink = "Entry No." = field("Entry No.");
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Visible = _CloudflareMediaVisible;
+            }
+            part(CloudflareMediaFactBox; "NPR MMMemberExtImageFactBox")
+            {
+                Caption = 'Picture';
+                ShowFilter = false;
+                SubPageLink = "Entry No." = field("Entry No.");
+                Visible = _CloudflareMediaVisible;
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
             systempart(Control6014400; Notes)
@@ -539,6 +560,7 @@
         MembershipRole: Record "NPR MM Membership Role";
         MembershipEntry: Record "NPR MM Membership Entry";
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
+        CloudflareMediaFeature: Codeunit "NPR MemberImageMediaFeature";
         ValidFrom2: Date;
         ValidUntil2: Date;
         RemainAmt: Decimal;
@@ -608,6 +630,8 @@
             AccentuateDueAmount := (DueAmount > 0);
             RemainingAmountText := StrSubstNo(PlaceHolderLbl, Format(RemainingAmount, 0, '<Precision,2:2><Integer><Decimals>'), Format(DueAmount, 0, '<Precision,2:2><Integer><Decimals>'));
 
+            _CloudflareMediaVisible := CloudflareMediaFeature.IsFeatureEnabled();
+
         end;
 
         _IsBirthdayMandatory := CheckBirthdayMandatory(Rec);
@@ -670,6 +694,7 @@
         NO_ENTRIES: Label 'No entries found for member %1.';
         RaptorEnabled: Boolean;
         _AutoRenewal: Boolean;
+        _CloudflareMediaVisible: Boolean;
 
     internal procedure SetMembershipEntryNo(MembershipEntryNo: Integer)
     begin

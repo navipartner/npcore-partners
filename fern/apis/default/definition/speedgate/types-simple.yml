@@ -476,11 +476,26 @@ types:
 
   # ScannerId setup
   Base64Image:
-    type: base64
-    docs: Base64 encoded image of the member. Prioritizes thumbnail size `large`.
+    type: string
+    docs: |
+        A Base64-encoded image string or a URL to the image.
+
+        **Change effective from 2025-10-27:**  
+        The `image` property now contains a complete image source string instead of raw Base64 data.
+
+        Depending on tenant configuration:
+        - Tenants with Business Central natively hosted image storage receive a Base64-encoded Data URI, e.g. `data:image/jpeg;base64,<encoded data>`
+        - Tenants with hosted image storage receive an HTTPS URL, e.g. `https://image-service.example.com/<imagename>.jpg`. The URL is time-limited and secured.
+
+        Both formats can be used directly in an `<img src>` attribute.  
+        Clients that previously decoded the Base64 manually should update accordingly.
     examples:
       - name: ExampleBase64Image
         value: SGVsbG8gV29ybGQ=
+      - name: ExampleDataUri
+        value: data:image/png;base64,SGVsbG8gV29ybGQ=
+      - name: ExampleImageUrl
+        value: https://image-service.example.com/member12345.jpg
 
   HasNotes:
     type: boolean

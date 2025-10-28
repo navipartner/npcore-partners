@@ -774,33 +774,106 @@
         TempBlob: Codeunit "Temp Blob";
         InStr: InStream;
         OutStr: OutStream;
+        MemberMedia: Codeunit "NPR MMMemberImageMediaHandler";
     begin
 
         if (not Member.Get(MemberEntryNo)) then
             exit(false);
 
-        if (not Member.Image.HasValue()) then
-            exit(false);
+        if (MemberMedia.IsFeatureEnabled()) then begin
+            MemberMedia.GetMemberImageB64(Member.SystemId, Enum::"NPR CloudflareMediaVariants"::PREVIEW, Base64StringImage);
 
-        TempBlob.CreateOutStream(OutStr);
-        Member.Image.ExportStream(OutStr);
-        TempBlob.CreateInStream(InStr);
-        Base64StringImage := Base64Convert.ToBase64(InStr);
+        end else begin
+            if (not Member.Image.HasValue()) then
+                exit(false);
+
+            TempBlob.CreateOutStream(OutStr);
+            Member.Image.ExportStream(OutStr);
+            TempBlob.CreateInStream(InStr);
+            Base64StringImage := Base64Convert.ToBase64(InStr);
+        end;
+
         exit(true);
     end;
 
     internal procedure GetMemberImageThumbnail(MemberEntryNo: Integer; var Base64StringImage: Text) Success: Boolean
+    var
+        MemberMedia: Codeunit "NPR MMMemberImageMediaHandler";
     begin
-        if (GetMemberImageThumbnail(MemberEntryNo, Base64StringImage, 360)) then
+        if (MemberMedia.IsFeatureEnabled()) then
+            exit(GetMemberImageThumbnailCloudflare(MemberEntryNo, Base64StringImage, 360));
+
+        // Local images
+        if (GetMemberImageThumbnailLocalMedia(MemberEntryNo, Base64StringImage, 360)) then
             exit(true);
 
-        if (GetMemberImageThumbnail(MemberEntryNo, Base64StringImage, 240)) then
+        if (GetMemberImageThumbnailLocalMedia(MemberEntryNo, Base64StringImage, 240)) then
             exit(true);
 
         exit(GetMemberImage(MemberEntryNo, Base64StringImage));
     end;
 
     internal procedure GetMemberImageThumbnail(MemberEntryNo: Integer; var Base64StringImage: Text; Width: Integer) Success: Boolean
+    var
+        MemberMedia: Codeunit "NPR MMMemberImageMediaHandler";
+    begin
+        if (MemberMedia.IsFeatureEnabled()) then
+            exit(GetMemberImageThumbnailCloudflare(MemberEntryNo, Base64StringImage, Width));
+
+        exit(GetMemberImageThumbnailLocalMedia(MemberEntryNo, Base64StringImage, Width));
+    end;
+
+    local procedure GetMemberImageThumbnailCloudflare(MemberEntryNo: Integer; var Base64StringImage: Text; Width: Integer) Success: Boolean
+    var
+        Member: Record "NPR MM Member";
+        MemberMedia: Codeunit "NPR MMMemberImageMediaHandler";
+    begin
+
+        Member.SetLoadFields(SystemId);
+        if (not Member.Get(MemberEntryNo)) then
+            exit(false);
+
+        case Width of
+            70:
+                Success := MemberMedia.GetMemberImageB64(Member.SystemId, Enum::"NPR CloudflareMediaVariants"::SMALL, Base64StringImage);
+            240:
+                Success := MemberMedia.GetMemberImageB64(Member.SystemId, Enum::"NPR CloudflareMediaVariants"::MEDIUM, Base64StringImage);
+            360:
+                Success := MemberMedia.GetMemberImageB64(Member.SystemId, Enum::"NPR CloudflareMediaVariants"::LARGE, Base64StringImage);
+            1024:
+                Success := MemberMedia.GetMemberImageB64(Member.SystemId, Enum::"NPR CloudflareMediaVariants"::PREVIEW, Base64StringImage);
+            else
+                Success := MemberMedia.GetMemberImageB64(Member.SystemId, Enum::"NPR CloudflareMediaVariants"::THUMBNAIL, Base64StringImage);
+        end;
+        exit(Success);
+    end;
+
+    internal procedure GetMemberImageThumbnailUrl(MemberEntryNo: Integer; var ImageUrl: Text; Width: Integer) Success: Boolean
+    var
+        Member: Record "NPR MM Member";
+        MemberMedia: Codeunit "NPR MMMemberImageMediaHandler";
+    begin
+
+        Member.SetLoadFields(SystemId);
+        if (not Member.Get(MemberEntryNo)) then
+            exit(false);
+
+        case Width of
+            70:
+                Success := MemberMedia.GetMemberImageUrl(Member.SystemId, Enum::"NPR CloudflareMediaVariants"::SMALL, 300, ImageUrl);
+            240:
+                Success := MemberMedia.GetMemberImageUrl(Member.SystemId, Enum::"NPR CloudflareMediaVariants"::MEDIUM, 300, ImageUrl);
+            360:
+                Success := MemberMedia.GetMemberImageUrl(Member.SystemId, Enum::"NPR CloudflareMediaVariants"::LARGE, 300, ImageUrl);
+            1024:
+                Success := MemberMedia.GetMemberImageUrl(Member.SystemId, Enum::"NPR CloudflareMediaVariants"::PREVIEW, 300, ImageUrl);
+            else
+                Success := MemberMedia.GetMemberImageUrl(Member.SystemId, Enum::"NPR CloudflareMediaVariants"::THUMBNAIL, 300, ImageUrl);
+        end;
+        exit(Success);
+    end;
+
+    internal procedure GetMemberImageThumbnailLocalMedia(MemberEntryNo: Integer; var Base64StringImage: Text; Width: Integer): Boolean
     var
         Member: Record "NPR MM Member";
         MediaThumbnail: Record "Tenant Media Thumbnails";
@@ -921,9 +994,13 @@
         Base64Convert: Codeunit "Base64 Convert";
         TempBlob: Codeunit "Temp Blob";
         Base64Start: Integer;
+        MemberMedia: Codeunit "NPR MMMemberImageMediaHandler";
     begin
         if (not Member.Get(MemberEntryNo)) then
             exit(false);
+
+        if (MemberMedia.IsFeatureEnabled()) then
+            exit(MemberMedia.PutMemberImageB64(Member.SystemId, '', Base64StringImage));
 
         Base64Start := 1;
         // Remove mime type prefix
@@ -936,6 +1013,7 @@
         TempBlob.CreateInStream(InStr);
         Member.Image.ImportStream(InStr, Member.FieldName(Image));
         exit(Member.Modify());
+
     end;
 
     internal procedure UpdateMemberPassword(MemberEntryNo: Integer; UserLogonID: Code[50]; NewPassword: Text[50]) Success: Boolean
@@ -6292,10 +6370,17 @@
     var
         Camera: Page "NPR NPCamera";
         PictureStream: InStream;
+        MemberMedia: Codeunit "NPR MMMemberImageMediaHandler";
     begin
         if (Camera.TakePicture(PictureStream)) then begin
-            MMMember.Image.ImportStream(PictureStream, MMMember.FieldName(Image));
-            MMMember.Modify();
+
+            if (MemberMedia.IsFeatureEnabled()) then begin
+                MemberMedia.PutMemberImageFromStream(MMMember.SystemId, '', PictureStream);
+            end else begin
+                MMMember.Image.ImportStream(PictureStream, MMMember.FieldName(Image));
+                MMMember.Modify();
+            end;
+
             Commit();
             TrainFacialRecognitionService(MMMember, PictureStream);
         end

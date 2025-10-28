@@ -120,7 +120,7 @@ codeunit 6150815 "NPR POS Action: MM Member ArrB"
         MemberScanned.Add('ExpiryDate', ValidUntilDate);
         MemberScanned.Add('ImageDataUrl', GetMemberImageDataUrl(MemberEntryNo));
         MemberScanned.Add('MembershipCode', Membership."Membership Code");
-        MemberScanned.Add('MembershipCodeCaption', Membership.FieldCaption("Membership Code"));
+        MemberScanned.Add('MembershipCodeCaption', StrSubstNo('%1: ', Membership.FieldCaption("Membership Code")));
         MemberScanned.Add('MembershipCodeDescription', MembershipSetup."Description");
 
         if (MemberCardEntryNo > 0) then
@@ -139,7 +139,16 @@ codeunit 6150815 "NPR POS Action: MM Member ArrB"
         MemberManagement: Codeunit "NPR MM MembershipMgtInternal";
         MemberImageBase64: Text;
         DataUrl: Label 'data:image/jpeg;base64,%1', locked = true;
+        HttpUrl: Text;
+        MemberMediaCloudflare: Codeunit "NPR MMMemberImageMediaHandler";
     begin
+        if (MemberMediaCloudflare.IsFeatureEnabled()) then begin
+            if (MemberManagement.GetMemberImageThumbnailUrl(MemberEntryNo, HttpUrl, 360)) then
+                exit(HttpUrl);
+
+            exit(NoPictureAvailableImage());
+        end;
+
         if (MemberManagement.GetMemberImageThumbnail(MemberEntryNo, MemberImageBase64)) then
             exit(StrSubstNo(DataUrl, MemberImageBase64));
 

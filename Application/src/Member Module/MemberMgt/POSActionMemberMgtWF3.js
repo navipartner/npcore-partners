@@ -124,10 +124,6 @@ let main = async ({ workflow, context, popup, captions, parameters }) => {
     
     // Set appropriate success message based on function type
     switch(FunctionNo){
-        case 0: {
-            successMessage = captions.MemberArrivalSuccess; // Member arrival
-            break;
-        }
         case 1: {
             successMessage = captions.SelectMembershipSuccess; // Select membership
             break;
@@ -141,6 +137,7 @@ let main = async ({ workflow, context, popup, captions, parameters }) => {
             successMessage = captions.TerminateSubscriptionSuccess; // Terminate subscription
             break;
         }
+        case 0:  // Member Arrival
         case 2:  // View Membership Entry - view operation so no toast needed
         case 3:  // Regret Membership - requires payment
         case 4:  // Renew Membership - requires payment

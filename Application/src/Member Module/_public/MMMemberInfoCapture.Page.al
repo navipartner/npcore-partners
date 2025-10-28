@@ -930,6 +930,15 @@
                 Caption = 'Picture';
                 SubPageLink = "Entry No." = field("Entry No.");
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Visible = not _HaveCloudflareMedia;
+            }
+            part(CloudflareMedia; "NPR MMMemberExtImageFactBox")
+            {
+                Caption = 'Picture';
+                ShowFilter = false;
+                SubPageLink = "Entry No." = field("Member Entry No");
+                Visible = _HaveCloudflareMedia;
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
             }
         }
     }
@@ -1090,6 +1099,8 @@
         _ReUseExistingMember: Boolean;
         HLMCFSubscriptionMgt: Codeunit "NPR HL MCF Subscription Mgt.";
         MCF_MemberOfVisible: Boolean;
+
+        _HaveCloudflareMedia: Boolean;
 
     local procedure UpdateMemberInfoOnReuse(var InfoCapture: Record "NPR MM Member Info Capture"; FromFieldId: Integer): Boolean
     var
@@ -1852,6 +1863,7 @@
         TempBlob: Codeunit "Temp Blob";
         InStr: InStream;
         OutStr: OutStream;
+        MemberCFMedia: Codeunit "NPR MMMemberImageMediaHandler";
     begin
 
         if (pExternalMemberNo = '') then begin
@@ -1872,15 +1884,21 @@
         Rec."Member Entry No" := Member."Entry No.";
         Rec."External Member No" := Member."External Member No.";
 
-        if (Member.Image.HasValue()) then begin
-            TempBlob.CreateOutStream(OutStr);
-            if (Member.Image.ExportStream(OutStr)) then begin
-                TempBlob.CreateInStream(InStr);
-                if (not InStr.EOS) then
-                    Rec.Image.ImportStream(InStr, Rec.FieldName(Image));
-            end
-        end else
-            Clear(Rec.Image);
+        _HaveCloudflareMedia := false;
+        if (not MemberCFMedia.IsFeatureEnabled()) then begin
+            if (Member.Image.HasValue()) then begin
+                TempBlob.CreateOutStream(OutStr);
+                if (Member.Image.ExportStream(OutStr)) then begin
+                    TempBlob.CreateInStream(InStr);
+                    if (not InStr.EOS) then
+                        Rec.Image.ImportStream(InStr, Rec.FieldName(Image));
+                end
+            end else
+                Clear(Rec.Image);
+        end;
+
+        if (MemberCFMedia.IsFeatureEnabled()) then
+            _HaveCloudflareMedia := MemberCFMedia.HaveMemberImage(Member.SystemId);
 
         if (not _ShowAzureSection) then begin
             Rec."First Name" := Member."First Name";
