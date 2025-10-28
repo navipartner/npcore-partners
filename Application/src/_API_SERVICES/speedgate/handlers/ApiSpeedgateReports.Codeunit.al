@@ -5,12 +5,19 @@ codeunit 6248381 "NPR ApiSpeedgateReports"
     internal procedure LookupReferenceNumber(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         EntryLog: Record "NPR SGEntryLog";
+        FromDate: Date;
     begin
         if (not Request.QueryParams().ContainsKey('referenceNumber')) then
             exit(Response.RespondBadRequest('Missing required query parameter: referenceNumber'));
 
-        EntryLog.SetCurrentKey(ReferenceNo);
+        FromDate := Today();
+        if (Request.QueryParams().ContainsKey('fromDate')) then
+            if (not Evaluate(FromDate, Request.QueryParams().Get('fromDate'), 9)) then
+                exit(Response.RespondBadRequest('Invalid fromDate format. Expected format (ISO 8601): YYYY-MM-DD'));
+
+        EntryLog.SetCurrentKey(ReferenceNo, SystemCreatedAt);
         EntryLog.SetFilter(ReferenceNo, '=%1', Request.QueryParams().Get('referenceNumber'));
+        EntryLog.SetFilter(SystemCreatedAt, '>=%1', CreateDateTime(FromDate, 0T));
 
         exit(Response.RespondOK(CreateLookupResponse(EntryLog).BuildAsArray()));
 

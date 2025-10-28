@@ -266,6 +266,7 @@ service:
         name: referenceNumberLookup
         query-parameters:
           referenceNumber: simpleTypes.ReferenceNumber
+          fromDate: optional<FromAdmittedAt>
       response:
         docs: Returns a list all usages of the reference number in the speedgate.
         type: list<compositeTypes.ReferenceNumberLookupResponse>
@@ -290,3 +291,7 @@ types:
 
   FailAdmitTokenResponse:
     properties: {}
+
+  FromAdmittedAt:
+    type: date 
+    docs: The date from which to start looking for reference number usages. Default is today. Date only, time is assumed to be 00:00:00 format ISO 8601 (YYYY-MM-DD).

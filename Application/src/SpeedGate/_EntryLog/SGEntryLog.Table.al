@@ -136,7 +136,7 @@ table 6150987 "NPR SGEntryLog"
         {
         }
 
-        key(Key3; ReferenceNo)
+        key(Key3; ReferenceNo, SystemCreatedAt)
         {
         }
 
