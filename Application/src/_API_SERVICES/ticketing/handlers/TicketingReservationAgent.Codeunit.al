@@ -320,20 +320,26 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         TicketRequest.Reset();
         TicketRequest.ReadIsolation := TicketRequest.ReadIsolation::UpdLock;
         TicketRequest.SetCurrentKey("Session Token ID");
-        TicketRequest.SetLoadFields("Admission Created", "External Adm. Sch. Entry No.", "Admission Code", "Scheduled Time Description");
+        TicketRequest.SetLoadFields("Ext. Line Reference No.", "Admission Created", "External Adm. Sch. Entry No.", "Admission Code", "Scheduled Time Description");
         TicketRequest.SetFilter("Session Token ID", '=%1', Token);
         TicketRequest.FindSet();
         repeat
             if (TicketRequest."Admission Created") then begin
-                TicketResponse.SetCurrentKey("Session Token ID");
+
+                TicketResponse.SetCurrentKey("Session Token ID", "Ext. Line Reference No.");
                 TicketResponse.SetLoadFields("Request Entry No.");
                 TicketResponse.SetFilter("Session Token ID", '=%1', Token);
+                TicketResponse.SetFilter("Ext. Line Reference No.", '=%1', TicketRequest."Ext. Line Reference No.");
+
                 if (TicketResponse.FindFirst()) then begin
+
                     Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketResponse."Request Entry No.");
                     if (Ticket.FindFirst()) then begin
+
                         AccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
                         AccessEntry.SetFilter("Admission Code", '=%1', TicketRequest."Admission Code");
                         if (AccessEntry.FindFirst()) then begin
+
                             DetailedEntry.SetCurrentKey("Ticket Access Entry No.");
                             DetailedEntry.SetLoadFields("External Adm. Sch. Entry No.");
                             DetailedEntry.SetFilter("Ticket Access Entry No.", '=%1', AccessEntry."Entry No.");
