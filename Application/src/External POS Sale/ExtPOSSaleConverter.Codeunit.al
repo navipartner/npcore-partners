@@ -44,12 +44,14 @@
                 Error(EftPaymenLineNotFoundLbl, ExternalPOSSaleLine."Line No.");
             end else begin
                 EftResponseDataBase64 := ExternalPOSSaleEftLine.GetBase64DataText();
-                EftResponseData := Base64Convert.FromBase64(EftResponseDataBase64);
-                CreateNewEFTTransactionRequest(EFTTransactionRequest);
-                EFTTransactionRequestPrefill(ExternalPOSSale, EFTTransactionRequest, ExternalPOSSaleLine, ExternalPOSSaleEftLine);
-                EFTTransactionRequestIntegrationHandle(EFTTransactionRequest, EftResponseData, ExternalPOSSaleEftLine);
-                ExternalPOSSaleLine."No." := EFTTransactionRequest."POS Payment Type Code";
-                ExternalPOSSaleLine.Modify();
+                if EftResponseDataBase64 <> '' then begin
+                    EftResponseData := Base64Convert.FromBase64(EftResponseDataBase64);
+                    CreateNewEFTTransactionRequest(EFTTransactionRequest);
+                    EFTTransactionRequestPrefill(ExternalPOSSale, EFTTransactionRequest, ExternalPOSSaleLine, ExternalPOSSaleEftLine);
+                    EFTTransactionRequestIntegrationHandle(EFTTransactionRequest, EftResponseData, ExternalPOSSaleEftLine);
+                    ExternalPOSSaleLine."No." := EFTTransactionRequest."POS Payment Type Code";
+                    ExternalPOSSaleLine.Modify();
+                end;
             end;
         end until ExternalPOSSaleLine.Next() = 0;
     end;
