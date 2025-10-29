@@ -138,4 +138,15 @@ codeunit 6185061 "NPR AttractionWalletFacade"
 
         Page.Run(Page::"NPR AttractionWalletCard", Wallet);
     end;
+
+    procedure GetOriginatesFromItemNo(WalletEntryNo: Integer; var OriginatesFromItemNo: Code[20]): Boolean
+    var
+        Wallet: Record "NPR AttractionWallet";
+    begin
+        if (not Wallet.Get(WalletEntryNo)) then
+            exit(false);
+
+        OriginatesFromItemNo := Wallet.OriginatesFromItemNo;
+        exit(true);
+    end;
 }
