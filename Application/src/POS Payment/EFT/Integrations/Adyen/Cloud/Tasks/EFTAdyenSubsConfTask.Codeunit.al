@@ -278,7 +278,10 @@ codeunit 6185084 "NPR EFT Adyen Subs Conf Task" implements "NPR POS Background T
         TempAutoRenewInfoCapture."Membership Entry No." := MembershipEntryNo;
         TempAutoRenewInfoCapture."Membership Code" := MembershipAlterationSetup."From Membership Code";
         TempAutoRenewInfoCapture."External Membership No." := ExternalMembershipNo;
-        TempAutoRenewInfoCapture."Item No." := MembershipAlterationSetup."Sales Item No.";
+        if (MembershipAlterationSetup."From Membership Code" = MembershipAlterationSetup."To Membership Code") and (MembershipAlterationSetup."Auto-Renew To" <> '') then
+            TempAutoRenewInfoCapture."Item No." := MembershipAlterationSetup."Auto-Renew To" // if we are activating subscription on existing membership
+        else
+            TempAutoRenewInfoCapture."Item No." := MembershipAlterationSetup."Sales Item No.";
         TempAutoRenewInfoCapture."Information Context" := TempAutoRenewInfoCapture."Information Context"::AUTORENEW;
         TempAutoRenewInfoCapture."Document Date" := Today(); // Active
         TempAutoRenewInfoCapture.Description := MembershipAlterationSetup.Description;
