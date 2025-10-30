@@ -806,8 +806,8 @@
         BinTransferDescriptionLbl: Label 'Description';
         BinTransferCashCountNothingToCountLbl: Label 'Nothing to count';
         BinTransferCashCountNothingToCountMessageLbl: Label 'There is nothing to count in this payment bin.';
-        NotificationToastMembershipExpirationLbl: Label 'Membership exp.: ';
-        NotificationToastValidForAdmissionLbl: Label 'Valid for admission: ';
+        NotificationToastMembershipExpirationLbl: Label 'Membership exp.:';
+        NotificationToastValidForAdmissionLbl: Label 'Valid for admission:';
         VariablesDialogTitleLbl: Label 'POS parameter values';
         VariablesDialogNameLbl: Label 'Name';
         VariablesDialogDescriptionLbl: Label 'Description';
