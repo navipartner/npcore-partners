@@ -136,7 +136,7 @@
             Error(DuplicateReceiptNo, ReceiptNo);
     end;
 
- 
+
     internal procedure GetContext(var SaleLineOut: Codeunit "NPR POS Sale Line"; var PaymentLineOut: Codeunit "NPR POS Payment Line")
     begin
         SaleLineOut := _SaleLine;
@@ -162,6 +162,11 @@
     begin
         _Rec.SetPosition(Position);
         exit(_Rec.Find());
+    end;
+
+    internal procedure SetBySystemId(Id: Guid): Boolean
+    begin
+        exit(_Rec.GetBySystemId(Id));
     end;
 
     internal procedure GetPosition(UseNames: Boolean): Text

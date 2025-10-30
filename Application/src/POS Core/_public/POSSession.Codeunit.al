@@ -237,16 +237,35 @@
         POSSale: Codeunit "NPR POS Sale";
         POSSaleLine: Codeunit "NPR POS Sale Line";
         POSPaymentLine: Codeunit "NPR POS Payment Line";
+        POSSaleSet, POSSaleLineSet, POSPaymentLineSet : Boolean;
+        FeatureFlag: Codeunit "NPR Feature Flags Management";
     begin
         GetSaleContext(POSSale, POSSaleLine, POSPaymentLine);
 
-        if (Context.SelectToken('data.positions.BUILTIN_SALE', JToken)) then
+        if (FeatureFlag.IsEnabled('usePOSDataRowIds')) then begin
+            if (Context.SelectToken('data.rowIds.BUILTIN_SALE', JToken)) then begin
+                POSSale.SetBySystemId(JToken.AsValue().AsText());
+                POSSaleSet := true;
+            end;
+
+            if (Context.SelectToken('data.rowIds.BUILTIN_SALELINE', JToken)) then begin
+                POSSaleLine.SetBySystemId(JToken.AsValue().AsText());
+                POSSaleLineSet := true;
+            end;
+
+            if (Context.SelectToken('data.rowIds.BUILTIN_PAYMENTLINE', JToken)) then begin
+                POSPaymentLine.SetBySystemId(JToken.AsValue().AsText());
+                POSPaymentLineSet := true;
+            end;
+        end;
+
+        if (Context.SelectToken('data.positions.BUILTIN_SALE', JToken) and (not POSSaleSet)) then
             POSSale.SetPosition(JToken.AsValue().AsText());
 
-        if (Context.SelectToken('data.positions.BUILTIN_SALELINE', JToken)) then
+        if (Context.SelectToken('data.positions.BUILTIN_SALELINE', JToken) and (not POSSaleLineSet)) then
             POSSaleLine.SetPosition(JToken.AsValue().AsText());
 
-        if (Context.SelectToken('data.positions.BUILTIN_PAYMENTLINE', JToken)) then
+        if (Context.SelectToken('data.positions.BUILTIN_PAYMENTLINE', JToken) and (not POSPaymentLineSet)) then
             POSPaymentLine.SetPosition(JToken.AsValue().AsText());
     end;
 

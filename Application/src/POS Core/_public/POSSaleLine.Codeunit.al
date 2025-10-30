@@ -131,9 +131,19 @@
         exit(Rec.Find());
     end;
 
+    internal procedure SetBySystemId(Id: Guid): Boolean
+    begin
+        exit(Rec.GetBySystemId(Id));
+    end;
+
     internal procedure GetPosition(UseNames: Boolean): Text
     begin
         exit(Rec.GetPosition(UseNames));
+    end;
+
+    internal procedure GetSystemId(): Guid
+    begin
+        exit(Rec.SystemId);
     end;
 
     procedure GetCurrentSaleLine(var SaleLinePOS: Record "NPR POS Sale Line")

@@ -46,6 +46,7 @@ codeunit 6150749 "NPR POS Refresh Sale"
 
         if POSSaleRec."Register No." <> '' then begin
             Data.Add('currentPosition', POSSaleRec.GetPosition(PositionWithNames));
+            Data.Add('currentRowId', Format(POSSaleRec.SystemId, 0, 4).ToLower());
         end else begin
             //For backwards compatibility reasons we support refreshing the POS sale record even if no sale is currently active.
             //This is because values like LastSaleTotals are implemented via data extensions on BUILTIN_SALE and are shown on the login screen even when no new sale is started yet.
@@ -54,6 +55,8 @@ codeunit 6150749 "NPR POS Refresh Sale"
             TempSale.Date := Today();
             TempSale.Insert();
             Data.Add('currentPosition', TempSale.GetPosition(PositionWithNames));
+            // TODO: This will just be a null guid, does it matter?
+            Data.Add('currentRowId', Format(TempSale.SystemId, 0, 4).ToLower());
         end;
 
         exit(Data);
@@ -263,6 +266,7 @@ codeunit 6150749 "NPR POS Refresh Sale"
         end;
 
         RowObject.Add('position', Rec.GetPosition(PositionWithNames));
+        RowObject.Add('rowId', Format(Rec.SystemId, 0, 4).ToLower());
         RowObject.Add('negative', false);
         RowObject.Add('class', '');
         RowObject.Add('style', '');

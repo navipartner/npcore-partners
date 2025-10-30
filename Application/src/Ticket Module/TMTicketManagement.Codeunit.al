@@ -4162,5 +4162,36 @@
             exit(true);
         exit(false);
     end;
+
+    internal procedure GetNextPossibleAdmissionScheduleStartTime(ItemNo: Code[20]; VariantCode: Code[10]): Time
+    var
+        TMAdmisScheduleLines: Record "NPR TM Admis. Schedule Lines";
+        NextTime: Time;
+        LowestTime: Time;
+        TimeTodayFound: Boolean;
+    begin
+        LowestTime := 235959T;
+        NextTime := 235959T;
+
+        TMAdmisScheduleLines.SetRange("Admission Code", GetDefaultAdmissionCode(ItemNo, VariantCode));
+        TMAdmisScheduleLines.SetRange(Blocked, false);
+        if TMAdmisScheduleLines.FindSet() then
+            repeat
+                if TMAdmisScheduleLines."Scheduled Start Time" < LowestTime then begin
+                    LowestTime := TMAdmisScheduleLines."Scheduled Start Time";
+                    if (LowestTime < NextTime) and (Time() < LowestTime) then begin
+                        NextTime := LowestTime;
+                        TimeTodayFound := true;
+                    end
+                end
+            until TMAdmisScheduleLines.Next() = 0;
+
+        if not TimeTodayFound then
+            NextTime := LowestTime;
+
+        exit(NextTime);
+    end;
+
+
 }
 

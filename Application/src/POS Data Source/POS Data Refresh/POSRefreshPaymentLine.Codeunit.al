@@ -51,6 +51,7 @@ codeunit 6150784 "NPR POS Refresh Payment Line"
         TotalsObject.Add('Subtotal', Subtotal);
         Data.Add('totals', TotalsObject);
         Data.Add('currentPosition', POSPaymentLine.GetPosition(PositionWithNames));
+        Data.Add('currentRowId', Format(POSPaymentLine.GetSystemId(), 0, 4).ToLower());
 
         exit(Data);
     end;
@@ -190,6 +191,7 @@ codeunit 6150784 "NPR POS Refresh Payment Line"
         end;
 
         RowObject.Add('position', Rec.GetPosition(PositionWithNames));
+        RowObject.Add('rowId', Format(Rec.SystemId, 0, 4).ToLower());
         RowObject.Add('index', Rec."Line No.");
         RowObject.Add('negative', false);
         RowObject.Add('class', '');
