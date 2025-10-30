@@ -3,42 +3,16 @@
 imports:
   globalApiTypes: ./../global-api-types.yml
   commonApiTypes: ./../common-api-types.yml
-
-service:
-  display-name: NPDesigner Manifests
-  auth: true
-  base-path: /npdesigner
-  
-  endpoints:
-
-    getManifest:
-      display-name: Get Manifest
-      docs: 
-        Retrieve a manifest by its ID.
-      method: GET
-      path: /manifest/{manifestId}
-      request:
-        name: getManifestRequest
-        path-parameters:
-          manifestId: uuid
-      response: GetManifestResponse
-      examples:
-        - name: Get Manifest
-          path-parameters:
-            tenant: $globalApiTypes.tenant.Exampletenant
-            environment: $globalApiTypes.environment.ExampleenvironmentProduction
-            company: $globalApiTypes.Company.ExampleCompanyCronus
-            manifestId: ddcfea9f-385e-4d83-8b50-42256885b03a
-          response:
-            body:
-              $GetManifestResponse.Example
+  simpleTypes: ./simple-types.yml
 
 webhooks:
-  
+ 
   designer_manifest_created:
+    display-name: Manifest Created
     docs:
       Notifies that Business Central (BC) has created or made a new and empty manifest available.
       These webhooks communicate manifest lifecycle events produced by BC to external consumers. 
+      Subscribe to `designer_manifest_created` to be informed when a new manifest is created.
     method: POST
     payload: DesignerManifestCreatedEvent
     examples:
@@ -49,6 +23,7 @@ webhooks:
     docs:
       Notifies that BC has added one asset to an existing manifest.
       Use this event to inform external consumers that manifest content changed.
+      Subscribe to `designer_manifest_content_added` to receive notifications when assets are added to manifests.
     method: POST
     payload: DesignerManifestContentAddEvent
     examples:
@@ -59,6 +34,7 @@ webhooks:
     docs:
       Notifies that BC has removed one asset from an existing manifest.
       This event is intended to inform external consumers that the manifest content has changed.
+      Subscribe to `designer_manifest_content_removed` to receive notifications when assets are removed from manifests.
     method: POST
     payload: DesignerManifestContentRemoveEvent
     examples:
@@ -68,7 +44,9 @@ webhooks:
     display-name: Manifest Content Changed
     docs:
       Notifies that BC has updated content (added or removed a set of assets) within an existing manifest.
+      Note that this event is only triggered when multiple assets are changed in a single operation and not for single asset additions or removals.
       Use this event to keep external consumers in sync with the latest manifest state.
+      Subscribe to `designer_manifest_content_changed` to receive notifications when manifest content changes.
     method: POST
     payload: DesignerManifestContentChangeEvent
     examples:
@@ -79,6 +57,7 @@ webhooks:
     docs:
       Notifies that BC has deleted a manifest and that it is no longer available.
       This webhook signals the manifest removal to external consumers.
+      Subscribe to `designer_manifest_deleted` to be informed when a manifest is deleted.
     method: POST
     payload: DesignerManifestDeletedEvent
     examples:
@@ -87,91 +66,7 @@ webhooks:
 
 # TYPES
 types:
-  ManifestId:
-    type: uuid
-    docs: The unique identifier of the manifest.
-    examples:
-      - name: Example
-        value: ddcfea9f-385e-4d83-8b50-42256885b03a
-      
-  Id:
-    type: uuid
-    docs: The unique identifier of the asset line in Business Central.
-    examples:
-      - name: Example
-        value: 5ecfea9f-385e-4d83-8b50-42256885b03a
-
-  AssetTableNumber:
-    type: integer
-    docs: The table number of the asset in Business Central.
-    examples:
-      - name: Example
-        value: 6059785
-
-  AssetId:
-    type: uuid
-    docs: The unique identifier of the asset.
-    examples:
-      - name: Example
-        value: e2cfea9f-385e-4d83-8b50-42256885b03a
-
-  AssetPublicId:
-    type: optional<string>
-    docs: An optional external identifier for the asset.
-    examples:
-      - name: Example
-        value: TICKET-1001
-
-  RenderWithTemplateId:
-    type: optional<string>
-    docs: The template ID used for rendering the asset.
-    examples:
-      - name: Example
-        value: ddcfea9f385e4d838b5042256885b03a
-        
-  RenderGroup:
-    type: optional<integer>
-    docs: A simple grouping mechanism for assets.
-    examples:
-      - name: Example
-        value: 1
-
-  RenderGroupOrder:
-    type: optional<integer>
-    docs: The order of the asset within its group.
-    examples:
-      - name: Example
-        value: 1
-
-# RESPONSES
-  Assets:
-    properties:
-      id: Id
-      assetTableNumber: AssetTableNumber
-      assetId: AssetId
-      assetPublicId: AssetPublicId
-      renderWithTemplateId: RenderWithTemplateId
-      renderGroup: RenderGroup
-      renderGroupOrder: RenderGroupOrder
-
-  GetManifestResponse:
-    properties:
-      manifestId: ManifestId
-      assets: list<Assets>
-    examples:
-      - name: Example
-        value:
-          manifestId: $ManifestId.Example
-          assets:
-            - id: $Id.Example
-              assetTableNumber: $AssetTableNumber.Example
-              assetId: $AssetId.Example
-              assetPublicId: $AssetPublicId.Example
-              renderWithTemplateId: $RenderWithTemplateId.Example
-              renderGroup: $RenderGroup.Example
-              renderGroupOrder: $RenderGroupOrder.Example
-
-# WEBHOOKS
+  # WEBHOOKS
   # designer_manifest_created
   DesignerManifestCreatedEvent:
     properties:
@@ -186,11 +81,11 @@ types:
 
   DesignerManifestCreatePayload:
     properties:
-      manifestId: ManifestId
+      manifestId: simpleTypes.ManifestId
     examples:
       - name: Example
         value:
-          manifestId: $ManifestId.Example
+          manifestId: $simpleTypes.ManifestId.Example
 
   DesignerManifestCreateObject:
     extends: commonApiTypes.WebhookEvent
@@ -223,21 +118,21 @@ types:
 
   DesignerManifestContentAddPayload:
     properties:
-      manifestId: ManifestId
-      id: Id
-      assetTableNumber: AssetTableNumber
-      assetId: AssetId
-      assetPublicId: AssetPublicId
-      renderWithTemplateId: RenderWithTemplateId
+      manifestId: simpleTypes.ManifestId
+      id: simpleTypes.Id
+      assetTableNumber: simpleTypes.AssetTableNumber
+      assetId: simpleTypes.AssetId
+      assetPublicId: simpleTypes.AssetPublicId
+      renderWithTemplateId: simpleTypes.RenderWithTemplateId
     examples:
       - name: Example
         value:
-          manifestId: $ManifestId.Example
-          id: $Id.Example
-          assetTableNumber: $AssetTableNumber.Example
-          assetId: $AssetId.Example
-          assetPublicId: $AssetPublicId.Example 
-          renderWithTemplateId: $RenderWithTemplateId.Example
+          manifestId: $simpleTypes.ManifestId.Example
+          id: $simpleTypes.Id.Example
+          assetTableNumber: $simpleTypes.AssetTableNumber.Example
+          assetId: $simpleTypes.AssetId.Example
+          assetPublicId: $simpleTypes.AssetPublicId.Example 
+          renderWithTemplateId: $simpleTypes.RenderWithTemplateId.Example
 
   DesignerManifestContentAddObject:
     extends: commonApiTypes.WebhookEvent
@@ -270,17 +165,17 @@ types:
 
   DesignerManifestContentRemovePayload:
     properties:
-      manifestId: ManifestId
-      id: Id
-      assetTableNumber: AssetTableNumber
-      assetId: AssetId
+      manifestId: simpleTypes.ManifestId
+      id: simpleTypes.Id
+      assetTableNumber: simpleTypes.AssetTableNumber
+      assetId: simpleTypes.AssetId
     examples:
       - name: Example
         value:
-          manifestId: $ManifestId.Example
-          id: $Id.Example
-          assetTableNumber: $AssetTableNumber.Example
-          assetId: $AssetId.Example
+          manifestId: $simpleTypes.ManifestId.Example
+          id: $simpleTypes.Id.Example
+          assetTableNumber: $simpleTypes.AssetTableNumber.Example
+          assetId: $simpleTypes.AssetId.Example
 
   DesignerManifestContentRemoveObject:
     extends: commonApiTypes.WebhookEvent
@@ -313,11 +208,11 @@ types:
 
   DesignerManifestContentChangePayload:
     properties:
-      manifestId: ManifestId
+      manifestId: simpleTypes.ManifestId
     examples:
       - name: Example
         value:
-          manifestId: $ManifestId.Example
+          manifestId: $simpleTypes.ManifestId.Example
 
   DesignerManifestContentChangeObject:
     extends: commonApiTypes.WebhookEvent
@@ -350,11 +245,11 @@ types:
 
   DesignerManifestDeletePayload:
     properties:
-      manifestId: ManifestId
+      manifestId: simpleTypes.ManifestId
     examples:
       - name: Example
         value:
-          manifestId: $ManifestId.Example
+          manifestId: $simpleTypes.ManifestId.Example
 
   DesignerManifestDeleteObject:
     extends: commonApiTypes.WebhookEvent

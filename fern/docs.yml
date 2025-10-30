@@ -375,15 +375,15 @@ navigation:
                 - endpoint: customer.service-customer.getCustomers
                 - endpoint: customer.service-customer.createCustomer          
 
-        - section: NP Designer
+        - section: PDF Designer
           #hidden: true
-          summary: ./docs/pages/np-designer/overview.mdx
+          summary: ./docs/pages/pdf-designer/overview.mdx
           contents:
-          - np-designer.service-np-designer:
+          - pdf-designer.service-pdf-designer:
               title: Manifests
               contents:
-                - endpoint: np-designer.service-np-designer.getManifest
-          - np-designer.service-np-designer:
+                - endpoint: pdf-designer.service-pdf-designer.getManifest
+          - pdf-designer.service-pdf-designer-webhooks:
               title: Webhooks
               contents:
                 - endpoint: designer_manifest_created
@@ -391,6 +391,7 @@ navigation:
                 - endpoint: designer_manifest_content_added
                 - endpoint: designer_manifest_content_removed
                 - endpoint: designer_manifest_content_changed
+
 
 navbar-links:
   - type: secondary

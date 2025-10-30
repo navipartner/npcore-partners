@@ -88,7 +88,7 @@
                         TicketURL := StrSubstNo(NpDesignTicketURL, Format(Ticket.SystemId, 0, 4).ToLower(), TicketDesignTemplateId);
 
                     if (_UseManifest) then begin
-                        ManifestId := Manifest.CreateManifest(TicketDesignTemplateId);
+                        ManifestId := Manifest.CreateManifest(TicketDesignTemplateId, ReservationRequest.TicketHolderPreferredLanguage, false);
                         Manifest.AddAssetToManifest(ManifestId, Database::"NPR TM Ticket", Ticket.SystemId, Ticket."External Ticket No.", TicketDesignTemplateId);
                         Manifest.GetManifestUrl(ManifestId, TicketURL);
                         _TicketsToManifest.Add(Ticket.SystemId, Ticket."External Ticket No.");
@@ -115,7 +115,7 @@
                     OrderTicketBom.SetFilter("NPDesignerTemplateId", '<>%1', '');
                     if (OrderTicketBom.FindFirst()) then begin
                         _OrderManifestTemplateId := OrderTicketBom.NPDesignerTemplateId;
-                        _OrderManifestId := Manifest.CreateManifest(_OrderManifestTemplateId);
+                        _OrderManifestId := Manifest.CreateManifest(_OrderManifestTemplateId, ReservationRequest.TicketHolderPreferredLanguage, true);
                         Manifest.GetManifestUrl(_OrderManifestId, OrderUrl);
                     end;
                 end;

@@ -1,0 +1,77 @@
+types:
+  ManifestId:
+    type: uuid
+    docs: The unique identifier of the manifest.
+    examples:
+      - name: Example
+        value: ddcfea9f-385e-4d83-8b50-42256885b03a
+      
+  Id:
+    type: uuid
+    docs: The unique identifier of the asset line in Business Central.
+    examples:
+      - name: Example
+        value: 5ecfea9f-385e-4d83-8b50-42256885b03a
+
+  AssetTableNumber:
+    type: integer
+    docs: The table number of the asset in Business Central.
+    examples:
+      - name: Example
+        value: 6059785
+
+  AssetId:
+    type: uuid
+    docs: The unique identifier of the asset.
+    examples:
+      - name: Example
+        value: e2cfea9f-385e-4d83-8b50-42256885b03a
+
+  AssetPublicId:
+    type: optional<string>
+    docs: An optional external identifier for the asset.
+    examples:
+      - name: Example
+        value: TICKET-1001
+
+  RenderWithTemplateId:
+    type: optional<string>
+    docs: The template ID used for rendering the asset.
+    examples:
+      - name: Example
+        value: ddcfea9f385e4d838b5042256885b03a
+        
+  RenderGroup:
+    type: optional<integer>
+    docs: A simple grouping mechanism for assets.
+    examples:
+      - name: Example
+        value: 1
+
+  RenderGroupOrder:
+    type: optional<integer>
+    docs: The order of the asset within its group.
+    examples:
+      - name: Example
+        value: 1
+
+  LanguageCode:
+    type: string
+    docs: The BC language code applied to template when rendered .
+    examples:
+      - name: Example
+        value: ENU
+
+  TableOfContents:
+    type: boolean
+    docs: Indicates whether the manifest should be rendered with a table of content to the user instead of producing the PDF's directly.
+    examples:
+      - name: Example
+        value: true
+
+  CreatedAt:
+    type: string
+    docs: The date and time when the asset was created (RFC 3339 timestamp.).
+    examples:
+      - name: Example
+        value: '2024-01-15T10:30:00Z'

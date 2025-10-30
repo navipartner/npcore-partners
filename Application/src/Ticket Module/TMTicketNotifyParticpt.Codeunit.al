@@ -696,6 +696,8 @@
                 if (NPDesignerSetup.EnableManifest) then begin
                     if (IsNullGuid(NotificationEntry.NPDesignerManifestId)) then begin
                         NotificationEntry.NPDesignerManifestId := Manifest.CreateManifest();
+                        Manifest.SetPreferredRenderingLanguage(NotificationEntry.NPDesignerManifestId, NotificationEntry."Ticket Holder Preferred Lang");
+                        Manifest.SetShowTableOfContents(NotificationEntry.NPDesignerManifestId, TicketReservationRequest.Quantity > 1);
                         Manifest.AddAssetToManifest(NotificationEntry.NPDesignerManifestId, Database::"NPR TM Ticket Reservation Req.", TicketReservationRequest.SystemId, TicketReservationRequest."Session Token ID", NotificationEntry.NPDesignerTemplateId);
                     end;
                     Manifest.GetManifestUrl(NotificationEntry.NPDesignerManifestId, NotificationEntry."Published Ticket URL");
@@ -1067,6 +1069,7 @@
             if (NPDesignerSetup.EnableManifest) then begin
                 if (IsNullGuid(NotificationEntry.NPDesignerManifestId)) then begin
                     NotificationEntry.NPDesignerManifestId := Manifest.CreateManifest();
+                    Manifest.SetPreferredRenderingLanguage(NotificationEntry.NPDesignerManifestId, NotificationEntry."Ticket Holder Preferred Lang");
                     Manifest.AddAssetToManifest(NotificationEntry.NPDesignerManifestId, Database::"NPR TM Ticket", Ticket.SystemId, Ticket."External Ticket No.", NotificationEntry.NPDesignerTemplateId);
                 end;
                 Manifest.GetManifestUrl(NotificationEntry.NPDesignerManifestId, NotificationEntry."Published Ticket URL");

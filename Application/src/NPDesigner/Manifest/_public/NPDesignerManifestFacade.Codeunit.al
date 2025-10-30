@@ -13,7 +13,29 @@ codeunit 6248596 "NPR NPDesignerManifestFacade"
     var
         NPDesigner: Codeunit "NPR NPDesigner";
     begin
-        exit(NPDesigner.CreateManifest(ExternalTemplateId));
+        exit(NPDesigner.CreateManifest(ExternalTemplateId, '', false));
+    end;
+
+    procedure CreateManifest(ExternalTemplateId: Text[40]; LanguageCode: Code[10]; ShowToC: Boolean): Guid
+    var
+        NPDesigner: Codeunit "NPR NPDesigner";
+    begin
+        exit(NPDesigner.CreateManifest(ExternalTemplateId, LanguageCode, ShowToC));
+    end;
+
+
+    procedure SetPreferredRenderingLanguage(ManifestId: Guid; LanguageCode: Code[10]): Boolean
+    var
+        NPDesigner: Codeunit "NPR NPDesigner";
+    begin
+        exit(NPDesigner.SetPreferredAssetLanguage(ManifestId, LanguageCode));
+    end;
+
+    procedure SetShowTableOfContents(ManifestId: Guid; ShowTableOfContents: Boolean): Boolean
+    var
+        NPDesigner: Codeunit "NPR NPDesigner";
+    begin
+        exit(NPDesigner.SetShowTableOfContents(ManifestId, ShowTableOfContents));
     end;
 
     procedure DeleteManifest(ManifestId: Guid): Boolean

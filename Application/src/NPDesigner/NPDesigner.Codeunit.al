@@ -45,10 +45,10 @@ codeunit 6248190 "NPR NPDesigner"
     #region Manifest Management
     internal procedure CreateManifest() ManifestId: Guid
     begin
-        exit(CreateManifest(''));
+        exit(CreateManifest('', '', false));
     end;
 
-    internal procedure CreateManifest(ExternalTemplateId: Text[40]) ManifestId: Guid
+    internal procedure CreateManifest(ExternalTemplateId: Text[40]; LanguageCode: Code[10]; ShowToC: Boolean) ManifestId: Guid
     var
         Manifest: Record "NPR NPDesignerManifest";
         Webhook: Codeunit "NPR NPDesignerManifestWebHook";
@@ -56,6 +56,8 @@ codeunit 6248190 "NPR NPDesigner"
         Manifest.Init();
         Manifest.ManifestId := CreateGuid();
         Manifest.MasterTemplateId := ExternalTemplateId;
+        Manifest.PreferredAssetLanguage := LanguageCode;
+        Manifest.ShowTableOfContents := ShowToC;
 
         if (not Manifest.Insert()) then
             Error('Could not create new NP Designer Manifest');
@@ -77,6 +79,8 @@ codeunit 6248190 "NPR NPDesigner"
             Error('Manifest with Id %1 not found', ManifestId);
 
         JManifest.Add('manifestId', Format(Manifest.ManifestId, 0, 4).toLower());
+        JManifest.Add('languageCode', Manifest.PreferredAssetLanguage);
+        JManifest.Add('toc', Manifest.ShowTableOfContents);
 
         ManifestLine.SetCurrentKey(EntryNo, RenderGroup, RenderGroupOrder);
         ManifestLine.SetFilter(EntryNo, '=%1', Manifest.EntryNo);
@@ -94,6 +98,31 @@ codeunit 6248190 "NPR NPDesigner"
             until (ManifestLine.Next() = 0);
 
         JManifest.Add('assets', Assets);
+    end;
+
+    internal procedure SetPreferredAssetLanguage(ManifestId: Guid; PreferredAssetLanguage: Code[10]): Boolean
+    var
+        Manifest: Record "NPR NPDesignerManifest";
+    begin
+        Manifest.SetCurrentKey(ManifestId);
+        Manifest.SetFilter(ManifestId, '=%1', ManifestId);
+        if (not Manifest.FindFirst()) then
+            exit(false);
+
+        Manifest.PreferredAssetLanguage := PreferredAssetLanguage;
+        exit(Manifest.Modify());
+    end;
+
+    internal procedure SetShowTableOfContents(ManifestId: Guid; ShowTableOfContents: Boolean): Boolean
+    var
+        Manifest: Record "NPR NPDesignerManifest";
+    begin
+        Manifest.SetCurrentKey(ManifestId);
+        Manifest.SetFilter(ManifestId, '=%1', ManifestId);
+        if (not Manifest.FindFirst()) then
+            exit(false);
+        Manifest.ShowTableOfContents := ShowTableOfContents;
+        exit(Manifest.Modify());
     end;
 
     internal procedure AddAssetToManifest(ManifestId: Guid; AssetTableNumber: Integer; AssetId: Guid; AssetPublicId: Text[100]; ExternalTemplateId: Text[40]): Boolean

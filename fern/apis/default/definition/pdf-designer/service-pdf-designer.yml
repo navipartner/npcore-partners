@@ -1,0 +1,73 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+  commonApiTypes: ./../common-api-types.yml
+  simpleTypes: ./simple-types.yml
+
+service:
+  display-name: NPDesigner Manifests
+  auth: true
+  base-path: /pdfdesigner
+  
+  endpoints:
+
+    getManifest:
+      display-name: Get Manifest
+      docs: 
+        Retrieve a manifest by its ID.
+      method: GET
+      path: /manifest/{manifestId}
+      request:
+        name: getManifestRequest
+        path-parameters:
+          manifestId: uuid
+      response: GetManifestResponse
+      examples:
+        - name: Get Manifest
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            manifestId: ddcfea9f-385e-4d83-8b50-42256885b03a
+          response:
+            body:
+              $GetManifestResponse.Example
+
+# RESPONSES
+types:
+  Assets:
+    properties:
+      id: simpleTypes.Id
+      assetTableNumber: simpleTypes.AssetTableNumber
+      assetId: simpleTypes.AssetId
+      assetPublicId: simpleTypes.AssetPublicId
+      renderWithTemplateId: simpleTypes.RenderWithTemplateId
+      renderGroup: simpleTypes.RenderGroup
+      renderGroupOrder: simpleTypes.RenderGroupOrder
+      createdAt: simpleTypes.CreatedAt
+
+  GetManifestResponse:
+    properties:
+      manifestId: simpleTypes.ManifestId
+      languageCode: simpleTypes.LanguageCode
+      toc: simpleTypes.TableOfContents
+      createdAt: simpleTypes.CreatedAt
+      assets: list<Assets>
+    examples:
+      - name: Example
+        value:
+          manifestId: $simpleTypes.ManifestId.Example
+          languageCode: $simpleTypes.LanguageCode.Example
+          toc: $simpleTypes.TableOfContents.Example
+          createdAt: $simpleTypes.CreatedAt.Example
+          assets:
+            - id: $simpleTypes.Id.Example
+              assetTableNumber: $simpleTypes.AssetTableNumber.Example
+              assetId: $simpleTypes.AssetId.Example
+              assetPublicId: $simpleTypes.AssetPublicId.Example
+              renderWithTemplateId: $simpleTypes.RenderWithTemplateId.Example
+              renderGroup: $simpleTypes.RenderGroup.Example
+              renderGroupOrder: $simpleTypes.RenderGroupOrder.Example
+              createdAt: $simpleTypes.CreatedAt.Example
+

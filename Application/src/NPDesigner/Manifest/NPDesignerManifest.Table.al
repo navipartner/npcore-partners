@@ -24,6 +24,19 @@ table 6151256 "NPR NPDesignerManifest"
             DataClassification = CustomerContent;
             Caption = 'Master Template Id';
         }
+
+        field(20; PreferredAssetLanguage; Code[10])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Preferred Asset Language';
+        }
+
+        field(30; ShowTableOfContents; Boolean)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Show Table Of Contents';
+            InitValue = false;
+        }
     }
 
     keys

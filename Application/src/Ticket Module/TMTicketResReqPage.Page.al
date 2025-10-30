@@ -175,6 +175,11 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     ToolTip = 'Specifies the value of the Ticket Holder Name field';
                 }
+                field(TicketHolderPreferredLanguage; Rec.TicketHolderPreferredLanguage)
+                {
+                    ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
+                    ToolTip = 'Specifies the value of the Ticket Holder Preferred Language field';
+                }
                 field("External Order No."; Rec."External Order No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;

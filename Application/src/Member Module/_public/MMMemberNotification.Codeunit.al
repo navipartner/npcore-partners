@@ -476,7 +476,8 @@
             end;
 
             MemberNotificationEntry.ManifestId := NpDesignerFacade.CreateManifest();
-            if (not IsNullGuid(MemberNotificationEntry.ManifestId)) then
+            if (not IsNullGuid(MemberNotificationEntry.ManifestId)) then begin
+                NpDesignerFacade.SetPreferredRenderingLanguage(MemberNotificationEntry.ManifestId, Member.PreferredLanguageCode);
                 case NotificationSetup.ManifestAsset of
                     NotificationSetup.ManifestAsset::MEMBERSHIP:
                         NpDesignerFacade.AddAssetToManifest(MemberNotificationEntry.ManifestId, Database::"NPR MM Membership", Membership.SystemId, Membership."External Membership No.", MembershipNotification.NPDesignerTemplateId);
@@ -486,6 +487,7 @@
                         if (MemberCard."Entry No." <> 0) then
                             NpDesignerFacade.AddAssetToManifest(MemberNotificationEntry.ManifestId, Database::"NPR MM Member Card", MemberCard.SystemId, MemberCard."External Card No.", MembershipNotification.NPDesignerTemplateId);
                 end;
+            end;
         end;
 
         if (not MemberNotificationEntry.Insert()) then

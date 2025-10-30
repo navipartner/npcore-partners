@@ -77,6 +77,13 @@ enum 6059812 "NPR API Module" implements "NPR API Module Resolver"
     value(6248598; npdesigner)
     {
         Implementation = "NPR API Module Resolver" = "NPR NPDesignerManifestResolver";
+        ObsoleteState = Pending;
+        ObsoleteTag = '2025-10-27';
+        ObsoleteReason = 'Segment path changed from /npdesigner to /pdfdesigner.';
+    }
+    value(6248599; pdfdesigner)
+    {
+        Implementation = "NPR API Module Resolver" = "NPR NPDesignerManifestResolver";
     }
 }
 #endif

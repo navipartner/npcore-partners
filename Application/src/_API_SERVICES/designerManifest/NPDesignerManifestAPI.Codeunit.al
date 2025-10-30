@@ -6,7 +6,7 @@ codeunit 6248597 "NPR NPDesignerManifestAPI" implements "NPR API Request Handler
     procedure Handle(var Request: Codeunit "NPR API Request"): Codeunit "NPR API Response"
     begin
         case true of
-            Request.Match('GET', '/npdesigner/manifest/:manifestId'):
+            Request.Match('GET', '/pdfdesigner/manifest/:manifestId'):
                 exit(GetManifest(Request));
         end;
     end;
@@ -46,7 +46,10 @@ codeunit 6248597 "NPR NPDesignerManifestAPI" implements "NPR API Request Handler
         ManifestLine: Record "NPR NPDesignerManifestLine";
     begin
         Json.StartObject()
-            .AddProperty('manifestId', Format(Manifest.ManifestId, 0, 4).ToLower());
+            .AddProperty('manifestId', Format(Manifest.ManifestId, 0, 4).ToLower())
+            .AddProperty('languageCode', Manifest.PreferredAssetLanguage)
+            .AddProperty('toc', Manifest.ShowTableOfContents)
+            .AddProperty('createdAt', Manifest.SystemCreatedAt);
 
         ManifestLine.SetCurrentKey(EntryNo, RenderGroupOrder);
         ManifestLine.SetFilter(EntryNo, '=%1', Manifest.EntryNo);
@@ -61,6 +64,7 @@ codeunit 6248597 "NPR NPDesignerManifestAPI" implements "NPR API Request Handler
                     .AddProperty('renderWithTemplateId', ManifestLine.RenderWithTemplateId)
                     .AddProperty('renderGroup', ManifestLine.RenderGroup)
                     .AddProperty('renderGroupOrder', ManifestLine.RenderGroupOrder)
+                    .AddProperty('createdAt', ManifestLine.SystemCreatedAt)
                 .EndObject();
             until (ManifestLine.Next() = 0);
             Json.EndArray();
