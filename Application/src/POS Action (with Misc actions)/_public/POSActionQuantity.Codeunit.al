@@ -72,14 +72,15 @@ codeunit 6150808 "NPR POS Action: Quantity" implements "NPR IPOS Workflow"
     procedure RunWorkflow(Step: Text; Context: Codeunit "NPR POS JSON Helper"; FrontEnd: Codeunit "NPR POS Front End Management"; Sale: Codeunit "NPR POS Sale"; SaleLine: Codeunit "NPR POS Sale Line"; PaymentLine: Codeunit "NPR POS Payment Line"; Setup: Codeunit "NPR POS Setup")
     begin
         case Step of
-            'AddPresetValuesToContext':
-                FrontEnd.WorkflowResponse(AddPresetValuesToContext(Context, Sale));
+            'TakePhoto':
+                TakePhoto(Sale);
             'AskForReturnReason':
-                FrontEnd.WorkflowResponse(SelectReturnReason());
+                FrontEnd.WorkflowResponse(SelectReturnReason(Context));
             'ChangeQty':
-                ChangeQty(Context, SaleLine, Sale);
-            'PreparePostWorkflows':
-                FrontEnd.WorkflowResponse(PreparePostWorkflows(Context, SaleLine));
+                begin
+                    ChangeQty(Context, SaleLine, Sale);
+                    FrontEnd.WorkflowResponse(PreparePostWorkflows(Context, SaleLine));
+                end;
         end;
     end;
 
@@ -137,29 +138,11 @@ codeunit 6150808 "NPR POS Action: Quantity" implements "NPR IPOS Workflow"
         exit(QuantityGlobal);
     end;
 
-    local procedure AddPresetValuesToContext(Context: Codeunit "NPR POS JSON Helper"; Sale: codeunit "NPR POS Sale") Response: JsonObject;
+    local procedure TakePhoto(Sale: codeunit "NPR POS Sale")
     var
-        POSAuditProfile: Record "NPR POS Audit Profile";
-        POSUnit: Record "NPR POS Unit";
-        POSSetup: Codeunit "NPR POS Setup";
-        POSSession: Codeunit "NPR POS Session";
         POSActionTakePhotoB: Codeunit "NPR POS Action Take Photo B";
-        Quantity: Decimal;
     begin
-        Quantity := GetQty(Context);
-
-        TakePhotoEnabled := Context.GetBooleanParameter(TakePhotoParLbl);
-        if TakePhotoEnabled then
-            POSActionTakePhotoB.TakePhoto(Sale);
-        if (Context.GetBooleanParameter('NegativeInput') = false) and (Quantity > 0) then begin
-            Response.Add('PromptForReason', false);
-            exit;
-        end;
-
-        POSSession.GetSetup(POSSetup);
-        POSSetup.GetPOSUnit(POSUnit);
-        if POSUnit.GetProfile(POSAuditProfile) then
-            Response.Add('PromptForReason', POSAuditProfile."Require Item Return Reason");
+        POSActionTakePhotoB.TakePhoto(Sale);
     end;
 
     local procedure PreparePostWorkflows(Context: Codeunit "NPR POS JSON Helper"; SaleLine: Codeunit "NPR POS Sale Line") Response: JsonObject
@@ -192,15 +175,33 @@ codeunit 6150808 "NPR POS Action: Quantity" implements "NPR IPOS Workflow"
         end;
     end;
 
-    local procedure SelectReturnReason() Response: JsonObject;
+    local procedure SelectReturnReason(Context: Codeunit "NPR POS JSON Helper") Response: JsonObject;
     var
         ReturnReason: Record "Return Reason";
         ReasonRequiredErr: Label 'You must choose a return reason.';
     begin
+        if not PromptForReturnReason() then begin
+            Context.SetContext('PromptForReason', false);
+            exit;
+        end;
         if Page.RunModal(Page::"NPR TouchScreen: Ret. Reasons", ReturnReason) = Action::LookupOK then
             Response.Add('ReturnReasonCode', ReturnReason.Code)
         else
             Error(ReasonRequiredErr);
+        Context.SetContext('PromptForReason', true);
+    end;
+
+    local procedure PromptForReturnReason(): Boolean
+    var
+        POSAuditProfile: Record "NPR POS Audit Profile";
+        POSUnit: Record "NPR POS Unit";
+        POSSetup: Codeunit "NPR POS Setup";
+        POSSession: Codeunit "NPR POS Session";
+    begin
+        POSSession.GetSetup(POSSetup);
+        POSSetup.GetPOSUnit(POSUnit);
+        if POSUnit.GetProfile(POSAuditProfile) then
+            exit(POSAuditProfile."Require Item Return Reason");
     end;
 
     #region Ean Box Event Handling
@@ -268,7 +269,7 @@ codeunit 6150808 "NPR POS Action: Quantity" implements "NPR IPOS Workflow"
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionQuantity.Codeunit.js###
-'let main=async({workflow:t,context:a,popup:e,parameters:r,captions:n})=>{let o,i=runtime.getData("BUILTIN_SALELINE"),s=parseFloat(i._current[12]);if(r.Constraint==r.Constraint["Positive Quantity Only"]&&s<0)return void e.error(n.MustBePositive);if(r.Constraint==r.Constraint["Negative Quantity Only"]&&s>0)return void e.error(n.MustBeNegative);if(a.PromptQuantity=0==r.InputType?await e.numpad({caption:n.QtyCaption,value:s}):1==r.InputType?r.ChangeToQuantity:2==r.InputType?s+r.IncrementQuantity:null,!a.PromptQuantity)return;if(r.MaxQuantityAllowed&&0!=r.MaxQuantityAllowed&&Math.abs(a.PromptQuantity)>r.MaxQuantityAllowed)return void e.error(n.CannotExceedMaxQty+" "+r.MaxQuantityAllowed);let p=await t.respond("AddPresetValuesToContext");if(r.PromptUnitPriceOnNegativeInput&&(r.NegativeInput?a.PromptQuantity>0:a.PromptQuantity<0)&&(a.PromptUnitPrice=await e.numpad({caption:n.PriceCaption,value:i._current[15]}),!a.PromptUnitPrice))return;p.PromptForReason?(o=await t.respond("AskForReturnReason"),a.PromptForReason=!0):(a.PromptForReason=!1,o=""),await t.respond("ChangeQty",o);let{postWorkflows:u}=await t.respond("PreparePostWorkflows");await processWorkflows(u)};async function processWorkflows(t){if(t)for(const[a,{mainParameters:e,customParameters:r}]of Object.entries(t))await workflow.run(a,{context:{customParameters:r},parameters:e})}'
+'let main=async({workflow:a,context:n,popup:i,parameters:t,captions:e})=>{let o,r=runtime.getData("BUILTIN_SALELINE"),u=parseFloat(r._current[12]);if(t.Constraint==t.Constraint["Positive Quantity Only"]&&u<0){i.error(e.MustBePositive);return}if(t.Constraint==t.Constraint["Negative Quantity Only"]&&u>0){i.error(e.MustBeNegative);return}if(n.PromptQuantity=t.InputType==0?await i.numpad({caption:e.QtyCaption,value:u}):t.InputType==1?t.ChangeToQuantity:t.InputType==2?u+t.IncrementQuantity:null,!n.PromptQuantity)return;if(t.MaxQuantityAllowed&&t.MaxQuantityAllowed!=0&&Math.abs(n.PromptQuantity)>t.MaxQuantityAllowed){i.error(e.CannotExceedMaxQty+" "+t.MaxQuantityAllowed);return}if(t.TakePhoto&&await a.respond("TakePhoto"),t.PromptUnitPriceOnNegativeInput&&(t.NegativeInput?n.PromptQuantity>0:n.PromptQuantity<0)&&(n.PromptUnitPrice=await i.numpad({caption:e.PriceCaption,value:r._current[15]}),!n.PromptUnitPrice))return;(t.NegativeInput?n.PromptQuantity>0:n.PromptQuantity<0)?o=await a.respond("AskForReturnReason"):(n.PromptForReason=!1,o="");let{postWorkflows:y}=await a.respond("ChangeQty",o);await processWorkflows(y)};async function processWorkflows(a){if(a)for(const[n,{mainParameters:i,customParameters:t}]of Object.entries(a))await workflow.run(n,{context:{customParameters:t},parameters:i})}'
           );
     end;
 

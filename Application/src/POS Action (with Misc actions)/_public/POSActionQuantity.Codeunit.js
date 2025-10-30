@@ -40,7 +40,8 @@ let main = async ({workflow, context, popup, parameters, captions}) => {
             return;
         }
     }
-    let PromptForReason = await workflow.respond("AddPresetValuesToContext");
+    if (parameters.TakePhoto)
+        await workflow.respond("TakePhoto");
     if (
         parameters.PromptUnitPriceOnNegativeInput &&
         (parameters.NegativeInput
@@ -54,9 +55,11 @@ let main = async ({workflow, context, popup, parameters, captions}) => {
         if (!context.PromptUnitPrice) return;
     }
 
-    if (PromptForReason["PromptForReason"]) {
+    if (parameters.NegativeInput
+            ? context.PromptQuantity > 0
+            : context.PromptQuantity < 0)
+    {
         ReturnReasonCode = await workflow.respond("AskForReturnReason");
-        context.PromptForReason = true;
     }
     else
     {
@@ -64,9 +67,7 @@ let main = async ({workflow, context, popup, parameters, captions}) => {
         ReturnReasonCode = "";
     }
 
-    await workflow.respond("ChangeQty",ReturnReasonCode);
-
-    let {postWorkflows} = await workflow.respond("PreparePostWorkflows");  
+    let {postWorkflows} = await workflow.respond("ChangeQty",ReturnReasonCode);
     await processWorkflows(postWorkflows);
 };
 
