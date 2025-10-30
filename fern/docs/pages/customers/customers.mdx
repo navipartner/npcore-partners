@@ -1,0 +1,32 @@
+The Customer service provides essential functionality for managing customer records in the NP Retail system. This service handles customer lifecycle operations including retrieval, creation, and template-based setup.
+
+## Customer Data Structure
+
+Customers in NP Retail contain comprehensive information including:
+
+- **Identification**: Unique ID, customer number, and name
+- **Address Information**: Complete address details including postal code, city, county, and country
+- **Contact Details**: Email, phone, and primary contact person
+- **Business Information**: EAN number, VAT registration number
+- **System Data**: Row version for optimistic concurrency control
+
+## Operations
+
+### Get Customer
+Retrieve a single customer by their unique identifier or customer number. This operation returns complete customer details and is typically used for:
+- Customer lookup during transactions
+- Customer profile display
+- Data verification and validation
+
+### Find Customers
+List customers with pagination support and optional filtering. This operation supports:
+- Pagination using page keys and row versions
+- Filtering by customer number
+- Synchronization scenarios with delta updates
+
+### Create Customer
+Create new customers with optional template application. This operation:
+- Automatically assigns customer numbers from configured number series
+- Applies configuration templates for consistent setup
+- Fires integration events for extensibility
+- Returns the complete created customer record

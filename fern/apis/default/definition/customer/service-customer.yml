@@ -1,0 +1,268 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+
+types:
+  CustomerId:
+    type: string
+    docs: The unique identifier for a customer.
+
+  Customer:
+    docs: Represents a customer in the system.
+    properties:
+      id: uuid
+      no: string
+      name: string
+      address: string
+      postCode: string
+      city: string
+      address2: string
+      county: string
+      countryCode: string
+      contact: string
+      email: string
+      phone: string
+      mobilePhone: string
+      ean: string
+      vatRegistrationNo: string
+      genBusPostingGroup: string
+      vatBusPostingGroup: string
+      customerPostingGroup: string
+      currencyCode: string
+      customerPriceGroup: string
+      invoiceDiscCode: string
+      customerDiscGroup: string
+      allowLineDisc: boolean
+      paymentTermsCode: string
+      paymentMethodCode: string
+      shipmentMethodCode: string
+      rowVersion: string
+    examples:
+      - name: ExampleCustomer
+        value:
+          id: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+          no: "CUST-10001"
+          name: "Acme Corporation"
+          address: "123 Main Street"
+          postCode: "10001"
+          city: "New York"
+          address2: "Suite 400"
+          county: "New York"
+          countryCode: "US"
+          contact: "Jane Doe"
+          email: "jane.doe@acme.com"
+          phone: "+1-555-123-4567"
+          mobilePhone: "+1-555-987-6543"
+          ean: "1234567890123"
+          vatRegistrationNo: "US123456789"
+          genBusPostingGroup: "DOMESTIC"
+          vatBusPostingGroup: "DOMESTIC"
+          customerPostingGroup: "DOMESTIC"
+          currencyCode: "USD"
+          customerPriceGroup: "RETAIL"
+          invoiceDiscCode: "STANDARD"
+          customerDiscGroup: "RETAIL"
+          allowLineDisc: true
+          paymentTermsCode: "NET30"
+          paymentMethodCode: "BANK"
+          shipmentMethodCode: "PICKUP"
+          rowVersion: "12345678901234567890"
+
+  ListCustomer:
+    docs: Represents a customer in the system for list operations.
+    properties:
+      id: uuid
+      no: string
+      name: string
+      address: string
+      postCode: string
+      city: string
+      address2: string
+      county: string
+      countryCode: string
+      contact: string
+      email: string
+      phone: string
+      mobilePhone: string
+      ean: string
+      vatRegistrationNo: string
+      rowVersion: string
+    examples:
+      - name: ExampleListCustomer
+        value:
+          id: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+          no: "CUST-10001"
+          name: "Acme Corporation"
+          address: "123 Main Street"
+          postCode: "10001"
+          city: "New York"
+          address2: "Suite 400"
+          county: "New York"
+          countryCode: "US"
+          contact: "Jane Doe"
+          email: "jane.doe@acme.com"
+          phone: "+1-555-123-4567"
+          mobilePhone: "+1-555-987-6543"
+          ean: "1234567890123"
+          vatRegistrationNo: "US123456789"
+          rowVersion: "12345678901234567890"
+
+  PaginatedCustomers:
+    docs: A paginated response containing multiple customers
+    properties:
+      morePages: boolean
+      nextPageKey: string
+      nextPageURL: string
+      data: list<ListCustomer>
+    examples:
+      - name: ExamplePaginatedCustomers
+        value:
+          morePages: true
+          nextPageKey: "c29tZSBiYXNlNjQgc3RyaW5n"
+          nextPageURL: "https://api.npretail.app/tenant/env/company/customer?pageKey=c29tZSBiYXNlNjQgc3RyaW5n&lastRowVersion=12345678901234567890"
+          data:
+            - $ListCustomer.ExampleListCustomer
+            - $ListCustomer.ExampleListCustomer
+
+  CreateCustomerRequest:
+    docs: Request body for creating a new customer
+    properties:
+      no: 
+        type: optional<string>
+        docs: Max. length 20 symbols.
+      name: 
+        type: string
+        docs: Max. length 100 symbols.
+      address: 
+        type: optional<string>
+        docs: Max. length 100 symbols.
+      postCode: 
+        type: optional<string>
+        docs: Max. length 20 symbols.
+      city: 
+        type: optional<string>
+        docs: Max. length 30 symbols.
+      address2: 
+        type: optional<string>
+        docs: Max. length 50 symbols.
+      county: 
+        type: optional<string>
+        docs: Max. length 30 symbols.
+      countryCode: 
+        type: optional<string>
+        docs: Max. length 10 symbols.
+      contact: 
+        type: optional<string>
+        docs: Max. length 100 symbols.
+      email: 
+        type: optional<string>
+        docs: Max. length 80 symbols.
+      phone: 
+        type: optional<string>
+        docs: Max. length 30 symbols.
+      mobilePhone: 
+        type: optional<string>
+        docs: Max. length 30 symbols.
+      ean: 
+        type: optional<string>
+        docs: Max. length 13 symbols.
+      vatRegistrationNo: 
+        type: optional<string>
+        docs: Max. length 20 symbols.
+      customerTemplate: 
+        type: optional<string>
+        docs: |
+          Customer template code from Customer Templ. table that applies customer-specific defaults.
+          If both `customerTemplate` and `configurationTemplate` are provided, `customerTemplate` takes priority and `configurationTemplate` will be ignored.
+          If neither template is specified, the default template from Ecommerce Setup will be used (Customer Template Code first, then Config Template Code as fallback).
+      configurationTemplate: 
+        type: optional<string>
+        docs: |
+          Configuration template code from Config. Template Header table that applies general setup defaults.
+          This template will only be applied if `customerTemplate` is not provided.
+          If neither template is specified, the default template from Ecommerce Setup will be used (Customer Template Code first, then Config Template Code as fallback).
+    examples:
+      - name: ExampleCreateCustomerRequest
+        value:
+          name: "New Corp Ltd"
+          address: "456 Business Ave"
+          postCode: "10002"
+          city: "New York"
+          countryCode: "US"
+          contact: "John Smith"
+          email: "john.smith@newcorp.com"
+          phone: "+1-555-987-6543"
+          mobilePhone: "+1-555-456-7890"
+          customerTemplate: "DOMESTIC"
+
+service:
+  auth: true
+  display-name: Customers
+  base-path: /customer
+  endpoints:
+    getCustomer:
+      display-name: Get Customer
+      docs: Get a customer by its ID or customer number
+      method: GET
+      path: "/{id}"
+      path-parameters:
+        id: CustomerId
+      response: Customer
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            id: "CUST-10001"
+          response:
+            body: $Customer.ExampleCustomer
+
+    getCustomers:
+      display-name: Find Customers
+      docs: Get a list of customers with pagination
+      method: GET
+      path: "/"
+      request:
+        name: getCustomersRequest
+        query-parameters:
+          customerNo: 
+            type: optional<string>
+            docs: Filter customers by customer number
+          email:
+            type: optional<string>
+            docs: Filter customers by email address
+          pageSize: optional<integer>
+          pageKey: optional<string>
+          lastRowVersion: optional<string>
+          sync: optional<boolean>
+      response: PaginatedCustomers
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            pageSize: 50
+            customerNo: "CUST-10001"
+            email: "jane.doe@acme.com"
+          response:
+            body: $PaginatedCustomers.ExamplePaginatedCustomers
+
+    createCustomer:
+      display-name: Create Customer
+      docs: Create a new customer with optional template application.
+      method: POST
+      path: "/"
+      request:
+        name: createCustomerRequest
+        body: CreateCustomerRequest
+      response: Customer
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          request: $CreateCustomerRequest.ExampleCreateCustomerRequest
+          response:
+            body: $Customer.ExampleCustomer

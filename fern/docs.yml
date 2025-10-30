@@ -364,6 +364,17 @@ navigation:
               title: General Ledger Journal
               summary: ./docs/pages/finance/gljournal.mdx          
 
+        - section: Customers
+          summary: ./docs/pages/customers/overview.mdx
+          contents:
+          - customer.service-customer:
+              title: Customers
+              summary: ./docs/pages/customers/customers.mdx
+              contents:
+                - endpoint: customer.service-customer.getCustomer
+                - endpoint: customer.service-customer.getCustomers
+                - endpoint: customer.service-customer.createCustomer          
+
         - section: NP Designer
           #hidden: true
           summary: ./docs/pages/np-designer/overview.mdx

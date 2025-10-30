@@ -1,0 +1,36 @@
+# Customer API
+
+The Customer API provides comprehensive functionality for managing customers in the NP Retail system. This API allows you to retrieve customer information, create new customers, and apply business templates for consistent customer setup.
+
+## Key Features
+
+- **Retrieve Customers**: Get individual customers by ID or customer number, or list customers with pagination and filtering
+- **Create Customers**: Create new customers with automatic number assignment and template application
+- **Template Support**: Apply configuration templates to ensure consistent customer setup across your organization
+- **Integration Events**: Extensibility hooks for third-party integrations and custom business logic
+
+## Common Use Cases
+
+- **Customer Lookup**: Retrieve customer details for POS transactions, customer service, or reporting
+- **Customer Onboarding**: Create new customers with standardized settings using templates
+- **Data Synchronization**: Sync customer data between systems using pagination and filtering
+- **Business Intelligence**: Extract customer data for analysis and reporting
+
+## Template System
+
+The Customer API supports configuration templates that allow you to:
+- Apply default values for new customers
+- Ensure consistent setup across customer types (e.g., retail vs. wholesale)
+- Streamline the customer creation process
+- Maintain business rules and compliance requirements
+
+## Integration Patterns
+
+The API includes integration events that fire during customer operations:
+- `OnBeforeGetCustomerTemplate`: Customize template selection logic before applying templates
+- `OnBeforeGetCustomerNoSeries`: Override the number series assignment logic for customer numbers
+- `OnBeforeInsertCustomer`: Validate or modify customer data before creation
+- `OnAfterInsertCustomer`: Perform additional actions after customer creation
+- `OnBeforeModifyCustomer`: Validate or modify customer data before final update
+
+These events enable seamless integration with external systems and custom business processes.
