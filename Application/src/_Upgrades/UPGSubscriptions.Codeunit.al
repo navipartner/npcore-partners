@@ -20,6 +20,7 @@ codeunit 6185060 "NPR UPG Subscriptions"
         UpdateSubscriptionAutoRenewStatus();
         UpdateSubscriptionRenewReqJobStartTime();
         UpdateSubscriptionRenewProcJobStartTime();
+        UpgradeTerminationSubsRequest();
     end;
 
     internal procedure CreateSubscriptions()
@@ -173,6 +174,26 @@ codeunit 6185060 "NPR UPG Subscriptions"
         SetUpgradeTag();
     end;
 
+    local procedure UpgradeTerminationSubsRequest()
+    var
+        Subscription: Record "NPR MM Subscription";
+    begin
+        UpgradeStep := 'UpgradeTerminationSubsRequest';
+        if HasUpgradeTag() then
+            exit;
+
+        Subscription.Reset();
+        Subscription.SetRange("Auto-Renew", Subscription."Auto-Renew"::TERMINATION_REQUESTED);
+        If Subscription.FindSet() then
+            repeat
+                CreateSubscTerminationRequest(Subscription);
+                ResetSubscriptionTerminationFields(Subscription);
+                DisableSubscriptionAutoRenewal(Subscription);
+            until Subscription.Next() = 0;
+
+        SetUpgradeTag();
+    end;
+
     local procedure SetJobStartTime(JobQueueEntry: Record "Job Queue Entry"; StartingTime: Time)
     var
         StartDateTime: DateTime;
@@ -212,5 +233,41 @@ codeunit 6185060 "NPR UPG Subscriptions"
     begin
         UpgradeTag.SetUpgradeTag(UpgTagDef.GetUpgradeTag(Codeunit::"NPR UPG Subscriptions", UpgradeStep));
         LogMessageStopwatch.LogFinish();
+    end;
+
+    local procedure CreateSubscTerminationRequest(Subscription: Record "NPR MM Subscription")
+    var
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+        TerminationRequestLbl: Label 'Termination request';
+    begin
+        SubscriptionRequest.Init();
+        SubscriptionRequest.Type := SubscriptionRequest.Type::Terminate;
+        SubscriptionRequest.Status := SubscriptionRequest.Status::Confirmed;
+        SubscriptionRequest."Processing Status" := SubscriptionRequest."Processing Status"::Success;
+        SubscriptionRequest."Subscription Entry No." := Subscription."Entry No.";
+        SubscriptionRequest.Description := TerminationRequestLbl;
+        SubscriptionRequest."Membership Code" := Subscription."Membership Code";
+        SubscriptionRequest."Terminate At" := Subscription."Terminate At";
+        SubscriptionRequest."Termination Reason" := Subscription."Termination Reason";
+        SubscriptionRequest."Termination Requested At" := Subscription."Termination Requested At";
+        SubscriptionRequest.Insert(true);
+    end;
+
+    local procedure ResetSubscriptionTerminationFields(var Subscription: Record "NPR MM Subscription")
+    begin
+        Subscription."Terminate At" := 0D;
+        Subscription."Termination Reason" := Subscription."Termination Reason"::NOT_TERMINATED;
+        Subscription."Termination Requested At" := 0DT;
+        Subscription.Modify(true);
+    end;
+
+    local procedure DisableSubscriptionAutoRenewal(Subscription: Record "NPR MM Subscription")
+    var
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+        Membership: Record "NPR MM Membership";
+    begin
+        if (Membership.Get(Subscription."Membership Entry No.")) then
+            if Membership."Auto-Renew" <> Membership."Auto-Renew"::NO then
+                MembershipMgtInternal.DisableMembershipAutoRenewal(Membership, true, false);
     end;
 }

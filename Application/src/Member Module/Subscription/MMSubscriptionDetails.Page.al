@@ -60,21 +60,6 @@ page 6184834 "NPR MM Subscription Details"
                     ToolTip = 'Specifies the value of the Auto-Renew field.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
-                field("Terminate At"; Rec."Terminate At")
-                {
-                    ToolTip = 'Specifies the value of the Terminate At field.';
-                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-                }
-                field("Termination Requested At"; Rec."Termination Requested At")
-                {
-                    ToolTip = 'Specifies the value of the Termination Requested At field.';
-                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-                }
-                field("Termination Reason"; Rec."Termination Reason")
-                {
-                    ToolTip = 'Specifies the value of the Termination Reason field.';
-                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-                }
                 field("Postpone Renewal Attempt Until"; Rec."Postpone Renewal Attempt Until")
                 {
                     ToolTip = 'Specifies the value of the Postpone Renewal Attempt Until field.';

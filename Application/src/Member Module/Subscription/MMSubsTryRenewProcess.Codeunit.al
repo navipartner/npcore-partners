@@ -93,6 +93,9 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
 
             SubscriptionRequest.Type::"Partial Regret":
                 CancelMembership(SubscriptionRequest);
+
+            SubscriptionRequest.Type::Terminate:
+                ProcessTermination(SubscriptionRequest);
         end;
     end;
 
@@ -358,6 +361,22 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
             exit;
 
         PayByLinkUrl := PayByLinkSubscrPaymentRequest."Pay by Link URL";
+    end;
+
+    internal procedure ProcessTermination(var SubscriptionRequest: Record "NPR MM Subscr. Request")
+    var
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+        Membership: Record "NPR MM Membership";
+        Subscription: Record "NPR MM Subscription";
+    begin
+        if not Subscription.Get(SubscriptionRequest."Subscription Entry No.") then
+            exit;
+
+        if (Membership.Get(Subscription."Membership Entry No.")) then
+            MembershipMgtInternal.DisableMembershipAutoRenewal(Membership, true, false);
+
+        SubscriptionRequest.Validate("Processing Status", SubscriptionRequest."Processing Status"::Success);
+        SubscriptionRequest.Modify(true);
     end;
 
     internal procedure SetSkipTryCountUpdate(SkipTryCountUpdate: Boolean)

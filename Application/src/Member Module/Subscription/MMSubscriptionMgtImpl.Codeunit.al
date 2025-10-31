@@ -171,7 +171,7 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
 
         CheckTerminationPeriod(Membership, Subscription, RequestedDate);
 
-        SetTerminationFields(Subscription, RequestedDate, Reason);
+        CreateTerminationSubsRequest(Subscription, RequestedDate, Reason);
         Subscription."Auto-Renew" := Subscription."Auto-Renew"::TERMINATION_REQUESTED;
         Subscription.Modify(true);
 
@@ -323,11 +323,11 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
                         SetCommitmentPeriod(Membership, Subscription);
                     end;
 
-                    ResetTerminationFields(Subscription);
                 end;
             "NPR MM MembershipAutoRenew"::TERMINATION_REQUESTED:
                 // This is a catch all if somebody sets it directly on the membership. We make some assumptions here.
-                SetTerminationFields(Subscription, Today(), "NPR MM Subs Termination Reason"::CUSTOMER_INITIATED);
+                CreateTerminationSubsRequest(Subscription, Today(), "NPR MM Subs Termination Reason"::CUSTOMER_INITIATED);
+
         end;
 
         Subscription."Auto-Renew" := Membership."Auto-Renew";
@@ -354,18 +354,22 @@ codeunit 6185043 "NPR MM Subscription Mgt. Impl."
         Subscription."Committed Until" := CommittedUntil;
     end;
 
-    local procedure SetTerminationFields(var Subscription: Record "NPR MM Subscription"; RequestedDate: Date; Reason: Enum "NPR MM Subs Termination Reason")
+    local procedure CreateTerminationSubsRequest(Subscription: Record "NPR MM Subscription"; RequestedDate: Date; Reason: Enum "NPR MM Subs Termination Reason")
+    var
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+        TerminationRequestLbl: Label 'Termination request';
     begin
-        Subscription."Terminate At" := RequestedDate;
-        Subscription."Termination Reason" := Reason;
-        Subscription."Termination Requested At" := CurrentDateTime();
-    end;
-
-    local procedure ResetTerminationFields(var Subscription: Record "NPR MM Subscription")
-    begin
-        Subscription."Terminate At" := 0D;
-        Subscription."Termination Reason" := Subscription."Termination Reason"::NOT_TERMINATED;
-        Subscription."Termination Requested At" := 0DT;
+        SubscriptionRequest.Init();
+        SubscriptionRequest.Type := SubscriptionRequest.Type::Terminate;
+        SubscriptionRequest.Status := SubscriptionRequest.Status::Confirmed;
+        SubscriptionRequest."Processing Status" := SubscriptionRequest."Processing Status"::Pending;
+        SubscriptionRequest."Subscription Entry No." := Subscription."Entry No.";
+        SubscriptionRequest.Description := TerminationRequestLbl;
+        SubscriptionRequest."Membership Code" := Subscription."Membership Code";
+        SubscriptionRequest."Terminate At" := RequestedDate;
+        SubscriptionRequest."Termination Reason" := Reason;
+        SubscriptionRequest."Termination Requested At" := CurrentDateTime();
+        SubscriptionRequest.Insert(true);
     end;
 
     local procedure CheckTerminationPeriod(Membership: Record "NPR MM Membership"; Subscription: Record "NPR MM Subscription"; RequestedDate: Date)

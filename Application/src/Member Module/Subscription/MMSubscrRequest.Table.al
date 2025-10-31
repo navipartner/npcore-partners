@@ -187,6 +187,17 @@ table 6150923 "NPR MM Subscr. Request"
             Caption = 'Renew Schedule Date';
             DataClassification = CustomerContent;
         }
+        field(252; "Termination Reason"; Enum "NPR MM Subs Termination Reason")
+        {
+            Caption = 'Termination Reason';
+            DataClassification = CustomerContent;
+            BlankZero = true;
+        }
+        field(253; "Termination Requested At"; DateTime)
+        {
+            Caption = 'Termination Requested At';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

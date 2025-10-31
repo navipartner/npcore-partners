@@ -83,16 +83,25 @@ table 6150918 "NPR MM Subscription"
         {
             Caption = 'Terminate At';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-11-03';
+            ObsoleteReason = 'Moved to NPR MM Subscr. Request table';
         }
         field(251; "Termination Reason"; Enum "NPR MM Subs Termination Reason")
         {
             Caption = 'Termination Reason';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-11-03';
+            ObsoleteReason = 'Moved to NPR MM Subscr. Request table';
         }
         field(252; "Termination Requested At"; DateTime)
         {
             Caption = 'Termination Requested At';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-11-03';
+            ObsoleteReason = 'Moved to NPR MM Subscr. Request table';
         }
         field(253; "Subscr Renew Sched Date Filter"; Date)
         {

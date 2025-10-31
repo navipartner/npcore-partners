@@ -88,16 +88,27 @@ codeunit 6248482 "NPR MembershipSubscrAgent"
             Json.AddProperty('startedAt', Subscription."Started At");
         if (Subscription."Committed Until" <> 0D) then
             Json.AddProperty('committedUntil', Subscription."Committed Until");
-        if (Subscription."Terminate At" <> 0D) then
-            Json.AddProperty('terminateAt', Subscription."Terminate At");
-        if (Subscription."Termination Requested At" <> 0DT) then
-            Json.AddProperty('terminationRequestedAt', Subscription."Termination Requested At");
-        if (Subscription."Termination Reason" <> Subscription."Termination Reason"::NOT_TERMINATED) then
-            Json.AddProperty('terminationReason', Enum::"NPR MM Subs Termination Reason".Names().Get(Enum::"NPR MM Subs Termination Reason".Ordinals().IndexOf(Subscription."Termination Reason".AsInteger())));
-
+        if Subscription."Auto-Renew" = Subscription."Auto-Renew"::TERMINATION_REQUESTED then
+            GetTerminationSubsRequest(Subscription, Json);
         Json.AddProperty('autoRenew', Enum::"NPR MM MembershipAutoRenew".Names().Get(Enum::"NPR MM MembershipAutoRenew".Ordinals().IndexOf(Subscription."Auto-Renew".AsInteger())))
             .EndObject();
         exit(Json);
+    end;
+
+    local procedure GetTerminationSubsRequest(Subscription: Record "NPR MM Subscription"; var Json: Codeunit "NPR Json Builder")
+    var
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+    begin
+        SubscriptionRequest.SetRange("Subscription Entry No.", Subscription."Entry No.");
+        SubscriptionRequest.SetRange(Type, SubscriptionRequest.Type::Terminate);
+        if SubscriptionRequest.FindLast() then begin
+            if (SubscriptionRequest."Terminate At" <> 0D) then
+                Json.AddProperty('terminateAt', SubscriptionRequest."Terminate At");
+            if (SubscriptionRequest."Termination Requested At" <> 0DT) then
+                Json.AddProperty('terminationRequestedAt', SubscriptionRequest."Termination Requested At");
+            if (SubscriptionRequest."Termination Reason" <> Enum::"NPR MM Subs Termination Reason"::NOT_TERMINATED) then
+                Json.AddProperty('terminationReason', Enum::"NPR MM Subs Termination Reason".Names().Get(Enum::"NPR MM Subs Termination Reason".Ordinals().IndexOf(SubscriptionRequest."Termination Reason".AsInteger())));
+        end;
     end;
 }
 #endif

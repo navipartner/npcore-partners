@@ -84,7 +84,7 @@ codeunit 6248187 "NPR MM Subscr. Reversal Mgt."
         SubscrReversalRequest.Description := CopyStr(StrSubstNo(DescrLbl, RefundAtDate), 1, MaxStrLen(SubscrReversalRequest.Description));
         SubscrReversalRequest."New Valid From Date" := NewValidFromDate;
         SubscrReversalRequest."New Valid Until Date" := RefundAtDate;
-        SubscrReversalRequest."Terminate At" := Subscription."Terminate At";
+        SubscrReversalRequest."Terminate At" := GetTerminationRequestTerminateAt(Subscription);
         SubscrReversalRequest.Amount := RefundPrice;
         SubscrReversalRequest."Currency Code" := SubscriptionRequest."Currency Code";
         SubscrReversalRequest."Item No." := RefundWithItemNo;
@@ -123,6 +123,18 @@ codeunit 6248187 "NPR MM Subscr. Reversal Mgt."
                 OriginalSubscrPmtRequest.Modify(true);
             end;
         end
+    end;
+
+    local procedure GetTerminationRequestTerminateAt(Subscription: Record "NPR MM Subscription"): Date
+    var
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+    begin
+        SubscriptionRequest.SetLoadFields("Terminate At");
+        SubscriptionRequest.SetCurrentKey("Subscription Entry No.", Type);
+        SubscriptionRequest.SetRange("Subscription Entry No.", Subscription."Entry No.");
+        SubscriptionRequest.SetRange(Type, SubscriptionRequest.Type::Terminate);
+        if SubscriptionRequest.FindLast() then
+            exit(SubscriptionRequest."Terminate At");
     end;
 
     internal procedure InitReversalRequest(SubscriptionRequest: Record "NPR MM Subscr. Request"; SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; ReversalType: Enum "NPR MM Payment Request Type"; var SubscrReversalRequest: Record "NPR MM Subscr. Request"; var SubscrPmtReversalRequest: Record "NPR MM Subscr. Payment Request")

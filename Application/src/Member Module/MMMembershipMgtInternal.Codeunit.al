@@ -6641,4 +6641,30 @@
         else
             SubscrReversalMgt.RequestRefund(Rec, SubscrPaymentRequest, true, SubscrPmtReversalRequest);
     end;
+
+    internal procedure CreateEnableDisableSubsRequest(Subscription: Record "NPR MM Subscription"; RequestType: Enum "NPR MM Subscr. Request Type")
+    var
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+        DisableRequestLbl: Label 'Disable request';
+        EnableRequestLbl: Label 'Enable request';
+        RequestLbl: Text;
+    begin
+        case RequestType of
+            SubscriptionRequest.Type::Enable:
+                RequestLbl := EnableRequestLbl;
+            SubscriptionRequest.Type::Disable:
+                RequestLbl := DisableRequestLbl;
+            else
+                exit;
+        end;
+
+        SubscriptionRequest.Init();
+        SubscriptionRequest."Subscription Entry No." := Subscription."Entry No.";
+        SubscriptionRequest.Type := RequestType;
+        SubscriptionRequest.Status := SubscriptionRequest.Status::Confirmed;
+        SubscriptionRequest."Processing Status" := SubscriptionRequest."Processing Status"::Success;
+        SubscriptionRequest.Description := CopyStr(RequestLbl, 1, MaxStrLen(SubscriptionRequest.Description));
+        SubscriptionRequest."Membership Code" := Subscription."Membership Code";
+        SubscriptionRequest.Insert(true);
+    end;
 }

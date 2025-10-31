@@ -78,6 +78,7 @@ page 6184909 "NPR MM Set Auto-Renew Status"
         MemberNotification: Codeunit "NPR MM Member Notification";
         MemberPaymentMethod: Record "NPR MM Member Payment Method";
         MembershipAutoRenewalWithoutPaymentMethodErr: Label 'You must specify a membership default payment method before enabling auto-renewal.';
+        Subscription: Record "NPR MM Subscription";
     begin
         case AutoRenewStatus of
             AutoRenewStatus::NO:
@@ -95,6 +96,31 @@ page 6184909 "NPR MM Set Auto-Renew Status"
                 end;
         end;
 
+        If GetSubscription(Subscription, Membership."Entry No.") then
+            CreateProcessSubscRequest(Subscription, AutoRenewStatus);
+
         MemberNotification.CreateUpdateWalletNotification_Membership(Membership."Entry No.");
+    end;
+
+    local procedure GetSubscription(var Subscription: Record "NPR MM Subscription"; MembershipEntryNo: Integer): Boolean
+    begin
+        Subscription.Reset();
+        Subscription.SetCurrentKey("Membership Entry No.");
+        Subscription.SetRange("Membership Entry No.", MembershipEntryNo);
+        exit(Subscription.FindFirst());
+    end;
+
+    local procedure CreateProcessSubscRequest(Subscription: Record "NPR MM Subscription"; AutoRenewStatus: Enum "NPR MM MembershipAutoRenew")
+    var
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+        RequestType: Enum "NPR MM Subscr. Request Type";
+    begin
+        case AutoRenewStatus of
+            AutoRenewStatus::NO:
+                MembershipMgtInternal.CreateEnableDisableSubsRequest(Subscription, RequestType::Disable);
+
+            AutoRenewStatus::YES_INTERNAL:
+                MembershipMgtInternal.CreateEnableDisableSubsRequest(Subscription, RequestType::Enable);
+        end;
     end;
 }
