@@ -624,41 +624,8 @@
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
 
                     trigger OnValidate()
-                    var
-                        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
-                        MembershipSetup: Record "NPR MM Membership Setup";
                     begin
-                        if (Rec."Item No." <> '') then begin
-                            MembershipSalesSetup.SetFilter(Type, '=%1', MembershipSalesSetup.Type::ITEM);
-                            MembershipSalesSetup.SetFilter("No.", '=%1', Rec."Item No.");
-                            if (MembershipSalesSetup.FindFirst()) then begin
-                                MembershipSetup.Get(MembershipSalesSetup."Membership Code");
-
-                                if (Rec."Document Date" > 0D) then begin
-                                    if (CalcDate(MembershipSalesSetup."Duration Formula", Rec."Document Date") < WorkDate()) then
-                                        Error(INVALID_ACTIVATION_DATE, Rec."Document Date");
-
-                                    if (MembershipSalesSetup."Valid From Base" = MembershipSalesSetup."Valid From Base"::PROMPT) then
-                                        if (Rec."Document Date" > CalcDate(MembershipSalesSetup."Duration Formula", WorkDate())) then
-                                            Error(INVALID_ACTIVATION_DATE_2, Rec."Document Date");
-
-                                    case MembershipSetup."Card Expire Date Calculation" of
-                                        MembershipSetup."Card Expire Date Calculation"::DATEFORMULA:
-                                            Rec."Valid Until" := CalcDate(MembershipSetup."Card Number Valid Until", Rec."Document Date");
-                                        MembershipSetup."Card Expire Date Calculation"::SYNCHRONIZED:
-                                            Rec."Valid Until" := CalcDate(MembershipSalesSetup."Duration Formula", Rec."Document Date");
-                                        else
-                                            Rec."Valid Until" := 0D;
-                                    end;
-
-                                end;
-
-                                if (MembershipSetup."Card Expire Date Calculation" = MembershipSetup."Card Expire Date Calculation"::NA) then
-                                    Rec."Valid Until" := 0D;
-
-                            end;
-                        end;
-                        ActivationDate := Rec."Document Date";
+                        ValidateDocumentDate();
                     end;
                 }
             }
@@ -1715,6 +1682,9 @@
                         Rec."Document Date" := 0D;
                 end;
 
+                if MembershipSetup."Enable Age Verification" then
+                    ValidateDocumentDate();
+
                 ValidUntilBaseDate := Rec."Document Date";
                 if (ValidUntilBaseDate = 0D) then
                     ValidUntilBaseDate := WorkDate();
@@ -2235,6 +2205,44 @@
         CheckFirstName();
 
         AuxiliaryPhoneNoField := Rec."Phone No.";
+    end;
+
+    local procedure ValidateDocumentDate()
+    var
+        MembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        MembershipSetup: Record "NPR MM Membership Setup";
+    begin
+        if (Rec."Item No." <> '') then begin
+            MembershipSalesSetup.SetFilter(Type, '=%1', MembershipSalesSetup.Type::ITEM);
+            MembershipSalesSetup.SetFilter("No.", '=%1', Rec."Item No.");
+            if (MembershipSalesSetup.FindFirst()) then begin
+                MembershipSetup.Get(MembershipSalesSetup."Membership Code");
+
+                if (Rec."Document Date" > 0D) then begin
+                    if (CalcDate(MembershipSalesSetup."Duration Formula", Rec."Document Date") < WorkDate()) then
+                        Error(INVALID_ACTIVATION_DATE, Rec."Document Date");
+
+                    if (MembershipSalesSetup."Valid From Base" = MembershipSalesSetup."Valid From Base"::PROMPT) then
+                        if (Rec."Document Date" > CalcDate(MembershipSalesSetup."Duration Formula", WorkDate())) then
+                            Error(INVALID_ACTIVATION_DATE_2, Rec."Document Date");
+
+                    case MembershipSetup."Card Expire Date Calculation" of
+                        MembershipSetup."Card Expire Date Calculation"::DATEFORMULA:
+                            Rec."Valid Until" := CalcDate(MembershipSetup."Card Number Valid Until", Rec."Document Date");
+                        MembershipSetup."Card Expire Date Calculation"::SYNCHRONIZED:
+                            Rec."Valid Until" := CalcDate(MembershipSalesSetup."Duration Formula", Rec."Document Date");
+                        else
+                            Rec."Valid Until" := 0D;
+                    end;
+
+                end;
+
+                if (MembershipSetup."Card Expire Date Calculation" = MembershipSetup."Card Expire Date Calculation"::NA) then
+                    Rec."Valid Until" := 0D;
+
+            end;
+        end;
+        ActivationDate := Rec."Document Date";
     end;
 
     procedure SetPOSUnit(PosUnitNoIn: Code[10])
