@@ -91,6 +91,7 @@
         TableMetadata: Record "Table Metadata";
         RecRef: RecordRef;
         RecID: RecordID;
+        AsInteger: Integer;
     begin
         case true of
             RecVariant.IsRecordRef:
@@ -103,7 +104,10 @@
                     RecRef := RecID.GetRecord();
                 end;
             RecVariant.IsInteger:
-                RecRef.Open(RecVariant, true);
+                begin
+                    AsInteger := RecVariant;
+                    RecRef.Open(AsInteger, true);
+                end;
             else
                 exit('');
         end;
