@@ -503,10 +503,11 @@
     var
         MixedDiscountLine: Record "NPR Mixed Discount Line";
         MixedDiscountPart: Record "NPR Mixed Discount";
+        CustomerDiscountGroupCode: Code[20];
     begin
         if IsTemporary then
             exit;
-
+        CustomerDiscountGroupCode := GetSingleCustomerDiscountGroupCode(Rec."Customer Disc. Group Filter");
         MixedDiscountLine.SetRange(Code, Code);
         if MixedDiscountLine.FindSet() then
             repeat
@@ -515,6 +516,8 @@
                 MixedDiscountLine.Status := Status;
                 MixedDiscountLine."Starting Time" := "Starting time";
                 MixedDiscountLine."Ending Time" := "Ending time";
+                MixedDiscountLine."Min. Quantity" := Rec."Min. Quantity";
+                MixedDiscountLine."Customer Disc. Group Code" := CustomerDiscountGroupCode;
                 MixedDiscountLine.Modify();
 
                 if MixedDiscountLine."Disc. Grouping Type" = MixedDiscountLine."Disc. Grouping Type"::"Mix Discount" then begin
@@ -527,6 +530,24 @@
                     MixedDiscountPart.Modify(true);
                 end;
             until MixedDiscountLine.Next() = 0;
+    end;
+
+    internal procedure GetSingleCustomerDiscountGroupCode(CustomerDiscGroupFilter: Text[250]): Code[20]
+    var
+        CustomerDiscountGroup: Record "Customer Discount Group";
+    begin
+        if CustomerDiscGroupFilter = '' then
+            exit('');
+        if StrLen(CustomerDiscGroupFilter) > MaxStrLen(CustomerDiscountGroup.Code) then
+            exit('');
+        CustomerDiscountGroup.SetLoadFields(Code);
+        if CustomerDiscountGroup.Get(CustomerDiscGroupFilter) then
+            exit(CopyStr(CustomerDiscGroupFilter.ToUpper(), 1, MaxStrLen(CustomerDiscountGroup.Code)));
+        if CustomerDiscGroupFilter.Contains('..') then
+            exit('');
+        if DelChr(CustomerDiscGroupFilter, '=', '&|*@<>=?') = CustomerDiscGroupFilter then
+            exit(CopyStr(CustomerDiscGroupFilter.ToUpper(), 1, MaxStrLen(CustomerDiscountGroup.Code)));
+        exit('');
     end;
 
     internal procedure AbsoluteAmountDiscount(): Boolean

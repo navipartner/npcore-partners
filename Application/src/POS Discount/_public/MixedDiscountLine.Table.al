@@ -239,6 +239,18 @@
             Editable = false;
             DataClassification = CustomerContent;
         }
+        field(310; "Customer Disc. Group Code"; Code[20])
+        {
+            Caption = 'Customer Disc. Group Code';
+            TableRelation = "Customer Discount Group";
+            ValidateTableRelation = false;
+            DataClassification = CustomerContent;
+        }
+        field(311; "Min. Quantity"; Decimal)
+        {
+            Caption = 'Min. Quantity';
+            DataClassification = CustomerContent;
+        }
 
         field(6151479; "Replication Counter"; BigInteger)
         {
@@ -265,7 +277,7 @@
         key(Key4; Priority)
         {
         }
-        key(Key5; "Disc. Grouping Type", "No.", "Variant Code", "Starting Date", "Ending Date", "Starting Time", "Ending Time", Status)
+        key(Key5; "Disc. Grouping Type", "No.", "Variant Code", "Starting Date", "Ending Date", "Starting Time", "Ending Time", Status, "Min. Quantity", "Customer Disc. Group Code")
         {
         }
 
@@ -335,6 +347,8 @@
             Status := MixedDiscount.Status;
             "Starting Time" := MixedDiscount."Starting time";
             "Ending Time" := MixedDiscount."Ending time";
+            Rec."Customer Disc. Group Code" := MixedDiscount.GetSingleCustomerDiscountGroupCode(MixedDiscount."Customer Disc. Group Filter");
+            Rec."Min. Quantity" := MixedDiscount."Min. Quantity";
         end;
     end;
 }

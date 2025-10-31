@@ -1968,7 +1968,7 @@
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR POS Sales Disc. Calc. Mgt.", 'OnFindActiveSaleLineDiscounts', '', false, false)]
-    local procedure OnFindActiveSaleLineDiscounts(var tmpDiscountPriority: Record "NPR Discount Priority" temporary; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete)
+    local procedure OnFindActiveSaleLineDiscounts(var tmpDiscountPriority: Record "NPR Discount Priority" temporary; SalePOS: Record "NPR POS Sale"; Rec: Record "NPR POS Sale Line"; xRec: Record "NPR POS Sale Line"; LineOperation: Option Insert,Modify,Delete)
     var
         MixedDiscountLine: Record "NPR Mixed Discount Line";
         IsActive: Boolean;
@@ -1985,6 +1985,8 @@
         MixedDiscountLine.SetRange(Status, MixedDiscountLine.Status::Active);
         MixedDiscountLine.SetFilter("Starting Date", '<=%1|=%2', Today, 0D);
         MixedDiscountLine.SetFilter("Ending Date", '>=%1|=%2', Today, 0D);
+        MixedDiscountLine.SetFilter("Customer Disc. Group Code", '%1|%2', '', SalePOS."Customer Disc. Group");
+        MixedDiscountLine.SetFilter("Min. Quantity", '<=%1', BasketSize(SalePOS));
         MixedDiscountLine.SetRange("Disc. Grouping Type", MixedDiscountLine."Disc. Grouping Type"::Item);
         MixedDiscountLine.SetRange("No.", Rec."No.");
         MixedDiscountLine.SetFilter("Variant Code", '%1|%2', '', Rec."Variant Code");
@@ -2213,6 +2215,17 @@
         end;
         SaleLinePOS.Amount := Round(SaleLinePOS.Amount, GLSetup."Amount Rounding Precision");
         SaleLinePOS."Amount Including VAT" := Round(SaleLinePOS."Amount Including VAT", GLSetup."Amount Rounding Precision");
+    end;
+
+    local procedure BasketSize(SalePOS: Record "NPR POS Sale"): Decimal
+    var
+        POSSaleLine: Record "NPR POS Sale Line";
+    begin
+        POSSaleLine.SetRange("Register No.", SalePos."Register No.");
+        POSSaleLine.SetRange("Sales Ticket No.", SalePOS."Sales Ticket No.");
+        POSSaleLine.SetFilter("Line Type", '%1|%2', "NPR POS Sale Line Type"::Item, "NPR POS Sale Line Type"::"Item Category");
+        POSSaleLine.CalcSums(Quantity);
+        exit(POSSaleLine.Quantity);
     end;
 
 
