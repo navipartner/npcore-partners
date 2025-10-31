@@ -526,6 +526,9 @@ codeunit 6150688 "NPR POS Action Print and Admit" implements "NPR IPOS Workflow"
             TryAdmitObj.Add('visualId', PrintandAdmitBuffer."Visual Id");
             TryAdmitObj.Add('systemId', PrintandAdmitBuffer."System Id");
             TryAdmitArray.Add(TryAdmitObj);
+        end else begin
+            Commit();  //log transaction in speedgate log entry
+            Error(ErrorMessage);
         end;
     end;
 
