@@ -122,6 +122,30 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR SMS Template Header" WHERE("Table No." = CONST(6151013));
         }
+        field(98; PDFDesignerTemplateId; Text[40])
+        {
+            Caption = 'Design Layout Id';
+            DataClassification = CustomerContent;
+        }
+        field(99; PDFDesignerTemplateLabel; Text[80])
+        {
+            Caption = 'Design Layout Label';
+            DataClassification = CustomerContent;
+            trigger OnLookup()
+            var
+                Designer: Codeunit "NPR NPDesigner";
+            begin
+                Designer.LookupDesignLayouts(Rec.FieldCaption(PDFDesignerTemplateLabel), Rec.PDFDesignerTemplateId, Rec.PDFDesignerTemplateLabel);
+            end;
+
+            trigger OnValidate()
+            var
+                Designer: Codeunit "NPR NPDesigner";
+            begin
+                Designer.ValidateDesignLayouts(Rec.PDFDesignerTemplateId, Rec.PDFDesignerTemplateLabel);
+            end;
+        }
+
         field(100; "Send Voucher Module"; Code[20])
         {
             Caption = 'Send Voucher Module';

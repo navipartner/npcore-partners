@@ -73,6 +73,7 @@ codeunit 6248563 "NPR NPEmailVoucherDataProvider" implements "NPR IDynamicTempla
         JObject.Add('no_send', 2);
         JObject.Add('disabled_for_web_service', false);
         JObject.Add('comment', 'Up to 250 character message');
+        JObject.Add('manifest_url', 'https://assets.npretail.app/manifest/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx');
         exit(JObject);
     end;
 
@@ -139,7 +140,27 @@ codeunit 6248563 "NPR NPEmailVoucherDataProvider" implements "NPR IDynamicTempla
         JObject.Add('no_send', Voucher."No. Send");
         JObject.Add('disabled_for_web_service', Voucher."Disabled for Web Service");
         JObject.Add('comment', Voucher.Comment);
+        JObject.Add('manifest_url', GetManifestUrl(Voucher."Voucher Type", Voucher."Language Code", Voucher.SystemId, Voucher."Reference No."));
         exit(JObject);
     end;
+
+    local procedure GetManifestUrl(VoucherTypeCode: Code[20]; LanguageCode: Code[10]; AssetId: Guid; ExternalReferenceNumber: Text[50]) Url: Text[250]
+    var
+        VoucherType: Record "NPR NpRv Voucher Type";
+        DesignerManifestFacade: Codeunit "NPR NPDesignerManifestFacade";
+        ManifestId: Guid;
+    begin
+        if (not VoucherType.Get(VoucherTypeCode)) then
+            exit('');
+
+        if (VoucherType.PDFDesignerTemplateId = '') then
+            exit('');
+
+        ManifestId := DesignerManifestFacade.CreateManifest(VoucherType.PDFDesignerTemplateId, LanguageCode, false);
+        if (DesignerManifestFacade.AddAssetToManifest(ManifestId, Database::"NPR NpRv Voucher", AssetId, ExternalReferenceNumber, VoucherType.PDFDesignerTemplateId)) then
+            if (not DesignerManifestFacade.GetManifestUrl(ManifestId, Url)) then
+                Url := '';
+    end;
+
 }
 #endif

@@ -252,6 +252,12 @@
                         ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies the value of the Default Unit of Measure field which is used in Sales Order.';
                     }
+                    field(PDFDesignerTemplateLabel; Rec.PDFDesignerTemplateLabel)
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the PDF Design Layout Label field.';
+                    }
+
                 }
             }
             group("Setup Voucher")
