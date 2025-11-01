@@ -175,4 +175,19 @@ codeunit 6060127 "NPR MM Membership Mgt."
         Membership.Get(MembershipEntryNo);
         MembershipManagement.DisableMembershipAutoRenewal(Membership, CreateMemberNotification, ForceMemberNotification);
     end;
+    /// <summary>
+    /// Compacts members that have conflicting Unique IDs by keeping the given member and merging conflicting members
+    /// into the member to keep. This procedure does not show any UI and is intended for use in automated processes.
+    /// </summary>
+    /// <param name="MemberToKeep">The member record to keep. Conflicting members will be merged into this member.</param>
+    /// <param name="ConflictExists">Output parameter indicating whether any conflicts were found.</param>
+    /// <param name="ConflictingMembersMerged">Output parameter indicating whether any conflicting members were merged.</param>
+    /// <param name="Explanation">Output parameter providing an explanation of the actions taken during the compaction process including a fail explanation.</param>
+    procedure CompactMembersOnUniqueIdChangeNoUI(MemberToKeep: Record "NPR MM Member"; var ConflictExists: Boolean; var ConflictingMembersMerged: Boolean; var Explanation: Text): Boolean
+    var
+        UpdateMemberUniqueId: Page "NPR MemberUpdateUniqueId";
+    begin
+        exit(UpdateMemberUniqueId.CompactMembersOnUniqueIdChangeNoUI(MemberToKeep, ConflictExists, ConflictingMembersMerged, Explanation));
+    end;
+
 }

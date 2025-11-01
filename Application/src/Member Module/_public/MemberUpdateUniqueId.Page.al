@@ -54,7 +54,7 @@ page 6184962 "NPR MemberUpdateUniqueId"
                     if (_NewFirstName = '') then
                         Error(FirstNameRequired);
 
-                    UpdateExplanation(_SourceMember."Entry No.");
+                    UpdateExplanation(_SourceMember."Entry No.", true);
                     _UniqueIdentityChanged := true;
                 end;
             }
@@ -77,7 +77,7 @@ page 6184962 "NPR MemberUpdateUniqueId"
                     if (_NewEmail = '') then
                         Error(EmailRequired);
 
-                    UpdateExplanation(_SourceMember."Entry No.");
+                    UpdateExplanation(_SourceMember."Entry No.", true);
                     _UniqueIdentityChanged := true;
                 end;
 
@@ -100,7 +100,7 @@ page 6184962 "NPR MemberUpdateUniqueId"
                     if (_NewPhoneNumber = '') then
                         Error(PhoneNoRequired);
 
-                    UpdateExplanation(_SourceMember."Entry No.");
+                    UpdateExplanation(_SourceMember."Entry No.", true);
                     _UniqueIdentityChanged := true;
                 end;
 
@@ -173,6 +173,30 @@ page 6184962 "NPR MemberUpdateUniqueId"
         exit(true);
     end;
 
+    internal procedure CompactMembersOnUniqueIdChangeNoUI(MemberToKeep: Record "NPR MM Member"; var ConflictExists: Boolean; var ConflictingMembersMerged: Boolean; var ReasonText: Text): Boolean
+    var
+        MembershipMgmt: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+        SetMember(MemberToKeep);
+        UpdateExplanation(MemberToKeep."Entry No.", false);
+
+        ConflictExists := _ConflictExists;
+        ConflictingMembersMerged := (_ConflictExists and _Merge);
+        ReasonText := _Explanation;
+
+        if (_ConflictExists and not _Merge) then
+            exit(false);
+
+        if (not _ConflictExists) then
+            MembershipMgmt.UpdateMemberUniqueId(_SourceMember, _NewFirstName, _NewEmail, _NewPhoneNumber, _NewExternalMemberNo);
+
+        if (_ConflictExists and _Merge) then
+            MembershipMgmt.MergeMemberUniqueId(_SourceMember, _NewFirstName, _NewEmail, _NewPhoneNumber, _NewExternalMemberNo);
+
+        exit(true);
+    end;
+
+
     internal procedure SetMember(var Member: Record "NPR MM Member")
     var
         MultipleCommunities: Label 'The member exist in multiple communities that employ different unique ID rules for the members. Merging members based on unique ID is not possible.';
@@ -198,7 +222,7 @@ page 6184962 "NPR MemberUpdateUniqueId"
         _MergeVisible := (_Community."Create Member UI Violation" = _Community."Create Member UI Violation"::MERGE_MEMBER);
     end;
 
-    local procedure UpdateExplanation(MemberEntryNo: Integer)
+    local procedure UpdateExplanation(MemberEntryNo: Integer; ShowConfirmationPrompt: Boolean)
     var
         MemberInfoCapture: Record "NPR MM Member Info Capture";
         MembershipMgmt: Codeunit "NPR MM MembershipMgtInternal";
@@ -230,10 +254,11 @@ page 6184962 "NPR MemberUpdateUniqueId"
 
             if (_Community."Create Member UI Violation" = _Community."Create Member UI Violation"::CONFIRM) then begin
                 _Explanation := ErrorMsg;
-                if (Confirm(ConfirmDuplicateMsg)) then begin
-                    _Explanation := AcceptDuplicateMsg;
-                    _ConflictExists := false;
-                end;
+                if (ShowConfirmationPrompt) then
+                    if (Confirm(ConfirmDuplicateMsg)) then begin
+                        _Explanation := AcceptDuplicateMsg;
+                        _ConflictExists := false;
+                    end;
             end;
 
             if (_Community."Create Member UI Violation" = _Community."Create Member UI Violation"::REUSE) then begin
