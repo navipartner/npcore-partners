@@ -1252,6 +1252,8 @@
         MemberInfoCapture."Contact No." := GetXmlText20(MemberRequest, 'preassigned_contact_number', false);
         MemberInfoCapture."Store Code" := GetXmlText20(MemberRequest, 'store_code', false);
 
+        MemberInfoCapture.AllowMergeOnConflict := (GetXmlAttributeText20(MemberRequest, 'allow_member_merge_on_conflict', false).ToLower() = 'true');
+
         MemberInfoCapture.Insert();
     end;
 

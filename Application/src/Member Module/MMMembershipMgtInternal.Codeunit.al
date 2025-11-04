@@ -1529,24 +1529,57 @@
     internal procedure BlockMembership(MembershipEntryNo: Integer; Block: Boolean)
     var
         Membership: Record "NPR MM Membership";
-        MembershipRole: Record "NPR MM Membership Role";
+        MembershipRole, MembershipRole2 : Record "NPR MM Membership Role";
+        MembersToHandle: List of [Integer];
+        MembershipRolesToHandle: List of [Integer];
+        MemberEntryNo: Integer;
     begin
-
         Membership.Get(MembershipEntryNo);
+
+        // (Un)block anonymous cards in this membership
         BlockMemberCards(MembershipEntryNo, 0, Block);
 
+        // All roles in this membership
         MembershipRole.SetFilter("Membership Entry No.", '=%1', MembershipEntryNo);
-        if (MembershipRole.FindSet()) then begin
+        if MembershipRole.FindSet() then begin
+            MembershipRole2.SetCurrentKey("Member Entry No.");
+            MembershipRole2.SetFilter("Membership Entry No.", '<>%1', MembershipEntryNo);
+
             repeat
-                BlockMember(MembershipEntryNo, MembershipRole."Member Entry No.", Block);
-            until (MembershipRole.Next() = 0);
+                // Look for roles in other memberships with the opposite block state
+                MembershipRole2.SetFilter("Member Entry No.", '=%1', MembershipRole."Member Entry No.");
+                MembershipRole2.SetFilter(Blocked, '=%1', not Block);
+
+                if MembershipRole2.IsEmpty() then
+                    // No conflicting roles in other memberships → (un)block member
+                    MembersToHandle.Add(MembershipRole."Member Entry No.")
+                else
+                    // Conflicting roles exist → only (un)block this membership role
+                    MembershipRolesToHandle.Add(MembershipRole."Member Entry No.");
+            until MembershipRole.Next() = 0;
         end;
 
-        if (Membership.Blocked <> Block) then begin
+        // (Un)block members that have no conflicting roles in other memberships
+        foreach MemberEntryNo in MembersToHandle do
+            BlockMember(MembershipEntryNo, MemberEntryNo, Block);
+
+        // (Un)block roles + cards in this membership for members that stay mixed across memberships
+        foreach MemberEntryNo in MembershipRolesToHandle do
+            if MembershipRole.Get(MembershipEntryNo, MemberEntryNo) then begin
+                BlockMemberCards(MembershipEntryNo, MemberEntryNo, Block);
+                if MembershipRole.Blocked <> Block then begin
+                    MembershipRole.Validate(Blocked, Block);
+                    MembershipRole.Modify();
+                end;
+            end;
+
+        // Finally (un)block the membership itself
+        if Membership.Blocked <> Block then begin
             Membership.Validate(Blocked, Block);
             Membership.Modify();
         end;
     end;
+
 
     internal procedure ReflectMembershipRoles(MembershipEntryNo: Integer; MemberEntryNo: Integer; Blocked: Boolean)
     var

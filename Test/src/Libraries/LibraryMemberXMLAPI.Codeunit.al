@@ -120,6 +120,10 @@ codeunit 85015 "NPR Library - Member XML API"
         XMLDoc.SetDeclaration(XMLDec);
 
         Request := XmlElement.Create('request', NameSpace);
+
+        if (MemberInfoCapture.AllowMergeOnConflict) then
+            Request.SetAttribute('allow_member_merge_on_conflict', Format(MemberInfoCapture.AllowMergeOnConflict, 0, 9));
+
         Request.Add(AddElement('membershipnumber', Membership."External Membership No.", NameSpace));
         Request.Add(AddElement('firstname', MemberInfoCapture."First Name", NameSpace));
         Request.Add(AddElement('middlename', MemberInfoCapture."Middle Name", NameSpace));

@@ -23,6 +23,11 @@ xmlport 6060128 "NPR MM Add Member"
                         XmlName = 'cache_instance_id';
                         Occurrence = Optional;
                     }
+                    textattribute(allowMemberMergeOnConflict)
+                    {
+                        XmlName = 'allow_member_merge_on_conflict';
+                        Occurrence = Optional;
+                    }
                     fieldelement(membershipnumber; tmpMemberInfoCapture."Item No.")
                     {
                     }

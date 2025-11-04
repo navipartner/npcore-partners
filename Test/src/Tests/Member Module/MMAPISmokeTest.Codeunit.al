@@ -341,6 +341,8 @@ codeunit 85016 "NPR MM API Smoke Test"
     procedure UpdateMemberImage()
     var
         MemberApiLibrary: Codeunit "NPR Library - Member XML API";
+        MemberMedia: Codeunit "NPR MMMemberImageMediaHandler";
+
         Assert: Codeunit Assert;
         TempBlob: Codeunit "Temp Blob";
         OutStr: OutStream;
@@ -378,12 +380,18 @@ codeunit 85016 "NPR MM API Smoke Test"
         Assert.IsTrue(true, StrSubstNo('Update member API failed: %1', GetLastErrorText()));
 
         _LastMember.Get(_LastMember."Entry No.");
-        if (not _LastMember.Image.HasValue()) then
-            Error('Member is expected to have picture after update.');
 
-        TempBlob.CreateOutStream(OutStr);
-        _LastMember.Image.ExportStream(OutStr);
-        Assert.AreEqual(1002, TempBlob.Length(), 'Incorrect length in BLOB when checking stored picture size.');
+        if (MemberMedia.IsFeatureEnabled()) then begin
+            Assert.IsTrue(MemberMedia.HaveMemberImage(_LastMember.SystemId), 'Member image is expected to be stored in Cloudflare R2 storage.');
+
+        end else begin
+            if (not _LastMember.Image.HasValue()) then
+                Error('Member is expected to have picture after update.');
+
+            TempBlob.CreateOutStream(OutStr);
+            _LastMember.Image.ExportStream(OutStr);
+            Assert.AreEqual(1002, TempBlob.Length(), 'Incorrect length in BLOB when checking stored picture size.');
+        end;
     end;
 
     [Test]
@@ -583,7 +591,7 @@ codeunit 85016 "NPR MM API Smoke Test"
 
         // [TEST 2]
         ApiStatus := MemberApiLibrary.MemberCardRegisterArrivalAPI('FOOBAR MEMBER NO', AdmissionCode, ScannerStation, ResponseMessage);
-        Assert.Isfalse(ApiStatus, StrSubstNo('Member arrival must fail when providing invalid card number: %1', ResponseMessage));
+        Assert.IsFalse(ApiStatus, StrSubstNo('Member arrival must fail when providing invalid card number: %1', ResponseMessage));
     end;
 
     [Test]
@@ -617,7 +625,7 @@ codeunit 85016 "NPR MM API Smoke Test"
 
         // [TEST 2]
         ApiStatus := MemberApiLibrary.MemberCardRegisterArrivalAPI('FOOBAR MEMBER NO', AdmissionCode, ScannerStation, ResponseMessage);
-        Assert.Isfalse(ApiStatus, StrSubstNo('Member arrival must fail when providing invalid card number: %1', ResponseMessage));
+        Assert.IsFalse(ApiStatus, StrSubstNo('Member arrival must fail when providing invalid card number: %1', ResponseMessage));
     end;
 
     [Test]
@@ -667,4 +675,340 @@ codeunit 85016 "NPR MM API Smoke Test"
 
     end;
 
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure BlockAndUnblockMembership()
+    var
+        MemberApiLibrary: Codeunit "NPR Library - Member XML API";
+        MemberLibrary: Codeunit "NPR Library - Member Module";
+        LibraryInventory: Codeunit "NPR Library - Inventory";
+        MemberManagementInternal: Codeunit "NPR MM MembershipMgtInternal";
+        Assert: Codeunit Assert;
+        ResponseMessage: Text;
+        ApiStatus: Boolean;
+
+        MemberItem: Record Item;
+        MemberCommunity: Record "NPR MM Member Community";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        Membership: Record "NPR MM Membership";
+        Member: Record "NPR MM Member";
+        MemberCard: Record "NPR MM Member Card";
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+
+        MembershipEntryNo: Integer;
+        MemberEntryNo: Integer;
+        MemberCardEntryNo: Integer;
+        CardNumber: Text[100];
+
+        MembershipCode: Code[20];
+        LoyaltyProgramCode: Code[20];
+        Description: Text[50];
+    begin
+
+        Initialize();
+        LibraryInventory.CreateItem(MemberItem);
+        MembershipCode := MemberLibrary.GenerateCode20();
+
+        MemberCommunity.Get(MemberLibrary.SetupCommunity_Simple());
+        MembershipSetup.Get(MemberLibrary.SetupMembership_Simple(MemberCommunity.Code, MembershipCode, LoyaltyProgramCode, Description));
+        MemberLibrary.SetupSimpleMembershipSalesItem(MemberItem."No.", MembershipCode);
+
+        ApiStatus := MemberApiLibrary.CreateMembership(MemberItem."No.", MembershipEntryNo, ResponseMessage);
+        Assert.IsTrue(ApiStatus, ResponseMessage);
+        Membership.Get(MembershipEntryNo);
+        _LastMembership := Membership;
+
+        MemberLibrary.SetRandomMemberInfoData(MemberInfoCapture);
+        ApiStatus := MemberApiLibrary.AddMembershipMember(_LastMembership, MemberInfoCapture, MemberEntryNo, ResponseMessage);
+        Assert.IsTrue(ApiStatus, ResponseMessage);
+        Member.Get(MemberEntryNo);
+        _LastMember := Member;
+
+        CardNumber := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ApiStatus := MemberApiLibrary.AddMemberCard(_LastMembership."External Membership No.", _LastMember."External Member No.", CardNumber, MemberCardEntryNo, ResponseMessage);
+        Assert.IsTrue(ApiStatus, ResponseMessage);
+        _LastMemberCard.Get(MemberCardEntryNo);
+
+
+        // [TEST]
+        MemberManagementInternal.BlockMembership(Membership."Entry No.", true);
+        Membership.Get(Membership."Entry No.");
+        Assert.IsTrue(Membership.Blocked, 'Membership is expected to be blocked.');
+
+        Member.Get(MemberEntryNo);
+        Assert.IsTrue(Member.Blocked, 'Member is expected to be blocked.');
+
+        MemberCard.Get(MemberCardEntryNo);
+        Assert.IsTrue(MemberCard.Blocked, 'Member card is expected to be blocked.');
+
+
+        MemberManagementInternal.BlockMembership(Membership."Entry No.", false);
+        Membership.Get(Membership."Entry No.");
+        Assert.IsFalse(Membership.Blocked, 'Membership is expected to be unblocked.');
+
+        Member.Get(MemberEntryNo);
+        Assert.IsFalse(Member.Blocked, 'Member is expected to be unblocked.');
+
+        MemberCard.Get(MemberCardEntryNo);
+        Assert.IsFalse(MemberCard.Blocked, 'Member card is expected to be unblocked.');
+
+    end;
+
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure MergeMembership()
+    var
+        MemberApiLibrary: Codeunit "NPR Library - Member XML API";
+        MemberLibrary: Codeunit "NPR Library - Member Module";
+        LibraryInventory: Codeunit "NPR Library - Inventory";
+        MemberManagementInternal: Codeunit "NPR MM MembershipMgtInternal";
+        MembershipFacade: Codeunit "NPR MM Membership Mgt.";
+        Assert: Codeunit Assert;
+        ResponseMessage: Text;
+        ApiStatus: Boolean;
+
+        MemberItem: Record Item;
+        MemberCommunity: Record "NPR MM Member Community";
+        MembershipSetup: Record "NPR MM Membership Setup";
+        Membership1, Membership2 : Record "NPR MM Membership";
+        Member1, Member2 : Record "NPR MM Member";
+        Card1, Card2 : Record "NPR MM Member Card";
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+        MembershipRole: Record "NPR MM Membership Role";
+
+        MembershipEntryNo, MemberShipEntryNo2 : Integer;
+        MemberEntryNo: Integer;
+        MemberCardEntryNo: Integer;
+        CardNumber: Text[100];
+
+        MembershipCode: Code[20];
+        LoyaltyProgramCode: Code[20];
+        Description: Text[50];
+
+        Name: Text[50];
+        Email: Text[80];
+        ConflictsExist, MembersMerged : Boolean;
+    begin
+
+        Name := DelChr(Format(CreateGuid()), '=', '{}-').ToLower();
+        Email := StrSubstNo('%1@%2.navipartner.dk', Name, Name);
+
+        Initialize();
+        LibraryInventory.CreateItem(MemberItem);
+        MembershipCode := MemberLibrary.GenerateCode20();
+
+        MemberCommunity.Get(MemberLibrary.SetupCommunity_Simple());
+        MembershipSetup.Get(MemberLibrary.SetupMembership_Simple(MemberCommunity.Code, MembershipCode, LoyaltyProgramCode, Description));
+        MemberCommunity."Member Unique Identity" := MemberCommunity."Member Unique Identity"::EMAIL_AND_FIRST_NAME;
+        MemberCommunity."Create Member UI Violation" := MemberCommunity."Create Member UI Violation"::MERGE_MEMBER;
+        MemberCommunity."Member Logon Credentials" := MemberCommunity."Member Logon Credentials"::NA;
+        MemberCommunity.Modify();
+
+        MemberLibrary.SetupSimpleMembershipSalesItem(MemberItem."No.", MembershipCode);
+
+        // first memberships
+        ApiStatus := MemberApiLibrary.CreateMembership(MemberItem."No.", MembershipEntryNo, ResponseMessage);
+        Assert.IsTrue(ApiStatus, ResponseMessage);
+        Membership1.Get(MembershipEntryNo);
+
+        MemberLibrary.SetRandomMemberInfoData(MemberInfoCapture);
+        MemberInfoCapture."First Name" := Name;
+        MemberInfoCapture."E-Mail Address" := Email;
+        ApiStatus := MemberApiLibrary.AddMembershipMember(Membership1, MemberInfoCapture, MemberEntryNo, ResponseMessage);
+        Assert.IsTrue(ApiStatus, ResponseMessage);
+        Member1.Get(MemberEntryNo);
+
+        CardNumber := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ApiStatus := MemberApiLibrary.AddMemberCard(Membership1."External Membership No.", Member1."External Member No.", CardNumber, MemberCardEntryNo, ResponseMessage);
+        Assert.IsTrue(ApiStatus, ResponseMessage);
+        Card1.Get(MemberCardEntryNo);
+
+        // second memberships
+        ApiStatus := MemberApiLibrary.CreateMembership(MemberItem."No.", MemberShipEntryNo2, ResponseMessage);
+        Assert.IsTrue(ApiStatus, ResponseMessage);
+        Membership2.Get(MemberShipEntryNo2);
+
+        MemberLibrary.SetRandomMemberInfoData(MemberInfoCapture);
+        MemberInfoCapture."First Name" := Name;
+        MemberInfoCapture."E-Mail Address" := Email;
+
+        // Add member with merge not allowed on conflict -> should fail
+        MemberInfoCapture.AllowMergeOnConflict := false;
+
+        // [TEST]
+        ApiStatus := MemberApiLibrary.AddMembershipMember(Membership2, MemberInfoCapture, MemberEntryNo, ResponseMessage);
+
+        // We are mixing GUI and API here which is not ideal but for the sake of this test we need to verify both paths
+        if (GuiAllowed) then begin
+            // In GUI mode, user will be prompted to reuse the existing member (updated with new data)
+            Assert.IsTrue(ApiStatus, ResponseMessage);
+            Member2.Get(MemberEntryNo);
+            Assert.AreEqual(Member1."Entry No.", Member2."Entry No.", 'Expected same member to be returned due to unique identity conflict.');
+        end;
+
+        if (not GuiAllowed) then begin
+            // In API mode, merge is only allowed when AllowMergeOnConflict is true
+            Assert.IsFalse(ApiStatus, 'Expected add member to fail due to duplicate unique identity.');
+
+            MemberInfoCapture.AllowMergeOnConflict := true;
+            ApiStatus := MemberApiLibrary.AddMembershipMember(Membership2, MemberInfoCapture, MemberEntryNo, ResponseMessage);
+            Assert.IsTrue(ApiStatus, ResponseMessage);
+
+            Member2.Get(MemberEntryNo);
+
+            // Member 1 should not exist anymore
+            asserterror Member1.Get(Member1."Entry No.");
+        end;
+
+        // verify that both memberships are linking the same member
+        MembershipRole.Get(Membership1."Entry No.", Member2."Entry No.");
+        MembershipRole.Get(Membership2."Entry No.", Member2."Entry No.");
+
+        CardNumber := UpperCase(DelChr(Format(CreateGuid()), '=', '{}-'));
+        ApiStatus := MemberApiLibrary.AddMemberCard(Membership2."External Membership No.", Member2."External Member No.", CardNumber, MemberCardEntryNo, ResponseMessage);
+        Assert.IsTrue(ApiStatus, ResponseMessage);
+        Card2.Get(MemberCardEntryNo);
+
+        _LastMembership := Membership2;
+        _LastMember := Member2;
+        _LastMemberCard := Card2;
+
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure BlockAndUnblockMembershipsWithSharedMember()
+    var
+        MemberManagementInternal: Codeunit "NPR MM MembershipMgtInternal";
+        Assert: Codeunit Assert;
+        Membership1: Record "NPR MM Membership";
+        Card1: Record "NPR MM Member Card";
+        MembershipRole: Record "NPR MM Membership Role";
+        MembershipRole1: Record "NPR MM Membership Role";
+    begin
+        // ------------------------------------------------------------
+        // Precondition: member is in two memberships with two cards:
+        //   _LastMembership + _LastMemberCard
+        //   Membership1     + Card1
+        // and everything is unblocked.
+        // ------------------------------------------------------------
+        MergeMembership();
+
+        // Refresh data
+        _LastMembership.Get(_LastMembership."Entry No.");
+        _LastMember.Get(_LastMember."Entry No.");
+        _LastMemberCard.Get(_LastMemberCard."Entry No.");
+        MembershipRole.Get(_LastMembership."Entry No.", _LastMember."Entry No.");
+
+        Assert.IsFalse(_LastMembership.Blocked, 'Precondition failed: Membership is expected to be unblocked.');
+        Assert.IsFalse(_LastMember.Blocked, 'Precondition failed: Member is expected to be unblocked.');
+        Assert.IsFalse(_LastMemberCard.Blocked, 'Precondition failed: Member card is expected to be unblocked.');
+        Assert.IsFalse(MembershipRole.Blocked, 'Precondition failed: Membership role is expected to be unblocked.');
+
+        // ------------------------------------------------------------
+        // 1) BLOCK _LastMembership (other membership stays active)
+        // ------------------------------------------------------------
+        MemberManagementInternal.BlockMembership(_LastMembership."Entry No.", true);
+
+        _LastMembership.Get(_LastMembership."Entry No.");
+        _LastMember.Get(_LastMember."Entry No.");
+        _LastMemberCard.Get(_LastMemberCard."Entry No.");
+        MembershipRole.Get(_LastMembership."Entry No.", _LastMember."Entry No.");
+
+        Assert.IsTrue(_LastMembership.Blocked, 'Membership is expected to be blocked.');
+        Assert.IsFalse(_LastMember.Blocked, 'Member is expected to be NOT blocked since it is also valid in membership 1.');
+        Assert.IsTrue(_LastMemberCard.Blocked, 'Member card is expected to be blocked since it is only valid in the blocked membership.');
+        Assert.IsTrue(MembershipRole.Blocked, 'Membership role is expected to be blocked.');
+
+        // Find the other membership - must be unblocked
+        MembershipRole.Reset();
+        MembershipRole.SetFilter("Member Entry No.", '%1', _LastMember."Entry No.");
+        MembershipRole.SetFilter("Membership Entry No.", '<>%1', _LastMembership."Entry No.");
+        MembershipRole.SetFilter(Blocked, '=%1', false);
+
+        Assert.IsTrue(MembershipRole.FindFirst(), 'Expected another membership role for this member.');
+
+        Membership1.Get(MembershipRole."Membership Entry No.");
+        Assert.IsFalse(Membership1.Blocked, 'Other membership is expected to be unblocked.');
+
+        Card1.Reset();
+        Card1.SetFilter("Membership Entry No.", '%1', Membership1."Entry No.");
+        Card1.SetFilter("Member Entry No.", '%1', _LastMember."Entry No.");
+        Card1.SetFilter(Blocked, '=%1', false);
+        Assert.IsTrue(Card1.FindFirst(), 'Expected an active card in the other membership.');
+
+        // ------------------------------------------------------------
+        // 2) BLOCK the remaining membership (Membership1)
+        //    -> now ALL memberships for the member are blocked
+        //    -> member must become blocked
+        // ------------------------------------------------------------
+        MemberManagementInternal.BlockMembership(Membership1."Entry No.", true);
+
+        // Refresh all
+        _LastMembership.Get(_LastMembership."Entry No.");
+        Membership1.Get(Membership1."Entry No.");
+        _LastMember.Get(_LastMember."Entry No.");
+        _LastMemberCard.Get(_LastMemberCard."Entry No.");
+        Card1.Get(Card1."Entry No.");
+
+        MembershipRole.Get(_LastMembership."Entry No.", _LastMember."Entry No.");
+        MembershipRole1.Get(Membership1."Entry No.", _LastMember."Entry No.");
+
+        Assert.IsTrue(_LastMembership.Blocked, 'Membership 2 is expected to be blocked.');
+        Assert.IsTrue(Membership1.Blocked, 'Membership 1 is expected to be blocked.');
+        Assert.IsTrue(_LastMember.Blocked, 'Member is expected to be blocked when all memberships are blocked.');
+        Assert.IsTrue(_LastMemberCard.Blocked, 'Member card in membership 2 is expected to be blocked.');
+        Assert.IsTrue(Card1.Blocked, 'Member card in membership 1 is expected to be blocked.');
+        Assert.IsTrue(MembershipRole.Blocked, 'Membership role in membership 2 is expected to be blocked.');
+        Assert.IsTrue(MembershipRole1.Blocked, 'Membership role in membership 1 is expected to be blocked.');
+
+        // ------------------------------------------------------------
+        // 3) UNBLOCK one membership (unblock _LastMembership)
+        //    -> member still has another blocked membership
+        //    -> member must remain blocked
+        // ------------------------------------------------------------
+        MemberManagementInternal.BlockMembership(_LastMembership."Entry No.", false);
+
+        _LastMembership.Get(_LastMembership."Entry No.");
+        Membership1.Get(Membership1."Entry No.");
+        _LastMember.Get(_LastMember."Entry No.");
+        _LastMemberCard.Get(_LastMemberCard."Entry No.");
+        Card1.Get(Card1."Entry No.");
+
+        MembershipRole.Get(_LastMembership."Entry No.", _LastMember."Entry No.");
+        MembershipRole1.Get(Membership1."Entry No.", _LastMember."Entry No.");
+
+        Assert.IsFalse(_LastMembership.Blocked, 'Membership 2 is expected to be unblocked.');
+        Assert.IsTrue(Membership1.Blocked, 'Membership 1 is expected to remain blocked.');
+        Assert.IsTrue(_LastMember.Blocked, 'Member is expected to remain blocked while another membership is blocked.');
+        Assert.IsFalse(_LastMemberCard.Blocked, 'Card in unblocked membership 2 is expected to be unblocked.');
+        Assert.IsTrue(Card1.Blocked, 'Card in still-blocked membership 1 is expected to stay blocked.');
+        Assert.IsFalse(MembershipRole.Blocked, 'Role in unblocked membership 2 is expected to be unblocked.');
+        Assert.IsTrue(MembershipRole1.Blocked, 'Role in membership 1 is expected to stay blocked.');
+
+        // ------------------------------------------------------------
+        // 4) UNBLOCK the final membership (Membership1)
+        //    -> no blocked memberships left
+        //    -> member must become unblocked
+        // ------------------------------------------------------------
+        MemberManagementInternal.BlockMembership(Membership1."Entry No.", false);
+
+        _LastMembership.Get(_LastMembership."Entry No.");
+        Membership1.Get(Membership1."Entry No.");
+        _LastMember.Get(_LastMember."Entry No.");
+        _LastMemberCard.Get(_LastMemberCard."Entry No.");
+        Card1.Get(Card1."Entry No.");
+
+        MembershipRole.Get(_LastMembership."Entry No.", _LastMember."Entry No.");
+        MembershipRole1.Get(Membership1."Entry No.", _LastMember."Entry No.");
+
+        Assert.IsFalse(_LastMembership.Blocked, 'Membership 2 is expected to be unblocked in the end.');
+        Assert.IsFalse(Membership1.Blocked, 'Membership 1 is expected to be unblocked in the end.');
+        Assert.IsFalse(_LastMember.Blocked, 'Member is expected to be unblocked when all memberships are unblocked.');
+        Assert.IsFalse(_LastMemberCard.Blocked, 'Card in membership 2 is expected to be unblocked in the end.');
+        Assert.IsFalse(Card1.Blocked, 'Card in membership 1 is expected to be unblocked in the end.');
+        Assert.IsFalse(MembershipRole.Blocked, 'Role in membership 2 is expected to be unblocked in the end.');
+        Assert.IsFalse(MembershipRole1.Blocked, 'Role in membership 1 is expected to be unblocked in the end.');
+    end;
 }
