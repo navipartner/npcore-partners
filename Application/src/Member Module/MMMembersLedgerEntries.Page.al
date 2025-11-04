@@ -31,7 +31,8 @@
                 }
                 field("Valid Until Date"; Rec."Valid Until Date")
                 {
-
+                    Style = Strong;
+                    StyleExpr = _Cancelled;
                     ToolTip = 'Specifies the value of the Valid Until Date field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
@@ -107,6 +108,13 @@
                     ToolTip = 'Specifies the value of the Blocked By field';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field(InitialValidUntilDate; _InitialValidUntilDate)
+                {
+                    Caption = 'Initial Valid Until Date';
+                    Editable = false;
+                    ToolTip = 'Calculates the Initial Valid Until Date using Valid From Date and Duration Dateformula fields';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
             }
         }
     }
@@ -153,6 +161,13 @@
         AccentuateAmount := false;
         if (Rec.CalculateRemainingAmount(OriginalAmountLCY, RemainingAmountLCY, DueDate)) then
             AccentuateAmount := ((RemainingAmountLCY > 0) and (DueDate < Today));
+
+        _InitialValidUntilDate := 0D;
+        _Cancelled := false;
+        if (Rec."Valid From Date" <> 0D) and (Format(Rec."Duration Dateformula") <> '') then begin
+            _InitialValidUntilDate := CalcDate(Rec."Duration Dateformula", Rec."Valid From Date");
+            _Cancelled := (Rec."Valid Until Date" <> 0D) and (Rec."Valid Until Date" <> _InitialValidUntilDate);
+        end;
     end;
 
     var
@@ -160,5 +175,7 @@
         OriginalAmountLCY: Decimal;
         DueDate: Date;
         AccentuateAmount: Boolean;
+        _InitialValidUntilDate: Date;
+        _Cancelled: Boolean;
 }
 
