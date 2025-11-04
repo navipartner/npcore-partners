@@ -138,7 +138,7 @@ page 6185102 "NPR MMMemberExtImageFactBox"
         CurrPage."Image Viewer".SetSource(SpinnerSvg());
         CurrPage.Update(false);
 
-        _HaveImage := MemberMedia.GetMemberImageUrl(Rec.SystemId, ENUM::"NPR CloudflareMediaVariants"::LARGE, 300, ImageUrl);
+        _HaveImage := MemberMedia.GetMemberImageUrl(Rec.SystemId, ENUM::"NPR CloudflareMediaVariants"::THUMBNAIL, 300, ImageUrl);
 
         if (not _HaveImage) then
             _HaveImage := MigrateLocalImage(Rec, ImageUrl);

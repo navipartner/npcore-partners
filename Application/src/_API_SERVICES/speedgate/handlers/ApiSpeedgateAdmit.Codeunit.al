@@ -883,11 +883,11 @@ codeunit 6185119 "NPR ApiSpeedgateAdmit"
             case GetApiVersion() of
                 0D .. DMY2Date(26, 10, 2025):
                     begin
-                        MemberMedia.GetMemberImageB64(Member.SystemId, Enum::"NPR CloudflareMediaVariants"::LARGE, Picture); // Raw b64 string
+                        MemberMedia.GetMemberImageB64(Member.SystemId, Enum::"NPR CloudflareMediaVariants"::THUMBNAIL, Picture); // Raw b64 string
                         Picture := StrSubstNo(DataUrl, Picture);
                     end;
                 else
-                    MemberMedia.GetMemberImageUrl(Member.SystemId, Enum::"NPR CloudflareMediaVariants"::LARGE, 300, Picture); // Http URL to image
+                    MemberMedia.GetMemberImageUrl(Member.SystemId, Enum::"NPR CloudflareMediaVariants"::THUMBNAIL, 300, Picture); // Http URL to image
             end;
 
         end else begin
