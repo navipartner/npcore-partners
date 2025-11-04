@@ -96,7 +96,7 @@
         key(Key5; Date)
         {
         }
-        key(Key6; "EFT Trans. Request Entry No.", "Receipt No.")
+        key(Key6; "EFT Trans. Request Entry No.", "Receipt No.", Date)
         {
         }
     }

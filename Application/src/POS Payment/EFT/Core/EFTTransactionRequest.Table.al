@@ -667,8 +667,9 @@
         if Handled then
             exit;
 
-        CreditCardTransaction.SetCurrentKey("EFT Trans. Request Entry No.", "Receipt No.");
-        CreditCardTransaction.SetFilter("EFT Trans. Request Entry No.", '=%1', Rec."Entry No.");
+        CreditCardTransaction.SetCurrentKey("EFT Trans. Request Entry No.", "Receipt No.", Date);
+        CreditCardTransaction.SetRange("EFT Trans. Request Entry No.", Rec."Entry No.");
+        CreditCardTransaction.SetRange(Date, Rec."Transaction Date");
         if not CreditCardTransaction.FindSet() then
             exit;
 
@@ -678,6 +679,7 @@
                 CreditCardTransaction2.SetCurrentKey("EFT Trans. Request Entry No.", "Receipt No.");
                 CreditCardTransaction2.SetRange("EFT Trans. Request Entry No.", CreditCardTransaction."EFT Trans. Request Entry No.");
                 CreditCardTransaction2.SetRange("Receipt No.", CreditCardTransaction."Receipt No.");
+                CreditCardTransaction2.SetRange(Date, CreditCardTransaction.Date);
                 CreditCardTransaction2.PrintTerminalReceipt();
             end;
             ReceiptNo := CreditCardTransaction."Receipt No.";
