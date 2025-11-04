@@ -67,6 +67,54 @@ page 6184835 "NPR MM Member Payment Methods"
                 }
             }
         }
+        area(factboxes)
+        {
+            part(AccountFactBox; "NPR MM SubsUserAccountFactbox")
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'User Account Details';
+                Visible = _DefaultFieldVisible;
+                SubPageLink = "Entry No." = field("Entry No.");
+            }
+        }
+    }
+    actions
+    {
+        area(Navigation)
+        {
+            action(UserAccount)
+            {
+                Caption = 'User Account';
+                ToolTip = 'Running this action will open the user account for selected payment method.';
+                ApplicationArea = NPRRetail;
+                Image = User;
+
+#if (BC17 or BC18 or BC19 or BC20)
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedOnly = true;
+#endif
+
+                trigger OnAction()
+                var
+                    UserAccount: Record "NPR UserAccount";
+                    UserAccounts: Page "NPR UserAccounts";
+                begin
+                    if (not UserAccount.Get(Rec."BC Record ID")) then
+                        exit;
+                    UserAccount.SetRecFilter();
+                    UserAccounts.SetTableView(UserAccount);
+                    UserAccounts.Run();
+                end;
+
+            }
+        }
+#if not (BC17 or BC18 or BC19 or BC20)
+        area(Promoted)
+        {
+            actionref(Promoted_UserAccount; UserAccount) { }
+        }
+#endif
     }
 
     var

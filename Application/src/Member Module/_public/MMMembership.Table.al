@@ -335,7 +335,9 @@
                 if (FilterString <> '') then
                     FilterString += '|';
                 FilterString += Format(PmtMethodMap.PaymentMethodId, 0, 9);
-            until PmtMethodMap.Next() = 0;
+            until PmtMethodMap.Next() = 0
+        else
+            FilterString := '00000000-0000-0000-0000-000000000000';
 
         MemberPaymentMethod.FilterGroup(2);
         MemberPaymentMethod.SetFilter(SystemId, FilterString);
