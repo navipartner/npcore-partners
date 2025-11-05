@@ -580,7 +580,7 @@ codeunit 6185062 "NPR AttractionWallet"
 
     internal procedure UpdateEmailAddressOnAllWallets(FromEmail: Text[100]; ToEmail: Text[100])
     var
-        WalletAssetHeaderRef: Record "NPR WalletAssetHeaderReference";
+        WalletAssetHeaderRef, WalletAssetHeaderRefUpdate : Record "NPR WalletAssetHeaderReference";
         NullGuid: Guid;
     begin
 #if (BC17 or BC18 or BC19 or BC20 or BC21)
@@ -595,8 +595,9 @@ codeunit 6185062 "NPR AttractionWallet"
         WalletAssetHeaderRef.SetRange(SupersededBy, 0);
         if (WalletAssetHeaderRef.FindSet()) then
             repeat
-                WalletAssetHeaderRef.LinkToReference := ToEmail;
-                WalletAssetHeaderRef.Modify();
+                WalletAssetHeaderRefUpdate.Get(WalletAssetHeaderRef.EntryNo);
+                WalletAssetHeaderRefUpdate.LinkToReference := ToEmail;
+                WalletAssetHeaderRefUpdate.Modify();
             until WalletAssetHeaderRef.Next() = 0;
     end;
 
@@ -1064,6 +1065,38 @@ codeunit 6185062 "NPR AttractionWallet"
         exit(Wallet.EntryNo);
     end;
 
+    internal procedure GetDesignerTemplate(WalletEntryNo: Integer; var TemplateLabel: Text[80]; var TemplateId: Text[40]): Boolean
+    var
+        Wallet: Record "NPR AttractionWallet";
+        Item: Record Item;
+        Setup: Record "NPR WalletAssetSetup";
+        WalletTemplate: Record "NPR NpIa Item AddOn";
+    begin
+        if (not Wallet.Get(WalletEntryNo)) then
+            exit(false);
+
+        if (not Setup.Get()) then
+            Setup.Init();
+
+        TemplateLabel := Setup.NPDesignerTemplateLabel;
+        TemplateId := Setup.NPDesignerTemplateId;
+
+        Item.SetLoadFields("NPR Item AddOn No.");
+        if (Wallet.OriginatesFromItemNo <> '') then
+            if (not Item.Get(Wallet.OriginatesFromItemNo)) then
+                exit(TemplateId <> '');
+
+        if (Item."NPR Item AddOn No." <> '') then
+            if (not WalletTemplate.Get(Item."NPR Item AddOn No.")) then
+                exit(TemplateId <> '');
+
+        if (WalletTemplate.NPDesignerTemplateId <> '') then begin
+            TemplateLabel := WalletTemplate.NPDesignerTemplateLabel;
+            TemplateId := WalletTemplate.NPDesignerTemplateId;
+        end;
+
+        exit(TemplateId <> '');
+    end;
     #endregion
 
 }

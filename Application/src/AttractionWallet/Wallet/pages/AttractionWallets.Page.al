@@ -158,21 +158,22 @@ page 6185089 "NPR AttractionWallets"
                 trigger OnAction()
                 var
                     NpDesignerManifestFacade: Codeunit "NPR NPDesignerManifestFacade";
+                    WalletFacade: Codeunit "NPR AttractionWalletFacade";
                     NPDesignerSetup: Record "NPR NPDesignerSetup";
                     NoManifestFound: Label 'Manifest URL could not be created for this entry.';
                     ManifestUrl: Text[250];
                     ManifestId: Guid;
-                    Item: Record Item;
-                    WalletTemplate: Record "NPR NpIa Item AddOn";
+                    TemplateId: Text[40];
+                    TemplateLabel: Text[80];
                 begin
                     NPDesignerSetup.Get();
                     NPDesignerSetup.TestField(EnableManifest, true);
-                    Item.Get(Rec.OriginatesFromItemNo);
-                    WalletTemplate.Get(Item."NPR Item AddOn No.");
-                    WalletTemplate.TestField(WalletTemplate.NPDesignerTemplateLabel);
+
+                    if (not WalletFacade.GetDesignerTemplate(Rec.EntryNo, TemplateLabel, TemplateId)) then
+                        Error(NoManifestFound);
 
                     ManifestId := NpDesignerManifestFacade.CreateManifest();
-                    NpDesignerManifestFacade.AddAssetToManifest(ManifestId, Database::"NPR AttractionWallet", Rec.SystemId, Rec.ReferenceNumber, WalletTemplate.NPDesignerTemplateId);
+                    NpDesignerManifestFacade.AddAssetToManifest(ManifestId, Database::"NPR AttractionWallet", Rec.SystemId, Rec.ReferenceNumber, TemplateId);
                     if (NpDesignerManifestFacade.GetManifestUrl(ManifestId, ManifestUrl)) then
                         Hyperlink(ManifestUrl)
                     else

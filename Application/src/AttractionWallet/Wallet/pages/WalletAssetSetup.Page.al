@@ -46,6 +46,11 @@ page 6184844 "NPR WalletAssetSetup"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies whether asset printed information will be updated when wallet print information is updated.';
                 }
+                field(NPDesignerTemplateLabel; Rec.NPDesignerTemplateLabel)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the design layout label used for wallet asset printing.';
+                }
             }
         }
     }

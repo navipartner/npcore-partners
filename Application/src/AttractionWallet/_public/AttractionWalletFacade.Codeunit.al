@@ -149,4 +149,11 @@ codeunit 6185061 "NPR AttractionWalletFacade"
         OriginatesFromItemNo := Wallet.OriginatesFromItemNo;
         exit(true);
     end;
+
+    procedure GetDesignerTemplate(WalletEntryNo: Integer; var TemplateLabel: Text[80]; var TemplateId: Text[40]): Boolean
+    var
+        WalletManagement: Codeunit "NPR AttractionWallet";
+    begin
+        exit(WalletManagement.GetDesignerTemplate(WalletEntryNo, TemplateLabel, TemplateId));
+    end;
 }
