@@ -209,7 +209,7 @@ codeunit 6248268 "NPR NpGp Export to API"
         POSEntry.ReadIsolation(IsolationLevel::ReadCommitted);
         if not POSEntry.Get(NpGpExportLog."POS Entry No.") then
             exit;
-        if not (POSEntry."Entry Type" in [POSEntry."Entry Type"::"Direct Sale", POSEntry."Entry Type"::"Direct Sale"]) then
+        if not (POSEntry."Entry Type" in [POSEntry."Entry Type"::"Direct Sale", POSEntry."Entry Type"::"Credit Sale"]) then
             exit;
 
         JsonRequest := InitODataReqBody(POSEntry);
