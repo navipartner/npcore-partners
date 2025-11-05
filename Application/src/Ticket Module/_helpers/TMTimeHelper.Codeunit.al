@@ -134,6 +134,23 @@ codeunit 6184773 "NPR TM TimeHelper"
             UtcDateTime := UtcDateTime - GetUserTimeZoneOffset() - GetDstOffset(TimeZoneNo, DT2Date(UtcDateTime), IsDaylightSavingsTime);
 
     end;
+
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    internal procedure GetCurrentUTCDateTime(): DateTime
+    var
+        TypeHelper: Codeunit "Type Helper";
+        DateString: Text;
+        UtcDate: Date;
+        UtcTime: Time;
+    begin
+        // yyyy-MM-ddTHH:mm:ssZ
+        DateString := TypeHelper.GetCurrUTCDateTimeISO8601();
+        Evaluate(UtcDate, (CopyStr(DateString, 1, 10)), 9);
+        Evaluate(UtcTime, (CopyStr(DateString, 12, 8)), 9);
+        exit(CreateDateTime(UtcDate, UtcTime));
+    end;
+#endif
+
     #endregion
 
     #region Create DateTime

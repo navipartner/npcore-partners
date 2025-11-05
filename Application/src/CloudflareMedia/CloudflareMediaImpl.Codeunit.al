@@ -213,7 +213,7 @@ codeunit 6248557 "NPR CloudflareMediaImpl" implements "NPR CloudflareMigrationIn
         if (CurrentDateTime() > ExpirationDate) then
             exit(false); // fall back to worker signing
 
-        Exp := Format(Round((CurrentDateTime() - CreateDateTime(DMY2Date(1, 1, 1970), 0T) + (TimeToLive * 1000)) / 1000, 1), 0, 9); // Unix epoch time in seconds
+        Exp := Format(Round((GetUTCDateTime() - CreateDateTime(DMY2Date(1, 1, 1970), 0T)) / 1000 + TimeToLive, 1), 0, 9);  // Unix epoch time in seconds (UTC)
         ImgUrl := StrSubstNo('/img/%1?variant=%2&response=bytes&kid=%3&exp=%4', UrlEncode(MediaKey), Variant.Names.Get(Variant.Ordinals.IndexOf(Variant.AsInteger())).ToLower(), Kid, Exp);
         ToSign := StrSubstNo('GET|%1|%2|%3|%4', MediaKey, Variant.Names.Get(Variant.Ordinals.IndexOf(Variant.AsInteger())).ToLower(), Kid, Exp);
         Signature := Cryptography.GenerateHashAsBase64String(ToSign, Secret, HashAlgorithmType::SHA256).Replace('+', '-').Replace('/', '_').Replace('=', '');
@@ -223,6 +223,26 @@ codeunit 6248557 "NPR CloudflareMediaImpl" implements "NPR CloudflareMigrationIn
         exit(true);
     end;
 
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    local procedure GetUTCDateTime(): DateTime
+    var
+        TypeHelper: Codeunit "Type Helper";
+        DateString: Text;
+        UtcDate: Date;
+        UtcTime: Time;
+    begin
+        // yyyy-MM-ddTHH:mm:ssZ
+        DateString := TypeHelper.GetCurrUTCDateTimeISO8601();
+        Evaluate(UtcDate, (CopyStr(DateString, 1, 10)), 9);
+        Evaluate(UtcTime, (CopyStr(DateString, 12, 8)), 9);
+        exit(CreateDateTime(UtcDate, UtcTime));
+    end;
+#else
+    local procedure GetUTCDateTime(): DateTime
+    begin
+        exit(CurrentDateTime() + 12 * 3600 * 1000); // BC17-22 does not have GetCurrUTCDateTime, so we add 12 hours to approximate worst case UTC time offset
+    end;
+#endif
 
     [NonDebuggable]
     [TryFunction]
