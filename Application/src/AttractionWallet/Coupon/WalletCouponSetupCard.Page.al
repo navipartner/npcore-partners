@@ -11,6 +11,8 @@ page 6184858 "NPR WalletCouponSetupCard"
         {
             group(GroupName)
             {
+                Caption = 'General';
+
                 field(TriggerOnItemNo; Rec.TriggerOnItemNo)
                 {
                     ToolTip = 'Specifies the value of the Trigger On Item No. field.';
