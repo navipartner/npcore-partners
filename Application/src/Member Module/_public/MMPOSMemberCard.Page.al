@@ -246,7 +246,7 @@
                 ShowFilter = false;
                 SubPageLink = "Entry No." = field("Entry No.");
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-                Visible = _CloudflareMediaVisible;
+                Visible = not _CloudflareMediaVisible;
             }
             part(CloudflareMediaFactBox; "NPR MMMemberExtImageFactBox")
             {
@@ -398,6 +398,10 @@
                     MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
                 begin
                     MembershipManagement.TakeMemberPicture(Rec);
+                    if (_CloudflareMediaVisible) then begin
+                        CurrPage.CloudflareMedia.Page.RefreshImage();
+                        CurrPage.CloudflareMediaFactBox.Page.RefreshImage();
+                    end;
                 end;
             }
         }
@@ -560,7 +564,6 @@
         MembershipRole: Record "NPR MM Membership Role";
         MembershipEntry: Record "NPR MM Membership Entry";
         MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
-        CloudflareMediaFeature: Codeunit "NPR MemberImageMediaFeature";
         ValidFrom2: Date;
         ValidUntil2: Date;
         RemainAmt: Decimal;
@@ -630,8 +633,6 @@
             AccentuateDueAmount := (DueAmount > 0);
             RemainingAmountText := StrSubstNo(PlaceHolderLbl, Format(RemainingAmount, 0, '<Precision,2:2><Integer><Decimals>'), Format(DueAmount, 0, '<Precision,2:2><Integer><Decimals>'));
 
-            _CloudflareMediaVisible := CloudflareMediaFeature.IsFeatureEnabled();
-
         end;
 
         _IsBirthdayMandatory := CheckBirthdayMandatory(Rec);
@@ -648,10 +649,11 @@
     trigger OnOpenPage()
     var
         RaptorSetup: Record "NPR Raptor Setup";
+        CloudflareMediaFeature: Codeunit "NPR MemberImageMediaFeature";
     begin
         RaptorEnabled := (RaptorSetup.Get() and RaptorSetup."Enable Raptor Functions");
+        _CloudflareMediaVisible := CloudflareMediaFeature.IsFeatureEnabled();
     end;
-
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
     begin

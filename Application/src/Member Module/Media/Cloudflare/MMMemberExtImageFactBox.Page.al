@@ -124,6 +124,12 @@ page 6185102 "NPR MMMemberExtImageFactBox"
         _ConfirmDeleteImage: Label 'Are you sure you want to delete the picture?';
         _ConfirmOverrideImage: Label 'The existing picture will be replaced. Do you want to continue?';
 
+    internal procedure RefreshImage()
+    begin
+        Clear(_HaveImageFor);
+        LoadImage();
+    end;
+
     internal procedure LoadImage()
     var
         MemberMedia: Codeunit "NPR MMMemberImageMediaHandler";

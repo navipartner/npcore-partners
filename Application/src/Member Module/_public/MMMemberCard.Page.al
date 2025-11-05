@@ -608,6 +608,8 @@
                     MembershipManagement: Codeunit "NPR MM MembershipMgtInternal";
                 begin
                     MembershipManagement.TakeMemberPicture(Rec);
+                    if (_CloudflareMediaVisible) then
+                        CurrPage.CloudflareMedia.Page.RefreshImage();
                 end;
             }
 

@@ -152,7 +152,7 @@ codeunit 6248557 "NPR CloudflareMediaImpl" implements "NPR CloudflareMigrationIn
     end;
 #pragma warning restore AA0139
 
-    //[NonDebuggable]
+    [NonDebuggable]
     [TryFunction]
     local procedure SignMediaUrlWorker(MediaKey: Text; Variant: Enum "NPR CloudflareMediaVariants"; TimeToLive: integer; responseType: Text; var MediaResponse: JsonObject)
     var
@@ -165,7 +165,6 @@ codeunit 6248557 "NPR CloudflareMediaImpl" implements "NPR CloudflareMigrationIn
         VariantAsText: Text;
     begin
         VariantAsText := Variant.Names.Get(Variant.Ordinals.IndexOf(Variant.AsInteger())).ToLower();
-
 
         // if bytes and license, self-sign the URL here and skip the call to the worker
         if (responseType = 'bytes') then
