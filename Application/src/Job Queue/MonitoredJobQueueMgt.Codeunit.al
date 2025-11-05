@@ -134,39 +134,78 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
         exit(JobQueueEntry.FindFirst());
     end;
 
-    internal procedure LookUpJobQueues(var JobQueueEntry: Record "Job Queue Entry"): Boolean
+    internal procedure LookUpJobQueues(var JobQueueEntry: Record "Job Queue Entry") Success: Boolean
     var
-        MonitoredJQEntry: Record "NPR Monitored Job Queue Entry";
+        AddJQToMonitored: Codeunit "NPR Add Job Queue To Monitored";
+#if not (BC17 or BC18 or BC19)
+        ErrorContextElement: Codeunit "Error Context Element";
+        ErrorContextElement0: Codeunit "Error Context Element";
+        ErrorMessageHandler: Codeunit "Error Message Handler";
+        ErrorMessageMgt: Codeunit "Error Message Management";
+#endif
         JobQueueManagement: Codeunit "NPR Job Queue Management";
         JobQueueEntries: Page "Job Queue Entries";
-        NotProtectedJob: Boolean;
-        MonitoredEntryAlreadyExistsErr: Label 'Monitored Job ''%1 %2 %3'' already exists!';
+#if not (BC17 or BC18 or BC19)
+        BatchProcessingTxt: Label 'Adding selected job queue entries to monitored list.';
+        DefaultErrorMsg: Label 'An error occurred. No further information has been provided.';
+        DoneWithErrorsLbl: Label 'Job Queue Entries process completed successfully, however there were some entries that couldn''t be processed.';
+        ProcessingMsg: Label 'Processing Job Queue Entry %1 %2 %3.', Comment = '%1 - Object Type to Run. %2 - Object ID to Run. %3 - Object Caption.';
+        ErrorMessage: Text;
+#endif
+        DoneLbl: Label 'Job Queue Entries process completed successfully.';
+        CounterSelected: Integer;
+        CounterProcessed: Integer;
     begin
         JobQueueEntries.LookupMode := true;
         if not (JobQueueEntries.RunModal() = Action::LookupOK) then
             exit;
 
-        JobQueueEntries.GetRecord(JobQueueEntry);
+        JobQueueEntries.SetSelectionFilter(JobQueueEntry);
+        JobQueueEntry.MarkedOnly(true);
+        if not JobQueueEntry.FindSet() then
+            exit;
 
-        if not JobQueueManagement.SkipUpdateNPManagedMonitoredJobs() and JobQueueManagement.IsNPRecurringJob(JobQueueEntry) then
-            Error(_IsNPJobErr, JobQueueEntry."Object Type to Run", JobQueueEntry."Object ID to Run", GetObjCaption(JobQueueEntry));
+#if not (BC17 or BC18 or BC19)
+        if ErrorMessageMgt.Activate(ErrorMessageHandler) then
+            ErrorMessageMgt.PushContext(ErrorContextElement0, Database::"Job Queue Entry", 0, BatchProcessingTxt);
+#endif
+        repeat
+            CounterSelected += 1;
+            if JobQueueManagement.SkipUpdateNPManagedMonitoredJobs() or not JobQueueManagement.IsNPRecurringJob(JobQueueEntry) then begin
+#if not (BC17 or BC18 or BC19)
+                ErrorMessageMgt.PushContext(ErrorContextElement, JobQueueEntry.RecordId(), 0, StrSubstNo(ProcessingMsg, JobQueueEntry."Object Type to Run", JobQueueEntry."Object ID to Run", JobQueueManagement.GetObjCaption(JobQueueEntry)));
+#endif
+                if AddJQToMonitored.Run(JobQueueEntry) then
+                    CounterProcessed += 1
+#if (BC17 or BC18 or BC19)
+            end;
+#else
+                else begin
+                    ErrorMessage := GetLastErrorText();
+                    if ErrorMessage = '' then
+                        ErrorMessage := DefaultErrorMsg;
+                    ErrorMessageMgt.LogError(JobQueueEntry, ErrorMessage, '');
+                    ErrorMessageMgt.PopContext(ErrorContextElement);
+                end;
+                ClearLastError();
+            end else
+                ErrorMessageMgt.LogError(JobQueueEntry, StrSubstNo(_IsNPJobErr, JobQueueEntry."Object Type to Run", JobQueueEntry."Object ID to Run", JobQueueManagement.GetObjCaption(JobQueueEntry)), '');
+#endif
+        until JobQueueEntry.Next() = 0;
 
-        MonitoredJQEntry.SetRange("Job Queue Entry ID", JobQueueEntry.ID);
-        if not MonitoredJQEntry.IsEmpty() then begin
-            Error(MonitoredEntryAlreadyExistsErr, JobQueueEntry."Object Type to Run", JobQueueEntry."Object ID to Run", GetObjCaption(JobQueueEntry));
+#if (BC17 or BC18 or BC19)
+        if CounterProcessed = CounterSelected then begin
+#else
+        if CounterProcessed <> CounterSelected then begin
+            if CounterProcessed > 0 then
+                Message(DoneWithErrorsLbl);
+            ErrorMessageHandler.InformAboutErrors(Enum::"Error Handling Options"::"Show Error");
+            ErrorMessageMgt.PopContext(ErrorContextElement0);
+        end else begin
+#endif
+            Success := true;
+            Message(DoneLbl);
         end;
-
-        JobQueueManagement.JobQueueIsManagedByApp(JobQueueEntry, NotProtectedJob);
-        AssignJobQueueEntryToManagedAndMonitored(NotProtectedJob, true, JobQueueEntry);
-        exit(true);
-    end;
-
-    local procedure GetObjCaption(JobQueueEntry: Record "Job Queue Entry"): Text
-    var
-        AllObjWithCaption: Record AllObjWithCaption;
-    begin
-        AllObjWithCaption.Get(JobQueueEntry."Object Type to Run", JobQueueEntry."Object ID to Run");
-        exit(AllObjWithCaption."Object Caption");
     end;
 
     internal procedure AssignJobQueueEntryToManagedAndMonitored(NotProtectedJob: Boolean; ManagedByApp: Boolean; JobQueueEntry: Record "Job Queue Entry")
@@ -204,7 +243,7 @@ codeunit 6248395 "NPR Monitored Job Queue Mgt."
         if Page.RunModal(Page::"NPR Monitored JQ Entry Card", TempJQEntry) = Action::LookupOK then begin
             JobQueueMgt.JobQueueIsManagedByApp(TempJQEntry, NotProtectedJob);
             if not NotProtectedJob then
-                Error(_IsNPJobErr, TempJQEntry."Object Type to Run", TempJQEntry."Object ID to Run", GetObjCaption(TempJQEntry));
+                Error(_IsNPJobErr, TempJQEntry."Object Type to Run", TempJQEntry."Object ID to Run", JobQueueMgt.GetObjCaption(TempJQEntry));
 
             MonitoredJQEntry.Init();
             MonitoredJQEntry."Entry No." := 0;

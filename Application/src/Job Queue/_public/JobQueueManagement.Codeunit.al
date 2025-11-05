@@ -1109,6 +1109,14 @@
         Managed := ManagedByAppJQ.Get(JobQueueEntry.ID) and ManagedByAppJQ."Managed by App";
     end;
 
+    internal procedure GetObjCaption(JobQueueEntry: Record "Job Queue Entry"): Text
+    var
+        AllObjWithCaption: Record AllObjWithCaption;
+    begin
+        AllObjWithCaption.Get(JobQueueEntry."Object Type to Run", JobQueueEntry."Object ID to Run");
+        exit(AllObjWithCaption."Object Caption");
+    end;
+
     local procedure IsMonitoredJobRefreshRoutineActive() Result: Boolean
     var
         Handled: Boolean;
