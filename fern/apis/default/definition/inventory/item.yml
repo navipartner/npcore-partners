@@ -19,9 +19,11 @@ types:
       itemDiscGroup: string
       itemCategoryCode: string
       vatProdPostingGroup: string
+      unitPrice: double
       inventory: double
       hasVariants: boolean
       rowVersion: string
+      attributes: optional<map<string, unknown>>
     examples:
       - name: ExampleItem
         value:
@@ -33,9 +35,16 @@ types:
           itemDiscGroup: "FURNITURE"
           itemCategoryCode: "CHAIR"
           vatProdPostingGroup: "STANDARD"
+          unitPrice: 4000
           inventory: 42.0
           hasVariants: true
           rowVersion: "12345678901234567890"
+          attributes:
+            Color: "Black"
+            Depth: 70
+            Width: 75
+            Height: 100
+            Material Description: "Leather, Satin Polished Aluminum base"
 
   ListItem:
     docs: Represents an inventory item in the system.
@@ -48,7 +57,9 @@ types:
       itemDiscGroup: string
       itemCategoryCode: string
       vatProdPostingGroup: string
+      unitPrice: double
       rowVersion: optional<string>
+      attributes: optional<map<string, unknown>>
     examples:
       - name: ExampleItem
         value:
@@ -60,7 +71,14 @@ types:
           itemDiscGroup: "FURNITURE"
           itemCategoryCode: "CHAIR"
           vatProdPostingGroup: "STANDARD"
+          unitPrice: 4000
           rowVersion: "12345678901234567890"
+          attributes:
+            Color: "Black"
+            Depth: 70
+            Width: 75
+            Height: 100
+            Material Description: "Leather, Satin Polished Aluminum base"
 
   PaginatedItems:
     docs: A paginated response containing multiple items
@@ -91,6 +109,12 @@ service:
       path: "/item/{id}"
       path-parameters:
         id: ItemId
+      request:
+        name: getItemRequest
+        query-parameters:
+          withAttributes:
+            type: optional<boolean>
+            docs: Indicates whether the item attributes should be included in the response.
       response: Item
       examples:
         - path-parameters:
@@ -98,6 +122,8 @@ service:
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
             id: "A1000"
+          query-parameters:
+            withAttributes: true
           response:
             body: $Item.ExampleItem
 
@@ -114,6 +140,9 @@ service:
           pageKey: optional<string>
           lastRowVersion: optional<string>
           sync: optional<boolean>
+          withAttributes:
+            type: optional<boolean>
+            docs: Indicates whether the item attributes should be included in the response.
       response: PaginatedItems
       examples:
         - path-parameters:
@@ -122,5 +151,6 @@ service:
             company: $globalApiTypes.Company.ExampleCompanyCronus
           query-parameters:
             pageSize: 50
+            withAttributes: true
           response:
             body: $PaginatedItems.ExamplePaginatedItems
