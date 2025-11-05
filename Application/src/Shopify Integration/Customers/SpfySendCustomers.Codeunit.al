@@ -32,7 +32,6 @@ codeunit 6248540 "NPR Spfy Send Customers"
         Clear(NcTask."Data Output");
         Clear(NcTask.Response);
         ClearLastError();
-        Success := true;
 
         PrepareCustomerUpdateRequest(NcTask, SpfyStoreCustomerLink);
         Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse);
@@ -63,7 +62,7 @@ codeunit 6248540 "NPR Spfy Send Customers"
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
         RecRef: RecordRef;
         ShopifyCustomerID: Text[30];
-        ShopifyCustomerIDEmptyErr: Label 'Shopify Customer Id must be specified for %1', Comment = '%1 - Customer record id';
+        ShopifyCustomerIDEmptyErr: Label 'Shopify Customer Id must be specified for %1, %2 = %3', Comment = '%1 - Customer record id, %2 - Shopify store code field name, %3 - Shopify store code';
     begin
         RecRef.Get(NcTask."Record ID");
         RecRef.SetTable(Customer);
@@ -79,7 +78,7 @@ codeunit 6248540 "NPR Spfy Send Customers"
                 NcTask.Type::Modify:
                     NcTask.Type := NcTask.Type::Insert;
                 NcTask.Type::Delete:
-                    Error(ShopifyCustomerIDEmptyErr, Format(Customer.RecordId()));
+                    Error(ShopifyCustomerIDEmptyErr, Format(Customer.RecordId()), SpfyStoreCustomerLink.FieldCaption("Shopify Store Code"), SpfyStoreCustomerLink."Shopify Store Code");
             end;
         end else
             if NcTask.Type = NcTask.Type::Insert then
@@ -387,6 +386,10 @@ codeunit 6248540 "NPR Spfy Send Customers"
         SpfyStoreCustomerLink."Synchronization Is Enabled" := SpfyStoreCustomerLink."Sync. to this Store";
         ModifySpfyStoreCustomerLink(SpfyStoreCustomerLink, true);
         SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreCustomerLink.RecordId(), "NPR Spfy ID Type"::"Entry ID", ShopifyCustomerID, false);
+#if not (BC18 or BC19 or BC20)
+        if SpfyStoreCustomerLink."Synchronization Is Enabled" and (SpfyStoreCustomerLink."Synchronization Is Enabled" <> xSpfyStoreCustomerLink."Synchronization Is Enabled") then
+            SyncCustomerOfflineOrderHistory(SpfyStoreCustomerLink."No.", SpfyStoreCustomerLink."Shopify Store Code");
+#endif
         if TriggeredExternally and not xSpfyStoreCustomerLink."Sync. to this Store" then
             SpfyMetafieldMgt.InitStoreCustomerLinkMetafields(SpfyStoreCustomerLink);
         UpdateMetafieldsFromShopify(SpfyStoreCustomerLink, ShopifyCustomerID);
@@ -491,6 +494,24 @@ codeunit 6248540 "NPR Spfy Send Customers"
         SpfyStoreCustomerLink."Sync. to this Store" := false;
         SpfyStoreCustomerLink."Synchronization Is Enabled" := false;
     end;
+
+#if not (BC18 or BC19 or BC20)
+    local procedure SyncCustomerOfflineOrderHistory(CustomerNo: Code[20]; ShopifyStoreCode: Code[20])
+    var
+        POSEntry: Record "NPR POS Entry";
+        TempSpfyExportPointerBuffer: Record "NPR Spfy Export Pointer Buffer" temporary;
+        SpfyPOSEntryExportMgt: Codeunit "NPR Spfy POS Entry Export Mgt.";
+        CutOffDate: Date;
+    begin
+        if not _SpfyIntegrationMgt.IsAutoSendHistBCOrders(ShopifyStoreCode, CutOffDate) then
+            exit;
+
+        TempSpfyExportPointerBuffer.Add(ShopifyStoreCode, CutOffDate, 0);
+        POSEntry.SetCurrentKey("Customer No.");
+        POSEntry.SetRange("Customer No.", CustomerNo);
+        SpfyPOSEntryExportMgt.ProcessOutstandingPOSEntries(POSEntry, TempSpfyExportPointerBuffer);
+    end;
+#endif
 
 #if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR Nc Task Mgt.", 'RunSourceCardEvent', '', false, false)]

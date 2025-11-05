@@ -330,11 +330,17 @@ page 6184704 "NPR Spfy Store Card"
                     ApplicationArea = NPRShopify;
                     Importance = Additional;
                 }
-                field("Last Orders Imported At"; Rec."Last Orders Imported At")
+                field("Last Orders Imported At"; _LastOrdersImportedAt)
                 {
+                    Caption = 'Last Orders Imported At';
                     ToolTip = 'Specifies the date and time sales orders were last imported from the Shopify store. The next time, the system will only import orders created or updated after this time.';
                     ApplicationArea = NPRShopify;
                     Importance = Additional;
+
+                    trigger OnValidate()
+                    begin
+                        Rec.SetLastOrdersImportedAt(_LastOrdersImportedAt);
+                    end;
                 }
                 field("Spfy C&C Order Workflow Code"; Rec."Spfy C&C Order Workflow Code")
                 {
@@ -382,6 +388,48 @@ page 6184704 "NPR Spfy Store Card"
                         }
                     }
                 }
+#if not (BC18 or BC19 or BC20)
+                group(BCCustomerTransSync)
+                {
+                    Caption = 'POS Customer Transactions';
+                    field("BC Customer Transactions"; Rec."BC Customer Transactions")
+                    {
+                        ToolTip = 'Specifies whether POS customer purchases should be sent to Shopify for customers who are synchronized between BC and Shopify.';
+                        ApplicationArea = NPRShopify;
+                        Enabled = _SalesOrderIntegrationIsEnabled;
+
+                        trigger OnValidate()
+                        begin
+                            CurrPage.Update(false);  //the record is saved by the fields OnValidate triggers in the table
+                        end;
+                    }
+                    field("Auto-Send Historical BC Orders"; Rec."Auto-Send Historical BC Orders")
+                    {
+                        ToolTip = 'When enabled, the system automatically schedules POS historical transaction synchronization for a customer as soon as it becomes known for the system that the customer account has been created on Shopify. If disabled, the procedure for sending POS historical transactions must be triggered manually. This setting only applies to POS transactions on or after the Histor. POS Trans. Cut-Off Date.';
+                        ApplicationArea = NPRShopify;
+                        Enabled = _SalesOrderIntegrationIsEnabled and _BCCustomerTransactionsEnabled;
+                    }
+                    field("Historical Data Cut-Off Date"; Rec."Historical Data Cut-Off Date")
+                    {
+                        ToolTip = 'Specifies the earliest date from which customer POS transactions will be synchronized with Shopify. POS transactions created before this date will be permanently excluded from synchronization. This helps to control the volume of data and ensures that only relevant historical transactions are sent.';
+                        ApplicationArea = NPRShopify;
+                        Enabled = _SalesOrderIntegrationIsEnabled and _BCCustomerTransactionsEnabled;
+                    }
+                    field("Last POS Entry Row Version"; _LastPOSEntryRowVersion)
+                    {
+                        Caption = 'Last POS Entry Row Version';
+                        ToolTip = 'Specifies the last SystemRowVersionNo up to which customer POS transactions were exported to Shopify by the system during the previous data export background job run. The next time the background job runs, it will only export POS transactions with a higher row version number.';
+                        ApplicationArea = NPRShopify;
+                        Enabled = _SalesOrderIntegrationIsEnabled and _BCCustomerTransactionsEnabled;
+                        Importance = Additional;
+
+                        trigger OnValidate()
+                        begin
+                            Rec.SetLastPOSRowVersion(_LastPOSEntryRowVersion);
+                        end;
+                    }
+                }
+#endif
             }
             group(Connection)
             {
@@ -389,7 +437,7 @@ page 6184704 "NPR Spfy Store Card"
 
                 field("Shopify Url"; Rec."Shopify Url")
                 {
-                    ToolTip = 'Specifies the Url to your Shopify store. Enter the URL that people will use to access your store. For example, https://navipartner.myshopify.com.';
+                    ToolTip = 'Specifies the Url to your Shopify store. The URL must refer to the internal shop location at myshopify.com. For example, https://navipartner.myshopify.com.';
                     ApplicationArea = NPRShopify;
                     ShowMandatory = true;
                 }
@@ -491,6 +539,24 @@ page 6184704 "NPR Spfy Store Card"
                         SpfySendCustomers.EnableIntegrationForCustomersAlreadyOnShopify(Rec.Code, true);
                     end;
                 }
+#if not (BC18 or BC19 or BC20)
+                action(ExportCustSalesTrans)
+                {
+                    Caption = 'Export Cust. POS Sales';
+                    ToolTip = 'Executes the initial export of customer POS sales transactions from Business Central to Shopify. The system will iterate through customers and their existing POS entries in Business Central and create transaction export requests for Shopify.';
+                    ApplicationArea = NPRShopify;
+                    Image = TransmitElectronicDoc;
+
+                    trigger OnAction()
+                    var
+                        ShopifyStore: Record "NPR Spfy Store";
+                    begin
+                        CurrPage.SaveRecord();
+                        ShopifyStore.SetRange(Code, Rec.Code);
+                        Report.Run(Report::"NPR Spfy Export POS Entries", true, false, ShopifyStore);
+                    end;
+                }
+#endif
                 action(SyncRetailVouchers)
                 {
                     Caption = 'Sync. Vouchers';
@@ -581,46 +647,6 @@ page 6184704 "NPR Spfy Store Card"
                 RunPageLink = "Store Code" = field(Code);
             }
         }
-#if not (BC17 or BC18 or BC19 or BC20)
-        area(Promoted)
-        {
-            actionref(SyncItems_Promoted; SyncItems)
-            {
-                Visible = false;
-                ObsoleteState = Pending;
-                ObsoleteTag = '2025-10-26';
-                ObsoleteReason = 'No need to have initial sync actions as promoted.';
-            }
-            actionref(SyncCustomers_Promoted; SyncCustomers)
-            {
-                Visible = false;
-                ObsoleteState = Pending;
-                ObsoleteTag = '2025-10-26';
-                ObsoleteReason = 'No need to have initial sync actions as promoted.';
-            }
-            actionref(SyncRetailVouchers_Promoted; SyncRetailVouchers)
-            {
-                Visible = false;
-                ObsoleteState = Pending;
-                ObsoleteTag = '2025-10-26';
-                ObsoleteReason = 'No need to have initial sync actions as promoted.';
-            }
-            actionref(SyncItemCategories_Promoted; SyncItemCategories)
-            {
-                Visible = false;
-                ObsoleteState = Pending;
-                ObsoleteTag = '2025-10-26';
-                ObsoleteReason = 'No need to have initial sync actions as promoted.';
-            }
-            actionref(SalesChannels_Promoted; SalesChannels)
-            {
-                Visible = false;
-                ObsoleteState = Pending;
-                ObsoleteTag = '2025-10-26';
-                ObsoleteReason = 'No need to have initial sync actions as promoted.';
-            }
-        }
-#endif
     }
 
     trigger OnOpenPage()
@@ -640,6 +666,14 @@ page 6184704 "NPR Spfy Store Card"
 
         _ItemCategoryMetafieldID := Rec.ItemCategoryMetafieldID();
         _LoyaltyPointsMetafieldID := Rec.LoyaltyPointsMetafieldID();
+
+#if BC18 or BC19 or BC20
+        Rec.CalcFields("Last Orders Imported At (FF)");
+#else
+        Rec.CalcFields("Last Orders Imported At (FF)", "Last POS Entry Row Version");
+        _LastPOSEntryRowVersion := Rec."Last POS Entry Row Version";
+#endif
+        _LastOrdersImportedAt := Rec."Last Orders Imported At (FF)";
 
         if _SpfyIntegrationMgt.IsEnabled(Enum::"NPR Spfy Integration Area"::" ", Rec.Code) then begin
             Parameters.Add('StoreCode', Rec.Code);
@@ -696,6 +730,9 @@ page 6184704 "NPR Spfy Store Card"
         _ItemListIntegrationIsEnabled := Rec."Item List Integration";
         _InventoryIntegrationIsEnabled := Rec."Send Inventory Updates";
         _SalesOrderIntegrationIsEnabled := Rec."Sales Order Integration";
+#if not (BC18 or BC19 or BC20)
+        _BCCustomerTransactionsEnabled := Rec."BC Customer Transactions";
+#endif
     end;
 
     local procedure UpdateItemWebhookRegistration(Update1st: Boolean; Update2nd: Boolean)
@@ -731,7 +768,6 @@ page 6184704 "NPR Spfy Store Card"
             repeat
                 if not TempxShopifyStore.Get(ShopifyStore.Code) then
                     exit(true);
-                TempxShopifyStore."Last Orders Imported At" := ShopifyStore."Last Orders Imported At";
                 if Format(ShopifyStore) <> Format(TempxShopifyStore) then
                     exit(true);
                 TempxShopifyStore.Delete();
@@ -755,10 +791,17 @@ page 6184704 "NPR Spfy Store Card"
         _SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
         _ItemCategoryMetafieldID: Text[30];
         _LoyaltyPointsMetafieldID: Text[30];
+        _LastOrdersImportedAt: DateTime;
+#if not (BC18 or BC19 or BC20)
+        _LastPOSEntryRowVersion: BigInteger;
+#endif
         _BackgroundTaskId: Integer;
         _AutoSetAsShopifyItem: Boolean;
         _AutoSyncItemChanges: Boolean;
         _AutoUpdateItemInfo: Boolean;
+#if not (BC18 or BC19 or BC20)        
+        _BCCustomerTransactionsEnabled: Boolean;
+#endif
         _HasAzureADConnection: Boolean;
         _InvalidCurrencyCode: Boolean;
         _InventoryIntegrationIsEnabled: Boolean;

@@ -93,6 +93,7 @@ table 6151228 "NPR Spfy Store-Customer Link"
             Clustered = true;
         }
         key(SyncEnabled; Type, "No.", "Synchronization Is Enabled") { }
+        key(SyncToStore; "Sync. to this Store") { }
         key(StoreCustomers; "Shopify Store Code") { }
     }
 

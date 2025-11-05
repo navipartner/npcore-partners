@@ -31,6 +31,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         UpdateMetafieldTaskSetup();
         CreateSOIntegrationRelatedDataLogSetups();
         MoveCustomerAssignedIDs();
+        MoveLastOrdersImportedAt();
     end;
 
     internal procedure UpdateShopifySetup()
@@ -484,6 +485,28 @@ codeunit 6184802 "NPR Spfy App Upgrade"
                     SpfyAssignedID.Delete();
                 until SpfyAssignedID.Next() = 0;
         end;
+
+        SetUpgradeTag();
+        LogFinish();
+    end;
+
+    local procedure MoveLastOrdersImportedAt()
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+    begin
+        _UpgradeStep := 'MoveLastOrdersImportedAt';
+        if HasUpgradeTag() then
+            exit;
+        LogStart();
+
+        if ShopifyStore.FindSet() then
+            repeat
+                if ShopifyStore."Last Orders Imported At" <> 0DT then begin
+                    ShopifyStore.SetLastOrdersImportedAt(ShopifyStore."Last Orders Imported At");
+                    ShopifyStore."Last Orders Imported At" := 0DT;
+                    ShopifyStore.Modify();
+                end;
+            until ShopifyStore.Next() = 0;
 
         SetUpgradeTag();
         LogFinish();

@@ -391,7 +391,7 @@ codeunit 6184816 "NPR Spfy Retail Voucher Mgt."
         Window: Dialog;
         RecNo: Integer;
         TotalRecNo: Integer;
-        ConfirmQst: Label 'This batch job will do intial retail voucher migration from BC to Shopify. It will go through retail vouchers in BC and create those marked as synchronizable with your Shopify Store ''%1'' as gift cards at the store. System will also update gift cards balances at Shopify, if needed.';
+        ConfirmQst: Label 'This batch job will do initial retail voucher migration from BC to Shopify. It will go through retail vouchers in BC and create those marked as synchronizable with your Shopify Store ''%1'' as gift cards at the store. System will also update gift cards balances at Shopify, if needed.';
         DialogText1Lbl: Label 'Syncing retail vouchers to Shopify Store ''%1''...\\';
         DialogText2Lbl: Label 'Voucher Type #1########\';
         DialogText3Lbl: Label 'Voucher No.  #2########\';

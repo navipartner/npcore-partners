@@ -95,6 +95,9 @@ codeunit 6248478 "NPR Refresh Job Queue Entry"
         exit(
             //3997 - Codeunit::"Retention Policy JQ"
             ((JQMonitorEntry."Object Type to Run" = JQMonitorEntry."Object Type to Run"::Codeunit) and (JQMonitorEntry."Object ID to Run" in [3997])) or
+#if not (BC17 or BC18 or BC19 or BC20)
+            ((JQMonitorEntry."Object Type to Run" = JQMonitorEntry."Object Type to Run"::Codeunit) and (JQMonitorEntry."Object ID to Run" in [Codeunit::"NPR Spfy Export BC Trans. JQ"])) or
+#endif            
             ((JQMonitorEntry."Object Type to Run" = JQMonitorEntry."Object Type to Run"::Report) and (JQMonitorEntry."Object ID to Run" in [Report::"Adjust Cost - Item Entries"]))
         );
     end;

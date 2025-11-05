@@ -119,7 +119,7 @@
         JobQueueEntry."Object Type to Run" := ObjectTypeToRun;
         JobQueueEntry.Validate("Object ID to Run", ObjectIdToRun);
         JobQueueEntry."Earliest Start Date/Time" := AtDateTime;
-        if not JobQueueMgt.JobQueueEntryExists(JobQueueEntry, JobQueueEntryGlobal) then
+        if not JobQueueMgt.JQEntryExists(JobQueueEntry, JobQueueEntryGlobal) then
             exit(false);
         JobQueueEntryOut := JobQueueEntryGlobal;
 

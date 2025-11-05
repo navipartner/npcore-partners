@@ -2,22 +2,6 @@ pageextension 6014425 "NPR Customer Card" extends "Customer Card"
 {
     layout
     {
-#if not BC17
-        addafter("No.")
-        {
-            field("NPR Spfy Customer ID"; '<Deprecated>')
-            {
-                Caption = 'Shopify Customer ID';
-                Editable = false;
-                Visible = false;
-                ApplicationArea = NPRShopify;
-                ToolTip = 'The field is deprecated and will be removed in future versions. Use the Shopify Integration part to manage Shopify customer IDs.';
-                ObsoleteState = Pending;
-                ObsoleteTag = '2025-09-20';
-                ObsoleteReason = 'Replaced by the Shopify Integration part.';
-            }
-        }
-#endif
         addafter(AdjProfitPct)
         {
             field("NPR To Anonymize On"; Rec."NPR To Anonymize On")

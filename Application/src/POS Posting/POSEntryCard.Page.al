@@ -246,6 +246,21 @@
                     ToolTip = 'Specifies the value of the Area field';
                     ApplicationArea = NPRRetail;
                 }
+#if not (BC17 or BC18 or BC19 or BC20)
+                group("NPR Shopify")
+                {
+                    ShowCaption = false;
+                    Visible = ShopifyPOSEntrySyncIsEnabled;
+                    field("NPR Synced with Shopify"; Rec.IsSyncedToShopify())
+                    {
+                        Caption = 'Synced with Shopify';
+                        ToolTip = 'Specifies whether the POS entry has been exported to a Shopify store';
+                        ApplicationArea = NPRShopify;
+                        Importance = Additional;
+                        Editable = false;
+                    }
+                }
+#endif
             }
             part(Sales; "NPR POS Sale Line Subpage")
             {
@@ -528,6 +543,27 @@
                     ApplicationArea = NPRRetail;
                 }
             }
+#if not (BC17 or BC18 or BC19 or BC20)
+            group("NPR Shopify Actions")
+            {
+                Caption = 'Shopify';
+                Visible = ShopifyPOSEntrySyncIsEnabled;
+                action("NPR SpfyStoreLinks")
+                {
+                    Caption = 'Shopify Order Links';
+                    ToolTip = 'Specifies the list of Shopify stores to which the POS entry has been exported and the corresponding Shopify order IDs.';
+                    ApplicationArea = NPRShopify;
+                    Image = LinkAccount;
+                    trigger OnAction()
+                    var
+                        SpfyStorePOSEntryLinks: Page "NPR Spfy Store-POS Entry Links";
+                    begin
+                        SpfyStorePOSEntryLinks.SetPOSEntry(Rec."Entry No.");
+                        SpfyStorePOSEntryLinks.Run();
+                    end;
+                }
+            }
+#endif
         }
         area(processing)
         {
@@ -727,6 +763,15 @@
         }
     }
 
+#if not (BC17 or BC18 or BC19 or BC20)
+    trigger OnOpenPage()
+    var
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+    begin
+        ShopifyPOSEntrySyncIsEnabled := SpfyIntegrationMgt.IsEnabledForAnyStore("NPR Spfy Integration Area"::"BC Customer Transactions");
+    end;
+#endif
+
     trigger OnAfterGetRecord()
     var
         POSEntrySalesDocLink: Record "NPR POS Entry Sales Doc. Link";
@@ -752,6 +797,9 @@
         HasTaxLines: Boolean;
         LastOpenSalesDocumentNo: Code[20];
         LastPostedSalesDocumentNo: Code[20];
+#if not (BC17 or BC18 or BC19 or BC20)
+        ShopifyPOSEntrySyncIsEnabled: Boolean;
+#endif
 
     local procedure TryGetLastOpenSalesDoc(var POSEntrySalesDocLinkOut: Record "NPR POS Entry Sales Doc. Link"): Boolean
     begin

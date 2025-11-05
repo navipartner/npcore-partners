@@ -222,7 +222,6 @@ page 6184553 "NPR Spfy Integration Setup"
             repeat
                 if not TempxShopifyStore.Get(ShopifyStore.Code) then
                     exit(true);
-                TempxShopifyStore."Last Orders Imported At" := ShopifyStore."Last Orders Imported At";
                 if Format(ShopifyStore) <> Format(TempxShopifyStore) then
                     exit(true);
                 TempxShopifyStore.Delete();

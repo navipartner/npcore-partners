@@ -279,7 +279,7 @@
             if Handled then
                 exit(Success);
 
-            if JobQueueEntryExists(Parameters, JobQueueEntryOut) then begin
+            if JQEntryExists(Parameters, JobQueueEntryOut) then begin
                 UpdateJobQueueEntry(Parameters, JobQueueEntryOut);
                 exit(true);
             end;
@@ -382,7 +382,13 @@
         JobQueueEntry."Notify On Success" := Parameters."Notify On Success";
     end;
 
+    [Obsolete('Replaced by the JQEntryExists procedure.', '2025-11-07')]
     procedure JobQueueEntryExists(Parameters: Record "Job Queue Entry"; var JobQueueEntryOut: Record "Job Queue Entry"): Boolean
+    begin
+        exit(JQEntryExists(Parameters, JobQueueEntryOut));
+    end;
+
+    procedure JQEntryExists(var Parameters: Record "Job Queue Entry"; var JobQueueEntryOut: Record "Job Queue Entry"): Boolean
     var
         JobQueueEntry: Record "Job Queue Entry";
     begin
@@ -400,6 +406,7 @@
             JobQueueEntry.SetRange("Job Queue Category Code", Parameters."Job Queue Category Code");
             if Format(Parameters."Record ID to Process") <> '' then
                 JobQueueEntry.SetFilter("Record ID to Process", Format(Parameters."Record ID to Process"));
+            OnAfterSettingFiltersForJobQueueEntryExists(Parameters, JobQueueEntry);
             if JobQueueEntry.IsEmpty() then begin
                 JobQueueEntry.SetRange("Job Queue Category Code");
                 if JobQueueEntry.IsEmpty() then
@@ -495,14 +502,19 @@
     end;
 
     internal procedure CancelNpManagedJobs(var JobQueueEntry: Record "Job Queue Entry")
-    var
-        MonitoredJobQueueMgt: Codeunit "NPR Monitored Job Queue Mgt.";
     begin
         JobQueueEntry.FindSet(true);
         repeat
-            JobQueueEntry.Cancel();
-            MonitoredJobQueueMgt.RemoveMonitoredJobQueueEntry(JobQueueEntry);
+            CancelNpManagedJob(JobQueueEntry);
         until JobQueueEntry.Next() = 0;
+    end;
+
+    internal procedure CancelNpManagedJob(JobQueueEntry: Record "Job Queue Entry")
+    var
+        MonitoredJobQueueMgt: Codeunit "NPR Monitored Job Queue Mgt.";
+    begin
+        JobQueueEntry.Cancel();
+        MonitoredJobQueueMgt.RemoveMonitoredJobQueueEntry(JobQueueEntry);
     end;
 
     local procedure HasValidStartDT(JobQueueEntry: Record "Job Queue Entry"; NotBeforeDateTime: DateTime): Boolean
@@ -1441,6 +1453,11 @@
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdateNPMonitoredJobs(var Skip: Boolean; var Handled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterSettingFiltersForJobQueueEntryExists(var Parameters: Record "Job Queue Entry"; var JobQueueEntry: Record "Job Queue Entry")
     begin
     end;
 

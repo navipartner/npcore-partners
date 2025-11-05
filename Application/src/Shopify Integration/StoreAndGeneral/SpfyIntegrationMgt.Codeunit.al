@@ -8,6 +8,9 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
     var
         _ShopifySetup: Record "NPR Spfy Integration Setup";
         _ShopifyStore: Record "NPR Spfy Store";
+#if not (BC18 or BC19 or BC20)
+        _BCCustomerTransactionSyncStatus: Option Undefined,Disabled,Enabled;
+#endif
 
     procedure CheckIsEnabled(IntegrationArea: Enum "NPR Spfy Integration Area"; ShopifyStoreCode: Code[20])
     var
@@ -81,6 +84,10 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
                 exit(ShopifyStore."Retail Voucher Integration");
             IntegrationArea::"Loyalty Points":
                 exit(ShopifyStore."Loyalty Points as Metafield");
+#if not (BC18 or BC19 or BC20)
+            IntegrationArea::"BC Customer Transactions":
+                exit(ShopifyStore."BC Customer Transactions");
+#endif
             else begin
                 AreaIsEnabled := false;
                 SpfyIntegrationEvents.OnCheckIfStoreIntegrationAreaIsEnabled(IntegrationArea, ShopifyStore.Code, AreaIsEnabled, Handled);
@@ -93,6 +100,11 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
     procedure IsEnabledForAnyStore(IntegrationArea: Enum "NPR Spfy Integration Area"): Boolean
     var
         ShopifyStore: Record "NPR Spfy Store";
+    begin
+        exit(IsEnabledForAnyStore(IntegrationArea, ShopifyStore));
+    end;
+
+    procedure IsEnabledForAnyStore(IntegrationArea: Enum "NPR Spfy Integration Area"; var ShopifyStore: Record "NPR Spfy Store"): Boolean
     begin
         if _ShopifySetup.IsEmpty() then
             exit(false);
@@ -280,10 +292,32 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
         exit(_ShopifySetup."Data Processing Handler ID");
     end;
 
+#if not (BC18 or BC19 or BC20)
+    procedure BCCustomerTransactionSyncIsEnabledForAnyStore(): Boolean
+    begin
+        if _BCCustomerTransactionSyncStatus = _BCCustomerTransactionSyncStatus::Undefined then
+            if IsEnabledForAnyStore("NPR Spfy Integration Area"::"BC Customer Transactions") then
+                _BCCustomerTransactionSyncStatus := _BCCustomerTransactionSyncStatus::Enabled
+            else
+                _BCCustomerTransactionSyncStatus := _BCCustomerTransactionSyncStatus::Disabled;
+        exit(_BCCustomerTransactionSyncStatus = _BCCustomerTransactionSyncStatus::Enabled);
+    end;
+
+    procedure IsAutoSendHistBCOrders(ShopifyStoreCode: Code[20]; var CutOffDate: Date): Boolean
+    begin
+        GetStore(ShopifyStoreCode);
+        CutOffDate := _ShopifyStore."Historical Data Cut-Off Date";
+        exit(_ShopifyStore."Auto-Send Historical BC Orders" and IsEnabled("NPR Spfy Integration Area"::"BC Customer Transactions", _ShopifyStore));
+    end;
+#endif
+
     procedure SetRereadSetup()
     begin
         Clear(_ShopifySetup);
         Clear(_ShopifyStore);
+#if not (BC18 or BC19 or BC20)
+        _BCCustomerTransactionSyncStatus := _BCCustomerTransactionSyncStatus::Undefined;
+#endif
         SelectLatestVersion();
     end;
 
@@ -328,6 +362,7 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
     procedure UpdateShopifyStoreWithDataFromShopify(var ShopifyStore: Record "NPR Spfy Store"; var ShopifyStoreID: Text[30]; ShopifyResponse: JsonToken; WithDialog: Boolean)
     var
         JsonHelper: Codeunit "NPR Json Helper";
+        SpfyPaymentGatewayHdlr: Codeunit "NPR Spfy Payment Gateway Hdlr";
         ShopifyPlan: JsonToken;
         RetrievedFieldValue: Text;
         SuccessLbl: Label 'Connection to Shopify store %1 has been successfully established. Do you want to update the store card with the data received from Shopify?', Comment = '%1 - Shopify store code';
@@ -340,7 +375,7 @@ codeunit 6184810 "NPR Spfy Integration Mgt."
                     ShopifyStore.Description := CopyStr(RetrievedFieldValue, 1, MaxStrLen(ShopifyStore.Description));
                 RetrievedFieldValue := JsonHelper.GetJText(ShopifyResponse, 'currencyCode', false);
                 if RetrievedFieldValue <> '' then
-                    ShopifyStore."Currency Code" := CopyStr(RetrievedFieldValue, 1, MaxStrLen(ShopifyStore."Currency Code"));
+                    ShopifyStore."Currency Code" := SpfyPaymentGatewayHdlr.TranslateCurrencyCode(RetrievedFieldValue);
             end;
 
         if ShopifyResponse.AsObject().Get('plan', ShopifyPlan) then begin

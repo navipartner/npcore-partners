@@ -5,7 +5,7 @@ report 6014530 "NPR Spfy Initial Voucher Sync"
     Caption = 'Initial Retail Voucher Sync. to Shopify';
     UsageCategory = None;
     ProcessingOnly = true;
-    Description = 'This batch job will do intial retail voucher migration from BC to Shopify. It will go through retail vouchers in BC and create those marked as synchronizable with your selected Shopify Store as gift cards at the store. System will also update gift cards balances at Shopify, if needed.';
+    Description = 'This batch job will do initial retail voucher migration from BC to Shopify. It will go through retail vouchers in BC and create those marked as synchronizable with your selected Shopify Store as gift cards at the store. System will also update gift cards balances at Shopify, if needed.';
 
     dataset
     {

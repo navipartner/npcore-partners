@@ -44,5 +44,11 @@ enum 6014656 "NPR Spfy Integration Area"
     {
         Caption = 'Loyalty Points';
     }
+#if not (BC18 or BC19 or BC20)
+    value(50; "BC Customer Transactions")
+    {
+        Caption = 'BC Customer Transactions';
+    }
+#endif
 }
 #endif

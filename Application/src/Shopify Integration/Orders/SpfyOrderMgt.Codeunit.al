@@ -14,10 +14,10 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         SpfyIntegrationMgt.CheckIsEnabled("NPR Spfy Integration Area"::"Sales Orders", '');
 
         ShopifyStore.SetRange(Enabled, true);
+        ShopifyStore.SetAutoCalcFields("Last Orders Imported At (FF)");
         if ShopifyStore.FindSet() then
             repeat
                 if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Sales Orders", ShopifyStore) then begin
-                    GetFromDT(ShopifyStore);
                     StartedAt := RoundDateTime(CurrentDateTime(), 1000, '<');
 
                     DownloadOrders(ShopifyStore, OrderStatus::Open);
@@ -26,8 +26,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
                     if ShopifyStore."Post on Completion" then
                         DownloadOrders(ShopifyStore, OrderStatus::Closed);
 
-                    ShopifyStore."Last Orders Imported At" := StartedAt;
-                    ShopifyStore.Modify();
+                    ShopifyStore.SetLastOrdersImportedAt(StartedAt);
                     Commit();
                 end;
             until ShopifyStore.Next() = 0;
@@ -60,7 +59,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         end;
 
         repeat
-            if SpfyCommunicationHandler.TryDownloadOrders(ShopifyStore.Code, Link, ShopifyStore."Last Orders Imported At" - 600 * 1000, Limit, SelectStr(OrderStatus + 1, OrderStatusesTxt), Orders, NextLink) then begin
+            if SpfyCommunicationHandler.TryDownloadOrders(ShopifyStore.Code, Link, GetFromDT(ShopifyStore) - 600 * 1000, Limit, SelectStr(OrderStatus + 1, OrderStatusesTxt), Orders, NextLink) then begin
                 SaveOrders(ShopifyStore, Orders, OrderStatus, ImportType);
                 Link := NextLink;
             end else
@@ -68,11 +67,11 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         until Link = '';
     end;
 
-    local procedure GetFromDT(var ShopifyStore: Record "NPR Spfy Store")
+    local procedure GetFromDT(ShopifyStore: Record "NPR Spfy Store"): DateTime
     begin
-        if ShopifyStore."Last Orders Imported At" <> 0DT then
-            exit;
-        ShopifyStore."Last Orders Imported At" := GetDefaultFromDT(ShopifyStore);
+        if ShopifyStore."Last Orders Imported At (FF)" <> 0DT then
+            exit(ShopifyStore."Last Orders Imported At (FF)");
+        exit(GetDefaultFromDT(ShopifyStore));
     end;
 
     local procedure GetDefaultFromDT(ShopifyStore: Record "NPR Spfy Store"): DateTime
@@ -108,9 +107,12 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         ImportEntry: Record "NPR Nc Import Entry";
         OutStr: OutStream;
     begin
+#if not (BC18 or BC19 or BC20)
+        if not EligibleSourceName(Order) then
+            exit;
+#endif
         if not HasReadyState(ShopifyStore, Order, OrderStatus) then
             exit;
-
         if DocExists(ImportType, ShopifyStore.Code, DocName) then
             exit;
 
@@ -125,6 +127,15 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         ImportEntry.Insert(true);
         Commit();
     end;
+
+#if not (BC18 or BC19 or BC20)
+    local procedure EligibleSourceName(Order: JsonToken): Boolean
+    var
+        SpfySendBCTransaction: Codeunit "NPR Spfy Send BC Transaction";
+    begin
+        exit(JsonHelper.GetJText(Order, 'source_name', true) <> SpfySendBCTransaction.NpRetailPOS_SourceName());
+    end;
+#endif
 
     local procedure HasReadyState(ShopifyStore: Record "NPR Spfy Store"; Order: JsonToken; OrderStatus: Option Open,Closed,Cancelled): Boolean
     begin
@@ -1685,7 +1696,6 @@ codeunit 6184814 "NPR Spfy Order Mgt."
     begin
         exit(Codeunit::"NPR Spfy Order Mgt.");
     end;
-
 
 #if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Table, Database::"Sales Line", 'OnAfterCopyFromItem', '', true, false)]

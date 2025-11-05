@@ -28,6 +28,10 @@ table 6150810 "NPR Spfy Store"
             trigger OnValidate()
             var
                 ShopifyStore: Record "NPR Spfy Store";
+                OrderMgt: Codeunit "NPR Spfy Order Mgt.";
+#if not (BC18 or BC19 or BC20)
+                SpfyExportBCTransJQ: Codeunit "NPR Spfy Export BC Trans. JQ";
+#endif
                 SpfyScheduleSend: Codeunit "NPR Spfy Schedule Send Tasks";
             begin
                 if Enabled then
@@ -37,6 +41,10 @@ table 6150810 "NPR Spfy Store"
                 ShopifyStore.Get("Code");
                 ShopifyStore.SetRecFilter();
                 SpfyScheduleSend.SetupTaskProcessingJobQueues(ShopifyStore);
+                OrderMgt.SetupJobQueues();
+#if not (BC18 or BC19 or BC20)
+                SpfyExportBCTransJQ.SetupBCTransExportJobQueues(ShopifyStore);
+#endif
                 Validate("Do Not Sync. Sales Prices");
             end;
         }
@@ -84,6 +92,16 @@ table 6150810 "NPR Spfy Store"
         {
             Caption = 'Last Orders Imported At';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-11-07';
+            ObsoleteReason = 'Replaced by the FlowField 51 "Last Orders Imported At (FF)", which is calculated based on table 6151261 "NPR Spfy Data Sync. Pointer".';
+        }
+        field(51; "Last Orders Imported At (FF)"; DateTime)
+        {
+            Caption = 'Last Orders Imported At';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = lookup("NPR Spfy Data Sync. Pointer"."Last Orders Imported At" where("Shopify Store Code" = field(Code)));
         }
         field(60; "Item List Integration"; Boolean)
         {
@@ -336,6 +354,53 @@ table 6150810 "NPR Spfy Store"
             Caption = 'Loyalty Points as Metafield';
             DataClassification = CustomerContent;
         }
+#if not (BC18 or BC19 or BC20)
+        field(300; "BC Customer Transactions"; Boolean)
+        {
+            Caption = 'Send POS Customer Purchases';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                POSEntry: Record "NPR POS Entry";
+                ShopifyStore: Record "NPR Spfy Store";
+                SpfyExportBCTransJQ: Codeunit "NPR Spfy Export BC Trans. JQ";
+            begin
+                if "BC Customer Transactions" then begin
+                    if "Historical Data Cut-Off Date" = 0D then
+                        "Historical Data Cut-Off Date" := CalcDate('<-2Y-CY>', Today());
+                    CalcFields("Last POS Entry Row Version");
+                    if "Last POS Entry Row Version" = 0 then begin
+                        POSEntry.SetCurrentKey(SystemRowVersion);
+                        if POSEntry.FindLast() then
+                            SetLastPOSRowVersion(POSEntry.SystemRowVersion);
+                    end;
+                    Modify();
+
+                    ShopifyStore := Rec;
+                    ShopifyStore.SetRecFilter();
+                    SpfyExportBCTransJQ.SetupBCTransExportJobQueues(ShopifyStore);
+                end;
+            end;
+        }
+        field(310; "Auto-Send Historical BC Orders"; Boolean)
+        {
+            Caption = 'Auto-Send Historical POS Trans.';
+            DataClassification = CustomerContent;
+        }
+        field(320; "Historical Data Cut-Off Date"; Date)
+        {
+            Caption = 'Histor.POS Trans. Cut-Off Date';
+            DataClassification = CustomerContent;
+        }
+        field(330; "Last POS Entry Row Version"; BigInteger)
+        {
+            Caption = 'Last POS Entry Row Version';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = lookup("NPR Spfy Data Sync. Pointer"."Last POS Entry Row Version" where("Shopify Store Code" = field(Code)));
+        }
+#endif
         field(500; "Auto Set as Shopify Item"; Boolean)
         {
             Caption = 'Auto Set as Shopify Item';
@@ -432,11 +497,15 @@ table 6150810 "NPR Spfy Store"
     trigger OnDelete()
     var
         SpfyAllowedFinStatus: Record "NPR Spfy Allowed Fin. Status";
+        SpfyDataSyncPointer: Record "NPR Spfy Data Sync. Pointer";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
     begin
         SpfyAllowedFinStatus.SetRange("Shopify Store Code", Code);
         if not SpfyAllowedFinStatus.IsEmpty() then
             SpfyAllowedFinStatus.DeleteAll();
+        SpfyDataSyncPointer.SetRange("Shopify Store Code", Code);
+        if not SpfyDataSyncPointer.IsEmpty() then
+            SpfyDataSyncPointer.DeleteAll();
         SpfyAssignedIDMgt.RemoveAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID");
     end;
 
@@ -529,6 +598,37 @@ table 6150810 "NPR Spfy Store"
         SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
     begin
         SpfyMetafieldMgt.SaveMetafieldMapping(RecordId(), FieldNo("Loyalty Points as Metafield"), Code, Enum::"NPR Spfy Metafield Owner Type"::CUSTOMER, MetafieldID);
+    end;
+
+    internal procedure SetLastOrdersImportedAt(NewDateTime: DateTime)
+    var
+        SpfyDataSyncPointer: Record "NPR Spfy Data Sync. Pointer";
+    begin
+        FindDataSyncPointer(SpfyDataSyncPointer);
+        SpfyDataSyncPointer."Last Orders Imported At" := NewDateTime;
+        SpfyDataSyncPointer.Modify();
+    end;
+
+#if not (BC18 or BC19 or BC20)
+    internal procedure SetLastPOSRowVersion(NewRowVersion: BigInteger)
+    var
+        SpfyDataSyncPointer: Record "NPR Spfy Data Sync. Pointer";
+    begin
+        FindDataSyncPointer(SpfyDataSyncPointer);
+        SpfyDataSyncPointer."Last POS Entry Row Version" := NewRowVersion;
+        SpfyDataSyncPointer.Modify();
+    end;
+#endif
+
+    local procedure FindDataSyncPointer(var SpfyDataSyncPointer: Record "NPR Spfy Data Sync. Pointer")
+    begin
+        TestField(Code);
+        SpfyDataSyncPointer.LockTable();
+        SpfyDataSyncPointer."Shopify Store Code" := Code;
+        if not SpfyDataSyncPointer.Find() then begin
+            SpfyDataSyncPointer.Init();
+            SpfyDataSyncPointer.Insert();
+        end;
     end;
 }
 #endif

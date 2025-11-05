@@ -236,6 +236,11 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
             Database::"Sales Invoice Header",
             Database::"NPR Magento Payment Line":
                 CreateTaskSetupEntry(Task."Task Processor Code", Task."Table No.", Codeunit::"NPR Spfy Capture Payment");
+#if not (BC18 or BC19 or BC20)
+
+            Database::"NPR POS Entry":
+                CreateTaskSetupEntry(Task."Task Processor Code", Task."Table No.", Codeunit::"NPR Spfy Send BC Transaction");
+#endif
         end;
     end;
 

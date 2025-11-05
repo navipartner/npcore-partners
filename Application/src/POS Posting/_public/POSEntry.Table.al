@@ -707,6 +707,9 @@
         key(Key15; "Posting Date", "Amount Excl. Tax", "Return Sales Quantity", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code") { }
         key(Key16; "Post Entry Status") { }
         key(Key17; "Post Sales Document Status") { }
+#if not (BC17 or BC18 or BC19 or BC20)
+        key(RowVersion; SystemRowVersion) { }
+#endif
     }
 
     fieldgroups
@@ -725,6 +728,11 @@
         POSCustomerInputEntry: Record "NPR POS Customer Input Entry";
         POSEntryMediaInfo: Record "NPR POS Entry Media Info";
         POSSaleDigitalReceiptEntry: Record "NPR POSSale Dig. Receipt Entry";
+#if not (BC17 or BC18 or BC19 or BC20)
+        ShopifyStore: Record "NPR Spfy Store";
+        SpfyStorePOSEntryLink: Record "NPR Spfy Store-POS Entry Link";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+#endif
     begin
         POSSalesLine.SetRange("POS Entry No.", "Entry No.");
         if not POSSalesLine.IsEmpty() then
@@ -755,6 +763,16 @@
         POSSaleDigitalReceiptEntry.SetRange("POS Entry No.", "Entry No.");
         if not POSSaleDigitalReceiptEntry.IsEmpty() then
             POSSaleDigitalReceiptEntry.DeleteAll();
+
+#if not (BC17 or BC18 or BC19 or BC20)
+        ShopifyStore.SetLoadFields(Code);
+        if ShopifyStore.FindSet() then
+            repeat
+                SpfyStorePOSEntryLink."POS Entry No." := Rec."Entry No.";
+                SpfyStorePOSEntryLink."Shopify Store Code" := ShopifyStore.Code;
+                SpfyAssignedIDMgt.RemoveAssignedShopifyID(SpfyStorePOSEntryLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+            until ShopifyStore.Next() = 0;
+#endif
     end;
 
     internal procedure Recalculate()
@@ -800,4 +818,30 @@
     begin
         DimMgt.ValidateShortcutDimValues(FieldNumber, ShortcutDimCode, Rec."Dimension Set ID");
     end;
+
+#if not (BC17 or BC18 or BC19 or BC20)
+    internal procedure IsSyncedToShopify(): Boolean
+    var
+        ShopifyStore: Record "NPR Spfy Store";
+    begin
+        ShopifyStore.SetLoadFields(Code);
+        if ShopifyStore.Find('-') then
+            repeat
+                if GetShopifyID(ShopifyStore.Code) <> '' then
+                    exit(true);
+            until ShopifyStore.Next() = 0;
+    end;
+
+    internal procedure GetShopifyID(ShopifyStoreCode: Code[20]): Text[30]
+    var
+        SpfyStorePOSEntryLink: Record "NPR Spfy Store-POS Entry Link";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+    begin
+        if ("Entry No." = 0) or (ShopifyStoreCode = '') then
+            exit('');
+        SpfyStorePOSEntryLink."POS Entry No." := "Entry No.";
+        SpfyStorePOSEntryLink."Shopify Store Code" := ShopifyStoreCode;
+        exit(SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStorePOSEntryLink.RecordId(), "NPR Spfy ID Type"::"Entry ID"));
+    end;
+#endif
 }

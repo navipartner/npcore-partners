@@ -22,11 +22,17 @@ table 6150807 "NPR Spfy Integration Setup"
             trigger OnValidate()
             var
                 OrderMgt: Codeunit "NPR Spfy Order Mgt.";
+#if not (BC18 or BC19 or BC20)
+                SpfyExportBCTransJQ: Codeunit "NPR Spfy Export BC Trans. JQ";
+#endif
                 SpfyScheduleSend: Codeunit "NPR Spfy Schedule Send Tasks";
             begin
                 Modify();
                 SpfyScheduleSend.SetupTaskProcessingJobQueues();
                 OrderMgt.SetupJobQueues();
+#if not (BC18 or BC19 or BC20)
+                SpfyExportBCTransJQ.SetupBCTransExportJobQueues();
+#endif
             end;
         }
         field(30; "Shopify Api Version"; Text[10])
