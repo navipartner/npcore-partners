@@ -57,7 +57,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
 #else
         PaymentLine.LockTable();
 #endif
-        PaymentLine.Get(NcTask."Record ID");
+        GetPaymentLine(NcTask."Record ID", PaymentLine);
         PaymentLine.TestField("Payment Gateway Code");
         PaymentLine.ToRequest(Request);
 
@@ -81,6 +81,72 @@ codeunit 6184804 "NPR Spfy Capture Payment"
                     AddPostingErrorMessageToNcTask(NcTask);
             end;
         end;
+    end;
+
+    local procedure GetPaymentLine(var RecID: RecordId; var PaymentLine: Record "NPR Magento Payment Line")
+    var
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        SalesInvHeader: Record "Sales Invoice Header";
+        RecRef: RecordRef;
+        Found: Boolean;
+    begin
+        if PaymentLine.Get(RecID) then
+            exit;
+
+        RecRef := RecID.GetRecord();
+        RecRef.SetTable(PaymentLine);
+
+        if (PaymentLine."Document Table No." = Database::"Sales Header") and (PaymentLine."Document No." <> '') then
+            case PaymentLine."Document Type" of
+                PaymentLine."Document Type"::Order,
+                PaymentLine."Document Type"::Invoice:
+                    begin
+#if not (BC18 or BC19 or BC20 or BC21)
+                        SalesInvHeader.ReadIsolation := IsolationLevel::ReadCommitted;
+#endif
+                        if PaymentLine."Document Type" = PaymentLine."Document Type"::Order then begin
+                            SalesInvHeader.SetCurrentKey("Order No.");
+                            SalesInvHeader.SetRange("Order No.", PaymentLine."Document No.");
+                        end else begin
+                            SalesInvHeader.SetCurrentKey("Pre-Assigned No.");
+                            SalesInvHeader.SetRange("Pre-Assigned No.", PaymentLine."Document No.");
+                        end;
+                        SalesInvHeader.SetLoadFields("No.");
+                        if SalesInvHeader.FindLast() then begin
+                            PaymentLine."Document Table No." := Database::"Sales Invoice Header";
+                            PaymentLine."Document Type" := Enum::"Sales Document Type".FromInteger(0);
+                            PaymentLine."Document No." := SalesInvHeader."No.";
+                            Found := PaymentLine.Find();
+                        end;
+                    end;
+
+                PaymentLine."Document Type"::"Return Order",
+                PaymentLine."Document Type"::"Credit Memo":
+                    begin
+#if not (BC18 or BC19 or BC20 or BC21)
+                        SalesCrMemoHeader.ReadIsolation := IsolationLevel::ReadCommitted;
+#endif
+                        if PaymentLine."Document Type" = PaymentLine."Document Type"::"Return Order" then begin
+                            SalesCrMemoHeader.SetCurrentKey("Return Order No.");
+                            SalesCrMemoHeader.SetRange("Return Order No.", PaymentLine."Document No.");
+                        end else begin
+                            SalesCrMemoHeader.SetCurrentKey("Pre-Assigned No.");
+                            SalesCrMemoHeader.SetRange("Pre-Assigned No.", PaymentLine."Document No.");
+                        end;
+                        SalesCrMemoHeader.SetLoadFields("No.");
+                        if SalesCrMemoHeader.FindLast() then begin
+                            PaymentLine."Document Table No." := Database::"Sales Cr.Memo Header";
+                            PaymentLine."Document Type" := Enum::"Sales Document Type".FromInteger(0);
+                            PaymentLine."Document No." := SalesCrMemoHeader."No.";
+                            Found := PaymentLine.Find();
+                        end;
+                    end;
+            end;
+
+        if not Found then
+            PaymentLine.Get(RecID);  //Raise error
+
+        RecID := PaymentLine.RecordId();
     end;
 
     internal procedure CaptureShopifyPayment(var PaymentLine: Record "NPR Magento Payment Line"; var NcTask: Record "NPR Nc Task"; var Response: Record "NPR PG Payment Response") Success: Boolean
