@@ -1,6 +1,9 @@
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
 enum 6059867 "NPR DynTemplateDataProvider" implements "NPR IDynamicTemplateDataProvider"
 {
+    Access = public;
+    Extensible = true;
+
     value(0; UNDEFINED)
     {
         Caption = ' ', Locked = true;
