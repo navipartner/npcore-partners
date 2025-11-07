@@ -969,6 +969,7 @@
         NewTransferLine: Record "Transfer Line";
         TransferLine2: Record "Transfer Line";
         RecRef: RecordRef;
+        SameOrderRecRef: RecordRef;
         MasterLineMapMgt: Codeunit "NPR Master Line Map Mgt.";
         LineNo: Integer;
     begin
@@ -981,16 +982,10 @@
             exit(Format(RecRef.RecordId));
         end;
 
+        RecRef.GetTable(MasterTransferLine);
         TransferLine2.SetRange("Document No.", MasterTransferLine."Document No.");
-        TransferLine2.FindLast();
-
-        if MasterLineMapMgt.IsMaster(Database::"Transfer Line", TransferLine2.SystemId) then
-            LineNo := TransferLine2."Line No." + 10000
-        else begin
-            LineNo := TransferLine2."Line No." + 10000; // fallback
-            if TransferLine2.GetBySystemId(MasterLineMapMgt.GetLastInLineSystemId(Database::"Transfer Line", MasterTransferLine.SystemId)) then
-                LineNo := TransferLine2."Line No." + 10000;
-        end;
+        SameOrderRecRef.GetTable(TransferLine2);
+        LineNo := GetNextLineNo(RecRef, SameOrderRecRef, MasterTransferLine.FieldNo("Line No."));
 
         NewTransferLine := MasterTransferLine;
         NewTransferLine."Line No." := LineNo;
