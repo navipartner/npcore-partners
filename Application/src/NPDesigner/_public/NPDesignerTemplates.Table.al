@@ -1,6 +1,6 @@
 table 6150990 "NPR NPDesignerTemplates"
 {
-    Access = Internal;
+    Access = Public;
     DataClassification = CustomerContent;
     TableType = Temporary;
     Caption = 'Design Templates';

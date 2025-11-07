@@ -98,6 +98,11 @@
                         ToolTip = 'Enable if the coupon is in use.';
                         ApplicationArea = NPRRetail;
                     }
+                    field(NPDesignerTemplateLabel; Rec.NPDesignerTemplateLabel)
+                    {
+                        ToolTip = 'Specifies the value of the Design Layout Label field.';
+                        ApplicationArea = NPRRetail;
+                    }
                 }
             }
             group("Issue Coupon")

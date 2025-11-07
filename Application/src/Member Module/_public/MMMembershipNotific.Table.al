@@ -133,15 +133,19 @@
             trigger OnLookup()
             var
                 Designer: Codeunit "NPR NPDesigner";
+                NotificationSetup: Record "NPR MM Member Notific. Setup";
             begin
-                Designer.LookupDesignLayouts(Rec.FieldCaption(NPDesignerTemplateLabel), Rec.NPDesignerTemplateId, Rec.NPDesignerTemplateLabel);
+                if (NotificationSetup.Get(Rec."Notification Code")) then
+                    Designer.LookupDesignLayouts(NotificationSetup.GetDesignerTemplateType(), Rec.FieldCaption(NPDesignerTemplateLabel), Rec.NPDesignerTemplateId, Rec.NPDesignerTemplateLabel);
             end;
 
             trigger OnValidate()
             var
                 Designer: Codeunit "NPR NPDesigner";
+                NotificationSetup: Record "NPR MM Member Notific. Setup";
             begin
-                Designer.ValidateDesignLayouts(Rec.NPDesignerTemplateId, Rec.NPDesignerTemplateLabel);
+                if (NotificationSetup.Get(Rec."Notification Code")) then
+                    Designer.ValidateDesignLayouts(NotificationSetup.GetDesignerTemplateType(), Rec.NPDesignerTemplateId, Rec.NPDesignerTemplateLabel);
             end;
         }
         field(300; "External Membership No."; Code[20])

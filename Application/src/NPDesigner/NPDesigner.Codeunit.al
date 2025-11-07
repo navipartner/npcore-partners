@@ -1,18 +1,18 @@
 codeunit 6248190 "NPR NPDesigner"
 {
     Access = Internal;
-    internal procedure LookupDesignLayouts(LookupCaption: Text; var NPDesignerTemplateId: Text[40]; var NPDesignerTemplateLabel: Text[80])
+    internal procedure LookupDesignLayouts(Type: Text; LookupCaption: Text; var NPDesignerTemplateId: Text[40]; var NPDesignerTemplateLabel: Text[80])
     var
         TemporaryNPDesignerTemplates: Record "NPR NPDesignerTemplates" temporary;
         SelectDesignLayouts: Page "NPR NPDesignerTemplateList";
     begin
 
-        GetDesignerTemplates(TemporaryNPDesignerTemplates);
+        GetDesignerTemplates(Type, TemporaryNPDesignerTemplates);
         if (TemporaryNPDesignerTemplates.FindFirst()) then;
         if (TemporaryNPDesignerTemplates.Get(NPDesignerTemplateId)) then;
 
         SelectDesignLayouts.SetData(TemporaryNPDesignerTemplates);
-        SelectDesignLayouts.SetCaption(LookupCaption);
+        SelectDesignLayouts.SetCaption(StrSubstNo('%1 - %2', Type, LookupCaption));
         SelectDesignLayouts.LookupMode(true);
         if (SelectDesignLayouts.RunModal() <> Action::LookupOK) then
             exit;
@@ -22,7 +22,7 @@ codeunit 6248190 "NPR NPDesigner"
         NPDesignerTemplateLabel := CopyStr(TemporaryNPDesignerTemplates.Description, 1, MaxStrLen(NPDesignerTemplateLabel));
     end;
 
-    internal procedure ValidateDesignLayouts(var NPDesignerTemplateId: Text[40]; var NPDesignerTemplateLabel: Text[80])
+    internal procedure ValidateDesignLayouts(Type: Text; var NPDesignerTemplateId: Text[40]; var NPDesignerTemplateLabel: Text[80])
     var
         TemporaryNPDesignerTemplates: Record "NPR NPDesignerTemplates" temporary;
         NotFound: Label 'Design Layout %1 not found';
@@ -33,7 +33,7 @@ codeunit 6248190 "NPR NPDesigner"
             exit;
         end;
 
-        GetDesignerTemplates(TemporaryNPDesignerTemplates);
+        GetDesignerTemplates(Type, TemporaryNPDesignerTemplates);
         TemporaryNPDesignerTemplates.SetFilter(Description, '%1', '@' + NPDesignerTemplateLabel + '*');
         if (not TemporaryNPDesignerTemplates.FindFirst()) then
             Error(NotFound, NPDesignerTemplateLabel);
@@ -350,13 +350,19 @@ codeunit 6248190 "NPR NPDesigner"
     end;
     #endregion
 
-    local procedure GetDesignerTemplates(var DesignerTemplates: Record "NPR NPDesignerTemplates" temporary)
+    internal procedure GetDesignerTemplates(Type: Text; var DesignerTemplates: Record "NPR NPDesignerTemplates" temporary)
     var
+        NoTemplatesFound: Label 'Could not retrieve design layouts from NP Designer: %1';
         Layouts: JsonObject;
         DesignLayouts: JsonArray;
         Result, Design, Designs : JsonToken;
     begin
-        Result := DesignerTemplateApi();
+
+        ClearLastError();
+        if (not DesignerTemplateApi(Type, Result)) then begin
+            Message(NoTemplatesFound, GetLastErrorText);
+            exit;
+        end;
 
         if (Result.IsObject()) then begin
             Layouts := Result.AsObject();
@@ -376,7 +382,9 @@ codeunit 6248190 "NPR NPDesigner"
 
     end;
 
-    procedure DesignerTemplateApi() Result: JsonToken
+    [TryFunction]
+    [NonDebuggable]
+    local procedure DesignerTemplateApi(Type: Text; Result: JsonToken)
     var
         HttpWebRequest: HttpRequestMessage;
         HttpWebResponse: HttpResponseMessage;
@@ -390,7 +398,7 @@ codeunit 6248190 "NPR NPDesigner"
         Setup.TestField(DesignerURL);
         Setup.TestField(ApiAuthorization);
 
-        HttpWebRequest.SetRequestUri(Setup.DesignerURL);
+        HttpWebRequest.SetRequestUri(StrSubstNo('%1?type=%2', Setup.DesignerURL, CopyStr(Type, 1, 50)));
         HttpWebRequest.Method('GET');
         HttpWebRequest.GetHeaders(Headers);
         Headers.Add('Authorization', StrSubstNo('Bearer %1', Setup.ApiAuthorization));
@@ -398,7 +406,7 @@ codeunit 6248190 "NPR NPDesigner"
         Client.Timeout := 60000;
         Client.Send(HttpWebRequest, HttpWebResponse);
         HttpWebResponse.Content.ReadAs(Response);
-        if not HttpWebResponse.IsSuccessStatusCode() then
+        if (not HttpWebResponse.IsSuccessStatusCode()) then
             Error('%1 - %2  \%3', HttpWebResponse.HttpStatusCode, HttpWebResponse.ReasonPhrase, Response);
 
         Result.ReadFrom(Response);

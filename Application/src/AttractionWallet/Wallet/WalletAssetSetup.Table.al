@@ -50,14 +50,14 @@ table 6150936 "NPR WalletAssetSetup"
             var
                 Designer: Codeunit "NPR NPDesigner";
             begin
-                Designer.LookupDesignLayouts(Rec.FieldCaption(NPDesignerTemplateLabel), Rec.NPDesignerTemplateId, Rec.NPDesignerTemplateLabel);
+                Designer.LookupDesignLayouts('attractionWallet', Rec.FieldCaption(NPDesignerTemplateLabel), Rec.NPDesignerTemplateId, Rec.NPDesignerTemplateLabel);
             end;
 
             trigger OnValidate()
             var
                 Designer: Codeunit "NPR NPDesigner";
             begin
-                Designer.ValidateDesignLayouts(Rec.NPDesignerTemplateId, Rec.NPDesignerTemplateLabel);
+                Designer.ValidateDesignLayouts('attractionWallet', Rec.NPDesignerTemplateId, Rec.NPDesignerTemplateLabel);
             end;
         }
     }

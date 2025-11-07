@@ -163,6 +163,32 @@
             TableRelation = "G/L Account" where("Account Type" = const(Posting),
                                                  "Direct Posting" = const(true));
         }
+
+        field(500; NPDesignerTemplateId; Text[40])
+        {
+            Caption = 'Design Layout Id';
+            DataClassification = CustomerContent;
+        }
+        field(501; NPDesignerTemplateLabel; Text[80])
+        {
+            Caption = 'Design Layout Label';
+            DataClassification = CustomerContent;
+            trigger OnLookup()
+            var
+                Designer: Codeunit "NPR NPDesigner";
+            begin
+                Designer.LookupDesignLayouts('coupon', Rec.FieldCaption(NPDesignerTemplateLabel), Rec.NPDesignerTemplateId, Rec.NPDesignerTemplateLabel);
+            end;
+
+            trigger OnValidate()
+            var
+                Designer: Codeunit "NPR NPDesigner";
+            begin
+                Designer.ValidateDesignLayouts('coupon', Rec.NPDesignerTemplateId, Rec.NPDesignerTemplateLabel);
+            end;
+        }
+
+
         field(1000; "Coupon Qty. (Open)"; Integer)
         {
             CalcFormula = count("NPR NpDc Coupon" where("Coupon Type" = field(Code),

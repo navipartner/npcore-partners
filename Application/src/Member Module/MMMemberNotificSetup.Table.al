@@ -151,14 +151,14 @@
             var
                 Designer: Codeunit "NPR NPDesigner";
             begin
-                Designer.LookupDesignLayouts(Rec.FieldCaption(NPDesignerTemplateLabel), Rec.NPDesignerTemplateId, Rec.NPDesignerTemplateLabel);
+                Designer.LookupDesignLayouts(GetDesignerTemplateType(Rec.ManifestAsset), Rec.FieldCaption(NPDesignerTemplateLabel), Rec.NPDesignerTemplateId, Rec.NPDesignerTemplateLabel);
             end;
 
             trigger OnValidate()
             var
                 Designer: Codeunit "NPR NPDesigner";
             begin
-                Designer.ValidateDesignLayouts(Rec.NPDesignerTemplateId, Rec.NPDesignerTemplateLabel);
+                Designer.ValidateDesignLayouts(GetDesignerTemplateType(Rec.ManifestAsset), Rec.NPDesignerTemplateId, Rec.NPDesignerTemplateLabel);
             end;
         }
         field(212; ManifestAsset; Option)
@@ -186,5 +186,27 @@
     fieldgroups
     {
     }
+
+    internal procedure GetDesignerTemplateType(): Text
+    begin
+        exit(GetDesignerTemplateType(Rec.ManifestAsset));
+    end;
+
+    local procedure GetDesignerTemplateType(AssetType: Option): Text
+    var
+        SelectAssetTyp: Label 'No valid Manifest Asset type selected.';
+    begin
+        case AssetType of
+            Rec.ManifestAsset::MEMBERSHIP:
+                exit('membership');
+            Rec.ManifestAsset::MEMBER:
+                exit('member');
+            Rec.ManifestAsset::MEMBERSHIP_CARD:
+                exit('membershipcard');
+            else
+                Error(SelectAssetTyp);
+        end;
+    end;
+
 }
 

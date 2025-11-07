@@ -135,14 +135,14 @@
             var
                 Designer: Codeunit "NPR NPDesigner";
             begin
-                Designer.LookupDesignLayouts(Rec.FieldCaption(PDFDesignerTemplateLabel), Rec.PDFDesignerTemplateId, Rec.PDFDesignerTemplateLabel);
+                Designer.LookupDesignLayouts('voucher', Rec.FieldCaption(PDFDesignerTemplateLabel), Rec.PDFDesignerTemplateId, Rec.PDFDesignerTemplateLabel);
             end;
 
             trigger OnValidate()
             var
                 Designer: Codeunit "NPR NPDesigner";
             begin
-                Designer.ValidateDesignLayouts(Rec.PDFDesignerTemplateId, Rec.PDFDesignerTemplateLabel);
+                Designer.ValidateDesignLayouts('voucher', Rec.PDFDesignerTemplateId, Rec.PDFDesignerTemplateLabel);
             end;
         }
 
