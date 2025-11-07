@@ -64,6 +64,10 @@ page 6150777 "NPR APIV1 PBISalesCrMemo"
                 {
                     Caption = 'Dimension Set ID', Locked = true;
                 }
+                field(systemCreatedAt; Rec.SystemCreatedAt)
+                {
+                    Caption = 'System Created At', Locked = true;
+                }
             }
         }
     }

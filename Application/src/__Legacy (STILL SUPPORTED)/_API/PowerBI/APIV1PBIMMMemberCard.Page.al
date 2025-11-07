@@ -111,6 +111,10 @@ page 6150788 "NPR APIV1 PBIMMMemberCard"
                 {
                     Caption = 'Valid Until';
                 }
+                field(systemCreatedAt; Rec.SystemCreatedAt)
+                {
+                    Caption = 'System Created At', Locked = true;
+                }
 #if not (BC17 or BC18 or BC19 or BC20)
                 field(systemRowVersion; Rec.SystemRowVersion)
                 {

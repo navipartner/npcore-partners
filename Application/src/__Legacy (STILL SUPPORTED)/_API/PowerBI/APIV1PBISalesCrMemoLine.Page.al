@@ -84,6 +84,10 @@ page 6150778 "NPR APIV1 PBISalesCrMemoLine"
                 {
                     Caption = 'Description', Locked = true;
                 }
+                field(systemCreatedAt; Rec.SystemCreatedAt)
+                {
+                    Caption = 'System Created At', Locked = true;
+                }
             }
         }
     }

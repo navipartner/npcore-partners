@@ -416,6 +416,10 @@ page 6151543 "NPR APIV1 PBISales Inv. Line"
                 {
                     Caption = 'Work Type Code', Locked = true;
                 }
+                field(systemCreatedAt; Rec.SystemCreatedAt)
+                {
+                    Caption = 'System Created At', Locked = true;
+                }
             }
         }
     }

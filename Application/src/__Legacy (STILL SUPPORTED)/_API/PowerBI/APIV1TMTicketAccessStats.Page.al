@@ -128,6 +128,10 @@ page 6151360 "NPR APIV1 TMTicketAccessStats"
                 {
                     Caption = 'Last Modified Date Filter', Locked = true;
                 }
+                field(systemCreatedAt; Rec.SystemCreatedAt)
+                {
+                    Caption = 'System Created At', Locked = true;
+                }
             }
         }
     }

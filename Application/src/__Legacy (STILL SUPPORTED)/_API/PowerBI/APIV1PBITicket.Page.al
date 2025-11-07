@@ -100,6 +100,10 @@ page 6059939 "NPR APIV1 PBITicket"
                 {
                     Caption = 'Last Modified Date Time', Locked = true;
                 }
+                field(systemCreatedAt; Rec.SystemCreatedAt)
+                {
+                    Caption = 'System Created At', Locked = true;
+                }
 #if not (BC17 or BC18 or BC19 or BC20)
                 field(systemRowVersion; Rec.SystemRowVersion)
                 {

@@ -536,6 +536,10 @@ page 6151542 "NPR APIV1 PBISales Inv. Hdr"
                 {
                     Caption = 'Last Modified Date Filter', Locked = true;
                 }
+                field(systemCreatedAt; Rec.SystemCreatedAt)
+                {
+                    Caption = 'System Created At', Locked = true;
+                }
             }
         }
     }

@@ -112,6 +112,10 @@ page 6059935 "NPR APIV1 PBIPOSEntry"
                 {
                     Caption = 'Last Modified Date Filter', Locked = true;
                 }
+                field(systemCreatedAt; Rec.SystemCreatedAt)
+                {
+                    Caption = 'System Created At', Locked = true;
+                }
 #if not (BC17 or BC18 or BC19 or BC20)
                 field(systemRowVersion; Rec.SystemRowVersion)
                 {
