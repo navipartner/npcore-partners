@@ -62,5 +62,22 @@ codeunit 6248373 "NPR NP Email"
         RecRef.GetTable(RecordVariant);
         NPEmailImpl.SendEmail(TemplateId, RecipientAddress, PreferredLanguage, RecRef);
     end;
+
+    /// <summary>
+    /// Get the list of template Ids for a given data provider
+    /// </summary>
+    /// <param name="DataProvider">Data provider enum value</param>
+    /// <returns>Temporary record of type "NPR NPEmailTemplateBuffer" containing the template Ids and descriptions</returns>
+    procedure GetTemplates(DataProvider: Enum "NPR DynTemplateDataProvider") TempEmailTemplateBuffer: Record "NPR NPEmailTemplateBuffer" temporary
+    var
+        EmailTemplate: Record "NPR NPEmailTemplate";
+    begin
+        EmailTemplate.SetFilter(DataProvider, '=%1', DataProvider);
+        if (EmailTemplate.FindSet()) then
+            repeat
+                TempEmailTemplateBuffer.TransferFields(EmailTemplate, true);
+                TempEmailTemplateBuffer.Insert();
+            until EmailTemplate.Next() = 0;
+    end;
 }
 #endif
