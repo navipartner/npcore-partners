@@ -185,9 +185,9 @@ codeunit 6060127 "NPR MM Membership Mgt."
     /// <param name="Explanation">Output parameter providing an explanation of the actions taken during the compaction process including a fail explanation.</param>
     procedure CompactMembersOnUniqueIdChangeNoUI(MemberToKeep: Record "NPR MM Member"; var ConflictExists: Boolean; var ConflictingMembersMerged: Boolean; var Explanation: Text): Boolean
     var
-        UpdateMemberUniqueId: Page "NPR MemberUpdateUniqueId";
+        MergeHandler: Codeunit "NPR MemberMergeHandler";
     begin
-        exit(UpdateMemberUniqueId.CompactMembersOnUniqueIdChangeNoUI(MemberToKeep, ConflictExists, ConflictingMembersMerged, Explanation));
+        exit(MergeHandler.CompactMembersOnUniqueIdChange(MemberToKeep, ConflictExists, ConflictingMembersMerged, Explanation));
     end;
 
 }
