@@ -54,7 +54,6 @@ codeunit 6248515 "NPR Spfy Update Adyen Tr. Info"
         NotificationRequestItem: JsonToken;
         WebhookDataToken: JsonToken;
         MerchantReference: Text;
-        TransactionDetailsUpdated: Boolean;
         TransactionExists: Boolean;
     begin
         if not GetWebhookData(AdyenWebhook, WebhookDataToken) then
@@ -62,18 +61,31 @@ codeunit 6248515 "NPR Spfy Update Adyen Tr. Info"
 
         WebhookDataToken.AsObject().Get('notificationItems', NotificationItem);
         NotificationItem.AsArray().Get(0, NotificationRequestItem);
-        if NotificationRequestItem.IsObject() then
-            MerchantReference := JsonHelper.GetJText(NotificationRequestItem, 'NotificationRequestItem.merchantReference', true);
+        if not NotificationRequestItem.IsObject() then
+            exit;
+        MerchantReference := JsonHelper.GetJText(NotificationRequestItem, 'NotificationRequestItem.merchantReference', true);
 
+        PaymentLine.SetCurrentKey("Transaction ID");
         TransactionExists := TransactionExistsByMerchantRef(PaymentLine, MerchantReference);
         if not TransactionExists then
             TransactionExists := TransactionExistsByPSPRef(PaymentLine, AdyenWebhook."PSP Reference");
 
-        if TransactionExists and NotificationRequestItem.IsObject() then
-            TransactionDetailsUpdated := UpdateTransactionDetails(PaymentLine, NotificationRequestItem);
+        if TransactionExists then
+            if UpdateTransactionDetails(PaymentLine, NotificationRequestItem) then
+                exit;
+        SaveTransactionDetails(NotificationRequestItem);
+    end;
 
-        if not TransactionDetailsUpdated then
-            SaveTransactionDetails(NotificationRequestItem);
+    internal procedure SyncShopifyTransactionWithReconLine(ReconLine: Record "NPR Adyen Recon. Line"): Boolean
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+    begin
+        PaymentLine.SetCurrentKey("Transaction ID");
+        if TransactionExistsByMerchantRef(PaymentLine, ReconLine."Merchant Reference") then begin
+            if not UpdateTransactionDetails(PaymentLine, ReconLine) then
+                SaveTransactionDetails(ReconLine);
+            exit(true);
+        end;
     end;
 
     local procedure TransactionExistsByMerchantRefAndPSP(var SpfyTransactionSync: Record "NPR Spfy Trans. PSP Details"; PaymentLine: Record "NPR Magento Payment Line"): Boolean
@@ -109,24 +121,32 @@ codeunit 6248515 "NPR Spfy Update Adyen Tr. Info"
         PrepareWebhookDataFields(NotificationRequestItem);
     end;
 
+    local procedure SaveTransactionDetails(ReconLine: Record "NPR Adyen Recon. Line")
+    begin
+        PrepareWebhookDataFields(ReconLine);
+    end;
+
     local procedure UpdateTransactionDetails(var PaymentLine: Record "NPR Magento Payment Line"; NotificationRequestItem: JsonToken): Boolean
     var
-        PaymentLine2: Record "NPR Magento Payment Line";
         SpfyTransactionSync: Record "NPR Spfy Trans. PSP Details";
     begin
-        if not PaymentLine.FindSet(true) then
-            exit;
+        PaymentLine.FindSet(true);
 
         SpfyTransactionSync := PrepareWebhookDataFields(NotificationRequestItem);
-        repeat
-            PaymentLine2 := PaymentLine;
+        UpdateTransactionDetailsFromSpfyTransactionSync(PaymentLine, SpfyTransactionSync);
 
-            UpdateTransactionDetails(SpfyTransactionSync, PaymentLine2);
+        TryDeleteSpfyTransactionSync(SpfyTransactionSync.SystemId);
+        exit(true);
+    end;
 
-            if Format(PaymentLine2) <> Format(PaymentLine) then begin
-                PaymentLine2.Modify();
-            end;
-        until PaymentLine.Next() = 0;
+    local procedure UpdateTransactionDetails(var PaymentLine: Record "NPR Magento Payment Line"; ReconLine: Record "NPR Adyen Recon. Line"): Boolean
+    var
+        SpfyTransactionSync: Record "NPR Spfy Trans. PSP Details";
+    begin
+        PaymentLine.FindSet(true);
+
+        SpfyTransactionSync := PrepareWebhookDataFields(ReconLine);
+        UpdateTransactionDetailsFromSpfyTransactionSync(PaymentLine, SpfyTransactionSync);
 
         TryDeleteSpfyTransactionSync(SpfyTransactionSync.SystemId);
         exit(true);
@@ -156,6 +176,51 @@ codeunit 6248515 "NPR Spfy Update Adyen Tr. Info"
         SpfyTransactionSync."Card Added Brand" := CopyStr(JsonHelper.GetJText(NotificationRequestItem, 'NotificationRequestItem.additionalData.checkout.cardAddedBrand', false), 1, MaxStrLen(SpfyTransactionSync."Card Added Brand"));
         SpfyTransactionSync."Merchant Order Reference" := CopyStr(JsonHelper.GetJText(NotificationRequestItem, 'NotificationRequestItem.additionalData.merchantOrderReference', false), 1, MaxStrLen(SpfyTransactionSync."Merchant Order Reference"));
         SpfyTransactionSync.Insert();
+    end;
+
+    local procedure PrepareWebhookDataFields(ReconLine: Record "NPR Adyen Recon. Line") SpfyTransactionSync: Record "NPR Spfy Trans. PSP Details";
+    begin
+        SpfyTransactionSync.SetCurrentKey("Transaction PSP", "PSP Reference");
+        SpfyTransactionSync.SetRange("Transaction PSP", SpfyTransactionSync."Transaction PSP"::Adyen);
+        SpfyTransactionSync.SetRange("PSP Reference", ReconLine."PSP Reference");
+        if SpfyTransactionSync.FindFirst() then
+            exit;
+
+        SpfyTransactionSync.Init();
+        SpfyTransactionSync."Transaction PSP" := SpfyTransactionSync."Transaction PSP"::Adyen;
+        SpfyTransactionSync."Entry No." := 0;
+        SpfyTransactionSync."Payment Method" := ReconLine."Payment Method";
+        SpfyTransactionSync."Merchant Account" := ReconLine."Merchant Account";
+        SpfyTransactionSync."Merchant Reference" := ReconLine."Merchant Reference";
+        SpfyTransactionSync."PSP Reference" := ReconLine."PSP Reference";
+        SpfyTransactionSync."Card Summary" := CopyStr(ReconLine."Card Number Summary", 1, MaxStrLen(SpfyTransactionSync."Card Summary"));
+        SpfyTransactionSync.Amount := Abs(ReconLine."Amount (TCY)");
+        SpfyTransactionSync."Card Added Brand" := CopyStr(ReconLine."Global Card Brand", 1, MaxStrLen(SpfyTransactionSync."Card Added Brand"));
+        SpfyTransactionSync."Merchant Order Reference" := ReconLine."Merchant Order Reference";
+        SpfyTransactionSync.Insert();
+    end;
+
+    local procedure PaymentLinesForSpfySyncAreNotEqual(PaymentLine: Record "NPR Magento Payment Line"; PaymentLine2: Record "NPR Magento Payment Line"): Boolean
+    begin
+        exit((PaymentLine2."Transaction ID" <> PaymentLine."Transaction ID") or
+            (PaymentLine2."Card Summary" <> PaymentLine."Card Summary") or
+            (PaymentLine2."External Payment Method Code" <> PaymentLine."External Payment Method Code") or
+            (PaymentLine2."Expiry Date Text" <> PaymentLine."Expiry Date Text"));
+    end;
+
+    local procedure UpdateTransactionDetailsFromSpfyTransactionSync(var PaymentLine: Record "NPR Magento Payment Line"; SpfyTransactionSync: Record "NPR Spfy Trans. PSP Details")
+    var
+        PaymentLine2: Record "NPR Magento Payment Line";
+    begin
+        repeat
+            PaymentLine2 := PaymentLine;
+
+            UpdateTransactionDetails(SpfyTransactionSync, PaymentLine2);
+
+            if PaymentLinesForSpfySyncAreNotEqual(PaymentLine, PaymentLine2) then begin
+                PaymentLine2.Modify();
+            end;
+        until PaymentLine.Next() = 0;
     end;
 
 #if BC18 or BC19 or BC20 or BC21

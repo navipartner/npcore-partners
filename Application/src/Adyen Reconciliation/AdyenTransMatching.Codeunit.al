@@ -604,7 +604,11 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         MatchingFound: Boolean;
     begin
         PaymentGateway.Reset();
+#if not BC17
+        PaymentGateway.SetFilter("Integration Type", '%1|%2', Enum::"NPR PG Integrations"::Adyen, Enum::"NPR PG Integrations"::Shopify);
+#else
         PaymentGateway.SetRange("Integration Type", Enum::"NPR PG Integrations"::Adyen);
+#endif
         if PaymentGateway.FindSet() then begin
             repeat
                 FilterPGCodes += PaymentGateway.Code + '|';
@@ -617,7 +621,7 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
         MagentoPaymentLine.Reset();
         MagentoPaymentLine.SetRange("Transaction ID", ReconciliationLine."PSP Reference");
         MagentoPaymentLine.SetFilter("Payment Gateway Code", FilterPGCodes);
-        MagentoPaymentLine.SetFilter(Amount, '=%1', Abs(ReconciliationLine."Amount (TCY)"));
+        MagentoPaymentLine.SetRange(Amount, Abs(ReconciliationLine."Amount (TCY)"));
 
         if not (ReconciliationLine."Transaction Type" in
             [ReconciliationLine."Transaction Type"::Chargeback,
@@ -631,7 +635,10 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             MagentoPaymentLine.SetRange(Reversed, false);
 
         if not MagentoPaymentLine.Find('-') then
-            exit;
+#if not BC17
+            if not FilterShopifyPaymentLine(MagentoPaymentLine, ReconciliationLine) then
+#endif
+                exit;
 
         MatchingFound := false;
 #if not (BC17 or BC18 or BC19 or BC20 or BC21)
@@ -716,6 +723,33 @@ codeunit 6184779 "NPR Adyen Trans. Matching"
             end;
         MatchedEntries += 1;
     end;
+
+#if not BC17
+    local procedure FilterShopifyPaymentLine(var PaymentLine: Record "NPR Magento Payment Line"; ReconciliationLine: Record "NPR Adyen Recon. Line"): Boolean
+    var
+        ShopifyAssignedID: Record "NPR Spfy Assigned ID";
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        SpfyUpdateAdyenTrInfo: Codeunit "NPR Spfy Update Adyen Tr. Info";
+        MerchantReference: Text[80];
+        TransactionIsShopifyRelated: Boolean;
+    begin
+        if ReconciliationLine."Merchant Reference" = '' then
+            exit;
+        SpfyAssignedIDMgt.FilterWhereUsedInTable(Database::"NPR Spfy Store", "NPR Spfy ID Type"::"Entry ID", '', ShopifyAssignedID);
+        ShopifyAssignedID.SetFilter("Shopify ID", '<>%1', '');
+        if not ShopifyAssignedID.Find('-') then
+            exit;
+        MerchantReference := ReconciliationLine."Merchant Reference";
+        repeat
+            TransactionIsShopifyRelated := MerchantReference.Contains(ShopifyAssignedID."Shopify ID");
+        until TransactionIsShopifyRelated or (ShopifyAssignedID.Next() = 0);
+        if not TransactionIsShopifyRelated then
+            exit;
+        if not SpfyUpdateAdyenTrInfo.SyncShopifyTransactionWithReconLine(ReconciliationLine) then
+            exit;
+        exit(PaymentLine.Find('-'));
+    end;
+#endif
     #endregion
 
     #region Reconciling
