@@ -1144,11 +1144,11 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         UnknownIdErr: Label 'Unknown %1: %2%3';
     begin
         OrderLineID := GetOrderID(OrderLine);
-        IsGiftCard := OrderLineIsGiftCard(OrderLine, IsNPGiftCard);
-        if IsGiftCard then begin
-            GetOrderLineProperties(OrderLine, PropertyDict);
-            GetVoucherType(ShopifyStoreCode, PropertyDict, VoucherType);
-        end else
+        GetOrderLineProperties(OrderLine, PropertyDict);
+        IsGiftCard := OrderLineIsGiftCard(OrderLine, PropertyDict, IsNPGiftCard);
+        if IsGiftCard then
+            GetVoucherType(ShopifyStoreCode, PropertyDict, VoucherType)
+        else
             if not SpfyItemMgt.ParseItem(OrderLine, ItemVariant, Sku) then
                 Error(UnknownIdErr, 'sku', Sku, StrSubstNo(' (line ID: %1, name: %2)', OrderLineID, JsonHelper.GetJText(OrderLine, 'name', false)));
 
@@ -1314,21 +1314,16 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         until FulfillmEntryDetailBuffer.Next() = 0;
     end;
 
-    local procedure OrderLineIsGiftCard(OrderLine: JsonToken; var IsNPGiftCard: Boolean): Boolean
+    local procedure OrderLineIsGiftCard(OrderLine: JsonToken; PropertyDict: Dictionary of [Text, Text]; var IsNPGiftCard: Boolean): Boolean
     var
-        OrderLineProperties: JsonToken;
-        OrderLineProperty: JsonToken;
+        PropertyValue: Text;
     begin
         IsNPGiftCard := false;
         if JsonHelper.GetJBoolean(OrderLine, 'gift_card', false) then
             exit(true);
-        if not (JsonHelper.GetJsonToken(OrderLine, 'properties', OrderLineProperties) and OrderLineProperties.IsArray()) then
-            exit(false);
-        foreach OrderLineProperty in OrderLineProperties.AsArray() do
-            if JsonHelper.GetJText(OrderLineProperty, 'name', false) = '_is_giftcard' then begin
-                IsNPGiftCard := JsonHelper.GetJBoolean(OrderLineProperty, 'value', false);
-                exit(IsNPGiftCard);
-            end;
+        if PropertyDict.Get('is_giftcard', PropertyValue) then
+            IsNPGiftCard := PropertyValue.ToLower() in ['1', 'true', 'on'];
+        exit(IsNPGiftCard);
     end;
 
     local procedure GetOrderLineProperties(OrderLine: JsonToken; var PropertyDict: Dictionary of [Text, Text]): Boolean
@@ -1342,12 +1337,50 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         if not JsonHelper.GetJsonToken(OrderLine, 'properties', OrderLineProperties) or not OrderLineProperties.IsArray() then
             exit(false);
         foreach OrderLineProperty in OrderLineProperties.AsArray() do begin
-            PropertyName := JsonHelper.GetJText(OrderLineProperty, 'name', false);
+            PropertyName := JsonHelper.GetJText(OrderLineProperty, 'name', false).TrimStart('_');
             if PropertyName <> '' then begin
                 PropertyValue := JsonHelper.GetJText(OrderLineProperty, 'value', false);
+                AddPropertyToDict(PropertyName, PropertyValue, PropertyDict);
+            end;
+        end;
+    end;
+
+    local procedure AddPropertyToDict(PropertyName: Text; PropertyValue: Text; var PropertyDict: Dictionary of [Text, Text])
+    var
+        Properties: JsonToken;
+        PropertyKeys: List of [Text];
+        PropertyKey: Text;
+    begin
+        if PropertyName.ToLower() = 'json_data' then begin
+            Properties.ReadFrom(PropertyValue);
+            if Properties.IsObject() then begin
+                PropertyKeys := Properties.AsObject().Keys();
+                foreach PropertyKey in PropertyKeys do begin
+                    PropertyValue := JsonHelper.GetJText(Properties, PropertyKey, false);
+                    AddPropertyToDict(PropertyKey, PropertyValue, PropertyDict);
+                end;
+            end;
+        end else begin
+            PropertyName := AdjustPropertyName(PropertyName);
+            if not PropertyDict.ContainsKey(PropertyName) then
                 if PropertyValue <> '' then
                     PropertyDict.Add(PropertyName, PropertyValue);
-            end;
+        end;
+    end;
+
+    local procedure AdjustPropertyName(PropertyName: Text): Text
+    begin
+        case PropertyName.ToLower() of
+            'recipient email':
+                exit('recipient_email');
+            'recipient name':
+                exit('recipient_name');
+            'template suffix':
+                exit('template_suffix');
+            'send on':
+                exit('send_on');
+            else
+                exit(PropertyName.ToLower());
         end;
     end;
 
@@ -1357,7 +1390,7 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         PropertyValue: Text;
         VoucherTypeCode: Code[20];
     begin
-        if PropertyDict.Get('_np_voucher_type', PropertyValue) then
+        if PropertyDict.Get('np_voucher_type', PropertyValue) then
             VoucherTypeCode := CopyStr(PropertyValue, 1, MaxStrLen(VoucherTypeCode));
         if (VoucherTypeCode = '') or not VoucherType.Get(VoucherTypeCode) then begin
             ShopifyStore.Get(ShopifyStoreCode);
@@ -1380,15 +1413,15 @@ codeunit 6184814 "NPR Spfy Order Mgt."
             PropertyValue := PropertyDict.Get(PropertyKey);
             if PropertyValue <> '' then
                 case PropertyKey of
-                    'Recipient Email':
+                    'recipient_email':
                         NpRvSalesLine."Spfy Recipient E-mail" := CopyStr(PropertyValue, 1, MaxStrLen(NpRvSalesLine."Spfy Recipient E-mail"));
-                    'Recipient Name':
+                    'recipient_name':
                         NpRvSalesLine."Spfy Recipient Name" := CopyStr(PropertyValue, 1, MaxStrLen(NpRvSalesLine."Spfy Recipient Name"));
-                    'Message':
+                    'message':
                         NpRvSalesLine."Voucher Message" := CopyStr(PropertyValue, 1, MaxStrLen(NpRvSalesLine."Voucher Message"));
-                    'Template Suffix':
+                    'template_suffix':
                         NpRvSalesLine."Spfy Liquid Template Suffix" := CopyStr(PropertyValue, 1, MaxStrLen(NpRvSalesLine."Spfy Liquid Template Suffix"));
-                    'Send On':
+                    'send_on':
                         if Evaluate(NpRvSalesLine."Spfy Send on", PropertyValue, 9) then;
                 end;
         end;
