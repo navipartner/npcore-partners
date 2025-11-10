@@ -2126,7 +2126,10 @@
             if not MembershipEntryLink.FindFirst() then
                 exit;
             if MembershipEntryLink."Context Period Starting Date" <> 0D then
-                StartDate := MembershipEntryLink."Context Period Starting Date";
+                if MembershipEntryLink.Context = MembershipEntryLink.Context::CANCEL then
+                    StartDate := CalcDate('<+1D>', MembershipEntryLink."Context Period Starting Date")
+                else
+                    StartDate := MembershipEntryLink."Context Period Starting Date";
         end;
     end;
 
@@ -2162,7 +2165,10 @@
             if not MembershipEntryLink.FindFirst() then
                 exit;
             if (MembershipEntryLink."Context Period Starting Date" <> 0D) and (MembershipEntryLink."Context Period Ending Date" >= MembershipEntryLink."Context Period Starting Date") then
-                NoOfPeriods := CountDefNoOfPeriodsBetweenDates(MembershipEntryLink."Context Period Starting Date", MembershipEntryLink."Context Period Ending Date");
+                if MembershipEntryLink.Context = MembershipEntryLink.Context::CANCEL then
+                    NoOfPeriods := CountDefNoOfPeriodsBetweenDates(CalcDate('<+1D>', MembershipEntryLink."Context Period Starting Date"), MembershipEntryLink."Context Period Ending Date")
+                else
+                    NoOfPeriods := CountDefNoOfPeriodsBetweenDates(MembershipEntryLink."Context Period Starting Date", MembershipEntryLink."Context Period Ending Date");
         end;
     end;
 
