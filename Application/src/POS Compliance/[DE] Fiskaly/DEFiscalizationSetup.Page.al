@@ -24,6 +24,11 @@ page 6184744 "NPR DE Fiscalization Setup"
                         EnabledValueChanged := true;
                 end;
             }
+            field("Enable UUIDv4 Check"; Rec."Enable UUIDv4 Check")
+            {
+                ApplicationArea = NPRRetail;
+                ToolTip = 'Specifies the value of the Enable UUIDv4 Check field.', Comment = '%';
+            }
         }
     }
 

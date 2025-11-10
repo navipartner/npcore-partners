@@ -2412,10 +2412,15 @@
 #ELSE
         Regex: Codeunit Regex;
 #ENDIF
+        DEFiscalizationSetup: Record "NPR DE Fiscalization Setup";
         UUIDv4StandardErr: Label 'GUID %1 is not according to UUIDv4 standard pattern.', Comment = '%1 - GUID value';
         UUIDv4StandardPatternLbl: Label '^[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}$', Locked = true;
         GUIDToCheckAsText: Text;
     begin
+        DEFiscalizationSetup.Get();
+        if not DEFiscalizationSetup."Enable UUIDv4 Check" then
+            exit;
+
         GUIDToCheckAsText := Format(GUIDToCheck, 0, 4).ToLower();
         if not Regex.IsMatch(GUIDToCheckAsText, UUIDv4StandardPatternLbl) then
             Error(UUIDv4StandardErr, GUIDToCheck);

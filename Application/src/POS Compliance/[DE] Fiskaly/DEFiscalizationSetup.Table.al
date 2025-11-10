@@ -18,5 +18,10 @@ table 6150916 "NPR DE Fiscalization Setup"
             Caption = 'Enable DE Fiscalization';
             DataClassification = CustomerContent;
         }
+        field(5; "Enable UUIDv4 Check"; Boolean)
+        {
+            Caption = 'Enable UUIDv4 Check';
+            DataClassification = CustomerContent;
+        }
     }
 }
