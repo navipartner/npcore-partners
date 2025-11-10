@@ -52,10 +52,6 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
                 CreateAdditionalGLEntries(SalesCrMemoHeader, RetailValueEntry, RSRetailCalculationType::VAT);
                 CreateAdditionalGLEntries(SalesCrMemoHeader, RetailValueEntry, RSRetailCalculationType::Margin);
                 CreateAdditionalGLEntries(SalesCrMemoHeader, RetailValueEntry, RSRetailCalculationType::"Margin with VAT");
-                RSRLocalizationMgt.InsertGLItemLedgerRelations(RetailValueEntry, GetRSAccountNoFromSetup(SalesCrMemoHeader, RSRetailCalculationType::VAT));
-                RSRLocalizationMgt.InsertGLItemLedgerRelations(RetailValueEntry, GetRSAccountNoFromSetup(SalesCrMemoHeader, RSRetailCalculationType::Margin));
-                if RetailValueEntry."Cost Amount (Actual)" <> 0 then
-                    RSRLocalizationMgt.InsertGLItemLedgerRelations(RetailValueEntry, GetRSAccountNoFromSetup(SalesCrMemoHeader, RSRetailCalculationType::"Margin with VAT"));
             end;
 
             CheckIfNivelationNeeded(SalesCrMemoHeader);
@@ -163,6 +159,8 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
         end;
 
         PostGLAcc(GenJournalLine, GLEntry);
+
+        RSRLocalizationMgt.InsertGLItemLedgerRelation(GenJnlPostLine, GLEntry."Entry No.", CalculationValueEntry."Entry No.");
     end;
 
     local procedure ValidateGenJnlLineNegativeAmounts(var GenJournalLine: Record "Gen. Journal Line"; SalesCrMemoHeader: Record "Sales Cr.Memo Header"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type"; CalculationValueEntry: Record "Value Entry")
@@ -554,8 +552,6 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
 
         CreateAdditionalGLEntries(SalesCrMemoHeader, COGSCorrectionValueEntry, RSRetailCalculationType::"COGS Correction");
         CreateAdditionalGLEntries(SalesCrMemoHeader, COGSCorrectionValueEntry, RSRetailCalculationType::"Counter COGS Correction");
-        RSRLocalizationMgt.InsertGLItemLedgerRelations(COGSCorrectionValueEntry, GetRSAccountNoFromSetup(SalesCrMemoHeader, RSRetailCalculationType::"COGS Correction"));
-        RSRLocalizationMgt.InsertGLItemLedgerRelations(COGSCorrectionValueEntry, GetRSAccountNoFromSetup(SalesCrMemoHeader, RSRetailCalculationType::"Counter COGS Correction"));
         RSRLocalizationMgt.InsertCOGSCorrectionValueEntryMappingEntry(COGSCorrectionValueEntry);
     end;
 
@@ -580,9 +576,6 @@ codeunit 6184743 "NPR RS SalesCrMemo GL Addition"
 
         CreateAdditionalGLEntries(SalesCrMemoHeader, StdCorrectionValueEntry, RSRetailCalculationType::"Standard Correction");
         CreateAdditionalGLEntries(SalesCrMemoHeader, StdCorrectionValueEntry, RSRetailCalculationType::"Counter Std Correction");
-
-        RSRLocalizationMgt.InsertGLItemLedgerRelations(StdCorrectionValueEntry, GetCOGSAccountFromGenPostingSetup(SalesCrMemoHeader));
-        RSRLocalizationMgt.InsertGLItemLedgerRelations(StdCorrectionValueEntry, GetRSAccountNoFromSetup(SalesCrMemoHeader, RSRetailCalculationType::"Counter Std Correction"));
     end;
 
     local procedure InsertRetailValueEntry(var RetailValueEntry: Record "Value Entry"; SalesCrMemoHeader: Record "Sales Cr.Memo Header"; StdValueEntry: Record "Value Entry"; StdCorrectionValueEntry: Record "Value Entry"; SumOfCOGSCostPerUnit: Decimal; SumOfCOGSCostAmtAct: Decimal)

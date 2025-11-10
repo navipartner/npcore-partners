@@ -48,10 +48,6 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
                 CreateAdditionalGLEntries(RetailValueEntry, RSRetailCalculationType::"Margin with VAT");
                 CreateAdditionalGLEntries(RetailValueEntry, RSRetailCalculationType::VAT);
                 CreateAdditionalGLEntries(RetailValueEntry, RSRetailCalculationType::Margin);
-
-                RSRLocalizationMgt.InsertGLItemLedgerRelations(RetailValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::VAT));
-                RSRLocalizationMgt.InsertGLItemLedgerRelations(RetailValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::"Margin with VAT"));
-                RSRLocalizationMgt.InsertGLItemLedgerRelations(RetailValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::Margin));
             end
         until TempPurchInvLine.Next() = 0;
 
@@ -104,6 +100,8 @@ codeunit 6151029 "NPR RS Purhc. GL Addition"
         end;
 
         PostGLAcc(GenJournalLine, GLEntry);
+
+        RSRLocalizationMgt.InsertGLItemLedgerRelation(GenJnlPostLine, GLEntry."Entry No.", CalculationValueEntry."Entry No.");
     end;
 
     local procedure InitAmounts(var GenJnlLine: Record "Gen. Journal Line")

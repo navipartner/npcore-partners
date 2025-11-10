@@ -293,6 +293,7 @@
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR POS License Billing Upgrd.", 'AddPOSBillingFeature'));
 #endif
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR RS Retail Calculation Upg.", 'MatchRemainingQtyToRSRetailValueEntryMapping'));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -1129,6 +1130,11 @@
                         exit('NPR-AddPOSBillingFeature-20250911');
                 end;
 #endif
+            Codeunit::"NPR RS Retail Calculation Upg.":
+                case UpgradeStep of
+                    'MatchRemainingQtyToRSRetailValueEntryMapping':
+                        exit('NPR-MatchRemainingQtyToRSRetailValueEntryMapping-20251102');
+                end;
         end;
     end;
 }

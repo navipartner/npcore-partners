@@ -89,6 +89,8 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         ValidateNegativeDebitCredit(GenJournalLine, RSRetailCalculationType);
 
         PostGLAcc(GenJournalLine, GLEntry);
+
+        RSRLocalizationMgt.InsertGLItemLedgerRelation(GenJnlPostLine, GLEntry."Entry No.", CalculationValueEntry."Entry No.");
     end;
 
     local procedure ValidateNegativeDebitCredit(var GenJournalLine: Record "Gen. Journal Line"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type")
@@ -310,10 +312,6 @@ codeunit 6151308 "NPR RS Trans. Sh. GL Addition"
         CreateAdditionalGLEntries(CorrectionValueEntry, StdTransitValueEntry, RSRetailCalculationType::Margin);
         CreateAdditionalGLEntries(CorrectionValueEntry, StdTransitValueEntry, RSRetailCalculationType::VAT);
         CreateAdditionalGLEntries(CorrectionValueEntry, StdTransitValueEntry, RSRetailCalculationType::"Transit Adjustment");
-
-        RSRLocalizationMgt.InsertGLItemLedgerRelations(CorrectionValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::Margin));
-        RSRLocalizationMgt.InsertGLItemLedgerRelations(CorrectionValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::VAT));
-        RSRLocalizationMgt.InsertGLItemLedgerRelations(CorrectionValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::"Transit Adjustment"));
     end;
 
     local procedure CalculateTransferFromAppliedItemLedgerEntriesCostPerUnit(var CostPerUnit: Decimal; TransitLocationItemLedgerEntries: Record "Item Ledger Entry"; TempTransferFromILEAppliedItemLedgerEntry: Record "Item Ledger Entry" temporary)

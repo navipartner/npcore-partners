@@ -55,10 +55,6 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
                     CreateAdditionalGLEntries(RetailValueEntry, RSRetailCalculationType::"Margin with VAT");
                     CreateAdditionalGLEntries(RetailValueEntry, RSRetailCalculationType::VAT);
                     CreateAdditionalGLEntries(RetailValueEntry, RSRetailCalculationType::Margin);
-
-                    RSRLocalizationMgt.InsertGLItemLedgerRelations(RetailValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::VAT));
-                    RSRLocalizationMgt.InsertGLItemLedgerRelations(RetailValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::"Margin with VAT"));
-                    RSRLocalizationMgt.InsertGLItemLedgerRelations(RetailValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::Margin));
                 until TempRetailValueEntry.Next() = 0;
         until TempTransferReceiptLine.Next() = 0;
 
@@ -104,6 +100,8 @@ codeunit 6151307 "NPR RS Trans. Rec. GL Addition"
             end;
 
         PostGLAcc(GenJournalLine, GLEntry);
+
+        RSRLocalizationMgt.InsertGLItemLedgerRelation(GenJnlPostLine, GLEntry."Entry No.", CalculationValueEntry."Entry No.");
     end;
 
     local procedure InitAmounts(var GenJnlLine: Record "Gen. Journal Line")

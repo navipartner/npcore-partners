@@ -208,34 +208,16 @@ codeunit 6151490 "NPR RS R Localization Mgt."
         exit(InventoryPostingSetup."Inventory Account");
     end;
 
-    internal procedure InsertGLItemLedgerRelations(ValueEntry: Record "Value Entry"; GLAccountNo: Code[20])
-    var
-        GLEntry: Record "G/L Entry";
-    begin
-        GLEntry.SetLoadFields("Entry No.");
-        GLEntry.SetRange("G/L Account No.", GLAccountNo);
-        GLEntry.SetRange("Document No.", ValueEntry."Document No.");
-        if GLEntry.IsEmpty() then
-            exit;
-
-        GLEntry.FindSet();
-        repeat
-            InsertGLItemLedgerRelation(GLEntry."Entry No.", ValueEntry."Entry No.");
-        until GLEntry.Next() = 0;
-    end;
-
-    local procedure InsertGLItemLedgerRelation(GLEntryNo: Integer; ValueEntryNo: Integer)
+    internal procedure InsertGLItemLedgerRelation(GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; GLEntryNo: Integer; ValueEntryNo: Integer)
     var
         GLRegister: Record "G/L Register";
         GLItemLedgerRelation: Record "G/L - Item Ledger Relation";
-        GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line";
     begin
         GenJnlPostLine.GetGLReg(GLRegister);
         if not GLItemLedgerRelation.Get(GLEntryNo, ValueEntryNo) then begin
             GLItemLedgerRelation.Init();
             GLItemLedgerRelation."Value Entry No." := ValueEntryNo;
             GLItemLedgerRelation."G/L Register No." := GLRegister."No.";
-
             GLItemLedgerRelation."G/L Entry No." := GLEntryNo;
             GLItemLedgerRelation.Insert(true);
         end;

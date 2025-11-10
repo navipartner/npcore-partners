@@ -56,9 +56,6 @@ codeunit 6151363 "NPR RS POS GL Addition"
                 CreateAdditionalGLEntries(RetailValueEntry, RSRetailCalculationType::"Margin with VAT");
                 CreateAdditionalGLEntries(RetailValueEntry, RSRetailCalculationType::VAT);
                 CreateAdditionalGLEntries(RetailValueEntry, RSRetailCalculationType::Margin);
-                RSRLocalizationMgt.InsertGLItemLedgerRelations(RetailValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::"Margin with VAT"));
-                RSRLocalizationMgt.InsertGLItemLedgerRelations(RetailValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::VAT));
-                RSRLocalizationMgt.InsertGLItemLedgerRelations(RetailValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::Margin));
             end;
 
             CheckIfNivelationNeeded();
@@ -171,6 +168,8 @@ codeunit 6151363 "NPR RS POS GL Addition"
         ValidateNegativeDebitCredit(GenJournalLine, RSRetailCalculationType);
 
         PostGLAcc(GenJournalLine, GLEntry);
+
+        RSRLocalizationMgt.InsertGLItemLedgerRelation(GenJnlPostLine, GLEntry."Entry No.", CalculationValueEntry."Entry No.");
     end;
 
     local procedure ValidateNegativeDebitCredit(var GenJournalLine: Record "Gen. Journal Line"; RSRetailCalculationType: Enum "NPR RS Retail Calculation Type")
@@ -547,9 +546,6 @@ codeunit 6151363 "NPR RS POS GL Addition"
 
         CreateAdditionalGLEntries(StdCorrectionValueEntry, RSRetailCalculationType::"Standard Correction");
         CreateAdditionalGLEntries(StdCorrectionValueEntry, RSRetailCalculationType::"Counter Std Correction");
-
-        RSRLocalizationMgt.InsertGLItemLedgerRelations(StdCorrectionValueEntry, GetCOGSAccountFromGenPostingSetup());
-        RSRLocalizationMgt.InsertGLItemLedgerRelations(StdCorrectionValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::"Counter Std Correction"));
     end;
 
     local procedure HandleApplicationValueEntry(ApplValueEntry: Record "Value Entry"; StdValueEntry: Record "Value Entry"; var SumOfCOGSCostPerUnit: Decimal; var SumOfCOGSCostAmtAct: Decimal; var QtyNeeded: Decimal; QtyTakenFromEntry: Decimal)
@@ -654,8 +650,6 @@ codeunit 6151363 "NPR RS POS GL Addition"
 
         CreateAdditionalGLEntries(COGSCorrectionValueEntry, RSRetailCalculationType::"COGS Correction");
         CreateAdditionalGLEntries(COGSCorrectionValueEntry, RSRetailCalculationType::"Counter COGS Correction");
-        RSRLocalizationMgt.InsertGLItemLedgerRelations(COGSCorrectionValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::"COGS Correction"));
-        RSRLocalizationMgt.InsertGLItemLedgerRelations(COGSCorrectionValueEntry, GetRSAccountNoFromSetup(RSRetailCalculationType::"Counter COGS Correction"));
 
         RSRLocalizationMgt.InsertCOGSCorrectionValueEntryMappingEntry(COGSCorrectionValueEntry);
     end;
