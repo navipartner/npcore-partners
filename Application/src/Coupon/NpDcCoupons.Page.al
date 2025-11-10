@@ -180,6 +180,35 @@
                 ToolTip = 'Displays the archived coupons.';
                 ApplicationArea = NPRRetail;
             }
+            action(ViewOnline)
+            {
+                Caption = 'View Online';
+                Image = SendAsPDF;
+                ToolTip = 'Opens the coupon in a web browser.';
+                ApplicationArea = NPRRetail;
+                Scope = Repeater;
+
+                trigger OnAction()
+                var
+                    DesignerFacade: Codeunit "NPR NPDesignerManifestFacade";
+                    CouponType: Record "NPR NpDc Coupon Type";
+                    AddAssetFailed: Label 'Unable to add the coupon to the manifest.';
+                    CreateUrlFailed: Label 'Unable to get the manifest URL.';
+                    ManifestUrl: Text[250];
+                    ManifestId: Guid;
+                begin
+                    CouponType.Get(Rec."Coupon Type");
+                    CouponType.TestField(NpDesignerTemplateId);
+                    ManifestId := DesignerFacade.CreateManifest();
+                    if (not DesignerFacade.AddAssetToManifest(ManifestId, DATABASE::"NPR NpDc Coupon", Rec.SystemId, Rec."Reference No.", CouponType.NPDesignerTemplateId)) then
+                        Error(AddAssetFailed);
+
+                    if (not DesignerFacade.GetManifestUrl(ManifestId, ManifestUrl)) then
+                        Error(CreateUrlFailed);
+
+                    Hyperlink(ManifestUrl);
+                end;
+            }
         }
     }
 

@@ -195,9 +195,38 @@
                 ToolTip = 'Displays the archived vouchers.';
                 ApplicationArea = NPRRetail;
             }
+            action(ViewOnline)
+            {
+                Caption = 'View Online';
+                Image = SendAsPDF;
+                ToolTip = 'Opens the voucher in a web browser.';
+                ApplicationArea = NPRRetail;
+                Scope = Repeater;
+
+                trigger OnAction()
+                var
+                    DesignerFacade: Codeunit "NPR NPDesignerManifestFacade";
+                    VoucherType: Record "NPR NpRv Voucher Type";
+                    AddAssetFailed: Label 'Unable to add the voucher to the manifest.';
+                    CreateUrlFailed: Label 'Unable to get the manifest URL.';
+                    ManifestUrl: Text[250];
+                    ManifestId: Guid;
+                begin
+                    ClearLastError();
+                    VoucherType.Get(Rec."Voucher Type");
+                    VoucherType.TestField(PDFDesignerTemplateId);
+                    ManifestId := DesignerFacade.CreateManifest();
+                    if (not DesignerFacade.AddAssetToManifest(ManifestId, DATABASE::"NPR NpRv Voucher", Rec.SystemId, Rec."Reference No.", VoucherType.PDFDesignerTemplateId)) then
+                        Error(AddAssetFailed);
+
+                    if (not DesignerFacade.GetManifestUrl(ManifestId, ManifestUrl)) then
+                        Error(CreateUrlFailed);
+
+                    Hyperlink(ManifestUrl);
+                end;
+            }
         }
     }
-
     var
         ReservedAmountVisible: Boolean;
 

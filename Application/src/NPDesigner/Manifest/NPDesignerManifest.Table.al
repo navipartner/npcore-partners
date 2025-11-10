@@ -29,6 +29,7 @@ table 6151256 "NPR NPDesignerManifest"
         {
             DataClassification = CustomerContent;
             Caption = 'Preferred Asset Language';
+            TableRelation = Language.Code;
         }
 
         field(30; ShowTableOfContents; Boolean)
