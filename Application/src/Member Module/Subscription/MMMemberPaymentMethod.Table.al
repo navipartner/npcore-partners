@@ -24,6 +24,11 @@ table 6150920 "NPR MM Member Payment Method"
             Caption = 'BC Record ID';
             DataClassification = CustomerContent;
         }
+        field(4; "BC Record System ID"; Guid)
+        {
+            Caption = 'BC Record System ID';
+            DataClassification = CustomerContent;
+        }
         field(10; PSP; Enum "NPR MM Subscription PSP")
         {
             Caption = 'PSP';
@@ -128,5 +133,6 @@ table 6150920 "NPR MM Member Payment Method"
         key(RelationFromBCTables; "Table No.", "BC Record ID", Status, Default) { }
         key(Key2; "Created from System Id") { }
         key(Key3; "Table No.", "BC Record ID", PSP, "Payment Token", "Shopper Reference") { }
+        key(Key4; "Table No.", "BC Record System ID", PSP, "Payment Token", "Shopper Reference") { }
     }
 }

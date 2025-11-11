@@ -10,6 +10,7 @@ codeunit 6248414 "NPR UPGUserAccounts"
     trigger OnUpgradePerCompany()
     begin
         UpgradeSubscriptionsToAccounts();
+        UpgradeBCRecordSystemIdInMemberPaymentMethods();
     end;
 
     local procedure UpgradeSubscriptionsToAccounts()
@@ -47,6 +48,7 @@ codeunit 6248414 "NPR UPGUserAccounts"
 
                         MemberPaymentMethod."Table No." := Database::"NPR UserAccount";
                         MemberPaymentMethod."BC Record ID" := UserAccount.RecordId();
+                        MemberPaymentMethod."BC Record System ID" := UserAccount.SystemId;
                         MemberPaymentMethod.Modify();
 
                         MembershipPmtMethodMap.Init();
@@ -59,5 +61,29 @@ codeunit 6248414 "NPR UPGUserAccounts"
             until (MemberPaymentMethod.Next() = 0);
 
         _UpgradeTag.SetUpgradeTag(_UpgradeTagDef.GetUpgradeTag(Codeunit::"NPR UPGUserAccounts", 'UpgradeSubscriptionsToAccounts'));
+    end;
+
+    internal procedure UpgradeBCRecordSystemIdInMemberPaymentMethods()
+    var
+        MemberPaymentMethod: Record "NPR MM Member Payment Method";
+        RecordRef: RecordRef;
+        SystemIdFieldRef: FieldRef;
+        EmptyGuid: Guid;
+    begin
+        if (_UpgradeTag.HasUpgradeTag(_UpgradeTagDef.GetUpgradeTag(Codeunit::"NPR UPGUserAccounts", 'UpgradeBCRecordSystemIdInMemberPaymentMethods'))) then
+            exit;
+
+        MemberPaymentMethod.Reset();
+        MemberPaymentMethod.SetRange("BC Record System ID", EmptyGuid);
+        if MemberPaymentMethod.FindSet(true) then
+            repeat
+                if RecordRef.Get(MemberPaymentMethod."BC Record ID") then begin
+                    SystemIdFieldRef := RecordRef.Field(RecordRef.SystemIdNo);
+                    MemberPaymentMethod."BC Record System ID" := SystemIdFieldRef.Value;
+                    MemberPaymentMethod.Modify(true);
+                end
+            until (MemberPaymentMethod.Next() = 0);
+
+        _UpgradeTag.SetUpgradeTag(_UpgradeTagDef.GetUpgradeTag(Codeunit::"NPR UPGUserAccounts", 'UpgradeBCRecordSystemIdInMemberPaymentMethods'));
     end;
 }

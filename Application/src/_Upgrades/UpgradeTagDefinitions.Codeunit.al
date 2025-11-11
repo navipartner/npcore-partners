@@ -294,6 +294,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR POS License Billing Upgrd.", 'AddPOSBillingFeature'));
 #endif
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR RS Retail Calculation Upg.", 'MatchRemainingQtyToRSRetailValueEntryMapping'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPGUserAccounts", 'UpgradeBCRecordSystemIdInMemberPaymentMethods'));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -1094,6 +1095,8 @@
                 case UpgradeStep of
                     'UpgradeSubscriptionsToAccounts':
                         exit('NPR-UpgradeSubscriptionsToAccounts-20250613');
+                    'UpgradeBCRecordSystemIdInMemberPaymentMethods':
+                        exit('NPR-UpgradeBCRecordSystemIdInMemberPaymentMethods-20251116');
                 end;
 #IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
             Codeunit::"NPR UPG No Series Experience":

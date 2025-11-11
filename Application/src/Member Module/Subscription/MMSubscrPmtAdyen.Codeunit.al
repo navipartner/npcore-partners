@@ -2079,6 +2079,7 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
 
         MemberPaymentMethod.Init();
         MemberPaymentMethod."BC Record ID" := UserAccount.RecordId();
+        MemberPaymentMethod."BC Record System ID" := UserAccount.SystemId;
         MemberPaymentMethod."Table No." := UserAccount.RecordId().TableNo();
         MemberPaymentMethod.Insert(true);
 

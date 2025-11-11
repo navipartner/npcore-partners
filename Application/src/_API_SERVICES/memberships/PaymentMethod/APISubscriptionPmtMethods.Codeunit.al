@@ -134,6 +134,7 @@ codeunit 6185107 "NPR API SubscriptionPmtMethods"
             MemberPaymentMethod."Entry No." := 0;
             MemberPaymentMethod."Table No." := UserAccount.RecordId().TableNo();
             MemberPaymentMethod."BC Record ID" := UserAccount.RecordId();
+            MemberPaymentMethod."BC Record System ID" := UserAccount.SystemId;
             MemberPaymentMethod.PSP := TempMemberPaymentMethod.PSP;
             MemberPaymentMethod."Payment Brand" := TempMemberPaymentMethod."Payment Brand";
             MemberPaymentMethod."Payment Instrument Type" := TempMemberPaymentMethod."Payment Instrument Type";

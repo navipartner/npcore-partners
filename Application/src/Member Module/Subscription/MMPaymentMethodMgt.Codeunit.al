@@ -255,6 +255,7 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
         Clear(MemberPaymentMethod);
         MemberPaymentMethod.Init();
         MemberPaymentMethod."BC Record ID" := UserAccount.RecordId();
+        MemberPaymentMethod."BC Record System ID" := UserAccount.SystemId;
         MemberPaymentMethod."Table No." := UserAccount.RecordId().TableNo();
         MemberPaymentMethod.Insert(true);
         MemberPaymentMethod."Payment Token" := PaymentLine."Payment Token";
@@ -293,6 +294,7 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
 
         MemberPaymentMethod.Init();
         MemberPaymentMethod."BC Record ID" := UserAccount.RecordId();
+        MemberPaymentMethod."BC Record System ID" := UserAccount.SystemId;
         MemberPaymentMethod."Table No." := UserAccount.RecordId().TableNo();
         MemberPaymentMethod.Insert(true);
         MemberPaymentMethod."Payment Token" := EFTTransactionRequest."Recurring Detail Reference";
