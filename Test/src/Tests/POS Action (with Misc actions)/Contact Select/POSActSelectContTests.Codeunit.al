@@ -12,6 +12,7 @@ codeunit 85081 "NPR POS Act. SelectCont. Tests"
 
     [Test]
     [HandlerFunctions('ContactListOkModalPageHandler')]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure SelectContact()
     var
         POSSale: Record "NPR POS Sale";
@@ -42,6 +43,7 @@ codeunit 85081 "NPR POS Act. SelectCont. Tests"
     end;
 
     [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure RemoveContact()
     var
         POSSale: Record "NPR POS Sale";
