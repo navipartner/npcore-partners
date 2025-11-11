@@ -264,7 +264,7 @@ codeunit 6184647 "NPR IT Audit Mgt."
         ITFiscalizationSetup.Delete();
 
         ITPOSUnitMapping.ChangeCompany(CompanyName);
-        ITPOSUnitMapping.SetFilter("Fiscal Printer IP Address", '<>''');
+        ITPOSUnitMapping.SetFilter("Fiscal Printer IP Address", '<>%1', '');
         ITPOSUnitMapping.ModifyAll("Fiscal Printer IP Address", '');
         ITPOSUnitMapping.ModifyAll("Fiscal Printer Password", '');
         ITPOSUnitMapping.ModifyAll("Fiscal Printer Serial No.", '');
