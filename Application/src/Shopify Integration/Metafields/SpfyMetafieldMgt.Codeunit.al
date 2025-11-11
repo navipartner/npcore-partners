@@ -58,7 +58,7 @@ codeunit 6185065 "NPR Spfy Metafield Mgt."
 
         clear(NcTask);
         NcTask.Type := NcTask.Type::Modify;
-        exit(SpfyScheduleSend.InitNcTask(ShopifyStoreCode, RecRef, SpfyEntityMetafield."BC Record ID", TaskRecordValue, NcTask.Type, 0DT, 0DT, NcTask));
+        exit(SpfyScheduleSend.InitNcTask(ShopifyStoreCode, RecRef, SpfyEntityMetafield."BC Record ID", TaskRecordValue, NcTask.Type, 0DT, 0DT, Enum::"NPR Spfy Reuse Delayed NC Task"::Any, NcTask));
     end;
 
     internal procedure SelectShopifyMetafield(ShopifyStoreCode: Code[20]; ShopifyOwnerType: Enum "NPR Spfy Metafield Owner Type"; var SelectedMetafieldID: Text[30]): Boolean

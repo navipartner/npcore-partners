@@ -89,10 +89,23 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
 
     procedure InitNcTask(ShopifyStoreCode: Code[20]; RecRef: RecordRef; TaskRecordValue: Text; TaskType: Option; LogDateTime: DateTime; var NcTask: Record "NPR Nc Task"): Boolean
     begin
-        exit(InitNcTask(ShopifyStoreCode, RecRef, RecRef.RecordId(), TaskRecordValue, TaskType, LogDateTime, 0DT, NcTask));
+        exit(InitNcTask(ShopifyStoreCode, RecRef, RecRef.RecordId(), TaskRecordValue, TaskType, LogDateTime, 0DT, Enum::"NPR Spfy Reuse Delayed NC Task"::Any, NcTask));
     end;
 
-    procedure InitNcTask(ShopifyStoreCode: Code[20]; RecRef: RecordRef; RecID: RecordId; TaskRecordValue: Text; TaskType: Option; LogDateTime: DateTime; NotBeforeDateTime: DateTime; var NcTask: Record "NPR Nc Task"): Boolean
+    /// <summary>
+    /// Initializes a new NC task for Shopify integration.
+    /// </summary>
+    /// <param name="ShopifyStoreCode"></param>
+    /// <param name="RecRef"></param>
+    /// <param name="RecID"></param>
+    /// <param name="TaskRecordValue"></param>
+    /// <param name="TaskType"></param>
+    /// <param name="LogDateTime"></param>
+    /// <param name="NotBeforeDateTime"></param>
+    /// <param name="ReuseExistingDelayed">Controls duplicate task checking: whether the system is allowed to reuse an existing delayed task (with a "Not Before Date-Time" specified) instead of creating a new one. The possible options are: "No" = reuse only if there is an exact match on the "Not Before Date-Time", "Later" = reuse if the existing task is scheduled to run at a later time, "Any" = ignore the "Not Before Date-Time" in the duplicate check (reuse any available).</param>
+    /// <param name="NcTask"></param>
+    /// <returns>Whether a new task has been created. The procedure will return false, if an existing task is found.</returns>
+    procedure InitNcTask(ShopifyStoreCode: Code[20]; RecRef: RecordRef; RecID: RecordId; TaskRecordValue: Text; TaskType: Option; LogDateTime: DateTime; NotBeforeDateTime: DateTime; ReuseExistingDelayed: Enum "NPR Spfy Reuse Delayed NC Task"; var NcTask: Record "NPR Nc Task"): Boolean
     var
         NcTask2: Record "NPR Nc Task";
     begin
@@ -121,7 +134,15 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
         NcTask2.SetRange("Record ID", NcTask."Record ID");
         NcTask2.SetRange("Record Value", NcTask."Record Value");
         NcTask2.SetRange("Store Code", NcTask."Store Code");
-        NcTask2.SetRange("Not Before Date-Time", NcTask."Not Before Date-Time");
+        case ReuseExistingDelayed of
+            ReuseExistingDelayed::No:
+                NcTask2.SetRange("Not Before Date-Time", NcTask."Not Before Date-Time");
+            ReuseExistingDelayed::Later:
+                if NcTask."Not Before Date-Time" <> 0DT then
+                    NcTask2.SetFilter("Not Before Date-Time", '%1..', NcTask."Not Before Date-Time");
+            ReuseExistingDelayed::Any:
+                ; // No filter on Not Before Date-Time  
+        end;
         NcTask2.SetFilter("Log Date", '%1..', CreateDateTime(Today() - 1, 0T));
         if NcTask2.FindLast() then begin
             NcTask := NcTask2;

@@ -560,7 +560,7 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         VariantSku := GetProductVariantSku(ItemPrice."Item No.", ItemPrice."Variant Code");
 
         RecRef.GetTable(ItemPrice);
-        exit(SpfyScheduleSend.InitNcTask(ItemPrice."Shopify Store Code", RecRef, RecRef.RecordId(), VariantSku, NcTask.Type::Modify, ItemPrice.SystemModifiedAt, CreateDateTime(ItemPrice."Starting Date", 0T), NcTask));
+        exit(SpfyScheduleSend.InitNcTask(ItemPrice."Shopify Store Code", RecRef, RecRef.RecordId(), VariantSku, NcTask.Type::Modify, ItemPrice.SystemModifiedAt, CreateDateTime(ItemPrice."Starting Date", 0T), Enum::"NPR Spfy Reuse Delayed NC Task"::No, NcTask));
     end;
 
     local procedure ScheduleCostSync(ShopifyStoreCode: Code[20]; Item: Record Item): Boolean
@@ -598,7 +598,7 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         if not Updated then
             exit(false);
         RecRef.GetTable(TagUpdateRequest);
-        exit(SpfyScheduleSend.InitNcTask(SpfyStoreItemLink."Shopify Store Code", RecRef, SpfyStoreItemLink.RecordId(), SpfyStoreItemLink."Item No.", NcTask.Type::Modify, 0DT, 0DT, NcTask));
+        exit(SpfyScheduleSend.InitNcTask(SpfyStoreItemLink."Shopify Store Code", RecRef, SpfyStoreItemLink.RecordId(), SpfyStoreItemLink."Item No.", NcTask.Type::Modify, 0DT, 0DT, Enum::"NPR Spfy Reuse Delayed NC Task"::Any, NcTask));
     end;
 
     local procedure AddItemCategoryTagUpdateRequests(RecID: RecordId; ItemCategoryCode: Code[20]; Type: Option; var TagUpdateRequest: Record "NPR Spfy Tag Update Request"): Boolean

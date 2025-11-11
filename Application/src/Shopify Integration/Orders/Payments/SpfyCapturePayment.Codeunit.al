@@ -294,6 +294,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         QueryStream: OutStream;
         TransactionID: Text[30];
         AlreadyCapturedErr: Label 'The payment transaction capture has already been requested or processed directly in Shopify.';
+        AlreadyMarkedAsCapturedErr: Label 'The payment line has already been marked as captured (the "%1" field is not empty).', Comment = '%1 - "Date Captured" field caption.';
         IsNotShopifyPmtLineErr: Label '%1 does not seem to be a Shopify related payment transaction', Comment = '%1 - Payment Line record Id';
         QueryTok: Label 'mutation TransactionCreate($input: OrderCaptureInput!) {orderCapture(input: $input) {transaction {id kind status parentTransaction{id} amountSet{presentmentMoney{amount currencyCode} shopMoney{amount currencyCode}} paymentId receiptJson settlementCurrency settlementCurrencyRate test} userErrors {message}}}', Locked = true;
     begin
@@ -303,7 +304,10 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         if TransactionID = '' then
             Error(IsNotShopifyPmtLineErr, PaymentLine.RecordId());
 
-        PaymentLine.TestField("Date Captured", 0D);
+        if PaymentLine."Date Captured" <> 0D then begin
+            SpfyIntegrationMgt.SetResponse(NcTask, StrSubstNo(AlreadyMarkedAsCapturedErr, PaymentLine.FieldCaption("Date Captured")));
+            exit;
+        end;
         if TransactionAlreadyCaptured(NcTask, TransactionID, PaymentLine) then begin
             SpfyIntegrationMgt.SetResponse(NcTask, AlreadyCapturedErr);
             exit;
@@ -805,7 +809,7 @@ codeunit 6184804 "NPR Spfy Capture Payment"
         RecRef: RecordRef;
     begin
         RecRef.GetTable(PaymentLine);
-        SpfyScheduleSend.InitNcTask(ShopifyStoreCode, RecRef, RecRef.RecordId(), OrderID, TaskType, CurrentDateTime(), NotBeforeDateTime, NcTask);
+        SpfyScheduleSend.InitNcTask(ShopifyStoreCode, RecRef, RecRef.RecordId(), OrderID, TaskType, CurrentDateTime(), NotBeforeDateTime, Enum::"NPR Spfy Reuse Delayed NC Task"::Later, NcTask);
     end;
 
     local procedure ShopifyPaymentGateway(StoreCurrencyCode: Text): Code[10]
