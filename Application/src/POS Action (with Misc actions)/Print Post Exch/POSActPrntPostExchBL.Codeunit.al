@@ -44,9 +44,13 @@ codeunit 6150697 "NPR POS Act:Prnt Post.Exch BL"
         ChooseDocumentCaption: Label 'Please choose sale';
         ChooseDetailsCaption: Label 'Please choose sale details';
     begin
+        POSEntry.Ascending(false);
+        POSEntry.FindFirst();
+
         POSEntries.LookupMode(true);
         POSEntries.Caption(ChooseDocumentCaption);
         POSEntries.SetTableView(POSEntry);
+        POSEntries.SetRecord(POSEntry);
         if not (POSEntries.RunModal() = ACTION::LookupOK) then
             Error('');
 
