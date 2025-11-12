@@ -71,6 +71,10 @@
         TestTable(DATABASE::"NPR EFT BIN Group");
         TestTable(DATABASE::"Item Category");
         TestTable(DATABASE::"NPR POS Payment Method");
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        TestTable(Database::"NPR NaviPartner API Key");
+        TestTable(Database::"NPR NaviPartner API Key Perm.");
+#endif
     end;
 
     local procedure TestTable(TableID: Integer)

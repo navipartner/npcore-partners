@@ -21,6 +21,9 @@ codeunit 6248565 "NPR NP API Key Mgt."
         ApiKeyValidationFailedErr: Label 'Error: %1\Details:%2', Comment = '%1 = error message, %2 = details';
         AtLeastOnePermissionSetMustBeAssignedErr: Label 'At least one permission set must be assigned to the API key before registering an Entra ID application.';
         AtLeastOnePermissionSetMustBeAssignedForSyncErr: Label 'At least one permission set must be assigned to the API key before synchronizing to Entra ID application.';
+        FailedToRotateApiKeyErr: Label 'Failed to rotate API key. Status code: %1. Response: %2', Comment = '%1 = HTTP status code, %2 = response body';
+        FailedToRemoveEntraAppErr: Label 'Failed to remove existing Entra ID application. Status code: %1. Response: %2', Comment = '%1 = HTTP status code, %2 = response body';
+        InvalidJtiGuidFormatErr: Label 'JTI is not a valid GUID. The value is: %1', Comment = '%1 = JTI value';
 
     procedure CreateNewApiKey(Description: Text[30]): Text
     var
@@ -41,6 +44,7 @@ codeunit 6248565 "NPR NP API Key Mgt."
     begin
         TenantId := GetTenantIdAsString();
         JsonBody.Add('tenantId', TenantId);
+        JsonBody.Add('description', Description);
         JsonBody.WriteTo(JsonBodyString);
 
         RequestMsg.GetHeaders(HttpHeaders);
@@ -60,7 +64,7 @@ codeunit 6248565 "NPR NP API Key Mgt."
         HttpClient.Send(RequestMsg, ResponseMsg);
 
         if (not ResponseMsg.IsSuccessStatusCode) then begin
-            if not ResponseMsg.Content.ReadAs(ResponseBody) then
+            if (not ResponseMsg.Content.ReadAs(ResponseBody)) then
                 ResponseBody := '';
             Error(FailedToCreateApiKeyErr, ResponseMsg.HttpStatusCode, ResponseBody);
         end;
@@ -69,7 +73,7 @@ codeunit 6248565 "NPR NP API Key Mgt."
             Error(FailedToReadResponseBodyErr);
         JsonBody.ReadFrom(JsonBodyString);
 
-        if not JsonBody.SelectToken('$.apiKey', JsonToken) then
+        if (not JsonBody.SelectToken('$.apiKey', JsonToken)) then
             Error(ApiKeyNotFoundInResponseErr);
         ApiKey := JsonToken.AsValue().AsText();
 
@@ -85,14 +89,90 @@ codeunit 6248565 "NPR NP API Key Mgt."
         exit(ApiKey);
     end;
 
-    procedure RevokeApiKey(var NPAPIKey: Record "NPR NaviPartner API Key")
+    procedure RotateApiKey(NPAPIKey: Record "NPR NaviPartner API Key"): Text
+    var
+        HttpContent: HttpContent;
+        HttpHeaders: HttpHeaders;
+        HttpContentHeaders: HttpHeaders;
+        HttpClient: HttpClient;
+        RequestMsg: HttpRequestMessage;
+        ResponseMsg: HttpResponseMessage;
+        JsonBody: JsonObject;
+        JsonToken: JsonToken;
+        JsonBodyString: Text;
+        ResponseBody: Text;
+        Jti: Text;
+        ApiKey: Text;
+        TenantIdStr: Text;
+        JtiGuid: Guid;
     begin
-        ChangeStatus(NPAPIKey, "NPR NP API Key Status"::Revoked, FailedToRevokeApiKeyErr);
+        NPAPIKey.LockTable();
+        NPAPIKey.Get(NPAPIKey.RecordId());
+
+        NPAPIKey.TestField(Id);
+        NPAPIKey.TestField(Status, "NPR NP API Key Status"::Active);
+
+        TenantIdStr := GetTenantIdAsString();
+        JsonBody.Add('tenantId', TenantIdStr);
+        JsonBody.WriteTo(JsonBodyString);
+
+        RequestMsg.GetHeaders(HttpHeaders);
+        HttpHeaders.Clear();
+        HttpHeaders.Add('Authorization', GetApiAuthHeader());
+
+        HttpContent.WriteFrom(JsonBodyString);
+        HttpContent.GetHeaders(HttpContentHeaders);
+
+        HttpContentHeaders.Clear();
+        HttpContentHeaders.Add('Content-Type', 'application/json');
+
+        RequestMsg.SetRequestUri(GetWorkerBaseUrl() + StrSubstNo('/keys/%1/rotate', GetGuidAsString(NPAPIKey.Id)));
+        RequestMsg.Method := 'POST';
+        RequestMsg.Content := HttpContent;
+
+        HttpClient.Send(RequestMsg, ResponseMsg);
+
+        if (not ResponseMsg.IsSuccessStatusCode) then begin
+            if (not ResponseMsg.Content.ReadAs(ResponseBody)) then
+                ResponseBody := '';
+            Error(FailedToRotateApiKeyErr, ResponseMsg.HttpStatusCode, ResponseBody);
+        end;
+
+        if (not ResponseMsg.Content.ReadAs(JsonBodyString)) then
+            Error(FailedToReadResponseBodyErr);
+        JsonBody.ReadFrom(JsonBodyString);
+
+        if (not JsonBody.SelectToken('$.apiKey', JsonToken)) then
+            Error(ApiKeyNotFoundInResponseErr);
+        ApiKey := JsonToken.AsValue().AsText();
+
+        Jti := GetIdFromApiKey(ApiKey);
+        if (not Evaluate(JtiGuid, Jti)) then
+            Error(InvalidJtiGuidFormatErr, Jti);
+
+        NPAPIKey.TestField(Id, JtiGuid);
+        NPAPIKey."Key Secret Hint" := CopyStr(APIKey, 1, 4) + '******' + CopyStr(APIKey, StrLen(APIKey) - 3, 4);
+        NPAPIKey.Modify(true);
+
+        exit(ApiKey);
     end;
 
-    procedure ActivateApiKey(var NPAPIKey: Record "NPR NaviPartner API Key")
+    procedure RevokeApiKey(NPAPIKey: Record "NPR NaviPartner API Key")
+    var
+        NPAPIKey2: Record "NPR NaviPartner API Key";
     begin
-        ChangeStatus(NPAPIKey, "NPR NP API Key Status"::Active, FailedToActivateApiKeyErr);
+        NPAPIKey2.LockTable();
+        NPAPIKey2.Get(NPAPIKey.Id);
+        ChangeStatus(NPAPIKey2, "NPR NP API Key Status"::Revoked, FailedToRevokeApiKeyErr);
+    end;
+
+    procedure ActivateApiKey(NPAPIKey: Record "NPR NaviPartner API Key")
+    var
+        NPAPIKey2: Record "NPR NaviPartner API Key";
+    begin
+        NPAPIKey2.LockTable();
+        NPAPIKey2.Get(NPAPIKey.Id);
+        ChangeStatus(NPAPIKey2, "NPR NP API Key Status"::Active, FailedToActivateApiKeyErr);
     end;
 
     procedure SynchronizeApiKeyPermissionsToEntraApps(NPAPIKeyId: Guid)
@@ -141,8 +221,11 @@ codeunit 6248565 "NPR NP API Key Mgt."
         JsonBody: JsonObject;
         JsonBodyString: Text;
         ResponseBody: Text;
+        TenantId: Text;
     begin
-        JsonBody.Add('status', Format(NewStatus, 0, 1));
+        TenantId := GetTenantIdAsString();
+        JsonBody.Add('tenantId', TenantId);
+        JsonBody.Add('status', Format(NewStatus, 0, 1).ToLower());
         JsonBody.WriteTo(JsonBodyString);
 
         HttpContent.WriteFrom(JsonBodyString);
@@ -161,7 +244,7 @@ codeunit 6248565 "NPR NP API Key Mgt."
         HttpClient.Send(RequestMsg, ResponseMsg);
 
         if (not ResponseMsg.IsSuccessStatusCode) then begin
-            if not ResponseMsg.Content.ReadAs(ResponseBody) then
+            if (not ResponseMsg.Content.ReadAs(ResponseBody)) then
                 ResponseBody := '';
             Error(ErrorMessage, ResponseMsg.HttpStatusCode, ResponseBody);
         end;
@@ -224,6 +307,7 @@ codeunit 6248565 "NPR NP API Key Mgt."
 
     end;
 
+    [NonDebuggable]
     procedure RegisterEntraAppAndCredentials(NPAPIKey: Record "NPR NaviPartner API Key")
     var
         AADApplication: Record "AAD Application";
@@ -239,10 +323,32 @@ codeunit 6248565 "NPR NP API Key Mgt."
         ClientID: Guid;
         ClientSecret: Text;
         ResponseBody: Text;
+        ConsentGranted: Boolean;
+        ErrorsFound: List of [Text];
+        ErrorFound: Text;
+        EntraAppNotCreatedErr: Label 'Entra ID application could not be created. The invoked actions and results are: ';
+        EntraAppNotCreatedFurtherDetailsErr: Label 'The following errors were encountered during the creation of the Entra ID application: ';
+        CreateNewEntraAppErrorBuilder: TextBuilder;
     begin
         TestValidPermissionSetsAssigned(NPAPIKey);
 
-        CreateNewEntraAppInAzure(GetEntraAppName(NPAPIKey.Description), 'Primary', GetNPAPIKeyPermissions(NPAPIKey), ApplicationId, ClientID, ClientSecret);
+        CreateNewEntraAppInAzure(GetEntraAppName(NPAPIKey.Description), 'Primary', GetNPAPIKeyPermissions(NPAPIKey), ApplicationId, ClientID, ClientSecret, ConsentGranted, ErrorsFound);
+
+        if ((IsNullGuid(ClientID)) or (ClientSecret = '') or (not ConsentGranted)) then begin
+            CreateNewEntraAppErrorBuilder.AppendLine(EntraAppNotCreatedErr);
+            CreateNewEntraAppErrorBuilder.AppendLine(StrSubstNo(' - Client ID created: %1', (not (IsNullGuid(ClientID)))));
+            CreateNewEntraAppErrorBuilder.AppendLine(StrSubstNo(' - Client Secret created: %1', (ClientSecret <> '')));
+            CreateNewEntraAppErrorBuilder.AppendLine(StrSubstNo(' - Consent granted: %1', ConsentGranted));
+            CreateNewEntraAppErrorBuilder.AppendLine('');
+
+            if (ErrorsFound.Count() > 0) then begin
+                CreateNewEntraAppErrorBuilder.AppendLine(EntraAppNotCreatedFurtherDetailsErr);
+                foreach ErrorFound in ErrorsFound do
+                    CreateNewEntraAppErrorBuilder.AppendLine(StrSubstNo(' - %1', ErrorFound));
+            end;
+
+            Error(CreateNewEntraAppErrorBuilder.ToText());
+        end;
 
         JsonBodyString := JsonBuilder
             .Initialize()
@@ -271,7 +377,7 @@ codeunit 6248565 "NPR NP API Key Mgt."
         HttpClient.Send(RequestMsg, ResponseMsg);
 
         if (not ResponseMsg.IsSuccessStatusCode) then begin
-            if not ResponseMsg.Content.ReadAs(ResponseBody) then
+            if (not ResponseMsg.Content.ReadAs(ResponseBody)) then
                 ResponseBody := '';
             Error(FailedToRegisterEntraAppErr, ResponseMsg.HttpStatusCode, ResponseBody);
         end;
@@ -279,6 +385,36 @@ codeunit 6248565 "NPR NP API Key Mgt."
         AADApplication.Get(ClientID);
         AADApplication.Validate("NPR NaviPartner API Key Id", NPAPIKey.Id);
         AADApplication.Modify(true);
+    end;
+
+    internal procedure RemoveEntraApp(var NPAPIKey: Record "NPR NaviPartner API Key"; var EntraApp: Record "AAD Application")
+    var
+        HttpClient: HttpClient;
+        HttpHeaders: HttpHeaders;
+        RequestMsg: HttpRequestMessage;
+        ResponseMsg: HttpResponseMessage;
+        ResponseBody: Text;
+    begin
+        EntraApp.LockTable();
+
+        NPAPIKey.TestField(Id);
+        EntraApp.TestField("NPR NaviPartner API Key Id", NPAPIKey.Id);
+
+        RequestMsg.GetHeaders(HttpHeaders);
+        HttpHeaders.Clear();
+        HttpHeaders.Add('Authorization', GetApiAuthHeader());
+
+        RequestMsg.SetRequestUri(GetWorkerBaseUrl() + '/entra-apps/' + GetGuidAsString(EntraApp."Client Id"));
+        RequestMsg.Method := 'DELETE';
+        HttpClient.Send(RequestMsg, ResponseMsg);
+
+        if (not ResponseMsg.IsSuccessStatusCode) then begin
+            if (not ResponseMsg.Content.ReadAs(ResponseBody)) then
+                ResponseBody := '';
+            Error(FailedToRemoveEntraAppErr, ResponseMsg.HttpStatusCode, ResponseBody);
+        end;
+
+        EntraApp.Delete(true);
     end;
 
     local procedure GetEntraAppName(ApiKeyName: Text) RetVal: Text[50]
@@ -329,7 +465,7 @@ codeunit 6248565 "NPR NP API Key Mgt."
     end;
 
     local procedure CreateNewEntraAppInAzure(AppDisplayName: Text[50]; SecretDisplayName: Text; PermissionSets: List of [Code[20]];
-        var ApplicationId: Guid; var ClientID: Guid; var ClientSecret: Text)
+        var ApplicationId: Guid; var ClientID: Guid; var ClientSecret: Text; var ConsentGranted: Boolean; var ErrorsFound: List of [Text])
     var
         EntraAppMgt: Codeunit "NPR AAD Application Mgt.";
     begin
@@ -337,6 +473,8 @@ codeunit 6248565 "NPR NP API Key Mgt."
         EntraAppMgt.CreateAzureADApplicationAndSecret(AppDisplayName, SecretDisplayName, PermissionSets);
         EntraAppMgt.GetApplicationIDAndSecret(ClientID, ClientSecret);
         ApplicationId := EntraAppMgt.GetApplicationId();
+        ConsentGranted := EntraAppMgt.GetConsentGranted();
+        EntraAppMgt.GetErrorMessages(ErrorsFound);
     end;
 
     local procedure TestValidPermissionSetsAssigned(NPAPIKey: Record "NPR NaviPartner API Key")

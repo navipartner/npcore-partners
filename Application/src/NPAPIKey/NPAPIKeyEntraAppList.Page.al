@@ -43,7 +43,39 @@ page 6185109 "NPR NP API Key Entra App List"
         }
     }
 
+    actions
+    {
+        area(processing)
+        {
+            action("Delete")
+            {
+                Caption = 'Delete';
+                ToolTip = 'Deletes the selected Entra ID application. This action cannot be undone.';
+                Image = Delete;
+                Enabled = true;
+                Ellipsis = true;
+
+                trigger OnAction()
+                var
+                    NPAPIKey: Record "NPR NaviPartner API Key";
+                    NPAPIKeyMgt: Codeunit "NPR NP API Key Mgt.";
+                    ConfirmMgt: Codeunit "Confirm Management";
+                begin
+                    if (not ConfirmMgt.GetResponseOrDefault(StrSubstNo(DeleteQst, Rec."Client Id"), true)) then
+                        Error('');
+
+                    NPAPIKey.Get(Rec."NPR NaviPartner API Key Id");
+                    NPAPIKeyMgt.RemoveEntraApp(NPAPIKey, Rec);
+
+                    CurrPage.Update(false);
+                end;
+            }
+        }
+    }
+
+
     var
         EntraAppNotFoundErr: Label 'Entra ID application with Client ID %1 not found.', Comment = '%1 - Client ID';
+        DeleteQst: Label 'Do you want to delete the Entra ID application with Client ID %1?', Comment = '%1 - Client ID';
 }
 #endif

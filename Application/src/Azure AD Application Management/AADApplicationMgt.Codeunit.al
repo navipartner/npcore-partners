@@ -31,6 +31,8 @@ codeunit 6060060 "NPR AAD Application Mgt."
         _ClientSecret: Text;
         _Silent: Boolean;
         _ApplicationObjectId: Guid;
+        _ConsentGranted: Boolean;
+        _ErrorMessageBuffer: List of [Text];
 
     internal procedure CreateAzureADApplicationAndSecret(AppDisplayName: Text[50]; SecretDisplayName: Text; PermissionSets: List of [Code[20]])
     var
@@ -49,6 +51,11 @@ codeunit 6060060 "NPR AAD Application Mgt."
         AttemptNo: Integer;
         Success: Boolean;
     begin
+        Clear(_ClientId);
+        Clear(_ClientSecret);
+        Clear(_ConsentGranted);
+        Clear(_ErrorMessageBuffer);
+
         if (not TryFindExistingAppsWithSameDisplayNameInEntra(AppDisplayName, ExistingAppsArray)) then begin
             Error(FindExistingEntraAppsErr, AppDisplayName, GetLastErrorText())
         end;
@@ -75,8 +82,13 @@ codeunit 6060060 "NPR AAD Application Mgt."
                     AttemptNo := AttemptNo + 1;
                 until Success or (AttemptNo >= 3);
                 Window.Close();
-                if not Success then
-                    Message(ErrorDuringAppConsentErr, ErrorTxt);
+
+                if (Success) then begin
+                    _ConsentGranted := true;
+                end else begin
+                    _ConsentGranted := false;
+                    ShowErrorAsWarningIfAllowed(StrSubstNo(ErrorDuringAppConsentErr, ErrorTxt));
+                end;
             end;
 
             if (TryCreateAzureADSecret(ApplicationObjectId, SecretDisplayName, Secret, Expires)) then begin
@@ -85,7 +97,7 @@ codeunit 6060060 "NPR AAD Application Mgt."
                 if not _Silent then
                     Message(CreatedAzureADAppSuccessMsg, ApplicationId, Secret, AzureADTenant.GetAadTenantId(), Expires);
             end else
-                Message(CreateAADAppCreationOfSecretFailedMsg, ApplicationId, AzureADTenant.GetAadTenantId());
+                ShowErrorAsWarningIfAllowed(StrSubstNo(CreateAADAppCreationOfSecretFailedMsg, ApplicationId, AzureADTenant.GetAadTenantId()));
         end else begin
             // Use an existing application (the first one - ideally we should try to find an app with consent already granted or let the user select one) and register in BC:
             ExistingAppsArray.Get(0, ExistingAppToken);
@@ -119,8 +131,7 @@ codeunit 6060060 "NPR AAD Application Mgt."
         if (not TryCreateAzureADSecret(ApplicationObjectId, DisplayName, Secret, Expires)) then
             Error(CouldNotCreateSecretErr, GetLastErrorText());
 
-        if not _Silent then
-            Message(CreatedSecretMsg, LowerCase(DelChr(ApplicationId, '=', '{}')), Secret, AzureADTenant.GetAadTenantId(), Expires);
+        ShowErrorAsWarningIfAllowed(StrSubstNo(CreatedSecretMsg, LowerCase(DelChr(ApplicationId, '=', '{}')), Secret, AzureADTenant.GetAadTenantId(), Expires));
     end;
 
     internal procedure RegenerateEntraAppSecret(var EntraApp: Record "AAD Application"; WithConfirmDialog: Boolean)
@@ -545,5 +556,26 @@ codeunit 6060060 "NPR AAD Application Mgt."
     begin
         AccessControl.SetRange("User Security ID", AADApplication."User ID");
         AccessControl.DeleteAll();
+    end;
+
+    local procedure ShowErrorAsWarningIfAllowed(ErrorMessage: Text)
+    begin
+        if (_ErrorMessageBuffer.IndexOf(ErrorMessage) = 0) then
+            _ErrorMessageBuffer.Add(ErrorMessage);
+
+        if (_Silent) then
+            exit;
+
+        Message(ErrorMessage);
+    end;
+
+    internal procedure GetConsentGranted(): Boolean
+    begin
+        exit(_ConsentGranted);
+    end;
+
+    internal procedure GetErrorMessages(var ErrorMessages: List of [Text])
+    begin
+        ErrorMessages := _ErrorMessageBuffer;
     end;
 }
