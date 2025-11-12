@@ -12,36 +12,36 @@ report 6014554 "NPR CRO Fiscal Bill A4"
     {
         dataitem("CRO POS Audit Log Aux Info"; "NPR CRO POS Aud. Log Aux. Info")
         {
-            column(CompanyName; CompanyName) { }
-            column(CompanyAddress; AddrArray[1]) { }
-            column(CompanyContact; AddrArray[2]) { }
-            column(CompanyWebsite; CompanyWebsite) { }
-            column(CompanyCity; CompanyCity) { }
-            column(LogTimeStamp; Format("Log Timestamp", 8, '<Hours24>:<Minutes,2>:<Seconds,2>')) { }
-            column(EntryDate; Format("Entry Date", 0, '<Day,2>/<Month,2>/<Year4>')) { }
-            column(JIRCode; "JIR Code") { }
-            column(Bill; StrSubstNo(BillLbl, "Bill No.", "POS Store Code", "POS Unit No.")) { }
-            column(ZKICode; "ZKI Code") { }
-            column(OperatorName; OperatorName) { }
-            column(QRCode; QRCode) { }
-            column(TotalAmount; "Total Amount") { }
-            column(CustomerPostCity; CustomerPostCity) { }
-            column(CustomerName; CustomerName) { }
-            column(CustomerAddress; CustomerAddress) { }
-            column(CustomerVATRegNo; CustomerVATRegNo) { }
-            column(CopyText; CopyText) { }
+            column(CRO_CompanyName; CompanyName) { }
+            column(CRO_CompanyAddress; AddrArray[1]) { }
+            column(CRO_CompanyContact; AddrArray[2]) { }
+            column(CRO_CompanyWebsite; CompanyWebsite) { }
+            column(CRO_CompanyCity; CompanyCity) { }
+            column(CRO_LogTimeStamp; Format("Log Timestamp", 8, '<Hours24>:<Minutes,2>:<Seconds,2>')) { }
+            column(CRO_EntryDate; Format("Entry Date", 0, '<Day,2>/<Month,2>/<Year4>')) { }
+            column(CRO_JIRCode; "JIR Code") { }
+            column(CRO_Bill; StrSubstNo(BillLbl, "Bill No.", "POS Store Code", "POS Unit No.")) { }
+            column(CRO_ZKICode; "ZKI Code") { }
+            column(CRO_OperatorName; OperatorName) { }
+            column(CRO_QRCode; QRCode) { }
+            column(CRO_TotalAmount; "Total Amount") { }
+            column(CRO_CustomerPostCity; CustomerPostCity) { }
+            column(CRO_CustomerName; CustomerName) { }
+            column(CRO_CustomerAddress; CustomerAddress) { }
+            column(CRO_CustomerVATRegNo; CustomerVATRegNo) { }
+            column(CRO_CopyText; CopyText) { }
             dataitem("POS Entry Lines"; "NPR POS Entry Sales Line")
             {
                 UseTemporary = true;
 
-                column(ItemDescription; Description) { }
-                column(Quantity; Quantity) { }
-                column(UnitPrice; "Unit Price") { }
-                column(UOM; "Unit of Measure Code") { }
-                column(DiscountPerc; "Line Discount %") { }
-                column(DiscountAmount; "Line Discount Amount Incl. VAT") { }
-                column(AmountIncludingVAT; "Amount Incl. VAT") { }
-                column(ItemNo; "No.") { }
+                column(CRO_ItemDescription; Description) { }
+                column(CRO_Quantity; Quantity) { }
+                column(CRO_UnitPrice; "Unit Price") { }
+                column(CRO_UOM; "Unit of Measure Code") { }
+                column(CRO_DiscountPerc; "Line Discount %") { }
+                column(CRO_DiscountAmount; "Line Discount Amount Incl. VAT") { }
+                column(CRO_AmountIncludingVAT; "Amount Incl. VAT") { }
+                column(CRO_ItemNo; "No.") { }
 
                 trigger OnPreDataItem()
                 begin
@@ -58,21 +58,21 @@ report 6014554 "NPR CRO Fiscal Bill A4"
             dataitem("POS Entry Tax Lines"; "NPR POS Entry Tax Line")
             {
                 UseTemporary = true;
-                column(VATPerc; "Tax %") { }
-                column(VATBaseAmount; "Tax Base Amount") { }
-                column(VATAmount; "Tax Amount") { }
-                column(AmountInclVAT; "Amount Including Tax") { }
+                column(CRO_VATPerc; "Tax %") { }
+                column(CRO_VATBaseAmount; "Tax Base Amount") { }
+                column(CRO_VATAmount; "Tax Amount") { }
+                column(CRO_AmountInclVAT; "Amount Including Tax") { }
             }
             dataitem("POS Store"; "NPR POS Store")
             {
                 DataItemLink = "Code" = field("POS Store Code");
 
-                column(StoreDetailsLine; StoreDetailsLine) { }
-                column(POSStoreName; Name) { }
-                column(POSStoreAddress; Address) { }
-                column(POSStorePostCode; "Post Code") { }
-                column(POSStoreCity; City) { }
-                column(POSStoreCode; Code) { }
+                column(CRO_StoreDetailsLine; StoreDetailsLine) { }
+                column(CRO_POSStoreName; Name) { }
+                column(CRO_POSStoreAddress; Address) { }
+                column(CRO_POSStorePostCode; "Post Code") { }
+                column(CRO_POSStoreCity; City) { }
+                column(CRO_POSStoreCode; Code) { }
 
                 trigger OnAfterGetRecord()
                 begin
@@ -106,8 +106,8 @@ report 6014554 "NPR CRO Fiscal Bill A4"
         dataitem("POS Entry Payment Lines"; "NPR POS Entry Payment Line")
         {
             UseTemporary = true;
-            column(POSPaymentMethod; "POS Payment Method Code") { }
-            column(Amount; "Amount (LCY)") { }
+            column(CRO_POSPaymentMethod; "POS Payment Method Code") { }
+            column(CRO_Amount; "Amount (LCY)") { }
         }
     }
     requestpage

@@ -4367,6 +4367,9 @@ End Function</Code>
         <Field Name="Type_POS_Sales_Item_Line">
           <DataField>Type_POS_Sales_Item_Line</DataField>
         </Field>
+        <Field Name="Item_No_POS_Sales_Item_Line">
+          <DataField>Item_No_POS_Sales_Item_Line</DataField>
+        </Field>
         <Field Name="No_POS_Sales_Item_Line">
           <DataField>No_POS_Sales_Item_Line</DataField>
         </Field>

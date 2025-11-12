@@ -12,11 +12,11 @@ controladdin "NPR StripeCreditCardControl"
     RequestedWidth = 300;
 
     Scripts = 'https://js.stripe.com/v3/',
-              'src\__Obsolete (NOT SUPPORTED)\Stripe\ControlAddIns\CreditCardControl\Script.js';
-    StartupScript = 'src\__Obsolete (NOT SUPPORTED)\Stripe\ControlAddIns\CreditCardControl\StartupScript.js';
-    StyleSheets = 'src\__Obsolete (NOT SUPPORTED)\Stripe\ControlAddIns\CreditCardControl\Style.css';
+              'src/__Obsolete (NOT SUPPORTED)/Stripe/ControlAddIns/CreditCardControl/Script.js';
+    StartupScript = 'src/__Obsolete (NOT SUPPORTED)/Stripe/ControlAddIns/CreditCardControl/StartupScript.js';
+    StyleSheets = 'src/__Obsolete (NOT SUPPORTED)/Stripe/ControlAddIns/CreditCardControl/Style.css';
 
-    Images = 'src\__Obsolete (NOT SUPPORTED)\Stripe\ControlAddIns\CreditCardControl\Stripe-wordmark-blurple-small.png';
+    Images = 'src/__Obsolete (NOT SUPPORTED)/Stripe/ControlAddIns/CreditCardControl/Stripe-wordmark-blurple-small.png';
 
     event ControlAddInReady();
     procedure InitializeCheckOutForm(publishableKey: Text);
