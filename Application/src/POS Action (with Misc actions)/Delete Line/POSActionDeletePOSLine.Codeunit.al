@@ -21,11 +21,17 @@ codeunit 6150796 "NPR POSAction: Delete POS Line" implements "NPR IPOS Workflow"
     procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
     var
         POSSession: Codeunit "NPR POS Session";
+        Response: JsonObject;
     begin
         case Step of
-            'preparePreWorkflows':
-                FrontEnd.WorkflowResponse(PreparePreWorkflows(Context, Sale, POSSession, SaleLine, PaymentLine));
-            'deleteLine':
+            'deleteOrGetPreWorkflows':
+                begin
+                    Response := PreparePreWorkflows(Context, Sale, POSSession, SaleLine, PaymentLine);
+                    if not ResponseContainsPreworkflows(Response) then
+                        DeletePosLine(POSSession, Context);
+                    FrontEnd.WorkflowResponse(Response)
+                end;
+            'deleteLineAfterPreWorkflows':
                 DeletePosLine(POSSession, Context);
         end;
     end;
@@ -34,7 +40,7 @@ codeunit 6150796 "NPR POSAction: Delete POS Line" implements "NPR IPOS Workflow"
     begin
         exit(
         //###NPR_INJECT_FROM_FILE:POSActionDeleteLine.js###
-        'let main=async({workflow:e,parameters:t,captions:r})=>{if("payment"===e.scope.view)var a=runtime.getData("BUILTIN_PAYMENTLINE");else a=runtime.getData("BUILTIN_SALELINE");if(!a.length||a._invalid)return void await popup.error(r.notallowed);if(t.ConfirmDialog&&!await popup.confirm({title:r.title,caption:r.Prompt.substitute(a._current[10])}))return;let{preWorkflows:o}=await e.respond("preparePreWorkflows");await processWorkflows(o),await e.respond("deleteLine")};async function processWorkflows(e){if(e)for(const[t,{mainParameters:r,customParameters:a}]of Object.entries(e))await workflow.run(t,{context:{customParameters:a},parameters:r})}'
+        'let main=async({workflow:e,parameters:a,captions:r})=>{debugger;switch(e.scope.view){case"payment":var t=runtime.getData("BUILTIN_PAYMENTLINE");break;default:var t=runtime.getData("BUILTIN_SALELINE")}if(!t.length||t._invalid){await popup.error(r.notallowed);return}if(a.ConfirmDialog&&!await popup.confirm({title:r.title,caption:r.Prompt.substitute(t._current[10])}))return;let{preWorkflows:i}=await e.respond("deleteOrGetPreWorkflows");!i||Object.keys(i).length===0||(await processWorkflows(i),await e.respond("deleteLineAfterPreWorkflows"))};async function processWorkflows(e){if(e)for(const[a,{mainParameters:r,customParameters:t}]of Object.entries(e))await workflow.run(a,{context:{customParameters:t},parameters:r})}'
         )
     end;
 
@@ -65,6 +71,17 @@ codeunit 6150796 "NPR POSAction: Delete POS Line" implements "NPR IPOS Workflow"
 
         if (CurrentView.GetType() = CurrentView.GetType() ::Payment) then begin
             DeletePOSLineB.DeletePaymentLine();
+        end;
+    end;
+
+    local procedure ResponseContainsPreworkflows(Response: JsonObject): Boolean
+    var
+        PreWorkflows: JsonToken;
+        PreWorkflowKeys: List of [Text];
+    begin
+        if Response.SelectToken('preWorkflows', PreWorkflows) then begin
+            PreWorkflowKeys := PreWorkflows.AsObject().Keys();
+            exit(PreWorkflowKeys.Count > 0)
         end;
     end;
 

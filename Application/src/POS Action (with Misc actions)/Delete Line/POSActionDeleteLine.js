@@ -19,10 +19,10 @@ let main = async ({ workflow, parameters, captions }) => {
         };
     };
     
-    let {preWorkflows} = await workflow.respond("preparePreWorkflows");
-
+    let {preWorkflows} = await workflow.respond("deleteOrGetPreWorkflows");
+    if (!preWorkflows || Object.keys(preWorkflows).length === 0) return;
     await processWorkflows(preWorkflows);
-    await workflow.respond("deleteLine");
+    await workflow.respond("deleteLineAfterPreWorkflows");
 };
 
 async function processWorkflows(workflows) {
