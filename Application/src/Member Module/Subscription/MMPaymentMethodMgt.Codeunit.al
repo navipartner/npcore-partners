@@ -233,6 +233,7 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
             Error(FailedToFindMembershipErr, MembershipEntryNo);
 
         MembershipPmtMethodMap.SetRange(MembershipId, Membership.SystemId);
+        MembershipPmtMethodMap.SetRange(Status, "NPR MM Payment Method Status"::Active);
         MembershipPmtMethodMap.SetRange(Default, true);
         if (not MembershipPmtMethodMap.FindFirst()) then begin
             if (not IncludeNonDefault) then
@@ -244,6 +245,19 @@ codeunit 6185075 "NPR MM Payment Method Mgt."
         end;
 
         MemberPaymentMethod.GetBySystemId(MembershipPmtMethodMap.PaymentMethodId);
+    end;
+
+    internal procedure GetMembershipPaymentMethodMap(MembershipSystemId: Guid; IncludeNonDefault: Boolean; var MembershipPmtMethodMap: Record "NPR MM MembershipPmtMethodMap"): Boolean
+    begin
+        MembershipPmtMethodMap.SetRange(MembershipId, MembershipSystemId);
+        MembershipPmtMethodMap.SetRange(Status, "NPR MM Payment Method Status"::Active);
+        MembershipPmtMethodMap.SetRange(Default, true);
+        if MembershipPmtMethodMap.FindFirst() then
+            exit(true);
+        if (not IncludeNonDefault) then
+            exit(false);
+        MembershipPmtMethodMap.SetRange(Default);
+        exit(MembershipPmtMethodMap.FindFirst());
     end;
 
     internal procedure AddMemberPaymentMethod(UserAccount: Record "NPR UserAccount"; PaymentLine: Record "NPR Magento Payment Line"; var MemberPaymentMethod: Record "NPR MM Member Payment Method")
