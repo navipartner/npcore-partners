@@ -512,6 +512,8 @@
 
     trigger OnOpenPage()
     begin
+        DateFilter := StrSubstNo(DateFilterLbl, Today, Today);
+        Rec.SetFilter("Period Start", DateFilter);
         ShowLastYear := false;
         SetShowLastYear();
         HideItem := true;
