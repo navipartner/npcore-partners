@@ -6538,6 +6538,7 @@
             Error(NotFoundReasonText);
 
         DisableMembershipAutoRenewal(Membership, true, false);
+        RegretSubscription(Membership);
     end;
 
     internal procedure CheckMembershipAutoRenewStatusYesInternal(CustomerNo: Code[20]): Boolean
