@@ -141,7 +141,7 @@ table 6150810 "NPR Spfy Store"
         {
             Caption = 'New Product Status';
             DataClassification = CustomerContent;
-            ValuesAllowed = DRAFT, ACTIVE;
+            ValuesAllowed = DRAFT, ACTIVE, UNLISTED;
             InitValue = DRAFT;
         }
         field(64; "Item Category as Metafield"; Boolean)

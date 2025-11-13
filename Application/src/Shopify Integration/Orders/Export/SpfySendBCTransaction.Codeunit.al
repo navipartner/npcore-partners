@@ -130,6 +130,7 @@ codeunit 6248589 "NPR Spfy Send BC Transaction"
     local procedure ShopifyOrderCreateQuery(SpfyStore: Record "NPR Spfy Store"; ShopifyCustomerID: Text[30]; POSEntry: Record "NPR POS Entry"; var POSEntrySalesLine: Record "NPR POS Entry Sales Line"; var POSEntryPaymentLine: Record "NPR POS Entry Payment Line"): JsonObject
     var
         CurrExchRate: Record "Currency Exchange Rate";
+        TempConsolidatedPOSEntryPaymentLine: Record "NPR POS Entry Payment Line" temporary;
         SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
         JsonBuilder: Codeunit "NPR Json Builder";
         ShopifyVariantID: Text[30];
@@ -230,32 +231,38 @@ codeunit 6248589 "NPR Spfy Send BC Transaction"
         JsonBuilder.EndObject();  //toAssociate
         JsonBuilder.EndObject();  //customer
 
-        if POSEntryPaymentLine.FindSet() then begin
+        SummarizePaymentLines(POSEntryPaymentLine, TempConsolidatedPOSEntryPaymentLine);
+        TempConsolidatedPOSEntryPaymentLine.SetFilter("Amount (Sales Currency)", '<>%1', 0);
+        if TempConsolidatedPOSEntryPaymentLine.FindSet() then begin
             JsonBuilder.StartArray('transactions');
             repeat
                 JsonBuilder.StartObject();  //transaction
-                JsonBuilder.AddProperty('kind', 'SALE');
+                if TempConsolidatedPOSEntryPaymentLine."Amount (Sales Currency)" > 0 then
+                    JsonBuilder.AddProperty('kind', 'SALE')
+                else
+                    JsonBuilder.AddProperty('kind', 'REFUND');
                 JsonBuilder.AddProperty('status', 'SUCCESS');
-                if POSEntryPaymentLine."POS Payment Line Created At" <> 0DT then
-                    JsonBuilder.AddProperty('processedAt', POSEntryPaymentLine."POS Payment Line Created At")
+                JsonBuilder.AddProperty('gateway', StrSubstNo('NPRetail.POS.%1', TempConsolidatedPOSEntryPaymentLine."POS Payment Method Code"));
+                if TempConsolidatedPOSEntryPaymentLine."POS Payment Line Created At" <> 0DT then
+                    JsonBuilder.AddProperty('processedAt', TempConsolidatedPOSEntryPaymentLine."POS Payment Line Created At")
                 else
                     JsonBuilder.AddProperty('processedAt', POSEntryProcessedAt);
                 JsonBuilder.StartObject('amountSet');
                 if PresentmentMoneyCurrCode <> '' then begin
                     JsonBuilder.StartObject('presentmentMoney');
-                    JsonBuilder.AddProperty('amount', POSEntryPaymentLine."Amount (Sales Currency)");
+                    JsonBuilder.AddProperty('amount', Abs(TempConsolidatedPOSEntryPaymentLine."Amount (Sales Currency)"));
                     JsonBuilder.AddProperty('currencyCode', PresentmentMoneyCurrCode);
                     JsonBuilder.EndObject();  //presentmentMoney
-                    ShopMoneyAmount := CurrExchRate.ExchangeAmount(POSEntryPaymentLine."Amount (Sales Currency)", POSEntry."Currency Code", SpfyStore."Currency Code", POSEntry."Entry Date");
+                    ShopMoneyAmount := CurrExchRate.ExchangeAmount(Abs(TempConsolidatedPOSEntryPaymentLine."Amount (Sales Currency)"), POSEntry."Currency Code", SpfyStore."Currency Code", POSEntry."Entry Date");
                 end else
-                    ShopMoneyAmount := POSEntryPaymentLine."Amount (Sales Currency)";
+                    ShopMoneyAmount := Abs(TempConsolidatedPOSEntryPaymentLine."Amount (Sales Currency)");
                 JsonBuilder.StartObject('shopMoney');
                 JsonBuilder.AddProperty('amount', ShopMoneyAmount);
                 JsonBuilder.AddProperty('currencyCode', ShopMoneyCurrCode);
                 JsonBuilder.EndObject();  //shopMoney
                 JsonBuilder.EndObject();  //amountSet
                 JsonBuilder.EndObject();  //transaction
-            until POSEntryPaymentLine.Next() = 0;
+            until TempConsolidatedPOSEntryPaymentLine.Next() = 0;
             JsonBuilder.EndArray();  //transactions
         end;
         JsonBuilder.EndObject();  //order
@@ -263,6 +270,28 @@ codeunit 6248589 "NPR Spfy Send BC Transaction"
         JsonBuilder.EndObject();
 
         exit(JsonBuilder.Build());
+    end;
+
+    local procedure SummarizePaymentLines(var POSEntryPaymentLine: Record "NPR POS Entry Payment Line"; var ConsolidatedPOSEntryPaymentLine: Record "NPR POS Entry Payment Line")
+    begin
+        if not ConsolidatedPOSEntryPaymentLine.IsTemporary() then
+            FunctionCallOnNonTempVarErr('SummarizePaymentLines');
+        ConsolidatedPOSEntryPaymentLine.Reset();
+        ConsolidatedPOSEntryPaymentLine.DeleteAll();
+
+        if POSEntryPaymentLine.FindSet() then
+            repeat
+                ConsolidatedPOSEntryPaymentLine.SetRange("POS Payment Method Code", POSEntryPaymentLine."POS Payment Method Code");
+                ConsolidatedPOSEntryPaymentLine.SetRange("Currency Code", POSEntryPaymentLine."Currency Code");
+                if not ConsolidatedPOSEntryPaymentLine.FindFirst() then begin
+                    ConsolidatedPOSEntryPaymentLine := POSEntryPaymentLine;
+                    ConsolidatedPOSEntryPaymentLine.Insert();
+                end else begin
+                    ConsolidatedPOSEntryPaymentLine."Amount (Sales Currency)" += POSEntryPaymentLine."Amount (Sales Currency)";
+                    ConsolidatedPOSEntryPaymentLine.Modify();
+                end;
+            until POSEntryPaymentLine.Next() = 0;
+        ConsolidatedPOSEntryPaymentLine.Reset();
     end;
 
     local procedure GetGLSetup()
@@ -297,6 +326,18 @@ codeunit 6248589 "NPR Spfy Send BC Transaction"
     internal procedure NpRetailPOS_SourceName(): Text
     begin
         exit('NPRetailPOS');
+    end;
+
+    local procedure FunctionCallOnNonTempVarErr(ProcedureName: Text)
+    var
+        SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
+    begin
+        SpfyIntegrationMgt.FunctionCallOnNonTempVarErr(StrSubstNo('[Codeunit::NPR Spfy Send BC Transaction(%1)].%2', CurrCodeunitID(), ProcedureName));
+    end;
+
+    local procedure CurrCodeunitID(): Integer
+    begin
+        exit(Codeunit::"NPR Spfy Send BC Transaction");
     end;
 }
 #endif

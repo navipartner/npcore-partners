@@ -21,5 +21,9 @@ enum 6059874 "NPR Spfy Product Status"
     {
         Caption = 'Archived';
     }
+    value(4; UNLISTED)
+    {
+        Caption = 'Unlisted';
+    }
 }
 #endif
