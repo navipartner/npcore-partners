@@ -24,16 +24,16 @@ types:
     docs: Represents a coupon with a specific value and type.
     properties:
       id: CouponId
-      number:
+      no:
         type: string
         docs: The internal coupon number from the number series.
-      type:
+      couponType:
         type: string
-        docs: The type of voucher, which carries the setup in NP Retail.
+        docs: The type of coupon, which carries the setup in NP Retail.
       description:
         type: string
         docs: A short description of the coupon.
-      barcode:
+      referenceNo:
         type: string
         docs: A unique, human-readable reference number, often used for barcodes.
       status:
@@ -71,10 +71,10 @@ types:
       - name: ExampleCoupon
         value:
           id: $CouponId.ExampleCouponId
-          number: "COUP00123"
-          type: "WELCOME"
+          no: "COUP00123"
+          couponType: "WELCOME"
           description: "Welcome Discount"
-          barcode: "9876543210987"
+          referenceNo: "9876543210987"
           status: ACTIVE
           discountType: PERCENTAGE
           discountAmount: null
@@ -89,52 +89,23 @@ types:
 
   CreateCouponRequest:
     docs: The request body for creating a new coupon.
-    properties:
-      requestId:
-        type: uuid
-        docs: A unique identifier for the request to ensure idempotency.
+    properties:     
       couponType:
         type: string
-        docs: The type of coupon, which links to a template defining its behavior.
-      description:
-        type: string
-        docs: A short description for the coupon.
-      barcode:
-        type: optional<string>
-        docs: The barcode or external reference number. If omitted, a number may be generated from a number series.
-      discountType: CouponDiscountType
-      discountAmount:
-        type: optional<double>
-        docs: The fixed discount amount. Required if discountType is 'AMOUNT'.
-      discountPercent:
-        type: optional<double>
-        docs: The discount percentage. Required if discountType is 'PERCENTAGE'.
-      maxDiscountAmount:
-        type: optional<double>
-        docs: The maximum discount amount that can be applied from this coupon.
+        docs: The type of coupon, which links to a template defining its behavior.     
       customerNo:
         type: optional<string>
-        docs: Optionally assign the coupon to a specific customer.
-      expiresAt:
-        type: optional<datetime>
-        docs: The date and time when the coupon expires. If omitted, the expiration is determined by the coupon type settings.
+        docs: Optionally assign the coupon to a specific customer.    
     examples:
       - name: ExampleCreateCoupon
-        value:
-          requestId: "c1d2e3f4-a5b6-c7d8-e9f0-a1b2c3d4e5f6"
-          couponType: "WELCOME"
-          description: "Welcome Discount"
-          barcode: "9876543210987"
-          discountType: PERCENTAGE
-          discountPercent: 10.0
-          maxDiscountAmount: 100.00
-          customerNo: "C00120"
-          expiresAt: "2025-08-31T23:59:59Z"
+        value:         
+          couponType: "WELCOME"         
+          customerNo: "C00120"        
 
   CreateCouponResponse:
     docs: The response body when creating a new coupon
     properties:
-      barcode:
+      referenceNo:
         type: string
         docs: The barcode of the created voucher
 

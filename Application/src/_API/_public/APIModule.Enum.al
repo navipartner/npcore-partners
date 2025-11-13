@@ -73,6 +73,10 @@ enum 6059812 "NPR API Module" implements "NPR API Module Resolver"
     {
         Implementation = "NPR API Module Resolver" = "NPR LoyaltyModuleResolver";
     }
+    value(6248330; coupon)
+    {
+        Implementation = "NPR API Module Resolver" = "NPR CouponModuleResolver";
+    }
 
     value(6248598; npdesigner)
     {
