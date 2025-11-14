@@ -20,6 +20,8 @@ types:
       itemCategoryCode: string
       vatProdPostingGroup: string
       unitPrice: double
+      vendorNo: string
+      vendorItemNo: string
       inventory: double
       hasVariants: boolean
       rowVersion: string
@@ -36,6 +38,8 @@ types:
           itemCategoryCode: "CHAIR"
           vatProdPostingGroup: "STANDARD"
           unitPrice: 4000
+          vendorNo: "01587796"
+          vendorItemNo: "ADG-4577"
           inventory: 42.0
           hasVariants: true
           rowVersion: "12345678901234567890"
@@ -58,6 +62,8 @@ types:
       itemCategoryCode: string
       vatProdPostingGroup: string
       unitPrice: double
+      vendorNo: string
+      vendorItemNo: string
       rowVersion: optional<string>
       attributes: optional<map<string, unknown>>
     examples:
@@ -72,6 +78,8 @@ types:
           itemCategoryCode: "CHAIR"
           vatProdPostingGroup: "STANDARD"
           unitPrice: 4000
+          vendorNo: "01587796"
+          vendorItemNo: "ADG-4577"
           rowVersion: "12345678901234567890"
           attributes:
             Color: "Black"

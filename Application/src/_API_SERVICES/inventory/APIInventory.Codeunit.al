@@ -136,7 +136,9 @@ codeunit 6248290 "NPR API Inventory" implements "NPR API Request Handler"
                                  .AddProperty('itemDiscGroup', Item."Item Disc. Group")
                                  .AddProperty('itemCategoryCode', Item."Item Category Code")
                                  .AddProperty('vatProdPostingGroup', Item."VAT Prod. Posting Group")
-                                 .AddProperty('unitPrice', Item."Unit Price");
+                                 .AddProperty('unitPrice', Item."Unit Price")
+                                 .AddProperty('vendorNo', Item."Vendor No.")
+                                 .AddProperty('vendorItemNo', Item."Vendor Item No.");
 
         if SingleItem then
             JsonBuilder.AddProperty('inventory', Item.Inventory)
