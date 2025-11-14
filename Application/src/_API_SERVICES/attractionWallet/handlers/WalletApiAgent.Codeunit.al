@@ -274,6 +274,7 @@ codeunit 6248331 "NPR WalletApiAgent"
         ResponseJson
             .StartObject('ticketDetails')
             .AddObject(TicketAgent.TicketValidDateProperties(ResponseJson, Ticket))
+            .AddObject(TicketAgent.AdmissionDetailsDTO(ResponseJson, 'content', Ticket))
             .AddArray(TicketAgent.TicketHistoryDTO(ResponseJson, 'accessHistory', Ticket, false))
             .EndObject();
         exit(ResponseJson);

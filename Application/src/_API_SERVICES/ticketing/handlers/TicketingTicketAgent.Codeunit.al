@@ -729,6 +729,29 @@ codeunit 6185080 "NPR TicketingTicketAgent"
         exit(ResponseJson);
     end;
 
+    internal procedure AdmissionDetailsDTO(var ResponseJson: Codeunit "NPR JSON Builder"; ArrayName: Text; Ticket: Record "NPR TM Ticket"): Codeunit "NPR JSON Builder";
+    var
+        TicketAccessEntry: Record "NPR TM Ticket Access Entry";
+        TicketDescriptionBuffer: Record "NPR TM TempTicketDescription";
+        TicketingCatalog: Codeunit "NPR TicketingCatalogAgent";
+    begin
+        ResponseJson.StartArray(ArrayName);
+
+        TicketAccessEntry.SetFilter("Ticket No.", '=%1', Ticket."No.");
+        if (TicketAccessEntry.FindSet()) then begin
+            TicketingCatalog.GetCatalogItemDescription('', Ticket."Item No.", TicketDescriptionBuffer);
+            repeat
+                ResponseJson.StartObject()
+                    .AddObject(AdmissionDTO(ResponseJson, 'admissionDetails', Ticket."Item No.", Ticket."Variant Code", TicketAccessEntry."Admission Code", TicketAccessEntry.Status = TicketAccessEntry.Status::BLOCKED, 255, TicketDescriptionBuffer))
+                    .AddObject(ScheduleDetailsDTO(ResponseJson, 'scheduleDetails', TicketAccessEntry."Entry No."))
+                .EndObject();
+            until (TicketAccessEntry.Next() = 0);
+        end;
+
+        ResponseJson.EndArray();
+        exit(ResponseJson);
+    end;
+
     local procedure AdmissionDetailsDTO(var ResponseJson: Codeunit "NPR JSON Builder"; ArrayName: Text; Ticket: Record "NPR TM Ticket"; var TicketDescriptionBuffer: Record "NPR TM TempTicketDescription"): Codeunit "NPR JSON Builder";
     var
         TicketAccessEntry: Record "NPR TM Ticket Access Entry";
