@@ -142,6 +142,7 @@ types:
       printedAt: optional<datetime>
       content: list<TicketContent>
       description: Descriptions
+      accessHistory: optional<list<TicketAccessHistory>>
     examples:
       - name: ExampleTicket1
         value:
@@ -165,6 +166,14 @@ types:
           content: 
             - $TicketContent.ExampleTicketContent1
           description: $Descriptions.ExampleTicket31001
+          accessHistory:
+          - admissionCode: CASTLE
+            firstAdmissionAt: "2025-01-31T09:12:00Z"
+            events:
+              - event: admitted
+                eventAt: "2025-01-31T09:12:00Z"
+              - event: departed
+                eventAt: "2025-01-31T12:47:00Z"
       - name: ExampleTicketMember
         value:
           ticketId: $simpleTypes.TicketId.ExampleTicket1
@@ -255,45 +264,81 @@ types:
       eventAt: datetime
 
   TicketAccessHistory:
-    docs: Details of the access history for a ticket
+    docs: 
+      Details of the access history for a ticket
+      The `events` list is only populated when `withAccessHistoryDetails` is set to true in the request.
     properties:
       admissionCode: simpleTypes.AdmissionCode
       firstAdmissionAt: optional<datetime>
-      blocked: boolean
       events: optional<list<TicketAccessEvent>>
 
   FindTicketResponse:
-    docs: Response to a find ticket request
+    docs: Details of the ticket 
     properties:
       ticketId: simpleTypes.TicketId
       ticketNumber: simpleTypes.TicketExternalNumber
+      reservationToken: simpleTypes.Token
       itemNumber: simpleTypes.ItemNumber
       validFrom: datetime
       validUntil: datetime
       issuedAt: simpleTypes.IssuedAt
       blocked: boolean
-      unitPrice: simpleTypes.UnitPrice
-      unitPriceInclVat: simpleTypes.UnitPriceInclVat
-      accessHistory: list<TicketAccessHistory>
+      pinCode: optional<simpleTypes.PinCode>
+      unitPrice: optional<double>
+      unitPriceInclVat: optional<double>
+      currencyCode: optional<string>
+      ticketHolder: optional<simpleTypes.TicketHolder>
+      ticketHolderLanguage: optional<simpleTypes.TicketHolderLanguage>
+      notificationAddress: optional<simpleTypes.NotificationAddress>
+      printCount: optional<integer>
+      printedAt: optional<datetime>
+      content: optional<list<TicketContent>>
+      description: optional<Descriptions>
+      accessHistory: optional<list<TicketAccessHistory>>
     examples:
-      - name: ExampleFindTicketWithDetails
+      - name: ExampleTicket1
         value:
           ticketId: $simpleTypes.TicketId.ExampleTicket1
           ticketNumber: $simpleTypes.TicketExternalNumber.ExampleTicket1
+          reservationToken : $simpleTypes.Token.ExampleToken
           itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
           validFrom: $simpleTypes.ReferenceDateTime.ExampleValidFrom
           validUntil: $simpleTypes.ReferenceDateTime.ExampleValidUntil
           issuedAt: $simpleTypes.IssuedAt.ExampleIssuedAt
           blocked: false
-          unitPrice: $simpleTypes.UnitPrice.ExampleUnitPrice
-          unitPriceInclVat: $simpleTypes.UnitPriceInclVat.ExampleUnitPrice
+          pinCode: 12-34
+          unitPrice: 80.00
+          unitPriceInclVat: 100.00
+          currencyCode: DKK
+          ticketHolder: $simpleTypes.TicketHolder.ExampleTicketHolder
+          ticketHolderLanguage: $simpleTypes.TicketHolderLanguage.ExampleAmericanEnglish
+          notificationAddress: $simpleTypes.NotificationAddress.ExampleEmail
+          printCount: 1
+          printedAt: $simpleTypes.ReferenceDateTime.ExamplePrintedAt
+          content: 
+            - $TicketContent.ExampleTicketContent1
+          description: $Descriptions.ExampleTicket31001
           accessHistory:
-            - admissionCode: CASTLE
-              firstAdmissionAt: "2025-01-31T09:12:00Z"
-              blocked: false
-              events:
-                - event: admitted
-                  eventAt: "2025-01-31T09:12:00Z"
-                - event: departed
-                  eventAt: "2025-01-31T12:47:00Z"
-        
+          - admissionCode: CASTLE
+            firstAdmissionAt: "2025-01-31T09:12:00Z"
+            events:
+              - event: admitted
+                eventAt: "2025-01-31T09:12:00Z"
+              - event: departed
+                eventAt: "2025-01-31T12:47:00Z"
+      - name: ExampleTicketMember
+        value:
+          ticketId: $simpleTypes.TicketId.ExampleTicket1
+          ticketNumber: $simpleTypes.TicketExternalNumber.ExampleTicket1
+          reservationToken : $simpleTypes.Token.ExampleToken
+          itemNumber: $simpleTypes.ItemNumber.ExampleItemNumber
+          validFrom: $simpleTypes.ReferenceDateTime.ExampleValidFrom
+          validUntil: $simpleTypes.ReferenceDateTime.ExampleValidUntil
+          issuedAt: $simpleTypes.IssuedAt.ExampleIssuedAt
+          blocked: false
+          pinCode: 12-34
+          ticketHolder: $simpleTypes.TicketHolder.ExampleTicketHolder
+          ticketHolderLanguage: $simpleTypes.TicketHolderLanguage.ExampleAmericanEnglish
+          content: 
+            - $TicketContent.ExampleTicketContent2
+          description: $Descriptions.ExampleTicket31001

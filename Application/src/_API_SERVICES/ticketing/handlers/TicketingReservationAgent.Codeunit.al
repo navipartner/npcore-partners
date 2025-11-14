@@ -398,7 +398,7 @@ codeunit 6185083 "NPR TicketingReservationAgent"
             Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', TicketRequest."Entry No.");
             if (Ticket.FindSet()) then begin
                 repeat
-                    ResponseJson.AddArray(TicketHandler.SingleTicketDTO(ResponseJson, Ticket, GeneralLedgerSetup."LCY Code", TicketDescriptionBuffer, TicketRequest));
+                    ResponseJson.AddArray(TicketHandler.SingleTicketDTO(ResponseJson, Ticket, GeneralLedgerSetup."LCY Code", true, false, false, TicketDescriptionBuffer, TicketRequest));
                 until (Ticket.Next() = 0);
             end;
 
@@ -459,7 +459,7 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         repeat
             ResponseJson
                 .StartObject()
-                .AddObject(TicketAgent.AdmissionDTO(ResponseJson, 'admissionDetails', TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest."Admission Code", TicketReservationRequest."Admission Inclusion", TicketDescriptionBuffer))
+                .AddObject(TicketAgent.AdmissionDTO(ResponseJson, 'admissionDetails', TicketReservationRequest."Item No.", TicketReservationRequest."Variant Code", TicketReservationRequest."Admission Code", false, TicketReservationRequest."Admission Inclusion", TicketDescriptionBuffer))
                 .AddObject(TicketAgent.ScheduleDTO(ResponseJson, 'scheduleDetails', TicketReservationRequest."External Adm. Sch. Entry No."))
                 .EndObject()
         until (TicketReservationRequest.Next() = 0);
