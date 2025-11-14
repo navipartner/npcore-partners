@@ -36,7 +36,6 @@
                     ToolTip = 'Specifies the value of the Description field';
                     ApplicationArea = NPRRetail;
                 }
-
                 field("Description 2"; Rec."Description 2")
                 {
                     ToolTip = 'Specifies the value of the Description 2 field';
@@ -215,7 +214,7 @@
             }
             action("Show Deferral Schedule")
             {
-                Caption = 'Show Deferral Schedule';
+                Caption = 'Deferral Schedule';
                 Image = ShowList;
                 ToolTip = 'Shows deferral schedule in a not editable mode.';
                 ApplicationArea = NPRRetail;
@@ -254,4 +253,3 @@
         exit(POSEntrySalesDocLinkOut.FindLast());
     end;
 }
-

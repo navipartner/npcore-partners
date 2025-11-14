@@ -157,6 +157,8 @@ codeunit 6248589 "NPR Spfy Send BC Transaction"
         JsonBuilder.StartObject('variables');
         JsonBuilder.StartObject('options');
         JsonBuilder.AddProperty('inventoryBehaviour', 'BYPASS');
+        JsonBuilder.AddProperty('sendReceipt', false);
+        JsonBuilder.AddProperty('sendFulfillmentReceipt', false);
         JsonBuilder.EndObject();  //options
 
         JsonBuilder.StartObject('order');
@@ -167,7 +169,8 @@ codeunit 6248589 "NPR Spfy Send BC Transaction"
             JsonBuilder.AddProperty('presentmentCurrency', PresentmentMoneyCurrCode);
         JsonBuilder.AddProperty('processedAt', POSEntryProcessedAt);
         JsonBuilder.AddProperty('closedAt', POSEntryProcessedAt);
-        JsonBuilder.AddProperty('sourceIdentifier', StrSubstNo('POSEntry-%1', Format(POSEntry."Entry No.", 0, 9)));
+        JsonBuilder.AddProperty('name', StrSubstNo('POS-%1', Format(POSEntry."Entry No.", 0, 9)));
+        JsonBuilder.AddProperty('sourceIdentifier', POSEntry."Document No.");
         JsonBuilder.AddProperty('sourceName', NpRetailPOS_SourceName());
         JsonBuilder.AddProperty('sourceUrl', GetUrl(ClientType::Web, CompanyName(), ObjectType::Page, Page::"NPR POS Entry Card", POSEntry));
         JsonBuilder.AddProperty('taxesIncluded', POSEntry."Prices Including VAT");

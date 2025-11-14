@@ -6,7 +6,6 @@
     Editable = false;
     PageType = Document;
     UsageCategory = None;
-
     RefreshOnActivate = true;
     SourceTable = "NPR POS Entry";
     SourceTableView = SORTING("Entry No.")
@@ -18,6 +17,7 @@
         {
             group(Group)
             {
+                Caption = 'General';
                 field("System Entry"; Rec."System Entry")
                 {
                     Visible = false;
@@ -548,6 +548,8 @@
             {
                 Caption = 'Shopify';
                 Visible = ShopifyPOSEntrySyncIsEnabled;
+                Image = LinkWeb;
+
                 action("NPR SpfyStoreLinks")
                 {
                     Caption = 'Shopify Order Links';
