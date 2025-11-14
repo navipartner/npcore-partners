@@ -669,7 +669,8 @@
 
         CreditCardTransaction.SetCurrentKey("EFT Trans. Request Entry No.", "Receipt No.", Date);
         CreditCardTransaction.SetRange("EFT Trans. Request Entry No.", Rec."Entry No.");
-        CreditCardTransaction.SetRange(Date, Rec."Transaction Date");
+        if Rec."Transaction Date" <> 0D then
+            CreditCardTransaction.SetRange(Date, Rec."Transaction Date");
         if not CreditCardTransaction.FindSet() then
             exit;
 
