@@ -53,5 +53,9 @@ table 6151174 "NPR MM MembershipPmtMethodMap"
         {
             Clustered = true;
         }
+
+        key(MembershipIdx; MembershipId)
+        {
+        }
     }
 }
