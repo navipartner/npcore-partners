@@ -75,19 +75,6 @@ codeunit 6184924 "NPR Spfy Communication Handler"
     end;
 
     [TryFunction]
-    procedure GetShopifyLocations(ShopifyStoreCode: Code[20]; var ShopifyResponse: JsonToken)
-    var
-        NcTask: Record "NPR Nc Task";
-        ResponseText: Text;
-        Url: Text;
-    begin
-        NcTask."Store Code" := ShopifyStoreCode;
-        Url := GetShopifyUrl(NcTask."Store Code") + 'locations.json';
-        ResponseText := SendShopifyRequest(NcTask, Enum::"Http Request Type"::GET, Url);
-        ShopifyResponse.ReadFrom(ResponseText);
-    end;
-
-    [TryFunction]
     procedure ExecuteShopifyGraphQLRequest(var NcTask: Record "NPR Nc Task"; CheckIntegrationIsEnabled: Boolean; var ShopifyResponse: JsonToken)
     var
         ResponseText: Text;
@@ -107,17 +94,6 @@ codeunit 6184924 "NPR Spfy Communication Handler"
 
         Url := GetShopifyUrl(NcTask."Store Code") + 'inventory_levels/set.json';
         SendShopifyRequest(NcTask, Enum::"Http Request Type"::POST, Url);
-    end;
-
-    [TryFunction]
-    procedure SendInvetoryItemUpdateRequest(var NcTask: Record "NPR Nc Task"; ShopifyInventoryItemID: Text[30])
-    var
-        Url: Text;
-    begin
-        CheckRequestContent(NcTask);
-
-        Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('inventory_items/%1.json', ShopifyInventoryItemID);
-        SendShopifyRequest(NcTask, Enum::"Http Request Type"::PUT, Url);
     end;
 
     [TryFunction]
@@ -179,7 +155,7 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         exit(false);
     end;
 
-    local procedure CheckRequestContent(var NcTask: Record "NPR Nc Task")
+    internal procedure CheckRequestContent(var NcTask: Record "NPR Nc Task")
     var
         NoRequestBodyErr: Label 'Each request must have a json formatted content attached';
     begin

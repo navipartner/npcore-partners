@@ -6,6 +6,9 @@ table 6150809 "NPR Spfy Location"
     DataClassification = CustomerContent;
     LookupPageId = "NPR Spfy Locations";
     DrillDownPageId = "NPR Spfy Locations";
+    ObsoleteState = Pending;
+    ObsoleteTag = '2025-11-15';
+    ObsoleteReason = 'Table type will be changed to temporary';
 
     fields
     {

@@ -131,7 +131,6 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         TempItemVariant: Record "Item Variant" temporary;
         TempNcTask: Record "NPR Nc Task" temporary;
         NcTaskOutput: Record "NPR Nc Task Output";
-        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         RecRef: RecordRef;
         ShopifyInventoryItemID: Text[30];
         Success: Boolean;
@@ -157,7 +156,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                     TempNcTask."Store Code" := NcTask."Store Code";
                     TempNcTask."Data Output" := NcTaskOutput.Data;
                     TempNcTask."Record Value" := CopyStr(NcTaskOutput.Name, 1, MaxStrLen(TempNcTask."Record Value"));
-                    if SpfyCommunicationHandler.SendInvetoryItemUpdateRequest(TempNcTask, ShopifyInventoryItemID) then
+                    if SendInvetoryItemUpdateRequest(TempNcTask) then
                         NcTaskOutput.Status := NcTaskOutput.Status::Success;
                     NcTaskOutput.Response := TempNcTask.Response;
                 end;
@@ -173,6 +172,21 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
 
         if not Success then
             Error(GetLastErrorText());
+    end;
+
+    [TryFunction]
+    procedure SendInvetoryItemUpdateRequest(var NcTask: Record "NPR Nc Task")
+    var
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+        ShopifyResponse: JsonToken;
+        Success: Boolean;
+    begin
+        SpfyCommunicationHandler.CheckRequestContent(NcTask);
+        Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ShopifyResponse);
+        if not Success then
+            Error(GetLastErrorText());
+        if SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse) then
+            Error('');
     end;
 
     local procedure SendMetafields()
@@ -642,9 +656,11 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
     var
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        InputObj: JsonObject;
         RequestJObject: JsonObject;
-        RequestJObjectChild: JsonObject;
+        Variables: JsonObject;
         OStream: OutStream;
+        InventoryItemUpdateRequest: Label 'mutation UpdateInventoryItem($id: ID!,$input: InventoryItemInput!) { inventoryItemUpdate(id: $id, input: $input) { inventoryItem { id unitCost { amount } } userErrors { message } } }', Locked = true;
     begin
         SpfyStoreItemLink.Type := SpfyStoreItemLink.Type::"Variant";
         SpfyStoreItemLink."Item No." := ItemVariant."Item No.";
@@ -658,9 +674,12 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             Error(_InventoryItemIDNotFoundErr,
                 ItemVariant.FieldCaption("Item No."), Item."No.", StrSubstNo('%1 %2', ItemVariant.TableCaption, ItemVariant.FieldCaption(Code)), ItemVariant.Code, ShopifyStoreCode);
 
-        RequestJObjectChild.Add('id', ShopifyInventoryItemID);
-        RequestJObjectChild.Add('cost', Item."Last Direct Cost");
-        RequestJObject.Add('inventory_item', RequestJObjectChild);
+        InputObj.Add('cost', Item."Last Direct Cost");
+        Variables.Add('id', StrSubstNo('gid://shopify/InventoryItem/%1', ShopifyInventoryItemID));
+        Variables.Add('input', InputObj);
+
+        RequestJObject.Add('query', InventoryItemUpdateRequest);
+        RequestJObject.Add('variables', Variables);
 
         NcTaskOutput.Data.CreateOutStream(OStream, TextEncoding::UTF8);
         RequestJObject.WriteTo(OStream);
@@ -1419,40 +1438,101 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
     procedure SelectShopifyLocation(ShopifyStoreCode: Code[20]; var SelectedLocationID: Text[30]): Boolean
     var
         TempShopifyLocation: Record "NPR Spfy Location" temporary;
-        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
-        ReceivedShopifyLocations: JsonArray;
-        ReceivedShopifyLocation: JsonToken;
-        ShopifyResponse: JsonToken;
         Window: Dialog;
     begin
         Window.Open(_QueryingShopifyLbl);
         ClearLastError();
-        if not SpfyCommunicationHandler.GetShopifyLocations(ShopifyStoreCode, ShopifyResponse) then
-            Error(GetLastErrorText());
-        ShopifyResponse.AsObject().Get('locations', ShopifyResponse);
-        ReceivedShopifyLocations := ShopifyResponse.AsArray();
-        foreach ReceivedShopifyLocation in ReceivedShopifyLocations do begin
-            TempShopifyLocation.Init();
-#pragma warning disable AA0139
-            TempShopifyLocation.ID := _JsonHelper.GetJText(ReceivedShopifyLocation, 'id', MaxStrLen(TempShopifyLocation.ID), true);
-            if not TempShopifyLocation.Find() then begin
-                TempShopifyLocation.Name := _JsonHelper.GetJText(ReceivedShopifyLocation, 'name', MaxStrLen(TempShopifyLocation.Name), false);
-                TempShopifyLocation.Address := _JsonHelper.GetJText(ReceivedShopifyLocation, 'address1', MaxStrLen(TempShopifyLocation.Address), false);
-                TempShopifyLocation."Address 2" := _JsonHelper.GetJText(ReceivedShopifyLocation, 'address2', MaxStrLen(TempShopifyLocation."Address 2"), false);
-                TempShopifyLocation.City := _JsonHelper.GetJText(ReceivedShopifyLocation, 'city', MaxStrLen(TempShopifyLocation.City), false);
-                TempShopifyLocation."Post Code" := _JsonHelper.GetJText(ReceivedShopifyLocation, 'zip', MaxStrLen(TempShopifyLocation."Post Code"), false);
-                TempShopifyLocation."Country/Region Code" := _JsonHelper.GetJText(ReceivedShopifyLocation, 'country_code', MaxStrLen(TempShopifyLocation."Country/Region Code"), false);
-#pragma warning restore AA0139
-                TempShopifyLocation.Active := _JsonHelper.GetJBoolean(ReceivedShopifyLocation, 'active', false);
-                TempShopifyLocation.Insert();
-            end;
-        end;
+        GetShopifyLocations(ShopifyStoreCode, TempShopifyLocation);
         Window.Close();
         if Page.RunModal(Page::"NPR Spfy Locations", TempShopifyLocation) = Action::LookupOK then begin
             SelectedLocationID := TempShopifyLocation.ID;
             exit(true);
         end;
         exit(false);
+    end;
+
+    local procedure GetShopifyLocations(ShopifyStoreCode: Code[20]; var TempShopifyLocation: Record "NPR Spfy Location" temporary)
+    var
+        NcTask: Record "NPR Nc Task";
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+        Cursor: Text;
+        HasNext: Boolean;
+        ShopifyResponse: JsonToken;
+        LocationRequest: Label 'query GetLocations($afterCursor: String) { locations(first:100, after: $afterCursor) { pageInfo{endCursor hasNextPage} edges { node { id name address { address1 address2 city zip countryCode } isActive } } } }', Locked = true;
+    begin
+        Cursor := '';
+        HasNext := true;
+        repeat
+            CreateRequest(NcTask, Cursor, ShopifyStoreCode, LocationRequest);
+            if not SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, false, ShopifyResponse) then
+                Error(GetLastErrorText());
+            Cursor := _JsonHelper.GetJText(ShopifyResponse, 'data.locations.pageInfo.endCursor', false);
+            HasNext := _JsonHelper.GetJBoolean(ShopifyResponse, 'data.locations.pageInfo.hasNextPage', true);
+
+            HandleGetLocationsResponse(ShopifyResponse, TempShopifyLocation);
+        until not HasNext;
+        TempShopifyLocation.Reset();
+    end;
+
+    local procedure HandleGetLocationsResponse(var ShopifyResponse: JsonToken; var TempShopifyLocation: Record "NPR Spfy Location" temporary)
+    var
+        ReceivedShopifyLocations: JsonToken;
+        ReceivedShopifyLocation: JsonToken;
+        ReceivedShopifyLocationsErr: Label 'Invalid GraphQL response: missing "data.locations" node.', Locked = true;
+    begin
+        ReceivedShopifyLocations := _JsonHelper.GetJsonToken(ShopifyResponse, 'data.locations.edges');
+        if (not ReceivedShopifyLocations.IsArray()) then
+            Error(ReceivedShopifyLocationsErr);
+
+        foreach ReceivedShopifyLocation in ReceivedShopifyLocations.AsArray() do begin
+            TempShopifyLocation.Init();
+#pragma warning disable AA0139
+            TempShopifyLocation.ID := _SpfyIntegrationMgt.RemoveUntil(_JsonHelper.GetJText(ReceivedShopifyLocation, 'node.id', true), '/');
+            if not TempShopifyLocation.Find() then begin
+                TempShopifyLocation.Name := _JsonHelper.GetJText(ReceivedShopifyLocation, 'node.name', MaxStrLen(TempShopifyLocation.Name), false);
+                TempShopifyLocation.Address := _JsonHelper.GetJText(ReceivedShopifyLocation, 'node.address.address1', MaxStrLen(TempShopifyLocation.Address), false);
+                TempShopifyLocation."Address 2" := _JsonHelper.GetJText(ReceivedShopifyLocation, 'node.address.address2', MaxStrLen(TempShopifyLocation."Address 2"), false);
+                TempShopifyLocation.City := _JsonHelper.GetJText(ReceivedShopifyLocation, 'node.address.city', MaxStrLen(TempShopifyLocation.City), false);
+                TempShopifyLocation."Post Code" := _JsonHelper.GetJText(ReceivedShopifyLocation, 'node.address.zip', MaxStrLen(TempShopifyLocation."Post Code"), false);
+                TempShopifyLocation."Country/Region Code" := _JsonHelper.GetJText(ReceivedShopifyLocation, 'node.address.countryCode', MaxStrLen(TempShopifyLocation."Country/Region Code"), false);
+#pragma warning restore AA0139
+                TempShopifyLocation.Active := _JsonHelper.GetJBoolean(ReceivedShopifyLocation, 'node.isActive', false);
+                TempShopifyLocation.Insert();
+            end;
+        end;
+    end;
+
+    local procedure CreateRequest(var NcTask: Record "NPR Nc Task"; Cursor: Text; ShopifyStoreCode: code[20]; RequestString: text)
+    var
+        VariablesJson: JsonObject;
+    begin
+        Clear(NcTask);
+        NcTask."Store Code" := ShopifyStoreCode;
+        AddCursor(VariablesJson, Cursor);
+        CompleteRequest(RequestString, VariablesJson, NcTask);
+    end;
+
+    local procedure AddCursor(var VariablesJson: JsonObject; Cursor: Text)
+    var
+        CursorValue: JsonValue;
+    begin
+        if Cursor = '' then
+            CursorValue.SetValueToNull()
+        else
+            CursorValue.SetValue(Cursor);
+
+        VariablesJson.Add('afterCursor', CursorValue);
+    end;
+
+    local procedure CompleteRequest(RequestString: text; VariablesJson: JsonObject; var NcTask: Record "NPR Nc Task")
+    var
+        QueryStream: OutStream;
+        RequestJson: JsonObject;
+    begin
+        RequestJson.Add('query', RequestString);
+        RequestJson.Add('variables', VariablesJson);
+        NcTask."Data Output".CreateOutStream(QueryStream, TextEncoding::UTF8);
+        RequestJson.WriteTo(QueryStream);
     end;
 
     procedure GetShopifyProductID(SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; WithDialog: Boolean): Text[30]
