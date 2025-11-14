@@ -375,8 +375,17 @@ navigation:
                 - endpoint: customer.service-customer.getCustomers
                 - endpoint: customer.service-customer.createCustomer          
 
+        - section: Retail Print
+          summary: ./docs/pages/retailprint/overview.mdx
+          contents:
+          - retailprint.service-retail-print:
+              title: Print Price Labels
+              summary: ./docs/pages/retailprint/retailprint.mdx
+              contents:
+                - endpoint: retailprint.service-retail-print.printPriceLabel
+
         - section: PDF Designer
-          #hidden: true
+          #hidden: truever
           summary: ./docs/pages/pdf-designer/overview.mdx
           contents:
           - pdf-designer.service-pdf-designer:

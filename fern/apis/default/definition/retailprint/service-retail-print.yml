@@ -1,0 +1,150 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  globalApiTypes: ./../global-api-types.yml
+  errors: ./../errors.yml
+
+types:
+  LayoutType:
+    enum:
+      - Codeunit
+      - PrintTemplate
+    docs: The type of layout to use for printing
+
+  PrintItem:
+    docs: |
+      An item to be printed with its quantity. Items can be identified using either:
+      - EAN/barcode (automatically resolves to Item No. and Variant Code)
+      - Item No. and optional Variant Code (for direct identification)
+      
+      Note: You must provide either 'ean' OR 'itemNo', but not both.
+    properties:
+      ean:
+        type: optional<string>
+        docs: The EAN/barcode of the item to print. Cannot be used together with itemNo.
+      itemNo:
+        type: optional<string>
+        docs: The item number. Cannot be used together with ean. When using this method, variantCode is optional.
+      variantCode:
+        type: optional<string>
+        docs: The variant code for the item. Only used when itemNo is provided. Can be omitted if the item has no variant.
+      qty:
+        type: integer
+        docs: The quantity of labels to print for this item. Must be greater than 0.
+    examples:
+      - name: ExamplePrintItemWithEan
+        value:
+          ean: "4006381333931"
+          qty: 10
+      - name: ExamplePrintItemWithItemNo
+        value:
+          itemNo: "1896-S"
+          variantCode: "BLUE"
+          qty: 5
+      - name: ExamplePrintItemWithItemNoOnly
+        value:
+          itemNo: "1900-S"
+          qty: 20
+
+  PrintPriceLabelRequest:
+    docs: Request body for printing price labels in batch
+    properties:
+      layoutType:
+        type: LayoutType
+        docs: The type of layout to use (Codeunit or PrintTemplate)
+      layout:
+        type: string
+        docs: The code/ID of the layout to use for printing
+      items:
+        type: list<PrintItem>
+        docs: |
+          List of items to print with their identification and quantities. Each item can be identified by:
+          - EAN/barcode - automatically looks up the item
+          - Item No. + optional Variant Code - directly specifies the item
+    examples:
+      - name: ExamplePrintRequestWithEan
+        value:
+          layoutType: PrintTemplate
+          layout: "TEMPLATE01"
+          items:
+            - ean: "4006381333931"
+              qty: 10
+            - ean: "5012345678900"
+              qty: 5
+      - name: ExamplePrintRequestWithItemNo
+        value:
+          layoutType: Codeunit
+          layout: "123456"
+          items:
+            - itemNo: "1896-S"
+              variantCode: "BLUE"
+              qty: 10
+            - itemNo: "1900-S"
+              qty: 5
+      - name: ExamplePrintRequestMixed
+        value:
+          layoutType: PrintTemplate
+          layout: "TEMPLATE01"
+          items:
+            - ean: "4006381333931"
+              qty: 10
+            - itemNo: "1896-S"
+              variantCode: "BLUE"
+              qty: 5
+            - itemNo: "1900-S"
+              qty: 20
+
+  PrintPriceLabelResponse:
+    docs: Response containing the print job details and printer information
+    properties:
+      printerType:
+        type: optional<string>
+        docs: The printer type (Matrix or Line). Only included when layoutType is PrintTemplate.
+      device:
+        type: optional<string>
+        docs: The printer device enum value (e.g., Zebra, Epson). Only included when layoutType is PrintTemplate.
+      type:
+        type: string
+        docs: The type of the print job (always "raw")
+      printJob:
+        type: string
+        docs: Base64-encoded print job data
+    examples:
+      - name: ExamplePrintTemplateResponse
+        value:
+          printerType: "Matrix"
+          device: "Zebra"
+          type: "raw"
+          printJob: "XlhBXkNJMjdeTEg1LDBeUFc0NDgKXkZPMTAsMzBeQVNOXkZEVEVTVF5GUwpeRk8xMCw3NV5BU05eRkRQcmlzXkZTCl5GTzIzMCw3NV5BVE5eRkRLci4gMTAuMDBeRlMKXkZPMTAsMjAwXkFQTl5GRFN0eWxlOiAxMDAxXkZTCl5GTzEwLDIyNV5CWTIsMy4wLDUwXkJDTiw1MCxZLE4sTixBXkZEMjgwMDAwMDAwMDAzNV5GUwpeRk8zMDAsMjc1XkFQTl5GRCBeRlMKXlha"
+      - name: ExampleCodeunitResponse
+        value:
+          type: "raw"
+          printJob: "XlhBXkNJMjdeTEg1LDBeUFc0NDgKXkZPMTAsMzBeQVNOXkZEVEVTVF5GUwpeRk8xMCw3NV5BU05eRkRQcmlzXkZTCl5GTzIzMCw3NV5BVE5eRkRLci4gMTAuMDBeRlMKXkZPMTAsMjAwXkFQTl5GRFN0eWxlOiAxMDAxXkZTCl5GTzEwLDIyNV5CWTIsMy4wLDUwXkJDTiw1MCxZLE4sTixBXkZEMjgwMDAwMDAwMDAzNV5GUwpeRk8zMDAsMjc1XkFQTl5GRCBeRlMKXlha"
+
+service:
+  auth: true
+  display-name: Retail Print
+  base-path: /retailprint
+  endpoints:
+    printPriceLabel:
+      display-name: Print Price Labels
+      docs: |
+        Generate print jobs for price labels in batch. Items can be identified by EAN/barcode or Item No. with optional Variant Code.
+        
+        Returns base64-encoded print job data. When using PrintTemplate layout type, also returns printer metadata (printerType and device).
+      method: POST
+      path: /pricelabel
+      request:
+        name: printPriceLabelRequest
+        body: PrintPriceLabelRequest
+      response: PrintPriceLabelResponse
+      errors:
+        - errors.BadRequest
+      examples:
+        - path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          request: $PrintPriceLabelRequest.ExamplePrintRequestMixed
+          response:
+            body: $PrintPriceLabelResponse.ExamplePrintTemplateResponse

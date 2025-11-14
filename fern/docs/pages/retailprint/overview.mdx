@@ -1,0 +1,21 @@
+---
+title: Retail Print API Overview
+subtitle: Batch printing of price labels and retail documents
+---
+
+The **Retail Print API** enables batch printing operations for retail environments. Generate print jobs for price labels with flexible item identification and layout options.
+
+## Key Features
+
+- **Batch Processing**: Print multiple labels in a single API call
+- **Flexible Item Identification**: Use EAN/barcode or Item No. with optional Variant Code
+- **Layout Support**: Codeunit-based and Print Template layouts
+- **Base64 Output**: Returns print job data ready to send to printers
+
+## Required Permissions
+
+The `NPR API RetailPrint` permission set must be assigned to the user account.
+
+<Note>
+This API returns base64-encoded print job data. You'll need to send this to your printer using a printing service (e.g., PrintNode).
+</Note>

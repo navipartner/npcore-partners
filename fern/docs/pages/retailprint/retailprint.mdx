@@ -1,0 +1,21 @@
+Generate print jobs for price labels in batch. Ideal for warehouse management systems and retail operations.
+
+## Item Identification
+
+Items can be identified using either method (but not both):
+
+- **EAN/Barcode**: Automatically resolves to Item No. and Variant Code
+- **Item No. + Variant Code**: Direct item specification (useful when barcodes are duplicated)
+
+<Warning>
+Each item must use exactly one identification method. You cannot specify both `ean` and `itemNo` for the same item.
+</Warning>
+
+## Layout Types
+
+- **PrintTemplate**: Returns printer metadata (`printerType` and `device`) along with the print job
+- **Codeunit**: Returns only the print job data
+
+<Note>
+This endpoint returns base64-encoded print job data. You'll need to send this data to your printer using a printing service (e.g., PrintNode).
+</Note>
