@@ -102,7 +102,7 @@ let main = async ({
 
   if (addItemAddOn) {
     await workflow.run("RUN_ITEM_ADDONS", {
-      context: { baseLineNo: baseLineNo },
+      context: { BaseLineNo: baseLineNo },
       parameters: { SkipItemAvailabilityCheck: true },
     });
     await workflow.respond("checkAvailability");
