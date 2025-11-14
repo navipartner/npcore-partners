@@ -76,6 +76,11 @@ page 6184835 "NPR MM Member Payment Methods"
                 Visible = _DefaultFieldVisible;
                 SubPageLink = "Entry No." = field("Entry No.");
             }
+            part(MembersFactbox; "NPR MM SubsMembersFactbox")
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Related Members';
+            }
         }
     }
     actions
@@ -121,6 +126,8 @@ page 6184835 "NPR MM Member Payment Methods"
         _DefaultFieldVisible: Boolean;
         _MembershipId: Guid;
         _IsDefault: Boolean;
+        _BackgroundTaskId: Integer;
+        _BackgroundSystemId: Guid;
 
     trigger OnAfterGetRecord()
     var
@@ -131,10 +138,35 @@ page 6184835 "NPR MM Member Payment Methods"
             _IsDefault := MembershipPmtMethodMap.Default;
     end;
 
+    trigger OnAfterGetCurrRecord()
+    begin
+        EnqueueBackgroundTask();
+    end;
+
     internal procedure SetMembershipId(MembershipId: Guid)
     begin
         _MembershipId := MembershipId;
         if (not IsNullGuid(MembershipId)) then
             _DefaultFieldVisible := true;
+    end;
+
+    local procedure EnqueueBackgroundTask()
+    var
+        Parameters: Dictionary of [Text, Text];
+    begin
+        if Rec.SystemId = _BackgroundSystemId then
+            exit;
+        if (_BackgroundTaskId <> 0) then
+            CurrPage.CancelBackgroundTask(_BackgroundTaskId);
+        Parameters.Add('systemId', Rec.SystemId);
+        CurrPage.EnqueueBackgroundTask(_BackgroundTaskId, Codeunit::"NPR MM SubsMembersFactbWorker", Parameters);
+        _BackgroundSystemId := Rec.SystemId;
+    end;
+
+    trigger OnPageBackgroundTaskCompleted(TaskId: Integer; Results: Dictionary of [Text, Text])
+    begin
+        if TaskId <> _BackgroundTaskId then
+            exit;
+        CurrPage.MembersFactbox.Page.FillData(_BackgroundSystemId, Results);
     end;
 }
