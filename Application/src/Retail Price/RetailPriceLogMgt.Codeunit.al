@@ -480,6 +480,7 @@
                         RetailJnlLine.Init();
                         RetailJnlLine.Validate("No.", RetailJnlHeader."No.");
                         RetailJnlLine."Line No." := LineNo;
+                        CopyAdditionalFieldsFromHeader(RetailJnlHeader, RetailJnlLine);
                         RetailJnlLine.Validate("Item No.", TempItem."No.");
                         RetailJnlLine.validate("Unit of Measure", RetailPriceLogEntry."Unit of Measure Code");
                         RetailJnlLine.Insert(true);
@@ -672,6 +673,14 @@
     local procedure QueryPriceLogViewName(): Code[40]
     begin
         exit('QUERY_RETAIL_PRICE_LOG');
+    end;
+
+    local procedure CopyAdditionalFieldsFromHeader(RetailJnlHeader: Record "NPR Retail Journal Header"; var RetailJnlLine: Record "NPR Retail Journal Line")
+    begin
+        RetailJnlLine."Calculation Date" := RetailJnlHeader."Date of creation";
+        RetailJnlLine."Customer Price Group" := RetailJnlHeader."Customer Price Group";
+        RetailJnlLine."Customer Disc. Group" := RetailJnlHeader."Customer Disc. Group";
+        RetailJnlLine."Register No." := RetailJnlHeader."Register No.";
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"NPR Retail Price Log Setup", 'OnAfterInsertEvent', '', true, true)]

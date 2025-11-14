@@ -371,6 +371,7 @@
             begin
                 Item.Get(Rec."Item No.");
                 Rec."Last Direct Cost" := Item."Last Direct Cost" * UnitofMeasureManagement.GetQtyPerUnitOfMeasure(Item, Rec."Unit of Measure");
+                UpdateBarcode();
                 FindItemSalesPrice();
                 CalcProfit();
             end;
@@ -853,14 +854,15 @@
         ResolvingTable: Integer;
         TmpItemNo: Code[20];
         TmpVarCode: Code[10];
+        TmpUnitOfMeasure: Code[10];
     begin
         if (Barcode = '') then begin
-            if BarcodeLibrary.GetItemVariantBarcode(BarcodeValue, "Item No.", "Variant Code", ResolvingTable, false) then
+            if BarcodeLibrary.GetItemVariantBarcode(BarcodeValue, "Item No.", "Variant Code", "Unit of Measure", ResolvingTable, false) then
                 Barcode := BarcodeValue;
         end else begin
-            BarcodeLibrary.TranslateBarcodeToItemVariant(Barcode, TmpItemNo, TmpVarCode, ResolvingTable, true);
-            if (TmpItemNo <> "Item No.") or (TmpVarCode <> "Variant Code") then
-                if BarcodeLibrary.GetItemVariantBarcode(BarcodeValue, "Item No.", "Variant Code", ResolvingTable, false) then
+            BarcodeLibrary.TranslateBarcodeToItemVariant(Barcode, TmpItemNo, TmpVarCode, TmpUnitOfMeasure, ResolvingTable, true);
+            if (TmpItemNo <> "Item No.") or (TmpVarCode <> "Variant Code") or (TmpUnitOfMeasure <> "Unit of Measure") then
+                if BarcodeLibrary.GetItemVariantBarcode(BarcodeValue, "Item No.", "Variant Code", "Unit of Measure", ResolvingTable, false) then
                     Barcode := BarcodeValue;
         end;
     end;

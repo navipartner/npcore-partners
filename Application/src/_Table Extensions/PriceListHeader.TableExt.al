@@ -2,6 +2,12 @@ tableextension 6014458 "NPR Price List Header" extends "Price List Header"
 {
     fields
     {
+#IF NOT (BC17 or BC18 or BC19 or BC20)
+        modify("Assign-to No.")
+        {
+            TableRelation = if ("Source Type" = const("NPR POS Price Profile")) "NPR POS Pricing Profile";
+        }
+#ENDIF
         field(6151479; "NPR Replication Counter"; BigInteger)
         {
             Caption = 'Replication Counter';

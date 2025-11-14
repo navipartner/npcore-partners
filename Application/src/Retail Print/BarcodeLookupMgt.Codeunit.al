@@ -8,6 +8,13 @@
 
     procedure TranslateBarcodeToItemVariant(Barcode: Text; var ItemNo: Code[20]; var VariantCode: Code[10]; var ResolvingTable: Integer; AllowDiscontinued: Boolean) Found: Boolean
     var
+        UnitOfMeasure: Code[10];
+    begin
+        exit(TranslateBarcodeToItemVariant(Barcode, ItemNo, VariantCode, UnitOfMeasure, ResolvingTable, AllowDiscontinued));
+    end;
+
+    procedure TranslateBarcodeToItemVariant(Barcode: Text; var ItemNo: Code[20]; var VariantCode: Code[10]; var UnitOfMeasure: Code[10]; var ResolvingTable: Integer; AllowDiscontinued: Boolean) Found: Boolean
+    var
         Item: Record Item;
         ItemReference: Record "Item Reference";
         ItemVariant: Record "Item Variant";
@@ -15,6 +22,7 @@
         ResolvingTable := 0;
         ItemNo := '';
         VariantCode := '';
+        UnitOfMeasure := '';
         if (Barcode = '') then exit(false);
         if (StrLen(Barcode) <= MaxStrLen(ItemReference."Reference No.")) then begin
             ItemReference.SetCurrentKey("Reference Type", "Reference No.");
@@ -32,6 +40,7 @@
                 ResolvingTable := DATABASE::"Item Reference";
                 ItemNo := ItemReference."Item No.";
                 VariantCode := ItemReference."Variant Code";
+                UnitOfMeasure := ItemReference."Unit of Measure";
                 exit(true);
             end;
         end;
@@ -56,6 +65,11 @@
     end;
 
     procedure GetItemVariantBarcode(var Barcode: Text[50]; ItemNo: Code[20]; VariantCode: Code[10]; var ResolvingTable: Integer; AllowDiscontinued: Boolean): Boolean
+    begin
+        exit(GetItemVariantBarcode(Barcode, ItemNo, VariantCode, '', ResolvingTable, AllowDiscontinued));
+    end;
+
+    procedure GetItemVariantBarcode(var Barcode: Text[50]; ItemNo: Code[20]; VariantCode: Code[10]; UnitOfMeasure: Code[10]; var ResolvingTable: Integer; AllowDiscontinued: Boolean): Boolean
     var
         ItemReference: Record "Item Reference";
         Item: Record Item;
@@ -68,9 +82,13 @@
             ItemReference.SetRange("Item No.", ItemNo);
             ItemReference.SetRange("Variant Code", VariantCode);
             ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
+            ItemReference.SetRange("Unit of Measure", UnitOfMeasure);
             ItemReference.SetRange("NPR Label Barcode", true);
-            if ItemReference.IsEmpty then
+            if ItemReference.IsEmpty() then begin
                 ItemReference.SetRange("NPR Label Barcode");
+                if ItemReference.IsEmpty() then
+                    ItemReference.SetRange("Unit of Measure");
+            end;
             if ItemReference.FindFirst() then begin
                 Barcode := ItemReference."Reference No.";
                 ResolvingTable := DATABASE::"Item Reference";
