@@ -191,4 +191,22 @@ codeunit 6248213 "NPR CRO Fiscal E-Mail Mgt."
         BodyText.GetSubText(Value, 1);
         exit(Value);
     end;
+
+    internal procedure TrySendFiscalBillForInvoice(SalesInvoiceHeader: Record "Sales Invoice Header"): Boolean
+    var
+        CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info";
+        TempEmailItem: Record "Email Item" temporary;
+        ErrorMessage: Text;
+    begin
+        CROPOSAuditLogAuxInfo.SetRange("Source Document No.", SalesInvoiceHeader."No.");
+        CROPOSAuditLogAuxInfo.SetRange("Audit Entry Type", CROPOSAuditLogAuxInfo."Audit Entry Type"::"Sales Invoice");
+        CROPOSAuditLogAuxInfo.SetRange("Fiscal Bill E-Mails", false);
+        if not CROPOSAuditLogAuxInfo.FindFirst() then
+            exit(false);
+        ErrorMessage := CreateAndSendEmailMessage(TempEmailItem, CROPOSAuditLogAuxInfo, CROPOSAuditLogAuxInfo."Email-To");
+        LogEmailSendingInfo(TempEmailItem, CROPOSAuditLogAuxInfo, ErrorMessage);
+        if ErrorMessage <> '' then
+            exit(false);
+        exit(true);
+    end;
 }
