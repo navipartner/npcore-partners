@@ -355,6 +355,63 @@ codeunit 6150648 "NPR Json Parser"
         exit(true);
     end;
 
+    procedure GetProperty(PropertyName: Text; var Value: Guid): Codeunit "NPR JSON Parser"
+    var
+        hasProperty: Boolean;
+    begin
+        exit(GetProperty(PropertyName, Value, hasProperty));
+    end;
+
+    procedure GetProperty(PropertyName: Text; var Value: Guid; var HasProperty: Boolean): Codeunit "NPR JSON Parser"
+    begin
+        InitcurrCodeunit();
+        HasProperty := TryGetProperty(PropertyName, Value);
+        exit(CurrCodeunit);
+    end;
+
+    procedure TryGetProperty(PropertyName: Text; var Value: Guid): Boolean
+    var
+        valueJsonToken: JsonToken;
+    begin
+        Clear(Value);
+        if not CurrentObject.Get(PropertyName, valueJsonToken) then
+            exit(false);
+
+        if not valueJsonToken.IsValue then
+            exit(false);
+
+        exit(Evaluate(Value, valueJsonToken.AsValue().AsText()));
+    end;
+
+    procedure GetProperty(PropertyName: Text; var Value: DateTime): Codeunit "NPR JSON Parser"
+    var
+        hasProperty: Boolean;
+    begin
+        exit(GetProperty(PropertyName, Value, hasProperty));
+    end;
+
+    procedure GetProperty(PropertyName: Text; var Value: DateTime; var HasProperty: Boolean): Codeunit "NPR JSON Parser"
+    begin
+        InitcurrCodeunit();
+        HasProperty := TryGetProperty(PropertyName, Value);
+        exit(CurrCodeunit);
+    end;
+
+    procedure TryGetProperty(PropertyName: Text; var Value: DateTime): Boolean
+    var
+        valueJsonToken: JsonToken;
+    begin
+        Clear(Value);
+        if not CurrentObject.Get(PropertyName, valueJsonToken) then
+            exit(false);
+
+        if not valueJsonToken.IsValue then
+            exit(false);
+
+        Value := valueJsonToken.AsValue().AsDateTime();
+        exit(true);
+    end;
+
     #region Fluent Interface
     local procedure InitcurrCodeunit()
     var
