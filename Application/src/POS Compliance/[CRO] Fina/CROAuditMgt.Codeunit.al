@@ -666,16 +666,18 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         BaseValuePatternLbl: Label '%1%2%3%4%5%6', Locked = true;
         ResponseText: Text;
         ZKIBaseValue: Text;
+        ZKICodeNotSignedErr: Label 'There was an error generating and signing ZKI Code.';
     begin
         CROFiscalSetup.Get();
 
         ZKIBaseValue := StrSubstNo(BaseValuePatternLbl, CROFiscalSetup."Certificate Subject OIB", Format(CROPOSAuditLogAuxInfo."Entry Date", 10, '<Day,2>.<Month,2>.<Year4>') + 'T' + Format(CROPOSAuditLogAuxInfo."Log Timestamp", 8, '<Hours24,2>:<Minutes,2>:<Seconds,2>'), CROPOSAuditLogAuxInfo."Bill No.", CROPOSAuditLogAuxInfo."POS Store Code", CROPOSAuditLogAuxInfo."POS Unit No.", FormatDecimal(CROPOSAuditLogAuxInfo."Total Amount"));
-        if SignZKICode(CROPOSAuditLogAuxInfo, ZKIBaseValue, ResponseText) then begin
+        if SignZKICode(ZKIBaseValue, ResponseText) then begin
 #pragma warning disable AA0139
             CROPOSAuditLogAuxInfo."ZKI Code" := ResponseText;
 #pragma warning restore AA0139
             CROPOSAuditLogAuxInfo.Modify();
-        end;
+        end else
+            Error(ZKICodeNotSignedErr);
     end;
 
     local procedure InsertParagonNumberToAuditLog(SalePOS: Record "NPR POS Sale"; var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info")
@@ -870,7 +872,19 @@ codeunit 6151547 "NPR CRO Audit Mgt."
             exit(true)
     end;
 
-    internal procedure SignZKICode(var CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info"; BaseValue: Text; var ResponseText: Text): Boolean
+    local procedure SignZKICode(BaseValue: Text; var ResponseText: Text): Boolean
+    var
+        ErrorCounter: Integer;
+    begin
+        for ErrorCounter := 1 to 3 do begin
+            if SendRequestForZKISignature(BaseValue, ResponseText) then
+                exit(true);
+            if ErrorCounter < 3 then
+                Sleep(1000);
+        end;
+    end;
+
+    internal procedure SendRequestForZKISignature(BaseValue: Text; var ResponseText: Text): Boolean
     var
         KeyVaultMgt: Codeunit "NPR Azure Key Vault Mgt.";
         Content: HttpContent;
@@ -905,8 +919,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         RequestMessage.Method('POST');
         RequestMessage.Content(Content);
         RequestMessage.GetHeaders(Headers);
-        if SendHttpRequest(RequestMessage, ResponseText, false) then
-            exit(true)
+        exit(SendHttpRequest(RequestMessage, ResponseText, true));
     end;
 
     internal procedure SetHeader(var Headers: HttpHeaders; HeaderName: Text; HeaderValue: Text)
