@@ -178,10 +178,8 @@ types:
     properties:
       admissionCode: simpleTypes.AdmissionCode
       firstAdmissionAt: optional<datetime>
-      blocked: boolean
     examples:
       - name: ExampleTicketAccessHistory
         value:
           admissionCode: $simpleTypes.AdmissionCode.ExampleAdmissionCastle
           firstAdmissionAt: "2025-01-31T09:12:00Z"
-          blocked: false
