@@ -5611,7 +5611,7 @@
             Error(PAN_TO_LONG, MaxStrLen(MemberInfoCapture."External Card No."), MembershipSetup."Card Number Pattern");
 
         MemberInfoCapture."External Card No." := PAN;
-        MemberInfoCapture."Pin Code" := '1234';
+        MemberInfoCapture."Pin Code" := GenerateRandom('N') + GenerateRandom('N') + GenerateRandom('N') + GenerateRandom('N');
 
     end;
 

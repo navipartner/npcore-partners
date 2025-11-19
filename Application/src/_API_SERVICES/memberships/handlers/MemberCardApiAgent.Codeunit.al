@@ -115,6 +115,40 @@ codeunit 6248223 "NPR MemberCardApiAgent"
         exit(Response.RespondOK(ResponseJson.Build()));
     end;
 
+    internal procedure PatchMemberCard(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        MemberCard: Record "NPR MM Member Card";
+        ResponseJson: Codeunit "NPR JSON Builder";
+
+        BodyJson: JsonObject;
+        jToken: JsonToken;
+        CardAsText: Text;
+    begin
+        if (not GetByCardId(Request, 3, MemberCard)) then
+            exit(Response.RespondBadRequest('Card not found'));
+
+        CardAsText := Format(MemberCard);
+
+        BodyJson := Request.BodyJson().AsObject();
+        if (BodyJson.Get('temporary', jToken)) then
+            MemberCard."Card Is Temporary" := jToken.AsValue().AsBoolean();
+
+        if (BodyJson.Get('expiryDate', jToken)) then
+            MemberCard."Valid Until" := jToken.AsValue().AsDate();
+
+        if (BodyJson.Get('pinCode', jToken)) then
+            MemberCard."Pin Code" := CopyStr(jToken.AsValue().AsText(), 1, MaxStrLen(MemberCard."Pin Code"));
+
+        if (Format(MemberCard) <> CardAsText) then
+            MemberCard.Modify();
+
+        ResponseJson.StartObject()
+            .AddObject(StartMemberCardDTO(ResponseJson, MemberCard, false, false))
+            .EndObject();
+
+        exit(Response.RespondOK(ResponseJson.Build()));
+    end;
+
     internal procedure SendToWallet(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         MemberCard: Record "NPR MM Member Card";
@@ -253,6 +287,7 @@ codeunit 6248223 "NPR MemberCardApiAgent"
             .AddProperty('expiryDate', MemberCard."Valid Until")
             .AddProperty('temporary', MemberCard."Card Is Temporary")
             .AddProperty('blocked', MemberCard.Blocked)
+            .AddProperty('pinCode', MemberCard."Pin Code")
             .AddProperty('createdAt', MemberCard.SystemCreatedAt)
             .AddProperty('modifiedAt', MemberCard.SystemModifiedAt)
             .AddObject(StartMemberDTO(ResponseJson, MemberCard."Member Entry No.", IncludeMember))

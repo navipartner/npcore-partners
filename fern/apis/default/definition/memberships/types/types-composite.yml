@@ -158,6 +158,8 @@ types:
           cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
           expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDate
           temporary: false
+          blocked: false
+          pinCode: $simpleTypes.PinCode.ExamplePinCode
           createdAt: $simpleTypes.CreatedAt.ExampleCreatedAt
           modifiedAt: $simpleTypes.ModifiedAt.ExampleModifiedAt
           member: $MemberEntityResponse.ExampleMember
@@ -561,6 +563,7 @@ types:
       expiryDate: simpleTypes.ExpiryDate
       temporary: simpleTypes.TemporaryCard
       blocked: optional<simpleTypes.Blocked>
+      pinCode: optional<simpleTypes.PinCode>
       createdAt: simpleTypes.CreatedAt
       modifiedAt: simpleTypes.ModifiedAt
     examples:
@@ -570,6 +573,8 @@ types:
           cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
           expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDate
           temporary: false
+          blocked: false
+          pinCode: $simpleTypes.PinCode.ExamplePinCode
           createdAt: $simpleTypes.CreatedAt.ExampleCreatedAt
           modifiedAt: $simpleTypes.ModifiedAt.ExampleModifiedAt
       - name: ExampleMemberCardBlocked
@@ -579,6 +584,7 @@ types:
           expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDate
           temporary: false
           blocked: true
+          pinCode: $simpleTypes.PinCode.ExamplePinCode
           createdAt: $simpleTypes.CreatedAt.ExampleCreatedAt
           modifiedAt: $simpleTypes.ModifiedAt.ExampleModifiedAt
       - name: ExampleMemberCardCreate
@@ -586,6 +592,8 @@ types:
           cardNumber: $simpleTypes.CardNumber.ExampleCardNumber
           expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDate
           temporary: false
+          blocked: false
+          pinCode: $simpleTypes.PinCode.ExamplePinCode
           createdAt: $simpleTypes.CreatedAt.ExampleCreatedAt
           modifiedAt: $simpleTypes.ModifiedAt.ExampleModifiedAt
 

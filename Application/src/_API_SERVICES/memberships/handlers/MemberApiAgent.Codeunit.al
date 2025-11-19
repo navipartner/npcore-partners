@@ -837,6 +837,7 @@ codeunit 6248220 "NPR MemberApiAgent"
                     .AddProperty('cardId', Format(MemberCard.SystemId, 0, 4).ToLower())
                     .AddProperty('cardNumber', MemberCard."External Card No.")
                     .AddProperty('expiryDate', MemberCard."Valid Until")
+                    .AddProperty('pinCode', MemberCard."Pin Code")
                     .AddProperty('temporary', MemberCard."Card Is Temporary")
                     .AddProperty('blocked', MemberCard.Blocked)
                     .AddProperty('createdAt', MemberCard.SystemCreatedAt)

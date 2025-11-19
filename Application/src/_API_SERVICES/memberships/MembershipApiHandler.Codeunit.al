@@ -141,6 +141,9 @@ codeunit 6185122 "NPR MembershipApiHandler"
             _ApiFunction::REPLACE_CARD:
                 _Response := MemberCardApiAgent.ReplaceMemberCard(_Request);
 
+            _ApiFunction::PATCH_CARD:
+                _Response := MemberCardApiAgent.PatchMemberCard(_Request);
+
             _ApiFunction::SEND_TO_WALLET:
                 _Response := MemberCardApiAgent.SendToWallet(_Request);
 

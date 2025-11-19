@@ -202,6 +202,9 @@ navigation:
                   - endpoint: memberships.service-card.getCardNumber
                   - endpoint: memberships.service-card.addCard
                   - endpoint: memberships.service-card.replaceCard
+                  - endpoint: memberships.service-card.patchCard
+                  - endpoint: memberships.service-card.blockCard
+                  - endpoint: memberships.service-card.unblockCard
                   #- endpoint: memberships.service-card.registerArrival
                   - endpoint: memberships.service-card.sendToWallet
 

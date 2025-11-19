@@ -156,6 +156,11 @@ enum 6059827 "NPR MembershipApiFunctions"
         Caption = 'Send to wallet';
     }
 
+    value(328; PATCH_CARD)
+    {
+        Caption = 'Update a card';
+    }
+
     value(400; GET_RENEWAL_OPTIONS)
     {
         Caption = 'Get renewal options';

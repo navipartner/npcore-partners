@@ -544,6 +544,13 @@ types:
         - name: ExampleTemporaryCard
           value: false
           
+  PinCode:
+    type: string
+    docs: The PIN code associated with the card.
+    examples:
+      - name: ExamplePinCode
+        value: "1234"
+  
   ## Role Related Types
   RoleEnum:
     enum:

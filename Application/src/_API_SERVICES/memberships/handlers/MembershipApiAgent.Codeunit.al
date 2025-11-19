@@ -317,6 +317,7 @@ codeunit 6185123 "NPR MembershipApiAgent"
                     .AddProperty('expiryDate', MemberCard."Valid Until")
                     .AddProperty('temporary', MemberCard."Card Is Temporary")
                     .AddProperty('blocked', MemberCard.Blocked)
+                    .AddProperty('pinCode', MemberCard."Pin Code")
                     .AddProperty('createdAt', MemberCard.SystemCreatedAt)
                     .AddProperty('modifiedAt', MemberCard.SystemModifiedAt)
                     .EndObject();

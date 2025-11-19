@@ -158,24 +158,22 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
         if (Request.Match('POST', '/membership/card/:cardId/sendToWallet')) then
             exit(Handle(_ApiFunction::SEND_TO_WALLET, Request));
 
+        if (Request.Match('POST', '/membership/:membershipId/member/:memberId/addCard')) then
+            exit(Handle(_ApiFunction::ADD_CARD, Request));
+
+
+        if Request.Match('POST', '/membership/:membershipId/points/reserve') then
+            exit(Handle(_ApiFunction::POINTS_RESERVE, Request));
+
+        if Request.Match('POST', '/membership/:membershipId/points') then
+            exit(Handle(_ApiFunction::POINTS_REGISTER_SALE, Request));
+
+
         if (Request.Match('POST', '/membership/:membershipId/subscription/start')) then
             exit(Handle(_ApiFunction::ENTER_SUBSCRIPTION, Request));
 
         if (Request.Match('POST', '/membership/:membershipId/subscription/terminate')) then
             exit(Handle(_ApiFunction::TERMINATE_SUBSCRIPTION, Request));
-
-
-        if (Request.Match('POST', '/membership/:membershipId/member/:memberId/addCard')) then
-            exit(Handle(_ApiFunction::ADD_CARD, Request));
-
-        if Request.Match('POST', '/membership/:membershipId/points/reserve') then
-            exit(Handle(_ApiFunction::POINTS_RESERVE, Request));
-
-        if Request.Match('DELETE', '/membership/:membershipId/points/reserve') then
-            exit(Handle(_ApiFunction::POINTS_CANCEL_RESERVATION, Request));
-
-        if Request.Match('POST', '/membership/:membershipId/points') then
-            exit(Handle(_ApiFunction::POINTS_REGISTER_SALE, Request));
 
         // ************************************************************
 
@@ -188,7 +186,17 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
 
         if (Request.Match('PATCH', '/membership/member/:memberId')) then
             exit(Handle(_ApiFunction::UPDATE_MEMBER, Request));
+
+        if (Request.Match('PATCH', '/membership/card/:cardId')) then
+            exit(Handle(_ApiFunction::PATCH_CARD, Request));
+
         // ************************************************************
+
+        if Request.Match('DELETE', '/membership/:membershipId/points/reserve') then
+            exit(Handle(_ApiFunction::POINTS_CANCEL_RESERVATION, Request));
+
+        if (Request.Match('DELETE', '/membership/member/:memberId/attributes')) then
+            exit(Handle(_ApiFunction::DELETE_MEMBER_ATTRIBUTE_VALUES, Request));
 
         if (Request.Match('DELETE', '/membership/paymentMethods/:paymentMethodId')) then
             exit(Handle(_ApiFunction::DELETE_PAYMENT_METHOD, Request));
@@ -196,8 +204,6 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
         if (Request.Match('DELETE', '/membership/:membershipId/attributes')) then
             exit(Handle(_ApiFunction::DELETE_MEMBERSHIP_ATTRIBUTE_VALUES, Request));
 
-        if (Request.Match('DELETE', '/membership/member/:memberId/attributes')) then
-            exit(Handle(_ApiFunction::DELETE_MEMBER_ATTRIBUTE_VALUES, Request));
 
         // ************************************************************
 

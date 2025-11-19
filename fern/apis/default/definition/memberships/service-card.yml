@@ -28,7 +28,7 @@ service:
         body: AddCardRequest
       response: AddCardResponse
       examples:
-        - name: ExampleAddCard
+        - name: Add a new Card to Member
           path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
@@ -54,7 +54,7 @@ service:
         body: ReplaceCardRequest
       response: ReplaceCardResponse
       examples:
-        - name: ExampleReplaceCard
+        - name: Replace Existing Card
           path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
@@ -78,7 +78,7 @@ service:
         name: getCardId
       response: GetCardResponse
       examples:
-        - name: ExampleGetCard
+        - name: Get Card using Id
           path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
@@ -101,7 +101,7 @@ service:
           cardNumber: simpleTypes.CardNumber
       response: GetCardNumberResponse
       examples:
-        - name: ExampleGetCard
+        - name: Get Card using Number
           path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
@@ -138,7 +138,7 @@ service:
     #         body: $RegisterArrivalResponse.ExampleRegisterArrival
 
     sendToWallet:
-      display-name: Send to Wallet
+      display-name: Send to Apple Wallet
       docs: 
         Sends the card to the apple wallet via email or phone number specified in the request. 
       method: POST
@@ -149,7 +149,8 @@ service:
         name: sendToWallet 
       response: WalletSentResponse
       examples:
-        - path-parameters:
+        - name: Send to Apple Wallet
+          path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
@@ -170,7 +171,7 @@ service:
         name: blockCard
       response: BlockCardResponse
       examples:
-        - name: ExampleBlockMember
+        - name: Block Member Card
           path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
@@ -192,7 +193,7 @@ service:
         name: unblockCard
       response: BlockCardResponse
       examples:
-        - name: ExampleUnblockMember
+        - name: Unblock Member Card
           path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
@@ -201,6 +202,30 @@ service:
           response: 
             body: $BlockCardResponse.ExampleUnBlockCard
 
+
+    patchCard:
+      docs:
+        Update specific details of a member card, such as expiry date or PIN code. 
+        This endpoint allows for modifications to card attributes without needing to replace the entire card.
+      display-name: Update Card
+      method: PATCH
+      path: /card/{cardId}
+      path-parameters:
+        cardId: simpleTypes.CardId
+      request:
+        name: patchCard
+        body: PatchCardRequest
+      response: PatchCardResponse
+      examples:
+        - name: Update Card Response
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            cardId: $simpleTypes.CardId.ExampleCardId
+          request: $PatchCardRequest.ExamplePatchCard
+          response: 
+            body: $PatchCardResponse.ExamplePatchedCard
 
     # printMemberCard:
     #   docs: Print a member's card
@@ -351,5 +376,27 @@ types:
         value:
           card: $compositeTypes.MemberCardEntity.ExampleMemberCardBlocked
       - name: ExampleUnBlockCard
+        value:
+          card: $compositeTypes.MemberCardEntity.ExampleMemberCard
+
+  PatchCardRequest:
+    docs: Request to update member card details
+    properties:
+      expiryDate: optional<simpleTypes.ExpiryDate>
+      pinCode: optional<simpleTypes.PinCode>
+      temporary: optional<simpleTypes.TemporaryCard>
+    examples:
+      - name: ExamplePatchCard
+        value:
+          expiryDate: $simpleTypes.ExpiryDate.ExampleExpiryDate
+          pinCode: $simpleTypes.PinCode.ExamplePinCode
+          temporary: $simpleTypes.TemporaryCard.ExampleTemporaryCard
+
+  PatchCardResponse:
+    docs: Response to updating a member card
+    properties:
+      card: compositeTypes.MemberCardEntity
+    examples:
+      - name: ExamplePatchedCard
         value:
           card: $compositeTypes.MemberCardEntity.ExampleMemberCard
