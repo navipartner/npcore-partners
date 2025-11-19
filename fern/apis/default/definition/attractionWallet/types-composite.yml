@@ -17,6 +17,7 @@ types:
       lastPrintedAt: simpleTypes.LastPrintedAt
       printCount: simpleTypes.PrintCount
       originatesFromItemNo: optional<simpleTypes.OriginatesFromItemNo>
+      originatesFromDescription: optional<simpleTypes.OriginatesFromDescription>
       externalReferenceNumber: optional<simpleTypes.WalletExternalReferenceNumber>
       assets: optional<list<AssetDetails>>
     examples:
@@ -29,6 +30,7 @@ types:
           lastPrintedAt: $simpleTypes.LastPrintedAt.ExampleLastPrintedAt
           printCount: $simpleTypes.PrintCount.ExamplePrintCount
           originatesFromItemNo: $simpleTypes.OriginatesFromItemNo.ExampleWalletNo
+          originatesFromDescription: $simpleTypes.OriginatesFromDescription.ExampleOriginatesFromDescription
           externalReferenceNumber: $simpleTypes.WalletExternalReferenceNumber.ExampleWalletExternalReferenceNumber
           assets:
             - $AssetDetails.ExampleTicket1
@@ -42,6 +44,7 @@ types:
           lastPrintedAt: $simpleTypes.LastPrintedAt.ExampleLastPrintedAtNoPrint
           printCount: $simpleTypes.PrintCount.ExamplePrintCount
           originatesFromItemNo: $simpleTypes.OriginatesFromItemNo.ExampleWalletNo
+          originatesFromDescription: $simpleTypes.OriginatesFromDescription.ExampleOriginatesFromDescription
           externalReferenceNumber: $simpleTypes.WalletExternalReferenceNumber.ExampleWalletExternalReferenceNumber
           assets:
             - $AssetDetails.ExampleTicket1
@@ -55,6 +58,7 @@ types:
           lastPrintedAt: $simpleTypes.LastPrintedAt.ExampleLastPrintedAt
           printCount: $simpleTypes.PrintCount.ExamplePrintCount
           originatesFromItemNo: $simpleTypes.OriginatesFromItemNo.ExampleWalletNo
+          originatesFromDescription: $simpleTypes.OriginatesFromDescription.ExampleOriginatesFromDescription
           externalReferenceNumber: $simpleTypes.WalletExternalReferenceNumber.ExampleWalletExternalReferenceNumber
           assets:
             - $AssetDetails.ExampleTicket1WithDetails

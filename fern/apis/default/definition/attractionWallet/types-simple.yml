@@ -150,6 +150,13 @@ types:
       - name: ExampleWalletNo
         value: "70009" 
 
+  OriginatesFromDescription:
+    type: string
+    docs: The item description from which the wallet originates.
+    examples:
+      - name: ExampleOriginatesFromDescription
+        value: "Family Fun Pack" 
+
   AssetDescription:
     type: string
     docs: A human-readable description of the asset.

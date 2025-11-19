@@ -207,14 +207,20 @@ codeunit 6248331 "NPR WalletApiAgent"
     var
         AttractionWallet: Codeunit "NPR AttractionWallet";
         ExternalReference: Text[100];
+        Item: Record Item;
     begin
 
+        Item.SetLoadFields("No.", Description);
+        if (Wallet.OriginatesFromItemNo <> '') then
+            if (not Item.Get(Wallet.OriginatesFromItemNo)) then
+                Item.Init();
 
         ResponseJson
             .AddProperty('walletId', Format(Wallet.SystemId, 0, 4).ToLower())
             .AddProperty('referenceNumber', Wallet.ReferenceNumber)
             .AddProperty('description', Wallet.Description)
             .AddProperty('originatesFromItemNo', Wallet.OriginatesFromItemNo)
+            .AddProperty('originatesFromDescription', Item.Description)
             .AddProperty('expiryDatetime', Wallet.ExpirationDate)
             .AddProperty('lastPrintedAt', Wallet.LastPrintAt)
             .AddProperty('printCount', Wallet.PrintCount);
