@@ -217,6 +217,16 @@ page 6184531 "NPR Adyen Setup"
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     ToolTip = 'Specifies the value of the Max. Subscription Request Processing Try Count field.';
                 }
+                field("Subscr. Reference Prefix"; Rec."Subscr. Reference Prefix")
+                {
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ToolTip = 'Specifies a prefix added to subscription payment references shown on bank statements.';
+                }
+                field("Subscr. Reference No.Series"; Rec."Subscr. Reference No.Series")
+                {
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ToolTip = 'Specifies the number series used for generating unique subscription payment references.';
+                }
                 field("Auto Process Subs Req Errors"; Rec."Auto Process Subs Req Errors")
                 {
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;

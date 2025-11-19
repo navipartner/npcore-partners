@@ -159,6 +159,11 @@ page 6184832 "NPR MM Subscr.Payment Requests"
                     ToolTip = 'Specifies the date when the subscription payment request has been reconciled.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced, NPRRetail;
                 }
+                field("Subscription Payment Reference"; Rec."Subscription Payment Reference")
+                {
+                    ToolTip = 'Specifies the payment reference shown on bank statements to identify this subscription payment.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
             }
         }
     }

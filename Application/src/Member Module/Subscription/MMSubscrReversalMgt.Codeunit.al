@@ -140,6 +140,7 @@ codeunit 6248187 "NPR MM Subscr. Reversal Mgt."
     internal procedure InitReversalRequest(SubscriptionRequest: Record "NPR MM Subscr. Request"; SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; ReversalType: Enum "NPR MM Payment Request Type"; var SubscrReversalRequest: Record "NPR MM Subscr. Request"; var SubscrPmtReversalRequest: Record "NPR MM Subscr. Payment Request")
     var
         DescrLbl: Label 'Reversed %1', Comment = '%1 - original subscription or payment request description';
+        SubsPayRequestUtils: Codeunit "NPR MM Subs Pay Request Utils";
     begin
         SubscrReversalRequest.Init();
         SubscrReversalRequest."Entry No." := 0;
@@ -166,6 +167,7 @@ codeunit 6248187 "NPR MM Subscr. Reversal Mgt."
         SubscrPmtReversalRequest.Amount := -SubscrPaymentRequest.Amount;
         SubscrPmtReversalRequest."Currency Code" := SubscrPaymentRequest."Currency Code";
         SubscrPmtReversalRequest.Description := CopyStr(StrSubstNo(DescrLbl, SubscrPaymentRequest.Description), 1, MaxStrLen(SubscrPmtReversalRequest.Description));
+        SubscrPmtReversalRequest."Subscription Payment Reference" := CopyStr(SubsPayRequestUtils.GenerateSubscriptionPaymentReference(), 1, MaxStrLen(SubscrPmtReversalRequest."Subscription Payment Reference"));
     end;
 
     internal procedure InsertReversalRequest(var SubscriptionRequest: Record "NPR MM Subscr. Request"; var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var SubscrReversalRequest: Record "NPR MM Subscr. Request"; var SubscrPmtReversalRequest: Record "NPR MM Subscr. Payment Request")

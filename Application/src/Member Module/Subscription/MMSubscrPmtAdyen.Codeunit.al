@@ -1370,6 +1370,9 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         Json.WriteStringProperty('shopperReference', ShopperReference);
         Json.WriteStringProperty('captureDelayHours', '0');
 
+        if SubscrPaymentRequest."Subscription Payment Reference" <> '' then
+            Json.WriteStringProperty('shopperStatement', SubscrPaymentRequest."Subscription Payment Reference");
+
         Json.WriteEndObject();
 
         //root
@@ -1978,6 +1981,8 @@ codeunit 6185030 "NPR MM Subscr.Pmt.: Adyen" implements "NPR MM Subscr.Payment I
         Json.WriteStringProperty('storePaymentMethodMode', 'enabled');
         Json.WriteStringProperty('expiresAt', ISO8601Date);
         Json.WriteStringProperty('captureDelayHours', '0');
+        if SubscrPaymentRequest."Subscription Payment Reference" <> '' then
+            Json.WriteStringProperty('shopperStatement', SubscrPaymentRequest."Subscription Payment Reference");
         Json.WriteEndObject();
         //root
         RequestJsonText := Json.GetJSonAsText();

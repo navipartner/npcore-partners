@@ -8,6 +8,7 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
         _RenewalSchedLine: Record "NPR MM Renewal Sched Line";
         _BatchNo: Integer;
         _SkipProcessSubscriptionCheck: Boolean;
+        SubsPayReqUtils: Codeunit "NPR MM Subs Pay Request Utils";
 
     trigger OnRun()
     var
@@ -139,6 +140,7 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
         SubscrPaymentRequest.Amount := SubscriptionRequest.Amount;
         SubscrPaymentRequest."Currency Code" := SubscriptionRequest."Currency Code";
         SubscrPaymentRequest.Description := SubscriptionRequest.Description;
+        SubscrPaymentRequest."Subscription Payment Reference" := CopyStr(SubsPayReqUtils.GenerateSubscriptionPaymentReference(), 1, MaxStrLen(SubscrPaymentRequest."Subscription Payment Reference"));
         SubscrPaymentRequest.Insert();
     end;
 
@@ -155,6 +157,7 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
         SubscrPaymentRequest."Currency Code" := SubscriptionRequest."Currency Code";
         SubscrPaymentRequest.Description := SubscriptionRequest.Description;
         SubscrPaymentRequest."Set Membership Auto-Renew" := AutoRenew;
+        SubscrPaymentRequest."Subscription Payment Reference" := CopyStr(SubsPayReqUtils.GenerateSubscriptionPaymentReference(), 1, MaxStrLen(SubscrPaymentRequest."Subscription Payment Reference"));
         SubscrPaymentRequest.Insert();
     end;
 

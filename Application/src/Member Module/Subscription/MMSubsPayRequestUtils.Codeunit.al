@@ -139,4 +139,31 @@ codeunit 6185103 "NPR MM Subs Pay Request Utils"
 
         ResetProcessTryCount(SubscrPaymentRequest);
     end;
+
+    internal procedure GenerateSubscriptionPaymentReference(): Text
+    var
+        NpPaySetup: Record "NPR Adyen Setup";
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23
+        NoSeriesManagement: Codeunit NoSeriesManagement;
+#else
+        NoSeries: Codeunit "No. Series";
+#endif
+        SubscriptionPaymentReference: Text;
+    begin
+        if not NpPaySetup.Get() then
+            exit('');
+
+        if NpPaySetup."Subscr. Reference No.Series" = '' then
+            exit('');
+
+        SubscriptionPaymentReference := NpPaySetup."Subscr. Reference Prefix";
+
+#if BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23
+        SubscriptionPaymentReference += NoSeriesManagement.GetNextNo(NpPaySetup."Subscr. Reference No.Series", Today, true);
+#else
+        SubscriptionPaymentReference += NoSeries.GetNextNo(NpPaySetup."Subscr. Reference No.Series");
+#endif
+
+        exit(SubscriptionPaymentReference);
+    end;
 }

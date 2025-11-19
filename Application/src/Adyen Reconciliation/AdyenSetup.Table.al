@@ -297,6 +297,23 @@ table 6150801 "NPR Adyen Setup"
             ObsoleteTag = '2025-03-05';
             ObsoleteReason = 'Not used.';
         }
+        field(300; "Subscr. Reference Prefix"; Code[10])
+        {
+            Caption = 'Subscription Payment Reference Prefix';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            begin
+                ValidateAllowedChars(Rec."Subscr. Reference Prefix");
+            end;
+        }
+        field(310; "Subscr. Reference No.Series"; Code[20])
+        {
+            Caption = 'Subscription Payment Reference No. Series';
+            DataClassification = CustomerContent;
+            TableRelation = "No. Series";
+        }
+
     }
     keys
     {
@@ -429,5 +446,18 @@ table 6150801 "NPR Adyen Setup"
             exit(false);
 
         exit(IsolatedStorage.Contains(Rec."Download Report API Key Token", DataScope::Company));
+    end;
+
+    local procedure ValidateAllowedChars(InputTxt: Text)
+    var
+        AllowedCharPatternLbl: Label '^[A-Za-z0-9.,''_?+* -]+$', Locked = true;
+        LabelInvalidChars: Label '%1 contains unsupported characters. Allowed: letters (A-Z, a-z), digits (0-9), and . , '' _ - ? + * or space.', Comment = '%1 - input text';
+        RegEx: Codeunit "NPR RegEx";
+    begin
+        if InputTxt = '' then
+            exit;
+
+        if not RegEx.IsMatch(InputTxt, AllowedCharPatternLbl) then
+            Error(LabelInvalidChars, InputTxt);
     end;
 }

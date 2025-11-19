@@ -201,6 +201,11 @@ table 6150921 "NPR MM Subscr. Payment Request"
             DataClassification = CustomerContent;
             Caption = 'Auto-Renew';
         }
+        field(350; "Subscription Payment Reference"; Code[22])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Subscription Payment Reference';
+        }
     }
 
     keys
