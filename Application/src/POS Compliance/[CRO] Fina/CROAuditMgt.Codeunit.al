@@ -5,8 +5,6 @@ codeunit 6151547 "NPR CRO Audit Mgt."
 
     var
         CROFiscalSetup: Record "NPR CRO Fiscalization Setup";
-        CROFiscalThermalPrint: Codeunit "NPR CRO Fiscal Thermal Print";
-        CROTaxCommunicationMgt: Codeunit "NPR CRO Tax Communication Mgt.";
         Enabled: Boolean;
         Initialized: Boolean;
         CAPTION_CERT_SUCCESS: Label 'Certificate with thumbprint %1 was uploaded successfully';
@@ -98,6 +96,8 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info";
         POSEntry: Record "NPR POS Entry";
         POSUnit: Record "NPR POS Unit";
+        CROTaxCommunicationMgt: Codeunit "NPR CRO Tax Communication Mgt.";
+        CROFiscalThermalPrint: Codeunit "NPR CRO Fiscal Thermal Print";
         IsHandled: Boolean;
     begin
         if not POSUnit.Get(SalePOS."Register No.") then
@@ -707,6 +707,8 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         CROFiscalizationSetup: Record "NPR CRO Fiscalization Setup";
         CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info";
         SalesInvoiceHeader: Record "Sales Invoice Header";
+        CROTaxCommunicationMgt: Codeunit "NPR CRO Tax Communication Mgt.";
+        CROFiscalThermalPrint: Codeunit "NPR CRO Fiscal Thermal Print";
     begin
         if not SalesInvoiceHeader.Get(SalesInvHdrNo) then
             exit;
@@ -728,6 +730,8 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         CROFiscalizationSetup: Record "NPR CRO Fiscalization Setup";
         CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        CROTaxCommunicationMgt: Codeunit "NPR CRO Tax Communication Mgt.";
+        CROFiscalThermalPrint: Codeunit "NPR CRO Fiscal Thermal Print";
     begin
         if not SalesCrMemoHeader.Get(SalesCrMemoHdrNo) then
             exit;
