@@ -55,6 +55,18 @@ page 6185084 "NPR APIV1 PBI MembPaymMethods"
                 {
                     Caption = 'Shopper Reference', Locked = true;
                 }
+                field(paymentMethodAlias; Rec."Payment Method Alias")
+                {
+                    Caption = 'Payment Method Alias', Locked = true;
+                }
+                field(paymentToken; Rec."Payment Token")
+                {
+                    Caption = 'Payment Token', Locked = true;
+                }
+                field(panLast4Digits; Rec."PAN Last 4 Digits")
+                {
+                    Caption = 'PAN Last 4 Digits', Locked = true;
+                }
 #if not (BC17 or BC18 or BC19 or BC20)
                 field(systemRowVersion; Rec.SystemRowVersion)
                 {

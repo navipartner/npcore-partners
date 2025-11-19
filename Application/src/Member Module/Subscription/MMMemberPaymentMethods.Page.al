@@ -57,9 +57,15 @@ page 6184835 "NPR MM Member Payment Methods"
                 }
                 field("Expiry Date"; Rec."Expiry Date")
                 {
-                    ToolTip = 'Specifies the expiry date of the payment methoid (card).';
+                    ToolTip = 'Specifies the expiry date of the payment method (card).';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
+                field("Payment Token"; Rec."Payment Token")
+                {
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ToolTip = 'Specifies the value of the Payment Token field.';
+                }
+
                 field("Entry No."; Rec."Entry No.")
                 {
                     ToolTip = 'Specifies a unique entry number, assigned by the system to this record according to an automatically maintained number series.';
