@@ -436,9 +436,7 @@ codeunit 6014578 "NPR Shipmondo Mgnt." implements "NPR IShipping Provider Interf
         QueryParams4Lbl: label '"commodity_code": "%1",', Locked = true;
         QueryParams5Lbl: label '"unit_value": "%1",', Locked = true;
         QueryParams6Lbl: label '"unit_weight": "%1"', Locked = true;
-        QueryParams7Lbl: label '"country_code": "%1"', Locked = true;
-
-
+        QueryParams7Lbl: label '"country_code": "%1",', Locked = true;
     begin
         CompanyInformation.Get();
 
