@@ -108,20 +108,16 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
         MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
         NewMembershipLedgerEntryNo: Integer;
         ReasonText: Text;
+        MemberInfoCaptureEntryNo: Integer;
     begin
         SubscriptionRequest.TestField(Type, SubscriptionRequest.Type::Renew);
         Subscription.Get(SubscriptionRequest."Subscription Entry No.");
         CheckHasntBeenChanged(Subscription, SubscriptionRequest);
-        MembershipAlterationSetup.Get(MembershipAlterationSetup."Alteration Type"::AUTORENEW, Subscription."Membership Code", SubscriptionRequest."Item No.");
-        MembershipAlterationSetup.TestField("Membership Duration");
+        MemberInfoCaptureEntryNo := MembershipMgt.CreateAutoRenewMemberInfoRequest(Subscription."Membership Entry No.", '', ReasonText);
 
-        MemberInfoCapture.Init();
-        MemberInfoCapture."Entry No." := 0;
-        MemberInfoCapture."Membership Entry No." := Subscription."Membership Entry No.";
-        MemberInfoCapture."Membership Code" := Subscription."Membership Code";
-        MemberInfoCapture."Item No." := SubscriptionRequest."Item No.";
-        MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::AUTORENEW;
-        MemberInfoCapture."Duration Formula" := MembershipAlterationSetup."Membership Duration";
+        if not MemberInfoCapture.Get(MemberInfoCaptureEntryNo) then
+            Error(ReasonText);
+
         MemberInfoCapture."Unit Price" := SubscriptionRequest.Amount;
         MemberInfoCapture."Amount Incl VAT" := SubscriptionRequest.Amount;
         MemberInfoCapture.Amount := (SubscriptionRequest.Amount / (1 + SubsRenewPost.CalcRevenueVAT(Subscription."Membership Entry No.") / 100));
@@ -132,6 +128,8 @@ codeunit 6185127 "NPR MM Subs Try Renew Process"
         SubscriptionRequest."Posted M/ship Ledg. Entry No." := NewMembershipLedgerEntryNo;
         SubscriptionRequest.Validate("Processing Status", SubscriptionRequest."Processing Status"::Success);
         SubscriptionRequest.Modify(true);
+
+        MemberInfoCapture.Delete();
     end;
 
     local procedure RegretMembershipAction(var SubscrReversalRequest: Record "NPR MM Subscr. Request")

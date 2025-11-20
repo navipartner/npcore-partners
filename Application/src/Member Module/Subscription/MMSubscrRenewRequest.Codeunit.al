@@ -51,7 +51,8 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
         SubscriptionRequest.Type := SubscriptionRequest.Type::Renew;
         SubscriptionRequest."Item No." := RenewWithItemNo;
         SubscriptionRequest.Status := SubscriptionRequest.Status::New;
-        SubscriptionRequest.Description := CopyStr(StrSubstNo(RenewDescrTxt, Subscription."Membership Code", Format(SubscriptionRequest."New Valid From Date", 0, 7), Format(SubscriptionRequest."New Valid Until Date", 0, 7)), 1, MaxStrLen(SubscriptionRequest.Description));
+        if SubscriptionRequest.Description = '' then
+            SubscriptionRequest.Description := CopyStr(StrSubstNo(RenewDescrTxt, Subscription."Membership Code", Format(SubscriptionRequest."New Valid From Date", 0, 7), Format(SubscriptionRequest."New Valid Until Date", 0, 7)), 1, MaxStrLen(SubscriptionRequest.Description));
         SubscriptionRequest."Entry No." := 0;
         SubscriptionRequest."Renew Schedule Date" := WorkDate();
         SubscriptionRequest."Renew Schedule Date Formula" := _RenewalSchedLine."Date Formula";
@@ -99,6 +100,7 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
         MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
         AlterationRuleSystemId: Guid;
         ReasonText: Text;
+        RenewDescrTxt: Label '%1 -> %2 membership renewal: %3-%4', Comment = '%1 - old membership code, %2 - new membership code, %3 - from date, %4 - to date';
     begin
         MembershipLedger.Get(Subscription."Membership Ledger Entry No.");
         if not MembershipMgt.SelectAutoRenewRule(MembershipLedger, RenewWithItemNo, AlterationRuleSystemId, ReasonText) then
@@ -117,6 +119,9 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
 
         if not MembershipMgt.AutoRenewMembership(MemberInfoCapture, false, Subscription."Valid Until Date", SubscriptionRequest."New Valid From Date", SubscriptionRequest."New Valid Until Date", SubscriptionRequest.Amount, ReasonText) then
             Error(ReasonText);
+
+        if Subscription."Membership Code" <> MemberInfoCapture."Membership Code" then
+            SubscriptionRequest.Description := CopyStr(StrSubstNo(RenewDescrTxt, Subscription."Membership Code", MemberInfoCapture."Membership Code", Format(SubscriptionRequest."New Valid From Date", 0, 7), Format(SubscriptionRequest."New Valid Until Date", 0, 7)), 1, MaxStrLen(SubscriptionRequest.Description))
     end;
 
     Internal procedure CreateSubscriptionPaymentRequest(Subscription: Record "NPR MM Subscription"; SubscriptionRequest: Record "NPR MM Subscr. Request"; var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request")
