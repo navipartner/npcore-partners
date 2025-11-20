@@ -1,0 +1,174 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fern-api/fern/main/fern.schema.json
+
+imports:
+  simpleTypes: ./../memberships/types/types-simple.yml
+  globalApiTypes: ./../global-api-types.yml
+
+service:
+  display-name: GDPR
+  auth: true
+  base-path: /customer
+
+  endpoints:
+
+    requestAnonymize:
+      docs: |
+        Request anonymization of a customer's personal data for GDPR compliance.
+        
+        This endpoint supports three different ways to identify the customer for anonymization:
+        
+        **Option 1: Customer Number Only**
+        - Send only `customerNo` in the request body
+        - Use for company-level anonymization when no specific contact needs to be identified
+        - Example: `{ "customerNo": "C00001" }`
+        
+        **Option 2: Customer Number with Contact Number**
+        - Send both `customerNo` and `contactNo` in the request body
+        - Use for person-level anonymization when the customer is linked to a specific contact
+        - Example: `{ "customerNo": "C00001", "contactNo": "CT00001" }`
+        
+        **Option 3: Email Address Only**
+        - Send only `email` in the request body
+        - The system will locate the customer using the email address
+        - Example: `{ "email": "customer@example.com" }`
+        
+        The anonymization process will:
+        - Verify if the customer exists in the system
+        - Check if anonymization is allowed (e.g., no active memberships or pending transactions)
+        - Create an anonymization request entry for audit purposes
+        - Return the status and relevant identifiers
+        
+        **Important Notes:**
+        - The customer must not have any active memberships or pending transactions
+        - The anonymization process is irreversible once executed
+        - A response code will indicate the reason if anonymization is not possible
+        - When using email, customer records must exist
+        
+        **Use Cases:**
+        - GDPR "Right to be Forgotten" requests
+        - Customer account closure with data removal
+        - Self-service customer data removal via email
+        - Compliance with data retention policies
+      display-name: Request Customer Anonymization
+      method: POST
+      path: /requestAnonymize
+      request:
+        name: requestAnonymize
+        body: AnonymizeCustomerRequest
+      response: AnonymizeCustomerResponse
+      examples:
+        - name: ExampleAnonymizeByCustomerNo
+          docs: Anonymize using only customer number (company-level)
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          request: $AnonymizeCustomerRequest.ExampleAnonymizeByCustomerNo
+          response: 
+            body: $AnonymizeCustomerResponse.ExampleAnonymizeByCustomerNoSuccess
+        - name: ExampleAnonymizeByCustomerAndContact
+          docs: Anonymize using customer number and contact number (person-level)
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          request: $AnonymizeCustomerRequest.ExampleAnonymizeByCustomerAndContact
+          response: 
+            body: $AnonymizeCustomerResponse.ExampleAnonymizeByCustomerAndContactSuccess
+        - name: ExampleAnonymizeByEmail
+          docs: Anonymize using email address (requires customer to exist)
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          request: $AnonymizeCustomerRequest.ExampleAnonymizeByEmail
+          response: 
+            body: $AnonymizeCustomerResponse.ExampleAnonymizeByEmailSuccess
+
+types:
+  # GDPR Anonymization Request
+  AnonymizeCustomerRequest:
+    docs: |
+      Request to anonymize a customer's data.
+      
+      **Three usage patterns are supported:**
+      
+      1. **Customer Number Only**: Provide only `customerNo` for company-level anonymization
+      2. **Customer + Contact**: Provide both `customerNo` and `contactNo` for person-level anonymization
+      3. **Email Only**: Provide only `email` to look up the customer
+      
+      **Important**: You must provide either:
+      - `customerNo` alone, OR
+      - `customerNo` AND `contactNo` together, OR
+      - `email` alone
+    properties:
+      customerNo:
+        type: optional<simpleTypes.CustomerNumber>
+        docs: The customer number. Required unless using email-based lookup.
+      contactNo:
+        type: optional<simpleTypes.ContactNumber>
+        docs: The contact number. Optional; use together with customerNo for person-level anonymization.
+      email:
+        type: optional<simpleTypes.Email>
+        docs: The email address. Use alone to identify customer by email.
+    examples:
+      - name: ExampleAnonymizeByCustomerNo
+        docs: Anonymize using only customer number
+        value:
+          customerNo: $simpleTypes.CustomerNumber.ExampleCustomerNumber
+      - name: ExampleAnonymizeByCustomerAndContact
+        docs: Anonymize using customer number and contact number
+        value:
+          customerNo: $simpleTypes.CustomerNumber.ExampleCustomerNumber
+          contactNo: $simpleTypes.ContactNumber.ExampleContactNumber
+      - name: ExampleAnonymizeByEmail
+        docs: Anonymize using email address
+        value:
+          email: $simpleTypes.Email.ExampleEmail
+
+  # GDPR Anonymization Response
+  AnonymizeCustomerResponse:
+    docs: |
+      Response to a customer anonymization request indicating success or failure.
+      
+      The response echoes back the identifier(s) used in the request:
+      - If you sent `customerNo` alone, the response includes `customerNo`
+      - If you sent `customerNo` and `contactNo`, the response includes both
+      - If you sent `email`, the response includes `email` and the resolved `customerNo`
+    properties:
+      success:
+        type: boolean
+        docs: Indicates whether the anonymization request was created successfully
+      message:
+        type: string
+        docs: Detailed message describing the result of the anonymization request
+      customerNo:
+        type: optional<simpleTypes.CustomerNumber>
+        docs: The customer number that was processed (included when applicable)
+      contactNo:
+        type: optional<simpleTypes.ContactNumber>
+        docs: The contact number that was processed (included when applicable)
+      email:
+        type: optional<simpleTypes.Email>
+        docs: The email address that was processed (included when using email-based lookup)
+    examples:
+      - name: ExampleAnonymizeByCustomerNoSuccess
+        docs: Successful response for customer number only
+        value:
+          success: true
+          message: "Anonymization request created successfully"
+          customerNo: $simpleTypes.CustomerNumber.ExampleCustomerNumber
+      - name: ExampleAnonymizeByCustomerAndContactSuccess
+        docs: Successful response for customer number and contact number
+        value:
+          success: true
+          message: "Anonymization request created successfully"
+          customerNo: $simpleTypes.CustomerNumber.ExampleCustomerNumber
+          contactNo: $simpleTypes.ContactNumber.ExampleContactNumber
+      - name: ExampleAnonymizeByEmailSuccess
+        docs: Successful response for email-based lookup
+        value:
+          success: true
+          message: "Anonymization request created successfully"
+          customerNo: $simpleTypes.CustomerNumber.ExampleCustomerNumber
+          email: $simpleTypes.Email.ExampleEmail

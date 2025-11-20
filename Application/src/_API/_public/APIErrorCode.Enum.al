@@ -271,5 +271,9 @@ enum 6059810 "NPR API Error Code"
     {
         Caption = 'The reference number was actively rejected by gate setup.', Locked = true;
     }
+    value(6060156; invalid_input)
+    {
+        Caption = 'The input provided is invalid.', Locked = true;
+    }
 
 }

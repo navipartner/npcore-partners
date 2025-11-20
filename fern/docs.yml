@@ -376,7 +376,12 @@ navigation:
               contents:
                 - endpoint: customer.service-customer.getCustomer
                 - endpoint: customer.service-customer.getCustomers
-                - endpoint: customer.service-customer.createCustomer          
+                - endpoint: customer.service-customer.createCustomer
+          - customer.service-gdpr:
+              title: GDPR
+              summary: ./docs/pages/customers/gdpr-introduction.mdx
+              contents:
+                - endpoint: customer.service-gdpr.requestAnonymize
 
         - section: Retail Print
           summary: ./docs/pages/retailprint/overview.mdx

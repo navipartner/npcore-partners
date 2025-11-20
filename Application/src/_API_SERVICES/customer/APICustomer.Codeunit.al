@@ -4,6 +4,8 @@ codeunit 6248370 "NPR API Customer" implements "NPR API Request Handler"
     Access = Internal;
 
     procedure Handle(var Request: Codeunit "NPR API Request"): Codeunit "NPR API Response"
+    var
+        CustomerGDPRApiAgent: Codeunit "NPR Customer GDPR Api Agent";
     begin
         case true of
             Request.Match('GET', '/customer/:id'):
@@ -12,6 +14,8 @@ codeunit 6248370 "NPR API Customer" implements "NPR API Request Handler"
                 exit(GetCustomer(Request));
             Request.Match('POST', '/customer'):
                 exit(CreateCustomer(Request));
+            Request.Match('POST', '/customer/requestAnonymize'):
+                exit(CustomerGDPRApiAgent.AnonymizeCustomer(Request));
         end;
     end;
 

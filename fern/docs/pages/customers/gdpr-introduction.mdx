@@ -1,0 +1,56 @@
+---
+# GDPR Anonymization
+---
+
+Use this endpoint to initiate GDPR-compliant anonymization of customer data. The API creates an anonymization request after validating eligibility (e.g., no active memberships or blocking conditions) and returns a status message.
+
+## Single Flexible Endpoint
+
+The GDPR anonymization API uses a **single POST endpoint** with a flexible request body that supports three different ways to identify the customer:
+
+### Option 1: Customer Number Only
+Send only the customer number for **company-level anonymization**:
+```json
+{
+  "customerNo": "C00001"
+}
+```
+Use this when you don't need to specify a contact person.
+
+### Option 2: Customer + Contact Number
+Send both customer number and contact number for **person-level anonymization**:
+```json
+{
+  "customerNo": "C00001",
+  "contactNo": "CT00001"
+}
+```
+Use this when the customer is linked to a specific contact person.
+
+### Option 3: Email Address Only
+Send only the email address to look up the customer:
+```json
+{
+  "email": "customer@example.com"
+}
+```
+
+## Notes and Constraints
+
+- The anonymization process is **irreversible** once executed by the back office job
+- Customers with active/confirmed memberships or certain dependencies may be ineligible
+- If ineligible, the response includes a reason code in the message
+- When using email lookup, customer records must exist
+
+## Response Format
+
+The API returns a response that echoes back the identifier(s) you provided:
+- `success`: boolean indicating if the request was created
+- `message`: detailed description of the result
+- `customerNo`: included when applicable
+- `contactNo`: included when provided in the request
+- `email`: included when using email-based lookup
+
+## Endpoint
+
+- **POST** `/customer/requestAnonymize`

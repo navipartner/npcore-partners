@@ -206,8 +206,6 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
 
 
         // ************************************************************
-
-
     end;
 
     local procedure Handle(ApiFunction: Enum "NPR MembershipApiFunctions"; var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
