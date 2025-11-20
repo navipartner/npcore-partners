@@ -163,6 +163,7 @@ codeunit 6185083 "NPR TicketingReservationAgent"
         Success: Boolean;
         ResponseMessage: Text;
         TicketBOM: Record "NPR TM Ticket Admission BOM";
+        SentryTagQuantity: Integer;
     begin
         if (not Create) then begin
             ReservationId := Request.Paths().Get(3);
@@ -190,7 +191,6 @@ codeunit 6185083 "NPR TicketingReservationAgent"
             if (not Reservation.Get('quantity', JValueToken)) then
                 exit(Response.RespondBadRequest('The quantity property is missing in the request body.'));
             Quantity := JValueToken.AsValue().AsInteger();
-
             ExternalLineNo += 1;
 
             if (Reservation.Get('content', JValueToken)) then begin
@@ -209,6 +209,7 @@ codeunit 6185083 "NPR TicketingReservationAgent"
                     if (ScheduleId = -1) then
                         ScheduleId := GetAsInteger(ContentLine, 'scheduleId', -1);
 
+                    SentryTagQuantity += Quantity;
                     Clear(Line);
                     Line.Add('itemReference', ItemNo);
                     Line.Add('quantity', Quantity);
@@ -224,6 +225,8 @@ codeunit 6185083 "NPR TicketingReservationAgent"
                 TicketBOM.SetFilter("Default", '=%1', true);
                 if (not TicketBOM.FindFirst()) then
                     exit(Response.RespondBadRequest(StrSubstNo('The item number %1 does not have a default admission.', ItemNo)));
+
+                SentryTagQuantity += Quantity;
                 Clear(Line);
                 Line.Add('itemReference', ItemNo);
                 Line.Add('quantity', Quantity);
@@ -243,7 +246,19 @@ codeunit 6185083 "NPR TicketingReservationAgent"
             exit(Response.RespondBadRequest(ResponseMessage));
         end;
 
-        exit(GetReservation(Token));
+        Response := GetReservation(Token);
+        case Abs(SentryTagQuantity) of
+            0 .. 10:
+                Response.AddSentryTag('bc.ticket_api.reservation.quantity', 'low');
+            11 .. 50:
+                Response.AddSentryTag('bc.ticket_api.reservation.quantity', 'medium');
+            51 .. 100:
+                Response.AddSentryTag('bc.ticket_api.reservation.quantity', 'high');
+            else
+                Response.AddSentryTag('bc.ticket_api.reservation.quantity', 'x-high');
+        end;
+
+        exit(Response);
     end;
 
     internal procedure CreateReservation(Lines: JsonArray; var Token: Text[100]; SalesReceiptNumber: Code[20]; SalesReceiptLineNo: Integer; var Success: Boolean; var ResponseMessage: Text): Boolean
