@@ -15,4 +15,9 @@ codeunit 6151518 "NPR POS Act. Insert Item Event"
     internal procedure OnAfterCheckPostworkflowSubscriptionExists(Item: Record Item; var PostworkflowSubscriptionExists: Boolean)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnSetNextCaptionUpdateTime(Item: Record Item; ItemReference: Record "Item Reference"; var NextUpdateTime: DateTime)
+    begin
+    end;
 }

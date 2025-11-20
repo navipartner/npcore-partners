@@ -664,6 +664,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
         Currency: Record Currency;
         Json: JsonObject;
         NextUpdateTime: DateTime;
+        ItemProcessingEvents: Codeunit "NPR POS Act. Insert Item Event";
     begin
         ItemIdentifier := Context.GetStringParameter('itemNo');
         ItemIdentifierType := Context.GetIntegerParameter('itemIdentifierType');
@@ -679,7 +680,7 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
 
         Currency.InitRoundingPrecision();
         NextUpdateTime := CreateDateTime(Today(), 235959T); // does not update recurringly unless a PTE subscribes and sets a custom rule for it
-        OnSetNextCaptionUpdateTime(Item, ItemReference, NextUpdateTime);
+        ItemProcessingEvents.OnSetNextCaptionUpdateTime(Item, ItemReference, NextUpdateTime);
 
         Json.Add('currentItemPrice', Format(Round(ItemPrice, Currency."Amount Rounding Precision")));
         Json.Add('nextUpdateTime', Format(NextUpdateTime, 0, 9));
@@ -914,11 +915,6 @@ codeunit 6150723 "NPR POS Action: Insert Item" implements "NPR IPOS Workflow"
 
         Rec := TempPOSParameterValue;
         Rec.CopyFilters(TempPOSParameterValue);
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnSetNextCaptionUpdateTime(Item: Record Item; ItemReference: Record "Item Reference"; var NextUpdateTime: DateTime)
-    begin
     end;
 
     local procedure CurrCodeunitId(): Integer
