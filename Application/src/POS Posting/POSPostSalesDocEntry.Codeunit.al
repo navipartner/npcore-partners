@@ -226,8 +226,8 @@ codeunit 6184928 "NPR POS Post Sales Doc.Entry"
                     "Sales Document Type"::"Credit Memo",
                     "Sales Document Type"::"Return Order":
                         begin
-                            SalesLine.TestField(Quantity, POSEntrySalesLine.Quantity);
-                            SalesLine.TestField("Amount Including VAT", POSEntrySalesLine."Amount Incl. VAT");
+                            SalesLine.TestField(Quantity, Abs(POSEntrySalesLine.Quantity));
+                            SalesLine.TestField("Amount Including VAT", Abs(POSEntrySalesLine."Amount Incl. VAT"));
                         end;
                 end;
                 SalesLine.TestField("Variant Code", POSEntrySalesLine."Variant Code");
