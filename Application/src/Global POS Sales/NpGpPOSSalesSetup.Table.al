@@ -157,7 +157,7 @@
         iAuth := Rec.AuthType;
         case Rec.AuthType of
             Rec.AuthType::Basic:
-                WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(copystr(Rec."Service Username", 1, 50), Rec."Service Password", AuthParamsBuff);
+                WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(Rec."Service Username", Rec."Service Password", AuthParamsBuff);
             Rec.AuthType::OAuth2:
                 WebServiceAuthHelper.GetOpenAuthorizationParamsBuff(Rec."OAuth2 Setup Code", AuthParamsBuff);
         end;

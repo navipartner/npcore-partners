@@ -11,7 +11,7 @@
     {
         field(1; PK; Code[10])
         {
-            Caption = 'Basic UserName';
+            Caption = 'PK';
             DataClassification = SystemMetadata;
         }
 
@@ -21,12 +21,11 @@
             DataClassification = SystemMetadata;
         }
 
-        field(5; "Basic UserName"; Code[100])
+        field(5; "Basic UserName"; Text[250])
         {
             Caption = 'Basic UserName';
             DataClassification = CustomerContent;
         }
-
         field(10; "Basic Password Key"; GUID)
         {
             Caption = 'Basic Password Key';

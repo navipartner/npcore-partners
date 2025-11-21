@@ -862,7 +862,7 @@
         iAuth := Rec.AuthType;
         case Rec.AuthType of
             Rec.AuthType::Basic:
-                WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(copystr(Rec.GetApiUsername(), 1, 100), Rec."API Password Key", AuthParamsBuff);
+                WebServiceAuthHelper.GetBasicAuthorizationParamsBuff(Rec.GetApiUsername(), Rec."API Password Key", AuthParamsBuff);
             Rec.AuthType::OAuth2:
                 WebServiceAuthHelper.GetOpenAuthorizationParamsBuff(Rec."OAuth2 Setup Code", AuthParamsBuff);
             Rec.AuthType::Custom:

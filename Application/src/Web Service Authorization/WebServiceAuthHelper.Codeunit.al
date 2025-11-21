@@ -84,11 +84,18 @@
     #endregion
 
     #region Authorization Parameters Buffer
-    procedure GetBasicAuthorizationParamsBuff(BasicUsername: Code[100]; BasicPasswordKey: Guid; var AuthorizationParamsBuffer: Record "NPR Auth. Param. Buffer")
+    procedure GetBasicAuthorizationParamsBuff(BasicUsername: Text[250]; BasicPasswordKey: Guid; var AuthorizationParamsBuffer: Record "NPR Auth. Param. Buffer")
+    var
+        FeatureFlagsManagement: Codeunit "NPR Feature Flags Management";
+        BasicUsernameCode: Code[250];
     begin
         AuthorizationParamsBuffer.Init();
         AuthorizationParamsBuffer."Auth. Type" := AuthorizationParamsBuffer."Auth. Type"::Basic;
-        AuthorizationParamsBuffer."Basic UserName" := BasicUsername;
+        if not FeatureFlagsManagement.IsEnabled('basicUsernameAsText') then begin
+            BasicUsernameCode := BasicUsername;
+            AuthorizationParamsBuffer."Basic UserName" := BasicUsernameCode;
+        end else
+            AuthorizationParamsBuffer."Basic UserName" := BasicUsername;
         AuthorizationParamsBuffer."Basic Password Key" := BasicPasswordKey;
     end;
 
