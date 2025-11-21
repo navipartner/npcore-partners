@@ -91,9 +91,9 @@
 
         CountFullReplace, CountUpdated, CountNew, CountCanceled : Integer;
     begin
-
         AdmissionScheduleLines.SetCurrentKey("Admission Code", "Process Order");
         AdmissionScheduleLines.SetFilter("Admission Code", '=%1', AdmissionCode);
+        AdmissionScheduleLines.SetLoadFields("Admission Code", "Schedule Code", "Process Order", "Prebook From", "Schedule Generated Until", "Schedule Generated At", "Admission Base Calendar Code");
         if (AdmissionScheduleLines.FindSet()) then begin
             GenerateFromDate := _TodaysDate;
             if ((ReferenceDate > _TodaysDate) and (Regenerate)) then
@@ -225,8 +225,9 @@
             end;
             exit;
         end;
-
+        Admission.SetLoadFields("Admission Code", "Admission Base Calendar Code");
         Admission.Get(AdmissionScheduleLines."Admission Code");
+
         Schedule.Get(AdmissionScheduleLines."Schedule Code");
 
         if (Schedule."Recur Every N On" = 0) then begin
@@ -234,18 +235,20 @@
             Schedule.Modify();
         end;
 
-        CreateEntryThisPeriod := true;
+        HighestEntryDate := AdmissionScheduleLines."Schedule Generated Until";
+        if HighestEntryDate = 0D then
+            HighestEntryDate := Schedule."Start From";
 
-        if (Schedule."Recurrence Pattern" = Schedule."Recurrence Pattern"::WEEKLY) then begin
-            DateRecordPeriod.SetFilter("Period Type", '=%1', DateRecordPeriod."Period Type"::Week);
-            if (not CreateEntryThisPeriod) then
-                HighestEntryDate := CalcDate('<CW-1W+1D>', HighestEntryDate); // align with periods first date
-        end;
+        CreateEntryThisPeriod := (GenerateForDate <= HighestEntryDate); // already generated or first day
 
-        if (Schedule."Recurrence Pattern" = Schedule."Recurrence Pattern"::DAILY) then
-            DateRecordPeriod.SetFilter("Period Type", '=%1', DateRecordPeriod."Period Type"::Date);
+        if (not CreateEntryThisPeriod) and (HighestEntryDate < GenerateForDate) then begin
+            // set DateRecordPeriod filter based on recurrence pattern
+            if (Schedule."Recurrence Pattern" = Schedule."Recurrence Pattern"::WEEKLY) then
+                DateRecordPeriod.SetFilter("Period Type", '=%1', DateRecordPeriod."Period Type"::Week);
 
-        if ((not CreateEntryThisPeriod) and (HighestEntryDate < GenerateForDate)) then begin
+            if (Schedule."Recurrence Pattern" = Schedule."Recurrence Pattern"::DAILY) then
+                DateRecordPeriod.SetFilter("Period Type", '=%1', DateRecordPeriod."Period Type"::Date);
+
             DateRecordPeriod.SetFilter("Period Start", '%1..%2', HighestEntryDate, GenerateForDate);
             PeriodCount := DateRecordPeriod.Count() - 1;
             CreateEntryThisPeriod := ((PeriodCount mod Schedule."Recur Every N On") = 0);
@@ -465,14 +468,17 @@
             AdmissionScheduleEntry.SetCurrentKey("Entry No.");
             AdmissionScheduleEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
             AdmissionScheduleEntry.SetFilter("Admission Start Date", '=%1', ReferenceDate);
+            AdmissionScheduleEntry.SetLoadFields("Entry No.", "External Schedule Entry No.", "Schedule Code", "Admission Start Date", "Admission End Date", "Admission Start Time", "Admission End Time", "Event Duration", "Regenerate With", Cancelled);
             repeat
                 AdmissionScheduleEntry.SetFilter("Schedule Code", '=%1', AdmissionScheduleLine."Schedule Code");
+
+                // We only need the newest version per schedule/date.
+                // Key is forced to Entry No., so FindLast() returns the single uncancelled slot;
+                // earlier versions are already marked Cancelled and shouldn’t be reprocessed.
                 if (AdmissionScheduleEntry.FindLast()) then begin
-                    repeat
-                        TempExistingAdmissionScheduleEntry.TransferFields(AdmissionScheduleEntry, true);
-                        TempExistingAdmissionScheduleEntry.Insert();
-                        CancelExistingList.Add(TempExistingAdmissionScheduleEntry."Entry No.");
-                    until (AdmissionScheduleEntry.Next() = 0);
+                    TempExistingAdmissionScheduleEntry.TransferFields(AdmissionScheduleEntry, true);
+                    TempExistingAdmissionScheduleEntry.Insert();
+                    CancelExistingList.Add(TempExistingAdmissionScheduleEntry."Entry No.");
                 end;
             until (AdmissionScheduleLine.Next() = 0);
         end;

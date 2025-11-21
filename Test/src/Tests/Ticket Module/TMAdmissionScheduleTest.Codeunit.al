@@ -120,6 +120,42 @@ codeunit 85170 "NPR TM AdmissionScheduleTest"
 
     [Test]
     [TestPermissions(TestPermissions::Disabled)]
+    procedure OnlyOneActiveEntryPerExternalScheduleEntry()
+    var
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        Assert: Codeunit Assert;
+        AdmissionCode: Code[20];
+        ScheduleCode: Code[20];
+        ItemNo: Code[20];
+        TicketTypeCode: Code[10];
+        ActiveExternalIds: Dictionary of [Integer, Boolean];
+    begin
+        CreateMinimalSetup();
+        CreateEvent(TicketTypeCode, ItemNo, AdmissionCode);
+        CreateTimeSlot(AdmissionCode, ScheduleCode, Today(), 080000T, 120000T, 5);
+
+        SoftRegenerateSchedule(AdmissionCode, Today());
+        SoftRegenerateSchedule(AdmissionCode, Today());
+        ForceRegenerateSchedule(AdmissionCode, Today());
+        SoftRegenerateSchedule(AdmissionCode, Today());
+
+        ScheduleEntry.Reset();
+        ScheduleEntry.SetFilter("Admission Code", '=%1', AdmissionCode);
+        ScheduleEntry.SetFilter("Admission Start Date", '=%1', Today());
+        ScheduleEntry.SetFilter(Cancelled, '=%1', false);
+        if (ScheduleEntry.FindSet()) then
+            repeat
+                if (ActiveExternalIds.ContainsKey(ScheduleEntry."External Schedule Entry No.")) then
+                    Assert.Fail(StrSubstNo('Multiple active entries share External Schedule Entry No. %1', ScheduleEntry."External Schedule Entry No."));
+                ActiveExternalIds.Add(ScheduleEntry."External Schedule Entry No.", true);
+            until (ScheduleEntry.Next() = 0);
+
+        Assert.IsTrue((ActiveExternalIds.Count() > 0), 'Scheduler did not produce any active entries to validate.');
+    end;
+
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
     procedure BlockedScheduleLines()
     var
         ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
@@ -1050,6 +1086,104 @@ codeunit 85170 "NPR TM AdmissionScheduleTest"
         Assert.AreEqual(5, SlotCount, 'Setting schedule line end date should only affect entries going forward and allow past entries to be as they were.');
 
     end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure DailyScheduleHonorsEverySecondDay()
+    var
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        Schedule: Record "NPR TM Admis. Schedule";
+        AdmissionCode: Code[20];
+        ScheduleCode: Code[20];
+        ItemNo: Code[20];
+        TicketTypeCode: Code[10];
+        Day0, Day1, Day2 : Date;
+    begin
+        CreateMinimalSetup();
+        CreateEvent(TicketTypeCode, ItemNo, AdmissionCode);
+
+        Day0 := Today();
+        Day1 := CalcDate('<+1D>', Day0);
+        Day2 := CalcDate('<+2D>', Day0);
+
+        // only generate one day at a time
+        CreateTimeSlotDaily(AdmissionCode, ScheduleCode, Day0, 0D, 100000T, 110000T, 0);
+
+        Schedule.Get(ScheduleCode);
+        Schedule."Recurrence Pattern" := Schedule."Recurrence Pattern"::DAILY;
+        Schedule."Recur Every N On" := 2; // every other day
+        Schedule.Modify();
+
+        SoftRegenerateSchedule(AdmissionCode, Day0);
+        CountScheduleEntries(ScheduleEntry, AdmissionCode, ScheduleCode, Day0, 1, 'Day 0 should have one slot');
+
+        SoftRegenerateSchedule(AdmissionCode, Day1);
+        CountScheduleEntries(ScheduleEntry, AdmissionCode, ScheduleCode, Day1, 0, 'Day 1 should be skipped');
+
+        SoftRegenerateSchedule(AdmissionCode, Day2);
+        CountScheduleEntries(ScheduleEntry, AdmissionCode, ScheduleCode, Day2, 1, 'Day 2 should be generated again');
+    end;
+
+    [Test]
+    [TestPermissions(TestPermissions::Disabled)]
+    procedure WeeklyScheduleHonorsEverySecondWeek()
+    var
+        ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+        Schedule: Record "NPR TM Admis. Schedule";
+        AdmissionCode: Code[20];
+        ScheduleCode: Code[20];
+        ItemNo: Code[20];
+        TicketTypeCode: Code[10];
+        Week0Monday, Week1Monday, Week2Monday : Date;
+    begin
+        CreateMinimalSetup();
+        CreateEvent(TicketTypeCode, ItemNo, AdmissionCode);
+
+        Week0Monday := CalcDate('<CW+1D>', Today()); // this week's Monday
+        Week1Monday := CalcDate('<+7D>', Week0Monday);
+        Week2Monday := CalcDate('<+14D>', Week0Monday);
+
+        CreateTimeSlot(AdmissionCode, ScheduleCode, Week0Monday, 090000T, 100000T, 0);
+
+        Schedule.Get(ScheduleCode);
+        Schedule."Recurrence Pattern" := Schedule."Recurrence Pattern"::WEEKLY;
+        Schedule."Recur Every N On" := 2;
+        Schedule.Monday := true;
+        Schedule.Tuesday := false;
+        Schedule.Wednesday := false;
+        Schedule.Thursday := false;
+        Schedule.Friday := false;
+        Schedule.Saturday := false;
+        Schedule.Sunday := false;
+        Schedule.Modify();
+
+        SoftRegenerateSchedule(AdmissionCode, Week0Monday);
+        CountScheduleEntries(ScheduleEntry, AdmissionCode, ScheduleCode, Week0Monday, 1, 'Week 0 Monday should be generated');
+
+        SoftRegenerateSchedule(AdmissionCode, Week1Monday);
+        CountScheduleEntries(ScheduleEntry, AdmissionCode, ScheduleCode, Week1Monday, 0, 'Week 1 should be skipped');
+
+        SoftRegenerateSchedule(AdmissionCode, Week2Monday);
+        CountScheduleEntries(ScheduleEntry, AdmissionCode, ScheduleCode, Week2Monday, 1, 'Week 2 Monday should be generated again');
+    end;
+
+    local procedure CountScheduleEntries(var ScheduleEntry: Record "NPR TM Admis. Schedule Entry";
+                                         AdmissionCode: Code[20];
+                                         ScheduleCode: Code[20];
+                                         TargetDate: Date;
+                                         Expected: Integer;
+                                         Message: Text)
+    var
+        Assert: Codeunit Assert;
+    begin
+        ScheduleEntry.Reset();
+        ScheduleEntry.SetRange("Admission Code", AdmissionCode);
+        ScheduleEntry.SetRange("Schedule Code", ScheduleCode);
+        ScheduleEntry.SetRange("Admission Start Date", TargetDate);
+        ScheduleEntry.SetRange(Cancelled, false);
+        Assert.AreEqual(Expected, ScheduleEntry.Count(), Message);
+    end;
+
 
     procedure Performance()
     var

@@ -258,6 +258,9 @@
         }
         key(Key3; "Admission Code", "Schedule Code", "Admission Start Date")
         {
+#if not (BC17 or BC18)
+            IncludedFields = "Admission Start Time", Cancelled;
+#endif            
         }
         key(Key4; "Admission Start Date", "Admission Start Time")
         {
