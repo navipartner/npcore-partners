@@ -1,5 +1,6 @@
 imports:
   simpleTypes: ./types-simple.yml
+  ticketTypes: ./../ticketing/types-composite.yml
 
 types:
 
@@ -166,6 +167,7 @@ types:
       validUntil: simpleTypes.ValidUntil
       issuedAt: simpleTypes.IssuedAt
       blocked: boolean
+      content: optional<list<ticketTypes.TicketContent>>
       accessHistory: list<TicketAccessHistory>
     examples:
       - name: ExampleTicketDetails
@@ -174,6 +176,8 @@ types:
           validUntil: $simpleTypes.ValidUntil.ExampleValidUntil
           issuedAt: $simpleTypes.IssuedAt.ExampleIssuedAt
           blocked: false
+          content:
+            - $ticketTypes.TicketContent.ExampleTicketContent1
           accessHistory:
             - $TicketAccessHistory.ExampleTicketAccessHistory
 

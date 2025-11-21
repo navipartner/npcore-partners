@@ -73,7 +73,7 @@ service:
           withDetails: optional<simpleTypes.WithDetails>
       response: compositeTypes.WalletDetails
       examples:
-        - name: GetWallets
+        - name: Get Wallet with details
           path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
@@ -84,6 +84,7 @@ service:
           response:
             body: $compositeTypes.WalletDetails.ExampleWalletDetailsWithDetails
 
+
     findWallet:
       docs: Find a wallet by any of its external references.
       display-name: Find Wallet
@@ -92,19 +93,24 @@ service:
       request:
         name: findWallet
         query-parameters:
-          referenceNumber: simpleTypes.ExternalWalletReferenceNumber
+          referenceNumber: optional<simpleTypes.ExternalWalletReferenceNumber>
+          referenceNumbers: optional<simpleTypes.ExternalWalletReferenceNumbers>
+          withAssets: optional<simpleTypes.WithAssets>
+          withDetails: optional<simpleTypes.WithDetails>
       response: list<compositeTypes.WalletDetails>
       examples:
-        - name: FindWallets
+        - name: Find Wallets with Assets including Details
           path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
           query-parameters:
-            referenceNumber: $simpleTypes.WalletReferenceNumber.ExampleWalletReferenceNumber
+            referenceNumbers: $simpleTypes.ExternalWalletReferenceNumbers.ExampleExternalWalletReferenceNumbers
+            withAssets: $simpleTypes.WithAssets.ExampleWithAssetsTrue
+            withDetails: $simpleTypes.WithDetails.ExampleWithDetailsTrue
           response:
             body: 
-              - $compositeTypes.WalletDetails.ExampleWalletDetails
+              - $compositeTypes.WalletDetails.ExampleWalletDetailsWithDetails
 
     assetHistory:
       docs: Get the history of an asset in a wallet.

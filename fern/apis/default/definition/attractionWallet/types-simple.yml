@@ -76,6 +76,12 @@ types:
       - name: ExampleExternalWalletReferenceNumber
         value: "john.doe@acme.com"
     
+  ExternalWalletReferenceNumbers:
+    type: string
+    docs: A comma separated list of external reference numbers used when searching for wallets.
+    examples: 
+      - name: ExampleExternalWalletReferenceNumbers
+        value: "john.doe@acme.com, WALLET-12345"
 
   Id:
     type: uuid
@@ -215,6 +221,13 @@ types:
     docs: Indicates whether the asset details should be included in the response.
     examples: 
       - name: ExampleWithDetailsTrue
+        value: true
+
+  WithAssets:
+    type: boolean
+    docs: Indicates whether the asset should be included in the response.
+    examples: 
+      - name: ExampleWithAssetsTrue
         value: true
 
   ValidFrom:
