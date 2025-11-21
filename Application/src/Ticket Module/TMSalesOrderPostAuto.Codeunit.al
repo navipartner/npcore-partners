@@ -102,6 +102,9 @@
         if not HasMemberItem(SalesHeader) then
             exit;
 
+        if HasNonMemberItem(SalesHeader) then
+            exit;
+
         PostSalesOrder(SalesHeader);
     end;
 
@@ -123,6 +126,27 @@
                 MMMembershipAlterationSetup.SetFilter("Sales Item No.", SalesLine."No.");
                 if MMMembershipAlterationSetup.FindFirst() then
                     exit(true)
+            until SalesLine.Next() = 0;
+
+        exit(false);
+    end;
+
+    local procedure HasNonMemberItem(SalesHeader: Record "Sales Header"): Boolean
+    var
+        SalesLine: Record "Sales Line";
+        MMMembershipSalesSetup: Record "NPR MM Members. Sales Setup";
+        MMMembershipAlterationSetup: Record "NPR MM Members. Alter. Setup";
+    begin
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.SetRange(Type, SalesLine.Type::Item);
+        SalesLine.SetFilter("No.", '<>%1', '');
+        if SalesLine.FindSet() then
+            repeat
+                Clear(MMMembershipAlterationSetup);
+                MMMembershipAlterationSetup.SetRange("Sales Item No.", SalesLine."No.");
+                if (not MMMembershipSalesSetup.Get(MMMembershipSalesSetup.Type::ITEM, SalesLine."No.")) and MMMembershipAlterationSetup.IsEmpty() then
+                    exit(true);
             until SalesLine.Next() = 0;
 
         exit(false);
