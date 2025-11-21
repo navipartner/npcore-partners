@@ -613,7 +613,6 @@
         NpRvVoucherEntry: Record "NPR NpRv Voucher Entry";
         NpRvSalesLine: Record "NPR NpRv Sales Line";
         NpRvVoucherMgt: Codeunit "NPR NpRv Voucher Mgt.";
-        AvailableAmount: Decimal;
         InUseQty: Integer;
     begin
         if not FindVoucher(TempNpRvVoucherBuffer."Voucher Type", TempNpRvVoucherBuffer."Reference No.", NpRvVoucher) then
@@ -621,15 +620,6 @@
 
         NpRvVoucher.CalcFields(Open);
         NpRvVoucher.TestField(Open);
-
-        if NpRvVoucherMgt.VoucherReservationByAmountFeatureEnabled() then begin
-            if not NpRvVoucherMgt.ValidateAmount(NpRvVoucher, TempNpRvVoucherBuffer.Amount, AvailableAmount) then
-                Error(Text002, AvailableAmount);
-        end else begin
-            NpRvVoucher.CalcFields(Amount);
-            if NpRvVoucher.Amount < TempNpRvVoucherBuffer.Amount then
-                Error(Text002, NpRvVoucher.Amount);
-        end;
 
         NpRvVoucherEntry.Init();
         NpRvVoucherEntry."Entry No." := 0;
