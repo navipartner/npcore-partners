@@ -1,11 +1,8 @@
-﻿table 6184512 "NPR EFT BIN Group Paym. Link"
+table 6151276 "NPR EFT BIN Group Payment Link"
 {
     Access = Internal;
     Caption = 'EFT Mapping Group Payment Link';
     DataClassification = CustomerContent;
-    ObsoleteState = Pending;
-    ObsoleteTag = '2025-05-11';
-    ObsoleteReason = 'Replaced by "NPR EFT Bin Group Payment Link"';
 
     fields
     {
@@ -27,11 +24,18 @@
             DataClassification = CustomerContent;
             TableRelation = "NPR POS Payment Method";
         }
+        field(4; "From Payment Type POS"; Code[10])
+        {
+            Caption = 'From Payment Type POS';
+            DataClassification = CustomerContent;
+            TableRelation = "NPR POS Payment Method";
+        }
     }
     keys
     {
-        key(Key1; "Group Code", "Location Code")
+        key(Key1; "Group Code", "Location Code", "From Payment Type POS")
         {
+            Clustered = true;
         }
     }
 }

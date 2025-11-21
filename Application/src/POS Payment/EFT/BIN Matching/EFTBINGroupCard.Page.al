@@ -38,7 +38,7 @@
                     ApplicationArea = NPRRetail;
                 }
             }
-            part(Control6014405; "NPR EFT BIN Group Paym. Links")
+            part(Control6014405; "NPR EFT BIN Group PaymentLinks")
             {
                 SubPageLink = "Group Code" = FIELD(Code);
                 ApplicationArea = NPRRetail;
@@ -58,4 +58,3 @@
         }
     }
 }
-

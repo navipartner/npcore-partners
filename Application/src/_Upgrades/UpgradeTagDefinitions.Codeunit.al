@@ -1138,6 +1138,11 @@
                     'MatchRemainingQtyToRSRetailValueEntryMapping':
                         exit('NPR-MatchRemainingQtyToRSRetailValueEntryMapping-20251102');
                 end;
+            Codeunit::"NPR BINMatching Upgrade":
+                case UpgradeStep of
+                    'UpgradeBINGroupPaymentLink':
+                        exit('NPR-UpgradeBINGroupPaymentLinks-20251711');
+                end;
         end;
     end;
 }
