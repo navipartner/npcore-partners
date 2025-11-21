@@ -17,7 +17,7 @@ codeunit 6151518 "NPR POS Act. Insert Item Event"
     end;
 
     [IntegrationEvent(false, false)]
-    procedure OnSetNextCaptionUpdateTime(Item: Record Item; ItemReference: Record "Item Reference"; var NextUpdateTime: DateTime)
+    internal procedure OnSetNextCaptionUpdateTime(Item: Record Item; ItemReference: Record "Item Reference"; var NextUpdateTime: DateTime)
     begin
     end;
 }
