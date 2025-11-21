@@ -18,11 +18,11 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
     begin
         if (not MembershipApiAgent.GetMembershipById(Request, 2, Membership)) then
             exit(Response.RespondBadRequest('Invalid Membership - Membership Id not valid.'));
-        Membership.CalcFields("Remaining Points");
-        Redeemable := Membership."Remaining Points";
-        if not IsLoyaltyCouponSetupActive(Membership.SystemId) then
-            PointsValue := Membership."Remaining Points" * LoyaltyBurnRate(Membership.SystemId)
-        else
+        if IsLoyaltyAsYouGo(Membership.SystemId) then begin
+            Membership.CalcFields("Remaining Points");
+            Redeemable := Membership."Remaining Points";
+            PointsValue := Membership."Remaining Points" * LoyaltyBurnRate(Membership.SystemId);
+        end else
             if (LoyaltyPointManagement.GetCouponToRedeemWS(Membership."Entry No.", TempLoyaltyPointsSetup, 1000000000, ReasonText)) then begin
                 Redeemable := LoyaltyPointManagement.CalculateRedeemablePointsCurrentPeriod(Membership."Entry No.");
                 TempLoyaltyPointsSetup.Reset();
@@ -348,11 +348,11 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
         exit(LoyaltySetup."Point Rate");
     end;
 
-    local procedure IsLoyaltyCouponSetupActive(MembershipSystemId: Guid): Boolean
+    local procedure IsLoyaltyAsYouGo(MembershipSystemId: Guid): Boolean
     var
         Membership: Record "NPR MM Membership";
         MembershipSetup: Record "NPR MM Membership Setup";
-        LoyaltyPointsSetup: Record "NPR MM Loyalty Point Setup";
+        LoyaltySetup: Record "NPR MM Loyalty Setup";
     begin
         Membership.SetLoadFields("Membership Code");
         if not Membership.GetBySystemId(MembershipSystemId) then
@@ -360,8 +360,9 @@ codeunit 6248490 "NPR LoyaltyApiAgent"
         MembershipSetup.SetLoadFields("Loyalty Code");
         if not MembershipSetup.Get(Membership."Membership Code") then
             exit(false);
-        LoyaltyPointsSetup.SetFilter(Code, '=%1', MembershipSetup."Loyalty Code");
-        exit(not LoyaltyPointsSetup.IsEmpty());
+        LoyaltySetup.SetRange(Code, MembershipSetup."Loyalty Code");
+        LoyaltySetup.SetRange("Collection Period", LoyaltySetup."Collection Period"::AS_YOU_GO);
+        exit(not LoyaltySetup.IsEmpty());
     end;
 
 }
