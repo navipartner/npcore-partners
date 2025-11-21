@@ -49,12 +49,26 @@
             DataClassification = CustomerContent;
 
             trigger OnValidate()
+            var
+                MemberCard: Record "NPR MM Member Card";
+                DuplicateCardNumber: Label 'Cannot unblock the card %1 because there is already an active card with the same External Card No.';
             begin
                 Rec."Blocked At" := CreateDateTime(0D, 0T);
                 Rec."Blocked By" := '';
                 if (Rec.Blocked) then begin
                     Rec."Blocked At" := CurrentDateTime();
                     Rec."Blocked By" := CopyStr(UserId(), 1, MaxStrLen(Rec."Blocked By"));
+                end;
+                if (not Rec.blocked and xRec.Blocked) then begin
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+                    MemberCard.ReadIsolation := MemberCard.ReadIsolation::UpdLock;
+#endif
+                    MemberCard.SetCurrentKey("External Card No.");
+                    MemberCard.SetFilter("External Card No.", '=%1', Rec."External Card No.");
+                    MemberCard.SetFilter(Blocked, '=%1', false);
+                    MemberCard.SetFilter("Entry No.", '<>%1', Rec."Entry No.");
+                    if (not MemberCard.IsEmpty()) then
+                        Error(DuplicateCardNumber, Rec."External Card No.");
                 end;
             end;
         }
