@@ -331,6 +331,49 @@ table 6151258 "NPR Ecom Sales Header"
             DataClassification = CustomerContent;
             Caption = 'Requested API Version Date';
         }
+        field(5000; "Bucket Id"; Integer)
+        {
+            Caption = 'Bucket Id';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
+        field(5049; "Virtual Items Exist"; Boolean)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Virtual Items Exist';
+        }
+        field(5050; "Vouchers Exist"; Boolean)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Vouchers Exist';
+        }
+        field(5080; "Voucher Processing Status"; Enum "NPR EcomVoucherStatus")
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Voucher Processing Status';
+        }
+
+        field(5090; "Capture Processing Status"; Enum "NPR Ecom Capture Status")
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Capture Processing Status';
+        }
+        field(5100; "Capture Retry Count"; Integer)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Capture Retry Count';
+            BlankZero = true;
+        }
+        field(5150; "Last Capture Error Message"; Text[500])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Last Capture Error Message';
+        }
+        field(5160; "Virtual Items Process Status"; Enum "NPR EcomVirtualItemDocStatus")
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Virtual Items Processing Status';
+        }
     }
 
     keys
@@ -351,6 +394,15 @@ table 6151258 "NPR Ecom Sales Header"
         key(CreatedDateSorting; SystemCreatedAt)
         {
         }
+        key(VoucherProcessing; "Document Type", "Creation Status", "Vouchers Exist", "Capture Processing Status", "Voucher Processing Status", "Bucket Id")
+        {
+        }
+        key(CaptureProcessing; "Creation Status", "Virtual Items Exist", "Capture Processing Status", "Bucket Id", "Capture Retry Count")
+        {
+        }
+        key(VirtualItemProcessing; "Document Type", "Creation Status", "Virtual Items Exist", "Virtual Items Process Status", "Bucket Id", "Process Retry Count")
+        {
+        }
 
     }
 #if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
@@ -360,6 +412,9 @@ table 6151258 "NPR Ecom Sales Header"
     begin
         EcomSalesDocUtils.DeleteSalesDocSalesLines(Rec);
         EcomSalesDocUtils.DeleteSalesDocPaymentLines(Rec);
+        EcomSalesDocUtils.DeleteMagentoPaymentLines(Rec);
+        EcomSalesDocUtils.DeleteVoucherSalesLines(Rec);
     end;
 #endif
+
 }

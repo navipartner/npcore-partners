@@ -904,6 +904,9 @@
     var
         PaymentGateway: Record "NPR Magento Payment Gateway";
         MagentPmtMgt: Codeunit "NPR Magento Pmt. Mgt.";
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+        EcomLineCaptureProc: Codeunit "NPR EcomLineCaptureProcess";
+#endif
         ErrorText: Text;
     begin
         if PaymentLine."Date Captured" <> 0D then
@@ -915,7 +918,7 @@
             exit;
         end;
 
-        if not (PaymentLine."Document Table No." in [Database::"Sales Header", Database::"Sales Invoice Header"]) then
+        if not (PaymentLine."Document Table No." in [Database::"Sales Header", Database::"Sales Invoice Header", Database::"NPR Ecom Sales Header"]) then
             exit;
 
         if (not PaymentGateway.Get(PaymentLine."Payment Gateway Code")) then
@@ -927,12 +930,29 @@
         PaymentGateway.EnsureIntegrationTypeSelected();
 
         Commit();
-        Clear(MagentPmtMgt);
-        MagentPmtMgt.SetProcessingOptions(_PaymentEventType::Capture);
-        if (not MagentPmtMgt.Run(PaymentLine)) then begin
-            ErrorText := GetLastErrorText();
-            if ErrorText <> '' then
-                Message(Text000, CopyStr(ErrorText, 1, 900));
+        case PaymentLine."Document Table No." of
+
+            Database::"NPR Ecom Sales Header":
+                begin
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+                    Clear(EcomLineCaptureProc);
+                    EcomLineCaptureProc.SetShowError(true);
+                    if (not EcomLineCaptureProc.Run(PaymentLine)) then begin
+                        ErrorText := GetLastErrorText();
+                        if ErrorText <> '' then
+                            Message(Text000, CopyStr(ErrorText, 1, 900));
+                    end;
+#endif
+                end;
+            else begin
+                Clear(MagentPmtMgt);
+                MagentPmtMgt.SetProcessingOptions(_PaymentEventType::Capture);
+                if (not MagentPmtMgt.Run(PaymentLine)) then begin
+                    ErrorText := GetLastErrorText();
+                    if ErrorText <> '' then
+                        Message(Text000, CopyStr(ErrorText, 1, 900));
+                end;
+            end;
         end;
     end;
 

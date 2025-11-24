@@ -5,24 +5,15 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
     internal procedure CreateIncomingEcomDocument(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         EcomSalesHeader: Record "NPR Ecom Sales Header";
-        EcomSalesDocSetup: Record "NPR Inc Ecom Sales Doc Setup";
-        EcomSalesDocProcess: Codeunit "NPR EcomSalesDocProcess";
+
     begin
         Request.SkipCacheIfNonStickyRequest(GetTableIds());
         InsertSalesDocument(Request, EcomSalesHeader);
 
-        if not EcomSalesDocSetup.Get() then
-            EcomSalesDocSetup.Init();
+        Commit();
+        PreProcessDocument(EcomSalesHeader);
 
-        EcomSalesHeader.Get(EcomSalesHeader.RecordId);
-        if (EcomSalesDocSetup."Proc Sales Order On Receive" and (EcomSalesHeader."Document Type" = EcomSalesHeader."Document Type"::Order)) or
-           (EcomSalesDocSetup."Proc Sales Ret Ord On Receive" and (EcomSalesHeader."Document Type" = EcomSalesHeader."Document Type"::"Return Order"))
-        then begin
-            Clear(EcomSalesDocProcess);
-            EcomSalesDocProcess.SetUpdateRetryCount(true);
-            EcomSalesDocProcess.Run(EcomSalesHeader);
-        end;
-
+        AssignBucketId(EcomSalesHeader);
         exit(Response.RespondOK(GetSalesDocumentCreateResponse(EcomSalesHeader)));
     end;
 
@@ -51,6 +42,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
     var
         RequestBody: JsonToken;
         RequestedApiVersion: Date;
+        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
     begin
         RequestBody := Request.BodyJson();
         RequestedApiVersion := Request.ApiVersion();
@@ -58,6 +50,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         ProcessIncomingSalesLines(RequestBody, EcomSalesHeader);
         ProcessIncomingSalesPaymentLines(RequestBody, EcomSalesHeader);
         ProcessIncomingSalesDocumentComments(RequestBody, EcomSalesHeader);
+        EcomVirtualItemMgt.UpdateVirtualItemInformationInHeader(EcomSalesHeader);
     end;
 
     local procedure DeserializeIncomingEcomSalesHeader(RequestBody: JsonToken; var EcomSalesHeader: Record "NPR Ecom Sales Header");
@@ -184,12 +177,63 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         EcomSalesLine.Insert(true);
     end;
 
+    local procedure ReserveVoucher(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line")
+    var
+        VoucherSalesLine: Record "NPR NpRv Sales Line";
+        Voucher: Record "NPR NpRv Voucher";
+        VoucherMngt: Codeunit "NPR NpRv Voucher Mgt.";
+        EcomSalesDocApiEvents: Codeunit "NPR EcomSalesDocApiEvents";
+        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+        VoucherInUser: Label 'Voucher with type %1 and reference no. %2 is already in use';
+    begin
+        if EcomSalesPmtLine."Payment Method Type" <> EcomSalesPmtLine."Payment Method Type"::Voucher then
+            exit;
+
+        EcomVirtualItemMgt.FindVoucher(EcomSalesPmtLine, Voucher);
+
+        VoucherSalesLine.Reset();
+        VoucherSalesLine.SetRange("Document Source", VoucherSalesLine."Document Source"::"Sales Document");
+        VoucherSalesLine.SetRange("External Document No.", EcomSalesHeader."External No.");
+        VoucherSalesLine.SetRange("Voucher Type", Voucher."Voucher Type");
+        VoucherSalesLine.SetRange("Voucher No.", Voucher."No.");
+        VoucherSalesLine.SetRange(Type, VoucherSalesLine.Type::Payment);
+        if not VoucherSalesLine.FindFirst() then begin
+            if not VoucherMngt.VoucherReservationByAmountFeatureEnabled() then begin
+                if Voucher.CalcInUseQty() > 0 then
+                    Error(VoucherInUser, Voucher."Voucher Type", Voucher."Reference No.");
+            end;
+
+
+            VoucherSalesLine.Init();
+            VoucherSalesLine.Id := CreateGuid();
+            VoucherSalesLine."Document Source" := VoucherSalesLine."Document Source"::"Sales Document";
+            VoucherSalesLine."External Document No." := EcomSalesHeader."External No.";
+            VoucherSalesLine.Type := VoucherSalesLine.Type::Payment;
+            VoucherSalesLine."Voucher Type" := Voucher."Voucher Type";
+            VoucherSalesLine."Voucher No." := Voucher."No.";
+            VoucherSalesLine."Reference No." := Voucher."Reference No.";
+            VoucherSalesLine.Description := Voucher.Description;
+            VoucherSalesLine."NPR Inc Ecom Sales Pmt Line Id" := EcomSalesPmtLine.SystemId;
+            VoucherSalesLine."NPR Inc Ecom Sale Id" := EcomSalesHeader.SystemId;
+            VoucherSalesLine.Amount := EcomSalesPmtLine.Amount;
+            VoucherSalesLine.Insert();
+        end else begin
+            VoucherSalesLine."NPR Inc Ecom Sales Pmt Line Id" := EcomSalesPmtLine.SystemId;
+            VoucherSalesLine."NPR Inc Ecom Sale Id" := EcomSalesHeader.SystemId;
+            VoucherSalesLine.Amount := EcomSalesPmtLine.Amount;
+            VoucherSalesLine.Modify();
+        end;
+
+        EcomSalesDocApiEvents.OnAfterReserveVoucher(EcomSalesHeader, EcomSalesPmtLine, VoucherSalesLine);
+    end;
+
     local procedure DeserializeIncomingEcomSalesLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesLineJsonToken: JsonToken; var EcomSalesLine: Record "NPR Ecom Sales Line")
     var
         EcomSalesDocApiEvents: Codeunit "NPR EcomSalesDocApiEvents";
         JsonHelper: Codeunit "NPR Json Helper";
         LineTypeText: Text;
         PropertyErrorText: Label 'Property %1 has incorrect value: %2.', Comment = '%1 - absolute path, %2 - type', Locked = true;
+        LengthErrorText: Label 'Property %1 has incorrect length: %2. Max length: %3', Comment = '%1 - absolute path, %2 - type', Locked = true;
     begin
         LineTypeText := JsonHelper.GetJText(SalesLineJsonToken, 'type', true);
         if not TryEvaluateIncSalesLineType(EcomSalesHeader, LineTypeText, EcomSalesLine.Type) then
@@ -199,6 +243,8 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
             EcomSalesLine.Type::Item:
                 begin
                     EcomSalesLine."No." := JsonHelper.GetJText(SalesLineJsonToken, 'no', MaxStrLen(EcomSalesLine."No."), true, false);
+                    if Strlen(EcomSalesLine."No.") > 20 then
+                        Error(LengthErrorText, JsonHelper.GetAbsolutePath(SalesLineJsonToken, 'no'), Strlen(EcomSalesLine."No."), 20);
                     EcomSalesLine."Variant Code" := JsonHelper.GetJText(SalesLineJsonToken, 'variantCode', MaxStrLen(EcomSalesLine."Variant Code"), true, false);
                     EcomSalesLine."Barcode No." := JsonHelper.GetJText(SalesLineJsonToken, 'barcodeNo', MaxStrLen(EcomSalesLine."Barcode No."), true, false);
                     if (EcomSalesLine."No." = '') and (EcomSalesLine."Barcode No." = '') then
@@ -224,6 +270,21 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                     EcomSalesLine."VAT %" := JsonHelper.GetJDecimal(SalesLineJsonToken, 'vatPercent', true);
                     EcomSalesLine."Line Amount" := JsonHelper.GetJDecimal(SalesLineJsonToken, 'lineAmount', true);
                 end;
+            EcomSalesLine.Type::Voucher:
+                begin
+                    EcomSalesLine."Voucher Type" := JsonHelper.GetJText(SalesLineJsonToken, 'voucherType', MaxStrLen(EcomSalesLine."Voucher Type"), true, false);
+                    EcomSalesLine."Barcode No." := JsonHelper.GetJText(SalesLineJsonToken, 'barcodeNo', MaxStrLen(EcomSalesLine."Barcode No."), true, false);
+                    if (EcomSalesLine."Barcode No." = '') then
+                        if (EcomSalesLine."Voucher Type" = '') then
+                            Error(PropertyErrorText, JsonHelper.GetAbsolutePath(SalesLineJsonToken, 'barcodeNo'), EcomSalesLine."Barcode No.");
+                    EcomSalesLine.Description := JsonHelper.GetJText(SalesLineJsonToken, 'description', MaxStrLen(EcomSalesLine.Description), true, true);
+                    EcomSalesLine."Unit Price" := JsonHelper.GetJDecimal(SalesLineJsonToken, 'unitPrice', true);
+                    EcomSalesLine.Quantity := JsonHelper.GetJDecimal(SalesLineJsonToken, 'quantity', true);
+                    if EcomSalesLine.Quantity <> 1 then
+                        Error(PropertyErrorText, JsonHelper.GetAbsolutePath(SalesLineJsonToken, 'quantity'), EcomSalesLine.Quantity);
+                    EcomSalesLine."VAT %" := JsonHelper.GetJDecimal(SalesLineJsonToken, 'vatPercent', true);
+                    EcomSalesLine."Line Amount" := JsonHelper.GetJDecimal(SalesLineJsonToken, 'lineAmount', true);
+                end;
         end;
 
 
@@ -235,6 +296,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
     procedure TryEvaluateIncSalesLineType(EcomSalesHeader: Record "NPR Ecom Sales Header"; IncSalesLineTypeText: Text; var EcomSalesLineType: Enum "NPR Ecom Sales Line Type")
     var
         UnsupportedLineTypeTextErr: Label 'Sales line type %1 is not supported.', Comment = '%1 - sales line type', Locked = true;
+        UnsupportedLineTypeReturnOrderTextErr: Label 'Sales line type %1 is not supported in documents with type returnOrder.', Comment = '%1 - sales line type', Locked = true;
     begin
         Case IncSalesLineTypeText of
             'item':
@@ -243,6 +305,11 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                 EcomSalesLineType := EcomSalesLineType::Comment;
             'shipmentFee':
                 EcomSalesLineType := EcomSalesLineType::"Shipment Fee";
+            'voucher':
+                if EcomSalesHeader."Document Type" = EcomSalesHeader."Document Type"::Order then
+                    EcomSalesLineType := EcomSalesLineType::Voucher
+                else
+                    Error(UnsupportedLineTypeReturnOrderTextErr, IncSalesLineTypeText);
             else
                 Error(UnsupportedLineTypeTextErr, IncSalesLineTypeText);
         End;
@@ -260,6 +327,8 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                 IncSalesLineTypeText := 'comment';
             EcomSalesLine.Type::"Shipment Fee":
                 IncSalesLineTypeText := 'shipmentFee';
+            EcomSalesLine.Type::Voucher:
+                IncSalesLineTypeText := 'voucher';
             else
                 Error(UnsupportedLineTypeTextErr, IncSalesLineTypeText);
         end;
@@ -291,6 +360,7 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         EcomSalesDocApiEvents: Codeunit "NPR EcomSalesDocApiEvents";
         EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
         ExternalPaymentMethodNotSetupErr: Label 'External payment method type: %1, external payment method code: %2 is not set up for payment.', Comment = '%1 - external payment method type, %2 - external payment method code', Locked = true;
+        VoucherLbl: Label 'Voucher';
     begin
         EcomSalesPmtLine.Init();
         EcomSalesPmtLine."Document Entry No." := EcomSalesHeader."Entry No.";
@@ -299,12 +369,25 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         EcomSalesPmtLine."Line No." := EcomSalesDocUtils.GetSalesDocLastPaymentLineLineNo(EcomSalesHeader) + 10000;
         DeserializeIncomingEcomSalesPaymentLine(EcomSalesHeader, PaymentLineJsonToken, EcomSalesPmtLine);
 
-        if not TryGetPaymentMethod(EcomSalesPmtLine."External Payment Type", EcomSalesPmtLine."External Payment Method Code", PaymentMethod, PaymentMapping) then
-            Error(ExternalPaymentMethodNotSetupErr, EcomSalesPmtLine."External Payment Type", EcomSalesPmtLine."External Payment Method Code");
+        case EcomSalesPmtLine."Payment Method Type" of
+            EcomSalesPmtLine."Payment Method Type"::"Payment Method":
+                begin
+                    if not TryGetPaymentMethod(EcomSalesPmtLine."External Payment Type", EcomSalesPmtLine."External Payment Method Code", PaymentMethod, PaymentMapping) then
+                        Error(ExternalPaymentMethodNotSetupErr, EcomSalesPmtLine."External Payment Type", EcomSalesPmtLine."External Payment Method Code");
+                    EcomSalesPmtLine.Description := CopyStr(PaymentMethod.Description + ' ' + EcomSalesHeader."External No.", 1, MaxStrLen(EcomSalesPmtLine.Description));
 
-        EcomSalesPmtLine.Description := CopyStr(PaymentMethod.Description + ' ' + EcomSalesHeader."External No.", 1, MaxStrLen(EcomSalesPmtLine.Description));
+                end;
+            EcomSalesPmtLine."Payment Method Type"::Voucher:
+                begin
+                    EcomSalesPmtLine.Description := CopyStr(VoucherLbl + ' ' + EcomSalesHeader."External No.", 1, MaxStrLen(EcomSalesPmtLine.Description));
+                end;
+        end;
+
         EcomSalesDocApiEvents.OnBeforeInsertIncomingSalesPaymentLineBeforeInsert(PaymentLineJsonToken, EcomSalesHeader, EcomSalesPmtLine);
         EcomSalesPmtLine.Insert(true);
+
+        if EcomSalesPmtLine."Payment Method Type" = EcomSalesPmtLine."Payment Method Type"::Voucher then
+            ReserveVoucher(EcomSalesHeader, EcomSalesPmtLine);
     end;
 
     local procedure DeserializeIncomingEcomSalesPaymentLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; PaymentLineJsonToken: JsonToken; var EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line")
@@ -334,6 +417,13 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                     EcomSalesPmtLine."Card Alias Token" := JsonHelper.GetJText(PaymentLineJsonToken, 'cardAliasToken', false);
 #pragma warning restore AA0139
                 end;
+            EcomSalesPmtLine."Payment Method Type"::Voucher:
+                begin
+#pragma warning disable AA0139
+                    EcomSalesPmtLine."Payment Reference" := JsonHelper.GetJText(PaymentLineJsonToken, 'paymentReference', MaxStrLen(EcomSalesPmtLine."Payment Reference"), true, true);
+                    EcomSalesPmtLine.Amount := JsonHelper.GetJDecimal(PaymentLineJsonToken, 'paymentAmount', true);
+#pragma warning restore AA0139
+                end;
         end;
 
         EcomSalesDocApiEvents.OnAfterDeserializeIncomingEcomSalesPaymentLine(PaymentLineJsonToken, EcomSalesPmtLine);
@@ -343,10 +433,16 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
     procedure TryEvaluateIncSalesPaymentLineType(EcomSalesHeader: Record "NPR Ecom Sales Header"; IncSalesPaymentLineTypeText: Text; var PaymentType: Enum "NPR Ecom Pmt Method Type")
     var
         NotSupportPaymentTypeErr: Label 'Payment type: %1 is not supported.', Comment = '%1 - payment type', Locked = true;
+        NotSupportPaymentTypeReturnOrderErr: Label 'Payment type: %1 is not supported in documents with type returnOrder.', Comment = '%1 - payment type', Locked = true;
     begin
         case IncSalesPaymentLineTypeText of
             'paymentGateway':
                 PaymentType := PaymentType::"Payment Method";
+            'voucher':
+                if EcomSalesHeader."Document Type" = EcomSalesHeader."Document Type"::Order then
+                    PaymentType := PaymentType::Voucher
+                else
+                    Error(NotSupportPaymentTypeReturnOrderErr, IncSalesPaymentLineTypeText);
             else
                 Error(NotSupportPaymentTypeErr, IncSalesPaymentLineTypeText);
         end;
@@ -441,6 +537,8 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                                  .AddProperty('yourReference', EcomSalesHeader."Your Reference")
                                  .AddProperty('locationCode', EcomSalesHeader."Location Code")
                                  .AddProperty('pricesExcludingVat', EcomSalesHeader."Price Excl. VAT")
+                                 .AddProperty('captureProcessingStatus', GetSalesDocumentCaptureProcessingStatusApiType(EcomSalesHeader))
+                                 .AddProperty('lastCaptureErrorMessage', EcomSalesHeader."Last Capture Error Message")
                                  .StartObject('sellToCustomer')
                                     .AddProperty('no', EcomSalesHeader."Sell-to Customer No.")
                                     .AddProperty('name', EcomSalesHeader."Sell-to Name")
@@ -583,7 +681,10 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
                                   .AddProperty('lineAmount', Format(EcomSalesLine."Line Amount", 0, 9))
                                   .AddProperty('requestedDeliveryDate', Format(EcomSalesLine."Requested Delivery Date", 0, 9))
                                   .AddProperty('invoicedQuantity', Format(EcomSalesLine."Invoiced Qty.", 0, 9))
-                                  .AddProperty('invoicedAmount', Format(EcomSalesLine."Invoiced Amount", 0, 9));
+                                  .AddProperty('invoicedAmount', Format(EcomSalesLine."Invoiced Amount", 0, 9))
+                                  .AddProperty('captured', EcomSalesLine.Captured)
+                                  .AddProperty('virtualItemProcessStatus', GetVirtualItemProcessStatusApiType(EcomSalesLine))
+                                  .AddProperty('virtualItemProcessErrorMessage', EcomSalesLine."Virtual Item Process ErrMsg");
         EcomSalesDocApiEvents.OnCreateAddSalesLineDetailsCustomFieldsJsonObject(EcomSalesLine, SalesLineDetailsCustomFieldsJsonObject);
         if SalesLineDetailsCustomFieldsJsonObject.IsInitialized() then
             SalesLineDetailsJsonObject.AddNestedObject('customFields', SalesLineDetailsCustomFieldsJsonObject);
@@ -669,5 +770,65 @@ codeunit 6248615 "NPR EcomSalesDocApiAgentV2"
         end;
     end;
 
+    local procedure AssignBucketId(var EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+    begin
+        EcomSalesHeader."Bucket Id" := EcomVirtualItemMgt.AssignBucketLines(EcomSalesHeader);
+        EcomSalesHeader.Modify();
+    end;
+
+    local procedure PreProcessDocument(var EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+    begin
+        if EcomSalesHeader."Virtual Items Exist" then begin
+            EcomVirtualItemMgt.CaptureEcomDocument(EcomSalesHeader, false, false);
+            EcomVirtualItemMgt.CreateVouchers(EcomSalesHeader, false, false);
+        end;
+        CreateDocument(EcomSalesHeader)
+    end;
+
+
+    local procedure CreateDocument(var EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        EcomSalesDocProcess: Codeunit "NPR EcomSalesDocProcess";
+    begin
+        if EcomSalesHeader."Creation Status" = EcomSalesHeader."Creation Status"::Created then
+            exit;
+
+        //Process document
+        EcomSalesHeader.Get(EcomSalesHeader.RecordId);
+        Clear(EcomSalesDocProcess);
+        EcomSalesDocProcess.SetShowError(false);
+        EcomSalesDocProcess.SetUpdateRetryCount(false);
+        EcomSalesDocProcess.Run(EcomSalesHeader);
+    end;
+
+    local procedure GetSalesDocumentCaptureProcessingStatusApiType(EcomSalesHeader: Record "NPR Ecom Sales Header") CaptureProcessingStatus: Text
+    begin
+        case EcomSalesHeader."Capture Processing Status" of
+            EcomSalesHeader."Capture Processing Status"::Error:
+                CaptureProcessingStatus := 'error';
+            EcomSalesHeader."Capture Processing Status"::"Partially Processed":
+                CaptureProcessingStatus := 'partiallyProcessed';
+            EcomSalesHeader."Capture Processing Status"::Processed:
+                CaptureProcessingStatus := 'processed';
+            EcomSalesHeader."Capture Processing Status"::Pending:
+                CaptureProcessingStatus := 'pending';
+        end;
+    end;
+
+    local procedure GetVirtualItemProcessStatusApiType(EcomSalesLine: Record "NPR Ecom Sales Line") VirtualItemProcessStatus: Text
+    begin
+        case EcomSalesLine."Virtual Item Process Status" of
+            EcomSalesLine."Virtual Item Process Status"::" ":
+                VirtualItemProcessStatus := '';
+            EcomSalesLine."Virtual Item Process Status"::Processed:
+                VirtualItemProcessStatus := 'processed';
+            EcomSalesLine."Virtual Item Process Status"::Error:
+                VirtualItemProcessStatus := 'error';
+        end;
+    end;
 }
 #endif

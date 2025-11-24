@@ -471,6 +471,34 @@
 
         Rec.TestField("Ask For Amount", false);
     end;
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EcomVirtualItemEvents", 'OnCalculateVoucherCaptureAmountCanProcessVoucher', '', true, true)]
+    local procedure OnCalculateVoucherCaptureAmountCanProcessVoucher(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line"; VoucherType: Record "NPR NpRv Voucher Type"; Voucher: Record "NPR NpRv Voucher"; TotalAmountToCapture: Decimal; AvailableVoucherAmount: Decimal; var ProcessVoucher: Boolean)
+    begin
+        if VoucherType."Apply Payment Module" <> ModuleCode() then
+            exit;
+        Voucher.CalcFields(Amount);
+        ProcessVoucher := (Voucher.Amount = AvailableVoucherAmount) and (TotalAmountToCapture >= AvailableVoucherAmount);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"NPR EcomSalesDocApiEvents", OnAfterDeserializeIncomingEcomSalesLine, '', false, false)]
+    local procedure OnAfterDeserializeIncomingEcomSalesLine(var EcomSalesLine: Record "NPR Ecom Sales Line"; SalesLineJsonToken: JsonToken)
+    var
+        VoucherType: Record "NPR NpRv Voucher Type";
+        JsonHelper: Codeunit "NPR Json Helper";
+        PropertyErrorText: Label 'Property %1 has unsupported value: %2.', Comment = '%1 - absolute path, %2 - type', Locked = true;
+    begin
+        if EcomSalesLine.Type <> EcomSalesLine.Type::Voucher then
+            exit;
+
+        VoucherType.SetLoadFields("Apply Payment Module");
+        if not VoucherType.Get(EcomSalesLine."Voucher Type") then
+            Error(PropertyErrorText, JsonHelper.GetAbsolutePath(SalesLineJsonToken, 'type'), EcomSalesLine."Voucher Type");
+
+        if VoucherType."Apply Payment Module" = ModuleCode() then
+            Error(PropertyErrorText, JsonHelper.GetAbsolutePath(SalesLineJsonToken, 'type'), EcomSalesLine."Voucher Type");
+    end;
+#endif
 
     local procedure CurrCodeunitId(): Integer
     begin

@@ -75,5 +75,11 @@ codeunit 6248606 "NPR EcomSalesDocApiEvents"
     internal procedure OnGetPaymentDocumentDetailsCustomFieldsJsonObject(EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line"; var PaymentDocumentDetailsCustomFieldsJsonObject: Codeunit "NPR Json Builder");
     begin
     end;
+
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterReserveVoucher(EcomSalesHeader: Record "NPR Ecom Sales Header"; EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line"; var VoucherSalesLine: Record "NPR NpRv Sales Line");
+    begin
+    end;
 }
 #endif

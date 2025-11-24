@@ -14,4 +14,8 @@ enum 6059942 "NPR Ecom Pmt Method Type"
     {
         Caption = 'Payment Method';
     }
+    value(7; "Voucher")
+    {
+        Caption = 'Voucher';
+    }
 }

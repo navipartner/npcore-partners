@@ -342,7 +342,11 @@
             Caption = 'Incoming Ecommerce Sales Line Id';
             DataClassification = CustomerContent;
         }
-
+        field(6059984; "NPR Inc Ecom Sale Id"; Guid)
+        {
+            Caption = 'Incoming Ecommerce Sale Id';
+            DataClassification = CustomerContent;
+        }
         field(6059982; "NPR Inc Ecom Sales Pmt Line Id"; Guid)
         {
             Caption = 'Incoming Ecommerce Sales Payment Line Id';
@@ -358,7 +362,6 @@
             Caption = 'Global Reservation Id';
             DataClassification = CustomerContent;
         }
-
     }
 
     keys

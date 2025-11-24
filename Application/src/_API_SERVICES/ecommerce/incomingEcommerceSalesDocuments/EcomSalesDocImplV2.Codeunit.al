@@ -12,14 +12,15 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         EcomSalesDocImplEvents: Codeunit "NPR EcomSalesDocImplEvents";
         IncEcomSalesWebhook: Codeunit "NPR Inc Ecom Sales Webhooks";
     begin
-        if EcomSalesHeader."Creation Status" = EcomSalesHeader."Creation Status"::Created then
-            exit;
+        //lock table
+        EcomSalesHeader.ReadIsolation := EcomSalesHeader.ReadIsolation::UpdLock;
+        EcomSalesHeader.Get(EcomSalesHeader.RecordId);
 
+        CheckIfDocumentCanBeProcessed(EcomSalesHeader);
         EcomSalesHeader."Creation Status" := EcomSalesHeader."Creation Status"::Created;
         EcomSalesHeader.Modify();
 
         InsertSalesDocument(EcomSalesHeader, SalesHeader);
-        Commit();
 
         Success := true;
 
@@ -30,6 +31,7 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
                 IncEcomSalesWebhook.OnSalesReturnOrderCreated(SalesHeader.SystemId, SalesHeader."External Document No.", SalesHeader."NPR External Order No.", SalesHeader."NPR Inc Ecom Sale Id");
         end;
 
+        PostEcomSalesDoc(EcomSalesHeader, SalesHeader);
         EcomSalesDocImplEvents.OnAfterProcess(EcomSalesHeader, Success);
     end;
 
@@ -47,6 +49,7 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
 
         InsertSalesHeader(EcomSalesHeader, SalesHeader);
         InsertSalesLines(EcomSalesHeader, SalesHeader);
+        TransferCapturedPayments(EcomSalesHeader, SalesHeader);
         InsertPaymentLines(EcomSalesHeader, SalesHeader);
         InsertCommentLines(EcomSalesHeader, SalesHeader);
         if EcomSalesHeader."Document Type" = EcomSalesHeader."Document Type"::Order then
@@ -280,8 +283,6 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         Customer."Post Code" := EcomSalesHeader."Sell-to Post Code";
         Customer."Country/Region Code" := EcomSalesHeader."Sell-to Country Code";
 
-        if (not NewCustomer) and (IncEcomSalesDocSetup."Customer Update Mode" in [IncEcomSalesDocSetup."Customer Update Mode"::"Create and Update", IncEcomSalesDocSetup."Customer Update Mode"::Update]) then
-            UpdateCustomerFromTemplates(Customer, CustomerTemplateCode, ConfigTemplateCode);
 
         PopulateCustomerNameFromEcomSalesHeader(EcomSalesHeader, Customer);
         Customer.Address := EcomSalesHeader."Sell-to Address";
@@ -457,6 +458,9 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
                     InsertSalesLineComment(EcomSalesHeader, SalesHeader, EcomSalesLine, SaleLine);
                 EcomSalesLine.Type::"Shipment Fee":
                     InsertSalesLineShipmentFee(EcomSalesHeader, SalesHeader, EcomSalesLine, SaleLine);
+                EcomSalesLine.Type::Voucher:
+                    InsertSalesLineVoucher(EcomSalesHeader, SalesHeader, EcomSalesLine, SaleLine);
+
             end;
         until EcomSalesLine.Next() = 0;
 
@@ -471,7 +475,7 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         VariantCode: Code[10];
         ItemDoesntExistErrorLbl: Label 'Item %1 in %2 does not exist.', Comment = '%1 - external no., %2 - inc sales line record id';
     begin
-        if EcomSalesLine.Type <> EcomSalesLine.Type::Item then
+        if (EcomSalesLine.Type <> EcomSalesLine.Type::Item) then
             exit;
 
         if not EcomSalesDocUtils.GetItemNoAndVariantNoFromEcomSalesLine(EcomSalesLine, ItemNo, VariantCode) then
@@ -597,6 +601,58 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         SalesLine.Modify(true);
     end;
 
+    local procedure InsertSalesLineVoucher(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesHeader: Record "Sales Header"; EcomSalesLine: Record "NPR Ecom Sales Line"; var SalesLine: Record "Sales Line")
+    var
+        EcomSalesDocImplEvents: Codeunit "NPR EcomSalesDocImplEvents";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvVoucherType: Record "NPR NpRv Voucher Type";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        RvArchVoucher: Record "NPR NpRv Arch. Voucher";
+        VoucherDoesntExistErrMsg: Label 'Voucher %1 doesn''t exist';
+    begin
+        if EcomSalesLine.Type <> EcomSalesLine.Type::Voucher then
+            exit;
+
+        if (EcomSalesLine."No." = '') then
+            exit;
+
+        if not NpRvVoucher.Get(EcomSalesLine."No.") then
+            if not RvArchVoucher.Get(EcomSalesLine."No.") then
+                Error(VoucherDoesntExistErrMsg, EcomSalesLine."No.");
+
+        NpRvSalesLine.SetCurrentKey("Document No.", "NPR Inc Ecom Sales Line Id");
+        NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Sales Document");
+        NpRvSalesLine.SetRange("NPR Inc Ecom Sales Line Id", EcomSalesLine.SystemId);
+        NpRvSalesLine.FindFirst();
+        NpRvVoucherType.Get(NpRvSalesLine."Voucher Type");
+
+        SalesLine.Init();
+        SalesLine."Document Type" := SalesHeader."Document Type";
+        SalesLine."Document No." := SalesHeader."No.";
+        SalesLine."Line No." := EcomSalesDocUtils.GetInternalSalesDocumentLastLineNo(SalesHeader) + 10000;
+        SalesLine.Insert(true);
+
+        SalesLine.Validate(Type, SalesLine.Type::"G/L Account");
+        SalesLine.Validate("No.", NpRvVoucherType."Account No.");
+        SalesLine.Description := CopyStr((StrSubstNo('%1 %2', EcomSalesLine."Barcode No.", NpRvVoucherType.Description)), 1, MaxStrLen(SalesLine.Description));
+        SalesLine.Validate(Quantity, EcomSalesLine.Quantity);
+        SalesLine.Validate("VAT %", EcomSalesLine."VAT %");
+        SalesLine.Validate("Unit Price", EcomSalesLine."Unit Price");
+        if SalesLine."Unit Price" <> 0 then
+            SalesLine.Validate("Line Amount", EcomSalesLine."Line Amount");
+        SalesLine."NPR Inc Ecom Sales Line Id" := EcomSalesLine.SystemId;
+
+        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
+        NpRvSalesLine."Document Type" := SalesLine."Document Type";
+        NpRvSalesLine."Document No." := SalesLine."Document No.";
+        NpRvSalesLine."Document Line No." := SalesLine."Line No.";
+        NpRvSalesLine.Modify(true);
+
+        EcomSalesDocImplEvents.OnInsertSalesLineVoucherBeforeFinalizeLine(EcomSalesHeader, SalesHeader, EcomSalesLine, SalesLine);
+        SalesLine.Modify(true);
+    end;
+
     local procedure PopulateSalesLineDescriptionFromEcomSalesLine(EcomSalesLine: Record "NPR Ecom Sales Line"; var SalesLine: Record "Sales Line")
     begin
         if EcomSalesLine.Description = '' then
@@ -668,9 +724,28 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
             case EcomSalesPmtLine."Payment Method Type" of
                 EcomSalesPmtLine."Payment Method Type"::"Payment Method":
                     InsertPaymentLinePaymentMethod(EcomSalesHeader, SalesHeader, EcomSalesPmtLine, PaymentLine);
+                EcomSalesPmtLine."Payment Method Type"::Voucher:
+                    InsertPaymentLineVoucher(EcomSalesHeader, SalesHeader, EcomSalesPmtLine, PaymentLine);
                 else
                     EcomSalesPmtLine.FieldError("Payment Method Type");
             end;
+        until EcomSalesPmtLine.Next() = 0;
+    end;
+
+    local procedure TransferCapturedPayments(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesHeader: Record "Sales Header")
+    var
+        EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line";
+    begin
+        EcomSalesPmtLine.Reset();
+        EcomSalesPmtLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesPmtLine.SetFilter("Captured Amount", '<>0');
+        if not EcomSalesPmtLine.FindSet() then
+            exit;
+
+        repeat
+            TransferCapturedPaymentLines(EcomSalesPmtLine, SalesHeader);
+            if EcomSalesPmtLine."Payment Method Type" = EcomSalesPmtLine."Payment Method Type"::Voucher then
+                TransferCapturedVoucherSalesLines(EcomSalesPmtLine, SalesHeader);
         until EcomSalesPmtLine.Next() = 0;
     end;
 
@@ -702,6 +777,10 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         if EcomSalesPmtLine.Amount = 0 then
             exit;
 
+
+        if EcomSalesPmtLine.Amount <= EcomSalesPmtLine."Captured Amount" then
+            exit; // Payment already captured
+
         PaymentMapping.Reset();
         PaymentMapping.SetRange("External Payment Method Code", EcomSalesPmtLine."External Payment Method Code");
         PaymentMapping.SetRange("External Payment Type", EcomSalesPmtLine."External Payment Type");
@@ -727,7 +806,7 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
         PaymentLine."Posting Date" := SalesHeader."Posting Date";
         PaymentLine."Source Table No." := DATABASE::"Payment Method";
         PaymentLine."Source No." := PaymentMethod.Code;
-        PaymentLine.Amount := EcomSalesPmtLine.Amount;
+        PaymentLine.Amount := EcomSalesPmtLine.Amount - EcomSalesPmtLine."Captured Amount";
         PaymentLine."Allow Adjust Amount" := PaymentMapping."Allow Adjust Payment Amount";
         PaymentLine."Payment Gateway Code" := PaymentMapping."Payment Gateway Code";
         PaymentLine."Payment Gateway Shopper Ref." := EcomSalesPmtLine."PAR Token";
@@ -744,11 +823,51 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
 #pragma warning restore AA0139
         PaymentLine."Card Alias Token" := EcomSalesPmtLine."Card Alias Token";
         PaymentLine."NPR Inc Ecom Sales Pmt Line Id" := EcomSalesPmtLine.SystemId;
+        PaymentLine."NPR Inc Ecom Sale Id" := EcomSalesHeader.SystemId;
         if PaymentMapping."Captured Externally" then
             PaymentLine."Date Captured" := GetDate(SalesHeader."Order Date", SalesHeader."Posting Date");
 
         EcomSalesDocCrtImplEvents.OnInsertPaymentLinePaymentMethodBeforeFinalizeLine(EcomSalesHeader, SalesHeader, EcomSalesPmtLine, PaymentLine);
         PaymentLine.Insert(true);
+    end;
+
+    local procedure TransferCapturedPaymentLines(EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line"; SalesHeader: Record "Sales Header")
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+        NewPaymentLine: Record "NPR Magento Payment Line";
+    begin
+        PaymentLine.Reset();
+        PaymentLine.SetRange("Document Table No.", Database::"NPR Ecom Sales Header");
+        PaymentLine.SetRange("Document No.", EcomSalesPmtLine."External Document No.");
+        PaymentLine.SetRange("Document Type", EcomSalesPmtLine."Document Type");
+        PaymentLine.SetRange("NPR Inc Ecom Sales Pmt Line Id", EcomSalesPmtLine.SystemId);
+        if not PaymentLine.FindSet() then
+            exit;
+
+        repeat
+            NewPaymentLine.Init();
+            NewPaymentLine := PaymentLine;
+            NewPaymentLine."Document Table No." := Database::"Sales Header";
+            NewPaymentLine."Document Type" := SalesHeader."Document Type";
+            NewPaymentLine."Document No." := SalesHeader."No.";
+            NewPaymentLine.SystemId := PaymentLine.SystemId;
+            PaymentLine.Delete();
+            NewPaymentLine.Insert(false, true);
+        until PaymentLine.Next() = 0;
+    end;
+
+    local procedure TransferCapturedVoucherSalesLines(EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line"; SalesHeader: Record "Sales Header")
+    var
+        VoucherSalesLine: Record "NPR NpRv Sales Line";
+    begin
+        VoucherSalesLine.Reset();
+        VoucherSalesLine.SetRange("NPR Inc Ecom Sales Pmt Line Id", EcomSalesPmtLine.SystemId);
+        if VoucherSalesLine.FindSet() then
+            repeat
+                VoucherSalesLine."Document Type" := SalesHeader."Document Type";
+                VoucherSalesLine."Document No." := SalesHeader."No.";
+                VoucherSalesLine.Modify(true);
+            until VoucherSalesLine.Next() = 0;
     end;
 
     local procedure UpdateExtCouponReservations(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesHeader: Record "Sales Header")
@@ -859,6 +978,83 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
             EcomSalesLine."Invoiced Amount" += SalesCrMemoLine."Amount Including VAT";
         EcomSalesDocImplEvents.OnUpdateSalesDocumentLinePostingInformationBeforeFinalizeRecordSalesCreditMemo(SalesCrMemoLine, EcomSalesHeader, EcomSalesLine);
         EcomSalesLine.Modify();
+    end;
+
+
+    local procedure InsertPaymentLineVoucher(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesHeader: Record "Sales Header"; EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line"; PaymentLine: Record "NPR Magento Payment Line")
+    var
+        NpRvVoucher: Record "NPR NpRv Voucher";
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+        NpRvVoucherMngt: Codeunit "NPR NpRv Voucher Mgt.";
+        EcomSalesDocImplEvents: Codeunit "NPR EcomSalesDocImplEvents";
+        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        AvailableAmount: Decimal;
+        VoucherPaymentAmountError: Label 'Voucher Payment Amount %1 exceeds available Voucher Amount %2';
+    begin
+        if EcomSalesPmtLine."Payment Method Type" <> EcomSalesPmtLine."Payment Method Type"::Voucher then
+            exit;
+
+        if EcomSalesPmtLine.Amount = 0 then
+            exit;
+
+
+        if EcomSalesPmtLine."Captured Amount" >= EcomSalesPmtLine.Amount then
+            exit; // Payment already captured
+
+        EcomVirtualItemMgt.FindVoucher(EcomSalesPmtLine, NpRvVoucher);
+
+        NpRvSalesLine.Reset();
+        NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Sales Document");
+        NpRvSalesLine.SetRange("External Document No.", SalesHeader."NPR External Order No.");
+        NpRvSalesLine.SetRange("Voucher Type", NpRvVoucher."Voucher Type");
+        NpRvSalesLine.SetRange("Voucher No.", NpRvVoucher."No.");
+        NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::Payment);
+        NpRvSalesLine.SetRange("Document Line No.", 0);
+        if not NpRvSalesLine.FindFirst() then begin
+            NpRvSalesLine.Init();
+            NpRvSalesLine.Id := CreateGuid();
+            NpRvSalesLine."External Document No." := SalesHeader."NPR External Order No.";
+            NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Sales Document";
+            NpRvSalesLine."Document Type" := SalesHeader."Document Type";
+            NpRvSalesLine."Document No." := SalesHeader."No.";
+            NpRvSalesLine.Type := NpRvSalesLine.Type::Payment;
+            NpRvSalesLine."Voucher Type" := NpRvVoucher."Voucher Type";
+            NpRvSalesLine."Voucher No." := NpRvVoucher."No.";
+            NpRvSalesLine."Reference No." := NpRvVoucher."Reference No.";
+            NpRvSalesLine.Description := NpRvVoucher.Description;
+            NpRvSalesLine.Insert(true);
+        end;
+
+        PaymentLine.Init();
+        PaymentLine."Document Table No." := DATABASE::"Sales Header";
+        PaymentLine."Document Type" := SalesHeader."Document Type";
+        PaymentLine."Document No." := SalesHeader."No.";
+        PaymentLine."Line No." := EcomSalesDocUtils.GetInternalSalesDocumentPaymentLastLineNo(SalesHeader) + 10000;
+        PaymentLine."Payment Type" := PaymentLine."Payment Type"::Voucher;
+        PaymentLine.Description := NpRvVoucher.Description;
+        PaymentLine."Account No." := NpRvVoucher."Account No.";
+        PaymentLine."No." := NpRvVoucher."Reference No.";
+        PaymentLine."Posting Date" := SalesHeader."Posting Date";
+        PaymentLine."Source Table No." := DATABASE::"NPR NpRv Voucher";
+        PaymentLine."Source No." := NpRvVoucher."No.";
+        PaymentLine.Amount := EcomSalesPmtLine.Amount - EcomSalesPmtLine."Captured Amount";
+        PaymentLine."NPR Inc Ecom Sales Pmt Line Id" := EcomSalesPmtLine.SystemId;
+        PaymentLine."NPR Inc Ecom Sale Id" := EcomSalesHeader.SystemId;
+        PaymentLine.Insert();
+
+        NpRvSalesLine."Document Source" := NpRvSalesLine."Document Source"::"Payment Line";
+        NpRvSalesLine."Document Type" := SalesHeader."Document Type";
+        NpRvSalesLine."Document No." := SalesHeader."No.";
+        NpRvSalesLine."Document Line No." := PaymentLine."Line No.";
+        NpRvSalesLine.Amount := PaymentLine.Amount;
+        NpRvSalesLine."Reservation Line Id" := PaymentLine.SystemId;
+        NpRvSalesLine.Modify(true);
+
+        if not NpRvVoucherMngt.ValidateAmount(NpRvVoucher, PaymentLine.SystemId, PaymentLine.Amount, AvailableAmount) then
+            Error(VoucherPaymentAmountError, PaymentLine.Amount, AvailableAmount);
+
+        EcomSalesDocImplEvents.OnAfterInsertPaymentLineVoucher(EcomSalesHeader, SalesHeader, EcomSalesPmtLine, PaymentLine, NpRvSalesLine);
     end;
 
     internal procedure UpdateSalesDocumentPaymentLinePostingInformation(PaymentLine: Record "NPR Magento Payment Line")
@@ -1008,6 +1204,73 @@ codeunit 6248609 "NPR Ecom Sales Doc Impl V2"
                 Customer.Modify(true);
             end;
         end;
+    end;
+
+    local procedure CheckIfDocumentCanBeProcessed(EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        SalesHeader: Record "Sales Header";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        EcomSalesLine: Record "NPR Ecom Sales Line";
+        EcomSalesDocImplEvents: Codeunit "NPR EcomSalesDocImplEvents";
+        Handled: Boolean;
+        UnprocessedVirtualItemsErrorLbl: Label 'There is unprocessed virtual item on %1. Type: %2, no.: %3', Comment = '%1 - recordid, %2 - virtual item type, $3 - virtual item no.';
+        CreatedDocumentErrorLbl: Label 'Sales document %1 has already been created from ecom document %2.', Comment = '%1 - sales document record id, %2 - ecom document record id';
+    begin
+        EcomSalesDocImplEvents.OnBeforeCheckIfDocumentCanBeProcessed(EcomSalesHeader, Handled);
+        if Handled then
+            exit;
+
+        if EcomSalesHeader."Creation Status" = EcomSalesHeader."Creation Status"::Created then
+            EcomSalesHeader.FieldError("Creation Status");
+
+        SalesHeader.Reset();
+        SalesHeader.SetRange("NPR Inc Ecom Sale Id", EcomSalesHeader.SystemId);
+        if not SalesHeader.IsEmpty then
+            Error(CreatedDocumentErrorLbl, SalesHeader.RecordId, EcomSalesHeader.RecordId);
+
+        SalesInvoiceHeader.Reset();
+        SalesInvoiceHeader.SetRange("NPR Inc Ecom Sale Id", EcomSalesHeader.SystemId);
+        if not SalesInvoiceHeader.IsEmpty then
+            Error(CreatedDocumentErrorLbl, SalesInvoiceHeader.RecordId, EcomSalesHeader.RecordId);
+
+        SalesCrMemoHeader.Reset();
+        SalesCrMemoHeader.SetRange("NPR Inc Ecom Sale Id", EcomSalesHeader.SystemId);
+        if not SalesCrMemoHeader.IsEmpty then
+            Error(CreatedDocumentErrorLbl, SalesCrMemoHeader.RecordId, EcomSalesHeader.RecordId);
+
+        EcomSalesLine.Reset();
+        EcomSalesLine.SetRange("Document Entry No.", EcomSalesHeader."Entry No.");
+        EcomSalesLine.SetFilter(Type, '%1', EcomSalesLine.Type::Voucher);
+        if EcomSalesLine.IsEmpty then
+            exit;
+
+        EcomSalesLine.SetFilter("Virtual Item Process Status", '%1|%2', EcomSalesLine."Virtual Item Process Status"::Error, EcomSalesLine."Virtual Item Process Status"::" ");
+        if EcomSalesLine.FindFirst() then
+            Error(UnprocessedVirtualItemsErrorLbl, EcomSalesLine.RecordId, EcomSalesLine.Type, EcomSalesLine."No.");
+
+        EcomSalesDocImplEvents.OnAfterCheckIfDocumentCanBeProcessed(EcomSalesHeader);
+    end;
+
+    internal procedure PostEcomSalesDoc(var EcomSalesHeader: Record "NPR Ecom Sales Header"; var SalesHeader: Record "Sales Header") Success: Boolean;
+    var
+        EcomSalesDocPost: Codeunit "NPR Ecom Sales Doc Post";
+        EcomSalesDocImplEvents: Codeunit "NPR EcomSalesDocImplEvents";
+        Handled: Boolean;
+    begin
+        EcomSalesDocImplEvents.OnBeforePostEcomSalesDoc(EcomSalesHeader, SalesHeader, Handled);
+        if Handled then
+            exit;
+
+        if not EcomSalesHeader."Virtual Items Exist" then
+            exit;
+
+        if EcomSalesHeader."Creation Status" <> EcomSalesHeader."Creation Status"::Created then
+            exit;
+
+        Commit();
+        Clear(EcomSalesDocPost);
+        Success := EcomSalesDocPost.Run(EcomSalesHeader);
     end;
 
     internal procedure GetApiVersion(): Date

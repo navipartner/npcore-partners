@@ -76,6 +76,11 @@ codeunit 6248607 "NPR EcomSalesDocImplEvents"
     end;
 
     [IntegrationEvent(false, false)]
+    internal procedure OnAfterInsertPaymentLineVoucher(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesHeader: Record "Sales Header"; EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line"; var PaymentLine: Record "NPR Magento Payment Line"; var NpRvSalesLine: Record "NPR NpRv Sales Line");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     internal procedure OnAfterInsertCommentLines(EcomSalesHeader: Record "NPR Ecom Sales Header"; var SalesHedaer: Record "Sales Header");
     begin
     end;
@@ -130,6 +135,28 @@ codeunit 6248607 "NPR EcomSalesDocImplEvents"
 
     [IntegrationEvent(false, false)]
     internal procedure OnUpdateSalesDocumentPaymentLineCaptureInformationBeforeFinalizeRecord(PaymentLine: Record "NPR Magento Payment Line"; var EcomSalesPmtLine: Record "NPR Ecom Sales Pmt. Line")
+    begin
+    end;
+
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnInsertSalesLineVoucherBeforeFinalizeLine(EcomSalesHeader: Record "NPR Ecom Sales Header"; SalesHeader: Record "Sales Header"; EcomSalesLine: Record "NPR Ecom Sales Line"; var SalesLine: Record "Sales Line");
+    begin
+    end;
+
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforeCheckIfDocumentCanBeProcessed(EcomSalesHeader: Record "NPR Ecom Sales Header"; var Handled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterCheckIfDocumentCanBeProcessed(EcomSalesHeader: Record "NPR Ecom Sales Header");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnBeforePostEcomSalesDoc(var EcomSalesHeader: Record "NPR Ecom Sales Header"; var SalesHeader: Record "Sales Header"; var Handled: Boolean)
     begin
     end;
 }

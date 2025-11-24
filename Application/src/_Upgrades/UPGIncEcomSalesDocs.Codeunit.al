@@ -16,6 +16,7 @@ codeunit 6248467 "NPR UPG Inc Ecom Sales Docs"
         UpgradeSalesOrderJQ();
         UpgradeSalesReturnOrderJQ();
         UpgradeDocumentsToNewTables();
+        UpgradeRetryCounts();
     end;
 
     internal procedure CreateIncEcomSalesDocSetup()
@@ -138,6 +139,30 @@ codeunit 6248467 "NPR UPG Inc Ecom Sales Docs"
                     EcomSalesPmtLine.Insert(false, true);
                 until IncEcomSalesPmtLine.Next() = 0;
         until IncEcomSalesHeader.Next() = 0;
+
+        SetUpgradeTag();
+    end;
+
+    local procedure UpgradeRetryCounts()
+    var
+        IncEcomSalesDocSetup: Record "NPR Inc Ecom Sales Doc Setup";
+        DefaultIncEcomSalesDocSetup: Record "NPR Inc Ecom Sales Doc Setup";
+    begin
+        UpgradeStep := 'UpgradeRetryCounts';
+        if HasUpgradeTag() then
+            exit;
+
+        if IncEcomSalesDocSetup.Get() then begin
+
+            DefaultIncEcomSalesDocSetup.Init();
+            if IncEcomSalesDocSetup."Max Virtual Item Retry Count" = 0 then
+                IncEcomSalesDocSetup."Max Virtual Item Retry Count" := DefaultIncEcomSalesDocSetup."Max Virtual Item Retry Count";
+
+            if IncEcomSalesDocSetup."Max Capture Retry Count" = 0 then
+                IncEcomSalesDocSetup."Max Capture Retry Count" := DefaultIncEcomSalesDocSetup."Max Capture Retry Count";
+
+            IncEcomSalesDocSetup.Modify();
+        end;
 
         SetUpgradeTag();
     end;

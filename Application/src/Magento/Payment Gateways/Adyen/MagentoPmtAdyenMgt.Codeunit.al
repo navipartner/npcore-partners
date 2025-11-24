@@ -15,6 +15,7 @@
         GeneralLedgerSetup: Record "General Ledger Setup";
         SalesHeader: Record "Sales Header";
         SalesInvHeader: Record "Sales Invoice Header";
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
         AdyenSetup: Record "NPR PG Adyen Setup";
         HttpWebRequest: HttpRequestMessage;
         JsonO: JsonObject;
@@ -45,6 +46,12 @@
                     Reference := SalesInvHeader."No.";
                     if SalesInvHeader."NPR External Order No." <> '' then
                         Reference := SalesInvHeader."NPR External Order No.";
+                end;
+            DATABASE::"NPR Ecom Sales Header":
+                begin
+                    EcomSalesHeader.GetBySystemId(Request."Document System Id");
+                    CurrencyCode := EcomSalesHeader."Currency Code";
+                    Reference := EcomSalesHeader."External Document No.";
                 end;
             else
                 Error(WrongTableSuppliedErr, Request."Document Table No.", StrSubstNo('%1, %2', Database::"Sales Header", Database::"Sales Invoice Header"));

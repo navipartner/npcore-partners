@@ -105,6 +105,13 @@ table 6151260 "NPR Ecom Sales Pmt. Line"
             Caption = 'Card Alias Token';
             DataClassification = CustomerContent;
         }
+        field(140; "Processing Payment Amount"; Decimal)
+        {
+            Caption = 'Processing Payment Amount';
+            FieldClass = FlowField;
+            CalcFormula = sum("NPR Magento Payment Line".Amount where("NPR Inc Ecom Sales Pmt Line Id" = field(SystemId)));
+            Editable = false;
+        }
     }
 
 

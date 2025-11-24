@@ -42,6 +42,11 @@ page 6248181 "NPR Ecom Sales Doc Pmt Sub"
                     ToolTip = 'Specifies the value of the Amount field';
                     ApplicationArea = NPRRetail;
                 }
+                field("Processing Payment Amount"; Rec."Processing Payment Amount")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Processing Payment Amount field.';
+                }
                 field("Captured Amount"; Rec."Captured Amount")
                 {
                     ApplicationArea = NPRRetail;

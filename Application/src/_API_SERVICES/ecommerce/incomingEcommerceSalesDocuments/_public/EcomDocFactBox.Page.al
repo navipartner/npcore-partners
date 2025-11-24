@@ -59,6 +59,89 @@ page 6185130 "NPR Ecom Doc FactBox"
                         ApplicationArea = NPRRetail;
                         ToolTip = 'Specifies the value of the Requested API Version Date field.';
                     }
+                    field("Bucket Id"; Rec."Bucket Id")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Bucket Id field.';
+                    }
+
+                }
+                group("Virtual Items")
+                {
+                    Caption = 'Virtual Items';
+                    field("Virtual Items Exist"; Rec."Virtual Items Exist")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Virtual Items Exist field.';
+                        trigger OnDrillDown()
+                        var
+                            EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+                        begin
+                            EcomVirtualItemMgt.OpenEcomVirtualItemLines(Rec);
+                        end;
+                    }
+                    field("Virtual Items Proccess Status"; Rec."Virtual Items Process Status")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Virtual Item Processing Status field.';
+                        StyleExpr = _VirtualItemProcessingStatusStyleText;
+                        trigger OnDrillDown()
+                        var
+                            EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+                        begin
+                            EcomVirtualItemMgt.OpenEcomVirtualItemLines(Rec);
+                        end;
+                    }
+                    field("Capture Processing Status"; Rec."Capture Processing Status")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Capture Processing Status field.';
+                        StyleExpr = _CaptureProcessingStatusStyleText;
+                        trigger OnDrillDown()
+                        var
+                            EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+                        begin
+                            EcomVirtualItemMgt.OpenEcomCapturedLines(Rec);
+                        end;
+                    }
+                    field("Last Capture Error Message"; Rec."Last Capture Error Message")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Last Capture Error Message field.';
+                        StyleExpr = _CaptureErrorStyleText;
+                        trigger OnDrillDown()
+                        begin
+                            Message(Rec."Last Capture Error Message");
+                        end;
+                    }
+                    field("Capture Retry Count"; Rec."Capture Retry Count")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Capture Retry Count field.';
+                    }
+                    field("Voucher Exists"; Rec."Vouchers Exist")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Voucher Exists field.';
+                        trigger OnDrillDown()
+                        var
+                            EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+                        begin
+                            EcomVirtualItemMgt.OpenEcomVoucherLines(Rec);
+                        end;
+                    }
+                    field("Voucher Processing Status"; Rec."Voucher Processing Status")
+                    {
+                        ApplicationArea = NPRRetail;
+                        ToolTip = 'Specifies the value of the Voucher Processing Status field.';
+                        StyleExpr = _VoucherProcessingStatusStyleText;
+                        trigger OnDrillDown()
+                        var
+                            EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+                        begin
+                            EcomVirtualItemMgt.OpenEcomVoucherLines(Rec);
+                        end;
+                    }
                 }
                 group("Error")
                 {
@@ -162,7 +245,7 @@ page 6185130 "NPR Ecom Doc FactBox"
     }
     trigger OnAfterGetCurrRecord()
     begin
-        GetStyles(_CreationStatusStyleText, _ErrorInformationStyleText);
+        GetStyles(_CreationStatusStyleText, _ErrorInformationStyleText, _VoucherProcessingStatusStyleText, _CaptureProcessingStatusStyleText, _CaptureErrorStyleText, _VirtualItemProcessingStatusStyleText);
     end;
 
     local procedure GetSystemReceivedByUserName() UserName: Code[50]
@@ -176,16 +259,25 @@ page 6185130 "NPR Ecom Doc FactBox"
         UserName := User."User Name";
     end;
 
-    local procedure GetStyles(var CreationStatusStyleText: Text; var ErrorInformationStyleText: Text)
+    local procedure GetStyles(var CreationStatusStyleText: Text; var ErrorInformationStyleText: Text; var VoucherProcessingStatusStyleText: Text; var CaptureProcessingStatusStyleText: Text; var CaptureErrorStyleText: Text; var VirtualItemProcessingStatusStyleText: Text)
     var
         EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
     begin
         CreationStatusStyleText := EcomSalesDocUtils.GetIncEcomSalesHeaderCreationStatusStyle(Rec);
         ErrorInformationStyleText := EcomSalesDocUtils.GetIncEcomSalesHeaderErrorInformationStyle(Rec);
+        VoucherProcessingStatusStyleText := EcomVirtualItemMgt.GetVoucherProcessingStatusStyle(Rec);
+        CaptureProcessingStatusStyleText := EcomVirtualItemMgt.GetCaptureProcessingStatusStyle(Rec);
+        CaptureErrorStyleText := EcomVirtualItemMgt.GetCaptureErrorStyle(Rec);
+        VirtualItemProcessingStatusStyleText := EcomVirtualItemMgt.GetVirtualItemProcessingStatusStyle(Rec);
     end;
 
     var
         _CreationStatusStyleText: Text;
         _ErrorInformationStyleText: Text;
+        _VoucherProcessingStatusStyleText: Text;
+        _CaptureProcessingStatusStyleText: Text;
+        _CaptureErrorStyleText: Text;
+        _VirtualItemProcessingStatusStyleText: Text;
 }
 #endIf

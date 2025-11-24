@@ -7,6 +7,7 @@ page 6248188 "NPR Ecom Sales Document"
     Caption = 'Ecommerce Sales Document';
     InsertAllowed = false;
     ModifyAllowed = false;
+    RefreshOnActivate = true;
     DataCaptionExpression = Format(Rec."Document Type") + ' ' + Rec."External No.";
     layout
     {
@@ -285,6 +286,25 @@ page 6248188 "NPR Ecom Sales Document"
     {
         area(Processing)
         {
+            action(CaptureVirtualItems)
+            {
+                Caption = 'Capture Virtual Items';
+                ToolTip = 'Capture Virtual Items';
+                ApplicationArea = NPRRetail;
+                Image = Payment;
+                trigger OnAction()
+                var
+                    EcomSaleDocCaptureProcess: Codeunit "NPR EcomSaleDocCaptureProcess";
+                    ConfirmManagement: Codeunit "Confirm Management";
+                    ConfirmVirtualItemCaptureLbl: Label 'Are you sure you want to capture the virtual item?';
+                begin
+                    if not ConfirmManagement.GetResponseOrDefault(ConfirmVirtualItemCaptureLbl, true) then
+                        exit;
+                    EcomSaleDocCaptureProcess.SetUpdateRetryCount(false);
+                    EcomSaleDocCaptureProcess.SetShowError(true);
+                    EcomSaleDocCaptureProcess.Run(Rec);
+                end;
+            }
             action(Process)
             {
                 Caption = 'Process';
@@ -300,7 +320,10 @@ page 6248188 "NPR Ecom Sales Document"
                     EcomSalesDocConfirm.Run(Rec);
                 end;
             }
+        }
 
+        area(Navigation)
+        {
             action(RelatedSalesDocuments)
             {
                 Caption = 'Related Sales Documents';
@@ -314,13 +337,30 @@ page 6248188 "NPR Ecom Sales Document"
                     EcomSalesDocUtils.OpenRelatedSalesDocumentsFromEcomDoc(Rec);
                 end;
             }
+            action("Retail Vouchers")
+            {
+                Caption = 'Vouchers';
+                Image = Certificate;
+                ToolTip = 'View linked vouchers';
+                ApplicationArea = NPRRetail;
+
+                trigger OnAction()
+                var
+                    EcomCreateVchrProcess: Codeunit "NPR EcomCreateVchrProcess";
+                begin
+                    EcomCreateVchrProcess.ShowRelatedVouchersAction(Rec);
+                end;
+            }
         }
+
         area(Promoted)
         {
             group(Home)
             {
                 actionref(Process_Promoted; Process) { }
+                actionref(CaptureVirtualItems_Promoted; CaptureVirtualItems) { }
                 actionref(Sales_Documents; RelatedSalesDocuments) { }
+
             }
         }
     }
@@ -328,6 +368,7 @@ page 6248188 "NPR Ecom Sales Document"
         EcomSalesDocImplV2: Codeunit "NPR Ecom Sales Doc Impl V2";
         ShowCustomerTypeField: Boolean;
         ShowCustomerTemplateFields: Boolean;
+
 
     trigger OnOpenPage()
     begin

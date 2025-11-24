@@ -745,6 +745,62 @@
         MarkRetailVoucherSalesLineAsPosted(NpRvSalesLine.Id);
     end;
 
+    internal procedure PostIncEcomPayment(var NpRvSalesLine: Record "NPR NpRv Sales Line"; var MagentoPaymentLine: Record "NPR Magento Payment Line"): Boolean
+    var
+        Voucher: Record "NPR NpRv Voucher";
+        VoucherEntry: Record "NPR NpRv Voucher Entry";
+        POSUnit: Record "NPR POS Unit";
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24)
+        EcomSalesDocProcess: Codeunit "NPR EcomSalesDocProcess";
+        VoucherWebhook: Codeunit "NPR Retail Voucher Webhooks";
+#endif
+    begin
+        Voucher.Get(NpRvSalesLine."Voucher No.");
+
+        InitVoucherEntry(Voucher, VoucherEntry);
+        if MagentoPaymentLine."Document Type" = MagentoPaymentLine."Document Type"::"Return Order"
+        then
+            VoucherEntry."Document Type" := VoucherEntry."Document Type"::"Credit Memo"
+        else
+            VoucherEntry."Document Type" := VoucherEntry."Document Type"::Invoice;
+
+        if NpRvSalesLine."Posting No." <> '' then
+            VoucherEntry."Document No." := NpRvSalesLine."Posting No."
+        else
+            VoucherEntry."Document No." := MagentoPaymentLine."Document No.";
+        VoucherEntry."Posting Date" := MagentoPaymentLine."Posting Date";
+        if VoucherEntry."Document Type" = VoucherEntry."Document Type"::"Credit Memo" then
+            VoucherEntry.Amount := MagentoPaymentLine.Amount
+        else
+            VoucherEntry.Amount := -MagentoPaymentLine.Amount;
+        if POSUnit.Get(NpRvSalesLine."Register No.") then
+            VoucherEntry."POS Store Code" := POSUnit."POS Store Code";
+        VoucherEntry.Company := CopyStr(CompanyName(), 1, MaxStrLen(VoucherEntry.Company));
+        VoucherEntry."Remaining Amount" := VoucherEntry.Amount;
+        VoucherEntry.Positive := VoucherEntry.Amount > 0;
+        VoucherEntry.Open := VoucherEntry.Amount <> 0;
+        VoucherEntry.Correction := VoucherEntry."Document Type" = VoucherEntry."Document Type"::"Credit Memo";
+
+        OnBeforeInsertPaymentVoucherEntry(VoucherEntry, NpRvSalesLine);
+        VoucherEntry."Reservation Line Id" := NpRvSalesLine."Reservation Line Id";
+        VoucherEntry.Insert();
+
+        RedeemVoucher(VoucherEntry, Voucher);
+        RedeemPartnerVouchers(VoucherEntry, Voucher);
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24)
+        Voucher.CalcFields("Initial Amount", Amount);
+        VoucherWebhook.OnVoucherPayment(Voucher.SystemId, Voucher."Voucher Type", Voucher."Initial Amount", Voucher.Amount, Voucher."Customer No.");
+#endif
+        ApplyEntry(VoucherEntry);
+        ArchiveClosedVoucher(Voucher);
+        MarkRetailVoucherSalesLineAsPosted(NpRvSalesLine.Id);
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22 or BC23 or BC24)
+        EcomSalesDocProcess.UpdateSalesDocPaymentLineCaptureInformation(MagentoPaymentLine);
+#endif
+
+        exit(true);
+    end;
+
     local procedure InitVoucherEntry(var Voucher: Record "NPR NpRv Voucher"; var VoucherEntry: Record "NPR NpRv Voucher Entry")
     var
         NpRvVoucherType: Record "NPR NpRv Voucher Type";

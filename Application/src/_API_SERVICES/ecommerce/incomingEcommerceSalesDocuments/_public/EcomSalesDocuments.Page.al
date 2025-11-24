@@ -48,6 +48,35 @@ page 6248189 "NPR Ecom Sales Documents"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Received Time field.';
                 }
+                field("Virtual Items Exist"; Rec."Virtual Items Exist")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Virtual Items Exist field.';
+                }
+                field("Virtual Items Proccess Status"; Rec."Virtual Items Process Status")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Virtual Item Processing Status field.';
+                }
+                field("Capture Processing Status"; Rec."Capture Processing Status")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Capture Processing Status field.';
+                }
+                field("Last Capture Error Message"; Rec."Last Capture Error Message")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Last Capture Error Message field.';
+                    trigger OnDrillDown()
+                    begin
+                        Message(Rec."Last Capture Error Message");
+                    end;
+                }
+                field("Voucher Processing Status"; Rec."Voucher Processing Status")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Voucher Processing Status field.';
+                }
                 field("Creation Status"; Rec."Creation Status")
                 {
                     ApplicationArea = NPRRetail;

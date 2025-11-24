@@ -91,6 +91,23 @@ page 6248186 "NPR Ecom Sales Lines"
                         EcomSalesDocUtils.OpenPostedSalesInvoiceLines(Rec);
                     end;
                 }
+                field("Virtual Item Process Status"; Rec."Virtual Item Process Status")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Virtual Item Process Status field.';
+                    StyleExpr = _VirtualItemProcessingStatusStyle;
+                }
+                field("Virtual Item Process ErrMsg"; Rec."Virtual Item Process ErrMsg")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Virtual Item Process ErrMsg field.';
+                    StyleExpr = _VirtualItemProcessingStatusStyle;
+                }
+                field(Captured; Rec.Captured)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Captured field.';
+                }
             }
         }
     }
@@ -135,5 +152,20 @@ page 6248186 "NPR Ecom Sales Lines"
             }
         }
     }
+
+    trigger OnAfterGetRecord()
+    begin
+        GetStyles();
+    end;
+
+    var
+        _VirtualItemProcessingStatusStyle: Text;
+
+    local procedure GetStyles()
+    var
+        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+    begin
+        _VirtualItemProcessingStatusStyle := EcomVirtualItemMgt.GetVirtualItemProcessingStatusStyle(Rec);
+    end;
 }
 #endIf

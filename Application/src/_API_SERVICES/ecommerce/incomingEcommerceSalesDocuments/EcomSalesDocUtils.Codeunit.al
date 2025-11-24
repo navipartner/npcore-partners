@@ -528,5 +528,51 @@ codeunit 6248601 "NPR Ecom Sales Doc Utils"
                 exit(EcomSalesDocImpl.GetApiVersion());
         end;
     end;
+
+    internal procedure GetInternalEcomDocumentPaymentLastLineNo(EcomSalesHeader: Record "NPR Ecom Sales Header") LastLineNo: Integer;
+    var
+        PaymentLine: Record "NPR Magento Payment Line";
+    begin
+        PaymentLine.Reset();
+        PaymentLine.SetRange("Document Table No.", Database::"NPR Ecom Sales Header");
+        case EcomSalesHeader."Document Type" of
+            EcomSalesHeader."Document Type"::Order:
+                PaymentLine.SetRange("Document Type", PaymentLine."Document Type"::Order);
+            EcomSalesHeader."Document Type"::"Return Order":
+                PaymentLine.SetRange("Document Type", PaymentLine."Document Type"::"Return Order");
+        end;
+        PaymentLine.SetRange("Document No.", EcomSalesHeader."External No.");
+        PaymentLine.SetLoadFields("Line No.");
+        if not PaymentLine.FindLast() then
+            exit;
+
+        LastLineNo := PaymentLine."Line No.";
+    end;
+
+    internal procedure DeleteMagentoPaymentLines(EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        MagentoPaymentLine: Record "NPR Magento Payment Line";
+    begin
+        MagentoPaymentLine.Reset();
+        MagentoPaymentLine.SetRange("NPR Inc Ecom Sale Id", EcomSalesHeader.SystemId);
+        MagentoPaymentLine.SetRange("Source Table No.", EcomSalesHeader.RecordId.TableNo);
+        if MagentoPaymentLine.IsEmpty then
+            exit;
+        MagentoPaymentLine.DeleteAll(true);
+    end;
+
+    internal procedure DeleteVoucherSalesLines(EcomSalesHeader: Record "NPR Ecom Sales Header")
+    var
+        NpRvSalesLine: Record "NPR NpRv Sales Line";
+    begin
+        NpRvSalesLine.Reset();
+        NpRvSalesLine.SetRange("Document Source", NpRvSalesLine."Document Source"::"Sales Document");
+        NpRvSalesLine.SetRange("External Document No.", EcomSalesHeader."External No.");
+        NpRvSalesLine.SetRange("Document No.", '');
+        NpRvSalesLine.SetRange(Type, NpRvSalesLine.Type::Payment);
+        NpRvSalesLine.SetRange("Document Line No.", 0);
+        if not NpRvSalesLine.IsEmpty then
+            NpRvSalesLine.DeleteAll(true);
+    end;
 }
 #endif

@@ -300,6 +300,16 @@
             Caption = 'Ecommerce Shopify Orders Amount Event Id';
             DataClassification = CustomerContent;
         }
+        field(6059984; "NPR Inc Ecom Sale Id"; Guid)
+        {
+            Caption = 'Incoming Ecommerce Sale Id';
+            DataClassification = CustomerContent;
+        }
+        field(6059985; "NPR Inc Ecom Sale Line Id"; Guid)
+        {
+            Caption = 'Incoming Ecommerce Sale Line Id';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys
@@ -319,12 +329,14 @@
         InvoiceLbl: Label 'Invoice';
         CreditMemoLbl: Label 'Credit Memo';
         DocumentNoLbl: Label 'Document No. %1', Comment = '%1 = document no';
+        IncomingEcomDocLbl: Label 'Incoming Ecommerce Document';
 
     internal procedure ToRequest(var Request: Record "NPR PG Payment Request")
     var
         SalesHeader: Record "Sales Header";
         SalesInvHeader: Record "Sales Invoice Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
     begin
         if (Rec."Transaction ID" <> '') then
             Request."Transaction ID" := Rec."Transaction ID"
@@ -359,6 +371,15 @@
                     Request."Document System Id" := SalesCrMemoHeader.SystemId;
                     Request."Request Description" := CreditMemoLbl + ' ' + SalesCrMemoHeader."No.";
                 end;
+            Database::"NPR Ecom Sales Header":
+                begin
+                    EcomSalesHeader.SetLoadFields(SystemId, "External Document No.");
+                    EcomSalesHeader.GetBySystemId(Rec."NPR Inc Ecom Sale Id");
+
+                    Request."Document System Id" := EcomSalesHeader.SystemId;
+                    Request."Request Description" := IncomingEcomDocLbl + ' ' + EcomSalesHeader."External Document No."
+                end;
+
             else
                 if (Rec."Document No." <> '') then
                     Request."Request Description" := CopyStr(StrSubstNo(DocumentNoLbl, Rec."Document No."), 1, MaxStrLen(Request."Request Description"));
@@ -374,6 +395,7 @@
         SalesHeader: Record "Sales Header";
         SalesInvHeader: Record "Sales Invoice Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+        EcomSalesHeader: Record "NPR Ecom Sales Header";
         CurrencyCode: Code[10];
         DocumentFound: Boolean;
     begin
@@ -398,6 +420,13 @@
                     DocumentFound := SalesCrMemoHeader.Get("Document No.");
                     if DocumentFound then
                         CurrencyCode := SalesCrMemoHeader."Currency Code";
+                end;
+            Database::"NPR Ecom Sales Header":
+                begin
+                    EcomSalesHeader.SetLoadFields("Currency Code");
+                    DocumentFound := EcomSalesHeader.GetBySystemId(Rec."NPR Inc Ecom Sale Id");
+                    if DocumentFound then
+                        CurrencyCode := EcomSalesHeader."Currency Code";
                 end;
         end;
 

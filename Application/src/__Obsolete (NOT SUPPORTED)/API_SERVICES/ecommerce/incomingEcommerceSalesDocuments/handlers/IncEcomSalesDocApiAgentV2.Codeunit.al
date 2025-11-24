@@ -18,13 +18,9 @@ codeunit 6248594 "NPR IncEcomSalesDocApiAgentV2"
             IncEcomSalesDocSetup.Init();
 
         IncEcomSalesHeader.Get(IncEcomSalesHeader.RecordId);
-        if (IncEcomSalesDocSetup."Proc Sales Order On Receive" and (IncEcomSalesHeader."Document Type" = IncEcomSalesHeader."Document Type"::Order)) or
-           (IncEcomSalesDocSetup."Proc Sales Ret Ord On Receive" and (IncEcomSalesHeader."Document Type" = IncEcomSalesHeader."Document Type"::"Return Order"))
-        then begin
-            Clear(IncEcomSalesDocProcess);
-            IncEcomSalesDocProcess.SetUpdateRetryCount(true);
-            IncEcomSalesDocProcess.Run(IncEcomSalesHeader);
-        end;
+        Clear(IncEcomSalesDocProcess);
+        IncEcomSalesDocProcess.SetUpdateRetryCount(true);
+        IncEcomSalesDocProcess.Run(IncEcomSalesHeader);
 
         exit(Response.RespondOK(GetSalesDocumentCreateResponse(IncEcomSalesHeader)));
     end;

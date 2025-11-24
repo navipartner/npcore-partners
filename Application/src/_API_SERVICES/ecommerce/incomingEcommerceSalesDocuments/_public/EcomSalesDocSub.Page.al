@@ -46,6 +46,11 @@ page 6248182 "NPR Ecom Sales Doc Sub"
                     ApplicationArea = NPRRetail;
                     ToolTip = 'Specifies the value of the Unit Price field.';
                 }
+                field(Captured; Rec.Captured)
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Captured field.';
+                }
                 field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = NPRRetail;
@@ -88,16 +93,33 @@ page 6248182 "NPR Ecom Sales Doc Sub"
                         EcomSalesDocUtils.OpenPostedSalesInvoiceLines(Rec);
                     end;
                 }
+                field("Virtual Item Process Status"; Rec."Virtual Item Process Status")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Virtual Item Process Status field.';
+                    StyleExpr = _VirtualItemProcessingStatusStyle;
+                }
+                field("Virtual Item Process ErrMsg"; Rec."Virtual Item Process ErrMsg")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Virtual Item Process ErrMsg field.';
+                    StyleExpr = _VirtualItemErrorTextStyle;
+                }
+                field("Voucher Type"; Rec."Voucher Type")
+                {
+                    ApplicationArea = NPRRetail;
+                    ToolTip = 'Specifies the value of the Voucher Type field.';
+                }
             }
             group(Control28)
             {
                 ShowCaption = false;
-                field("Total Amount"; EcomSalesHeader."Amount")
+                field("Total Amount"; _EcomSalesHeader."Amount")
                 {
                     ApplicationArea = NPRRetail;
-                    AutoFormatExpression = Currency.Code;
+                    AutoFormatExpression = _Currency.Code;
                     AutoFormatType = 1;
-                    CaptionClass = EcomSalesDocUtils.GetTotalAmountCaption(Currency.Code);
+                    CaptionClass = _EcomSalesDocUtils.GetTotalAmountCaption(_Currency.Code);
                     Caption = 'Total Amount';
                     DrillDown = false;
                     Editable = false;
@@ -107,26 +129,65 @@ page 6248182 "NPR Ecom Sales Doc Sub"
             }
         }
     }
+    actions
+    {
+        area(processing)
+        {
+            action(ProcessVoucher)
+            {
+                Caption = 'Process Virtual Item';
+                ApplicationArea = NPRRetail;
+                Image = NewItem;
+                ToolTip = 'Process Virtual Item';
+                Visible = _VirtualItemActionVisibility;
+                trigger OnAction()
+                var
+                    EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+                begin
+                    EcomVirtualItemMgt.ProcessVirtualItemLineWithConfirmation(Rec);
+                end;
+            }
+        }
+    }
+
+
 
     trigger OnAfterGetCurrRecord()
     begin
         GetGlobals();
+        _VirtualItemActionVisibility := Rec."Document Type" = Rec."Document Type"::Order;
+    end;
+
+    trigger OnAfterGetRecord()
+    begin
+        GetStyles();
     end;
 
     var
-        EcomSalesHeader: Record "NPR Ecom Sales Header";
-        Currency: Record Currency;
+        _EcomSalesHeader: Record "NPR Ecom Sales Header";
+        _Currency: Record Currency;
 
-        EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        _EcomSalesDocUtils: Codeunit "NPR Ecom Sales Doc Utils";
+        _VirtualItemActionVisibility: Boolean;
+        _VirtualItemProcessingStatusStyle: Text;
+        _VirtualItemErrorTextStyle: Text;
 
     local procedure GetGlobals()
     begin
-        EcomSalesHeader.SetAutoCalcFields("Amount");
-        if not EcomSalesHeader.Get(Rec."Document Entry No.") then
-            Clear(EcomSalesHeader);
+        _EcomSalesHeader.SetAutoCalcFields("Amount");
+        if not _EcomSalesHeader.Get(Rec."Document Entry No.") then
+            Clear(_EcomSalesHeader);
 
-        if not Currency.Get(EcomSalesHeader."Currency Code") then
-            Clear(Currency);
+        if not _Currency.Get(_EcomSalesHeader."Currency Code") then
+            Clear(_Currency);
+    end;
+
+    local procedure GetStyles()
+    var
+        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+    begin
+        _VirtualItemProcessingStatusStyle := EcomVirtualItemMgt.GetVirtualItemProcessingStatusStyle(Rec);
+        _VirtualItemErrorTextStyle := EcomVirtualItemMgt.GetVirtualItemErrorTextStyle(Rec);
     end;
 }
 #endif

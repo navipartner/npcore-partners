@@ -137,6 +137,18 @@ codeunit 6059932 "NPR POS Pmt. Method Item Mgt."
               OriginalVoucherSalesLine."Reference No.");
     end;
 
+    internal procedure IsThisPOSPaymentMethodItem(POSPaymentMethodCode: Code[20]; EcomSalesLine: Record "NPR Ecom Sales Line"): Boolean
+    var
+        Item: Record Item;
+    begin
+        Item.SetLoadFields("Item Category Code");
+        if not Item.Get(EcomSalesLine."No.") then
+            exit(false);
+#pragma warning disable AA0139 
+        exit(IsThisPOSPaymentMethodItem(POSPaymentMethodCode, Item."Item Category Code", EcomSalesLine."No."))
+#pragma warning restore AA0139
+    end;
+
     internal procedure IsThisPOSPaymentMethodItem(POSPaymentMethodCode: Code[20]; POSSaleLine: Record "NPR POS Sale Line"): Boolean
     begin
         exit(IsThisPOSPaymentMethodItem(POSPaymentMethodCode, POSSaleLine."Item Category Code", POSSaleLine."No."))

@@ -108,6 +108,38 @@ table 6151259 "NPR Ecom Sales Line"
             Caption = 'Invoiced Amount';
             BlankZero = true;
         }
+        field(23; "Virtual Item Process Status"; Enum "NPR EcomVirtualItemProcestatus")
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Virtual Item Process Status';
+        }
+        field(24; "Virtual Item Process ErrMsg"; Text[500])
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Virtual Item Process Error Message';
+        }
+        field(25; Captured; Boolean)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Captured';
+        }
+        field(16; "Voucher Type"; Code[20])
+        {
+            Caption = 'Voucher Type';
+            DataClassification = CustomerContent;
+        }
+        field(5000; "Bucket Id"; Integer)
+        {
+            Caption = 'Bucket';
+            DataClassification = CustomerContent;
+            Editable = false;
+        }
+        field(5010; "Virtual Item Proc Retry Count"; Integer)
+        {
+            DataClassification = CustomerContent;
+            Caption = 'Virtual Item Process Retry Count';
+            BlankZero = true;
+        }
 
     }
 
@@ -118,6 +150,16 @@ table 6151259 "NPR Ecom Sales Line"
             Clustered = true;
         }
         key(Key2; "Document Type", "External Document No.")
+        {
+        }
+        key(Key3; "External Document No.", "Document Type", "Bucket Id", Type)
+        {
+        }
+        key(Key4; "External Document No.", "Document Type", Type, "Virtual Item Process Status", Captured)
+        {
+        }
+
+        key(Key5; "Document Entry No.", Type, Captured, "Virtual Item Process Status", "Virtual Item Proc Retry Count")
         {
         }
     }

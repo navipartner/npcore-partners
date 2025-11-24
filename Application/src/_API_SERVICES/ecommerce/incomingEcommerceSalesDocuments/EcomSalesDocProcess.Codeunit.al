@@ -13,6 +13,7 @@ codeunit 6248610 "NPR EcomSalesDocProcess"
 
         Clear(EcomSalesDocTryProcess);
         _Success := EcomSalesDocTryProcess.Run(Rec);
+        Rec.ReadIsolation := Rec.ReadIsolation::UpdLock;
         Rec.Get(Rec.RecordId);
 
         HandleResponse(_Success, Rec, _UpdateRetryCount);
@@ -223,7 +224,6 @@ codeunit 6248610 "NPR EcomSalesDocProcess"
     begin
         if not IncEcomSalesDocSetup.Get() then
             IncEcomSalesDocSetup.Init();
-        HandleSalesOrderProcessJQSchedule(IncEcomSalesDocSetup."Auto Proc Sales Order");
         HandleSalesReturnOrderProcessJQSchedule(IncEcomSalesDocSetup."Auto Proc Sales Ret Order");
     end;
 
@@ -235,16 +235,12 @@ codeunit 6248610 "NPR EcomSalesDocProcess"
             exit;
 
         if (JobQueueEntry."Object Type to Run" = JobQueueEntry."Object Type to Run"::Codeunit) and
-           (JobQueueEntry."Object ID to Run" in
-               [Codeunit::"NPR EcomSalesOrderProcJQ",
-                Codeunit::"NPR EcomSalesRetOrderProcJQ"])
+           (JobQueueEntry."Object ID to Run" = Codeunit::"NPR EcomSalesRetOrderProcJQ")
         then begin
             IsNpJob := true;
             Handled := true;
         end;
     end;
-
-
 
     var
         _UpdateRetryCount: Boolean;

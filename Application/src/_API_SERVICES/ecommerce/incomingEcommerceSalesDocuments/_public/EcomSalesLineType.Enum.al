@@ -19,4 +19,9 @@ enum 6059943 "NPR Ecom Sales Line Type"
     {
         Caption = 'Shipment Fee';
     }
+
+    value(4; "Voucher")
+    {
+        Caption = 'Voucher';
+    }
 }

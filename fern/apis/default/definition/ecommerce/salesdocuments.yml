@@ -24,6 +24,8 @@ types:
         value: 'shipmentFee'
       - name: paymentFee
         value: 'paymentFee'
+      - name: voucher
+        value: 'voucher'
   
   salesDocumentLineTypeRequest:
     enum:
@@ -33,11 +35,24 @@ types:
         value: 'comment'
       - name: shipmentFee
         value: 'shipmentFee'
+      - name: voucher
+        value: 'voucher'
+
+  salesDocumentLineVirtualItemProcessStatus:
+    enum:
+      - name: blank
+        value: ''
+      - name: processed
+        value: 'processed'
+      - name: error
+        value: 'error'
 
   salesDocumentPaymentMethodType:
     enum:
       - name: paymentGateway
         value: 'paymentGateway'
+      - name: voucher
+        value: 'voucher'
   
   salesDocumentCreationStatus:
     enum:
@@ -65,6 +80,17 @@ types:
         value: 'order'
       - name: returnOrder
         value: 'returnOrder'
+
+  salesDocumentcaptureProcessingStatus:
+    enum:
+      - name: error
+        value: 'error'
+      - name: partiallyProcessed
+        value: 'partiallyProcessed'
+      - name: processed
+        value: 'processed'
+      - name: pending
+        value: 'pending'
    
   CreateSalesDocumentDTO:
     properties:
@@ -87,6 +113,8 @@ types:
       locationCode: string
       yourReference: string
       pricesExcludingVat: boolean 
+      captureProcessingStatus: salesDocumentcaptureProcessingStatus
+      lastCaptureErrorMessage: string
       sellToCustomer: SalesDocumentSellToCustomerDTO
       shipToCustomer: SalesDocumentShipToCustomerDTO
       shipment: SalesDocumentShipmentDTO
@@ -110,11 +138,14 @@ types:
           locationCode: ""
           yourReference: "REF-789"
           pricesExcludingVat: false
+          captureProcessingStatus: pending
+          lastCaptureErrorMessage: ""
           sellToCustomer: $SalesDocumentSellToCustomerDTO.ExampleSellToCustomerDTO
           shipToCustomer: $SalesDocumentShipToCustomerDTO.ExampleShipToCustomerDTO
           shipment: $SalesDocumentShipmentDTO.ExampleShipmentDTO
           payments: 
            - $SalesDocumentPaymentsDTO.ExamplePaymentsDTO
+           - $SalesDocumentPaymentsDTO.ExamplePaymentsDTOVoucher
           comments:
             - $SalesDocumentCommentsDTO.ExampleCommentsDTO
           salesDocumentLines: 
@@ -222,7 +253,23 @@ types:
           externalPaymentMethodCode: adyen_cc
           externalPaymentType: mc
           paymentReference: Z3ZR6HT5BNVPZQT5
-          paymentAmount: 2500.00
+          paymentAmount: 2000.00
+          parToken: ''
+          pspToken: ''
+          cardBrand: ''
+          maskedCardNumber: ''
+          cardExpiryDate: ''
+          cardAliasToken: ''
+          capturedPaymentAmount: 0
+          customFields: $SalesDocumentCustomFieldsRequest.ExampleSalesDocumentCustomFieldsRequest
+      - name: ExamplePaymentsDTOVoucher
+        value:
+          id: "be02c86c-44fb-4c59-8dd2-84bfa136be93"
+          paymentMethodType: voucher
+          externalPaymentMethodCode: ''
+          externalPaymentType: ''
+          paymentReference: '2807000107658'
+          paymentAmount: 500.00
           parToken: ''
           pspToken: ''
           cardBrand: ''
@@ -257,6 +304,9 @@ types:
       requestedDeliveryDate: date
       invoicedQuantity: double
       invoicedAmount: double
+      captured: boolean
+      virtualItemProcessStatus: salesDocumentLineVirtualItemProcessStatus
+      virtualItemProcessErrorMessage: string
       customFields: 
         type: optional<SalesDocumentCustomFieldsRequest>
         docs: This section allows you to add custom fields as key-value pairs. You can handle these fields by subscribing to our extension publishers and implementing custom serialization logic.
@@ -277,6 +327,9 @@ types:
           requestedDeliveryDate: "2025-06-01"
           invoicedQuantity: 0
           invoicedAmount: 0
+          captured: true
+          virtualItemProcessStatus: processed
+          virtualItemProcessErrorMessage: ""
           customFields: $SalesDocumentCustomFieldsRequest.ExampleSalesDocumentCustomFieldsRequest
 ############################################
 
@@ -414,16 +467,18 @@ types:
 
   SalesDocumentPaymentsRequest:
     properties:
-      paymentMethodType: salesDocumentPaymentMethodType
+      paymentMethodType:
+        type: salesDocumentPaymentMethodType
+        docs: PaymentMethodType voucher is not supported with returnOrder.
       externalPaymentMethodCode: 
         type: string
-        docs: Max. length 50 symbols.
+        docs: Max. length 50 symbols. This field is required if payment method type is set to payment gateway.
       externalPaymentType:
         type: optional<string>
         docs: Max. length 50 symbols.
       paymentReference: 
-        type: optional<string>
-        docs: Max. length 250 symbols.
+        type: string
+        docs: Max. length 250 symbols. This field is required if payment method type is set to voucher.
       paymentAmount: double
       parToken:
         type: optional<string>
@@ -453,7 +508,15 @@ types:
           externalPaymentMethodCode: adyen_cc
           externalPaymentType: mc
           paymentReference: Z3ZR6HT5BNVPZQT5
-          paymentAmount: 2500.00
+          paymentAmount: 2000.00
+          customFields: $SalesDocumentPaymentsCustomFieldsRequest.ExampleSalesDocumentPaymentsCustomFieldsRequest
+      - name: ExamplePaymentsRequestVoucher
+        value:
+          paymentMethodType: voucher
+          externalPaymentMethodCode: ''
+          externalPaymentType: ''
+          paymentReference: '2807000107658'
+          paymentAmount: 500.00
           customFields: $SalesDocumentPaymentsCustomFieldsRequest.ExampleSalesDocumentPaymentsCustomFieldsRequest
 
   SalesDocumentPaymentsCustomFieldsRequest:
@@ -480,7 +543,7 @@ types:
     properties:
       type: 
         type: salesDocumentLineTypeRequest
-        docs: When type comment is selected, the api will create comments that are going to be visible on the sales order lines.
+        docs: When type comment is selected, the api will create comments that are going to be visible on the sales order lines. Type voucher is not supported with returnOrder.
       no: 
         type: optional<string>
         docs: Max. length 20 symbols, for lines with type shipmentFee 50 symbols. The no field or the barcodeNo field has to be populated.
@@ -489,7 +552,7 @@ types:
         docs: Max. length 10 symbols.
       barcodeNo: 
         type: optional<string>
-        docs: Max. length 50 symbols. The item no and the variant code are going to be populated based on the barcodeNo field.  The no field or the barcodeNo field has to be populated.
+        docs: Max. length 50 symbols. The item no and the variant code are going to be populated based on the barcodeNo field.  The no field or the barcodeNo field has to be populated for type Item.
       description:
         type: optional<string>
         docs: Max. length 150 symbols.
@@ -499,6 +562,9 @@ types:
       vatPercent: double
       lineAmount: double
       requestedDeliveryDate: optional<date>
+      voucherType: 
+        type: optional<string>
+        docs: Relevant for type voucher. It has to be populated if the barcodeNo is populated.
       customFields: 
         type: optional<SalesDocumentLinesCustomFieldsRequest>
         docs: This section allows you to add custom fields as key-value pairs. You can handle these fields by subscribing to our extension publishers and implementing custom deserialization logic.
@@ -569,6 +635,7 @@ types:
           shipToCustomer: $SalesDocumentShipToCustomerRequest.ExampleShipToCustomerRequest
           payments: 
             - $SalesDocumentPaymentsRequest.ExamplePaymentsRequest
+            - $SalesDocumentPaymentsRequest.ExamplePaymentsRequestVoucher
           comments:
             - $SalesDocumentCommentsRequest.ExampleCommentsRequest
           salesDocumentLines: 

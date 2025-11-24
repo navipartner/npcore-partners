@@ -10,6 +10,8 @@ codeunit 6248617 "NPR EcomSalesDocApiAgent"
         EcomSalesHeader: Record "NPR Ecom Sales Header";
         EcomSalesDocSetup: Record "NPR Inc Ecom Sales Doc Setup";
         EcomSalesDocProcess: Codeunit "NPR EcomSalesDocProcess";
+        EcomVirtualItemMgt: Codeunit "NPR Ecom Virtual Item Mgt";
+
     begin
         Request.SkipCacheIfNonStickyRequest(GetTableIds());
         InsertSalesDocument(Request, EcomSalesHeader);
@@ -18,13 +20,13 @@ codeunit 6248617 "NPR EcomSalesDocApiAgent"
             EcomSalesDocSetup.Init();
 
         EcomSalesHeader.Get(EcomSalesHeader.RecordId);
-        if (EcomSalesDocSetup."Proc Sales Order On Receive" and (EcomSalesHeader."Document Type" = EcomSalesHeader."Document Type"::Order)) or
-           (EcomSalesDocSetup."Proc Sales Ret Ord On Receive" and (EcomSalesHeader."Document Type" = EcomSalesHeader."Document Type"::"Return Order"))
-        then begin
-            Clear(EcomSalesDocProcess);
-            EcomSalesDocProcess.SetUpdateRetryCount(true);
-            EcomSalesDocProcess.Run(EcomSalesHeader);
-        end;
+        Clear(EcomSalesDocProcess);
+        EcomSalesDocProcess.SetUpdateRetryCount(true);
+        EcomSalesDocProcess.Run(EcomSalesHeader);
+
+
+        EcomSalesHeader."Bucket Id" := EcomVirtualItemMgt.AssignBucketLines(EcomSalesHeader);
+        EcomSalesHeader.Modify();
 
         exit(Response.RespondOK(GetSalesDocumentCreateResponse(EcomSalesHeader)));
     end;

@@ -25,37 +25,33 @@ table 6151190 "NPR Inc Ecom Sales Doc Setup"
         {
             Caption = 'Auto Process Sales Order';
             DataClassification = CustomerContent;
-#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
-            trigger OnValidate()
-            var
-                EcomSalesDocProcess: Codeunit "NPR EcomSalesDocProcess";
-            begin
-                EcomSalesDocProcess.HandleSalesOrderProcessJQScheduleConfirmation(Rec."Auto Proc Sales Order");
-            end;
-#endif
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-11-17';
+            ObsoleteReason = 'Not used anymore.';
         }
         field(4; "Proc Sales Order On Receive"; Boolean)
         {
             Caption = 'Process Sales Order On Receive';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-11-17';
+            ObsoleteReason = 'Not used anymore.';
         }
         field(6; "Auto Proc Sales Ret Order"; Boolean)
         {
             Caption = 'Auto Process Sales Return Order';
             DataClassification = CustomerContent;
-#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
-            trigger OnValidate()
-            var
-                EcomSalesDocProcess: Codeunit "NPR EcomSalesDocProcess";
-            begin
-                EcomSalesDocProcess.HandleSalesReturnOrderProcessJQScheduleConfirmation(Rec."Auto Proc Sales Ret Order");
-            end;
-#endif
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-11-17';
+            ObsoleteReason = 'Not used anymore.';
         }
         field(7; "Proc Sales Ret Ord On Receive"; Boolean)
         {
             Caption = 'Process Sales Return Order On Receive';
             DataClassification = CustomerContent;
+            ObsoleteState = Pending;
+            ObsoleteTag = '2025-11-17';
+            ObsoleteReason = 'Not used anymore.';
         }
         field(8; "Def. Sales Location Code"; Code[10])
         {
@@ -95,8 +91,19 @@ table 6151190 "NPR Inc Ecom Sales Doc Setup"
             DataClassification = CustomerContent;
             TableRelation = "Customer Templ.";
         }
+        field(18; "Max Capture Retry Count"; Integer)
+        {
+            Caption = 'Max Capture Retry Count';
+            DataClassification = CustomerContent;
+            InitValue = 3;
+        }
+        field(19; "Max Virtual Item Retry Count"; Integer)
+        {
+            Caption = 'Max Virutal Item Retry Count';
+            DataClassification = CustomerContent;
+            InitValue = 3;
+        }
     }
-
     keys
     {
         key(PK; "Primary Key")
