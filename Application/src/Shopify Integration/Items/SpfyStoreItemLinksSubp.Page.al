@@ -308,6 +308,15 @@ page 6184557 "NPR Spfy Store-Item Links Subp"
                     CurrPage.Update(false);
                 end;
             }
+            action(InventoryLocations)
+            {
+                Caption = 'Inventory Locations';
+                ApplicationArea = NPRShopify;
+                Image = List;
+                ToolTip = 'Shows a list of Shopify store locations where the listed inventory items are activated.';
+                RunObject = page "NPR Spfy Inv. Item Locations";
+                RunPageLink = "Shopify Store Code" = field("Shopify Store Code"), "Item No." = field("Item No."), "Variant Code" = field("Variant Code");
+            }
         }
     }
 

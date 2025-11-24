@@ -117,6 +117,21 @@ page 6184565 "NPR Spfy Item Variant IDs Subp"
             }
         }
     }
+    actions
+    {
+        area(Processing)
+        {
+            action(InventoryLocations)
+            {
+                Caption = 'Inventory Locations';
+                ApplicationArea = NPRShopify;
+                Image = List;
+                ToolTip = 'Shows a list of Shopify store locations where the listed inventory items are activated.';
+                RunObject = page "NPR Spfy Inv. Item Locations";
+                RunPageLink = "Shopify Store Code" = field("Shopify Store Code"), "Item No." = field("Item No."), "Variant Code" = field("Variant Code");
+            }
+        }
+    }
 
     var
         SpfyStoreItemVariantLink: Record "NPR Spfy Store-Item Link";

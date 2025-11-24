@@ -691,7 +691,7 @@
 #if not BC17
         if Task."Task Processor Code" <> '' then
             if Task."Task Processor Code" = SpfyScheduleSend.GetShopifyTaskProcessorCode(false) then
-                BatchProcessing := Task."Table No." in [Database::"Item Variant", Database::"NPR Spfy Item Price"];
+                BatchProcessing := Task."Table No." in [Database::"Item Variant", Database::"NPR Spfy Item Price", Database::"NPR Spfy Inventory Level"];
 #endif
     end;
 

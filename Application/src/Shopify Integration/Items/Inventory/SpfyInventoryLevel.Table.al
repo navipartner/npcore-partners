@@ -65,7 +65,7 @@ table 6150816 "NPR Spfy Inventory Level"
         "Last Updated at" := CurrentDateTime;
     end;
 
-    procedure AvailableInventory(): Decimal
+    internal procedure AvailableInventory(): Integer
     var
         SpfyIntegrationMgt: Codeunit "NPR Spfy Integration Mgt.";
     begin

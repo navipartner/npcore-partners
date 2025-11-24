@@ -236,7 +236,8 @@ codeunit 6184817 "NPR Spfy Schedule Send Tasks"
             Database::"Inventory Buffer",
             Database::"NPR Spfy Tag Update Request",
             Database::"NPR Spfy Inventory Level",
-            Database::"NPR Spfy Item Price":
+            Database::"NPR Spfy Item Price",
+            Database::"NPR Spfy Inv Item Location":
                 CreateTaskSetupEntry(Task."Task Processor Code", Task."Table No.", Codeunit::"NPR Spfy Send Items&Inventory");
 
             Database::"NPR Spfy Entity Metafield":

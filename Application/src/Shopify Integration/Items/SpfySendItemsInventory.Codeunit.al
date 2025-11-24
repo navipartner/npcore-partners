@@ -19,9 +19,11 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             Database::"NPR Spfy Tag Update Request":
                 SendTags(Rec);
             Database::"NPR Spfy Inventory Level":
-                SendShopifyInventoryUpdate(Rec);
+                BulkSendShopifyInventoryUpdate(Rec);
             Database::"NPR Spfy Item Price":
                 SendShopifyItemPrices(Rec);
+            Database::"NPR Spfy Inv Item Location":
+                SendShopifyActivateInventoryItemAtLocation(Rec);
         end;
     end;
 
@@ -35,6 +37,7 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         _InventoryIntegrIsEnabled, _ItemPriceIntegrIsEnabled : Boolean;
         _InventoryItemIDNotFoundErr: Label 'Shopify Inventory Item ID could not be found for %1=%2, %3=%4 at Shopify Store %5', Comment = '%1 = Item No. fieldcaption, %2 = Item No., %3 = Variant Code fieldcaption, %4 = Variant Code, %5 = Shopify Store Code';
         _ItemIntegrNotEnabledErr: Label 'Shopify integration is not enabled for the item.';
+        _ItemVariantBlockedOrDoesNotExistErr: Label 'The item %1 variant %2 is blocked or has been removed from the system. The request is no longer applicable.', Comment = '%1 - Item No., %2 - Variant Code';
         _QueryingShopifyLbl: Label 'Querying Shopify...';
 
 
@@ -124,6 +127,104 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
             end;
     end;
 
+    local procedure BulkSendShopifyInventoryUpdate(var NcTask: Record "NPR Nc Task")
+    var
+        TempIncomingNcTasks: Record "NPR Nc Task" temporary;
+        TempNcTask: Record "NPR Nc Task" temporary;
+        BulkUpdateRequest: JsonObject;
+    begin
+        if not NcTask.FindSet() then
+            exit;
+        RefreshIntegrationStatus(NcTask."Store Code");
+        repeat
+            TempIncomingNcTasks := NcTask;
+            TempIncomingNcTasks.Insert();
+        until NcTask.Next() = 0;
+
+        while PrepareItemUpdateRequest(TempIncomingNcTasks, TempNcTask) do
+            if GenerateBulkRequestAndSetNcTaskPostponed(TempNcTask, BulkUpdateRequest) then
+                ProcessShopifyResponseAndUpdateNcTask(TempNcTask, BulkUpdateRequest);
+    end;
+
+    [TryFunction]
+    local procedure PrepareItemUpdateRequest(var NcTaskIn: Record "NPR Nc Task"; var NcTaskOut: Record "NPR Nc Task")
+    var
+        InventoryLevel: Record "NPR Spfy Inventory Level";
+        ItemVariant: Record "Item Variant";
+        SpfyStore: Record "NPR Spfy Store";
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
+        SpfyInvLocationAct: Codeunit "NPR Spfy Inv. Location Act.";
+        OStream: OutStream;
+        IncludedNcTasks: Integer;
+        MaxPerRequest: Integer;
+        ShopifyInventoryItemID: Text[30];
+        LocInvItemNotActivatedErr: Label 'The specified Shopify Inventory Item ID %1 is not stocked at Shopify Location ID %2 at Shopify Store %3. Awaiting the activation task to complete.', Comment = '%1 =ShopifyInventoryItemID;%2=InventoryLevel."Shopify Location ID";%3=InventoryLevel."Shopify Store Code"';
+        UpdateLevelItemRequest: Label '%1: inventorySetQuantities(input:{reason:"correction",name:"available",ignoreCompareQuantity:true,quantities:[{inventoryItemId:"gid://shopify/InventoryItem/%2",locationId:"gid://shopify/Location/%3",quantity:%4}]}){userErrors{field message}}', Locked = true;
+        VariantNotAvailErr: Label 'The variant is marked as not available in Shopify. The request is no longer applicable.';
+    begin
+        if not (NcTaskIn.IsTemporary() and NcTaskOut.IsTemporary()) then
+            FunctionCallOnNonTempVarErr('PrepareItemUpdateUpdateRequest');
+
+        NcTaskOut.DeleteAll();
+        NcTaskIn.FindSet();
+        SpfyStore.Get(NcTaskIn."Store Code");
+        MaxPerRequest := SpfyStore.InventoryLevelUpdateRequestBatchSize();
+        IncludedNcTasks := 0;
+        repeat
+            Clear(ShopifyInventoryItemID);
+            ClearLastError();
+            NcTaskOut := NcTaskIn;
+            NcTaskOut."Last Processing Started at" := CurrentDateTime();
+            if not TryLoadInventoryLevel(InventoryLevel, NcTaskOut."Record ID") then begin
+                NcTaskOut.Processed := true;
+                _SpfyIntegrationMgt.SetResponse(NcTaskOut, GetLastErrorText());
+            end else begin
+                if InventoryLevel."Variant Code" <> '' then
+                    if not ItemVariant.Get(InventoryLevel."Item No.", InventoryLevel."Variant Code") or SpfyItemMgt.ItemVariantIsBlocked(ItemVariant) then begin
+                        NcTaskOut.Processed := true;
+                        _SpfyIntegrationMgt.SetResponse(NcTaskOut, StrSubstNo(_ItemVariantBlockedOrDoesNotExistErr, InventoryLevel."Item No.", InventoryLevel."Variant Code"));
+                    end;
+                if not NcTaskOut.Processed then begin
+                    NcTaskOut."Process Error" := not GetStoreItemLink(InventoryLevel."Item No.", InventoryLevel."Shopify Store Code", true, SpfyStoreItemLink);  //Check integration is enabled for the item
+                    if NcTaskOut."Process Error" then
+                        _SpfyIntegrationMgt.SetResponse(NcTaskOut, _ItemIntegrNotEnabledErr)
+                    else begin
+                        NcTaskOut."Process Error" := ItemVariantNotAvailableInShopify(SpfyStoreItemLink, InventoryLevel."Item No.", InventoryLevel."Variant Code", InventoryLevel."Shopify Store Code");
+                        if NcTaskOut."Process Error" then
+                            _SpfyIntegrationMgt.SetResponse(NcTaskOut, VariantNotAvailErr)
+                        else begin
+                            ShopifyInventoryItemID := FindShopifyInventoryItemID(SpfyStoreItemLink);
+                            NcTaskOut."Process Error" := ShopifyInventoryItemID = '';
+                            if NcTaskOut."Process Error" then
+                                _SpfyIntegrationMgt.SetResponse(NcTaskOut, StrSubstNo(_InventoryItemIDNotFoundErr,
+                                    InventoryLevel.FieldCaption("Item No."), InventoryLevel."Item No.", InventoryLevel.FieldCaption("Variant Code"), InventoryLevel."Variant Code", InventoryLevel."Shopify Store Code"))
+                            else begin
+                                NcTaskOut."Process Error" := SpfyInvLocationAct.IsInventoryItemActivationRequired(InventoryLevel);
+                                if NcTaskOut."Process Error" then begin
+                                    SpfyInvLocationAct.CreateNcTaskActivateInvLocation(InventoryLevel, false);
+                                    _SpfyIntegrationMgt.SetResponse(NcTaskOut, StrSubstNo(LocInvItemNotActivatedErr, ShopifyInventoryItemID, InventoryLevel."Shopify Location ID", InventoryLevel."Shopify Store Code"));
+                                end else begin
+                                    IncludedNcTasks += 1;
+                                    NcTaskOut."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
+                                    OStream.WriteText(StrSubstNo(UpdateLevelItemRequest, 'NCTask' + Format(NcTaskIn."Entry No."), ShopifyInventoryItemID, InventoryLevel."Shopify Location ID", InventoryLevel.AvailableInventory()));
+                                end;
+                            end;
+                        end;
+                    end;
+                end;
+            end;
+            NcTaskOut.Insert();
+            NcTaskIn.Delete();
+        until (NcTaskIn.Next() = 0) or (IncludedNcTasks >= MaxPerRequest);
+    end;
+
+    [TryFunction]
+    local procedure TryLoadInventoryLevel(var InventoryLevel: Record "NPR Spfy Inventory Level"; RecID: RecordID)
+    begin
+        InventoryLevel.Get(RecID);  // fails if record missing
+    end;
+
     local procedure SendItemCost(var NcTask: Record "NPR Nc Task")
     var
         InventoryBuffer: Record "Inventory Buffer";
@@ -196,25 +297,6 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         Error(WrongCodeunitErr);
     end;
 
-    local procedure SendShopifyInventoryUpdate(var NcTask: Record "NPR Nc Task")
-    var
-        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
-        Success: Boolean;
-    begin
-        Clear(NcTask."Data Output");
-        Clear(NcTask.Response);
-        ClearLastError();
-        Success := true;
-
-        if PrepareInventoryLevelUpdateRequest(NcTask) then
-            Success := SpfyCommunicationHandler.SendInvetoryLevelUpdateRequest(NcTask);
-
-        NcTask.Modify();
-        Commit();
-        if not Success then
-            Error(GetLastErrorText());
-    end;
-
     local procedure SendShopifyItemPrices(var NcTask: Record "NPR Nc Task")
     var
         TempIncomingNcTasks: Record "NPR Nc Task" temporary;
@@ -264,6 +346,84 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                 Found := FindNcTaskInDictionary(NcTaskIn, ResponseDictionary, NcTaskErrorText);
             MarkNcTaskAsCompleted(NcTaskIn."Entry No.", ShopifyResponse, Success and Found, NcTaskErrorText);
         until NcTaskIn.Next() = 0;
+    end;
+
+    local procedure ProcessShopifyResponseAndUpdateNcTask(var NcTaskIn: Record "NPR Nc Task"; ShopifyRequest: JsonObject)
+    var
+        NcTask: Record "NPR Nc Task";
+        InventoryLevel: Record "NPR Spfy Inventory Level";
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+        SpfyInvLocationAct: Codeunit "NPR Spfy Inv. Location Act.";
+        ResponseDictionary: Dictionary of [BigInteger, Text];
+        RecRef: RecordRef;
+        ResponseDataSet: JsonToken;
+        ShopifyResponse: JsonToken;
+        ShopifyResponseUserErrors: JsonToken;
+        UserError: JsonToken;
+        StringTextBuilder: TextBuilder;
+        OStream: OutStream;
+        TaskEntryNo: BigInteger;
+        DataKey: Text;
+        ErrPart: Text;
+        RequestErrorText: Text;
+        Success: Boolean;
+        NcTaskNotFoundLbl: Label 'Nc Task %1 was not found in the Shopify response.';
+    begin
+        if not NcTaskIn.FindSet() then
+            exit;
+        NcTask."Store Code" := NcTaskIn."Store Code";
+        NcTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
+        ShopifyRequest.WriteTo(OStream);
+        ClearLastError();
+        Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse);
+
+        if not Success then begin
+            repeat
+                MarkNcTaskAsCompleted(NcTaskIn."Entry No.", ShopifyResponse, Success, GetLastErrorText());
+            until NcTaskIn.Next() = 0;
+        end else begin
+            if ShopifyResponse.SelectToken('data', ResponseDataSet) and ResponseDataSet.IsObject() then
+                foreach DataKey in ResponseDataSet.AsObject().Keys() do begin
+                    Clear(RequestErrorText);
+                    if GetNcTaskFromResponse(DataKey, TaskEntryNo) then begin
+                        Clear(StringTextBuilder);
+                        if ResponseDataSet.SelectToken(DataKey + '.userErrors', ShopifyResponseUserErrors) and ShopifyResponseUserErrors.IsArray() then
+                            if ShopifyResponseUserErrors.AsArray().Count() > 0 then
+                                foreach UserError in ShopifyResponseUserErrors.AsArray() do begin
+                                    ErrPart := _JsonHelper.GetJText(UserError, 'message', false);
+                                    if ErrPart <> '' then
+                                        StringTextBuilder.AppendLine(ErrPart);
+                                end;
+                        if StringTextBuilder.Length > 0 then
+                            RequestErrorText := StringTextBuilder.ToText();
+                        if not ResponseDictionary.ContainsKey(TaskEntryNo) then
+                            ResponseDictionary.Add(TaskEntryNo, RequestErrorText);
+                    end;
+                end;
+
+            repeat
+                Clear(RequestErrorText);
+                if not ResponseDictionary.Get(NcTaskIn."Entry No.", RequestErrorText) then
+                    MarkNcTaskAsCompleted(NcTaskIn."Entry No.", ShopifyResponse, false, StrSubstNo(NcTaskNotFoundLbl, NcTaskIn."Entry No."))
+                else begin
+                    if RequestErrorText <> '' then
+                        if SpfyInvLocationAct.IsNotStockedAtLocationErr(RequestErrorText) then begin
+                            RecRef.Get(NcTaskIn."Record ID");
+                            RecRef.SetTable(InventoryLevel);
+                            SpfyInvLocationAct.CreateNcTaskActivateInvLocation(InventoryLevel, true);
+                        end;
+                    MarkNcTaskAsCompleted(NcTaskIn."Entry No.", ShopifyResponse, RequestErrorText = '', RequestErrorText);
+                end;
+            until NcTaskIn.Next() = 0;
+        end;
+    end;
+
+    [TryFunction]
+    local procedure GetNcTaskFromResponse(DataKey: Text; var TaskEntryNo: biginteger)
+    begin
+        if StrPos(DataKey, 'NCTask') = 0 then
+            Error('');
+        Evaluate(TaskEntryNo, CopyStr(DataKey, StrLen('NCTask') + 1));
     end;
 
     local procedure ProcessAndUpdateNCTasksWithDataFromShopify(var NcTaskIn: Record "NPR Nc Task"; var RequestedVariantBuffer: Record "NPR Spfy ID/Task Buffer"; ShopifyRequest: JsonObject)
@@ -685,61 +845,16 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         RequestJObject.WriteTo(OStream);
     end;
 
-    local procedure PrepareInventoryLevelUpdateRequest(var NcTask: Record "NPR Nc Task"): Boolean
+    local procedure ItemVariantNotAvailableInShopify(var SpfyStoreItemLink: Record "NPR Spfy Store-Item Link"; ItemNo: Code[20]; VariantCode: Code[10]; StoreCode: Code[20]): Boolean
     var
-        InventoryLevel: Record "NPR Spfy Inventory Level";
-        ItemVariant: Record "Item Variant";
-        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
-        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
-        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
         SpfyItemVariantModifMgt: Codeunit "NPR Spfy ItemVariantModif Mgt.";
-        RecRef: RecordRef;
-        RequestJObject: JsonObject;
-        OStream: OutStream;
-        ShopifyInventoryItemID: Text[30];
-        ItemVariantDoesNotExistErr: Label 'The item %1 variant %2 is blocked or has been removed from the system. The request is no longer applicable.', Comment = '%1 - Item No., %2 - Variant Code';
-        VariantNotAvailErr: Label 'The variant is marked as not available in Shopify. The request is no longer applicable.';
     begin
-        RecRef.Get(NcTask."Record ID");
-        RecRef.SetTable(InventoryLevel);
-
-        if InventoryLevel."Variant Code" <> '' then
-            if not ItemVariant.Get(InventoryLevel."Item No.", InventoryLevel."Variant Code") or SpfyItemMgt.ItemVariantIsBlocked(ItemVariant) then begin
-                _SpfyIntegrationMgt.SetResponse(NcTask, StrSubstNo(ItemVariantDoesNotExistErr, InventoryLevel."Item No.", InventoryLevel."Variant Code"));
-                exit(false);
-            end;
-        GetStoreItemLink(InventoryLevel."Item No.", InventoryLevel."Shopify Store Code", SpfyStoreItemLink);  //Check integration is enabled for the item
-
         Clear(SpfyStoreItemLink);
         SpfyStoreItemLink.Type := SpfyStoreItemLink.Type::"Variant";
-        SpfyStoreItemLink."Item No." := InventoryLevel."Item No.";
-        SpfyStoreItemLink."Variant Code" := InventoryLevel."Variant Code";
-        SpfyStoreItemLink."Shopify Store Code" := InventoryLevel."Shopify Store Code";
-        if SpfyItemVariantModifMgt.ItemVariantNotAvailableInShopify(SpfyStoreItemLink) then begin
-            _SpfyIntegrationMgt.SetResponse(NcTask, VariantNotAvailErr);
-            exit(false);
-        end;
-
-        ShopifyInventoryItemID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Inventory Item ID");
-        if ShopifyInventoryItemID = '' then begin
-            ShopifyInventoryItemID := GetShopifyInventoryItemID(SpfyStoreItemLink, false);
-            if ShopifyInventoryItemID <> '' then begin
-                SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Inventory Item ID", ShopifyInventoryItemID, false);
-                Commit();
-            end;
-        end;
-        if ShopifyInventoryItemID = '' then
-            Error(_InventoryItemIDNotFoundErr,
-                InventoryLevel.FieldCaption("Item No."), InventoryLevel."Item No.", InventoryLevel.FieldCaption("Variant Code"), InventoryLevel."Variant Code", InventoryLevel."Shopify Store Code");
-
-        RequestJObject.Add('location_id', InventoryLevel."Shopify Location ID");
-        RequestJObject.Add('inventory_item_id', ShopifyInventoryItemID);
-        RequestJObject.Add('available', Format(InventoryLevel.AvailableInventory(), 0, 9));
-
-        NcTask."Store Code" := InventoryLevel."Shopify Store Code";
-        NcTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
-        RequestJObject.WriteTo(OStream);
-        exit(true);
+        SpfyStoreItemLink."Item No." := ItemNo;
+        SpfyStoreItemLink."Variant Code" := VariantCode;
+        SpfyStoreItemLink."Shopify Store Code" := StoreCode;
+        exit(SpfyItemVariantModifMgt.ItemVariantNotAvailableInShopify(SpfyStoreItemLink));
     end;
 
     [TryFunction]
@@ -1878,53 +1993,81 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
 
     local procedure SetNcTaskPostponed(var NcTaskIn: Record "NPR Nc Task"; var RequestString: Text) Success: Boolean
     var
-        NcTask: Record "NPR Nc Task";
         MutationQueryRequestLabel: Label 'mutation UpdateProductVariants { %1 }', Locked = true, Comment = '%1 = Update Product Variants Array';
-        IStream: InStream;
-        productVariantsBulkUpdateRequestStringPart: Text;
         productVariantsBulkUpdateRequestStringTextBuilder: TextBuilder;
     begin
         if not NcTaskIn.IsTemporary() then
             FunctionCallOnNonTempVarErr('SetNcTaskPostponed');
-        if not NcTaskIn.FindSet() then
-            exit;
 
+        Success := GenerateBulkRequest(NcTaskIn, productVariantsBulkUpdateRequestStringTextBuilder);
+
+        RequestString := StrSubstNo(MutationQueryRequestLabel, productVariantsBulkUpdateRequestStringTextBuilder.ToText());
+    end;
+
+    local procedure GenerateBulkRequestAndSetNcTaskPostponed(var NcTaskIn: Record "NPR Nc Task"; var RequestJObject: JsonObject) Success: Boolean
+    var
+        RequestStringTextBuilder: TextBuilder;
+        Request: Text;
+    begin
+        Clear(RequestJObject);
+        if not NcTaskIn.IsTemporary() then
+            FunctionCallOnNonTempVarErr('GenerateBulkRequestAndSetNcTaskPostponed');
+
+        Success := GenerateBulkRequest(NcTaskIn, RequestStringTextBuilder);
+
+        Request := RequestStringTextBuilder.ToText();
+        if Request <> '' then
+            RequestJObject.Add('query', StrSubstNo('mutation {%1}', Request));
+    end;
+
+    local procedure GenerateBulkRequest(var NcTaskIn: Record "NPR Nc Task"; var RequestStringTextBuilder: TextBuilder) Success: Boolean
+    begin
+        if not NcTaskIn.FindSet() then
+            exit(false);
+
+        RequestStringTextBuilder.Clear();
+        repeat
+            UpdateNcTaskBatchProcessing(NcTaskIn, Success, RequestStringTextBuilder)
+        until NcTaskIn.Next() = 0;
+        Commit();
+    end;
+
+    local procedure UpdateNcTaskBatchProcessing(var NcTaskIn: Record "NPR Nc Task"; var Success: Boolean; var RequestStringTextBuilder: TextBuilder)
+    var
+        NcTask: Record "NPR Nc Task";
+        IStream: InStream;
+        BulkUpdateRequestStringPart: Text;
+    begin
 #if not (BC18 or BC19 or BC20 or BC21)
         NcTask.ReadIsolation := IsolationLevel::UpdLock;
 #else
         NcTask.LockTable();
 #endif
-
-        productVariantsBulkUpdateRequestStringTextBuilder.Clear();
-        repeat
-            if NcTask.Get(NcTaskIn."Entry No.") and not (NcTask.Processed or NcTask.Postponed) then begin
-                if NcTaskIn."Process Error" then begin
-                    NcTaskIn.CalcFields(Response);
-                    NcTask.Response := NcTaskIn.Response;
-                    NcTask."Process Error" := true;
-                    NcTask."Last Processing Completed at" := CurrentDateTime();
-                    NcTaskIn.Delete();
-                end else begin
-                    NcTask.Postponed := true;
-                    NcTask."Postponed At" := CurrentDateTime();
-                    NcTask."Last Processing Completed at" := 0DT;
-                    NcTaskIn.CalcFields("Data Output");
-                    NcTask."Data Output" := NcTaskIn."Data Output";
-                    NcTask."Data Output".CreateInStream(IStream, TextEncoding::UTF8);
-                    IStream.ReadText(productVariantsBulkUpdateRequestStringPart);
-                    productVariantsBulkUpdateRequestStringTextBuilder.Append(productVariantsBulkUpdateRequestStringPart);
-                    Success := true;
-                end;
-                NcTask."Last Processing Started at" := NcTaskIn."Last Processing Started at";
-                NcTask."Last Processing Duration" := 0;
-                NcTask."Process Count" += 1;
-
-                NcTask.Modify();
-            end else
+        if NcTask.Get(NcTaskIn."Entry No.") and not (NcTask.Processed or NcTask.Postponed) then begin
+            if NcTaskIn."Process Error" or NcTaskIn.Processed then begin
+                NcTaskIn.CalcFields(Response);
+                NcTask.Response := NcTaskIn.Response;
+                NcTask."Process Error" := NcTaskIn."Process Error";
+                NcTask.Processed := NcTaskIn.Processed;
+                NcTask."Last Processing Completed at" := CurrentDateTime();
                 NcTaskIn.Delete();
-        until NcTaskIn.Next() = 0;
-        Commit();
-        RequestString := StrSubstNo(MutationQueryRequestLabel, productVariantsBulkUpdateRequestStringTextBuilder.ToText());
+            end else begin
+                NcTask.Postponed := true;
+                NcTask."Postponed At" := CurrentDateTime();
+                NcTask."Last Processing Completed at" := 0DT;
+                NcTaskIn.CalcFields("Data Output");
+                NcTask."Data Output" := NcTaskIn."Data Output";
+                NcTask."Data Output".CreateInStream(IStream, TextEncoding::UTF8);
+                IStream.ReadText(BulkUpdateRequestStringPart);
+                RequestStringTextBuilder.Append(BulkUpdateRequestStringPart);
+                Success := true;
+            end;
+            NcTask."Last Processing Started at" := NcTaskIn."Last Processing Started at";
+            NcTask."Last Processing Duration" := 0;
+            NcTask."Process Count" += 1;
+            NcTask.Modify();
+        end else
+            NcTaskIn.Delete();
     end;
 
     local procedure CreateNcTaskParam(var NcTaskIn: Record "NPR Nc Task"; var NcTaskParam: Record "NPR Nc Task"; productVariantsBulkUpdateRequest: Text)
@@ -1983,6 +2126,96 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
                     NcTaskErrorText := NcTaskResultDictionary.Get('Error');
                     exit;
                 end;
+        end;
+    end;
+
+    local procedure SendShopifyActivateInventoryItemAtLocation(var NcTask: Record "NPR Nc Task")
+    var
+        InventoryLocation: Record "NPR Spfy Inv Item Location";
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
+        ShopifyResponse: JsonToken;
+        RecRef: RecordRef;
+        Success: Boolean;
+    begin
+        Clear(NcTask."Data Output");
+        Clear(NcTask.Response);
+        ClearLastError();
+        Success := true;
+
+        RecRef.Get(NcTask."Record ID");
+        RecRef.SetTable(InventoryLocation);
+        if PrepareActivateInventoryItemAtLocationRequest(NcTask, InventoryLocation) then
+            Success := SpfyCommunicationHandler.ExecuteShopifyGraphQLRequest(NcTask, true, ShopifyResponse);
+        NcTask.Modify();
+        Commit();
+
+        if not Success then
+            Error(GetLastErrorText());
+        if SpfyCommunicationHandler.UserErrorsExistInGraphQLResponse(ShopifyResponse) then
+            Error('');
+        InventoryLocation.Activated := Success;
+        InventoryLocation.Modify();
+    end;
+
+    local procedure PrepareActivateInventoryItemAtLocationRequest(var NcTask: Record "NPR Nc Task"; InventoryLocation: Record "NPR Spfy Inv Item Location"): Boolean
+    var
+        RequestJObject: JsonObject;
+        VariablesJObject: JsonObject;
+        OStream: OutStream;
+        ShopifyInventoryItemID: Text[30];
+        ActivateItemRequest: Label 'mutation ActivateInventoryItem($inventoryItemId: ID!, $locationId: ID!, $available: Int) { inventoryActivate(inventoryItemId: $inventoryItemId, locationId: $locationId, available: $available) { userErrors { message } } }', Locked = true;
+    begin
+        If not ValidateInventoryItem(NcTask, InventoryLocation, ShopifyInventoryItemID) then
+            exit(false);
+        VariablesJObject.Add('inventoryItemId', StrSubstNo('gid://shopify/InventoryItem/%1', ShopifyInventoryItemID));
+        VariablesJObject.Add('locationId', StrSubstNo('gid://shopify/Location/%1', InventoryLocation."Shopify Location ID"));
+        RequestJObject.Add('query', ActivateItemRequest);
+        RequestJObject.Add('variables', VariablesJObject);
+        NcTask."Store Code" := InventoryLocation."Shopify Store Code";
+        NcTask."Data Output".CreateOutStream(OStream, TextEncoding::UTF8);
+        RequestJObject.WriteTo(OStream);
+        exit(true);
+    end;
+
+    internal procedure ValidateInventoryItem(var NcTask: Record "NPR Nc Task"; InventoryLocation: Record "NPR Spfy Inv Item Location"; var ShopifyInventoryItemID: Text[30]): Boolean
+    var
+        ItemVariant: Record "Item Variant";
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+        SpfyItemMgt: Codeunit "NPR Spfy Item Mgt.";
+        VariantNotAvailErr: Label 'The variant is marked as not available in Shopify. The request is no longer applicable.';
+    begin
+        Clear(ShopifyInventoryItemID);
+        if InventoryLocation."Variant Code" <> '' then
+            if not ItemVariant.Get(InventoryLocation."Item No.", InventoryLocation."Variant Code") or SpfyItemMgt.ItemVariantIsBlocked(ItemVariant) then begin
+                _SpfyIntegrationMgt.SetResponse(NcTask, StrSubstNo(_ItemVariantBlockedOrDoesNotExistErr, InventoryLocation."Item No.", InventoryLocation."Variant Code"));
+                exit(false);
+            end;
+
+        GetStoreItemLink(InventoryLocation."Item No.", InventoryLocation."Shopify Store Code", SpfyStoreItemLink);  //Check integration is enabled for the item
+        If ItemVariantNotAvailableInShopify(SpfyStoreItemLink, InventoryLocation."Item No.", InventoryLocation."Variant Code", InventoryLocation."Shopify Store Code") then begin
+            _SpfyIntegrationMgt.SetResponse(NcTask, VariantNotAvailErr);
+            exit(false);
+        end;
+
+        ShopifyInventoryItemID := FindShopifyInventoryItemID(SpfyStoreItemLink);
+        if ShopifyInventoryItemID = '' then begin
+            _SpfyIntegrationMgt.SetResponse(NcTask, StrSubstNo(_InventoryItemIDNotFoundErr, InventoryLocation.FieldCaption("Item No."), InventoryLocation."Item No.", InventoryLocation.FieldCaption("Variant Code"), InventoryLocation."Variant Code", InventoryLocation."Shopify Store Code"));
+            exit(false);
+        end;
+        exit(true);
+    end;
+
+    local procedure FindShopifyInventoryItemID(var SpfyStoreItemLink: Record "NPR Spfy Store-Item Link") ShopifyInventoryItemID: Text[30]
+    var
+        SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+    begin
+        ShopifyInventoryItemID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Inventory Item ID");
+        if ShopifyInventoryItemID <> '' then
+            exit(ShopifyInventoryItemID);
+        ShopifyInventoryItemID := GetShopifyInventoryItemID(SpfyStoreItemLink, false);
+        if ShopifyInventoryItemID <> '' then begin
+            SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Inventory Item ID", ShopifyInventoryItemID, false);
+            Commit();
         end;
     end;
 

@@ -224,20 +224,30 @@
                     ProcessManually();
                 end;
             }
-
             action(UnPostpone)
             {
-                Caption = 'Set as Not Postponed';
-                Image = ChangeStatus;
-                ToolTip = 'This action removes the "Postponed" checkmarks (flags) from selected tasks. Tasks are flagged as "Postponed" when the system needs to defer processing because certain types of tasks should be processed together in a batch rather than individually. This means that there may be a process currently working on these tasks. The flags should be cleared automatically once the system has finished processing. It is strongly recommended that you do not remove the flags manually (using this action) as this may result in a task being processed more than once. You should only do this if you are absolutely sure that no processes are currently running (for example, if a task processing job was abruptly interrupted, the tasks may remain deferred and you may want to reset the flags manually).';
+                Caption = 'Set as not Postponed';
+                Image = ResetStatus;
+                ToolTip = 'This action removes the "Postponed" flag from the selected tasks. Tasks are flagged as "Postponed" when the system needs to defer processing because certain types of tasks should be processed together in a batch rather than individually. The flags should be cleared automatically once processing is complete. It is strongly recommended that you do not clear the flags manually (using this action), as this may result in a task being processed more than once. Only do this if you are absolutely sure that no processes are running. One scenario in which you may need to reset the flags manually is if a task processing job has been interrupted abruptly.';
                 ApplicationArea = NPRNaviConnect;
 
                 trigger OnAction()
                 begin
-                    MarkAsNotPostponed();
+                    ResetStatus(Rec.FieldNo(Postponed));
                 end;
             }
+            action(SetAsNotProcessed)
+            {
+                Caption = 'Set as not Processed';
+                Image = ResetStatus;
+                ToolTip = 'This action removes the "Processed" flag from the selected tasks. Tasks are flagged as "Processed" once the system has finished processing them. Most tasks can be reprocessed without removing the flag. However, reprocessing some tasks is undesirable and can lead to unintended consequencies, such as duplicate data. If you want to reprocess these kinds of tasks, you will have to clear the flag first.';
+                ApplicationArea = NPRNaviConnect;
 
+                trigger OnAction()
+                begin
+                    ResetStatus(Rec.FieldNo(Processed));
+                end;
+            }
             action("Reschedule For Processing")
             {
                 Caption = 'Reschedule for Processing';
@@ -492,31 +502,58 @@
         NcTaskMgt.RunSourceCard(Rec);
     end;
 
-    local procedure MarkAsNotPostponed()
+    local procedure ResetStatus(ResetFieldNo: Integer)
     var
         Task: Record "NPR Nc Task";
-        Counter: Integer;
+        Task2: Record "NPR Nc Task";
         Window: Dialog;
-        NoPostponedTasksWhereSelectedLbl: Label 'No Postponed tasks where selected.';
-        UnmarkPostponedTasksLbl: Label 'This action removes the "Postponed" checkmarks (flags) from selected tasks. Tasks are flagged as "Postponed" when the system needs to defer processing because certain types of tasks should be processed together in a batch rather than individually. This means that there may be a process currently working on these tasks. The flags should be cleared automatically once the system has finished processing. It is strongly recommended that you do not remove the flags manually (using this action) as this may result in a task being processed more than once. You should only do this if you are absolutely sure that no processes are currently running (for example, if a task processing job was abruptly interrupted, the tasks may remain deferred and you may want to reset the flags manually).\Are you sure you want to continue?';
+        Counter: Integer;
+        ConfirmTxt: Text;
+        Updated: Boolean;
+        NoApplicableEntriesSelectedLbl: Label 'No applicable tasks were selected.';
+        UnmarkPostponedTasksLbl: Label 'This action removes the "Postponed" flag from the selected tasks. Tasks are flagged as "Postponed" when the system needs to defer processing because certain types of tasks should be processed together in a batch rather than individually. This means that the system may currently be processing these tasks. The flags should be cleared automatically once processing is complete. It is strongly recommended that you do not clear the flags manually (using this action), as this may result in a task being processed more than once. Only do this if you are absolutely sure that no processes are running. One scenario in which you may need to reset the flags manually is if a task processing job has been interrupted abruptly.\Are you sure you want to continue?';
+        UnmarkProcessedTasksLbl: Label 'This action removes the "Processed" flag from the selected tasks. Tasks are flagged as "Processed" once the system has finished processing them. Most tasks can be reprocessed without removing the flag. However, reprocessing some tasks is undesirable and can lead to unintended consequencies, such as duplicate data. If you want to reprocess these kinds of tasks, you will have to clear the flag first.\Are you sure you want to continue?';
     begin
         CurrPage.SetSelectionFilter(Task);
-        Task.SetRange(Postponed, true);
-        if not Task.IsEmpty() then begin
-            if not Confirm(UnmarkPostponedTasksLbl) then
-                Error('');
-        end else
-            Error(NoPostponedTasksWhereSelectedLbl);
+        case ResetFieldNo of
+            Rec.FieldNo(Postponed):
+                begin
+                    Task.SetRange(Postponed, true);
+                    ConfirmTxt := UnmarkPostponedTasksLbl;
+                end;
+            Rec.FieldNo(Processed):
+                begin
+                    Task.SetRange(Processed, true);
+                    ConfirmTxt := UnmarkProcessedTasksLbl;
+                end;
+        end;
+        if Task.IsEmpty() then
+            Error(NoApplicableEntriesSelectedLbl);
+        if not Confirm(ConfirmTxt) then
+            Error('');
+
         Window.Open(OpenWindowTxt);
         Window.Update(2, Task.Count());
         if Task.FindSet(true) then
             repeat
                 Counter += 1;
                 Window.Update(1, Counter);
-                if Task.Postponed then begin
-                    Task.Postponed := false;
-                    Task.Modify();
+                Updated := false;
+                Task2 := Task;
+                case ResetFieldNo of
+                    Rec.FieldNo(Postponed):
+                        if Task2.Postponed then begin
+                            Task2.Postponed := false;
+                            Updated := true;
+                        end;
+                    Rec.FieldNo(Processed):
+                        if Task2.Processed then begin
+                            Task2.Processed := false;
+                            Updated := true;
+                        end;
                 end;
+                if Updated then
+                    Task2.Modify();
             until Task.Next() = 0;
         Window.Close();
 

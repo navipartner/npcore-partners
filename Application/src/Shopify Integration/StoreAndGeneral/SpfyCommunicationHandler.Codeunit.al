@@ -86,17 +86,6 @@ codeunit 6184924 "NPR Spfy Communication Handler"
     end;
 
     [TryFunction]
-    procedure SendInvetoryLevelUpdateRequest(var NcTask: Record "NPR Nc Task")
-    var
-        Url: Text;
-    begin
-        CheckRequestContent(NcTask);
-
-        Url := GetShopifyUrl(NcTask."Store Code") + 'inventory_levels/set.json';
-        SendShopifyRequest(NcTask, Enum::"Http Request Type"::POST, Url);
-    end;
-
-    [TryFunction]
     procedure SendCloseOrderRequest(var NcTask: Record "NPR Nc Task")
     var
         Url: Text;

@@ -530,6 +530,7 @@ codeunit 6184812 "NPR Spfy Item Mgt."
         InventoryLevel: Record "NPR Spfy Inventory Level";
         NcTask: Record "NPR Nc Task";
         SpfyScheduleSend: Codeunit "NPR Spfy Schedule Send Tasks";
+        SpfyInvLocationAct: Codeunit "NPR Spfy Inv. Location Act.";
         RecRef: RecordRef;
         VariantSku: Text;
     begin
@@ -537,6 +538,7 @@ codeunit 6184812 "NPR Spfy Item Mgt."
             exit;
         if not SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels", InventoryLevel."Shopify Store Code") then
             exit;
+        SpfyInvLocationAct.CreateNcTaskActivateInvLocation(InventoryLevel, false);
 
         VariantSku := GetProductVariantSku(InventoryLevel."Item No.", InventoryLevel."Variant Code");
 

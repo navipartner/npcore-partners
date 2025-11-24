@@ -460,7 +460,7 @@ table 6150810 "NPR Spfy Store"
         }
         field(610; "No. of Prices per Request"; Integer)
         {
-            Caption = 'No. of Prices per Request';
+            Caption = 'Price Update Batch Size';
             DataClassification = CustomerContent;
         }
         field(620; "Sales Price on Order Lines"; Enum "NPR Spfy Order Line Price Type")
@@ -473,6 +473,11 @@ table 6150810 "NPR Spfy Store"
             Caption = 'C&C Order Workflow Code';
             DataClassification = CustomerContent;
             TableRelation = "NPR NpCs Workflow";
+        }
+        field(640; "Invent.Level Update Batch Size"; Integer)
+        {
+            Caption = 'Invent.Level Update Batch Size';
+            DataClassification = CustomerContent;
         }
     }
     keys
@@ -513,6 +518,13 @@ table 6150810 "NPR Spfy Store"
     begin
         if "No. of Prices per Request" > 0 then
             exit("No. of Prices per Request");
+        exit(100);
+    end;
+
+    internal procedure InventoryLevelUpdateRequestBatchSize(): Integer
+    begin
+        if "Invent.Level Update Batch Size" > 0 then
+            exit("Invent.Level Update Batch Size");
         exit(100);
     end;
 

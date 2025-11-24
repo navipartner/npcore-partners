@@ -32,6 +32,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         CreateSOIntegrationRelatedDataLogSetups();
         MoveCustomerAssignedIDs();
         MoveLastOrdersImportedAt();
+        UpdateShopifyInventoryLocations();
     end;
 
     internal procedure UpdateShopifySetup()
@@ -507,6 +508,32 @@ codeunit 6184802 "NPR Spfy App Upgrade"
                     ShopifyStore.Modify();
                 end;
             until ShopifyStore.Next() = 0;
+
+        SetUpgradeTag();
+        LogFinish();
+    end;
+
+    local procedure UpdateShopifyInventoryLocations()
+    var
+        InventoryLevel: Record "NPR Spfy Inventory Level";
+        LocationInvItem: Record "NPR Spfy Inv Item Location";
+        InvLocationAct: Codeunit "NPR Spfy Inv. Location Act.";
+    begin
+        _UpgradeStep := 'UpdateShopifyInventoryLocations';
+
+        if HasUpgradeTag() then
+            exit;
+        if not InventoryLevel.FindSet() then
+            exit;
+        LogStart();
+
+        if InventoryLevel.FindSet() then
+            repeat
+                if not InvLocationAct.IsLocationActivated(LocationInvItem, InventoryLevel) then begin
+                    LocationInvItem.Activated := true;
+                    LocationInvItem.Modify();
+                end;
+            until InventoryLevel.Next() = 0;
 
         SetUpgradeTag();
         LogFinish();

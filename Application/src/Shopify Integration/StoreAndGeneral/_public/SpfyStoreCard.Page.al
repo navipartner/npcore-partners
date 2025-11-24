@@ -125,7 +125,8 @@ page 6184704 "NPR Spfy Store Card"
                     }
                     field("No. of Prices per Request"; Rec."No. of Prices per Request")
                     {
-                        ToolTip = 'Specifies the number of item prices that can be sent to Shopify in a single batch price update request. The default value is 100, which will be used by the system if you set the field value to zero.';
+                        Caption = 'Batch Size';
+                        ToolTip = 'Specifies the number of item prices that can be sent to Shopify in a single batch price update request. The default value is 100.';
                         ApplicationArea = NPRShopify;
                         Enabled = _ItemListIntegrationIsEnabled;
                     }
@@ -190,6 +191,13 @@ page 6184704 "NPR Spfy Store Card"
                     begin
                         UpdateControlVisibility();
                     end;
+                }
+                field("Invent.Level Update Batch Size"; Rec."Invent.Level Update Batch Size")
+                {
+                    Caption = 'Batch Size';
+                    ToolTip = 'Specifies the number of entries that can be sent to Shopify in a single batch inventory level update request. The default value is 100.';
+                    ApplicationArea = NPRShopify;
+                    Enabled = _InventoryIntegrationIsEnabled;
                 }
                 field("Include Transfer Orders"; Rec."Include Transfer Orders")
                 {
