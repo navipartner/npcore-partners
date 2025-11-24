@@ -116,6 +116,8 @@
         }
         key(Key2; "Authorization Code")
         { }
+        key(SoapUniqueness; "POS Store Code", "Company Name", "Reference Number", "POS Unit Code", "Entry Type") { }
+        key(RestUniqueness; "POS Store Code", "Company Name", "Foreign Transaction Id", "POS Unit Code", "Entry Type") { }
     }
 
     fieldgroups
