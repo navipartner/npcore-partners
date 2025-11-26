@@ -195,14 +195,14 @@ codeunit 6248253 "NPR RetailVoucherAgent"
     begin
         JsontoTempNpRvSalesLine(TempNpRvSalesLine, RequestJson);
 
-        NpRvSalesLine.SetRange("External Document No.", TempNpRvSalesLine."Document No.");
-        NpRvSalesLine.SetRange("Reference No.", TempNpRvSalesLine."Reference No.");
-        if NpRvSalesLine.FindFirst() then begin
-            VoucherSalesLinetoJson(NpRvSalesLine, 'voucher', Json);
-            exit;
-        end;
-
         if TempNpRvSalesLine."Reference No." <> '' then begin
+            NpRvSalesLine.SetRange("External Document No.", TempNpRvSalesLine."Document No.");
+            NpRvSalesLine.SetRange("Reference No.", TempNpRvSalesLine."Reference No.");
+            if NpRvSalesLine.FindFirst() then begin
+                VoucherSalesLinetoJson(NpRvSalesLine, 'voucher', Json);
+                exit;
+            end;
+
             if FindVoucher(TempNpRvSalesLine."Voucher Type", TempNpRvSalesLine."Reference No.", NpRvVoucher) then begin
                 NpRvVoucher.TestField("Allow Top-up");
                 Voucher2TempNpRvSalesLine(NpRvVoucher, TempNpRvSalesLine);
@@ -376,6 +376,8 @@ codeunit 6248253 "NPR RetailVoucherAgent"
         NpRvVoucher."E-mail" := NpRvSalesLine."E-mail";
         NpRvVoucher."Phone No." := NpRvSalesLine."Phone No.";
         NpRvVoucher."Voucher Message" := NpRvSalesLine."Voucher Message";
+        if NpRvSalesLine."Reference No." <> '' then
+            NpRvVoucher."Reference No." := NpRvSalesLine."Reference No.";
     end;
 
     procedure FindVoucher(VoucherTypeFilter: Text; ReferenceNo: Text[50]; var Voucher: Record "NPR NpRv Voucher"): Boolean
