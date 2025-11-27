@@ -10,4 +10,9 @@ codeunit 6060005 "NPR Sales Doc. Exp. Mgt Public"
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    procedure OnBeforePost(var SalesHeader: Record "Sales Header"; var Post: Boolean; var AsyncPosting: Boolean)
+    begin
+    end;
+
 }

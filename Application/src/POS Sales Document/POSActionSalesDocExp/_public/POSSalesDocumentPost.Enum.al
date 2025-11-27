@@ -1,8 +1,5 @@
 enum 6014544 "NPR POS Sales Document Post"
 {
-#IF NOT BC17
-    Access = Internal;
-#ENDIF
     value(0; No)
     {
         Caption = 'No';

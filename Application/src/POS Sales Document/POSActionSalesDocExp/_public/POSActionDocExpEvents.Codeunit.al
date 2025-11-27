@@ -20,5 +20,14 @@ codeunit 6151367 "NPR POS Action Doc Exp Events"
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    procedure OnBeforeHandlePrepayment(SalesHeader: Record "Sales Header"; PrepaymentValue: Decimal; PrepaymentIsAmount: Boolean; var Print: Boolean; var Send: Boolean; var Pdf2Nav: Boolean; var SalePosting: Enum "NPR POS Sales Document Post"; PrepaymentManualLineControl: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnBeforeHandlePayAndPost(SalesHeader: Record "Sales Header"; var Print: Boolean; var Pdf2Nav: Boolean; var Send: Boolean; FullPosting: Boolean; var SalePosting: Enum "NPR POS Sales Document Post")
+    begin
+    end;
 
 }

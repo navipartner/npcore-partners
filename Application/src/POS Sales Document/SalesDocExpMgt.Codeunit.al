@@ -268,6 +268,7 @@
         CreatedSalesHeader := SalesHeader;
         Post := SalesHeader.Invoice or SalesHeader.Receive or SalesHeader.Ship;
 
+        SalesDocExpMgtPublic.OnBeforePost(SalesHeader, Post, AsyncPosting);
         if Post then begin
             if (not AsyncPosting) then begin
                 if Ask then
