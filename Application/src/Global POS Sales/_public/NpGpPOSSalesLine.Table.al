@@ -98,7 +98,7 @@
             DataClassification = CustomerContent;
             TableRelation = Location;
         }
-        field(230; Description; Text[80])
+        field(230; Description; Text[100])
         {
             Caption = 'Description';
             DataClassification = CustomerContent;

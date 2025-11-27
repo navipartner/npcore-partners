@@ -90,6 +90,39 @@ codeunit 6248268 "NPR NpGp Export to API"
             Error(EndpointErr, NpGpPOSSalesSetup."OData Base Url".TrimEnd('/') + '/pos/globalentry', GetLastErrorText());
     end;
 
+    procedure ManualExportPOSEntry(POSSalesSetupCode: Code[10])
+    var
+        NpGpPOSSalesSetup: Record "NPR NpGp POS Sales Setup";
+        NpGpExportLog: Record "NPR NpGp Export Log";
+        POSEntry: Record "NPR POS Entry";
+        POSEntryList: Page "NPR POS Entry List";
+        EntryAlreadyExportedErr: Label 'POS Entry No. %1 has already been exported successfully.', Comment = '%1 = Entry No.';
+        EntryExportedMsg: Label 'POS Entry No. %1 has been queued for export.', Comment = '%1 = Entry No.';
+        EntryNoMsg: Label 'You cannot manually export POS Entries with Entry No. higher than the Last exported POS Entry %1. Only skipped entries that require a correction can be manually exported, not future entries.', Comment = '%1 = Last exported POS Entry';
+    begin
+        NpGpPOSSalesSetup.Get(POSSalesSetupCode);
+        NpGpPOSSalesSetup.TestField("Use api");
+        NpGpPOSSalesSetup.TestField("OData Base Url");
+
+        POSEntryList.LookupMode := true;
+        if POSEntryList.RunModal() <> Action::LookupOK then
+            exit;
+        POSEntryList.GetRecord(POSEntry);
+
+        NpGpPOSSalesSetup.CalcFields("Last exported POS Entry");
+        if POSEntry."Entry No." > NpGpPOSSalesSetup."Last exported POS Entry" then
+            Error(EntryNoMsg, NpGpPOSSalesSetup."Last exported POS Entry");
+
+        NpGpExportLog.SetRange("POS Sales Setup Code", POSSalesSetupCode);
+        NpGpExportLog.SetRange("POS Entry No.", POSEntry."Entry No.");
+        if not NpGpExportLog.IsEmpty() then
+            Error(EntryAlreadyExportedErr, POSEntry."Entry No.");
+
+        NpGpExportLog := InsertLogEntry(POSSalesSetupCode, POSEntry."Entry No.");
+        ExportAndUpdateLogEntry(NpGpPOSSalesSetup, NpGpExportLog);
+        Message(EntryExportedMsg, POSEntry."Entry No.");
+    end;
+
     local procedure ExportNpGpPOSSalesSetup(NpGpPOSSalesSetup: Record "NPR NpGp POS Sales Setup")
     begin
         if not NpGpPOSSalesSetup."Use api" then
@@ -207,8 +240,8 @@ codeunit 6248268 "NPR NpGp Export to API"
 
     begin
         POSEntry.ReadIsolation(IsolationLevel::ReadCommitted);
-        if not POSEntry.Get(NpGpExportLog."POS Entry No.") then
-            exit;
+        POSEntry.Get(NpGpExportLog."POS Entry No.");
+
         if not (POSEntry."Entry Type" in [POSEntry."Entry Type"::"Direct Sale", POSEntry."Entry Type"::"Credit Sale"]) then
             exit;
 

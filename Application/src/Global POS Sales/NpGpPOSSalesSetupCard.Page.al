@@ -170,6 +170,23 @@
                         Error(GetLastErrorText());
                 end;
             }
+#if not (BC17 or BC18 or BC19 or BC20 or BC21 or BC22)
+            action("Manual Export POS Entry")
+            {
+                Caption = 'Manual Export POS Entry';
+                Image = ExportFile;
+                ToolTip = 'Manually export a specific POS Entry that was skipped or needs to be re-exported';
+                ApplicationArea = NPRRetail;
+                Visible = Rec."Use api";
+
+                trigger OnAction()
+                var
+                    NpGpExporttoAPI: Codeunit "NPR NpGp Export to API";
+                begin
+                    NpGpExporttoAPI.ManualExportPOSEntry(Rec.Code);
+                end;
+            }
+#endif
         }
     }
 
