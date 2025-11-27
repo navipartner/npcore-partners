@@ -19,7 +19,7 @@
         EncodedScope: Text;
         State: Integer;
 #ENDIF
-        AccessToken, TokenCache, AuthCodeError : Text;
+        AccessToken, RefreshToken, AuthCodeError : Text;
         AccesTokenMsg: Label 'Access token acquired.';
         FailErr: Label 'Acquire token failed. Error message: %1';
     begin
@@ -37,12 +37,12 @@
         AuthCode := NPROAuthControlAddIn.GetAuthCode();
         AuthCodeError := NPROAuthControlAddIn.GetAuthError();
         NPROAuthControlAddIn.SetTenant('common');
-        NPROAuthControlAddIn.RequestToken(AuthCode, RedirectURL, _GraphApiSetup."Client Id", _GraphApiSetup."Client Secret", AccessToken);
+        NPROAuthControlAddIn.RequestToken(AuthCode, RedirectURL, _GraphApiSetup."Client Id", _GraphApiSetup."Client Secret", AccessToken, RefreshToken);
 #ENDIF
         if (AccessToken = '') or (AuthCodeError <> '') then
             Error(FailErr, AuthCodeError);
 
-        SetAccessToken(EventExchIntEMail, AccessToken, GetRefreshTokenFromTokenCache(TokenCache));
+        SetAccessToken(EventExchIntEMail, AccessToken, RefreshToken);
 
         Message(AccesTokenMsg);
     end;
@@ -364,22 +364,6 @@
         JOResponse.ReadFrom(Response);
         JOResponse.SelectToken('userPrincipalName', JTEmail);
         Email := JTEmail.AsValue().AsText();
-    end;
-
-    local procedure GetRefreshTokenFromTokenCache(TokenCache: Text) RefreshToken: Text
-    var
-        Base64Convert: Codeunit "Base64 Convert";
-        TokenCacheCoverted: Text;
-        JOTokenCache: JsonObject;
-        JTRefreshToken, JTSecret : JsonToken;
-    begin
-        if TokenCache = '' then
-            exit('');
-        TokenCacheCoverted := Base64Convert.FromBase64(TokenCache);
-        JOTokenCache.ReadFrom(TokenCacheCoverted);
-        JOTokenCache.SelectToken('RefreshToken', JTRefreshToken);
-        JTRefreshToken.SelectToken('*.secret', JTSecret);
-        RefreshToken := JTSecret.AsValue().AsText();
     end;
 
     local procedure GetTestGraphAPISetup()

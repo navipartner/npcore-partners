@@ -92,6 +92,13 @@ page 6059982 "NPR OAuth ControlAddIn"
 
     internal procedure RequestToken(AuthCode: Text; RedirectUrl: Text; ClientId: Text; ClientSecret: Text; var AccessToken: Text)
     var
+        RefreshToken: Text;
+    begin
+        RequestToken(AuthCode, RedirectUrl, ClientId, ClientSecret, AccessToken, RefreshToken);
+    end;
+
+    internal procedure RequestToken(AuthCode: Text; RedirectUrl: Text; ClientId: Text; ClientSecret: Text; var AccessToken: Text; var RefreshToken: Text)
+    var
         TypeHelper: Codeunit "Type Helper";
         Client: HttpClient;
         Content: HttpContent;
@@ -120,6 +127,8 @@ page 6059982 "NPR OAuth ControlAddIn"
         ResponseJson := ParseResponseAsJson(ResponseMsg);
         if ResponseJson.SelectToken('access_token', TempToken) then
             AccessToken := TempToken.AsValue().AsText();
+        if ResponseJson.SelectToken('refresh_token', TempToken) then
+            RefreshToken := TempToken.AsValue().AsText();
     end;
 
     local procedure SetHeader(var Headers: HttpHeaders; Name: Text; Value: Text)
