@@ -46,13 +46,15 @@ service:
     findTicket:
       docs: >
         Retrieves ticket id and access details about a specific ticket or list of tickets,
-        depending on which query parameter is used.
-        Exactly one of `ticketId`, `externalNumber` or `notificationAddress` must be provided.
-        <br> - Filter using `ticketId`, `externalNumber` or `notificationAddress` to get a specific ticket or a list of tickets.
+        depending on which query parameter is used. 
+        If the value is not found, an empty list is returned. In case when a list of external numbers is provided,
+        all matching tickets are returned, including duplicates. Tickets not found are omitted from the result.
+        Leading and trailing spaces are ignored in the provided ticket numbers.
+        <br>Exactly one of `ticketId`, `externalNumbers` or `notificationAddress` must be provided.<br>
+        <br> - Filter using `ticketId`, `externalNumbers` or `notificationAddress` to get a specific ticket or a list of tickets.
         <br> - Use `externalNumbers` to find multiple tickets by their external numbers. (Separate the ticket number with a comma).
         <br> - Admission content and item descriptions can be included with `withAdmissionContent`.
         <br> - Access history summary is always included; use `withAccessHistoryDetails` to also include event-level events.
-        <br> - `withEvents` is deprecated and only honored for API versions before 2025-11-06; use `withAccessHistoryDetails` instead.
         <br> - `activeOnly` controls whether blocked/expired tickets are filtered out (defaults to `true` when omitted).
       display-name: Find Ticket
       method: GET
@@ -60,23 +62,22 @@ service:
       request:
         name: findTicket
         query-parameters:
-          externalNumber: optional<simpleTypes.TicketExternalNumber>
+          externalNumbers: optional<simpleTypes.TicketExternalNumbers>
           ticketId: optional<simpleTypes.TicketId>
           notificationAddress: optional<simpleTypes.NotificationAddress>
-          withEvents: optional<boolean>          # deprecated – only used for API versions < 2025-11-06
           withAdmissionContent: optional<boolean>
           withAccessHistoryDetails: optional<boolean>
           activeOnly: optional<boolean>
           storeCode: optional<simpleTypes.StoreCode>
       response: list<compositeTypes.FindTicketResponse>
       examples:
-        - name: ExampleFindTicketByExternalNumber
+        - name: Find tickets using external ticket numbers
           path-parameters:
             tenant: $globalApiTypes.tenant.Exampletenant
             environment: $globalApiTypes.environment.ExampleenvironmentProduction
             company: $globalApiTypes.Company.ExampleCompanyCronus
           query-parameters:
-            externalNumber: $simpleTypes.TicketExternalNumber.ExampleTicket1
+            externalNumbers: $simpleTypes.TicketExternalNumbers.ExampleTicket1
             withAdmissionContent: true
             withAccessHistoryDetails: true
             activeOnly: true

@@ -124,6 +124,13 @@ types:
       - name: ExampleTicketInvalid
         value: FOO123
 
+  TicketExternalNumbers:
+    type: string
+    docs: A list of unique identifiers of tickets, separated by commas
+    examples:
+      - name: ExampleTicket1
+        value: TICKET123,TICKET124
+
   PinCode:
     type: string
     docs: A pin code for the ticket, used for validation when rescheduling or revoking a confirmed ticket
