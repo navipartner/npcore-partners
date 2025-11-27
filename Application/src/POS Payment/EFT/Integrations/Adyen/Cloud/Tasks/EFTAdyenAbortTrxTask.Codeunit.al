@@ -26,7 +26,7 @@ codeunit 6184615 "NPR EFT Adyen Abort Trx Task" implements "NPR POS Background T
         if Parameters.ContainsKey('CalledFromActionWF') then
             Evaluate(CalledFromActionWF, Parameters.Get('CalledFromActionWF'));
 
-        GetEftTransactionRequestAndLogError(EntryNo, 10, 100, 'ExecuteBackgroundTask', EFTTransactionRequest);
+        GetEftTransactionRequestAndLogError(EntryNo, 20, 100, 'ExecuteBackgroundTask', EFTTransactionRequest);
 
         if CalledFromActionWF <> DataCollectionLbl then
             EFTSetup.FindSetup(EFTTransactionRequest."Register No.", EFTTransactionRequest."Original POS Payment Type Code");
@@ -70,7 +70,7 @@ codeunit 6184615 "NPR EFT Adyen Abort Trx Task" implements "NPR POS Background T
         if Parameters.ContainsKey('CalledFromActionWF') then
             Evaluate(CalledFromActionWF, Parameters.Get('CalledFromActionWF'));
 
-        GetEftTransactionRequestAndLogError(EntryNo, 10, 100, 'BackgroundTaskSuccessContinuation', EFTTransactionRequest);
+        GetEftTransactionRequestAndLogError(EntryNo, 20, 100, 'BackgroundTaskSuccessContinuation', EFTTransactionRequest);
 
         Evaluate(Completed, Results.Get('Completed'), 9);
         Logs := Results.Get('Logs');
@@ -111,7 +111,7 @@ codeunit 6184615 "NPR EFT Adyen Abort Trx Task" implements "NPR POS Background T
         if Parameters.ContainsKey('CalledFromActionWF') then
             Evaluate(CalledFromActionWF, Parameters.Get('CalledFromActionWF'));
 
-        GetEftTransactionRequestAndLogError(EntryNo, 10, 100, 'BackgroundTaskErrorContinuation', EFTTransactionRequest);
+        GetEftTransactionRequestAndLogError(EntryNo, 20, 100, 'BackgroundTaskErrorContinuation', EFTTransactionRequest);
 
         if CalledFromActionWF = DataCollectionLbl then
             EFTAdyenIntegration.WriteGenericDataCollectionLogEntry(EFTTransactionRequest."Entry No.", 'AbortTrxTaskError', StrSubstNo('Error: %1 \\Callstack: %2', ErrorText, ErrorCallStack))
@@ -139,7 +139,7 @@ codeunit 6184615 "NPR EFT Adyen Abort Trx Task" implements "NPR POS Background T
         if Parameters.ContainsKey('CalledFromActionWF') then
             Evaluate(CalledFromActionWF, Parameters.Get('CalledFromActionWF'));
 
-        GetEftTransactionRequestAndLogError(EntryNo, 10, 100, 'BackgroundTaskCancelled', EFTTransactionRequest);
+        GetEftTransactionRequestAndLogError(EntryNo, 20, 100, 'BackgroundTaskCancelled', EFTTransactionRequest);
 
         if CalledFromActionWF = DataCollectionLbl then
             EFTAdyenIntegration.WriteGenericDataCollectionLogEntry(EFTTransactionRequest."Entry No.", 'AbortTrxTaskCancelled', '')
