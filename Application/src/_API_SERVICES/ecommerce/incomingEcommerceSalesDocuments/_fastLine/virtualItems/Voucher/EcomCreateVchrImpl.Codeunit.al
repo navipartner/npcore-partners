@@ -276,10 +276,9 @@ codeunit 6248510 "NPR EcomCreateVchrImpl"
         NpRvVoucherEntry.SetFilter("Entry Type", '%1|%2', NpRvVoucherEntry."Entry Type"::"Issue Voucher", NpRvVoucherEntry."Entry Type"::"Top-up");
         NpRvVoucherEntry.SetRange("Voucher No.", NpRvSalesLine."Voucher No.");
         NpRvVoucherEntry.SetRange("Voucher Type", NpRvSalesLine."Voucher Type");
-        NpRvVoucherEntry.SetRange("External Document No.", SalesHeader."External Document No.");
+        NpRvVoucherEntry.SetRange("External Document No.", SalesHeader."NPR External Order No.");
         NpRvVoucherEntry.SetLoadFields("Document No.", "Document Line No.");
         IF NpRvVoucherEntry.FindFirst() then begin
-            //  NpRvVoucherEntry."Posting Date" := NpRvSalesLine."Sale Date";
             NpRvVoucherEntry."Document No." := SalesInvLine."Document No.";
             NpRvVoucherEntry."Document Line No." := SalesInvLine."Line No.";
             NpRvVoucherEntry.Modify();

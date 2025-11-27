@@ -117,7 +117,7 @@ codeunit 6248646 "NPR EcomCaptureImpl"
         PaymentLine."Account No." := PaymentMethod."Bal. Account No.";
         PaymentLine."No." := CopyStr(EcomSalesPmtLine."Payment Reference", 1, MaxStrLen(PaymentLine."No."));
         PaymentLine."Transaction ID" := EcomSalesPmtLine."Payment Reference";
-        PaymentLine."Posting Date" := EcomSalesHeader."Created Date";
+        PaymentLine."Posting Date" := EcomSalesHeader."Received Date";
         PaymentLine."Source Table No." := DATABASE::"Payment Method";
         PaymentLine."Source No." := PaymentMethod.Code;
         if AmountToCapture > EcomSalesPmtLine.Amount then
@@ -142,7 +142,7 @@ codeunit 6248646 "NPR EcomCaptureImpl"
         PaymentLine."NPR Inc Ecom Sales Pmt Line Id" := EcomSalesPmtLine.SystemId;
         PaymentLine."NPR Inc Ecom Sale Id" := EcomSalesHeader.SystemId;
         if PaymentMapping."Captured Externally" then
-            PaymentLine."Date Captured" := EcomSalesHeader."Created Date";
+            PaymentLine."Date Captured" := EcomSalesHeader."Received Date";
 
         EcomVirtualItemEvents.OnBeforeInsertPaymentLinePaymentMethod(PaymentLine, EcomSalesHeader, EcomSalesPmtLine);
         PaymentLine.Insert(true);
