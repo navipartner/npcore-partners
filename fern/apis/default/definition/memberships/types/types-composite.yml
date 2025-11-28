@@ -451,6 +451,27 @@ types:
           autoRenewalActivated: false
           attributes: []
 
+  MemberEntityBasicRequest:
+    docs: 
+    # Use this DTO to create or update a member
+      The MemberEntityBasicRequest defines the basic properties required to create or update a Member.
+    properties:
+      firstName: optional<simpleTypes.FirstName>
+      middleName: optional<simpleTypes.MiddleName>
+      lastName: optional<simpleTypes.LastName>
+      address: optional<simpleTypes.Address>
+      postCode: optional<simpleTypes.PostCode>
+      city: optional<simpleTypes.City>
+      country: optional<simpleTypes.Country>
+      birthday: optional<simpleTypes.Birthday>
+      gender: optional<simpleTypes.Gender>
+      newsletter: optional<simpleTypes.Newsletter>
+      phoneNo: optional<simpleTypes.PhoneNo>
+      email: optional<simpleTypes.Email>
+      preferredLanguage: optional<simpleTypes.PreferredLanguage>
+      storeCode: optional<simpleTypes.StoreCode>
+      attributes: optional<list<attributeTypes.SetAttributeValue>>  
+
   MemberEntityBasic:
     docs: 
       The MemberEntityBasic defines the basic properties required on a Member. 
@@ -476,7 +497,7 @@ types:
       # Use this DTO to create or update a member without including their associated memberships or cards.
       The MemberEntityRequest defines the basic properties required to create or update a Member. 
     extends:
-      MemberEntityBasic
+      MemberEntityBasicRequest
     properties:
       gdprConsent: optional<simpleTypes.GDPRConsent>
       preassignedContactNumber: optional<simpleTypes.PreassignedContactNumber>
