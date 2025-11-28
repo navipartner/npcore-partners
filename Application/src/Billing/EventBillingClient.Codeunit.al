@@ -24,7 +24,7 @@ codeunit 6248217 "NPR Event Billing Client"
         CustDimErrorReasonCodeTok: Label 'ReasonCode', Locked = true;
         CustDimErrorReasonTextTok: Label 'ReasonText', Locked = true;
         CustDimensionOperationTok: Label 'Operation', Locked = true;
-        NumberOfDateToCheckInvalidErr: Label 'Number of days without processing must be greater than 0.';
+        NumberOfHoursToCheckInvalidErr: Label 'Number of hours without processing must be greater than 0.';
 
     #region === Register Event in BC Database (public) ===
     /// <summary>
@@ -184,16 +184,17 @@ codeunit 6248217 "NPR Event Billing Client"
     /// <summary>
     /// Checks if there are any pending billing changes that need to be processed.
     /// </summary>
-    /// <param name="OlderThanNumberOfDays">Number of days that will be ignored. The search will happen the days before it. 
+    /// <param name="OlderThanNumberOfHours">Number of hours that will be ignored. The search will happen the hours before it. 
     /// For value 0 the filter is ignored.</param>
     /// <returns>True if there are pending changes, otherwise false.</returns>
-    procedure HasPendingChanges(OlderThanNumberOfDays: Integer): Boolean
+    procedure HasPendingChanges(OlderThanNumberOfHours: Integer): Boolean
     var
         BillingQueueEntry: Record "NPR Billing Queue Entry";
         DateTimeRangeToCheck: DateTime;
+        HourDuration: Duration;
     begin
-        if (OlderThanNumberOfDays < 0) then
-            Error(NumberOfDateToCheckInvalidErr);
+        if (OlderThanNumberOfHours < 1) then
+            Error(NumberOfHoursToCheckInvalidErr);
 
         InitSessionVars();
 
@@ -202,8 +203,9 @@ codeunit 6248217 "NPR Event Billing Client"
         BillingQueueEntry.SetCurrentKey(Status, "Is Production Environment", SystemCreatedAt);
         BillingQueueEntry.SetRange(Status, BillingQueueEntry.Status::Pending);
         BillingQueueEntry.SetRange("Is Production Environment", IsProductionEnvironment);
-        if (OlderThanNumberOfDays > 0) then begin
-            DateTimeRangeToCheck := CreateDateTime(CalcDate(StrSubstNo('<-%1D>', OlderThanNumberOfDays), Today()), 0T);
+        if (OlderThanNumberOfHours > 0) then begin
+            HourDuration := OlderThanNumberOfHours * (1000 * 60 * 60);
+            DateTimeRangeToCheck := CurrentDateTime() - HourDuration;
             BillingQueueEntry.SetFilter(SystemCreatedAt, '<%1', DateTimeRangeToCheck);
         end;
 

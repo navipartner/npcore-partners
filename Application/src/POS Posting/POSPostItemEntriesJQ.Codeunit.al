@@ -52,7 +52,7 @@ codeunit 6059770 "NPR POS Post Item Entries JQ"
     var
         BillingDataSenderJQ: Codeunit "NPR Billing Data Sender JQ";
     begin
-        BillingDataSenderJQ.CheckNonRunningTaskViaJQAndProcess(true, 3);
+        BillingDataSenderJQ.CheckNonRunningTaskViaJQAndProcess(true, 1);
     end;
 #endif
 }

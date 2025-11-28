@@ -7,14 +7,14 @@ codeunit 6060051 "NPR Billing Data Sender JQ"
         tabledata "Job Queue Log Entry" = R;
 
     var
-        NumberOfDateToCheckInvalidErr: Label 'Number of days without processing must be greater than 0.';
+        NumberOfHoursToCheckInvalidErr: Label 'Number of hours without processing must be greater than 0.';
 
     trigger OnRun()
     begin
         ForwardDataToBillingDatabase();
     end;
 
-    procedure CheckNonRunningTaskViaJQAndProcess(AsBackgroundTask: Boolean; NumberOfDaysWithoutProcessing: Integer) RetVal: Boolean
+    procedure CheckNonRunningTaskViaJQAndProcess(AsBackgroundTask: Boolean; NumberOfHoursWithoutProcessing: Integer) RetVal: Boolean
     var
         JobQueueEntry: Record "Job Queue Entry";
         JobQueueLogEntry: Record "Job Queue Log Entry";
@@ -22,14 +22,16 @@ codeunit 6060051 "NPR Billing Data Sender JQ"
         LogCustDims: Dictionary of [Text, Text];
         DateTimeRangeToCheck: DateTime;
         SessionId: Integer;
+        HourDuration: Duration;
     begin
-        if (NumberOfDaysWithoutProcessing < 1) then
-            Error(NumberOfDateToCheckInvalidErr);
+        if (NumberOfHoursWithoutProcessing < 1) then
+            Error(NumberOfHoursToCheckInvalidErr);
 
-        if (not BillingClient.HasPendingChanges(NumberOfDaysWithoutProcessing)) then
+        if (not BillingClient.HasPendingChanges(NumberOfHoursWithoutProcessing)) then
             exit(true);
 
-        DateTimeRangeToCheck := CreateDateTime(CalcDate(StrSubstNo('<-%1D>', NumberOfDaysWithoutProcessing), Today()), 0T);
+        HourDuration := NumberOfHoursWithoutProcessing * (1000 * 60 * 60);
+        DateTimeRangeToCheck := CurrentDateTime() - HourDuration;
 
         JobQueueLogEntry.ReadIsolation := JobQueueLogEntry.ReadIsolation::ReadCommitted;
         JobQueueLogEntry.Reset();
