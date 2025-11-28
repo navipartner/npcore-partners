@@ -8,6 +8,13 @@ types:
       - name: ExampleCouponId
         value: "77a1b3c2-d5e6-f7a8-b9c0-d1e2f3a4b5c6"
 
+  DocumentNo:
+    type: string
+    docs: Transaction number where the coupon is applied.
+    examples:
+      - name: ExampleDocumentNo
+        value: "EXT-WEB-01"
+
   CouponStatus:
     docs: The current status of the coupon.
     enum:
@@ -115,3 +122,169 @@ types:
       reason:
         type: string
         docs: The reason for voiding.
+
+  ApplyCouponDiscount:
+    docs: The request body used for applying coupon discount.
+    properties:
+      documentNo:
+        type: string
+        docs: The document number which links coupon to specific transaction.
+      posSalesLines: list<posSalesLineDTO>
+      discountCoupons: list<discountCouponDTO>
+    examples:
+      - name: ExampleApplyCouponDiscountDTO
+        value:         
+          documentNo: "EXT-WEB-01"
+          posSalesLines: 
+            - $posSalesLineDTO.ExamplePosSalesLineDTO
+          discountCoupons:
+            - $discountCouponDTO.ExampleDiscountCouponDTO
+
+  ReserveCouponRequest:
+    docs: The request body for reserving the coupon.
+    properties:  
+      documentNo:
+        type: string
+        docs: The document number which links coupon to specific transaction.    
+    examples:
+      - name: ExampleReserveCoupon
+        value:         
+          documentNo: "EXT-WEB-01"
+
+  posSalesLineDTO:
+    properties:
+      lineNo: string
+      itemNo: string
+      variantCode: optional<string>
+      description: optional<string>
+      description2: optional<string>
+      unitPriceInclVat: double
+      quantity: double
+      unitOfMeasure: optional<string>
+      discountPct: optional<double>
+      discountAmount: optional<double>
+      vatPercent: double
+      lineAmountInclVat: double
+      magentoBrand: optional<string>
+    examples:
+      - name: ExamplePosSalesLineDTO
+        value:
+          lineNo: "10000"
+          itemNo: "ITEM-001"
+          variantCode: "RED"
+          description: "Red T-shirt"
+          description2: "Limited Edition"
+          unitPriceInclVat: 199.99
+          quantity: 2
+          unitOfMeasure: "PCS"
+          discountPct: 10.0
+          discountAmount: 0
+          vatPercent: 25.0
+          lineAmountInclVat: 359.99
+          magentoBrand: "BrandX" 
+
+  discountCouponDTO:
+    properties:
+      referenceNo: string
+    examples:
+      - name: ExampleDiscountCouponDTO
+        value: 
+          referenceNo: "C100009-TC"
+
+  ResponseApplyCouponDiscountDTO:
+    docs: The response body returned after applying coupon discount.
+    properties:
+      documentNo:
+        type: string
+        docs: The document number which links coupon to specific transaction.
+      posSalesLines: list<posSalesLineDTO>
+    examples:
+      - name: ExampleApplyCouponDiscountDTO
+        value:         
+          documentNo: "EXT-WEB-01"
+          posSalesLines: 
+            - $posSalesLineDTO.ExamplePosSalesLineDTO
+
+  ResponseCheckCouponDTO:
+    properties:
+      couponId:
+        type: string
+        docs:  The unique identifier of the coupon..
+      documentNo:
+        type: string
+        docs: The document number which links coupon to specific transaction.
+      referenceNo:
+        type: string
+        docs: A unique, human-readable reference number, often used for barcodes.
+      couponType:
+        type: string
+        docs: The type of coupon, which carries the setup in NP Retail.
+      description:
+        type: string
+        docs: A short description of the coupon and its intended use..
+      startingDate:
+        type: datetime
+        docs: The date and time when the coupon becomes valid.
+      endingDate:
+        type: datetime
+        docs: The date and time when the coupon expires.
+      open:
+        type: boolean
+        docs: Indicates whether the coupon is currently active and available for use.
+      maxUsePerSale:
+        type: integer
+        docs: The maximum number of times this coupon can be applied in a single sale or transaction.
+      remainingQuantity:
+        type: double
+        docs: The number of uses left for this coupon.
+      inUseQuantity:
+        type: integer
+        docs: The number of times the coupon is currently being used in active transactions.
+    examples:
+      - name: ExampleCheckCouponDTOResponse
+        value:
+          couponId: "{9D0CFD99-FA87-F011-B3A4-9453539B9919}"
+          documentNo: "EXT-WEB-01"
+          referenceNo: "C100007-VQ"
+          couponType: "20%OFF"
+          description: "20%OFF coupon on all item"
+          startingDate: "2019-06-30T22:00:00Z"
+          endingDate: "2019-08-30T22:00:00Z"
+          open: true
+          maxUsePerSale: 3
+          remainingQuantity: 3.0
+          inUseQuantity: 1
+
+
+  ResponseReserveCoupon:
+    docs: The response body returned after reserving coupon.
+    properties:
+      reservation: responseReserveCouponDTO
+    examples:
+      - name: ExampleResponseReserveCoupon
+        value:
+          reservation: $responseReserveCouponDTO.ExampleResponseReserveCouponDTO
+
+  responseReserveCouponDTO:
+    properties:
+      referenceNo: string
+      documentNo: string
+      couponType: string
+      description: string
+      startingDate: datetime
+      endingDate: datetime
+      open: boolean
+      remainingQuantity: double
+      inUseQuantity: integer
+    examples:
+      - name: ExampleResponseReserveCouponDTO
+        value:
+          referenceNo: "C100009-TC"
+          documentNo: "EXT-WEB-01"
+          couponType: "20%OFF"
+          description: "20%OFF coupon on all item"
+          startingDate: "2019-06-30T22:00:00Z"
+          endingDate: "2019-08-30T22:00:00Z"
+          open: true
+          remainingQuantity: 3.0
+          inUseQuantity: 3

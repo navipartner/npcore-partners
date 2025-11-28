@@ -67,3 +67,90 @@ service:
             id: $couponTypes.CouponId.ExampleCouponId
           request:
             reason: "Voided to refund points"
+
+    applyCouponDiscount:
+      display-name: Apply Coupon Discount
+      docs: Applies coupon discount.
+      method: POST
+      path: /apply
+      request: couponTypes.ApplyCouponDiscount
+      response:
+        type: couponTypes.ResponseApplyCouponDiscountDTO
+        status-code: 200
+      availability: pre-release
+      examples:
+        - name: "Create a new coupon"
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          request: $couponTypes.ApplyCouponDiscount.ExampleApplyCouponDiscountDTO
+          response:
+            body: $couponTypes.ResponseApplyCouponDiscountDTO.ExampleApplyCouponDiscountDTO
+
+    checkCouypon:
+      display-name: Check Coupon
+      docs: Checks coupon availability.
+      method: POST
+      path: /check/{couponId}
+      path-parameters:
+        couponId: couponTypes.CouponId
+      response:
+        type: couponTypes.ResponseCheckCouponDTO
+        status-code: 200
+      availability: pre-release
+      examples:
+        - name: "Check coupon availability"
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            couponId: $couponTypes.CouponId.ExampleCouponId
+          response:
+            body: $couponTypes.ResponseCheckCouponDTO.ExampleCheckCouponDTOResponse
+
+    reserveCoupon:
+      display-name: Reserve Coupon
+      docs: Reserve coupon for a specific transaction.
+      method: POST
+      path: /{couponId}/reservation
+      path-parameters:
+        couponId: couponTypes.CouponId
+      request: couponTypes.ReserveCouponRequest
+      response:
+        type: couponTypes.ResponseReserveCoupon
+        status-code: 200
+      availability: pre-release
+      examples:
+        - name: "Reserve coupon."
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            couponId: $couponTypes.CouponId.ExampleCouponId
+          request: $couponTypes.ReserveCouponRequest.ExampleReserveCoupon
+          response:
+            body: $couponTypes.ResponseReserveCoupon.ExampleResponseReserveCoupon
+
+    cancelCouponReservation:
+      display-name: Cancel Coupon Reservation
+      docs: Cancels a previously reserved coupon for a specific transaction.
+      method: POST
+      path: /reservation/{documentNo}/{couponId}
+      path-parameters:
+        documentNo: couponTypes.DocumentNo
+        couponId: couponTypes.CouponId
+      response:
+        type: couponTypes.ResponseReserveCoupon
+        status-code: 200
+      availability: pre-release
+      examples:
+        - name: "Cancel coupon reservation."
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+            documentNo: $couponTypes.DocumentNo.ExampleDocumentNo
+            couponId: $couponTypes.CouponId.ExampleCouponId
+          response:
+            body: $couponTypes.ResponseReserveCoupon.ExampleResponseReserveCoupon

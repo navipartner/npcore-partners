@@ -16,6 +16,18 @@ codeunit 6248526 "NPR CouponAPI" implements "NPR API Request Handler"
 
         if (Request.Match('DELETE', '/coupon/:couponId')) then
             exit(Handle(_ApiFunction::DELETE_COUPON, Request));
+
+        if (Request.Match('POST', '/coupon/apply')) then
+            exit(Handle(_ApiFunction::APPLY_COUPON_DISCOUNT, Request));
+
+        if (Request.Match('POST', '/coupon/check/:couponId')) then
+            exit(Handle(_ApiFunction::CHECK_COUPON, Request));
+
+        if (Request.Match('POST', '/coupon/:couponId/reservation')) then
+            exit(Handle(_ApiFunction::RESERVE_COUPON, Request));
+
+        if (Request.Match('POST', '/coupon/reservation/:documentNo/:couponId')) then
+            exit(Handle(_ApiFunction::CANCEL_COUPON_RESERVATION, Request));
     end;
 
     local procedure Handle(ApiFunction: Enum "NPR CouponApiFunctions"; var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"

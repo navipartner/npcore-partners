@@ -19,5 +19,21 @@ enum 6059843 "NPR CouponApiFunctions"
     {
         Caption = 'Delete Coupon using ID';
     }
+    value(13; APPLY_COUPON_DISCOUNT)
+    {
+        Caption = 'Apply coupon discount';
+    }
+    value(14; CHECK_COUPON)
+    {
+        Caption = 'Check coupon';
+    }
+    value(15; RESERVE_COUPON)
+    {
+        Caption = 'Reserve coupon';
+    }
+    value(16; CANCEL_COUPON_RESERVATION)
+    {
+        Caption = 'Cancel coupon reservation';
+    }
 }
 #endif
