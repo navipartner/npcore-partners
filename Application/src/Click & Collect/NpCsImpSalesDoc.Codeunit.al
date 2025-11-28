@@ -221,11 +221,13 @@
         CustNo: Code[20];
         ConfigTemplateCode: Code[10];
         PrevRec: Text;
+        NewCustomer: Boolean;
     begin
         if not FindCustomer(Element, Customer) then begin
             Customer.Init();
             Customer."No." := '';
             Customer.Insert(true);
+            NewCustomer := true;
         end;
 
         StoreCode := GetFromStoreCode(Element);
@@ -236,8 +238,10 @@
             NpCsDocumentMapping.Modify(true);
         end;
 
-        PrevRec := Format(Customer);
+        If SkipCustomerUpdate(Customer, NewCustomer, Element) then
+            exit;
 
+        PrevRec := Format(Customer);
         ConfigTemplateCode := CopyStr(NpXmlDomMgt.GetElementCode(Element, 'sell_to_customer/config_template', MaxStrLen(ConfigTemplateHeader.Code), false), 1, MaxStrLen(ConfigTemplateHeader.Code));
         if (ConfigTemplateCode <> '') and ConfigTemplateHeader.Get(ConfigTemplateCode) then begin
             RecRef.GetTable(Customer);
@@ -708,6 +712,15 @@
         end;
 
         exit(Callback);
+    end;
+
+    local procedure SkipCustomerUpdate(var Customer: Record Customer; NewCustomer: Boolean; Element: XmlElement): Boolean
+    var
+        ClickCollect: Codeunit "NPR Click & Collect";
+        Skip: Boolean;
+    begin
+        ClickCollect.OnSkipCustomerUpsertOnCollectOrderImport(Customer, NewCustomer, Element, Skip);
+        exit(Skip);
     end;
 }
 

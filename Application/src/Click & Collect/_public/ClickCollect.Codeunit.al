@@ -145,4 +145,9 @@ codeunit 6059847 "NPR Click & Collect"
     internal procedure InsertArchCollectDocumentOnBeforeInsert(NpCsDocument: Record "NPR NpCs Document"; var NpCsArchDocument: Record "NPR NpCs Arch. Document")
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnSkipCustomerUpsertOnCollectOrderImport(var Customer: Record Customer; var NewCustomer: Boolean; Element: XmlElement; var Skip: Boolean)
+    begin
+    end;
 }
