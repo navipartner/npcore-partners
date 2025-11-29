@@ -53,6 +53,9 @@ report 6014453 "NPR RS Fiscal Bill A4 v1"
                 column(CompanyInformationBlock; CompanyInformationBlock)
                 {
                 }
+                column(CustomerInformationBlock; CustomerInformationBlock)
+                {
+                }
                 column(ESIRBlock; ESIRBlock)
                 {
                 }
@@ -122,6 +125,7 @@ report 6014453 "NPR RS Fiscal Bill A4 v1"
                 if StrLen("NPR RS POS Audit Log Aux. Info".GetTextFromJournal()) = 0 then
                     Error(RSAuditNotFiscalisedErrLbl, "NPR RS POS Audit Log Aux. Info"."Audit Entry No.");
                 ParseJournalTextToFields("NPR RS POS Audit Log Aux. Info".GetTextFromJournal());
+                CustomerInformationBlock := GetCustomerInformation();
 #if not BC17
                 QRCode := GenerateQRCode("NPR RS POS Audit Log Aux. Info");
 #endif
@@ -251,6 +255,75 @@ report 6014453 "NPR RS Fiscal Bill A4 v1"
         ReturnText += PrintText.Get(5) + NewLine;
         ReturnText += PrintText.Get(6) + NewLine;
         exit(ReturnText);
+    end;
+
+    local procedure GetCustomerInformation() ReturnText: Text
+    var
+        POSEntry: Record "NPR POS Entry";
+        SalesHeader: Record "Sales Header";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        SalesCrMemoHeader: Record "Sales Cr.Memo Header";
+    begin
+        case RSAuditEntryType of
+            RSAuditEntryType::"POS Entry":
+                if POSEntry.Get(POSEntryNo) then
+                    ReturnText := GetCustomerInformation(POSEntry."Customer No.");
+            RSAuditEntryType::"Sales Header":
+                if SalesHeader.Get(DocumentType, DocumentNo) then
+                    ReturnText := GetCustomerInformation(SalesHeader."Bill-to Customer No.");
+            RSAuditEntryType::"Sales Invoice Header":
+                if SalesInvoiceHeader.Get(DocumentNo) then
+                    ReturnText := GetCustomerInformation(SalesInvoiceHeader."Bill-to Customer No.");
+            RSAuditEntryType::"Sales Cr.Memo Header":
+                if SalesCrMemoHeader.Get(DocumentNo) then
+                    ReturnText := GetCustomerInformation(SalesCrMemoHeader."Bill-to Customer No.");
+        end;
+    end;
+
+    local procedure GetCustomerInformation(CustomerNo: Code[20]) ReturnText: Text
+    var
+        Customer: Record Customer;
+    begin
+        if CustomerNo = '' then
+            exit('');
+        if not Customer.Get(CustomerNo) then
+            exit('');
+        if Customer.Name <> '' then
+            AppendNewLineText(ReturnText, Customer.Name);
+        if Customer."Address" <> '' then
+            AppendNewLineText(ReturnText, Customer."Address");
+        if (Customer."Post Code" <> '') and (Customer.City <> '') then
+            AppendNewLineText(ReturnText, Customer."Post Code" + ', ' + Customer.City);
+        if Customer."VAT Registration No." <> '' then
+            AppendNewLineText(ReturnText, VATRegNoLbl + Customer."VAT Registration No.")
+        else
+            AppendCustomerAdditionalInformation(ReturnText);
+    end;
+
+    local procedure AppendNewLineText(var ReturnText: Text; TextToAppend: Text)
+    var
+        NewLine: Text;
+    begin
+        NewLine := PrintNewLine();
+        if ReturnText <> '' then
+            ReturnText += NewLine;
+        ReturnText += TextToAppend;
+    end;
+
+    local procedure AppendCustomerAdditionalInformation(var CustomerInfoText: Text)
+    var
+        NewLine: Text;
+    begin
+        NewLine := PrintNewLine();
+
+        if "NPR RS POS Audit Log Aux. Info"."Customer Identification" <> '' then
+            if StrLen(Format("NPR RS POS Audit Log Aux. Info"."Customer Identification").TrimStart('10:')) = StrLen(Format("NPR RS POS Audit Log Aux. Info"."Customer Identification")) then
+                AppendNewLineText(CustomerInfoText, Format("NPR RS POS Audit Log Aux. Info"."Customer Identification"))
+            else
+                AppendNewLineText(CustomerInfoText, VATRegNoLbl + Format("NPR RS POS Audit Log Aux. Info"."Customer Identification").TrimStart('10:'));
+
+        if "NPR RS POS Audit Log Aux. Info"."Additional Customer Field" <> '' then
+            AppendNewLineText(CustomerInfoText, "NPR RS POS Audit Log Aux. Info"."Additional Customer Field");
     end;
 
     local procedure GetESIRBlockFromJournalText(PrintTextList: List of [Text]; EndIndex: Integer): Text
@@ -410,7 +483,7 @@ report 6014453 "NPR RS Fiscal Bill A4 v1"
         exit(ReturnText);
     end;
 
-#if not BC17  
+#if not BC17
     local procedure GenerateQRCode(RSPOSAuditLogAuxInfo: Record "NPR RS POS Audit Log Aux. Info"): Text
     var
         BarcodeFontProviderMgt: Codeunit "NPR Barcode Font Provider Mgt.";
@@ -479,6 +552,7 @@ report 6014453 "NPR RS Fiscal Bill A4 v1"
         CompanyPhoneCaptionLbl: Label 'Phone:', Locked = true;
         DiscountAmountLblCaption: Label 'Износ попуста: ', Locked = true;
         DiscountLblCaption: Label 'ОСТВАРИЛИ СТЕ ПОПУСТ', Locked = true;
+        VATRegNoLbl: Label 'ПИБ: ', Locked = true;
         DiscountLineLbl: Label '------------------------------------------', Locked = true;
         DottedLineLbl: Label '----------------------------------------', Locked = true;
         ItemsLineLbl: Label '========================================', Locked = true;
@@ -487,6 +561,7 @@ report 6014453 "NPR RS Fiscal Bill A4 v1"
         RegexLineWithOnlyNumberPatternLbl: Label '^[^a-zA-Z]*$', Locked = true;
         Barcode: Text;
         CompanyInformationBlock: Text;
+        CustomerInformationBlock: Text;
         DiscountAmount: Text;
         ESIRBlock: Text;
         FiscalBegginingText: Text;
