@@ -99,6 +99,7 @@ service:
         name: getCardNumber
         query-parameters:
           cardNumber: simpleTypes.CardNumber
+          withDetails: optional<CardQueryWithDetails>
       response: GetCardNumberResponse
       examples:
         - name: Get Card using Number
@@ -400,3 +401,7 @@ types:
       - name: ExamplePatchedCard
         value:
           card: $compositeTypes.MemberCardEntity.ExampleMemberCard
+
+  CardQueryWithDetails:
+    type: boolean
+    docs: Set to true will include more detailed information in the response

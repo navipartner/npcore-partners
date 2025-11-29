@@ -7,12 +7,17 @@ codeunit 6248223 "NPR MemberCardApiAgent"
     var
         MemberCard: Record "NPR MM Member Card";
         ResponseJson: Codeunit "NPR JSON Builder";
+        RespondWithDetails: Boolean;
     begin
         if (not GetByCardNumber(Request, MemberCard)) then
             exit(Response.RespondBadRequest('Card not found'));
 
+        RespondWithDetails := false;
+        if (Request.QueryParams().ContainsKey('withDetails')) then
+            RespondWithDetails := (Request.QueryParams().Get('withDetails').ToLower() in ['true', '1']);
+
         ResponseJson.StartObject()
-            .AddObject(StartMemberCardDTO(ResponseJson, MemberCard, false, false))
+            .AddObject(StartMemberCardDTO(ResponseJson, MemberCard, RespondWithDetails, RespondWithDetails))
             .EndObject();
 
         exit(Response.RespondOK(ResponseJson.Build()));

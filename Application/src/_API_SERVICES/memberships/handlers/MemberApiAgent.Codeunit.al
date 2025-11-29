@@ -8,27 +8,39 @@ codeunit 6248220 "NPR MemberApiAgent"
         Member: Record "NPR MM Member";
         ResponseJson: Codeunit "NPR JSON Builder";
         BirthDay: Date;
+        RespondWithDetails: Boolean;
         MaxMemberCount, MemberCount : Integer;
     begin
 
         if (Request.QueryParams().ContainsKey('memberNumber')) then
             Member.SetFilter("External Member No.", '=%1', CopyStr(UpperCase(Request.QueryParams().Get('memberNumber')), 1, MaxStrLen(Member."External Member No.")));
 
+        if (Request.QueryParams().ContainsKey('firstName')) then
+            Member.SetFilter("First Name", '%1', '@' + CopyStr(Request.QueryParams().Get('firstName'), 1, MaxStrLen(Member."First Name")));
+
         if (Request.QueryParams().ContainsKey('lastName')) then
-            Member.SetFilter("Last Name", '=%1', CopyStr(Request.QueryParams().Get('lastName'), 1, MaxStrLen(Member."Last Name")));
+            Member.SetFilter("Last Name", '%1', '@' + CopyStr(Request.QueryParams().Get('lastName'), 1, MaxStrLen(Member."Last Name")));
 
         if (Request.QueryParams().ContainsKey('birthday')) then begin
-            if (not Evaluate(BirthDay, Request.QueryParams().Get('birthday'))) then
+            if (not Evaluate(BirthDay, Request.QueryParams().Get('birthday'), 9)) then // ISO 8601 format
                 exit(Response.RespondBadRequest('Invalid birthday format'));
             Member.SetFilter("Birthday", '=%1', BirthDay);
         end;
+
         if (Request.QueryParams().ContainsKey('email')) then
             Member.SetFilter("E-Mail Address", '=%1', CopyStr(LowerCase(Request.QueryParams().Get('email')), 1, MaxStrLen(Member."E-Mail Address")));
 
         if (Request.QueryParams().ContainsKey('phone')) then
-            Member.SetFilter("Phone No.", '=%1', CopyStr(Request.QueryParams().Get('phone'), 1, MaxStrLen(Member."Phone No.")));
+            Member.SetFilter("Phone No.", '%1', CopyStr(Request.QueryParams().Get('phone'), 1, MaxStrLen(Member."Phone No.")));
 
-        MaxMemberCount := 10;
+        RespondWithDetails := false;
+        if (Request.QueryParams().ContainsKey('withDetails')) then
+            RespondWithDetails := (Request.QueryParams().Get('withDetails').ToLower() in ['true', '1']);
+
+        if (Member.GetFilters() = '') then
+            exit(Response.RespondBadRequest('At least one query parameter must be provided to find members'));
+
+        MaxMemberCount := 50;
         if (Request.QueryParams().ContainsKey('limit')) then begin
             if (not Evaluate(MaxMemberCount, Request.QueryParams().Get('limit'))) then
                 exit(Response.RespondBadRequest('Invalid limit format'));
@@ -37,17 +49,16 @@ codeunit 6248220 "NPR MemberApiAgent"
             if (MaxMemberCount > 100) then
                 exit(Response.RespondBadRequest('Limit value is too high'));
         end;
-        ResponseJson.StartObject().StartArray('members');
 
+        ResponseJson.StartObject().StartArray('members');
         if (Member.FindSet()) then begin
-            MemberCount := 0;
             repeat
-                ResponseJson.AddObject(StartAnonymousMemberDTO(ResponseJson, Member));
+                ResponseJson.AddObject(StartAnonymousMemberDTO(ResponseJson, Member, RespondWithDetails));
                 MemberCount += 1;
             until (Member.Next() = 0) or (MemberCount >= MaxMemberCount);
         end;
-
         ResponseJson.EndArray().EndObject();
+
         exit(Response.RespondOK(ResponseJson.Build()));
 
     end;
@@ -727,10 +738,11 @@ codeunit 6248220 "NPR MemberApiAgent"
     end;
 
 
-    local procedure StartAnonymousMemberDTO(var ResponseJson: Codeunit "NPR JSON Builder"; var Member: Record "NPR MM Member"): Codeunit "NPR JSON Builder"
+    local procedure StartAnonymousMemberDTO(var ResponseJson: Codeunit "NPR JSON Builder"; var Member: Record "NPR MM Member"; WithDetails: Boolean): Codeunit "NPR JSON Builder"
     begin
         ResponseJson.StartObject()
             .AddObject(MemberDTO(ResponseJson, Member))
+            .AddArray(MembershipsDTO(ResponseJson, Member."Entry No.", WithDetails))
             .EndObject();
     end;
 

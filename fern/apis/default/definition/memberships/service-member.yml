@@ -190,8 +190,12 @@ service:
     
     findMembers:
       docs: 
-         Search for members based on various criteria such as name, birth date, email, phone number, or card number. 
-         This endpoint allows you to perform a flexible search and return a list of members that match the provided criteria.
+        "Search for members by name, birth date, email, phone number, or card number. 
+        At least one filtering parameter is required. 
+        First and last name support wildcards (* and ?) and are case-insensitive. 
+        Use limit to cap results (default 50, max 100). If more members match than the limit, only the first limit matches are returned; overflow is not indicated. 
+        The result set is not ordered.
+        Performance note: some fields may not be indexed, so broad or unbounded queries can be slower — prefer specific values and reasonable limits."
       display-name: Find Members
       method: GET
       path: /member
@@ -199,13 +203,13 @@ service:
         name: findMembers
         query-parameters:
           memberNumber: optional<simpleTypes.MemberNumber>
-          #firstName: optional<simpleTypes.FirstName>
+          firstName: optional<simpleTypes.FirstName>
           lastName: optional<simpleTypes.LastName>
           birthDate: optional<simpleTypes.Birthday>
           email: optional<simpleTypes.Email>
           phone: optional<simpleTypes.PhoneNo>
           limit: optional<simpleTypes.Limit>
-          offset: optional<simpleTypes.Offset>
+          withDetails: optional<MemberQueryWithDetails>
       response: GetMemberListResponse 
       examples:
         - name: Example Find Members
@@ -215,13 +219,10 @@ service:
             company: $globalApiTypes.Company.ExampleCompanyCronus
           query-parameters:
             memberNumber: $simpleTypes.MemberNumber.ExampleMemberNumber
-            #firstName: $simpleTypes.FirstName.ExampleFirstName
             lastName: $simpleTypes.LastName.ExampleLastName
             birthDate: $simpleTypes.Birthday.ExampleBirthday
             email: $simpleTypes.Email.ExampleEmail
             phone: $simpleTypes.PhoneNo.ExamplePhoneNo
-            #limit: $simpleTypes.Limit.ExampleLimit
-            #offset: $simpleTypes.Offset.ExampleOffset
           response: 
             body: $GetMemberListResponse.ExampleGetMember
 
@@ -405,3 +406,7 @@ types:
         value:
           title: $simpleTypes.NoteTitle.ExampleNoteTitle
           comment: $simpleTypes.NoteComment.ExampleNoteComment
+
+  MemberQueryWithDetails:
+    type: boolean
+    docs: Set to true will include more detailed information in the response
