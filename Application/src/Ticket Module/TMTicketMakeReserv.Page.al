@@ -24,12 +24,12 @@
                     Caption = 'Item No.';
                     Editable = false;
                     Style = Unfavorable;
-                    StyleExpr = gVisualQueueUnfavorable;
+                    StyleExpr = _VisualQueueUnfavorable;
                     ToolTip = 'Specifies the value of the Item No. field';
 
                     trigger OnValidate()
                     begin
-                        gReservationEdited := true;
+                        _ReservationEdited := true;
                     end;
                 }
                 field("Admission Code"; Rec."Admission Code")
@@ -37,7 +37,7 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                     Style = Unfavorable;
-                    StyleExpr = gVisualQueueUnfavorable;
+                    StyleExpr = _VisualQueueUnfavorable;
                     ToolTip = 'Specifies the value of the Admission Code field';
 
                     trigger OnDrillDown()
@@ -51,8 +51,8 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                     Style = Unfavorable;
-                    StyleExpr = gVisualQueueUnfavorable;
-                    Visible = gPrimaryRequestMode;
+                    StyleExpr = _VisualQueueUnfavorable;
+                    Visible = _PrimaryRequestMode;
                     ToolTip = 'Specifies the value of the Scheduled Time Description field';
 
                     trigger OnDrillDown()
@@ -72,8 +72,8 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                     Style = Subordinate;
-                    StyleExpr = gDisallowReschedule;
-                    Visible = gChangeRequestMode;
+                    StyleExpr = _DisallowReschedule;
+                    Visible = _ChangeRequestMode;
                     ToolTip = 'Specifies the value of the Scheduled Time Description field';
 
                     trigger OnDrillDown()
@@ -94,7 +94,7 @@
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Editable = false;
                     Style = Unfavorable;
-                    StyleExpr = gVisualQueueUnfavorable;
+                    StyleExpr = _VisualQueueUnfavorable;
                     ToolTip = 'Specifies the value of the Admission Description field';
 
                     trigger OnDrillDown()
@@ -106,9 +106,9 @@
                 field(Quantity; Rec.Quantity)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    Editable = gAllowQuantityChange;
+                    Editable = _AllowQuantityChange;
                     Style = Unfavorable;
-                    StyleExpr = gVisualQueueUnfavorable;
+                    StyleExpr = _VisualQueueUnfavorable;
                     ToolTip = 'Specifies the value of the Quantity field';
 
                     trigger OnValidate()
@@ -169,36 +169,36 @@
                         end;
 
                         if (xRec."Admission Inclusion" <> Rec."Admission Inclusion") then
-                            gReservationEdited := true;
+                            _ReservationEdited := true;
 
-                        gReservationEdited := true;
-                        gVisualQueueUnfavorable := CalcVisualQueueUnfavorable(Rec);
+                        _ReservationEdited := true;
+                        _VisualQueueUnfavorable := CalcVisualQueueUnfavorable(Rec);
                     end;
                 }
                 field("Customer No."; Rec."Customer No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    Visible = gBatchTicketCreateMode;
+                    Visible = _BatchTicketCreateMode;
                     ToolTip = 'Specifies the value of the Customer No. field';
 
                     trigger OnValidate()
                     begin
                         Rec.ModifyAll("Customer No.", Rec."Customer No.");
                         CurrPage.Update(false);
-                        gReservationEdited := true;
+                        _ReservationEdited := true;
                     end;
                 }
                 field("External Order No."; Rec."External Order No.")
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
-                    Visible = gBatchTicketCreateMode;
+                    Visible = _BatchTicketCreateMode;
                     ToolTip = 'Specifies the value of the External Order No. field';
 
                     trigger OnValidate()
                     begin
                         Rec.ModifyAll("External Order No.", Rec."External Order No.");
                         CurrPage.Update(false);
-                        gReservationEdited := true;
+                        _ReservationEdited := true;
                     end;
                 }
                 field("Payment Option"; Rec."Payment Option")
@@ -211,7 +211,7 @@
                     begin
                         Rec.ModifyAll("Payment Option", Rec."Payment Option");
                         CurrPage.Update(false);
-                        gReservationEdited := true;
+                        _ReservationEdited := true;
                     end;
                 }
                 field("Waiting List Reference Code"; Rec."Waiting List Reference Code")
@@ -250,13 +250,13 @@
                             Rec.Validate(Quantity, TicketWaitingList.Quantity);
                             Rec."External Adm. Sch. Entry No." := AdmissionScheduleEntry."External Schedule Entry No.";
                             Rec."Scheduled Time Description" := StrSubstNo(DateTimeLbl, AdmissionScheduleEntry."Admission Start Date", AdmissionScheduleEntry."Admission Start Time");
-                            if (gDeliverTicketTo = '') then
-                                gDeliverTicketTo := TicketWaitingList."Notification Address";
+                            if (_DeliverTicketTo = '') then
+                                _DeliverTicketTo := TicketWaitingList."Notification Address";
 
                         end;
 
                         Rec.Modify();
-                        gReservationEdited := true;
+                        _ReservationEdited := true;
                         CurrPage.Update(false);
 
                         CalcVisualQueueUnfavorable(Rec);
@@ -289,8 +289,8 @@
             group(PaymentOptions)
             {
                 ShowCaption = true;
-                Visible = gTourTicket;
-                field(gTourTicketPaymentOptions; gTourTicketPaymentOptions)
+                Visible = _TourTicket;
+                field(gTourTicketPaymentOptions; _TourTicketPaymentOptions)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Payment Options';
@@ -300,16 +300,16 @@
                     begin
                         Rec.ModifyAll("Payment Option", Rec."Payment Option");
                         CurrPage.Update(false);
-                        gReservationEdited := true;
+                        _ReservationEdited := true;
                     end;
                 }
             }
             group(Control6014406)
             {
                 ShowCaption = false;
-                Visible = gShowDeliverTo;
+                Visible = _ShowDeliverTo;
 
-                field(gTicketHolderName; gTicketHolderName)
+                field(gTicketHolderName; _TicketHolderName)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Ticket Holder Name';
@@ -319,7 +319,7 @@
             group(TicketHolderLangGrp)
             {
                 ShowCaption = false;
-                Visible = gShowDeliverTo;
+                Visible = _ShowDeliverTo;
 
                 field(TicketHolderLang; _TicketHolderLang)
                 {
@@ -332,9 +332,9 @@
             group(Control6014407)
             {
                 ShowCaption = false;
-                Visible = gShowDeliverTo;
+                Visible = _ShowDeliverTo;
 
-                field(gDeliverTicketTo; gDeliverTicketTo)
+                field(gDeliverTicketTo; _DeliverTicketTo)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Deliver Ticket To';
@@ -344,13 +344,13 @@
             group(Control6014400)
             {
                 ShowCaption = false;
-                field(gConfirmStatusText; gConfirmStatusText)
+                field(gConfirmStatusText; _ConfirmStatusText)
                 {
                     ApplicationArea = NPRTicketEssential, NPRTicketAdvanced;
                     Caption = 'Reservation Confirm Status';
                     Enabled = false;
                     Style = Favorable;
-                    StyleExpr = gConfirmStatusStyleFavorable;
+                    StyleExpr = _ConfirmStatusStyleFavorable;
                     ToolTip = 'Specifies the value of the Reservation Confirm Status field';
                 }
             }
@@ -401,12 +401,12 @@
         _UnitPriceIncludesVat := false;
         _UnitPriceVatPercentage := 0;
 
-        if (gTicketItemNo <> '') then begin
-            if (not TicketPrice.CalculateErpUnitPrice(gTicketItemNo, gTicketVariantCode, '', Today(), 1, _UnitPrice, _DiscountPct, _UnitPriceIncludesVat, _UnitPriceVatPercentage)) then begin
-                Item.Get(gTicketItemNo);
+        if (_TicketItemNo <> '') then begin
+            if (not TicketPrice.CalculateErpUnitPrice(_TicketItemNo, _TicketVariantCode, '', Today(), 1, _UnitPrice, _DiscountPct, _UnitPriceIncludesVat, _UnitPriceVatPercentage)) then begin
+                Item.Get(_TicketItemNo);
                 _UnitPrice := Item."Unit Price";
                 _UnitPriceIncludesVat := Item."Price Includes VAT";
-                _UnitPriceVatPercentage := TicketPrice.GetItemDefaultVat(gTicketItemNo);
+                _UnitPriceVatPercentage := TicketPrice.GetItemDefaultVat(_TicketItemNo);
             end;
         end;
     end;
@@ -416,17 +416,17 @@
         BasePrice, AddonPrice : Decimal;
         FormatLabel: Label '<Sign><Integer><Decimals>', Locked = true;
     begin
-        gVisualQueueUnfavorable := CalcVisualQueueUnfavorable(Rec);
+        _VisualQueueUnfavorable := CalcVisualQueueUnfavorable(Rec);
 
-        gConfirmStatusStyleFavorable := (not gVisualQueueUnfavorable);
+        _ConfirmStatusStyleFavorable := (not _VisualQueueUnfavorable);
 
-        if (gConfirmStatusStyleFavorable) then
-            if (gReservationEdited) then
-                gConfirmStatusText := STATUS_UNCONFIRMED
+        if (_ConfirmStatusStyleFavorable) then
+            if (_ReservationEdited) then
+                _ConfirmStatusText := STATUS_UNCONFIRMED
             else
-                gConfirmStatusText := STATUS_CONFIRMED;
+                _ConfirmStatusText := STATUS_CONFIRMED;
 
-        gDisallowReschedule := not IsRescheduleAllowed(Rec."External Adm. Sch. Entry No.");
+        _DisallowReschedule := not IsRescheduleAllowed(Rec."External Adm. Sch. Entry No.");
 
         GetAdmissionPrice(Rec."Admission Code", Rec."External Adm. Sch. Entry No.", BasePrice, AddonPrice);
         _UnitPriceDisplay := StrSubstNo('%1', Format(BasePrice, 0, FormatLabel));
@@ -447,7 +447,7 @@
 
         if (CloseAction = Action::LookupOK) then begin
 
-            if (gBatchTicketCreateMode) then
+            if (_BatchTicketCreateMode) then
                 if (Rec."Payment Option" <> Rec."Payment Option"::DIRECT) and (Rec."Entry Type" <> Rec."Entry Type"::CHANGE) then begin
                     Rec.TestField("External Order No.");
                     Rec.TestField("Customer No.");
@@ -458,23 +458,23 @@
     end;
 
     var
-        gAllowQuantityChange: Boolean;
-        gBatchTicketCreateMode: Boolean;
-        gChangeRequestMode: Boolean;
-        gConfirmStatusStyleFavorable: Boolean;
-        gDisallowReschedule: Boolean;
-        gIgnoreScheduleFilter: Boolean;
-        gPrimaryRequestMode: Boolean;
-        gQuantityChanged: Boolean;
-        gReservationEdited: Boolean;
-        gShowDeliverTo: Boolean;
-        gVisualQueueUnfavorable: Boolean;
-        gTicketVariantCode: Code[10];
-        gTicketItemNo: Code[20];
-        gLimitToDateSelected: Date;
-        gTicketRequestEntryNo: Integer;
-        gTourTicket: Boolean;
-        gTourTicketPaymentOptions: Option UNPAID,POSTPAID;
+        _AllowQuantityChange: Boolean;
+        _BatchTicketCreateMode: Boolean;
+        _ChangeRequestMode: Boolean;
+        _ConfirmStatusStyleFavorable: Boolean;
+        _DisallowReschedule: Boolean;
+        _IgnoreScheduleFilter: Boolean;
+        _PrimaryRequestMode: Boolean;
+        _QuantityChanged: Boolean;
+        _ReservationEdited: Boolean;
+        _ShowDeliverTo: Boolean;
+        _VisualQueueUnfavorable: Boolean;
+        _TicketVariantCode: Code[10];
+        _TicketItemNo: Code[20];
+        _LimitToDateSelected: Date;
+        _TicketRequestEntryNo: Integer;
+        _TourTicket: Boolean;
+        _TourTicketPaymentOptions: Option UNPAID,POSTPAID;
         _AllowCustomizableTicketQtyChange: Boolean;
         NOT_REQUIRED: Label '%1 can not be changed to required when initial value was optional.';
         NOT_EDITABLE: Label '%1 can not be changed when admission is required.';
@@ -488,9 +488,9 @@
         QTY_MUST_BE_GT_ZERO: Label 'Ticket quantity must be greater than zero.';
         WAITING_LIST: Label 'Waiting List';
         NO_NOTIFICATION_ADDR: Label 'When you have selected a ticket schedule with waiting list, you need to provide e-mail or sms in the deliver-to field.';
-        gConfirmStatusText: Text;
-        gDeliverTicketTo: Text[100];
-        gTicketHolderName: Text[100];
+        _ConfirmStatusText: Text;
+        _DeliverTicketTo: Text[100];
+        _TicketHolderName: Text[100];
         _TicketHolderLang: Code[10];
         _UnitPriceDisplay: Text;
         _UnitPrice: Decimal;
@@ -504,8 +504,8 @@
     begin
         CurrentEntryNo := Rec."Entry No.";
 
-        gReservationEdited := true;
-        gQuantityChanged := true;
+        _ReservationEdited := true;
+        _QuantityChanged := true;
 
         Rec.ModifyAll(Quantity, NewQuantity);
 
@@ -541,14 +541,14 @@
             if (TMAdmission."POS Schedule Selection Date F." <> "0DF") then begin
                 ToDate := CalcDate(TMAdmission."POS Schedule Selection Date F.", Today);
 
-                if (not gIgnoreScheduleFilter) then
+                if (not _IgnoreScheduleFilter) then
                     AdmissionScheduleEntry.SetRange("Admission Start Date", Today, ToDate);
 
             end;
         end;
 
         Clear(PageScheduleEntry);
-        PageScheduleEntry.FillPage(AdmissionScheduleEntry, Rec.Quantity, gTicketItemNo, gTicketVariantCode);
+        PageScheduleEntry.FillPage(AdmissionScheduleEntry, Rec.Quantity, _TicketItemNo, _TicketVariantCode);
         PageScheduleEntry.LookupMode(true);
         PageAction := PageScheduleEntry.RunModal();
 
@@ -561,17 +561,17 @@
 
             if (AdmissionScheduleEntry."Allocation By" = AdmissionScheduleEntry."Allocation By"::WAITINGLIST) then begin
                 Rec."Scheduled Time Description" := StrSubstNo(PlaceHolderLbl, WAITING_LIST);
-                gShowDeliverTo := true;
+                _ShowDeliverTo := true;
             end;
 
-            if (gLimitToDateSelected = 0D) then
-                gLimitToDateSelected := AdmissionScheduleEntry."Admission Start Date";
+            if (_LimitToDateSelected = 0D) then
+                _LimitToDateSelected := AdmissionScheduleEntry."Admission Start Date";
 
-            if (gLimitToDateSelected <> 0D) then
-                if (gLimitToDateSelected <> AdmissionScheduleEntry."Admission Start Date") then begin
-                    if (not Confirm(DIFFERENT_DATES, false, AdmissionScheduleEntry."Admission Start Date", gLimitToDateSelected)) then
+            if (_LimitToDateSelected <> 0D) then
+                if (_LimitToDateSelected <> AdmissionScheduleEntry."Admission Start Date") then begin
+                    if (not Confirm(DIFFERENT_DATES, false, AdmissionScheduleEntry."Admission Start Date", _LimitToDateSelected)) then
                         Error('');
-                    gLimitToDateSelected := AdmissionScheduleEntry."Admission Start Date";
+                    _LimitToDateSelected := AdmissionScheduleEntry."Admission Start Date";
                 end;
 
             Rec.Modify();
@@ -580,7 +580,7 @@
             ConfirmOverlappingTimes(Rec."Entry No.", Rec."External Adm. Sch. Entry No.");
 
             if (OldEntryNo <> Rec."External Adm. Sch. Entry No.") then begin
-                gReservationEdited := true;
+                _ReservationEdited := true;
 
             end;
 
@@ -600,7 +600,7 @@
         ResponseMessage: Text;
     begin
 
-        gConfirmStatusText := '';
+        _ConfirmStatusText := '';
 
         if (TicketReservationRequest."Admission Inclusion" = TicketReservationRequest."Admission Inclusion"::NOT_SELECTED) then
             exit(false);
@@ -616,12 +616,12 @@
                 AdmissionSchEntry.CalcFields("Open Reservations", "Open Admitted", "Initial Entry");
                 ScheduleLine.Get(AdmissionSchEntry."Admission Code", AdmissionSchEntry."Schedule Code");
 
-                TicketManagement.CheckTicketBaseCalendar(TicketReservationRequest."Admission Code", gTicketItemNo, gTicketVariantCode, AdmissionSchEntry."Admission Start Date", NonWorking, ResponseMessage);
+                TicketManagement.CheckTicketBaseCalendar(TicketReservationRequest."Admission Code", _TicketItemNo, _TicketVariantCode, AdmissionSchEntry."Admission Start Date", NonWorking, ResponseMessage);
                 if (NonWorking) then begin
-                    gConfirmStatusText := ResponseMessage;
+                    _ConfirmStatusText := ResponseMessage;
                     exit(true);
                 end;
-                TicketManagement.GetTicketCapacity(gTicketItemNo, gTicketVariantCode, AdmissionSchEntry."Admission Code", AdmissionSchEntry."Schedule Code", AdmissionSchEntry."Entry No.", MaxCapacity, CapacityControl);
+                TicketManagement.GetTicketCapacity(_TicketItemNo, _TicketVariantCode, AdmissionSchEntry."Admission Code", AdmissionSchEntry."Schedule Code", AdmissionSchEntry."Entry No.", MaxCapacity, CapacityControl);
 
                 case CapacityControl of
                     Admission."Capacity Control"::ADMITTED:
@@ -653,8 +653,8 @@
 
         TicketReservationRequest.SetFilter("Session Token ID", '=%1', Token);
         if (TicketReservationRequest.FindSet()) then begin
-            gDeliverTicketTo := TicketReservationRequest."Notification Address";
-            gTicketHolderName := TicketReservationRequest."TicketHolderName";
+            _DeliverTicketTo := TicketReservationRequest."Notification Address";
+            _TicketHolderName := TicketReservationRequest."TicketHolderName";
             _TicketHolderLang := TicketReservationRequest.TicketHolderPreferredLanguage;
 
             repeat
@@ -666,27 +666,27 @@
                     AdmissionScheduleEntry.SetFilter(Cancelled, '=%1', false);
                     if (AdmissionScheduleEntry.FindLast()) then begin
 
-                        if (gLimitToDateSelected = 0D) then
-                            gLimitToDateSelected := AdmissionScheduleEntry."Admission Start Date";
+                        if (_LimitToDateSelected = 0D) then
+                            _LimitToDateSelected := AdmissionScheduleEntry."Admission Start Date";
 
-                        if (gLimitToDateSelected <> 0D) then
-                            ShowDifferentDatesWarning := ShowDifferentDatesWarning or (gLimitToDateSelected <> AdmissionScheduleEntry."Admission Start Date");
+                        if (_LimitToDateSelected <> 0D) then
+                            ShowDifferentDatesWarning := ShowDifferentDatesWarning or (_LimitToDateSelected <> AdmissionScheduleEntry."Admission Start Date");
 
                     end;
                 end;
 
                 if (Rec."Primary Request Line") then
-                    gTicketRequestEntryNo := TicketReservationRequest."Entry No.";
+                    _TicketRequestEntryNo := TicketReservationRequest."Entry No.";
                 if ((Rec."Primary Request Line") and (TicketReservationRequest."Entry Type" = TicketReservationRequest."Entry Type"::CHANGE)) then
-                    gTicketRequestEntryNo := TicketReservationRequest."Superseeds Entry No.";
+                    _TicketRequestEntryNo := TicketReservationRequest."Superseeds Entry No.";
 
             until (TicketReservationRequest.Next() = 0);
         end;
 
-        gReservationEdited := false;
-        gBatchTicketCreateMode := (Rec."Payment Option" <> Rec."Payment Option"::DIRECT);
-        gChangeRequestMode := (Rec."Entry Type" = Rec."Entry Type"::CHANGE);
-        gPrimaryRequestMode := not gChangeRequestMode;
+        _ReservationEdited := false;
+        _BatchTicketCreateMode := (Rec."Payment Option" <> Rec."Payment Option"::DIRECT);
+        _ChangeRequestMode := (Rec."Entry Type" = Rec."Entry Type"::CHANGE);
+        _PrimaryRequestMode := not _ChangeRequestMode;
 
         if (ShowDifferentDatesWarning) then
             Message(DIFFERENT_DATES_WARNING);
@@ -698,38 +698,38 @@
         TicketType: Record "NPR TM Ticket Type";
         TicketBOM: Record "NPR TM Ticket Admission BOM";
     begin
-        gTicketItemNo := ItemNo;
-        gTicketVariantCode := VariantCode;
+        _TicketItemNo := ItemNo;
+        _TicketVariantCode := VariantCode;
 
         if (Item.Get(ItemNo)) then begin
             if (TicketType.Get(Item."NPR Ticket Type")) then
-                gShowDeliverTo := TicketType."eTicket Activated";
+                _ShowDeliverTo := TicketType."eTicket Activated";
         end;
 
         TicketBOM.SetFilter("Item No.", '=%1', ItemNo);
         TicketBOM.SetFilter("Variant Code", '=%1', VariantCode);
         TicketBOM.SetFilter("Publish Ticket URL", '<>%1', TicketBOM."Publish Ticket URL"::DISABLE);
-        if (not gShowDeliverTo) then
-            gShowDeliverTo := TicketBOM.FindFirst();
+        if (not _ShowDeliverTo) then
+            _ShowDeliverTo := TicketBOM.FindFirst();
 
         TicketBOM.Reset();
         TicketBOM.SetFilter("Item No.", '=%1', ItemNo);
         TicketBOM.SetFilter("Variant Code", '=%1', VariantCode);
         TicketBOM.SetFilter("Notification Profile Code", '<>%1', '');
-        if (not gShowDeliverTo) then
-            gShowDeliverTo := TicketBOM.FindFirst();
+        if (not _ShowDeliverTo) then
+            _ShowDeliverTo := TicketBOM.FindFirst();
 
         TicketBOM.Reset();
         TicketBOM.SetFilter("Item No.", '=%1', ItemNo);
         TicketBOM.SetFilter("Variant Code", '=%1', VariantCode);
         TicketBOM.SetFilter(NPDesignerTemplateId, '<>%1', '');
-        if (not gShowDeliverTo) then
-            gShowDeliverTo := TicketBOM.FindFirst();
+        if (not _ShowDeliverTo) then
+            _ShowDeliverTo := TicketBOM.FindFirst();
     end;
 
     internal procedure AllowQuantityChange(IsQuantityChangeAllowed: Boolean)
     begin
-        gAllowQuantityChange := IsQuantityChangeAllowed;
+        _AllowQuantityChange := IsQuantityChangeAllowed;
     end;
 
     internal procedure FinalizeReservationRequest(FailWithError: Boolean; var ResponseMessage: Text): Integer
@@ -740,16 +740,16 @@
         TicketWaitingListMgr: Codeunit "NPR TM Ticket WaitingList Mgr.";
     begin
 
-        if ((gDeliverTicketTo <> '') or (gTicketHolderName <> '')) then begin
+        if ((_DeliverTicketTo <> '') or (_TicketHolderName <> '') or (_TicketHolderLang <> '')) then begin
             Rec.Reset();
             if (Rec.FindSet()) then;
             repeat
                 TicketReservationRequest.Get(Rec."Entry No.");
 
-                TicketReservationRequest."Notification Address" := gDeliverTicketTo;
-                TicketReservationRequest.TicketHolderName := gTicketHolderName;
+                TicketReservationRequest."Notification Address" := _DeliverTicketTo;
+                TicketReservationRequest.TicketHolderName := _TicketHolderName;
                 TicketReservationRequest.TicketHolderPreferredLanguage := _TicketHolderLang;
-                if (StrPos(gDeliverTicketTo, '@') > 0) then
+                if (StrPos(_DeliverTicketTo, '@') > 0) then
                     TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::EMAIL
                 else
                     TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::SMS;
@@ -761,7 +761,7 @@
         Rec.Reset();
         Rec.SetFilter("Scheduled Time Description", '=%1', WAITING_LIST);
         if (Rec.FindSet()) then begin
-            if (gDeliverTicketTo = '') then begin
+            if (_DeliverTicketTo = '') then begin
                 ResponseMessage := NO_NOTIFICATION_ADDR;
                 exit(10);
             end;
@@ -769,7 +769,7 @@
             TicketRequestManager.DeleteReservationRequest(Rec."Session Token ID", false);
             repeat
                 TicketReservationRequest.Get(Rec."Entry No.");
-                TicketWaitingListMgr.CreateWaitingListEntry(Rec, gDeliverTicketTo);
+                TicketWaitingListMgr.CreateWaitingListEntry(Rec, _DeliverTicketTo);
             until (Rec.Next() = 0);
             Message('Added to waiting list.');
             ResponseMessage := 'If this message is shown, waiting list return code 11 is not handled properly.';
@@ -779,7 +779,7 @@
         Rec.SetCurrentKey("Session Token ID", "Admission Inclusion");
         Rec.Reset();
 
-        if (gReservationEdited) then begin
+        if (_ReservationEdited) then begin
 
             TicketRequestManager.DeleteReservationRequest(Rec."Session Token ID", false);
 
@@ -792,7 +792,7 @@
                 TicketReservationRequest.Quantity := Rec.Quantity;
                 TicketReservationRequest."External Adm. Sch. Entry No." := Rec."External Adm. Sch. Entry No.";
                 TicketReservationRequest."Scheduled Time Description" := Rec."Scheduled Time Description";
-                if (gBatchTicketCreateMode) then begin
+                if (_BatchTicketCreateMode) then begin
                     TicketReservationRequest."External Order No." := Rec."External Order No.";
                     TicketReservationRequest."Payment Option" := Rec."Payment Option";
                     TicketReservationRequest."Customer No." := Rec."Customer No.";
@@ -818,7 +818,7 @@
 
             until (Rec.Next() = 0);
 
-            TicketRequestManager.SetShowProgressBar(gBatchTicketCreateMode);
+            TicketRequestManager.SetShowProgressBar(_BatchTicketCreateMode);
 
             exit(TicketRequestManager.IssueTicketFromReservationToken(Rec."Session Token ID", FailWithError, ResponseMessage));
         end;
@@ -835,15 +835,15 @@
         NewTicketRequestEntryNo: Integer;
     begin
 
-        if ((gDeliverTicketTo <> '') or (gTicketHolderName <> '')) then begin
+        if ((_DeliverTicketTo <> '') or (_TicketHolderName <> '')) then begin
             Rec.Reset();
             if (Rec.FindSet()) then;
             repeat
                 TicketReservationRequest.Get(Rec."Entry No.");
-                TicketReservationRequest."Notification Address" := gDeliverTicketTo;
-                TicketReservationRequest.TicketHolderName := gTicketHolderName;
+                TicketReservationRequest."Notification Address" := _DeliverTicketTo;
+                TicketReservationRequest.TicketHolderName := _TicketHolderName;
                 TicketReservationRequest.TicketHolderPreferredLanguage := _TicketHolderLang;
-                if (STRPOS(gDeliverTicketTo, '@') > 0) then
+                if (STRPOS(_DeliverTicketTo, '@') > 0) then
                     TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::EMAIL
                 else
                     TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::SMS;
@@ -859,7 +859,7 @@
             exit(13);
         end;
 
-        if (gReservationEdited) then begin
+        if (_ReservationEdited) then begin
             Rec.Reset();
 
             Rec.FindSet();
@@ -891,7 +891,7 @@
             TicketRequestManager.ConfirmChangeRequest(Rec."Session Token ID");
         end;
 
-        if (gAllowQuantityChange and gQuantityChanged) then
+        if (_AllowQuantityChange and _QuantityChanged) then
             ChangeTourTicketQuantity(Rec);
 
         Rec.SetCurrentKey("Session Token ID", "Admission Inclusion");
@@ -909,15 +909,15 @@
         SalesTicketNo: Code[20];
     begin
 
-        if ((gDeliverTicketTo <> '') or (gTicketHolderName <> '')) then begin
+        if ((_DeliverTicketTo <> '') or (_TicketHolderName <> '')) then begin
             Rec.Reset();
             if (Rec.FindSet()) then;
             repeat
                 TicketReservationRequest.Get(Rec."Entry No.");
-                TicketReservationRequest."Notification Address" := gDeliverTicketTo;
-                TicketReservationRequest.TicketHolderName := gTicketHolderName;
+                TicketReservationRequest."Notification Address" := _DeliverTicketTo;
+                TicketReservationRequest.TicketHolderName := _TicketHolderName;
                 TicketReservationRequest.TicketHolderPreferredLanguage := _TicketHolderLang;
-                if (STRPOS(gDeliverTicketTo, '@') > 0) then
+                if (STRPOS(_DeliverTicketTo, '@') > 0) then
                     TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::EMAIL
                 else
                     TicketReservationRequest."Notification Method" := TicketReservationRequest."Notification Method"::SMS;
@@ -933,7 +933,7 @@
             exit(13);
         end;
 
-        if (gReservationEdited) then begin
+        if (_ReservationEdited) then begin
 
 
             Rec.Reset();
@@ -984,7 +984,7 @@
         if (Rec.FindFirst()) then
             NewQuantity := Rec.Quantity;
 
-        exit(gQuantityChanged);
+        exit(_QuantityChanged);
     end;
 
     procedure GetDefaultAdmissionScheduleDescription(): Text[30]
@@ -999,7 +999,7 @@
 
     internal procedure SetTicketBatchMode()
     begin
-        gBatchTicketCreateMode := true;
+        _BatchTicketCreateMode := true;
     end;
 
     local procedure ConfirmOverlappingTimes(SelectedRequestEntryNo: Integer; SelectedExternalAdmSchEntryNo: Integer)
@@ -1054,8 +1054,8 @@
 
     internal procedure SetIgnoreScheduleSelectionFilter(IgnoreFilter: Boolean): Boolean
     begin
-        gIgnoreScheduleFilter := IgnoreFilter;
-        exit(gIgnoreScheduleFilter);
+        _IgnoreScheduleFilter := IgnoreFilter;
+        exit(_IgnoreScheduleFilter);
     end;
 
     internal procedure SetAllowCustomizableTicketQtyChange(AllowChange: Boolean)
@@ -1071,8 +1071,8 @@
     begin
         RescheduleAllowed := true;
 
-        if (gChangeRequestMode) then begin
-            Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', gTicketRequestEntryNo);
+        if (_ChangeRequestMode) then begin
+            Ticket.SetFilter("Ticket Reservation Entry No.", '=%1', _TicketRequestEntryNo);
             if (Ticket.FindFirst()) then
                 RescheduleAllowed := TicketManagement.IsRescheduleAllowed(Ticket."External Ticket No.", ExtAdmSchEntryNo, CurrentDateTime());
         end;
@@ -1139,8 +1139,8 @@
         SelectedPriceRule: Record "NPR TM Dynamic Price Rule";
     begin
         HavePriceRule := TicketPrice.CalculateScheduleEntryPrice(
-                    gTicketItemNo,
-                    gTicketVariantCode,
+                    _TicketItemNo,
+                    _TicketVariantCode,
                     AdmissionCode,
                     ExternalScheduleEntryNo,
                     _UnitPrice,
