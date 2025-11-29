@@ -20,13 +20,20 @@ headers:
 error-discrimination:
   strategy: status-code
 
-auth: Bearer                  # The name here must match the name of the auth-scheme defined below.
+# The name here must match one of the names of the auth-schemes defined below.
+auth: NPApiKeyAuthScheme
+
 auth-schemes:
-  Bearer:                     # The name here must match the name of the auth scheme defined above.
+  Bearer:
     scheme: bearer
     token:
       name: apiKey
       env: MY_API_KEY
+  NPApiKeyAuthScheme:
+    header: x-np-api-key
+    name: NaviPartner API Key
+    type: string
+    env: NP_API_KEY
 
 audiences:
   - internal
