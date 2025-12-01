@@ -146,6 +146,8 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
         SubscrPaymentRequest."Currency Code" := SubscriptionRequest."Currency Code";
         SubscrPaymentRequest.Description := SubscriptionRequest.Description;
         SubscrPaymentRequest."Subscription Payment Reference" := CopyStr(SubsPayReqUtils.GenerateSubscriptionPaymentReference(), 1, MaxStrLen(SubscrPaymentRequest."Subscription Payment Reference"));
+        SubscrPaymentRequest."External Membership No." := SubsPayReqUtils.GetExternalMembershipNo(Subscription."Membership Entry No.");
+        SubsPayReqUtils.TrySetPaymentContactFromUserAcc(SubscrPaymentRequest, MemberPaymentMethod);
         SubscrPaymentRequest.Insert();
     end;
 
@@ -163,6 +165,9 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
         SubscrPaymentRequest.Description := SubscriptionRequest.Description;
         SubscrPaymentRequest."Set Membership Auto-Renew" := AutoRenew;
         SubscrPaymentRequest."Subscription Payment Reference" := CopyStr(SubsPayReqUtils.GenerateSubscriptionPaymentReference(), 1, MaxStrLen(SubscrPaymentRequest."Subscription Payment Reference"));
+        SubscrPaymentRequest."External Membership No." := SubsPayReqUtils.GetExternalMembershipNo(Subscription."Membership Entry No.");
+        if not SubsPayReqUtils.TrySetPaymentContactFromPaymentMethod(Subscription, SubscrPaymentRequest) then
+            SubsPayReqUtils.TrySetPaymentContactFromMember(Subscription, SubscrPaymentRequest);
         SubscrPaymentRequest.Insert();
     end;
 

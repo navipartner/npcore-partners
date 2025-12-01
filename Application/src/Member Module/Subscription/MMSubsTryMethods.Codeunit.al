@@ -85,7 +85,7 @@ codeunit 6248294 "NPR MM Subs Try Methods"
     begin
         Clear(PayByLinkSubscriptionPaymentRequest);
 
-        OriginalSubscriptionPaymentRequest.SetLoadFields(PSP, Amount, "Currency Code", Description);
+        OriginalSubscriptionPaymentRequest.SetLoadFields(PSP, Amount, "Currency Code", Description, "Payment E-mail", "Payment Phone No.", "External Membership No.");
         OriginalSubscriptionPaymentRequest.Get(OriginalSubscriptionPaymentRequestEntryNo);
 
         PayByLinkSubscriptionPaymentRequest.Init();
@@ -99,6 +99,9 @@ codeunit 6248294 "NPR MM Subs Try Methods"
         PayByLinkSubscriptionPaymentRequest.Description := OriginalSubscriptionPaymentRequest.Description;
         PayByLinkSubscriptionPaymentRequest.Type := PayByLinkSubscriptionPaymentRequest.Type::PayByLink;
         PayByLinkSubscriptionPaymentRequest."Set Membership Auto-Renew" := true;
+        PayByLinkSubscriptionPaymentRequest."External Membership No." := OriginalSubscriptionPaymentRequest."External Membership No.";
+        PayByLinkSubscriptionPaymentRequest."Payment E-mail" := OriginalSubscriptionPaymentRequest."Payment E-mail";
+        PayByLinkSubscriptionPaymentRequest."Payment Phone No." := OriginalSubscriptionPaymentRequest."Payment Phone No.";
         PayByLinkSubscriptionPaymentRequest.Insert();
     end;
 

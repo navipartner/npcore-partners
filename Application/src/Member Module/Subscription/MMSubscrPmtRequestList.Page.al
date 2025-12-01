@@ -1,11 +1,16 @@
-page 6184832 "NPR MM Subscr.Payment Requests"
+page 6248207 "NPR MM Subscr.Pmt Request List"
 {
-    Extensible = false;
-    Caption = 'Subscr. Payment Requests';
     PageType = List;
+    UsageCategory = Lists;
     SourceTable = "NPR MM Subscr. Payment Request";
-    UsageCategory = None;
+    SourceTableView = sorting("Entry No.") order(descending);
+    Caption = 'Subscription Payment Request List';
+    Extensible = false;
+    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
     Editable = false;
+    InsertAllowed = false;
+    ModifyAllowed = false;
+    DeleteAllowed = false;
 
     layout
     {
@@ -13,14 +18,9 @@ page 6184832 "NPR MM Subscr.Payment Requests"
         {
             repeater(General)
             {
-                field("Entry No."; Rec."Entry No.")
+                field("External Membership No."; Rec."External Membership No.")
                 {
-                    ToolTip = 'Specifies a unique entry number, assigned by the system to this record according to an automatically maintained number series.';
-                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-                }
-                field("Batch No."; Rec."Batch No.")
-                {
-                    ToolTip = 'Specifies the value of the Batch No. field.';
+                    ToolTip = 'Specifies the value of the External Membership No. field.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(PSP; Rec.PSP)
@@ -41,6 +41,16 @@ page 6184832 "NPR MM Subscr.Payment Requests"
                 field(Description; Rec.Description)
                 {
                     ToolTip = 'Specifies the value of the Description field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field("Payment E-mail"; Rec."Payment E-mail")
+                {
+                    ToolTip = 'Specifies the value of the Payment E-mail field.';
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                }
+                field("Payment Phone No."; Rec."Payment Phone No.")
+                {
+                    ToolTip = 'Specifies the value of the Payment Phone No. field.';
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 }
                 field(Amount; Rec.Amount)
@@ -165,116 +175,94 @@ page 6184832 "NPR MM Subscr.Payment Requests"
                 }
             }
         }
+        area(factboxes)
+        {
+            part(SubsPmtRequestFactBox; "NPR MMSubscrPmtRequest FactBox")
+            {
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Caption = 'Details';
+                SubPageLink = "Entry No." = field("Entry No.");
+                Visible = true;
+            }
+        }
     }
 
     actions
     {
         area(Processing)
         {
-            action(Process)
+            action(Membership)
             {
-                Caption = 'Process';
-                ToolTip = 'Processes the current subscription payment request';
+                Caption = 'Membership';
+                ToolTip = 'Opens membership card.';
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-                Image = NextRecord;
+                Image = CustomerContact;
+                Scope = Repeater;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                RunObject = page "NPR MM Membership Card";
+                RunPageLink = "External Membership No." = field("External Membership No.");
+            }
+            action(Subscription)
+            {
+                Caption = 'Subscription';
+                ToolTip = 'Opens membership subscription details.';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Image = DueDate;
+                Scope = Repeater;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                trigger OnAction()
+                var
+                    Subscription: Record "NPR MM Subscription";
+                    Membership: Record "NPR MM Membership";
+                begin
+                    Membership.SetRange("External Membership No.", Rec."External Membership No.");
+                    if Membership.FindFirst() then begin
+                        Subscription.SetRange("Membership Entry No.", Membership."Entry No.");
+                        Page.Run(Page::"NPR MM Subscription Details", Subscription);
+                    end;
+                end;
+            }
+            action(SubscriptionRequests)
+            {
+                Caption = 'Subscription Request';
+                ToolTip = 'Opens subscription requests for selected membership.';
+                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                Image = History;
+                Scope = Repeater;
+                Promoted = true;
+                PromotedOnly = true;
+                PromotedCategory = Process;
+                RunObject = page "NPR MM Subscr. Requests";
+                RunPageLink = "Entry No." = field("Subscr. Request Entry No.");
+            }
 
-#if BC17 or BC18 or BC19 or BC20
-                Promoted = true;
-                PromotedIsBig = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
-#endif
-                trigger OnAction()
-                begin
-                    ProcessCurrentRecord(false)
-                end;
-            }
-            action(ProcessWithoutTryCountUpdate)
+            action(UserAccount)
             {
-                Caption = 'Process (Without Try Count Update)';
-                ToolTip = 'Processes the current subscription payment request without incrementing the try count';
+                Caption = 'User Account';
+                ToolTip = 'Opens the user account for selected payment subscription request.';
+                Image = User;
+                Scope = Repeater;
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-                Image = NextRecord;
-
-#if BC17 or BC18 or BC19 or BC20
                 Promoted = true;
-                PromotedIsBig = true;
-                PromotedCategory = Process;
                 PromotedOnly = true;
-#endif
-                trigger OnAction()
-                begin
-                    ProcessCurrentRecord(true)
-                end;
-            }
-            action(Cancel)
-            {
-                Caption = 'Cancel';
-                ToolTip = 'Sets the status of the current subscription payment reques to Cancelled';
-                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-                Image = Cancel;
-
-#if BC17 or BC18 or BC19 or BC20
-                Promoted = true;
-                PromotedIsBig = true;
                 PromotedCategory = Process;
-                PromotedOnly = true;
-#endif
-                trigger OnAction()
-                begin
-                    SetStatusCancelled();
-                end;
+                RunObject = page "NPR UserAccounts";
+                RunPageLink = EmailAddress = field("Payment E-mail");
             }
-            action(Refund)
-            {
-                Caption = 'Refund';
-                ToolTip = 'Requests a refund for the current subscription payment. In order to request a refund, the status of the payment must be "Captured".';
-                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-                Image = VendorPayment;
-#if BC17 or BC18 or BC19 or BC20
-                Promoted = true;
-                PromotedIsBig = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
-#endif
-                trigger OnAction()
-                begin
-                    RequestRefund();
-                end;
-            }
-            action(ResetTryCount)
-            {
-                Caption = 'Reset Process Try Count';
-                ToolTip = 'Sets the process try count to zero';
-                ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
-                Image = Restore;
-
-#if BC17 or BC18 or BC19 or BC20
-                Promoted = true;
-                PromotedIsBig = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
-#endif
-                trigger OnAction()
-                begin
-                    ResetProcessTryCount();
-                end;
-            }
-        }
-        area(Navigation)
-        {
             action(LogEntries)
             {
                 Caption = 'Log Entries';
                 ToolTip = 'Shows the interactions for the current subscription payment request';
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 Image = Log;
-#if BC17 or BC18 or BC19 or BC20
                 Promoted = true;
                 PromotedIsBig = true;
                 PromotedCategory = Process;
                 PromotedOnly = true;
-#endif
                 trigger OnAction()
                 begin
                     OpenLogEntries()
@@ -287,54 +275,17 @@ page 6184832 "NPR MM Subscr.Payment Requests"
                 ToolTip = 'Find the posted entries for current subscription payment request';
                 ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                 Image = Navigate;
-#if BC17 or BC18 or BC19 or BC20
                 Promoted = true;
                 PromotedIsBig = true;
                 PromotedCategory = Process;
                 PromotedOnly = true;
-#endif
                 trigger OnAction()
                 begin
                     FindPostedEntries();
                 end;
             }
         }
-
-#if not (BC17 or BC18 or BC19 or BC20)
-        area(Promoted)
-        {
-            actionref(LogEntries_Promoted; LogEntries) { }
-            actionref(FindEntries_Promoted; FindEntries) { }
-            actionref(Process_Promoted; Process) { }
-            actionref(ProcessWithoutTryCountUpdate_Promoted; ProcessWithoutTryCountUpdate) { }
-            actionref(Cancel_Promoted; Cancel) { }
-            actionref(Refund_Promoted; Refund) { }
-            actionref(ResetTryCount_Promoted; ResetTryCount) { }
-        }
-#endif
     }
-
-    local procedure ProcessCurrentRecord(SkipTryCountUpdate: Boolean)
-    var
-        SubsPayRequestUtils: Codeunit "NPR MM Subs Pay Request Utils";
-    begin
-        SubsPayRequestUtils.ProcessSubsPayRequestWithConfirmation(Rec, SkipTryCountUpdate);
-    end;
-
-    local procedure OpenLogEntries()
-    var
-        SubsPayReqLogUtils: Codeunit "NPR MM Subs Pay Req Log Utils";
-    begin
-        SubsPayReqLogUtils.OpenLogEntries(Rec);
-    end;
-
-    local procedure SetStatusCancelled()
-    var
-        SubsPayRequestUtils: Codeunit "NPR MM Subs Pay Request Utils";
-    begin
-        SubsPayRequestUtils.SetSubscrPaymentRequestStatusCancelled(Rec, false);
-    end;
-
     local procedure FindPostedEntries()
     var
         Navigate: Page Navigate;
@@ -343,25 +294,10 @@ page 6184832 "NPR MM Subscr.Payment Requests"
         Navigate.Run();
     end;
 
-    local procedure ResetProcessTryCount()
+    local procedure OpenLogEntries()
     var
-        SubsPayRequestUtils: Codeunit "NPR MM Subs Pay Request Utils";
+        SubsPayReqLogUtils: Codeunit "NPR MM Subs Pay Req Log Utils";
     begin
-        SubsPayRequestUtils.ResetProcessTryCountWithConfirmation(Rec);
-    end;
-
-    local procedure RequestRefund()
-    var
-        SubscrPmtReversalRequest: Record "NPR MM Subscr. Payment Request";
-        SubscrReversalMgt: Codeunit "NPR MM Subscr. Reversal Mgt.";
-        RefundReqestedMsg: Label 'Refund of selected subscription payment has been successfully requested.';
-    begin
-        SubscrReversalMgt.RequestRefundWithConfirmation(Rec, SubscrPmtReversalRequest);
-        if SubscrPmtReversalRequest."Entry No." <> 0 then begin
-            Rec := SubscrPmtReversalRequest;
-            Rec.Mark(true);
-            CurrPage.Update(false);
-            Message(RefundReqestedMsg);
-        end;
+        SubsPayReqLogUtils.OpenLogEntries(Rec);
     end;
 }

@@ -21,6 +21,7 @@ codeunit 6185060 "NPR UPG Subscriptions"
         UpdateSubscriptionRenewReqJobStartTime();
         UpdateSubscriptionRenewProcJobStartTime();
         UpgradeTerminationSubsRequest();
+        UpgradePaymentSubscriptionRequests();
     end;
 
     internal procedure CreateSubscriptions()
@@ -269,5 +270,75 @@ codeunit 6185060 "NPR UPG Subscriptions"
         if (Membership.Get(Subscription."Membership Entry No.")) then
             if Membership."Auto-Renew" <> Membership."Auto-Renew"::NO then
                 MembershipMgtInternal.DisableMembershipAutoRenewal(Membership, true, false);
+    end;
+
+    local procedure UpgradePaymentSubscriptionRequests()
+    var
+        SubscriptionPaymentRequest: Record "NPR MM Subscr. Payment Request";
+    begin
+        UpgradeStep := 'UpgradePaymentSubscriptionRequests';
+        if HasUpgradeTag() then
+            exit;
+
+        SubscriptionPaymentRequest.Reset();
+        if SubscriptionPaymentRequest.FindSet() then
+            repeat
+                ProcessSubscriptionPaymentRequest(SubscriptionPaymentRequest);
+            until SubscriptionPaymentRequest.Next() = 0;
+
+        SetUpgradeTag();
+    end;
+
+    local procedure ProcessSubscriptionPaymentRequest(var SubscriptionPaymentRequest: Record "NPR MM Subscr. Payment Request")
+    var
+        Modi: Boolean;
+    begin
+        Modi := false;
+
+        UpdatePaymentMethodFields(SubscriptionPaymentRequest, Modi);
+        UpdateSubscriptionFields(SubscriptionPaymentRequest, Modi);
+
+        if Modi then
+            SubscriptionPaymentRequest.Modify(true);
+    end;
+
+    local procedure UpdatePaymentMethodFields(var SubscriptionPaymentRequest: Record "NPR MM Subscr. Payment Request"; var Modi: Boolean)
+    var
+        MemberPaymentMethod: Record "NPR MM Member Payment Method";
+        UserAccount: Record "NPR UserAccount";
+    begin
+        if not MemberPaymentMethod.Get(SubscriptionPaymentRequest."Payment Method Entry No.") then
+            exit;
+
+        if not UserAccount.Get(MemberPaymentMethod."BC Record ID") then
+            exit;
+
+        if SubscriptionPaymentRequest."Payment E-mail" = '' then begin
+            SubscriptionPaymentRequest."Payment E-mail" := UserAccount.EmailAddress;
+            Modi := true;
+        end;
+
+        if SubscriptionPaymentRequest."Payment Phone No." = '' then begin
+            SubscriptionPaymentRequest."Payment Phone No." := UserAccount.PhoneNo;
+            Modi := true;
+        end;
+    end;
+
+    local procedure UpdateSubscriptionFields(var SubscriptionPaymentRequest: Record "NPR MM Subscr. Payment Request"; var Modi: Boolean)
+    var
+        SubscriptionRequest: Record "NPR MM Subscr. Request";
+        Subscription: Record "NPR MM Subscription";
+        SubsPayReqUtils: Codeunit "NPR MM Subs Pay Request Utils";
+    begin
+        if not SubscriptionRequest.Get(SubscriptionPaymentRequest."Subscr. Request Entry No.") then
+            exit;
+
+        if not Subscription.Get(SubscriptionRequest."Subscription Entry No.") then
+            exit;
+
+        if SubscriptionPaymentRequest."External Membership No." = '' then begin
+            SubscriptionPaymentRequest."External Membership No." := SubsPayReqUtils.GetExternalMembershipNo(Subscription."Membership Entry No.");
+            Modi := true;
+        end;
     end;
 }

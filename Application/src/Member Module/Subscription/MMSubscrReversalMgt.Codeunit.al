@@ -38,6 +38,7 @@ codeunit 6248187 "NPR MM Subscr. Reversal Mgt."
         OriginalSubscrPmtRequest, SubscrReversalPmtRequest : Record "NPR MM Subscr. Payment Request";
         NewValidFromDate: Date;
         PaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
+        SubsPayReqUtils: Codeunit "NPR MM Subs Pay Request Utils";
         MemberPaymentMethod: Record "NPR MM Member Payment Method";
         MembershipEntry: Record "NPR MM Membership Entry";
         DescrLbl: Label 'Partial refund from date %1', Comment = '%1 = date refund is effective from';
@@ -102,6 +103,8 @@ codeunit 6248187 "NPR MM Subscr. Reversal Mgt."
         SubscrReversalPmtRequest.Amount := RefundPrice;
         SubscrReversalPmtRequest."Currency Code" := SubscrReversalRequest."Currency Code";
         SubscrReversalPmtRequest.Description := CopyStr(SubscrReversalRequest.Description, 1, MaxStrLen(SubscrReversalPmtRequest.Description));
+        SubscrReversalPmtRequest."External Membership No." := SubsPayReqUtils.GetExternalMembershipNo(Subscription."Membership Entry No.");
+        SubsPayReqUtils.TrySetPaymentContactFromUserAcc(SubscrReversalPmtRequest, MemberPaymentMethod);
         SubscrReversalPmtRequest.Insert(true);
 
         if (SubscriptionRequestFound) then begin
@@ -168,6 +171,9 @@ codeunit 6248187 "NPR MM Subscr. Reversal Mgt."
         SubscrPmtReversalRequest."Currency Code" := SubscrPaymentRequest."Currency Code";
         SubscrPmtReversalRequest.Description := CopyStr(StrSubstNo(DescrLbl, SubscrPaymentRequest.Description), 1, MaxStrLen(SubscrPmtReversalRequest.Description));
         SubscrPmtReversalRequest."Subscription Payment Reference" := CopyStr(SubsPayRequestUtils.GenerateSubscriptionPaymentReference(), 1, MaxStrLen(SubscrPmtReversalRequest."Subscription Payment Reference"));
+        SubscrPmtReversalRequest."External Membership No." := SubscrPaymentRequest."External Membership No.";
+        SubscrPmtReversalRequest."Payment E-mail" := SubscrPaymentRequest."Payment E-mail";
+        SubscrPmtReversalRequest."Payment Phone No." := SubscrPaymentRequest."Payment Phone No.";
     end;
 
     internal procedure InsertReversalRequest(var SubscriptionRequest: Record "NPR MM Subscr. Request"; var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var SubscrReversalRequest: Record "NPR MM Subscr. Request"; var SubscrPmtReversalRequest: Record "NPR MM Subscr. Payment Request")

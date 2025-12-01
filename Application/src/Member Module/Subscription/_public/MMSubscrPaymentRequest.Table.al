@@ -206,6 +206,21 @@ table 6150921 "NPR MM Subscr. Payment Request"
             DataClassification = CustomerContent;
             Caption = 'Subscription Payment Reference';
         }
+        field(360; "External Membership No."; Code[20])
+        {
+            Caption = 'External Membership No.';
+            DataClassification = CustomerContent;
+        }
+        field(370; "Payment E-mail"; Text[80])
+        {
+            Caption = 'Payment E-mail';
+            DataClassification = CustomerContent;
+        }
+        field(380; "Payment Phone No."; Text[80])
+        {
+            Caption = 'Payment Phone No.';
+            DataClassification = CustomerContent;
+        }
     }
 
     keys

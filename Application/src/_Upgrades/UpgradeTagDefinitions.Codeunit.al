@@ -265,6 +265,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Subscriptions", 'UpdateSubscriptionRenewProcJobStartTime'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Subscriptions", 'UpdateSubscriptionRenewReqJobStartTime'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Subscriptions", 'UpgradeTerminationSubsRequest'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Subscriptions", 'UpgradePaymentSubscriptionRequests'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Subscriptions Install", 'ScheduleSubscriptionRequestCreationJobQueue'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Subscriptions Install", 'ScheduleSubscriptionPaymentRequestProcessingJobQueue'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Subscriptions Install", 'ScheduleSubscriptionRequestProcessingJobQueue'));
@@ -1016,6 +1017,8 @@
                         exit('NPR-UpdateSubscriptionRenewProcJobStartTime-20250227');
                     'UpgradeTerminationSubsRequest':
                         exit('NPR-UpgradeTerminationSubsRequest-20251103');
+                    'UpgradePaymentSubscriptionRequests':
+                        exit('NPR-UpgradePaymentSubscriptionRequests-20251201');
                 end;
             Codeunit::"NPR UPG POS Pay View Dimension":
                 case UpgradeStep of

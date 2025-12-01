@@ -166,4 +166,51 @@ codeunit 6185103 "NPR MM Subs Pay Request Utils"
 
         exit(SubscriptionPaymentReference);
     end;
+
+    internal procedure GetExternalMembershipNo(MembershipEntryNo: Integer): Code[20]
+    var
+        Membership: Record "NPR MM Membership";
+    begin
+        Membership.SetLoadFields("External Membership No.");
+        if Membership.Get(MembershipEntryNo) then
+            exit(Membership."External Membership No.");
+    end;
+
+    internal procedure TrySetPaymentContactFromPaymentMethod(Subscription: Record "NPR MM Subscription"; var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"): Boolean
+    var
+        MemberPaymentMethod: Record "NPR MM Member Payment Method";
+        PaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
+    begin
+        if not PaymentMethodMgt.TryGetMemberPaymentMethod(Subscription, true, MemberPaymentMethod) then
+            exit(false);
+
+        TrySetPaymentContactFromUserAcc(SubscrPaymentRequest, MemberPaymentMethod);
+        exit(true);
+    end;
+
+    internal procedure TrySetPaymentContactFromMember(Subscription: Record "NPR MM Subscription"; var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request")
+    var
+        Member: Record "NPR MM Member";
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+        Member.SetLoadFields("E-Mail Address", "Phone No.");
+        if not MembershipMgtInternal.GetFirstAdminMember(Subscription."Membership Entry No.", Member) then
+            exit;
+
+        SubscrPaymentRequest."Payment E-mail" := Member."E-Mail Address";
+        SubscrPaymentRequest."Payment Phone No." := Member."Phone No.";
+    end;
+
+    internal procedure TrySetPaymentContactFromUserAcc(var SubscrPaymentRequest: Record "NPR MM Subscr. Payment Request"; var MemberPaymentMethod: Record "NPR MM Member Payment Method")
+    var
+        UserAccount: Record "NPR UserAccount";
+    begin
+        UserAccount.SetLoadFields(EmailAddress, PhoneNo);
+
+        if not UserAccount.Get(MemberPaymentMethod."BC Record ID") then
+            exit;
+
+        SubscrPaymentRequest."Payment E-mail" := UserAccount.EmailAddress;
+        SubscrPaymentRequest."Payment Phone No." := UserAccount.PhoneNo;
+    end;
 }
