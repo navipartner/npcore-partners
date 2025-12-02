@@ -144,6 +144,12 @@
         {
             Caption = 'Barcode Reference';
             DataClassification = CustomerContent;
+            trigger OnValidate()
+            begin
+                if ((Rec."Line Type" = Rec."Line Type"::Item) and (Rec."No." = '') and
+                 (Rec."Barcode Reference" <> '')) then
+                    TryFindItemFromBarcode(Rec);
+            end;
         }
         field(75; "Location Code"; Code[10])
         {
@@ -164,7 +170,6 @@
             Caption = 'Description';
             DataClassification = CustomerContent;
         }
-
         field(101; "Description 2"; Text[50])
         {
             Caption = 'Description 2';
@@ -1242,5 +1247,30 @@
         Rec."VAT Prod. Posting Group" := POSSaleLine."VAT Prod. Posting Group";
         Rec."VAT Base Amount" := POSSaleLine."VAT Base Amount";
         Rec."VAT Calculation Type" := POSSaleLine."VAT Calculation Type";
+    end;
+
+    local procedure TryFindItemFromBarcode(var ExternalPOSSaleLine: Record "NPR External POS Sale Line")
+    var
+        ItemReference: Record "Item Reference";
+        BarcodeLookupMgt: Codeunit "NPR Barcode Lookup Mgt.";
+        ItemNo: Code[20];
+        ItemVariantCode: Code[10];
+        ResolvingTable: Integer;
+    begin
+        if (BarcodeLookupMgt.TranslateBarcodeToItemVariant(ExternalPOSSaleLine."Barcode Reference", ItemNo, ItemVariantCode, ResolvingTable, False)) then begin
+            ExternalPOSSaleLine.Validate("No.", ItemNo);
+            if ItemVariantCode <> '' then
+                ExternalPOSSaleLine.Validate("Variant Code", ItemVariantCode);
+        end;
+
+        // Validate and set proper UoM
+        ItemReference.Reset();
+        ItemReference.SetCurrentKey("Reference Type", "Reference No.", "Item No.");
+        ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
+        ItemReference.SetRange("Reference No.", ExternalPOSSaleLine."Barcode Reference");
+        ItemReference.SetRange("Item No.", ExternalPOSSaleLine."No.");
+        if ItemReference.FindFirst() then
+            if ItemReference."Unit of Measure" <> ExternalPOSSaleLine."Unit of Measure Code" then
+                ExternalPOSSaleLine.Validate("Unit of Measure Code", ItemReference."Unit of Measure");
     end;
 }

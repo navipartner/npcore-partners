@@ -1,7 +1,6 @@
 ﻿page 6059774 "NPR External POS Sale Subform"
 {
-    Extensible = False;
-
+    Extensible = false;
     Caption = 'External POS Sale Subform';
     PageType = ListPart;
     SourceTable = "NPR External POS Sale Line";
@@ -39,7 +38,6 @@
                     Caption = 'Barcode Reference';
                     ToolTip = 'Specifies the value of the Barcode Reference field';
                     ApplicationArea = NPRRetail;
-                    Editable = false;
                 }
                 field("date"; Rec."Date")
                 {

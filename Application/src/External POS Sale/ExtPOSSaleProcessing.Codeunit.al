@@ -80,9 +80,6 @@ codeunit 6248233 "NPR Ext. POS Sale Processing"
         case ExternalPOSSaleLine."Line Type" of
             Enum::"NPR POS Sale Line Type"::Item:
                 begin
-                    if ((ExternalPOSSaleLine."No." = '') and (ExternalPOSSaleLine."Barcode Reference" <> '')) then begin
-                        TryFindItemFromBarcode(ExternalPOSSaleLine);
-                    end;
                     ExternalPOSSaleLine."Gen. Bus. Posting Group" := ExternalPOSSale."Gen. Bus. Posting Group";
                     if (Item.Get(ExternalPOSSaleLine."No.")) then begin
 
@@ -221,31 +218,6 @@ codeunit 6248233 "NPR Ext. POS Sale Processing"
         until ExternalPOSSaleLine.Next() = 0;
         if (SaleAmount - PaidAmount + RoundingAmount <> 0) then
             Error(SaleBalanceNotValidErrLbl);
-    end;
-
-    local procedure TryFindItemFromBarcode(var ExternalPOSSaleLine: Record "NPR External POS Sale Line")
-    var
-        ItemReference: Record "Item Reference";
-        BarcodeLookupMgt: Codeunit "NPR Barcode Lookup Mgt.";
-        ItemNo: Code[20];
-        ItemVariantCode: Code[10];
-        ResolvingTable: Integer;
-    begin
-        if (BarcodeLookupMgt.TranslateBarcodeToItemVariant(ExternalPOSSaleLine."Barcode Reference", ItemNo, ItemVariantCode, ResolvingTable, False)) then begin
-            ExternalPOSSaleLine.Validate("No.", ItemNo);
-            if ItemVariantCode <> '' then
-                ExternalPOSSaleLine.Validate("Variant Code", ItemVariantCode);
-        end;
-
-        // Validate and set proper UoM
-        ItemReference.Reset();
-        ItemReference.SetCurrentKey("Reference Type", "Reference No.", "Item No.");
-        ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::"Bar Code");
-        ItemReference.SetRange("Reference No.", ExternalPOSSaleLine."Barcode Reference");
-        ItemReference.SetRange("Item No.", ExternalPOSSaleLine."No.");
-        if ItemReference.FindFirst() then
-            if ItemReference."Unit of Measure" <> ExternalPOSSaleLine."Unit of Measure Code" then
-                ExternalPOSSaleLine.Validate("Unit of Measure Code", ItemReference."Unit of Measure");
     end;
 
     procedure AddConversionError(var ExternalPOSSale: Record "NPR External POS Sale"; ErrorTxt: Text)
