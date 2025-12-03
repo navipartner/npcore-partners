@@ -4731,8 +4731,13 @@
         Customer.Modify(true);
 
         if (ContTemplateCode <> '') and ConfigTemplateHeader.Get(ContTemplateCode) then begin
-            ContBusRelation.SetRange("Link to Table", ContBusRelation."Link to Table"::Customer);
-            ContBusRelation.SetRange("No.", Customer."No.");
+#IF NOT (BC17 OR BC18 OR BC19 OR BC20 OR BC21 OR BC22 OR BC23)
+            ContBusRelation.ReadIsolation := IsolationLevel::ReadUncommitted;
+#ENDIF 
+            ContBusRelation.SetCurrentKey("Link to Table", "No.");
+            ContBusRelation.SetFilter("Link to Table", '=%1', ContBusRelation."Link to Table"::Customer);
+            ContBusRelation.SetFilter("No.", '=%1', Customer."No.");
+
             if (ContBusRelation.FindFirst() and Contact.Get(ContBusRelation."Contact No.")) then begin
                 RecRef.GetTable(Contact);
                 ConfigTemplateMgt.UpdateRecord(ConfigTemplateHeader, RecRef);
