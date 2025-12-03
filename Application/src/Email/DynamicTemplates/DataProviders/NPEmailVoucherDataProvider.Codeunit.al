@@ -24,7 +24,9 @@ codeunit 6248563 "NPR NPEmailVoucherDataProvider" implements "NPR IDynamicTempla
         JObject.Add('description', 'Giftvoucher 0000000');
         JObject.Add('reference_no', '1234567890123');
         JObject.Add('starting_date', CreateDateTime(20250101D, 0T));
+        JObject.Add('starting_date_formatted', Format(CreateDateTime(20250101D, 0T), 0, '<Standard Format,0>'));
         JObject.Add('ending_date', CreateDateTime(20251231D, 0T));
+        JObject.Add('ending_date_formatted', Format(CreateDateTime(20251231D, 0T), 0, '<Standard Format,0>'));
         JObject.Add('no_series', 'VOUCHERS');
         JObject.Add('arch_no_series', 'ARCH_VOUCHERS');
         JObject.Add('arch_no', 'A000000');
@@ -33,8 +35,11 @@ codeunit 6248563 "NPR NPEmailVoucherDataProvider" implements "NPR IDynamicTempla
         JObject.Add('allow_top_up', true);
         JObject.Add('open', true);
         JObject.Add('amount', 150.00);
+        JObject.Add('amount_formatted', Format(150.00, 0, '<Precision,2><Standard Format,2>'));
         JObject.Add('initial_amount', 520.00);
+        JObject.Add('initial_amount_formatted', Format(520.00, 0, '<Precision,2><Standard Format,2>'));
         JObject.Add('reserved_amount', 25.00);
+        JObject.Add('reserved_amount_formatted', Format(25.00, 0, '<Precision,2><Standard Format,2>'));
         JObject.Add('in_use_quantity', 2);
         JObject.Add('sms_template_code', 'SMS TEMPLATE');
         JObject.Add('send_voucher_module', 'SEND MODULE');
@@ -59,10 +64,12 @@ codeunit 6248563 "NPR NPEmailVoucherDataProvider" implements "NPR IDynamicTempla
         JObject.Add('voucher_message', 'Up to 250 character message');
         JObject.Add('spfy_send_from_shopify', false);
         JObject.Add('spfy_send_on', 0DT);
+        JObject.Add('spfy_send_on_formatted', Format(0DT, 0, '<Standard Format,0>'));
         JObject.Add('spfy_liquid_template_suffix', 'abc');
         JObject.Add('spfy_recipient_email', 'test@example.com');
         JObject.Add('spfy_recipient_name', '');
         JObject.Add('issue_date', 20250101D);
+        JObject.Add('issue_date_formatted', Format(20250101D, 0, '<Standard Format,0>'));
         JObject.Add('issue_register_no', 'POS00000');
         JObject.Add('issue_document_type', Voucher."Issue Document Type"::"Audit Roll");
         JObject.Add('issue_document_no', 'TIC00000');
@@ -84,6 +91,7 @@ codeunit 6248563 "NPR NPEmailVoucherDataProvider" implements "NPR IDynamicTempla
     local procedure VoucherToJson(Voucher: Record "NPR NpRv Voucher"): JsonObject
     var
         JObject: JsonObject;
+        DataProviderHelper: Codeunit "NPR DynTemplateDataProvHelper";
     begin
         Voucher.CalcFields(Open, Amount, "Initial Amount", "Reserved Amount", "In-use Quantity", "Send Voucher Module", "Validate Voucher Module", "Apply Payment Module", "Issue Date", "Issue Register No.", "Issue Document Type", "Issue Document No.", "Issue External Document No.", "Issue User ID", "Issue Partner Code", "Partner Clearing", "No. Send");
         JObject.Add('voucher_no', Voucher."No.");
@@ -91,7 +99,9 @@ codeunit 6248563 "NPR NPEmailVoucherDataProvider" implements "NPR IDynamicTempla
         JObject.Add('description', Voucher.Description);
         JObject.Add('reference_no', Voucher."Reference No.");
         JObject.Add('starting_date', Voucher."Starting Date");
+        JObject.Add('starting_date_formatted', DataProviderHelper.FormatToTextFromLanguage(Voucher."Starting Date", Voucher."Language Code"));
         JObject.Add('ending_date', Voucher."Ending Date");
+        JObject.Add('ending_date_formatted', DataProviderHelper.FormatToTextFromLanguage(Voucher."Ending Date", Voucher."Language Code"));
         JObject.Add('no_series', Voucher."No. Series");
         JObject.Add('arch_no_series', Voucher."Arch. No. Series");
         JObject.Add('arch_no', Voucher."Arch. No.");
@@ -100,8 +110,11 @@ codeunit 6248563 "NPR NPEmailVoucherDataProvider" implements "NPR IDynamicTempla
         JObject.Add('allow_top_up', Voucher."Allow Top-up");
         JObject.Add('open', Voucher.Open);
         JObject.Add('amount', Voucher.Amount);
+        JObject.Add('amount_formatted', DataProviderHelper.FormatToTextFromLanguage(Voucher.Amount, Voucher."Language Code"));
         JObject.Add('initial_amount', Voucher."Initial Amount");
+        JObject.Add('initial_amount_formatted', DataProviderHelper.FormatToTextFromLanguage(Voucher."Initial Amount", Voucher."Language Code"));
         JObject.Add('reserved_amount', Voucher."Reserved Amount");
+        JObject.Add('reserved_amount_formatted', DataProviderHelper.FormatToTextFromLanguage(Voucher."Reserved Amount", Voucher."Language Code"));
         JObject.Add('in_use_quantity', Voucher."In-use Quantity");
         JObject.Add('sms_template_code', Voucher."SMS Template Code");
         JObject.Add('send_voucher_module', Voucher."Send Voucher Module");
@@ -126,10 +139,12 @@ codeunit 6248563 "NPR NPEmailVoucherDataProvider" implements "NPR IDynamicTempla
         JObject.Add('voucher_message', Voucher."Voucher Message");
         JObject.Add('spfy_send_from_shopify', Voucher."Spfy Send from Shopify");
         JObject.Add('spfy_send_on', Voucher."Spfy Send on");
+        JObject.Add('spfy_send_on_formatted', DataProviderHelper.FormatToTextFromLanguage(Voucher."Spfy Send on", Voucher."Language Code"));
         JObject.Add('spfy_liquid_template_suffix', Voucher."Spfy Liquid Template Suffix");
         JObject.Add('spfy_recipient_email', Voucher."Spfy Recipient E-mail");
         JObject.Add('spfy_recipient_name', Voucher."Spfy Recipient Name");
         JObject.Add('issue_date', Voucher."Issue Date");
+        JObject.Add('issue_date_formatted', DataProviderHelper.FormatToTextFromLanguage(Voucher."Issue Date", Voucher."Language Code"));
         JObject.Add('issue_register_no', Voucher."Issue Register No.");
         JObject.Add('issue_document_type', Voucher."Issue Document Type");
         JObject.Add('issue_document_no', Voucher."Issue Document No.");

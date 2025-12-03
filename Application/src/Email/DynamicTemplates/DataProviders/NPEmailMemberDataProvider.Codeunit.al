@@ -10,6 +10,7 @@ codeunit 6248377 "NPR NPEmailMemberDataProvider" implements "NPR IDynamicTemplat
     var
         Entry: Record "NPR MM Member Notific. Entry";
         EntryBuffer: Record "NPR MMMemberNotificEntryBuf";
+        DataProviderHelper: Codeunit "NPR DynTemplateDataProvHelper";
         JObject, CustomJObject : JsonObject;
         WrongRecordReceivedErr: Label 'The code received a record of an unknown type. Most likely a wrong data driver was used on the Dynamic Template.';
     begin
@@ -20,10 +21,14 @@ codeunit 6248377 "NPR NPEmailMemberDataProvider" implements "NPR IDynamicTemplat
 
         JObject.Add('coupon_reference_no', Entry."Coupon Reference No.");
         JObject.Add('coupon_starting_date', Entry."Coupon Starting Date");
+        JObject.Add('coupon_starting_date_formatted', DataProviderHelper.FormatToTextFromLanguage(Entry."Coupon Starting Date", Entry.PreferredLanguageCode));
         JObject.Add('coupon_ending_date', Entry."Coupon Ending Date");
+        JObject.Add('coupon_ending_date_formatted', DataProviderHelper.FormatToTextFromLanguage(Entry."Coupon Ending Date", Entry.PreferredLanguageCode));
         JObject.Add('coupon_discount_type', Entry."Coupon Discount Type");
         JObject.Add('coupon_discount_amount', Entry."Coupon Discount Amount");
+        JObject.Add('coupon_discount_amount_formatted', DataProviderHelper.FormatToTextFromLanguage(Entry."Coupon Discount Amount", Entry.PreferredLanguageCode));
         JObject.Add('coupon_discount_pct', Entry."Coupon Discount %");
+        JObject.Add('coupon_discount_pct_formatted', DataProviderHelper.FormatToTextFromLanguage(Entry."Coupon Discount %", Entry.PreferredLanguageCode));
         JObject.Add('coupon_description', Entry."Coupon Description");
         JObject.Add('member_external_no', Entry."External Member No.");
         JObject.Add('member_name', Entry."Display Name");
@@ -37,11 +42,14 @@ codeunit 6248377 "NPR NPEmailMemberDataProvider" implements "NPR IDynamicTemplat
         JObject.Add('member_country_code', Entry."Country Code");
         JObject.Add('member_country', Entry.Country);
         JObject.Add('member_birthday', Entry.Birthday);
+        JObject.Add('member_birthday_formatted', DataProviderHelper.FormatToTextFromLanguage(Entry.Birthday, Entry.PreferredLanguageCode));
         JObject.Add('member_card_no', Entry."External Member Card No.");
         JObject.Add('membership_code', Entry."Membership Code");
         JObject.Add('membership_external_no', Entry."External Membership No.");
         JObject.Add('membership_valid_from', Entry."Membership Valid From");
+        JObject.Add('membership_valid_from_formatted', DataProviderHelper.FormatToTextFromLanguage(Entry."Membership Valid From", Entry.PreferredLanguageCode));
         JObject.Add('membership_valid_until', Entry."Membership Valid Until");
+        JObject.Add('membership_valid_until_formatted', DataProviderHelper.FormatToTextFromLanguage(Entry."Membership Valid Until", Entry.PreferredLanguageCode));
         JObject.Add('membership_description', Entry."Membership Description");
         JObject.Add('membership_auto_renew', "NPR MM MembershipAutoRenew".Names().Get("NPR MM MembershipAutoRenew".Ordinals().IndexOf("NPR MM MembershipAutoRenew"::YES_INTERNAL.AsInteger())));
         JObject.Add('membership_remaining_points', Entry."Remaining Points");
@@ -69,10 +77,14 @@ codeunit 6248377 "NPR NPEmailMemberDataProvider" implements "NPR IDynamicTemplat
     begin
         JObject.Add('coupon_reference_no', 'COUPON1234');
         JObject.Add('coupon_starting_date', 20250101D);
+        JObject.Add('coupon_starting_date_formatted', Format(20250101D, 0, '<Standard Format,0>'));
         JObject.Add('coupon_ending_date', 20251231D);
+        JObject.Add('coupon_ending_date_formatted', Format(20251231D, 0, '<Standard Format,0>'));
         JObject.Add('coupon_discount_type', 'Discount Amount');
         JObject.Add('coupon_discount_amount', 100.0);
+        JObject.Add('coupon_discount_amount_formatted', Format(100.0, 0, '<Precision,2><Standard Format,2>'));
         JObject.Add('coupon_discount_pct', 25);
+        JObject.Add('coupon_discount_pct_formatted', Format(25, 0, '<Precision,2><Standard Format,2>'));
         JObject.Add('coupon_description', 'Test coupon!');
         JObject.Add('member_external_no', 'MM1234567890');
         JObject.Add('member_name', 'Hans Jens Hansen');
@@ -86,11 +98,14 @@ codeunit 6248377 "NPR NPEmailMemberDataProvider" implements "NPR IDynamicTemplat
         JObject.Add('member_country_code', 'DK');
         JObject.Add('member_country', 'Denmark');
         JObject.Add('member_birthday', 20200101D);
+        JObject.Add('member_birthday_formatted', Format(20200101D, 0, '<Standard Format,0>'));
         JObject.Add('member_card_no', 'DEMO-123414-T');
         JObject.Add('membership_code', 'GOLD');
         JObject.Add('membership_external_no', 'MS123456789');
         JObject.Add('membership_valid_from', 20250101D);
+        JObject.Add('membership_valid_from_formatted', Format(20250101D, 0, '<Standard Format,0>'));
         JObject.Add('membership_valid_until', 20251130D);
+        JObject.Add('membership_valid_until_formatted', Format(20251130D, 0, '<Standard Format,0>'));
         JObject.Add('membership_description', 'Gold membership');
         JObject.Add('membership_auto_renew', "NPR MM MembershipAutoRenew".Names().Get("NPR MM MembershipAutoRenew".Ordinals().IndexOf("NPR MM MembershipAutoRenew"::YES_INTERNAL.AsInteger())));
         JObject.Add('membership_remaining_points', 0);

@@ -8,6 +8,7 @@ codeunit 6248408 "NPR NPEmailTicketDataProvider" implements "NPR IDynamicTemplat
         Entry: Record "NPR TM Ticket Notif. Entry";
         JObject: JsonObject;
         WrongRecordReceivedErr: Label 'The code received a record of an unknown type. Most likely a wrong data driver was used on the Dynamic Template.';
+        DataProviderHelper: Codeunit "NPR DynTemplateDataProvHelper";
     begin
         if (RecRef.Number() <> Database::"NPR TM Ticket Notif. Entry") then
             Error(WrongRecordReceivedErr);
@@ -21,8 +22,11 @@ codeunit 6248408 "NPR NPEmailTicketDataProvider" implements "NPR IDynamicTemplat
         JObject.Add('ticket_external_item_no', Entry."Ticket External Item No.");
         JObject.Add('ticket_external_no', Entry."External Ticket No.");
         JObject.Add('ticket_relevant_date', Entry."Relevant Date");
+        JObject.Add('ticket_relevant_date_formatted', DataProviderHelper.FormatToTextFromLanguage(Entry."Relevant Date", Entry."Ticket Holder Preferred Lang"));
         JObject.Add('ticket_relevant_time', Entry."Relevant Time");
+        JObject.Add('ticket_relevant_time_formatted', DataProviderHelper.FormatToTextFromLanguage(Entry."Relevant Time", Entry."Ticket Holder Preferred Lang"));
         JObject.Add('ticket_relevant_datetime', Entry."Relevant Datetime");
+        JObject.Add('ticket_relevant_datetime_formatted', DataProviderHelper.FormatToTextFromLanguage(Entry."Relevant Datetime", Entry."Ticket Holder Preferred Lang"));
         JObject.Add('ticket_holder_name', Entry."Ticket Holder Name");
         JObject.Add('ticket_holder_email', Entry."Ticket Holder E-Mail");
         JObject.Add('ticket_bom_description', Entry."Ticket BOM Description");
@@ -32,7 +36,9 @@ codeunit 6248408 "NPR NPEmailTicketDataProvider" implements "NPR IDynamicTemplat
         JObject.Add('admission_code', Entry."Admission Code");
         JObject.Add('notification_address', Entry."Notification Address");
         JObject.Add('event_start_date', Entry."Event Start Date");
+        JObject.Add('event_start_date_formatted', DataProviderHelper.FormatToTextFromLanguage(Entry."Event Start Date", Entry."Ticket Holder Preferred Lang"));
         JObject.Add('event_start_time', Entry."Event Start Time");
+        JObject.Add('event_start_time_formatted', DataProviderHelper.FormatToTextFromLanguage(Entry."Event Start Time", Entry."Ticket Holder Preferred Lang"));
         JObject.Add('eticket_pass_id', Entry."eTicket Pass Id");
         JObject.Add('eticket_pass_landing_url', Entry."eTicket Pass Landing URL");
         JObject.Add('published_ticket_url', Entry."Published Ticket URL");
@@ -51,8 +57,11 @@ codeunit 6248408 "NPR NPEmailTicketDataProvider" implements "NPR IDynamicTemplat
         JObject.Add('ticket_external_item_no', '123456789');
         JObject.Add('ticket_external_no', 'BIL123456789');
         JObject.Add('ticket_relevant_date', 20250101D);
+        JObject.Add('ticket_relevant_date_formatted', Format(20250101D, 0, '<Standard Format,0>'));
         JObject.Add('ticket_relevant_time', 110000T);
+        JObject.Add('ticket_relevant_time_formatted', Format(110000T, 0, '<Standard Format,0>'));
         JObject.Add('ticket_relevant_datetime', CreateDateTime(20250101D, 110000T));
+        JObject.Add('ticket_relevant_datetime_formatted', Format(CreateDateTime(20250101D, 110000T), 0, '<Standard Format,0>'));
         JObject.Add('ticket_holder_name', 'Hans Hansen');
         JObject.Add('ticket_holder_email', 'test@example.com');
         JObject.Add('ticket_bom_description', 'Entrance');
@@ -62,7 +71,9 @@ codeunit 6248408 "NPR NPEmailTicketDataProvider" implements "NPR IDynamicTemplat
         JObject.Add('admission_code', 'ENTRANCE');
         JObject.Add('notification_address', 'test@example.com');
         JObject.Add('event_start_date', 20250101D);
+        JObject.Add('event_start_date_formatted', Format(20250101D, 0, '<Standard Format,0>'));
         JObject.Add('event_start_time', 110000T);
+        JObject.Add('event_start_time_formatted', Format(110000T, 0, '<Standard Format,0>'));
         JObject.Add('eticket_pass_id', 'ABCDE1234');
         JObject.Add('eticket_pass_landing_url', 'https://passes.example.com');
         JObject.Add('published_ticket_url', 'https://tickets.example.com');
