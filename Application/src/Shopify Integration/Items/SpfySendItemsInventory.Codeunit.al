@@ -1410,54 +1410,54 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
         FirstVariant := true;
         foreach ShopifyVariant in ShopifyVariants.AsArray() do begin
             Cursor := _JsonHelper.GetJText(ShopifyVariant, 'cursor', false);
-            if ShopifyVariant.SelectToken('node', ShopifyVariant) then begin
-                SpfyItemMgt.ParseItem(ShopifyVariant, ItemVariant, VariantSku);
-                if (FirstPage and FirstVariant) or (ItemVariant.Code = '') then begin
-                    SpfyStoreItemLink.Type := SpfyStoreItemLink.Type::Item;
-                    SpfyStoreItemLink."Item No." := ItemVariant."Item No.";
-                    SpfyStoreItemLink."Variant Code" := '';
-                    SpfyStoreItemLink."Shopify Store Code" := NcTask."Store Code";
-                    LinkExists := SpfyStoreItemLink.Find();
-                    if NcTask.Type = NcTask.Type::Delete then begin
-                        DisableIntegrationForItem(SpfyStoreItemLink);
-                        if LinkExists then
-                            ModifySpfyStoreItemLink(SpfyStoreItemLink, true);
-                        exit;
+            if ShopifyVariant.SelectToken('node', ShopifyVariant) then
+                if SpfyItemMgt.ParseItem(ShopifyVariant, ItemVariant, VariantSku) then begin
+                    if (FirstPage and FirstVariant) or (ItemVariant.Code = '') then begin
+                        SpfyStoreItemLink.Type := SpfyStoreItemLink.Type::Item;
+                        SpfyStoreItemLink."Item No." := ItemVariant."Item No.";
+                        SpfyStoreItemLink."Variant Code" := '';
+                        SpfyStoreItemLink."Shopify Store Code" := NcTask."Store Code";
+                        LinkExists := SpfyStoreItemLink.Find();
+                        if NcTask.Type = NcTask.Type::Delete then begin
+                            DisableIntegrationForItem(SpfyStoreItemLink);
+                            if LinkExists then
+                                ModifySpfyStoreItemLink(SpfyStoreItemLink, true);
+                            exit;
+                        end;
+                        if not LinkExists then begin
+                            SpfyStoreItemLink.Init();
+                            SpfyStoreItemLink.Insert();
+                        end;
+                        xSpfyStoreItemLink := SpfyStoreItemLink;
+                        if TriggeredExternally then
+                            SpfyStoreItemLink."Sync. to this Store" := true;
+                        SpfyStoreItemLink."Synchronization Is Enabled" := SpfyStoreItemLink."Sync. to this Store";
+
+                        if ShopifyProductStatus <> '' then
+                            if Evaluate(SpfyStoreItemLink."Shopify Status", UpperCase(ShopifyProductStatus)) then;
+                        if ((ShopifyProductTitle <> '') or not BCIsNameDescriptionMaster) and (SpfyStoreItemLink."Shopify Name" <> ShopifyProductTitle) then
+                            SpfyStoreItemLink."Shopify Name" := CopyStr(ShopifyProductTitle, 1, MaxStrLen(SpfyStoreItemLink."Shopify Name"));
+                        if (ShopifyProductDetailedDescr <> '') or not BCIsNameDescriptionMaster then
+                            SpfyStoreItemLink.SetShopifyDescription(ShopifyProductDetailedDescr);
+                        SpfyStoreItemLink.Vendor := CopyStr(ShopifyProductVendor, 1, MaxStrLen(SpfyStoreItemLink.Vendor));
+
+                        ModifySpfyStoreItemLink(SpfyStoreItemLink, true);
+                        xShopifyProductID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+                        SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID", ShopifyProductID, false);
+                        if TriggeredExternally and not xSpfyStoreItemLink."Sync. to this Store" then
+                            SpfyMetafieldMgt.InitStoreItemLinkMetafields(SpfyStoreItemLink);
+                        UpdateMetafieldsFromShopify(SpfyStoreItemLink, ShopifyProductID);
+
+                        if (TriggeredExternally and not xSpfyStoreItemLink."Synchronization Is Enabled") or ((xShopifyProductID <> '') and (ShopifyProductID <> xShopifyProductID)) then begin
+                            RecalculateInventoryLevels(SpfyStoreItemLink);
+                            RecalculatePrices(SpfyStoreItemLink);
+                            SkipRecalc := true;
+                        end else
+                            SkipRecalc := false;
+                        FirstVariant := false;
                     end;
-                    if not LinkExists then begin
-                        SpfyStoreItemLink.Init();
-                        SpfyStoreItemLink.Insert();
-                    end;
-                    xSpfyStoreItemLink := SpfyStoreItemLink;
-                    if TriggeredExternally then
-                        SpfyStoreItemLink."Sync. to this Store" := true;
-                    SpfyStoreItemLink."Synchronization Is Enabled" := SpfyStoreItemLink."Sync. to this Store";
-
-                    if ShopifyProductStatus <> '' then
-                        if Evaluate(SpfyStoreItemLink."Shopify Status", UpperCase(ShopifyProductStatus)) then;
-                    if ((ShopifyProductTitle <> '') or not BCIsNameDescriptionMaster) and (SpfyStoreItemLink."Shopify Name" <> ShopifyProductTitle) then
-                        SpfyStoreItemLink."Shopify Name" := CopyStr(ShopifyProductTitle, 1, MaxStrLen(SpfyStoreItemLink."Shopify Name"));
-                    if (ShopifyProductDetailedDescr <> '') or not BCIsNameDescriptionMaster then
-                        SpfyStoreItemLink.SetShopifyDescription(ShopifyProductDetailedDescr);
-                    SpfyStoreItemLink.Vendor := CopyStr(ShopifyProductVendor, 1, MaxStrLen(SpfyStoreItemLink.Vendor));
-
-                    ModifySpfyStoreItemLink(SpfyStoreItemLink, true);
-                    xShopifyProductID := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
-                    SpfyAssignedIDMgt.AssignShopifyID(SpfyStoreItemLink.RecordId(), "NPR Spfy ID Type"::"Entry ID", ShopifyProductID, false);
-                    if TriggeredExternally and not xSpfyStoreItemLink."Sync. to this Store" then
-                        SpfyMetafieldMgt.InitStoreItemLinkMetafields(SpfyStoreItemLink);
-                    UpdateMetafieldsFromShopify(SpfyStoreItemLink, ShopifyProductID);
-
-                    if (TriggeredExternally and not xSpfyStoreItemLink."Synchronization Is Enabled") or ((xShopifyProductID <> '') and (ShopifyProductID <> xShopifyProductID)) then begin
-                        RecalculateInventoryLevels(SpfyStoreItemLink);
-                        RecalculatePrices(SpfyStoreItemLink);
-                        SkipRecalc := true;
-                    end else
-                        SkipRecalc := false;
-                    FirstVariant := false;
+                    UpdateItemVariant(NcTask."Store Code", ShopifyVariant, ItemVariant, TriggeredExternally, SkipRecalc);
                 end;
-                UpdateItemVariant(NcTask."Store Code", ShopifyVariant, ItemVariant, TriggeredExternally, SkipRecalc);
-            end;
         end;
     end;
 
@@ -1619,24 +1619,13 @@ codeunit 6184819 "NPR Spfy Send Items&Inventory"
 
     local procedure CreateRequest(var NcTask: Record "NPR Nc Task"; Cursor: Text; ShopifyStoreCode: code[20]; RequestString: text)
     var
+        SpfyCommunicationHandler: Codeunit "NPR Spfy Communication Handler";
         VariablesJson: JsonObject;
     begin
         Clear(NcTask);
         NcTask."Store Code" := ShopifyStoreCode;
-        AddCursor(VariablesJson, Cursor);
+        SpfyCommunicationHandler.AddGraphQLCursor(VariablesJson, Cursor);
         CompleteRequest(RequestString, VariablesJson, NcTask);
-    end;
-
-    local procedure AddCursor(var VariablesJson: JsonObject; Cursor: Text)
-    var
-        CursorValue: JsonValue;
-    begin
-        if Cursor = '' then
-            CursorValue.SetValueToNull()
-        else
-            CursorValue.SetValue(Cursor);
-
-        VariablesJson.Add('afterCursor', CursorValue);
     end;
 
     local procedure CompleteRequest(RequestString: text; VariablesJson: JsonObject; var NcTask: Record "NPR Nc Task")

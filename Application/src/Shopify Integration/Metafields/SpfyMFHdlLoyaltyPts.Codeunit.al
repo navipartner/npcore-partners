@@ -53,14 +53,13 @@ codeunit 6248558 "NPR Spfy M/F Hdl.-Loyalty Pts"
 
         Membership.SetCurrentKey("Customer No.");
         Membership.SetFilter("Customer No.", '<>%1', '');
+        Membership.SetRange(Blocked, false);
         if Membership.IsEmpty() then
             exit;
         Membership.SetLoadFields("Customer No.");
         Membership.SetAutoCalcFields("Remaining Points");
-        Membership.FindSet();
-        repeat
-            ProcessLoyaltyPointBalanceChange(Membership, '', Removed);
-        until Membership.Next() = 0;
+        Membership.FindFirst();
+        ProcessLoyaltyPointBalanceChange(Membership, '', Removed);
     end;
 
     local procedure ProcessLoyaltyPointBalanceChange(Membership: Record "NPR MM Membership"; ShopifyStoreCode: Code[20]; Removed: Boolean)

@@ -89,22 +89,35 @@ codeunit 6248540 "NPR Spfy Send Customers"
 
     local procedure PrepareCustomerUpdateRequest(var NcTask: Record "NPR Nc Task"; SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; ShopifyCustomerID: Text[30])
     var
-        CustomerJson: JsonObject;
+        InputJson: JsonObject;
         Request: JsonObject;
         Variables: JsonObject;
         OStream: OutStream;
-        CustomerCreate_QueryTok: Label 'mutation CreateCustomer($input: CustomerInput!) {customerCreate(input: $input) {customer{id} userErrors {message field}}}', Locked = true;
-        CustomerDelete_QueryTok: Label 'mutation DeleteCustomer($input: CustomerDeleteInput!) {customerDelete(input: $input) {deletedCustomerId userErrors{field message}}}', Locked = true;
-        CustomerUpdate_QueryTok: Label 'mutation UpdateCustomer($input: CustomerInput!) {customerUpdate(input: $input) {customer{id} userErrors{field message}}}', Locked = true;
+        EmailMarketingConsentIncluded: Boolean;
+        CustomerCreate_QueryTok: Label 'mutation CreateCustomer($customerInput: CustomerInput!) {customerCreate(input: $customerInput) {customer{id} userErrors {message field}}}', Locked = true;
+        CustomerDelete_QueryTok: Label 'mutation DeleteCustomer($customerInput: CustomerDeleteInput!) {customerDelete(input: $customerInput) {deletedCustomerId userErrors{field message}}}', Locked = true;
+        CustomerUpdate_QueryTok: Label 'mutation UpdateCustomer(%1) {customerUpdate(input: $customerInput) {customer{id} userErrors{field message}}%2}', Locked = true;
+        EmailMarketingConsentUpdate_QueryTok: Label 'customerEmailMarketingConsentUpdate(input: $emailMarketingConsentInput) {customer{id defaultEmailAddress{emailAddress marketingState marketingOptInLevel marketingUpdatedAt}} userErrors{field message}}', Locked = true;
     begin
-        AddCustomerInfo(SpfyStoreCustomerLink, NcTask.Type, ShopifyCustomerID, CustomerJson);
-        Variables.Add('input', CustomerJson);
+        AddCustomerInfo(SpfyStoreCustomerLink, NcTask.Type, ShopifyCustomerID, InputJson);
+        Variables.Add('customerInput', InputJson);
+        if (ShopifyCustomerID <> '') and (NcTask.Type = NcTask.Type::Modify) then begin
+            Clear(InputJson);
+            EmailMarketingConsentIncluded := AddEmailMarketingConsentInfo(SpfyStoreCustomerLink, ShopifyCustomerID, InputJson);
+            if EmailMarketingConsentIncluded then
+                Variables.Add('emailMarketingConsentInput', InputJson);
+        end;
 
         case NcTask.Type of
             NcTask.Type::Insert:
                 Request.Add('query', CustomerCreate_QueryTok);
             NcTask.Type::Modify:
-                Request.Add('query', CustomerUpdate_QueryTok);
+                begin
+                    if EmailMarketingConsentIncluded then
+                        Request.Add('query', StrSubstNo(CustomerUpdate_QueryTok, '$customerInput: CustomerInput!, $emailMarketingConsentInput: CustomerEmailMarketingConsentUpdateInput!', EmailMarketingConsentUpdate_QueryTok))
+                    else
+                        Request.Add('query', StrSubstNo(CustomerUpdate_QueryTok, '$customerInput: CustomerInput!', ''));
+                end;
             NcTask.Type::Delete:
                 Request.Add('query', CustomerDelete_QueryTok);
         end;
@@ -132,9 +145,36 @@ codeunit 6248540 "NPR Spfy Send Customers"
             CustomerJson.Add('firstName', SpfyStoreCustomerLink."First Name");
         CustomerJson.Add('lastName', SpfyStoreCustomerLink."Last Name");
 
+        if ShopifyCustomerID = '' then  // Marketing consent must be sent as a separate request when updating an existing customer
+            AddEmailMarketingConsentInfo(SpfyStoreCustomerLink, ShopifyCustomerID, CustomerJson);
+
         SpfyMetafieldMgt.GenerateMetafieldUpdateArrays(SpfyStoreCustomerLink.RecordId(), "NPR Spfy Metafield Owner Type"::CUSTOMER, '', SpfyStoreCustomerLink."Shopify Store Code", UpdateMetafields, RemoveMetafields);
         if UpdateMetafields.Count() > 0 then
             CustomerJson.Add('metafields', UpdateMetafields);
+    end;
+
+    local procedure AddEmailMarketingConsentInfo(SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; ShopifyCustomerID: Text[30]; var InputJson: JsonObject): Boolean
+    var
+        SpfyCustomerMgt: Codeunit "NPR Spfy Customer Mgt.";
+        EmailMarketingConsentJson: JsonObject;
+    begin
+        if SpfyStoreCustomerLink."E-mail Marketing State" = SpfyStoreCustomerLink."E-mail Marketing State"::UNKNOWN then
+            SpfyCustomerMgt.UpdateMarketingConsentState(SpfyStoreCustomerLink);
+        if SpfyStoreCustomerLink."Marketing State Updated in BC" and (SpfyStoreCustomerLink."E-mail Marketing State" <> SpfyStoreCustomerLink."E-mail Marketing State"::UNKNOWN) then begin
+            if SpfyStoreCustomerLink."E-mail Marketing State" = SpfyStoreCustomerLink."E-mail Marketing State"::SUBSCRIBED then
+                EmailMarketingConsentJson.Add('marketingOptInLevel', 'SINGLE_OPT_IN');  // Possible values: CONFIRMED_OPT_IN, SINGLE_OPT_IN, UNKNOWN
+            EmailMarketingConsentJson.Add('marketingState', SpfyEmailMarketingStateEnumValueName(SpfyStoreCustomerLink."E-mail Marketing State"));
+            if ShopifyCustomerID <> '' then
+                InputJson.Add('customerId', 'gid://shopify/Customer/' + ShopifyCustomerID);
+            InputJson.Add('emailMarketingConsent', EmailMarketingConsentJson);
+            exit(true);
+        end;
+        exit(false);
+    end;
+
+    local procedure SpfyEmailMarketingStateEnumValueName(State: Enum "NPR Spfy EMail Marketing State") Result: Text
+    begin
+        State.Names().Get(State.Ordinals().IndexOf(State.AsInteger()), Result);
     end;
 
     internal procedure GetShopifyCustomerID(var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; WithDialog: Boolean): Text[30]
@@ -339,7 +379,7 @@ codeunit 6248540 "NPR Spfy Send Customers"
         QueryStream: OutStream;
         Request: JsonObject;
         Variables: JsonObject;
-        QueryTok: Label 'query GetCustomer($customerID: ID!) {customer(id: $customerID) {id firstName lastName email phone}}', Locked = true;
+        QueryTok: Label 'query GetCustomer($customerID: ID!) {customer(id: $customerID) {id firstName lastName defaultEmailAddress{emailAddress marketingOptInLevel marketingState marketingUpdatedAt} defaultPhoneNumber{phoneNumber}}}', Locked = true;
     begin
         NcTask."Store Code" := ShopifyStoreCode;
         Variables.Add('customerID', 'gid://shopify/Customer/' + ShopifyCustomerID);
@@ -355,7 +395,9 @@ codeunit 6248540 "NPR Spfy Send Customers"
     var
         xSpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
         SpfyAssignedIDMgt: Codeunit "NPR Spfy Assigned ID Mgt Impl.";
+        SpfyCustomerMgt: Codeunit "NPR Spfy Customer Mgt.";
         SpfyMetafieldMgt: Codeunit "NPR Spfy Metafield Mgt.";
+        EmailMarketingState: Text;
         ShopifyCustomerID: Text[30];
         LinkExists: Boolean;
     begin
@@ -378,9 +420,15 @@ codeunit 6248540 "NPR Spfy Send Customers"
 #pragma warning disable AA0139
         SpfyStoreCustomerLink."First Name" := _JsonHelper.GetJText(ShopifyResponse, 'customer.firstName', MaxStrLen(SpfyStoreCustomerLink."First Name"), false);
         SpfyStoreCustomerLink."Last Name" := _JsonHelper.GetJText(ShopifyResponse, 'customer.lastName', MaxStrLen(SpfyStoreCustomerLink."Last Name"), false);
-        SpfyStoreCustomerLink."E-Mail" := _JsonHelper.GetJText(ShopifyResponse, 'customer.email', MaxStrLen(SpfyStoreCustomerLink."E-Mail"), false);
-        SpfyStoreCustomerLink."Phone No." := _JsonHelper.GetJText(ShopifyResponse, 'customer.phone', MaxStrLen(SpfyStoreCustomerLink."Phone No."), false);
+        SpfyStoreCustomerLink."E-Mail" := _JsonHelper.GetJText(ShopifyResponse, 'customer.defaultEmailAddress.emailAddress', MaxStrLen(SpfyStoreCustomerLink."E-Mail"), false);
+        SpfyStoreCustomerLink."Phone No." := _JsonHelper.GetJText(ShopifyResponse, 'customer.defaultPhoneNumber.phoneNumber', MaxStrLen(SpfyStoreCustomerLink."Phone No."), false);
 #pragma warning restore AA0139
+        EmailMarketingState := _JsonHelper.GetJText(ShopifyResponse, 'customer.defaultEmailAddress.marketingState', false);
+        if EmailMarketingState <> '' then
+            if Evaluate(SpfyStoreCustomerLink."E-mail Marketing State", UpperCase(EmailMarketingState)) then begin
+                SpfyStoreCustomerLink."Marketing State Updated in BC" := false;
+                SpfyCustomerMgt.UpdateMemberNewsletterSubscription(SpfyStoreCustomerLink);
+            end;
         if TriggeredExternally then
             SpfyStoreCustomerLink."Sync. to this Store" := true;
         SpfyStoreCustomerLink."Synchronization Is Enabled" := SpfyStoreCustomerLink."Sync. to this Store";

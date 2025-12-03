@@ -407,14 +407,19 @@ table 6150810 "NPR Spfy Store"
             DataClassification = CustomerContent;
 
             trigger OnValidate()
+            var
+                SpfyItemWebhookHandler: Codeunit "NPR Spfy Item Webhook Handler";
+                IncludeFields: List of [Text];
             begin
                 TestField(Code);
                 TestField(Enabled);
                 Modify();
-                _SpfyWebhookMgt.ToggleWebhook(Code, Enum::"NPR Spfy Webhook Topic"::"products/create", "Auto Set as Shopify Item");
+                if "Auto Set as Shopify Item" then
+                    IncludeFields := SpfyItemWebhookHandler.WebhookSubscriptionFields();
+                _SpfyWebhookMgt.ToggleWebhook(Code, Enum::"NPR Spfy Webhook Topic"::"products/create", IncludeFields, "Auto Set as Shopify Item");
                 _SpfyWebhookMgt.ToggleWebhook(Code, Enum::"NPR Spfy Webhook Topic"::"products/delete", "Auto Set as Shopify Item");
                 if not "Auto Update Items from Shopify" then
-                    _SpfyWebhookMgt.ToggleWebhook(Code, Enum::"NPR Spfy Webhook Topic"::"products/update", "Auto Set as Shopify Item");
+                    _SpfyWebhookMgt.ToggleWebhook(Code, Enum::"NPR Spfy Webhook Topic"::"products/update", IncludeFields, "Auto Set as Shopify Item");
             end;
         }
         field(510; "Auto Update Items from Shopify"; Boolean)
@@ -423,12 +428,14 @@ table 6150810 "NPR Spfy Store"
             DataClassification = CustomerContent;
 
             trigger OnValidate()
+            var
+                SpfyItemWebhookHandler: Codeunit "NPR Spfy Item Webhook Handler";
             begin
                 TestField(Code);
                 TestField(Enabled);
                 Modify();
                 if not "Auto Set as Shopify Item" then
-                    _SpfyWebhookMgt.ToggleWebhook(Code, Enum::"NPR Spfy Webhook Topic"::"products/update", "Auto Update Items from Shopify");
+                    _SpfyWebhookMgt.ToggleWebhook(Code, Enum::"NPR Spfy Webhook Topic"::"products/update", SpfyItemWebhookHandler.WebhookSubscriptionFields(), "Auto Update Items from Shopify");
             end;
         }
         field(520; "Item Created Webhook Exists"; Boolean)
@@ -450,6 +457,35 @@ table 6150810 "NPR Spfy Store"
             Caption = 'Item Updated Webhook Exists';
             FieldClass = FlowField;
             CalcFormula = exist("NPR Spfy Webhook Subscription" where("Store Code" = field(Code), Topic = const("products/update")));
+            Editable = false;
+        }
+        field(560; "Auto Update Cust. from Shopify"; Boolean)
+        {
+            Caption = 'Auto Update Customers from Shopify';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                SpfyCustWebhookHandler: Codeunit "NPR Spfy Cust. Webhook Handler";
+                Window: Dialog;
+                ApplyingChangesLbl: Label 'Applying changes. Please wait...';
+            begin
+                TestField(Code);
+                TestField(Enabled);
+                Modify();
+
+                if GuiAllowed() then
+                    Window.Open(ApplyingChangesLbl);
+                _SpfyWebhookMgt.ToggleWebhook(Code, Enum::"NPR Spfy Webhook Topic"::"customers/update", SpfyCustWebhookHandler.WebhookSubscriptionFields(), "Auto Update Cust. from Shopify");
+                if GuiAllowed() then
+                    Window.Close();
+            end;
+        }
+        field(590; "Cust. Updated Webhook Exists"; Boolean)
+        {
+            Caption = 'Customer Updated Webhook Exists';
+            FieldClass = FlowField;
+            CalcFormula = exist("NPR Spfy Webhook Subscription" where("Store Code" = field(Code), Topic = const("customers/update")));
             Editable = false;
         }
         field(600; "Customer No. (Price)"; Code[20])

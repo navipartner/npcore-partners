@@ -33,6 +33,7 @@ codeunit 6184802 "NPR Spfy App Upgrade"
         MoveCustomerAssignedIDs();
         MoveLastOrdersImportedAt();
         UpdateShopifyInventoryLocations();
+        RemoveEmptyShopifyStoreItemLinks();
     end;
 
     internal procedure UpdateShopifySetup()
@@ -534,6 +535,26 @@ codeunit 6184802 "NPR Spfy App Upgrade"
                     LocationInvItem.Modify();
                 end;
             until InventoryLevel.Next() = 0;
+
+        SetUpgradeTag();
+        LogFinish();
+    end;
+
+    local procedure RemoveEmptyShopifyStoreItemLinks()
+    var
+        SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
+    begin
+        _UpgradeStep := 'RemoveEmptyShopifyStoreItemLinks';
+
+        if HasUpgradeTag() then
+            exit;
+        if SpfyStoreItemLink.IsEmpty() then
+            exit;
+        LogStart();
+
+        SpfyStoreItemLink.SetRange("Item No.", '');
+        if not SpfyStoreItemLink.IsEmpty() then
+            SpfyStoreItemLink.DeleteAll();
 
         SetUpgradeTag();
         LogFinish();

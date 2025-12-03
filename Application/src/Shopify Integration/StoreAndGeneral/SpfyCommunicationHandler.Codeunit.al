@@ -94,41 +94,15 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         SendShopifyRequest(NcTask, Enum::"Http Request Type"::POST, Url);
     end;
 
-    [TryFunction]
-    procedure GetRegisteredWebhooks(SpfyStoreCode: Code[20]; Topic: Text; var ShopifyResponse: JsonToken)
-    var
-        NcTask: Record "NPR Nc Task";
-        Url: Text;
-    begin
-        NcTask."Store Code" := SpfyStoreCode;
-        Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('webhooks.json?topic=%1', Topic);
-        ShopifyResponse.ReadFrom(SendShopifyRequest(NcTask, Enum::"Http Request Type"::GET, Url));
-    end;
-
-    [TryFunction]
-    procedure DeleteRegisteredWebhook(SpfyStoreCode: Code[20]; SpfyWebhookId: Text[50])
-    var
-        NcTask: Record "NPR Nc Task";
-        Url: Text;
-    begin
-        NcTask."Store Code" := SpfyStoreCode;
-        Url := GetShopifyUrl(NcTask."Store Code") + StrSubstNo('webhooks/%1.json', SpfyWebhookId);
-        SendShopifyRequest(NcTask, Enum::"Http Request Type"::DELETE, Url);
-    end;
-
-    procedure RegisterWebhook(var NcTask: Record "NPR Nc Task") ShopifyResponse: JsonToken
-    var
-        Url: Text;
-    begin
-        CheckRequestContent(NcTask);
-
-        Url := GetShopifyUrl(NcTask."Store Code") + 'webhooks.json';
-        ShopifyResponse.ReadFrom(SendShopifyRequest(NcTask, Enum::"Http Request Type"::POST, Url));
-    end;
-
     procedure UserErrorsExistInGraphQLResponse(ShopifyResponse: JsonToken): Boolean
     var
         ResponseDataItemUserErrors: JsonToken;
+    begin
+        exit(UserErrorsExistInGraphQLResponse(ShopifyResponse, ResponseDataItemUserErrors));
+    end;
+
+    procedure UserErrorsExistInGraphQLResponse(ShopifyResponse: JsonToken; var ResponseDataItemUserErrors: JsonToken): Boolean
+    var
         ResponseDataSet: JsonToken;
         DataKey: Text;
     begin
@@ -138,10 +112,21 @@ codeunit 6184924 "NPR Spfy Communication Handler"
         foreach DataKey in ResponseDataSet.AsObject().Keys() do
             if ResponseDataSet.SelectToken(DataKey + '.userErrors', ResponseDataItemUserErrors) then
                 if ResponseDataItemUserErrors.IsArray() then
-                    if ResponseDataItemUserErrors.AsArray().Count() > 0 then
-                        exit(true);
+                    exit(ResponseDataItemUserErrors.AsArray().Count() > 0);
 
         exit(false);
+    end;
+
+    procedure AddGraphQLCursor(var VariablesJson: JsonObject; Cursor: Text)
+    var
+        CursorValue: JsonValue;
+    begin
+        if Cursor = '' then
+            CursorValue.SetValueToNull()
+        else
+            CursorValue.SetValue(Cursor);
+
+        VariablesJson.Add('afterCursor', CursorValue);
     end;
 
     internal procedure CheckRequestContent(var NcTask: Record "NPR Nc Task")

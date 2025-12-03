@@ -364,6 +364,24 @@ page 6184704 "NPR Spfy Store Card"
                         ApplicationArea = NPRShopify;
                         Enabled = _SalesOrderIntegrationIsEnabled;
                     }
+                    group(CustomerWebhooks)
+                    {
+                        Caption = 'Customer Webhooks';
+                        ShowCaption = false;
+                        Visible = _HasAzureADConnection;
+                        field("Auto Update Cust. from Shopify"; Rec."Auto Update Cust. from Shopify")
+                        {
+                            ToolTip = 'Specifies whether to automatically update customer information in Business Central when related customer information is changed in Shopify. Note that this option is only available in BC SaaS environments.';
+                            ApplicationArea = NPRShopify;
+                            Importance = Additional;
+                            Enabled = _SalesOrderIntegrationIsEnabled;
+
+                            trigger OnValidate()
+                            begin
+                                CurrPage.Update(false);
+                            end;
+                        }
+                    }
                     field("Loyalty Points as Metafield"; Rec."Loyalty Points as Metafield")
                     {
                         ToolTip = 'Specifies whether the membership loyalty points should be sent to Shopify as a customer metafield.';

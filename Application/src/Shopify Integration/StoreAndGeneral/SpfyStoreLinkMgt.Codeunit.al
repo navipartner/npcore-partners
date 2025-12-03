@@ -163,6 +163,7 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
     var
         ShopifyStore: Record "NPR Spfy Store";
         SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
+        SpfyCustomerMgt: Codeunit "NPR Spfy Customer Mgt.";
     begin
         if Customer."No." = '' then
             exit;
@@ -174,6 +175,7 @@ codeunit 6184800 "NPR Spfy Store Link Mgt."
                 SpfyStoreCustomerLink."Shopify Store Code" := ShopifyStore.Code;
                 if not SpfyStoreCustomerLink.Find() then begin
                     SpfyStoreCustomerLink.Init();
+                    SpfyCustomerMgt.UpdateMarketingConsentState(SpfyStoreCustomerLink);
                     SpfyStoreCustomerLink.Insert();
                 end;
             until ShopifyStore.Next() = 0;

@@ -237,6 +237,7 @@
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'MoveCustomerAssignedIDs'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'MoveLastOrdersImportedAt'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'UpdateShopifyInventoryLocations'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR Spfy App Upgrade", 'RemoveEmptyShopifyStoreItemLinks'));
 #endif
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Dig. Rcpt. Enable", 'UpgradeDigitalReceiptSetupEnable'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG Dig. Rcpt. Enable", 'UpdateDigitalReceiptSetupTable'));
@@ -930,6 +931,8 @@
                         exit('NPR-Spfy-MoveLastOrdersImportedAt-20251031');
                     'UpdateShopifyInventoryLocations':
                         exit('NPR-Spfy-UpdateShopifyInventoryLocations-20251120');
+                    'RemoveEmptyShopifyStoreItemLinks':
+                        exit('NPR-Spfy-RemoveEmptyShopifyStoreItemLinks-20251127');
                 end;
 #endif
             Codeunit::"NPR UPG Dig. Rcpt. Enable":

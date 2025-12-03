@@ -23,5 +23,20 @@ enum 6059772 "NPR Spfy Webhook Topic" implements "NPR Spfy Webhook Notif. IHndlr
         Caption = 'product updated';
         Implementation = "NPR Spfy Webhook Notif. IHndlr" = "NPR Spfy Item Webhook Handler";
     }
+    value(20; "customers/create")
+    {
+        Caption = 'customer created';
+        Implementation = "NPR Spfy Webhook Notif. IHndlr" = "NPR Spfy Cust. Webhook Handler";
+    }
+    value(21; "customers/delete")
+    {
+        Caption = 'customer deleted';
+        Implementation = "NPR Spfy Webhook Notif. IHndlr" = "NPR Spfy Cust. Webhook Handler";
+    }
+    value(22; "customers/update")
+    {
+        Caption = 'customer updated';
+        Implementation = "NPR Spfy Webhook Notif. IHndlr" = "NPR Spfy Cust. Webhook Handler";
+    }
 }
 #endif

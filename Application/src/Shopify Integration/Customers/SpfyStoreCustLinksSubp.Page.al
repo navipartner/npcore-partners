@@ -53,22 +53,27 @@ page 6185092 "NPR Spfy Store-Cust.Links Subp"
                 }
                 field("First Name"; Rec."First Name")
                 {
-                    ToolTip = 'Specifies the first name of the customer as it is specified in the Shopify store.';
+                    ToolTip = 'Specifies the first name of the customer as it is defined in the Shopify store.';
                     ApplicationArea = NPRShopify;
                 }
                 field("Last Name"; Rec."Last Name")
                 {
-                    ToolTip = 'Specifies the last name of the customer as it is specified in the Shopify store.';
+                    ToolTip = 'Specifies the last name of the customer as it is defined in the Shopify store.';
                     ApplicationArea = NPRShopify;
                 }
                 field("E-Mail"; Rec."E-Mail")
                 {
-                    ToolTip = 'Specifies the email address of the customer as it is specified in the Shopify store.';
+                    ToolTip = 'Specifies the email address of the customer as it is defined in the Shopify store.';
                     ApplicationArea = NPRShopify;
                 }
                 field("Phone No."; Rec."Phone No.")
                 {
-                    ToolTip = 'Specifies the phone number of the customer as it is specified in the Shopify store.';
+                    ToolTip = 'Specifies the phone number of the customer as it is defined in the Shopify store.';
+                    ApplicationArea = NPRShopify;
+                }
+                field("E-mail Marketing State"; Rec."E-mail Marketing State")
+                {
+                    ToolTip = 'Specifies the customer’s e-mail marketing consent state (i.e. whether the customer is subscribed to the newsletter) at the Shopify store.';
                     ApplicationArea = NPRShopify;
                 }
                 field("Shopify Customer ID"; SpfyAssignedIDMgt.GetAssignedShopifyID(Rec.RecordId(), "NPR Spfy ID Type"::"Entry ID"))

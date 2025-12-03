@@ -85,6 +85,26 @@ table 6151228 "NPR Spfy Store-Customer Link"
             FieldClass = FlowField;
             CalcFormula = lookup("NPR Spfy Store".Enabled where(Code = field("Shopify Store Code")));
         }
+        field(200; "E-mail Marketing State"; Enum "NPR Spfy EMail Marketing State")
+        {
+            Caption = 'E-mail Marketing State';
+            DataClassification = CustomerContent;
+
+            trigger OnValidate()
+            var
+                InvalidValueErr: Label 'This value cannot be set directly.';
+            begin
+                if not ("E-mail Marketing State" in ["E-mail Marketing State"::SUBSCRIBED, "E-mail Marketing State"::UNSUBSCRIBED]) then
+                    Error(InvalidValueErr);
+                if "E-mail Marketing State" <> xRec."E-mail Marketing State" then
+                    "Marketing State Updated in BC" := true;
+            end;
+        }
+        field(210; "Marketing State Updated in BC"; Boolean)
+        {
+            Caption = 'Marketing State Updated in BC';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {

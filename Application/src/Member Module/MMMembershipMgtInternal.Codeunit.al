@@ -4829,6 +4829,7 @@
 
         Customer.Modify();
 #if not BC17
+        SpfyCustomerMgt.UpdateMarketingConsentState(Member, Customer."No.");
         SpfyCustomerMgt.AutoEnableCustomerSync(Customer);
 #endif
 

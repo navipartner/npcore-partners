@@ -183,6 +183,141 @@ codeunit 6248553 "NPR Spfy Customer Mgt."
         exit(Customer."NPR Spfy Synced Cust.(Planned)");
     end;
 
+    internal procedure UpdateMarketingConsentState(var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link")
+    var
+        Member: Record "NPR MM Member";
+    begin
+        if not FindMember(SpfyStoreCustomerLink, Member) then
+            exit;
+        UpdateMarketingConsentState(Member, SpfyStoreCustomerLink);
+    end;
+
+    internal procedure UpdateMarketingConsentState(Member: Record "NPR MM Member")
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipRole: Record "NPR MM Membership Role";
+    begin
+        MembershipRole.SetRange("Member Entry No.", Member."Entry No.");
+        MembershipRole.SetRange(Blocked, false);
+        MembershipRole.SetLoadFields("Membership Entry No.");
+        if not MembershipRole.FindFirst() then
+            exit;
+        Membership.SetLoadFields("Customer No.");
+        if not Membership.Get(MembershipRole."Membership Entry No.") then
+            exit;
+        UpdateMarketingConsentState(Member, Membership."Customer No.");
+    end;
+
+    internal procedure UpdateMarketingConsentState(Member: Record "NPR MM Member"; CustomerNo: Code[20])
+    var
+        SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link";
+        SpfyStoreCustomerLink2: Record "NPR Spfy Store-Customer Link";
+    begin
+        if CustomerNo = '' then
+            exit;
+        SpfyStoreCustomerLink.SetRange(Type, SpfyStoreCustomerLink.Type::Customer);
+        SpfyStoreCustomerLink.SetRange("No.", CustomerNo);
+#if not (BC18 or BC19 or BC20 or BC21)
+        SpfyStoreCustomerLink.ReadIsolation := IsolationLevel::UpdLock;
+#endif
+        if SpfyStoreCustomerLink.FindSet() then
+            repeat
+                SpfyStoreCustomerLink2 := SpfyStoreCustomerLink;
+                if UpdateMarketingConsentState(Member, SpfyStoreCustomerLink2) then
+                    SpfyStoreCustomerLink2.Modify();
+            until SpfyStoreCustomerLink.Next() = 0;
+    end;
+
+    local procedure UpdateMarketingConsentState(Member: Record "NPR MM Member"; var SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"): Boolean
+    var
+        EmailMarketingState: Enum "NPR Spfy EMail Marketing State";
+    begin
+        case Member."E-Mail News Letter" of
+            Member."E-Mail News Letter"::NOT_SPECIFIED:
+                EmailMarketingState := EmailMarketingState::UNKNOWN;
+            Member."E-Mail News Letter"::NO:
+                EmailMarketingState := EmailMarketingState::UNSUBSCRIBED;
+            Member."E-Mail News Letter"::YES:
+                EmailMarketingState := EmailMarketingState::SUBSCRIBED;
+        end;
+        if EmailMarketingState in [EmailMarketingState::UNKNOWN, SpfyStoreCustomerLink."E-mail Marketing State"] then
+            exit(false);
+        SpfyStoreCustomerLink."E-mail Marketing State" := EmailMarketingState;
+        SpfyStoreCustomerLink."Marketing State Updated in BC" := true;
+        exit(true);
+    end;
+
+    internal procedure UpdateMemberNewsletterSubscription(SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link")
+    var
+        Member: Record "NPR MM Member";
+        xMember: Record "NPR MM Member";
+        SpfyStoreCustomerLink2: Record "NPR Spfy Store-Customer Link";
+    begin
+        if SpfyStoreCustomerLink.Type <> SpfyStoreCustomerLink.Type::Customer then
+            exit;
+
+        SpfyStoreCustomerLink2.SetRange(Type, SpfyStoreCustomerLink.Type);
+        SpfyStoreCustomerLink2.SetRange("No.", SpfyStoreCustomerLink."No.");
+        SpfyStoreCustomerLink2.SetFilter("Shopify Store Code", '<>%1', SpfyStoreCustomerLink."Shopify Store Code");
+        SpfyStoreCustomerLink2.SetRange("Sync. to this Store", true);
+        if SpfyStoreCustomerLink2.Find('-') then
+            repeat
+                if SpfyIntegrationMgt.IsEnabled(Enum::"NPR Spfy Integration Area"::"Sales Orders", SpfyStoreCustomerLink2."Shopify Store Code") then
+                    if SpfyStoreCustomerLink2."E-mail Marketing State" <> SpfyStoreCustomerLink."E-mail Marketing State" then
+                        exit;  //different states in different stores - do not update member
+            until SpfyStoreCustomerLink2.Next() = 0;
+
+        if not FindMember(SpfyStoreCustomerLink, Member) then
+            exit;
+        xMember := Member;
+        case SpfyStoreCustomerLink."E-mail Marketing State" of
+            SpfyStoreCustomerLink."E-mail Marketing State"::SUBSCRIBED:
+                Member."E-Mail News Letter" := Member."E-Mail News Letter"::YES;
+            SpfyStoreCustomerLink."E-mail Marketing State"::UNSUBSCRIBED:
+                Member."E-Mail News Letter" := Member."E-Mail News Letter"::NO;
+            else  //UNKNOWN, INVALID, NOT_SUBSCRIBED, PENDING, REDACTED
+                Member."E-Mail News Letter" := Member."E-Mail News Letter"::NOT_SPECIFIED;
+        end;
+        if Member."E-Mail News Letter" = xMember."E-Mail News Letter" then
+            exit;
+        Member.Modify();
+
+        //Update other store-customer links for the same customer
+        SpfyStoreCustomerLink2.SetRange("Sync. to this Store");
+#if not (BC18 or BC19 or BC20 or BC21)
+        SpfyStoreCustomerLink2.ReadIsolation := IsolationLevel::UpdLock;
+#endif
+        if SpfyStoreCustomerLink2.FindSet() then
+            repeat
+                if UpdateMarketingConsentState(Member, SpfyStoreCustomerLink2) then
+                    SpfyStoreCustomerLink2.Modify();
+            until SpfyStoreCustomerLink2.Next() = 0;
+    end;
+
+    local procedure FindMember(SpfyStoreCustomerLink: Record "NPR Spfy Store-Customer Link"; var Member: Record "NPR MM Member"): Boolean
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipRole: Record "NPR MM Membership Role";
+    begin
+        if SpfyStoreCustomerLink.Type <> SpfyStoreCustomerLink.Type::Customer then
+            exit(false);
+
+        Membership.SetCurrentKey("Customer No.");
+        Membership.SetRange("Customer No.", SpfyStoreCustomerLink."No.");
+        Membership.SetRange(Blocked, false);
+        Membership.SetLoadFields("Entry No.");
+        if not Membership.FindFirst() then
+            exit(false);
+
+        MembershipRole.SetRange("Membership Entry No.", Membership."Entry No.");
+        MembershipRole.SetRange(Blocked, false);
+        MembershipRole.SetLoadFields("Member Entry No.");
+        if not MembershipRole.FindFirst() then
+            exit(false);
+
+        exit(Member.Get(MembershipRole."Member Entry No."));
+    end;
+
 #if BC18 or BC19 or BC20 or BC21
     [EventSubscriber(ObjectType::Table, Database::Customer, 'OnBeforeRenameEvent', '', true, false)]
 #else

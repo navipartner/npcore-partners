@@ -161,5 +161,10 @@ codeunit 6184824 "NPR Spfy Integration Events"
     internal procedure OnCheckIfShopifyVoucherReferenceNoValidationSuspended(var Suspended: Boolean)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnSpfyWebhookTopicName(Topic: Enum "NPR Spfy Webhook Topic"; GraphQLName: Boolean; var Result: Text)
+    begin
+    end;
 }
 #endif

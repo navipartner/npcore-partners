@@ -139,8 +139,10 @@ page 6184707 "NPR Spfy Webhook Notifications"
                 trigger OnAction()
                 var
                     SpfyWebhookNotifIHndlr: Interface "NPR Spfy Webhook Notif. IHndlr";
+                    SpfyWebhookNotifParser: Codeunit "NPR Spfy Webhook Notif. Parser";
                 begin
-                    Rec.TestField(Topic);
+                    if Rec.Topic = Rec.Topic::UNDEFINED then
+                        SpfyWebhookNotifParser.IdentifyTopic(Rec);
                     SpfyWebhookNotifIHndlr := Rec.Topic;
                     SpfyWebhookNotifIHndlr.NavigateToRelatedBCEntity(Rec);
                 end;

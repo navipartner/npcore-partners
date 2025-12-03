@@ -194,9 +194,15 @@
             trigger OnValidate()
             var
                 HLMemberMgt: Codeunit "NPR HL Member Mgt. Impl.";
+#if not BC17
+                SpfyCustomerMgt: Codeunit "NPR Spfy Customer Mgt.";
+#endif
             begin
                 if "E-Mail News Letter" = "E-Mail News Letter"::YES then
                     HLMemberMgt.CheckAndConfirmHLResubscription(Rec);
+#if not BC17
+                SpfyCustomerMgt.UpdateMarketingConsentState(Rec);
+#endif
             end;
         }
         field(65; PreferredLanguageCode; Code[10])

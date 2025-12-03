@@ -32,7 +32,7 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
         exit(true);
     end;
 
-    local procedure FindTouchedSKUs(DataLogEntry: Record "NPR Data Log Record"; var InventoryLevelTemp: Record "NPR Spfy Inventory Level")
+    local procedure FindTouchedSKUs(DataLogEntry: Record "NPR Data Log Record"; var InventoryLevel: Record "NPR Spfy Inventory Level")
     var
         ItemLedger: Record "Item Ledger Entry";
         SalesLine: Record "Sales Line";
@@ -40,11 +40,11 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
         DataLogSubscriberMgt: Codeunit "NPR Data Log Sub. Mgt.";
         RecRef: RecordRef;
     begin
-        if not InventoryLevelTemp.IsTemporary() then
+        if not InventoryLevel.IsTemporary() then
             FunctionCallOnNonTempVarErr('FindTouchedSKUs()');
 
-        Clear(InventoryLevelTemp);
-        InventoryLevelTemp.DeleteAll();
+        Clear(InventoryLevel);
+        InventoryLevel.DeleteAll();
 
         RecRef := DataLogEntry."Record ID".GetRecord();
         case RecRef.Number of
@@ -53,18 +53,18 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
                     if not DataLogSubscriberMgt.RestoreRecordToRecRef(DataLogEntry."Entry No.", false, RecRef) then
                         exit;
                     RecRef.SetTable(ItemLedger);
-                    TouchInventoryLevel(ItemLedger."Location Code", ItemLedger."Item No.", ItemLedger."Variant Code", InventoryLevelTemp);
+                    TouchInventoryLevel(ItemLedger."Location Code", ItemLedger."Item No.", ItemLedger."Variant Code", InventoryLevel);
                 end;
 
             Database::"Sales Line":
                 begin
                     if DataLogSubscriberMgt.RestoreRecordToRecRef(DataLogEntry."Entry No.", false, RecRef) then begin
                         RecRef.SetTable(SalesLine);
-                        TouchInventoryLevel(SalesLine, InventoryLevelTemp);
+                        TouchInventoryLevel(SalesLine, InventoryLevel);
                     end;
                     if DataLogSubscriberMgt.RestoreRecordToRecRef(DataLogEntry."Entry No.", true, RecRef) then begin
                         RecRef.SetTable(SalesLine);
-                        TouchInventoryLevel(SalesLine, InventoryLevelTemp);
+                        TouchInventoryLevel(SalesLine, InventoryLevel);
                     end;
                 end;
 
@@ -72,38 +72,38 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
                 begin
                     if DataLogSubscriberMgt.RestoreRecordToRecRef(DataLogEntry."Entry No.", false, RecRef) then begin
                         RecRef.SetTable(TransferLine);
-                        TouchInventoryLevel(TransferLine, InventoryLevelTemp);
+                        TouchInventoryLevel(TransferLine, InventoryLevel);
                     end;
                     if DataLogSubscriberMgt.RestoreRecordToRecRef(DataLogEntry."Entry No.", true, RecRef) then begin
                         RecRef.SetTable(TransferLine);
-                        TouchInventoryLevel(TransferLine, InventoryLevelTemp);
+                        TouchInventoryLevel(TransferLine, InventoryLevel);
                     end;
                 end;
         end;
     end;
 
-    local procedure TouchInventoryLevel(SalesLine: Record "Sales Line"; var InventoryLevelTemp: Record "NPR Spfy Inventory Level")
+    local procedure TouchInventoryLevel(SalesLine: Record "Sales Line"; var InventoryLevel: Record "NPR Spfy Inventory Level")
     begin
         if (SalesLine."Document Type" <> SalesLine."Document Type"::Order) or
            (SalesLine.Type <> SalesLine.Type::Item) or
            (SalesLine."No." = '')
         then
             exit;
-        TouchInventoryLevel(SalesLine."Location Code", SalesLine."No.", SalesLine."Variant Code", InventoryLevelTemp);
+        TouchInventoryLevel(SalesLine."Location Code", SalesLine."No.", SalesLine."Variant Code", InventoryLevel);
     end;
 
-    local procedure TouchInventoryLevel(TransferLine: Record "Transfer Line"; var InventoryLevelTemp: Record "NPR Spfy Inventory Level")
+    local procedure TouchInventoryLevel(TransferLine: Record "Transfer Line"; var InventoryLevel: Record "NPR Spfy Inventory Level")
     begin
         if (TransferLine."Derived From Line No." <> 0) or
            (TransferLine."Item No." = '') or
            not IncludeTransferOrdersAnyStore
         then
             exit;
-        TouchInventoryLevel(TransferLine."Transfer-from Code", TransferLine."Item No.", TransferLine."Variant Code", InventoryLevelTemp);
-        TouchInventoryLevel(TransferLine."Transfer-to Code", TransferLine."Item No.", TransferLine."Variant Code", InventoryLevelTemp);
+        TouchInventoryLevel(TransferLine."Transfer-from Code", TransferLine."Item No.", TransferLine."Variant Code", InventoryLevel);
+        TouchInventoryLevel(TransferLine."Transfer-to Code", TransferLine."Item No.", TransferLine."Variant Code", InventoryLevel);
     end;
 
-    local procedure TouchInventoryLevel(LocationCode: Code[10]; ItemNo: Code[20]; VariantCode: Code[10]; var InventoryLevelTemp: Record "NPR Spfy Inventory Level")
+    local procedure TouchInventoryLevel(LocationCode: Code[10]; ItemNo: Code[20]; VariantCode: Code[10]; var InventoryLevel: Record "NPR Spfy Inventory Level")
     var
         SpfyStoreItemLink: Record "NPR Spfy Store-Item Link";
         SpfyStoreLocationLink: Record "NPR Spfy Store-Location Link";
@@ -116,15 +116,15 @@ codeunit 6184811 "NPR Spfy Inventory Level Mgt."
         if SpfyStoreLocationLink.FindSet() then
             repeat
                 if SpfyIntegrationMgt.IsEnabled("NPR Spfy Integration Area"::"Inventory Levels", SpfyStoreLocationLink."Shopify Store Code") then begin
-                    InventoryLevelTemp."Shopify Location ID" := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreLocationLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
-                    if InventoryLevelTemp."Shopify Location ID" <> '' then begin
-                        InventoryLevelTemp."Shopify Store Code" := SpfyStoreLocationLink."Shopify Store Code";
-                        InventoryLevelTemp."Item No." := ItemNo;
-                        InventoryLevelTemp."Variant Code" := VariantCode;
-                        if not InventoryLevelTemp.Find() then
+                    InventoryLevel."Shopify Location ID" := SpfyAssignedIDMgt.GetAssignedShopifyID(SpfyStoreLocationLink.RecordId(), "NPR Spfy ID Type"::"Entry ID");
+                    if InventoryLevel."Shopify Location ID" <> '' then begin
+                        InventoryLevel."Shopify Store Code" := SpfyStoreLocationLink."Shopify Store Code";
+                        InventoryLevel."Item No." := ItemNo;
+                        InventoryLevel."Variant Code" := VariantCode;
+                        if not InventoryLevel.Find() then
                             if SpfyStoreItemLink.Get(SpfyStoreItemLink.Type::Item, ItemNo, '', SpfyStoreLocationLink."Shopify Store Code") and SpfyStoreItemLink."Sync. to this Store" then begin
-                                InventoryLevelTemp.Init();
-                                InventoryLevelTemp.Insert();
+                                InventoryLevel.Init();
+                                InventoryLevel.Insert();
                             end;
                     end;
                 end;

@@ -48,10 +48,38 @@ codeunit 6184930 "NPR Spfy Webhook Notif. Parser"
 
         //read the original Shopify content payload through a text to remove the escape characters added by double searialization
         ShopifyWebhookDetails.ReadFrom(JsonHelper.GetJText(AFPayload, 'Content', true));
+        if SpfyWebhookNotification."Triggered for Source ID" = '' then
+#pragma warning disable AA0139
+            SpfyWebhookNotification."Triggered for Source ID" := JsonHelper.GetJText(ShopifyWebhookDetails, 'id', MaxStrLen(SpfyWebhookNotification."Triggered for Source ID"), false);
+#pragma warning restore AA0139
         SpfyWebhookNotification.SetPayload(ShopifyWebhookDetails);
 
-        SpfyWebhookNotification.Topic :=
-            Enum::"NPR Spfy Webhook Topic".FromInteger(Enum::"NPR Spfy Webhook Topic".Ordinals().Get(Enum::"NPR Spfy Webhook Topic".Names().IndexOf(SpfyWebhookNotification."Topic (Received)")));
+        IdentifyTopic(SpfyWebhookNotification);
+    end;
+
+    internal procedure IdentifyTopic(var SpfyWebhookNotification: Record "NPR Spfy Webhook Notification")
+    var
+        UnsupportedTopicErr: Label 'The webhook topic "%1" is not supported.', Comment = '%1 - Shopify webhook topic';
+    begin
+        if not TryParseTopic(SpfyWebhookNotification."Topic (Received)", SpfyWebhookNotification.Topic) then
+            Error(UnsupportedTopicErr, SpfyWebhookNotification."Topic (Received)");
+    end;
+
+    [TryFunction]
+    internal procedure TryParseTopic(TopicAsText: Text; var Topic: Enum "NPR Spfy Webhook Topic")
+    begin
+        Topic := Enum::"NPR Spfy Webhook Topic".FromInteger(Enum::"NPR Spfy Webhook Topic".Ordinals().Get(Enum::"NPR Spfy Webhook Topic".Names().IndexOf(TopicAsText)));
+    end;
+
+    internal procedure UpdateSourceIDFromPayload(var SpfyWebhookNotification: Record "NPR Spfy Webhook Notification")
+    var
+        JsonHelper: Codeunit "NPR Json Helper";
+        ShopifyPayload: JsonToken;
+    begin
+        ShopifyPayload.ReadFrom(SpfyWebhookNotification.GetPayloadStream());
+#pragma warning disable AA0139
+        SpfyWebhookNotification."Triggered for Source ID" := JsonHelper.GetJText(ShopifyPayload, 'id', MaxStrLen(SpfyWebhookNotification."Triggered for Source ID"), true);
+#pragma warning restore AA0139
     end;
 
     internal procedure SetWebhook(json: Text)
