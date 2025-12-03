@@ -27,49 +27,25 @@ codeunit 6150743 "NPR MMMembershipRestApi"
 
     internal procedure GetRemoteMembership(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; Prefix: Code[10]; ForeignMemberCardNumber: Text[100]; var ForeignMembershipNumber: Code[20]; var RemoteInfoCapture: Record "NPR MM Member Info Capture"; var NotValidReason: Text) IsValid: Boolean
     var
-        Request, Response : JsonObject;
+        Response: JsonObject;
     begin
-        NPRRemoteEndpointSetup.TestField("Rest Api Endpoint URI");
-        if IsNullGuid(RemoteInfoCapture.ExternalCardSystemId) then
-            RemoteInfoCapture.ExternalCardSystemId := GetExternalIdForRemoteCard(NPRRemoteEndpointSetup, ForeignMemberCardNumber);
-        if IsNullGuid(RemoteInfoCapture.ExternalCardSystemId) then begin
-            NotValidReason := EndpointCardValidationError(NPRRemoteEndpointSetup, '/membership/card', ForeignMemberCardNumber);
+        if not GetRemoteCardWithDetails(NPRRemoteEndpointSetup, ForeignMemberCardNumber, NotValidReason, Response) then
             exit(false);
-        end;
-
-        if not WebServiceApi(NPRRemoteEndpointSetup, 'GET', StrSubstNo('/membership/card/%1', Format(RemoteInfoCapture.ExternalCardSystemId, 0, 4)), Request, Response) then begin
-            NotValidReason := EndpointCardValidationError(NPRRemoteEndpointSetup, '/membership/card', ForeignMemberCardNumber);
-            exit(false);
-        end;
-
         IsValid := ValidateMembershipResponse(Prefix, ForeignMembershipNumber, Response, RemoteInfoCapture);
-
         if (StrLen(RemoteInfoCapture."External Card No.") >= 4) then
 #pragma warning disable AA0139
             RemoteInfoCapture."External Card No. Last 4" := CopyStr(RemoteInfoCapture."External Card No.", StrLen(RemoteInfoCapture."External Card No.") - 4 + 1);
 #pragma warning restore AA0139
         exit(IsValid);
-
     end;
 
     internal procedure GetRemoteMember(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; Prefix: Code[10]; ForeignMemberCardNumber: Text[100]; ForeignMembershipNumber: Code[20]; IncludeMemberImage: Boolean; var RemoteInfoCapture: Record "NPR MM Member Info Capture"; var TempRequestMemberFieldUpdate: Record "NPR MM Request Member Update" temporary; var NotValidReason: Text) IsValid: Boolean
     var
-        Request, Response : JsonObject;
+        Response: JsonObject;
     begin
-        NPRRemoteEndpointSetup.TestField("Rest Api Endpoint URI");
-        if IsNullGuid(RemoteInfoCapture.ExternalCardSystemId) then
-            RemoteInfoCapture.ExternalCardSystemId := GetExternalIdForRemoteCard(NPRRemoteEndpointSetup, ForeignMemberCardNumber);
-        if IsNullGuid(RemoteInfoCapture.ExternalCardSystemId) then begin
-            NotValidReason := EndpointCardValidationError(NPRRemoteEndpointSetup, '/membership/card', ForeignMemberCardNumber);
+        if not GetRemoteCardWithDetails(NPRRemoteEndpointSetup, ForeignMemberCardNumber, NotValidReason, Response) then
             exit(false);
-        end;
-
-        if not WebServiceApi(NPRRemoteEndpointSetup, 'GET', StrSubstNo('/membership/card/%1', Format(RemoteInfoCapture.ExternalCardSystemId, 0, 4)), Request, Response) then begin
-            NotValidReason := EndpointCardValidationError(NPRRemoteEndpointSetup, '/membership/card', ForeignMemberCardNumber);
-            exit(false);
-        end;
         IsValid := ValidateMemberResponse(NPRRemoteEndpointSetup, Prefix, ForeignMembershipNumber, IncludeMemberImage, Response, RemoteInfoCapture);
-
         exit(IsValid);
     end;
 
@@ -150,7 +126,7 @@ codeunit 6150743 "NPR MMMembershipRestApi"
             NotValidReason := StrSubstNo(ErrorResponseLbl, NPRRemoteEndpointSetup."Rest Api Endpoint URI", '/membership/member', GetErrorMessage(Response));
             exit(false);
         end;
-        exit(ValidateMemberSearchResponse(NPRRemoteEndpointSetup, Response, TmpSearchResult, NotValidReason));
+        exit(ValidateMemberSearchResponse(Response, TmpSearchResult, NotValidReason));
     end;
 
     procedure TestEndpointConnection(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"): Text
@@ -327,20 +303,11 @@ codeunit 6150743 "NPR MMMembershipRestApi"
     var
         JsonHelper: Codeunit "NPR Json Helper";
         Request, Response : JsonObject;
-        ExternalCardId: Guid;
         MembershipId: Guid;
     begin
         NPRRemoteEndpointSetup.TestField("Rest Api Endpoint URI");
-        if not WebServiceApi(NPRRemoteEndpointSetup, 'GET', StrSubstNo('/membership/card?cardNumber=%1', ForeignMemberCardNumber), Request, Response) then
+        if not WebServiceApi(NPRRemoteEndpointSetup, 'GET', StrSubstNo('/membership/card?cardNumber=%1&withDetails=true', ForeignMemberCardNumber), Request, Response) then
             exit(MembershipId);
-        if Evaluate(MembershipId, JsonHelper.GetJText(Response.AsToken(), 'card.membership.membershipId', false)) then;
-        if IsNullGuid(MembershipId) then begin
-            if Evaluate(ExternalCardId, JsonHelper.GetJText(Response.AsToken(), 'card.cardId', false)) then;
-            if IsNullGuid(ExternalCardId) then
-                exit(MembershipId);
-            if not WebServiceApi(NPRRemoteEndpointSetup, 'GET', StrSubstNo('/membership/card/%1', Format(ExternalCardId, 0, 4)), Request, Response) then
-                exit(MembershipId);
-        end;
         if Evaluate(MembershipId, JsonHelper.GetJText(Response.AsToken(), 'card.membership.membershipId', false)) then;
         exit(MembershipId);
     end;
@@ -367,6 +334,23 @@ codeunit 6150743 "NPR MMMembershipRestApi"
             exit(MembershipId);
         if Evaluate(MembershipId, JsonHelper.GetJText(Response.AsToken(), 'members[0].memberId', false)) then;
         exit(MembershipId);
+    end;
+
+    local procedure GetRemoteCardWithDetails(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; ForeignMemberCardNumber: Text[100]; var NotValidReason: Text; var Response: JsonObject): Boolean
+    var
+        JsonHelper: Codeunit "NPR Json Helper";
+        Request: JsonObject;
+    begin
+        NPRRemoteEndpointSetup.TestField("Rest Api Endpoint URI");
+        if not WebServiceApi(NPRRemoteEndpointSetup, 'GET', StrSubstNo('/membership/card?cardNumber=%1&withDetails=true', ForeignMemberCardNumber), Request, Response) then begin
+            NotValidReason := EndpointCardValidationError(NPRRemoteEndpointSetup, '/membership/card', ForeignMemberCardNumber);
+            exit(false);
+        end;
+        if JsonHelper.GetJBoolean(Response.AsToken(), 'card.blocked', false) then begin
+            NotValidReason := EndpointCardValidationError(NPRRemoteEndpointSetup, '/membership/card', ForeignMemberCardNumber);
+            exit(false);
+        end;
+        exit(true);
     end;
 
     local procedure EndpointCardValidationError(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; Path: Text; ForeignMemberCardNumber: Text[100]): Text
@@ -402,6 +386,7 @@ codeunit 6150743 "NPR MMMembershipRestApi"
 #pragma warning restore AA0139
         if Evaluate(RemoteInfoCapture.ExternalMembershipSystemId, JsonHelper.GetJText(Response.AsToken(), 'card.membership.membershipId', false)) then;
         if Evaluate(RemoteInfoCapture.ExternalMemberSystemId, JsonHelper.GetJText(Response.AsToken(), 'card.member.memberId', false)) then;
+        if Evaluate(RemoteInfoCapture.ExternalCardSystemId, JsonHelper.GetJText(Response.AsToken(), 'card.cardId', false)) then;
         exit(true);
     end;
 
@@ -434,6 +419,7 @@ codeunit 6150743 "NPR MMMembershipRestApi"
         RemoteInfoCapture."Phone No." := JsonHelper.GetJText(Response.AsToken(), 'card.member.phoneNo', false);
         RemoteInfoCapture."E-Mail Address" := JsonHelper.GetJText(Response.AsToken(), 'card.member.email', false);
         RemoteInfoCapture."Store Code" := JsonHelper.GetJText(Response.AsToken(), 'card.member.storeCode', false);
+        if Evaluate(RemoteInfoCapture.ExternalCardSystemId, JsonHelper.GetJText(Response.AsToken(), 'card.cardId', false)) then;
 #pragma warning restore AA0139
         if IncludeMemberImage then
             if JsonHelper.GetJBoolean(Response.AsToken(), 'card.member.hasPicture', false) then
@@ -624,12 +610,12 @@ codeunit 6150743 "NPR MMMembershipRestApi"
         if MembershipInfo.Birthday <> 0D then
             QueryString += 'birthday=' + Format(MembershipInfo.Birthday, 0, 9) + '&';
         if MembershipInfo.Quantity <> 0 then
-            QueryString += 'limitresultset=' + Format(MembershipInfo.Quantity, 0, 9) + '&';
-        QueryString := QueryString.TrimEnd('&');
+            QueryString += 'limit=' + Format(MembershipInfo.Quantity, 0, 9) + '&';
+        QueryString += 'withDetails=true';
         exit(QueryString);
     end;
 
-    local procedure ValidateMemberSearchResponse(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; Response: JsonObject; var TempSearchResult: Record "NPR MM Member Info Capture" temporary; var NotValidReason: Text): Boolean
+    local procedure ValidateMemberSearchResponse(Response: JsonObject; var TempSearchResult: Record "NPR MM Member Info Capture" temporary; var NotValidReason: Text): Boolean
     var
         JsonHelper: Codeunit "NPR Json Helper";
         Members: JsonToken;
@@ -645,7 +631,7 @@ codeunit 6150743 "NPR MMMembershipRestApi"
         if NotValidReason <> '' then
             exit(false);
         foreach Member in Members.AsArray() do
-            AddMemberSearchResult(NPRRemoteEndpointSetup, Member, TempSearchResult, EntryNo);
+            AddMemberSearchResult(Member, TempSearchResult, EntryNo);
         if TempSearchResult.Count() = 0 then begin
             NotValidReason := ServerResponseLbl;
             exit(false);
@@ -654,20 +640,12 @@ codeunit 6150743 "NPR MMMembershipRestApi"
 
     end;
 
-    local procedure AddMemberSearchResult(NPRRemoteEndpointSetup: Record "NPR MM NPR Remote Endp. Setup"; Member: JsonToken; var TempSearchResult: Record "NPR MM Member Info Capture" temporary; var EntryNo: Integer)
+    local procedure AddMemberSearchResult(Member: JsonToken; var TempSearchResult: Record "NPR MM Member Info Capture" temporary; var EntryNo: Integer)
     var
         JsonHelper: Codeunit "NPR Json Helper";
-        Request, Response : JsonObject;
         Membership, Memberships : JsonToken;
-        MemberId: Guid;
     begin
-        if not evaluate(MemberId, JsonHelper.GetJText(Member, 'memberId', false)) then
-            exit;
-        if IsNullGuid(MemberId) then
-            exit;
-        if not WebServiceApi(NPRRemoteEndpointSetup, 'GET', StrSubstNo('/membership/member/%1', Format(MemberId, 0, 4)), Request, Response) then
-            exit;
-        if not JsonHelper.GetJsonToken(Response.AsToken(), 'member.memberships', Memberships) then
+        if not JsonHelper.GetJsonToken(Member, 'memberships', Memberships) then
             exit;
         if Memberships.AsArray().Count() = 0 then
             exit;
