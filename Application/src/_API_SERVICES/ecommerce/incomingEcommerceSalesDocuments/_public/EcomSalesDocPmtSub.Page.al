@@ -163,7 +163,7 @@ page 6248181 "NPR Ecom Sales Doc Pmt Sub"
 
     local procedure GetGlobals()
     begin
-        EcomSalesHeader.SetAutoCalcFields("Payment Amount");
+        EcomSalesHeader.SetAutoCalcFields("Payment Amount", "Captured Payment Amount");
         if not EcomSalesHeader.Get(Rec."Document Entry No.") then
             Clear(EcomSalesHeader);
 

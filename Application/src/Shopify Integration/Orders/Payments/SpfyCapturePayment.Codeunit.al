@@ -207,7 +207,8 @@ codeunit 6184804 "NPR Spfy Capture Payment"
 #pragma warning disable AA0139
                     Response."Response Operation Id" := SpfyIntegrationMgt.RemoveUntil(JsonHelper.GetJText(ShopifyResponse, 'data.orderCapture.transaction.id', true), '/');
 #pragma warning restore AA0139
-            end;
+            end else
+                Error(JsonHelper.GetJText(ShopifyResponse, 'data.orderCapture.userErrors[0].message', true));
         end else
             Error(GetLastErrorText());
     end;
