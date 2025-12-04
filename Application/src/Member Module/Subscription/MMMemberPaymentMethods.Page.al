@@ -82,6 +82,12 @@ page 6184835 "NPR MM Member Payment Methods"
                 Visible = _DefaultFieldVisible;
                 SubPageLink = "Entry No." = field("Entry No.");
             }
+            part(MembershipFactbox; "NPR MM SubsMembershipFactbox")
+            {
+                ApplicationArea = NPRRetail;
+                Caption = 'Related Memberships';
+                SubPageLink = PaymentMethodId = field(SystemId), Default = const(true);
+            }
             part(MembersFactbox; "NPR MM SubsMembersFactbox")
             {
                 ApplicationArea = NPRRetail;
