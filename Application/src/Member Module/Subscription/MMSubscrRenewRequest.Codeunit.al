@@ -114,7 +114,7 @@ codeunit 6185047 "NPR MM Subscr. Renew: Request"
 
         MemberInfoCapture."Membership Entry No." := Subscription."Membership Entry No.";
         MemberInfoCapture."Membership Code" := MembershipAlterationSetup."From Membership Code";
-        MemberInfoCapture."Item No." := MembershipAlterationSetup."Sales Item No.";
+        MemberInfoCapture."Item No." := RenewWithItemNo;
         MemberInfoCapture."Information Context" := MemberInfoCapture."Information Context"::AUTORENEW;
 
         if not MembershipMgt.AutoRenewMembership(MemberInfoCapture, false, Subscription."Valid Until Date", SubscriptionRequest."New Valid From Date", SubscriptionRequest."New Valid Until Date", SubscriptionRequest.Amount, ReasonText) then
