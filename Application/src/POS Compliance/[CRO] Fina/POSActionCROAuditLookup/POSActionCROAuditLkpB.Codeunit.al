@@ -18,7 +18,6 @@ codeunit 6184556 "NPR POS Action: CROAudit Lkp-B"
     local procedure ShowAllCROAuditLog(ParameterShow: Option All,AllFiscalised,AllNonFiscalised,LastTransaction)
     var
         CROPOSAuditLogAuxInfo: Record "NPR CRO POS Aud. Log Aux. Info";
-        CROPOSAuditLogAuxInfoPage: Page "NPR CRO POS Aud. Log Aux. Info";
     begin
         case ParameterShow of
             ParameterShow::AllFiscalised:
@@ -26,8 +25,8 @@ codeunit 6184556 "NPR POS Action: CROAudit Lkp-B"
             ParameterShow::AllNonFiscalised:
                 CROPOSAuditLogAuxInfo.SetRange("Receipt Fiscalized", false);
         end;
-        CROPOSAuditLogAuxInfoPage.SetTableView(CROPOSAuditLogAuxInfo);
-        CROPOSAuditLogAuxInfoPage.RunModal();
+        CROPOSAuditLogAuxInfo.FindLast();
+        Page.Run(Page::"NPR CRO POS Aud. Log Aux. Info", CROPOSAuditLogAuxInfo);
     end;
 
     local procedure ShowLastCROAuditLog()
@@ -42,6 +41,6 @@ codeunit 6184556 "NPR POS Action: CROAudit Lkp-B"
         CROPOSAuditLogAuxInfo2.SetRange("Audit Entry Type", CROPOSAuditLogAuxInfo."Audit Entry Type");
         CROPOSAuditLogAuxInfo2.SetRange("Audit Entry No.", CROPOSAuditLogAuxInfo."Audit Entry No.");
         CROPOSAuditLogAuxInfoPage.SetTableView(CROPOSAuditLogAuxInfo2);
-        CROPOSAuditLogAuxInfoPage.RunModal();
+        CROPOSAuditLogAuxInfoPage.Run();
     end;
 }

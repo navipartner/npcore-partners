@@ -700,6 +700,7 @@ codeunit 6151547 "NPR CRO Audit Mgt."
         if not Customer.Get(CustomerNo) then
             exit;
         CROPOSAuditLogAuxInfo."Email-To" := Customer."E-Mail";
+        CROPOSAuditLogAuxInfo."Customer No." := Customer."No.";
     end;
 
     local procedure FiscalizeSalesInvoice(SalesInvHdrNo: Code[20])

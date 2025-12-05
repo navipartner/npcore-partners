@@ -158,6 +158,26 @@ table 6060059 "NPR CRO POS Aud. Log Aux. Info"
             Editable = false;
             FieldClass = FlowField;
         }
+        field(25; "Customer No."; Code[20])
+        {
+            Caption = 'Customer No.';
+            DataClassification = CustomerContent;
+            TableRelation = Customer;
+        }
+        field(26; "Customer Name"; Text[100])
+        {
+            Caption = 'Customer Name';
+            FieldClass = FlowField;
+            CalcFormula = Lookup(Customer.Name where("No." = field("Customer No.")));
+            Editable = false;
+        }
+        field(27; "Customer OIB"; Text[20])
+        {
+            Caption = 'Customer OIB';
+            FieldClass = FlowField;
+            CalcFormula = Lookup(Customer."VAT Registration No." where("No." = field("Customer No.")));
+            Editable = false;
+        }
         field(30; "Collect in Store"; Boolean)
         {
             Caption = 'Collect in Store';

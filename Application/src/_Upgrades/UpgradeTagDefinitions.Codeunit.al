@@ -301,6 +301,7 @@
 #endif
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR RS Retail Calculation Upg.", 'MatchRemainingQtyToRSRetailValueEntryMapping'));
         PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPGUserAccounts", 'UpgradeBCRecordSystemIdInMemberPaymentMethods'));
+        PerCompanyUpgradeTags.Add(GetUpgradeTag(Codeunit::"NPR UPG CRO Customer No.", 'init-customer-no-on-cro-pos-audit-log'));
     end;
 
     // Use methods to avoid hard-coding the tags. It is easy to remove afterwards because it's compiler-driven.
@@ -1165,6 +1166,11 @@
                 case UpgradeStep of
                     'UpgradeBINGroupPaymentLink':
                         exit('NPR-UpgradeBINGroupPaymentLinks-20251711');
+                end;
+            Codeunit::"NPR UPG CRO Customer No.":
+                case UpgradeStep of
+                    'init-customer-no-on-cro-pos-audit-log':
+                        exit('NPR-init-customer-no-on-cro-pos-audit-log-20251207');
                 end;
         end;
     end;

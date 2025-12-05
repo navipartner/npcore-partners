@@ -61,6 +61,21 @@ page 6151213 "NPR CRO POS Aud. Log Aux. Info"
                     ApplicationArea = NPRCROFiscal;
                     ToolTip = 'Specifies the time of the record creation.';
                 }
+                field("Customer Name"; Rec."Customer Name")
+                {
+                    ApplicationArea = NPRCROFiscal;
+                    ToolTip = 'Specifies the Customer Name related to this record.';
+                }
+                field("Customer OIB"; Rec."Customer OIB")
+                {
+                    ApplicationArea = NPRCROFiscal;
+                    ToolTip = 'Specifies the Customer OIB related to this record.';
+                }
+                field("Total Amount"; Rec."Total Amount")
+                {
+                    ApplicationArea = NPRCROFiscal;
+                    ToolTip = 'Specifies the Total Amount of the transaction.';
+                }
                 field("Paragon Number"; Rec."Paragon Number")
                 {
                     ApplicationArea = NPRCROFiscal;
