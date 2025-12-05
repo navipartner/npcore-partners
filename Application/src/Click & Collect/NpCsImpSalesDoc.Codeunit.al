@@ -309,6 +309,7 @@
     local procedure InsertSalesHeader(Element: XmlElement; Customer: Record Customer; var SalesHeader: Record "Sales Header")
     var
         NpXmlDomMgt: Codeunit "NPR NpXml Dom Mgt.";
+        ClickCollect: Codeunit "NPR Click & Collect";
         InclVATElement: XmlElement;
         DocNo: Text;
         BillToCustNo: Code[20];
@@ -336,6 +337,8 @@
         SalesHeader."Ship-to Contact" := CopyStr(NpXmlDomMgt.GetElementText(Element, 'ship_to_contact', MaxStrLen(SalesHeader."Ship-to Contact"), false), 1, MaxStrLen(SalesHeader."Ship-to Contact"));
         if NpXmlDomMgt.FindElement(Element, 'prices_including_vat', false, InclVATElement) then
             if Evaluate(SalesHeader."Prices Including VAT", InclVATElement.InnerText, 9) then;
+
+        ClickCollect.OnBeforeModifySalesHeaderOnCollectOrderImport(Customer, SalesHeader, Element);
         SalesHeader.Modify(true);
     end;
 

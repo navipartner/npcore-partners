@@ -150,4 +150,9 @@ codeunit 6059847 "NPR Click & Collect"
     procedure OnSkipCustomerUpsertOnCollectOrderImport(var Customer: Record Customer; var NewCustomer: Boolean; Element: XmlElement; var Skip: Boolean)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    procedure OnBeforeModifySalesHeaderOnCollectOrderImport(var Customer: Record Customer; var SalesHeader: Record "Sales Header"; Element: XmlElement)
+    begin
+    end;
 }
