@@ -352,6 +352,9 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         NpEcDocument.SetRange("Store Code", NpEcStore.Code);
         NpEcDocument.SetRange("Reference No.", OrderNo);
         NpEcDocument.SetRange("Document Type", NpEcDocument."Document Type"::"Sales Order");
+#if not (BC18 or BC19 or BC20 or BC21)
+        NpEcDocument.ReadIsolation := IsolationLevel::ReadUncommitted;
+#endif
         if not NpEcDocument.FindFirst() then
             exit(false);
 
@@ -391,6 +394,9 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         NpEcDocument.SetRange("Store Code", NpEcStore.Code);
         NpEcDocument.SetRange("Reference No.", OrderNo);
         NpEcDocument.SetRange("Document Type", NpEcDocument."Document Type"::"Posted Sales Invoice");
+#if not (BC18 or BC19 or BC20 or BC21)
+        NpEcDocument.ReadIsolation := IsolationLevel::ReadUncommitted;
+#endif
         if NpEcDocument.IsEmpty() then
             exit(false);
 
@@ -1158,6 +1164,9 @@ codeunit 6184814 "NPR Spfy Order Mgt."
         NpEcDocument.SetCurrentKey("Document Type", "Document No.");
         NpEcDocument.SetRange("Document Type", NpEcDocument."Document Type"::"Sales Order");
         NpEcDocument.SetRange("Document No.", SalesHeader."No.");
+#if not (BC18 or BC19 or BC20 or BC21)
+        NpEcDocument.ReadIsolation := IsolationLevel::ReadUncommitted;
+#endif
         if NpEcDocument.FindFirst() then
             if NpEcStore.Get(NpEcDocument."Store Code") then;
 
@@ -1689,21 +1698,6 @@ codeunit 6184814 "NPR Spfy Order Mgt."
             until ExistingLineFound or (ShopifyAssignedID.Next(-1) = 0);
 
         exit(ExistingLineFound);
-    end;
-
-    procedure LockTables()
-    var
-        NpEcDocument: Record "NPR NpEc Document";
-        SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
-        ShopifyAssignedID: Record "NPR Spfy Assigned ID";
-    begin
-        //TODO: refactor this
-        //Always perform table locking in the same order to prevent deadlocks
-        ShopifyAssignedID.LockTable();
-        NpEcDocument.LockTable();
-        SalesHeader.LockTable();
-        SalesLine.LockTable();
     end;
 
     local procedure GetDeliveryLocationID(ShippingLineCode: Code[50]; ShippingMethodId: Text[50]) DeliveryLocationID: Code[50]

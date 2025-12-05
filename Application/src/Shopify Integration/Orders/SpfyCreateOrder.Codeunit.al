@@ -34,7 +34,6 @@ codeunit 6184808 "NPR Spfy Create Order" implements "NPR Nc Import List IProcess
         if OrderMgt.SkipOrderImport(ShopifyStoreCode, Order) then
             exit;
 
-        OrderMgt.LockTables();
         OrderMgt.InsertSalesHeader(ShopifyStoreCode, Order, SalesHeader);
         OrderMgt.UpsertSalesLines(ShopifyStoreCode, Order, SalesHeader, false);
         OrderMgt.InsertPaymentLines(ShopifyStoreCode, Order, SalesHeader);
@@ -61,6 +60,9 @@ codeunit 6184808 "NPR Spfy Create Order" implements "NPR Nc Import List IProcess
         NpEcDocument.SetCurrentKey("Document Type", "Document No.");
         NpEcDocument.SetRange("Document Type", NpEcDocument."Document Type"::"Sales Order");
         NpEcDocument.SetRange("Document No.", SalesHeader."No.");
+#if not (BC18 or BC19 or BC20 or BC21)
+        NpEcDocument.ReadIsolation := IsolationLevel::ReadUncommitted;
+#endif
         if NpEcDocument.FindFirst() then
             if NpEcStore.Get(NpEcDocument."Store Code") then;
 

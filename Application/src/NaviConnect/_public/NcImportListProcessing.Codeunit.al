@@ -62,10 +62,10 @@
             NcImportType.CopyFilter(Code, NcImportEntry."Import Type");
         NcImportEntry.SetRange(Imported, false);
         NcImportEntry.SetRange("Runtime Error", false);
-        NcImportEntry.SetFilter("Earliest Import Datetime", '<=%1', CurrentDateTime);
+        NcImportEntry.SetFilter("Earliest Import Datetime", '<=%1', CurrentDateTime());
         if NcImportEntry.IsEmpty then
             exit;
-        if NcImportEntry.FindSet(true) then
+        if NcImportEntry.FindSet() then
             repeat
                 NcImportEntry2 := NcImportEntry;
                 NcSyncMgt.ProcessImportEntry(NcImportEntry2);

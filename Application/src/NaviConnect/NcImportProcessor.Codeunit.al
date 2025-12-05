@@ -7,14 +7,21 @@
         BatchEntriesMustBeImportedInOrderErr: Label 'Cannot Import the entry because Batch Entries should be imported in the order of creation. There are one or more entries with Entry No. lower than the Entry No. ''%1''. Please import first the oldest entry from Batch Id ''%2''.';
 
     trigger OnRun()
+    var
+        NcImportEntry: Record "NPR Nc Import Entry";
     begin
-        if Rec.HasActiveImport() then
-            exit;
-
-        if Rec."Earliest Import Datetime" > CurrentDateTime then
-            Sleep(Rec."Earliest Import Datetime" - CurrentDateTime);
-
-        ProcessImportEntry(Rec);
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        NcImportEntry.ReadIsolation := IsolationLevel::UpdLock;
+#else
+        NcImportEntry.LockTable();
+#endif
+        NcImportEntry.Get(Rec."Entry No.");
+        if not NcImportEntry.Imported and (NcImportEntry."Earliest Import Datetime" <= CurrentDateTime()) then begin
+            if not NcImportEntry.HasActiveImport() then
+                ProcessImportEntry(NcImportEntry);
+        end;
+        Rec := NcImportEntry;
+        Commit();
     end;
 
     procedure ProcessImportEntry(var NcImportEntry: Record "NPR Nc Import Entry") Success: Boolean
@@ -83,21 +90,22 @@
     end;
 
     local procedure MarkAsStarted(var NcImportEntry: Record "NPR Nc Import Entry")
+    var
+        JobQueueManagement: Codeunit "NPR Job Queue Management";
     begin
         ClearLastError();
-        NcImportEntry.LockTable();
-        NcImportEntry.Get(NcImportEntry."Entry No.");
         Clear(NcImportEntry."Last Error Message");
         NcImportEntry.Imported := false;
         NcImportEntry."Runtime Error" := true;
         NcImportEntry."Error Message" := '';
-        NcImportEntry."Import Started at" := CurrentDateTime;
+        NcImportEntry."Import Started at" := CurrentDateTime();
         NcImportEntry."Import Duration" := 0;
         NcImportEntry."Import Completed at" := 0DT;
         NcImportEntry."Import Count" += 1;
         NcImportEntry."Import Started by" := CopyStr(UserId, 1, MaxStrLen(NcImportEntry."Import Started by"));
         NcImportEntry."Server Instance Id" := ServiceInstanceId();
         NcImportEntry."Session Id" := SessionId();
+        NcImportEntry."Earliest Import Datetime" := JobQueueManagement.NowWithDelayInSeconds(30);  // to avoid concurrent processing by multiple sessions
         NcImportEntry.Modify(true);
         Commit();
     end;
@@ -111,11 +119,16 @@
         OutStr: OutStream;
         LastErrorText: Text;
     begin
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+        NcImportEntry.ReadIsolation := IsolationLevel::UpdLock;
+#else
         NcImportEntry.LockTable();
+#endif
         NcImportEntry.Get(NcImportEntry."Entry No.");
-        NcImportEntry."Import Completed at" := CurrentDateTime;
+        NcImportEntry."Import Completed at" := CurrentDateTime();
         if NcImportEntry."Import Started at" <> 0DT then
             NcImportEntry."Import Duration" := (NcImportEntry."Import Completed at" - NcImportEntry."Import Started at") / 1000;
+        NcImportEntry."Earliest Import Datetime" := 0DT;
         NcImportEntry."Server Instance Id" := 0;
         NcImportEntry."Session Id" := 0;
         NcImportEntry.Imported := Success;
@@ -141,7 +154,11 @@
         if NcImportType."Send e-mail on Error" then begin
             NcImportMgt.SendErrorMail(NcImportEntry, TempErrorMessage, TempEmailItem);
             if TempErrorMessage.IsEmpty() then begin
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+                NcImportEntry.ReadIsolation := IsolationLevel::UpdLock;
+#else
                 NcImportEntry.LockTable();
+#endif
                 NcImportEntry.Get(NcImportEntry."Entry No.");
                 NcImportEntry."Last Error E-mail Sent at" := CurrentDateTime;
                 NcImportEntry."Last Error E-mail Sent to" := NcImportType."E-mail address on Error";
@@ -163,7 +180,11 @@
             exit;
 
         if NcImportType."Delay between Retries" > 0 then begin
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+            NcImportEntry.ReadIsolation := IsolationLevel::UpdLock;
+#else
             NcImportEntry.LockTable();
+#endif
             NcImportEntry.Get(NcImportEntry."Entry No.");
             NcImportEntry."Earliest Import Datetime" := CurrentDateTime + NcImportType."Delay between Retries";
             NcImportEntry.Modify(true);
@@ -262,6 +283,11 @@
         NcImportEntry.SetRange(Imported, false);
         NcImportEntry.SetFilter("Import Count", '>%1', 0);
         If not NcImportEntry.IsEmpty() then begin
+#if not (BC17 or BC18 or BC19 or BC20 or BC21)
+            NcImportEntry.ReadIsolation := IsolationLevel::UpdLock;
+#else
+            NcImportEntry.LockTable();
+#endif
             If NcImportEntry.FindSet() then
                 repeat
                     NcImportEntry2 := NcImportEntry;

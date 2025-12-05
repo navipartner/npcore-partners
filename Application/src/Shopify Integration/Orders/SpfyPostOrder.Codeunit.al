@@ -35,7 +35,6 @@ codeunit 6184815 "NPR Spfy Post Order" implements "NPR Nc Import List IProcess"
         if OrderMgt.SkipOrderImport(ShopifyStoreCode, Order) then
             exit;
 
-        OrderMgt.LockTables();
         if not OrderMgt.FindSalesOrder(ShopifyStoreCode, Order, SalesHeader) then begin
             if OrderMgt.FindSalesInvoices(ShopifyStoreCode, Order, TempSalesInvHeader) then begin
                 OrderMgt.SetImportEntryErrorMsg(ImportEntry, AlreadyPostedMsg);

@@ -393,7 +393,7 @@
     var
         NoInputTxt: Label 'No Input';
         ScheduleForReImportQst: Label 'The %1 selected Import Entries will be scheduled for re-import\Continue?', Comment = '%1="NPR Nc Import Entry".Count()';
-        NoOfImportedDoscMsg: Label '%1 Documents have been imported\\%2 Documents failed.', Comment = '%1=ImportedCount;%2=ImportEntry.Count()';
+        NoOfImportedDoscMsg: Label '%1 Documents have been imported\\%2 Documents failed\%3 Documents skipped.', Comment = '%1 = total number of processed entries; %2 = number of failed entries; %3 = number of skipped entries';
         WebClient: Boolean;
         ImportFileTxt: Label 'Import File';
         EmptyStyleSheetErr: Label 'XML Stylesheet is empty for Import Type: %1', Comment = '%1="NPR Nc Import Entry"."Import Type"';
@@ -441,11 +441,29 @@
         ImportEntry: Record "NPR Nc Import Entry";
         ImportEntry2: Record "NPR Nc Import Entry";
         ImportedCount: Integer;
+        SkippedCount: Integer;
+        StartedAt: DateTime;
+        ConfirmReimportMsg: Label 'Some of the selected entries have already been imported. Are you sure you want to import them again?';
+        ConfirmSkipFutureMsg: Label 'Some of the selected entries have an "Earliest Import Datetime" in the future.\Do you want to skip them and continue importing the rest?';
     begin
         ImportedCount := 0;
+        StartedAt := CurrentDateTime();
         CurrPage.SetSelectionFilter(ImportEntry);
-        ImportEntry.ModifyAll("Earliest Import Datetime", 0DT);
-        Commit();
+        ImportEntry.SetFilter("Earliest Import Datetime", '>%1', StartedAt);
+        if not ImportEntry.IsEmpty() then
+            if not Confirm(ConfirmSkipFutureMsg, true) then
+                exit;
+        SkippedCount := ImportEntry.Count();
+        ImportEntry.SetFilter("Earliest Import Datetime", '<=%1', StartedAt);
+        ImportEntry.SetRange(Imported, true);
+        if not ImportEntry.IsEmpty() then begin
+            if not Confirm(ConfirmReimportMsg, true) then
+                exit;
+            ImportEntry.ModifyAll(Imported, false);
+            ImportEntry.SetRange(Imported);
+            Commit();
+        end;
+
         if ImportEntry.FindSet() then
             repeat
                 ImportEntry2 := ImportEntry;
@@ -453,16 +471,22 @@
                 ImportedCount += 1;
             until ImportEntry.Next() = 0;
         ImportEntry.SetRange("Runtime Error", true);
-        Message(NoOfImportedDoscMsg, ImportedCount, ImportEntry.Count());
+        Message(NoOfImportedDoscMsg, ImportedCount, ImportEntry.Count(), SkippedCount);
     end;
 
     local procedure RescheduleSelectedforImport()
     var
         ImportEntry: Record "NPR Nc Import Entry";
         NcImportProcessor: Codeunit "NPR Nc Import Processor";
+        ConfirmProcessFutureMsg: Label 'Some of the selected entries have an "Earliest Import Datetime" in the future.\Do you want to ignore this and schedule them for import too? This will reset their "Earliest Import Datetime" to an empty value.';
     begin
         CurrPage.SetSelectionFilter(ImportEntry);
         if Confirm(ScheduleForReImportQst, true, ImportEntry.Count()) then begin
+            ImportEntry.SetFilter("Earliest Import Datetime", '>%1', CurrentDateTime());
+            if not ImportEntry.IsEmpty() then
+                if not Confirm(ConfirmProcessFutureMsg, true) then
+                    exit;
+            ImportEntry.SetRange("Earliest Import Datetime");
             ImportEntry.ModifyAll(Imported, false, false);
             ImportEntry.ModifyAll("Runtime Error", false, false);
             ImportEntry.ModifyAll("Earliest Import Datetime", 0DT);
