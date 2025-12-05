@@ -951,6 +951,9 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
         MMPaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.";
         UserAccount: Record "NPR UserAccount";
+        POSSession: Codeunit "NPR POS Session";
+        POSSale: Codeunit "NPR POS Sale";
+        SalePOS: Record "NPR POS Sale";
     begin
         if not Membership.Get(MMMemberInfoCapture."Membership Entry No.") then
             exit;
@@ -958,15 +961,20 @@ codeunit 6184639 "NPR EFT Adyen Integration"
         if MemberPaymentMethod.Get(MMMemberInfoCapture."Member Payment Method") then
             MemberPaymentMethod.Delete();
 
+        Member.Get(MMMemberInfoCapture."Member Entry No");
+
+        if (not MembershipMgtInternal.GetUserAccountFromMember(Member, UserAccount)) then
+            MembershipMgtInternal.CreateUserAccountFromMember(Member, UserAccount);
+
         if MMPaymentMethodMgt.FindMemberPaymentMethod(EftTransactionRequest, MemberPaymentMethod) then
             MMPaymentMethodMgt.SetMemberPaymentMethodAsDefault(Membership, MemberPaymentMethod)
         else begin
-            Member.Get(MMMemberInfoCapture."Member Entry No");
 
-            if (not MembershipMgtInternal.GetUserAccountFromMember(Member, UserAccount)) then
-                MembershipMgtInternal.CreateUserAccountFromMember(Member, UserAccount);
+            POSSession.GetSale(POSSale);
+            POSSale.GetCurrentSale(SalePOS);
 
-            MMPaymentMethodMgt.AddMemberPaymentMethod(UserAccount, EftTransactionRequest, MemberPaymentMethod);
+            AddPaymentMethodForMemberOrPayer(SalePOS, UserAccount, EftTransactionRequest, MemberPaymentMethod, MembershipMgtInternal, MMPaymentMethodMgt);
+
             MMPaymentMethodMgt.SetMemberPaymentMethodAsDefault(Membership, MemberPaymentMethod);
 
             MMMemberInfoCapture."Enable Auto-Renew" := true;
@@ -1004,10 +1012,35 @@ codeunit 6184639 "NPR EFT Adyen Integration"
             MembershipMgt.CreateUserAccountFromMember(Member, UserAccount);
 
         if not MMPaymentMethodMgt.FindMemberPaymentMethod(EftTransactionRequest, MemberPaymentMethod) then
-            MMPaymentMethodMgt.AddMemberPaymentMethod(UserAccount, EftTransactionRequest, MemberPaymentMethod);
+            AddPaymentMethodForMemberOrPayer(SalePOS, UserAccount, EftTransactionRequest, MemberPaymentMethod, MembershipMgt, MMPaymentMethodMgt);
 
         // NOTE: Previously this would not add it as default, but that should be safe to do now.
         MMPaymentMethodMgt.SetMemberPaymentMethodAsDefault(Membership, MemberPaymentMethod);
+    end;
+
+    local procedure AddPaymentMethodForMemberOrPayer(SalePOS: Record "NPR POS Sale"; MemberUserAccount: Record "NPR UserAccount"; EftTransactionRequest: Record "NPR EFT Transaction Request"; var MemberPaymentMethod: Record "NPR MM Member Payment Method"; MembershipMgt: Codeunit "NPR MM MembershipMgtInternal"; MMPaymentMethodMgt: Codeunit "NPR MM Payment Method Mgt.")
+    var
+        PaymentUserAccount: Record "NPR UserAccount";
+        UserAccountMgtImpl: Codeunit "NPR UserAccountMgtImpl";
+        MemberEmailAddress: Text[80];
+    begin
+        // Default: use member's UserAccount
+        if SalePOS."Membership Payer E-Mail" = '' then begin
+            MMPaymentMethodMgt.AddMemberPaymentMethod(MemberUserAccount, EftTransactionRequest, MemberPaymentMethod);
+            exit;
+        end;
+
+        // Check if payer email is different from member email
+        MemberEmailAddress := CopyStr(MemberUserAccount.EmailAddress.ToLower().Trim(), 1, MaxStrLen(MemberEmailAddress));
+        if SalePOS."Membership Payer E-Mail" = MemberEmailAddress then begin
+            MMPaymentMethodMgt.AddMemberPaymentMethod(MemberUserAccount, EftTransactionRequest, MemberPaymentMethod);
+            exit;
+        end;
+
+        // Create payment method with payer's UserAccount
+        if not UserAccountMgtImpl.FindAccountByEmail(SalePOS."Membership Payer E-Mail", PaymentUserAccount) then
+            MembershipMgt.CreatePaymentUserAccountFromEmail(SalePOS."Membership Payer E-Mail", PaymentUserAccount);
+        MMPaymentMethodMgt.AddMemberPaymentMethod(PaymentUserAccount, EftTransactionRequest, MemberPaymentMethod);
     end;
 
     local procedure DeleteMemberPaymentMethods(CurrEftTransactionRequest: Record "NPR EFT Transaction Request")

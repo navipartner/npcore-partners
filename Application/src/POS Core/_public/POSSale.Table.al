@@ -800,6 +800,12 @@
             DataClassification = CustomerContent;
             Editable = false;
         }
+        field(6021; "Membership Payer E-Mail"; Text[80])
+        {
+            Caption = 'Membership Payer E-Mail';
+            DataClassification = CustomerContent;
+            Description = 'Temporary field to store payer email for membership subscription payments';
+        }
     }
 
     keys

@@ -3552,9 +3552,19 @@
         if (Member."Middle Name" <> '') then
             UserAccount.Validate(FirstName, UserAccount.FirstName + ' ' + Member."Middle Name");
         UserAccount.Validate(LastName, Member."Last Name");
-        UserAccount.EmailAddress := Member."E-Mail Address".ToLower();
+        UserAccount.EmailAddress := CopyStr(Member."E-Mail Address".ToLower().Trim(), 1, MaxStrLen(UserAccount.EmailAddress));
         UserAccount.PhoneNo := Member."Phone No.";
 
+        UserAccountMgt.CreateAccount(UserAccount);
+    end;
+
+    internal procedure CreatePaymentUserAccountFromEmail(EmailAddress: Text[80]; var UserAccount: Record "NPR UserAccount")
+    var
+        UserAccountMgt: Codeunit "NPR UserAccountMgtImpl";
+    begin
+        UserAccount.Init();
+        UserAccount.AccountNo := 0;
+        UserAccount.EmailAddress := EmailAddress.ToLower();
         UserAccountMgt.CreateAccount(UserAccount);
     end;
 
@@ -6751,5 +6761,65 @@
         SubscriptionRequest.Description := CopyStr(RequestLbl, 1, MaxStrLen(SubscriptionRequest.Description));
         SubscriptionRequest."Membership Code" := Subscription."Membership Code";
         SubscriptionRequest.Insert(true);
+    end;
+
+    internal procedure POSAssignMembershipPaymentUserAccount(Sale: Codeunit "NPR POS Sale"; PaymentUserAccount: Text)
+    var
+        POSSale: Record "NPR POS Sale";
+    begin
+        Sale.GetCurrentSale(POSSale);
+        POSSale."Membership Payer E-Mail" := CopyStr(PaymentUserAccount.ToLower().Trim(), 1, MaxStrLen(POSSale."Membership Payer E-Mail"));
+        POSSale.Modify();
+    end;
+
+    internal procedure POSMembershipSelected(SalePOS: Record "NPR POS Sale"): Boolean
+    var
+        Membership: Record "NPR MM Membership";
+        MembershipEntry: Record "NPR MM Membership Entry";
+    begin
+        Membership.SetCurrentKey("Customer No.");
+        Membership.SetRange("Customer No.", SalePOS."Customer No.");
+        if not Membership.FindFirst() then
+            exit(false);
+
+        MembershipEntry.SetRange("Membership Entry No.", Membership."Entry No.");
+        MembershipEntry.SetRange(Blocked, false);
+        MembershipEntry.SetFilter(Context, '<>%1', MembershipEntry.Context::REGRET);
+        if MembershipEntry.IsEmpty() then
+            exit(false);
+
+        exit(true);
+    end;
+
+    internal procedure GetMemberEmail(SalePOS: Record "NPR POS Sale"; var MembershipEmail: Text)
+    var
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+        MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
+        Member: Record "NPR MM Member";
+        Membership: Record "NPR MM Membership";
+    begin
+        MemberInfoCapture.SetRange("Receipt No.", SalePOS."Sales Ticket No.");
+        MemberInfoCapture.SetLoadFields("E-Mail Address");
+        if MemberInfoCapture.FindFirst() then begin
+            MembershipEmail := MemberInfoCapture."E-Mail Address";
+            exit;
+        end;
+
+        Membership.SetRange("Customer No.", SalePOS."Customer No.");
+        Membership.SetLoadFields("Entry No.");
+        if Membership.FindFirst() then begin
+            MembershipMgt.GetFirstAdminMember(Membership."Entry No.", Member);
+            MembershipEmail := Member."E-Mail Address";
+        end;
+    end;
+
+    internal procedure MemberInfoCaptureExist(SalePOS: Record "NPR POS Sale"): Boolean
+    var
+        MemberInfoCapture: Record "NPR MM Member Info Capture";
+    begin
+        MemberInfoCapture.Reset();
+        MemberInfoCapture.SetCurrentKey("Receipt No.", "Line No.");
+        MemberInfoCapture.SetRange("Receipt No.", SalePOS."Sales Ticket No.");
+        exit(not MemberInfoCapture.IsEmpty());
     end;
 }

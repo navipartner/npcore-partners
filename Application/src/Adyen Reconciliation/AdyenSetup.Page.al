@@ -232,6 +232,11 @@ page 6184531 "NPR Adyen Setup"
                     ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
                     ToolTip = 'Specifies the value of the Auto Process Subscription Request Errors field.';
                 }
+                field("Enable Collect Payer Email"; Rec."Collect Subscr. Payer Email")
+                {
+                    ApplicationArea = NPRMembershipEssential, NPRMembershipAdvanced;
+                    ToolTip = 'Specifies the value of the Collect Subscription Payer Email field.';
+                }
             }
         }
     }

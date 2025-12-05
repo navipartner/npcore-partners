@@ -15,6 +15,8 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         EndSaleName: Label 'Try End Sale';
         EndSaleNameDesc: Label 'Try to end the sale after the payment is processed.';
         MMPaymentMethodAssignedCaption: Label 'A payment method has already been assigned to the membership. Do you want to change it?';
+        MembershipSubscPayerEmailTitle: Label 'Enter Payer E-mail';
+        MembershipSubscPayerEmailCaption: Label 'Please enter the e-mail address of the person paying for this subscription.';
     begin
         WorkflowConfig.AddJavascript(GetActionScript());
         WorkflowConfig.AddActionDescription(ActionDescription);
@@ -24,6 +26,8 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         WorkflowConfig.AddBooleanParameter('tryEndSale', true, EndSaleName, EndSaleNameDesc);
         WorkflowConfig.AddTextParameter('paymentNo', '', PaymentMethodCodeName, PaymentMethodCodeName);
         WorkflowConfig.AddLabel('paymentMethodAssignedCaption', MMPaymentMethodAssignedCaption);
+        WorkflowConfig.AddLabel('MembershipSubscPayerEmailTitle', MembershipSubscPayerEmailTitle);
+        WorkflowConfig.AddLabel('MembershipSubscPayerEmailCaption', MembershipSubscPayerEmailCaption);
     end;
 
     procedure RunWorkflow(Step: Text; Context: codeunit "NPR POS JSON Helper"; FrontEnd: codeunit "NPR POS Front End Management"; Sale: codeunit "NPR POS Sale"; SaleLine: codeunit "NPR POS Sale Line"; PaymentLine: codeunit "NPR POS Payment Line"; Setup: codeunit "NPR POS Setup");
@@ -33,6 +37,8 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
                 Frontend.WorkflowResponse(PreparePreWorkflows(Context));
             'preparePaymentWorkflow':
                 Frontend.WorkflowResponse(PreparePayment(Sale, PaymentLine, Context));
+            'SetMembershipSubscPayerEmail':
+                SetMembershipSubscPayerEmail(Context, Sale);
             'tryEndSale':
                 Frontend.WorkflowResponse(AttemptEndSale(Context));
             'doLegacyPaymentWorkflow':
@@ -55,6 +61,7 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         TextAmountLabel: Label 'Enter Amount';
         ForceAmount: Boolean;
         CollectReturnInformation: Boolean;
+        MembershipEmail: Text;
     begin
         SwitchToPaymentView(Context);
 #pragma warning disable AA0139
@@ -62,6 +69,7 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
 #pragma warning restore AA0139
 
         Sale.GetCurrentSale(SalePOS);
+
         Payments.PrepareForPayment(PaymentLine, PaymentMethodCode, WorkflowName, POSPaymentMethod, RemainingAmount, ForceAmount, CollectReturnInformation);
 
         Response.ReadFrom('{}');
@@ -75,6 +83,8 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         Response.Add('forceAmount', ForceAmount);
         Response.Add('mmPaymentMethodAssigned', Payments.CheckMMPaymentMethodAssigned(PaymentMethodCode, SalePOS));
         Response.Add('collectReturnInformation', CollectReturnInformation);
+        Response.Add('EnableMemberSubscPayerEmail', Payments.CheckMembershipSubscription(SalePOS, POSPaymentMethod, MembershipEmail));
+        Response.Add('membershipEmail', MembershipEmail);
         exit(Response);
     end;
 
@@ -184,11 +194,24 @@ codeunit 6059796 "NPR POS Action: Payment WF2" implements "NPR IPOS Workflow"
         exit(Response);
     end;
 
+    local procedure SetMembershipSubscPayerEmail(Context: Codeunit "NPR POS JSON Helper"; Sale: Codeunit "NPR POS Sale")
+    var
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+        PaymentUserAccount: Text;
+        PayerEmailMustBeSpecifiedErr: Label 'You must specify a payer e-mail address for the membership subscription.';
+    begin
+        PaymentUserAccount := Context.GetString('membershipPayerEmail');
+        if PaymentUserAccount = '' then
+            Error(PayerEmailMustBeSpecifiedErr);
+
+        MembershipMgtInternal.POSAssignMembershipPaymentUserAccount(Sale, PaymentUserAccount);
+    end;
+
     local procedure GetActionScript(): Text
     begin
         exit(
 //###NPR_INJECT_FROM_FILE:POSActionPaymentWF2.Codeunit.js###
-'const main=async({workflow:e,popup:o,parameters:a,context:r,captions:u})=>{const{HideAmountDialog:p,HideZeroAmountDialog:l}=a,{preWorkflows:i}=await e.respond("preparePreWorkflows");if(i)for(const m of Object.entries(i)){const[c,P]=m;c&&await e.run(c,{parameters:P})}const{dispatchToWorkflow:f,paymentType:d,remainingAmount:n,paymentDescription:y,amountPrompt:A,forceAmount:W,mmPaymentMethodAssigned:g,collectReturnInformation:w}=await e.respond("preparePaymentWorkflow");if(g&&!await o.confirm(u.paymentMethodAssignedCaption))return{};let t=n;if(!p&&(!l||n>0)){if(t=await o.numpad({title:y,caption:A,value:n}),t===null)return{};if(t===0&&n>0)return{}}if(w&&n===t&&!(await e.run("DATA_COLLECTION",{parameters:{requestCollectInformation:"ReturnInformation"}})).success)return{};let{postWorkflows:N}=await e.respond("preparePostWorkflows",{paymentAmount:t});if(await processWorkflows(N),t===0&&n===0&&!W)return await e.run("END_SALE",{parameters:{calledFromWorkflow:"PAYMENT_2",paymentNo:a.paymentNo}}),{};const s=await e.run(f,{context:{paymentType:d,suggestedAmount:t,remainingAmount:n}});return s.legacy?(r.fallbackAmount=t,await e.respond("doLegacyPaymentWorkflow")):s.tryEndSale&&a.tryEndSale&&await e.run("END_SALE",{parameters:{calledFromWorkflow:"PAYMENT_2",paymentNo:a.paymentNo}}),{success:s.success}};async function processWorkflows(e){if(e)for(const[o,{mainParameters:a,customParameters:r}]of Object.entries(e))await workflow.run(o,{context:{customParameters:r},parameters:a})}'
+'const main=async({workflow:e,popup:r,parameters:n,context:i,captions:o})=>{const{HideAmountDialog:c,HideZeroAmountDialog:p}=n,{preWorkflows:m}=await e.respond("preparePreWorkflows");if(m)for(const l of Object.entries(m)){const[u,N]=l;u&&await e.run(u,{parameters:N})}const{dispatchToWorkflow:f,paymentType:y,remainingAmount:t,paymentDescription:d,amountPrompt:A,forceAmount:E,mmPaymentMethodAssigned:P,collectReturnInformation:b,EnableMemberSubscPayerEmail:W,membershipEmail:g}=await e.respond("preparePaymentWorkflow");if(P&&!await r.confirm(o.paymentMethodAssignedCaption))return{};if(W){if(i.membershipPayerEmail=await r.input({title:o.MembershipSubscPayerEmailTitle,caption:o.MembershipSubscPayerEmailCaption,value:g}),i.membershipPayerEmail===null)return{};await e.respond("SetMembershipSubscPayerEmail")}let a=t;if(!c&&(!p||t>0)){if(a=await r.numpad({title:d,caption:A,value:t}),a===null)return{};if(a===0&&t>0)return{}}if(b&&t===a&&!(await e.run("DATA_COLLECTION",{parameters:{requestCollectInformation:"ReturnInformation"}})).success)return{};let{postWorkflows:w}=await e.respond("preparePostWorkflows",{paymentAmount:a});if(await processWorkflows(w),a===0&&t===0&&!E)return await e.run("END_SALE",{parameters:{calledFromWorkflow:"PAYMENT_2",paymentNo:n.paymentNo}}),{};const s=await e.run(f,{context:{paymentType:y,suggestedAmount:a,remainingAmount:t}});return s.legacy?(i.fallbackAmount=a,await e.respond("doLegacyPaymentWorkflow")):s.tryEndSale&&n.tryEndSale&&await e.run("END_SALE",{parameters:{calledFromWorkflow:"PAYMENT_2",paymentNo:n.paymentNo}}),{success:s.success}};async function processWorkflows(e){if(e)for(const[r,{mainParameters:n,customParameters:i}]of Object.entries(e))await workflow.run(r,{context:{customParameters:i},parameters:n})}'
         );
     end;
 }

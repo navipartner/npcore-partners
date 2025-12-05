@@ -25,12 +25,23 @@ const main = async ({ workflow, popup, parameters, context, captions }) => {
     forceAmount,
     mmPaymentMethodAssigned,
     collectReturnInformation,
-  } = await workflow.respond("preparePaymentWorkflow");
-  
+    EnableMemberSubscPayerEmail,
+    membershipEmail,
+  } = await workflow.respond("preparePaymentWorkflow");  
   if (mmPaymentMethodAssigned) {
     if (!(await popup.confirm(captions.paymentMethodAssignedCaption)))
       return {};
   }
+  if (EnableMemberSubscPayerEmail) {
+    context.membershipPayerEmail = await popup.input({
+      title: captions.MembershipSubscPayerEmailTitle,
+      caption: captions.MembershipSubscPayerEmailCaption,
+      value: membershipEmail,
+    });
+    if (context.membershipPayerEmail === null) return {}; // user cancelled dialog
+    await workflow.respond("SetMembershipSubscPayerEmail");
+  }
+
   let suggestedAmount = remainingAmount;
   if (!HideAmountDialog && (!HideZeroAmountDialog || remainingAmount > 0)) {
     suggestedAmount = await popup.numpad({

@@ -76,4 +76,44 @@ codeunit 6059778 "NPR POS Action: Payment WF2 BL"
                 PaymentMethodAssigned := EFTAdyenIntegration.CheckMMPaymentMethodAssignedToPOSSale(EFTSetup, SalePOS."Sales Ticket No.");
         end;
     end;
+
+    local procedure IsEFTSubscriptionPayment(POSPaymentMethod: Record "NPR POS Payment Method"; salePOS: Record "NPR POS Sale"): Boolean
+    var
+        EFTSetup: Record "NPR EFT Setup";
+        EFTAdyenIntegration: Codeunit "NPR EFT Adyen Integration";
+    begin
+
+        if POSPaymentMethod."Processing Type" <> POSPaymentMethod."Processing Type"::EFT then
+            exit(false);
+
+        EFTSetup.FindSetup(SalePOS."Register No.", POSPaymentMethod.Code);
+        case EFTSetup."EFT Integration Type" of
+            EFTAdyenIntegration.CloudIntegrationType(),
+            EFTAdyenIntegration.HWCIntegrationType():
+                exit(EFTAdyenIntegration.GetCreateRecurringContract(EFTSetup) <> 0);
+        end;
+
+        exit(false);
+    end;
+
+    internal procedure CheckMembershipSubscription(SalePOS: Record "NPR POS Sale"; PosPaymentMethod: Record "NPR POS Payment Method"; var MembershipEmail: Text): Boolean
+    var
+        NpPaySetup: Record "NPR Adyen Setup";
+        MembershipMgtInternal: Codeunit "NPR MM MembershipMgtInternal";
+    begin
+        if not NpPaySetup.Get() then
+            exit(false);
+
+        if not NpPaySetup."Collect Subscr. Payer Email" then
+            exit(false);
+
+        if not IsEFTSubscriptionPayment(PosPaymentMethod, SalePOS) then
+            exit(false);
+
+        if (not MembershipMgtInternal.MemberInfoCaptureExist(SalePOS)) and (not MembershipMgtInternal.POSMembershipSelected(SalePOS)) then
+            exit(false);
+
+        MembershipMgtInternal.GetMemberEmail(SalePOS, MembershipEmail);
+        exit(true);
+    end;
 }

@@ -313,7 +313,11 @@ table 6150801 "NPR Adyen Setup"
             DataClassification = CustomerContent;
             TableRelation = "No. Series";
         }
-
+        field(320; "Collect Subscr. Payer Email"; Boolean)
+        {
+            Caption = 'Collect Subscription Payer Email';
+            DataClassification = CustomerContent;
+        }
     }
     keys
     {
