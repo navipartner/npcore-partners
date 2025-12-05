@@ -243,7 +243,7 @@ types:
     examples:
       - name: ExampleCheckCouponDTOResponse
         value:
-          couponId: "{9D0CFD99-FA87-F011-B3A4-9453539B9919}"
+          couponId: "77a1b3c2-d5e6-f7a8-b9c0-d1e2f3a4b5c6"
           documentNo: "EXT-WEB-01"
           referenceNo: "C100007-VQ"
           couponType: "20%OFF"
@@ -288,3 +288,15 @@ types:
           open: true
           remainingQuantity: 3.0
           inUseQuantity: 3
+
+  FindCouponsResponse:
+    docs: The response body returned when finding coupons by search criteria.
+    properties:
+      coupons:
+        type: list<Coupon>
+        docs: List of coupons matching the search criteria.
+    examples:
+      - name: ExampleFindCouponsResponse
+        value:
+          coupons:
+            - $Coupon.ExampleCoupon

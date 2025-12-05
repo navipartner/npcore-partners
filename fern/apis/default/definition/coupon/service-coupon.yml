@@ -10,6 +10,33 @@ service:
   base-path: /coupon
 
   endpoints:
+    findCoupons:
+      display-name: Find Coupons
+      docs: Search for coupons based on customer number or reference number.
+      method: GET
+      path: ""
+      request:
+        name: findCoupons
+        query-parameters:
+          customerNo:
+            type: optional<string>
+            docs: Filter coupons by customer number.
+          referenceNo:
+            type: optional<string>
+            docs: Filter coupons by reference number.
+      response: couponTypes.FindCouponsResponse
+      examples:
+        - name: Example list of Coupons
+          path-parameters:
+            tenant: $globalApiTypes.tenant.Exampletenant
+            environment: $globalApiTypes.environment.ExampleenvironmentProduction
+            company: $globalApiTypes.Company.ExampleCompanyCronus
+          query-parameters:
+            customerNo: "C00120"
+            referenceNo: "9876543210987"
+          response:
+            body: $couponTypes.FindCouponsResponse.ExampleFindCouponsResponse
+
     getCoupon:
       display-name: Get Coupon
       docs: Retrieves the details of a specific coupon by its system ID.

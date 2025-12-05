@@ -35,5 +35,9 @@ enum 6059843 "NPR CouponApiFunctions"
     {
         Caption = 'Cancel coupon reservation';
     }
+    value(17; FIND_COUPON)
+    {
+        Caption = 'Find coupon';
+    }
 }
 #endif

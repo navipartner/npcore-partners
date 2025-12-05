@@ -178,6 +178,28 @@ codeunit 6248530 "NPR CouponApiAgent"
         exit(Response.RespondOK(Json));
     end;
 
+    internal procedure FindCoupons(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
+    var
+        NpDcCoupon: Record "NPR NpDc Coupon";
+        ResponseJson: Codeunit "NPR JSON Builder";
+    begin
+        if (Request.QueryParams().ContainsKey('customerNo')) then
+            NpDcCoupon.SetFilter("Customer No.", '=%1', CopyStr(UpperCase(Request.QueryParams().Get('customerNo')), 1, MaxStrLen(NpDcCoupon."Customer No.")));
+
+        if (Request.QueryParams().ContainsKey('referenceNo')) then
+            NpDcCoupon.SetFilter("Reference No.", '=%1', CopyStr(Request.QueryParams().Get('referenceNo'), 1, MaxStrLen(NpDcCoupon."Reference No.")));
+
+        ResponseJson.StartObject('');
+        ResponseJson.StartArray('coupons');
+        if NpDcCoupon.FindSet() then begin
+            repeat
+                CoupontoJson(NpDcCoupon, 'coupon', ResponseJson);
+            until NpDcCoupon.Next() = 0;
+        end;
+        ResponseJson.EndArray().EndObject();
+        exit(Response.RespondOK(ResponseJson));
+    end;
+
     internal procedure ReserveCoupon(var Request: Codeunit "NPR API Request") Response: Codeunit "NPR API Response"
     var
         NpDcCoupon: Record "NPR NpDc Coupon";
@@ -534,7 +556,7 @@ codeunit 6248530 "NPR CouponApiAgent"
 
     local procedure CoupontoJson(Coupon: Record "NPR NpDc Coupon"; JsonObjectName: Text; var Json: Codeunit "NPR Json Builder")
     begin
-        Coupon.CalcFields(Open);
+        Coupon.CalcFields(Open, "Remaining Quantity");
         Json.StartObject(JsonObjectName)
             .AddProperty('id', Format(Coupon.SystemId, 0, 4).ToLower())
             .AddProperty('no', Coupon."No.")

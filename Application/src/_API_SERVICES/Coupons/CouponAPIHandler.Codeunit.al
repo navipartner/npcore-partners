@@ -39,6 +39,8 @@ codeunit 6248528 "NPR CouponAPIHandler"
                 _Response := CouponApiAgent.CreateCoupon(_Request);
             _ApiFunction::GET_COUPON:
                 _Response := CouponApiAgent.GetCoupon(_Request);
+            _ApiFunction::FIND_COUPON:
+                _Response := CouponApiAgent.FindCoupons(_Request);
             _ApiFunction::DELETE_COUPON:
                 _Response := CouponApiAgent.DeleteCoupon(_Request);
             _ApiFunction::APPLY_COUPON_DISCOUNT:

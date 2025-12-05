@@ -11,6 +11,9 @@ codeunit 6248526 "NPR CouponAPI" implements "NPR API Request Handler"
         if (Request.Match('POST', '/coupon')) then
             exit(Handle(_ApiFunction::CREATE_COUPON, Request));
 
+        if Request.Match('GET', '/coupon') then
+            exit(Handle(_ApiFunction::FIND_COUPON, Request));
+
         if (Request.Match('GET', '/coupon/:couponId')) then
             exit(Handle(_ApiFunction::GET_COUPON, Request));
 
