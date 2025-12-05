@@ -101,7 +101,9 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
     begin
         StartTime := Time();
         Commit();
+        ClearLastError();
 
+        Request.SkipCacheIfNonStickyRequest(TicketTransactionTables());
         ApiName := ApiFunction.Names.Get(ApiFunction.Ordinals.IndexOf(ApiFunction.AsInteger())).ToLower();
 
         TicketingApiHandler.SetRequest(ApiFunction, Request);
@@ -109,7 +111,7 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
             Response := TicketingApiHandler.GetResponse();
             Response.AddSentryTag('bc.ticket_api.function_name', ApiName);
 
-            LogMessage(ApiFunction, (Time() - StartTime), Response.GetStatusCode(), Response, '');
+            LogMessage(Request, ApiFunction, (Time() - StartTime), Response.GetStatusCode(), Response, '');
             exit(Response);
         end;
 
@@ -121,7 +123,7 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
         Response.CreateErrorResponse(ApiError, ResponseMessage);
         Response.AddSentryTag('bc.ticket_api.function_name', ApiName);
 
-        LogMessage(ApiFunction, (Time() - StartTime), Response.GetStatusCode(), Response, CallStack);
+        LogMessage(Request, ApiFunction, (Time() - StartTime), Response.GetStatusCode(), Response, CallStack);
         exit(Response);
     end;
 
@@ -130,7 +132,7 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
         exit(Enum::"NPR API Error Code"::generic_error);
     end;
 
-    local procedure LogMessage(Function: Enum "NPR TicketingApiFunctions"; DurationMs: Decimal; HttpStatusCode: Integer; Response: Codeunit "NPR API Response"; CallStack: Text)
+    local procedure LogMessage(Request: Codeunit "NPR API Request"; Function: Enum "NPR TicketingApiFunctions"; DurationMs: Decimal; HttpStatusCode: Integer; Response: Codeunit "NPR API Response"; CallStack: Text)
     var
         CustomDimensions: Dictionary of [Text, Text];
         ActiveSession: Record "Active Session";
@@ -150,6 +152,7 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
         CustomDimensions.Add('NPR_CompanyName', CompanyName());
         CustomDimensions.Add('NPR_UserID', ActiveSession."User ID");
         CustomDimensions.Add('NPR_SessionId', Format(Database.SessionId(), 0, 9));
+        CustomDimensions.Add('NPR_StickyCache', CheckStickyCache(Request));
         CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
         CustomDimensions.Add('NPR_CallStack', CallStack);
 
@@ -169,6 +172,65 @@ codeunit 6185040 "NPR TicketingApi" implements "NPR API Request Handler"
 
             Session.LogMessage('NPR_API_Ticketing', ResponseMessage, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
         end;
+    end;
+
+    local procedure CheckStickyCache(var Request: Codeunit "NPR API Request"): Text
+    var
+        RequestServerId: Integer;
+    begin
+        if (Request.Headers().ContainsKey('x-server-cache-id')) then
+            if (Evaluate(RequestServerId, Request.Headers().Get('x-server-cache-id'))) then
+                if (RequestServerId = ServiceInstanceId()) then
+                    exit('sticky-cache [match]')
+                else
+                    exit(StrSubstNo('sticky-cache [%1 <> %2]', RequestServerId, ServiceInstanceId()));
+
+        exit('sticky-cache [no header]');
+    end;
+
+    internal procedure TicketTransactionTables() TableList: List of [Integer]
+    begin
+        TableList.Add(Database::"NPR TM Admission");
+        TableList.Add(Database::"NPR TM Ticket Admission BOM");
+
+        TableList.Add(Database::"NPR TM Adm. Dependency");
+        TableList.Add(Database::"NPR TM Adm. Dependency Line");
+        TableList.Add(Database::"NPR TM Admis. Schedule");
+        TableList.Add(Database::"NPR TM Admis. Schedule Entry");
+        TableList.Add(Database::"NPR TM Admis. Schedule Lines");
+
+        TableList.Add(Database::"NPR TM Ticket Access Fact");
+        TableList.Add(Database::"NPR TM Ticket Access Stats");
+
+        TableList.Add(Database::"NPR TM Notification Profile");
+        TableList.Add(Database::"NPR TM Notif. Profile Line");
+        TableList.Add(Database::"NPR TM Detained Notification");
+        TableList.Add(Database::"NPR TM Ticket Notif. Entry");
+
+        TableList.Add(Database::"NPR TM Ticket Type");
+        TableList.Add(Database::"NPR TM Ticket");
+        TableList.Add(Database::"NPR TM Ticket Access Entry");
+        TableList.Add(Database::"NPR TM Det. Ticket AccessEntry");
+        TableList.Add(Database::"NPR TM DurationGroup");
+        TableList.Add(Database::"NPR TM DynamicPriceItemList");
+        TableList.Add(Database::"NPR TM Dynamic Price Profile");
+        TableList.Add(Database::"NPR TM Dynamic Price Rule");
+        TableList.Add(Database::"NPR TM TicketRequestMutex");
+        TableList.Add(Database::"NPR TM Ticket Reservation Req.");
+        TableList.Add(Database::"NPR TM Ticket Reserv. Resp.");
+
+        TableList.Add(Database::"NPR TM DeferRevenueProfile");
+        TableList.Add(Database::"NPR TM DeferRevenueReqDetail");
+        TableList.Add(Database::"NPR TM DeferRevenueRequest");
+        TableList.Add(Database::"NPR TM DeferralCue");
+
+        TableList.Add(Database::"NPR TM CouponProfile");
+        TableList.Add(Database::"NPR TM TicketCoupons");
+        TableList.Add(Database::"NPR TM POS Default Admission");
+        TableList.Add(Database::"NPR TM ImportTicketHeader");
+        TableList.Add(Database::"NPR TM ImportTicketLine");
+        TableList.Add(Database::"NPR TM TicketHolder");
+        TableList.Add(Database::"NPR TM Category");
     end;
 
 }

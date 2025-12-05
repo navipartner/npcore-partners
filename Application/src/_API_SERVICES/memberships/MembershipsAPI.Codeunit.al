@@ -219,10 +219,12 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
         Commit();
         ClearLastError();
 
+        Request.SkipCacheIfNonStickyRequest(MembershipTransactionTables());
+
         MembershipApiHandler.SetRequest(ApiFunction, Request);
         if (MembershipApiHandler.Run()) then begin
             Response := MembershipApiHandler.GetResponse();
-            LogMessage(ApiFunction, (Time() - StartTime), Response.GetStatusCode(), Response);
+            LogMessage(Request, ApiFunction, (Time() - StartTime), Response.GetStatusCode(), Response);
             exit(Response);
         end;
 
@@ -230,7 +232,7 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
         ApiError := ErrorToEnum(ResponseMessage);
 
         Response.CreateErrorResponse(ApiError, ResponseMessage);
-        LogMessage(ApiFunction, (Time() - StartTime), Response.GetStatusCode(), Response);
+        LogMessage(Request, ApiFunction, (Time() - StartTime), Response.GetStatusCode(), Response);
         exit(Response);
     end;
 
@@ -266,7 +268,8 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
         exit(Enum::"NPR API Error Code"::generic_error);
     end;
 
-    local procedure LogMessage(Function: Enum "NPR MembershipApiFunctions";
+    local procedure LogMessage(Request: Codeunit "NPR API Request";
+        Function: Enum "NPR MembershipApiFunctions";
         DurationMs: Decimal;
         HttpStatusCode: Integer;
         Response: Codeunit "NPR API Response")
@@ -289,6 +292,7 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
         CustomDimensions.Add('NPR_CompanyName', CompanyName());
         CustomDimensions.Add('NPR_UserID', ActiveSession."User ID");
         CustomDimensions.Add('NPR_SessionId', Format(Database.SessionId(), 0, 9));
+        CustomDimensions.Add('NPR_StickyCache', CheckStickyCache(Request));
         CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
 
         if (HttpStatusCode in [200 .. 299]) then begin
@@ -309,6 +313,91 @@ codeunit 6185113 "NPR MembershipsAPI" implements "NPR API Request Handler"
         end;
     end;
 
+    local procedure CheckStickyCache(var Request: Codeunit "NPR API Request"): Text
+    var
+        RequestServerId: Integer;
+    begin
+        if (Request.Headers().ContainsKey('x-server-cache-id')) then
+            if (Evaluate(RequestServerId, Request.Headers().Get('x-server-cache-id'))) then
+                if (RequestServerId = ServiceInstanceId()) then
+                    exit('sticky-cache [match]')
+                else
+                    exit(StrSubstNo('sticky-cache [%1 <> %2]', RequestServerId, ServiceInstanceId()));
+
+        exit('sticky-cache [no header]');
+    end;
+
+    internal procedure MembershipTransactionTables() TableList: List of [Integer]
+    begin
+        TableList.Add(Database::"NPR MM Member Info Capture");
+        TableList.Add(Database::"NPR MM Member");
+        TableList.Add(Database::"NPR MM Member Card");
+        TableList.Add(Database::"NPR MM Membership");
+        TableList.Add(Database::"NPR MM Membership Entry");
+        TableList.Add(Database::"NPR MM Membership Role");
+
+        TableList.Add(Database::"NPR MM Admis. Scanner Stations");
+        TableList.Add(Database::"NPR MM Admis. Service Entry");
+        TableList.Add(Database::"NPR MM Admis. Service Log");
+
+        TableList.Add(Database::"NPR MM Language");
+        TableList.Add(Database::"NPR MM Member Communication");
+        TableList.Add(Database::"NPR MM Membership Notific.");
+        TableList.Add(Database::"NPR MMMemberNotificEntryBuf");
+        TableList.Add(Database::"NPR MM Member Notific. Entry");
+        TableList.Add(Database::"NPR MM Member Arr. Log Entry");
+
+        TableList.Add(Database::"NPR MM Members. Alter. Group");
+        TableList.Add(Database::"NPR MM Members. Alter. Line");
+
+        TableList.Add(Database::"NPR MM Pending Customer Update");
+        TableList.Add(Database::"NPR MM POS Sales Info");
+
+        TableList.Add(Database::"NPR MM Request Member Update");
+        TableList.Add(Database::"NPR MM Sponsors. Ticket Entry");
+
+        TableList.Add(Database::"NPR MM AchActivity");
+        TableList.Add(Database::"NPR MM AchActivityCondition");
+        TableList.Add(Database::"NPR MM AchActivityEntry");
+        TableList.Add(Database::"NPR MM AchGoal");
+        TableList.Add(Database::"NPR MM Achievement");
+        TableList.Add(Database::"NPR MM AchReward");
+
+        TableList.Add(Database::"NPR MM POS Loyalty Profile");
+        TableList.Add(Database::"NPR MM Loyalty Setup");
+        TableList.Add(Database::"NPR MM Loy. Item Point Setup");
+        TableList.Add(Database::"NPR MM Loyalty Sales Channel");
+        TableList.Add(Database::"NPR MM LoyaltyRetryQueue");
+        TableList.Add(Database::"NPR MM Loyalty Store Setup");
+        TableList.Add(Database::"NPR MM Loy. LedgerEntry (Srvr)");
+        TableList.Add(Database::"NPR MM Loyalty Alter Members.");
+        TableList.Add(Database::"NPR MM Loyalty Point Setup");
+        TableList.Add(Database::"NPR MM MembershipLoyaltyJnl");
+        TableList.Add(Database::"NPR MM Members. Points Entry");
+        TableList.Add(Database::"NPR MM Members. Points Summary");
+
+        TableList.Add(Database::"NPR MM Member Payment Method");
+        TableList.Add(Database::"NPR MM MembershipPmtMethodMap");
+        TableList.Add(Database::"NPR MM Renewal Sched Hdr");
+        TableList.Add(Database::"NPR MM Renewal Sched Line");
+        TableList.Add(Database::"NPR MM Subs Adyen PG Setup");
+        TableList.Add(Database::"NPR MM Subscription");
+        TableList.Add(Database::"NPR MM Subscription Log");
+        TableList.Add(Database::"NPR MM Subscription Template");
+        TableList.Add(Database::"NPR MM Subscription Transact.");
+        TableList.Add(Database::"NPR MM Subscr. Request");
+        TableList.Add(Database::"NPR MM Subs Req Log Entry");
+        TableList.Add(Database::"NPR MM Subscr. Payment Request");
+        TableList.Add(Database::"NPR MM Subs. Payment Gateway");
+        TableList.Add(Database::"NPR MM Subs Pay Req Log Entry");
+        TableList.Add(Database::"NPR MM Add. Info. Request");
+        TableList.Add(Database::"NPR MM Add. Info. Response");
+        TableList.Add(Database::"NPR MM VippsMP Login Setup");
+        TableList.Add(Database::"NPR MM Payment Reconci.");
+        TableList.Add(Database::"NPR MM Recur. Paym. Setup");
+        TableList.Add(Database::"NPR MM Membership Auto Renew");
+        TableList.Add(Database::"NPR MM Membership Entry Link");
+    end;
 
 }
 #endif

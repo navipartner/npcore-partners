@@ -43,6 +43,8 @@ codeunit 6248329 "NPR AttrWalletAPI" implements "NPR API Request Handler"
         Commit();
         ClearLastError();
 
+        Request.SkipCacheIfNonStickyRequest(AttractionWalletTransactionTables());
+
         AttrWalletAPIHandler.SetRequest(ApiFunction, Request);
         if (AttrWalletAPIHandler.Run()) then begin
             Response := AttrWalletAPIHandler.GetResponse();
@@ -107,6 +109,29 @@ codeunit 6248329 "NPR AttrWalletAPI" implements "NPR API Request Handler"
 
             Session.LogMessage('NPR_API_Membership', ResponseMessage, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
         end;
+    end;
+
+    local procedure AttractionWalletTransactionTables() TableList: List of [Integer]
+    begin
+        TableList.Add(Database::"NPR AttractionWallet");
+        TableList.Add(Database::"NPR AttractionWalletExtRef");
+        TableList.Add(Database::"NPR AttractionWalletSaleHdr");
+        TableList.Add(Database::"NPR AttractionWalletSaleLine");
+        TableList.Add(Database::"NPR WalletAssetHeader");
+        TableList.Add(Database::"NPR WalletAssetHeaderReference");
+        TableList.Add(Database::"NPR WalletAssetLine");
+        TableList.Add(Database::"NPR WalletAssetLineReference");
+
+        TableList.Add(Database::"NPR MM Member Card");
+        TableList.Add(Database::"NPR MM Member");
+        TableList.Add(Database::"NPR MM Membership");
+        TableList.Add(Database::"NPR MM Membership Role");
+
+        TableList.Add(Database::"NPR TM Ticket");
+        TableList.Add(Database::"NPR TM Ticket Type");
+        TableList.Add(Database::"NPR TM Ticket Access Entry");
+        TableList.Add(Database::"NPR TM Det. Ticket AccessEntry");
+        TableList.Add(Database::"NPR TM Ticket Reservation Req.");
     end;
 
 }

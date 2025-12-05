@@ -137,13 +137,15 @@ codeunit 6185116 "NPR ApiSpeedgate" implements "NPR API Request Handler"
         StartTime: Time;
     begin
         StartTime := Time();
-
         Commit();
+        ClearLastError();
+
+        Request.SkipCacheIfNonStickyRequest(SpeedGateTransactionTables());
         SpeedgateHandler.SetRequest(Function, Request);
 
         if (SpeedgateHandler.Run()) then begin
             Response := SpeedgateHandler.GetResponse();
-            LogMessage(Function, (Time() - StartTime), Response.GetStatusCode(), Response);
+            LogMessage(Request, Function, (Time() - StartTime), Response.GetStatusCode(), Response);
             exit(Response);
         end;
 
@@ -157,11 +159,11 @@ codeunit 6185116 "NPR ApiSpeedgate" implements "NPR API Request Handler"
         end;
 
         Response.CreateErrorResponse(ApiError, ResponseMessage);
-        LogMessage(Function, (Time() - StartTime), Response.GetStatusCode(), Response);
+        LogMessage(Request, Function, (Time() - StartTime), Response.GetStatusCode(), Response);
         exit(Response);
     end;
 
-    local procedure LogMessage(Function: Enum "NPR ApiSpeedgateFunctions"; DurationMs: Decimal; HttpStatusCode: Integer; Response: Codeunit "NPR API Response")
+    local procedure LogMessage(Request: Codeunit "NPR API Request"; Function: Enum "NPR ApiSpeedgateFunctions"; DurationMs: Decimal; HttpStatusCode: Integer; Response: Codeunit "NPR API Response")
     var
         CustomDimensions: Dictionary of [Text, Text];
         ActiveSession: Record "Active Session";
@@ -181,6 +183,7 @@ codeunit 6185116 "NPR ApiSpeedgate" implements "NPR API Request Handler"
         CustomDimensions.Add('NPR_CompanyName', CompanyName());
         CustomDimensions.Add('NPR_UserID', ActiveSession."User ID");
         CustomDimensions.Add('NPR_SessionId', Format(Database.SessionId(), 0, 9));
+        CustomDimensions.Add('NPR_StickyCache', CheckStickyCache(Request));
         CustomDimensions.Add('NPR_ClientComputerName', ActiveSession."Client Computer Name");
 
         if (HttpStatusCode in [200 .. 299]) then begin
@@ -200,6 +203,20 @@ codeunit 6185116 "NPR ApiSpeedgate" implements "NPR API Request Handler"
 
             Session.LogMessage('NPR_API_Speedgate', ResponseMessage, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
         end;
+    end;
+
+    local procedure CheckStickyCache(var Request: Codeunit "NPR API Request"): Text
+    var
+        RequestServerId: Integer;
+    begin
+        if (Request.Headers().ContainsKey('x-server-cache-id')) then
+            if (Evaluate(RequestServerId, Request.Headers().Get('x-server-cache-id'))) then
+                if (RequestServerId = ServiceInstanceId()) then
+                    exit('sticky-cache [match]')
+                else
+                    exit(StrSubstNo('sticky-cache [%1 <> %2]', RequestServerId, ServiceInstanceId()));
+
+        exit('sticky-cache [no header]');
     end;
 
     local procedure ErrorToEnum(ErrorMessage: Text): Enum "NPR API Error Code"
@@ -253,6 +270,34 @@ codeunit 6185116 "NPR ApiSpeedgate" implements "NPR API Request Handler"
 
         if (ErrorMessage.StartsWith('[-3149]')) then
             Exit(Enum::"NPR API Error Code"::member_card_limitation_error);
+
+    end;
+
+    local procedure SpeedGateTransactionTables() TableList: List of [Integer]
+    begin
+
+        TableList.Add(Database::"NPR SGEntryLog");
+
+        TableList.Add(Database::"NPR MM Member Card");
+        TableList.Add(Database::"NPR MM Member");
+        TableList.Add(Database::"NPR MM Membership");
+        TableList.Add(Database::"NPR MM Membership Entry");
+        TableList.Add(Database::"NPR MM Membership Role");
+
+        TableList.Add(Database::"NPR TM Ticket");
+        TableList.Add(Database::"NPR TM Ticket Type");
+        TableList.Add(Database::"NPR TM Ticket Access Entry");
+        TableList.Add(Database::"NPR TM Det. Ticket AccessEntry");
+        TableList.Add(Database::"NPR TM Ticket Reservation Req.");
+
+        TableList.Add(Database::"NPR AttractionWallet");
+        TableList.Add(Database::"NPR AttractionWalletExtRef");
+        TableList.Add(Database::"NPR AttractionWalletSaleHdr");
+        TableList.Add(Database::"NPR AttractionWalletSaleLine");
+        TableList.Add(Database::"NPR WalletAssetHeader");
+        TableList.Add(Database::"NPR WalletAssetHeaderReference");
+        TableList.Add(Database::"NPR WalletAssetLine");
+        TableList.Add(Database::"NPR WalletAssetLineReference");
 
     end;
 }
