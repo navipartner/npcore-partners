@@ -98,4 +98,89 @@ codeunit 6185029 "NPR MM Subscription Mgt."
             ListOfMembershipEntryNo.Add(Membership."Entry No.");
     end;
 #endif
+
+#if not BC17 and not BC18 and not BC19 and not BC20 and not BC21 and not BC22
+    /// <summary>
+    /// Requests termination of a subscription for a given membership
+    /// </summary>
+    /// <param name="Membership">The membership record to terminate</param>
+    /// <param name="RequestedDate">The requested termination date</param>
+    /// <param name="Reason">The reason for termination</param>
+    /// <param name="Refund">If true, a refund will be processed for the remaining period</param>
+    /// <param name="RefundItemNo">The item number to use for the refund (required if Refund is true)</param>
+    /// <param name="RefundPrice">The refund price to use (required if Refund is true, must be negative)</param>
+    /// <returns>True if termination request was successful, false otherwise</returns>
+    procedure RequestSubscriptionTermination(var Membership: Record "NPR MM Membership"; RequestedDate: Date; Reason: Enum "NPR MM Subs Termination Reason"; Refund: Boolean; RefundItemNo: Code[20]; RefundPrice: Decimal): Boolean
+    var
+        SubscriptionMgtImpl: Codeunit "NPR MM Subscription Mgt. Impl.";
+        SubscrReversalMgt: Codeunit "NPR MM Subscr. Reversal Mgt.";
+        Subscription: Record "NPR MM Subscription";
+        RefundItemNoMissingErr: Label 'Refund item number is required when Refund is set to true.';
+    begin
+        // Validate refund parameters
+        if Refund and (RefundItemNo = '') then
+            Error(RefundItemNoMissingErr);
+
+        // Request termination first
+        if not SubscriptionMgtImpl.RequestTermination(Membership, RequestedDate, Reason) then
+            exit(false);
+
+        // If refund is requested, process the partial refund
+        if Refund then begin
+            // Get the subscription record
+            if not SubscriptionMgtImpl.GetSubscriptionFromMembership(Membership."Entry No.", Subscription) then
+                exit(false);
+
+            // Request the partial refund with the provided price
+            SubscrReversalMgt.RequestPartialRefund(Subscription, Membership, RefundItemNo, RequestedDate, RefundPrice);
+        end;
+
+        exit(true);
+    end;
+
+    /// <summary>
+    /// Calculates and returns the refund item details for a subscription
+    /// </summary>
+    /// <param name="Membership">The membership record</param>
+    /// <param name="RequestedDate">The date from which the refund applies</param>
+    /// <param name="RefundItemNo">Output: The suggested item number to use for the refund</param>
+    /// <param name="RefundPrice">Output: The calculated refund price (negative value)</param>
+    /// <returns>True if refund item was calculated successfully, false otherwise</returns>
+    procedure CalculateTerminationRefundItem(Membership: Record "NPR MM Membership"; RequestedDate: Date; var RefundItemNo: Code[20]; var RefundPrice: Decimal): Boolean
+    var
+        AlterationSetup: Record "NPR MM Members. Alter. Setup";
+        TempMemberInfoCapture: Record "NPR MM Member Info Capture" temporary;
+        MembershipMgt: Codeunit "NPR MM MembershipMgtInternal";
+        StartDate, EndDate : Date;
+        RefundAvailable: Boolean;
+    begin
+        // Find suggested refund item from alteration setup
+        AlterationSetup.SetRange("Alteration Type", AlterationSetup."Alteration Type"::CANCEL);
+        AlterationSetup.SetRange("From Membership Code", Membership."Membership Code");
+        AlterationSetup.SetRange("Alteration Activate From", AlterationSetup."Alteration Activate From"::ASAP);
+
+        if AlterationSetup.FindSet() then
+            repeat
+                RefundItemNo := AlterationSetup."Sales Item No.";
+
+                // Initialize member info capture for cancellation
+                TempMemberInfoCapture.Init();
+                TempMemberInfoCapture."Membership Entry No." := Membership."Entry No.";
+                TempMemberInfoCapture."Item No." := RefundItemNo;
+                TempMemberInfoCapture."Information Context" := TempMemberInfoCapture."Information Context"::CANCEL;
+                TempMemberInfoCapture."Document Date" := RequestedDate;
+
+                // Try to calculate refund price with this item
+                RefundAvailable := MembershipMgt.CancelMembership(TempMemberInfoCapture, false, false, StartDate, EndDate, RefundPrice);
+            until (AlterationSetup.Next() = 0) or RefundAvailable;
+
+        if not RefundAvailable then begin
+            Clear(RefundItemNo);
+            Clear(RefundPrice);
+            exit(false);
+        end;
+
+        exit(true);
+    end;
+#endif
 }
